@@ -6,6 +6,22 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-09-22 - A loading Button stays at full colour
+
+**Decision.** The Button base classes gain `aria-busy:opacity-100`, so a loading button keeps its colour instead of dimming (PLAN.md 8.4).
+
+**Why.** Found while drawing the Button states in Figma. `index.tsx` sets `disabled: disabled || loading`, and the base classes carry `disabled:opacity-50`, so every loading button would have rendered at half opacity and read as disabled. Loading and disabled are different states and must look different: loading keeps full colour, shows the spinner and sets `aria-busy`; disabled dims.
+
+**Affects.** PLAN.md 8.4 and every component that follows the same pattern. The Figma states matrix shows the two side by side, which is how the clash was noticed - the reason Figma comes before code.
+
+## 2026-09-22 - Button hover, active and soft-hover become real tokens
+
+**Decision.** The Semantic collection gains `<tone>/hover`, `<tone>/active`, `<tone>/soft-hover` and `<tone>/soft-active` for the three Button tones, and the Palette gains `violet/800`, `red/500`, `red/800`, `cyan/800`, `cyan/900`.
+
+**Why.** PLAN.md 8.4 says tones set `--tc-hover`, `--tc-active` and `--tc-soft-hover`, but no such variables existed, and 6.6 forbids a raw colour anywhere in the Figma file. Solid hover and active step one and two shades toward more contrast with the page: darker in light mode, lighter in dark mode, because a near-black neutral button cannot get darker. The soft steps were derived the same way the existing `soft` values were - an oklch mix of the solid into the page - which measured at exactly 12%, so hover is 20% and active 28%.
+
+**Affects.** The Semantic collection is now 45 variables, the Palette 36. `shared/classes.ts` `HOVER` reads these. Success, warning and info do not have them yet; add them when a component needs a toned hover outside Button's three.
+
 ## 2026-09-21 - Icon takes the five size names too; only its default differs
 
 **Decision.** `<Icon>` accepts `xs | sm | md | lg | xl` against its own pixel values - `ICON_SIZE = { xs: 16, sm: 20, md: 24, lg: 32, xl: 40 }` - as well as any CSS length. Its default stays `1em`, not `md` (R-5.7-2, PLAN.md 5.7 and 7.3).

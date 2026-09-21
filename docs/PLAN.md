@@ -1122,7 +1122,7 @@ export const buttonVariants = cva(
   [
     'inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium',
     'rounded-control border-transparent',
-    'disabled:pointer-events-none disabled:opacity-50 aria-busy:cursor-progress',
+    'disabled:pointer-events-none disabled:opacity-50 aria-busy:opacity-100 aria-busy:cursor-progress',
     BORDER,
     FOCUS_RING,
     TOUCH_TARGET,
