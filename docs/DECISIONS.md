@@ -22,13 +22,13 @@ The format is: date, decision, why, and what it affects.
 
 **Affects.** PLAN.md O3, the type specimen on the Foundations page, and `next/font` in Phase 0's docs skeleton. The library still ships no font.
 
-## 2026-09-21 - The starter icon set is 62 named icons
+## 2026-09-21 - The starter icon set is 80 named icons, including three solid variants
 
-**Decision.** The starter set is fixed at the 62 Phosphor `regular` icons listed in `docs/icons.md`, thirteen of which flip in RTL.
+**Decision.** The starter set is fixed at the 80 Phosphor icons listed in `docs/icons.md`, sixteen of which flip in RTL. Seventy-seven come from the `regular` weight; `star-fill`, `circle-fill` and `heart-fill` come from the `fill` weight.
 
-**Why.** The plan said "the first 40 to 60 icons" without naming them, which left Phase 2 and the Figma page free to diverge. Naming the list once makes `packages/icons/raw/` and the Figma Icons page checkable against each other.
+**Why.** The plan said "the first 40 to 60 icons" without naming them, which left Phase 2 and the Figma page free to diverge. An audit of the tier-1 catalog against the first 62 found nine that a component cannot render a state without - Rating has no filled star, RadioGroup no selected dot, Pagination no first and last, Table no sort direction, ThemeSwitcher no "system", nothing for a drag handle or an external link - so the set was completed before the Figma page is signed off rather than after.
 
-**Affects.** PLAN.md 7.2 and Phase 2. `sign-out`, `paper-plane-tilt` and `sidebar-simple` are the manual directional entries: the `arrow-*` / `caret-*` / `chevron-*` patterns do not catch them, and all three point along the reading direction.
+**Affects.** PLAN.md 7.2 and Phase 2. Two points worth keeping: the `fill` weight is a separate folder in Phosphor, named `<name>-fill.svg`, and is used only where an outline cannot express an on state; and `sign-out`, `paper-plane-tilt` and `sidebar-simple` remain the manual directional entries, because the `arrow-*` / `caret-*` / `chevron-*` patterns do not catch them.
 
 ## 2026-09-21 - Everything is designed in Figma before it is built
 

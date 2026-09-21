@@ -2030,7 +2030,7 @@ Everything a component will ever need, built and tested before any component exi
 
 ## Phase 2 - Icons
 
-**Build:** `packages/icons` (section 7) - the build pipeline, the 62 icons of the starter set listed in `docs/icons.md`, the generated modules, names, directional list and loaders - plus `<Icon>` and `<Svg>` wired up, the icons page as a collection, and the `topclassui-icons add-set` CLI.
+**Build:** `packages/icons` (section 7) - the build pipeline, the 80 icons of the starter set listed in `docs/icons.md`, the generated modules, names, directional list and loaders - plus `<Icon>` and `<Svg>` wired up, the icons page as a collection, and the `topclassui-icons add-set` CLI.
 
 **Accept when:** a wrong icon name is a TypeScript error; directional icons flip in RTL and others do not; a page that renders icons makes no icon requests and ships no icon JavaScript from a Server Component; a client component that imports one icon ships only that icon; `<Icon className="hidden md:inline-block" />` is actually hidden, proving `cn()` is used; decorative and labelled icons pass axe; the icons page keeps its DOM under the collection limit with twenty thousand entries registered.
 
