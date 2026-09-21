@@ -1,0 +1,109 @@
+<!-- Generated from docs/RULES.md by `pnpm rules:sync`. Do not edit. -->
+
+# TopClass UI - working rules
+
+The full specification is docs/PLAN.md; the rules below are the complete list; do not deviate without a docs/DECISIONS.md entry.
+
+## Commands
+
+```
+pnpm check            lint + typecheck + unit tests + structure/boundary/contrast + rules:sync
+pnpm test:visual      Playwright visual matrix (baselines are Linux-only)
+pnpm test:e2e         Playwright behaviour tests
+pnpm size             bundle budgets
+pnpm new:component x  scaffold a component folder
+pnpm icons:build      regenerate the icon modules
+pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from docs/RULES.md
+```
+
+## How to work
+
+- One phase at a time (PLAN.md section 19), one catalog row (section 18) per branch and per pull request.
+- Read docs/DECISIONS.md before proposing anything that looks like a decision; it may already be made.
+- Check the installed package's types before using an API. Never guess an API.
+- Run `pnpm check` before reporting done, and report the real output.
+- If a rule cannot be followed, stop and ask. Do not silently deviate.
+- No new dependency and no extra scope without naming it, its purpose and its size.
+
+## 1. Server and client
+
+- **R-5.1-1** `index.tsx` never contains `'use client'`, never imports a React client hook (only `useId` and `use` are allowed) and never imports `./hook.js`. _(check-boundaries)_
+- **R-5.1-2** For a C component or a connector, `index.tsx` holds no markup: it re-exports the client parts, the prop types, the variants and the skeleton. _(check-structure)_
+- **R-5.1-3** Only serializable props cross the boundary: strings, numbers, booleans, plain objects, arrays and `ReactNode` children; functions never, except Server Actions. _(manual)_
+- **R-5.1-4** No React context in Server Components: direction and theme come from `dir` and `data-theme` on the HTML; labels come from props. _(check-boundaries)_
+- **R-9.2-3** Export flat names (`DialogRoot`), never an object (`Dialog.Root`) that a server file would dot into. _(eslint)_
+
+## 2. Styling
+
+- **R-5.2-1** Semantic classes only inside `packages/react`; palette classes, arbitrary colours and the `dark:` variant are banned. _(eslint)_
+- **R-5.2-2** Merge classes with `cn()` from `shared/cn.ts`, which uses `extendTailwindMerge`; the consumer's `className` is passed last. _(eslint + unit test)_
+- **R-5.2-3** Never build class names dynamically; use a lookup object or cva variants. _(eslint)_
+- **R-5.2-4** Sizes, radius, border width, the focus ring, hover, transitions and scroll classes come from the knobs and `shared/classes.ts`; never `rounded-md`, `h-10`, `outline-2`, `duration-200`, or a hand-written `hover:` or `focus-visible:`. _(eslint)_
+- **R-5.2-5** `style` is only for setting a `--tc-*` variable. _(eslint)_
+- **R-5.2-6** Write bare data and aria variants (`data-open:`, `group-data-panel-open:`, `aria-busy:`); brackets only for values. _(eslint)_
+- **R-4-1** Only custom-property declarations and `@keyframes` may be unlayered; other rules go in `@layer base` (tokens) or `@layer components` (react). _(stylelint)_
+
+## 3. RTL
+
+- **R-5.3-1** Logical utilities only (`ps-`, `pe-`, `ms-`, `me-`, `inset-s-`, `inset-e-`, `text-start`, `border-s`, `rounded-s`); never physical `left`/`right`, never the deprecated `start-*`/`end-*`, never `space-x` or `divide-x`. _(eslint)_
+- **R-5.3-2** Translate, transform origin and gradient direction multiply by `--tc-dir`; `object-*` and `bg-*` positions use an `rtl:` variant. _(eslint)_
+- **R-5.3-3** No `tracking-*` anywhere inside `packages/react`. _(eslint)_
+- **R-5.3-4** Use the `placement` prop, which maps to Base UI's `side` and `align`; never `left` or `right` as a side. _(eslint + type)_
+- **R-13-1** The app mounts `TopClassProvider` at the root layout with `direction` and `locale` as props from the layout, never read from `document.dir` in an effect. _(development warning)_
+
+## 4. API conventions
+
+- **R-5.7-1** The prop vocabulary: `variant`, `tone`, `size`, positive booleans; `onValueChange` and `onOpenChange`; `value`/`defaultValue` and `open`/`defaultOpen`. _(manual + type tests)_
+- **R-5.7-2** `size` is `xs | sm | md | lg | xl | custom`, default `md`, on every component with a visual scale; `custom` emits no size classes. `<Icon>` is the exception: its `size` is a CSS length. _(shared/contracts/size.ts + type tests)_
+- **R-5.7-3** Every component accepts `className`, `style` and `ref` and spreads the rest onto its root element; `ref` is a normal prop, never `forwardRef`. _(type tests)_
+- **R-5.7-4** Server components accept the `render` element form only, through `renderElement`; client components may also accept the function form through `useRender`. _(check-boundaries)_
+- **R-5.7-5** Public types are aliases derived at the seam (`Omit<Base.Root.Props, ...> & OwnProps`); never re-export a Base UI type name and never hand-copy a primitive's prop list. _(eslint + review)_
+- **R-5.7-6** Boolean presence attributes (`data-open`, `data-loading`), never `data-state="..."`; enumerated design props are value attributes. _(eslint)_
+- **R-5.7-7** Numeric props have `min` and `max` in the schema and are clamped at runtime. _(unit test)_
+
+## 5. Schemas and constants
+
+- **R-8.3-1** Components import the schema with `import type`; `zod` is a required peer dependency. _(check-boundaries + attw)_
+- **R-8.3-2** Defaults and component-specific enums live in `constants.ts`; the size enum comes from `shared/contracts/size.ts`. _(unit test)_
+- **R-8.3-3** The docs props table is generated from the emitted `.d.ts`, with defaults and limits from the schema. _(docs build)_
+
+## 6. Text and i18n
+
+- **R-5.11-1** No hard-coded user-visible text; every built-in string comes from `labels`, with `en` and `ar` defaults. Demo files are exempt. _(eslint)_
+- **R-5.11-2** A label containing a count is `(n, fmt) => string`, and the Arabic file uses `Intl.PluralRules`. _(type)_
+
+## 7. Collections and scrolling
+
+- **R-8.5-1** Any component that renders items uses `CollectionProps` and `useCollection`: the `--tc-list-rows` knob, windowing above the threshold, optional page-by-page loading. _(check-structure + Playwright)_
+- **R-8.5-2** Components never fetch, cache or paginate; they call `loadMore()` and render what they are given. _(eslint)_
+- **R-10.5-1** Popups use `POPUP_BOUNDS` and the row cap; dialogs and drawers scroll their body with sticky header and footer; every scroll container inside an overlay sets `overscroll-behavior: contain`. _(Playwright)_
+- **R-10.5-2** A tooltip is one or two lines of plain text; anything larger, or with a link or control, is a Popover. _(eslint)_
+- **R-10.5-3** A sticky or fixed bar sets `--tc-sticky-top` or `--tc-sticky-bottom`, and the scroll container reads them into `scroll-padding-block`. _(Playwright)_
+
+## 8. Code structure
+
+- **R-5.12-1** `client.tsx` is JSX plus at most one call to `useXxx()` from `hook.ts`; no `useState`, `useEffect`, `useReducer`, `useRef`, `useMemo` or `useCallback` in it. Pure helpers live in `lib.ts`. _(eslint + check-structure)_
+- **R-5.12-2** Files stay small: warn at 200 lines, fail at 300; more files go in `parts/`, one component each. _(check-structure)_
+- **R-5.12-3** Comments are one line, only for what the code cannot say. No paragraph comments, no commented-out code, no narration. _(eslint)_
+- **R-5.12-4** kebab-case files, PascalCase components, `useThing` hooks, verb-first pure functions, `SCREAMING_CASE` constants in `constants.ts` or `classes.ts` only. _(check-structure)_
+- **R-5.12-5** No `any`, no `@ts-ignore`, no non-null assertion without a one-line reason; relative imports carry `.js`, type imports use `import type`. _(eslint + tsc)_
+- **R-8.1-1** Only the files in PLAN.md 8.1 may exist, and only if needed. Never `loading.tsx` or `error.tsx`; use `skeleton.tsx` and `states.tsx`. Demos are one file each under `demos/`. _(check-structure)_
+
+## 9. Icons
+
+- **R-7-1** `<Icon name>` on the server; `<Svg icon={x}>` with an explicit per-icon import in client and shared files. Never import the loader map outside `components/icon`. _(eslint + server-only)_
+- **R-7-2** A contract that carries `icon: IconName` is resolved to an element by the component's server half; the client contract carries `ReactNode`. _(type)_
+
+## 10. Accessibility
+
+- **R-5.6-1** WCAG 2.2 AA: ARIA Authoring Practices keyboard behaviour, a visible `focus-visible` ring everywhere, labels enforced by types. _(axe + manual)_
+- **R-5.6-2** Every interactive element is at least 24x24 CSS px on every pointer type and 44px under `pointer-coarse`. _(Playwright)_
+- **R-5.6-3** Every drag has a keyboard or button alternative. _(manual + keyboard tests)_
+- **R-5.6-4** 4.5:1 for text including tone text on its soft tint; 3:1 for `--tc-border-strong`, `--tc-ring` and icons; `--tc-border` is decorative and exempt. _(check-contrast)_
+
+## 11. Dependencies and process
+
+- **R-5.9-1** Core may depend only on `@topclassui/icons`, `@base-ui/react`, `clsx`, `tailwind-merge` and `class-variance-authority`; `react`, `react-dom`, `tailwindcss`, `@topclassui/tokens` and `zod` are peers; anything else is an optional peer. _(publint + review)_
+- **R-0-1** Check the installed types or the official docs before using any API, and record anything that differs in docs/DECISIONS.md. _(manual)_
+- **R-0-2** Run `pnpm check` before reporting done and paste the real output. _(manual)_
+- **R-20-1** A component is finished only when every line of PLAN.md section 20 is true, including the Figma parity check. _(pull-request checklist)_
