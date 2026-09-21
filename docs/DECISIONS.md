@@ -14,13 +14,17 @@ The format is: date, decision, why, and what it affects.
 
 **Affects.** Phase 0.5 sits before Phase 1. Every component's Definition of Done includes a parity check against its Figma frame. "1:1" means the same tokens, dimensions and states with a screenshot diff inside the visual-test tolerance; pixel-identical output is not achievable across a browser and Figma.
 
-## 2026-09-21 - Figma access stays on the free plan for now
+## 2026-09-21 - Figma free plan cannot carry Phase 0.5 (corrected)
 
-**Decision.** Use the remote Figma MCP server on the existing Starter plan and View seat. Do not upgrade yet.
+**Decision.** Phase 0.5 needs Figma Professional with a Full seat. The free Starter plan cannot do it.
 
-**Why.** Verified on this date by creating a file and writing a component into it: the write tools are exempt from Figma's rate limits and the View seat was allowed to write. The desktop MCP server was ruled out because it is read-only and needs a paid Dev or Full seat.
+**Why.** Two limits were found by hitting them, not by reading about them:
+1. **Variable modes:** Starter allows one mode per collection, so light, dark and ocean cannot live in one collection. Worked around with three parallel collections (`Semantic Light`, `Semantic Dark`, `Semantic Ocean`) that share identical token names.
+2. **Tool calls:** Starter allows 20 MCP calls per month **in total**. An earlier entry recorded that the write tools were exempt; that was wrong. Figma's docs exempt only `create_new_file`, `whoami` and `add_code_connect_map` - not `use_figma`, which is the tool that draws. The cap was reached after 20 write calls, partway through the foundations.
 
-**Affects.** The monthly cap applies to read tools, so Phase 0.5 verifies each batch from the write tool's own return value and takes screenshots only at sign-off points. If a write is ever refused, upgrade to Professional with a Full seat (200 calls a day) before continuing.
+**Affects.** Phase 0.5 is blocked until the plan is upgraded (200 calls a day on Professional). What was completed before the cap is saved in the file: 161 variables (palette, three semantic sets, knobs, sizes), the palette grid, the three mode cards, the size scale, and a screen example showing where each colour is used. Section 6.6 of the plan is corrected to state the requirement rather than the assumption.
+
+**Lesson recorded.** Verify a platform limit by attempting the operation once, early, before planning around the documentation.
 
 ## 2026-09-21 - `<Icon name>` stays; the sprite does not
 
