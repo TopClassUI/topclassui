@@ -143,7 +143,7 @@ React Native, Vue or other frameworks; styling systems other than Tailwind; CSS-
 |----|-------------------------------|------------------------------------------|
 | O1 | Icon library | Phosphor, regular weight |
 | O2 | Brand colour | Tailwind `violet` as a placeholder |
-| O3 | Fonts (docs site only; the library ships none) | Inter + IBM Plex Sans Arabic via `next/font`; the docs set `--tc-font-latin` and `--tc-font-arabic` from those variables |
+| O3 | Fonts (docs site only; the library ships none) | Inter + Noto Sans Arabic via `next/font`; the docs set `--tc-font-latin` and `--tc-font-arabic` from those variables |
 | O4 | Licence | MIT |
 | O5 | Docs hosting | Vercel |
 | O6 | Default radius | `0.5rem` |
@@ -864,7 +864,7 @@ export const arrowLeft: IconData = {
 
 1. Only the SVG files actually used are placed in `packages/icons/raw/` (downloaded from the chosen library). This folder is the allow-list.
 2. `pnpm icons:build` runs SVGO on each file, rewrites hard-coded colours to `currentColor`, extracts the `viewBox` and the merged path, and writes one module per icon to `src/icons/<name>.ts` with LF and no BOM.
-3. The same script generates `src/names.generated.ts` (the `IconName` union), `src/directional.generated.ts` (names that flip in RTL, matched by pattern: `arrow-*`, `caret-*`, `chevron-*`, plus a manual list), `src/version.generated.ts` (a content hash over the generated modules) and `src/loaders.generated.ts`:
+3. The same script generates `src/names.generated.ts` (the `IconName` union), `src/directional.generated.ts` (names that flip in RTL, matched by pattern: `arrow-*`, `caret-*`, `chevron-*`, plus the manual list in `docs/icons.md`), `src/version.generated.ts` (a content hash over the generated modules) and `src/loaders.generated.ts`:
 
 ```typescript
 // packages/icons/src/loaders.generated.ts
@@ -2016,7 +2016,7 @@ Everything a component will ever need, built and tested before any component exi
 
 ## Phase 2 - Icons
 
-**Build:** `packages/icons` (section 7) - the build pipeline, the first 40 to 60 icons, the generated modules, names, directional list and loaders - plus `<Icon>` and `<Svg>` wired up, the icons page as a collection, and the `topclassui-icons add-set` CLI.
+**Build:** `packages/icons` (section 7) - the build pipeline, the 62 icons of the starter set listed in `docs/icons.md`, the generated modules, names, directional list and loaders - plus `<Icon>` and `<Svg>` wired up, the icons page as a collection, and the `topclassui-icons add-set` CLI.
 
 **Accept when:** a wrong icon name is a TypeScript error; directional icons flip in RTL and others do not; a page that renders icons makes no icon requests and ships no icon JavaScript from a Server Component; a client component that imports one icon ships only that icon; `<Icon className="hidden md:inline-block" />` is actually hidden, proving `cn()` is used; decorative and labelled icons pass axe; the icons page keeps its DOM under the collection limit with twenty thousand entries registered.
 

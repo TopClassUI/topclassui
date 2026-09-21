@@ -6,6 +6,22 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-09-21 - The Arabic font is Noto Sans Arabic, not IBM Plex Sans Arabic
+
+**Decision.** The docs site loads Noto Sans Arabic for `--tc-font-arabic` (PLAN.md O3).
+
+**Why.** IBM Plex Sans Arabic is on Google Fonts but is not in Figma's font list, so the Arabic half of every frame could not be drawn in the font the site ships. The parity rule of 6.6 makes that unacceptable. Noto Sans Arabic is in both, carries Regular, Medium and SemiBold - the exact three weights of the type scale - and is the closest Arabic counterpart to Inter's neutral tone. Cairo, Tajawal and Almarai are also in both and remain available if the brand wants more character.
+
+**Affects.** PLAN.md O3, the type specimen on the Foundations page, and `next/font` in Phase 0's docs skeleton. The library still ships no font.
+
+## 2026-09-21 - The starter icon set is 62 named icons
+
+**Decision.** The starter set is fixed at the 62 Phosphor `regular` icons listed in `docs/icons.md`, thirteen of which flip in RTL.
+
+**Why.** The plan said "the first 40 to 60 icons" without naming them, which left Phase 2 and the Figma page free to diverge. Naming the list once makes `packages/icons/raw/` and the Figma Icons page checkable against each other.
+
+**Affects.** PLAN.md 7.2 and Phase 2. `sign-out`, `paper-plane-tilt` and `sidebar-simple` are the manual directional entries: the `arrow-*` / `caret-*` / `chevron-*` patterns do not catch them, and all three point along the reading direction.
+
 ## 2026-09-21 - Everything is designed in Figma before it is built
 
 **Decision.** The whole design system exists in Figma before any component code: every catalog row as a component set with all states, modes and both directions, and every docs route as a page frame. What is in Figma is what gets built (PLAN.md 6.6, Phase 0.5).
