@@ -516,7 +516,7 @@ Use logical utilities so layout follows the text direction automatically.
 Consistency across components is the main feature of a design system. Every component follows the same vocabulary.
 
 - **Prop vocabulary:** `variant` (visual style), `tone` (`primary | neutral | success | warning | danger | info`), `size` (`xs | sm | md | lg | xl | custom`, default `md`), plus booleans with positive names (`disabled`, `loading`, `fullWidth`, never `isDisabled`).
-- **The size scale is the same five names on every component that has a visual scale.** `custom` emits no size classes and the consumer supplies them through `className` or the component's size variables. Components with no meaningful scale (Separator, VisuallyHidden, SkipLink, Container) do not take `size`. On coarse pointers `xs` and `sm` controls still grow to the 44px touch target. `<Icon>` is the one documented exception: its `size` is a CSS length (default `1em`) so it follows the text it sits in.
+- **The size scale is the same five names on every component that has a visual scale.** `custom` emits no size classes and the consumer supplies them through `className` or the component's size variables. Components with no meaningful scale (Separator, VisuallyHidden, SkipLink, Container) do not take `size`. On coarse pointers `xs` and `sm` controls still grow to the 44px touch target. `<Icon>` takes the same five names, mapped to its own pixel values (`xs` 16, `sm` 20, `md` 24, `lg` 32, `xl` 40), and also accepts any CSS length; it is the one component whose default is not `md` but `1em`, so an icon with no `size` follows the text it sits in.
 - **Events:** `onValueChange(value)`, `onOpenChange(open)`.
 - **Controlled and uncontrolled:** `value` + `defaultValue`, `open` + `defaultOpen`.
 - **Always:** accept `className`, `style`, `ref` (React 19: `ref` is a normal prop, never `forwardRef`), and spread remaining props onto the root element.
@@ -892,8 +892,8 @@ import { cn } from '../../shared/cn.js'
 
 export interface IconProps extends Omit<SVGProps<SVGSVGElement>, 'name'> {
   name: IconName
-  /** CSS size. Defaults to 1em so the icon follows the text size. */
-  size?: number | string | undefined
+  /** The five names, or any CSS length. Defaults to 1em so the icon follows the text. */
+  size?: IconSize | number | (string & {}) | undefined
   /** Set for a meaningful icon; leave unset for a decorative one. */
   label?: string | undefined
   /** Defaults to true for directional icons (arrows, carets). */
@@ -903,11 +903,12 @@ export interface IconProps extends Omit<SVGProps<SVGSVGElement>, 'name'> {
 export async function Icon({ name, size = '1em', label, flipRtl, className, ...rest }: IconProps) {
   const icon = await loadIcon(name)
   const flip = flipRtl ?? DIRECTIONAL.has(name)
+  const length = resolveIconSize(size)
 
   return (
     <svg
-      width={size}
-      height={size}
+      width={length}
+      height={length}
       viewBox={icon.viewBox}
       role={label ? 'img' : undefined}
       aria-label={label}
@@ -923,6 +924,19 @@ export async function Icon({ name, size = '1em', label, flipRtl, className, ...r
 ```
 
 `loadIcon` caches in memory, so an icon used on many pages is loaded once per server process; the docs are static, so it happens at build time.
+
+`resolveIconSize` lives in `shared/contracts/size.ts` next to `sizeSchema`, so the icon scale and the control scale are declared in one file:
+
+```typescript
+export const ICON_SIZE = { xs: 16, sm: 20, md: 24, lg: 32, xl: 40 } as const
+export type IconSize = keyof typeof ICON_SIZE
+
+export function resolveIconSize(size: IconSize | number | (string & {})): number | string {
+  return typeof size === 'string' && size in ICON_SIZE ? ICON_SIZE[size as IconSize] : size
+}
+```
+
+`<Icon>` is the only component whose default is not `md`. Leaving `size` off gives `1em`, so an icon inside a `sm` button is 14px and the same markup inside an `xl` button is 18px without anyone passing a size. The five names exist for a standalone icon that has no text to follow.
 
 **Client and shared: `<Svg icon>`** lives in `packages/react/src/components/svg/index.tsx`, has no directive, and is exported as `@topclassui/react/svg`. Every file that can end up in a client bundle - `client.tsx` files and shared components such as Button - imports the icon it needs explicitly:
 

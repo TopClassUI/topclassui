@@ -126,8 +126,8 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 **Enforced by:** `manual` + type tests
 
 ### R-5.7-2 One size scale
-**Rule:** `size` is `xs | sm | md | lg | xl | custom`, default `md`, on every component that has a visual scale; `custom` emits no size classes. `<Icon>` is the exception: its `size` is a CSS length.
-**Why:** a Button, an Input and a Select trigger of the same size must line up in a form row.
+**Rule:** `size` is `xs | sm | md | lg | xl | custom`, default `md`, on every component that has a visual scale; `custom` emits no size classes. `<Icon>` takes the same five names against its own pixel values (`ICON_SIZE`: 16, 20, 24, 32, 40) and any CSS length, and is the only component whose default is `1em` rather than `md`.
+**Why:** a Button, an Input and a Select trigger of the same size must line up in a form row; an icon instead has to match the text beside it, which `1em` does without anyone passing a size.
 **Enforced by:** `shared/contracts/size.ts` + type tests
 
 ### R-5.7-3 Pass through className, style, ref and rest

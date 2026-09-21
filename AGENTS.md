@@ -54,7 +54,7 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from doc
 ## 4. API conventions
 
 - **R-5.7-1** The prop vocabulary: `variant`, `tone`, `size`, positive booleans; `onValueChange` and `onOpenChange`; `value`/`defaultValue` and `open`/`defaultOpen`. _(manual + type tests)_
-- **R-5.7-2** `size` is `xs | sm | md | lg | xl | custom`, default `md`, on every component with a visual scale; `custom` emits no size classes. `<Icon>` is the exception: its `size` is a CSS length. _(shared/contracts/size.ts + type tests)_
+- **R-5.7-2** `size` is `xs | sm | md | lg | xl | custom`, default `md`, on every component with a visual scale; `custom` emits no size classes. `<Icon>` takes the same five names against its own pixel values (`ICON_SIZE`: 16, 20, 24, 32, 40) and any CSS length, and is the only component whose default is `1em` rather than `md`. _(shared/contracts/size.ts + type tests)_
 - **R-5.7-3** Every component accepts `className`, `style` and `ref` and spreads the rest onto its root element; `ref` is a normal prop, never `forwardRef`. _(type tests)_
 - **R-5.7-4** Server components accept the `render` element form only, through `renderElement`; client components may also accept the function form through `useRender`. _(check-boundaries)_
 - **R-5.7-5** Public types are aliases derived at the seam (`Omit<Base.Root.Props, ...> & OwnProps`); never re-export a Base UI type name and never hand-copy a primitive's prop list. _(eslint + review)_

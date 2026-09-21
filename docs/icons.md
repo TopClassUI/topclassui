@@ -34,5 +34,5 @@ Everything not in this table never flips, including `magnifying-glass`, `check`,
 
 - One path per icon. A multi-path or `<circle>`/`<rect>` icon does not survive the `path` field of `IconData`; convert it in `raw/` first.
 - `currentColor` fill, no stroke. In Figma the fill is bound to the `base/body` variable, which is the same thing.
-- Size is a CSS length, default `1em`, never the `xs..xl` scale (R-5.7-2).
+- Size takes the five names (`xs` 16, `sm` 20, `md` 24, `lg` 32, `xl` 40) or any CSS length. The default is `1em`, not `md`, so an icon with no `size` matches the text beside it (R-5.7-2).
 - Adding an icon means adding its SVG to `raw/` and rerunning `pnpm icons:build`; the Figma page is updated in the same change, because Figma is the parity gate (PLAN.md 6.6).

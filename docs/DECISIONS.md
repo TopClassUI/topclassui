@@ -6,6 +6,14 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-09-21 - Icon takes the five size names too; only its default differs
+
+**Decision.** `<Icon>` accepts `xs | sm | md | lg | xl` against its own pixel values - `ICON_SIZE = { xs: 16, sm: 20, md: 24, lg: 32, xl: 40 }` - as well as any CSS length. Its default stays `1em`, not `md` (R-5.7-2, PLAN.md 5.7 and 7.3).
+
+**Why.** Omar read the Figma page and could not find the size names on the icon card: an icon documented only in pixels looks like a different API from every other component. Giving it the same five words removes the exception from the part people read. The default cannot move to `md`, because an icon inside a `sm` button would then render at 24px against 14px text and every caller would have to pass a size to undo it; `1em` keeps the common case free.
+
+**Affects.** `shared/contracts/size.ts` gains `ICON_SIZE`, `IconSize` and `resolveIconSize`, so the control scale and the icon scale sit in one file. This supersedes the earlier entry that called `<Icon>` "the documented exception: its `size` is a CSS length" - the exception is now only the default.
+
 ## 2026-09-21 - The Arabic font is Noto Sans Arabic, not IBM Plex Sans Arabic
 
 **Decision.** The docs site loads Noto Sans Arabic for `--tc-font-arabic` (PLAN.md O3).
@@ -56,7 +64,7 @@ The format is: date, decision, why, and what it affects.
 
 **Why.** Omar asked for the full scale everywhere, not only on Button and Input. Defining it once is what makes a Button, an Input and a Select trigger of the same size line up in a form row.
 
-**Affects.** Every schema imports `sizeSchema`. Connector contracts carry `size`. `<Icon>` is the documented exception: its `size` is a CSS length.
+**Affects.** Every schema imports `sizeSchema`. Connector contracts carry `size`. `<Icon>` was the documented exception here; see the later entry of the same date, which gives it the five names and leaves only its `1em` default different.
 
 ## 2026-09-21 - Lists window and page instead of rendering everything
 
