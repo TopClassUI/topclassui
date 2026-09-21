@@ -564,6 +564,7 @@ Enforced by `check-structure`, ESLint and Prettier. A rule that only lives in pr
 - **Data never lives in components.** Fetching, caching and pagination belong to the app; components receive data and callbacks through the contracts in 8.2 and 8.5.
 - **File size:** `check-structure` warns at 200 lines and fails at 300. A component that needs more files than the contract lists gets a `parts/` folder with one part per file.
 - **Naming:** files in `parts/` export one component named after the file (`dialog-root.tsx` exports `DialogRoot`). The contract's fixed files export what the contract says; `index.tsx` may re-export several names. Hooks are `useThing`, pure functions are verb-first (`clampValue`, `formatCount`), and constants are `SCREAMING_CASE` in `constants.ts` or `classes.ts` only.
+- **Types live in `types.ts`.** A component's prop interfaces and unions are declared there, derived from `constants.ts` and `schema.ts`, and imported with `import type` by the files that need them. No prop interface is declared inline in `index.tsx` or `client.tsx`, and no value list is a TypeScript `enum`, which would survive compilation into the bundle (8.3).
 - **Comments are one line, and only for what the code cannot say**: a browser quirk, a spec reference, a constraint that is not visible locally. No paragraph comments, no commented-out code, no explanation of what the next line does. JSDoc on a public prop is one line. A lint rule fails on any comment block longer than one line outside `shared/labels`.
 - **No `any`, no `@ts-ignore`, no non-null assertion without a one-line reason.**
 - **Imports** are relative with explicit `.js` extensions, and type imports use `import type`.
@@ -953,8 +954,9 @@ Each component is a folder. A file exists only when the component needs it. `pnp
 | `hook.ts` | The component's state, effects and handlers | Returns a plain object, contains no JSX, imported only by `client.tsx` |
 | `lib.ts` | Pure helpers, unit-tested | No React imports; called by `hook.ts` and `index.tsx` |
 | `variants.ts` | cva class definitions | Exported, so other elements can reuse the look (a link styled as a button) |
-| `schema.ts` | Zod schema of the design props, with min/max | Components import it with `import type` only |
-| `constants.ts` | Data constants: limits, defaults and enums shared by the schema, cva and the component | No classes, no Zod |
+| `schema.ts` | Zod schema of the design props, with min/max | Imports `constants.ts`; components import it with `import type` only |
+| `types.ts` | Every type the component exposes: the unions derived from `constants.ts`, the design props derived from `schema.ts`, and the public prop interfaces | Types only, so the file erases completely. No runtime value, no TypeScript `enum` |
+| `constants.ts` | Data constants: the `as const` value lists, the limits and the defaults shared by the schema, cva and the component | No classes, no Zod, no types |
 | `classes.ts` | Component-specific class constants, only when the shared ones are not enough | Imported by `variants.ts` |
 | `skeleton.tsx` | Skeleton with the same dimensions as the real component | Usable as a `<Suspense fallback>`; layout shift must be zero. Never named `loading.tsx`: Next.js reserves that name in `app/` |
 | `states.tsx` | Default error and empty states | Data components only; overridable by props. Never named `error.tsx`: in `app/` that name must be a Client Component |
@@ -987,18 +989,33 @@ Defaults come from the component's own `skeleton.tsx` and `states.tsx`. Simple c
 
 **Render errors are separate from data status.** A cell renderer that throws unmounts the nearest boundary, which in Next.js is the route segment. Every data component and every connector wraps its interactive part in `ErrorBoundary` (a class component, because only class components can catch render errors) whose default fallback is `ErrorState` with a retry that remounts the children by key, plus an `onError` for reporting. It does not replace the app's route-level `error.tsx`.
 
-## 8.3 Schemas without runtime cost
+## 8.3 Constants, schema, types
+
+Three files, one direction of flow, so a value is declared exactly once:
+
+```text
+constants.ts  the values          (runtime, no types, no Zod)
+     v
+schema.ts     the Zod schema      (imports constants; the only file that imports Zod)
+     v
+types.ts      every type          (derives from both; erases completely)
+     v
+index.tsx / client.tsx / variants.ts / hook.ts
+```
 
 The Zod schema describes the design-prop subset that must be machine-editable: the playground controls, the generated `registry.json`, the future editor's inspector panel and AI tool definitions. The **public props table** is generated from the emitted `.d.ts`, because that is the type users actually consume and it includes `className`, `render`, `children` and every inherited HTML or Base UI prop; the schema supplies the defaults and the limits.
 
-Defaults and enums are declared once, in `constants.ts`, and imported by the schema, by cva and by the component, so the three can never disagree. The shared size enum lives in one place for the whole library:
+**Value lists are `as const` arrays, never a TypeScript `enum`.** An `enum` is a runtime value: it survives compilation into the bundle, it does not tree-shake, and Node's type stripping rejects it outright. An `as const` array gives the same closed set, feeds `z.enum()` directly, and disappears from the types layer.
+
+The shared size list lives in one place for the whole library:
 
 ```typescript
 // shared/contracts/size.ts
 import { z } from 'zod'
 
-export const sizeSchema = z.enum(['xs', 'sm', 'md', 'lg', 'xl', 'custom'])
-export type Size = z.infer<typeof sizeSchema>
+export const SIZES = ['xs', 'sm', 'md', 'lg', 'xl', 'custom'] as const
+export const sizeSchema = z.enum(SIZES)
+export type Size = (typeof SIZES)[number]
 ```
 
 ```typescript
@@ -1021,10 +1038,32 @@ export const buttonSchema = z.object({
   loading: z.boolean().default(false),
   fullWidth: z.boolean().default(false),
 })
+```
+
+```typescript
+// components/button/types.ts
+import type { ComponentPropsWithRef, ReactElement } from 'react'
+import type { z } from 'zod'
+import type { BUTTON_TONES, BUTTON_VARIANTS } from './constants.js'
+import type { buttonSchema } from './schema.js'
+
+export type ButtonVariant = (typeof BUTTON_VARIANTS)[number]
+export type ButtonTone = (typeof BUTTON_TONES)[number]
 
 /** z.input keeps fields that have defaults optional, which is what props need. */
 export type ButtonDesignProps = z.input<typeof buttonSchema>
+
+export interface ButtonProps extends ComponentPropsWithRef<'button'>, ButtonDesignProps {
+  /** Render as another element, for example a framework link. */
+  render?: ReactElement | undefined
+}
+
+export type ButtonSkeletonProps = Pick<ButtonDesignProps, 'size' | 'fullWidth'> & {
+  className?: string | undefined
+}
 ```
+
+Every import in `types.ts` is an `import type`, including the one from `schema.ts`, so the whole file erases at compile time and Zod never reaches a bundle. `index.tsx` and `client.tsx` import their types from `./types.js` and never redeclare a prop interface inline; `variants.ts` and `hook.ts` do the same. One file to open to see a component's whole public surface.
 
 Limits use the same constants so the schema and the runtime clamp can never disagree:
 
@@ -1096,18 +1135,12 @@ The example shows the `primary` tone only. Tones are implemented as cva compound
 // components/button/index.tsx
 // No 'use client': a Server Component by default, and it becomes part of the
 // client bundle only when a client file imports it.
-import type { ComponentPropsWithRef, ReactElement } from 'react'
 import { spinner } from '@topclassui/icons/spinner'
 import { cn } from '../../shared/cn.js'
 import { renderElement } from '../../shared/render.js'
 import { Svg } from '../svg/index.js'
-import type { ButtonDesignProps } from './schema.js' // type-only: Zod is never bundled
+import type { ButtonProps } from './types.js'
 import { buttonVariants } from './variants.js'
-
-export interface ButtonProps extends ComponentPropsWithRef<'button'>, ButtonDesignProps {
-  /** Render as another element, for example a framework link. */
-  render?: ReactElement | undefined
-}
 
 export function Button({
   variant = 'solid',
@@ -1142,12 +1175,13 @@ export function Button({
 
 export { buttonVariants }
 export { ButtonSkeleton } from './skeleton.js'
+export type { ButtonProps, ButtonDesignProps, ButtonTone, ButtonVariant } from './types.js'
 ```
 
 ```typescript
 // components/button/skeleton.tsx
 import { cn } from '../../shared/cn.js'
-import type { ButtonDesignProps } from './schema.js'
+import type { ButtonSkeletonProps } from './types.js'
 
 const SIZES = {
   xs: 'h-control-xs w-16',
@@ -1157,8 +1191,6 @@ const SIZES = {
   xl: 'h-control-xl w-32',
   custom: '',
 } as const
-
-type ButtonSkeletonProps = Pick<ButtonDesignProps, 'size' | 'fullWidth'> & { className?: string | undefined }
 
 export function ButtonSkeleton({ size = 'md', fullWidth = false, className }: ButtonSkeletonProps) {
   return (

@@ -64,8 +64,10 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from doc
 ## 5. Schemas and constants
 
 - **R-8.3-1** Components import the schema with `import type`; `zod` is a required peer dependency. _(check-boundaries + attw)_
-- **R-8.3-2** Defaults and component-specific enums live in `constants.ts`; the size enum comes from `shared/contracts/size.ts`. _(unit test)_
+- **R-8.3-2** Defaults and component-specific value lists live in `constants.ts`; the size list comes from `shared/contracts/size.ts`. _(unit test)_
 - **R-8.3-3** The docs props table is generated from the emitted `.d.ts`, with defaults and limits from the schema. _(docs build)_
+- **R-8.3-4** A component's unions and prop interfaces are declared in `types.ts`, derived from `constants.ts` and `schema.ts`, and imported with `import type`; never inline in `index.tsx` or `client.tsx`. _(check-structure + eslint)_
+- **R-8.3-5** Value lists are `as const` arrays with the union derived from them; never a TypeScript `enum`, which survives into the bundle. _(eslint)_
 
 ## 6. Text and i18n
 

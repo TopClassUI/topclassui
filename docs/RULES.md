@@ -163,9 +163,19 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 **Enforced by:** `scripts/check-boundaries.ts` + `attw`
 
 ### R-8.3-2 Defaults live once
-**Rule:** defaults and component-specific enums live in `constants.ts` and are imported by the schema, by cva and by the component; the size enum comes from `shared/contracts/size.ts`.
+**Rule:** defaults and component-specific value lists live in `constants.ts` and are imported by the schema, by cva and by the component; the size list comes from `shared/contracts/size.ts`.
 **Why:** three declarations of the same default cannot be kept in agreement.
 **Enforced by:** unit test
+
+### R-8.3-4 Types live in types.ts
+**Rule:** a component's unions and prop interfaces are declared in `types.ts`, derived from `constants.ts` and `schema.ts`, and imported with `import type`; no prop interface is declared inline in `index.tsx` or `client.tsx`.
+**Why:** one file shows a component's whole public surface, and a type-only file erases completely.
+**Enforced by:** `scripts/check-structure.ts` + `eslint`
+
+### R-8.3-5 No TypeScript enum
+**Rule:** value lists are `as const` arrays with the union derived from them; never a TypeScript `enum`.
+**Why:** an `enum` is a runtime value that survives into the bundle, does not tree-shake, and Node's type stripping rejects it.
+**Enforced by:** `eslint` (`no-restricted-syntax`)
 
 ### R-8.3-3 Props table from the types
 **Rule:** the docs props table is generated from the emitted `.d.ts`, with defaults and limits supplied by the schema.
