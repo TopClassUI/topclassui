@@ -1,6 +1,6 @@
 # The starter icon set
 
-Eighty icons, one merged path each, `viewBox="0 0 256 256"`. They exist as components on the **Icons** page of the Figma file and are the exact list `packages/icons/raw/` carries in Phase 2 (PLAN.md section 7, Phase 2).
+Eighty-four icons, one merged path each, `viewBox="0 0 256 256"`. They exist as components on the **Icons** page of the Figma file and are the exact list `packages/icons/raw/` carries in Phase 2 (PLAN.md section 7, Phase 2).
 
 Source, MIT licensed:
 
@@ -9,7 +9,7 @@ Source, MIT licensed:
 
 ## Which icons flip in RTL
 
-Sixteen of the eighty. `arrow-*`, `caret-*` and `chevron-*` are matched by pattern; the rest are the manual list that `icons:build` reads from here.
+Sixteen of the eighty-four. `arrow-*`, `caret-*` and `chevron-*` are matched by pattern; the rest are the manual list that `icons:build` reads from here.
 
 **Manual list:** `sign-out`, `paper-plane-tilt`, `sidebar-simple`.
 
@@ -31,9 +31,9 @@ Everything not in this table never flips, including `magnifying-glass`, `check`,
 
 **Actions** (19) - `arrows-clockwise` `check` `command` `copy` `download-simple` `funnel` `link-simple` `magnifying-glass` `minus` `palette` `paperclip` `pencil-simple` `plus` `sort-ascending` `sort-descending` `translate` `trash` `upload-simple` `x`
 
-**Status and feedback** (11) - `bell` `bell-slash` `check-circle` `circle-notch` `info` `prohibit` `question` `spinner` `warning` `warning-circle` `x-circle`
+**Status and feedback** (13) - `asterisk` `bell` `bell-slash` `check-circle` `circle-notch` `info` `prohibit` `question` `spinner` `tray` `warning` `warning-circle` `x-circle`
 
-**Objects and places** (34) - `book-open` `calendar-blank` `circle` `clock` `code` `dots-six-vertical` `dots-three` `dots-three-vertical` `envelope-simple` `eye` `eye-slash` `file` `folder` `gear` `github-logo` `globe` `heart` `house` `image` `list` `lock-open` `lock-simple` `monitor` `moon` `paper-plane-tilt` `pause` `play` `sidebar-simple` `sign-out` `star` `sun` `terminal-window` `user` `users`
+**Objects and places** (36) - `book-open` `calendar-blank` `circle` `clock` `code` `dots-six-vertical` `dots-three` `dots-three-vertical` `envelope-simple` `eye` `eye-slash` `file` `file-text` `folder` `folder-open` `gear` `github-logo` `globe` `heart` `house` `image` `list` `lock-open` `lock-simple` `monitor` `moon` `paper-plane-tilt` `pause` `play` `sidebar-simple` `sign-out` `star` `sun` `terminal-window` `user` `users`
 
 **Solid variants** (3) - `circle-fill` `heart-fill` `star-fill`
 
@@ -59,6 +59,19 @@ An outline and a solid of the same shape are the clearest way to show an on and 
 | `envelope-simple` | form demos |
 | `command` | the Command palette and `Kbd` |
 | `github-logo` `book-open` | the docs header and its navigation |
+| `tray` | the `empty` state of the state contract (8.2), which every collection component renders |
+| `folder-open` `file-text` | TreeView - an expanded node and a leaf; `folder` alone only covers the closed node |
+| `asterisk` | the required marker on `Field`, on every required control |
+
+## Deliberately not in the set yet
+
+An audit of the tier-1 catalog and the docs site against this list proposed about ninety more. They were left out because no tier-1 component needs them to render a documented state, and adding an icon later costs one SVG file and one `pnpm icons:build`. The ones most likely to be wanted first, so the search does not have to happen twice:
+
+- **Docs site:** `package` (npm link), `keyboard` (the keyboard table), `tag` and `clock-counter-clockwise` (versions and changelog), `hash` (heading anchors), `sliders-horizontal` (the page controls), `list-dashes` (table of contents), `text-align-left` and `text-align-right` (the direction switcher), `browser` and `hard-drives` (the server/client breakdown), `compass` (404).
+- **States with no contract entry yet:** `wifi-slash` (offline), `bug` (ErrorBoundary), `image-broken` (failed media), `lightbulb` and `warning-octagon` (Alert tones).
+- **Tier 3:** `arrows-out`, `arrows-in`, `magnifying-glass-plus`, `magnifying-glass-minus` (Lightbox), `eyedropper` (ColorPicker), `cloud-arrow-up` (Dropzone), `star-half` (half ratings), `columns` and `rows` (DataTable density and column visibility).
+
+Add any of them the moment a component in a phase actually needs it, and update the Figma page in the same change.
 
 ## Rules this set has to keep
 

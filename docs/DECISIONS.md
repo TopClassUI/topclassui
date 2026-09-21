@@ -22,11 +22,13 @@ The format is: date, decision, why, and what it affects.
 
 **Affects.** PLAN.md O3, the type specimen on the Foundations page, and `next/font` in Phase 0's docs skeleton. The library still ships no font.
 
-## 2026-09-21 - The starter icon set is 80 named icons, including three solid variants
+## 2026-09-21 - The starter icon set is 84 named icons, including three solid variants
 
-**Decision.** The starter set is fixed at the 80 Phosphor icons listed in `docs/icons.md`, sixteen of which flip in RTL. Seventy-seven come from the `regular` weight; `star-fill`, `circle-fill` and `heart-fill` come from the `fill` weight.
+**Decision.** The starter set is fixed at the 84 Phosphor icons listed in `docs/icons.md`, sixteen of which flip in RTL. Eighty-one come from the `regular` weight; `star-fill`, `circle-fill` and `heart-fill` come from the `fill` weight.
 
-**Why.** The plan said "the first 40 to 60 icons" without naming them, which left Phase 2 and the Figma page free to diverge. An audit of the tier-1 catalog against the first 62 found nine that a component cannot render a state without - Rating has no filled star, RadioGroup no selected dot, Pagination no first and last, Table no sort direction, ThemeSwitcher no "system", nothing for a drag handle or an external link - so the set was completed before the Figma page is signed off rather than after.
+**Why.** The plan said "the first 40 to 60 icons" without naming them, which left Phase 2 and the Figma page free to diverge. Two audits of the tier-1 catalog and the docs site against the first 62 found twenty-two missing: Rating had no filled star, RadioGroup no selected dot, Pagination no first and last, Table no sort direction, ThemeSwitcher no "system", the state contract's `empty` state no icon at all, TreeView no open folder or leaf, `Field` no required marker, and nothing for a drag handle or an external link. Completing the set before the Figma page is signed off is cheaper than redrawing the page after.
+
+The second audit proposed about ninety more. They were declined and listed at the end of `docs/icons.md` instead, because no tier-1 component needs them to render a documented state and adding one later costs a single SVG and a rebuild. The rule for adding: a component in the current phase needs it, and Figma is updated in the same change.
 
 **Affects.** PLAN.md 7.2 and Phase 2. Two points worth keeping: the `fill` weight is a separate folder in Phosphor, named `<name>-fill.svg`, and is used only where an outline cannot express an on state; and `sign-out`, `paper-plane-tilt` and `sidebar-simple` remain the manual directional entries, because the `arrow-*` / `caret-*` / `chevron-*` patterns do not catch them.
 
