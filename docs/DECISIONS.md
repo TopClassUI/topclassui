@@ -6,15 +6,17 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
-## 2026-09-22 - Phase 0.5: 46 components drawn, one of them as a variant set
+## 2026-09-22 - Phase 0.5: 46 components drawn, 8 of them as variant sets
 
-**Decision.** The Components page now carries all 46 tier-1 components as documentation frames showing every state, plus a three-column Light / Dark / Ocean comparison. Only Button exists as a real Figma component set (90 variants). The other 45 are drawn, not yet componentised.
+**Decision.** The Components page carries all 46 tier-1 components as documentation frames showing every state, a three-column Light / Dark / Ocean comparison, and a left-to-right against right-to-left comparison in Arabic. Eight are real Figma component sets, 263 variants in total: Button 90, Input 30, Tag 30, Checkbox 30, Radio 25, Switch 25, Badge 18, Avatar 15.
 
-**Why.** Breadth first. A drawn component settles the visual decisions, which is what the parity gate of 6.6 actually needs, and it surfaces the contradictions early - the loading-versus-disabled clash was found this way. Turning 45 of them into variant sets is mechanical and costs Figma MCP calls that are capped at 200 a day, so it is its own pass.
+**Why.** Breadth first. A drawn component settles the visual decisions, which is what the parity gate of 6.6 actually needs, and it surfaces contradictions early - the loading-versus-disabled clash was found this way. The eight componentised are the ones a designer reaches for most and the ones with a clean property grid; the rest are compositions whose variants would be guesses until the code exists.
 
-**Affects.** Phase 0.5 is not complete until each row of section 18 has a component set whose properties match section 5.7 verbatim. What exists today is the visual reference; a designer can read it but cannot yet drop an instance of anything but Button.
+**Affects.** Phase 0.5 is not complete until each row of section 18 has a component set whose properties match section 5.7 verbatim. Today a designer can instance those eight and read the other 38.
 
-**Still missing from Phase 0.5:** component sets for the other 45; every frame in RTL; the docs route page frames; tiers 2 to 4.
+RTL is covered by one comparison section showing six components in both directions in Arabic, not by a mirrored copy of every frame. That is enough to settle the rules - the layout mirrors, `arrow-*` and `caret-*` flip, `magnifying-glass` and `check-circle` do not - and cheaper than doubling the page. A per-component RTL frame is only needed where a component's mirroring is not obvious from those rules.
+
+**Still missing from Phase 0.5:** component sets for the other 38; the docs route page frames; tiers 2 to 4.
 
 ## 2026-09-22 - Three more Size groups: padding-y, toggle and icon
 
