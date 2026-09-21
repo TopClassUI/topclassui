@@ -6,6 +6,24 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-09-22 - Phase 0.5: 46 components drawn, one of them as a variant set
+
+**Decision.** The Components page now carries all 46 tier-1 components as documentation frames showing every state, plus a three-column Light / Dark / Ocean comparison. Only Button exists as a real Figma component set (90 variants). The other 45 are drawn, not yet componentised.
+
+**Why.** Breadth first. A drawn component settles the visual decisions, which is what the parity gate of 6.6 actually needs, and it surfaces the contradictions early - the loading-versus-disabled clash was found this way. Turning 45 of them into variant sets is mechanical and costs Figma MCP calls that are capped at 200 a day, so it is its own pass.
+
+**Affects.** Phase 0.5 is not complete until each row of section 18 has a component set whose properties match section 5.7 verbatim. What exists today is the visual reference; a designer can read it but cannot yet drop an instance of anything but Button.
+
+**Still missing from Phase 0.5:** component sets for the other 45; every frame in RTL; the docs route page frames; tiers 2 to 4.
+
+## 2026-09-22 - Three more Size groups: padding-y, toggle and icon
+
+**Decision.** The Size collection gains `padding-y/<size>` (2, 4, 6, 8, 10), `toggle/<size>` (14, 16, 20, 24, 28) and `icon/<size>` (16, 20, 24, 32, 40), taking it to 35 variables.
+
+**Why.** Drawing the components found three scales the plan used but never defined. A Badge and an Alert need vertical padding that is not `padding-x`. A Checkbox, Radio and Switch need a box size that is neither a control height nor an icon size - 40px would be a huge checkbox. And `icon/<size>` is the scale behind the five `<Icon>` names.
+
+**Affects.** `shared/contracts/size.ts` carries all three alongside `CONTROL_SIZE`. Every value is a variable in Figma, so no component drawn on the page contains a raw number.
+
 ## 2026-09-22 - A loading Button stays at full colour
 
 **Decision.** The Button base classes gain `aria-busy:opacity-100`, so a loading button keeps its colour instead of dimming (PLAN.md 8.4).
