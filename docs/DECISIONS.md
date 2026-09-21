@@ -16,7 +16,9 @@ The format is: date, decision, why, and what it affects.
 
 RTL is covered by one comparison section showing six components in both directions in Arabic, not by a mirrored copy of every frame. That is enough to settle the rules - the layout mirrors, `arrow-*` and `caret-*` flip, `magnifying-glass` and `check-circle` do not - and cheaper than doubling the page. A per-component RTL frame is only needed where a component's mirroring is not obvious from those rules.
 
-**Still missing from Phase 0.5:** component sets for the other 38; the docs route page frames; tiers 2 to 4.
+Three docs page frames exist on the Docs pages page: the component page template at 1280 and at 390, and the marketing home at 1280. The component template is the one that mattered, because it settles the layout every component page inherits - a two-column demo grid with a Preview/Code tab and a copy button on each, page controls for mode, direction and density, the full state matrix rendered at once rather than behind a dropdown, a props table generated from the same names the schema uses, and a "what ships to the browser" block. The mobile frame proves the template degrades: the props table becomes cards and the demo grid becomes one column.
+
+**Still missing from Phase 0.5:** component sets for the other 38; the remaining docs routes (getting started, colours, icons, theming, RTL, server-first, connector template, preview); RTL versions of the page frames; tiers 2 to 4.
 
 ## 2026-09-22 - Three more Size groups: padding-y, toggle and icon
 
