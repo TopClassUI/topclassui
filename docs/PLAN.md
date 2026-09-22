@@ -393,7 +393,12 @@ import { extendTailwindMerge } from 'tailwind-merge'
 const twMerge = extendTailwindMerge({
   extend: {
     theme: {
-      spacing: ['control-xs', 'control-sm', 'control-md', 'control-lg', 'control-xl'],
+      spacing: [
+        'control-xs', 'control-sm', 'control-md', 'control-lg', 'control-xl',
+        'toggle-xs', 'toggle-sm', 'toggle-md', 'toggle-lg', 'toggle-xl',
+        'icon-xs', 'icon-sm', 'icon-md', 'icon-lg', 'icon-xl',
+        'pad-y-xs', 'pad-y-sm', 'pad-y-md', 'pad-y-lg', 'pad-y-xl',
+      ],
       radius: ['control', 'box', 'chip'],
     },
   },
@@ -687,16 +692,22 @@ The tokens package holds only these variables, the mode blocks and its `@layer b
    not only :root, so a nested section recomputes it from its own values. */
 :root,
 [data-theme] {
-  --tc-ring: var(--tc-primary);
+  /* Not var(--tc-primary): violet-600 measures 2.57:1 on a dark raised surface. */
+  --tc-ring: var(--tc-primary-text);
   --tc-primary-soft: color-mix(in oklch, var(--tc-primary) 12%, var(--tc-bg));
   --tc-neutral-soft: color-mix(in oklch, var(--tc-neutral) 8%, var(--tc-bg));
   --tc-success-soft: color-mix(in oklch, var(--tc-success) 12%, var(--tc-bg));
   --tc-warning-soft: color-mix(in oklch, var(--tc-warning) 16%, var(--tc-bg));
   --tc-danger-soft: color-mix(in oklch, var(--tc-danger) 12%, var(--tc-bg));
   --tc-info-soft: color-mix(in oklch, var(--tc-info) 12%, var(--tc-bg));
-  --tc-hover: color-mix(in oklch, var(--tc-primary) 88%, black);
-  --tc-active: color-mix(in oklch, var(--tc-primary) 78%, black);
+  /* A solid button's hover is constrained by its own label, not by the page, so it
+     steps away from that label in every mode. Each tone sets these three; the values
+     here are the primary tone. Mixing toward black instead would keep darkening on a
+     dark page, and stepping toward the page would drop white text below 4.5:1. */
+  --tc-hover: var(--color-violet-700);
+  --tc-active: var(--color-violet-800);
   --tc-soft-hover: color-mix(in oklch, var(--tc-primary) 20%, var(--tc-bg));
+  --tc-soft-active: color-mix(in oklch, var(--tc-primary) 28%, var(--tc-bg));
 }
 
 [dir="rtl"] { --tc-dir: -1; }
@@ -704,6 +715,19 @@ The tokens package holds only these variables, the mode blocks and its `@layer b
 @media (prefers-reduced-motion: reduce) {
   :root { --tc-motion: 0; }
 }
+```
+
+**The interaction ramp, per tone.** `--tc-hover` and `--tc-active` are named shades, not a computed mix, because the step has to keep the button's own label readable and no single mix does that in both modes. Every value below is computed and passes 4.5:1 against its `-fg`:
+
+| Tone | hover | active | Why |
+|------|-------|--------|-----|
+| primary | violet-700 | violet-800 | White label in every mode, so the step is the same in every mode |
+| danger | red-700 | red-800 | Same |
+| neutral | light: neutral-800 then 700; dark: neutral-200 then 300 | | Its solid is already near-black or near-white, so it steps toward the middle and its label flips with it |
+
+`--tc-soft-hover` and `--tc-soft-active` stay a mix, because a tint has no label of its own. The rule is **the tone's own soft percentage plus 8, then plus 16** - which is why they differ per tone: `primary`, `success`, `danger` and `info` are 12/20/28, `neutral` is 8/16/24, and `warning` is 16/24/32. Reading 20% off the primary block and applying it to every tone is the mistake to avoid.
+
+```css
 
 @layer base {
   /* font-family inherits as a resolved list, so setting the property is the only thing that works
@@ -770,6 +794,31 @@ The mapping to utilities lives in `packages/react/src/styles.css`:
   --spacing-control-lg: calc(3rem * var(--tc-density));
   --spacing-control-xl: calc(3.5rem * var(--tc-density));
 
+  /* A toggle is neither a control height nor an icon: a 40px checkbox is absurd and a
+     16px one is not a control. Its own scale, and every step still carries a 24px
+     target through TOUCH_TARGET. */
+  --spacing-toggle-xs: calc(0.875rem * var(--tc-density));
+  --spacing-toggle-sm: calc(1rem * var(--tc-density));
+  --spacing-toggle-md: calc(1.25rem * var(--tc-density));
+  --spacing-toggle-lg: calc(1.5rem * var(--tc-density));
+  --spacing-toggle-xl: calc(1.75rem * var(--tc-density));
+
+  /* The five names behind ICON_SIZE (section 7.3). Not multiplied by density: an icon
+     follows its text, and the text is not scaled by the density knob either. */
+  --spacing-icon-xs: 1rem;
+  --spacing-icon-sm: 1.25rem;
+  --spacing-icon-md: 1.5rem;
+  --spacing-icon-lg: 2rem;
+  --spacing-icon-xl: 2.5rem;
+
+  /* Vertical padding for things that hug their text rather than take a control
+     height: Badge, Tag, Alert, Toast. padding-x is not the right value for them. */
+  --spacing-pad-y-xs: calc(0.125rem * var(--tc-density));
+  --spacing-pad-y-sm: calc(0.25rem * var(--tc-density));
+  --spacing-pad-y-md: calc(0.375rem * var(--tc-density));
+  --spacing-pad-y-lg: calc(0.5rem * var(--tc-density));
+  --spacing-pad-y-xl: calc(0.625rem * var(--tc-density));
+
   /* Every transition-* utility reads this, so the motion knob reaches all of them. */
   --default-transition-duration: calc(150ms * var(--tc-motion));
 }
@@ -831,7 +880,34 @@ A page where a user picks a brand colour, radius and density and receives a read
 
 Everything is designed in Figma before it is built, and what is in Figma is what gets built. The file is generated with the Figma MCP from the token values above and the component specs of section 18, and it is the reference every implementation is checked against.
 
-- **Variables:** one collection per knob and semantic token (`--tc-*`), with modes `light`, `dark` and `ocean`; the five control sizes; the type scale; radius and density as variables, so changing a knob re-renders the whole file.
+- **Variables:** five collections - `Palette`, `Semantic`, `Knobs`, `Size`, `Type`. `Semantic` and `Knobs` carry the three modes; the rest have one. Changing a knob re-renders the whole file.
+
+**Figma names are not CSS names, and this table is the only thing that reconciles them.** Figma has no custom properties, so a variable is named by its role in a path; CSS names the same role with a suffix. A generator or a reviewer that assumes they match will produce the wrong token.
+
+| Figma variable | CSS custom property | What it is |
+|---|---|---|
+| `base/page` | `--tc-bg` | the page behind everything |
+| `base/surface` | `--tc-surface` | a recessed or striped surface |
+| `base/surface-raised` | `--tc-surface-raised` | a card, a popup, an input |
+| `base/body` | `--tc-fg` | body text |
+| `base/muted` | `--tc-muted-fg` | secondary text |
+| `base/line` | `--tc-border` | a decorative hairline, exempt from 3:1 |
+| `base/line-strong` | `--tc-border-strong` | a control boundary, must reach 3:1 |
+| `base/ring` | `--tc-ring` | the focus ring |
+| `base/overlay` | `--tc-overlay` | the scrim behind a dialog |
+| `<tone>/solid` | `--tc-<tone>` | the strong fill |
+| `<tone>/on-solid` | `--tc-<tone>-fg` | text on that fill |
+| `<tone>/soft` | `--tc-<tone>-soft` | the tint |
+| `<tone>/on-soft` | `--tc-<tone>-text` | text on the tint, and coloured text anywhere |
+| `<tone>/hover`, `/active` | `--tc-hover`, `--tc-active` | set by the tone's compound variant |
+| `<tone>/soft-hover`, `/soft-active` | `--tc-soft-hover`, `--tc-soft-active` | same |
+| `control/<size>` | `--spacing-control-<size>` | control height |
+| `toggle/<size>` | `--spacing-toggle-<size>` | checkbox, radio and switch box |
+| `icon/<size>` | `--spacing-icon-<size>` | the five `ICON_SIZE` values |
+| `padding-x/<size>`, `padding-y/<size>` | `--spacing-pad-x-*`, `--spacing-pad-y-*` | control padding |
+| `radius/control`, `/box`, `/chip` | `--tc-radius`, and the box and chip derivations | corner radii |
+
+Phase 1's `tokens:check` script asserts this table in both directions: every Figma variable has a CSS counterpart and every `--tc-*` has a Figma variable. Neither side may gain a token without the other.
 - **Components:** one component set per catalog row, with properties named exactly as section 5.7 (`variant`, `tone`, `size`, `disabled`, `loading`, `invalid`, `open`), one variant frame per state in the States block grammar (idle, hover, focus-visible, active, disabled, loading, invalid, empty, error), in LTR and RTL, in every mode. Every colour, radius, spacing and font in the file is a variable, never a raw value.
 - **Pages:** every docs route of section 16 as a page frame at 390 px and 1280 px, in both directions.
 - **Parity gate:** a component or page is done only when its `/preview` screenshot matches its Figma frame within the visual-test tolerance. The Figma frame wins: a deliberate change is made in Figma first, then in code, and `docs/DECISIONS.md` records every intentional divergence. Pixel-identical output between Figma and a browser is not achievable (font rasterisation, sub-pixel rounding), so 1:1 means the same tokens, the same dimensions, the same states and a screenshot diff inside the tolerance.

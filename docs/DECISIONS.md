@@ -42,7 +42,13 @@ Nine docs page frames exist on the Docs pages page: the component page template 
 
 **Decision.** The Semantic collection gains `<tone>/hover`, `<tone>/active`, `<tone>/soft-hover` and `<tone>/soft-active` for the three Button tones, and the Palette gains `violet/800`, `red/500`, `red/800`, `cyan/800`, `cyan/900`.
 
-**Why.** PLAN.md 8.4 says tones set `--tc-hover`, `--tc-active` and `--tc-soft-hover`, but no such variables existed, and 6.6 forbids a raw colour anywhere in the Figma file. Solid hover and active step one and two shades **away from the button's own text**, not away from the page: primary and danger go to the 700 and 800 shades in every mode, because their label is white in every mode. The soft steps were derived the same way the existing `soft` values were - an oklch mix of the solid into the page - which measured at exactly 12%, so hover is 20% and active 28%.
+**Why.** The Figma file had no such variables, and 6.6 forbids a raw colour anywhere in it. Solid hover and active step one and two shades **away from the button's own text**, not away from the page: primary and danger go to the 700 and 800 shades in every mode, because their label is white in every mode. `soft-hover` and `soft-active` stay a mix, at the tone's own soft percentage plus 8 then plus 16.
+
+**Two corrections to this entry, both found by reviewing it.**
+
+*First:* the original wording claimed `--tc-hover`, `--tc-active` and `--tc-soft-hover` did not exist. They did - PLAN.md 6.2 defined them as `color-mix(--tc-primary 88%, black)`, `78%, black` and `20%, --tc-bg`. What actually happened is that the shade-step model **replaces** the black mix, because a black mix keeps darkening on a dark page where the button needs to move the other way to stay distinguishable. The plan is now amended to match; `soft-active` is genuinely new.
+
+*Second:* the soft percentages are not uniform. The plan sets `neutral-soft` at 8% and `warning-soft` at 16%, not 12%. The first pass measured primary and danger, found 12% in both, and generalised - so `neutral/soft-hover` and `soft-active` shipped at 20% and 28% instead of 16% and 24%, a visibly heavier hover than the rest of the system. Corrected in Figma.
 
 **Corrected the same day.** The first version reversed the direction in dark mode, using the 500 and 400 shades on the theory that hover should move toward the page. Computing the ratios killed it: white on violet-500 is 4.40:1 and on violet-400 is 2.85:1, against a 4.5 floor, so every dark-mode hover and press would have failed R-5.6-4. Red was worse at 3.82 and 2.89. The lesson is that a solid button's hover is constrained by its label, not by its background - and that a colour rule that sounds right has to be computed before it is committed.
 
