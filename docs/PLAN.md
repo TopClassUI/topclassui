@@ -650,7 +650,8 @@ The tokens package holds only these variables, the mode blocks and its `@layer b
   --tc-warning-text: var(--color-amber-700);
   --tc-danger: var(--color-red-600);
   --tc-danger-fg: var(--color-white);
-  --tc-danger-text: var(--color-red-700);
+  /* red-800 not red-700: red-700 measures 4.35:1 on danger-soft-active. */
+  --tc-danger-text: var(--color-red-800);
   --tc-info: var(--color-sky-700);
   --tc-info-fg: var(--color-white);
   --tc-info-text: var(--color-sky-700);
@@ -684,7 +685,8 @@ The tokens package holds only these variables, the mode blocks and its `@layer b
   color-scheme: light;
   --tc-primary: var(--color-cyan-700);
   --tc-primary-fg: var(--color-white);
-  --tc-primary-text: var(--color-cyan-700);
+  /* cyan-800 not cyan-700: the whole ocean soft ramp fails at cyan-700. */
+  --tc-primary-text: var(--color-cyan-800);
   --tc-radius: 9999px;
 }
 
