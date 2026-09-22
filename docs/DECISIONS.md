@@ -6,13 +6,17 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
-## 2026-09-22 - Phase 0.5: 46 components drawn, 8 of them as variant sets
+## 2026-09-22 - Phase 0.5: 46 components drawn, 6 of the 40 tier-1 rows componentised
 
-**Decision.** The Components page carries all 46 tier-1 components as documentation frames showing every state, a three-column Light / Dark / Ocean comparison, and a left-to-right against right-to-left comparison in Arabic. Eight are real Figma component sets, 263 variants in total: Button 90, Input 30, Tag 30, Checkbox 30, Radio 25, Switch 25, Badge 18, Avatar 15.
+**Decision.** The Components page carries 46 drawn components as documentation frames showing every state, a three-column Light / Dark / Ocean comparison, and a left-to-right against right-to-left comparison in Arabic. Eight are real Figma component sets, 263 variants in total: Button 90, Input 30, Tag 30, Checkbox 30, Radio 25, Switch 25, Badge 18, Avatar 15.
 
-**Why.** Breadth first. A drawn component settles the visual decisions, which is what the parity gate of 6.6 actually needs, and it surfaces contradictions early - the loading-versus-disabled clash was found this way. The eight componentised are the ones a designer reaches for most and the ones with a clean property grid; the rest are compositions whose variants would be guesses until the code exists.
+**The ledger, stated correctly.** Section 18 has **40 tier-1 rows**, not 46. Of the eight component sets, **six are tier-1** (Button, Input, Badge, Checkbox, Radio, Switch) and **two are tier-2** (Tag, Avatar), which were built early because their property grid is clean, not because they were due. So: **6 of 40 tier-1 rows have a component set; 34 remain.** The 46 drawn frames are a count of things drawn, which mixes tiers and includes compositions that are not catalog rows at all.
 
-**Affects.** Phase 0.5 is not complete until each row of section 18 has a component set whose properties match section 5.7 verbatim. Today a designer can instance those eight and read the other 38.
+The first version of this entry said "46 tier-1 components" and "the other 38". Both were wrong: it took the drawn count for the catalog count and it counted two tier-2 sets as tier-1 progress. A ledger that flatters itself is worse than none, because the next session plans against it.
+
+**Why breadth first.** A drawn component settles the visual decisions, which is what the parity gate of 6.6 actually needs, and it surfaces contradictions early - the loading-versus-disabled clash was found this way. The eight componentised are the ones with a clean property grid; the rest are compositions whose variants would be guesses until the code exists.
+
+**Affects.** Phase 0.5 is not complete until each row of section 18 has a component set whose properties match section 5.7 verbatim.
 
 RTL is covered by one comparison section showing six components in both directions in Arabic, not by a mirrored copy of every frame. That is enough to settle the rules - the layout mirrors, `arrow-*` and `caret-*` flip, `magnifying-glass` and `check-circle` do not - and cheaper than doubling the page. A per-component RTL frame is only needed where a component's mirroring is not obvious from those rules.
 
@@ -20,7 +24,9 @@ RTL is covered by one comparison section showing six components in both directio
 
 Nine docs page frames exist on the Docs pages page: the component page template at 1280 and at 390, and the marketing home, Installation, Colours, Theming, Icons, Server first and Right to left at 1280. The component template is the one that mattered, because it settles the layout every component page inherits - a two-column demo grid with a Preview/Code tab and a copy button on each, page controls for mode, direction and density, the full state matrix rendered at once rather than behind a dropdown, a props table generated from the same names the schema uses, and a "what ships to the browser" block. The mobile frame proves the template degrades: the props table becomes cards and the demo grid becomes one column.
 
-**Still missing from Phase 0.5:** component sets for the other 38; the connector page template and the `/preview` route; RTL and mobile versions of the page frames other than the component template; tiers 2 to 4.
+**Still missing from Phase 0.5:** component sets for the remaining 34 tier-1 rows; the connector page template and the `/preview` route; RTL and mobile versions of every page frame but the component template; tiers 2 to 4.
+
+**Open, and needing a decision before more drawing.** PLAN.md 6.6 asks for every docs route at 390 and 1280 in both directions. Section 16 lists about twelve routes, so that is roughly forty-eight frames against the nine that exist, and the RTL half is an Arabic copywriting job rather than a drawing one. Either that scope is accepted and budgeted, or 6.6 is amended to "1280 LTR for every route, plus 390 and RTL for the component template and the home page" - which is what was actually built. Leaving 6.6 as written means Phase 0.5 has an acceptance criterion nobody intends to meet, and a gate that cannot be passed is the same as no gate.
 
 ## 2026-09-22 - Three more Size groups: padding-y, toggle and icon
 
@@ -40,7 +46,7 @@ Nine docs page frames exist on the Docs pages page: the component page template 
 
 ## 2026-09-22 - Button hover, active and soft-hover become real tokens
 
-**Decision.** The Semantic collection gains `<tone>/hover`, `<tone>/active`, `<tone>/soft-hover` and `<tone>/soft-active` for the three Button tones, and the Palette gains `violet/800`, `red/500`, `red/800`, `cyan/800`, `cyan/900`.
+**Decision.** The Semantic collection gains `<tone>/hover`, `<tone>/active`, `<tone>/soft-hover` and `<tone>/soft-active` for the three Button tones, and the Palette gains `violet/800`, `red/500`, `red/800`, `cyan/800` and `cyan/900`. The shades the ramp actually aliases - `violet/400`, `violet/500`, `neutral/200`, `neutral/300`, `neutral/700`, `neutral/800` - were already there.
 
 **Why.** The Figma file had no such variables, and 6.6 forbids a raw colour anywhere in it. Solid hover and active step one and two shades **away from the button's own text**, not away from the page: primary and danger go to the 700 and 800 shades in every mode, because their label is white in every mode. `soft-hover` and `soft-active` stay a mix, at the tone's own soft percentage plus 8 then plus 16.
 

@@ -141,7 +141,7 @@ React Native, Vue or other frameworks; styling systems other than Tailwind; CSS-
 
 | # | Question | Default |
 |----|-------------------------------|------------------------------------------|
-| O1 | Icon library | Phosphor, regular weight |
+| O1 | Icon library | Phosphor: the regular weight, plus the three solid variants named in docs/icons.md |
 | O2 | Brand colour | Tailwind `violet` as a placeholder |
 | O3 | Fonts (docs site only; the library ships none) | Inter + Noto Sans Arabic via `next/font`; the docs set `--tc-font-latin` and `--tc-font-arabic` from those variables |
 | O4 | Licence | MIT |
@@ -433,13 +433,14 @@ export const CONTROL_SIZE = {
   custom: '',
 } as const
 
-// The tone sets --tc-hover, --tc-active and --tc-soft-hover, so these strings never change per tone.
+// The tone sets the four interaction variables, so these strings never change per tone.
 export const HOVER = {
   solid: 'hover:bg-(--tc-hover) active:bg-(--tc-active)',
-  soft: 'hover:bg-(--tc-soft-hover)',
-  outline: 'hover:bg-surface',
-  ghost: 'hover:bg-surface',
-  link: 'hover:underline',
+  soft: 'hover:bg-(--tc-soft-hover) active:bg-(--tc-soft-active)',
+  // outline and ghost are transparent at rest, so they borrow the tone's tint on the way in.
+  outline: 'hover:bg-(--tc-soft) active:bg-(--tc-soft-hover)',
+  ghost: 'hover:bg-(--tc-soft) active:bg-(--tc-soft-hover)',
+  link: 'hover:underline active:underline',
 } as const
 
 export const POPUP_BOUNDS =
