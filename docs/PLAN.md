@@ -510,7 +510,7 @@ Use logical utilities so layout follows the text direction automatically.
 - A visible focus ring on every interactive element via `focus-visible`, from `FOCUS_RING`. Never remove an outline without replacing it.
 - Types enforce labels: `IconButton` requires `label`; `Image` requires `alt`; form controls require a label through `Field`.
 - Respect `prefers-reduced-motion` and support `forced-colors` (borders stay visible in Windows high-contrast mode).
-- Contrast is checked in CI for every mode by `scripts/check-contrast.ts`: 4.5:1 for text, including a tone's text colour on its own `-soft` tint; 3:1 for `--tc-border-strong`, `--tc-ring` and icons. `--tc-border` is a decorative divider and is exempt, because no neutral light enough to read as a hairline reaches 3:1; controls that need a visible boundary use `--tc-border-strong`. The script uses CSS Color 4 gamut mapping, not naive clipping, and fails anything within 0.15 of a threshold, because the chromatic shades are outside sRGB and browsers map them differently.
+- Contrast is checked in CI for every mode by `scripts/check-contrast.ts`: 4.5:1 for text, including a tone's text colour on its own `-soft` tint; 3:1 for `--tc-border-strong`, `--tc-ring` and icons, measured against **every** surface the element can sit on (`--tc-bg`, `--tc-surface` and `--tc-surface-raised`), not only the page. It also asserts that every `-soft` tint keeps at least a 1.06 step from all three surfaces, because a tint nobody can see is not a tint: a boundary that passes on the page can fail on a card, which is how the dark `--tc-border-strong` reached only 3.19:1 before it was corrected. `--tc-border` is a decorative divider and is exempt, because no neutral light enough to read as a hairline reaches 3:1; controls that need a visible boundary use `--tc-border-strong`. The script uses CSS Color 4 gamut mapping, not naive clipping, and fails anything within 0.15 of a threshold, because the chromatic shades are outside sRGB and browsers map them differently.
 - Essential information never lives only in a tooltip.
 - **WCAG 2.2 criteria that axe cannot check, enforced by rule and by test:**
   - **2.5.8 Target Size (Minimum):** 24x24 CSS px on every pointer type, including `size="xs"`, Tag remove buttons, Pagination items, Slider thumbs and the Toast close button; 44px under `pointer-coarse`. A Playwright test measures every focusable element in every demo.
@@ -656,6 +656,14 @@ The tokens package holds only these variables, the mode blocks and its `@layer b
   --tc-info: var(--color-sky-700);
   --tc-info-fg: var(--color-white);
   --tc-info-text: var(--color-sky-700);
+
+  /* How much of the tone goes into its soft tint. Dark needs more (see the dark block). */
+  --tc-primary-mix: 12%;
+  --tc-neutral-mix: 8%;
+  --tc-success-mix: 12%;
+  --tc-warning-mix: 16%;
+  --tc-danger-mix: 12%;
+  --tc-info-mix: 12%;
 }
 
 [data-theme="dark"] {
@@ -667,7 +675,7 @@ The tokens package holds only these variables, the mode blocks and its `@layer b
   --tc-fg: var(--color-neutral-50);
   --tc-muted-fg: var(--color-neutral-400);
   --tc-border: var(--color-neutral-800);
-  --tc-border-strong: var(--color-neutral-500);
+  --tc-border-strong: var(--color-neutral-400);   /* 5.83:1 on a raised card; neutral-500 measured only 3.19:1 there */
   --tc-overlay: oklch(0 0 0 / 0.7);
 
   --tc-neutral: var(--color-neutral-100);
@@ -678,6 +686,16 @@ The tokens package holds only these variables, the mode blocks and its `@layer b
   --tc-warning-text: var(--color-amber-400);
   --tc-danger-text: var(--color-red-400);
   --tc-info-text: var(--color-sky-400);
+
+  /* A tone mixed into near-black barely moves: at the light percentages every dark soft
+     tint measured 1.01-1.03 against --tc-surface, which is invisible. These are the
+     smallest values that keep a step against all three surfaces and the text above 4.5:1. */
+  --tc-primary-mix: 24%;
+  --tc-neutral-mix: 12%;
+  --tc-success-mix: 24%;
+  --tc-warning-mix: 14%;
+  --tc-danger-mix: 22%;
+  --tc-info-mix: 24%;
 }
 
 /* A custom mode is one more block. It may change knobs as well as colours,
@@ -697,20 +715,20 @@ The tokens package holds only these variables, the mode blocks and its `@layer b
 [data-theme] {
   /* Not var(--tc-primary): violet-600 measures 2.57:1 on a dark raised surface. */
   --tc-ring: var(--tc-primary-text);
-  --tc-primary-soft: color-mix(in oklch, var(--tc-primary) 12%, var(--tc-bg));
-  --tc-neutral-soft: color-mix(in oklch, var(--tc-neutral) 8%, var(--tc-bg));
-  --tc-success-soft: color-mix(in oklch, var(--tc-success) 12%, var(--tc-bg));
-  --tc-warning-soft: color-mix(in oklch, var(--tc-warning) 16%, var(--tc-bg));
-  --tc-danger-soft: color-mix(in oklch, var(--tc-danger) 12%, var(--tc-bg));
-  --tc-info-soft: color-mix(in oklch, var(--tc-info) 12%, var(--tc-bg));
+  --tc-primary-soft: color-mix(in oklch, var(--tc-primary) var(--tc-primary-mix), var(--tc-bg));
+  --tc-neutral-soft: color-mix(in oklch, var(--tc-neutral) var(--tc-neutral-mix), var(--tc-bg));
+  --tc-success-soft: color-mix(in oklch, var(--tc-success) var(--tc-success-mix), var(--tc-bg));
+  --tc-warning-soft: color-mix(in oklch, var(--tc-warning) var(--tc-warning-mix), var(--tc-bg));
+  --tc-danger-soft: color-mix(in oklch, var(--tc-danger) var(--tc-danger-mix), var(--tc-bg));
+  --tc-info-soft: color-mix(in oklch, var(--tc-info) var(--tc-info-mix), var(--tc-bg));
   /* A solid button's hover is constrained by its own label, not by the page, so it
      steps away from that label in every mode. Each tone sets these three; the values
      here are the primary tone. Mixing toward black instead would keep darkening on a
      dark page, and stepping toward the page would drop white text below 4.5:1. */
   --tc-hover: var(--color-violet-700);
   --tc-active: var(--color-violet-800);
-  --tc-soft-hover: color-mix(in oklch, var(--tc-primary) 20%, var(--tc-bg));
-  --tc-soft-active: color-mix(in oklch, var(--tc-primary) 28%, var(--tc-bg));
+  --tc-soft-hover: color-mix(in oklch, var(--tc-primary) calc(var(--tc-primary-mix) + 8%), var(--tc-bg));
+  --tc-soft-active: color-mix(in oklch, var(--tc-primary) calc(var(--tc-primary-mix) + 16%), var(--tc-bg));
 }
 
 [dir="rtl"] { --tc-dir: -1; }
@@ -728,7 +746,7 @@ The tokens package holds only these variables, the mode blocks and its `@layer b
 | danger | red-700 | red-800 | Same |
 | neutral | light: neutral-800 then 700; dark: neutral-200 then 300 | | Its solid is already near-black or near-white, so it steps toward the middle and its label flips with it |
 
-`--tc-soft-hover` and `--tc-soft-active` stay a mix, because a tint has no label of its own. The rule is **the tone's own soft percentage plus 8, then plus 16** - which is why they differ per tone: `primary`, `success`, `danger` and `info` are 12/20/28, `neutral` is 8/16/24, and `warning` is 16/24/32. Reading 20% off the primary block and applying it to every tone is the mistake to avoid.
+`--tc-soft-hover` and `--tc-soft-active` stay a mix, because a tint has no label of its own. The rule is **the tone's own soft percentage plus 8, then plus 16**, and the percentage is `--tc-<tone>-mix`, which differs per tone **and per mode**. Light and ocean: `primary`, `success`, `danger` and `info` are 12, `neutral` is 8, `warning` is 16. Dark: 24, 24, 22, 24, 12 and 14 respectively. Dark needs roughly double because a mid-lightness tone mixed into near-black hardly moves - at the light percentages every dark soft tint measured 1.01-1.03 against `--tc-surface`, which is no step at all. Reading one number off the primary block and applying it to every tone, or reading the light number and applying it to dark, are the two mistakes to avoid.
 
 ```css
 
@@ -1834,6 +1852,26 @@ The preview tree lives outside `[locale]`, so `app/(preview)/preview/[theme]/[di
 A component page contains: a one-sentence description; the install and import line; a **demo grid** - two columns on desktop, one on mobile - where each demo from `demos/` is a live preview with a code tab and a copy button; a **States block** that renders the full state matrix at once, with states as rows (`idle`, `hover`, `focus-visible`, `active`, `disabled`, `loading`, `invalid`, `empty`, `error`) and variants as columns, using the forced-state attributes (`data-hover`, `data-focus-visible`, `data-active`) that the variants also match, so no interaction is needed to see a state; **page controls** - segmented, not a dropdown - for mode, direction, density and radius, which change every block on the page; the props table generated from the emitted `.d.ts` with defaults and limits from `schema.ts`; accessibility notes with a keyboard table; RTL notes; the server/client breakdown with the measured client JavaScript size; and related components. The `/preview` route renders the same States block, so the visual tests and the docs can never disagree.
 
 The live demo at the top of a component page is the playground: its controls are generated from `schema.ts` (an enum becomes a select, a boolean a switch, a number a slider with the schema's min and max). It is built with the page template in Phase 0, not later.
+
+**The previewer.** Every component on the catalog page and at the top of its own page sits in one wrapper, so a reader learns the layout once and then reads 46 components with it. Five parts, in this order: the **stage** (the hero demo on `--tc-bg`, so the component is seen against the page it will live on); the **playground** (the schema-generated controls, beside the stage); the **code** (the JSX that produces the stage, syntax-highlighted, with the copy button bound to *it* - a copy button with no visible source is ambiguous and is not allowed); the **states block**; and the **two install paths**, the CLI command and the package import, side by side. The kind chip in the header carries the measured size, never the bare word: `server - 0 KB`, `client - 4.8 KB`, `split - 0 KB server + 1.2 KB client`, generated from the size-limit JSON so the page cannot drift from the budget. A component whose chip says `lazy` says so on the chip.
+
+**Accessible names on a page of 46 previewers.** The page repeats the same control dozens of times, and a screen-reader user meets them as one long list, so every repeated control is named by what it acts on. Each string is a `labels` entry with `en` and `ar` defaults (R-5.11-1) composed with the component name, never a literal.
+
+| Control | Count | Accessible name |
+|---|---|---|
+| Section mode switcher | 46 | `Colour mode for {Component}` on the radiogroup; the options keep their own words, `Light` / `Dark` / `Ocean`, and never repeat the component name |
+| Page mode switcher | 1 | `Colour mode for the whole page` - deliberately different wording, so it is never announced like a section control |
+| Page direction, density, radius | 1 each | `Text direction for the whole page`, and the same shape for the other two |
+| Copy, CLI line | 46 | `Copy the CLI command for {Component}` |
+| Copy, import line | 46 | `Copy the import for {Component}` |
+| Copy, demo code | 46 | `Copy the {demo} code for {Component}`, where `{demo}` is the `demos/` file name |
+| Preview / Code tabs | 46 pairs | The tab list is `{Component} demo`; the tabs keep the bare words `Preview` and `Code`, and each panel is named by its tab with `aria-labelledby` |
+| Section heading anchor | 46 | `Link to the {Component} section` |
+| The two navigation landmarks | 2 | `<nav aria-label="Site">` and `<nav aria-label="On this page">`; two unnamed navs are announced identically |
+
+A copy button's accessible name never changes to "Copied". Success is announced from one polite live region per section - renaming the focused control re-announces it and throws away the name the reader just heard. The current sidebar row carries `aria-current="page"`.
+
+**Part naming.** The root of a part family is `<Name>Root` without exception: `CardRoot`, `DialogRoot`, `DrawerRoot`, `AvatarRoot`, `TabsRoot`, `AccordionRoot`, `NavbarRoot`, `SidebarRoot`, `PopoverRoot`, `TooltipRoot`, `SegmentedControlRoot`. A scrolling overlay names its three parts `<Name>Header`, `<Name>Body` and `<Name>Footer`, and the **Body** is the scroll container that rule 10.5-3 requires - a Dialog whose title and footer sit loose in the popup has nothing to scroll.
 
 The docs site is built only with TopClass UI components once they exist. Until the component a page needs is shipped, the docs use plain HTML elements styled with the same semantic classes, each marked `{/* TODO(tc): replace with <Select> in Phase 4 */}`. `pnpm check` lists these markers, and Phase 7 is accepted only when the list is empty. If the docs need a component that is not on the roadmap at all, that is a signal for the roadmap.
 

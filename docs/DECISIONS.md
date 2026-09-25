@@ -6,6 +6,73 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-09-25 - The docs page: one previewer, and a prototype built from variable modes
+
+**Decision.** The documentation site is one page of 46 component cards, all in the same five-part previewer: stage, playground, code, every state, two install paths. It is drawn in Figma as `Docs site - LTR` (1440 x 48709) and `Docs site - RTL` (1440 x 3533), both on the Docs pages page, with `Docs site` as the prototype's starting point.
+
+**The code block is not optional.** The first draft had a stage, a playground, a state matrix and two install lines, and never showed a line of JSX - while carrying a `Copy` button in the header with no visible source. A reviewer reading it as a working engineer stopped there, and was right to: a copy button that does not say what it copies is worse than no copy button. Every card now carries the JSX that produces its own stage, syntax-highlighted, with the copy button moved onto that block. The header keeps only `Install`.
+
+**The size is on the chip.** `server`, `client` and `split` alone hide the number that decides whether a component is worth using. Each chip now reads `server - 0 KB`, `client - 4.8 KB` or `split - 0 KB server + 1.2 KB client`. These are **budgets, not measurements** - no code exists yet - and the page says so where it matters. Phase 3 generates them from the size-limit JSON so the two cannot drift.
+
+**Three modes, one page, no clones.** The obvious way to prototype a mode switcher is to duplicate the page three times. On a 48000 px page that is three copies to keep in sync, and they would drift by the second edit. Figma's prototype can set a variable mode instead, so all 47 mode switchers - one global, one per card - carry a `SET_VARIABLE_MODE` action on the Semantic and Knobs collections, and the single page recolours. Six new variables (`ui/seg-on-*`, `ui/seg-label-*`) make the active segment follow the mode, so the control is not lying about its own state.
+
+**What the prototype cannot do honestly.** A per-card switcher changes the whole page rather than that card. In the built site it is a scoped `data-theme` on the card and behaves correctly; the limitation is Figma's, not the design's, and the per-card control stays because it is the real specification.
+
+**Direction needed a second frame, and got a small one.** Direction is layout, not colour, so no variable mode can express it. A full mirrored copy of 48000 px would be the drift problem the mode switcher just avoided, and mirroring it by hand across thousands of nodes would introduce errors rather than prove anything. `Docs site - RTL` is instead a complete page - navbar, sidebar on the inline-end, table of contents on the inline-start, footer note - carrying **three** cards (Button, Input, Pagination) chosen because between them they cover text, a Field-wrapped control, directional icons and Arabic-Indic digits. The LTR and RTL switchers navigate between the two frames. What it proves is that the template mirrors; the other 43 add no new decision.
+
+**The sidebar is the site, the table of contents is the page.** They were the same list of seven groups twice on one screen. The sidebar is now the route tree of section 16 - Start here, Foundations, Reference, More - and the right rail stays the seven sections of this page.
+
+**Also added, from the same review.** A proof band above the catalog, because the old fold opened on `Heading` and `Text` and said nothing about why this library exists: three panels, each a rendered demonstration rather than a claim - the server/client split of one invoice card with the size-limit entry that enforces it, the same component tree in both directions in Arabic with the 3 x 4 test matrix, and one `AdaptiveMenu` call rendering as a Dropdown and as a Drawer. And a **Before you start** block, because 46 install lines are useless without the package install, the three `@import` lines, and the provider.
+
+**Affects.** PLAN.md 16 gains the previewer contract, the accessible-name table for a page that repeats one control 46 times, and the part-naming rule. The catalog page is a new route and does not replace the per-component pages the Definition of Done requires; both render the same previewer.
+
+## 2026-09-25 - Ten defects in the first pass of the docs code samples
+
+**Decision.** The 46 JSX samples were written by eight authors who could not see each other's work, then audited against PLAN.md and RULES.md as one set. Ten defects were found in eight snippets and all ten are fixed; the other 38 were clean.
+
+**Three would not have run.** Toast had `'use client'` *after* its imports, where a directive prologue is a dead string - the file would have compiled as a Server Component with a function prop and thrown at render. Dialog rendered `DialogFooter` without importing it. The Command palette imported `useState`, never called it, and had no component wrapper, so `open` and `setOpen` were undefined.
+
+**One was a boundary error.** TreeView is a client component passing `getKey`, and carried no `'use client'` - while its own caption said it needed one.
+
+**The rest were drift between authors**, which is the defect a single reviewer never catches and a cross-cutting audit always does: TreeView passed `<Svg>` elements where Timeline, DropdownMenu and the `MenuItem` contract all pass `IconName` strings; Card was the only part family whose root was not `CardRoot`; Dialog had no `DialogBody`, so rule 10.5-3 had nothing to scroll, while Drawer two cards away did it correctly; Rating reached past `<Text muted>` for a raw `text-muted-fg` span; Breadcrumb and Pagination both dropped the `locale` half of `getLabels`, which a count label of the form `(n, fmt)` cannot work without and which a Server Component has no other way to obtain (R-5.1-4).
+
+**One number was wrong.** The Command palette was chipped at 6.2 KB while being a Combobox-class collection (5.6) inside a Dialog (2.1) - below the sum of its own parts. It is now `client - 9.4 KB, lazy`, which also surfaces that it is one of the three components rule 9.2-7 requires to be lazy-loaded.
+
+**Why this is recorded.** Eight of 46 is a 17% defect rate in code that reads fluently and was written against the specification. Writing many samples in parallel and auditing them as one set is now the method, not an afterthought - a reviewer with all 46 in front of them finds the inconsistencies that no author of six of them can see.
+
+## 2026-09-25 - The dark soft tints were invisible, and the dark control boundary was thin
+
+**Decision.** The soft-tint mix percentage becomes a per-tone, per-mode variable, `--tc-<tone>-mix`. Light and ocean keep 12 / 8 / 12 / 16 / 12 / 12 for primary, neutral, success, warning, danger and info. Dark gets 24 / 12 / 24 / 14 / 22 / 24. Dark `--tc-border-strong` moves from neutral-500 to neutral-400.
+
+**Why.** Building the docs page put every component on a card, which is a surface the original token audit never measured against. Two things fell out of that, both measured from the Tailwind 4.3.3 `theme.css` with CSS Color 4 gamut mapping, not estimated:
+
+- Every dark soft tint measured **1.01 to 1.03** against `--tc-surface`. That is not a faint tint, it is no tint: a soft Badge on a striped panel in dark mode was the panel. The cause is arithmetic - a mid-lightness tone mixed 12% into near-black hardly moves, so the result lands almost exactly on neutral-900. The light percentages were never wrong for light; they were applied to dark without being re-measured there.
+- Dark `--tc-border-strong` (neutral-500) on `--tc-surface-raised` (neutral-800) measured **3.19:1**. It passes 3:1, but the plan's own check fails anything within 0.15 of a threshold, so it cleared the bar by 0.04. On the page being built, every input sits on exactly that surface. neutral-400 measures 5.83:1 there.
+
+**How the dark percentages were chosen.** The smallest value per tone that keeps at least a 1.06 step from all three surfaces while holding the tone's text above 4.5:1 on the tint, on its +8 hover and on its +16 active. Stricter targets were tried first and are not reachable: at a 1.12 floor, primary and danger have **no feasible value at all**, because any tint bright enough to show on a raised card has moved into the lightness of the 400-shade text that sits on it. That is a real constraint of a single-hue ramp in dark mode, not a number that needed more searching.
+
+**Affects.** `--tc-soft-hover` and `--tc-soft-active` become `calc(var(--tc-primary-mix) + 8%)` and `+ 16%`, so the plus-8-then-16 rule survives unchanged and now follows the mode. `check-contrast.ts` gains two duties: measure `--tc-border-strong`, `--tc-ring` and icons against **all three** surfaces rather than the page alone, and assert every `-soft` tint keeps a 1.06 step from all three. The Figma Semantic collection's dark mode was updated to match, with `base/line-strong` re-aliased to Palette neutral-400 rather than given a raw value.
+
+**Not changed, and why.** A reviewer also asked for a `--tc-ring-offset-color` token, on the grounds that the focus ring's offset gap would show the wrong colour on a card. That applies to Tailwind's v3 box-shadow ring, where the offset is a painted ring. This plan uses a real CSS `outline` with `outline-offset`, where the gap is not painted at all - it shows the actual backdrop, which is correct on any surface. No token is needed.
+
+## 2026-09-25 - Two ways to install: the registry CLI and the package
+
+**Decision.** Every component is available two ways, and the docs show both on every component page: `npx topclassui add <slug>` copies that component's source into the consumer's repo, and `import { X } from '@topclassui/react/<slug>'` imports it from the published package. The registry moves from "after v0.1" to a v0.1 deliverable.
+
+**Why.** Omar asked for the shadcn model - take only what you need rather than installing a library. Worth being precise about what that buys, because the package already solved half of it: per-component subpath exports plus `sideEffects: false` mean a consumer who imports one component ships one component, so "the whole library" was never shipping. What the registry adds is **ownership** - the source lands in your repo, you can edit it, and you are not waiting on us for a change. Those are different goods and there is no reason to choose between them.
+
+**Affects.** `registry.json` and the `topclassui add` CLI become Phase 7 work rather than post-1.0. The generated source has to compile without the package present, so the CLI rewrites `../../shared/*` imports to a local `lib/` path and pulls the component's `constants.ts`, `schema.ts`, `types.ts` and `variants.ts` alongside it. A component that imports another component pulls that one too, so each registry entry lists its dependencies.
+
+**The risk, stated.** Two distribution paths means two things to keep working. Phase 7 acceptance gains: a fresh Next.js app installs one component through the CLI, `tsc --noEmit` passes without `@topclassui/react` in `package.json`, and the rendered output matches the package version's `/preview` screenshot.
+
+## 2026-09-25 - The docs are dark first
+
+**Decision.** The documentation site defaults to dark, with light and ocean one click away. The component page is designed dark first and light is derived from it.
+
+**Why.** It is what the audience expects from a component library, and it is the harder direction to get right - a design that works dark generally works light, and the reverse often does not. It also exercises the mode system on the page a visitor sees first, so a broken dark token is noticed immediately rather than in a mode nobody opens.
+
+**Affects.** `ThemeScript`'s default flips from `light` to `dark`, following the system only when the visitor has expressed no preference. Note for whoever builds the Figma side: a frame's explicit variable mode applies to its descendants, not to the frame's own fill, so the page background is a bound child rectangle rather than the frame fill.
+
 ## 2026-09-22 - Phase 0.5: 46 components drawn, 6 of the 40 tier-1 rows componentised
 
 **Decision.** The Components page carries 46 drawn components as documentation frames showing every state, a three-column Light / Dark / Ocean comparison, and a left-to-right against right-to-left comparison in Arabic. Eight are real Figma component sets, 263 variants in total: Button 90, Input 30, Tag 30, Checkbox 30, Radio 25, Switch 25, Badge 18, Avatar 15.

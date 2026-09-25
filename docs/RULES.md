@@ -54,6 +54,11 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 **Why:** React's client-module proxy allows one level of access and throws on the second.
 **Enforced by:** `eslint`
 
+### R-9.2-4 The root of a part family is `<Name>Root`
+**Rule:** a component split into parts names its root `<Name>Root` without exception (`CardRoot`, `DialogRoot`, `AvatarRoot`), and a scrolling overlay names its parts `<Name>Header`, `<Name>Body` and `<Name>Footer`, where the Body is the scroll container R-10.5-1 requires.
+**Why:** one family naming its root `Card` while ten others use `XxxRoot` is the drift a cross-file audit catches and an author never does; an overlay without a Body has nothing to scroll.
+**Enforced by:** `check-structure`
+
 ## 2. Styling
 
 ### R-5.2-1 Semantic classes only
