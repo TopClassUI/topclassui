@@ -6,6 +6,16 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-09-25 - Next.js and React only; the table gets sorting, sticky columns and a page size
+
+**Decision.** The library supports TypeScript projects on Next.js and React. Plain-JavaScript projects are not a target: the docs no longer describe them, the registry CLI has no type-stripping mode, and the earlier JavaScript decision is closed rather than left open. The published package still works in a JavaScript project because it ships compiled code with declarations, but nothing is promised or tested there.
+
+**Why.** Omar chose it: "since js will be hard, make it nextjs + react only". Every hour spent on stripped-type output, sibling declaration files and a second CI job is an hour not spent on the 40 rows. It can be reopened after 1.0 if a real user asks.
+
+**Table.** Omar asked whether the table supports sortable columns, fixed columns and a choice of rows per page. It now does, by decision: `sortable` on a column definition renders a real sort control in the header and sorts on the server through a `?sort=` link, so it works before hydration; `stickyFirstColumn` keeps the first column in view while a wide table scrolls, using `inset-s-0` so it mirrors; and `pageSize` takes `25 | 50 | 100 | 500` with a page-size selector that is also a link. All three are on the Table card and in the props table.
+
+**Affects.** PLAN.md 18 (Table row), the Install and CLI pages, the JavaScript sections removed from both. The open question on `zod` recorded in the CLI entry is unaffected.
+
 ## 2026-09-25 - Publishing: one organisation, a hand-published 0.0.1, then trusted publishing with no token fallback
 
 **Decision.** Create the free npm organisation `topclassui` this week (the organisation name is the scope), publish a real `0.0.1` of `@topclassui/react`, `@topclassui/tokens` and `@topclassui/icons` by hand with `--access public`, then attach a trusted publisher to each with the direct-publish permission and release from `release.yml` on Node 24. Delete the token fallback.

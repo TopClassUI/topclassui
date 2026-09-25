@@ -1990,7 +1990,7 @@ Rendering: **S** = server only (0 KB JS), **Sp** = split (`index.tsx` + `client.
 | EmptyState, ErrorState | S | 1 | Used by every `states.tsx` |
 | ErrorBoundary | C | 1 | Class component; default fallback `ErrorState` with `labels.retry`, remounts children by key; `onError` for reporting; used internally by every data component and connector |
 | Progress, Meter | S | 2 | `min`/`max`, clamped |
-| Table | S | 1 | Static semantic table; windowed and sticky-header rules in 8.5 and 10.5 |
+| Table | S | 1 | Sortable columns through `?sort=` links; `stickyFirstColumn` with `inset-s-0`; `pageSize` of 25, 50, 100 or 500 with a link-based selector; the collection contract of 8.5 |
 | Rating | Sp | 3 | Display is server; input is client |
 
 ## 18.3 Actions
