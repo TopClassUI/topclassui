@@ -6,6 +6,12 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-09-25 - The site copy is written for users, not for us
+
+**Decision.** Every string on the 19 frames was reworded for a developer who has never seen the project: no phase numbers, no catalog rows, no tiers, no file names from the plan, no budget jargon, no competitor. Early access is stated once per page, calmly. A separate review of the seven newest pages found 46 defects - two code samples that would not compile, a wrong provider prop, a file layout that contradicted R-8.1-1 - and all were applied. The hero now reads "The React UI kit that reads both ways", because "rendered on the server" oversold a library where a third of the components run in the browser.
+
+**Affects.** Figma only. The plan keeps its own vocabulary; the site does not use it.
+
 ## 2026-09-25 - Next.js and React only; the table gets sorting, sticky columns and a page size
 
 **Decision.** The library supports TypeScript projects on Next.js and React. Plain-JavaScript projects are not a target: the docs no longer describe them, the registry CLI has no type-stripping mode, and the earlier JavaScript decision is closed rather than left open. The published package still works in a JavaScript project because it ships compiled code with declarations, but nothing is promised or tested there.
