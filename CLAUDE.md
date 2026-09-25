@@ -31,6 +31,7 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from doc
 - **R-5.1-2** For a C component or a connector, `index.tsx` holds no markup: it re-exports the client parts, the prop types, the variants and the skeleton. _(check-structure)_
 - **R-5.1-3** Only serializable props cross the boundary: strings, numbers, booleans, plain objects, arrays and `ReactNode` children; functions never, except Server Actions. _(manual)_
 - **R-5.1-4** No React context in Server Components: direction and theme come from `dir` and `data-theme` on the HTML; labels come from props. _(check-boundaries)_
+- **R-5.1-5** Only `components/icon/index.tsx` may be async or import `server-only`; every other `index.tsx` renders in a non-RSC React tree. _(check-boundaries)_
 - **R-9.2-3** Export flat names (`DialogRoot`), never an object (`Dialog.Root`) that a server file would dot into. _(eslint)_
 - **R-9.2-4** The root of a part family is `<Name>Root` (`CardRoot`), and a scrolling overlay adds `<Name>Header`, `<Name>Body` and `<Name>Footer`, the Body being the scroll container. _(check-structure)_
 

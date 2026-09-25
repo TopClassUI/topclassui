@@ -49,6 +49,11 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 **Why:** context does not exist in the Server Component render.
 **Enforced by:** `scripts/check-boundaries.ts`
 
+### R-5.1-5 Only `components/icon/index.tsx` may be async or import `server-only`
+**Rule:** every other `index.tsx` in `packages/react` renders in a non-RSC React tree; the async server `<Icon>` is the one exception, and the sync `<Icon>` from `icon-registry` carries the identical props for browser-only trees.
+**Why:** it is the gate that keeps every non-Next target working; without it the first component that quietly becomes async breaks every Vite and React Router consumer and nothing catches it.
+**Enforced by:** `scripts/check-boundaries.ts`
+
 ### R-9.2-3 Never dot into a client module from a server file
 **Rule:** export flat names (`DialogRoot`), never an object (`Dialog.Root`) that a server file would dot into.
 **Why:** React's client-module proxy allows one level of access and throws on the second.

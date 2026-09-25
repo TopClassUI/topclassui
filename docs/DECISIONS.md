@@ -6,6 +6,40 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-09-25 - Publishing: one organisation, a hand-published 0.0.1, then trusted publishing with no token fallback
+
+**Decision.** Create the free npm organisation `topclassui` this week (the organisation name is the scope), publish a real `0.0.1` of `@topclassui/react`, `@topclassui/tokens` and `@topclassui/icons` by hand with `--access public`, then attach a trusted publisher to each with the direct-publish permission and release from `release.yml` on Node 24. Delete the token fallback.
+
+**Why.** Three things in 17.4 would have failed the first release, each verified against npm's current documentation on 2026-09-25: a trusted publisher cannot be attached to a package that does not exist yet, so OIDC cannot perform a first publish; since 2026-09-03 a new trusted publisher allows only staged publishing unless direct publish is enabled, and `changeset publish` publishes directly; and `npm install -g npm@latest` no longer installs on Node 22.14, which the plan's engines floor allows. Provenance additionally requires a public repository, which `TopClassUI/topclassui` is not today - a private repository does not fail the publish, it silently produces releases with no attestation. An organisation rather than a user scope because npm does not rename published packages, so the scope cannot be migrated later. The token fallback goes because classic tokens no longer exist, a granular write token expires within 90 days, and a token does not buy provenance on its own.
+
+**Answered plainly.** npm, pnpm, yarn and bun are four clients of one registry. One npm account and one organisation; nothing to create anywhere else.
+
+**Affects.** PLAN.md 17.4 rewritten. Before the bootstrap publish: three package READMEs, `"license": "MIT"` per package, `repository` with `directory`, keywords, and the repository made public.
+
+## 2026-09-25 - React without Next.js: support tiers, the icon registry, and one new rule
+
+**Decision.** Next.js App Router is tier 1. Vite single-page apps, React Router v7 framework mode and the Next.js Pages Router are tier 2: every component works and they sit in the same CI matrix, and the features that need a server render are documented as unavailable. TanStack Start, Astro islands, Remix v2 and webpack-based React are tier 3: same mechanism, not in CI. A tier is feature coverage, not quality.
+
+**The one hard break, and its answer.** The catalog's RSC-hard surface is one file: `components/icon/index.tsx` is async and imports `server-only`. Everything else renders in a plain React tree. A second entry point, `@topclassui/react/icon-registry`, ships a synchronous `<Icon>` with the identical props plus `registerIcons()`, so `name` keeps working in a browser-only tree - including in every contract that carries an `IconName`. A typo is a type error; a missing registration renders an empty SVG at the resolved size, warns in development, and `npx topclassui icons scan` writes the registration file from source. A map of lazy loaders was rejected because a 20,000-icon map is 600 KB before a single path loads; `<Svg>`-only was rejected because it forks the data contract between the two worlds.
+
+**Also decided.** `@topclassui/vite`, one file with `vite` as its only peer, scopes the `MODULE_LEVEL_DIRECTIVE` warning to our package ids and injects the theme script into `index.html`; `THEME_SCRIPT` is exported as a string beside `ThemeScript` so the two cannot drift. `MenuItem` becomes a discriminated union on `onSelect` or `action`, because the two render different elements and nothing stopped a caller setting both. `<form action={fn}>` takes any function; only a Server Action also works before hydration, and the docs say so. `JsonLd` moves to `@topclassui/react/json-ld`; the `Image` adapter is `render`-based before it is built. The `0 KB` rows are an RSC guarantee and every chip on the docs site is read as the Next.js cost.
+
+**Affects.** New rule R-5.1-5 in RULES.md, enforced by `check-boundaries`. PLAN.md 4, 7.2, 7.3, 11.3, 12, 14, 15.2, 16, 17.3 and 18.8 carry the edits listed in the React-support decision; they land with the phases that build those parts, not in 0.5.
+
+## 2026-09-25 - The registry CLI: init and add, auto-detect first, ask second
+
+**Decision.** `npx topclassui@latest init` detects the package manager (`npm_config_user_agent`, then the `packageManager` field, then the lockfile), the framework (its config file plus the `app` or `pages` directory) and TypeScript (`tsconfig.json`), and asks two questions: the CSS entry and the import alias for shared code. It adds the three `@import` lines and writes `topclassui.json`. `add <slug>` copies the component folder with `../../shared` rewritten to the alias, pulls the components it imports, installs missing peers with the detected manager, never overwrites a file it did not just write, and offers `diff`, `--overwrite`, `--yes`, `--dry-run`, `--schema` and `--js`/`--ts`. It sends no telemetry and touches no file it did not create. The four invocations are `npx`, `pnpm dlx`, `yarn dlx` and `bunx`.
+
+**Open question, recorded rather than decided.** The JavaScript decision argues that `zod` should move from required to optional peer by declaring the design-prop interfaces in `types.ts` and proving them equal to the schema's input type with a type test, which also removes a runtime `zod` import from `<Icon>`'s size helper. It was not adversarially reviewed before the session limit and it reverses M1, so the docs and 5.9 keep `zod` required until Phase 0 settles it. The mechanism is in the decision file and is the recommended default.
+
+## 2026-09-25 - The documentation site is drawn in full: 19 frames, one prototype
+
+**What exists.** On the Docs pages page, left to right in sidebar order: Home, Install the package, Add with the CLI, CSS entry, Provider, Your first component, Colours, Icons, Theming, Right to left, Server first, Accessibility, Components, Components in Arabic, Connectors, Theme builder, Changelog, Blog, Demo preview. Every sidebar row, navbar link, footer link, next block and on-this-page entry navigates; every mode switcher sets the variable mode; 857 wired links. The prototype starts on Home.
+
+**The landing page.** A centred two-line headline at 92px over a violet radial glow, the install command with two calls to action, and a 1200 by 720 product frame - an invoices screen drawn only from catalog components - rising out of the glow. Below it: the three proof panels cloned from the components page, the same form in three explicit variable modes side by side, five labelled numbers, the 46-chip catalog, the two install paths, the phase ledger with 0.5 highlighted, and three things a visitor can do today. Four concepts were drafted; the GitHub-style structure won on first impression and the honest status chip and larger type were grafted from two others. Nothing on it claims to exist that does not.
+
+**Copy.** The reviewer's 37 replacements were applied across every card: no competitor named, no shouting eyebrows, budgets labelled as budgets, the count corrected to 46.
+
 ## 2026-09-25 - The docs page: one previewer, and a prototype built from variable modes
 
 **Decision.** The documentation site is one page of 46 component cards, all in the same five-part previewer: stage, playground, code, every state, two install paths. It is drawn in Figma as `Docs site - LTR` (1440 x 48709) and `Docs site - RTL` (1440 x 3533), both on the Docs pages page, with `Docs site` as the prototype's starting point.
