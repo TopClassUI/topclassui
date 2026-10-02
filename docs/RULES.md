@@ -1,6 +1,6 @@
 # TopClass UI - rules
 
-The full specification is `docs/PLAN.md`; the rules below are the complete list; do not deviate without a `docs/DECISIONS.md` entry.
+Read `docs/STATUS.md` first for where things stand. The full specification is `docs/PLAN.md`; the rules below are the complete list; do not deviate without a `docs/DECISIONS.md` entry.
 
 This file is the single source. `CLAUDE.md`, `AGENTS.md` and `.cursor/rules/topclassui.mdc` are generated from it by `pnpm rules:sync`, and `pnpm check` fails if any of them has drifted. Edit this file, never the generated ones.
 
