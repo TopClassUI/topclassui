@@ -2,7 +2,7 @@
 
 # TopClass UI - working rules
 
-The full specification is docs/PLAN.md; the rules below are the complete list; do not deviate without a docs/DECISIONS.md entry.
+Read docs/STATUS.md first for where things stand. The full specification is docs/PLAN.md; the rules below are the complete list; do not deviate without a docs/DECISIONS.md entry.
 
 ## Commands
 
