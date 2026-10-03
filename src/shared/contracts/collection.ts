@@ -18,13 +18,19 @@ export interface CollectionProps<T> extends StateProps {
   selectedItem?: T | undefined
 }
 
-/** The defaults TopClassProvider carries, which a component may override per instance. */
-export const COLLECTION_DEFAULTS = {
+export interface CollectionDefaults {
+  visibleRows: number
+  virtualizeAbove: number
+  loadMoreThreshold: number
+  estimateRowHeight: number
+  overscan: number
+}
+
+/** Typed rather than `as const`, or the override prop would only accept these exact numbers. */
+export const COLLECTION_DEFAULTS: CollectionDefaults = {
   visibleRows: 7,
   virtualizeAbove: 200,
   loadMoreThreshold: 10,
   estimateRowHeight: 36,
   overscan: 6,
-} as const
-
-export type CollectionDefaults = typeof COLLECTION_DEFAULTS
+}
