@@ -1,0 +1,96 @@
+import type { CountLabel, Labels } from './types.js'
+
+const plural = new Intl.PluralRules('ar')
+
+/** Arabic has six categories, so a count label picks a form rather than filling a template. */
+function byCount(forms: {
+  zero: string
+  one: string
+  two: string
+  few: (n: string) => string
+  many: (n: string) => string
+  other: (n: string) => string
+}): CountLabel {
+  return (n, fmt) => {
+    const rule = plural.select(n)
+    const value = fmt.format(n)
+    if (rule === 'zero') return forms.zero
+    if (rule === 'one') return forms.one
+    if (rule === 'two') return forms.two
+    if (rule === 'few') return forms.few(value)
+    if (rule === 'many') return forms.many(value)
+    return forms.other(value)
+  }
+}
+
+export const ar = {
+  common: {
+    close: 'إغلاق',
+    cancel: 'إلغاء',
+    confirm: 'تأكيد',
+    retry: 'حاول مرة أخرى',
+    loading: 'جارٍ التحميل',
+    more: 'المزيد',
+    clear: 'مسح',
+    copy: 'نسخ',
+    copied: 'تم النسخ',
+    search: 'بحث',
+    required: 'مطلوب',
+    optional: 'اختياري',
+  },
+  state: {
+    empty: 'لا يوجد شيء بعد',
+    emptyDescription: 'عندما يصبح هناك ما يُعرض، سيظهر هنا.',
+    error: 'حدث خطأ ما',
+    errorDescription: 'تعذّر تحميل القائمة.',
+    loadingMore: 'جارٍ تحميل المزيد',
+  },
+  collection: {
+    results: byCount({
+      zero: 'لا نتائج',
+      one: 'نتيجة واحدة',
+      two: 'نتيجتان',
+      few: (n) => `${n} نتائج`,
+      many: (n) => `${n} نتيجة`,
+      other: (n) => `${n} نتيجة`,
+    }),
+    selected: byCount({
+      zero: 'لم يتم تحديد شيء',
+      one: 'عنصر واحد محدد',
+      two: 'عنصران محددان',
+      few: (n) => `${n} عناصر محددة`,
+      many: (n) => `${n} عنصرًا محددًا`,
+      other: (n) => `${n} عنصر محدد`,
+    }),
+    noResults: 'لا نتائج',
+  },
+  pagination: {
+    label: 'ترقيم الصفحات',
+    previous: 'السابق',
+    next: 'التالي',
+    first: 'الصفحة الأولى',
+    last: 'الصفحة الأخيرة',
+    page: (n, fmt) => `صفحة ${fmt.format(n)}`,
+    ofPages: (n, fmt) => `من ${fmt.format(n)}`,
+  },
+  select: {
+    placeholder: 'اختر',
+    open: 'افتح القائمة',
+  },
+  dialog: {
+    close: 'إغلاق هذا الحوار',
+  },
+  file: {
+    drop: 'أفلت الملفات هنا',
+    browse: 'تصفّح',
+    remove: 'إزالة',
+    tooMany: byCount({
+      zero: 'لا يُسمح بأي ملف',
+      one: 'يُسمح بملف واحد فقط',
+      two: 'يُسمح بملفين فقط',
+      few: (n) => `يُسمح بـ ${n} ملفات فقط`,
+      many: (n) => `يُسمح بـ ${n} ملفًا فقط`,
+      other: (n) => `يُسمح بـ ${n} ملف فقط`,
+    }),
+  },
+} satisfies Labels
