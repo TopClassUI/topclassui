@@ -6,6 +6,84 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-03 - Tailwind as far as it goes, Base UI the one exception, and a quality test for every dependency
+
+**Decision.** Build on Tailwind and the platform wherever possible. `@base-ui/react` is the single accepted behaviour dependency. No stack of third-party libraries behind the components.
+
+**The test is quality, not thinness.** Omar's rule: "if library can save from 100 lines to 20 lines iam ok if it stay - just focus on what is better". A dependency goes only when the platform already does the job as well or better.
+
+**Two optional peers are struck:**
+
+| Dependency | Replaced by |
+|---|---|
+| `react-day-picker` | `Intl.DateTimeFormat` for locale month and weekday names, `calendar: "islamic"` for Hijri, and the logical utilities for RTL. Our own month grid is roughly 200 lines and inherits the tokens |
+| `@tanstack/react-virtual` | `useCollection`, which the plan already specifies with windowing and paging - the two were duplicates |
+
+**Four are kept**, each because hand-rolling it would be worse, not merely longer:
+
+| Dependency | Why it stays |
+|---|---|
+| `embla-carousel` | CSS `scroll-snap` snaps, but does not give drag momentum, loop or programmatic control |
+| `react-resizable-panels` | CSS `resize` has no per-panel min and max, no keyboard path and no persistence |
+| `@tanstack/react-table` | Sorting, filtering and the column model are a thousand lines of someone else's solved problem |
+| `dnd-kit` | Accessible drag-and-drop with a keyboard alternative is the hardest thing on this list |
+
+`react-hook-form` is not counted here: it is an adapter the consumer installs themselves, and costs nothing to anyone who does not.
+
+**All six are tier 2 or 3, so v0.1 ships with no optional dependency at all.**
+
+**Why.** Omar's words: "one of our goals is the library be built based on tailwind as possible, i accept base ui as exception, i dont want be like shadcn, multi layers." A component library whose headline numbers are 0 KB server and a small client cost cannot also carry a calendar library, a virtualiser and a carousel engine. Every dependency is also a second RTL implementation to fight, a second set of class names to override, and a second upgrade path.
+
+**The competitive position, stated plainly.** TopClass UI competes on four things and nothing else: RTL enforced by lint rather than documented per component; server-first so most components cost nothing; lighter, because the dependency list is short by design; and an architecture a contributor cannot break, because `check-structure`, `check-boundaries` and the custom ESLint rules fail the build. Anything that weakens one of those four is not worth adding.
+
+**Affects.** PLAN.md 2 (the optional dependency list), 18.4 (Calendar, DatePicker and DateRangePicker lose their library and are built on `Intl`), 8.5 (`useCollection` is now the only virtualiser), and R-5.9-1.
+
+## 2026-10-02 - CSS token names now match the Figma names, so `border-border` is gone
+
+**Decision.** The CSS custom properties and the Tailwind utility names are renamed to the names already used in Figma. One name per role, everywhere.
+
+| Role | Was | Now | Utility |
+|---|---|---|---|
+| page background | `--tc-bg` | `--tc-page` | `bg-page` |
+| body text | `--tc-fg` | `--tc-body` | `text-body` |
+| secondary text | `--tc-muted-fg` | `--tc-muted` | `text-muted` |
+| hairline | `--tc-border` | `--tc-line` | `border-line` |
+| control boundary | `--tc-border-strong` | `--tc-line-strong` | `border-line-strong` |
+| strong fill | `--tc-<tone>` | `--tc-<tone>-solid` | `bg-<tone>-solid` |
+| text on that fill | `--tc-<tone>-fg` | `--tc-<tone>-on-solid` | `text-<tone>-on-solid` |
+| text on the tint | `--tc-<tone>-text` | `--tc-<tone>-on-soft` | `text-<tone>-on-soft` |
+
+`--tc-surface`, `--tc-surface-raised`, `--tc-<tone>-soft`, `--tc-ring` and `--tc-overlay` already complied and are unchanged.
+
+**Why.** PLAN.md 6.6 already carried the rule - "no abbreviations and no name repeats its Tailwind prefix" - and the Figma Semantic collection already followed it (`base/page`, `base/body`, `base/line`, `<tone>/on-soft`). Only the CSS side was never brought across, which left the plan contradicting itself: 6.6 prescribed `bg-primary-solid text-primary-on-solid` while 6.2, R-5.2-1 and the Button example of 8.4 used `bg-primary text-primary-fg`, and the docs site published `bg-bg`, `border-border` and `text-primary-text`. Omar spotted the inconsistency on the CSS entry page and remembered the rule had been settled; it had, on one side only.
+
+**What this removes.** The Figma-to-CSS translation table in 6.6 was "the only thing that reconciles them". It is now a contract, not a translation: every row reads the same on both sides, so a generator, a reviewer or `tokens:check` compares names directly instead of mapping them.
+
+**Applied.** 131 replacements in PLAN.md, 5 in RULES.md, 2 each in CLAUDE.md, AGENTS.md and `.cursor/rules/topclassui.mdc`. The `@theme inline` block gains `--color-<tone>-solid` so `bg-<tone>-solid` resolves; without it the renamed Button example would have referenced a class that does not exist. `--tc-<tone>-mix`, `--tc-<tone>-soft` and the Tailwind palette (`--color-violet-600`) were deliberately excluded from the rename.
+
+**Still to do.** The Figma docs frames that print the old names - CSS entry, Colours, Theming, Theme builder, Home and the components page - and the `tokens:check` script of Phase 1, which now asserts equality rather than a mapping.
+
+**Affects.** PLAN.md 5.2, 6.2, 6.6, 8.4, 9; R-5.2-1; the three generated rule files.
+
+## 2026-10-02 - One package named `topclassui`, components come from the CLI, and three state files
+
+**Decision.** Seven changes, taken together while reviewing the docs site page by page.
+
+1. **One unscoped package, `topclassui`.** `@topclassui/react`, `@topclassui/tokens` and `@topclassui/icons` are folded into it. The install line is `npm i topclassui zod`. Omar confirmed he holds the npm name and the domain. This reverses the three-package scope decision of 2026-09-25; that entry's publishing *mechanics* (org, hand-published 0.0.1, then trusted publishing) still stand, applied to one package instead of three.
+2. **`npm` is the documented default**, with pnpm, yarn and bun behind a switcher. npm ships with Node; pnpm costs a first-time visitor an extra install and an error on step one. The repository itself still uses pnpm - that is a contributor concern and belongs in CONTRIBUTING.md.
+3. **`zod` becomes a normal dependency, not a peer.** It is imported `import type` only, so it never reaches the browser bundle, and as a dependency it installs itself. This closes the open question recorded in the registry-CLI entry, in the direction that entry recommended.
+4. **The package ships zero components.** `npm i topclassui zod` installs the base - tokens CSS, icons, shared helpers, the provider. Components arrive one at a time through `npx topclassui add <slug>`, shadcn-style. The docs must say this on the Install page or a reader installs the package and has no Button.
+5. **`states.tsx` splits into `empty-state.tsx` and `error-state.tsx`.** Three states, three files, each named after the component it exports (`EmptyState`, `ErrorState`), matching `skeleton.tsx` for loading. One file was only ever a saving of one file, which is a weak reason against a structure a reader never has to think about. `check-structure` enforces all three. The ban on `loading.tsx` and `error.tsx` stands: those names are reserved by Next.js inside `app/` only, so in a component folder they promise route behaviour that never happens.
+6. **`demos/` is renamed `dummy/`, and the CLI copies it.** Omar's preference on the name. Copying it means a user who runs `topclassui add button` gets working examples in their own repo and never needs the docs site open.
+8. **`index.test.tsx` becomes a `test/` folder.** One file cannot hold the four kinds of test the Definition of Done requires, and a component that grows gets a 400-line test file that nobody reads. The folder holds `behaviour.test.tsx`, `keyboard.test.tsx`, `a11y.test.tsx` and `ssr.test.tsx`; `check-structure` requires the folder and at least one file in it, and the file-size rule applies per file.
+7. **No animation layer in v0.1.** Icon morphing was considered and rejected: morphicons needs stroke icons on a 24x24 grid while this set is one filled path per icon, and any morph engine is client JavaScript on a server-first library. A two-icon CSS crossfade driven by `--tc-motion` covers the visible cases at 0 KB. Transitions are unaffected.
+
+**Also applied to the docs site.** The framework-support table is trimmed to Next.js App Router (tier 1) and Vite (tier 2); React Router v7, the Pages Router, TanStack Start, Astro and Remix come back when they are in CI. Every table row in the Figma was fixed-height, so any description that wrapped to two lines was clipped - rows now hug their content on the Install and CLI pages, and the same fix is owed on the remaining 17 frames.
+
+**Still open.** How the three-package monorepo in PLAN.md section 4 reconciles with shipping one package. Whether the CLI path needs the npm package at all - the CLI page says `shared/` is copied into the user's repo, which would make components standalone and contradict point 4.
+
+**Affects.** PLAN.md 4, 8.1, 17.4, the Install and Add-with-the-CLI pages, R-8.1-1 and R-5.9-1 in RULES.md.
+
 ## 2026-09-25 - The site copy is written for users, not for us
 
 **Decision.** Every string on the 19 frames was reworded for a developer who has never seen the project: no phase numbers, no catalog rows, no tiers, no file names from the plan, no budget jargon, no competitor. Early access is stated once per page, calmly. A separate review of the seven newest pages found 46 defects - two code samples that would not compile, a wrong provider prop, a file layout that contradicted R-8.1-1 - and all were applied. The hero now reads "The React UI kit that reads both ways", because "rendered on the server" oversold a library where a third of the components run in the browser.

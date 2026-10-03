@@ -381,7 +381,7 @@ Every rule has a reason. The rules are enforced by ESLint rules and scripts wher
 
 ## 5.2 Styling
 
-- **Semantic classes only** inside `packages/react`: `bg-primary`, `text-fg`, `border-border`. Palette classes (`bg-violet-600`), arbitrary colours (`bg-[#fff]`) and the `dark:` variant are banned there. Reason: a component that never names a real colour works in every mode, including modes that do not exist yet.
+- **Semantic classes only** inside `packages/react`: `bg-primary-solid`, `text-body`, `border-line`. Palette classes (`bg-violet-600`), arbitrary colours (`bg-[#fff]`) and the `dark:` variant are banned there. Reason: a component that never names a real colour works in every mode, including modes that do not exist yet.
 - Merge classes with `cn()` (`clsx` plus a **configured** `tailwind-merge`). `shared/cn.ts` uses `extendTailwindMerge`, never the default `twMerge`: tailwind-merge only knows Tailwind's own `--spacing-*` and `--radius-*` keys, so `h-control-md` and `rounded-control` are unknown to it and `cn('h-control-md', 'h-12')` would keep both classes. Custom `--color-*` keys need no configuration.
 
 ```typescript
@@ -416,7 +416,7 @@ export function cn(...inputs: ClassValue[]): string {
 // shared/classes.ts
 export const FOCUS_RING =
   'outline-none focus-visible:outline-(length:--tc-ring-width) focus-visible:outline-offset-(length:--tc-ring-offset) focus-visible:outline-ring'
-export const BORDER = 'border-(length:--tc-border-width)'
+export const BORDER = 'border-(length:--tc-line-width)'
 export const DISABLED =
   'disabled:pointer-events-none disabled:opacity-50 data-disabled:pointer-events-none data-disabled:opacity-50'
 export const LOADING = 'data-loading:cursor-progress'
@@ -510,7 +510,7 @@ Use logical utilities so layout follows the text direction automatically.
 - A visible focus ring on every interactive element via `focus-visible`, from `FOCUS_RING`. Never remove an outline without replacing it.
 - Types enforce labels: `IconButton` requires `label`; `Image` requires `alt`; form controls require a label through `Field`.
 - Respect `prefers-reduced-motion` and support `forced-colors` (borders stay visible in Windows high-contrast mode).
-- Contrast is checked in CI for every mode by `scripts/check-contrast.ts`: 4.5:1 for text, including a tone's text colour on its own `-soft` tint; 3:1 for `--tc-border-strong`, `--tc-ring` and icons, measured against **every** surface the element can sit on (`--tc-bg`, `--tc-surface` and `--tc-surface-raised`), not only the page. It also asserts that every `-soft` tint keeps at least a 1.06 step from all three surfaces, because a tint nobody can see is not a tint: a boundary that passes on the page can fail on a card, which is how the dark `--tc-border-strong` reached only 3.19:1 before it was corrected. `--tc-border` is a decorative divider and is exempt, because no neutral light enough to read as a hairline reaches 3:1; controls that need a visible boundary use `--tc-border-strong`. The script uses CSS Color 4 gamut mapping, not naive clipping, and fails anything within 0.15 of a threshold, because the chromatic shades are outside sRGB and browsers map them differently.
+- Contrast is checked in CI for every mode by `scripts/check-contrast.ts`: 4.5:1 for text, including a tone's text colour on its own `-soft` tint; 3:1 for `--tc-line-strong`, `--tc-ring` and icons, measured against **every** surface the element can sit on (`--tc-page`, `--tc-surface` and `--tc-surface-raised`), not only the page. It also asserts that every `-soft` tint keeps at least a 1.06 step from all three surfaces, because a tint nobody can see is not a tint: a boundary that passes on the page can fail on a card, which is how the dark `--tc-line-strong` reached only 3.19:1 before it was corrected. `--tc-line` is a decorative divider and is exempt, because no neutral light enough to read as a hairline reaches 3:1; controls that need a visible boundary use `--tc-line-strong`. The script uses CSS Color 4 gamut mapping, not naive clipping, and fails anything within 0.15 of a threshold, because the chromatic shades are outside sRGB and browsers map them differently.
 - Essential information never lives only in a tooltip.
 - **WCAG 2.2 criteria that axe cannot check, enforced by rule and by test:**
   - **2.5.8 Target Size (Minimum):** 24x24 CSS px on every pointer type, including `size="xs"`, Tag remove buttons, Pagination items, Slider thumbs and the Toast close button; 44px under `pointer-coarse`. A Playwright test measures every focusable element in every demo.
@@ -596,7 +596,7 @@ The tokens package holds only these variables, the mode blocks and its `@layer b
 /* Knobs live on :root only, so a nested themed section keeps the page's feel. */
 :root {
   --tc-radius: 0.5rem;          /* 0 = square, 9999px = pill */
-  --tc-border-width: 1px;
+  --tc-line-width: 1px;
   --tc-ring-width: 2px;
   --tc-ring-offset: 2px;
   --tc-density: 1;              /* 0.875 compact, 1 default, 1.125 comfortable */
@@ -628,34 +628,34 @@ The tokens package holds only these variables, the mode blocks and its `@layer b
 [data-theme="light"] {
   color-scheme: light;
 
-  --tc-bg: var(--color-white);
+  --tc-page: var(--color-white);
   --tc-surface: var(--color-neutral-50);
   --tc-surface-raised: var(--color-white);
-  --tc-fg: var(--color-neutral-950);
-  --tc-muted-fg: var(--color-neutral-600);
-  --tc-border: var(--color-neutral-200);          /* decorative hairline, exempt from 3:1 (5.6) */
-  --tc-border-strong: var(--color-neutral-500);   /* control boundaries, 4.73:1 on white */
+  --tc-body: var(--color-neutral-950);
+  --tc-muted: var(--color-neutral-600);
+  --tc-line: var(--color-neutral-200);          /* decorative hairline, exempt from 3:1 (5.6) */
+  --tc-line-strong: var(--color-neutral-500);   /* control boundaries, 4.73:1 on white */
   --tc-overlay: oklch(0 0 0 / 0.5);
 
-  --tc-primary: var(--color-violet-600);
-  --tc-primary-fg: var(--color-white);
-  --tc-primary-text: var(--color-violet-700);
-  --tc-neutral: var(--color-neutral-900);
-  --tc-neutral-fg: var(--color-white);
-  --tc-neutral-text: var(--color-neutral-900);
-  --tc-success: var(--color-emerald-700);
-  --tc-success-fg: var(--color-white);
-  --tc-success-text: var(--color-emerald-700);
-  --tc-warning: var(--color-amber-500);
-  --tc-warning-fg: var(--color-neutral-950);
-  --tc-warning-text: var(--color-amber-700);
-  --tc-danger: var(--color-red-600);
-  --tc-danger-fg: var(--color-white);
+  --tc-primary-solid: var(--color-violet-600);
+  --tc-primary-on-solid: var(--color-white);
+  --tc-primary-on-soft: var(--color-violet-700);
+  --tc-neutral-solid: var(--color-neutral-900);
+  --tc-neutral-on-solid: var(--color-white);
+  --tc-neutral-on-soft: var(--color-neutral-900);
+  --tc-success-solid: var(--color-emerald-700);
+  --tc-success-on-solid: var(--color-white);
+  --tc-success-on-soft: var(--color-emerald-700);
+  --tc-warning-solid: var(--color-amber-500);
+  --tc-warning-on-solid: var(--color-neutral-950);
+  --tc-warning-on-soft: var(--color-amber-700);
+  --tc-danger-solid: var(--color-red-600);
+  --tc-danger-on-solid: var(--color-white);
   /* red-800 not red-700: red-700 measures 4.35:1 on danger-soft-active. */
-  --tc-danger-text: var(--color-red-800);
-  --tc-info: var(--color-sky-700);
-  --tc-info-fg: var(--color-white);
-  --tc-info-text: var(--color-sky-700);
+  --tc-danger-on-soft: var(--color-red-800);
+  --tc-info-solid: var(--color-sky-700);
+  --tc-info-on-solid: var(--color-white);
+  --tc-info-on-soft: var(--color-sky-700);
 
   /* How much of the tone goes into its soft tint. Dark needs more (see the dark block). */
   --tc-primary-mix: 12%;
@@ -669,23 +669,23 @@ The tokens package holds only these variables, the mode blocks and its `@layer b
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --tc-bg: var(--color-neutral-950);
+  --tc-page: var(--color-neutral-950);
   --tc-surface: var(--color-neutral-900);
   --tc-surface-raised: var(--color-neutral-800);
-  --tc-fg: var(--color-neutral-50);
-  --tc-muted-fg: var(--color-neutral-400);
-  --tc-border: var(--color-neutral-800);
-  --tc-border-strong: var(--color-neutral-400);   /* 5.83:1 on a raised card; neutral-500 measured only 3.19:1 there */
+  --tc-body: var(--color-neutral-50);
+  --tc-muted: var(--color-neutral-400);
+  --tc-line: var(--color-neutral-800);
+  --tc-line-strong: var(--color-neutral-400);   /* 5.83:1 on a raised card; neutral-500 measured only 3.19:1 there */
   --tc-overlay: oklch(0 0 0 / 0.7);
 
-  --tc-neutral: var(--color-neutral-100);
-  --tc-neutral-fg: var(--color-neutral-950);
-  --tc-neutral-text: var(--color-neutral-200);
-  --tc-primary-text: var(--color-violet-400);
-  --tc-success-text: var(--color-emerald-400);
-  --tc-warning-text: var(--color-amber-400);
-  --tc-danger-text: var(--color-red-400);
-  --tc-info-text: var(--color-sky-400);
+  --tc-neutral-solid: var(--color-neutral-100);
+  --tc-neutral-on-solid: var(--color-neutral-950);
+  --tc-neutral-on-soft: var(--color-neutral-200);
+  --tc-primary-on-soft: var(--color-violet-400);
+  --tc-success-on-soft: var(--color-emerald-400);
+  --tc-warning-on-soft: var(--color-amber-400);
+  --tc-danger-on-soft: var(--color-red-400);
+  --tc-info-on-soft: var(--color-sky-400);
 
   /* A tone mixed into near-black barely moves: at the light percentages every dark soft
      tint measured 1.01-1.03 against --tc-surface, which is invisible. These are the
@@ -702,10 +702,10 @@ The tokens package holds only these variables, the mode blocks and its `@layer b
    and it declares its own color-scheme. */
 [data-theme="ocean"] {
   color-scheme: light;
-  --tc-primary: var(--color-cyan-700);
-  --tc-primary-fg: var(--color-white);
+  --tc-primary-solid: var(--color-cyan-700);
+  --tc-primary-on-solid: var(--color-white);
   /* cyan-800 not cyan-700: the whole ocean soft ramp fails at cyan-700. */
-  --tc-primary-text: var(--color-cyan-800);
+  --tc-primary-on-soft: var(--color-cyan-800);
   --tc-radius: 9999px;
 }
 
@@ -713,22 +713,22 @@ The tokens package holds only these variables, the mode blocks and its `@layer b
    not only :root, so a nested section recomputes it from its own values. */
 :root,
 [data-theme] {
-  /* Not var(--tc-primary): violet-600 measures 2.57:1 on a dark raised surface. */
-  --tc-ring: var(--tc-primary-text);
-  --tc-primary-soft: color-mix(in oklch, var(--tc-primary) var(--tc-primary-mix), var(--tc-bg));
-  --tc-neutral-soft: color-mix(in oklch, var(--tc-neutral) var(--tc-neutral-mix), var(--tc-bg));
-  --tc-success-soft: color-mix(in oklch, var(--tc-success) var(--tc-success-mix), var(--tc-bg));
-  --tc-warning-soft: color-mix(in oklch, var(--tc-warning) var(--tc-warning-mix), var(--tc-bg));
-  --tc-danger-soft: color-mix(in oklch, var(--tc-danger) var(--tc-danger-mix), var(--tc-bg));
-  --tc-info-soft: color-mix(in oklch, var(--tc-info) var(--tc-info-mix), var(--tc-bg));
+  /* Not var(--tc-primary-solid): violet-600 measures 2.57:1 on a dark raised surface. */
+  --tc-ring: var(--tc-primary-on-soft);
+  --tc-primary-soft: color-mix(in oklch, var(--tc-primary-solid) var(--tc-primary-mix), var(--tc-page));
+  --tc-neutral-soft: color-mix(in oklch, var(--tc-neutral-solid) var(--tc-neutral-mix), var(--tc-page));
+  --tc-success-soft: color-mix(in oklch, var(--tc-success-solid) var(--tc-success-mix), var(--tc-page));
+  --tc-warning-soft: color-mix(in oklch, var(--tc-warning-solid) var(--tc-warning-mix), var(--tc-page));
+  --tc-danger-soft: color-mix(in oklch, var(--tc-danger-solid) var(--tc-danger-mix), var(--tc-page));
+  --tc-info-soft: color-mix(in oklch, var(--tc-info-solid) var(--tc-info-mix), var(--tc-page));
   /* A solid button's hover is constrained by its own label, not by the page, so it
      steps away from that label in every mode. Each tone sets these three; the values
      here are the primary tone. Mixing toward black instead would keep darkening on a
      dark page, and stepping toward the page would drop white text below 4.5:1. */
   --tc-hover: var(--color-violet-700);
   --tc-active: var(--color-violet-800);
-  --tc-soft-hover: color-mix(in oklch, var(--tc-primary) calc(var(--tc-primary-mix) + 8%), var(--tc-bg));
-  --tc-soft-active: color-mix(in oklch, var(--tc-primary) calc(var(--tc-primary-mix) + 16%), var(--tc-bg));
+  --tc-soft-hover: color-mix(in oklch, var(--tc-primary-solid) calc(var(--tc-primary-mix) + 8%), var(--tc-page));
+  --tc-soft-active: color-mix(in oklch, var(--tc-primary-solid) calc(var(--tc-primary-mix) + 16%), var(--tc-page));
 }
 
 [dir="rtl"] { --tc-dir: -1; }
@@ -767,40 +767,40 @@ The mapping to utilities lives in `packages/react/src/styles.css`:
 
 ```css
 @theme inline {
-  --color-bg: var(--tc-bg);
+  --color-page: var(--tc-page);
   --color-surface: var(--tc-surface);
   --color-surface-raised: var(--tc-surface-raised);
-  --color-fg: var(--tc-fg);
-  --color-muted-fg: var(--tc-muted-fg);
-  --color-border: var(--tc-border);
-  --color-border-strong: var(--tc-border-strong);
+  --color-body: var(--tc-body);
+  --color-muted: var(--tc-muted);
+  --color-line: var(--tc-line);
+  --color-line-strong: var(--tc-line-strong);
   --color-overlay: var(--tc-overlay);
   --color-ring: var(--tc-ring);
 
-  --color-primary: var(--tc-primary);
-  --color-primary-fg: var(--tc-primary-fg);
+  --color-primary-solid: var(--tc-primary-solid);
+  --color-primary-on-solid: var(--tc-primary-on-solid);
   --color-primary-soft: var(--tc-primary-soft);
-  --color-primary-text: var(--tc-primary-text);
-  --color-neutral: var(--tc-neutral);
-  --color-neutral-fg: var(--tc-neutral-fg);
+  --color-primary-on-soft: var(--tc-primary-on-soft);
+  --color-neutral-solid: var(--tc-neutral-solid);
+  --color-neutral-on-solid: var(--tc-neutral-on-solid);
   --color-neutral-soft: var(--tc-neutral-soft);
-  --color-neutral-text: var(--tc-neutral-text);
-  --color-success: var(--tc-success);
-  --color-success-fg: var(--tc-success-fg);
+  --color-neutral-on-soft: var(--tc-neutral-on-soft);
+  --color-success-solid: var(--tc-success-solid);
+  --color-success-on-solid: var(--tc-success-on-solid);
   --color-success-soft: var(--tc-success-soft);
-  --color-success-text: var(--tc-success-text);
-  --color-warning: var(--tc-warning);
-  --color-warning-fg: var(--tc-warning-fg);
+  --color-success-on-soft: var(--tc-success-on-soft);
+  --color-warning-solid: var(--tc-warning-solid);
+  --color-warning-on-solid: var(--tc-warning-on-solid);
   --color-warning-soft: var(--tc-warning-soft);
-  --color-warning-text: var(--tc-warning-text);
-  --color-danger: var(--tc-danger);
-  --color-danger-fg: var(--tc-danger-fg);
+  --color-warning-on-soft: var(--tc-warning-on-soft);
+  --color-danger-solid: var(--tc-danger-solid);
+  --color-danger-on-solid: var(--tc-danger-on-solid);
   --color-danger-soft: var(--tc-danger-soft);
-  --color-danger-text: var(--tc-danger-text);
-  --color-info: var(--tc-info);
-  --color-info-fg: var(--tc-info-fg);
+  --color-danger-on-soft: var(--tc-danger-on-soft);
+  --color-info-solid: var(--tc-info-solid);
+  --color-info-on-solid: var(--tc-info-on-solid);
   --color-info-soft: var(--tc-info-soft);
-  --color-info-text: var(--tc-info-text);
+  --color-info-on-soft: var(--tc-info-on-soft);
 
   --radius-control: var(--tc-radius);                        /* buttons, inputs */
   --radius-box: min(calc(var(--tc-radius) * 1.5), 1.5rem);   /* cards, dialogs */
@@ -850,8 +850,8 @@ Notes for implementation:
 - Every `--color-*` theme variable automatically becomes `bg-*`, `text-*`, `border-*`, `ring-*`, `outline-*`, `fill-*`, `stroke-*`, `from-*` and so on. This is the "custom colour classes that work on text, background, etc." requirement.
 - The `min()` on `--radius-box` stops cards turning into circles when buttons are pills.
 - A named `--spacing-*` key generates a value for every spacing-driven utility: `h-`, `min-h-`, `max-h-`, `w-`, `size-`, `p*-`, `m*-`, `gap-`, `inset*-` and more. The bare `--spacing` multiplier is a different key and is untouched, so `h-10` still works. With `@theme inline`, `h-control-md` compiles to `height: calc(2.5rem * var(--tc-density))`. The namespace also leaks into unrelated utilities such as `leading-control-md`; that is harmless, but the lint rule must not assume `control-*` only appears on `h-` and `w-`.
-- Tailwind emits only the theme variables it sees used, and a `var(--color-*)` reference in plain CSS counts as usage, so the palette values this file references are emitted without `@theme static`. The reverse matters more: `@theme inline` variables are inlined into utilities and are not emitted as CSS variables, so consumer CSS and the colours page always read `var(--tc-primary)`, never `var(--color-primary)`.
-- Opacity modifiers work on these colours: `bg-primary/90` compiles to `color-mix(in oklab, var(--tc-primary) 90%, transparent)`, evaluated at the element, so a nested themed section recomputes it correctly.
+- Tailwind emits only the theme variables it sees used, and a `var(--color-*)` reference in plain CSS counts as usage, so the palette values this file references are emitted without `@theme static`. The reverse matters more: `@theme inline` variables are inlined into utilities and are not emitted as CSS variables, so consumer CSS and the colours page always read `var(--tc-primary-solid)`, never `var(--color-primary)`.
+- Opacity modifiers work on these colours: `bg-primary-solid/90` compiles to `color-mix(in oklab, var(--tc-primary-solid) 90%, transparent)`, evaluated at the element, so a nested themed section recomputes it correctly.
 
 ## 6.3 Switching modes without a flash, while pages stay static
 
@@ -890,7 +890,7 @@ export function ThemeScript({ nonce }: { nonce?: string | undefined }) {
 A docs page modelled on Tailwind's colour reference.
 
 - Grid 1: the palette, 50-950 per hue, showing the oklch value on hover and copying the class name on click.
-- Grid 2: every semantic token, shown in all modes side by side, with the class name (`bg-primary`), the variable (`--tc-primary`) and a contrast badge (pass or fail, from the same computation `check-contrast` uses) for each foreground and background pair.
+- Grid 2: every semantic token, shown in all modes side by side, with the class name (`bg-primary-solid`), the variable (`--tc-primary-solid`) and a contrast badge (pass or fail, from the same computation `check-contrast` uses) for each foreground and background pair.
 - Live controls at the top: mode, direction, radius, density. They change the page itself so the knobs are demonstrated, not described. In Phase 1 these are native `<select>` and `<input type="range">` elements in a small client component, replaced by ThemeSwitcher, Select and Slider in Phase 6.
 
 ## 6.5 Later: theme builder
@@ -903,23 +903,23 @@ Everything is designed in Figma before it is built, and what is in Figma is what
 
 - **Variables:** five collections - `Palette`, `Semantic`, `Knobs`, `Size`, `Type`. `Semantic` and `Knobs` carry the three modes; the rest have one. Changing a knob re-renders the whole file.
 
-**Figma names are not CSS names, and this table is the only thing that reconciles them.** Figma has no custom properties, so a variable is named by its role in a path; CSS names the same role with a suffix. A generator or a reviewer that assumes they match will produce the wrong token.
+**Figma and CSS now use the same names, and this table is the contract.** Figma has no custom properties, so a variable is named by its role in a path (`base/page`); CSS spells the same role as a custom property (`--tc-page`). One name per role, so a generator or a reviewer never has to translate.
 
 | Figma variable | CSS custom property | What it is |
 |---|---|---|
-| `base/page` | `--tc-bg` | the page behind everything |
+| `base/page` | `--tc-page` | the page behind everything |
 | `base/surface` | `--tc-surface` | a recessed or striped surface |
 | `base/surface-raised` | `--tc-surface-raised` | a card, a popup, an input |
-| `base/body` | `--tc-fg` | body text |
-| `base/muted` | `--tc-muted-fg` | secondary text |
-| `base/line` | `--tc-border` | a decorative hairline, exempt from 3:1 |
-| `base/line-strong` | `--tc-border-strong` | a control boundary, must reach 3:1 |
+| `base/body` | `--tc-body` | body text |
+| `base/muted` | `--tc-muted` | secondary text |
+| `base/line` | `--tc-line` | a decorative hairline, exempt from 3:1 |
+| `base/line-strong` | `--tc-line-strong` | a control boundary, must reach 3:1 |
 | `base/ring` | `--tc-ring` | the focus ring |
 | `base/overlay` | `--tc-overlay` | the scrim behind a dialog |
-| `<tone>/solid` | `--tc-<tone>` | the strong fill |
-| `<tone>/on-solid` | `--tc-<tone>-fg` | text on that fill |
+| `<tone>/solid` | `--tc-<tone>-solid` | the strong fill |
+| `<tone>/on-solid` | `--tc-<tone>-on-solid` | text on that fill |
 | `<tone>/soft` | `--tc-<tone>-soft` | the tint |
-| `<tone>/on-soft` | `--tc-<tone>-text` | text on the tint, and coloured text anywhere |
+| `<tone>/on-soft` | `--tc-<tone>-on-soft` | text on the tint, and coloured text anywhere |
 | `<tone>/hover`, `/active` | `--tc-hover`, `--tc-active` | set by the tone's compound variant |
 | `<tone>/soft-hover`, `/soft-active` | `--tc-soft-hover`, `--tc-soft-active` | same |
 | `control/<size>` | `--spacing-control-<size>` | control height |
@@ -1228,11 +1228,11 @@ export const buttonVariants = cva(
   {
     variants: {
       variant: {
-        solid: `bg-primary text-primary-fg ${HOVER.solid}`,
-        soft: `bg-primary-soft text-primary-text ${HOVER.soft}`,
-        outline: `border-border-strong text-fg ${HOVER.outline}`,
-        ghost: `text-fg ${HOVER.ghost}`,
-        link: `text-primary-text underline-offset-4 ${HOVER.link}`,
+        solid: `bg-primary-solid text-primary-on-solid ${HOVER.solid}`,
+        soft: `bg-primary-soft text-primary-on-soft ${HOVER.soft}`,
+        outline: `border-line-strong text-body ${HOVER.outline}`,
+        ghost: `text-body ${HOVER.ghost}`,
+        link: `text-primary-on-soft underline-offset-4 ${HOVER.link}`,
       },
       size: CONTROL_SIZE,
       fullWidth: { true: 'w-full' },
@@ -1419,7 +1419,7 @@ export type AccordionRootProps = Omit<Base.Root.Props, 'className'> & { classNam
 export function AccordionRoot({ className, ...rest }: AccordionRootProps) {
   return (
     <Base.Root
-      className={cn('divide-y divide-border rounded-box border border-border', className)}
+      className={cn('divide-y divide-line rounded-box border border-line', className)}
       {...rest}
     />
   )
@@ -1444,7 +1444,7 @@ export function AccordionItem({ value, title, children }: AccordionItemProps) {
         </Base.Trigger>
       </Base.Header>
       {/* hiddenUntilFound keeps closed content in the DOM: findable with Ctrl+F and indexable. */}
-      <Base.Panel hiddenUntilFound className="px-4 pb-4 text-muted-fg">
+      <Base.Panel hiddenUntilFound className="px-4 pb-4 text-muted">
         {children}
       </Base.Panel>
     </Base.Item>
@@ -1853,7 +1853,7 @@ A component page contains: a one-sentence description; the install and import li
 
 The live demo at the top of a component page is the playground: its controls are generated from `schema.ts` (an enum becomes a select, a boolean a switch, a number a slider with the schema's min and max). It is built with the page template in Phase 0, not later.
 
-**The previewer.** Every component on the catalog page and at the top of its own page sits in one wrapper, so a reader learns the layout once and then reads 46 components with it. Five parts, in this order: the **stage** (the hero demo on `--tc-bg`, so the component is seen against the page it will live on); the **playground** (the schema-generated controls, beside the stage); the **code** (the JSX that produces the stage, syntax-highlighted, with the copy button bound to *it* - a copy button with no visible source is ambiguous and is not allowed); the **states block**; and the **two install paths**, the CLI command and the package import, side by side. The kind chip in the header carries the measured size, never the bare word: `server - 0 KB`, `client - 4.8 KB`, `split - 0 KB server + 1.2 KB client`, generated from the size-limit JSON so the page cannot drift from the budget. A component whose chip says `lazy` says so on the chip.
+**The previewer.** Every component on the catalog page and at the top of its own page sits in one wrapper, so a reader learns the layout once and then reads 46 components with it. Five parts, in this order: the **stage** (the hero demo on `--tc-page`, so the component is seen against the page it will live on); the **playground** (the schema-generated controls, beside the stage); the **code** (the JSX that produces the stage, syntax-highlighted, with the copy button bound to *it* - a copy button with no visible source is ambiguous and is not allowed); the **states block**; and the **two install paths**, the CLI command and the package import, side by side. The kind chip in the header carries the measured size, never the bare word: `server - 0 KB`, `client - 4.8 KB`, `split - 0 KB server + 1.2 KB client`, generated from the size-limit JSON so the page cannot drift from the budget. A component whose chip says `lazy` says so on the chip.
 
 **Accessible names on a page of 46 previewers.** The page repeats the same control dozens of times, and a screen-reader user meets them as one long list, so every repeated control is named by what it acts on. Each string is a `labels` entry with `en` and `ar` defaults (R-5.11-1) composed with the component name, never a literal.
 
@@ -2131,7 +2131,7 @@ Everything a component will ever need, built and tested before any component exi
 
 **Build, docs app:** the `(site)/[locale]` and `(preview)` root layouts, the component page template (demo grid, States block, page controls, the props table from `.d.ts` plus schema, and the schema-generated playground controls), the `/preview` route with its `generateStaticParams` including the `blank/empty` baseline, and the visual-matrix fixture.
 
-**Accept when:** `pnpm check` and CI are green; every shared module has tests; the lint fixtures prove that `pl-4`, `bg-red-500`, `dark:bg-black`, `` `bg-${x}` ``, `outline-2`, `start-4` and a two-line comment all fail inside `packages/react`, and that `ps-4`, `bg-primary`, `inset-s-4` and `FOCUS_RING` pass; `cn('h-control-md','h-control-sm')` returns only the second class and the same holds for `rounded-control` against `rounded-box`; `useCollection` keeps fewer than a hundred rows in the DOM for a ten-thousand-item harness; the `createAdaptive` type tests pass; the docs skeleton prerenders every route; `git ls-files --eol` shows `i/lf w/lf` for every text file on Omar's machine and `check-boundaries` passes its CRLF fixture; `rules-sync --check` is clean.
+**Accept when:** `pnpm check` and CI are green; every shared module has tests; the lint fixtures prove that `pl-4`, `bg-red-500`, `dark:bg-black`, `` `bg-${x}` ``, `outline-2`, `start-4` and a two-line comment all fail inside `packages/react`, and that `ps-4`, `bg-primary-solid`, `inset-s-4` and `FOCUS_RING` pass; `cn('h-control-md','h-control-sm')` returns only the second class and the same holds for `rounded-control` against `rounded-box`; `useCollection` keeps fewer than a hundred rows in the DOM for a ten-thousand-item harness; the `createAdaptive` type tests pass; the docs skeleton prerenders every route; `git ls-files --eol` shows `i/lf w/lf` for every text file on Omar's machine and `check-boundaries` passes its CRLF fixture; `rules-sync --check` is clean.
 
 ## Phase 0.5 - Design (Figma)
 
@@ -2269,7 +2269,7 @@ pnpm new:component x  scaffold a component folder
    boundary are serializable. For C components and connectors, index.tsx re-exports only.
 2. Server Components never use React context. Direction and theme come from HTML attributes
    and CSS. Labels come from props.
-3. Semantic colour classes only (bg-primary). No palette classes, no arbitrary colours,
+3. Semantic colour classes only (bg-primary-solid). No palette classes, no arbitrary colours,
    no dark: variant, inside packages/react.
 4. Logical utilities only (ps- pe- ms- me- inset-s- inset-e- text-start border-s rounded-s).
    No physical left/right utilities, no deprecated start-*/end-*, no space-x / divide-x.
@@ -2355,7 +2355,7 @@ const PROPS =
   'bg|text|border(-[tbsexy])?|divide|ring|ring-offset|inset-ring|outline|fill|stroke|' +
   'from|via|to|shadow|inset-shadow|text-shadow|accent|caret|decoration|placeholder'
 
-/** bg-neutral (a tone token) is allowed; bg-neutral-500 (palette) is not.
+/** bg-neutral-solid (a tone token) is allowed; bg-neutral-500 (palette) is not.
  *  Also catches hover:bg-red-500, bg-red-500/50, bg-red-500!, border-s-red-500, ring-offset-white. */
 export const BANNED_PALETTE = new RegExp(
   `(^|[\\s:!])(${PROPS})-((${HUES})-\\d{2,3}|white|black)(?=[/\\s!]|$)`,

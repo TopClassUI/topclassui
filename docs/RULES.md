@@ -67,7 +67,7 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 ## 2. Styling
 
 ### R-5.2-1 Semantic classes only
-**Rule:** inside `packages/react`, use `bg-primary`, `text-fg`, `border-border`; palette classes, arbitrary colours and the `dark:` variant are banned.
+**Rule:** inside `packages/react`, use `bg-primary-solid`, `text-body`, `border-line`; palette classes, arbitrary colours and the `dark:` variant are banned.
 **Why:** a component that never names a real colour works in every mode, including modes that do not exist yet.
 **Enforced by:** `eslint` (Appendix C patterns)
 
@@ -293,7 +293,7 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 **Enforced by:** `manual` + keyboard tests
 
 ### R-5.6-4 Contrast
-**Rule:** 4.5:1 for text, including a tone's text colour on its own soft tint; 3:1 for `--tc-border-strong`, `--tc-ring` and icons. `--tc-border` is decorative and exempt.
+**Rule:** 4.5:1 for text, including a tone's text colour on its own soft tint; 3:1 for `--tc-line-strong`, `--tc-ring` and icons. `--tc-line` is decorative and exempt.
 **Why:** a hairline divider cannot reach 3:1 with any neutral light enough to read as a hairline.
 **Enforced by:** `scripts/check-contrast.ts`
 

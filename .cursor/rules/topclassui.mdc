@@ -106,7 +106,7 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from doc
 - **R-5.6-1** WCAG 2.2 AA: ARIA Authoring Practices keyboard behaviour, a visible `focus-visible` ring everywhere, labels enforced by types. _(axe + manual)_
 - **R-5.6-2** Every interactive element is at least 24x24 CSS px on every pointer type and 44px under `pointer-coarse`. _(Playwright)_
 - **R-5.6-3** Every drag has a keyboard or button alternative. _(manual + keyboard tests)_
-- **R-5.6-4** 4.5:1 for text including tone text on its soft tint; 3:1 for `--tc-border-strong`, `--tc-ring` and icons; `--tc-border` is decorative and exempt. _(check-contrast)_
+- **R-5.6-4** 4.5:1 for text including tone text on its soft tint; 3:1 for `--tc-line-strong`, `--tc-ring` and icons; `--tc-line` is decorative and exempt. _(check-contrast)_
 
 ## 11. Dependencies and process
 
