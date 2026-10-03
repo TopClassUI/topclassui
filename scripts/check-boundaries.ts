@@ -2,6 +2,13 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { join, posix, relative, sep } from 'node:path'
 
+import {
+  hasLateUseClient,
+  hasUseClient,
+  importedNames,
+  relativeImportsMissingExtension,
+} from './lib/source-checks.js'
+
 const ROOT = process.cwd()
 const SRC = join(ROOT, 'src')
 
@@ -21,29 +28,6 @@ function walk(dir: string, out: string[] = []): string[] {
     else if (/\.tsx?$/.test(e.name)) out.push(p)
   }
   return out
-}
-
-/** The directive prologue only counts before any statement, so a late 'use client' is a dead string. */
-function hasUseClient(source: string) {
-  const head = source.replace(/^\uFEFF/, '').trimStart()
-  return /^(['"])use client\1\s*;?/.test(head)
-}
-
-function hasLateUseClient(source: string) {
-  return !hasUseClient(source) && /^\s*(['"])use client\1\s*;?\s*$/m.test(source)
-}
-
-function importedNames(source: string, from: string): string[] {
-  const names: string[] = []
-  const re = new RegExp(`import\\s*\\{([^}]*)\\}\\s*from\\s*['"]${from}['"]`, 'g')
-  let m: RegExpExecArray | null
-  while ((m = re.exec(source))) {
-    for (const part of m[1]!.split(',')) {
-      const name = part.split(' as ')[0]!.trim()
-      if (name && name !== 'type') names.push(name.replace(/^type\s+/, ''))
-    }
-  }
-  return names
 }
 
 let files: string[] = []
@@ -112,13 +96,8 @@ for (const file of files) {
     errors.push(`${r}: types.ts is types only, so the file erases completely (R-8.3-4).`)
   }
 
-  // A relative import must carry .js, or Node cannot resolve the emitted ESM.
-  const relImports = source.match(/from\s+['"](\.[^'"]*)['"]/g) ?? []
-  for (const imp of relImports) {
-    const spec = /from\s+['"](\.[^'"]*)['"]/.exec(imp)![1]!
-    if (!/\.(js|json|css)$/.test(spec)) {
-      errors.push(`${r}: relative import "${spec}" needs a .js extension (R-5.12-5).`)
-    }
+  for (const spec of relativeImportsMissingExtension(source)) {
+    errors.push(`${r}: relative import "${spec}" needs a .js extension (R-5.12-5).`)
   }
 }
 
