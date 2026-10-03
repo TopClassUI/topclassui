@@ -1,0 +1,30 @@
+import type { StateProps } from './state.js'
+
+/** R-8.5-1: every component that renders items takes these, so behaviour is identical everywhere. */
+export interface CollectionProps<T> extends StateProps {
+  items: readonly T[]
+  /** Stable identity across pages, so a row keeps its place when a page is prepended. */
+  getKey: (item: T) => string
+  /** Rows before scrolling; defaults to the --tc-list-rows knob. */
+  visibleRows?: number | undefined
+  /** 'auto' turns windowing on above virtualizeAbove. */
+  virtualize?: 'auto' | boolean | undefined
+  estimateRowHeight?: number | undefined
+  hasMore?: boolean | undefined
+  /** Client-only, or a Server Action. Called once when the window nears the end. */
+  loadMore?: (() => void | Promise<void>) | undefined
+  loadMoreThreshold?: number | undefined
+  /** The selected value's item when it is not in the loaded pages, so the trigger is never blank. */
+  selectedItem?: T | undefined
+}
+
+/** The defaults TopClassProvider carries, which a component may override per instance. */
+export const COLLECTION_DEFAULTS = {
+  visibleRows: 7,
+  virtualizeAbove: 200,
+  loadMoreThreshold: 10,
+  estimateRowHeight: 36,
+  overscan: 6,
+} as const
+
+export type CollectionDefaults = typeof COLLECTION_DEFAULTS
