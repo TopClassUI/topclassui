@@ -35,10 +35,15 @@ export default defineConfig(
     },
   },
 
-  // Demos show real usage, so hard-coded strings are the point.
+  // A test has to write the banned string to prove the rule or the merge works,
+  // and a demo exists to show real usage. Neither is published.
   {
-    files: ['src/**/dummy/**/*.tsx'],
-    rules: { 'topclass/no-hardcoded-text': 'off' },
+    files: ['src/**/*.test.{ts,tsx}', 'src/**/test/**/*.{ts,tsx}', 'src/**/dummy/**/*.tsx'],
+    rules: {
+      'topclass/semantic-classes-only': 'off',
+      'topclass/shared-class-constants': 'off',
+      'topclass/logical-properties-only': 'off',
+    },
   },
 
   // Tooling runs in Node, never ships, and walks untyped ESLint AST nodes.

@@ -215,9 +215,15 @@ const rules = {
             }
             const text = c.value.trim()
             if (/^(eslint|@ts-|prettier|TODO|biome)/.test(text)) { flushRun(); continue }
-            if (/[;{}]$|^(const|let|var|function|import|export|return|if|for)\b/.test(text)) {
-              ctx.report({ node: c, messageId: 'commentedCode' })
-            }
+            // Prose may name a keyword, so this looks for code shape, not a leading word.
+            const looksLikeCode =
+              /;\s*$/.test(text) ||
+              /^[{}]\s*$/.test(text) ||
+              /^(const|let|var)\s+\w+\s*=/.test(text) ||
+              /^(import|export)\b[^.]*\bfrom\b/.test(text) ||
+              /^(function|class)\s+\w+\s*[({]/.test(text) ||
+              /^(if|for|while|switch)\s*\(/.test(text)
+            if (looksLikeCode) ctx.report({ node: c, messageId: 'commentedCode' })
             const prev = run[run.length - 1]
             const prevLine: number = prev ? Number(prev.loc.end.line) : -1
             if (prev && Number(c.loc.start.line) === prevLine + 1) run.push(c)
