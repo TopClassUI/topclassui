@@ -97,9 +97,19 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 **Enforced by:** `eslint`
 
 ### R-4-1 Every authored rule sits in a cascade layer
-**Rule:** only custom-property declarations and `@keyframes` may be unlayered; other rules go in `@layer base` (tokens) or `@layer components` (react).
+**Rule:** only custom-property declarations and `@keyframes` may be unlayered; other rules go in `@layer base` (tokens) or `@layer components` (react). `@utility` and `@custom-variant` count as layered, because Tailwind emits them into its own layers.
 **Why:** an unlayered rule outranks every consumer utility and `cn()` cannot fix that.
-**Enforced by:** `stylelint`
+**Enforced by:** `check-css`
+
+### R-4-2 Every token a file reads is declared
+**Rule:** every `--tc-*` name referenced anywhere in `src/` is declared in `src/tokens.css`.
+**Why:** a misspelled custom property is silent - `bg-(--tc-primry-soft)` compiles and paints nothing, and no type or lint rule can see it.
+**Enforced by:** `check-css`
+
+### R-4-3 One-line comments in stylesheets too
+**Rule:** R-5.12-3 applies to `.css` files; no comment spans more than one line.
+**Why:** the ESLint rule reads TypeScript only, so a stylesheet was the one place the comment rule went unenforced.
+**Enforced by:** `check-css`
 
 ## 3. RTL
 

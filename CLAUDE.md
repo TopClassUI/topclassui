@@ -43,7 +43,9 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 - **R-5.2-4** Sizes, radius, border width, the focus ring, hover, transitions and scroll classes come from the knobs and `shared/classes.ts`; never `rounded-md`, `h-10`, `outline-2`, `border-2`, `duration-200`, or a hand-written `hover:` or `focus-visible:`. _(eslint)_
 - **R-5.2-5** `style` is only for setting a `--tc-*` variable. _(eslint)_
 - **R-5.2-6** Write `data-open:`, `group-data-panel-open:`, `aria-busy:`; brackets only for values. _(eslint)_
-- **R-4-1** Only custom-property declarations and `@keyframes` may be unlayered; other rules go in `@layer base` (tokens) or `@layer components` (react). _(stylelint)_
+- **R-4-1** Only custom-property declarations and `@keyframes` may be unlayered; other rules go in `@layer base` (tokens) or `@layer components` (react). `@utility` and `@custom-variant` count as layered, because Tailwind emits them into its own layers. _(check-css)_
+- **R-4-2** Every `--tc-*` name referenced anywhere in `src/` is declared in `src/tokens.css`. _(check-css)_
+- **R-4-3** R-5.12-3 applies to `.css` files; no comment spans more than one line. _(check-css)_
 
 ## 3. RTL
 

@@ -2,13 +2,13 @@
 
 Read this first in a new session, then `docs/PLAN.md` for the specification and `docs/DECISIONS.md` (newest entries at the top). The three newest DECISIONS entries are from 2 and 3 October 2026 and they change the plan in ways PLAN.md does not yet reflect.
 
-Last updated: 3 October 2026.
+Last updated: 3 October 2026 (coding in progress).
 
 ---
 
 ## The one-line version
 
-The design system and the documentation site exist in Figma. No code has been written. The next real step is still Phase 0, but what Phase 0 builds changed on 2 October: one package, not three.
+The design system and the documentation site exist in Figma. **Coding has started**: the repo scaffold, the six custom ESLint rules, the check scripts, `shared/`, and the design tokens are done and `pnpm check` is green. Next is the 84 icons, then Button end to end.
 
 ## The product, in the words the site uses
 
@@ -106,9 +106,28 @@ Every docs page except the components page and the home page was reviewed line b
 
 ---
 
+## The code, as of 3 October
+
+`pnpm check` runs all six gates and is green: **351 tests in 22 files**, lint, typecheck, `check-structure`, `check-boundaries`, `check-css`, `check-contrast`, `rules:sync --check`.
+
+| Done | What it is |
+|---|---|
+| Scaffold | One package `topclassui`, `private: true`, `0.0.0`. Exact pins. TypeScript **6.0.3**, not 7.x, because typescript-eslint caps at `<6.1.0`. happy-dom, not jsdom, which needs a newer Node than the 22.14 floor. |
+| ESLint rules | Six custom rules in `eslint-rules/`, the thing the library actually sells: `logical-properties-only`, `semantic-classes-only`, `no-dynamic-class-names`, `shared-class-constants`, `no-enum`, `one-line-comments`. 40 fixture tests prove each one fires and that correct code passes. |
+| Check scripts | `check-structure`, `check-boundaries`, `check-css`, `check-contrast`, `rules-sync`. Shared predicates live in `scripts/lib/` and are tested against **LF and CRLF** both. The scripts were themselves audited and five silent-failure defects fixed; see the 3 October DECISIONS entry. CSS is parsed by one string-aware walker, `scripts/lib/css-parse.ts`, because both regex parsers could be made to pass while measuring nothing. |
+| `shared/` | `cn()` on `extendTailwindMerge`, `classes.ts`, the size contract split so `resolveIconSize` never pulls zod into the bundle, `renderElement`, `toSideAlign`, `useCollection` with windowing, labels in English and Arabic with real `Intl.PluralRules`, `TopClassProvider`, the theme script. |
+| Tokens | `src/tokens.css` and `src/styles.css`. Three modes, six knobs, direction-aware safe-area insets. `check-contrast` measures **132 pairs** across the three modes and the three surfaces; `src/styles.test.ts` compiles both files through the installed Tailwind and asserts the semantic utilities, the knob maths and the forced-state variants all resolve. |
+
+Eight deliberate departures from PLAN.md sections 4 and 6 are recorded in `docs/DECISIONS.md` (the `@source "./shared"` line, the RTL-correct safe-area insets, `check-css` in place of stylelint, and `color-scheme` moved into `@layer base`).
+
+**Open, for Omar to decide:** PLAN 5.3 says `:lang(ar)` sets the Arabic font *and* line-height, but 6.2 omits line-height and names no value. It changes the rhythm of every Arabic page, so the number is a design call, not a default to guess.
+
+**Next:** Phase 2, the 84 icons. Then Phase 3, Button finished completely as the template for the other 45. The docs app comes after Button.
+
 ## What is not done
 
-- **No code at all.** `pnpm check` cannot run; there is no `package.json`. Say so rather than claiming a check passed.
+- **45 of 46 components, and the icons.** Nothing in `src/components/` yet.
+- **The docs site** is not built, only designed.
 - **The components page** (`Docs site - LTR`, 46 cards) has not been reviewed. It is the largest frame in the file and the most important one left.
 - **The home page** has not been reviewed.
 - **The Connectors page needs a visual pass.** The 16 cards were built without being able to see them, and Omar's verdict on the result was "so bad". The structure is sound and the audit is clean - no raw colours, no fixed rows, no overflow - but it needs eyes.

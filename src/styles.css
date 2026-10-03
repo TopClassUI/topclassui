@@ -1,0 +1,110 @@
+/* Relative to this file, so they work from inside node_modules and ignore .gitignore. */
+@source "./components";
+@source "./connectors";
+/* shared/classes.ts holds the class constants every component spreads. */
+@source "./shared";
+
+/* The forced attribute lets the docs show every state; hover keeps its media guard. */
+@custom-variant hover {
+  @media (hover: hover) { &:hover { @slot } }
+  &[data-hover] { @slot }
+}
+@custom-variant focus-visible {
+  &:focus-visible { @slot }
+  &[data-focus-visible] { @slot }
+}
+@custom-variant active {
+  &:active { @slot }
+  &[data-active] { @slot }
+}
+
+/* For consumer code only; the library never uses dark:. The :not() makes one level of nesting behave. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *):not(:where([data-theme="light"], [data-theme="light"] *)));
+
+/* The start and end insets flip with the direction, which env() alone cannot do. */
+@utility pt-safe { padding-top: var(--tc-safe-top); }
+@utility pb-safe { padding-bottom: var(--tc-safe-bottom); }
+@utility ps-safe { padding-inline-start: var(--tc-safe-start); }
+@utility pe-safe { padding-inline-end: var(--tc-safe-end); }
+
+@theme inline {
+  --color-page: var(--tc-page);
+  --color-surface: var(--tc-surface);
+  --color-surface-raised: var(--tc-surface-raised);
+  --color-body: var(--tc-body);
+  --color-muted: var(--tc-muted);
+  --color-line: var(--tc-line);
+  --color-line-strong: var(--tc-line-strong);
+  --color-overlay: var(--tc-overlay);
+  --color-ring: var(--tc-ring);
+
+  --color-primary-solid: var(--tc-primary-solid);
+  --color-primary-on-solid: var(--tc-primary-on-solid);
+  --color-primary-soft: var(--tc-primary-soft);
+  --color-primary-on-soft: var(--tc-primary-on-soft);
+  --color-neutral-solid: var(--tc-neutral-solid);
+  --color-neutral-on-solid: var(--tc-neutral-on-solid);
+  --color-neutral-soft: var(--tc-neutral-soft);
+  --color-neutral-on-soft: var(--tc-neutral-on-soft);
+  --color-success-solid: var(--tc-success-solid);
+  --color-success-on-solid: var(--tc-success-on-solid);
+  --color-success-soft: var(--tc-success-soft);
+  --color-success-on-soft: var(--tc-success-on-soft);
+  --color-warning-solid: var(--tc-warning-solid);
+  --color-warning-on-solid: var(--tc-warning-on-solid);
+  --color-warning-soft: var(--tc-warning-soft);
+  --color-warning-on-soft: var(--tc-warning-on-soft);
+  --color-danger-solid: var(--tc-danger-solid);
+  --color-danger-on-solid: var(--tc-danger-on-solid);
+  --color-danger-soft: var(--tc-danger-soft);
+  --color-danger-on-soft: var(--tc-danger-on-soft);
+  --color-info-solid: var(--tc-info-solid);
+  --color-info-on-solid: var(--tc-info-on-solid);
+  --color-info-soft: var(--tc-info-soft);
+  --color-info-on-soft: var(--tc-info-on-soft);
+
+  /* Control heights multiply by the density knob, so one value resizes every control. */
+  --spacing-control-xs: calc(1.75rem * var(--tc-density));
+  --spacing-control-sm: calc(2rem * var(--tc-density));
+  --spacing-control-md: calc(2.5rem * var(--tc-density));
+  --spacing-control-lg: calc(3rem * var(--tc-density));
+  --spacing-control-xl: calc(3.5rem * var(--tc-density));
+
+  --spacing-toggle-xs: calc(0.875rem * var(--tc-density));
+  --spacing-toggle-sm: calc(1rem * var(--tc-density));
+  --spacing-toggle-md: calc(1.25rem * var(--tc-density));
+  --spacing-toggle-lg: calc(1.5rem * var(--tc-density));
+  --spacing-toggle-xl: calc(1.75rem * var(--tc-density));
+
+  --spacing-icon-xs: 1rem;
+  --spacing-icon-sm: 1.25rem;
+  --spacing-icon-md: 1.5rem;
+  --spacing-icon-lg: 2rem;
+  --spacing-icon-xl: 2.5rem;
+
+  --spacing-pad-x-xs: calc(0.5rem * var(--tc-density));
+  --spacing-pad-x-sm: calc(0.75rem * var(--tc-density));
+  --spacing-pad-x-md: calc(1rem * var(--tc-density));
+  --spacing-pad-x-lg: calc(1.25rem * var(--tc-density));
+  --spacing-pad-x-xl: calc(1.5rem * var(--tc-density));
+
+  --spacing-pad-y-xs: calc(0.125rem * var(--tc-density));
+  --spacing-pad-y-sm: calc(0.25rem * var(--tc-density));
+  --spacing-pad-y-md: calc(0.375rem * var(--tc-density));
+  --spacing-pad-y-lg: calc(0.5rem * var(--tc-density));
+  --spacing-pad-y-xl: calc(0.625rem * var(--tc-density));
+
+  /* The min() stops a card becoming a circle when the knob is set to a pill. */
+  --radius-control: var(--tc-radius);
+  --radius-box: min(calc(var(--tc-radius) * 1.5), 1.5rem);
+  --radius-chip: min(calc(var(--tc-radius) * 0.5), 0.5rem);
+
+  --font-sans: var(--tc-font-sans);
+  --font-mono: var(--tc-font-mono);
+
+}
+
+/* Not inline: the transition utilities read this through var(), so it must be emitted. */
+@theme {
+  --default-transition-duration: calc(150ms * var(--tc-motion));
+}

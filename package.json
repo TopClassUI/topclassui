@@ -36,7 +36,8 @@
     "check:boundaries": "tsx scripts/check-boundaries.ts",
     "check:contrast": "tsx scripts/check-contrast.ts",
     "rules:sync": "tsx scripts/rules-sync.ts",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm check:structure && pnpm check:boundaries && pnpm check:contrast && pnpm rules:sync --check"
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm check:structure && pnpm check:boundaries && pnpm check:css && pnpm check:contrast && pnpm rules:sync --check",
+    "check:css": "tsx scripts/check-css.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

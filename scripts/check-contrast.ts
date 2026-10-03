@@ -1,14 +1,24 @@
-// R-5.6-4: WCAG contrast of every token pair in every mode.
-// A no-op until Phase 1 creates the tokens file, as PLAN.md section 19 specifies.
-import { existsSync } from 'node:fs'
+// R-5.6-4: contrast for every token pair in every mode. The checks live in
+// lib/contrast-checks.ts so the tests can measure without spawning this script.
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const TOKENS = join(process.cwd(), 'src', 'styles', 'tokens.css')
+import { checkTokens, MODES } from './lib/contrast-checks.js'
+import { readPalette } from './lib/tokens.js'
+
+const TOKENS = join(process.cwd(), 'src', 'tokens.css')
 
 if (!existsSync(TOKENS)) {
-  console.log('check-contrast: ok (no tokens file yet; this check arrives in Phase 1)')
+  console.log('check-contrast: ok (no tokens file yet)')
   process.exit(0)
 }
 
-console.error('check-contrast: tokens.css exists but the check is not implemented yet (Phase 1).')
-process.exit(1)
+const { failures, pairs } = checkTokens(readFileSync(TOKENS, 'utf8'), readPalette())
+
+for (const f of failures) console.error(`error ${f}`)
+
+if (failures.length) {
+  console.error(`\ncheck-contrast: ${String(failures.length)} failure${failures.length === 1 ? '' : 's'}.`)
+  process.exit(1)
+}
+console.log(`check-contrast: ok (${String(MODES.length)} modes, ${String(pairs)} pairs measured)`)

@@ -1,0 +1,186 @@
+/* Consumer order: tailwindcss, then this file, then topclassui/styles.css. */
+
+/* Knobs live on :root only, so a nested themed section keeps the page's feel. */
+:root {
+  --tc-radius: 0.5rem;
+  --tc-line-width: 1px;
+  --tc-ring-width: 2px;
+  --tc-ring-offset: 2px;
+  --tc-density: 1;
+  --tc-motion: 1;
+  --tc-list-rows: 7;
+  --tc-row-height: calc(2.5rem * var(--tc-density));
+  --tc-overlay-inset: 1rem;
+  --tc-sticky-top: 0px;
+  --tc-sticky-bottom: 0px;
+  --tc-dir: 1;
+
+  /* env() is physical, so the inline edges are named here and swapped per direction. */
+  --tc-safe-top: env(safe-area-inset-top);
+  --tc-safe-bottom: env(safe-area-inset-bottom);
+  --tc-safe-start: env(safe-area-inset-left);
+  --tc-safe-end: env(safe-area-inset-right);
+
+  /* Literal, not var(--tc-font-sans): on <html lang="ar"> that would be a cycle. */
+  --tc-font-latin: ui-sans-serif, system-ui, sans-serif;
+  --tc-font-arabic: ui-sans-serif, system-ui, sans-serif;
+  --tc-font-sans: var(--tc-font-latin);
+  --tc-font-mono: ui-monospace, monospace;
+
+  --tc-duration-fast: calc(100ms * var(--tc-motion));
+  --tc-duration-base: calc(150ms * var(--tc-motion));
+  --tc-duration-slow: calc(300ms * var(--tc-motion));
+  --tc-duration: var(--tc-duration-base);
+
+  --tc-z-sticky: 10;
+  --tc-z-drawer: 40;
+  --tc-z-dialog: 50;
+  --tc-z-popup: 60;
+  --tc-z-toast: 70;
+}
+
+/* Both selectors, so a light island inside a dark page resets every colour. */
+:root,
+[data-theme='light'] {
+  --tc-page: var(--color-white);
+  --tc-surface: var(--color-neutral-50);
+  --tc-surface-raised: var(--color-white);
+  --tc-body: var(--color-neutral-950);
+  --tc-muted: var(--color-neutral-600);
+  --tc-line: var(--color-neutral-200);
+  --tc-line-strong: var(--color-neutral-500);
+  --tc-overlay: oklch(0 0 0 / 0.5);
+
+  --tc-primary-solid: var(--color-violet-600);
+  --tc-primary-on-solid: var(--color-white);
+  --tc-primary-on-soft: var(--color-violet-700);
+  --tc-neutral-solid: var(--color-neutral-900);
+  --tc-neutral-on-solid: var(--color-white);
+  --tc-neutral-on-soft: var(--color-neutral-900);
+  --tc-success-solid: var(--color-emerald-700);
+  --tc-success-on-solid: var(--color-white);
+  /* emerald-800 not emerald-700: on its own tint emerald-700 measures only 4.64:1. */
+  --tc-success-on-soft: var(--color-emerald-800);
+  --tc-warning-solid: var(--color-amber-500);
+  --tc-warning-on-solid: var(--color-neutral-950);
+  /* amber-800 not amber-700: amber needs a 16% tint, which lifts it to 4.51:1. */
+  --tc-warning-on-soft: var(--color-amber-800);
+  --tc-danger-solid: var(--color-red-600);
+  --tc-danger-on-solid: var(--color-white);
+  /* red-800 not red-700: red-700 measures 4.35:1 on danger-soft-active. */
+  --tc-danger-on-soft: var(--color-red-800);
+  --tc-info-solid: var(--color-sky-700);
+  --tc-info-on-solid: var(--color-white);
+  --tc-info-on-soft: var(--color-sky-700);
+
+  /* How much of the tone goes into its soft tint. Dark needs roughly double. */
+  --tc-primary-mix: 12%;
+  --tc-neutral-mix: 8%;
+  --tc-success-mix: 12%;
+  --tc-warning-mix: 16%;
+  --tc-danger-mix: 12%;
+  --tc-info-mix: 12%;
+
+  --tc-hover: var(--color-violet-700);
+  --tc-active: var(--color-violet-800);
+}
+
+[data-theme='dark'] {
+  --tc-page: var(--color-neutral-950);
+  --tc-surface: var(--color-neutral-900);
+  --tc-surface-raised: var(--color-neutral-800);
+  --tc-body: var(--color-neutral-50);
+  --tc-muted: var(--color-neutral-400);
+  --tc-line: var(--color-neutral-800);
+  /* neutral-400 not neutral-500: on a raised card neutral-500 measured only 3.19:1. */
+  --tc-line-strong: var(--color-neutral-400);
+  --tc-overlay: oklch(0 0 0 / 0.7);
+
+  --tc-neutral-solid: var(--color-neutral-100);
+  --tc-neutral-on-solid: var(--color-neutral-950);
+  --tc-neutral-on-soft: var(--color-neutral-200);
+  --tc-primary-on-soft: var(--color-violet-400);
+  --tc-success-on-soft: var(--color-emerald-400);
+  --tc-warning-on-soft: var(--color-amber-400);
+  --tc-danger-on-soft: var(--color-red-400);
+  --tc-info-on-soft: var(--color-sky-400);
+
+  /* At the light percentages every dark tint measured 1.01-1.03 on --tc-surface. */
+  --tc-primary-mix: 24%;
+  --tc-neutral-mix: 12%;
+  --tc-success-mix: 24%;
+  --tc-warning-mix: 14%;
+  --tc-danger-mix: 22%;
+  --tc-info-mix: 24%;
+}
+
+/* A custom mode is one more block. It may change knobs as well as colours. */
+[data-theme='ocean'] {
+  --tc-primary-solid: var(--color-cyan-700);
+  --tc-primary-on-solid: var(--color-white);
+  /* cyan-800 not cyan-700: the whole ocean soft ramp fails at cyan-700. */
+  --tc-primary-on-soft: var(--color-cyan-800);
+  --tc-hover: var(--color-cyan-800);
+  --tc-active: var(--color-cyan-900);
+  --tc-radius: 9999px;
+}
+
+/* On every themed element, not only :root, so a nested section recomputes these. */
+:root,
+[data-theme] {
+  /* Not --tc-primary-solid: violet-600 measures 2.57:1 on a dark raised surface. */
+  --tc-ring: var(--tc-primary-on-soft);
+
+  --tc-primary-soft: color-mix(in oklch, var(--tc-primary-solid) var(--tc-primary-mix), var(--tc-page));
+  --tc-neutral-soft: color-mix(in oklch, var(--tc-neutral-solid) var(--tc-neutral-mix), var(--tc-page));
+  --tc-success-soft: color-mix(in oklch, var(--tc-success-solid) var(--tc-success-mix), var(--tc-page));
+  --tc-warning-soft: color-mix(in oklch, var(--tc-warning-solid) var(--tc-warning-mix), var(--tc-page));
+  --tc-danger-soft: color-mix(in oklch, var(--tc-danger-solid) var(--tc-danger-mix), var(--tc-page));
+  --tc-info-soft: color-mix(in oklch, var(--tc-info-solid) var(--tc-info-mix), var(--tc-page));
+
+  /* The tone's own percentage plus 8, then plus 16, so the rule survives a mode change. */
+  --tc-soft-hover: color-mix(in oklch, var(--tc-primary-solid) calc(var(--tc-primary-mix) + 8%), var(--tc-page));
+  --tc-soft-active: color-mix(in oklch, var(--tc-primary-solid) calc(var(--tc-primary-mix) + 16%), var(--tc-page));
+}
+
+/* Both blocks: these inherit, so an ltr island in an rtl page needs its own reset. */
+[dir='rtl'] {
+  --tc-dir: -1;
+  --tc-safe-start: env(safe-area-inset-right);
+  --tc-safe-end: env(safe-area-inset-left);
+}
+
+[dir='ltr'] {
+  --tc-dir: 1;
+  --tc-safe-start: env(safe-area-inset-left);
+  --tc-safe-end: env(safe-area-inset-right);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --tc-motion: 0;
+  }
+}
+
+@layer base {
+  /* color-scheme is not a custom property, so it belongs in a layer (R-4-1). */
+  :root,
+  [data-theme='light'],
+  [data-theme='ocean'] {
+    color-scheme: light;
+  }
+
+  [data-theme='dark'] {
+    color-scheme: dark;
+  }
+
+  /* font-family inherits resolved, so only setting the property works when nested. */
+  :lang(ar) {
+    font-family: var(--tc-font-arabic);
+    letter-spacing: 0;
+  }
+
+  html {
+    scrollbar-gutter: stable;
+  }
+}

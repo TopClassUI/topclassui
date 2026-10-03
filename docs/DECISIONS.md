@@ -6,6 +6,51 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-03 - The checks are measured against their own blind spots, not trusted
+
+**Decision.** Three defects found by auditing the check scripts themselves are fixed at the root, and the one judgement call is recorded rather than quietly taken.
+
+1. **One string-aware CSS parser, `scripts/lib/css-parse.ts`, replaces both regex parsers.** The old ones were string-blind and could not nest. Measured consequences, each reproduced before the fix: writing `[data-theme="dark"]` instead of `[data-theme='dark']` made `check-contrast` print `ok (3 modes, 138 pairs measured)` while dark mode was never measured at all and light was measured three times; `@media` wrappers were discarded, so the reduced-motion block leaked `--tc-motion: 0` into light unconditionally; `content: "/*"` erased every real offence that followed it; `content: "}"` invented an offence in valid CSS; a block's last declaration was dropped if it had no trailing semicolon, leaking the light value into the mode.
+
+2. **A mode that declares no block of its own is now a failure.** `declaredModes()` plus a guard in `checkTokens` means a renamed, misspelled or deleted mode block fails loudly instead of being silently measured with the base values. This is what makes defect 1 structurally impossible rather than merely patched, and it is covered by a test that mutates only the dark block and only the ocean block.
+
+3. **`@property`, `@font-face`, `@counter-style` and `@font-palette-values` are exempt from R-4-1,** because a cascade layer cannot reorder their contents. Before this, declaring `--tc-dir` with `@property` - the standard next step for a custom property that gets multiplied - produced three spurious R-4-1 errors.
+
+4. **The gamut question is answered by bracketing, not by choosing.** `gamutMap()` reduces chroma by bisection; a plain clip is the other plausible reading, and the two disagree by up to **0.1474** on the shipped tokens (worst case: dark `--tc-success-on-soft` on `--tc-success-soft`). `MARGIN` is 0.15, so the margin that existed to absorb *browser* differences was almost entirely consumed by our own choice of algorithm. Rather than pick one and hope, `contrastRange()` computes both and `check-contrast` judges the **worse** of the two, with `MARGIN` now sitting on top of that bracket. Every token still passes under the stricter measurement, so no value had to move. The alternative - adopting CSS Color 4's `css-gamut-map` - was rejected for now because it shifts all 138 ratios and cannot be verified against a real browser offline.
+
+**Why.** A check that passes while measuring nothing is worse than no check, because it is reported as evidence. Every defect above was reproduced by mutation before being fixed, and each now has a test that fails if the fix is reverted.
+
+**Affects** `scripts/lib/css-parse.ts` (new), `scripts/lib/css-layers.ts`, `scripts/lib/tokens.ts`, `scripts/lib/contrast-checks.ts`, `scripts/lib/color.ts` and their tests.
+
+**Also fixed in `color.ts`**, found in the same audit: alpha was composited in linear light instead of gamma-encoded sRGB, and `contrast()` never flattened a translucent *background*, so the same pair read 1.909 one way and 21.000 the other; 50% black on white now reads 3.9767 both ways. `parseOklch` is anchored, so a wrapper like `light-dark(oklch(..), oklch(..))` no longer silently resolves to its first colour, and it now accepts percentage alpha, percentage chroma, `deg` hues and negative hues. `mixOklch` interpolates in polar Oklch with the CSS Color 4 powerless-hue rule, which is what `in oklch` means; it agreed with the old rectangular code only because every page colour has chroma 0.
+
+---
+
+## 2026-10-03 - Four corrections to the stylesheets as PLAN.md section 4 writes them
+
+**Decision.** The two stylesheets ship as `src/tokens.css` and `src/styles.css`, and four things differ from the snippet in PLAN.md section 4.
+
+1. **`@source "./shared"` is added** to the two the plan lists. `shared/classes.ts` holds the class constants every component spreads (`FOCUS_RING`, `CONTROL_SIZE`, `SCROLL_AREA`). Without the third line Tailwind never sees those strings and every focus ring, control height and scroll container renders unstyled.
+2. **The safe-area utilities read `--tc-safe-*`** rather than `env(safe-area-inset-left)` directly. `env()` is physical, so the plan's `ps-safe { padding-inline-start: env(safe-area-inset-left) }` applies the left inset to the right edge of an RTL page. `tokens.css` names the four insets and swaps start and end under `[dir='rtl']`.
+3. **R-4-1 is enforced by `scripts/check-css.ts`, not stylelint.** One rule does not justify stylelint and its plugin chain; the script is 40 lines, adds no dependency, and follows the pattern of the four checks already in `pnpm check`. `@utility` and `@custom-variant` are treated as layered, because Tailwind emits them into its own layers. `docs/RULES.md` is updated, so the generated rule files say `check-css`.
+4. **`color-scheme` moved into `@layer base`.** It is not a custom property, so R-4-1 applies to it; it was unlayered in the first draft of `tokens.css`.
+
+**Why.** Points 1 and 2 are correctness: the first makes the library render at all, the second is the RTL promise the library is built on. Points 3 and 4 close the gap between a rule and its enforcement.
+
+5. **A new rule, R-4-2, is added:** every `--tc-*` name referenced in `src/` must be declared in `src/tokens.css`. `check-css` enforces it alongside R-4-1. This is an addition to the rule set, not a deviation from it, and it exists because a misspelled custom property is the one styling mistake nothing else in the toolchain can see: `bg-(--tc-primry-soft)` compiles without complaint and paints nothing.
+
+6. **A second new rule, R-4-3:** no comment in a `.css` file spans more than one line. R-5.12-3 already says this, but the ESLint rule reads TypeScript only, so stylesheets were the one place it went unenforced - and seven comments had already drifted past one line before the check existed.
+
+7. **`[dir='ltr']` is declared as well as `[dir='rtl']`.** PLAN.md section 6.2 declares only the rtl block. Custom properties inherit, so an English island inside an Arabic page keeps `--tc-dir: -1` and every translate, transform origin and gradient in that subtree points the wrong way, with `ps-safe` and `pe-safe` still swapped. PLAN 5.3 explicitly allows `dir="auto"` on inputs, which makes this reachable. The plan needs the same amendment.
+
+8. **Four token values differ from PLAN.md section 6.2, each for a measured reason.** `--tc-success-on-soft` is emerald-800 and `--tc-warning-on-soft` is amber-800, because the plan's emerald-700 and amber-700 measure 4.64:1 and 4.51:1 on their own tints and fail `check-contrast` in light and ocean. `--tc-hover` and `--tc-active` moved from the `:root, [data-theme]` block to the light block, because that block is last and its violet would otherwise beat a custom mode at equal specificity, hovering an ocean button violet on a cyan fill; ocean declares its own cyan pair. `--tc-duration` is added so `shared/classes.ts` can write `duration-(--tc-duration)` once.
+
+**Affects** `src/styles.css`, `src/tokens.css`, `scripts/check-css.ts`, `scripts/lib/css-layers.ts`, `scripts/lib/token-refs.ts`, `docs/RULES.md`, the generated rule files, and the `check` script.
+
+**Confirmed by measurement.** Tailwind 4.3.3 compiles the block form of `@custom-variant hover` to `@media (hover: hover) { &:hover }` plus `&[data-hover]`; the list form `(&:hover, &[data-hover])` drops the media guard, which leaves a tapped control stuck in its hover state on a touch device. The plan's block form is correct and is what ships.
+
+---
+
 ## 2026-10-03 - Tailwind as far as it goes, Base UI the one exception, and a quality test for every dependency
 
 **Decision.** Build on Tailwind and the platform wherever possible. `@base-ui/react` is the single accepted behaviour dependency. No stack of third-party libraries behind the components.
