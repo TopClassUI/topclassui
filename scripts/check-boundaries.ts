@@ -1,0 +1,131 @@
+// R-5.1-1, R-5.1-4, R-5.1-5, R-7-1: what may cross the server and client boundary.
+import { readdirSync, readFileSync } from 'node:fs'
+import { join, posix, relative, sep } from 'node:path'
+
+const ROOT = process.cwd()
+const SRC = join(ROOT, 'src')
+
+/** Hooks a Server Component may call. Everything else needs 'use client'. */
+const SERVER_SAFE_HOOKS = new Set(['useId', 'use'])
+
+/** Only this file may be async or import server-only; everything else renders in a plain React tree. */
+const RSC_ONLY = posix.join('src', 'components', 'icon', 'index.tsx')
+
+const errors: string[] = []
+const rel = (p: string) => relative(ROOT, p).split(sep).join(posix.sep)
+
+function walk(dir: string, out: string[] = []): string[] {
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    const p = join(dir, e.name)
+    if (e.isDirectory()) walk(p, out)
+    else if (/\.tsx?$/.test(e.name)) out.push(p)
+  }
+  return out
+}
+
+/** The directive prologue only counts before any statement, so a late 'use client' is a dead string. */
+function hasUseClient(source: string) {
+  const head = source.replace(/^\uFEFF/, '').trimStart()
+  return /^(['"])use client\1\s*;?/.test(head)
+}
+
+function hasLateUseClient(source: string) {
+  return !hasUseClient(source) && /^\s*(['"])use client\1\s*;?\s*$/m.test(source)
+}
+
+function importedNames(source: string, from: string): string[] {
+  const names: string[] = []
+  const re = new RegExp(`import\\s*\\{([^}]*)\\}\\s*from\\s*['"]${from}['"]`, 'g')
+  let m: RegExpExecArray | null
+  while ((m = re.exec(source))) {
+    for (const part of m[1]!.split(',')) {
+      const name = part.split(' as ')[0]!.trim()
+      if (name && name !== 'type') names.push(name.replace(/^type\s+/, ''))
+    }
+  }
+  return names
+}
+
+let files: string[] = []
+try {
+  files = walk(SRC)
+} catch {
+  console.log('check-boundaries: ok (no src yet)')
+  process.exit(0)
+}
+
+for (const file of files) {
+  const r = rel(file)
+  const source = readFileSync(file, 'utf8')
+  const isIndex = /(^|\/)index\.tsx$/.test(r)
+  const isClient = /(^|\/)client\.tsx$/.test(r)
+  const isHook = /(^|\/)hook\.ts$/.test(r)
+  const isLib = /(^|\/)lib\.ts$/.test(r)
+  const isTypes = /(^|\/)types\.ts$/.test(r)
+
+  if (hasLateUseClient(source)) {
+    errors.push(`${r}: 'use client' must be the first statement in the file, or it is a dead string.`)
+  }
+
+  if (isIndex) {
+    if (hasUseClient(source)) errors.push(`${r}: index.tsx never contains 'use client' (R-5.1-1).`)
+
+    for (const name of importedNames(source, 'react')) {
+      if (name.startsWith('use') && !SERVER_SAFE_HOOKS.has(name)) {
+        errors.push(`${r}: imports ${name} from react. A Server Component may only call useId and use (R-5.1-1).`)
+      }
+    }
+    if (/from\s+['"]\.\/hook\.js['"]/.test(source)) {
+      errors.push(`${r}: imports ./hook.js. Only client.tsx may (R-5.1-1).`)
+    }
+    if (/\bcreateContext\s*\(|\buseContext\s*\(/.test(source)) {
+      errors.push(`${r}: React context does not exist in a Server Component render. Direction and theme come from dir and data-theme (R-5.1-4).`)
+    }
+    if (r !== RSC_ONLY) {
+      if (/export\s+(default\s+)?async\s+function/.test(source)) {
+        errors.push(`${r}: only ${RSC_ONLY} may be async; every other index.tsx must render in a non-RSC tree (R-5.1-5).`)
+      }
+      if (/from\s+['"]server-only['"]/.test(source)) {
+        errors.push(`${r}: only ${RSC_ONLY} may import server-only (R-5.1-5).`)
+      }
+    }
+    if (/from\s+['"].*icons\/loaders/.test(source) && !r.startsWith('src/components/icon/')) {
+      errors.push(`${r}: the icon loader map is private to components/icon (R-7-1).`)
+    }
+  }
+
+  if (isClient && !hasUseClient(source)) {
+    errors.push(`${r}: client.tsx must start with 'use client' (R-8.1-1).`)
+  }
+
+  if (isHook) {
+    if (/<[A-Za-z]/.test(source.replace(/\/\/.*$/gm, ''))) {
+      errors.push(`${r}: hook.ts returns a plain object and contains no JSX (R-8.1-1).`)
+    }
+  }
+
+  if (isLib && /from\s+['"]react['"]/.test(source)) {
+    errors.push(`${r}: lib.ts holds pure helpers and imports no React (R-8.1-1).`)
+  }
+
+  if (isTypes && /^(?!.*\btype\b).*\bexport\s+(const|function|class|let|var)\s/m.test(source)) {
+    errors.push(`${r}: types.ts is types only, so the file erases completely (R-8.3-4).`)
+  }
+
+  // A relative import must carry .js, or Node cannot resolve the emitted ESM.
+  const relImports = source.match(/from\s+['"](\.[^'"]*)['"]/g) ?? []
+  for (const imp of relImports) {
+    const spec = /from\s+['"](\.[^'"]*)['"]/.exec(imp)![1]!
+    if (!/\.(js|json|css)$/.test(spec)) {
+      errors.push(`${r}: relative import "${spec}" needs a .js extension (R-5.12-5).`)
+    }
+  }
+}
+
+for (const e of errors) console.error(`error ${e}`)
+
+if (errors.length) {
+  console.error(`\ncheck-boundaries: ${errors.length} error${errors.length === 1 ? '' : 's'}.`)
+  process.exit(1)
+}
+console.log(`check-boundaries: ok (${files.length} file${files.length === 1 ? '' : 's'})`)

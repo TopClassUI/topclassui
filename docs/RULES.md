@@ -40,17 +40,17 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 **Enforced by:** `scripts/check-structure.ts`
 
 ### R-5.1-3 Only serializable props cross the boundary
-**Rule:** strings, numbers, booleans, plain objects, arrays and `ReactNode` children only; functions never, except Server Actions.
+**Rule:** only serializable props cross the boundary: strings, numbers, booleans, plain objects, arrays and `ReactNode` children; functions never, except Server Actions.
 **Why:** React throws at render otherwise.
 **Enforced by:** `manual` (contracts document each callback as client-only or Server Action)
 
 ### R-5.1-4 No React context in Server Components
-**Rule:** direction and theme come from `dir` and `data-theme` on the HTML; labels come from props.
+**Rule:** no React context in Server Components: direction and theme come from `dir` and `data-theme` on the HTML, and labels come from props.
 **Why:** context does not exist in the Server Component render.
 **Enforced by:** `scripts/check-boundaries.ts`
 
 ### R-5.1-5 Only `components/icon/index.tsx` may be async or import `server-only`
-**Rule:** every other `index.tsx` in `packages/react` renders in a non-RSC React tree; the async server `<Icon>` is the one exception, and the sync `<Icon>` from `icon-registry` carries the identical props for browser-only trees.
+**Rule:** only `components/icon/index.tsx` may be async or import `server-only`; every other `index.tsx` renders in a non-RSC React tree, and the sync `<Icon>` from `icon-registry` carries the identical props for browser-only trees.
 **Why:** it is the gate that keeps every non-Next target working; without it the first component that quietly becomes async breaks every Vite and React Router consumer and nothing catches it.
 **Enforced by:** `scripts/check-boundaries.ts`
 
@@ -67,7 +67,7 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 ## 2. Styling
 
 ### R-5.2-1 Semantic classes only
-**Rule:** inside `packages/react`, use `bg-primary-solid`, `text-body`, `border-line`; palette classes, arbitrary colours and the `dark:` variant are banned.
+**Rule:** inside `src/`, use `bg-primary-solid`, `text-body`, `border-line`; palette classes, arbitrary colours and the `dark:` variant are banned.
 **Why:** a component that never names a real colour works in every mode, including modes that do not exist yet.
 **Enforced by:** `eslint` (Appendix C patterns)
 
@@ -114,7 +114,7 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 **Enforced by:** `eslint`
 
 ### R-5.3-3 No letter-spacing
-**Rule:** no `tracking-*` anywhere inside `packages/react`.
+**Rule:** no `tracking-*` anywhere inside `src/`.
 **Why:** it breaks the joined letter shapes of Arabic, and a component never knows its text's language.
 **Enforced by:** `eslint`
 
@@ -214,7 +214,7 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 ### R-8.5-2 The app owns the data
 **Rule:** components never fetch, cache or paginate; they call `loadMore()` and render what they are given.
 **Why:** data belongs to the application, not to the design system.
-**Enforced by:** `eslint` (no fetch inside `packages/react`)
+**Enforced by:** `eslint` (no fetch inside `src/`)
 
 ### R-10.5-1 Overlays scroll inside themselves
 **Rule:** popups use `POPUP_BOUNDS` and the row cap, dialogs and drawers scroll their body with sticky header and footer, and every scroll container inside an overlay sets `overscroll-behavior: contain`.

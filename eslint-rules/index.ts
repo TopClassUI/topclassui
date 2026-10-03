@@ -1,10 +1,11 @@
 // The rules of docs/RULES.md that a linter can enforce. Rule ids are in the messages.
+import type { ESLint } from 'eslint'
 
 type Node = any
 type Context = any
 
 /** A string literal only matters when it can become a class name. */
-function inClassContext(ctx: Context, node: Node): boolean {
+function inClassContext(node: Node): boolean {
   let n = node.parent
   let depth = 0
   while (n && depth++ < 12) {
@@ -23,17 +24,17 @@ function inClassContext(ctx: Context, node: Node): boolean {
   return false
 }
 
-function eachClassString(ctx: Context, report: (node: Node, value: string) => void) {
+function eachClassString(report: (node: Node, value: string) => void) {
   return {
     Literal(node: Node) {
       if (typeof node.value !== 'string') return
-      if (!inClassContext(ctx, node)) return
+      if (!inClassContext(node)) return
       report(node, node.value)
     },
     TemplateElement(node: Node) {
       const raw = node.value?.cooked
       if (typeof raw !== 'string' || !raw.trim()) return
-      if (!inClassContext(ctx, node)) return
+      if (!inClassContext(node)) return
       report(node, raw)
     },
   }
@@ -69,13 +70,13 @@ const HAND_WRITTEN_STATE = /(^|\s)(hover|focus-visible|active):/
 const rules = {
   'logical-properties-only': {
     meta: {
-      type: 'problem',
+      type: 'problem' as const,
       docs: { description: 'R-5.3-1, R-5.3-3: logical utilities only; never physical left or right.' },
       schema: [],
       messages: { physical: 'R-5.3-1: "{{cls}}" is physical. {{hint}}.' },
     },
     create(ctx: Context) {
-      return eachClassString(ctx, (node, value) => {
+      return eachClassString((node, value) => {
         for (const [re, hint] of PHYSICAL) {
           const m = re.exec(value)
           if (m) {
@@ -89,7 +90,7 @@ const rules = {
 
   'semantic-classes-only': {
     meta: {
-      type: 'problem',
+      type: 'problem' as const,
       docs: { description: 'R-5.2-1: semantic tokens only; no palette, no arbitrary colour, no dark: variant.' },
       schema: [],
       messages: {
@@ -99,7 +100,7 @@ const rules = {
       },
     },
     create(ctx: Context) {
-      return eachClassString(ctx, (node, value) => {
+      return eachClassString((node, value) => {
         const p = PALETTE.exec(value)
         if (p) return ctx.report({ node, messageId: 'palette', data: { cls: p[0].trim() } })
         const a = ARBITRARY_COLOR.exec(value)
@@ -111,7 +112,7 @@ const rules = {
 
   'no-dynamic-class-names': {
     meta: {
-      type: 'problem',
+      type: 'problem' as const,
       docs: { description: 'R-5.2-3: never build a class name from an expression.' },
       schema: [],
       messages: {
@@ -122,13 +123,16 @@ const rules = {
       return {
         TemplateLiteral(node: Node) {
           if (node.expressions.length === 0) return
-          if (!inClassContext(ctx, node.quasis[0] ?? node)) return
+          if (!inClassContext(node.quasis[0] ?? node)) return
           // An interpolation is only a problem when it sits inside a class token,
           // so `${A} ${B}` of whole constants is allowed but `bg-${tone}` is not.
-          const joined = node.quasis.map((q: Node) => q.value.cooked).join('\u0000')
-          if (/[\w-]\u0000|\u0000[\w-]/.test(joined)) {
-            ctx.report({ node, messageId: 'dynamic' })
-          }
+          const parts: string[] = node.quasis.map((q: Node) => String(q.value.cooked ?? ''))
+          const splicesIntoToken = parts.some((part, i) => {
+            const endsOpen = i < parts.length - 1 && /[\w-]$/.test(part)
+            const startsOpen = i > 0 && /^[\w-]/.test(part)
+            return endsOpen || startsOpen
+          })
+          if (splicesIntoToken) ctx.report({ node, messageId: 'dynamic' })
         },
       }
     },
@@ -136,7 +140,7 @@ const rules = {
 
   'shared-class-constants': {
     meta: {
-      type: 'problem',
+      type: 'problem' as const,
       docs: { description: 'R-5.2-4: sizes, radius, focus ring, hover and transitions come from the knobs.' },
       schema: [],
       messages: { banned: 'R-5.2-4: "{{cls}}" is hand-written. {{hint}}.' },
@@ -146,7 +150,7 @@ const rules = {
       // place these strings are allowed to be written out.
       const file = String(ctx.filename ?? ctx.getFilename?.() ?? '')
       if (/(^|[\\/])classes\.ts$/.test(file)) return {}
-      return eachClassString(ctx, (node, value) => {
+      return eachClassString((node, value) => {
         for (const [re, hint] of BANNED_SCALE) {
           const m = re.exec(value)
           if (m) return ctx.report({ node, messageId: 'banned', data: { cls: m[0].trim(), hint } })
@@ -165,7 +169,7 @@ const rules = {
 
   'no-enum': {
     meta: {
-      type: 'problem',
+      type: 'problem' as const,
       docs: { description: 'R-8.3-5: value lists are as const arrays; a TypeScript enum survives into the bundle.' },
       schema: [],
       messages: { enum: 'R-8.3-5: enum survives into the bundle. Use an `as const` array and derive the union.' },
@@ -181,7 +185,7 @@ const rules = {
 
   'one-line-comments': {
     meta: {
-      type: 'suggestion',
+      type: 'suggestion' as const,
       docs: { description: 'R-5.12-3: comments are one line, only for what the code cannot say.' },
       schema: [],
       messages: {
@@ -215,7 +219,8 @@ const rules = {
               ctx.report({ node: c, messageId: 'commentedCode' })
             }
             const prev = run[run.length - 1]
-            if (prev && c.loc.start.line === prev.loc.end.line + 1) run.push(c)
+            const prevLine: number = prev ? Number(prev.loc.end.line) : -1
+            if (prev && Number(c.loc.start.line) === prevLine + 1) run.push(c)
             else { flushRun(); run = [c] }
           }
           flushRun()
@@ -225,4 +230,4 @@ const rules = {
   },
 }
 
-export default { rules }
+export default { rules } satisfies ESLint.Plugin

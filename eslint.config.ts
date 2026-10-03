@@ -1,9 +1,10 @@
 import js from '@eslint/js'
+import { defineConfig } from 'eslint/config'
 import tseslint from 'typescript-eslint'
 
 import topclass from './eslint-rules/index.ts'
 
-export default tseslint.config(
+export default defineConfig(
   { ignores: ['node_modules', 'dist', '.next', 'apps/**/.next', 'coverage'] },
 
   js.configs.recommended,
@@ -40,12 +41,20 @@ export default tseslint.config(
     rules: { 'topclass/no-hardcoded-text': 'off' },
   },
 
-  // Scripts run in Node and are not part of the published surface.
+  // Tooling runs in Node, never ships, and walks untyped ESLint AST nodes.
+  // The strict rules stay on for src/, which is the published surface.
   {
     files: ['scripts/**/*.ts', 'eslint-rules/**/*.ts', '*.config.ts'],
     rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
       'no-console': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
     },
   },
 )

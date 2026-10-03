@@ -79,7 +79,7 @@ describe('classes that must fail', () => {
 })
 
 describe('classes that must pass', () => {
-  const allowed = [
+  const allowed: [string, string][] = [
     ['ps-4', '<div className="ps-4" />'],
     ['pe-4 me-2', '<div className="pe-4 me-2" />'],
     ['inset-s-4', '<div className="absolute inset-s-4" />'],
