@@ -28,7 +28,9 @@ jobs:
       # through with CRLF would differ here. .gitattributes is what prevents it.
       - name: Line endings are LF
         run: |
-          if git ls-files --eol | grep -v 'i/lf'; then
+          bad=$(git ls-files --eol | grep -E '^i/(crlf|mixed)' | grep -v 'eol=crlf' || true)
+          if [ -n "$bad" ]; then
+            echo "$bad"
             echo "A tracked text file is not LF. Run: git add --renormalize ."
             exit 1
           fi

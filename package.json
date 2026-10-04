@@ -36,8 +36,10 @@
     "check:boundaries": "tsx scripts/check-boundaries.ts",
     "check:contrast": "tsx scripts/check-contrast.ts",
     "rules:sync": "tsx scripts/rules-sync.ts",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm check:structure && pnpm check:boundaries && pnpm check:css && pnpm check:contrast && pnpm rules:sync --check",
-    "check:css": "tsx scripts/check-css.ts"
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm check:structure && pnpm check:boundaries && pnpm check:css && pnpm check:icons && pnpm check:contrast && pnpm rules:sync --check",
+    "check:css": "tsx scripts/check-css.ts",
+    "icons:build": "tsx scripts/icons-build.ts",
+    "check:icons": "tsx scripts/icons-build.ts --check"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
@@ -58,6 +60,7 @@
     "@base-ui/react": "1.8.0",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
+    "server-only": "0.0.1",
     "tailwind-merge": "3.7.0",
     "zod": "4.6.5"
   },

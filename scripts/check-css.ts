@@ -50,7 +50,9 @@ if (existsSync(TOKENS)) {
     .map((file) => ({ file, content: readFileSync(file, 'utf8') }))
 
   for (const r of findUndefinedReferences(defined, readers)) {
-    errors.push(`${rel(r.file)}:${String(r.line)} reads '${r.token}', which src/tokens.css never declares`)
+    errors.push(
+      `${rel(r.file)}:${String(r.line)} R-4-2: reads '${r.token}', which src/tokens.css never declares`,
+    )
   }
 }
 

@@ -2,6 +2,8 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, posix, relative, sep } from 'node:path'
 
+import { inlinePropInterfaces } from './lib/source-checks.js'
+
 const ROOT = process.cwd()
 const COMPONENTS = join(ROOT, 'src', 'components')
 const CONNECTORS = join(ROOT, 'src', 'connectors')
@@ -94,6 +96,17 @@ function checkComponentFolder(dir: string, slug: string) {
   }
 
   for (const f of files) checkFileSize(join(dir, f))
+
+  // R-8.3-4: a prop interface is declared in types.ts, never inline in a component file.
+  for (const f of files) {
+    if (f !== 'index.tsx' && f !== 'client.tsx') continue
+    for (const name of inlinePropInterfaces(readFileSync(join(dir, f), 'utf8'))) {
+      errors.push(
+        `${rel(join(dir, f))}: declares ${name} inline.`
+        + ' A prop interface lives in types.ts and is re-exported (R-8.3-4).',
+      )
+    }
+  }
 
   // parts/: one component per file, named after the file.
   if (dirs.includes('parts')) {

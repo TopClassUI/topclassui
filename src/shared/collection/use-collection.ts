@@ -48,47 +48,53 @@ export function useCollection<T>(props: CollectionProps<T>): UseCollectionResult
 
   const [scrollTop, setScrollTop] = useState(0)
   const [viewportHeight, setViewportHeight] = useState(0)
-  const [measured, setMeasured] = useState<ReadonlyMap<number, number>>(() => new Map())
+  // Starts true: with no measured container we cannot rule out being at the end.
+  const [atEnd, setAtEnd] = useState(true)
+  // A version counter, not a new Map per row: copying it made scrolling quadratic.
+  const measuredRef = useRef<Map<number, number>>(new Map())
+  const [measuredVersion, setMeasuredVersion] = useState(0)
 
+  // State, not a ref: the effect has to rebind when the container node is replaced.
+  const [container, setContainer] = useState<HTMLElement | null>(null)
   const containerRef = useRef<HTMLElement | null>(null)
-  const observerRef = useRef<ResizeObserver | null>(null)
 
   const scrollRef = useCallback((node: HTMLElement | null) => {
     containerRef.current = node
-    if (!node) return
-    setViewportHeight(node.clientHeight)
-    setScrollTop(node.scrollTop)
+    setContainer(node)
   }, [])
 
+  /** How close to the bottom counts as the end, in pixels. */
+  const reach = Math.max(0, loadMoreThreshold) * estimateRowHeight
+
   useIsomorphicLayoutEffect(() => {
-    const node = containerRef.current
-    if (!node || !virtualized) return undefined
+    if (!container) return undefined
 
-    const onScroll = () => { setScrollTop(node.scrollTop) }
-    node.addEventListener('scroll', onScroll, { passive: true })
+    const read = () => {
+      setScrollTop(container.scrollTop)
+      setViewportHeight(container.clientHeight)
+      const slack = container.scrollHeight - container.scrollTop - container.clientHeight
+      setAtEnd(container.clientHeight === 0 || slack <= reach)
+    }
 
-    const ro = new ResizeObserver(() => { setViewportHeight(node.clientHeight) })
-    ro.observe(node)
-    observerRef.current = ro
+    read()
+    container.addEventListener('scroll', read, { passive: true })
+    const ro = new ResizeObserver(read)
+    ro.observe(container)
 
     return () => {
-      node.removeEventListener('scroll', onScroll)
+      container.removeEventListener('scroll', read)
       ro.disconnect()
-      observerRef.current = null
     }
-  }, [virtualized])
+  }, [container, reach])
 
   const rowRef = useCallback(
     (index: number) => (node: HTMLElement | null) => {
       if (!node) return
       const height = node.getBoundingClientRect().height
       if (height <= 0) return
-      setMeasured((prev) => {
-        if (prev.get(index) === height) return prev
-        const next = new Map(prev)
-        next.set(index, height)
-        return next
-      })
+      if (measuredRef.current.get(index) === height) return
+      measuredRef.current.set(index, height)
+      setMeasuredVersion((v) => v + 1)
     },
     [],
   )
@@ -101,9 +107,9 @@ export function useCollection<T>(props: CollectionProps<T>): UseCollectionResult
       count,
       estimateRowHeight,
       overscan: defaults.overscan,
-      measured,
+      measured: measuredRef.current,
     })
-  }, [virtualized, scrollTop, viewportHeight, count, estimateRowHeight, defaults.overscan, measured])
+  }, [virtualized, scrollTop, viewportHeight, count, estimateRowHeight, defaults.overscan, measuredVersion])
 
   const start = virtualized ? windowed.start : 0
   const end = virtualized ? windowed.end : count
@@ -128,14 +134,19 @@ export function useCollection<T>(props: CollectionProps<T>): UseCollectionResult
     return out
   }, [items, getKey, start, end])
 
+  // Unvirtualized, count - end is always 0, so only the scroll position can stop the asking.
+  const wantsMore = virtualized
+    ? shouldLoadMore(end, count, loadMoreThreshold, hasMore)
+    : hasMore && atEnd
+
   // Asked once per page: the guard only clears when items grows or the promise rejects.
   const askedAt = useRef(-1)
   useEffect(() => {
-    if (!loadMore || !shouldLoadMore(end, count, loadMoreThreshold, hasMore)) return
+    if (!loadMore || !wantsMore) return
     if (askedAt.current === count) return
     askedAt.current = count
     void Promise.resolve(loadMore()).catch(() => { askedAt.current = -1 })
-  }, [loadMore, end, count, loadMoreThreshold, hasMore])
+  }, [loadMore, wantsMore, count])
 
   const scrollToIndex = useCallback(
     (index: number, block: ScrollBlock = 'nearest') => {
@@ -146,11 +157,11 @@ export function useCollection<T>(props: CollectionProps<T>): UseCollectionResult
         viewportHeight: node.clientHeight,
         estimateRowHeight,
         overscan: defaults.overscan,
-        measured,
+        measured: measuredRef.current,
         block,
       })
     },
-    [count, estimateRowHeight, defaults.overscan, measured],
+    [count, estimateRowHeight, defaults.overscan, measuredVersion],
   )
 
   const scrollToKey = useCallback(

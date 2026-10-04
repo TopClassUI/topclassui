@@ -21,6 +21,7 @@ const config = [
       'topclass/shared-class-constants': 'error',
       'topclass/no-enum': 'error',
       'topclass/one-line-comments': 'error',
+      'topclass/icon-loaders-stay-server': 'error',
     },
   },
 ] as unknown as Linter.Config[]
@@ -122,5 +123,132 @@ describe('classes that must pass', () => {
 
   it('a palette name outside a class context passes', () => {
     expect(lint('const note = "the bg-red-500 class is banned"')).toEqual([])
+  })
+})
+
+describe('icon-loaders-stay-server', () => {
+  const MAP = "import { LOADERS } from '../../icons/loaders.generated.js'"
+
+  it('allows the map inside components/icon, which is the only place that may load it', () => {
+    expect(lint(MAP, 'src/components/icon/lib.ts')).toEqual([])
+    expect(lint(MAP, 'src/components/icon/index.tsx')).toEqual([])
+  })
+
+  it('refuses it anywhere else, because the map would reach the browser', () => {
+    for (const file of [
+      'src/shared/cn.ts',
+      'src/components/button/client.tsx',
+      'src/components/icon-registry/index.tsx',
+      'src/connectors/adaptive-menu/index.tsx',
+    ]) {
+      const messages = lint(MAP, file)
+      expect(messages, file).toHaveLength(1)
+      expect(messages[0]?.message, file).toMatch(/R-7-1/)
+    }
+  })
+
+  it('leaves a per-icon import alone, which is the supported way', () => {
+    const code = "import { spinner } from '../../icons/data/spinner.js'"
+    expect(lint(code, 'src/components/button/client.tsx')).toEqual([])
+  })
+
+  it('leaves the client-safe icons entry alone', () => {
+    const code = "import { DIRECTIONAL } from '../../icons/index.js'"
+    expect(lint(code, 'src/components/button/client.tsx')).toEqual([])
+  })
+})
+
+describe('icon-loaders-stay-server covers every import form', () => {
+  const MAP = '../../icons/loaders.generated.js'
+  const forms: [string, string][] = [
+    ['static import', `import { LOADERS } from '${MAP}'`],
+    ['bare import', `import '${MAP}'`],
+    ['namespace import', `import * as m from '${MAP}'`],
+    ['re-export named', `export { LOADERS } from '${MAP}'`],
+    ['re-export all', `export * from '${MAP}'`],
+    ['dynamic import', `export const m = () => import('${MAP}')`],
+    ['require', `const m = require('${MAP}')`],
+    ['type import', `type M = import('${MAP}').Loaders`],
+  ]
+
+  for (const [label, code] of forms) {
+    it(`catches a ${label} outside components/icon`, () => {
+      const messages = lint(code, 'src/shared/probe.ts')
+      expect(messages.filter((m) => /R-7-1/.test(m.message)), label).toHaveLength(1)
+    })
+
+    it(`allows a ${label} inside components/icon`, () => {
+      const messages = lint(code, 'src/components/icon/lib.ts')
+      expect(messages.filter((m) => /R-7-1/.test(m.message)), label).toEqual([])
+    })
+  }
+
+  it('leaves an unrelated dynamic import alone', () => {
+    const code = "export const m = () => import('../../icons/data/spinner.js')"
+    expect(lint(code, 'src/shared/probe.ts').filter((m) => /R-7-1/.test(m.message))).toEqual([])
+  })
+})
+
+describe('gaps the general review found', () => {
+  const fails = (cls: string, rule: string) => {
+    const got = ids(`<div className="${cls}" />`)
+    expect(got, cls).toContain(rule)
+  }
+  const passes = (cls: string) => {
+    expect(ids(`<div className="${cls}" />`), cls).toEqual([])
+  }
+
+  it('catches a negative physical margin or offset', () => {
+    fails('-ml-2', 'topclass/logical-properties-only')
+    fails('-mr-4', 'topclass/logical-properties-only')
+    fails('absolute -left-1', 'topclass/logical-properties-only')
+  })
+
+  it('catches float and clear, which are physical with no logical alias in use', () => {
+    fails('float-left', 'topclass/logical-properties-only')
+    fails('clear-right', 'topclass/logical-properties-only')
+  })
+
+  it('catches the fixed colours that break theming', () => {
+    fails('bg-white', 'topclass/semantic-classes-only')
+    fails('text-black', 'topclass/semantic-classes-only')
+    fails('border-white', 'topclass/semantic-classes-only')
+  })
+
+  it('leaves the mode-agnostic keywords alone, which are not palette colours', () => {
+    passes('bg-transparent')
+    passes('fill-current')
+    passes('text-inherit')
+  })
+
+  it('catches a palette colour behind a variant prefix', () => {
+    fails('md:bg-red-500', 'topclass/semantic-classes-only')
+    fails('group-hover:text-violet-600', 'topclass/semantic-classes-only')
+  })
+
+  it('catches the dark variant behind another variant, not only at the start', () => {
+    fails('md:dark:bg-surface', 'topclass/semantic-classes-only')
+    fails('group-hover:dark:text-body', 'topclass/semantic-classes-only')
+  })
+
+  it('catches a hand-written state behind a variant prefix', () => {
+    fails('md:hover:bg-primary-soft', 'topclass/shared-class-constants')
+    fails('sm:focus-visible:outline-ring', 'topclass/shared-class-constants')
+  })
+
+  it('catches border-2, which R-5.2-4 names explicitly', () => {
+    fails('border-2', 'topclass/shared-class-constants')
+    fails('border-4', 'topclass/shared-class-constants')
+  })
+
+  it('catches the Tailwind v4 radius names the list had missed', () => {
+    fails('rounded-xs', 'topclass/shared-class-constants')
+    fails('rounded-4xl', 'topclass/shared-class-constants')
+  })
+
+  it('still accepts the semantic and logical forms', () => {
+    passes('ps-4 me-2 text-start border-s rounded-s-control')
+    passes('bg-primary-solid text-body border-line')
+    passes('h-control-md rounded-box')
   })
 })

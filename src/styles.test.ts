@@ -5,6 +5,8 @@ import { dirname, join, resolve } from 'node:path'
 import { compile } from 'tailwindcss'
 import { beforeAll, describe, expect, it } from 'vitest'
 
+import { FOCUS_RING } from './shared/classes.js'
+
 const ROOT = process.cwd()
 const ENTRY = '@import "tailwindcss";\n@import "./src/tokens.css";\n@import "./src/styles.css";\n'
 
@@ -123,5 +125,27 @@ describe('the three modes and the direction', () => {
 
   it('reads the safe-area utilities from those tokens, not from env() directly', () => {
     expect(css).toMatch(/\.ps-safe\s*\{\s*padding-inline-start:\s*var\(--tc-safe-start\)/)
+  })
+})
+
+describe('the focus ring actually paints', () => {
+  it('restores outline-style on focus-visible, which the reset zeroes', async () => {
+    const compiled = await compile(ENTRY, { base: ROOT, loadStylesheet })
+    const ring = compiled.build(FOCUS_RING.split(' '))
+
+    // The reset sets --tw-outline-style: none, so without this the width substitutes none.
+    expect(ring).toMatch(/outline-solid[^{]*:focus-visible\s*\{[^}]*outline-style:\s*solid/)
+    expect(ring).toMatch(/--tw-outline-style:\s*solid/)
+  })
+
+  it('keeps a ring under forced-colors, which outline-none would remove', () => {
+    expect(FOCUS_RING).toContain('outline-hidden')
+    expect(FOCUS_RING).not.toMatch(/(^|\s)outline-none(\s|$)/)
+  })
+
+  it('reads the ring width, offset and colour from the knobs', () => {
+    expect(FOCUS_RING).toContain('--tc-ring-width')
+    expect(FOCUS_RING).toContain('--tc-ring-offset')
+    expect(FOCUS_RING).toContain('outline-ring')
   })
 })

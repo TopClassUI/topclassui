@@ -162,3 +162,75 @@ describe('scrolling to a row', () => {
     expect(getByTestId('s').scrollTop).toBe(0)
   })
 })
+
+/** happy-dom reports 0 for layout, so the scroll geometry is stubbed per node. */
+function measure(node: HTMLElement, clientHeight: number, scrollHeight: number, scrollTop = 0) {
+  Object.defineProperty(node, 'clientHeight', { value: clientHeight, configurable: true })
+  Object.defineProperty(node, 'scrollHeight', { value: scrollHeight, configurable: true })
+  Object.defineProperty(node, 'scrollTop', { value: scrollTop, writable: true, configurable: true })
+}
+
+describe('paging an unvirtualized list', () => {
+  it('stops asking once there is content below the fold, instead of draining the dataset', () => {
+    const loadMore = vi.fn()
+    let node: HTMLElement | null = null
+    const Harness = ({ n }: { n: number }) => {
+      const c = useCollection<Row>({ items: makeItems(n), getKey, hasMore: true, loadMore })
+      return <div data-testid="s" ref={(el) => { node = el; c.scrollRef(el) }} />
+    }
+    const { rerender, getByTestId } = render(<Harness n={20} />)
+    node = getByTestId('s')
+
+    // 20 rows of content in a 360px viewport: the user is at the top with more below.
+    measure(node, 360, 4000, 0)
+    act(() => { node?.dispatchEvent(new Event('scroll')) })
+    const askedBefore = loadMore.mock.calls.length
+
+    rerender(<Harness n={40} />)
+    act(() => { node?.dispatchEvent(new Event('scroll')) })
+    expect(loadMore.mock.calls.length).toBe(askedBefore)
+  })
+
+  it('asks for the next page once the user reaches the bottom', () => {
+    const loadMore = vi.fn()
+    let node: HTMLElement | null = null
+    const Harness = ({ n }: { n: number }) => {
+      const c = useCollection<Row>({ items: makeItems(n), getKey, hasMore: true, loadMore })
+      return <div data-testid="s" ref={(el) => { node = el; c.scrollRef(el) }} />
+    }
+    const { rerender, getByTestId } = render(<Harness n={20} />)
+    node = getByTestId('s')
+
+    // Scrolled to the bottom, so the next page is wanted the moment one can be asked for.
+    measure(node, 360, 4000, 3640)
+    act(() => { node?.dispatchEvent(new Event('scroll')) })
+    const asked = loadMore.mock.calls.length
+
+    rerender(<Harness n={40} />)
+    act(() => { node?.dispatchEvent(new Event('scroll')) })
+    expect(loadMore.mock.calls.length).toBeGreaterThan(asked)
+  })
+})
+
+describe('a replaced container', () => {
+  it('rebinds the scroll listener, so windowing does not freeze on the old node', () => {
+    const items = makeItems(10_000)
+    let api: ReturnType<typeof useCollection<Row>> | undefined
+    const Harness = ({ which }: { which: string }) => {
+      api = useCollection<Row>({ items, getKey })
+      return <div key={which} data-testid={which} ref={api.scrollRef} />
+    }
+    const { rerender, getByTestId } = render(<Harness which="first" />)
+    const first = getByTestId('first')
+    measure(first, 360, 360_000, 0)
+    act(() => { first.dispatchEvent(new Event('scroll')) })
+
+    rerender(<Harness which="second" />)
+    const second = getByTestId('second')
+    expect(second).not.toBe(first)
+
+    measure(second, 360, 360_000, 36_000)
+    act(() => { second.dispatchEvent(new Event('scroll')) })
+    expect(api?.rows[0]?.index ?? 0).toBeGreaterThan(0)
+  })
+})

@@ -9,14 +9,21 @@ Each rule has an id, one line of rule, one line of reason, and what enforces it.
 ## Commands
 
 ```
-pnpm check            lint + typecheck + unit tests + structure/boundary/contrast + rules:sync
-pnpm test:visual      Playwright visual matrix (baselines are Linux-only)
-pnpm test:e2e         Playwright behaviour tests
-pnpm size             bundle budgets
-pnpm new:component x  scaffold a component folder
-pnpm icons:build      regenerate the icon modules
+pnpm check            every gate below, in order
+pnpm lint             eslint, including the seven custom rules
+pnpm typecheck        tsc --noEmit
+pnpm test             vitest, four projects: node, dom, rsc, ssr
+pnpm check:structure  the folder contract and file sizes
+pnpm check:boundaries the server and client rules
+pnpm check:css        cascade layers, token references, one-line comments in CSS
+pnpm check:icons      the generated icon modules still match raw/
+pnpm check:contrast   AA contrast in every mode
 pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from this file
+pnpm icons:build      regenerate the icon modules from raw/
 ```
+
+Not built yet, so do not run them: `pnpm test:visual`, `pnpm test:e2e`, `pnpm size`,
+`pnpm new:component`. They arrive with the phases that need them.
 
 ## How to work
 
@@ -37,7 +44,7 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 ### R-5.1-2 Client components re-export through index
 **Rule:** for a C component or a connector, `index.tsx` holds no markup: it re-exports the client parts, the prop types, the variants and the skeleton.
 **Why:** `exports` resolves `*/index.js`, and a directive-less re-export of a client module is safe.
-**Enforced by:** `scripts/check-structure.ts`
+**Enforced by:** not yet - planned: `check-structure`
 
 ### R-5.1-3 Only serializable props cross the boundary
 **Rule:** only serializable props cross the boundary: strings, numbers, booleans, plain objects, arrays and `ReactNode` children; functions never, except Server Actions.
@@ -57,24 +64,24 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 ### R-9.2-3 Never dot into a client module from a server file
 **Rule:** export flat names (`DialogRoot`), never an object (`Dialog.Root`) that a server file would dot into.
 **Why:** React's client-module proxy allows one level of access and throws on the second.
-**Enforced by:** `eslint`
+**Enforced by:** not yet - planned: `eslint`
 
 ### R-9.2-4 The root of a part family is `<Name>Root`
 **Rule:** a component split into parts names its root `<Name>Root` without exception (`CardRoot`, `DialogRoot`, `AvatarRoot`), and a scrolling overlay names its parts `<Name>Header`, `<Name>Body` and `<Name>Footer`, where the Body is the scroll container R-10.5-1 requires.
 **Why:** one family naming its root `Card` while ten others use `XxxRoot` is the drift a cross-file audit catches and an author never does; an overlay without a Body has nothing to scroll.
-**Enforced by:** `check-structure`
+**Enforced by:** not yet - planned: `check-structure`
 
 ## 2. Styling
 
 ### R-5.2-1 Semantic classes only
 **Rule:** inside `src/`, use `bg-primary-solid`, `text-body`, `border-line`; palette classes, arbitrary colours and the `dark:` variant are banned.
 **Why:** a component that never names a real colour works in every mode, including modes that do not exist yet.
-**Enforced by:** `eslint` (Appendix C patterns)
+**Enforced by:** `eslint` (a subset of the Appendix C patterns)
 
 ### R-5.2-2 Merge with the configured cn()
 **Rule:** merge classes with `cn()` from `shared/cn.ts`, which uses `extendTailwindMerge`; the consumer's `className` is passed last.
 **Why:** tailwind-merge does not know the custom spacing and radius keys, so the default `twMerge` would keep both conflicting classes.
-**Enforced by:** `eslint` + unit test
+**Enforced by:** unit test (`shared/cn.test.ts`); the argument order is not linted
 
 ### R-5.2-3 Never build class names dynamically
 **Rule:** no `` `bg-${tone}` ``; use a lookup object or cva variants.
@@ -89,12 +96,12 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 ### R-5.2-5 No inline style except a CSS variable
 **Rule:** `style` is only for setting a `--tc-*` variable.
 **Why:** anything else escapes the token system.
-**Enforced by:** `eslint`
+**Enforced by:** not yet - planned: `eslint`
 
 ### R-5.2-6 Bare data and aria variants
 **Rule:** write `data-open:`, `group-data-panel-open:`, `aria-busy:`; brackets only for values.
 **Why:** it is the v4 idiom and the upgrade tool rewrites the bracket form.
-**Enforced by:** `eslint`
+**Enforced by:** not yet - planned: `eslint`
 
 ### R-4-1 Every authored rule sits in a cascade layer
 **Rule:** only custom-property declarations and `@keyframes` may be unlayered; other rules go in `@layer base` (tokens) or `@layer components` (react). `@utility` and `@custom-variant` count as layered, because Tailwind emits them into its own layers.
@@ -116,12 +123,12 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 ### R-5.3-1 Logical utilities only
 **Rule:** `ps-`, `pe-`, `ms-`, `me-`, `inset-s-`, `inset-e-`, `text-start`, `border-s`, `rounded-s`; never physical `left`/`right`, never the deprecated `start-*`/`end-*`, never `space-x` or `divide-x`.
 **Why:** layout must follow the text direction with no JavaScript.
-**Enforced by:** `eslint` (Appendix C patterns)
+**Enforced by:** `eslint` (a subset of the Appendix C patterns)
 
 ### R-5.3-2 Directional motion uses --tc-dir
 **Rule:** translate, transform origin and gradient direction multiply by `--tc-dir`; `object-*` and `bg-*` positions use an `rtl:` variant, since no logical form exists.
 **Why:** these properties have no logical equivalent.
-**Enforced by:** `eslint`
+**Enforced by:** not yet - planned: `eslint`
 
 ### R-5.3-3 No letter-spacing
 **Rule:** no `tracking-*` anywhere inside `src/`.
@@ -153,22 +160,22 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 ### R-5.7-3 Pass through className, style, ref and rest
 **Rule:** every component accepts them and spreads the rest onto its root element; `ref` is a normal prop, never `forwardRef`.
 **Why:** consumers must be able to extend any component.
-**Enforced by:** type tests
+**Enforced by:** not yet - planned: type tests
 
 ### R-5.7-4 Polymorphism through render
 **Rule:** server components accept the element form only, implemented with `renderElement`; client components may also accept the function form through `useRender`.
 **Why:** `useRender` calls hooks, so it can never appear in `index.tsx`.
-**Enforced by:** `scripts/check-boundaries.ts`
+**Enforced by:** not yet - planned: `check-boundaries`
 
 ### R-5.7-5 Public types are aliases derived at the seam
 **Rule:** `export type DialogRootProps = Omit<Base.Root.Props, 'className'> & OwnProps`; never re-export a Base UI type name and never hand-copy a primitive's prop list.
 **Why:** a hand-copied list hides new props and drifts; the alias is the one line that changes if the primitive changes.
-**Enforced by:** `eslint` + review
+**Enforced by:** review; not linted
 
 ### R-5.7-6 Base UI state attribute grammar
 **Rule:** boolean presence attributes (`data-open`, `data-loading`, `data-disabled`), never `data-state="..."`; enumerated design props are value attributes (`data-variant`, `data-size`, `data-tone`).
 **Why:** Base UI already sets the boolean form, and two vocabularies would drift.
-**Enforced by:** `eslint`
+**Enforced by:** not yet - planned: `eslint`
 
 ### R-5.7-7 Clamp every numeric limit
 **Rule:** numeric props have `min` and `max` in the schema and are clamped at runtime with `clamp()`.
@@ -178,9 +185,9 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 ## 5. Schemas and constants
 
 ### R-8.3-1 schema.ts is type-only for components
-**Rule:** components import the schema with `import type`; `zod` is a required peer dependency.
+**Rule:** components import the schema with `import type`, so no component pulls `zod` into the browser; `zod` is a direct dependency, because `npm i topclassui zod` installs it for validation and types together.
 **Why:** Zod must never reach the client bundle, but the published types reference it.
-**Enforced by:** `scripts/check-boundaries.ts` + `attw`
+**Enforced by:** unit test (`no-zod-at-runtime`); `attw` is not in the repo yet
 
 ### R-8.3-2 Defaults live once
 **Rule:** defaults and component-specific value lists live in `constants.ts` and are imported by the schema, by cva and by the component; the size list comes from `shared/contracts/size.ts`.
@@ -195,12 +202,12 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 ### R-8.3-5 No TypeScript enum
 **Rule:** value lists are `as const` arrays with the union derived from them; never a TypeScript `enum`.
 **Why:** an `enum` is a runtime value that survives into the bundle, does not tree-shake, and Node's type stripping rejects it.
-**Enforced by:** `eslint` (`no-restricted-syntax`)
+**Enforced by:** `eslint` (`topclass/no-enum`)
 
 ### R-8.3-3 Props table from the types
 **Rule:** the docs props table is generated from the emitted `.d.ts`, with defaults and limits supplied by the schema.
 **Why:** the schema covers only design props and would omit `className`, `children` and inherited props.
-**Enforced by:** docs build
+**Enforced by:** not yet - the docs build does not exist yet
 
 ## 6. Text and i18n
 
@@ -219,34 +226,34 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 ### R-8.5-1 Lists use the collection contract
 **Rule:** any component that renders items uses `CollectionProps` and `useCollection`: the `--tc-list-rows` knob, windowing above the threshold, and optional page-by-page loading.
 **Why:** a component must never create ten thousand DOM nodes, and the app must not be forced to hand over every item at once.
-**Enforced by:** `scripts/check-structure.ts` + Playwright test
+**Enforced by:** not yet - planned: `check-structure` + Playwright
 
 ### R-8.5-2 The app owns the data
 **Rule:** components never fetch, cache or paginate; they call `loadMore()` and render what they are given.
 **Why:** data belongs to the application, not to the design system.
-**Enforced by:** `eslint` (no fetch inside `src/`)
+**Enforced by:** not yet - planned: `eslint`
 
 ### R-10.5-1 Overlays scroll inside themselves
 **Rule:** popups use `POPUP_BOUNDS` and the row cap, dialogs and drawers scroll their body with sticky header and footer, and every scroll container inside an overlay sets `overscroll-behavior: contain`.
 **Why:** the page must never scroll behind an open overlay.
-**Enforced by:** Playwright test
+**Enforced by:** not yet - Playwright is not in the repo yet
 
 ### R-10.5-2 Tooltips never scroll
 **Rule:** a tooltip is one or two lines of plain text; anything larger, or anything with a link or control, is a Popover.
 **Why:** a scrolling tooltip cannot be reached by pointer or keyboard.
-**Enforced by:** `eslint` (`tooltip-content-is-text`)
+**Enforced by:** not yet - planned: `eslint`
 
 ### R-10.5-3 Sticky bars set the scroll padding
 **Rule:** a sticky or fixed bar sets `--tc-sticky-top` or `--tc-sticky-bottom`, and the scroll container reads them into `scroll-padding-block`.
 **Why:** WCAG 2.4.11: a focused element must not be hidden behind a bar.
-**Enforced by:** Playwright test
+**Enforced by:** not yet - Playwright is not in the repo yet
 
 ## 8. Code structure
 
 ### R-5.12-1 Logic is separate from markup
 **Rule:** `client.tsx` is JSX plus at most one call to `useXxx()` from `hook.ts`; it holds no `useState`, `useEffect`, `useReducer`, `useRef`, `useMemo` or `useCallback`. Pure helpers live in `lib.ts`.
 **Why:** markup and behaviour change for different reasons and are tested differently.
-**Enforced by:** `eslint` + `scripts/check-structure.ts`
+**Enforced by:** not yet - planned: `eslint` + `check-structure`
 
 ### R-5.12-2 Files stay small
 **Rule:** `check-structure` warns at 200 lines and fails at 300; a component that needs more files gets a `parts/` folder with one component per file.
@@ -269,7 +276,7 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 **Enforced by:** `eslint` + `tsc`
 
 ### R-8.1-1 The folder contract
-**Rule:** a file exists only if the component needs it, and only the files in PLAN.md 8.1 may exist. Never `loading.tsx` or `error.tsx` (Next.js reserves those names); use `skeleton.tsx` and `states.tsx`. Demos are one file each under `demos/`.
+**Rule:** a file exists only if the component needs it, and only the files in PLAN.md 8.1 may exist. Never `loading.tsx`, `error.tsx`, `page.tsx` or `layout.tsx` (Next.js reserves those names); use `skeleton.tsx`, `empty-state.tsx` and `error-state.tsx`. Examples are one file each under `dummy/`, and tests under `test/`.
 **Why:** a predictable folder is what makes scaffolding, checking and documenting automatic.
 **Enforced by:** `scripts/check-structure.ts`
 
@@ -283,24 +290,24 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 ### R-7-2 Names in data props resolve on the server
 **Rule:** a contract that carries `icon: IconName` is resolved to an element by the component's server half; the client-side contract carries `ReactNode`.
 **Why:** it keeps string names in the public API without shipping the map.
-**Enforced by:** type
+**Enforced by:** type, once a component carries an `IconName` contract
 
 ## 10. Accessibility
 
 ### R-5.6-1 WCAG 2.2 AA
 **Rule:** keyboard behaviour follows the ARIA Authoring Practices; a visible `focus-visible` ring on every interactive element; types enforce labels.
 **Why:** it is a promise of the library, not an extra.
-**Enforced by:** axe (unit and browser) + `manual`
+**Enforced by:** manual; `axe` is not in the repo yet
 
 ### R-5.6-2 Target size
 **Rule:** every interactive element is at least 24x24 CSS px on every pointer type and 44px under `pointer-coarse`.
 **Why:** WCAG 2.5.8.
-**Enforced by:** Playwright test
+**Enforced by:** not yet - Playwright is not in the repo yet
 
 ### R-5.6-3 Every drag has an alternative
 **Rule:** Slider, Drawer and Toast swipe, Carousel, Resizable, sortable lists and the editor kit each provide a keyboard or button path to the same result.
 **Why:** WCAG 2.5.7.
-**Enforced by:** `manual` + keyboard tests
+**Enforced by:** manual; the keyboard tests do not exist yet
 
 ### R-5.6-4 Contrast
 **Rule:** 4.5:1 for text, including a tone's text colour on its own soft tint; 3:1 for `--tc-line-strong`, `--tc-ring` and icons. `--tc-line` is decorative and exempt.
@@ -310,9 +317,9 @@ pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from thi
 ## 11. Dependencies and process
 
 ### R-5.9-1 The allowed dependency list
-**Rule:** core may depend on `@topclassui/icons`, `@base-ui/react`, `clsx`, `tailwind-merge` and `class-variance-authority`; `react`, `react-dom`, `tailwindcss`, `@topclassui/tokens` and `zod` are peers; anything else is an optional peer used by exactly the components that need it. Banned: CSS-in-JS runtimes, lodash, moment, runtime theme objects.
+**Rule:** the package may depend on `@base-ui/react`, `clsx`, `tailwind-merge`, `class-variance-authority`, `zod` and `server-only`; `react`, `react-dom` and `tailwindcss` are peers; anything else is an optional peer used by exactly the components that need it. Banned: CSS-in-JS runtimes, lodash, moment, runtime theme objects.
 **Why:** installing the library for a Button must not pull in a calendar.
-**Enforced by:** `publint` + review
+**Enforced by:** review; `publint` is not in the repo yet
 
 ### R-0-1 Verify before using an API
 **Rule:** check the installed package's types or the official docs before using any API, and record anything that differs in `docs/DECISIONS.md`.

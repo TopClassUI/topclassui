@@ -6,6 +6,56 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-05 - What a 113-agent review found, and the rule file stops overstating itself
+
+**Decision.** Everything below was found by adversarially reviewing the repo against itself, confirmed by reproducing it, and fixed with a test that fails if the fix is reverted. 74 findings were confirmed and 34 refuted; the seven rated high are all fixed.
+
+1. **The focus ring painted nothing, anywhere.** `FOCUS_RING` paired `outline-none` with `focus-visible:outline-(length:--tc-ring-width)`. Tailwind v4 compiles the first to `--tw-outline-style: none` unconditionally and the second to `outline-style: var(--tw-outline-style)`, so on `:focus-visible` the style resolved to `none`: correct width, correct colour, correct offset, nothing drawn. Measured in a real browser over a real Tab keypress: 0 ring-coloured pixels before, 592 after. R-5.6-1 promises a visible ring on every interactive element, and it was false for all 46 components before one existed. It now reads `outline-hidden focus-visible:outline-solid ...`; `outline-hidden` rather than `outline-none` because it keeps a ring under `forced-colors`, which `outline-none` removes.
+
+2. **Six holes in the lint rules**, each now covered by a fixture test: a negative physical utility (`-ml-2`), `float-left` and `clear-right`, the fixed colours `bg-white` and `text-black`, a palette colour or a `dark:` or `hover:` behind another variant (`md:dark:`, `md:hover:`), `border-2` which R-5.2-4 names explicitly, and Tailwind v4's `rounded-xs` and `rounded-4xl`. **`bg-transparent`, `fill-current` and `text-inherit` are deliberately still allowed**, against the reviewer's recommendation: they carry no fixed colour and behave correctly in every mode, so banning them would be a false positive.
+
+3. **CI was red.** The "Line endings are LF" step rejected anything not reporting `i/lf`, and the 84 Phosphor SVGs had no trailing newline, so git reported `i/none` for all of them. The step also would have failed on any `.bat` or `.cmd` file, which `.gitattributes` deliberately marks `eol=crlf`. The SVGs gained a trailing newline and the step now fails only on `crlf` or `mixed`, honouring a declared `eol=crlf`.
+
+4. **Three defects in `useCollection`.** The scroll listener and the ResizeObserver were bound inside an effect keyed on `[virtualized]` while the node came from a ref, so replacing the container left both bound to a detached node and windowing froze; the container is now state and the effect rebinds. Paging asked `count - end <= threshold`, which for an unvirtualized list is always `0 <= threshold`, so a short list with `hasMore` fetched page after page on mount - an infinite fetch loop against an endless feed; it now also requires a measured scroll position within reach of the bottom, and an unmeasured container still allows the ask so the documented once-per-page contract is unchanged. Row measurement copied the whole `Map` per measured row, which is quadratic in rows scrolled past - about 50 million entry copies over a 10,000-row list; the map is now mutated behind a version counter, which React batches into one render per pass.
+
+5. **The rule file stops claiming enforcement it does not have.** Cross-referencing every rule id against every file that could enforce it showed **23 rules naming a mechanism that does not exist**, and several more crediting the wrong one. 27 `Enforced by:` lines were rewritten to the truth, in a vocabulary that now distinguishes three states: enforced today, `manual`, and `not yet - planned: X`. Nothing that depends on Playwright, axe, publint, attw or the docs build claims to be enforced, because none of those are in the repo. R-8.3-5 credited `no-restricted-syntax` when the work is done by the custom `topclass/no-enum`. R-4-2 was genuinely enforced but its failure message did not name the rule, so it now does. **This matters more than it looks:** the project's pitch is that its rules are enforced rather than documented, and a third of them were documentation wearing an enforcement label.
+
+6. **Three rule texts still described decisions that had been reversed.** R-8.3-1 called `zod` a required peer when the 2 October decision made it a direct dependency; R-8.1-1 named `states.tsx` and `demos/`, both of which `check-structure` rejects in favour of `empty-state.tsx`, `error-state.tsx` and `dummy/`; R-5.9-1 listed the three scoped packages and `@topclassui/tokens` as peers. The Commands block listed four scripts that do not exist (`test:visual`, `test:e2e`, `size`, `new:component`) and omitted every gate that does; it now lists the real ones and names the missing four as not built yet.
+
+**Also fixed, from the same review:** `check-boundaries` could not see `import 'server-only'` - the bare form, which is the only form the one allowed file uses - because every predicate was anchored on `from`; it now reads bare, namespace, re-export, dynamic and `require` forms, and the `server-only` and loader-map checks apply to every file rather than only `index.tsx`. The `icon-loaders-stay-server` ESLint rule visited only `ImportDeclaration`, so five other ways in were silent.
+
+**One defect was invisible in a diff.** `check-structure`'s R-8.3-4 check never fired once: a heredoc had written a literal backspace byte (0x08) where the source said `\b`, so the pattern required a backspace after "Props" and could never match. The check had been dead since the moment it was written, while reporting success. A test now walks every text file in the repo and fails on any control byte or BOM, because this class of bug had already struck twice.
+
+**Affects** `src/shared/classes.ts`, `src/shared/collection/use-collection.ts`, `eslint-rules/index.ts`, `scripts/check-boundaries.ts`, `scripts/check-structure.ts`, `scripts/check-css.ts`, `scripts/lib/source-checks.ts`, `.github/workflows/ci.yml`, `raw/*.svg`, `docs/RULES.md` and the generated rule files, and `docs/STATUS.md`.
+
+---
+
+## 2026-10-03 - Phase 2, icons: one renderer, and the loader map physically out of reach
+
+**Decision.** The 84 starter icons ship as one generated module each, with a single rendering path and eight departures from PLAN.md section 7 recorded below.
+
+1. **`server-only` is a new dependency.** It is two files and under a kilobyte, it is published by the React team, and PLAN 7.3 and R-5.1-5 both require `import 'server-only'`. R-5.9-1 does not list it, so this entry is the amendment. Without it, importing the async `<Icon>` from a client file fails at runtime instead of at build time.
+
+2. **One renderer.** `<Svg icon={data}>` is the only component that emits an `<svg>`. The server `<Icon>` resolves a name and returns `<Svg>`; the browser `<Icon>` from `icon-registry` looks the name up and returns `<Svg>`. PLAN 7.3 writes the markup out twice, once per entry point, which is two places for the aria, size and flip rules to drift apart. A test asserts the registry `<Icon>` renders byte-identical markup to `<Svg>` for the same icon, and the rsc test asserts the server `<Icon>` returns a `<Svg>` element and nothing else.
+
+3. **`loadIcon` lives in `src/components/icon/lib.ts`, not in the icons barrel.** PLAN 7.3 imports it from the icons package, but the barrel is the file a client may import for `IconName` and `DIRECTIONAL`; exporting `loadIcon` there puts `loaders.generated` on an import path a bundler can follow. Tree-shaking would probably drop it, and "probably" is not a safety property. This also makes R-7-1 literally true: the loader map is imported only inside `components/icon`. Two independent guards enforce it, a new ESLint rule `icon-loaders-stay-server` and a test that walks every source file, and a planted import was confirmed to fail both.
+
+4. **No SVGO.** PLAN 7.2 step 2 runs SVGO to merge paths and rewrite colours. Every one of the 84 Phosphor sources is already a single `<path>` with `fill="currentColor"` and `viewBox="0 0 256 256"`, verified across the whole set, so the dependency would do nothing. Instead `readIcon` **fails** on anything with a second path, a shape element, a hard-coded colour or a different viewBox, which enforces the "one path per icon" rule in docs/icons.md rather than silently producing a broken icon.
+
+5. **`docs/icons.md` is the parity gate.** `pnpm icons:build` fails if `raw/` and the doc's "The set" section disagree in either direction, and if the directional set derived from the patterns plus the manual list differs from the doc's own table. The doc says sixteen of the eighty-four flip; the build proves it.
+
+6. **A loader entry resolves to the icon, not to the module.** `() => import('./data/x.js').then((m) => m.x)` rather than returning the namespace, so no data module needs a default export and the map stays explicit. Paths are `./data/<name>.js` because the modules sit in `src/icons/data/`.
+
+7. **`SvgProps` omits `name` as well as `children`.** `SVGProps<SVGSVGElement>` already carries a `name` attribute, which would collide with the icon name; PLAN 7.3 omits it for the same reason.
+
+8. **A fourth Vitest project, `rsc`.** PLAN 17.1 names it. It needs `ssr.resolve.conditions` **and** `ssr.resolve.externalConditions` set to `['react-server']`: `server-only` is a dependency, so Vite externalises it and Node resolves it, and the plain `resolve.conditions` never applies. With only the first, every test in the project failed to import. Async Server Components cannot be rendered by Vitest, so the test calls `Icon(props)` and asserts the element it returns.
+
+**Deferred, with the reason.** The icons page, the `topclassui-icons add-set` CLI, the axe assertions and the Playwright "no icon requests, no icon JavaScript" measurement are not built, because the docs app, `axe-core` and Playwright do not exist in this repo yet. The static reachability test is not a substitute for a measured bundle and is not presented as one.
+
+**Affects** `raw/` (84 files), `scripts/lib/icons.ts`, `scripts/icons-build.ts`, `src/icons/`, `src/components/{svg,icon,icon-registry}/`, `eslint-rules/index.ts`, `vitest.config.ts`, `package.json`, and the `icons:build` and `check:icons` scripts.
+
+---
+
 ## 2026-10-03 - The checks are measured against their own blind spots, not trusted
 
 **Decision.** Three defects found by auditing the check scripts themselves are fixed at the root, and the one judgement call is recorded rather than quietly taken.

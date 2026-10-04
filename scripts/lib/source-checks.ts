@@ -27,14 +27,21 @@ export function importedNames(source: string, from: string): string[] {
   return names
 }
 
+/** Every form that pulls a module in: bare, named, re-exported, dynamic and require. */
+const SPECIFIER = /(?:\bimport\s*\(\s*|\brequire\s*\(\s*|\bfrom\s+|\bimport\s+)['"]([^'"]+)['"]/g
+
+/** Each module id the file imports, however it imports it. */
+export function importedModules(source: string): string[] {
+  return [...source.matchAll(SPECIFIER)].map((m) => m[1] ?? '')
+}
+
+/** Prop interfaces declared in a component file instead of types.ts (R-8.3-4). */
+export function inlinePropInterfaces(source: string): string[] {
+  return [...source.matchAll(/^export\s+(?:interface|type)\s+(\w*Props)\b/gm)].map((m) => m[1] ?? '')
+}
+
 /** Relative specifiers that are missing the .js the emitted ESM needs (R-5.12-5). */
 export function relativeImportsMissingExtension(source: string): string[] {
-  const bad: string[] = []
-  const re = /from\s+['"](\.[^'"]*)['"]/g
-  let m: RegExpExecArray | null
-  while ((m = re.exec(source))) {
-    const spec = m[1] ?? ''
-    if (!/\.(js|json|css)$/.test(spec)) bad.push(spec)
-  }
-  return bad
+  return importedModules(source)
+    .filter((spec) => spec.startsWith('.') && !/\.(js|json|css|svg)$/.test(spec))
 }

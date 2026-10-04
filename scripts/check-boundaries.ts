@@ -5,6 +5,7 @@ import { join, posix, relative, sep } from 'node:path'
 import {
   hasLateUseClient,
   hasUseClient,
+  importedModules,
   importedNames,
   relativeImportsMissingExtension,
 } from './lib/source-checks.js'
@@ -65,17 +66,19 @@ for (const file of files) {
     if (/\bcreateContext\s*\(|\buseContext\s*\(/.test(source)) {
       errors.push(`${r}: React context does not exist in a Server Component render. Direction and theme come from dir and data-theme (R-5.1-4).`)
     }
-    if (r !== RSC_ONLY) {
-      if (/export\s+(default\s+)?async\s+function/.test(source)) {
-        errors.push(`${r}: only ${RSC_ONLY} may be async; every other index.tsx must render in a non-RSC tree (R-5.1-5).`)
-      }
-      if (/from\s+['"]server-only['"]/.test(source)) {
-        errors.push(`${r}: only ${RSC_ONLY} may import server-only (R-5.1-5).`)
-      }
+    if (r !== RSC_ONLY && /export\s+(default\s+)?async\s+function/.test(source)) {
+      errors.push(`${r}: only ${RSC_ONLY} may be async; every other index.tsx must render in a non-RSC tree (R-5.1-5).`)
     }
-    if (/from\s+['"].*icons\/loaders/.test(source) && !r.startsWith('src/components/icon/')) {
-      errors.push(`${r}: the icon loader map is private to components/icon (R-7-1).`)
-    }
+  }
+
+  const modules = importedModules(source)
+
+  if (r !== RSC_ONLY && modules.includes('server-only')) {
+    errors.push(`${r}: only ${RSC_ONLY} may import server-only (R-5.1-5).`)
+  }
+
+  if (modules.some((m) => /icons\/loaders/.test(m)) && !r.startsWith('src/components/icon/')) {
+    errors.push(`${r}: the icon loader map is private to components/icon (R-7-1).`)
   }
 
   if (isClient && !hasUseClient(source)) {

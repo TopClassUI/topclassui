@@ -41,31 +41,34 @@ function eachClassString(report: (node: Node, value: string) => void) {
 }
 
 const PHYSICAL = [
-  [/(^|[\s:])(ml|mr)-/, 'use ms- or me-'],
-  [/(^|[\s:])(pl|pr)-/, 'use ps- or pe-'],
-  [/(^|[\s:])(left|right)-/, 'use inset-s- or inset-e-'],
-  [/(^|[\s:])(start|end)-\d/, 'start-* and end-* are deprecated; use inset-s- or inset-e-'],
+  [/(^|[\s:])-?(ml|mr)-/, 'use ms- or me-'],
+  [/(^|[\s:])-?(pl|pr)-/, 'use ps- or pe-'],
+  [/(^|[\s:])-?(left|right)-/, 'use inset-s- or inset-e-'],
+  [/(^|[\s:])-?(start|end)-\d/, 'start-* and end-* are deprecated; use inset-s- or inset-e-'],
   [/(^|[\s:])text-(left|right)(\s|$)/, 'use text-start or text-end'],
   [/(^|[\s:])border-(l|r)(-|\s|$)/, 'use border-s or border-e'],
   [/(^|[\s:])rounded-(l|r|tl|tr|bl|br)-/, 'use the logical rounded-s- or rounded-e- forms'],
-  [/(^|[\s:])(space|divide)-x-/, 'use gap-*, or border-s on the item'],
+  [/(^|[\s:])-?(space|divide)-x-/, 'use gap-*, or border-s on the item'],
+  [/(^|[\s:])(float|clear)-(left|right)(\s|$)/, 'use float-start, float-end, clear-start or clear-end'],
   [/(^|[\s:])tracking-/, 'letter-spacing breaks Arabic script; never use it (R-5.3-3)'],
 ] as const
 
+/** white and black are fixed colours; transparent and current are mode-agnostic and allowed. */
 const PALETTE =
-  /(^|[\s:])(bg|text|border|outline|ring|fill|stroke|from|via|to|divide|decoration|shadow|accent|caret|placeholder)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}/
+  /(^|[\s:])(bg|text|border|outline|ring|fill|stroke|from|via|to|divide|decoration|shadow|accent|caret|placeholder)-((slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}|white|black)(\s|$|\/)/
 
 const ARBITRARY_COLOR =
   /(^|[\s:])(bg|text|border|outline|ring|fill|stroke|shadow|accent|caret|placeholder)-\[(#|rgb|hsl|oklch|color)/
 
 const BANNED_SCALE = [
-  [/(^|[\s:])rounded-(none|sm|md|lg|xl|2xl|3xl|full)(\s|$)/, 'use rounded-control, rounded-box or rounded-chip'],
+  [/(^|[\s:])rounded-(none|xs|sm|md|lg|xl|2xl|3xl|4xl|full)(\s|$)/, 'use rounded-control, rounded-box or rounded-chip'],
   [/(^|[\s:])h-\d+(\s|$)/, 'use h-control-xs .. h-control-xl from the size scale'],
   [/(^|[\s:])outline-\d+(\s|$)/, 'use FOCUS_RING from shared/classes'],
+  [/(^|[\s:])border-\d+(\s|$)/, 'use BORDER or BORDER_STRONG from shared/classes'],
   [/(^|[\s:])duration-\d+(\s|$)/, 'use TRANSITION from shared/classes; durations read --tc-motion'],
 ] as const
 
-const HAND_WRITTEN_STATE = /(^|\s)(hover|focus-visible|active):/
+const HAND_WRITTEN_STATE = /(^|[\s:])(hover|focus-visible|active):/
 
 const rules = {
   'logical-properties-only': {
@@ -105,7 +108,7 @@ const rules = {
         if (p) return ctx.report({ node, messageId: 'palette', data: { cls: p[0].trim() } })
         const a = ARBITRARY_COLOR.exec(value)
         if (a) return ctx.report({ node, messageId: 'arbitrary', data: { cls: a[0].trim() } })
-        if (/(^|\s)dark:/.test(value)) ctx.report({ node, messageId: 'dark' })
+        if (/(^|[\s:])dark:/.test(value)) ctx.report({ node, messageId: 'dark' })
       })
     },
   },
@@ -178,6 +181,44 @@ const rules = {
       return {
         TSEnumDeclaration(node: Node) {
           ctx.report({ node, messageId: 'enum' })
+        },
+      }
+    },
+  },
+
+  'icon-loaders-stay-server': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-7-1: the loader map is imported only inside components/icon.' },
+      schema: [],
+      messages: {
+        leak:
+          'R-7-1: "{{source}}" pulls {{what}} into whatever bundle imports it. '
+          + 'Only components/icon may import it; elsewhere use <Svg icon={x}> with a per-icon import.',
+      },
+    },
+    create(ctx: Context) {
+      const file = String(ctx.filename ?? ctx.getFilename()).replace(/\\/g, '/')
+      const allowed = /(^|\/)src\/components\/icon\//.test(file)
+
+      const check = (node: Node, raw: unknown) => {
+        if (allowed || typeof raw !== 'string') return
+        if (!/loaders\.generated/.test(raw)) return
+        ctx.report({ node, messageId: 'leak', data: { source: raw, what: 'the icon loader map' } })
+      }
+
+      // Every form that pulls a module in, not only the static import declaration.
+      return {
+        ImportDeclaration: (node: Node) => { check(node, node.source?.value) },
+        ExportNamedDeclaration: (node: Node) => { check(node, node.source?.value) },
+        ExportAllDeclaration: (node: Node) => { check(node, node.source?.value) },
+        ImportExpression: (node: Node) => { check(node, node.source?.value) },
+        TSImportType: (node: Node) => { check(node, node.argument?.literal?.value) },
+        CallExpression: (node: Node) => {
+          const callee = node.callee
+          const isRequire = callee?.type === 'Identifier' && callee.name === 'require'
+          const isDynamic = callee?.type === 'Import'
+          if (isRequire || isDynamic) check(node, node.arguments?.[0]?.value)
         },
       }
     },
