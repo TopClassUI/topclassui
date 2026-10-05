@@ -1,10 +1,13 @@
 // R-5.2-4: every size, radius, ring, hover and transition class lives here, so a knob change reaches all 46 at once.
 
+/** The width alone, so a filled control can hold the box size with a transparent colour. */
+export const BORDER_WIDTH = 'border-(length:--tc-line-width)'
+
 /** A hairline that is decorative, so it is exempt from the 3:1 rule. */
-export const BORDER = 'border-(length:--tc-line-width) border-line'
+export const BORDER = `${BORDER_WIDTH} border-line`
 
 /** A control boundary, which must reach 3:1 against every surface it can sit on. */
-export const BORDER_STRONG = 'border-(length:--tc-line-width) border-line-strong'
+export const BORDER_STRONG = `${BORDER_WIDTH} border-line-strong`
 
 /** A real CSS outline with an offset, so the gap shows the actual backdrop on any surface. */
 export const FOCUS_RING = [
@@ -27,8 +30,9 @@ export const TOUCH_TARGET = 'min-h-6 min-w-6 pointer-coarse:min-h-11 pointer-coa
 export const HOVER = {
   solid: 'hover:bg-(--tc-hover) active:bg-(--tc-active)',
   soft: 'hover:bg-(--tc-soft-hover) active:bg-(--tc-soft-active)',
-  outline: 'hover:bg-(--tc-soft-hover) active:bg-(--tc-soft-active)',
-  ghost: 'hover:bg-(--tc-soft-hover) active:bg-(--tc-soft-active)',
+  // Transparent at rest, so they borrow the tone's tint on the way in rather than its next step.
+  outline: 'hover:bg-(--tc-soft) active:bg-(--tc-soft-hover)',
+  ghost: 'hover:bg-(--tc-soft) active:bg-(--tc-soft-hover)',
   link: 'hover:underline',
 } as const
 
@@ -56,9 +60,11 @@ export const TOGGLE_SIZE = {
 export const SCROLL_AREA = 'overflow-y-auto overscroll-contain'
 
 /** Disabled is opacity plus no pointer events; loading keeps full colour so it never reads as disabled. */
-// data-disabled too: R-5.7-6 uses it for anything that is not a real form control.
+// data-disabled carries it for an element with no disabled attribute, such as an anchor.
 export const DISABLED = [
   'disabled:pointer-events-none disabled:opacity-50',
   'data-disabled:pointer-events-none data-disabled:opacity-50',
 ].join(' ')
-export const LOADING = 'aria-busy:cursor-progress aria-busy:opacity-100'
+
+/** Full colour, so loading never reads as disabled, and no clicks while it is busy. */
+export const LOADING = 'aria-busy:cursor-progress aria-busy:opacity-100 data-loading:pointer-events-none'

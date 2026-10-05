@@ -6,6 +6,9 @@ import { compile } from 'tailwindcss'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import { FOCUS_RING } from './shared/classes.js'
+import { BUTTON_SIZES, BUTTON_TONES, BUTTON_VARIANTS } from './components/button/constants.js'
+import { buttonVariants } from './components/button/variants.js'
+import { TONES } from './shared/contracts/tone.js'
 
 const ROOT = process.cwd()
 const ENTRY = '@import "tailwindcss";\n@import "./src/tokens.css";\n@import "./src/styles.css";\n'
@@ -147,5 +150,51 @@ describe('the focus ring actually paints', () => {
     expect(FOCUS_RING).toContain('--tc-ring-width')
     expect(FOCUS_RING).toContain('--tc-ring-offset')
     expect(FOCUS_RING).toContain('outline-ring')
+  })
+})
+
+describe('the tone utilities', () => {
+  let toneCss = ''
+
+  beforeAll(async () => {
+    const compiled = await compile(ENTRY, { base: ROOT, loadStylesheet })
+    toneCss = compiled.build(TONES.map((t) => `tone-${t}`))
+  })
+
+  for (const tone of TONES) {
+    it(`tone-${tone} swaps all five interaction variables`, () => {
+      const start = toneCss.indexOf(`.tone-${tone} {`)
+      const block = start < 0 ? '' : toneCss.slice(start, toneCss.indexOf('}', start))
+      for (const name of ['soft', 'hover', 'active', 'soft-hover', 'soft-active']) {
+        expect(block, `${tone}/${name}`).toContain(`--tc-${name}: var(--tc-${tone}-${name})`)
+      }
+    })
+  }
+
+  it('emits one utility per tone and nothing else', () => {
+    expect([...toneCss.matchAll(/\.tone-[a-z]+\s*\{/g)]).toHaveLength(TONES.length)
+  })
+})
+
+describe('every class Button emits resolves to real CSS', () => {
+  it('leaves no class without a rule, in any variant and tone combination', async () => {
+    const wanted = new Set<string>()
+    for (const variant of BUTTON_VARIANTS) {
+      for (const tone of BUTTON_TONES) {
+        for (const size of BUTTON_SIZES) {
+          for (const cls of buttonVariants({ variant, tone, size, fullWidth: true }).split(/\s+/)) {
+            if (cls) wanted.add(cls)
+          }
+        }
+      }
+    }
+
+    const compiled = await compile(ENTRY, { base: ROOT, loadStylesheet })
+    const out = compiled.build([...wanted])
+    /** Tailwind escapes every character a CSS identifier may not carry. */
+    const selector = (cls: string) => `.${cls.replace(/[^\w-]/g, (ch) => `\\${ch}`)}`
+
+    const missing = [...wanted].filter((c) => !out.includes(selector(c)))
+    expect(missing).toEqual([])
   })
 })

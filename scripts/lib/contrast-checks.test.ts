@@ -28,7 +28,7 @@ describe('checkTokens', () => {
   })
 
   it('measures the number of pairs it claims; change this only on purpose', () => {
-    expect(run(css).pairs).toBe(138)
+    expect(run(css).pairs).toBe(249)
   })
 })
 
@@ -125,5 +125,51 @@ describe('the gamut bracket', () => {
     if (!grey || !white) throw new Error('unparsed')
     const range = contrastRange(grey, white)
     expect(range.min).toBeCloseTo(range.max, 10)
+  })
+})
+
+describe('the per-tone interaction ramp', () => {
+  it('catches a hover fill its own label cannot be read on', () => {
+    const blind = css.replace('--tc-danger-hover: var(--color-red-700);', '--tc-danger-hover: var(--color-red-300);')
+    expect(failures(blind)).toMatch(/danger label on its hover fill/)
+  })
+
+  it('catches a tone whose soft hover does not move', () => {
+    const still = css.replace(
+      'var(--tc-info-solid) calc(var(--tc-info-mix) + 8%)',
+      'var(--tc-info-solid) calc(var(--tc-info-mix) + 0%)',
+    )
+    expect(failures(still)).toMatch(/info-soft-hover does not step away/)
+  })
+
+  it('catches a global that stops being the primary tone', () => {
+    const off = css.replace('--tc-hover: var(--tc-primary-hover);', '--tc-hover: var(--tc-danger-hover);')
+    expect(failures(off)).toMatch(/--tc-hover is not the primary tone/)
+  })
+
+  it('measures all six tones, not just the three Button needs', () => {
+    for (const tone of ['primary', 'neutral', 'success', 'warning', 'danger', 'info']) {
+      const broken = css.replace(`--tc-${tone}-hover:`, `--tc-${tone}-hover-unused:`)
+      expect(failures(broken), tone).toMatch(new RegExp(`${tone} label on its hover fill`))
+    }
+  })
+})
+
+describe('the label on the hovered and pressed tint', () => {
+  it('is measured, not just the resting tint', () => {
+    const pale = css.replace('--tc-danger-on-soft: var(--color-red-800);', '--tc-danger-on-soft: var(--color-red-500);')
+    const text = failures(pale)
+    expect(text).toMatch(/danger text on its soft-hover tint/)
+    expect(text).toMatch(/danger text on its soft-active tint/)
+  })
+
+  it('covers every tone, so no tone can hide a failing ramp', () => {
+    for (const tone of ['primary', 'neutral', 'success', 'warning', 'danger', 'info']) {
+      const broken = css.replace(
+        new RegExp(`--tc-${tone}-soft-active: [^;]+;`),
+        `--tc-${tone}-soft-active: var(--tc-${tone}-solid);`,
+      )
+      expect(failures(broken), tone).toMatch(new RegExp(`${tone} text on its soft-active tint`))
+    }
   })
 })

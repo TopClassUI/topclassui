@@ -1,7 +1,7 @@
 // R-7-1: the only file that may import the loader map, so it can never reach a browser.
-import type { IconName } from '../../icons/names.generated.js'
-import { LOADERS } from '../../icons/loaders.generated.js'
-import type { IconData } from '../../icons/types.js'
+import type { IconName } from '#icons/names.generated.js'
+import { LOADERS } from '#icons/loaders.generated.js'
+import type { IconData } from '#icons/types.js'
 
 const cache = new Map<IconName, IconData>()
 

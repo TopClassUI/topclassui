@@ -27,6 +27,50 @@
 @utility ps-safe { padding-inline-start: var(--tc-safe-start); }
 @utility pe-safe { padding-inline-end: var(--tc-safe-end); }
 
+/* A tone swaps the five interaction variables, so the hover classes never change. */
+@utility tone-primary {
+  --tc-soft: var(--tc-primary-soft);
+  --tc-hover: var(--tc-primary-hover);
+  --tc-active: var(--tc-primary-active);
+  --tc-soft-hover: var(--tc-primary-soft-hover);
+  --tc-soft-active: var(--tc-primary-soft-active);
+}
+@utility tone-neutral {
+  --tc-soft: var(--tc-neutral-soft);
+  --tc-hover: var(--tc-neutral-hover);
+  --tc-active: var(--tc-neutral-active);
+  --tc-soft-hover: var(--tc-neutral-soft-hover);
+  --tc-soft-active: var(--tc-neutral-soft-active);
+}
+@utility tone-success {
+  --tc-soft: var(--tc-success-soft);
+  --tc-hover: var(--tc-success-hover);
+  --tc-active: var(--tc-success-active);
+  --tc-soft-hover: var(--tc-success-soft-hover);
+  --tc-soft-active: var(--tc-success-soft-active);
+}
+@utility tone-warning {
+  --tc-soft: var(--tc-warning-soft);
+  --tc-hover: var(--tc-warning-hover);
+  --tc-active: var(--tc-warning-active);
+  --tc-soft-hover: var(--tc-warning-soft-hover);
+  --tc-soft-active: var(--tc-warning-soft-active);
+}
+@utility tone-danger {
+  --tc-soft: var(--tc-danger-soft);
+  --tc-hover: var(--tc-danger-hover);
+  --tc-active: var(--tc-danger-active);
+  --tc-soft-hover: var(--tc-danger-soft-hover);
+  --tc-soft-active: var(--tc-danger-soft-active);
+}
+@utility tone-info {
+  --tc-soft: var(--tc-info-soft);
+  --tc-hover: var(--tc-info-hover);
+  --tc-active: var(--tc-info-active);
+  --tc-soft-hover: var(--tc-info-soft-hover);
+  --tc-soft-active: var(--tc-info-soft-active);
+}
+
 @theme inline {
   --color-page: var(--tc-page);
   --color-surface: var(--tc-surface);

@@ -1,6 +1,6 @@
-import type { IconName } from '../../icons/names.generated.js'
-import type { IconData } from '../../icons/types.js'
-import { Svg } from '../svg/index.js'
+import type { IconName } from '#icons/names.generated.js'
+import type { IconData } from '#icons/types.js'
+import { Svg } from '#components/svg/index.js'
 import { camelCase } from './lib.js'
 import type { IconProps } from './types.js'
 

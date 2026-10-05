@@ -2,9 +2,9 @@
 import type { ReactElement } from 'react'
 import { describe, expect, it } from 'vitest'
 
-import { arrowLeft } from '../../icons/data/arrow-left.js'
-import { check } from '../../icons/data/check.js'
-import { Svg, type SvgProps } from '../svg/index.js'
+import { arrowLeft } from '#icons/data/arrow-left.js'
+import { check } from '#icons/data/check.js'
+import { Svg, type SvgProps } from '#components/svg/index.js'
 import { Icon, type IconProps } from './index.js'
 import { loadIcon } from './lib.js'
 
@@ -24,7 +24,7 @@ describe('loadIcon', () => {
   })
 
   it('loads every name in the set', async () => {
-    const { ICON_NAMES } = await import('../../icons/names.generated.js')
+    const { ICON_NAMES } = await import('#icons/names.generated.js')
     const all = await Promise.all(ICON_NAMES.map((n) => loadIcon(n)))
     expect(all).toHaveLength(84)
     expect(all.every((i) => i.path.length > 0 && i.viewBox === '0 0 256 256')).toBe(true)

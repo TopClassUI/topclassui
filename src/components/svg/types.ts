@@ -1,7 +1,7 @@
 import type { SVGProps } from 'react'
 
-import type { IconData } from '../../icons/types.js'
-import type { IconSize } from '../../shared/contracts/size.js'
+import type { IconData } from '#icons/types.js'
+import type { IconSize } from '#shared/contracts/size.js'
 
 /** `name` is omitted: the svg attribute would collide with the icon name. */
 export interface SvgProps extends Omit<SVGProps<SVGSVGElement>, 'children' | 'name'> {

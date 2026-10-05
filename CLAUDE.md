@@ -18,10 +18,11 @@ pnpm check:icons      the generated icon modules still match raw/
 pnpm check:contrast   AA contrast in every mode
 pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from this file
 pnpm icons:build      regenerate the icon modules from raw/
+pnpm new:component x  scaffold a component folder that already passes pnpm check
 ```
 
-Not built yet, so do not run them: `pnpm test:visual`, `pnpm test:e2e`, `pnpm size`,
-`pnpm new:component`. They arrive with the phases that need them.
+Not built yet, so do not run them: `pnpm test:visual`, `pnpm test:e2e`, `pnpm size`.
+They arrive with the phases that need them.
 
 ## How to work
 
