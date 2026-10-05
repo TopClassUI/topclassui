@@ -11,8 +11,9 @@ const has = (constant: string, cls: string) => constant.split(' ').includes(cls)
 
 describe('the touch target covers both axes and both pointers (R-5.6-2)', () => {
   for (const cls of [
-    'min-h-(--tc-target-min)', 'min-w-(--tc-target-min)',
-    'pointer-coarse:min-h-(--tc-target-coarse)', 'pointer-coarse:min-w-(--tc-target-coarse)',
+    'min-h-[var(--tc-target-min,24px)]', 'min-w-[var(--tc-target-min,24px)]',
+    'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]',
+    'pointer-coarse:min-w-[var(--tc-target-coarse,44px)]',
   ]) {
     it(`sets ${cls}`, () => {
       expect(has(TOUCH_TARGET, cls)).toBe(true)
@@ -21,6 +22,11 @@ describe('the touch target covers both axes and both pointers (R-5.6-2)', () => 
 
   it('reads px tokens, because SC 2.5.8 is specified in CSS px rather than rem', () => {
     expect(TOUCH_TARGET).not.toMatch(/min-[hw]-\d/)
+  })
+
+  it('carries a px fallback, so a consumer token file cannot remove the floor', () => {
+    expect(TOUCH_TARGET.split(' ').filter((c) => c.includes(',24px'))).toHaveLength(2)
+    expect(TOUCH_TARGET.split(' ').filter((c) => c.includes(',44px'))).toHaveLength(2)
   })
 })
 

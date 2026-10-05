@@ -3,7 +3,7 @@ import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { buildGraph } from '../../scripts/lib/module-graph.js'
+import { UNKNOWN_SUBPATH, buildGraph } from '../../scripts/lib/module-graph.js'
 
 // R-8.3-1: only a schema file may load zod, and nothing may reach one at runtime.
 const SRC = join(process.cwd(), 'src')
@@ -22,7 +22,7 @@ const relative = (file: string) => file.slice(SRC.length + 1).split('\\').join('
 
 describe('zod never reaches the browser', () => {
   const files = walk(SRC)
-  const graph = buildGraph(files, SRC)
+  const graph = buildGraph(files, process.cwd())
 
   it('finds files to check', () => {
     expect(files.length).toBeGreaterThan(0)
@@ -39,7 +39,10 @@ describe('zod never reaches the browser', () => {
     it(`${rel} cannot reach zod through any value import`, () => {
       const route = [...graph.reachable(file)].filter((f) => isSchema(relative(f)))
       expect(route.map(relative), `${rel} imports a schema file at runtime`).toEqual([])
-      expect([...graph.packages(file)]).not.toContain('zod')
+      const packages = [...graph.packages(file)]
+      expect(packages).not.toContain('zod')
+      // A subpath the graph cannot resolve would be followed by nothing at all.
+      expect(packages.filter((p) => p.startsWith(UNKNOWN_SUBPATH)), rel).toEqual([])
     })
   }
 })

@@ -1,6 +1,6 @@
 // One shape for all 46 meta.ts files, so the docs navigation and registry.json cannot drift.
 
-/** The sections of PLAN 18, which the docs navigation groups the catalog by. */
+/** One per catalog section of PLAN 18; 18.8's SEO kit groups under providers. */
 export const CATEGORIES = [
   'typography-and-layout',
   'media-and-display',

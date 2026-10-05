@@ -67,7 +67,7 @@ They arrive with the phases that need them.
 
 - **R-5.7-1** `variant`, `tone`, `size`, positive booleans (`disabled`, `loading`, `fullWidth`); events are `onValueChange` and `onOpenChange`; controlled pairs are `value`/`defaultValue` and `open`/`defaultOpen`. _(manual + type tests)_
 - **R-5.7-2** `size` is `xs | sm | md | lg | xl | custom`, default `md`, on every component that has a visual scale; `custom` emits no size classes. `<Icon>` takes the same five names against its own pixel values (`ICON_SIZE`: 16, 20, 24, 32, 40) and any CSS length, and is the only component whose default is `1em` rather than `md`. _(shared/contracts/size + type tests)_
-- **R-5.7-3** Every component accepts them and spreads the rest onto its root element; `ref` is a normal prop, never `forwardRef`. _(not yet - planned: type tests)_
+- **R-5.7-3** Every component accepts them and spreads the rest onto its root element; `ref` is a normal prop, never `forwardRef`. A skeleton is a component too. _(type tests and a render test per component; no check proves all 46 have one)_
 - **R-5.7-4** Server components accept the element form only, implemented with `renderElement`; client components may also accept the function form through `useRender`. _(not yet - planned: check-boundaries)_
 - **R-5.7-5** `export type DialogRootProps = Omit<Base.Root.Props, 'className'> & OwnProps`; never re-export a Base UI type name and never hand-copy a primitive's prop list. _(review; not linted)_
 - **R-5.7-6** Boolean presence attributes (`data-open`, `data-loading`, `data-disabled`), never `data-state="..."`; enumerated design props are value attributes (`data-variant`, `data-size`, `data-tone`). _(not yet - planned: eslint)_
@@ -98,10 +98,11 @@ They arrive with the phases that need them.
 
 - **R-5.12-1** `client.tsx` is JSX plus at most one call to `useXxx()` from `hook.ts`; it holds no `useState`, `useEffect`, `useReducer`, `useRef`, `useMemo` or `useCallback`. Pure helpers live in `lib.ts`. _(not yet - planned: eslint + check-structure)_
 - **R-5.12-2** `check-structure` warns at 200 lines and fails at 300; a component that needs more files gets a `parts/` folder with one component per file. _(check-structure)_
-- **R-5.12-3** One line maximum, only for what the code cannot say (a browser quirk, a spec reference, a non-local constraint). No paragraph comments, no commented-out code, no narration of the next line. _(eslint)_
-- **R-5.12-4** Kebab-case files and folders, PascalCase components, `useThing` hooks, verb-first pure functions, `SCREAMING_CASE` constants in `constants.ts` or `classes.ts` only; a file in `parts/` exports one component named after the file. _(check-structure)_
+- **R-5.12-3** One line maximum, only for what the code cannot say (a browser quirk, a spec reference, a non-local constraint). No paragraph comments, no commented-out code, no narration of the next line. A `/** ... */` block documenting an export may run longer, and `scripts/`, `eslint-rules/` and config files are outside the check. _(eslint under src/; the JSDoc exemption and everything outside src/ are manual)_
+- **R-5.12-4** Kebab-case files and folders, PascalCase components, `useThing` hooks, verb-first pure functions, `SCREAMING_CASE` constants in `constants.ts` or `classes.ts` inside a component folder; a shared contract under `shared/` may declare its own. A file in `parts/` exports one component named after the file. _(check-structure for the kebab-case names; the rest is manual)_
 - **R-5.12-5** No `any`, no `@ts-ignore`, no non-null assertion without a one-line reason; relative imports carry explicit `.js` extensions and type imports use `import type`. _(eslint + tsc)_
 - **R-8.1-1** A file exists only if the component needs it, and only the files in PLAN.md 8.1 may exist. Never `loading.tsx`, `error.tsx`, `page.tsx` or `layout.tsx` (Next.js reserves those names); use `skeleton.tsx`, `empty-state.tsx` and `error-state.tsx`. Examples are one file each under `dummy/`, and tests under `test/`. _(check-structure)_
+- **R-8.1-2** `meta.ts` is declared `satisfies ComponentMeta` from `#shared/meta.js`, its `slug` is the folder name, and `baseUiRange` is non-null whenever `baseUi` is. `status` is `stable` only when every line of PLAN 20 is true. _(src/shared/meta.test for every folder that has the file; check-structure does not yet require it)_
 
 ## 9. Icons
 
@@ -111,7 +112,7 @@ They arrive with the phases that need them.
 ## 10. Accessibility
 
 - **R-5.6-1** Keyboard behaviour follows the ARIA Authoring Practices; a visible `focus-visible` ring on every interactive element; types enforce labels. _(manual; axe is not in the repo yet)_
-- **R-5.6-2** Every interactive element is at least 24x24 CSS px on every pointer type and 44px under `pointer-coarse`. _(not yet - Playwright is not in the repo yet)_
+- **R-5.6-2** Every interactive element is at least 24x24 CSS px on every pointer type and 44px under `pointer-coarse`. The floor is a px token with a px fallback, never a rem step, because the success criterion is written in CSS px. _(unit tests on TOUCH_TARGET and the compiled rule; the measured size still needs Playwright)_
 - **R-5.6-3** Slider, Drawer and Toast swipe, Carousel, Resizable, sortable lists and the editor kit each provide a keyboard or button path to the same result. _(manual; the keyboard tests do not exist yet)_
 - **R-5.6-4** 4.5:1 for text, including a tone's text colour on its own soft tint; 3:1 for `--tc-line-strong`, `--tc-ring` and icons. `--tc-line` is decorative and exempt. _(check-contrast)_
 

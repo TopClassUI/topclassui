@@ -3,7 +3,8 @@ import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { globToRegExp, projectsFor } from './test-projects.js'
+import { PROJECTS, SUFFIXES, globToRegExp, patternFor, projectsFor } from './test-projects.js'
+import type { Suffix } from './test-projects.js'
 
 const ROOT = process.cwd()
 
@@ -47,11 +48,31 @@ describe('the four projects are symmetric', () => {
     })
   }
 
+  const suffixes = Object.keys(SUFFIXES) as Suffix[]
+
+  it('gives every suffix exactly one owning project', () => {
+    for (const suffix of suffixes) {
+      expect(PROJECTS.filter((p) => p.owns === suffix).map((p) => p.name), suffix).toHaveLength(1)
+    }
+    expect(PROJECTS.filter((p) => p.owns === null)).toHaveLength(1)
+  })
+
+  it('excludes every suffix a project does not own, so a fifth cannot be forgotten', () => {
+    for (const project of PROJECTS) {
+      const missing = suffixes
+        .filter((suffix) => suffix !== project.owns)
+        .map(patternFor)
+        .filter((pattern) => !project.exclude.includes(pattern))
+      expect(missing, project.name).toEqual([])
+    }
+  })
+
   // The asymmetry that existed: .ssr.test.ts ran in both node and ssr.
-  for (const suffix of ['dom', 'rsc', 'ssr'] as const) {
+  for (const suffix of suffixes) {
+    const owner = PROJECTS.find((p) => p.owns === suffix)?.name
     for (const ext of ['ts', 'tsx'] as const) {
-      it(`a .${suffix}.test.${ext} file runs only in ${suffix}`, () => {
-        expect(projectsFor(`src/components/x/test/x.${suffix}.test.${ext}`)).toEqual([suffix])
+      it(`a .${suffix}.test.${ext} file runs only in ${String(owner)}`, () => {
+        expect(projectsFor(`src/components/x/test/x.${suffix}.test.${ext}`)).toEqual([owner])
       })
     }
   }

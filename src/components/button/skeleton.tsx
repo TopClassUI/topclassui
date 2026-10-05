@@ -16,7 +16,6 @@ export function ButtonSkeleton({
 }: ButtonSkeletonProps) {
   return (
     <span
-      aria-hidden
       className={cn(
         'block animate-pulse rounded-control bg-surface motion-reduce:animate-none',
         CONTROL_HEIGHT[size],
@@ -25,6 +24,7 @@ export function ButtonSkeleton({
         className,
       )}
       {...rest}
+      aria-hidden
     />
   )
 }

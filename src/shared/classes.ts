@@ -25,10 +25,11 @@ export const TRANSITION = 'transition-[color,background-color,border-color,outli
 
 /** R-5.6-2: SC 2.5.8 is written in CSS px, so the floor is a px token, never a rem step. */
 export const TOUCH_TARGET = [
-  'min-h-(--tc-target-min)',
-  'min-w-(--tc-target-min)',
-  'pointer-coarse:min-h-(--tc-target-coarse)',
-  'pointer-coarse:min-w-(--tc-target-coarse)',
+  // The fallback matters: a consumer token file missing these would leave no floor at all.
+  'min-h-[var(--tc-target-min,24px)]',
+  'min-w-[var(--tc-target-min,24px)]',
+  'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]',
+  'pointer-coarse:min-w-[var(--tc-target-coarse,44px)]',
 ].join(' ')
 
 /** Hover and active are tone-driven: the compound variant sets the variables, these read them. */

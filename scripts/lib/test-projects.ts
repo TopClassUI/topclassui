@@ -1,26 +1,38 @@
 // The four Vitest projects of PLAN 17.1 as data, so a test can prove the
 // patterns stay symmetric and no file is run by two projects at once.
 
-export interface Project { name: string; include: string[]; exclude: string[] }
+export interface Project {
+  name: string
+  /** The filename suffix this project owns, or null for the plain .test.ts default. */
+  owns: Suffix | null
+  include: string[]
+  exclude: string[]
+}
 
-/** One suffix per environment, each excluded from every project that is not its own. */
-const SUFFIXES = { dom: 'dom', rsc: 'rsc', ssr: 'ssr' } as const
+/** One suffix per environment. Adding one here reaches every project's exclude. */
+export const SUFFIXES = { dom: 'dom', rsc: 'rsc', ssr: 'ssr' } as const
+export type Suffix = keyof typeof SUFFIXES
 
-const not = (...names: Array<keyof typeof SUFFIXES>) =>
-  names.map((n) => `src/**/*.${SUFFIXES[n]}.test.{ts,tsx}`)
+export const patternFor = (suffix: Suffix): string => `src/**/*.${SUFFIXES[suffix]}.test.{ts,tsx}`
+
+/** Every suffix this project does not own, so no file is ever run by two projects. */
+const otherSuffixes = (owns: Suffix | null) =>
+  (Object.keys(SUFFIXES) as Suffix[]).filter((s) => s !== owns).map(patternFor)
 
 export const PROJECTS: Project[] = [
   {
     name: 'node',
+    owns: null,
     include: ['scripts/**/*.test.ts', 'eslint-rules/**/*.test.ts', 'src/**/*.test.ts'],
-    exclude: not('dom', 'rsc', 'ssr'),
+    exclude: otherSuffixes(null),
   },
-  { name: 'dom', include: [`src/**/*.${SUFFIXES.dom}.test.{ts,tsx}`], exclude: [] },
-  { name: 'rsc', include: [`src/**/*.${SUFFIXES.rsc}.test.{ts,tsx}`], exclude: [] },
+  { name: 'dom', owns: 'dom', include: [patternFor('dom')], exclude: otherSuffixes('dom') },
+  { name: 'rsc', owns: 'rsc', include: [patternFor('rsc')], exclude: otherSuffixes('rsc') },
   {
     name: 'ssr',
-    include: [`src/**/*.${SUFFIXES.ssr}.test.{ts,tsx}`, 'src/**/*.test.tsx'],
-    exclude: not('dom', 'rsc'),
+    owns: 'ssr',
+    include: [patternFor('ssr'), 'src/**/*.test.tsx'],
+    exclude: otherSuffixes('ssr'),
   },
 ]
 

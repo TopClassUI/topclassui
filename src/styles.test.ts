@@ -199,14 +199,23 @@ describe('every class Button emits resolves to real CSS', () => {
   })
 })
 
-/** The layer each top-level region belongs to, so cascade order can be asserted. */
+/** Blanked, not removed, so every index still points at the same character. */
+function blankNoise(css: string): string {
+  const blanks = (match: string) => ' '.repeat(match.length)
+  return css
+    .replace(/\/\*[\s\S]*?\*\//g, blanks)
+    .replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g, blanks)
+}
+
+/** The top-level layer a byte belongs to. A content:"{" would desync a bare brace count. */
 function layerOf(css: string, index: number): string {
+  const clean = blankNoise(css)
   let depth = 0
   let layer: string | null = null
   let start = 0
-  for (let i = 0; i < css.length; i++) {
-    if (css[i] === '{') { depth++; continue }
-    if (css[i] === '}') {
+  for (let i = 0; i < clean.length; i++) {
+    if (clean[i] === '{') { depth++; continue }
+    if (clean[i] === '}') {
       depth--
       if (depth === 0 && layer !== null) {
         if (index > start && index < i) return layer
@@ -214,8 +223,12 @@ function layerOf(css: string, index: number): string {
       }
       continue
     }
-    if (depth === 0 && css.startsWith('@layer ', i)) {
-      const head = css.slice(i, css.indexOf('{', i))
+    if (depth === 0 && clean.startsWith('@layer ', i)) {
+      const brace = clean.indexOf('{', i)
+      const semi = clean.indexOf(';', i)
+      // `@layer a, b;` declares an order and opens no block.
+      if (brace < 0 || (semi >= 0 && semi < brace)) continue
+      const head = clean.slice(i, brace)
       if (head.includes(',')) continue
       layer = head.replace('@layer', '').trim()
       start = i
@@ -244,6 +257,13 @@ describe('a tone beats the theme defaults on the same element', () => {
   it('emits the tone utility in a layer that outranks it', () => {
     expect(layerOf(toned, toned.indexOf('.tone-danger'))).toBe('utilities')
   })
+
+  it('orders the layers so utilities really is the later one', () => {
+    const order = /@layer ([^;{]+);/.exec(toned)?.[1]?.split(',').map((n) => n.trim()) ?? []
+    expect(order).toContain('base')
+    expect(order).toContain('utilities')
+    expect(order.indexOf('utilities')).toBeGreaterThan(order.indexOf('base'))
+  })
 })
 
 describe('the shared control classes resolve to the knobs they promise', () => {
@@ -254,11 +274,15 @@ describe('the shared control classes resolve to the knobs they promise', () => {
     expect(out).toContain('var(--tc-line-width)')
   })
 
-  it('floors the touch target in CSS px, which SC 2.5.8 is written in', async () => {
+  it('floors the touch target in CSS px on both axes, which SC 2.5.8 is written in', async () => {
     const compiled = await compile(ENTRY, { base: ROOT, loadStylesheet })
-    const out = compiled.build(TOUCH_TARGET.split(' '))
-    expect(out).toContain('var(--tc-target-min)')
-    expect(out).toContain('var(--tc-target-coarse)')
+    for (const cls of TOUCH_TARGET.split(' ')) {
+      // One rule per class, or the width classes alone satisfy a whole-output match.
+      const property = cls.includes('min-h') ? 'min-height' : 'min-width'
+      const token = cls.includes('coarse') ? '--tc-target-coarse,44px' : '--tc-target-min,24px'
+      const out = compiled.build([cls])
+      expect(out, cls).toContain(`${property}: var(${token})`)
+    }
     expect(css).toContain('--tc-target-min: 24px')
     expect(css).toContain('--tc-target-coarse: 44px')
   })

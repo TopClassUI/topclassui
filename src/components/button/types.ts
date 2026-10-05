@@ -14,7 +14,10 @@ export type ButtonDesignProps = {
 }
 
 /** The four props that decide the look, which `buttonVariants` takes on its own. */
-export type ButtonVariantProps = Pick<ButtonDesignProps, 'variant' | 'tone' | 'size' | 'fullWidth'>
+export type ButtonVariantProps = Pick<ButtonDesignProps, 'variant' | 'tone' | 'size' | 'fullWidth'> & {
+  className?: string | undefined
+  class?: string | undefined
+}
 
 // R-5.7-4: the element form only, so it resolves without a hook in a Server Component.
 export interface RenderProp {
@@ -29,4 +32,5 @@ export interface ButtonProps
 
 /** R-8.3-4: the control's own design props, so the two cannot describe different boxes. */
 export type ButtonSkeletonProps =
-  Omit<ComponentPropsWithRef<'span'>, 'children'> & Pick<ButtonDesignProps, 'size' | 'fullWidth'>
+  Omit<ComponentPropsWithRef<'span'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
+  & Pick<ButtonDesignProps, 'size' | 'fullWidth'>

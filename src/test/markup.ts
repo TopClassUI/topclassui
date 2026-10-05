@@ -1,5 +1,4 @@
-// The three helpers every component's server-render test needs, in one place
-// rather than copied into 46 folders.
+// The three helpers every component's server-render test needs, in one place.
 import type { ReactElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 

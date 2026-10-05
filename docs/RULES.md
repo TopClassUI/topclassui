@@ -116,7 +116,7 @@ They arrive with the phases that need them.
 
 ### R-4-3 One-line comments in stylesheets too
 **Rule:** R-5.12-3 applies to `.css` files; no comment spans more than one line.
-**Why:** the ESLint rule reads TypeScript only, so a stylesheet was the one place the comment rule went unenforced.
+**Why:** the ESLint rule reads TypeScript under `src/` only, so stylesheets needed their own check.
 **Enforced by:** `check-css`
 
 ## 3. RTL
@@ -159,9 +159,9 @@ They arrive with the phases that need them.
 **Enforced by:** `shared/contracts/size.ts` + type tests
 
 ### R-5.7-3 Pass through className, style, ref and rest
-**Rule:** every component accepts them and spreads the rest onto its root element; `ref` is a normal prop, never `forwardRef`.
+**Rule:** every component accepts them and spreads the rest onto its root element; `ref` is a normal prop, never `forwardRef`. A skeleton is a component too.
 **Why:** consumers must be able to extend any component.
-**Enforced by:** not yet - planned: type tests
+**Enforced by:** type tests and a render test per component; no check proves all 46 have one
 
 ### R-5.7-4 Polymorphism through render
 **Rule:** server components accept the element form only, implemented with `renderElement`; client components may also accept the function form through `useRender`.
@@ -262,14 +262,14 @@ They arrive with the phases that need them.
 **Enforced by:** `scripts/check-structure.ts`
 
 ### R-5.12-3 Comments are one line
-**Rule:** one line maximum, only for what the code cannot say (a browser quirk, a spec reference, a non-local constraint). No paragraph comments, no commented-out code, no narration of the next line.
+**Rule:** one line maximum, only for what the code cannot say (a browser quirk, a spec reference, a non-local constraint). No paragraph comments, no commented-out code, no narration of the next line. A `/** ... */` block documenting an export may run longer, and `scripts/`, `eslint-rules/` and config files are outside the check.
 **Why:** long comments go stale and hide the code.
-**Enforced by:** `eslint`
+**Enforced by:** `eslint` under `src/`; the JSDoc exemption and everything outside `src/` are manual
 
 ### R-5.12-4 Naming
-**Rule:** kebab-case files and folders, PascalCase components, `useThing` hooks, verb-first pure functions, `SCREAMING_CASE` constants in `constants.ts` or `classes.ts` only; a file in `parts/` exports one component named after the file.
+**Rule:** kebab-case files and folders, PascalCase components, `useThing` hooks, verb-first pure functions, `SCREAMING_CASE` constants in `constants.ts` or `classes.ts` inside a component folder; a shared contract under `shared/` may declare its own. A file in `parts/` exports one component named after the file.
 **Why:** a predictable name is the cheapest documentation.
-**Enforced by:** `scripts/check-structure.ts`
+**Enforced by:** `scripts/check-structure.ts` for the kebab-case names; the rest is manual
 
 ### R-5.12-5 Strict TypeScript
 **Rule:** no `any`, no `@ts-ignore`, no non-null assertion without a one-line reason; relative imports carry explicit `.js` extensions and type imports use `import type`.
@@ -280,6 +280,11 @@ They arrive with the phases that need them.
 **Rule:** a file exists only if the component needs it, and only the files in PLAN.md 8.1 may exist. Never `loading.tsx`, `error.tsx`, `page.tsx` or `layout.tsx` (Next.js reserves those names); use `skeleton.tsx`, `empty-state.tsx` and `error-state.tsx`. Examples are one file each under `dummy/`, and tests under `test/`.
 **Why:** a predictable folder is what makes scaffolding, checking and documenting automatic.
 **Enforced by:** `scripts/check-structure.ts`
+
+### R-8.1-2 meta.ts answers to one contract
+**Rule:** `meta.ts` is declared `satisfies ComponentMeta` from `#shared/meta.js`, its `slug` is the folder name, and `baseUiRange` is non-null whenever `baseUi` is. `status` is `stable` only when every line of PLAN 20 is true.
+**Why:** the docs navigation and the generated `registry.json` key on these fields, and 46 hand-written objects drift before anything reads them.
+**Enforced by:** `src/shared/meta.test.ts` for every folder that has the file; `check-structure` does not yet require it
 
 ## 9. Icons
 
@@ -301,9 +306,9 @@ They arrive with the phases that need them.
 **Enforced by:** manual; `axe` is not in the repo yet
 
 ### R-5.6-2 Target size
-**Rule:** every interactive element is at least 24x24 CSS px on every pointer type and 44px under `pointer-coarse`.
+**Rule:** every interactive element is at least 24x24 CSS px on every pointer type and 44px under `pointer-coarse`. The floor is a px token with a px fallback, never a rem step, because the success criterion is written in CSS px.
 **Why:** WCAG 2.5.8.
-**Enforced by:** not yet - Playwright is not in the repo yet
+**Enforced by:** unit tests on `TOUCH_TARGET` and the compiled rule; the measured size still needs Playwright
 
 ### R-5.6-3 Every drag has an alternative
 **Rule:** Slider, Drawer and Toast swipe, Carousel, Resizable, sortable lists and the editor kit each provide a keyboard or button path to the same result.

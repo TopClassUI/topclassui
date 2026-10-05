@@ -4,7 +4,7 @@ import { Button } from '../index.js'
 
 export default function Demo() {
   return (
-    <div dir="rtl" className="flex flex-wrap items-center gap-3">
+    <div dir="rtl" lang="ar" className="flex flex-wrap items-center gap-3">
       <Button>احفظ</Button>
       <Button variant="soft" tone="danger">احذف</Button>
       <Button variant="outline">

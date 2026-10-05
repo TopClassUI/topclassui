@@ -34,7 +34,7 @@ export function Button({
   const inactive = disabled || loading
 
   // Only a real button has a disabled attribute; anything else needs the ARIA pair.
-  const nativeButton = render === undefined || render.type === 'button'
+  const nativeButton = render == null || render.type === 'button'
 
   return renderElement(render ?? <button type={type} />, {
     type: nativeButton ? type : undefined,

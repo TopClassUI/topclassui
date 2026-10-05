@@ -6,6 +6,44 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-05 - Six parallel reviewers find two holes in the gates that had just been written
+
+**Decision.** The 28 fixes above were themselves reviewed across six dimensions in parallel, each reviewer working in its own copy of the repo and required to reproduce a finding before reporting it. They found 2 high, 11 medium and 9 low. Everything below is fixed, and every attack was replayed against the fix.
+
+**Two high, both in gates written hours earlier.**
+
+1. **A comment on the same line as an import defeated the zod guard.** `/* R-8.3-1 */ import { z } from 'zod'` passed all nine gates, because the patterns were anchored with `^[ \t]*`. So did `;import ...`, a second `import` later on the same line, and a backtick specifier. The scanner now blanks comments first (preserving length, so a commented-out import cannot hide a real one behind it) and matches unanchored on a word boundary. `scripts/lib/module-graph.test.ts` holds all nineteen forms as a table, plus the type-only non-matches.
+
+2. **`import { z } from 'zod/v4'` walked straight in**, because the guard compared the raw specifier against the string `zod` while `zod@4.6.5` really exports `./v4`. Specifiers are now reduced to a package name (`zod/v4`, `zod/mini` and `zod?raw` all to `zod`, with both segments kept for a scoped package).
+
+**The rest.**
+
+3. **The ramp check was chained but not anchored**, so a state that stepped away and back passed: `--tc-primary-active: var(--tc-primary-solid)` reported ok in all three modes, meaning a pressed button painting its resting colour. Both ramps now require a step from the base as well as from the state before.
+
+4. **A tone's text at rest was never measured against a bare surface** - which is exactly where `outline`, `ghost` and `link` labels sit, since they have no fill. 54 pairs were missing; all pass, the worst at 5.23 in dark. The gate now measures 339 pairs.
+
+5. **"285 pairs measured" was 285 calls, not 285 measurements.** `--tc-page` and `--tc-surface-raised` are the same colour in light and ocean, and 47 of the 55 tokens the gate reads are identical in those two modes, so 42% of the readings were duplicates. This is the project's own documented failure mode - a number reported as evidence - so the gate now prints both: `339 pairs, 205 distinct colour readings`.
+
+6. **The RTL demo rendered Arabic without `lang`**, so `:lang(ar)` set neither the Arabic font nor the `letter-spacing: 0` reset that R-5.3-3 exists to guarantee. Demos are the docs code tab and the visual baselines, so this would have shipped as the example people copy.
+
+7. **`min-h-(--tc-target-min)` removes the floor entirely if the token is missing**, because an unresolved `var()` is invalid at computed-value time and `min-height` falls back to its initial value. PLAN 6.1 lets a consumer replace the whole token file, so the classes now carry the px fallback: `min-h-[var(--tc-target-min,24px)]`.
+
+8. **A fifth Vitest project would have been silently double-run**, because each project's `exclude` was hand-written. Excludes are now derived from the `SUFFIXES` map, the config is built by mapping over the projects rather than destructuring them positionally, and the test derives its table from the same map - reproduced by adding an `edge` project, which the old test passed and the new one fails.
+
+9. **Nothing gated the schema descriptions** the previous entry had just added: no file called `z.toJSONSchema`, so a field with no `.meta()` kept `pnpm check` green. `button.schema.test.ts` now asserts a description and the `constants.ts` default for every field.
+
+10. **The scaffold still wrote the old shape.** `pnpm new:component` emitted a schema with no descriptions, `z.enum(SIZES)` instead of the shared `sizeSchema`, and a hand-written `DesignProps` interface rather than one derived from the schema - handing all 45 later components the drift this branch exists to remove.
+
+11. **Smaller, all confirmed:** `render={null}` threw a raw `TypeError` instead of falling back to a button, because line 37 used `=== undefined` while line 39 used `??`; `buttonVariants` silently dropped a `className` that the old cva export appended; `ButtonSkeleton` let a consumer set `aria-hidden={false}` on a decorative placeholder, because the spread came after it; the hydration test hard-coded eight demos and so never hydrated the two new ones; `layerOf` in `styles.test.ts` was a brace counter that one `content: "{"` would desync; the touch-target assertion in the same file was satisfied by the width classes alone; and `docs/STATUS.md` overstated its own test count, Button's test-file count, and what the meta contract validates.
+
+**Rejected.** Using `es-module-lexer` for the import scan, as one reviewer suggested: it is in `node_modules` only as a transitive dependency of Vite, and R-5.9-1 does not permit reaching for an undeclared package.
+
+**Still open, for Omar.** `ButtonProps` extends `ComponentPropsWithRef<'button'>`, so `name`, `value` and `form` typecheck and render on `render={<a/>}`. That is inherent to the element-form `render` API and wants one decision for all 46 components, not a patch here.
+
+**Affects** `scripts/lib/{module-graph,test-projects,contrast-checks,scaffold}.ts` and their tests, `scripts/check-contrast.ts`, `vitest.config.ts`, `src/shared/{classes,meta}.ts`, `src/shared/classes.test.ts`, `src/components/button/{index.tsx,types.ts,skeleton.tsx,variants.ts}`, `src/components/button/test/`, `src/components/button/dummy/rtl.tsx`, `src/styles.test.ts`, `src/test/`, `docs/RULES.md` and `docs/STATUS.md`.
+
+---
+
 ## 2026-10-05 - The Button template closes its last 28 findings, most of them tests that proved nothing
 
 **Decision.** Every finding the 83-agent Button review left open is fixed on `feat/button`, because Button is the file 45 components copy and a weak test shape copied 45 times costs more than the component did. Each fix below was proved by mutation: the defect was reintroduced, the suite was run, and the failure was recorded. Eighteen mutations, eighteen failures.

@@ -103,5 +103,7 @@ export function buttonVariants(props: ButtonVariantProps = {}): string {
     classes = cn(resolve({ variant, tone, size, fullWidth }))
     cache.set(key, classes)
   }
-  return classes
+  // The cva export appended these, so dropping them would be a silent regression.
+  const extra = props.className ?? props.class
+  return extra === undefined ? classes : cn(classes, extra)
 }

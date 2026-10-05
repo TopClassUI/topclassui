@@ -22,6 +22,9 @@ export function readSlug(slug: string): Scaffold {
   return { slug, name: pascalCase(slug), screaming: screamingCase(slug) }
 }
 
+const camel = (slug: string) =>
+  slug.split('-').map((w, i) => (i ? w.charAt(0).toUpperCase() + w.slice(1) : w)).join('')
+
 const constants = ({ screaming }: Scaffold) => `// R-8.3-2: the value lists and defaults, imported by the schema, by cva and by the component.
 import { DEFAULT_SIZE, SIZES } from '#shared/contracts/size.js'
 import { DEFAULT_TONE, TONES } from '#shared/contracts/tone.js'
@@ -39,35 +42,40 @@ export const ${screaming}_DEFAULTS = {
 } as const
 `
 
-const schema = ({ slug, screaming }: Scaffold) => `// R-8.3-1: zod lives here only, and components import this file with \`import type\`.
+const schema = ({ name, slug, screaming }: Scaffold) => `// R-8.3-1: zod lives here only, and components import this file with \`import type\`.
 import { z } from 'zod'
 
-import { SIZES } from '#shared/contracts/size.js'
+import { sizeSchema } from '#shared/contracts/size.schema.js'
 import { TONES } from '#shared/contracts/tone.js'
 import { ${screaming}_DEFAULTS, ${screaming}_VARIANTS } from './constants.js'
 
-export const ${slug.split('-').map((w, i) => (i ? w.charAt(0).toUpperCase() + w.slice(1) : w)).join('')}Schema = z.object({
-  variant: z.enum(${screaming}_VARIANTS).default(${screaming}_DEFAULTS.variant),
-  tone: z.enum(TONES).default(${screaming}_DEFAULTS.tone),
-  size: z.enum(SIZES).default(${screaming}_DEFAULTS.size),
+// R-8.3-3: .meta() is last in each chain, and every field needs one for the props table.
+export const ${camel(slug)}Schema = z.object({
+  variant: z.enum(${screaming}_VARIANTS).default(${screaming}_DEFAULTS.variant)
+    .meta({ description: 'TODO(tc): how much weight the ${name} carries on the page.' }),
+  tone: z.enum(TONES).default(${screaming}_DEFAULTS.tone)
+    .meta({ description: 'TODO(tc): the meaning it signals, which picks its colour ramp.' }),
+  size: sizeSchema.default(${screaming}_DEFAULTS.size)
+    .meta({ description: 'The shared control scale; custom emits no size classes.' }),
 })
+
+export type ${name}SchemaInput = z.input<typeof ${camel(slug)}Schema>
 `
 
 const types = ({ name, screaming }: Scaffold) => `import type { ComponentPropsWithRef, ReactNode } from 'react'
 
-import type { Size } from '#shared/contracts/size.js'
 import type { Tone } from '#shared/contracts/tone.js'
 import type { ${screaming}_VARIANTS } from './constants.js'
+import type { ${name}SchemaInput } from './schema.js'
 
 export type ${name}Variant = (typeof ${screaming}_VARIANTS)[number]
 
 /** The shared vocabulary, so adding a tone reaches every component at once. */
 export type ${name}Tone = Tone
 
-export interface ${name}DesignProps {
-  variant?: ${name}Variant | undefined
-  tone?: ${name}Tone | undefined
-  size?: Size | undefined
+// R-8.3-4: derived from the schema, so the props and the validation cannot drift apart.
+export type ${name}DesignProps = {
+  [K in keyof ${name}SchemaInput]?: ${name}SchemaInput[K] | undefined
 }
 
 export interface ${name}Props
@@ -101,7 +109,7 @@ const ON_SOFT = {
   info: 'bg-info-soft text-info-on-soft',
 } as const
 
-export const ${slug.split('-').map((w, i) => (i ? w.charAt(0).toUpperCase() + w.slice(1) : w)).join('')}Variants = cva(
+export const ${camel(slug)}Variants = cva(
   ['inline-flex items-center justify-center rounded-control', FOCUS_RING, TRANSITION],
   {
     variants: {
@@ -121,9 +129,6 @@ export const ${slug.split('-').map((w, i) => (i ? w.charAt(0).toUpperCase() + w.
   },
 )
 `
-
-const camel = (slug: string) =>
-  slug.split('-').map((w, i) => (i ? w.charAt(0).toUpperCase() + w.slice(1) : w)).join('')
 
 const index = (s: Scaffold) => `// No 'use client': a client bundle gets it only when a client file imports it.
 import { cn } from '#shared/cn.js'
