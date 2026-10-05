@@ -107,3 +107,48 @@ describe('getLabels', () => {
     expect(labels.collection.results(3, latn)).toBe('3 hits')
   })
 })
+
+describe('an override with an explicit undefined', () => {
+  it('keeps the default instead of writing undefined over it', () => {
+    const { labels } = getLabels('en', { common: { close: undefined } })
+    expect(labels.common.close).toBe(en.common.close)
+  })
+
+  it('still applies the real overrides beside it', () => {
+    const { labels } = getLabels('en', { common: { close: undefined, clear: 'Wipe' } })
+    expect(labels.common.close).toBe(en.common.close)
+    expect(labels.common.clear).toBe('Wipe')
+  })
+
+  it('leaves every other group untouched', () => {
+    const { labels } = getLabels('en', { common: { close: undefined } })
+    expect(labels.state).toEqual(en.state)
+    expect(labels.dialog).toEqual(en.dialog)
+  })
+})
+
+describe('createNumberFormat', () => {
+  it('formats with the tag it is given', () => {
+    expect(createNumberFormat('en-US').format(1234)).toBe('1,234')
+  })
+
+  it('survives a POSIX-style tag, which Intl rejects outright', () => {
+    expect(() => createNumberFormat('en_US')).not.toThrow()
+    expect(createNumberFormat('en_US').format(1234)).toBe('1,234')
+  })
+
+  it('survives a tag that is not a locale at all', () => {
+    expect(() => createNumberFormat('not a locale')).not.toThrow()
+    expect(() => createNumberFormat('')).not.toThrow()
+  })
+
+  it('still honours the numbering system', () => {
+    expect(createNumberFormat('ar', 'arab').format(1234)).not.toBe('1,234')
+  })
+})
+
+describe('getLabels with an odd tag', () => {
+  it('reads the language from a POSIX-style tag', () => {
+    expect(getLabels('ar_EG').labels.common.close).toBe(ar.common.close)
+  })
+})

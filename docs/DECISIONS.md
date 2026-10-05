@@ -6,6 +6,34 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-05 - The review backlog, including two crashes and a production-only divergence
+
+**Decision.** Eight more findings from the 5 October review are fixed. Two of them crashed, one behaved differently in production than in development, and one module cited by a rule as unit-tested had no test file at all.
+
+1. **A label override containing an explicit `undefined` crashed at render.** `{ ...base.common, ...overrides.common }` writes `undefined` over the default, so `{ common: { close: undefined } }` - which any object built from optional props produces - left a label missing. The groups are still spelled out one by one, so a new group fails to compile, but each is merged by a helper that skips `undefined`.
+
+2. **An invalid locale tag took the whole tree down.** `getLabels` accepts any string, and `new Intl.NumberFormat('en_US')` throws `RangeError` on the POSIX form. `createNumberFormat` now tries the tag, then its language subtag, then `en`, and `getLabels` reads the language across `-` or `_`.
+
+3. **`renderElement` silently dropped a ref.** When the render element carried its own ref, the component's ref was discarded, so `<Button render={<Link ref={mine} />}>` left the component unable to see its own root. Both refs are composed now, including the React 19 cleanup form, and an object ref is cleared on unmount. The old test asserted the element's ref *won*, which encoded the defect; it now asserts composition.
+
+4. **`useControllableState` behaved differently in production.** The controlled-or-uncontrolled ref was only refreshed inside the `NODE_ENV !== 'production'` branch, so a production build kept the mount-time value forever while development followed the switch. The ref is updated unconditionally and only the warning is dev-only.
+
+5. **The theme script set no mode at all when storage was blocked.** One `try` wrapped everything, so a `localStorage` read that throws - Safari private mode, blocked site data - skipped the `prefers-color-scheme` fallback entirely and left `data-theme` unset, giving a dark-preferring reader a light page. The read now has its own `try`, so a storage failure still falls through to the media query.
+
+6. **`clampToStep` drifted.** `min + steps * step` makes `0.1 + 2 * 0.1` render as `0.30000000000000004` in the DOM. The result is rounded to the decimal places that `min` and `step` are written with.
+
+7. **`DISABLED` only styled `:disabled`.** R-5.7-6 marks anything that is not a real form control with `data-disabled`, so a disabled anchor or div had no disabled styling at all. It now carries both.
+
+8. **The duplicate-key warning fired on every scroll**, because it sat inside a memo that recomputes per scroll position. It is now warned once per key.
+
+**Also:** `clamp.ts` had no test file, while R-5.7-7 names a unit test as its enforcement - the same class of gap as the 23 rules corrected earlier the same day. It now has twelve tests, covering `NaN`, both infinities, an inverted range, a zero-width range, a non-finite step, and the cases where the last step would overshoot `max`.
+
+**Rejected after trying it.** Caching one `MediaQueryList` per query in `useAdaptiveMode` broke three adaptive tests, because a module-level cache outlives a stubbed `matchMedia` and silently serves the first test's object to every later one. Making the hook untestable is not worth saving a `matchMedia` call, so only the useful half was kept: when the mode is forced the hook no longer subscribes to a query it never reads.
+
+**Affects** `src/shared/labels/get-labels.ts`, `src/shared/render.ts`, `src/shared/use-controllable-state.ts`, `src/shared/theme/script.ts`, `src/shared/clamp.ts`, `src/shared/classes.ts`, `src/shared/collection/use-collection.ts`, `src/shared/adaptive/use-adaptive-mode.ts` and their tests.
+
+---
+
 ## 2026-10-05 - What a 113-agent review found, and the rule file stops overstating itself
 
 **Decision.** Everything below was found by adversarially reviewing the repo against itself, confirmed by reproducing it, and fixed with a test that fails if the fix is reverted. 74 findings were confirmed and 34 refuted; the seven rated high are all fixed.

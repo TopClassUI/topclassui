@@ -56,11 +56,14 @@ describe('renderElement', () => {
     expect(order).toEqual(['theirs', 'ours'])
   })
 
-  it('an explicit ref on the render element wins', () => {
+  it('composes both refs rather than dropping either', () => {
     const ourRef = { current: null }
     const theirRef = { current: null }
     const el = renderElement(<a ref={theirRef} />, { ref: ourRef })
-    expect((el.props as { ref: unknown }).ref).toBe(theirRef)
+    const composed = (el.props as { ref: unknown }).ref
+    expect(composed).not.toBe(theirRef)
+    expect(composed).not.toBe(ourRef)
+    expect(typeof composed).toBe('function')
   })
 
   it('uses the component ref when the element has none', () => {
@@ -71,5 +74,15 @@ describe('renderElement', () => {
 
   it('rejects anything that is not an element', () => {
     expect(() => renderElement('nope' as never, {})).toThrow(TypeError)
+  })
+})
+
+describe('an empty className', () => {
+  it('emits no class attribute at all', () => {
+    expect(html(renderElement(<div className="" />, {}))).not.toContain('class=')
+  })
+
+  it('still emits the merged class when there is one', () => {
+    expect(html(renderElement(<div className="" />, { className: 'text-body' }))).toContain('class="text-body"')
   })
 })

@@ -108,7 +108,7 @@ Every docs page except the components page and the home page was reviewed line b
 
 ## The code, as of 3 October
 
-`pnpm check` runs all nine gates and is green: **593 tests in 28 files**, lint, typecheck, `check-structure`, `check-boundaries`, `check-css`, `check-icons`, `check-contrast`, `rules:sync --check`.
+`pnpm check` runs all nine gates and is green: **619 tests in 30 files**, lint, typecheck, `check-structure`, `check-boundaries`, `check-css`, `check-icons`, `check-contrast`, `rules:sync --check`.
 
 | Done | What it is |
 |---|---|
@@ -121,7 +121,7 @@ Every docs page except the components page and the home page was reviewed line b
 
 Deliberate departures from PLAN.md sections 4, 6 and 7 are recorded in `docs/DECISIONS.md` (the `@source "./shared"` line, the RTL-correct safe-area insets, `check-css` in place of stylelint, and `color-scheme` moved into `@layer base`).
 
-**Reviewed hard on 5 October.** 113 agents reviewed everything except the icons; 74 findings confirmed, 34 refuted, and all seven rated high are fixed. The 5 October DECISIONS entry has the detail. The one that matters most: `FOCUS_RING` painted no ring at all, so R-5.6-1 was false for every component. A backlog of about 45 low and cosmetic findings is not yet done.
+**Reviewed hard on 5 October.** 113 agents reviewed everything except the icons; 74 findings confirmed, 34 refuted, and all seven rated high are fixed. The 5 October DECISIONS entry has the detail. The one that matters most: `FOCUS_RING` painted no ring at all, so R-5.6-1 was false for every component. Eight more were fixed on 5 October, including two that crashed and one that behaved differently in production; about 35 low and cosmetic findings remain.
 
 **Open, for Omar to decide:** PLAN 5.3 says `:lang(ar)` sets the Arabic font *and* line-height, but 6.2 omits line-height and names no value. It changes the rhythm of every Arabic page, so the number is a design call, not a default to guess.
 

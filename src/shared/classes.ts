@@ -56,5 +56,9 @@ export const TOGGLE_SIZE = {
 export const SCROLL_AREA = 'overflow-y-auto overscroll-contain'
 
 /** Disabled is opacity plus no pointer events; loading keeps full colour so it never reads as disabled. */
-export const DISABLED = 'disabled:pointer-events-none disabled:opacity-50'
+// data-disabled too: R-5.7-6 uses it for anything that is not a real form control.
+export const DISABLED = [
+  'disabled:pointer-events-none disabled:opacity-50',
+  'data-disabled:pointer-events-none data-disabled:opacity-50',
+].join(' ')
 export const LOADING = 'aria-busy:cursor-progress aria-busy:opacity-100'

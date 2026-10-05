@@ -114,6 +114,8 @@ export function useCollection<T>(props: CollectionProps<T>): UseCollectionResult
   const start = virtualized ? windowed.start : 0
   const end = virtualized ? windowed.end : count
 
+  const warnedKeys = useRef<Set<string>>(new Set())
+
   // A duplicate key would make React reuse the wrong row, so the second is dropped.
   const rows = useMemo(() => {
     const seen = new Set<string>()
@@ -123,7 +125,9 @@ export function useCollection<T>(props: CollectionProps<T>): UseCollectionResult
       if (item === undefined) continue
       const key = getKey(item)
       if (seen.has(key)) {
-        if (process.env['NODE_ENV'] !== 'production') {
+        // Warned once per key, not once per render: this memo recomputes on every scroll.
+        if (process.env['NODE_ENV'] !== 'production' && !warnedKeys.current.has(key)) {
+          warnedKeys.current.add(key)
           console.warn(`useCollection: duplicate key "${key}" at index ${String(i)}; the row was dropped.`)
         }
         continue

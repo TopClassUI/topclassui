@@ -10,6 +10,8 @@ export const THEME_STORAGE_KEY = 'tc-theme'
  * dynamic, which costs caching and SEO.
  */
 export const THEME_SCRIPT =
-  `(function(){try{var m=["light","dark","ocean"];var t=localStorage.getItem('tc-theme');` +
+  `(function(){try{var m=["light","dark","ocean"];var t=null;` +
+  // Its own try: a blocked localStorage threw past the fallback and set no mode at all.
+  `try{t=localStorage.getItem('tc-theme')}catch(e){}` +
   `if(!t||t==='system'||m.indexOf(t)<0){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}` +
   `document.documentElement.dataset.theme=t}catch(e){}})()`

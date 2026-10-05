@@ -20,12 +20,15 @@ export function useControllableState<T>(options: {
   const onChangeRef = useRef(onChange)
   onChangeRef.current = onChange
 
+  // Updated outside the dev branch, or production keeps the mount-time value forever.
   const controlledRef = useRef(isControlled)
-  if (process.env['NODE_ENV'] !== 'production' && controlledRef.current !== isControlled) {
-    console.warn(
-      `A component switched from ${controlledRef.current ? 'controlled' : 'uncontrolled'} to ` +
-        `${isControlled ? 'controlled' : 'uncontrolled'}. Pass the prop from the first render, or never.`,
-    )
+  if (controlledRef.current !== isControlled) {
+    if (process.env['NODE_ENV'] !== 'production') {
+      console.warn(
+        `A component switched from ${controlledRef.current ? 'controlled' : 'uncontrolled'} to ` +
+          `${isControlled ? 'controlled' : 'uncontrolled'}. Pass the prop from the first render, or never.`,
+      )
+    }
     controlledRef.current = isControlled
   }
 
