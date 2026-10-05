@@ -13,7 +13,8 @@ describe('the schema is the documentation', () => {
   const keys = Object.keys(buttonSchema.shape)
 
   it('covers every design prop', () => {
-    expect(keys.sort()).toEqual(Object.keys(BUTTON_DEFAULTS).sort())
+    // Named, or a key dropped from BUTTON_DEFAULTS drops from the expectation too.
+    expect(keys.sort()).toEqual(['fullWidth', 'loading', 'size', 'tone', 'variant'])
   })
 
   it('converts to JSON Schema at all', () => {

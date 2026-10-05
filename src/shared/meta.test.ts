@@ -49,9 +49,9 @@ describe('every meta.ts answers to one contract', () => {
       const loaded = await import(`../components/${slug}/meta.ts`) as { meta?: ComponentMeta }
       const meta = loaded.meta
       if (!meta) return
+      // A split or client folder calling itself server would make the 0 KB claim false.
       const files = readdirSync(join(COMPONENTS, slug))
-      const client = files.includes('client.tsx')
-      expect(meta.rendering === 'server', `${slug} has client.tsx`).toBe(!client)
+      if (files.includes('client.tsx')) expect(meta.rendering, slug).not.toBe('server')
     })
 
     it(`${slug} is not called stable while PLAN 20 is unfinished`, async () => {

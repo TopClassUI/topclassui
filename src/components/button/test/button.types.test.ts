@@ -1,3 +1,5 @@
+import type { ReactElement } from 'react'
+
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import type { Size } from '#shared/contracts/size.js'
@@ -103,5 +105,29 @@ describe('the schema', () => {
     expect(BUTTON_DEFAULTS.size).toBe('md')
     expect(BUTTON_DEFAULTS.variant).toBe('solid')
     expect(BUTTON_DEFAULTS.tone).toBe('primary')
+  })
+})
+
+describe('render changes the element, so the element decides the attributes', () => {
+  /** Assignable means the compiler would accept that call. */
+  type Given<Props> = Props extends ButtonProps ? true : false
+
+  it('takes the button attributes when it really is a button', () => {
+    expectTypeOf<Given<{ type: 'submit'; name: 'n'; value: 'v'; form: 'f' }>>().toEqualTypeOf<true>()
+    expectTypeOf<Given<{ formAction: '/x' }>>().toEqualTypeOf<true>()
+  })
+
+  it('refuses them once render makes it something else', () => {
+    expectTypeOf<Given<{ render: ReactElement; type: 'submit' }>>().toEqualTypeOf<false>()
+    expectTypeOf<Given<{ render: ReactElement; name: 'n' }>>().toEqualTypeOf<false>()
+    expectTypeOf<Given<{ render: ReactElement; value: 'v' }>>().toEqualTypeOf<false>()
+    expectTypeOf<Given<{ render: ReactElement; form: 'f' }>>().toEqualTypeOf<false>()
+    expectTypeOf<Given<{ render: ReactElement; formAction: '/x' }>>().toEqualTypeOf<false>()
+  })
+
+  it('keeps the attributes every element has, with or without render', () => {
+    expectTypeOf<Given<{ render: ReactElement; id: 'x'; className: 'c' }>>().toEqualTypeOf<true>()
+    expectTypeOf<Given<{ render: ReactElement; disabled: true; loading: true }>>().toEqualTypeOf<true>()
+    expectTypeOf<Given<{ render: ReactElement; tone: 'danger'; size: 'lg' }>>().toEqualTypeOf<true>()
   })
 })

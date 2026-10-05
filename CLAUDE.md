@@ -8,7 +8,7 @@ Read docs/STATUS.md first for where things stand. The full specification is docs
 
 ```
 pnpm check            every gate below, in order
-pnpm lint             eslint, including the seven custom rules
+pnpm lint             eslint, including the eight custom rules
 pnpm typecheck        tsc --noEmit
 pnpm test             vitest, four projects: node, dom, rsc, ssr
 pnpm check:structure  the folder contract and file sizes
@@ -16,12 +16,15 @@ pnpm check:boundaries the server and client rules
 pnpm check:css        cascade layers, token references, one-line comments in CSS
 pnpm check:icons      the generated icon modules still match raw/
 pnpm check:contrast   AA contrast in every mode
+pnpm test:e2e         playwright: target size, the focus ring and axe, in a real browser
 pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from this file
 pnpm icons:build      regenerate the icon modules from raw/
 pnpm new:component x  scaffold a component folder that already passes pnpm check
+pnpm test:mutation    break the code on purpose; a surviving mutation is a test measuring nothing
+pnpm harness:build    the static demo pages test:e2e measures
 ```
 
-Not built yet, so do not run them: `pnpm test:visual`, `pnpm test:e2e`, `pnpm size`.
+Not built yet, so do not run them: `pnpm test:visual`, `pnpm size`.
 They arrive with the phases that need them.
 
 ## How to work
@@ -111,8 +114,8 @@ They arrive with the phases that need them.
 
 ## 10. Accessibility
 
-- **R-5.6-1** Keyboard behaviour follows the ARIA Authoring Practices; a visible `focus-visible` ring on every interactive element; types enforce labels. _(manual; axe is not in the repo yet)_
-- **R-5.6-2** Every interactive element is at least 24x24 CSS px on every pointer type and 44px under `pointer-coarse`. The floor is a px token with a px fallback, never a rem step, because the success criterion is written in CSS px. _(unit tests on TOUCH_TARGET and the compiled rule; the measured size still needs Playwright)_
+- **R-5.6-1** Keyboard behaviour follows the ARIA Authoring Practices; a visible `focus-visible` ring on every interactive element; types enforce labels. _(e2e/focus-ring.spec for the ring and e2e/axe.spec for the rest; the keyboard paths of R-5.6-3 are still manual)_
+- **R-5.6-2** Every interactive element is at least 24x24 CSS px on every pointer type and 44px under `pointer-coarse`. The floor is a px token with a px fallback, never a rem step, because the success criterion is written in CSS px. _(e2e/target-size.spec, which measures every interactive box in a real browser at both pointer types)_
 - **R-5.6-3** Slider, Drawer and Toast swipe, Carousel, Resizable, sortable lists and the editor kit each provide a keyboard or button path to the same result. _(manual; the keyboard tests do not exist yet)_
 - **R-5.6-4** 4.5:1 for text, including a tone's text colour on its own soft tint; 3:1 for `--tc-line-strong`, `--tc-ring` and icons. `--tc-line` is decorative and exempt. _(check-contrast)_
 

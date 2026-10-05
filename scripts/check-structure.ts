@@ -75,6 +75,16 @@ function checkComponentFolder(dir: string, slug: string) {
   const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name)
 
   if (!files.includes('index.tsx')) errors.push(`${rel(dir)}: index.tsx is required (R-8.1-1).`)
+  if (!files.includes('meta.ts')) errors.push(`${rel(dir)}: meta.ts is required (R-8.1-2).`)
+
+  // R-8.1-1 names index.test.tsx as required, so a folder can never ship untested.
+  const ownTests = files.filter((f) => /\.test\.tsx?$/.test(f))
+  const folderTests = dirs.includes('test')
+    ? listDir(join(dir, 'test')).filter((e) => e.isFile() && /\.test\.tsx?$/.test(e.name))
+    : []
+  if (ownTests.length + folderTests.length === 0) {
+    errors.push(`${rel(dir)}: has no test file, in the folder or in test/ (R-8.1-1).`)
+  }
 
   for (const name of [...files, ...dirs]) {
     const replacement = RESERVED.get(name)

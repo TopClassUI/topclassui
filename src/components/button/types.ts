@@ -19,16 +19,26 @@ export type ButtonVariantProps = Pick<ButtonDesignProps, 'variant' | 'tone' | 's
   class?: string | undefined
 }
 
+/** The attributes only a real `<button>` has; an anchor or a div must not take them. */
+type NativeOnly =
+  'type' | 'name' | 'value' | 'form'
+  | 'formAction' | 'formEncType' | 'formMethod' | 'formNoValidate' | 'formTarget'
+
 // R-5.7-4: the element form only, so it resolves without a hook in a Server Component.
 export interface RenderProp {
   /** Render as another element, for example a framework link. */
   render?: ReactElement | undefined
 }
 
-export interface ButtonProps
-  extends Omit<ComponentPropsWithRef<'button'>, 'children'>, ButtonDesignProps, RenderProp {
-  children?: ReactNode | undefined
-}
+/** Declared on both halves, so the component can still destructure them. */
+type AsButton = { render?: undefined } & Pick<ComponentPropsWithRef<'button'>, NativeOnly>
+type AsSomethingElse = { render: ReactElement } & { [K in NativeOnly]?: never }
+
+export type ButtonProps =
+  Omit<ComponentPropsWithRef<'button'>, 'children' | 'render' | NativeOnly>
+  & ButtonDesignProps
+  & { children?: ReactNode | undefined }
+  & (AsButton | AsSomethingElse)
 
 /** R-8.3-4: the control's own design props, so the two cannot describe different boxes. */
 export type ButtonSkeletonProps =

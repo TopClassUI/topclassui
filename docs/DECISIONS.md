@@ -6,6 +6,28 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-05 - The guarantees get gates: a lint rule, a mutation runner, and a real browser
+
+**Decision.** Five weaknesses that no reviewer raised, because they are about the shape of the project rather than its code. Each is now enforced rather than remembered.
+
+1. **The mistake that caught me seven times is an ESLint rule.** `topclass/no-derived-expectations` is the eighth custom rule: inside a `*.test.ts(x)` file, the expectation side of `toEqual`, `toContain`, `toHaveLength`, `toBe` and `toStrictEqual` may not be `CONSTANT.split(' ')`, `Object.keys/values/entries(CONSTANT)` of an imported binding, or `readdirSync(...)`. A local fixture built in the test file is fine; so is splitting the value under test on the *actual* side. It found a real instance the moment it was switched on - `button.schema.test.ts` compared the schema's keys against `Object.keys(BUTTON_DEFAULTS)`, so dropping a design prop would have dropped it from both sides. Twelve fixture tests, seven rejected forms and five allowed ones.
+
+2. **`check-structure` now requires `meta.ts` and at least one test** in every component folder, which PLAN 8.1 lists as required and nothing enforced. Turning it on failed immediately: **`svg` is a tier-1 catalog row and had no test of its own** - it was covered only incidentally by Icon's tests. It now has 19, including the empty-path case, the labelled and decorative branches, and the directional flip. `icon`, `svg` and `icon-registry` gained the `meta.ts` they were missing; `icon-registry` is honestly `rendering: 'client'`, and the contract test's rendering cross-check was softened to the direction that matters - a folder with `client.tsx` may not call itself `server`, because that is what would make the 0 KB claim false.
+
+3. **`render` now decides which attributes exist.** `<Button render={<a/>} name="n" value="v" form="f" type="submit">` type-checked and rendered all four onto an anchor. `ButtonProps` is a union: the native half carries the button-only attributes, the rendered half declares each of them `?: never`, which keeps them destructurable while making them impossible to pass. Nine `expectTypeOf` cases prove both halves. This is the shape all 46 components will use.
+
+4. **Mutation testing is `pnpm test:mutation`.** Every mutation run in this session was a throwaway script; the finding that mattered most - that a test can pass while measuring nothing - deserves a command. `scripts/mutations/index.ts` holds 30 rows, each a behaviour some test claims to protect and most of them a real survivor from this week. The runner copies the repo to a temp directory, applies one mutation, runs the suite, and fails if it still passes. It also fails when a mutation's anchor text no longer exists, because a mutation that matches nothing tests nothing - the same failure mode as the gates it guards. All 30 are caught.
+
+5. **Playwright and axe are in, three phases early.** PLAN 19 puts them in Phase 7; that would mean 45 components finished against unmeasured promises. Five lines of PLAN 20 need a browser, and three of them can be measured today without the docs app: `scripts/build-harness.tsx` renders every demo to a static page with the real compiled stylesheet - 60 pages, 10 demos across three modes and both directions - and `e2e/` measures them. Target size is now measured on every interactive box at both pointer types rather than asserted on a class name; the focus ring is proven to paint by reading the computed outline after a real Tab; and axe runs over all 60 pages, scoped to the demo because landmarks and document structure belong to the docs app. 84 tests, all passing. `pnpm check` has a tenth gate.
+
+**Dependencies added**, all `devDependencies`, so the published package is unchanged: `@playwright/test` with `playwright` (~19 MB) and `axe-core` with `@axe-core/playwright` (~2.4 MB). Chromium is already in the container; `playwright.config.ts` points at it with `executablePath` rather than downloading a second copy, guarded by an `existsSync` so a normal machine still works.
+
+**Still not done, and said plainly.** The visual matrix of PLAN 20 - the screenshots compared against Figma - is not built. That needs baselines and a Figma parity decision, not just a browser. The 0 KB measurement still needs the docs app's `/preview` route. Button therefore stays `status: 'beta'`.
+
+**Affects** `eslint-rules/`, `eslint.config.ts`, `scripts/check-structure.ts`, `scripts/{mutate.ts,mutations/,lib/mutate.ts,lib/harness.ts,build-harness.tsx}`, `playwright.config.ts`, `e2e/`, `src/components/{icon,svg,icon-registry}/meta.ts`, `src/components/svg/svg.test.tsx`, `src/components/button/types.ts`, `package.json`, `tsconfig.json` and `docs/RULES.md`.
+
+---
+
 ## 2026-10-05 - 85 mutations against the new tests; 23 got through, and six of them were one mistake
 
 **Decision.** The sixth reviewer attacked the rewritten tests with 85 mutations rather than reading them. 62 were caught. The 23 that survived are fixed, and all 23 were replayed against the fix before this entry was written. The kill rate was 73%; it is now 100% of what was thrown.

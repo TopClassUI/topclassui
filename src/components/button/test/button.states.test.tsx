@@ -76,7 +76,8 @@ describe('disabled', () => {
 })
 
 describe('an element that is not a button', () => {
-  const link = (props: ButtonProps = {}) =>
+  // Narrowed on purpose: the type now refuses button-only attributes on an anchor.
+  const link = (props: { disabled?: boolean; loading?: boolean } = {}) =>
     markup(<Button render={<a href="/x" />} {...props}>Go</Button>)
 
   it('gets the ARIA pair instead of a disabled attribute, which an anchor has not', () => {

@@ -8,7 +8,7 @@ Last updated: 5 October 2026 (coding in progress, Phase 3 finished).
 
 ## The one-line version
 
-The design system and the documentation site exist in Figma. **Coding has started**: the repo scaffold, the custom ESLint rules, the check scripts, `shared/`, the design tokens, the 84 icons and **Button** are done and `pnpm check` is green. Next is Phase 4, forms.
+The design system and the documentation site exist in Figma. **Coding has started**: the repo scaffold, the custom ESLint rules, the check scripts, `shared/`, the design tokens, the 84 icons and **Button** are done and `pnpm check` is green across ten gates, including Playwright and axe. Next is Phase 4, forms.
 
 ## The product, in the words the site uses
 
@@ -108,12 +108,12 @@ Every docs page except the components page and the home page was reviewed line b
 
 ## The code, as of 5 October
 
-`pnpm check` runs all nine gates and is green: **1052 tests in 49 files**, lint, typecheck, `check-structure`, `check-boundaries`, `check-css`, `check-icons`, `check-contrast`, `rules:sync --check`.
+`pnpm check` runs all ten gates and is green: **1102 unit tests in 50 files plus 84 browser tests**, lint, typecheck, `check-structure`, `check-boundaries`, `check-css`, `check-icons`, `check-contrast`, `rules:sync --check`.
 
 | Done | What it is |
 |---|---|
 | Scaffold | One package `topclassui`, `private: true`, `0.0.0`. Exact pins. TypeScript **6.0.3**, not 7.x, because typescript-eslint caps at `<6.1.0`. happy-dom, not jsdom, which needs a newer Node than the 22.14 floor. |
-| ESLint rules | Seven custom rules in `eslint-rules/`, the thing the library actually sells: `logical-properties-only`, `semantic-classes-only`, `no-dynamic-class-names`, `shared-class-constants`, `no-enum`, `one-line-comments`, `icon-loaders-stay-server`. Fixture tests prove each one fires and that correct code passes, including every import form for the last one. |
+| ESLint rules | Eight custom rules in `eslint-rules/`, the thing the library actually sells: `logical-properties-only`, `semantic-classes-only`, `no-dynamic-class-names`, `shared-class-constants`, `no-enum`, `one-line-comments`, `icon-loaders-stay-server`, `no-derived-expectations`. Fixture tests prove each one fires and that correct code passes, including every import form for the last one. |
 | Check scripts | `check-structure`, `check-boundaries`, `check-css`, `check-contrast`, `rules-sync`. Shared predicates live in `scripts/lib/` and are tested against **LF and CRLF** both. The scripts were themselves audited and five silent-failure defects fixed; see the 3 October DECISIONS entry. CSS is parsed by one string-aware walker, `scripts/lib/css-parse.ts`, because both regex parsers could be made to pass while measuring nothing. |
 | `shared/` | `cn()` on `extendTailwindMerge`, `classes.ts`, the size contract split so `resolveIconSize` never pulls zod into the bundle, `renderElement`, `toSideAlign`, `useCollection` with windowing, labels in English and Arabic with real `Intl.PluralRules`, `TopClassProvider`, the theme script. |
 | Icons | The 84 starter icons of `docs/icons.md`, one generated module each from `raw/`. `pnpm icons:build` writes them, `pnpm check:icons` proves they still match, and the build fails if `raw/` and the doc disagree or if the 16 directional icons drift from the doc's table. One renderer, `<Svg icon={data}>`; the server `<Icon name>` is the only async, `server-only` file; `icon-registry` is its synchronous browser twin with `registerIcons()`. A wrong name is a type error. The loader map is kept out of every browser bundle by an ESLint rule and a test, both proven against a planted leak. |

@@ -22,6 +22,7 @@ const config = [
       'topclass/no-enum': 'error',
       'topclass/one-line-comments': 'error',
       'topclass/icon-loaders-stay-server': 'error',
+      'topclass/no-derived-expectations': 'error',
     },
   },
 ] as unknown as Linter.Config[]
@@ -30,8 +31,8 @@ function lint(code: string, filename = 'fixture.tsx') {
   return linter.verify(code, config, filename)
 }
 
-function ids(code: string) {
-  return lint(code).map((m) => m.ruleId)
+function ids(code: string, filename?: string) {
+  return lint(code, filename).map((m) => m.ruleId)
 }
 
 describe('classes that must fail', () => {
@@ -250,5 +251,44 @@ describe('gaps the general review found', () => {
     passes('ps-4 me-2 text-start border-s rounded-s-control')
     passes('bg-primary-solid text-body border-line')
     passes('h-control-md rounded-box')
+  })
+})
+
+describe('a test expectation is named, never derived from what it tests', () => {
+  const RULE = 'topclass/no-derived-expectations'
+  const test = (code: string) => ids(`import { CONSTANT } from './x.js'\n${code}`, 'a.test.ts')
+
+  const derived: [string, string][] = [
+    ['splitting the constant under test', "expect(list).toEqual(CONSTANT.split(' '))"],
+    ['splitting a member of it', "expect(list).toEqual(CONSTANT.md.split(' '))"],
+    ['Object.keys of it', 'expect(keys).toEqual(Object.keys(CONSTANT))'],
+    ['Object.values of it', 'expect(v).toEqual(Object.values(CONSTANT))'],
+    ['a length taken from it', "expect(list).toHaveLength(CONSTANT.split(' ').length)"],
+    ['a directory listing', "expect(files).toEqual(readdirSync(DIR))"],
+    ['toContain on a derived list', "expect(list).toContain(CONSTANT.split(' ')[0])"],
+  ]
+
+  for (const [label, code] of derived) {
+    it(`rejects ${label}`, () => {
+      expect(test(code), code).toContain(RULE)
+    })
+  }
+
+  const named: [string, string][] = [
+    ['a literal array', "expect(list).toEqual(['h-control-md', 'px-pad-x-md'])"],
+    ['a literal string', "expect(cls).toBe('h-control-md')"],
+    ['a local fixture built in the file', "const WANTED = ['a', 'b']\nexpect(list).toEqual(WANTED)"],
+    ['splitting the value under test, which is the actual side', "expect(CONSTANT.split(' ')).toContain('x')"],
+  ]
+
+  for (const [label, code] of named) {
+    it(`allows ${label}`, () => {
+      expect(test(code), code).not.toContain(RULE)
+    })
+  }
+
+  it('leaves files that are not tests alone', () => {
+    expect(ids("import { CONSTANT } from './x.js'\nexpect(a).toEqual(CONSTANT.split(' '))", 'lib.ts'))
+      .not.toContain(RULE)
   })
 })

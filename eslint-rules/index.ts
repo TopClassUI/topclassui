@@ -275,6 +275,66 @@ const rules = {
       }
     },
   },
+
+  'no-derived-expectations': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-17-1: a test expectation is named, never derived from what it tests.' },
+      schema: [],
+      messages: {
+        derived:
+          'R-17-1: this expectation is derived from {{source}}, so deleting half of it deletes'
+          + ' half the expectation. Name the expected value literally.',
+      },
+    },
+    create(ctx: Context) {
+      const file = String(ctx.filename ?? ctx.getFilename?.() ?? '')
+      if (!/\.test\.tsx?$/.test(file)) return {}
+
+      // An imported binding is the thing under test; a literal in the file is the fixture.
+      const imported = new Set<string>()
+
+      function derivedFrom(node: Node): string | null {
+        if (!node || node.type !== 'CallExpression') return null
+        const callee = node.callee
+        const method = callee?.property?.name
+        const object = callee?.object
+
+        if (method === 'split') {
+          if (object?.type === 'Identifier' && imported.has(object.name)) return object.name
+          const root = object?.type === 'MemberExpression' ? object.object : null
+          if (root?.type === 'Identifier' && imported.has(root.name)) return root.name
+        }
+        if (['values', 'keys', 'entries'].includes(method) && callee?.object?.name === 'Object') {
+          const arg = node.arguments?.[0]
+          if (arg?.type === 'Identifier' && imported.has(arg.name)) return arg.name
+        }
+        if (callee?.name === 'readdirSync') return 'the directory listing'
+        return null
+      }
+
+      const MATCHERS = new Set(['toEqual', 'toStrictEqual', 'toContain', 'toHaveLength', 'toBe'])
+
+      return {
+        ImportDeclaration(node: Node) {
+          if (node.importKind === 'type') return
+          for (const spec of node.specifiers ?? []) {
+            if (spec.importKind === 'type') continue
+            if (spec.local?.name) imported.add(spec.local.name)
+          }
+        },
+        CallExpression(node: Node) {
+          if (!MATCHERS.has(node.callee?.property?.name)) return
+          for (const arg of node.arguments ?? []) {
+            const source = derivedFrom(arg)
+              ?? derivedFrom(arg?.callee?.object)
+              ?? (arg?.type === 'MemberExpression' ? derivedFrom(arg.object) : null)
+            if (source) ctx.report({ node: arg, messageId: 'derived', data: { source } })
+          }
+        },
+      }
+    },
+  },
 }
 
 export default { rules } satisfies ESLint.Plugin

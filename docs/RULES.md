@@ -10,7 +10,7 @@ Each rule has an id, one line of rule, one line of reason, and what enforces it.
 
 ```
 pnpm check            every gate below, in order
-pnpm lint             eslint, including the seven custom rules
+pnpm lint             eslint, including the eight custom rules
 pnpm typecheck        tsc --noEmit
 pnpm test             vitest, four projects: node, dom, rsc, ssr
 pnpm check:structure  the folder contract and file sizes
@@ -18,12 +18,15 @@ pnpm check:boundaries the server and client rules
 pnpm check:css        cascade layers, token references, one-line comments in CSS
 pnpm check:icons      the generated icon modules still match raw/
 pnpm check:contrast   AA contrast in every mode
+pnpm test:e2e         playwright: target size, the focus ring and axe, in a real browser
 pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from this file
 pnpm icons:build      regenerate the icon modules from raw/
 pnpm new:component x  scaffold a component folder that already passes pnpm check
+pnpm test:mutation    break the code on purpose; a surviving mutation is a test measuring nothing
+pnpm harness:build    the static demo pages test:e2e measures
 ```
 
-Not built yet, so do not run them: `pnpm test:visual`, `pnpm test:e2e`, `pnpm size`.
+Not built yet, so do not run them: `pnpm test:visual`, `pnpm size`.
 They arrive with the phases that need them.
 
 ## How to work
@@ -303,12 +306,12 @@ They arrive with the phases that need them.
 ### R-5.6-1 WCAG 2.2 AA
 **Rule:** keyboard behaviour follows the ARIA Authoring Practices; a visible `focus-visible` ring on every interactive element; types enforce labels.
 **Why:** it is a promise of the library, not an extra.
-**Enforced by:** manual; `axe` is not in the repo yet
+**Enforced by:** `e2e/focus-ring.spec.ts` for the ring and `e2e/axe.spec.ts` for the rest; the keyboard paths of R-5.6-3 are still manual
 
 ### R-5.6-2 Target size
 **Rule:** every interactive element is at least 24x24 CSS px on every pointer type and 44px under `pointer-coarse`. The floor is a px token with a px fallback, never a rem step, because the success criterion is written in CSS px.
 **Why:** WCAG 2.5.8.
-**Enforced by:** unit tests on `TOUCH_TARGET` and the compiled rule; the measured size still needs Playwright
+**Enforced by:** `e2e/target-size.spec.ts`, which measures every interactive box in a real browser at both pointer types
 
 ### R-5.6-3 Every drag has an alternative
 **Rule:** Slider, Drawer and Toast swipe, Carousel, Resizable, sortable lists and the editor kit each provide a keyboard or button path to the same result.

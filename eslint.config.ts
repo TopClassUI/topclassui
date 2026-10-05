@@ -28,6 +28,7 @@ export default defineConfig(
       'topclass/no-enum': 'error',
       'topclass/one-line-comments': 'error',
       'topclass/icon-loaders-stay-server': 'error',
+      'topclass/no-derived-expectations': 'error',
 
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/ban-ts-comment': 'error',
