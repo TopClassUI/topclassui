@@ -24,6 +24,10 @@ pnpm test:mutation    break the code on purpose; a surviving mutation is a test 
 pnpm harness:build    the static demo pages test:e2e measures
 ```
 
+`pnpm check` runs `test:e2e`, which cannot launch a browser it has not downloaded.
+Once per machine: `npx playwright install chromium`. `pnpm test:mutation` is not in
+`pnpm check`, because it runs the whole suite once per mutant; CI runs it as its own job.
+
 Not built yet, so do not run them: `pnpm test:visual`, `pnpm size`.
 They arrive with the phases that need them.
 

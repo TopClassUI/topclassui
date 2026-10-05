@@ -35,4 +35,26 @@ jobs:
             exit 1
           fi
 
+      # pnpm check runs test:e2e, which cannot launch a browser that is not downloaded.
+      - name: Playwright browsers
+        run: npx playwright install --with-deps chromium
+
       - run: pnpm check
+
+  mutation:
+    name: the gate on the gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # A test suite that passes while the code is wrong is the failure this catches.
+      - run: pnpm test:mutation

@@ -1,6 +1,7 @@
 // pnpm harness:build - writes one static page per demo, mode and direction.
 import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 import { renderToStaticMarkup } from 'react-dom/server'
 import type { ComponentType } from 'react'
@@ -20,7 +21,8 @@ const demos: Array<{ name: string; body: string }> = []
 for (const folder of folders) {
   const dir = join(COMPONENTS, folder, 'dummy')
   for (const file of readdirSync(dir).filter((f) => f.endsWith('.tsx')).sort()) {
-    const loaded = await import(join(dir, file)) as { default: ComponentType }
+    // A file URL, or Node rejects a Windows path: 'Received protocol c:'.
+    const loaded = await import(pathToFileURL(join(dir, file)).href) as { default: ComponentType }
     demos.push({ name: `${folder}--${file.slice(0, -4)}`, body: renderToStaticMarkup(<loaded.default />) })
   }
 }

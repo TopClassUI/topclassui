@@ -1,7 +1,7 @@
 // pnpm test:mutation - the gate on the gates. See scripts/mutations/index.ts.
 import { cpSync, mkdtempSync, readFileSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { join, sep } from 'node:path'
 import { spawnSync } from 'node:child_process'
 
 import { type Outcome, readAnchors, summarise } from './lib/mutate.js'
@@ -29,11 +29,15 @@ const outcomes: Outcome[] = []
 for (const mutation of chosen) {
   const dir = mkdtempSync(join(tmpdir(), 'tc-mutate-'))
   try {
+    // join, not a literal slash: on Windows the separator is \ and the filter never matched,
+    // so cpSync walked into pnpm's symlink store and failed with EPERM.
+    const skip = [join(ROOT, 'node_modules'), join(ROOT, '.git'), join(ROOT, '.harness')]
     cpSync(ROOT, dir, {
       recursive: true,
-      filter: (src) => !src.includes(`${ROOT}/node_modules`) && !src.includes(`${ROOT}/.git`),
+      filter: (src) => !skip.some((prefix) => src === prefix || src.startsWith(prefix + sep)),
     })
-    symlinkSync(join(ROOT, 'node_modules'), join(dir, 'node_modules'))
+    // A junction needs no elevation on Windows, unlike a symlink.
+    symlinkSync(join(ROOT, 'node_modules'), join(dir, 'node_modules'), 'junction')
 
     const target = join(dir, mutation.file)
     if (mutation.to === null) unlinkSync(target)
