@@ -10,9 +10,15 @@ import { markup } from '#test/markup.js'
 const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
+/** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
+const EXPECTED = [
+  'as-link', 'custom-size', 'full-width', 'rtl', 'sizes',
+  'skeleton', 'states', 'tones', 'variants', 'with-icon',
+]
+
 describe('every demo renders on the server', () => {
-  it('finds the demo files, so an empty folder cannot pass', () => {
-    expect(files.length).toBeGreaterThan(5)
+  it('holds exactly the demos PLAN 20 asks for, so none can be deleted silently', () => {
+    expect(files).toEqual(EXPECTED)
   })
 
   for (const file of files) {
@@ -21,7 +27,8 @@ describe('every demo renders on the server', () => {
       const Demo = loaded.default
       expect(typeof Demo, file).toBe('function')
       if (!Demo) return
-      expect(markup(<Demo />), file).toContain('<')
+      // Not toContain('<'): an empty div passes that, and both parts wear the radius knob.
+      expect(markup(<Demo />), file).toContain('rounded-control')
     })
   }
 })

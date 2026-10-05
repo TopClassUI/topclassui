@@ -68,7 +68,22 @@ describe('the size maps cover the scale and read the knobs', () => {
     }
   })
 
+  /** The scale, written out, so collapsing two steps into one is a failure. */
+  const TYPE_STEP = { xs: 'text-xs', sm: 'text-sm', md: 'text-sm', lg: 'text-base', xl: 'text-base' } as const
+
+  it('gives the scale three distinct type steps, not one repeated', () => {
+    expect(new Set(Object.values(TYPE_STEP)).size).toBe(3)
+  })
+
   for (const size of real) {
+    it(`${size} is the square toggle box of its own name`, () => {
+      expect(TOGGLE_SIZE[size]).toBe(`size-toggle-${size}`)
+    })
+
+    it(`${size} carries the type step the scale names for it`, () => {
+      expect(has(CONTROL_SIZE[size], TYPE_STEP[size])).toBe(true)
+    })
+
     it(`${size} carries a height, inline padding and a type step`, () => {
       expect(has(CONTROL_SIZE[size], `h-control-${size}`)).toBe(true)
       expect(has(CONTROL_SIZE[size], `px-pad-x-${size}`)).toBe(true)
@@ -105,5 +120,12 @@ describe('hover and active read the tone variables, never a colour', () => {
   it('routes the transition through the motion knob', () => {
     expect(has(TRANSITION, 'duration-(--tc-duration)')).toBe(true)
     expect(TRANSITION).not.toMatch(/duration-\d/)
+  })
+
+  it('animates the properties a tone, a state and a press actually change', () => {
+    // Named, not derived: TRANSITION.split(' ') would shrink with the constant.
+    expect(has(TRANSITION, 'transition-[color,background-color,border-color,outline-color,opacity,translate]')).toBe(true)
+    expect(has(TRANSITION, 'ease-out')).toBe(true)
+    expect(TRANSITION).not.toContain('transition-none')
   })
 })

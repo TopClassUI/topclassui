@@ -8,9 +8,9 @@ import { declaredModes, readBlocks, resolve, tokensFor } from './tokens.js'
 /** A colour as a key, so the same reading taken twice is counted once. */
 const key = (c: Color) => `${c.l.toFixed(6)}/${c.c.toFixed(6)}/${c.h.toFixed(4)}/${c.alpha.toFixed(4)}`
 
-const MARGIN = 0.15
-const VISIBLE_STEP = 1.06
-const STATE_STEP = 1.02
+export const MARGIN = 0.15
+export const VISIBLE_STEP = 1.06
+export const STATE_STEP = 1.02
 
 /** Re-exported from the contract, so a new tone is measured without touching this file. */
 export { TONES } from '#shared/contracts/tone.js'

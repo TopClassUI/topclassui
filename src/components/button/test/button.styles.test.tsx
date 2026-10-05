@@ -11,6 +11,9 @@ import type { ButtonProps } from '../types.js'
 const html = (props: ButtonProps = {}) => markup(<Button {...props}>Save</Button>)
 const classes = (props: ButtonProps = {}) => classList(html(props))
 
+/** Written out, so collapsing two sizes onto one type step is a failure. */
+const TYPE_STEP = { xs: 'text-xs', sm: 'text-sm', md: 'text-sm', lg: 'text-base', xl: 'text-base' } as const
+
 describe('size', () => {
   for (const size of BUTTON_SIZES) {
     it(`${size} emits a height, inline padding and a type step, not only a height`, () => {
@@ -19,7 +22,7 @@ describe('size', () => {
       // Named independently of CONTROL_SIZE, or dropping a class drops the expectation too.
       expect(list, size).toContain(`h-control-${size}`)
       expect(list, size).toContain(`px-pad-x-${size}`)
-      expect(list.filter((c) => /^text-(xs|sm|base|lg|xl)$/.test(c)), size).toHaveLength(1)
+      expect(list, size).toContain(TYPE_STEP[size])
     })
 
     it(`${size} emits every class CONTROL_SIZE names for it`, () => {
@@ -114,5 +117,17 @@ describe('the shared class constants are used whole, not spot-copied', () => {
 
   it('reads the radius from the knob rather than naming a Tailwind radius', () => {
     expect(classes()).toContain('rounded-control')
+  })
+
+  it('is a centred flex row, which is what puts the spinner beside the label', () => {
+    const list = classes()
+    for (const cls of ['inline-flex', 'items-center', 'justify-center', 'gap-2']) {
+      expect(list, cls).toContain(cls)
+    }
+  })
+
+  it('keeps the label on one line at its own weight', () => {
+    expect(classes()).toContain('whitespace-nowrap')
+    expect(classes()).toContain('font-medium')
   })
 })

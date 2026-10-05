@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import { contrast, contrastRange, parseOklch } from './color.js'
-import { checkTokens, MODES } from './contrast-checks.js'
+import { MARGIN, STATE_STEP, VISIBLE_STEP, checkTokens, MODES } from './contrast-checks.js'
 import { readPalette } from './tokens.js'
 
 const palette = readPalette()
@@ -190,5 +190,48 @@ describe('the label on the hovered and pressed tint', () => {
       )
       expect(failures(broken), tone).toMatch(new RegExp(`${tone} text on its soft-active tint`))
     }
+  })
+})
+
+describe('each threshold is the number R-5.6-4 names, and each one bites', () => {
+  it('keeps the margin that absorbs browser differences', () => {
+    expect(MARGIN).toBe(0.15)
+    expect(VISIBLE_STEP).toBe(1.06)
+    expect(STATE_STEP).toBe(1.02)
+  })
+
+  // Seeded between 3 and 4.5, so lowering a 4.5 threshold to 3 stops being invisible.
+  it('fails body text that reads 4.0 on the page, which clears 3 but not 4.5', () => {
+    // Measured at 3.95 on the light page: clears 3, misses 4.5.
+    const dim = css.replace('--tc-body: var(--color-neutral-950);', '--tc-body: oklch(60% 0 0);')
+    expect(dim, 'the body declaration moved').not.toBe(css)
+    expect(failures(dim)).toMatch(/light: body on page/)
+  })
+
+  it('fails a tone label that reads 4.0 on its own fill', () => {
+    // Measured at 4.00 on the danger fill.
+    const dim = css.replace('--tc-danger-on-solid: var(--color-white);', '--tc-danger-on-solid: oklch(94% 0 0);')
+    expect(dim, 'the label declaration moved').not.toBe(css)
+    expect(failures(dim)).toMatch(/danger label on its fill/)
+  })
+
+  // Seeded between 1 and 3, which is the half of R-5.6-4 nothing used to cover.
+  it('fails a control boundary that reads 2.0, keeping the 3:1 half alive', () => {
+    // Measured at 2.23 on the light page: clears 1, misses 3.
+    const faint = css.replace(
+      '--tc-line-strong: var(--color-neutral-500);',
+      '--tc-line-strong: oklch(75% 0 0);',
+    )
+    expect(faint, 'the line-strong declaration moved').not.toBe(css)
+    expect(failures(faint)).toMatch(/light: line-strong on page/)
+  })
+
+  it('judges the worse gamut reading, measured through checkTokens itself', () => {
+    // Measured against success-soft: min 4.15, max 5.68. The clipped reading would
+    // pass the 4.65 floor, so this fails only while checkTokens takes the low end.
+    const wide = css.replace('--tc-success-on-soft: var(--color-emerald-800);',
+      '--tc-success-on-soft: oklch(46% 0.4 150);')
+    expect(wide, 'the on-soft declaration moved').not.toBe(css)
+    expect(failures(wide)).toMatch(/light: success text on its tint/)
   })
 })

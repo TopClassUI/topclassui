@@ -6,6 +6,33 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-05 - 85 mutations against the new tests; 23 got through, and six of them were one mistake
+
+**Decision.** The sixth reviewer attacked the rewritten tests with 85 mutations rather than reading them. 62 were caught. The 23 that survived are fixed, and all 23 were replayed against the fix before this entry was written. The kill rate was 73%; it is now 100% of what was thrown.
+
+**The one mistake, made six times.** The previous entry says a test derived from the constant it tests shrinks when the constant does, and that the first draft of the new size test had exactly that flaw. The fix was applied to that test and nowhere else, so the same shape survived in six more places:
+
+- `TRANSITION` could be reduced to `duration-(--tc-duration)`, or set to `transition-none`, and nothing failed. Every one of the 46 components would have stopped animating. The assertion was `constant.split(' ')`, so it shrank with the constant, and no test named the property list.
+- The whole size scale could collapse onto one type step, because the "no other size's classes" test filtered a foreign class out of its own list once two sizes shared it.
+- `TOGGLE_SIZE` could become `size-toggle-md` five times over: only its key set was checked, while `CONTROL_HEIGHT` beside it had a real per-size assertion.
+- The skeleton could reserve `w-24` at every size, because the width half of its test counted classes where the height half compared them.
+- Any four of the ten demos could be deleted, because `readdirSync` sized the loop.
+- A demo could render `<div />` and pass, because the assertion was `toContain('<')`.
+
+Each of these now names its expected value literally, beside a one-line comment saying why.
+
+**The two that mattered most.**
+
+1. **The 3:1 half of R-5.6-4 was unenforced.** Changing the comparison to `ratio < min + MARGIN && min > 4.4` deleted every `line-strong` and `ring` check, and the gate still reported 285 pairs, because `pairs++` ran before the comparison. `MARGIN` could be set to 0 and the 4.5 thresholds to 3 or to 1, all silently: the existing "thresholds bite" test seeded a colour so pale that it failed under any threshold, so it could not tell which one was in force. The thresholds are now exported and asserted directly, and three seeds are measured to land between the floors - 3.95 on the page (clears 3, misses 4.5), 4.00 on the danger fill, and 2.23 for the 3:1 pair.
+
+2. **The zod guard had no positive control.** `buildGraph` could be made to stop after one hop, or to read only the entry file's own imports, and the suite stayed green - because it only ever asserts an empty result over a codebase where nothing reaches zod. Against a real two-hop violation the crippled walk found 1 of 11 files instead of 11. `buildGraph` now has a synthetic three-file chain, a cycle and an isolated file.
+
+**Also:** `worst()` could return `contrastRange().max` instead of `.min`, undoing the gamut bracket the 3 October entry introduced, because the test that names that behaviour exercised `contrastRange` directly and never `checkTokens`; it now seeds a colour measured at min 4.15 / max 5.68 against `success-soft`, which fails only while the low end is taken. `meta.ts` could change its category, rendering, name, tier or status freely, since every field but `slug` was checked only for membership in its own list; the shared test now derives the name from the slug, cross-checks `rendering` against whether `client.tsx` exists and refuses `status: 'stable'` while PLAN 20 is open, and Button pins its own row value by value. `inline-flex`, `items-center`, `justify-center`, `gap-2`, `font-medium` and the skeleton's `animate-pulse` had no assertion anywhere - the last one making "respects reduced motion" pass vacuously, since nothing was animating. And `vitest.config.ts` could drop a project's `exclude` while `test-projects.test.ts` still proved the data symmetric, so a test now compares the config's entries against that data.
+
+**Affects** `src/shared/classes.test.ts`, `src/shared/meta.test.ts`, `src/components/button/test/`, `scripts/lib/{contrast-checks,module-graph,test-projects}.test.ts`, `scripts/lib/contrast-checks.ts` (the thresholds are exported).
+
+---
+
 ## 2026-10-05 - Six parallel reviewers find two holes in the gates that had just been written
 
 **Decision.** The 28 fixes above were themselves reviewed across six dimensions in parallel, each reviewer working in its own copy of the repo and required to reproduce a finding before reporting it. They found 2 high, 11 medium and 9 low. Everything below is fixed, and every attack was replayed against the fix.

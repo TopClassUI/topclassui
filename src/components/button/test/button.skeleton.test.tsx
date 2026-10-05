@@ -21,10 +21,14 @@ describe('ButtonSkeleton', () => {
     })
   }
 
-  it('reserves a width at every real size, or it reserves no space at all', () => {
+  /** Written out, so one width repeated across the scale is a failure. */
+  const WIDTH = { xs: 'w-16', sm: 'w-20', md: 'w-24', lg: 'w-28', xl: 'w-32' } as const
+
+  it('reserves a width that grows with the size, never one width for all five', () => {
+    expect(new Set(Object.values(WIDTH)).size).toBe(5)
     for (const size of BUTTON_SIZES) {
       const widths = classes({ size }).filter((c) => /^w-\d/.test(c))
-      expect(widths.length, size).toBe(size === 'custom' ? 0 : 1)
+      expect(widths, size).toEqual(size === 'custom' ? [] : [WIDTH[size]])
     }
   })
 
@@ -42,7 +46,9 @@ describe('ButtonSkeleton', () => {
     expect(classes({ fullWidth: true })).toContain('w-full')
   })
 
-  it('respects reduced motion', () => {
+  it('pulses, and stops pulsing for a reader who asked it to', () => {
+    // Without the first, the second passes vacuously: nothing is animating.
+    expect(classes({})).toContain('animate-pulse')
     expect(classes({})).toContain('motion-reduce:animate-none')
   })
 

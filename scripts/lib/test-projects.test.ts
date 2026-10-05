@@ -3,6 +3,7 @@ import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import config from '../../vitest.config.js'
 import { PROJECTS, SUFFIXES, globToRegExp, patternFor, projectsFor } from './test-projects.js'
 import type { Suffix } from './test-projects.js'
 
@@ -81,4 +82,21 @@ describe('the four projects are symmetric', () => {
     expect(projectsFor('src/shared/x.test.ts')).toEqual(['node'])
     expect(projectsFor('src/shared/x.test.tsx')).toEqual(['ssr'])
   })
+})
+
+describe('vitest.config.ts really consumes the project data', () => {
+  type Entry = { test?: { name?: string; include?: string[]; exclude?: string[] } }
+  const projects = (config.test?.projects ?? []) as Entry[]
+
+  it('declares one entry per project, in the same order', () => {
+    expect(projects.map((p) => p.test?.name)).toEqual(PROJECTS.map((p) => p.name))
+  })
+
+  for (const project of PROJECTS) {
+    it(`${project.name} is given both its include and its exclude`, () => {
+      const entry = projects.find((p) => p.test?.name === project.name)
+      expect(entry?.test?.include, project.name).toEqual(project.include)
+      expect(entry?.test?.exclude, project.name).toEqual(project.exclude)
+    })
+  }
 })

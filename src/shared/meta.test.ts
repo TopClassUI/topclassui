@@ -28,7 +28,9 @@ describe('every meta.ts answers to one contract', () => {
       if (!meta) return
 
       expect(meta.slug, 'slug is the folder name, which is the docs route').toBe(slug)
-      expect(meta.name).toMatch(/^[A-Z][A-Za-z]*$/)
+      // Membership alone proves the TypeScript type and nothing about the row.
+      const pascal = slug.split('-').map((w) => `${w.charAt(0).toUpperCase()}${w.slice(1)}`).join('')
+      expect(meta.name).toBe(pascal)
       expect(CATEGORIES).toContain(meta.category)
       expect(RENDERINGS).toContain(meta.rendering)
       expect(STATUSES).toContain(meta.status)
@@ -41,6 +43,23 @@ describe('every meta.ts answers to one contract', () => {
       const meta = loaded.meta
       if (!meta) return
       if (meta.baseUi !== null) expect(meta.baseUiRange, slug).not.toBeNull()
+    })
+
+    it(`${slug} reports the rendering its folder actually has`, async () => {
+      const loaded = await import(`../components/${slug}/meta.ts`) as { meta?: ComponentMeta }
+      const meta = loaded.meta
+      if (!meta) return
+      const files = readdirSync(join(COMPONENTS, slug))
+      const client = files.includes('client.tsx')
+      expect(meta.rendering === 'server', `${slug} has client.tsx`).toBe(!client)
+    })
+
+    it(`${slug} is not called stable while PLAN 20 is unfinished`, async () => {
+      const loaded = await import(`../components/${slug}/meta.ts`) as { meta?: ComponentMeta }
+      const meta = loaded.meta
+      if (!meta) return
+      // The visual matrix and the docs page need Playwright and the docs app.
+      expect(meta.status, `${slug} claims stable before the visual matrix exists`).not.toBe('stable')
     })
   }
 })

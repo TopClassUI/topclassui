@@ -1,6 +1,10 @@
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+
 import { describe, expect, it } from 'vitest'
 
-import { blankComments, packageName, readSubpaths, valueImports } from './module-graph.js'
+import { blankComments, buildGraph, packageName, readSubpaths, valueImports } from './module-graph.js'
 
 // Every row here defeated an earlier version of this scanner.
 const CAUGHT: Array<[string, string]> = [
@@ -74,5 +78,44 @@ describe('readSubpaths', () => {
     const prefixes = readSubpaths(process.cwd()).map(([prefix]) => prefix)
     expect(prefixes).toContain('#shared/')
     expect(prefixes).toContain('#test/')
+  })
+})
+
+describe('buildGraph walks the whole chain, which is the entire point', () => {
+  // index -> variants -> schema -> zod, the shape a per-file grep cannot see.
+  const root = mkdtempSync(join(tmpdir(), 'graph-'))
+  mkdirSync(join(root, 'src'), { recursive: true })
+  writeFileSync(join(root, 'package.json'), JSON.stringify({ imports: { '#shared/*': './src/*' } }))
+  const file = (name: string, body: string) => {
+    const path = join(root, 'src', name)
+    writeFileSync(path, body)
+    return path
+  }
+  const schema = file('schema.ts', "import { z } from 'zod'\nexport const s = z")
+  const variants = file('variants.ts', "export { s } from './schema.js'\n")
+  const index = file('index.tsx', "import { s } from '#shared/variants.js'\nexport const i = s")
+  const unrelated = file('plain.ts', "export const p = 1\n")
+  const graph = buildGraph([schema, variants, index, unrelated], root)
+
+  it('reaches the far end of a three-file chain', () => {
+    expect([...graph.reachable(index)].sort()).toEqual([index, schema, variants].sort())
+  })
+
+  it('reports a package two hops away, not only a direct import', () => {
+    expect([...graph.packages(index)]).toContain('zod')
+    expect([...graph.packages(variants)]).toContain('zod')
+  })
+
+  it('leaves a file that imports nothing alone', () => {
+    expect([...graph.reachable(unrelated)]).toEqual([unrelated])
+    expect([...graph.packages(unrelated)]).toEqual([])
+  })
+
+  it('terminates on a cycle rather than hanging', () => {
+    const a = file('a.ts', "import './b.js'\n")
+    const b = file('b.ts', "import './a.js'\nimport 'zod'\n")
+    const cyclic = buildGraph([a, b], root)
+    expect([...cyclic.reachable(a)].sort()).toEqual([a, b].sort())
+    expect([...cyclic.packages(a)]).toContain('zod')
   })
 })
