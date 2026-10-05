@@ -6,6 +6,42 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-05 - The Button template closes its last 28 findings, most of them tests that proved nothing
+
+**Decision.** Every finding the 83-agent Button review left open is fixed on `feat/button`, because Button is the file 45 components copy and a weak test shape copied 45 times costs more than the component did. Each fix below was proved by mutation: the defect was reintroduced, the suite was run, and the failure was recorded. Eighteen mutations, eighteen failures.
+
+**Two were real misbehaviour, not coverage.**
+
+1. **A tone lost to the theme on the same element.** The five interaction variables (`--tc-soft`, `--tc-hover`, `--tc-active`, `--tc-soft-hover`, `--tc-soft-active`) were declared in an unlayered `:root, [data-theme]` block. CSS Cascade 5 puts unlayered normal declarations above every layer, and the `tone-*` utilities are emitted inside `@layer utilities`, so `<div data-theme="dark" class="tone-danger">` resolved to the *primary* ramp. Verified by compiling the real entry and reading the layer each declaration lands in. The five declarations now sit in `@layer base`, which `@layer utilities` outranks; the `color-mix` definitions above them stay unlayered, because nothing overrides those.
+
+2. **`loading` rendered no spinner when the render element carried its own children.** `renderElement` applied the component's children only when the element had none, so `<Button render={<a>Go</a>} loading>` dropped the spinner with them. The shared answer for every component that composes its own content with the consumer's is a third argument: `renderElement(element, props, decorate)` wraps whichever children survive. Button passes it only while loading, so the output is byte-identical otherwise.
+
+**The rest were contracts and tests.**
+
+3. **`meta.ts` had no contract.** `ComponentMeta` and `src/shared/meta.ts` were named by PLAN 8.4 and existed nowhere, so 46 hand-written `as const` objects would have drifted before anything read them. `shared/meta.ts` now declares the type plus the `CATEGORIES`, `RENDERINGS`, `STATUSES` and `TIERS` lists; Button's file is `satisfies ComponentMeta` and its keys go back to the plan's names (`baseUi`, `baseUiRange`, lower-case `category`, with `slug` restored). Its `status` is **`beta`, not `stable`**: PLAN 20 is not met while the visual matrix and the docs page do not exist. A test walks every `meta.ts` in `src/components/` and checks the slug against the folder name. The scaffold writes the same shape with a `TODO(tc)` on the category.
+
+4. **`buttonVariants` was a trap and a cost.** PLAN 8.1 exports it so a plain element can reuse the look, but its raw output carried two or three conflicting border declarations that only the component's own `cn()` resolved, and its cva signature admitted `null` where the component's props did not. Each variant now names its own border colour, so the string is conflict-free by construction, and the export is a typed function over `ButtonVariantProps` that memoises its 360 outcomes. Measured in one process on one machine: **12.26 us/call before, 0.32 us/call after**, a 38x difference on what was the largest single cost of rendering a Button.
+
+5. **The 24 px touch floor was not 24 px.** `min-h-6` compiles to `1.5rem`, and SC 2.5.8 is written in CSS px, so a consumer stylesheet with `html { font-size: 14px }` dropped the floor to 21 px. `--tc-target-min: 24px` and `--tc-target-coarse: 44px` are new tokens and `TOUCH_TARGET` reads them.
+
+6. **`tone-*` was not a tailwind-merge group**, so `cn('tone-primary', 'tone-danger')` kept both and stylesheet order decided the winner - an override that worked for two tones of six. It is now its own group, which needed `extendTailwindMerge<'tone'>` to declare the id.
+
+7. **The contrast gate measured the solid ramp's readability but not its motion.** Setting any `--tc-<tone>-hover` to its own `-solid` passed. The solid ramp now gets the same `STATE_STEP` check the soft ramp already had, which took the gate from 249 to **285 pairs**, and the mutation that used to pass now fails in all three modes.
+
+8. **The zod guard caught one of seven ways in.** It was a per-file regex for a direct `import ... from 'zod'`, while the failure mode is transitive: `types.ts` importing `schema.ts` as a value ships 104 KB to the browser. `scripts/lib/module-graph.ts` now walks the value-import graph across relative and `#` subpath specifiers, covering bare `import 'zod'`, `export ... from`, dynamic `import()` and `require()`. Both previously-missed mutations were reproduced and now fail.
+
+9. **A `*.ssr.test.ts` file would have run twice.** The node project excluded `.ssr.test.tsx` but not `.ssr.test.ts`, and `.rsc.test.ts` but not `.rsc.test.tsx`. The four projects now come from `scripts/lib/test-projects.ts`, which `vitest.config.ts` reads, and a test asserts every test file in `src/` lands in exactly one project.
+
+10. **Nine test shapes that would have been copied 45 times.** The per-variant loop asserted `inline-flex`, a base class, for every variant; 17 of 30 variant x tone cells had no assertion; the size loop measured height and not padding or the type step; the `link` variant could emit nothing; the spinner's identity and its position before the label were untested; the shared-constant block was a five-string spot check that four half-copies passed; the skeleton test asserted a string against itself rather than against `CONTROL_HEIGHT`; nothing rendered the eight demos; and two test names claimed checks their bodies did not make. Each is replaced by a table named independently of the thing it measures, which is the point: **a test derived from the constant it tests shrinks when the constant does.** The first version of the new size test had exactly that flaw and the mutation run caught it.
+
+**Also:** `CONTROL_HEIGHT` is split out of `CONTROL_SIZE` so a skeleton reads the control's height instead of copying it; `ButtonSkeleton` takes `ref`, `style` and the rest props that PLAN 20 requires of every component, and its defaults come from `BUTTON_DEFAULTS`; `buttonSchema` carries a `.meta({ description })` per field and uses the shared `sizeSchema`, which nothing had imported; `#test/*` is a new subpath so the three markup helpers live once rather than in 46 test folders; and `dummy/` gains a `custom` size demo and an RTL demo, with the tone demo widened to outline, ghost and link.
+
+**Not done, and why.** `icon` and `svg` are catalog rows (PLAN 18.2) with no `meta.ts`; `check-structure` still does not require the file, because making it mandatory would also demand one for `icon-registry`, which is an entry point rather than a catalog row. That is a folder-contract decision for Phase 4, not a Button fix.
+
+**Affects** `src/tokens.css`, `src/styles.css`, `src/styles.test.ts`, `src/shared/{classes,cn,render,meta}.ts`, `src/shared/{classes,meta,no-zod-at-runtime}.test.ts`, `src/components/button/` in full, `scripts/lib/{contrast-checks,module-graph,test-projects,scaffold}.ts`, `vitest.config.ts`, `test/markup.ts` and `package.json`.
+
+---
+
 ## 2026-10-05 - The review backlog, including two crashes and a production-only divergence
 
 **Decision.** Eight more findings from the 5 October review are fixed. Two of them crashed, one behaved differently in production than in development, and one module cited by a rule as unit-tested had no test file at all.

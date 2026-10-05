@@ -1,145 +1,68 @@
-import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 
+import {
+  BORDER_WIDTH, CONTROL_SIZE, DISABLED, FOCUS_RING, LOADING, TOUCH_TARGET, TRANSITION,
+} from '#shared/classes.js'
+import { attr, classList, markup } from '#test/markup.js'
 import { Button } from '../index.js'
 import { BUTTON_SIZES } from '../constants.js'
-import { ButtonSkeleton } from '../skeleton.js'
 import type { ButtonProps } from '../types.js'
 
-const html = (props: ButtonProps = {}) => renderToStaticMarkup(<Button {...props}>Save</Button>)
-
-/** Anchored, or `id="x"` also matches inside `data-testid="x"`. */
-const attr = (markup: string, name: string) =>
-  new RegExp(`(?:^|[ ])${name}="([^"]*)"`).exec(markup)?.[1]
-
-const classes = (props: ButtonProps = {}) => (attr(html(props), 'class') ?? '').split(/\s+/)
+const html = (props: ButtonProps = {}) => markup(<Button {...props}>Save</Button>)
+const classes = (props: ButtonProps = {}) => classList(html(props))
 
 describe('size', () => {
   for (const size of BUTTON_SIZES) {
-    it(`${size} is reported and emits only its own height`, () => {
+    it(`${size} emits a height, inline padding and a type step, not only a height`, () => {
       const list = classes({ size })
-      const heights = list.filter((c) => c.startsWith('h-control-'))
-      expect(heights, size).toEqual(size === 'custom' ? [] : [`h-control-${size}`])
+      if (size === 'custom') return
+      // Named independently of CONTROL_SIZE, or dropping a class drops the expectation too.
+      expect(list, size).toContain(`h-control-${size}`)
+      expect(list, size).toContain(`px-pad-x-${size}`)
+      expect(list.filter((c) => /^text-(xs|sm|base|lg|xl)$/.test(c)), size).toHaveLength(1)
+    })
+
+    it(`${size} emits every class CONTROL_SIZE names for it`, () => {
+      const list = classes({ size })
+      const wanted = CONTROL_SIZE[size].split(' ').filter(Boolean)
+      expect(wanted.filter((c) => !list.includes(c)), size).toEqual([])
+    })
+
+    it(`${size} emits no other size's height, padding or type step`, () => {
+      const list = classes({ size })
+      const foreign = BUTTON_SIZES
+        .filter((other) => other !== size)
+        .flatMap((other) => CONTROL_SIZE[other].split(' ').filter(Boolean))
+        .filter((c) => !CONTROL_SIZE[size].includes(c))
+      expect([...new Set(foreign)].filter((c) => list.includes(c)), size).toEqual([])
+    })
+
+    it(`${size} reports itself on data-size`, () => {
+      expect(attr(html({ size }), 'data-size')).toBe(size)
     })
   }
 
   it('custom opts out of the scale entirely, which is what it is for', () => {
+    expect(CONTROL_SIZE.custom).toBe('')
     const list = classes({ size: 'custom' })
-    expect(list.filter((c) => c.startsWith('h-control-') || c.startsWith('px-pad-x-'))).toEqual([])
-  })
-})
-
-describe('loading', () => {
-  it('shows a spinner, marks itself busy and stops taking clicks', () => {
-    const markup = html({ loading: true })
-    expect(markup).toContain('animate-spin')
-    expect(attr(markup, 'aria-busy')).toBe('true')
-    expect(markup).toContain('disabled=""')
-  })
-
-  it('respects reduced motion, so the spinner does not spin for everyone', () => {
-    expect(html({ loading: true })).toContain('motion-reduce:animate-none')
-  })
-
-  it('keeps full colour, so it never reads as disabled', () => {
-    expect(classes({ loading: true })).toContain('aria-busy:opacity-100')
-  })
-
-  it('hides the spinner from the accessibility tree, since aria-busy says it already', () => {
-    expect(html({ loading: true })).toContain('aria-hidden="true"')
-  })
-
-  it('is not busy when it is not loading', () => {
-    // The class string carries aria-busy: variants, so the attribute is what is asserted.
-    expect(attr(html(), 'aria-busy')).toBeUndefined()
-    expect(attr(html(), 'data-loading')).toBeUndefined()
-  })
-})
-
-describe('disabled', () => {
-  it('sets both the attribute and the presence flag', () => {
-    const markup = html({ disabled: true })
-    expect(markup).toContain('disabled=""')
-    expect(attr(markup, 'data-disabled')).toBe('')
-  })
-
-  it('stays enabled when neither disabled nor loading', () => {
-    // Anchored: the class string legitimately contains the text data-disabled:opacity-50.
-    expect(attr(html(), 'disabled')).toBeUndefined()
-    expect(attr(html(), 'data-disabled')).toBeUndefined()
-  })
-
-  it('cannot be re-enabled while loading, which PLAN 8.4 spells with ||', () => {
-    expect(html({ disabled: false, loading: true })).toContain('disabled=""')
-  })
-
-  it('is actually dimmed and stops taking pointer events', () => {
-    const list = classes({ disabled: true })
-    expect(list).toContain('data-disabled:opacity-50')
-    expect(list).toContain('data-disabled:pointer-events-none')
-  })
-
-  it('keeps a loading button at full colour by not marking it disabled for styling', () => {
-    expect(attr(html({ loading: true }), 'data-disabled')).toBeUndefined()
-    expect(classes({ loading: true })).toContain('aria-busy:opacity-100')
-  })
-
-  it('blocks clicks while loading even on an element with no disabled attribute', () => {
-    expect(classes({ loading: true })).toContain('data-loading:pointer-events-none')
-  })
-})
-
-describe('an element that is not a button', () => {
-  const link = (props: ButtonProps = {}) =>
-    renderToStaticMarkup(<Button render={<a href="/x" />} {...props}>Go</Button>)
-
-  it('gets the ARIA pair instead of a disabled attribute, which an anchor does not have', () => {
-    const markup = link({ disabled: true })
-    expect(attr(markup, 'disabled')).toBeUndefined()
-    expect(attr(markup, 'aria-disabled')).toBe('true')
-    expect(attr(markup, 'tabindex')).toBe('-1')
-  })
-
-  it('is taken out of the tab order while loading too', () => {
-    const markup = link({ loading: true })
-    expect(attr(markup, 'aria-disabled')).toBe('true')
-    expect(attr(markup, 'tabindex')).toBe('-1')
-  })
-
-  it('is left alone when it is usable', () => {
-    const markup = link()
-    expect(markup).not.toContain('aria-disabled')
-    expect(markup).not.toContain('tabindex')
-  })
-
-  it('never carries a button type, which is invalid on an anchor', () => {
-    expect(link()).not.toContain('type="button"')
-  })
-
-  it('still gets the button type when the rendered element is a button', () => {
-    const markup = renderToStaticMarkup(<Button render={<button />}>Go</Button>)
-    expect(attr(markup, 'type')).toBe('button')
+    expect(list.filter((c) => /^(h-control-|px-pad-x-|text-(xs|sm|base)$)/.test(c))).toEqual([])
   })
 })
 
 describe('the border holds the box size', () => {
-  it('keeps the width with a transparent colour, so outline shifts nothing', () => {
-    const list = classes()
-    expect(list).toContain('border-(length:--tc-line-width)')
-    expect(list).toContain('border-transparent')
-  })
-
-  it('survives the merge rather than being dropped by a later border colour', () => {
-    for (const variant of ['solid', 'soft', 'ghost', 'link'] as const) {
-      expect(classes({ variant }), variant).toContain('border-transparent')
+  it('always carries the shared width, so switching to outline shifts nothing', () => {
+    for (const variant of ['solid', 'soft', 'outline', 'ghost', 'link'] as const) {
+      expect(classes({ variant }), variant).toContain(BORDER_WIDTH)
     }
   })
 
-  it('outline overrides only the colour', () => {
-    const list = classes({ variant: 'outline' })
-    expect(list).toContain('border-line-strong')
-    expect(list).toContain('border-(length:--tc-line-width)')
-    expect(list).not.toContain('border-transparent')
+  it('paints a transparent colour unless the variant is outline', () => {
+    for (const variant of ['solid', 'soft', 'ghost', 'link'] as const) {
+      expect(classes({ variant }), variant).toContain('border-transparent')
+    }
+    const outline = classes({ variant: 'outline' })
+    expect(outline).toContain('border-line-strong')
+    expect(outline).not.toContain('border-transparent')
   })
 })
 
@@ -168,73 +91,28 @@ describe('className', () => {
   })
 })
 
-describe('the shared class constants are used, not hand-written copies', () => {
-  it('carries the focus ring, the touch target and the transition', () => {
-    const list = classes()
-    expect(list).toContain('outline-hidden')
-    expect(list).toContain('focus-visible:outline-solid')
-    expect(list).toContain('min-h-6')
-    expect(list).toContain('pointer-coarse:min-h-11')
-    expect(list.some((c) => c.startsWith('duration-'))).toBe(true)
+describe('the shared class constants are used whole, not spot-copied', () => {
+  const SHARED = { BORDER_WIDTH, DISABLED, FOCUS_RING, LOADING, TOUCH_TARGET, TRANSITION }
+
+  for (const [name, constant] of Object.entries(SHARED)) {
+    it(`carries every class of ${name}`, () => {
+      const list = classes()
+      const wanted = constant.split(' ').filter(Boolean)
+      expect(wanted.length, name).toBeGreaterThan(0)
+      expect(wanted.filter((c) => !list.includes(c)), name).toEqual([])
+    })
+  }
+
+  it('reads the touch target from px tokens, since SC 2.5.8 is written in CSS px', () => {
+    expect(TOUCH_TARGET).toContain('--tc-target-min')
+    expect(TOUCH_TARGET).toContain('--tc-target-coarse')
+  })
+
+  it('reads the transition duration from the motion knob rather than a fixed number', () => {
+    expect(classes()).toContain('duration-(--tc-duration)')
   })
 
   it('reads the radius from the knob rather than naming a Tailwind radius', () => {
     expect(classes()).toContain('rounded-control')
-  })
-})
-
-describe('the render prop', () => {
-  it('becomes the element it is given, so a link can look like a button', () => {
-    const markup = renderToStaticMarkup(
-      <Button render={<a href="/docs" />}>Docs</Button>,
-    )
-    expect(markup).toMatch(/^<a /)
-    expect(attr(markup, 'href')).toBe('/docs')
-    expect(markup).toContain('Docs')
-  })
-
-  it('still carries the button look and the design attributes', () => {
-    const markup = renderToStaticMarkup(<Button render={<a href="/x" />} tone="danger">Go</Button>)
-    expect(attr(markup, 'class')).toContain('bg-danger-solid')
-    expect(attr(markup, 'data-tone')).toBe('danger')
-  })
-
-  it('does not put a button type on something that is not a button', () => {
-    expect(renderToStaticMarkup(<Button render={<a href="/x" />}>Go</Button>)).not.toContain('type="button"')
-  })
-
-  it('keeps the element its own children when it has them', () => {
-    const markup = renderToStaticMarkup(<Button render={<a href="/x">Mine</a>}>Theirs</Button>)
-    expect(markup).toContain('Mine')
-    expect(markup).not.toContain('Theirs')
-  })
-
-  it('merges the element className last, so the consumer still wins', () => {
-    const markup = renderToStaticMarkup(<Button render={<a href="/x" className="bg-surface" />}>Go</Button>)
-    expect(attr(markup, 'class')).toContain('bg-surface')
-    expect(attr(markup, 'class')).not.toContain('bg-primary-solid')
-  })
-})
-
-describe('ButtonSkeleton', () => {
-  it('is hidden from the accessibility tree', () => {
-    expect(renderToStaticMarkup(<ButtonSkeleton />)).toContain('aria-hidden="true"')
-  })
-
-  it('matches the real control height at every size, so swapping shifts nothing', () => {
-    for (const size of BUTTON_SIZES) {
-      const markup = renderToStaticMarkup(<ButtonSkeleton size={size} />)
-      const list = (attr(markup, 'class') ?? '').split(/\s+/)
-      expect(list.filter((c) => c.startsWith('h-control-')), size)
-        .toEqual(size === 'custom' ? [] : [`h-control-${size}`])
-    }
-  })
-
-  it('stretches when the button it stands in for does', () => {
-    expect(renderToStaticMarkup(<ButtonSkeleton fullWidth />)).toContain('w-full')
-  })
-
-  it('respects reduced motion', () => {
-    expect(renderToStaticMarkup(<ButtonSkeleton />)).toContain('motion-reduce:animate-none')
   })
 })

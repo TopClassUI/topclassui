@@ -73,10 +73,19 @@ export function checkTokens(css: string, palette: Map<string, Color>): Report {
 
       if (!soft) { failures.push(`${mode}: --tc-${tone}-soft could not be resolved`); continue }
 
-      // A label must stay readable while the control is hovered or pressed.
+      // The solid ramp must keep stepping, or a hover that paints the resting colour passes.
+      let fill = solid
       for (const state of ['hover', 'active'] as const) {
-        const fill = get(`--tc-${tone}-${state}`)
-        check(`${mode}: ${tone} label on its ${state} fill`, onSolid && fill && worst(onSolid, fill), 4.5)
+        const next = get(`--tc-${tone}-${state}`)
+        if (!next || !fill) { failures.push(`${mode}: --tc-${tone}-${state} could not be resolved`); continue }
+        pairs++
+        const moved = worst(next, fill)
+        if (moved < STATE_STEP) {
+          failures.push(`${mode}: ${tone}-${state} does not step away from the fill before it (${moved.toFixed(3)})`)
+        }
+        // A label must stay readable while the control is hovered or pressed.
+        check(`${mode}: ${tone} label on its ${state} fill`, onSolid && worst(onSolid, next), 4.5)
+        fill = next
       }
 
       // The soft ramp must keep stepping, or hovering a tinted control does nothing.

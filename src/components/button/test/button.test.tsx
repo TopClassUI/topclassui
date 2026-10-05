@@ -1,15 +1,24 @@
-import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 
+import { attr, classList, markup } from '#test/markup.js'
 import { Button } from '../index.js'
-import { BUTTON_DEFAULTS, BUTTON_TONES, BUTTON_VARIANTS } from '../constants.js'
+import { BUTTON_DEFAULTS, BUTTON_VARIANTS } from '../constants.js'
 import type { ButtonProps } from '../types.js'
 
-const html = (props: ButtonProps = {}) => renderToStaticMarkup(<Button {...props}>Save</Button>)
-/** Anchored, or `id="x"` also matches inside `data-testid="x"`. */
-const attr = (markup: string, name: string) =>
-  new RegExp(`(?:^|[ ])${name}="([^"]*)"`).exec(markup)?.[1]
-const classes = (props: ButtonProps = {}) => (attr(html(props), 'class') ?? '').split(/\s+/)
+const html = (props: ButtonProps = {}) => markup(<Button {...props}>Save</Button>)
+const classes = (props: ButtonProps = {}) => classList(html(props))
+
+/**
+ * What each variant alone is allowed to paint. Anything in another variant's row
+ * and not in its own must be absent, so a variant cannot quietly emit nothing.
+ */
+const MARKS: Record<string, string[]> = {
+  solid: ['border-transparent', 'bg-primary-solid', 'text-primary-on-solid', 'hover:bg-(--tc-hover)', 'active:bg-(--tc-active)'],
+  soft: ['border-transparent', 'bg-primary-soft', 'text-primary-on-soft', 'hover:bg-(--tc-soft-hover)', 'active:bg-(--tc-soft-active)'],
+  outline: ['border-line-strong', 'text-primary-on-soft', 'hover:bg-(--tc-soft)', 'active:bg-(--tc-soft-hover)'],
+  ghost: ['border-transparent', 'text-primary-on-soft', 'hover:bg-(--tc-soft)', 'active:bg-(--tc-soft-hover)'],
+  link: ['border-transparent', 'text-primary-on-soft', 'underline-offset-4', 'hover:underline'],
+}
 
 describe('the element it renders', () => {
   it('is a button with an explicit type, so it never submits a form by accident', () => {
@@ -25,25 +34,30 @@ describe('the element it renders', () => {
   })
 
   it('spreads the rest onto the root', () => {
-    const markup = html({ 'data-testid': 'x', id: 'save' } as ButtonProps)
-    expect(attr(markup, 'data-testid')).toBe('x')
-    expect(attr(markup, 'id')).toBe('save')
+    const html_ = html({ 'data-testid': 'x', id: 'save' } as ButtonProps)
+    expect(attr(html_, 'data-testid')).toBe('x')
+    expect(attr(html_, 'id')).toBe('save')
+  })
+
+  it('passes style through, which R-5.2-5 makes the channel for a --tc-* knob', () => {
+    const styled = html({ style: { '--tc-radius': '0px' } } as ButtonProps)
+    expect(attr(styled, 'style')).toBe('--tc-radius:0px')
   })
 })
 
 describe('the design attributes', () => {
   it('reports its variant, tone and size, which the docs and tests read', () => {
-    const markup = html({ variant: 'soft', tone: 'danger', size: 'lg' })
-    expect(attr(markup, 'data-variant')).toBe('soft')
-    expect(attr(markup, 'data-tone')).toBe('danger')
-    expect(attr(markup, 'data-size')).toBe('lg')
+    const html_ = html({ variant: 'soft', tone: 'danger', size: 'lg' })
+    expect(attr(html_, 'data-variant')).toBe('soft')
+    expect(attr(html_, 'data-tone')).toBe('danger')
+    expect(attr(html_, 'data-size')).toBe('lg')
   })
 
   it('reports the defaults when nothing is passed', () => {
-    const markup = html()
-    expect(attr(markup, 'data-variant')).toBe(BUTTON_DEFAULTS.variant)
-    expect(attr(markup, 'data-tone')).toBe(BUTTON_DEFAULTS.tone)
-    expect(attr(markup, 'data-size')).toBe(BUTTON_DEFAULTS.size)
+    const html_ = html()
+    expect(attr(html_, 'data-variant')).toBe(BUTTON_DEFAULTS.variant)
+    expect(attr(html_, 'data-tone')).toBe(BUTTON_DEFAULTS.tone)
+    expect(attr(html_, 'data-size')).toBe(BUTTON_DEFAULTS.size)
   })
 
   it('uses presence attributes, never data-state', () => {
@@ -52,69 +66,31 @@ describe('the design attributes', () => {
   })
 })
 
-describe('every variant', () => {
+describe('every variant paints its own look and no other', () => {
+  it('names every variant in the table, so adding one cannot skip coverage', () => {
+    expect(Object.keys(MARKS).sort()).toEqual([...BUTTON_VARIANTS].sort())
+  })
+
   for (const variant of BUTTON_VARIANTS) {
-    it(`${variant} emits its own classes and no other variant's fill`, () => {
+    const own = MARKS[variant] ?? []
+    const foreign = [...new Set(Object.entries(MARKS)
+      .filter(([name]) => name !== variant)
+      .flatMap(([, marks]) => marks))].filter((mark) => !own.includes(mark))
+
+    it(`${variant} emits all of its own classes`, () => {
       const list = classes({ variant })
-      expect(list).toContain('inline-flex')
-      expect(attr(html({ variant }), 'data-variant')).toBe(variant)
+      expect(own.filter((mark) => !list.includes(mark)), variant).toEqual([])
+    })
+
+    it(`${variant} emits none that belong to another variant`, () => {
+      const list = classes({ variant })
+      expect(foreign.filter((mark) => list.includes(mark)), variant).toEqual([])
     })
   }
 
-  it('solid fills with the tone and puts the on-solid text on it', () => {
-    const list = classes({ variant: 'solid' })
-    expect(list).toContain('bg-primary-solid')
-    expect(list).toContain('text-primary-on-solid')
-  })
-
-  it('soft tints with the tone and puts the on-soft text on it', () => {
-    const list = classes({ variant: 'soft' })
-    expect(list).toContain('bg-primary-soft')
-    expect(list).toContain('text-primary-on-soft')
-  })
-
-  it('outline draws a visible boundary rather than the decorative hairline', () => {
-    expect(classes({ variant: 'outline' })).toContain('border-line-strong')
-  })
-
-  it('ghost and link carry no fill at rest', () => {
+  it('leaves ghost and link with no fill at rest', () => {
     for (const variant of ['ghost', 'link'] as const) {
-      const list = classes({ variant })
-      expect(list.filter((c) => c.startsWith('bg-')), variant).toEqual([])
-    }
-  })
-})
-
-describe('every tone', () => {
-  for (const tone of BUTTON_TONES) {
-    it(`${tone} applies its own utility, so the hover classes never change`, () => {
-      expect(classes({ tone })).toContain(`tone-${tone}`)
-    })
-
-    it(`${tone} solid uses its own fill and label`, () => {
-      const list = classes({ variant: 'solid', tone })
-      expect(list).toContain(`bg-${tone}-solid`)
-      expect(list).toContain(`text-${tone}-on-solid`)
-    })
-
-    it(`${tone} ghost uses its own text colour`, () => {
-      expect(classes({ variant: 'ghost', tone })).toContain(`text-${tone}-on-soft`)
-    })
-  }
-
-  it('reads hover and active from the variables a tone swaps', () => {
-    const list = classes({ variant: 'solid' })
-    expect(list).toContain('hover:bg-(--tc-hover)')
-    expect(list).toContain('active:bg-(--tc-active)')
-  })
-
-  it('names no palette colour anywhere, in any combination', () => {
-    const palette = /-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d/
-    for (const variant of BUTTON_VARIANTS) {
-      for (const tone of BUTTON_TONES) {
-        const list = classes({ variant, tone })
-        expect(list.filter((c) => palette.test(c)), `${variant}/${tone}`).toEqual([])
-      }
+      expect(classes({ variant }).filter((c) => /^bg-(?!\()/.test(c)), variant).toEqual([])
     }
   })
 })

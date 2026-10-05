@@ -5,7 +5,7 @@ import { dirname, join, resolve } from 'node:path'
 import { compile } from 'tailwindcss'
 import { beforeAll, describe, expect, it } from 'vitest'
 
-import { FOCUS_RING } from './shared/classes.js'
+import { BORDER_WIDTH, FOCUS_RING, TOUCH_TARGET } from './shared/classes.js'
 import { BUTTON_SIZES, BUTTON_TONES, BUTTON_VARIANTS } from './components/button/constants.js'
 import { buttonVariants } from './components/button/variants.js'
 import { TONES } from './shared/contracts/tone.js'
@@ -196,5 +196,70 @@ describe('every class Button emits resolves to real CSS', () => {
 
     const missing = [...wanted].filter((c) => !out.includes(selector(c)))
     expect(missing).toEqual([])
+  })
+})
+
+/** The layer each top-level region belongs to, so cascade order can be asserted. */
+function layerOf(css: string, index: number): string {
+  let depth = 0
+  let layer: string | null = null
+  let start = 0
+  for (let i = 0; i < css.length; i++) {
+    if (css[i] === '{') { depth++; continue }
+    if (css[i] === '}') {
+      depth--
+      if (depth === 0 && layer !== null) {
+        if (index > start && index < i) return layer
+        layer = null
+      }
+      continue
+    }
+    if (depth === 0 && css.startsWith('@layer ', i)) {
+      const head = css.slice(i, css.indexOf('{', i))
+      if (head.includes(',')) continue
+      layer = head.replace('@layer', '').trim()
+      start = i
+    }
+  }
+  return 'unlayered'
+}
+
+describe('a tone beats the theme defaults on the same element', () => {
+  let toned = ''
+
+  beforeAll(async () => {
+    const compiled = await compile(ENTRY, { base: ROOT, loadStylesheet })
+    toned = compiled.build(['tone-danger', 'tone-primary'])
+  })
+
+  it('declares the fallback tone in a layer, not outside every layer', () => {
+    const places = [...toned.matchAll(/--tc-soft: var\(--tc-primary-soft\)/g)]
+      .map((m) => layerOf(toned, m.index))
+    expect(places.length).toBeGreaterThan(1)
+    // Unlayered declarations outrank every layer, so [data-theme] would beat the utility.
+    expect(places).toContain('base')
+    expect(places).not.toContain('unlayered')
+  })
+
+  it('emits the tone utility in a layer that outranks it', () => {
+    expect(layerOf(toned, toned.indexOf('.tone-danger'))).toBe('utilities')
+  })
+})
+
+describe('the shared control classes resolve to the knobs they promise', () => {
+  it('gives the border a real width from --tc-line-width', async () => {
+    const compiled = await compile(ENTRY, { base: ROOT, loadStylesheet })
+    const out = compiled.build([BORDER_WIDTH, 'border-line-strong'])
+    expect(out).toMatch(/border-style:\s*var\(--tw-border-style\)|border-width:\s*var\(--tc-line-width\)/)
+    expect(out).toContain('var(--tc-line-width)')
+  })
+
+  it('floors the touch target in CSS px, which SC 2.5.8 is written in', async () => {
+    const compiled = await compile(ENTRY, { base: ROOT, loadStylesheet })
+    const out = compiled.build(TOUCH_TARGET.split(' '))
+    expect(out).toContain('var(--tc-target-min)')
+    expect(out).toContain('var(--tc-target-coarse)')
+    expect(css).toContain('--tc-target-min: 24px')
+    expect(css).toContain('--tc-target-coarse: 44px')
   })
 })

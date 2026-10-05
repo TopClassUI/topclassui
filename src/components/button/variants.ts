@@ -1,11 +1,13 @@
 import { cva } from 'class-variance-authority'
 
+import { cn } from '#shared/cn.js'
+
 import {
   BORDER_WIDTH, CONTROL_SIZE, DISABLED, FOCUS_RING, HOVER, LOADING, TOUCH_TARGET, TRANSITION,
 } from '#shared/classes.js'
 import { TONE_CLASS } from '#shared/contracts/tone.js'
 import { BUTTON_DEFAULTS, BUTTON_TONES } from './constants.js'
-import type { ButtonVariant } from './types.js'
+import type { ButtonVariant, ButtonVariantProps } from './types.js'
 
 /** R-5.2-3: a lookup of complete class strings, never a name built from an expression. */
 const ON_SOLID = {
@@ -39,11 +41,11 @@ const TONE_TEXT = {
   info: 'text-info-on-soft',
 } as const
 
-export const buttonVariants = cva(
+const resolve = cva(
   [
     'inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium rounded-control',
-    // The width is always present with a transparent colour, so outline shifts nothing.
-    `${BORDER_WIDTH} border-transparent`,
+    // The width is always present, so switching to outline shifts no layout.
+    BORDER_WIDTH,
     DISABLED,
     LOADING,
     FOCUS_RING,
@@ -52,12 +54,13 @@ export const buttonVariants = cva(
   ],
   {
     variants: {
+      // Each variant names its own border colour, so the raw output never conflicts.
       variant: {
-        solid: HOVER.solid,
-        soft: HOVER.soft,
+        solid: `border-transparent ${HOVER.solid}`,
+        soft: `border-transparent ${HOVER.soft}`,
         outline: `border-line-strong ${HOVER.outline}`,
-        ghost: HOVER.ghost,
-        link: `underline-offset-4 ${HOVER.link}`,
+        ghost: `border-transparent ${HOVER.ghost}`,
+        link: `border-transparent underline-offset-4 ${HOVER.link}`,
       },
       tone: TONE_CLASS,
       size: CONTROL_SIZE,
@@ -80,3 +83,25 @@ export const buttonVariants = cva(
     },
   },
 )
+
+/**
+ * The look as a string, for an element that cannot be a Button. Four enums give
+ * 360 outcomes, so each is resolved once instead of rescanning 18 compound
+ * variants on every render.
+ */
+const cache = new Map<string, string>()
+
+export function buttonVariants(props: ButtonVariantProps = {}): string {
+  const variant = props.variant ?? BUTTON_DEFAULTS.variant
+  const tone = props.tone ?? BUTTON_DEFAULTS.tone
+  const size = props.size ?? BUTTON_DEFAULTS.size
+  const fullWidth = props.fullWidth ?? BUTTON_DEFAULTS.fullWidth
+
+  const key = `${variant}|${tone}|${size}|${String(fullWidth)}`
+  let classes = cache.get(key)
+  if (classes === undefined) {
+    classes = cn(resolve({ variant, tone, size, fullWidth }))
+    cache.set(key, classes)
+  }
+  return classes
+}

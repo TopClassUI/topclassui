@@ -28,7 +28,7 @@ describe('checkTokens', () => {
   })
 
   it('measures the number of pairs it claims; change this only on purpose', () => {
-    expect(run(css).pairs).toBe(249)
+    expect(run(css).pairs).toBe(285)
   })
 })
 
@@ -150,7 +150,20 @@ describe('the per-tone interaction ramp', () => {
   it('measures all six tones, not just the three Button needs', () => {
     for (const tone of ['primary', 'neutral', 'success', 'warning', 'danger', 'info']) {
       const broken = css.replace(`--tc-${tone}-hover:`, `--tc-${tone}-hover-unused:`)
-      expect(failures(broken), tone).toMatch(new RegExp(`${tone} label on its hover fill`))
+      expect(failures(broken), tone).toMatch(new RegExp(`--tc-${tone}-hover could not be resolved`))
+    }
+  })
+
+  it('rejects a solid hover or press that paints the resting fill', () => {
+    for (const state of ['hover', 'active'] as const) {
+      const before = state === 'hover' ? '--tc-danger-solid' : '--tc-danger-hover'
+      const dead = css.replace(
+        new RegExp(`--tc-danger-${state}: [^;]+;`),
+        `--tc-danger-${state}: var(${before});`,
+      )
+      expect(failures(dead), state).toMatch(
+        new RegExp(`danger-${state} does not step away from the fill before it`),
+      )
     }
   })
 })

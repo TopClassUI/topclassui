@@ -1,12 +1,15 @@
-/** Feeds the docs navigation and the registry.json generated after v0.1. */
+// Feeds the docs navigation and the registry.json generated after v0.1.
+import type { ComponentMeta } from '#shared/meta.js'
+
 export const meta = {
   name: 'Button',
-  category: 'Actions',
+  slug: 'button',
+  category: 'actions',
   tier: 1,
-  status: 'stable',
+  // PLAN 20 is not met until the visual matrix and the docs page exist.
+  status: 'beta',
   rendering: 'server',
-  basePrimitive: null,
+  baseUi: null,
+  baseUiRange: null,
   optionalDeps: [],
-  /** R-20-1: no Base UI part is used, so there is no version range to verify against. */
-  verifiedBaseUi: null,
-} as const
+} satisfies ComponentMeta

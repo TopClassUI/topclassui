@@ -1,4 +1,6 @@
 // No 'use client': a client bundle gets it only when a client file imports it.
+import type { ReactNode } from 'react'
+
 import { spinner } from '#icons/data/spinner.js'
 import { cn } from '#shared/cn.js'
 import { renderElement } from '#shared/render.js'
@@ -20,10 +22,11 @@ export function Button({
   render,
   ...rest
 }: ButtonProps) {
-  const content = (
+  // Composed rather than replaced, so render={<a>Go</a>} keeps its label and the spinner.
+  const withSpinner = (label: ReactNode) => (
     <>
-      {loading ? <Svg icon={spinner} className="animate-spin motion-reduce:animate-none" /> : null}
-      {children}
+      <Svg icon={spinner} className="animate-spin motion-reduce:animate-none" />
+      {label}
     </>
   )
 
@@ -47,11 +50,13 @@ export function Button({
     'data-tone': tone,
     'data-size': size,
     className: cn(buttonVariants({ variant, tone, size, fullWidth }), className),
-    children: content,
+    children,
     ...rest,
-  })
+  }, loading ? withSpinner : undefined)
 }
 
 export { buttonVariants } from './variants.js'
 export { ButtonSkeleton } from './skeleton.js'
-export type { ButtonDesignProps, ButtonProps, ButtonSkeletonProps, ButtonTone, ButtonVariant } from './types.js'
+export type {
+  ButtonDesignProps, ButtonProps, ButtonSkeletonProps, ButtonTone, ButtonVariant, ButtonVariantProps,
+} from './types.js'

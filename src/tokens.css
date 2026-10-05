@@ -4,6 +4,10 @@
 :root {
   --tc-radius: 0.5rem;
   --tc-line-width: 1px;
+  /* R-5.6-2: SC 2.5.8 is specified in CSS px, so these never follow the root font size. */
+  --tc-target-min: 24px;
+  --tc-target-coarse: 44px;
+
   --tc-ring-width: 2px;
   --tc-ring-offset: 2px;
   --tc-density: 1;
@@ -169,13 +173,6 @@
   --tc-danger-soft-active: color-mix(in oklch, var(--tc-danger-solid) calc(var(--tc-danger-mix) + 16%), var(--tc-page));
   --tc-info-soft-hover: color-mix(in oklch, var(--tc-info-solid) calc(var(--tc-info-mix) + 8%), var(--tc-page));
   --tc-info-soft-active: color-mix(in oklch, var(--tc-info-solid) calc(var(--tc-info-mix) + 16%), var(--tc-page));
-
-  /* The five a component reads. A tone swaps them; without a tone they are primary. */
-  --tc-soft: var(--tc-primary-soft);
-  --tc-hover: var(--tc-primary-hover);
-  --tc-active: var(--tc-primary-active);
-  --tc-soft-hover: var(--tc-primary-soft-hover);
-  --tc-soft-active: var(--tc-primary-soft-active);
 }
 
 /* Both blocks: these inherit, so an ltr island in an rtl page needs its own reset. */
@@ -198,6 +195,16 @@
 }
 
 @layer base {
+  /* Layered, so @layer utilities (a tone-* class) outranks them on one element. */
+  :root,
+  [data-theme] {
+    --tc-soft: var(--tc-primary-soft);
+    --tc-hover: var(--tc-primary-hover);
+    --tc-active: var(--tc-primary-active);
+    --tc-soft-hover: var(--tc-primary-soft-hover);
+    --tc-soft-active: var(--tc-primary-soft-active);
+  }
+
   /* color-scheme is not a custom property, so it belongs in a layer (R-4-1). */
   :root,
   [data-theme='light'],

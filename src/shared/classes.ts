@@ -23,8 +23,13 @@ export const FOCUS_RING = [
 /** Every transition multiplies by --tc-motion, so one knob can stop all of them. */
 export const TRANSITION = 'transition-[color,background-color,border-color,outline-color,opacity,translate] duration-(--tc-duration) ease-out'
 
-/** R-5.6-2: 24px on every pointer, 44px where the pointer is coarse. */
-export const TOUCH_TARGET = 'min-h-6 min-w-6 pointer-coarse:min-h-11 pointer-coarse:min-w-11'
+/** R-5.6-2: SC 2.5.8 is written in CSS px, so the floor is a px token, never a rem step. */
+export const TOUCH_TARGET = [
+  'min-h-(--tc-target-min)',
+  'min-w-(--tc-target-min)',
+  'pointer-coarse:min-h-(--tc-target-coarse)',
+  'pointer-coarse:min-w-(--tc-target-coarse)',
+].join(' ')
 
 /** Hover and active are tone-driven: the compound variant sets the variables, these read them. */
 export const HOVER = {
@@ -36,13 +41,23 @@ export const HOVER = {
   link: 'hover:underline',
 } as const
 
-/** Control height by size. `custom` emits nothing, which is what opts a component out. */
+/** The height alone, so a skeleton stands in for a control without copying the value. */
+export const CONTROL_HEIGHT = {
+  xs: 'h-control-xs',
+  sm: 'h-control-sm',
+  md: 'h-control-md',
+  lg: 'h-control-lg',
+  xl: 'h-control-xl',
+  custom: '',
+} as const
+
+/** Height, inline padding and the type step. `custom` emits nothing, which opts a component out. */
 export const CONTROL_SIZE = {
-  xs: 'h-control-xs px-pad-x-xs text-xs',
-  sm: 'h-control-sm px-pad-x-sm text-sm',
-  md: 'h-control-md px-pad-x-md text-sm',
-  lg: 'h-control-lg px-pad-x-lg text-base',
-  xl: 'h-control-xl px-pad-x-xl text-base',
+  xs: `${CONTROL_HEIGHT.xs} px-pad-x-xs text-xs`,
+  sm: `${CONTROL_HEIGHT.sm} px-pad-x-sm text-sm`,
+  md: `${CONTROL_HEIGHT.md} px-pad-x-md text-sm`,
+  lg: `${CONTROL_HEIGHT.lg} px-pad-x-lg text-base`,
+  xl: `${CONTROL_HEIGHT.xl} px-pad-x-xl text-base`,
   custom: '',
 } as const
 

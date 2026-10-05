@@ -156,30 +156,30 @@ export { ${camel(s.slug)}Variants } from './variants.js'
 export type { ${s.name}DesignProps, ${s.name}Props, ${s.name}Tone, ${s.name}Variant } from './types.js'
 `
 
-const meta = ({ name }: Scaffold) => `/** Feeds the docs navigation and the registry.json generated after v0.1. */
+const meta = ({ name, slug }: Scaffold) => `// Feeds the docs navigation and the registry.json generated after v0.1.
+import type { ComponentMeta } from '#shared/meta.js'
+
 export const meta = {
   name: '${name}',
-  category: 'TODO',
+  slug: '${slug}',
+  // TODO(tc): the catalog section this row belongs to (PLAN 18).
+  category: 'actions',
   tier: 1,
   status: 'draft',
   rendering: 'server',
-  basePrimitive: null,
+  baseUi: null,
+  baseUiRange: null,
   optionalDeps: [],
-  verifiedBaseUi: null,
-} as const
+} satisfies ComponentMeta
 `
 
-const test = (s: Scaffold) => `import { renderToStaticMarkup } from 'react-dom/server'
-import { describe, expect, it } from 'vitest'
+const test = (s: Scaffold) => `import { describe, expect, it } from 'vitest'
 
+import { attr, markup } from '#test/markup.js'
 import { ${s.screaming}_DEFAULTS, ${s.screaming}_SIZES, ${s.screaming}_TONES, ${s.screaming}_VARIANTS } from '../constants.js'
 import { ${s.name} } from '../index.js'
 
-const html = () => renderToStaticMarkup(<${s.name}>Hello</${s.name}>)
-
-/** Anchored, or \`id="x"\` also matches inside \`data-testid="x"\`. */
-const attr = (markup: string, name: string) =>
-  new RegExp(\`(?:^|[ ])\${name}="([^"]*)"\`).exec(markup)?.[1]
+const html = () => markup(<${s.name}>Hello</${s.name}>)
 
 describe('${s.name}', () => {
   it('renders its children', () => {

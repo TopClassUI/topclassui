@@ -74,6 +74,7 @@
   "imports": {
     "#shared/*": "./src/shared/*",
     "#icons/*": "./src/icons/*",
-    "#components/*": "./src/components/*"
+    "#components/*": "./src/components/*",
+    "#test/*": "./test/*"
   }
 }

@@ -19,6 +19,14 @@ export default function Demo() {
         <Button variant="soft" tone="danger">Danger</Button>
         <Button variant="soft" tone="info">Info</Button>
       </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button variant="outline" tone="primary">Primary</Button>
+        <Button variant="outline" tone="success">Success</Button>
+        <Button variant="outline" tone="danger">Danger</Button>
+        <Button variant="ghost" tone="warning">Warning</Button>
+        <Button variant="ghost" tone="info">Info</Button>
+        <Button variant="link" tone="neutral">Neutral</Button>
+      </div>
     </div>
   )
 }
