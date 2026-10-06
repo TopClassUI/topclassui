@@ -10,17 +10,19 @@ Each rule has an id, one line of rule, one line of reason, and what enforces it.
 
 ```
 pnpm check            every gate below, in order
-pnpm lint             eslint, including the eight custom rules
+pnpm lint             eslint, including the thirteen custom rules
 pnpm typecheck        tsc --noEmit
 pnpm test             vitest, four projects: node, dom, rsc, ssr
 pnpm check:structure  the folder contract and file sizes
 pnpm check:boundaries the server and client rules
 pnpm check:css        cascade layers, token references, one-line comments in CSS
 pnpm check:icons      the generated icon modules still match raw/
+pnpm check:readme     every component README still matches its schema and types
 pnpm check:contrast   AA contrast in every mode
 pnpm test:e2e         playwright: target size, the focus ring and axe, in a real browser
 pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from this file
 pnpm icons:build      regenerate the icon modules from raw/
+pnpm readme:build     regenerate every component README
 pnpm new:component x  scaffold a component folder that already passes pnpm check
 pnpm test:mutation    break the code on purpose; a surviving mutation is a test measuring nothing
 pnpm harness:build    the static demo pages test:e2e measures
@@ -72,12 +74,12 @@ They arrive with the phases that need them.
 ### R-9.2-3 Never dot into a client module from a server file
 **Rule:** export flat names (`DialogRoot`), never an object (`Dialog.Root`) that a server file would dot into.
 **Why:** React's client-module proxy allows one level of access and throws on the second.
-**Enforced by:** not yet - planned: `eslint`
+**Enforced by:** `eslint`
 
 ### R-9.2-4 The root of a part family is `<Name>Root`
 **Rule:** a component split into parts names its root `<Name>Root` without exception (`CardRoot`, `DialogRoot`, `AvatarRoot`), and a scrolling overlay names its parts `<Name>Header`, `<Name>Body` and `<Name>Footer`, where the Body is the scroll container R-10.5-1 requires.
 **Why:** one family naming its root `Card` while ten others use `XxxRoot` is the drift a cross-file audit catches and an author never does; an overlay without a Body has nothing to scroll.
-**Enforced by:** not yet - planned: `check-structure`
+**Enforced by:** `eslint`, which reads the exported names; the `parts/` half is manual
 
 ## 2. Styling
 
@@ -104,7 +106,7 @@ They arrive with the phases that need them.
 ### R-5.2-5 No inline style except a CSS variable
 **Rule:** `style` is only for setting a `--tc-*` variable.
 **Why:** anything else escapes the token system.
-**Enforced by:** not yet - planned: `eslint`
+**Enforced by:** `eslint`
 
 ### R-5.2-6 Bare data and aria variants
 **Rule:** write `data-open:`, `group-data-panel-open:`, `aria-busy:`; brackets only for values.
@@ -146,12 +148,12 @@ They arrive with the phases that need them.
 ### R-5.3-4 Logical overlay placement
 **Rule:** use the `placement` prop, which maps to Base UI's `side` and `align`; never `left` or `right` as a side.
 **Why:** `align` and the `inline-*` sides flip in RTL automatically.
-**Enforced by:** `eslint` + type
+**Enforced by:** type; the `eslint` half does not exist
 
 ### R-13-1 TopClassProvider is required
 **Rule:** the app mounts `TopClassProvider` at the root layout with `direction` and `locale` as props from the layout, never read from `document.dir` in an effect.
 **Why:** Base UI learns the direction only from `DirectionProvider`, and reading it in an effect disagrees with the server render.
-**Enforced by:** development warning
+**Enforced by:** not yet - the provider has a silent fallback instead of a warning
 
 ## 4. API conventions
 
@@ -183,7 +185,7 @@ They arrive with the phases that need them.
 ### R-5.7-6 Base UI state attribute grammar
 **Rule:** boolean presence attributes (`data-open`, `data-loading`, `data-disabled`), never `data-state="..."`; enumerated design props are value attributes (`data-variant`, `data-size`, `data-tone`).
 **Why:** Base UI already sets the boolean form, and two vocabularies would drift.
-**Enforced by:** not yet - planned: `eslint`
+**Enforced by:** `eslint`
 
 ### R-5.7-7 Clamp every numeric limit
 **Rule:** numeric props have `min` and `max` in the schema and are clamped at runtime with `clamp()`.
@@ -222,7 +224,7 @@ They arrive with the phases that need them.
 ### R-5.11-1 No hard-coded user-visible text
 **Rule:** every built-in string comes from the `labels` prop with defaults from `shared/labels/en.ts`; `ar.ts` ships too. Demo files are exempt.
 **Why:** the library must be usable in any language without patching components.
-**Enforced by:** `eslint`
+**Enforced by:** `eslint` for visible text and the labelled attributes; a string built at runtime is manual
 
 ### R-5.11-2 Labels with numbers are functions
 **Rule:** a label containing a count is `(n, fmt) => string` and the Arabic file uses `Intl.PluralRules`.
@@ -244,7 +246,7 @@ They arrive with the phases that need them.
 ### R-10.5-1 Overlays scroll inside themselves
 **Rule:** popups use `POPUP_BOUNDS` and the row cap, dialogs and drawers scroll their body with sticky header and footer, and every scroll container inside an overlay sets `overscroll-behavior: contain`.
 **Why:** the page must never scroll behind an open overlay.
-**Enforced by:** not yet - Playwright is not in the repo yet
+**Enforced by:** not yet - no overlay component exists yet
 
 ### R-10.5-2 Tooltips never scroll
 **Rule:** a tooltip is one or two lines of plain text; anything larger, or anything with a link or control, is a Popover.
@@ -254,7 +256,7 @@ They arrive with the phases that need them.
 ### R-10.5-3 Sticky bars set the scroll padding
 **Rule:** a sticky or fixed bar sets `--tc-sticky-top` or `--tc-sticky-bottom`, and the scroll container reads them into `scroll-padding-block`.
 **Why:** WCAG 2.4.11: a focused element must not be hidden behind a bar.
-**Enforced by:** not yet - Playwright is not in the repo yet
+**Enforced by:** not yet - no sticky or fixed bar exists yet
 
 ## 8. Code structure
 
@@ -278,6 +280,11 @@ They arrive with the phases that need them.
 **Why:** a predictable name is the cheapest documentation.
 **Enforced by:** `scripts/check-structure.ts` for the kebab-case names; the rest is manual
 
+### R-17-1 A test expectation is named, never derived
+**Rule:** an expectation is written out, never computed from the thing under test; deleting half the implementation must not also delete half the assertion.
+**Why:** a derived expectation passes whatever the code does, which is how several suites here passed while the code was wrong.
+**Enforced by:** `eslint` (`topclass/no-derived-expectations`)
+
 ### R-5.12-5 Strict TypeScript
 **Rule:** no `any`, no `@ts-ignore`, no non-null assertion without a one-line reason; relative imports carry explicit `.js` extensions and type imports use `import type`.
 **Why:** the types are the public API.
@@ -291,7 +298,12 @@ They arrive with the phases that need them.
 ### R-8.1-2 meta.ts answers to one contract
 **Rule:** `meta.ts` is declared `satisfies ComponentMeta` from `#shared/meta.js`, its `slug` is the folder name, and `baseUiRange` is non-null whenever `baseUi` is. `status` is `stable` only when every line of PLAN 20 is true.
 **Why:** the docs navigation and the generated `registry.json` key on these fields, and 46 hand-written objects drift before anything reads them.
-**Enforced by:** `src/shared/meta.test.ts` for every folder that has the file; `check-structure` does not yet require it
+**Enforced by:** `check-structure` requires the file; `src/shared/meta.test.ts` checks its shape for every folder that has one
+
+### R-8.1-3 The README is generated, never written by hand
+**Rule:** every component folder has a `README.md` written by `pnpm readme:build` from `schema.ts`, `types.ts` and `meta.ts`. Prose goes between the `<!-- hand-written -->` markers and nothing else in the file is edited.
+**Why:** the first question anyone asks of a component is whether a prop is optional or mandatory, and a hand-written table answers it confidently and wrongly within a week. Generating it from the schema and the types means it cannot disagree with the code.
+**Enforced by:** `check-structure` requires the file; `check:readme` fails when it is stale
 
 ## 9. Icons
 
@@ -310,7 +322,7 @@ They arrive with the phases that need them.
 ### R-5.6-1 WCAG 2.2 AA
 **Rule:** keyboard behaviour follows the ARIA Authoring Practices; a visible `focus-visible` ring on every interactive element; types enforce labels.
 **Why:** it is a promise of the library, not an extra.
-**Enforced by:** `e2e/focus-ring.spec.ts` for the ring and `e2e/axe.spec.ts` for the rest; the keyboard paths of R-5.6-3 are still manual
+**Enforced by:** manual; `axe` covers the ARIA attributes in `test:e2e`, not the keyboard behaviour
 
 ### R-5.6-2 Target size
 **Rule:** every interactive element is at least 24x24 CSS px on every pointer type and 44px under `pointer-coarse`. The floor is a px token with a px fallback, never a rem step, because the success criterion is written in CSS px.

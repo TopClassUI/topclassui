@@ -102,8 +102,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the variants cache forgets the size',
     file: 'src/components/button/variants.ts',
-    from: '  const key = `${variant}|${tone}|${size}|${String(fullWidth)}`',
-    to: '  const key = `${variant}|${tone}|${String(fullWidth)}`',
+    from: '`${variant}|${tone}|${size}|${String(fullWidth)}`',
+    to: '`${variant}|${tone}|${String(fullWidth)}`',
   },
   {
     label: 'the skeleton stops pulsing',
@@ -177,5 +177,59 @@ export const MUTATIONS: Mutation[] = [
     file: 'vitest.config.ts',
     from: '        exclude: project.exclude,',
     to: "        ...(project.name === 'node' ? {} : { exclude: project.exclude }),",
+  },
+  {
+    label: 'styles.css loses the @source Tailwind scans our components with',
+    file: 'src/styles.css',
+    from: '@source "./components";',
+    to: '',
+  },
+  {
+    label: 'a disabled anchor keeps the href it can still be followed by',
+    file: 'src/components/button/index.tsx',
+    from: "  const deadLink = inactive && render?.type === 'a'",
+    to: '  const deadLink = false',
+  },
+  {
+    label: 'the file-size walk stops descending, so a nested folder escapes',
+    file: 'scripts/lib/file-sizes.ts',
+    from: 'if (e.isDirectory()) out.push(...sourceFilesUnder(path))',
+    to: 'if (e.isDirectory()) continue',
+  },
+  {
+    label: 'the style rule stops caring what the property is called',
+    file: 'eslint-rules/index.ts',
+    from: "if (!name.startsWith('--tc-')) ctx.report({ node: prop, messageId: 'property', data: { name } })",
+    to: "if (false) ctx.report({ node: prop, messageId: 'property', data: { name } })",
+  },
+  {
+    label: 'the label rule stops recognising prose',
+    file: 'eslint-rules/index.ts',
+    from: 'const isProse = (text: string) => /[A-Za-z]{2,}/.test(text)',
+    to: 'const isProse = (text: string) => text === String(Symbol())',
+  },
+  {
+    label: 'data-state stops being reported, so Base UI grammar leaks in',
+    file: 'eslint-rules/index.ts',
+    from: "if (name === 'data-state') {",
+    to: "if (false) {",
+  },
+  {
+    label: 'the README stops saying a prop is required',
+    file: 'scripts/lib/readme.ts',
+    from: 'required: required.has(name),',
+    to: 'required: false,',
+  },
+  {
+    label: 'the README loses the hand-written prose on every rebuild',
+    file: 'scripts/lib/readme.ts',
+    from: "return body === '' ? PLACEHOLDER : body",
+    to: 'return PLACEHOLDER',
+  },
+  {
+    label: 'the README stops escaping a pipe, so the props table collapses',
+    file: 'scripts/lib/readme.ts',
+    from: "const cell = (text: string) => text.split('|').join('\\\\|')",
+    to: 'const cell = (text: string) => text',
   },
 ]

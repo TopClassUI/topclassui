@@ -1,5 +1,5 @@
 // No 'use client': a client bundle gets it only when a client file imports it.
-import type { ReactNode } from 'react'
+import { cloneElement, type ReactElement, type ReactNode } from 'react'
 
 import { spinner } from '#icons/data/spinner.js'
 import { cn } from '#shared/cn.js'
@@ -36,7 +36,19 @@ export function Button({
   // Only a real button has a disabled attribute; anything else needs the ARIA pair.
   const nativeButton = render == null || render.type === 'button'
 
-  return renderElement(render ?? <button type={type} />, {
+  /**
+   * An anchor still navigates under pointer-events: none, and a Server Component has no
+   * handler to cancel it, so the href goes instead. next/link keeps its own: the prop is
+   * required there, and removing it would crash the component. See DECISIONS.md.
+   */
+  const deadLink = inactive && render?.type === 'a'
+  const element = deadLink
+    ? cloneElement(render as ReactElement<{ href?: string }>, { href: undefined })
+    : (render ?? <button type={type} />)
+
+  return renderElement(element, {
+    // An <a> with no href has no role, so aria-disabled would reach no screen reader.
+    role: deadLink ? 'link' : undefined,
     type: nativeButton ? type : undefined,
     disabled: nativeButton ? inactive : undefined,
     'aria-disabled': !nativeButton && inactive ? true : undefined,

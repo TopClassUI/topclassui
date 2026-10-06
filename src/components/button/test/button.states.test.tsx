@@ -31,10 +31,6 @@ describe('loading', () => {
     expect(classes({ loading: true })).toContain('data-loading:pointer-events-none')
   })
 
-  it('shows the busy cursor, so the pointer says the same thing as aria-busy', () => {
-    expect(classes({ loading: true })).toContain('aria-busy:cursor-progress')
-  })
-
   it('keeps full colour, so it never reads as disabled', () => {
     expect(classes({ loading: true })).toContain('aria-busy:opacity-100')
     expect(attr(busy, 'data-disabled')).toBeUndefined()
@@ -103,5 +99,31 @@ describe('an element that is not a button', () => {
 
   it('still gets the button type when the rendered element is a button', () => {
     expect(attr(markup(<Button render={<button />}>Go</Button>), 'type')).toBe('button')
+  })
+})
+
+describe('a disabled anchor cannot still be followed', () => {
+  const link = (props: { disabled?: boolean; loading?: boolean } = {}) =>
+    markup(<Button render={<a href="/x" />} {...props}>Go</Button>)
+
+  it('drops the href, because pointer-events cannot stop Enter or .click()', () => {
+    expect(attr(link({ disabled: true }), 'href')).toBeUndefined()
+    expect(attr(link({ loading: true }), 'href')).toBeUndefined()
+  })
+
+  it('keeps announcing itself, which an anchor with no href would not', () => {
+    expect(attr(link({ disabled: true }), 'role')).toBe('link')
+    expect(attr(link({ disabled: true }), 'aria-disabled')).toBe('true')
+  })
+
+  it('leaves a usable link alone, href and all', () => {
+    expect(attr(link(), 'href')).toBe('/x')
+    expect(link()).not.toContain('role=')
+  })
+
+  it('keeps the rest of the anchor, so only the href is taken away', () => {
+    const html_ = markup(<Button render={<a href="/x" id="go" hrefLang="en" />} disabled>Go</Button>)
+    expect(attr(html_, 'id')).toBe('go')
+    expect(attr(html_, 'hrefLang')).toBe('en')
   })
 })

@@ -1,4 +1,5 @@
 // pnpm new:component <name> scaffolds a component folder that already passes pnpm check.
+import { spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 
@@ -33,5 +34,16 @@ for (const [rel, content] of written) {
   writeFileSync(file, content, { encoding: 'utf8' })
 }
 
-console.log(`new-component: wrote ${String(written.size)} files to src/components/${scaffold.slug}`)
+// README.md is generated, not scaffolded, and check-structure requires it, so the
+// folder would fail its own gate without this (Phase 3 asks the scaffold to pass clean).
+const readme = spawnSync('node', [join(process.cwd(), 'node_modules/tsx/dist/cli.mjs'), 'scripts/readme-build.ts'], {
+  cwd: process.cwd(),
+  encoding: 'utf8',
+})
+if (readme.status !== 0) {
+  console.error(`new-component: readme:build failed\n${readme.stderr}`)
+  process.exit(1)
+}
+
+console.log(`new-component: wrote ${String(written.size + 1)} files to src/components/${scaffold.slug}`)
 console.log('Next: fill in the variants, then run pnpm check.')

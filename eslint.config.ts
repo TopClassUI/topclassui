@@ -29,6 +29,11 @@ export default defineConfig(
       'topclass/one-line-comments': 'error',
       'topclass/icon-loaders-stay-server': 'error',
       'topclass/no-derived-expectations': 'error',
+      'topclass/style-sets-tokens-only': 'error',
+      'topclass/presence-state-attributes': 'error',
+      'topclass/flat-part-exports': 'error',
+      'topclass/root-part-is-named-root': 'error',
+      'topclass/text-comes-from-labels': 'error',
 
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/ban-ts-comment': 'error',
@@ -38,13 +43,16 @@ export default defineConfig(
   },
 
   // A test has to write the banned string to prove the rule or the merge works,
-  // and a demo exists to show real usage. Neither is published.
+  // and a demo exists to show real usage. Neither is published. R-5.11-1 exempts
+  // demos by name, and a test needs a real scroll box with a height and an overflow.
   {
     files: ['src/**/*.test.{ts,tsx}', 'src/**/test/**/*.{ts,tsx}', 'src/**/dummy/**/*.tsx'],
     rules: {
       'topclass/semantic-classes-only': 'off',
       'topclass/shared-class-constants': 'off',
       'topclass/logical-properties-only': 'off',
+      'topclass/style-sets-tokens-only': 'off',
+      'topclass/text-comes-from-labels': 'off',
     },
   },
 

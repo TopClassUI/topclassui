@@ -5,6 +5,7 @@ import { join, posix, relative, sep } from 'node:path'
 
 import { findLongComments, findUnlayeredDeclarations } from './lib/css-layers.js'
 import { definedTokens, findUndefinedReferences } from './lib/token-refs.js'
+import { readBlocks, tokensMissingPerMode } from './lib/tokens.js'
 
 const ROOT = process.cwd()
 const SRC = join(ROOT, 'src')
@@ -44,7 +45,12 @@ for (const file of stylesheets) {
 }
 
 if (existsSync(TOKENS)) {
-  const defined = definedTokens(readFileSync(TOKENS, 'utf8'))
+  const tokensCss = readFileSync(TOKENS, 'utf8')
+  for (const m of tokensMissingPerMode(readBlocks(tokensCss))) {
+    errors.push(`src/tokens.css R-4-2: '${m.token}' is not declared in the '${m.mode}' mode`)
+  }
+
+  const defined = definedTokens(tokensCss)
   const readers = files
     .filter((f) => f !== TOKENS && !f.endsWith('.test.ts') && !f.endsWith('.test.tsx'))
     .map((file) => ({ file, content: readFileSync(file, 'utf8') }))

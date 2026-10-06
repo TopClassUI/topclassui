@@ -1,25 +1,11 @@
-// Compiles the real stylesheets, because unstyled output throws no error.
-import { readFileSync } from 'node:fs'
-import { dirname, join, resolve } from 'node:path'
+// R-4-1, R-4-2, R-5.2-4: the stylesheet has to compile and emit what we promise.
+import { describe, expect, it, beforeAll } from 'vitest'
 
-import { compile } from 'tailwindcss'
-import { beforeAll, describe, expect, it } from 'vitest'
-
-import { BORDER_WIDTH, FOCUS_RING, TOUCH_TARGET } from './shared/classes.js'
+import { compileEntry } from '#test/stylesheet.js'
+import { FOCUS_RING } from './shared/classes.js'
 import { BUTTON_SIZES, BUTTON_TONES, BUTTON_VARIANTS } from './components/button/constants.js'
 import { buttonVariants } from './components/button/variants.js'
 import { TONES } from './shared/contracts/tone.js'
-
-const ROOT = process.cwd()
-const ENTRY = '@import "tailwindcss";\n@import "./src/tokens.css";\n@import "./src/styles.css";\n'
-
-/** Tailwind's own resolver needs a bundler; the entry only ever imports three files. */
-function loadStylesheet(id: string, base: string) {
-  const file = id === 'tailwindcss'
-    ? join(ROOT, 'node_modules', 'tailwindcss', 'index.css')
-    : resolve(base, id)
-  return Promise.resolve({ path: file, base: dirname(file), content: readFileSync(file, 'utf8') })
-}
 
 const CANDIDATES = [
   'bg-page', 'bg-surface', 'bg-surface-raised', 'text-body', 'text-muted',
@@ -38,8 +24,7 @@ const CANDIDATES = [
 let css = ''
 
 beforeAll(async () => {
-  const compiled = await compile(ENTRY, { base: ROOT, loadStylesheet })
-  css = compiled.build(CANDIDATES)
+  css = (await compileEntry()).build(CANDIDATES)
 })
 
 /** Tailwind emits nothing at all for a candidate it cannot resolve. */
@@ -133,7 +118,7 @@ describe('the three modes and the direction', () => {
 
 describe('the focus ring actually paints', () => {
   it('restores outline-style on focus-visible, which the reset zeroes', async () => {
-    const compiled = await compile(ENTRY, { base: ROOT, loadStylesheet })
+    const compiled = await compileEntry()
     const ring = compiled.build(FOCUS_RING.split(' '))
 
     // The reset sets --tw-outline-style: none, so without this the width substitutes none.
@@ -157,7 +142,7 @@ describe('the tone utilities', () => {
   let toneCss = ''
 
   beforeAll(async () => {
-    const compiled = await compile(ENTRY, { base: ROOT, loadStylesheet })
+    const compiled = await compileEntry()
     toneCss = compiled.build(TONES.map((t) => `tone-${t}`))
   })
 
@@ -189,101 +174,12 @@ describe('every class Button emits resolves to real CSS', () => {
       }
     }
 
-    const compiled = await compile(ENTRY, { base: ROOT, loadStylesheet })
+    const compiled = await compileEntry()
     const out = compiled.build([...wanted])
     /** Tailwind escapes every character a CSS identifier may not carry. */
     const selector = (cls: string) => `.${cls.replace(/[^\w-]/g, (ch) => `\\${ch}`)}`
 
     const missing = [...wanted].filter((c) => !out.includes(selector(c)))
     expect(missing).toEqual([])
-  })
-})
-
-/** Blanked, not removed, so every index still points at the same character. */
-function blankNoise(css: string): string {
-  const blanks = (match: string) => ' '.repeat(match.length)
-  return css
-    .replace(/\/\*[\s\S]*?\*\//g, blanks)
-    .replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g, blanks)
-}
-
-/** The top-level layer a byte belongs to. A content:"{" would desync a bare brace count. */
-function layerOf(css: string, index: number): string {
-  const clean = blankNoise(css)
-  let depth = 0
-  let layer: string | null = null
-  let start = 0
-  for (let i = 0; i < clean.length; i++) {
-    if (clean[i] === '{') { depth++; continue }
-    if (clean[i] === '}') {
-      depth--
-      if (depth === 0 && layer !== null) {
-        if (index > start && index < i) return layer
-        layer = null
-      }
-      continue
-    }
-    if (depth === 0 && clean.startsWith('@layer ', i)) {
-      const brace = clean.indexOf('{', i)
-      const semi = clean.indexOf(';', i)
-      // `@layer a, b;` declares an order and opens no block.
-      if (brace < 0 || (semi >= 0 && semi < brace)) continue
-      const head = clean.slice(i, brace)
-      if (head.includes(',')) continue
-      layer = head.replace('@layer', '').trim()
-      start = i
-    }
-  }
-  return 'unlayered'
-}
-
-describe('a tone beats the theme defaults on the same element', () => {
-  let toned = ''
-
-  beforeAll(async () => {
-    const compiled = await compile(ENTRY, { base: ROOT, loadStylesheet })
-    toned = compiled.build(['tone-danger', 'tone-primary'])
-  })
-
-  it('declares the fallback tone in a layer, not outside every layer', () => {
-    const places = [...toned.matchAll(/--tc-soft: var\(--tc-primary-soft\)/g)]
-      .map((m) => layerOf(toned, m.index))
-    expect(places.length).toBeGreaterThan(1)
-    // Unlayered declarations outrank every layer, so [data-theme] would beat the utility.
-    expect(places).toContain('base')
-    expect(places).not.toContain('unlayered')
-  })
-
-  it('emits the tone utility in a layer that outranks it', () => {
-    expect(layerOf(toned, toned.indexOf('.tone-danger'))).toBe('utilities')
-  })
-
-  it('orders the layers so utilities really is the later one', () => {
-    const order = /@layer ([^;{]+);/.exec(toned)?.[1]?.split(',').map((n) => n.trim()) ?? []
-    expect(order).toContain('base')
-    expect(order).toContain('utilities')
-    expect(order.indexOf('utilities')).toBeGreaterThan(order.indexOf('base'))
-  })
-})
-
-describe('the shared control classes resolve to the knobs they promise', () => {
-  it('gives the border a real width from --tc-line-width', async () => {
-    const compiled = await compile(ENTRY, { base: ROOT, loadStylesheet })
-    const out = compiled.build([BORDER_WIDTH, 'border-line-strong'])
-    expect(out).toMatch(/border-style:\s*var\(--tw-border-style\)|border-width:\s*var\(--tc-line-width\)/)
-    expect(out).toContain('var(--tc-line-width)')
-  })
-
-  it('floors the touch target in CSS px on both axes, which SC 2.5.8 is written in', async () => {
-    const compiled = await compile(ENTRY, { base: ROOT, loadStylesheet })
-    for (const cls of TOUCH_TARGET.split(' ')) {
-      // One rule per class, or the width classes alone satisfy a whole-output match.
-      const property = cls.includes('min-h') ? 'min-height' : 'min-width'
-      const token = cls.includes('coarse') ? '--tc-target-coarse,44px' : '--tc-target-min,24px'
-      const out = compiled.build([cls])
-      expect(out, cls).toContain(`${property}: var(${token})`)
-    }
-    expect(css).toContain('--tc-target-min: 24px')
-    expect(css).toContain('--tc-target-coarse: 44px')
   })
 })

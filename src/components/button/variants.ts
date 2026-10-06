@@ -6,7 +6,7 @@ import {
   BORDER_WIDTH, CONTROL_SIZE, DISABLED, FOCUS_RING, HOVER, LOADING, TOUCH_TARGET, TRANSITION,
 } from '#shared/classes.js'
 import { TONE_CLASS } from '#shared/contracts/tone.js'
-import { BUTTON_DEFAULTS, BUTTON_TONES } from './constants.js'
+import { BUTTON_DEFAULTS, BUTTON_SIZES, BUTTON_TONES, BUTTON_VARIANTS } from './constants.js'
 import type { ButtonVariant, ButtonVariantProps } from './types.js'
 
 /** R-5.2-3: a lookup of complete class strings, never a name built from an expression. */
@@ -91,17 +91,29 @@ const resolve = cva(
  */
 const cache = new Map<string, string>()
 
+/** One definition, so the cached key and the allowed set can never disagree. */
+const keyFor = (variant: string, tone: string, size: string, fullWidth: boolean) =>
+  `${variant}|${tone}|${size}|${String(fullWidth)}`
+
+/** Only the 360 real keys, so a JS caller passing a free string cannot grow the map. */
+const CACHEABLE = new Set(
+  BUTTON_VARIANTS.flatMap((variant) =>
+    BUTTON_TONES.flatMap((tone) =>
+      BUTTON_SIZES.flatMap((size) =>
+        [true, false].map((wide) => keyFor(variant, tone, size, wide))))),
+)
+
 export function buttonVariants(props: ButtonVariantProps = {}): string {
   const variant = props.variant ?? BUTTON_DEFAULTS.variant
   const tone = props.tone ?? BUTTON_DEFAULTS.tone
   const size = props.size ?? BUTTON_DEFAULTS.size
   const fullWidth = props.fullWidth ?? BUTTON_DEFAULTS.fullWidth
 
-  const key = `${variant}|${tone}|${size}|${String(fullWidth)}`
+  const key = keyFor(variant, tone, size, fullWidth)
   let classes = cache.get(key)
   if (classes === undefined) {
     classes = cn(resolve({ variant, tone, size, fullWidth }))
-    cache.set(key, classes)
+    if (CACHEABLE.has(key)) cache.set(key, classes)
   }
   // The cva export appended these, so dropping them would be a silent regression.
   const extra = props.className ?? props.class

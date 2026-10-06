@@ -82,5 +82,10 @@ export const DISABLED = [
   'data-disabled:pointer-events-none data-disabled:opacity-50',
 ].join(' ')
 
-/** Full colour, so loading never reads as disabled, and no clicks while it is busy. */
-export const LOADING = 'aria-busy:cursor-progress aria-busy:opacity-100 data-loading:pointer-events-none'
+/**
+ * Full colour, so loading never reads as disabled, and no clicks while it is busy.
+ * No cursor: a loading control is always pointer-events: none, from `disabled` on a
+ * native button or `data-loading` elsewhere, so a cursor could never paint. See
+ * DECISIONS.md. The opacity order is pinned by styles.test.ts, not by this string.
+ */
+export const LOADING = 'aria-busy:opacity-100 data-loading:pointer-events-none'

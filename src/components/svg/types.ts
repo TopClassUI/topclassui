@@ -5,6 +5,7 @@ import type { IconSize } from '#shared/contracts/size.js'
 
 /** `name` is omitted: the svg attribute would collide with the icon name. */
 export interface SvgProps extends Omit<SVGProps<SVGSVGElement>, 'children' | 'name'> {
+  /** An icon imported explicitly, so the loader map never reaches the browser. */
   icon: IconData
   /** The five names, or any CSS length. Defaults to 1em so the icon follows the text. */
   size?: IconSize | number | (string & {}) | undefined

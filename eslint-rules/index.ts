@@ -9,7 +9,7 @@ function inClassContext(node: Node): boolean {
   let n = node.parent
   let depth = 0
   while (n && depth++ < 12) {
-    if (n.type === 'JSXAttribute' && n.name?.name === 'className') return true
+    if (n.type === 'JSXAttribute' && (n.name?.name === 'className' || n.name?.name === 'class')) return true
     if (n.type === 'CallExpression') {
       const callee = n.callee
       const name = callee?.name ?? callee?.property?.name
@@ -17,25 +17,49 @@ function inClassContext(node: Node): boolean {
     }
     if (n.type === 'VariableDeclarator') {
       const id = n.id?.name ?? ''
-      if (/Variants$|^[A-Z0-9_]+$/.test(id)) return true
+      if (/Variants$|Class(es)?$|^[A-Z0-9_]+$/.test(id)) return true
+    }
+    if (n.type === 'Property') {
+      const key = n.key?.name ?? n.key?.value ?? ''
+      if (/^class(Name)?$|Class(es)?$/.test(String(key))) return true
     }
     n = n.parent
   }
   return false
 }
 
+const CLASSY_TOKEN = /^-?[a-z0-9][a-z0-9:_\-./[\]()%&>*]*$/
+
+/**
+ * A class list is recognisable on its own, so a plain const, an object value or a
+ * string returned from a helper is covered without naming every shape it can take.
+ */
+function looksLikeClassList(value: string): boolean {
+  const trimmed = value.trim()
+  if (!trimmed || trimmed.length > 400) return false
+  // A path or a URL is never a class list, and both can carry a hyphen.
+  if (trimmed.includes('://') || trimmed.startsWith('/') || trimmed.startsWith('.')) return false
+  const tokens = trimmed.split(/\s+/)
+  if (!tokens.every((t) => CLASSY_TOKEN.test(t))) return false
+  // Half or more must be utility-shaped, or prose that merely names a class is flagged.
+  const utilities = tokens.filter((t) => t.includes('-') || t.includes(':')).length
+  return utilities > 0 && utilities * 2 >= tokens.length
+}
+
 function eachClassString(report: (node: Node, value: string) => void) {
+  const consider = (node: Node, value: string) => {
+    if (!inClassContext(node) && !looksLikeClassList(value)) return
+    report(node, value)
+  }
   return {
     Literal(node: Node) {
       if (typeof node.value !== 'string') return
-      if (!inClassContext(node)) return
-      report(node, node.value)
+      consider(node, node.value)
     },
     TemplateElement(node: Node) {
       const raw = node.value?.cooked
       if (typeof raw !== 'string' || !raw.trim()) return
-      if (!inClassContext(node)) return
-      report(node, raw)
+      consider(node, raw)
     },
   }
 }
@@ -69,6 +93,19 @@ const BANNED_SCALE = [
 ] as const
 
 const HAND_WRITTEN_STATE = /(^|[\s:])(hover|focus-visible|active):/
+
+/** `style`, `props.style` or `rest.style`: the caller's own, which must reach the element. */
+function isConsumerStyle(node: Node): boolean {
+  if (node?.type === 'Identifier') return node.name === 'style'
+  if (node?.type === 'MemberExpression') return node.property?.name === 'style'
+  return false
+}
+
+/**
+ * A sibling export that is not a part: a skeleton or a state stands beside the component
+ * rather than inside it, so `Card` next to `CardSkeleton` needs no `Root`.
+ */
+const NOT_A_PART = /^(Skeleton|EmptyState|ErrorState|Client|Provider|Context|Variants|Props)$/
 
 const rules = {
   'logical-properties-only': {
@@ -330,6 +367,174 @@ const rules = {
               ?? derivedFrom(arg?.callee?.object)
               ?? (arg?.type === 'MemberExpression' ? derivedFrom(arg.object) : null)
             if (source) ctx.report({ node: arg, messageId: 'derived', data: { source } })
+          }
+        },
+      }
+    },
+  },
+
+  'style-sets-tokens-only': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-5.2-5: the style prop may only set a --tc-* custom property.' },
+      schema: [],
+      messages: {
+        property: 'R-5.2-5: style only sets a --tc-* variable. "{{name}}" is a CSS property; use a class.',
+        opaque: 'R-5.2-5: style must be an object literal of --tc-* names, so the rule can read it.',
+      },
+    },
+    create(ctx: Context) {
+      return {
+        JSXAttribute(node: Node) {
+          if (node.name?.name !== 'style') return
+          const value = node.value
+          if (value?.type !== 'JSXExpressionContainer') return
+          const expression = value.expression
+          // The consumer's own style has to survive, whether passed through or merged.
+          if (isConsumerStyle(expression)) return
+          if (expression?.type !== 'ObjectExpression') {
+            ctx.report({ node, messageId: 'opaque' })
+            return
+          }
+          for (const prop of expression.properties ?? []) {
+            if (prop.type === 'SpreadElement') {
+              if (!isConsumerStyle(prop.argument)) ctx.report({ node: prop, messageId: 'opaque' })
+              continue
+            }
+            const name = String(prop.key?.value ?? prop.key?.name ?? '')
+            if (!name.startsWith('--tc-')) ctx.report({ node: prop, messageId: 'property', data: { name } })
+          }
+        },
+      }
+    },
+  },
+
+  'presence-state-attributes': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-5.7-6: presence attributes such as data-open, never data-state="open".' },
+      schema: [],
+      messages: {
+        state: 'R-5.7-6: data-state belongs to Base UI, not to us. Emit data-{{value}} as a presence attribute.',
+        valued: 'R-5.7-6: "{{name}}" is a state, so it is present or absent. Only a design prop carries a value.',
+      },
+    },
+    create(ctx: Context) {
+      const STATEFUL = /^data-(open|closed|loading|disabled|busy|checked|selected|active|pressed|expanded)$/
+      const flag = (node: Node, name: string, raw: string | null) => {
+        if (name === 'data-state') {
+          ctx.report({ node, messageId: 'state', data: { value: raw ?? 'open' } })
+          return
+        }
+        if (STATEFUL.test(name) && raw !== null && raw !== '') {
+          ctx.report({ node, messageId: 'valued', data: { name } })
+        }
+      }
+      return {
+        JSXAttribute(node: Node) {
+          const name = String(node.name?.name ?? '')
+          if (!name.startsWith('data-')) return
+          const value = node.value
+          flag(node, name, value?.type === 'Literal' ? String(value.value) : null)
+        },
+        Property(node: Node) {
+          const name = String(node.key?.value ?? node.key?.name ?? '')
+          if (!name.startsWith('data-')) return
+          const literal = node.value?.type === 'Literal' && typeof node.value.value === 'string'
+          flag(node, name, literal ? String(node.value.value) : null)
+        },
+      }
+    },
+  },
+
+  'flat-part-exports': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-9.2-3: export flat names; never an object a server file would dot into.' },
+      schema: [],
+      messages: {
+        namespace: 'R-9.2-3: export {{name}}Root and {{name}}{{part}} separately. An object pulls every part in and breaks across the use client boundary.',
+      },
+    },
+    create(ctx: Context) {
+      const isComponent = (name: string) => /^[A-Z][A-Za-z0-9]*$/.test(name)
+      return {
+        VariableDeclarator(node: Node) {
+          const name = String(node.id?.name ?? '')
+          if (!isComponent(name) || node.init?.type !== 'ObjectExpression') return
+          const properties = (node.init.properties ?? []).filter((p: Node) => p.type === 'Property')
+          const parts = properties.map((p: Node) => String(p.key?.name ?? p.key?.value ?? ''))
+          // A namespace holds references to components. A lookup holds class strings, and
+          // `const Tone = { Primary: 'tone-primary' }` is a lookup however it is spelled.
+          const references = properties.every((p: Node) =>
+            p.value?.type === 'Identifier' || p.value?.type === 'MemberExpression')
+          if (parts.length < 2 || !parts.every(isComponent) || !references) return
+          const part = parts.find((p: string) => p !== 'Root') ?? 'Header'
+          ctx.report({ node, messageId: 'namespace', data: { name, part } })
+        },
+      }
+    },
+  },
+
+  'root-part-is-named-root': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-9.2-4: a component split into parts names its root <Name>Root.' },
+      schema: [],
+      messages: {
+        bare: 'R-9.2-4: {{name}} is the root of {{name}}{{part}}, so it is named {{name}}Root without exception.',
+      },
+    },
+    create(ctx: Context) {
+      const exported = new Map<string, Node>()
+      const keep = (node: Node, name: string) => {
+        if (/^[A-Z][A-Za-z0-9]*$/.test(name)) exported.set(name, node)
+      }
+      return {
+        'ExportNamedDeclaration > FunctionDeclaration'(node: Node) {
+          keep(node, String(node.id?.name ?? ''))
+        },
+        'ExportNamedDeclaration > VariableDeclaration > VariableDeclarator'(node: Node) {
+          keep(node, String(node.id?.name ?? ''))
+        },
+        'Program:exit'() {
+          for (const [name, node] of exported) {
+            const part = [...exported.keys()]
+              .filter((other) => other !== name && other.startsWith(name))
+              .map((other) => other.slice(name.length))
+              .find((suffix) => suffix !== '' && !NOT_A_PART.test(suffix))
+            if (part === undefined) continue
+            ctx.report({ node, messageId: 'bare', data: { name, part } })
+          }
+        },
+      }
+    },
+  },
+
+  'text-comes-from-labels': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-5.11-1: every built-in string comes from the labels prop.' },
+      schema: [],
+      messages: {
+        hardcoded: 'R-5.11-1: "{{text}}" is built-in English. Take it from labels, which ships an Arabic default.',
+      },
+    },
+    create(ctx: Context) {
+      const LABELLED = new Set(['aria-label', 'aria-valuetext', 'aria-placeholder', 'alt', 'placeholder', 'title'])
+      /** Two letters or more, so a chevron, a bullet or a separator is not prose. */
+      const isProse = (text: string) => /[A-Za-z]{2,}/.test(text)
+      return {
+        JSXText(node: Node) {
+          const text = String(node.value ?? '').trim()
+          if (isProse(text)) ctx.report({ node, messageId: 'hardcoded', data: { text: text.slice(0, 40) } })
+        },
+        JSXAttribute(node: Node) {
+          if (!LABELLED.has(String(node.name?.name ?? ''))) return
+          const value = node.value
+          if (value?.type !== 'Literal' || typeof value.value !== 'string') return
+          if (isProse(value.value)) {
+            ctx.report({ node, messageId: 'hardcoded', data: { text: value.value.slice(0, 40) } })
           }
         },
       }

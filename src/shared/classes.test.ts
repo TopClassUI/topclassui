@@ -53,7 +53,7 @@ describe('disabled and loading each carry both halves', () => {
 
   it('keeps a loading control at full colour, shows progress and blocks clicks', () => {
     for (const cls of [
-      'aria-busy:cursor-progress', 'aria-busy:opacity-100', 'data-loading:pointer-events-none',
+      'aria-busy:opacity-100', 'data-loading:pointer-events-none',
     ]) expect(has(LOADING, cls), cls).toBe(true)
   })
 })

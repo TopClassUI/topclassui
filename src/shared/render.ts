@@ -1,5 +1,5 @@
 import { mergeProps } from '@base-ui/react/merge-props'
-import { cloneElement, isValidElement, type ReactElement, type ReactNode } from 'react'
+import { Fragment, cloneElement, isValidElement, type ReactElement, type ReactNode } from 'react'
 
 import { cn } from './cn.js'
 
@@ -44,6 +44,10 @@ export function renderElement(
 ): ReactElement {
   if (!isValidElement(element)) {
     throw new TypeError('render must be an element, such as render={<Link href="/x" />}')
+  }
+  // A Fragment takes no className, no data-* and no ref, so it would drop the whole look.
+  if (element.type === Fragment) {
+    throw new TypeError('render must be an element that takes attributes, not a fragment')
   }
 
   const own = (element.props ?? {}) as Props

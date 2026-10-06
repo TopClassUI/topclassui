@@ -6,6 +6,38 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-06 - Every component carries a generated README.md
+
+**Decision.** A new file joins the folder contract: `README.md`, written by `pnpm readme:build` from `schema.ts` (types, enums, defaults, limits, descriptions), `types.ts` (which props the component declares and whether each is required) and `meta.ts` (category, tier, status, rendering cost, Base UI range). Prose lives between `<!-- hand-written -->` markers and survives every regeneration. `pnpm check:readme` is in `pnpm check` and fails when a README is stale, `check-structure` requires the file, and `pnpm new:component` generates it so a scaffolded folder still passes clean.
+
+**Why.** The first thing anyone asks of a component - a person or an assistant reading the repo - is whether a prop is optional or mandatory and what its default is. Answering that from the source means reading `types.ts`, `schema.ts` and `constants.ts` together. A hand-written table would answer it immediately and would be wrong within a week, which is worse than no table. Generating it means it cannot disagree with the code: the required flag comes from the TypeScript checker, walking every branch of the props union and marking a prop required only when every branch requires it, and the defaults and limits come from the Zod schema through `z.toJSONSchema`.
+
+**Affects.** PLAN.md 8.1 lists the files a component folder may hold and did not include `README.md`; R-8.1-1 and the new R-8.1-3 now do. R-8.3-3 still stands for the docs site's props table, which is a different output from the same two sources.
+
+## 2026-10-06 - A disabled `render={<a>}` loses its `href`; a component element keeps it
+
+**Decision.** When `disabled` or `loading` is set and `render` is an intrinsic `<a>`, Button removes the `href` and adds `role="link"`. When `render` is a component element, such as `next/link`, the `href` stays and only `aria-disabled` and `tabIndex={-1}` apply.
+
+**Why.** ARIA 1.2 asks that a disabled control cannot be activated. `pointer-events: none` stops a real pointer but not `Enter` or `HTMLElement.click()`, and a Server Component has no event handler to cancel with - Base UI's `useButton` needs `onClick` plus `preventDefault` for the same job. Dropping the `href` is the only server-side stop. It is not applied to a component element because `href` is a required prop of `next/link`, so removing it would crash the component rather than disable it. `role="link"` is needed because an `<a>` with no `href` exposes no role, which would leave `aria-disabled` unannounced.
+
+**Affects.** R-5.6-1, PLAN.md 8.4. Guidance for consumers: do not disable a navigation link - hide it, or render a real button.
+
+## 2026-10-06 - `LOADING` drops the progress cursor PLAN.md asks for
+
+**Decision.** `LOADING` is `aria-busy:opacity-100 data-loading:pointer-events-none`. The `cursor-progress` half of PLAN.md 5.2 and 8.4 is gone.
+
+**Why.** A loading control is always `pointer-events: none`: a native button gets the `disabled` attribute, which `DISABLED` pairs with `disabled:pointer-events-none`, and anything else gets `data-loading:pointer-events-none`. An element that is not a hit target takes its cursor from an ancestor, so `cursor: progress` could never paint in either case. Keeping the pointer block matters more than the cursor, because dropping it would let `hover:` repaint a disabled control. `src/cascade.test.ts` now fails if the cursor comes back.
+
+**Affects.** PLAN.md 5.2 and 8.4, R-5.2-4. If the progress cursor is wanted later, the pointer block has to be replaced by `not-disabled:hover:` guards on `HOVER`, which is a change to every component.
+
+## 2026-10-06 - The emitted order of two same-property utilities is pinned by a test
+
+**Decision.** `src/cascade.test.ts` asserts that Tailwind emits `aria-busy:opacity-100` after `disabled:opacity-50` and `data-disabled:opacity-50` after both.
+
+**Why.** Both are the `opacity` utility under different variants, so they carry the same specificity and the emitted order is the only thing that decides. Every test we had asserted the class was in the `class` attribute, which says nothing about which one the browser takes. A Tailwind variant-order change would silently make a loading button look disabled.
+
+**Affects.** R-5.2-4, R-4-1.
+
 ## 2026-10-05 - The guarantees get gates: a lint rule, a mutation runner, and a real browser
 
 **Decision.** Five weaknesses that no reviewer raised, because they are about the shape of the project rather than its code. Each is now enforced rather than remembered.

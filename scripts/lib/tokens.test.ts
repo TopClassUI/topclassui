@@ -3,7 +3,9 @@ import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { declaredModes, readBlocks, readPalette, resolve, resolvePercent, tokensFor } from './tokens.js'
+import {
+  declaredModes, readBlocks, readPalette, resolve, resolvePercent, tokensFor, tokensMissingPerMode,
+} from './tokens.js'
 
 const CSS = `
 /* a comment with a { brace } in it */
@@ -187,5 +189,37 @@ describe('the shipped tokens', () => {
 
   it('keeps the motion knob at 1, since the reduced-motion block is conditional', () => {
     expect(tokensFor(real, 'light').get('--tc-motion')).toBe('1')
+  })
+})
+
+describe('a token has to exist in every mode, not only the one it was added for', () => {
+  const css = (body: string) => readBlocks(body)
+
+  it('passes when :root declares it, because every mode inherits that', () => {
+    expect(tokensMissingPerMode(css(
+      ":root { --tc-a: 1px }\n[data-theme='dark'] { --tc-b: 2px }\n[data-theme='light'] { --tc-b: 3px }\n",
+    ))).toEqual([])
+  })
+
+  it('catches a token only one mode declares, which is undefined in the other', () => {
+    const found = tokensMissingPerMode(css(
+      ":root { --tc-a: 1px }\n[data-theme='dark'] { --tc-only: 2px }\n[data-theme='light'] { --tc-a: 3px }\n",
+    ))
+    expect(found).toEqual([{ mode: 'light', token: '--tc-only' }])
+  })
+
+  it('reports one row per mode and token, so the message names every hole', () => {
+    const found = tokensMissingPerMode(css(
+      "[data-theme='dark'] { --tc-only: 2px }\n[data-theme='light'] { --tc-a: 1px }\n[data-theme='ocean'] { --tc-a: 4px }\n",
+    ))
+    expect(found).toEqual([
+      { mode: 'dark', token: '--tc-a' },
+      { mode: 'light', token: '--tc-only' },
+      { mode: 'ocean', token: '--tc-only' },
+    ])
+  })
+
+  it('says nothing about the real tokens file, which is symmetric today', () => {
+    expect(tokensMissingPerMode(readBlocks(readFileSync(join(process.cwd(), 'src', 'tokens.css'), 'utf8')))).toEqual([])
   })
 })
