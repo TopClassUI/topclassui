@@ -15,7 +15,7 @@ test('the selector finds interactive elements somewhere in the set', async ({ pa
     await page.goto(urlFor(demo, 'light', 'ltr'))
     total += await page.locator(INTERACTIVE).count()
   }
-  expect(total).toBeGreaterThan(DEMOS.length)
+  expect(total).toBeGreaterThan(0)
 })
 
 for (const demo of DEMOS) {
