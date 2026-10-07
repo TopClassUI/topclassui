@@ -8,6 +8,9 @@ export const BUTTON_TONES = TONES
 
 export const BUTTON_SIZES = SIZES
 
+/** The three variants with no fill, so only the tone's text colour applies. */
+export const BUTTON_UNFILLED = ['outline', 'ghost', 'link'] as const
+
 export const BUTTON_DEFAULTS = {
   variant: 'solid',
   tone: DEFAULT_TONE,

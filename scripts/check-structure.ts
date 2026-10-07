@@ -3,7 +3,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, posix, relative, sep } from 'node:path'
 
 import { FAIL_LINES, WARN_LINES, countLines, sizeVerdict, sourceFilesUnder } from './lib/file-sizes.js'
-import { inlinePropInterfaces } from './lib/source-checks.js'
+import { inlinePropInterfaces, screamingConstants } from './lib/source-checks.js'
 
 const ROOT = process.cwd()
 const COMPONENTS = join(ROOT, 'src', 'components')
@@ -100,6 +100,18 @@ function checkComponentFolder(dir: string, slug: string) {
 
   if (files.includes('hook.ts') && !files.includes('client.tsx')) {
     errors.push(`${rel(dir)}: hook.ts exists with no client.tsx. Only client.tsx may import it (R-8.1-1).`)
+  }
+
+  // R-5.12-4: a SCREAMING_CASE table is data or classes, so it lives in the file for that.
+  const CONSTANT_HOMES = new Set(['constants.ts', 'classes.ts'])
+  for (const f of files) {
+    if (CONSTANT_HOMES.has(f) || /\.test\.tsx?$/.test(f)) continue
+    for (const name of screamingConstants(readFileSync(join(dir, f), 'utf8'))) {
+      errors.push(
+        `${rel(join(dir, f))}: declares ${name}.`
+        + ' A SCREAMING_CASE constant lives in constants.ts or classes.ts (R-5.12-4).',
+      )
+    }
   }
 
   // R-8.3-4: a prop interface is declared in types.ts, never inline in a component file.

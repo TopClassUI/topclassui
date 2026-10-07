@@ -6,40 +6,9 @@ import {
   BORDER_WIDTH, CONTROL_SIZE, DISABLED, FOCUS_RING, HOVER, LOADING, TOUCH_TARGET, TRANSITION,
 } from '#shared/classes.js'
 import { TONE_CLASS } from '#shared/contracts/tone.js'
-import { BUTTON_DEFAULTS, BUTTON_SIZES, BUTTON_TONES, BUTTON_VARIANTS } from './constants.js'
-import type { ButtonVariant, ButtonVariantProps } from './types.js'
-
-/** R-5.2-3: a lookup of complete class strings, never a name built from an expression. */
-const ON_SOLID = {
-  primary: 'bg-primary-solid text-primary-on-solid',
-  neutral: 'bg-neutral-solid text-neutral-on-solid',
-  success: 'bg-success-solid text-success-on-solid',
-  warning: 'bg-warning-solid text-warning-on-solid',
-  danger: 'bg-danger-solid text-danger-on-solid',
-  info: 'bg-info-solid text-info-on-solid',
-} as const
-
-const ON_SOFT = {
-  primary: 'bg-primary-soft text-primary-on-soft',
-  neutral: 'bg-neutral-soft text-neutral-on-soft',
-  success: 'bg-success-soft text-success-on-soft',
-  warning: 'bg-warning-soft text-warning-on-soft',
-  danger: 'bg-danger-soft text-danger-on-soft',
-  info: 'bg-info-soft text-info-on-soft',
-} as const
-
-/** cva wants a mutable list here, so the tuple is declared once rather than inline. */
-const UNFILLED: ButtonVariant[] = ['outline', 'ghost', 'link']
-
-/** outline, ghost and link have no fill, so only the tone's text colour applies. */
-const TONE_TEXT = {
-  primary: 'text-primary-on-soft',
-  neutral: 'text-neutral-on-soft',
-  success: 'text-success-on-soft',
-  warning: 'text-warning-on-soft',
-  danger: 'text-danger-on-soft',
-  info: 'text-info-on-soft',
-} as const
+import { ON_SOFT, ON_SOLID, TONE_TEXT } from './classes.js'
+import { BUTTON_DEFAULTS, BUTTON_SIZES, BUTTON_TONES, BUTTON_UNFILLED, BUTTON_VARIANTS } from './constants.js'
+import type { ButtonVariantProps } from './types.js'
 
 const resolve = cva(
   [
@@ -70,7 +39,8 @@ const resolve = cva(
       ...BUTTON_TONES.map((tone) => ({ variant: 'solid' as const, tone, class: ON_SOLID[tone] })),
       ...BUTTON_TONES.map((tone) => ({ variant: 'soft' as const, tone, class: ON_SOFT[tone] })),
       ...BUTTON_TONES.map((tone) => ({
-        variant: UNFILLED,
+        // Spread: cva wants a mutable list, and R-8.3-5 wants the source as const.
+        variant: [...BUTTON_UNFILLED],
         tone,
         class: TONE_TEXT[tone],
       })),

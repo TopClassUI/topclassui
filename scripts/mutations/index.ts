@@ -95,7 +95,7 @@ export const MUTATIONS: Mutation[] = [
   },
   {
     label: 'two tones share one fill',
-    file: 'src/components/button/variants.ts',
+    file: 'src/components/button/classes.ts',
     from: "  danger: 'bg-danger-solid text-danger-on-solid',",
     to: "  danger: 'bg-success-solid text-success-on-solid',",
   },
@@ -113,7 +113,7 @@ export const MUTATIONS: Mutation[] = [
   },
   {
     label: 'the skeleton reserves one width at every size',
-    file: 'src/components/button/skeleton.tsx',
+    file: 'src/components/button/classes.ts',
     from: "  xs: 'w-16', sm: 'w-20', md: 'w-24', lg: 'w-28', xl: 'w-32', custom: '',",
     to: "  xs: 'w-24', sm: 'w-24', md: 'w-24', lg: 'w-24', xl: 'w-24', custom: '',",
   },
@@ -231,5 +231,11 @@ export const MUTATIONS: Mutation[] = [
     file: 'scripts/lib/readme.ts',
     from: "const cell = (text: string) => text.split('|').join('\\\\|')",
     to: 'const cell = (text: string) => text',
+  },
+  {
+    label: 'a SCREAMING_CASE table can hide in any file again',
+    file: 'scripts/lib/source-checks.ts',
+    from: "return [...source.matchAll(re)].map((m) => m[1] ?? '')",
+    to: 'return []',
   },
 ]

@@ -83,3 +83,15 @@ export function exportsAsync(source: string): boolean {
     || /export\s+(?:const|let|var)\s+[\w$]+\s*(?::[^=]+)?=\s*async\b/.test(source)
     || /export\s+default\s+async\s*\(/.test(source)
 }
+
+/**
+ * SCREAMING_CASE tables declared outside constants.ts and classes.ts (R-5.12-4). Only a
+ * literal counts: `new Set(...)` or `cva(...)` is computed, not data someone goes looking
+ * for, and the rule exists so a reader knows which file holds the lookups.
+ */
+export function screamingConstants(source: string): string[] {
+  const name = String.raw`([A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+|[A-Z][A-Z0-9]{2,})`
+  const literal = String.raw`[{['"\`\d]`
+  const re = new RegExp(String.raw`^(?:export\s+)?const\s+${name}\s*(?::[^=]+)?=\s*${literal}`, 'gm')
+  return [...source.matchAll(re)].map((m) => m[1] ?? '')
+}
