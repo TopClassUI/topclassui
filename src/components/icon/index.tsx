@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { Svg } from '../svg/index.js'
+import { Svg } from '#components/svg/index.js'
 import { loadIcon } from './lib.js'
 import type { IconProps } from './types.js'
 

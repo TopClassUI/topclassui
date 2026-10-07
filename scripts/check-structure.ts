@@ -2,7 +2,8 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, posix, relative, sep } from 'node:path'
 
-import { inlinePropInterfaces } from './lib/source-checks.js'
+import { FAIL_LINES, WARN_LINES, countLines, sizeVerdict, sourceFilesUnder } from './lib/file-sizes.js'
+import { inlinePropInterfaces, screamingConstants } from './lib/source-checks.js'
 
 const ROOT = process.cwd()
 const COMPONENTS = join(ROOT, 'src', 'components')
@@ -14,15 +15,18 @@ const ALLOWED_FILES = new Set([
   'client.tsx',
   'hook.ts',
   'lib.ts',
+  'lib.tsx',
   'variants.ts',
   'classes.ts',
   'constants.ts',
+  'boundaries.ts',
   'types.ts',
   'schema.ts',
   'skeleton.tsx',
   'empty-state.tsx',
   'error-state.tsx',
   'meta.ts',
+  'README.md',
 ])
 
 const ALLOWED_DIRS = new Set(['dummy', 'parts', 'test'])
@@ -37,9 +41,6 @@ const RESERVED = new Map([
   ['demos', 'dummy'],
 ])
 
-const WARN_LINES = 200
-const FAIL_LINES = 300
-
 const errors: string[] = []
 const warnings: string[] = []
 
@@ -53,18 +54,15 @@ function listDir(dir: string) {
   }
 }
 
-function countLines(file: string) {
-  return readFileSync(file, 'utf8').split(/\r?\n/).length
-}
-
 function isKebab(name: string) {
   return /^[a-z0-9]+(-[a-z0-9]+)*$/.test(name)
 }
 
 function checkFileSize(file: string) {
   const lines = countLines(file)
-  if (lines > FAIL_LINES) errors.push(`${rel(file)}: ${lines} lines, over the ${FAIL_LINES} limit (R-5.12-2). Move parts into parts/.`)
-  else if (lines > WARN_LINES) warnings.push(`${rel(file)}: ${lines} lines, over the ${WARN_LINES} warning line (R-5.12-2).`)
+  const verdict = sizeVerdict(lines)
+  if (verdict === 'fail') errors.push(`${rel(file)}: ${lines} lines, over the ${FAIL_LINES} limit (R-5.12-2). Move parts into parts/.`)
+  else if (verdict === 'warn') warnings.push(`${rel(file)}: ${lines} lines, over the ${WARN_LINES} warning line (R-5.12-2).`)
 }
 
 function checkComponentFolder(dir: string, slug: string) {
@@ -75,6 +73,17 @@ function checkComponentFolder(dir: string, slug: string) {
   const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name)
 
   if (!files.includes('index.tsx')) errors.push(`${rel(dir)}: index.tsx is required (R-8.1-1).`)
+  if (!files.includes('meta.ts')) errors.push(`${rel(dir)}: meta.ts is required (R-8.1-2).`)
+  if (!files.includes('README.md')) errors.push(`${rel(dir)}: README.md is required. Run pnpm readme:build (R-8.1-3).`)
+
+  // R-8.1-1 names index.test.tsx as required, so a folder can never ship untested.
+  const ownTests = files.filter((f) => /\.test\.tsx?$/.test(f))
+  const folderTests = dirs.includes('test')
+    ? listDir(join(dir, 'test')).filter((e) => e.isFile() && /\.test\.tsx?$/.test(e.name))
+    : []
+  if (ownTests.length + folderTests.length === 0) {
+    errors.push(`${rel(dir)}: has no test file, in the folder or in test/ (R-8.1-1).`)
+  }
 
   for (const name of [...files, ...dirs]) {
     const replacement = RESERVED.get(name)
@@ -95,7 +104,17 @@ function checkComponentFolder(dir: string, slug: string) {
     errors.push(`${rel(dir)}: hook.ts exists with no client.tsx. Only client.tsx may import it (R-8.1-1).`)
   }
 
-  for (const f of files) checkFileSize(join(dir, f))
+  // R-5.12-4: a SCREAMING_CASE table is data or classes, so it lives in the file for that.
+  const CONSTANT_HOMES = new Set(['constants.ts', 'classes.ts', 'boundaries.ts'])
+  for (const f of files) {
+    if (CONSTANT_HOMES.has(f) || /\.test\.tsx?$/.test(f)) continue
+    for (const name of screamingConstants(readFileSync(join(dir, f), 'utf8'))) {
+      errors.push(
+        `${rel(join(dir, f))}: declares ${name}.`
+        + ' A SCREAMING_CASE constant lives in constants.ts or classes.ts (R-5.12-4).',
+      )
+    }
+  }
 
   // R-8.3-4: a prop interface is declared in types.ts, never inline in a component file.
   for (const f of files) {
@@ -113,7 +132,6 @@ function checkComponentFolder(dir: string, slug: string) {
     for (const e of listDir(join(dir, 'parts'))) {
       if (!e.isFile()) { errors.push(`${rel(join(dir, 'parts', e.name))}: parts/ holds files, not folders (R-8.1-1).`); continue }
       if (!isKebab(e.name.replace(/\.tsx?$/, ''))) errors.push(`${rel(join(dir, 'parts', e.name))}: part files are kebab-case (R-5.12-4).`)
-      checkFileSize(join(dir, 'parts', e.name))
     }
   }
 
@@ -131,7 +149,6 @@ function checkComponentFolder(dir: string, slug: string) {
   if (dirs.includes('test')) {
     const tests = listDir(join(dir, 'test')).filter((e) => e.isFile() && /\.test\.tsx?$/.test(e.name))
     if (tests.length === 0) errors.push(`${rel(join(dir, 'test'))}: holds no test file (R-8.1-1).`)
-    for (const t of tests) checkFileSize(join(dir, 'test', t.name))
   }
 }
 
@@ -145,6 +162,7 @@ function walk(root: string) {
 
 walk(COMPONENTS)
 walk(CONNECTORS)
+for (const file of sourceFilesUnder(join(ROOT, 'src'))) checkFileSize(file)
 
 for (const w of warnings) console.warn(`warn  ${w}`)
 for (const e of errors) console.error(`error ${e}`)

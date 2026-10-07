@@ -4,11 +4,8 @@ export type BuiltInMode = (typeof BUILT_IN_MODES)[number]
 
 export const THEME_STORAGE_KEY = 'tc-theme'
 
-/**
- * Runs while the browser parses the head, before first paint, so the page never
- * flashes the wrong mode. Reading a cookie on the server would make every page
- * dynamic, which costs caching and SEO.
- */
+/** Runs before first paint, so the page never flashes the wrong mode. A cookie read
+ * on the server would make every page dynamic, costing caching and SEO. */
 export const THEME_SCRIPT =
   `(function(){try{var m=["light","dark","ocean"];var t=null;` +
   // Its own try: a blocked localStorage threw past the fallback and set no mode at all.

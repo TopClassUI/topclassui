@@ -1,8 +1,10 @@
 import { clsx, type ClassValue } from 'clsx'
 import { extendTailwindMerge } from 'tailwind-merge'
 
+import { TONES } from './contracts/tone.js'
+
 // Without these, h-control-md and h-control-sm would both survive a merge.
-const twMerge = extendTailwindMerge({
+const twMerge = extendTailwindMerge<'tone'>({
   extend: {
     theme: {
       spacing: [
@@ -14,6 +16,8 @@ const twMerge = extendTailwindMerge({
       ],
       radius: ['control', 'box', 'chip'],
     },
+    // Its own group, or two tone-* classes both survive and stylesheet order decides.
+    classGroups: { tone: [{ tone: [...TONES] }] },
   },
 })
 

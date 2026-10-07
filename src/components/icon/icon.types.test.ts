@@ -1,8 +1,8 @@
 // Type-only imports, so the server-only module is never loaded in this project.
 import { describe, expectTypeOf, it } from 'vitest'
 
-import type { IconName } from '../../icons/names.generated.js'
-import type { SvgProps } from '../svg/index.js'
+import type { IconName } from '#icons/names.generated.js'
+import type { SvgProps } from '#components/svg/index.js'
 import type { IconProps as RegistryIconProps } from '../icon-registry/types.js'
 import type { IconProps } from './types.js'
 

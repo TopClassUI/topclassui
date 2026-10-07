@@ -3,10 +3,13 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { join, posix, relative, sep } from 'node:path'
 
 import {
+  exportsAsync,
   hasLateUseClient,
   hasUseClient,
   importedModules,
   importedNames,
+  memberHookCalls,
+  namespaceNamesOf,
   relativeImportsMissingExtension,
 } from './lib/source-checks.js'
 
@@ -55,9 +58,14 @@ for (const file of files) {
   if (isIndex) {
     if (hasUseClient(source)) errors.push(`${r}: index.tsx never contains 'use client' (R-5.1-1).`)
 
-    for (const name of importedNames(source, 'react')) {
+    // Named, plus anything reached through a namespace or default React import.
+    const hooks = [
+      ...importedNames(source, 'react'),
+      ...memberHookCalls(source, namespaceNamesOf(source, 'react')),
+    ]
+    for (const name of new Set(hooks)) {
       if (name.startsWith('use') && !SERVER_SAFE_HOOKS.has(name)) {
-        errors.push(`${r}: imports ${name} from react. A Server Component may only call useId and use (R-5.1-1).`)
+        errors.push(`${r}: uses ${name} from react. A Server Component may only call useId and use (R-5.1-1).`)
       }
     }
     if (/from\s+['"]\.\/hook\.js['"]/.test(source)) {
@@ -66,7 +74,7 @@ for (const file of files) {
     if (/\bcreateContext\s*\(|\buseContext\s*\(/.test(source)) {
       errors.push(`${r}: React context does not exist in a Server Component render. Direction and theme come from dir and data-theme (R-5.1-4).`)
     }
-    if (r !== RSC_ONLY && /export\s+(default\s+)?async\s+function/.test(source)) {
+    if (r !== RSC_ONLY && exportsAsync(source)) {
       errors.push(`${r}: only ${RSC_ONLY} may be async; every other index.tsx must render in a non-RSC tree (R-5.1-5).`)
     }
   }

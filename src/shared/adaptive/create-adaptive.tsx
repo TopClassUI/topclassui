@@ -10,11 +10,8 @@ export interface AdaptiveExtras {
   onOpenChange?: ((open: boolean) => void) | undefined
 }
 
-/**
- * R-11.2: both halves accept the same props, spelled out as the type argument.
- * NoInfer stops TypeScript inferring the contract from the two components, which
- * would quietly promote a mobile-only required prop into the public API.
- */
+/** R-11.2: both halves take the same props. NoInfer stops the contract being
+ * inferred, which would promote a mobile-only prop into the public API. */
 export function createAdaptive<P extends object>(
   Desktop: ComponentType<NoInfer<P>>,
   Mobile: ComponentType<NoInfer<P>>,

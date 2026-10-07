@@ -1,5 +1,5 @@
 import { mergeProps } from '@base-ui/react/merge-props'
-import { cloneElement, isValidElement, type ReactElement } from 'react'
+import { Fragment, cloneElement, isValidElement, type ReactElement, type ReactNode } from 'react'
 
 import { cn } from './cn.js'
 
@@ -29,14 +29,19 @@ function composeRefs(a: AnyRef, b: AnyRef): AnyRef {
   }
 }
 
-/**
- * R-5.7-4: the element form of `render`, with no hooks, so it works in a Server
- * Component. `<Button render={<Link href="/docs" />}>` becomes a real anchor that
- * looks like a button and still costs 0 KB.
- */
-export function renderElement(element: ReactElement, props: Props): ReactElement {
+/** R-5.7-4: the element form of `render`, no hooks, so it works in a server
+ * component. `decorate` wraps whichever children survive, so a spinner is not lost. */
+export function renderElement(
+  element: ReactElement,
+  props: Props,
+  decorate?: (children: ReactNode) => ReactNode,
+): ReactElement {
   if (!isValidElement(element)) {
     throw new TypeError('render must be an element, such as render={<Link href="/x" />}')
+  }
+  // A Fragment takes no className, no data-* and no ref, so it would drop the whole look.
+  if (element.type === Fragment) {
+    throw new TypeError('render must be an element that takes attributes, not a fragment')
   }
 
   const own = (element.props ?? {}) as Props
@@ -52,7 +57,8 @@ export function renderElement(element: ReactElement, props: Props): ReactElement
   if (composed) merged['ref'] = composed
 
   // An element written with children keeps them; otherwise the component supplies them.
-  if (own['children'] === undefined) merged['children'] = props['children']
+  const children = own['children'] === undefined ? props['children'] : own['children']
+  merged['children'] = decorate ? decorate(children as ReactNode) : children
 
   return cloneElement(element, merged)
 }

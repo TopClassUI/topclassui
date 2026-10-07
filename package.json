@@ -36,18 +36,28 @@
     "check:boundaries": "tsx scripts/check-boundaries.ts",
     "check:contrast": "tsx scripts/check-contrast.ts",
     "rules:sync": "tsx scripts/rules-sync.ts",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm check:structure && pnpm check:boundaries && pnpm check:css && pnpm check:icons && pnpm check:contrast && pnpm rules:sync --check",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm check:structure && pnpm check:boundaries && pnpm check:css && pnpm check:icons && pnpm check:readme && pnpm check:contrast && pnpm test:e2e && pnpm rules:sync --check",
     "check:css": "tsx scripts/check-css.ts",
     "icons:build": "tsx scripts/icons-build.ts",
-    "check:icons": "tsx scripts/icons-build.ts --check"
+    "check:icons": "tsx scripts/icons-build.ts --check",
+    "new:component": "tsx scripts/new-component.ts",
+    "test:mutation": "tsx scripts/mutate.ts",
+    "harness:build": "tsx scripts/build-harness.tsx",
+    "test:e2e": "pnpm harness:build && playwright test",
+    "readme:build": "tsx scripts/readme-build.ts",
+    "check:readme": "tsx scripts/readme-build.ts --check"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
     "@eslint/js": "10.0.1",
+    "@playwright/test": "1.63.0",
     "@testing-library/dom": "10.4.2",
     "@testing-library/react": "16.3.3",
+    "@testing-library/user-event": "14.6.7",
     "@types/node": "22.14.0",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "axe-core": "4.14.0",
     "eslint": "10.12.0",
     "happy-dom": "20.14.5",
     "jiti": "2.7.0",
@@ -68,5 +78,11 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwindcss": "^4.2.0"
+  },
+  "imports": {
+    "#shared/*": "./src/shared/*",
+    "#icons/*": "./src/icons/*",
+    "#components/*": "./src/components/*",
+    "#test/*": "./src/test/*"
   }
 }

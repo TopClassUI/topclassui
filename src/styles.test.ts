@@ -1,22 +1,11 @@
-// Compiles the real stylesheets, because unstyled output throws no error.
-import { readFileSync } from 'node:fs'
-import { dirname, join, resolve } from 'node:path'
+// R-4-1, R-4-2, R-5.2-4: the stylesheet has to compile and emit what we promise.
+import { describe, expect, it, beforeAll } from 'vitest'
 
-import { compile } from 'tailwindcss'
-import { beforeAll, describe, expect, it } from 'vitest'
-
+import { compileEntry } from '#test/stylesheet.js'
 import { FOCUS_RING } from './shared/classes.js'
-
-const ROOT = process.cwd()
-const ENTRY = '@import "tailwindcss";\n@import "./src/tokens.css";\n@import "./src/styles.css";\n'
-
-/** Tailwind's own resolver needs a bundler; the entry only ever imports three files. */
-function loadStylesheet(id: string, base: string) {
-  const file = id === 'tailwindcss'
-    ? join(ROOT, 'node_modules', 'tailwindcss', 'index.css')
-    : resolve(base, id)
-  return Promise.resolve({ path: file, base: dirname(file), content: readFileSync(file, 'utf8') })
-}
+import { BUTTON_SIZES, BUTTON_TONES, BUTTON_VARIANTS } from './components/button/constants.js'
+import { buttonVariants } from './components/button/variants.js'
+import { TONES } from './shared/contracts/tone.js'
 
 const CANDIDATES = [
   'bg-page', 'bg-surface', 'bg-surface-raised', 'text-body', 'text-muted',
@@ -35,8 +24,7 @@ const CANDIDATES = [
 let css = ''
 
 beforeAll(async () => {
-  const compiled = await compile(ENTRY, { base: ROOT, loadStylesheet })
-  css = compiled.build(CANDIDATES)
+  css = (await compileEntry()).build(CANDIDATES)
 })
 
 /** Tailwind emits nothing at all for a candidate it cannot resolve. */
@@ -130,7 +118,7 @@ describe('the three modes and the direction', () => {
 
 describe('the focus ring actually paints', () => {
   it('restores outline-style on focus-visible, which the reset zeroes', async () => {
-    const compiled = await compile(ENTRY, { base: ROOT, loadStylesheet })
+    const compiled = await compileEntry()
     const ring = compiled.build(FOCUS_RING.split(' '))
 
     // The reset sets --tw-outline-style: none, so without this the width substitutes none.
@@ -147,5 +135,51 @@ describe('the focus ring actually paints', () => {
     expect(FOCUS_RING).toContain('--tc-ring-width')
     expect(FOCUS_RING).toContain('--tc-ring-offset')
     expect(FOCUS_RING).toContain('outline-ring')
+  })
+})
+
+describe('the tone utilities', () => {
+  let toneCss = ''
+
+  beforeAll(async () => {
+    const compiled = await compileEntry()
+    toneCss = compiled.build(TONES.map((t) => `tone-${t}`))
+  })
+
+  for (const tone of TONES) {
+    it(`tone-${tone} swaps all five interaction variables`, () => {
+      const start = toneCss.indexOf(`.tone-${tone} {`)
+      const block = start < 0 ? '' : toneCss.slice(start, toneCss.indexOf('}', start))
+      for (const name of ['soft', 'hover', 'active', 'soft-hover', 'soft-active']) {
+        expect(block, `${tone}/${name}`).toContain(`--tc-${name}: var(--tc-${tone}-${name})`)
+      }
+    })
+  }
+
+  it('emits one utility per tone and nothing else', () => {
+    expect([...toneCss.matchAll(/\.tone-[a-z]+\s*\{/g)]).toHaveLength(TONES.length)
+  })
+})
+
+describe('every class Button emits resolves to real CSS', () => {
+  it('leaves no class without a rule, in any variant and tone combination', async () => {
+    const wanted = new Set<string>()
+    for (const variant of BUTTON_VARIANTS) {
+      for (const tone of BUTTON_TONES) {
+        for (const size of BUTTON_SIZES) {
+          for (const cls of buttonVariants({ variant, tone, size, fullWidth: true }).split(/\s+/)) {
+            if (cls) wanted.add(cls)
+          }
+        }
+      }
+    }
+
+    const compiled = await compileEntry()
+    const out = compiled.build([...wanted])
+    /** Tailwind escapes every character a CSS identifier may not carry. */
+    const selector = (cls: string) => `.${cls.replace(/[^\w-]/g, (ch) => `\\${ch}`)}`
+
+    const missing = [...wanted].filter((c) => !out.includes(selector(c)))
+    expect(missing).toEqual([])
   })
 })

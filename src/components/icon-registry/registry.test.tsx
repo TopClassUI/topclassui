@@ -1,9 +1,9 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { arrowLeft } from '../../icons/data/arrow-left.js'
-import { check } from '../../icons/data/check.js'
-import { Svg } from '../svg/index.js'
+import { arrowLeft } from '#icons/data/arrow-left.js'
+import { check } from '#icons/data/check.js'
+import { Svg } from '#components/svg/index.js'
 import { Icon, registerIcons, registeredIcons } from './index.js'
 
 registerIcons({ 'arrow-left': arrowLeft, check })

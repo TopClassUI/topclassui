@@ -6,6 +6,193 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-07 - `zod/mini` may run in a client file; the full build still never ships
+
+**Decision.** R-8.3-1 is relaxed. A client file (`client.tsx`, `hook.ts`, `lib.ts`, `lib.tsx`) may `import * as z from 'zod/mini'` at runtime for layer-2 validation. `schema.ts` is still imported with `import type` only, the full `zod` build still never reaches the browser, and a Server Component may import neither. The guard in `src/shared/no-zod-at-runtime.test.ts` now reads the exact specifier rather than the package name, because `packageName()` collapsed `zod/mini` to `zod`.
+
+**Why.** Measured with esbuild, minified and gzipped, for one `z.string().max(100)`: the full build is 89 KB and `zod/mini` is 3.4 KB. The earlier rule assumed one number for both. Validation needs three layers and the library owns two of them: `maxLength` on the input stops typing, but not a paste, not `input.value = ...` and not a DevTools edit, so a client control needs a real check in JavaScript. 3.4 KB buys that. 89 KB does not, and the server half still costs nothing either way.
+
+**Affects.** R-8.3-1. No component uses it yet - Button is server-only and no input exists - so the validator itself is written with the first client control rather than invented ahead of it.
+
+## 2026-10-07 - Defaults and bounds move out of constants.ts into boundaries.ts
+
+**Decision.** A new file joins the folder contract: `boundaries.ts`, holding `<NAME>_DEFAULTS` and `<NAME>_BOUNDARIES`. `constants.ts` keeps the `as const` value lists and nothing else. `schema.ts`, `variants.ts` and the component import the defaults from `boundaries.ts`. `pnpm new:component` writes it, and `check-structure` allows it. A team overrides any default by passing the prop.
+
+**Why.** PLAN.md 8.1 put the value lists, the limits and the defaults in one file. In practice the defaults are the only part a consuming team reads: they are the answer to "what happens if I pass nothing, and what may I change". Mixed in with twenty lines of value lists they read as constants rather than as choices. The split also keeps `R-5.7-8` honest, because the default cap a text field inherits is now visible in one short file per component rather than buried.
+
+**Affects.** PLAN.md 8.1 and the new R-8.3-6; R-8.3-2 narrowed to the value lists. The scaffold also gained `classes.ts`, because R-5.12-4 now rejects the `ON_SOLID` and `ON_SOFT` tables it used to write into `variants.ts` - which means `pnpm new:component` had been producing a folder that failed its own gate since that rule landed.
+
+## 2026-10-07 - Every text field has a default maxLength, set high enough never to cut real input
+
+**Decision.** `shared/contracts/boundaries.ts` holds `TEXT_MAX_LENGTH`, a default character cap per input type: text 512, email 254, url 2048, tel 32, search 256, password 256, textarea 5000. `resolveMaxLength(given, type)` is the single implementation every input component calls: it takes the caller's number when there is one, falls back to the type's default, and returns `undefined` for an explicit `null`, which is the documented opt-out. A counter appears at `COUNTER_THRESHOLD` (0.9) of the cap. A number field never uses a length cap at all; it is bounded by `min`, `max` and `step`.
+
+**Why.** An earlier version of R-5.7-8 said the opposite - that `maxLength` should have no default, because a default truncates data. That reasoning was about a single field in a single app. In a design system used by several teams, no default means each team picks a different number and one team forgets entirely, which is how an unbounded field reaches production. The default exists for the developer who never considered the case. The objection still holds for a *low* default, so every number here sits far above the longest real value of its type: the RFC 5321 maximum address, a 2048-character URL, a 72-character bcrypt password and a 2000-word review all fit, while a one-megabyte paste is stopped for every type.
+
+**Affects.** R-5.7-8, rewritten. Every input component of PLAN 18.4, none of which exists yet, so nothing has to be retrofitted. `src/shared/contracts/boundaries.test.ts` proves each cap clears the longest real value of its type and still stops a pasted file.
+
+## 2026-10-07 - A long label truncates the control, and a limit never truncates data
+
+**Decision.** Two rules, R-5.2-7 and R-5.7-8. A control that renders caller-supplied text carries `CONTAIN` (`max-w-full`) and wraps the text parts of its children in a span carrying `LABEL` (`truncate min-w-0`); element children are left alone so an icon keeps its own flex slot. Separately: numeric and structural props get a default limit that is clamped and overridable, while `maxLength` and `minLength` get no default at all, and a number field limits with `min`, `max` and `step`.
+
+**Why.** Measured in Chromium: a Button with a 60-character label was 436px wide inside a 200px box and escaped it. The obvious fix does not work - `truncate` on the control itself clips with no ellipsis, because a bare string inside `inline-flex` is an anonymous flex item and `text-overflow` never applies to one. The label needs an element of its own, and only the text parts can be wrapped, or the gap between an icon and its label collapses. On limits: a bad number or an unbounded row count breaks the UI, so a default is a safety net; a default character cap silently truncates a name, an address or a pasted token, which is data loss the caller never asked for and which no browser does either.
+
+**Affects.** PLAN.md 5.2 and 5.7, every component that renders a label. `e2e/contain.spec.ts` measures the control against its container in three modes and both directions, and the six tests fail if `CONTAIN` is emptied. Tooltip moves into Unit 1 of docs/CLOUD-PLAN.md so the truncated text has somewhere to be read in full.
+
+## 2026-10-06 - Every component carries a generated README.md
+
+**Decision.** A new file joins the folder contract: `README.md`, written by `pnpm readme:build` from `schema.ts` (types, enums, defaults, limits, descriptions), `types.ts` (which props the component declares and whether each is required) and `meta.ts` (category, tier, status, rendering cost, Base UI range). Prose lives between `<!-- hand-written -->` markers and survives every regeneration. `pnpm check:readme` is in `pnpm check` and fails when a README is stale, `check-structure` requires the file, and `pnpm new:component` generates it so a scaffolded folder still passes clean.
+
+**Why.** The first thing anyone asks of a component - a person or an assistant reading the repo - is whether a prop is optional or mandatory and what its default is. Answering that from the source means reading `types.ts`, `schema.ts` and `constants.ts` together. A hand-written table would answer it immediately and would be wrong within a week, which is worse than no table. Generating it means it cannot disagree with the code: the required flag comes from the TypeScript checker, walking every branch of the props union and marking a prop required only when every branch requires it, and the defaults and limits come from the Zod schema through `z.toJSONSchema`.
+
+**Affects.** PLAN.md 8.1 lists the files a component folder may hold and did not include `README.md`; R-8.1-1 and the new R-8.1-3 now do. R-8.3-3 still stands for the docs site's props table, which is a different output from the same two sources.
+
+## 2026-10-06 - A disabled `render={<a>}` loses its `href`; a component element keeps it
+
+**Decision.** When `disabled` or `loading` is set and `render` is an intrinsic `<a>`, Button removes the `href` and adds `role="link"`. When `render` is a component element, such as `next/link`, the `href` stays and only `aria-disabled` and `tabIndex={-1}` apply.
+
+**Why.** ARIA 1.2 asks that a disabled control cannot be activated. `pointer-events: none` stops a real pointer but not `Enter` or `HTMLElement.click()`, and a Server Component has no event handler to cancel with - Base UI's `useButton` needs `onClick` plus `preventDefault` for the same job. Dropping the `href` is the only server-side stop. It is not applied to a component element because `href` is a required prop of `next/link`, so removing it would crash the component rather than disable it. `role="link"` is needed because an `<a>` with no `href` exposes no role, which would leave `aria-disabled` unannounced.
+
+**Affects.** R-5.6-1, PLAN.md 8.4. Guidance for consumers: do not disable a navigation link - hide it, or render a real button.
+
+## 2026-10-06 - `LOADING` drops the progress cursor PLAN.md asks for
+
+**Decision.** `LOADING` is `aria-busy:opacity-100 data-loading:pointer-events-none`. The `cursor-progress` half of PLAN.md 5.2 and 8.4 is gone.
+
+**Why.** A loading control is always `pointer-events: none`: a native button gets the `disabled` attribute, which `DISABLED` pairs with `disabled:pointer-events-none`, and anything else gets `data-loading:pointer-events-none`. An element that is not a hit target takes its cursor from an ancestor, so `cursor: progress` could never paint in either case. Keeping the pointer block matters more than the cursor, because dropping it would let `hover:` repaint a disabled control. `src/cascade.test.ts` now fails if the cursor comes back.
+
+**Affects.** PLAN.md 5.2 and 8.4, R-5.2-4. If the progress cursor is wanted later, the pointer block has to be replaced by `not-disabled:hover:` guards on `HOVER`, which is a change to every component.
+
+## 2026-10-06 - The emitted order of two same-property utilities is pinned by a test
+
+**Decision.** `src/cascade.test.ts` asserts that Tailwind emits `aria-busy:opacity-100` after `disabled:opacity-50` and `data-disabled:opacity-50` after both.
+
+**Why.** Both are the `opacity` utility under different variants, so they carry the same specificity and the emitted order is the only thing that decides. Every test we had asserted the class was in the `class` attribute, which says nothing about which one the browser takes. A Tailwind variant-order change would silently make a loading button look disabled.
+
+**Affects.** R-5.2-4, R-4-1.
+
+## 2026-10-05 - The guarantees get gates: a lint rule, a mutation runner, and a real browser
+
+**Decision.** Five weaknesses that no reviewer raised, because they are about the shape of the project rather than its code. Each is now enforced rather than remembered.
+
+1. **The mistake that caught me seven times is an ESLint rule.** `topclass/no-derived-expectations` is the eighth custom rule: inside a `*.test.ts(x)` file, the expectation side of `toEqual`, `toContain`, `toHaveLength`, `toBe` and `toStrictEqual` may not be `CONSTANT.split(' ')`, `Object.keys/values/entries(CONSTANT)` of an imported binding, or `readdirSync(...)`. A local fixture built in the test file is fine; so is splitting the value under test on the *actual* side. It found a real instance the moment it was switched on - `button.schema.test.ts` compared the schema's keys against `Object.keys(BUTTON_DEFAULTS)`, so dropping a design prop would have dropped it from both sides. Twelve fixture tests, seven rejected forms and five allowed ones.
+
+2. **`check-structure` now requires `meta.ts` and at least one test** in every component folder, which PLAN 8.1 lists as required and nothing enforced. Turning it on failed immediately: **`svg` is a tier-1 catalog row and had no test of its own** - it was covered only incidentally by Icon's tests. It now has 19, including the empty-path case, the labelled and decorative branches, and the directional flip. `icon`, `svg` and `icon-registry` gained the `meta.ts` they were missing; `icon-registry` is honestly `rendering: 'client'`, and the contract test's rendering cross-check was softened to the direction that matters - a folder with `client.tsx` may not call itself `server`, because that is what would make the 0 KB claim false.
+
+3. **`render` now decides which attributes exist.** `<Button render={<a/>} name="n" value="v" form="f" type="submit">` type-checked and rendered all four onto an anchor. `ButtonProps` is a union: the native half carries the button-only attributes, the rendered half declares each of them `?: never`, which keeps them destructurable while making them impossible to pass. Nine `expectTypeOf` cases prove both halves. This is the shape all 46 components will use.
+
+4. **Mutation testing is `pnpm test:mutation`.** Every mutation run in this session was a throwaway script; the finding that mattered most - that a test can pass while measuring nothing - deserves a command. `scripts/mutations/index.ts` holds 30 rows, each a behaviour some test claims to protect and most of them a real survivor from this week. The runner copies the repo to a temp directory, applies one mutation, runs the suite, and fails if it still passes. It also fails when a mutation's anchor text no longer exists, because a mutation that matches nothing tests nothing - the same failure mode as the gates it guards. All 30 are caught.
+
+5. **Playwright and axe are in, three phases early.** PLAN 19 puts them in Phase 7; that would mean 45 components finished against unmeasured promises. Five lines of PLAN 20 need a browser, and three of them can be measured today without the docs app: `scripts/build-harness.tsx` renders every demo to a static page with the real compiled stylesheet - 60 pages, 10 demos across three modes and both directions - and `e2e/` measures them. Target size is now measured on every interactive box at both pointer types rather than asserted on a class name; the focus ring is proven to paint by reading the computed outline after a real Tab; and axe runs over all 60 pages, scoped to the demo because landmarks and document structure belong to the docs app. 84 tests, all passing. `pnpm check` has a tenth gate.
+
+**Dependencies added**, all `devDependencies`, so the published package is unchanged: `@playwright/test` with `playwright` (~19 MB) and `axe-core` with `@axe-core/playwright` (~2.4 MB). Chromium is already in the container; `playwright.config.ts` points at it with `executablePath` rather than downloading a second copy, guarded by an `existsSync` so a normal machine still works.
+
+**Still not done, and said plainly.** The visual matrix of PLAN 20 - the screenshots compared against Figma - is not built. That needs baselines and a Figma parity decision, not just a browser. The 0 KB measurement still needs the docs app's `/preview` route. Button therefore stays `status: 'beta'`.
+
+**Affects** `eslint-rules/`, `eslint.config.ts`, `scripts/check-structure.ts`, `scripts/{mutate.ts,mutations/,lib/mutate.ts,lib/harness.ts,build-harness.tsx}`, `playwright.config.ts`, `e2e/`, `src/components/{icon,svg,icon-registry}/meta.ts`, `src/components/svg/svg.test.tsx`, `src/components/button/types.ts`, `package.json`, `tsconfig.json` and `docs/RULES.md`.
+
+---
+
+## 2026-10-05 - 85 mutations against the new tests; 23 got through, and six of them were one mistake
+
+**Decision.** The sixth reviewer attacked the rewritten tests with 85 mutations rather than reading them. 62 were caught. The 23 that survived are fixed, and all 23 were replayed against the fix before this entry was written. The kill rate was 73%; it is now 100% of what was thrown.
+
+**The one mistake, made six times.** The previous entry says a test derived from the constant it tests shrinks when the constant does, and that the first draft of the new size test had exactly that flaw. The fix was applied to that test and nowhere else, so the same shape survived in six more places:
+
+- `TRANSITION` could be reduced to `duration-(--tc-duration)`, or set to `transition-none`, and nothing failed. Every one of the 46 components would have stopped animating. The assertion was `constant.split(' ')`, so it shrank with the constant, and no test named the property list.
+- The whole size scale could collapse onto one type step, because the "no other size's classes" test filtered a foreign class out of its own list once two sizes shared it.
+- `TOGGLE_SIZE` could become `size-toggle-md` five times over: only its key set was checked, while `CONTROL_HEIGHT` beside it had a real per-size assertion.
+- The skeleton could reserve `w-24` at every size, because the width half of its test counted classes where the height half compared them.
+- Any four of the ten demos could be deleted, because `readdirSync` sized the loop.
+- A demo could render `<div />` and pass, because the assertion was `toContain('<')`.
+
+Each of these now names its expected value literally, beside a one-line comment saying why.
+
+**The two that mattered most.**
+
+1. **The 3:1 half of R-5.6-4 was unenforced.** Changing the comparison to `ratio < min + MARGIN && min > 4.4` deleted every `line-strong` and `ring` check, and the gate still reported 285 pairs, because `pairs++` ran before the comparison. `MARGIN` could be set to 0 and the 4.5 thresholds to 3 or to 1, all silently: the existing "thresholds bite" test seeded a colour so pale that it failed under any threshold, so it could not tell which one was in force. The thresholds are now exported and asserted directly, and three seeds are measured to land between the floors - 3.95 on the page (clears 3, misses 4.5), 4.00 on the danger fill, and 2.23 for the 3:1 pair.
+
+2. **The zod guard had no positive control.** `buildGraph` could be made to stop after one hop, or to read only the entry file's own imports, and the suite stayed green - because it only ever asserts an empty result over a codebase where nothing reaches zod. Against a real two-hop violation the crippled walk found 1 of 11 files instead of 11. `buildGraph` now has a synthetic three-file chain, a cycle and an isolated file.
+
+**Also:** `worst()` could return `contrastRange().max` instead of `.min`, undoing the gamut bracket the 3 October entry introduced, because the test that names that behaviour exercised `contrastRange` directly and never `checkTokens`; it now seeds a colour measured at min 4.15 / max 5.68 against `success-soft`, which fails only while the low end is taken. `meta.ts` could change its category, rendering, name, tier or status freely, since every field but `slug` was checked only for membership in its own list; the shared test now derives the name from the slug, cross-checks `rendering` against whether `client.tsx` exists and refuses `status: 'stable'` while PLAN 20 is open, and Button pins its own row value by value. `inline-flex`, `items-center`, `justify-center`, `gap-2`, `font-medium` and the skeleton's `animate-pulse` had no assertion anywhere - the last one making "respects reduced motion" pass vacuously, since nothing was animating. And `vitest.config.ts` could drop a project's `exclude` while `test-projects.test.ts` still proved the data symmetric, so a test now compares the config's entries against that data.
+
+**Affects** `src/shared/classes.test.ts`, `src/shared/meta.test.ts`, `src/components/button/test/`, `scripts/lib/{contrast-checks,module-graph,test-projects}.test.ts`, `scripts/lib/contrast-checks.ts` (the thresholds are exported).
+
+---
+
+## 2026-10-05 - Six parallel reviewers find two holes in the gates that had just been written
+
+**Decision.** The 28 fixes above were themselves reviewed across six dimensions in parallel, each reviewer working in its own copy of the repo and required to reproduce a finding before reporting it. They found 2 high, 11 medium and 9 low. Everything below is fixed, and every attack was replayed against the fix.
+
+**Two high, both in gates written hours earlier.**
+
+1. **A comment on the same line as an import defeated the zod guard.** `/* R-8.3-1 */ import { z } from 'zod'` passed all nine gates, because the patterns were anchored with `^[ \t]*`. So did `;import ...`, a second `import` later on the same line, and a backtick specifier. The scanner now blanks comments first (preserving length, so a commented-out import cannot hide a real one behind it) and matches unanchored on a word boundary. `scripts/lib/module-graph.test.ts` holds all nineteen forms as a table, plus the type-only non-matches.
+
+2. **`import { z } from 'zod/v4'` walked straight in**, because the guard compared the raw specifier against the string `zod` while `zod@4.6.5` really exports `./v4`. Specifiers are now reduced to a package name (`zod/v4`, `zod/mini` and `zod?raw` all to `zod`, with both segments kept for a scoped package).
+
+**The rest.**
+
+3. **The ramp check was chained but not anchored**, so a state that stepped away and back passed: `--tc-primary-active: var(--tc-primary-solid)` reported ok in all three modes, meaning a pressed button painting its resting colour. Both ramps now require a step from the base as well as from the state before.
+
+4. **A tone's text at rest was never measured against a bare surface** - which is exactly where `outline`, `ghost` and `link` labels sit, since they have no fill. 54 pairs were missing; all pass, the worst at 5.23 in dark. The gate now measures 339 pairs.
+
+5. **"285 pairs measured" was 285 calls, not 285 measurements.** `--tc-page` and `--tc-surface-raised` are the same colour in light and ocean, and 47 of the 55 tokens the gate reads are identical in those two modes, so 42% of the readings were duplicates. This is the project's own documented failure mode - a number reported as evidence - so the gate now prints both: `339 pairs, 205 distinct colour readings`.
+
+6. **The RTL demo rendered Arabic without `lang`**, so `:lang(ar)` set neither the Arabic font nor the `letter-spacing: 0` reset that R-5.3-3 exists to guarantee. Demos are the docs code tab and the visual baselines, so this would have shipped as the example people copy.
+
+7. **`min-h-(--tc-target-min)` removes the floor entirely if the token is missing**, because an unresolved `var()` is invalid at computed-value time and `min-height` falls back to its initial value. PLAN 6.1 lets a consumer replace the whole token file, so the classes now carry the px fallback: `min-h-[var(--tc-target-min,24px)]`.
+
+8. **A fifth Vitest project would have been silently double-run**, because each project's `exclude` was hand-written. Excludes are now derived from the `SUFFIXES` map, the config is built by mapping over the projects rather than destructuring them positionally, and the test derives its table from the same map - reproduced by adding an `edge` project, which the old test passed and the new one fails.
+
+9. **Nothing gated the schema descriptions** the previous entry had just added: no file called `z.toJSONSchema`, so a field with no `.meta()` kept `pnpm check` green. `button.schema.test.ts` now asserts a description and the `constants.ts` default for every field.
+
+10. **The scaffold still wrote the old shape.** `pnpm new:component` emitted a schema with no descriptions, `z.enum(SIZES)` instead of the shared `sizeSchema`, and a hand-written `DesignProps` interface rather than one derived from the schema - handing all 45 later components the drift this branch exists to remove.
+
+11. **Smaller, all confirmed:** `render={null}` threw a raw `TypeError` instead of falling back to a button, because line 37 used `=== undefined` while line 39 used `??`; `buttonVariants` silently dropped a `className` that the old cva export appended; `ButtonSkeleton` let a consumer set `aria-hidden={false}` on a decorative placeholder, because the spread came after it; the hydration test hard-coded eight demos and so never hydrated the two new ones; `layerOf` in `styles.test.ts` was a brace counter that one `content: "{"` would desync; the touch-target assertion in the same file was satisfied by the width classes alone; and `docs/STATUS.md` overstated its own test count, Button's test-file count, and what the meta contract validates.
+
+**Rejected.** Using `es-module-lexer` for the import scan, as one reviewer suggested: it is in `node_modules` only as a transitive dependency of Vite, and R-5.9-1 does not permit reaching for an undeclared package.
+
+**Still open, for Omar.** `ButtonProps` extends `ComponentPropsWithRef<'button'>`, so `name`, `value` and `form` typecheck and render on `render={<a/>}`. That is inherent to the element-form `render` API and wants one decision for all 46 components, not a patch here.
+
+**Affects** `scripts/lib/{module-graph,test-projects,contrast-checks,scaffold}.ts` and their tests, `scripts/check-contrast.ts`, `vitest.config.ts`, `src/shared/{classes,meta}.ts`, `src/shared/classes.test.ts`, `src/components/button/{index.tsx,types.ts,skeleton.tsx,variants.ts}`, `src/components/button/test/`, `src/components/button/dummy/rtl.tsx`, `src/styles.test.ts`, `src/test/`, `docs/RULES.md` and `docs/STATUS.md`.
+
+---
+
+## 2026-10-05 - The Button template closes its last 28 findings, most of them tests that proved nothing
+
+**Decision.** Every finding the 83-agent Button review left open is fixed on `feat/button`, because Button is the file 45 components copy and a weak test shape copied 45 times costs more than the component did. Each fix below was proved by mutation: the defect was reintroduced, the suite was run, and the failure was recorded. Eighteen mutations, eighteen failures.
+
+**Two were real misbehaviour, not coverage.**
+
+1. **A tone lost to the theme on the same element.** The five interaction variables (`--tc-soft`, `--tc-hover`, `--tc-active`, `--tc-soft-hover`, `--tc-soft-active`) were declared in an unlayered `:root, [data-theme]` block. CSS Cascade 5 puts unlayered normal declarations above every layer, and the `tone-*` utilities are emitted inside `@layer utilities`, so `<div data-theme="dark" class="tone-danger">` resolved to the *primary* ramp. Verified by compiling the real entry and reading the layer each declaration lands in. The five declarations now sit in `@layer base`, which `@layer utilities` outranks; the `color-mix` definitions above them stay unlayered, because nothing overrides those.
+
+2. **`loading` rendered no spinner when the render element carried its own children.** `renderElement` applied the component's children only when the element had none, so `<Button render={<a>Go</a>} loading>` dropped the spinner with them. The shared answer for every component that composes its own content with the consumer's is a third argument: `renderElement(element, props, decorate)` wraps whichever children survive. Button passes it only while loading, so the output is byte-identical otherwise.
+
+**The rest were contracts and tests.**
+
+3. **`meta.ts` had no contract.** `ComponentMeta` and `src/shared/meta.ts` were named by PLAN 8.4 and existed nowhere, so 46 hand-written `as const` objects would have drifted before anything read them. `shared/meta.ts` now declares the type plus the `CATEGORIES`, `RENDERINGS`, `STATUSES` and `TIERS` lists; Button's file is `satisfies ComponentMeta` and its keys go back to the plan's names (`baseUi`, `baseUiRange`, lower-case `category`, with `slug` restored). Its `status` is **`beta`, not `stable`**: PLAN 20 is not met while the visual matrix and the docs page do not exist. A test walks every `meta.ts` in `src/components/` and checks the slug against the folder name. The scaffold writes the same shape with a `TODO(tc)` on the category.
+
+4. **`buttonVariants` was a trap and a cost.** PLAN 8.1 exports it so a plain element can reuse the look, but its raw output carried two or three conflicting border declarations that only the component's own `cn()` resolved, and its cva signature admitted `null` where the component's props did not. Each variant now names its own border colour, so the string is conflict-free by construction, and the export is a typed function over `ButtonVariantProps` that memoises its 360 outcomes. Measured in one process on one machine: **12.26 us/call before, 0.32 us/call after**, a 38x difference on what was the largest single cost of rendering a Button.
+
+5. **The 24 px touch floor was not 24 px.** `min-h-6` compiles to `1.5rem`, and SC 2.5.8 is written in CSS px, so a consumer stylesheet with `html { font-size: 14px }` dropped the floor to 21 px. `--tc-target-min: 24px` and `--tc-target-coarse: 44px` are new tokens and `TOUCH_TARGET` reads them.
+
+6. **`tone-*` was not a tailwind-merge group**, so `cn('tone-primary', 'tone-danger')` kept both and stylesheet order decided the winner - an override that worked for two tones of six. It is now its own group, which needed `extendTailwindMerge<'tone'>` to declare the id.
+
+7. **The contrast gate measured the solid ramp's readability but not its motion.** Setting any `--tc-<tone>-hover` to its own `-solid` passed. The solid ramp now gets the same `STATE_STEP` check the soft ramp already had, which took the gate from 249 to **285 pairs**, and the mutation that used to pass now fails in all three modes.
+
+8. **The zod guard caught one of seven ways in.** It was a per-file regex for a direct `import ... from 'zod'`, while the failure mode is transitive: `types.ts` importing `schema.ts` as a value ships 104 KB to the browser. `scripts/lib/module-graph.ts` now walks the value-import graph across relative and `#` subpath specifiers, covering bare `import 'zod'`, `export ... from`, dynamic `import()` and `require()`. Both previously-missed mutations were reproduced and now fail.
+
+9. **A `*.ssr.test.ts` file would have run twice.** The node project excluded `.ssr.test.tsx` but not `.ssr.test.ts`, and `.rsc.test.ts` but not `.rsc.test.tsx`. The four projects now come from `scripts/lib/test-projects.ts`, which `vitest.config.ts` reads, and a test asserts every test file in `src/` lands in exactly one project.
+
+10. **Nine test shapes that would have been copied 45 times.** The per-variant loop asserted `inline-flex`, a base class, for every variant; 17 of 30 variant x tone cells had no assertion; the size loop measured height and not padding or the type step; the `link` variant could emit nothing; the spinner's identity and its position before the label were untested; the shared-constant block was a five-string spot check that four half-copies passed; the skeleton test asserted a string against itself rather than against `CONTROL_HEIGHT`; nothing rendered the eight demos; and two test names claimed checks their bodies did not make. Each is replaced by a table named independently of the thing it measures, which is the point: **a test derived from the constant it tests shrinks when the constant does.** The first version of the new size test had exactly that flaw and the mutation run caught it.
+
+**Also:** `CONTROL_HEIGHT` is split out of `CONTROL_SIZE` so a skeleton reads the control's height instead of copying it; `ButtonSkeleton` takes `ref`, `style` and the rest props that PLAN 20 requires of every component, and its defaults come from `BUTTON_DEFAULTS`; `buttonSchema` carries a `.meta({ description })` per field and uses the shared `sizeSchema`, which nothing had imported; `#test/*` is a new subpath so the three markup helpers live once rather than in 46 test folders; and `dummy/` gains a `custom` size demo and an RTL demo, with the tone demo widened to outline, ghost and link.
+
+**Not done, and why.** `icon` and `svg` are catalog rows (PLAN 18.2) with no `meta.ts`; `check-structure` still does not require the file, because making it mandatory would also demand one for `icon-registry`, which is an entry point rather than a catalog row. That is a folder-contract decision for Phase 4, not a Button fix.
+
+**Affects** `src/tokens.css`, `src/styles.css`, `src/styles.test.ts`, `src/shared/{classes,cn,render,meta}.ts`, `src/shared/{classes,meta,no-zod-at-runtime}.test.ts`, `src/components/button/` in full, `scripts/lib/{contrast-checks,module-graph,test-projects,scaffold}.ts`, `vitest.config.ts`, `test/markup.ts` and `package.json`.
+
+---
+
 ## 2026-10-05 - The review backlog, including two crashes and a production-only divergence
 
 **Decision.** Eight more findings from the 5 October review are fixed. Two of them crashed, one behaved differently in production than in development, and one module cited by a rule as unit-tested had no test file at all.

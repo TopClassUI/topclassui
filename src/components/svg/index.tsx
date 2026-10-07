@@ -1,5 +1,5 @@
-import { cn } from '../../shared/cn.js'
-import { resolveIconSize } from '../../shared/contracts/size.js'
+import { cn } from '#shared/cn.js'
+import { resolveIconSize } from '#shared/contracts/size.js'
 import type { SvgProps } from './types.js'
 
 export type { SvgProps } from './types.js'

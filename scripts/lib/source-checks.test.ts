@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { hasLateUseClient, hasUseClient, importedModules, importedNames, inlinePropInterfaces, relativeImportsMissingExtension } from './source-checks.js'
+import {
+  hasLateUseClient, hasUseClient, importedModules, importedNames, inlinePropInterfaces,
+  relativeImportsMissingExtension, screamingConstants,
+} from './source-checks.js'
 
 /** The same source with Windows line endings, so a CRLF checkout cannot change a result. */
 const crlf = (s: string) => s.replace(/\n/g, '\r\n')
@@ -130,5 +133,44 @@ describe('inlinePropInterfaces', () => {
   it('finds every declaration, not only the first', () => {
     const source = 'export interface AProps { a: 1 }\nexport type BProps = { b: 2 }'
     expect(inlinePropInterfaces(source)).toEqual(['AProps', 'BProps'])
+  })
+})
+
+describe('R-5.12-4: SCREAMING_CASE constants belong in constants.ts or classes.ts', () => {
+  it('finds a plain and an exported declaration', () => {
+    expect(screamingConstants('const SKELETON_WIDTH = {}')).toEqual(['SKELETON_WIDTH'])
+    expect(screamingConstants('export const TONE_CLASS = {}')).toEqual(['TONE_CLASS'])
+  })
+
+  it('finds one with a type annotation', () => {
+    expect(screamingConstants('const UNFILLED: Variant[] = []')).toEqual(['UNFILLED'])
+  })
+
+  it('leaves camelCase and PascalCase alone', () => {
+    expect(screamingConstants('const buttonVariants = cva()')).toEqual([])
+    expect(screamingConstants('const Button = () => null')).toEqual([])
+  })
+
+  it('leaves a short name alone, which is a local and not a table', () => {
+    expect(screamingConstants('const T = 1')).toEqual([])
+    expect(screamingConstants('const ID = 2')).toEqual([])
+  })
+
+  it('does not match a constant mentioned inside a longer line', () => {
+    expect(screamingConstants('  return CONTROL_HEIGHT[size]')).toEqual([])
+  })
+})
+
+describe('a computed constant is not a table', () => {
+  it('ignores one built by a call, which nobody reads as data', () => {
+    expect(screamingConstants('const CACHEABLE = new Set(keys)')).toEqual([])
+    expect(screamingConstants('const RESOLVE = cva(base, {})')).toEqual([])
+  })
+
+  it('still catches an object, an array and a plain value', () => {
+    expect(screamingConstants('const ON_SOLID = {')).toEqual(['ON_SOLID'])
+    expect(screamingConstants("const UNFILLED: Variant[] = ['a']")).toEqual(['UNFILLED'])
+    expect(screamingConstants("const PREFIX = 'tc-'")).toEqual(['PREFIX'])
+    expect(screamingConstants('const WARN_LINES = 200')).toEqual(['WARN_LINES'])
   })
 })

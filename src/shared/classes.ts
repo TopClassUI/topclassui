@@ -1,10 +1,13 @@
 // R-5.2-4: every size, radius, ring, hover and transition class lives here, so a knob change reaches all 46 at once.
 
+/** The width alone, so a filled control can hold the box size with a transparent colour. */
+export const BORDER_WIDTH = 'border-(length:--tc-line-width)'
+
 /** A hairline that is decorative, so it is exempt from the 3:1 rule. */
-export const BORDER = 'border-(length:--tc-line-width) border-line'
+export const BORDER = `${BORDER_WIDTH} border-line`
 
 /** A control boundary, which must reach 3:1 against every surface it can sit on. */
-export const BORDER_STRONG = 'border-(length:--tc-line-width) border-line-strong'
+export const BORDER_STRONG = `${BORDER_WIDTH} border-line-strong`
 
 /** A real CSS outline with an offset, so the gap shows the actual backdrop on any surface. */
 export const FOCUS_RING = [
@@ -20,25 +23,42 @@ export const FOCUS_RING = [
 /** Every transition multiplies by --tc-motion, so one knob can stop all of them. */
 export const TRANSITION = 'transition-[color,background-color,border-color,outline-color,opacity,translate] duration-(--tc-duration) ease-out'
 
-/** R-5.6-2: 24px on every pointer, 44px where the pointer is coarse. */
-export const TOUCH_TARGET = 'min-h-6 min-w-6 pointer-coarse:min-h-11 pointer-coarse:min-w-11'
+/** R-5.6-2: SC 2.5.8 is written in CSS px, so the floor is a px token, never a rem step. */
+export const TOUCH_TARGET = [
+  // The fallback matters: a consumer token file missing these would leave no floor at all.
+  'min-h-[var(--tc-target-min,24px)]',
+  'min-w-[var(--tc-target-min,24px)]',
+  'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]',
+  'pointer-coarse:min-w-[var(--tc-target-coarse,44px)]',
+].join(' ')
 
 /** Hover and active are tone-driven: the compound variant sets the variables, these read them. */
 export const HOVER = {
   solid: 'hover:bg-(--tc-hover) active:bg-(--tc-active)',
   soft: 'hover:bg-(--tc-soft-hover) active:bg-(--tc-soft-active)',
-  outline: 'hover:bg-(--tc-soft-hover) active:bg-(--tc-soft-active)',
-  ghost: 'hover:bg-(--tc-soft-hover) active:bg-(--tc-soft-active)',
+  // Transparent at rest, so they borrow the tone's tint on the way in rather than its next step.
+  outline: 'hover:bg-(--tc-soft) active:bg-(--tc-soft-hover)',
+  ghost: 'hover:bg-(--tc-soft) active:bg-(--tc-soft-hover)',
   link: 'hover:underline',
 } as const
 
-/** Control height by size. `custom` emits nothing, which is what opts a component out. */
+/** The height alone, so a skeleton stands in for a control without copying the value. */
+export const CONTROL_HEIGHT = {
+  xs: 'h-control-xs',
+  sm: 'h-control-sm',
+  md: 'h-control-md',
+  lg: 'h-control-lg',
+  xl: 'h-control-xl',
+  custom: '',
+} as const
+
+/** Height, inline padding and the type step. `custom` emits nothing, which opts a component out. */
 export const CONTROL_SIZE = {
-  xs: 'h-control-xs px-pad-x-xs text-xs',
-  sm: 'h-control-sm px-pad-x-sm text-sm',
-  md: 'h-control-md px-pad-x-md text-sm',
-  lg: 'h-control-lg px-pad-x-lg text-base',
-  xl: 'h-control-xl px-pad-x-xl text-base',
+  xs: `${CONTROL_HEIGHT.xs} px-pad-x-xs text-xs`,
+  sm: `${CONTROL_HEIGHT.sm} px-pad-x-sm text-sm`,
+  md: `${CONTROL_HEIGHT.md} px-pad-x-md text-sm`,
+  lg: `${CONTROL_HEIGHT.lg} px-pad-x-lg text-base`,
+  xl: `${CONTROL_HEIGHT.xl} px-pad-x-xl text-base`,
   custom: '',
 } as const
 
@@ -56,9 +76,20 @@ export const TOGGLE_SIZE = {
 export const SCROLL_AREA = 'overflow-y-auto overscroll-contain'
 
 /** Disabled is opacity plus no pointer events; loading keeps full colour so it never reads as disabled. */
-// data-disabled too: R-5.7-6 uses it for anything that is not a real form control.
+// data-disabled carries it for an element with no disabled attribute, such as an anchor.
 export const DISABLED = [
   'disabled:pointer-events-none disabled:opacity-50',
   'data-disabled:pointer-events-none data-disabled:opacity-50',
 ].join(' ')
-export const LOADING = 'aria-busy:cursor-progress aria-busy:opacity-100'
+
+/** Full colour while busy, and no clicks. No cursor: a loading control is always
+ * pointer-events: none, so one could never paint. The order is pinned by a test. */
+export const LOADING = 'aria-busy:opacity-100 data-loading:pointer-events-none'
+
+/** A control never outgrows its box. Measured at 436px inside a 200px box before
+ * this existed. */
+export const CONTAIN = 'max-w-full'
+
+/** The label truncates, so the control shrinks rather than the page. It needs its
+ * own element: `text-overflow` never applies to an anonymous flex item. */
+export const LABEL = 'truncate min-w-0'

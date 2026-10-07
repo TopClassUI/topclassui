@@ -151,3 +151,23 @@ export function resolve(
   }
   return null
 }
+
+/**
+ * A token declared in one mode and not another is simply undefined there, and `var()`
+ * has no fallback to recover with, so the rule that pays off is: every mode declares
+ * every token, whether in its own block or by inheriting `:root`.
+ */
+export function tokensMissingPerMode(blocks: Block[]): { mode: string; token: string }[] {
+  const modes = [...declaredModes(blocks)].sort()
+  const perMode = new Map(modes.map((mode) => [mode, tokensFor(blocks, mode)]))
+  const every = new Set<string>()
+  for (const tokens of perMode.values()) for (const name of tokens.keys()) every.add(name)
+
+  const out: { mode: string; token: string }[] = []
+  for (const mode of modes) {
+    for (const token of [...every].sort()) {
+      if (!perMode.get(mode)?.has(token)) out.push({ mode, token })
+    }
+  }
+  return out
+}

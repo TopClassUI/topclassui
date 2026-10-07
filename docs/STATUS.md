@@ -2,13 +2,15 @@
 
 Read this first in a new session, then `docs/PLAN.md` for the specification and `docs/DECISIONS.md` (newest entries at the top). The three newest DECISIONS entries are from 2 and 3 October 2026 and they change the plan in ways PLAN.md does not yet reflect.
 
-Last updated: 5 October 2026 (coding in progress).
+Last updated: 6 October 2026 (Phase 3 finished and reviewed). The plan for building the
+remaining components is `docs/CLOUD-PLAN.md`; it recommends one deviation from PLAN.md's
+phase order and asks Omar to confirm it before any component starts.
 
 ---
 
 ## The one-line version
 
-The design system and the documentation site exist in Figma. **Coding has started**: the repo scaffold, the custom ESLint rules, the check scripts, `shared/`, the design tokens and the 84 icons are done and `pnpm check` is green. Next is Button, end to end.
+The design system and the documentation site exist in Figma. **Coding has started**: the repo scaffold, the custom ESLint rules, the check scripts, `shared/`, the design tokens, the 84 icons and **Button** are done and `pnpm check` is green across eleven gates, including Playwright and axe: 1224 unit tests in 57 files, 84 Playwright tests, 339 contrast pairs, and 39 of 39 mutations caught by `pnpm test:mutation`. Next is the component run described in `docs/CLOUD-PLAN.md`.
 
 ## The product, in the words the site uses
 
@@ -106,18 +108,21 @@ Every docs page except the components page and the home page was reviewed line b
 
 ---
 
-## The code, as of 3 October
+## The code, as of 5 October
 
-`pnpm check` runs all nine gates and is green: **619 tests in 30 files**, lint, typecheck, `check-structure`, `check-boundaries`, `check-css`, `check-icons`, `check-contrast`, `rules:sync --check`.
+`pnpm check` runs all eleven gates and is green: **1224 unit tests in 57 files plus 84 browser tests**, lint, typecheck, `check-structure`, `check-boundaries`, `check-css`, `check-icons`, `check-readme`, `check-contrast`, `rules:sync --check`.
 
 | Done | What it is |
 |---|---|
 | Scaffold | One package `topclassui`, `private: true`, `0.0.0`. Exact pins. TypeScript **6.0.3**, not 7.x, because typescript-eslint caps at `<6.1.0`. happy-dom, not jsdom, which needs a newer Node than the 22.14 floor. |
-| ESLint rules | Seven custom rules in `eslint-rules/`, the thing the library actually sells: `logical-properties-only`, `semantic-classes-only`, `no-dynamic-class-names`, `shared-class-constants`, `no-enum`, `one-line-comments`, `icon-loaders-stay-server`. Fixture tests prove each one fires and that correct code passes, including every import form for the last one. |
+| ESLint rules | Thirteen custom rules in `eslint-rules/`, the thing the library actually sells: `logical-properties-only`, `semantic-classes-only`, `no-dynamic-class-names`, `shared-class-constants`, `no-enum`, `one-line-comments`, `icon-loaders-stay-server`, `no-derived-expectations`, `style-sets-tokens-only`, `presence-state-attributes`, `flat-part-exports`, `root-part-is-named-root`, `text-comes-from-labels`. Fixture tests prove each one fires and that correct code passes, and a second set proves each leaves real component code alone. |
 | Check scripts | `check-structure`, `check-boundaries`, `check-css`, `check-contrast`, `rules-sync`. Shared predicates live in `scripts/lib/` and are tested against **LF and CRLF** both. The scripts were themselves audited and five silent-failure defects fixed; see the 3 October DECISIONS entry. CSS is parsed by one string-aware walker, `scripts/lib/css-parse.ts`, because both regex parsers could be made to pass while measuring nothing. |
 | `shared/` | `cn()` on `extendTailwindMerge`, `classes.ts`, the size contract split so `resolveIconSize` never pulls zod into the bundle, `renderElement`, `toSideAlign`, `useCollection` with windowing, labels in English and Arabic with real `Intl.PluralRules`, `TopClassProvider`, the theme script. |
 | Icons | The 84 starter icons of `docs/icons.md`, one generated module each from `raw/`. `pnpm icons:build` writes them, `pnpm check:icons` proves they still match, and the build fails if `raw/` and the doc disagree or if the 16 directional icons drift from the doc's table. One renderer, `<Svg icon={data}>`; the server `<Icon name>` is the only async, `server-only` file; `icon-registry` is its synchronous browser twin with `registerIcons()`. A wrong name is a type error. The loader map is kept out of every browser bundle by an ESLint rule and a test, both proven against a planted leak. |
-| Tokens | `src/tokens.css` and `src/styles.css`. Three modes, six knobs, direction-aware safe-area insets. `check-contrast` measures **138 pairs** across the three modes and the three surfaces, taking the worse of the two gamut readings; `src/styles.test.ts` compiles both files through the installed Tailwind and asserts the semantic utilities, the knob maths and the forced-state variants all resolve. |
+| Button | The first component, finished as the template for the other 45: `index.tsx` (a sync Server Component, no `client.tsx`), five variants x six tones x six sizes, the skeleton, ten demos and twelve test files. Reviewed by 83 agents, then every one of the 51 confirmed findings fixed. |
+| The tone mechanism | `shared/contracts/tone.ts` is the one source of the six tones; `tokens.css` carries `--tc-<tone>-hover`, `-active`, `-soft-hover` and `-soft-active`; `styles.css` has one `@utility tone-<tone>` that swaps the five variables a component reads, so eleven class strings replace thirty compound variants. Adding a tone is one file plus its tokens, and five tests fail by name if either is missing. |
+| Contracts | `shared/meta.ts` (`ComponentMeta`, validated for every component that has one), `#shared/*`, `#icons/*`, `#components/*` and `#test/*` subpath imports, and `pnpm new:component <name>`, which writes eight files that already pass every gate. |
+| Tokens | `src/tokens.css` and `src/styles.css`. Three modes, six knobs, direction-aware safe-area insets. `check-contrast` measures **339 pairs, 205 of them distinct** across the three modes and the three surfaces, taking the worse of the two gamut readings; `src/styles.test.ts` compiles both files through the installed Tailwind and asserts the semantic utilities, the knob maths and the forced-state variants all resolve. |
 
 Deliberate departures from PLAN.md sections 4, 6 and 7 are recorded in `docs/DECISIONS.md` (the `@source "./shared"` line, the RTL-correct safe-area insets, `check-css` in place of stylelint, and `color-scheme` moved into `@layer base`).
 
@@ -125,13 +130,17 @@ Deliberate departures from PLAN.md sections 4, 6 and 7 are recorded in `docs/DEC
 
 **Open, for Omar to decide:** PLAN 5.3 says `:lang(ar)` sets the Arabic font *and* line-height, but 6.2 omits line-height and names no value. It changes the rhythm of every Arabic page, so the number is a design call, not a default to guess.
 
-**Next:** Phase 3, Button finished completely as the template for the other 45. The docs app comes after Button.
+**Reviewed again on 5 October**, after Button. 83 agents found 51 confirmed defects and 26 refuted claims; 23 of the entries were fixed with Button itself, and **the remaining 28 are now fixed too**. Two of those 28 were real misbehaviour: a `tone-*` class lost to `data-theme` on the same element because the fallback variables were unlayered, and `loading` rendered no spinner when the `render` element carried its own children. The other 26 were contracts that did not exist and tests that passed while measuring nothing; 18 of them were proved by reintroducing the defect and watching the suite fail.
+
+**Then reviewed again, six dimensions in parallel**, which found 2 high defects in the new gates themselves - a comment on the same line as an `import`, and the subpath `zod/v4`, both walked straight past the new zod guard - plus a ramp check that accepted a pressed state identical to the resting one, a contrast count that overstated itself by 40%, Arabic rendered without `lang`, and a touch-target token with no fallback. All are fixed. A sixth reviewer then threw 85 mutations at the rewritten tests: 62 were caught and **23 got through**, six of them the same circular-expectation mistake applied narrowly the first time - a test whose expected value is derived from the constant it tests cannot fail when that constant shrinks. The worst two: the 3:1 half of R-5.6-4 could be deleted with the gate still reporting success, and the zod guard had no positive control, so its transitive walk was never exercised. All 23 are fixed and replayed. The three 5 October entries in `docs/DECISIONS.md` have the detail.
+
+**Next:** Phase 4, forms. Field, Label, Input and Textarea need no new dependency; Checkbox, RadioGroup, Switch, NumberField, Slider, Select and `FieldLive` need `@base-ui/react`, which is **not installed yet**.
 
 **Carried forward, each needing something that does not exist yet.** The colours page, the icons page and the no-flash-on-reload check need the docs app. The `topclassui-icons add-set` CLI, the axe assertions and the measured "no icon requests, no icon JavaScript" check need the docs app, `axe-core` and Playwright. None of these are claimed as done.
 
 ## What is not done
 
-- **46 components.** `src/components/` holds only the three icon entry points.
+- **45 components.** `src/components/` holds Button and the three icon entry points.
 - **The docs site** is not built, only designed.
 - **The components page** (`Docs site - LTR`, 46 cards) has not been reviewed. It is the largest frame in the file and the most important one left.
 - **The home page** has not been reviewed.

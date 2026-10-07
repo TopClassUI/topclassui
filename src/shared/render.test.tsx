@@ -1,3 +1,4 @@
+import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -84,5 +85,20 @@ describe('an empty className', () => {
 
   it('still emits the merged class when there is one', () => {
     expect(html(renderElement(<div className="" />, { className: 'text-body' }))).toContain('class="text-body"')
+  })
+})
+
+describe('a fragment cannot carry the look', () => {
+  it('is refused, rather than silently dropping every class and attribute', () => {
+    expect(() => renderElement(<></>, { className: 'x' })).toThrow(/not a fragment/)
+  })
+
+  it('does not catch a component element, which is the common render prop', () => {
+    const Link = (props: { href?: string; className?: string; children?: unknown }) =>
+      createElement('a', props)
+    const out = html(renderElement(<Link href="/x" />, { className: 'look', children: 'Go' }))
+    expect(out).toContain('href="/x"')
+    expect(out).toContain('class="look"')
+    expect(out).toContain('Go')
   })
 })

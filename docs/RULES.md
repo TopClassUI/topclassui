@@ -10,20 +10,30 @@ Each rule has an id, one line of rule, one line of reason, and what enforces it.
 
 ```
 pnpm check            every gate below, in order
-pnpm lint             eslint, including the seven custom rules
+pnpm lint             eslint, including the thirteen custom rules
 pnpm typecheck        tsc --noEmit
 pnpm test             vitest, four projects: node, dom, rsc, ssr
 pnpm check:structure  the folder contract and file sizes
 pnpm check:boundaries the server and client rules
 pnpm check:css        cascade layers, token references, one-line comments in CSS
 pnpm check:icons      the generated icon modules still match raw/
+pnpm check:readme     every component README still matches its schema and types
 pnpm check:contrast   AA contrast in every mode
+pnpm test:e2e         playwright: target size, the focus ring and axe, in a real browser
 pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from this file
 pnpm icons:build      regenerate the icon modules from raw/
+pnpm readme:build     regenerate every component README
+pnpm new:component x  scaffold a component folder that already passes pnpm check
+pnpm test:mutation    break the code on purpose; a surviving mutation is a test measuring nothing
+pnpm harness:build    the static demo pages test:e2e measures
 ```
 
-Not built yet, so do not run them: `pnpm test:visual`, `pnpm test:e2e`, `pnpm size`,
-`pnpm new:component`. They arrive with the phases that need them.
+`pnpm check` runs `test:e2e`, which cannot launch a browser it has not downloaded.
+Once per machine: `npx playwright install chromium`. `pnpm test:mutation` is not in
+`pnpm check`, because it runs the whole suite once per mutant; CI runs it as its own job.
+
+Not built yet, so do not run them: `pnpm test:visual`, `pnpm size`.
+They arrive with the phases that need them.
 
 ## How to work
 
@@ -64,12 +74,12 @@ Not built yet, so do not run them: `pnpm test:visual`, `pnpm test:e2e`, `pnpm si
 ### R-9.2-3 Never dot into a client module from a server file
 **Rule:** export flat names (`DialogRoot`), never an object (`Dialog.Root`) that a server file would dot into.
 **Why:** React's client-module proxy allows one level of access and throws on the second.
-**Enforced by:** not yet - planned: `eslint`
+**Enforced by:** `eslint`
 
 ### R-9.2-4 The root of a part family is `<Name>Root`
 **Rule:** a component split into parts names its root `<Name>Root` without exception (`CardRoot`, `DialogRoot`, `AvatarRoot`), and a scrolling overlay names its parts `<Name>Header`, `<Name>Body` and `<Name>Footer`, where the Body is the scroll container R-10.5-1 requires.
 **Why:** one family naming its root `Card` while ten others use `XxxRoot` is the drift a cross-file audit catches and an author never does; an overlay without a Body has nothing to scroll.
-**Enforced by:** not yet - planned: `check-structure`
+**Enforced by:** `eslint`, which reads the exported names; the `parts/` half is manual
 
 ## 2. Styling
 
@@ -96,7 +106,7 @@ Not built yet, so do not run them: `pnpm test:visual`, `pnpm test:e2e`, `pnpm si
 ### R-5.2-5 No inline style except a CSS variable
 **Rule:** `style` is only for setting a `--tc-*` variable.
 **Why:** anything else escapes the token system.
-**Enforced by:** not yet - planned: `eslint`
+**Enforced by:** `eslint`
 
 ### R-5.2-6 Bare data and aria variants
 **Rule:** write `data-open:`, `group-data-panel-open:`, `aria-busy:`; brackets only for values.
@@ -115,8 +125,14 @@ Not built yet, so do not run them: `pnpm test:visual`, `pnpm test:e2e`, `pnpm si
 
 ### R-4-3 One-line comments in stylesheets too
 **Rule:** R-5.12-3 applies to `.css` files; no comment spans more than one line.
-**Why:** the ESLint rule reads TypeScript only, so a stylesheet was the one place the comment rule went unenforced.
+**Why:** the ESLint rule reads TypeScript under `src/` only, so stylesheets needed their own check.
 **Enforced by:** `check-css`
+
+### R-5.2-7 Content shrinks the control, never the layout
+**Rule:** a control that renders caller-supplied text carries `CONTAIN` from `shared/classes.ts`, and its label sits on an element of its own carrying `LABEL`, so a long label truncates with an ellipsis instead of pushing the page apart. The data is never cut: only the rendering is.
+**Why:** a Button with a 60-character label measured 436px inside a 200px box and escaped it. `truncate` on the control alone does not fix that - a bare string inside `inline-flex` is an anonymous flex item, and `text-overflow` never applies to one, so it clips with no ellipsis.
+**Enforced by:** `e2e/contain.spec.ts`, which measures the control against its container in three modes and both directions
+
 
 ## 3. RTL
 
@@ -138,12 +154,12 @@ Not built yet, so do not run them: `pnpm test:visual`, `pnpm test:e2e`, `pnpm si
 ### R-5.3-4 Logical overlay placement
 **Rule:** use the `placement` prop, which maps to Base UI's `side` and `align`; never `left` or `right` as a side.
 **Why:** `align` and the `inline-*` sides flip in RTL automatically.
-**Enforced by:** `eslint` + type
+**Enforced by:** type; the `eslint` half does not exist
 
 ### R-13-1 TopClassProvider is required
 **Rule:** the app mounts `TopClassProvider` at the root layout with `direction` and `locale` as props from the layout, never read from `document.dir` in an effect.
 **Why:** Base UI learns the direction only from `DirectionProvider`, and reading it in an effect disagrees with the server render.
-**Enforced by:** development warning
+**Enforced by:** not yet - the provider has a silent fallback instead of a warning
 
 ## 4. API conventions
 
@@ -158,9 +174,9 @@ Not built yet, so do not run them: `pnpm test:visual`, `pnpm test:e2e`, `pnpm si
 **Enforced by:** `shared/contracts/size.ts` + type tests
 
 ### R-5.7-3 Pass through className, style, ref and rest
-**Rule:** every component accepts them and spreads the rest onto its root element; `ref` is a normal prop, never `forwardRef`.
+**Rule:** every component accepts them and spreads the rest onto its root element; `ref` is a normal prop, never `forwardRef`. A skeleton is a component too.
 **Why:** consumers must be able to extend any component.
-**Enforced by:** not yet - planned: type tests
+**Enforced by:** type tests and a render test per component; no check proves all 46 have one
 
 ### R-5.7-4 Polymorphism through render
 **Rule:** server components accept the element form only, implemented with `renderElement`; client components may also accept the function form through `useRender`.
@@ -175,7 +191,7 @@ Not built yet, so do not run them: `pnpm test:visual`, `pnpm test:e2e`, `pnpm si
 ### R-5.7-6 Base UI state attribute grammar
 **Rule:** boolean presence attributes (`data-open`, `data-loading`, `data-disabled`), never `data-state="..."`; enumerated design props are value attributes (`data-variant`, `data-size`, `data-tone`).
 **Why:** Base UI already sets the boolean form, and two vocabularies would drift.
-**Enforced by:** not yet - planned: `eslint`
+**Enforced by:** `eslint`
 
 ### R-5.7-7 Clamp every numeric limit
 **Rule:** numeric props have `min` and `max` in the schema and are clamped at runtime with `clamp()`.
@@ -184,13 +200,17 @@ Not built yet, so do not run them: `pnpm test:visual`, `pnpm test:e2e`, `pnpm si
 
 ## 5. Schemas and constants
 
+### R-5.7-8 Every limit has a default, and the default never cuts real input
+**Rule:** every bounded prop ships a default: numeric and structural ones (`visibleRows`, `maxRows`, `siblingCount`, `slidesPerView`, `Rating.max`) are clamped, and a text field takes its `maxLength` from `TEXT_MAX_LENGTH` in `shared/contracts/boundaries.ts`, keyed by input type. Each number sits far above any real value of that type, a counter appears at `COUNTER_THRESHOLD` of it, and the caller overrides with their own `maxLength` or removes the cap with `maxLength={null}`. A number field is bounded by `min`, `max` and `step`, never by a count of characters.
+**Why:** a design system with no default is a design system where every team picks a different one and the fourth team forgets entirely, which is how an unbounded field reaches production. The default is there for the developer who never considered the case. It is set high enough that it is a guard rail rather than a validator, because a cap that cuts a name, an address or a pasted token is worse than no cap at all.
+**Enforced by:** `src/shared/contracts/boundaries.test.ts`, which proves each cap clears the longest real value of its type and still stops a pasted file; the clamping half is `R-5.7-7`
 ### R-8.3-1 schema.ts is type-only for components
-**Rule:** components import the schema with `import type`, so no component pulls `zod` into the browser; `zod` is a direct dependency, because `npm i topclassui zod` installs it for validation and types together.
-**Why:** Zod must never reach the client bundle, but the published types reference it.
-**Enforced by:** unit test (`no-zod-at-runtime`); `attw` is not in the repo yet
+**Rule:** `schema.ts` is imported with `import type` only, so the full `zod` build never reaches the browser. A client file may import `zod/mini` at runtime for layer-2 validation; a Server Component may not import either. `zod` is a direct dependency, because `npm i topclassui zod` installs it for validation and types together.
+**Why:** measured, the full build is 89 KB gzipped for one validator and `zod/mini` is 3.4 KB. HTML `maxLength` stops typing but not a paste or a DevTools edit, so a client control needs a real check; 3.4 KB buys that, 89 KB does not.
+**Enforced by:** unit test (`no-zod-at-runtime`), which allows `zod/mini` in a client file and nothing else; `attw` is not in the repo yet
 
 ### R-8.3-2 Defaults live once
-**Rule:** defaults and component-specific value lists live in `constants.ts` and are imported by the schema, by cva and by the component; the size list comes from `shared/contracts/size.ts`.
+**Rule:** component-specific value lists live in `constants.ts` and are imported by the schema, by cva and by the component; the size list comes from `shared/contracts/size.ts`. The bounds live in `boundaries.ts` (R-8.3-6).
 **Why:** three declarations of the same default cannot be kept in agreement.
 **Enforced by:** unit test
 
@@ -204,6 +224,11 @@ Not built yet, so do not run them: `pnpm test:visual`, `pnpm test:e2e`, `pnpm si
 **Why:** an `enum` is a runtime value that survives into the bundle, does not tree-shake, and Node's type stripping rejects it.
 **Enforced by:** `eslint` (`topclass/no-enum`)
 
+### R-8.3-6 Defaults and bounds live apart from the value lists
+**Rule:** every component folder has a `boundaries.ts` holding `<NAME>_BOUNDARIES` and nothing else: the bounds the component enforces, each far above any real value so that it is a guard rail rather than a validator. The value lists and the defaults stay in `constants.ts`. A bounded prop is clamped with `clamp()` and declared in `schema.ts` with the same number (R-5.7-7, R-5.7-8).
+**Why:** a bound is not a default. A default is what the component does when asked for nothing; a bound is what it refuses whatever it is asked. Keeping them apart means the file a reviewer opens to check the guard rails holds only guard rails.
+**Enforced by:** `check-structure` allows `boundaries.ts` in the folder contract and `pnpm new:component` writes it; that the component enforces the bound is review
+
 ### R-8.3-3 Props table from the types
 **Rule:** the docs props table is generated from the emitted `.d.ts`, with defaults and limits supplied by the schema.
 **Why:** the schema covers only design props and would omit `className`, `children` and inherited props.
@@ -214,7 +239,7 @@ Not built yet, so do not run them: `pnpm test:visual`, `pnpm test:e2e`, `pnpm si
 ### R-5.11-1 No hard-coded user-visible text
 **Rule:** every built-in string comes from the `labels` prop with defaults from `shared/labels/en.ts`; `ar.ts` ships too. Demo files are exempt.
 **Why:** the library must be usable in any language without patching components.
-**Enforced by:** `eslint`
+**Enforced by:** `eslint` for visible text and the labelled attributes; a string built at runtime is manual
 
 ### R-5.11-2 Labels with numbers are functions
 **Rule:** a label containing a count is `(n, fmt) => string` and the Arabic file uses `Intl.PluralRules`.
@@ -236,7 +261,7 @@ Not built yet, so do not run them: `pnpm test:visual`, `pnpm test:e2e`, `pnpm si
 ### R-10.5-1 Overlays scroll inside themselves
 **Rule:** popups use `POPUP_BOUNDS` and the row cap, dialogs and drawers scroll their body with sticky header and footer, and every scroll container inside an overlay sets `overscroll-behavior: contain`.
 **Why:** the page must never scroll behind an open overlay.
-**Enforced by:** not yet - Playwright is not in the repo yet
+**Enforced by:** not yet - no overlay component exists yet
 
 ### R-10.5-2 Tooltips never scroll
 **Rule:** a tooltip is one or two lines of plain text; anything larger, or anything with a link or control, is a Popover.
@@ -246,7 +271,7 @@ Not built yet, so do not run them: `pnpm test:visual`, `pnpm test:e2e`, `pnpm si
 ### R-10.5-3 Sticky bars set the scroll padding
 **Rule:** a sticky or fixed bar sets `--tc-sticky-top` or `--tc-sticky-bottom`, and the scroll container reads them into `scroll-padding-block`.
 **Why:** WCAG 2.4.11: a focused element must not be hidden behind a bar.
-**Enforced by:** not yet - Playwright is not in the repo yet
+**Enforced by:** not yet - no sticky or fixed bar exists yet
 
 ## 8. Code structure
 
@@ -261,14 +286,19 @@ Not built yet, so do not run them: `pnpm test:visual`, `pnpm test:e2e`, `pnpm si
 **Enforced by:** `scripts/check-structure.ts`
 
 ### R-5.12-3 Comments are one line
-**Rule:** one line maximum, only for what the code cannot say (a browser quirk, a spec reference, a non-local constraint). No paragraph comments, no commented-out code, no narration of the next line.
+**Rule:** one line maximum, only for what the code cannot say (a browser quirk, a spec reference, a non-local constraint). No paragraph comments, no commented-out code, no narration of the next line. A `/** ... */` block documenting an export may run to three lines of prose and no more; past that it is an article and belongs in `docs/DECISIONS.md`. `scripts/`, `eslint-rules/` and config files are outside the check.
 **Why:** long comments go stale and hide the code.
-**Enforced by:** `eslint`
+**Enforced by:** `eslint` under `src/`; the JSDoc exemption and everything outside `src/` are manual
 
 ### R-5.12-4 Naming
-**Rule:** kebab-case files and folders, PascalCase components, `useThing` hooks, verb-first pure functions, `SCREAMING_CASE` constants in `constants.ts` or `classes.ts` only; a file in `parts/` exports one component named after the file.
+**Rule:** kebab-case files and folders, PascalCase components, `useThing` hooks, verb-first pure functions, `SCREAMING_CASE` constants in `constants.ts` or `classes.ts` inside a component folder; a shared contract under `shared/` may declare its own. A file in `parts/` exports one component named after the file.
 **Why:** a predictable name is the cheapest documentation.
-**Enforced by:** `scripts/check-structure.ts`
+**Enforced by:** `scripts/check-structure.ts` for the kebab-case names and for a SCREAMING_CASE table declared outside `constants.ts` or `classes.ts`; the rest is manual
+
+### R-17-1 A test expectation is named, never derived
+**Rule:** an expectation is written out, never computed from the thing under test; deleting half the implementation must not also delete half the assertion.
+**Why:** a derived expectation passes whatever the code does, which is how several suites here passed while the code was wrong.
+**Enforced by:** `eslint` (`topclass/no-derived-expectations`)
 
 ### R-5.12-5 Strict TypeScript
 **Rule:** no `any`, no `@ts-ignore`, no non-null assertion without a one-line reason; relative imports carry explicit `.js` extensions and type imports use `import type`.
@@ -279,6 +309,16 @@ Not built yet, so do not run them: `pnpm test:visual`, `pnpm test:e2e`, `pnpm si
 **Rule:** a file exists only if the component needs it, and only the files in PLAN.md 8.1 may exist. Never `loading.tsx`, `error.tsx`, `page.tsx` or `layout.tsx` (Next.js reserves those names); use `skeleton.tsx`, `empty-state.tsx` and `error-state.tsx`. Examples are one file each under `dummy/`, and tests under `test/`.
 **Why:** a predictable folder is what makes scaffolding, checking and documenting automatic.
 **Enforced by:** `scripts/check-structure.ts`
+
+### R-8.1-2 meta.ts answers to one contract
+**Rule:** `meta.ts` is declared `satisfies ComponentMeta` from `#shared/meta.js`, its `slug` is the folder name, and `baseUiRange` is non-null whenever `baseUi` is. `status` is `stable` only when every line of PLAN 20 is true.
+**Why:** the docs navigation and the generated `registry.json` key on these fields, and 46 hand-written objects drift before anything reads them.
+**Enforced by:** `check-structure` requires the file; `src/shared/meta.test.ts` checks its shape for every folder that has one
+
+### R-8.1-3 The README is generated, never written by hand
+**Rule:** every component folder has a `README.md` written by `pnpm readme:build` from `schema.ts`, `types.ts` and `meta.ts`. Prose goes between the `<!-- hand-written -->` markers and nothing else in the file is edited.
+**Why:** the first question anyone asks of a component is whether a prop is optional or mandatory, and a hand-written table answers it confidently and wrongly within a week. Generating it from the schema and the types means it cannot disagree with the code.
+**Enforced by:** `check-structure` requires the file; `check:readme` fails when it is stale
 
 ## 9. Icons
 
@@ -297,12 +337,12 @@ Not built yet, so do not run them: `pnpm test:visual`, `pnpm test:e2e`, `pnpm si
 ### R-5.6-1 WCAG 2.2 AA
 **Rule:** keyboard behaviour follows the ARIA Authoring Practices; a visible `focus-visible` ring on every interactive element; types enforce labels.
 **Why:** it is a promise of the library, not an extra.
-**Enforced by:** manual; `axe` is not in the repo yet
+**Enforced by:** manual; `axe` covers the ARIA attributes in `test:e2e`, not the keyboard behaviour
 
 ### R-5.6-2 Target size
-**Rule:** every interactive element is at least 24x24 CSS px on every pointer type and 44px under `pointer-coarse`.
+**Rule:** every interactive element is at least 24x24 CSS px on every pointer type and 44px under `pointer-coarse`. The floor is a px token with a px fallback, never a rem step, because the success criterion is written in CSS px.
 **Why:** WCAG 2.5.8.
-**Enforced by:** not yet - Playwright is not in the repo yet
+**Enforced by:** `e2e/target-size.spec.ts`, which measures every interactive box in a real browser at both pointer types
 
 ### R-5.6-3 Every drag has an alternative
 **Rule:** Slider, Drawer and Toast swipe, Carousel, Resizable, sortable lists and the editor kit each provide a keyboard or button path to the same result.

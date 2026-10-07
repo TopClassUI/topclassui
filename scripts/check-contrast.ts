@@ -13,7 +13,7 @@ if (!existsSync(TOKENS)) {
   process.exit(0)
 }
 
-const { failures, pairs } = checkTokens(readFileSync(TOKENS, 'utf8'), readPalette())
+const { failures, pairs, distinct } = checkTokens(readFileSync(TOKENS, 'utf8'), readPalette())
 
 for (const f of failures) console.error(`error ${f}`)
 
@@ -21,4 +21,4 @@ if (failures.length) {
   console.error(`\ncheck-contrast: ${String(failures.length)} failure${failures.length === 1 ? '' : 's'}.`)
   process.exit(1)
 }
-console.log(`check-contrast: ok (${String(MODES.length)} modes, ${String(pairs)} pairs measured)`)
+console.log(`check-contrast: ok (${String(MODES.length)} modes, ${String(pairs)} pairs, ${String(distinct)} distinct colour readings)`)

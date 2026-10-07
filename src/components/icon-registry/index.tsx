@@ -1,6 +1,7 @@
-import type { IconName } from '../../icons/names.generated.js'
-import type { IconData } from '../../icons/types.js'
-import { Svg } from '../svg/index.js'
+import type { IconName } from '#icons/names.generated.js'
+import type { IconData } from '#icons/types.js'
+import { Svg } from '#components/svg/index.js'
+import { MISSING } from './constants.js'
 import { camelCase } from './lib.js'
 import type { IconProps } from './types.js'
 
@@ -8,9 +9,6 @@ export type { IconProps } from './types.js'
 
 /** Nothing is registered until the app calls registerIcons, so no path data is implied. */
 const registry = new Map<IconName, IconData>()
-
-/** An empty path renders an empty svg at the resolved size, holding the layout. */
-const MISSING: IconData = { viewBox: '0 0 256 256', path: '', directional: false }
 
 const warned = new Set<IconName>()
 

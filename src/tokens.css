@@ -4,6 +4,10 @@
 :root {
   --tc-radius: 0.5rem;
   --tc-line-width: 1px;
+  /* R-5.6-2: SC 2.5.8 is specified in CSS px, so these never follow the root font size. */
+  --tc-target-min: 24px;
+  --tc-target-coarse: 44px;
+
   --tc-ring-width: 2px;
   --tc-ring-offset: 2px;
   --tc-density: 1;
@@ -71,7 +75,8 @@
   --tc-danger-on-soft: var(--color-red-800);
   --tc-info-solid: var(--color-sky-700);
   --tc-info-on-solid: var(--color-white);
-  --tc-info-on-soft: var(--color-sky-700);
+  /* sky-800 not sky-700: sky-700 measures 3.84:1 on info-soft-active. */
+  --tc-info-on-soft: var(--color-sky-800);
 
   /* How much of the tone goes into its soft tint. Dark needs roughly double. */
   --tc-primary-mix: 12%;
@@ -81,8 +86,21 @@
   --tc-danger-mix: 12%;
   --tc-info-mix: 12%;
 
-  --tc-hover: var(--color-violet-700);
-  --tc-active: var(--color-violet-800);
+  /* Away from the tone's own label, not the page, so a white label survives both modes. */
+  --tc-primary-hover: var(--color-violet-700);
+  --tc-primary-active: var(--color-violet-800);
+  --tc-danger-hover: var(--color-red-700);
+  --tc-danger-active: var(--color-red-800);
+  --tc-success-hover: var(--color-emerald-800);
+  --tc-success-active: var(--color-emerald-900);
+  --tc-info-hover: var(--color-sky-800);
+  --tc-info-active: var(--color-sky-900);
+  /* Warning's label is dark, so its step is lighter while every other tone goes darker. */
+  --tc-warning-hover: var(--color-amber-400);
+  --tc-warning-active: var(--color-amber-300);
+  /* Neutral's solid is already near-black, so it steps toward the middle instead. */
+  --tc-neutral-hover: var(--color-neutral-800);
+  --tc-neutral-active: var(--color-neutral-700);
 }
 
 [data-theme='dark'] {
@@ -112,6 +130,10 @@
   --tc-warning-mix: 14%;
   --tc-danger-mix: 22%;
   --tc-info-mix: 24%;
+
+  /* Near-white in dark, so it steps toward the middle from the other side. */
+  --tc-neutral-hover: var(--color-neutral-200);
+  --tc-neutral-active: var(--color-neutral-300);
 }
 
 /* A custom mode is one more block. It may change knobs as well as colours. */
@@ -120,8 +142,8 @@
   --tc-primary-on-solid: var(--color-white);
   /* cyan-800 not cyan-700: the whole ocean soft ramp fails at cyan-700. */
   --tc-primary-on-soft: var(--color-cyan-800);
-  --tc-hover: var(--color-cyan-800);
-  --tc-active: var(--color-cyan-900);
+  --tc-primary-hover: var(--color-cyan-800);
+  --tc-primary-active: var(--color-cyan-900);
   --tc-radius: 9999px;
 }
 
@@ -139,8 +161,18 @@
   --tc-info-soft: color-mix(in oklch, var(--tc-info-solid) var(--tc-info-mix), var(--tc-page));
 
   /* The tone's own percentage plus 8, then plus 16, so the rule survives a mode change. */
-  --tc-soft-hover: color-mix(in oklch, var(--tc-primary-solid) calc(var(--tc-primary-mix) + 8%), var(--tc-page));
-  --tc-soft-active: color-mix(in oklch, var(--tc-primary-solid) calc(var(--tc-primary-mix) + 16%), var(--tc-page));
+  --tc-primary-soft-hover: color-mix(in oklch, var(--tc-primary-solid) calc(var(--tc-primary-mix) + 8%), var(--tc-page));
+  --tc-primary-soft-active: color-mix(in oklch, var(--tc-primary-solid) calc(var(--tc-primary-mix) + 16%), var(--tc-page));
+  --tc-neutral-soft-hover: color-mix(in oklch, var(--tc-neutral-solid) calc(var(--tc-neutral-mix) + 8%), var(--tc-page));
+  --tc-neutral-soft-active: color-mix(in oklch, var(--tc-neutral-solid) calc(var(--tc-neutral-mix) + 16%), var(--tc-page));
+  --tc-success-soft-hover: color-mix(in oklch, var(--tc-success-solid) calc(var(--tc-success-mix) + 8%), var(--tc-page));
+  --tc-success-soft-active: color-mix(in oklch, var(--tc-success-solid) calc(var(--tc-success-mix) + 16%), var(--tc-page));
+  --tc-warning-soft-hover: color-mix(in oklch, var(--tc-warning-solid) calc(var(--tc-warning-mix) + 8%), var(--tc-page));
+  --tc-warning-soft-active: color-mix(in oklch, var(--tc-warning-solid) calc(var(--tc-warning-mix) + 16%), var(--tc-page));
+  --tc-danger-soft-hover: color-mix(in oklch, var(--tc-danger-solid) calc(var(--tc-danger-mix) + 8%), var(--tc-page));
+  --tc-danger-soft-active: color-mix(in oklch, var(--tc-danger-solid) calc(var(--tc-danger-mix) + 16%), var(--tc-page));
+  --tc-info-soft-hover: color-mix(in oklch, var(--tc-info-solid) calc(var(--tc-info-mix) + 8%), var(--tc-page));
+  --tc-info-soft-active: color-mix(in oklch, var(--tc-info-solid) calc(var(--tc-info-mix) + 16%), var(--tc-page));
 }
 
 /* Both blocks: these inherit, so an ltr island in an rtl page needs its own reset. */
@@ -163,6 +195,16 @@
 }
 
 @layer base {
+  /* Layered, so @layer utilities (a tone-* class) outranks them on one element. */
+  :root,
+  [data-theme] {
+    --tc-soft: var(--tc-primary-soft);
+    --tc-hover: var(--tc-primary-hover);
+    --tc-active: var(--tc-primary-active);
+    --tc-soft-hover: var(--tc-primary-soft-hover);
+    --tc-soft-active: var(--tc-primary-soft-active);
+  }
+
   /* color-scheme is not a custom property, so it belongs in a layer (R-4-1). */
   :root,
   [data-theme='light'],
