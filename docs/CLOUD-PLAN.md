@@ -103,34 +103,30 @@ branch.*
 
 ---
 
-## 5. One thing Omar must confirm before you start
+## 5. The one deviation this plan makes
 
 `docs/PLAN.md` section 19 puts **forms** next (Phase 4: Field, Label, Input, Textarea,
-Checkbox, RadioGroup, Switch, NumberField, Slider, Select, Form).
+Checkbox, RadioGroup, Switch, NumberField, Slider, Select, Form), and section 18 lists a
+catalog larger than what the site advertises. This plan does neither, for two reasons.
 
-This plan recommends a different order, and that is a deviation that needs Omar's word.
-**The recommendation:** build the tier-1 **server** components first, then one client
-component as a second template, then forms.
+**It follows the site's 46, not the catalog.** The home page promises 46 components by
+name. The catalog in section 18 is longer and includes `Heading`, `Text`, `Container`,
+`Stack` and `Grid`, which the site never mentions and which, in a Tailwind library, are
+mostly indirection over `max-w-5xl mx-auto px-4`. Build what was promised; reconsider the
+rest once it ships.
 
-The reasoning:
+**It builds the server set before the forms.** No component has a `client.tsx` yet, so
+the client half of the folder contract is described by `R-5.12-1` and checked by
+`check-boundaries` but proven by nothing. Phase 4 is almost entirely client components,
+which would mean inventing the client template, the Field architecture, the Base UI Field
+integration and the `labels` wiring at once, in parallel, at volume. That is design work,
+not quantity work. The server set copies Button exactly, so throughput is high and risk is
+low - which is what this session is for - and one client component built carefully and
+reviewed hard is worth more than eleven built on a pattern nobody has validated.
 
-1. Forms are almost all client components, and **no client component exists yet**. Phase
-   4 would mean inventing the client template, the Field/Form architecture, the Base UI
-   Field integration and the `labels` wiring all at once, in parallel, at volume. That is
-   design work, not quantity work.
-2. The server set is pure template-copying. Button already proves every part of it, so
-   the throughput is high and the risk is low - exactly what the cloud session is for.
-3. One client component built carefully, alone, and reviewed hard is worth more than
-   eleven built on a pattern nobody has validated.
-
-**If Omar says yes:** paste the entry in Appendix C into `docs/DECISIONS.md` as your
-first commit, then follow section 6.
-**If Omar says no:** use Appendix B, the strict Phase 4 order, and expect Track B's work
-to happen inside the Field/Input branch instead.
-
-Until Omar answers, Gate 0 below is safe to do either way.
-
----
+Omar has agreed to both. **Paste the entry in Appendix C into `docs/DECISIONS.md` as your
+first commit**, then follow section 6. Appendix B records the strict section 19 order in
+case it is ever needed.
 
 ## 6. The order of work
 
@@ -150,22 +146,25 @@ Ten components per unit, three or four worktrees running at a time. See Appendix
 
 ### Track B - the first client component, alone
 
-**Switch.** One worktree, no parallel work beside it, highest care. It is the second
-template, so it decides the shape of thirty other components.
+**Tooltip.** One worktree, no parallel work beside it, highest care. It is the second
+template, so it decides the shape of every client component after it: `'use client'`,
+`client.tsx`, `hook.ts` (`R-5.12-1`), `lib.tsx`, a hydration test, and the first use of
+`zod/mini` if it needs validation at all.
 
-Switch is the right first client component because it is the smallest real Base UI
-control that still exercises everything the pattern needs: `'use client'`, `client.tsx`,
-`hook.ts`, `useControllableState`, a hidden input for no-JS form submission, a thumb that
-must translate by `--tc-dir` in RTL (`R-5.3-2`), the `data-*` state attributes of
-`R-5.7-6`, and a hydration test.
+It is also the first component to use `shared/floating.ts`, which already exists and has
+never been exercised: the `placement` prop mapping to Base UI's `side` and `align`
+(`R-5.3-4`), a popup that stays inside the viewport, and a delay group so moving between
+two tooltips does not re-wait. Read `node_modules/@base-ui/react/tooltip/` before writing
+a line, and record anything that differs in `docs/DECISIONS.md` (`R-0-1`).
 
-Switch also forces one API decision that every later control inherits: Base UI uses
-`checked` / `defaultChecked` / `onCheckedChange`, and `R-5.7-1` says controlled pairs are
-`value` / `defaultValue` with `onValueChange`. **Do not guess.** Read
-`node_modules/@base-ui/react/switch/`, write the recommendation in the pull request, and
-let Omar choose. Record it in `docs/DECISIONS.md` once he does.
+Run it last in Unit 1, after the nine server components, so the server template is
+re-proven before the client one is invented.
 
-Run Track B after Batch 1 of Track A, so the server template is re-proven first.
+**`Switch` is the other template**, and it opens Unit 4 for the same reason: it settles
+whether a form control uses Base UI's `checked` / `onCheckedChange` or the
+`value` / `onValueChange` that `R-5.7-1` asks for. **Do not guess.** Read
+`node_modules/@base-ui/react/switch/`, put the recommendation in the pull request, and
+let Omar choose.
 
 ---
 
@@ -495,69 +494,89 @@ to prevent. If a unit lands with no findings worth fixing, raise the next one to
 worktree, one branch, one pull request; three or four run at once so that two components
 never edit `shared/labels/en.ts` on the same afternoon.
 
+### The list this follows
+
+The home page advertises **46 components**, and that set is what v0.1 owes anyone who
+reads it. `docs/PLAN.md` section 18 is a larger internal catalog across four tiers, and
+the two disagree: the catalog has `Heading`, `Text`, `Container`, `Stack` and others the
+site never promises. **The site's 46 wins.** Build those, then look at what is left and
+decide whether it earns a place.
+
 ### Unit 1 - the ones closest to Button
 
 | # | Component | Mode | Why it is here | New ground it breaks |
 |---|---|---|---|---|
 | 1 | `Badge` | S | Button's variant and tone machinery with no interaction | none - it re-proves the template |
-| 2 | `IconButton` | S | Button with a required `label` | first required prop; first **yes** in a README |
-| 3 | `Spinner` | S | every `loading` state needs it | first `labels` entry of its own |
-| 4 | `Skeleton` | S | every later `skeleton.tsx` is built on it | the `rows` boundary |
-| 5 | `Separator` | S | orientation without tone | first `orientation` prop, and its RTL |
-| 6 | `Heading` | S | `level` separate from `size` | semantics split from looks |
-| 7 | `Text` | S | sizes, `muted`, truncate, line clamp | first numeric boundary after Button |
-| 8 | `Code` | S | inline code | smallest component in the catalog |
-| 9 | `Container` | S | max width and gutters | first layout primitive |
+| 2 | `Spinner` | S | every `loading` state needs it | first `labels` entry of its own |
+| 3 | `Skeleton` | S | every later `skeleton.tsx` is built on it | the `rows` boundary |
+| 4 | `Separator` | S | orientation without tone | first `orientation` prop, and its RTL |
+| 5 | `Kbd` | S | a keyboard key | smallest component on the list |
+| 6 | `Alert` | S | tones, an icon, a title, actions | first component that composes an icon |
+| 7 | `EmptyState` | S | used by every later `states.tsx` | labels with an illustration slot |
+| 8 | `Progress` | S | `min`/`max`, clamped | **first numeric boundary and first `clamp()`** |
+| 9 | `Card` | S | header, body, footer | **first multi-part component: `CardRoot` (R-9.2-4)** |
 | 10 | **`Tooltip`** | **C** | the full text of a truncated label has to be readable | **the first client component in the repo** |
 
 **Build order.** `Badge` first and **alone**: it re-proves the whole template end to end
 and the local session reviews it before anything else starts. Then 2 to 9 in three or
 four worktrees at a time. `Tooltip` **last and alone**.
 
-**Why Tooltip is in a server unit.** It is the only `C` component here, and it is the
-first in the repo, so it is the second template - `client.tsx`, `hook.ts`, `'use client'`,
-and the first use of `zod/mini` if it needs validation at all. It earns the same care
-Button got. It is in this unit rather than later because `R-5.2-7` truncates a long label
-to an ellipsis, and the text it hides has to be readable somewhere.
+Three of these break genuinely new ground, so expect them to take longer than the rest:
+`Progress` is the first component with a numeric boundary to clamp, `Card` is the first
+split into parts, and `Tooltip` is the first that runs in the browser at all.
+
+**Why Tooltip is in a server unit.** It is the only `C` component here and the first in
+the repo, so it is the second template: `client.tsx`, `hook.ts`, `'use client'`, and the
+first use of `zod/mini` if it needs validation. It earns the same care Button got. It is
+in this unit rather than later because `R-5.2-7` truncates a long label to an ellipsis,
+and the text it hides has to be readable somewhere.
 
 **Shared additions, which land first in their own pull request (section 9):** labels for
-`IconButton`, `Spinner` and `Tooltip`.
+`Spinner`, `Alert`, `EmptyState` and `Tooltip`; one or two icons in `raw/` for `Alert`.
 
 **What Button already settled, so do not reinvent it:** the folder contract including
-`boundaries.ts` and `lib.tsx`, `memoizeVariants` from `#shared/variants.js`, `CONTAIN` and
-`LABEL` for a long label, `renderElement` for the `render` prop, the tone and size
-contracts, and the generated `README.md`. A component that needs none of these is
-probably wrong.
+`boundaries.ts`, `classes.ts` and `lib.tsx`, `memoizeVariants` from `#shared/variants.js`,
+`CONTAIN` and `LABEL` for a long label, `renderElement` for the `render` prop, the tone
+and size contracts, and the generated `README.md`. A component that needs none of these
+is probably wrong.
 
-`Stack` moved to Unit 2 to keep this unit at ten.
+### Unit 2 - the rest of the server set
 
-### Unit 2 - containers, feedback and navigation
+`Input`, `Table`, `Breadcrumb`, `Pagination`, `Timeline`, `Tag`, `Avatar`,
+`AvatarGroup`, `Banner`, `Rating`.
 
-`Stack`, `Grid`, `Card`, `Alert`, `EmptyState`, `ErrorState`, `Link`, `VisuallyHidden`,
-`SkipLink`, `Breadcrumb`.
+`Input` is the first form control and the first consumer of `TEXT_MAX_LENGTH`
+(`R-5.7-8`): its `maxLength` comes from the shared default by input type, the browser
+enforces it, and a prop overrides it. `Table` and `Timeline` are the first components
+that render items, so they are the first to use `useCollection` (`R-8.5-1`).
+`Pagination` is real `href`s with `siblingCount` clamped.
 
-`Card` is the first multi-part component, so it proves `R-9.2-3` and `R-9.2-4`: flat
-exports, `CardRoot`, and the `Header`/`Body`/`Footer` naming. `Alert`, `EmptyState` and
-`ErrorState` all carry labels and an icon. `Link` settles external-link handling,
-`Breadcrumb` emits structured data, and `Pagination` is real `href`s with `siblingCount`
-clamped - the second schema limit.
+### Unit 3 - the overlays
 
-Shared additions expected: labels for `Alert`, `EmptyState`, `ErrorState`, `SkipLink`,
-`Breadcrumb` and `Pagination`; possibly one or two icons in `raw/`.
+`Dialog`, `Drawer`, `Popover`, `Toast`, `DropdownMenu`, `CommandPalette`, `Tabs`,
+`Accordion`, `Navbar`, `Sidebar`.
 
-### Unit 3 - Switch and the first forms
+All client or split. By now Tooltip has settled the client template and `shared/floating`
+already exists, so this unit fills the provider's toast viewport and tooltip slots and
+proves `R-10.5-1`: a popup that stays inside the viewport, a body that scrolls inside
+itself, and focus that returns to the trigger.
 
-`Switch` opens it, alone and first: it is the first *form* control, so it settles the
-`checked` / `onCheckedChange` versus `value` / `onValueChange` question that every later
-control inherits (section 6, Track B). Only when it is merged do the rest start.
+### Unit 4 - the remaining form controls
 
-Then `Pagination`, carried over from Unit 2, and the Phase 4 forms in the order of
-`docs/PLAN.md` section 19: `Field`, `Label`, `Input`, `Textarea`, `Checkbox`,
-`RadioGroup`, `NumberField`.
+`Select`, `Combobox`, `Checkbox`, `RadioGroup`, `Switch`, `Slider`, `NumberField`,
+`Textarea`, `SegmentedControl`, `OTPField`.
 
-`Field` and `Label` go second and together, because they are the architecture every other
-control plugs into. `Input` and `Textarea` follow. `NumberField` is the first component to
-exercise `R-5.7-8`: it limits with `min`, `max` and `step`, never with `maxLength`.
+Phase 4 of `docs/PLAN.md` section 19, with its acceptance criteria. `Switch` opens it,
+alone, because it settles `checked`/`onCheckedChange` against `value`/`onValueChange`
+for every control after it.
+
+### Unit 5 - what is left
+
+`DatePicker`, `FileUpload`, `TreeView`, `Stepper`, `CodeBlock`, `Progress`'s sibling
+`Meter`, and whatever the first four units proved was missing. Then, and only then, read
+`docs/PLAN.md` section 18 again and decide which of the catalog's extras - `Heading`,
+`Text`, `Container`, `Stack`, `Grid` - earn a place. In a Tailwind library most of them
+are indirection over `max-w-5xl mx-auto px-4`, so the default answer is no.
 
 ---
 
@@ -591,19 +610,24 @@ Add this to `docs/DECISIONS.md` **at the top**, under the `---`, because that fi
 newest first. Nothing else in that commit.
 
 ```markdown
-## 2026-10-06 - The server tier-1 set is built before Phase 4 forms
+## 2026-10-07 - The site's 46 is the build list, server set first
 
-**Decision.** After Button lands, the next components are the tier-1 server components of
-catalog 18.1 to 18.3 (Appendix A of docs/CLOUD-PLAN.md), then Switch as the first client
-component, then Phase 4 forms in the order of PLAN.md section 19.
+**Decision.** The 46 components the home page advertises are what v0.1 builds, in the five
+units of Appendix A in docs/CLOUD-PLAN.md: the server set first, Tooltip as the first
+client component, then the overlays, then the Phase 4 form controls. PLAN.md section 18
+stays as the long-term catalog, and its extras - Heading, Text, Container, Stack, Grid -
+are reconsidered only after the 46 ship.
 
-**Why.** No component has a `client.tsx` yet, so the client half of the folder contract is
-described by R-5.12-1 and checked by check-boundaries but proven by nothing. Phase 4 is
-almost entirely client components, which would mean inventing the client template, the
-Field architecture and the Base UI Field integration at volume and in parallel. The server
-set copies Button exactly, so it is quantity rather than design, and it re-proves the
-template before the second one is written.
+**Why.** Two reasons, and they point the same way. The catalog and the site disagree: the
+catalog lists components the home page never promises, so building them first would delay
+what a reader was told to expect. And no component has a client.tsx yet, so the client
+half of the folder contract is described by R-5.12-1 and checked by check-boundaries but
+proven by nothing; Phase 4 is almost entirely client components, which would mean
+inventing the client template, the Field architecture and the Base UI Field integration at
+volume and in parallel. The server set copies Button exactly, so it is quantity rather
+than design, and it re-proves the template before the second one is written.
 
-**Affects.** PLAN.md section 19 phase order only. Every Definition of Done line and every
-acceptance criterion is unchanged, and Phase 4's own criteria still gate Phase 4.
+**Affects.** PLAN.md section 19 phase order and section 18's priority. Every Definition of
+Done line and every acceptance criterion is unchanged, and Phase 4's own criteria still
+gate the form controls when Unit 4 reaches them.
 ```
