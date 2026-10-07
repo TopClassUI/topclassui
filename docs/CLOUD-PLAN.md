@@ -42,13 +42,13 @@ and let the review come to you. Never merge your own branch.
 
 ## 3. Ground truth: what exists today
 
-Verified on branch `feat/button`, 2026-10-06, all eleven gates green:
+Verified on branch `feat/button`, 2026-10-07, all eleven gates green:
 
 ```
-pnpm check   ->  lint, typecheck, 1224 tests in 57 files, check-structure,
+pnpm check   ->  lint, typecheck, 1289 tests in 60 files, check-structure,
                  check-boundaries, check-css, check-icons, check-readme,
-                 check-contrast, 84 Playwright tests, rules-sync --check
-pnpm test:mutation  ->  39 of 39 mutations caught
+                 check-contrast, 98 Playwright tests, rules-sync --check
+pnpm test:mutation  ->  47 of 47 mutations caught
 ```
 
 **Built and finished:**
@@ -60,12 +60,14 @@ pnpm test:mutation  ->  39 of 39 mutations caught
 - **Icons.** 84 Phosphor icons in `raw/`, built into `src/icons/` by `pnpm icons:build`.
   Two entry points: async `<Icon name>` for server trees, sync `<Svg icon={x}>` for
   client and shared files.
-- **Shared.** `cn`, `clamp`, `renderElement`, `floating`, `contracts/` (size, state,
-  tone, collection), `collection/useCollection`, `adaptive/useAdaptiveMode`,
-  `labels/` (en + ar with plural rules), `theme/script`, `provider/context`,
-  `use-controllable-state`. All with tests.
-- **Button.** Server-only, zero client JavaScript, 5 variants x 6 tones x 6 sizes.
-- **Gates.** Ten in `pnpm check`, plus `pnpm test:mutation` as the gate on the gates.
+- **Shared.** `cn`, `clamp`, `renderElement`, `floating`, `variants/memoizeVariants`,
+  `contracts/` (size, state, tone, collection, boundaries), `collection/useCollection`,
+  `adaptive/useAdaptiveMode`, `labels/` (en + ar with plural rules), `theme/script`,
+  `provider/context`, `use-controllable-state`. All with tests.
+- **Button.** Server-only, zero client JavaScript, 5 variants x 6 tones x 6 sizes. A
+  long label truncates with an ellipsis instead of pushing the layout apart (`R-5.2-7`),
+  and `boundaries.ts` caps the label string itself.
+- **Gates.** Eleven in `pnpm check`, plus `pnpm test:mutation` as the gate on the gates.
   Thirteen custom ESLint rules. A static Playwright harness: every `dummy/*.tsx` becomes
   6 pages (3 modes x 2 directions) and is automatically covered by the axe,
   target-size and focus-ring specs.
@@ -225,58 +227,64 @@ a minute, the same failure found at step 11 is an hour.
 2. **Scaffold.** `pnpm new:component <slug>`. It writes `constants.ts`, `boundaries.ts`,
    `classes.ts`, `schema.ts`, `types.ts`, `variants.ts`, `index.tsx`, `meta.ts`,
    `README.md`, `test/<slug>.test.tsx` and `dummy/basic.tsx`, and the result already
-   passes `pnpm check`. Run `pnpm check` now,
-   before writing a line, so you know the baseline is green.
-3. **Check the installed types before using any API** (`R-0-1`). Open
+   passes `pnpm check`. Run it now, before writing a line, so you know the baseline is
+   green.
+3. **The folder contract gained three files since Button.** `boundaries.ts` holds the
+   bounds and nothing else (`R-8.3-6`), `classes.ts` holds this component's class tables
+   (`R-5.12-4`), and `lib.tsx` is where a pure helper that returns JSX lives, because
+   `lib.ts` may not import React. `pnpm new:component` writes all three.
+4. **Check the installed types before using any API** (`R-0-1`). Open
    `node_modules/@base-ui/react/<part>/` and read the `.d.ts`. Never guess a prop name.
    Anything that differs from what you expected goes in `docs/DECISIONS.md`.
-4. **`constants.ts` and `boundaries.ts`** - the value lists as `as const` arrays go in
+5. **`constants.ts` and `boundaries.ts`** - the value lists as `as const` arrays go in
    `constants.ts` and nothing else does; the defaults and the bounds go in `boundaries.ts`,
    which is the one file a team opens to see what it may override (`R-8.3-6`). Sizes
    come from `shared/contracts/size.ts`, tones from `shared/contracts/tone.ts` and a
    text cap from `shared/contracts/boundaries.ts`. Never redeclare any of them locally
    (`R-8.3-2`, `R-5.7-8`).
-5. **`schema.ts`** - every design prop, with `min` and `max` on anything numeric
+6. **`schema.ts`** - every design prop, with `min` and `max` on anything numeric
    (`R-5.7-7`, and `docs/PLAN.md` 18.11 lists which props have limits). Clamp at runtime
    with `clamp()`.
-6. **`types.ts`** - the unions derived from `constants.ts`, the prop interfaces derived
+7. **`types.ts`** - the unions derived from `constants.ts`, the prop interfaces derived
    from the schema. No prop interface anywhere else (`R-8.3-4`).
-7. **`variants.ts`** - cva, with complete class strings in a lookup object. Never a
-   built class name (`R-5.2-3`). Sizes, radius, border, focus, hover and transitions come
-   from `shared/classes.ts` (`R-5.2-4`).
-8. **`index.tsx`** - the server half. No `'use client'`, no client hook, no import of
+8. **`classes.ts` and `variants.ts`** - the class tables go in `classes.ts`, cva goes in
+   `variants.ts`, and the export is wrapped in `memoizeVariants` from
+   `#shared/variants.js`, which caches the 360 real combinations (7.43us against 0.52us).
+   Never a built class name (`R-5.2-3`). Sizes, radius, border, focus, hover, transitions
+   and `CONTAIN` come from `shared/classes.ts` (`R-5.2-4`, `R-5.2-7`).
+9. **`index.tsx`** - the server half. No `'use client'`, no client hook, no import of
    `./hook.js` (`R-5.1-1`). Spread the rest onto the root, support `render` through
    `renderElement` (`R-5.7-4`), and emit presence attributes (`data-open`, not
    `data-state="open"`, `R-5.7-6`).
-9. **`client.tsx` and `hook.ts`**, only if the catalog row says `C` or `Sp`. `client.tsx`
+10. **`client.tsx` and `hook.ts`**, only if the catalog row says `C` or `Sp`. `client.tsx`
    is JSX plus at most one `useXxx()` call; every `useState`, `useEffect`, `useRef`,
    `useMemo` and `useCallback` lives in `hook.ts`, and pure helpers in `lib.ts`
    (`R-5.12-1`).
-10. **`skeleton.tsx`** - the real dimensions, from the same size knobs the component
+11. **`skeleton.tsx`** - the real dimensions, from the same size knobs the component
     uses. A skeleton that reserves the wrong height is a layout shift.
-11. **`dummy/*.tsx`** - one demo per file, covering every variant, size, tone and state,
+12. **`dummy/*.tsx`** - one demo per file, covering every variant, size, tone and state,
     plus an `rtl.tsx`. Each file becomes 6 harness pages and is picked up automatically
     by the axe, target-size and focus-ring specs. This is the cheapest coverage in the
     repo; use it.
-12. **Tests**, in `test/`. Button's thirteen files are the pattern:
+13. **Tests**, in `test/`. Button's fourteen files are the pattern:
     behaviour, the design attributes, every variant, every tone, the states, the schema,
     the types, the skeleton, the `render` prop, the demos under SSR, hydration in the DOM,
     and `meta.ts`. Suffix rules: `.dom.test.tsx` for happy-dom, `.rsc.test.tsx` for a
     React Server Components tree, `.ssr.test.tsx` and plain `.test.tsx` for SSR,
     `.test.ts` for node.
-13. **`meta.ts`** - set `baseUi` and `baseUiRange` to the version you read the types from
+14. **`meta.ts`** - set `baseUi` and `baseUiRange` to the version you read the types from
     (`@base-ui/react` is 1.8.0 today). `status` stays `'beta'` while section 20 is not
     fully met.
-14. **Labels**, if the component has any built-in text: add it to
+15. **Labels**, if the component has any built-in text: add it to
     `src/shared/labels/en.ts` **and** `ar.ts`. A label with a count is
     `(n, fmt) => string` using `Intl.PluralRules` in Arabic (`R-5.11-1`, `R-5.11-2`).
     This is a shared file - read section 9 first.
-15. **`pnpm check`**, then **`pnpm test:mutation`**. A green suite that no mutation
+16. **`pnpm check`**, then **`pnpm test:mutation`**. A green suite that no mutation
     disturbs is a suite that measures nothing.
-16. **Add a mutation** for whatever the component's hardest guarantee is, in
+17. **Add a mutation** for whatever the component's hardest guarantee is, in
     `scripts/mutations/index.ts`. Every component should leave one behind. Prove it bites
     by breaking the source by hand first.
-17. **Push the branch, open a pull request** with the body from section 12. Do not merge.
+18. **Push the branch, open a pull request** with the body from section 12. Do not merge.
 
 ---
 
