@@ -6,6 +6,27 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-07 - The site's 46 is the build list, server set first
+
+**Decision.** The 46 components the home page advertises are what v0.1 builds, in the five
+units of Appendix A in docs/CLOUD-PLAN.md: the server set first, Tooltip as the first
+client component, then the overlays, then the Phase 4 form controls. PLAN.md section 18
+stays as the long-term catalog, and its extras - Heading, Text, Container, Stack, Grid -
+are reconsidered only after the 46 ship.
+
+**Why.** Two reasons, and they point the same way. The catalog and the site disagree: the
+catalog lists components the home page never promises, so building them first would delay
+what a reader was told to expect. And no component has a client.tsx yet, so the client
+half of the folder contract is described by R-5.12-1 and checked by check-boundaries but
+proven by nothing; Phase 4 is almost entirely client components, which would mean
+inventing the client template, the Field architecture and the Base UI Field integration at
+volume and in parallel. The server set copies Button exactly, so it is quantity rather
+than design, and it re-proves the template before the second one is written.
+
+**Affects.** PLAN.md section 19 phase order and section 18's priority. Every Definition of
+Done line and every acceptance criterion is unchanged, and Phase 4's own criteria still
+gate the form controls when Unit 4 reaches them.
+
 ## 2026-10-07 - `zod/mini` may run in a client file; the full build still never ships
 
 **Decision.** R-8.3-1 is relaxed. A client file (`client.tsx`, `hook.ts`, `lib.ts`, `lib.tsx`) may `import * as z from 'zod/mini'` at runtime for layer-2 validation. `schema.ts` is still imported with `import type` only, the full `zod` build still never reaches the browser, and a Server Component may import neither. The guard in `src/shared/no-zod-at-runtime.test.ts` now reads the exact specifier rather than the package name, because `packageName()` collapsed `zod/mini` to `zod`.
