@@ -224,8 +224,8 @@ They arrive with the phases that need them.
 **Why:** an `enum` is a runtime value that survives into the bundle, does not tree-shake, and Node's type stripping rejects it.
 **Enforced by:** `eslint` (`topclass/no-enum`)
 
-### R-8.3-6 Defaults and bounds live apart from the value lists
-**Rule:** every component folder has a `boundaries.ts` holding `<NAME>_BOUNDARIES` and nothing else: the bounds the component enforces, each far above any real value so that it is a guard rail rather than a validator. The value lists and the defaults stay in `constants.ts`. A bounded prop is clamped with `clamp()` and declared in `schema.ts` with the same number (R-5.7-7, R-5.7-8).
+### R-8.3-6 Bounds live apart from the value lists and the defaults
+**Rule:** a component that enforces a bound has a `boundaries.ts` holding `<NAME>_BOUNDARIES` and nothing else: the bounds the component enforces, each far above any real value so that it is a guard rail rather than a validator. A component with nothing to bound has no such file (R-8.1-1). The value lists and the defaults stay in `constants.ts`. A bounded prop is clamped with `clamp()` and declared in `schema.ts` with the same number (R-5.7-7, R-5.7-8).
 **Why:** a bound is not a default. A default is what the component does when asked for nothing; a bound is what it refuses whatever it is asked. Keeping them apart means the file a reviewer opens to check the guard rails holds only guard rails.
 **Enforced by:** `check-structure` allows `boundaries.ts` in the folder contract and `pnpm new:component` writes it; that the component enforces the bound is review
 
