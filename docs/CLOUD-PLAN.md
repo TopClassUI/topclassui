@@ -144,7 +144,7 @@ before creating any worktree.
 ### Track A - the server set, in parallel worktrees
 
 Three to four worktrees at a time. Each is one component, one branch, one pull request.
-See Appendix A for the batches and why they are grouped that way.
+Ten components per unit, three or four worktrees running at a time. See Appendix A.
 
 ### Track B - the first client component, alone
 
@@ -210,7 +210,7 @@ git worktree prune
 
 **The limit on parallelism is not the worktrees, it is the shared files.** Two components
 that both add a label, a token or a shared class will conflict. Section 9 is how you
-avoid that; Appendix A groups the batches so that it mostly cannot happen.
+avoid that; Appendix A groups each unit so that it mostly cannot happen.
 
 ---
 
@@ -460,7 +460,8 @@ The credit is finite and the work is long, so spend it on building, not on redis
   `pnpm lint` are seconds. `pnpm check` is a minute or two. `pnpm test:mutation` runs the
   whole suite once per mutation - run it at the end of a component, not during.
 - **Three or four worktrees at a time**, not ten. Past that, the shared-file conflicts
-  cost more than the parallelism returns.
+  cost more than the parallelism returns. Ten per unit is the review round, not the
+  number running at once - see Appendix A.
 - **Do not re-derive what `docs/DECISIONS.md` already settled.** It is the cheapest file
   in the repo.
 - **Stop at a blocker and say so.** A long session spent working around a missing shared
@@ -468,37 +469,58 @@ The credit is finite and the work is long, so spend it on building, not on redis
 
 ---
 
-## Appendix A - Track A batches
+## Appendix A - Track A units
 
-Grouped so that components in one batch do not need the same shared addition. All are
-tier 1 and all are `S` (server) unless noted.
+Ten components per unit. One unit is one review round: the cloud session builds all ten,
+the local session reviews all ten, then they merge together and the next unit starts.
 
-**Batch 1 - the ones closest to Button.** `Badge`, `IconButton`, `Separator`,
-`Skeleton`, `Spinner`.
-Why first: `Badge` is Button's variant and tone machinery with no interaction;
-`IconButton` is Button with a required `label`; `Separator` has orientation but no tone;
-`Skeleton` and `Spinner` are needed by every later `skeleton.tsx`.
-Shared additions expected: a label for `IconButton`, `Spinner` labels.
+**Ten, not fifteen.** The limit is not the worktrees, it is the two things that do not
+parallelise: shared files (section 9) and review. Fifteen pull requests in one round
+means the review becomes a rubber stamp, which is the one failure this whole plan exists
+to prevent. If a unit lands with no findings worth fixing, raise the next one to fifteen.
 
-**Batch 2 - text and layout.** `Heading`, `Text`, `Code`, `Container`, `Stack`, `Grid`.
-Why: no tones, no state, no labels. Pure size-scale and logical-property work, and
+**Inside a unit, run three or four worktrees at a time**, not ten. Each component is one
+worktree, one branch, one pull request; three or four run at once so that two components
+never edit `shared/labels/en.ts` on the same afternoon.
+
+### Unit 1 - the ones closest to Button
+
+`Badge`, `IconButton`, `Separator`, `Skeleton`, `Spinner`, `Heading`, `Text`, `Code`,
+`Container`, `Stack`.
+
+All tier 1, all `S` (server), all of them Button with different variants. `Badge` is
+Button's variant and tone machinery with no interaction. `IconButton` is Button with a
+required `label`, so it is the first component whose README shows a **yes** in the
+required column. `Skeleton` and `Spinner` are needed by every later `skeleton.tsx`.
 `Text`'s line clamp is the first schema limit outside Button.
-Shared additions expected: none.
 
-**Batch 3 - containers and feedback.** `Card` (`CardRoot`, `CardHeader`, `CardBody`,
-`CardFooter` - `R-9.2-4` names `CardRoot` explicitly), `Alert`, `EmptyState`, `ErrorState`.
-Why: `Card` is the first multi-part component, so it proves `R-9.2-3` and `R-9.2-4` -
-flat exports, `<Name>Root`, and the header/body/footer naming. `Alert`, `EmptyState` and
-`ErrorState` all carry labels and an icon.
-Shared additions expected: labels for all three; possibly an icon or two in `raw/`.
+Order inside the unit: `Badge` first and alone. It re-proves the template end to end,
+and the local session reviews it before the other nine start.
 
-**Batch 4 - links and navigation.** `Link`, `VisuallyHidden`, `SkipLink`, `Breadcrumb`,
-`Pagination`.
-Why: `Link` settles external-link handling; `Breadcrumb` emits structured data;
-`Pagination` is real `href`s with `siblingCount` clamped - the second schema limit.
-Shared additions expected: `SkipLink`, `Breadcrumb` and `Pagination` labels.
+Shared additions expected, which land first in their own pull request (section 9):
+labels for `IconButton` and `Spinner`.
 
-Then **Track B (Switch)**, alone.
+### Unit 2 - containers, feedback and navigation
+
+`Grid`, `Card`, `Alert`, `EmptyState`, `ErrorState`, `Link`, `VisuallyHidden`,
+`SkipLink`, `Breadcrumb`, `Pagination`.
+
+`Card` is the first multi-part component, so it proves `R-9.2-3` and `R-9.2-4`: flat
+exports, `CardRoot`, and the `Header`/`Body`/`Footer` naming. `Alert`, `EmptyState` and
+`ErrorState` all carry labels and an icon. `Link` settles external-link handling,
+`Breadcrumb` emits structured data, and `Pagination` is real `href`s with `siblingCount`
+clamped - the second schema limit.
+
+Shared additions expected: labels for `Alert`, `EmptyState`, `ErrorState`, `SkipLink`,
+`Breadcrumb` and `Pagination`; possibly one or two icons in `raw/`.
+
+### Unit 3 - Switch, alone
+
+Not ten. One. `Switch` is the first client component in the repo and therefore the
+second template, so it gets a whole round to itself and the hardest review. See Track B
+in section 6.
+
+Only after Switch is merged does a unit of client components make sense.
 
 ---
 
