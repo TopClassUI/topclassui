@@ -29,14 +29,8 @@ function composeRefs(a: AnyRef, b: AnyRef): AnyRef {
   }
 }
 
-/**
- * R-5.7-4: the element form of `render`, with no hooks, so it works in a Server
- * Component. `<Button render={<Link href="/docs" />}>` becomes a real anchor that
- * looks like a button and still costs 0 KB.
- *
- * `decorate` wraps whichever children survive, so a component's own spinner,
- * chevron or close icon is never lost to `render={<a>Label</a>}`.
- */
+/** R-5.7-4: the element form of `render`, no hooks, so it works in a server
+ * component. `decorate` wraps whichever children survive, so a spinner is not lost. */
 export function renderElement(
   element: ReactElement,
   props: Props,

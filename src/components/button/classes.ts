@@ -1,8 +1,5 @@
-/**
- * R-5.12-4: Button's own class tables, read by variants.ts and skeleton.tsx. The shared
- * constants in #shared/classes.js cover height, radius, the ring and the interaction
- * ramp; only the per-tone fills and the skeleton width are specific to this control.
- */
+/** R-5.12-4: Button's own class tables. The shared ones cover height, radius and
+ * the ring; only the per-tone fills and the skeleton width are Button's. */
 import type { Size } from '#shared/contracts/size.js'
 import type { Tone } from '#shared/contracts/tone.js'
 

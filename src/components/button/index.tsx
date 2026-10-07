@@ -6,6 +6,7 @@ import { cn } from '#shared/cn.js'
 import { renderElement } from '#shared/render.js'
 import { Svg } from '#components/svg/index.js'
 import { BUTTON_DEFAULTS } from './constants.js'
+import { truncateLabel } from './lib.js'
 import type { ButtonProps } from './types.js'
 import { buttonVariants } from './variants.js'
 
@@ -36,11 +37,8 @@ export function Button({
   // Only a real button has a disabled attribute; anything else needs the ARIA pair.
   const nativeButton = render == null || render.type === 'button'
 
-  /**
-   * An anchor still navigates under pointer-events: none, and a Server Component has no
-   * handler to cancel it, so the href goes instead. next/link keeps its own: the prop is
-   * required there, and removing it would crash the component. See DECISIONS.md.
-   */
+  /** An anchor navigates under pointer-events: none and a server component cannot
+   * cancel it, so the href goes. next/link keeps its own: the prop is required. */
   const deadLink = inactive && render?.type === 'a'
   const element = deadLink
     ? cloneElement(render as ReactElement<{ href?: string }>, { href: undefined })
@@ -62,7 +60,7 @@ export function Button({
     'data-tone': tone,
     'data-size': size,
     className: cn(buttonVariants({ variant, tone, size, fullWidth }), className),
-    children,
+    children: truncateLabel(children),
     ...rest,
   }, loading ? withSpinner : undefined)
 }

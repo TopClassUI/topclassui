@@ -3,7 +3,8 @@ import type { ReactElement } from 'react'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import type { Size } from '#shared/contracts/size.js'
-import { BUTTON_DEFAULTS, BUTTON_SIZES, BUTTON_TONES, BUTTON_VARIANTS } from '../constants.js'
+import { BUTTON_SIZES, BUTTON_TONES, BUTTON_VARIANTS } from '../constants.js'
+import { BUTTON_DEFAULTS } from '../constants.js'
 import { buttonSchema } from '../schema.js'
 import type { ButtonDesignProps, ButtonProps, ButtonTone, ButtonVariant } from '../types.js'
 

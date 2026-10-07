@@ -15,9 +15,11 @@ const ALLOWED_FILES = new Set([
   'client.tsx',
   'hook.ts',
   'lib.ts',
+  'lib.tsx',
   'variants.ts',
   'classes.ts',
   'constants.ts',
+  'boundaries.ts',
   'types.ts',
   'schema.ts',
   'skeleton.tsx',
@@ -103,7 +105,7 @@ function checkComponentFolder(dir: string, slug: string) {
   }
 
   // R-5.12-4: a SCREAMING_CASE table is data or classes, so it lives in the file for that.
-  const CONSTANT_HOMES = new Set(['constants.ts', 'classes.ts'])
+  const CONSTANT_HOMES = new Set(['constants.ts', 'classes.ts', 'boundaries.ts'])
   for (const f of files) {
     if (CONSTANT_HOMES.has(f) || /\.test\.tsx?$/.test(f)) continue
     for (const name of screamingConstants(readFileSync(join(dir, f), 'utf8'))) {

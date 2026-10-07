@@ -25,7 +25,7 @@ export function readSlug(slug: string): Scaffold {
 const camel = (slug: string) =>
   slug.split('-').map((w, i) => (i ? w.charAt(0).toUpperCase() + w.slice(1) : w)).join('')
 
-const constants = ({ screaming }: Scaffold) => `// R-8.3-2: the value lists and defaults, imported by the schema, by cva and by the component.
+const constants = ({ screaming }: Scaffold) => `// R-8.3-2: the value lists and the defaults. The bounds live in boundaries.ts.
 import { DEFAULT_SIZE, SIZES } from '#shared/contracts/size.js'
 import { DEFAULT_TONE, TONES } from '#shared/contracts/tone.js'
 
@@ -35,10 +35,18 @@ export const ${screaming}_TONES = TONES
 
 export const ${screaming}_SIZES = SIZES
 
+/** Every prop's starting value. A caller overrides any of them by passing the prop. */
 export const ${screaming}_DEFAULTS = {
   variant: 'solid',
   tone: DEFAULT_TONE,
   size: DEFAULT_SIZE,
+} as const
+`
+
+const boundaries = ({ screaming }: Scaffold) => `/** R-8.3-6: the bounds only, each far above any real value, so this is a guard rail
+ * rather than a validator. Numeric ones are clamped with clamp() (R-5.7-7, R-5.7-8). */
+export const ${screaming}_BOUNDARIES = {
+  labelMaxLength: 100,
 } as const
 `
 
@@ -84,30 +92,35 @@ export interface ${name}Props
 }
 `
 
-const variants = ({ slug, screaming }: Scaffold) => `import { cva } from 'class-variance-authority'
-
-import { CONTROL_SIZE, FOCUS_RING, TRANSITION } from '#shared/classes.js'
-import { TONE_CLASS } from '#shared/contracts/tone.js'
-import { ${screaming}_DEFAULTS, ${screaming}_TONES } from './constants.js'
+const classes = () => `// R-5.12-4: this component's own class tables, read by variants.ts.
+import type { Tone } from '#shared/contracts/tone.js'
 
 /** R-5.2-3: a lookup of complete class strings, never a name built from an expression. */
-const ON_SOLID = {
+export const ON_SOLID = {
   primary: 'bg-primary-solid text-primary-on-solid',
   neutral: 'bg-neutral-solid text-neutral-on-solid',
   success: 'bg-success-solid text-success-on-solid',
   warning: 'bg-warning-solid text-warning-on-solid',
   danger: 'bg-danger-solid text-danger-on-solid',
   info: 'bg-info-solid text-info-on-solid',
-} as const
+} as const satisfies Record<Tone, string>
 
-const ON_SOFT = {
+export const ON_SOFT = {
   primary: 'bg-primary-soft text-primary-on-soft',
   neutral: 'bg-neutral-soft text-neutral-on-soft',
   success: 'bg-success-soft text-success-on-soft',
   warning: 'bg-warning-soft text-warning-on-soft',
   danger: 'bg-danger-soft text-danger-on-soft',
   info: 'bg-info-soft text-info-on-soft',
-} as const
+} as const satisfies Record<Tone, string>
+`
+
+const variants = ({ slug, screaming }: Scaffold) => `import { cva } from 'class-variance-authority'
+
+import { CONTROL_SIZE, FOCUS_RING, TRANSITION } from '#shared/classes.js'
+import { TONE_CLASS } from '#shared/contracts/tone.js'
+import { ${screaming}_DEFAULTS, ${screaming}_TONES } from './constants.js'
+import { ON_SOFT, ON_SOLID } from './classes.js'
 
 export const ${camel(slug)}Variants = cva(
   ['inline-flex items-center justify-center rounded-control', FOCUS_RING, TRANSITION],
@@ -181,7 +194,9 @@ export const meta = {
 const test = (s: Scaffold) => `import { describe, expect, it } from 'vitest'
 
 import { attr, markup } from '#test/markup.js'
-import { ${s.screaming}_DEFAULTS, ${s.screaming}_SIZES, ${s.screaming}_TONES, ${s.screaming}_VARIANTS } from '../constants.js'
+import {
+  ${s.screaming}_DEFAULTS, ${s.screaming}_SIZES, ${s.screaming}_TONES, ${s.screaming}_VARIANTS,
+} from '../constants.js'
 import { ${s.name} } from '../index.js'
 
 const html = () => markup(<${s.name}>Hello</${s.name}>)
@@ -226,6 +241,8 @@ export default function Demo() {
 export function files(scaffold: Scaffold): Map<string, string> {
   return new Map([
     ['constants.ts', constants(scaffold)],
+    ['boundaries.ts', boundaries(scaffold)],
+    ['classes.ts', classes()],
     ['schema.ts', schema(scaffold)],
     ['types.ts', types(scaffold)],
     ['variants.ts', variants(scaffold)],

@@ -100,10 +100,10 @@ export const MUTATIONS: Mutation[] = [
     to: "  danger: 'bg-success-solid text-success-on-solid',",
   },
   {
-    label: 'the variants cache forgets the size',
-    file: 'src/components/button/variants.ts',
-    from: '`${variant}|${tone}|${size}|${String(fullWidth)}`',
-    to: '`${variant}|${tone}|${String(fullWidth)}`',
+    label: 'the variants cache keys on one prop, so combinations collide',
+    file: 'src/shared/variants.ts',
+    from: '      parts.push(String(value))',
+    to: '      if (parts.length === 0) parts.push(String(value))',
   },
   {
     label: 'the skeleton stops pulsing',
@@ -237,5 +237,47 @@ export const MUTATIONS: Mutation[] = [
     file: 'scripts/lib/source-checks.ts',
     from: "return [...source.matchAll(re)].map((m) => m[1] ?? '')",
     to: 'return []',
+  },
+  {
+    label: 'a long label escapes its container again',
+    file: 'src/shared/classes.ts',
+    from: "export const CONTAIN = 'max-w-full'",
+    to: "export const CONTAIN = ''",
+  },
+  {
+    label: 'the label loses the element that makes the ellipsis work',
+    file: 'src/shared/classes.ts',
+    from: "export const LABEL = 'truncate min-w-0'",
+    to: "export const LABEL = ''",
+  },
+  {
+    label: 'the explicit maxLength opt-out silently keeps the cap',
+    file: 'src/shared/contracts/boundaries.ts',
+    from: 'if (given === null) return undefined',
+    to: 'if (false) return undefined',
+  },
+  {
+    label: 'every text field falls back to one cap, losing the per-type limits',
+    file: 'src/shared/contracts/boundaries.ts',
+    from: '    ? TEXT_MAX_LENGTH[known]',
+    to: '    ? TEXT_MAX_LENGTH.text',
+  },
+  {
+    label: 'the label bound stops cutting, so a megabyte reaches the DOM',
+    file: 'src/components/button/lib.tsx',
+    from: 'const text = run.slice(0, BUTTON_BOUNDARIES.labelMaxLength)',
+    to: 'const text = run',
+  },
+  {
+    label: 'each text child gets its own span, so the gap opens inside the words',
+    file: 'src/components/button/lib.tsx',
+    from: 'if (isText(part)) { run += String(part); continue }',
+    to: 'if (isText(part)) { run = String(part); flush(); continue }',
+  },
+  {
+    label: 'the variants cache stops checking the key, so a free string grows it',
+    file: 'src/shared/variants.ts',
+    from: 'if (cacheable.has(key)) cache.set(key, classes)',
+    to: 'cache.set(key, classes)',
   },
 ]

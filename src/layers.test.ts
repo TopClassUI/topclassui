@@ -1,8 +1,5 @@
-/**
- * R-4-1: which rule wins. An unlayered declaration outranks every layer, so a token
- * written outside `@layer base` would beat the utility meant to override it. Nothing
- * in a class list shows that - only the layer a byte lands in does.
- */
+/** R-4-1: an unlayered declaration outranks every layer, so a token outside
+ * `@layer base` would beat the utility meant to override it. */
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import { compileEntry } from '#test/stylesheet.js'

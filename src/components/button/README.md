@@ -51,6 +51,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/as-link.tsx`
 - `dummy/custom-size.tsx`
 - `dummy/full-width.tsx`
+- `dummy/long-label.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`
 - `dummy/skeleton.tsx`

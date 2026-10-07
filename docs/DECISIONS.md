@@ -6,6 +6,38 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-07 - `zod/mini` may run in a client file; the full build still never ships
+
+**Decision.** R-8.3-1 is relaxed. A client file (`client.tsx`, `hook.ts`, `lib.ts`, `lib.tsx`) may `import * as z from 'zod/mini'` at runtime for layer-2 validation. `schema.ts` is still imported with `import type` only, the full `zod` build still never reaches the browser, and a Server Component may import neither. The guard in `src/shared/no-zod-at-runtime.test.ts` now reads the exact specifier rather than the package name, because `packageName()` collapsed `zod/mini` to `zod`.
+
+**Why.** Measured with esbuild, minified and gzipped, for one `z.string().max(100)`: the full build is 89 KB and `zod/mini` is 3.4 KB. The earlier rule assumed one number for both. Validation needs three layers and the library owns two of them: `maxLength` on the input stops typing, but not a paste, not `input.value = ...` and not a DevTools edit, so a client control needs a real check in JavaScript. 3.4 KB buys that. 89 KB does not, and the server half still costs nothing either way.
+
+**Affects.** R-8.3-1. No component uses it yet - Button is server-only and no input exists - so the validator itself is written with the first client control rather than invented ahead of it.
+
+## 2026-10-07 - Defaults and bounds move out of constants.ts into boundaries.ts
+
+**Decision.** A new file joins the folder contract: `boundaries.ts`, holding `<NAME>_DEFAULTS` and `<NAME>_BOUNDARIES`. `constants.ts` keeps the `as const` value lists and nothing else. `schema.ts`, `variants.ts` and the component import the defaults from `boundaries.ts`. `pnpm new:component` writes it, and `check-structure` allows it. A team overrides any default by passing the prop.
+
+**Why.** PLAN.md 8.1 put the value lists, the limits and the defaults in one file. In practice the defaults are the only part a consuming team reads: they are the answer to "what happens if I pass nothing, and what may I change". Mixed in with twenty lines of value lists they read as constants rather than as choices. The split also keeps `R-5.7-8` honest, because the default cap a text field inherits is now visible in one short file per component rather than buried.
+
+**Affects.** PLAN.md 8.1 and the new R-8.3-6; R-8.3-2 narrowed to the value lists. The scaffold also gained `classes.ts`, because R-5.12-4 now rejects the `ON_SOLID` and `ON_SOFT` tables it used to write into `variants.ts` - which means `pnpm new:component` had been producing a folder that failed its own gate since that rule landed.
+
+## 2026-10-07 - Every text field has a default maxLength, set high enough never to cut real input
+
+**Decision.** `shared/contracts/boundaries.ts` holds `TEXT_MAX_LENGTH`, a default character cap per input type: text 512, email 254, url 2048, tel 32, search 256, password 256, textarea 5000. `resolveMaxLength(given, type)` is the single implementation every input component calls: it takes the caller's number when there is one, falls back to the type's default, and returns `undefined` for an explicit `null`, which is the documented opt-out. A counter appears at `COUNTER_THRESHOLD` (0.9) of the cap. A number field never uses a length cap at all; it is bounded by `min`, `max` and `step`.
+
+**Why.** An earlier version of R-5.7-8 said the opposite - that `maxLength` should have no default, because a default truncates data. That reasoning was about a single field in a single app. In a design system used by several teams, no default means each team picks a different number and one team forgets entirely, which is how an unbounded field reaches production. The default exists for the developer who never considered the case. The objection still holds for a *low* default, so every number here sits far above the longest real value of its type: the RFC 5321 maximum address, a 2048-character URL, a 72-character bcrypt password and a 2000-word review all fit, while a one-megabyte paste is stopped for every type.
+
+**Affects.** R-5.7-8, rewritten. Every input component of PLAN 18.4, none of which exists yet, so nothing has to be retrofitted. `src/shared/contracts/boundaries.test.ts` proves each cap clears the longest real value of its type and still stops a pasted file.
+
+## 2026-10-07 - A long label truncates the control, and a limit never truncates data
+
+**Decision.** Two rules, R-5.2-7 and R-5.7-8. A control that renders caller-supplied text carries `CONTAIN` (`max-w-full`) and wraps the text parts of its children in a span carrying `LABEL` (`truncate min-w-0`); element children are left alone so an icon keeps its own flex slot. Separately: numeric and structural props get a default limit that is clamped and overridable, while `maxLength` and `minLength` get no default at all, and a number field limits with `min`, `max` and `step`.
+
+**Why.** Measured in Chromium: a Button with a 60-character label was 436px wide inside a 200px box and escaped it. The obvious fix does not work - `truncate` on the control itself clips with no ellipsis, because a bare string inside `inline-flex` is an anonymous flex item and `text-overflow` never applies to one. The label needs an element of its own, and only the text parts can be wrapped, or the gap between an icon and its label collapses. On limits: a bad number or an unbounded row count breaks the UI, so a default is a safety net; a default character cap silently truncates a name, an address or a pasted token, which is data loss the caller never asked for and which no browser does either.
+
+**Affects.** PLAN.md 5.2 and 5.7, every component that renders a label. `e2e/contain.spec.ts` measures the control against its container in three modes and both directions, and the six tests fail if `CONTAIN` is emptied. Tooltip moves into Unit 1 of docs/CLOUD-PLAN.md so the truncated text has somewhere to be read in full.
+
 ## 2026-10-06 - Every component carries a generated README.md
 
 **Decision.** A new file joins the folder contract: `README.md`, written by `pnpm readme:build` from `schema.ts` (types, enums, defaults, limits, descriptions), `types.ts` (which props the component declares and whether each is required) and `meta.ts` (category, tier, status, rendering cost, Base UI range). Prose lives between `<!-- hand-written -->` markers and survives every regeneration. `pnpm check:readme` is in `pnpm check` and fails when a README is stale, `check-structure` requires the file, and `pnpm new:component` generates it so a scaffolded folder still passes clean.

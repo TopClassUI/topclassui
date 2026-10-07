@@ -1,8 +1,5 @@
-/**
- * Two utilities that set the same property have the same specificity, so the order
- * Tailwind emits them in decides. A class-list assertion cannot see that, and a
- * Tailwind upgrade could reorder the variants, so the order is pinned here.
- */
+/** Two utilities on one property share a specificity, so the emitted order decides.
+ * A class-list assertion cannot see that, so the order is pinned here. */
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import { compileEntry, declarationIndex } from '#test/stylesheet.js'

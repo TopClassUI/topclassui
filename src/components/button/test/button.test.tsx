@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import { attr, classList, markup } from '#test/markup.js'
 import { Button } from '../index.js'
-import { BUTTON_DEFAULTS, BUTTON_VARIANTS } from '../constants.js'
+import { BUTTON_VARIANTS } from '../constants.js'
+import { BUTTON_DEFAULTS } from '../constants.js'
 import type { ButtonProps } from '../types.js'
 
 const html = (props: ButtonProps = {}) => markup(<Button {...props}>Save</Button>)

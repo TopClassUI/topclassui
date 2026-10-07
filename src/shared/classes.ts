@@ -82,10 +82,14 @@ export const DISABLED = [
   'data-disabled:pointer-events-none data-disabled:opacity-50',
 ].join(' ')
 
-/**
- * Full colour, so loading never reads as disabled, and no clicks while it is busy.
- * No cursor: a loading control is always pointer-events: none, from `disabled` on a
- * native button or `data-loading` elsewhere, so a cursor could never paint. See
- * DECISIONS.md. The opacity order is pinned by styles.test.ts, not by this string.
- */
+/** Full colour while busy, and no clicks. No cursor: a loading control is always
+ * pointer-events: none, so one could never paint. The order is pinned by a test. */
 export const LOADING = 'aria-busy:opacity-100 data-loading:pointer-events-none'
+
+/** A control never outgrows its box. Measured at 436px inside a 200px box before
+ * this existed. */
+export const CONTAIN = 'max-w-full'
+
+/** The label truncates, so the control shrinks rather than the page. It needs its
+ * own element: `text-overflow` never applies to an anonymous flex item. */
+export const LABEL = 'truncate min-w-0'

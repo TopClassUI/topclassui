@@ -94,6 +94,9 @@ const BANNED_SCALE = [
 
 const HAND_WRITTEN_STATE = /(^|[\s:])(hover|focus-visible|active):/
 
+/** Lines of prose a JSDoc block may hold before it is an article (R-5.12-3). */
+const PROSE_LIMIT = 3
+
 /** `style`, `props.style` or `rest.style`: the caller's own, which must reach the element. */
 function isConsumerStyle(node: Node): boolean {
   if (node?.type === 'Identifier') return node.name === 'style'
@@ -269,6 +272,7 @@ const rules = {
       messages: {
         paragraph: 'R-5.12-3: comments are one line. Say what the code cannot, or say nothing.',
         commentedCode: 'R-5.12-3: no commented-out code.',
+        essay: 'R-5.12-3: a doc block is {{lines}} lines of prose. Three is the limit; the rest belongs in docs/DECISIONS.md.',
       },
     },
     create(ctx: Context) {
@@ -283,11 +287,14 @@ const rules = {
           }
           for (const c of comments) {
             if (c.type === 'Block') {
-              // A directive block or a JSDoc block is allowed; prose is not.
               const lines = c.value.split('\n').filter((l: string) => l.trim())
-              if (lines.length > 1 && !c.value.trim().startsWith('*')) {
-                ctx.report({ node: c, messageId: 'paragraph' })
+              const isDoc = c.value.trim().startsWith('*')
+              // A JSDoc block documents an export, so it may pass one line. Three is
+              // where a comment stops explaining and starts being an article.
+              if (isDoc && lines.length > PROSE_LIMIT) {
+                ctx.report({ node: c, messageId: 'essay', data: { lines: String(lines.length) } })
               }
+              if (lines.length > 1 && !isDoc) ctx.report({ node: c, messageId: 'paragraph' })
               flushRun()
               continue
             }

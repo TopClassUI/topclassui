@@ -68,6 +68,7 @@ They arrive with the phases that need them.
 - **R-4-1** Only custom-property declarations and `@keyframes` may be unlayered; other rules go in `@layer base` (tokens) or `@layer components` (react). `@utility` and `@custom-variant` count as layered, because Tailwind emits them into its own layers. _(check-css)_
 - **R-4-2** Every `--tc-*` name referenced anywhere in `src/` is declared in `src/tokens.css`. _(check-css)_
 - **R-4-3** R-5.12-3 applies to `.css` files; no comment spans more than one line. _(check-css)_
+- **R-5.2-7** A control that renders caller-supplied text carries `CONTAIN` from `shared/classes.ts`, and its label sits on an element of its own carrying `LABEL`, so a long label truncates with an ellipsis instead of pushing the page apart. The data is never cut: only the rendering is. _(e2e/contain.spec, which measures the control against its container in three modes and both directions)_
 
 ## 3. RTL
 
@@ -89,10 +90,12 @@ They arrive with the phases that need them.
 
 ## 5. Schemas and constants
 
-- **R-8.3-1** Components import the schema with `import type`, so no component pulls `zod` into the browser; `zod` is a direct dependency, because `npm i topclassui zod` installs it for validation and types together. _(unit test ; attw is not in the repo yet)_
-- **R-8.3-2** Defaults and component-specific value lists live in `constants.ts` and are imported by the schema, by cva and by the component; the size list comes from `shared/contracts/size.ts`. _(unit test)_
+- **R-5.7-8** Every bounded prop ships a default: numeric and structural ones (`visibleRows`, `maxRows`, `siblingCount`, `slidesPerView`, `Rating.max`) are clamped, and a text field takes its `maxLength` from `TEXT_MAX_LENGTH` in `shared/contracts/boundaries.ts`, keyed by input type. Each number sits far above any real value of that type, a counter appears at `COUNTER_THRESHOLD` of it, and the caller overrides with their own `maxLength` or removes the cap with `maxLength={null}`. A number field is bounded by `min`, `max` and `step`, never by a count of characters. _(src/shared/contracts/boundaries.test, which proves each cap clears the longest real value of its type and still stops a pasted file; the clamping half is R-5.7-7)_
+- **R-8.3-1** `schema.ts` is imported with `import type` only, so the full `zod` build never reaches the browser. A client file may import `zod/mini` at runtime for layer-2 validation; a Server Component may not import either. `zod` is a direct dependency, because `npm i topclassui zod` installs it for validation and types together. _(unit test , which allows zod/mini in a client file and nothing else; attw is not in the repo yet)_
+- **R-8.3-2** Component-specific value lists live in `constants.ts` and are imported by the schema, by cva and by the component; the size list comes from `shared/contracts/size.ts`. The bounds live in `boundaries.ts` (R-8.3-6). _(unit test)_
 - **R-8.3-4** A component's unions and prop interfaces are declared in `types.ts`, derived from `constants.ts` and `schema.ts`, and imported with `import type`; no prop interface is declared inline in `index.tsx` or `client.tsx`. _(check-structure + eslint)_
 - **R-8.3-5** Value lists are `as const` arrays with the union derived from them; never a TypeScript `enum`. _(eslint)_
+- **R-8.3-6** Every component folder has a `boundaries.ts` holding `<NAME>_BOUNDARIES` and nothing else: the bounds the component enforces, each far above any real value so that it is a guard rail rather than a validator. The value lists and the defaults stay in `constants.ts`. A bounded prop is clamped with `clamp()` and declared in `schema.ts` with the same number (R-5.7-7, R-5.7-8). _(check-structure allows boundaries in the folder contract and pnpm new:component writes it; that the component enforces the bound is review)_
 - **R-8.3-3** The docs props table is generated from the emitted `.d.ts`, with defaults and limits supplied by the schema. _(not yet - the docs build does not exist yet)_
 
 ## 6. Text and i18n
@@ -112,7 +115,7 @@ They arrive with the phases that need them.
 
 - **R-5.12-1** `client.tsx` is JSX plus at most one call to `useXxx()` from `hook.ts`; it holds no `useState`, `useEffect`, `useReducer`, `useRef`, `useMemo` or `useCallback`. Pure helpers live in `lib.ts`. _(not yet - planned: eslint + check-structure)_
 - **R-5.12-2** `check-structure` warns at 200 lines and fails at 300; a component that needs more files gets a `parts/` folder with one component per file. _(check-structure)_
-- **R-5.12-3** One line maximum, only for what the code cannot say (a browser quirk, a spec reference, a non-local constraint). No paragraph comments, no commented-out code, no narration of the next line. A `/** ... */` block documenting an export may run longer, and `scripts/`, `eslint-rules/` and config files are outside the check. _(eslint under src/; the JSDoc exemption and everything outside src/ are manual)_
+- **R-5.12-3** One line maximum, only for what the code cannot say (a browser quirk, a spec reference, a non-local constraint). No paragraph comments, no commented-out code, no narration of the next line. A `/** ... */` block documenting an export may run to three lines of prose and no more; past that it is an article and belongs in `docs/DECISIONS.md`. `scripts/`, `eslint-rules/` and config files are outside the check. _(eslint under src/; the JSDoc exemption and everything outside src/ are manual)_
 - **R-5.12-4** Kebab-case files and folders, PascalCase components, `useThing` hooks, verb-first pure functions, `SCREAMING_CASE` constants in `constants.ts` or `classes.ts` inside a component folder; a shared contract under `shared/` may declare its own. A file in `parts/` exports one component named after the file. _(check-structure for the kebab-case names and for a SCREAMING_CASE table declared outside constants or classes; the rest is manual)_
 - **R-17-1** An expectation is written out, never computed from the thing under test; deleting half the implementation must not also delete half the assertion. _(eslint)_
 - **R-5.12-5** No `any`, no `@ts-ignore`, no non-null assertion without a one-line reason; relative imports carry explicit `.js` extensions and type imports use `import type`. _(eslint + tsc)_

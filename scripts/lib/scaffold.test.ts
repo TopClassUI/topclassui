@@ -29,6 +29,8 @@ describe('what it writes', () => {
 
   it('writes exactly the folder-contract files, and nothing outside it', () => {
     expect([...written.keys()].sort()).toEqual([
+      'boundaries.ts',
+      'classes.ts',
       'constants.ts',
       'dummy/basic.tsx',
       'index.tsx',
@@ -42,7 +44,11 @@ describe('what it writes', () => {
 
   it('names the component and its constants consistently', () => {
     expect(written.get('index.tsx')).toContain('export function IconButton(')
+    expect(written.get('constants.ts')).toContain('ICON_BUTTON_VARIANTS')
     expect(written.get('constants.ts')).toContain('ICON_BUTTON_DEFAULTS')
+    // R-8.3-6: boundaries.ts holds the bounds and nothing else, defaults included.
+    expect(written.get('boundaries.ts')).toContain('ICON_BUTTON_BOUNDARIES')
+    expect(written.get('boundaries.ts')).not.toContain('ICON_BUTTON_DEFAULTS')
     expect(written.get('variants.ts')).toContain('iconButtonVariants')
   })
 

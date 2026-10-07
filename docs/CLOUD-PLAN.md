@@ -222,16 +222,20 @@ a minute, the same failure found at step 11 is an hour.
 1. **Read the catalog row** (`docs/PLAN.md` section 18) and the Figma frame name if one
    is recorded. The row decides the rendering mode (`S`, `Sp`, `C`), the tier and the
    notes. The row is the specification; do not widen it.
-2. **Scaffold.** `pnpm new:component <slug>`. It writes `constants.ts`, `schema.ts`,
-   `types.ts`, `variants.ts`, `index.tsx`, `meta.ts`, `test/<slug>.test.tsx` and
-   `dummy/basic.tsx`, and the result already passes `pnpm check`. Run `pnpm check` now,
+2. **Scaffold.** `pnpm new:component <slug>`. It writes `constants.ts`, `boundaries.ts`,
+   `classes.ts`, `schema.ts`, `types.ts`, `variants.ts`, `index.tsx`, `meta.ts`,
+   `README.md`, `test/<slug>.test.tsx` and `dummy/basic.tsx`, and the result already
+   passes `pnpm check`. Run `pnpm check` now,
    before writing a line, so you know the baseline is green.
 3. **Check the installed types before using any API** (`R-0-1`). Open
    `node_modules/@base-ui/react/<part>/` and read the `.d.ts`. Never guess a prop name.
    Anything that differs from what you expected goes in `docs/DECISIONS.md`.
-4. **`constants.ts`** - the value lists as `as const` arrays and the defaults. Sizes come
-   from `shared/contracts/size.ts`; tones come from `shared/contracts/tone.ts`. Never
-   redeclare either locally (`R-8.3-2`).
+4. **`constants.ts` and `boundaries.ts`** - the value lists as `as const` arrays go in
+   `constants.ts` and nothing else does; the defaults and the bounds go in `boundaries.ts`,
+   which is the one file a team opens to see what it may override (`R-8.3-6`). Sizes
+   come from `shared/contracts/size.ts`, tones from `shared/contracts/tone.ts` and a
+   text cap from `shared/contracts/boundaries.ts`. Never redeclare any of them locally
+   (`R-8.3-2`, `R-5.7-8`).
 5. **`schema.ts`** - every design prop, with `min` and `max` on anything numeric
    (`R-5.7-7`, and `docs/PLAN.md` 18.11 lists which props have limits). Clamp at runtime
    with `clamp()`.
@@ -486,10 +490,18 @@ never edit `shared/labels/en.ts` on the same afternoon.
 ### Unit 1 - the ones closest to Button
 
 `Badge`, `IconButton`, `Separator`, `Skeleton`, `Spinner`, `Heading`, `Text`, `Code`,
-`Container`, `Stack`.
+`Container`, **`Tooltip`**.
 
-All tier 1, all `S` (server), all of them Button with different variants. `Badge` is
-Button's variant and tone machinery with no interaction. `IconButton` is Button with a
+`Tooltip` is the exception: it is the only `C` (client) component in the unit, so it is
+built **last and alone**, with the care Track B describes. It is here rather than later
+because `R-5.2-7` truncates a long label with an ellipsis, and the full text has to be
+reachable somewhere - that somewhere is a Tooltip. Until it exists the ellipsis is the
+whole story, which is correct but not kind.
+
+`Stack` moves to Unit 2.
+
+All tier 1, and every one but Tooltip is `S` (server): Button with different
+variants. `Badge` is Button's variant and tone machinery with no interaction. `IconButton` is Button with a
 required `label`, so it is the first component whose README shows a **yes** in the
 required column. `Skeleton` and `Spinner` are needed by every later `skeleton.tsx`.
 `Text`'s line clamp is the first schema limit outside Button.
@@ -502,8 +514,8 @@ labels for `IconButton` and `Spinner`.
 
 ### Unit 2 - containers, feedback and navigation
 
-`Grid`, `Card`, `Alert`, `EmptyState`, `ErrorState`, `Link`, `VisuallyHidden`,
-`SkipLink`, `Breadcrumb`, `Pagination`.
+`Stack`, `Grid`, `Card`, `Alert`, `EmptyState`, `ErrorState`, `Link`, `VisuallyHidden`,
+`SkipLink`, `Breadcrumb`.
 
 `Card` is the first multi-part component, so it proves `R-9.2-3` and `R-9.2-4`: flat
 exports, `CardRoot`, and the `Header`/`Body`/`Footer` naming. `Alert`, `EmptyState` and
@@ -514,13 +526,19 @@ clamped - the second schema limit.
 Shared additions expected: labels for `Alert`, `EmptyState`, `ErrorState`, `SkipLink`,
 `Breadcrumb` and `Pagination`; possibly one or two icons in `raw/`.
 
-### Unit 3 - Switch, alone
+### Unit 3 - Switch and the first forms
 
-Not ten. One. `Switch` is the first client component in the repo and therefore the
-second template, so it gets a whole round to itself and the hardest review. See Track B
-in section 6.
+`Switch` opens it, alone and first: it is the first *form* control, so it settles the
+`checked` / `onCheckedChange` versus `value` / `onValueChange` question that every later
+control inherits (section 6, Track B). Only when it is merged do the rest start.
 
-Only after Switch is merged does a unit of client components make sense.
+Then `Pagination`, carried over from Unit 2, and the Phase 4 forms in the order of
+`docs/PLAN.md` section 19: `Field`, `Label`, `Input`, `Textarea`, `Checkbox`,
+`RadioGroup`, `NumberField`.
+
+`Field` and `Label` go second and together, because they are the architecture every other
+control plugs into. `Input` and `Textarea` follow. `NumberField` is the first component to
+exercise `R-5.7-8`: it limits with `min`, `max` and `step`, never with `maxLength`.
 
 ---
 

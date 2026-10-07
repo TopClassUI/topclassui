@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import { CONTROL_HEIGHT } from '#shared/classes.js'
 import { attr, classList, markup } from '#test/markup.js'
-import { BUTTON_DEFAULTS, BUTTON_SIZES } from '../constants.js'
+import { BUTTON_SIZES } from '../constants.js'
+import { BUTTON_DEFAULTS } from '../constants.js'
 import { ButtonSkeleton } from '../skeleton.js'
 
 const classes = (...args: Parameters<typeof ButtonSkeleton>) =>

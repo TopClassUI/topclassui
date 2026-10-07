@@ -77,24 +77,29 @@ export interface Graph {
   reachable: (entry: string) => Set<string>
   /** The bare package names a file pulls in at runtime, transitively. */
   packages: (entry: string) => Set<string>
+  /** The bare specifiers as written, so `zod/mini` is not collapsed to `zod`. */
+  specifiers: (entry: string) => Set<string>
 }
 
 export function buildGraph(files: readonly string[], root: string): Graph {
   const edges = new Map<string, string[]>()
   const bare = new Map<string, string[]>()
+  const written = new Map<string, string[]>()
   const subpaths = readSubpaths(root)
 
   for (const file of files) {
     const local: string[] = []
     const external: string[] = []
+    const exact: string[] = []
     for (const specifier of valueImports(readFileSync(file, 'utf8'))) {
       const target = resolveSpecifier(specifier, file, root, subpaths)
-      if (target === null) external.push(packageName(specifier))
+      if (target === null) { external.push(packageName(specifier)); exact.push(specifier) }
       else if (target.startsWith(UNKNOWN_SUBPATH)) external.push(target)
       else local.push(target)
     }
     edges.set(file, local)
     bare.set(file, external)
+    written.set(file, exact)
   }
 
   const walk = (entry: string) => {
@@ -114,6 +119,11 @@ export function buildGraph(files: readonly string[], root: string): Graph {
     packages: (entry) => {
       const out = new Set<string>()
       for (const file of walk(entry)) for (const name of bare.get(file) ?? []) out.add(name)
+      return out
+    },
+    specifiers: (entry) => {
+      const out = new Set<string>()
+      for (const file of walk(entry)) for (const name of written.get(file) ?? []) out.add(name)
       return out
     },
   }
