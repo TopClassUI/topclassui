@@ -294,15 +294,15 @@ a minute, the same failure found at step 11 is an hour.
     `src/shared/labels/en.ts` **and** `ar.ts`. A label with a count is
     `(n, fmt) => string` using `Intl.PluralRules` in Arabic (`R-5.11-1`, `R-5.11-2`).
     This is a shared file - read section 9 first. Unit 1 adds no label key.
-16. **`pnpm readme:build`, `pnpm check`**, then **`pnpm test:mutation`**. Rebuild the README
-    whenever `schema.ts`, `types.ts` or `meta.ts` changed, or `check:readme` fails on a
-    stale file, and replace every scaffolded `TODO(tc)`: the schema descriptions, the
-    comment in `meta.ts` and the placeholder between the hand-written markers of
-    `README.md` (`R-8.1-3`). A green suite that no mutation disturbs is a suite that
-    measures nothing.
+16. **`pnpm readme:build`, then `pnpm check`.** Rebuild the README whenever `schema.ts`,
+    `types.ts` or `meta.ts` changed, or `check:readme` fails on a stale file, and replace
+    every scaffolded `TODO(tc)`: the schema descriptions, the comment in `meta.ts` and the
+    placeholder between the hand-written markers of `README.md` (`R-8.1-3`).
 17. **Add a mutation** for whatever the component's hardest guarantee is, in
-    `scripts/mutations/index.ts`. Every component should leave one behind. Prove it bites
-    by breaking the source by hand first.
+    `scripts/mutations/index.ts`; the Build this block names it. Every component should
+    leave one behind. Prove it bites by breaking the source by hand first, then run
+    **`pnpm test:mutation`** once, with the new row in it. A green suite that no mutation
+    disturbs is a suite that measures nothing.
 18. **Push the branch, open a pull request** with the body from section 12. Do not merge.
 
 ---
@@ -444,10 +444,10 @@ they will happen again.
 
 ## 12. Commits, branches, pull requests
 
-- One component per branch and per pull request. Three catalog rows name two components
-  (`Skeleton, Spinner`; `EmptyState, ErrorState`; `Progress, Meter`): each component is
-  still its own branch, which is how "one catalog row per branch" at the top of `CLAUDE.md`
-  reads in this plan.
+- One component per branch and per pull request. Many catalog rows name more than one
+  component; in Unit 1 they are `Skeleton, Spinner`, `EmptyState, ErrorState` and
+  `Progress, Meter`. Each component is still its own branch, which is how "one catalog row
+  per branch" at the top of `CLAUDE.md` reads in this plan.
 - Branch names: `feat/<slug>` for a component, `feat/shared-<thing>` for a shared
   addition, `fix/<slug>-<what>` for a follow-up.
 - Conventional commits, subject in lower case, describing the effect and not the file
@@ -561,9 +561,10 @@ in this unit rather than later because `R-5.2-7` truncates a long label to an el
 and the text it hides has to be readable somewhere.
 
 **Shared additions, each in its own pull request first (section 9):**
-`feat/shared-progress-token`, one `--tc-progress-value` line in `src/tokens.css`, before
-`Progress`; and `feat/shared-tooltip-provider`, the Base UI `Tooltip.Provider` inside
-`TopClassProvider`, before `Tooltip`. No label and no icon is needed: every string and all
+`feat/shared-progress-token`, before `Progress`: the `--tc-progress-value` line in
+`src/tokens.css` and the type declaration in a new `src/shared/style-tokens.ts` that lets
+`style` carry a `--tc-*` key; and `feat/shared-tooltip-provider`, the Base UI
+`Tooltip.Provider` inside `TopClassProvider`, before `Tooltip`. No label and no icon is needed: every string and all
 twelve icons the designs use already exist.
 
 **What Button already settled, so do not reinvent it:** the folder contract including

@@ -71,8 +71,8 @@ the one color drawn is the on-soft of a tone and every toned component offers th
 (`src/shared/contracts/tone.ts`), and Separator `decorative`, because the frame description
 states it and the role depends on it. A prop that a playground names but nothing draws is
 not built, and one prop is out although its row names it: Progress `min` and `max`, which
-wait for Meter. Each Build this block ends with what was left out; copy that line into the
-pull request under Decisions.
+wait for Meter. Each Build this block has a **Not built** line; copy it into the pull
+request under Decisions.
 
 **When this file does not answer.** Choose what the rules and Button's precedent give, build
 it, and write the question and your choice in the pull request under Decisions. Do not edit
@@ -137,11 +137,11 @@ a sample passes an icon by name (`icon="tray"`), the component takes a `ReactNod
 
 ## Shared pull requests
 
-Two, each its own pull request, merged before the branch that needs it
-(`docs/CLOUD-PLAN.md` section 9). Open both before Badge: they are the only work that may sit
+Two, each its own pull request (`docs/CLOUD-PLAN.md` section 9). Progress needs the first
+one merged before it starts; Tooltip does not wait for the second. Open both before Badge: they are the only work that may sit
 beside it, and Omar has to merge them, so they should be waiting while Badge is built and
-reviewed. If one is not merged yet, build the other components first; never copy the change
-into a component branch.
+reviewed. If the first is not merged yet, build the other components first; never copy the
+change into a component branch.
 
 1. **`feat/shared-progress-token`**, before Progress. Two additions. In `src/tokens.css`, one
    line at the end of the first `:root` block, with the knobs: `--tc-progress-value: 0%;`,
@@ -162,7 +162,7 @@ into a component branch.
    no custom properties: without this `tsc` rejects the key, and a cast inside the attribute
    fails the lint rule that reads it. With it `'--tc-progress-value'` compiles and
    `'--other'` is still an error.
-2. **`feat/shared-tooltip-provider`**, before Tooltip. `<Tooltip.Provider>` from
+2. **`feat/shared-tooltip-provider`**, opened before Tooltip. `<Tooltip.Provider>` from
    `@base-ui/react/tooltip`, with no props, inside `TopClassProvider`
    (`src/shared/provider/provider.tsx`). It renders no element, so the markup does not
    change, and there is no new provider prop. The dom test goes in `provider.dom.test.tsx`
@@ -537,8 +537,8 @@ component.
 - **Actions in demos** go on the soft variant, as `<Button size="sm" tone={tone}>` and
   `<Button size="sm" variant="outline" tone={tone}>`. An unfilled Button on a solid Alert is
   `on-soft` text on a `solid` fill, 1 to 3.4:1, and `e2e/axe.spec.ts` fails it.
-- **Files.** `constants.ts`, `classes.ts`, `schema.ts`, `types.ts`, `variants.ts`. No
-  `boundaries.ts`.
+- **Files.** `constants.ts`, `classes.ts`, `schema.ts`, `types.ts`, `variants.ts` (the
+  scaffolded `TONE_CLASS` goes, as on Badge). No `boundaries.ts`.
 - **Mutation.** The default icon of a tone.
 - **Not built:** the dismiss icon and `dismissible` (dismissal needs client state and belongs
   to Banner in Unit 2), `withIcon` (`icon={null}` covers it), `size`, `skeleton.tsx`.
@@ -648,8 +648,13 @@ merged first. `Meter` shares the catalog row and is not in this unit.
   `max` prop: a custom range is Meter's job. `tone`: the six `TONES`, default `primary`.
   `size`: the six `SIZES`, default `md`. `indeterminate`: default `false`.
 - **Props type.** The props of a `<div>` without `children`, `dangerouslySetInnerHTML`,
-  `role`, `aria-valuemin`, `aria-valuemax` and `aria-valuenow`: the component owns the role
-  and the three value attributes, so no caller value passes the clamp.
+  `role`, `aria-valuemin`, `aria-valuemax` and `aria-valuenow`, then the design props, then
+  the union of the next bullet; an `Omit` wrapped around the union would flatten it and
+  make both names optional. The type alone does not keep a caller out: TypeScript accepts
+  any hyphenated JSX attribute, so `<Progress aria-valuenow={150}>` still compiles. Spread
+  `...rest` first and write `role` and the three `aria-value*` attributes after it, as `Svg`
+  does, so no caller value passes the clamp. One test passes `aria-valuenow={150}` and reads
+  the clamped number back.
 - **A name is required.** The props type requires one of `aria-label` or `aria-labelledby`;
   passing neither is a type error (`R-5.6-1`). The component renders no text. The generated
   README table cannot say "one of two", so say it in the hand-written block.
@@ -831,8 +836,12 @@ and say so in the pull request: the grouped delay arrives when both are merged.
   child of the Popup. Base UI sets only its cross-axis offset inline, so the edge it sits on
   is ours, keyed on the `data-side` Base UI writes: `data-[side=top]:-bottom-1
   data-[side=bottom]:-top-1 data-[side=inline-start]:-inset-e-1
-  data-[side=inline-end]:-inset-s-1`. `<Svg>` is the only component that may emit an
-  `<svg>`.
+  data-[side=inline-end]:-inset-s-1`. Those four are all `toSideAlign` asks for, but Base
+  UI also writes `left` and `right`: its tooltip default is `fallbackAxisSide: 'end'`, so a
+  `top` or `bottom` popup with room on neither side moves beside the trigger, where no
+  class above matches and the lint refuses `left-*` and `right-*`. Pass
+  `collisionAvoidance={{ fallbackAxisSide: 'none' }}` to the Positioner, so a side only
+  ever flips to its opposite. `<Svg>` is the only component that may emit an `<svg>`.
 - **Accessibility.** Base UI 1.8.0 gives the popup no `role` and the trigger no
   `aria-describedby`: the tooltip is visual only. So the accessible name of the trigger
   carries the text (`docs/PLAN.md` 10.4 and the Figma note): an icon-only trigger in a demo
@@ -850,17 +859,22 @@ and say so in the pull request: the grouped delay arrives when both are merged.
   see a file named `client.tsx`, so prefer one `client.tsx` holding the three parts, with
   no `hook.ts` and no `lib.tsx`: Base UI holds the state. Write the layout under Decisions.
 - **Tests.** happy-dom: opens on hover and on focus, closes on Escape and on leave, the
-  delays clamp, `placement` maps to `side` and `align`, and hydration is clean. The static
+  delays clamp, `placement` maps to `side` and `align`, and hydration is clean. Base UI
+  reads `inline-start` and `inline-end` from its own direction context, not from `dir`, so
+  an RTL test wraps the tooltip in `TopClassProvider` with `direction="rtl"`. The static
   harness runs no script, so no popup can open in Playwright: list "stays inside the
   viewport at all four edges" and "the arrow sits on the right edge" under Deferred, and
   leave `scripts/build-harness.tsx` alone.
+- **Mutation.** The `delay` clamp: remove it and a `delay` of 20000 must fail a test.
 - **Not built:** `showArrow`, `instant`, a character cap, a touch fallback (that is the
   AdaptiveTooltip connector), an enter or exit transition (the pattern of `docs/PLAN.md`
   5.8 needs `scale`, which `TRANSITION` does not carry).
 - **For the reviewer:** in Dark the popup is a light chip with dark text, from the tokens.
   In Ocean `rounded-control` makes a two-line popup very round. The generated README prints
-  `import { Tooltip } from 'topclassui'`, which is not an export; the local session fixes
-  `scripts/lib/readme.ts`. Do not edit the script or the generated lines.
+  `import { Tooltip } from 'topclassui'`, which is not an export, and says the rest props
+  reach the root element, which `TooltipRoot` does not render. Both lines come from
+  `scripts/lib/readme.ts`, which the local session fixes. Do not edit the script or the
+  generated lines.
 
 ## Notes
 
