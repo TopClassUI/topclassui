@@ -489,28 +489,39 @@ never edit `shared/labels/en.ts` on the same afternoon.
 
 ### Unit 1 - the ones closest to Button
 
-`Badge`, `IconButton`, `Separator`, `Skeleton`, `Spinner`, `Heading`, `Text`, `Code`,
-`Container`, **`Tooltip`**.
+| # | Component | Mode | Why it is here | New ground it breaks |
+|---|---|---|---|---|
+| 1 | `Badge` | S | Button's variant and tone machinery with no interaction | none - it re-proves the template |
+| 2 | `IconButton` | S | Button with a required `label` | first required prop; first **yes** in a README |
+| 3 | `Spinner` | S | every `loading` state needs it | first `labels` entry of its own |
+| 4 | `Skeleton` | S | every later `skeleton.tsx` is built on it | the `rows` boundary |
+| 5 | `Separator` | S | orientation without tone | first `orientation` prop, and its RTL |
+| 6 | `Heading` | S | `level` separate from `size` | semantics split from looks |
+| 7 | `Text` | S | sizes, `muted`, truncate, line clamp | first numeric boundary after Button |
+| 8 | `Code` | S | inline code | smallest component in the catalog |
+| 9 | `Container` | S | max width and gutters | first layout primitive |
+| 10 | **`Tooltip`** | **C** | the full text of a truncated label has to be readable | **the first client component in the repo** |
 
-`Tooltip` is the exception: it is the only `C` (client) component in the unit, so it is
-built **last and alone**, with the care Track B describes. It is here rather than later
-because `R-5.2-7` truncates a long label with an ellipsis, and the full text has to be
-reachable somewhere - that somewhere is a Tooltip. Until it exists the ellipsis is the
-whole story, which is correct but not kind.
+**Build order.** `Badge` first and **alone**: it re-proves the whole template end to end
+and the local session reviews it before anything else starts. Then 2 to 9 in three or
+four worktrees at a time. `Tooltip` **last and alone**.
 
-`Stack` moves to Unit 2.
+**Why Tooltip is in a server unit.** It is the only `C` component here, and it is the
+first in the repo, so it is the second template - `client.tsx`, `hook.ts`, `'use client'`,
+and the first use of `zod/mini` if it needs validation at all. It earns the same care
+Button got. It is in this unit rather than later because `R-5.2-7` truncates a long label
+to an ellipsis, and the text it hides has to be readable somewhere.
 
-All tier 1, and every one but Tooltip is `S` (server): Button with different
-variants. `Badge` is Button's variant and tone machinery with no interaction. `IconButton` is Button with a
-required `label`, so it is the first component whose README shows a **yes** in the
-required column. `Skeleton` and `Spinner` are needed by every later `skeleton.tsx`.
-`Text`'s line clamp is the first schema limit outside Button.
+**Shared additions, which land first in their own pull request (section 9):** labels for
+`IconButton`, `Spinner` and `Tooltip`.
 
-Order inside the unit: `Badge` first and alone. It re-proves the template end to end,
-and the local session reviews it before the other nine start.
+**What Button already settled, so do not reinvent it:** the folder contract including
+`boundaries.ts` and `lib.tsx`, `memoizeVariants` from `#shared/variants.js`, `CONTAIN` and
+`LABEL` for a long label, `renderElement` for the `render` prop, the tone and size
+contracts, and the generated `README.md`. A component that needs none of these is
+probably wrong.
 
-Shared additions expected, which land first in their own pull request (section 9):
-labels for `IconButton` and `Spinner`.
+`Stack` moved to Unit 2 to keep this unit at ten.
 
 ### Unit 2 - containers, feedback and navigation
 
