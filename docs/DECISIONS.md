@@ -6,6 +6,51 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-07 - Unit 1 is built from docs/figma/unit-1.md, and where it leaves the drawing the file says so
+
+**Decision.** The session that builds Unit 1 has no Figma access, so the design of its ten components is written out in `docs/figma/unit-1.md`: the facts read from the file, and a **Build this** block per component that fixes its parts, props, defaults and classes. When sources disagree the order is the rules in CLAUDE.md, this file, the Build this block, the catalog row and the Unit 1 table, a bound Figma variable, a raw Figma number, and last a prop name in a docs playground. The Build this blocks are adopted as written. The larger changes from the drawing or from the recipe, one line each; the Not built and For the reviewer lines of each block hold the rest:
+
+- Radii stay on the formulas in `src/styles.css`, so in Ocean a chip is 8 px and a box 24 px where Figma has 100 and 28.
+- Text uses the type steps with their own line heights, not the Auto line height of the drawings, so no drawn height is a target.
+- Badge defaults to `soft`, which the docs playground and every drawing of a single Badge show (the variant grids draw all three), not to the first cell of the Figma set. It carries a border on every variant, and its xl type step is `text-lg` as Figma and PLAN 5.2 say, while Button's xl stays `text-base` until that is decided.
+- Alert has no dismiss button and no opacity on its description. Kbd, Card and Separator are built without the states, the media part and the label that are drawn.
+- Progress xs is 2 px from the token, not the drawn 4.
+- None of the nine server components takes `render`, which narrows the 2026-10-05 line "This is the shape all 46 components will use" to the components that take it.
+- A decision made in a component branch, and anything R-0-1 asks to be recorded, is written in the pull request under Decisions. The local session copies it here when the unit merges, so ten branches never edit this file at once.
+
+**Why.** PLAN 6.6 says the Figma frame wins and that every intentional divergence is recorded here. It also asks that a deliberate change is made in Figma first; it is not, because the session cannot write to Figma, so the drawings stay as they are until Omar rules on the twelve choices. The Figma file contradicts itself or the code in more than forty places, so "the frame wins" alone would stop the session on the first component, and mapping a raw number to "the nearest token" would have it write classes the lint rejects, such as `h-1` and `rounded-full`. A second pass re-read every node: 535 statements held, 18 were wrong and are corrected, and 62 missing facts were added. Most of the changes above keep a gate green - contrast, the lint, the server boundary - or keep a catalog row from growing; the Badge default and its xl step follow the stronger evidence.
+
+**Affects.** PLAN 6.6 for Unit 1, R-0-1 in where its record is first written, and docs/CLOUD-PLAN.md sections 1, 3 to 6 and 8 to 12 with Appendices A and C, which now point at the file. The twelve choices that are Omar's to revisit are the table at the end of `docs/figma/unit-1.md`; changing one is a small pull request.
+
+## 2026-10-07 - Defaults stay in constants.ts; boundaries.ts holds bounds, and only when there are any
+
+**Decision.** `<NAME>_DEFAULTS` lives in `constants.ts` beside the value lists. `boundaries.ts` holds `<NAME>_BOUNDARIES` and nothing else, and a component with nothing to bound has no `boundaries.ts` at all. This corrects the entry below of the same date, "Defaults and bounds move out of constants.ts into boundaries.ts", in the one point where it says the defaults move.
+
+**Why.** That entry was written before the split was finished. What shipped, and what R-8.3-6, Button and `pnpm new:component` all do, is defaults in `constants.ts`: a default is what the component does when asked for nothing, a bound is what it refuses whatever it is asked, and the file a reviewer opens to check the guard rails should hold only guard rails. Two texts that disagree are worse than either, and a new session reads both. On the missing file: R-8.3-6 said every folder has a `boundaries.ts`, but `icon`, `svg` and `icon-registry` have none and `check-structure` does not ask for one, and an empty table would be a file that exists for nothing, which R-8.1-1 forbids.
+
+**Affects.** R-8.3-6, reworded in the same change: a component that enforces a bound has the file, and one with nothing to bound does not. docs/CLOUD-PLAN.md section 8 step 5, corrected with it.
+
+## 2026-10-07 - The site's 46 is the build list, server set first
+
+**Decision.** The 46 components the home page advertises are what v0.1 builds, in the five
+units of Appendix A in docs/CLOUD-PLAN.md: the server set first, Tooltip as the first
+client component, then the overlays, then the Phase 4 form controls. PLAN.md section 18
+stays as the long-term catalog, and its extras - Heading, Text, Container, Stack, Grid -
+are reconsidered only after the 46 ship.
+
+**Why.** Two reasons, and they point the same way. The catalog and the site disagree: the
+catalog lists components the home page never promises, so building them first would delay
+what a reader was told to expect. And no component has a client.tsx yet, so the client
+half of the folder contract is described by R-5.12-1 and checked by check-boundaries but
+proven by nothing; Phase 4 is almost entirely client components, which would mean
+inventing the client template, the Field architecture and the Base UI Field integration at
+volume and in parallel. The server set copies Button exactly, so it is quantity rather
+than design, and it re-proves the template before the second one is written.
+
+**Affects.** PLAN.md section 19 phase order and section 18's priority. Every Definition of
+Done line and every acceptance criterion is unchanged, and Phase 4's own criteria still
+gate the form controls when Unit 4 reaches them.
+
 ## 2026-10-07 - `zod/mini` may run in a client file; the full build still never ships
 
 **Decision.** R-8.3-1 is relaxed. A client file (`client.tsx`, `hook.ts`, `lib.ts`, `lib.tsx`) may `import * as z from 'zod/mini'` at runtime for layer-2 validation. `schema.ts` is still imported with `import type` only, the full `zod` build still never reaches the browser, and a Server Component may import neither. The guard in `src/shared/no-zod-at-runtime.test.ts` now reads the exact specifier rather than the package name, because `packageName()` collapsed `zod/mini` to `zod`.
@@ -15,6 +60,8 @@ The format is: date, decision, why, and what it affects.
 **Affects.** R-8.3-1. No component uses it yet - Button is server-only and no input exists - so the validator itself is written with the first client control rather than invented ahead of it.
 
 ## 2026-10-07 - Defaults and bounds move out of constants.ts into boundaries.ts
+
+*Corrected the same day: the defaults stayed in `constants.ts`. See "Defaults stay in constants.ts" above.*
 
 **Decision.** A new file joins the folder contract: `boundaries.ts`, holding `<NAME>_DEFAULTS` and `<NAME>_BOUNDARIES`. `constants.ts` keeps the `as const` value lists and nothing else. `schema.ts`, `variants.ts` and the component import the defaults from `boundaries.ts`. `pnpm new:component` writes it, and `check-structure` allows it. A team overrides any default by passing the prop.
 

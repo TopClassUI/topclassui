@@ -16,6 +16,9 @@ touched by it.
    18 (the catalog) and 20 (the Definition of Done).
 5. `src/components/button/` - the whole folder. Button is the template. Every component
    in this plan is Button with different variants, so read it before writing anything.
+6. `docs/figma/unit-1.md` - the design of the ten Unit 1 components, as text. You have no
+   Figma access, so it is your only design input; do not ask for screenshots. Each
+   component has the facts and a **Build this** block, and the block is what you build.
 
 Do not skim `src/components/button/test/`. Fourteen test files is not ceremony; each one
 exists because a review found something the others could not see.
@@ -42,7 +45,7 @@ and let the review come to you. Never merge your own branch.
 
 ## 3. Ground truth: what exists today
 
-Verified on branch `feat/button`, 2026-10-07, all eleven gates green:
+Verified on `main` after Button merged, 2026-10-07, all eleven gates green:
 
 ```
 pnpm check   ->  lint, typecheck, 1289 tests in 60 files, check-structure,
@@ -69,8 +72,8 @@ pnpm test:mutation  ->  47 of 47 mutations caught
   and `boundaries.ts` caps the label string itself.
 - **Gates.** Eleven in `pnpm check`, plus `pnpm test:mutation` as the gate on the gates.
   Thirteen custom ESLint rules. A static Playwright harness: every `dummy/*.tsx` becomes
-  6 pages (3 modes x 2 directions) and is automatically covered by the axe,
-  target-size and focus-ring specs.
+  6 pages (3 modes x 2 directions) and is automatically covered by the axe and
+  target-size specs. The focus-ring and contain specs open Button's demos by name.
 
 **Not built. Do not try to use them:**
 
@@ -80,17 +83,20 @@ pnpm test:mutation  ->  47 of 47 mutations caught
 - No docs site, no docs pages, no props-table generation.
 - No monorepo. One package, `src/` at the root. `docs/PLAN.md` section 4 still describes
   three packages; that is an open question in `docs/STATUS.md`, not your problem.
-- **No component has a `client.tsx` yet.** Nothing in the repo has ever shipped
-  `'use client'`. `check-boundaries` has rules for it and `R-5.12-1` describes it, but no
-  component proves the pattern works. This is why Track B exists.
+- **No component has a `client.tsx` yet.** `src/shared/` has client files, the provider and
+  the hooks among them, but no component has ever shipped `'use client'`.
+  `check-boundaries` has rules for it and `R-5.12-1` describes it, but no component proves
+  the pattern works. This is why Track B exists.
 
 ---
 
 ## 4. Out of scope, explicitly
 
 Do not build, edit or plan: the docs site, any page, any route, MDX, the props table
-generator, Figma frames or Figma parity, `@topclassui/next`, the SEO kit, the CLI
-(`npx topclassui add`), the editor kit, the release pipeline, the monorepo split.
+generator, Figma frames, the screenshot comparison against Figma, `@topclassui/next`, the
+SEO kit, the CLI (`npx topclassui add`), the editor kit, the release pipeline, the monorepo
+split. The design itself is in scope: the tokens, parts and states of each component follow
+`docs/figma/unit-1.md`.
 
 Do not add a dependency. Do not add a script. Do not add a gate. Do not edit
 `docs/PLAN.md`, `docs/RULES.md`, `CLAUDE.md`, `AGENTS.md` or `.cursor/rules/`.
@@ -124,20 +130,20 @@ not quantity work. The server set copies Button exactly, so throughput is high a
 low - which is what this session is for - and one client component built carefully and
 reviewed hard is worth more than eleven built on a pattern nobody has validated.
 
-Omar has agreed to both. **Paste the entry in Appendix C into `docs/DECISIONS.md` as your
-first commit**, then follow section 6. Appendix B records the strict section 19 order in
-case it is ever needed.
+Omar has agreed to both, and the entry in Appendix C is already in `docs/DECISIONS.md`: do
+not paste it again. Follow section 6. Appendix B records the strict section 19 order in case
+it is ever needed.
 
 ## 6. The order of work
 
-### Gate 0 - land Button first
+### Gate 0 - start from a `main` that has Button and this plan
 
-Nothing starts until `feat/button` is merged to `main`. Every component branch must
-start from a `main` that already contains Button, the tone contract, `shared/classes.ts`
-and the eleven gates, or you will rebase forty times.
+Button merged on 2026-10-07. Every component branch must start from a `main` that contains
+Button, the tone contract, `shared/classes.ts` and the eleven gates, or you will rebase
+forty times.
 
-Omar merges it. Your job is to confirm `origin/main` contains `src/components/button/`
-before creating any worktree.
+Before creating any worktree, confirm `origin/main` contains `src/components/button/` and
+`docs/figma/unit-1.md`.
 
 ### Track A - the server set, in parallel worktrees
 
@@ -148,14 +154,15 @@ Ten components per unit, three or four worktrees running at a time. See Appendix
 
 **Tooltip.** One worktree, no parallel work beside it, highest care. It is the second
 template, so it decides the shape of every client component after it: `'use client'`,
-`client.tsx`, `hook.ts` (`R-5.12-1`), `lib.tsx`, a hydration test, and the first use of
-`zod/mini` if it needs validation at all.
+`client.tsx`, an `index.tsx` that only re-exports, and a hydration test. Base UI holds its
+state, so it has no `hook.ts` and no `lib.tsx` (`R-8.1-1`); the first component with state
+of its own settles those. It does not need `zod/mini`: `clamp()` covers its two delays.
 
 It is also the first component to use `shared/floating.ts`, which already exists and has
 never been exercised: the `placement` prop mapping to Base UI's `side` and `align`
 (`R-5.3-4`), a popup that stays inside the viewport, and a delay group so moving between
 two tooltips does not re-wait. Read `node_modules/@base-ui/react/tooltip/` before writing
-a line, and record anything that differs in `docs/DECISIONS.md` (`R-0-1`).
+a line, and write anything that differs in the pull request under Decisions (`R-0-1`).
 
 Run it last in Unit 1, after the nine server components, so the server template is
 re-proven before the client one is invented.
@@ -220,24 +227,27 @@ avoid that; Appendix A groups each unit so that it mostly cannot happen.
 Follow it in order. The gate after each step is the point - a failure found at step 4 is
 a minute, the same failure found at step 11 is an hour.
 
-1. **Read the catalog row** (`docs/PLAN.md` section 18) and the Figma frame name if one
-   is recorded. The row decides the rendering mode (`S`, `Sp`, `C`), the tier and the
-   notes. The row is the specification; do not widen it.
+1. **Read the catalog row** (`docs/PLAN.md` section 18) and the section of the component in
+   `docs/figma/unit-1.md`. The row decides the rendering mode (`S`, `Sp`, `C`), the tier
+   and the notes; the **Build this** block decides the parts, the props, the defaults and
+   the classes. Do not widen either.
 2. **Scaffold.** `pnpm new:component <slug>`. It writes `constants.ts`, `boundaries.ts`,
    `classes.ts`, `schema.ts`, `types.ts`, `variants.ts`, `index.tsx`, `meta.ts`,
    `README.md`, `test/<slug>.test.tsx` and `dummy/basic.tsx`, and the result already
    passes `pnpm check`. Run it now, before writing a line, so you know the baseline is
-   green.
+   green. Then delete every prop and file the component does not have (`R-8.1-1`): the
+   scaffold writes a `variant`, `tone` and `size` trio that most of Unit 1 does not need.
 3. **The folder contract gained three files since Button.** `boundaries.ts` holds the
    bounds and nothing else (`R-8.3-6`), `classes.ts` holds this component's class tables
    (`R-5.12-4`), and `lib.tsx` is where a pure helper that returns JSX lives, because
-   `lib.ts` may not import React. `pnpm new:component` writes all three.
+   `lib.ts` may not import React. `pnpm new:component` writes the first two; add `lib.tsx`
+   by hand when a helper returns JSX, as the `truncateLabel` of Badge does.
 4. **Check the installed types before using any API** (`R-0-1`). Open
    `node_modules/@base-ui/react/<part>/` and read the `.d.ts`. Never guess a prop name.
-   Anything that differs from what you expected goes in `docs/DECISIONS.md`.
-5. **`constants.ts` and `boundaries.ts`** - the value lists as `as const` arrays go in
-   `constants.ts` and nothing else does; the defaults and the bounds go in `boundaries.ts`,
-   which is the one file a team opens to see what it may override (`R-8.3-6`). Sizes
+   Anything that differs from what you expected goes in the pull request under Decisions.
+5. **`constants.ts` and `boundaries.ts`** - the value lists as `as const` arrays and the
+   defaults (`<NAME>_DEFAULTS`) go in `constants.ts`; the bounds go in `boundaries.ts` and
+   nothing else does (`R-8.3-6`). A component with nothing to bound has no such file. Sizes
    come from `shared/contracts/size.ts`, tones from `shared/contracts/tone.ts` and a
    text cap from `shared/contracts/boundaries.ts`. Never redeclare any of them locally
    (`R-8.3-2`, `R-5.7-8`).
@@ -252,37 +262,47 @@ a minute, the same failure found at step 11 is an hour.
    Never a built class name (`R-5.2-3`). Sizes, radius, border, focus, hover, transitions
    and `CONTAIN` come from `shared/classes.ts` (`R-5.2-4`, `R-5.2-7`).
 9. **`index.tsx`** - the server half. No `'use client'`, no client hook, no import of
-   `./hook.js` (`R-5.1-1`). Spread the rest onto the root, support `render` through
-   `renderElement` (`R-5.7-4`), and emit presence attributes (`data-open`, not
-   `data-state="open"`, `R-5.7-6`).
+   `./hook.js` (`R-5.1-1`). Spread the rest onto the root and emit presence attributes
+   (`data-open`, not `data-state="open"`, `R-5.7-6`). A component takes `render` only where
+   its Build this block says so, and then through `renderElement` (`R-5.7-4`); none of the
+   nine server components of Unit 1 does.
 10. **`client.tsx` and `hook.ts`**, only if the catalog row says `C` or `Sp`. `client.tsx`
    is JSX plus at most one `useXxx()` call; every `useState`, `useEffect`, `useRef`,
    `useMemo` and `useCallback` lives in `hook.ts`, and pure helpers in `lib.ts`
    (`R-5.12-1`).
-11. **`skeleton.tsx`** - the real dimensions, from the same size knobs the component
-    uses. A skeleton that reserves the wrong height is a layout shift.
+11. **`skeleton.tsx`**, only where the Build this block names one - the real dimensions,
+    from the same size knobs the component uses. A skeleton that reserves the wrong height
+    is a layout shift.
 12. **`dummy/*.tsx`** - one demo per file, covering every variant, size, tone and state,
     plus an `rtl.tsx`. Each file becomes 6 harness pages and is picked up automatically
-    by the axe, target-size and focus-ring specs. This is the cheapest coverage in the
-    repo; use it.
+    by the axe and target-size specs; the focus-ring and contain specs measure Button's
+    demos only. This is the cheapest coverage in the repo; use it. The target-size spec
+    measures every `button` and `a[href]` in every demo, so a link in a demo is a `Button`
+    with `render`, never a bare `<a href>`.
 13. **Tests**, in `test/`. Button's fourteen files are the pattern:
     behaviour, the design attributes, every variant, every tone, the states, the schema,
     the types, the skeleton, the `render` prop, the demos under SSR, hydration in the DOM,
     and `meta.ts`. Suffix rules: `.dom.test.tsx` for happy-dom, `.rsc.test.tsx` for a
     React Server Components tree, `.ssr.test.tsx` and plain `.test.tsx` for SSR,
     `.test.ts` for node.
-14. **`meta.ts`** - set `baseUi` and `baseUiRange` to the version you read the types from
-    (`@base-ui/react` is 1.8.0 today). `status` stays `'beta'` while section 20 is not
-    fully met.
+14. **`meta.ts`** - `baseUi` and `baseUiRange` are `null` for a component that imports no
+    Base UI part, and otherwise the part and the version you read the types from
+    (`@base-ui/react` is 1.8.0 today). Set the category and the tier from the catalog row:
+    the scaffold writes `'actions'`, tier 1 and `'draft'`. `status` is `'beta'` while
+    section 20 is not fully met.
 15. **Labels**, if the component has any built-in text: add it to
     `src/shared/labels/en.ts` **and** `ar.ts`. A label with a count is
     `(n, fmt) => string` using `Intl.PluralRules` in Arabic (`R-5.11-1`, `R-5.11-2`).
-    This is a shared file - read section 9 first.
-16. **`pnpm check`**, then **`pnpm test:mutation`**. A green suite that no mutation
-    disturbs is a suite that measures nothing.
+    This is a shared file - read section 9 first. Unit 1 adds no label key.
+16. **`pnpm readme:build`, then `pnpm check`.** Rebuild the README whenever `schema.ts`,
+    `types.ts` or `meta.ts` changed, or `check:readme` fails on a stale file, and replace
+    every scaffolded `TODO(tc)`: the schema descriptions, the comment in `meta.ts` and the
+    placeholder between the hand-written markers of `README.md` (`R-8.1-3`).
 17. **Add a mutation** for whatever the component's hardest guarantee is, in
-    `scripts/mutations/index.ts`. Every component should leave one behind. Prove it bites
-    by breaking the source by hand first.
+    `scripts/mutations/index.ts`; the Build this block names it. Every component should
+    leave one behind. Prove it bites by breaking the source by hand first, then run
+    **`pnpm test:mutation`** once, with the new row in it. A green suite that no mutation
+    disturbs is a suite that measures nothing.
 18. **Push the branch, open a pull request** with the body from section 12. Do not merge.
 
 ---
@@ -304,15 +324,21 @@ In practice:
 
 - Before starting a batch, read the batch's components and list every shared addition they
   need - a new label, a new token, a new class constant, a new contract value.
-- Land those in one small `feat(shared):` pull request first, with tests.
-- Then create the worktrees from the new `main`.
-- `scripts/mutations/index.ts` is append-only: add at the end of the array and the merge
-  conflict is trivial. `docs/DECISIONS.md` is the opposite - newest entry first, directly
-  under the `---` - so expect a conflict there and resolve it by keeping both entries in
-  date order.
+- Land those first, each in its own small `feat(shared):` pull request with tests. Unit 1
+  has two, listed in `docs/figma/unit-1.md`.
+- Then create the worktrees that need them from the new `main`.
+- `scripts/mutations/index.ts` is the one shared file a component branch edits itself
+  (step 17): a mutation names a file of the component, so it cannot land first. Append one
+  row at the end of the array and the merge conflict is trivial. `docs/DECISIONS.md` is
+  newest entry first, directly under the `---`, and no component branch edits it (see
+  below).
 
 A new tone, size or state value is a change to a contract, which reaches every component
 at once. That is a decision, not a component detail. Ask.
+
+**A decision made inside a component branch goes in the pull request body**, under
+Decisions, not in `docs/DECISIONS.md`. The local session records one entry per unit when it
+merges, so ten branches never edit that file at once.
 
 ---
 
@@ -323,7 +349,7 @@ be met because the infrastructure does not exist:
 
 | Line | Status here |
 |---|---|
-| The visual matrix is approved and matches Figma | **deferred** - no baselines exist |
+| The visual matrix is approved and matches Figma | **deferred** - no baselines exist; the tokens, parts and states still follow `docs/figma/unit-1.md` |
 | Behaviour tests pass in Firefox and WebKit | **deferred** - Chromium only today |
 | The docs page exists in English and Arabic | **deferred** - no docs site |
 | A changeset is added | **deferred** - no `.changeset/` |
@@ -409,7 +435,7 @@ they will happen again.
     measured a PNG's byte length, which is never zero. An opacity assertion checked the
     class attribute, not the cascade. Ask of every new test: what single-character change
     to the source makes this fail? If there is none, delete it or fix it.
-17. **Run `pnpm test:mutation` before claiming a component is tested.** 33 mutations today
+17. **Run `pnpm test:mutation` before claiming a component is tested.** 47 mutations today
     and every one is caught. Add one per component.
 18. **Review agents leave probe files behind.** If `tsc` suddenly fails on a file you do
     not recognise, that is what happened. Delete it.
@@ -418,18 +444,16 @@ they will happen again.
 
 ## 12. Commits, branches, pull requests
 
-- One catalog row per branch and per pull request (`docs/PLAN.md` section 18, and the
-  rule at the top of `CLAUDE.md`).
+- One component per branch and per pull request. Many catalog rows name more than one
+  component; in Unit 1 they are `Skeleton, Spinner`, `EmptyState, ErrorState` and
+  `Progress, Meter`. Each component is still its own branch, which is how "one catalog row
+  per branch" at the top of `CLAUDE.md` reads in this plan.
 - Branch names: `feat/<slug>` for a component, `feat/shared-<thing>` for a shared
   addition, `fix/<slug>-<what>` for a follow-up.
 - Conventional commits, subject in lower case, describing the effect and not the file
   list. Look at `git log` for the register: *"fix(ci): the three Windows and CI faults the
   Linux session could not see"*.
-- End every commit message with:
-
-  ```
-  Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
-  ```
+- A commit message is that one subject line: no body and no `Co-Authored-By` trailer.
 
 - Pull request body, every time:
 
@@ -445,10 +469,11 @@ they will happen again.
   The thirteen lines that apply, each ticked or explained.
 
   ## Deferred
-  The four lines from section 10, unchanged.
+  The four lines from section 10, unchanged, plus anything the Build this block defers.
 
   ## Decisions
-  Anything you had to decide, and whether it is in `docs/DECISIONS.md` yet.
+  Anything you had to decide, and the "Not built" line of the Build this block. The local
+  session records them in `docs/DECISIONS.md` when the unit merges.
 
   ## For the reviewer
   Where you are least confident. Be specific - this is the most useful section in the
@@ -507,32 +532,40 @@ decide whether it earns a place.
 | # | Component | Mode | Why it is here | New ground it breaks |
 |---|---|---|---|---|
 | 1 | `Badge` | S | Button's variant and tone machinery with no interaction | none - it re-proves the template |
-| 2 | `Spinner` | S | every `loading` state needs it | first `labels` entry of its own |
+| 2 | `Spinner` | S | every `loading` state needs it | first component to take the `labels` prop |
 | 3 | `Skeleton` | S | every later `skeleton.tsx` is built on it | the `rows` boundary |
 | 4 | `Separator` | S | orientation without tone | first `orientation` prop, and its RTL |
 | 5 | `Kbd` | S | a keyboard key | smallest component on the list |
 | 6 | `Alert` | S | tones, an icon, a title, actions | first component that composes an icon |
-| 7 | `EmptyState` | S | used by every later `states.tsx` | labels with an illustration slot |
-| 8 | `Progress` | S | `min`/`max`, clamped | **first numeric boundary and first `clamp()`** |
+| 7 | `EmptyState` | S | used by every later `empty-state.tsx` | labels with an illustration slot |
+| 8 | `Progress` | S | `value`, clamped to 0 to 100 | **a clamped value that drives a CSS variable** |
 | 9 | `Card` | S | header, body, footer | **first multi-part component: `CardRoot` (R-9.2-4)** |
 | 10 | **`Tooltip`** | **C** | the full text of a truncated label has to be readable | **the first client component in the repo** |
 
-**Build order.** `Badge` first and **alone**: it re-proves the whole template end to end
-and the local session reviews it before anything else starts. Then 2 to 9 in three or
-four worktrees at a time. `Tooltip` **last and alone**.
+**What each one is** - its parts, props, defaults and classes - is the Build this block of
+its section in `docs/figma/unit-1.md`. This table says why a component is in the unit; that
+file says what to build.
+
+**Build order.** Open the two shared pull requests, then `Badge` **alone**: it re-proves
+the whole template end to end and the local session reviews it before any other component
+starts. Then 2 to 9 in three or four worktrees at a time. `Tooltip` **last and alone**.
 
 Three of these break genuinely new ground, so expect them to take longer than the rest:
-`Progress` is the first component with a numeric boundary to clamp, `Card` is the first
-split into parts, and `Tooltip` is the first that runs in the browser at all.
+`Progress` is the first component whose clamped value drives a CSS variable, `Card` is the
+first split into parts, and `Tooltip` is the first that runs in the browser at all.
 
 **Why Tooltip is in a server unit.** It is the only `C` component here and the first in
-the repo, so it is the second template: `client.tsx`, `hook.ts`, `'use client'`, and the
-first use of `zod/mini` if it needs validation. It earns the same care Button got. It is
+the repo, so it is the second template: `'use client'`, `client.tsx` and an `index.tsx`
+that only re-exports. It earns the same care Button got. It is
 in this unit rather than later because `R-5.2-7` truncates a long label to an ellipsis,
 and the text it hides has to be readable somewhere.
 
-**Shared additions, which land first in their own pull request (section 9):** labels for
-`Spinner`, `Alert`, `EmptyState` and `Tooltip`; one or two icons in `raw/` for `Alert`.
+**Shared additions, each in its own pull request first (section 9):**
+`feat/shared-progress-token`, before `Progress`: the `--tc-progress-value` line in
+`src/tokens.css` and the type declaration in a new `src/shared/style-tokens.ts` that lets
+`style` carry a `--tc-*` key; and `feat/shared-tooltip-provider`, the Base UI
+`Tooltip.Provider` inside `TopClassProvider`, before `Tooltip`. No label and no icon is needed: every string and all
+twelve icons the designs use already exist.
 
 **What Button already settled, so do not reinvent it:** the folder contract including
 `boundaries.ts`, `classes.ts` and `lib.tsx`, `memoizeVariants` from `#shared/variants.js`,
@@ -557,7 +590,8 @@ that render items, so they are the first to use `useCollection` (`R-8.5-1`).
 `Accordion`, `Navbar`, `Sidebar`.
 
 All client or split. By now Tooltip has settled the client template and `shared/floating`
-already exists, so this unit fills the provider's toast viewport and tooltip slots and
+already exists, so this unit fills the provider's toast viewport (the tooltip provider
+lands in Unit 1) and
 proves `R-10.5-1`: a popup that stays inside the viewport, a body that scrolls inside
 itself, and focus that returns to the trigger.
 
@@ -604,10 +638,10 @@ traps, the pull request format - applies unchanged.
 
 ---
 
-## Appendix C - the `docs/DECISIONS.md` entry to paste if the order is accepted
+## Appendix C - the `docs/DECISIONS.md` entry for this order, already recorded
 
-Add this to `docs/DECISIONS.md` **at the top**, under the `---`, because that file is
-newest first. Nothing else in that commit.
+This entry has been in `docs/DECISIONS.md` since 2026-10-07. It is kept here for reference;
+do not add it again.
 
 ```markdown
 ## 2026-10-07 - The site's 46 is the build list, server set first
