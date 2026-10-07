@@ -280,4 +280,16 @@ export const MUTATIONS: Mutation[] = [
     from: 'if (cacheable.has(key)) cache.set(key, classes)',
     to: 'cache.set(key, classes)',
   },
+  {
+    label: 'style loses its --tc-* type, so Progress cannot set its value without a cast',
+    file: 'src/shared/style-tokens.ts',
+    from: '    [token: `--tc-${string}`]: string | number | undefined\n',
+    to: '',
+  },
+  {
+    label: 'the style fence widens to every custom property, not only --tc-*',
+    file: 'src/shared/style-tokens.ts',
+    from: '[token: `--tc-${string}`]',
+    to: '[token: `--${string}`]',
+  },
 ]
