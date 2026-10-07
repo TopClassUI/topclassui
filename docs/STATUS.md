@@ -1,16 +1,17 @@
 # Where things stand
 
-Read this first in a new session, then `docs/PLAN.md` for the specification and `docs/DECISIONS.md` (newest entries at the top). The three newest DECISIONS entries are from 2 and 3 October 2026 and they change the plan in ways PLAN.md does not yet reflect.
+Read this first in a new session, then `docs/PLAN.md` for the specification and `docs/DECISIONS.md` (newest entries at the top). The newest DECISIONS entries are from 7 October 2026 and they change the plan in ways PLAN.md does not yet reflect.
 
-Last updated: 6 October 2026 (Phase 3 finished and reviewed). The plan for building the
-remaining components is `docs/CLOUD-PLAN.md`; it recommends one deviation from PLAN.md's
-phase order and asks Omar to confirm it before any component starts.
+Last updated: 7 October 2026 (Button merged to `main`). The plan for building the remaining
+components is `docs/CLOUD-PLAN.md`. Omar confirmed its build order on 7 October: the site's
+46, the server set first. The design of the first ten is written out in
+`docs/figma/unit-1.md`, because the session that builds them has no Figma access.
 
 ---
 
 ## The one-line version
 
-The design system and the documentation site exist in Figma. **Coding has started**: the repo scaffold, the custom ESLint rules, the check scripts, `shared/`, the design tokens, the 84 icons and **Button** are done and `pnpm check` is green across eleven gates, including Playwright and axe: 1224 unit tests in 57 files, 84 Playwright tests, 339 contrast pairs, and 39 of 39 mutations caught by `pnpm test:mutation`. Next is the component run described in `docs/CLOUD-PLAN.md`.
+The design system and the documentation site exist in Figma. **Coding has started**: the repo scaffold, the custom ESLint rules, the check scripts, `shared/`, the design tokens, the 84 icons and **Button** are done and `pnpm check` is green across eleven gates, including Playwright and axe: 1289 unit tests in 60 files, 98 Playwright tests, 339 contrast pairs, and 47 of 47 mutations caught by `pnpm test:mutation`. Next is the component run described in `docs/CLOUD-PLAN.md`.
 
 ## The product, in the words the site uses
 
@@ -110,7 +111,7 @@ Every docs page except the components page and the home page was reviewed line b
 
 ## The code, as of 5 October
 
-`pnpm check` runs all eleven gates and is green: **1224 unit tests in 57 files plus 84 browser tests**, lint, typecheck, `check-structure`, `check-boundaries`, `check-css`, `check-icons`, `check-readme`, `check-contrast`, `rules:sync --check`.
+On 5 October `pnpm check` ran all eleven gates green with 1224 unit tests in 57 files and 84 browser tests (the current counts are in the one-line version above): lint, typecheck, `check-structure`, `check-boundaries`, `check-css`, `check-icons`, `check-readme`, `check-contrast`, `rules:sync --check`.
 
 | Done | What it is |
 |---|---|
@@ -119,9 +120,9 @@ Every docs page except the components page and the home page was reviewed line b
 | Check scripts | `check-structure`, `check-boundaries`, `check-css`, `check-contrast`, `rules-sync`. Shared predicates live in `scripts/lib/` and are tested against **LF and CRLF** both. The scripts were themselves audited and five silent-failure defects fixed; see the 3 October DECISIONS entry. CSS is parsed by one string-aware walker, `scripts/lib/css-parse.ts`, because both regex parsers could be made to pass while measuring nothing. |
 | `shared/` | `cn()` on `extendTailwindMerge`, `classes.ts`, the size contract split so `resolveIconSize` never pulls zod into the bundle, `renderElement`, `toSideAlign`, `useCollection` with windowing, labels in English and Arabic with real `Intl.PluralRules`, `TopClassProvider`, the theme script. |
 | Icons | The 84 starter icons of `docs/icons.md`, one generated module each from `raw/`. `pnpm icons:build` writes them, `pnpm check:icons` proves they still match, and the build fails if `raw/` and the doc disagree or if the 16 directional icons drift from the doc's table. One renderer, `<Svg icon={data}>`; the server `<Icon name>` is the only async, `server-only` file; `icon-registry` is its synchronous browser twin with `registerIcons()`. A wrong name is a type error. The loader map is kept out of every browser bundle by an ESLint rule and a test, both proven against a planted leak. |
-| Button | The first component, finished as the template for the other 45: `index.tsx` (a sync Server Component, no `client.tsx`), five variants x six tones x six sizes, the skeleton, ten demos and twelve test files. Reviewed by 83 agents, then every one of the 51 confirmed findings fixed. |
+| Button | The first component, finished as the template for the other 45: `index.tsx` (a sync Server Component, no `client.tsx`), five variants x six tones x six sizes, the skeleton, eleven demos and fourteen test files. Reviewed by 83 agents, then every one of the 51 confirmed findings fixed. |
 | The tone mechanism | `shared/contracts/tone.ts` is the one source of the six tones; `tokens.css` carries `--tc-<tone>-hover`, `-active`, `-soft-hover` and `-soft-active`; `styles.css` has one `@utility tone-<tone>` that swaps the five variables a component reads, so eleven class strings replace thirty compound variants. Adding a tone is one file plus its tokens, and five tests fail by name if either is missing. |
-| Contracts | `shared/meta.ts` (`ComponentMeta`, validated for every component that has one), `#shared/*`, `#icons/*`, `#components/*` and `#test/*` subpath imports, and `pnpm new:component <name>`, which writes eight files that already pass every gate. |
+| Contracts | `shared/meta.ts` (`ComponentMeta`, validated for every component that has one), `#shared/*`, `#icons/*`, `#components/*` and `#test/*` subpath imports, and `pnpm new:component <name>`, which writes eleven files that already pass every gate. |
 | Tokens | `src/tokens.css` and `src/styles.css`. Three modes, six knobs, direction-aware safe-area insets. `check-contrast` measures **339 pairs, 205 of them distinct** across the three modes and the three surfaces, taking the worse of the two gamut readings; `src/styles.test.ts` compiles both files through the installed Tailwind and asserts the semantic utilities, the knob maths and the forced-state variants all resolve. |
 
 Deliberate departures from PLAN.md sections 4, 6 and 7 are recorded in `docs/DECISIONS.md` (the `@source "./shared"` line, the RTL-correct safe-area insets, `check-css` in place of stylelint, and `color-scheme` moved into `@layer base`).
@@ -134,9 +135,9 @@ Deliberate departures from PLAN.md sections 4, 6 and 7 are recorded in `docs/DEC
 
 **Then reviewed again, six dimensions in parallel**, which found 2 high defects in the new gates themselves - a comment on the same line as an `import`, and the subpath `zod/v4`, both walked straight past the new zod guard - plus a ramp check that accepted a pressed state identical to the resting one, a contrast count that overstated itself by 40%, Arabic rendered without `lang`, and a touch-target token with no fallback. All are fixed. A sixth reviewer then threw 85 mutations at the rewritten tests: 62 were caught and **23 got through**, six of them the same circular-expectation mistake applied narrowly the first time - a test whose expected value is derived from the constant it tests cannot fail when that constant shrinks. The worst two: the 3:1 half of R-5.6-4 could be deleted with the gate still reporting success, and the zod guard had no positive control, so its transitive walk was never exercised. All 23 are fixed and replayed. The three 5 October entries in `docs/DECISIONS.md` have the detail.
 
-**Next:** Phase 4, forms. Field, Label, Input and Textarea need no new dependency; Checkbox, RadioGroup, Switch, NumberField, Slider, Select and `FieldLive` need `@base-ui/react`, which is **not installed yet**.
+**Next:** Unit 1 of `docs/CLOUD-PLAN.md` - Badge, Spinner, Skeleton, Separator, Kbd, Alert, EmptyState, Progress, Card and Tooltip - built from `docs/figma/unit-1.md`. `@base-ui/react` 1.8.0 is installed. The forms of Phase 4 are Unit 4.
 
-**Carried forward, each needing something that does not exist yet.** The colours page, the icons page and the no-flash-on-reload check need the docs app. The `topclassui-icons add-set` CLI, the axe assertions and the measured "no icon requests, no icon JavaScript" check need the docs app, `axe-core` and Playwright. None of these are claimed as done.
+**Carried forward, each needing something that does not exist yet.** The colours page, the icons page and the no-flash-on-reload check need the docs app. The `topclassui-icons add-set` CLI, the axe assertions and the measured "no icon requests, no icon JavaScript" check need the docs app (`axe-core` and Playwright are installed now). None of these are claimed as done.
 
 ## What is not done
 
@@ -158,6 +159,8 @@ Deliberate departures from PLAN.md sections 4, 6 and 7 are recorded in `docs/DEC
 4. **`@tanstack/react-table` and `dnd-kit`** are the two undecided dependencies. Both tier 3, so this can wait.
 5. **Per-route Arabic** for the 18 non-RTL pages is still unscoped.
 6. **The "0 KB" claim.** The home page shows a `.size-limit.json` block whose `ignore` list contains `@base-ui/react`, so the number is the marginal cost of our own code, not what the browser downloads. Either drop Base UI from `ignore` and publish the real total, or relabel the chip.
+7. **The twelve Unit 1 choices.** `docs/figma/unit-1.md` ends with a table, "Choices for Omar": the Badge default variant, the Ocean radius, the xl text size and nine more. Each already has a default, so none blocks the build.
+8. **Three components with no home.** `ErrorState` and `IconButton` are in no unit of `docs/CLOUD-PLAN.md`, and `Meter` is in Unit 5 without a card among the site's 46. Recommended: `ErrorState` joins Unit 2 beside `Table`, its first consumer; the other two wait until something needs them.
 
 ---
 
@@ -173,7 +176,7 @@ Deliberate departures from PLAN.md sections 4, 6 and 7 are recorded in `docs/DEC
 
 ## Known environment problems
 
-- **Figma access works.** The connector is authenticated as `omarfathiabed@gmail.com`, Full seat, Pro, admin. Writes succeed. An earlier version of this file said access was broken; that is out of date.
+- **Figma access works on Omar's machine; the cloud session has none.** The connector is authenticated as `omarfathiabed@gmail.com`, Full seat, Pro, admin. Writes succeed. An earlier version of this file said access was broken; that is out of date.
 - **`get_metadata` under-reports pages.** Called without a nodeId it listed 2 of the 4 pages. Use `use_figma` with `figma.root.children` for anything structural.
 - **Images stop working in a long session.** Once a conversation accumulates several large screenshots, every later image is rejected, including `node.screenshot()` from the Figma tool. **Start a fresh session for visual work.** This is what caused the Connectors page to be built blind.
 - **Writing Figma text resets syntax highlighting.** Setting `characters` on a multi-segment code block flattens it to one colour. Use targeted `insertCharacters` plus `deleteCharacters` to preserve it.
