@@ -293,6 +293,18 @@ export const MUTATIONS: Mutation[] = [
     to: '[token: `--${string}`]',
   },
   {
+    label: 'the provider loses its tooltip delay group, so every tooltip waits again',
+    file: 'src/shared/provider/provider.tsx',
+    from: '{nested ? isolated : <Tooltip.Provider>{isolated}</Tooltip.Provider>}',
+    to: '{isolated}',
+  },
+  {
+    label: 'a nested provider starts its own delay group, splitting an RTL island off the page',
+    file: 'src/shared/provider/provider.tsx',
+    from: 'const nested = useContext(TopClassContext) !== null',
+    to: 'const nested = false',
+  },
+  {
     label: 'a hidden spinner still passes its label, so it is announced beside its own text',
     file: 'src/components/spinner/index.tsx',
     from: 'label={decorative ? undefined : name}',
