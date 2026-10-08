@@ -1,4 +1,6 @@
-import { render } from '@testing-library/react'
+import { Tooltip } from '@base-ui/react/tooltip'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -90,5 +92,72 @@ describe('TopClassProvider', () => {
       <TopClassProvider direction="ltr" locale="en"><span>x</span></TopClassProvider>,
     )
     expect(container.querySelector('.isolate')).not.toBeNull()
+  })
+})
+
+/** One Base UI tooltip; TooltipRoot does not exist yet, so the parts are used directly. */
+function Tip({ label }: { label: string }) {
+  return (
+    <Tooltip.Root>
+      <Tooltip.Trigger>{label}</Tooltip.Trigger>
+      <Tooltip.Portal>
+        <Tooltip.Positioner><Tooltip.Popup>{`${label} tip`}</Tooltip.Popup></Tooltip.Positioner>
+      </Tooltip.Portal>
+    </Tooltip.Root>
+  )
+}
+
+/** Hover the first until it opens, then move to the second and report whether it opened at once. */
+async function secondOpensAtOnce() {
+  const user = userEvent.setup()
+  const first = screen.getByRole('button', { name: 'First' })
+  await user.hover(first)
+  // Not yet: the first tooltip waits out Base UI's 600 ms, or the timing below proves nothing.
+  expect(screen.queryByText('First tip')).toBeNull()
+  await screen.findByText('First tip', undefined, { timeout: 1500 })
+
+  await user.unhover(first)
+  await user.hover(screen.getByRole('button', { name: 'Second' }))
+  try {
+    await screen.findByText('Second tip', undefined, { timeout: 100 })
+    return true
+  } catch {
+    return false
+  }
+}
+
+describe('the tooltip delay group (PLAN 18.8)', () => {
+  it('opens the next tooltip within 100 ms once one has been shown', async () => {
+    render(<TopClassProvider direction="ltr" locale="en"><Tip label="First" /><Tip label="Second" /></TopClassProvider>)
+    expect(await secondOpensAtOnce()).toBe(true)
+  })
+
+  it('makes the second wait its full delay without the provider, which is what it adds', async () => {
+    render(<><Tip label="First" /><Tip label="Second" /></>)
+    expect(await secondOpensAtOnce()).toBe(false)
+    // And it still opens once the delay has passed, so false meant "waited", not "never".
+    expect(await screen.findByText('Second tip', undefined, { timeout: 1500 })).toBeTruthy()
+  })
+
+  it('keeps one group across a nested provider, such as an RTL island', async () => {
+    render(
+      <TopClassProvider direction="ltr" locale="en">
+        <Tip label="First" />
+        <TopClassProvider direction="rtl" locale="ar"><Tip label="Second" /></TopClassProvider>
+      </TopClassProvider>,
+    )
+    expect(await secondOpensAtOnce()).toBe(true)
+  })
+
+  it("lets an app's own Tooltip.Provider inside it set the delay, which is where it belongs", async () => {
+    const user = userEvent.setup()
+    render(
+      <TopClassProvider direction="ltr" locale="en">
+        <Tooltip.Provider delay={100}><Tip label="First" /></Tooltip.Provider>
+      </TopClassProvider>,
+    )
+    await user.hover(screen.getByRole('button', { name: 'First' }))
+    // Well under the 600 ms default, so only the inner delay can explain it.
+    expect(await screen.findByText('First tip', undefined, { timeout: 400 })).toBeTruthy()
   })
 })
