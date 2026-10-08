@@ -292,4 +292,52 @@ export const MUTATIONS: Mutation[] = [
     from: '[token: `--tc-${string}`]',
     to: '[token: `--${string}`]',
   },
+  {
+    label: 'the badge loses its border width, so outline draws no line at all',
+    file: 'src/components/badge/variants.ts',
+    from: '    BORDER_WIDTH,\n',
+    to: '',
+  },
+  {
+    label: 'the badge skeleton loses its border width, so it is 2 px shorter than the badge',
+    file: 'src/components/badge/skeleton.tsx',
+    from: '        BORDER_WIDTH,\n',
+    to: '',
+  },
+  {
+    label: 'the badge skeleton lets a caller un-hide it',
+    file: 'src/components/badge/skeleton.tsx',
+    from: '      {...rest}\n      aria-hidden\n',
+    to: '      aria-hidden\n      {...rest}\n',
+  },
+  {
+    label: 'the badge label bound stops cutting, so a megabyte reaches the DOM',
+    file: 'src/components/badge/lib.tsx',
+    from: 'const text = run.slice(0, BADGE_BOUNDARIES.labelMaxLength)',
+    to: 'const text = run',
+  },
+  {
+    label: 'each badge text child gets its own span, so the gap opens inside the words',
+    file: 'src/components/badge/lib.tsx',
+    from: 'if (isText(part)) { run += String(part); continue }',
+    to: 'if (isText(part)) { run = String(part); flush(); continue }',
+  },
+  {
+    label: 'a badge tone loses its transparent border, so it draws a ring in its label colour',
+    file: 'src/components/badge/classes.ts',
+    from: "  danger: 'bg-danger-solid text-danger-on-solid border-transparent',",
+    to: "  danger: 'bg-danger-solid text-danger-on-solid',",
+  },
+  {
+    label: 'the badge label run is never reset, so text before an icon repeats after it',
+    file: 'src/components/badge/lib.tsx',
+    from: "    run = ''\n  }",
+    to: '  }',
+  },
+  {
+    label: 'the badge skeleton passes className first, so the consumer loses every conflict',
+    file: 'src/components/badge/skeleton.tsx',
+    from: "      className={cn(\n        'inline-flex animate-pulse rounded-chip border-transparent bg-neutral-soft motion-reduce:animate-none',\n        BORDER_WIDTH,\n        BADGE_SIZE[size],\n        SKELETON_WIDTH[size],\n        className,\n      )}",
+    to: "      className={cn(\n        className,\n        'inline-flex animate-pulse rounded-chip border-transparent bg-neutral-soft motion-reduce:animate-none',\n        BORDER_WIDTH,\n        BADGE_SIZE[size],\n        SKELETON_WIDTH[size],\n      )}",
+  },
 ]
