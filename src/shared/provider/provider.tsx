@@ -1,7 +1,8 @@
 'use client'
 
 import { DirectionProvider } from '@base-ui/react/direction-provider'
-import { type ReactNode, useMemo } from 'react'
+import { Tooltip } from '@base-ui/react/tooltip'
+import { type ReactNode, useContext, useMemo } from 'react'
 
 import { AdaptiveQueryContext, DEFAULT_ADAPTIVE_QUERY } from '../adaptive/use-adaptive-mode.js'
 import { COLLECTION_DEFAULTS, type CollectionDefaults } from '../contracts/collection.js'
@@ -21,6 +22,10 @@ export interface TopClassProviderProps {
   collection?: Partial<CollectionDefaults> | undefined
 }
 
+/**
+ * Renders the tooltip delay group once, at the outermost provider. An app's own
+ * <Tooltip.Provider> belongs inside this one: placed above it, ours shadows it.
+ */
 export function TopClassProvider(props: TopClassProviderProps) {
   const {
     children,
@@ -33,6 +38,8 @@ export function TopClassProvider(props: TopClassProviderProps) {
   } = props
 
   const query = adaptive?.query ?? DEFAULT_ADAPTIVE_QUERY
+  // A nested provider, such as an RTL island, joins the outer delay group instead of starting one.
+  const nested = useContext(TopClassContext) !== null
 
   const value = useMemo<TopClassContextValue>(() => {
     const { labels } = getLabels(locale, overrides)
@@ -47,12 +54,15 @@ export function TopClassProvider(props: TopClassProviderProps) {
     }
   }, [direction, locale, overrides, numberingSystem, query, collection])
 
+  // isolate keeps every overlay above the page without a z-index race.
+  const isolated = <div className="isolate contents">{children}</div>
+
   return (
     <TopClassContext.Provider value={value}>
       <AdaptiveQueryContext.Provider value={query}>
         <DirectionProvider direction={direction}>
-          {/* isolate keeps every overlay above the page without a z-index race */}
-          <div className="isolate contents">{children}</div>
+          {/* One delay group, so moving from one tooltip to the next does not wait again. */}
+          {nested ? isolated : <Tooltip.Provider>{isolated}</Tooltip.Provider>}
         </DirectionProvider>
       </AdaptiveQueryContext.Provider>
     </TopClassContext.Provider>

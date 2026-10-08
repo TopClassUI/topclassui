@@ -293,6 +293,18 @@ export const MUTATIONS: Mutation[] = [
     to: '[token: `--${string}`]',
   },
   {
+    label: 'the provider loses its tooltip delay group, so every tooltip waits again',
+    file: 'src/shared/provider/provider.tsx',
+    from: '{nested ? isolated : <Tooltip.Provider>{isolated}</Tooltip.Provider>}',
+    to: '{isolated}',
+  },
+  {
+    label: 'a nested provider starts its own delay group, splitting an RTL island off the page',
+    file: 'src/shared/provider/provider.tsx',
+    from: 'const nested = useContext(TopClassContext) !== null',
+    to: 'const nested = false',
+  },
+  {
     label: 'the key renders a span instead of a kbd, so it stops meaning keyboard input',
     file: 'src/components/kbd/index.tsx',
     from: '<kbd className={classes} {...rest}>{children}</kbd>',
