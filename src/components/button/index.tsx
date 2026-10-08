@@ -3,10 +3,11 @@ import { cloneElement, type ReactElement, type ReactNode } from 'react'
 
 import { spinner } from '#icons/data/spinner.js'
 import { cn } from '#shared/cn.js'
+import { truncateLabel } from '#shared/truncate-label.js'
 import { renderElement } from '#shared/render.js'
 import { Svg } from '#components/svg/index.js'
+import { BUTTON_BOUNDARIES } from './boundaries.js'
 import { BUTTON_DEFAULTS } from './constants.js'
-import { truncateLabel } from './lib.js'
 import type { ButtonProps } from './types.js'
 import { buttonVariants } from './variants.js'
 
@@ -60,7 +61,7 @@ export function Button({
     'data-tone': tone,
     'data-size': size,
     className: cn(buttonVariants({ variant, tone, size, fullWidth }), className),
-    children: truncateLabel(children),
+    children: truncateLabel(children, BUTTON_BOUNDARIES.labelMaxLength),
     ...rest,
   }, loading ? withSpinner : undefined)
 }
