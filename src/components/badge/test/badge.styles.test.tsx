@@ -78,8 +78,12 @@ describe('the box', () => {
 })
 
 describe('className', () => {
-  it('keeps a consumer utility', () => {
-    expect(classes({ className: 'ms-2' })).toContain('ms-2')
+  it('keeps a consumer utility beside every class of its own, so it merges and never replaces', () => {
+    expect(classes({ className: 'ms-2' }).sort()).toEqual([
+      'bg-primary-soft', 'border-(length:--tc-line-width)', 'border-transparent', 'font-medium',
+      'gap-2', 'inline-flex', 'items-center', 'max-w-full', 'ms-2', 'px-3', 'py-pad-y-md',
+      'rounded-chip', 'text-primary-on-soft', 'text-sm',
+    ])
   })
 
   it('lets the consumer replace the radius, so a pill is one class away', () => {

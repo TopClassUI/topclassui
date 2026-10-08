@@ -69,6 +69,14 @@ describe('BadgeSkeleton', () => {
     expect(list).toContain('motion-reduce:animate-none')
   })
 
+  it('keeps a consumer utility beside every class of its own, so it merges and never replaces', () => {
+    expect(classes({ className: 'ms-2' }).sort()).toEqual([
+      'animate-pulse', 'bg-neutral-soft', 'border-(length:--tc-line-width)', 'border-transparent',
+      'gap-2', 'inline-flex', 'motion-reduce:animate-none', 'ms-2', 'px-3', 'py-pad-y-md',
+      'rounded-chip', 'text-sm', 'w-16',
+    ])
+  })
+
   it('lets the consumer className win a conflict, because it is passed last', () => {
     const list = classes({ className: 'rounded-box w-full' })
     expect(list).toContain('rounded-box')

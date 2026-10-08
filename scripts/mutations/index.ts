@@ -340,4 +340,16 @@ export const MUTATIONS: Mutation[] = [
     from: "      className={cn(\n        'inline-flex animate-pulse rounded-chip border-transparent bg-neutral-soft motion-reduce:animate-none',\n        BORDER_WIDTH,\n        BADGE_SIZE[size],\n        SKELETON_WIDTH[size],\n        className,\n      )}",
     to: "      className={cn(\n        className,\n        'inline-flex animate-pulse rounded-chip border-transparent bg-neutral-soft motion-reduce:animate-none',\n        BORDER_WIDTH,\n        BADGE_SIZE[size],\n        SKELETON_WIDTH[size],\n      )}",
   },
+  {
+    label: 'a badge className replaces its classes instead of merging, so the look disappears',
+    file: 'src/components/badge/index.tsx',
+    from: 'cn(badgeVariants({ variant, tone, size }), className)',
+    to: 'cn(className ?? badgeVariants({ variant, tone, size }))',
+  },
+  {
+    label: 'a badge skeleton className replaces its classes instead of merging, so the box disappears',
+    file: 'src/components/badge/skeleton.tsx',
+    from: "      className={cn(\n        'inline-flex",
+    to: "      className={className ?? cn(\n        'inline-flex",
+  },
 ]
