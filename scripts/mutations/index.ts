@@ -293,6 +293,18 @@ export const MUTATIONS: Mutation[] = [
     to: '[token: `--${string}`]',
   },
   {
+    label: 'the provider loses its tooltip delay group, so every tooltip waits again',
+    file: 'src/shared/provider/provider.tsx',
+    from: '{nested ? isolated : <Tooltip.Provider>{isolated}</Tooltip.Provider>}',
+    to: '{isolated}',
+  },
+  {
+    label: 'a nested provider starts its own delay group, splitting an RTL island off the page',
+    file: 'src/shared/provider/provider.tsx',
+    from: 'const nested = useContext(TopClassContext) !== null',
+    to: 'const nested = false',
+  },
+  {
     label: 'the tooltip delay loses its clamp, so a delay of 20000 makes the reader wait 20 seconds',
     file: 'src/components/tooltip/client.tsx',
     from: 'delay={delay === undefined ? undefined : clamp(delay, delayMin, delayMax)}',
