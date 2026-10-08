@@ -1,7 +1,8 @@
 // No 'use client': a client bundle gets it only when a client file imports it.
 import { cn } from '#shared/cn.js'
+import { truncateLabel } from '#shared/truncate-label.js'
+import { BADGE_BOUNDARIES } from './boundaries.js'
 import { BADGE_DEFAULTS } from './constants.js'
-import { truncateLabel } from './lib.js'
 import type { BadgeProps } from './types.js'
 import { badgeVariants } from './variants.js'
 
@@ -22,7 +23,7 @@ export function Badge({
       className={cn(badgeVariants({ variant, tone, size }), className)}
       {...rest}
     >
-      {truncateLabel(children)}
+      {truncateLabel(children, BADGE_BOUNDARIES.labelMaxLength)}
     </span>
   )
 }
