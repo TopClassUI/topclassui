@@ -293,6 +293,18 @@ export const MUTATIONS: Mutation[] = [
     to: '[token: `--${string}`]',
   },
   {
+    label: 'the provider loses its tooltip delay group, so every tooltip waits again',
+    file: 'src/shared/provider/provider.tsx',
+    from: '{nested ? isolated : <Tooltip.Provider>{isolated}</Tooltip.Provider>}',
+    to: '{isolated}',
+  },
+  {
+    label: 'a nested provider starts its own delay group, splitting an RTL island off the page',
+    file: 'src/shared/provider/provider.tsx',
+    from: 'const nested = useContext(TopClassContext) !== null',
+    to: 'const nested = false',
+  },
+  {
     label: 'a bare Card export appears beside the card parts',
     file: 'src/components/card/index.tsx',
     from: "export { CardRoot } from './parts/card-root.js'",
