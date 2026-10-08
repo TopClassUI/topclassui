@@ -41,6 +41,9 @@
   --tc-z-dialog: 50;
   --tc-z-popup: 60;
   --tc-z-toast: 70;
+
+  /* Set inline by Progress from its clamped value; declared here so R-4-2 can see it. */
+  --tc-progress-value: 0%;
 }
 
 /* Both selectors, so a light island inside a dark page resets every colour. */

@@ -41,7 +41,7 @@ describe('the element it renders', () => {
   })
 
   it('passes style through, which R-5.2-5 makes the channel for a --tc-* knob', () => {
-    const styled = html({ style: { '--tc-radius': '0px' } } as ButtonProps)
+    const styled = html({ style: { '--tc-radius': '0px' } })
     expect(attr(styled, 'style')).toBe('--tc-radius:0px')
   })
 })
