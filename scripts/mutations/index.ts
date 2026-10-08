@@ -293,6 +293,18 @@ export const MUTATIONS: Mutation[] = [
     to: '[token: `--${string}`]',
   },
   {
+    label: 'the provider loses its tooltip delay group, so every tooltip waits again',
+    file: 'src/shared/provider/provider.tsx',
+    from: '{nested ? isolated : <Tooltip.Provider>{isolated}</Tooltip.Provider>}',
+    to: '{isolated}',
+  },
+  {
+    label: 'a nested provider starts its own delay group, splitting an RTL island off the page',
+    file: 'src/shared/provider/provider.tsx',
+    from: 'const nested = useContext(TopClassContext) !== null',
+    to: 'const nested = false',
+  },
+  {
     label: 'the progress clamp is gone, so a value of 150 is announced and widens the bar past the track',
     file: 'src/components/progress/index.tsx',
     from: 'const percent = clamp(value, PROGRESS_BOUNDARIES.valueMin, PROGRESS_BOUNDARIES.valueMax)',
