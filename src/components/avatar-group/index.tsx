@@ -5,7 +5,7 @@ import { AvatarFallback, AvatarRoot } from '#components/avatar/index.js'
 import { cn } from '#shared/cn.js'
 import { en } from '#shared/labels/en.js'
 import { createNumberFormat } from '#shared/labels/get-labels.js'
-import { GROUP_OVERLAP, GROUP_RING } from './classes.js'
+import { GROUP_CHILD, GROUP_COUNTER, GROUP_OVERLAP, GROUP_RING, GROUP_ROOT } from './classes.js'
 import { AVATAR_GROUP_DEFAULTS } from './constants.js'
 import { splitOverflow } from './lib.js'
 import type { AvatarGroupProps } from './types.js'
@@ -31,11 +31,11 @@ export function AvatarGroup({
       {...rest}
       role="group"
       data-size={size}
-      className={cn('inline-flex items-center', GROUP_RING, GROUP_OVERLAP, className)}
+      className={cn(GROUP_ROOT, GROUP_RING, GROUP_CHILD, GROUP_OVERLAP[size], className)}
     >
       {visible}
       {fmt && (
-        <AvatarRoot size={size} role="img" aria-label={labels.avatar.more(hidden, fmt)}>
+        <AvatarRoot size={size} role="img" aria-label={labels.avatar.more(hidden, fmt)} className={GROUP_COUNTER[size]}>
           {/* dir: an rtl paragraph would move a leading plus to the far side of its digits. */}
           <AvatarFallback dir="ltr">+{fmt.format(hidden)}</AvatarFallback>
         </AvatarRoot>

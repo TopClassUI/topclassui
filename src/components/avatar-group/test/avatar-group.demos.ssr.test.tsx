@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['custom-size', 'four', 'max', 'overflow', 'rtl', 'sizes', 'two']
+const EXPECTED = ['counts', 'custom-size', 'four', 'linked', 'many', 'max', 'on-card', 'overflow', 'rtl', 'sizes', 'two']
 
 const render = async (file: string) => {
   const loaded = await import(`../dummy/${file}.tsx`) as { default?: ComponentType }
@@ -24,11 +24,12 @@ const groups = (html: string) => [...html.matchAll(/<span [^>]*role="group"[^>]*
 /** The name of every counter, in order: the one img whose text is pinned left to right. */
 const counters = (html: string) =>
   [...html.matchAll(/<span [^>]*role="img"[^>]*>(?=<span [^>]*dir="ltr")/g)].map((m) => attr(m[0], 'aria-label'))
-/** How many avatars the demo renders, counters included: each one is a circle. */
-const circles = (html: string) => html.split('rounded-full').length - 1
+/** How many avatars the demo renders, counters included: each one is a circle of its own.
+ * Not the group's `*:rounded-full`, which is one class on the root for all of them. */
+const circles = (html: string) => html.match(/(?<![:\w-])rounded-full/g)?.length ?? 0
 /** Every circle's opening tag, with the picture laid in it when it has one. */
 const avatars = (html: string) =>
-  [...html.matchAll(/<span [^>]*class="[^"]*rounded-full[^"]*"[^>]*>(<img [^>]*>)?/g)]
+  [...html.matchAll(/<span [^>]*class="(?:[^"]* )?rounded-full[^"]*"[^>]*>(<img [^>]*>)?/g)]
     .map((m) => ({ root: m[0].replace(m[1] ?? '', ''), image: m[1] }))
 
 describe('every demo renders on the server', () => {
@@ -89,6 +90,34 @@ describe('the demos cover the three states the site draws', () => {
     expect(circles(html)).toBe(3)
     expect(counters(html)).toEqual(['1 more'])
     expect(html).toContain('>+1</span>')
+  })
+})
+
+describe('the demos cover what a real dashboard does to a group', () => {
+  it('many: sixty members under max 20, so twenty show and the counter stands for forty', async () => {
+    const html = await render('many')
+    expect(circles(html)).toBe(21)
+    expect(counters(html)).toEqual(['40 more'])
+  })
+
+  it('counts: a count of two, three and five digits at each of the five sizes', async () => {
+    const html = await render('counts')
+    const row = ['99 more', '999 more', '12,345 more']
+    expect(counters(html)).toEqual([...row, ...row, ...row, ...row, ...row])
+    expect(html).toContain('>+12,345</span>')
+  })
+
+  it('linked: every face that shows is the one child of a link, and the links are the children of the group', async () => {
+    const html = await render('linked')
+    expect(html.match(/<a href="\/people\/[a-z]+" class="inline-flex"><span [^>]*role="img"/g)).toHaveLength(3)
+    expect(html).toMatch(/^<span [^>]*role="group"[^>]*><a /)
+    expect(counters(html)).toEqual(['2 more'])
+  })
+
+  it('on-card: the group inside a Card is given the colour of the Card for its ring', async () => {
+    const tag = groups(await render('on-card'))[0] ?? ''
+    expect(attr(tag, 'class')).toContain('*:ring-surface-raised')
+    expect(attr(tag, 'class')).not.toContain('*:ring-page')
   })
 })
 

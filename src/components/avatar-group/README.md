@@ -27,7 +27,35 @@ same `size`. For Arabic, pass `labels` and `locale` from `getLabels('ar')`.
 are, and without it "1 more" has nothing to count. Name each avatar too, by the `alt` of its
 picture or by `role="img"` and `aria-label` on `AvatarRoot`, because initials alone are silent.
 
+**Counting.** One avatar per child. An array or a `map()` counts one by one; a fragment
+(`<>...</>`) counts as one child, so pass the array itself.
+
+**A long count.** A count too long for a circle widens the counter into a pill, so `+12,345`
+keeps its plus and every digit.
+
+**A narrow screen.** A group wider than its container wraps onto another row instead of
+pushing the page sideways. In a flex row it keeps its width, so the text beside it gives
+way first; pass `className="shrink"` to let the faces wrap sooner.
+
+**On a Card.** The ring between avatars is the page colour. On a Card, or any surface that is
+not the page, give it that surface: `className="*:ring-surface-raised"`.
+
+**Links.** Wrap an avatar in a link and make the link `inline-flex`. The link is then the
+child the group rings and overlaps, and its focus ring shows all the way round:
+
+```tsx
+<AvatarGroup aria-label="Maintainers">
+  <a href="/people/omar" className="inline-flex">
+    <AvatarRoot aria-label="Omar Abed"><AvatarFallback>OA</AvatarFallback></AvatarRoot>
+  </a>
+</AvatarGroup>
+```
+
+**Sizes.** The overlap is half as deep at `xs` and `sm`, so two initials stay readable.
 With `size="custom"`, size every child and the counter from the group: `className="*:size-16"`.
+
+**Padding.** Pad a wrapper, not the group. The group's own start padding is the step its
+first avatar moves back over, so `p-1` or `px-3` on the group shifts that avatar.
 
 <!-- /hand-written -->
 
@@ -47,15 +75,19 @@ Every prop below is optional and falls back to the default shown.
 | `labels` | no | `Labels` | - | The built-in strings; the counter is named by `labels.avatar.more`. Defaults to English. |
 | `locale` | no | `string` | - | The BCP 47 tag the count is formatted in. Defaults to `en`. |
 | `max` | no | `integer`, min 1, max 20 | `4` | How many children show before the +N counter takes the rest; clamped to 1-20. |
-| `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The size of the +N counter; pass the size the avatars carry. custom emits none. |
+| `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The size of the +N counter and the depth of the overlap; pass the size the avatars carry. custom leaves the counter unsized. |
 
 Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
 
+- `dummy/counts.tsx`
 - `dummy/custom-size.tsx`
 - `dummy/four.tsx`
+- `dummy/linked.tsx`
+- `dummy/many.tsx`
 - `dummy/max.tsx`
+- `dummy/on-card.tsx`
 - `dummy/overflow.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`

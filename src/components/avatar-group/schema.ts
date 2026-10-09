@@ -11,7 +11,7 @@ export const avatarGroupSchema = z.object({
     .default(AVATAR_GROUP_DEFAULTS.max)
     .meta({ description: 'How many children show before the +N counter takes the rest; clamped to 1-20.' }),
   size: sizeSchema.default(AVATAR_GROUP_DEFAULTS.size)
-    .meta({ description: 'The size of the +N counter; pass the size the avatars carry. custom emits none.' }),
+    .meta({ description: 'The size of the +N counter and the depth of the overlap; pass the size the avatars carry. custom leaves the counter unsized.' }),
 })
 
 export type AvatarGroupSchemaInput = z.input<typeof avatarGroupSchema>
