@@ -1,17 +1,47 @@
 # Where things stand
 
-Read this first in a new session, then `docs/PLAN.md` for the specification and `docs/DECISIONS.md` (newest entries at the top). The newest DECISIONS entries are from 7 October 2026 and they change the plan in ways PLAN.md does not yet reflect.
+Read this first in a new session, then `docs/PLAN.md` for the specification and `docs/DECISIONS.md` (newest entries at the top). The newest DECISIONS entry is from 10 October 2026 and records where Unit 2 left its design file.
 
-Last updated: 7 October 2026 (Button merged to `main`). The plan for building the remaining
-components is `docs/CLOUD-PLAN.md`. Omar confirmed its build order on 7 October: the site's
-46, the server set first. The design of the first ten is written out in
-`docs/figma/unit-1.md`, because the session that builds them has no Figma access.
+Last updated: 10 October 2026 (Unit 2 merged to `main`). The build order is `docs/CLOUD-PLAN.md`: the site's 46, the server set first. The design of each unit is written out in `docs/figma/unit-1.md` and `docs/figma/unit-2.md`, because the session that builds them has no Figma access.
 
 ---
 
 ## The one-line version
 
-The design system and the documentation site exist in Figma. **Coding has started**: the repo scaffold, the custom ESLint rules, the check scripts, `shared/`, the design tokens, the 84 icons and **Button** are done and `pnpm check` is green across eleven gates, including Playwright and axe: 1289 unit tests in 60 files, 98 Playwright tests, 339 contrast pairs, and 47 of 47 mutations caught by `pnpm test:mutation`. Next is the component run described in `docs/CLOUD-PLAN.md`.
+The design system and the documentation site exist in Figma. **20 of the 46 components are on `main`**: Button, then Unit 1 (Badge, Kbd, Separator, Spinner, Skeleton, EmptyState, Alert, Card, Progress, Tooltip), then Unit 2 (Input, Tag, Avatar, AvatarGroup, Breadcrumb, Pagination, Timeline, Table, Banner). `pnpm check` is green on the merged tree: 5201 unit tests in 290 files, 1463 Playwright tests over 924 harness pages (154 demos, three modes, two directions), and 289 mutations in `pnpm test:mutation` [lead: write the final caught count of the run on main]. Next is Unit 3, the overlays.
+
+## What is on main
+
+| Unit | Components | Notes |
+|---|---|---|
+| Button | Button | The template. Server, with `render`. |
+| Unit 1 | Badge, Kbd, Separator, Spinner, Skeleton, EmptyState, Alert, Card, Progress, Tooltip | Tooltip is the first client component and the only one on Base UI so far. |
+| Unit 2 | Input, Tag, Avatar, AvatarGroup, Breadcrumb, Pagination, Timeline, Table, Banner | All server, 0 KB. Tag, Avatar and Banner are the server half only. |
+
+Unit 2 also added: labels for breadcrumb, avatar, rating, table, timeline and `pagination.pageOf` in English and Arabic; the tokens `--tc-table-sticky-width` and `--tc-input-width`; the utility `text-match-parent`; and one Playwright spec per component beside the four shared ones.
+
+Every component is `status: 'beta'`. None is `stable`: PLAN 20 asks for the visual matrix, the docs page and the Figma parity check, and none of the three exists yet.
+
+**Where Unit 2 differs from its design file** is one entry in `docs/DECISIONS.md`, dated 10 October. The short list: a `link` prop on Breadcrumb, Pagination and Table for Next.js; Input has its own width and keeps Latin values left-to-right; Table cells stay on one line and the table scrolls inside itself; Pagination defaults to `md`; Timeline says its status in words; Rating moved to Unit 3.
+
+## Next
+
+**Unit 3, the overlays**: Dialog, Drawer, Popover, Toast, DropdownMenu, CommandPalette, Tabs, Accordion, Navbar and Sidebar. Then a small second part: Rating, and the client halves of Tag (remove button), Avatar (hide a failed image) and Banner (dismiss). Its plan is `docs/figma/unit-3.md` [lead: on branch docs/unit-3-prep until it is merged].
+
+**Small shared fixes, planned, each its own pull request:**
+
+- The focus ring is drawn at rest under forced colours (`FOCUS_RING` uses `outline-hidden`).
+- A Server Component cannot ask for Arabic-Indic digits.
+- The generated README import line names an export a part family does not have (Card, Tooltip, Avatar).
+- The label cut can split an emoji, and a truncated label in the other script shows its tail; `dir="auto"` on the label span fixes the second.
+- The page-scroll checks in `e2e/table.spec.ts` and `e2e/pagination.spec.ts` compare with `documentElement.clientWidth`, which is 15 px lenient under `scrollbar-gutter: stable`.
+- One mutation file per component, so ten branches stop meeting in `scripts/mutations/index.ts`.
+- `--tc-line` is faint in dark.
+- From the review of the whole unit on 10 October: the lint lets a named colour such as `bg-[red]` through, so "system colours behind `forced-colors:` only" is review, not a gate; `InputSkeleton` is full width and 28 to 40 px tall where a default Input is 13.8em wide and 44 px tall under a coarse pointer (`ButtonSkeleton` shares the height half); the Table README sets `--tc-table-sticky-width` through `style`, which compiles only when `#shared/style-tokens.js` is in the program, and only Progress imports it; `TableSkeleton` stops at 100 rows while PLAN 18.2 offers a page of 500.
+
+**Not built on purpose, and waiting for a reason:** Table's sticky header, loading and error states and row class hook; Pagination's page-size selector (it needs Select); AvatarGroup's `total` and a ring that follows the surface of a Card; `useCollection` in Table and Timeline.
+
+**GitHub Actions is off** (the billing budget). The gate is `pnpm check` and `pnpm test:mutation` on Omar's machine, run on `main` after every merge.
 
 ## The product, in the words the site uses
 
@@ -109,7 +139,7 @@ Every docs page except the components page and the home page was reviewed line b
 
 ---
 
-## The code, as of 5 October
+## The foundation, as of 5 October (history)
 
 On 5 October `pnpm check` ran all eleven gates green with 1224 unit tests in 57 files and 84 browser tests (the current counts are in the one-line version above): lint, typecheck, `check-structure`, `check-boundaries`, `check-css`, `check-icons`, `check-readme`, `check-contrast`, `rules:sync --check`.
 
@@ -135,14 +165,13 @@ Deliberate departures from PLAN.md sections 4, 6 and 7 are recorded in `docs/DEC
 
 **Then reviewed again, six dimensions in parallel**, which found 2 high defects in the new gates themselves - a comment on the same line as an `import`, and the subpath `zod/v4`, both walked straight past the new zod guard - plus a ramp check that accepted a pressed state identical to the resting one, a contrast count that overstated itself by 40%, Arabic rendered without `lang`, and a touch-target token with no fallback. All are fixed. A sixth reviewer then threw 85 mutations at the rewritten tests: 62 were caught and **23 got through**, six of them the same circular-expectation mistake applied narrowly the first time - a test whose expected value is derived from the constant it tests cannot fail when that constant shrinks. The worst two: the 3:1 half of R-5.6-4 could be deleted with the gate still reporting success, and the zod guard had no positive control, so its transitive walk was never exercised. All 23 are fixed and replayed. The three 5 October entries in `docs/DECISIONS.md` have the detail.
 
-**Unit 1 is merged (9 October):** Badge, Kbd, Separator, Spinner, Skeleton, EmptyState, Alert, Card, Progress and Tooltip are on `main`, with 3023 unit tests and 642 browser tests green. **Next:** Unit 2, from `docs/figma/unit-2.md`. What follows described the step before: Unit 1 of `docs/CLOUD-PLAN.md` - Badge, Spinner, Skeleton, Separator, Kbd, Alert, EmptyState, Progress, Card and Tooltip - built from `docs/figma/unit-1.md`. `@base-ui/react` 1.8.0 is installed. The forms of Phase 4 are Unit 4.
-
 **Carried forward, each needing something that does not exist yet.** The colours page, the icons page and the no-flash-on-reload check need the docs app. The `topclassui-icons add-set` CLI, the axe assertions and the measured "no icon requests, no icon JavaScript" check need the docs app (`axe-core` and Playwright are installed now). None of these are claimed as done.
 
 ## What is not done
 
-- **45 components.** `src/components/` holds Button and the three icon entry points.
-- **The docs site** is not built, only designed.
+- **26 components.** Unit 3 (ten, plus Rating and three client halves), Unit 4 (the form controls) and Unit 5.
+- **The docs site** is not built, only designed. The harness pages under `.harness/` stand in for it in the browser tests.
+- **`pnpm test:visual` and `pnpm size`** do not exist, so no component can be `stable`.
 - **The components page** (`Docs site - LTR`, 46 cards) has not been reviewed. It is the largest frame in the file and the most important one left.
 - **The home page** has not been reviewed.
 - **The Connectors page needs a visual pass.** The 16 cards were built without being able to see them, and Omar's verdict on the result was "so bad". The structure is sound and the audit is clean - no raw colours, no fixed rows, no overflow - but it needs eyes.
@@ -160,7 +189,8 @@ Deliberate departures from PLAN.md sections 4, 6 and 7 are recorded in `docs/DEC
 5. **Per-route Arabic** for the 18 non-RTL pages is still unscoped.
 6. **The "0 KB" claim.** The home page shows a `.size-limit.json` block whose `ignore` list contains `@base-ui/react`, so the number is the marginal cost of our own code, not what the browser downloads. Either drop Base UI from `ignore` and publish the real total, or relabel the chip.
 7. **The twelve Unit 1 choices.** `docs/figma/unit-1.md` ends with a table, "Choices for Omar": the Badge default variant, the Ocean radius, the xl text size and nine more. Each already has a default, so none blocks the build.
-8. **Three components with no home.** `ErrorState` and `IconButton` are in no unit of `docs/CLOUD-PLAN.md`, and `Meter` is in Unit 5 without a card among the site's 46. Recommended: `ErrorState` joins Unit 2 beside `Table`, its first consumer; the other two wait until something needs them.
+8. **Three components with no home.** `ErrorState` and `IconButton` are in no unit of `docs/CLOUD-PLAN.md`, and `Meter` is in Unit 5 without a card among the site's 46. `ErrorState` was not built in Unit 2, and Table has no error state yet. Recommended: it comes with Table's loading and error states; the other two wait until something needs them.
+9. **The Unit 2 choices.** `docs/figma/unit-2.md` ends with five, and the review added four: Arabic-Indic digits by a locale tag (`-u-nu-arab`) or by a prop; whether Input keeps its own width unless `fullWidth`; a `total` prop on AvatarGroup; and the two new tokens. Each has a default in the code, so none blocks Unit 3.
 
 ---
 
