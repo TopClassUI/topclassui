@@ -31,6 +31,7 @@ function withOverrides(base: Labels, overrides?: PartialLabels): Labels {
     avatar: group(base.avatar, overrides.avatar),
     rating: group(base.rating, overrides.rating),
     table: group(base.table, overrides.table),
+    timeline: group(base.timeline, overrides.timeline),
   }
 }
 

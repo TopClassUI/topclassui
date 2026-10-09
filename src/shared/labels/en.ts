@@ -35,6 +35,7 @@ export const en = {
     last: 'Last page',
     page: (n, fmt) => `Page ${fmt.format(n)}`,
     ofPages: (n, fmt) => `of ${fmt.format(n)}`,
+    pageOf: (page, count, fmt) => `Page ${fmt.format(page)} of ${fmt.format(count)}`,
   },
   select: {
     placeholder: 'Select',
@@ -63,5 +64,10 @@ export const en = {
     sortBy: 'Sort by',
     sortedAscending: 'sorted ascending',
     sortedDescending: 'sorted descending',
+  },
+  timeline: {
+    done: 'Done',
+    current: 'Current',
+    todo: 'Not started',
   },
 } satisfies Labels
