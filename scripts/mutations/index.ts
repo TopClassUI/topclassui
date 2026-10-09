@@ -1023,4 +1023,40 @@ export const MUTATIONS: Mutation[] = [
     from: '      <TooltipTrigger\n        render={\n          <Button variant="ghost" aria-label="Copy link">\n            <Svg icon={linkSimple} />\n          </Button>\n        }\n      />',
     to: '      <TooltipTrigger render={<Button variant="ghost" aria-label="Copy link" />}>\n        <Svg icon={linkSimple} />\n      </TooltipTrigger>',
   },
+  {
+    label: 'the banner writes its role before the rest props, so a caller can turn the landmark into something else',
+    file: 'src/components/banner/index.tsx',
+    from: '      {...rest}\n      role="region"\n',
+    to: '      role="region"\n      {...rest}\n',
+  },
+  {
+    label: 'the banner loses wrap-anywhere, so a long URL runs out of the row',
+    file: 'src/components/banner/variants.ts',
+    from: "text-sm font-medium wrap-anywhere'",
+    to: "text-sm font-medium'",
+  },
+  {
+    label: 'the banner message loses min-w-0, so it cannot shrink below its longest word beside an action',
+    file: 'src/components/banner/index.tsx',
+    from: '"min-w-0 flex-1"',
+    to: '"flex-1"',
+  },
+  {
+    label: 'an empty banner message renders an empty element, so it opens a gap',
+    file: 'src/components/banner/index.tsx',
+    from: '{isEmpty(children) ? null : <div className="min-w-0 flex-1">{children}</div>}',
+    to: '<div className="min-w-0 flex-1">{children}</div>',
+  },
+  {
+    label: 'the banner passes className first, so the consumer loses every conflict',
+    file: 'src/components/banner/index.tsx',
+    from: 'className={cn(bannerVariants({ tone }), className)}',
+    to: 'className={cn(className, bannerVariants({ tone }))}',
+  },
+  {
+    label: 'the danger banner paints the solid fill under the on-soft text, so the pair is no longer the soft one',
+    file: 'src/components/banner/classes.ts',
+    from: "danger: 'bg-danger-soft text-danger-on-soft'",
+    to: "danger: 'bg-danger-solid text-danger-on-soft'",
+  },
 ]
