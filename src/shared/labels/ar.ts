@@ -116,4 +116,9 @@ export const ar = {
     sortedAscending: 'مرتب تصاعديًا',
     sortedDescending: 'مرتب تنازليًا',
   },
+  timeline: {
+    done: 'مكتمل',
+    current: 'الحالي',
+    todo: 'لم يبدأ',
+  },
 } satisfies Labels

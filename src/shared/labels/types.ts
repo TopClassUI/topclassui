@@ -71,6 +71,12 @@ export interface Labels {
     readonly sortedAscending: string
     readonly sortedDescending: string
   }
+  /** The status of a Timeline item, read out where a sighted reader sees the marker. */
+  readonly timeline: {
+    readonly done: string
+    readonly current: string
+    readonly todo: string
+  }
 }
 
 /** Only the keys a consumer wants to change; everything else keeps its default. */

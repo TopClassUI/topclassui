@@ -1071,4 +1071,10 @@ export const MUTATIONS: Mutation[] = [
     from: 'key={getKey(item)}',
     to: 'key={index}',
   },
+  {
+    label: 'a timeline status override is dropped on the way through getLabels, so a caller cannot reword a status',
+    file: 'src/shared/labels/get-labels.ts',
+    from: '    timeline: group(base.timeline, overrides.timeline),',
+    to: '    timeline: base.timeline,',
+  },
 ]
