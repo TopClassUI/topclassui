@@ -192,16 +192,24 @@ the README to print flat names. None of the nine opens before Unit 2 is merged.
    export const POPUP_MOTION = 'origin-(--transform-origin) transition-[opacity,scale] duration-(--tc-duration) ease-out data-starting-style:scale-95 data-starting-style:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0'
    export const SLIDE_MOTION = 'transition-[translate,opacity] duration-(--tc-duration-slow) ease-out data-swiping:transition-none'
    export const OVERLAY_SURFACE = `rounded-box bg-surface-raised text-body ${BORDER} shadow-lg`
-   export const ROW = 'flex min-h-(--tc-row-height) w-full items-center gap-2 rounded-control px-3 text-start text-sm outline-hidden'
-   export const ROW_HIGHLIGHT = 'data-highlighted:bg-primary-soft data-highlighted:text-primary-on-soft'
+   export const ROW = 'flex min-h-(--tc-row-height) w-full items-center gap-2 rounded-control px-3 text-start text-sm outline-none'
+   export const ROW_HIGHLIGHT = 'data-highlighted:bg-primary-soft data-highlighted:text-primary-on-soft forced-colors:data-highlighted:forced-color-adjust-none forced-colors:data-highlighted:bg-[Highlight] forced-colors:data-highlighted:text-[HighlightText]'
    export const LIST_CAP = 'max-h-[min(var(--available-height,100dvh),calc(var(--tc-list-rows)*var(--tc-row-height)))]'
    export const SCROLL_X = 'overflow-x-auto overscroll-x-contain'
    export const STICKY_TOP = 'sticky top-0 z-(--tc-z-sticky)'
    export const ICON_BUTTON = `inline-flex shrink-0 items-center justify-center rounded-control ${TOUCH_TARGET} ${FOCUS_RING} ${TRANSITION}`
-   export const FOCUS_RING_INSET = 'outline-hidden focus-visible:outline-solid focus-visible:outline-(length:--tc-ring-width) focus-visible:-outline-offset-(length:--tc-ring-width) focus-visible:outline-ring'
-   export const FOCUS_RING_WITHIN = 'outline-hidden has-focus-visible:outline-solid has-focus-visible:outline-(length:--tc-ring-width) has-focus-visible:outline-offset-(length:--tc-ring-offset) has-focus-visible:outline-ring'
+   export const FOCUS_RING_INSET = 'outline-none focus-visible:outline-solid focus-visible:outline-(length:--tc-ring-width) focus-visible:-outline-offset-(length:--tc-ring-width) focus-visible:outline-ring'
+   export const FOCUS_RING_WITHIN = 'outline-none has-focus-visible:outline-solid has-focus-visible:outline-(length:--tc-ring-width) has-focus-visible:outline-offset-(length:--tc-ring-offset) has-focus-visible:outline-ring'
    ```
 
+   Every reset here is `outline-none`, never `outline-hidden`: under forced colours
+   Tailwind's `outline-hidden` draws a 2 px ring on the element at rest, which the review
+   of Pagination measured on every link. `fix/shared-forced-colors` changes `FOCUS_RING`
+   on `main` the same way and must be merged first. Forced colours also erase a fill, so
+   a state told by its fill alone (a highlighted row, the active tab of the enclosed look,
+   the current link of the Sidebar) takes the system pair `Highlight` and
+   `HighlightText` with `forced-color-adjust: none`, as `ROW_HIGHLIGHT` does. Measure it in
+   the browser with `forcedColors: 'active'`.
    `LIST_CAP` counts rows only, not the padding of the popup or the gaps between rows, so
    the last row it shows is cut short. That is wanted: a cut row says there is more.
    `FOCUS_RING_INSET` is for a control that sits flush against an edge that clips, such as
@@ -627,7 +635,7 @@ requests 6 and 7. No label. Base UI `menu` (`baseUi: 'menu'`): `Root`, `Trigger`
   `bottom-start`, the shared `DEFAULT_PLACEMENT`.
   - Positioner: `z-(--tc-z-popup)`, `sideOffset` and `collisionPadding` from `POPUP_BOUNDS`.
   - Popup: `flex min-w-48 max-w-(--available-width) flex-col gap-0.5 p-1.5`,
-    `OVERLAY_SURFACE`, `POPUP_MOTION`, `LIST_CAP`, `SCROLL_AREA`, `outline-hidden`.
+    `OVERLAY_SURFACE`, `POPUP_MOTION`, `LIST_CAP`, `SCROLL_AREA`, `outline-none`.
 - **`DropdownItem`.** `Base.Item`: `ROW`, `ROW_HIGHLIGHT`, `DISABLED`, `cursor-default
   select-none`. `icon?: ReactNode` before the label, `shortcut?: string` after it
   (`ms-auto ps-4 font-mono text-xs text-muted`), and the label through
