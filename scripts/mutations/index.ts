@@ -1023,4 +1023,40 @@ export const MUTATIONS: Mutation[] = [
     from: '      <TooltipTrigger\n        render={\n          <Button variant="ghost" aria-label="Copy link">\n            <Svg icon={linkSimple} />\n          </Button>\n        }\n      />',
     to: '      <TooltipTrigger render={<Button variant="ghost" aria-label="Copy link" />}>\n        <Svg icon={linkSimple} />\n      </TooltipTrigger>',
   },
+  {
+    label: 'every Input type gets a character cap, though HTML allows maxlength on six text types only',
+    file: 'src/components/input/index.tsx',
+    from: 'maxLength={capped ? resolveMaxLength(maxLength, type) : undefined}',
+    to: 'maxLength={resolveMaxLength(maxLength, type)}',
+  },
+  {
+    label: 'every Input takes the text cap, so an email field accepts 512 characters instead of 254',
+    file: 'src/components/input/index.tsx',
+    from: 'resolveMaxLength(maxLength, type)',
+    to: 'resolveMaxLength(maxLength)',
+  },
+  {
+    label: 'an invalid Input turns its border red but never says so to a screen reader',
+    file: 'src/components/input/index.tsx',
+    from: 'aria-invalid={invalid ? true : ariaInvalid}',
+    to: 'aria-invalid={ariaInvalid}',
+  },
+  {
+    label: 'an invalid Input keeps the resting border, so nothing on the screen marks the error',
+    file: 'src/components/input/variants.ts',
+    from: "    'aria-invalid:border-danger-solid',\n",
+    to: '',
+  },
+  {
+    label: 'the Input type stops asking for a name, so an unlabelled one compiles',
+    file: 'src/components/input/types.ts',
+    from: "    id: string\n    'aria-label'?: string | undefined",
+    to: "    id?: string | undefined\n    'aria-label'?: string | undefined",
+  },
+  {
+    label: 'the Input skeleton loses its full width, so the field shifts the form when it loads',
+    file: 'src/components/input/skeleton.tsx',
+    from: "'block w-full animate-pulse",
+    to: "'block animate-pulse",
+  },
 ]
