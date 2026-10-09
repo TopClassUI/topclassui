@@ -41,6 +41,14 @@ describe('every demo renders on the server', () => {
     expect(out.match(/aria-current="step"/g)).toHaveLength(1)
   })
 
+  it('the basic demo passes a time element, so a date reaches a machine as well as a reader', async () => {
+    const Demo = await load('basic')
+    const out = markup(<Demo />)
+    expect([...out.matchAll(/<time dateTime="([^"]*)">([^<]*)<\/time>/g)].map((m) => [m[1], m[2]]))
+      .toEqual([['2026-10-02T09:12', '2 October, 09:12'], ['2026-10-04T16:40', '4 October, 16:40']])
+    expect(out).toContain('<div class="text-xs text-muted"><time dateTime="2026-10-02T09:12">')
+  })
+
   it('shows all six tones in the tones demo', async () => {
     const Demo = await load('tones')
     expect([...markup(<Demo />).matchAll(/data-tone="(\w+)"/g)].map((m) => m[1]))
@@ -50,5 +58,11 @@ describe('every demo renders on the server', () => {
   it('the rtl demo sets the direction on a wrapper and passes none to the timeline', async () => {
     const Demo = await load('rtl')
     expect(markup(<Demo />)).toMatch(/^<div dir="rtl" lang="ar"><ol class="flex flex-col" role="list">/)
+  })
+
+  it('the rtl demo says each status in Arabic, not in the English default', async () => {
+    const Demo = await load('rtl')
+    expect([...markup(<Demo />).matchAll(/<span class="sr-only">([^<]*)<\/span>/g)].map((m) => m[1]))
+      .toEqual(['مكتمل', 'مكتمل', 'الحالي', 'لم يبدأ'])
   })
 })

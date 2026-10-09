@@ -14,16 +14,16 @@ const EVENTS: Event[] = [
 ]
 
 describe('in a real tree', () => {
-  it('is a list of three items, each read as its title and its time', () => {
+  it('is a list of three items, each read as its status, its title and its time', () => {
     render(<Timeline items={EVENTS} getKey={key} aria-label="Activity" />)
     const items = within(screen.getByRole('list', { name: 'Activity' })).getAllByRole('listitem')
-    expect(items.map((item) => item.textContent)).toEqual(['CreatedMonday', 'In reviewToday', 'Launch'])
+    expect(items.map((item) => item.textContent)).toEqual(['DoneCreatedMonday', 'CurrentIn reviewToday', 'Not startedLaunch'])
   })
 
   it('exposes the current step, and only that one', () => {
     render(<Timeline items={EVENTS} getKey={key} />)
     const current = screen.getAllByRole('listitem').filter((item) => item.hasAttribute('aria-current'))
-    expect(current.map((item) => [item.textContent, item.getAttribute('aria-current')])).toEqual([['In reviewToday', 'step']])
+    expect(current.map((item) => [item.textContent, item.getAttribute('aria-current')])).toEqual([['CurrentIn reviewToday', 'step']])
   })
 
   it('carries the list role as an attribute, not only as the implicit role of an ol', () => {
@@ -47,7 +47,7 @@ describe('in a real tree', () => {
     const before = screen.getAllByRole('listitem')
     rerender(<Timeline items={[...EVENTS].reverse()} getKey={key} />)
     const after = screen.getAllByRole('listitem')
-    expect(after.map((item) => item.textContent)).toEqual(['Launch', 'In reviewToday', 'CreatedMonday'])
+    expect(after.map((item) => item.textContent)).toEqual(['Not startedLaunch', 'CurrentIn reviewToday', 'DoneCreatedMonday'])
     expect(after[2]).toBe(before[0])
     expect(after[0]).toBe(before[2])
   })

@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
-import { TIMELINE_DOT, TIMELINE_ICON } from '../classes.js'
+import type { Labels } from '#shared/labels/types.js'
+import { TIMELINE_DOT, TIMELINE_DOT_CURRENT, TIMELINE_ICON } from '../classes.js'
 import { TIMELINE_DEFAULTS, TIMELINE_STATUSES, TIMELINE_STATUS_TONES, TIMELINE_TONES } from '../constants.js'
 import type { TimelineItem, TimelineProps, TimelineStatus, TimelineTone } from '../types.js'
 
@@ -30,8 +31,9 @@ describe('the unions come from the constants', () => {
     expectTypeOf<Accepts<TimelineTone, 'brand'>>().toEqualTypeOf<false>()
   })
 
-  it('has a class for every tone in both marker tables, so a seventh cannot ship unpainted', () => {
+  it('has a class for every tone in all three marker tables, so a seventh cannot ship unpainted', () => {
     expect(Object.keys(TIMELINE_DOT)).toEqual(['primary', 'neutral', 'success', 'warning', 'danger', 'info'])
+    expect(Object.keys(TIMELINE_DOT_CURRENT)).toEqual(['primary', 'neutral', 'success', 'warning', 'danger', 'info'])
     expect(Object.keys(TIMELINE_ICON)).toEqual(['primary', 'neutral', 'success', 'warning', 'danger', 'info'])
   })
 
@@ -74,6 +76,10 @@ describe('the props follow the vocabulary', () => {
 
   it('takes the empty fallback as a node', () => {
     expectTypeOf<TimelineProps['emptyFallback']>().toEqualTypeOf<ReactNode>()
+  })
+
+  it('takes the labels as a prop, because a Server Component has no context to read them from', () => {
+    expectTypeOf<TimelineProps['labels']>().toEqualTypeOf<Labels | undefined>()
   })
 
   it('accepts className, style and ref, and ref is a normal prop', () => {

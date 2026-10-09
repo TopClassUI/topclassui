@@ -1,6 +1,7 @@
 import type { ComponentPropsWithRef, ReactNode } from 'react'
 
 import type { Tone } from '#shared/contracts/tone.js'
+import type { Labels } from '#shared/labels/types.js'
 import type { TIMELINE_STATUSES } from './constants.js'
 
 export type TimelineStatus = (typeof TIMELINE_STATUSES)[number]
@@ -10,7 +11,7 @@ export type TimelineTone = Tone
 
 /** One event. An item may carry more fields, such as the id that `getKey` reads. */
 export interface TimelineItem {
-  /** What happened, in medium weight on the first line. */
+  /** What happened, in medium weight on the first line. Any node, block content included. */
   title: ReactNode
   /** When it happened, muted under the title. Pass a `<time>` for a machine-readable date. */
   time?: ReactNode | undefined
@@ -18,7 +19,8 @@ export interface TimelineItem {
   tone?: TimelineTone | undefined
   /** Stands in for the dot. An element, not a name: `<Svg icon={plus} />`. */
   icon?: ReactNode | undefined
-  /** `current` is announced as the current step, and `todo` draws a hollow marker. */
+  /** Drawn as the shape of the marker and read out as hidden text from `labels.timeline`.
+   * `current` is also announced as the current step. */
   status?: TimelineStatus | undefined
 }
 
@@ -32,4 +34,6 @@ export interface TimelineProps<T extends TimelineItem = TimelineItem>
   getKey: (item: T) => string
   /** Rendered in place of the list while `items` is empty. Without it, nothing renders. */
   emptyFallback?: ReactNode | undefined
+  /** The built-in strings, which name each status. Defaults to English; pass `getLabels(locale).labels` for another. */
+  labels?: Labels | undefined
 }

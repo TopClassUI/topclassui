@@ -65,15 +65,19 @@ describe('the element it renders', () => {
 })
 
 describe('each item', () => {
-  it('shows the title in a paragraph and the time under it', () => {
+  it('shows the title on its own line and the time under it', () => {
     const [first = ''] = rows(html())
-    expect(first).toContain('<p class="text-sm font-medium text-body">Created</p><p class="text-xs text-muted">Monday</p>')
+    expect(first).toContain('<div class="min-h-5 text-sm font-medium text-body">Created</div><div class="text-xs text-muted">Monday</div>')
+  })
+
+  it('wraps neither in a paragraph, which may not hold the block content a node can be', () => {
+    expect(html()).not.toContain('<p')
   })
 
   it('renders no time element for an item without one', () => {
     const [, , third = ''] = rows(html())
-    expect(third).toContain('Launch</p></div></li>')
-    expect(third.match(/<p /g)).toHaveLength(1)
+    expect(third).toContain('Launch</div></div></li>')
+    expect(third).not.toContain('text-xs text-muted')
   })
 
   it('reports its status, and nothing for an item that has none', () => {

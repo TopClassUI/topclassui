@@ -10,6 +10,7 @@ media and display · tier 3 · beta · renders on the server and ships no client
 
 For dated events in the order they happened: an activity log, an order's steps, a release history.
 Each item is `{ title, time?, tone?, icon?, status? }`, and `status` is `done`, `current` or `todo`.
+`getKey` returns a string, so pass a numeric id as `getKey={(row) => String(row.id)}`.
 
 <!-- /hand-written -->
 
@@ -28,6 +29,7 @@ Required: `getKey`, `items`. Every other prop below is optional.
 | `getKey` | **yes** | `(item: T) => string` | - | A stable identity for each item, which becomes its React key. |
 | `items` | **yes** | `readonly T[]` | - | The events, first to last. The connector runs from each marker to the next. |
 | `emptyFallback` | no | `ReactNode` | - | Rendered in place of the list while `items` is empty. Without it, nothing renders. |
+| `labels` | no | `Labels` | - | The built-in strings, which name each status. Defaults to English; pass `getLabels(locale).labels` for another. |
 
 Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 

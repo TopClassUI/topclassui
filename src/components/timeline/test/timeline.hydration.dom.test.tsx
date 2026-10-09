@@ -52,6 +52,14 @@ describe('a server-rendered Timeline hydrates cleanly', () => {
     expect(await hydrate(<Timeline items={items} getKey={key} />)).toEqual([])
   })
 
+  it('reports nothing for block content in a title or a time, which a paragraph may not hold', async () => {
+    const items: Event[] = [
+      { id: 'a', title: <><p>One</p><p>Two</p></>, time: <div>Monday</div> },
+      { id: 'b', title: <ul><li>Item</li></ul>, status: 'current' },
+    ]
+    expect(await hydrate(<Timeline items={items} getKey={key} />)).toEqual([])
+  })
+
   it('reports nothing for no items, with and without a fallback', async () => {
     expect(await hydrate(<Timeline items={[]} getKey={key} />)).toEqual([])
     expect(await hydrate(<Timeline items={[]} getKey={key} emptyFallback={<p>None</p>} />)).toEqual([])

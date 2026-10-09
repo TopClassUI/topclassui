@@ -35,8 +35,26 @@ describe('each part wears exactly the classes the spec names', () => {
     expect(nth(html(TWO), MARKER)).toEqual(['flex', 'items-center', 'min-h-5', 'shrink-0'])
   })
 
-  it('the dot is a 12 px circle filled with the solid of its tone', () => {
-    expect(nth(html(TWO), DOT)).toEqual(['bg-primary-solid', 'block', 'forced-color-adjust-none', 'rounded-full', 'size-3'])
+  it('the dot is a 12 px circle filled with the solid of its tone, inside the strong stroke', () => {
+    expect(nth(html(TWO), DOT)).toEqual([
+      'bg-primary-solid', 'block', 'border-(length:--tc-line-width)', 'border-line-strong', 'forced-color-adjust-none',
+      'forced-colors:bg-[CanvasText]', 'forced-colors:border-[CanvasText]', 'rounded-full', 'size-3',
+    ])
+  })
+
+  it('the current dot is the same circle with its fill clipped 2 px inside the stroke', () => {
+    expect(nth(html([{ id: 'a', title: 'Now', status: 'current' }]), DOT)).toEqual([
+      'bg-clip-content', 'bg-primary-solid', 'block', 'border-(length:--tc-line-width)', 'border-line-strong',
+      'forced-color-adjust-none', 'forced-colors:bg-[CanvasText]', 'forced-colors:border-[CanvasText]', 'p-0.5',
+      'rounded-full', 'size-3',
+    ])
+  })
+
+  it('a done dot is filled to the stroke, so it is not the shape of the current one', () => {
+    const list = nth(html([{ id: 'a', title: 'Created', status: 'done' }]), DOT)
+    expect(list).toContain('bg-success-solid')
+    expect(list).not.toContain('bg-clip-content')
+    expect(list).not.toContain('p-0.5')
   })
 
   it('the connector is the 2 px line that fills the rest of the rail', () => {
@@ -49,8 +67,8 @@ describe('each part wears exactly the classes the spec names', () => {
     expect(nth(html(TWO), BODY)).toEqual(['flex', 'flex-1', 'flex-col', 'gap-0.5', 'min-w-0', 'pb-4', 'wrap-anywhere'])
   })
 
-  it('the title is the small step in medium, the time the extra-small step in the muted colour', () => {
-    expect(nth(html(TWO), TITLE)).toEqual(['font-medium', 'text-body', 'text-sm'])
+  it('the title is the small step in medium and one line tall even when empty, the time the muted extra-small step', () => {
+    expect(nth(html(TWO), TITLE)).toEqual(['font-medium', 'min-h-5', 'text-body', 'text-sm'])
     expect(nth(html(TWO), TIME)).toEqual(['text-muted', 'text-xs'])
   })
 })
@@ -77,6 +95,13 @@ describe('every tone paints its own marker and no other', () => {
     it(`${tone} fills the dot with its own solid`, () => {
       const list = nth(html([{ id: 'a', title: 'x', tone: tone as TimelineItem['tone'] }]), DOT)
       expect(list.filter((c) => c.startsWith('bg-'))).toEqual([fill])
+      expect(list).toContain('border-line-strong')
+    })
+
+    it(`${tone} keeps its own solid and the stroke as the current step`, () => {
+      const list = nth(html([{ id: 'a', title: 'x', status: 'current', tone: tone as TimelineItem['tone'] }]), DOT)
+      expect(list.filter((c) => c.startsWith('bg-'))).toEqual(['bg-clip-content', fill])
+      expect(list).toContain('border-line-strong')
     })
   }
 
@@ -112,6 +137,15 @@ describe('forced colours', () => {
   it('keeps the fill of a toned dot, and leaves the hollow one to its border', () => {
     expect(nth(html(TWO), DOT)).toContain('forced-color-adjust-none')
     expect(nth(html([{ id: 'a', title: 'Later', status: 'todo' }]), DOT)).not.toContain('forced-color-adjust-none')
+  })
+
+  it('paints a filled dot in the system text colour, because a kept theme fill can match a forced canvas', () => {
+    for (const status of [undefined, 'done', 'current'] as const) {
+      const list = nth(html([{ id: 'a', title: 'x', tone: 'neutral', status }]), DOT)
+      expect(list, String(status)).toContain('forced-colors:bg-[CanvasText]')
+      expect(list, String(status)).toContain('forced-colors:border-[CanvasText]')
+    }
+    expect(html([{ id: 'a', title: 'Later', status: 'todo' }])).not.toContain('CanvasText')
   })
 })
 

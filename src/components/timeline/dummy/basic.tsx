@@ -1,13 +1,14 @@
 import { Timeline } from '../index.js'
 
 const EVENTS = [
-  { id: 'created', title: 'Project created', time: '2 October, 09:12', status: 'done' },
-  { id: 'deployed', title: 'First deploy', time: '4 October, 16:40', status: 'done' },
+  { id: 'created', title: 'Project created', time: <time dateTime="2026-10-02T09:12">2 October, 09:12</time>, status: 'done' },
+  { id: 'deployed', title: 'First deploy', time: <time dateTime="2026-10-04T16:40">4 October, 16:40</time>, status: 'done' },
   { id: 'review', title: 'In review', time: 'Today', status: 'current' },
   { id: 'launch', title: 'Launch', time: 'Not scheduled', status: 'todo' },
 ] as const
 
-/** The drawn rail: done in success, the current step in primary, and a hollow todo. */
+/** The drawn rail: done filled in success, the current step a dot in a ring, and a hollow todo.
+ * A `<time>` gives a date a machine can read; each status is also said in hidden text. */
 export default function Demo() {
   return <Timeline items={EVENTS} getKey={(event) => event.id} />
 }
