@@ -72,6 +72,7 @@ export const ar = {
     last: 'الصفحة الأخيرة',
     page: (n, fmt) => `صفحة ${fmt.format(n)}`,
     ofPages: (n, fmt) => `من ${fmt.format(n)}`,
+    pageOf: (page, count, fmt) => `صفحة ${fmt.format(page)} من ${fmt.format(count)}`,
   },
   select: {
     placeholder: 'اختر',
@@ -92,5 +93,32 @@ export const ar = {
       many: (n) => `يُسمح بـ ${n} ملفًا فقط`,
       other: (n) => `يُسمح بـ ${n} ملف فقط`,
     }),
+  },
+  breadcrumb: {
+    label: 'مسار التنقل',
+    home: 'الرئيسية',
+  },
+  avatar: {
+    more: byCount({
+      zero: 'لا أحد آخر',
+      one: 'واحد آخر',
+      two: 'اثنان آخران',
+      few: (n) => `${n} آخرون`,
+      many: (n) => `${n} آخرون`,
+      other: (n) => `${n} آخرون`,
+    }),
+  },
+  rating: {
+    value: (value, max, fmt) => `${fmt.format(value)} من ${fmt.format(max)}`,
+  },
+  table: {
+    sortBy: 'ترتيب حسب',
+    sortedAscending: 'مرتب تصاعديًا',
+    sortedDescending: 'مرتب تنازليًا',
+  },
+  timeline: {
+    done: 'مكتمل',
+    current: 'الحالي',
+    todo: 'لم يبدأ',
   },
 } satisfies Labels
