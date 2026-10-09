@@ -93,4 +93,26 @@ export const ar = {
       other: (n) => `يُسمح بـ ${n} ملف فقط`,
     }),
   },
+  breadcrumb: {
+    label: 'مسار التنقل',
+    home: 'الرئيسية',
+  },
+  avatar: {
+    more: byCount({
+      zero: 'لا أحد آخر',
+      one: 'واحد آخر',
+      two: 'اثنان آخران',
+      few: (n) => `${n} آخرون`,
+      many: (n) => `${n} آخرون`,
+      other: (n) => `${n} آخرون`,
+    }),
+  },
+  rating: {
+    value: (value, max, fmt) => `${fmt.format(value)} من ${fmt.format(max)}`,
+  },
+  table: {
+    sortBy: 'ترتيب حسب',
+    sortedAscending: 'مرتب تصاعديًا',
+    sortedDescending: 'مرتب تنازليًا',
+  },
 } satisfies Labels

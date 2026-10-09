@@ -39,6 +39,17 @@ describe('the two bundled languages', () => {
       }
     }
   })
+
+  it('the breadcrumb and table strings are these, in both', () => {
+    expect(en.breadcrumb).toEqual({ label: 'Breadcrumb', home: 'Home' })
+    expect(en.table.sortBy).toBe('Sort by')
+    expect(en.table.sortedAscending).toBe('sorted ascending')
+    expect(en.table.sortedDescending).toBe('sorted descending')
+    expect(ar.breadcrumb).toEqual({ label: 'مسار التنقل', home: 'الرئيسية' })
+    expect(ar.table.sortBy).toBe('ترتيب حسب')
+    expect(ar.table.sortedAscending).toBe('مرتب تصاعديًا')
+    expect(ar.table.sortedDescending).toBe('مرتب تنازليًا')
+  })
 })
 
 describe('Arabic plural forms', () => {
@@ -68,6 +79,26 @@ describe('Arabic plural forms', () => {
 
   it('formats a large count with separators', () => {
     expect(en.collection.results(12_345, latn)).toBe('12,345 results')
+  })
+
+  it('English counts the hidden avatars with one template, because "more" has no plural', () => {
+    expect(en.avatar.more(1, latn)).toBe('1 more')
+    expect(en.avatar.more(9, latn)).toBe('9 more')
+  })
+
+  it('Arabic names 0, 1 and 2 hidden avatars in words and prints the number from 3 up', () => {
+    expect(ar.avatar.more(0, arab)).toBe('لا أحد آخر')
+    expect(ar.avatar.more(1, arab)).toBe('واحد آخر')
+    expect(ar.avatar.more(2, arab)).toBe('اثنان آخران')
+    expect(ar.avatar.more(3, arab)).toBe('٣ آخرون')
+    expect(ar.avatar.more(11, arab)).toBe('١١ آخرون')
+    expect(ar.avatar.more(100, latn)).toBe('100 آخرون')
+  })
+
+  it('a rating reads its value before its maximum, half steps included', () => {
+    expect(en.rating.value(4, 5, latn)).toBe('4 out of 5')
+    expect(en.rating.value(3.5, 5, latn)).toBe('3.5 out of 5')
+    expect(ar.rating.value(4, 5, arab)).toBe('٤ من ٥')
   })
 })
 
@@ -105,6 +136,19 @@ describe('getLabels', () => {
   it('accepts a count function as an override', () => {
     const { labels } = getLabels('en', { collection: { results: (n, f) => `${f.format(n)} hits` } })
     expect(labels.collection.results(3, latn)).toBe('3 hits')
+  })
+
+  it('overrides one key in each newer group and keeps its neighbours', () => {
+    const { labels } = getLabels('en', {
+      breadcrumb: { home: 'Start' },
+      avatar: { more: (n, f) => `+${f.format(n)}` },
+      rating: { value: (value, max, f) => `${f.format(value)}/${f.format(max)}` },
+      table: { sortBy: 'Order by' },
+    })
+    expect(labels.breadcrumb).toEqual({ label: 'Breadcrumb', home: 'Start' })
+    expect(labels.avatar.more(9, latn)).toBe('+9')
+    expect(labels.rating.value(4, 5, latn)).toBe('4/5')
+    expect(labels.table.sortBy).toBe('Order by')
   })
 })
 
