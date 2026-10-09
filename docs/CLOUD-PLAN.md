@@ -478,8 +478,6 @@ they will happen again.
   ## For the reviewer
   Where you are least confident. Be specific - this is the most useful section in the
   file.
-
-  🤖 Generated with [Claude Code](https://claude.com/claude-code)
   ```
 
 - **Never merge, never force-push a shared branch, never push to `main`.**
@@ -574,6 +572,11 @@ and size contracts, and the generated `README.md`. A component that needs none o
 is probably wrong.
 
 ### Unit 2 - the rest of the server set
+
+**What each one is** - parts, props, defaults, classes and what is left out - is its Build
+this block in `docs/figma/unit-2.md`, which also lists the four shared pull requests that
+land first and what Unit 1 taught. Where that file and the paragraph below differ, the file
+wins.
 
 `Input`, `Table`, `Breadcrumb`, `Pagination`, `Timeline`, `Tag`, `Avatar`,
 `AvatarGroup`, `Banner`, `Rating`.
