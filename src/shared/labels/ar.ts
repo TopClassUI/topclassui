@@ -72,6 +72,7 @@ export const ar = {
     last: 'الصفحة الأخيرة',
     page: (n, fmt) => `صفحة ${fmt.format(n)}`,
     ofPages: (n, fmt) => `من ${fmt.format(n)}`,
+    pageOf: (page, count, fmt) => `صفحة ${fmt.format(page)} من ${fmt.format(count)}`,
   },
   select: {
     placeholder: 'اختر',

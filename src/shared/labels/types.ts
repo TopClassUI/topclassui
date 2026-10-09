@@ -40,6 +40,8 @@ export interface Labels {
     readonly last: string
     readonly page: CountLabel
     readonly ofPages: CountLabel
+    /** The current page and the count in one label, so a language orders the two its own way. */
+    readonly pageOf: RatioLabel
   }
   readonly select: {
     readonly placeholder: string
