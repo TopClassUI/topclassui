@@ -11,7 +11,9 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['custom-size', 'first-page', 'last-page', 'many-pages', 'middle', 'rtl', 'sizes']
+const EXPECTED = [
+  'custom-size', 'first-page', 'last-page', 'many-pages', 'middle', 'rtl', 'sizes', 'two-navs', 'wide-numbers',
+]
 
 const load = async (file: string) => {
   const loaded = await import(`../dummy/${file}.tsx`) as { default?: ComponentType }
@@ -85,10 +87,26 @@ describe('each demo shows the state its name promises', () => {
     expect(html.match(/<li/g)).toHaveLength(15)
   })
 
+  it('two-navs: the pager above and the one below each carry a name of their own', async () => {
+    const html = await render('two-navs')
+    expect([...html.matchAll(/<nav aria-label="([^"]*)"/g)].map((m) => m[1]))
+      .toEqual(['Orders pages, top', 'Orders pages, bottom'])
+  })
+
+  it('wide-numbers: page 12,345 of 123,456 at the three smallest sizes, which e2e measures', async () => {
+    const html = await render('wide-numbers')
+    expect([...html.matchAll(/<nav aria-label="[^"]*" data-size="([^"]*)"/g)].map((m) => m[1])).toEqual(['xs', 'sm', 'md'])
+    expect(pages(html)).toEqual([
+      '1', '12,344', '12,345', '12,346', '123,456',
+      '1', '12,344', '12,345', '12,346', '123,456',
+      '1', '12,344', '12,345', '12,346', '123,456',
+    ])
+  })
+
   it('custom-size: the second nav opts out of the scale and still names itself', async () => {
     const html = await render('custom-size')
     expect([...html.matchAll(/<nav ([^>]*)>/g)].map((m) => m[1])).toEqual([
-      'aria-label="The scale" data-size="sm"',
+      'aria-label="The scale" data-size="md"',
       'class="text-xs" aria-label="Your own cells" data-size="custom"',
     ])
   })

@@ -43,8 +43,8 @@ describe('the schema is the documentation', () => {
   it('carries the three defaults', () => {
     expect(json.properties?.['siblingCount']?.default).toBe(1)
     expect(json.properties?.['boundaryCount']?.default).toBe(1)
-    expect(json.properties?.['size']?.default).toBe('sm')
-    expect(paginationSchema.parse(page)).toEqual({ value: 3, pageCount: 12, siblingCount: 1, boundaryCount: 1, size: 'sm' })
+    expect(json.properties?.['size']?.default).toBe('md')
+    expect(paginationSchema.parse(page)).toEqual({ value: 3, pageCount: 12, siblingCount: 1, boundaryCount: 1, size: 'md' })
   })
 
   // PLAN 20: a value test passes a hand-written copy with the same value, so read the source.

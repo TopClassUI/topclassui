@@ -1,6 +1,6 @@
 import { cva } from 'class-variance-authority'
 
-import { DISABLED, FOCUS_RING, TOUCH_TARGET } from '#shared/classes.js'
+import { DISABLED, FOCUS_RING, TOUCH_TARGET, TRANSITION } from '#shared/classes.js'
 import { memoizeVariants } from '#shared/variants.js'
 import { CELL, CELL_CURRENT, CELL_OTHER, CELL_SIZE } from './classes.js'
 import { PAGINATION_DEFAULTS, PAGINATION_SIZES } from './constants.js'
@@ -9,7 +9,7 @@ import { PAGINATION_DEFAULTS, PAGINATION_SIZES } from './constants.js'
 const defaults = { size: PAGINATION_DEFAULTS.size, current: false } as const
 
 const resolve = cva(
-  [CELL, DISABLED, FOCUS_RING, TOUCH_TARGET],
+  [CELL, DISABLED, FOCUS_RING, TOUCH_TARGET, TRANSITION],
   {
     variants: {
       size: CELL_SIZE,

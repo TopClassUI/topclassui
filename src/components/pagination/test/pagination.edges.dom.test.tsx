@@ -12,14 +12,17 @@ const expectEdge = (name: string) => {
   expect(control.getAttribute('aria-disabled'), name).toBe('true')
   expect(control.getAttribute('data-disabled'), name).toBe('')
   expect(control.hasAttribute('href'), name).toBe(false)
+  expect(control.hasAttribute('rel'), name).toBe(false)
   expect(control.hasAttribute('tabindex'), name).toBe(false)
 }
 
-/** A control with a page to go to: an anchor to that page, with no disabled state. */
-const expectLink = (name: string, href: string) => {
+/** A control with a page to go to: an anchor to that page, with no disabled state.
+ * rel is written out per call: only Previous and Next name their place in the series. */
+const expectLink = (name: string, href: string, rel: 'prev' | 'next' | null) => {
   const control = screen.getByRole('link', { name })
   expect(control.tagName, name).toBe('A')
   expect(control.getAttribute('href'), name).toBe(href)
+  expect(control.getAttribute('rel'), name).toBe(rel)
   expect(control.hasAttribute('aria-disabled'), name).toBe(false)
   expect(control.hasAttribute('data-disabled'), name).toBe(false)
 }
@@ -33,23 +36,29 @@ describe('on the first page', () => {
 
   it('next goes to page 2 and last to page 12', () => {
     render(<Pagination value={1} pageCount={12} getHref={blog} />)
-    expectLink('Next', '/blog?page=2')
-    expectLink('Last page', '/blog?page=12')
+    expectLink('Next', '/blog?page=2', 'next')
+    expectLink('Last page', '/blog?page=12', null)
   })
 })
 
 describe('in the middle', () => {
   it('all four controls are links, one page either side and both ends', () => {
     render(<Pagination value={6} pageCount={12} getHref={blog} />)
-    expectLink('First page', '/blog?page=1')
-    expectLink('Previous', '/blog?page=5')
-    expectLink('Next', '/blog?page=7')
-    expectLink('Last page', '/blog?page=12')
+    expectLink('First page', '/blog?page=1', null)
+    expectLink('Previous', '/blog?page=5', 'prev')
+    expectLink('Next', '/blog?page=7', 'next')
+    expectLink('Last page', '/blog?page=12', null)
   })
 
   it('has no disabled control at all', () => {
     const { container } = render(<Pagination value={6} pageCount={12} getHref={blog} />)
     expect(container.querySelectorAll('[aria-disabled], [data-disabled]')).toHaveLength(0)
+  })
+
+  it('says rel on previous and next only: a page number is not a place in the series', () => {
+    const { container } = render(<Pagination value={6} pageCount={12} getHref={blog} />)
+    expect([...container.querySelectorAll('a[rel]')].map((a) => [a.getAttribute('aria-label'), a.getAttribute('rel')]))
+      .toEqual([['Previous', 'prev'], ['Next', 'next']])
   })
 })
 
@@ -62,8 +71,8 @@ describe('on the last page', () => {
 
   it('previous goes to page 11 and first to page 1', () => {
     render(<Pagination value={12} pageCount={12} getHref={blog} />)
-    expectLink('Previous', '/blog?page=11')
-    expectLink('First page', '/blog?page=1')
+    expectLink('Previous', '/blog?page=11', 'prev')
+    expectLink('First page', '/blog?page=1', null)
   })
 })
 
@@ -81,7 +90,7 @@ describe('a value outside 1 to pageCount is clamped before any link is built (R-
     for (const value of [0, -3, Number.NaN]) {
       const { unmount } = render(<Pagination value={value} pageCount={12} getHref={blog} />)
       expectEdge('Previous')
-      expectLink('Next', '/blog?page=2')
+      expectLink('Next', '/blog?page=2', 'next')
       expect(screen.getByRole('link', { name: 'Page 1 of 12' }).getAttribute('aria-current')).toBe('page')
       unmount()
     }
@@ -90,7 +99,7 @@ describe('a value outside 1 to pageCount is clamped before any link is built (R-
   it('reads 99 as page 12, so next cannot point at page 100', () => {
     render(<Pagination value={99} pageCount={12} getHref={blog} />)
     expectEdge('Next')
-    expectLink('Previous', '/blog?page=11')
+    expectLink('Previous', '/blog?page=11', 'prev')
     expect(screen.getByRole('link', { name: 'Page 12 of 12' }).getAttribute('aria-current')).toBe('page')
   })
 

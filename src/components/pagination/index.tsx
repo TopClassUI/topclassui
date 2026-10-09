@@ -1,4 +1,6 @@
 // No 'use client': a client bundle gets it only when a client file imports it.
+import { cloneElement, type ReactElement } from 'react'
+
 import { caretDoubleLeft } from '#icons/data/caret-double-left.js'
 import { caretDoubleRight } from '#icons/data/caret-double-right.js'
 import { caretLeft } from '#icons/data/caret-left.js'
@@ -7,11 +9,12 @@ import type { IconData } from '#icons/types.js'
 import { cn } from '#shared/cn.js'
 import { en } from '#shared/labels/en.js'
 import { createNumberFormat } from '#shared/labels/get-labels.js'
+import { renderElement } from '#shared/render.js'
 import { Svg } from '#components/svg/index.js'
 import { CELL_GAP, CELL_SIZE, LIST } from './classes.js'
 import { PAGINATION_DEFAULTS } from './constants.js'
 import { clampPage, clampPageCount, listPages } from './lib.js'
-import type { PaginationProps } from './types.js'
+import type { PaginationLinkParts, PaginationProps } from './types.js'
 import { paginationVariants } from './variants.js'
 
 /** Links to the pages around the current one. Every cell is a real anchor, so it works
@@ -20,6 +23,7 @@ export function Pagination({
   value,
   pageCount,
   getHref,
+  link,
   siblingCount = PAGINATION_DEFAULTS.siblingCount,
   boundaryCount = PAGINATION_DEFAULTS.boundaryCount,
   size = PAGINATION_DEFAULTS.size,
@@ -37,9 +41,16 @@ export function Pagination({
   // An empty aria-label names nothing; a caller with two navs on a page names each.
   const name = ariaLabel === undefined || ariaLabel === '' ? text.label : ariaLabel
 
+  /** An `<a>`, or the caller's element so a framework link navigates on the client. The
+   * href is cloned in before the merge: renderElement lets the element's own props win. */
+  const anchor = (target: number, parts: PaginationLinkParts) => renderElement(
+    cloneElement((link ?? <a />) as ReactElement<{ href?: string }>, { href: getHref(target) }),
+    { ...parts },
+  )
+
   /** At an edge there is no page to go to, so it is a span and not a link to nowhere.
    * role="link" is what lets aria-disabled reach a screen reader, as Button's dead link does. */
-  const control = (target: number, label: string, icon: IconData, atEdge: boolean) => (
+  const control = (target: number, label: string, icon: IconData, atEdge: boolean, rel?: 'prev' | 'next') => (
     <li>
       {atEdge
         ? (
@@ -47,11 +58,7 @@ export function Pagination({
             <Svg icon={icon} />
           </span>
         )
-        : (
-          <a href={getHref(target)} aria-label={label} className={cell}>
-            <Svg icon={icon} />
-          </a>
-        )}
+        : anchor(target, { 'aria-label': label, rel, className: cell, children: <Svg icon={icon} /> })}
     </li>
   )
 
@@ -64,28 +71,25 @@ export function Pagination({
         className={LIST}
       >
         {control(1, text.first, caretDoubleLeft, page === 1)}
-        {control(page - 1, text.previous, caretLeft, page === 1)}
+        {control(page - 1, text.previous, caretLeft, page === 1, 'prev')}
         {listPages({ value: page, pageCount: count, siblingCount, boundaryCount }).map((item) => {
           if (typeof item !== 'number') {
             return <li key={item} aria-hidden="true" className={cn(CELL_GAP, CELL_SIZE[size])}>...</li>
           }
           const current = item === page
-          const pageName = text.page(item, numbers)
           return (
             <li key={item}>
-              <a
-                href={getHref(item)}
-                // The total is said once, on the page the reader is on: "Page 3 of 12".
-                aria-label={current ? `${pageName} ${text.ofPages(count, numbers)}` : pageName}
-                aria-current={current ? 'page' : undefined}
-                className={paginationVariants({ size, current })}
-              >
-                {numbers.format(item)}
-              </a>
+              {anchor(item, {
+                // The count is said once, on the page the reader is on: "Page 3 of 12".
+                'aria-label': current ? text.pageOf(item, count, numbers) : text.page(item, numbers),
+                'aria-current': current ? 'page' : undefined,
+                className: paginationVariants({ size, current }),
+                children: numbers.format(item),
+              })}
             </li>
           )
         })}
-        {control(page + 1, text.next, caretRight, page === count)}
+        {control(page + 1, text.next, caretRight, page === count, 'next')}
         {control(count, text.last, caretDoubleRight, page === count)}
       </ul>
     </nav>

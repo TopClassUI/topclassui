@@ -24,9 +24,9 @@ describe('paginationVariants is a cache, so it has to behave like a pure functio
     expect(seen.size).toBe(12)
   })
 
-  it('is the sm cell of a page that is not current when nothing is passed', () => {
-    expect(paginationVariants()).toBe(paginationVariants({ size: 'sm', current: false }))
-    expect(paginationVariants().split(' ')).toContain('size-control-sm')
+  it('is the md cell of a page that is not current when nothing is passed', () => {
+    expect(paginationVariants()).toBe(paginationVariants({ size: 'md', current: false }))
+    expect(paginationVariants().split(' ')).toContain('h-control-md')
     expect(paginationVariants().split(' ')).toContain('border-line-strong')
     expect(paginationVariants().split(' ')).not.toContain('bg-primary-solid')
   })

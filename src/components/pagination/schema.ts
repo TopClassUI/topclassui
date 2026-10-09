@@ -12,7 +12,7 @@ export const paginationSchema = z.object({
     .meta({ description: 'The current page, counted from 1; anything outside 1 to pageCount is clamped.' }),
   pageCount: z.number().int()
     .min(PAGINATION_BOUNDARIES.pageMin).max(PAGINATION_BOUNDARIES.pageCountMax)
-    .meta({ description: 'How many pages there are; anything below 1 is one page.' }),
+    .meta({ description: 'How many pages there are; a fraction is rounded up and anything below 1 is one page.' }),
   siblingCount: z.number().int()
     .min(PAGINATION_BOUNDARIES.siblingCountMin).max(PAGINATION_BOUNDARIES.siblingCountMax)
     .default(PAGINATION_DEFAULTS.siblingCount)
@@ -22,7 +22,7 @@ export const paginationSchema = z.object({
     .default(PAGINATION_DEFAULTS.boundaryCount)
     .meta({ description: 'How many pages always show at each end of the list; clamped to 0-3.' }),
   size: sizeSchema.default(PAGINATION_DEFAULTS.size)
-    .meta({ description: 'The control scale each square cell takes; custom emits no size classes.' }),
+    .meta({ description: 'The control scale each cell takes its height from; custom emits no size classes.' }),
 })
 
 export type PaginationSchemaInput = z.input<typeof paginationSchema>

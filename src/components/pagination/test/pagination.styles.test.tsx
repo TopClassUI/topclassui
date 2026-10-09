@@ -25,13 +25,11 @@ const CURRENT = /<a [^>]*aria-current[^>]*>/g
 /** Page 1 of 12 renders all of them: two edge spans, eight links, one of them current, one gap. */
 const cells = (props: Partial<PaginationProps> = {}) => [...classesOf(html(props), LINK), ...classesOf(html(props), EDGE)]
 
+const missing = (wanted: readonly string[], list: readonly string[]) => wanted.filter((cls) => !list.includes(cls))
+
 /** Written out, so losing one axis of the floor or one part of the ring is a failure. */
-const TOUCH = [
-  'min-h-[var(--tc-target-min,24px)]',
-  'min-w-[var(--tc-target-min,24px)]',
-  'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]',
-  'pointer-coarse:min-w-[var(--tc-target-coarse,44px)]',
-]
+const FLOOR_HEIGHT = ['min-h-[var(--tc-target-min,24px)]', 'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]']
+const FLOOR_WIDTH = ['min-w-[var(--tc-target-min,24px)]', 'pointer-coarse:min-w-[var(--tc-target-coarse,44px)]']
 const RING = [
   'outline-hidden',
   'focus-visible:outline-solid',
@@ -40,44 +38,56 @@ const RING = [
   'focus-visible:outline-ring',
 ]
 const TYPE_STEP = { xs: 'text-xs', sm: 'text-sm', md: 'text-sm', lg: 'text-base', xl: 'text-base' } as const
-const SCALE = /^(size-control-|h-control-|w-control-|text-(xs|sm|base|lg)$)/
+const PADDING = { xs: 'px-0.5', sm: 'px-0.5', md: 'px-1', lg: 'px-1', xl: 'px-1' } as const
+const SCALE = /^(size-control-|h-control-|w-control-|aspect-|px-|(pointer-coarse:)?min-w-auto$|text-(xs|sm|base|lg)$)/
 
 describe('every cell is a target a finger can hit (R-5.6-2)', () => {
   it('found the ten cells of page 1 of 12, so an empty list cannot pass', () => {
     expect(cells()).toHaveLength(10)
   })
 
-  it('carries the 24 px floor and the 44 px coarse floor on both axes', () => {
-    for (const list of cells()) expect(TOUCH.filter((cls) => !list.includes(cls))).toEqual([])
-  })
-
-  it('carries the whole focus ring', () => {
-    for (const list of cells()) expect(RING.filter((cls) => !list.includes(cls))).toEqual([])
-  })
-
-  it('carries them at every size, custom included', () => {
+  it('carries the 24 px floor and the 44 px coarse floor on its height at every size', () => {
     for (const size of ['xs', 'sm', 'md', 'lg', 'xl', 'custom'] as const) {
+      for (const list of cells({ size })) expect(missing(FLOOR_HEIGHT, list), size).toEqual([])
+    }
+  })
+
+  // e2e/target-size.spec measures the result: a square cannot be narrower than it is tall.
+  it('takes its width floor through the square, so a long number can still widen the cell', () => {
+    for (const size of ['xs', 'sm', 'md', 'lg', 'xl'] as const) {
       for (const list of cells({ size })) {
-        expect([...TOUCH, ...RING].filter((cls) => !list.includes(cls)), size).toEqual([])
+        expect(missing(['aspect-square', 'min-w-auto', 'pointer-coarse:min-w-auto'], list), size).toEqual([])
+        expect(list.filter((cls) => FLOOR_WIDTH.includes(cls)), size).toEqual([])
       }
     }
   })
 
-  it('is a centred box with the control radius and the medium weight', () => {
+  it('keeps both px floors on its width at size custom, where nothing makes it square', () => {
+    for (const list of cells({ size: 'custom' })) expect(missing(FLOOR_WIDTH, list)).toEqual([])
+  })
+
+  it('carries the whole focus ring at every size', () => {
+    for (const size of ['xs', 'sm', 'md', 'lg', 'xl', 'custom'] as const) {
+      for (const list of cells({ size })) expect(missing(RING, list), size).toEqual([])
+    }
+  })
+
+  it('is a centred box with the control radius, the medium weight and digits of one width', () => {
     for (const list of cells()) {
-      expect(['inline-flex', 'items-center', 'justify-center', 'rounded-control', 'font-medium']
-        .filter((cls) => !list.includes(cls))).toEqual([])
+      expect(missing(['inline-flex', 'items-center', 'justify-center', 'rounded-control', 'font-medium', 'tabular-nums'], list))
+        .toEqual([])
     }
   })
 })
 
 describe('size', () => {
   for (const size of ['xs', 'sm', 'md', 'lg', 'xl'] as const) {
-    it(`${size} makes every cell and the gap a square at that control size`, () => {
+    it(`${size} gives every cell and the gap that control height, a square ratio and a little padding`, () => {
       const html_ = html({ size })
       for (const list of [...cells({ size }), ...classesOf(html_, GAP)]) {
-        expect(list.filter((cls) => SCALE.test(cls)).sort(), size)
-          .toEqual([`size-control-${size}`, TYPE_STEP[size]].sort())
+        expect(list.filter((cls) => SCALE.test(cls)).sort(), size).toEqual([
+          'aspect-square', `h-control-${size}`, 'min-w-auto', 'pointer-coarse:min-w-auto', PADDING[size], TYPE_STEP[size],
+        ].sort())
       }
     })
 
@@ -86,8 +96,9 @@ describe('size', () => {
     })
   }
 
-  it('is sm when none is passed, the 32 px cell the frame draws', () => {
-    for (const list of cells()) expect(list).toContain('size-control-sm')
+  it('is md when none is passed, like every other control (R-5.7-2)', () => {
+    expect(attr(html(), 'data-size')).toBe('md')
+    for (const list of cells()) expect(list).toContain('h-control-md')
   })
 
   it('custom emits no size class and no type step, on a cell or on the gap (R-5.7-2)', () => {
@@ -112,8 +123,7 @@ describe('the current page and the others', () => {
     const others = cells({ value: 1 }).filter((list) => !list.includes('bg-primary-solid'))
     expect(others).toHaveLength(9)
     for (const list of others) {
-      expect(['border-(length:--tc-line-width)', 'border-line-strong', 'text-body']
-        .filter((cls) => !list.includes(cls))).toEqual([])
+      expect(missing(['border-(length:--tc-line-width)', 'border-line-strong', 'text-body'], list)).toEqual([])
     }
   })
 
@@ -135,10 +145,11 @@ describe('an edge span is dimmed and takes no pointer', () => {
 })
 
 describe('a gap is text, not a control', () => {
-  it('carries no floor, no ring and no stroke', () => {
+  it('carries no floor, no ring, no stroke and no hover', () => {
     const [gap] = classesOf(html(), GAP)
     expect(gap).toContain('text-body')
-    expect((gap ?? []).filter((cls) => /^(min-[hw]-|pointer-coarse:|outline-|focus-visible:|border-)/.test(cls))).toEqual([])
+    const control = /^(min-h-|pointer-coarse:min-h-|min-w-\[|outline-|focus-visible:|border-|hover:|active:|tone-|transition)/
+    expect((gap ?? []).filter((cls) => control.test(cls))).toEqual([])
   })
 })
 
@@ -148,7 +159,7 @@ describe('the list', () => {
   })
 
   it('adds no class of its own to the nav, so className arrives alone', () => {
-    expect(html().startsWith('<nav aria-label="Pagination" data-size="sm">')).toBe(true)
+    expect(html().startsWith('<nav aria-label="Pagination" data-size="md">')).toBe(true)
     expect(attr(html({ className: 'mt-4 justify-self-end' }), 'class')).toBe('mt-4 justify-self-end')
   })
 })

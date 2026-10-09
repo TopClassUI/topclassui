@@ -1,10 +1,11 @@
+import type { ReactElement } from 'react'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import type { Size } from '#shared/contracts/size.js'
 import type { Labels } from '#shared/labels/types.js'
 import { paginationSchema } from '../schema.js'
 import type {
-  PaginationDesignProps, PaginationGap, PaginationItem, PaginationProps, PaginationRange,
+  PaginationDesignProps, PaginationGap, PaginationItem, PaginationLinkParts, PaginationProps, PaginationRange,
 } from '../types.js'
 
 /** Assignability as a value, so a rejected prop is a passing assertion. */
@@ -68,10 +69,21 @@ describe('the optional props follow the vocabulary', () => {
     expectTypeOf<Accepts<keyof PaginationProps, 'dangerouslySetInnerHTML'>>().toEqualTypeOf<false>()
   })
 
+  it('takes the element every link is cloned from, in the element form only', () => {
+    expectTypeOf<PaginationProps['link']>().toEqualTypeOf<ReactElement | undefined>()
+    expectTypeOf<Given<{ value: 1; pageCount: 12; getHref: Href; link: ReactElement }>>().toEqualTypeOf<true>()
+    expectTypeOf<Given<{ value: 1; pageCount: 12; getHref: Href; link: () => null }>>().toEqualTypeOf<false>()
+  })
+
+  it('calls it link, not render: render replaces a root element, and this replaces each link', () => {
+    expectTypeOf<Accepts<keyof PaginationProps, 'link'>>().toEqualTypeOf<true>()
+    expectTypeOf<Accepts<keyof PaginationProps, 'render'>>().toEqualTypeOf<false>()
+  })
+
   it('does not build the props the playground names and nothing draws', () => {
     expectTypeOf<Accepts<keyof PaginationProps, 'shape' | 'compact' | 'showFirstLast' | 'showPrevNext'>>()
       .toEqualTypeOf<false>()
-    expectTypeOf<Accepts<keyof PaginationProps, 'onValueChange' | 'render' | 'tone' | 'variant'>>()
+    expectTypeOf<Accepts<keyof PaginationProps, 'onValueChange' | 'tone' | 'variant'>>()
       .toEqualTypeOf<false>()
   })
 })
@@ -104,5 +116,11 @@ describe('the page list', () => {
   it('is worked out from four numbers, all of them present', () => {
     expectTypeOf<PaginationRange>()
       .toEqualTypeOf<{ value: number; pageCount: number; siblingCount: number; boundaryCount: number }>()
+  })
+
+  it('is what Pagination writes on a link, whichever element renders it', () => {
+    expectTypeOf<keyof PaginationLinkParts>()
+      .toEqualTypeOf<'aria-label' | 'aria-current' | 'rel' | 'className' | 'children'>()
+    expectTypeOf<PaginationLinkParts['rel']>().toEqualTypeOf<'prev' | 'next' | undefined>()
   })
 })

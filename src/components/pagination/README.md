@@ -13,14 +13,30 @@ is a real link, so it works with no JavaScript and a crawler follows it.
 
 ```tsx
 <Pagination value={3} pageCount={12} getHref={(page) => `/blog?page=${page}`} />
-<Pagination value={3} pageCount={12} getHref={getHref} {...getLabels('ar')} />
 ```
 
-`value` is clamped to 1 to `pageCount`, so a bad number in the URL never builds a link to a
-page that does not exist. On the first and the last page, the controls with nowhere to go
-are dimmed spans instead of links. `getLabels(locale)` returns the `labels` and the `locale`
-together; the four carets flip in RTL by themselves. Two navs on one page need a name each:
-pass `aria-label`.
+**Next.js.** A plain link reloads the page. Pass `link` and each page change is a client navigation:
+
+```tsx
+<Pagination
+  value={Number(page)}
+  pageCount={Math.ceil(total / 25)}
+  getHref={(next) => `/orders?page=${next}`}
+  link={<Link href="" />}
+/>
+```
+
+**Two on one page.** Above and below a table, each needs a name of its own:
+
+```tsx
+<Pagination aria-label="Orders pages, top" value={page} pageCount={count} getHref={getHref} />
+<Pagination aria-label="Orders pages, bottom" value={page} pageCount={count} getHref={getHref} />
+```
+
+- **Arabic.** `{...getLabels('ar')}` passes `labels` and `locale`; the four carets flip in RTL.
+- **A bad page in the URL.** `value` is clamped for what is shown; clamp the page you query the same way.
+- **Alignment.** `className` lands on the `<nav>`; `className="[&>ul]:justify-end"` moves the row to the end.
+- **Size.** `md` is 40 px, the height of a Button; `size="sm"` is the 32 px cell of the design.
 
 <!-- /hand-written -->
 
@@ -37,13 +53,14 @@ Required: `getHref`, `pageCount`, `value`. Every other prop below is optional.
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
 | `getHref` | **yes** | `(page: number) => string` | - | The address of a page, so every cell is a real link a crawler can follow. |
-| `pageCount` | **yes** | `integer`, min 1, max 9007199254740991 | - | How many pages there are; anything below 1 is one page. |
+| `pageCount` | **yes** | `integer`, min 1, max 9007199254740991 | - | How many pages there are; a fraction is rounded up and anything below 1 is one page. |
 | `value` | **yes** | `integer`, min 1, max 9007199254740991 | - | The current page, counted from 1; anything outside 1 to pageCount is clamped. |
 | `boundaryCount` | no | `integer`, min 0, max 3 | `1` | How many pages always show at each end of the list; clamped to 0-3. |
 | `labels` | no | `Labels` | - | The built-in strings: the name of the nav, of each page and of the four icon links. Defaults to English. |
+| `link` | no | `ReactElement` | - | The element every link is cloned from, such as `link={<Link href="" />}`; its href is replaced. |
 | `locale` | no | `string` | - | The locale the page numbers are formatted in. Defaults to `en`. |
 | `siblingCount` | no | `integer`, min 0, max 3 | `1` | How many pages show on each side of the current one; clamped to 0-3. |
-| `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"sm"` | The control scale each square cell takes; custom emits no size classes. |
+| `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The control scale each cell takes its height from; custom emits no size classes. |
 
 Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
@@ -56,6 +73,8 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/middle.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`
+- `dummy/two-navs.tsx`
+- `dummy/wide-numbers.tsx`
 
 ## Verified against
 

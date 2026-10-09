@@ -113,6 +113,6 @@ describe('the root element', () => {
 
   it('reports its size, and keeps reporting it when a caller passes another', () => {
     render(<Pagination value={3} pageCount={12} getHref={blog} {...{ 'data-size': 'xl' }} />)
-    expect(screen.getByRole('navigation').getAttribute('data-size')).toBe('sm')
+    expect(screen.getByRole('navigation').getAttribute('data-size')).toBe('md')
   })
 })

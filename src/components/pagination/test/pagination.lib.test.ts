@@ -22,6 +22,13 @@ describe('1, 2 and 7 pages fit the default row, so nothing is left out', () => {
     }
   })
 
+  it('4, 5 and 6 pages are every page too', () => {
+    expect(pages(1, 4)).toEqual([1, 2, 3, 4])
+    expect(pages(3, 5)).toEqual([1, 2, 3, 4, 5])
+    expect(pages(6, 6)).toEqual([1, 2, 3, 4, 5, 6])
+    expect(pages(1, 2, 0, 0)).toEqual([1, 2])
+  })
+
   it('8 pages are the first count that needs a gap, and the row stays seven cells', () => {
     expect(pages(1, 8)).toEqual([1, 2, 3, 4, 5, 'gap-end', 8])
     expect(pages(4, 8)).toEqual([1, 2, 3, 4, 5, 'gap-end', 8])

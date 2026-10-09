@@ -57,17 +57,25 @@ describe('the built-in strings come from labels (R-5.11-1)', () => {
 })
 
 describe('a count label gets the formatter (R-5.11-2)', () => {
-  it('hands page and ofPages the number and one Intl.NumberFormat', () => {
+  it('hands page the number, pageOf the page and the count, and both one Intl.NumberFormat', () => {
     const labels = {
       ...en,
       pagination: {
         ...en.pagination,
         page: (n: number, fmt: Intl.NumberFormat) => `p${fmt.format(n)}`,
-        ofPages: (n: number, fmt: Intl.NumberFormat) => `/ ${fmt.format(n)}`,
+        pageOf: (page: number, count: number, fmt: Intl.NumberFormat) => `${fmt.format(count)} pages, on ${fmt.format(page)}`,
       },
     }
     const all = names(html({ labels, value: 1000, pageCount: 2000, siblingCount: 0 }))
-    expect(all.slice(3, -2)).toEqual(['p1', 'p1,000 / 2,000', 'p2,000'])
+    expect(all.slice(3, -2)).toEqual(['p1', '2,000 pages, on 1,000', 'p2,000'])
+  })
+
+  it('names the current page with one label, so no order and no separator is fixed here', () => {
+    const labels = {
+      ...en,
+      pagination: { ...en.pagination, page: () => 'PAGE', ofPages: () => 'OF', pageOf: () => 'CURRENT' },
+    }
+    expect(names(html({ labels })).slice(3, -2)).toEqual(['PAGE', 'PAGE', 'CURRENT', 'PAGE', 'PAGE', 'PAGE'])
   })
 })
 

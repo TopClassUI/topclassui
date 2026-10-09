@@ -31,7 +31,7 @@ describe('Pagination on the server', () => {
 
   it('is named by the labels, and reports its size', () => {
     expect(attr(html(), 'aria-label')).toBe('Pagination')
-    expect(attr(html(), 'data-size')).toBe('sm')
+    expect(attr(html(), 'data-size')).toBe('md')
   })
 
   it('shows page 3 of 12 as five pages, a gap and the last page', () => {
@@ -84,13 +84,13 @@ describe('the current page', () => {
 })
 
 describe('the defaults', () => {
-  it('are one sibling, one boundary, the sm cell and the en locale', () => {
-    expect(PAGINATION_DEFAULTS).toEqual({ siblingCount: 1, boundaryCount: 1, size: 'sm', locale: 'en' })
+  it('are one sibling, one boundary, the md cell of R-5.7-2 and the en locale', () => {
+    expect(PAGINATION_DEFAULTS).toEqual({ siblingCount: 1, boundaryCount: 1, size: 'md', locale: 'en' })
   })
 
   it('apply to an explicit undefined too', () => {
     const html_ = html({ size: undefined, siblingCount: undefined, boundaryCount: undefined, locale: undefined, labels: undefined })
-    expect(attr(html_, 'data-size')).toBe('sm')
+    expect(attr(html_, 'data-size')).toBe('md')
     expect(shown(html_)).toEqual(['1', '2', '3', '4', '5', '...', '12'])
   })
 
@@ -99,10 +99,21 @@ describe('the defaults', () => {
   })
 })
 
+describe('two paginations on one page', () => {
+  const names = (html_: string) => [...html_.matchAll(/<nav aria-label="([^"]*)"/g)].map((match) => match[1])
+
+  // A server component cannot know it has a twin, so the caller names each: see the README.
+  it('share the built-in name until each is given an aria-label of its own', () => {
+    expect(names(html() + html())).toEqual(['Pagination', 'Pagination'])
+    expect(names(html({ 'aria-label': 'Orders pages, top' }) + html({ 'aria-label': 'Orders pages, bottom' })))
+      .toEqual(['Orders pages, top', 'Orders pages, bottom'])
+  })
+})
+
 describe('the props that are not attributes', () => {
   it('never reach the nav as attributes', () => {
-    const html_ = html({ siblingCount: 2, boundaryCount: 2, locale: 'ar' })
+    const html_ = html({ siblingCount: 2, boundaryCount: 2, locale: 'ar', link: <a data-own="" /> })
     const nav = tags(html_, 'nav')[0] ?? ''
-    expect(nav).not.toMatch(/getHref|pageCount|siblingCount|boundaryCount|labels|locale|value=/i)
+    expect(nav).not.toMatch(/getHref|pageCount|siblingCount|boundaryCount|labels|locale|link|value=/i)
   })
 })

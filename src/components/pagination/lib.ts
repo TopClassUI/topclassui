@@ -3,14 +3,18 @@ import { clamp } from '#shared/clamp.js'
 import { PAGINATION_BOUNDARIES } from './boundaries.js'
 import type { PaginationItem, PaginationRange } from './types.js'
 
+/** Number() first: clamp only catches a real NaN, so a string from a JavaScript
+ * caller would reach Math.max and print NaN in a link. After it, 'abc' is the minimum. */
+const bound = (given: unknown, min: number, max: number): number => clamp(Number(given), min, max)
+
 /** A whole number of pages, at least one. Rounded up: 7.5 pages of rows need an eighth. */
 export function clampPageCount(pageCount: number): number {
-  return Math.ceil(clamp(pageCount, PAGINATION_BOUNDARIES.pageMin, PAGINATION_BOUNDARIES.pageCountMax))
+  return Math.ceil(bound(pageCount, PAGINATION_BOUNDARIES.pageMin, PAGINATION_BOUNDARIES.pageCountMax))
 }
 
 /** The current page, held inside 1 to the count whatever the URL said. */
 export function clampPage(value: number, pageCount: number): number {
-  return Math.floor(clamp(value, PAGINATION_BOUNDARIES.pageMin, clampPageCount(pageCount)))
+  return Math.floor(bound(value, PAGINATION_BOUNDARIES.pageMin, clampPageCount(pageCount)))
 }
 
 const range = (from: number, to: number): number[] =>
@@ -22,10 +26,10 @@ export function listPages({ value, pageCount, siblingCount, boundaryCount }: Pag
   const count = clampPageCount(pageCount)
   const page = clampPage(value, count)
   const siblings = Math.floor(
-    clamp(siblingCount, PAGINATION_BOUNDARIES.siblingCountMin, PAGINATION_BOUNDARIES.siblingCountMax),
+    bound(siblingCount, PAGINATION_BOUNDARIES.siblingCountMin, PAGINATION_BOUNDARIES.siblingCountMax),
   )
   const boundary = Math.floor(
-    clamp(boundaryCount, PAGINATION_BOUNDARIES.boundaryCountMin, PAGINATION_BOUNDARIES.boundaryCountMax),
+    bound(boundaryCount, PAGINATION_BOUNDARIES.boundaryCountMin, PAGINATION_BOUNDARIES.boundaryCountMax),
   )
 
   // Both ends, the siblings, the current page and two gaps: at or under that, every page fits.

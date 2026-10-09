@@ -56,6 +56,11 @@ describe('a server-rendered Pagination hydrates cleanly', () => {
     expect(await hydrate(element)).toEqual([])
   })
 
+  it('reports nothing when a link element renders every link', async () => {
+    const element = createElement(Pagination, { value: 6, pageCount: 12, getHref: blog, link: createElement('a', { 'data-own': '' }) })
+    expect(await hydrate(element)).toEqual([])
+  })
+
   it('reports nothing for a clamped value, which both sides clamp the same way', async () => {
     expect(await hydrate(createElement(Pagination, { value: 99, pageCount: 12, getHref: blog }))).toEqual([])
   })
