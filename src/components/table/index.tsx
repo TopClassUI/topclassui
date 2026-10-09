@@ -5,6 +5,8 @@ import { Svg } from '#components/svg/index.js'
 import { BORDER, FOCUS_RING } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
 import { en } from '#shared/labels/en.js'
+// Named here as well, so a consumer program that never compiles shared/ gets the --tc-* keys.
+import type {} from '#shared/style-tokens.js'
 import {
   BODY_CELL, BOX, CAPTION, CELL_ALIGN, EMPTY_CELL, EMPTY_WORDS, HEADER_CELL, HEADER_LABEL, LINK_ALIGN,
   ROW_FILL, ROW_HEADER, SORT_LINK, STICKY_BOX, STICKY_CELL,

@@ -68,4 +68,10 @@ export const MUTATIONS: Mutation[] = [
     from: 'aria-labelledby={plain ? undefined : headerId}',
     to: 'aria-labelledby={undefined}',
   },
+  {
+    label: 'a table stops importing the style augmentation, so the sticky width of its README does not compile in a program without Progress',
+    file: 'src/components/table/index.tsx',
+    from: "import type {} from '#shared/style-tokens.js'\n",
+    to: '',
+  },
 ]

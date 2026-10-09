@@ -89,6 +89,7 @@ const verdict = compile({
   skeleton: 'export const probe = <TableSkeleton rows={3} columns={4} captionVisible className="mt-4" />',
   skeletonString: "export const probe = <TableSkeleton rows='3' />",
   skeletonChild: 'export const probe = <TableSkeleton>Loading</TableSkeleton>',
+  stickyWidth: table(ONE, "caption='Revenue by region' getKey={(invoice) => invoice.id} stickyFirstColumn style={{ '--tc-table-sticky-width': '20rem' }}"),
   readonlyItems: "const frozen = [{ id: 'a' }, { id: 'b' }] as const\nexport const probe = <Table items={frozen} caption='Letters' getKey={(letter) => letter.id} columns={[{ key: 'id', header: 'Id', cell: (letter) => letter.id }]} />",
 })
 
@@ -106,6 +107,12 @@ describe('the item type is inferred from items and reaches every column', () => 
   it('refuses a cell that reads a field the item does not have', () => {
     // The message, not a count: a program that fails for any other reason also has errors.
     expect(said('missingField')).toContain("Property 'total' does not exist on type 'Invoice'")
+  })
+})
+
+describe('the --tc-* style keys reach a program that compiles only Table', () => {
+  it('compiles the sticky width the README raises through style', () => {
+    expect(verdict['stickyWidth']).toEqual([])
   })
 })
 

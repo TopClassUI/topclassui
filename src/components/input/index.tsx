@@ -1,6 +1,8 @@
 // No 'use client': a client bundle gets it only when a client file imports it.
 import { cn } from '#shared/cn.js'
 import { resolveMaxLength } from '#shared/contracts/boundaries.js'
+// Named here as well, so a consumer program that never compiles shared/ gets the --tc-* keys.
+import type {} from '#shared/style-tokens.js'
 import { INPUT_OWN_WIDTH, INPUT_READ_ONLY } from './classes.js'
 import {
   INPUT_CAPPED_TYPES, INPUT_DEFAULT_TYPE, INPUT_DEFAULTS, INPUT_LTR_TYPES, INPUT_OWN_WIDTH_TYPES,
