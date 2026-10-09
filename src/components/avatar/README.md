@@ -23,9 +23,21 @@ import { AvatarFallback, AvatarImage, AvatarRoot, AvatarSkeleton } from 'topclas
 Every part is a flat export: `AvatarRoot`, `AvatarImage`, `AvatarFallback` and
 `AvatarSkeleton`; there is no `Avatar`. Only `AvatarRoot` takes `size`. Always render the
 fallback: the image is laid over it, so it shows until the image paints, with no JavaScript.
-`alt` is required; pass `alt=""` and `aria-hidden` on the fallback when the name is written
-beside the avatar. A failed image shows the browser's broken-image mark for now: hiding it
-needs the client half, which is not built yet.
+A failed image shows the browser's broken-image mark for now: hiding it needs the client
+half, which is not built yet.
+
+**Naming it.** The fallback is decorative: it renders `aria-hidden="true"`, so the image's
+`alt` is the one name a screen reader reads. `alt` is required; pass `alt=""` when the name
+is written beside the avatar. An avatar with no image and no name written beside it takes
+`role="img"` and `aria-label` on `AvatarRoot`:
+
+```tsx
+<AvatarRoot role="img" aria-label="Lina Haddad">
+  <AvatarFallback>LH</AvatarFallback>
+</AvatarRoot>
+```
+
+Pass `aria-hidden={false}` to `AvatarFallback` only if the initials themselves should be read.
 
 <!-- /hand-written -->
 

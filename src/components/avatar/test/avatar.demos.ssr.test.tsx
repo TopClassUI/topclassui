@@ -47,3 +47,39 @@ describe('every demo renders on the server', () => {
     expect(withImage).toEqual(['basic', 'custom-size', 'rtl', 'with-name'])
   })
 })
+
+/** Per demo: fallbacks rendered, roots named with role="img", and pictures named by a non-empty alt. */
+const NAMING: Record<string, { fallbacks: number; namedRoots: number; namedImages: number }> = {
+  'basic': { fallbacks: 2, namedRoots: 1, namedImages: 1 },
+  'custom-size': { fallbacks: 2, namedRoots: 1, namedImages: 1 },
+  'icon': { fallbacks: 3, namedRoots: 3, namedImages: 0 },
+  // The names are written beside both avatars, so neither adds a second one.
+  'rtl': { fallbacks: 2, namedRoots: 0, namedImages: 0 },
+  'sizes': { fallbacks: 5, namedRoots: 5, namedImages: 0 },
+  'skeleton': { fallbacks: 5, namedRoots: 5, namedImages: 0 },
+  'with-name': { fallbacks: 1, namedRoots: 0, namedImages: 0 },
+}
+
+const count = (html: string, pattern: RegExp) => (html.match(pattern) ?? []).length
+
+describe('every demo names each avatar once', () => {
+  it('lists every demo, so a new one cannot skip the check', () => {
+    expect(Object.keys(NAMING).sort()).toEqual(EXPECTED)
+  })
+
+  for (const file of files) {
+    it(`${file}.tsx hides every fallback and never un-hides one`, async () => {
+      const html = await render(file)
+      expect(count(html, /<span aria-hidden="true" class="inline-flex items-center justify-center">/g), file)
+        .toBe(NAMING[file]?.fallbacks)
+      expect(html, file).not.toContain('aria-hidden="false"')
+    })
+
+    it(`${file}.tsx names an avatar on its root or by its alt, as often as written here`, async () => {
+      const html = await render(file)
+      expect(count(html, /<span data-size="[a-z]+" class="[^"]+" role="img" aria-label="[^"]+">/g), file)
+        .toBe(NAMING[file]?.namedRoots)
+      expect(count(html, /<img alt="[^"]+"/g), file).toBe(NAMING[file]?.namedImages)
+    })
+  }
+})

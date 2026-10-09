@@ -11,7 +11,7 @@ export default function Demo() {
       </div>
       <div className="flex items-center gap-3">
         {SIZES.map((size) => (
-          <AvatarRoot key={size} size={size}>
+          <AvatarRoot key={size} size={size} role="img" aria-label="Omar Abed">
             <AvatarFallback>OA</AvatarFallback>
           </AvatarRoot>
         ))}

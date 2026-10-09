@@ -11,7 +11,7 @@ export default function Demo() {
         <AvatarImage src={PORTRAIT} alt="Omar Abed" />
         <AvatarFallback>OA</AvatarFallback>
       </AvatarRoot>
-      <AvatarRoot size="custom" className="size-24 text-lg">
+      <AvatarRoot size="custom" className="size-24 text-lg" role="img" aria-label="Omar Abed">
         <AvatarFallback>OA</AvatarFallback>
       </AvatarRoot>
     </div>

@@ -40,20 +40,55 @@ describe('AvatarRoot', () => {
 })
 
 describe('AvatarFallback', () => {
-  it('is one span around the initials', () => {
-    expect(markup(<AvatarFallback>OA</AvatarFallback>)).toMatch(/^<span class="[^"]+">OA<\/span>$/)
+  it('is one span around the initials, hidden from assistive technology', () => {
+    expect(markup(<AvatarFallback>OA</AvatarFallback>))
+      .toMatch(/^<span aria-hidden="true" class="[^"]+">OA<\/span>$/)
   })
 
   it('holds an Svg icon as readily as text', () => {
     const html = markup(<AvatarFallback><Svg icon={user} /></AvatarFallback>)
-    expect(html).toMatch(/^<span class="[^"]+"><svg [^>]+><path [^>]+><\/path><\/svg><\/span>$/)
+    expect(html).toMatch(/^<span aria-hidden="true" class="[^"]+"><svg [^>]+><path [^>]+><\/path><\/svg><\/span>$/)
   })
 
-  it('spreads the rest onto its span, so a caller can hide initials a visible name repeats', () => {
-    const html = markup(<AvatarFallback id="f" aria-hidden style={{ opacity: 0.5 }}>OA</AvatarFallback>)
+  it('spreads the rest and the style onto its span', () => {
+    const html = markup(<AvatarFallback id="f" data-testid="x" title="Omar" style={{ opacity: 0.5 }}>OA</AvatarFallback>)
     expect(attr(html, 'id')).toBe('f')
-    expect(attr(html, 'aria-hidden')).toBe('true')
+    expect(attr(html, 'data-testid')).toBe('x')
+    expect(attr(html, 'title')).toBe('Omar')
     expect(attr(html, 'style')).toBe('opacity:0.5')
+  })
+})
+
+describe('the fallback stays out of the accessibility tree unless asked', () => {
+  it('is aria-hidden by default, so the alt of the image over it is the one name', () => {
+    expect(attr(markup(<AvatarFallback>OA</AvatarFallback>), 'aria-hidden')).toBe('true')
+  })
+
+  it('stays hidden when the caller passes true, or undefined as a conditional prop does', () => {
+    expect(attr(markup(<AvatarFallback aria-hidden>OA</AvatarFallback>), 'aria-hidden')).toBe('true')
+    expect(attr(markup(<AvatarFallback aria-hidden={undefined}>OA</AvatarFallback>), 'aria-hidden')).toBe('true')
+  })
+
+  it('is read again when the caller passes aria-hidden={false}, whose value wins', () => {
+    const html = markup(<AvatarFallback aria-hidden={false}>OA</AvatarFallback>)
+    expect(attr(html, 'aria-hidden')).toBe('false')
+    expect(html.split('aria-hidden').length - 1).toBe(1)
+  })
+
+  it('leaves the root and the image in the tree: neither carries aria-hidden', () => {
+    expect(markup(<AvatarRoot>OA</AvatarRoot>)).not.toContain('aria-hidden')
+    expect(markup(<AvatarImage src="/a.jpg" alt="A" />)).not.toContain('aria-hidden')
+  })
+
+  it('an avatar with no image is named on the root, with role="img" and aria-label', () => {
+    const html = markup(
+      <AvatarRoot role="img" aria-label="Lina Haddad">
+        <AvatarFallback>LH</AvatarFallback>
+      </AvatarRoot>,
+    )
+    expect(html).toMatch(
+      /^<span data-size="md" class="[^"]+" role="img" aria-label="Lina Haddad"><span aria-hidden="true" class="[^"]+">LH<\/span><\/span>$/,
+    )
   })
 })
 
@@ -94,8 +129,14 @@ describe('the parts compose', () => {
 
   it('renders the image and the fallback together inside the root, in the order given', () => {
     expect(html).toMatch(
-      /^<span data-size="lg" class="[^"]+"><img alt="Omar Abed" class="[^"]+" src="\/team\/omar\.jpg"\/><span class="[^"]+">OA<\/span><\/span>$/,
+      /^<span data-size="lg" class="[^"]+"><img alt="Omar Abed" class="[^"]+" src="\/team\/omar\.jpg"\/><span aria-hidden="true" class="[^"]+">OA<\/span><\/span>$/,
     )
+  })
+
+  it('carries one name, the alt, and hides the one node that would repeat it', () => {
+    expect(html.match(/ alt="[^"]*"/g)).toEqual([' alt="Omar Abed"'])
+    expect(html.match(/ aria-hidden="[^"]*"/g)).toEqual([' aria-hidden="true"'])
+    expect(html).not.toContain('aria-label')
   })
 
   it('always renders the fallback, since no script will put it back when the image fails', () => {
@@ -109,6 +150,6 @@ describe('the parts compose', () => {
         <AvatarImage src="/a.jpg" alt="A" />
       </AvatarRoot>,
     )
-    expect(swapped).toMatch(/^<span [^>]+><span class="[^"]+">OA<\/span><img alt="A" class="[^"]*absolute[^"]*" src="\/a\.jpg"\/><\/span>$/)
+    expect(swapped).toMatch(/^<span [^>]+><span aria-hidden="true" class="[^"]+">OA<\/span><img alt="A" class="[^"]*absolute[^"]*" src="\/a\.jpg"\/><\/span>$/)
   })
 })

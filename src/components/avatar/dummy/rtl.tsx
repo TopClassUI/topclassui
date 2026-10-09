@@ -8,10 +8,10 @@ export default function Demo() {
     <div dir="rtl" lang="ar" className="flex items-center gap-3">
       <AvatarRoot size="lg">
         <AvatarImage src={PORTRAIT} alt="" />
-        <AvatarFallback aria-hidden>ع ف</AvatarFallback>
+        <AvatarFallback>ع ف</AvatarFallback>
       </AvatarRoot>
       <AvatarRoot size="lg">
-        <AvatarFallback aria-hidden>ل ح</AvatarFallback>
+        <AvatarFallback>ل ح</AvatarFallback>
       </AvatarRoot>
       <span className="text-sm text-body">عمر فتحي وليلى حسن</span>
     </div>

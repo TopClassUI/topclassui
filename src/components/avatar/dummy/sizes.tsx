@@ -9,7 +9,7 @@ export default function Demo() {
     <div className="flex flex-col gap-3">
       {SIZES.map((size) => (
         <div key={size} className="flex items-center gap-3">
-          <AvatarRoot size={size}>
+          <AvatarRoot size={size} role="img" aria-label="Omar Abed">
             <AvatarFallback>OA</AvatarFallback>
           </AvatarRoot>
           <Button size={size} variant="outline" tone="neutral">Follow</Button>

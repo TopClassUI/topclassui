@@ -17,7 +17,7 @@ export interface AvatarRootProps
 }
 
 export interface AvatarFallbackProps extends Omit<ComponentPropsWithRef<'span'>, 'children'> {
-  /** Initials, or an Svg icon. Shown while the image loads and when there is none. */
+  /** Initials or an Svg icon, shown until the image paints. Decorative: aria-hidden unless you pass false. */
   children?: ReactNode | undefined
 }
 

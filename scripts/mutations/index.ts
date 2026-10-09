@@ -1054,6 +1054,18 @@ export const MUTATIONS: Mutation[] = [
     to: 'aria-hidden {...rest}>',
   },
   {
+    label: 'the avatar fallback is no longer hidden by default, so the initials are read after the alt',
+    file: 'src/components/avatar/parts/avatar-fallback.tsx',
+    from: "'aria-hidden': ariaHidden = true,",
+    to: "'aria-hidden': ariaHidden,",
+  },
+  {
+    label: 'the avatar fallback ignores the caller, so aria-hidden={false} can never bring the initials back',
+    file: 'src/components/avatar/parts/avatar-fallback.tsx',
+    from: '<span aria-hidden={ariaHidden} ',
+    to: '<span aria-hidden ',
+  },
+  {
     label: 'an avatar part becomes a client module, which check-boundaries checks only in index.tsx',
     file: 'src/components/avatar/parts/avatar-image.tsx',
     from: "import { cn } from '#shared/cn.js'\n",
