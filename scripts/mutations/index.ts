@@ -1026,8 +1026,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the avatar image is no longer laid over the fallback, so both sit side by side in the circle',
     file: 'src/components/avatar/classes.ts',
-    from: "'absolute inset-0 size-full object-cover'",
-    to: "'size-full object-cover'",
+    from: "'absolute inset-0 size-full object-cover text-transparent forced-color-adjust-none'",
+    to: "'size-full object-cover text-transparent forced-color-adjust-none'",
   },
   {
     label: 'the avatar root passes className first, so the consumer loses every conflict',
@@ -1070,5 +1070,47 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/avatar/parts/avatar-image.tsx',
     from: "import { cn } from '#shared/cn.js'\n",
     to: "'use client'\nimport { cn } from '#shared/cn.js'\n",
+  },
+  {
+    label: 'a failed avatar image prints its alt again, over the initials, in every mode and under forced colours',
+    file: 'src/components/avatar/classes.ts',
+    from: " object-cover text-transparent forced-color-adjust-none'",
+    to: " object-cover'",
+  },
+  {
+    label: 'a failed avatar image stays quiet only outside forced colours, which repaint its alt with a backplate',
+    file: 'src/components/avatar/classes.ts',
+    from: " text-transparent forced-color-adjust-none'",
+    to: " text-transparent'",
+  },
+  {
+    label: 'the avatar root takes no role when it is labelled, so a span carries a name ARIA prohibits',
+    file: 'src/components/avatar/parts/avatar-root.tsx',
+    from: "role={role ?? (named ? 'img' : undefined)}",
+    to: 'role={role}',
+  },
+  {
+    label: "the avatar root overrides the caller's own role whenever it is labelled",
+    file: 'src/components/avatar/parts/avatar-root.tsx',
+    from: "role={role ?? (named ? 'img' : undefined)}",
+    to: "role={named ? 'img' : role}",
+  },
+  {
+    label: 'the avatar root becomes an image for an empty label, which is an image with no name',
+    file: 'src/components/avatar/parts/avatar-root.tsx',
+    from: "Boolean(rest['aria-label']) || Boolean(rest['aria-labelledby'])",
+    to: "rest['aria-label'] !== undefined || rest['aria-labelledby'] !== undefined",
+  },
+  {
+    label: 'the avatar and its skeleton lose their edge under forced colours, where no fill draws them',
+    file: 'src/components/avatar/classes.ts',
+    from: "export const AVATAR_FORCED_EDGE = 'forced-colors:outline-(length:--tc-line-width)'",
+    to: "export const AVATAR_FORCED_EDGE = ''",
+  },
+  {
+    label: 'the avatar image ignores render, so a framework image is replaced by a plain img',
+    file: 'src/components/avatar/parts/avatar-image.tsx',
+    from: 'renderElement(render ?? <img />, ',
+    to: 'renderElement(<img />, ',
   },
 ]

@@ -23,16 +23,35 @@ import { AvatarFallback, AvatarImage, AvatarRoot, AvatarSkeleton } from 'topclas
 Every part is a flat export: `AvatarRoot`, `AvatarImage`, `AvatarFallback` and
 `AvatarSkeleton`; there is no `Avatar`. Only `AvatarRoot` takes `size`. Always render the
 fallback: the image is laid over it, so it shows until the image paints, with no JavaScript.
-A failed image shows the browser's broken-image mark for now: hiding it needs the client
-half, which is not built yet.
+Initials are one or two characters: a longer string is cut at the edge of the circle.
+
+**A picture that fails.** The browser's broken-image mark shows in the corner; the alt text
+is not drawn, so the initials stay readable. Hiding the mark needs the client half, which
+is not built yet.
+
+**A picture with transparency.** The initials show through it. Leave `AvatarFallback` out, or
+pass `className="bg-surface"` to `AvatarImage`, which also hides the fallback while the
+picture loads and after it fails.
+
+**next/image.** Pass it as `render`. It carries its own `src` and `alt`, and takes the
+classes that fill the circle:
+
+```tsx
+import Image from 'next/image'
+
+<AvatarRoot size="lg">
+  <AvatarImage render={<Image src="/team/omar.jpg" alt="Omar Abed" width={48} height={48} />} />
+  <AvatarFallback>OA</AvatarFallback>
+</AvatarRoot>
+```
 
 **Naming it.** The fallback is decorative: it renders `aria-hidden="true"`, so the image's
 `alt` is the one name a screen reader reads. `alt` is required; pass `alt=""` when the name
 is written beside the avatar. An avatar with no image and no name written beside it takes
-`role="img"` and `aria-label` on `AvatarRoot`:
+`aria-label` on `AvatarRoot`, which then renders `role="img"` itself:
 
 ```tsx
-<AvatarRoot role="img" aria-label="Lina Haddad">
+<AvatarRoot aria-label="Lina Haddad">
   <AvatarFallback>LH</AvatarFallback>
 </AvatarRoot>
 ```
@@ -62,6 +81,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 
 - `dummy/basic.tsx`
 - `dummy/custom-size.tsx`
+- `dummy/failed.tsx`
 - `dummy/icon.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`

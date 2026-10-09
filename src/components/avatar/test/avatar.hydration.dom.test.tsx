@@ -54,7 +54,7 @@ describe('a server-rendered Avatar hydrates cleanly', () => {
 
 describe('every demo renders and hydrates', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'custom-size', 'icon', 'rtl', 'sizes', 'skeleton', 'with-name'])
+    expect(names).toEqual(['basic', 'custom-size', 'failed', 'icon', 'rtl', 'sizes', 'skeleton', 'with-name'])
   })
 
   for (const [name, Demo] of DEMOS) {

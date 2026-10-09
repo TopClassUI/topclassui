@@ -7,10 +7,10 @@ import type { AvatarSkeletonProps } from '../types.js'
 const html = (props: AvatarSkeletonProps = {}) => markup(<AvatarSkeleton {...props} />)
 const classes = (props: AvatarSkeletonProps = {}) => classList(html(props)).sort()
 
-/** The circle, the fill Figma binds and the pulse, sorted and written out. */
+/** The circle, the fill Figma binds, the pulse and the forced-colours edge, sorted and written out. */
 const SHARED = [
-  'animate-pulse', 'bg-neutral-soft', 'inline-flex', 'items-center', 'justify-center',
-  'motion-reduce:animate-none', 'rounded-full', 'shrink-0',
+  'animate-pulse', 'bg-neutral-soft', 'forced-colors:outline-(length:--tc-line-width)', 'inline-flex',
+  'items-center', 'justify-center', 'motion-reduce:animate-none', 'rounded-full', 'shrink-0',
 ]
 
 /** The box and the type step of the avatar each one stands in for. */
@@ -56,8 +56,9 @@ describe('AvatarSkeleton', () => {
 
   it('lets every conflicting consumer class win, because className is passed last', () => {
     expect(classes({ className: 'rounded-box size-control-xl bg-surface' })).toEqual([
-      'animate-pulse', 'bg-surface', 'inline-flex', 'items-center', 'justify-center',
-      'motion-reduce:animate-none', 'rounded-box', 'shrink-0', 'size-control-xl', 'text-sm',
+      'animate-pulse', 'bg-surface', 'forced-colors:outline-(length:--tc-line-width)', 'inline-flex',
+      'items-center', 'justify-center', 'motion-reduce:animate-none', 'rounded-box', 'shrink-0',
+      'size-control-xl', 'text-sm',
     ])
   })
 

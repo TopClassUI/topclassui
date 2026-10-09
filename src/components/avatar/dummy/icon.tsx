@@ -6,13 +6,13 @@ import { AvatarFallback, AvatarRoot } from '../index.js'
 export default function Demo() {
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <AvatarRoot size="sm" role="img" aria-label="Guest">
+      <AvatarRoot size="sm" aria-label="Guest">
         <AvatarFallback><Svg icon={user} /></AvatarFallback>
       </AvatarRoot>
-      <AvatarRoot role="img" aria-label="Guest">
+      <AvatarRoot aria-label="Guest">
         <AvatarFallback><Svg icon={user} /></AvatarFallback>
       </AvatarRoot>
-      <AvatarRoot size="xl" role="img" aria-label="Guest">
+      <AvatarRoot size="xl" aria-label="Guest">
         <AvatarFallback><Svg icon={user} /></AvatarFallback>
       </AvatarRoot>
     </div>
