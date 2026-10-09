@@ -1035,4 +1035,10 @@ export const MUTATIONS: Mutation[] = [
     from: '    rating: group(base.rating, overrides.rating),',
     to: '    rating: base.rating,',
   },
+  {
+    label: 'a timeline status override is dropped on the way through getLabels, so a caller cannot reword a status',
+    file: 'src/shared/labels/get-labels.ts',
+    from: '    timeline: group(base.timeline, overrides.timeline),',
+    to: '    timeline: base.timeline,',
+  },
 ]

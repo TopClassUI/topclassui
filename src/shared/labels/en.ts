@@ -65,4 +65,9 @@ export const en = {
     sortedAscending: 'sorted ascending',
     sortedDescending: 'sorted descending',
   },
+  timeline: {
+    done: 'Done',
+    current: 'Current',
+    todo: 'Not started',
+  },
 } satisfies Labels
