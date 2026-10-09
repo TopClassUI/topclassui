@@ -19,6 +19,8 @@
   --tc-sticky-bottom: 0px;
   /* The widest a Table's stuck first column gets, and the scroll padding that keeps focus clear of it. */
   --tc-table-sticky-width: clamp(8rem, 30vw, 16rem);
+  /* A text input's own width: the browser's twenty characters as an em, so it follows the size scale. */
+  --tc-input-width: 13.8em;
   --tc-dir: 1;
 
   /* env() is physical, so the inline edges are named here and swapped per direction. */
