@@ -40,6 +40,8 @@ export interface Labels {
     readonly last: string
     readonly page: CountLabel
     readonly ofPages: CountLabel
+    /** The current page and the count in one label, so a language orders the two its own way. */
+    readonly pageOf: RatioLabel
   }
   readonly select: {
     readonly placeholder: string
@@ -68,6 +70,12 @@ export interface Labels {
     readonly sortBy: string
     readonly sortedAscending: string
     readonly sortedDescending: string
+  }
+  /** The status of a Timeline item, read out where a sighted reader sees the marker. */
+  readonly timeline: {
+    readonly done: string
+    readonly current: string
+    readonly todo: string
   }
 }
 
