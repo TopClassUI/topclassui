@@ -27,6 +27,9 @@
 @utility ps-safe { padding-inline-start: var(--tc-safe-start); }
 @utility pe-safe { padding-inline-end: var(--tc-safe-end); }
 
+/* Chromium only knows the prefixed value; the parent's side, whatever the element's own dir. */
+@utility text-match-parent { text-align: -webkit-match-parent; text-align: match-parent; }
+
 /* A tone swaps the five interaction variables, so the hover classes never change. */
 @utility tone-primary {
   --tc-soft: var(--tc-primary-soft);
