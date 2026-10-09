@@ -1023,4 +1023,40 @@ export const MUTATIONS: Mutation[] = [
     from: '      <TooltipTrigger\n        render={\n          <Button variant="ghost" aria-label="Copy link">\n            <Svg icon={linkSimple} />\n          </Button>\n        }\n      />',
     to: '      <TooltipTrigger render={<Button variant="ghost" aria-label="Copy link" />}>\n        <Svg icon={linkSimple} />\n      </TooltipTrigger>',
   },
+  {
+    label: 'the avatar image is no longer laid over the fallback, so both sit side by side in the circle',
+    file: 'src/components/avatar/classes.ts',
+    from: "'absolute inset-0 size-full object-cover'",
+    to: "'size-full object-cover'",
+  },
+  {
+    label: 'the avatar root passes className first, so the consumer loses every conflict',
+    file: 'src/components/avatar/parts/avatar-root.tsx',
+    from: 'cn(AVATAR_ROOT, AVATAR_SIZE[size], className)',
+    to: 'cn(className, AVATAR_ROOT, AVATAR_SIZE[size])',
+  },
+  {
+    label: 'the avatar custom size emits the md box, so className can no longer be the only size',
+    file: 'src/components/avatar/classes.ts',
+    from: "  custom: '',",
+    to: "  custom: 'size-control-md text-sm',",
+  },
+  {
+    label: 'the avatar circle becomes the control radius, on the root and its skeleton at once',
+    file: 'src/components/avatar/classes.ts',
+    from: "export const AVATAR_CIRCLE = 'rounded-full'",
+    to: "export const AVATAR_CIRCLE = 'rounded-control'",
+  },
+  {
+    label: 'the avatar skeleton spreads the rest after aria-hidden, so a caller can un-hide a placeholder',
+    file: 'src/components/avatar/skeleton.tsx',
+    from: '{...rest} aria-hidden>',
+    to: 'aria-hidden {...rest}>',
+  },
+  {
+    label: 'an avatar part becomes a client module, which check-boundaries checks only in index.tsx',
+    file: 'src/components/avatar/parts/avatar-image.tsx',
+    from: "import { cn } from '#shared/cn.js'\n",
+    to: "'use client'\nimport { cn } from '#shared/cn.js'\n",
+  },
 ]
