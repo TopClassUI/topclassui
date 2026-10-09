@@ -1023,4 +1023,22 @@ export const MUTATIONS: Mutation[] = [
     from: '      <TooltipTrigger\n        render={\n          <Button variant="ghost" aria-label="Copy link">\n            <Svg icon={linkSimple} />\n          </Button>\n        }\n      />',
     to: '      <TooltipTrigger render={<Button variant="ghost" aria-label="Copy link" />}>\n        <Svg icon={linkSimple} />\n      </TooltipTrigger>',
   },
+  {
+    label: 'the rating name swaps its two numbers, so 4 out of 5 is announced as 5 out of 4',
+    file: 'src/shared/labels/en.ts',
+    from: '`${fmt.format(value)} out of ${fmt.format(max)}`',
+    to: '`${fmt.format(max)} out of ${fmt.format(value)}`',
+  },
+  {
+    label: 'a rating override is dropped on the way through getLabels, so a caller cannot reword the name',
+    file: 'src/shared/labels/get-labels.ts',
+    from: '    rating: group(base.rating, overrides.rating),',
+    to: '    rating: base.rating,',
+  },
+  {
+    label: 'a timeline status override is dropped on the way through getLabels, so a caller cannot reword a status',
+    file: 'src/shared/labels/get-labels.ts',
+    from: '    timeline: group(base.timeline, overrides.timeline),',
+    to: '    timeline: base.timeline,',
+  },
 ]
