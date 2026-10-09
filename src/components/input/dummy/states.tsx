@@ -4,12 +4,12 @@ import { Input } from '../index.js'
 export default function Demo() {
   return (
     <div className="grid max-w-sm gap-3">
-      <Input placeholder="Enter your email" aria-label="Idle" />
-      <Input defaultValue="omar@example.com" aria-label="Filled" />
-      <Input disabled defaultValue="omar@example.com" aria-label="Disabled" />
-      <Input readOnly defaultValue="omar@example.com" aria-label="Read-only" />
-      <Input invalid defaultValue="omar@example" aria-label="Invalid" />
-      <Input required placeholder="Required" aria-label="Required" />
+      <Input fullWidth placeholder="Enter your email" aria-label="Idle" />
+      <Input fullWidth defaultValue="omar@example.com" aria-label="Filled" />
+      <Input fullWidth disabled defaultValue="omar@example.com" aria-label="Disabled" />
+      <Input fullWidth readOnly defaultValue="omar@example.com" aria-label="Read-only" />
+      <Input fullWidth invalid defaultValue="omar@example" aria-label="Invalid" />
+      <Input fullWidth required placeholder="Required" aria-label="Required" />
     </div>
   )
 }

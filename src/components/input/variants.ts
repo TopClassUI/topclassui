@@ -1,9 +1,10 @@
 import { cva } from 'class-variance-authority'
 
 import {
-  BORDER_STRONG, CONTAIN, CONTROL_SIZE, DISABLED, FOCUS_RING, TOUCH_TARGET, TRANSITION,
+  BORDER_STRONG, CONTAIN, DISABLED, FOCUS_RING, TOUCH_TARGET, TRANSITION,
 } from '#shared/classes.js'
 import { memoizeVariants } from '#shared/variants.js'
+import { INPUT_INVALID_WIDTH, INPUT_LTR, INPUT_SIZE } from './classes.js'
 import { INPUT_DEFAULTS, INPUT_SIZES } from './constants.js'
 
 const resolve = cva(
@@ -11,6 +12,8 @@ const resolve = cva(
     'rounded-control bg-surface-raised text-body placeholder:text-muted',
     // It beats BORDER_STRONG on specificity: the attribute selector outranks the plain class.
     'aria-invalid:border-danger-solid',
+    INPUT_INVALID_WIDTH,
+    INPUT_LTR,
     BORDER_STRONG,
     CONTAIN,
     DISABLED,
@@ -20,7 +23,7 @@ const resolve = cva(
   ],
   {
     variants: {
-      size: CONTROL_SIZE,
+      size: INPUT_SIZE,
       fullWidth: { true: 'w-full', false: '' },
     },
     defaultVariants: {

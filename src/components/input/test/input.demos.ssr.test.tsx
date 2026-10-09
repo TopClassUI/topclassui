@@ -12,7 +12,7 @@ const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
 const EXPECTED = [
-  'custom-size', 'full-width', 'labelled', 'rtl', 'sizes', 'skeleton', 'states', 'types',
+  'custom-size', 'full-width', 'labelled', 'row', 'rtl', 'sizes', 'skeleton', 'states', 'types',
 ]
 
 const render = async (file: string) => {
@@ -100,6 +100,15 @@ describe('the demos cover what PLAN 20 asks for', () => {
     expect(tags.map((tag) => / w-full[ "]/.test(tag))).toEqual([true, false])
   })
 
+  it('fills the column in the states and types demos, so a date and a text field line up', async () => {
+    // A grid stretches a date, whose width is auto, but not a text field at its own width.
+    for (const file of ['states', 'types']) {
+      const tags = inputs(await render(file))
+      expect(tags.length, file).toBeGreaterThan(5)
+      expect(tags.filter((tag) => !/ w-full[ "]/.test(tag)).map((tag) => attr(tag, 'aria-label')), file).toEqual([])
+    }
+  })
+
   it('shows the skeleton hidden from assistive technology', async () => {
     expect(await render('skeleton')).toContain('aria-hidden="true"')
   })
@@ -112,5 +121,21 @@ describe('the demos cover what PLAN 20 asks for', () => {
 
   it('renders the right-to-left demo inside dir="rtl"', async () => {
     expect(await render('rtl')).toMatch(/^<div dir="rtl" lang="ar"/)
+  })
+
+  it('keeps the email and the number left-to-right inside it, and the name with the form', async () => {
+    const tags = inputs(await render('rtl'))
+    expect(tags.map((tag) => [attr(tag, 'type'), attr(tag, 'dir')]))
+      .toEqual([['text', undefined], ['email', 'ltr'], ['number', 'ltr'], ['text', undefined]])
+    expect(tags.find((tag) => attr(tag, 'type') === 'number')).toContain('value="-1234.5"')
+  })
+
+  it('shows two inputs at their own width in a flex row inside a grid form', async () => {
+    const html = await render('row')
+    expect(html).toMatch(/^<form class="grid gap-4"><div data-row="own" class="flex gap-2"><input /)
+    const own = inputs(/<div data-row="own"[^>]*>(.*?)<\/div>/.exec(html)?.[1] ?? '')
+    expect(own.map((tag) => / w-\[min\(100%,var\(--tc-input-width\)\)\][ "]/.test(tag))).toEqual([true, true])
+    const grow = inputs(/<div data-row="grow"[^>]*>(.*?)<\/div>/.exec(html)?.[1] ?? '')
+    expect(grow.map((tag) => / flex-1[ "]/.test(tag))).toEqual([true, true])
   })
 })

@@ -11,6 +11,7 @@ import { InputSkeleton } from '../skeleton.js'
 const RENDERED = [...new Set([
   ...classList(markup(createElement(Input, { 'aria-label': 'Email', fullWidth: true }))),
   ...classList(markup(createElement(Input, { 'aria-label': 'Email', size: 'xs' }))),
+  ...classList(markup(createElement(Input, { 'aria-label': 'Email', type: 'email', readOnly: true }))),
   ...classList(markup(createElement(InputSkeleton))),
 ])]
 
@@ -35,6 +36,16 @@ const ruleAt = (cls: string) => {
 const blockOf = (cls: string) => {
   const at = ruleAt(cls)
   return at === -1 ? '' : css.slice(at, css.indexOf('}', at))
+}
+
+/** The at-rule a class's rule sits inside, or '' when it sits in none. */
+const mediaOf = (cls: string) => {
+  const at = ruleAt(cls)
+  const media = css.lastIndexOf('@media', at)
+  if (at === -1 || media === -1) return ''
+  const between = css.slice(media, at)
+  const open = between.split('{').length - between.split('}').length
+  return open === 1 ? between.slice(0, between.indexOf('{')).trim() : ''
 }
 
 describe('every class the component renders paints something', () => {
@@ -67,5 +78,68 @@ describe('the placeholder', () => {
     const block = blockOf('placeholder:text-muted')
     expect(block).toContain('::placeholder')
     expect(block).toContain('color: var(--tc-muted)')
+  })
+})
+
+describe('the invalid line is thicker as well as red', () => {
+  it('draws a ring inside the line, as wide as the ring knob is wider than the line', () => {
+    const block = blockOf('aria-invalid:inset-ring-[calc(var(--tc-ring-width)-var(--tc-line-width))]')
+    expect(block).toContain('[aria-invalid="true"]')
+    expect(block).toContain('inset 0 0 0 calc(var(--tc-ring-width) - var(--tc-line-width))')
+  })
+
+  it('paints that ring in the danger colour', () => {
+    const block = blockOf('aria-invalid:inset-ring-danger-solid')
+    expect(block).toContain('[aria-invalid="true"]')
+    expect(block).toContain('--tw-inset-ring-color: var(--tc-danger-solid)')
+  })
+
+  it('widens the border itself under forced colours only, after the resting width in the sheet', () => {
+    const cls = 'forced-colors:aria-invalid:border-(length:--tc-ring-width)'
+    expect(mediaOf(cls)).toBe('@media (forced-colors: active)')
+    expect(blockOf(cls)).toContain('[aria-invalid="true"]')
+    expect(blockOf(cls)).toContain('border-width: var(--tc-ring-width)')
+    expect(ruleAt(cls)).toBeGreaterThan(ruleAt('border-(length:--tc-line-width)'))
+  })
+})
+
+describe('the own width', () => {
+  it('is the smaller of the container and the token, and sits in no media query', () => {
+    const cls = 'w-[min(100%,var(--tc-input-width))]'
+    expect(blockOf(cls)).toContain('width: min(100%, var(--tc-input-width))')
+    expect(mediaOf(cls)).toBe('')
+  })
+
+  it('reads a token the sheet declares in em, so the width follows the size scale', () => {
+    expect(css).toContain('--tc-input-width: 13.8em;')
+  })
+})
+
+describe('a value forced left-to-right', () => {
+  it('takes the side of its parent, with the prefixed value Chromium needs first', () => {
+    const block = blockOf('data-ltr:text-match-parent')
+    expect(block).toContain('[data-ltr]')
+    expect(block).toMatch(/text-align: -webkit-match-parent;\s+text-align: match-parent/)
+  })
+
+  it('orders its placeholder by the script the placeholder is written in', () => {
+    const block = blockOf('data-ltr:placeholder:[unicode-bidi:plaintext]')
+    expect(block).toContain('[data-ltr]::placeholder')
+    expect(block).toContain('unicode-bidi: plaintext')
+  })
+})
+
+describe('the touch floor for the text', () => {
+  it('is 16 CSS px at least, under a coarse pointer only, after the type step in the sheet', () => {
+    const cls = 'pointer-coarse:text-[max(1rem,16px)]'
+    expect(mediaOf(cls)).toBe('@media (pointer: coarse)')
+    expect(blockOf(cls)).toContain('font-size: max(1rem, 16px)')
+    expect(ruleAt(cls)).toBeGreaterThan(ruleAt('text-xs'))
+  })
+})
+
+describe('the read-only surface', () => {
+  it('is the neutral tint, whose step from every surface check:contrast measures', () => {
+    expect(blockOf('bg-neutral-soft')).toContain('background-color: var(--tc-neutral-soft)')
   })
 })

@@ -6,6 +6,7 @@ export default function Demo() {
       <label htmlFor="demo-name-ar" className="text-sm font-medium text-body">الاسم</label>
       <Input id="demo-name-ar" fullWidth placeholder="اكتب اسمك" />
       <Input type="email" fullWidth defaultValue="omar@example.com" aria-label="البريد الإلكتروني" />
+      <Input type="number" fullWidth defaultValue="-1234.5" aria-label="الرصيد" />
       <Input invalid fullWidth defaultValue="٠٧٩" aria-label="رقم الهاتف" />
     </div>
   )

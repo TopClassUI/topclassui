@@ -15,3 +15,9 @@ export const INPUT_DEFAULT_TYPE = 'text'
 
 /** The six types HTML allows `maxlength` on; every other type gets no cap at all (R-5.7-8). */
 export const INPUT_CAPPED_TYPES = ['text', 'search', 'url', 'tel', 'email', 'password'] as const
+
+/** The types the browser draws twenty characters wide, which take the width token instead. */
+export const INPUT_OWN_WIDTH_TYPES = [...INPUT_CAPPED_TYPES, 'number'] as const
+
+/** The types whose value is Latin-ordered, so they stay left-to-right in a right-to-left form. */
+export const INPUT_LTR_TYPES = ['email', 'number', 'tel', 'url'] as const

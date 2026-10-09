@@ -40,6 +40,9 @@ function compile(snippets: Record<string, string>): Record<string, string[]> {
   return out
 }
 
+/** The second import a wrapper needs, which a probe that never names the type must not carry. */
+const PROPS = "import type { InputProps } from '../index.js'\n"
+
 const verdict = compile({
   unnamed: "export const bad = <Input type='email' />",
   withId: "export const ok = <Input id='email' />",
@@ -51,6 +54,8 @@ const verdict = compile({
   uncapped: "export const ok = <Input aria-label='Email' maxLength={null} />",
   variant: "export const bad = <Input aria-label='Email' variant='outline' />",
   sample: "export const ok = <Input id='email' name='email' type='email' autoComplete='email' required invalid fullWidth />",
+  wrapper: `${PROPS}export const Search = (props: InputProps) => <Input {...props} type='search' />`,
+  omitted: `${PROPS}export const Search = (props: Omit<InputProps, 'type'>) => <Input {...props} type='search' />`,
 })
 
 describe('a name is required by the type (R-5.6-1)', () => {
@@ -101,5 +106,15 @@ describe('what an Input does take', () => {
 
   it('takes the docs sample: native props beside the design props', () => {
     expect(verdict['sample']).toEqual([])
+  })
+})
+
+describe('wrapping an Input, as the README says to', () => {
+  it('compiles when the wrapper takes InputProps and sets the type inside', () => {
+    expect(verdict['wrapper']).toEqual([])
+  })
+
+  it('refuses Omit<InputProps>, which makes all three names optional, so none is required', () => {
+    expect((verdict['omitted'] ?? []).join(' ')).toContain("Types of property ''aria-labelledby'' are incompatible")
   })
 })

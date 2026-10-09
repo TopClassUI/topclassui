@@ -9,7 +9,7 @@ export const inputSchema = z.object({
   size: sizeSchema.default(INPUT_DEFAULTS.size)
     .meta({ description: 'The shared control scale; custom emits no size classes.' }),
   invalid: z.boolean().default(INPUT_DEFAULTS.invalid)
-    .meta({ description: 'Marks the value as wrong: sets aria-invalid and turns the border to danger.' }),
+    .meta({ description: 'Marks the value as wrong: sets aria-invalid, and the border turns to danger and thickens.' }),
   fullWidth: z.boolean().default(INPUT_DEFAULTS.fullWidth)
     .meta({ description: 'Stretches the input to the width of its container.' }),
 })

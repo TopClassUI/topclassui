@@ -25,6 +25,24 @@ password 256). Pass your own number, or `maxLength={null}` for no cap. Only thos
 take one, because HTML allows `maxlength` on no other: a `number`, a `date` or a `checkbox`
 gets none, and a `number` is bounded by `min`, `max` and `step`.
 
+**Its own width is `--tc-input-width`** (13.8em), and less in a narrow row, so two side by side
+fit a phone. A grid or a column does not stretch it: pass `fullWidth` to fill, or your own `w-*`
+class. `flex-1` grows past it.
+
+**Email, number, tel and url stay left-to-right** in a right-to-left form, on the form's side.
+Pass `dir` to decide yourself.
+
+**Text types only.** `checkbox`, `radio`, `range`, `color` and `file` render, but in the
+text-field box, which is wrong for them: they belong to their own components.
+
+**On a touch screen the text is at least 16px**, or iOS zooms the page on focus.
+`size="custom"` opts out.
+
+**A wrapper** takes `InputProps` and sets `type` inside. `Omit<InputProps, 'type'>` does not
+compile: it merges the three ways to name an input into one where none is required.
+
+**A parent that clips** (`overflow-hidden`) needs 4px of padding, or it cuts the focus ring off.
+
 <!-- /hand-written -->
 
 ## Import
@@ -40,7 +58,7 @@ Every prop below is optional and falls back to the default shown.
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
 | `fullWidth` | no | `boolean` | `false` | Stretches the input to the width of its container. |
-| `invalid` | no | `boolean` | `false` | Marks the value as wrong: sets aria-invalid and turns the border to danger. |
+| `invalid` | no | `boolean` | `false` | Marks the value as wrong: sets aria-invalid, and the border turns to danger and thickens. |
 | `maxLength` | no | `number \| null` | - | The character cap: your number, the default of the `type`, or `null` for none. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The shared control scale; custom emits no size classes. |
 
@@ -51,6 +69,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/custom-size.tsx`
 - `dummy/full-width.tsx`
 - `dummy/labelled.tsx`
+- `dummy/row.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`
 - `dummy/skeleton.tsx`
