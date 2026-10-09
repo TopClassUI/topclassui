@@ -4,14 +4,16 @@ import { DIRECTIONS } from '../scripts/lib/harness.js'
 import { DEMOS, urlFor } from './pages.js'
 
 // What a class list cannot show, each measured failing before it was fixed: a hidden
-// span that widened the page, cells stacked word by word, a dimmed Button painted over
-// the stuck column, and a focused control lying under it (WCAG 2.2 SC 2.4.11).
+// span or a card in a grid that widened the page, cells stacked word by word, a dimmed
+// Button painted over the stuck column, and a focused control lying under it (SC 2.4.11).
 const TABLES = DEMOS.filter((demo) => demo.startsWith('table--'))
 const STUCK = ['table--sticky-first-column', 'table--rtl']
 
 test('the set holds the table demos, so a renamed folder cannot empty the loops below', () => {
   expect(TABLES.length).toBeGreaterThan(5)
   for (const demo of STUCK) expect(TABLES).toContain(demo)
+  // A table in a card of a grid and beside a sidebar: 715 px of page at 390 before the box became a grid.
+  expect(TABLES).toContain('table--in-a-layout')
 })
 
 test.describe('at 390 px', () => {

@@ -4,8 +4,9 @@ import { CONTAIN, FOCUS_RING, HOVER, TOUCH_TARGET } from '#shared/classes.js'
 import type { TableAlign } from './types.js'
 
 /** relative: the box contains every sr-only span, or one in a far column widens the page.
- * isolate: the z-index of a stuck cell stays inside, under any sticky bar of the page. */
-export const BOX = 'relative isolate overflow-x-auto rounded-box bg-surface-raised'
+ * isolate: the z-index of a stuck cell stays inside, under any sticky bar of the page.
+ * grid grid-cols-1: a grid or flex parent can shrink the box instead of being widened by it. */
+export const BOX = 'relative isolate grid grid-cols-1 overflow-x-auto rounded-box bg-surface-raised'
 
 /** SC 2.4.11: a focused control is scrolled clear of the stuck column, which is never wider than this. */
 export const STICKY_BOX = 'scroll-ps-[var(--tc-table-sticky-width,8rem)]'
@@ -58,8 +59,9 @@ export const SORT_LINK = `flex items-center -my-1 rounded-chip ${CONTAIN} ${HOVE
 /** R-5.2-7: LABEL without its nowrap, so the cell still decides whether its header wraps. */
 export const HEADER_LABEL = 'min-w-0 overflow-hidden text-ellipsis'
 
-/** The placeholder never scrolls: it has no tab stop, so nothing in it may need one. */
-export const SKELETON_BOX = 'overflow-hidden rounded-box bg-surface-raised'
+/** The placeholder never scrolls: it has no tab stop, so nothing in it may need one.
+ * grid grid-cols-1 as on BOX: it stands where the table will, in the same grid or flex parent. */
+export const SKELETON_BOX = 'grid grid-cols-1 overflow-hidden rounded-box bg-surface-raised'
 
 /** One line of nothing: as tall as the type, with margins making up the line height. */
 export const SKELETON_BAR = 'block h-[1em] my-[calc((1lh-1em)/2)] w-full rounded-chip bg-neutral-soft animate-pulse motion-reduce:animate-none'

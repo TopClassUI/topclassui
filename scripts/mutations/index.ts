@@ -1074,8 +1074,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the box of a table stops containing its sr-only spans, so one in a far column widens the page',
     file: 'src/components/table/classes.ts',
-    from: "export const BOX = 'relative isolate overflow-x-auto",
-    to: "export const BOX = 'isolate overflow-x-auto",
+    from: "export const BOX = 'relative isolate grid",
+    to: "export const BOX = 'isolate grid",
+  },
+  {
+    label: 'a table inside a flex or grid item widens the page again, because its box stops being a one-column grid',
+    file: 'src/components/table/classes.ts',
+    from: "'relative isolate grid grid-cols-1 overflow-x-auto",
+    to: "'relative isolate overflow-x-auto",
   },
   {
     label: 'a stuck table cell loses its z-index, so a dimmed Button in a later cell is painted over it',

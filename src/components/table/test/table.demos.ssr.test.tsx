@@ -12,7 +12,8 @@ const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
 const EXPECTED = [
-  'basic', 'caption', 'column-classes', 'empty', 'rtl', 'skeleton', 'sorted', 'sticky-first-column', 'striped',
+  'basic', 'caption', 'column-classes', 'empty', 'in-a-layout', 'rtl', 'skeleton', 'sorted', 'sticky-first-column',
+  'striped',
 ]
 
 const render = async (file: string) => {
@@ -154,7 +155,23 @@ describe('each demo shows what its name says', () => {
     expect(html).toContain(STUCK)
   })
 
-  it('rtl: the wrapper of the narrow table may shrink, or as a grid item it grows to the table and the page scrolls', async () => {
-    expect(await render('rtl')).toContain('<div class="min-w-0 max-w-sm"><div role="region"')
+  it('rtl: the narrow table sits in a plain wrapper inside a grid, with no min-w-0 to help it', async () => {
+    const html = await render('rtl')
+    expect(html).toMatch(/^<div dir="rtl" lang="ar" class="grid gap-6">/)
+    expect(html).toContain('<div class="max-w-sm"><div role="region"')
+    expect(html).not.toContain('min-w-0 max-w-sm')
+  })
+
+  it('in-a-layout: a table in a card of a grid and one in the growing column of a flex row, neither parent told to shrink', async () => {
+    const html = await render('in-a-layout')
+    // The two layouts e2e/table.spec opens at 390 px: without the grid on the box each widens the page.
+    expect(html).toMatch(/<div class="grid gap-6 lg:grid-cols-3"><section class="[^"]*"><h2 [^>]*>Recent orders<\/h2><div role="region"/)
+    expect(html).toMatch(/<div class="flex gap-6"><p [^>]*>[^<]*<\/p><div class="flex-1"><div role="region"/)
+    expect(html).not.toMatch(/min-w-0|overflow-hidden/)
+    const [inCard, beside] = tables(html)
+    for (const table of [inCard ?? '', beside ?? '']) {
+      expect(table.split('<th scope="col"').length - 1).toBe(6)
+      expect(table).toMatch(/^<div [^>]*class="relative isolate grid grid-cols-1 overflow-x-auto /)
+    }
   })
 })

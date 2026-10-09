@@ -33,7 +33,7 @@ export default function Demo() {
         sort={{ key: 'amount', direction: 'descending' }}
         columns={columns}
       />
-      <div className="min-w-0 max-w-sm">
+      <div className="max-w-sm">
         <Table
           labels={ar}
           stickyFirstColumn

@@ -62,7 +62,8 @@ so a screen reader moves through it by row and by column.
 
 ## In a layout
 
-- **Inside a grid or flex item**, give that item `min-w-0`, or the page scrolls instead of the table.
+- **Inside a grid or flex item** the table scrolls and the page does not: the parent needs no `min-w-0`. See `dummy/in-a-layout.tsx`.
+- **A shrink-to-fit parent** (`inline-flex`, `w-fit`) is as wide as the table while there is room, and scrolls the table when there is not.
 - **`ref`, `className` and other attributes** go to the scrolling box around the table. A menu opened from a cell must be portalled, or the box clips it.
 - **Build the columns where you render the table.** `columns` and `getKey` hold functions, so they cannot be passed from a Server Component into a Client Component.
 - **In a wrapper**, type your own caption as `TableProps<Row>['caption']` and a columns array outside the JSX as `TableColumn<Row>[]`.
@@ -101,6 +102,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/caption.tsx`
 - `dummy/column-classes.tsx`
 - `dummy/empty.tsx`
+- `dummy/in-a-layout.tsx`
 - `dummy/rtl.tsx`
 - `dummy/skeleton.tsx`
 - `dummy/sorted.tsx`

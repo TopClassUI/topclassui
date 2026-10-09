@@ -67,8 +67,12 @@ describe('rows and columns', () => {
 describe('it has the dimensions of the table it stands in for', () => {
   it('wears the box without its scrolling: a placeholder with no tab stop must not need one', () => {
     expect(classList(html()).sort()).toEqual([
-      'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line', 'overflow-hidden', 'rounded-box',
+      'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line', 'grid', 'grid-cols-1', 'overflow-hidden', 'rounded-box',
     ])
+  })
+
+  it('is the same one-column grid as the table, so twelve columns of padding never widen the card it loads in', () => {
+    expect(classList(html({ columns: 12 }))).toEqual(expect.arrayContaining(['grid', 'grid-cols-1']))
   })
 
   it('wears the header cell and the body cell of the table, class for class', () => {

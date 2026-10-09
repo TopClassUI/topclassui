@@ -37,8 +37,20 @@ describe('each part wears exactly the classes it needs', () => {
   it('the root scrolls sideways on the box radius, with the hairline, the raised fill and a ring', () => {
     expect(classList(html()).sort()).toEqual([
       'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line', ...RING,
-      'isolate', 'overflow-x-auto', 'relative', 'rounded-box',
+      'grid', 'grid-cols-1', 'isolate', 'overflow-x-auto', 'relative', 'rounded-box',
     ].sort())
+  })
+
+  it('the root is a one-column grid, whose track can shrink to nothing: a grid or flex parent is never widened by the table', () => {
+    for (const html_ of [html(), html({ items: [] }), html({ stickyFirstColumn: true })]) {
+      expect(classList(html_)).toEqual(expect.arrayContaining(['grid', 'grid-cols-1']))
+    }
+  })
+
+  it('lets a caller take the grid back, as it lets every class of the root be replaced', () => {
+    const list = classList(html({ className: 'block' }))
+    expect(list).toContain('block')
+    expect(list).not.toContain('grid')
   })
 
   it('the root is the containing block of every sr-only span, or one in a far column widens the page', () => {
