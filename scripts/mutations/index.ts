@@ -1023,4 +1023,40 @@ export const MUTATIONS: Mutation[] = [
     from: '      <TooltipTrigger\n        render={\n          <Button variant="ghost" aria-label="Copy link">\n            <Svg icon={linkSimple} />\n          </Button>\n        }\n      />',
     to: '      <TooltipTrigger render={<Button variant="ghost" aria-label="Copy link" />}>\n        <Svg icon={linkSimple} />\n      </TooltipTrigger>',
   },
+  {
+    label: 'the tag default tone goes back to the shared primary, so a row of topics shouts',
+    file: 'src/components/tag/constants.ts',
+    from: "  tone: 'neutral',",
+    to: "  tone: 'primary',",
+  },
+  {
+    label: 'the tag renders its children bare, so a long label has no span to truncate and no bound',
+    file: 'src/components/tag/index.tsx',
+    from: '{truncateLabel(children, TAG_BOUNDARIES.labelMaxLength)}',
+    to: '{children}',
+  },
+  {
+    label: 'the tag loses CONTAIN, so a long label pushes it past its container',
+    file: 'src/components/tag/variants.ts',
+    from: '    BORDER_WIDTH,\n    CONTAIN,\n',
+    to: '    BORDER_WIDTH,\n',
+  },
+  {
+    label: 'a tag className replaces its classes instead of merging, so the look disappears',
+    file: 'src/components/tag/index.tsx',
+    from: 'cn(tagVariants({ tone, size }), className)',
+    to: 'cn(className ?? tagVariants({ tone, size }))',
+  },
+  {
+    label: 'the danger tag paints the solid pair, a look the tag does not have',
+    file: 'src/components/tag/classes.ts',
+    from: "  danger: 'bg-danger-soft text-danger-on-soft border-transparent',",
+    to: "  danger: 'bg-danger-solid text-danger-on-solid border-transparent',",
+  },
+  {
+    label: 'the tag label bound is raised to 10000, so a pasted file reaches the DOM',
+    file: 'src/components/tag/boundaries.ts',
+    from: 'labelMaxLength: 100,',
+    to: 'labelMaxLength: 10_000,',
+  },
 ]
