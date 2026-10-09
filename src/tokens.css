@@ -17,6 +17,8 @@
   --tc-overlay-inset: 1rem;
   --tc-sticky-top: 0px;
   --tc-sticky-bottom: 0px;
+  /* The widest a Table's stuck first column gets, and the scroll padding that keeps focus clear of it. */
+  --tc-table-sticky-width: clamp(8rem, 30vw, 16rem);
   --tc-dir: 1;
 
   /* env() is physical, so the inline edges are named here and swapped per direction. */
