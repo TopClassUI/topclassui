@@ -3,7 +3,7 @@ import { cva } from 'class-variance-authority'
 import { memoizeVariants } from '#shared/variants.js'
 
 import { BORDER_WIDTH, CONTAIN } from '#shared/classes.js'
-import { ON_SOFT, TAG_SIZE } from './classes.js'
+import { CLIP, ON_SOFT, TAG_SIZE } from './classes.js'
 import { TAG_DEFAULTS, TAG_SIZES, TAG_TONES } from './constants.js'
 
 const resolve = cva(
@@ -12,6 +12,7 @@ const resolve = cva(
     // The width Badge carries, so a Tag is exactly as tall as a Badge beside it.
     BORDER_WIDTH,
     CONTAIN,
+    CLIP,
   ],
   {
     variants: {

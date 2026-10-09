@@ -1059,4 +1059,40 @@ export const MUTATIONS: Mutation[] = [
     from: 'labelMaxLength: 100,',
     to: 'labelMaxLength: 10_000,',
   },
+  {
+    label: 'the tag loses CLIP, so an element label widens the page or grows the tag to many lines',
+    file: 'src/components/tag/variants.ts',
+    from: '    CONTAIN,\n    CLIP,\n',
+    to: '    CONTAIN,\n',
+  },
+  {
+    label: 'the tag clip loses overflow-hidden, so an unbroken element label runs out of the chip',
+    file: 'src/components/tag/classes.ts',
+    from: "export const CLIP = 'overflow-hidden whitespace-nowrap shrink-0'",
+    to: "export const CLIP = 'whitespace-nowrap shrink-0'",
+  },
+  {
+    label: 'the tag clip loses whitespace-nowrap, so an element label wraps the tag to many lines',
+    file: 'src/components/tag/classes.ts',
+    from: "export const CLIP = 'overflow-hidden whitespace-nowrap shrink-0'",
+    to: "export const CLIP = 'overflow-hidden shrink-0'",
+  },
+  {
+    label: 'the tag clip loses shrink-0, so a flex row crushes a short tag and a column squashes it',
+    file: 'src/components/tag/classes.ts',
+    from: "export const CLIP = 'overflow-hidden whitespace-nowrap shrink-0'",
+    to: "export const CLIP = 'overflow-hidden whitespace-nowrap'",
+  },
+  {
+    label: 'the tag link demo wraps its link in a Tag, the form whose focus ring the clip cuts',
+    file: 'src/components/tag/dummy/link.tsx',
+    from: '<a href="#platform" className={chip}>{LONG}</a>',
+    to: '<span data-tone="info" className={chip}><a href="#platform">{LONG}</a></span>',
+  },
+  {
+    label: 'the tag long-label demo drops the class that lets two tags share a row, so the second leaves the box',
+    file: 'src/components/tag/dummy/long-label.tsx',
+    from: '<Tag className="shrink" tone="success">{LONG}</Tag>',
+    to: '<Tag tone="success">{LONG}</Tag>',
+  },
 ]

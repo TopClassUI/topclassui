@@ -13,6 +13,11 @@ export const ON_SOFT = {
   info: 'bg-info-soft text-info-on-soft border-transparent',
 } as const satisfies Record<Tone, string>
 
+/** An element label, or bare text on a tagVariants() anchor, is cut at the chip on one line
+ * instead of widening the page. shrink-0, or the clip leaves a flex item no minimum size:
+ * a row crushed a 55 px tag to 36 beside wrapping text, and a column squashed it to 14 tall. */
+export const CLIP = 'overflow-hidden whitespace-nowrap shrink-0'
+
 /** The drawn inline padding is twice padding-y at every size, so it is not pad-x. */
 export const TAG_SIZE = {
   xs: 'px-1 py-pad-y-xs gap-1 text-xs',

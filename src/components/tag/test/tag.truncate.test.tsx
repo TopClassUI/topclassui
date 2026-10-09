@@ -53,6 +53,20 @@ describe('a long label truncates instead of breaking the layout', () => {
   })
 })
 
+describe('an element label is clipped by the chip, not truncated', () => {
+  it('passes the element through with no span around it, so only the chip can hold it', () => {
+    const html = markup(<Tag><strong>{LONG}</strong></Tag>)
+    expect(spans(html)).toBe(0)
+    expect(html).toContain(`<strong>${LONG}</strong>`)
+  })
+
+  it('carries the clip on the chip itself, which is what stops that element at its edge', () => {
+    const list = classList(markup(<Tag><strong>{LONG}</strong></Tag>))
+    expect(list).toContain('overflow-hidden')
+    expect(list).toContain('whitespace-nowrap')
+  })
+})
+
 describe('an interpolated label is one span, not one per child', () => {
   it('joins a run of text, so the gap does not open inside the words', () => {
     const count = 3

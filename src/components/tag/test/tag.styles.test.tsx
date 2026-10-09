@@ -60,6 +60,18 @@ describe('the box', () => {
     expect(classes()).toContain('max-w-full')
   })
 
+  it('clips to one line at every size, so an element label is cut at the chip and never widens the page', () => {
+    for (const size of ['xs', 'sm', 'md', 'lg', 'xl', 'custom'] as const) {
+      const list = classes({ size })
+      expect(list, size).toContain('overflow-hidden')
+      expect(list, size).toContain('whitespace-nowrap')
+    }
+  })
+
+  it('never shrinks as a flex item, which the clip alone would let a row or a column do', () => {
+    expect(classes()).toContain('shrink-0')
+  })
+
   it('carries the border width on every tone, so a Tag is exactly as tall as a Badge beside it', () => {
     for (const tone of ['primary', 'neutral', 'success', 'warning', 'danger', 'info'] as const) {
       expect(classes({ tone }).filter((c) => c.startsWith('border')).sort(), tone)
@@ -84,9 +96,15 @@ describe('className', () => {
   it('keeps a consumer utility beside every class of its own, so it merges and never replaces', () => {
     expect(classes({ className: 'ms-2' }).sort()).toEqual([
       'bg-neutral-soft', 'border-(length:--tc-line-width)', 'border-transparent', 'font-medium',
-      'gap-2', 'inline-flex', 'items-center', 'max-w-full', 'ms-2', 'px-3', 'py-pad-y-md',
-      'rounded-chip', 'text-neutral-on-soft', 'text-sm',
+      'gap-2', 'inline-flex', 'items-center', 'max-w-full', 'ms-2', 'overflow-hidden', 'px-3',
+      'py-pad-y-md', 'rounded-chip', 'shrink-0', 'text-neutral-on-soft', 'text-sm', 'whitespace-nowrap',
     ])
+  })
+
+  it('lets the consumer make it shrink, for tags that share a row which does not wrap', () => {
+    const list = classes({ className: 'shrink' })
+    expect(list).toContain('shrink')
+    expect(list).not.toContain('shrink-0')
   })
 
   it('lets the consumer replace the radius, so a pill is one class away', () => {

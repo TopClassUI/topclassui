@@ -5,6 +5,8 @@ import type { ComponentType } from 'react'
 import { describe, expect, it } from 'vitest'
 
 import { markup } from '#test/markup.js'
+import ElementLabel from '../dummy/element-label.js'
+import Link from '../dummy/link.js'
 import LongLabel from '../dummy/long-label.js'
 import Rtl from '../dummy/rtl.js'
 import Sizes from '../dummy/sizes.js'
@@ -15,7 +17,12 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['custom-size', 'long-label', 'rtl', 'sizes', 'tones', 'topics', 'with-icon']
+const EXPECTED = [
+  'custom-size', 'element-label', 'link', 'long-label', 'rtl', 'sizes', 'tones', 'topics', 'with-icon',
+]
+
+/** The link demo holds no Tag: its chips are anchors wearing tagVariants(). */
+const WITHOUT_A_TAG = ['link']
 
 describe('every demo renders on the server', () => {
   it('holds exactly the demos PLAN 20 asks for, so none can be deleted silently', () => {
@@ -31,7 +38,7 @@ describe('every demo renders on the server', () => {
       // Not toContain('<'): an empty div passes that, and only a tag wears data-tone on the chip radius.
       const html = markup(<Demo />)
       expect(html, file).toContain('rounded-chip')
-      expect(html, file).toContain('data-tone=')
+      if (!WITHOUT_A_TAG.includes(file)) expect(html, file).toContain('data-tone=')
     })
   }
 
@@ -53,6 +60,32 @@ describe('every demo renders on the server', () => {
     const html = markup(<LongLabel />)
     expect(html).toContain('data-narrow')
     expect(html).toContain('<span class="truncate min-w-0">Infrastructure, platform reliability')
+  })
+
+  it('lets two long tags share a row that does not wrap, each with the class that lets it shrink', () => {
+    const html = markup(<LongLabel />)
+    expect(html.match(/<span data-tone="[a-z]+" data-size="md" class="[^"]* shrink"/g) ?? []).toHaveLength(2)
+  })
+
+  it('passes an element as the label in the element-label demo, with no truncating span to lean on', () => {
+    const html = markup(<ElementLabel />)
+    expect(html.match(/data-narrow/g) ?? []).toHaveLength(3)
+    for (const label of ['<strong>Infrastructure', '<em>Infrastructure', '<code>sha256_']) {
+      expect(html, label).toContain(label)
+    }
+    expect(html).not.toContain('<span class="truncate')
+  })
+
+  it('makes the link the chip in the link demo, never a link inside a Tag', () => {
+    const html = markup(<Link />)
+    expect(html).not.toContain('data-tone=')
+    expect(html.match(/<a href="#[a-z-]+" class="[^"]*rounded-chip/g) ?? []).toHaveLength(4)
+  })
+
+  it('gives one long link a label span and leaves the other bare, so the e2e page measures both', () => {
+    const html = markup(<Link />)
+    expect(html).toContain('<span class="truncate min-w-0">Infrastructure, platform reliability')
+    expect(html).toMatch(/<a href="#platform" class="[^"]*">Infrastructure, platform reliability/)
   })
 
   it('sets the direction on the rtl demo itself', () => {

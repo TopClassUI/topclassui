@@ -18,9 +18,30 @@ wrapping row. For a status such as Paid or Overdue, use a Badge.
 </div>
 ```
 
-Tag has no ARIA role, so the text must carry the meaning; colour alone never does. A long
-label truncates to its container instead of wrapping. This is the server half: the
-removable tag and its dismiss button arrive with the client half.
+Tag has no ARIA role, so the text must carry the meaning; colour alone never does. This is
+the server half: the removable tag and its dismiss button arrive with the client half.
+
+## Long labels
+
+A Tag stays on one line and never grows wider than its container. Plain text is cut with an
+ellipsis; an element passed as the label (`<strong>`, a translation component) is clipped
+at the edge of the chip, with no ellipsis.
+
+In a row that does not wrap, a Tag keeps its width, as a Badge does. Add `className="shrink"`
+and it shrinks and truncates instead.
+
+## A linked tag
+
+Make the link the chip, and give the label a span of its own so it keeps the ellipsis:
+
+```tsx
+<Link href="/topics/react" className={tagVariants()}>
+  <span className="truncate min-w-0">React</span>
+</Link>
+```
+
+Add your own focus ring and touch target to the link; `dummy/link.tsx` shows both. Do not put
+a link inside a Tag: its focus ring is cut off at size `xs` and at the end of a long label.
 
 <!-- /hand-written -->
 
@@ -45,6 +66,8 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 ## Examples
 
 - `dummy/custom-size.tsx`
+- `dummy/element-label.tsx`
+- `dummy/link.tsx`
 - `dummy/long-label.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`

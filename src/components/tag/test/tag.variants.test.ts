@@ -38,6 +38,13 @@ describe('tagVariants is a cache, so it has to behave like a pure function', () 
     expect(tagVariants({})).toBe(before)
   })
 
+  it('carries the whole box in the string, so bare text on an anchor wearing it stays on one line inside it', () => {
+    const classes = tagVariants({}).split(' ')
+    for (const cls of ['max-w-full', 'overflow-hidden', 'whitespace-nowrap', 'shrink-0']) {
+      expect(classes, cls).toContain(cls)
+    }
+  })
+
   it('appends the consumer classes last, which is what lets them win', () => {
     expect(tagVariants({ className: 'mt-4' }).endsWith('mt-4')).toBe(true)
     expect(tagVariants({ class: 'mt-4' }).endsWith('mt-4')).toBe(true)
