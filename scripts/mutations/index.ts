@@ -1035,4 +1035,40 @@ export const MUTATIONS: Mutation[] = [
     from: '    rating: group(base.rating, overrides.rating),',
     to: '    rating: base.rating,',
   },
+  {
+    label: 'a breadcrumb label holding </script> closes the JSON-LD script tag and the rest is parsed as HTML',
+    file: 'src/components/breadcrumb/lib.ts',
+    from: ".replace(/</g, '\\\\u003c')",
+    to: '',
+  },
+  {
+    label: 'the breadcrumb JSON-LD lists the current page too, as a ListItem with no URL',
+    file: 'src/components/breadcrumb/lib.ts',
+    from: 'items.filter((item) => item.href !== undefined)',
+    to: 'items',
+  },
+  {
+    label: 'the last breadcrumb crumb is no longer marked aria-current, so nothing says which page this is',
+    file: 'src/components/breadcrumb/index.tsx',
+    from: "aria-current={current ? 'page' : undefined} ",
+    to: '',
+  },
+  {
+    label: 'a breadcrumb link loses its touch target, so it is a 20 px line of text again',
+    file: 'src/components/breadcrumb/classes.ts',
+    from: '  TOUCH_TARGET,\n',
+    to: '',
+  },
+  {
+    label: 'the breadcrumb caret stops flipping, so it points against the trail under dir="rtl"',
+    file: 'src/components/breadcrumb/index.tsx',
+    from: '<Svg icon={caretRight} className={SEPARATOR} />',
+    to: '<Svg icon={caretRight} flipRtl={false} className={SEPARATOR} />',
+  },
+  {
+    label: 'the breadcrumb nav is named in English whatever labels the caller passes',
+    file: 'src/components/breadcrumb/index.tsx',
+    from: 'aria-label={labels.breadcrumb.label}',
+    to: 'aria-label={en.breadcrumb.label}',
+  },
 ]
