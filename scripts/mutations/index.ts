@@ -1035,4 +1035,40 @@ export const MUTATIONS: Mutation[] = [
     from: '    rating: group(base.rating, overrides.rating),',
     to: '    rating: base.rating,',
   },
+  {
+    label: 'the pagination value loses its clamp, so page 99 of 12 builds links to pages that do not exist',
+    file: 'src/components/pagination/lib.ts',
+    from: 'return Math.floor(clamp(value, PAGINATION_BOUNDARIES.pageMin, clampPageCount(pageCount)))',
+    to: 'return Math.floor(value)',
+  },
+  {
+    label: 'the pagination siblingCount loses its clamp, so a count of 50 renders a row of 105 cells',
+    file: 'src/components/pagination/lib.ts',
+    from: 'clamp(siblingCount, PAGINATION_BOUNDARIES.siblingCountMin, PAGINATION_BOUNDARIES.siblingCountMax),',
+    to: 'siblingCount,',
+  },
+  {
+    label: 'the pagination boundaryCount loses its clamp, so a count of 50 lists a hundred pages at the ends',
+    file: 'src/components/pagination/lib.ts',
+    from: 'clamp(boundaryCount, PAGINATION_BOUNDARIES.boundaryCountMin, PAGINATION_BOUNDARIES.boundaryCountMax),',
+    to: 'boundaryCount,',
+  },
+  {
+    label: 'the pagination previous control stays a link on page 1, a dead link to page 0',
+    file: 'src/components/pagination/index.tsx',
+    from: '{control(page - 1, text.previous, caretLeft, page === 1)}',
+    to: '{control(page - 1, text.previous, caretLeft, false)}',
+  },
+  {
+    label: 'a pagination cell loses its touch target, so a page link can fall under 24 px',
+    file: 'src/components/pagination/variants.ts',
+    from: '[CELL, DISABLED, FOCUS_RING, TOUCH_TARGET],',
+    to: '[CELL, DISABLED, FOCUS_RING],',
+  },
+  {
+    label: 'a pagination gap is no longer hidden, so a screen reader announces three dots as a list item',
+    file: 'src/components/pagination/index.tsx',
+    from: '<li key={item} aria-hidden="true" className={cn(CELL_GAP, CELL_SIZE[size])}>',
+    to: '<li key={item} className={cn(CELL_GAP, CELL_SIZE[size])}>',
+  },
 ]
