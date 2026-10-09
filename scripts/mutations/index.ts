@@ -1131,4 +1131,40 @@ export const MUTATIONS: Mutation[] = [
     from: 'renderElement(render ?? <img />, ',
     to: 'renderElement(<img />, ',
   },
+  {
+    label: 'AvatarGroup max loses its clamp, so max={0} shows no avatar and max={500} shows every one',
+    file: 'src/components/avatar-group/lib.ts',
+    from: 'clamp(max, AVATAR_GROUP_BOUNDARIES.maxMin, AVATAR_GROUP_BOUNDARIES.maxMax)',
+    to: 'max',
+  },
+  {
+    label: 'the AvatarGroup counter ignores size, so +N stays md beside avatars of any other size',
+    file: 'src/components/avatar-group/index.tsx',
+    from: '<AvatarRoot size={size} role="img"',
+    to: '<AvatarRoot role="img"',
+  },
+  {
+    label: 'an AvatarGroup whose children all fit still ends in a +0 counter',
+    file: 'src/components/avatar-group/index.tsx',
+    from: 'const fmt = hidden > 0 ? createNumberFormat(locale) : undefined',
+    to: 'const fmt = createNumberFormat(locale)',
+  },
+  {
+    label: 'the AvatarGroup overlap becomes a physical margin, so the row no longer mirrors in rtl',
+    file: 'src/components/avatar-group/classes.ts',
+    from: "'*:not-first:-ms-2'",
+    to: "'*:not-first:-ml-2'",
+  },
+  {
+    label: 'the AvatarGroup ring loses the page colour, so it paints in the text colour of each avatar',
+    file: 'src/components/avatar-group/classes.ts',
+    from: "'*:ring-2 *:ring-page'",
+    to: "'*:ring-2'",
+  },
+  {
+    label: 'the AvatarGroup counter is named from the English labels whatever the labels prop says',
+    file: 'src/components/avatar-group/index.tsx',
+    from: 'aria-label={labels.avatar.more(hidden, fmt)}',
+    to: 'aria-label={en.avatar.more(hidden, fmt)}',
+  },
 ]
