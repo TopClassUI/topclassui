@@ -220,7 +220,7 @@ Playground: variant (default), align (start), tone (primary), toggles compact (o
 Sample: <Timeline getKey={(event) => event.id} items={[{ id, icon: 'plus', title, time }, ...]} />. Note: "Item icons are IconName strings: the server half resolves them, no icon JS ships."
 ```
 
-**Build this.** Server. Tier 3, `data`. An `<ol>`.
+**Build this.** Server. Tier 3, `media-and-display`. An `<ol>` with `role="list"`.
 
 - **Props.** `items`: `{ title: ReactNode; time?: ReactNode; tone?: Tone; icon?: ReactNode;
   status?: 'done' | 'current' | 'todo' }[]`, `getKey`, and `emptyFallback?: ReactNode`.
@@ -243,7 +243,7 @@ Playground: density (comfortable), variant (outline), sortBy (name), pageSize (5
 Sample: <Table items={invoices} getKey={(invoice) => invoice.id} columns={[{ key: 'number', header: 'Invoice', cell: (invoice) => invoice.number }, ...]} />.
 ```
 
-**Build this.** Server. Tier 1, `data`. Build it last and alone: it is the largest of the ten.
+**Build this.** Server. Tier 1, `media-and-display`. Build it last and alone: it is the largest of the ten.
 A real `<table>` inside a `<div>` that scrolls sideways (`overflow-x-auto`, `rounded-box`,
 `BORDER`).
 
