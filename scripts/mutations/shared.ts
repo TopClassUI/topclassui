@@ -1,0 +1,167 @@
+// The mutations of src/shared and the stylesheets. Found by scripts/mutations/index.ts.
+import type { Mutation } from '../lib/mutate.js'
+
+export const MUTATIONS: Mutation[] = [
+  {
+    label: 'the shared transition is gutted, so nothing animates',
+    file: 'src/shared/classes.ts',
+    from: "'transition-[color,background-color,border-color,outline-color,opacity,translate] duration-(--tc-duration) ease-out'",
+    to: "'duration-(--tc-duration)'",
+  },
+  {
+    label: 'the touch target loses its width axis',
+    file: 'src/shared/classes.ts',
+    from: "  'min-w-[var(--tc-target-min,24px)]',\n",
+    to: '',
+  },
+  {
+    label: 'the focus ring stops being solid, so it paints nothing',
+    file: 'src/shared/classes.ts',
+    from: "  'focus-visible:outline-solid',\n",
+    to: '',
+  },
+  {
+    label: 'the whole size scale collapses onto one type step',
+    file: 'src/shared/classes.ts',
+    from: '  md: `${CONTROL_HEIGHT.md} px-pad-x-md text-sm`,',
+    to: '  md: `${CONTROL_HEIGHT.md} px-pad-x-md text-base`,',
+  },
+  {
+    label: 'the square toggle boxes all become one size',
+    file: 'src/shared/classes.ts',
+    from: "  xs: 'size-toggle-xs',",
+    to: "  xs: 'size-toggle-md',",
+  },
+  {
+    label: 'disabled styling stops reaching an element with no disabled attribute',
+    file: 'src/shared/classes.ts',
+    from: "  'data-disabled:pointer-events-none data-disabled:opacity-50',\n",
+    to: '',
+  },
+  {
+    label: 'a tone class stops being its own tailwind-merge group',
+    file: 'src/shared/cn.ts',
+    from: '    classGroups: { tone: [{ tone: [...TONES] }] },\n',
+    to: '',
+  },
+  {
+    label: 'renderElement stops composing, so a spinner is lost to a render element',
+    file: 'src/shared/render.ts',
+    from: "  merged['children'] = decorate ? decorate(children as ReactNode) : children",
+    to: "  merged['children'] = children",
+  },
+  {
+    label: 'renderElement drops the component ref instead of composing both',
+    file: 'src/shared/render.ts',
+    from: "  if (composed) merged['ref'] = composed",
+    to: '',
+  },
+  {
+    label: 'the variants cache keys on one prop, so combinations collide',
+    file: 'src/shared/variants.ts',
+    from: '      parts.push(String(value))',
+    to: '      if (parts.length === 0) parts.push(String(value))',
+  },
+  {
+    label: 'styles.css loses the @source Tailwind scans our components with',
+    file: 'src/styles.css',
+    from: '@source "./components";',
+    to: '',
+  },
+  {
+    label: 'a long label escapes its container again',
+    file: 'src/shared/classes.ts',
+    from: "export const CONTAIN = 'max-w-full'",
+    to: "export const CONTAIN = ''",
+  },
+  {
+    label: 'the label loses the element that makes the ellipsis work',
+    file: 'src/shared/classes.ts',
+    from: "export const LABEL = 'truncate min-w-0'",
+    to: "export const LABEL = ''",
+  },
+  {
+    label: 'the explicit maxLength opt-out silently keeps the cap',
+    file: 'src/shared/contracts/boundaries.ts',
+    from: 'if (given === null) return undefined',
+    to: 'if (false) return undefined',
+  },
+  {
+    label: 'every text field falls back to one cap, losing the per-type limits',
+    file: 'src/shared/contracts/boundaries.ts',
+    from: '    ? TEXT_MAX_LENGTH[known]',
+    to: '    ? TEXT_MAX_LENGTH.text',
+  },
+  {
+    label: 'the label bound stops cutting, so a megabyte reaches the DOM',
+    file: 'src/shared/truncate-label.tsx',
+    from: 'const text = run.slice(0, maxLength)',
+    to: 'const text = run',
+  },
+  {
+    label: 'each text child gets its own span, so the gap opens inside the words',
+    file: 'src/shared/truncate-label.tsx',
+    from: 'if (isText(part)) { run += String(part); continue }',
+    to: 'if (isText(part)) { run = String(part); flush(); continue }',
+  },
+  {
+    label: 'the variants cache stops checking the key, so a free string grows it',
+    file: 'src/shared/variants.ts',
+    from: 'if (cacheable.has(key)) cache.set(key, classes)',
+    to: 'cache.set(key, classes)',
+  },
+  {
+    label: 'style loses its --tc-* type, so Progress cannot set its value without a cast',
+    file: 'src/shared/style-tokens.ts',
+    from: '    [token: `--tc-${string}`]: string | number | undefined\n',
+    to: '',
+  },
+  {
+    label: 'the style fence widens to every custom property, not only --tc-*',
+    file: 'src/shared/style-tokens.ts',
+    from: '[token: `--tc-${string}`]',
+    to: '[token: `--${string}`]',
+  },
+  {
+    label: 'the provider loses its tooltip delay group, so every tooltip waits again',
+    file: 'src/shared/provider/provider.tsx',
+    from: '{nested ? isolated : <Tooltip.Provider>{isolated}</Tooltip.Provider>}',
+    to: '{isolated}',
+  },
+  {
+    label: 'a nested provider starts its own delay group, splitting an RTL island off the page',
+    file: 'src/shared/provider/provider.tsx',
+    from: 'const nested = useContext(TopClassContext) !== null',
+    to: 'const nested = false',
+  },
+  {
+    label: 'the label run is never reset, so text before an icon repeats after it',
+    file: 'src/shared/truncate-label.tsx',
+    from: "    run = ''\n  }",
+    to: '  }',
+  },
+  {
+    label: 'the rating name swaps its two numbers, so 4 out of 5 is announced as 5 out of 4',
+    file: 'src/shared/labels/en.ts',
+    from: '`${fmt.format(value)} out of ${fmt.format(max)}`',
+    to: '`${fmt.format(max)} out of ${fmt.format(value)}`',
+  },
+  {
+    label: 'a rating override is dropped on the way through getLabels, so a caller cannot reword the name',
+    file: 'src/shared/labels/get-labels.ts',
+    from: '    rating: group(base.rating, overrides.rating),',
+    to: '    rating: base.rating,',
+  },
+  {
+    label: 'a timeline status override is dropped on the way through getLabels, so a caller cannot reword a status',
+    file: 'src/shared/labels/get-labels.ts',
+    from: '    timeline: group(base.timeline, overrides.timeline),',
+    to: '    timeline: base.timeline,',
+  },
+  {
+    label: 'the pagination current page swaps its two numbers, so page 3 of 12 is announced as page 12 of 3',
+    file: 'src/shared/labels/en.ts',
+    from: '`Page ${fmt.format(page)} of ${fmt.format(count)}`',
+    to: '`Page ${fmt.format(count)} of ${fmt.format(page)}`',
+  },
+]
