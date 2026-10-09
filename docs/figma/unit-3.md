@@ -185,7 +185,7 @@ Conventions Unit 2 settled, which this file follows:
 
 ## Shared pull requests
 
-Eight, each on its own, opened first, and one carried over: `fix/readme-part-family` of
+Eight, each on its own, opened first, three more at the end of this list, and one carried over: `fix/readme-part-family` of
 `unit-2.md` was not built in Unit 2. Build it here, before Dialog: every part family needs
 the README to print flat names. None of the nine opens before Unit 2 is merged.
 
@@ -298,6 +298,25 @@ the README to print flat names. None of the nine opens before Unit 2 is merged.
    - The mutation that removes the tooltip provider anchors on the exact line this pull
      request rewrites. Update its `from`, or `pnpm test:mutation` stops on a lost anchor.
    - The dom test uses Base UI's parts directly, since the component does not exist yet.
+
+Three more, carried over from the reviews of Unit 2. Each is small and on its own:
+
+9. **`fix/shared-forced-colors`**, before 4. `FOCUS_RING` in `src/shared/classes.ts` resets
+   with `outline-none`, not `outline-hidden`, with the tests that pin the old class
+   (`src/styles.test.ts`, `src/shared/classes.test.ts`, Pagination's styles test). A
+   browser guard under `forcedColors: 'active'`: a control that is not focused has no
+   outline, the focused one has. With the stray ring gone, the current page of Pagination
+   has no box there, so its `CELL_CURRENT` takes
+   `forced-colors:forced-color-adjust-none forced-colors:bg-[Highlight]
+   forced-colors:text-[HighlightText] forced-colors:[--tc-ring:Highlight]`, measured: without
+   `forced-color-adjust-none` Chromium paints a backplate that hides the digit.
+10. **`fix/shared-number-format-tag`.** `createNumberFormat(locale)` honours the tag's own
+    `-u-nu-arab` when no numbering system is passed, so a Server Component reaches
+    Arabic-Indic digits with `locale="ar-u-nu-arab"` and no new prop. An explicit system
+    from the provider still wins; `ar`, `ar-EG` and `fa-IR` stay Latin as today.
+11. **`fix/shared-truncate`.** `truncateLabel` cuts by grapheme, so an emoji is never split,
+    and its span carries `dir="auto"`, so a label in the other script keeps its first
+    characters when it is cut (measured on Tag, Badge and Button: 53 hidden before, 0 after).
 
 **No icon pull request.** `raw/star-fill.svg` exists, and so does `icon/star-fill` on the
 Icons page. `star-half` is in neither, and nothing in the file draws a half star. Rating
