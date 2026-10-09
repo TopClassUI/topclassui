@@ -45,7 +45,7 @@ Checked on 2026-10-09, in the worktree of this file:
   directive; `createViteServer` in the types of `vitest/node` 5.0.3; every token named
   below in `src/tokens.css`. Forty-three of the unusual classes compiled again. `Menu` has
   no `virtualized` prop; `Combobox` has one. That pass changed the Drawer's x and safe
-  area, the Navbar on a narrow screen, the fourth kind of menu item, and choices 26 to 28.
+  area, the Navbar on a narrow screen, the link element of a menu, and choices 26 to 28.
 
 Not checked. Say so in the pull request when one of these turns out wrong:
 
@@ -89,6 +89,46 @@ Not checked. Say so in the pull request when one of these turns out wrong:
 - **Commit as Omar**, one conventional-commit line, no trailer, no attribution, no comment
   on a pull request. GitHub's checks may not run: paste the real tail of `pnpm check` and
   `pnpm test:mutation`.
+
+### What the reviews of Unit 2 found, after every gate had passed
+
+All ten components of Unit 2 passed lint, types, unit tests, axe, target size, contrast and
+their mutations. A second review that measured each one in a browser then found a real
+fault in every one: a page that scrolled sideways on a phone (Table, Input, Tag,
+AvatarGroup), text outside its box (Pagination from 1,000 pages, a Banner message one
+letter wide), a focused control hidden under a sticky cell, a state told by hue alone
+(Input invalid, Timeline done against current), things lost under forced colours, and three
+components a Next.js app could not navigate with. So in Unit 3 the measuring is part of the
+build, not a later review. Before a branch reports, its builder has run all of this and
+pasted the numbers:
+
+- **At 320, 390 and 1280 px, in LTR and RTL**, with the demos and with hostile content (a
+  300-character word, an element where text is expected, sixty items, an empty value): the
+  page never scrolls sideways, nothing is painted outside its box, nothing overlaps. The
+  harness keeps a scrollbar gutter, so compare `documentElement.scrollWidth` with
+  `document.body.clientWidth`; the root's `clientWidth` is 15 px lenient.
+- **Inside a real layout**: a grid track, a `flex-1` column and a `w-fit` parent. A box that
+  scrolls needs `grid grid-cols-1` or a percentage width, or it widens its parent instead.
+- **Forced colours, both palettes** (Playwright `forcedColors: 'active'`): no state or
+  boundary is told by a fill alone, and a system colour sits only behind `forced-colors:`.
+- **Colour is never the only cue**: a current, selected, invalid or done state also differs
+  by weight, shape, an icon or a thicker line.
+- **A coarse pointer**: every target is 44 px, and the text of anything typed into is 16 px,
+  or iOS zooms the page.
+- **Each of these is a test that fails on the code without it**, in the component's own
+  `e2e/<slug>.spec.ts`, and a mutation row that `vitest run` catches. Prove it once by
+  putting the old line back.
+
+Conventions Unit 2 settled, which this file follows:
+
+- **A link built from data takes one element prop named `link`** on the component
+  (`link={<Link href="" />}`), as Pagination, Table and Breadcrumb do: the `href` is cloned
+  in first, then `renderElement` merges the rest, because the element's own props win there.
+  `render` stays the prop that replaces a part's own element.
+- **A mutation label names its component in lowercase**: the filter of
+  `pnpm test:mutation <name>` is a case-sensitive substring.
+- **An absolute child ignores its parent's padding**, and an `overflow` that clips also
+  drops the automatic minimum size of a flex item: measure both when you add either.
 
 ## Rules for all fourteen
 
@@ -236,12 +276,13 @@ the README to print flat names. None of the nine opens before Unit 2 is merged.
    changed. Dialog, Drawer, Popover and Dropdown call it.
 7. **`feat/shared-menu-contract`.** `src/shared/contracts/menu.ts`, types only, with a type
    test: `MenuItem` and `MenuContract` as `docs/PLAN.md` 11.3 writes them, with three
-   changes. `icon` is a `ReactNode` (`<Icon name>` is async). An item is a union of four:
-   `href` (a plain anchor), `render` (a link element that carries its own `href`, such as
-   `<Link href="/profile" />` from `next/link`), `action` (a Server Action) or `onSelect`
-   (client only). `render` is not in PLAN 11.3: a plain anchor loads the whole page in
-   Next.js, and an element is the one link form that crosses from a server page. `size`
-   is left out until a menu has more than one row height.
+   changes. `icon` is a `ReactNode` (`<Icon name>` is async). An item is a union of three:
+   `href`, `action` (a Server Action) or `onSelect` (client only). The contract gains
+   `link?: ReactElement`, the element every `href` item is cloned from
+   (`link={<Link href="" />}`), the name Pagination, Table and Breadcrumb use. It is not
+   in PLAN 11.3: a plain anchor loads the whole page in Next.js, and an element is the one
+   link form that crosses from a server page. `size` is left out until a menu has more
+   than one row height.
 8. **`feat/shared-toast-provider`.** The mechanics, as `feat/shared-tooltip-provider` was
    for Tooltip:
    - `src/shared/contracts/toast.ts`: `TOAST_PLACEMENTS` (`top-start`, `top`, `top-end`,
@@ -650,10 +691,10 @@ requests 6 and 7. No label. Base UI `menu` (`baseUi: 'menu'`): `Root`, `Trigger`
 - **`DropdownMenu`.** Props: `MenuContract` (`trigger`, `title`, `items`, `open`,
   `defaultOpen`, `onOpenChange`) plus `placement` and `className`. It renders the parts:
   the trigger through `render`, one group labelled by `title`, a separator before an item
-  with `separatorBefore`, a link item for `href`, a link item with the element as its
-  `render` for `render`, and an item whose click runs `onSelect`, or runs
-  `action(new FormData())` inside `startTransition`. That handler is `useDropdownMenu()`
-  in `hook.ts`.
+  with `separatorBefore`, a link item for `href`, rendered into the `link` element when
+  one is passed (the `href` is cloned in first, then it is the `render` of the link item),
+  and an item whose click runs `onSelect`, or runs `action(new FormData())` inside
+  `startTransition`. That handler is `useDropdownMenu()` in `hook.ts`.
 - **Not a collection.** `docs/PLAN.md` 8.5 says a Dropdown windows above the threshold. It
   does not: Base UI's Menu has no `virtualized` prop, and its arrow keys and type-ahead
   reach mounted items only. The row cap alone applies (`R-8.5-1`: say so in the pull
@@ -673,8 +714,8 @@ requests 6 and 7. No label. Base UI `menu` (`baseUi: 'menu'`): `Root`, `Trigger`
   a visible arrow, and icons by name.
 - **For the reviewer:** a row is `--tc-row-height` tall (40 px), not the drawn 31, so the
   cap shows about `--tc-list-rows` rows, the last one cut. Under a coarse pointer a row is
-  44 px and the cap shows fewer. A dom test proves a `render` item renders the given
-  element, keeps its `href` and is a `menuitem`.
+  44 px and the cap shows fewer. A dom test proves an `href` item under `link` renders the
+  given element with the item's `href` and is a `menuitem`.
 
 ## Command
 
@@ -1235,7 +1276,7 @@ Every row has a default above, so nothing here blocks the build.
 | 23 | A removable Tag | passing `onRemove` shows the button | a `removable` boolean beside it |
 | 24 | Banner | `dismissible` off by default; hides after hydration | on by default, as the frame says; an inline script that hides it before paint |
 | 25 | The live harness | a Vite server from `vitest/node`, no new dependency | `esbuild` as a dev dependency and static bundles |
-| 26 | A menu link in Next.js | an item takes `render: <Link href="/profile" />` and navigates on the client | `href` only: a plain anchor, which loads the whole page in Next.js |
+| 26 | A menu link in Next.js | `DropdownMenu` takes `link={<Link href="" />}`, as Pagination, Table and Breadcrumb do, and navigates on the client | `href` only: a plain anchor, which loads the whole page in Next.js |
 | 27 | The image of an Avatar | a client part: a broken image falls back to the initials, and every avatar with an image hydrates | stays server HTML at 0 KB; a broken image shows the browser's broken mark and its `alt` |
 | 28 | A very long menu | the row cap only; every item is mounted | windowing, as PLAN 8.5 says; Base UI's Menu cannot reach a row that is not mounted |
 
@@ -1245,8 +1286,8 @@ The local session records these as one `docs/DECISIONS.md` entry once Omar has a
 the choices, before any Unit 3 branch opens. No component branch edits that file.
 
 - AlertDialog (18.5, Phase 5) is not built: it is not among the 46.
-- `MenuContract` (11.3): `icon` is a `ReactNode`, an item has a fourth kind, `render`, and
-  `size` is left out.
+- `MenuContract` (11.3): `icon` is a `ReactNode`, the contract gains `link`, and `size`
+  is left out.
 - A Dropdown is not windowed (8.5).
 - The toast stack is a plain column, not the collapsed stack of 10.3.
 - A Drawer swipes from the whole sheet, not from a handle, and has no snap points (10.5).
