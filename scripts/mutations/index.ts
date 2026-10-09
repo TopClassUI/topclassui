@@ -1037,15 +1037,15 @@ export const MUTATIONS: Mutation[] = [
   },
   {
     label: 'the banner message loses min-w-0, so it cannot shrink below its longest word beside an action',
-    file: 'src/components/banner/index.tsx',
-    from: '"min-w-0 flex-1"',
-    to: '"flex-1"',
+    file: 'src/components/banner/classes.ts',
+    from: "'min-w-0 grow basis-40'",
+    to: "'grow basis-40'",
   },
   {
     label: 'an empty banner message renders an empty element, so it opens a gap',
     file: 'src/components/banner/index.tsx',
-    from: '{isEmpty(children) ? null : <div className="min-w-0 flex-1">{children}</div>}',
-    to: '<div className="min-w-0 flex-1">{children}</div>',
+    from: '{isEmpty(children) ? null : <div className={MESSAGE}>{children}</div>}',
+    to: '<div className={MESSAGE}>{children}</div>',
   },
   {
     label: 'the banner passes className first, so the consumer loses every conflict',
@@ -1058,5 +1058,23 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/banner/classes.ts',
     from: "danger: 'bg-danger-soft text-danger-on-soft'",
     to: "danger: 'bg-danger-solid text-danger-on-soft'",
+  },
+  {
+    label: 'the banner row stops wrapping, so a long action squeezes the message to nothing instead of dropping under it',
+    file: 'src/components/banner/variants.ts',
+    from: "'flex w-full flex-wrap items-center",
+    to: "'flex w-full items-center",
+  },
+  {
+    label: 'the banner message loses its basis, so beside a long action it is one letter wide',
+    file: 'src/components/banner/classes.ts',
+    from: "'min-w-0 grow basis-40'",
+    to: "'min-w-0 flex-1'",
+  },
+  {
+    label: 'the banner loses its forced-colours edge, so nothing marks the row once the fill is gone',
+    file: 'src/components/banner/classes.ts',
+    from: "FORCED_EDGE = 'forced-colors:border-b-(length:--tc-line-width)'",
+    to: "FORCED_EDGE = ''",
   },
 ]

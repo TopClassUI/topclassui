@@ -3,7 +3,7 @@ import { Banner } from '../index.js'
 
 const LOG_URL = 'https://example.com/projects/topclassui/deployments/2026-10-09/logs/build-step-four-of-six.txt'
 
-/** Two narrow boxes: the long message wraps beside its action, and the unbroken URL breaks anywhere. */
+/** Two narrow boxes: the long message wraps above its action, and the unbroken URL breaks anywhere. */
 export default function Demo() {
   return (
     <div className="flex flex-col gap-3">

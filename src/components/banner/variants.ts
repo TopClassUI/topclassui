@@ -2,11 +2,11 @@ import { cva } from 'class-variance-authority'
 
 import { memoizeVariants } from '#shared/variants.js'
 
-import { ON_SOFT } from './classes.js'
+import { FORCED_EDGE, ON_SOFT } from './classes.js'
 import { BANNER_DEFAULTS, BANNER_TONES } from './constants.js'
 
-// No radius and no border: the row spans the page, edge to edge.
-const resolve = cva('flex w-full items-center gap-3 px-5 py-3 text-sm font-medium wrap-anywhere', {
+// No radius and no border: the row spans the page, edge to edge. It wraps, so a long action drops under the message.
+const resolve = cva(['flex w-full flex-wrap items-center gap-3 px-5 py-3 text-sm font-medium wrap-anywhere', FORCED_EDGE], {
   variants: {
     tone: ON_SOFT,
   },

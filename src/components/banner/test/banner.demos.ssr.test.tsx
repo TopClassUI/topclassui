@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['basic', 'long-text', 'minimal', 'rtl', 'tones', 'with-action']
+const EXPECTED = ['basic', 'long-action', 'long-text', 'minimal', 'rtl', 'tones', 'with-action']
 
 // Rendered here, not inside a test: the first import is cold and can outlast the 5 s timeout.
 const HTML = new Map(await Promise.all(files.map(async (file) => {
@@ -55,14 +55,15 @@ describe('every demo renders on the server', () => {
 
   it('gives every action the tone of its banner, so its text keeps 4.5:1 on the soft fill', () => {
     const pairs: string[] = []
-    for (const file of ['basic', 'long-text', 'rtl', 'with-action']) {
+    for (const file of ['basic', 'long-action', 'long-text', 'rtl', 'with-action']) {
       for (const banner of banners(load(file))) {
         const action = / data-tone="(\w+)"/.exec(banner)?.[1]
         if (action !== undefined) pairs.push(`${file}: ${banner.slice(0, banner.indexOf('"'))}/${action}`)
       }
     }
     expect(pairs).toEqual([
-      'basic: info/info', 'long-text: warning/warning', 'rtl: info/info',
+      'basic: info/info', 'long-action: warning/warning', 'long-action: info/info',
+      'long-text: warning/warning', 'rtl: info/info',
       'with-action: warning/warning', 'with-action: danger/danger', 'with-action: primary/primary',
     ])
   })

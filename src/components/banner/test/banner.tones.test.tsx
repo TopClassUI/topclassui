@@ -7,8 +7,11 @@ import type { BannerTone } from '../types.js'
 
 const html = (tone: BannerTone) => markup(<Banner aria-label="Notice" tone={tone}>Stored.</Banner>)
 
-/** The row every tone shares: layout, padding, the type step and the wrap. */
-const ROW = ['flex', 'w-full', 'items-center', 'gap-3', 'px-5', 'py-3', 'text-sm', 'font-medium', 'wrap-anywhere']
+/** The row every tone shares: layout, padding, the type step, both wraps and the forced-colours edge. */
+const ROW = [
+  'flex', 'w-full', 'flex-wrap', 'items-center', 'gap-3', 'px-5', 'py-3', 'text-sm', 'font-medium', 'wrap-anywhere',
+  'forced-colors:border-b-(length:--tc-line-width)',
+]
 
 /** All six written out: the soft fill and the text colour that reaches 4.5:1 on it. */
 const PAINT: Record<string, string[]> = {

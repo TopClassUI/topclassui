@@ -2,6 +2,7 @@
 import type { ReactNode } from 'react'
 
 import { cn } from '#shared/cn.js'
+import { MESSAGE } from './classes.js'
 import { BANNER_DEFAULTS } from './constants.js'
 import type { BannerProps } from './types.js'
 import { bannerVariants } from './variants.js'
@@ -28,7 +29,7 @@ export function Banner({
       role="region"
     >
       {icon}
-      {isEmpty(children) ? null : <div className="min-w-0 flex-1">{children}</div>}
+      {isEmpty(children) ? null : <div className={MESSAGE}>{children}</div>}
       {action}
     </div>
   )

@@ -23,6 +23,14 @@ Put it above the header; it is in the page flow, so it pushes the page down and 
 two names. The generated table below cannot say "one of two", which is why it is said here.
 The dismiss button, `sticky` and `placement` are not built yet.
 
+**Narrow screens.** When the message and the action do not fit on one line, the action moves under the message.
+
+**A link action is a `Button`** with `render={<a href="..." />}`, as above. A bare `<a>` gets no styling and no 44 px touch target.
+
+**Pass an icon when the tone matters.** Colour alone does not tell a warning from a notice.
+
+**Wrapping it.** `Omit<BannerProps, 'tone'>` drops the name rule; add it back with `Omit<BannerProps, 'tone'> & BannerName`.
+
 <!-- /hand-written -->
 
 ## Import
@@ -47,6 +55,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 ## Examples
 
 - `dummy/basic.tsx`
+- `dummy/long-action.tsx`
 - `dummy/long-text.tsx`
 - `dummy/minimal.tsx`
 - `dummy/rtl.tsx`

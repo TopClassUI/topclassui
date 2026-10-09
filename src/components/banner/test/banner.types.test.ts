@@ -33,6 +33,21 @@ describe('a name is required, one of two ways (R-5.6-1)', () => {
   })
 })
 
+describe('a wrapper that drops a prop', () => {
+  it('loses the name through the built-in Omit, which folds one of two into neither', () => {
+    expectTypeOf<Accepts<BannerProps, Omit<BannerProps, 'tone'>>>().toEqualTypeOf<false>()
+  })
+
+  it('gets the name back from BannerName, the form the README gives', () => {
+    expectTypeOf<Accepts<BannerProps, Omit<BannerProps, 'tone'> & BannerName>>().toEqualTypeOf<true>()
+  })
+
+  it('or drops both names and passes its own', () => {
+    type Titled = Omit<BannerProps, 'aria-label' | 'aria-labelledby'> & { 'aria-label': string }
+    expectTypeOf<Accepts<BannerProps, Titled>>().toEqualTypeOf<true>()
+  })
+})
+
 describe('the props follow the vocabulary', () => {
   it('takes the three slots as nodes', () => {
     expectTypeOf<BannerProps['icon']>().toEqualTypeOf<ReactNode>()

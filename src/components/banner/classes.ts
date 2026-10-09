@@ -1,5 +1,11 @@
-// R-5.12-4: Banner's own class table, read by variants.ts.
+// R-5.12-4: Banner's own class tables, read by variants.ts and index.tsx.
 import type { Tone } from '#shared/contracts/tone.js'
+
+/** The message keeps a readable width; below it the action wraps to a line of its own. */
+export const MESSAGE = 'min-w-0 grow basis-40'
+
+/** Forced colours remove the fill, the only thing that marks the row, so an edge shows there alone. */
+export const FORCED_EDGE = 'forced-colors:border-b-(length:--tc-line-width)'
 
 /** R-5.2-3: a lookup of complete class strings, never a name built from an expression. */
 export const ON_SOFT = {

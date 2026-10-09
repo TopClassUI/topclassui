@@ -5,7 +5,7 @@ import { Svg } from '#components/svg/index.js'
 import { markup } from '#test/markup.js'
 import { Banner } from '../index.js'
 
-const MESSAGE = '<div class="min-w-0 flex-1">'
+const MESSAGE = '<div class="min-w-0 grow basis-40">'
 
 /** Everything inside the root, exactly as rendered. */
 const inner = (source: string) => source.replace(/^<div[^>]*>/, '').replace(/<\/div>$/, '')
@@ -18,7 +18,7 @@ describe('the three slots, in reading order', () => {
     expect(inner(source)).toBe(`<i>icon</i>${MESSAGE}Version 2 is out.</div><a href="/more">Read more</a>`)
   })
 
-  it('gives the message an element of its own, which fills the row and may shrink', () => {
+  it('gives the message an element of its own, which grows from a readable basis and may shrink', () => {
     expect(inner(markup(<Banner aria-label="Notice">Out.</Banner>))).toBe(`${MESSAGE}Out.</div>`)
   })
 
@@ -29,7 +29,7 @@ describe('the three slots, in reading order', () => {
 
   it('renders the icon as given, a direct child of the row and hidden from a screen reader', () => {
     const source = markup(<Banner aria-label="Notice" icon={<Svg icon={bell} size="xs" />}>Out.</Banner>)
-    expect(inner(source)).toMatch(/^<svg width="16" height="16"[^>]*aria-hidden="true"[^>]*>.*<\/svg><div class="min-w-0 flex-1">Out\.<\/div>$/)
+    expect(inner(source)).toMatch(/^<svg width="16" height="16"[^>]*aria-hidden="true"[^>]*>.*<\/svg><div class="min-w-0 grow basis-40">Out\.<\/div>$/)
   })
 
   it('has no icon of its own: the drawing marks it optional and names none per tone', () => {
