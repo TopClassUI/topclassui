@@ -10,8 +10,9 @@ components; "Rules for all fourteen" below replaces them.
 **Read this instead of Figma.** File `BxRSdAVOhk9Hj3Tkq4tjcy`, read on 2026-10-09: the
 fourteen docs previewers in `Docs site - LTR` (133:148), their drawings on the Components
 page, `Page: Provider` (193:2659) and `Page: Accessibility` (183:1877). Text and layer
-facts only, no screenshot. One reader, not re-checked: where a fact looks wrong, build from
-the Build this block and say so in the pull request.
+facts only, no screenshot. One reader; a second read of four frames (Dialog, Dropdown menu,
+Toast, Drawer) matched. Where a fact looks wrong, build from the Build this block and say
+so in the pull request.
 
 Each component has the two parts of the earlier files: the facts in a fenced block, and
 **Build this**, which wins where the two disagree.
@@ -38,6 +39,13 @@ Checked on 2026-10-09, in the worktree of this file:
   `display: contents` creates no stacking context: a page element at `z-index: 9999` painted
   above a fixed layer at `z-index: 50`. Without `display: contents` it stayed below. Shared
   pull request 3 fixes it.
+- **A second pass, the same day.** Read again in the installed packages: the fifteen
+  `drawer` parts and `swipeDirection` on `Drawer.Root`; `inline` on `Autocomplete.Root`;
+  `Menu.LinkItem`; `Dialog.Viewport`; `createToastManager` in a file with no client
+  directive; `createViteServer` in the types of `vitest/node` 5.0.3; every token named
+  below in `src/tokens.css`. Forty-three of the unusual classes compiled again. `Menu` has
+  no `virtualized` prop; `Combobox` has one. That pass changed the Drawer's x and safe
+  area, the Navbar on a narrow screen, the fourth kind of menu item, and choices 26 to 28.
 
 Not checked. Say so in the pull request when one of these turns out wrong:
 
@@ -137,10 +145,13 @@ Not checked. Say so in the pull request when one of these turns out wrong:
 
 ## Shared pull requests
 
-Eight, each on its own, opened first. Unit 2's `fix/readme-part-family` must be merged too:
-every part family here needs the README to print flat names.
+Eight, each on its own, opened first, and one carried over: `fix/readme-part-family` of
+`unit-2.md` was not built in Unit 2. Build it here, before Dialog: every part family needs
+the README to print flat names. None of the nine opens before Unit 2 is merged.
 
-1. **`feat/shared-mutation-files`.** One file per area in `scripts/mutations/`
+1. **`feat/shared-mutation-files`.** Every Unit 2 branch still appends to
+   `scripts/mutations/index.ts`, and this one rewrites it, so it waits for all of them.
+   One file per area in `scripts/mutations/`
    (`shared.ts`, `button.ts`, one per component), each exporting its rows. `index.ts` reads
    the folder (`readdirSync`, sorted, then `await import`) and exports `MUTATIONS`, so a
    component branch adds a file and never edits `index.ts`. A test proves every file is
@@ -191,6 +202,8 @@ every part family here needs the README to print flat names.
    export const FOCUS_RING_WITHIN = 'outline-hidden has-focus-visible:outline-solid has-focus-visible:outline-(length:--tc-ring-width) has-focus-visible:outline-offset-(length:--tc-ring-offset) has-focus-visible:outline-ring'
    ```
 
+   `LIST_CAP` counts rows only, not the padding of the popup or the gaps between rows, so
+   the last row it shows is cut short. That is wanted: a cut row says there is more.
    `FOCUS_RING_INSET` is for a control that sits flush against an edge that clips, such as
    an accordion trigger or a tab in a scrolling list. `FOCUS_RING_WITHIN` is for a label
    that wraps a hidden input. And one rule in `src/tokens.css`, inside the existing
@@ -215,9 +228,12 @@ every part family here needs the README to print flat names.
    changed. Dialog, Drawer, Popover and Dropdown call it.
 7. **`feat/shared-menu-contract`.** `src/shared/contracts/menu.ts`, types only, with a type
    test: `MenuItem` and `MenuContract` as `docs/PLAN.md` 11.3 writes them, with three
-   changes. `icon` is a `ReactNode` (`<Icon name>` is async). An item is a union of three:
-   `href`, `action` (a Server Action) or `onSelect` (client only), as the DECISIONS entry of
-   2026-09-25 asks. `size` is left out until a menu has more than one row height.
+   changes. `icon` is a `ReactNode` (`<Icon name>` is async). An item is a union of four:
+   `href` (a plain anchor), `render` (a link element that carries its own `href`, such as
+   `<Link href="/profile" />` from `next/link`), `action` (a Server Action) or `onSelect`
+   (client only). `render` is not in PLAN 11.3: a plain anchor loads the whole page in
+   Next.js, and an element is the one link form that crosses from a server page. `size`
+   is left out until a menu has more than one row height.
 8. **`feat/shared-toast-provider`.** The mechanics, as `feat/shared-tooltip-provider` was
    for Tooltip:
    - `src/shared/contracts/toast.ts`: `TOAST_PLACEMENTS` (`top-start`, `top`, `top-end`,
@@ -383,19 +399,22 @@ Surprising:
     - `start`: the mirror: `border-e-...`, `ps-safe`, and
       `translate-x-[calc(-100%*var(--tc-dir))]`.
     - `bottom`: `max-h-[90dvh] w-full border-t-(length:--tc-line-width) border-line
-      pb-safe`, and `translate-y-full` on both attributes.
-    - `top`: `border-b-...`, `pt-safe`, and `-translate-y-full`.
+      pb-safe ps-safe pe-safe`, and `translate-y-full` on both attributes.
+    - `top`: `border-b-...`, `pt-safe ps-safe pe-safe`, and `-translate-y-full`.
   - Width, for `start` and `end` only: `max-w-64`, `max-w-72`, `max-w-80`, `max-w-96`,
     `max-w-120` (256 to 480 px), `custom` empty.
   - A bottom sheet starts with the grabber, `aria-hidden`: `mx-auto mt-2.5 mb-1 h-1 w-9
     rounded-full bg-line-strong`, in `classes.ts`. It is decoration: the whole sheet takes
     the swipe. A bottom sheet also wraps its children in `Base.VirtualKeyboardProvider`.
-  - The popup always ends with the x: `DrawerClose` with no children, `absolute top-3
-    inset-e-3`, named by `labels.drawer.close`. No prop removes it: a swipe is a drag, and
-    WCAG 2.5.7 needs the other path. It is last in the markup, so the first focus goes to
-    the content.
-- **`DrawerHeader`**: Dialog's header classes with `pe-12`, so a title never runs under the
-  x. **`DrawerTitle`**, **`DrawerDescription`**, **`DrawerFooter`**: as Dialog's. The
+  - The popup always ends with the x: `DrawerClose` with no children, `absolute`, named by
+    `labels.drawer.close`. An absolute box ignores the padding of its parent, so its
+    offsets add the safe area themselves, by placement: `top-3` for `bottom` and
+    `top-[calc(0.75rem+var(--tc-safe-top))]` for the other three; `inset-e-3` for `start`
+    and `inset-e-[calc(0.75rem+var(--tc-safe-end))]` for the other three. No prop removes
+    it: a swipe is a drag, and WCAG 2.5.7 needs the other path. It is last in the markup,
+    so the first focus goes to the content.
+- **`DrawerHeader`**: Dialog's header classes with `pe-16`, so a title never runs under the
+  x, which is 44 px wide under a coarse pointer. **`DrawerTitle`**, **`DrawerDescription`**, **`DrawerFooter`**: as Dialog's. The
   strings are written again in `drawer/classes.ts`; Drawer does not import Dialog.
 - **`DrawerBody`.** `Base.Content` with `min-h-0 flex-1 px-4 py-4` and `SCROLL_AREA`.
   `Content` marks the region where a mouse drag selects text instead of swiping.
@@ -414,7 +433,8 @@ Surprising:
 - **For the reviewer:** `docs/PLAN.md` 10.5 says the swipe starts only from the handle.
   1.8.0 has no such part; its Viewport tells a body scroll from a swipe itself. That, the
   virtual keyboard and the safe area need the iPhone check. `placement` is on the Root,
-  not on the popup as the sample writes it.
+  not on the popup as the sample writes it. Nothing keeps the first line of a drawer with
+  no `DrawerHeader` clear of the x: every demo has a header, and the README says why.
 
 ## Popover
 
@@ -622,9 +642,14 @@ requests 6 and 7. No label. Base UI `menu` (`baseUi: 'menu'`): `Root`, `Trigger`
 - **`DropdownMenu`.** Props: `MenuContract` (`trigger`, `title`, `items`, `open`,
   `defaultOpen`, `onOpenChange`) plus `placement` and `className`. It renders the parts:
   the trigger through `render`, one group labelled by `title`, a separator before an item
-  with `separatorBefore`, a link item for `href`, and an item whose click runs `onSelect`,
-  or runs `action(new FormData())` inside `startTransition`. That handler is
-  `useDropdownMenu()` in `hook.ts`.
+  with `separatorBefore`, a link item for `href`, a link item with the element as its
+  `render` for `render`, and an item whose click runs `onSelect`, or runs
+  `action(new FormData())` inside `startTransition`. That handler is `useDropdownMenu()`
+  in `hook.ts`.
+- **Not a collection.** `docs/PLAN.md` 8.5 says a Dropdown windows above the threshold. It
+  does not: Base UI's Menu has no `virtualized` prop, and its arrow keys and type-ahead
+  reach mounted items only. The row cap alone applies (`R-8.5-1`: say so in the pull
+  request).
 - **`DropdownTrigger`.** As Dialog's. `delay` and `closeDelay` (Base UI's hover opening)
   are clamped to `delayMin: 0`, `delayMax: 10000` when passed.
 - **Files.** `client.tsx`, `hook.ts`, `classes.ts`, `constants.ts`, `boundaries.ts`,
@@ -638,9 +663,10 @@ requests 6 and 7. No label. Base UI `menu` (`baseUi: 'menu'`): `Root`, `Trigger`
 - **Mutation.** An `href` item stops rendering a link item.
 - **Not built:** checkbox items, radio items and submenus (all three are drawn), `size`,
   a visible arrow, and icons by name.
-- **For the reviewer:** a row is `--tc-row-height` tall (40 px), not the drawn 31, so that
-  `--tc-list-rows` rows is exactly what the cap shows. Under a coarse pointer a row is
-  44 px and the cap shows fewer.
+- **For the reviewer:** a row is `--tc-row-height` tall (40 px), not the drawn 31, so the
+  cap shows about `--tc-list-rows` rows, the last one cut. Under a coarse pointer a row is
+  44 px and the cap shows fewer. A dom test proves a `render` item renders the given
+  element, keeps its `href` and is a `menuitem`.
 
 ## Command
 
@@ -905,7 +931,9 @@ and 5.
   items-center gap-2 text-base font-semibold text-body rounded-control`, `FOCUS_RING`,
   `TOUCH_TARGET`.
 - **`NavbarLinks`.** `<nav>` named by `labels.navbar.label`, holding a `<ul>` with `flex
-  items-center gap-5`. `labels?: Labels`.
+  w-max items-center gap-5`. `labels?: Labels`. The `<nav>` carries `-m-1 min-w-0 p-1` and
+  `SCROLL_X`: on a narrow screen the links scroll sideways inside the bar and the page
+  never grows wider. The padding is the room a focus ring needs inside a box that clips.
 - **`NavbarLink`.** An `<li>` and a link through `renderElement`. `current`: default
   `false`, sets `aria-current="page"`. `inline-flex items-center rounded-control text-sm
   text-muted aria-[current=page]:font-semibold aria-[current=page]:text-body`,
@@ -917,7 +945,9 @@ and 5.
 - **Tests.** Unit: the markup, `aria-current`, the nav name in English and Arabic. Dom:
   the hook sets the variable from a stubbed size and clears it on unmount. Browser: with
   the sticky bar and a long page, an `#anchor` target lands below the bar, and a focused
-  link scrolled into view is not under it (WCAG 2.4.11); in RTL the brand is at the right.
+  link scrolled into view is not under it (WCAG 2.4.11); in RTL the brand is at the right;
+  at 320 px wide with six links the page has no sideways scroll and the ring of a focused
+  link is fully painted.
 - **Mutation.** The hook stops setting the variable.
 - **Not built:** the mobile menu (the AdaptiveNav connector, Phase 6), the scrolled
   shadow, the transparent variant, `size`, `bordered`, a search part.
@@ -1087,6 +1117,8 @@ to the client.
 
 - **Mutation.** The check on mount is removed.
 - **Not built:** `shape`, `bordered`, `status`, `clickable`, `onLoadingStatusChange`.
+- **For the reviewer:** every avatar with an image now hydrates, a table of fifty included.
+  An avatar with initials only stays at 0 KB. See choice 27.
 
 ### Banner
 
@@ -1147,8 +1179,9 @@ Read in the built JavaScript of Base UI 1.8.0, where the types are silent. Not r
 
 ## Build order
 
-1. **The shared pull requests.** 1, 2, 4, 5, 6, 7 and 8 can be open together. 3 follows
-   2. Nothing below starts before 1, 2, 4 and 6 are merged.
+1. **The shared pull requests**, once Unit 2 is merged. `fix/readme-part-family` and 1, 2,
+   4, 5, 6, 7 and 8 can be open together. 3 follows 2. Nothing below starts before 1, 2, 4
+   and 6 are merged.
 2. **Dialog, alone, and stop for review.** It settles what every later overlay copies: the
    portal, backdrop, viewport and popup in one part, the Header, Body and Footer names,
    the built-in x, and the first `e2e/<slug>.spec.ts` with its helpers.
@@ -1194,6 +1227,26 @@ Every row has a default above, so nothing here blocks the build.
 | 23 | A removable Tag | passing `onRemove` shows the button | a `removable` boolean beside it |
 | 24 | Banner | `dismissible` off by default; hides after hydration | on by default, as the frame says; an inline script that hides it before paint |
 | 25 | The live harness | a Vite server from `vitest/node`, no new dependency | `esbuild` as a dev dependency and static bundles |
+| 26 | A menu link in Next.js | an item takes `render: <Link href="/profile" />` and navigates on the client | `href` only: a plain anchor, which loads the whole page in Next.js |
+| 27 | The image of an Avatar | a client part: a broken image falls back to the initials, and every avatar with an image hydrates | stays server HTML at 0 KB; a broken image shows the browser's broken mark and its `alt` |
+| 28 | A very long menu | the row cap only; every item is mounted | windowing, as PLAN 8.5 says; Base UI's Menu cannot reach a row that is not mounted |
+
+## Where this file departs from docs/PLAN.md
+
+The local session records these as one `docs/DECISIONS.md` entry once Omar has answered
+the choices, before any Unit 3 branch opens. No component branch edits that file.
+
+- AlertDialog (18.5, Phase 5) is not built: it is not among the 46.
+- `MenuContract` (11.3): `icon` is a `ReactNode`, an item has a fourth kind, `render`, and
+  `size` is left out.
+- A Dropdown is not windowed (8.5).
+- The toast stack is a plain column, not the collapsed stack of 10.3.
+- A Drawer swipes from the whole sheet, not from a handle, and has no snap points (10.5).
+- An enter and exit transition may animate `translate` too (5.8).
+- The isolation root has a box, as 10.2 draws it; today it has none.
+- New infrastructure, which Phases 4 to 7 forbid without a record: the live harness, the
+  render-trigger helper, the menu contract and the toast manager.
+- Overlays use the native scrollbar; `ScrollArea` (10.5, rule 6) is not built.
 
 Outside Unit 3, noticed while reading: `TopClassProvider` isolates nothing today (row 3);
 `docs/PLAN.md` 10.5 describes a Drawer handle that Base UI 1.8.0 does not have; and
