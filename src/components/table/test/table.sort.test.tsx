@@ -95,41 +95,52 @@ describe('the caret of the sorted column', () => {
   })
 })
 
-describe('a sortable header is a real link', () => {
-  it('wraps the header in an anchor to sortHref, and only where one is given', () => {
-    const cells = headers(html())
-    expect(cells.map((th) => /<a href="([^"]*)"/.exec(th)?.[1]))
-      .toEqual(['/invoices?sort=number&amp;dir=asc', undefined, '/invoices?sort=amount&amp;dir=asc'])
+describe('a header is named by its own words, which are read out with every cell under it', () => {
+  /** The id a header cell points at, and the text of the element that carries it. */
+  const named = (th: string) => {
+    const id = attr(th.slice(0, th.indexOf('>') + 1), 'aria-labelledby')
+    return id === undefined ? undefined : new RegExp(`<span id="${id}"[^>]*>(.*?)</span>`).exec(th)?.[1]
+  }
+
+  it('points a sortable header at its own text, so "Sort by" stays in the link and out of the column name', () => {
+    expect(headers(html()).map(named)).toEqual(['Invoice', undefined, 'Amount'])
   })
 
-  it('leaves a header with no sortHref as plain text in its cell', () => {
-    expect(headers(html())[1]).toMatch(/^<th [^>]*>Status<\/th>$/)
+  it('keeps the words of the caret out of the name too, on a sorted column with a link or without', () => {
+    expect(headers(html({ sort: { key: 'amount', direction: 'descending' } })).map(named)).toEqual(['Invoice', undefined, 'Amount'])
+    expect(headers(html({ sort: { key: 'status', direction: 'ascending' } })).map(named)).toEqual(['Invoice', 'Status', 'Amount'])
   })
 
-  it('says what the link does before the header, in text only a screen reader gets', () => {
-    expect(headers(html())[0]).toMatch(/<a [^>]*><span class="sr-only">Sort by <\/span>Invoice<\/a><\/th>$/)
+  it('leaves a plain header alone: its text is its name already', () => {
+    const plain = headers(html())[1] ?? ''
+    expect(plain).not.toContain('aria-labelledby')
+    expect(plain).not.toContain('<span')
   })
 
-  it('keeps the caret inside the link, so the whole header is one target', () => {
-    const th = headers(html({ sort: { key: 'amount', direction: 'descending' } }))[2] ?? ''
-    expect(th).toMatch(/<span class="sr-only">Sort by <\/span>Amount<svg [^>]*>.*<\/svg><\/a><\/th>$/)
+  it('gives every column of every table an id of its own', () => {
+    const both = markup(
+      <>
+        <Table caption="First" items={invoices} getKey={(invoice) => invoice.id} columns={columns} />
+        <Table caption="Second" items={invoices} getKey={(invoice) => invoice.id} columns={columns} />
+      </>,
+    )
+    const ids = [...both.matchAll(/<span id="([^"]+)"/g)].map((m) => m[1])
+    expect(ids).toHaveLength(4)
+    expect(new Set(ids).size).toBe(4)
+    expect([...both.matchAll(/<th [^>]*aria-labelledby="([^"]+)"/g)].map((m) => m[1])).toEqual(ids)
   })
 
-  it('has no role, no tabindex and no handler: the browser already knows an anchor', () => {
-    const anchor = /<a [^>]*>/.exec(html())?.[0] ?? ''
-    expect(anchor).not.toMatch(/ (role|tabindex|onclick|aria-disabled)=/)
-  })
-
-  it('is a link whether or not its column is the sorted one', () => {
-    const cells = headers(html({ sort: { key: 'number', direction: 'ascending' } }))
-    expect(cells.map((th) => th.includes('<a href='))).toEqual([true, false, true])
+  it('keeps the whole Arabic name of the link, and only the header in the name of the column', () => {
+    const th = headers(html({ labels: ar, sort: { key: 'amount', direction: 'descending' } }))[2] ?? ''
+    expect(named(th)).toBe('Amount')
+    expect(th.replace(/<svg [^>]*aria-label="([^"]*)".*<\/svg>/, ' $1').replace(/<[^>]+>/g, '')).toBe('ترتيب حسب Amount مرتب تنازليًا')
   })
 })
 
 describe('the words come from labels (R-5.11-1)', () => {
   it('are Arabic with the Arabic labels', () => {
     const html_ = html({ labels: ar, sort: { key: 'amount', direction: 'descending' } })
-    expect(html_).toContain('<span class="sr-only">ترتيب حسب </span>Invoice')
+    expect(html_).toContain('<span class="sr-only">ترتيب حسب </span>')
     expect(html_).toContain('aria-label="مرتب تنازليًا"')
     expect(html_).not.toContain('Sort by')
     expect(html({ labels: ar, sort: { key: 'amount', direction: 'ascending' } })).toContain('aria-label="مرتب تصاعديًا"')
@@ -137,6 +148,7 @@ describe('the words come from labels (R-5.11-1)', () => {
 
   it('follow a caller who changes one string', () => {
     const labels = { ...en, table: { ...en.table, sortBy: 'Order by' } }
-    expect(html({ labels })).toContain('<span class="sr-only">Order by </span>Invoice')
+    expect(html({ labels })).toContain('<span class="sr-only">Order by </span>')
+    expect(html({ labels })).not.toContain('Sort by')
   })
 })

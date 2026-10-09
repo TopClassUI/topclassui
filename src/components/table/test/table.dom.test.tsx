@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
-import { Table } from '../index.js'
+import { Table, TableSkeleton } from '../index.js'
 import type { TableColumn } from '../types.js'
 
 interface Invoice { id: string; number: string; amount: number }
@@ -56,6 +56,37 @@ describe('in a real tree', () => {
     expect(within(links[1] as HTMLElement).getByRole('img', { name: 'sorted descending' }).tagName).toBe('svg')
   })
 
+  it('names each column header by its own words, with "Sort by" and the caret left to the link', () => {
+    render(table())
+    expect(screen.getByRole('columnheader', { name: 'Invoice' }).tagName).toBe('TH')
+    expect(screen.getByRole('columnheader', { name: 'Amount' }).getAttribute('aria-sort')).toBe('descending')
+    expect(screen.queryByRole('columnheader', { name: /Sort by|sorted/ })).toBeNull()
+    expect(screen.getAllByRole('link').map((link) => link.textContent)).toEqual(['Sort by Invoice', 'Sort by Amount'])
+  })
+
+  it('exposes a row header per row when a column asks to be one', () => {
+    const withRowHeader: TableColumn<Invoice>[] = [{ ...columns[0], rowHeader: true } as TableColumn<Invoice>, columns[1] as TableColumn<Invoice>]
+    render(<Table caption="Invoices" items={invoices} getKey={(invoice) => invoice.id} columns={withRowHeader} />)
+    expect(screen.getAllByRole('rowheader').map((cell) => cell.textContent)).toEqual(['INV-1', 'INV-2'])
+    expect(screen.getAllByRole('cell').map((cell) => cell.textContent)).toEqual(['120', '80'])
+    expect(screen.getAllByRole('columnheader')).toHaveLength(2)
+  })
+
+  it('renders its sort links through the element in link, with the href of each column', () => {
+    render(
+      <Table
+        caption="Invoices"
+        items={invoices}
+        getKey={(invoice) => invoice.id}
+        columns={columns}
+        link={<a data-soft-navigation="" href="" />}
+      />,
+    )
+    const links = screen.getAllByRole('link')
+    expect(links.map((link) => link.getAttribute('href'))).toEqual(['/invoices?sort=number', '/invoices?sort=amount'])
+    expect(links.map((link) => link.hasAttribute('data-soft-navigation'))).toEqual([true, true])
+  })
+
   it('is one tab stop for scrolling, then the sort links in reading order', async () => {
     render(table())
     const [number, amount] = screen.getAllByRole('link')
@@ -93,5 +124,23 @@ describe('ref', () => {
     )
     unmount()
     expect(ref.current).toBeNull()
+  })
+})
+
+describe('the placeholder in a real tree', () => {
+  it('is out of the accessibility tree: no table, no row and no cell to read out', () => {
+    render(<TableSkeleton rows={3} columns={2} />)
+    expect(screen.queryByRole('table')).toBeNull()
+    expect(screen.queryAllByRole('row')).toEqual([])
+    expect(screen.queryAllByRole('cell')).toEqual([])
+  })
+
+  it('takes a ref to its box, and is no tab stop', async () => {
+    const ref = { current: null as HTMLDivElement | null }
+    render(<TableSkeleton ref={ref} />)
+    expect(ref.current?.tagName).toBe('DIV')
+    expect(ref.current?.getAttribute('aria-hidden')).toBe('true')
+    await userEvent.tab()
+    expect(document.activeElement).toBe(document.body)
   })
 })

@@ -69,8 +69,8 @@ describe('the element it renders', () => {
     expect(texts(html({ items: reversed }), 'td')).toEqual(['INV-3', '310', 'INV-2', '80', 'INV-1', '120'])
   })
 
-  it('exports one component and no variants helper, because it has no variants', () => {
-    expect(Object.keys(entry)).toEqual(['Table'])
+  it('exports the table and its placeholder, and no variants helper, because it has no variants', () => {
+    expect(Object.keys(entry).sort()).toEqual(['Table', 'TableSkeleton'])
   })
 })
 
@@ -110,6 +110,19 @@ describe('the scrolling box is a named tab stop (axe scrollable-region-focusable
     expect(attr(html_, 'aria-labelledby')).toBe(attr(opening(html_, 'caption')[0] ?? '', 'id'))
     expect(html_).not.toContain('elsewhere')
   })
+
+  it('is named by the caption alone: an aria-label, which JSX lets through, never reaches the box', () => {
+    const html_ = markup(<Table aria-label="Mine" caption="Invoices" items={invoices} getKey={(invoice) => invoice.id} columns={columns} />)
+    expect(html_).not.toContain('aria-label=')
+    expect(html_).not.toContain('Mine')
+  })
+
+  it('is no tab stop when there is no column: one cell of words cannot need scrolling', () => {
+    const html_ = html({ columns: [] })
+    expect(html_).not.toContain('tabindex')
+    expect(attr(html_, 'role')).toBe('region')
+    expect(attr(html_, 'aria-labelledby')).toBe(attr(opening(html_, 'caption')[0] ?? '', 'id'))
+  })
 })
 
 describe('the caption', () => {
@@ -141,7 +154,7 @@ describe('what reaches the root', () => {
 
   it('reads its own props and never forwards one as an attribute', () => {
     expect(html({ striped: true, stickyFirstColumn: true, captionVisible: true, sort: { key: 'amount', direction: 'ascending' } }))
-      .not.toMatch(/ (items|columns|labels|caption|sort|striped|stickyfirstcolumn|captionvisible|emptyfallback|getkey)=/i)
+      .not.toMatch(/ (items|columns|labels|caption|sort|striped|stickyfirstcolumn|captionvisible|emptyfallback|getkey|link|rowheader)=/i)
   })
 })
 

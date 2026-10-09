@@ -33,32 +33,50 @@ const RING = [
   'focus-visible:outline-ring', 'focus-visible:outline-solid', 'outline-hidden',
 ]
 
-describe('each part wears exactly the classes the spec names', () => {
+describe('each part wears exactly the classes it needs', () => {
   it('the root scrolls sideways on the box radius, with the hairline, the raised fill and a ring', () => {
     expect(classList(html()).sort()).toEqual([
       'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line', ...RING,
-      'overflow-x-auto', 'rounded-box',
+      'isolate', 'overflow-x-auto', 'relative', 'rounded-box',
     ].sort())
+  })
+
+  it('the root is the containing block of every sr-only span, or one in a far column widens the page', () => {
+    expect(classList(html())).toContain('relative')
+    expect(classList(html({ items: [] }))).toContain('relative')
+  })
+
+  it('the root is its own stacking context, so the z-index of a stuck cell never rises above a bar of the page', () => {
+    expect(classList(html())).toContain('isolate')
   })
 
   it('the table fills the box and keeps its borders on the cells, where a sticky cell needs them', () => {
     expect(classesOf(html(), 'table')).toEqual([['w-full', 'border-separate', 'border-spacing-0']])
   })
 
-  it('a header cell is 16 by 10 px of padding, the small muted step, on the surface', () => {
+  it('a header cell is 16 by 10 px of padding, the small muted step, on the surface, on one line', () => {
     const [, status, amount] = classesOf(html(), 'th')
-    expect(status).toEqual(['px-4', 'py-2.5', 'text-xs', 'font-medium', 'text-muted', 'bg-surface', 'text-start'])
-    expect(amount).toEqual(['px-4', 'py-2.5', 'text-xs', 'font-medium', 'text-muted', 'bg-surface', 'text-end'])
+    expect(status).toEqual(['px-4', 'py-2.5', 'text-xs', 'font-medium', 'whitespace-nowrap', 'text-muted', 'bg-surface', 'text-start'])
+    expect(amount).toEqual([
+      'px-4', 'py-2.5', 'text-xs', 'font-medium', 'whitespace-nowrap', 'text-muted', 'bg-surface', 'text-end', 'tabular-nums',
+    ])
   })
 
-  it('a body cell is 16 by 12 px of padding at the body step, with the line above it', () => {
+  it('a body cell is 16 by 12 px of padding at the body step, on one line, with the line above it', () => {
     const [number, , amount] = classesOf(body(html()), 'td')
     expect(number).toEqual([
-      'border-t-(length:--tc-line-width)', 'border-line', 'px-4', 'py-3', 'text-sm', 'text-body', 'text-start',
+      'border-t-(length:--tc-line-width)', 'border-line', 'px-4', 'py-3', 'text-sm', 'whitespace-nowrap', 'text-body', 'text-start',
     ])
     expect(amount).toEqual([
-      'border-t-(length:--tc-line-width)', 'border-line', 'px-4', 'py-3', 'text-sm', 'text-body', 'text-end',
+      'border-t-(length:--tc-line-width)', 'border-line', 'px-4', 'py-3', 'text-sm', 'whitespace-nowrap', 'text-body',
+      'text-end', 'tabular-nums',
     ])
+  })
+
+  it('keeps every header and every cell on one line, so a narrow box scrolls instead of stacking words', () => {
+    const cells = [...classesOf(html(), 'th'), ...classesOf(html(), 'td')]
+    expect(cells).toHaveLength(15)
+    expect(cells.filter((list) => !list.includes('whitespace-nowrap'))).toEqual([])
   })
 
   it('divides every row from the one above, the first from the header included', () => {
@@ -83,11 +101,18 @@ describe('alignment is logical (R-5.3-1)', () => {
     ])
   })
 
+  it('gives an end-aligned column digits of one width, whatever font the page brings', () => {
+    const rows = classesOf(body(html()), 'td')
+    expect(rows.map((list) => list.includes('tabular-nums')))
+      .toEqual([false, false, true, false, false, true, false, false, true, false, false, true])
+  })
+
   it('names no physical side anywhere, in any mode of the table', () => {
     const everything = html({ striped: true, stickyFirstColumn: true, captionVisible: true, sort: { key: 'amount', direction: 'ascending' } })
+      + html({ items: [] })
     const names = [...everything.matchAll(/class="([^"]*)"/g)].flatMap((m) => (m[1] ?? '').split(' '))
-    expect(names.filter((c) => /(^|:)-?(left|right|pl|pr|ml|mr|start|end)-|text-(left|right)|border-[lr](-|$)|rounded-[lr]/.test(c))).toEqual([])
-    expect(names).toContain('inset-s-0')
+    expect(names.filter((c) => /(^|:)-?(left|right|pl|pr|ml|mr|start|end)-|text-(left|right)|border-[lr](-|$)|rounded-[lr]|scroll-p[lr]/.test(c))).toEqual([])
+    expect(names).toEqual(expect.arrayContaining(['inset-s-0', 'inset-s-4', 'inset-e-4', 'scroll-ps-[var(--tc-table-sticky-width,8rem)]']))
   })
 })
 
@@ -103,73 +128,6 @@ describe('striped', () => {
   it('fills the row and not its cells, which have no background to paint over it', () => {
     const cells = classesOf(body(html({ striped: true })), 'td')
     expect(cells.flat().filter((c) => c.startsWith('bg-'))).toEqual([])
-  })
-})
-
-describe('stickyFirstColumn', () => {
-  it('sticks nothing by default', () => {
-    expect(html()).not.toContain('sticky')
-    expect(html()).not.toContain('inset-s-0')
-  })
-
-  it('sticks the first header cell to the inline start, on the fill every header has', () => {
-    const [first, ...others] = classesOf(html({ stickyFirstColumn: true }), 'th')
-    expect(first).toEqual(expect.arrayContaining(['sticky', 'inset-s-0', 'bg-surface']))
-    expect(others.flat().filter((c) => c === 'sticky' || c === 'inset-s-0')).toEqual([])
-  })
-
-  it('sticks the first cell of every row and no other', () => {
-    const cells = classesOf(body(html({ stickyFirstColumn: true })), 'td')
-    expect(cells.map((list) => list.includes('sticky') && list.includes('inset-s-0')))
-      .toEqual([true, false, false, true, false, false, true, false, false, true, false, false])
-  })
-
-  it('gives the sticky cell an opaque fill of its own, or the columns scrolling under it show through', () => {
-    const cells = classesOf(body(html({ stickyFirstColumn: true })), 'td')
-    expect(cells.map((list) => list.filter((c) => c.startsWith('bg-')).join()))
-      .toEqual(['bg-surface-raised', '', '', 'bg-surface-raised', '', '', 'bg-surface-raised', '', '', 'bg-surface-raised', '', ''])
-  })
-
-  it('repeats the tint on the sticky cell of a striped row, and only there', () => {
-    const cells = classesOf(body(html({ stickyFirstColumn: true, striped: true })), 'td')
-    expect(cells.map((list) => list.filter((c) => c.startsWith('bg-')).join()))
-      .toEqual(['bg-surface-raised', '', '', 'bg-surface', '', '', 'bg-surface-raised', '', '', 'bg-surface', '', ''])
-  })
-})
-
-describe('the sort link is the only interactive part', () => {
-  const link = () => classesOf(html(), 'a')
-
-  it('carries the shared focus ring and the shared touch target, 24 px and 44 under a coarse pointer', () => {
-    for (const list of link()) {
-      expect(list).toEqual(expect.arrayContaining(RING))
-      expect(list).toEqual(expect.arrayContaining([
-        'min-h-[var(--tc-target-min,24px)]', 'min-w-[var(--tc-target-min,24px)]',
-        'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]', 'pointer-coarse:min-w-[var(--tc-target-coarse,44px)]',
-      ]))
-    }
-    expect(link()).toHaveLength(2)
-  })
-
-  it('fills its cell as a row, pulled back 4 px each way so the header row is no taller for it', () => {
-    for (const list of link()) {
-      expect(list).toEqual(expect.arrayContaining(['flex', 'items-center', '-my-1', 'rounded-chip', 'hover:underline']))
-    }
-  })
-
-  it('follows the alignment of its column, which text-align cannot do inside a flex row', () => {
-    const [number, amount] = link()
-    expect(number).toContain('justify-start')
-    expect(number).not.toContain('justify-end')
-    expect(amount).toContain('justify-end')
-    expect(amount).not.toContain('justify-start')
-  })
-
-  it('puts no ring, hover or target on a cell or a row: none of them can be activated', () => {
-    const interactive = /(^|:)(hover|active|focus-visible):|^(min-h-|cursor-|transition)/
-    for (const tag of ['table', 'thead', 'tbody', 'tr', 'th', 'td', 'caption']) {
-      expect(classesOf(html({ striped: true }), tag).flat().filter((c) => interactive.test(c)), tag).toEqual([])
-    }
   })
 })
 
@@ -189,5 +147,11 @@ describe('className is merged last, so the consumer wins every conflict', () => 
     expect(list).toContain('border-line-strong')
     expect(list).not.toContain('border-line')
     expect(list).toContain('border-(length:--tc-line-width)')
+  })
+
+  it('replaces the scroll padding of a stuck column, for a caller who measured its own', () => {
+    const list = classList(html({ stickyFirstColumn: true, className: 'scroll-ps-40' }))
+    expect(list).toContain('scroll-ps-40')
+    expect(list).not.toContain('scroll-ps-[var(--tc-table-sticky-width,8rem)]')
   })
 })

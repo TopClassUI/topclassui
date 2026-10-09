@@ -18,17 +18,54 @@ so a screen reader moves through it by row and by column.
   getKey={(invoice) => invoice.id}
   sort={{ key: 'amount', direction: 'descending' }}
   columns={[
-    { key: 'number', header: 'Invoice', cell: (invoice) => invoice.number },
-    { key: 'amount', header: 'Amount', align: 'end', sortHref: '?sort=amount', cell: (invoice) => invoice.amount },
+    { key: 'number', header: 'Invoice', rowHeader: true, cell: (invoice) => invoice.number },
+    { key: 'amount', header: 'Amount', align: 'end', sortHref: '?sort=amount&dir=asc', cell: (invoice) => invoice.amount },
   ]}
 />
 ```
 
-- **`caption` is required.** It names the table. It is read out but not drawn; `captionVisible` draws it.
-- **Sorting is a link.** Give a column a `sortHref`, sort the rows on the server, and pass `sort` to mark the column.
-- **It scrolls sideways** when the columns do not fit. `stickyFirstColumn` keeps the first one in view.
-- **No items** shows one row with `emptyFallback`, or "Nothing here yet" from `labels`.
+- **`caption` is required, in real words.** It is the only name of the table: `aria-label` and `aria-labelledby` are ignored. It is read out but not drawn; `captionVisible` draws it.
+- **Sorting is a link.** `sortHref` is where a click goes, so it holds the next direction (this table is descending, so its link says `dir=asc`) and any filters you want kept. Sort the rows on the server and pass `sort` to mark the column. See `dummy/sorted.tsx`.
+- **In Next.js** pass `link={<Link href="" />}`: every sort link is cloned from it, with its `href` replaced by the column's `sortHref`.
+- **`rowHeader: true`** goes on the column that identifies a row, so a screen reader says which row a number belongs to.
+- **Cells stay on one line**, so a narrow screen scrolls sideways instead of stacking words. A column of prose opts out with `className: 'min-w-64 whitespace-normal'`, and `className: 'hidden sm:table-cell'` hides a column on a phone.
+- **Leave a column out** with `isAdmin && { ... }`: false, null and undefined entries are skipped.
+- **`getKey` returns a string**: write `String(row.id)` for a numeric id.
+- **No items** shows one row with `emptyFallback`, or "Nothing here yet" from `labels`. A fallback wider than the box starts at its edge and the rest is reached by scrolling.
 - **One page at a time.** Table renders the `items` it is given; Pagination moves between pages.
+
+## Sticky first column
+
+```tsx
+<Table
+  stickyFirstColumn
+  style={{ '--tc-table-sticky-width': '20rem' }}
+  caption="Revenue by region"
+  items={regions}
+  getKey={(region) => region.name}
+  columns={columns}
+/>
+```
+
+- **When the table scrolls, the stuck column is cut with an ellipsis** at `--tc-table-sticky-width` (8rem on a phone, up to 16rem on a wide screen). Raise it through `style`, and keep it narrower than the box.
+- **A control you Tab to is scrolled clear of it.** The box keeps that same width free when focus moves.
+
+## While it loads
+
+```tsx
+<Suspense fallback={<TableSkeleton rows={25} columns={4} />}>
+  <InvoiceTable />
+</Suspense>
+```
+
+- **Same box, same row height**, so nothing moves when the rows arrive. Pass `captionVisible` if the table draws its caption.
+
+## In a layout
+
+- **Inside a grid or flex item**, give that item `min-w-0`, or the page scrolls instead of the table.
+- **`ref`, `className` and other attributes** go to the scrolling box around the table. A menu opened from a cell must be portalled, or the box clips it.
+- **Build the columns where you render the table.** `columns` and `getKey` hold functions, so they cannot be passed from a Server Component into a Client Component.
+- **In a wrapper**, type your own caption as `TableProps<Row>['caption']` and a columns array outside the JSX as `TableColumn<Row>[]`.
 
 <!-- /hand-written -->
 
@@ -44,15 +81,16 @@ Required: `caption`, `columns`, `getKey`, `items`. Every other prop below is opt
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `caption` | **yes** | `Exclude<ReactNode, boolean \| null \| undefined>` | - | What the table holds. It names the table and its scrolling region, so it cannot be nothing. |
-| `columns` | **yes** | `readonly TableColumn<T>[]` | - | The columns, in reading order. |
-| `getKey` | **yes** | `(item: T) => string \| number` | - | A stable identity for a row, which becomes its React key. |
+| `caption` | **yes** | `NonEmpty<Caption>` | - | What the table holds, in real words. It is the only name of the table and of its scrolling region. |
+| `columns` | **yes** | `TableColumns<T>` | - | The columns, in reading order. A false, null or undefined entry is skipped, so `cond && {...}` hides one. |
+| `getKey` | **yes** | `(item: T) => string` | - | A stable identity for a row, as the shared collection contract has it. It becomes the React key. |
 | `items` | **yes** | `readonly T[]` | - | The rows, already sorted and paged: Table renders what it is given. |
 | `captionVisible` | no | `boolean` | `false` | Draws the caption above the header row; when false it is still read out, only not drawn. |
-| `emptyFallback` | no | `ReactNode` | - | Shown in one row across every column when there are no items. Defaults to `labels.state.empty`. |
+| `emptyFallback` | no | `ReactNode` | - | Shown in one row across every column when there are no items. `null` also gives `labels.state.empty`. |
 | `labels` | no | `Labels` | - | The built-in strings: the empty row and the words of the sort links. Defaults to English. |
+| `link` | no | `ReactElement` | - | The element every sort link is cloned from, such as `link={<Link href="" />}`; its `href` is replaced with the column's `sortHref`. |
 | `sort` | no | `TableSort` | - | The column the rows are sorted by, which gets `aria-sort` and a caret. |
-| `stickyFirstColumn` | no | `boolean` | `false` | Keeps the first column in view while the others scroll sideways under it. |
+| `stickyFirstColumn` | no | `boolean` | `false` | Keeps the first column in view while the others scroll sideways under it. It is cut with an ellipsis past `--tc-table-sticky-width`. |
 | `striped` | no | `boolean` | `false` | Tints every second row, so the eye can follow a wide row across. |
 
 Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
@@ -61,8 +99,10 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 
 - `dummy/basic.tsx`
 - `dummy/caption.tsx`
+- `dummy/column-classes.tsx`
 - `dummy/empty.tsx`
 - `dummy/rtl.tsx`
+- `dummy/skeleton.tsx`
 - `dummy/sorted.tsx`
 - `dummy/sticky-first-column.tsx`
 - `dummy/striped.tsx`

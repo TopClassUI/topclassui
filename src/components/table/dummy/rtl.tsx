@@ -12,14 +12,12 @@ const invoices: Invoice[] = [
 
 const nobody: Invoice[] = []
 
-const nowrap = (text: string) => <span className="whitespace-nowrap">{text}</span>
-
 const columns: TableColumn<Invoice>[] = [
-  { key: 'id', header: 'الفاتورة', sortHref: '?sort=id&dir=asc', cell: (invoice) => nowrap(invoice.id) },
-  { key: 'customer', header: 'العميل', sortHref: '?sort=customer&dir=asc', cell: (invoice) => nowrap(invoice.customer) },
-  { key: 'status', header: 'الحالة', cell: (invoice) => nowrap(invoice.status) },
-  { key: 'due', header: nowrap('تاريخ الاستحقاق'), cell: (invoice) => nowrap(invoice.due) },
-  { key: 'amount', header: 'المبلغ', align: 'end', sortHref: '?sort=amount&dir=asc', cell: (invoice) => nowrap(invoice.amount) },
+  { key: 'id', header: 'الفاتورة', sortHref: '?sort=id&dir=asc', rowHeader: true, cell: (invoice) => invoice.id },
+  { key: 'customer', header: 'العميل', sortHref: '?sort=customer&dir=asc', cell: (invoice) => invoice.customer },
+  { key: 'status', header: 'الحالة', cell: (invoice) => invoice.status },
+  { key: 'due', header: 'تاريخ الاستحقاق', cell: (invoice) => invoice.due },
+  { key: 'amount', header: 'المبلغ', align: 'end', sortHref: '?sort=amount&dir=asc', cell: (invoice) => invoice.amount },
 ]
 
 /** Arabic: the first column sticks to the right edge, the amounts end on the left, and the built-in words are Arabic. */
@@ -35,7 +33,7 @@ export default function Demo() {
         sort={{ key: 'amount', direction: 'descending' }}
         columns={columns}
       />
-      <div className="max-w-sm">
+      <div className="min-w-0 max-w-sm">
         <Table
           labels={ar}
           stickyFirstColumn

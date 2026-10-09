@@ -1,4 +1,4 @@
-// R-8.3-2: the value lists, the defaults and what each sort direction shows. Table bounds nothing.
+// R-8.3-2: the value lists, the defaults and what each sort direction shows. The bounds live in boundaries.ts.
 import { caretDown } from '#icons/data/caret-down.js'
 import { caretUp } from '#icons/data/caret-up.js'
 import type { IconData } from '#icons/types.js'
@@ -19,6 +19,12 @@ export const TABLE_DEFAULTS = {
 /** What a column falls back to when it names no alignment. */
 export const TABLE_COLUMN_DEFAULTS = {
   align: 'start',
+} as const
+
+/** The placeholder's starting shape: PLAN 8.2 writes its example with five rows. */
+export const TABLE_SKELETON_DEFAULTS = {
+  rows: 5,
+  columns: 4,
 } as const
 
 /** The caret of the sorted column: up for the smallest value first. */

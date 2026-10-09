@@ -7,7 +7,7 @@ import { hydrateRoot } from 'react-dom/client'
 import { renderToString } from 'react-dom/server'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { Table } from '../index.js'
+import { Table, TableSkeleton } from '../index.js'
 import type { TableColumn } from '../types.js'
 
 // Read from the folder, or a demo added later is never hydrated and nobody notices.
@@ -46,9 +46,13 @@ async function hydrate(element: ReactElement) {
     return Promise.resolve()
   })
 
-  // useId is the one value the two renders could disagree on, so read it after hydration.
-  const named = [...container.querySelectorAll('[role="region"]')]
+  // useId is the one value the two renders could disagree on, so read it after hydration:
+  const captions = [...container.querySelectorAll('[role="region"]')]
     .every((region) => region.querySelector('caption')?.id === region.getAttribute('aria-labelledby'))
+  // on the box, and on every header that is named by an element inside it.
+  const headers = [...container.querySelectorAll('th[aria-labelledby]')]
+    .every((th) => th.querySelector('span[id]')?.id === th.getAttribute('aria-labelledby'))
+  const named = captions && headers
 
   onError.mockRestore()
   container.remove()
@@ -82,6 +86,24 @@ describe('a server-rendered Table hydrates cleanly', () => {
       </>
     )
     expect(await hydrate(element)).toEqual({ errors: [], named: true })
+  })
+
+  it('reports nothing for sort links cloned from the caller element, row headers and a column left out', async () => {
+    const element = (
+      <Table
+        caption="Invoices"
+        items={invoices}
+        getKey={(invoice) => invoice.id}
+        columns={[{ ...columns[0], rowHeader: true, className: 'min-w-40' } as TableColumn<Invoice>, false, columns[1]]}
+        link={<a rel="nofollow" href="" />}
+        sort={{ key: 'amount', direction: 'descending' }}
+      />
+    )
+    expect(await hydrate(element)).toEqual({ errors: [], named: true })
+  })
+
+  it('reports nothing for the placeholder', async () => {
+    expect(await hydrate(<TableSkeleton rows={3} columns={3} captionVisible />)).toEqual({ errors: [], named: true })
   })
 })
 

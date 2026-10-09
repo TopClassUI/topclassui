@@ -15,12 +15,12 @@ const columns: TableColumn<Member>[] = [
 export default function Demo() {
   return (
     <div className="grid gap-6">
-      <Table caption="Pending invitations" items={nobody} getKey={(member) => member.id} columns={columns} />
+      <Table caption="Pending invitations" items={nobody} getKey={(member) => String(member.id)} columns={columns} />
       <Table
         caption="Team members"
         captionVisible
         items={nobody}
-        getKey={(member) => member.id}
+        getKey={(member) => String(member.id)}
         columns={columns}
         emptyFallback={(
           <div className="grid justify-items-center gap-3 py-4">

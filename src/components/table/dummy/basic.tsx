@@ -10,7 +10,7 @@ const invoices: Invoice[] = [
   { id: 'inv_1045', number: 'INV-1045', customer: 'Adventure Works', status: 'Paid', amount: '$76.00' },
 ]
 
-/** The drawn table: a caption that is read out but not drawn, amounts at the end, and a link per row. */
+/** The drawn table: a caption read out but not drawn, the invoice as the header of its row, and a link per row. */
 export default function Demo() {
   return (
     <Table
@@ -18,7 +18,7 @@ export default function Demo() {
       items={invoices}
       getKey={(invoice) => invoice.id}
       columns={[
-        { key: 'number', header: 'Invoice', cell: (invoice) => invoice.number },
+        { key: 'number', header: 'Invoice', rowHeader: true, cell: (invoice) => invoice.number },
         { key: 'customer', header: 'Customer', cell: (invoice) => invoice.customer },
         { key: 'status', header: 'Status', cell: (invoice) => invoice.status },
         { key: 'amount', header: 'Amount', align: 'end', cell: (invoice) => invoice.amount },

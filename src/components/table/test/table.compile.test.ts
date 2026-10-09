@@ -11,11 +11,14 @@ const slash = (path: string) => path.replace(/\\/g, '/')
 const probePath = (name: string) => slash(join(FOLDER, 'test', `table-probe-${name}.tsx`))
 
 const PRELUDE = [
-  "import { Table } from '../index.js'",
+  "import { Table, TableSkeleton } from '../index.js'",
   'interface Invoice { id: string; number: string; amount: number }',
   'interface Customer { name: string }',
   "const invoices: Invoice[] = [{ id: 'a', number: 'INV-1', amount: 120 }]",
-  'void [invoices, {} as Customer]',
+  'declare const admin: boolean',
+  'declare const title: string',
+  'declare const maybe: string | undefined',
+  'void [Table, TableSkeleton, invoices, {} as Customer, admin, title, maybe]',
 ].join('\n')
 
 /**
@@ -52,6 +55,9 @@ function compile(snippets: Record<string, string>): Record<string, string[]> {
 const table = (columns: string, rest = "caption='Invoices' getKey={(invoice) => invoice.id}") =>
   `export const probe = <Table items={invoices} ${rest} columns={[${columns}]} />`
 
+/** The one column most probes share: they differ in what stands beside it. */
+const ONE = "{ key: 'number', header: 'Invoice', cell: (invoice) => invoice.number }"
+
 const verdict = compile({
   inferred: table("{ key: 'number', header: 'Invoice', cell: (invoice) => invoice.number }"),
   missingField: table("{ key: 'total', header: 'Total', cell: (invoice) => invoice.total }"),
@@ -68,6 +74,21 @@ const verdict = compile({
   sorted: table("{ key: 'number', header: 'Invoice', cell: (invoice) => invoice.number }", "caption='Invoices' getKey={(invoice) => invoice.id} sort={{ key: 'number', direction: 'ascending' }}"),
   role: table("{ key: 'number', header: 'Invoice', cell: (invoice) => invoice.number }", "caption='Invoices' getKey={(invoice) => invoice.id} role='presentation'"),
   child: `export const probe = <Table items={invoices} caption='Invoices' getKey={(invoice) => invoice.id} columns={[]}>Hello</Table>`,
+  numberKey: table(ONE, "caption='Invoices' getKey={(invoice) => invoice.amount}"),
+  emptyCaption: table(ONE, "caption='' getKey={(invoice) => invoice.id}"),
+  stringCaption: table(ONE, 'caption={title} getKey={(invoice) => invoice.id}'),
+  nodeCaption: table(ONE, 'caption={<strong>Invoices</strong>} getKey={(invoice) => invoice.id}'),
+  maybeCaption: table(ONE, 'caption={maybe} getKey={(invoice) => invoice.id}'),
+  falsyColumns: table(`admin && { key: 'id', header: 'Id', cell: (invoice) => invoice.id }, null, undefined, ${ONE}`),
+  columnProps: table("{ key: 'number', header: 'Invoice', rowHeader: true, className: 'min-w-40 whitespace-normal', cell: (invoice) => invoice.number }"),
+  unknownColumnProp: table("{ key: 'number', header: 'Invoice', width: 160, cell: (invoice) => invoice.number }"),
+  centredColumn: table("{ key: 'number', header: 'Invoice', align: 'center', cell: (invoice) => invoice.number }"),
+  link: table(ONE, "caption='Invoices' getKey={(invoice) => invoice.id} link={<a rel='nofollow' />}"),
+  stringLink: table(ONE, "caption='Invoices' getKey={(invoice) => invoice.id} link='a'"),
+  renderProp: table(ONE, "caption='Invoices' getKey={(invoice) => invoice.id} render={<section />}"),
+  skeleton: 'export const probe = <TableSkeleton rows={3} columns={4} captionVisible className="mt-4" />',
+  skeletonString: "export const probe = <TableSkeleton rows='3' />",
+  skeletonChild: 'export const probe = <TableSkeleton>Loading</TableSkeleton>',
   readonlyItems: "const frozen = [{ id: 'a' }, { id: 'b' }] as const\nexport const probe = <Table items={frozen} caption='Letters' getKey={(letter) => letter.id} columns={[{ key: 'id', header: 'Id', cell: (letter) => letter.id }]} />",
 })
 
@@ -112,18 +133,51 @@ describe('the rest of the contract', () => {
     expect(verdict['logicalAlign']).toEqual([])
   })
 
-  it('refuses a getKey that returns the item, which React cannot use as a key', () => {
-    expect(said('objectKey')).toContain("Type 'Invoice' is not assignable to type 'string | number'")
+  it('refuses a getKey that returns the item or a number: the shared collection contract keys by string', () => {
+    expect(said('objectKey')).toContain("Type 'Invoice' is not assignable to type 'string'")
+    expect(said('numberKey')).toContain("Type 'number' is not assignable to type 'string'")
   })
 
-  it('refuses a table with no caption, and one whose caption is null', () => {
+  it('refuses a table with no caption, and one whose caption is null or may be undefined', () => {
     expect(said('noCaption')).toContain("Property 'caption' is missing")
     expect(said('nullCaption')).toContain("Type 'null' is not assignable to type")
+    expect(said('maybeCaption')).toContain("Type 'undefined' is not assignable to type")
+  })
+
+  it('refuses the empty string as a caption, which would leave the table and its region unnamed', () => {
+    expect(said('emptyCaption')).toContain("Type 'string' is not assignable to type 'never'")
+  })
+
+  it('accepts a caption that is a string variable or an element', () => {
+    expect(verdict['stringCaption']).toEqual([])
+    expect(verdict['nodeCaption']).toEqual([])
   })
 
   it('refuses a sort direction aria-sort does not know, and accepts the two it does', () => {
     expect(said('shortDirection')).toContain('Type \'"asc"\' is not assignable to type \'"ascending" | "descending"\'')
     expect(verdict['sorted']).toEqual([])
+  })
+
+  it('accepts false, null and undefined among the columns, with the cell of a conditional one still inferred', () => {
+    expect(verdict['falsyColumns']).toEqual([])
+  })
+
+  it('accepts rowHeader and className on a column, and refuses a prop a column does not have', () => {
+    expect(verdict['columnProps']).toEqual([])
+    expect(said('unknownColumnProp')).toContain("'width' does not exist in type")
+    expect(said('centredColumn')).toContain(`Type '"center"' is not assignable to type`)
+  })
+
+  it('takes the sort link as an element named link, never as a string and never as render', () => {
+    expect(verdict['link']).toEqual([])
+    expect(said('stringLink')).toContain("Type 'string' is not assignable to type 'ReactElement")
+    expect(said('renderProp')).toContain("Property 'render' does not exist")
+  })
+
+  it('types the placeholder: two numbers, no children', () => {
+    expect(verdict['skeleton']).toEqual([])
+    expect(said('skeletonString')).toContain("Type 'string' is not assignable to type 'number'")
+    expect(said('skeletonChild')).toContain("Type '{ children: string; }' has no properties in common with type")
   })
 
   it('refuses role, which is always region, and children, because the rows come from items', () => {

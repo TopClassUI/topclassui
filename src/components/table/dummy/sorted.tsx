@@ -19,7 +19,7 @@ export default function Demo() {
         caption="Customers, by name"
         captionVisible
         items={byName}
-        getKey={(customer) => customer.id}
+        getKey={(customer) => String(customer.id)}
         sort={{ key: 'name', direction: 'ascending' }}
         columns={[
           { key: 'name', header: 'Customer', sortHref: '?sort=name&dir=desc', cell: (customer) => customer.name },
@@ -31,7 +31,7 @@ export default function Demo() {
         caption="Customers, by seats"
         captionVisible
         items={bySeats}
-        getKey={(customer) => customer.id}
+        getKey={(customer) => String(customer.id)}
         sort={{ key: 'seats', direction: 'descending' }}
         columns={[
           { key: 'name', header: 'Customer', sortHref: '?sort=name&dir=asc', cell: (customer) => customer.name },

@@ -18,4 +18,20 @@ describe('<Table> in a Server Component tree', () => {
     expect(typeof entry.Table).toBe('function')
     expect(entry.Table.constructor.name).toBe('Function')
   })
+
+  it('still has cloneElement there, which is all the link prop needs to put an href on the caller element', () => {
+    expect(typeof React.cloneElement).toBe('function')
+    expect(typeof React.isValidElement).toBe('function')
+  })
+})
+
+describe('<TableSkeleton> in a Server Component tree', () => {
+  /** The element it returns, read before React renders it: it calls no hook, so it can be called here. */
+  const element = entry.TableSkeleton({ rows: 2, columns: 3 }) as React.ReactElement<{ 'aria-hidden': boolean; className: string }>
+
+  it('returns the box itself, hidden, with nothing around it', () => {
+    expect(element.type).toBe('div')
+    expect(element.props['aria-hidden']).toBe(true)
+    expect(element.props.className.split(' ')).toContain('overflow-hidden')
+  })
 })

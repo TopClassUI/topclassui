@@ -2,11 +2,16 @@ import type { ReactElement, ReactNode } from 'react'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import type { IconData } from '#icons/types.js'
+import type { CollectionProps } from '#shared/contracts/collection.js'
 import type { Labels } from '#shared/labels/types.js'
-import { SORT_ICONS, SORT_LABELS, TABLE_ALIGNS, TABLE_COLUMN_DEFAULTS, TABLE_DEFAULTS, TABLE_SORT_DIRECTIONS } from '../constants.js'
+import { TABLE_BOUNDARIES } from '../boundaries.js'
+import {
+  SORT_ICONS, SORT_LABELS, TABLE_ALIGNS, TABLE_COLUMN_DEFAULTS, TABLE_DEFAULTS, TABLE_SKELETON_DEFAULTS, TABLE_SORT_DIRECTIONS,
+} from '../constants.js'
 import type { Table } from '../index.js'
 import type {
-  TableAlign, TableColumn, TableDesignProps, TableProps, TableSort, TableSortDirection,
+  TableAlign, TableCaption, TableColumn, TableColumns, TableDesignProps, TableProps, TableSkeletonDesignProps,
+  TableSkeletonProps, TableSort, TableSortDirection,
 } from '../types.js'
 
 /** Assignability as a value, so a rejected prop is a passing assertion. */
@@ -36,58 +41,36 @@ describe('the unions come from the constants', () => {
     expectTypeOf<Accepts<keyof Labels['table'], (typeof SORT_LABELS)[TableSortDirection]>>().toEqualTypeOf<true>()
   })
 
-  it('names the defaults the spec names', () => {
+  it('names the defaults and the bounds, each written out', () => {
     expect(TABLE_DEFAULTS).toEqual({ captionVisible: false, striped: false, stickyFirstColumn: false })
     expect(TABLE_COLUMN_DEFAULTS).toEqual({ align: 'start' })
-  })
-})
-
-describe('a column is typed by the item', () => {
-  it('hands cell the item type of the table', () => {
-    expectTypeOf<TableColumn<Invoice>['cell']>().toEqualTypeOf<(item: Invoice) => ReactNode>()
-    expectTypeOf<Parameters<TableColumn<Invoice>['cell']>[0]>().toEqualTypeOf<Invoice>()
-  })
-
-  it('rejects a cell written for another item', () => {
-    type CustomerColumn = { key: string; header: string; cell: (item: Customer) => ReactNode }
-    expectTypeOf<Accepts<TableColumn<Invoice>, CustomerColumn>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<TableColumn<Customer>, CustomerColumn>>().toEqualTypeOf<true>()
-  })
-
-  it('rejects a cell that returns something React cannot render', () => {
-    type ObjectCell = { key: string; header: string; cell: (item: Invoice) => { amount: number } }
-    expectTypeOf<Accepts<TableColumn<Invoice>, ObjectCell>>().toEqualTypeOf<false>()
-  })
-
-  it('rejects a cell that takes a second argument the table never passes', () => {
-    type IndexedCell = { key: string; header: string; cell: (item: Invoice, index: number) => ReactNode }
-    expectTypeOf<Accepts<TableColumn<Invoice>, IndexedCell>>().toEqualTypeOf<false>()
-  })
-
-  it('requires key, header and cell, and leaves sortHref and align optional', () => {
-    expectTypeOf<Accepts<TableColumn<Invoice>, { key: string; header: string }>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<TableColumn<Invoice>, { header: string; cell: () => string }>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<TableColumn<Invoice>, { key: string; header: string; cell: () => string }>>().toEqualTypeOf<true>()
-    expectTypeOf<TableColumn<Invoice>['sortHref']>().toEqualTypeOf<string | undefined>()
-    expectTypeOf<TableColumn<Invoice>['align']>().toEqualTypeOf<TableAlign | undefined>()
-  })
-
-  it('takes any node as a header, and a string key', () => {
-    expectTypeOf<TableColumn<Invoice>['header']>().toEqualTypeOf<ReactNode>()
-    expectTypeOf<TableColumn<Invoice>['key']>().toEqualTypeOf<string>()
+    expect(TABLE_SKELETON_DEFAULTS).toEqual({ rows: 5, columns: 4 })
+    expect(TABLE_BOUNDARIES).toEqual({ skeletonRowsMin: 1, skeletonRowsMax: 100, skeletonColumnsMin: 1, skeletonColumnsMax: 50 })
   })
 })
 
 describe('the props are generic over the item', () => {
   it('takes a readonly list, so a frozen or as-const list is accepted', () => {
     expectTypeOf<TableProps<Invoice>['items']>().toEqualTypeOf<readonly Invoice[]>()
-    expectTypeOf<TableProps<Invoice>['columns']>().toEqualTypeOf<readonly TableColumn<Invoice>[]>()
   })
 
-  it('types getKey by the item, returning what React accepts as a key', () => {
-    expectTypeOf<TableProps<Invoice>['getKey']>().toEqualTypeOf<(item: Invoice) => string | number>()
+  it('takes columns with holes in them, so a flag can leave one out', () => {
+    expectTypeOf<TableProps<Invoice>['columns']>().toEqualTypeOf<TableColumns<Invoice>>()
+    expectTypeOf<TableColumns<Invoice>>().toEqualTypeOf<readonly (TableColumn<Invoice> | false | null | undefined)[]>()
+    expectTypeOf<Accepts<TableProps<Invoice>['columns'], TableColumn<Invoice>[]>>().toEqualTypeOf<true>()
+    expectTypeOf<Accepts<TableProps<Invoice>['columns'], (TableColumn<Invoice> | true)[]>>().toEqualTypeOf<false>()
+  })
+
+  it('types getKey by the item and returns a string, as the shared collection contract does', () => {
+    expectTypeOf<TableProps<Invoice>['getKey']>().toEqualTypeOf<(item: Invoice) => string>()
     expectTypeOf<Accepts<TableProps<Invoice>['getKey'], (item: Customer) => string>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<TableProps<Invoice>['getKey'], (item: Invoice) => boolean>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<TableProps<Invoice>['getKey'], (item: Invoice) => number>>().toEqualTypeOf<false>()
+  })
+
+  it('has not drifted from the contract in the three props it copies from it (R-8.5-1)', () => {
+    type Shared = 'items' | 'getKey' | 'emptyFallback'
+    expectTypeOf<Accepts<Pick<CollectionProps<Invoice>, Shared>, Pick<TableProps<Invoice>, Shared>>>().toEqualTypeOf<true>()
+    expectTypeOf<Accepts<Pick<TableProps<Invoice>, Shared>, Pick<CollectionProps<Invoice>, Shared>>>().toEqualTypeOf<true>()
   })
 
   it('is one generic function component, so the item is inferred from items', () => {
@@ -101,11 +84,24 @@ describe('the props are generic over the item', () => {
   })
 
   it('refuses a caption that renders nothing, because the caption is the name (R-5.6-1)', () => {
-    expectTypeOf<Accepts<TableProps<Invoice>['caption'], string>>().toEqualTypeOf<true>()
-    expectTypeOf<Accepts<TableProps<Invoice>['caption'], ReactElement>>().toEqualTypeOf<true>()
-    expectTypeOf<Accepts<TableProps<Invoice>['caption'], null>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<TableProps<Invoice>['caption'], undefined>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<TableProps<Invoice>['caption'], false>>().toEqualTypeOf<false>()
+    expectTypeOf<TableProps<Invoice>['caption']>().toEqualTypeOf<TableCaption>()
+    expectTypeOf<Accepts<TableCaption, string>>().toEqualTypeOf<true>()
+    expectTypeOf<Accepts<TableCaption, ReactElement>>().toEqualTypeOf<true>()
+    expectTypeOf<Accepts<TableCaption, null>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<TableCaption, undefined>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<TableCaption, false>>().toEqualTypeOf<false>()
+  })
+
+  it('refuses the empty string literal too, and still takes any other string', () => {
+    expectTypeOf<TableProps<Invoice, ''>['caption']>().toBeNever()
+    expectTypeOf<TableProps<Invoice, 'Invoices'>['caption']>().toEqualTypeOf<'Invoices'>()
+    expectTypeOf<TableProps<Invoice, string>['caption']>().toEqualTypeOf<string>()
+  })
+
+  it('gives a wrapper one type to hand its own caption on with', () => {
+    expectTypeOf<Accepts<TableProps<Invoice>['caption'], TableCaption>>().toEqualTypeOf<true>()
+    // In a tuple, or the check runs once per member of ReactNode and answers yes and no.
+    expectTypeOf<Accepts<[TableProps<Invoice>['caption']], [ReactNode]>>().toEqualTypeOf<false>()
   })
 
   it('takes the fallback, the sort and the labels as the spec names them', () => {
@@ -113,6 +109,11 @@ describe('the props are generic over the item', () => {
     expectTypeOf<TableProps<Invoice>['sort']>().toEqualTypeOf<TableSort | undefined>()
     expectTypeOf<TableSort>().toEqualTypeOf<{ key: string; direction: TableSortDirection }>()
     expectTypeOf<TableProps<Invoice>['labels']>().toEqualTypeOf<Labels | undefined>()
+  })
+
+  it('takes the sort link as one element, named link and not render', () => {
+    expectTypeOf<TableProps<Invoice>['link']>().toEqualTypeOf<ReactElement | undefined>()
+    expectTypeOf<Accepts<keyof TableProps<Invoice>, 'render'>>().toEqualTypeOf<false>()
   })
 })
 
@@ -145,7 +146,8 @@ describe('the props follow the vocabulary', () => {
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'hasMore'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'loadMore'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'selectedKeys'>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<keyof TableProps<Invoice>, 'render'>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<keyof TableProps<Invoice>, 'stickyHeader'>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<keyof TableProps<Invoice>, 'loading'>>().toEqualTypeOf<false>()
   })
 })
 
@@ -160,5 +162,25 @@ describe('the design props and the schema cannot drift', () => {
 
   it('is a subset of the component props, so every design prop is settable', () => {
     expectTypeOf<Accepts<keyof TableProps<Invoice>, keyof TableDesignProps>>().toEqualTypeOf<true>()
+  })
+})
+
+describe('the placeholder', () => {
+  it('takes two counts from its own schema, and the caption toggle of the table it stands in for', () => {
+    expectTypeOf<TableSkeletonDesignProps>().toEqualTypeOf<{ rows?: number | undefined; columns?: number | undefined }>()
+    expectTypeOf<TableSkeletonProps['captionVisible']>().toEqualTypeOf<boolean | undefined>()
+  })
+
+  it('accepts className, style and ref, and nothing that would put content in it or un-hide it', () => {
+    expectTypeOf<TableSkeletonProps['className']>().toEqualTypeOf<string | undefined>()
+    expectTypeOf<Accepts<keyof TableSkeletonProps, 'ref'>>().toEqualTypeOf<true>()
+    expectTypeOf<Accepts<keyof TableSkeletonProps, 'children'>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<keyof TableSkeletonProps, 'dangerouslySetInnerHTML'>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<keyof TableSkeletonProps, 'aria-hidden'>>().toEqualTypeOf<false>()
+  })
+
+  it('takes nothing of the data: a placeholder has no items and no columns to read', () => {
+    expectTypeOf<Accepts<keyof TableSkeletonProps, 'items'>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<keyof TableSkeletonProps, 'striped'>>().toEqualTypeOf<false>()
   })
 })

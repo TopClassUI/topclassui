@@ -1,8 +1,10 @@
 import { z } from 'zod'
 import { describe, expect, it } from 'vitest'
 
+import { TABLE_BOUNDARIES } from '../boundaries.js'
 import { TABLE_DEFAULTS } from '../constants.js'
-import { tableSchema } from '../schema.js'
+import * as schemas from '../schema.js'
+import { tableSchema, tableSkeletonSchema } from '../schema.js'
 
 // R-8.3-3: the props table, the playground and registry.json all read this output.
 const json = z.toJSONSchema(tableSchema, { io: 'input' }) as {
@@ -50,5 +52,38 @@ describe('the schema is the documentation', () => {
     for (const key of ['pageSize', 'density', 'variant', 'hasMore', 'sortable', 'selectable', 'size', 'tone']) {
       expect(keys, key).not.toContain(key)
     }
+  })
+
+  it('is the first schema the file exports, which is the one the README table is built from', () => {
+    expect(Object.keys(schemas)).toEqual(['tableSchema', 'tableSkeletonSchema'])
+  })
+})
+
+describe('the schema of the placeholder (R-5.7-7)', () => {
+  const skeleton = z.toJSONSchema(tableSkeletonSchema, { io: 'input' }) as {
+    properties?: Record<string, { description?: string; default?: unknown; type?: string; minimum?: number; maximum?: number }>
+  }
+
+  it('bounds its two counts with the numbers boundaries.ts holds, written out here', () => {
+    expect(skeleton.properties?.['rows']).toMatchObject({ type: 'integer', minimum: 1, maximum: 100, default: 5 })
+    expect(skeleton.properties?.['columns']).toMatchObject({ type: 'integer', minimum: 1, maximum: 50, default: 4 })
+    expect(TABLE_BOUNDARIES.skeletonRowsMax).toBe(100)
+    expect(TABLE_BOUNDARIES.skeletonColumnsMax).toBe(50)
+  })
+
+  it('describes both, with no placeholder text left in', () => {
+    for (const key of ['rows', 'columns']) {
+      expect((skeleton.properties?.[key]?.description ?? '').length, key).toBeGreaterThan(10)
+      expect(skeleton.properties?.[key]?.description ?? '', key).not.toContain('TODO')
+    }
+  })
+
+  it('fills the defaults and refuses what the clamp would have to repair', () => {
+    expect(tableSkeletonSchema.parse({})).toEqual({ rows: 5, columns: 4 })
+    expect(tableSkeletonSchema.safeParse({ rows: 0 }).success).toBe(false)
+    expect(tableSkeletonSchema.safeParse({ rows: 101 }).success).toBe(false)
+    expect(tableSkeletonSchema.safeParse({ rows: 2.5 }).success).toBe(false)
+    expect(tableSkeletonSchema.safeParse({ columns: 51 }).success).toBe(false)
+    expect(tableSkeletonSchema.safeParse({ rows: 100, columns: 50 }).success).toBe(true)
   })
 })
