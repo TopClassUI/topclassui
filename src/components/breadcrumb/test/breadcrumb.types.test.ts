@@ -1,4 +1,4 @@
-import type { Ref } from 'react'
+import type { ReactElement, Ref } from 'react'
 import { describe, expectTypeOf, it } from 'vitest'
 
 import type { Labels } from '#shared/labels/types.js'
@@ -60,8 +60,22 @@ describe('the props', () => {
     expectTypeOf<Accepts<keyof BreadcrumbProps, 'dangerouslySetInnerHTML'>>().toEqualTypeOf<false>()
   })
 
-  it('has no render prop: the links are its own anchors', () => {
+  it('takes one link element for every crumb, in the element form a Server Component can pass', () => {
+    expectTypeOf<BreadcrumbProps['link']>().toEqualTypeOf<ReactElement | undefined>()
+    expectTypeOf<Accepts<BreadcrumbProps['link'], () => ReactElement>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<BreadcrumbProps['link'], string>>().toEqualTypeOf<false>()
+  })
+
+  it('has no render prop, on the nav or on an item: the root is the nav and a crumb comes from link', () => {
     expectTypeOf<Accepts<keyof BreadcrumbProps, 'render'>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<keyof BreadcrumbItem, 'render'>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<keyof BreadcrumbItem, 'link'>>().toEqualTypeOf<false>()
+  })
+
+  it('takes baseUrl as a string, which only the JSON-LD reads', () => {
+    expectTypeOf<BreadcrumbProps['baseUrl']>().toEqualTypeOf<string | undefined>()
+    expectTypeOf<Accepts<BreadcrumbProps['baseUrl'], URL>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<keyof BreadcrumbItem, 'baseUrl'>>().toEqualTypeOf<false>()
   })
 
   it('has none of the props the spec leaves unbuilt', () => {

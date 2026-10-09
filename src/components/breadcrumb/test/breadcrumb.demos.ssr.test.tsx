@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['all-links', 'basic', 'long-label', 'long-trail', 'rtl']
+const EXPECTED = ['all-links', 'basic', 'deep-trail', 'long-label', 'long-trail', 'rtl']
 
 const load = async (file: string) => {
   const loaded = await import(`../dummy/${file}.tsx`) as { default: ComponentType }
@@ -59,6 +59,15 @@ describe('each demo shows what its name says', () => {
     expect(count(out, '<li')).toBe(9)
     expect(count(out, '<svg')).toBe(8)
     expect(out).toMatch(/^<div class="[^"]*max-w-85[^"]*">/)
+  })
+
+  it('deep-trail is twelve long crumbs with no box around them, which is what a phone has to fit', async () => {
+    const out = await load('deep-trail')
+    expect(out).toMatch(/^<nav /)
+    expect(count(out, '<li')).toBe(12)
+    expect(count(out, '<a href=')).toBe(11)
+    expect(out).toContain('<a href="/handbook/step-11" ')
+    expect(out).toContain('>Worked examples for a split leave across two tax years</span></li>')
   })
 
   it('long-label puts a link and a current page wider than the box inside a narrow one', async () => {

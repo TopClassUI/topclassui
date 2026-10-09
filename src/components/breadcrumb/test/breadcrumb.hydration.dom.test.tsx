@@ -58,6 +58,17 @@ describe('a server-rendered Breadcrumb hydrates cleanly', () => {
     expect(await hydrate(createElement(Breadcrumb, { items, labels: ar }))).toEqual([])
   })
 
+  it('reports nothing when the crumbs are cloned from a link element and the JSON-LD has a base', async () => {
+    const items = [{ href: '/', label: 'Home' }, { href: '/docs', label: 'Docs' }, { label: 'Breadcrumb' }]
+    const link = createElement('a', { 'data-client-link': '', href: '' })
+    expect(await hydrate(createElement(Breadcrumb, { items, link, baseUrl: 'https://example.com' }))).toEqual([])
+  })
+
+  it('reports nothing for a trail whose blank crumbs were left out', async () => {
+    const items = [{ href: '/', label: 'Home' }, { href: '/untitled', label: ' ' }, { label: '' }]
+    expect(await hydrate(createElement(Breadcrumb, { items }))).toEqual([])
+  })
+
   it('reports nothing for a label that had to be escaped inside the script', async () => {
     const items = [{ href: '/x', label: '</script><script>alert(1)</script>' }, { label: 'Tom & "Jerry"' }]
     expect(await hydrate(createElement(Breadcrumb, { items }))).toEqual([])

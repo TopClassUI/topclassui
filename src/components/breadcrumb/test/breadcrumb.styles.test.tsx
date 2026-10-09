@@ -45,8 +45,8 @@ describe('every part carries exactly its own classes', () => {
     expect(classesOf(html(), 'ol')).toEqual(['flex', 'flex-wrap', 'gap-2', 'items-center'])
   })
 
-  it('each item is a row of its own that may shrink, with the same 8 px before its crumb', () => {
-    const expected = ['flex', 'gap-2', 'items-center', 'max-w-full', 'min-w-0']
+  it('each item is a row of its own that may shrink, in the muted colour its caret inherits', () => {
+    const expected = ['flex', 'gap-2', 'items-center', 'max-w-full', 'min-w-0', 'text-muted']
     expect(classesOf(html(), 'li', 0)).toEqual(expected)
     expect(classesOf(html(), 'li', 1)).toEqual(expected)
     expect(classesOf(html(), 'li', 2)).toEqual(expected)
@@ -65,12 +65,13 @@ describe('every part carries exactly its own classes', () => {
     expect(html()).toContain('<span class="truncate min-w-0 text-muted">Settings</span>')
   })
 
-  it('the current page is in the body colour, and it truncates itself', () => {
-    expect(html()).toContain('<span aria-current="page" class="truncate min-w-0 text-body">Profile</span>')
+  it('the current page is in the body colour and semibold, so colour is not its only cue', () => {
+    expect(html()).toContain('<span aria-current="page" class="truncate min-w-0 text-body font-semibold">Profile</span>')
   })
 
-  it('the separator is Svg\'s own classes, the rtl flip and the muted colour', () => {
-    const expected = ['inline-block', 'rtl:-scale-x-100', 'shrink-0', 'text-muted']
+  // A colour set on the svg itself is kept under forced colours; an inherited one is replaced.
+  it('the separator is Svg\'s own classes and the rtl flip, with no colour of its own', () => {
+    const expected = ['inline-block', 'rtl:-scale-x-100', 'shrink-0']
     expect(classesOf(html(), 'svg', 0)).toEqual(expected)
     expect(classesOf(html(), 'svg', 1)).toEqual(expected)
   })
@@ -160,6 +161,6 @@ describe('className is passed last, so the consumer wins every conflict', () => 
     const out = html({ className: 'mt-4' })
     expect(classesOf(out, 'ol')).toEqual(['flex', 'flex-wrap', 'gap-2', 'items-center'])
     expect(classesOf(out, 'a')).toEqual(sorted(LINK))
-    expect(classesOf(out, 'svg')).toEqual(['inline-block', 'rtl:-scale-x-100', 'shrink-0', 'text-muted'])
+    expect(classesOf(out, 'svg')).toEqual(['inline-block', 'rtl:-scale-x-100', 'shrink-0'])
   })
 })
