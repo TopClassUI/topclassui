@@ -1035,4 +1035,40 @@ export const MUTATIONS: Mutation[] = [
     from: '    rating: group(base.rating, overrides.rating),',
     to: '    rating: base.rating,',
   },
+  {
+    label: 'a sorted Table puts aria-sort and a caret on every column, so no one of them is named',
+    file: 'src/components/table/index.tsx',
+    from: 'sort?.key === key && Object.hasOwn(SORT_ICONS, sort.direction)',
+    to: 'sort !== undefined && Object.hasOwn(SORT_ICONS, sort.direction)',
+  },
+  {
+    label: 'the sticky cell of a Table loses its own fill, so the columns scrolling under it show through',
+    file: 'src/components/table/index.tsx',
+    from: '                      sticks(index) && fill,\n',
+    to: '',
+  },
+  {
+    label: 'a Table writes its role, name and tab stop before the rest, so a caller can make the scrolling box unreachable',
+    file: 'src/components/table/index.tsx',
+    from: '      {...rest}\n      role="region"\n      aria-labelledby={captionId}\n      tabIndex={0}\n',
+    to: '      role="region"\n      aria-labelledby={captionId}\n      tabIndex={0}\n      {...rest}\n',
+  },
+  {
+    label: 'the sort link of a Table loses its touch target, so a header is a 16 px line to hit',
+    file: 'src/components/table/classes.ts',
+    from: ' ${FOCUS_RING} ${TOUCH_TARGET}`',
+    to: ' ${FOCUS_RING}`',
+  },
+  {
+    label: 'a Table column takes a cell written for any item, so a wrong cell signature compiles',
+    file: 'src/components/table/types.ts',
+    from: '  cell: (item: T) => ReactNode\n',
+    to: '  cell: (item: any) => ReactNode\n',
+  },
+  {
+    label: 'the empty row of a Table reads its words from English, whatever labels it was given',
+    file: 'src/components/table/index.tsx',
+    from: '{emptyFallback ?? labels.state.empty}',
+    to: '{emptyFallback ?? en.state.empty}',
+  },
 ]
