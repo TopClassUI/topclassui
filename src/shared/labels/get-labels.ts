@@ -27,6 +27,10 @@ function withOverrides(base: Labels, overrides?: PartialLabels): Labels {
     select: group(base.select, overrides.select),
     dialog: group(base.dialog, overrides.dialog),
     file: group(base.file, overrides.file),
+    breadcrumb: group(base.breadcrumb, overrides.breadcrumb),
+    avatar: group(base.avatar, overrides.avatar),
+    rating: group(base.rating, overrides.rating),
+    table: group(base.table, overrides.table),
   }
 }
 

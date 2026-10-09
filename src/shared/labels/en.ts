@@ -35,6 +35,7 @@ export const en = {
     last: 'Last page',
     page: (n, fmt) => `Page ${fmt.format(n)}`,
     ofPages: (n, fmt) => `of ${fmt.format(n)}`,
+    pageOf: (page, count, fmt) => `Page ${fmt.format(page)} of ${fmt.format(count)}`,
   },
   select: {
     placeholder: 'Select',
@@ -48,5 +49,20 @@ export const en = {
     browse: 'Browse',
     remove: 'Remove',
     tooMany: (n, fmt) => (n === 1 ? 'Only 1 file allowed' : `Only ${fmt.format(n)} files allowed`),
+  },
+  breadcrumb: {
+    label: 'Breadcrumb',
+    home: 'Home',
+  },
+  avatar: {
+    more: (n, fmt) => `${fmt.format(n)} more`,
+  },
+  rating: {
+    value: (value, max, fmt) => `${fmt.format(value)} out of ${fmt.format(max)}`,
+  },
+  table: {
+    sortBy: 'Sort by',
+    sortedAscending: 'sorted ascending',
+    sortedDescending: 'sorted descending',
   },
 } satisfies Labels
