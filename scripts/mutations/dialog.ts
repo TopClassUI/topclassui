@@ -3,25 +3,42 @@ import type { Mutation } from '../lib/mutate.js'
 
 const CLIENT = 'src/components/dialog/client.tsx'
 const CLASSES = 'src/components/dialog/classes.ts'
+const LIB = 'src/components/dialog/lib.ts'
+const DUMMY = 'src/components/dialog/dummy'
+
+/** The ring drawn outside the box, as FOCUS_RING writes it: what the popup wore before it was moved inside. */
+const RING_OUTSIDE = 'outline-none focus-visible:outline-solid focus-visible:outline-(length:--tc-ring-width) focus-visible:outline-offset-(length:--tc-ring-offset) focus-visible:outline-ring'
 
 export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog body loses SCROLL_AREA, so a long body pushes the footer out of the popup instead of scrolling',
     file: CLASSES,
-    from: 'text-sm text-muted ${SCROLL_AREA} ${FOCUS_RING_INSET}`',
-    to: 'text-sm text-muted ${FOCUS_RING_INSET}`',
+    from: 'text-sm text-muted ${SCROLL_AREA} ${FOCUS_RING_INSET}',
+    to: 'text-sm text-muted ${FOCUS_RING_INSET}',
   },
   {
     label: 'the dialog body loses its inset ring, so a body the keyboard lands on shows no focus: the ring outside its box is clipped',
     file: CLASSES,
-    from: 'text-sm text-muted ${SCROLL_AREA} ${FOCUS_RING_INSET}`',
-    to: 'text-sm text-muted ${SCROLL_AREA}`',
+    from: 'text-sm text-muted ${SCROLL_AREA} ${FOCUS_RING_INSET}',
+    to: 'text-sm text-muted ${SCROLL_AREA}',
   },
   {
     label: 'the dialog body loses its one-line floor, so a tall header and footer squeeze it to nothing on a small phone',
     file: CLASSES,
     from: '`min-h-15 flex-1 px-5 py-5',
     to: '`min-h-0 flex-1 px-5 py-5',
+  },
+  {
+    label: 'the dialog body keeps scrolling on a screen under 272 px tall, so a wheel that starts on it never reaches the actions',
+    file: CLASSES,
+    from: ' ${FOCUS_RING_INSET} ${DIALOG_BODY_SHORT}`',
+    to: ' ${FOCUS_RING_INSET}`',
+  },
+  {
+    label: 'the dialog body stops scrolling on a short screen but may still shrink, so it is cut at 60 px with no way to its end',
+    file: CLASSES,
+    from: "'[@media(height<17rem)]:shrink-0 [@media(height<17rem)]:overflow-y-visible'",
+    to: "'[@media(height<17rem)]:overflow-y-visible'",
   },
   {
     label: 'the dialog popup clips instead of scrolling, so an action below the screen of a small phone can never be reached',
@@ -40,6 +57,12 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: "'flex max-h-[calc(100dvh-2*var(--tc-overlay-inset))] w-full",
     to: "'flex w-full",
+  },
+  {
+    label: 'the dialog popup draws its ring outside its box again, on the scrim, where it reads at 1.8:1',
+    file: CLASSES,
+    from: "  POPUP_MOTION,\n  FOCUS_RING_INSET,\n",
+    to: `  POPUP_MOTION,\n  '${RING_OUTSIDE}',\n`,
   },
   {
     label: 'the dialog viewport loses its inset, so the popup touches the edges of a phone',
@@ -72,40 +95,130 @@ export const MUTATIONS: Mutation[] = [
     to: '`text-muted tone-neutral ${HOVER.ghost}`',
   },
   {
+    label: 'the dialog footer stops lifting nowrap from its actions, so a long action ends in an ellipsis on a phone',
+    file: CLASSES,
+    from: "'**:whitespace-normal *:data-size:text-center',",
+    to: "'*:data-size:text-center',",
+  },
+  {
+    label: 'the dialog footer lets a label wrap but keeps the button at the height of its size, so the second line spills out of it',
+    file: CLASSES,
+    from: "'*:data-size:not-data-[size=custom]:h-auto *:data-size:not-data-[size=custom]:py-1',",
+    to: "'*:data-size:not-data-[size=custom]:py-1',",
+  },
+  {
+    label: 'the dialog footer drops the 44 px floor of a medium action under a finger, so it is 40 px tall on a phone',
+    file: CLASSES,
+    from: "  'pointer-coarse:*:data-[size=md]:min-h-[var(--tc-target-coarse,44px)]',\n",
+    to: '',
+  },
+  {
+    label: 'the dialog footer gives a medium action the floor of a small one, so it is 32 px tall where it was 40',
+    file: CLASSES,
+    from: '*:data-[size=md]:min-h-control-md',
+    to: '*:data-[size=md]:min-h-control-sm',
+  },
+  {
     label: 'the dialog viewport loses the direction of its provider, so the dialog of an RTL island has its x on the right and its text left-aligned',
     file: CLIENT,
-    from: '<Base.Viewport dir={direction} className={DIALOG_VIEWPORT}>',
-    to: '<Base.Viewport className={DIALOG_VIEWPORT}>',
+    from: '<Base.Viewport dir={direction} className=',
+    to: '<Base.Viewport className=',
+  },
+  {
+    label: 'a dialog that is not modal still draws its scrim, so the page it leaves usable is dimmed',
+    file: CLIENT,
+    from: '{blocks ? <Base.Backdrop className={DIALOG_BACKDROP} /> : null}',
+    to: '<Base.Backdrop className={DIALOG_BACKDROP} />',
+  },
+  {
+    label: 'the viewport of a dialog that is not modal still catches every press, so nothing on the page behind can be pressed',
+    file: CLIENT,
+    from: 'className={cn(DIALOG_VIEWPORT, !blocks && DIALOG_VIEWPORT_PASSIVE)}',
+    to: 'className={DIALOG_VIEWPORT}',
+  },
+  {
+    label: 'the popup of a dialog that is not modal never takes its presses back from its viewport, so its own buttons are dead',
+    file: CLIENT,
+    from: 'cn(DIALOG_POPUP, !blocks && DIALOG_POPUP_PASSIVE, DIALOG_WIDTH[size], className)',
+    to: 'cn(DIALOG_POPUP, DIALOG_WIDTH[size], className)',
+  },
+  {
+    label: 'a trap-focus dialog is treated as fully modal by its popup, so it dims and blocks a page the pointer should keep',
+    file: CLIENT,
+    from: 'const blocks = modal === true',
+    to: 'const blocks = modal !== false',
+  },
+  {
+    label: 'the dialog root never shares modal with its popup, so modal={false} still draws the scrim',
+    file: CLIENT,
+    from: '<DialogModalContext value={modal}>',
+    to: '<DialogModalContext value={true}>',
+  },
+  {
+    label: 'the dialog root shares modal with its popup but never hands it to Base UI, so a dialog with no scrim still locks and hides the page',
+    file: CLIENT,
+    from: '<Base.Root {...props} modal={modal} onOpenChange=',
+    to: '<Base.Root {...props} onOpenChange=',
+  },
+  {
+    label: 'the dialog root forwards only its children, so open, defaultOpen and disablePointerDismissal never reach Base UI',
+    file: CLIENT,
+    from: '<Base.Root {...props} modal={modal} onOpenChange={guardEscape(onOpenChange)} />',
+    to: '<Base.Root modal={modal} onOpenChange={guardEscape(onOpenChange)}>{props.children}</Base.Root>',
+  },
+  {
+    label: 'the dialog root drops its Escape guard, so one key closes a tooltip opened by hover and the dialog under it',
+    file: CLIENT,
+    from: 'onOpenChange={guardEscape(onOpenChange)}',
+    to: 'onOpenChange={onOpenChange}',
+  },
+  {
+    label: 'the dialog Escape guard cancels the close but lets Base UI stop the key, so the tooltip never hears it and stays open',
+    file: LIB,
+    from: "      // Base UI stops the key at the popup; the tooltip listens on the document, further up.\n      details.allowPropagation()\n",
+    to: '',
+  },
+  {
+    label: 'the dialog Escape guard cancels every Escape, whether or not a popup is open inside, so the key never closes a dialog',
+    file: LIB,
+    from: " && holdsOpenPopup(details.event.target)) {",
+    to: ') {',
+  },
+  {
+    label: 'the dialog Escape guard also cancels a press outside while a tooltip is open, so the scrim stops closing the dialog',
+    file: LIB,
+    from: "if (!open && details.reason === 'escape-key' && holdsOpenPopup(",
+    to: 'if (!open && holdsOpenPopup(',
   },
   {
     label: "the dialog popup's own classes beat a consumer className",
     file: CLIENT,
-    from: 'className={cn(DIALOG_POPUP, DIALOG_WIDTH[size], className)}',
-    to: 'className={cn(className, DIALOG_POPUP, DIALOG_WIDTH[size])}',
+    from: 'cn(DIALOG_POPUP, !blocks && DIALOG_POPUP_PASSIVE, DIALOG_WIDTH[size], className)',
+    to: 'cn(className, DIALOG_POPUP, !blocks && DIALOG_POPUP_PASSIVE, DIALOG_WIDTH[size])',
   },
   {
     label: 'the dialog popup ignores its size, so every dialog is 400 px wide',
     file: CLIENT,
-    from: 'className={cn(DIALOG_POPUP, DIALOG_WIDTH[size], className)}',
-    to: 'className={cn(DIALOG_POPUP, DIALOG_WIDTH.md, className)}',
+    from: 'DIALOG_POPUP_PASSIVE, DIALOG_WIDTH[size], className)',
+    to: 'DIALOG_POPUP_PASSIVE, DIALOG_WIDTH.md, className)',
   },
   {
     label: 'the dialog popup drops the rest props, so ref, id, lang, initialFocus and its children never reach it',
     file: CLIENT,
-    from: '<Base.Popup data-size={size} {...rest} className=',
-    to: '<Base.Popup data-size={size} className=',
+    from: '          data-size={size}\n          {...rest}\n',
+    to: '          data-size={size}\n',
   },
   {
-    label: 'the dialog root forwards only its children, so open, onOpenChange and disablePointerDismissal never reach Base UI',
+    label: 'the dialog popup never hands container to its portal, so it always mounts at the end of the body',
     file: CLIENT,
-    from: 'return <Base.Root {...props} />',
-    to: 'return <Base.Root>{props.children}</Base.Root>',
+    from: '<Base.Portal container={container} keepMounted={keepMounted}>',
+    to: '<Base.Portal keepMounted={keepMounted}>',
   },
   {
-    label: 'the dialog root turns modal off, so the page behind scrolls and stays readable to a screen reader',
+    label: 'the dialog popup never hands keepMounted to its portal, so a closed dialog always leaves the document',
     file: CLIENT,
-    from: 'return <Base.Root {...props} />',
-    to: 'return <Base.Root {...props} modal={false} />',
+    from: '<Base.Portal container={container} keepMounted={keepMounted}>',
+    to: '<Base.Portal container={container}>',
   },
   {
     label: 'the dialog header always draws its x, so closeButton={false} does nothing',
@@ -146,14 +259,26 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a dialog close with a label of its own draws the x over it, so Cancel becomes a second x',
     file: CLIENT,
-    from: 'if (render !== undefined || children != null) {',
+    from: 'if (render !== undefined || hasContent(children)) {',
     to: 'if (render !== undefined) {',
   },
   {
-    label: 'a dialog close whose children render nothing is an empty button with no name, where it was the x',
+    label: 'a dialog close whose children are false or an empty string is an invisible button with no name, where it was the x',
     file: CLIENT,
-    from: 'if (render !== undefined || children != null) {',
-    to: 'if (render !== undefined || children !== undefined) {',
+    from: 'if (render !== undefined || hasContent(children)) {',
+    to: 'if (render !== undefined || children != null) {',
+  },
+  {
+    label: 'hasContent counts a boolean as content, so a dialog close around {saving && label} is an empty button while saving is false',
+    file: LIB,
+    from: " && typeof children !== 'boolean' && children !== ''",
+    to: " && children !== ''",
+  },
+  {
+    label: 'hasContent reads a list as content whatever it holds, so a dialog close around two blank children is an empty button',
+    file: LIB,
+    from: '  if (Array.isArray(children)) return children.some(hasContent)\n',
+    to: '',
   },
   {
     label: 'a className on the dialog trigger never reaches the element passed as render',
@@ -170,8 +295,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog popup gains a second hook call, where a part may hold only the one from hook.ts (R-5.12-1)',
     file: CLIENT,
-    from: '  const { direction } = useDialogPopup()\n',
-    to: '  const { direction } = useDialogPopup()\n  useDialogClose()\n',
+    from: '  const { direction, modal } = useDialogPopup()\n',
+    to: '  const { direction, modal } = useDialogPopup()\n  useDialogClose()\n',
   },
   {
     label: 'the dialog default size becomes lg, so a dialog with no size is 512 px wide',
@@ -186,27 +311,75 @@ export const MUTATIONS: Mutation[] = [
     to: '  closeButton: false,',
   },
   {
-    label: 'the dialog basic demo puts its label back on the trigger, the form a Button rendered on the server drops',
-    file: 'src/components/dialog/dummy/basic.tsx',
+    label: 'a dialog is not modal unless asked, so the default one has no scrim and leaves the page behind it in use',
+    file: 'src/components/dialog/constants.ts',
+    from: '  modal: true,',
+    to: '  modal: false,',
+  },
+  {
+    label: 'the dialog basic demo puts its label back on the trigger, where a server-built Button loses its truncating span',
+    file: `${DUMMY}/basic.tsx`,
     from: '<DialogTrigger render={<Button>Publish</Button>} />',
     to: '<DialogTrigger render={<Button />}>Publish</DialogTrigger>',
   },
   {
     label: 'the dialog form demo makes its form a box, so the three bars stop being the column of the popup and the body no longer scrolls',
-    file: 'src/components/dialog/dummy/with-form.tsx',
+    file: `${DUMMY}/with-form.tsx`,
     from: '<form className="contents">',
     to: '<form>',
   },
   {
     label: 'the dialog long-body demo drops its tabIndex, so axe reports a scrolling region the keyboard cannot reach',
-    file: 'src/components/dialog/dummy/long-body.tsx',
+    file: `${DUMMY}/long-body.tsx`,
     from: '<DialogBody tabIndex={0} className="grid gap-3">',
     to: '<DialogBody className="grid gap-3">',
   },
   {
+    label: 'the dialog long-content demo drops its tabIndex, so on a 320 px phone its scrolling body is out of reach of the keyboard',
+    file: `${DUMMY}/long-content.tsx`,
+    from: '<DialogBody tabIndex={0}>{WORD}</DialogBody>',
+    to: '<DialogBody>{WORD}</DialogBody>',
+  },
+  {
     label: 'the dialog confirm demo loses disablePointerDismissal, so a stray press outside dismisses a destructive question',
-    file: 'src/components/dialog/dummy/confirm.tsx',
+    file: `${DUMMY}/confirm.tsx`,
     from: '<DialogRoot disablePointerDismissal>',
+    to: '<DialogRoot>',
+  },
+  {
+    label: 'the dialog confirm demo says its consequence in plain body text, so a screen reader opens it with a title and nothing else',
+    file: `${DUMMY}/confirm.tsx`,
+    from: '          <DialogDescription>This removes the project and every file in it. This cannot be undone.</DialogDescription>\n',
+    to: '          This removes the project and every file in it. This cannot be undone.\n',
+  },
+  {
+    label: 'the dialog close-on-success demo never closes after a good save, as the plain Server Action sample never did',
+    file: `${DUMMY}/close-on-success.tsx`,
+    from: '    if (error === null) onSaved()\n',
+    to: '',
+  },
+  {
+    label: 'the dialog close-on-success demo closes whatever the action answers, so a refused name is lost with its error',
+    file: `${DUMMY}/close-on-success.tsx`,
+    from: '    if (error === null) onSaved()\n',
+    to: '    onSaved()\n',
+  },
+  {
+    label: 'the dialog close-on-success demo forgets the typed name after a refused save, so the field springs back to the old one',
+    file: `${DUMMY}/close-on-success.tsx`,
+    from: '    return { name: nameIn(data), error }',
+    to: "    return { name: 'Website redesign', error }",
+  },
+  {
+    label: 'the dialog non-modal demo loses modal={false}, so the panel that leaves the page in use dims and blocks it',
+    file: `${DUMMY}/non-modal.tsx`,
+    from: '<DialogRoot modal={false}>',
+    to: '<DialogRoot>',
+  },
+  {
+    label: 'the dialog trap-focus demo turns fully modal, so the page it leaves to the pointer is dimmed and blocked',
+    file: `${DUMMY}/trap-focus.tsx`,
+    from: '<DialogRoot modal="trap-focus">',
     to: '<DialogRoot>',
   },
 ]

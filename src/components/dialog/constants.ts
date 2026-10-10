@@ -5,4 +5,6 @@ import { DEFAULT_SIZE } from '#shared/contracts/size.js'
 export const DIALOG_DEFAULTS = {
   size: DEFAULT_SIZE,
   closeButton: true,
+  // Base UI's own default, named here because the popup reads it too: only true draws a scrim.
+  modal: true,
 } as const

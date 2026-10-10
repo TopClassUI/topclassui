@@ -69,15 +69,24 @@ describe('the root renders no element', () => {
     expectTypeOf<Accepts<keyof DialogRootProps, 'ref'>>().toEqualTypeOf<false>()
   })
 
-  it('passes every Base UI root prop through untouched (R-5.7-5)', () => {
-    expectTypeOf<DialogRootProps>().toEqualTypeOf<Dialog.Root.Props>()
+  it('takes exactly these ten props, every one of them Base UI root prop but the handle (R-5.7-5)', () => {
+    expectTypeOf<keyof DialogRootProps>().toEqualTypeOf<
+      'open' | 'defaultOpen' | 'modal' | 'onOpenChange' | 'onOpenChangeComplete' | 'disablePointerDismissal'
+      | 'actionsRef' | 'children' | 'triggerId' | 'defaultTriggerId'
+    >()
+    expectTypeOf<Omit<DialogRootProps, 'children'>>().toEqualTypeOf<Omit<Dialog.Root.Props, 'handle' | 'children'>>()
     expectTypeOf<DialogRootProps['open']>().toEqualTypeOf<boolean | undefined>()
     expectTypeOf<DialogRootProps['defaultOpen']>().toEqualTypeOf<boolean | undefined>()
-    expectTypeOf<DialogRootProps['modal']>().toEqualTypeOf<boolean | 'trap-focus' | undefined>()
     expectTypeOf<DialogRootProps['disablePointerDismissal']>().toEqualTypeOf<boolean | undefined>()
-    expectTypeOf<Accepts<keyof DialogRootProps, 'onOpenChange'>>().toEqualTypeOf<true>()
-    expectTypeOf<Accepts<keyof DialogRootProps, 'actionsRef'>>().toEqualTypeOf<true>()
-    expectTypeOf<Accepts<keyof DialogRootProps, 'handle'>>().toEqualTypeOf<true>()
+  })
+
+  it('takes modal as Base UI types it: true, false or trap-focus', () => {
+    expectTypeOf<DialogRootProps['modal']>().toEqualTypeOf<boolean | 'trap-focus' | undefined>()
+  })
+
+  it('takes children as nodes only: the function form exists to receive the payload of a handle', () => {
+    expectTypeOf<DialogRootProps['children']>().toEqualTypeOf<ReactNode>()
+    expectTypeOf<Accepts<DialogRootProps['children'], () => ReactNode>>().toEqualTypeOf<false>()
   })
 
   it('reports an open change with the event that follows the R-5.7-1 name', () => {
@@ -138,9 +147,15 @@ describe('what Base UI gives each part passes through', () => {
     expectTypeOf<Accepts<DialogPopupProps['initialFocus'], false>>().toEqualTypeOf<true>()
   })
 
-  it('the trigger keeps its Base UI props: disabled, nativeButton, handle and payload', () => {
+  it('the trigger keeps disabled and nativeButton, which an element that is not a button needs', () => {
     expectTypeOf<DialogTriggerProps['disabled']>().toEqualTypeOf<boolean | undefined>()
-    expectTypeOf<Accepts<keyof DialogTriggerProps, 'nativeButton' | 'handle' | 'payload'>>().toEqualTypeOf<true>()
+    expectTypeOf<DialogTriggerProps['nativeButton']>().toEqualTypeOf<boolean | undefined>()
+  })
+
+  it('the popup takes the two props of the portal it renders, as Base UI types them', () => {
+    expectTypeOf<DialogPopupProps['container']>().toEqualTypeOf<Dialog.Portal.Props['container']>()
+    expectTypeOf<DialogPopupProps['keepMounted']>().toEqualTypeOf<boolean | undefined>()
+    expectTypeOf<Accepts<DialogPopupProps['container'], HTMLElement | null>>().toEqualTypeOf<true>()
   })
 
   it('the header, the body and the footer are plain divs: they take no render', () => {
@@ -162,21 +177,20 @@ describe('none of the props the spec leaves unbuilt', () => {
   })
 })
 
-describe('a typed handle types the payload, as Base UI does', () => {
-  interface Project { id: string }
-
-  it('the trigger takes the handle and a payload of its type', () => {
-    expectTypeOf<DialogTriggerProps<Project>['payload']>().toEqualTypeOf<Project | undefined>()
-    expectTypeOf<DialogTriggerProps<Project>['handle']>().toEqualTypeOf<Dialog.Handle<Project> | undefined>()
+// Nothing exported can create a handle, so a prop that takes one could never be given a value.
+describe('a trigger outside its root is not built', () => {
+  it('has no handle on the root or the trigger, and no payload to send through one', () => {
+    expectTypeOf<Extract<keyof DialogRootProps, 'handle'>>().toEqualTypeOf<never>()
+    expectTypeOf<Extract<keyof DialogTriggerProps, 'handle' | 'payload'>>().toEqualTypeOf<never>()
   })
 
-  it('the root children function receives the payload as that type', () => {
-    type Render = Extract<DialogRootProps<Project>['children'], (arg: never) => unknown>
-    expectTypeOf<Parameters<Render>[0]['payload']>().toEqualTypeOf<Project | undefined>()
+  it('keeps the two ids a controlled dialog names its trigger by', () => {
+    expectTypeOf<DialogRootProps['triggerId']>().toEqualTypeOf<string | null | undefined>()
+    expectTypeOf<DialogTriggerProps['id']>().toEqualTypeOf<string | undefined>()
   })
 
-  it('both parts are generic, so JSX infers the payload from the handle', () => {
-    expectTypeOf<Parameters<typeof DialogRoot<Project>>[0]>().toEqualTypeOf<DialogRootProps<Project>>()
-    expectTypeOf<Parameters<typeof DialogTrigger<Project>>[0]>().toEqualTypeOf<DialogTriggerProps<Project>>()
+  it('neither part is generic any more: each takes its props type as it is', () => {
+    expectTypeOf<Parameters<typeof DialogRoot>[0]>().toEqualTypeOf<DialogRootProps>()
+    expectTypeOf<Parameters<typeof DialogTrigger>[0]>().toEqualTypeOf<DialogTriggerProps>()
   })
 })

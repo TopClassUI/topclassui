@@ -22,6 +22,7 @@ interface Shown {
 /** What each trigger of each demo opens, written out. */
 const SHOWN: Record<string, Shown[]> = {
   'basic': [{ trigger: 'Publish', title: 'Publish changes', controls: ['Close this dialog', 'Cancel', 'Publish now'] }],
+  'close-on-success': [{ trigger: 'Rename and close', title: 'Rename this project', controls: ['Close this dialog', 'Name', 'Cancel', 'Save'] }],
   'confirm': [{ trigger: 'Delete project', title: 'Delete this project?', controls: ['Close this dialog', 'Cancel', 'Delete'] }],
   'long-body': [{ trigger: 'Read the terms', title: 'Terms of service', controls: ['Close this dialog', 'Decline', 'Accept'] }],
   'long-content': [{
@@ -30,6 +31,7 @@ const SHOWN: Record<string, Shown[]> = {
     controls: ['Close this dialog', 'Keep it where it is', 'Move a copy and keep the original', 'Move everything to the archive'],
   }],
   'no-close-button': [{ trigger: 'What is new', title: 'Version 2.4', controls: ['Got it'] }],
+  'non-modal': [{ trigger: 'Find and replace', title: 'Find and replace', controls: ['Close this dialog', 'Done'] }],
   'rtl': [{ trigger: 'نشر', title: 'نشر التغييرات', controls: ['إغلاق هذا الحوار', 'إلغاء', 'انشر الآن'] }],
   'sizes': [
     { trigger: 'xs', title: 'Size xs', controls: ['Close this dialog', 'Done'] },
@@ -39,7 +41,9 @@ const SHOWN: Record<string, Shown[]> = {
     { trigger: 'xl', title: 'Size xl', controls: ['Close this dialog', 'Done'] },
     { trigger: 'custom', title: 'Size custom', controls: ['Close this dialog', 'Done'] },
   ],
+  'trap-focus': [{ trigger: 'Inspect', title: 'Inspector', controls: ['Close this dialog', 'Done'] }],
   'with-form': [{ trigger: 'Rename', title: 'Rename this project', controls: ['Close this dialog', 'Name', 'Cancel', 'Save'] }],
+  'with-tooltip': [{ trigger: 'Share', title: 'Share this project', controls: ['Close this dialog', 'Link', 'Copy link', 'Done'] }],
 }
 
 /** What a screen reader announces for a control: its aria-label, its label element, or else its text. */
@@ -50,11 +54,12 @@ function nameOf(control: Element): string {
   return (label ?? control).textContent
 }
 
-/** Opens each dialog of a demo in turn from its trigger, reads it, and closes it with Escape. */
+/** Opens each dialog of a demo in turn from its trigger, reads it, and closes it with Escape. A button
+ * of the page that opens nothing, as two demos hold beside their trigger, is not one. */
 async function shown(Demo: ComponentType): Promise<Shown[]> {
   render(<Demo />)
   const out: Shown[] = []
-  const triggers = screen.getAllByRole('button')
+  const triggers = screen.getAllByRole('button').filter((button) => button.getAttribute('aria-haspopup') === 'dialog')
   for (const trigger of triggers) {
     await userEvent.click(trigger)
     const popup = await screen.findByRole('dialog')
@@ -80,61 +85,4 @@ describe('every demo opens the dialog its trigger names', () => {
       expect(await shown(loaded.default), name).toEqual(SHOWN[name])
     })
   }
-})
-
-describe('what the demos show of the props', () => {
-  /** Opens the dialog of one trigger of a demo: the first, or the one with that label. */
-  const openFirst = async (name: string, trigger?: string) => {
-    const loaded = await import(`../dummy/${name}.tsx`) as { default: ComponentType }
-    render(<loaded.default />)
-    await userEvent.click(trigger === undefined ? screen.getAllByRole('button')[0] as HTMLElement : screen.getByRole('button', { name: trigger }))
-    return screen.findByRole('dialog')
-  }
-
-  it('confirm: a press outside leaves it open, because the root carries disablePointerDismissal', async () => {
-    const popup = await openFirst('confirm')
-    await userEvent.click(popup.parentElement?.previousElementSibling as Element)
-    await new Promise((resolve) => { setTimeout(resolve, 30) })
-    expect(popup.hasAttribute('data-open')).toBe(true)
-  })
-
-  it('basic: the same press closes it', async () => {
-    const popup = await openFirst('basic')
-    await userEvent.click(popup.parentElement?.previousElementSibling as Element)
-    await waitFor(() => { expect(screen.queryByRole('dialog')).toBeNull() })
-  })
-
-  it('with-form: the popup stays a div with the dialog role, and one form inside it holds the field and the submit button', async () => {
-    const popup = await openFirst('with-form')
-    expect(popup.tagName).toBe('DIV')
-    const form = popup.querySelector('form')
-    expect(form?.parentElement).toBe(popup)
-    expect(form?.getAttribute('class')).toBe('contents')
-    expect(form?.getAttribute('role')).toBeNull()
-    expect(form?.querySelector('input[name="name"]')).not.toBeNull()
-    expect(form?.querySelector('button[type="submit"]')?.textContent).toBe('Save')
-  })
-
-  it('with-form: the first focus is in the field, not on the x', async () => {
-    const popup = await openFirst('with-form')
-    await waitFor(() => { expect(document.activeElement).toBe(popup.querySelector('input[name="name"]')) })
-  })
-
-  it('long-body: the body can take focus, so a keyboard reaches a text with no control in it', async () => {
-    const popup = await openFirst('long-body')
-    expect(popup.children[1]?.getAttribute('tabindex')).toBe('0')
-    expect(popup.children[1]?.querySelectorAll('p')).toHaveLength(40)
-  })
-
-  it('rtl: the popup carries the language its portal would lose, and its viewport the direction', async () => {
-    const popup = await openFirst('rtl')
-    expect(popup.getAttribute('lang')).toBe('ar')
-    expect(popup.parentElement?.getAttribute('dir')).toBe('rtl')
-  })
-
-  it('sizes: custom carries the width of its className and no width of ours', async () => {
-    const popup = await openFirst('sizes', 'custom')
-    expect(popup.getAttribute('data-size')).toBe('custom')
-    expect((popup.getAttribute('class') ?? '').split(' ').filter((cls) => cls.startsWith('max-w-'))).toEqual(['max-w-3xl'])
-  })
 })

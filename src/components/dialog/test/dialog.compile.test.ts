@@ -11,19 +11,30 @@ const FOLDER = join(ROOT, 'src', 'components', 'dialog')
 const slash = (path: string) => path.replace(/\\/g, '/')
 const probePath = (name: string) => slash(join(FOLDER, 'test', `dialog-probe-${name}.tsx`))
 
+/** The nine parts, by the names the README imports them under. */
+const PARTS = 'DialogBody, DialogClose, DialogDescription, DialogFooter, DialogHeader, DialogPopup, DialogRoot, DialogTitle, DialogTrigger'
+
 /** What a page that pastes a sample has in scope: the nine parts, Button, Input and its own Server Actions. */
 const PRELUDE = [
   "import { Button } from '../../button/index.js'",
   "import { Input } from '../../input/index.js'",
-  'import {',
-  '  DialogBody, DialogClose, DialogDescription, DialogFooter, DialogHeader, DialogPopup, DialogRoot, DialogTitle,',
-  '  DialogTrigger,',
-  "} from '../index.js'",
+  `import { ${PARTS} } from '../index.js'`,
   'declare function renameProject(data: FormData): Promise<void>',
   'declare function publishSite(data: FormData): Promise<void>',
-  'export const used = [Button, Input, DialogBody, DialogClose, DialogDescription, DialogFooter, DialogHeader, DialogPopup,',
-  '  DialogRoot, DialogTitle, DialogTrigger, renameProject, publishSite]',
+  '/** Answers with an error message, or with none. */',
+  'declare function saveName(data: FormData): Promise<string | null>',
+  `export const used = [Button, Input, ${PARTS}, renameProject, publishSite, saveName]`,
 ].join('\n')
+
+/** A sample that is a whole client file compiles as a module, the import line as one that uses
+ * what it imports, and any other sample as JSX, the way a page would paste it. */
+function wrap(code: string): string {
+  if (code.startsWith("'use client'")) {
+    return `${PRELUDE}\nimport { useActionState, useState } from 'react'\nexport const hooks = [useActionState, useState]\n${code}\n`
+  }
+  if (code.startsWith('import ')) return `${code.replace("'topclassui'", "'../index.js'")}\nexport const imported = [${PARTS}]\n`
+  return `${PRELUDE}\nexport const sample = (\n<>\n${code}\n</>\n)\n`
+}
 
 /**
  * The compiler's verdict, read at runtime: a type assertion erases before Vitest runs, so
@@ -32,8 +43,7 @@ const PRELUDE = [
 function compile(snippets: Record<string, string>): Record<string, string[]> {
   const read = ts.readConfigFile(join(ROOT, 'tsconfig.json'), ts.sys.readFile.bind(ts.sys))
   const options = { ...ts.parseJsonConfigFileContent(read.config ?? {}, ts.sys, ROOT).options, noEmit: true }
-  const probes = new Map(Object.entries(snippets).map(([name, code]) =>
-    [probePath(name), `${PRELUDE}\nexport const sample = (\n<>\n${code}\n</>\n)\n`]))
+  const probes = new Map(Object.entries(snippets).map(([name, code]) => [probePath(name), wrap(code)]))
 
   const host = ts.createCompilerHost(options)
   const getSourceFile = host.getSourceFile.bind(host)
@@ -55,36 +65,53 @@ function compile(snippets: Record<string, string>): Record<string, string[]> {
   return out
 }
 
-/** Every tsx block a reader can copy out of the hand-written half of the README, in order. */
+/** Every code block a reader can copy out of the hand-written half of the README, in order. */
 function readmeSamples(): string[] {
   const readme = readFileSync(join(FOLDER, 'README.md'), 'utf8')
   const hand = readme.slice(readme.indexOf('<!-- hand-written -->'), readme.indexOf('<!-- /hand-written -->'))
-  return [...hand.matchAll(/```tsx\r?\n([\s\S]*?)```/g)].map((match) => match[1] ?? '')
+  return [...hand.matchAll(/```tsx?\r?\n([\s\S]*?)```/g)].map((match) => match[1] ?? '')
 }
 
 const SAMPLES = readmeSamples()
+const sample = (index: number) => SAMPLES[index] ?? '<Missing />'
+const dialog = (root: string, popup: string, inside = '') => `<DialogRoot${root}><DialogPopup${popup}>${inside}</DialogPopup></DialogRoot>`
 
 const verdict = compile({
-  readmeFirst: SAMPLES[0] ?? '<Missing />',
-  readmeSecond: SAMPLES[1] ?? '<Missing />',
+  readmeImport: sample(0),
+  readmeFirst: sample(1),
+  readmeSecond: sample(2),
+  readmeThird: sample(3),
   // The sample of the docs card: it type-checks, which is why the README has to say not to write it.
-  formOnPopup: '<DialogRoot><DialogPopup render={<form action={publishSite} />}><DialogBody>Body</DialogBody></DialogPopup></DialogRoot>',
-  confirm: '<DialogRoot disablePointerDismissal><DialogPopup size="xs"><DialogHeader closeButton={false} /></DialogPopup></DialogRoot>',
-  controlled: '<DialogRoot open onOpenChange={(open, details) => { void [open, details.reason] }}><DialogPopup /></DialogRoot>',
-  bodyFocus: '<DialogRoot><DialogPopup lang="ar"><DialogBody tabIndex={0}>Text</DialogBody></DialogPopup></DialogRoot>',
-  badSize: '<DialogRoot><DialogPopup size="huge" /></DialogRoot>',
-  rootClass: '<DialogRoot className="p-4"><DialogPopup /></DialogRoot>',
-  badCloseButton: '<DialogRoot><DialogPopup><DialogHeader closeButton="no" /></DialogPopup></DialogRoot>',
-  dismissible: '<DialogRoot dismissible={false}><DialogPopup /></DialogRoot>',
-  classFunction: "<DialogRoot><DialogPopup className={() => 'p-4'} /></DialogRoot>",
-  sizeOnHeader: '<DialogRoot><DialogPopup><DialogHeader size="lg" /></DialogPopup></DialogRoot>',
+  formOnPopup: dialog('', ' render={<form action={publishSite} />}', '<DialogBody>Body</DialogBody>'),
+  confirm: dialog(' disablePointerDismissal', ' size="xs"', '<DialogHeader closeButton={false} />'),
+  confirmThatActs: dialog('', '', '<form action={publishSite} className="contents"><DialogFooter>'
+    + '<DialogClose render={<Button type="submit" tone="danger">Delete</Button>} /></DialogFooter></form>'),
+  controlled: dialog(' open onOpenChange={(open, details) => { void [open, details.reason] }}', ''),
+  bodyFocus: dialog('', ' lang="ar"', '<DialogBody tabIndex={0}>Text</DialogBody>'),
+  modalValues: `<>${dialog(' modal', '')}${dialog(' modal={false}', '')}${dialog(' modal="trap-focus"', '')}</>`,
+  portal: dialog('', ' keepMounted container={null} finalFocus={() => document.body}'),
+  linkTrigger: '<DialogRoot><DialogTrigger nativeButton={false} render={<span role="button">Open</span>} /></DialogRoot>',
+  badSize: dialog('', ' size="huge"'),
+  badModal: dialog(' modal="half"', ''),
+  rootClass: dialog(' className="p-4"', ''),
+  rootHandle: dialog(' handle={undefined}', ''),
+  badCloseButton: dialog('', '', '<DialogHeader closeButton="no" />'),
+  dismissible: dialog(' dismissible={false}', ''),
+  classFunction: dialog('', " className={() => 'p-4'}"),
+  sizeOnHeader: dialog('', '', '<DialogHeader size="lg" />'),
 })
 
 describe('the samples in the README compile as written', () => {
-  it('finds both samples, so an empty extraction cannot pass', () => {
-    expect(SAMPLES).toHaveLength(2)
-    expect(SAMPLES[0]).toContain('<DialogTitle>Publish changes</DialogTitle>')
-    expect(SAMPLES[1]).toContain('<form action={renameProject} className="contents">')
+  it('finds the import line and the three samples, so an empty extraction cannot pass', () => {
+    expect(SAMPLES).toHaveLength(4)
+    expect(SAMPLES[0]).toContain("} from 'topclassui'")
+    expect(SAMPLES[1]).toContain('<DialogTitle>Publish changes</DialogTitle>')
+    expect(SAMPLES[2]).toContain('<form action={renameProject} className="contents">')
+    expect(SAMPLES[3]).toContain('<DialogRoot open={open} onOpenChange={setOpen}>')
+  })
+
+  it('the import line names nine exports that exist, where the generated one names a Dialog that does not', () => {
+    expect(verdict['readmeImport']).toEqual([])
   })
 
   it('the first sample: a header, a body and a footer with two ways out', () => {
@@ -94,11 +121,19 @@ describe('the samples in the README compile as written', () => {
   it('the second sample: a form with a Server Action around the three bars', () => {
     expect(verdict['readmeSecond']).toEqual([])
   })
+
+  it('the third sample: a client file that closes on success and shows the error otherwise', () => {
+    expect(verdict['readmeThird']).toEqual([])
+  })
 })
 
 describe('what a Dialog does take', () => {
   it('a confirm: disablePointerDismissal on the root, a size and no x', () => {
     expect(verdict['confirm']).toEqual([])
+  })
+
+  it('a confirm that acts: a submit Button as the close, inside a form', () => {
+    expect(verdict['confirmThatActs']).toEqual([])
   })
 
   it('a controlled dialog, whose handler reads the reason it was asked to close', () => {
@@ -109,12 +144,32 @@ describe('what a Dialog does take', () => {
     expect(verdict['bodyFocus']).toEqual([])
   })
 
+  it('each of the three values of modal', () => {
+    expect(verdict['modalValues']).toEqual([])
+  })
+
+  it('where its portal mounts, whether it stays mounted, and a function for the last focus', () => {
+    expect(verdict['portal']).toEqual([])
+  })
+
+  it('a trigger that is not a button, with nativeButton={false}', () => {
+    expect(verdict['linkTrigger']).toEqual([])
+  })
+
   it('a form as the popup itself, because render passes to Base UI: valid TypeScript, invalid ARIA', () => {
     expect(verdict['formOnPopup']).toEqual([])
   })
 })
 
 describe('what a Dialog does not take', () => {
+  it('refuses a fourth value of modal', () => {
+    expect((verdict['badModal'] ?? []).join(' ')).toContain('Type \'"half"\' is not assignable')
+  })
+
+  it('refuses a handle on the root: nothing exported can create one', () => {
+    expect((verdict['rootHandle'] ?? []).join(' ')).toContain("Property 'handle' does not exist")
+  })
+
   it('refuses a size outside the scale', () => {
     expect((verdict['badSize'] ?? []).join(' ')).toContain('Type \'"huge"\' is not assignable')
   })

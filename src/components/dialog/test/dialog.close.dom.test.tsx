@@ -127,9 +127,51 @@ describe('DialogClose with content is that control, not the x', () => {
     await closed()
   })
 
-  it('with children that render nothing it falls back to the x, never an empty button with no name', async () => {
-    close(<DialogClose>{null}</DialogClose>)
+  // `{saving && 'Saving'}` is false most of the time: an empty, nameless, 0 px button would be the result.
+  for (const [what, children] of [
+    ['null', null], ['false', false], ['an empty string', ''], ['a list of nothing', [false, null, '']],
+  ] as const) {
+    it(`with children that are ${what} it is the x, never an empty button with no name`, async () => {
+      close(<DialogClose>{children}</DialogClose>)
+      const popup = await screen.findByRole('dialog')
+      expect(popup.querySelectorAll('button')).toHaveLength(1)
+      expect(x().querySelectorAll('svg')).toHaveLength(1)
+      expect(x().getAttribute('class')).toContain('min-h-[var(--tc-target-min,24px)]')
+    })
+  }
+
+  it('with zero as its child it is a button that reads 0, since React draws a zero', async () => {
+    close(<DialogClose>{0}</DialogClose>)
     await screen.findByRole('dialog')
-    expect(x().querySelectorAll('svg')).toHaveLength(1)
+    expect(screen.getByRole('button', { name: '0' }).querySelector('svg')).toBeNull()
+  })
+
+  it('with render and children that draw nothing, the control keeps the label it brought', async () => {
+    close(<DialogClose render={<Button>Cancel</Button>}>{false}</DialogClose>)
+    await screen.findByRole('dialog')
+    expect(screen.getByRole('button', { name: 'Cancel' }).innerHTML).toBe('<span class="truncate min-w-0">Cancel</span>')
+  })
+})
+
+// A trigger has no x to fall back on: with nothing to draw it is the control passed to render, as that control is.
+describe('DialogTrigger with children that draw nothing', () => {
+  it('leaves the Button passed to render its own label: the props of a render element win', () => {
+    render(
+      <DialogRoot>
+        <DialogTrigger render={<Button>Open</Button>}>{false}</DialogTrigger>
+        <DialogPopup><DialogBody>Body</DialogBody></DialogPopup>
+      </DialogRoot>,
+    )
+    expect(screen.getByRole('button', { name: 'Open' }).innerHTML).toBe('<span class="truncate min-w-0">Open</span>')
+  })
+
+  it('and a Button with no label of its own takes the one written on the trigger, in a client file', () => {
+    render(
+      <DialogRoot>
+        <DialogTrigger render={<Button />}>Open</DialogTrigger>
+        <DialogPopup><DialogBody>Body</DialogBody></DialogPopup>
+      </DialogRoot>,
+    )
+    expect(screen.getByRole('button', { name: 'Open' }).innerHTML).toBe('<span class="truncate min-w-0">Open</span>')
   })
 })

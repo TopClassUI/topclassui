@@ -16,6 +16,7 @@ import { FORCED_CANVAS, inkOn, pixelsOf } from './pixels.js'
 /** The first trigger of every demo and the title its dialog shows. Written out, so a renamed demo fails here. */
 const DIALOGS: Record<string, { trigger: string, title: string }> = {
   'dialog--basic': { trigger: 'Publish', title: 'Publish changes' },
+  'dialog--close-on-success': { trigger: 'Rename and close', title: 'Rename this project' },
   'dialog--confirm': { trigger: 'Delete project', title: 'Delete this project?' },
   'dialog--long-body': { trigger: 'Read the terms', title: 'Terms of service' },
   'dialog--long-content': {
@@ -23,9 +24,12 @@ const DIALOGS: Record<string, { trigger: string, title: string }> = {
     title: 'Move the quarterly report, its eleven attachments and every comment thread to the shared archive of the finance team',
   },
   'dialog--no-close-button': { trigger: 'What is new', title: 'Version 2.4' },
+  'dialog--non-modal': { trigger: 'Find and replace', title: 'Find and replace' },
   'dialog--rtl': { trigger: 'نشر', title: 'نشر التغييرات' },
   'dialog--sizes': { trigger: 'xs', title: 'Size xs' },
+  'dialog--trap-focus': { trigger: 'Inspect', title: 'Inspector' },
   'dialog--with-form': { trigger: 'Rename', title: 'Rename this project' },
+  'dialog--with-tooltip': { trigger: 'Share', title: 'Share this project' },
 }
 
 /** The three screens Unit 3 measures at: a small phone, a phone and a desktop. */
@@ -71,9 +75,64 @@ const partsOf = (popup: Locator) => popup.evaluate((element): Parts => {
 const bodyOf = (popup: Locator) => popup.locator('div:has(> div > h2) + div')
 const scrollY = (page: Page) => page.evaluate(() => Math.round(window.scrollY))
 
+/** Each action of the footer: how tall its button is, how many lines its label takes, and whether any of it is cut. */
+const actionsOf = (popup: Locator) => popup.evaluate((element) => {
+  const footer = element.querySelector('h2')?.parentElement?.parentElement?.nextElementSibling?.nextElementSibling
+  return [...(footer?.querySelectorAll('button') ?? [])].map((button) => {
+    const label = button.querySelector('span') ?? button
+    const range = document.createRange()
+    range.selectNodeContents(label)
+    const lines = new Set([...range.getClientRects()].map((rect) => Math.round(rect.top))).size
+    const cut = label.scrollWidth > label.clientWidth + 1 || label.scrollHeight > label.clientHeight + 1
+    return `${String(button.getBoundingClientRect().height)} px, ${String(lines)} ${lines === 1 ? 'line' : 'lines'}, ${cut ? 'cut' : 'whole'}`
+  })
+})
+
+/** How many boxes of a popup really scroll up and down: the popup itself and its body are the two that can. */
+const scrollersOf = (popup: Locator) => popup.evaluate((element) => {
+  const body = element.querySelector('h2')?.parentElement?.parentElement?.nextElementSibling
+  return [element, body].filter((box) => box && box.scrollHeight > box.clientHeight + 1 && getComputedStyle(box).overflowY !== 'visible').length
+})
+
 test('the table names every dialog demo', () => {
   expect(Object.keys(DIALOGS).sort()).toEqual(DEMOS.filter((demo) => demo.startsWith('dialog--')).sort())
-  expect(Object.keys(DIALOGS)).toHaveLength(8)
+  expect(Object.keys(DIALOGS)).toHaveLength(12)
+})
+
+test.describe('the helper that opens every overlay', () => {
+  /** What moves on the popup and beside it, read in the same tick openOverlay returned in. */
+  const motion = (popup: Locator) => popup.evaluate((element) => {
+    const style = getComputedStyle(element)
+    const layer = element.closest('[data-base-ui-portal]') ?? element
+    return {
+      opacity: style.opacity, scale: style.scale, translate: style.translate,
+      width: element.getBoundingClientRect().width, left: element.getBoundingClientRect().left,
+      running: layer.getAnimations({ subtree: true }).filter((animation) => animation.playState === 'running').length,
+    }
+  })
+
+  // On the first frame a popup is open and past its starting style it is at opacity 0, scale 0.95, 380 px wide.
+  test('returns a dialog at rest: opaque, at full size, with no transition left running', async ({ page }) => {
+    const popup = await open(page, 'dialog--basic')
+    expect(await motion(popup)).toEqual({ opacity: '1', scale: 'none', translate: 'none', width: 400, left: 432.5, running: 0 })
+  })
+
+  // A Drawer slides and never fades, so a wait on its opacity would return on the first frame of the slide.
+  test('waits out a slide that never fades, as a Drawer will make: the box it returns is the final one', async ({ page }) => {
+    await openLive(page, 'dialog--basic')
+    await page.addStyleTag({ content: [
+      '[role="dialog"] { transition: translate 300ms linear !important; opacity: 1 !important; scale: none !important }',
+      '[role="dialog"][data-starting-style] { translate: 100% 0 !important }',
+    ].join('\n') })
+    const popup = await openOverlay(page, triggerOf(page, 'Publish'))
+    expect(await motion(popup)).toEqual({ opacity: '1', scale: 'none', translate: 'none', width: 400, left: 432.5, running: 0 })
+  })
+
+  test('returns at once where nothing moves, under reduced motion', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    const popup = await open(page, 'dialog--basic')
+    expect(await motion(popup)).toEqual({ opacity: '1', scale: 'none', translate: 'none', width: 400, left: 432.5, running: 0 })
+  })
 })
 
 test.describe('focus', () => {
@@ -144,16 +203,72 @@ test.describe('focus', () => {
     await expect(popup.locator('form')).toHaveAttribute('data-submitted', 'yes')
   })
 
-  test('in a window too short for the form, its body is still what scrolls: the form makes no box of its own', async ({ page }) => {
-    // 228 px of popup, 226 inside its line, for 234 px of header, body and footer.
-    await page.setViewportSize({ width: 400, height: 260 })
+  test('with more in the form than the window holds, its body is still what scrolls: the form makes no box of its own', async ({ page }) => {
+    // 268 px of popup, 266 inside its line, for a header of 57, a footer of 73 and a body grown to 304.
+    await page.setViewportSize({ width: 400, height: 300 })
     const popup = await open(page, 'dialog--with-form')
+    await bodyOf(popup).evaluate((body) => {
+      const more = document.createElement('div')
+      more.style.height = '200px'
+      body.append(more)
+    })
     const parts = await partsOf(popup)
-    expect(parts.popup.height).toBe(228)
-    expect(parts.scrollable, 'px the body scrolls').toBe(8)
+    expect(parts.popup.height).toBe(268)
+    expect(parts.body.height).toBe(136)
+    expect(parts.scrollable, 'px the body scrolls').toBe(172)
     expect(parts.footer.bottom).toBe(parts.popup.bottom - 1)
     expect(await popup.evaluate((el) => el.scrollHeight - el.clientHeight), 'px the popup scrolls').toBe(0)
   })
+
+  test('a form closes when its action succeeds, stays open with the error when it fails, and starts clean next time', async ({ page }) => {
+    const popup = await open(page, 'dialog--close-on-success', { by: 'keyboard' })
+    const field = popup.locator('input[name="name"]')
+    await expect(field).toBeFocused()
+    await expect(field).toHaveValue('Website redesign')
+
+    // The name the stand-in action refuses. React empties the form after it; the demo hands the name back.
+    await field.fill('Untitled')
+    await page.keyboard.press('Enter')
+    await expect(popup.locator('#demo-rename-error')).toHaveText('That name is taken.')
+    await expect(popup).toHaveAttribute('data-open', '')
+    await expect(field).toHaveValue('Untitled')
+    await expect(field).toHaveAttribute('aria-invalid', 'true')
+
+    await field.fill('Atlas')
+    await popup.locator('button[type="submit"]').click()
+    await expectClosed(page)
+    await expect(triggerOf(page, 'Rename and close')).toBeFocused()
+    expect((await pageLock(page)).overflow).toBe('visible')
+
+    await page.keyboard.press('Enter')
+    const again = page.locator('[role="dialog"][data-open]')
+    await expect(again.locator('input[name="name"]')).toHaveValue('Website redesign')
+    await expect(again.locator('#demo-rename-error')).toHaveCount(0)
+    expect(await liveErrors(page)).toEqual([])
+  })
+
+  // The popup itself takes focus when its text is clicked, and shows its ring as soon as a key is pressed.
+  for (const mode of MODES) {
+    test(`${mode}: the ring of the popup is drawn inside it, on its own surface, and not on the scrim`, async ({ page }) => {
+      const popup = await open(page, 'dialog--basic', { mode })
+      await popup.locator('h2').click()
+      await page.keyboard.press('ArrowDown')
+      await expect(popup).toBeFocused()
+      await expect(popup).toHaveCSS('outline-style', 'solid')
+      await expect(popup).toHaveCSS('outline-offset', '-2px')
+
+      // Its top edge, clear of the corners: the second row from the edge is ring against the surface, at 3:1 or more.
+      const frame = await boxOf(popup)
+      const [left, top] = [Math.floor(frame.left), Math.floor(frame.top)]
+      const surface = await pixelsOf(page, { x: left + 40, y: top + 8, width: 1, height: 1 })
+      const band = await pixelsOf(page, { x: left + 24, y: top + 1, width: 352, height: 1 })
+      expect(inkOn(band, surface[0] ?? [0, 0, 0]), 'pixels of ring at 3:1 on the surface, along the top edge').toBe(352)
+      // And nothing of it outside the box, where it lay on the scrim at 1.8:1.
+      const ring = (band[0] ?? [0, 0, 0]).join(',')
+      const outside = await pixelsOf(page, { x: left + 24, y: top - 4, width: 352, height: 3 })
+      expect(outside.filter((pixel) => pixel.join(',') === ring), 'pixels of ring in the three rows above the popup').toEqual([])
+    })
+  }
 })
 
 test.describe('the page behind', () => {
@@ -349,7 +464,7 @@ test.describe('inside the viewport', () => {
         // action. A wheel, not scrollIntoView: a script scrolls a box that clips, and a reader cannot.
         const [frame, header] = [await boxOf(popup), (await partsOf(popup)).header]
         const hidden = await popup.evaluate((el) => el.scrollHeight - el.clientHeight)
-        expect(hidden, 'px of popup below its own box').toBe(screen.height === 480 ? 16 : 0)
+        expect(hidden, 'px of popup below its own box').toBe(screen.height === 480 ? 36 : 0)
         await wheelAt(page, header.left + 40, header.top + 20, hidden)
         expect(await popup.evaluate((el) => el.scrollTop), 'px the wheel scrolled the popup').toBe(hidden)
         for (const button of await popup.locator('button:not([aria-label])').all()) {
@@ -360,6 +475,12 @@ test.describe('inside the viewport', () => {
           expect(box.left, `${name} starts outside the popup`).toBeGreaterThanOrEqual(frame.left)
           expect(box.right, `${name} ends outside the popup`).toBeLessThanOrEqual(frame.right)
         }
+
+        // No action ends in an ellipsis. At 320 px the two long ones wrap onto a second line and grow by one
+        // line of text; where a label fits its row, the button keeps the 40 px of its size.
+        expect(await actionsOf(popup)).toEqual(screen.width === 320
+          ? ['40 px, 1 line, whole', '50 px, 2 lines, whole', '50 px, 2 lines, whole']
+          : ['40 px, 1 line, whole', '40 px, 1 line, whole', '40 px, 1 line, whole'])
       })
     }
   }
@@ -394,6 +515,164 @@ test.describe('inside the viewport', () => {
       inset: '16px', scrim: true, fixed: 'fixed fixed',
     })
   })
+})
+
+test.describe('a screen under 272 px tall', () => {
+  // 320 x 256 is where WCAG judges reflow: 1280 x 1024 at 400%. 844 x 190 is a phone on its side with its keyboard up.
+  for (const [width, height] of [[320, 256], [844, 190]] as const) {
+    test(`${String(width)} x ${String(height)}: the popup is the one scroller, so a wheel that starts on the body reaches the last action`, async ({ page }) => {
+      await page.setViewportSize({ width, height })
+      const popup = await open(page, 'dialog--long-body')
+      await expectInsideViewport(popup, 'the popup', 16)
+      await expect(bodyOf(popup)).toHaveCSS('overflow-y', 'visible')
+      expect(await scrollersOf(popup), 'boxes that scroll').toBe(1)
+
+      const [frame, parts] = [await boxOf(popup), await partsOf(popup)]
+      expect(parts.footer.bottom, 'the footer starts out below the popup').toBeGreaterThan(frame.bottom + 1000)
+      for (let turn = 0; turn < 6; turn++) await wheelAt(page, parts.body.left + 40, frame.top + frame.height / 2, 1000)
+      expect(await popup.evaluate((el) => el.scrollHeight - el.clientHeight - el.scrollTop), 'px of popup still below').toBe(0)
+      expect((await partsOf(popup)).footer.bottom).toBe(frame.bottom - 1)
+      await expectNoSidewaysScroll(page)
+    })
+  }
+
+  test('568 x 320, a phone on its side: tall enough, so the bars stay put and the body is the one scroller', async ({ page }) => {
+    await page.setViewportSize({ width: 568, height: 320 })
+    const popup = await open(page, 'dialog--long-body')
+    await expect(bodyOf(popup)).toHaveCSS('overflow-y', 'auto')
+    expect(await scrollersOf(popup), 'boxes that scroll').toBe(1)
+    const parts = await partsOf(popup)
+    expect(parts.body.height).toBe(136)
+    expect(parts.footer.bottom).toBe(parts.popup.bottom - 1)
+    expect(await popup.evaluate((el) => el.scrollHeight - el.clientHeight)).toBe(0)
+  })
+})
+
+test.describe('each value of modal', () => {
+  const behind = (page: Page) => triggerOf(page, 'Behind the panel')
+  const scrims = (page: Page) => page.locator('[data-base-ui-portal] .bg-overlay')
+
+  /** Counts the presses a page button receives from now on, on the button itself. */
+  const count = (button: Locator) => button.evaluate((element: HTMLElement) => {
+    element.dataset['presses'] = '0'
+    element.addEventListener('click', () => { element.dataset['presses'] = String(Number(element.dataset['presses']) + 1) })
+  })
+
+  /** Presses the middle of a box with the mouse, whatever is painted there: locator.click would wait for the box itself. */
+  const pressAt = async (page: Page, target: Locator) => {
+    const box = await boxOf(target)
+    await page.mouse.click(box.left + box.width / 2, box.top + box.height / 2)
+  }
+
+  /** Whether a press in the middle of the popup lands on the popup: under a viewport that lets presses through, it must take its own back. */
+  const takesPresses = (popup: Locator) => popup.evaluate((element) => {
+    const box = element.getBoundingClientRect()
+    return element.contains(document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2))
+  })
+
+  test('true, the default: a scrim, and a press on a page button closes the dialog without reaching the button', async ({ page }) => {
+    await open(page, 'dialog--basic')
+    await expect(scrims(page)).toHaveCount(1)
+    const trigger = triggerOf(page, 'Publish')
+    await count(trigger)
+    await pressAt(page, trigger)
+    await expectClosed(page)
+    await expect(trigger).toHaveAttribute('data-presses', '0')
+  })
+
+  test('trap-focus: no scrim, the page takes a wheel and a press, and Tab and a screen reader stay in the dialog', async ({ page }) => {
+    const popup = await open(page, 'dialog--trap-focus', { tall: true, by: 'keyboard' })
+    await expect(scrims(page)).toHaveCount(0)
+    await expect(popup.locator('xpath=..')).toHaveCSS('pointer-events', 'none')
+    await expect(popup).toHaveCSS('pointer-events', 'auto')
+    expect(await takesPresses(popup), 'a press on the popup lands on it').toBe(true)
+
+    // The keyboard and the screen reader: held, as in a modal dialog.
+    const seen = [await pressInside(page, popup, 'Tab'), await pressInside(page, popup, 'Tab'), await pressInside(page, popup, 'Tab')]
+    expect(seen).toEqual(['Done', 'Close this dialog', 'Done'])
+    const lock = await pageLock(page)
+    expect(lock.reachable).toEqual(['portal'])
+
+    // The pointer: free. The page scrolls behind the open dialog, and its button takes the press.
+    expect(lock.overflow).toBe('visible')
+    await wheelAt(page, 8, 500, 300)
+    expect(await scrollY(page)).toBe(300)
+    await page.evaluate(() => { window.scrollTo(0, 0) })
+    await count(behind(page))
+    await pressAt(page, behind(page))
+    await expect(behind(page)).toHaveAttribute('data-presses', '1')
+    // And that press outside closes it, as in every dialog without disablePointerDismissal.
+    await expectClosed(page)
+  })
+
+  test('false: no scrim, the page takes a wheel and a press and is read, and Tab past the last control closes the dialog', async ({ page }) => {
+    const popup = await open(page, 'dialog--non-modal', { tall: true, by: 'keyboard' })
+    await expect(scrims(page)).toHaveCount(0)
+    await expect(popup.locator('xpath=..')).toHaveCSS('pointer-events', 'none')
+    await expect(popup).toHaveCSS('pointer-events', 'auto')
+    expect(await takesPresses(popup), 'a press on the popup lands on it').toBe(true)
+    const lock = await pageLock(page)
+    expect(lock.reachable).toEqual(['h1', 'main', 'pre', 'portal'])
+    expect(lock.overflow).toBe('visible')
+    await wheelAt(page, 8, 500, 300)
+    expect(await scrollY(page)).toBe(300)
+    await page.evaluate(() => { window.scrollTo(0, 0) })
+
+    // Focus is not held: from the x, one Tab reaches Done, and the next leaves the dialog and closes it.
+    expect(await pressInside(page, popup, 'Tab')).toBe('Done')
+    await page.keyboard.press('Tab')
+    await expectClosed(page)
+
+    await openOverlay(page, triggerOf(page, 'Find and replace'))
+    await count(behind(page))
+    await pressAt(page, behind(page))
+    await expect(behind(page)).toHaveAttribute('data-presses', '1')
+    await expectClosed(page)
+  })
+})
+
+// What wrap-anywhere costs: text may break at any letter, so beside a part that cannot shrink it shrinks to one.
+// break-word instead lets a 300-character word widen a grid body to 2509 px, so anywhere stays and the cost is pinned.
+test('320 x 480: a label beside a part that cannot shrink is one letter a line, and flex-wrap on the row is the remedy', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 480 })
+  const popup = await open(page, 'dialog--basic')
+  /** Puts a row of a label and a file name that never wraps into the body, and measures the label. */
+  const labelIn = (row: string) => bodyOf(popup).evaluate((body, classes) => {
+    document.getElementById('row')?.remove()
+    body.insertAdjacentHTML('beforeend', `<div id="row" class="${classes}"><span id="label">Project name</span>`
+      + '<span class="whitespace-nowrap">quarterly-report-final-v2-reviewed.pdf</span></div>')
+    const label = document.getElementById('label')?.getBoundingClientRect()
+    return { width: Math.round(label?.width ?? 0), height: Math.round(label?.height ?? 0), sideways: body.scrollWidth - body.clientWidth }
+  }, row)
+
+  expect(await labelIn('flex gap-2')).toEqual({ width: 12, height: 180, sideways: 5 })
+  expect(await labelIn('flex flex-wrap gap-2')).toEqual({ width: 81, height: 20, sideways: 0 })
+})
+
+test.describe('a popup inside the dialog', () => {
+  const tooltip = (page: Page) => page.locator('[data-placement][data-open]')
+
+  // Base UI's tooltip is outside its tree of popups: opened by hover, one Escape used to close it and the dialog.
+  for (const path of ['hover', 'focus'] as const) {
+    test(`a tooltip opened by ${path}: the first Escape closes the tooltip, the second the dialog`, async ({ page }) => {
+      const popup = await open(page, 'dialog--with-tooltip', { by: 'keyboard' })
+      const copy = popup.locator('button[aria-label="Copy link"]')
+      if (path === 'hover') await copy.hover()
+      else await copy.focus()
+      await expect(tooltip(page)).toHaveText('Copy link')
+      // By hover the focus is still on the x; by focus it is on the tooltip's own trigger.
+      expect(await focusedName(page)).toBe(path === 'hover' ? 'Close this dialog' : 'Copy link')
+
+      await page.keyboard.press('Escape')
+      await expect(tooltip(page)).toHaveCount(0)
+      await expect(popup).toHaveAttribute('data-open', '')
+      await expect(popup).toBeVisible()
+
+      await page.keyboard.press('Escape')
+      await expectClosed(page)
+      await expect(triggerOf(page, 'Share')).toBeFocused()
+    })
+  }
 })
 
 test.describe('direction', () => {
@@ -481,7 +760,7 @@ for (const scheme of ['light', 'dark'] as const) {
 test.describe('under a coarse pointer', () => {
   test.use({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } })
 
-  for (const demo of ['dialog--basic', 'dialog--confirm', 'dialog--no-close-button', 'dialog--with-form', 'dialog--long-content']) {
+  for (const demo of Object.keys(DIALOGS)) {
     test(`${demo}: the x, every button and every field of the open dialog is at least 44 px`, async ({ page }) => {
       const popup = await open(page, demo, { by: 'tap' })
       const targets = await popup.locator('button, input').all()
@@ -502,14 +781,14 @@ test.describe('under a coarse pointer', () => {
     const parts = await partsOf(popup)
     // The body keeps one whole line, and what no longer fits is reached by scrolling the popup.
     expect(parts.body.height).toBe(60)
-    expect(await popup.evaluate((el) => el.scrollHeight - el.clientHeight), 'px of popup below its own box').toBe(52)
+    expect(await popup.evaluate((el) => el.scrollHeight - el.clientHeight), 'px of popup below its own box').toBe(58)
     const last = popup.locator('button').last()
     const frame = await boxOf(popup)
-    expect((await boxOf(last)).bottom, 'the last action, before any scroll').toBe(frame.bottom + 35)
+    expect((await boxOf(last)).bottom, 'the last action, before any scroll').toBe(frame.bottom + 41)
 
     // A finger on the header drags the popup up: a real drag, since a script scrolls a box that clips and a finger cannot.
     await touchDrag(page, parts.header.left + 40, parts.header.top + 200, parts.header.top + 80)
-    expect(await popup.evaluate((el) => el.scrollTop), 'px the drag scrolled the popup').toBe(52)
+    expect(await popup.evaluate((el) => el.scrollTop), 'px the drag scrolled the popup').toBe(58)
     const box = await boxOf(last)
     expect(box.height).toBe(44)
     expect(box.bottom, 'the last action ends below the popup').toBeLessThanOrEqual(frame.bottom)
@@ -518,18 +797,55 @@ test.describe('under a coarse pointer', () => {
   })
 })
 
+/**
+ * axe on the demo and on the portal its dialog opens in. Not on the shell of the harness page: its
+ * heading sits in no landmark, which a modal dialog hides and a dialog that is not modal leaves in view.
+ */
+async function axe(page: Page): Promise<{ violations: string[], passes: string[] }> {
+  const results = await new AxeBuilder({ page }).include('#demo').include('[data-base-ui-portal]').analyze()
+  return {
+    violations: results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`),
+    passes: results.passes.map((pass) => pass.id),
+  }
+}
+
 test.describe('axe on the open dialog', () => {
   for (const demo of Object.keys(DIALOGS)) {
     for (const mode of MODES) {
       for (const direction of DIRECTIONS) {
-        test(`${demo} ${mode} ${direction}: no violation, the page behind included`, async ({ page }) => {
+        test(`${demo} ${mode} ${direction}: no violation, in the dialog or in the demo behind it`, async ({ page }) => {
           await open(page, demo, { mode, direction })
-          const results = await new AxeBuilder({ page }).analyze()
-          expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([])
+          const results = await axe(page)
+          expect(results.violations).toEqual([])
           // Not an empty run: axe did read the dialog.
-          expect(results.passes.map((pass) => pass.id)).toContain('aria-dialog-name')
+          expect(results.passes).toContain('aria-dialog-name')
         })
       }
+    }
+  }
+})
+
+// At 320 x 480 the hostile body is 60 px tall for 240 px of text: a scroller with no control in it.
+test.describe('axe on the open dialog, on a 320 x 480 phone', () => {
+  test.use({ hasTouch: true, isMobile: true, viewport: { width: 320, height: 480 } })
+
+  const violations = async (page: Page) => (await axe(page)).violations
+
+  for (const demo of Object.keys(DIALOGS)) {
+    test(`${demo}: no violation`, async ({ page }) => {
+      await open(page, demo, { by: 'tap' })
+      expect(await violations(page)).toEqual([])
+    })
+  }
+
+  for (const mode of MODES) {
+    for (const direction of DIRECTIONS) {
+      test(`dialog--long-content ${mode} ${direction}: its body scrolls there, and the keyboard can reach it`, async ({ page }) => {
+        const popup = await open(page, 'dialog--long-content', { mode, direction, by: 'tap' })
+        expect((await partsOf(popup)).scrollable, 'px the body scrolls').toBeGreaterThan(100)
+        await expect(bodyOf(popup)).toHaveAttribute('tabindex', '0')
+        expect(await violations(page)).toEqual([])
+      })
     }
   }
 })

@@ -1,5 +1,5 @@
 import type { Dialog as Base } from '@base-ui/react/dialog'
-import type { ComponentPropsWithRef } from 'react'
+import type { ComponentPropsWithRef, ReactNode } from 'react'
 
 import type { DialogSchemaInput } from './schema.js'
 
@@ -14,13 +14,23 @@ interface OwnClassName {
   className?: string | undefined
 }
 
-// R-5.7-5: derived at the seam with Base UI's Payload, so a typed handle still types the payload.
-export type DialogRootProps<Payload = unknown> = Omit<Base.Root.Props<Payload>, 'className'>
+/** Base UI's three: true, false and 'trap-focus'. The root shares it with its popup. */
+export type DialogModal = NonNullable<Base.Root.Props['modal']>
 
-export type DialogTriggerProps<Payload = unknown> = Omit<Base.Trigger.Props<Payload>, 'className'> & OwnClassName
+// R-5.7-5: derived at the seam. No handle: nothing here creates one, so a trigger sits inside its root.
+export type DialogRootProps = Omit<Base.Root.Props, 'className' | 'handle' | 'children'> & {
+  /** The trigger and the popup. With no trigger, hold `open` in a client file. */
+  children?: ReactNode | undefined
+}
 
-/** The popup's own props: the portal, the scrim and the viewport around it take none. */
-export type DialogPopupProps = Omit<Base.Popup.Props, 'className'> & Pick<DialogDesignProps, 'size'> & OwnClassName
+export type DialogTriggerProps = Omit<Base.Trigger.Props, 'className' | 'handle' | 'payload'> & OwnClassName
+
+/** The popup's own props, and the two of the portal around it: where it mounts, and whether
+ * it stays mounted while closed. The scrim and the viewport take none. */
+export type DialogPopupProps = Omit<Base.Popup.Props, 'className'>
+  & Pick<Base.Portal.Props, 'container' | 'keepMounted'>
+  & Pick<DialogDesignProps, 'size'>
+  & OwnClassName
 
 export type DialogHeaderProps = Omit<ComponentPropsWithRef<'div'>, 'className'>
   & Pick<DialogDesignProps, 'closeButton'> & OwnClassName
@@ -33,5 +43,5 @@ export type DialogBodyProps = Omit<ComponentPropsWithRef<'div'>, 'className'> & 
 
 export type DialogFooterProps = Omit<ComponentPropsWithRef<'div'>, 'className'> & OwnClassName
 
-/** With neither children nor render it is the x, named by labels.dialog.close. */
+/** With no render and no children that draw anything it is the x, named by labels.dialog.close. */
 export type DialogCloseProps = Omit<Base.Close.Props, 'className'> & OwnClassName

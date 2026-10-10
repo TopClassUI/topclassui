@@ -12,19 +12,29 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['basic', 'confirm', 'long-body', 'long-content', 'no-close-button', 'rtl', 'sizes', 'with-form']
+const EXPECTED = [
+  'basic', 'close-on-success', 'confirm', 'long-body', 'long-content', 'no-close-button', 'non-modal', 'rtl', 'sizes',
+  'trap-focus', 'with-form', 'with-tooltip',
+]
 
 /** The label of each trigger a demo holds, every one of them a Button. */
 const TRIGGERS: Record<string, string[]> = {
   'basic': ['Publish'],
+  'close-on-success': ['Rename and close'],
   'confirm': ['Delete project'],
   'long-body': ['Read the terms'],
   'long-content': ['Move to the archive'],
   'no-close-button': ['What is new'],
+  'non-modal': ['Find and replace'],
   'rtl': ['نشر'],
   'sizes': ['xs', 'sm', 'md', 'lg', 'xl', 'custom'],
+  'trap-focus': ['Inspect'],
   'with-form': ['Rename'],
+  'with-tooltip': ['Share'],
 }
+
+/** The two demos that hold a button of the page beside their trigger, to press while the panel is open. */
+const BEHIND: Record<string, string[]> = { 'non-modal': ['Behind the panel'], 'trap-focus': ['Behind the panel'] }
 
 /** Anything written as a child of a trigger or a close, which a server-built Button never sees. */
 function partChildren(source: string): string[] {
@@ -60,10 +70,13 @@ describe('every demo renders on the server', () => {
 
     it(`${file}.tsx renders each trigger as a Button with its label in the truncating span`, async () => {
       const html = await render(file)
-      const buttons = html.match(/<button [^>]*>[\s\S]*?<\/button>/g) ?? []
-      expect(buttons.map((button) => /<span class="truncate min-w-0">([^<]*)<\/span>/.exec(button)?.[1]), file).toEqual(TRIGGERS[file])
+      const all = html.match(/<button [^>]*>[\s\S]*?<\/button>/g) ?? []
+      const label = (button: string) => /<span class="truncate min-w-0">([^<]*)<\/span>/.exec(button)?.[1]
+      const buttons = all.filter((button) => button.includes('aria-haspopup="dialog"'))
+      expect(buttons.map(label), file).toEqual(TRIGGERS[file])
+      // Every other button of the page is one the table above names: nothing unlisted is on it.
+      expect(all.filter((button) => !buttons.includes(button)).map(label), file).toEqual(BEHIND[file] ?? [])
       for (const button of buttons) {
-        expect(button, file).toContain('aria-haspopup="dialog"')
         expect(button, file).toContain('aria-expanded="false"')
         expect(button, file).toContain('rounded-control')
         expect(button, file).toContain('pointer-coarse:min-h-[var(--tc-target-coarse,44px)]')

@@ -103,16 +103,6 @@ describe('what assistive technology gets', () => {
     await closed()
     await waitFor(() => { expect(document.body.style.overflowY).toBe('') })
   })
-
-  it('a dialog that is not modal hides nothing and locks nothing, which is why modal is left to Base UI', async () => {
-    const { container } = render(<Publish modal={false} />)
-    await userEvent.click(trigger())
-    await screen.findByRole('dialog')
-    // Long enough for the lock Base UI sets from a timer to have run, had there been one.
-    await new Promise((resolve) => { setTimeout(resolve, 30) })
-    expect(container.getAttribute('aria-hidden')).toBeNull()
-    expect(document.body.style.overflowY).toBe('')
-  })
 })
 
 describe('state attributes', () => {

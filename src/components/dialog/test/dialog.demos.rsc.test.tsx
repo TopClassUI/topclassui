@@ -1,5 +1,5 @@
 // The rsc project, where React resolves its react-server build and has no client hooks.
-import { readdirSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { isValidElement, type ReactElement, type ReactNode } from 'react'
@@ -17,9 +17,16 @@ vi.mock('../client.js', () => Object.fromEntries([
   'DialogTitle', 'DialogTrigger',
 ].map((name) => [name, reference(name)])))
 vi.mock('#shared/provider/provider.js', () => ({ TopClassProvider: reference('TopClassProvider') }))
+vi.mock('#components/tooltip/client.js', () => Object.fromEntries(
+  ['TooltipPopup', 'TooltipRoot', 'TooltipTrigger'].map((name) => [name, reference(name)]),
+))
 
 const DUMMY = join(import.meta.dirname, '..', 'dummy')
-const names = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
+const every = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
+
+/** A demo that is itself a client file: it holds state, so a server page imports it as a reference and never runs it. */
+const isClient = (name: string) => readFileSync(join(DUMMY, `${name}.tsx`), 'utf8').startsWith("'use client'")
+const names = every.filter((name) => !isClient(name))
 
 interface Crossing { part: string, props: Props }
 
@@ -57,7 +64,16 @@ const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { 
 
 describe('every demo is a Server Component that only hands the parts what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'confirm', 'long-body', 'long-content', 'no-close-button', 'rtl', 'sizes', 'with-form'])
+    expect(names).toEqual([
+      'basic', 'confirm', 'long-body', 'long-content', 'no-close-button', 'non-modal', 'rtl', 'sizes', 'trap-focus',
+      'with-form', 'with-tooltip',
+    ])
+  })
+
+  it('leaves out the one demo that is a client file, which cannot run here: it calls useState', async () => {
+    expect(every.filter(isClient)).toEqual(['close-on-success'])
+    const Demo = await load('close-on-success')
+    expect(() => Demo()).toThrow(/useState/)
   })
 
   for (const name of names) {

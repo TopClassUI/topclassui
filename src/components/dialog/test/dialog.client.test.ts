@@ -48,9 +48,9 @@ function hooksByPart(source: string): Record<string, string[]> {
 
 // The first modal folder of Unit 3: Drawer, Command and the popups copy this half of the contract.
 describe('the folder is the client template', () => {
-  it('holds exactly the files Dialog needs: a hook.ts, and no boundaries, lib, variants or skeleton', () => {
+  it('holds exactly the files Dialog needs: a hook.ts and a lib.ts, and no boundaries, variants or skeleton', () => {
     expect(readdirSync(FOLDER).sort()).toEqual([
-      'README.md', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'meta.ts',
+      'README.md', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'lib.ts', 'meta.ts',
       'schema.ts', 'test', 'types.ts',
     ])
   })
@@ -109,9 +109,13 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
     })
   })
 
-  it('takes both hooks from hook.ts, and calls no hook from anywhere else', () => {
-    expect(importedNames(source, './hook.js')).toEqual(['useDialogClose', 'useDialogPopup'])
+  it('takes both hooks and the modal context from hook.ts, and calls no hook from anywhere else', () => {
+    expect(importedNames(source, './hook.js')).toEqual(['DialogModalContext', 'useDialogClose', 'useDialogPopup'])
     expect(hookCallsIn(parse(source)).sort()).toEqual(['useDialogClose', 'useDialogPopup'])
+  })
+
+  it('takes its two pure helpers from lib.ts, so no logic is written between the tags', () => {
+    expect(importedNames(source, './lib.js')).toEqual(['guardEscape', 'hasContent'])
   })
 
   it('the scan sees a bare hook, a member hook and use, a second call in one part, and not a word that starts with use', () => {
@@ -145,11 +149,22 @@ describe('hook.ts holds what the parts read from the provider (R-5.12-1)', () =>
     expect(source.startsWith("'use client'\n")).toBe(true)
   })
 
-  it('imports the provider context and nothing else: no React, so no state of its own', () => {
-    expect(importedModules(source)).toEqual(['#shared/provider/context.js'])
+  it('imports createContext and useContext from React and no hook that holds state', () => {
+    expect(importedModules(source)).toEqual(['react', '#shared/provider/context.js', './constants.js', './types.js'])
+    expect(importedNames(source, 'react')).toEqual(['createContext', 'useContext'])
   })
 
-  it('reads the direction in one hook and the labels in the other, and calls no other hook', () => {
-    expect(hooksByPart(source)).toEqual({ useDialogPopup: ['useDirection'], useDialogClose: ['useLabels'] })
+  it('reads the direction and how modal the root is in one hook, the labels in the other', () => {
+    expect(hooksByPart(source)).toEqual({ useDialogPopup: ['useDirection', 'useContext'], useDialogClose: ['useLabels'] })
+  })
+})
+
+describe('lib.ts holds the pure helpers (R-8.1-1)', () => {
+  const source = read('lib.ts')
+
+  it('imports no React and no client code: only the types it shares with the parts', () => {
+    expect(hasUseClient(source)).toBe(false)
+    expect(importedModules(source)).toEqual(['./types.js'])
+    expect(hookCallsIn(parse(source))).toEqual([])
   })
 })

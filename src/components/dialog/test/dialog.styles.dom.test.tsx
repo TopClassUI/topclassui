@@ -58,10 +58,27 @@ async function opened(overrides: Overrides = {}) {
 const classes = (element: Element | null | undefined) =>
   (element?.getAttribute('class') ?? '').split(/\s+/).filter(Boolean).sort()
 
-/** The ring every focusable control wears, drawn outside its box. */
+/** The ring the x wears, drawn outside its box. */
 const RING = [
   'focus-visible:outline-(length:--tc-ring-width)', 'focus-visible:outline-offset-(length:--tc-ring-offset)',
   'focus-visible:outline-ring', 'focus-visible:outline-solid', 'outline-none',
+]
+
+/** The ring of the popup and of the body, drawn inside the box: outside it lies on the scrim, or is clipped. */
+const RING_INSET = [
+  'focus-visible:-outline-offset-(length:--tc-ring-width)', 'focus-visible:outline-(length:--tc-ring-width)',
+  'focus-visible:outline-ring', 'focus-visible:outline-solid', 'outline-none',
+]
+
+/** What the footer asks of the actions in it: wrap the label, grow from the height of the size, 44 px under a finger. */
+const ACTION_WRAP = [
+  '**:whitespace-normal', '*:data-size:text-center',
+  '*:data-size:not-data-[size=custom]:h-auto', '*:data-size:not-data-[size=custom]:py-1',
+  '*:data-[size=xs]:min-h-control-xs', '*:data-[size=sm]:min-h-control-sm', '*:data-[size=md]:min-h-control-md',
+  '*:data-[size=lg]:min-h-control-lg', '*:data-[size=xl]:min-h-control-xl',
+  'pointer-coarse:*:data-[size=xs]:min-h-[var(--tc-target-coarse,44px)]',
+  'pointer-coarse:*:data-[size=sm]:min-h-[var(--tc-target-coarse,44px)]',
+  'pointer-coarse:*:data-[size=md]:min-h-[var(--tc-target-coarse,44px)]',
 ]
 
 describe('every element carries exactly the classes the spec names', () => {
@@ -80,7 +97,7 @@ describe('every element carries exactly the classes the spec names', () => {
 
   it('the popup: a column no taller than the screen, on the raised surface, 400 px at most', async () => {
     expect(classes((await opened()).popup)).toEqual([
-      ...RING,
+      ...RING_INSET,
       'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line', 'data-ending-style:opacity-0',
       'data-ending-style:scale-95', 'data-starting-style:opacity-0', 'data-starting-style:scale-95',
       'duration-(--tc-duration)', 'ease-out', 'flex', 'flex-col', 'max-h-[calc(100dvh-2*var(--tc-overlay-inset))]',
@@ -107,17 +124,18 @@ describe('every element carries exactly the classes the spec names', () => {
 
   it('the body: the scroll container, at least one line tall, with its ring drawn inside its box', async () => {
     expect(classes((await opened()).body)).toEqual([
-      'flex-1', 'focus-visible:-outline-offset-(length:--tc-ring-width)',
-      'focus-visible:outline-(length:--tc-ring-width)', 'focus-visible:outline-ring', 'focus-visible:outline-solid',
-      'min-h-15', 'outline-none', 'overflow-y-auto', 'overscroll-contain', 'px-5', 'py-5', 'text-muted', 'text-sm',
-    ])
+      ...RING_INSET,
+      '[@media(height<17rem)]:overflow-y-visible', '[@media(height<17rem)]:shrink-0', 'flex-1', 'min-h-15',
+      'overflow-y-auto', 'overscroll-contain', 'px-5', 'py-5', 'text-muted', 'text-sm',
+    ].sort())
   })
 
   it('the footer: a row that never shrinks, its actions at the end, with a line over it', async () => {
     expect(classes((await opened()).footer)).toEqual([
+      ...ACTION_WRAP,
       'border-line', 'border-t-(length:--tc-line-width)', 'flex', 'flex-wrap', 'gap-2', 'items-center', 'justify-end',
       'px-5', 'py-4', 'shrink-0',
-    ])
+    ].sort())
   })
 
   it('the x: an icon button of at least 24 px, 44 under a coarse pointer, muted, with the ghost hover', async () => {

@@ -46,7 +46,11 @@ describe('the schema and the constants agree', () => {
   })
 
   it('names the defaults the spec gives, so a changed constant is a failure here', () => {
-    expect(DIALOG_DEFAULTS).toEqual({ size: 'md', closeButton: true })
+    expect(DIALOG_DEFAULTS).toEqual({ size: 'md', closeButton: true, modal: true })
+  })
+
+  it('keeps modal out of the schema: the prop is Base UI own, and only its default is named here', () => {
+    expect(Object.keys(dialogSchema.shape)).not.toContain('modal')
   })
 
   it('gives every size of the shared scale a width, in its order', () => {

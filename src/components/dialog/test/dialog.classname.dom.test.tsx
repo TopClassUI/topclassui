@@ -92,7 +92,7 @@ describe('className is passed last', () => {
     expect(list).toContain('grid')
     expect(list).toContain('gap-3')
     expect(list).toContain('overflow-y-auto')
-    expect(list).toHaveLength(15)
+    expect(list).toHaveLength(17)
   })
 
   it('lets a consumer class beat the x, on a bare DialogClose', async () => {

@@ -11,6 +11,13 @@ overlays · tier 1 · beta · runs in the browser.
 For a task or a question the page waits for: a form, a confirm, a text to accept. While it
 is open the page behind does not scroll, takes no press and is hidden from a screen reader.
 
+```ts
+import {
+  DialogBody, DialogClose, DialogDescription, DialogFooter, DialogHeader, DialogPopup,
+  DialogRoot, DialogTitle, DialogTrigger,
+} from 'topclassui'
+```
+
 ```tsx
 <DialogRoot>
   <DialogTrigger render={<Button>Publish</Button>} />
@@ -30,8 +37,10 @@ is open the page behind does not scroll, takes no press and is hidden from a scr
 
 - **Parts.** Nine flat names and no bare `Dialog`: `DialogRoot`, `DialogTrigger`,
   `DialogPopup`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogBody`,
-  `DialogFooter` and `DialogClose`.
-- **Scrolling.** `DialogBody` scrolls. The header and the footer stay put.
+  `DialogFooter` and `DialogClose`. Each part passes the rest of its props to the element
+  it draws. `DialogRoot` draws none.
+- **Scrolling.** `DialogBody` scrolls. The header and the footer stay put. On a screen
+  under 272 px tall the whole popup scrolls instead.
 - **Labels.** A label goes inside the Button passed to `render`, never on `DialogTrigger`
   or `DialogClose`: a Server Component renders that Button first, and a label left on
   the part is then dropped.
@@ -41,16 +50,54 @@ is open the page behind does not scroll, takes no press and is hidden from a scr
   `custom` sets no width; give it one with `className`.
 - **The x.** `DialogHeader` ends with a close button. `closeButton={false}` removes it;
   then put a `DialogClose` in the footer, because a touch screen reader has no Escape key.
-- **A confirm.** `disablePointerDismissal` on `DialogRoot`: a press outside no longer
-  closes it. There is no AlertDialog.
+- **A text close.** `<DialogClose render={<Button variant="outline">Cancel</Button>} />`.
+  A `DialogClose` with nothing in it is the x.
 - **First focus.** It lands on the x. A form puts `autoFocus` on its first field.
+- **Focus back.** It returns to the trigger. If closing removes the trigger, pass
+  `finalFocus` to `DialogPopup` from a client file: `() => theElementThatTakesIt`.
 - **A long text.** A body that scrolls and holds no control takes `tabIndex={0}`, so the
   keyboard reaches it in every browser. Chrome reaches it anyway; axe still asks for it.
+- **A long action.** In the footer a label too long for one row wraps onto two lines.
+- **A row in the body.** Give a row of a label and a control `flex-wrap`, or a control
+  that cannot shrink squeezes the label to one letter per line.
+- **Escape.** It closes one thing: a tooltip open inside the dialog first, then the dialog.
 - **Arabic inside an English page.** The popup takes its direction from the nearest
   `TopClassProvider`. Its language it does not: pass `lang` to `DialogPopup`.
 
-A form wraps the parts in a `form` with the class `contents`, so the submit button in the
-footer belongs to it and a Server Action needs no client handler:
+### A confirm
+
+`disablePointerDismissal` on `DialogRoot`: a press outside no longer closes it. Put the
+consequence in a `DialogDescription`, so a screen reader reads it when the dialog opens.
+It is announced as a dialog (`role="dialog"`): AlertDialog is not built.
+
+### What Base UI gives
+
+| Prop | On | What it does |
+|---|---|---|
+| `open`, `defaultOpen`, `onOpenChange` | `DialogRoot` | Open state, yours or its own. |
+| `modal` | `DialogRoot` | How much of the page it blocks. See below. |
+| `disablePointerDismissal` | `DialogRoot` | A press outside no longer closes it. |
+| `initialFocus`, `finalFocus` | `DialogPopup` | Where focus goes on open and on close. |
+| `container`, `keepMounted` | `DialogPopup` | Where it mounts, and whether it stays mounted while closed. |
+| `nativeButton` | `DialogTrigger`, `DialogClose` | `false` when `render` is not a button. |
+
+- **`modal` (the default).** A scrim. The page takes no press, does not scroll and is hidden
+  from a screen reader. Tab stays in the dialog.
+- **`modal="trap-focus"`.** No scrim. The page takes presses and scrolls. Tab still stays in
+  the dialog, and the page is still hidden from a screen reader.
+- **`modal={false}`.** No scrim. The page takes presses, scrolls and is read. Tab past the
+  last control closes the dialog.
+- **All three.** A press outside closes it, unless `disablePointerDismissal`.
+- **A link as the trigger.** The trigger is a button. For any other element pass
+  `nativeButton={false}`, and give it no `href`: a link that opens a dialog also navigates.
+- **Mounted late.** What your app adds to the page after the dialog opens is not hidden
+  from a screen reader. A live region needs its own `aria-live`, or it is hidden.
+
+### A form
+
+A `form` with the class `contents` wraps the parts, so the submit button in the footer
+belongs to it. A Server Action runs with no client code, but the dialog stays open after
+it, unless the action redirects:
 
 ```tsx
 <DialogRoot>
@@ -72,8 +119,58 @@ footer belongs to it and a Server Action needs no client handler:
 </DialogRoot>
 ```
 
-Do not write `render={<form />}` on `DialogPopup`. It works, but it puts `role="dialog"` on
-a `form`, which HTML does not allow, and axe reports it.
+To close it when the action succeeds and keep it open when it fails, hold `open` in a
+client file. Here `saveName` is an action that answers with an error message, or `null`.
+React empties the form after every action: `dummy/close-on-success.tsx` shows how to send
+the typed value back with the error.
+
+```tsx
+'use client'
+
+export function RenameDialog() {
+  const [open, setOpen] = useState(false)
+  const [error, save, saving] = useActionState(async (_: string | null, data: FormData) => {
+    const failed = await saveName(data)
+    if (failed === null) setOpen(false)
+    return failed
+  }, null)
+  return (
+    <DialogRoot open={open} onOpenChange={setOpen}>
+      <DialogTrigger render={<Button>Rename</Button>} />
+      <DialogPopup>
+        <form action={save} className="contents">
+          <DialogHeader>
+            <DialogTitle>Rename this project</DialogTitle>
+          </DialogHeader>
+          <DialogBody>
+            <Input name="name" aria-label="Name" invalid={error !== null} autoFocus fullWidth required />
+            {error}
+          </DialogBody>
+          <DialogFooter>
+            <DialogClose render={<Button variant="outline">Cancel</Button>} />
+            <Button type="submit" loading={saving}>Save</Button>
+          </DialogFooter>
+        </form>
+      </DialogPopup>
+    </DialogRoot>
+  )
+}
+```
+
+- **From a server page.** Pass text, booleans, elements (`render={<Button />}`) and a
+  Server Action. Pass no function: `onOpenChange`, `onOpenChangeComplete`, a function
+  `render`, a function `initialFocus` or `finalFocus`, and `actionsRef` need a
+  `'use client'` file.
+- **A confirm that acts.** In a form, make the action
+  `<DialogClose render={<Button type="submit" tone="danger">Delete</Button>} />`: it submits
+  and closes. Only with no required field: with one left empty it closes and submits nothing.
+- **Not on the popup.** Do not write `render={<form />}` on `DialogPopup`. It works, but it
+  puts `role="dialog"` on a `form`, which HTML does not allow, and axe reports it.
+
+### Not built
+
+AlertDialog, a trigger outside its `DialogRoot` (Base UI's `handle`: hold `open` in a client
+file instead), a style for a dialog inside a dialog, `placement`, `dismissible`, `scrollBody`.
 
 <!-- /hand-written -->
 
@@ -89,6 +186,7 @@ Every prop below is optional and falls back to the default shown.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
+| `children` | no | `ReactNode` | - | The trigger and the popup. With no trigger, hold `open` in a client file. |
 | `closeButton` | no | `boolean` | `true` | DialogHeader: whether it ends with the built-in close button. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | DialogPopup: the widest it grows, 320 to 640 px; custom sets no width. |
 
@@ -97,13 +195,17 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 ## Examples
 
 - `dummy/basic.tsx`
+- `dummy/close-on-success.tsx`
 - `dummy/confirm.tsx`
 - `dummy/long-body.tsx`
 - `dummy/long-content.tsx`
 - `dummy/no-close-button.tsx`
+- `dummy/non-modal.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`
+- `dummy/trap-focus.tsx`
 - `dummy/with-form.tsx`
+- `dummy/with-tooltip.tsx`
 
 ## Verified against
 

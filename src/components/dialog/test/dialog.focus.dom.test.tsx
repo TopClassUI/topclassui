@@ -87,6 +87,45 @@ describe('focus', () => {
   })
 })
 
+// The commonest confirm deletes the row that held its trigger. Nothing here can guess who should take focus then.
+describe('focus when the trigger is gone by the time the dialog closes', () => {
+  /** A row whose trigger leaves the page while its dialog is open, as the row of a deleted project would. */
+  function Row({ deleted = false, finalFocus }: { deleted?: boolean, finalFocus?: () => HTMLElement | null }) {
+    return (
+      <>
+        <h2 id="list" tabIndex={-1}>Projects</h2>
+        <DialogRoot>
+          {deleted ? null : <DialogTrigger render={<Button>Publish</Button>} />}
+          <DialogPopup finalFocus={finalFocus}>
+            <DialogHeader><DialogTitle>Delete it?</DialogTitle></DialogHeader>
+          </DialogPopup>
+        </DialogRoot>
+      </>
+    )
+  }
+
+  it('falls to the body with no finalFocus: Base UI has no other element to return it to', async () => {
+    const { rerender } = render(<Row />)
+    await open()
+    rerender(<Row deleted />)
+    expect(screen.queryByText('Publish')).toBeNull()
+    await userEvent.keyboard('{Escape}')
+    await closed()
+    await new Promise((resolve) => { setTimeout(resolve, 30) })
+    expect(document.activeElement).toBe(document.body)
+  })
+
+  it('goes to the element finalFocus names, which is the remedy the README gives', async () => {
+    const toList = () => document.getElementById('list')
+    const { rerender } = render(<Row finalFocus={toList} />)
+    await open()
+    rerender(<Row deleted finalFocus={toList} />)
+    await userEvent.keyboard('{Escape}')
+    await closed()
+    await waitFor(() => { expect(document.activeElement?.id).toBe('list') })
+  })
+})
+
 describe('closing', () => {
   it('closes on Escape', async () => {
     render(<Publish />)

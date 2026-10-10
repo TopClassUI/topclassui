@@ -1,13 +1,13 @@
 // The steps every modal spec repeats on the live harness: open by a trigger and wait until the popup
 // has settled, read where focus is, read what locks the page behind, and scroll with a wheel or a finger.
 // Dialog uses them first; Drawer, Command and a modal Popover open and lock the same way.
-// openOverlay and expectClosed open and close; focusedName and pressInside follow the focus; pageLock,
+// openOverlay, atRest and expectClosed open and close; focusedName and pressInside follow the focus; pageLock,
 // scrollPageTo, wheelAt and touchDrag test the lock; withScrollbar gives a page whose bar is real;
 // boxOf, inkOf and expectNothingSideways measure what is inside the popup.
 import { chromium, expect, test, type Locator, type Page } from '@playwright/test'
 
-/** A popup Base UI has opened and already moved out of its starting style, so its box is its final one. */
-export const SETTLED = '[data-open]:not([data-starting-style])'
+/** A popup Base UI has opened and moved past its first frame. Its transition is still running: atRest waits for it. */
+export const OPENED = '[data-open]:not([data-starting-style])'
 
 /**
  * A test whose `barPage` is a page in a browser that draws its scrollbars. Playwright hides them in headless
@@ -30,8 +30,27 @@ export interface OpenOptions {
 }
 
 /**
- * Presses a trigger and returns its popup once it is open, opaque and holds the focus. Never a fixed
- * wait: the first frames of a fresh browser took 405 ms on 2026-10-10, and the popup sat at opacity 0.
+ * Resolves once nothing moves any more: every transition and every animation that ends, on the popup, inside
+ * it, and on the scrim and the viewport that share its portal. A fade, a slide that never fades and a popup
+ * with no motion at all end the same way, with nothing running; a spinner that turns for ever is not waited for.
+ */
+export async function atRest(popup: Locator): Promise<void> {
+  await popup.evaluate(async (element) => {
+    const layer = element.closest('[data-base-ui-portal]') ?? element
+    const running = () => layer.getAnimations({ subtree: true }).filter((animation) => {
+      const end = animation.effect?.getComputedTiming().endTime
+      return animation.playState === 'running' && typeof end === 'number' && Number.isFinite(end)
+    })
+    // Read again after each wait: a transition can start when another ends. allSettled, since a cancelled one rejects.
+    for (let pending = running(); pending.length > 0; pending = running()) {
+      await Promise.allSettled(pending.map((animation) => animation.finished))
+    }
+  })
+}
+
+/**
+ * Presses a trigger and returns its popup once it is open, at rest and holds the focus. Never a fixed wait,
+ * and never one property: on its first frame an open popup is still at opacity 0 and scale 0.95, 20 px narrow.
  */
 export async function openOverlay(page: Page, trigger: Locator, { by = 'click', popup = '[role="dialog"]' }: OpenOptions = {}): Promise<Locator> {
   if (by === 'keyboard') {
@@ -40,16 +59,16 @@ export async function openOverlay(page: Page, trigger: Locator, { by = 'click', 
   } else if (by === 'tap') await trigger.tap()
   else await trigger.click()
 
-  const opened = page.locator(`${popup}${SETTLED}`).last()
-  await expect(opened).toBeVisible()
-  await expect(opened).toHaveCSS('opacity', '1')
+  const opened = page.locator(`${popup}${OPENED}`).last()
+  await expect(opened, 'the popup never opened, or never left its starting style').toBeVisible()
+  await atRest(opened)
   await expect.poll(() => focusIsInside(opened), { message: 'focus never moved into the popup' }).toBe(true)
   return opened
 }
 
-/** Waits until no popup is left in the page: a closed one stays mounted while it fades. */
+/** Waits until no popup can be seen: a closed one stays mounted while it leaves, and for good with keepMounted. */
 export async function expectClosed(page: Page, popup = '[role="dialog"]'): Promise<void> {
-  await expect(page.locator(popup)).toHaveCount(0)
+  await expect(page.locator(`${popup}:visible`)).toHaveCount(0)
 }
 
 /** Whether the focused element is the popup or inside it. A focus guard beside the popup is outside. */
