@@ -6,6 +6,35 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-10 - The review of the merged Unit 2, and what it changed
+
+**Decision.** With Unit 2 on main, six reviewers looked at the unit as a whole: the components used together in three dashboard pages, a sweep of every demo page, the code, the API across components, a keyboard and screen-reader journey, and the record. There was no blocker. What changed, one line each:
+
+- **One mutation file per area.** `scripts/mutations/<area>.ts`, found by `index.ts`, so a component branch edits no shared file. The 289 rows moved byte for byte.
+- **A test gets 20 seconds.** On a busy machine the first test of a file paid for its imports and timed out at 5.
+- **The lint holds R-5.2-1 for named colours.** `bg-[red]` is refused, and a system colour passes only behind `forced-colors:`. The rule text says so.
+- **One `link` helper.** `renderLink` in `src/shared/link.tsx` serves Pagination, Breadcrumb and Table, and says which prop is wrong when it is not an element.
+- **The `--tc-*` style typing is imported by Table and Input**, so the README's `style` samples compile in a program without Progress.
+- **`locale` is accepted and dropped** by Breadcrumb, Table, Timeline, EmptyState and Spinner, so `{...getLabels('ar')}` no longer writes a `locale` attribute. ESLint's unused-variable rule ignores rest siblings for this.
+- **AvatarGroup keeps its natural width** (`w-max max-w-full`), so a team in a table cell stays on one row. The cost: a group of twenty in a box sized by its content no longer wraps on a phone; `className="w-auto"` brings the wrap back.
+- **Table.** A sort link is as wide as its label. The box keeps 2rem of focus room at both ends, and the controls of the stuck column never move it. The stuck column has an edge in `--tc-line-strong`, drawn on a pseudo-element so no cell moves. `TableSkeleton` takes up to 500 rows. `aria-label` on a Table compiles and is ignored, as its README says.
+- **InputSkeleton is the box of its field**: its own width, or the full width with `fullWidth`, and the touch height. Beside a Button the README's recipe is `flex-1` on the Input.
+- **Small guards.** A false icon in a Timeline keeps the dot. A Breadcrumb label that is not a string leaves its crumb out. Pagination exports `clampPage`, which its README tells a caller to query with.
+- **A live harness** hydrates every demo in a real browser (`pnpm harness:serve`, `e2e/live.ts`), on a Vite server taken from `vitest/node`, so no dependency is added.
+
+**Why.** Each line answers a measurement, in Chromium.
+
+- An AvatarGroup in a scrolling table cell stacked one avatar per line: 40 x 216 px for five members.
+- `InputSkeleton` was 1201 px wide for a 193 px field, and 28 px tall where the field is 44 on touch.
+- A sort link filled its column, so its ring was as wide as the column and was cut by the box; tabbing down 25 rows moved the box 49 times. Chromium leaves a focused control alone when any part of it is inside the scroll padding, so the padding is what decides how much of it shows.
+- In dark the hairline is the colour of a raised cell, so an edge in `--tc-line` painted nothing.
+- `style={{ '--tc-table-sticky-width': '24rem' }}` failed with TS2353 unless Progress was imported somewhere.
+- `{...getLabels('ar')}` put `locale="ar"` on the root of three components.
+- Four tests timed out at 5 s in a run beside other suites and passed alone.
+- The live harness is what Unit 3 is accepted on (PLAN 19, Phase 5). On its first run it measured a Tooltip arrow 76 px from the edge that faces its trigger, inside a right-to-left provider on a left-to-right page: a portal takes the direction of `<body>`.
+
+**Affects.** R-5.2-1 and its lint. `docs/CLOUD-PLAN.md` sections 7 and 9. `vitest.config.ts`, `eslint.config.ts`, `playwright.config.ts`. Left open for Omar: a `total` on AvatarGroup, an Input that gives way by default, whether Tag and Badge may shrink, the page-size selector, and Arabic-Indic digits in a Server Component. The use of `createViteServer` from `vitest/node` leans on an export Vitest does not document as public (R-0-1).
+
 ## 2026-10-10 - Unit 2 is on main, and where it leaves its Build this blocks the reason was measured
 
 **Decision.** Unit 2 is nine components: Input, Tag, Avatar, AvatarGroup, Breadcrumb, Pagination, Timeline, Table and Banner, built from the Build this blocks of `docs/figma/unit-2.md`. Each was reviewed twice in a real browser before it merged, and the review changed the blocks in the places below. The code, the README of each component and this entry are the record; the blocks are not edited. One line per change:
@@ -22,7 +51,7 @@ The format is: date, decision, why, and what it affects.
 - **Avatar.** `AvatarImage` takes `render` (the element form) for next/image. `AvatarRoot` takes `role="img"` by itself when it is given `aria-label` or `aria-labelledby`. `AvatarFallback` is `aria-hidden` unless told otherwise. A failed image no longer paints its alt (`text-transparent`). Forced colours get an outline.
 - **AvatarGroup.** The group wraps and is never wider than its container. The counter is a circle until its count is too long, then a pill. The overlap is 4 px at `xs` and `sm`, 8 px above. A child that is a link is ringed and rises when focused.
 - **Tag.** The root is `overflow-hidden whitespace-nowrap shrink-0`, so a label passed as an element is clipped at the chip. `TAG_BOUNDARIES.labelMaxLength` is 100; Breadcrumb's is 200.
-- **System colours are allowed behind `forced-colors:` and nowhere else.** Timeline writes `forced-colors:bg-[CanvasText]` and `forced-colors:border-[CanvasText]`. This narrows R-5.2-1. The lint does not hold the line yet: it reads `#`, `rgb`, `hsl`, `oklch` and `color` only, so a named colour passes anywhere. Until it does, this is review.
+- **System colours are allowed behind `forced-colors:` and nowhere else.** Timeline writes `forced-colors:bg-[CanvasText]` and `forced-colors:border-[CanvasText]`. This narrows R-5.2-1. The lint holds the line since the entry above.
 - **Two tokens and one utility are new:** `--tc-table-sticky-width`, `--tc-input-width` and `text-match-parent`.
 
 **Why.** Each change answers a measurement on the built component; the numbers are from Chromium, on the harness pages.
