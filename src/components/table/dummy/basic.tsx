@@ -10,7 +10,7 @@ const invoices: Invoice[] = [
   { id: 'inv_1045', number: 'INV-1045', customer: 'Adventure Works', status: 'Paid', amount: '$76.00' },
 ]
 
-/** The drawn table: a caption read out but not drawn, the invoice as the header of its row, and a link per row. */
+/** The drawn table: a caption read out but not drawn, the invoice as the header of its row, and a link per row named by its invoice. */
 export default function Demo() {
   return (
     <Table
@@ -27,7 +27,12 @@ export default function Demo() {
           header: <span className="sr-only">Open</span>,
           align: 'end',
           cell: (invoice) => (
-            <Button size="sm" variant="outline" render={<a href={`/invoices/${invoice.id}`} />}>
+            <Button
+              size="sm"
+              variant="outline"
+              aria-label={`View invoice ${invoice.number}`}
+              render={<a href={`/invoices/${invoice.id}`} />}
+            >
               View
             </Button>
           ),

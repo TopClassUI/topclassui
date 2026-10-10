@@ -28,8 +28,7 @@ const PRELUDE = [
 function compile(snippets: Record<string, string>): Record<string, string[]> {
   const read = ts.readConfigFile(join(ROOT, 'tsconfig.json'), ts.sys.readFile.bind(ts.sys))
   const options = { ...ts.parseJsonConfigFileContent(read.config ?? {}, ts.sys, ROOT).options, noEmit: true }
-  const probes = new Map(Object.entries(snippets).map(([name, code]) =>
-    [probePath(name), `${PRELUDE}\n${code}\n`]))
+  const probes = new Map(Object.entries(snippets).map(([name, code]) => [probePath(name), `${PRELUDE}\n${code}\n`]))
 
   const host = ts.createCompilerHost(options)
   const getSourceFile = host.getSourceFile.bind(host)
@@ -73,6 +72,7 @@ const verdict = compile({
   shortDirection: table("{ key: 'number', header: 'Invoice', cell: (invoice) => invoice.number }", "caption='Invoices' getKey={(invoice) => invoice.id} sort={{ key: 'number', direction: 'asc' }}"),
   sorted: table("{ key: 'number', header: 'Invoice', cell: (invoice) => invoice.number }", "caption='Invoices' getKey={(invoice) => invoice.id} sort={{ key: 'number', direction: 'ascending' }}"),
   role: table("{ key: 'number', header: 'Invoice', cell: (invoice) => invoice.number }", "caption='Invoices' getKey={(invoice) => invoice.id} role='presentation'"),
+  named: table(ONE, "caption='Invoices' getKey={(invoice) => invoice.id} aria-label='Mine' aria-labelledby='elsewhere'"),
   child: `export const probe = <Table items={invoices} caption='Invoices' getKey={(invoice) => invoice.id} columns={[]}>Hello</Table>`,
   numberKey: table(ONE, "caption='Invoices' getKey={(invoice) => invoice.amount}"),
   emptyCaption: table(ONE, "caption='' getKey={(invoice) => invoice.id}"),
@@ -190,5 +190,9 @@ describe('the rest of the contract', () => {
   it('refuses role, which is always region, and children, because the rows come from items', () => {
     expect(said('role')).toContain("Property 'role' does not exist")
     expect(said('child')).toContain("Property 'children' does not exist")
+  })
+
+  it('lets aria-label and aria-labelledby through, as JSX lets every hyphenated attribute: ignored (README), not refused', () => {
+    expect(verdict['named']).toEqual([])
   })
 })

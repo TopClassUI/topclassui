@@ -53,10 +53,17 @@ describe('rows and columns', () => {
   })
 
   it('clamps both to their bounds, so rows={1e6} cannot write a million rows (R-5.7-7)', () => {
-    expect(shape(html({ rows: 1_000_000, columns: 1_000 }))).toEqual([100, 50])
+    expect(shape(html({ rows: 1_000_000, columns: 1_000 }))).toEqual([500, 50])
     expect(shape(html({ rows: 0, columns: 0 }))).toEqual([1, 1])
     expect(shape(html({ rows: -4, columns: -1 }))).toEqual([1, 1])
-    expect(shape(html({ rows: Number.POSITIVE_INFINITY, columns: Number.NaN }))).toEqual([100, 1])
+    expect(shape(html({ rows: Number.POSITIVE_INFINITY, columns: Number.NaN }))).toEqual([500, 1])
+  })
+
+  it('holds a whole page of every size a table is given, so nothing is left to move when the rows arrive', () => {
+    // PLAN 18.2 offers pages of 25, 50, 100 and 500: at a bound of 100 the last stood in for a fifth of itself.
+    expect(shape(html({ rows: 100, columns: 3 }))).toEqual([100, 3])
+    expect(shape(html({ rows: 500, columns: 3 }))).toEqual([500, 3])
+    expect(shape(html({ rows: 501, columns: 3 }))).toEqual([500, 3])
   })
 
   it('drops a fraction instead of asking for half a row', () => {

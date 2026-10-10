@@ -9,8 +9,8 @@ import { renderLink } from '#shared/link.js'
 // Named here as well, so a consumer program that never compiles shared/ gets the --tc-* keys.
 import type {} from '#shared/style-tokens.js'
 import {
-  BODY_CELL, BOX, CAPTION, CELL_ALIGN, EMPTY_CELL, EMPTY_WORDS, HEADER_CELL, HEADER_LABEL, LINK_ALIGN,
-  ROW_FILL, ROW_HEADER, SORT_LINK, STICKY_BOX, STICKY_CELL,
+  BODY_CELL, BOX, CAPTION, CELL_ALIGN, EMPTY_CELL, EMPTY_WORDS, FOCUS_ROOM, HEADER_CELL, HEADER_LABEL,
+  LINK_ALIGN, ROW_FILL, ROW_HEADER, SORT_LINK, STICKY_BOX, STICKY_CELL,
 } from './classes.js'
 import { SORT_ICONS, SORT_LABELS, TABLE_COLUMN_DEFAULTS, TABLE_DEFAULTS } from './constants.js'
 import { columnsOf, directionOf } from './lib.js'
@@ -52,7 +52,7 @@ export function Table<T, Caption extends TableCaption = TableCaption>({
       data-striped={striped ? '' : undefined}
       data-sticky-first-column={stickyFirstColumn ? '' : undefined}
       data-empty={empty ? '' : undefined}
-      className={cn(BOX, BORDER, FOCUS_RING, stickyFirstColumn && STICKY_BOX, className)}
+      className={cn(BOX, FOCUS_ROOM, BORDER, FOCUS_RING, stickyFirstColumn && STICKY_BOX, className)}
     >
       {/* border-separate: under border-collapse the table paints the lines, and a sticky cell leaves its own behind. */}
       <table className="w-full border-separate border-spacing-0">

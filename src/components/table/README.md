@@ -28,6 +28,7 @@ so a screen reader moves through it by row and by column.
 - **Sorting is a link.** `sortHref` is where a click goes, so it holds the next direction (this table is descending, so its link says `dir=asc`) and any filters you want kept. Sort the rows on the server and pass `sort` to mark the column. See `dummy/sorted.tsx`.
 - **In Next.js** pass `link={<Link href="" />}`: every sort link is cloned from it, with its `href` replaced by the column's `sortHref`.
 - **`rowHeader: true`** goes on the column that identifies a row, so a screen reader says which row a number belongs to.
+- **Name a row action by its row.** ``aria-label={`Refund order ${order.number}`}`` reads "Refund order 1042", where a bare "Refund" reads the same on every row of a list of buttons. See `dummy/row-actions.tsx`.
 - **Cells stay on one line**, so a narrow screen scrolls sideways instead of stacking words. A column of prose opts out with `className: 'min-w-64 whitespace-normal'`, and `className: 'hidden sm:table-cell'` hides a column on a phone.
 - **Leave a column out** with `isAdmin && { ... }`: false, null and undefined entries are skipped.
 - **`getKey` returns a string**: write `String(row.id)` for a numeric id.
@@ -48,7 +49,8 @@ so a screen reader moves through it by row and by column.
 ```
 
 - **When the table scrolls, the stuck column is cut with an ellipsis** at `--tc-table-sticky-width` (8rem on a phone, up to 16rem on a wide screen). Raise it through `style`, and keep it narrower than the box.
-- **A control you Tab to is scrolled clear of it.** The box keeps that same width free when focus moves.
+- **A control you Tab to is scrolled clear of it**, so at least 2rem of it shows. A link inside the stuck column never moves the box.
+- **A line marks its edge**, so text scrolling under it does not read as part of it. The line takes no room from the column.
 
 ## While it loads
 
@@ -58,11 +60,11 @@ so a screen reader moves through it by row and by column.
 </Suspense>
 ```
 
-- **Same box, same row height**, so nothing moves when the rows arrive. Pass `captionVisible` if the table draws its caption.
+- **Same box, same row height**, so nothing moves when the rows arrive. Pass the page size as `rows`, up to 500, and `captionVisible` if the table draws its caption.
 
 ## In a layout
 
-- **Inside a grid or flex item** the table scrolls and the page does not: the parent needs no `min-w-0`. See `dummy/in-a-layout.tsx`.
+- **Inside a grid or flex item** the table scrolls and the page does not: the table needs no `min-w-0` on its parent. A page column that also holds other wide content, such as a row of buttons or a long tag, still needs `min-w-0`. See `dummy/in-a-layout.tsx`.
 - **A shrink-to-fit parent** (`inline-flex`, `w-fit`) is as wide as the table while there is room, and scrolls the table when there is not.
 - **`ref`, `className` and other attributes** go to the scrolling box around the table. A menu opened from a cell must be portalled, or the box clips it.
 - **Build the columns where you render the table.** `columns` and `getKey` hold functions, so they cannot be passed from a Server Component into a Client Component.
@@ -104,6 +106,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/column-classes.tsx`
 - `dummy/empty.tsx`
 - `dummy/in-a-layout.tsx`
+- `dummy/row-actions.tsx`
 - `dummy/rtl.tsx`
 - `dummy/skeleton.tsx`
 - `dummy/sorted.tsx`
