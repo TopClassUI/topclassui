@@ -75,6 +75,12 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
+    label: 'the tooltip positioner loses the direction of its provider, so the popup of an RTL island runs left to right and its arrow points away from the trigger',
+    file: 'src/components/tooltip/client.tsx',
+    from: '        dir={direction}\n',
+    to: '',
+  },
+  {
     label: "the tooltip popup's own classes beat a consumer className",
     file: 'src/components/tooltip/client.tsx',
     from: 'className={cn(TOOLTIP_POPUP, className)}',
@@ -123,19 +129,19 @@ export const MUTATIONS: Mutation[] = [
     to: 'Math.min(closeDelay, delayMax)',
   },
   {
-    label: 'the long-label demo puts its text on the trigger, so a Server Component renders its Button with no truncating span',
+    label: 'the tooltip long-label demo puts its text on the trigger, so a Server Component renders its Button with no truncating span',
     file: 'src/components/tooltip/dummy/long-label.tsx',
     from: '<TooltipTrigger render={<Button>{LONG}</Button>} />',
     to: '<TooltipTrigger render={<Button />}>{LONG}</TooltipTrigger>',
   },
   {
-    label: 'TooltipPopup gains a hook call, which client.tsx may not hold without a hook.ts (R-5.12-1)',
+    label: 'the tooltip popup gains a second hook call, where client.tsx may hold only the one from hook.ts (R-5.12-1)',
     file: 'src/components/tooltip/client.tsx',
     from: 'const { side, align } = toSideAlign(placement)',
     to: 'const { side, align } = toSideAlign(placement) ?? usePlacementState(placement)',
   },
   {
-    label: 'the basic demo puts its icon back on the trigger, the form whose icon a loading Button rendered on the server replaces with its spinner',
+    label: 'the tooltip basic demo puts its icon back on the trigger, the form whose icon a loading Button rendered on the server replaces with its spinner',
     file: 'src/components/tooltip/dummy/basic.tsx',
     from: '      <TooltipTrigger\n        render={\n          <Button variant="ghost" aria-label="Copy link">\n            <Svg icon={linkSimple} />\n          </Button>\n        }\n      />',
     to: '      <TooltipTrigger render={<Button variant="ghost" aria-label="Copy link" />}>\n        <Svg icon={linkSimple} />\n      </TooltipTrigger>',
