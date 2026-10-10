@@ -6,6 +6,7 @@ import { Tooltip } from '@base-ui/react/tooltip'
 import { type ReactNode, useContext, useMemo } from 'react'
 
 import { AdaptiveQueryContext, DEFAULT_ADAPTIVE_QUERY } from '../adaptive/use-adaptive-mode.js'
+import { cn } from '../cn.js'
 import { COLLECTION_DEFAULTS, type CollectionDefaults } from '../contracts/collection.js'
 import { resolveToastSettings, type ToastSettingsInput } from '../contracts/toast.js'
 import { createNumberFormat, getLabels, type NumberingSystem } from '../labels/get-labels.js'
@@ -17,6 +18,8 @@ import {
 
 export interface TopClassProviderProps {
   children?: ReactNode
+  /** For the one div this provider renders: the isolation root, or the boxless div of a nested provider. */
+  className?: string | undefined
   /** R-13-1: from the route, never read from document.dir in an effect. */
   direction: Direction
   locale: string
@@ -30,12 +33,13 @@ export interface TopClassProviderProps {
 }
 
 /**
- * Renders the toast provider and the tooltip delay group once, at the outermost provider.
- * An app's own <Tooltip.Provider> belongs inside this one: placed above it, ours shadows it.
+ * Renders the isolation root, the toast provider and the tooltip delay group once, at the outermost
+ * provider. An app's own <Tooltip.Provider> belongs inside this one: placed above it, ours shadows it.
  */
 export function TopClassProvider(props: TopClassProviderProps) {
   const {
     children,
+    className,
     direction,
     locale,
     labels: overrides,
@@ -46,7 +50,7 @@ export function TopClassProvider(props: TopClassProviderProps) {
   } = props
 
   const query = adaptive?.query ?? DEFAULT_ADAPTIVE_QUERY
-  // A nested provider, such as an RTL island, joins the outer delay group and the outer toasts.
+  // A nested provider, such as an RTL island, joins the outer root, delay group and toasts.
   const nested = useContext(TopClassContext) !== null
 
   const value = useMemo<TopClassContextValue>(() => {
@@ -69,8 +73,8 @@ export function TopClassProvider(props: TopClassProviderProps) {
     [placement, limit, duration],
   )
 
-  // isolate keeps every overlay above the page without a z-index race.
-  const isolated = <div className="isolate contents">{children}</div>
+  // A real box: on an element with display: contents, isolate creates no stacking context.
+  const isolated = <div className={cn(nested ? 'contents' : 'isolate', className)}>{children}</div>
 
   return (
     <TopClassContext.Provider value={value}>
