@@ -12,7 +12,15 @@ import type { BreadcrumbProps } from './types.js'
 
 /** Where the page sits in the site: real links, the page being read last, and the same
  * trail as BreadcrumbList JSON-LD for a crawler. An empty trail renders nothing. */
-export function Breadcrumb({ items, link, baseUrl, labels = en, className, ...rest }: BreadcrumbProps) {
+export function Breadcrumb({
+  items,
+  link,
+  baseUrl,
+  labels = en,
+  className,
+  'aria-label': ariaLabel,
+  ...rest
+}: BreadcrumbProps) {
   // A blank label is a link with no name, so the crumb is left out of the list and the JSON-LD.
   const trail = items.filter((item) => item.label.trim() !== '')
   // A navigation landmark with nothing in it is announced and then leads nowhere.
@@ -20,9 +28,11 @@ export function Breadcrumb({ items, link, baseUrl, labels = en, className, ...re
 
   const lastIndex = trail.length - 1
   const jsonLd = buildBreadcrumbList(trail, baseUrl)
+  // An empty aria-label names nothing, so the label stands in for it, as in Pagination.
+  const name = ariaLabel === undefined || ariaLabel === '' ? labels.breadcrumb.label : ariaLabel
 
   return (
-    <nav aria-label={labels.breadcrumb.label} className={cn(ROOT, className)} {...rest}>
+    <nav aria-label={name} className={cn(ROOT, className)} {...rest}>
       {/* Preflight removes the list style, and Safari with VoiceOver then drops the list role. */}
       <ol role="list" className={LIST}>
         {trail.map((item, index) => {

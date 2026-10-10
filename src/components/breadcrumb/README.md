@@ -34,6 +34,7 @@ Pass `baseUrl="https://example.com"` and those URLs are absolute; the links stay
 
 - **Arabic.** `labels={getLabels('ar').labels}` names the `<nav>`; the crumbs are your own text.
 - **A blank label.** A crumb with an empty label is left out, of the trail and of the JSON-LD.
+- **Its name.** `aria-label` renames the `<nav>`; an empty one falls back to the built-in name.
 
 <!-- /hand-written -->
 

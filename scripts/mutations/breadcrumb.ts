@@ -35,8 +35,20 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the breadcrumb nav is named in English whatever labels the caller passes',
     file: 'src/components/breadcrumb/index.tsx',
-    from: 'aria-label={labels.breadcrumb.label}',
-    to: 'aria-label={en.breadcrumb.label}',
+    from: '? labels.breadcrumb.label : ariaLabel',
+    to: '? en.breadcrumb.label : ariaLabel',
+  },
+  {
+    label: 'an empty breadcrumb aria-label is written as given, so the landmark has no name, though pagination falls back for the same input',
+    file: 'src/components/breadcrumb/index.tsx',
+    from: "ariaLabel === undefined || ariaLabel === '' ? labels.breadcrumb.label",
+    to: 'ariaLabel === undefined ? labels.breadcrumb.label',
+  },
+  {
+    label: 'a breadcrumb aria-label a wrapper forwards as undefined strips the name of the landmark',
+    file: 'src/components/breadcrumb/index.tsx',
+    from: "ariaLabel === undefined || ariaLabel === '' ? labels.breadcrumb.label",
+    to: "ariaLabel === '' ? labels.breadcrumb.label",
   },
   {
     label: 'a breadcrumb crumb ignores the link element, so every click in a Next.js app reloads the document',

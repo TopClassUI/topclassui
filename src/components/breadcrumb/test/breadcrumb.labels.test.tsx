@@ -54,6 +54,24 @@ describe('the name of the nav comes from labels', () => {
   })
 })
 
+describe('a name from the caller, handled as Pagination handles one', () => {
+  it('falls back to the labels for an empty aria-label, which would name nothing', () => {
+    expect(name(html({ 'aria-label': '' }))).toBe(EN_LABEL)
+    expect(name(html({ 'aria-label': '', labels: ar }))).toBe(AR_LABEL)
+  })
+
+  it('falls back to the labels for an aria-label a wrapper forwards as undefined', () => {
+    expect(name(html({ 'aria-label': undefined }))).toBe(EN_LABEL)
+    expect(name(html({ 'aria-label': undefined, labels: ar }))).toBe(AR_LABEL)
+  })
+
+  it('keeps a real name, written once and in the place of the built-in one', () => {
+    const out = html({ 'aria-label': 'Category trail', className: 'mt-2' })
+    expect(out.startsWith('<nav aria-label="Category trail" class="text-sm mt-2"><ol ')).toBe(true)
+    expect(count(out, 'aria-label=')).toBe(1)
+  })
+})
+
 describe('the crumbs are the caller\'s own text', () => {
   it('adds no built-in crumb: the first item is the caller\'s, in either language', () => {
     expect(count(html(), '<li')).toBe(2)
