@@ -17,6 +17,7 @@ export function Breadcrumb({
   link,
   baseUrl,
   labels = en,
+  locale: _locale,
   className,
   'aria-label': ariaLabel,
   ...rest

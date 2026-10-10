@@ -35,6 +35,13 @@ describe('the name of the nav comes from labels', () => {
     expect(name(html({ labels: getLabels('en-GB').labels }))).toBe(EN_LABEL)
   })
 
+  it('takes the whole pair getLabels returns as a spread, and writes no locale on the nav', () => {
+    const out = html({ ...getLabels('ar') })
+    expect(name(out)).toBe(AR_LABEL)
+    expect(out).not.toMatch(/locale=|\[object/)
+    expect(out.startsWith('<nav aria-label="مسار التنقل" class="text-sm"><ol ')).toBe(true)
+  })
+
   it('takes a caller override of that one key', () => {
     const labels = getLabels('en', { breadcrumb: { label: 'You are here' } }).labels
     expect(name(html({ labels }))).toBe('You are here')

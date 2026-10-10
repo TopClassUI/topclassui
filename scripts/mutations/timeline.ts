@@ -80,4 +80,10 @@ export const MUTATIONS: Mutation[] = [
     from: "export const TIMELINE_TITLE = 'min-h-5 text-sm font-medium text-body'",
     to: "export const TIMELINE_TITLE = 'text-sm font-medium text-body'",
   },
+  {
+    label: 'the timeline forwards locale to its list again, so a spread of getLabels writes an attribute HTML does not have',
+    file: 'src/components/timeline/index.tsx',
+    from: '  locale: _locale,\n',
+    to: '',
+  },
 ]

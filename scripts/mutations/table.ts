@@ -80,4 +80,10 @@ export const MUTATIONS: Mutation[] = [
     from: "import type {} from '#shared/style-tokens.js'\n",
     to: '',
   },
+  {
+    label: 'a table forwards locale to its scrolling box again, so a spread of getLabels writes an attribute HTML does not have',
+    file: 'src/components/table/index.tsx',
+    from: '  locale: _locale,\n',
+    to: '',
+  },
 ]

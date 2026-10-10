@@ -80,4 +80,10 @@ export const MUTATIONS: Mutation[] = [
     from: "typeof node === 'boolean'",
     to: 'node === false',
   },
+  {
+    label: 'the empty state forwards locale to its root again, so a spread of getLabels writes an attribute HTML does not have',
+    file: 'src/components/empty-state/index.tsx',
+    from: '  locale: _locale,\n',
+    to: '',
+  },
 ]

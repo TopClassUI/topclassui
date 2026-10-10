@@ -92,4 +92,10 @@ export const MUTATIONS: Mutation[] = [
     from: 'text-body font-semibold`',
     to: 'text-body`',
   },
+  {
+    label: 'a breadcrumb forwards locale to its nav again, so a spread of getLabels writes an attribute HTML does not have',
+    file: 'src/components/breadcrumb/index.tsx',
+    from: '  locale: _locale,\n',
+    to: '',
+  },
 ]

@@ -27,6 +27,7 @@ export function Timeline<T extends TimelineItem = TimelineItem>({
   getKey,
   emptyFallback,
   labels = en,
+  locale: _locale,
   className,
   ...rest
 }: TimelineProps<T>) {

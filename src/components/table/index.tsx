@@ -30,6 +30,7 @@ export function Table<T, Caption extends TableCaption = TableCaption>({
   emptyFallback,
   link,
   labels = en,
+  locale: _locale,
   className,
   ...rest
 }: TableProps<T, Caption>) {
