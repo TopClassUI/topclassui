@@ -1,7 +1,7 @@
 // A real page per demo, with the real compiled stylesheet, so a browser can
 // measure what a consumer would see. The docs app will replace this; until then
 // it is the only place the CSS and the markup meet (PLAN 17.1).
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 
 import { compile } from 'tailwindcss'
@@ -37,22 +37,45 @@ export async function compileCss(root: string, candidates: readonly string[]): P
   return compiled.build([...candidates])
 }
 
+export interface Demo { name: string; file: string }
+
+/** Every dummy/*.tsx of every component folder, named `<folder>--<file>`: the one list both harnesses serve. */
+export function findDemos(root: string): Demo[] {
+  const components = join(root, 'src', 'components')
+  return readdirSync(components, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && readdirSync(join(components, e.name)).includes('dummy'))
+    .flatMap((e) => {
+      const dir = join(components, e.name, 'dummy')
+      return readdirSync(dir).filter((f) => f.endsWith('.tsx')).sort()
+        .map((f) => ({ name: `${e.name}--${f.slice(0, -4)}`, file: join(dir, f) }))
+    })
+}
+
+/** The classes of the page itself, which no demo names. */
+export const PAGE_CANDIDATES = ['bg-page', 'text-body', 'p-8', 'sr-only'] as const
+
+/** The language each direction stands for: the page's `lang`, and the locale a live page gives the provider. */
+export const LANG = { ltr: 'en', rtl: 'ar' } as const satisfies Record<Direction, string>
+
 export interface Page { mode: Mode; direction: Direction; demo: string; body: string }
 
-export function pageHtml({ mode, direction, demo, body }: Page, css: string): string {
-  const lang = direction === 'rtl' ? 'ar' : 'en'
+/** What the live harness adds around the same page; the static one passes nothing. */
+export interface Shell { head?: string; bodyAttributes?: string; tail?: string }
+
+export function pageHtml({ mode, direction, demo, body }: Page, css: string, shell: Shell = {}): string {
+  const { head = '', bodyAttributes = '', tail = '' } = shell
   return `<!doctype html>
-<html lang="${lang}" dir="${direction}" data-theme="${mode}">
+<html lang="${LANG[direction]}" dir="${direction}" data-theme="${mode}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${demo} - ${mode} - ${direction}</title>
 <style>${css}</style>
-</head>
-<body class="bg-page text-body">
+${head}</head>
+<body class="bg-page text-body"${bodyAttributes}>
 <h1 class="sr-only">${demo}</h1>
 <main id="demo" class="p-8">${body}</main>
-</body>
+${tail}</body>
 </html>
 `
 }
