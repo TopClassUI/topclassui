@@ -1,4 +1,4 @@
-// The mutations of what the overlays share: the trigger helper, the scroll tab stop and the scroll area. Found by scripts/mutations/index.ts.
+// The mutations of what the overlays share: trigger helper, scroll tab stop, scroll area, portal locale. Found by scripts/mutations/index.ts.
 import type { Mutation } from '../lib/mutate.js'
 
 export const MUTATIONS: Mutation[] = [
@@ -55,6 +55,18 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/shared/use-scroll-tab-stop.ts',
     from: '    content.observe(element, { childList: true, characterData: true, subtree: true })\n',
     to: '',
+  },
+  {
+    label: 'usePortalLocale falls back to ltr with no provider, so a popup on a right-to-left page with none is stamped left to right',
+    file: 'src/shared/provider/use-portal-locale.ts',
+    from: 'dir: provided?.direction,',
+    to: "dir: provided?.direction ?? 'ltr',",
+  },
+  {
+    label: 'usePortalLocale falls back to English with no provider, so a popup on an Arabic page with none is announced as English',
+    file: 'src/shared/provider/use-portal-locale.ts',
+    from: 'lang: provided?.locale }',
+    to: "lang: provided?.locale ?? 'en' }",
   },
   {
     label: 'the shared scroll area loses its scroll padding, so the ring of a control that Tab brings into view is cut at the edge',

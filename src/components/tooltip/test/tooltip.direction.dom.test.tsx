@@ -66,8 +66,8 @@ describe('the positioner carries the direction of its provider, because its port
     expect(arrow?.hasAttribute('dir')).toBe(false)
   })
 
-  it('falls back to ltr with no provider, the direction Base UI already places the popup in', () => {
-    expect(opened(tooltip()).positioner?.getAttribute('dir')).toBe('ltr')
+  it('writes no dir with no provider, so the portal inherits the direction of the page', () => {
+    expect(opened(tooltip()).positioner?.hasAttribute('dir')).toBe(false)
   })
 
   it('leaves a dir the caller writes on the popup alone, for one tooltip in the other script', () => {
@@ -120,8 +120,8 @@ describe('the positioner carries the language of its provider as well', () => {
     expect(arrow?.hasAttribute('lang')).toBe(false)
   })
 
-  it('falls back to en with no provider, the language of the built-in labels', () => {
-    expect(opened(tooltip()).positioner?.getAttribute('lang')).toBe('en')
+  it('writes no lang with no provider, so an Arabic page is not announced as English', () => {
+    expect(opened(tooltip()).positioner?.hasAttribute('lang')).toBe(false)
   })
 
   it('leaves a lang the caller writes on the popup alone, for one tooltip in another language', () => {

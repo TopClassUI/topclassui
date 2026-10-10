@@ -235,3 +235,37 @@ test('an RTL island on an LTR page draws its arrow toward the trigger, and its p
   }))
   expect(languages).toEqual({ page: 'en', positioner: 'ar', arabic: true, english: false })
 })
+
+/** What a popup must inherit from each page when no provider tells it, written out. */
+const INHERITED = {
+  ltr: { direction: 'ltr', arabic: false, english: true, startEdge: 'left' },
+  rtl: { direction: 'rtl', arabic: true, english: false, startEdge: 'right' },
+} as const
+
+// R-13-1 asks for the provider and the harness always mounts one, so these tooltips come from a fixture module.
+// Base UI has no direction either then: start and end still open on the LTR sides, their arrow on the far edge.
+test.describe('with no provider at all, a popup takes the direction and the language of its page', () => {
+  for (const direction of DIRECTIONS) {
+    test(`${direction} page: nothing is stamped on the positioner, and a top tooltip is whole`, async ({ page }) => {
+      await openLive(page, 'separator--horizontal', { direction })
+      await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/tooltip-no-provider.tsx' })
+      await expect(page.locator('#no-provider button')).toHaveCount(4)
+
+      expectArrowTowardTrigger(await openNext(page, 'top'), 'top')
+      const read = await openPopup(page).evaluate((popup) => ({
+        dir: popup.parentElement?.getAttribute('dir') ?? null,
+        lang: popup.parentElement?.getAttribute('lang') ?? null,
+        direction: getComputedStyle(popup).direction,
+        arabic: popup.matches(':lang(ar)'),
+        english: popup.matches(':lang(en)'),
+      }))
+      const { startEdge, ...inherited } = INHERITED[direction]
+      expect(read).toEqual({ dir: null, lang: null, ...inherited })
+
+      // Floating UI reads the same inherited direction, so start is the page's start edge of the trigger.
+      const aligned = await openNext(page, 'top-start')
+      expectArrowTowardTrigger(aligned, 'top-start')
+      expect(Math.abs(aligned.popup[startEdge] - aligned.trigger[startEdge]), `top-start is not aligned to the ${startEdge} edge`).toBeLessThanOrEqual(1)
+    })
+  }
+})

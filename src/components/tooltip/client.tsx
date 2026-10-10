@@ -50,12 +50,12 @@ export function TooltipPopup({
   ...rest
 }: TooltipPopupProps) {
   const { side, align } = toSideAlign(placement)
-  const { direction, locale } = useTooltipPopup()
+  const { dir, lang } = useTooltipPopup()
   return (
     <Base.Portal>
       <Base.Positioner
-        dir={direction}
-        lang={locale}
+        dir={dir}
+        lang={lang}
         side={side}
         align={align}
         sideOffset={POPUP_BOUNDS.sideOffset + TOOLTIP_ARROW_HEIGHT}
