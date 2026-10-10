@@ -12,16 +12,16 @@ const sorted = (list: readonly string[]) => [...list].sort()
 const ROOT: Record<string, string[]> = {
   text: ['flex', 'flex-col', 'w-full'],
   circle: [
-    'animate-pulse', 'bg-neutral-soft', 'block', 'motion-reduce:animate-none',
-    'rounded-full', 'shrink-0', 'size-control-md',
+    'animate-pulse', 'bg-neutral-soft', 'block', 'forced-colors:outline-(length:--tc-line-width)',
+    'motion-reduce:animate-none', 'rounded-full', 'shrink-0', 'size-control-md',
   ],
   rect: [
-    'animate-pulse', 'bg-neutral-soft', 'block', 'h-control-md',
-    'motion-reduce:animate-none', 'rounded-control', 'w-full',
+    'animate-pulse', 'bg-neutral-soft', 'block', 'forced-colors:outline-(length:--tc-line-width)',
+    'h-control-md', 'motion-reduce:animate-none', 'rounded-control', 'w-full',
   ],
   card: [
     'animate-pulse', 'aspect-5/2', 'bg-neutral-soft', 'block',
-    'motion-reduce:animate-none', 'rounded-box', 'w-full',
+    'forced-colors:outline-(length:--tc-line-width)', 'motion-reduce:animate-none', 'rounded-box', 'w-full',
   ],
 }
 
@@ -119,7 +119,9 @@ describe('every shape wears its own classes and no others', () => {
   it('renders a hidden, unsized span rather than throwing for a shape a JS caller made up', () => {
     const out = html({ variant: 'avatar' as never })
     expect(attr(out, 'aria-hidden')).toBe('true')
-    expect(sorted(classList(out))).toEqual(['animate-pulse', 'bg-neutral-soft', 'motion-reduce:animate-none'])
+    expect(sorted(classList(out))).toEqual([
+      'animate-pulse', 'bg-neutral-soft', 'forced-colors:outline-(length:--tc-line-width)', 'motion-reduce:animate-none',
+    ])
   })
 })
 
@@ -127,15 +129,15 @@ describe('the whole markup, written out', () => {
   it('is a column of two rows, the last one two thirds wide', () => {
     expect(html({ rows: 2 })).toBe(
       '<span data-variant="text" class="flex flex-col w-full" aria-hidden="true">'
-      + '<span class="block h-[1em] my-[calc((1lh-1em)/2)] rounded-chip bg-neutral-soft animate-pulse motion-reduce:animate-none"></span>'
-      + '<span class="block h-[1em] my-[calc((1lh-1em)/2)] rounded-chip bg-neutral-soft animate-pulse motion-reduce:animate-none w-2/3"></span>'
+      + '<span class="block h-[1em] my-[calc((1lh-1em)/2)] rounded-chip bg-neutral-soft animate-pulse motion-reduce:animate-none forced-colors:outline-(length:--tc-line-width)"></span>'
+      + '<span class="block h-[1em] my-[calc((1lh-1em)/2)] rounded-chip bg-neutral-soft animate-pulse motion-reduce:animate-none forced-colors:outline-(length:--tc-line-width) w-2/3"></span>'
       + '</span>',
     )
   })
 
   it('is one empty filled span for the circle', () => {
     expect(html({ variant: 'circle' })).toBe(
-      '<span data-variant="circle" class="block size-control-md shrink-0 rounded-full bg-neutral-soft animate-pulse motion-reduce:animate-none" aria-hidden="true"></span>',
+      '<span data-variant="circle" class="block size-control-md shrink-0 rounded-full bg-neutral-soft animate-pulse motion-reduce:animate-none forced-colors:outline-(length:--tc-line-width)" aria-hidden="true"></span>',
     )
   })
 })

@@ -9,6 +9,10 @@ export const BORDER = `${BORDER_WIDTH} border-line`
 /** A control boundary, which must reach 3:1 against every surface it can sit on. */
 export const BORDER_STRONG = `${BORDER_WIDTH} border-line-strong`
 
+/** Forced colours erase every fill, so a shape drawn by its fill alone keeps a line there and
+ * nowhere else. An outline, not a border: it takes no room, so the box is the same in every mode. */
+export const FORCED_EDGE = 'forced-colors:outline-(length:--tc-line-width)'
+
 /** A real CSS outline with an offset, so the gap shows the actual backdrop on any surface. */
 export const FOCUS_RING = [
   // outline-none, not outline-hidden: under forced colours that one paints a 2px outline on every control at rest.

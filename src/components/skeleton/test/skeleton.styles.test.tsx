@@ -34,6 +34,27 @@ describe('the fill', () => {
   })
 })
 
+// e2e/skeleton.spec measures it: with the fill erased, a skeleton painted nothing at all.
+describe('the line that forced colours leave of a fill', () => {
+  const edges = (list: readonly string[]) => list.filter((c) => c.includes('outline'))
+
+  for (const variant of ['circle', 'rect', 'card'] as const) {
+    it(`${variant} carries one outline, and only under forced colours`, () => {
+      expect(edges(classes({ variant }))).toEqual(['forced-colors:outline-(length:--tc-line-width)'])
+    })
+  }
+
+  it('puts it on each row of the text shape, where the fill is, and not on the column', () => {
+    const out = html({ rows: 3 })
+    expect(edges(classList(out))).toEqual([])
+    expect(rowClasses(out).map((row) => edges(row.split(' ')))).toEqual([
+      ['forced-colors:outline-(length:--tc-line-width)'],
+      ['forced-colors:outline-(length:--tc-line-width)'],
+      ['forced-colors:outline-(length:--tc-line-width)'],
+    ])
+  })
+})
+
 describe('the text column', () => {
   it('sets no gap, so the margins of the rows alone make up each line height', () => {
     expect(classes().filter((c) => c.startsWith('gap-'))).toEqual([])

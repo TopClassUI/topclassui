@@ -94,3 +94,21 @@ describe('reduced motion stops the pulse', () => {
     expect(css.slice(query, still)).not.toContain('}')
   })
 })
+
+describe('the line that forced colours leave of a fill', () => {
+  const edge = selectorOf('forced-colors:outline-(length:--tc-line-width)')
+
+  it('is an outline at the line width, which takes no room in the layout', () => {
+    expect(ruleOf(edge)).toContain('outline-style: var(--tw-outline-style);')
+    expect(ruleOf(edge)).toContain('outline-width: var(--tc-line-width);')
+    // Nothing on a skeleton resets the style, so it is the registered initial value.
+    expect(css).toMatch(/@property --tw-outline-style \{[^}]*initial-value: solid;/)
+  })
+
+  it('sits inside the forced-colours query, so no other mode gains an outline', () => {
+    const query = css.indexOf('@media (forced-colors: active)')
+    expect(query).toBeGreaterThan(-1)
+    expect(css.indexOf(`${edge} {`)).toBeGreaterThan(query)
+    expect(css.split(`${edge} {`)).toHaveLength(2)
+  })
+})

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { SIZES } from './contracts/size.js'
 import {
   BORDER, BORDER_STRONG, BORDER_WIDTH, CONTROL_HEIGHT, CONTROL_SIZE, DISABLED, FOCUS_RING,
-  HOVER, LOADING, TOGGLE_SIZE, TOUCH_TARGET, TRANSITION,
+  FORCED_EDGE, HOVER, LOADING, TOGGLE_SIZE, TOUCH_TARGET, TRANSITION,
 } from './classes.js'
 
 // Shapes are named here, not derived: a derived expectation shrinks with the constant.
@@ -49,6 +49,12 @@ describe('the focus ring paints on focus and nothing at rest (R-5.6-1)', () => {
 
   it('is those five classes and no sixth', () => {
     expect(FOCUS_RING.split(' ')).toHaveLength(5)
+  })
+})
+
+describe('the line forced colours leave of a shape drawn by its fill alone', () => {
+  it('is one outline at the line width, behind forced-colors and nowhere else', () => {
+    expect(FORCED_EDGE).toBe('forced-colors:outline-(length:--tc-line-width)')
   })
 })
 

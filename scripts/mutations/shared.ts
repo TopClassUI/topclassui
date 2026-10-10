@@ -170,4 +170,16 @@ export const MUTATIONS: Mutation[] = [
     from: '`Page ${fmt.format(page)} of ${fmt.format(count)}`',
     to: '`Page ${fmt.format(count)} of ${fmt.format(page)}`',
   },
+  {
+    label: 'the shared forced edge is emptied, so a shape drawn by its fill alone paints nothing in forced colours',
+    file: 'src/shared/classes.ts',
+    from: "export const FORCED_EDGE = 'forced-colors:outline-(length:--tc-line-width)'",
+    to: "export const FORCED_EDGE = ''",
+  },
+  {
+    label: 'the shared forced edge leaves its variant, so a skeleton wears an outline in every mode and not only in forced colours',
+    file: 'src/shared/classes.ts',
+    from: "export const FORCED_EDGE = 'forced-colors:outline-(length:--tc-line-width)'",
+    to: "export const FORCED_EDGE = 'outline-(length:--tc-line-width)'",
+  },
 ]
