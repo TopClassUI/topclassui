@@ -94,3 +94,26 @@ describe('the shared control classes resolve to the knobs they promise', () => {
     expect(base).toContain('--tc-target-coarse: 44px')
   })
 })
+
+// e2e/overlay-styles.spec measures it: a target scrolled into view under a bar 64 px tall.
+describe('the page keeps a target clear of a sticky bar (R-10.5-3)', () => {
+  let sheet = ''
+
+  beforeAll(async () => {
+    sheet = (await compileEntry()).build(['bg-page'])
+  })
+
+  it('reads both sticky tokens into the scroll padding of the root, top and then bottom', () => {
+    expect(sheet).toMatch(/\n {2}html \{[^}]*\n {4}scroll-padding-block: var\(--tc-sticky-top\) var\(--tc-sticky-bottom\);/)
+  })
+
+  it('declares it once, in the base layer: it is no custom property, so it may not be unlayered (R-4-1)', () => {
+    const places = [...sheet.matchAll(/scroll-padding-block:/g)].map((m) => layerOf(sheet, m.index))
+    expect(places).toEqual(['base'])
+  })
+
+  it('starts both tokens at zero, so a page with no bar keeps nothing clear', () => {
+    expect(sheet).toContain('--tc-sticky-top: 0px;')
+    expect(sheet).toContain('--tc-sticky-bottom: 0px;')
+  })
+})
