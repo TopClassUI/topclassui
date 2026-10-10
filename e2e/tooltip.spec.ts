@@ -212,7 +212,7 @@ test.describe('with the trigger flush against an edge', () => {
 
 // The demo mounts its own RTL provider, so on an LTR page its portal sits in a <body> of the other direction.
 // Without a dir of its own the popup took the body's: on 2026-10-10 the arrow was 76 px away, on the far edge.
-test('an RTL island on an LTR page draws its arrow toward the trigger, and lays its popup out right to left', async ({ page }) => {
+test('an RTL island on an LTR page draws its arrow toward the trigger, and its popup is right to left and in Arabic', async ({ page }) => {
   await openLive(page, 'tooltip--rtl', { direction: 'ltr', edge: 'end' })
   const placed = await openNext(page, 'نسخ الرابط')
   expect(placed.where).toBe('left')
@@ -225,4 +225,13 @@ test('an RTL island on an LTR page draws its arrow toward the trigger, and lays 
     arrow: getComputedStyle(popup.querySelector('[aria-hidden="true"]') ?? popup).direction,
   }))
   expect(directions).toEqual({ body: 'ltr', positioner: 'rtl', popup: 'rtl', arrow: 'rtl' })
+
+  // The nearest lang is what a screen reader announces in and the browser shapes glyphs for: the island's, not the page's.
+  const languages = await openPopup(page).evaluate((popup) => ({
+    page: document.documentElement.lang,
+    positioner: popup.parentElement?.getAttribute('lang') ?? null,
+    arabic: popup.matches(':lang(ar)'),
+    english: popup.matches(':lang(en)'),
+  }))
+  expect(languages).toEqual({ page: 'en', positioner: 'ar', arabic: true, english: false })
 })

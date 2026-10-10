@@ -81,6 +81,12 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
+    label: 'the tooltip positioner loses the language of its provider, so the popup of an Arabic island is announced and shaped as English',
+    file: 'src/components/tooltip/client.tsx',
+    from: '        lang={locale}\n',
+    to: '',
+  },
+  {
     label: "the tooltip popup's own classes beat a consumer className",
     file: 'src/components/tooltip/client.tsx',
     from: 'className={cn(TOOLTIP_POPUP, className)}',

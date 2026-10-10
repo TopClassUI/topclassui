@@ -107,7 +107,7 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
   })
 })
 
-describe('hook.ts holds the one thing a part reads from the provider (R-5.12-1)', () => {
+describe('hook.ts holds what a part reads from the provider, and nothing else (R-5.12-1)', () => {
   const source = read('hook.ts')
 
   it("starts with 'use client', as every module that calls a hook does", () => {
@@ -119,7 +119,7 @@ describe('hook.ts holds the one thing a part reads from the provider (R-5.12-1)'
     expect(importedModules(source)).toEqual(['#shared/provider/context.js'])
   })
 
-  it('calls useDirection and no other hook', () => {
-    expect(hookCalls(source)).toEqual(['useDirection'])
+  it('calls useDirection and useLocale, the two things a portal cannot inherit, and no other hook', () => {
+    expect(hookCalls(source)).toEqual(['useDirection', 'useLocale'])
   })
 })

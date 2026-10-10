@@ -78,3 +78,57 @@ describe('the positioner carries the direction of its provider, because its port
     expect(positioner?.getAttribute('dir')).toBe('rtl')
   })
 })
+
+// A screen reader picks its voice from lang, and the browser its glyph shapes: a portal loses both with dir.
+describe('the positioner carries the language of its provider as well', () => {
+  it('is ar inside an Arabic provider', () => {
+    const { positioner } = opened(<TopClassProvider direction="rtl" locale="ar">{tooltip()}</TopClassProvider>)
+    expect(positioner?.getAttribute('lang')).toBe('ar')
+  })
+
+  it('is en inside an English provider', () => {
+    const { positioner } = opened(<TopClassProvider direction="ltr" locale="en">{tooltip()}</TopClassProvider>)
+    expect(positioner?.getAttribute('lang')).toBe('en')
+  })
+
+  it('is the whole tag the provider was given, region and numbering system included', () => {
+    const { positioner } = opened(<TopClassProvider direction="rtl" locale="ar-EG-u-nu-arab">{tooltip()}</TopClassProvider>)
+    expect(positioner?.getAttribute('lang')).toBe('ar-EG-u-nu-arab')
+  })
+
+  it('is ar for an Arabic island on an English page, whose body would hand it en', () => {
+    const { positioner } = opened(
+      <TopClassProvider direction="ltr" locale="en">
+        <TopClassProvider direction="rtl" locale="ar">{tooltip()}</TopClassProvider>
+      </TopClassProvider>,
+    )
+    expect(positioner?.getAttribute('lang')).toBe('ar')
+  })
+
+  it('is en for an English island on an Arabic page, whose body would hand it ar', () => {
+    const { positioner } = opened(
+      <TopClassProvider direction="rtl" locale="ar">
+        <TopClassProvider direction="ltr" locale="en">{tooltip()}</TopClassProvider>
+      </TopClassProvider>,
+    )
+    expect(positioner?.getAttribute('lang')).toBe('en')
+  })
+
+  it('is written once, on the positioner: the popup and the arrow inherit it', () => {
+    const { popup, arrow } = opened(<TopClassProvider direction="rtl" locale="ar">{tooltip()}</TopClassProvider>)
+    expect(popup.hasAttribute('lang')).toBe(false)
+    expect(arrow?.hasAttribute('lang')).toBe(false)
+  })
+
+  it('falls back to en with no provider, the language of the built-in labels', () => {
+    expect(opened(tooltip()).positioner?.getAttribute('lang')).toBe('en')
+  })
+
+  it('leaves a lang the caller writes on the popup alone, for one tooltip in another language', () => {
+    const { popup, positioner } = opened(
+      <TopClassProvider direction="rtl" locale="ar">{tooltip({ lang: 'fr' })}</TopClassProvider>,
+    )
+    expect(popup.getAttribute('lang')).toBe('fr')
+    expect(positioner?.getAttribute('lang')).toBe('ar')
+  })
+})
