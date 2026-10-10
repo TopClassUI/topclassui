@@ -740,6 +740,35 @@ test.describe('each value of modal', () => {
   })
 })
 
+// A Server Component hands a part its Button already rendered. A Button that is not disabled writes no disabled
+// key, so the part's own is not outranked: before, such a trigger looked disabled and was announced as enabled.
+test('disabled on a trigger or a close around a server-built Button: it leaves the tab order, is exposed as disabled, and takes no press', async ({ page }) => {
+  await openLive(page, 'separator--horizontal')
+  await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/dialog-server-built.tsx' })
+  const off = page.locator('#server-built button').filter({ hasText: 'Disabled on the part' })
+  await expect(off).toHaveAttribute('disabled', '')
+  await expect(off).toHaveAttribute('data-disabled', '')
+  await expect(off).toHaveCSS('pointer-events', 'none')
+  // What a screen reader is told: a button that is unavailable, by its native state and no ARIA stand-in.
+  await expect(page.getByRole('button', { name: 'Disabled on the part', disabled: true })).toHaveCount(1)
+  expect(await off.getAttribute('aria-disabled')).toBeNull()
+
+  // Tab passes it by, and a click the page makes itself opens nothing.
+  await page.locator('#before').focus()
+  await page.keyboard.press('Tab')
+  expect(await focusedName(page)).toBe('Enabled')
+  await off.evaluate((button: HTMLButtonElement) => { button.click() })
+  await expect(page.locator('[role="dialog"]')).toHaveCount(0)
+
+  // The close that is disabled on the part, inside the dialog the enabled trigger opens.
+  const popup = await openOverlay(page, page.locator('#server-built button').filter({ hasText: 'Enabled' }), { by: 'keyboard' })
+  await expect(popup.getByRole('button', { name: 'Not now', disabled: true })).toHaveCount(1)
+  await expect(popup.getByRole('button', { name: 'Done', disabled: false })).toHaveCount(1)
+  // Two stops, not three: the x and Done.
+  expect([await pressInside(page, popup, 'Tab'), await pressInside(page, popup, 'Tab')]).toEqual(['Done', 'Close this dialog'])
+  expect(await liveErrors(page)).toEqual([])
+})
+
 // What wrap-anywhere costs: text may break at any letter, so beside a part that cannot shrink it shrinks to one.
 // break-word instead lets a 300-character word widen a grid body to 2509 px, so anywhere stays and the cost is pinned.
 test('320 x 480: a label beside a part that cannot shrink is one letter a line, and flex-wrap on the row is the remedy', async ({ page }) => {

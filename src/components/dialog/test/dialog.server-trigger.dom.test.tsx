@@ -128,7 +128,7 @@ describe('a label left on the part survives a Button that ran on the server with
   })
 })
 
-// A Button that ran on the server carries disabled: false, a key Flight keeps, and a render element's props win.
+// A Button that is not disabled writes no disabled key, so nothing crosses Flight to outrank the part's own.
 describe('disabled on the part, around a Button that ran on the server', () => {
   const state = (button: HTMLButtonElement) => ({ native: button.disabled, marked: button.hasAttribute('data-disabled') })
 
@@ -136,21 +136,41 @@ describe('disabled on the part, around a Button that ran on the server', () => {
     expect(state(trigger({ disabled: true, render: <Button />, children: 'Publish' }) as HTMLButtonElement)).toEqual({ native: true, marked: true })
   })
 
-  it('a server-built Button loses the native attribute: it is only marked, so it looks disabled and is announced as enabled', () => {
-    const button = trigger({ disabled: true, render: delivered(Button({})), children: 'Publish' }) as HTMLButtonElement
-    expect(state(button)).toEqual({ native: false, marked: true })
-    expect(button.getAttribute('aria-disabled')).toBeNull()
-    // Base UI still refuses the press, so the dialog stays shut.
-    button.click()
-    expect(screen.queryByRole('dialog')).toBeNull()
+  for (const [form, built] of [
+    ['as Flight delivers it', () => delivered(Button({}))],
+    ['in a lazy wrapper', () => lazy(delivered(Button({})))],
+  ] as const) {
+    it(`on the trigger, ${form}: natively disabled and marked, so it leaves the tab order and is announced as unavailable`, () => {
+      const button = trigger({ disabled: true, render: built(), children: 'Publish' }) as HTMLButtonElement
+      expect(state(button)).toEqual({ native: true, marked: true })
+      expect(button.getAttribute('aria-disabled')).toBeNull()
+      button.click()
+      expect(screen.queryByRole('dialog')).toBeNull()
+    })
+
+    it(`on the close, ${form}: the same`, async () => {
+      expect(state(await close({ disabled: true, render: built(), children: 'Cancel' }))).toEqual({ native: true, marked: true })
+    })
+  }
+
+  // Not a shape a real app sees: a stand-in for a server-built Button must delete the empty keys, as delivered() does.
+  it('called by hand, a Button keeps keys that hold undefined, and those still erase what the part says', () => {
+    const button = trigger({ disabled: true, render: Button({}), children: 'Publish' }) as HTMLButtonElement
+    expect(state(button)).toEqual({ native: false, marked: false })
   })
 
-  it('the same on the close', async () => {
-    expect(state(await close({ disabled: true, render: delivered(Button({})), children: 'Cancel' }))).toEqual({ native: false, marked: true })
+  it('a part that is not disabled leaves a server-built Button enabled, and unmarked', () => {
+    const button = trigger({ render: delivered(Button({})), children: 'Publish' }) as HTMLButtonElement
+    expect(state(button)).toEqual({ native: false, marked: false })
   })
 
-  it('written on the Button itself, disabled crosses whole: that is the form to write on a server page', () => {
+  it('a Button that was built disabled stays so, whatever the part says: its own true crosses whole', () => {
     const button = trigger({ render: delivered(Button({ disabled: true, children: 'Publish' })) }) as HTMLButtonElement
+    expect(button.disabled).toBe(true)
+  })
+
+  it('and one that was built loading: the part cannot switch a busy button back on', () => {
+    const button = trigger({ disabled: false, render: delivered(Button({ loading: true, children: 'Publish' })) }) as HTMLButtonElement
     expect(button.disabled).toBe(true)
   })
 })

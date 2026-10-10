@@ -49,7 +49,8 @@ export function Button({
     // An <a> with no href has no role, so aria-disabled would reach no screen reader.
     role: deadLink ? 'link' : undefined,
     type: nativeButton ? type : undefined,
-    disabled: nativeButton ? inactive : undefined,
+    // true or no key at all: Flight keeps a false, and it would then outrank the disabled of a part rendered as this button.
+    disabled: nativeButton && inactive ? true : undefined,
     'aria-disabled': !nativeButton && inactive ? true : undefined,
     tabIndex: !nativeButton && inactive ? -1 : undefined,
     // R-5.7-6: presence attributes, and aria-busy is what a screen reader announces.

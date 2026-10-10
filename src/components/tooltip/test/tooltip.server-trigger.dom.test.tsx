@@ -136,3 +136,38 @@ describe('a label left on the trigger survives a Button that ran with none of it
     expect(button.innerHTML).toBe('<span class="truncate min-w-0">Copy link</span>')
   })
 })
+
+// Base UI's tooltip trigger never writes the attribute: disabled there switches the tooltip off, not the control.
+describe('disabled on the trigger, around a Button that ran on the server', () => {
+  const state = (button: HTMLElement) => ({
+    native: (button as HTMLButtonElement).disabled,
+    tooltipOff: button.hasAttribute('data-trigger-disabled'),
+  })
+
+  for (const [form, built] of [
+    ['written in a client file', () => <Button aria-label="Copy link" />],
+    ['as Flight delivers it', () => delivered(Button({ 'aria-label': 'Copy link' }))],
+    ['in a lazy wrapper', () => lazy(delivered(Button({ 'aria-label': 'Copy link' })))],
+  ] as const) {
+    it(`${form}: the tooltip is off and the Button stays a working button, the same in all three`, () => {
+      expect(state(trigger({ disabled: true, render: built() }))).toEqual({ native: false, tooltipOff: true })
+    })
+
+    it(`${form}: with nothing disabled the Button carries no disabled attribute and no mark`, () => {
+      const button = trigger({ render: built() })
+      expect(state(button)).toEqual({ native: false, tooltipOff: false })
+      expect([button.hasAttribute('disabled'), button.hasAttribute('data-disabled')]).toEqual([false, false])
+    })
+  }
+
+  it('to disable the control itself, disabled goes on the Button: it crosses whole, with the mark that dims it', () => {
+    const button = trigger({ render: delivered(Button({ 'aria-label': 'Copy link', disabled: true })) })
+    expect(state(button)).toEqual({ native: true, tooltipOff: false })
+    expect(button.hasAttribute('data-disabled')).toBe(true)
+  })
+
+  it('a server-built Button hands the trigger no disabled key at all, where it used to hand it false', () => {
+    const props = delivered(Button({ 'aria-label': 'Copy link' })).props as Record<string, unknown>
+    expect('disabled' in props).toBe(false)
+  })
+})
