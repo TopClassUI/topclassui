@@ -105,6 +105,7 @@ describe('the link prop: one element every sort link is cloned from (R-5.7-4)', 
     const notAnElement = 'a' as unknown as TableProps<Invoice>['link']
     expect(() => html({ link: notAnElement })).toThrow(TypeError)
     expect(() => html({ link: notAnElement })).toThrow('link must be an element')
+    expect(() => html({ link: notAnElement })).toThrow('Table: link must be an element, such as link={<Link href="" />}')
   })
 })
 

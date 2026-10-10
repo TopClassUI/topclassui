@@ -41,14 +41,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a breadcrumb crumb ignores the link element, so every click in a Next.js app reloads the document',
     file: 'src/components/breadcrumb/index.tsx',
-    from: '(link ?? <a />)',
-    to: '(<a />)',
-  },
-  {
-    label: 'a breadcrumb link element keeps the href it came with, so every crumb leads to one address',
-    file: 'src/components/breadcrumb/index.tsx',
-    from: 'cloneElement((link ?? <a />) as ReactElement<{ href?: string }>, { href: item.href }),\n                { className: LINK,',
-    to: '(link ?? <a />),\n                { href: item.href, className: LINK,',
+    from: "renderLink('Breadcrumb', link, item.href,",
+    to: "renderLink('Breadcrumb', undefined, item.href,",
   },
   {
     label: 'a breadcrumb crumb with an empty label is rendered again, as a link with no name',

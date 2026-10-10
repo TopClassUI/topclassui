@@ -1,11 +1,9 @@
 // No 'use client': a client bundle gets it only when a client file imports it.
-import { cloneElement, type ReactElement } from 'react'
-
 import { caretRight } from '#icons/data/caret-right.js'
 import { LABEL } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
 import { en } from '#shared/labels/en.js'
-import { renderElement } from '#shared/render.js'
+import { renderLink } from '#shared/link.js'
 import { Svg } from '#components/svg/index.js'
 import { BREADCRUMB_BOUNDARIES } from './boundaries.js'
 import { CURRENT, ITEM, LINK, LIST, ROOT, TEXT } from './classes.js'
@@ -39,11 +37,9 @@ export function Breadcrumb({ items, link, baseUrl, labels = en, className, ...re
               {index === 0 ? null : <Svg icon={caretRight} />}
               {item.href === undefined ? (
                 <span aria-current={current ? 'page' : undefined} className={current ? CURRENT : TEXT}>{text}</span>
-              ) : renderElement(
-                // The href is cloned in before the merge: renderElement lets the element's own props win.
-                cloneElement((link ?? <a />) as ReactElement<{ href?: string }>, { href: item.href }),
-                { className: LINK, children: <span className={LABEL}>{text}</span> },
-              )}
+              ) : renderLink('Breadcrumb', link, item.href, {
+                className: LINK, children: <span className={LABEL}>{text}</span>,
+              })}
             </li>
           )
         })}

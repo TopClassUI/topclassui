@@ -69,6 +69,12 @@ export const MUTATIONS: Mutation[] = [
     to: 'aria-labelledby={undefined}',
   },
   {
+    label: 'a table ignores the link element, so every sort in a Next.js app reloads the document',
+    file: 'src/components/table/index.tsx',
+    from: "renderLink('Table', link, column.sortHref,",
+    to: "renderLink('Table', undefined, column.sortHref,",
+  },
+  {
     label: 'a table stops importing the style augmentation, so the sticky width of its README does not compile in a program without Progress',
     file: 'src/components/table/index.tsx',
     from: "import type {} from '#shared/style-tokens.js'\n",
