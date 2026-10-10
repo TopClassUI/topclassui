@@ -1,4 +1,4 @@
-// The mutations of what the overlays share: render-trigger.ts and use-scroll-tab-stop.ts. Found by scripts/mutations/index.ts.
+// The mutations of what the overlays share: the trigger helper, the scroll tab stop and the scroll area. Found by scripts/mutations/index.ts.
 import type { Mutation } from '../lib/mutate.js'
 
 export const MUTATIONS: Mutation[] = [
@@ -55,5 +55,11 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/shared/use-scroll-tab-stop.ts',
     from: '    content.observe(element, { childList: true, characterData: true, subtree: true })\n',
     to: '',
+  },
+  {
+    label: 'the shared scroll area loses its scroll padding, so the ring of a control that Tab brings into view is cut at the edge',
+    file: 'src/shared/classes.ts',
+    from: " scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]'",
+    to: "'",
   },
 ]

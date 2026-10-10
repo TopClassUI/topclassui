@@ -72,8 +72,9 @@ export const TOGGLE_SIZE = {
   custom: '',
 } as const
 
-/** R-10.5-1: a scroll container inside an overlay never scrolls the page behind it. */
-export const SCROLL_AREA = 'overflow-y-auto overscroll-contain'
+/** R-10.5-1: a scroll container inside an overlay never scrolls the page behind it. A control that
+ * Tab scrolls into view lands flush with its edge, so the area keeps the reach of the focus ring clear. */
+export const SCROLL_AREA = 'overflow-y-auto overscroll-contain scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]'
 
 /** Disabled is opacity plus no pointer events; loading keeps full colour so it never reads as disabled. */
 // data-disabled carries it for an element with no disabled attribute, such as an anchor.
