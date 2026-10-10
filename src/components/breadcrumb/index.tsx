@@ -22,8 +22,8 @@ export function Breadcrumb({
   'aria-label': ariaLabel,
   ...rest
 }: BreadcrumbProps) {
-  // A blank label is a link with no name, so the crumb is left out of the list and the JSON-LD.
-  const trail = items.filter((item) => item.label.trim() !== '')
+  // A blank label is a link with no name, and a CMS may send none: either way the crumb is left out, of the JSON-LD too.
+  const trail = items.filter((item) => typeof item.label === 'string' && item.label.trim() !== '')
   // A navigation landmark with nothing in it is announced and then leads nowhere.
   if (trail.length === 0) return null
 
