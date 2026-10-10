@@ -11,8 +11,8 @@ export const BORDER_STRONG = `${BORDER_WIDTH} border-line-strong`
 
 /** A real CSS outline with an offset, so the gap shows the actual backdrop on any surface. */
 export const FOCUS_RING = [
-  // outline-hidden, not outline-none: it keeps a ring under forced-colors.
-  'outline-hidden',
+  // outline-none, not outline-hidden: under forced colours that one paints a 2px outline on every control at rest.
+  'outline-none',
   // Both resets set --tw-outline-style: none, which the width utility would substitute.
   'focus-visible:outline-solid',
   'focus-visible:outline-(length:--tc-ring-width)',

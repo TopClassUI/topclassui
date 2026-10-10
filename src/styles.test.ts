@@ -126,9 +126,21 @@ describe('the focus ring actually paints', () => {
     expect(ring).toMatch(/--tw-outline-style:\s*solid/)
   })
 
-  it('keeps a ring under forced-colors, which outline-none would remove', () => {
-    expect(FOCUS_RING).toContain('outline-hidden')
-    expect(FOCUS_RING).not.toMatch(/(^|\s)outline-none(\s|$)/)
+  it('resets with outline-none, which declares no outline of its own in any mode', async () => {
+    const ring = (await compileEntry()).build(FOCUS_RING.split(' '))
+
+    expect(FOCUS_RING.split(' ')).toContain('outline-none')
+    expect(ring).toMatch(/\.outline-none\s*\{\s*--tw-outline-style:\s*none;\s*outline-style:\s*none;\s*\}/)
+    expect(ring).not.toContain('solid transparent')
+    expect(ring).not.toContain('forced-colors')
+  })
+
+  // The reason, pinned: e2e/focus-ring.spec measured that outline as 2px on every control at rest.
+  it('never resets with outline-hidden, which Tailwind turns into an outline under forced colours', async () => {
+    const hidden = (await compileEntry()).build(['outline-hidden'])
+
+    expect(FOCUS_RING.split(' ')).not.toContain('outline-hidden')
+    expect(hidden).toMatch(/@media \(forced-colors: active\)\s*\{\s*outline:\s*2px solid transparent/)
   })
 
   it('reads the ring width, offset and colour from the knobs', () => {

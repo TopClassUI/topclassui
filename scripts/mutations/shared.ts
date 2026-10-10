@@ -21,6 +21,12 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
+    label: 'the focus ring resets with outline-hidden again, a 2 px ring on every control at rest in forced colours',
+    file: 'src/shared/classes.ts',
+    from: "  'outline-none',\n",
+    to: "  'outline-hidden',\n",
+  },
+  {
     label: 'the whole size scale collapses onto one type step',
     file: 'src/shared/classes.ts',
     from: '  md: `${CONTROL_HEIGHT.md} px-pad-x-md text-sm`,',

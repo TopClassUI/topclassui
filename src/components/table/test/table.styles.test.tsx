@@ -30,7 +30,7 @@ const body = (source: string) => source.slice(source.indexOf('<tbody>'))
 
 const RING = [
   'focus-visible:outline-(length:--tc-ring-width)', 'focus-visible:outline-offset-(length:--tc-ring-offset)',
-  'focus-visible:outline-ring', 'focus-visible:outline-solid', 'outline-hidden',
+  'focus-visible:outline-ring', 'focus-visible:outline-solid', 'outline-none',
 ]
 
 describe('each part wears exactly the classes it needs', () => {
