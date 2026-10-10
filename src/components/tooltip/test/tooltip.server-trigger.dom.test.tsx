@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import type { ReactElement } from 'react'
+import { createElement, type ReactElement } from 'react'
 import { describe, expect, it } from 'vitest'
 
 import { linkSimple } from '#icons/data/link-simple.js'
@@ -95,5 +95,44 @@ describe('an icon inside the loading Button passed to render is drawn beside its
   it('an icon left on the trigger is replaced by the spinner of a loading Button rendered on the server', () => {
     const element = trigger({ render: Button({ loading: true, 'aria-label': 'Copy link' }), children: <Svg icon={linkSimple} /> })
     expect(drawn(element)).toEqual(['M136,32V64'])
+  })
+})
+
+/** As the Flight client of React 19.3.0 delivers an element: a key whose value is undefined is deleted on the way. */
+const delivered = (element: ReactElement) =>
+  createElement(element.type, Object.fromEntries(Object.entries(element.props as object).filter(([, value]) => value !== undefined)))
+
+// Called by hand, a Button with no label keeps a children key that holds nothing; Flight would have deleted it.
+describe('a label left on the trigger survives a Button that ran with none of its own', () => {
+  for (const [form, bare] of [
+    ['called by hand, as a host element', () => Button({})],
+    ['called by hand, in a lazy wrapper', () => lazy(Button({}))],
+    ['as Flight delivers it, with its empty keys deleted', () => delivered(Button({}))],
+  ] as const) {
+    it(`${form}: the button keeps the text, which is its only name`, () => {
+      expect(trigger({ render: bare(), children: 'Copy link' }).innerHTML).toBe('Copy link')
+    })
+
+    it(`${form}: it keeps the text beside a className as well`, () => {
+      const button = trigger({ render: bare(), className: 'h-control-sm', children: 'Copy link' })
+      expect(button.innerHTML).toBe('Copy link')
+      expect(classes(button)).toContain('h-control-sm')
+      expect(classes(button)).not.toContain('h-control-md')
+    })
+  }
+
+  it('reaches the function form as it always did', () => {
+    const button = trigger({ render: (props) => <button {...props} type="button" />, children: 'Copy link' })
+    expect(button.innerHTML).toBe('Copy link')
+  })
+
+  it('a Button rendered with a label of its own keeps that one, in the span it wrapped it in', () => {
+    const button = trigger({ render: Button({ children: 'Copy link' }), children: 'Another label' })
+    expect(button.innerHTML).toBe('<span class="truncate min-w-0">Copy link</span>')
+  })
+
+  it('a Button written in a client file with a label of its own keeps that one too: the element wins in Base UI', () => {
+    const button = trigger({ render: <Button>Copy link</Button>, children: 'Another label' })
+    expect(button.innerHTML).toBe('<span class="truncate min-w-0">Copy link</span>')
   })
 })

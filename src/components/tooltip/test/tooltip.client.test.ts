@@ -38,9 +38,10 @@ function hookCalls(source: string): string[] {
 
 // The first client folder in the repo, so the half of the contract no gate checks yet is read here.
 describe('the folder is the client template', () => {
-  it('holds exactly the files Tooltip needs, with no hook.ts and no lib: Base UI holds the state', () => {
+  // hook.ts arrived with the direction: a portal sits in <body>, so the popup must be told the provider's.
+  it('holds exactly the files Tooltip needs: a hook.ts for the direction and no lib, since Base UI holds the state', () => {
     expect(readdirSync(FOLDER).sort()).toEqual([
-      'README.md', 'boundaries.ts', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'index.tsx',
+      'README.md', 'boundaries.ts', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx',
       'meta.ts', 'schema.ts', 'test', 'types.ts',
     ])
   })
@@ -84,15 +85,16 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
     expect(hooks).toEqual([])
   })
 
-  it('calls no hook from any module, since there is no hook.ts to call', () => {
-    expect(hookCalls(source)).toEqual([])
+  it('calls one hook and no other: its own, from hook.ts, for the direction a portaled popup cannot inherit', () => {
+    expect(hookCalls(source)).toEqual(['useTooltipPopup'])
+    expect(importedNames(source, './hook.js')).toEqual(['useTooltipPopup'])
   })
 
   it('the call scan sees a bare hook, a member hook and use, and not a word that starts with use', () => {
     expect(hookCalls('f(useA(), X.useB(), use(p), user(), x.used())')).toEqual(['useA', 'useB', 'use'])
   })
 
-  it('imports nothing from the provider, so every test passes without it', () => {
+  it('imports nothing from the provider itself: the direction and the language come through hook.ts, or from the page with no provider', () => {
     expect(importedModules(source).filter((m) => m.includes('provider'))).toEqual([])
   })
 
@@ -102,5 +104,22 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
 
   it('imports the schema with nothing at runtime, so zod never ships', () => {
     expect(importedModules(source).filter((m) => m.includes('schema') || m.startsWith('zod'))).toEqual([])
+  })
+})
+
+describe('hook.ts holds what a part reads from the provider, and nothing else (R-5.12-1)', () => {
+  const source = read('hook.ts')
+
+  it("starts with 'use client', as every module that calls a hook does", () => {
+    expect(hasUseClient(source)).toBe(true)
+    expect(source.startsWith("'use client'\n")).toBe(true)
+  })
+
+  it('imports the shared portal hook and nothing else: no React, so no state of its own', () => {
+    expect(importedModules(source)).toEqual(['#shared/provider/use-portal-locale.js'])
+  })
+
+  it('calls usePortalLocale, which every portaled part calls, and no other hook', () => {
+    expect(hookCalls(source)).toEqual(['usePortalLocale'])
   })
 })

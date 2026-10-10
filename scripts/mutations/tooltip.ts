@@ -1,4 +1,4 @@
-// The mutations of src/components/tooltip. Found by scripts/mutations/index.ts.
+// The mutations of src/components/tooltip, and of the shared trigger helper as Tooltip uses it. Found by scripts/mutations/index.ts.
 import type { Mutation } from '../lib/mutate.js'
 
 export const MUTATIONS: Mutation[] = [
@@ -75,6 +75,18 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
+    label: 'the tooltip positioner loses the direction of its provider, so the popup of an RTL island runs left to right and its arrow points away from the trigger',
+    file: 'src/components/tooltip/client.tsx',
+    from: '        dir={dir}\n',
+    to: '',
+  },
+  {
+    label: 'the tooltip positioner loses the language of its provider, so the popup of an Arabic island is announced and shaped as English',
+    file: 'src/components/tooltip/client.tsx',
+    from: '        lang={lang}\n',
+    to: '',
+  },
+  {
     label: "the tooltip popup's own classes beat a consumer className",
     file: 'src/components/tooltip/client.tsx',
     from: 'className={cn(TOOLTIP_POPUP, className)}',
@@ -89,25 +101,25 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a className on the tooltip trigger never reaches the element passed as render',
     file: 'src/components/tooltip/client.tsx',
-    from: 'render={own ? cloneElement(own, { className: cn(own.props.className, className) }) : render}',
+    from: 'render={trigger.render}',
     to: 'render={render}',
   },
   {
     label: 'a className on a tooltip trigger with a render function, or no render, never reaches the element',
     file: 'src/components/tooltip/client.tsx',
-    from: '      className={own ? undefined : className}\n',
+    from: '      className={trigger.className}\n',
     to: '',
   },
   {
     label: "a tooltip trigger className is only appended to a server-built Button's classes, so the Button's own background still wins",
-    file: 'src/components/tooltip/client.tsx',
+    file: 'src/shared/render-trigger.ts',
     from: 'cn(own.props.className, className)',
     to: "[own.props.className, className].join(' ')",
   },
   {
     label: 'a tooltip trigger never unwraps the lazy element Flight hands over, so its className is only appended',
-    file: 'src/components/tooltip/client.tsx',
-    from: 'Children.toArray(render)[0]',
+    file: 'src/shared/render-trigger.ts',
+    from: 'Children.toArray(render as ReactNode)[0]',
     to: 'undefined',
   },
   {
@@ -123,19 +135,19 @@ export const MUTATIONS: Mutation[] = [
     to: 'Math.min(closeDelay, delayMax)',
   },
   {
-    label: 'the long-label demo puts its text on the trigger, so a Server Component renders its Button with no truncating span',
+    label: 'the tooltip long-label demo puts its text on the trigger, so a Server Component renders its Button with no truncating span',
     file: 'src/components/tooltip/dummy/long-label.tsx',
     from: '<TooltipTrigger render={<Button>{LONG}</Button>} />',
     to: '<TooltipTrigger render={<Button />}>{LONG}</TooltipTrigger>',
   },
   {
-    label: 'TooltipPopup gains a hook call, which client.tsx may not hold without a hook.ts (R-5.12-1)',
+    label: 'the tooltip popup gains a second hook call, where client.tsx may hold only the one from hook.ts (R-5.12-1)',
     file: 'src/components/tooltip/client.tsx',
     from: 'const { side, align } = toSideAlign(placement)',
     to: 'const { side, align } = toSideAlign(placement) ?? usePlacementState(placement)',
   },
   {
-    label: 'the basic demo puts its icon back on the trigger, the form whose icon a loading Button rendered on the server replaces with its spinner',
+    label: 'the tooltip basic demo puts its icon back on the trigger, the form whose icon a loading Button rendered on the server replaces with its spinner',
     file: 'src/components/tooltip/dummy/basic.tsx',
     from: '      <TooltipTrigger\n        render={\n          <Button variant="ghost" aria-label="Copy link">\n            <Svg icon={linkSimple} />\n          </Button>\n        }\n      />',
     to: '      <TooltipTrigger render={<Button variant="ghost" aria-label="Copy link" />}>\n        <Svg icon={linkSimple} />\n      </TooltipTrigger>',

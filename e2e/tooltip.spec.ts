@@ -47,6 +47,11 @@ const SIDES: ReadonlyArray<{ demo: string, direction: Direction, edge: Edge, nam
   { demo: 'tooltip--rtl', direction: 'rtl', edge: 'end', name: 'نسخ الرابط', where: 'right' },
   { demo: 'tooltip--rtl', direction: 'rtl', edge: 'end', name: 'حذف هذا الصف', where: 'right' },
   { demo: 'tooltip--rtl', direction: 'rtl', edge: 'start', name: 'حذف هذا الصف', where: 'left' },
+  // The same demo as an island on an LTR page: its own provider still makes start the right-hand side.
+  { demo: 'tooltip--rtl', direction: 'ltr', edge: 'start', name: 'نسخ الرابط', where: 'right' },
+  { demo: 'tooltip--rtl', direction: 'ltr', edge: 'start', name: 'حذف هذا الصف', where: 'right' },
+  { demo: 'tooltip--rtl', direction: 'ltr', edge: 'end', name: 'نسخ الرابط', where: 'left' },
+  { demo: 'tooltip--rtl', direction: 'ltr', edge: 'end', name: 'حذف هذا الصف', where: 'left' },
 ]
 
 interface Box { left: number, top: number, right: number, bottom: number }
@@ -180,9 +185,6 @@ test('the stylesheet already holds the classes of a popup nothing has rendered y
   })
 })
 
-/** An island: the demo mounts its own RTL provider, so on an LTR page its portal sits in a body of the other direction. */
-const island = (demo: string, direction: Direction) => demo === 'tooltip--rtl' && direction === 'ltr'
-
 test.describe('with the trigger flush against an edge', () => {
   // Twelve tooltips on one page: 9 s on a busy machine, so the default half minute is too close.
   test.describe.configure({ timeout: 60_000 })
@@ -200,7 +202,7 @@ test.describe('with the trigger flush against an edge', () => {
 
             const written = SIDES.find((row) => row.demo === demo && row.direction === direction && row.edge === edge && row.name === name)
             if (written) expect(placed.where, `"${name}" opened on the wrong side`).toBe(written.where)
-            if (!island(demo, direction)) expectArrowTowardTrigger(placed, name)
+            expectArrowTowardTrigger(placed, name)
           }
         })
       }
@@ -208,11 +210,62 @@ test.describe('with the trigger flush against an edge', () => {
   }
 })
 
-// Measured on 2026-10-10: the arrow is 76 px away, on the far edge. Base UI takes start and end from
-// the provider, while `-inset-s-1` on the arrow resolves in the direction of <body>, where the portal is.
-test.fail('an RTL island on an LTR page draws its arrow toward the trigger', async ({ page }) => {
+// The demo mounts its own RTL provider, so on an LTR page its portal sits in a <body> of the other direction.
+// Without a dir of its own the popup took the body's: on 2026-10-10 the arrow was 76 px away, on the far edge.
+test('an RTL island on an LTR page draws its arrow toward the trigger, and its popup is right to left and in Arabic', async ({ page }) => {
   await openLive(page, 'tooltip--rtl', { direction: 'ltr', edge: 'end' })
   const placed = await openNext(page, 'نسخ الرابط')
   expect(placed.where).toBe('left')
   expectArrowTowardTrigger(placed, 'نسخ الرابط')
+
+  const directions = await openPopup(page).evaluate((popup) => ({
+    body: getComputedStyle(document.body).direction,
+    positioner: getComputedStyle(popup.parentElement ?? popup).direction,
+    popup: getComputedStyle(popup).direction,
+    arrow: getComputedStyle(popup.querySelector('[aria-hidden="true"]') ?? popup).direction,
+  }))
+  expect(directions).toEqual({ body: 'ltr', positioner: 'rtl', popup: 'rtl', arrow: 'rtl' })
+
+  // The nearest lang is what a screen reader announces in and the browser shapes glyphs for: the island's, not the page's.
+  const languages = await openPopup(page).evaluate((popup) => ({
+    page: document.documentElement.lang,
+    positioner: popup.parentElement?.getAttribute('lang') ?? null,
+    arabic: popup.matches(':lang(ar)'),
+    english: popup.matches(':lang(en)'),
+  }))
+  expect(languages).toEqual({ page: 'en', positioner: 'ar', arabic: true, english: false })
+})
+
+/** What a popup must inherit from each page when no provider tells it, written out. */
+const INHERITED = {
+  ltr: { direction: 'ltr', arabic: false, english: true, startEdge: 'left' },
+  rtl: { direction: 'rtl', arabic: true, english: false, startEdge: 'right' },
+} as const
+
+// R-13-1 asks for the provider and the harness always mounts one, so these tooltips come from a fixture module.
+// Base UI has no direction either then: start and end still open on the LTR sides, their arrow on the far edge.
+test.describe('with no provider at all, a popup takes the direction and the language of its page', () => {
+  for (const direction of DIRECTIONS) {
+    test(`${direction} page: nothing is stamped on the positioner, and a top tooltip is whole`, async ({ page }) => {
+      await openLive(page, 'separator--horizontal', { direction })
+      await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/tooltip-no-provider.tsx' })
+      await expect(page.locator('#no-provider button')).toHaveCount(4)
+
+      expectArrowTowardTrigger(await openNext(page, 'top'), 'top')
+      const read = await openPopup(page).evaluate((popup) => ({
+        dir: popup.parentElement?.getAttribute('dir') ?? null,
+        lang: popup.parentElement?.getAttribute('lang') ?? null,
+        direction: getComputedStyle(popup).direction,
+        arabic: popup.matches(':lang(ar)'),
+        english: popup.matches(':lang(en)'),
+      }))
+      const { startEdge, ...inherited } = INHERITED[direction]
+      expect(read).toEqual({ dir: null, lang: null, ...inherited })
+
+      // Floating UI reads the same inherited direction, so start is the page's start edge of the trigger.
+      const aligned = await openNext(page, 'top-start')
+      expectArrowTowardTrigger(aligned, 'top-start')
+      expect(Math.abs(aligned.popup[startEdge] - aligned.trigger[startEdge]), `top-start is not aligned to the ${startEdge} edge`).toBeLessThanOrEqual(1)
+    })
+  }
 })
