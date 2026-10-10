@@ -56,4 +56,28 @@ export const MUTATIONS: Mutation[] = [
     from: 'clamp(Number(given), min, max)',
     to: 'clamp(given as number, min, max)',
   },
+  {
+    label: 'the pagination current page loses the system pair, so it is a bare digit with no box in forced colours',
+    file: 'src/components/pagination/classes.ts',
+    from: ' ${CELL_CURRENT_FORCED}`',
+    to: '`',
+  },
+  {
+    label: 'the pagination current page stays adjusted, so a backplate hides its digit in forced colours',
+    file: 'src/components/pagination/classes.ts',
+    from: "  'forced-colors:forced-color-adjust-none',\n",
+    to: '',
+  },
+  {
+    label: 'the pagination current page keeps the ring of its theme, 2.9:1 on a black canvas in forced colours',
+    file: 'src/components/pagination/classes.ts',
+    from: "  'forced-colors:[--tc-ring:Highlight]',\n",
+    to: '',
+  },
+  {
+    label: 'the pagination current page takes the hover fill of its theme under a pointer in forced colours',
+    file: 'src/components/pagination/classes.ts',
+    from: "  'forced-colors:hover:bg-[Highlight]',\n",
+    to: '',
+  },
 ]

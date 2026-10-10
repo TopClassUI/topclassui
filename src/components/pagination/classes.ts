@@ -21,8 +21,20 @@ export const CELL_SIZE = {
   custom: '',
 } as const satisfies Record<Size, string>
 
+/** Forced colours erase a fill, so the current page takes the system pair and paints it itself.
+ * Without forced-color-adjust-none Chromium lays a backplate under the digit, which hides it. */
+export const CELL_CURRENT_FORCED = [
+  'forced-colors:forced-color-adjust-none',
+  'forced-colors:bg-[Highlight]',
+  'forced-colors:text-[HighlightText]',
+  'forced-colors:[--tc-ring:Highlight]',
+  // Opted out, so nothing forces HOVER.solid either: the theme's violet under a black digit measured 2.9:1.
+  'forced-colors:hover:bg-[Highlight]',
+  'forced-colors:active:bg-[Highlight]',
+].join(' ')
+
 /** The page the reader is on: filled, so it is found without reading a number. */
-export const CELL_CURRENT = `bg-primary-solid text-primary-on-solid ${TONE_CLASS.primary} ${HOVER.solid}`
+export const CELL_CURRENT = `bg-primary-solid text-primary-on-solid ${TONE_CLASS.primary} ${HOVER.solid} ${CELL_CURRENT_FORCED}`
 
 /** Every other cell: a control boundary at 3:1, body text, and the neutral tint under a pointer. */
 export const CELL_OTHER = `${BORDER_STRONG} text-body ${TONE_CLASS.neutral} ${HOVER.outline}`

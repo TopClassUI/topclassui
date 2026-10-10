@@ -46,3 +46,14 @@ export function inkOn(pixels: readonly Rgb[], backdrop: Rgb, ratio = 3): number 
 export function strayOn(pixels: readonly Rgb[], backdrop: Rgb): number {
   return pixels.filter((pixel) => pixel.some((channel, index) => channel !== backdrop[index])).length
 }
+
+/** How many pixels are exactly one colour: a fill, as against the smoothed edge of a glyph on it. */
+export function paintedIn(pixels: readonly Rgb[], colour: Rgb): number {
+  return pixels.length - strayOn(pixels, colour)
+}
+
+/** A computed colour as numbers: `rgb(55, 0, 110)` is [55, 0, 110]. */
+export function rgbOf(computed: string): Rgb {
+  const [r = 0, g = 0, b = 0] = (computed.match(/\d+/g) ?? []).map(Number)
+  return [r, g, b]
+}
