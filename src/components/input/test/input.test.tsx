@@ -98,6 +98,21 @@ describe('maxLength (R-5.7-8)', () => {
     expect(html({ type: 'week' })).not.toMatch(/maxlength/i)
   })
 
+  /** Written out: HTML matches the type without regard to case, so each is the field it names. */
+  const OTHER_CASE = [['EMAIL', '254'], ['Email', '254'], ['TEXT', '512'], ['Tel', '32'], ['URL', '2048']] as const
+
+  for (const [type, cap] of OTHER_CASE) {
+    it(`type="${type}" takes the cap of its type, ${cap}, and reaches the browser as it was written`, () => {
+      expect(attr(html({ type }), 'maxLength')).toBe(cap)
+      expect(attr(html({ type }), 'type')).toBe(type)
+    })
+  }
+
+  it('gives type="NUMBER" and type="Date" no cap either, whatever the case', () => {
+    expect(html({ type: 'NUMBER', maxLength: 3 })).not.toMatch(/maxlength/i)
+    expect(html({ type: 'Date' })).not.toMatch(/maxlength/i)
+  })
+
   it('keeps min, max and step on a number field, which are its real bounds', () => {
     const out = html({ type: 'number', min: 0, max: 120, step: 5 })
     expect(attr(out, 'min')).toBe('0')
