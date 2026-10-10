@@ -11,7 +11,7 @@ import {
   DIALOG_POPUP, DIALOG_POPUP_PASSIVE, DIALOG_TITLE, DIALOG_VIEWPORT, DIALOG_VIEWPORT_PASSIVE, DIALOG_WIDTH,
 } from './classes.js'
 import { DIALOG_DEFAULTS } from './constants.js'
-import { DialogModalContext, useDialogClose, useDialogPopup } from './hook.js'
+import { DialogModalContext, useDialogBody, useDialogClose, useDialogPopup } from './hook.js'
 import { guardEscape, hasContent } from './lib.js'
 import type {
   DialogBodyProps, DialogCloseProps, DialogDescriptionProps, DialogFooterProps, DialogHeaderProps, DialogPopupProps,
@@ -36,7 +36,7 @@ export function DialogTrigger({ className, render, ...rest }: DialogTriggerProps
 }
 
 /** The portal, the scrim, the viewport and the popup in one part. Rest props reach the
- * popup; the viewport carries the direction of the provider, which a portal cannot inherit.
+ * popup; the viewport carries the dir and the lang of the provider, which a portal cannot inherit.
  * Only a modal dialog gets the scrim: any other leaves the page behind it to the pointer. */
 export function DialogPopup({
   size = DIALOG_DEFAULTS.size,
@@ -45,12 +45,12 @@ export function DialogPopup({
   className,
   ...rest
 }: DialogPopupProps) {
-  const { direction, modal } = useDialogPopup()
+  const { dir, lang, modal } = useDialogPopup()
   const blocks = modal === true
   return (
     <Base.Portal container={container} keepMounted={keepMounted}>
       {blocks ? <Base.Backdrop className={DIALOG_BACKDROP} /> : null}
-      <Base.Viewport dir={direction} className={cn(DIALOG_VIEWPORT, !blocks && DIALOG_VIEWPORT_PASSIVE)}>
+      <Base.Viewport dir={dir} lang={lang} className={cn(DIALOG_VIEWPORT, !blocks && DIALOG_VIEWPORT_PASSIVE)}>
         <Base.Popup
           data-size={size}
           {...rest}
@@ -86,9 +86,11 @@ export function DialogDescription({ className, ...rest }: DialogDescriptionProps
   return <Base.Description {...rest} className={cn(DIALOG_DESCRIPTION, className)} />
 }
 
-/** R-10.5-1: the scroll container. The header and the footer keep their boxes around it. */
-export function DialogBody({ className, ...rest }: DialogBodyProps) {
-  return <div {...rest} className={cn(DIALOG_BODY, className)} />
+/** R-10.5-1: the scroll container. The header and the footer keep their boxes around it.
+ * While it scrolls it is a tab stop, so the keyboard reaches a text that holds no control. */
+export function DialogBody({ ref, className, ...rest }: DialogBodyProps) {
+  const body = useDialogBody(ref)
+  return <div tabIndex={body.tabIndex} {...rest} ref={body.ref} className={cn(DIALOG_BODY, className)} />
 }
 
 /** The bar that stays put below the body, for the actions. */

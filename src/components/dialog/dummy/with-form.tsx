@@ -4,8 +4,8 @@ import {
   DialogBody, DialogClose, DialogFooter, DialogHeader, DialogPopup, DialogRoot, DialogTitle, DialogTrigger,
 } from '../index.js'
 
-/** The popup renders the form, so the footer's submit button belongs to it and a Server
- * Action needs no client handler. autoFocus puts the first focus in the field, not on the x. */
+/** One form with display contents wraps the three bars, so the footer's submit button belongs
+ * to it and a Server Action needs no client handler. autoFocus puts the first focus in the field. */
 export default function Demo() {
   return (
     <DialogRoot>

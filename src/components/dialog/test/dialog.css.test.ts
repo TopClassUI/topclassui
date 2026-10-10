@@ -35,6 +35,7 @@ const DECLARATION: Record<string, string> = {
   'wrap-anywhere': 'overflow-wrap: anywhere;',
   'overflow-y-auto': 'overflow-y: auto;',
   'overscroll-contain': 'overscroll-behavior: contain;',
+  'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]': 'scroll-padding-block: calc(var(--tc-ring-width) + var(--tc-ring-offset));',
   'rounded-box': 'border-radius: min(calc(var(--tc-radius) * 1.5), 1.5rem);',
   'bg-surface-raised': 'background-color: var(--tc-surface-raised);',
   'text-body': 'color: var(--tc-body);',
@@ -134,7 +135,7 @@ describe('every class an open Dialog wears compiles with the installed Tailwind'
       DIALOG_TITLE, DIALOG_DESCRIPTION, DIALOG_BODY, DIALOG_FOOTER, DIALOG_CLOSE,
     ]).filter((cls) => cls !== '' && !elsewhere.has(cls))
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(70)
+    expect(all).toHaveLength(71)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

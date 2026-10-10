@@ -95,7 +95,7 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
   })
 
   // Read part by part: nine parts share the file, and each one is markup plus at most one hook of its own.
-  it('each part calls at most one hook: the popup for its direction, the close for its label, the rest none', () => {
+  it('each part calls at most one hook: the popup for its locale, the body for its tab stop, the close for its label', () => {
     expect(hooksByPart(source)).toEqual({
       DialogRoot: [],
       DialogTrigger: [],
@@ -103,15 +103,19 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
       DialogHeader: [],
       DialogTitle: [],
       DialogDescription: [],
-      DialogBody: [],
+      DialogBody: ['useDialogBody'],
       DialogFooter: [],
       DialogClose: ['useDialogClose'],
     })
   })
 
-  it('takes both hooks and the modal context from hook.ts, and calls no hook from anywhere else', () => {
-    expect(importedNames(source, './hook.js')).toEqual(['DialogModalContext', 'useDialogClose', 'useDialogPopup'])
-    expect(hookCallsIn(parse(source)).sort()).toEqual(['useDialogClose', 'useDialogPopup'])
+  it('takes its three hooks and the modal context from hook.ts, and calls no hook from anywhere else', () => {
+    expect(importedNames(source, './hook.js')).toEqual(['DialogModalContext', 'useDialogBody', 'useDialogClose', 'useDialogPopup'])
+    expect(hookCallsIn(parse(source)).sort()).toEqual(['useDialogBody', 'useDialogClose', 'useDialogPopup'])
+  })
+
+  it('imports neither shared hook itself: the tab stop and the locale reach the parts through hook.ts', () => {
+    expect(importedModules(source).filter((m) => m.includes('use-scroll-tab-stop') || m.includes('use-portal-locale'))).toEqual([])
   })
 
   it('takes its two pure helpers from lib.ts, so no logic is written between the tags', () => {
@@ -149,13 +153,24 @@ describe('hook.ts holds what the parts read from the provider (R-5.12-1)', () =>
     expect(source.startsWith("'use client'\n")).toBe(true)
   })
 
-  it('imports createContext and useContext from React and no hook that holds state', () => {
-    expect(importedModules(source)).toEqual(['react', '#shared/provider/context.js', './constants.js', './types.js'])
-    expect(importedNames(source, 'react')).toEqual(['createContext', 'useContext'])
+  it('imports the context and the ref hooks from React and no hook that holds state: the shared tab stop does', () => {
+    expect(importedModules(source)).toEqual([
+      'react', '#shared/provider/context.js', '#shared/provider/use-portal-locale.js', '#shared/use-scroll-tab-stop.js',
+      './constants.js', './types.js',
+    ])
+    expect(importedNames(source, 'react')).toEqual(['createContext', 'useContext', 'useImperativeHandle', 'useRef'])
   })
 
-  it('reads the direction and how modal the root is in one hook, the labels in the other', () => {
-    expect(hooksByPart(source)).toEqual({ useDialogPopup: ['useDirection', 'useContext'], useDialogClose: ['useLabels'] })
+  it('one hook per part: the locale of the portal and how modal the root is, the ref and the tab stop of the body, the label of the x', () => {
+    expect(hooksByPart(source)).toEqual({
+      useDialogPopup: ['usePortalLocale', 'useContext'],
+      useDialogBody: ['useRef', 'useImperativeHandle', 'useScrollTabStop'],
+      useDialogClose: ['useLabels'],
+    })
+  })
+
+  it('no longer reads the direction alone: useDirection answers ltr with no provider, which a portal must not be stamped with', () => {
+    expect(importedNames(source, '#shared/provider/context.js')).toEqual(['useLabels'])
   })
 })
 

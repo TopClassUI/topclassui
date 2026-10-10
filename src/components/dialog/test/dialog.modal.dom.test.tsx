@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
+import { TopClassProvider } from '#shared/provider/provider.js'
 import { Button } from '#components/button/index.js'
 import { DialogBody, DialogClose, DialogFooter, DialogHeader, DialogPopup, DialogRoot, DialogTitle, DialogTrigger } from '../index.js'
 import type { DialogPopupProps, DialogRootProps } from '../types.js'
@@ -56,12 +57,13 @@ describe('each value of modal', () => {
     expect(await opened({ modal: false })).toMatchObject({ scrims: 0, passive: [true, true], pageHidden: null, pageLocked: '' })
   })
 
-  it('a dialog that is not modal keeps its viewport, which still centres it and carries the direction', async () => {
-    const { viewport } = await opened({ modal: false })
+  it('a dialog that is not modal keeps its viewport, which still centres it and carries the direction and the language', async () => {
+    render(<TopClassProvider direction="rtl" locale="ar"><Panel defaultOpen modal={false} /></TopClassProvider>)
+    const viewport = (await screen.findByRole('dialog')).parentElement
     expect(classes(viewport)).toEqual([
       'fixed', 'inset-0', 'z-(--tc-z-dialog)', 'grid', 'place-items-center', 'p-(--tc-overlay-inset)', 'pointer-events-none',
     ])
-    expect(viewport?.getAttribute('dir')).toBe('ltr')
+    expect([viewport?.getAttribute('dir'), viewport?.getAttribute('lang')]).toEqual(['rtl', 'ar'])
   })
 
   it('follows the nearest root: a panel that is not modal, opened from inside a modal dialog, draws no scrim of its own', async () => {

@@ -41,9 +41,11 @@ import {
   it draws. `DialogRoot` draws none.
 - **Scrolling.** `DialogBody` scrolls. The header and the footer stay put. On a screen
   under 272 px tall the whole popup scrolls instead.
-- **Labels.** A label goes inside the Button passed to `render`, never on `DialogTrigger`
-  or `DialogClose`: a Server Component renders that Button first, and a label left on
-  the part is then dropped.
+- **Labels.** Two forms work, on `DialogTrigger` and on `DialogClose`:
+  `render={<Button>Publish</Button>}`, and `render={<Button />}` with `Publish` as children.
+  On a server page only the first keeps the ellipsis of a long label, so the demos use it.
+- **Disabled.** Write `disabled` on the Button passed to `render`. Written on the part
+  alone, a Button from a server page looks disabled but is announced as enabled.
 - **A name.** `DialogTitle` names the dialog. With no title, pass `aria-label` to
   `DialogPopup`.
 - **Size.** `size` on `DialogPopup` is the widest it grows: 320, 360, 400, 512 or 640 px.
@@ -55,14 +57,14 @@ import {
 - **First focus.** It lands on the x. A form puts `autoFocus` on its first field.
 - **Focus back.** It returns to the trigger. If closing removes the trigger, pass
   `finalFocus` to `DialogPopup` from a client file: `() => theElementThatTakesIt`.
-- **A long text.** A body that scrolls and holds no control takes `tabIndex={0}`, so the
-  keyboard reaches it in every browser. Chrome reaches it anyway; axe still asks for it.
+- **A long text.** While `DialogBody` scrolls it is a tab stop, so the keyboard reaches a
+  text with no control in it. You write no `tabIndex`; `tabIndex={-1}` opts out.
 - **A long action.** In the footer a label too long for one row wraps onto two lines.
 - **A row in the body.** Give a row of a label and a control `flex-wrap`, or a control
   that cannot shrink squeezes the label to one letter per line.
 - **Escape.** It closes one thing: a tooltip open inside the dialog first, then the dialog.
-- **Arabic inside an English page.** The popup takes its direction from the nearest
-  `TopClassProvider`. Its language it does not: pass `lang` to `DialogPopup`.
+- **Arabic inside an English page.** The popup takes its direction and its language from
+  the nearest `TopClassProvider`. With no provider it takes those of the page.
 
 ### A confirm
 

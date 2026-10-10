@@ -424,6 +424,99 @@ test.describe('the long body', () => {
   })
 })
 
+// No demo writes a tabIndex: the body takes one from useScrollTabStop for as long as its content overflows it.
+test.describe('the body is a tab stop only while it scrolls', () => {
+  test('a body that holds all it has takes no tabindex, so Tab goes from the x straight to the actions', async ({ page }) => {
+    const popup = await open(page, 'dialog--basic', { by: 'keyboard' })
+    expect((await partsOf(popup)).scrollable, 'px the body scrolls').toBe(0)
+    await expect(bodyOf(popup)).not.toHaveAttribute('tabindex')
+    expect(await pressInside(page, popup, 'Tab')).toBe('Cancel')
+  })
+
+  test('a body that scrolls takes tabindex 0: it is the stop after the x, and the arrow keys scroll it', async ({ page }) => {
+    const popup = await open(page, 'dialog--long-body', { by: 'keyboard' })
+    expect((await partsOf(popup)).scrollable, 'px the body scrolls').toBeGreaterThan(1000)
+    await expect(bodyOf(popup)).toHaveAttribute('tabindex', '0')
+    await page.keyboard.press('Tab')
+    await expect(bodyOf(popup)).toBeFocused()
+    await page.keyboard.press('ArrowDown')
+    await expect.poll(async () => (await partsOf(popup)).scrollTop).toBeGreaterThan(0)
+    expect(await pressInside(page, popup, 'Tab')).toBe('Decline')
+  })
+
+  test('it becomes a stop when the screen shrinks under its text, and stops being one when the screen grows back', async ({ page }) => {
+    const popup = await open(page, 'dialog--long-content')
+    expect((await partsOf(popup)).scrollable, 'px the body scrolls at 1280 x 720').toBe(0)
+    await expect(bodyOf(popup)).not.toHaveAttribute('tabindex')
+
+    await page.setViewportSize({ width: 320, height: 480 })
+    await expect(bodyOf(popup)).toHaveAttribute('tabindex', '0')
+    expect((await partsOf(popup)).scrollable, 'px the body scrolls at 320 x 480').toBe(180)
+
+    await page.setViewportSize({ width: 1280, height: 720 })
+    await expect(bodyOf(popup)).not.toHaveAttribute('tabindex')
+    expect(await liveErrors(page)).toEqual([])
+  })
+})
+
+// BRO-1 and A11-1. Tab scrolls a control only just into view, flush with the edge of the box that scrolls it,
+// and the ring is drawn 4 px outside the control: SCROLL_AREA keeps that much clear with scroll-padding.
+test.describe('twenty fields in the body', () => {
+  /** Adds twenty copies of the demo's field to the body, named f0 to f19, and says which box scrolls now and how far. */
+  const addFields = (popup: Locator) => bodyOf(popup).evaluate((body) => {
+    const field = body.querySelector('input')
+    // Not its parent: in this demo a form with display contents sits between the two.
+    const popupBox = body.closest('[role="dialog"]')
+    if (!field || !popupBox) throw new Error('the body holds no field')
+    for (let index = 0; index < 20; index++) {
+      const copy = field.cloneNode(true) as HTMLInputElement
+      copy.id = `f${String(index)}`
+      copy.name = copy.id
+      copy.removeAttribute('autofocus')
+      body.append(copy)
+    }
+    const far = (box: Element) => box.scrollHeight - box.clientHeight
+    return { body: far(body) > 0, popup: far(popupBox) > 0 }
+  })
+
+  /** The room between the focused field and the two block edges of the box that scrolls it, inside that box's line. */
+  const roomOf = (popup: Locator) => bodyOf(popup).evaluate((body) => {
+    const scroller = getComputedStyle(body).overflowY === 'visible' ? body.closest('[role="dialog"]') ?? body : body
+    const top = scroller.getBoundingClientRect().top + scroller.clientTop
+    const field = (document.activeElement ?? body).getBoundingClientRect()
+    return { above: field.top - top, below: top + scroller.clientHeight - field.bottom }
+  })
+
+  for (const [width, height, scrolls] of [
+    [390, 844, { body: true, popup: false }], [1280, 800, { body: true, popup: false }],
+    // Under 272 px the popup is the one scroller, and it carries the same class.
+    [320, 256, { body: false, popup: true }],
+  ] as const) {
+    for (const direction of DIRECTIONS) {
+      test(`${String(width)} x ${String(height)} ${direction}: every field Tab brings into view keeps the 4 px its ring reaches, forward and back`, async ({ page }) => {
+        await page.setViewportSize({ width, height })
+        const popup = await open(page, 'dialog--with-form', { direction, by: 'keyboard' })
+        expect(await addFields(popup), 'which box scrolls').toEqual(scrolls)
+
+        const cut: string[] = []
+        const visit = async (key: 'Tab' | 'Shift+Tab', index: number) => {
+          await page.keyboard.press(key)
+          await expect(popup.locator(`#f${String(index)}`)).toBeFocused()
+          const { above, below } = await roomOf(popup)
+          if (above < 4 || below < 4) cut.push(`${key} to f${String(index)}: ${String(above)} px above, ${String(below)} px below`)
+        }
+        for (let index = 0; index < 20; index++) await visit('Tab', index)
+        // The ring those 4 px are for: 2 px wide, 2 px away from the field.
+        await expect(popup.locator('#f19')).toHaveCSS('outline-style', 'solid')
+        await expect(popup.locator('#f19')).toHaveCSS('outline-width', '2px')
+        await expect(popup.locator('#f19')).toHaveCSS('outline-offset', '2px')
+        for (let index = 18; index >= 0; index--) await visit('Shift+Tab', index)
+        expect(cut).toEqual([])
+      })
+    }
+  }
+})
+
 test.describe('inside the viewport', () => {
   for (const screen of SCREENS) {
     for (const direction of DIRECTIONS) {
@@ -535,6 +628,22 @@ test.describe('a screen under 272 px tall', () => {
       await expectNoSidewaysScroll(page)
     })
   }
+
+  // The popup is tabindex -1: no stop of its own. Every control is inside it, so the keys that scroll act on it.
+  test('320 x 256: the body is no tab stop there, and End, pressed on the x, scrolls the popup to its last action', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 256 })
+    const popup = await open(page, 'dialog--long-body', { by: 'keyboard' })
+    await expect(bodyOf(popup)).not.toHaveAttribute('tabindex')
+    await expect(popup).toHaveAttribute('tabindex', '-1')
+    await expect(xOf(popup)).toBeFocused()
+    expect(await popup.evaluate((el) => el.scrollHeight - el.clientHeight), 'px the popup scrolls').toBeGreaterThan(3000)
+
+    await page.keyboard.press('End')
+    await expect.poll(() => popup.evaluate((el) => el.scrollHeight - el.clientHeight - el.scrollTop), { message: 'px of popup still below' }).toBe(0)
+    expect((await partsOf(popup)).footer.bottom).toBe((await boxOf(popup)).bottom - 1)
+    await expect(xOf(popup)).toBeFocused()
+    expect((await axe(page)).violations).toEqual([])
+  })
 
   test('568 x 320, a phone on its side: tall enough, so the bars stay put and the body is the one scroller', async ({ page }) => {
     await page.setViewportSize({ width: 568, height: 320 })
@@ -712,12 +821,50 @@ test.describe('direction', () => {
     expect(await layoutOf(popup)).toMatchObject({ xFromLeft: 21, titleFromRight: 21, secondFromLeft: 21, firstIsRightOfSecond: true })
     // Named by the island's own labels, not the page's.
     await expect(xOf(popup)).toHaveAttribute('aria-label', CLOSE.ar)
+
+    // And read in the island's language: the viewport carries the locale of the provider, and no demo writes lang.
+    const languages = await popup.evaluate((element) => ({
+      page: document.documentElement.lang,
+      viewport: element.parentElement?.getAttribute('lang') ?? null,
+      popup: element.getAttribute('lang'),
+      arabic: element.matches(':lang(ar)'),
+      english: element.matches(':lang(en)'),
+    }))
+    expect(languages).toEqual({ page: 'en', viewport: 'ar', popup: null, arabic: true, english: false })
   })
 
   test('the same demo on the RTL page is laid out the same way', async ({ page }) => {
     const popup = await open(page, 'dialog--rtl', { direction: 'rtl' })
     expect(await layoutOf(popup)).toMatchObject({ xFromLeft: 21, titleFromRight: 21, secondFromLeft: 21, firstIsRightOfSecond: true })
   })
+
+  /** What a dialog must inherit from each page when no provider tells it, written out. */
+  const INHERITED = {
+    ltr: { direction: 'ltr', arabic: false, english: true, layout: { xFromRight: 21, titleFromLeft: 21, secondFromRight: 21, firstIsRightOfSecond: false } },
+    rtl: { direction: 'rtl', arabic: true, english: false, layout: { xFromLeft: 21, titleFromRight: 21, secondFromLeft: 21, firstIsRightOfSecond: true } },
+  } as const
+
+  // R-13-1 asks for the provider and the harness always mounts one, so this dialog comes from a fixture module.
+  for (const direction of DIRECTIONS) {
+    test(`with no provider at all, on the ${direction} page: nothing is stamped on the viewport, and the dialog is laid out as its page is`, async ({ page }) => {
+      await openLive(page, 'separator--horizontal', { direction })
+      await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/dialog-no-provider.tsx' })
+      const popup = await openOverlay(page, page.locator('#no-provider button'))
+      const read = await popup.evaluate((element) => ({
+        dir: element.parentElement?.getAttribute('dir') ?? null,
+        lang: element.parentElement?.getAttribute('lang') ?? null,
+        direction: getComputedStyle(element).direction,
+        arabic: element.matches(':lang(ar)'),
+        english: element.matches(':lang(en)'),
+      }))
+      const { layout, ...inherited } = INHERITED[direction]
+      expect(read).toEqual({ dir: null, lang: null, ...inherited })
+      expect(await layoutOf(popup)).toMatchObject(layout)
+      // With no provider the labels are the English defaults, on either page.
+      await expect(xOf(popup)).toHaveAttribute('aria-label', CLOSE.en)
+      expect(await liveErrors(page)).toEqual([])
+    })
+  }
 })
 
 for (const scheme of ['light', 'dark'] as const) {

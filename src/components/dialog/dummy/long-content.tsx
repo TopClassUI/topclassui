@@ -10,7 +10,7 @@ const FILE = 'quarterly-report-final-v2-reviewed-by-legal-and-finance-and-signed
 
 /** Hostile content: a title of many lines, a word of 300 characters and three long actions.
  * The title wraps beside the x, the word breaks inside the body, and a long action wraps onto
- * two lines. On a small phone the body scrolls, so it takes tabIndex for the keyboard. */
+ * two lines. On a small phone the body scrolls, and is a tab stop for as long as it does. */
 export default function Demo() {
   return (
     <DialogRoot>
@@ -20,7 +20,7 @@ export default function Demo() {
           <DialogTitle>{TITLE}</DialogTitle>
           <DialogDescription>{FILE}</DialogDescription>
         </DialogHeader>
-        <DialogBody tabIndex={0}>{WORD}</DialogBody>
+        <DialogBody>{WORD}</DialogBody>
         <DialogFooter>
           <DialogClose render={<Button variant="outline">Keep it where it is</Button>} />
           <DialogClose render={<Button variant="outline">Move a copy and keep the original</Button>} />

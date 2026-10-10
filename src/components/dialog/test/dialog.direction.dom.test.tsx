@@ -57,13 +57,53 @@ describe('the viewport carries the direction of its provider, because its portal
     expect(popup.querySelectorAll('[dir]')).toHaveLength(0)
   })
 
-  it('falls back to ltr with no provider, the direction a page without one is read in', async () => {
-    expect((await opened(dialog())).viewport?.getAttribute('dir')).toBe('ltr')
+  it('writes no dir at all with no provider, so the dialog is laid out as its page is', async () => {
+    const { viewport, popup } = await opened(dialog())
+    expect(viewport?.hasAttribute('dir')).toBe(false)
+    expect(popup.closest('[dir]')).toBeNull()
   })
 
   it('leaves a dir the caller writes on the popup alone, for one dialog in the other script', async () => {
     const { popup, viewport } = await opened(rtl(dialog({ dir: 'ltr' })))
     expect(popup.getAttribute('dir')).toBe('ltr')
     expect(viewport?.getAttribute('dir')).toBe('rtl')
+  })
+})
+
+// A screen reader picks its voice by lang, and a portal in the body would be read in the language of the page.
+describe('the viewport carries the language of its provider as well', () => {
+  it('is ar inside an Arabic provider', async () => {
+    expect((await opened(rtl(dialog()))).viewport?.getAttribute('lang')).toBe('ar')
+  })
+
+  it('is en inside an English one', async () => {
+    expect((await opened(ltr(dialog()))).viewport?.getAttribute('lang')).toBe('en')
+  })
+
+  it('is the locale as the provider was given it, region and all', async () => {
+    const tree = <TopClassProvider direction="rtl" locale="ar-EG">{dialog()}</TopClassProvider>
+    expect((await opened(tree)).viewport?.getAttribute('lang')).toBe('ar-EG')
+  })
+
+  it('is that of the nearest provider, for an Arabic island on an English page', async () => {
+    expect((await opened(ltr(rtl(dialog())))).viewport?.getAttribute('lang')).toBe('ar')
+  })
+
+  it('is written once, on the viewport: the popup and the scrim carry none', async () => {
+    const { popup, scrim } = await opened(rtl(dialog()))
+    expect(popup.hasAttribute('lang')).toBe(false)
+    expect(scrim?.hasAttribute('lang')).toBe(false)
+  })
+
+  it('is not written at all with no provider, so the language of the page applies', async () => {
+    const { viewport, popup } = await opened(dialog())
+    expect(viewport?.hasAttribute('lang')).toBe(false)
+    expect(popup.closest('[lang]')).toBeNull()
+  })
+
+  it('leaves a lang the caller writes on the popup alone, for one dialog in another language', async () => {
+    const { popup, viewport } = await opened(rtl(dialog({ lang: 'fr' })))
+    expect(popup.getAttribute('lang')).toBe('fr')
+    expect(viewport?.getAttribute('lang')).toBe('ar')
   })
 })

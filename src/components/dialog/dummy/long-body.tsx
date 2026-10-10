@@ -17,7 +17,7 @@ export default function Demo() {
           <DialogTitle>Terms of service</DialogTitle>
           <DialogDescription>Forty clauses. Scroll to read them all.</DialogDescription>
         </DialogHeader>
-        <DialogBody tabIndex={0} className="grid gap-3">
+        <DialogBody className="grid gap-3">
           {CLAUSES.map((clause) => (
             <p key={clause}>
               Clause {clause}. You keep the rights to what you publish, and you let us store it and show it

@@ -101,8 +101,9 @@ describe('every element carries exactly the classes the spec names', () => {
       'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line', 'data-ending-style:opacity-0',
       'data-ending-style:scale-95', 'data-starting-style:opacity-0', 'data-starting-style:scale-95',
       'duration-(--tc-duration)', 'ease-out', 'flex', 'flex-col', 'max-h-[calc(100dvh-2*var(--tc-overlay-inset))]',
-      'max-w-100', 'origin-(--transform-origin)', 'overflow-y-auto', 'overscroll-contain', 'rounded-box', 'shadow-lg',
-      'text-body', 'transition-[opacity,scale]', 'w-full', 'wrap-anywhere',
+      'max-w-100', 'origin-(--transform-origin)', 'overflow-y-auto', 'overscroll-contain', 'rounded-box',
+      'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]', 'shadow-lg', 'text-body', 'transition-[opacity,scale]',
+      'w-full', 'wrap-anywhere',
     ].sort())
   })
 
@@ -126,7 +127,8 @@ describe('every element carries exactly the classes the spec names', () => {
     expect(classes((await opened()).body)).toEqual([
       ...RING_INSET,
       '[@media(height<17rem)]:overflow-y-visible', '[@media(height<17rem)]:shrink-0', 'flex-1', 'min-h-15',
-      'overflow-y-auto', 'overscroll-contain', 'px-5', 'py-5', 'text-muted', 'text-sm',
+      'overflow-y-auto', 'overscroll-contain', 'px-5', 'py-5', 'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]',
+      'text-muted', 'text-sm',
     ].sort())
   })
 

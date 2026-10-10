@@ -6,15 +6,15 @@ import {
 } from '../index.js'
 
 /** Arabic, inside TopClassProvider as the root layout would mount it. The popup is portaled
- * into the body, so it takes its direction from the provider: the x is on the left, the text
- * is right-aligned and the actions end at the left, on an English page too. */
+ * into the body, so it takes its direction and its language from the provider: the x is on
+ * the left, the text is right-aligned and the actions end at the left, on an English page too. */
 export default function Demo() {
   return (
     <TopClassProvider direction="rtl" locale="ar">
       <div dir="rtl" lang="ar">
         <DialogRoot>
           <DialogTrigger render={<Button>نشر</Button>} />
-          <DialogPopup lang="ar">
+          <DialogPopup>
             <DialogHeader>
               <DialogTitle>نشر التغييرات</DialogTitle>
               <DialogDescription>تظهر تغييراتك للجميع فورًا.</DialogDescription>

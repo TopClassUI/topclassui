@@ -1,3 +1,6 @@
+import { readdirSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ComponentType } from 'react'
@@ -41,16 +44,28 @@ describe('what the demos show of the props', () => {
     await waitFor(() => { expect(document.activeElement).toBe(popup.querySelector('input[name="name"]')) })
   })
 
-  it('long-body: the body can take focus, so a keyboard reaches a text with no control in it', async () => {
+  it('long-body: forty clauses in the body, which writes no tabindex of its own: nothing has a size here to overflow', async () => {
     const popup = await openFirst('long-body')
-    expect(popup.children[1]?.getAttribute('tabindex')).toBe('0')
     expect(popup.children[1]?.querySelectorAll('p')).toHaveLength(40)
+    expect(popup.children[1]?.hasAttribute('tabindex')).toBe(false)
   })
 
-  it('rtl: the popup carries the language its portal would lose, and its viewport the direction', async () => {
+  it('rtl: the viewport carries the direction and the language its portal would lose, and the popup writes neither', async () => {
     const popup = await openFirst('rtl')
-    expect(popup.getAttribute('lang')).toBe('ar')
-    expect(popup.parentElement?.getAttribute('dir')).toBe('rtl')
+    expect([popup.parentElement?.getAttribute('dir'), popup.parentElement?.getAttribute('lang')]).toEqual(['rtl', 'ar'])
+    expect([popup.hasAttribute('dir'), popup.hasAttribute('lang')]).toEqual([false, false])
+  })
+
+  // The body takes its tab stop from its hook and the viewport its language from the provider, so no demo teaches either by hand.
+  it('no demo writes a tabIndex, or a lang on a part of the dialog', () => {
+    const byHand = /tabIndex|<Dialog\w+[^>]*\slang=/
+    const DUMMY = join(import.meta.dirname, '..', 'dummy')
+    const files = readdirSync(DUMMY).filter((file) => file.endsWith('.tsx'))
+    expect(files).toHaveLength(12)
+    expect(files.filter((file) => byHand.test(readFileSync(join(DUMMY, file), 'utf8')))).toEqual([])
+    expect(byHand.test('<DialogPopup size="xs" lang="ar">')).toBe(true)
+    expect(byHand.test('<DialogBody tabIndex={0}>')).toBe(true)
+    expect(byHand.test('<div dir="rtl" lang="ar">')).toBe(false)
   })
 
   it('sizes: custom carries the width of its className and no width of ours', async () => {
@@ -67,10 +82,6 @@ describe('what the demos show of the props', () => {
     expect(description?.parentElement).toBe(popup.children[1])
     // Announced as a dialog: no AlertDialog is built.
     expect(popup.getAttribute('role')).toBe('dialog')
-  })
-
-  it('long-content: the body can take focus too, because on a small phone it scrolls', async () => {
-    expect((await openFirst('long-content')).children[1]?.getAttribute('tabindex')).toBe('0')
   })
 
   it('non-modal: no scrim, and the page behind is left to the reader and the pointer', async () => {

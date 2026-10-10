@@ -4,6 +4,7 @@ import type { Mutation } from '../lib/mutate.js'
 const CLIENT = 'src/components/dialog/client.tsx'
 const CLASSES = 'src/components/dialog/classes.ts'
 const LIB = 'src/components/dialog/lib.ts'
+const HOOK = 'src/components/dialog/hook.ts'
 const DUMMY = 'src/components/dialog/dummy'
 
 /** The ring drawn outside the box, as FOCUS_RING writes it: what the popup wore before it was moved inside. */
@@ -121,8 +122,56 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog viewport loses the direction of its provider, so the dialog of an RTL island has its x on the right and its text left-aligned',
     file: CLIENT,
-    from: '<Base.Viewport dir={direction} className=',
-    to: '<Base.Viewport className=',
+    from: '<Base.Viewport dir={dir} lang={lang} className=',
+    to: '<Base.Viewport lang={lang} className=',
+  },
+  {
+    label: 'the dialog viewport loses the language of its provider, so an Arabic dialog on an English page is read in an English voice',
+    file: CLIENT,
+    from: '<Base.Viewport dir={dir} lang={lang} className=',
+    to: '<Base.Viewport dir={dir} className=',
+  },
+  {
+    label: 'the dialog viewport is stamped ltr when no provider is mounted, so on an RTL page with none the dialog is laid out left to right',
+    file: CLIENT,
+    from: '<Base.Viewport dir={dir} lang={lang} className=',
+    to: "<Base.Viewport dir={dir ?? 'ltr'} lang={lang} className=",
+  },
+  {
+    label: 'the dialog popup hook reads the direction of its provider and forgets the language',
+    file: HOOK,
+    from: 'return { ...usePortalLocale(), modal: useContext(DialogModalContext) }',
+    to: 'return { dir: usePortalLocale().dir, lang: undefined, modal: useContext(DialogModalContext) }',
+  },
+  {
+    label: 'the dialog body takes no tabIndex from its hook, so a long text with no control in it is out of reach of the keyboard',
+    file: CLIENT,
+    from: 'return <div tabIndex={body.tabIndex} {...rest} ref={body.ref}',
+    to: 'return <div {...rest} ref={body.ref}',
+  },
+  {
+    label: 'the tabIndex of the dialog body is written after the rest props, so tabIndex={-1} from a caller no longer opts out',
+    file: CLIENT,
+    from: 'return <div tabIndex={body.tabIndex} {...rest} ref={body.ref}',
+    to: 'return <div {...rest} tabIndex={body.tabIndex} ref={body.ref}',
+  },
+  {
+    label: 'the dialog body never hands its element to its hook, so nothing is measured and it is never a tab stop',
+    file: CLIENT,
+    from: '{...rest} ref={body.ref} className={cn(DIALOG_BODY, className)}',
+    to: '{...rest} className={cn(DIALOG_BODY, className)}',
+  },
+  {
+    label: 'the ref a caller passes to the dialog body is taken by the hook and never filled',
+    file: HOOK,
+    from: '  useImperativeHandle(forwarded, () => ref.current as HTMLDivElement, [])\n',
+    to: '',
+  },
+  {
+    label: 'the dialog body is a tab stop whether or not it scrolls, so Tab stops on every one-line body',
+    file: HOOK,
+    from: 'return { ref, tabIndex: useScrollTabStop(ref) }',
+    to: 'return { ref, tabIndex: 0 as const }',
   },
   {
     label: 'a dialog that is not modal still draws its scrim, so the page it leaves usable is dimmed',
@@ -233,10 +282,10 @@ export const MUTATIONS: Mutation[] = [
     to: '<div className={cn(DIALOG_HEADER, className)}>',
   },
   {
-    label: 'the dialog body drops the rest props, so the tabIndex that lets a keyboard reach a long text never arrives',
+    label: 'the dialog body drops the rest props, so an id, a role and a tabIndex of the caller never reach it',
     file: CLIENT,
-    from: 'return <div {...rest} className={cn(DIALOG_BODY, className)} />',
-    to: 'return <div className={cn(DIALOG_BODY, className)}>{rest.children}</div>',
+    from: 'return <div tabIndex={body.tabIndex} {...rest} ref={body.ref} className={cn(DIALOG_BODY, className)} />',
+    to: 'return <div tabIndex={body.tabIndex} ref={body.ref} className={cn(DIALOG_BODY, className)}>{rest.children}</div>',
   },
   {
     label: 'the dialog x loses its name, so a screen reader announces a button and nothing else',
@@ -295,8 +344,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog popup gains a second hook call, where a part may hold only the one from hook.ts (R-5.12-1)',
     file: CLIENT,
-    from: '  const { direction, modal } = useDialogPopup()\n',
-    to: '  const { direction, modal } = useDialogPopup()\n  useDialogClose()\n',
+    from: '  const { dir, lang, modal } = useDialogPopup()\n',
+    to: '  const { dir, lang, modal } = useDialogPopup()\n  useDialogClose()\n',
   },
   {
     label: 'the dialog default size becomes lg, so a dialog with no size is 512 px wide',
@@ -329,16 +378,16 @@ export const MUTATIONS: Mutation[] = [
     to: '<form>',
   },
   {
-    label: 'the dialog long-body demo drops its tabIndex, so axe reports a scrolling region the keyboard cannot reach',
+    label: 'the dialog long-body demo writes a tabIndex by hand again, which the body now takes for itself only while it scrolls',
     file: `${DUMMY}/long-body.tsx`,
-    from: '<DialogBody tabIndex={0} className="grid gap-3">',
-    to: '<DialogBody className="grid gap-3">',
+    from: '<DialogBody className="grid gap-3">',
+    to: '<DialogBody tabIndex={0} className="grid gap-3">',
   },
   {
-    label: 'the dialog long-content demo drops its tabIndex, so on a 320 px phone its scrolling body is out of reach of the keyboard',
-    file: `${DUMMY}/long-content.tsx`,
-    from: '<DialogBody tabIndex={0}>{WORD}</DialogBody>',
-    to: '<DialogBody>{WORD}</DialogBody>',
+    label: 'the dialog rtl demo writes lang on its popup by hand again, which the viewport now takes from the provider',
+    file: `${DUMMY}/rtl.tsx`,
+    from: '          <DialogPopup>\n',
+    to: '          <DialogPopup lang="ar">\n',
   },
   {
     label: 'the dialog confirm demo loses disablePointerDismissal, so a stray press outside dismisses a destructive question',

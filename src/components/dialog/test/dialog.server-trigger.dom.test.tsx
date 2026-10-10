@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import type { ReactElement } from 'react'
+import { createElement, type ReactElement } from 'react'
 import { describe, expect, it } from 'vitest'
 
 import { Button } from '#components/button/index.js'
@@ -12,6 +12,10 @@ const serverButton = (label: string) => Button({ children: label })
 /** How Flight delivers that element to a client file: a lazy wrapper with no props of its own. */
 const lazy = (element: ReactElement) =>
   ({ $$typeof: Symbol.for('react.lazy'), _payload: element, _init: (p: ReactElement) => p }) as unknown as ReactElement
+
+/** As the Flight client of React 19.3.0 delivers an element: a key whose value is undefined is deleted on the way. */
+const delivered = (element: ReactElement) =>
+  createElement(element.type, Object.fromEntries(Object.entries(element.props as object).filter(([, value]) => value !== undefined)))
 
 const FORMS = [
   ['as a host element', serverButton],
@@ -101,14 +105,52 @@ describe('a DialogClose className does the same to a Button rendered on the serv
   })
 })
 
-// A Button that already ran carries its own children key, empty, and a render element's props win over the part's.
-describe('a label left on the part is dropped by a Button rendered on the server', () => {
-  it('on the trigger: the button comes out empty, with no name at all', () => {
-    const button = trigger({ render: Button({}), children: 'Publish' })
-    expect(button.innerHTML).toBe('')
+// Called by hand, a Button with no label keeps a children key that holds nothing; Flight would have deleted it.
+describe('a label left on the part survives a Button that ran on the server with none of its own', () => {
+  for (const [form, bare] of [
+    ['called by hand, as a host element', () => Button({})],
+    ['called by hand, in a lazy wrapper', () => lazy(Button({}))],
+    ['as Flight delivers it, with its empty keys deleted', () => delivered(Button({}))],
+  ] as const) {
+    it(`on the trigger, ${form}: the button keeps the text, bare, which is its only name`, () => {
+      expect(trigger({ render: bare(), children: 'Publish' }).innerHTML).toBe('Publish')
+    })
+
+    it(`on the close, ${form}: the same, and it is not the x`, async () => {
+      const button = await close({ render: bare(), children: 'Cancel' })
+      expect(button.innerHTML).toBe('Cancel')
+      expect(button.getAttribute('aria-label')).toBeNull()
+    })
+  }
+
+  it('only the Button that was given the label wraps it in the span that truncates it', () => {
+    expect(trigger({ render: delivered(Button({ children: 'Publish' })) }).innerHTML).toBe('<span class="truncate min-w-0">Publish</span>')
+  })
+})
+
+// A Button that ran on the server carries disabled: false, a key Flight keeps, and a render element's props win.
+describe('disabled on the part, around a Button that ran on the server', () => {
+  const state = (button: HTMLButtonElement) => ({ native: button.disabled, marked: button.hasAttribute('data-disabled') })
+
+  it('a Button written in a client file is disabled natively, and marked', () => {
+    expect(state(trigger({ disabled: true, render: <Button />, children: 'Publish' }) as HTMLButtonElement)).toEqual({ native: true, marked: true })
   })
 
-  it('on the close: the same, in a lazy wrapper too', async () => {
-    expect((await close({ render: lazy(Button({})), children: 'Cancel' })).innerHTML).toBe('')
+  it('a server-built Button loses the native attribute: it is only marked, so it looks disabled and is announced as enabled', () => {
+    const button = trigger({ disabled: true, render: delivered(Button({})), children: 'Publish' }) as HTMLButtonElement
+    expect(state(button)).toEqual({ native: false, marked: true })
+    expect(button.getAttribute('aria-disabled')).toBeNull()
+    // Base UI still refuses the press, so the dialog stays shut.
+    button.click()
+    expect(screen.queryByRole('dialog')).toBeNull()
+  })
+
+  it('the same on the close', async () => {
+    expect(state(await close({ disabled: true, render: delivered(Button({})), children: 'Cancel' }))).toEqual({ native: false, marked: true })
+  })
+
+  it('written on the Button itself, disabled crosses whole: that is the form to write on a server page', () => {
+    const button = trigger({ render: delivered(Button({ disabled: true, children: 'Publish' })) }) as HTMLButtonElement
+    expect(button.disabled).toBe(true)
   })
 })
