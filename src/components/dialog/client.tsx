@@ -3,16 +3,17 @@
 import { Dialog as Base } from '@base-ui/react/dialog'
 
 import { x } from '#icons/data/x.js'
+import { POPUP_PASSIVE, VIEWPORT_PASSIVE } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
-import { renderTrigger } from '#shared/render-trigger.js'
+import { guardEscape } from '#shared/overlay.js'
+import { hasContent, renderTrigger } from '#shared/render-trigger.js'
 import { Svg } from '#components/svg/index.js'
 import {
   DIALOG_BACKDROP, DIALOG_BODY, DIALOG_CLOSE, DIALOG_DESCRIPTION, DIALOG_FOOTER, DIALOG_HEADER, DIALOG_HEADING,
-  DIALOG_POPUP, DIALOG_POPUP_PASSIVE, DIALOG_TITLE, DIALOG_VIEWPORT, DIALOG_VIEWPORT_PASSIVE, DIALOG_WIDTH,
+  DIALOG_POPUP, DIALOG_TITLE, DIALOG_VIEWPORT, DIALOG_WIDTH,
 } from './classes.js'
 import { DIALOG_DEFAULTS } from './constants.js'
 import { DialogModalContext, useDialogBody, useDialogClose, useDialogPopup } from './hook.js'
-import { guardEscape, hasContent } from './lib.js'
 import type {
   DialogBodyProps, DialogCloseProps, DialogDescriptionProps, DialogFooterProps, DialogHeaderProps, DialogPopupProps,
   DialogRootProps, DialogTitleProps, DialogTriggerProps,
@@ -50,11 +51,11 @@ export function DialogPopup({
   return (
     <Base.Portal container={container} keepMounted={keepMounted}>
       {blocks ? <Base.Backdrop className={DIALOG_BACKDROP} /> : null}
-      <Base.Viewport dir={dir} lang={lang} className={cn(DIALOG_VIEWPORT, !blocks && DIALOG_VIEWPORT_PASSIVE)}>
+      <Base.Viewport dir={dir} lang={lang} className={cn(DIALOG_VIEWPORT, !blocks && VIEWPORT_PASSIVE)}>
         <Base.Popup
           data-size={size}
           {...rest}
-          className={cn(DIALOG_POPUP, !blocks && DIALOG_POPUP_PASSIVE, DIALOG_WIDTH[size], className)}
+          className={cn(DIALOG_POPUP, !blocks && POPUP_PASSIVE, DIALOG_WIDTH[size], className)}
         />
       </Base.Viewport>
     </Base.Portal>

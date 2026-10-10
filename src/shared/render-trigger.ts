@@ -29,3 +29,11 @@ export function renderTrigger<Render>(
   const merged = className === undefined ? {} : { className: cn(own.props.className, className) }
   return { render: bare ? withoutChildren(own, merged) : cloneElement(own, merged), className: undefined }
 }
+
+/** Whether children put anything on the page, which decides between a part's built-in control and
+ * the caller's own. React draws nothing for null, undefined, a boolean or an empty string, so
+ * `{saving && 'Saving'}` is no content while it is false. */
+export function hasContent(children: unknown): boolean {
+  if (Array.isArray(children)) return children.some(hasContent)
+  return children !== null && children !== undefined && typeof children !== 'boolean' && children !== ''
+}

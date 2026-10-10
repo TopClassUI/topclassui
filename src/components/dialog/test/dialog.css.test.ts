@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
+import { ACTIONS_WRAP, POPUP_PASSIVE, VIEWPORT_PASSIVE } from '#shared/classes.js'
 import { compileEntry } from '#test/stylesheet.js'
 import {
-  DIALOG_ACTION_WRAP, DIALOG_BACKDROP, DIALOG_BODY, DIALOG_BODY_SHORT, DIALOG_CLOSE, DIALOG_DESCRIPTION, DIALOG_FOOTER,
-  DIALOG_HEADER, DIALOG_HEADING, DIALOG_POPUP, DIALOG_POPUP_PASSIVE, DIALOG_TITLE, DIALOG_VIEWPORT,
-  DIALOG_VIEWPORT_PASSIVE, DIALOG_WIDTH,
+  DIALOG_BACKDROP, DIALOG_BODY, DIALOG_BODY_SHORT, DIALOG_CLOSE, DIALOG_DESCRIPTION, DIALOG_FOOTER, DIALOG_HEADER,
+  DIALOG_HEADING, DIALOG_POPUP, DIALOG_TITLE, DIALOG_VIEWPORT, DIALOG_WIDTH,
 } from '../classes.js'
 
 // The static harness never opens a popup, so none of these classes reaches Tailwind there.
@@ -129,7 +129,7 @@ describe('every class an open Dialog wears compiles with the installed Tailwind'
 
   // The classes that only act on a short screen, in a footer action or in a dialog that is not modal have a file of their own.
   it('the table names exactly the classes of the eleven strings in classes.ts, less those dialog.css.layout.test.ts holds', () => {
-    const elsewhere = new Set(written([DIALOG_BODY_SHORT, DIALOG_ACTION_WRAP, DIALOG_VIEWPORT_PASSIVE, DIALOG_POPUP_PASSIVE]))
+    const elsewhere = new Set(written([DIALOG_BODY_SHORT, ACTIONS_WRAP, VIEWPORT_PASSIVE, POPUP_PASSIVE]))
     const all = written([
       DIALOG_BACKDROP, DIALOG_VIEWPORT, DIALOG_POPUP, ...Object.values(DIALOG_WIDTH), DIALOG_HEADER, DIALOG_HEADING,
       DIALOG_TITLE, DIALOG_DESCRIPTION, DIALOG_BODY, DIALOG_FOOTER, DIALOG_CLOSE,

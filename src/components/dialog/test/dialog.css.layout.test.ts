@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
+import { ACTIONS_WRAP, POPUP_PASSIVE, VIEWPORT_PASSIVE } from '#shared/classes.js'
 import { compileEntry } from '#test/stylesheet.js'
-import { DIALOG_ACTION_WRAP, DIALOG_BODY_SHORT, DIALOG_POPUP_PASSIVE, DIALOG_VIEWPORT_PASSIVE } from '../classes.js'
+import { DIALOG_BODY_SHORT } from '../classes.js'
 
 const COARSE = 'min-height: var(--tc-target-coarse,44px);'
 
@@ -60,7 +61,7 @@ describe('the classes of the footer actions, the short screen and the dialog tha
   const css = compileEntry().then((compiled) => compiled.build([...Object.keys(DECLARATION), ...OF_BUTTON]))
 
   it('the table names exactly the classes of the four strings', () => {
-    const all = written([DIALOG_ACTION_WRAP, DIALOG_BODY_SHORT, DIALOG_VIEWPORT_PASSIVE, DIALOG_POPUP_PASSIVE])
+    const all = written([ACTIONS_WRAP, DIALOG_BODY_SHORT, VIEWPORT_PASSIVE, POPUP_PASSIVE])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
     expect(all).toHaveLength(16)
   })
