@@ -1,0 +1,105 @@
+import { readdirSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
+import type { ComponentType } from 'react'
+import ts from 'typescript'
+import { describe, expect, it } from 'vitest'
+
+import { markup } from '#test/markup.js'
+
+// PLAN 17.1: the demos are the docs code tab and the visual baselines, so each must render.
+const DUMMY = join(import.meta.dirname, '..', 'dummy')
+const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
+
+/** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
+const EXPECTED = ['basic', 'confirm', 'long-body', 'long-content', 'no-close-button', 'rtl', 'sizes', 'with-form']
+
+/** The label of each trigger a demo holds, every one of them a Button. */
+const TRIGGERS: Record<string, string[]> = {
+  'basic': ['Publish'],
+  'confirm': ['Delete project'],
+  'long-body': ['Read the terms'],
+  'long-content': ['Move to the archive'],
+  'no-close-button': ['What is new'],
+  'rtl': ['نشر'],
+  'sizes': ['xs', 'sm', 'md', 'lg', 'xl', 'custom'],
+  'with-form': ['Rename'],
+}
+
+/** Anything written as a child of a trigger or a close, which a server-built Button never sees. */
+function partChildren(source: string): string[] {
+  const out: string[] = []
+  const visit = (node: ts.Node): void => {
+    if (ts.isJsxElement(node) && ['DialogTrigger', 'DialogClose'].includes(node.openingElement.tagName.getText())) {
+      for (const child of node.children) {
+        if (!ts.isJsxText(child) || child.text.trim() !== '') out.push(child.getText().trim())
+      }
+    }
+    ts.forEachChild(node, visit)
+  }
+  visit(ts.createSourceFile('demo.tsx', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX))
+  return out
+}
+
+const render = async (file: string) => {
+  const loaded = await import(`../dummy/${file}.tsx`) as { default?: ComponentType }
+  const Demo = loaded.default
+  return Demo ? markup(<Demo />) : ''
+}
+
+describe('every demo renders on the server', () => {
+  it('holds exactly the demos the plan asks for, so none can be deleted silently', () => {
+    expect(files).toEqual(EXPECTED)
+  })
+
+  for (const file of files) {
+    it(`${file}.tsx exports one default demo`, async () => {
+      const loaded = await import(`../dummy/${file}.tsx`) as { default?: ComponentType }
+      expect(typeof loaded.default, file).toBe('function')
+    })
+
+    it(`${file}.tsx renders each trigger as a Button with its label in the truncating span`, async () => {
+      const html = await render(file)
+      const buttons = html.match(/<button [^>]*>[\s\S]*?<\/button>/g) ?? []
+      expect(buttons.map((button) => /<span class="truncate min-w-0">([^<]*)<\/span>/.exec(button)?.[1]), file).toEqual(TRIGGERS[file])
+      for (const button of buttons) {
+        expect(button, file).toContain('aria-haspopup="dialog"')
+        expect(button, file).toContain('aria-expanded="false"')
+        expect(button, file).toContain('rounded-control')
+        expect(button, file).toContain('pointer-coarse:min-h-[var(--tc-target-coarse,44px)]')
+      }
+    })
+
+    it(`${file}.tsx renders no popup on the server, because the portal mounts in the browser`, async () => {
+      const html = await render(file)
+      expect(html, file).not.toContain('role="dialog"')
+      expect(html, file).not.toContain('bg-overlay')
+      expect(html, file).not.toContain('<h2')
+    })
+
+    it(`${file}.tsx uses no bare anchor and no svg outside Svg`, async () => {
+      const html = await render(file)
+      expect(html.match(/<a[\s>]/g) ?? [], file).toEqual([])
+      for (const svg of html.match(/<svg [^>]*>/g) ?? []) expect(svg, file).toContain('aria-hidden="true"')
+    })
+  }
+})
+
+describe('the label of a trigger or a close sits inside the Button passed to render', () => {
+  it('in every demo, so a Button a Server Component rendered keeps its truncating span', () => {
+    const found = files.flatMap((file) => partChildren(readFileSync(join(DUMMY, `${file}.tsx`), 'utf8')))
+    expect(found).toEqual([])
+  })
+
+  it('the scan sees text, an expression and an element on a trigger and on a close, and skips bare line breaks', () => {
+    const probe = '<><DialogTrigger render={<Button />}>Save {n}</DialogTrigger><DialogClose>\n  <Svg icon={x} />\n</DialogClose><DialogBody>Text</DialogBody></>'
+    expect(partChildren(probe)).toEqual(['Save', '{n}', '<Svg icon={x} />'])
+  })
+})
+
+describe('the rtl demo is an island', () => {
+  it('wraps its trigger in an element that carries the direction and the language', async () => {
+    const html = await render('rtl')
+    expect(html).toContain('<div dir="rtl" lang="ar"><button ')
+  })
+})
