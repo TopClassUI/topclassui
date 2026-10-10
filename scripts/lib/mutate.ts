@@ -1,7 +1,8 @@
 // Mutation testing: break the code on purpose, run the suite, and fail if it
 // still passes. A test that survives its own mutation is measuring nothing.
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 export interface Mutation {
   /** What is being broken, in the words a failure should read in. */
@@ -14,6 +15,26 @@ export interface Mutation {
 }
 
 export interface Outcome { label: string; caught: boolean; reason?: string }
+
+/** The area files of a folder: every .ts in it but index.ts, sorted so the order never depends on the disk. */
+export function mutationFiles(dir: string): string[] {
+  return readdirSync(dir, { withFileTypes: true })
+    .filter((e) => e.isFile() && e.name.endsWith('.ts') && e.name !== 'index.ts')
+    .map((e) => e.name)
+    .sort()
+}
+
+/** Every row of every area file. A file that exports no rows is an error, never a silent skip. */
+export async function collectMutations(dir: string): Promise<Mutation[]> {
+  const rows: Mutation[] = []
+  for (const file of mutationFiles(dir)) {
+    const path = join(dir, file)
+    const found: unknown = (await import(pathToFileURL(path).href)).MUTATIONS
+    if (!Array.isArray(found)) throw new Error(`mutate: ${path} must export MUTATIONS, an array of rows`)
+    rows.push(...(found as Mutation[]))
+  }
+  return rows
+}
 
 /** Every mutation must still find its anchor, or it silently tests nothing. */
 export function readAnchors(root: string, mutations: readonly Mutation[]): string[] {

@@ -298,11 +298,12 @@ a minute, the same failure found at step 11 is an hour.
     `types.ts` or `meta.ts` changed, or `check:readme` fails on a stale file, and replace
     every scaffolded `TODO(tc)`: the schema descriptions, the comment in `meta.ts` and the
     placeholder between the hand-written markers of `README.md` (`R-8.1-3`).
-17. **Add a mutation** for whatever the component's hardest guarantee is, in
-    `scripts/mutations/index.ts`; the Build this block names it. Every component should
-    leave one behind. Prove it bites by breaking the source by hand first, then run
-    **`pnpm test:mutation`** once, with the new row in it. A green suite that no mutation
-    disturbs is a suite that measures nothing.
+17. **Add a mutation** for whatever the component's hardest guarantee is, in a file of the
+    component's own, `scripts/mutations/<slug>.ts`; the Build this block names it. Copy the
+    shape of `scripts/mutations/kbd.ts`. The runner finds the file by itself: do not edit
+    `scripts/mutations/index.ts`. Every component should leave one behind. Prove it bites
+    by breaking the source by hand first, then run **`pnpm test:mutation`** once, with the
+    new row in it. A green suite that no mutation disturbs is a suite that measures nothing.
 18. **Push the branch, open a pull request** with the body from section 12. Do not merge.
 
 ---
@@ -314,7 +315,7 @@ These files are touched by many components and are where parallel work goes wron
 ```
 src/tokens.css                 src/shared/labels/en.ts    src/shared/labels/ar.ts
 src/shared/classes.ts          src/shared/contracts/*     src/styles.css
-docs/DECISIONS.md              scripts/mutations/index.ts
+docs/DECISIONS.md              scripts/mutations/shared.ts
 ```
 
 The rule: **a change to a shared file is its own pull request, merged before the component
@@ -327,11 +328,13 @@ In practice:
 - Land those first, each in its own small `feat(shared):` pull request with tests. Unit 1
   has two, listed in `docs/figma/unit-1.md`.
 - Then create the worktrees that need them from the new `main`.
-- `scripts/mutations/index.ts` is the one shared file a component branch edits itself
-  (step 17): a mutation names a file of the component, so it cannot land first. Append one
-  row at the end of the array and the merge conflict is trivial. `docs/DECISIONS.md` is
-  newest entry first, directly under the `---`, and no component branch edits it (see
-  below).
+- A component branch edits no shared file for its mutations. They go in a file of its own,
+  `scripts/mutations/<slug>.ts` (step 17), and `scripts/mutations/index.ts` finds every
+  file in that folder by itself, so nobody edits `index.ts`. A row that breaks a shared
+  file belongs to the shared pull request that changes that file: `shared.ts` for
+  `src/shared` and the stylesheets, `scripts.ts` and `eslint-rules.ts` for the tooling.
+  `docs/DECISIONS.md` is newest entry first, directly under the `---`, and no component
+  branch edits it (see below).
 
 A new tone, size or state value is a change to a contract, which reaches every component
 at once. That is a decision, not a component detail. Ask.

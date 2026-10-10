@@ -78,9 +78,9 @@ request under Decisions.
 it, and write the question and your choice in the pull request under Decisions. Do not edit
 `docs/DECISIONS.md` from a component branch, and do not stop. Stop only if the choice needs a
 new tone, size or state value, a new dependency, a new label key, or an edit to a shared
-file that "Shared pull requests" below does not list. `scripts/mutations/index.ts` is the one
-shared file every component branch edits itself: append the mutation of the component at
-the end of the array (`docs/CLOUD-PLAN.md` section 8, step 17).
+file that "Shared pull requests" below does not list. The mutation of the component goes in
+a file of its own, `scripts/mutations/<slug>.ts`, which the runner finds by itself
+(`docs/CLOUD-PLAN.md` section 8, step 17).
 
 **Code samples show intent, not imports.** `Text`, `Heading`, `IconButton` and `next/link` do
 not exist here, and `<Icon name>` is async, so it cannot render in `dummy/` or in the ssr
@@ -169,11 +169,11 @@ change into a component branch.
    and uses the Base UI parts directly, because `TooltipRoot` does not exist yet: two
    `Tooltip.Root`s inside `TopClassProvider`, hover the first and wait out its 600 ms, move
    to the second, and assert that its popup is open within 100 ms. On `main` today that
-   fails, which is the proof. Append the mutation that removes the provider.
+   fails, which is the proof. Add the mutation that removes the provider.
    `docs/PLAN.md` 18.8 and the Figma Provider page both say the provider renders it.
 
 Nothing else is needed: no icon, no label key, no class constant and no contract value. The
-mutation each component appends to `scripts/mutations/index.ts` is not a shared pull request.
+mutation each component adds in `scripts/mutations/<slug>.ts` is not a shared pull request.
 
 ## Badge
 
