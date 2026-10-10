@@ -125,7 +125,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the provider loses its tooltip delay group, so every tooltip waits again',
     file: 'src/shared/provider/provider.tsx',
-    from: '{nested ? isolated : <Tooltip.Provider>{isolated}</Tooltip.Provider>}',
+    from: '<Tooltip.Provider>{isolated}</Tooltip.Provider>',
     to: '{isolated}',
   },
   {
