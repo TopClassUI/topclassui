@@ -180,12 +180,26 @@ Conventions Unit 2 settled, which this file follows:
   overlay in three modes and both directions.
 - **Mutation.** `scripts/mutations/<slug>.ts`. A mutation must be caught by `vitest run`:
   the runner does not start Playwright.
+- **A portaled part sets `dir` itself.** A portal sits in `<body>`. Inside a right-to-left
+  provider on a left-to-right page, a popup therefore takes the body's direction: its
+  logical classes resolve the wrong way, its text is laid out left-to-right and its arrow
+  points away from the trigger (measured on Tooltip with the live harness: the arrow 76 px
+  from the facing edge). Every part that renders a Portal puts `dir={direction}` from
+  `useDirection()` on the element it positions, through `hook.ts`, and its spec runs the
+  island case: `rtl.tsx` opened on the LTR page as well as on the `--rtl` page.
+- **The live harness** is `pnpm harness:serve` and `e2e/live.ts`: `openLive(page, demo,
+  { mode, direction, edge, tall })` waits for hydration and throws on any console or
+  hydration error, `pinTo`, `viewportBox`, `expectInsideViewport` and
+  `expectNoSidewaysScroll`. A page is `/<folder>--<demo>--<mode>--<direction>.html`, with
+  `?edge=top|bottom|start|end` and `?tall=1`. Select an open popup with `[data-open]`: a
+  closed one can stay in the DOM for a second. The port is 4517; two checks on one machine
+  need `TC_HARNESS_PORT=<another port>` on the second, or it stops with "already used".
 - **Deferred**, in every pull request: the four lines of `docs/CLOUD-PLAN.md` section 10,
   and for Drawer and Toast the check on a real iPhone that Phase 5 asks Omar to record.
 
 ## Shared pull requests
 
-Eight, each on its own, opened first, three more at the end of this list, and one carried over: `fix/readme-part-family` of
+Eight, each on its own, opened first, four more at the end of this list, and one carried over: `fix/readme-part-family` of
 `unit-2.md` was not built in Unit 2. Build it here, before Dialog: every part family needs
 the README to print flat names. None of the nine opens before Unit 2 is merged.
 
@@ -317,6 +331,12 @@ Three more, carried over from the reviews of Unit 2. Each is small and on its ow
 11. **`fix/shared-truncate`.** `truncateLabel` cuts by grapheme, so an emoji is never split,
     and its span carries `dir="auto"`, so a label in the other script keeps its first
     characters when it is cut (measured on Tag, Badge and Button: 53 hidden before, 0 after).
+
+12. **`fix/tooltip-direction`**, after 2. The first use of the rule above: Tooltip's
+    positioner takes `dir` from `useDirection()`, which needs the `hook.ts` Tooltip does not
+    have yet (`tooltip.client.test.ts` pins its absence: update that test with the reason).
+    `e2e/tooltip.spec.ts` already holds the failing case as `test.fail`: make it a plain
+    test that passes.
 
 **No icon pull request.** `raw/star-fill.svg` exists, and so does `icon/star-fill` on the
 Icons page. `star-half` is in neither, and nothing in the file draws a half star. Rating
