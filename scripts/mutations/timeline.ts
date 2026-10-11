@@ -86,4 +86,10 @@ export const MUTATIONS: Mutation[] = [
     from: '  locale: _locale,\n',
     to: '',
   },
+  {
+    label: 'the timeline takes a false icon for an icon, so `cond && <Svg />` leaves an item with no marker at all',
+    file: 'src/components/timeline/index.tsx',
+    from: '{isBlank(item.icon)',
+    to: '{item.icon == null',
+  },
 ]
