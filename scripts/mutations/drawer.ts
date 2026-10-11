@@ -1,0 +1,461 @@
+// The mutations of src/components/drawer. Found by scripts/mutations/index.ts.
+import type { Mutation } from '../lib/mutate.js'
+
+const CLIENT = 'src/components/drawer/client.tsx'
+const CLASSES = 'src/components/drawer/classes.ts'
+const HOOK = 'src/components/drawer/hook.ts'
+const LIB = 'src/components/drawer/lib.ts'
+const DUMMY = 'src/components/drawer/dummy'
+
+/** The line that hands the popup its classes, whole: three rows change one word of it. */
+const POPUP_CLASSES = '            DRAWER_POPUP, DRAWER_EDGE[placement], isSideSheet(placement) && DRAWER_WIDTH[size], !blocks && POPUP_PASSIVE, className,'
+
+/** The ring drawn outside the box, as FOCUS_RING writes it. Three edges of a sheet are the edges of the screen. */
+const RING_OUTSIDE = 'outline-none focus-visible:outline-solid focus-visible:outline-(length:--tc-ring-width) focus-visible:outline-offset-(length:--tc-ring-offset) focus-visible:outline-ring'
+
+export const MUTATIONS: Mutation[] = [
+  {
+    label: 'the drawer swipe stops reading the direction, so an RTL end sheet at the left closes by a swipe right, away from its edge',
+    file: LIB,
+    from: "const inlineEnd = direction === 'rtl' ? 'left' : 'right'",
+    to: "const inlineEnd = 'right'",
+  },
+  {
+    label: 'the drawer swipe of a start sheet stops reading the direction, so in RTL it closes by a swipe toward the middle of the screen',
+    file: LIB,
+    from: "const inlineStart = direction === 'rtl' ? 'right' : 'left'",
+    to: "const inlineStart = 'left'",
+  },
+  {
+    label: 'a top drawer closes by a swipe down, into the screen',
+    file: LIB,
+    from: "if (placement === 'top') return 'up'",
+    to: "if (placement === 'top') return 'down'",
+  },
+  {
+    label: 'a start drawer is no side sheet, so its size is ignored and it fills the screen',
+    file: LIB,
+    from: "return placement === 'start' || placement === 'end'",
+    to: "return placement === 'end'",
+  },
+  {
+    label: 'the drawer root reads no direction, so every swipe is the left-to-right one under an RTL provider',
+    file: HOOK,
+    from: 'const direction = useDirection()',
+    to: "const direction = 'ltr' as const",
+  },
+  {
+    label: 'the drawer popup hook reads the direction of its provider and forgets the language',
+    file: HOOK,
+    from: 'return { ...usePortalLocale(), ...useContext(DrawerContext) }',
+    to: 'return { dir: usePortalLocale().dir, lang: undefined, ...useContext(DrawerContext) }',
+  },
+  {
+    label: 'the drawer body is a tab stop whether or not it scrolls, so Tab stops on every one-line body',
+    file: HOOK,
+    from: 'return { ref, tabIndex: useScrollTabStop(ref) }',
+    to: 'return { ref, tabIndex: 0 as const }',
+  },
+  {
+    label: 'the ref a caller passes to the drawer body is taken by the hook and never filled',
+    file: HOOK,
+    from: '  useImperativeHandle(forwarded, () => ref.current as HTMLDivElement, [])\n',
+    to: '',
+  },
+  {
+    label: 'the drawer x is named by the label of a dialog, so a sheet is closed by "Close this dialog"',
+    file: HOOK,
+    from: 'return { label: useLabels().drawer.close }',
+    to: 'return { label: useLabels().dialog.close }',
+  },
+  {
+    label: 'the drawer root never hands Base UI its swipe, so every sheet closes by a swipe down, whatever edge it stands on',
+    file: CLIENT,
+    from: ' swipeDirection={root.swipeDirection} onOpenChange=',
+    to: ' onOpenChange=',
+  },
+  {
+    label: 'the drawer root lets a caller pass a physical swipeDirection over the one its placement gives',
+    file: CLIENT,
+    from: '<Base.Root {...props} modal={modal} swipeDirection={root.swipeDirection}',
+    to: '<Base.Root swipeDirection={root.swipeDirection} {...props} modal={modal}',
+  },
+  {
+    label: 'the drawer root never shares its settings with its popup, so every sheet is an end sheet of size md',
+    file: CLIENT,
+    from: '<DrawerContext value={root.settings}>',
+    to: '<DrawerContext value={DRAWER_DEFAULTS}>',
+  },
+  {
+    label: 'the drawer root shares modal with its popup but never hands it to Base UI, so a sheet with no scrim still locks and hides the page',
+    file: CLIENT,
+    from: '<Base.Root {...props} modal={modal} swipeDirection=',
+    to: '<Base.Root {...props} swipeDirection=',
+  },
+  {
+    label: 'the drawer root drops its Escape guard, so one key closes a tooltip opened by hover and the sheet under it',
+    file: CLIENT,
+    from: 'onOpenChange={guardEscape(onOpenChange)}',
+    to: 'onOpenChange={onOpenChange}',
+  },
+  {
+    label: 'the drawer viewport loses the direction of its provider, so the sheet of an RTL island is laid out left to right',
+    file: CLIENT,
+    from: '        dir={dir}\n',
+    to: '',
+  },
+  {
+    label: 'the drawer viewport loses the language of its provider, so an Arabic sheet on an English page is read in an English voice',
+    file: CLIENT,
+    from: '        lang={lang}\n',
+    to: '',
+  },
+  {
+    label: 'the drawer viewport is stamped ltr when no provider is mounted, so on an RTL page with none the sheet is laid out left to right',
+    file: CLIENT,
+    from: '        dir={dir}\n',
+    to: "        dir={dir ?? 'ltr'}\n",
+  },
+  {
+    label: 'a drawer that is not modal still draws its scrim, so the page it leaves usable is dimmed',
+    file: CLIENT,
+    from: '{blocks ? <Base.Backdrop className={DRAWER_BACKDROP} /> : null}',
+    to: '<Base.Backdrop className={DRAWER_BACKDROP} />',
+  },
+  {
+    label: 'the viewport of a drawer that is not modal still catches every press, so nothing on the page beside it can be pressed',
+    file: CLIENT,
+    from: 'DRAWER_VIEWPORT_EDGE[placement], !blocks && VIEWPORT_PASSIVE)}',
+    to: 'DRAWER_VIEWPORT_EDGE[placement])}',
+  },
+  {
+    label: 'the popup of a drawer that is not modal never takes its presses back from its viewport, so its own buttons are dead',
+    file: CLIENT,
+    from: POPUP_CLASSES,
+    to: '            DRAWER_POPUP, DRAWER_EDGE[placement], isSideSheet(placement) && DRAWER_WIDTH[size], className,',
+  },
+  {
+    label: 'a trap-focus drawer is treated as fully modal by its popup, so it dims and blocks a page the pointer should keep',
+    file: CLIENT,
+    from: 'const blocks = modal === true',
+    to: 'const blocks = modal !== false',
+  },
+  {
+    label: 'the drawer viewport seats every sheet at the inline end, so a start, a top and a bottom sheet all stand at the end',
+    file: CLIENT,
+    from: 'cn(DRAWER_VIEWPORT, DRAWER_VIEWPORT_EDGE[placement],',
+    to: 'cn(DRAWER_VIEWPORT, DRAWER_VIEWPORT_EDGE.end,',
+  },
+  {
+    label: 'the drawer popup wears the box of an end sheet at every placement, so a bottom sheet is as tall as the screen and slides sideways',
+    file: CLIENT,
+    from: POPUP_CLASSES,
+    to: '            DRAWER_POPUP, DRAWER_EDGE.end, isSideSheet(placement) && DRAWER_WIDTH[size], !blocks && POPUP_PASSIVE, className,',
+  },
+  {
+    label: 'the drawer popup gives a top and a bottom sheet the width of its size, so a bottom sheet is 320 px of a phone',
+    file: CLIENT,
+    from: 'isSideSheet(placement) && DRAWER_WIDTH[size]',
+    to: 'DRAWER_WIDTH[size]',
+  },
+  {
+    label: 'the drawer popup ignores its size, so every side sheet is 320 px wide',
+    file: CLIENT,
+    from: 'isSideSheet(placement) && DRAWER_WIDTH[size]',
+    to: 'isSideSheet(placement) && DRAWER_WIDTH.md',
+  },
+  {
+    label: "the drawer popup's own classes beat a consumer className",
+    file: CLIENT,
+    from: POPUP_CLASSES,
+    to: '            className, DRAWER_POPUP, DRAWER_EDGE[placement], isSideSheet(placement) && DRAWER_WIDTH[size], !blocks && POPUP_PASSIVE,',
+  },
+  {
+    label: 'the drawer popup drops the rest props, so ref, id, lang and initialFocus never reach it',
+    file: CLIENT,
+    from: '          data-size={size}\n          {...rest}\n',
+    to: '          data-size={size}\n',
+  },
+  {
+    label: 'the drawer popup no longer reports its placement, so nothing outside it can tell a bottom sheet from a side sheet',
+    file: CLIENT,
+    from: '          data-placement={placement}\n',
+    to: '',
+  },
+  {
+    label: 'every drawer starts with a grabber, so a side sheet wears the handle of a bottom sheet',
+    file: CLIENT,
+    from: "{placement === 'bottom' ? <div aria-hidden=\"true\" className={DRAWER_GRABBER} /> : null}",
+    to: '<div aria-hidden="true" className={DRAWER_GRABBER} />',
+  },
+  {
+    label: 'the drawer grabber is no longer hidden from assistive technology, so a screen reader stops on an empty element',
+    file: CLIENT,
+    from: '<div aria-hidden="true" className={DRAWER_GRABBER} />',
+    to: '<div className={DRAWER_GRABBER} />',
+  },
+  {
+    label: 'the drawer x comes before the content in the markup, so it is the first stop of Tab and not the last',
+    file: CLIENT,
+    from: '          {children}\n          <DrawerClose className={DRAWER_X[placement]} />\n',
+    to: '          <DrawerClose className={DRAWER_X[placement]} />\n          {children}\n',
+  },
+  {
+    label: 'the drawer popup renders no x, so a sheet can only be closed by a drag or a key (WCAG 2.5.7)',
+    file: CLIENT,
+    from: '          <DrawerClose className={DRAWER_X[placement]} />\n',
+    to: '',
+  },
+  {
+    label: 'the drawer x is not placed, so it sits in the flow under the footer instead of in its corner',
+    file: CLIENT,
+    from: '<DrawerClose className={DRAWER_X[placement]} />',
+    to: '<DrawerClose />',
+  },
+  {
+    label: 'a bottom drawer is no longer wrapped in the keyboard provider, so a tap on a field under the keyboard of a phone is left to the browser',
+    file: CLIENT,
+    from: "return placement === 'bottom' ? <Base.VirtualKeyboardProvider>{portal}</Base.VirtualKeyboardProvider> : portal",
+    to: 'return portal',
+  },
+  {
+    label: 'every drawer is wrapped in the keyboard provider, so a side sheet takes over the taps on its fields too',
+    file: CLIENT,
+    from: "return placement === 'bottom' ? <Base.VirtualKeyboardProvider>{portal}</Base.VirtualKeyboardProvider> : portal",
+    to: 'return <Base.VirtualKeyboardProvider>{portal}</Base.VirtualKeyboardProvider>',
+  },
+  {
+    label: 'the drawer popup never hands container to its portal, so it always mounts at the end of the body',
+    file: CLIENT,
+    from: '<Base.Portal container={container} keepMounted={keepMounted}>',
+    to: '<Base.Portal keepMounted={keepMounted}>',
+  },
+  {
+    label: 'the drawer popup never hands keepMounted to its portal, so a closed sheet always leaves the document',
+    file: CLIENT,
+    from: '<Base.Portal container={container} keepMounted={keepMounted}>',
+    to: '<Base.Portal container={container}>',
+  },
+  {
+    label: 'the drawer header drops the rest props, so ref, id and style never reach it',
+    file: CLIENT,
+    from: 'return <div {...rest} className={cn(DRAWER_HEADER, className)} />',
+    to: 'return <div className={cn(DRAWER_HEADER, className)}>{rest.children}</div>',
+  },
+  {
+    label: 'the drawer body is a plain div and not Base UI content, so a mouse that selects text in it drags the sheet away',
+    file: CLIENT,
+    from: 'return <Base.Content tabIndex={body.tabIndex}',
+    to: 'return <div tabIndex={body.tabIndex}',
+  },
+  {
+    label: 'the drawer body takes no tabIndex from its hook, so a long text with no control in it is out of reach of the keyboard',
+    file: CLIENT,
+    from: '<Base.Content tabIndex={body.tabIndex} {...rest} ref={body.ref}',
+    to: '<Base.Content {...rest} ref={body.ref}',
+  },
+  {
+    label: 'the tabIndex of the drawer body is written after the rest props, so tabIndex={-1} from a caller no longer opts out',
+    file: CLIENT,
+    from: '<Base.Content tabIndex={body.tabIndex} {...rest} ref={body.ref}',
+    to: '<Base.Content {...rest} tabIndex={body.tabIndex} ref={body.ref}',
+  },
+  {
+    label: 'the drawer body never hands its element to its hook, so nothing is measured and it is never a tab stop',
+    file: CLIENT,
+    from: '{...rest} ref={body.ref} className={cn(DRAWER_BODY, className)}',
+    to: '{...rest} className={cn(DRAWER_BODY, className)}',
+  },
+  {
+    label: 'the drawer x loses its name, so a screen reader announces a button and nothing else',
+    file: CLIENT,
+    from: '<Base.Close aria-label={label} {...rest} className={cn(DRAWER_CLOSE, className)}>',
+    to: '<Base.Close {...rest} className={cn(DRAWER_CLOSE, className)}>',
+  },
+  {
+    label: "the drawer x puts its label after the rest props, so a caller's own aria-label is overwritten",
+    file: CLIENT,
+    from: '<Base.Close aria-label={label} {...rest} className={cn(DRAWER_CLOSE, className)}>',
+    to: '<Base.Close {...rest} aria-label={label} className={cn(DRAWER_CLOSE, className)}>',
+  },
+  {
+    label: 'a drawer close whose children draw nothing is an empty button with no name, where it should be the x',
+    file: CLIENT,
+    from: 'if (render !== undefined || hasContent(children)) {',
+    to: 'if (render !== undefined || children !== undefined) {',
+  },
+  {
+    label: 'the drawer trigger hands its className to Base UI as it is, so it cannot beat a class of a Button a Server Component rendered',
+    file: CLIENT,
+    from: 'const trigger = renderTrigger(render, className)',
+    to: 'const trigger = { render, className }',
+  },
+  {
+    label: 'the drawer body loses SCROLL_AREA, so sixty rows push the footer off the screen instead of scrolling',
+    file: CLASSES,
+    from: 'text-sm ${SCROLL_AREA} ${FOCUS_RING_INSET} ${DRAWER_BODY_SHORT}',
+    to: 'text-sm ${FOCUS_RING_INSET} ${DRAWER_BODY_SHORT}',
+  },
+  {
+    label: 'the drawer body loses its inset ring, so a body the keyboard lands on shows no focus: the ring outside its box is clipped',
+    file: CLASSES,
+    from: 'text-sm ${SCROLL_AREA} ${FOCUS_RING_INSET} ${DRAWER_BODY_SHORT}',
+    to: 'text-sm ${SCROLL_AREA} ${DRAWER_BODY_SHORT}',
+  },
+  {
+    label: 'the drawer body loses its one-line floor, so a tall header and footer squeeze it to nothing on a phone on its side',
+    file: CLASSES,
+    from: '`min-h-13 flex-1 px-4 py-4',
+    to: '`min-h-0 flex-1 px-4 py-4',
+  },
+  {
+    label: 'the drawer body keeps scrolling on a screen under 272 px tall, so a wheel that starts on it never reaches the actions',
+    file: CLASSES,
+    from: ' ${FOCUS_RING_INSET} ${DRAWER_BODY_SHORT}`',
+    to: ' ${FOCUS_RING_INSET}`',
+  },
+  {
+    label: 'the drawer body only stops shrinking on a short screen, as a dialog does, so in a side sheet its text is painted over the footer',
+    file: CLASSES,
+    from: "'[@media(height<17rem)]:flex-none ",
+    to: "'[@media(height<17rem)]:shrink-0 ",
+  },
+  {
+    label: 'the drawer sheet follows the finger by the translate property again, so it runs 80 px for a drag of 40',
+    file: CLASSES,
+    from: "'transform-[translate(var(--drawer-swipe-movement-x,0px),var(--drawer-swipe-movement-y,0px))] data-swiping:select-none'",
+    to: "'translate-x-[var(--drawer-swipe-movement-x,0px)] translate-y-[var(--drawer-swipe-movement-y,0px)] data-swiping:select-none'",
+  },
+  {
+    label: 'the drawer sheet lets a mouse select text while it drags the sheet by its header',
+    file: CLASSES,
+    from: "var(--drawer-swipe-movement-y,0px))] data-swiping:select-none'",
+    to: "var(--drawer-swipe-movement-y,0px))]'",
+  },
+  {
+    label: 'the drawer popup stops breaking a long word, so a 300-character word makes the body scroll sideways',
+    file: CLASSES,
+    from: 'text-body shadow-lg wrap-anywhere',
+    to: 'text-body shadow-lg',
+  },
+  {
+    label: 'the drawer popup clips instead of scrolling, so an action below the screen of a phone on its side can never be reached',
+    file: CLASSES,
+    from: '  DRAWER_MOTION,\n  SCROLL_AREA,\n',
+    to: "  DRAWER_MOTION,\n  'overflow-hidden',\n",
+  },
+  {
+    label: 'the drawer popup draws its ring outside its box, off the screen on three sides and on the scrim on the fourth',
+    file: CLASSES,
+    from: '  SCROLL_AREA,\n  FOCUS_RING_INSET,\n',
+    to: `  SCROLL_AREA,\n  '${RING_OUTSIDE}',\n`,
+  },
+  {
+    label: 'the drawer end sheet slides without --tc-dir, so in RTL it comes in from the right while it stands at the left',
+    file: CLASSES,
+    from: "const OFF_END = 'data-starting-style:transform-[translateX(calc(100%*var(--tc-dir)))] data-ending-style:transform-[translateX(calc(100%*var(--tc-dir)))]'",
+    to: "const OFF_END = 'data-starting-style:transform-[translateX(100%)] data-ending-style:transform-[translateX(100%)]'",
+  },
+  {
+    label: 'the bottom drawer loses pb-safe, so its last row lies under the home indicator of a phone',
+    file: CLASSES,
+    from: 'border-line pb-safe ps-safe pe-safe ${OFF_BOTTOM}',
+    to: 'border-line ps-safe pe-safe ${OFF_BOTTOM}',
+  },
+  {
+    label: 'the bottom drawer loses its nine-tenths cap, so a long list covers the whole screen and its top is out of reach',
+    file: CLASSES,
+    from: 'bottom: `max-h-[90dvh] w-full',
+    to: 'bottom: `w-full',
+  },
+  {
+    label: 'the drawer end sheet draws its line on the edge that touches the screen, so nothing parts it from the page under forced colours',
+    file: CLASSES,
+    from: 'end: `h-dvh w-full border-s-(length:--tc-line-width)',
+    to: 'end: `h-dvh w-full border-e-(length:--tc-line-width)',
+  },
+  {
+    label: 'the drawer end sheet no longer keeps a corner for its x, so the first line of a sheet with no header runs under the x',
+    file: CLASSES,
+    from: 'pt-safe pb-safe pe-safe ${OFF_END} ${CLEAR_OF_X}`',
+    to: 'pt-safe pb-safe pe-safe ${OFF_END}`',
+  },
+  {
+    label: 'the corner a drawer keeps for its x is given to the x itself in an empty sheet, which stretches it by 4rem',
+    file: CLASSES,
+    from: "const CLEAR_OF_X = '*:first:not-last:pe-16 ",
+    to: "const CLEAR_OF_X = '*:first:pe-16 ",
+  },
+  {
+    label: 'the bottom drawer keeps the corner of its x on its first child, the grabber, so the row under it runs beneath the x',
+    file: CLASSES,
+    from: 'pb-safe ps-safe pe-safe ${OFF_BOTTOM} ${CLEAR_OF_X_BOTTOM}`',
+    to: 'pb-safe ps-safe pe-safe ${OFF_BOTTOM} ${CLEAR_OF_X}`',
+  },
+  {
+    label: 'the drawer x of an end sheet forgets the safe areas, so it is drawn under the notch of a phone',
+    file: CLASSES,
+    from: "  end: 'absolute top-[calc(0.75rem+var(--tc-safe-top))] inset-e-[calc(0.75rem+var(--tc-safe-end))]',",
+    to: "  end: 'absolute top-3 inset-e-3',",
+  },
+  {
+    label: 'the drawer grabber keeps no line under forced colours, where its fill is erased and nothing is left of it',
+    file: CLASSES,
+    from: 'rounded-full bg-line-strong ${FORCED_EDGE}`',
+    to: 'rounded-full bg-line-strong`',
+  },
+  {
+    label: 'the drawer header no longer ends short of the x, so a long title runs under it',
+    file: CLASSES,
+    from: "border-line py-4 ps-4 pe-16'",
+    to: "border-line py-4 px-4'",
+  },
+  {
+    label: 'the drawer footer no longer wears the shared action wrap, so a long action ends in an ellipsis on a phone',
+    file: CLASSES,
+    from: 'border-line px-4 py-4 ${ACTIONS_WRAP}`',
+    to: 'border-line px-4 py-4`',
+  },
+  {
+    label: 'the drawer x loses the icon button classes, so it is 16 px wide under a finger and has no ring',
+    file: CLASSES,
+    from: '`${ICON_BUTTON} text-muted tone-neutral ${HOVER.ghost}`',
+    to: '`text-muted tone-neutral ${HOVER.ghost}`',
+  },
+  {
+    label: 'the drawer md width becomes 384 px, the width of lg',
+    file: CLASSES,
+    from: "md: 'max-w-80',",
+    to: "md: 'max-w-96',",
+  },
+  {
+    label: 'the drawer scrim leaves the drawer layer, so a sticky bar of the page paints over it',
+    file: CLASSES,
+    from: '`${SCRIM} z-(--tc-z-drawer) ${FADE_MOTION}`',
+    to: '`${SCRIM} ${FADE_MOTION}`',
+  },
+  {
+    label: 'the drawer default placement becomes start, so a sheet nobody placed opens from the other side',
+    file: 'src/components/drawer/constants.ts',
+    from: "placement: 'end',",
+    to: "placement: 'start',",
+  },
+  {
+    label: 'the drawer form demo is a side sheet, so the one demo of a field has no keyboard provider around it',
+    file: `${DUMMY}/with-form.tsx`,
+    from: '<DrawerRoot placement="bottom">',
+    to: '<DrawerRoot>',
+  },
+  {
+    label: 'the drawer rtl demo mounts a left-to-right provider, so the island it shows is no island',
+    file: `${DUMMY}/rtl.tsx`,
+    from: '<TopClassProvider direction="rtl" locale="ar">',
+    to: '<TopClassProvider direction="ltr" locale="ar">',
+  },
+  {
+    label: 'the drawer README sample passes a physical side, which no reader could compile',
+    file: 'src/components/drawer/README.md',
+    from: '<DrawerRoot placement="bottom">\n  <DrawerTrigger render={<Button>Invite</Button>} />',
+    to: '<DrawerRoot placement="down">\n  <DrawerTrigger render={<Button>Invite</Button>} />',
+  },
+]
