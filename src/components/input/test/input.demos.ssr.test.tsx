@@ -12,7 +12,8 @@ const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
 const EXPECTED = [
-  'custom-size', 'full-width', 'labelled', 'row', 'rtl', 'sizes', 'skeleton', 'states', 'types',
+  'custom-size', 'full-width', 'labelled', 'row', 'rtl', 'sizes', 'skeleton', 'skeleton-match', 'states',
+  'types',
 ]
 
 const render = async (file: string) => {
@@ -54,7 +55,13 @@ describe('every demo renders on the server', () => {
     })
 
     it(`${file}.tsx holds no bare link or button, which the target-size spec would measure`, async () => {
-      expect(await render(file), file).not.toMatch(/<a |<button /)
+      const html = await render(file)
+      expect(html, file).not.toMatch(/<a /)
+      // A Button is not bare: it carries the floor that spec measures, at both pointer types.
+      for (const tag of html.match(/<button [^>]*>/g) ?? []) {
+        expect(tag, file).toContain('min-h-[var(--tc-target-min,24px)]')
+        expect(tag, file).toContain('pointer-coarse:min-h-[var(--tc-target-coarse,44px)]')
+      }
     })
   }
 })
@@ -113,6 +120,12 @@ describe('the demos cover what PLAN 20 asks for', () => {
     expect(await render('skeleton')).toContain('aria-hidden="true"')
   })
 
+  it('shows the skeleton at its own width three times, then filling the column', async () => {
+    const spans = (await render('skeleton')).match(/<span class="[^"]*"/g) ?? []
+    expect(spans.map((tag) => / w-full"/.test(tag))).toEqual([false, false, false, true])
+    expect(spans.map((tag) => / w-\[min\(100%,var\(--tc-input-width\)\)\]"/.test(tag))).toEqual([true, true, true, false])
+  })
+
   it('ties the hint to the labelled input', async () => {
     const html = await render('labelled')
     expect(html).toContain('aria-describedby="demo-email-hint"')
@@ -137,5 +150,19 @@ describe('the demos cover what PLAN 20 asks for', () => {
     expect(own.map((tag) => / w-\[min\(100%,var\(--tc-input-width\)\)\][ "]/.test(tag))).toEqual([true, true])
     const grow = inputs(/<div data-row="grow"[^>]*>(.*?)<\/div>/.exec(html)?.[1] ?? '')
     expect(grow.map((tag) => / flex-1[ "]/.test(tag))).toEqual([true, true])
+  })
+
+  it('shows the recipe beside a Button: flex-1 on the field, so the Button keeps its label', async () => {
+    const action = /<div data-row="action" class="flex gap-2">(.*?)<\/div>/.exec(await render('row'))?.[1] ?? ''
+    expect(inputs(action).map((tag) => / flex-1[ "]/.test(tag))).toEqual([true])
+    expect(action).toMatch(/^<input [^>]*\/><button [^>]*><span [^>]*>Send invite<\/span><\/button>$/)
+  })
+
+  it('shows each field with the skeleton that stands in for it, one pair per case', async () => {
+    const html = await render('skeleton-match')
+    const pairs = [...html.matchAll(/data-pair="([a-z]+)"/g)].map((m) => m[1])
+    expect(pairs).toEqual(['xs', 'sm', 'md', 'lg', 'xl', 'full', 'custom', 'label', 'narrow'])
+    expect(inputs(html).length).toBe(9)
+    expect(html.match(/<span class="[^"]*" aria-hidden="true">/g)?.length).toBe(9)
   })
 })

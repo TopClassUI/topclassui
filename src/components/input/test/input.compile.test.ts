@@ -43,6 +43,9 @@ function compile(snippets: Record<string, string>): Record<string, string[]> {
 /** The second import a wrapper needs, which a probe that never names the type must not carry. */
 const PROPS = "import type { InputProps } from '../index.js'\n"
 
+/** The skeleton, which comes from the same entry as the control it stands in for. */
+const SKELETON = "import { InputSkeleton } from '../index.js'\n"
+
 const verdict = compile({
   unnamed: "export const bad = <Input type='email' />",
   withId: "export const ok = <Input id='email' />",
@@ -57,6 +60,8 @@ const verdict = compile({
   token: "export const ok = <Input aria-label='Email' style={{ '--tc-input-width': '20rem' }} />",
   wrapper: `${PROPS}export const Search = (props: InputProps) => <Input {...props} type='search' />`,
   omitted: `${PROPS}export const Search = (props: Omit<InputProps, 'type'>) => <Input {...props} type='search' />`,
+  skeletonPair: `${SKELETON}export const ok = [<Input key='a' id='q' size='lg' fullWidth />, <InputSkeleton key='b' size='lg' fullWidth />]`,
+  skeletonState: `${SKELETON}export const bad = [<Input key='a' id='q' invalid />, <InputSkeleton key='b' invalid />]`,
 })
 
 describe('a name is required by the type (R-5.6-1)', () => {
@@ -113,6 +118,16 @@ describe('what an Input does take', () => {
 describe('the --tc-* style keys reach a program that compiles only Input', () => {
   it('compiles the width the README names, set through style', () => {
     expect(verdict['token']).toEqual([])
+  })
+})
+
+describe('the skeleton takes the two props that decide the box of the field', () => {
+  it('compiles with the same size and fullWidth as the Input beside it', () => {
+    expect(verdict['skeletonPair']).toEqual([])
+  })
+
+  it('refuses invalid, which changes no box', () => {
+    expect((verdict['skeletonState'] ?? []).join(' ')).toContain("Property 'invalid' does not exist")
   })
 })
 
