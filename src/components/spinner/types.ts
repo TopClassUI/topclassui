@@ -17,4 +17,6 @@ type OwnedBySpinner = 'icon' | 'size' | 'label' | 'flipRtl' | 'role'
 export interface SpinnerProps extends Omit<SvgProps, OwnedBySpinner>, SpinnerDesignProps {
   /** The built-in strings; the accessible name is `labels.common.loading`. Defaults to English. */
   labels?: Labels | undefined
+  /** Accepted so `{...getLabels(locale)}` spreads cleanly. Nothing here formats a number, so it is not used and never reaches the element. */
+  locale?: string | undefined
 }

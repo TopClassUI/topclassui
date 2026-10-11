@@ -38,6 +38,13 @@ describe('the status in words', () => {
     expect(spoken(out)).toEqual(['مكتمل', 'الحالي', 'لم يبدأ', null])
   })
 
+  it('takes the whole pair getLabels returns as a spread, and writes no locale on the list', () => {
+    const out = markup(<Timeline items={EVENTS} getKey={key} {...getLabels('ar')} />)
+    expect(spoken(out)).toEqual(['مكتمل', 'الحالي', 'لم يبدأ', null])
+    expect(out).not.toMatch(/locale=|\[object/)
+    expect(out.startsWith('<ol class="flex flex-col" role="list">')).toBe(true)
+  })
+
   it('takes a reworded status from the labels', () => {
     const { labels } = getLabels('en', { timeline: { todo: 'Upcoming' } })
     expect(spoken(markup(<Timeline items={EVENTS} getKey={key} labels={labels} />)))

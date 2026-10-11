@@ -1,6 +1,4 @@
 // No 'use client': a client bundle gets it only when a client file imports it.
-import { cloneElement, type ReactElement } from 'react'
-
 import { caretDoubleLeft } from '#icons/data/caret-double-left.js'
 import { caretDoubleRight } from '#icons/data/caret-double-right.js'
 import { caretLeft } from '#icons/data/caret-left.js'
@@ -9,7 +7,7 @@ import type { IconData } from '#icons/types.js'
 import { cn } from '#shared/cn.js'
 import { en } from '#shared/labels/en.js'
 import { createNumberFormat } from '#shared/labels/get-labels.js'
-import { renderElement } from '#shared/render.js'
+import { renderLink } from '#shared/link.js'
 import { Svg } from '#components/svg/index.js'
 import { CELL_GAP, CELL_SIZE, LIST } from './classes.js'
 import { PAGINATION_DEFAULTS } from './constants.js'
@@ -41,12 +39,9 @@ export function Pagination({
   // An empty aria-label names nothing; a caller with two navs on a page names each.
   const name = ariaLabel === undefined || ariaLabel === '' ? text.label : ariaLabel
 
-  /** An `<a>`, or the caller's element so a framework link navigates on the client. The
-   * href is cloned in before the merge: renderElement lets the element's own props win. */
-  const anchor = (target: number, parts: PaginationLinkParts) => renderElement(
-    cloneElement((link ?? <a />) as ReactElement<{ href?: string }>, { href: getHref(target) }),
-    { ...parts },
-  )
+  /** An `<a>`, or the caller's element so a framework link navigates on the client. */
+  const anchor = (target: number, parts: PaginationLinkParts) =>
+    renderLink('Pagination', link, getHref(target), { ...parts })
 
   /** At an edge there is no page to go to, so it is a span and not a link to nowhere.
    * role="link" is what lets aria-disabled reach a screen reader, as Button's dead link does. */

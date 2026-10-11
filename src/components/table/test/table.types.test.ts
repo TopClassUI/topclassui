@@ -111,6 +111,12 @@ describe('the props are generic over the item', () => {
     expectTypeOf<TableProps<Invoice>['labels']>().toEqualTypeOf<Labels | undefined>()
   })
 
+  it('takes locale beside labels, so the pair getLabels returns spreads onto it', () => {
+    expectTypeOf<TableProps<Invoice>['locale']>().toEqualTypeOf<string | undefined>()
+    expectTypeOf<Accepts<Pick<TableProps<Invoice>, 'labels' | 'locale'>, { locale: string; labels: Labels }>>()
+      .toEqualTypeOf<true>()
+  })
+
   it('takes the sort link as one element, named link and not render', () => {
     expectTypeOf<TableProps<Invoice>['link']>().toEqualTypeOf<ReactElement | undefined>()
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'render'>>().toEqualTypeOf<false>()

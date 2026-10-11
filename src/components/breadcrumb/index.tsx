@@ -1,11 +1,9 @@
 // No 'use client': a client bundle gets it only when a client file imports it.
-import { cloneElement, type ReactElement } from 'react'
-
 import { caretRight } from '#icons/data/caret-right.js'
 import { LABEL } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
 import { en } from '#shared/labels/en.js'
-import { renderElement } from '#shared/render.js'
+import { renderLink } from '#shared/link.js'
 import { Svg } from '#components/svg/index.js'
 import { BREADCRUMB_BOUNDARIES } from './boundaries.js'
 import { CURRENT, ITEM, LINK, LIST, ROOT, TEXT } from './classes.js'
@@ -14,7 +12,16 @@ import type { BreadcrumbProps } from './types.js'
 
 /** Where the page sits in the site: real links, the page being read last, and the same
  * trail as BreadcrumbList JSON-LD for a crawler. An empty trail renders nothing. */
-export function Breadcrumb({ items, link, baseUrl, labels = en, className, ...rest }: BreadcrumbProps) {
+export function Breadcrumb({
+  items,
+  link,
+  baseUrl,
+  labels = en,
+  locale: _locale,
+  className,
+  'aria-label': ariaLabel,
+  ...rest
+}: BreadcrumbProps) {
   // A blank label is a link with no name, so the crumb is left out of the list and the JSON-LD.
   const trail = items.filter((item) => item.label.trim() !== '')
   // A navigation landmark with nothing in it is announced and then leads nowhere.
@@ -22,9 +29,11 @@ export function Breadcrumb({ items, link, baseUrl, labels = en, className, ...re
 
   const lastIndex = trail.length - 1
   const jsonLd = buildBreadcrumbList(trail, baseUrl)
+  // An empty aria-label names nothing, so the label stands in for it, as in Pagination.
+  const name = ariaLabel === undefined || ariaLabel === '' ? labels.breadcrumb.label : ariaLabel
 
   return (
-    <nav aria-label={labels.breadcrumb.label} className={cn(ROOT, className)} {...rest}>
+    <nav aria-label={name} className={cn(ROOT, className)} {...rest}>
       {/* Preflight removes the list style, and Safari with VoiceOver then drops the list role. */}
       <ol role="list" className={LIST}>
         {trail.map((item, index) => {
@@ -39,11 +48,9 @@ export function Breadcrumb({ items, link, baseUrl, labels = en, className, ...re
               {index === 0 ? null : <Svg icon={caretRight} />}
               {item.href === undefined ? (
                 <span aria-current={current ? 'page' : undefined} className={current ? CURRENT : TEXT}>{text}</span>
-              ) : renderElement(
-                // The href is cloned in before the merge: renderElement lets the element's own props win.
-                cloneElement((link ?? <a />) as ReactElement<{ href?: string }>, { href: item.href }),
-                { className: LINK, children: <span className={LABEL}>{text}</span> },
-              )}
+              ) : renderLink('Breadcrumb', link, item.href, {
+                className: LINK, children: <span className={LABEL}>{text}</span>,
+              })}
             </li>
           )
         })}

@@ -30,6 +30,7 @@ Required: `getKey`, `items`. Every other prop below is optional.
 | `items` | **yes** | `readonly T[]` | - | The events, first to last. The connector runs from each marker to the next. |
 | `emptyFallback` | no | `ReactNode` | - | Rendered in place of the list while `items` is empty. Without it, nothing renders. |
 | `labels` | no | `Labels` | - | The built-in strings, which name each status. Defaults to English; pass `getLabels(locale).labels` for another. |
+| `locale` | no | `string` | - | Accepted so `{...getLabels(locale)}` spreads cleanly. Nothing here formats a number, so it is not used and never reaches the element. |
 
 Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 

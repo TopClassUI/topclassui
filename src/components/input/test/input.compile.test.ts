@@ -54,6 +54,7 @@ const verdict = compile({
   uncapped: "export const ok = <Input aria-label='Email' maxLength={null} />",
   variant: "export const bad = <Input aria-label='Email' variant='outline' />",
   sample: "export const ok = <Input id='email' name='email' type='email' autoComplete='email' required invalid fullWidth />",
+  token: "export const ok = <Input aria-label='Email' style={{ '--tc-input-width': '20rem' }} />",
   wrapper: `${PROPS}export const Search = (props: InputProps) => <Input {...props} type='search' />`,
   omitted: `${PROPS}export const Search = (props: Omit<InputProps, 'type'>) => <Input {...props} type='search' />`,
 })
@@ -106,6 +107,12 @@ describe('what an Input does take', () => {
 
   it('takes the docs sample: native props beside the design props', () => {
     expect(verdict['sample']).toEqual([])
+  })
+})
+
+describe('the --tc-* style keys reach a program that compiles only Input', () => {
+  it('compiles the width the README names, set through style', () => {
+    expect(verdict['token']).toEqual([])
   })
 })
 

@@ -35,20 +35,26 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the breadcrumb nav is named in English whatever labels the caller passes',
     file: 'src/components/breadcrumb/index.tsx',
-    from: 'aria-label={labels.breadcrumb.label}',
-    to: 'aria-label={en.breadcrumb.label}',
+    from: '? labels.breadcrumb.label : ariaLabel',
+    to: '? en.breadcrumb.label : ariaLabel',
+  },
+  {
+    label: 'an empty breadcrumb aria-label is written as given, so the landmark has no name, though pagination falls back for the same input',
+    file: 'src/components/breadcrumb/index.tsx',
+    from: "ariaLabel === undefined || ariaLabel === '' ? labels.breadcrumb.label",
+    to: 'ariaLabel === undefined ? labels.breadcrumb.label',
+  },
+  {
+    label: 'a breadcrumb aria-label a wrapper forwards as undefined strips the name of the landmark',
+    file: 'src/components/breadcrumb/index.tsx',
+    from: "ariaLabel === undefined || ariaLabel === '' ? labels.breadcrumb.label",
+    to: "ariaLabel === '' ? labels.breadcrumb.label",
   },
   {
     label: 'a breadcrumb crumb ignores the link element, so every click in a Next.js app reloads the document',
     file: 'src/components/breadcrumb/index.tsx',
-    from: '(link ?? <a />)',
-    to: '(<a />)',
-  },
-  {
-    label: 'a breadcrumb link element keeps the href it came with, so every crumb leads to one address',
-    file: 'src/components/breadcrumb/index.tsx',
-    from: 'cloneElement((link ?? <a />) as ReactElement<{ href?: string }>, { href: item.href }),\n                { className: LINK,',
-    to: '(link ?? <a />),\n                { href: item.href, className: LINK,',
+    from: "renderLink('Breadcrumb', link, item.href,",
+    to: "renderLink('Breadcrumb', undefined, item.href,",
   },
   {
     label: 'a breadcrumb crumb with an empty label is rendered again, as a link with no name',
@@ -85,5 +91,11 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/breadcrumb/classes.ts',
     from: 'text-body font-semibold`',
     to: 'text-body`',
+  },
+  {
+    label: 'a breadcrumb forwards locale to its nav again, so a spread of getLabels writes an attribute HTML does not have',
+    file: 'src/components/breadcrumb/index.tsx',
+    from: '  locale: _locale,\n',
+    to: '',
   },
 ]

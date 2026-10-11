@@ -68,4 +68,22 @@ export const MUTATIONS: Mutation[] = [
     from: 'aria-labelledby={plain ? undefined : headerId}',
     to: 'aria-labelledby={undefined}',
   },
+  {
+    label: 'a table ignores the link element, so every sort in a Next.js app reloads the document',
+    file: 'src/components/table/index.tsx',
+    from: "renderLink('Table', link, column.sortHref,",
+    to: "renderLink('Table', undefined, column.sortHref,",
+  },
+  {
+    label: 'a table stops importing the style augmentation, so the sticky width of its README does not compile in a program without Progress',
+    file: 'src/components/table/index.tsx',
+    from: "import type {} from '#shared/style-tokens.js'\n",
+    to: '',
+  },
+  {
+    label: 'a table forwards locale to its scrolling box again, so a spread of getLabels writes an attribute HTML does not have',
+    file: 'src/components/table/index.tsx',
+    from: '  locale: _locale,\n',
+    to: '',
+  },
 ]

@@ -5,12 +5,15 @@ import { Svg } from '#components/svg/index.js'
 import { BORDER, FOCUS_RING } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
 import { en } from '#shared/labels/en.js'
+import { renderLink } from '#shared/link.js'
+// Named here as well, so a consumer program that never compiles shared/ gets the --tc-* keys.
+import type {} from '#shared/style-tokens.js'
 import {
   BODY_CELL, BOX, CAPTION, CELL_ALIGN, EMPTY_CELL, EMPTY_WORDS, HEADER_CELL, HEADER_LABEL, LINK_ALIGN,
   ROW_FILL, ROW_HEADER, SORT_LINK, STICKY_BOX, STICKY_CELL,
 } from './classes.js'
 import { SORT_ICONS, SORT_LABELS, TABLE_COLUMN_DEFAULTS, TABLE_DEFAULTS } from './constants.js'
-import { columnsOf, directionOf, sortLink } from './lib.js'
+import { columnsOf, directionOf } from './lib.js'
 import type { TableCaption, TableProps } from './types.js'
 
 /** A real table in a box that scrolls sideways. Sorting is a link per header, so it costs
@@ -27,6 +30,7 @@ export function Table<T, Caption extends TableCaption = TableCaption>({
   emptyFallback,
   link,
   labels = en,
+  locale: _locale,
   className,
   ...rest
 }: TableProps<T, Caption>) {
@@ -74,13 +78,16 @@ export function Table<T, Caption extends TableCaption = TableCaption>({
                   aria-labelledby={plain ? undefined : headerId}
                   className={cn(HEADER_CELL, CELL_ALIGN[align], sticks(index) && STICKY_CELL, column.className)}
                 >
-                  {column.sortHref === undefined ? <>{header}{caret}</> : sortLink(link, column.sortHref, cn(SORT_LINK, LINK_ALIGN[align]), (
-                    <>
-                      <span className="sr-only">{`${labels.table.sortBy} `}</span>
-                      {header}
-                      {caret}
-                    </>
-                  ))}
+                  {column.sortHref === undefined ? <>{header}{caret}</> : renderLink('Table', link, column.sortHref, {
+                    className: cn(SORT_LINK, LINK_ALIGN[align]),
+                    children: (
+                      <>
+                        <span className="sr-only">{`${labels.table.sortBy} `}</span>
+                        {header}
+                        {caret}
+                      </>
+                    ),
+                  })}
                 </th>
               )
             })}

@@ -90,6 +90,7 @@ Required: `caption`, `columns`, `getKey`, `items`. Every other prop below is opt
 | `emptyFallback` | no | `ReactNode` | - | Shown in one row across every column when there are no items. `null` also gives `labels.state.empty`. |
 | `labels` | no | `Labels` | - | The built-in strings: the empty row and the words of the sort links. Defaults to English. |
 | `link` | no | `ReactElement` | - | The element every sort link is cloned from, such as `link={<Link href="" />}`; its `href` is replaced with the column's `sortHref`. |
+| `locale` | no | `string` | - | Accepted so `{...getLabels(locale)}` spreads cleanly. Nothing here formats a number, so it is not used and never reaches the element. |
 | `sort` | no | `TableSort` | - | The column the rows are sorted by, which gets `aria-sort` and a caret. |
 | `stickyFirstColumn` | no | `boolean` | `false` | Keeps the first column in view while the others scroll sideways under it. It is cut with an ellipsis past `--tc-table-sticky-width`. |
 | `striped` | no | `boolean` | `false` | Tints every second row, so the eye can follow a wide row across. |
