@@ -56,4 +56,10 @@ export const MUTATIONS: Mutation[] = [
     from: 'clamp(Number(given), min, max)',
     to: 'clamp(given as number, min, max)',
   },
+  {
+    label: 'the pagination file stops exporting clampPage, so the README names a helper no caller can import',
+    file: 'src/components/pagination/index.tsx',
+    from: "export { clampPage } from './lib.js'\n",
+    to: '',
+  },
 ]

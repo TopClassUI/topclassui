@@ -91,5 +91,7 @@ export function Pagination({
   )
 }
 
+// The page Pagination shows, for the query that fetches it: `?page=999` of 12 is page 12 in both.
+export { clampPage } from './lib.js'
 export { paginationVariants } from './variants.js'
 export type { PaginationDesignProps, PaginationProps } from './types.js'
