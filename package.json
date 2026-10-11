@@ -43,6 +43,7 @@
     "new:component": "tsx scripts/new-component.ts",
     "test:mutation": "tsx scripts/mutate.ts",
     "harness:build": "tsx scripts/build-harness.tsx",
+    "harness:serve": "tsx scripts/serve-harness.ts",
     "test:e2e": "pnpm harness:build && playwright test",
     "readme:build": "tsx scripts/readme-build.ts",
     "check:readme": "tsx scripts/readme-build.ts --check"

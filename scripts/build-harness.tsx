@@ -1,30 +1,24 @@
 // pnpm harness:build - writes one static page per demo, mode and direction.
-import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 import { renderToStaticMarkup } from 'react-dom/server'
 import type { ComponentType } from 'react'
 
-import { DIRECTIONS, MODES, candidatesIn, compileCss, pageHtml, pageName } from './lib/harness.js'
+import {
+  DIRECTIONS, MODES, PAGE_CANDIDATES, candidatesIn, compileCss, findDemos, pageHtml, pageName,
+} from './lib/harness.js'
 
 const ROOT = process.cwd()
 const OUT = join(ROOT, '.harness')
-const COMPONENTS = join(ROOT, 'src', 'components')
-
-const folders = readdirSync(COMPONENTS, { withFileTypes: true })
-  .filter((e) => e.isDirectory() && readdirSync(join(COMPONENTS, e.name)).includes('dummy'))
-  .map((e) => e.name)
 
 const demos: Array<{ name: string; body: string }> = []
 
-for (const folder of folders) {
-  const dir = join(COMPONENTS, folder, 'dummy')
-  for (const file of readdirSync(dir).filter((f) => f.endsWith('.tsx')).sort()) {
-    // A file URL, or Node rejects a Windows path: 'Received protocol c:'.
-    const loaded = await import(pathToFileURL(join(dir, file)).href) as { default: ComponentType }
-    demos.push({ name: `${folder}--${file.slice(0, -4)}`, body: renderToStaticMarkup(<loaded.default />) })
-  }
+for (const { name, file } of findDemos(ROOT)) {
+  // A file URL, or Node rejects a Windows path: 'Received protocol c:'.
+  const loaded = await import(pathToFileURL(file).href) as { default: ComponentType }
+  demos.push({ name, body: renderToStaticMarkup(<loaded.default />) })
 }
 
 if (demos.length === 0) throw new Error('harness: no demos found, so there is nothing to measure')
@@ -32,7 +26,7 @@ if (demos.length === 0) throw new Error('harness: no demos found, so there is no
 // One stylesheet for every page: the classes are the union of what the demos emit.
 const css = await compileCss(ROOT, [
   ...new Set(demos.flatMap((d) => candidatesIn(d.body))),
-  'bg-page', 'text-body', 'p-8', 'sr-only',
+  ...PAGE_CANDIDATES,
 ])
 
 rmSync(OUT, { recursive: true, force: true })

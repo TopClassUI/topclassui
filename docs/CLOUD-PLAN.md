@@ -220,6 +220,27 @@ git worktree prune
 that both add a label, a token or a shared class will conflict. Section 9 is how you
 avoid that; Appendix A groups each unit so that it mostly cannot happen.
 
+### The live harness: one page by hand
+
+The static pages cannot open anything. The live ones are the same pages, hydrated:
+
+```bash
+pnpm harness:serve
+# http://127.0.0.1:4517/                                    every demo, six links each
+# http://127.0.0.1:4517/tooltip--basic--light--ltr.html     one page, named like the static file
+# http://127.0.0.1:4517/tooltip--basic--light--rtl.html?edge=top&tall=1
+```
+
+- `edge` pins the demo to `top`, `bottom`, `start` or `end`. `tall=1` makes the page three
+  screens high. Any other parameter is a 404 that says why.
+- A page that failed shows a red box, and `data-harness` on `<html>` reads `failed`
+  instead of `hydrated`.
+- The server reads the source once. Restart it after an edit.
+- `pnpm test:e2e` starts its own server and refuses a port that is taken: stop yours first.
+- Two worktrees at once: give the second its own port, for the whole command.
+  `TC_HARNESS_PORT=4518 pnpm check`, or `$env:TC_HARNESS_PORT = 4518` first in PowerShell.
+- A spec opens a page with `openLive` from `e2e/live.ts`; `e2e/tooltip.spec.ts` is the pattern.
+
 ---
 
 ## 8. The per-component recipe
