@@ -59,8 +59,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a breadcrumb crumb with an empty label is rendered again, as a link with no name',
     file: 'src/components/breadcrumb/index.tsx',
-    from: "items.filter((item) => item.label.trim() !== '')",
+    from: "items.filter((item) => typeof item.label === 'string' && item.label.trim() !== '')",
     to: 'items',
+  },
+  {
+    label: 'a breadcrumb crumb with a null label throws again, and the page holding the trail fails to render',
+    file: 'src/components/breadcrumb/index.tsx',
+    from: "typeof item.label === 'string' && item.label.trim() !== ''",
+    to: "item.label.trim() !== ''",
   },
   {
     label: 'a breadcrumb label of spaces counts as a name, so the trail holds a link nobody can see',

@@ -33,7 +33,9 @@ With an `href` it is one more link, and no page is marked current.
 Pass `baseUrl="https://example.com"` and those URLs are absolute; the links stay as written.
 
 - **Arabic.** `labels={getLabels('ar').labels}` names the `<nav>`; the crumbs are your own text.
-- **A blank label.** A crumb with an empty label is left out, of the trail and of the JSON-LD.
+- **A blank label.** A crumb with an empty label, or one that is not a string (a CMS page with no title), is left out, of the trail and of the JSON-LD.
+- **No `href` in the middle.** A crumb without an `href` that is not the last one is plain text: no link, and no entry in the JSON-LD.
+- **A long label.** It ends in an ellipsis at the width of its box, and the text is cut at 200 characters. The JSON-LD keeps the whole label.
 - **Its name.** `aria-label` renames the `<nav>`; an empty one falls back to the built-in name.
 
 <!-- /hand-written -->
