@@ -45,7 +45,7 @@ describe('the unions come from the constants', () => {
     expect(TABLE_DEFAULTS).toEqual({ captionVisible: false, striped: false, stickyFirstColumn: false })
     expect(TABLE_COLUMN_DEFAULTS).toEqual({ align: 'start' })
     expect(TABLE_SKELETON_DEFAULTS).toEqual({ rows: 5, columns: 4 })
-    expect(TABLE_BOUNDARIES).toEqual({ skeletonRowsMin: 1, skeletonRowsMax: 100, skeletonColumnsMin: 1, skeletonColumnsMax: 50 })
+    expect(TABLE_BOUNDARIES).toEqual({ skeletonRowsMin: 1, skeletonRowsMax: 500, skeletonColumnsMin: 1, skeletonColumnsMax: 50 })
   })
 })
 
@@ -135,13 +135,18 @@ describe('the props follow the vocabulary', () => {
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'aria-describedby'>>().toEqualTypeOf<true>()
   })
 
-  it('takes none of what it writes itself', () => {
+  it('declares none of what it writes itself, which is what refuses the four JSX checks by name', () => {
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'children'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'dangerouslySetInnerHTML'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'role'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'tabIndex'>>().toEqualTypeOf<false>()
+  })
+
+  it('declares no aria-label and no aria-labelledby either, but that refuses nothing: they are ignored, as the README says', () => {
+    // JSX never checks a hyphenated attribute it does not know, so both compile (table.compile.test) and neither is rendered (table.test).
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'aria-label'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'aria-labelledby'>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<TableProps<Invoice>, TableProps<Invoice> & { 'aria-label': string; 'aria-labelledby': string }>>().toEqualTypeOf<true>()
   })
 
   it('has none of the props the spec leaves unbuilt', () => {
