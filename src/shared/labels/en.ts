@@ -59,6 +59,7 @@ export const en = {
   },
   rating: {
     value: (value, max, fmt) => `${fmt.format(value)} out of ${fmt.format(max)}`,
+    stars: (n, fmt) => (n === 1 ? '1 star' : `${fmt.format(n)} stars`),
   },
   table: {
     sortBy: 'Sort by',
@@ -69,5 +70,30 @@ export const en = {
     done: 'Done',
     current: 'Current',
     todo: 'Not started',
+  },
+  drawer: {
+    close: 'Close this panel',
+  },
+  toast: {
+    region: 'Notifications',
+    close: 'Dismiss this notification',
+  },
+  command: {
+    label: 'Command palette',
+    placeholder: 'Type a command or search',
+  },
+  navbar: {
+    label: 'Main',
+  },
+  sidebar: {
+    label: 'Sidebar',
+    collapse: 'Collapse the sidebar',
+    expand: 'Expand the sidebar',
+  },
+  tag: {
+    remove: 'Remove',
+  },
+  banner: {
+    dismiss: 'Dismiss',
   },
 } satisfies Labels

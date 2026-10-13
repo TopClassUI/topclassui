@@ -9,8 +9,28 @@ media and display · tier 3 · beta · renders on the server and ships no client
 ## When to use
 
 For dated events in the order they happened: an activity log, an order's steps, a release history.
-Each item is `{ title, time?, tone?, icon?, status? }`, and `status` is `done`, `current` or `todo`.
-`getKey` returns a string, so pass a numeric id as `getKey={(row) => String(row.id)}`.
+
+```tsx
+<Timeline
+  getKey={(event) => event.id}
+  items={[
+    { id: 'placed', title: 'Order placed', time: '2 October, 09:12', status: 'done' },
+    { id: 'packed', title: 'Being packed', time: 'Today', status: 'current' },
+    { id: 'shipped', title: 'Shipped', status: 'todo' },
+  ]}
+/>
+```
+
+An item is `{ title, time?, status?, tone?, icon? }`, plus any field of your own, such as the `id` above.
+
+- **`title`** is what happened. Any node, and the only field an item must have.
+- **`time`** is when, muted under the title. Pass a `<time dateTime="...">` for a date a machine can read.
+- **`status`** is `done` (a filled dot), `current` (a dot in a ring, announced as the current step) or `todo` (a hollow dot). Each is also read out in words, from `labels`.
+- **`tone`** colours the marker: `primary`, `neutral`, `success`, `warning`, `danger` or `info`. With none, `done` is `success` and the rest are `primary`. A `todo` marker stays hollow whatever the tone.
+- **`icon`** stands in for the dot. It is an element, not a name: `icon: <Svg icon={check} size="xs" />`. `false`, `null` and `undefined` keep the dot, so `failed && <Svg icon={warning} />` is safe.
+- **Arabic.** `labels={getLabels('ar').labels}` says each status in Arabic. The titles and times are your own text, and the rail mirrors by itself.
+- **`getKey` returns a string**: write `String(row.id)` for a numeric id.
+- **No items** renders `emptyFallback` on its own, or nothing without one. `className`, `ref` and every other prop go with the list, so style the fallback itself.
 
 <!-- /hand-written -->
 
@@ -30,6 +50,7 @@ Required: `getKey`, `items`. Every other prop below is optional.
 | `items` | **yes** | `readonly T[]` | - | The events, first to last. The connector runs from each marker to the next. |
 | `emptyFallback` | no | `ReactNode` | - | Rendered in place of the list while `items` is empty. Without it, nothing renders. |
 | `labels` | no | `Labels` | - | The built-in strings, which name each status. Defaults to English; pass `getLabels(locale).labels` for another. |
+| `locale` | no | `string` | - | Accepted so `{...getLabels(locale)}` spreads cleanly. Nothing here formats a number, so it is not used and never reaches the element. |
 
 Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 

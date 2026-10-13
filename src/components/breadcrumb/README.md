@@ -33,7 +33,10 @@ With an `href` it is one more link, and no page is marked current.
 Pass `baseUrl="https://example.com"` and those URLs are absolute; the links stay as written.
 
 - **Arabic.** `labels={getLabels('ar').labels}` names the `<nav>`; the crumbs are your own text.
-- **A blank label.** A crumb with an empty label is left out, of the trail and of the JSON-LD.
+- **A blank label.** A crumb with an empty label, or one that is not a string (a CMS page with no title), is left out, of the trail and of the JSON-LD.
+- **No `href` in the middle.** A crumb without an `href` that is not the last one is plain text: no link, and no entry in the JSON-LD.
+- **A long label.** It ends in an ellipsis at the width of its box, and the text is cut at 200 characters. The JSON-LD keeps the whole label.
+- **Its name.** `aria-label` renames the `<nav>`; an empty one falls back to the built-in name.
 
 <!-- /hand-written -->
 
@@ -53,6 +56,7 @@ Required: `items`. Every other prop below is optional.
 | `baseUrl` | no | `string` | - | The address of the site, such as `https://example.com`: the JSON-LD then lists absolute URLs. The links stay as written. |
 | `labels` | no | `Labels` | - | The built-in strings; the nav is named by `labels.breadcrumb.label`. Defaults to English. |
 | `link` | no | `ReactElement` | - | The element every crumb link is cloned from, such as `link={<Link href="" />}`; its href is replaced with the item's. |
+| `locale` | no | `string` | - | Accepted so `{...getLabels(locale)}` spreads cleanly. Nothing here formats a number, so it is not used and never reaches the element. |
 
 Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
