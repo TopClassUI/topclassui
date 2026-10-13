@@ -1,14 +1,15 @@
 'use client'
 
 import { Tooltip as Base } from '@base-ui/react/tooltip'
-import { Children, cloneElement, isValidElement } from 'react'
 
 import { clamp } from '#shared/clamp.js'
 import { cn } from '#shared/cn.js'
 import { POPUP_BOUNDS, toSideAlign } from '#shared/floating.js'
+import { renderTrigger } from '#shared/render-trigger.js'
 import { TOOLTIP_BOUNDARIES } from './boundaries.js'
 import { TOOLTIP_ARROW, TOOLTIP_POPUP, TOOLTIP_POSITIONER } from './classes.js'
 import { TOOLTIP_ARROW_HEIGHT, TOOLTIP_COLLISION_AVOIDANCE, TOOLTIP_DEFAULTS } from './constants.js'
+import { useTooltipPopup } from './hook.js'
 import type { TooltipPopupProps, TooltipRootProps, TooltipTriggerProps } from './types.js'
 
 const { delayMin, delayMax } = TOOLTIP_BOUNDARIES
@@ -28,17 +29,14 @@ export function TooltipTrigger<Payload>({
   render,
   ...rest
 }: TooltipTriggerProps<Payload>) {
-  // Flight hands an element built in a Server Component over as a lazy wrapper; toArray unwraps it.
-  const element = isValidElement(render) || typeof render === 'function' ? render : Children.toArray(render)[0]
-  // Base UI only joins the two class strings, and a server-built Button has already run its cn().
-  const own = className !== undefined && isValidElement<{ className?: string }>(element) ? element : undefined
+  const trigger = renderTrigger(render, className)
   return (
     <Base.Trigger
       {...rest}
-      render={own ? cloneElement(own, { className: cn(own.props.className, className) }) : render}
+      render={trigger.render}
       delay={delay === undefined ? undefined : clamp(delay, delayMin, delayMax)}
       closeDelay={closeDelay === undefined ? undefined : clamp(closeDelay, delayMin, delayMax)}
-      className={own ? undefined : className}
+      className={trigger.className}
     />
   )
 }
@@ -52,9 +50,11 @@ export function TooltipPopup({
   ...rest
 }: TooltipPopupProps) {
   const { side, align } = toSideAlign(placement)
+  const { direction } = useTooltipPopup()
   return (
     <Base.Portal>
       <Base.Positioner
+        dir={direction}
         side={side}
         align={align}
         sideOffset={POPUP_BOUNDS.sideOffset + TOOLTIP_ARROW_HEIGHT}

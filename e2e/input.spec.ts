@@ -36,7 +36,7 @@ for (const width of [320, 390]) {
 
       const form = await boxOf(page.locator('form'))
       const fields = await page.locator('form input').all()
-      expect(fields.length).toBe(5)
+      expect(fields.length).toBe(6)
       for (const field of fields) {
         const box = await boxOf(field)
         // One pixel of tolerance for sub-pixel rounding at a fractional zoom.
@@ -66,6 +66,74 @@ test('1280px: an input with room is 193px wide, as a text field in a block alway
   for (const box of grown) expect(box.width).toBeGreaterThan(500)
   expect(Math.abs(grown.reduce((sum, box) => sum + box.width, 8) - row.width)).toBeLessThan(1)
 })
+
+// The README recipe. Without flex-1 both shrink in step, and the label is cut to "Send in…".
+for (const direction of ['ltr', 'rtl'] as const) {
+  test(`320px ${direction}: beside a flex-1 input a button keeps its whole label, and the field stays usable`, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 800 })
+    await page.goto(urlFor('input--row', 'light', direction))
+
+    const row = page.locator('[data-row="action"]')
+    const label = row.locator('button span.truncate')
+    await expect(label).toHaveText('Send invite')
+    expect(await label.evaluate((el) => el.scrollWidth - el.clientWidth), 'the label is cut').toBe(0)
+
+    const [outer, field, button] = await Promise.all([row, row.locator('input'), row.locator('button')].map(boxOf))
+    // 128px here, the row less the Button and the gap; the margin is for a wider typeface.
+    expect(field?.width).toBeGreaterThan(96)
+    expect(field?.y, 'the Button wrapped under the field').toBe(button?.y)
+    expect((field?.width ?? 0) + (button?.width ?? 0) + 8, 'the pair is wider than its row').toBeLessThanOrEqual((outer?.width ?? 0) + 1)
+  })
+}
+
+/** Written out: the box of each size in CSS px, under a mouse and then under a finger. */
+const FIELD_BOX = {
+  fine: [[166, 28], [193, 32], [193, 40], [221, 48], [221, 56]],
+  coarse: [[221, 44], [221, 44], [221, 44], [221, 48], [221, 56]],
+}
+
+/** Runs in the page: a field and its skeleton, each as width, height, place in its wrapper and
+ * the wrapper's own height, which is what moves the page; then the text beside it, if any. */
+const measurePairs = (pairs: Element[]) => pairs.map((pair) => {
+  const measure = (wrapper: Element | undefined) => {
+    const outer = wrapper?.getBoundingClientRect() ?? new DOMRect()
+    const place = (el: Element | null | undefined) => {
+      const box = el?.getBoundingClientRect() ?? outer
+      return [box.width, box.height, box.x - outer.x, box.y - outer.y].map((px) => Math.round(px * 100) / 100)
+    }
+    return {
+      box: [...place(wrapper?.querySelector('input, span[aria-hidden]')), Math.round(outer.height * 100) / 100],
+      beside: place(wrapper?.querySelector('span:not([aria-hidden])')),
+    }
+  }
+  return { name: String(pair.getAttribute('data-pair')), field: measure(pair.children[0]), skeleton: measure(pair.children[1]) }
+})
+
+async function expectSkeletonsToMatch(page: Page, direction: string, pointer: keyof typeof FIELD_BOX) {
+  await page.goto(urlFor('input--skeleton-match', 'light', direction))
+  expect(await page.evaluate(() => matchMedia('(pointer: coarse)').matches)).toBe(pointer === 'coarse')
+
+  const pairs = await page.locator('[data-pair]').evaluateAll(measurePairs)
+  expect(pairs.map((pair) => pair.name)).toEqual(['xs', 'sm', 'md', 'lg', 'xl', 'full', 'custom', 'label', 'narrow'])
+  // The field is pinned first, so two boxes that are both wrong cannot agree their way through.
+  expect(pairs.slice(0, 5).map(({ field }) => [Math.round(field.box[0] ?? 0), field.box[1]])).toEqual(FIELD_BOX[pointer])
+
+  for (const { name, field, skeleton } of pairs) {
+    expect(field.box[0], `${name}: no field to measure`).toBeGreaterThan(0)
+    expect(skeleton.box, `${name}: width, height, x, y, wrapper height`).toEqual(field.box)
+    expect(skeleton.beside.slice(0, 3), `${name}: the text beside it`).toEqual(field.beside.slice(0, 3))
+    // A field centres its font box and a line box rounds its half-leading down: under a pixel apart.
+    expect(Math.abs((skeleton.beside[3] ?? 0) - (field.beside[3] ?? 0)), `${name}: the text beside it jumps`).toBeLessThan(1)
+  }
+  // The label really sits lower than the top of its row, or sharing a baseline proved nothing.
+  expect(pairs.find((pair) => pair.name === 'label')?.field.beside[3]).toBeGreaterThan(4)
+}
+
+for (const direction of ['ltr', 'rtl'] as const) {
+  test(`fine pointer ${direction}: a skeleton is the box of the field it stands in for`, async ({ page }) => {
+    await expectSkeletonsToMatch(page, direction, 'fine')
+  })
+}
 
 // Light and dark only: under ocean the pill's curve crosses the pixel column this reads.
 for (const mode of ['light', 'dark'] as const) {
@@ -139,6 +207,13 @@ test.describe('under a coarse pointer', () => {
         const size = await field.evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize))
         expect(size, name).toBeGreaterThanOrEqual(16)
       }
+    })
+  }
+
+  // The 44px floor and the 16px text both change the field here, so the skeleton has to follow.
+  for (const direction of ['ltr', 'rtl'] as const) {
+    test(`${direction}: a skeleton is the box of the field it stands in for`, async ({ page }) => {
+      await expectSkeletonsToMatch(page, direction, 'coarse')
     })
   }
 })

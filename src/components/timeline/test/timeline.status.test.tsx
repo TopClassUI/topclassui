@@ -38,6 +38,13 @@ describe('the status in words', () => {
     expect(spoken(out)).toEqual(['مكتمل', 'الحالي', 'لم يبدأ', null])
   })
 
+  it('takes the whole pair getLabels returns as a spread, and writes no locale on the list', () => {
+    const out = markup(<Timeline items={EVENTS} getKey={key} {...getLabels('ar')} />)
+    expect(spoken(out)).toEqual(['مكتمل', 'الحالي', 'لم يبدأ', null])
+    expect(out).not.toMatch(/locale=|\[object/)
+    expect(out.startsWith('<ol class="flex flex-col" role="list">')).toBe(true)
+  })
+
   it('takes a reworded status from the labels', () => {
     const { labels } = getLabels('en', { timeline: { todo: 'Upcoming' } })
     expect(spoken(markup(<Timeline items={EVENTS} getKey={key} labels={labels} />)))
@@ -71,6 +78,33 @@ describe('a time that is blank', () => {
 
   it('still renders a zero, which is a value and not a missing one', () => {
     expect(time(0)).toContain('<div class="text-xs text-muted">0</div>')
+  })
+})
+
+// `failed && <Svg icon={x} />` leaves false behind when the condition is false.
+describe('an icon that is blank', () => {
+  const row = (item: Omit<TimelineItem, 'title'>) =>
+    rows(markup(<Timeline items={[{ id: 'a', title: 'Launch', ...item }]} getKey={key} />))[0] ?? ''
+  const MARKER = '<span class="flex min-h-5 shrink-0 items-center">'
+  const STROKE = 'block size-3 rounded-full border-(length:--tc-line-width) border-line-strong'
+  const FILLED = `${STROKE} forced-color-adjust-none forced-colors:border-[CanvasText] forced-colors:bg-[CanvasText]`
+
+  it('draws the dot for false, null, undefined, true or an empty string, never an empty wrapper', () => {
+    for (const blank of [false, null, undefined, true, '']) {
+      expect(row({ icon: blank }), String(blank)).toContain(`${MARKER}<span class="${FILLED} bg-primary-solid"></span></span>`)
+      expect(row({ icon: blank }), String(blank)).not.toContain('text-primary-on-soft')
+    }
+  })
+
+  it('draws the marker of the status: done filled, current clipped, todo hollow', () => {
+    expect(row({ icon: false, status: 'done' })).toContain(`${MARKER}<span class="${FILLED} bg-success-solid"></span></span>`)
+    expect(row({ icon: false, status: 'current' }))
+      .toContain(`${MARKER}<span class="${FILLED} bg-primary-solid bg-clip-content p-0.5"></span></span>`)
+    expect(row({ icon: false, status: 'todo' })).toContain(`${MARKER}<span class="${STROKE}"></span></span>`)
+  })
+
+  it('still renders a zero, which React prints', () => {
+    expect(row({ icon: 0 })).toContain(`${MARKER}<span class="flex text-primary-on-soft">0</span></span>`)
   })
 })
 

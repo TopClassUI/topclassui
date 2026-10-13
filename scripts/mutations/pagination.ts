@@ -45,15 +45,21 @@ export const MUTATIONS: Mutation[] = [
     to: "  md: 'size-control-md text-sm',",
   },
   {
-    label: 'a pagination link element keeps its own href, so every page of a Next.js pager leads to one address',
+    label: 'a pagination ignores the link element, so every page change in a Next.js app reloads the document',
     file: 'src/components/pagination/index.tsx',
-    from: 'cloneElement((link ?? <a />) as ReactElement<{ href?: string }>, { href: getHref(target) }),',
-    to: '(link ?? <a href={getHref(target)} />),',
+    from: "renderLink('Pagination', link, getHref(target),",
+    to: "renderLink('Pagination', undefined, getHref(target),",
   },
   {
     label: 'a pagination string from a JavaScript caller reaches Math.max, so NaN is printed in a link',
     file: 'src/components/pagination/lib.ts',
     from: 'clamp(Number(given), min, max)',
     to: 'clamp(given as number, min, max)',
+  },
+  {
+    label: 'the pagination file stops exporting clampPage, so the README names a helper no caller can import',
+    file: 'src/components/pagination/index.tsx',
+    from: "export { clampPage } from './lib.js'\n",
+    to: '',
   },
 ]

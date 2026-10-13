@@ -30,6 +30,12 @@ describe('the content props are nodes, not strings', () => {
     expectTypeOf<Accepts<EmptyStateProps['labels'], { locale: string; labels: Labels }>>()
       .toEqualTypeOf<false>()
   })
+
+  it('takes locale beside labels, so the pair getLabels returns spreads onto it', () => {
+    expectTypeOf<EmptyStateProps['locale']>().toEqualTypeOf<string | undefined>()
+    expectTypeOf<Accepts<Pick<EmptyStateProps, 'labels' | 'locale'>, { locale: string; labels: Labels }>>()
+      .toEqualTypeOf<true>()
+  })
 })
 
 describe('the props follow the vocabulary', () => {
