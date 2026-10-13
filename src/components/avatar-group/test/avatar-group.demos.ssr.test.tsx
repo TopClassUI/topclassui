@@ -11,7 +11,11 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['counts', 'custom-size', 'four', 'linked', 'many', 'max', 'on-card', 'overflow', 'rtl', 'sizes', 'two']
+const EXPECTED = ['counts', 'custom-size', 'four', 'in-table', 'linked', 'many', 'max', 'on-card', 'overflow', 'rtl', 'sizes', 'two']
+
+/** inline-flex and then the focus ring of the library, written out class by class. */
+const RINGED_LINK = 'inline-flex outline-none focus-visible:outline-solid focus-visible:outline-(length:--tc-ring-width)'
+  + ' focus-visible:outline-offset-(length:--tc-ring-offset) focus-visible:outline-ring'
 
 const render = async (file: string) => {
   const loaded = await import(`../dummy/${file}.tsx`) as { default?: ComponentType }
@@ -109,9 +113,38 @@ describe('the demos cover what a real dashboard does to a group', () => {
 
   it('linked: every face that shows is the one child of a link, and the links are the children of the group', async () => {
     const html = await render('linked')
-    expect(html.match(/<a href="\/people\/[a-z]+" class="inline-flex"><span [^>]*role="img"/g)).toHaveLength(3)
+    expect(html.match(/<a href="\/people\/[a-z]+" class="[^"]*"><span [^>]*role="img"/g)).toHaveLength(3)
     expect(html).toMatch(/^<span [^>]*role="group"[^>]*><a /)
     expect(counters(html)).toEqual(['2 more'])
+  })
+
+  it('linked: every link carries the focus ring of the library, not the one the browser draws', async () => {
+    const links = [...(await render('linked')).matchAll(/<a [^>]*>/g)].map((m) => attr(m[0], 'class'))
+    expect(links).toEqual([RINGED_LINK, RINGED_LINK, RINGED_LINK])
+  })
+
+  it('in-table: teams of 3, 5 and 20, each alone in its cell, beside a count and in a fitted box', async () => {
+    const html = await render('in-table')
+    expect(groups(html).map((tag) => attr(tag, 'aria-label'))).toEqual([
+      'Billing redesign: team', 'Billing redesign: team with a count', 'Billing redesign: team in a box',
+      'Mobile onboarding: team', 'Mobile onboarding: team with a count', 'Mobile onboarding: team in a box',
+      'Search migration: team', 'Search migration: team with a count', 'Search migration: team in a box',
+    ])
+    // Three faces, then four and a counter twice: 3 + 5 + 5 circles, in each of the three places.
+    expect(circles(html)).toBe(39)
+    expect(counters(html)).toEqual(['1 more', '1 more', '1 more', '16 more', '16 more', '16 more'])
+    expect(html.match(/<td [^>]*><span [^>]*role="group"/g)).toHaveLength(3)
+    expect(html.match(/<td [^>]*><span class="inline-flex items-center gap-2"><span [^>]*role="group"/g)).toHaveLength(3)
+    expect(html.match(/<td [^>]*><div class="w-fit [^"]*"><span [^>]*role="group"/g)).toHaveLength(3)
+  })
+
+  it('in-table: every group takes the colour of the table for its ring, as on a Card', async () => {
+    const tags = groups(await render('in-table'))
+    expect(tags).toHaveLength(9)
+    for (const tag of tags) {
+      expect(attr(tag, 'class'), tag).toContain('*:ring-surface-raised')
+      expect(attr(tag, 'class'), tag).not.toContain('*:ring-page')
+    }
   })
 
   it('on-card: the group inside a Card is given the colour of the Card for its ring', async () => {

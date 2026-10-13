@@ -110,6 +110,14 @@ export const ar = {
   },
   rating: {
     value: (value, max, fmt) => `${fmt.format(value)} من ${fmt.format(max)}`,
+    stars: byCount({
+      zero: 'بلا نجوم',
+      one: 'نجمة واحدة',
+      two: 'نجمتان',
+      few: (n) => `${n} نجوم`,
+      many: (n) => `${n} نجمة`,
+      other: (n) => `${n} نجمة`,
+    }),
   },
   table: {
     sortBy: 'ترتيب حسب',
@@ -120,5 +128,30 @@ export const ar = {
     done: 'مكتمل',
     current: 'الحالي',
     todo: 'لم يبدأ',
+  },
+  drawer: {
+    close: 'إغلاق هذه اللوحة',
+  },
+  toast: {
+    region: 'الإشعارات',
+    close: 'إغلاق هذا الإشعار',
+  },
+  command: {
+    label: 'لوحة الأوامر',
+    placeholder: 'اكتب أمرًا أو ابحث',
+  },
+  navbar: {
+    label: 'التنقل الرئيسي',
+  },
+  sidebar: {
+    label: 'الشريط الجانبي',
+    collapse: 'طي الشريط الجانبي',
+    expand: 'توسيع الشريط الجانبي',
+  },
+  tag: {
+    remove: 'إزالة',
+  },
+  banner: {
+    dismiss: 'إغلاق',
   },
 } satisfies Labels

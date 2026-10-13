@@ -65,6 +65,8 @@ export interface Labels {
   }
   readonly rating: {
     readonly value: RatioLabel
+    /** The name of one step of an editable rating, "3 stars". */
+    readonly stars: CountLabel
   }
   readonly table: {
     readonly sortBy: string
@@ -76,6 +78,31 @@ export interface Labels {
     readonly done: string
     readonly current: string
     readonly todo: string
+  }
+  readonly drawer: {
+    readonly close: string
+  }
+  readonly toast: {
+    readonly region: string
+    readonly close: string
+  }
+  readonly command: {
+    readonly label: string
+    readonly placeholder: string
+  }
+  readonly navbar: {
+    readonly label: string
+  }
+  readonly sidebar: {
+    readonly label: string
+    readonly collapse: string
+    readonly expand: string
+  }
+  readonly tag: {
+    readonly remove: string
+  }
+  readonly banner: {
+    readonly dismiss: string
   }
 }
 
