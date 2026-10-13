@@ -65,9 +65,9 @@ describe('the schema of the placeholder (R-5.7-7)', () => {
   }
 
   it('bounds its two counts with the numbers boundaries.ts holds, written out here', () => {
-    expect(skeleton.properties?.['rows']).toMatchObject({ type: 'integer', minimum: 1, maximum: 100, default: 5 })
+    expect(skeleton.properties?.['rows']).toMatchObject({ type: 'integer', minimum: 1, maximum: 500, default: 5 })
     expect(skeleton.properties?.['columns']).toMatchObject({ type: 'integer', minimum: 1, maximum: 50, default: 4 })
-    expect(TABLE_BOUNDARIES.skeletonRowsMax).toBe(100)
+    expect(TABLE_BOUNDARIES.skeletonRowsMax).toBe(500)
     expect(TABLE_BOUNDARIES.skeletonColumnsMax).toBe(50)
   })
 
@@ -81,9 +81,11 @@ describe('the schema of the placeholder (R-5.7-7)', () => {
   it('fills the defaults and refuses what the clamp would have to repair', () => {
     expect(tableSkeletonSchema.parse({})).toEqual({ rows: 5, columns: 4 })
     expect(tableSkeletonSchema.safeParse({ rows: 0 }).success).toBe(false)
-    expect(tableSkeletonSchema.safeParse({ rows: 101 }).success).toBe(false)
+    expect(tableSkeletonSchema.safeParse({ rows: 501 }).success).toBe(false)
     expect(tableSkeletonSchema.safeParse({ rows: 2.5 }).success).toBe(false)
     expect(tableSkeletonSchema.safeParse({ columns: 51 }).success).toBe(false)
-    expect(tableSkeletonSchema.safeParse({ rows: 100, columns: 50 }).success).toBe(true)
+    expect(tableSkeletonSchema.safeParse({ rows: 500, columns: 50 }).success).toBe(true)
+    // The largest page a table is given is a whole page here too, not five of them.
+    expect(tableSkeletonSchema.safeParse({ rows: 101 }).success).toBe(true)
   })
 })
