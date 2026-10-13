@@ -82,6 +82,12 @@ describe('the props follow the vocabulary', () => {
     expectTypeOf<TimelineProps['labels']>().toEqualTypeOf<Labels | undefined>()
   })
 
+  it('takes locale beside labels, so the pair getLabels returns spreads onto it', () => {
+    expectTypeOf<TimelineProps['locale']>().toEqualTypeOf<string | undefined>()
+    expectTypeOf<Accepts<Pick<TimelineProps, 'labels' | 'locale'>, { locale: string; labels: Labels }>>()
+      .toEqualTypeOf<true>()
+  })
+
   it('accepts className, style and ref, and ref is a normal prop', () => {
     expectTypeOf<TimelineProps['className']>().toEqualTypeOf<string | undefined>()
     expectTypeOf<Accepts<keyof TimelineProps, 'style'>>().toEqualTypeOf<true>()

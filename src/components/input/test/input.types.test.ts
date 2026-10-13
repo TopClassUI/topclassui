@@ -92,9 +92,14 @@ describe('the skeleton', () => {
     expectTypeOf<Accepts<InputSkeletonProps, object>>().toEqualTypeOf<true>()
   })
 
-  it('takes no content, no aria-hidden and no fullWidth: it is always full width', () => {
+  it('takes fullWidth as the control does, so the two describe one width', () => {
+    expectTypeOf<InputSkeletonProps['fullWidth']>().toEqualTypeOf<boolean | undefined>()
+    expectTypeOf<InputSkeletonProps['fullWidth']>().toEqualTypeOf<InputProps['fullWidth']>()
+  })
+
+  it('takes no content, no aria-hidden and no state: it is a box and nothing else', () => {
     expectTypeOf<Accepts<keyof InputSkeletonProps, 'children'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof InputSkeletonProps, 'aria-hidden'>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<keyof InputSkeletonProps, 'fullWidth'>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<keyof InputSkeletonProps, 'invalid'>>().toEqualTypeOf<false>()
   })
 })

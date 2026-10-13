@@ -53,6 +53,8 @@ describe('classes that must fail', () => {
     ['bg-red-500', '<div className="bg-red-500" />', 'topclass/semantic-classes-only'],
     ['text-violet-600', '<div className="text-violet-600" />', 'topclass/semantic-classes-only'],
     ['bg-[#fff]', '<div className="bg-[#fff]" />', 'topclass/semantic-classes-only'],
+    ['bg-[red]', '<div className="bg-[red]" />', 'topclass/semantic-classes-only'],
+    ['bg-[CanvasText] with no variant', '<div className="bg-[CanvasText]" />', 'topclass/semantic-classes-only'],
     ['dark:bg-black', '<div className="dark:bg-black" />', 'topclass/semantic-classes-only'],
     ['rounded-md', '<div className="rounded-md" />', 'topclass/shared-class-constants'],
     ['h-10', '<div className="h-10" />', 'topclass/shared-class-constants'],
@@ -256,6 +258,177 @@ describe('gaps the general review found', () => {
     passes('ps-4 me-2 text-start border-s rounded-s-control')
     passes('bg-primary-solid text-body border-line')
     passes('h-control-md rounded-box')
+  })
+})
+
+describe('R-5.2-1: a colour in an arbitrary value', () => {
+  const RULE = 'topclass/semantic-classes-only'
+  /** The message ids this rule reports for one class: none, `arbitrary` or `system`. */
+  const found = (cls: string) =>
+    lint(`<div className="${cls}" />`).filter((m) => m.ruleId === RULE).map((m) => m.messageId)
+
+  const NAMED = [
+    'aliceblue', 'antiquewhite', 'aqua', 'aquamarine', 'azure', 'beige', 'bisque', 'black', 'blanchedalmond',
+    'blue', 'blueviolet', 'brown', 'burlywood', 'cadetblue', 'chartreuse', 'chocolate', 'coral', 'cornflowerblue',
+    'cornsilk', 'crimson', 'cyan', 'darkblue', 'darkcyan', 'darkgoldenrod', 'darkgray', 'darkgreen', 'darkgrey',
+    'darkkhaki', 'darkmagenta', 'darkolivegreen', 'darkorange', 'darkorchid', 'darkred', 'darksalmon',
+    'darkseagreen', 'darkslateblue', 'darkslategray', 'darkslategrey', 'darkturquoise', 'darkviolet', 'deeppink',
+    'deepskyblue', 'dimgray', 'dimgrey', 'dodgerblue', 'firebrick', 'floralwhite', 'forestgreen', 'fuchsia',
+    'gainsboro', 'ghostwhite', 'gold', 'goldenrod', 'gray', 'green', 'greenyellow', 'grey', 'honeydew', 'hotpink',
+    'indianred', 'indigo', 'ivory', 'khaki', 'lavender', 'lavenderblush', 'lawngreen', 'lemonchiffon', 'lightblue',
+    'lightcoral', 'lightcyan', 'lightgoldenrodyellow', 'lightgray', 'lightgreen', 'lightgrey', 'lightpink',
+    'lightsalmon', 'lightseagreen', 'lightskyblue', 'lightslategray', 'lightslategrey', 'lightsteelblue',
+    'lightyellow', 'lime', 'limegreen', 'linen', 'magenta', 'maroon', 'mediumaquamarine', 'mediumblue',
+    'mediumorchid', 'mediumpurple', 'mediumseagreen', 'mediumslateblue', 'mediumspringgreen', 'mediumturquoise',
+    'mediumvioletred', 'midnightblue', 'mintcream', 'mistyrose', 'moccasin', 'navajowhite', 'navy', 'oldlace',
+    'olive', 'olivedrab', 'orange', 'orangered', 'orchid', 'palegoldenrod', 'palegreen', 'paleturquoise',
+    'palevioletred', 'papayawhip', 'peachpuff', 'peru', 'pink', 'plum', 'powderblue', 'purple', 'rebeccapurple',
+    'red', 'rosybrown', 'royalblue', 'saddlebrown', 'salmon', 'sandybrown', 'seagreen', 'seashell', 'sienna',
+    'silver', 'skyblue', 'slateblue', 'slategray', 'slategrey', 'snow', 'springgreen', 'steelblue', 'tan', 'teal',
+    'thistle', 'tomato', 'turquoise', 'violet', 'wheat', 'white', 'whitesmoke', 'yellow', 'yellowgreen',
+  ]
+
+  const SYSTEM = [
+    'Canvas', 'CanvasText', 'LinkText', 'VisitedText', 'ActiveText', 'ButtonFace', 'ButtonText', 'ButtonBorder',
+    'Field', 'FieldText', 'Highlight', 'HighlightText', 'SelectedItem', 'SelectedItemText', 'Mark', 'MarkText',
+    'GrayText', 'AccentColor', 'AccentColorText',
+  ]
+
+  it('refuses every one of the 148 CSS named colours', () => {
+    expect(NAMED).toHaveLength(148)
+    for (const name of NAMED) expect(found(`bg-[${name}]`), name).toEqual(['arbitrary'])
+  })
+
+  const fixed: [string, string][] = [
+    ['a named colour on text', 'text-[rebeccapurple]'],
+    ['a named colour on a border', 'border-[tomato]'],
+    ['a named colour in capitals, since a CSS keyword has no case', 'bg-[RED]'],
+    ['a named colour with an opacity', 'bg-[red]/50'],
+    ['a named colour with an arbitrary opacity', 'bg-[red]/[0.5]'],
+    ['a named colour behind a variant', 'md:bg-[red]'],
+    ['a named colour marked important', '!bg-[red]'],
+    ['a named colour marked important at the end', 'bg-[red]!'],
+    ['a short hex', 'bg-[#fff]'],
+    ['a hex with alpha', 'bg-[#ffffff80]'],
+    ['rgb()', 'bg-[rgb(0,0,0)]'],
+    ['rgba()', 'bg-[rgba(0,0,0,0.5)]'],
+    ['hsl()', 'bg-[hsl(0_0%_0%)]'],
+    ['hwb()', 'bg-[hwb(0_0%_0%)]'],
+    ['lab()', 'bg-[lab(50_0_0)]'],
+    ['lch()', 'bg-[lch(50_0_0)]'],
+    ['oklab()', 'bg-[oklab(0.5_0_0)]'],
+    ['oklch()', 'bg-[oklch(0.5_0_0)]'],
+    ['color()', 'bg-[color(display-p3_1_0_0)]'],
+    ['color-mix()', 'bg-[color-mix(in_oklab,var(--tc-primary),transparent)]'],
+    ['light-dark()', 'bg-[light-dark(var(--tc-page),var(--tc-body))]'],
+    ['a gradient stop, which the first list of prefixes had missed', 'from-[#fff]'],
+    ['an inset ring', 'inset-ring-[red]'],
+    ['a logical border side', 'border-s-[red]'],
+    ['a decoration', 'decoration-[red]'],
+    ['a value declared a colour', 'bg-[color:red]'],
+    ['a value declared a colour that reads a variable', 'bg-[color:var(--tc-primary)]'],
+    ['an arbitrary property', '[color:red]'],
+    ['an arbitrary property with a hex', '[background-color:#fff]'],
+    ['a knob set to a named colour', '[--tc-ring:red]'],
+    ['a named colour behind forced-colors, which exempts system colours only', 'forced-colors:bg-[red]'],
+    ['a hex behind forced-colors', 'forced-colors:bg-[#fff]'],
+    ['a knob set to a named colour behind forced-colors', 'forced-colors:[--tc-ring:red]'],
+  ]
+  for (const [label, cls] of fixed) {
+    it(`refuses ${label}`, () => {
+      expect(found(cls), cls).toEqual(['arbitrary'])
+    })
+  }
+
+  for (const name of SYSTEM) {
+    it(`accepts ${name} behind forced-colors and refuses it anywhere else`, () => {
+      expect(found(`forced-colors:bg-[${name}]`), name).toEqual([])
+      expect(found(`bg-[${name}]`), name).toEqual(['system'])
+    })
+  }
+
+  const unforced: [string, string][] = [
+    ['behind another variant', 'md:bg-[CanvasText]'],
+    ['behind the opposite variant', 'not-forced-colors:bg-[CanvasText]'],
+    ['on a border', 'border-[Highlight]'],
+    ['in lower case', 'bg-[canvastext]'],
+    ['with an opacity', 'bg-[CanvasText]/50'],
+    ['declared a colour', 'bg-[color:Highlight]'],
+    ['in a knob', '[--tc-ring:Highlight]'],
+    ['in an arbitrary property', '[outline-color:Highlight]'],
+  ]
+  for (const [label, cls] of unforced) {
+    it(`refuses a system colour ${label} without forced-colors`, () => {
+      expect(found(cls), cls).toEqual(['system'])
+    })
+  }
+
+  it('says that a system colour needs the forced-colors variant', () => {
+    const messages = lint('<div className="md:bg-[CanvasText]" />').filter((m) => m.ruleId === RULE)
+    expect(messages.map((m) => m.message)).toEqual([
+      'R-5.2-1: "md:bg-[CanvasText]" is a CSS system colour, which is allowed only behind the forced-colors: variant.',
+    ])
+  })
+
+  it('names the whole class when the colour is fixed', () => {
+    const messages = lint('<div className="flex md:bg-[red]/50" />').filter((m) => m.ruleId === RULE)
+    expect(messages.map((m) => m.message)).toEqual([
+      'R-5.2-1: "md:bg-[red]/50" is an arbitrary colour. Use a semantic token.',
+    ])
+  })
+
+  const forced: [string, string][] = [
+    ['the Timeline dot', 'forced-colors:border-[CanvasText] forced-colors:bg-[CanvasText]'],
+    ['the variant first', 'forced-colors:data-highlighted:bg-[Highlight]'],
+    ['the variant last', 'data-highlighted:forced-colors:bg-[Highlight]'],
+    ['the variant between two others', 'md:forced-colors:aria-invalid:border-[Highlight]'],
+    ['the variant beside an arbitrary one', 'forced-colors:data-[side=top]:bg-[Highlight]'],
+    ['a knob', 'forced-colors:[--tc-ring:Highlight]'],
+    ['an arbitrary property', 'forced-colors:[outline-color:Highlight]'],
+    ['lower case', 'forced-colors:bg-[canvastext]'],
+    ['a value declared a colour', 'forced-colors:bg-[color:Highlight]'],
+  ]
+  for (const [label, cls] of forced) {
+    it(`accepts a system colour behind forced-colors: ${label}`, () => {
+      expect(lint(`<div className="${cls}" />`), cls).toEqual([])
+    })
+  }
+
+  const untouched: [string, string][] = [
+    ['a variable', 'bg-[var(--tc-primary)]'],
+    ['a variable with a fallback', 'min-h-[var(--tc-target-min,24px)]'],
+    ['a length', 'h-[1em]'],
+    ['a calculation', 'my-[calc((1lh-1em)/2)]'],
+    ['a font size', 'pointer-coarse:text-[max(1rem,16px)]'],
+    ['a width', 'w-[min(100%,var(--tc-input-width))]'],
+    ['a ring width', 'aria-invalid:inset-ring-[calc(var(--tc-ring-width)-var(--tc-line-width))]'],
+    ['the typed variable form', 'border-(length:--tc-line-width)'],
+    ['the typed variable form behind forced-colors', 'forced-colors:outline-(length:--tc-line-width)'],
+    ['a value declared a length', 'text-[length:var(--tc-font-size)]'],
+    ['an arbitrary property that is not a colour', 'data-ltr:placeholder:[unicode-bidi:plaintext]'],
+    ['a knob set to a variable', '[--tc-ring:var(--tc-line-strong)]'],
+    ['a list of property names', 'transition-[color,background-color,border-color,outline-color,opacity,translate]'],
+    ['an arbitrary variant that names a colour', 'data-[tone=red]:bg-surface'],
+    ['an arbitrary variant with a colon inside', 'supports-[color:red]:bg-surface'],
+    ['transparent, which is mode-agnostic in a bracket as outside one', 'bg-[transparent]'],
+    ['currentColor', 'text-[currentColor]'],
+    ['inherit', 'text-[inherit]'],
+  ]
+  for (const [label, cls] of untouched) {
+    it(`leaves ${label} alone`, () => {
+      expect(found(cls), cls).toEqual([])
+    })
+  }
+
+  it('catches a colour wherever the class string sits', () => {
+    expect(ids('const FORCED = "bg-[CanvasText] flex"')).toContain(RULE)
+    expect(ids('const DOT = { done: "block bg-[red]" }')).toContain(RULE)
+    expect(ids('const dot = "block bg-[red]"')).toContain(RULE)
+    expect(ids('const FORCED = "forced-colors:bg-[CanvasText] flex"')).toEqual([])
+  })
+
+  it('still catches a hex spliced into a template', () => {
+    expect(ids('const c = cn(`bg-[#${hex}]`)')).toContain(RULE)
   })
 })
 

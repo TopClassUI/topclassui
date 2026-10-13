@@ -12,8 +12,8 @@ const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
 const EXPECTED = [
-  'basic', 'caption', 'column-classes', 'empty', 'in-a-layout', 'rtl', 'skeleton', 'sorted', 'sticky-first-column',
-  'striped',
+  'basic', 'caption', 'column-classes', 'empty', 'in-a-layout', 'row-actions', 'rtl', 'skeleton', 'sorted',
+  'sticky-first-column', 'striped',
 ]
 
 const render = async (file: string) => {
@@ -28,7 +28,7 @@ const tables = (html: string) => [...html.matchAll(/<div [^>]*role="region"[^>]*
 const captionOf = (table: string) => /<caption id="([^"]*)"[^>]*>(.*?)<\/caption>/.exec(table)
 
 /** What a stuck body cell ends its class list with, before its fill. */
-const STUCK = 'sticky inset-s-0 z-(--tc-z-sticky) max-w-[var(--tc-table-sticky-width,8rem)] truncate'
+const STUCK = 'sticky inset-s-0 z-(--tc-z-sticky) max-w-[var(--tc-table-sticky-width,8rem)] truncate after:absolute after:inset-y-0 after:inset-e-0 after:border-e-(length:--tc-line-width) after:border-line-strong **:scroll-mx-[100vw]'
 
 describe('every demo renders on the server', () => {
   it('holds exactly these demos, so none can be deleted silently', () => {
@@ -100,7 +100,8 @@ describe('each demo shows what its name says', () => {
     for (const table of [plain ?? '', striped ?? '']) {
       expect(table.split(STUCK).length - 1).toBe(5)
       expect(table).toContain('data-sticky-first-column=""')
-      expect(table).toContain('scroll-ps-[var(--tc-table-sticky-width,8rem)]')
+      expect(table).toContain('scroll-pe-8 ')
+      expect(table).toContain('scroll-ps-[calc(var(--tc-table-sticky-width,8rem)+2rem)]')
     }
     expect(plain).not.toContain('data-striped')
     expect((striped ?? '').split(`${STUCK} bg-surface"`).length - 1).toBe(2)
@@ -113,6 +114,8 @@ describe('each demo shows what its name says', () => {
     expect([...(plain ?? '').matchAll(/<button (?![^>]*disabled="")[^>]*>/g)]).toHaveLength(2)
     expect([...(plain ?? '').matchAll(/<a [^>]*href="\?sort=q\d"/g)]).toHaveLength(4)
     expect([...(plain ?? '').matchAll(/<th scope="row"/g)]).toHaveLength(4)
+    // The last column is sortable and end-aligned: the link e2e/table.spec brings in from past the end of the box.
+    expect((plain ?? '').slice((plain ?? '').lastIndexOf('<th scope="col"'))).toMatch(/^<th [^>]*text-end[^>]*><a [^>]*href="\?sort=total"/)
   })
 
   it('empty: the built-in words in one table and the caller own fallback in the other', async () => {

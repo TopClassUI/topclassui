@@ -95,3 +95,16 @@ describe('with link={<Link href="" />} (PLAN 5.8)', () => {
     expect(linked.startsWith('<nav aria-label="Pagination" data-size="md">')).toBe(true)
   })
 })
+
+describe('a link that is not an element', () => {
+  it('is refused by the name of the prop and of the component, before React fails on it', () => {
+    const notAnElement = 'a' as unknown as PaginationProps['link']
+    expect(() => html({ link: notAnElement })).toThrow(TypeError)
+    expect(() => html({ link: notAnElement })).toThrow('Pagination: link must be an element, such as link={<Link href="" />}')
+  })
+
+  it('says the same for the component passed whole, which is the usual slip: link={Link}', () => {
+    const component = Link as unknown as PaginationProps['link']
+    expect(() => html({ link: component })).toThrow('Pagination: link must be an element')
+  })
+})

@@ -42,6 +42,12 @@ describe('the props', () => {
       .toEqualTypeOf<false>()
   })
 
+  it('takes locale beside labels, so the pair getLabels returns spreads onto it', () => {
+    expectTypeOf<BreadcrumbProps['locale']>().toEqualTypeOf<string | undefined>()
+    expectTypeOf<Accepts<Pick<BreadcrumbProps, 'labels' | 'locale'>, { locale: string; labels: Labels }>>()
+      .toEqualTypeOf<true>()
+  })
+
   it('accepts className, style and ref, and ref is a normal prop on the nav', () => {
     expectTypeOf<BreadcrumbProps['className']>().toEqualTypeOf<string | undefined>()
     expectTypeOf<Accepts<keyof BreadcrumbProps, 'style'>>().toEqualTypeOf<true>()
@@ -84,7 +90,6 @@ describe('the props', () => {
     expectTypeOf<Accepts<keyof BreadcrumbProps, 'separator'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof BreadcrumbProps, 'showHome'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof BreadcrumbProps, 'truncate'>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<keyof BreadcrumbProps, 'locale'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof BreadcrumbProps, 'size'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof BreadcrumbProps, 'variant'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof BreadcrumbProps, 'tone'>>().toEqualTypeOf<false>()

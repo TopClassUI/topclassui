@@ -39,6 +39,7 @@ Every prop below is optional and falls back to the default shown.
 | `description` | no | `ReactNode` | - | Defaults to `labels.state.emptyDescription` only while `title` is unset too; `null` hides it. |
 | `icon` | no | `ReactNode` | - | Above the title. Defaults to the tray icon in the muted colour; `null` hides it. |
 | `labels` | no | `Labels` | - | The built-in strings. Defaults to English; pass `getLabels(locale).labels` for another. |
+| `locale` | no | `string` | - | Accepted so `{...getLabels(locale)}` spreads cleanly. Nothing here formats a number, so it is not used and never reaches the element. |
 | `title` | no | `ReactNode` | - | The bold first line, a paragraph and not a heading. Defaults to `labels.state.empty`; `null` hides it. |
 
 Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.

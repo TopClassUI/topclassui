@@ -81,8 +81,92 @@ const PHYSICAL = [
 const PALETTE =
   /(^|[\s:])(bg|text|border|outline|ring|fill|stroke|from|via|to|divide|decoration|shadow|accent|caret|placeholder)-((slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}|white|black)(\s|$|\/)/
 
-const ARBITRARY_COLOR =
-  /(^|[\s:])(bg|text|border|outline|ring|fill|stroke|shadow|accent|caret|placeholder)-\[(#|rgb|hsl|oklch|color)/
+/** The 148 CSS named colours. transparent and currentColor are not among them: they stay allowed. */
+const NAMED_COLORS = new Set([
+  'aliceblue antiquewhite aqua aquamarine azure beige bisque black blanchedalmond blue blueviolet brown',
+  'burlywood cadetblue chartreuse chocolate coral cornflowerblue cornsilk crimson cyan darkblue darkcyan',
+  'darkgoldenrod darkgray darkgreen darkgrey darkkhaki darkmagenta darkolivegreen darkorange darkorchid darkred',
+  'darksalmon darkseagreen darkslateblue darkslategray darkslategrey darkturquoise darkviolet deeppink',
+  'deepskyblue dimgray dimgrey dodgerblue firebrick floralwhite forestgreen fuchsia gainsboro ghostwhite gold',
+  'goldenrod gray green greenyellow grey honeydew hotpink indianred indigo ivory khaki lavender lavenderblush',
+  'lawngreen lemonchiffon lightblue lightcoral lightcyan lightgoldenrodyellow lightgray lightgreen lightgrey',
+  'lightpink lightsalmon lightseagreen lightskyblue lightslategray lightslategrey lightsteelblue lightyellow',
+  'lime limegreen linen magenta maroon mediumaquamarine mediumblue mediumorchid mediumpurple mediumseagreen',
+  'mediumslateblue mediumspringgreen mediumturquoise mediumvioletred midnightblue mintcream mistyrose moccasin',
+  'navajowhite navy oldlace olive olivedrab orange orangered orchid palegoldenrod palegreen paleturquoise',
+  'palevioletred papayawhip peachpuff peru pink plum powderblue purple rebeccapurple red rosybrown royalblue',
+  'saddlebrown salmon sandybrown seagreen seashell sienna silver skyblue slateblue slategray slategrey snow',
+  'springgreen steelblue tan teal thistle tomato turquoise violet wheat white whitesmoke yellow yellowgreen',
+].join(' ').split(' '))
+
+/** CSS system colours, lower-cased: they only mean something once forced colours own the palette. */
+const SYSTEM_COLORS = new Set([
+  'canvas canvastext linktext visitedtext activetext buttonface buttontext buttonborder field fieldtext',
+  'highlight highlighttext selecteditem selecteditemtext mark marktext graytext accentcolor accentcolortext',
+].join(' ').split(' '))
+
+const COLOR_FUNCTION = /^(rgba?|hsla?|hwb|lab|lch|oklab|oklch|color|color-mix|light-dark|contrast-color)\(/
+
+/** Splits a class at the colons between its variants, never at one inside brackets or parentheses. */
+function splitAtColons(token: string): string[] {
+  const parts: string[] = []
+  let depth = 0
+  let start = 0
+  for (let i = 0; i < token.length; i++) {
+    const ch = token[i]
+    if (ch === '[' || ch === '(') depth++
+    else if (ch === ']' || ch === ')') depth = Math.max(0, depth - 1)
+    else if (ch === ':' && depth === 0) {
+      parts.push(token.slice(start, i))
+      start = i + 1
+    }
+  }
+  parts.push(token.slice(start))
+  return parts
+}
+
+/** What sits between a bracket and its match; to the end when a template cut the class short. */
+function bracketContent(text: string, open: number): string {
+  let depth = 0
+  for (let i = open; i < text.length; i++) {
+    if (text[i] === '[') depth++
+    else if (text[i] === ']' && --depth === 0) return text.slice(open + 1, i)
+  }
+  return text.slice(open + 1)
+}
+
+/**
+ * The kind of colour a utility's arbitrary value is, if it is one. bg-[red], bg-[color:red],
+ * [color:red] and [--tc-ring:red] all hold red, so the value decides and never the prefix.
+ */
+function arbitraryColor(utility: string): 'arbitrary' | 'system' | undefined {
+  const bare = utility.replace(/^!/, '')
+  const open = bare.indexOf('[')
+  if (open === -1) return undefined
+  const isProperty = open === 0
+  if (!isProperty && !/^-?[a-z][a-z0-9-]*-$/.test(bare.slice(0, open))) return undefined
+  const inner = bracketContent(bare, open)
+  // A property name in [color:red], or the type a value declares in bg-[color:red].
+  const head = /^(--)?[a-z][a-z0-9-]*:/.exec(inner)?.[0] ?? ''
+  if (isProperty && head === '') return undefined
+  const value = inner.slice(head.length).toLowerCase()
+  if (SYSTEM_COLORS.has(value)) return 'system'
+  if (NAMED_COLORS.has(value) || value.startsWith('#') || COLOR_FUNCTION.test(value)) return 'arbitrary'
+  // bg-[color:var(--x)] declares a colour, whatever the variable holds.
+  return !isProperty && head === 'color:' ? 'arbitrary' : undefined
+}
+
+/** The first class whose arbitrary value is a colour, unless it is a system colour behind forced-colors. */
+function findArbitraryColor(value: string): { cls: string; kind: 'arbitrary' | 'system' } | undefined {
+  for (const cls of value.split(/\s+/)) {
+    const variants = splitAtColons(cls)
+    const kind = arbitraryColor(variants.pop() ?? '')
+    if (kind === undefined) continue
+    if (kind === 'system' && variants.includes('forced-colors')) continue
+    return { cls, kind }
+  }
+  return undefined
+}
 
 const BANNED_SCALE = [
   [/(^|[\s:])rounded-(none|xs|sm|md|lg|xl|2xl|3xl|4xl|full)(\s|$)/, 'use rounded-control, rounded-box or rounded-chip'],
@@ -134,11 +218,16 @@ const rules = {
   'semantic-classes-only': {
     meta: {
       type: 'problem' as const,
-      docs: { description: 'R-5.2-1: semantic tokens only; no palette, no arbitrary colour, no dark: variant.' },
+      docs: {
+        description:
+          'R-5.2-1: semantic tokens only; no palette, no arbitrary colour, no dark: variant.'
+          + ' A CSS system colour passes only behind forced-colors:.',
+      },
       schema: [],
       messages: {
         palette: 'R-5.2-1: "{{cls}}" names a palette colour. Use a semantic class such as bg-primary-solid or text-body.',
         arbitrary: 'R-5.2-1: "{{cls}}" is an arbitrary colour. Use a semantic token.',
+        system: 'R-5.2-1: "{{cls}}" is a CSS system colour, which is allowed only behind the forced-colors: variant.',
         dark: 'R-5.2-1: the dark: variant is banned. Modes are set by data-theme, so one class covers every mode.',
       },
     },
@@ -146,8 +235,8 @@ const rules = {
       return eachClassString((node, value) => {
         const p = PALETTE.exec(value)
         if (p) return ctx.report({ node, messageId: 'palette', data: { cls: p[0].trim() } })
-        const a = ARBITRARY_COLOR.exec(value)
-        if (a) return ctx.report({ node, messageId: 'arbitrary', data: { cls: a[0].trim() } })
+        const a = findArbitraryColor(value)
+        if (a) return ctx.report({ node, messageId: a.kind, data: { cls: a.cls } })
         if (/(^|[\s:])dark:/.test(value)) ctx.report({ node, messageId: 'dark' })
       })
     },
