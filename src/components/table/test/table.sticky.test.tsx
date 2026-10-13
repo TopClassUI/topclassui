@@ -28,15 +28,28 @@ const classesOf = (source: string, tag: string) =>
 
 const body = (source: string) => source.slice(source.indexOf('<tbody>'))
 
+/** The line down the inline end of the stuck column, drawn on a pseudo-element of each stuck cell. */
+const LINE = ['after:absolute', 'after:inset-y-0', 'after:inset-e-0', 'after:border-e-(length:--tc-line-width)', 'after:border-line-strong']
+
 /** What a stuck cell adds to its own classes, before its fill. */
-const STUCK = ['sticky', 'inset-s-0', 'z-(--tc-z-sticky)', 'max-w-[var(--tc-table-sticky-width,8rem)]', 'truncate']
+const STUCK = [
+  'sticky', 'inset-s-0', 'z-(--tc-z-sticky)', 'max-w-[var(--tc-table-sticky-width,8rem)]', 'truncate', ...LINE, '**:scroll-mx-[100vw]',
+]
+
+/** Every header cell and every body cell of a table with a stuck column, in document order. */
+const stuckCells = () => [...classesOf(html({ stickyFirstColumn: true }), 'th'), ...classesOf(html({ stickyFirstColumn: true }), 'td')]
+
+/** Which of those fifteen cells are in the first column. */
+const FIRST_COLUMN = [true, false, false, true, false, false, true, false, false, true, false, false, true, false, false]
 
 describe('stickyFirstColumn', () => {
-  it('sticks nothing and pads nothing by default', () => {
+  it('sticks nothing, draws no edge and keeps no room for a stuck column by default', () => {
     expect(html()).not.toContain('sticky')
     expect(html()).not.toContain('inset-s-0')
-    expect(html()).not.toContain('scroll-ps-')
     expect(html()).not.toContain('--tc-table-sticky-width')
+    expect(html()).not.toContain('after:')
+    expect(html()).not.toContain('scroll-mx-')
+    expect(classList(html()).filter((c) => c.startsWith('scroll-p'))).toEqual(['scroll-ps-8', 'scroll-pe-8'])
   })
 
   it('sticks the first header cell to the inline start, on the fill every header has', () => {
@@ -74,15 +87,36 @@ describe('stickyFirstColumn', () => {
 
   it('caps the stuck column by the variable the box pads its scrolling with, so the pad is never the smaller', () => {
     const html_ = html({ stickyFirstColumn: true })
-    expect(classList(html_)).toContain('scroll-ps-[var(--tc-table-sticky-width,8rem)]')
+    // The cap and 2rem more: a focused control shows that much clear of the column, or is scrolled to.
+    expect(classList(html_).filter((c) => c.startsWith('scroll-p')))
+      .toEqual(['scroll-pe-8', 'scroll-ps-[calc(var(--tc-table-sticky-width,8rem)+2rem)]'])
     const [header] = classesOf(html_, 'th')
     const [cell] = classesOf(body(html_), 'td')
     expect(header).toEqual(expect.arrayContaining(STUCK))
-    expect(cell?.slice(-6)).toEqual([...STUCK, 'bg-surface-raised'])
+    expect(cell?.slice(-12)).toEqual([...STUCK, 'bg-surface-raised'])
   })
 
-  it('pads the scrolling only when a column is stuck: with none, nothing can cover a control', () => {
-    expect(classList(html({ stickyFirstColumn: false }))).not.toContain('scroll-ps-[var(--tc-table-sticky-width,8rem)]')
+  it('pads the scrolling by the stuck column only when a column is stuck: with none, nothing can cover a control', () => {
+    expect(classList(html({ stickyFirstColumn: false })).filter((c) => c.includes('--tc-table-sticky-width'))).toEqual([])
+  })
+
+  it('draws the edge of the stuck column with the strong line, on the inline end of every stuck cell and of no other', () => {
+    expect(stuckCells().map((list) => LINE.every((c) => list.includes(c)))).toEqual(FIRST_COLUMN)
+    expect(stuckCells().flat().filter((c) => c.startsWith('after:'))).toHaveLength(25)
+    // Not the hairline of the row lines: in dark that is the fill of a raised cell, and a line of it paints nothing.
+    expect(stuckCells().flat()).not.toContain('after:border-line')
+  })
+
+  it('puts that edge on a pseudo-element: a border on the cell itself would widen the column by its own width', () => {
+    expect(stuckCells().flat().filter((c) => /^border-[se]-/.test(c))).toEqual([])
+    // absolute against the cell that sticky positions, so nothing in the row is laid out around it.
+    expect(stuckCells().filter((list) => list.includes('after:absolute')).every((list) => list.includes('sticky'))).toBe(true)
+  })
+
+  it('takes every control of the stuck column out of the scrolling, or focusing one pulls the box back on every row', () => {
+    expect(stuckCells().map((list) => list.includes('**:scroll-mx-[100vw]'))).toEqual(FIRST_COLUMN)
+    // On what the cell holds, never on the cell: a margin of its own would move nothing a keyboard reaches.
+    expect(stuckCells().flat().filter((c) => c.startsWith('scroll-m'))).toEqual([])
   })
 })
 

@@ -84,7 +84,7 @@ They arrive with the phases that need them.
 ## 2. Styling
 
 ### R-5.2-1 Semantic classes only
-**Rule:** inside `src/`, use `bg-primary-solid`, `text-body`, `border-line`; palette classes, arbitrary colours and the `dark:` variant are banned.
+**Rule:** inside `src/`, use `bg-primary-solid`, `text-body`, `border-line`; palette classes, arbitrary colours (a hex, a colour function or a named colour such as `bg-[red]`) and the `dark:` variant are banned. The one exception is a CSS system colour (`CanvasText`, `Canvas`, `Highlight`), allowed only behind the `forced-colors:` variant.
 **Why:** a component that never names a real colour works in every mode, including modes that do not exist yet.
 **Enforced by:** `eslint` (a subset of the Appendix C patterns)
 

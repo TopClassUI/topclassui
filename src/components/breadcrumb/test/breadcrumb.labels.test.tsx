@@ -35,6 +35,13 @@ describe('the name of the nav comes from labels', () => {
     expect(name(html({ labels: getLabels('en-GB').labels }))).toBe(EN_LABEL)
   })
 
+  it('takes the whole pair getLabels returns as a spread, and writes no locale on the nav', () => {
+    const out = html({ ...getLabels('ar') })
+    expect(name(out)).toBe(AR_LABEL)
+    expect(out).not.toMatch(/locale=|\[object/)
+    expect(out.startsWith('<nav aria-label="مسار التنقل" class="text-sm"><ol ')).toBe(true)
+  })
+
   it('takes a caller override of that one key', () => {
     const labels = getLabels('en', { breadcrumb: { label: 'You are here' } }).labels
     expect(name(html({ labels }))).toBe('You are here')
@@ -51,6 +58,24 @@ describe('the name of the nav comes from labels', () => {
     const out = html({ labels: ar })
     expect(count(out, AR_LABEL)).toBe(1)
     expect(out).not.toContain(`>${AR_LABEL}<`)
+  })
+})
+
+describe('a name from the caller, handled as Pagination handles one', () => {
+  it('falls back to the labels for an empty aria-label, which would name nothing', () => {
+    expect(name(html({ 'aria-label': '' }))).toBe(EN_LABEL)
+    expect(name(html({ 'aria-label': '', labels: ar }))).toBe(AR_LABEL)
+  })
+
+  it('falls back to the labels for an aria-label a wrapper forwards as undefined', () => {
+    expect(name(html({ 'aria-label': undefined }))).toBe(EN_LABEL)
+    expect(name(html({ 'aria-label': undefined, labels: ar }))).toBe(AR_LABEL)
+  })
+
+  it('keeps a real name, written once and in the place of the built-in one', () => {
+    const out = html({ 'aria-label': 'Category trail', className: 'mt-2' })
+    expect(out.startsWith('<nav aria-label="Category trail" class="text-sm mt-2"><ol ')).toBe(true)
+    expect(count(out, 'aria-label=')).toBe(1)
   })
 })
 
