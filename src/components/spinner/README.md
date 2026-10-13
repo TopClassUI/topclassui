@@ -42,6 +42,7 @@ Every prop below is optional and falls back to the default shown.
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
 | `labels` | no | `Labels` | - | The built-in strings; the accessible name is `labels.common.loading`. Defaults to English. |
+| `locale` | no | `string` | - | Accepted so `{...getLabels(locale)}` spreads cleanly. Nothing here formats a number, so it is not used and never reaches the element. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The icon scale, 16 to 40 px; custom sets no size, so it follows the text at 1em. |
 | `tone` | no | `primary` \| `neutral` \| `success` \| `warning` \| `danger` \| `info` | `"primary"` | The colour ramp it draws in; className="text-current" takes the text colour instead. |
 

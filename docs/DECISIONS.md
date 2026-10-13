@@ -6,6 +6,70 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-10 - The review of the merged Unit 2, and what it changed
+
+**Decision.** With Unit 2 on main, six reviewers looked at the unit as a whole: the components used together in three dashboard pages, a sweep of every demo page, the code, the API across components, a keyboard and screen-reader journey, and the record. There was no blocker. What changed, one line each:
+
+- **One mutation file per area.** `scripts/mutations/<area>.ts`, found by `index.ts`, so a component branch edits no shared file. The 289 rows moved byte for byte.
+- **A test gets 20 seconds.** On a busy machine the first test of a file paid for its imports and timed out at 5.
+- **The lint holds R-5.2-1 for named colours.** `bg-[red]` is refused, and a system colour passes only behind `forced-colors:`. The rule text says so.
+- **One `link` helper.** `renderLink` in `src/shared/link.tsx` serves Pagination, Breadcrumb and Table, and says which prop is wrong when it is not an element.
+- **The `--tc-*` style typing is imported by Table and Input**, so the README's `style` samples compile in a program without Progress.
+- **`locale` is accepted and dropped** by Breadcrumb, Table, Timeline, EmptyState and Spinner, so `{...getLabels('ar')}` no longer writes a `locale` attribute. ESLint's unused-variable rule ignores rest siblings for this.
+- **AvatarGroup keeps its natural width** (`w-max max-w-full`), so a team in a table cell stays on one row. The cost: a group of twenty in a box sized by its content no longer wraps on a phone; `className="w-auto"` brings the wrap back.
+- **Table.** A sort link is as wide as its label. The box keeps 2rem of focus room at both ends, and the controls of the stuck column never move it. The stuck column has an edge in `--tc-line-strong`, drawn on a pseudo-element so no cell moves. `TableSkeleton` takes up to 500 rows. `aria-label` on a Table compiles and is ignored, as its README says.
+- **InputSkeleton is the box of its field**: its own width, or the full width with `fullWidth`, and the touch height. Beside a Button the README's recipe is `flex-1` on the Input.
+- **Small guards.** A false icon in a Timeline keeps the dot. A Breadcrumb label that is not a string leaves its crumb out. Pagination exports `clampPage`, which its README tells a caller to query with.
+- **A live harness** hydrates every demo in a real browser (`pnpm harness:serve`, `e2e/live.ts`), on a Vite server taken from `vitest/node`, so no dependency is added.
+
+**Why.** Each line answers a measurement, in Chromium.
+
+- An AvatarGroup in a scrolling table cell stacked one avatar per line: 40 x 216 px for five members.
+- `InputSkeleton` was 1201 px wide for a 193 px field, and 28 px tall where the field is 44 on touch.
+- A sort link filled its column, so its ring was as wide as the column and was cut by the box; tabbing down 25 rows moved the box 49 times. Chromium leaves a focused control alone when any part of it is inside the scroll padding, so the padding is what decides how much of it shows.
+- In dark the hairline is the colour of a raised cell, so an edge in `--tc-line` painted nothing.
+- `style={{ '--tc-table-sticky-width': '24rem' }}` failed with TS2353 unless Progress was imported somewhere.
+- `{...getLabels('ar')}` put `locale="ar"` on the root of three components.
+- Four tests timed out at 5 s in a run beside other suites and passed alone.
+- The live harness is what Unit 3 is accepted on (PLAN 19, Phase 5). On its first run it measured a Tooltip arrow 76 px from the edge that faces its trigger, inside a right-to-left provider on a left-to-right page: a portal takes the direction of `<body>`.
+
+**Affects.** R-5.2-1 and its lint. `docs/CLOUD-PLAN.md` sections 7 and 9. `vitest.config.ts`, `eslint.config.ts`, `playwright.config.ts`. Left open for Omar: a `total` on AvatarGroup, an Input that gives way by default, whether Tag and Badge may shrink, the page-size selector, and Arabic-Indic digits in a Server Component. The use of `createViteServer` from `vitest/node` leans on an export Vitest does not document as public (R-0-1).
+
+## 2026-10-10 - Unit 2 is on main, and where it leaves its Build this blocks the reason was measured
+
+**Decision.** Unit 2 is nine components: Input, Tag, Avatar, AvatarGroup, Breadcrumb, Pagination, Timeline, Table and Banner, built from the Build this blocks of `docs/figma/unit-2.md`. Each was reviewed twice in a real browser before it merged, and the review changed the blocks in the places below. The code, the README of each component and this entry are the record; the blocks are not edited. One line per change:
+
+- **Rating moves to Unit 3.** It is built whole there, with its editable half, beside the client halves of Tag (remove), Avatar (hide a failed image) and Banner (dismiss). `rating.value` is already in the labels and has no reader until then.
+- **`link` on Breadcrumb, Pagination and Table.** `link={<Link href="" />}` is the element every link is cloned from; its `href` is replaced. The blocks had a plain `<a>` only.
+- **Input.** Its own width is `--tc-input-width` (13.8em), less in a narrow row; `fullWidth` fills. Email, number, tel and url are `dir="ltr"` unless the caller passes `dir`, and keep the form's side through the new utility `text-match-parent`. `invalid` thickens the line as well as colouring it. Under a coarse pointer the text is at least 16 px. `readOnly` sits on `bg-neutral-soft`. `maxLength` is written only on the six types HTML allows it on.
+- **Table.** Cells are `whitespace-nowrap`. A column takes `className` and `rowHeader`. The stuck column is capped at `--tc-table-sticky-width` (`clamp(8rem, 30vw, 16rem)`) and the box keeps the same width free with `scroll-padding`. The box is `relative isolate grid grid-cols-1`, a named `role="region"` with a tab stop. `captionVisible` draws the caption. `columns` skips false, null and undefined. `TableSkeleton` exists, with `rows` (1 to 100) and `columns` (1 to 50). Its category is `media-and-display`, as PLAN 18.2 lists it, not `data` as the block says; the same holds for Timeline.
+- **Table and Timeline do not use `useCollection`.** docs/CLOUD-PLAN.md says they are its first users. They render the `items` they are given; windowing and `loadMore` wait for the first list that needs them (R-8.5-1 stays "not yet").
+- **Pagination.** The default size is `md`, not the drawn `sm`. A cell is a square that grows with its number. The current page is named by the new label `pagination.pageOf` ("Page 3 of 12"). Previous and next carry `rel`. An edge control is `<span role="link" aria-disabled="true">`.
+- **Timeline.** The status is said in words: a visually hidden `labels.timeline.done`, `.current` or `.todo` in each item (three new labels). The current marker is a smaller dot inside the same 12 px box. Every filled dot carries the `BORDER_STRONG` stroke. A status with no tone takes success for done and primary for current. Title and time are `<div>`, not `<p>`. `getKey` returns a string.
+- **Banner.** The row wraps (`flex-wrap`), and the message is `min-w-0 grow basis-40`, so the action drops under it. Forced colours get a bottom edge.
+- **Breadcrumb.** `baseUrl` makes the JSON-LD URLs absolute. The current page is `font-semibold` as well as `text-body`. A crumb with a blank label is left out. A crumb with no `href` that is not the last is plain text. It takes no `locale`: it formats no number.
+- **Avatar.** `AvatarImage` takes `render` (the element form) for next/image. `AvatarRoot` takes `role="img"` by itself when it is given `aria-label` or `aria-labelledby`. `AvatarFallback` is `aria-hidden` unless told otherwise. A failed image no longer paints its alt (`text-transparent`). Forced colours get an outline.
+- **AvatarGroup.** The group wraps and is never wider than its container. The counter is a circle until its count is too long, then a pill. The overlap is 4 px at `xs` and `sm`, 8 px above. A child that is a link is ringed and rises when focused.
+- **Tag.** The root is `overflow-hidden whitespace-nowrap shrink-0`, so a label passed as an element is clipped at the chip. `TAG_BOUNDARIES.labelMaxLength` is 100; Breadcrumb's is 200.
+- **System colours are allowed behind `forced-colors:` and nowhere else.** Timeline writes `forced-colors:bg-[CanvasText]` and `forced-colors:border-[CanvasText]`. This narrows R-5.2-1. The lint holds the line since the entry above.
+- **Two tokens and one utility are new:** `--tc-table-sticky-width`, `--tc-input-width` and `text-match-parent`.
+
+**Why.** Each change answers a measurement on the built component; the numbers are from Chromium, on the harness pages.
+
+- `link`: every crumb, page and sort link was a full page load in Next.js, and the types refused any other element (TS2353).
+- Input width: two Inputs in a row inside a grid form were 426 px wide on a 320 px phone. Direction: in an Arabic form `-1234.5` was painted `1234.5-`, and an email put its domain before the `@`. Invalid: the idle line was 4.74:1 and the invalid one 4.77:1 on white, so they differed by hue alone, and under forced colours not at all. Touch: the text was 12 to 14 px, and iOS Safari zooms the page under 16. Read-only looked exactly like a filled input.
+- Table: at 390 px the page itself scrolled, to 430 px on the RTL demo and 594 px with the sticky column, because the hidden "Sort by" spans sat outside the box. Inside a flex item the page was 797 px wide at 390, and inside an `inline-flex` parent 755; the grid box brings both to 375. The stuck column took 240 px of a 384 px box and hid the control that had focus. Without `nowrap` a narrow screen stacked a date word by word. A table without a row header gives a screen reader a number with no row to belong to. PLAN 8.2 names `TableSkeleton`: five rows are 263 px in both.
+- Pagination: R-5.7-2 says `md` on every component with a scale, and 40 px is the height of the Button beside it. A long page number spilled out of a fixed square.
+- Timeline: the status reached a screen reader for `current` only, and the done and current fills were 1.1:1 against each other. The warning dot was 2.13:1 on white. Under forced colours a kept neutral fill was 1.17:1 on the canvas, which is what the system colour is for. A `<p>` title holding paragraphs was emptied by the parser and failed hydration.
+- Banner: at 320 px the action squeezed the message to 0 px, 25 lines, in a banner 524 px tall.
+- Breadcrumb: the JSON-LD listed `"item":"/"`, which a crawler cannot resolve. The current page differed from a link by colour alone. A blank label was a nameless 24 x 24 link that failed axe.
+- Avatar: next/image had no way in. `aria-label` on a span with no role fails axe (`aria-prohibited-attr`). A failed image printed its alt over the initials. Under forced colours the circle was 1:1 against the page.
+- AvatarGroup: a long group made a 320 px page 1048 px wide. `+12,345` at `xs` lost 76 px of ink to the circle. At `xs` the overlap covered 4.5 of the 17 px of the initials.
+- Tag: `<Tag><strong>` with 300 characters put a 2319 px child in a 182 px tag and the page at 2341 px. Without `shrink-0` a row crushed a 55 px tag to 36.
+- Rating: its editing half is client code, and the client template is settled by Unit 3's first overlay, not before.
+
+**Affects.** PLAN 6.6 for Unit 2. R-5.2-1 (the forced-colours exception, to be written into `docs/RULES.md` with the lint). R-5.7-4 in use for the first time on a server component (`link`, `AvatarImage render`). docs/CLOUD-PLAN.md Appendix A: Rating leaves Unit 2 for Unit 3, and the line that Table and Timeline use `useCollection` is not true yet. `src/tokens.css`, `src/styles.css` and `src/shared/labels`. Open and planned, not decided here: the focus ring under forced colours, Arabic-Indic digits in a Server Component, the README import line of a part family, an emoji-safe label cut, and one mutation file per component.
+
 ## 2026-10-07 - Unit 1 is built from docs/figma/unit-1.md, and where it leaves the drawing the file says so
 
 **Decision.** The session that builds Unit 1 has no Figma access, so the design of its ten components is written out in `docs/figma/unit-1.md`: the facts read from the file, and a **Build this** block per component that fixes its parts, props, defaults and classes. When sources disagree the order is the rules in CLAUDE.md, this file, the Build this block, the catalog row and the Unit 1 table, a bound Figma variable, a raw Figma number, and last a prop name in a docs playground. The Build this blocks are adopted as written. The larger changes from the drawing or from the recipe, one line each; the Not built and For the reviewer lines of each block hold the rest:

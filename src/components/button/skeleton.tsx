@@ -1,5 +1,5 @@
 import { cn } from '#shared/cn.js'
-import { CONTROL_HEIGHT } from '#shared/classes.js'
+import { CONTROL_HEIGHT, FORCED_EDGE } from '#shared/classes.js'
 import { SKELETON_WIDTH } from './classes.js'
 import { BUTTON_DEFAULTS } from './constants.js'
 import type { ButtonSkeletonProps } from './types.js'
@@ -14,6 +14,7 @@ export function ButtonSkeleton({
     <span
       className={cn(
         'block animate-pulse rounded-control bg-surface motion-reduce:animate-none',
+        FORCED_EDGE,
         CONTROL_HEIGHT[size],
         SKELETON_WIDTH[size],
         fullWidth && 'w-full',

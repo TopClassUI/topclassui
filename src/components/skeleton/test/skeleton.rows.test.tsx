@@ -13,8 +13,8 @@ const rowsOf = (out: string) =>
 
 /** Every class a row wears, written out, so a row that loses its fill or its margins fails. */
 const ROW = [
-  'animate-pulse', 'bg-neutral-soft', 'block', 'h-[1em]', 'motion-reduce:animate-none',
-  'my-[calc((1lh-1em)/2)]', 'rounded-chip',
+  'animate-pulse', 'bg-neutral-soft', 'block', 'forced-colors:outline-(length:--tc-line-width)', 'h-[1em]',
+  'motion-reduce:animate-none', 'my-[calc((1lh-1em)/2)]', 'rounded-chip',
 ]
 const LAST = [...ROW, 'w-2/3'].sort()
 

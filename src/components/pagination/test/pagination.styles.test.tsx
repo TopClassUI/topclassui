@@ -31,7 +31,7 @@ const missing = (wanted: readonly string[], list: readonly string[]) => wanted.f
 const FLOOR_HEIGHT = ['min-h-[var(--tc-target-min,24px)]', 'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]']
 const FLOOR_WIDTH = ['min-w-[var(--tc-target-min,24px)]', 'pointer-coarse:min-w-[var(--tc-target-coarse,44px)]']
 const RING = [
-  'outline-hidden',
+  'outline-none',
   'focus-visible:outline-solid',
   'focus-visible:outline-(length:--tc-ring-width)',
   'focus-visible:outline-offset-(length:--tc-ring-offset)',

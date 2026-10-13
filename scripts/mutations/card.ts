@@ -56,4 +56,10 @@ export const MUTATIONS: Mutation[] = [
     from: 'CardRootProps, CardSkeletonProps,',
     to: 'CardRootProps, CardRootProps as Card, CardSkeletonProps,',
   },
+  {
+    label: 'the card skeleton loses its line, so it paints nothing in forced colours',
+    file: 'src/components/card/classes.ts',
+    from: "  FORCED_EDGE,\n].join(' ')",
+    to: "].join(' ')",
+  },
 ]

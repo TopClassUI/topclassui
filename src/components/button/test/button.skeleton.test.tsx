@@ -47,6 +47,14 @@ describe('ButtonSkeleton', () => {
     expect(classes({ fullWidth: true })).toContain('w-full')
   })
 
+  // e2e/skeleton.spec measures it: with the fill erased, the box painted nothing at all.
+  it('keeps one line under forced colours at every size, and no outline outside them', () => {
+    for (const size of BUTTON_SIZES) {
+      expect(classes({ size }).filter((c) => c.includes('outline')), size)
+        .toEqual(['forced-colors:outline-(length:--tc-line-width)'])
+    }
+  })
+
   it('pulses, and stops pulsing for a reader who asked it to', () => {
     // Without the first, the second passes vacuously: nothing is animating.
     expect(classes({})).toContain('animate-pulse')

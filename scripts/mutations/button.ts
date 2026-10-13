@@ -87,4 +87,10 @@ export const MUTATIONS: Mutation[] = [
     from: "  const deadLink = inactive && render?.type === 'a'",
     to: '  const deadLink = false',
   },
+  {
+    label: 'the button skeleton loses its line, so it paints nothing in forced colours',
+    file: 'src/components/button/skeleton.tsx',
+    from: '        FORCED_EDGE,\n',
+    to: '',
+  },
 ]

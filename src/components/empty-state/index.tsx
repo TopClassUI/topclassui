@@ -18,6 +18,7 @@ export function EmptyState({
   title,
   description,
   labels = en,
+  locale: _locale,
   className,
   children,
   ...rest

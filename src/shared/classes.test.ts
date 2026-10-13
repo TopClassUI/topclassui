@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { SIZES } from './contracts/size.js'
 import {
   BORDER, BORDER_STRONG, BORDER_WIDTH, CONTROL_HEIGHT, CONTROL_SIZE, DISABLED, FOCUS_RING,
-  HOVER, LOADING, TOGGLE_SIZE, TOUCH_TARGET, TRANSITION,
+  FORCED_EDGE, HOVER, LOADING, TOGGLE_SIZE, TOUCH_TARGET, TRANSITION,
 } from './classes.js'
 
 // Shapes are named here, not derived: a derived expectation shrinks with the constant.
@@ -30,9 +30,9 @@ describe('the touch target covers both axes and both pointers (R-5.6-2)', () => 
   })
 })
 
-describe('the focus ring paints and survives forced colours (R-5.6-1)', () => {
+describe('the focus ring paints on focus and nothing at rest (R-5.6-1)', () => {
   for (const cls of [
-    'outline-hidden', 'focus-visible:outline-solid',
+    'outline-none', 'focus-visible:outline-solid',
     'focus-visible:outline-(length:--tc-ring-width)',
     'focus-visible:outline-offset-(length:--tc-ring-offset)',
     'focus-visible:outline-ring',
@@ -41,6 +41,21 @@ describe('the focus ring paints and survives forced colours (R-5.6-1)', () => {
       expect(has(FOCUS_RING, cls)).toBe(true)
     })
   }
+
+  // Tailwind's outline-hidden is a 2px transparent outline under forced colours, which paints it.
+  it('never resets with outline-hidden, which rings every control at rest under forced colours', () => {
+    expect(has(FOCUS_RING, 'outline-hidden')).toBe(false)
+  })
+
+  it('is those five classes and no sixth', () => {
+    expect(FOCUS_RING.split(' ')).toHaveLength(5)
+  })
+})
+
+describe('the line forced colours leave of a shape drawn by its fill alone', () => {
+  it('is one outline at the line width, behind forced-colors and nowhere else', () => {
+    expect(FORCED_EDGE).toBe('forced-colors:outline-(length:--tc-line-width)')
+  })
 })
 
 describe('disabled and loading each carry both halves', () => {

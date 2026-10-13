@@ -25,7 +25,7 @@ const LINK = [
   'inline-flex', 'items-center', 'justify-center', 'rounded-chip', 'text-muted', 'underline-offset-4',
   'max-w-full',
   'hover:underline',
-  'outline-hidden',
+  'outline-none',
   'focus-visible:outline-solid',
   'focus-visible:outline-(length:--tc-ring-width)',
   'focus-visible:outline-offset-(length:--tc-ring-offset)',
@@ -81,7 +81,7 @@ describe('the link is interactive, so it carries what R-5.6 asks of every contro
   const link = () => classesOf(html(), 'a')
 
   it('has the whole focus ring, including the solid style without which it paints nothing', () => {
-    expect(link()).toContain('outline-hidden')
+    expect(link()).toContain('outline-none')
     expect(link()).toContain('focus-visible:outline-solid')
     expect(link()).toContain('focus-visible:outline-(length:--tc-ring-width)')
     expect(link()).toContain('focus-visible:outline-offset-(length:--tc-ring-offset)')
