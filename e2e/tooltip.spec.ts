@@ -47,6 +47,11 @@ const SIDES: ReadonlyArray<{ demo: string, direction: Direction, edge: Edge, nam
   { demo: 'tooltip--rtl', direction: 'rtl', edge: 'end', name: 'نسخ الرابط', where: 'right' },
   { demo: 'tooltip--rtl', direction: 'rtl', edge: 'end', name: 'حذف هذا الصف', where: 'right' },
   { demo: 'tooltip--rtl', direction: 'rtl', edge: 'start', name: 'حذف هذا الصف', where: 'left' },
+  // The same demo as an island on an LTR page: its own provider still makes start the right-hand side.
+  { demo: 'tooltip--rtl', direction: 'ltr', edge: 'start', name: 'نسخ الرابط', where: 'right' },
+  { demo: 'tooltip--rtl', direction: 'ltr', edge: 'start', name: 'حذف هذا الصف', where: 'right' },
+  { demo: 'tooltip--rtl', direction: 'ltr', edge: 'end', name: 'نسخ الرابط', where: 'left' },
+  { demo: 'tooltip--rtl', direction: 'ltr', edge: 'end', name: 'حذف هذا الصف', where: 'left' },
 ]
 
 interface Box { left: number, top: number, right: number, bottom: number }
@@ -180,9 +185,6 @@ test('the stylesheet already holds the classes of a popup nothing has rendered y
   })
 })
 
-/** An island: the demo mounts its own RTL provider, so on an LTR page its portal sits in a body of the other direction. */
-const island = (demo: string, direction: Direction) => demo === 'tooltip--rtl' && direction === 'ltr'
-
 test.describe('with the trigger flush against an edge', () => {
   // Twelve tooltips on one page: 9 s on a busy machine, so the default half minute is too close.
   test.describe.configure({ timeout: 60_000 })
@@ -200,7 +202,7 @@ test.describe('with the trigger flush against an edge', () => {
 
             const written = SIDES.find((row) => row.demo === demo && row.direction === direction && row.edge === edge && row.name === name)
             if (written) expect(placed.where, `"${name}" opened on the wrong side`).toBe(written.where)
-            if (!island(demo, direction)) expectArrowTowardTrigger(placed, name)
+            expectArrowTowardTrigger(placed, name)
           }
         })
       }
@@ -208,11 +210,19 @@ test.describe('with the trigger flush against an edge', () => {
   }
 })
 
-// Measured on 2026-10-10: the arrow is 76 px away, on the far edge. Base UI takes start and end from
-// the provider, while `-inset-s-1` on the arrow resolves in the direction of <body>, where the portal is.
-test.fail('an RTL island on an LTR page draws its arrow toward the trigger', async ({ page }) => {
+// The demo mounts its own RTL provider, so on an LTR page its portal sits in a <body> of the other direction.
+// Without a dir of its own the popup took the body's: on 2026-10-10 the arrow was 76 px away, on the far edge.
+test('an RTL island on an LTR page draws its arrow toward the trigger, and lays its popup out right to left', async ({ page }) => {
   await openLive(page, 'tooltip--rtl', { direction: 'ltr', edge: 'end' })
   const placed = await openNext(page, 'نسخ الرابط')
   expect(placed.where).toBe('left')
   expectArrowTowardTrigger(placed, 'نسخ الرابط')
+
+  const directions = await openPopup(page).evaluate((popup) => ({
+    body: getComputedStyle(document.body).direction,
+    positioner: getComputedStyle(popup.parentElement ?? popup).direction,
+    popup: getComputedStyle(popup).direction,
+    arrow: getComputedStyle(popup.querySelector('[aria-hidden="true"]') ?? popup).direction,
+  }))
+  expect(directions).toEqual({ body: 'ltr', positioner: 'rtl', popup: 'rtl', arrow: 'rtl' })
 })

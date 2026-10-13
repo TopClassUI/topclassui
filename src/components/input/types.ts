@@ -46,7 +46,7 @@ export type InputProps =
   }
   & InputName
 
-/** R-8.3-4: the control's own size prop, so the two cannot describe different heights. */
+/** R-8.3-4: the control's own size and width props, so the two cannot describe different boxes. */
 export type InputSkeletonProps =
   Omit<ComponentPropsWithRef<'span'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
-  & Pick<InputDesignProps, 'size'>
+  & Pick<InputDesignProps, 'size' | 'fullWidth'>

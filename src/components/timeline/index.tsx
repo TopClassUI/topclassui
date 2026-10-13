@@ -17,7 +17,7 @@ const pickTone = ({ tone, status }: TimelineItem): TimelineTone => {
   return status === 'done' || status === 'current' ? TIMELINE_STATUS_TONES[status] : TIMELINE_DEFAULTS.tone
 }
 
-// A wrapper around nothing would still open the 2 px gap under the title, so it is left out.
+// What React prints nothing for: wrapped, it is a marker with no dot or a 2 px gap under the title.
 const isBlank = (node: ReactNode) => node == null || typeof node === 'boolean' || node === ''
 
 /** A rail of dated events. It renders what it is given, in the order given, and never
@@ -27,6 +27,7 @@ export function Timeline<T extends TimelineItem = TimelineItem>({
   getKey,
   emptyFallback,
   labels = en,
+  locale: _locale,
   className,
   ...rest
 }: TimelineProps<T>) {
@@ -58,7 +59,7 @@ export function Timeline<T extends TimelineItem = TimelineItem>({
           >
             <div className="flex flex-col items-center">
               <span className={TIMELINE_MARKER}>
-                {item.icon == null
+                {isBlank(item.icon)
                   ? <span className={hollow ? TIMELINE_DOT_HOLLOW : dot} />
                   : <span className={hollow ? TIMELINE_ICON_HOLLOW : TIMELINE_ICON[tone]}>{item.icon}</span>}
               </span>

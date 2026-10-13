@@ -4,13 +4,22 @@ import { DIRECTIONS } from '../scripts/lib/harness.js'
 import { urlFor } from './pages.js'
 
 // Measured, because a class list cannot see it: every unit test passed while twenty avatars
-// scrolled a phone sideways, +12,345 read "12,34" and an avatar inside a link lost its ring.
+// scrolled a phone sideways, +12,345 read "12,34", an avatar inside a link lost its ring and
+// a team in a table cell stood one face per line as soon as the table scrolled.
 
 /** Every demo, written out, so a deleted one fails here. */
-const DEMOS = ['counts', 'custom-size', 'four', 'linked', 'many', 'max', 'on-card', 'overflow', 'rtl', 'sizes', 'two']
+const DEMOS = ['counts', 'custom-size', 'four', 'in-table', 'linked', 'many', 'max', 'on-card', 'overflow', 'rtl', 'sizes', 'two']
 
 /** The control scale in CSS px, which an avatar and the counter beside it both measure. */
 const SCALE = [28, 32, 40, 48, 56]
+
+/** Teams of 3, 5 and 20 under the default max: three faces, then four and a counter, 40 px
+ * each and 32 px apart. [name, rows, width], alone in the cell, beside a count and in a box. */
+const IN_TABLE = [
+  ['Billing redesign: team', 1, 104], ['Billing redesign: team with a count', 1, 104], ['Billing redesign: team in a box', 1, 104],
+  ['Mobile onboarding: team', 1, 168], ['Mobile onboarding: team with a count', 1, 168], ['Mobile onboarding: team in a box', 1, 168],
+  ['Search migration: team', 1, 168], ['Search migration: team with a count', 1, 168], ['Search migration: team in a box', 1, 168],
+]
 
 /** Runs in the page: each group against its children, its parent and the page. */
 function probe() {
@@ -63,9 +72,9 @@ async function pixelsOf(page: Page, clip: Clip): Promise<number[]> {
 /** How many pixels are text: the digits are dark, and the fill, the ring and the page are not. */
 const inkIn = (pixels: number[]) => pixels.filter((value, index) => index % 4 === 0 && value < 200).length
 
-/** The ring of the second child where it crosses the first, on the centre line. */
+/** The ring of the second child where it crosses the first, on the centre line, in the first group. */
 async function ringBetween(page: Page, direction: string) {
-  const second = await page.locator('#demo [role="group"] > :nth-child(2)').boundingBox()
+  const second = await page.locator('#demo [role="group"] > :nth-child(2)').first().boundingBox()
   if (!second) throw new Error('no second avatar to measure')
   const x = direction === 'rtl' ? second.x + second.width : second.x - 1
   return (await pixelsOf(page, { x, y: second.y + second.height / 2, width: 1, height: 1 })).slice(0, 3)
@@ -93,6 +102,26 @@ for (const width of [320, 390]) {
       test(`many ${direction}: twenty avatars and the counter wrap onto three rows`, async ({ page }) => {
         await page.goto(urlFor('avatar-group--many', 'light', direction))
         expect((await page.evaluate(probe)).groups.map((group) => group.rows)).toEqual([3])
+      })
+
+      test(`in-table ${direction}: a team in a cell keeps one row at its full width, and the table scrolls`, async ({ page }) => {
+        await page.goto(urlFor('avatar-group--in-table', 'light', direction))
+        const box = page.locator('#demo [role="region"]')
+        // A table that fits squeezes no column: each team stood on one row then, before the fix too.
+        expect(await box.evaluate((el) => el.scrollWidth > el.clientWidth), 'the table fits, so this measured nothing').toBe(true)
+        const atRest = await page.evaluate(probe)
+        // Before w-max: 40 px wide on 3 and 5 rows alone and in a box, and 110 px on 2 rows beside a count.
+        expect(atRest.groups.map((group) => [group.name, group.rows, group.width])).toEqual(IN_TABLE)
+
+        // To the far end, which is a negative offset in rtl.
+        const moved = await box.evaluate((el) => {
+          el.scrollLeft = (getComputedStyle(el).direction === 'rtl' ? -1 : 1) * el.scrollWidth
+          return Math.abs(el.scrollLeft)
+        })
+        expect(moved, 'the box did not scroll').toBeGreaterThan(100)
+        const scrolled = await page.evaluate(probe)
+        expect(scrolled.groups.map((group) => [group.name, group.rows, group.width])).toEqual(IN_TABLE)
+        expect(scrolled.scrollWidth, 'the page scrolls sideways').toBeLessThanOrEqual(scrolled.pageWidth)
       })
     }
   })
@@ -143,6 +172,13 @@ for (const direction of DIRECTIONS) {
     await page.keyboard.press('Tab')
     await expect(second).toBeFocused()
     expect(Buffer.compare(atRest, await page.screenshot({ clip: far, animations: 'disabled' })), 'the next avatar hides the focus ring').not.toBe(0)
+
+    // The ring of the library, as a circle and above the next face: the browser's own is `auto 1px`.
+    const ring = await second.evaluate((link) => {
+      const style = getComputedStyle(link)
+      return [style.outlineStyle, style.outlineWidth, style.outlineOffset, style.zIndex, Number.parseFloat(style.borderTopLeftRadius) >= 24]
+    })
+    expect(ring).toEqual(['solid', '2px', '2px', '1', true])
   })
 }
 
@@ -196,6 +232,9 @@ for (const surface of SURFACES) {
     await page.goto(urlFor('avatar-group--overflow', surface.mode, 'ltr'))
     expect(await ringBetween(page, 'ltr')).toEqual(surface.page)
     await page.goto(urlFor('avatar-group--on-card', surface.mode, 'ltr'))
+    expect(await ringBetween(page, 'ltr')).toEqual(surface.card)
+    // A Table is the same raised surface, so the same class matches it.
+    await page.goto(urlFor('avatar-group--in-table', surface.mode, 'ltr'))
     expect(await ringBetween(page, 'ltr')).toEqual(surface.card)
   })
 }

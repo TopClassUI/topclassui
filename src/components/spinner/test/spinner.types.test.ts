@@ -40,6 +40,12 @@ describe('the props follow the vocabulary', () => {
     expectTypeOf<SpinnerProps['labels']>().toEqualTypeOf<Labels | undefined>()
   })
 
+  it('takes locale beside labels, so the pair getLabels returns spreads onto it', () => {
+    expectTypeOf<SpinnerProps['locale']>().toEqualTypeOf<string | undefined>()
+    expectTypeOf<Accepts<Pick<SpinnerProps, 'labels' | 'locale'>, { locale: string; labels: Labels }>>()
+      .toEqualTypeOf<true>()
+  })
+
   it('keeps the two attributes it reads, and the rest of the svg props', () => {
     expectTypeOf<Accepts<keyof SpinnerProps, 'aria-label'>>().toEqualTypeOf<true>()
     expectTypeOf<Accepts<keyof SpinnerProps, 'aria-hidden'>>().toEqualTypeOf<true>()
@@ -63,7 +69,6 @@ describe('the props follow the vocabulary', () => {
   it('has none of the props the spec leaves unbuilt', () => {
     expectTypeOf<Accepts<keyof SpinnerProps, 'centered'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof SpinnerProps, 'overlay'>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<keyof SpinnerProps, 'locale'>>().toEqualTypeOf<false>()
   })
 })
 

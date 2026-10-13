@@ -1,6 +1,8 @@
 // No 'use client': a client bundle gets it only when a client file imports it.
 import { cn } from '#shared/cn.js'
 import { resolveMaxLength } from '#shared/contracts/boundaries.js'
+// Named here as well, so a consumer program that never compiles shared/ gets the --tc-* keys.
+import type {} from '#shared/style-tokens.js'
 import { INPUT_OWN_WIDTH, INPUT_READ_ONLY } from './classes.js'
 import {
   INPUT_CAPPED_TYPES, INPUT_DEFAULT_TYPE, INPUT_DEFAULTS, INPUT_LTR_TYPES, INPUT_OWN_WIDTH_TYPES,
@@ -22,12 +24,14 @@ export function Input({
   'aria-invalid': ariaInvalid,
   ...rest
 }: InputProps) {
+  // HTML matches the type attribute without regard to case, so 'Email' is an email field.
+  const kind = String(type).toLowerCase()
   // HTML allows maxlength on these six only, so a date or a checkbox never carries one.
-  const capped = INPUT_CAPPED_TYPES.some((allowed) => allowed === type)
+  const capped = INPUT_CAPPED_TYPES.some((allowed) => allowed === kind)
   // UAX 9: in a right-to-left paragraph a leading sign or a trailing slash changes sides.
-  const ltr = dir === undefined && INPUT_LTR_TYPES.some((latin) => latin === type)
+  const ltr = dir === undefined && INPUT_LTR_TYPES.some((latin) => latin === kind)
   // A checkbox, a colour well or a date keeps the box the browser gives it.
-  const ownWidth = !fullWidth && INPUT_OWN_WIDTH_TYPES.some((text) => text === type)
+  const ownWidth = !fullWidth && INPUT_OWN_WIDTH_TYPES.some((text) => text === kind)
 
   // The rest goes first, so the resolved cap and the design attributes are never overwritten.
   return (
@@ -37,7 +41,7 @@ export function Input({
       dir={ltr ? 'ltr' : dir}
       data-ltr={ltr ? '' : undefined}
       readOnly={readOnly}
-      maxLength={capped ? resolveMaxLength(maxLength, type) : undefined}
+      maxLength={capped ? resolveMaxLength(maxLength, kind) : undefined}
       // A Field passes aria-invalid itself, so it survives when `invalid` is off.
       aria-invalid={invalid ? true : ariaInvalid}
       data-invalid={invalid ? '' : undefined}

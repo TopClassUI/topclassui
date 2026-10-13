@@ -54,7 +54,7 @@ They arrive with the phases that need them.
 
 ## 2. Styling
 
-- **R-5.2-1** Inside `src/`, use `bg-primary-solid`, `text-body`, `border-line`; palette classes, arbitrary colours and the `dark:` variant are banned. _(eslint)_
+- **R-5.2-1** Inside `src/`, use `bg-primary-solid`, `text-body`, `border-line`; palette classes, arbitrary colours (a hex, a colour function or a named colour such as `bg-[red]`) and the `dark:` variant are banned. The one exception is a CSS system colour (`CanvasText`, `Canvas`, `Highlight`), allowed only behind the `forced-colors:` variant. _(eslint)_
 - **R-5.2-2** Merge classes with `cn()` from `shared/cn.ts`, which uses `extendTailwindMerge`; the consumer's `className` is passed last. _(unit test ; the argument order is not linted)_
 - **R-5.2-3** No `` `bg-${tone}` ``; use a lookup object or cva variants. _(eslint)_
 - **R-5.2-4** Sizes, radius, border width, the focus ring, hover, transitions and scroll classes come from the knobs and `shared/classes.ts`; never `rounded-md`, `h-10`, `outline-2`, `border-2`, `duration-200`, or a hand-written `hover:` or `focus-visible:`. _(eslint)_
