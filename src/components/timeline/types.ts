@@ -36,4 +36,6 @@ export interface TimelineProps<T extends TimelineItem = TimelineItem>
   emptyFallback?: ReactNode | undefined
   /** The built-in strings, which name each status. Defaults to English; pass `getLabels(locale).labels` for another. */
   labels?: Labels | undefined
+  /** Accepted so `{...getLabels(locale)}` spreads cleanly. Nothing here formats a number, so it is not used and never reaches the element. */
+  locale?: string | undefined
 }

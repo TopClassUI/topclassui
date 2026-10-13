@@ -91,7 +91,7 @@ describe('the link prop: one element every sort link is cloned from (R-5.7-4)', 
   it('keeps the look and the words of the sort link, and merges the caller class last', () => {
     const html_ = html({ link: <Link href="" className="no-underline justify-center" />, sort: { key: 'amount', direction: 'descending' } })
     const [first] = anchors(html_)
-    expect(classList(first ?? '')).toEqual(expect.arrayContaining(['flex', '-my-1', 'max-w-full', 'outline-hidden', 'no-underline', 'justify-center']))
+    expect(classList(first ?? '')).toEqual(expect.arrayContaining(['inline-flex', '-my-1', 'max-w-full', 'outline-hidden', 'no-underline', 'justify-center']))
     expect(classList(first ?? '')).not.toContain('justify-start')
     expect(html_).toContain('<span class="sr-only">Sort by </span>')
     expect(html_.split('<svg').length - 1).toBe(1)
@@ -105,6 +105,7 @@ describe('the link prop: one element every sort link is cloned from (R-5.7-4)', 
     const notAnElement = 'a' as unknown as TableProps<Invoice>['link']
     expect(() => html({ link: notAnElement })).toThrow(TypeError)
     expect(() => html({ link: notAnElement })).toThrow('link must be an element')
+    expect(() => html({ link: notAnElement })).toThrow('Table: link must be an element, such as link={<Link href="" />}')
   })
 })
 
@@ -122,9 +123,19 @@ describe('the sort link is the only interactive part', () => {
     expect(link()).toHaveLength(2)
   })
 
-  it('fills its cell as a row, pulled back 4 px each way so the header row is no taller for it', () => {
+  it('is a row as wide as its label, pulled back 4 px each way so the header row is no taller for it', () => {
     for (const list of link()) {
-      expect(list).toEqual(expect.arrayContaining(['flex', 'items-center', '-my-1', 'rounded-chip', 'hover:underline']))
+      expect(list).toEqual(expect.arrayContaining(['inline-flex', 'items-center', '-my-1', 'rounded-chip', 'hover:underline']))
+    }
+  })
+
+  it('sits on the top of its line, not on the baseline, where a header that wraps made its row 4 px taller', () => {
+    for (const list of link()) expect(list).toContain('align-top')
+  })
+
+  it('never fills its cell: a link as wide as its column has a ring the box cuts and a label that can lie out of view', () => {
+    for (const list of link()) {
+      expect(list.filter((c) => c === 'flex' || c === 'block' || c === 'grid' || c === 'w-full' || c === 'flex-1')).toEqual([])
     }
   })
 
@@ -138,7 +149,7 @@ describe('the sort link is the only interactive part', () => {
     expect(html()).not.toMatch(/<span id="[^"]*" class="[^"]*(truncate|whitespace-nowrap)/)
   })
 
-  it('follows the alignment of its column, which text-align cannot do inside a flex row', () => {
+  it('follows the alignment of its column inside the 24 and 44 px floors, where text-align moves nothing', () => {
     const [number, amount] = link()
     expect(number).toContain('justify-start')
     expect(number).not.toContain('justify-end')

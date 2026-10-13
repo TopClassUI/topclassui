@@ -1,6 +1,6 @@
 /** R-5.12-4: Input's own class strings. The box, the ring and the scale are the shared
  * ones; these are what only a text field needs. */
-import { CONTROL_SIZE } from '#shared/classes.js'
+import { BORDER_WIDTH, CONTAIN, CONTROL_SIZE, TOUCH_TARGET } from '#shared/classes.js'
 import type { Size } from '#shared/contracts/size.js'
 
 /** A percentage with a cap, which a flex row can shrink. The browser's own width is a
@@ -36,3 +36,13 @@ export const INPUT_SIZE = {
   xl: `${CONTROL_SIZE.xl} ${COARSE_TEXT}`,
   custom: '',
 } as const satisfies Record<Size, string>
+
+/** The field's box model around one line of nothing: its border width, its floor and its
+ * baseline, so a flex row or a line of text lays the placeholder out as it lays the field. */
+export const INPUT_SKELETON = [
+  'inline-flex items-center',
+  `${BORDER_WIDTH} border-transparent`,
+  CONTAIN,
+  TOUCH_TARGET,
+  'animate-pulse rounded-control bg-neutral-soft motion-reduce:animate-none',
+].join(' ')

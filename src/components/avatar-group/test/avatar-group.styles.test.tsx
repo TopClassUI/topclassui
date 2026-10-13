@@ -36,6 +36,10 @@ describe('the root', () => {
     expect(classList(group())).toContain('gap-y-1')
   })
 
+  it('asks for its natural width, so a table cell cannot size its column from one face', () => {
+    expect(classList(group())).toContain('w-max')
+  })
+
   it('does not shrink in a flex row, so the text beside it gives way before the faces wrap', () => {
     expect(classList(group())).toContain('shrink-0')
   })

@@ -20,4 +20,22 @@ export const MUTATIONS: Mutation[] = [
     from: "if (name === 'data-state') {",
     to: "if (false) {",
   },
+  {
+    label: 'eslint stops reading the named colours, so bg-[red] passes R-5.2-1',
+    file: 'eslint-rules/index.ts',
+    from: "if (NAMED_COLORS.has(value) || value.startsWith('#') || COLOR_FUNCTION.test(value)) return 'arbitrary'",
+    to: "if (value.startsWith('#') || COLOR_FUNCTION.test(value)) return 'arbitrary'",
+  },
+  {
+    label: 'eslint accepts a system colour with no forced-colors variant, so bg-[CanvasText] passes anywhere',
+    file: 'eslint-rules/index.ts',
+    from: "if (kind === 'system' && variants.includes('forced-colors')) continue",
+    to: "if (kind === 'system') continue",
+  },
+  {
+    label: 'eslint lets forced-colors exempt any colour, so forced-colors:bg-[red] passes',
+    file: 'eslint-rules/index.ts',
+    from: "if (kind === 'system' && variants.includes('forced-colors')) continue",
+    to: "if (variants.includes('forced-colors')) continue",
+  },
 ]

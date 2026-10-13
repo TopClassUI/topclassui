@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import { attr, markup } from '#test/markup.js'
 import { PAGINATION_DEFAULTS, PAGINATION_GAPS, PAGINATION_SIZES } from '../constants.js'
-import { Pagination } from '../index.js'
+import * as entry from '../index.js'
+import { clampPage, Pagination } from '../index.js'
 import type { PaginationProps } from '../types.js'
 
 const blog = (page: number) => `/blog?page=${String(page)}`
@@ -107,6 +108,25 @@ describe('two paginations on one page', () => {
     expect(names(html() + html())).toEqual(['Pagination', 'Pagination'])
     expect(names(html({ 'aria-label': 'Orders pages, top' }) + html({ 'aria-label': 'Orders pages, bottom' })))
       .toEqual(['Orders pages, top', 'Orders pages, bottom'])
+  })
+})
+
+// The README tells a caller to query the page Pagination shows: this is the helper it names.
+describe('the page a caller queries', () => {
+  it('is clampPage, exported beside the component and its variants, and nothing more', () => {
+    expect(Object.keys(entry).sort()).toEqual(['Pagination', 'clampPage', 'paginationVariants'])
+  })
+
+  it('is the page Pagination marks current, whatever the URL said', () => {
+    for (const [asked, held] of [[999, 12], [0, 1], [-3, 1], [Number('abc'), 1], [3.7, 3], [6, 6]] as const) {
+      const current = tags(html({ value: asked }), 'a').find((tag) => tag.includes('aria-current')) ?? ''
+      expect(clampPage(asked, 12), String(asked)).toBe(held)
+      expect(attr(current, 'href'), String(asked)).toBe(`/blog?page=${String(held)}`)
+    }
+  })
+
+  it('is page 1 of a list with no rows, where the count a caller worked out is zero', () => {
+    expect(clampPage(5, 0)).toBe(1)
   })
 })
 
