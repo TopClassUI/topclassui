@@ -74,4 +74,10 @@ export const MUTATIONS: Mutation[] = [
     from: ", 'forced-colors:text-current', className)",
     to: ', className)',
   },
+  {
+    label: 'the spinner forwards locale to its svg again, so a spread of getLabels writes an attribute SVG does not have',
+    file: 'src/components/spinner/index.tsx',
+    from: '  locale: _locale,\n',
+    to: '',
+  },
 ]

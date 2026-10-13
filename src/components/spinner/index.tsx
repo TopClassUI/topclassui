@@ -13,6 +13,7 @@ export function Spinner({
   size = SPINNER_DEFAULTS.size,
   tone = SPINNER_DEFAULTS.tone,
   labels = en,
+  locale: _locale,
   className,
   'aria-label': ariaLabel,
   'aria-hidden': ariaHidden,

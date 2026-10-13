@@ -15,13 +15,15 @@ const columns: TableColumn<Region>[] = [
   {
     key: 'report',
     header: 'Report',
-    cell: (region) => <Button size="sm" variant="outline" disabled={!region.closed}>Export</Button>,
+    cell: (region) => (
+      <Button size="sm" variant="outline" disabled={!region.closed} aria-label={`Export ${region.name}`}>Export</Button>
+    ),
   },
   { key: 'q1', header: 'Q1', align: 'end', sortHref: '?sort=q1', cell: (region) => region.q1 },
   { key: 'q2', header: 'Q2', align: 'end', sortHref: '?sort=q2', cell: (region) => region.q2 },
   { key: 'q3', header: 'Q3', align: 'end', sortHref: '?sort=q3', cell: (region) => region.q3 },
   { key: 'q4', header: 'Q4', align: 'end', sortHref: '?sort=q4', cell: (region) => region.q4 },
-  { key: 'total', header: 'Full year', align: 'end', cell: (region) => region.total },
+  { key: 'total', header: 'Full year', align: 'end', sortHref: '?sort=total', cell: (region) => region.total },
 ]
 
 /** A box narrower than its table: the region names stay in view, over tinted rows and a dimmed button alike. */

@@ -15,4 +15,6 @@ export interface EmptyStateProps
   children?: ReactNode | undefined
   /** The built-in strings. Defaults to English; pass `getLabels(locale).labels` for another. */
   labels?: Labels | undefined
+  /** Accepted so `{...getLabels(locale)}` spreads cleanly. Nothing here formats a number, so it is not used and never reaches the element. */
+  locale?: string | undefined
 }
