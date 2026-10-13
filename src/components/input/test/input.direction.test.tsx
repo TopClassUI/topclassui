@@ -37,6 +37,21 @@ describe('a Latin-ordered value stays left-to-right', () => {
     expect(attr(html(), 'dir')).toBeUndefined()
     expect(attr(html(), 'data-ltr')).toBeUndefined()
   })
+
+  /** Written out: HTML matches the type without regard to case, so these are the same four fields. */
+  const OTHER_CASE = ['Email', 'NUMBER', 'Tel', 'URL'] as const
+
+  for (const type of OTHER_CASE) {
+    it(`type="${type}" is left-to-right too`, () => {
+      expect(attr(html({ type }), 'dir'), type).toBe('ltr')
+      expect(attr(html({ type }), 'data-ltr'), type).toBe('')
+    })
+  }
+
+  it('leaves type="TEXT" and type="Password" to the form, whatever the case', () => {
+    expect(attr(html({ type: 'TEXT' }), 'dir')).toBeUndefined()
+    expect(attr(html({ type: 'Password' }), 'data-ltr')).toBeUndefined()
+  })
 })
 
 describe("the caller's dir wins", () => {

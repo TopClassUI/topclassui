@@ -13,6 +13,7 @@ const RENDERED = [...new Set([
   ...classList(markup(createElement(Input, { 'aria-label': 'Email', size: 'xs' }))),
   ...classList(markup(createElement(Input, { 'aria-label': 'Email', type: 'email', readOnly: true }))),
   ...classList(markup(createElement(InputSkeleton))),
+  ...classList(markup(createElement(InputSkeleton, { size: 'lg', fullWidth: true }))),
 ])]
 
 let css = ''

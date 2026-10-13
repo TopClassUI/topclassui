@@ -115,3 +115,16 @@ describe('with link={<Link href="" />} (PLAN 5.8)', () => {
     expect(script(html({ link: <Link href="/placeholder" /> }))).not.toContain('placeholder')
   })
 })
+
+describe('a link that is not an element', () => {
+  it('is refused by the name of the prop and of the component, before React fails on it', () => {
+    const notAnElement = 'a' as unknown as BreadcrumbProps['link']
+    expect(() => html({ link: notAnElement })).toThrow(TypeError)
+    expect(() => html({ link: notAnElement })).toThrow('Breadcrumb: link must be an element, such as link={<Link href="" />}')
+  })
+
+  it('says the same for the component passed whole, which is the usual slip: link={Link}', () => {
+    const component = Link as unknown as BreadcrumbProps['link']
+    expect(() => html({ link: component })).toThrow('Breadcrumb: link must be an element')
+  })
+})

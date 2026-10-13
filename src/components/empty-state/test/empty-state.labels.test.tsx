@@ -31,6 +31,13 @@ describe('the built-in text comes from labels', () => {
     expect(out).toContain(`>${AR_DESCRIPTION}</div>`)
   })
 
+  it('takes the whole pair getLabels returns as a spread, and writes no locale on the root', () => {
+    const out = markup(<EmptyState {...getLabels('ar')} />)
+    expect(out).toContain(`>${AR_TITLE}</p>`)
+    expect(out).toContain(`>${AR_DESCRIPTION}</div>`)
+    expect(out).not.toMatch(/locale=|\[object/)
+  })
+
   it('reads the title and the description keys separately, so one override leaves the other', () => {
     const labels = getLabels('en', { state: { empty: 'No invoices yet' } }).labels
     const out = markup(<EmptyState labels={labels} />)

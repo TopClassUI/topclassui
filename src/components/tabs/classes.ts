@@ -1,0 +1,70 @@
+// R-5.12-4: one class string per element Tabs styles, built from the shared constants.
+import {
+  CONTAIN, FOCUS_RING, FOCUS_RING_INSET, FORCED_EDGE, SCROLL_X, TOUCH_TARGET, TRANSITION,
+} from '#shared/classes.js'
+import type { TabsVariant } from './types.js'
+
+/** A grid of one column that may shrink to nothing: a list that scrolls would otherwise widen a
+ * grid track, a w-fit parent or a table cell to the width of all its tabs. */
+export const TABS_ROOT = 'grid grid-cols-1'
+
+/** The line under the tabs, drawn inside the list as a shadow and not as its border: the list
+ * clips, so a tab can paint over a shadow and never over a border. Forced colours erase a
+ * shadow, so there the line is a border and the bar sits above it. */
+export const TABS_LIST_LINE = 'shadow-[inset_0_calc(var(--tc-line-width)*-1)_var(--tc-line)] forced-colors:border-b-(length:--tc-line-width)'
+
+/** Base UI brings a tab into view by whole pixels measured from its offset parent, and Chromium
+ * stops an RTL list a fraction short of its end: the list is that parent, keeps a pixel of scroll
+ * padding and a pixel after its last tab, so no tab the keyboard reaches is cut (0.72 px was). */
+export const TABS_LIST_SCROLL = `relative scroll-px-px ${SCROLL_X}`
+
+/** R-5.2-3: the list of each look. Both scroll sideways inside themselves when the tabs do not fit. */
+export const TABS_LIST = {
+  line: `flex items-center gap-6 pe-px ${TABS_LIST_LINE} ${TABS_LIST_SCROLL}`,
+  enclosed: `flex w-fit max-w-full items-center gap-1 rounded-control bg-surface p-1 ${FORCED_EDGE} ${TABS_LIST_SCROLL}`,
+} as const satisfies Record<TabsVariant, string>
+
+/** A disabled tab still takes the focus from the arrow keys, so what it holds is dimmed and
+ * not the tab: its ring keeps its full contrast (2.5:1 was measured at half opacity). Base UI
+ * writes aria-disabled, so no browser greys it: forced colours take the system's grey instead. */
+export const TABS_TAB_DISABLED = [
+  'data-disabled:pointer-events-none data-disabled:*:opacity-50',
+  'forced-colors:data-disabled:*:opacity-100 forced-colors:data-disabled:not-data-active:text-[GrayText]',
+].join(' ')
+
+/** What a tab of either look is. It clips what it holds, and its ring is drawn inside its
+ * box, because the list clips too. Content that fits is centred; content that does not starts
+ * at the start edge, so the beginning of a label is never the part that is cut. */
+const TAB = [
+  'inline-flex shrink-0 items-center justify-center-safe gap-2 overflow-hidden whitespace-nowrap font-medium text-muted',
+  'data-active:font-semibold data-active:text-body',
+  CONTAIN,
+  FOCUS_RING_INSET,
+  TOUCH_TARGET,
+  TRANSITION,
+  TABS_TAB_DISABLED,
+].join(' ')
+
+/** Forced colours paint every border, a transparent one too: there the bar of a tab that is
+ * not active takes the colour of the page, and the active one the system's highlight. */
+export const TABS_BAR = 'border-b-2 border-transparent data-active:border-primary-solid forced-colors:border-[Canvas] forced-colors:data-active:border-[Highlight]'
+
+/** Forced colours erase a fill and a shadow, so there the active tab takes the system pair
+ * and paints it itself, with a ring that shows on that fill. */
+export const TABS_RAISED = [
+  'rounded-control data-active:bg-surface-raised data-active:shadow-sm',
+  'forced-colors:data-active:forced-color-adjust-none forced-colors:data-active:bg-[Highlight]',
+  'forced-colors:data-active:text-[HighlightText] forced-colors:data-active:shadow-none',
+  'forced-colors:data-active:[--tc-ring:HighlightText]',
+].join(' ')
+
+/** R-5.2-3: the active tab is told by a bar or by a raised surface, and by its weight too
+ * wherever the font draws 500 and 600 apart: Windows' own draws them as one face. */
+export const TABS_TAB = {
+  line: `${TAB} ${TABS_BAR}`,
+  enclosed: `${TAB} ${TABS_RAISED}`,
+} as const satisfies Record<TabsVariant, string>
+
+/** A margin and not a padding: the ring of a focused panel reaches 4 px outside its box,
+ * and the list above would paint over a ring that lay on it. A long word breaks. */
+export const TABS_PANEL = `mt-4 wrap-anywhere ${FOCUS_RING}`

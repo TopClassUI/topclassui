@@ -61,6 +61,10 @@ describe('the containment', () => {
     expect(ruleOf('.max-w-full {')).toBe('max-width: 100%;')
     expect(ruleOf('.shrink-0 {')).toBe('flex-shrink: 0;')
   })
+
+  it('is as wide as its one row, so the least a table column may give it is every face', () => {
+    expect(ruleOf('.w-max {')).toBe('width: max-content;')
+  })
 })
 
 describe('the ring', () => {

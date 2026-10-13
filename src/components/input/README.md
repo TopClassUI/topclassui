@@ -23,11 +23,29 @@ the control look, so every native prop works and it ships no JavaScript.
 **`maxLength` has a default per `type`** (text 512, email 254, tel 32, url 2048, search and
 password 256). Pass your own number, or `maxLength={null}` for no cap. Only those six types
 take one, because HTML allows `maxlength` on no other: a `number`, a `date` or a `checkbox`
-gets none, and a `number` is bounded by `min`, `max` and `step`.
+gets none, and a `number` is bounded by `min`, `max` and `step`. The case of `type` does not
+matter, as in HTML: `type="Email"` is an email field.
 
 **Its own width is `--tc-input-width`** (13.8em), and less in a narrow row, so two side by side
 fit a phone. A grid or a column does not stretch it: pass `fullWidth` to fill, or your own `w-*`
 class. `flex-1` grows past it.
+
+**Beside a Button, put `flex-1` on the Input.** In a narrow row both shrink, so the Button's label
+is cut while the field still has room. With `flex-1` the field takes only what the Button leaves.
+
+```tsx
+<div className="flex gap-2">
+  <Input className="flex-1" type="email" aria-label="Invite by email" />
+  <Button>Send invite</Button>
+</div>
+```
+
+**`InputSkeleton` is the box of the field.** Give it the same `size` and `fullWidth`. It stands in
+for a text field: for a date, a colour or a checkbox, pass your own `w-*` class.
+
+```tsx
+<InputSkeleton size="lg" fullWidth />
+```
 
 **Email, number, tel and url stay left-to-right** in a right-to-left form, on the form's side.
 Pass `dir` to decide yourself.
@@ -73,6 +91,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`
 - `dummy/skeleton.tsx`
+- `dummy/skeleton-match.tsx`
 - `dummy/states.tsx`
 - `dummy/types.tsx`
 
