@@ -68,6 +68,8 @@ export interface TableProps<T, Caption extends TableCaption = TableCaption>
   link?: ReactElement | undefined
   /** The built-in strings: the empty row and the words of the sort links. Defaults to English. */
   labels?: Labels | undefined
+  /** Accepted so `{...getLabels(locale)}` spreads cleanly. Nothing here formats a number, so it is not used and never reaches the element. */
+  locale?: string | undefined
 }
 
 // R-8.3-4: derived from the schema, as the design props of the table are.

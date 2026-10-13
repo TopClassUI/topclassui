@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { ar } from '#shared/labels/ar.js'
 import { en } from '#shared/labels/en.js'
+import { getLabels } from '#shared/labels/get-labels.js'
 import { attr, classList, markup } from '#test/markup.js'
 import { Table } from '../index.js'
 import type { TableColumn, TableProps } from '../types.js'
@@ -99,6 +100,13 @@ describe('the words of the empty row', () => {
   it('come from the labels prop, so Arabic says it in Arabic (R-5.11-1)', () => {
     expect(words(html({ labels: ar }))).toBe('لا يوجد شيء بعد')
     expect(html({ labels: ar })).not.toContain('Nothing here yet')
+  })
+
+  it('take the whole pair getLabels returns as a spread, and no locale reaches the box', () => {
+    const html_ = html({ ...getLabels('ar') })
+    expect(words(html_)).toBe('لا يوجد شيء بعد')
+    expect(html_).not.toMatch(/locale=|\[object/)
+    expect(html_).toMatch(/^<div role="region" /)
   })
 
   it('follow a caller who changes the one string', () => {

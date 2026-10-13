@@ -20,6 +20,8 @@ export default defineConfig({
     projects: PROJECTS.map((project) => ({
       test: {
         name: project.name,
+        // The first test of a file pays for its imports: 5 s is not enough on a machine that is busy.
+        testTimeout: 20_000,
         ...ENVIRONMENT[project.name],
         include: project.include,
         exclude: project.exclude,

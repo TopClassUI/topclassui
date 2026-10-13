@@ -65,6 +65,44 @@ describe('a crumb whose label is empty or only whitespace', () => {
   })
 })
 
+// A CMS page with no title, or a JavaScript caller: the type refuses these and the render gets them anyway.
+describe('a crumb whose label is not a string', () => {
+  const STRAY = [null, undefined, 2024]
+  const stray = (label: unknown) =>
+    of([{ href: '/', label: 'Home' }, { href: '/stray', label }, { label: 'Page' }] as unknown as BreadcrumbItem[])
+
+  it('does not throw for null, undefined or a number, which would take the whole page down', () => {
+    for (const label of STRAY) expect(() => stray(label), String(label)).not.toThrow()
+  })
+
+  it('leaves the crumb out of the trail, exactly as a blank one is', () => {
+    for (const label of STRAY) {
+      const out = stray(label)
+      expect(count(out, '<li'), String(label)).toBe(2)
+      expect(count(out, '<svg'), String(label)).toBe(1)
+      expect(anchors(out).map((anchor) => attr(anchor, 'href')), String(label)).toEqual(['/'])
+      expect(out, String(label)).not.toContain('2024')
+    }
+  })
+
+  it('leaves it out of the JSON-LD too, so the list agrees with what is rendered', () => {
+    for (const label of STRAY) {
+      expect(listed(stray(label)), String(label)).toEqual([{ '@type': 'ListItem', position: 1, name: 'Home', item: '/' }])
+      expect(stray(label), String(label)).not.toContain('/stray')
+    }
+  })
+
+  it('keeps the current page on the last crumb that has a name', () => {
+    const out = of([{ href: '/', label: 'Home' }, { label: 'Settings' }, { label: null }] as unknown as BreadcrumbItem[])
+    expect(count(out, 'aria-current="page"')).toBe(1)
+    expect(out).toMatch(/<span aria-current="page" class="[^"]*">Settings<\/span><\/li><\/ol>/)
+  })
+
+  it('renders nothing at all when no label is a string, like an empty trail', () => {
+    expect(of([{ href: '/', label: null }, { label: 2024 }, {}] as unknown as BreadcrumbItem[])).toBe('')
+  })
+})
+
 describe('a label that has text', () => {
   it('is written exactly as given, spaces around it included: only the blank ones are dropped', () => {
     const out = of([{ href: '/', label: ' Home ' }, { label: 'Page' }])

@@ -3,6 +3,7 @@ import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import type { Size } from '#shared/contracts/size.js'
 import type { Labels } from '#shared/labels/types.js'
+import { clampPage } from '../index.js'
 import { paginationSchema } from '../schema.js'
 import type {
   PaginationDesignProps, PaginationGap, PaginationItem, PaginationLinkParts, PaginationProps, PaginationRange,
@@ -104,6 +105,16 @@ describe('the design props and the schema cannot drift', () => {
     expectTypeOf<Accepts<PaginationDesignProps, { value: 1; pageCount: 2 }>>().toEqualTypeOf<true>()
     expectTypeOf<Accepts<PaginationDesignProps, { siblingCount: 1; boundaryCount: 1; size: 'sm' }>>()
       .toEqualTypeOf<false>()
+  })
+})
+
+describe('the helper the README names for the page a caller queries', () => {
+  it('is exported by the component file: two numbers in, the page to query out', () => {
+    expectTypeOf(clampPage).toEqualTypeOf<(value: number, pageCount: number) => number>()
+  })
+
+  it('refuses the raw string of a search param, so a caller writes Number() around it', () => {
+    expectTypeOf<Accepts<Parameters<typeof clampPage>[0], string>>().toEqualTypeOf<false>()
   })
 })
 

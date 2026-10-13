@@ -41,14 +41,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'AvatarGroup no longer wraps, so twenty avatars push a phone page sideways instead of taking a second row',
     file: 'src/components/avatar-group/classes.ts',
-    from: "'inline-flex max-w-full shrink-0 flex-wrap items-center gap-y-1'",
-    to: "'inline-flex max-w-full shrink-0 items-center gap-y-1'",
+    from: "'inline-flex w-max max-w-full shrink-0 flex-wrap items-center gap-y-1'",
+    to: "'inline-flex w-max max-w-full shrink-0 items-center gap-y-1'",
   },
   {
     label: 'AvatarGroup may be wider than its container again, because nothing caps its width',
     file: 'src/components/avatar-group/classes.ts',
-    from: "'inline-flex max-w-full shrink-0",
-    to: "'inline-flex shrink-0",
+    from: "'inline-flex w-max max-w-full shrink-0",
+    to: "'inline-flex w-max shrink-0",
   },
   {
     label: 'AvatarGroup shrinks in a flex row, so the faces wrap into a column while the text beside them could still give way',
@@ -109,5 +109,29 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/avatar-group/classes.ts',
     from: " *:focus-visible:z-1'",
     to: "'",
+  },
+  {
+    label: 'AvatarGroup loses its natural width, so a table cell squeezes a team to one avatar per line as soon as the table scrolls',
+    file: 'src/components/avatar-group/classes.ts',
+    from: "'inline-flex w-max max-w-full",
+    to: "'inline-flex max-w-full",
+  },
+  {
+    label: 'the AvatarGroup in-table demo is deleted, so no page measures a team in a table cell',
+    file: 'src/components/avatar-group/dummy/in-table.tsx',
+    from: '',
+    to: null,
+  },
+  {
+    label: 'the AvatarGroup in-table demo gives every team its own max, so no row shows the default of four and a counter',
+    file: 'src/components/avatar-group/dummy/in-table.tsx',
+    from: '<AvatarGroup className="*:ring-surface-raised"',
+    to: '<AvatarGroup max={20} className="*:ring-surface-raised"',
+  },
+  {
+    label: 'the AvatarGroup linked demo drops the focus ring of the library, so its links show the ring the browser draws',
+    file: 'src/components/avatar-group/dummy/linked.tsx',
+    from: "cn('inline-flex', FOCUS_RING)",
+    to: "cn('inline-flex')",
   },
 ]
