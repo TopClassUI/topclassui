@@ -28,8 +28,7 @@ const PRELUDE = [
 function compile(snippets: Record<string, string>): Record<string, string[]> {
   const read = ts.readConfigFile(join(ROOT, 'tsconfig.json'), ts.sys.readFile.bind(ts.sys))
   const options = { ...ts.parseJsonConfigFileContent(read.config ?? {}, ts.sys, ROOT).options, noEmit: true }
-  const probes = new Map(Object.entries(snippets).map(([name, code]) =>
-    [probePath(name), `${PRELUDE}\n${code}\n`]))
+  const probes = new Map(Object.entries(snippets).map(([name, code]) => [probePath(name), `${PRELUDE}\n${code}\n`]))
 
   const host = ts.createCompilerHost(options)
   const getSourceFile = host.getSourceFile.bind(host)
@@ -73,6 +72,7 @@ const verdict = compile({
   shortDirection: table("{ key: 'number', header: 'Invoice', cell: (invoice) => invoice.number }", "caption='Invoices' getKey={(invoice) => invoice.id} sort={{ key: 'number', direction: 'asc' }}"),
   sorted: table("{ key: 'number', header: 'Invoice', cell: (invoice) => invoice.number }", "caption='Invoices' getKey={(invoice) => invoice.id} sort={{ key: 'number', direction: 'ascending' }}"),
   role: table("{ key: 'number', header: 'Invoice', cell: (invoice) => invoice.number }", "caption='Invoices' getKey={(invoice) => invoice.id} role='presentation'"),
+  named: table(ONE, "caption='Invoices' getKey={(invoice) => invoice.id} aria-label='Mine' aria-labelledby='elsewhere'"),
   child: `export const probe = <Table items={invoices} caption='Invoices' getKey={(invoice) => invoice.id} columns={[]}>Hello</Table>`,
   numberKey: table(ONE, "caption='Invoices' getKey={(invoice) => invoice.amount}"),
   emptyCaption: table(ONE, "caption='' getKey={(invoice) => invoice.id}"),
@@ -89,6 +89,7 @@ const verdict = compile({
   skeleton: 'export const probe = <TableSkeleton rows={3} columns={4} captionVisible className="mt-4" />',
   skeletonString: "export const probe = <TableSkeleton rows='3' />",
   skeletonChild: 'export const probe = <TableSkeleton>Loading</TableSkeleton>',
+  stickyWidth: table(ONE, "caption='Revenue by region' getKey={(invoice) => invoice.id} stickyFirstColumn style={{ '--tc-table-sticky-width': '20rem' }}"),
   readonlyItems: "const frozen = [{ id: 'a' }, { id: 'b' }] as const\nexport const probe = <Table items={frozen} caption='Letters' getKey={(letter) => letter.id} columns={[{ key: 'id', header: 'Id', cell: (letter) => letter.id }]} />",
 })
 
@@ -106,6 +107,12 @@ describe('the item type is inferred from items and reaches every column', () => 
   it('refuses a cell that reads a field the item does not have', () => {
     // The message, not a count: a program that fails for any other reason also has errors.
     expect(said('missingField')).toContain("Property 'total' does not exist on type 'Invoice'")
+  })
+})
+
+describe('the --tc-* style keys reach a program that compiles only Table', () => {
+  it('compiles the sticky width the README raises through style', () => {
+    expect(verdict['stickyWidth']).toEqual([])
   })
 })
 
@@ -183,5 +190,9 @@ describe('the rest of the contract', () => {
   it('refuses role, which is always region, and children, because the rows come from items', () => {
     expect(said('role')).toContain("Property 'role' does not exist")
     expect(said('child')).toContain("Property 'children' does not exist")
+  })
+
+  it('lets aria-label and aria-labelledby through, as JSX lets every hyphenated attribute: ignored (README), not refused', () => {
+    expect(verdict['named']).toEqual([])
   })
 })

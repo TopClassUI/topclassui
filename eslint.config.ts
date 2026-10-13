@@ -39,6 +39,8 @@ export default defineConfig(
       '@typescript-eslint/ban-ts-comment': 'error',
       '@typescript-eslint/consistent-type-imports': ['error', { fixStyle: 'separate-type-imports' }],
       '@typescript-eslint/no-non-null-assertion': 'error',
+      // A prop named beside ...rest is being kept off the element, which is a use.
+      '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true }],
     },
   },
 

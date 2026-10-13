@@ -63,6 +63,30 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
+    label: 'the link helper stops checking what it was given, so a link that is not an element fails in the words of React in a pagination, a breadcrumb and a table',
+    file: 'src/shared/link.tsx',
+    from: 'if (link != null && !isValidElement(link)) {',
+    to: 'if (false) {',
+  },
+  {
+    label: 'the link helper names no component in its error, so a page with a pagination and a table cannot tell whose link is wrong',
+    file: 'src/shared/link.tsx',
+    from: '`${component}: link must be an element',
+    to: '`link must be an element',
+  },
+  {
+    label: 'the link helper merges the href late, so a link element keeps the href it came with and every pagination, breadcrumb and table link leads to one address',
+    file: 'src/shared/link.tsx',
+    from: 'renderElement(cloneElement((link ?? <a />) as ReactElement<{ href?: string }>, { href }), props)',
+    to: 'renderElement(link ?? <a />, { href, ...props })',
+  },
+  {
+    label: 'the link helper ignores the link element, so every pagination, breadcrumb and table link of a Next.js app reloads the document',
+    file: 'src/shared/link.tsx',
+    from: '(link ?? <a />)',
+    to: '(<a />)',
+  },
+  {
     label: 'the variants cache keys on one prop, so combinations collide',
     file: 'src/shared/variants.ts',
     from: '      parts.push(String(value))',
@@ -131,7 +155,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the provider loses its tooltip delay group, so every tooltip waits again',
     file: 'src/shared/provider/provider.tsx',
-    from: '{nested ? isolated : <Tooltip.Provider>{isolated}</Tooltip.Provider>}',
+    from: '<Tooltip.Provider>{isolated}</Tooltip.Provider>',
     to: '{isolated}',
   },
   {
