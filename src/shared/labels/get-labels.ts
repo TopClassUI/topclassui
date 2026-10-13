@@ -32,6 +32,13 @@ function withOverrides(base: Labels, overrides?: PartialLabels): Labels {
     rating: group(base.rating, overrides.rating),
     table: group(base.table, overrides.table),
     timeline: group(base.timeline, overrides.timeline),
+    drawer: group(base.drawer, overrides.drawer),
+    toast: group(base.toast, overrides.toast),
+    command: group(base.command, overrides.command),
+    navbar: group(base.navbar, overrides.navbar),
+    sidebar: group(base.sidebar, overrides.sidebar),
+    tag: group(base.tag, overrides.tag),
+    banner: group(base.banner, overrides.banner),
   }
 }
 

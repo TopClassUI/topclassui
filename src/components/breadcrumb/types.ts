@@ -21,4 +21,6 @@ export interface BreadcrumbProps
   baseUrl?: string | undefined
   /** The built-in strings; the nav is named by `labels.breadcrumb.label`. Defaults to English. */
   labels?: Labels | undefined
+  /** Accepted so `{...getLabels(locale)}` spreads cleanly. Nothing here formats a number, so it is not used and never reaches the element. */
+  locale?: string | undefined
 }

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { ar } from '#shared/labels/ar.js'
 import { en } from '#shared/labels/en.js'
+import { getLabels } from '#shared/labels/get-labels.js'
 import { attr, markup } from '#test/markup.js'
 import { Spinner } from '../index.js'
 import type { SpinnerProps } from '../types.js'
@@ -33,6 +34,12 @@ describe('the accessible name', () => {
 
   it('reads labels and never forwards the object onto the svg', () => {
     expect(html({ labels: ar })).not.toContain('labels=')
+  })
+
+  it('takes the whole pair getLabels returns as a spread, and writes no locale on the svg', () => {
+    const out = html({ ...getLabels('ar') })
+    named(out, 'جارٍ التحميل')
+    expect(out).not.toMatch(/locale=|\[object/)
   })
 
   it('follows a caller who changes the one string', () => {
