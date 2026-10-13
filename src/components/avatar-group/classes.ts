@@ -2,8 +2,9 @@
 import type { Size } from '#shared/contracts/size.js'
 
 /** One row while it fits and never wider than its container: it wraps rather than push the
- * page sideways. shrink-0, so a sibling in a flex row gives way before the faces do. */
-export const GROUP_ROOT = 'inline-flex max-w-full shrink-0 flex-wrap items-center gap-y-1'
+ * page sideways. w-max: a table cell sizes a column from the least its content needs, which
+ * for a wrapping row is one face. shrink-0: a sibling in a flex row gives way first. */
+export const GROUP_ROOT = 'inline-flex w-max max-w-full shrink-0 flex-wrap items-center gap-y-1'
 
 /** A ring in the page colour on every child, the counter included, so an overlap reads.
  * On the root, so a Server Component never clones the avatars it was handed. */

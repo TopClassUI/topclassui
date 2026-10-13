@@ -37,11 +37,16 @@ keeps its plus and every digit.
 pushing the page sideways. In a flex row it keeps its width, so the text beside it gives
 way first; pass `className="shrink"` to let the faces wrap sooner.
 
-**On a Card.** The ring between avatars is the page colour. On a Card, or any surface that is
-not the page, give it that surface: `className="*:ring-surface-raised"`.
+**In a table.** In a table cell the group keeps one row at its full width: the column grows
+and the table scrolls, so keep `max` small. A box as wide as its content (`inline-flex`,
+`w-fit`) does the same; there `className="w-auto"` lets a long group wrap again.
+
+**On a Card.** The ring between avatars is the page colour. On a Card, in a Table, or on any
+surface that is not the page, give it that surface: `className="*:ring-surface-raised"`.
 
 **Links.** Wrap an avatar in a link and make the link `inline-flex`. The link is then the
-child the group rings and overlaps, and its focus ring shows all the way round:
+child the group rings and overlaps. Give it a focus ring of your own, as `dummy/linked.tsx`
+does: the group makes it a circle and lifts the focused face, so it shows all the way round:
 
 ```tsx
 <AvatarGroup aria-label="Maintainers">
@@ -84,6 +89,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/counts.tsx`
 - `dummy/custom-size.tsx`
 - `dummy/four.tsx`
+- `dummy/in-table.tsx`
 - `dummy/linked.tsx`
 - `dummy/many.tsx`
 - `dummy/max.tsx`

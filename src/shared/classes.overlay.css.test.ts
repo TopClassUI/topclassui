@@ -5,12 +5,12 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import { compileEntry } from '#test/stylesheet.js'
 import {
   FADE_MOTION, FOCUS_RING_INSET, FOCUS_RING_WITHIN, ICON_BUTTON, LIST_CAP, OVERLAY_SURFACE, POPUP_MOTION,
-  ROW, ROW_HIGHLIGHT, SCRIM, SCROLL_X, SLIDE_MOTION, STICKY_TOP,
+  POPUP_PASSIVE, ROW, ROW_HIGHLIGHT, SCRIM, SCROLL_X, SLIDE_MOTION, STICKY_TOP, VIEWPORT_PASSIVE,
 } from './classes.js'
 
 const CONSTANTS = {
   SCRIM, FADE_MOTION, POPUP_MOTION, SLIDE_MOTION, OVERLAY_SURFACE, ROW, ROW_HIGHLIGHT, LIST_CAP, SCROLL_X,
-  STICKY_TOP, ICON_BUTTON, FOCUS_RING_INSET, FOCUS_RING_WITHIN,
+  STICKY_TOP, ICON_BUTTON, FOCUS_RING_INSET, FOCUS_RING_WITHIN, VIEWPORT_PASSIVE, POPUP_PASSIVE,
 }
 
 const CLASSES = [...new Set(Object.values(CONSTANTS).flatMap((constant) => constant.split(' ')))]
@@ -31,8 +31,8 @@ const ruleOf = (selector: string) => {
 }
 
 describe('every class of every constant paints something', () => {
-  it('read thirteen constants and their classes, so an empty list cannot pass', () => {
-    expect(Object.keys(CONSTANTS)).toHaveLength(13)
+  it('read fifteen constants and their classes, so an empty list cannot pass', () => {
+    expect(Object.keys(CONSTANTS)).toHaveLength(15)
     expect(CLASSES.length).toBeGreaterThan(50)
   })
 
@@ -61,6 +61,11 @@ describe('what the classes with a value in them declare', () => {
     expect(ruleOf('.fixed')).toBe('position: fixed;')
     expect(ruleOf('.inset-0')).toBe('inset: 0px;')
     expect(ruleOf('.bg-overlay')).toBe('background-color: var(--tc-overlay);')
+  })
+
+  it('lets presses through a viewport that is not modal, and hands them back to the popup inside it', () => {
+    expect(ruleOf('.pointer-events-none')).toBe('pointer-events: none;')
+    expect(ruleOf('.pointer-events-auto')).toBe('pointer-events: auto;')
   })
 
   it('keeps a sideways scroll inside its own box', () => {

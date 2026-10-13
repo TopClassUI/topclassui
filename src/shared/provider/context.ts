@@ -3,6 +3,7 @@
 import { createContext, useContext } from 'react'
 
 import { COLLECTION_DEFAULTS, type CollectionDefaults } from '../contracts/collection.js'
+import { resolveToastSettings, type ToastSettings } from '../contracts/toast.js'
 import { en } from '../labels/en.js'
 import { createNumberFormat, type NumberingSystem } from '../labels/get-labels.js'
 import type { Labels } from '../labels/types.js'
@@ -33,6 +34,9 @@ export const FALLBACK_CONTEXT: TopClassContextValue = {
 
 export const TopClassContext = createContext<TopClassContextValue | null>(null)
 
+/** Set by the outermost provider only, so a nested one reads the settings the one Toast.Provider runs on. */
+export const ToastSettingsContext = createContext<ToastSettings>(resolveToastSettings())
+
 function useTopClass(): TopClassContextValue {
   return useContext(TopClassContext) ?? FALLBACK_CONTEXT
 }
@@ -55,4 +59,9 @@ export function useNumberFormat(): Intl.NumberFormat {
 
 export function useCollectionDefaults(): CollectionDefaults {
   return useTopClass().collection
+}
+
+/** Where the toasts sit, how many show and how long one stays, after the clamp. */
+export function useToastSettings(): ToastSettings {
+  return useContext(ToastSettingsContext)
 }

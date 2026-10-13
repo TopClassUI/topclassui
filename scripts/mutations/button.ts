@@ -93,4 +93,22 @@ export const MUTATIONS: Mutation[] = [
     from: '        FORCED_EDGE,\n',
     to: '',
   },
+  {
+    label: 'a button that is not disabled writes disabled: false again, a key that crosses Flight and outranks the disabled of a part rendered as it',
+    file: 'src/components/button/index.tsx',
+    from: '    disabled: nativeButton && inactive ? true : undefined,',
+    to: '    disabled: nativeButton ? inactive : undefined,',
+  },
+  {
+    label: 'a loading button writes no disabled key, so a busy button takes a second press',
+    file: 'src/components/button/index.tsx',
+    from: '    disabled: nativeButton && inactive ? true : undefined,',
+    to: '    disabled: nativeButton && disabled ? true : undefined,',
+  },
+  {
+    label: 'the button writes disabled on an anchor it renders, an attribute an anchor does not have',
+    file: 'src/components/button/index.tsx',
+    from: '    disabled: nativeButton && inactive ? true : undefined,',
+    to: '    disabled: inactive ? true : undefined,',
+  },
 ]

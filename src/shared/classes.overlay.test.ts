@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   FADE_MOTION, FOCUS_RING_INSET, FOCUS_RING_WITHIN, ICON_BUTTON, LIST_CAP, OVERLAY_SURFACE, POPUP_MOTION,
-  ROW, ROW_HIGHLIGHT, SCRIM, SCROLL_X, SLIDE_MOTION, STICKY_TOP,
+  POPUP_PASSIVE, ROW, ROW_HIGHLIGHT, SCRIM, SCROLL_X, SLIDE_MOTION, STICKY_TOP, VIEWPORT_PASSIVE,
 } from './classes.js'
 
 // Every list is written out in full and compared whole: an extra class fails as surely as a missing one.
@@ -21,6 +21,17 @@ describe('the layer behind an overlay and the box it sits in', () => {
     expect(list(OVERLAY_SURFACE)).toEqual([
       'rounded-box', 'bg-surface-raised', 'text-body', 'border-(length:--tc-line-width)', 'border-line', 'shadow-lg',
     ])
+  })
+})
+
+// A dialog and a drawer centre or dock their popup inside a layer as large as the screen; a popover has no such layer.
+describe('an overlay that is not modal leaves the page under its viewport usable', () => {
+  it('VIEWPORT_PASSIVE lets every press through the layer that covers the screen', () => {
+    expect(list(VIEWPORT_PASSIVE)).toEqual(['pointer-events-none'])
+  })
+
+  it('POPUP_PASSIVE takes them back for the popup, which would inherit none from its viewport', () => {
+    expect(list(POPUP_PASSIVE)).toEqual(['pointer-events-auto'])
   })
 })
 

@@ -34,11 +34,21 @@ const RING = [
 ]
 
 describe('each part wears exactly the classes it needs', () => {
-  it('the root scrolls sideways on the box radius, with the hairline, the raised fill and a ring', () => {
+  it('the root scrolls sideways on the box radius, with the hairline, the raised fill, a ring and room for a focused control', () => {
     expect(classList(html()).sort()).toEqual([
       'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line', ...RING,
-      'grid', 'grid-cols-1', 'isolate', 'overflow-x-auto', 'relative', 'rounded-box',
+      'grid', 'grid-cols-1', 'isolate', 'overflow-x-auto', 'relative', 'rounded-box', 'scroll-pe-8', 'scroll-ps-8',
     ].sort())
+  })
+
+  it('keeps 2rem at both ends of the box out of what counts as in view, so a focused control shows that much or is scrolled to', () => {
+    for (const html_ of [html(), html({ items: [] }), html({ striped: true })]) {
+      expect(classList(html_)).toEqual(expect.arrayContaining(['scroll-ps-8', 'scroll-pe-8']))
+    }
+    // With a stuck column the start half is measured from that column, and the end half stays.
+    const stuck = classList(html({ stickyFirstColumn: true }))
+    expect(stuck).toContain('scroll-pe-8')
+    expect(stuck).not.toContain('scroll-ps-8')
   })
 
   it('the root is a one-column grid, whose track can shrink to nothing: a grid or flex parent is never widened by the table', () => {
@@ -123,8 +133,11 @@ describe('alignment is logical (R-5.3-1)', () => {
     const everything = html({ striped: true, stickyFirstColumn: true, captionVisible: true, sort: { key: 'amount', direction: 'ascending' } })
       + html({ items: [] })
     const names = [...everything.matchAll(/class="([^"]*)"/g)].flatMap((m) => (m[1] ?? '').split(' '))
-    expect(names.filter((c) => /(^|:)-?(left|right|pl|pr|ml|mr|start|end)-|text-(left|right)|border-[lr](-|$)|rounded-[lr]|scroll-p[lr]/.test(c))).toEqual([])
-    expect(names).toEqual(expect.arrayContaining(['inset-s-0', 'inset-s-4', 'inset-e-4', 'scroll-ps-[var(--tc-table-sticky-width,8rem)]']))
+    expect(names.filter((c) => /(^|:)-?(left|right|pl|pr|ml|mr|start|end)-|text-(left|right)|border-[lr](-|$)|rounded-[lr]|scroll-[pm][lr]/.test(c))).toEqual([])
+    expect(names).toEqual(expect.arrayContaining([
+      'inset-s-0', 'inset-s-4', 'inset-e-4', 'scroll-pe-8', 'scroll-ps-[calc(var(--tc-table-sticky-width,8rem)+2rem)]',
+      'after:inset-e-0', 'after:border-e-(length:--tc-line-width)', '**:scroll-mx-[100vw]',
+    ]))
   })
 })
 
@@ -163,7 +176,8 @@ describe('className is merged last, so the consumer wins every conflict', () => 
 
   it('replaces the scroll padding of a stuck column, for a caller who measured its own', () => {
     const list = classList(html({ stickyFirstColumn: true, className: 'scroll-ps-40' }))
-    expect(list).toContain('scroll-ps-40')
-    expect(list).not.toContain('scroll-ps-[var(--tc-table-sticky-width,8rem)]')
+    expect(list.filter((c) => c.startsWith('scroll-ps-'))).toEqual(['scroll-ps-40'])
+    // Only the half that was replaced: the room at the end of the box is still kept.
+    expect(list).toContain('scroll-pe-8')
   })
 })

@@ -141,3 +141,23 @@ export const FOCUS_RING_INSET = 'outline-none focus-visible:outline-solid focus-
 
 /** The ring on a wrapper whose focused element is hidden: a label around a native radio. */
 export const FOCUS_RING_WITHIN = 'outline-none has-focus-visible:outline-solid has-focus-visible:outline-(length:--tc-ring-width) has-focus-visible:outline-offset-(length:--tc-ring-offset) has-focus-visible:outline-ring'
+
+/** On the bar that holds an overlay's actions. An action is the decision, so its label wraps where
+ * Button alone would end it in an ellipsis. A Button of one of the five sizes grows from its own height,
+ * and never drops under the 44 px a finger needs; a custom one keeps the height its caller gave it. */
+export const ACTIONS_WRAP = [
+  '**:whitespace-normal *:data-size:text-center',
+  '*:data-size:not-data-[size=custom]:h-auto *:data-size:not-data-[size=custom]:py-1',
+  '*:data-[size=xs]:min-h-control-xs *:data-[size=sm]:min-h-control-sm *:data-[size=md]:min-h-control-md',
+  '*:data-[size=lg]:min-h-control-lg *:data-[size=xl]:min-h-control-xl',
+  'pointer-coarse:*:data-[size=xs]:min-h-[var(--tc-target-coarse,44px)]',
+  'pointer-coarse:*:data-[size=sm]:min-h-[var(--tc-target-coarse,44px)]',
+  'pointer-coarse:*:data-[size=md]:min-h-[var(--tc-target-coarse,44px)]',
+].join(' ')
+
+/** An overlay that is not modal leaves the page usable: the viewport that covers the screen for
+ * a dialog or a drawer lets every press through. A popover has no such layer and needs neither. */
+export const VIEWPORT_PASSIVE = 'pointer-events-none'
+
+/** And the popup inside that viewport takes its own presses back. */
+export const POPUP_PASSIVE = 'pointer-events-auto'

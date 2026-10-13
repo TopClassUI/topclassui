@@ -45,6 +45,13 @@ describe('the own width shrinks, so two inputs in a row fit a phone', () => {
       expect(widths(classes({ type })), type).toEqual([])
     })
   }
+
+  it('reads the type without regard to case, as HTML does', () => {
+    expect(widths(classes({ type: 'Email' }))).toEqual([OWN_WIDTH])
+    expect(widths(classes({ type: 'SEARCH' }))).toEqual([OWN_WIDTH])
+    expect(widths(classes({ type: 'Checkbox' }))).toEqual([])
+    expect(widths(classes({ type: 'DATE' }))).toEqual([])
+  })
 })
 
 describe('the own width gives way', () => {
