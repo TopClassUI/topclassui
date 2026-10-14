@@ -4,7 +4,8 @@ import { join } from 'node:path'
 
 import ts from 'typescript'
 
-import type { PropRow } from './readme.js'
+import { type PropRow, mergeRows } from './readme.js'
+import type { PartFamily } from './readme-parts.js'
 
 /** One program for every component, because creating one per folder costs seconds each. */
 export function openTypeProgram(root: string, files: string[]): ts.Program {
@@ -78,4 +79,53 @@ function shorten(printed: string): string {
   if (withoutUndefined.length <= 48) return withoutUndefined
   const generic = /^([A-Za-z0-9_.]+)</.exec(withoutUndefined)
   return generic?.[1] ?? `${withoutUndefined.slice(0, 45)}...`
+}
+
+function exportsOf(program: ts.Program, file: string): ts.Symbol[] {
+  const checker = program.getTypeChecker()
+  const source = program.getSourceFile(file)
+  const moduleSymbol = source ? checker.getSymbolAtLocation(source) : undefined
+  return moduleSymbol ? checker.getExportsOfModule(moduleSymbol) : []
+}
+
+/** The names an index.tsx exports as values, in the order it exports them: types are left out. */
+export function valueExportsOf(program: ts.Program, file: string): string[] {
+  const checker = program.getTypeChecker()
+  return exportsOf(program, file)
+    .filter((e) => {
+      const target = (e.flags & ts.SymbolFlags.Alias) === 0 ? e : checker.getAliasedSymbol(e)
+      return (target.flags & ts.SymbolFlags.Value) !== 0
+    })
+    .map((e) => e.name)
+}
+
+/** Every prop a type accepts, wherever it is declared, Base UI's included. */
+export function propNamesOf(program: ts.Program, file: string, exportName: string): Set<string> {
+  const checker = program.getTypeChecker()
+  const found = exportsOf(program, file).find((e) => e.name === exportName)
+  if (!found) return new Set()
+  const declared = checker.getDeclaredTypeOfSymbol(found)
+  const branches = declared.isUnion() ? declared.types : [declared]
+  return new Set(branches.flatMap((branch) => checker.getPropertiesOfType(branch).map((p) => p.name)))
+}
+
+/**
+ * A part family part by part, the Root first: each schema row goes to every part that accepts the
+ * prop, and one no part accepts stays on the Root rather than vanish. className is the closing line's.
+ */
+export function familyOf(
+  program: ts.Program, typeFile: string, exported: readonly string[], root: string, fromSchema: PropRow[],
+): PartFamily {
+  const claimed = new Set<string>()
+  const parts = [root, ...exported.filter((name) => name !== root)].map((name) => {
+    const accepts = propNamesOf(program, typeFile, `${name}Props`)
+    const schemaRows = fromSchema.filter((row) => accepts.has(row.name))
+    for (const row of schemaRows) claimed.add(row.name)
+    const rows = mergeRows(schemaRows, ownPropsOf(program, typeFile, `${name}Props`))
+    return { name, rows: rows.filter((row) => row.name !== 'className') }
+  })
+  const orphans = fromSchema.filter((row) => !claimed.has(row.name))
+  const first = parts[0]
+  if (first && orphans.length > 0) parts[0] = { ...first, rows: mergeRows(orphans, first.rows) }
+  return { parts, rootDraws: propNamesOf(program, typeFile, `${root}Props`).has('className') }
 }

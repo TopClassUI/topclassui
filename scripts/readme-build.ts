@@ -9,7 +9,7 @@ import { z } from 'zod'
 import type { ComponentMeta } from '../src/shared/meta.js'
 import type { JsonSchemaObject } from './lib/readme.js'
 import { handWrittenOf, mergeRows, renderReadme, rowsFromJsonSchema } from './lib/readme.js'
-import { openTypeProgram, ownPropsOf } from './lib/readme-types.js'
+import { familyOf, openTypeProgram, ownPropsOf, valueExportsOf } from './lib/readme-types.js'
 
 const ROOT = process.cwd()
 const COMPONENTS = join(ROOT, 'src', 'components')
@@ -25,7 +25,10 @@ const folders = readdirSync(COMPONENTS, { withFileTypes: true })
 const typeFiles = folders
   .map((slug) => join(COMPONENTS, slug, 'types.ts'))
   .filter((f) => existsSync(f))
-const program = openTypeProgram(ROOT, typeFiles)
+const indexFiles = folders
+  .map((slug) => join(COMPONENTS, slug, 'index.tsx'))
+  .filter((f) => existsSync(f))
+const program = openTypeProgram(ROOT, [...typeFiles, ...indexFiles])
 
 const stale: string[] = []
 let written = 0
@@ -56,6 +59,12 @@ for (const slug of folders) {
   const fromTypes = existsSync(typeFile)
     ? firstOf(ownPropsOf(program, typeFile, `${meta.name}Props`), ownPropsOf(program, typeFile, `${meta.name}RootProps`))
     : []
+  // R-9.2-4: a family exports <Name>Root and no bare <Name>, so it is imported and documented part by part.
+  const exported = valueExportsOf(program, join(dir, 'index.tsx'))
+  const root = `${meta.name}Root`
+  const family = exported.includes(root) && existsSync(typeFile)
+    ? familyOf(program, typeFile, exported, root, fromSchema)
+    : undefined
 
   const demoDir = join(dir, 'dummy')
   const demos = existsSync(demoDir)
@@ -69,6 +78,7 @@ for (const slug of folders) {
     props: mergeRows(fromSchema, fromTypes),
     demos,
     handWritten: handWrittenOf(existing),
+    family,
   })
 
   if (existing === next) continue
