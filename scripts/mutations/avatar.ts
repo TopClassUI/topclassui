@@ -46,7 +46,7 @@ export const MUTATIONS: Mutation[] = [
   },
   {
     label: 'an avatar part becomes a client module, which check-boundaries checks only in index.tsx',
-    file: 'src/components/avatar/parts/avatar-image.tsx',
+    file: 'src/components/avatar/parts/avatar-root.tsx',
     from: "import { cn } from '#shared/cn.js'\n",
     to: "'use client'\nimport { cn } from '#shared/cn.js'\n",
   },
@@ -88,7 +88,7 @@ export const MUTATIONS: Mutation[] = [
   },
   {
     label: 'the avatar image ignores render, so a framework image is replaced by a plain img',
-    file: 'src/components/avatar/parts/avatar-image.tsx',
+    file: 'src/components/avatar/client.tsx',
     from: 'renderElement(render ?? <img />, ',
     to: 'renderElement(<img />, ',
   },

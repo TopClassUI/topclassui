@@ -1,0 +1,162 @@
+// The mutations of src/components/command. Found by scripts/mutations/index.ts.
+import type { Mutation } from '../lib/mutate.js'
+
+const CLIENT = 'src/components/command/client.tsx'
+const CLASSES = 'src/components/command/classes.ts'
+const HOOK = 'src/components/command/hook.ts'
+const LIB = 'src/components/command/lib.ts'
+const PANEL = 'src/components/command/parts/command-panel.tsx'
+const ROWS = 'src/components/command/parts/command-rows.tsx'
+
+export const MUTATIONS: Mutation[] = [
+  {
+    label: 'command: filterCommands stops lowering the case, so BUTTON no longer finds Button',
+    file: LIB,
+    from: 'const label = getLabel(item).toLowerCase()',
+    to: 'const label = getLabel(item)',
+  },
+  {
+    label: 'command: client.tsx imports the panel statically, so Base UI loads with every page that shows the trigger',
+    file: CLIENT,
+    from: "import { useCommand } from './hook.js'",
+    to: "import { useCommand } from './hook.js'\nimport './parts/command-panel.js'",
+  },
+  {
+    label: 'command: the shortcut stops asking for Ctrl or Cmd, so typing a k anywhere opens the palette',
+    file: LIB,
+    from: 'if (!(press.ctrlKey || press.metaKey) || press.altKey || press.shiftKey) return false',
+    to: 'if (press.altKey || press.shiftKey) return false',
+  },
+  {
+    label: 'command: the shortcut stops matching the key by its place, so Ctrl+K does nothing under an Arabic layout',
+    file: LIB,
+    from: ' || (code !== undefined && press.code === code)',
+    to: '',
+  },
+  {
+    label: 'command: the shortcut no longer takes the key from the browser, which moves to its own search bar',
+    file: HOOK,
+    from: '      event.preventDefault()\n',
+    to: '',
+  },
+  {
+    label: 'command: the escape guard falls back to the dialog roles, and the always-open input holds every Escape',
+    file: PANEL,
+    from: 'guardEscape(panel.onDialogOpenChange, COMMAND_ESCAPE_GUARD)',
+    to: 'guardEscape(panel.onDialogOpenChange)',
+  },
+  {
+    label: 'command: no escape guard, so one Escape closes a tooltip inside and the palette with it',
+    file: PANEL,
+    from: 'onOpenChange={guardEscape(panel.onDialogOpenChange, COMMAND_ESCAPE_GUARD)}',
+    to: 'onOpenChange={panel.onDialogOpenChange}',
+  },
+  {
+    label: 'command: a row the keyboard moves to is not scrolled to, so the last of ten thousand is never mounted',
+    file: HOOK,
+    from: '      target.scrollIntoView({ block: \'nearest\' })\n    } else scrollToIndex(row)\n',
+    to: '      target.scrollIntoView({ block: \'nearest\' })\n    }\n',
+  },
+  {
+    label: 'command: a new query keeps the old scroll, so its first match can sit above the window',
+    file: HOOK,
+    from: '    if (list.current) list.current.scrollTop = 0\n',
+    to: '',
+  },
+  {
+    label: 'command: the query survives a close, so the next open starts filtered',
+    file: HOOK,
+    from: "onOpenChangeComplete: (next: boolean) => { if (!next) setQuery('') },",
+    to: 'onOpenChangeComplete: () => undefined,',
+  },
+  {
+    label: 'command: the panel mounts already open, so the first open pops in where every later one fades',
+    file: HOOK,
+    from: 'open: props.open && primed,',
+    to: 'open: props.open,',
+  },
+  {
+    label: 'command: choosing a row runs it and leaves the palette open',
+    file: HOOK,
+    from: '    onOpenChange(false)\n    onSelect(item)',
+    to: '    onSelect(item)',
+  },
+  {
+    label: 'command: visibleRows is no longer clamped, so 100000 rows of cap reach the list',
+    file: HOOK,
+    from: ': clamp(visibleRows, COMMAND_BOUNDARIES.visibleRowsMin, COMMAND_BOUNDARIES.visibleRowsMax)',
+    to: ': visibleRows',
+  },
+  {
+    label: 'command: the spacer above the window stands for nothing, so the rows jump to the top as the list scrolls',
+    file: HOOK,
+    from: 'before: collection.virtualized ? first : 0,',
+    to: 'before: 0,',
+  },
+  {
+    label: 'command: the search field loses its 256 cap, so a pasted file becomes the query',
+    file: PANEL,
+    from: '                  maxLength={TEXT_MAX_LENGTH.search}\n',
+    to: '',
+  },
+  {
+    label: 'command: a group whose heading scrolled away is no longer named, so a reader hears an unnamed group',
+    file: ROWS,
+    from: 'aria-label={run.label ? undefined : run.group}',
+    to: 'aria-label={undefined}',
+  },
+  {
+    label: 'command: the viewport centres the popup, which then jumps as the results change',
+    file: CLASSES,
+    from: 'flex items-start justify-center p-(--tc-overlay-inset) pt-[15dvh]',
+    to: 'flex items-center justify-center p-(--tc-overlay-inset)',
+  },
+  {
+    label: 'command: the list takes back the drawn 2 px gap, and slides 2 px under the wheel for every row the window passes',
+    file: CLASSES,
+    from: "`flex min-h-0 flex-col p-1.5 ${LIST_CAP}",
+    to: "`flex min-h-0 flex-col gap-0.5 p-1.5 ${LIST_CAP}",
+  },
+  {
+    label: 'command: a heading is shorter than a row, so the spacers of a grouped list count the wrong height',
+    file: CLASSES,
+    from: 'text-xs font-medium text-muted ${COMMAND_UNIT}`',
+    to: 'text-xs font-medium text-muted`',
+  },
+  {
+    label: 'command: a row stays 40 px under a finger, below the 44 px a touch target needs',
+    file: CLASSES,
+    from: " pointer-coarse:h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]'",
+    to: "'",
+  },
+  {
+    label: 'command: the active row is told by its fill alone, under 3:1 against the popup',
+    file: CLASSES,
+    from: '${ROW} ${ROW_HIGHLIGHT} ${COMMAND_ACTIVE} ${DISABLED}',
+    to: '${ROW} ${ROW_HIGHLIGHT} ${DISABLED}',
+  },
+  {
+    label: 'command: the input text drops to 14 px, and iOS zooms the page into it',
+    file: CLASSES,
+    from: 'bg-transparent px-2 text-base text-body',
+    to: 'bg-transparent px-2 text-sm text-body',
+  },
+  {
+    label: 'command: the empty listbox stays in view when nothing matches',
+    file: CLASSES,
+    from: ' data-empty:hidden`',
+    to: '`',
+  },
+  {
+    label: 'command: the empty live region keeps its 48 px of padding under every list',
+    file: CLASSES,
+    from: 'text-muted empty:p-0',
+    to: 'text-muted',
+  },
+  {
+    label: 'command: the popup clips its children, and the ring of the input with them',
+    file: CLASSES,
+    from: 'max-w-105 flex-col wrap-anywhere',
+    to: 'max-w-105 flex-col overflow-hidden wrap-anywhere',
+  },
+]
