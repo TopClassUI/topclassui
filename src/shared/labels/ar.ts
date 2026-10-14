@@ -154,4 +154,19 @@ export const ar = {
   banner: {
     dismiss: 'إغلاق',
   },
+  numberField: {
+    increase: 'زيادة',
+    decrease: 'إنقاص',
+    field: 'حقل رقمي',
+  },
+  slider: {
+    minimum: 'الحد الأدنى',
+    maximum: 'الحد الأقصى',
+  },
+  otp: {
+    character: (place, length, fmt) => `الخانة ${fmt.format(place)} من ${fmt.format(length)}`,
+  },
+  textarea: {
+    count: (length, max, fmt) => `عدد الأحرف: ${fmt.format(length)} من ${fmt.format(max)}`,
+  },
 } satisfies Labels
