@@ -15,7 +15,7 @@ function Link({ href, prefetch, className, children, ...rest }: LinkProps) {
 describe('<NavbarLink render>', () => {
   it('renders the element it is given inside the list item, with its own href', () => {
     const html = markup(<NavbarLink render={<Link href="/docs" />}>Docs</NavbarLink>)
-    expect(html).toMatch(/^<li class="[^"]+"><a href="\/docs" data-prefetch="on" class="[^"]+"><span class="truncate min-w-0">Docs<\/span><\/a><\/li>$/)
+    expect(html).toMatch(/^<li class="[^"]+"><a href="\/docs" data-prefetch="on" class="[^"]+"><span dir="auto" class="truncate min-w-0">Docs<\/span><\/a><\/li>$/)
   })
 
   it('gives it the classes of a link, so it looks like the anchor it replaces', () => {
@@ -64,7 +64,7 @@ describe('<NavbarLink render>', () => {
 describe('<NavbarBrand render>', () => {
   it('renders the element it is given, with its own href and the classes of the brand', () => {
     const html = markup(<NavbarBrand render={<Link href="/" />}>TopClass UI</NavbarBrand>)
-    expect(html).toMatch(/^<a href="\/" data-prefetch="on" class="[^"]+"><span class="truncate min-w-0">TopClass UI<\/span><\/a>$/)
+    expect(html).toMatch(/^<a href="\/" data-prefetch="on" class="[^"]+"><span dir="auto" class="truncate min-w-0">TopClass UI<\/span><\/a>$/)
     expect(classList(html)).toEqual(classList(markup(<NavbarBrand href="/">TopClass UI</NavbarBrand>)))
     expect(classList(html)).toContain('font-semibold')
   })

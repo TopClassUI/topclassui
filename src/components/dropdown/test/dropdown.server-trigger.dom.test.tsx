@@ -45,7 +45,7 @@ describe('a trigger className replaces a conflicting class of a Button rendered 
     })
 
     it(`${form}: the label keeps the truncating span Button wrapped it in`, () => {
-      expect(trigger({ render: element('Actions') }).innerHTML).toBe('<span class="truncate min-w-0">Actions</span>')
+      expect(trigger({ render: element('Actions') }).innerHTML).toBe('<span dir="auto" class="truncate min-w-0">Actions</span>')
     })
   }
 
@@ -88,7 +88,7 @@ describe('a label left on the part survives a Button that ran on the server with
   }
 
   it('a label left on the part reaches a Button written in a client file, which wraps it itself', () => {
-    expect(trigger({ render: <Button />, children: 'Actions' }).innerHTML).toBe('<span class="truncate min-w-0">Actions</span>')
+    expect(trigger({ render: <Button />, children: 'Actions' }).innerHTML).toBe('<span dir="auto" class="truncate min-w-0">Actions</span>')
   })
 })
 
