@@ -1,5 +1,6 @@
 import type { Tabs as Base } from '@base-ui/react/tabs'
 
+import type { GroupName } from '#shared/contracts/name.js'
 import type { Size } from '#shared/contracts/size.js'
 import type { TABS_VARIANTS } from './constants.js'
 import type { TabsSchemaInput } from './schema.js'
@@ -26,17 +27,7 @@ interface OwnClassName {
 }
 
 /** R-5.6-1: a tablist draws no text of its own, so a caller must name it one of two ways. */
-export type TabsListName =
-  | {
-    /** The name read out when no visible text names the tabs. */
-    'aria-label': string
-    'aria-labelledby'?: string | undefined
-  }
-  | {
-    'aria-label'?: string | undefined
-    /** The id of the visible text that names the tabs. */
-    'aria-labelledby': string
-  }
+export type TabsListName = GroupName
 
 // R-5.7-5: derived at the seam, so every Base UI prop passes through untouched.
 export type TabsRootProps = Omit<Base.Root.Props, 'className'>
