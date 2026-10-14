@@ -179,20 +179,66 @@ file instead), a style for a dialog inside a dialog, `placement`, `dismissible`,
 ## Import
 
 ```tsx
-import { Dialog } from 'topclassui'
+import {
+  DialogRoot,
+  DialogBody,
+  DialogClose,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogPopup,
+  DialogTitle,
+  DialogTrigger,
+} from 'topclassui'
 ```
 
 ## Props
 
 Every prop below is optional and falls back to the default shown.
 
+### DialogRoot
+
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
 | `children` | no | `ReactNode` | - | The trigger and the popup. With no trigger, hold `open` in a client file. |
+
+### DialogBody
+
+This part takes no design props of its own.
+
+### DialogClose
+
+This part takes no design props of its own.
+
+### DialogDescription
+
+This part takes no design props of its own.
+
+### DialogFooter
+
+This part takes no design props of its own.
+
+### DialogHeader
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
 | `closeButton` | no | `boolean` | `true` | DialogHeader: whether it ends with the built-in close button. |
+
+### DialogPopup
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | DialogPopup: the widest it grows, 320 to 640 px; custom sets no width. |
 
-Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
+### DialogTitle
+
+This part takes no design props of its own.
+
+### DialogTrigger
+
+This part takes no design props of its own.
+
+`DialogRoot` draws no element, so it takes no `className`, `style` or `ref`. Anything else on another part is passed to the element it draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
 

@@ -28,9 +28,12 @@ export const AVATAR_SIZE = {
 /** Centred on its own too, so an icon and initials sit the same way. */
 export const AVATAR_FALLBACK = 'inline-flex items-center justify-center'
 
-/** Over the fallback, which shows until the image paints. A failed image draws its mark but
- * not its alt: forced colours would repaint the text, so the image opts out of them. */
-export const AVATAR_IMAGE = 'absolute inset-0 size-full object-cover text-transparent forced-color-adjust-none'
+/** Over the fallback, which shows until the image paints. Before the script runs a failed image
+ * draws its mark but not its alt; once it has, data-error hides the mark too and keeps the img. */
+export const AVATAR_IMAGE = [
+  'absolute inset-0 size-full object-cover text-transparent forced-color-adjust-none',
+  'data-error:opacity-0',
+].join(' ')
 
 /** The root's own box and line, in the fill Figma binds for a placeholder. */
 export const AVATAR_SKELETON = [

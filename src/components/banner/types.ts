@@ -24,6 +24,21 @@ export type BannerName =
     'aria-labelledby': string
   }
 
+/** A banner the visitor can dismiss needs an id: the dismissal is remembered by it. */
+export type BannerDismissal =
+  | {
+    dismissible: true
+    /** The key the dismissal is remembered under, and the element's id. Required with `dismissible`. */
+    id: string
+    /** Called once when the x is pressed. A function, so only a client caller can pass it. */
+    onDismiss?: (() => void) | undefined
+  }
+  | {
+    dismissible?: false | undefined
+    id?: string | undefined
+    onDismiss?: undefined
+  }
+
 /** The content, and the role the component writes itself. */
 type Owned = 'children' | 'dangerouslySetInnerHTML' | 'role'
 
@@ -37,7 +52,15 @@ export interface BannerOwnProps {
 }
 
 export type BannerProps =
-  Omit<ComponentPropsWithRef<'div'>, Owned>
+  Omit<ComponentPropsWithRef<'div'>, Owned | 'id'>
   & BannerDesignProps
   & BannerOwnProps
   & BannerName
+  & BannerDismissal
+
+/** What index.tsx hands the client shell: the root's attributes, with the id and the tone it reads. */
+export type BannerShellProps = Omit<ComponentPropsWithRef<'div'>, 'id'> & {
+  'id': string
+  'data-tone': BannerTone
+  'onDismiss'?: (() => void) | undefined
+}

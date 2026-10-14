@@ -92,4 +92,16 @@ export const MUTATIONS: Mutation[] = [
     from: '`عدد الأحرف: ${fmt.format(length)} من ${fmt.format(max)}`',
     to: '`عدد الأحرف: ${fmt.format(max)} من ${fmt.format(length)}`',
   },
+  {
+    label: 'the shared number format ignores the -u-nu- extension of its tag, so ar-u-nu-arab still prints Latin digits',
+    file: 'src/shared/labels/get-labels.ts',
+    from: 'numberingSystem: numberingSystem ?? fromTag ?? \'latn\' })',
+    to: 'numberingSystem: numberingSystem ?? \'latn\' })',
+  },
+  {
+    label: 'the shared number format lets the tag beat an explicit numberingSystem, so a caller cannot force Latin digits',
+    file: 'src/shared/labels/get-labels.ts',
+    from: 'numberingSystem: numberingSystem ?? fromTag ?? \'latn\' })',
+    to: 'numberingSystem: fromTag ?? numberingSystem ?? \'latn\' })',
+  },
 ]

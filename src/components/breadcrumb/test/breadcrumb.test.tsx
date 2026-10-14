@@ -66,8 +66,8 @@ describe('a crumb with an href', () => {
 
   it('holds its label in a span of its own, the element the ellipsis needs', () => {
     const out = html()
-    expect(out).toContain('<span class="truncate min-w-0">Home</span></a>')
-    expect(out).toContain('<span class="truncate min-w-0">Docs</span></a>')
+    expect(out).toContain('<span dir="auto" class="truncate min-w-0">Home</span></a>')
+    expect(out).toContain('<span dir="auto" class="truncate min-w-0">Docs</span></a>')
   })
 
   it('is never marked as the current page', () => {
@@ -98,7 +98,7 @@ describe('a crumb with an href', () => {
 describe('the last crumb without an href', () => {
   it('is a span marked aria-current="page", and not a link', () => {
     const last = crumbs(html())[2] ?? ''
-    expect(last).toMatch(/<span aria-current="page" class="[^"]*">Breadcrumb<\/span><\/li>$/)
+    expect(last).toMatch(/<span dir="auto" aria-current="page" class="[^"]*">Breadcrumb<\/span><\/li>$/)
     expect(last).not.toContain('<a')
     expect(last).not.toContain('href')
   })
@@ -110,7 +110,7 @@ describe('the last crumb without an href', () => {
 
   it('is current even when it is the only crumb', () => {
     const out = of([{ label: 'Home' }])
-    expect(out).toMatch(/<li[^>]*><span aria-current="page" class="[^"]*">Home<\/span><\/li>/)
+    expect(out).toMatch(/<li[^>]*><span dir="auto" aria-current="page" class="[^"]*">Home<\/span><\/li>/)
   })
 })
 
@@ -119,14 +119,14 @@ describe('a crumb without an href that is not the last', () => {
 
   it('is plain text: a span with no href and no aria-current', () => {
     const middle = crumbs(out)[1] ?? ''
-    expect(middle).toMatch(/<span class="[^"]*">Settings<\/span><\/li>$/)
+    expect(middle).toMatch(/<span dir="auto" class="[^"]*">Settings<\/span><\/li>$/)
     expect(middle).not.toContain('<a')
     expect(middle).not.toContain('aria-current')
   })
 
   it('leaves the current page on the last crumb alone', () => {
     expect(count(out, 'aria-current="page"')).toBe(1)
-    expect(crumbs(out)[2] ?? '').toContain('<span aria-current="page"')
+    expect(crumbs(out)[2] ?? '').toContain('<span dir="auto" aria-current="page"')
   })
 })
 
