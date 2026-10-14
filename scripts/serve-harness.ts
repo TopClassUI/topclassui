@@ -59,7 +59,7 @@ async function reply(url: string): Promise<Reply | null> {
   const file = demos.get(route.demo)
   if (file === undefined) return plain(404, `there is no demo named "${route.demo}"; ${liveOrigin(PORT)}/ lists them`)
 
-  const body = renderToString(liveTree(await loadDemo(file), route.direction, LANG[route.direction]))
+  const body = renderToString(liveTree(await loadDemo(file), route.direction, LANG[route.direction], undefined, route.toast))
   return { status: 200, html: livePageHtml(route, body, css, ROOT) }
 }
 

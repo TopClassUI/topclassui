@@ -8,8 +8,8 @@ export const meta = {
   tier: 2,
   // PLAN 20 is not met until the visual matrix and the docs page exist.
   status: 'beta',
-  // The server half only: the dismiss button of the catalog's Sp row comes with Unit 3.
-  rendering: 'server',
+  // A plain banner is server HTML; only a dismissible one renders the client shell.
+  rendering: 'split',
   baseUi: null,
   baseUiRange: null,
   optionalDeps: [],
