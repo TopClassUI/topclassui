@@ -101,24 +101,36 @@ that is always on, a skeleton (use `Skeleton`).
 ## Import
 
 ```tsx
-import { RadioGroup } from 'topclassui'
+import {
+  RadioGroupRoot,
+  RadioGroupItem,
+} from 'topclassui'
 ```
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `value` on `RadioGroupItem`. Every other prop below is optional.
+
+### RadioGroupRoot
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
 | `aria-label` | no | `string` | - | The name read out when no visible text names the group. |
 | `aria-labelledby` | no | `string` | - | The id of the visible text that names the group. |
-| `className` | no | `string` | - | Merged last, so a consumer class wins a conflict with the group's own. |
 | `invalid` | no | `boolean` | `false` | RadioGroupRoot: marks the choice as wrong: sets aria-invalid on the group, and every circle turns to danger and thickens. |
 | `orientation` | no | `vertical` \| `horizontal` | `"vertical"` | RadioGroupRoot: a column, or a row that wraps. Layout only, written as data-orientation; the arrow keys do not change. |
 | `ref` | no | `Ref<HTMLDivElement>` | - | The element with role="radiogroup". |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | RadioGroupRoot: the toggle scale of every circle and the type step of its label; custom emits no size classes. |
 
-Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
+### RadioGroupItem
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `value` | **yes** | `string` | - | The string the form receives, and what `value` and `onValueChange` of the group carry. |
+| `ref` | no | `Ref<HTMLButtonElement>` | - | The radio itself, which is a `<button>`. |
+| `style` | no | `CSSProperties` | - | On the `<label>` around the radio and its text. |
+
+Anything else is passed to the element each part draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
 
