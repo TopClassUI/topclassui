@@ -125,8 +125,26 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the label bound stops cutting, so a megabyte reaches the DOM',
     file: 'src/shared/truncate-label.tsx',
-    from: 'const text = run.slice(0, maxLength)',
+    from: 'const text = cutLabel(run, maxLength)',
     to: 'const text = run',
+  },
+  {
+    label: 'the shared label cut slices UTF-16 units again, splitting an emoji, a flag or a harakah at the bound',
+    file: 'src/shared/truncate-label.tsx',
+    from: 'return text.slice(0, end)',
+    to: 'return text.slice(0, maxLength)',
+  },
+  {
+    label: 'the shared label cut reads no unit past the bound, so a skin tone right after it is cut off its hand',
+    file: 'src/shared/truncate-label.tsx',
+    from: 'text.slice(0, maxLength + 2)',
+    to: 'text.slice(0, maxLength)',
+  },
+  {
+    label: 'the shared label cut span loses dir="auto", so an English-first label in an RTL page is cut at its start',
+    file: 'src/shared/truncate-label.tsx',
+    from: ' dir="auto" className={LABEL}>',
+    to: ' className={LABEL}>',
   },
   {
     label: 'each text child gets its own span, so the gap opens inside the words',

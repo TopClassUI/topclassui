@@ -139,21 +139,52 @@ client file instead).
 ## Import
 
 ```tsx
-import { Popover } from 'topclassui'
+import {
+  PopoverRoot,
+  PopoverClose,
+  PopoverDescription,
+  PopoverPopup,
+  PopoverTitle,
+  PopoverTrigger,
+} from 'topclassui'
 ```
 
 ## Props
 
 Every prop below is optional and falls back to the default shown.
 
+### PopoverRoot
+
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
 | `children` | no | `ReactNode` | - | The trigger and the popup. With no trigger, hold `open` in a client file. |
-| `closeDelay` | no | `number`, min 0, max 10000 | `0` | PopoverTrigger, with openOnHover: milliseconds it stays open after the pointer leaves, clamped. |
-| `delay` | no | `number`, min 0, max 10000 | `300` | PopoverTrigger, with openOnHover: milliseconds of hover before it opens, clamped. |
+
+### PopoverClose
+
+This part takes no design props of its own.
+
+### PopoverDescription
+
+This part takes no design props of its own.
+
+### PopoverPopup
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
 | `placement` | no | `top` \| `top-start` \| `top-end` \| `bottom` \| `bottom-start` \| `bottom-end` \| `start` \| `start-top` \| `start-bottom` \| `end` \| `end-top` \| `end-bottom` | `"bottom"` | PopoverPopup: the side and alignment it opens at; start and end mirror in Arabic. |
 
-Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
+### PopoverTitle
+
+This part takes no design props of its own.
+
+### PopoverTrigger
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `closeDelay` | no | `number`, min 0, max 10000 | `0` | PopoverTrigger, with openOnHover: milliseconds it stays open after the pointer leaves, clamped. |
+| `delay` | no | `number`, min 0, max 10000 | `300` | PopoverTrigger, with openOnHover: milliseconds of hover before it opens, clamped. |
+
+`PopoverRoot` draws no element, so it takes no `className`, `style` or `ref`. Anything else on another part is passed to the element it draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
 

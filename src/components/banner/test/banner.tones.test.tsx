@@ -29,8 +29,8 @@ describe('every tone', () => {
     expect([...BANNER_TONES]).toEqual(['primary', 'neutral', 'success', 'warning', 'danger', 'info'])
   })
 
-  it('starts at primary', () => {
-    expect(BANNER_DEFAULTS).toEqual({ tone: 'primary' })
+  it('starts at primary, and not dismissible', () => {
+    expect(BANNER_DEFAULTS).toEqual({ tone: 'primary', dismissible: false })
   })
 
   for (const [tone, paint] of Object.entries(PAINT)) {

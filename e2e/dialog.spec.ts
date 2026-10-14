@@ -274,13 +274,15 @@ test.describe('focus', () => {
 test.describe('the page behind', () => {
   test('is hidden from assistive technology and cannot scroll while the dialog is open, and is given back on close', async ({ page }) => {
     await openLive(page, 'dialog--basic', { tall: true })
-    expect((await pageLock(page)).reachable).toEqual(['h1', 'main', 'pre'])
+    // The first portal is the toast region TopClassProvider mounts on every page, which a modal leaves readable.
+    expect((await pageLock(page)).reachable).toEqual(['h1', 'main', 'pre', 'portal'])
     await expect(page.getByRole('button', { name: 'Publish' })).toHaveCount(1)
 
     await openOverlay(page, triggerOf(page, 'Publish'))
     // Base UI 1.8.0 marks every sibling of its portal aria-hidden, and locks the scroll on the body.
     const locked = await pageLock(page)
-    expect(locked.reachable).toEqual(['portal'])
+    // The first portal is the toast region TopClassProvider mounts on every page, which a modal leaves readable.
+    expect(locked.reachable).toEqual(['portal', 'portal'])
     expect(locked.body).toBe('overflow: hidden;')
     expect(locked.overflow).toBe('hidden')
     await expect(page.getByRole('button', { name: 'Publish', exact: true })).toHaveCount(0)
@@ -289,7 +291,8 @@ test.describe('the page behind', () => {
     await page.keyboard.press('Escape')
     await expectClosed(page)
     const released = await pageLock(page)
-    expect(released.reachable).toEqual(['h1', 'main', 'pre'])
+    // The first portal is the toast region TopClassProvider mounts on every page, which a modal leaves readable.
+    expect(released.reachable).toEqual(['h1', 'main', 'pre', 'portal'])
     expect(released.overflow).toBe('visible')
   })
 
@@ -700,7 +703,8 @@ test.describe('each value of modal', () => {
     const seen = [await pressInside(page, popup, 'Tab'), await pressInside(page, popup, 'Tab'), await pressInside(page, popup, 'Tab')]
     expect(seen).toEqual(['Done', 'Close this dialog', 'Done'])
     const lock = await pageLock(page)
-    expect(lock.reachable).toEqual(['portal'])
+    // The first portal is the toast region TopClassProvider mounts on every page, which a modal leaves readable.
+    expect(lock.reachable).toEqual(['portal', 'portal'])
 
     // The pointer: free. The page scrolls behind the open dialog, and its button takes the press.
     expect(lock.overflow).toBe('visible')
@@ -721,7 +725,8 @@ test.describe('each value of modal', () => {
     await expect(popup).toHaveCSS('pointer-events', 'auto')
     expect(await takesPresses(popup), 'a press on the popup lands on it').toBe(true)
     const lock = await pageLock(page)
-    expect(lock.reachable).toEqual(['h1', 'main', 'pre', 'portal'])
+    // The first portal is the toast region TopClassProvider mounts on every page, which a modal leaves readable.
+    expect(lock.reachable).toEqual(['h1', 'main', 'pre', 'portal', 'portal'])
     expect(lock.overflow).toBe('visible')
     await wheelAt(page, 8, 500, 300)
     expect(await scrollY(page)).toBe(300)
