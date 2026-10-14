@@ -48,16 +48,17 @@ describe('hook.ts holds what the parts read from the provider (R-5.12-1)', () =>
 
   it('imports the context, the ref and the memo hooks from React and no hook that holds state: the shared tab stop does', () => {
     expect(importedModules(source)).toEqual([
-      'react', '#shared/provider/context.js', '#shared/provider/use-portal-locale.js', '#shared/use-scroll-tab-stop.js',
-      './constants.js', './lib.js', './types.js',
+      'react', '#shared/overlay-scope.js', '#shared/provider/context.js', '#shared/provider/use-portal-locale.js',
+      '#shared/use-scroll-tab-stop.js', './constants.js', './lib.js', './types.js',
     ])
     expect(importedNames(source, 'react')).toEqual(['createContext', 'useContext', 'useImperativeHandle', 'useMemo', 'useRef'])
+    expect(importedNames(source, '#shared/overlay-scope.js')).toEqual(['useOverlayRoot', 'useOverlayScope'])
   })
 
-  it('one hook per part: the direction and the settings of the root, the locale of the portal, the ref and the tab stop of the body, the label of the x', () => {
+  it('one hook per part: the direction, the settings and the scope of the root, the locale and the scope of the portal, the ref and the tab stop of the body, the label of the x', () => {
     expect(hooksByPart(source)).toEqual({
-      useDrawerRoot: ['useDirection', 'useMemo'],
-      useDrawerPopup: ['usePortalLocale', 'useContext'],
+      useDrawerRoot: ['useDirection', 'useMemo', 'useOverlayRoot'],
+      useDrawerPopup: ['usePortalLocale', 'useContext', 'useOverlayScope'],
       useDrawerBody: ['useRef', 'useImperativeHandle', 'useScrollTabStop'],
       useDrawerClose: ['useLabels'],
     })

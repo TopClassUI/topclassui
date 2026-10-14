@@ -12,6 +12,8 @@ import { resolveToastSettings, type ToastSettingsInput } from '../contracts/toas
 import { createNumberFormat, getLabels, type NumberingSystem } from '../labels/get-labels.js'
 import type { PartialLabels } from '../labels/types.js'
 import { toastManager } from '../toast/manager.js'
+// The one planned exception to CLOUD-PLAN 9, a shared file importing a component: Toast ships with the provider.
+import { ToastViewport } from '../../components/toast/client.js'
 import {
   type Direction, ToastSettingsContext, TopClassContext, type TopClassContextValue,
 } from './context.js'
@@ -86,6 +88,8 @@ export function TopClassProvider(props: TopClassProviderProps) {
               <Toast.Provider toastManager={toastManager} limit={toastSettings.limit} timeout={toastSettings.duration}>
                 {/* One delay group, so moving from one tooltip to the next does not wait again. */}
                 <Tooltip.Provider>{isolated}</Tooltip.Provider>
+                {/* The one live region, after the app, at the outermost provider only: toast.add() needs nothing else. */}
+                <ToastViewport />
               </Toast.Provider>
             </ToastSettingsContext.Provider>
           )}

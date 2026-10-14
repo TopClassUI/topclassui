@@ -39,6 +39,9 @@ export type AvatarImageProps =
   Omit<ComponentPropsWithRef<'img'>, 'alt' | 'children' | 'dangerouslySetInnerHTML'>
   & (AvatarImageAsImg | AvatarImageAsElement)
 
+/** The event an img that fails hands its onError: what useAvatarImage passes on to the caller's. */
+export type AvatarImageError = Parameters<NonNullable<AvatarImageProps['onError']>>[0]
+
 /** R-8.3-4: the avatar's own size prop, so the two cannot describe different boxes. */
 export type AvatarSkeletonProps =
   Omit<ComponentPropsWithRef<'span'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
