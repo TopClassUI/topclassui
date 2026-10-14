@@ -1,4 +1,5 @@
 import { act, render, renderHook } from '@testing-library/react'
+import type { CSSProperties } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useCollection } from './use-collection.js'
@@ -148,6 +149,38 @@ describe('scrolling to a row', () => {
     const { getByTestId } = render(<Harness />)
     act(() => { api?.scrollToKey('r500', 'start') })
     expect(getByTestId('s').scrollTop).toBe(500 * 36)
+  })
+
+  // Row 100 spans 3,600 to 3,636 px of 360,000, in a list 360 px tall.
+  function scroller(style?: CSSProperties) {
+    const items = makeItems(10_000)
+    let api: ReturnType<typeof useCollection<Row>> | null = null
+    function Harness() {
+      api = useCollection<Row>({ items, getKey })
+      return <div data-testid="s" ref={api.scrollRef} style={style} />
+    }
+    const node = render(<Harness />).getByTestId('s')
+    return { node, to: (index: number, at: number) => { measure(node, 360, 360_000, at); act(() => { api?.scrollToIndex(index) }) } }
+  }
+
+  it('scrollToIndex starts from where the list is: a row above goes to the top edge, one in view stays', () => {
+    const { node, to } = scroller()
+    to(100, 10_000)
+    expect(node.scrollTop).toBe(3_600)
+    to(100, 3_500)
+    expect(node.scrollTop).toBe(3_500)
+    to(100, 0)
+    expect(node.scrollTop).toBe(3_276)
+  })
+
+  it('scrollToIndex lands a row where scrollIntoView would, past the list padding and inside its scroll padding', () => {
+    const { node, to } = scroller({ paddingTop: 6, scrollPaddingTop: 4, scrollPaddingBottom: 4 })
+    to(100, 10_000)
+    expect(node.scrollTop).toBe(3_602)
+    to(100, 0)
+    expect(node.scrollTop).toBe(3_286)
+    to(100, 3_500)
+    expect(node.scrollTop).toBe(3_500)
   })
 
   it('ignores a key that is not in the list', () => {

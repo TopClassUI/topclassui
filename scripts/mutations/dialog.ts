@@ -193,14 +193,32 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog root forwards only its children, so open, defaultOpen and disablePointerDismissal never reach Base UI',
     file: CLIENT,
-    from: '<Base.Root {...props} modal={modal} onOpenChange={guardEscape(onOpenChange)} />',
-    to: '<Base.Root modal={modal} onOpenChange={guardEscape(onOpenChange)}>{props.children}</Base.Root>',
+    from: '<Base.Root {...props} modal={modal} onOpenChange={root.onOpenChange} />',
+    to: '<Base.Root modal={modal} onOpenChange={root.onOpenChange}>{props.children}</Base.Root>',
   },
   {
     label: 'the dialog root drops its Escape guard, so one key closes a tooltip opened by hover and the dialog under it',
     file: CLIENT,
-    from: 'onOpenChange={guardEscape(onOpenChange)}',
+    from: 'onOpenChange={root.onOpenChange}',
     to: 'onOpenChange={onOpenChange}',
+  },
+  {
+    label: 'the lifted escape scope never reaches the dialog popup, so its guard looks for a popup that is not there',
+    file: CLIENT,
+    from: '          data-overlay={scope}\n',
+    to: '',
+  },
+  {
+    label: 'the lifted escape scope is written before the rest props of the dialog popup, so a data-overlay of the caller breaks its guard',
+    file: CLIENT,
+    from: '          {...rest}\n          data-overlay={scope}\n',
+    to: '          data-overlay={scope}\n          {...rest}\n',
+  },
+  {
+    label: 'the lifted escape scope of a dialog root is not handed to its popup, so every dialog popup carries an empty one',
+    file: CLIENT,
+    from: '<OverlayScopeContext value={root.scope}>',
+    to: '<OverlayScopeContext value="">',
   },
   {
     label: "the dialog popup's own classes beat a consumer className",

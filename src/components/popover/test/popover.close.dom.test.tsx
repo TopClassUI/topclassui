@@ -110,7 +110,7 @@ describe('a PopoverClose with content is that control, not the x', () => {
 
   it('with render it is the Button it was given, with that Button label and classes', async () => {
     const button = await close(<PopoverClose render={<Button variant="outline">Cancel</Button>} />)
-    expect(button.innerHTML).toBe('<span class="truncate min-w-0">Cancel</span>')
+    expect(button.innerHTML).toBe('<span dir="auto" class="truncate min-w-0">Cancel</span>')
     expect(button.getAttribute('data-variant')).toBe('outline')
     expect(button.getAttribute('aria-label')).toBeNull()
     expect(classes(button)).not.toContain('tone-neutral')
