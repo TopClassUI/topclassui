@@ -71,10 +71,13 @@ are three more components outside the 46; with the folders `icon`, `svg` and
 
 Checked on 2026-10-14 and 2026-10-15 against the read base `u5-read` (local branch
 `u5/read-base`, head `d4bdb61`), with Base UI 1.8.0, Tailwind 4.3.3, happy-dom 20.14.5,
-Node 22.14.0 and Playwright's Chromium. Nothing was written into that checkout. The
-planner's scripts are in the lead's handoff folder under `unit-5/scratch-plan/`; the
-readers' under `unit-5/scratch-figma/`, `scratch-baseui/`, `scratch-code/` and
-`rules-scratch/`.
+Node 22.14.0, React 19.3.0 and Playwright's Chromium. Nothing was written into that
+checkout. Three passes: the planner's, three reviews of the planner's draft, and a final
+edit that checked each blocker and major before it changed this file and then ran the
+file's own verification again. The scripts are in the lead's handoff folder: the planner's
+under `unit-5/scratch-plan/`; the readers' under `unit-5/scratch-figma/`, `scratch-baseui/`,
+`scratch-code/` and `rules-scratch/`; the reviewers' under `scratch-acc/`, `scratch-bui/`
+and `scratch-review-everyone/`; the final edit's under `scratch-final/`.
 
 By the four readers, whose notes are in `handoff/unit-5/`:
 
@@ -89,20 +92,23 @@ By the four readers, whose notes are in `handoff/unit-5/`:
 - **Rules** (`rules-notes.md`): the 46 by name from two Figma frames (three calls); every
   rule, PLAN section and DECISIONS entry that touches a candidate.
 
-By the planner, against this file as written:
+By the planner, and run again by the final edit on this file as it now stands (the numbers
+are the final edit's):
 
 - **Classes.** The seven fenced `ts` blocks were read back out of this file and evaluated
-  against the repo's `src/shared/classes.ts`: 77 constants and 220 distinct classes, each
+  against the repo's `src/shared/classes.ts`: 77 constants and 224 distinct classes, each
   compiled alone with `compileCss` from `scripts/lib/harness.ts`. All produce a rule except
   the three group markers (`group/zone`, `group/tree`, `group/row`), each of which is read by
   a variant that does. No constant takes the name of a shared one. No inline-code class in
-  the prose is missing from the blocks.
+  the prose is missing from the blocks. The repo's `cn()` run over every constant drops no
+  class, so none holds two classes for one property.
 - **Lint.** Each block, with the shared names it reads imported, through the repo's own
   ESLint config, typed rules included, as `src/components/popover/classes.ts`: 0 messages
   for all seven. `npx eslint --stdin --stdin-filename src/components/popover/classes.ts`
-  exits 0 on two of them. The same blocks named `index.tsx` get 5 errors from
-  `shared-class-constants` (`rounded-full` and its kind): keep every string in a
-  `classes.ts`.
+  exits 0 on two of them. The same blocks named `index.tsx` get 4 errors from
+  `shared-class-constants`: `rounded-full` (Stepper), `h-5` (Field), and the two
+  hand-written states recorded as departures, `hover:` (CodeBlock) and `focus-visible:`
+  (TreeView). Keep every string in a `classes.ts`.
 - **The root-part lint.** `Field` declared in `index.tsx` with `FieldLive` re-exported,
   `FieldLive` alone in `client.tsx`, and `Form` with `FormAction` re-exported: 0 messages.
   The controls: `Field` and `FieldLive` declared in one file, 1 message; `DatePicker` beside
@@ -111,22 +117,34 @@ By the planner, against this file as written:
   `aria-selected:` and `data-selected:` fills come after `hover:` and `active:`, so a
   selected row or day keeps its fill under the pointer; `data-dragging:` borders come after
   `has-aria-invalid:`; `group-aria-selected/row:` text comes after `text-muted`.
-- **Base UI.** 66 names in the installed types and built files: the six popover parts and
-  every prop this file gives them, `'trap-focus'`, the popup's `role: 'dialog'` and its
-  `aria-labelledby` from the title, the trigger's `aria-haspopup`, the parts of `field`,
-  `fieldset`, `form` and `meter`, `'use client'` at the top of Meter, Field and Form,
-  `internals/composite`, and no calendar, tree, stepper, file or code export.
-- **Names.** 164 names: every shared constant, hook, helper, contract, label key, token,
+- **Base UI.** 73 names in the installed types and built files: the seven popover parts
+  (with `Close`) and every prop this file gives them, `'trap-focus'` and the type comment
+  that asks for a `Close` with it, `focusManagerModal = modal !== false && hasClosePart` in
+  `PopoverPopup.js`, the trigger's focus guards when it is false, the popup's
+  `role: 'dialog'` and its `aria-labelledby` from the title, the trigger's
+  `aria-haspopup`, the parts of `field`, `fieldset`, `form` and `meter`, `'use client'` at
+  the top of Meter, Field and Form, `internals/composite`, no `dispatchEvent` in
+  `SelectRoot.js`, and no calendar, tree, stepper, file or code export.
+- **Names.** 176 names: every shared constant, hook, helper, contract, label key, token,
   icon and file this file leans on exists where it says, and every one a shared pull
   request creates (two label groups and nine keys, three tokens, `form-errors.ts`) does not
-  exist yet. The five controls of Unit 4's second half are not on the base, and each has its
-  section in `unit-4.md`.
+  exist yet. Among them, what the reviews made the file lean on: `useId` in the server
+  `index.tsx` of Table, Tag and Textarea; `textarea.demos.rsc.test.tsx`, and none for
+  Progress; Rating's `lib.tsx` alone, tested as `rating.lib.test.ts`; Timeline's
+  `role="list"`; the `askedAt.current === count` guard of `useCollection`; Command's
+  `hook.ts` imported by both `client.tsx` and its lazy part; `--color-ring` read through
+  `@theme inline`; `common.close` and `common.required`; and react-dom 19.3.0's
+  `requestFormReset` before a function action. The five controls of Unit 4's second half
+  are not on the base, and each has its section in `unit-4.md`.
 - **`Intl`, in Node 22.14.0, where the dom tests run.** `getLabels('ar-u-nu-arab')` keeps
   the tag; `createNumberFormat` prints U+0662 for it and `2` for `ar` and `ar-EG`.
   `Intl.Locale` week info: `en` 7, `en-GB` 1, `ar` 6, `ar-SA` 7, `ar-EG` 6, `he` 7, through
   the `weekInfo` getter; `getWeekInfo` is undefined there. `Date.UTC(1, 0, 1)` falls in 1901
   and `setUTCFullYear` gives year 1. The dates quoted in DatePicker. `fa` defaults to the
-  Persian calendar. `en` formats 2.4 megabytes as "2.4 MB" and 512 kilobytes as "512 kB".
+  Persian calendar. `en` formats 2.4 megabytes as "2.4 MB" and 512 kilobytes as "512 kB";
+  300 bytes as "300 byte" in the short form and "300 bytes" in the long. A `process.env.TZ`
+  set at run time takes effect at once: `2026-10-14T22:30:00Z` is the 15th by `getDate()` in
+  `Asia/Riyadh` and the 14th by `getUTCDate()`.
 - **happy-dom 20.14.5** has `DataTransfer` and `File`, and an assigned `input.files` keeps
   its two files.
 - **Static layout in Chromium** (one browser): the blocks on hand-written markup that follows
@@ -137,23 +155,77 @@ By the planner, against this file as written:
     first step is at the right. Six steps with 40-character titles at 320 px never scroll
     the page sideways; the titles wrap.
   - The calendar: the popup 280 x 274 px at 1280 and 280 x 354 at 320 coarse; the smallest
-    day 31.1 x 32 px, and 31.1 x 44 under a coarse pointer; previous and next 24 px, 44
-    coarse; the 1st of September 2026 in the second column from the inline start in both
-    directions; no sideways scroll.
+    day 31.1 x 32 px, and 31.1 x 44 under a coarse pointer; the 1st of September 2026 in the
+    second column from the inline start in both directions; no sideways scroll. Measured
+    again by the final edit with the header as it now is (previous, title, next, close):
+    the same two heights; the three buttons 24 px, 44 coarse; the title 150 px wide on one
+    line at 1280, and 90 px on two lines at 320 coarse, where "September 2026" and a longer
+    month wrap and nothing is cut.
   - The tree: rows of 40 px, 44 coarse; the caret 17, 35 and 53 px from the tree's inline
     start at levels 0, 1 and 2, in both directions; a 300-character label scrolls nothing
-    sideways.
+    sideways. The final edit: Tab onto the tree with no highlighted row draws the tree's
+    own ring (solid, 2 px); with a row holding `data-highlighted` the tree's ring goes and
+    the row's shows, in both directions.
   - FileUpload: the input fills the zone inside its 1 px line; the zone is 152 px tall; the
-    remove button 24 px, 44 coarse; a 300-character name scrolls nothing sideways.
+    remove button 24 px, 44 coarse; a 300-character name scrolls nothing sideways. The final
+    edit: the hidden status line is placed absolutely, and the root is as tall with a
+    refusal in it as without.
   - CodeBlock: a 300-character line scrolls inside the `<pre>` and the page does not, alone,
     in a grid track of `1fr`, in a `flex-1` column and in a table cell, in both directions;
     in RTL the code still starts at the left of the `<pre>` and the button sits at the left,
-    the inline end; the button is 44 px under a coarse pointer.
+    the inline end; the button is 44 px under a coarse pointer. The final edit, with the
+    shared rings: in Light and Dark the `<pre>`'s ring and, once its 150 ms transition has
+    run, the button's ring are the block's text colour (`--tc-ring` reads `#fff` on the
+    button in Light); one cold read under Playwright's `isMobile` caught the button's ring
+    mid-transition at its 70% text colour, and the same case read white on a second run and
+    with reduced motion.
   - Field with `inline` and a 300-character label: the box first, the hint under the label,
     no sideways scroll, in both directions.
   - Meter: 512 of 1024 fills half the track from the inline start in both directions; `md`
     is 6 px tall.
-- **ASCII.** The file holds no character outside ASCII.
+- **ASCII.** The file holds no character outside ASCII, no carriage return and no tab.
+- **Three reviews of the planner's draft.** Three reviewers read it, each through one lens
+  and each with scripts of its own against the same base: 37 findings, three blockers,
+  fifteen majors, nineteen minors.
+  - *Is it accurate?* Found: Field's `lib.ts` beside a `lib.tsx` cannot work (`./lib.js`
+    resolves to `lib.ts`; the two compile to one `lib.js`; probed with the repo's `tsc`);
+    `modal="trap-focus"` traps nothing without a `Close` part (read in `PopoverPopup.js`);
+    CodeBlock wrote its own rings and hover; Field's ids clashed when one form is rendered
+    twice; five slips (a key count, a bound's purpose, a string count, a test file Progress
+    does not have, what `unit: 'byte'` prints).
+  - *Does it work for everyone?* It rendered the built controls with the control object,
+    ran axe on server HTML and dispatched events in happy-dom. Found: React 19 resets a form
+    after every function action, so FormAction erased what was typed; one name on several
+    Fields gave several controls one id; a required DatePicker was never heard as required;
+    a scripted value fires no event, so FieldLive kept a fixed error; the focus after errors
+    landed on a radiogroup that takes none; the `<ol>` and `<ul>` lost their list in Safari
+    with VoiceOver; a refused file was silent; the tree drew no ring before hydration or
+    after a wheel, and named an id no element had; today was left to UTC; and four small
+    gaps (the clipboard outside a secure context, five copy buttons with one name, the order
+    of FileUpload's descriptions, month buttons with no type).
+  - *Can a builder with no memory build from it?* Found the same ids, events, list role and
+    today, and: DatePicker had none of the layout and no-provider fixtures unit-4.md gives a
+    field; a tree's `loadMore` would be asked twice when a branch opens near the end
+    (`useCollection` guards on the visible rows); what a server `Form` cannot show with no
+    script; and small gaps in the Not built lists, a test set, the lazy claim (`hook.ts` and
+    `lib.ts` load with the trigger, as in Command) and a value outside the range.
+- **The final edit.** It checked the three blockers and the fifteen majors before it changed
+  anything: by running a reviewer's probe again (the `lib` pair through `tsc`, the server
+  HTML of the built controls with the control object), by reading the cited line (the
+  close-part condition and the trigger's focus guards, `startHostTransition`, the guard of
+  `useCollection`, Timeline's role, `SelectRoot.js`, unit-4.md's fixtures, `guardEscape`)
+  or by a run of its own (`Intl` for bytes, `TZ` at run time). All eighteen held. Two parts
+  of the proposed fixes did not, and were left out: keeping Field's ids from the name with
+  no `useId` (one name on several Fields is common, and three server files on the base
+  already call `useId`), and `guardEscape` on DatePicker's root (it guards an Escape meant
+  for a tooltip inside the popup; the calendar holds none, and Select's in-dialog case
+  passes without it). Where two reviewers proposed different fixes for
+  one fault, the file takes one and says why: Field's ids from `useId` (choice 33), and
+  FieldLive's error cleared by comparing the field's entries after any `input`, `change`,
+  `click` or `keyup`, with DatePicker and FileUpload dispatching `input`, since Base UI's
+  Select dispatches nothing. Then it ran this file's verification again: the classes, the
+  lint, the Base UI names, the shared names, ASCII, and the static probe above for what
+  changed.
 
 Not checked. Say so in the pull request when one of these turns out wrong:
 
@@ -164,15 +236,24 @@ Not checked. Say so in the pull request when one of these turns out wrong:
   304 px).
 - No behaviour was run: the keys, the focus, the lazy calendar, drag and drop, the
   clipboard, `useActionState`, the windowing of a tree, the reset cases, a popover with
-  `modal="trap-focus"` around a lazy child.
+  `modal="trap-focus"` around a lazy child whose `Close` part mounts after the popup opens,
+  FieldLive's comparison of entries, the `input` events DatePicker and FileUpload dispatch,
+  React's form reset in a browser (read in the react-dom source, not run), FormAction's
+  focus moving into a radiogroup, and the tree's `loadMore` guard.
+- Two measurements are a reviewer's and were not repeated here: axe's `aria-allowed-attr`
+  on a button with `aria-required`, and `aria-valid-attr-value` on a dangling
+  `aria-activedescendant` (`scratch-review-everyone/axe-probe.mts`).
 - Next.js: a Server Action, the response it renders with no script through
   `useActionState`, the `enctype` React writes for a function action, a file posted through
   a Server Action.
 - Firefox, WebKit, a real phone, a screen reader. Week info in Firefox and WebKit. Whether a
-  browser's ICU prints the trigger's date as Node's does.
+  browser's ICU prints the trigger's date as Node's does. Whether a screen reader reads the
+  hidden "required" word of a DatePicker, and the list role of the `<ol>` in Safari with
+  VoiceOver (the reason is Timeline's comment, not a run).
 - Contrast that `check-contrast` does not measure: primary/on-soft "Browse" on base/surface,
-  danger/on-soft errors on the page, the 70% header text and the on-solid rings on
-  neutral/solid, in the three modes. Each block's spec measures them with `e2e/pixels.ts`.
+  danger/on-soft errors on the page, the 70% header text, the copy button's 10% hover tint
+  and the on-solid rings on neutral/solid, in the three modes. Each block's spec measures
+  them with `e2e/pixels.ts`.
 - Bundle sizes: `pnpm size` does not exist, and the chips are budgets.
 - The Arabic strings of shared pull request 1: not written yet.
 - Unit 4's second half is not on the base: what Field says of Slider, NumberField, OTPField,
@@ -244,8 +325,12 @@ Only what changes how these eight are built. The long forms are in the earlier f
   starts with `'use client'`, exports one component named after its file, is not
   re-exported by `index.tsx`, and its hook calls count in `<slug>.client.test.ts`. `hook.ts`
   writes no type argument in angle brackets. `lib.ts` imports no React; a helper that returns
-  JSX goes in `lib.tsx`. A folder whose only bounds are shared has no `boundaries.ts`. No
-  `variants.ts`: a lookup is a plain object in `classes.ts`. No `skeleton.tsx` (see Deferred).
+  JSX goes in `lib.tsx`. A folder then keeps every helper in that `lib.tsx`: it has `lib.ts`
+  or `lib.tsx`, never both, because `./lib.js` resolves to `lib.ts` first and the two would
+  compile to one `lib.js` (measured with the repo's `tsc`; Rating's `lib.tsx` is the model,
+  tested as `rating.lib.test.ts`). A folder whose only bounds are shared has no
+  `boundaries.ts`. No `variants.ts`: a lookup is a plain object in `classes.ts`. No
+  `skeleton.tsx` (see Deferred).
 - **Folders, exports and `meta.ts`.** Every export is flat (`R-9.2-3`). None of the eight is
   a family, so none has a `Root` (`R-9.2-4`). Field and Form each export a second name from
   `client.tsx`; the root-part lint reads one file at a time and a re-export line does not
@@ -270,8 +355,9 @@ Only what changes how these eight are built. The long forms are in the earlier f
 - **Labels (`R-5.11-1`).** A client part reads `useLabels()` through `hook.ts`. A server
   component takes `labels` (default `en`) and `locale` (default `'en'`), so
   `{...getLabels(locale)}` spreads; where it formats no number it accepts `locale` and drops
-  it, as Timeline does. CodeBlock hands its two strings to its client part as props, so a
-  server page's `labels` reach the button with or without a provider. Shared pull request 1
+  it, as Timeline does. CodeBlock hands its three strings (`common.copy`, `common.copied`,
+  `common.copyFailed`) to its client part as props, so a server page's `labels` reach the
+  button with or without a provider. Shared pull request 1
   adds the nine keys. No English in markup: the lint reads `aria-label` too.
 - **Form participation**, as Unit 4. DatePicker and FileUpload take `id`, `name`, `required`,
   `aria-labelledby`, `aria-describedby` and `aria-invalid` as plain props and put each on the
@@ -279,7 +365,10 @@ Only what changes how these eight are built. The long forms are in the earlier f
   `invalid` (default `false`), `disabled`, `form` and a name by type (`ControlName`). Each
   puts a real input in the server HTML and ships `dummy/form.tsx`, read by its spec on the
   static page with `serverEntries` from `e2e/form.ts`. DatePicker holds its value with
-  `useFormValue`; FileUpload its list. Each has an `e2e/fixtures/<slug>-reset.tsx`.
+  `useFormValue`; FileUpload its list. Each has an `e2e/fixtures/<slug>-reset.tsx`. Each
+  writes its form input from script (a value, a file list), which fires no event, so each
+  dispatches `new Event('input', { bubbles: true })` on that input after the write: an app's
+  own listener and FieldLive then hear the change as they hear a typed one.
 - **Values and events.**
 
   | Component | Controlled pair | Event |
@@ -350,13 +439,17 @@ Only what changes how these eight are built. The long forms are in the earlier f
   writes `tabIndex`. `rtl.tsx` wraps itself in `TopClassProvider` with `direction="rtl"` and
   `locale="ar"` (a server one spreads `getLabels('ar')`). Each block lists its demos;
   anything else a test needs is a fixture in `e2e/fixtures/<slug>-<what>.tsx`, with inline
-  styles only.
+  styles only. The two fields, DatePicker and FileUpload, each have `<slug>-layouts.tsx` as
+  unit-4.md's ten do: alone as a grid item, in a wrapper in a grid track, in a `flex-1`
+  column, in a `w-fit` parent, in a table cell and in a label row. DatePicker, a trigger
+  that copies Select's box, adds Select's two side by side (a grid written `1fr 1fr`, a flex
+  row, one beside a label in `auto 1fr`) and `date-picker-no-provider.tsx`.
 - **Tests.** The file set of the template of each kind, by suffix:
 
   | Kind | Files |
   |---|---|
-  | Server (Progress) | `.test.tsx`, `.compile.test.ts`, `.types.test.ts`, `.schema.test.ts`, `.meta.test.ts`, `.styles.test.tsx`, `.dom.test.tsx`, `.hydration.dom.test.tsx`, `.demos.ssr.test.tsx`, `.demos.rsc.test.tsx` |
-  | Split (Textarea) | the server set, and `.client.test.ts`, `.exports.test.ts`, `.css.test.ts`, `.demos.dom.test.tsx`, `.lib.test.ts` where there is a `lib.ts` |
+  | Server (Progress; `.demos.rsc.test.tsx` copied from Textarea, since Progress has none) | `.test.tsx`, `.compile.test.ts`, `.types.test.ts`, `.schema.test.ts`, `.meta.test.ts`, `.styles.test.tsx`, `.dom.test.tsx`, `.hydration.dom.test.tsx`, `.demos.ssr.test.tsx`, `.demos.rsc.test.tsx` |
+  | Split (Textarea) | the server set, and `.client.test.ts`, `.exports.test.ts`, `.css.test.ts`, `.demos.dom.test.tsx`, `.lib.test.ts` where there is a `lib.ts` or a `lib.tsx` |
   | Client (Switch) | the split set, and `.keyboard.dom.test.tsx` and `.form.dom.test.tsx` where the block names keys or a form |
 
   Then one `e2e/<slug>.spec.ts`: the static page for what the server HTML promises, the live
@@ -393,8 +486,9 @@ too.
    (`radio-group`, `segmented-control`, `tabs`; run by the code reader): left as they are,
    `check:readme` fails on every Unit 5 branch.
 1. **`feat/shared-unit-5-labels`.** In `types.ts`, `en.ts`, `ar.ts`, and in
-   `withOverrides()` of `get-labels.ts`, which names every group by hand. Two new groups and
-   two keys in existing ones, nine keys in all. English:
+   `withOverrides()` of `get-labels.ts`, which names every group by hand. Two new groups of
+   three keys each (`datePicker`, `stepper`) and three keys in existing groups
+   (`file.tooLarge`, `file.wrongType`, `common.copyFailed`), nine keys in all. English:
 
    | Key | English | Kind |
    |---|---|---|
@@ -414,7 +508,8 @@ too.
    is 172 lines; nine keys and two group lines keep it under 200. A
    `src/shared/labels/unit-5.test.ts` like `unit-4.test.ts`, and rows in
    `scripts/mutations/shared-labels.ts`. Labels used as they are: `common.copy`,
-   `common.copied`, `common.loading`, `state.empty`, `state.loadingMore`, `file.drop`,
+   `common.copied`, `common.close`, `common.required`, `common.loading`, `state.empty`,
+   `state.loadingMore`, `file.drop`,
    `file.browse`, `file.remove`, `file.tooMany`. Month and weekday names are not labels: they
    come from `Intl` (`docs/DECISIONS.md` 2026-10-03).
 2. **`feat/shared-unit-5-tokens`.** Three lines in `src/tokens.css`, in `:root` under
@@ -477,12 +572,13 @@ hydration).
   `aria-valuenow` and, when the caller passes one, `aria-valuetext`. The native `<meter>` is
   not used: the browser draws its bar, and its look cannot take the tokens in every engine.
 - **Props.** `value` (default 0), `min` (default 0) and `max` (default 100). `min` and `max`
-  are clamped to `METER_BOUNDARIES` (-1e15 to 1e15, the guard rail NumberField uses for its
-  `step`); `max` is raised to `min` when it is below it; `value` is clamped to the result
-  with `clamp()`, which also turns `NaN` into `min`. `tone`: the six `TONES`, default
-  `primary`. `size`: default `md`. The name: `MeterName`, written as `ProgressName` is (one of
-  `aria-label` or `aria-labelledby` required). `aria-valuetext` passes through, for a caller
-  who wants "512 GB of 1 TB" read. No `labels`: Meter writes no text.
+  are clamped to `METER_BOUNDARIES` (-1e15 to 1e15, the guard rail NumberField and Slider use
+  for their `min` and `max`); `max` is raised to `min` when it is below it; `value` is
+  clamped to the result with `clamp()`, which also turns `NaN` into `min`. `tone`: the six
+  `TONES`, default `primary`. `size`: default `md`. The name: `MeterName`, written as
+  `ProgressName` is (one of `aria-label` or `aria-labelledby` required). `aria-valuetext`
+  passes through, for a caller who wants "512 GB of 1 TB" read. No `labels`: Meter writes no
+  text.
 - **The bar's width** is `meterPercent(value, min, max)` in `lib.ts`: `(value - min) / (max
   - min) * 100`, and 100 when `max` equals `min`.
 - **Markup.** As Progress: `<div {...rest} role="meter" aria-valuemin={min}
@@ -600,8 +696,12 @@ on an ordered list and `aria-current="step"`.
   it; a `value` that no item has leaves every step `todo`. That is `statusOf(items, value)` in
   `lib.ts`. `size`: default `md`. `labels` (default `en`) and `locale` (default `'en'`, for
   the digits). `className`, `style`, `ref` and the rest props reach the `<ol>`. The prop is
-  `value`, an id, as the code sample has it, not the playground's `activeStep`.
-- **Markup.** `<ol>` with `STEPPER_ROOT`. Each step is an `<li>` with `STEPPER_STEP`,
+  `value`, an id, as the code sample has it, not the playground's `activeStep`. Empty
+  `items` render nothing (`null`), as Timeline does.
+- **Markup.** `<ol>` with `STEPPER_ROOT`, the rest props, and after them `role="list"`, as
+  Timeline writes it: with `list-style: none` Safari with VoiceOver drops the list unless
+  the role is written, and with it the "2 of 4" this markup relies on, since the mark is
+  hidden. Each step is an `<li>` with `STEPPER_STEP`,
   `data-status` (a value attribute, as Timeline writes it) and `aria-current="step"` when
   current. In it a `<div>` with `STEPPER_MARK_ROW` holding, on every step but the last, the
   connector `<span aria-hidden="true">` with `STEPPER_CONNECTOR` and `data-done` when this
@@ -680,14 +780,17 @@ on an ordered list and `aria-current="step"`.
   holds a tick and "Completed", the second has `aria-current="step"` and a "2", the last two
   "Not started"; an item's own `status` wins; an unknown `value` makes every step todo; the
   connector of a done step has `data-done`, and the last step has no connector;
-  `arabic-digits` prints U+0662. Browser, static (`e2e/stepper.spec.ts`): at 320, 390 and
-  1280 px in both directions each connector starts at its circle's centre and ends at the
-  next one's, level with both centres, within 1 px; `long-content` never scrolls the page
-  sideways and its titles wrap inside their columns; at the five sizes the circles are 24,
-  28, 32, 40 and 48 px; under forced colours a done, a current and a todo mark are all
-  visible and differ (tick, number with a fill, number with a line).
+  `arabic-digits` prints U+0662; the `<ol>` carries `role="list"` as an attribute, also when
+  the caller passes another `role`; empty `items` render nothing. Browser, static
+  (`e2e/stepper.spec.ts`): at 320, 390 and 1280 px in both directions each connector starts
+  at its circle's centre and ends at the next one's, level with both centres, within 1 px;
+  `long-content` never scrolls the page sideways and its titles wrap inside their columns;
+  at the five sizes the circles are 24, 28, 32, 40 and 48 px; under forced colours a done, a
+  current and a todo mark are all visible and differ (tick, number with a fill, number with
+  a line).
 - **Mutation.** `statusOf` marks the current step `done`: the server render test catches it. A
-  second row: `STEPPER_CONNECTOR` loses `inset-s-1/2` (a styles test reads it).
+  second row: `STEPPER_CONNECTOR` loses `inset-s-1/2` (a styles test reads it). A third: the
+  `<ol>` loses `role="list"` (the server render test).
 - **Not built:** the client half of the catalog (clickable steps, `defaultValue`,
   `onValueChange`; choice 10), step panels and next or back buttons, `orientation`
   (vertical), `compact`, `showConnector`, a description line, a disabled look, `tone`.
@@ -739,7 +842,8 @@ that calls `navigator.clipboard.writeText`. No highlighter (choice 12).
 - **Exports:** `CodeBlock`, from `index.tsx`. Its copy button, `CodeBlockCopy`, lives in
   `client.tsx` and is not re-exported, as `TagRemove` is not.
 - **What the platform gives:** `<pre>` keeps every space and line break;
-  `navigator.clipboard.writeText` works in a secure context after a press.
+  `navigator.clipboard.writeText` works in a secure context after a press. Outside one (plain
+  `http` on a LAN address, some embedded views) `navigator.clipboard` is `undefined`.
 - **Props.** `children: string`, required: the code, as the sample passes it. `lang`: written
   as `data-lang` and nothing else (a class built from it would be a built class name,
   `R-5.2-3`). `title: ReactNode`: the file name in the header (the HTML `title` attribute is
@@ -751,37 +855,42 @@ that calls `navigator.clipboard.writeText`. No highlighter (choice 12).
 - **Markup.** A `<div>` with `CODE_BLOCK_ROOT` and `data-lang`. A header, a `<div>` with
   `CODE_BLOCK_HEADER`, when there is a `title` or a copy button: with a title, a
   `<span aria-hidden="true">` with `CODE_BLOCK_ICON` holding `<Svg icon={terminalWindow}
-  size="0.875rem" />`, and the title in a `<span dir="auto">` with `CODE_BLOCK_TITLE`; then
-  `<CodeBlockCopy>` when `showCopy`, imported from `./client.js` and rendered on that branch
-  only, so a block without it ships no script. Then `<pre dir="ltr" translate="no">` with
-  `CODE_BLOCK_PRE`, `CODE_BLOCK_PRE_ALONE` when there is no header and `CODE_BLOCK_WRAP` with
-  `wrap`, and `tabIndex={0}` unless `wrap`: a server render cannot know whether it
-  overflows, so it is always a tab stop, as Table's box is. In it `<code>` with
-  `highlighted` or `children`.
+  size="0.875rem" />`, and the title in a `<span dir="auto" id>` with `CODE_BLOCK_TITLE`, its
+  id from `useId()` (`R-5.1-1` allows it; Table does the same); then `<CodeBlockCopy>` when
+  `showCopy`, imported from `./client.js` and rendered on that branch only, so a block
+  without it ships no script. Then `<pre dir="ltr" translate="no">` with `CODE_BLOCK_PRE`,
+  `CODE_BLOCK_PRE_ALONE` when there is no header and `CODE_BLOCK_WRAP` with `wrap`, and
+  `tabIndex={0}` unless `wrap`: a server render cannot know whether it overflows, so it is
+  always a tab stop, as Table's box is; with a title, the `<pre>` is also `role="region"`
+  with `aria-labelledby` set to the title's id, as Table's box is named by its caption. In
+  it `<code>` with `highlighted` or `children`.
 - **The copy button.** `CodeBlockCopy` takes `code`, `label` (`labels.common.copy`),
   `copied` (`labels.common.copied`) and `failed` (`labels.common.copyFailed`), strings the
-  server hands it. It calls one hook, `useCodeBlockCopy(code)` in `hook.ts`. It renders a
-  `<button type="button" aria-label={label}>` with `CODE_BLOCK_COPY` and `data-copied` while
-  copied, holding `<Svg icon={copy} />` or, for `COPY_RESET_MS` (2000, in `constants.ts`),
-  `<Svg icon={check} />`, both at `0.875rem`; and beside it a `<span role="status">` with
-  `CODE_BLOCK_STATUS`, which says the copied or the failed text and is emptied after the
-  same time, so the next copy is announced again. The name of the button never changes
-  (PLAN 16). The tick is the colour of the button, not success/on-soft: the change of icon
-  is the cue.
+  server hands it, and `titleId` when the block has a title. It calls one hook,
+  `useCodeBlockCopy(code)` in `hook.ts`, which also makes the button's id. The hook copies
+  with `await navigator.clipboard?.writeText(code)` inside `try`, and treats a missing
+  clipboard, a throw and a rejection alike: each says `failed` and the icon stays. It renders
+  a `<button type="button" id aria-label={label}>`, which with a title also takes
+  `aria-labelledby="<its own id> <titleId>"`, so it reads "Copy page.tsx" and five blocks on
+  a page are five different buttons, as FileUpload's remove names its file. It carries
+  `CODE_BLOCK_COPY` and `data-copied` while copied, holding `<Svg icon={copy} />` or, for
+  `COPY_RESET_MS` (2000, in `constants.ts`), `<Svg icon={check} />`, both at `0.875rem`; and
+  beside it a `<span role="status">` with `CODE_BLOCK_STATUS`, which says the copied or the
+  failed text and is emptied after the same time, so the next copy is announced again. The
+  name of the button never changes (PLAN 16). The tick is the colour of the button, not
+  success/on-soft: the change of icon is the cue.
 
   ```ts
   // code-block/classes.ts
-  /** One column, so the code scrolls inside the block and never widens its parent. relative: it holds the live region. */
-  export const CODE_BLOCK_ROOT = `relative grid min-w-0 grid-cols-1 rounded-box bg-neutral-solid text-neutral-on-solid ${CONTAIN} ${FORCED_EDGE}`
+  /** One column, so the code scrolls inside the block and never widens its parent. relative: it holds the live region. The rings take the block's text colour. */
+  export const CODE_BLOCK_ROOT = `relative grid min-w-0 grid-cols-1 rounded-box bg-neutral-solid text-neutral-on-solid [--tc-ring:var(--tc-neutral-on-solid)] ${CONTAIN} ${FORCED_EDGE}`
   export const CODE_BLOCK_HEADER = 'flex min-w-0 items-center gap-2 px-3.5 py-1.5'
   export const CODE_BLOCK_ICON = 'flex shrink-0 text-neutral-on-solid/70'
   export const CODE_BLOCK_TITLE = `${LABEL} flex-1 font-mono text-xs text-neutral-on-solid/70`
-  /** The ring takes the block's text colour: --tc-ring is measured on the page and the surfaces, not on neutral/solid. */
-  export const CODE_BLOCK_RING = 'outline-none focus-visible:outline-solid focus-visible:outline-(length:--tc-ring-width) focus-visible:outline-offset-(length:--tc-ring-offset) focus-visible:outline-neutral-on-solid'
-  /** 24 px, 44 under a finger: the drawn 14 px icon is under the floor. */
-  export const CODE_BLOCK_COPY = `ms-auto inline-flex shrink-0 items-center justify-center rounded-control text-neutral-on-solid/70 hover:bg-neutral-on-solid/10 hover:text-neutral-on-solid ${TOUCH_TARGET} ${TRANSITION} ${CODE_BLOCK_RING}`
-  /** Sideways inside its own box; the ring is drawn inside, since the block clips nothing but sits flush with its edges. */
-  export const CODE_BLOCK_PRE = `rounded-b-box px-3.5 pb-3.5 font-mono text-sm whitespace-pre tab-2 text-start outline-none focus-visible:outline-solid focus-visible:outline-(length:--tc-ring-width) focus-visible:-outline-offset-(length:--tc-ring-width) focus-visible:outline-neutral-on-solid ${SCROLL_X}`
+  /** 24 px, 44 under a finger: the drawn 14 px icon is under the floor. HOVER.ghost reads the page's neutral/soft, which sits next to this text colour. */
+  export const CODE_BLOCK_COPY = `ms-auto ${ICON_BUTTON} text-neutral-on-solid/70 hover:bg-neutral-on-solid/10 hover:text-neutral-on-solid`
+  /** Sideways inside its own box; the ring is drawn inside, since the block sits flush with its edges. */
+  export const CODE_BLOCK_PRE = `rounded-b-box px-3.5 pb-3.5 font-mono text-sm whitespace-pre tab-2 text-start ${FOCUS_RING_INSET} ${SCROLL_X}`
   /** No header above it: the top padding comes back and every corner rounds. */
   export const CODE_BLOCK_PRE_ALONE = 'rounded-box pt-3.5'
   /** wrap: a long line breaks, and nothing scrolls sideways. */
@@ -794,8 +903,11 @@ that calls `navigator.clipboard.writeText`. No highlighter (choice 12).
 - **Direction.** The `<pre>` is always `dir="ltr"`: code reads left to right in an Arabic
   page. The header keeps the page's direction, so the button sits at the inline end, and the
   title is `dir="auto"`.
-- **Surface.** `neutral-solid` as drawn, so in Dark the block is light (choice 13). The text,
-  the icons and both rings are `neutral-on-solid`, a pair the tokens keep at 4.5:1;
+- **Surface.** `neutral-solid` as drawn, so in Dark the block is light (choice 13). The text
+  and the icons are `neutral-on-solid`, a pair the tokens keep at 4.5:1. Both rings are the
+  shared `FOCUS_RING` (through `ICON_BUTTON`) and `FOCUS_RING_INSET`, recoloured by
+  `--tc-ring` set to neutral/on-solid on the root, as Pagination, Sidebar and Tabs recolour
+  theirs; `--tc-ring` itself is measured on the page and the surfaces, not on neutral/solid.
   `FORCED_EDGE` draws its edge under forced colours.
 - **Files.** `index.tsx`, `client.tsx` (`CodeBlockCopy`), `hook.ts` (`useCodeBlockCopy`),
   `classes.ts`, `constants.ts` (`CODE_BLOCK_DEFAULTS`, `COPY_RESET_MS`), `schema.ts`
@@ -806,19 +918,24 @@ that calls `navigator.clipboard.writeText`. No highlighter (choice 12).
 - **Tests.** The split set, and: the server HTML of `<pre>` is `dir="ltr"` and holds the code
   with its spaces; `highlighted` replaces the text and the button still copies `children`;
   `showCopy={false}` renders no button and no header without a title; the `<pre>` is a tab
-  stop unless `wrap`. Dom (`navigator.clipboard` stubbed, fake timers): a press writes
-  exactly `children`; the status says "Copied" and is empty again after 2000 ms; the name of
-  the button stays "Copy"; a rejected write says "Could not copy". Browser
+  stop unless `wrap`; with a title the `<pre>` is a `region` named by it and the button is
+  named "Copy page.tsx", without one it is "Copy". Dom (`navigator.clipboard` stubbed, fake
+  timers): a press writes exactly `children`; the status says "Copied" and is empty again
+  after 2000 ms; the name of the button stays the same; a rejected write says "Could not
+  copy"; with `navigator.clipboard` undefined a press says "Could not copy" and throws
+  nothing. Browser
   (`e2e/code-block.spec.ts`): static, at 320 px in LTR and RTL, `long-line` scrolls inside
   the `<pre>` (its `scrollWidth` is over its `clientWidth`) and the page does not scroll
   sideways, alone, in a grid track of `1fr`, in a `flex-1` column and in a table cell; in RTL
   the code's first character is at the left of the `<pre>` and the button at the left of the
-  header; the button is at least 24 px (44 coarse); its ring has 3:1 against the block in
-  the three modes (`e2e/pixels.ts`); under forced colours the block has an edge. Live, with
+  header; the button is at least 24 px (44 coarse); its ring and the `<pre>`'s are
+  neutral/on-solid and have 3:1 against the block in the three modes (`e2e/pixels.ts`);
+  under forced colours the block has an edge. Live, with
   clipboard permission granted to Chromium: Tab to the button, Enter, the clipboard holds the
   code, the status says the copied text, the name is unchanged.
 - **Mutation.** The `<pre>` loses `dir="ltr"`: the server render test catches it. A second
-  row: the button's name becomes the copied text after a press (the dom test).
+  row: the button's name becomes the copied text after a press (the dom test). A third:
+  `CODE_BLOCK_ROOT` loses `[--tc-ring:var(--tc-neutral-on-solid)]` (a styles test reads it).
 - **Not built:** Shiki or any highlighter (choice 12), a syntax palette (the docs cards'
   on-soft colours sit on base/page, not on neutral/solid, and belong to the docs app), line
   numbers, highlighted lines, `maxLines`, a `theme` prop, a language badge, a fixed dark
@@ -826,7 +943,9 @@ that calls `navigator.clipboard.writeText`. No highlighter (choice 12).
 - **For the reviewer:** the `<pre>` is a tab stop even when nothing overflows, because the
   server cannot measure; `wrap` drops it. The colours of `highlighted` nodes are the
   caller's and nothing here checks them against `neutral-solid`. The success tick is drawn
-  in the block's own text colour, not the drawn success/on-soft.
+  in the block's own text colour, not the drawn success/on-soft. The copy button's hover is
+  written by hand, a 10% tint of neutral/on-solid: `HOVER.ghost` would paint the page's
+  neutral/soft under a text of nearly the same colour (`R-5.2-4`; see the departures).
 
 ## Field
 
@@ -860,7 +979,8 @@ The look is this file's: nothing is drawn.
   `error: string | readonly string[]`: one message, or the array Zod's `fieldErrors` gives.
   `invalid`: default `true` when `error` holds a message. `required`: default `false`.
   `inline`: default `false`: the control first and the label beside it, for a Checkbox or a
-  Switch. `id`: replaces the control's id. `children: (control: FieldControl) => ReactNode`:
+  Switch. `id`: the control's id, and with it every id of the field (see Ids).
+  `children: (control: FieldControl) => ReactNode`:
   required, a function (choice 8). `className`, `style`, `ref` and the rest props reach the
   root. `FieldLive` takes the same and, when it is given no `error`, reads its own from the
   nearest `FormAction` through `useFormErrors()`.
@@ -875,10 +995,15 @@ The look is this file's: nothing is drawn.
   types refuse the five without it. On the others it names what the label already names.
   `aria-describedby` lists the hint's id and then the error's, only those rendered.
   `aria-invalid` is `true` or absent.
-- **Ids.** `toFieldIds(name, id)` in `lib.ts`: the control `id ?? 'tc-f-<name>'`, the label
-  `tc-f-<name>-label`, the hint `-hint`, the error `-err`; white space in a name becomes `-`.
-  No `useId`: the server HTML and FieldLive's hydration agree, and a Server Action's errors
-  are keyed by the same name.
+- **Ids.** `toFieldIds(controlId)` in `lib.tsx`, where `controlId` is `id ?? useId()`: the
+  label `<controlId>-label`, the hint `-hint`, the error `-err`. `R-5.1-1` allows `useId` in
+  `index.tsx`, and Table, Tag and Textarea already call it there; React's server renderer
+  and the client agree on it, so FieldLive hydrates with the same ids. Never from `name`
+  alone (choice 33): a checkbox group repeats one name across several Fields, and two forms
+  on a page (a header and a footer subscribe form) can share one; ids from the name would
+  give two controls one id, point every label but the first at the wrong control (a click on
+  "Text me" would toggle "Email me") and make axe report `duplicate-id-aria`. A Server
+  Action's errors stay keyed by `name`.
 - **How each control takes it.** `{...control}` spreads onto all eleven with no change to
   them:
 
@@ -903,7 +1028,9 @@ The look is this file's: nothing is drawn.
   and `<Svg icon={warningCircle} />`, and each message in its own `<div>`. With `inline` the
   hint and the error also take `FIELD_NOTE_INLINE`. The hint and the error are `<div>`s: a
   `<p>` that holds a block is emptied by the parser (Timeline). A required field is heard
-  through the control's own `required`; the asterisk is only seen.
+  through the control: `required` on a native one, `aria-required` on Checkbox, Switch and
+  the two groups (measured in their server HTML), and the word "required" in a DatePicker's
+  description (see DatePicker). The asterisk is only seen.
 
   ```ts
   // field/classes.ts
@@ -927,11 +1054,22 @@ The look is this file's: nothing is drawn.
   export const FIELD_REQUIRED = 'ms-0.5 inline-flex text-danger-on-soft'
   ```
 
-- **FieldLive.** It calls one hook, `useFieldLive({ name, error })` in `hook.ts`, and then
-  `renderField()`. The hook takes the error from the prop, else from `useFormErrors()?.[name]`.
-  An error from the form goes once a value inside the field changes (an `input` or `change`
-  event caught on its root) and comes back with the next result of the action, as Base UI's
-  `errors` prop does; the hook keys that on the identity of the errors object. FieldLive
+- **FieldLive.** It calls one hook, `useFieldLive({ id, name, error })` in `hook.ts`, and
+  then `renderField()`. The hook makes the ids as Field does and takes the error from the
+  prop, else from `useFormErrors()?.[name]`. An error from the form goes once the field's
+  value changes, and comes back with the next result of the action, as Base UI's `errors`
+  prop does; the hook keys that on the identity of the errors object. When new errors
+  arrive, the hook records the field's entries, `new FormData(form).getAll(name)` with a
+  file read by its name, where `form` is found as `useFormValue`'s private `findForm` finds
+  it (the input's `form`, else the closest `<form>`); it records them
+  in a `setTimeout` from its effect, so React's reset and `useFormValue`'s restore have
+  landed first. On every `input`, `change`, `click` and `keyup` caught on its root as React
+  events (so a press in a portaled popup counts), it reads them again on the next frame and
+  clears the error when they differ: a click that changes nothing keeps it. A plain
+  `input` or `change` is not enough: Base UI's Select writes its hidden input from state and
+  dispatches nothing (read in `SelectRoot.js`), which the `click` and `keyup` catch; and
+  DatePicker and FileUpload dispatch an `input` event after a scripted write (see "Rules
+  for all eight"), which also covers a drop. FieldLive
   writes the same ids, label and `aria-describedby` into its server HTML as Field does. Its
   child is a function, so it is used from a client file, as the sample is; a server page
   uses Field (`R-5.1-3`).
@@ -940,28 +1078,36 @@ The look is this file's: nothing is drawn.
   static page.
 - **RTL.** A grid and logical classes: with `inline` the control sits at the inline start.
 - **Files.** `index.tsx` (`Field`), `client.tsx` (`FieldLive`), `hook.ts` (`useFieldLive`),
-  `lib.ts` (`toFieldIds`, `messagesOf`), `lib.tsx` (`renderField`), `classes.ts`,
+  `lib.tsx` (`toFieldIds`, `messagesOf`, `renderField`; no `lib.ts`: `./lib.js` resolves to
+  `lib.ts` first, and the two would compile to one `lib.js`), `classes.ts`,
   `constants.ts` (`FIELD_DEFAULTS`), `schema.ts` (`required`, `inline`, `invalid`), `types.ts`
   (`FieldControl`, `FieldProps`, `FieldLiveProps`), `meta.ts`, `README.md`. No
   `boundaries.ts`. Demos: `basic` (an Input), `hint-error`, `required`, `inline` (a Checkbox
   and a Switch), `group` (a RadioGroup), `form`, `rtl`, `long-content` (a 300-character label
   and hint), `live` (FieldLive outside a form).
-- **Tests.** The split set, and: the label's `for` is the control's id, the ids follow the
-  name, `aria-describedby` lists the hint and then the error and nothing that is not
-  rendered, `aria-invalid` with an error, the asterisk is hidden and `required` reaches the
+- **Tests.** The split set, and `field.lib.test.ts` (importing from `../lib.js`):
+  `toFieldIds` and `messagesOf`. Server render: the label's `for` is the control's id; the
+  ids follow `id` when it is given; two Fields with one `name` write no id twice, each
+  label's `for` is its own control's id, and each control's `aria-describedby` resolves to
+  its own hint; `aria-describedby` lists the hint and then the error and nothing that is not
+  rendered; `aria-invalid` with an error; the asterisk is hidden and `required` reaches the
   control. A compile test spreads one `control` onto each of the eleven controls (a test may
   import other components, as a demo may) and refuses a child that is not a function.
   Hydration: FieldLive hydrates with the same ids and no warning. Dom: a FieldLive error from
-  a provided `FormErrors` shows, goes on an `input` event inside, and comes back with a new
-  errors object. Browser (`e2e/field.spec.ts`): static, `serverEntries` on `field--form`;
+  a provided `FormErrors` shows; it goes after a real change of an Input, a Checkbox and a
+  Select inside a form (Unit 4 is on `main` by gate 0), and not after a click that changes
+  nothing; it comes back with a new errors object. DatePicker and FileUpload test the same
+  in their own branches, since they are built after Field. Browser (`e2e/field.spec.ts`):
+  static, `serverEntries` on `field--form`;
   axe on every demo (the shared spec) with the label, hint and error linked in the server
   HTML; `long-content` wraps and never scrolls a 320 px page sideways, also in a grid track
   of `1fr`, a `flex-1` column and a table cell; under forced colours the asterisk and the
   error icon are visible. Live: a click on the label of the `inline` Checkbox toggles it; a
   click on the label of an Input focuses it.
 - **Mutation.** `renderField` leaves the error's id out of `aria-describedby`: the server
-  render test catches it. A second row: FieldLive's error no longer goes on input (the dom
-  test).
+  render test catches it. A second row: FieldLive's error no longer goes after a change (the
+  dom test). A third: the ids are built from `name` again (the server render test with two
+  Fields of one name).
 - **Not built:** a Label export (choice 1), an element child (choice 8), Base UI's Field
   (choice 6), `size`, an "optional" text, a counter, Fieldset (its own catalog row), any
   check in the browser beyond the browser's own.
@@ -969,7 +1115,8 @@ The look is this file's: nothing is drawn.
   points at an element no label can name; the group is named by `aria-labelledby`, and a
   click on its label does nothing. The error carries no role and no live region: it arrives
   with the page, and after a FormAction the focus goes to the first invalid control (see
-  Form).
+  Form). The ids come from `useId` unless `id` is given, so a page that links to a field
+  (`#email`, an error summary of its own) passes `id`.
 
 ## Form
 
@@ -1021,42 +1168,78 @@ off.
 - **FormAction.** Props: `action: (state: S, formData: FormData) => S | Promise<S>`,
   required (a Server Action a server page hands it, or a client function); `initialState`:
   default `{}`; `permalink`: passed to `useActionState`, so a submit before hydration lands
-  on the right page; and every form attribute but `action`. `S` extends `FormActionState =
-  { errors?: FormErrors }`, in `types.ts`.
+  on the right page; `children`: a `ReactNode`, or `(state: S, pending: boolean) =>
+  ReactNode`, so the fields can read the action's answer (the submitted values, a form-level
+  message); and every form attribute but `action`. `S` extends `FormActionState = {
+  errors?: FormErrors }`, in `types.ts`; the caller's own state type adds `values` or
+  `message` as it needs. A function child is written in a client file, as the sample is; a
+  server page hands FormAction plain children (`R-5.1-3`).
 - **The hook.** `useFormAction({ action, initialState, permalink })` in `hook.ts` calls
   `useActionState` and returns the state, the form action and `pending`. After a result
   with errors it moves the focus to the first element in the form with
-  `aria-invalid="true"`, so a screen reader hears the control and its error.
+  `aria-invalid="true"`. When that element cannot take the focus itself (a
+  `role="radiogroup"` with no `tabindex`, as RadioGroupRoot and SegmentedControlRoot render
+  it, measured; a Slider's root group), the focus goes instead to the first element inside
+  it whose `tabIndex` is 0 or more: the checked or first radio, the thumb. A screen reader
+  then hears the control and its error.
 - **Markup.** `<FormErrorsContext value={state.errors}>` around `<form {...rest}
   action={formAction} aria-busy={pending || undefined}>`, with `className`, `style` and `ref`
-  on the form. No `classes.ts`: neither half has a class of its own (`R-8.1-1`).
-- **What a reset does.** React 19 resets a form when its action settles: an action that
-  returns errors should also return the submitted values, and the page passes them back as
-  each control's default. Unit 4 measured that every control then keeps the value on screen
-  and in the form. Say so in the README, with the sample.
+  on the form, holding `children(state, pending)` when `children` is a function and
+  `children` otherwise. No `classes.ts`: neither half has a class of its own (`R-8.1-1`).
+- **What a reset does.** React 19 resets a form whenever a function action settles, errors
+  or not: `startHostTransition` calls `requestFormReset` before the action runs (read in
+  react-dom 19.3.0, `cjs/react-dom-client.development.js`). So an action that returns errors
+  also returns the submitted values, and the fields take them back as their defaults
+  through the function child:
+
+  ```text
+  <FormAction action={subscribe}>
+    {(state) => (
+      <FieldLive name="email" label="Email">
+        {(control) => <Input {...control} defaultValue={state.values?.email} />}
+      </FieldLive>
+    )}
+  </FormAction>
+  ```
+
+  Every control then resets to what was typed: a native field through its new
+  `defaultValue`, the others through `useFormValue`, which restores the latest default
+  (Unit 4 measured that every control then keeps the value on screen and in the form). The
+  no-script response of a `permalink` renders the same child with the same state. Say so in
+  the README, with the sample.
+- **What a server Form cannot do.** It posts with no script, but it cannot show what the
+  action returns: a server component never sees that value. Errors after a no-script post
+  come from `FormAction` with `permalink` (`useActionState` renders its state into the
+  response), or from the app's own redirect. The README says so.
 - **Files.** `index.tsx` (`Form`), `client.tsx` (`FormAction`), `hook.ts`
   (`useFormAction`), `constants.ts` (`FORM_DEFAULTS`), `types.ts`, `meta.ts`, `README.md`.
   No `schema.ts`: neither half has a design prop. Demos: `basic` (the subscribe form, with
   `action="/subscribe"`), `server-errors` (Fields given the errors an action returns),
-  `form-action` (a client demo: FormAction with FieldLive and a client function that returns
-  an error for `taken@example.com`).
-- **Tests.** The split set, and: Form writes its attributes and no `noValidate`. Dom: the
+  `form-action` (a client demo: FormAction with a function child, FieldLive, and a client
+  function that returns an error and the submitted values for `taken@example.com`).
+- **Tests.** The split set without `.schema.test.ts`, `.styles.test.tsx` and `.css.test.ts`
+  (no schema, no classes), and: Form writes its attributes and no `noValidate`. Dom: the
   `form-action` action's errors show in the matching FieldLive with `aria-invalid`, the
   focus moves to it, typing clears it, a second submit with no errors clears every error, and
-  `aria-busy` is set while pending. Browser (`e2e/form.spec.ts`): static, no script: fill
+  `aria-busy` is set while pending; a value typed into `form-action` is still in the field
+  and in `FormData` after an action that returns an error; a function child receives the
+  state and `pending`; with a RadioGroupRoot first in error, the focus lands on its checked
+  or first radio. Browser (`e2e/form.spec.ts`): static, no script: fill
   `form--basic` and submit; `page.route` catches the POST to `/subscribe` and its body holds
   `email=`; an empty required field sends nothing. Static, `form--server-errors`: each error
   is on its own field (`aria-invalid`, and `aria-describedby` resolves to its text); axe
   passes. Live, `form--form-action`: the URL does not change, the error shows, the focus is
   on the field, typing clears it.
 - **Mutation.** FormAction no longer provides the errors: the dom test catches it. A second
-  row: the focus effect is removed (the dom test).
+  row: the focus effect is removed (the dom test). A third: FormAction calls a function
+  child with `initialState` instead of the current state (the dom test).
 - **Not built:** Base UI's Form (choice 6), an error summary with a count ("2 errors"), the
   `onFormSubmit` values, any check in the browser beyond the browser's own.
 - **For the reviewer:** a Server Action posted from a page with no script, and its response
   rendered with the errors, are Next.js's; no Next.js app was run here (see "What was
   checked"). Phase 4's first two clauses are met as far as the harness can reach: see Build
-  order.
+  order. The function child is not in PLAN 12, whose FormAction takes FieldLive children:
+  without it, the reset of React 19 empties every field an error was about.
 
 ## FileUpload
 
@@ -1115,13 +1298,16 @@ server HTML. Sixth. Needs shared pull request 1. No Base UI part: built on
 - **What we add:** the zone and its drag look, the list of chosen files with their sizes and
   a remove button each, the limits, and files that add up across picks and drops.
 - **Props.** `maxFiles`: default 1, bounds 1 to 100; the input is `multiple` when it is above
-  1 (the sample passes `maxFiles={5}` and no `multiple`). `maxSize`, in bytes: default and
+  1 (the sample passes `maxFiles={5}` and no `multiple`); `multiple` is omitted from the
+  type, so `maxFiles` alone decides it. `maxSize`, in bytes: default and
   maximum 10,737,418,240 (10 GiB), minimum 1. `accept`: native. `visibleRows`: clamped to
   `COLLECTION_BOUNDARIES`, sets `--tc-list-rows` on the list. `onValueChange(files)`: the
   accepted files after each change. `children`: the hint drawn inside the zone (the
-  drawing's "PNG, JPG or PDF, up to 10 MB"), linked to the input by `aria-describedby`.
-  `invalid`, `name`, `required`, `disabled`, `form`, the name by `ControlName`, and
-  `aria-describedby`, `aria-invalid`, `aria-labelledby`. `className`, `style` and `ref`
+  drawing's "PNG, JPG or PDF, up to 10 MB"), linked to the input by `aria-describedby`: the
+  zone hint's id first, then the caller's (Field's hint and error), only those rendered.
+  `invalid`, `name`, `required`, `disabled` (each remove button is `disabled` with it),
+  `form`, the name by `ControlName`, and `aria-describedby`, `aria-invalid`,
+  `aria-labelledby`. `className`, `style` and `ref`
   reach the root; the rest reach the `<input>` (a departure from `R-5.7-3`, as Unit 4's
   RadioGroupItem).
 - **The list.** `useFileUpload()` in `hook.ts` holds the accepted files with `useFormValue`
@@ -1131,34 +1317,44 @@ server HTML. Sixth. Needs shared pull request 1. No Base UI part: built on
   `matchesAccept` refuses rejected as the wrong type, and whether the count cut any. The hook
   then writes the accepted files back into `input.files` through a `DataTransfer`, so the
   form sends exactly the list on screen; a rejected file is shown with its reason and never
-  sent. With `maxFiles` 1 a new file replaces the old one.
-- **Helpers in `lib.ts`.** `matchesAccept(file, accept)`: a `.ext` by the end of the name, case
-  apart; `type/*` by the start of the MIME type; an exact MIME type; an empty `accept` takes
-  everything. `formatBytes(bytes, locale, numberingSystem)`: `Intl.NumberFormat` with
+  sent. With `maxFiles` 1 a new file replaces the old one. After a drop or a remove writes
+  `input.files`, the hook dispatches `new Event('input', { bubbles: true })` on the input
+  (see "Rules for all eight"). Not `change`: the component's own `onChange` reads that as a
+  new pick and would add the files again.
+- **Helpers in `lib.ts`.** `matchesAccept(file, accept)`: a `.ext` by the end of the name,
+  case apart; `type/*` by the start of the MIME type; an exact MIME type; an empty `accept`
+  takes everything. `formatBytes(bytes, locale, numberingSystem)`: `Intl.NumberFormat` with
   `style: 'unit'` and byte, kilobyte, megabyte or gigabyte, steps of 1024 (the sample writes
-  `5 * 1024 * 1024`), one decimal; measured in Node: `en` "2.4 MB" and "512 kB", `ar` with
-  Arabic unit names.
+  `5 * 1024 * 1024`), one decimal; below 1024 bytes `unit: 'byte'` with `unitDisplay: 'long'`
+  ("300 bytes": the short form prints "300 byte" in Node 22 and Chromium 153); measured in
+  Node: `en` "2.4 MB" and "512 kB", `ar` with Arabic unit names.
 - **Markup.** A `<div>` with `FILE_UPLOAD_ROOT`. In it the zone, a `<div>` with
   `FILE_UPLOAD_ZONE`, `data-dragging` while a drag is over it and `data-disabled`: a
   `<span aria-hidden="true">` with `FILE_UPLOAD_ICON` and `<Svg icon={uploadSimple}
   size="1.75rem" />`; a `<span>` with `FILE_UPLOAD_PROMPT` holding `labels.file.drop` and a
   `<span>` with `FILE_UPLOAD_BROWSE` holding `labels.file.browse`; the hint in a
   `<span id>` with `FILE_UPLOAD_HINT`; and last the `<input type="file">` with
-  `FILE_UPLOAD_INPUT`, covering the whole zone. Then the list, a `<ul>` with
-  `FILE_UPLOAD_LIST` (a tab stop while it overflows: `useScrollTabStop`), one `<li>` with
+  `FILE_UPLOAD_INPUT`, covering the whole zone. Then the list, a `<ul role="list">` with
+  `FILE_UPLOAD_LIST` (the role written, as Stepper's: `list-style: none` drops the list in
+  Safari with VoiceOver; a tab stop while it overflows: `useScrollTabStop`), one `<li>` with
   `FILE_UPLOAD_ROW` per file: a `<span aria-hidden="true">` with `FILE_UPLOAD_ROW_ICON` and
   `<Svg icon={file} />` (or `FILE_UPLOAD_REJECTED_ICON` and `warningCircle` for a rejected
   file), the name in a `<span dir="auto" id>` with `FILE_UPLOAD_NAME`, the size with
   `FILE_UPLOAD_SIZE` or the reason (`labels.file.tooLarge`, `labels.file.wrongType`) with
   `FILE_UPLOAD_REASON`, and the remove `<button type="button">` with `FILE_UPLOAD_REMOVE`,
   `aria-label={labels.file.remove}` and `aria-labelledby="<its own id> <the name's id>"`, so
-  it reads "Remove brief.pdf", as Tag's remove does. Last a `<div role="status">` with
-  `FILE_UPLOAD_MESSAGE` holding `labels.file.tooMany(maxFiles, fmt)` when the count cut
-  files. Move the list to `parts/file-upload-list.tsx` if `client.tsx` passes 200 lines.
+  it reads "Remove brief.pdf", as Tag's remove does. Last two live regions, each emptied by
+  the next change: a `<div role="status">` with `FILE_UPLOAD_MESSAGE` holding
+  `labels.file.tooMany(maxFiles, fmt)` when the latest change cut files; and a `<div
+  role="status">` with `FILE_UPLOAD_ANNOUNCE` holding, for each file the latest change
+  refused, its name and its reason in two spans ("brief.pdf Too large"), so a screen reader
+  hears a refusal the list only shows. The second is `sr-only`, so it is placed out of the
+  root's grid and adds no gap. Move the list to `parts/file-upload-list.tsx` if `client.tsx`
+  passes 200 lines.
 
   ```ts
   // file-upload/classes.ts
-  /** One column, so the list scrolls instead of widening its parent. relative: it holds the status line. */
+  /** One column, so the list scrolls instead of widening its parent. relative: it holds the hidden status line. */
   export const FILE_UPLOAD_ROOT = 'relative grid min-w-0 grid-cols-1 gap-2.5 text-body'
   /** The ring shows when the input over the zone has the keyboard; the dashed 3:1 line, danger when invalid, primary while a drag is over it. */
   export const FILE_UPLOAD_ZONE = `group/zone relative flex flex-col items-center justify-center gap-2 rounded-box border-dashed bg-surface p-6 text-center ${BORDER_STRONG} ${TRANSITION} ${FOCUS_RING_WITHIN} ${FIELD_INVALID_WITHIN} data-disabled:opacity-50 data-dragging:border-primary-solid data-dragging:bg-primary-soft data-dragging:text-primary-on-soft forced-colors:data-dragging:border-[Highlight]`
@@ -1179,6 +1375,8 @@ server HTML. Sixth. Needs shared pull request 1. No Base UI part: built on
   /** The x: an icon button on the neutral ramp, as Popover's close. */
   export const FILE_UPLOAD_REMOVE = `${ICON_BUTTON} text-muted tone-neutral ${HOVER.ghost}`
   export const FILE_UPLOAD_MESSAGE = 'text-sm text-danger-on-soft empty:hidden'
+  /** The refusals, read and not seen: each row already shows its reason. */
+  export const FILE_UPLOAD_ANNOUNCE = 'sr-only'
   ```
 
 - **Drag and drop.** `dragenter` and `dragover` on the zone prevent the default (so a drop is
@@ -1189,7 +1387,7 @@ server HTML. Sixth. Needs shared pull request 1. No Base UI part: built on
   remove button, else the previous one, else the input.
 - **Keyboard and ARIA (`R-5.6-3`).** The drop has a keyboard and a pointer path: the input
   itself. Tab reaches it and the zone draws the ring; Enter or Space opens the picker
-  (native). Each remove button is a tab stop. The status line is polite.
+  (native). Each remove button is a tab stop. Both status lines are polite.
 - **Form.** Before hydration the input posts its files in a multipart form. An input has no
   `enctype`, so the component cannot set the form's: the README says that a form with a
   string `action` needs `encType="multipart/form-data"`. `maxFiles`, `maxSize` and `accept`
@@ -1206,29 +1404,40 @@ server HTML. Sixth. Needs shared pull request 1. No Base UI part: built on
 - **Tests.** The client set, and `file-upload.lib.test.ts`: `matchesAccept` for `.PDF`,
   `image/*`, `application/pdf` and an empty accept; `sortFiles` keeps the order, cuts at
   `maxFiles`, rejects too large and the wrong type, and replaces with `maxFiles` 1;
-  `formatBytes` in `en` and `ar`. Server render: the input has the `name`, `accept`,
-  `required` and `id`, `multiple` only above 1, and `aria-describedby` with the hint's id;
-  the zone holds the two labels. Dom: a change with three files and `maxFiles` 2 shows two
-  rows, "Only 2 files allowed", and two files in `input.files`; a remove leaves one; a file
-  over `maxSize` is not in `input.files`; `onValueChange`; a reset empties the list
-  (happy-dom 20.14.5 has `DataTransfer` and `File` and keeps an assigned `input.files`:
-  checked). Browser (`e2e/file-upload.spec.ts`): static, no script: `setInputFiles` with two
-  files on `file-upload--form`, submit, and `page.route` finds both file parts by name in
-  the body; an empty required input sends nothing; the input fills the zone inside its 1 px
-  line, so the shared target spec measures the zone. Live: three files with `maxFiles` 2
-  give two rows and the message; a 6 MB file with `maxSize` 5 MB gives a rejected row and is
-  not in the posted body; after a remove the focus is on the next remove button; a drop
-  dispatched with a `DataTransfer` adds files, and `data-dragging` is set during `dragover`;
-  Tab to the input rings the zone; a 300-character file name at 320 and 1280 px in both
-  directions never scrolls the page sideways; under forced colours the dashed edge is
-  visible; the reset cases of Switch.
+  `formatBytes` in `en` ("300 bytes", "512 kB", "2.4 MB") and `ar`. Server render: the input
+  has the `name`, `accept`, `required` and `id`, `multiple` only above 1, and
+  `aria-describedby` with the hint's id; inside a Field with a hint and an error, the input's
+  `aria-describedby` lists the zone hint, then the Field hint, then the error, and each
+  resolves; the list is `role="list"`; the zone holds the two labels. Dom: a change with
+  three files and `maxFiles` 2 shows two rows, "Only 2 files allowed", and two files in
+  `input.files`; a remove leaves one and fires one `input` event and no `change`; a file over
+  `maxSize` is not in `input.files`, and its name and "Too large" are in the hidden status
+  line, which the next accepted pick empties; `disabled` disables each remove button;
+  `onValueChange`; a reset empties the list (happy-dom 20.14.5 has `DataTransfer` and `File`
+  and keeps an assigned `input.files`: checked); inside a FieldLive in a FormAction, an
+  error goes when a file is removed. Browser (`e2e/file-upload.spec.ts`): static, no
+  script: `setInputFiles` with two files on `file-upload--form`, submit, and `page.route`
+  finds both file parts by name in the body; an empty required input sends nothing; the
+  input fills the zone inside its 1 px line, so the shared target spec measures the zone.
+  Live: three files with `maxFiles` 2 give two rows and the message; a 6 MB file with
+  `maxSize` 5 MB gives a rejected row and is not in the posted body; after a remove the
+  focus is on the next remove button; a drop dispatched with a `DataTransfer` adds files,
+  and `data-dragging` is set during `dragover`; Tab to the input rings the zone; a
+  300-character file name at 320 and 1280 px in both directions never scrolls the page
+  sideways; with `e2e/fixtures/file-upload-layouts.tsx` (see "Rules for all eight") at 320
+  px coarse and 1280 px the page never scrolls sideways and the zone fills its parent; under
+  forced colours the dashed edge is visible; the reset cases of Switch.
 - **Mutation.** The hook stops writing the accepted files back into `input.files`, so a
   rejected file is sent: the dom test catches it. A second row: `sortFiles` keeps a file over
   `maxSize` (the lib test). A third: the input is `multiple` at `maxFiles` 1 (the server
-  render test).
+  render test). A fourth: the refused file is left out of the hidden status line (the dom
+  test).
 - **Not built:** upload progress and a done or failed state per file (choice 23), a separate
   Browse button (choice 22), image previews, `capture`, folders, a controlled list
-  (`value`), windowing (choice 25), `size`.
+  (`value`), windowing (choice 25), `size`; the drawn "Drop to upload" while dragging (the
+  prompt keeps `file.drop`; the zone's colour and line change); a `showList` toggle; paste
+  of a file into the zone; a check for the same file twice (a second pick of one file adds
+  a second row).
 - **For the reviewer:** the input is invisible over the zone and the ring is the zone's
   (`FOCUS_RING_WITHIN`); the browser's own "No file chosen" never shows. The zone is 152 px
   tall where the drawing has 126: "Browse" sits on its own line under the prompt. The
@@ -1307,8 +1516,13 @@ pull request 2. No Base UI part: built on the ARIA tree pattern with
   `visibleRows` when it is passed.
 - **The focus.** The tree is the one tab stop: `tabIndex={0}` in the server HTML whenever it
   has rows, so no `useServerTabStop` is needed. `aria-activedescendant` names the row the
-  keys are on, which carries `data-highlighted`. When the tree takes the focus the highlight
-  goes to the selected row, else the first. A key that moves it brings the row into view:
+  keys are on, which carries `data-highlighted`, only while that row is mounted. While it is
+  not (after a wheel), the attribute is absent, never an id no element has (axe
+  `aria-valid-attr-value`), and the tree draws its own ring, as it does before hydration
+  (`TREE_VIEW_TREE`); the next key brings the row back with `scrollToIndex`. When the tree
+  takes the focus the highlight goes to the selected row when it is visible (not inside a
+  closed branch), else the first visible row, and that row is brought into view as a key
+  would bring it. A key that moves it brings the row into view:
   `scrollIntoView({ block: 'nearest' })` when it is mounted, `scrollToIndex` when it is not.
   The focus never sits on a row, so windowing can never drop it (choice 27).
 - **Keys** (the Authoring Practices tree view, single select):
@@ -1347,9 +1561,10 @@ pull request 2. No Base UI part: built on the ARIA tree pattern with
   // tree-view/classes.ts
   /** The box: one column, so the tree scrolls inside it and never widens its parent. */
   export const TREE_VIEW_ROOT = 'grid min-w-0 grid-cols-1 gap-1'
-  /** The one tab stop and the scroll container. No gap: the two spacers stand for the rows not mounted, counted in whole rows. */
+  /** The one tab stop and the scroll container; its own ring shows only while no mounted row holds the highlight. No gap: the spacers count whole rows. */
   export const TREE_VIEW_TREE = [
     'group/tree relative flex flex-col rounded-box bg-surface-raised p-2 outline-none tone-neutral',
+    'focus-visible:not-has-data-highlighted:outline-solid focus-visible:not-has-data-highlighted:outline-(length:--tc-ring-width) focus-visible:not-has-data-highlighted:-outline-offset-(length:--tc-ring-width) focus-visible:not-has-data-highlighted:outline-ring',
     'max-h-[calc(var(--tc-list-rows)*var(--tc-row-height))]',
     'pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-coarse,44px)))]',
     'before:h-(--tc-list-pad-start) before:shrink-0 after:h-(--tc-list-pad-end) after:shrink-0',
@@ -1377,8 +1592,14 @@ pull request 2. No Base UI part: built on the ARIA tree pattern with
   export const TREE_VIEW_NOTE = 'px-3 py-2 text-sm text-muted empty:hidden'
   ```
 
-- **Paging (`R-8.5-2`).** The tree asks and never fetches: `useCollection` calls `loadMore()`
-  once per length of the visible rows when the window nears the end, only while `hasMore`.
+- **Paging (`R-8.5-2`).** The tree asks and never fetches. `loadMore` asks for more nodes at
+  the root; a branch's children arrive through `onExpandedChange` and `items`, never through
+  `loadMore`. `useCollection` guards on the count it is given, the visible rows
+  (`askedAt.current === count` in `use-collection.ts`), so opening a branch near the end
+  would ask again for a page already on its way. So `useTreeView()` hands it a `loadMore`
+  that asks once per length of `items`, the root nodes: it keeps that length in a ref, does
+  nothing while it is unchanged, and clears the ref when the promise rejects, as the shared
+  guard does. Only while `hasMore`.
 - **RTL.** The indent is the inline start's padding, the caret points the reading way, and
   the arrow keys swap.
 - **Files.** `client.tsx`, `hook.ts` (`useTreeView`), `lib.ts` (`flattenTree`, the key
@@ -1392,24 +1613,36 @@ pull request 2. No Base UI part: built on the ARIA tree pattern with
   a three-level tree with one branch closed; the key moves in both directions; typeahead.
   Server render: `role="tree"` with `tabindex="0"` and its name; the rows with their
   attributes; `ten-thousand` renders only its first window. Dom, keys: every key of the table
-  in both directions, controlled and uncontrolled `value` and `expanded`, a disabled row.
-  Browser, live (`e2e/tree-view.spec.ts`), with `ten-thousand`: fewer than a hundred rows in
+  in both directions, controlled and uncontrolled `value` and `expanded`, a disabled row;
+  with the selected row inside a closed branch, the focus highlights the first visible row;
+  after the highlighted row is scrolled out of the window, the tree has no
+  `aria-activedescendant`. Dom, paging: with `load-more` scrolled to the end, opening and
+  closing a branch while the page is pending makes no second call; the next page makes one.
+  Browser, static: Tab onto the tree draws its ring. Browser, live (`e2e/tree-view.spec.ts`),
+  with `ten-thousand`: fewer than a hundred rows in
   the DOM on load, after fifty ArrowDown, after End and after a wheel to the end (the line of
   PLAN 20); after End the last row is highlighted and in view and `aria-activedescendant`
-  names it; `window.scrollY` stays 0. With `load-more`: one call per page. In RTL ArrowLeft
+  names it; after a wheel to the end `aria-activedescendant` is absent and the tree draws
+  its ring; `window.scrollY` stays 0. With `load-more`: one call per page. In RTL ArrowLeft
   opens a closed branch. The ring shows on the highlighted row after a key and not after a
   press. Rows are 40 px, 44 under a coarse pointer, and a row three levels deep starts 36 px
   further in than a root row. A 300-character label at 320 and 1280 px never scrolls the page
   sideways. Under forced colours the selected row is `Highlight`. axe on every demo.
 - **Mutation.** The swap of ArrowRight and ArrowLeft in RTL is removed: the keyboard test
-  catches it. A second row: the rows lose `aria-level` (the server render test).
+  catches it. A second row: the rows lose `aria-level` (the server render test). A third:
+  the root-length guard of `loadMore` is removed (the dom paging test).
 - **Not built:** multi-select and checkboxes, `selectionMode`, `showLines`, the folder and
   folder-open swap, `*` to open every sibling, drag to reorder (the LayersPanel's), links in
   rows, `error` (choice 3), `selectedItem` and a stale `loadMore` dropped by request id
-  (`docs/PLAN.md` 8.5), an `indent` prop (the token is the knob), `size`.
-- **For the reviewer:** after a wheel the highlighted row can be unmounted, so
-  `aria-activedescendant` names an id no element has until a key brings it back; the focus
-  stays on the tree. The drawn rows are 29 px; these are the list rows of the library.
+  (`docs/PLAN.md` 8.5), an `indent` prop (the token is the knob), `size`; the drawn Skeleton
+  loading rows and the empty icon (both are text in the status line); a loading row inside a
+  branch whose children are on their way (the app passes them in).
+- **For the reviewer:** after a wheel the highlighted row can be unmounted; the tree then
+  renders no `aria-activedescendant`, never a dangling id, and draws its own ring until a
+  key brings the row back; the focus stays on the tree. Both rings are written in
+  `classes.ts` with the ring's tokens, not `FOCUS_RING` (a departure, see the end): the lint
+  passes them there and refuses `focus-visible:` anywhere else. The drawn rows are 29 px;
+  these are the list rows of the library.
 
 ## DatePicker
 
@@ -1462,19 +1695,23 @@ Surprising:
 
 **Build this.** Client. Last and alone: the riskiest of the unit. Needs shared pull request
 1, and Field for its `in-field` demo. Base UI `popover` (`baseUi: 'popover'`): `Root`,
-`Trigger`, `Portal`, `Positioner`, `Popup`, `Title`. The month grid is ours, on `Intl`: no
-date library (`docs/DECISIONS.md` 2026-10-03 struck react-day-picker, which PLAN 2 and 18.4
-still name; choice 15).
+`Trigger`, `Portal`, `Positioner`, `Popup`, `Title`, `Close`. The month grid is ours, on
+`Intl`: no date library (`docs/DECISIONS.md` 2026-10-03 struck react-day-picker, which
+PLAN 2 and 18.4 still name; choice 15).
 
 - **Export:** `DatePicker`, one element.
 - **What Base UI gives** (from the installed types and the built files): the trigger is a
   `<button>` with `aria-haspopup="dialog"` and `aria-expanded`; the popup has `role="dialog"`
   and `aria-labelledby` set to its `Title`'s id; Escape and a press outside close it and the
-  focus returns to the trigger; `modal` takes `true`, `'trap-focus'` or `false`; the
-  positioner takes `side`, `align`, `sideOffset` and `collisionPadding` and sets
-  `--available-width` and `--available-height`; the popup sets `data-starting-style` and
-  `data-ending-style`. `Portal` takes `container` and `keepMounted`; `Popup` takes
-  `initialFocus` and `finalFocus`.
+  focus returns to the trigger; `modal` takes `true`, `'trap-focus'` or `false`; the focus
+  is trapped only while a `Close` part is mounted inside the popup (`PopoverPopup.js`:
+  `focusManagerModal = modal !== false && hasClosePart`; without one the trigger renders
+  focus guards and Tab leaves the popup), and the types ask for one with `'trap-focus'` "so
+  touch screen readers can escape the popup"; the positioner takes `side`, `align`,
+  `sideOffset` and `collisionPadding` and sets `--available-width` and
+  `--available-height`; the popup sets `data-starting-style` and `data-ending-style`.
+  `Portal` takes `container` and `keepMounted`; `Popup` takes `initialFocus` and
+  `finalFocus`.
 - **What the platform gives:** `Intl.DateTimeFormat` names months and weekdays in the
   locale, with `calendar`, `numberingSystem` and `timeZone` options; `Intl.Locale` gives the
   first day of the week (`getWeekInfo()` in Chromium 153, the `weekInfo` getter in Node 22;
@@ -1483,9 +1720,11 @@ still name; choice 15).
   that is not a real date counts as `null`. `onValueChange(value)`. `minDate` and `maxDate`:
   ISO dates, default and bounds `'0001-01-01'` and `'9999-12-31'` (`DATE_PICKER_BOUNDARIES`);
   each is clamped into the bounds and `maxDate` is raised to `minDate` when below it
-  (`clampIso` in `lib.ts`: `R-5.7-7` for a date). `firstDayOfWeek`: 1 to 7, Monday to
-  Sunday as `Intl` counts them, rounded and clamped; default the locale's, read in the
-  browser, and Monday where the browser has none (choice 17). `placeholder`: default
+  (`clampIso` in `lib.ts`: `R-5.7-7` for a date). A `value` outside `minDate` to `maxDate`
+  is kept, shown and submitted as given (the data is never changed); the calendar opens on
+  it, and the active day moves into the range on the first key. `firstDayOfWeek`: 1 to 7,
+  Monday to Sunday as `Intl` counts them, rounded and clamped; default the locale's, read
+  in the browser, and Monday where the browser has none (choice 17). `placeholder`: default
   `labels.datePicker.placeholder`. `size`: default `md`. `invalid`. `fullWidth`: default
   `false`. `placement`: the twelve `PLACEMENTS`, default `bottom-start`, through
   `toSideAlign`. `container`, to the Portal. `open`, `defaultOpen`, `onOpenChange`, to the
@@ -1496,13 +1735,15 @@ still name; choice 15).
   and the rest props reach the trigger, as on Select.
 - **The value.** `useDatePicker()` in `hook.ts` holds it with `useFormValue`, from the parsed
   `defaultValue`; the part hands the calendar the value and a setter, and the form input
-  carries it, so a reset returns the default.
+  carries it, so a reset returns the default. After a choice, once the new value is
+  committed, the hook dispatches `new Event('input', { bubbles: true })` on the form input
+  (see "Rules for all eight"): a value set by script fires no event.
 - **Date math** in `lib.ts`, on plain `{ year, month, day }`, with a UTC `Date` only for a
   weekday and a month's length: `parseIsoDate`, `toIsoDate`, `addDays`, `addMonths` (the day
   kept inside the new month: 31 January plus a month is 28 or 29 February), `daysInMonth`,
-  `monthGrid(year, month, firstDay)` (42 cells, `null` outside the month), `clampIso`. A year
-  under 100 needs `setUTCFullYear`: `Date.UTC(1, 0, 1)` is a day in 1901 (measured). ISO
-  strings compare as strings.
+  `monthGrid(year, month, firstDay)` (42 cells, `null` outside the month), `clampIso`,
+  `todayParts(now)` (see Keys). A year under 100 needs `setUTCFullYear`: `Date.UTC(1, 0,
+  1)` is a day in 1901 (measured). ISO strings compare as strings.
 - **Formatting.** One set of formatters per locale and numbering system, from `useLocale()`
   and `useNumberFormat().resolvedOptions().numberingSystem`, always with
   `calendar: 'gregory'` and `timeZone: 'UTC'`: the trigger `dateStyle: 'medium'`, the title
@@ -1515,29 +1756,41 @@ still name; choice 15).
   Islamic variant has to be chosen for it.
 - **Lazy.** `client.tsx` holds `const DatePickerCalendar = lazy(() =>
   import('./parts/date-picker-calendar.js').then(...))`, as Command's `client.tsx` does, and
-  renders it in `<Suspense fallback={null}>` inside the popup: the first bundle carries the
-  trigger only (PLAN 9.2 rule 7, PLAN 14).
+  renders it in `<Suspense fallback={null}>` inside the popup: the calendar part and its
+  markup load on first open (PLAN 9.2 rule 7, PLAN 14). `hook.ts` and `lib.ts` are shared
+  with the trigger and load with it, as in Command, whose `parts/command-panel.tsx` imports
+  `useCommandPanel` from the `hook.ts` that `client.tsx` imports: a bundler puts a module in
+  one chunk, so `useDatePickerCalendar`, the keys and the date math are in the first bundle.
 - **Markup.** A `<span>` with `DATE_PICKER_ROOT`, `FIELD_TEXT[size]` and `FIELD_HOLDER_FULL`
   with `fullWidth`: the box that owns the width, as Select's. In it `Base.Root` with
   `modal="trap-focus"` and the open state; `Base.Trigger` with `DATE_PICKER_TRIGGER`,
   `FIELD_SIZE[size]`, `data-size`, the `id`, `aria-invalid`, and `aria-describedby` set to
-  the value's id and then the caller's (a `<label for>` names the button, so the date is
-  heard as its description); in it a `<span aria-hidden="true">` with `DATE_PICKER_ICON` and
-  `<Svg icon={calendarBlank} />`, and the value in a `<span id>` with `DATE_PICKER_VALUE` and
-  `data-placeholder` when empty. Then the form input: `<input aria-hidden="true"
-  tabIndex={-1} autoComplete="off">` with `DATE_PICKER_INPUT`, `name`, `form`, `required`,
-  `disabled`, `value={value ?? ''}` and a no-op `onChange` (React refuses a `value` without
-  one, and `readOnly` would take the input out of the `required` check). Then `Base.Portal`
+  the value's id, then, when `required`, the id of the required word below, then the
+  caller's. A `<label for>` names the button, so the date is heard as its description. A
+  button cannot carry `aria-required` (axe `aria-allowed-attr`, measured by a reviewer), and
+  the input that holds `required` is hidden from the accessibility tree, so the word is the
+  only place a screen reader learns it. In the trigger a `<span aria-hidden="true">` with
+  `DATE_PICKER_ICON` and `<Svg icon={calendarBlank} />`, and the value in a `<span id>` with
+  `DATE_PICKER_VALUE` and `data-placeholder` when empty. Then the form input: `<input
+  aria-hidden="true" tabIndex={-1} autoComplete="off">` with `DATE_PICKER_INPUT`, `name`,
+  `form`, `required`, `disabled`, `value={value ?? ''}` and a no-op `onChange` (React
+  refuses a `value` without one, and `readOnly` would take the input out of the `required`
+  check). When `required`, a `<span id hidden>` holding `labels.common.required`: hidden,
+  and still read where `aria-describedby` points at it. Then `Base.Portal`
   (`container`), `Base.Positioner` with `DATE_PICKER_POSITIONER`, the side and the align,
   `sideOffset` and `collisionPadding` from `POPUP_BOUNDS`, and `dir` and `lang` from
   `usePortalLocale()`; `Base.Popup` with `DATE_PICKER_POPUP` and `data-placement`; in it the
   lazy calendar.
 - **The calendar part** (`parts/date-picker-calendar.tsx`, one hook,
   `useDatePickerCalendar(props)`): a header, a `<div>` with `DATE_PICKER_HEADER`: the
-  previous button (`DATE_PICKER_NAV`, `aria-label={labels.datePicker.previousMonth}`,
-  `<Svg icon={caretLeft} />`, `disabled` when the month before is wholly under `minDate`),
-  `Base.Title` as an `<h2 id aria-live="polite">` with `DATE_PICKER_TITLE` holding the month,
-  and the next button likewise. Then `<table role="grid" aria-labelledby={titleId}>` with
+  previous `<button type="button">` (`DATE_PICKER_NAV`,
+  `aria-label={labels.datePicker.previousMonth}`, `<Svg icon={caretLeft} />`, `disabled`
+  when the month before is wholly under `minDate`), `Base.Title` as an `<h2 id
+  aria-live="polite">` with `DATE_PICKER_TITLE` holding the month, the next button likewise
+  (a `container` can put the popup inside a `<form>`, where a button with no type submits
+  it), and last `Base.Close` with `DATE_PICKER_NAV`, `aria-label={labels.common.close}` and
+  `<Svg icon={x} />`: without it Base UI traps nothing and a touch screen reader cannot
+  leave. Then `<table role="grid" aria-labelledby={titleId}>` with
   `DATE_PICKER_GRID`: a head of seven `<th scope="col" abbr={long}>` with
   `DATE_PICKER_WEEKDAY`, and six rows of seven `<td role="gridcell">` with
   `DATE_PICKER_CELL`, always six, so the popup keeps its height from month to month (choice
@@ -1567,8 +1820,9 @@ still name; choice 15).
     FOCUS_RING_INSET,
   ].join(' ')
   export const DATE_PICKER_HEADER = 'flex items-center gap-2'
-  export const DATE_PICKER_TITLE = 'min-w-0 flex-1 truncate text-center text-sm font-semibold text-body'
-  /** Previous and next month: 24 px, 44 under a finger, where the drawing has bare 14 px carets. */
+  /** Three 44 px buttons under a finger leave about 92 px at 320 px: the month wraps, never cut. */
+  export const DATE_PICKER_TITLE = 'min-w-0 flex-1 text-center text-sm font-semibold text-body wrap-anywhere'
+  /** Previous, next and close: 24 px, 44 under a finger, where the drawing has bare 14 px carets. */
   export const DATE_PICKER_NAV = `${ICON_BUTTON} text-body ${HOVER.ghost} ${DISABLED}`
   export const DATE_PICKER_GRID = 'w-full table-fixed border-collapse'
   export const DATE_PICKER_WEEKDAY = 'pb-1 text-center text-xs font-medium text-muted'
@@ -1598,13 +1852,18 @@ still name; choice 15).
   | Shift with PageUp, PageDown | the same day last year, next year |
   | Enter, Space | choose the day, close, the focus back on the trigger |
   | Escape | close with no change (Base UI) |
-  | Tab | previous, next, the grid, round again (`trap-focus`) |
+  | Tab | previous, next, close, the grid, round again (`trap-focus` with the `Close` part) |
 
   The active day never leaves `minDate` to `maxDate`; when it crosses into another month the
   grid shows that month. Today is read in the browser when the calendar mounts, and the
   calendar never renders on the server, so the server and the browser cannot disagree on it.
-  On open the focus goes to the chosen day, else today clamped into the range: the part's
-  hook does it once it mounts.
+  Today is the browser's local calendar day: `todayParts(now)` in `lib.ts` returns `{ year:
+  now.getFullYear(), month: now.getMonth() + 1, day: now.getDate() }` of `new Date()`.
+  Never `toISOString()` or a UTC getter: in Riyadh after 21:00 UTC that is tomorrow, and in
+  California it is tomorrow from 17:00 local time (16:00 in winter). The UTC `Date` stays
+  for a weekday and a month's length, and every formatter keeps `timeZone: 'UTC'`, since it
+  formats a plain date, not an instant. On open the focus goes to the chosen day, else today
+  clamped into the range: the part's hook does it once it mounts.
 - **Form.** The form input submits `name=YYYY-MM-DD`, and `name=` when empty; before
   hydration it sends the default. `required` blocks an empty one, with or without script,
   and the browser then puts the focus on the input nobody sees: say so in the README, as
@@ -1627,30 +1886,55 @@ still name; choice 15).
   `.placement.dom.test.tsx`, as Select. `date-picker.lib.test.ts`: parse and print; a string
   that is not a date; `addMonths` from 31 March back to 28 February and from 29 February
   2024 to 28 February 2025; the grid of September 2026 Monday first (one blank, then 1 to 6)
-  and Sunday first (two blanks); year 1 and year 9999; 2100 is not a leap year; `clampIso`.
-  Server render: the trigger shows the default in `en` or the placeholder; the form input
-  holds the ISO value and the `name`; `aria-describedby` starts with the value's id; no
-  calendar is in the HTML. Dom, keys: every key of the table in both directions; PageUp from
-  31 March; the range stops the active day; Enter chooses and closes; Escape keeps the value.
-  Form: `FormData` from the server HTML, after a choice and after a reset. Browser, static:
-  `serverEntries` on `date-picker--form`. Browser, live (`e2e/date-picker.spec.ts`): a click
-  and Enter each open it with the focus on the chosen day; the keys move it; in RTL
-  ArrowLeft is the next day; at the four edges of the viewport the popup is inside it; at 320
-  x 480 with a coarse pointer every day is at least 24 px wide and 44 px tall and the page
-  does not scroll sideways; with `e2e/fixtures/date-picker-in-dialog.tsx` the first Escape
-  closes the calendar and the second the dialog; axe on the open popup; under forced colours
-  the chosen day is `Highlight` and today is underlined; the reset cases of Switch.
+  and Sunday first (two blanks); year 1 and year 9999; 2100 is not a leap year; `clampIso`;
+  `todayParts`, with `process.env.TZ` set in the test and restored after (Node reads it at
+  once, measured in Node 22): `Asia/Riyadh` at `2026-10-14T22:30:00Z` is 15 October, and
+  `America/Los_Angeles` at `2026-10-15T05:30:00Z` is 14 October. Server render: the trigger
+  shows the default in `en` or the placeholder; the form input holds the ISO value and the
+  `name`; `aria-describedby` starts with the value's id; a required DatePicker's
+  `aria-describedby` resolves to its value, then "required", then the caller's text; a value
+  outside the range is kept in the trigger and the input; no calendar is in the HTML. Dom:
+  the open popup holds a button named "Close" inside the dialog, and a press on it closes
+  the popup with no change; with `container` inside a `<form>`, a press on next month does
+  not submit it; after a choice one `input` event reaches the form input; inside a FieldLive
+  in a FormAction, choosing a day clears the field's error. Dom, keys: every key of the
+  table in both directions; PageUp from 31 March; the range stops the active day; Enter
+  chooses and closes; Escape keeps the value. Form: `FormData` from the server HTML, after a
+  choice and after a reset. Browser, static: `serverEntries` on `date-picker--form`.
+  Browser, live (`e2e/date-picker.spec.ts`): `basic` hydrates with no console error in
+  `en`, `en-GB` and `ar` (a server and a browser ICU that print the date differently show
+  up here); a click and Enter each open it with the focus on the chosen day; the keys move
+  it; Tab from the grid goes to previous, next and close, then back to the grid, also on
+  the first open, when the part loads after the popup; in RTL ArrowLeft is the next day;
+  with `test.use({ timezoneId: 'Asia/Riyadh' })` and `page.clock.setFixedTime` at
+  `2026-10-14T22:30:00Z` the open calendar marks 15 October with `aria-current="date"`;
+  at the four edges of the viewport the popup is inside it; at 320 x 480 with a coarse
+  pointer every day is at least 24 px wide and 44 px tall and the page does not scroll
+  sideways; with `e2e/fixtures/date-picker-in-dialog.tsx` the first Escape closes the
+  calendar and the second the dialog; with `date-picker-layouts.tsx` (see "Rules for all
+  eight") at 320 and 390 px with a coarse pointer the two side by side are as wide as two
+  Inputs there (124 and 159 px), each trigger keeps its height, and the page never scrolls
+  sideways, and at 1280 px the trigger is as wide as an Input; with
+  `date-picker-no-provider.tsx` it opens, formats in `en`, the popup is LTR and the keys
+  work; axe on the open popup; under forced colours the chosen day is `Highlight` and
+  today is underlined; the reset cases of Switch.
 - **Mutation.** `addMonths` stops keeping the day inside the month: the lib test catches it. A
-  second row: the RTL swap of the arrow keys is removed (the keyboard test).
+  second row: the RTL swap of the arrow keys is removed (the keyboard test). A third: the
+  `Close` part is removed (the dom test). A fourth: `todayParts` reads the UTC getters (the
+  lib test).
 - **Not built:** Hijri and every other calendar (choice 16), a range (DateRangePicker), week
   numbers, a clear or a today button (choice 21), a text input to type a date, a time,
   `isDateDisabled`, a month or year menu, two months side by side, `readOnly`, the
-  AdaptiveDatePicker connector (choice 19), a `locale` prop (the provider's).
+  AdaptiveDatePicker connector (choice 19), a `locale` prop (the provider's), the drawn open
+  look of the trigger (a ring while the popup is open: the focus is in the popup then).
 - **For the reviewer:** the server and the browser each format the trigger's text with their
   own ICU: Node 22 writes `en-GB` "22 Sept 2026", and a browser with other data may write
-  "Sep" and report a text mismatch at hydration (not run). The 18.5 KB of the chip is a
-  budget; no bundle was measured. What loads lazily is our own code: the calendar part, its
-  keys, the date math and the formatters; no library. The sample's `minDate` is after the
+  "Sep" and report a text mismatch at hydration (the live hydration test is where it shows).
+  The 18.5 KB of the chip is a budget; no bundle was measured. What loads lazily is the
+  calendar part's markup; its keys, the date math and the formatters sit in `hook.ts` and
+  `lib.ts`, which the trigger loads (see Lazy); no library. The `Close` part mounts with the
+  lazy part, so on a first open the trap starts once the part has loaded; whether Base UI
+  switches its focus manager to modal then was not run. The sample's `minDate` is after the
   drawn selection: the sample wins, and the demo's default sits inside its range.
 
 ## Build order
@@ -1683,8 +1967,8 @@ still name; choice 15).
 
    | Clause | Where it is met |
    |---|---|
-   | Input and Textarea in server Fields, posted with JavaScript off, showing server errors on the right fields after the full-page response | `form--basic` posts with no script; `form--server-errors` shows each error on its field. The Next.js round trip of a Server Action was not run |
-   | The same form with FormAction and FieldLive shows errors without a reload | `form--form-action`, live |
+   | Input and Textarea in server Fields, posted with JavaScript off, showing server errors on the right fields after the full-page response | `form--basic` posts with no script; `form--server-errors` shows how Fields render the errors handed to them. A server `Form` cannot read what its action returns: the round trip with no script is FormAction with `permalink`, or the app's own redirect, and it was not run here (no Next.js app) |
+   | The same form with FormAction and FieldLive shows errors without a reload | `form--form-action`, live, with the typed values kept through React's reset |
    | Six controls submit the right FormData after hydration, and their defaults before it | Unit 4: `select/dummy/phase-4-form.tsx` |
    | Numeric limits clamp | Unit 4, and here Meter, FileUpload, DatePicker's dates and `firstDayOfWeek`, TreeView's collection numbers |
    | Ten thousand options under the collection limit | Unit 4: Combobox |
@@ -1729,6 +2013,7 @@ the scope and are asked before the session starts.
 | 30 | The provider's digits | unchanged: the provider passes `latn` unless told; a server half follows its locale tag | the provider stops defaulting, so `ar-u-nu-arab` decides everywhere (NumberField and Slider change too) |
 | 31 | Keys of the day grid and the tree | our own code | Base UI's undocumented `internals/composite`, safe only while the pin stays 1.8.0 |
 | 32 | Builders at once | one | two, as the pairs in Build order |
+| 33 | Field's ids | `id ?? useId()`, and the label, hint and error ids from it, so one name on several Fields (a checkbox group, two forms on a page) never repeats an id | from the name, as PLAN 12 (`tc-f-<name>`): readable and linkable, but a page that repeats a name must pass `id` on all but one Field, or labels point at the wrong control |
 
 ## Where this file departs from docs/PLAN.md
 
@@ -1737,16 +2022,27 @@ builders report, as for Units 3 and 4. No component branch edits that file.
 
 - Field, Form and Meter are built, though they are not among the 46. Label is not a
   component (18.4).
-- The control object of 12 gains `aria-labelledby`.
+- The control object of 12 gains `aria-labelledby`. Field's ids come from `useId()` unless
+  `id` is given, never from the name (12: "deterministic ids from the required `name`";
+  choice 33).
 - FieldLive and FormAction use neither Base UI's Field nor its Form (12, 18.4). FormAction
-  keeps the browser's own validation.
+  keeps the browser's own validation, and takes a function child that receives the action's
+  state, so the fields keep what was typed through React's reset (12 gives it FieldLive
+  children only).
 - Stepper is a server component (18.6 says split).
 - CodeBlock has no highlighter and its own copy part (18.1: "Shiki on the server + a client
-  CopyButton").
+  CopyButton"). Its copy button writes its own `hover:` (a 10% tint of neutral/on-solid),
+  because `HOVER.ghost` reads the page's neutral/soft, which sits next to the block's text
+  colour (`R-5.2-4`). Its rings stay the shared ones, recoloured through `--tc-ring`.
+- TreeView writes its two rings with the ring's own tokens under its own conditions
+  (`R-5.2-4`): the tree's while it has the keyboard and no mounted row holds the highlight,
+  a row's while it holds it, as Command's highlighted row writes its own. `FOCUS_RING_INSET`
+  on the tree would draw two rings at once.
 - DatePicker is built on `Intl`, as `docs/DECISIONS.md` 2026-10-03 decided; PLAN 2 and 18.4
   still name react-day-picker and are corrected with this entry. Its grid is Gregorian. A
   day is narrower than 44 px under a coarse pointer on a phone (`R-5.6-2`). The month grid
-  always has six rows.
+  always has six rows. The popup carries a Close button, which nothing draws, because Base
+  UI traps the focus only while one is mounted.
 - The FileUpload list is not windowed (8.5, 18.4 "the file list is a collection"), and its
   rest props reach the input, not the root (`R-5.7-3`).
 - TreeView and FileUpload take no `error` status and are not wrapped in ErrorBoundary (8.2).
