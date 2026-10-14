@@ -1,5 +1,7 @@
 // The live half of the harness: the page the static one writes, served and hydrated, so a
 // browser test can open what `renderToStaticMarkup` leaves shut. Only the pure parts are here.
+// Relative: Playwright loads this file too, and does not map a #shared .js import to its source.
+import { TOAST_PLACEMENTS, type ToastPlacement } from '../../src/shared/contracts/toast.js'
 import {
   DIRECTIONS, LANG, MODES, PAGE_CANDIDATES, pageHtml, pageName, type Direction, type Mode,
 } from './harness.js'
@@ -27,12 +29,15 @@ export const liveOrigin = (port: number = livePort()) => `http://${LIVE_HOST}:${
 export const EDGES = ['top', 'bottom', 'start', 'end'] as const
 export type Edge = (typeof EDGES)[number]
 
-export interface RouteOptions { edge?: Edge | undefined; tall?: boolean | undefined }
-export interface Route { demo: string; mode: Mode; direction: Direction; edge: Edge | null; tall: boolean }
+/** `toast` is the placement the page's provider gives its toasts; left out, the provider's default applies. */
+export interface RouteOptions { edge?: Edge | undefined; tall?: boolean | undefined; toast?: ToastPlacement | undefined }
+export interface Route { demo: string; mode: Mode; direction: Direction; edge: Edge | null; tall: boolean; toast?: ToastPlacement | undefined }
 
-/** The static page's own file name, plus the two parameters only a live page understands. */
+/** The static page's own file name, plus the three parameters only a live page understands. */
 export function routeFor(demo: string, mode: Mode, direction: Direction, options: RouteOptions = {}): string {
-  const query = [options.edge ? `edge=${options.edge}` : '', options.tall ? 'tall=1' : ''].filter(Boolean)
+  const query = [
+    options.edge ? `edge=${options.edge}` : '', options.tall ? 'tall=1' : '', options.toast ? `toast=${options.toast}` : '',
+  ].filter(Boolean)
   return `/${pageName(demo, mode, direction)}${query.length > 0 ? `?${query.join('&')}` : ''}`
 }
 
@@ -58,15 +63,21 @@ export function parseRoute(url: string): Route | { error: string } | null {
     return { error: `the direction "${direction ?? ''}" is not one of ${DIRECTIONS.join(', ')}` }
   }
 
+  // toast is taken too, for the toast spec's placements; the message keeps the words e2e/live.spec.ts reads verbatim.
   for (const key of searchParams.keys()) {
-    if (key !== 'edge' && key !== 'tall') return { error: `"${key}" is not a parameter; a page takes edge and tall` }
+    if (key !== 'edge' && key !== 'tall' && key !== 'toast') return { error: `"${key}" is not a parameter; a page takes edge and tall` }
   }
   const edge = searchParams.get('edge')
   if (edge !== null && !oneOf(EDGES, edge)) return { error: `the edge "${edge}" is not one of ${EDGES.join(', ')}` }
   const tall = searchParams.get('tall')
   if (tall !== null && tall !== '1') return { error: `tall takes 1 and nothing else, not "${tall}"` }
 
-  return { demo: `${folder}--${file}`, mode, direction, edge, tall: tall === '1' }
+  const toast = searchParams.get('toast')
+  if (toast !== null && !oneOf(TOAST_PLACEMENTS, toast)) {
+    return { error: `the toast placement "${toast}" is not one of ${TOAST_PLACEMENTS.join(', ')}` }
+  }
+
+  return { demo: `${folder}--${file}`, mode, direction, edge, tall: tall === '1', ...(toast === null ? {} : { toast }) }
 }
 
 /** The module a browser imports for a demo: its source file, which Vite compiles on request. */
@@ -142,11 +153,12 @@ export function trapScript(root: string): string {
 }
 
 /** The inline module: the same tree the server rendered, handed to `hydrateRoot`. */
-export function hydrateScript(route: Pick<Route, 'demo' | 'direction'>): string {
+export function hydrateScript(route: Pick<Route, 'demo' | 'direction' | 'toast'>): string {
+  const toast = route.toast === undefined ? '' : `, ${inScript(route.toast)}`
   return [
     `import { hydrateDemo } from ${inScript(CLIENT_ENTRY)}`,
     `import Demo from ${inScript(demoModule(route.demo))}`,
-    `hydrateDemo(Demo, ${inScript(route.direction)}, ${inScript(LANG[route.direction])})`,
+    `hydrateDemo(Demo, ${inScript(route.direction)}, ${inScript(LANG[route.direction])}${toast})`,
   ].join('\n')
 }
 
