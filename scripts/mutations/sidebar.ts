@@ -1,0 +1,430 @@
+// The mutations of src/components/sidebar. Found by scripts/mutations/index.ts.
+import type { Mutation } from '../lib/mutate.js'
+
+const CLASSES = 'src/components/sidebar/classes.ts'
+const CLIENT = 'src/components/sidebar/client.tsx'
+const HOOK = 'src/components/sidebar/hook.ts'
+const HEADER = 'src/components/sidebar/parts/sidebar-header.tsx'
+const GROUP = 'src/components/sidebar/parts/sidebar-group.tsx'
+const LINK = 'src/components/sidebar/parts/sidebar-link.tsx'
+
+export const MUTATIONS: Mutation[] = [
+  // The state, the toggle and the names.
+  {
+    label: 'the sidebar trigger stops calling onOpenChange, so no page learns that the rail was collapsed',
+    file: HOOK,
+    from: '{ value: open, defaultValue: defaultOpen, onChange: onOpenChange }',
+    to: '{ value: open, defaultValue: defaultOpen }',
+  },
+  {
+    label: 'a press on the sidebar trigger asks for the state the rail already has, so it never moves',
+    file: HOOK,
+    from: 'if (!event.defaultPrevented) state.setOpen(!state.open)',
+    to: 'if (!event.defaultPrevented) state.setOpen(state.open)',
+  },
+  {
+    label: "an onClick that prevents the default no longer stops the sidebar toggle",
+    file: HOOK,
+    from: 'if (!event.defaultPrevented) state.setOpen(!state.open)',
+    to: 'state.setOpen(!state.open)',
+  },
+  {
+    label: "the sidebar trigger drops its caller's onClick",
+    file: HOOK,
+    from: '      onClick?.(event)\n',
+    to: '',
+  },
+  {
+    label: 'the sidebar root ignores open, so a caller cannot hold its state',
+    file: HOOK,
+    from: '{ value: open, defaultValue: defaultOpen, onChange: onOpenChange }',
+    to: '{ value: undefined, defaultValue: defaultOpen, onChange: onOpenChange }',
+  },
+  {
+    label: 'a sidebar starts collapsed when nothing says how it starts',
+    file: 'src/components/sidebar/constants.ts',
+    from: '  defaultOpen: true,',
+    to: '  defaultOpen: false,',
+  },
+  {
+    label: 'the sidebar root stops writing data-closed, so no server part can tell that the rail is collapsed',
+    file: CLIENT,
+    from: "        data-closed={sidebar.state.open ? undefined : ''}\n",
+    to: '',
+  },
+  {
+    label: "the sidebar root lets a caller's data-open through, so a collapsed rail can say it is expanded",
+    file: CLIENT,
+    from: "        {...rest}\n        aria-label={sidebar.label}\n        data-open={sidebar.state.open ? '' : undefined}\n        data-closed={sidebar.state.open ? undefined : ''}\n",
+    to: "        aria-label={sidebar.label}\n        data-open={sidebar.state.open ? '' : undefined}\n        data-closed={sidebar.state.open ? undefined : ''}\n        {...rest}\n",
+  },
+  {
+    label: 'the sidebar nav loses its name, so it is one more unnamed navigation on the page',
+    file: CLIENT,
+    from: '        aria-label={sidebar.label}\n',
+    to: '',
+  },
+  {
+    label: 'an empty aria-label leaves the sidebar nav with a name that names nothing',
+    file: HOOK,
+    from: "name === undefined || name === '' ? label : name",
+    to: 'name === undefined ? label : name',
+  },
+  {
+    label: 'the sidebar trigger is named Collapse while the rail is collapsed',
+    file: HOOK,
+    from: 'label: state.open ? labels.collapse : labels.expand,',
+    to: 'label: labels.collapse,',
+  },
+  {
+    label: 'the sidebar trigger stops saying whether the rail is expanded',
+    file: CLIENT,
+    from: '      aria-expanded={trigger.open}\n',
+    to: '',
+  },
+  {
+    label: 'the sidebar trigger takes the type its caller writes, so one inside a form submits it',
+    file: CLIENT,
+    from: '      {...rest}\n      type="button"\n',
+    to: '      type="button"\n      {...rest}\n',
+  },
+  {
+    label: 'a sidebar trigger outside a rail fails with whatever JavaScript says, not with where it belongs',
+    file: HOOK,
+    from: "  if (state === null) throw new Error('SidebarTrigger must be rendered inside a SidebarRoot')\n",
+    to: '',
+  },
+  {
+    label: 'the icon of the sidebar trigger no longer mirrors in a right-to-left rail',
+    file: CLIENT,
+    from: '<Svg icon={sidebarSimple} />',
+    to: '<Svg icon={sidebarSimple} flipRtl={false} />',
+  },
+  {
+    label: "the sidebar root's own classes beat a consumer className, so data-open:w-72 sets no width",
+    file: CLIENT,
+    from: 'className={cn(SIDEBAR_ROOT, className)}',
+    to: 'className={cn(className, SIDEBAR_ROOT)}',
+  },
+  {
+    label: "the sidebar trigger's own classes beat a consumer className",
+    file: CLIENT,
+    from: 'className={cn(SIDEBAR_TRIGGER, className)}',
+    to: 'className={cn(className, SIDEBAR_TRIGGER)}',
+  },
+  // The server parts.
+  {
+    label: 'the sidebar header stops drawing the toggle, so a rail has no way to collapse',
+    file: HEADER,
+    from: '      <SidebarTrigger />\n',
+    to: '',
+  },
+  {
+    label: 'the title of a sidebar header is no longer cut at 100 characters',
+    file: HEADER,
+    from: '{boundLabel(children, SIDEBAR_BOUNDARIES.labelMaxLength)}',
+    to: '{children}',
+  },
+  {
+    label: "the sidebar header's own classes beat a consumer className",
+    file: HEADER,
+    from: 'className={cn(SIDEBAR_HEADER, className)}',
+    to: 'className={cn(className, SIDEBAR_HEADER)}',
+  },
+  {
+    label: 'the label of a sidebar group no longer names its list',
+    file: GROUP,
+    from: ' aria-labelledby={named ? id : undefined}',
+    to: '',
+  },
+  {
+    label: 'a sidebar group with no label still writes a paragraph and a name that points at it',
+    file: GROUP,
+    from: 'const named = hasContent(label)',
+    to: 'const named = true',
+  },
+  {
+    label: 'the list of a sidebar group loses the list role Preflight costs it in Safari',
+    file: GROUP,
+    from: '<ul role="list" ',
+    to: '<ul ',
+  },
+  {
+    label: 'the label of a sidebar group is no longer cut at 100 characters',
+    file: GROUP,
+    from: '{boundLabel(label, SIDEBAR_BOUNDARIES.labelMaxLength)}',
+    to: '{label}',
+  },
+  {
+    label: 'a sidebar link stops marking the page being read with aria-current',
+    file: LINK,
+    from: "'aria-current': current ? 'page' : undefined,",
+    to: "'aria-current': undefined,",
+  },
+  {
+    label: 'a sidebar link keeps an aria-current written by hand, so a row is announced as current and drawn as any other',
+    file: LINK,
+    from: "        ...rest,\n        // After the rest: JSX lets a hyphenated attribute past the type, and the row must look the way it is announced.\n        'aria-current': current ? 'page' : undefined,\n",
+    to: "        'aria-current': current ? 'page' : undefined,\n        ...rest,\n",
+  },
+  {
+    label: 'the label of a sidebar link loses its own element, so a collapsed rail has nothing to hide',
+    file: LINK,
+    from: '? <span className={SIDEBAR_LINK_LABEL}>{boundLabel(label, SIDEBAR_BOUNDARIES.labelMaxLength)}</span>',
+    to: '? boundLabel(label, SIDEBAR_BOUNDARIES.labelMaxLength)',
+  },
+  {
+    label: 'the label of a sidebar link is no longer cut at 100 characters',
+    file: LINK,
+    from: '{boundLabel(label, SIDEBAR_BOUNDARIES.labelMaxLength)}',
+    to: '{label}',
+  },
+  {
+    label: 'a sidebar link whose render element holds the text loses its icon and the label that can hide',
+    file: LINK,
+    from: '      }, row)}',
+    to: '      })}',
+  },
+  {
+    label: 'the icon of a sidebar link loses its wrapper, so its colour would have to sit on the svg',
+    file: LINK,
+    from: '{hasContent(icon) ? <span className={SIDEBAR_ICON[state]}>{icon}</span> : null}',
+    to: '{icon}',
+  },
+  {
+    label: "a sidebar link's own classes beat a consumer className",
+    file: LINK,
+    from: 'cn(SIDEBAR_LINK, SIDEBAR_LINK_STATE[state], className)',
+    to: 'cn(className, SIDEBAR_LINK, SIDEBAR_LINK_STATE[state])',
+  },
+  {
+    label: 'the bound of a sidebar label grows to 1000, so a pasted paragraph is a row',
+    file: 'src/components/sidebar/boundaries.ts',
+    from: 'labelMaxLength: 100,',
+    to: 'labelMaxLength: 1000,',
+  },
+  // The classes: each one a measurement of e2e/sidebar.spec.ts.
+  {
+    label: 'a sidebar row takes its 24 px floor after its height, so cn() leaves it 24 px tall',
+    file: CLASSES,
+    from: '  TOUCH_TARGET,\n  ROW,\n',
+    to: '  ROW,\n  TOUCH_TARGET,\n',
+  },
+  {
+    label: 'a sidebar row loses the 44 px floor, so it is 40 px under a finger',
+    file: CLASSES,
+    from: '  TOUCH_TARGET,\n  ROW,\n',
+    to: '  ROW,\n',
+  },
+  {
+    label: 'a collapsed sidebar stays 60 px under a finger, 5 px narrower than the 44 px row it holds',
+    file: CLASSES,
+    from: '  SIDEBAR_COARSE,\n',
+    to: '',
+  },
+  {
+    label: 'the sidebar may shrink, so a flex row squeezes it to 209 px on a phone',
+    file: CLASSES,
+    from: 'flex h-full shrink-0 flex-col',
+    to: 'flex h-full flex-col',
+  },
+  {
+    label: 'the sidebar may be wider than its parent, so large text scrolls a phone page sideways',
+    file: CLASSES,
+    from: '  SIDEBAR_COARSE,\n  CONTAIN,\n',
+    to: '  SIDEBAR_COARSE,\n',
+  },
+  {
+    label: 'the line of the sidebar is on its inline start, away from the page',
+    file: CLASSES,
+    from: "'border-e-(length:--tc-line-width) border-line',",
+    to: "'border-s-(length:--tc-line-width) border-line',",
+  },
+  {
+    label: 'a collapsed sidebar is as wide as an expanded one',
+    file: CLASSES,
+    from: "'data-open:w-55 data-closed:w-15'",
+    to: "'data-open:w-55 data-closed:w-55'",
+  },
+  {
+    label: 'the sidebar body keeps no room for a ring, so the ring of its first and last row is cut',
+    file: CLASSES,
+    from: '${SCROLL_AREA} ${SIDEBAR_RING_ROOM} ${SIDEBAR_BAR}',
+    to: '${SCROLL_AREA} ${SIDEBAR_BAR}',
+  },
+  {
+    label: 'the sidebar body does not hold its hidden labels, so ten collapsed groups make the page 1732 px taller',
+    file: CLASSES,
+    from: '`relative flex flex-1 flex-col gap-1',
+    to: '`flex flex-1 flex-col gap-1',
+  },
+  {
+    label: 'the sidebar itself is not positioned, so a rail with no body lets its hidden labels out of the box that scrolls it',
+    file: CLASSES,
+    from: "'group/sidebar relative flex h-full",
+    to: "'group/sidebar flex h-full",
+  },
+  {
+    label: 'the sidebar body takes a min-h-0 again, a class that changes nothing on a box that scrolls',
+    file: CLASSES,
+    from: '`relative flex flex-1 flex-col gap-1',
+    to: '`relative flex min-h-0 flex-1 flex-col gap-1',
+  },
+  {
+    label: 'the sidebar body no longer scrolls, so a list longer than the rail is cut off',
+    file: CLASSES,
+    from: 'gap-1 ${SCROLL_AREA} ${SIDEBAR_RING_ROOM}',
+    to: 'gap-1 ${SIDEBAR_RING_ROOM}',
+  },
+  {
+    label: 'a collapsed sidebar draws its scrollbar, which leaves a row 24 px and pushes every icon off the middle',
+    file: CLASSES,
+    from: ' ${SIDEBAR_BAR}`',
+    to: '`',
+  },
+  {
+    label: 'the label of a collapsed sidebar link is removed with display none, so the link loses its name',
+    file: CLASSES,
+    from: '`${LABEL} group-data-closed/sidebar:sr-only`\n',
+    to: '`${LABEL} group-data-closed/sidebar:hidden`\n',
+  },
+  {
+    label: 'the label of a sidebar link no longer truncates, so a long one pushes the row past the rail',
+    file: CLASSES,
+    from: 'export const SIDEBAR_LINK_LABEL = `${LABEL} ',
+    to: 'export const SIDEBAR_LINK_LABEL = `',
+  },
+  {
+    label: 'the title of a collapsed sidebar stays drawn, in a rail 39 px wide',
+    file: CLASSES,
+    from: 'text-sm font-semibold group-data-closed/sidebar:sr-only',
+    to: 'text-sm font-semibold',
+  },
+  {
+    label: 'the label of a group stays drawn in a collapsed sidebar',
+    file: CLASSES,
+    from: "text-muted group-data-closed/sidebar:sr-only'",
+    to: "text-muted'",
+  },
+  {
+    label: 'a collapsed sidebar row is not centred, so its icon starts 12 px in and sits off the middle',
+    file: CLASSES,
+    from: "  'group-data-closed/sidebar:justify-center',\n",
+    to: '',
+  },
+  {
+    label: 'the toggle of a collapsed sidebar stays at the start, 7.5 px off the icons under it',
+    file: CLASSES,
+    from: " pb-1.5 group-data-closed/sidebar:justify-center'",
+    to: " pb-1.5'",
+  },
+  {
+    label: 'the current sidebar row is medium, which a font with a regular and a bold face draws as regular',
+    file: CLASSES,
+    from: 'bg-primary-soft font-semibold text-primary-on-soft',
+    to: 'bg-primary-soft font-medium text-primary-on-soft',
+  },
+  {
+    label: 'the current sidebar row has no bar, so in a collapsed rail only a colour tells it from the others',
+    file: CLASSES,
+    from: 'text-primary-on-soft ${SIDEBAR_MARK} ${SIDEBAR_CURRENT_FORCED}',
+    to: 'text-primary-on-soft ${SIDEBAR_CURRENT_FORCED}',
+  },
+  {
+    label: 'the bar of the current sidebar row is the solid primary, 2.84:1 on its fill in dark',
+    file: CLASSES,
+    from: "before:rounded-full before:bg-current'",
+    to: "before:rounded-full before:bg-primary-solid'",
+  },
+  {
+    label: 'the current sidebar row takes no highlight under forced colours, where its fill is erased',
+    file: CLASSES,
+    from: '${SIDEBAR_MARK} ${SIDEBAR_CURRENT_FORCED}`',
+    to: '${SIDEBAR_MARK}`',
+  },
+  {
+    label: 'the current sidebar row keeps the ring of its theme under forced colours',
+    file: CLASSES,
+    from: "  'forced-colors:[--tc-ring:CanvasText]',\n",
+    to: '',
+  },
+  {
+    label: 'the current sidebar row answers the pointer, with a fill of its theme under the text of the highlight',
+    file: CLASSES,
+    from: 'current: `bg-primary-soft',
+    to: 'current: `${HOVER.ghost} bg-primary-soft',
+  },
+  {
+    label: 'a sidebar row that is not current no longer answers the pointer',
+    file: CLASSES,
+    from: 'rest: `tone-neutral text-body ${HOVER.ghost}`,',
+    to: "rest: 'tone-neutral text-body',",
+  },
+  {
+    label: 'a focused sidebar row shows no ring',
+    file: CLASSES,
+    from: '  FOCUS_RING,\n  TRANSITION,\n',
+    to: '  TRANSITION,\n',
+  },
+  {
+    label: 'a sidebar row no longer clips, so an icon 400 px wide makes the body scroll sideways',
+    file: CLASSES,
+    from: "  'relative overflow-hidden',\n",
+    to: "  'relative',\n",
+  },
+  {
+    label: 'the icon of a sidebar row that is not current is not muted',
+    file: CLASSES,
+    from: "rest: 'inline-flex shrink-0 text-muted',",
+    to: "rest: 'inline-flex shrink-0',",
+  },
+  {
+    label: 'the sidebar trigger is not the shared icon button: no 24 and 44 px floor, no ring',
+    file: CLASSES,
+    from: '`${ICON_BUTTON} text-muted tone-neutral',
+    to: '`inline-flex text-muted tone-neutral',
+  },
+  // The demos, the index, the README, the types and the schema.
+  {
+    label: 'the collapsed sidebar demo starts expanded, so no page shows a rail the server sent collapsed',
+    file: 'src/components/sidebar/dummy/collapsed.tsx',
+    from: '<SidebarRoot defaultOpen={false}>',
+    to: '<SidebarRoot>',
+  },
+  {
+    label: 'the rtl sidebar demo mounts an English provider, so an Arabic rail is named Sidebar',
+    file: 'src/components/sidebar/dummy/rtl.tsx',
+    from: '<TopClassProvider direction="rtl" locale="ar">',
+    to: '<TopClassProvider direction="rtl" locale="en">',
+  },
+  {
+    label: 'the long-list sidebar demo gives its rail no height, so its sixty links scroll the page',
+    file: 'src/components/sidebar/dummy/long-list.tsx',
+    from: '<div className="h-[calc(100dvh-4rem)]">',
+    to: '<div>',
+  },
+  {
+    label: 'the sidebar index stops exporting SidebarLink, so no page can render a row',
+    file: 'src/components/sidebar/index.tsx',
+    from: "export { SidebarLink } from './parts/sidebar-link.js'\n",
+    to: '',
+  },
+  {
+    label: 'the sidebar README sample forgets where a link goes, which no longer compiles',
+    file: 'src/components/sidebar/README.md',
+    from: '<SidebarLink href="/docs/theming" icon={<Icon name="palette" />}>Theming</SidebarLink>',
+    to: '<SidebarLink icon={<Icon name="palette" />}>Theming</SidebarLink>',
+  },
+  {
+    label: 'a plain sidebar link no longer needs an href, so a row can go nowhere',
+    file: 'src/components/sidebar/types.ts',
+    from: '  /** Where the row goes. */\n  href: string\n',
+    to: '  /** Where the row goes. */\n  href?: string | undefined\n',
+  },
+  {
+    label: 'the sidebar schema loses the default of defaultOpen, so the props table says a rail starts as nothing',
+    file: 'src/components/sidebar/schema.ts',
+    from: 'z.boolean().default(SIDEBAR_DEFAULTS.defaultOpen)',
+    to: 'z.boolean().optional()',
+  },
+]

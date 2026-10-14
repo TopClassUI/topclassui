@@ -104,4 +104,16 @@ export const MUTATIONS: Mutation[] = [
     from: '  locale: _locale,\n',
     to: '',
   },
+  {
+    label: 'the breadcrumb current page cuts its label with a slice of its own again, splitting an Arabic letter from its harakat',
+    file: 'src/components/breadcrumb/index.tsx',
+    from: '{cutLabel(item.label, max)}',
+    to: '{item.label.slice(0, max)}',
+  },
+  {
+    label: 'the breadcrumb current page loses dir="auto", so an English-first label in an RTL page is cut at its start',
+    file: 'src/components/breadcrumb/index.tsx',
+    from: '<span dir="auto" aria-current',
+    to: '<span aria-current',
+  },
 ]

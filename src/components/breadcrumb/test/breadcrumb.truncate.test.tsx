@@ -12,7 +12,7 @@ const classesBefore = (out: string, text: string) =>
 describe('a long crumb truncates instead of pushing the page apart', () => {
   it('puts a linked label on an element of its own that truncates', () => {
     const out = markup(<Breadcrumb items={[{ href: '/guide', label: LONG }, { label: 'Now' }]} />)
-    expect(out).toContain(`<span class="truncate min-w-0">${LONG}</span></a>`)
+    expect(out).toContain(`<span dir="auto" class="truncate min-w-0">${LONG}</span></a>`)
   })
 
   it('never lets the link or its list item outgrow the container', () => {
@@ -41,7 +41,7 @@ describe('the label bound stops a megabyte reaching the visible trail', () => {
 
   it('cuts a linked label at the boundary, not at the width', () => {
     const out = markup(<Breadcrumb items={[{ href: '/x', label: 'x'.repeat(10_000) }, { label: 'Now' }]} />)
-    expect(out).toContain(`<span class="truncate min-w-0">${'x'.repeat(200)}</span>`)
+    expect(out).toContain(`<span dir="auto" class="truncate min-w-0">${'x'.repeat(200)}</span>`)
   })
 
   it('cuts the current page at the same boundary', () => {
@@ -59,5 +59,17 @@ describe('the label bound stops a megabyte reaching the visible trail', () => {
   it('keeps a label of exactly 200 characters whole', () => {
     const out = markup(<Breadcrumb items={[{ label: 'z'.repeat(200) }]} />)
     expect(out).toContain(`>${'z'.repeat(200)}</span>`)
+  })
+})
+
+describe('the bound cuts between graphemes, with the shared cut every truncating label uses', () => {
+  it('never splits a skin tone from its hand in a linked label', () => {
+    const out = markup(<Breadcrumb items={[{ href: '/x', label: `${'x'.repeat(198)}👍🏽` }, { label: 'Now' }]} />)
+    expect(out).toContain(`<span dir="auto" class="truncate min-w-0">${'x'.repeat(198)}</span></a>`)
+  })
+
+  it('never splits an Arabic letter from its harakat in the current page', () => {
+    const out = markup(<Breadcrumb items={[{ href: '/', label: 'Home' }, { label: `${'x'.repeat(198)}مَّ` }]} />)
+    expect(out).toContain(`>${'x'.repeat(198)}</span></li>`)
   })
 })
