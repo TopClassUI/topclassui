@@ -25,7 +25,7 @@ describe('a crumb whose label is empty or only whitespace', () => {
   it('renders no link for it, so no anchor in the trail is without a name', () => {
     expect(anchors(out)).toHaveLength(1)
     expect(attr(anchors(out)[0] ?? '', 'href')).toBe('/')
-    expect(out).not.toMatch(/<span class="truncate min-w-0">\s*<\/span>/)
+    expect(out).not.toMatch(/<span dir="auto" class="truncate min-w-0">\s*<\/span>/)
   })
 
   it('renders no list item and no separator for it either', () => {
@@ -57,7 +57,7 @@ describe('a crumb whose label is empty or only whitespace', () => {
     const last = of([{ href: '/', label: 'Home' }, { label: 'Settings' }, { label: '' }])
     expect(count(last, '<li')).toBe(2)
     expect(count(last, 'aria-current="page"')).toBe(1)
-    expect(last).toMatch(/<span aria-current="page" class="[^"]*">Settings<\/span><\/li><\/ol>/)
+    expect(last).toMatch(/<span dir="auto" aria-current="page" class="[^"]*">Settings<\/span><\/li><\/ol>/)
   })
 
   it('renders nothing at all when every label is blank, like an empty trail', () => {
@@ -95,7 +95,7 @@ describe('a crumb whose label is not a string', () => {
   it('keeps the current page on the last crumb that has a name', () => {
     const out = of([{ href: '/', label: 'Home' }, { label: 'Settings' }, { label: null }] as unknown as BreadcrumbItem[])
     expect(count(out, 'aria-current="page"')).toBe(1)
-    expect(out).toMatch(/<span aria-current="page" class="[^"]*">Settings<\/span><\/li><\/ol>/)
+    expect(out).toMatch(/<span dir="auto" aria-current="page" class="[^"]*">Settings<\/span><\/li><\/ol>/)
   })
 
   it('renders nothing at all when no label is a string, like an empty trail', () => {
@@ -106,7 +106,7 @@ describe('a crumb whose label is not a string', () => {
 describe('a label that has text', () => {
   it('is written exactly as given, spaces around it included: only the blank ones are dropped', () => {
     const out = of([{ href: '/', label: ' Home ' }, { label: 'Page' }])
-    expect(out).toContain('<span class="truncate min-w-0"> Home </span></a>')
+    expect(out).toContain('<span dir="auto" class="truncate min-w-0"> Home </span></a>')
     expect(listed(out)).toEqual([{ '@type': 'ListItem', position: 1, name: ' Home ', item: '/' }])
   })
 

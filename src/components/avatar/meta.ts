@@ -6,9 +6,9 @@ export const meta = {
   slug: 'avatar',
   category: 'media-and-display',
   tier: 2,
-  // PLAN 20 is not met until the client half, the visual matrix and the docs page exist.
+  // PLAN 20 is not met until the visual matrix and the docs page exist.
   status: 'beta',
-  rendering: 'server',
+  rendering: 'split',
   baseUi: null,
   baseUiRange: null,
   optionalDeps: [],
