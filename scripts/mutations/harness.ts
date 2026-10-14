@@ -159,4 +159,16 @@ export const MUTATIONS: Mutation[] = [
     from: "export const LANG = { ltr: 'en', rtl: 'ar' }",
     to: "export const LANG = { ltr: 'en', rtl: 'en' }",
   },
+  {
+    label: 'the target-size spec measures every input again, so the hidden 1 px input Base UI puts beside a toggle fails it',
+    file: 'scripts/lib/targets.ts',
+    from: `  'input:not([type="hidden"]):not([aria-hidden="true"])',\n  'input:not([type="hidden"]):not([tabindex="-1"])',\n`,
+    to: "  'input',\n",
+  },
+  {
+    label: 'the target-size spec loses the three toggle roles, so a toggle drawn by a span is never measured',
+    file: 'scripts/lib/targets.ts',
+    from: `  '[role="checkbox"]',\n  '[role="radio"]',\n  '[role="switch"]',\n`,
+    to: '',
+  },
 ]
