@@ -55,15 +55,19 @@ export function getLabels(
   return { locale, labels: withOverrides(base, overrides) }
 }
 
-/** One formatter per provider, because creating an Intl.NumberFormat is not cheap. */
-export function createNumberFormat(locale: string, numberingSystem: NumberingSystem = 'latn') {
+/**
+ * One formatter per provider, because creating an Intl.NumberFormat is not cheap. With no
+ * numberingSystem, a `-u-nu-` extension in the tag decides, and Latin digits otherwise.
+ */
+export function createNumberFormat(locale: string, numberingSystem?: NumberingSystem) {
   // An invalid tag throws RangeError, and a bad prop must not take the whole tree down.
   for (const tag of [locale, locale.split(/[-_]/)[0] ?? 'en']) {
     try {
-      return new Intl.NumberFormat(tag, { numberingSystem })
+      const fromTag = new Intl.Locale(tag).numberingSystem
+      return new Intl.NumberFormat(tag, { numberingSystem: numberingSystem ?? fromTag ?? 'latn' })
     } catch {
       continue
     }
   }
-  return new Intl.NumberFormat('en', { numberingSystem })
+  return new Intl.NumberFormat('en', { numberingSystem: numberingSystem ?? 'latn' })
 }

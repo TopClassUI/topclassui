@@ -60,7 +60,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a misspelt parameter of a live harness page is ignored, so the spec measures a demo nothing pinned',
     file: 'scripts/lib/live-harness.ts',
-    from: "if (key !== 'edge' && key !== 'tall') return",
+    from: "if (key !== 'edge' && key !== 'tall' && key !== 'toast') return",
     to: "if (key === '') return",
   },
   {
@@ -132,14 +132,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a live harness page hydrates every demo left to right, whatever direction the page has',
     file: 'scripts/lib/live-tree.tsx',
-    from: '<TopClassProvider direction={direction} locale={locale}>',
-    to: '<TopClassProvider direction="ltr" locale={locale}>',
+    from: '<TopClassProvider direction={direction} locale={locale} toast=',
+    to: '<TopClassProvider direction="ltr" locale={locale} toast=',
   },
   {
     label: 'a live harness page gives the provider English labels on an Arabic page',
     file: 'scripts/lib/live-tree.tsx',
-    from: '<TopClassProvider direction={direction} locale={locale}>',
-    to: '<TopClassProvider direction={direction} locale="en">',
+    from: '<TopClassProvider direction={direction} locale={locale} toast=',
+    to: '<TopClassProvider direction={direction} locale="en" toast=',
   },
   {
     label: 'the harness takes the notes in a dummy folder for a demo',

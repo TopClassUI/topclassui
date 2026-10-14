@@ -99,6 +99,14 @@ describe('it has the dimensions of the table it stands in for', () => {
     }
   })
 
+  // Forced colours erase the fill, and a bar drawn by its fill alone painted nothing (e2e/skeleton.spec).
+  it('keeps an outline under forced colours on every bar, and nowhere else', () => {
+    const bars = opening(html({ rows: 2, columns: 2 }), 'span').map((tag) => classList(tag))
+    expect(bars).toHaveLength(6)
+    for (const bar of bars) expect(bar).toContain('forced-colors:outline-(length:--tc-line-width)')
+    expect(bars.flat().filter((c) => c.includes('outline') && !c.startsWith('forced-colors:'))).toEqual([])
+  })
+
   it('pulses, and stops for reduced motion', () => {
     for (const tag of opening(html({ rows: 1, columns: 1 }), 'span')) {
       expect(classList(tag)).toEqual(expect.arrayContaining(['animate-pulse', 'motion-reduce:animate-none']))

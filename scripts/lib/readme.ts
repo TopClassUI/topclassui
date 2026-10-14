@@ -1,6 +1,7 @@
 // R-8.3-3: the props table is generated, never written by hand, so it cannot tell a
 // reader that a prop is optional when the schema says otherwise.
 import type { ComponentMeta, Rendering } from '../../src/shared/meta.js'
+import { type PartFamily, familyImport, familyProps } from './readme-parts.js'
 
 export const HAND_START = '<!-- hand-written -->'
 export const HAND_END = '<!-- /hand-written -->'
@@ -23,6 +24,8 @@ export interface ReadmeInput {
   demos: string[]
   /** Kept across a regeneration, so the prose a human wrote is never lost. */
   handWritten: string
+  /** A part family (R-9.2-4): its flat names and its props part by part, in place of `props`. */
+  family?: PartFamily | undefined
 }
 
 const RENDERING_LINE: Record<Rendering, string> = {
@@ -105,10 +108,23 @@ function propsTable(rows: PropRow[]): string {
   return [head, ...body].join('\n')
 }
 
-export function renderReadme(input: ReadmeInput): string {
-  const { meta, props, demos, handWritten } = input
-  const category = meta.category.replace(/-/g, ' ')
+function singleProps(props: PropRow[]): string[] {
   const required = props.filter((p) => p.required)
+  return [
+    required.length === 0
+      ? 'Every prop below is optional and falls back to the default shown.'
+      : `Required: ${required.map((p) => `\`${p.name}\``).join(', ')}. Every other prop below is optional.`,
+    '',
+    propsTable(props),
+    '',
+    `Anything else is passed to the root element, so standard attributes (\`onClick\`, \`aria-*\`, \`data-*\`, \`id\`) work. \`className\` is merged last, so yours wins a conflict, and \`ref\` is a normal prop.`,
+    '',
+  ]
+}
+
+export function renderReadme(input: ReadmeInput): string {
+  const { meta, props, demos, handWritten, family } = input
+  const category = meta.category.replace(/-/g, ' ')
 
   const lines = [
     `# ${meta.name}`,
@@ -126,19 +142,12 @@ export function renderReadme(input: ReadmeInput): string {
     '## Import',
     '',
     '```tsx',
-    `import { ${meta.name} } from 'topclassui'`,
+    family ? familyImport(family) : `import { ${meta.name} } from 'topclassui'`,
     '```',
     '',
     '## Props',
     '',
-    required.length === 0
-      ? 'Every prop below is optional and falls back to the default shown.'
-      : `Required: ${required.map((p) => `\`${p.name}\``).join(', ')}. Every other prop below is optional.`,
-    '',
-    propsTable(props),
-    '',
-    `Anything else is passed to the root element, so standard attributes (\`onClick\`, \`aria-*\`, \`data-*\`, \`id\`) work. \`className\` is merged last, so yours wins a conflict, and \`ref\` is a normal prop.`,
-    '',
+    ...(family ? familyProps(family, propsTable) : singleProps(props)),
   ]
 
   if (demos.length > 0) {
