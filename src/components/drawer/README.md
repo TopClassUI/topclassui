@@ -142,12 +142,24 @@ outside its `DrawerRoot` (Base UI's `handle`: hold `open` in a client file inste
 ## Import
 
 ```tsx
-import { Drawer } from 'topclassui'
+import {
+  DrawerRoot,
+  DrawerBody,
+  DrawerClose,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerPopup,
+  DrawerTitle,
+  DrawerTrigger,
+} from 'topclassui'
 ```
 
 ## Props
 
 Every prop below is optional and falls back to the default shown.
+
+### DrawerRoot
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
@@ -155,7 +167,39 @@ Every prop below is optional and falls back to the default shown.
 | `placement` | no | `start` \| `end` \| `top` \| `bottom` | `"end"` | DrawerRoot: the edge the sheet slides from; start and end follow the direction. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | DrawerRoot: the widest a start or an end sheet grows, 256 to 480 px; custom sets no width. |
 
-Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
+### DrawerBody
+
+This part takes no design props of its own.
+
+### DrawerClose
+
+This part takes no design props of its own.
+
+### DrawerDescription
+
+This part takes no design props of its own.
+
+### DrawerFooter
+
+This part takes no design props of its own.
+
+### DrawerHeader
+
+This part takes no design props of its own.
+
+### DrawerPopup
+
+This part takes no design props of its own.
+
+### DrawerTitle
+
+This part takes no design props of its own.
+
+### DrawerTrigger
+
+This part takes no design props of its own.
+
+`DrawerRoot` draws no element, so it takes no `className`, `style` or `ref`. Anything else on another part is passed to the element it draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
 
