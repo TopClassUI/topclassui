@@ -108,18 +108,22 @@ read-only look, a line around the selected segment, a skeleton (use `Skeleton`).
 ## Import
 
 ```tsx
-import { SegmentedControl } from 'topclassui'
+import {
+  SegmentedControlRoot,
+  SegmentedControlItem,
+} from 'topclassui'
 ```
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `value` on `SegmentedControlItem`. Every other prop below is optional.
+
+### SegmentedControlRoot
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
 | `aria-label` | no | `string` | - | The name read out when no visible text names the group. |
 | `aria-labelledby` | no | `string` | - | The id of the visible text that names the group. |
-| `className` | no | `string` | - | On the track, merged last, so a consumer class wins a conflict with the track's own. |
 | `defaultValue` | no | `string` | - | The segment selected when the page opens, and after a form reset. |
 | `fullWidth` | no | `boolean` | `false` | SegmentedControlRoot: the track fills its parent and its segments share it equally. For a few short segments. |
 | `invalid` | no | `boolean` | `false` | SegmentedControlRoot: marks the choice as wrong: sets aria-invalid on the track, whose line turns to danger and thickens. |
@@ -127,7 +131,16 @@ Every prop below is optional and falls back to the default shown.
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | SegmentedControlRoot: the height of the track and the padding and type step of every segment; custom emits none. |
 | `value` | no | `string` | - | The selected segment, held by its owner. |
 
-Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
+### SegmentedControlItem
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `value` | **yes** | `string` | - | The string the form receives, and what `value` and `onValueChange` of the root carry. |
+| `icon` | no | `ReactNode` | - | Drawn before the label, at the size of its own. Decoration: the label names the segment. |
+| `ref` | no | `Ref<HTMLButtonElement>` | - | The segment itself, which is a `<button>`. |
+| `style` | no | `CSSProperties` | - |  |
+
+Anything else is passed to the element each part draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
 
