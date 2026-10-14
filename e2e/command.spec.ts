@@ -111,6 +111,39 @@ test.describe('opening and closing', () => {
     })
   }
 
+  // Playwright cannot switch the keyboard layout, so the event an Arabic layout sends for Ctrl and the K key is dispatched.
+  test('under an Arabic layout the K key types its own letter, and Ctrl with it still opens the palette', async ({ page }) => {
+    await openLive(page, 'command--basic')
+    await page.evaluate(() => {
+      document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'ن', code: 'KeyK', ctrlKey: true, bubbles: true, cancelable: true }))
+    })
+    await expect(inputOf(page)).toBeFocused()
+  })
+
+  test('Ctrl+Shift+K and Ctrl+Alt+K are left to the browser and the system, and Ctrl+K after them still opens it', async ({ page }) => {
+    await open(page, 'command--basic')
+    await page.keyboard.press('Escape')
+    await expectClosed(page)
+    // The panel is loaded now, so a press that wrongly opened it would show within two frames.
+    for (const chord of ['Control+Shift+K', 'Control+Alt+k']) {
+      await page.keyboard.press(chord)
+      await page.evaluate(() => new Promise((resolve) => { requestAnimationFrame(() => { requestAnimationFrame(resolve) }) }))
+      await expect(page.locator('[role="dialog"]'), chord).toHaveCount(0)
+    }
+    await page.keyboard.press('Control+k')
+    await expect(inputOf(page)).toBeFocused()
+  })
+
+  test('the popup, focused from the keyboard, draws its ring inside its own box, never on the scrim', async ({ page }) => {
+    const popup = await open(page, 'command--basic', { by: 'keyboard' })
+    await popup.evaluate((element) => { (element as HTMLElement).focus() })
+    await expect(popup).toBeFocused()
+    expect(await popup.evaluate((element) => {
+      const style = getComputedStyle(element)
+      return `${style.outlineStyle} ${style.outlineWidth} ${style.outlineOffset}`
+    })).toBe('solid 2px -2px')
+  })
+
   test('the panel is fetched on the first open and never before: the page that shows the trigger loads none of it', async ({ page }) => {
     const panel: string[] = []
     page.on('request', (request) => { if (/command-panel|command-rows|@base-ui_react_autocomplete/.test(request.url())) panel.push(request.url()) })
@@ -492,6 +525,16 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(look.outline).toBe('solid')
       expect(look.width).toBe('2px')
       expect(look.line).not.toBe(look.fill)
+      // The line is the system's HighlightText, read off a probe that forced colours leave alone.
+      const highlightText = await page.evaluate(() => {
+        const probe = document.createElement('span')
+        probe.style.cssText = 'color: HighlightText; forced-color-adjust: none'
+        document.body.append(probe)
+        const colour = getComputedStyle(probe).color
+        probe.remove()
+        return colour
+      })
+      expect(look.line).toBe(highlightText)
       const rest = await page.locator('[role="option"]:not([data-highlighted])').first().evaluate((row) => getComputedStyle(row).outlineStyle)
       expect(rest).toBe('none')
       // The line is drawn: the frame inside the active row, in HighlightText on Highlight.
