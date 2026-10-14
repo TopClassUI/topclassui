@@ -176,7 +176,7 @@ describe('the label of a segment', () => {
 
   it('is one span that truncates, around the whole text, and names the segment', () => {
     const element = one('Calendar')
-    expect([...element.children].map((child) => child.outerHTML)).toEqual(['<span class="truncate min-w-0">Calendar</span>'])
+    expect([...element.children].map((child) => child.outerHTML)).toEqual(['<span dir="auto" class="truncate min-w-0">Calendar</span>'])
     expect(segment('Calendar')).toBe(element)
   })
 

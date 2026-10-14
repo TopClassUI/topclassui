@@ -44,7 +44,7 @@ function tracksIn(html: string): string[] {
     const own = /^[^>]*aria-label="([^"]*)"/.exec(part)?.[1]
     const by = /^[^>]*aria-labelledby="([^"]*)"/.exec(part)?.[1]
     const pointed = by ? new RegExp(`id="${by}"[^>]*>([^<]*)<`).exec(html)?.[1] : undefined
-    const items = [...part.matchAll(/<button ([^>]*)>(?:<span class="flex shrink-0"><svg [\s\S]*?<\/svg><\/span>)?<span class="truncate min-w-0">([^<]*)<\/span><\/button>/g)]
+    const items = [...part.matchAll(/<button ([^>]*)>(?:<span class="flex shrink-0"><svg [\s\S]*?<\/svg><\/span>)?<span dir="auto" class="truncate min-w-0">([^<]*)<\/span><\/button>/g)]
       .map(([, button = '', text = '']) => `${text}${button.includes('aria-checked="true"') ? ' *' : ''}${button.includes('tabindex="0"') ? '^' : ''}`)
     return `${own ?? pointed ?? '(no name)'}: ${items.join(' | ')}`
   })
