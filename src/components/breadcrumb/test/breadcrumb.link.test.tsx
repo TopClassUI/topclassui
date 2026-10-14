@@ -33,7 +33,7 @@ describe('with no link element', () => {
 
   it('writes the anchor as it did before link existed: the href, then the class, then the label', () => {
     expect(html()).toContain('<a href="/" class="inline-flex items-center justify-center rounded-chip text-muted ')
-    expect(html()).toContain('"><span class="truncate min-w-0">Home</span></a></li>')
+    expect(html()).toContain('"><span dir="auto" class="truncate min-w-0">Home</span></a></li>')
     expect(html()).not.toMatch(/<a class=/)
   })
 
@@ -62,8 +62,8 @@ describe('with link={<Link href="" />} (PLAN 5.8)', () => {
   })
 
   it('still holds each label in its own truncating span, inside the element', () => {
-    expect(linked).toContain('"><span class="truncate min-w-0">Home</span></a></li>')
-    expect(linked).toContain('"><span class="truncate min-w-0">Profile</span></a></li>')
+    expect(linked).toContain('"><span dir="auto" class="truncate min-w-0">Home</span></a></li>')
+    expect(linked).toContain('"><span dir="auto" class="truncate min-w-0">Profile</span></a></li>')
   })
 
   it('gives every link the look of a crumb: the colour, the containment, the floor and the ring', () => {
@@ -96,8 +96,8 @@ describe('with link={<Link href="" />} (PLAN 5.8)', () => {
   })
 
   it('leaves the current page and a crumb with no href as spans, since neither is a link', () => {
-    expect(linked).toContain('<span class="truncate min-w-0 text-muted">Settings</span></li>')
-    expect(linked).toContain('<span aria-current="page" class="truncate min-w-0 text-body font-semibold">Avatar</span></li>')
+    expect(linked).toContain('<span dir="auto" class="truncate min-w-0 text-muted">Settings</span></li>')
+    expect(linked).toContain('<span dir="auto" aria-current="page" class="truncate min-w-0 text-body font-semibold">Avatar</span></li>')
     expect(linked.match(/<span [^>]*data-client-link/g)).toBeNull()
   })
 

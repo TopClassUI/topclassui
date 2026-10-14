@@ -95,9 +95,9 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
   })
 
   // Read part by part: nine parts share the file, and each one is markup plus at most one hook of its own.
-  it('each part calls at most one hook: the popup for its locale, the body for its tab stop, the close for its label', () => {
+  it('each part calls at most one hook: the root for its scope, the popup for its locale, the body for its tab stop, the close for its label', () => {
     expect(hooksByPart(source)).toEqual({
-      DialogRoot: [],
+      DialogRoot: ['useDialogRoot'],
       DialogTrigger: [],
       DialogPopup: ['useDialogPopup'],
       DialogHeader: [],
@@ -109,17 +109,21 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
     })
   })
 
-  it('takes its three hooks and the modal context from hook.ts, and calls no hook from anywhere else', () => {
-    expect(importedNames(source, './hook.js')).toEqual(['DialogModalContext', 'useDialogBody', 'useDialogClose', 'useDialogPopup'])
-    expect(hookCallsIn(parse(source)).sort()).toEqual(['useDialogBody', 'useDialogClose', 'useDialogPopup'])
+  it('takes its four hooks and the modal context from hook.ts, and calls no hook from anywhere else', () => {
+    expect(importedNames(source, './hook.js')).toEqual([
+      'DialogModalContext', 'useDialogBody', 'useDialogClose', 'useDialogPopup', 'useDialogRoot',
+    ])
+    expect(hookCallsIn(parse(source)).sort()).toEqual(['useDialogBody', 'useDialogClose', 'useDialogPopup', 'useDialogRoot'])
   })
 
   it('imports neither shared hook itself: the tab stop and the locale reach the parts through hook.ts', () => {
     expect(importedModules(source).filter((m) => m.includes('use-scroll-tab-stop') || m.includes('use-portal-locale'))).toEqual([])
   })
 
-  it('takes its two pure helpers from src/shared, where the next overlay finds them, so no logic is written between the tags', () => {
-    expect(importedNames(source, '#shared/overlay.js')).toEqual(['guardEscape'])
+  it('takes its helpers from src/shared, where the next overlay finds them, so no logic is written between the tags', () => {
+    // The Escape guard comes through hook.ts with the root's own scope, which this context hands to the popup.
+    expect(importedNames(source, '#shared/overlay.js')).toEqual([])
+    expect(importedNames(source, '#shared/overlay-scope.js')).toEqual(['OverlayScopeContext'])
     expect(importedNames(source, '#shared/render-trigger.js')).toEqual(['hasContent', 'renderTrigger'])
     expect(importedModules(source).filter((m) => m.startsWith('./')).sort()).toEqual([
       './classes.js', './constants.js', './hook.js', './types.js',
@@ -159,15 +163,16 @@ describe('hook.ts holds what the parts read from the provider (R-5.12-1)', () =>
 
   it('imports the context and the ref hooks from React and no hook that holds state: the shared tab stop does', () => {
     expect(importedModules(source)).toEqual([
-      'react', '#shared/provider/context.js', '#shared/provider/use-portal-locale.js', '#shared/use-scroll-tab-stop.js',
-      './constants.js', './types.js',
+      'react', '#shared/overlay-scope.js', '#shared/provider/context.js', '#shared/provider/use-portal-locale.js',
+      '#shared/use-scroll-tab-stop.js', './constants.js', './types.js',
     ])
     expect(importedNames(source, 'react')).toEqual(['createContext', 'useContext', 'useImperativeHandle', 'useRef'])
   })
 
   it('one hook per part: the locale of the portal and how modal the root is, the ref and the tab stop of the body, the label of the x', () => {
     expect(hooksByPart(source)).toEqual({
-      useDialogPopup: ['usePortalLocale', 'useContext'],
+      useDialogRoot: ['useOverlayRoot'],
+      useDialogPopup: ['usePortalLocale', 'useContext', 'useOverlayScope'],
       useDialogBody: ['useRef', 'useImperativeHandle', 'useScrollTabStop'],
       useDialogClose: ['useLabels'],
     })
