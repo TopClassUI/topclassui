@@ -63,6 +63,30 @@ export const MUTATIONS: Mutation[] = [
     to: 'const cell = (text: string) => text',
   },
   {
+    label: 'the README of a part family imports the bare name again, which index.tsx does not export',
+    file: 'scripts/lib/readme.ts',
+    from: 'family ? familyImport(family) : ',
+    to: '',
+  },
+  {
+    label: 'the README of a part family says a Root that draws nothing passes attributes to its element',
+    file: 'scripts/lib/readme-parts.ts',
+    from: 'return family.rootDraws',
+    to: 'return true',
+  },
+  {
+    label: 'the README of a part family takes every Root for one that draws an element',
+    file: 'scripts/lib/readme-types.ts',
+    from: ".has('className') }",
+    to: ".has('className') || true }",
+  },
+  {
+    label: 'the README of a part family lists every schema prop under every part',
+    file: 'scripts/lib/readme-types.ts',
+    from: 'fromSchema.filter((row) => accepts.has(row.name))',
+    to: 'fromSchema',
+  },
+  {
     label: 'a SCREAMING_CASE table can hide in any file again',
     file: 'scripts/lib/source-checks.ts',
     from: "return [...source.matchAll(re)].map((m) => m[1] ?? '')",

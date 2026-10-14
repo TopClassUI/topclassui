@@ -3,7 +3,7 @@ import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import { BANNER_DEFAULTS, BANNER_TONES } from '../constants.js'
 import { bannerSchema } from '../schema.js'
-import type { BannerDesignProps, BannerName, BannerProps, BannerTone } from '../types.js'
+import type { BannerDesignProps, BannerDismissal, BannerName, BannerProps, BannerTone } from '../types.js'
 
 /** Assignability as a value, so a rejected prop is a passing assertion. */
 type Accepts<Union, Candidate> = Candidate extends Union ? true : false
@@ -38,13 +38,37 @@ describe('a wrapper that drops a prop', () => {
     expectTypeOf<Accepts<BannerProps, Omit<BannerProps, 'tone'>>>().toEqualTypeOf<false>()
   })
 
-  it('gets the name back from BannerName, the form the README gives', () => {
-    expectTypeOf<Accepts<BannerProps, Omit<BannerProps, 'tone'> & BannerName>>().toEqualTypeOf<true>()
+  it('gets the name and the id rule back from BannerName and BannerDismissal, the form the README gives', () => {
+    expectTypeOf<Accepts<BannerProps, Omit<BannerProps, 'tone'> & BannerName>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<BannerProps, Omit<BannerProps, 'tone'> & BannerName & BannerDismissal>>().toEqualTypeOf<true>()
   })
 
   it('or drops both names and passes its own', () => {
-    type Titled = Omit<BannerProps, 'aria-label' | 'aria-labelledby'> & { 'aria-label': string }
+    type Titled = Omit<BannerProps, 'aria-label' | 'aria-labelledby'> & { 'aria-label': string } & BannerDismissal
     expectTypeOf<Accepts<BannerProps, Titled>>().toEqualTypeOf<true>()
+  })
+})
+
+describe('dismissal (the client half)', () => {
+  type Named = { 'aria-label': string }
+
+  it('requires an id with dismissible, since the dismissal is remembered by it', () => {
+    expectTypeOf<Accepts<BannerProps, Named & { dismissible: true }>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<BannerProps, Named & { dismissible: true; id: string }>>().toEqualTypeOf<true>()
+  })
+
+  it('takes onDismiss only with dismissible, where it has an x to answer', () => {
+    expectTypeOf<Accepts<BannerProps, Named & { onDismiss: () => void }>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<BannerProps, Named & { dismissible: true; id: string; onDismiss: () => void }>>().toEqualTypeOf<true>()
+  })
+
+  it('leaves dismissible off and the id optional on a plain banner', () => {
+    expectTypeOf<Accepts<BannerProps, Named & { dismissible: false }>>().toEqualTypeOf<true>()
+    expectTypeOf<Accepts<BannerProps, Named & { id: string }>>().toEqualTypeOf<true>()
+  })
+
+  it('takes a callback of no argument that returns nothing', () => {
+    expectTypeOf<Extract<BannerProps, { dismissible: true }>['onDismiss']>().toEqualTypeOf<(() => void) | undefined>()
   })
 })
 
@@ -72,8 +96,6 @@ describe('the props follow the vocabulary', () => {
   })
 
   it('has none of the props the spec leaves unbuilt', () => {
-    expectTypeOf<Accepts<keyof BannerProps, 'dismissible'>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<keyof BannerProps, 'onDismiss'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof BannerProps, 'sticky'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof BannerProps, 'placement'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof BannerProps, 'variant'>>().toEqualTypeOf<false>()
@@ -85,7 +107,8 @@ describe('the props follow the vocabulary', () => {
 describe('the design props and the schema cannot drift', () => {
   it('is derived from the schema input', () => {
     expectTypeOf<BannerDesignProps['tone']>().toEqualTypeOf<BannerTone | undefined>()
-    expectTypeOf<keyof BannerDesignProps>().toEqualTypeOf<'tone'>()
+    expectTypeOf<BannerDesignProps['dismissible']>().toEqualTypeOf<boolean | undefined>()
+    expectTypeOf<keyof BannerDesignProps>().toEqualTypeOf<'tone' | 'dismissible'>()
   })
 
   it('is a subset of the component props, so every design prop is settable', () => {
@@ -95,7 +118,7 @@ describe('the design props and the schema cannot drift', () => {
 
 describe('the schema', () => {
   it('fills the default from constants.ts', () => {
-    expect(bannerSchema.parse({})).toEqual({ tone: BANNER_DEFAULTS.tone })
+    expect(bannerSchema.parse({})).toEqual({ tone: BANNER_DEFAULTS.tone, dismissible: BANNER_DEFAULTS.dismissible })
   })
 
   it('accepts every value the constants list', () => {

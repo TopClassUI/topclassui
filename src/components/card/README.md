@@ -33,18 +33,48 @@ heading level to you. `CardBody` is a block, so space several paragraphs yoursel
 ## Import
 
 ```tsx
-import { Card } from 'topclassui'
+import {
+  CardRoot,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  CardSkeleton,
+} from 'topclassui'
 ```
 
 ## Props
 
 Every prop below is optional and falls back to the default shown.
 
+### CardRoot
+
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
 | `children` | no | `ReactNode` | - | The parts, in order: CardHeader, CardBody and CardFooter. Each one is optional. |
 
-Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
+### CardHeader
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `children` | no | `ReactNode` | - | The title, in the heading element the page outline needs. |
+
+### CardBody
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `children` | no | `ReactNode` | - | The text. Several paragraphs are spaced by the caller. |
+
+### CardFooter
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `children` | no | `ReactNode` | - | The actions, in a row that wraps when the card is narrow. |
+
+### CardSkeleton
+
+This part takes no design props of its own.
+
+Anything else is passed to the element each part draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
 

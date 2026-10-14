@@ -106,7 +106,7 @@ describe('DrawerClose with content is that control, not the x', () => {
 
   it('with render and children that draw nothing, the control keeps the label it brought', async () => {
     const { inFooter } = await withFooter(<DrawerClose render={<Button>Cancel</Button>}>{false}</DrawerClose>)
-    expect(inFooter?.innerHTML).toBe('<span class="truncate min-w-0">Cancel</span>')
+    expect(inFooter?.innerHTML).toBe('<span dir="auto" class="truncate min-w-0">Cancel</span>')
   })
 })
 
@@ -119,7 +119,7 @@ describe('DrawerTrigger with children that draw nothing', () => {
         <DrawerPopup><DrawerHeader><DrawerTitle>Sheet</DrawerTitle></DrawerHeader></DrawerPopup>
       </DrawerRoot>,
     )
-    expect(screen.getByRole('button', { name: 'Open' }).innerHTML).toBe('<span class="truncate min-w-0">Open</span>')
+    expect(screen.getByRole('button', { name: 'Open' }).innerHTML).toBe('<span dir="auto" class="truncate min-w-0">Open</span>')
   })
 
   it('and a Button with no label of its own takes the one written on the trigger, in a client file', () => {
@@ -129,6 +129,6 @@ describe('DrawerTrigger with children that draw nothing', () => {
         <DrawerPopup><DrawerHeader><DrawerTitle>Sheet</DrawerTitle></DrawerHeader></DrawerPopup>
       </DrawerRoot>,
     )
-    expect(screen.getByRole('button', { name: 'Open' }).innerHTML).toBe('<span class="truncate min-w-0">Open</span>')
+    expect(screen.getByRole('button', { name: 'Open' }).innerHTML).toBe('<span dir="auto" class="truncate min-w-0">Open</span>')
   })
 })
