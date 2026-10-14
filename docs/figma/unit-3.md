@@ -171,8 +171,8 @@ Conventions Unit 2 settled, which this file follows:
 - **`client.tsx` is markup.** No `useState`, `useEffect`, `useRef`, `useMemo` or
   `useCallback` (`R-5.12-1`). A part that needs state, a label or the direction calls one
   `use<Name>...()` from `hook.ts`, and `useLabels()`, `useDirection()` and
-  `useControllableState()` are called there. A component whose state is all Base UI's has
-  no `hook.ts`.
+  `useControllableState()` are called there. A portaled part still has a `hook.ts`, for
+  `usePortalLocale()`, even when its state is all Base UI's (Tooltip does).
 - **Types are derived at the seam** (`R-5.7-5`): `Omit<Base.X.Props, 'className'>` plus a
   string `className`, as `tooltip/types.ts` does. Every Base UI prop passes through
   untouched. A Build this block lists only the props we add or change.

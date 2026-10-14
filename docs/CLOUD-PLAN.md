@@ -155,8 +155,8 @@ Ten components per unit, three or four worktrees running at a time. See Appendix
 **Tooltip.** One worktree, no parallel work beside it, highest care. It is the second
 template, so it decides the shape of every client component after it: `'use client'`,
 `client.tsx`, an `index.tsx` that only re-exports, and a hydration test. Base UI holds its
-state, so it has no `hook.ts` and no `lib.tsx` (`R-8.1-1`); the first component with state
-of its own settles those. It does not need `zod/mini`: `clamp()` covers its two delays.
+state, so it has no `lib.tsx` (`R-8.1-1`); its `hook.ts` only reads the portal's direction
+and language (`usePortalLocale`). It does not need `zod/mini`: `clamp()` covers its two delays.
 
 It is also the first component to use `shared/floating.ts`, which already exists and has
 never been exercised: the `placement` prop mapping to Base UI's `side` and `align`
@@ -392,8 +392,9 @@ they will happen again.
 **Tailwind and CSS**
 
 5. **`outline-none` sets `--tw-outline-style: none`,** which the width utility then
-   substitutes, so a focus ring paints nothing. `FOCUS_RING` uses `outline-hidden` plus
-   `focus-visible:outline-solid`. Verified in a real browser: 0 ring pixels before the
+   substitutes, so a focus ring paints nothing. `FOCUS_RING` uses `outline-none` plus
+   `focus-visible:outline-solid` (not `outline-hidden`: under forced colours it rings every
+   control at rest). Verified in a real browser: 0 ring pixels before the
    fix, 592 after. The e2e spec exists because the unit tests could not see it.
 6. **`@theme inline` stops Tailwind emitting the declaration.** Putting
    `--default-transition-duration` inside `@theme inline` killed every transition while
