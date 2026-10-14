@@ -31,7 +31,7 @@ describe('on the server', () => {
     for (const button of segments(html)) {
       expect(button).toMatch(/^<button data-(un)?checked="" type="button" tabindex="-?[01]" role="radio" aria-checked="(true|false)" /)
     }
-    expect(html).toContain('<span class="truncate min-w-0">Table</span></button><input type="radio"')
+    expect(html).toContain('<span dir="auto" class="truncate min-w-0">Table</span></button><input type="radio"')
   })
 
   it('one tab stop, on the segment of the default value; the others are -1 as Base UI serves them', () => {
@@ -155,7 +155,7 @@ describe('on the server', () => {
         <SegmentedControlItem value="b" icon={null}>B</SegmentedControlItem>
       </SegmentedControlRoot>,
     )
-    expect(html).toContain('<span class="flex shrink-0"><i></i></span><span class="truncate min-w-0">A</span>')
+    expect(html).toContain('<span class="flex shrink-0"><i></i></span><span dir="auto" class="truncate min-w-0">A</span>')
     expect(html).toContain('aria-checked="false" id="')
     expect(html.match(/flex shrink-0"/g)).toHaveLength(1)
   })
