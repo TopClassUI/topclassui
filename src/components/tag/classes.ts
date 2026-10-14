@@ -1,5 +1,6 @@
 /** R-5.12-4: Tag's own class tables. A chip is tighter than a control, so its size
  * table is its own, and a tag is only ever drawn on the soft pair of its tone. */
+import { HOVER, ICON_BUTTON, LABEL } from '#shared/classes.js'
 import type { Size } from '#shared/contracts/size.js'
 import type { Tone } from '#shared/contracts/tone.js'
 
@@ -25,5 +26,39 @@ export const TAG_SIZE = {
   md: 'px-3 py-pad-y-md gap-2 text-sm',
   lg: 'px-4 py-pad-y-lg gap-2 text-base',
   xl: 'px-5 py-pad-y-xl gap-3 text-lg',
+  custom: '',
+} as const satisfies Record<Size, string>
+
+// The removable tag: its label clips itself, so the chip stops clipping and never cuts the ring of its button.
+
+/** A label column that starts at 0, so a long label never sets the least width of a flex column or a table cell. */
+export const REMOVABLE = 'inline-grid grid-cols-[minmax(0,auto)_auto] overflow-visible'
+
+/** The end padding drops to the block padding, as drawn: the button brings its own room. */
+export const REMOVABLE_END = {
+  xs: 'pe-pad-y-xs',
+  sm: 'pe-pad-y-sm',
+  md: 'pe-pad-y-md',
+  lg: 'pe-pad-y-lg',
+  xl: 'pe-pad-y-xl',
+  custom: '',
+} as const satisfies Record<Size, string>
+
+/** The one element that holds the label and names the button; an icon in it keeps the gap of the chip. */
+export const TAG_LABEL = `${LABEL} flex items-center gap-[inherit]`
+
+/** Forced colours erase the hover tint, so a hovered x takes the system pair and paints it itself. */
+export const REMOVE_FORCED = 'forced-colors:hover:forced-color-adjust-none forced-colors:hover:bg-[Highlight] forced-colors:hover:text-[HighlightText]'
+
+/** The x: a 24 px target, 44 under a finger, on the tint of its own tag. */
+export const TAG_REMOVE = `${ICON_BUTTON} ${HOVER.soft} ${REMOVE_FORCED}`
+
+/** The button reaches over the block padding and the border, so it sets the height only where it is taller. */
+export const REMOVE_SIZE = {
+  xs: '-my-[calc(var(--spacing-pad-y-xs)+var(--tc-line-width))]',
+  sm: '-my-[calc(var(--spacing-pad-y-sm)+var(--tc-line-width))]',
+  md: '-my-[calc(var(--spacing-pad-y-md)+var(--tc-line-width))]',
+  lg: '-my-[calc(var(--spacing-pad-y-lg)+var(--tc-line-width))]',
+  xl: '-my-[calc(var(--spacing-pad-y-xl)+var(--tc-line-width))]',
   custom: '',
 } as const satisfies Record<Size, string>

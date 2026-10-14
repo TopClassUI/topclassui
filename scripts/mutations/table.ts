@@ -146,4 +146,10 @@ export const MUTATIONS: Mutation[] = [
     from: 'skeletonRowsMax: 500',
     to: 'skeletonRowsMax: 100',
   },
+  {
+    label: 'the table skeleton bars lose their forced-colours edge, so a loading table is an empty box there',
+    file: 'src/components/table/classes.ts',
+    from: ' motion-reduce:animate-none ${FORCED_EDGE}`',
+    to: ' motion-reduce:animate-none`',
+  },
 ]

@@ -2,20 +2,27 @@
 
 import { createContext, useContext, useImperativeHandle, useRef } from 'react'
 
+import { useOverlayRoot, useOverlayScope } from '#shared/overlay-scope.js'
 import { useLabels } from '#shared/provider/context.js'
 import { usePortalLocale } from '#shared/provider/use-portal-locale.js'
 import { useScrollTabStop } from '#shared/use-scroll-tab-stop.js'
 import { DIALOG_DEFAULTS } from './constants.js'
-import type { DialogBodyProps, DialogModal } from './types.js'
+import type { DialogBodyProps, DialogModal, DialogRootProps } from './types.js'
 
 /** How modal the nearest DialogRoot is. The root provides it, because Base UI tells the popup
  * nothing: only a dialog that blocks the page may dim it and catch its presses. */
 export const DialogModalContext = createContext(DIALOG_DEFAULTS.modal as DialogModal)
 
+/** What DialogRoot hands on: its scope, and the Escape guard that looks inside its own popup only,
+ * so a dialog nested in another still closes once focus is back on its trigger. */
+export function useDialogRoot(onOpenChange: DialogRootProps['onOpenChange']) {
+  return useOverlayRoot(onOpenChange)
+}
+
 /** What DialogPopup reads: the dir and the lang of the provider, which its portal in the body
- * cannot inherit and its viewport therefore carries, and how modal its root is. */
+ * cannot inherit and its viewport therefore carries, how modal its root is, and the root's scope. */
 export function useDialogPopup() {
-  return { ...usePortalLocale(), modal: useContext(DialogModalContext) }
+  return { ...usePortalLocale(), modal: useContext(DialogModalContext), scope: useOverlayScope() }
 }
 
 /** The body's own ref, which the caller's ref follows, and the tabIndex it needs: 0 only while
