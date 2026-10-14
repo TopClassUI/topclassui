@@ -46,9 +46,12 @@ describe('the props follow the vocabulary', () => {
   it('has none of the props the spec leaves unbuilt', () => {
     expectTypeOf<Accepts<keyof TagProps, 'variant'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof TagProps, 'removable'>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<keyof TagProps, 'onRemove'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof TagProps, 'truncate'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof TagProps, 'disabled'>>().toEqualTypeOf<false>()
+  })
+
+  it('takes onRemove, a handler that is given nothing: the handler is the switch, not a removable boolean', () => {
+    expectTypeOf<TagProps['onRemove']>().toEqualTypeOf<(() => void) | undefined>()
   })
 })
 

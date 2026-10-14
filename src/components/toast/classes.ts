@@ -1,0 +1,71 @@
+// R-5.12-4: one class string per element Toast styles, built from the shared overlay constants.
+import {
+  FADE_MOTION, FOCUS_RING, FOCUS_RING_INSET, HOVER, ICON_BUTTON, OVERLAY_SURFACE, POPUP_PASSIVE, SCROLL_AREA,
+  VIEWPORT_PASSIVE,
+} from '#shared/classes.js'
+import type { ToastIconType, ToastPlacement } from './types.js'
+
+/** A column on the toast layer, 360 px wide or the screen. It lets every press through where no toast is, and
+ * scrolls itself when its toasts are taller than the screen. F6 focuses it, so its ring is drawn inside its padding. */
+export const TOAST_VIEWPORT = `fixed z-(--tc-z-toast) flex max-h-dvh w-90 max-w-full gap-2 p-(--tc-overlay-inset) ${SCROLL_AREA} ${FOCUS_RING_INSET} ${VIEWPORT_PASSIVE}`
+
+/** Base UI lists the newest first, so the column runs away from the edge: the newest toast is the nearest. */
+const TOP = 'top-0 flex-col pt-[calc(var(--tc-overlay-inset)+var(--tc-safe-top))]'
+const BOTTOM = 'bottom-0 flex-col-reverse pb-[calc(var(--tc-overlay-inset)+var(--tc-safe-bottom))]'
+
+/** R-5.3-1: the block edge and the inline side, logical, so start and end swap sides in RTL. */
+export const TOAST_PLACEMENT = {
+  'top-start': `${TOP} inset-s-0`,
+  top: `${TOP} inset-x-0 mx-auto`,
+  'top-end': `${TOP} inset-e-0`,
+  'bottom-start': `${BOTTOM} inset-s-0`,
+  bottom: `${BOTTOM} inset-x-0 mx-auto`,
+  'bottom-end': `${BOTTOM} inset-e-0`,
+} as const satisfies Record<ToastPlacement, string>
+
+/** Base UI moves a held toast by an inline transform and leaves these two once it lets go, so the toast rests
+ * on a transform too: on the translate property the two would add up, twice the finger's travel. */
+const FOLLOW = 'transform-[translate(var(--toast-swipe-movement-x,0px),var(--toast-swipe-movement-y,0px))] data-swiping:select-none'
+
+/** One toast: the raised surface, the fade, a row of icon, text and x. It takes presses inside a viewport that
+ * lets them through, and a toast past the limit stays mounted but is not drawn. */
+export const TOAST_ROOT = [
+  `${OVERLAY_SURFACE} ${FADE_MOTION} ${FOCUS_RING} ${POPUP_PASSIVE}`,
+  'flex shrink-0 items-start gap-3 px-4 py-3.5 wrap-anywhere data-limited:hidden',
+  FOLLOW,
+].join(' ')
+
+/** The icon sits on the first line of the title, and its colour is on this box, never on the svg. */
+export const TOAST_ICON = 'flex h-5 shrink-0 items-center'
+
+/** R-5.2-3: the on-soft colour of each tone that has an icon; a toast that waits is muted. */
+export const TOAST_ICON_TONE = {
+  success: 'text-success-on-soft',
+  danger: 'text-danger-on-soft',
+  error: 'text-danger-on-soft',
+  warning: 'text-warning-on-soft',
+  info: 'text-info-on-soft',
+  loading: 'text-muted',
+} as const satisfies Record<ToastIconType, string>
+
+/** Only the spinner turns, and not at all for a reader who asked for less motion. */
+export const TOAST_ICON_SVG = {
+  success: '',
+  danger: '',
+  error: '',
+  warning: '',
+  info: '',
+  loading: 'animate-spin motion-reduce:animate-none',
+} as const satisfies Record<ToastIconType, string>
+
+export const TOAST_CONTENT = 'flex min-w-0 flex-1 flex-col gap-0.5'
+
+export const TOAST_TITLE = 'text-sm font-semibold text-body'
+
+export const TOAST_DESCRIPTION = 'text-sm text-muted wrap-anywhere'
+
+/** A small outline button under the text. A long label wraps onto more lines instead of leaving the toast. */
+export const TOAST_ACTION = 'mt-2 self-start h-auto min-h-control-sm whitespace-normal py-1 text-start'
+
+/** The x: an icon button on the neutral ramp, so its hover is the ghost tint. */
+export const TOAST_CLOSE = `${ICON_BUTTON} text-muted tone-neutral ${HOVER.ghost}`

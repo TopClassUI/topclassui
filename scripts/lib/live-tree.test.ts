@@ -2,7 +2,7 @@ import { createElement } from 'react'
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 
-import { useDirection, useLabels, useLocale } from '#shared/provider/context.js'
+import { useDirection, useLabels, useLocale, useToastSettings } from '#shared/provider/context.js'
 import { liveTree } from './live-tree.js'
 
 /** A demo that prints what the provider above it says, as a client component would read it. */
@@ -22,5 +22,16 @@ describe('the tree a live page renders and hydrates', () => {
     expect(withCallback).toBe(renderToString(liveTree(Probe, 'ltr', 'en')))
     // No effect runs on the server: the flag is the browser's to set.
     expect(called).toBe(0)
+  })
+})
+
+describe('the toast placement a page asks for', () => {
+  function Placement() {
+    return createElement('p', null, useToastSettings().placement)
+  }
+
+  it('reaches the provider the page mounts, and the default stays when none is asked for', () => {
+    expect(renderToString(liveTree(Placement, 'ltr', 'en', undefined, 'top-start'))).toContain('<p>top-start</p>')
+    expect(renderToString(liveTree(Placement, 'ltr', 'en'))).toContain('<p>bottom-end</p>')
   })
 })
