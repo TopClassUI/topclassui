@@ -340,15 +340,20 @@ test.describe('motion', () => {
     await expect(xOf(release(page))).toHaveCSS('transition-duration', '0.15s')
   })
 
-  test.describe('reduced', () => {
-    test.use({ reducedMotion: 'reduce' })
+  // One element, both settings: an x with no transition at all is 0 s too, so the 150 ms is what makes this a test.
+  test('the same x transitions its colours over 150 ms, then at once under prefers-reduced-motion, and still dismisses', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' })
+    await openLive(page, DEMO)
+    const x = xOf(release(page))
+    const PROPERTIES = 'color, background-color, border-color, outline-color, opacity, translate'
+    await expect(x).toHaveCSS('transition-property', PROPERTIES)
+    await expect(x).toHaveCSS('transition-duration', '0.15s')
 
-    test('with prefers-reduced-motion it changes at once, and the x still dismisses', async ({ page }) => {
-      await openLive(page, DEMO)
-      await expect(xOf(release(page))).toHaveCSS('transition-duration', '0s')
-      await xOf(release(page)).click()
-      await expect(release(page)).toHaveCount(0)
-    })
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await expect(x).toHaveCSS('transition-property', PROPERTIES)
+    await expect(x).toHaveCSS('transition-duration', '0s')
+    await x.click()
+    await expect(release(page)).toHaveCount(0)
   })
 })
 
