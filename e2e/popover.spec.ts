@@ -527,7 +527,8 @@ test.describe('the page stays live', () => {
   test('the page behind is read by a screen reader and none of it is hidden, and nothing dims it', async ({ page }) => {
     await open(page, 'popover--basic')
     const lock = await pageLock(page)
-    expect(lock.reachable).toEqual(['h1', 'main', 'pre', 'portal'])
+    // The first portal is the toast region TopClassProvider mounts on every page, which a modal leaves readable.
+    expect(lock.reachable).toEqual(['h1', 'main', 'pre', 'portal', 'portal'])
     expect(lock.body).toBeNull()
     await expect(page.getByRole('button', { name: 'Share' })).toHaveCount(1)
     // The portal holds the positioner and Base UI's focus guards, and no layer over the page.
