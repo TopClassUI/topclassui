@@ -11,7 +11,7 @@ describe('the catalog row', () => {
       category: 'media-and-display',
       tier: 2,
       status: 'beta',
-      rendering: 'server',
+      rendering: 'split',
       baseUi: null,
       baseUiRange: null,
       optionalDeps: [],

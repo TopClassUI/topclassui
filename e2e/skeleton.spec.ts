@@ -8,12 +8,16 @@ import { FORCED_CANVAS, inkOn, pixelsOf } from './pixels.js'
 // shared Skeleton, ButtonSkeleton and CardSkeleton painted nothing at all there: a page that
 // was loading looked empty. A class list cannot see that, nor that the line they keep is painted.
 
-/** Each page and the shapes on it, written out: three rows and three shapes, 1 + 3 + 5 rows, three buttons, two cards. */
+/** Each page and the shapes on it, written out: three rows and three shapes, 1 + 3 + 5 rows, three buttons, two cards,
+ * four fields, and a table of four columns: four header bars and sixteen cell bars. The field keeps the transparent
+ * border of the field it stands for, which forced colours paint: an outline beside it would draw the edge twice. */
 const PAGES = [
-  { demo: 'skeleton--variants', shapes: 6 },
-  { demo: 'skeleton--rows', shapes: 9 },
-  { demo: 'button--skeleton', shapes: 3 },
-  { demo: 'card--skeleton', shapes: 2 },
+  { demo: 'skeleton--variants', shapes: 6, line: 'outline' },
+  { demo: 'skeleton--rows', shapes: 9, line: 'outline' },
+  { demo: 'button--skeleton', shapes: 3, line: 'outline' },
+  { demo: 'card--skeleton', shapes: 2, line: 'outline' },
+  { demo: 'input--skeleton', shapes: 4, line: 'border' },
+  { demo: 'table--skeleton', shapes: 20, line: 'outline' },
 ] as const
 
 const SHAPES = '#demo .animate-pulse'
@@ -23,17 +27,22 @@ const outlines = (elements: Element[]) => elements.map((el) => {
   return style.outlineStyle === 'none' ? 'none' : `${style.outlineStyle} ${style.outlineWidth}`
 })
 
+const borders = (elements: Element[]) => elements.map((el) => {
+  const style = getComputedStyle(el)
+  return style.borderTopStyle === 'none' ? 'none' : `${style.borderTopStyle} ${style.borderTopWidth}`
+})
+
 for (const scheme of ['light', 'dark'] as const) {
   test.describe(`forced colours, ${scheme} palette`, () => {
     test.use({ forcedColors: 'active', colorScheme: scheme })
 
-    for (const { demo, shapes } of PAGES) {
+    for (const { demo, shapes, line: kept } of PAGES) {
       test(`${demo}: every shape keeps a line once its fill is gone, and the line is painted`, async ({ page }) => {
         await page.goto(urlFor(demo, 'light', 'ltr'))
         expect(await page.evaluate(() => matchMedia('(forced-colors: active)').matches)).toBe(true)
-        const found = await page.locator(SHAPES).evaluateAll(outlines)
+        const found = await page.locator(SHAPES).evaluateAll(kept === 'outline' ? outlines : borders)
         expect(found).toHaveLength(shapes)
-        for (const outline of found) expect(outline).toBe('solid 1px')
+        for (const edge of found) expect(edge).toBe('solid 1px')
 
         // The pixels too: a computed outline can still paint nothing, or paint the canvas colour.
         for (const shape of await page.locator(SHAPES).all()) {
