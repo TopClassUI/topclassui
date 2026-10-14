@@ -2,6 +2,7 @@
 import type { ComponentType } from 'react'
 import { hydrateRoot } from 'react-dom/client'
 
+import type { ToastPlacement } from '#shared/contracts/toast.js'
 import type { Direction } from './harness.js'
 import { liveTree } from './live-tree.js'
 
@@ -19,11 +20,11 @@ declare global {
 }
 
 /** Hydrates the server's markup with the server's tree, and reports what React had to repair. */
-export function hydrateDemo(Demo: ComponentType, direction: Direction, locale: string): void {
+export function hydrateDemo(Demo: ComponentType, direction: Direction, locale: string, toast?: ToastPlacement): void {
   const container = document.getElementById('demo')
   const trap = window.__harness
   if (!container || !trap) throw new Error('harness: the page has no #demo or no error trap to hydrate into')
-  hydrateRoot(container, liveTree(Demo, direction, locale, trap.done), {
+  hydrateRoot(container, liveTree(Demo, direction, locale, trap.done, toast), {
     onRecoverableError: (error) => { trap.fail('hydration', error) },
   })
 }

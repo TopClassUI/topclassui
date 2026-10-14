@@ -73,6 +73,31 @@ test.describe('the same twelve crumbs on a desktop 1280 px wide', () => {
   })
 })
 
+/** Runs in the page: for each label that is cut, its direction and the side its hidden text runs off,
+ * which is the side the ellipsis takes the place of. */
+function cutSides() {
+  return [...document.querySelectorAll('nav li > span, nav li > a > span')].flatMap((label) => {
+    if (label.scrollWidth <= label.clientWidth) return []
+    const box = label.getBoundingClientRect()
+    const range = document.createRange()
+    range.selectNodeContents(label)
+    const text = range.getBoundingClientRect()
+    const side = text.right > box.right + 1 ? 'right' : text.left < box.left - 1 ? 'left' : 'none'
+    return [{ direction: getComputedStyle(label).direction, ellipsis: getComputedStyle(label).textOverflow, side }]
+  })
+}
+
+// dir="auto": an English-first label in an RTL page was cut on its left, the ellipsis eating its start.
+test.describe('a label that starts in English and goes on in Arabic', () => {
+  for (const direction of DIRECTIONS) {
+    test(`${direction} page: both cut labels keep their start and end in an ellipsis on the right`, async ({ page }) => {
+      await page.goto(urlFor('breadcrumb--mixed-label', 'light', direction))
+      const expected = { direction: 'ltr', ellipsis: 'ellipsis', side: 'right' }
+      expect(await page.evaluate(cutSides)).toEqual([expected, expected])
+    })
+  }
+})
+
 /** Runs in the page: which way each caret is painted, and on which side its crumb sits. */
 function carets() {
   return [...document.querySelectorAll('nav li')].flatMap((item) => {

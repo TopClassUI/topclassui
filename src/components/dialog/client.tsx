@@ -5,7 +5,7 @@ import { Dialog as Base } from '@base-ui/react/dialog'
 import { x } from '#icons/data/x.js'
 import { POPUP_PASSIVE, VIEWPORT_PASSIVE } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
-import { guardEscape } from '#shared/overlay.js'
+import { OverlayScopeContext } from '#shared/overlay-scope.js'
 import { hasContent, renderTrigger } from '#shared/render-trigger.js'
 import { Svg } from '#components/svg/index.js'
 import {
@@ -13,7 +13,7 @@ import {
   DIALOG_POPUP, DIALOG_TITLE, DIALOG_VIEWPORT, DIALOG_WIDTH,
 } from './classes.js'
 import { DIALOG_DEFAULTS } from './constants.js'
-import { DialogModalContext, useDialogBody, useDialogClose, useDialogPopup } from './hook.js'
+import { DialogModalContext, useDialogBody, useDialogClose, useDialogPopup, useDialogRoot } from './hook.js'
 import type {
   DialogBodyProps, DialogCloseProps, DialogDescriptionProps, DialogFooterProps, DialogHeaderProps, DialogPopupProps,
   DialogRootProps, DialogTitleProps, DialogTriggerProps,
@@ -21,12 +21,15 @@ import type {
 
 /** Groups one trigger with its popup. It renders no element, so it takes no className,
  * style or ref. Base UI holds the open state, the focus trap and the scroll lock; the root
- * shares modal with its popup, and keeps an Escape meant for a popup inside it from closing it. */
+ * shares modal and its scope with its popup, and keeps an Escape meant for a popup inside it from closing it. */
 export function DialogRoot({ modal = DIALOG_DEFAULTS.modal, onOpenChange, ...props }: DialogRootProps) {
+  const root = useDialogRoot(onOpenChange)
   return (
-    <DialogModalContext value={modal}>
-      <Base.Root {...props} modal={modal} onOpenChange={guardEscape(onOpenChange)} />
-    </DialogModalContext>
+    <OverlayScopeContext value={root.scope}>
+      <DialogModalContext value={modal}>
+        <Base.Root {...props} modal={modal} onOpenChange={root.onOpenChange} />
+      </DialogModalContext>
+    </OverlayScopeContext>
   )
 }
 
@@ -46,7 +49,7 @@ export function DialogPopup({
   className,
   ...rest
 }: DialogPopupProps) {
-  const { dir, lang, modal } = useDialogPopup()
+  const { dir, lang, modal, scope } = useDialogPopup()
   const blocks = modal === true
   return (
     <Base.Portal container={container} keepMounted={keepMounted}>
@@ -55,6 +58,7 @@ export function DialogPopup({
         <Base.Popup
           data-size={size}
           {...rest}
+          data-overlay={scope}
           className={cn(DIALOG_POPUP, !blocks && POPUP_PASSIVE, DIALOG_WIDTH[size], className)}
         />
       </Base.Viewport>
