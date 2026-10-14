@@ -6,9 +6,10 @@ export const meta = {
   slug: 'tag',
   category: 'media-and-display',
   tier: 2,
-  // PLAN 20 is not met until the removable client half, the visual matrix and the docs page exist.
+  // PLAN 20 is not met until the visual matrix and the docs page exist.
   status: 'beta',
-  rendering: 'server',
+  // A plain tag stays on the server; passing onRemove adds the client button.
+  rendering: 'split',
   baseUi: null,
   baseUiRange: null,
   optionalDeps: [],
