@@ -100,8 +100,8 @@ Every prop below is optional and falls back to the default shown.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `aria-label` | no | `string` | - | The name read out when no visible text names the tabs. |
-| `aria-labelledby` | no | `string` | - | The id of the visible text that names the tabs. |
+| `aria-label` | no | `string` | - | The name read out when no visible text names the group. |
+| `aria-labelledby` | no | `string` | - | The id of the visible text that names the group. |
 
 ### TabsPanel
 
