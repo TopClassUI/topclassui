@@ -41,8 +41,8 @@ that checkout. Three passes: the planner's, three reviews of the planner's draft
 final edit that checked each finding before it changed this file and then ran the file's
 own verification again. The scripts are in the lead's handoff folder, under
 `unit-4/scratch-plan/` (the planner's), `unit-4/scratch-baseui/` (the Base UI reader's) and
-`unit-4/scratch-review-forms/` (the forms reviewer's). The final edit's are outside the repo
-as well, and the lead has them.
+`unit-4/scratch-review-forms/` (the forms reviewer's) and `unit-4/scratch-final/` (the final
+edit's).
 
 - **Base UI types.** Every part and prop a Build this block names was read in the installed
   types under `node_modules/@base-ui/react/` and then looked up again by a script: 253 names
@@ -263,7 +263,8 @@ Not checked. Say so in the pull request when one of these turns out wrong:
 - Dropdown and Command are not on the branch that was read. What they settled for a 44 px
   row and for a windowed list is not in this file: read them first if they are merged.
 - Next.js: that a Server Action receives these entries. Bundle sizes (`pnpm size` does not
-  exist). The Arabic strings: this file is ASCII and lists the English ones.
+  exist). The seven Arabic strings of shared pull request 5 were written by the lead and
+  read by no second Arabic speaker: Omar reads them in that pull request.
 
 ## What Units 1 to 3 taught a form control
 
@@ -783,9 +784,25 @@ one before, never two at once.
    | `otp.character` | `Character 2 of 6` | `RatioLabel`: `(place, length, fmt)` |
    | `textarea.count` | `42 of 500 characters` | `RatioLabel`: `(length, max, fmt)` |
 
-   Arabic: to be supplied, for all seven. `ar.ts` is typed `satisfies Labels`, so this pull
-   request needs every one of them; gate 0 of the build order says what the session does
-   while they are missing. Both ratio labels pass both numbers through `fmt`, as
+   Arabic, supplied by the lead on 2026-10-14. This file is ASCII, so each string is
+   written here as `\u` escapes; `ar.ts` takes the real letters, and the lead's handoff
+   folder has them ready to copy in `unit-4/arabic-labels.md`, with the reason for each
+   word. The digits in the two ratio rows stand for the two numbers.
+
+   | Key | Arabic, escaped |
+   |---|---|
+   | `numberField.increase` | `\u0632\u064a\u0627\u062f\u0629` |
+   | `numberField.decrease` | `\u0625\u0646\u0642\u0627\u0635` |
+   | `numberField.field` | `\u062d\u0642\u0644 \u0631\u0642\u0645\u064a` |
+   | `slider.minimum` | `\u0627\u0644\u062d\u062f \u0627\u0644\u0623\u062f\u0646\u0649` |
+   | `slider.maximum` | `\u0627\u0644\u062d\u062f \u0627\u0644\u0623\u0642\u0635\u0649` |
+   | `otp.character` | `\u0627\u0644\u062e\u0627\u0646\u0629 2 \u0645\u0646 6` |
+   | `textarea.count` | `\u0639\u062f\u062f \u0627\u0644\u0623\u062d\u0631\u0641: 42 \u0645\u0646 500` |
+
+   `textarea.count` puts the noun before the numbers ("character count: 42 of 500"): an
+   Arabic noun after a number changes with it, so this is the one order that is right for
+   every pair and needs no `Intl.PluralRules`. `ar.ts` is typed `satisfies Labels`, so this
+   pull request needs all seven. Both ratio labels pass both numbers through `fmt`, as
    `rating.value` and `pagination.pageOf` do. A `src/shared/labels/unit-4.test.ts` like
    `unit-3.test.ts`, and rows in `scripts/mutations/shared-labels.ts`. Labels that exist
    and are used as they are: `select.placeholder` ("Select"), `collection.noResults`
@@ -2421,15 +2438,14 @@ silent:
 
 ## Build order
 
-0. **Gates.** Two things are Omar's, and they are asked before the fresh session starts,
-   not during it: the answers to choices 1 to 4, each of which changes all ten controls,
-   and the seven Arabic strings of shared pull request 5, which that item still marks
-   "to be supplied". Inside the unit the session never waits for Omar. If it starts
-   without the answers it builds the Built as column, as the handoff says of every choice
-   that is his, and every pull request of the unit says in its first line: built on the
-   defaults of `unit-4.md`, choices not answered yet. If it starts while the Arabic is
-   still marked, shared pull request 5 writes the seven strings itself, as the Unit 3
-   label pull request did, and lists them in its description for Omar to correct.
+0. **Gates.** One thing is Omar's, and it is asked before the fresh session starts, not
+   during it: the answers to choices 1 to 4, each of which changes all ten controls.
+   Inside the unit the session never waits for Omar. If it starts without the answers it
+   builds the Built as column, as the handoff says of every choice that is his, and every
+   pull request of the unit says in its first line: built on the defaults of `unit-4.md`,
+   choices not answered yet. The seven Arabic strings of shared pull request 5 are in
+   that item: the pull request copies them and lists them in its description for Omar to
+   correct.
    `docs/CLOUD-PLAN.md` section 6 asks Switch's pull request to bring the recommendation
    on the state props and lets Omar choose: the recommendation is choice 2, Switch's pull
    request repeats it, and a different answer later is a rename in Switch and Checkbox.
