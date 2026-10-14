@@ -55,7 +55,7 @@ describe('a trigger className replaces a conflicting class of a Button rendered 
 
     it(`${form}: the label keeps the truncating span Button wrapped it in`, () => {
       const button = trigger({ render: element('Publish') })
-      expect(button.innerHTML).toBe('<span class="truncate min-w-0">Publish</span>')
+      expect(button.innerHTML).toBe('<span dir="auto" class="truncate min-w-0">Publish</span>')
     })
   }
 
@@ -95,13 +95,13 @@ describe('a PopoverClose className does the same to a Button rendered on the ser
       const button = await close({ className: 'h-control-sm', render: element('Cancel') })
       expect(classes(button)).toContain('h-control-sm')
       expect(classes(button)).not.toContain('h-control-md')
-      expect(button.innerHTML).toBe('<span class="truncate min-w-0">Cancel</span>')
+      expect(button.innerHTML).toBe('<span dir="auto" class="truncate min-w-0">Cancel</span>')
     })
   }
 
   it('a label left on the close reaches a Button written in a client file, which wraps it itself', async () => {
     const button = await close({ render: <Button />, children: 'Cancel' })
-    expect(button.innerHTML).toBe('<span class="truncate min-w-0">Cancel</span>')
+    expect(button.innerHTML).toBe('<span dir="auto" class="truncate min-w-0">Cancel</span>')
   })
 })
 
@@ -124,7 +124,7 @@ describe('a label left on the part survives a Button that ran on the server with
   }
 
   it('only the Button that was given the label wraps it in the span that truncates it', () => {
-    expect(trigger({ render: delivered(Button({ children: 'Publish' })) }).innerHTML).toBe('<span class="truncate min-w-0">Publish</span>')
+    expect(trigger({ render: delivered(Button({ children: 'Publish' })) }).innerHTML).toBe('<span dir="auto" class="truncate min-w-0">Publish</span>')
   })
 })
 

@@ -77,21 +77,43 @@ style, scroll buttons at the ends of a long list, and a `Tabs` built from data.
 ## Import
 
 ```tsx
-import { Tabs } from 'topclassui'
+import {
+  TabsRoot,
+  TabsList,
+  TabsPanel,
+  TabsTab,
+} from 'topclassui'
 ```
 
 ## Props
 
 Every prop below is optional and falls back to the default shown.
 
+### TabsRoot
+
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `className` | no | `string` | - | Merged last, so a consumer class wins a conflict with the part's own. |
-| `keepMounted` | no | `boolean` | `true` | TabsPanel: whether a panel that is not active stays in the HTML, hidden. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | TabsRoot: the height, padding and type step of every tab; custom emits none. |
 | `variant` | no | `line` \| `enclosed` | `"line"` | TabsRoot: line underlines the active tab, enclosed lifts it onto a raised surface. |
 
-Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
+### TabsList
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `aria-label` | no | `string` | - | The name read out when no visible text names the tabs. |
+| `aria-labelledby` | no | `string` | - | The id of the visible text that names the tabs. |
+
+### TabsPanel
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `keepMounted` | no | `boolean` | `true` | TabsPanel: whether a panel that is not active stays in the HTML, hidden. |
+
+### TabsTab
+
+This part takes no design props of its own.
+
+Anything else is passed to the element each part draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
 

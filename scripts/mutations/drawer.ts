@@ -47,8 +47,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the drawer popup hook reads the direction of its provider and forgets the language',
     file: HOOK,
-    from: 'return { ...usePortalLocale(), ...useContext(DrawerContext) }',
-    to: 'return { dir: usePortalLocale().dir, lang: undefined, ...useContext(DrawerContext) }',
+    from: 'return { ...usePortalLocale(), ...useContext(DrawerContext),',
+    to: 'return { dir: usePortalLocale().dir, lang: undefined, ...useContext(DrawerContext),',
   },
   {
     label: 'the drawer body is a tab stop whether or not it scrolls, so Tab stops on every one-line body',
@@ -95,8 +95,32 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the drawer root drops its Escape guard, so one key closes a tooltip opened by hover and the sheet under it',
     file: CLIENT,
-    from: 'onOpenChange={guardEscape(onOpenChange)}',
+    from: 'onOpenChange={root.onOpenChange}',
     to: 'onOpenChange={onOpenChange}',
+  },
+  {
+    label: 'the lifted escape scope never reaches the drawer popup, so its guard looks for a sheet that is not there',
+    file: CLIENT,
+    from: '          data-overlay={scope}\n',
+    to: '',
+  },
+  {
+    label: 'the lifted escape scope is written before the rest props of the drawer popup, so a data-overlay of the caller breaks its guard',
+    file: CLIENT,
+    from: '          {...rest}\n          data-overlay={scope}\n',
+    to: '          data-overlay={scope}\n          {...rest}\n',
+  },
+  {
+    label: 'the lifted escape scope of a drawer root is not handed to its popup, so every sheet carries an empty one',
+    file: CLIENT,
+    from: '<OverlayScopeContext value={root.scope}>',
+    to: '<OverlayScopeContext value="">',
+  },
+  {
+    label: 'the drawer popup hook forgets the scope of its root, so the sheet writes no data-overlay for the guard to find',
+    file: HOOK,
+    from: '...useContext(DrawerContext), scope: useOverlayScope() }',
+    to: '...useContext(DrawerContext) }',
   },
   {
     label: 'the drawer viewport loses the direction of its provider, so the sheet of an RTL island is laid out left to right',

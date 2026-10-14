@@ -297,3 +297,21 @@ describe('the live page', () => {
     ])
   })
 })
+
+describe('the toast placement of a page', () => {
+  it('is a parameter a route carries and reads back', () => {
+    expect(routeFor('toast--basic', 'light', 'rtl', { toast: 'top-start' })).toBe('/toast--basic--light--rtl.html?toast=top-start')
+    expect(parseRoute('/toast--basic--light--rtl.html?toast=top-start'))
+      .toEqual({ demo: 'toast--basic', mode: 'light', direction: 'rtl', edge: null, tall: false, toast: 'top-start' })
+  })
+
+  it('refuses a placement outside the six, and a physical side', () => {
+    expect(parseRoute('/toast--basic--light--ltr.html?toast=bottom-right'))
+      .toEqual({ error: 'the toast placement "bottom-right" is not one of top-start, top, top-end, bottom-start, bottom, bottom-end' })
+  })
+
+  it('reaches the hydration call only when the page names one, so every other page hydrates as before', () => {
+    expect(hydrateScript({ demo: 'toast--basic', direction: 'ltr', toast: 'top' })).toContain('hydrateDemo(Demo, "ltr", "en", "top")')
+    expect(hydrateScript({ demo: 'toast--basic', direction: 'ltr' })).toContain('hydrateDemo(Demo, "ltr", "en")')
+  })
+})
