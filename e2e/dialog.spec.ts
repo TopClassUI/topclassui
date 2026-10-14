@@ -811,6 +811,25 @@ test.describe('a popup inside the dialog', () => {
       await expect(triggerOf(page, 'Share')).toBeFocused()
     })
   }
+
+  // The inner trigger sits in the outer popup and is itself open: a guard that read the role of every dialog found it
+  // there and cancelled the inner close, so the key closed nothing. Each root now looks inside its own popup only.
+  test('a dialog nested in a dialog, focus back on its trigger: the first Escape closes it, the second the outer one', async ({ page }) => {
+    await openLive(page, 'separator--horizontal')
+    await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/dialog-nested.tsx' })
+    const inner = page.locator('button').filter({ hasText: 'Rename' })
+    const titles = () => page.locator('[role="dialog"][data-open] h2').allTextContents()
+    await openOverlay(page, page.locator('#nested-dialog button').filter({ hasText: 'Settings' }), { by: 'keyboard' })
+    await openOverlay(page, inner, { by: 'keyboard' })
+    expect(await titles()).toEqual(['Project settings', 'Rename this project'])
+    await page.keyboard.press('Shift+Tab')
+    await expect(inner).toBeFocused()
+
+    await page.keyboard.press('Escape')
+    await expect.poll(titles).toEqual(['Project settings'])
+    await page.keyboard.press('Escape')
+    await expect.poll(titles).toEqual([])
+  })
 })
 
 test.describe('direction', () => {
