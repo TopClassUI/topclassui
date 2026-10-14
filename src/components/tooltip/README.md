@@ -43,20 +43,36 @@ Button is loading.
 ## Import
 
 ```tsx
-import { Tooltip } from 'topclassui'
+import {
+  TooltipRoot,
+  TooltipPopup,
+  TooltipTrigger,
+} from 'topclassui'
 ```
 
 ## Props
 
 Every prop below is optional and falls back to the default shown.
 
+### TooltipRoot
+
+This part takes no design props of its own.
+
+### TooltipPopup
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `children` | no | `TooltipText \| readonly TooltipText[]` | - | Text only, never an element: a link or a control belongs in a Popover (R-10.5-2). |
+| `placement` | no | `top` \| `top-start` \| `top-end` \| `bottom` \| `bottom-start` \| `bottom-end` \| `start` \| `start-top` \| `start-bottom` \| `end` \| `end-top` \| `end-bottom` | `"top"` | TooltipPopup: the side and alignment it opens at; start and end mirror in Arabic. |
+
+### TooltipTrigger
+
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
 | `closeDelay` | no | `number`, min 0, max 10000 | `0` | TooltipTrigger: milliseconds it stays open after the pointer leaves, clamped. |
 | `delay` | no | `number`, min 0, max 10000 | `600` | TooltipTrigger: milliseconds of hover before it opens, clamped to the limits. |
-| `placement` | no | `top` \| `top-start` \| `top-end` \| `bottom` \| `bottom-start` \| `bottom-end` \| `start` \| `start-top` \| `start-bottom` \| `end` \| `end-top` \| `end-bottom` | `"top"` | TooltipPopup: the side and alignment it opens at; start and end mirror in Arabic. |
 
-Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
+`TooltipRoot` draws no element, so it takes no `className`, `style` or `ref`. Anything else on another part is passed to the element it draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
 

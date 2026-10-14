@@ -82,20 +82,32 @@ closed), `variant`, a data-driven `Accordion`, one `headingLevel` for a whole ro
 ## Import
 
 ```tsx
-import { Accordion } from 'topclassui'
+import {
+  AccordionRoot,
+  AccordionItem,
+} from 'topclassui'
 ```
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `title` on `AccordionItem`, `value` on `AccordionItem`. Every other prop below is optional.
+
+### AccordionRoot
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `className` | no | `string` | - | Merged last, so a consumer class wins a conflict with the part's own. |
-| `headingLevel` | no | `integer`, min 2, max 6 | `3` | AccordionItem: the level of the heading its trigger sits in, clamped to h2 through h6. |
 | `hiddenUntilFound` | no | `boolean` | `true` | AccordionRoot: closed panels stay in the HTML, where find-in-page and a crawler read them. |
 
-Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
+### AccordionItem
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `title` | **yes** | `ReactNode` | - | The text of the trigger. It sits inside a button: text and inline elements, never a link or a control. |
+| `value` | **yes** | `string` | - | The name of this item in the root's value and defaultValue. |
+| `children` | no | `ReactNode` | - | What the panel holds. It stays in the HTML while the panel is closed. |
+| `headingLevel` | no | `integer`, min 2, max 6 | `3` | AccordionItem: the level of the heading its trigger sits in, clamped to h2 through h6. |
+
+Anything else is passed to the element each part draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
 

@@ -5,7 +5,7 @@ import { Drawer as Base } from '@base-ui/react/drawer'
 import { x } from '#icons/data/x.js'
 import { POPUP_PASSIVE, VIEWPORT_PASSIVE } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
-import { guardEscape } from '#shared/overlay.js'
+import { OverlayScopeContext } from '#shared/overlay-scope.js'
 import { hasContent, renderTrigger } from '#shared/render-trigger.js'
 import { Svg } from '#components/svg/index.js'
 import {
@@ -30,11 +30,13 @@ export function DrawerRoot({
   onOpenChange,
   ...props
 }: DrawerRootProps) {
-  const root = useDrawerRoot(placement, size, modal)
+  const root = useDrawerRoot(placement, size, modal, onOpenChange)
   return (
-    <DrawerContext value={root.settings}>
-      <Base.Root {...props} modal={modal} swipeDirection={root.swipeDirection} onOpenChange={guardEscape(onOpenChange)} />
-    </DrawerContext>
+    <OverlayScopeContext value={root.scope}>
+      <DrawerContext value={root.settings}>
+        <Base.Root {...props} modal={modal} swipeDirection={root.swipeDirection} onOpenChange={root.onOpenChange} />
+      </DrawerContext>
+    </OverlayScopeContext>
   )
 }
 
@@ -48,7 +50,7 @@ export function DrawerTrigger({ className, render, ...rest }: DrawerTriggerProps
  * viewport carries the dir and the lang of the provider, which a portal cannot inherit. A bottom
  * sheet starts with its grabber, and every sheet ends with the x: a swipe is a drag (WCAG 2.5.7). */
 export function DrawerPopup({ container, keepMounted, className, children, ...rest }: DrawerPopupProps) {
-  const { dir, lang, placement, size, modal } = useDrawerPopup()
+  const { dir, lang, placement, size, modal, scope } = useDrawerPopup()
   const blocks = modal === true
   const portal = (
     <Base.Portal container={container} keepMounted={keepMounted}>
@@ -62,6 +64,7 @@ export function DrawerPopup({ container, keepMounted, className, children, ...re
           data-placement={placement}
           data-size={size}
           {...rest}
+          data-overlay={scope}
           className={cn(
             DRAWER_POPUP, DRAWER_EDGE[placement], isSideSheet(placement) && DRAWER_WIDTH[size], !blocks && POPUP_PASSIVE, className,
           )}
