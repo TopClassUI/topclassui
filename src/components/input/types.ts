@@ -1,5 +1,6 @@
 import type { ComponentPropsWithRef } from 'react'
 
+import type { ControlName } from '#shared/contracts/name.js'
 import type { InputSchemaInput } from './schema.js'
 
 // R-8.3-4: derived from the schema, so the props and the validation cannot drift apart.
@@ -14,25 +15,7 @@ export type InputVariantProps = Pick<InputDesignProps, 'size' | 'fullWidth'> & {
 }
 
 /** R-5.6-1: an input renders no text of its own, so a caller names it one of three ways. */
-export type InputName =
-  | {
-    /** The id a `<label htmlFor>` points at. */
-    id: string
-    'aria-label'?: string | undefined
-    'aria-labelledby'?: string | undefined
-  }
-  | {
-    id?: string | undefined
-    /** The name read out when no visible label names the input. */
-    'aria-label': string
-    'aria-labelledby'?: string | undefined
-  }
-  | {
-    id?: string | undefined
-    'aria-label'?: string | undefined
-    /** The id of the visible text that names the input. */
-    'aria-labelledby': string
-  }
+export type InputName = ControlName
 
 /** A void element, the native `size` (a width in characters) and the cap this widens. */
 type Owned = 'children' | 'dangerouslySetInnerHTML' | 'size' | 'maxLength'
