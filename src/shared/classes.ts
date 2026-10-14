@@ -178,3 +178,58 @@ export const TOGGLE_ON = 'group-data-checked/toggle:border-primary-solid group-d
 
 /** Invalid: red and thicker, as on Input. The compound class makes it win over checked. */
 export const TOGGLE_INVALID = 'group-aria-invalid/toggle:border-danger-solid group-aria-invalid/toggle:group-data-checked/toggle:border-danger-solid group-aria-invalid/toggle:inset-ring-[calc(var(--tc-ring-width)-var(--tc-line-width))] group-aria-invalid/toggle:inset-ring-danger-solid forced-colors:group-aria-invalid/toggle:border-(length:--tc-ring-width)'
+
+// Unit 4: the fields. Input's own strings, lifted so the fields of Unit 4 share them; Input reads them under its old names.
+
+/** The height of a target alone, for a field whose width may shrink. */
+export const TARGET_HEIGHT = 'min-h-[var(--tc-target-min,24px)] pointer-coarse:min-h-[var(--tc-target-coarse,44px)]'
+
+/** iOS Safari zooms the page when a focused field's text is under 16 CSS px. */
+export const FIELD_TEXT_COARSE = 'pointer-coarse:text-[max(1rem,16px)]'
+
+/** A percentage with a cap, which a flex row can shrink. fullWidth replaces it with w-full. For a field the browser gives a width: an input, a textarea, or a box that holds nothing else. */
+export const FIELD_OWN_WIDTH = 'w-[min(100%,var(--tc-input-width))]'
+
+/** The same width for a box with no width of its own, on a grid or an inline grid: one column that may shrink to nothing and grows to an Input. A parent that sizes to its content counts the box as an Input wide, and a narrow track still shrinks it. */
+export const FIELD_HOLDER = 'w-fit max-w-full grid-cols-[minmax(0,var(--tc-input-width))]'
+
+/** fullWidth, merged after it by cn(): w-full replaces w-fit and the column fills the box. */
+export const FIELD_HOLDER_FULL = 'w-full grid-cols-1'
+
+/** Thicker as well as red (WCAG 1.4.1). Forced colours drop shadows, so there the line grows. */
+export const FIELD_INVALID = 'aria-invalid:border-danger-solid aria-invalid:inset-ring-[calc(var(--tc-ring-width)-var(--tc-line-width))] aria-invalid:inset-ring-danger-solid forced-colors:aria-invalid:border-(length:--tc-ring-width)'
+
+/** The same, on a box whose invalid field is inside it. */
+export const FIELD_INVALID_WITHIN = 'has-aria-invalid:border-danger-solid has-aria-invalid:inset-ring-[calc(var(--tc-ring-width)-var(--tc-line-width))] has-aria-invalid:inset-ring-danger-solid forced-colors:has-aria-invalid:border-(length:--tc-ring-width)'
+
+/** A value forced left-to-right keeps the form's side. */
+export const FIELD_LTR = 'data-ltr:text-match-parent data-ltr:placeholder:[unicode-bidi:plaintext]'
+
+/** Kept but not typed in. Set from the prop, never from read-only:. */
+export const FIELD_READ_ONLY = 'bg-neutral-soft'
+
+/** The box of a field: its fill, its 3:1 line and its radius. */
+export const FIELD_SURFACE = `rounded-control bg-surface-raised text-body ${BORDER_STRONG} ${CONTAIN} ${TRANSITION}`
+
+/** A field that is one element: the box, the ring, the floor and the invalid mark. */
+export const FIELD_BOX = `${FIELD_SURFACE} placeholder:text-muted ${DISABLED} ${FOCUS_RING} ${TOUCH_TARGET} ${FIELD_INVALID}`
+
+/** The type step of a field, for a wrapper that owns the width: --tc-input-width is in em. */
+export const FIELD_TEXT = {
+  xs: `text-xs ${FIELD_TEXT_COARSE}`,
+  sm: `text-sm ${FIELD_TEXT_COARSE}`,
+  md: `text-sm ${FIELD_TEXT_COARSE}`,
+  lg: 'text-base',
+  xl: 'text-base',
+  custom: '',
+} as const
+
+/** Height, inline padding and the type step of a one-line field. */
+export const FIELD_SIZE = {
+  xs: `${CONTROL_SIZE.xs} ${FIELD_TEXT_COARSE}`,
+  sm: `${CONTROL_SIZE.sm} ${FIELD_TEXT_COARSE}`,
+  md: `${CONTROL_SIZE.md} ${FIELD_TEXT_COARSE}`,
+  lg: `${CONTROL_SIZE.lg} ${FIELD_TEXT_COARSE}`,
+  xl: `${CONTROL_SIZE.xl} ${FIELD_TEXT_COARSE}`,
+  custom: '',
+} as const

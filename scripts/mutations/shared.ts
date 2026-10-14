@@ -320,4 +320,35 @@ export const MUTATIONS: Mutation[] = [
     from: "    'aria-label'?: string | undefined\n    /** The id of the visible text that names the group. */\n    'aria-labelledby': string",
     to: "    'aria-label'?: string | undefined\n    /** The id of the visible text that names the group. */\n    'aria-labelledby'?: string | undefined",
   },
+  // Input's own strings, moved here with the field classes; the labels still name Input, whose tests catch them.
+  {
+    label: 'an invalid Input keeps the resting border, so nothing on the screen marks the error',
+    file: 'src/shared/classes.ts',
+    from: "export const FIELD_INVALID = 'aria-invalid:border-danger-solid ",
+    to: "export const FIELD_INVALID = '",
+  },
+  {
+    label: 'an invalid input is told by hue alone again: the ring inside its line is gone',
+    file: 'src/shared/classes.ts',
+    from: ' aria-invalid:inset-ring-[calc(var(--tc-ring-width)-var(--tc-line-width))]',
+    to: '',
+  },
+  {
+    label: 'an invalid input looks like a valid one under forced colours, where its ring cannot paint',
+    file: 'src/shared/classes.ts',
+    from: " forced-colors:aria-invalid:border-(length:--tc-ring-width)'",
+    to: "'",
+  },
+  {
+    label: 'an invalid input widens its border in every mode, which moves its text by a pixel',
+    file: 'src/shared/classes.ts',
+    from: " forced-colors:aria-invalid:border-(length:--tc-ring-width)'",
+    to: " aria-invalid:border-(length:--tc-ring-width)'",
+  },
+  {
+    label: 'the text of a medium input drops under 16px on a touch screen, so iOS zooms the page on focus',
+    file: 'src/shared/classes.ts',
+    from: '  md: `${CONTROL_SIZE.md} ${FIELD_TEXT_COARSE}`,',
+    to: '  md: CONTROL_SIZE.md,',
+  },
 ]
