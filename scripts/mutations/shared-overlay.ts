@@ -44,6 +44,18 @@ export const MUTATIONS: Mutation[] = [
     to: `popups = '[role="dialog"]',`,
   },
   {
+    label: 'the lifted escape scope is dropped from the root guard, so an overlay nested in a dialog swallows Escape once focus is back on its trigger',
+    file: 'src/shared/overlay-scope.ts',
+    from: 'guardEscape(onOpenChange, toScopeSelector(scope))',
+    to: 'guardEscape(onOpenChange)',
+  },
+  {
+    label: 'the lifted escape scope selector matches every scoped popup, so the inner overlay finds the outer dialog and swallows the key',
+    file: OVERLAY,
+    from: 'return `[data-overlay="${scope}"]`',
+    to: 'return `[data-overlay]`',
+  },
+  {
     label: 'the lifted content test counts a boolean as content, so a close around {saving && label} is an empty control while saving is false',
     file: TRIGGER,
     from: " && typeof children !== 'boolean' && children !== ''",

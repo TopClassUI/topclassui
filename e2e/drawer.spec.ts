@@ -697,6 +697,50 @@ test.describe('focus', () => {
   }
 })
 
+// The sheet's trigger sits in the dialog and is itself open: a guard that read the role of every dialog found it there
+// and cancelled the sheet's own close, so the key closed nothing. Each root now looks inside its own popup only.
+test.describe('a sheet inside a dialog', () => {
+  const titles = (page: Page) => page.locator('[role="dialog"][data-open] h2').allTextContents()
+  const tooltip = (page: Page) => page.locator('[data-placement][data-open]:not([role])')
+  const escape = async (page: Page, left: string[]) => {
+    await page.keyboard.press('Escape')
+    await expect.poll(() => titles(page)).toEqual(left)
+  }
+
+  /** e2e/fixtures/drawer-nested.tsx with its dialog open and, inside it, its sheet: both from the keyboard. */
+  async function nested(page: Page): Promise<Locator> {
+    await openLive(page, 'separator--horizontal')
+    await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/drawer-nested.tsx' })
+    await openOverlay(page, triggerOf(page, 'Settings', '#nested-drawer'), { by: 'keyboard' })
+    const sheet = await openOverlay(page, triggerOf(page, 'Share', 'body'), { by: 'keyboard' })
+    expect(await titles(page)).toEqual(['Project settings', 'Share this project'])
+    return sheet
+  }
+
+  test('focus back on its trigger: the first Escape closes the sheet and leaves the dialog open, the second the dialog', async ({ page }) => {
+    await nested(page)
+    await page.keyboard.press('Shift+Tab')
+    await expect(triggerOf(page, 'Share', 'body')).toBeFocused()
+
+    await escape(page, ['Project settings'])
+    await escape(page, [])
+  })
+
+  // From the keyboard: the dialog's viewport stands above every sheet (--tc-z-dialog over --tc-z-drawer) and takes the pointer.
+  test('a tooltip open inside the sheet closes first, then the sheet, then the dialog', async ({ page }) => {
+    const sheet = await nested(page)
+    await page.keyboard.press('Tab')
+    await expect(sheet.locator('button[aria-label="Copy link"]')).toBeFocused()
+    await expect(tooltip(page)).toHaveText('Copy link')
+
+    await page.keyboard.press('Escape')
+    await expect(tooltip(page)).toHaveCount(0)
+    expect(await titles(page)).toEqual(['Project settings', 'Share this project'])
+    await escape(page, ['Project settings'])
+    await escape(page, [])
+  })
+})
+
 test.describe('a mouse', () => {
   test('dragged on the header it moves the sheet and selects no text; dragged in the body it selects text and the sheet stays', async ({ page }) => {
     const popup = await open(page, 'drawer--end')
@@ -723,12 +767,14 @@ test.describe('a mouse', () => {
 test.describe('the page behind', () => {
   test('is hidden from assistive technology and cannot scroll while the sheet is open, and is given back on close', async ({ page }) => {
     await openLive(page, 'drawer--end', { tall: true })
-    expect((await pageLock(page)).reachable).toEqual(['h1', 'main', 'pre'])
+    // The first portal is the toast region TopClassProvider mounts on every page, which a modal leaves readable.
+    expect((await pageLock(page)).reachable).toEqual(['h1', 'main', 'pre', 'portal'])
     await expect(page.getByRole('button', { name: 'Filters' })).toHaveCount(1)
 
     await openOverlay(page, triggerOf(page, 'Filters'))
     const locked = await pageLock(page)
-    expect(locked.reachable).toEqual(['portal'])
+    // The first portal is the toast region TopClassProvider mounts on every page, which a modal leaves readable.
+    expect(locked.reachable).toEqual(['portal', 'portal'])
     expect(locked.body).toBe('overflow: hidden;')
     expect(locked.overflow).toBe('hidden')
     await expect(page.getByRole('button', { name: 'Filters', exact: true })).toHaveCount(0)
@@ -737,7 +783,8 @@ test.describe('the page behind', () => {
     await page.keyboard.press('Escape')
     await expectClosed(page)
     const released = await pageLock(page)
-    expect(released.reachable).toEqual(['h1', 'main', 'pre'])
+    // The first portal is the toast region TopClassProvider mounts on every page, which a modal leaves readable.
+    expect(released.reachable).toEqual(['h1', 'main', 'pre', 'portal'])
     expect(released.overflow).toBe('visible')
   })
 
@@ -1212,7 +1259,8 @@ test.describe('each value of modal', () => {
     const seen = [await pressInside(page, popup, 'Tab'), await pressInside(page, popup, 'Tab'), await pressInside(page, popup, 'Tab')]
     expect(seen).toEqual(['Done', 'Close this panel', 'Done'])
     const lock = await pageLock(page)
-    expect(lock.reachable).toEqual(['portal'])
+    // The first portal is the toast region TopClassProvider mounts on every page, which a modal leaves readable.
+    expect(lock.reachable).toEqual(['portal', 'portal'])
 
     // The pointer: free. The page scrolls beside the open sheet, and its button takes the press.
     expect(lock.overflow).toBe('visible')
@@ -1233,7 +1281,8 @@ test.describe('each value of modal', () => {
     await expect(popup).toHaveCSS('pointer-events', 'auto')
     expect(await takesPresses(popup), 'a press on the sheet lands on it').toBe(true)
     const lock = await pageLock(page)
-    expect(lock.reachable).toEqual(['h1', 'main', 'pre', 'portal'])
+    // The first portal is the toast region TopClassProvider mounts on every page, which a modal leaves readable.
+    expect(lock.reachable).toEqual(['h1', 'main', 'pre', 'portal', 'portal'])
     expect(lock.overflow).toBe('visible')
     await wheelAt(page, 8, 500, 300)
     expect(await scrollY(page)).toBe(300)
