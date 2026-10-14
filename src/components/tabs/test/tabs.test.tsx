@@ -116,7 +116,7 @@ describe('what the server writes around the panels', () => {
   })
 
   it('puts each label in a span of its own, which is what can end in an ellipsis', () => {
-    expect(tabs()).toContain('<span class="truncate min-w-0">Overview</span></button>')
+    expect(tabs()).toContain('<span dir="auto" class="truncate min-w-0">Overview</span></button>')
   })
 
   // Base UI 1.8.0 learns which tab holds which value in an effect, so the server cannot match a string to 0.

@@ -69,7 +69,8 @@ describe('the arrow keys follow the direction of the provider', () => {
 describe('nothing about the direction is written on an element', () => {
   it('no part carries dir or lang: the tabs are laid out by the page they sit in', () => {
     const { container } = render(rtl(tabs))
-    expect(container.querySelectorAll('[dir]')).toHaveLength(0)
+    // A label's own dir="auto" sets the direction of its text, never of the tabs around it.
+    expect(container.querySelectorAll('[dir]:not(span[dir="auto"])')).toHaveLength(0)
     expect(container.querySelectorAll('[lang]')).toHaveLength(0)
   })
 

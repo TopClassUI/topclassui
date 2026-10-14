@@ -59,7 +59,7 @@ describe('every demo renders on the server', () => {
   it('puts the long label inside a narrow box, so the e2e pages have something to cut', () => {
     const html = markup(<LongLabel />)
     expect(html).toContain('data-narrow')
-    expect(html).toContain('<span class="truncate min-w-0">Infrastructure, platform reliability')
+    expect(html).toContain('<span dir="auto" class="truncate min-w-0">Infrastructure, platform reliability')
   })
 
   it('lets two long tags share a row that does not wrap, each with the class that lets it shrink', () => {
@@ -73,7 +73,7 @@ describe('every demo renders on the server', () => {
     for (const label of ['<strong>Infrastructure', '<em>Infrastructure', '<code>sha256_']) {
       expect(html, label).toContain(label)
     }
-    expect(html).not.toContain('<span class="truncate')
+    expect(html).not.toContain('<span dir="auto" class="truncate')
   })
 
   it('makes the link the chip in the link demo, never a link inside a Tag', () => {
