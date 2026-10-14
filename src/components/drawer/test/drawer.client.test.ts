@@ -117,8 +117,10 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
     expect(importedModules(source).filter((m) => m.includes('use-scroll-tab-stop') || m.includes('use-portal-locale'))).toEqual([])
   })
 
-  it('takes the escape guard and the trigger helper from src/shared, and nothing from the Dialog it was copied from', () => {
-    expect(importedNames(source, '#shared/overlay.js')).toEqual(['guardEscape'])
+  it('takes the scope of the escape guard and the trigger helper from src/shared, and nothing from the Dialog it was copied from', () => {
+    // The Escape guard comes through hook.ts with the root's own scope, which this context hands to the popup.
+    expect(importedNames(source, '#shared/overlay.js')).toEqual([])
+    expect(importedNames(source, '#shared/overlay-scope.js')).toEqual(['OverlayScopeContext'])
     expect(importedNames(source, '#shared/render-trigger.js')).toEqual(['hasContent', 'renderTrigger'])
     expect(importedNames(source, '#shared/classes.js')).toEqual(['POPUP_PASSIVE', 'VIEWPORT_PASSIVE'])
     expect(importedModules(source).filter((m) => m.startsWith('./')).sort()).toEqual([

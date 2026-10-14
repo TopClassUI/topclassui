@@ -68,11 +68,52 @@ describe('the design attributes', () => {
     expect(html()).not.toMatch(/data-(variant|size)/)
   })
 
-  it('carries no state attribute: dismissing and sticking are the client half, not built', () => {
+  it('carries no state attribute, dismissible or not: a dismissed banner is gone, not marked', () => {
     expect(html()).not.toMatch(/data-(state|open|dismissed|dismissible|sticky|placement)/)
+    const shell = markup(<Banner aria-label="Notice" dismissible id="v2">Out.</Banner>)
+    expect(shell).not.toMatch(/data-(state|open|dismissed|dismissible|sticky|placement)/)
   })
 
-  it('renders no button of its own, so the server half ships no dismiss control', () => {
+  it('renders no button of its own unless dismissible, so a plain banner ships no dismiss control', () => {
     expect(html()).not.toContain('<button')
+    expect(markup(<Banner aria-label="Notice" dismissible={false} id="v2">Out.</Banner>)).not.toContain('<button')
+  })
+})
+
+describe('a dismissible banner on the server', () => {
+  const shell = () => markup(
+    <Banner aria-label="Release announcement" tone="warning" dismissible id="release-v2" className="mt-4">Version 2 is out.</Banner>,
+  )
+
+  it('is shown, since the server cannot read the storage that remembers a dismissal', () => {
+    expect(shell()).toMatch(/^<div [^>]*role="region"/)
+    expect(shell()).toContain('Version 2 is out.')
+  })
+
+  it('keeps the root of the plain banner: tone, classes with the caller last, name, role and id', () => {
+    const tag = rootTag(shell())
+    expect(attr(tag, 'data-tone')).toBe('warning')
+    expect(attr(tag, 'aria-label')).toBe('Release announcement')
+    expect(attr(tag, 'id')).toBe('release-v2')
+    expect(attr(tag, 'class')?.endsWith(' mt-4')).toBe(true)
+    expect(attr(tag, 'class')).toContain('bg-warning-soft')
+  })
+
+  it('ends with one plain button, after the message, named in English with no provider', () => {
+    const source = shell()
+    expect(source.match(/<button/g)).toHaveLength(1)
+    expect(source).toMatch(/Version 2 is out\.<\/div><button type="button" aria-label="Dismiss"/)
+    expect(source).toMatch(/<\/svg><\/button><\/div>$/)
+  })
+
+  it('keeps the region role when a JS caller passes another', () => {
+    const props = { role: 'alert' } as object
+    const source = markup(<Banner aria-label="Notice" dismissible id="v2" {...props}>Saved.</Banner>)
+    expect(attr(rootTag(source), 'role')).toBe('region')
+  })
+
+  it('falls back to the plain banner when a JS caller leaves the id out, since nothing could remember it', () => {
+    const props = { dismissible: true } as object
+    expect(markup(<Banner aria-label="Notice" {...props}>Saved.</Banner>)).not.toContain('<button')
   })
 })

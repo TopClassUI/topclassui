@@ -149,7 +149,7 @@ describe('DialogClose with content is that control, not the x', () => {
   it('with render and children that draw nothing, the control keeps the label it brought', async () => {
     close(<DialogClose render={<Button>Cancel</Button>}>{false}</DialogClose>)
     await screen.findByRole('dialog')
-    expect(screen.getByRole('button', { name: 'Cancel' }).innerHTML).toBe('<span class="truncate min-w-0">Cancel</span>')
+    expect(screen.getByRole('button', { name: 'Cancel' }).innerHTML).toBe('<span dir="auto" class="truncate min-w-0">Cancel</span>')
   })
 })
 
@@ -162,7 +162,7 @@ describe('DialogTrigger with children that draw nothing', () => {
         <DialogPopup><DialogBody>Body</DialogBody></DialogPopup>
       </DialogRoot>,
     )
-    expect(screen.getByRole('button', { name: 'Open' }).innerHTML).toBe('<span class="truncate min-w-0">Open</span>')
+    expect(screen.getByRole('button', { name: 'Open' }).innerHTML).toBe('<span dir="auto" class="truncate min-w-0">Open</span>')
   })
 
   it('and a Button with no label of its own takes the one written on the trigger, in a client file', () => {
@@ -172,6 +172,6 @@ describe('DialogTrigger with children that draw nothing', () => {
         <DialogPopup><DialogBody>Body</DialogBody></DialogPopup>
       </DialogRoot>,
     )
-    expect(screen.getByRole('button', { name: 'Open' }).innerHTML).toBe('<span class="truncate min-w-0">Open</span>')
+    expect(screen.getByRole('button', { name: 'Open' }).innerHTML).toBe('<span dir="auto" class="truncate min-w-0">Open</span>')
   })
 })

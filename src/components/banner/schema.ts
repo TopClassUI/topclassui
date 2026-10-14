@@ -7,6 +7,8 @@ import { BANNER_DEFAULTS, BANNER_TONES } from './constants.js'
 export const bannerSchema = z.object({
   tone: z.enum(BANNER_TONES).default(BANNER_DEFAULTS.tone)
     .meta({ description: 'What the message means, which picks the soft fill and the text colour on it.' }),
+  dismissible: z.boolean().default(BANNER_DEFAULTS.dismissible)
+    .meta({ description: 'Adds an x that hides the banner and remembers it in this browser. Requires `id`.' }),
 })
 
 export type BannerSchemaInput = z.input<typeof bannerSchema>
