@@ -153,7 +153,7 @@ describe('the link element', () => {
 
     it(`${form}: the row keeps its label, in the span that truncates it, and its row classes`, async () => {
       await open(items, { link })
-      expect(row('Profile').innerHTML).toBe('<span class="truncate min-w-0">Profile</span>')
+      expect(row('Profile').innerHTML).toBe('<span dir="auto" class="truncate min-w-0">Profile</span>')
       expect(row('Profile').className).toContain('min-h-(--tc-row-height)')
     })
   }
@@ -162,7 +162,7 @@ describe('the link element', () => {
     await open(items)
     expect(row('Profile').getAttributeNames().includes('data-link')).toBe(false)
     expect(row('Profile').getAttribute('href')).toBe('/profile')
-    expect(row('Profile').innerHTML).toBe('<span class="truncate min-w-0">Profile</span>')
+    expect(row('Profile').innerHTML).toBe('<span dir="auto" class="truncate min-w-0">Profile</span>')
   })
 
   it('a link that is not an element fails by the name of the prop', () => {
