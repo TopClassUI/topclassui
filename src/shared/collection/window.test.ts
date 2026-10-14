@@ -81,31 +81,56 @@ describe('getWindow', () => {
 })
 
 describe('offsetForIndex', () => {
+  const list = { ...base, count: 1_000, scrollTop: 0 }
+
   it('puts the row at the top for block start', () => {
-    expect(offsetForIndex(100, { ...base, count: 1_000, block: 'start' })).toBe(3_600)
+    expect(offsetForIndex(100, { ...list, block: 'start' })).toBe(3_600)
   })
 
   it('centres the row for block center', () => {
-    const got = offsetForIndex(100, { ...base, count: 1_000, block: 'center' })
+    const got = offsetForIndex(100, { ...list, block: 'center' })
     expect(got).toBe(3_600 - (360 - 36) / 2)
   })
 
-  it('scrolls the least it can for block nearest', () => {
-    expect(offsetForIndex(100, { ...base, count: 1_000, block: 'nearest' })).toBe(3_600 - 360 + 36)
-  })
-
   it('never scrolls past the end', () => {
-    const got = offsetForIndex(999, { ...base, count: 1_000, block: 'start' })
+    const got = offsetForIndex(999, { ...list, block: 'start' })
     expect(got).toBe(1_000 * 36 - 360)
   })
 
   it('never scrolls before the start', () => {
-    expect(offsetForIndex(0, { ...base, count: 1_000, block: 'center' })).toBe(0)
+    expect(offsetForIndex(0, { ...list, block: 'center' })).toBe(0)
   })
 
   it('clamps an index outside the list', () => {
-    expect(offsetForIndex(-5, { ...base, count: 10, block: 'start' })).toBe(0)
-    expect(offsetForIndex(999, { ...base, count: 10, block: 'start' })).toBe(0)
+    expect(offsetForIndex(-5, { ...list, count: 10, block: 'start' })).toBe(0)
+    expect(offsetForIndex(999, { ...list, count: 10, block: 'start' })).toBe(0)
+  })
+})
+
+// Row 100 spans 3,600 to 3,636 px; the view is 360 px tall. Nearest is the default block.
+describe('offsetForIndex, block nearest, from where the list is', () => {
+  const list = { ...base, count: 1_000 }
+
+  it('puts a row above the view at the top edge', () => {
+    expect(offsetForIndex(100, { ...list, scrollTop: 10_000 })).toBe(3_600)
+  })
+
+  it('puts a row below the view at the bottom edge', () => {
+    expect(offsetForIndex(100, { ...list, scrollTop: 0 })).toBe(3_276)
+  })
+
+  it('moves nothing for a row already in view', () => {
+    expect(offsetForIndex(100, { ...list, scrollTop: 3_500 })).toBe(3_500)
+  })
+
+  it('treats a row the top edge cuts as above, and one the bottom edge cuts as below', () => {
+    expect(offsetForIndex(100, { ...list, scrollTop: 3_610 })).toBe(3_600)
+    expect(offsetForIndex(100, { ...list, scrollTop: 3_250 })).toBe(3_276)
+  })
+
+  it('takes a row flush with either edge as in view', () => {
+    expect(offsetForIndex(100, { ...list, scrollTop: 3_600 })).toBe(3_600)
+    expect(offsetForIndex(100, { ...list, scrollTop: 3_276 })).toBe(3_276)
   })
 })
 

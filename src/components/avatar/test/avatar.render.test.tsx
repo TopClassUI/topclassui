@@ -20,13 +20,13 @@ describe('AvatarImage renders as the element it is given', () => {
 
   it('renders the framework image, not a plain img beside it', () => {
     expect(html).toBe(
-      '<img data-optimised="" src="/_next/image?url=/team/omar.jpg" alt="Omar Abed" width="48" height="48" class="absolute inset-0 size-full object-cover text-transparent forced-color-adjust-none"/>',
+      '<img data-optimised="" src="/_next/image?url=/team/omar.jpg" alt="Omar Abed" width="48" height="48" class="absolute inset-0 size-full object-cover text-transparent forced-color-adjust-none data-error:opacity-0"/>',
     )
   })
 
   it('hands it the classes that lay a picture over the fallback and keep a failed one quiet', () => {
     expect(classList(html).sort()).toEqual([
-      'absolute', 'forced-color-adjust-none', 'inset-0', 'object-cover', 'size-full', 'text-transparent',
+      'absolute', 'data-error:opacity-0', 'forced-color-adjust-none', 'inset-0', 'object-cover', 'size-full', 'text-transparent',
     ])
   })
 
@@ -45,7 +45,7 @@ describe('AvatarImage renders as the element it is given', () => {
   it('passes its own props into an element that names none of them', () => {
     const plain = markup(<AvatarImage alt="Omar Abed" src="/a.jpg" loading="lazy" className="ms-2" render={<img data-own="" />} />)
     expect(plain).toBe(
-      '<img data-own="" alt="Omar Abed" class="absolute inset-0 size-full object-cover text-transparent forced-color-adjust-none ms-2" src="/a.jpg" loading="lazy"/>',
+      '<img data-own="" alt="Omar Abed" class="absolute inset-0 size-full object-cover text-transparent forced-color-adjust-none data-error:opacity-0 ms-2" src="/a.jpg" loading="lazy"/>',
     )
   })
 
@@ -65,7 +65,7 @@ describe('AvatarImage renders as the element it is given', () => {
 describe('AvatarImage with no render is the plain img it always was', () => {
   it('writes alt, class and src, in that order, and nothing else', () => {
     expect(markup(<AvatarImage src="/team/omar.jpg" alt="Omar Abed" />)).toBe(
-      '<img alt="Omar Abed" class="absolute inset-0 size-full object-cover text-transparent forced-color-adjust-none" src="/team/omar.jpg"/>',
+      '<img alt="Omar Abed" class="absolute inset-0 size-full object-cover text-transparent forced-color-adjust-none data-error:opacity-0" src="/team/omar.jpg"/>',
     )
   })
 

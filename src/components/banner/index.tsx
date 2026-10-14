@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 
 import { cn } from '#shared/cn.js'
 import { MESSAGE } from './classes.js'
+import { BannerShell } from './client.js'
 import { BANNER_DEFAULTS } from './constants.js'
 import type { BannerProps } from './types.js'
 import { bannerVariants } from './variants.js'
@@ -19,8 +20,28 @@ export function Banner({
   action,
   className,
   children,
+  dismissible = BANNER_DEFAULTS.dismissible,
+  onDismiss,
   ...rest
 }: BannerProps) {
+  const content = (
+    <>
+      {icon}
+      {isEmpty(children) ? null : <div className={MESSAGE}>{children}</div>}
+      {action}
+    </>
+  )
+
+  // Only a dismissible banner reaches the client module; a JS caller with no id gets the plain one.
+  if (dismissible && rest.id !== undefined) {
+    const look = cn(bannerVariants({ tone }), className)
+    return (
+      <BannerShell data-tone={tone} className={look} {...rest} id={rest.id} role="region" onDismiss={onDismiss}>
+        {content}
+      </BannerShell>
+    )
+  }
+
   return (
     <div
       data-tone={tone}
@@ -28,12 +49,12 @@ export function Banner({
       {...rest}
       role="region"
     >
-      {icon}
-      {isEmpty(children) ? null : <div className={MESSAGE}>{children}</div>}
-      {action}
+      {content}
     </div>
   )
 }
 
 export { bannerVariants } from './variants.js'
-export type { BannerDesignProps, BannerName, BannerOwnProps, BannerProps, BannerTone } from './types.js'
+export type {
+  BannerDesignProps, BannerDismissal, BannerName, BannerOwnProps, BannerProps, BannerTone,
+} from './types.js'

@@ -1,0 +1,89 @@
+import type { Dialog as Base } from '@base-ui/react/dialog'
+import type { ReactNode } from 'react'
+
+import type { CollectionProps } from '#shared/contracts/collection.js'
+import type { CommandSchemaInput } from './schema.js'
+
+// R-8.3-4: derived from the schema, so the props and the validation cannot drift apart.
+export type CommandDesignProps = {
+  [K in keyof CommandSchemaInput]?: CommandSchemaInput[K] | undefined
+}
+
+/** The part of the shared collection contract the palette takes: no loadMore, no errorFallback. */
+type CommandCollection<T> = Pick<CollectionProps<T>, 'items' | 'getKey' | 'status' | 'emptyFallback' | 'loadingFallback'>
+
+// R-5.7-5: the popup's own props reach Base UI's popup, with the two of the portal around it.
+type CommandPopupProps = Omit<Base.Popup.Props, 'className' | 'children' | 'render' | 'onSelect'>
+  & Pick<Base.Portal.Props, 'container' | 'keepMounted'>
+
+export type CommandProps<T> = CommandCollection<T> & CommandDesignProps & CommandPopupProps & {
+  /** The text a row shows and the query is matched against, word by word. */
+  getLabel: (item: T) => string
+  /** Called with the chosen item, by a press or by Enter; the palette has closed by then. */
+  onSelect: (item: T) => void
+  /** The heading a row sits under; rows with none come first, in a group with no heading. */
+  getGroup?: ((item: T) => string | undefined) | undefined
+  /** What a row holds in place of its label. It stays one row tall. */
+  renderItem?: ((item: T) => ReactNode) | undefined
+  /** Whether it is open. Use with onOpenChange when controlled. */
+  open?: boolean | undefined
+  onOpenChange?: ((open: boolean) => void) | undefined
+  /** Merged last onto the popup, so a consumer class wins a conflict with its own. */
+  className?: string | undefined
+}
+
+/** What the shell keeps: the open state, which it shares with the panel, and the shortcut. */
+export type CommandShellOptions = Pick<CommandProps<unknown>, 'open' | 'defaultOpen' | 'onOpenChange' | 'shortcut'>
+
+/** The lazy panel's props: the palette's, with the open state the shell holds. */
+export type CommandPanelProps = Omit<CommandProps<unknown>, keyof CommandShellOptions> & {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
+
+/** A heading or an item, one row each: the flat list windowing counts. `row` is its place in that
+ * list; `index` is an item's place among the items alone, which is Base UI's. */
+export type CommandEntry =
+  | { kind: 'label', key: string, row: number, group: string }
+  | { kind: 'item', key: string, row: number, group: string | undefined, item: unknown, index: number }
+
+/** The shape Base UI takes for a grouped list: the heading as its value, and its items. */
+export interface CommandGroup {
+  value: string | undefined
+  items: readonly unknown[]
+}
+
+/** The rows of one group that are mounted, and whether its heading is among them. */
+export interface CommandRun {
+  group: string | undefined
+  label: CommandEntry | undefined
+  items: (CommandEntry & { kind: 'item' })[]
+}
+
+/** What the rows part draws: the runs of mounted rows, the spacers around them, and each row. */
+export interface CommandRowsProps {
+  runs: readonly CommandRun[]
+  /** How many rows the spacers stand for above and below the mounted ones. */
+  before: number
+  after: number
+  getLabel: (item: unknown) => string
+  renderItem?: ((item: unknown) => ReactNode) | undefined
+  select: (item: unknown) => void
+}
+
+/** What Base UI hands onItemHighlighted, as far as the palette reads it. */
+export interface CommandHighlight {
+  reason: string
+  index: number
+}
+
+
+/** What the shortcut reads of a keyboard event, so a test can pass a plain object. */
+export interface CommandKeyPress {
+  key: string
+  code: string
+  ctrlKey: boolean
+  metaKey: boolean
+  altKey: boolean
+  shiftKey: boolean
+}
