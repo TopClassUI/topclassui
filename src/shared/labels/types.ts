@@ -104,6 +104,25 @@ export interface Labels {
   readonly banner: {
     readonly dismiss: string
   }
+  readonly numberField: {
+    readonly increase: string
+    readonly decrease: string
+    /** The role description of the input, read where a sighted reader sees the two steppers. */
+    readonly field: string
+  }
+  /** The names of the two thumbs of a range; a single thumb takes the slider's own name. */
+  readonly slider: {
+    readonly minimum: string
+    readonly maximum: string
+  }
+  readonly otp: {
+    /** The name of one cell after the first, "Character 2 of 6". */
+    readonly character: RatioLabel
+  }
+  readonly textarea: {
+    /** The count of a textarea against its cap, "42 of 500 characters". */
+    readonly count: RatioLabel
+  }
 }
 
 /** Only the keys a consumer wants to change; everything else keeps its default. */

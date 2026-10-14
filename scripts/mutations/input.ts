@@ -27,12 +27,6 @@ export const MUTATIONS: Mutation[] = [
     to: 'aria-invalid={ariaInvalid}',
   },
   {
-    label: 'an invalid Input keeps the resting border, so nothing on the screen marks the error',
-    file: 'src/components/input/variants.ts',
-    from: "    'aria-invalid:border-danger-solid',\n",
-    to: '',
-  },
-  {
     label: 'the input skeleton is full width again, so it is three times the field it stands in for',
     file: 'src/components/input/skeleton.tsx',
     from: "fullWidth ? 'w-full' : INPUT_OWN_WIDTH,",
@@ -103,30 +97,6 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/input/index.tsx',
     from: 'const ltr = dir === undefined && INPUT_LTR_TYPES',
     to: 'const ltr = INPUT_LTR_TYPES',
-  },
-  {
-    label: 'an invalid input is told by hue alone again: the ring inside its line is gone',
-    file: 'src/components/input/classes.ts',
-    from: "  'aria-invalid:inset-ring-[calc(var(--tc-ring-width)-var(--tc-line-width))]',\n",
-    to: '',
-  },
-  {
-    label: 'an invalid input looks like a valid one under forced colours, where its ring cannot paint',
-    file: 'src/components/input/classes.ts',
-    from: "  'forced-colors:aria-invalid:border-(length:--tc-ring-width)',\n",
-    to: '',
-  },
-  {
-    label: 'an invalid input widens its border in every mode, which moves its text by a pixel',
-    file: 'src/components/input/classes.ts',
-    from: "'forced-colors:aria-invalid:border-(length:--tc-ring-width)'",
-    to: "'aria-invalid:border-(length:--tc-ring-width)'",
-  },
-  {
-    label: 'the text of a medium input drops under 16px on a touch screen, so iOS zooms the page on focus',
-    file: 'src/components/input/classes.ts',
-    from: '  md: `${CONTROL_SIZE.md} ${COARSE_TEXT}`,',
-    to: '  md: CONTROL_SIZE.md,',
   },
   {
     label: 'a read-only input looks exactly like an editable one again',

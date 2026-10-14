@@ -1,26 +1,13 @@
 import { cva } from 'class-variance-authority'
 
-import {
-  BORDER_STRONG, CONTAIN, DISABLED, FOCUS_RING, TOUCH_TARGET, TRANSITION,
-} from '#shared/classes.js'
+import { FIELD_BOX, FIELD_LTR } from '#shared/classes.js'
 import { memoizeVariants } from '#shared/variants.js'
-import { INPUT_INVALID_WIDTH, INPUT_LTR, INPUT_SIZE } from './classes.js'
+import { INPUT_SIZE } from './classes.js'
 import { INPUT_DEFAULTS, INPUT_SIZES } from './constants.js'
 
+// The red line of FIELD_BOX beats BORDER_STRONG on specificity: the attribute selector outranks the plain class.
 const resolve = cva(
-  [
-    'rounded-control bg-surface-raised text-body placeholder:text-muted',
-    // It beats BORDER_STRONG on specificity: the attribute selector outranks the plain class.
-    'aria-invalid:border-danger-solid',
-    INPUT_INVALID_WIDTH,
-    INPUT_LTR,
-    BORDER_STRONG,
-    CONTAIN,
-    DISABLED,
-    FOCUS_RING,
-    TOUCH_TARGET,
-    TRANSITION,
-  ],
+  [FIELD_BOX, FIELD_LTR],
   {
     variants: {
       size: INPUT_SIZE,
