@@ -255,7 +255,8 @@ Not checked. Say so in the pull request when one of these turns out wrong:
   and the on-solid rings on neutral/solid, in the three modes. Each block's spec measures
   them with `e2e/pixels.ts`.
 - Bundle sizes: `pnpm size` does not exist, and the chips are budgets.
-- The Arabic strings of shared pull request 1: not written yet.
+- The nine Arabic strings of shared pull request 1 were written by the lead and read by no
+  second Arabic speaker: Omar reads them in that pull request.
 - Unit 4's second half is not on the base: what Field says of Slider, NumberField, OTPField,
   Select and Combobox comes from their Build this blocks.
 - The readers' own lists of what they did not check apply to the facts they report.
@@ -502,9 +503,25 @@ too.
    | `stepper.error` | `Needs attention` | string: read after a step with an error |
    | `common.copyFailed` | `Could not copy` | string: announced when the clipboard refuses |
 
-   Arabic: to be supplied by the lead before this pull request opens, as for Unit 4
-   (`handoff/unit-4/arabic-labels.md` is the model). `ar.ts` is typed `satisfies Labels`, so
-   the pull request needs all nine. None holds a number, so none needs `byCount`. `ar.ts`
+   Arabic, supplied by the lead on 2026-10-15. This file is ASCII, so each string is
+   written here as `\u` escapes; `ar.ts` takes the real letters, and the lead's handoff
+   folder has them ready to copy in `unit-5/arabic-labels.md`, with the reason for each
+   word.
+
+   | Key | Arabic, escaped |
+   |---|---|
+   | `datePicker.placeholder` | `\u0627\u062e\u062a\u0631 \u062a\u0627\u0631\u064a\u062e\u064b\u0627` |
+   | `datePicker.previousMonth` | `\u0627\u0644\u0634\u0647\u0631 \u0627\u0644\u0633\u0627\u0628\u0642` |
+   | `datePicker.nextMonth` | `\u0627\u0644\u0634\u0647\u0631 \u0627\u0644\u062a\u0627\u0644\u064a` |
+   | `file.tooLarge` | `\u0627\u0644\u062d\u062c\u0645 \u0643\u0628\u064a\u0631 \u062c\u062f\u064b\u0627` |
+   | `file.wrongType` | `\u0646\u0648\u0639 \u063a\u064a\u0631 \u0645\u0642\u0628\u0648\u0644` |
+   | `stepper.done` | `\u0645\u0643\u062a\u0645\u0644` |
+   | `stepper.todo` | `\u0644\u0645 \u064a\u0628\u062f\u0623` |
+   | `stepper.error` | `\u064a\u062d\u062a\u0627\u062c \u0625\u0644\u0649 \u0645\u0631\u0627\u062c\u0639\u0629` |
+   | `common.copyFailed` | `\u062a\u0639\u0630\u0651\u0631 \u0627\u0644\u0646\u0633\u062e` |
+
+   `stepper.done` and `stepper.todo` are the words of `timeline.done` and `timeline.todo`.
+   `ar.ts` is typed `satisfies Labels`, so the pull request needs all nine. None holds a number, so none needs `byCount`. `ar.ts`
    is 172 lines; nine keys and two group lines keep it under 200. A
    `src/shared/labels/unit-5.test.ts` like `unit-4.test.ts`, and rows in
    `scripts/mutations/shared-labels.ts`. Labels used as they are: `common.copy`,
@@ -1944,7 +1961,8 @@ PLAN 2 and 18.4 still name; choice 15).
    before the session starts, not during it. Without them the session builds the Built as
    column, and every pull request says in its first line: built on the defaults of
    `unit-5.md`, choices not answered yet. The nine Arabic strings of shared pull request 1
-   are supplied by the lead before it opens.
+   are in that item, supplied by the lead: the pull request copies them and lists them in
+   its description for Omar to correct.
 1. **The shared pull requests 1, 2 and 3**, one at a time, in that order. None touches a
    file another touches. `pnpm check` on each, and on `main` after each merge (GitHub's
    checks do not run).
