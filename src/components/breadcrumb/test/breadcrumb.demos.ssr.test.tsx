@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['all-links', 'basic', 'deep-trail', 'long-label', 'long-trail', 'rtl']
+const EXPECTED = ['all-links', 'basic', 'deep-trail', 'long-label', 'long-trail', 'mixed-label', 'rtl']
 
 const load = async (file: string) => {
   const loaded = await import(`../dummy/${file}.tsx`) as { default: ComponentType }
@@ -45,7 +45,7 @@ describe('each demo shows what its name says', () => {
     expect(count(out, '<a href=')).toBe(2)
     expect(out).toContain('<a href="/" ')
     expect(out).toContain('<a href="/docs" ')
-    expect(out).toMatch(/<span aria-current="page" class="[^"]*">Breadcrumb<\/span>/)
+    expect(out).toMatch(/<span dir="auto" aria-current="page" class="[^"]*">Breadcrumb<\/span>/)
   })
 
   it('all-links marks no current page, because every crumb is an ancestor', async () => {
@@ -75,6 +75,13 @@ describe('each demo shows what its name says', () => {
     expect(out).toMatch(/^<div class="[^"]*w-60[^"]*">/)
     expect(out).toContain('>Everything you need to know before migrating a design system</span></a>')
     expect(out).toContain('>A step-by-step guide to moving every component to logical properties</span></li>')
+  })
+
+  it('mixed-label puts two labels that start in English and go on in Arabic inside a narrow box', async () => {
+    const out = await load('mixed-label')
+    expect(out).toMatch(/^<div class="[^"]*w-60[^"]*">/)
+    expect(out).toContain('<span dir="auto" class="truncate min-w-0">Release notes ملاحظات الإصدار لكل مكوّن في المكتبة</span></a>')
+    expect(out).toContain('<span dir="auto" aria-current="page" class="truncate min-w-0 text-body font-semibold">Logical properties')
   })
 
   it('rtl sets the direction, names the nav in Arabic and keeps the flipping caret', async () => {

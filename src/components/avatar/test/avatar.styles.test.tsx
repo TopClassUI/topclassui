@@ -61,7 +61,7 @@ describe('AvatarFallback and AvatarImage', () => {
 
   it('the image is laid over the whole root and cropped to fill it', () => {
     expect(image()).toEqual([
-      'absolute', 'forced-color-adjust-none', 'inset-0', 'object-cover', 'size-full', 'text-transparent',
+      'absolute', 'data-error:opacity-0', 'forced-color-adjust-none', 'inset-0', 'object-cover', 'size-full', 'text-transparent',
     ])
   })
 
@@ -98,7 +98,7 @@ describe('className is passed last on every part', () => {
 
   it('AvatarImage lets a consumer class replace its own', () => {
     expect(image('object-contain inset-1')).toEqual([
-      'absolute', 'forced-color-adjust-none', 'inset-1', 'object-contain', 'size-full', 'text-transparent',
+      'absolute', 'data-error:opacity-0', 'forced-color-adjust-none', 'inset-1', 'object-contain', 'size-full', 'text-transparent',
     ])
   })
 
@@ -114,7 +114,7 @@ describe('Avatar is not interactive, and names no palette colour', () => {
 
   it('carries no ring, hover, transition, touch target or disabled state', () => {
     const interactive = /^(hover:|active:|focus|outline-|transition|duration-|min-[hw]-|disabled:|data-disabled:|cursor-)/
-    expect(ALL).toHaveLength(22)
+    expect(ALL).toHaveLength(23)
     expect(ALL.filter((c) => interactive.test(c))).toEqual([])
   })
 

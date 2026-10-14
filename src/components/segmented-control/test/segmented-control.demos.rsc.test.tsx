@@ -1,0 +1,99 @@
+// The rsc project, where React resolves its react-server build and has no client hooks.
+import { readdirSync } from 'node:fs'
+import { join } from 'node:path'
+
+import { isValidElement, type ReactElement, type ReactNode } from 'react'
+import { describe, expect, it, vi } from 'vitest'
+
+type Props = Record<string, unknown>
+type Part = ((props: Props) => ReactNode) & { client?: string }
+
+/** What a bundler leaves of a 'use client' export on the server: a reference that is never called there. */
+const reference = (name: string): Part => Object.assign(() => { throw new Error(`${name} ran on the server`) }, { client: name })
+
+vi.mock('../client.js', () => ({ SegmentedControlRoot: reference('SegmentedControlRoot'), SegmentedControlItem: reference('SegmentedControlItem') }))
+vi.mock('#shared/provider/provider.js', () => ({ TopClassProvider: reference('TopClassProvider') }))
+vi.mock('#components/button/index.js', () => ({ Button: reference('Button') }))
+
+const DUMMY = join(import.meta.dirname, '..', 'dummy')
+const names = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
+
+interface Crossing { part: string, props: Props }
+
+/** Every client part a tree hands props to, in document order. A Server Component in between is run, as React would. */
+function crossings(node: ReactNode, found: Crossing[] = []): Crossing[] {
+  if (Array.isArray(node)) for (const child of node) crossings(child as ReactNode, found)
+  else if (isValidElement(node)) {
+    const { type, props } = node as ReactElement<Props>
+    const part = typeof type === 'function' ? (type as Part) : undefined
+    if (part?.client !== undefined) {
+      found.push({ part: part.client, props })
+      crossings(props['children'] as ReactNode, found)
+    } else if (part) crossings(part(props), found)
+    else crossings(props['children'] as ReactNode, found)
+  }
+  return found
+}
+
+/** The path of everything in a value that Flight cannot serialize: a function, a symbol, a class instance. */
+function unserializable(value: unknown, path: string, found: string[] = []): string[] {
+  if (typeof value === 'function' || typeof value === 'symbol' || typeof value === 'bigint') found.push(path)
+  else if (Array.isArray(value)) value.forEach((item, index) => unserializable(item, `${path}[${String(index)}]`, found))
+  else if (isValidElement(value)) {
+    for (const [key, inner] of Object.entries((value as ReactElement<Props>).props)) unserializable(inner, `${path}.${key}`, found)
+  } else if (value !== null && typeof value === 'object') {
+    if (Object.getPrototypeOf(value) !== Object.prototype) found.push(path)
+    else for (const [key, inner] of Object.entries(value)) unserializable(inner, `${path}.${key}`, found)
+  }
+  return found
+}
+
+const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { default: () => ReactNode }).default
+
+describe('every demo is a Server Component that only hands the segmented control what can cross (R-5.1-3)', () => {
+  it('found the demo folder, so an empty list cannot pass', () => {
+    expect(names).toEqual(['basic', 'form', 'full-width', 'long-content', 'many', 'rtl', 'sizes', 'states', 'with-icons'])
+  })
+
+  for (const name of names) {
+    it(`${name}: runs with no hook, and passes no function, symbol or class instance to a client part`, async () => {
+      const found = crossings((await load(name))())
+      expect(found.filter(({ part }) => part === 'SegmentedControlRoot').length, name).toBeGreaterThan(0)
+      expect(found.filter(({ part }) => part === 'SegmentedControlItem').length, name).toBeGreaterThan(1)
+      expect(found.flatMap(({ props }) => unserializable({ ...props, children: undefined }, 'props')), name).toEqual([])
+    })
+  }
+
+  it('states: each state is a plain prop of the track, or of one segment', async () => {
+    const props = crossings((await load('states'))())
+      .map(({ part, props: given }) => `${part}: ${Object.keys(given).filter((key) => !['aria-label', 'children'].includes(key)).join(' ')}`)
+    expect(props).toEqual([
+      'SegmentedControlRoot: invalid defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value',
+      'SegmentedControlRoot: disabled defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value',
+      'SegmentedControlRoot: defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value disabled', 'SegmentedControlItem: value',
+      'SegmentedControlRoot: readOnly defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value',
+    ])
+  })
+
+  it('rtl: the track sits inside the provider an island mounts', async () => {
+    expect(crossings((await load('rtl'))()).map(({ part }) => part))
+      .toEqual(['TopClassProvider', 'SegmentedControlRoot', 'SegmentedControlItem', 'SegmentedControlItem', 'SegmentedControlItem'])
+  })
+
+  it('with-icons: each icon crosses as an element whose props are plain data', async () => {
+    const icons = crossings((await load('with-icons'))()).flatMap(({ props }) => (props['icon'] === undefined ? [] : [props['icon']]))
+    expect(icons).toHaveLength(3)
+    expect(icons.flatMap((icon, at) => unserializable(icon, `icon${String(at)}`))).toEqual([])
+  })
+})
+
+describe('the scans see what they claim to', () => {
+  it('a function, a symbol and a class instance are each reported by the path that holds them', () => {
+    expect(unserializable({ on: () => undefined, when: new Date(0), mark: Symbol('x'), fine: [1, 'a'] }, 'SegmentedControlRoot'))
+      .toEqual(['SegmentedControlRoot.on', 'SegmentedControlRoot.when', 'SegmentedControlRoot.mark'])
+  })
+
+  it('a reference throws if anything on the server does call it', () => {
+    expect(() => reference('SegmentedControlRoot')({})).toThrow('SegmentedControlRoot ran on the server')
+  })
+})

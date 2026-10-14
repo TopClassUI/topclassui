@@ -128,12 +128,12 @@ describe('a label left on the trigger survives a Button that ran with none of it
 
   it('a Button rendered with a label of its own keeps that one, in the span it wrapped it in', () => {
     const button = trigger({ render: Button({ children: 'Copy link' }), children: 'Another label' })
-    expect(button.innerHTML).toBe('<span class="truncate min-w-0">Copy link</span>')
+    expect(button.innerHTML).toBe('<span dir="auto" class="truncate min-w-0">Copy link</span>')
   })
 
   it('a Button written in a client file with a label of its own keeps that one too: the element wins in Base UI', () => {
     const button = trigger({ render: <Button>Copy link</Button>, children: 'Another label' })
-    expect(button.innerHTML).toBe('<span class="truncate min-w-0">Copy link</span>')
+    expect(button.innerHTML).toBe('<span dir="auto" class="truncate min-w-0">Copy link</span>')
   })
 })
 

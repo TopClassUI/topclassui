@@ -89,7 +89,7 @@ describe('the structured data', () => {
     const long = 'x'.repeat(1000)
     const out = of([{ href: '/long', label: long }, { label: 'Now' }])
     expect(parsed(out).itemListElement[0]?.name).toBe('x'.repeat(1000))
-    expect(out).toContain(`<span class="truncate min-w-0">${'x'.repeat(200)}</span>`)
+    expect(out).toContain(`<span dir="auto" class="truncate min-w-0">${'x'.repeat(200)}</span>`)
   })
 })
 

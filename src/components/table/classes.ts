@@ -1,6 +1,6 @@
 /** R-5.12-4: Table's own class tables. A cell reads its alignment from one and a sticky
  * cell its fill from another, so the columns scrolling under it never show through. */
-import { CONTAIN, FOCUS_RING, HOVER, TOUCH_TARGET } from '#shared/classes.js'
+import { CONTAIN, FOCUS_RING, FORCED_EDGE, HOVER, TOUCH_TARGET } from '#shared/classes.js'
 import type { TableAlign } from './types.js'
 
 /** relative: the box contains every sr-only span, or one in a far column widens the page.
@@ -81,7 +81,7 @@ export const HEADER_LABEL = 'min-w-0 overflow-hidden text-ellipsis'
 export const SKELETON_BOX = 'grid grid-cols-1 overflow-hidden rounded-box bg-surface-raised'
 
 /** One line of nothing: as tall as the type, with margins making up the line height. */
-export const SKELETON_BAR = 'block h-[1em] my-[calc((1lh-1em)/2)] w-full rounded-chip bg-neutral-soft animate-pulse motion-reduce:animate-none'
+export const SKELETON_BAR = `block h-[1em] my-[calc((1lh-1em)/2)] w-full rounded-chip bg-neutral-soft animate-pulse motion-reduce:animate-none ${FORCED_EDGE}`
 
 /** A percentage width adds nothing to the column, so a narrow box squeezes the bars and never overflows. */
 export const SKELETON_WIDTH = {
