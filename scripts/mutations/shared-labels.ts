@@ -50,4 +50,16 @@ export const MUTATIONS: Mutation[] = [
     from: "(n === 1 ? '1 star' : `${fmt.format(n)} stars`)",
     to: '`${fmt.format(n)} stars`',
   },
+  {
+    label: 'the shared number format ignores the -u-nu- extension of its tag, so ar-u-nu-arab still prints Latin digits',
+    file: 'src/shared/labels/get-labels.ts',
+    from: 'numberingSystem: numberingSystem ?? fromTag ?? \'latn\' })',
+    to: 'numberingSystem: numberingSystem ?? \'latn\' })',
+  },
+  {
+    label: 'the shared number format lets the tag beat an explicit numberingSystem, so a caller cannot force Latin digits',
+    file: 'src/shared/labels/get-labels.ts',
+    from: 'numberingSystem: numberingSystem ?? fromTag ?? \'latn\' })',
+    to: 'numberingSystem: fromTag ?? numberingSystem ?? \'latn\' })',
+  },
 ]

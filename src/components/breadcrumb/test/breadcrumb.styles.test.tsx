@@ -58,15 +58,15 @@ describe('every part carries exactly its own classes', () => {
 
   it('the label inside the link is the truncating element', () => {
     expect(html()).toContain('<a href="/" class="')
-    expect(html()).toContain('"><span class="truncate min-w-0">Home</span></a>')
+    expect(html()).toContain('"><span dir="auto" class="truncate min-w-0">Home</span></a>')
   })
 
   it('a crumb with no href in the middle is muted text', () => {
-    expect(html()).toContain('<span class="truncate min-w-0 text-muted">Settings</span>')
+    expect(html()).toContain('<span dir="auto" class="truncate min-w-0 text-muted">Settings</span>')
   })
 
   it('the current page is in the body colour and semibold, so colour is not its only cue', () => {
-    expect(html()).toContain('<span aria-current="page" class="truncate min-w-0 text-body font-semibold">Profile</span>')
+    expect(html()).toContain('<span dir="auto" aria-current="page" class="truncate min-w-0 text-body font-semibold">Profile</span>')
   })
 
   // A colour set on the svg itself is kept under forced colours; an inherited one is replaced.
@@ -119,7 +119,7 @@ describe('what is not interactive stays plain', () => {
 
   it('the current page and a crumb with no href are not focusable and have no ring', () => {
     const out = html()
-    const spans = [...out.matchAll(/<span(?: aria-current="page")? class="([^"]*)">(?:Settings|Profile)</g)]
+    const spans = [...out.matchAll(/<span dir="auto"(?: aria-current="page")? class="([^"]*)">(?:Settings|Profile)</g)]
     expect(spans).toHaveLength(2)
     for (const span of spans) {
       expect((span[1] ?? '').split(' ').filter((c) => interactive.test(c))).toEqual([])

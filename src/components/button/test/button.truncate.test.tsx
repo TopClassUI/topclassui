@@ -15,39 +15,39 @@ describe('a long label truncates instead of breaking the layout', () => {
 
   it('wraps the text in an element of its own, which is what makes the ellipsis work', () => {
     const html = markup(<Button>{LONG}</Button>)
-    expect(html).toContain('<span class="truncate min-w-0">')
+    expect(html).toContain('<span dir="auto" class="truncate min-w-0">')
     expect(html).toContain(LONG)
   })
 
   it('leaves an element child alone, so an icon keeps its own width', () => {
     const html = markup(<Button><Svg icon={check} />{LONG}</Button>)
     // The icon is its own flex item; only the text is wrapped.
-    expect(html.indexOf('<svg')).toBeLessThan(html.indexOf('<span class="truncate'))
-    expect(html).not.toContain('<span class="truncate min-w-0"><svg')
+    expect(html.indexOf('<svg')).toBeLessThan(html.indexOf('<span dir="auto" class="truncate'))
+    expect(html).not.toContain('<span dir="auto" class="truncate min-w-0"><svg')
   })
 
   it('wraps a number, which React renders as text too', () => {
-    expect(markup(<Button>{42}</Button>)).toContain('<span class="truncate min-w-0">42</span>')
+    expect(markup(<Button>{42}</Button>)).toContain('<span dir="auto" class="truncate min-w-0">42</span>')
   })
 
   it('wraps nothing when there is no text, so an icon-only button gains no span', () => {
-    expect(markup(<Button><Svg icon={check} /></Button>)).not.toContain('<span class="truncate')
+    expect(markup(<Button><Svg icon={check} /></Button>)).not.toContain('<span dir="auto" class="truncate')
   })
 
   it('still carries the label through a render element', () => {
     const html = markup(<Button render={<a href="/x" />}>{LONG}</Button>)
     expect(attr(html, 'href')).toBe('/x')
-    expect(html).toContain('<span class="truncate min-w-0">')
+    expect(html).toContain('<span dir="auto" class="truncate min-w-0">')
   })
 
   it('keeps the spinner outside the truncating span while loading', () => {
     const html = markup(<Button loading>{LONG}</Button>)
-    expect(html.indexOf('<svg')).toBeLessThan(html.indexOf('<span class="truncate'))
+    expect(html.indexOf('<svg')).toBeLessThan(html.indexOf('<span dir="auto" class="truncate'))
   })
 })
 
 describe('the label wrapper survives the shapes children really take', () => {
-  const spans = (html: string) => (html.match(/<span class="truncate min-w-0">/g) ?? []).length
+  const spans = (html: string) => (html.match(/<span dir="auto" class="truncate min-w-0">/g) ?? []).length
 
   it('does not add a span for a child that renders nothing', () => {
     expect(spans(markup(<Button>{false}Save</Button>))).toBe(1)
@@ -68,7 +68,7 @@ describe('the label wrapper survives the shapes children really take', () => {
 
   it('keeps an element and its text in separate flex items', () => {
     const html = markup(<Button><Svg icon={check} />Save</Button>)
-    expect(html).not.toContain('<span class="truncate min-w-0"><svg')
+    expect(html).not.toContain('<span dir="auto" class="truncate min-w-0"><svg')
     expect(spans(html)).toBe(1)
   })
 })
@@ -91,7 +91,7 @@ describe('the label bound stops a megabyte reaching the DOM', () => {
     const over = BUTTON_BOUNDARIES.labelMaxLength + 50
     const html = markup(<Button>{'a'.repeat(over)}{'b'.repeat(over)}</Button>)
     // Scoped to the label: the class attribute is full of b's and a's of its own.
-    const label = /<span class="truncate min-w-0">([^<]*)<\/span>/.exec(html)?.[1] ?? ''
+    const label = /<span dir="auto" class="truncate min-w-0">([^<]*)<\/span>/.exec(html)?.[1] ?? ''
     expect(label).toBe('a'.repeat(BUTTON_BOUNDARIES.labelMaxLength))
   })
 
@@ -104,7 +104,7 @@ describe('the label bound stops a megabyte reaching the DOM', () => {
 })
 
 describe('an interpolated label is one span, not one per child', () => {
-  const spans = (html: string) => (html.match(/<span class="truncate min-w-0">/g) ?? []).length
+  const spans = (html: string) => (html.match(/<span dir="auto" class="truncate min-w-0">/g) ?? []).length
 
   it('joins a run of text, so the gap does not open inside the words', () => {
     const count = 5
