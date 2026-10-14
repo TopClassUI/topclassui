@@ -96,4 +96,19 @@ export const en = {
   banner: {
     dismiss: 'Dismiss',
   },
+  numberField: {
+    increase: 'Increase',
+    decrease: 'Decrease',
+    field: 'Number field',
+  },
+  slider: {
+    minimum: 'Minimum',
+    maximum: 'Maximum',
+  },
+  otp: {
+    character: (place, length, fmt) => `Character ${fmt.format(place)} of ${fmt.format(length)}`,
+  },
+  textarea: {
+    count: (length, max, fmt) => `${fmt.format(length)} of ${fmt.format(max)} characters`,
+  },
 } satisfies Labels
