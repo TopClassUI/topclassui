@@ -1,7 +1,8 @@
 'use client'
 
-import { createContext, useContext, useMemo, useState, useSyncExternalStore } from 'react'
+import { createContext, useContext, useMemo, useState } from 'react'
 
+import { useServerTabStop } from '#shared/use-server-tab-stop.js'
 import { TABS_DEFAULTS } from './constants.js'
 import type { TabsLook } from './types.js'
 
@@ -23,15 +24,10 @@ export function useTabsLook() {
   return useContext(TabsLookContext)
 }
 
-const subscribe = () => () => undefined
-const stop = { tabIndex: 0 } as const
-const none = {}
-
-/** What TabsTab reads: the look, and a tab stop for the server HTML alone. Base UI finds its one
- * tab stop in an effect, so every tab it serves is tabindex -1 and a list that scrolls cannot be
- * reached by the keyboard until the page hydrates. Once it has, Base UI owns the tab stop again. */
+/** What TabsTab reads: the look, and a tab stop for the server HTML alone on the tab the page opens
+ * on, so a list that scrolls can be reached by the keyboard before the page hydrates. */
 export function useTabsTab(value: unknown) {
   const { variant, size, opensOn } = useContext(TabsLookContext)
-  const served = useSyncExternalStore(subscribe, () => false, () => true)
-  return { variant, size, stop: served && value === opensOn ? stop : none }
+  const stop = useServerTabStop(value === opensOn)
+  return { variant, size, stop }
 }
