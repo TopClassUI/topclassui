@@ -36,7 +36,7 @@ describe('the demos', () => {
     it(`${name}: renders its buttons on the server, and no toast, which only a press adds`, async () => {
       const Demo = await load(name)
       const html = markup(<Demo />)
-      const found = [...html.matchAll(/<span class="truncate min-w-0">([^<]*)<\/span>/g)].map((m) => m[1])
+      const found = [...html.matchAll(/<span dir="auto" class="truncate min-w-0">([^<]*)<\/span>/g)].map((m) => m[1])
       expect(found).toEqual(labels)
       expect(html).not.toContain('role="region"')
     })

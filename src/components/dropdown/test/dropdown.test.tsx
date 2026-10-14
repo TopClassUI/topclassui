@@ -26,7 +26,7 @@ describe('on the server', () => {
     expect(html).toMatch(/^<button type="button" tabindex="0" data-variant="outline"/)
     expect(attr(html, 'aria-haspopup')).toBe('menu')
     expect(attr(html, 'aria-expanded')).toBe('false')
-    expect(html).toContain('<span class="truncate min-w-0">Actions</span>')
+    expect(html).toContain('<span dir="auto" class="truncate min-w-0">Actions</span>')
   })
 
   it('renders nothing but the trigger: no menu, no positioner and none of its rows', () => {
