@@ -308,4 +308,16 @@ export const MUTATIONS: Mutation[] = [
     from: '    scroll-padding-block: var(--tc-sticky-top) var(--tc-sticky-bottom);\n',
     to: '',
   },
+  {
+    label: 'the name contract: ControlName stops asking for a name, so an unlabelled Input compiles',
+    file: 'src/shared/contracts/name.ts',
+    from: "    id: string\n    'aria-label'?: string | undefined",
+    to: "    id?: string | undefined\n    'aria-label'?: string | undefined",
+  },
+  {
+    label: 'the name contract: GroupName makes both names optional, so an unnamed tabs list compiles',
+    file: 'src/shared/contracts/name.ts',
+    from: "    'aria-label'?: string | undefined\n    /** The id of the visible text that names the group. */\n    'aria-labelledby': string",
+    to: "    'aria-label'?: string | undefined\n    /** The id of the visible text that names the group. */\n    'aria-labelledby'?: string | undefined",
+  },
 ]
