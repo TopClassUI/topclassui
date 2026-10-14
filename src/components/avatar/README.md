@@ -63,19 +63,45 @@ Pass `aria-hidden={false}` to `AvatarFallback` only if the initials themselves s
 ## Import
 
 ```tsx
-import { Avatar } from 'topclassui'
+import {
+  AvatarRoot,
+  AvatarImage,
+  AvatarFallback,
+  AvatarSkeleton,
+} from 'topclassui'
 ```
 
 ## Props
 
 Every prop below is optional and falls back to the default shown.
 
+### AvatarRoot
+
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
 | `children` | no | `ReactNode` | - | The parts: an AvatarFallback, and an AvatarImage when there is a picture. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The control scale on both axes, so an avatar lines up with a button of the same size; custom emits no size classes. |
 
-Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
+### AvatarImage
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `alt` | no | `string` | - | Who the picture shows. Pass an empty string when the name is written beside it. |
+| `render` | no | `ReactElement` | - | Render the picture as another element, such as next/image, which carries its own src and alt. |
+
+### AvatarFallback
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `children` | no | `ReactNode` | - | Initials or an Svg icon, shown until the image paints. Decorative: aria-hidden unless you pass false. |
+
+### AvatarSkeleton
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The control scale on both axes, so an avatar lines up with a button of the same size; custom emits no size classes. |
+
+Anything else is passed to the element each part draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
 
