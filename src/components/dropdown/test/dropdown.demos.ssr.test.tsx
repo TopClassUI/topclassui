@@ -69,7 +69,7 @@ describe('every demo renders on the server', () => {
     it(`${file}.tsx renders each trigger as a Button with its label in the truncating span`, async () => {
       const html = await render(file)
       const all = html.match(/<button [^>]*>[\s\S]*?<\/button>/g) ?? []
-      const label = (button: string) => /<span class="truncate min-w-0">([^<]*)<\/span>/.exec(button)?.[1]
+      const label = (button: string) => /<span dir="auto" class="truncate min-w-0">([^<]*)<\/span>/.exec(button)?.[1]
       const buttons = all.filter((button) => button.includes('aria-haspopup="menu"'))
       expect(buttons.map(label), file).toEqual(TRIGGERS[file])
       // Every other button of the page is one the table above names: nothing unlisted is on it.
