@@ -1,0 +1,95 @@
+// The mutations of src/components/stepper. Found by scripts/mutations/index.ts.
+import type { Mutation } from '../lib/mutate.js'
+
+export const MUTATIONS: Mutation[] = [
+  {
+    label: 'the stepper marks the current step done, so a tick stands where its number belongs',
+    file: 'src/components/stepper/lib.ts',
+    from: "return index < at ? 'done' : 'current'",
+    to: "return 'done'",
+  },
+  {
+    label: 'the stepper ignores a step\'s own status, so an error step reads as done or todo',
+    file: 'src/components/stepper/lib.ts',
+    from: '    if (isStatus(item.status)) return item.status\n',
+    to: '',
+  },
+  {
+    label: 'the stepper connector loses inset-s-1/2, so it starts at the inline start and not at the centre of its circle',
+    file: 'src/components/stepper/classes.ts',
+    from: 'absolute top-1/2 inset-s-1/2 w-full',
+    to: 'absolute top-1/2 w-full',
+  },
+  {
+    label: 'the stepper ol loses role="list", which Safari with VoiceOver needs to say "2 of 4"',
+    file: 'src/components/stepper/index.tsx',
+    from: '      role="list"\n',
+    to: '',
+  },
+  {
+    label: 'the stepper writes its role before the rest, so a caller\'s role replaces the list',
+    file: 'src/components/stepper/index.tsx',
+    from: '      {...rest}\n      // After the rest: with list-style none, Safari with VoiceOver drops the list unless the role is written.\n      role="list"\n',
+    to: '      role="list"\n      {...rest}\n',
+  },
+  {
+    label: 'the stepper connector never carries data-done, so the line after a done step stays grey',
+    file: 'src/components/stepper/index.tsx',
+    from: "data-done={status === 'done' ? '' : undefined}",
+    to: 'data-done={undefined}',
+  },
+  {
+    label: 'the stepper circle is no longer hidden, so a screen reader reads the number twice',
+    file: 'src/components/stepper/index.tsx',
+    from: '<span aria-hidden="true" className={cn(STEPPER_MARK,',
+    to: '<span className={cn(STEPPER_MARK,',
+  },
+  {
+    label: 'the stepper says no word for a done, todo or error step, so its state is a colour and a shape only',
+    file: 'src/components/stepper/index.tsx',
+    from: "{status === 'current' ? null : <span className={STEPPER_STATUS_TEXT}>{labels.stepper[status]}</span>}",
+    to: '',
+  },
+  {
+    label: 'the stepper writes its numbers in English whatever the locale, so ar-u-nu-arab prints Latin digits',
+    file: 'src/components/stepper/index.tsx',
+    from: 'const numbers = createNumberFormat(locale)',
+    to: "const numbers = createNumberFormat('en')",
+  },
+  {
+    label: 'the stepper title loses dir="auto", so an English title in an Arabic page takes the page direction',
+    file: 'src/components/stepper/index.tsx',
+    from: '<span dir="auto" className={cn(STEPPER_TITLE,',
+    to: '<span className={cn(STEPPER_TITLE,',
+  },
+  {
+    label: 'the stepper renders an empty list for no steps instead of nothing',
+    file: 'src/components/stepper/index.tsx',
+    from: '  if (items.length === 0) return null\n',
+    to: '',
+  },
+  {
+    label: 'the stepper title loses wrap-anywhere, so a long word pushes its column wider than its share',
+    file: 'src/components/stepper/classes.ts',
+    from: "export const STEPPER_TITLE = 'max-w-full wrap-anywhere'",
+    to: "export const STEPPER_TITLE = 'max-w-full'",
+  },
+  {
+    label: 'the stepper step loses min-w-0, so a long title widens its column and the connectors leave the centres',
+    file: 'src/components/stepper/classes.ts',
+    from: "'relative flex min-w-0 flex-1 flex-col",
+    to: "'relative flex flex-1 flex-col",
+  },
+  {
+    label: 'the stepper filled circle keeps its theme fill under forced colours, which can match the canvas',
+    file: 'src/components/stepper/classes.ts',
+    from: "const FILLED = 'forced-color-adjust-none forced-colors:bg-[CanvasText] forced-colors:text-[Canvas]'",
+    to: "const FILLED = 'forced-color-adjust-none'",
+  },
+  {
+    label: 'the stepper md circle is the control size, 40 px, and not the drawn 32',
+    file: 'src/components/stepper/classes.ts',
+    from: "md: 'size-control-sm text-sm',",
+    to: "md: 'size-control-md text-sm',",
+  },
+]

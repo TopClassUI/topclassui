@@ -1,0 +1,92 @@
+import type { ComponentPropsWithRef, FocusEvent, KeyboardEvent, MouseEvent, PointerEvent, ReactNode } from 'react'
+
+import type { GroupName } from '#shared/contracts/name.js'
+import type { TREE_VIEW_STATUSES } from './constants.js'
+import type { TreeViewSchemaInput } from './schema.js'
+
+export type TreeViewStatus = (typeof TREE_VIEW_STATUSES)[number]
+
+// R-8.3-4: derived from the schema, so the props and the validation cannot drift apart.
+export type TreeViewDesignProps = {
+  [K in keyof TreeViewSchemaInput]?: TreeViewSchemaInput[K] | undefined
+}
+
+/** R-5.6-1: a tree draws no name of its own, so it takes an aria-label or an aria-labelledby. */
+export type TreeViewName = GroupName
+
+/** One node, as plain data a Server Component can pass. A node with `children`, even an empty array, is a branch. */
+export interface TreeNode {
+  /** Unique in the whole tree: the key, the selected value and an expanded id. */
+  id: string
+  label: string
+  /** An element, such as `<Svg icon={folder} />`; R-7-2. */
+  icon?: ReactNode | undefined
+  disabled?: boolean | undefined
+  children?: readonly TreeNode[] | undefined
+}
+
+/** One visible row: its node, where it sits, and whether it is a branch and open. */
+export interface TreeRow {
+  node: TreeNode
+  /** 1 for a root node. */
+  level: number
+  setSize: number
+  /** 1 for the first among its siblings. */
+  posInSet: number
+  parentId: string | null
+  branch: boolean
+  open: boolean
+}
+
+/** What a key does to the tree: highlight another row, open or close a branch, or select (and open or close) a row. */
+export type TreeKeyAction =
+  | { type: 'move', to: number }
+  | { type: 'open', index: number }
+  | { type: 'close', index: number }
+  | { type: 'select', index: number, toggle: boolean }
+
+/** Ours to set, or not offered: the tree is the one tab stop, and its role, its busy state and its active row are its own. */
+type DivOwned =
+  | 'children' | 'defaultValue' | 'role' | 'tabIndex' | 'aria-activedescendant' | 'aria-busy' | 'aria-label'
+  | 'aria-labelledby' | 'aria-multiselectable' | 'className'
+
+export type TreeViewProps = Omit<ComponentPropsWithRef<'div'>, DivOwned> & TreeViewDesignProps & {
+  /** The nodes, as plain data. Keep the array stable between renders. */
+  items: readonly TreeNode[]
+  /** The selected node's id, or null for none. Use with onValueChange when controlled. */
+  value?: string | null | undefined
+  /** The id selected when the tree mounts. */
+  defaultValue?: string | null | undefined
+  /** Called with the id of the node Enter, Space or a press selects. */
+  onValueChange?: ((id: string) => void) | undefined
+  /** The ids of the open branches. Use with onExpandedChange when controlled. */
+  expanded?: readonly string[] | undefined
+  /** The ids open when the tree mounts. */
+  defaultExpanded?: readonly string[] | undefined
+  /** Called with every open id after a branch opens or closes: load a branch's children here. */
+  onExpandedChange?: ((ids: readonly string[]) => void) | undefined
+  /** More root nodes exist, so loadMore is called when the tree nears its end. */
+  hasMore?: boolean | undefined
+  /** Called with no argument for the next page of root nodes, once per page. It never fetches a branch. */
+  loadMore?: (() => void | Promise<void>) | undefined
+  /** What status loading says, in place of labels.common.loading. */
+  loadingFallback?: ReactNode | undefined
+  /** What status empty says, in place of labels.state.empty. */
+  emptyFallback?: ReactNode | undefined
+  /** On the element with role tree, merged last. */
+  className?: string | undefined
+} & TreeViewName
+
+/** The events the tree handles, named here so hook.ts writes no type argument. */
+export type TreeKeyEvent = KeyboardEvent<HTMLDivElement>
+export type TreeFocusEvent = FocusEvent<HTMLDivElement>
+export type TreePointerEvent = PointerEvent<HTMLDivElement>
+export type TreeMouseEvent = MouseEvent<HTMLDivElement>
+
+/** What the hook reads: every prop but the markup's. */
+export type TreeViewHookProps = Pick<
+  TreeViewProps,
+  | 'items' | 'value' | 'defaultValue' | 'onValueChange' | 'expanded' | 'defaultExpanded' | 'onExpandedChange'
+  | 'visibleRows' | 'virtualize' | 'hasMore' | 'loadMore' | 'loadMoreThreshold' | 'status' | 'loadingFallback'
+  | 'emptyFallback' | 'ref' | 'style' | 'onKeyDown' | 'onFocus' | 'onBlur' | 'onPointerDown' | 'onClick'
+>
