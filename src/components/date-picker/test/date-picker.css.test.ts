@@ -1,0 +1,117 @@
+/** A closed popup renders none of its classes, so the static stylesheet never holds them (unit-5.md, "A popup's classes
+ * never reach the static stylesheet"): this compiles the real entry with every class of the DatePicker's own strings
+ * and reads the rule of the ones that carry a guarantee. */
+import { beforeAll, describe, expect, it } from 'vitest'
+
+import { compileEntry } from '#test/stylesheet.js'
+import {
+  DATE_PICKER_CELL, DATE_PICKER_DAY, DATE_PICKER_GRID, DATE_PICKER_HEADER, DATE_PICKER_ICON, DATE_PICKER_INPUT, DATE_PICKER_NAV,
+  DATE_PICKER_POPUP, DATE_PICKER_POSITIONER, DATE_PICKER_ROOT, DATE_PICKER_TITLE, DATE_PICKER_TRIGGER, DATE_PICKER_VALUE,
+  DATE_PICKER_WEEKDAY,
+} from '../classes.js'
+
+const OWN = [
+  DATE_PICKER_CELL, DATE_PICKER_DAY, DATE_PICKER_GRID, DATE_PICKER_HEADER, DATE_PICKER_ICON, DATE_PICKER_INPUT, DATE_PICKER_NAV,
+  DATE_PICKER_POPUP, DATE_PICKER_POSITIONER, DATE_PICKER_ROOT, DATE_PICKER_TITLE, DATE_PICKER_TRIGGER, DATE_PICKER_VALUE,
+  DATE_PICKER_WEEKDAY,
+]
+const CLASSES = [...new Set(OWN.join(' ').split(' ').filter(Boolean))]
+
+let css = ''
+
+beforeAll(async () => {
+  css = (await compileEntry()).build(CLASSES)
+})
+
+/** Tailwind's selector for a class: every character outside a plain name is escaped. */
+const selectorOf = (cls: string) => `.${cls.replace(/[^a-zA-Z0-9_-]/g, (c) => `\\${c}`)}`
+
+/** The declarations of the first rule that starts with a selector, without the braces, on one line. */
+const ruleOf = (selector: string) => {
+  const at = css.indexOf(`${selector} {`)
+  return at === -1 ? '' : css.slice(css.indexOf('{', at) + 1, css.indexOf('}', at)).replace(/\s+/g, ' ').trim()
+}
+
+/** The at-rule a class's rule sits in, read back from the rule. */
+const mediaOf = (selector: string) => {
+  const at = css.indexOf(`${selector} {`)
+  return css.slice(css.lastIndexOf('@media', at), at).split('{')[0]?.trim()
+}
+
+describe('every class of the DatePicker paints something', () => {
+  it('read the classes, so an empty list cannot pass', () => {
+    expect(CLASSES.length).toBeGreaterThan(80)
+  })
+
+  it('finds each one in the sheet, so a typo cannot ship silently', () => {
+    expect(CLASSES.filter((cls) => !css.includes(selectorOf(cls)))).toEqual([])
+  })
+})
+
+describe('the box, the trigger and the form input', () => {
+  it('the box is one column that may shrink to nothing and grows to an Input, and holds the input', () => {
+    expect(ruleOf(selectorOf('grid-cols-[minmax(0,var(--tc-input-width))]'))).toBe('grid-template-columns: minmax(0,var(--tc-input-width));')
+    expect(DATE_PICKER_ROOT.split(' ')).toEqual(expect.arrayContaining(['relative', 'inline-grid', 'w-fit']))
+  })
+
+  it('the placeholder is muted, and the form input is out of sight', () => {
+    expect(ruleOf(`${selectorOf('data-placeholder:text-muted')}[data-placeholder]`)).toBe('color: var(--tc-muted);')
+    expect(ruleOf(selectorOf('sr-only'))).toContain('position: absolute; width: 1px; height: 1px;')
+  })
+})
+
+describe('the popup', () => {
+  it('sits on the popup layer and hides with its trigger', () => {
+    expect(ruleOf(selectorOf('z-(--tc-z-popup)'))).toBe('z-index: var(--tc-z-popup);')
+    expect(ruleOf(`${selectorOf('data-anchor-hidden:invisible')}[data-anchor-hidden]`)).toBe('visibility: hidden;')
+  })
+
+  it('is 280 px at density 1, never wider or taller than the room Base UI measured, and scrolls itself', () => {
+    expect(ruleOf(selectorOf('w-[calc(17.5rem*var(--tc-density))]'))).toBe('width: calc(17.5rem * var(--tc-density));')
+    expect(ruleOf(selectorOf('max-w-(--available-width)'))).toBe('max-width: var(--available-width);')
+    expect(ruleOf(selectorOf('max-h-(--available-height)'))).toBe('max-height: var(--available-height);')
+    expect(ruleOf(selectorOf('overscroll-contain'))).toBe('overscroll-behavior: contain;')
+    expect(css).toMatch(/\.\\\*\\:shrink-0 > \*\) \{\s*flex-shrink: 0;\s*\}/)
+  })
+
+  it('the month wraps rather than being cut', () => {
+    expect(ruleOf(selectorOf('wrap-anywhere'))).toBe('overflow-wrap: anywhere;')
+    expect(DATE_PICKER_TITLE.split(' ')).toEqual(expect.arrayContaining(['min-w-0', 'flex-1', 'text-center']))
+  })
+})
+
+describe('a day', () => {
+  it('is 32 px tall, 44 under a finger, and as wide as its column', () => {
+    expect(ruleOf(selectorOf('h-control-sm'))).toBe('height: calc(2rem * var(--tc-density));')
+    const coarse = 'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]'
+    expect(ruleOf(selectorOf(coarse))).toBe('min-height: var(--tc-target-coarse,44px);')
+    expect(mediaOf(selectorOf(coarse))).toBe('@media (pointer: coarse)')
+    expect(DATE_PICKER_DAY.split(' ')).toEqual(expect.arrayContaining(['w-full', coarse]))
+    expect(ruleOf(selectorOf('table-fixed'))).toBe('table-layout: fixed;')
+  })
+
+  it('the chosen day is a fill and a weight, and under forced colours the Highlight pair it paints itself', () => {
+    expect(ruleOf(`${selectorOf('data-selected:bg-primary-solid')}[data-selected]`)).toBe('background-color: var(--tc-primary-solid);')
+    expect(ruleOf(`${selectorOf('data-selected:font-medium')}[data-selected]`)).toBe('--tw-font-weight: var(--font-weight-medium); font-weight: var(--font-weight-medium);')
+    expect(ruleOf(`${selectorOf('forced-colors:data-selected:bg-[Highlight]')}[data-selected]`)).toBe('background-color: Highlight;')
+    expect(ruleOf(`${selectorOf('forced-colors:data-selected:forced-color-adjust-none')}[data-selected]`)).toBe('forced-color-adjust: none;')
+  })
+
+  it('today is a weight and an underline, never a fill', () => {
+    expect(ruleOf(`${selectorOf('aria-[current=date]:underline')}[aria-current="date"]`)).toBe('text-decoration-line: underline;')
+    expect(ruleOf(`${selectorOf('aria-[current=date]:font-semibold')}[aria-current="date"]`)).toContain('font-weight: var(--font-weight-semibold);')
+    expect(DATE_PICKER_DAY).not.toMatch(/aria-\[current=date\]:bg-/)
+  })
+
+  it('a day outside the range dims to half and takes no press', () => {
+    expect(ruleOf(`${selectorOf('aria-disabled:opacity-50')}[aria-disabled="true"]`)).toBe('opacity: 50%;')
+    expect(ruleOf(`${selectorOf('aria-disabled:pointer-events-none')}[aria-disabled="true"]`)).toBe('pointer-events: none;')
+  })
+})
+
+describe('the three buttons of the header', () => {
+  it('are 24 px and 44 under a finger, where the drawing has bare 14 px carets', () => {
+    expect(DATE_PICKER_NAV.split(' ')).toEqual(expect.arrayContaining(['min-h-[var(--tc-target-min,24px)]', 'min-w-[var(--tc-target-min,24px)]', 'pointer-coarse:min-w-[var(--tc-target-coarse,44px)]']))
+    expect(ruleOf(`${selectorOf('disabled:opacity-50')}:disabled`)).toBe('opacity: 50%;')
+  })
+})
