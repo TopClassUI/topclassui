@@ -11,6 +11,7 @@ export const en = {
     clear: 'Clear',
     copy: 'Copy',
     copied: 'Copied',
+    copyFailed: 'Could not copy',
     search: 'Search',
     required: 'required',
     optional: 'optional',
@@ -49,6 +50,8 @@ export const en = {
     browse: 'Browse',
     remove: 'Remove',
     tooMany: (n, fmt) => (n === 1 ? 'Only 1 file allowed' : `Only ${fmt.format(n)} files allowed`),
+    tooLarge: 'Too large',
+    wrongType: 'Not an accepted type',
   },
   breadcrumb: {
     label: 'Breadcrumb',
@@ -110,5 +113,15 @@ export const en = {
   },
   textarea: {
     count: (length, max, fmt) => `${fmt.format(length)} of ${fmt.format(max)} characters`,
+  },
+  datePicker: {
+    placeholder: 'Pick a date',
+    previousMonth: 'Previous month',
+    nextMonth: 'Next month',
+  },
+  stepper: {
+    done: 'Completed',
+    todo: 'Not started',
+    error: 'Needs attention',
   },
 } satisfies Labels

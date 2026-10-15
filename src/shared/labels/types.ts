@@ -16,6 +16,8 @@ export interface Labels {
     readonly clear: string
     readonly copy: string
     readonly copied: string
+    /** Announced when the clipboard refuses a copy. */
+    readonly copyFailed: string
     readonly search: string
     readonly required: string
     readonly optional: string
@@ -55,6 +57,9 @@ export interface Labels {
     readonly browse: string
     readonly remove: string
     readonly tooMany: CountLabel
+    /** The reasons on a rejected file's row, beside its name. */
+    readonly tooLarge: string
+    readonly wrongType: string
   }
   readonly breadcrumb: {
     readonly label: string
@@ -122,6 +127,18 @@ export interface Labels {
   readonly textarea: {
     /** The count of a textarea against its cap, "42 of 500 characters". */
     readonly count: RatioLabel
+  }
+  /** The trigger with no value and the names of the two month buttons; month and weekday names come from Intl. */
+  readonly datePicker: {
+    readonly placeholder: string
+    readonly previousMonth: string
+    readonly nextMonth: string
+  }
+  /** The status of a step, read out after its title where a sighted reader sees the marker. */
+  readonly stepper: {
+    readonly done: string
+    readonly todo: string
+    readonly error: string
   }
 }
 
