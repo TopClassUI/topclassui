@@ -51,6 +51,12 @@
   /* Set inline by a windowed list to the spacers of useCollection, read by two spacers and never by its padding. */
   --tc-list-pad-start: 0px;
   --tc-list-pad-end: 0px;
+  /* Set inline by Meter from its clamped value; declared here so R-4-2 can see it. */
+  --tc-meter-value: 0%;
+  /* Set inline on each tree row to its depth, a bare number so the indent can multiply by it. */
+  --tc-tree-level: 0;
+  /* One level of a tree's indent: 18 px at density 1, as the Components page and the playground draw it. */
+  --tc-tree-indent: calc(1.125rem * var(--tc-density));
 }
 
 /* Both selectors, so a light island inside a dark page resets every colour. */
