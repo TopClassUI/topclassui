@@ -1,0 +1,143 @@
+import { readdirSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
+import ts from 'typescript'
+import { describe, expect, it } from 'vitest'
+
+import {
+  hasLateUseClient, hasUseClient, importedModules, importedNames, memberHookCalls, namespaceNamesOf,
+} from '../../../../scripts/lib/source-checks.js'
+
+const FOLDER = join(import.meta.dirname, '..')
+const read = (file: string) => readFileSync(join(FOLDER, file), 'utf8')
+
+const parse = (source: string) => ts.createSourceFile('client.tsx', source, ts.ScriptTarget.Latest, false, ts.ScriptKind.TSX)
+
+/** Every top-level statement that is not an `export ... from` line, as its syntax kind. */
+function nonReexports(source: string): string[] {
+  return parse(source).statements
+    .filter((node) => !(ts.isExportDeclaration(node) && node.moduleSpecifier !== undefined))
+    .map((node) => ts.SyntaxKind[node.kind])
+}
+
+const isHook = (name: string) => name === 'use' || /^use[A-Z]/.test(name)
+
+/** The callee name of every call under a node that reads as a hook, bare or on an object. */
+function hookCallsIn(root: ts.Node): string[] {
+  const out: string[] = []
+  const visit = (node: ts.Node): void => {
+    if (ts.isCallExpression(node)) {
+      const callee = node.expression
+      const name = ts.isIdentifier(callee) ? callee.text : ts.isPropertyAccessExpression(callee) ? callee.name.text : ''
+      if (isHook(name)) out.push(name)
+    }
+    ts.forEachChild(node, visit)
+  }
+  visit(root)
+  return out
+}
+
+/** The hooks each top-level function of a file calls, by the function's name, in source order. */
+function hooksByPart(source: string): Record<string, string[]> {
+  const out: Record<string, string[]> = {}
+  for (const node of parse(source).statements) {
+    if (ts.isFunctionDeclaration(node) && node.name) out[node.name.text] = hookCallsIn(node)
+  }
+  return out
+}
+
+describe('the folder holds what SegmentedControl needs and nothing else (R-8.1-1)', () => {
+  it('a hook.ts and a boundaries.ts, and no lib, variants or skeleton', () => {
+    expect(readdirSync(FOLDER).sort()).toEqual([
+      'README.md', 'boundaries.ts', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'meta.ts',
+      'schema.ts', 'test', 'types.ts',
+    ])
+  })
+})
+
+describe('index.tsx re-exports and holds no markup (R-5.1-2)', () => {
+  const source = read('index.tsx')
+
+  it('has no use client, so a server file can import it', () => {
+    expect(hasUseClient(source)).toBe(false)
+    expect(hasLateUseClient(source)).toBe(false)
+  })
+
+  it('is nothing but export-from lines, from client.tsx and types.ts', () => {
+    expect(nonReexports(source)).toEqual([])
+    expect(importedModules(source).sort()).toEqual(['./client.js', './types.js'])
+  })
+})
+
+describe('client.tsx is the browser half (R-5.12-1)', () => {
+  const source = read('client.tsx')
+
+  it("starts with 'use client', the first statement in the file", () => {
+    expect(source.startsWith("'use client'\n")).toBe(true)
+  })
+
+  it('imports no React hook, named or through a namespace', () => {
+    const hooks = [...importedNames(source, 'react'), ...memberHookCalls(source, namespaceNamesOf(source, 'react'))].filter(isHook)
+    expect(hooks).toEqual([])
+  })
+
+  it('each part calls one hook from hook.ts', () => {
+    expect(hooksByPart(source)).toEqual({ SegmentedControlRoot: ['useSegmentedControlRoot'], SegmentedControlItem: ['useSegmentedControlItem'] })
+    expect(importedNames(source, './hook.js')).toEqual(['SegmentedControlLookContext', 'useSegmentedControlItem', 'useSegmentedControlRoot'])
+  })
+
+  it('takes Base UI from its radio and radio-group entries (no toggle group: choice 15), no other component, and no schema', () => {
+    expect(importedModules(source).filter((m) => m.startsWith('@base-ui/'))).toEqual(['@base-ui/react/radio', '@base-ui/react/radio-group'])
+    expect(importedModules(source).filter((m) => m.startsWith('#components/') || m.startsWith('#icons/'))).toEqual([])
+    expect(importedModules(source).filter((m) => m.includes('schema') || m.startsWith('zod'))).toEqual([])
+  })
+
+  it('always renders a native button with no indicator, and never hands Base UI a default: the hook holds the value', () => {
+    expect(source).toMatch(/\n {6}nativeButton\n {6}render=\{<button \/>\}\n/)
+    expect(source).toContain('value={track.value}')
+    expect(source).not.toMatch(/defaultValue=\{|Radio\.Indicator/)
+  })
+
+  it('spreads the server tab stop before the caller props, so a caller tabIndex wins', () => {
+    expect(source).toContain('<Radio.Root\n      {...stop}\n      {...rest}\n')
+  })
+
+  it('cuts a label to the bound of boundaries.ts, in a span that truncates', () => {
+    expect(source).toContain('truncateLabel(children, SEGMENTED_CONTROL_BOUNDARIES.labelMaxLength)')
+  })
+})
+
+describe('hook.ts holds the value and the look of the track (R-5.12-1)', () => {
+  const source = read('hook.ts')
+
+  it("starts with 'use client'", () => {
+    expect(source.startsWith("'use client'\n")).toBe(true)
+  })
+
+  it('builds on the shared form value and the shared server tab stop', () => {
+    expect(importedModules(source)).toEqual(['react', '#shared/use-form-value.js', '#shared/use-server-tab-stop.js', './constants.js', './types.js'])
+    expect(importedNames(source, 'react')).toEqual(['createContext', 'useContext', 'useImperativeHandle', 'useMemo', 'useState'])
+    expect(hooksByPart(source)).toEqual({
+      syncRadios: [],
+      useSegmentedControlRoot: ['useFormValue', 'useImperativeHandle', 'useState', 'useMemo'],
+      useSegmentedControlItem: ['useContext', 'useServerTabStop'],
+    })
+  })
+
+  // check-boundaries reads a `<Letter` in hook.ts as JSX.
+  it('writes no type argument in angle brackets', () => {
+    expect(source).not.toMatch(/<[A-Za-z]/)
+  })
+})
+
+describe('classes.ts builds every string from the shared constants (R-5.2-4)', () => {
+  it('takes the line, the box, the ring, the target, the motion and the scroll from src/shared', () => {
+    expect(importedNames(read('classes.ts'), '#shared/classes.js')).toEqual([
+      'BORDER', 'CONTAIN', 'DISABLED', 'FIELD_INVALID', 'FOCUS_RING_INSET', 'SCROLL_X', 'TOUCH_TARGET', 'TRANSITION',
+    ])
+  })
+
+  it('names no physical side', () => {
+    expect(read('classes.ts')).not.toMatch(/\b(left|right)-|\b[mp][lr]-/)
+  })
+})
