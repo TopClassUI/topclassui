@@ -6,6 +6,37 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-15 - Unit 5: where it departs from its plan
+
+**Decision.** Unit 5 is built as `docs/figma/unit-5.md` asks, on top of the local Units 3 and 4 stack, with these departures. Omar has not answered its "Choices for Omar"; every open choice is built as its "Built as" column.
+
+From the plan itself:
+
+- Field, Form and Meter are built, though they are not among the 46. Label is a prop, not a component.
+- Field's control object gains `aria-labelledby`; its ids come from `useId()` unless `id` is given.
+- FieldLive and FormAction use neither Base UI's Field nor its Form. FormAction keeps the browser's own validation and takes a function child that gets the action's state.
+- Stepper is a server component. CodeBlock has no highlighter and its own copy part.
+- TreeView writes its own two rings. DatePicker is built on `Intl` (2026-10-03); its grid is Gregorian, six rows, with a Close button.
+- The FileUpload list is not windowed. TreeView and FileUpload take no `error` status. FileUpload, TreeView, CodeBlock and Field take no `size`.
+- `expanded`, `defaultExpanded` and `onExpandedChange` join the vocabulary.
+- Not built in v0.1: ErrorState, ErrorBoundary, IconButton, Heading, Text, Container, Stack, Grid.
+- New infrastructure: nine label keys, three tokens, `src/shared/form-errors.ts`.
+
+From the builders, each measured in Chromium:
+
+- **Meter.** Some tones fill the bar at under 3:1 against the track (warning in light and ocean, primary and info in dark): Progress's tokens too, a token decision for Omar. A meter in a `w-fit` parent is 0 px wide, as Progress.
+- **Stepper.** `defaultValue` is refused by the type. Past about 8 steps at md on a 320 px phone the circles overlap; the page never scrolls.
+- **CodeBlock.** Copy reports "Could not copy" when there is no clipboard (the plan's optional chain reported success).
+- **Field.** All eleven Unit 4 controls work inside a Field before and after hydration. Found in other folders: Slider puts `aria-invalid` on its group, not its range input.
+- **Form.** `method`, `encType` and `target` are not FormAction props (React writes them). `initialState` is required unless every key is optional.
+- **FileUpload.** The empty message line is `sr-only`, not hidden (a live region); a drag also turns the line solid; refused rows stay until the next pick.
+- **TreeView.** The note is a live region kept in the tree when empty; the selected row's ring under forced colours is fixed by specificity.
+- **DatePicker.** The whole Positioner and Popup live in the lazy part, inside the Portal (a popup that grew after mounting made Base UI flip it inside a ResizeObserver callback). Focus moves to the day one frame after the popup is placed. Home and End stay inside the visible month. Days are 31 px wide on a 320 px phone (choice 19). The modal popup hides the caller's label while open, as Combobox's does.
+
+**Why.** Each line answers a measurement or a rule; the numbers are in `handoff/LOG-5.md` and the specs.
+
+---
+
 ## 2026-10-14 - Unit 3: where it departs from its plan
 
 **Decision.** Unit 3 is built as `docs/figma/unit-3.md` asks, with these departures. Omar has not answered that file's "Choices for Omar"; every open choice is built as its "Built as" column.

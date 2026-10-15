@@ -2,7 +2,7 @@
 
 Read this first in a new session, then `docs/PLAN.md` for the specification and `docs/DECISIONS.md` (newest entries at the top). The newest DECISIONS entry is from 10 October 2026 and records where Unit 2 left its design file.
 
-Last updated: 14 October 2026 (Unit 3 and the first half of Unit 4 built on local branches, waiting for review and merge; `main` is still Unit 2). The build order is `docs/CLOUD-PLAN.md`: the site's 46, the server set first. The design of each unit is written out in `docs/figma/unit-1.md` and `docs/figma/unit-2.md`, because the session that builds them has no Figma access.
+Last updated: 15 October 2026 (Units 3, 4 and 5 built on local branches, waiting for review and merge; `main` is still Unit 2). The build order is `docs/CLOUD-PLAN.md`: the site's 46, the server set first. The design of each unit is written out in `docs/figma/unit-1.md` and `docs/figma/unit-2.md`, because the session that builds them has no Figma access.
 
 ---
 
@@ -24,13 +24,15 @@ Every component is `status: 'beta'`. None is `stable`: PLAN 20 asks for the visu
 
 **Where Unit 2 differs from its design file** is one entry in `docs/DECISIONS.md`, dated 10 October. The short list: a `link` prop on Breadcrumb, Pagination and Table for Next.js; Input has its own width and keeps Latin values left-to-right; Table cells stay on one line and the table scrolls inside itself; Pagination defaults to `md`; Timeline says its status in words; Rating moved to Unit 3.
 
-## Built, not merged yet (14 October)
+## Built, not merged yet (15 October)
 
 **Unit 3**, all built and checked on local branches: Dialog, Drawer, Popover, Toast, Dropdown, Command, Tabs, Accordion, Navbar, Sidebar; and the second part: Rating, Tag's remove button, Avatar's image fallback, Banner's dismiss. Its departures are one entry in `docs/DECISIONS.md`, dated 14 October. Plan: `docs/figma/unit-3.md`.
 
-**Unit 4, first half**, built on top: the shared pieces 1 to 6 and 9, then Switch, Checkbox, RadioGroup, Textarea and SegmentedControl. Plan: `docs/figma/unit-4.md` (branch `docs/unit-4-prep`). The second half (Slider, NumberField, OTPField, Select, Combobox) waits for Omar.
+**Unit 4**, all ten built on top: the shared pieces 1 to 9, then Switch, Checkbox, RadioGroup, SegmentedControl, Textarea, Slider, NumberField, OTPField, Select and Combobox. Plan: `docs/figma/unit-4.md`.
 
-**Next:** the independent review of both, then merge in stack order.
+**Unit 5**, the last unit, built on top: the shared labels, tokens and form errors, then Meter, Stepper, CodeBlock, Field, Form, FileUpload, TreeView and DatePicker. Its departures are one entry in `docs/DECISIONS.md`, dated 15 October. Plan: `docs/figma/unit-5.md`.
+
+**Next:** the independent review of Units 3 to 5, then merge in stack order.
 
 **Small shared fixes, built in Unit 3** (each its own branch): the focus ring at rest under forced colours, digits from the locale tag, the README of a part family, the grapheme label cut with `dir="auto"`, the table skeleton's edge, the Escape guard. Still open from the list below:
 - The page-scroll checks in `e2e/table.spec.ts` and `e2e/pagination.spec.ts` compare with `documentElement.clientWidth`, which is 15 px lenient under `scrollbar-gutter: stable`.
