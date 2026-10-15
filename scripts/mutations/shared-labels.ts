@@ -1,4 +1,4 @@
-// The mutations of the labels Units 3 and 4 added to src/shared/labels. Found by scripts/mutations/index.ts.
+// The mutations of the labels Units 3, 4 and 5 added to src/shared/labels. Found by scripts/mutations/index.ts.
 import type { Mutation } from '../lib/mutate.js'
 
 export const MUTATIONS: Mutation[] = [
@@ -103,5 +103,35 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/shared/labels/get-labels.ts',
     from: 'numberingSystem: numberingSystem ?? fromTag ?? \'latn\' })',
     to: 'numberingSystem: fromTag ?? numberingSystem ?? \'latn\' })',
+  },
+  {
+    label: 'unit 5: a datepicker label override is dropped on the way through getLabels, so a caller cannot rename a month button',
+    file: 'src/shared/labels/get-labels.ts',
+    from: '    datePicker: group(base.datePicker, overrides.datePicker),',
+    to: '    datePicker: base.datePicker,',
+  },
+  {
+    label: 'unit 5: a stepper label override is dropped on the way through getLabels, so a caller cannot reword a step status',
+    file: 'src/shared/labels/get-labels.ts',
+    from: '    stepper: group(base.stepper, overrides.stepper),',
+    to: '    stepper: base.stepper,',
+  },
+  {
+    label: 'unit 5: a refused copy is announced as a done one',
+    file: 'src/shared/labels/en.ts',
+    from: "    copyFailed: 'Could not copy',",
+    to: "    copyFailed: 'Copied',",
+  },
+  {
+    label: 'unit 5: a file too large is rejected with the reason of a wrong type',
+    file: 'src/shared/labels/en.ts',
+    from: "    tooLarge: 'Too large',",
+    to: "    tooLarge: 'Not an accepted type',",
+  },
+  {
+    label: 'unit 5: an Arabic step not reached reads as the current one',
+    file: 'src/shared/labels/ar.ts',
+    from: "    todo: 'لم يبدأ',\n    error:",
+    to: "    todo: 'الحالي',\n    error:",
   },
 ]
