@@ -34,6 +34,7 @@ export const ar = {
     clear: 'مسح',
     copy: 'نسخ',
     copied: 'تم النسخ',
+    copyFailed: 'تعذّر النسخ',
     search: 'بحث',
     required: 'مطلوب',
     optional: 'اختياري',
@@ -93,6 +94,8 @@ export const ar = {
       many: (n) => `يُسمح بـ ${n} ملفًا فقط`,
       other: (n) => `يُسمح بـ ${n} ملف فقط`,
     }),
+    tooLarge: 'الحجم كبير جدًا',
+    wrongType: 'نوع غير مقبول',
   },
   breadcrumb: {
     label: 'مسار التنقل',
@@ -168,5 +171,15 @@ export const ar = {
   },
   textarea: {
     count: (length, max, fmt) => `عدد الأحرف: ${fmt.format(length)} من ${fmt.format(max)}`,
+  },
+  datePicker: {
+    placeholder: 'اختر تاريخًا',
+    previousMonth: 'الشهر السابق',
+    nextMonth: 'الشهر التالي',
+  },
+  stepper: {
+    done: 'مكتمل',
+    todo: 'لم يبدأ',
+    error: 'يحتاج إلى مراجعة',
   },
 } satisfies Labels
