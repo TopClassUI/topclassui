@@ -750,6 +750,8 @@ test.describe('a mouse', () => {
     await page.mouse.move(frame.left + 100, 27, { steps: 8 })
     expect((await boxOf(popup)).left, 'the sheet follows the mouse').toBeGreaterThan(frame.left + 40)
     expect(await page.evaluate(() => String(getSelection())), 'text selected on the way').toBe('')
+    // Base UI dismisses a drag faster than 0.5 px/ms start to release: held, 80 px reads as a slow drop.
+    await page.waitForTimeout(400)
     await page.mouse.up()
     await atRest(popup)
     expect(await boxOf(popup)).toEqual(frame)
