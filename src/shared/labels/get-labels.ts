@@ -43,6 +43,8 @@ function withOverrides(base: Labels, overrides?: PartialLabels): Labels {
     slider: group(base.slider, overrides.slider),
     otp: group(base.otp, overrides.otp),
     textarea: group(base.textarea, overrides.textarea),
+    datePicker: group(base.datePicker, overrides.datePicker),
+    stepper: group(base.stepper, overrides.stepper),
   }
 }
 
