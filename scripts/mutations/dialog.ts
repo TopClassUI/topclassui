@@ -121,8 +121,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog popup hook reads the direction of its provider and forgets the language',
     file: HOOK,
-    from: 'return { ...usePortalLocale(), modal: useContext(DialogModalContext) }',
-    to: 'return { dir: usePortalLocale().dir, lang: undefined, modal: useContext(DialogModalContext) }',
+    from: 'return { ...usePortalLocale(), modal: useContext(DialogModalContext), scope: useOverlayScope() }',
+    to: 'return { dir: usePortalLocale().dir, lang: undefined, modal: useContext(DialogModalContext), scope: useOverlayScope() }',
   },
   {
     label: 'the dialog body takes no tabIndex from its hook, so a long text with no control in it is out of reach of the keyboard',
@@ -313,8 +313,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog popup gains a second hook call, where a part may hold only the one from hook.ts (R-5.12-1)',
     file: CLIENT,
-    from: '  const { dir, lang, modal } = useDialogPopup()\n',
-    to: '  const { dir, lang, modal } = useDialogPopup()\n  useDialogClose()\n',
+    from: '  const { dir, lang, modal, scope } = useDialogPopup()\n',
+    to: '  const { dir, lang, modal, scope } = useDialogPopup()\n  useDialogClose()\n',
   },
   {
     label: 'the dialog default size becomes lg, so a dialog with no size is 512 px wide',
