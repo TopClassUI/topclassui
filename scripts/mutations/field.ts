@@ -1,0 +1,95 @@
+// The mutations of src/components/field. Found by scripts/mutations/index.ts; every label starts with "field:", which no
+// other row holds, so `pnpm test:mutation field:` runs these alone.
+import type { Mutation } from '../lib/mutate.js'
+
+const INDEX = 'src/components/field/index.tsx'
+const HOOK = 'src/components/field/hook.ts'
+const LIB = 'src/components/field/lib.tsx'
+const CLASSES = 'src/components/field/classes.ts'
+
+export const MUTATIONS: Mutation[] = [
+  {
+    label: "field: renderField leaves the error's id out of aria-describedby, so the control never reads its error",
+    file: LIB,
+    from: "[hint ? ids.hint : '', error ? ids.error : '']",
+    to: "[hint ? ids.hint : '', '']",
+  },
+  {
+    label: 'field: the description reads the error before the hint',
+    file: LIB,
+    from: "[hint ? ids.hint : '', error ? ids.error : '']",
+    to: "[error ? ids.error : '', hint ? ids.hint : '']",
+  },
+  {
+    label: 'field: the ids are built from the name again, so two Fields of one name write one id twice',
+    file: INDEX,
+    from: 'ids: toFieldIds(id ?? generated)',
+    to: 'ids: toFieldIds(id ?? name)',
+  },
+  {
+    label: "field: the label loses its for, so a click on it no longer focuses or toggles the control",
+    file: LIB,
+    from: '<label id={ids.label} htmlFor={ids.control}',
+    to: '<label id={ids.label}',
+  },
+  {
+    label: 'field: the control object loses aria-labelledby, so a RadioGroup, a SegmentedControl and a Slider have no name',
+    file: LIB,
+    from: "    'aria-labelledby': ids.label,\n",
+    to: '',
+  },
+  {
+    label: 'field: an error no longer makes the control invalid by default',
+    file: INDEX,
+    from: 'invalid: invalid ?? messages.length > 0',
+    to: 'invalid: invalid ?? false',
+  },
+  {
+    label: 'field: empty messages are kept, so error="" draws an empty error and marks the control invalid',
+    file: LIB,
+    from: "return all.filter((message) => typeof message === 'string' && message.trim() !== '')",
+    to: 'return [...all]',
+  },
+  {
+    label: 'field: the asterisk is no longer hidden, so a screen reader reads "star" after every required label',
+    file: LIB,
+    from: '<span aria-hidden="true" className={FIELD_REQUIRED}>',
+    to: '<span className={FIELD_REQUIRED}>',
+  },
+  {
+    label: "field: FieldLive's error no longer goes after a change of the field's value",
+    file: HOOK,
+    from: 'if (before !== null && !sameEntries(before, entriesOf(rootRef.current, name))) setAnswered(errors)',
+    to: 'if (before !== null && !sameEntries(before, entriesOf(rootRef.current, name))) void before',
+  },
+  {
+    label: "field: FieldLive's error goes after any click, one that changes nothing included",
+    file: HOOK,
+    from: 'if (before !== null && !sameEntries(before, entriesOf(rootRef.current, name))) setAnswered(errors)',
+    to: 'if (before !== null) setAnswered(errors)',
+  },
+  {
+    label: "field: FieldLive keys the answered error on nothing, so the action's next answer does not bring it back",
+    file: HOOK,
+    from: 'const fromForm = own || answered === errors ? undefined : errors?.[name]',
+    to: 'const fromForm = own || answered !== undefined ? undefined : errors?.[name]',
+  },
+  {
+    label: "field: FieldLive drops the caller's own click listener for its own",
+    file: HOOK,
+    from: 'onClick: (event: FieldClickEvent) => { onClick?.(event); check() },',
+    to: 'onClick: () => { check() },',
+  },
+  {
+    label: 'field: the root loses min-w-0, so a long label widens the grid track it sits in',
+    file: CLASSES,
+    from: "export const FIELD_ROOT = 'grid min-w-0 content-start'",
+    to: "export const FIELD_ROOT = 'grid content-start'",
+  },
+  {
+    label: 'field: an inline label is no longer placed beside the control, so it drops under the box',
+    file: CLASSES,
+    from: "export const FIELD_LABEL_INLINE = 'col-start-2 row-start-1 font-normal'",
+    to: "export const FIELD_LABEL_INLINE = 'font-normal'",
+  },
+]
