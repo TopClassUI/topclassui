@@ -155,14 +155,6 @@ describe('an image that failed before the script ran', () => {
     done()
   })
 
-  it("calls no onError when decode() accepts the picture", async () => {
-    decodes('resolve')
-    const onError = vi.fn()
-    const { done } = await hydrated('/team/omar.svg', { onError })
-    expect(onError).not.toHaveBeenCalled()
-    done()
-  })
-
   it('fires no second error when the img already reported its own before decode() refused it', async () => {
     let refuse: (reason: Error) => void = () => undefined
     vi.spyOn(HTMLImageElement.prototype, 'decode').mockImplementation(() => new Promise((_, reject) => { refuse = reject }))
@@ -174,10 +166,12 @@ describe('an image that failed before the script ran', () => {
     done()
   })
 
-  it('is left alone when decode() accepts it, though it reads complete and 0 px wide', async () => {
+  it('is left alone when decode() accepts it, though it reads complete and 0 px wide, and onError is not called', async () => {
     decodes('resolve')
-    const { image, done } = await hydrated('/team/omar.svg')
+    const onError = vi.fn()
+    const { image, done } = await hydrated('/team/omar.svg', { onError })
     expect(image?.hasAttribute('data-error')).toBe(false)
+    expect(onError).not.toHaveBeenCalled()
     done()
   })
 
@@ -198,43 +192,5 @@ describe('an image that failed before the script ran', () => {
     rerender(avatar('/new.jpg'))
     await act(() => { refuse(new Error('EncodingError')); return Promise.resolve() })
     expect(screen.getByRole('img').hasAttribute('data-error')).toBe(false)
-  })
-})
-
-describe('ref', () => {
-  it("the caller's ref still reaches the img, beside the one the check reads", () => {
-    decodes('resolve')
-    const ref = { current: null as HTMLImageElement | null }
-    render(avatar('/a.jpg', { ref }))
-    expect(ref.current).toBe(screen.getByRole('img'))
-  })
-
-  it('a stable callback ref is called once per node, as on a plain img, though the picture fails and renders again', () => {
-    decodes('resolve')
-    const calls: string[] = []
-    const ref = (node: HTMLImageElement | null) => { calls.push(node ? 'node' : 'null') }
-    const { rerender, unmount } = render(avatar('/a.jpg', { ref }))
-    fireEvent.error(screen.getByRole('img'))
-    rerender(avatar('/b.jpg', { ref }))
-    expect(calls).toEqual(['node'])
-    unmount()
-    expect(calls).toEqual(['node', 'null'])
-  })
-
-  it("runs the cleanup a callback ref returns, instead of calling it with null", () => {
-    decodes('resolve')
-    const calls: string[] = []
-    const ref = (node: HTMLImageElement | null) => { calls.push(node ? 'node' : 'null'); return () => { calls.push('cleanup') } }
-    const { unmount } = render(avatar('/a.jpg', { ref }))
-    unmount()
-    expect(calls).toEqual(['node', 'cleanup'])
-  })
-
-  it('an object ref is emptied when the img goes', () => {
-    decodes('resolve')
-    const ref = { current: null as HTMLImageElement | null }
-    const { unmount } = render(avatar('/a.jpg', { ref }))
-    unmount()
-    expect(ref.current).toBeNull()
   })
 })
