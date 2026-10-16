@@ -12,7 +12,8 @@ const direction = document.documentElement.dir === 'rtl' ? 'rtl' : 'ltr'
 function Fixture() {
   return (
     <TopClassProvider direction={direction} locale={direction === 'rtl' ? 'ar' : 'en'}>
-      <div id="rows" style={{ display: 'grid', gap: 8, padding: 16, justifyItems: 'start' }}>
+      {/* The rows stretch: a field's 100% is then the page, not the intrinsic width of a textarea, which follows the fonts. */}
+      <div id="rows" style={{ display: 'grid', gap: 8, padding: 16 }}>
         {SIZES.map((size) => (
           <div key={size} data-size={size} style={{ display: 'grid', gap: 8, justifyItems: 'start' }}>
             <Textarea aria-label={`${size} plain`} size={size} rows={1} />
