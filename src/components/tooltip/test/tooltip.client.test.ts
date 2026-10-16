@@ -94,7 +94,7 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
     expect(hookCalls('f(useA(), X.useB(), use(p), user(), x.used())')).toEqual(['useA', 'useB', 'use'])
   })
 
-  it('imports nothing from the provider itself: the direction comes through hook.ts, with ltr when no provider is mounted', () => {
+  it('imports nothing from the provider itself: the direction and the language come through hook.ts, or from the page with no provider', () => {
     expect(importedModules(source).filter((m) => m.includes('provider'))).toEqual([])
   })
 
@@ -107,7 +107,7 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
   })
 })
 
-describe('hook.ts holds the one thing a part reads from the provider (R-5.12-1)', () => {
+describe('hook.ts holds what a part reads from the provider, and nothing else (R-5.12-1)', () => {
   const source = read('hook.ts')
 
   it("starts with 'use client', as every module that calls a hook does", () => {
@@ -115,11 +115,11 @@ describe('hook.ts holds the one thing a part reads from the provider (R-5.12-1)'
     expect(source.startsWith("'use client'\n")).toBe(true)
   })
 
-  it('imports the provider context and nothing else: no React, so no state of its own', () => {
-    expect(importedModules(source)).toEqual(['#shared/provider/context.js'])
+  it('imports the shared portal hook and nothing else: no React, so no state of its own', () => {
+    expect(importedModules(source)).toEqual(['#shared/provider/use-portal-locale.js'])
   })
 
-  it('calls useDirection and no other hook', () => {
-    expect(hookCalls(source)).toEqual(['useDirection'])
+  it('calls usePortalLocale, which every portaled part calls, and no other hook', () => {
+    expect(hookCalls(source)).toEqual(['usePortalLocale'])
   })
 })

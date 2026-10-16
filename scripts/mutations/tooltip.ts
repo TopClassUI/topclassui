@@ -77,7 +77,13 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the tooltip positioner loses the direction of its provider, so the popup of an RTL island runs left to right and its arrow points away from the trigger',
     file: 'src/components/tooltip/client.tsx',
-    from: '        dir={direction}\n',
+    from: '        dir={dir}\n',
+    to: '',
+  },
+  {
+    label: 'the tooltip positioner loses the language of its provider, so the popup of an Arabic island is announced and shaped as English',
+    file: 'src/components/tooltip/client.tsx',
+    from: '        lang={lang}\n',
     to: '',
   },
   {
