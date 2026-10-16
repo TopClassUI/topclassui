@@ -72,7 +72,7 @@ browser sends the focus of a blocked submit to the hidden input, a box of 1 px.
 the box. `size="custom"` draws no box size: give the box one from your own CSS.
 
 **The radius is `rounded-chip`**: 4 px, and 8 px in Ocean, where the `xs` and `sm` boxes are
-circles until they are ticked.
+circles, ticked or not: only the tick or the dash tells them from a radio.
 
 **`parent`** reaches Base UI, but does nothing without a `CheckboxGroup`, which is not built.
 
