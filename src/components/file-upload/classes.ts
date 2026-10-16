@@ -25,9 +25,9 @@ export const FILE_UPLOAD_BROWSE = 'text-primary-on-soft underline underline-offs
 export const FILE_UPLOAD_HINT = `text-xs text-muted group-data-dragging/zone:text-primary-on-soft wrap-anywhere ${CONTAIN} [&_a,&_button]:relative [&_a,&_button]:z-1`
 
 /** At most --tc-list-rows whole rows and their gaps, then it scrolls inside itself. A row is its remove or its name with
- * padding and line, or --tc-row-height if taller, which ROW_TOUCH replaces under a coarse pointer. auto-rows-max: a row
+ * padding and line, or --tc-row-height if taller, which ROW_TOUCH keeps under a coarse pointer. auto-rows-max: a row
  * never shrinks under its content. Nothing at all while empty. */
-export const FILE_UPLOAD_LIST = `grid grid-cols-1 auto-rows-max gap-1.5 max-h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-min,24px)+var(--spacing)*2+var(--tc-line-width)*2,var(--text-sm)*var(--text-sm--line-height)+var(--spacing)*2+var(--tc-line-width)*2)+(var(--tc-list-rows)-1)*var(--spacing)*1.5)] pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-target-coarse,44px)+var(--spacing)*2+var(--tc-line-width)*2,var(--text-sm)*var(--text-sm--line-height)+var(--spacing)*2+var(--tc-line-width)*2)+(var(--tc-list-rows)-1)*var(--spacing)*1.5)] empty:hidden ${SCROLL_AREA} ${FOCUS_RING_INSET}`
+export const FILE_UPLOAD_LIST = `grid grid-cols-1 auto-rows-max gap-1.5 max-h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-min,24px)+var(--spacing)*2+var(--tc-line-width)*2,var(--text-sm)*var(--text-sm--line-height)+var(--spacing)*2+var(--tc-line-width)*2)+(var(--tc-list-rows)-1)*var(--spacing)*1.5)] pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-coarse,44px)+var(--spacing)*2+var(--tc-line-width)*2,var(--text-sm)*var(--text-sm--line-height)+var(--spacing)*2+var(--tc-line-width)*2)+(var(--tc-list-rows)-1)*var(--spacing)*1.5)] empty:hidden ${SCROLL_AREA} ${FOCUS_RING_INSET}`
 
 export const FILE_UPLOAD_ROW = `flex min-h-(--tc-row-height) min-w-0 items-center gap-2.5 rounded-control px-3 py-1 text-sm ${BORDER} ${ROW_TOUCH}`
 
