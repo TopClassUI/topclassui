@@ -169,4 +169,10 @@ export const MUTATIONS: Mutation[] = [
     from: "FILE_UPLOAD_INPUT = 'absolute inset-0 size-full",
     to: "FILE_UPLOAD_INPUT = 'absolute size-full",
   },
+  {
+    label: 'the file upload picks the unit before rounding, so 1,048,575 bytes print 1,024 kB',
+    file: LIB,
+    from: 'while (Math.round(value * 10) / 10 >= 1024 &&',
+    to: 'while (value >= 1024 &&',
+  },
 ]
