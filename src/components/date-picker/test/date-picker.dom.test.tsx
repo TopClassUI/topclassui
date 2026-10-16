@@ -54,6 +54,14 @@ describe('the popup', () => {
     expect(within(grid).getAllByRole('button').filter((b) => b.tabIndex === 0)).toEqual([chosen])
   })
 
+  it('the focused chosen day says so itself, pressed, since a reader announces the button and not its cell', async () => {
+    render(<CheckIn defaultValue="2026-09-22" />)
+    const grid = await open()
+    const pressed = within(grid).getAllByRole('button', { pressed: true }).map((b) => b.getAttribute('aria-label'))
+    expect(pressed).toEqual(['Tuesday, September 22, 2026'])
+    expect(within(grid).getAllByRole('button', { pressed: false })).toHaveLength(29)
+  })
+
   it('six rows of seven cells always; the cells outside the month are empty', async () => {
     render(<CheckIn defaultValue="2027-02-10" firstDayOfWeek={1} />)
     const grid = await open()

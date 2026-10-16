@@ -182,4 +182,11 @@ export const MUTATIONS: Mutation[] = [
     from: 'export const DATE_PICKER_NAV = `${ICON_BUTTON} text-body ${HOVER.ghost} ${ARIA_DISABLED}`',
     to: 'export const DATE_PICKER_NAV = `${ICON_BUTTON} text-body ${HOVER.ghost}`',
   },
+  {
+    label: 'the date picker day button loses aria-pressed, so the focused chosen day reads as a plain button',
+    file: PART,
+    from: '                        aria-pressed={day.selected}
+',
+    to: '',
+  },
 ]
