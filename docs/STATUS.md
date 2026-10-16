@@ -2,13 +2,13 @@
 
 Read this first in a new session, then `docs/PLAN.md` for the specification and `docs/DECISIONS.md` (newest entries at the top). The newest DECISIONS entry is from 16 October 2026 and records what the deep reviews of Units 4 and 5 changed.
 
-Last updated: 16 October 2026 (Units 1 and 2 on `main`; Unit 3 and its review fixes being merged; Units 4 and 5 built, reviewed, fixed and verified twice on local branches). The build order is `docs/CLOUD-PLAN.md`: the site's 46, the server set first. The design of each unit is written out in `docs/figma/unit-1.md` to `docs/figma/unit-5.md`, because the session that builds them has no Figma access.
+Last updated: 16 October 2026 (Units 1 and 2 on `main`; Unit 3 and its review fixes being merged; Units 4 and 5 built, reviewed and fixed on local branches). The build order is `docs/CLOUD-PLAN.md`: the site's 46, the server set first. The design of each unit is written out in `docs/figma/unit-1.md` to `docs/figma/unit-5.md`, because the session that builds them has no Figma access.
 
 ---
 
 ## The one-line version
 
-The design system and the documentation site exist in Figma. **20 of the 46 components are on `main`**: Button, then Unit 1 (Badge, Kbd, Separator, Spinner, Skeleton, EmptyState, Alert, Card, Progress, Tooltip), then Unit 2 (Input, Tag, Avatar, AvatarGroup, Breadcrumb, Pagination, Timeline, Table, Banner). `pnpm check` is green on the merged tree: 5201 unit tests in 290 files, 1463 Playwright tests over 924 harness pages (154 demos, three modes, two directions), and 289 mutations in `pnpm test:mutation`. All 46 components of the site are built: the other 26 are in Units 3 to 5 on local branches (below).
+The design system and the documentation site exist in Figma. **20 of the 46 components are on `main`**: Button, then Unit 1 (Badge, Kbd, Separator, Spinner, Skeleton, EmptyState, Alert, Card, Progress, Tooltip), then Unit 2 (Input, Tag, Avatar, AvatarGroup, Breadcrumb, Pagination, Timeline, Table, Banner). `pnpm check` is green on the merged tree: 5201 unit tests in 290 files, 1463 Playwright tests over 924 harness pages (154 demos, three modes, two directions), and 289 mutations in `pnpm test:mutation`. All 46 components of the site are built: the other 26 are Units 3 to 5 (below).
 
 ## What is on main
 
@@ -26,13 +26,13 @@ Every component is `status: 'beta'`. None is `stable`: PLAN 20 asks for the visu
 
 ## Built, not merged yet (16 October)
 
-**Unit 3**, all built and checked: Dialog, Drawer, Popover, Toast, Dropdown, Command, Tabs, Accordion, Navbar, Sidebar; and the second part: Rating, Tag's remove button, Avatar's image fallback, Banner's dismiss. Its departures are one entry in `docs/DECISIONS.md`, dated 14 October; its deep review found 73 faults, fixed in fourteen `fix/*-review` branches (16 October entry). Unit 3 and those fixes are pull requests #38 to #82, being merged now. Plan: `docs/figma/unit-3.md`.
+**Unit 3**, all built and checked: Dialog, Drawer, Popover, Toast, Dropdown, Command, Tabs, Accordion, Navbar, Sidebar; and the second part: Rating, Tag's remove button, Avatar's image fallback, Banner's dismiss. Its departures are one entry in `docs/DECISIONS.md`, dated 14 October; its deep review found 73 faults, fixed in fourteen `fix/*-review` branches (16 October entry). Unit 3 and those fixes are pull requests #38 to #81, and its notes #82, being merged now. Plan: `docs/figma/unit-3.md`.
 
 **Unit 4**, all ten built on top: the shared pieces 1 to 9, then Switch, Checkbox, RadioGroup, SegmentedControl, Textarea, Slider, NumberField, OTPField, Select and Combobox. Its departures are one entry in `docs/DECISIONS.md`, dated 15 October. Plan: `docs/figma/unit-4.md`.
 
 **Unit 5**, the last unit, built on top: the shared labels, tokens and form errors, then Meter, Stepper, CodeBlock, Field, Form, TreeView, FileUpload and DatePicker. Its departures are one entry in `docs/DECISIONS.md`, dated 15 October. Plan: `docs/figma/unit-5.md`.
 
-**Units 4 and 5 are reviewed, fixed and verified twice.** The deep reviews found 56 faults in Unit 4 and 40 in Unit 5, three blockers each. Each was fixed with a test that fails without it, in eight `fix/*-review` branches after `feat/combobox` and six after `feat/date-picker`, and the fixes were checked a second time on Omar's laptop. What they changed, and what is left for Omar, is the 16 October entry.
+**Units 4 and 5 are reviewed and fixed.** The deep reviews found 56 faults in Unit 4 and 40 in Unit 5, three blockers each. Each code fix carries a test that fails without it, in eight `fix/*-review` branches after `feat/combobox` and six after `feat/date-picker`. OTPField's and Slider's fixes were made on Omar's laptop; the other twelve branches were checked a second time there. What they changed, and what is left for Omar, is the 16 October entry.
 
 **Next:** the pull requests of Units 4 and 5 and their review fixes, in stack order, once Unit 3 is merged.
 
