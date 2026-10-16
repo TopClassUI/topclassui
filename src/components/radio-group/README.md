@@ -52,9 +52,10 @@ export function PlanField(control: { id: string, name: string, required: boolean
 arrows move to the next radio and select it, skip a disabled one, and wrap at both ends. Under
 an RTL `TopClassProvider`, ArrowRight goes to the radio before. Space selects. Enter does not, and
 there is no Home or End (Base UI's). Before the page hydrates the radio of `value`, else of
-`defaultValue`, is the one tab stop. **A group with neither has no tab stop until hydration**:
-the group cannot know its first radio on the server. A disabled radio is a disabled button, so
-it leaves the tab order and the arrow order.
+`defaultValue`, is the one tab stop. A group with neither, or with a value no radio has, serves
+it on the first enabled radio it finds among its children, where Base UI keeps it once hydrated;
+a radio a component of yours renders is not found. A disabled radio is a disabled button, so it
+leaves the tab order and the arrow order.
 
 **The form.** With a `name`, each radio has a hidden radio input: the form sends `name=<value>`,
 and nothing while no radio is checked. Before the page hydrates it sends the default.

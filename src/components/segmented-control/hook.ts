@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 
 import { useFormValue } from '#shared/use-form-value.js'
-import { useServerTabStop } from '#shared/use-server-tab-stop.js'
+import { serveTabStopOn, useServerTabStop } from '#shared/use-server-tab-stop.js'
 import { SEGMENTED_CONTROL_DEFAULTS } from './constants.js'
 import type { SegmentedControlChangeDetails, SegmentedControlLook, SegmentedControlValueProps } from './types.js'
 
@@ -21,7 +21,7 @@ function syncRadios(value: string | null, _input: HTMLInputElement | null, root:
 
 /** The value of a segmented control, held here so a form reset brings it back to its latest default (unit-4.md, "A
  * form reset"), and the look its segments read. Base UI always gets the controlled pair. */
-export function useSegmentedControlRoot(size: SegmentedControlLook['size'], { value, defaultValue, onValueChange, ref }: SegmentedControlValueProps) {
+export function useSegmentedControlRoot(size: SegmentedControlLook['size'], { value, defaultValue, onValueChange, ref, children, disabled }: SegmentedControlValueProps) {
   // Base UI puts its tab stop on the checked radio only on mount, so a value set from outside remounts it, focus allowing.
   const [resetKey, setResetKey] = useState(0)
   const picked = useRef(value)
@@ -43,7 +43,7 @@ export function useSegmentedControlRoot(size: SegmentedControlLook['size'], { va
   }, [value, state.rootRef])
 
   // Read once: the server HTML and the render that hydrates must agree on the one tab stop.
-  const [opensOn] = useState(() => value ?? defaultValue ?? null)
+  const [opensOn] = useState(() => serveTabStopOn(children, value ?? defaultValue ?? null, disabled))
   const look = useMemo(() => ({ size, opensOn }), [size, opensOn])
 
   // The caller first, with Base UI's details, so details.cancel() still keeps the track as it was.

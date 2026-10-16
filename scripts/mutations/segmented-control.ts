@@ -223,4 +223,10 @@ export const MUTATIONS: Mutation[] = [
     from: "  '*:min-w-0 *:truncate',\n",
     to: '',
   },
+  {
+    label: 'the segmented control reads no children for its server tab stop, so with nothing checked the server HTML has none',
+    file: HOOK,
+    from: 'useState(() => serveTabStopOn(children, value ?? defaultValue ?? null, disabled))',
+    to: 'useState(() => value ?? defaultValue ?? null)',
+  },
 ]

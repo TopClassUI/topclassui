@@ -210,4 +210,10 @@ export const MUTATIONS: Mutation[] = [
     from: 'toggle:border-primary-on-soft',
     to: 'toggle:border-primary-solid',
   },
+  {
+    label: 'the radio group reads no children for its server tab stop, so with nothing checked the server HTML has none',
+    file: HOOK,
+    from: 'useState(() => serveTabStopOn(children, value ?? defaultValue ?? null, disabled))',
+    to: 'useState(() => value ?? defaultValue ?? null)',
+  },
 ]

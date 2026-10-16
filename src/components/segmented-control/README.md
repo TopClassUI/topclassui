@@ -59,7 +59,8 @@ export function ViewField(control: { id: string, name: string, required: boolean
 The arrows move to the next segment and select it, skip a disabled one, and wrap at both ends.
 Under an RTL `TopClassProvider`, ArrowRight goes to the segment before. Space selects. Enter does
 not, and there is no Home or End (Base UI's). Before the page hydrates the selected segment is
-the one tab stop. A disabled segment is a disabled button: it leaves the tab and arrow order.
+the one tab stop; with none selected it is the first enabled segment among the children, as Base
+UI makes it once hydrated. A disabled segment is a disabled button: it leaves the tab and arrow order.
 
 **The form.** With a `name` the form sends `name=<value>`; before the page hydrates it sends the
 default. Without a `name` it is a view switch and sends nothing. **A form reset**, a reset
