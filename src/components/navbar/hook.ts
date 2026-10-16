@@ -19,8 +19,8 @@ export function useNavbarOffset() {
     // Rounded up: a bar of 60.5 px would otherwise cover half a pixel of what lands under it.
     const publish = () => {
       const height = Math.ceil(bar.getBoundingClientRect().height)
-      // A bar taller than its share of the screen scrolls away, and then covers nothing.
-      const unstuck = height > view.innerHeight * NAVBAR_STICKY_SHARE
+      // Against the screen with the address bar shown, which does not change as it hides on a scroll.
+      const unstuck = height > root.clientHeight * NAVBAR_STICKY_SHARE
       bar.toggleAttribute('data-unstuck', unstuck)
       root.style.setProperty(NAVBAR_OFFSET_VARIABLE, `${String(unstuck ? 0 : height)}px`)
     }

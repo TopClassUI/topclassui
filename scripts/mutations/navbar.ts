@@ -63,14 +63,20 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the navbar hook never lets go of the top, so at a 32 px root three rows cover two thirds of a phone',
     file: HOOK,
-    from: 'const unstuck = height > view.innerHeight * NAVBAR_STICKY_SHARE',
-    to: 'const unstuck = false && height > view.innerHeight * NAVBAR_STICKY_SHARE',
+    from: 'const unstuck = height > root.clientHeight * NAVBAR_STICKY_SHARE',
+    to: 'const unstuck = false && height > root.clientHeight * NAVBAR_STICKY_SHARE',
   },
   {
     label: 'the navbar hook lets go of a bar of exactly its share of the screen',
     file: HOOK,
-    from: 'height > view.innerHeight * NAVBAR_STICKY_SHARE',
-    to: 'height >= view.innerHeight * NAVBAR_STICKY_SHARE',
+    from: 'height > root.clientHeight * NAVBAR_STICKY_SHARE',
+    to: 'height >= root.clientHeight * NAVBAR_STICKY_SHARE',
+  },
+  {
+    label: 'the navbar hook measures the window, which grows as a phone hides its address bar, so the bar sticks and lets go as the page scrolls',
+    file: HOOK,
+    from: 'height > root.clientHeight * NAVBAR_STICKY_SHARE',
+    to: 'height > view.innerHeight * NAVBAR_STICKY_SHARE',
   },
   {
     label: 'the navbar may cover half the screen before it lets go',
