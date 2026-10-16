@@ -1,7 +1,12 @@
+import { mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+
 import { expect, test, type Page } from '@playwright/test'
 
 import { DIRECTIONS } from '../scripts/lib/harness.js'
 import { expectInsideViewport, expectNoSidewaysScroll, openLive, viewportBox } from './live.js'
+import { demoListProblem, newerSource } from './pages.js'
 import { paintedRgb, pixelsOf, rgbOf } from './pixels.js'
 
 // The measuring helpers themselves: each one fails on the case it exists to catch, so a spec built on it can fail too.
@@ -85,4 +90,40 @@ test.describe('expectNoSidewaysScroll', () => {
       await expectNoSidewaysScroll(page)
     })
   }
+})
+
+test.describe('the static page list', () => {
+  /** A repository of one component with the given demos, in a folder of its own. */
+  const repo = (demos: readonly string[]) => {
+    const root = mkdtempSync(join(tmpdir(), 'tc-pages-'))
+    mkdirSync(join(root, 'src', 'components', 'tag', 'dummy'), { recursive: true })
+    for (const demo of demos) writeFileSync(join(root, 'src', 'components', 'tag', 'dummy', `${demo}.tsx`), '')
+    return root
+  }
+
+  test('a list that matches the demos on disk is fine; one missing or extra demo is named', () => {
+    const root = repo(['basic', 'tones'])
+    try {
+      expect(demoListProblem(['tag--basic', 'tag--tones'], root)).toBeNull()
+      expect(demoListProblem(['tag--basic'], root)).toBe('run pnpm harness:build first: .harness lists 1 demos, src has 2 (not built: tag--tones; gone: none)')
+      expect(demoListProblem(['tag--basic', 'tag--tones', 'button--basic'], root)).toBe('run pnpm harness:build first: .harness lists 3 demos, src has 2 (not built: none; gone: button--basic)')
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
+  })
+
+  test('a source file changed after the build is found, in a folder or named alone', () => {
+    const root = repo(['basic'])
+    const demo = join(root, 'src', 'components', 'tag', 'dummy', 'basic.tsx')
+    try {
+      utimesSync(demo, new Date(2000, 0, 1), new Date(2000, 0, 1))
+      const built = new Date(2001, 0, 1).getTime()
+      expect(newerSource(built, [join(root, 'src'), demo])).toBeNull()
+      utimesSync(demo, new Date(2002, 0, 1), new Date(2002, 0, 1))
+      expect(newerSource(built, [join(root, 'src')])).toBe(demo)
+      expect(newerSource(built, [demo])).toBe(demo)
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
+  })
 })
