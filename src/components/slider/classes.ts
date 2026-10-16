@@ -3,8 +3,9 @@ import {
   DISABLED, FIELD_HOLDER, FIELD_HOLDER_FULL, FIELD_TEXT, FORCED_EDGE, TARGET_HEIGHT, TOGGLE_SIZE, TOUCH_TARGET,
 } from '#shared/classes.js'
 
-/** The box that owns the width. No type step here: FIELD_TEXT[size] gives it, so the em of the width is an Input's. */
-export const SLIDER_ROOT = `group/slider grid ${FIELD_HOLDER} ${DISABLED}`
+/** The box that owns the width. No type step here: FIELD_TEXT[size] gives it, so the em of the width is an Input's.
+ * has-disabled: a disabled fieldset disables the range input, which Base UI does not know, so the root dims on that. */
+export const SLIDER_ROOT = `group/slider grid ${FIELD_HOLDER} ${DISABLED} has-disabled:pointer-events-none has-disabled:opacity-50`
 
 /** An Input's type step at each size, which sets the em of --tc-input-width. */
 export const SLIDER_TEXT = FIELD_TEXT

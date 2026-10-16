@@ -31,6 +31,18 @@ export const MUTATIONS: Mutation[] = [
     to: 'export const SLIDER_ROOT = `group/slider grid ${DISABLED}`',
   },
   {
+    label: 'the slider root loses has-disabled, so inside a disabled fieldset a press on the track still moves the thumb',
+    file: CLASSES,
+    from: ' has-disabled:pointer-events-none',
+    to: '',
+  },
+  {
+    label: 'the slider root does not dim inside a disabled fieldset, so it looks live while the form sends nothing',
+    file: CLASSES,
+    from: ' has-disabled:opacity-50',
+    to: '',
+  },
+  {
     label: 'the slider hands Base UI defaultValue again, so a form reset leaves the thumb where it was',
     file: CLIENT,
     from: '      value={slider.value as Value}\n      onValueChange={slider.onValueChange}\n',

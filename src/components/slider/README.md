@@ -69,7 +69,7 @@ your `locale` and `format`. A `format` of `percent` multiplies: give it values f
 **`invalid`**, or an `aria-invalid` a Field passes, sets `aria-invalid` on the group and, from
 hydration, on each range input, the element a screen reader lands on: point `aria-describedby`
 at the error text too. The fill and the knob turn red, and a line is drawn around the track. **`disabled`** dims it and disables every range input, so the form sends
-nothing. A slider has no read-only state.
+nothing; a disabled `<fieldset>` around it dims it too, and a press on its track moves nothing. A slider has no read-only state.
 
 **The width** is an Input's of the same `size` (`--tc-input-width`), and it shrinks in a narrow
 track. **`fullWidth`** fills the parent, but in a parent that sizes to its content (a `w-fit`

@@ -56,6 +56,11 @@ describe('the box that owns the width', () => {
     expect(ruleOf(selectorOf('grid-cols-1'))).toBe('grid-template-columns: repeat(1, minmax(0, 1fr));')
   })
 
+  it('a range input disabled by a fieldset, which Base UI does not know, dims the root and stops a press on its track', () => {
+    expect(ruleOf(`${selectorOf('has-disabled:pointer-events-none')}:has(:disabled)`)).toBe('pointer-events: none;')
+    expect(ruleOf(`${selectorOf('has-disabled:opacity-50')}:has(:disabled)`)).toBe('opacity: 50%;')
+  })
+
   it('the control is padded by half a target, 12 px, and 22 under a finger', () => {
     expect(ruleOf(selectorOf('px-[calc(var(--tc-target-min,24px)/2)]'))).toBe('padding-inline: calc(var(--tc-target-min,24px) / 2);')
     const coarse = 'pointer-coarse:px-[calc(var(--tc-target-coarse,44px)/2)]'

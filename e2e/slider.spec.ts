@@ -481,6 +481,27 @@ test.describe('live: a form reset', () => {
   })
 })
 
+for (const pointer of ['fine', 'coarse'] as const) {
+  test.describe(`live: a disabled fieldset, ${pointer} pointer`, () => {
+    test.use(pointer === 'coarse' ? COARSE : {})
+    test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
+
+    test('the slider dims to half, a press on its track moves nothing, and the form sends nothing', async ({ page }) => {
+      await openLive(page, 'separator--horizontal')
+      await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/slider-reset.tsx' })
+      await expect(page.locator('#slider-reset')).toHaveAttribute('data-ready', '')
+      const input = thumbIn(page, 'Fenced')
+      expect(await input.evaluate((el) => getComputedStyle(el.closest('[role="group"]') as Element).opacity)).toBe('0.5')
+      const track = await boxOf(trackOf(input))
+      const [x, y] = [track.left + track.width * 0.9, track.top + track.height / 2]
+      if (pointer === 'fine') await page.mouse.click(x, y)
+      else await page.touchscreen.tap(x, y)
+      expect([await valueOf(input), await input.inputValue(), await fromLeft(input)]).toEqual(['20', '20', 20])
+      expect(await serverEntries(page, '#fenced')).toEqual([])
+    })
+  })
+}
+
 test.describe('live: where a page puts a slider', () => {
   const fixture = async (page: Page, options: LiveOptions = {}) => {
     await openLive(page, 'separator--horizontal', options)
