@@ -37,8 +37,9 @@ describe('one thumb or two, pinned by the type argument', () => {
 })
 
 describe('the props Slider adds come from the schema', () => {
-  it('are size, invalid, fullWidth, showValue, min, max and step, all optional', () => {
-    expectTypeOf<keyof SliderDesignProps>().toEqualTypeOf<'size' | 'invalid' | 'fullWidth' | 'showValue' | 'min' | 'max' | 'step'>()
+  it('are size, invalid, fullWidth, showValue, min, max, step, largeStep and minStepsBetweenValues, all optional', () => {
+    expectTypeOf<keyof SliderDesignProps>().toEqualTypeOf<'size' | 'invalid' | 'fullWidth' | 'showValue' | 'min' | 'max' | 'step' | 'largeStep' | 'minStepsBetweenValues'>()
+    expectTypeOf<SliderProps['largeStep']>().toEqualTypeOf<number | undefined>()
     expectTypeOf<SliderProps['size']>().toEqualTypeOf<Sizes | undefined>()
     expectTypeOf<SliderProps['showValue']>().toEqualTypeOf<boolean | undefined>()
     expectTypeOf<SliderProps['step']>().toEqualTypeOf<number | undefined>()

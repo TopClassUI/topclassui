@@ -123,6 +123,22 @@ describe('a segment', () => {
     }
   })
 
+  // SEGMENTED-1: the system pair opts it out of forced colours, so the browser's GrayText never reaches it.
+  it('selected and disabled under forced colours takes GrayText, as every other disabled segment does', () => {
+    const both = '[data-checked][data-disabled]'
+    expect(ruleOf(`${selectorOf('forced-colors:data-checked:data-disabled:bg-[GrayText]')}${both}`)).toBe('background-color: GrayText;')
+    expect(ruleOf(`${selectorOf('forced-colors:data-checked:data-disabled:text-[Canvas]')}${both}`)).toBe('color: Canvas;')
+    expect(mediaOf(`${selectorOf('forced-colors:data-checked:data-disabled:bg-[GrayText]')}${both}`)).toBe('@media (forced-colors: active)')
+    expect(css.indexOf(selectorOf('forced-colors:data-checked:data-disabled:bg-[GrayText]')))
+      .toBeGreaterThan(css.indexOf(selectorOf('forced-colors:data-checked:bg-[Highlight]')))
+  })
+
+  // SEGMENTED-2: truncateLabel wraps a run of text, never an element, which a segment would cut with no ellipsis.
+  it('every child of a segment may shrink and truncates, so an element for a label ends in an ellipsis (R-5.2-7)', () => {
+    expect(ruleOf(`:is(${selectorOf('*:min-w-0')} > *)`)).toBe('min-width: 0px;')
+    expect(ruleOf(`:is(${selectorOf('*:truncate')} > *)`)).toBe('overflow: hidden; text-overflow: ellipsis; white-space: nowrap;')
+  })
+
   it('the ring is drawn inside the segment, since the track clips', () => {
     expect(ruleOf(`${selectorOf('focus-visible:-outline-offset-(length:--tc-ring-width)')}:focus-visible`)).toBe('outline-offset: calc(var(--tc-ring-width) * -1);')
   })

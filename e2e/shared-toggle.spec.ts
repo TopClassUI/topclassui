@@ -3,7 +3,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
 import { DIRECTIONS } from '../scripts/lib/harness.js'
 import { type LiveOptions, expectNoSidewaysScroll, openLive } from './live.js'
 import { boxOf } from './overlay.js'
-import { FORCED_CANVAS, pixelsOf, rgbOf } from './pixels.js'
+import { FORCED_CANVAS, inkOn, pixelsOf, rgbOf, ringRow } from './pixels.js'
 
 // What the shared toggle classes promise and only a browser can show, on the stand-in of e2e/fixtures/shared-toggle.tsx:
 // the target is a floor whatever the box, it never stretches in a grid, and the ring and the states are drawn on the box.
@@ -154,6 +154,29 @@ for (const scheme of ['light', 'dark'] as const) {
       await target(page, 'size-md').focus()
       expect(await css(box(page, 'size-md'), 'outline-style')).toBe('solid')
       expect(await css(target(page, 'size-md'), 'outline-style')).toBe('none')
+    })
+
+    test('a checked box that is invalid has a CanvasText line and no author red; one that is disabled is GrayText', async ({ page }) => {
+      await fixture(page)
+      const [canvasText, grayText] = [await resolved(page, 'color', 'CanvasText'), await resolved(page, 'color', 'GrayText')]
+      expect(await css(box(page, 'checked-invalid'), 'border-top-color')).toBe(canvasText)
+      expect(await css(box(page, 'checked-invalid'), 'border-top-width')).toBe('2px')
+      // The red inset ring is zero wide: no author colour is painted.
+      expect(await css(box(page, 'checked-invalid'), 'box-shadow')).not.toMatch(/[1-9]px inset/)
+      expect(await css(box(page, 'checked-disabled'), 'background-color')).toBe(grayText)
+      expect(await css(box(page, 'checked-disabled'), 'border-top-color')).toBe(grayText)
+      expect(await css(box(page, 'checked'), 'background-color')).toBe(await resolved(page, 'background-color', 'Highlight'))
+    })
+
+    test('on a page in the other theme, a filled box rings in CanvasText, not the author ring that opting out would keep', async ({ page }) => {
+      await fixture(page, { mode: scheme === 'light' ? 'dark' : 'light' })
+      const canvasText = await resolved(page, 'color', 'CanvasText')
+      for (const id of ['size-md', 'checked', 'checked-invalid']) {
+        await target(page, id).focus()
+        expect(await css(box(page, id), 'outline-color'), id).toBe(canvasText)
+        const row = await ringRow(page, await boxOf(box(page, id)))
+        expect(inkOn(row, FORCED_CANVAS[scheme]), id).toBe(row.length)
+      }
     })
   })
 }

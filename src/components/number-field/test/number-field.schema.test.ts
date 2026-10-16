@@ -55,6 +55,9 @@ describe('the schema, the bounds and the constants agree', () => {
     expect(numberFieldSchema.safeParse({ step: 'all' }).success).toBe(false)
     expect(numberFieldSchema.safeParse({ size: 'xxl' }).success).toBe(false)
     expect(numberFieldSchema.safeParse({ step: 'any', min: -1e15, max: 1e15 }).success).toBe(true)
+    expect(numberFieldSchema.safeParse({ min: Number.NaN }).success).toBe(false)
+    expect(numberFieldSchema.safeParse({ min: 10, max: 2 }).success).toBe(false)
+    expect(numberFieldSchema.safeParse({ min: 2, max: 2 }).success).toBe(true)
   })
 
   it('keeps what is not built out of the schema: no tone, no variant, no prefix, no suffix', () => {

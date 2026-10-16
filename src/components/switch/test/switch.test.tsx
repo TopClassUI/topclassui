@@ -78,9 +78,11 @@ describe('on the server', () => {
     expect(attr(button, 'class')?.endsWith(' ms-2')).toBe(true)
   })
 
-  it('size custom emits no size class on the track and no slide on the thumb', () => {
+  it('size custom emits no size class on the track, and a thumb that slides by what it measures of the track', () => {
     const html = markup(<Switch aria-label="A" size="custom" />)
     expect(html).not.toContain('h-toggle-')
-    expect(html).not.toContain('translate-x-')
+    expect(html).not.toContain('w-[calc(')
+    expect(html).toContain('@container')
+    expect(html).toContain('group-data-checked/toggle:translate-x-[calc((100cqw-100%)*var(--tc-dir))]')
   })
 })

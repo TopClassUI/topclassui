@@ -94,9 +94,9 @@ describe('the list', () => {
 })
 
 describe('a row', () => {
-  it('is exactly one unit tall, and 44 px under a finger, so the spacers stand for whole rows', () => {
+  it('is exactly one unit tall, and at least 44 px under a finger, so the spacers stand for whole rows', () => {
     expect(ruleOf(selectorOf('h-(--tc-row-height)'))).toBe('height: var(--tc-row-height);')
-    const coarse = 'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]'
+    const coarse = 'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]'
     expect(mediaOf(selectorOf(coarse))).toBe('@media (pointer: coarse)')
     expect(COMBOBOX_ITEM.split(' ')).toEqual(expect.arrayContaining(['h-(--tc-row-height)', coarse, 'shrink-0']))
   })

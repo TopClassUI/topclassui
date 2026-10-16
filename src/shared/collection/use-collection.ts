@@ -39,7 +39,12 @@ function edgesOf(node: HTMLElement) {
 /** useLayoutEffect warns during a server render, and there is nothing to measure there. */
 const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
-export function useCollection<T>(props: CollectionProps<T>): UseCollectionResult<T> {
+export interface UseCollectionOptions<T> extends CollectionProps<T> {
+  /** How many items are loaded, when `items` is a filtered view of them: one page is asked per value of it. */
+  loadedCount?: number | undefined
+}
+
+export function useCollection<T>(props: UseCollectionOptions<T>): UseCollectionResult<T> {
   const defaults = useCollectionDefaults()
   const {
     items,
@@ -52,13 +57,14 @@ export function useCollection<T>(props: CollectionProps<T>): UseCollectionResult
   } = props
 
   const count = items.length
+  const loaded = props.loadedCount ?? count
   const virtualized =
     virtualize === true || (virtualize === 'auto' && count > defaults.virtualizeAbove)
 
   const [scrollTop, setScrollTop] = useState(0)
   const [viewportHeight, setViewportHeight] = useState(0)
-  // Starts true: with no measured container we cannot rule out being at the end.
-  const [atEnd, setAtEnd] = useState(true)
+  // Whether the list was at its end, and at what count: a page that lands is not at the end until its rows are read.
+  const [edge, setEdge] = useState({ count: -1, atEnd: false })
   // A version counter, not a new Map per row: copying it made scrolling quadratic.
   const measuredRef = useRef<Map<number, number>>(new Map())
   const [measuredVersion, setMeasuredVersion] = useState(0)
@@ -82,7 +88,8 @@ export function useCollection<T>(props: CollectionProps<T>): UseCollectionResult
       setScrollTop(container.scrollTop)
       setViewportHeight(container.clientHeight)
       const slack = container.scrollHeight - container.scrollTop - container.clientHeight
-      setAtEnd(container.clientHeight === 0 || slack <= reach)
+      const atEnd = container.clientHeight === 0 || slack <= reach
+      setEdge((last) => (last.count === count && last.atEnd === atEnd ? last : { count, atEnd }))
     }
 
     read()
@@ -94,7 +101,7 @@ export function useCollection<T>(props: CollectionProps<T>): UseCollectionResult
       container.removeEventListener('scroll', read)
       ro.disconnect()
     }
-  }, [container, reach])
+  }, [container, reach, count])
 
   const rowRef = useCallback(
     (index: number) => (node: HTMLElement | null) => {
@@ -147,19 +154,19 @@ export function useCollection<T>(props: CollectionProps<T>): UseCollectionResult
     return out
   }, [items, getKey, start, end])
 
-  // Unvirtualized, count - end is always 0, so only the scroll position can stop the asking.
-  const wantsMore = virtualized
+  // Read at this count first; unvirtualized, count - end is always 0, so only the scroll position can stop the asking.
+  const wantsMore = edge.count === count && (virtualized
     ? shouldLoadMore(end, count, loadMoreThreshold, hasMore)
-    : hasMore && atEnd
+    : hasMore && edge.atEnd)
 
-  // Asked once per page: the guard only clears when items grows or the promise rejects.
+  // Asked once per page: the guard only clears when the loaded count grows or the promise rejects.
   const askedAt = useRef(-1)
   useEffect(() => {
     if (!loadMore || !wantsMore) return
-    if (askedAt.current === count) return
-    askedAt.current = count
+    if (askedAt.current === loaded) return
+    askedAt.current = loaded
     void Promise.resolve(loadMore()).catch(() => { askedAt.current = -1 })
-  }, [loadMore, wantsMore, count])
+  }, [loadMore, wantsMore, loaded])
 
   const scrollToIndex = useCallback(
     (index: number, block: ScrollBlock = 'nearest') => {

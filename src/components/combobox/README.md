@@ -23,8 +23,9 @@ import { Combobox } from 'topclassui'
 **A name is required.** `id` for a `<label htmlFor>` (the root hands it to the input), or
 `aria-label`, or `aria-labelledby`; the type refuses a Combobox with none. While the list is open
 Base UI hides everything else from assistive technology, the label too, and Chrome then gives the
-input no name; so once the page hydrates the input carries the label's text as `aria-label`, read
-again at each open. Pass `aria-label` or `aria-labelledby` yourself and nothing is copied.
+input no name; so while the list is open the input carries the label's text as `aria-label`, read at
+each open and dropped at each close, when the label names it again. Pass `aria-label` or
+`aria-labelledby` yourself and nothing is copied.
 
 **`items` is plain data**, `{ value, label, disabled? }`, so a server page renders a Combobox with
 no function crossing to the browser. `value` is what the form receives, unique in its list; `label`

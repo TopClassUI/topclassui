@@ -72,13 +72,13 @@ const RING_INSET = [
 
 /** What the footer asks of the actions in it: wrap the label, grow from the height of the size, 44 px under a finger. */
 const ACTION_WRAP = [
-  '**:whitespace-normal', '*:data-size:text-center',
-  '*:data-size:not-data-[size=custom]:h-auto', '*:data-size:not-data-[size=custom]:py-1',
-  '*:data-[size=xs]:min-h-control-xs', '*:data-[size=sm]:min-h-control-sm', '*:data-[size=md]:min-h-control-md',
-  '*:data-[size=lg]:min-h-control-lg', '*:data-[size=xl]:min-h-control-xl',
-  'pointer-coarse:*:data-[size=xs]:min-h-[var(--tc-target-coarse,44px)]',
-  'pointer-coarse:*:data-[size=sm]:min-h-[var(--tc-target-coarse,44px)]',
-  'pointer-coarse:*:data-[size=md]:min-h-[var(--tc-target-coarse,44px)]',
+  '**:whitespace-normal', '*:[&:is(button,a)]:data-size:text-center',
+  '*:[&:is(button,a)]:data-size:not-data-[size=custom]:h-auto', '*:[&:is(button,a)]:data-size:not-data-[size=custom]:py-1',
+  '*:[&:is(button,a)]:data-[size=xs]:min-h-control-xs', '*:[&:is(button,a)]:data-[size=sm]:min-h-control-sm', '*:[&:is(button,a)]:data-[size=md]:min-h-control-md',
+  '*:[&:is(button,a)]:data-[size=lg]:min-h-control-lg', '*:[&:is(button,a)]:data-[size=xl]:min-h-control-xl',
+  'pointer-coarse:*:[&:is(button,a)]:data-[size=xs]:min-h-[var(--tc-target-coarse,44px)]',
+  'pointer-coarse:*:[&:is(button,a)]:data-[size=sm]:min-h-[var(--tc-target-coarse,44px)]',
+  'pointer-coarse:*:[&:is(button,a)]:data-[size=md]:min-h-[var(--tc-target-coarse,44px)]',
 ]
 
 describe('every element carries exactly the classes the spec names', () => {
@@ -91,7 +91,7 @@ describe('every element carries exactly the classes the spec names', () => {
 
   it('the viewport: the whole screen less the inset, centring the popup on the dialog layer', async () => {
     expect(classes((await opened()).viewport)).toEqual([
-      'fixed', 'grid', 'inset-0', 'p-(--tc-overlay-inset)', 'place-items-center', 'z-(--tc-z-dialog)',
+      '[container-type:size]', 'fixed', 'grid', 'inset-0', 'p-(--tc-overlay-inset)', 'place-items-center', 'z-(--tc-z-dialog)',
     ])
   })
 
@@ -126,7 +126,7 @@ describe('every element carries exactly the classes the spec names', () => {
   it('the body: the scroll container, at least one line tall, with its ring drawn inside its box', async () => {
     expect(classes((await opened()).body)).toEqual([
       ...RING_INSET,
-      '[@media(height<17rem)]:overflow-y-visible', '[@media(height<17rem)]:shrink-0', 'flex-1', 'min-h-15',
+      '[@container(height<15rem)]:overflow-y-visible', '[@container(height<15rem)]:shrink-0', 'flex-1', 'min-h-15',
       'overflow-y-auto', 'overscroll-contain', 'px-5', 'py-5', 'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]',
       'text-muted', 'text-sm',
     ].sort())

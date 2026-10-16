@@ -58,6 +58,8 @@ import {
   follows its trigger, and hides when the trigger scrolls out of view.
 - **A form.** Put the `form` inside `PopoverPopup`. Do not write `render={<form />}` on it:
   that puts `role="dialog"` on a `form`, which HTML does not allow.
+  Give the form an `action` or an `onSubmit`: with neither, the browser sends it and
+  reloads the page. To close the popover on save, hold `open` in a client file.
 - **A long action.** A label wider than the popup ends in an ellipsis, as on any Button.
 - **A wide element.** A `pre` or a table wider than the popup makes the popup scroll
   sideways. Give it its own `overflow-x-auto` instead.
@@ -102,6 +104,8 @@ title wraps beside it:
 - **`delay`, `closeDelay`.** Milliseconds, 0 to 10000. Left out: 300 and 0. Give
   `closeDelay` 200 or so when the popover holds a link, so the pointer can reach it.
 - **Focus.** A popover the pointer opened does not take the focus.
+  The first Tab from the trigger then rests once on a hidden focus guard of Base UI
+  1.8.0, with no ring; the second reaches the popover.
 
 ### What Base UI gives
 
