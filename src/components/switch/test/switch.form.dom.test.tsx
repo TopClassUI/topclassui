@@ -107,4 +107,20 @@ describe('a reset brings it back to its default, on screen and in the form', () 
     expect(screen.getByRole('switch').getAttribute('aria-checked')).toBe('false')
     expect(entries(formOf())).toEqual([])
   })
+
+  it('a switch whose form prop moves to another form follows the new one, and the old one resets it no longer', async () => {
+    const page = (owner: string) => <><form id="fa" /><form id="fb" /><Switch aria-label="A" name="mv" form={owner} /></>
+    const { rerender } = render(page('fa'))
+    rerender(page('fb'))
+    const [fa, fb] = ['fa', 'fb'].map((id) => document.getElementById(id) as HTMLFormElement) as [HTMLFormElement, HTMLFormElement]
+    await userEvent.click(screen.getByRole('switch'))
+    expect(entries(fb)).toEqual([['mv', 'on']])
+    act(() => { fa.reset() })
+    await settle()
+    expect(screen.getByRole('switch').getAttribute('aria-checked')).toBe('true')
+    act(() => { fb.reset() })
+    await settle()
+    expect(screen.getByRole('switch').getAttribute('aria-checked')).toBe('false')
+    expect(entries(fb)).toEqual([])
+  })
 })

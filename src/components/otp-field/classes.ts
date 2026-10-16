@@ -3,14 +3,18 @@ import {
   BORDER_STRONG, DISABLED, FIELD_INVALID, FIELD_TEXT_COARSE, FOCUS_RING, TARGET_HEIGHT, TRANSITION,
 } from '#shared/classes.js'
 
-/** As wide as its cells, so in an Arabic form the group sits at the start, beside its label, while the cells run left to right. */
-export const OTP_ROOT = 'flex w-fit min-w-0 max-w-full items-center gap-2'
+/** As wide as its cells, so in an Arabic form the group sits at the start, beside its label, while the cells run left to right.
+ * It wraps: a parent narrower than the cells' floor (two fields in 1fr 1fr at 320 px) gets a second line, not a sideways scroll. */
+export const OTP_ROOT = 'flex w-fit min-w-0 max-w-full flex-wrap items-center gap-2'
 
-/** Past eight items a row cannot shrink enough: nine cells of 24 px and their gaps are 280 px. */
-export const OTP_WRAP = 'flex-wrap'
+/** Eight items or fewer: a line breaks only where cells of 24 px do not fit, and each grows to its max-w. The basis is the floor, so a table cell counts a cell as 24 px. */
+export const OTP_CELL_FIT = 'basis-[var(--tc-target-min,24px)] grow'
 
-/** A cell may give up width where six do not fit, and never height. w-full under a max-w, not a basis: a table cell or a shrinking parent then counts a cell as 24 px, not 44. */
-export const OTP_CELL = `w-full min-w-[var(--tc-target-min,24px)] shrink grow-0 p-0 text-center font-semibold tabular-nums rounded-control bg-surface-raised text-body ${BORDER_STRONG} ${TRANSITION} ${DISABLED} ${FOCUS_RING} ${TARGET_HEIGHT} ${FIELD_INVALID}`
+/** Past eight items a row cannot shrink enough (nine cells of 24 px and their gaps are 280 px), so it breaks at whole cells and each keeps its max-w. */
+export const OTP_CELL_WHOLE = 'w-full grow-0'
+
+/** A cell may give up width where the row does not fit, never under the 24 px floor, and never height. */
+export const OTP_CELL = `min-w-[var(--tc-target-min,24px)] shrink p-0 text-center font-semibold tabular-nums rounded-control bg-surface-raised text-body ${BORDER_STRONG} ${TRANSITION} ${DISABLED} ${FOCUS_RING} ${TARGET_HEIGHT} ${FIELD_INVALID}`
 
 /** A square of the control scale, as the most a cell may be. Under a coarse pointer the three small sizes may be 44 px wide, and typed text is never under 16 px. */
 export const OTP_CELL_SIZE = {

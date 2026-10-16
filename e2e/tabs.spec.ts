@@ -41,6 +41,13 @@ const tabsIn = (list: Locator) => list.locator('[role="tab"]')
 const focusedText = (page: Page) => page.evaluate(() => document.activeElement?.textContent ?? null)
 const selectedIn = (list: Locator) => list.locator('[aria-selected="true"]').evaluateAll((all) => all.map((tab) => tab.textContent))
 
+/** The one panel shown in a root: Base UI keeps the panel it closes until its exit animation ends, a frame at least. */
+async function shownPanel(page: Page, root: string): Promise<Locator> {
+  const shown = page.locator(`${root} [role="tabpanel"]:visible`)
+  await expect(shown).toHaveCount(1)
+  return shown
+}
+
 /** Presses a key and waits until the focus rests on the tab with that text: Base UI moves it in a microtask. */
 async function press(page: Page, key: string, lands: string): Promise<void> {
   await page.keyboard.press(key)
@@ -262,7 +269,7 @@ test.describe('a panel that is not open', () => {
     await openFixture(page)
     await expect(page.locator('#unmounted [role="tabpanel"]')).toHaveCount(1)
     await page.locator('#unmounted [role="tab"]').nth(1).click()
-    await expect(page.locator('#unmounted [role="tabpanel"]:visible')).toHaveText('Heavy panel')
+    await expect(await shownPanel(page, '#unmounted')).toHaveText('Heavy panel')
   })
 })
 
@@ -328,7 +335,7 @@ for (const direction of DIRECTIONS) {
       expect(await selectedIn(list)).toEqual(['One'])
       await press(page, next, 'Three')
       await expect.poll(() => selectedIn(list)).toEqual(['Three'])
-      await expect(page.locator('#auto [role="tabpanel"]:visible')).toHaveText('Panel three')
+      await expect(await shownPanel(page, '#auto')).toHaveText('Panel three')
     })
 
     test('with loopFocus off the arrows stop at the first and at the last tab', async ({ page }) => {
@@ -380,7 +387,7 @@ test.describe('the panel is a tab stop', () => {
   test('with tabIndex={-1} on the panel, Tab goes from the tab straight to the control', async ({ page }) => {
     await openFixture(page)
     await tabsIn(listIn(page, '#controls')).nth(1).click()
-    await expect(page.locator('#controls [role="tabpanel"]:visible')).toHaveAttribute('tabindex', '-1')
+    await expect(await shownPanel(page, '#controls')).toHaveAttribute('tabindex', '-1')
     await page.keyboard.press('Tab')
     await expect(page.getByRole('button', { name: 'Inside no stop' })).toBeFocused()
   })
@@ -475,6 +482,22 @@ test.describe('eight tabs on a 320 px screen', () => {
       await expect(tabsIn(list).last()).toBeInViewport({ ratio: 1 })
       await page.mouse.wheel(towardsEnd, 0)
       expect(await page.evaluate(() => window.scrollX)).toBe(0)
+    })
+
+    test(`${direction}: hydration leaves both lists where the server HTML drew them, and no tab moves`, async ({ browser, page }) => {
+      const where = (into: Page) => into.locator('#demo [role="tablist"]').evaluateAll((lists) => lists.map((list) => {
+        const first = list.querySelector('[role="tab"]')?.getBoundingClientRect()
+        return `scrollLeft ${String(list.scrollLeft)}, first tab ${String(first?.left)}..${String(first?.right)}`
+      }))
+      const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 320, height: 480 } })
+      const served = await context.newPage()
+      await served.goto(liveUrl('tabs--many', { direction }))
+      const before = await where(served)
+      await context.close()
+      await openLive(page, 'tabs--many', { direction })
+      await atRest(page)
+      expect(before).toHaveLength(2)
+      expect(await where(page)).toEqual(before)
     })
   }
 })
@@ -734,6 +757,32 @@ for (const mode of MODES) {
       await expect(other).toHaveCSS('box-shadow', 'none')
       // The list hugs its tabs: 4 px of padding round a 40 px row.
       expect((await boxOf(list)).height).toBe(48)
+    })
+
+    // WCAG 1.4.11: the raised fill is near the tint of the list, so the state needs an edge of its own.
+    test('enclosed: the active tab has an edge of 3:1 against the list, and its label is heavier than the same label at rest', async ({ page }) => {
+      await openLive(page, 'tabs--enclosed', { mode })
+      await atRest(page)
+      const list = listIn(page, '#demo')
+      const [frame, active, other] = [await boxOf(list), await boxOf(tabsIn(list).nth(0)), await boxOf(tabsIn(list).nth(1))]
+      const tint = await pixelAt(page, frame.left + 2, frame.top + frame.height / 2)
+      const edges = {
+        top: await pixelAt(page, active.left + active.width / 2, active.top),
+        bottom: await pixelAt(page, active.left + active.width / 2, active.bottom - 1),
+        start: await pixelAt(page, active.left, active.top + active.height / 2),
+        end: await pixelAt(page, active.right - 1, active.top + active.height / 2),
+      }
+      for (const [side, pixel] of Object.entries(edges)) {
+        expect(contrast(pixel, tint), `${side} edge ${pixel.join(',')} on the list ${tint.join(',')}`).toBeGreaterThanOrEqual(3)
+      }
+      const rest = await pixelAt(page, other.left + other.width / 2, other.top)
+      expect(contrast(rest, tint), `a tab at rest has no edge: ${rest.join(',')}`).toBeLessThan(1.1)
+
+      const label = (index: number) => tabsIn(list).nth(index).locator('span').evaluate((element) => element.getBoundingClientRect().width)
+      const wide = await label(0)
+      await tabsIn(list).nth(1).click()
+      await atRest(page)
+      expect(wide - await label(0), 'px the same label loses when its tab is no longer active').toBeGreaterThanOrEqual(1)
     })
 
     for (const look of LOOKS) {

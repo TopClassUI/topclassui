@@ -79,6 +79,16 @@ describe('indeterminate is filled as checked is (CHECKBOX_MIXED)', () => {
     expect(CHECKBOX_MIXED.split(' ')).toContain(cls)
     expect(ruleOf(`${selectorOf(cls)}${INVALID}${MIXED}`)).toBe('border-color: var(--tc-danger-solid);')
   })
+
+  it('under forced colours, which the mixed box opts out of, invalid is a CanvasText line and disabled is GrayText', () => {
+    const DISABLED = ':is(:where(.group\\/toggle):disabled *)'
+    expect(forced('forced-colors:group-aria-invalid/toggle:group-data-indeterminate/toggle:border-[CanvasText]', `${INVALID}${MIXED}`))
+      .toEqual({ rule: 'border-color: CanvasText;', query: '@media (forced-colors: active)' })
+    expect(forced('forced-colors:group-disabled/toggle:group-data-indeterminate/toggle:bg-[GrayText]', `${DISABLED}${MIXED}`))
+      .toEqual({ rule: 'background-color: GrayText;', query: '@media (forced-colors: active)' })
+    expect(forced('forced-colors:group-disabled/toggle:group-data-indeterminate/toggle:border-[GrayText]', `${DISABLED}${MIXED}`))
+      .toEqual({ rule: 'border-color: GrayText;', query: '@media (forced-colors: active)' })
+  })
 })
 
 describe('the mark', () => {

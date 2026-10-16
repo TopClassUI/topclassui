@@ -7,7 +7,7 @@ import { serverEntries } from './form.js'
 import { type LiveOptions, expectNoSidewaysScroll, liveErrors, openLive } from './live.js'
 import { boxOf } from './overlay.js'
 import { urlFor } from './pages.js'
-import { FORCED_CANVAS, contrast, inkOn, paintedIn, pixelsOf, rgbOf } from './pixels.js'
+import { FORCED_CANVAS, contrast, inkOn, paintedIn, pixelsOf, rgbOf, ringRow } from './pixels.js'
 
 // What happy-dom cannot lay out or press: the target around the box, the mark inside it, the ring, forced colours,
 // the screens, a wrapping label, and the form a real browser sends, before hydration and after a reset.
@@ -150,6 +150,42 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(paintedIn((await rows(page, boxIn(page, 'Unchecked'))).flat(), highlight)).toBe(0)
       expect(contrast(rgbOf(await css(drawn(boxIn(page, 'Unchecked')), 'border-top-color')), FORCED_CANVAS[scheme])).toBeGreaterThanOrEqual(3)
     })
+
+    test('invalid and ticked or mixed: a CanvasText line and no author red; disabled and ticked or mixed, prop or fieldset: GrayText', async ({ page }) => {
+      await page.goto(urlFor('checkbox--states', 'light', 'ltr'))
+      const [canvasText, grayText] = [await resolve(page, 'CanvasText'), await resolve(page, 'GrayText')]
+      for (const name of ['Invalid, checked', 'Invalid, indeterminate']) {
+        expect(await css(drawn(boxIn(page, name)), 'border-top-color'), name).toBe(canvasText)
+        expect(await css(drawn(boxIn(page, name)), 'box-shadow'), name).not.toMatch(/[1-9]px inset/)
+      }
+      // The static page runs no script: a mixed box disabled by hand, and a ticked one moved into a disabled fieldset.
+      await boxIn(page, 'Indeterminate').evaluate((el) => { el.setAttribute('disabled', '') })
+      await boxIn(page, 'Checked').evaluate((el) => {
+        const fieldset = document.createElement('fieldset')
+        fieldset.disabled = true
+        el.before(fieldset)
+        fieldset.append(el)
+      })
+      for (const name of ['Disabled, checked', 'Indeterminate', 'Checked']) {
+        expect(await css(drawn(boxIn(page, name)), 'background-color'), name).toBe(grayText)
+        expect(await css(drawn(boxIn(page, name)), 'border-top-color'), name).toBe(grayText)
+        expect(contrast(rgbOf(await css(drawn(boxIn(page, name)), 'color')), rgbOf(grayText)), name).toBeGreaterThanOrEqual(3)
+      }
+    })
+
+    // The page in the other theme, where --tc-ring fell to 2.85:1 on Canvas: only a system colour holds in both.
+    for (const mode of scheme === 'light' ? ['dark'] as const : ['light', 'ocean'] as const) {
+      test(`${mode} page: the ring of a focused box is the user's CanvasText, 3:1 on Canvas, ticked, mixed and invalid too`, async ({ page }) => {
+        await page.goto(urlFor('checkbox--states', mode, 'ltr'))
+        const canvasText = await resolve(page, 'CanvasText')
+        for (const name of ['Unchecked', 'Checked', 'Indeterminate', 'Invalid, checked', 'Invalid, indeterminate', 'Read-only']) {
+          await boxIn(page, name).focus()
+          expect(await css(drawn(boxIn(page, name)), 'outline-color'), name).toBe(canvasText)
+          const row = await ringRow(page, await boxOf(drawn(boxIn(page, name))))
+          expect(inkOn(row, FORCED_CANVAS[scheme]), name).toBe(row.length)
+        }
+      })
+    }
 
     test('invalid thickens the line to 2 px; disabled dims the whole box; no target has an outline at rest', async ({ page }) => {
       await page.goto(urlFor('checkbox--states', 'light', 'ltr'))
@@ -315,7 +351,8 @@ test.describe('live: a form reset', () => {
   for (const how of ['form.reset()', 'a reset button'] as const) {
     test(`after ${how}, each box is back at its default on screen and in the form; a controlled one keeps its owner's value; a mixed one stays mixed`, async ({ page }) => {
       for (const name of ['Terms', 'News', 'Owned', 'Mixed', 'Far']) await boxIn(page, name).click()
-      expect(await serverEntries(page, '#plain')).toEqual([['news', 'on'], ['owned', 'on'], ['mixed', 'on'], ['far', 'on']])
+      // A mixed box sends nothing while it shows the dash, pressed or not.
+      expect(await serverEntries(page, '#plain')).toEqual([['news', 'on'], ['owned', 'on'], ['far', 'on']])
       expect(await state(page, 'Mixed')).toBe('mixed')
       if (how === 'form.reset()') await page.locator('#plain').evaluate((node) => { (node as HTMLFormElement).reset() })
       else await page.getByRole('button', { name: 'Reset' }).click()

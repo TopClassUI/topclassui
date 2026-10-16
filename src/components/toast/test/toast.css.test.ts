@@ -118,4 +118,27 @@ describe('inside a toast', () => {
     expect(words(TOAST_ROOT)).toContain('wrap-anywhere')
     expect(words(TOAST_DESCRIPTION)).toContain('wrap-anywhere')
   })
+
+  it('the x is sticky beside the text, so it stays on screen while any of a toast taller than the screen shows (TOAST-3)', async () => {
+    expect(words(TOAST_CLOSE)).toEqual(expect.arrayContaining(['col-start-3', 'row-start-1', 'row-span-2', 'self-start', 'sticky', 'top-0']))
+    const css = await compiled
+    expect(ruleFor(css, 'sticky')).toContain('position: sticky;')
+    expect(ruleFor(css, 'row-span-2')).toContain('grid-row: span 2 / span 2;')
+  })
+
+  it('a toast is a grid that the viewport measures: under 16rem the icon and the action take rows of their own (TOAST-4)', async () => {
+    expect(words(TOAST_VIEWPORT)).toContain('@container')
+    expect(words(TOAST_ROOT)).toEqual(expect.arrayContaining(['grid', 'grid-cols-[auto_minmax(0,1fr)_auto]']))
+    expect(words(TOAST_ICON)).toEqual(expect.arrayContaining(['col-start-1', 'row-start-1', 'me-3']))
+    expect(words(TOAST_CONTENT)).toEqual(expect.arrayContaining(['col-start-2', 'row-start-1', '@max-3xs:col-start-1', '@max-3xs:col-span-2', '@max-3xs:row-start-2']))
+    expect(words(TOAST_ACTION)).toEqual(expect.arrayContaining(['col-start-2', 'row-start-2', 'justify-self-start', '@max-3xs:col-start-1', '@max-3xs:col-span-3', '@max-3xs:row-start-3']))
+    const css = await compiled
+    expect(ruleFor(css, '@container')).toContain('container-type: inline-size;')
+    expect(ruleFor(css, '@max-3xs:col-span-3')).toContain('grid-column: span 3 / span 3;')
+    // Tailwind groups the variant's rules in one block: the class sits inside the last one opened before it.
+    const at = css.indexOf(`.${escape('@max-3xs:col-span-3')}`)
+    const block = css.slice(css.lastIndexOf('@container', at), at)
+    expect(block.startsWith('@container (width < 16rem) {')).toBe(true)
+    expect(block.split('{').length).toBeGreaterThan(block.split('}').length)
+  })
 })

@@ -19,27 +19,38 @@ wrapping row. For a status such as Paid or Overdue, use a Badge.
 ```
 
 Tag has no ARIA role, so the text must carry the meaning; colour alone never does. A plain
-Tag renders on the server and ships no JavaScript.
+Tag renders on the server, with no client part. Tag imports the code of its x, so a page
+that imports Tag may still load that one small file (about 3 KB gzipped).
 
 ## A removable tag
 
 Pass `onRemove` and the tag gets an x button. The x only calls `onRemove`: you take the tag
-out of your list. `onRemove` is a function, and a Server Component cannot pass a function, so
-put the list in a client component:
+out of your list. A Server Component can pass `onRemove` only as a Server Action
+(`onRemove={removeTopic.bind(null, id)}`). To keep the list in state, put it in a client
+component, and move the focus before the x goes:
 
 ```tsx
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Tag } from 'topclassui'
 
 export function Topics({ initial }: { initial: string[] }) {
   const [topics, setTopics] = useState(initial)
+  const list = useRef<HTMLUListElement>(null)
+
+  const remove = (topic: string, index: number) => {
+    const buttons = list.current?.querySelectorAll('button')
+    const next = buttons?.[index + 1] ?? buttons?.[index - 1]
+    next?.focus()
+    setTopics(topics.filter((other) => other !== topic))
+  }
+
   return (
-    <ul aria-label="Topics" className="flex flex-wrap gap-2">
-      {topics.map((topic) => (
+    <ul ref={list} aria-label="Topics" className="flex flex-wrap gap-2">
+      {topics.map((topic, index) => (
         <li key={topic}>
-          <Tag onRemove={() => { setTopics(topics.filter((other) => other !== topic)) }}>{topic}</Tag>
+          <Tag onRemove={() => { remove(topic, index) }}>{topic}</Tag>
         </li>
       ))}
     </ul>
@@ -47,10 +58,10 @@ export function Topics({ initial }: { initial: string[] }) {
 }
 ```
 
-Your server page renders `<Topics initial={['React', 'Tailwind']} />`: strings cross, functions do not.
+Your server page renders `<Topics initial={['React', 'Tailwind']} />`: strings cross, and a function crosses only as a Server Action.
 
 - **Name.** The x reads "Remove React": the word comes from `labels.tag.remove` of the provider ("إزالة" in Arabic), then the label.
-- **Focus.** A removed x takes the focus with it, to the page body. Move it yourself: to the x that took its place, the one before it, or a control after the list. `dummy/removable.tsx` does this.
+- **Focus.** A removed x would take the focus with it, to the page body. The sample sends it to the next x, or the one before; when the list empties, focus a control after it, as `dummy/removable.tsx` does.
 - **Size.** The x is 24 px, 44 under a touch pointer. An `xs` tag grows from 22 to 24 px, and every tag is 44 px tall under a touch pointer (`xl` stays 50).
 - **Long labels.** The label is cut with an ellipsis and the x always stays whole.
 
