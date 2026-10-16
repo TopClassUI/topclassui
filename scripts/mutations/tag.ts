@@ -74,4 +74,10 @@ export const MUTATIONS: Mutation[] = [
     from: '<Tag className="shrink" tone="success">{LONG}</Tag>',
     to: '<Tag tone="success">{LONG}</Tag>',
   },
+  {
+    label: 'the tag README promises again that a plain Tag ships no JavaScript, though index.tsx still imports the x',
+    file: 'src/components/tag/README.md',
+    from: 'Tag renders on the server, with no client part.',
+    to: 'Tag renders on the server and ships no JavaScript.',
+  },
 ]
