@@ -743,6 +743,22 @@ test.describe('live: focus, forced colours and motion', () => {
         const pixels = await pixelsOf(page, { x: Math.floor(caret.left), y: Math.floor(caret.top), width: Math.ceil(caret.width), height: Math.ceil(caret.height) })
         expect(inkOn(pixels, FORCED_CANVAS[scheme]), 'pixels of the caret at 3:1').toBeGreaterThan(5)
       })
+
+    })
+  }
+
+  for (const mode of MODES) {
+    test(`${mode}: the chosen day is told by more than its fill, an edge at 3:1 on the surface and a heavier weight`, async ({ page }) => {
+      await openLive(page, 'date-picker--basic', { mode })
+      const popup = await openCalendar(page, trigger(page))
+      await atRest(popup)
+      await press(page, 'ArrowRight', 'Wednesday, September 23, 2026')
+      const chosen = day(popup, 'Tuesday, September 22, 2026')
+      const [box, frame] = [await boxOf(chosen), await boxOf(popup)]
+      const [surface = FORCED_CANVAS.light] = await pixelsOf(page, { x: Math.round(frame.left + 8), y: Math.round(frame.bottom - 8), width: 1, height: 1 })
+      const edge = await pixelsOf(page, { x: Math.floor(box.left), y: Math.round(box.top + box.height / 2), width: 2, height: 1 })
+      expect(Math.max(...edge.map((pixel) => contrast(pixel, surface))), 'the edge of the chosen day on the surface').toBeGreaterThanOrEqual(3)
+      expect([await css(chosen, 'font-weight'), await css(day(popup, 'Monday, September 21, 2026'), 'font-weight')]).toEqual(['500', '400'])
     })
   }
 

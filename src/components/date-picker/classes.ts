@@ -31,7 +31,8 @@ export const DATE_PICKER_NAV = `${ICON_BUTTON} text-body ${HOVER.ghost} ${ARIA_D
 export const DATE_PICKER_GRID = 'w-full table-fixed border-collapse'
 export const DATE_PICKER_WEEKDAY = 'pb-1 text-center text-xs font-medium text-muted'
 export const DATE_PICKER_CELL = 'p-0.5 text-center'
-/** A day: 32 px tall and 44 under a finger, as wide as its column. Selected is a fill and a weight; today an underline. */
+/** A day: 32 px tall and 44 under a finger, as wide as its column. Selected is a fill, a weight and an inset line at 3:1
+ * on the surface in every mode, where the dark fill alone is 2.57:1; today an underline. */
 export const DATE_PICKER_DAY = [
   'inline-flex h-control-sm w-full items-center justify-center rounded-control text-sm tabular-nums text-body',
   TARGET_HEIGHT,
@@ -39,7 +40,9 @@ export const DATE_PICKER_DAY = [
   TRANSITION,
   HOVER.ghost,
   'data-selected:bg-primary-solid data-selected:font-medium data-selected:text-primary-on-solid',
+  'data-selected:inset-ring-(length:--tc-line-width) data-selected:inset-ring-primary-on-soft',
   'forced-colors:data-selected:forced-color-adjust-none forced-colors:data-selected:bg-[Highlight] forced-colors:data-selected:text-[HighlightText]',
+  'forced-colors:data-selected:inset-ring-[color:Highlight]',
   'aria-[current=date]:font-semibold aria-[current=date]:underline aria-[current=date]:underline-offset-4',
   ARIA_DISABLED,
 ].join(' ')

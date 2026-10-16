@@ -97,6 +97,12 @@ describe('a day', () => {
     expect(ruleOf(`${selectorOf('forced-colors:data-selected:forced-color-adjust-none')}[data-selected]`)).toBe('forced-color-adjust: none;')
   })
 
+  it('the chosen day also has an inset line in the tone of the ring, which reaches 3:1 on the surface where the dark fill does not', () => {
+    expect(ruleOf(`${selectorOf('data-selected:inset-ring-(length:--tc-line-width)')}[data-selected]`)).toContain('--tw-inset-ring-shadow: inset 0 0 0 var(--tc-line-width)')
+    expect(ruleOf(`${selectorOf('data-selected:inset-ring-primary-on-soft')}[data-selected]`)).toBe('--tw-inset-ring-color: var(--tc-primary-on-soft);')
+    expect(ruleOf(`${selectorOf('forced-colors:data-selected:inset-ring-[color:Highlight]')}[data-selected]`)).toBe('--tw-inset-ring-color: Highlight;')
+  })
+
   it('today is a weight and an underline, never a fill', () => {
     expect(ruleOf(`${selectorOf('aria-[current=date]:underline')}[aria-current="date"]`)).toBe('text-decoration-line: underline;')
     expect(ruleOf(`${selectorOf('aria-[current=date]:font-semibold')}[aria-current="date"]`)).toContain('font-weight: var(--font-weight-semibold);')
