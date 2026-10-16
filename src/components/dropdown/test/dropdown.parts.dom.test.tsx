@@ -47,12 +47,17 @@ describe('DropdownItem', () => {
     expect(screen.getByRole('menuitem').querySelector('span')?.textContent).toBe('a'.repeat(100))
   })
 
-  it('keeps the shortcut whole beside a long label: it never shrinks, and is cut only past its own cap', async () => {
+  it('puts the shortcut at the end of the row, gives way with it before the label, and cuts it past its own cap', async () => {
     await popup(<DropdownItem shortcut="Ctrl P">Profile</DropdownItem>)
     const list = classes(row('Profile Ctrl P').children[1])
-    for (const cls of ['ms-auto', 'shrink-0', 'truncate', 'ps-4', 'font-mono', 'text-xs', 'text-muted', 'group-data-highlighted:text-inherit']) {
+    for (const cls of [
+      'ms-auto', 'shrink-10000', 'truncate', 'ps-4', 'font-mono', 'text-xs', 'text-muted',
+      'group-data-highlighted:text-inherit',
+    ]) {
       expect(list, cls).toContain(cls)
     }
+    // shrink-0 kept the hint whole and cut the name of the row at a doubled text size.
+    expect(list).not.toContain('shrink-0')
     expect(list).toContain('max-w-[min(calc(var(--spacing)*40),calc(var(--available-width)/2))]')
   })
 
@@ -137,6 +142,20 @@ describe('DropdownLinkItem', () => {
     expect(row('Status').getAttribute('target')).toBe('_blank')
     expect(row('Status').getAttribute('rel')).toBe('noreferrer')
     expect(row('Status').getAttribute('data-tone')).toBe('danger')
+  })
+
+  it('paints a danger link as a danger row, at rest and highlighted, and a neutral one as any row', async () => {
+    await popup(
+      <>
+        <DropdownLinkItem href="#x" tone="danger">Delete account</DropdownLinkItem>
+        <DropdownLinkItem href="#y">Settings</DropdownLinkItem>
+      </>,
+    )
+    const danger = classes(row('Delete account'))
+    for (const cls of ['text-danger-on-soft', 'data-highlighted:bg-danger-soft', 'data-highlighted:text-danger-on-soft']) {
+      expect(danger, cls).toContain(cls)
+    }
+    expect(classes(row('Settings')).filter((cls) => cls.includes('danger'))).toEqual([])
   })
 
   it('closes the menu on a press, which Base UI alone would leave open', async () => {

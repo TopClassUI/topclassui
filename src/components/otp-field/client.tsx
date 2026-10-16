@@ -4,7 +4,7 @@ import { DirectionProvider } from '@base-ui/react/direction-provider'
 import { OTPField as Base } from '@base-ui/react/otp-field'
 
 import { cn } from '#shared/cn.js'
-import { OTP_CELL, OTP_CELL_SIZE, OTP_ROOT, OTP_SEPARATOR, OTP_WRAP } from './classes.js'
+import { OTP_CELL, OTP_CELL_FIT, OTP_CELL_SIZE, OTP_CELL_WHOLE, OTP_ROOT, OTP_SEPARATOR } from './classes.js'
 import { OTP_FIELD_DEFAULTS } from './constants.js'
 import { useOtpField } from './hook.js'
 import type { OtpFieldProps } from './types.js'
@@ -19,6 +19,8 @@ export function OTPField({
   value,
   defaultValue,
   onValueChange,
+  onValueComplete,
+  autoSubmit,
   validationType,
   normalizeValue,
   inputMode,
@@ -29,7 +31,9 @@ export function OTPField({
   'aria-invalid': ariaInvalid,
   ...rest
 }: OtpFieldProps) {
-  const otp = useOtpField({ length, groupSize, value, defaultValue, onValueChange, validationType, normalizeValue, inputMode, ref })
+  const otp = useOtpField({
+    length, groupSize, value, defaultValue, onValueChange, onValueComplete, autoSubmit, validationType, normalizeValue, inputMode, ref,
+  })
   // A Field passes aria-invalid itself, so it survives when `invalid` is off.
   const cellInvalid = invalid ? true : ariaInvalid
   // A code reads left to right: without the provider an Arabic page would run the arrows against the cells.
@@ -42,9 +46,11 @@ export function OTPField({
         length={otp.length}
         value={otp.value}
         onValueChange={otp.onValueChange}
+        onValueComplete={otp.onValueComplete}
         dir="ltr"
+        aria-labelledby={ariaLabelledBy}
         data-size={size}
-        className={cn(OTP_ROOT, otp.wraps && OTP_WRAP, className)}
+        className={cn(OTP_ROOT, className)}
       >
         {otp.cells.flatMap(({ label, separator }, index) => {
           const cell = (
@@ -54,7 +60,7 @@ export function OTPField({
               aria-labelledby={index === 0 ? ariaLabelledBy : undefined}
               aria-describedby={index === 0 ? ariaDescribedBy : undefined}
               aria-invalid={cellInvalid}
-              className={cn(OTP_CELL, OTP_CELL_SIZE[size])}
+              className={cn(OTP_CELL, otp.whole ? OTP_CELL_WHOLE : OTP_CELL_FIT, OTP_CELL_SIZE[size])}
             />
           )
           return separator ? [cell, <span key={`separator-${String(index)}`} aria-hidden className={OTP_SEPARATOR} />] : [cell]

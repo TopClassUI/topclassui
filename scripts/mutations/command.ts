@@ -7,6 +7,7 @@ const HOOK = 'src/components/command/hook.ts'
 const LIB = 'src/components/command/lib.ts'
 const PANEL = 'src/components/command/parts/command-panel.tsx'
 const ROWS = 'src/components/command/parts/command-rows.tsx'
+const TYPES = 'src/components/command/types.ts'
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -30,7 +31,19 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'command: the shortcut stops matching the key by its place, so Ctrl+K does nothing under an Arabic layout',
     file: LIB,
-    from: ' || (code !== undefined && press.code === code)',
+    from: 'return code !== undefined && press.code === code',
+    to: 'return false',
+  },
+  {
+    label: 'command: status takes error again, and a failed fetch is announced as No results',
+    file: TYPES,
+    from: "  status?: Exclude<Status, 'error' | 'loading-more'> | undefined",
+    to: '  status?: Status | undefined',
+  },
+  {
+    label: 'command: the shortcut matches the K key by its place under Colemak too, and takes Ctrl+E from the page',
+    file: LIB,
+    from: "  if (/^[a-z0-9]$/.test(named)) return false\n",
     to: '',
   },
   {
@@ -89,9 +102,33 @@ export const MUTATIONS: Mutation[] = [
   },
   {
     label: 'command: the spacer above the window stands for nothing, so the rows jump to the top as the list scrolls',
+    file: ROWS,
+    from: '<Spacer rows={run.start - (runs[at - 1]?.end ?? 0)} />',
+    to: '<Spacer rows={0} />',
+  },
+  {
+    label: 'command: a scroll that is not the keyboard unmounts the active row, so Enter does nothing and aria-activedescendant dangles',
     file: HOOK,
-    from: 'before: collection.virtualized ? first : 0,',
-    to: 'before: 0,',
+    from: 'const mounted = collection.virtualized ? withActiveRow(windowed, arranged.entries, arranged.rowOfItem[active] ?? -1) : windowed',
+    to: 'const mounted = windowed',
+  },
+  {
+    label: 'command: only a keyboard highlight is kept mounted, so the first match of a query is lost to a finger drag',
+    file: HOOK,
+    from: "    setActive(details.index)\n    // A pointer highlights what it is over; a query highlights the first row, which a new query scrolls to.\n    if (details.reason !== 'keyboard') return\n",
+    to: "    // A pointer highlights what it is over; a query highlights the first row, which a new query scrolls to.\n    if (details.reason !== 'keyboard') return\n    setActive(details.index)\n",
+  },
+  {
+    label: 'command: the active row kept apart from the window joins the run beside it, and the spacer between them is lost',
+    file: LIB,
+    from: ' || last.end !== entry.row',
+    to: '',
+  },
+  {
+    label: 'command: the options lose aria-setsize and aria-posinset, so a reader hears 13 of 13 out of ten thousand',
+    file: ROWS,
+    from: '            aria-setsize={entry.size}\n            aria-posinset={entry.position}\n',
+    to: '',
   },
   {
     label: 'command: the search field loses its 256 cap, so a pasted file becomes the query',
@@ -130,10 +167,10 @@ export const MUTATIONS: Mutation[] = [
     to: "'",
   },
   {
-    label: 'command: the active row is told by its fill alone, under 3:1 against the popup',
+    label: 'command: the active row drops the shared highlight, so neither a fill nor a ring tells it apart',
     file: CLASSES,
-    from: '${ROW} ${ROW_HIGHLIGHT} ${COMMAND_ACTIVE} ${DISABLED}',
-    to: '${ROW} ${ROW_HIGHLIGHT} ${DISABLED}',
+    from: '${ROW} ${ROW_HIGHLIGHT} ${DISABLED}',
+    to: '${ROW} ${DISABLED}',
   },
   {
     label: 'command: the input text drops to 14 px, and iOS zooms the page into it',

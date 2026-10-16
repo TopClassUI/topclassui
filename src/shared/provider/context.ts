@@ -5,7 +5,7 @@ import { createContext, useContext } from 'react'
 import { COLLECTION_DEFAULTS, type CollectionDefaults } from '../contracts/collection.js'
 import { resolveToastSettings, type ToastSettings } from '../contracts/toast.js'
 import { en } from '../labels/en.js'
-import { createNumberFormat, type NumberingSystem } from '../labels/get-labels.js'
+import { createNumberFormat } from '../labels/get-labels.js'
 import type { Labels } from '../labels/types.js'
 import { DEFAULT_ADAPTIVE_QUERY } from '../adaptive/use-adaptive-mode.js'
 
@@ -15,7 +15,8 @@ export interface TopClassContextValue {
   direction: Direction
   locale: string
   labels: Labels
-  numberingSystem: NumberingSystem
+  /** The digits numberFormat writes: the provider's own, or the locale tag's. */
+  numberingSystem: string
   numberFormat: Intl.NumberFormat
   adaptive: { query: string }
   collection: CollectionDefaults
