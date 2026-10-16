@@ -200,6 +200,12 @@ export const MUTATIONS: Mutation[] = [
     to: "'z-(--tc-z-popup)'",
   },
   {
+    label: 'a dropdown row drops the shared highlight, so the row the keyboard is on has neither fill nor ring',
+    file: CLASSES,
+    from: '  ROW,\n  ROW_HIGHLIGHT,\n',
+    to: '  ROW,\n',
+  },
+  {
     label: 'the dropdown icon is read out with the label',
     file: LIB,
     from: '<span aria-hidden="true" className={DROPDOWN_ICON}>',

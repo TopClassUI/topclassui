@@ -130,10 +130,10 @@ export const MUTATIONS: Mutation[] = [
     to: "'",
   },
   {
-    label: 'command: the active row is told by its fill alone, under 3:1 against the popup',
+    label: 'command: the active row drops the shared highlight, so neither a fill nor a ring tells it apart',
     file: CLASSES,
-    from: '${ROW} ${ROW_HIGHLIGHT} ${COMMAND_ACTIVE} ${DISABLED}',
-    to: '${ROW} ${ROW_HIGHLIGHT} ${DISABLED}',
+    from: '${ROW} ${ROW_HIGHLIGHT} ${DISABLED}',
+    to: '${ROW} ${DISABLED}',
   },
   {
     label: 'command: the input text drops to 14 px, and iOS zooms the page into it',

@@ -9,7 +9,7 @@ import {
   wheelAt, withScrollbar,
 } from './overlay.js'
 import { DEMOS } from './pages.js'
-import { FORCED_CANVAS, type Rgb, inkOn, paintedIn, pixelsOf, rgbOf } from './pixels.js'
+import { FORCED_CANVAS, type Clip, type Rgb, inkOn, insideRing, paintedIn, pixelsOf, rgbOf } from './pixels.js'
 
 // What happy-dom cannot lay out and the static page cannot open: the keys of the menu-button pattern in a real
 // browser, where the menu lands, what scrolls, what the page behind still does, and what forced colours leave.
@@ -262,8 +262,9 @@ test.describe('where the focus is drawn', () => {
     await rowOf(menu, 'Settings').hover()
     await expect.poll(() => focusedRow(page)).toBe('Settings')
     await expect(rowOf(menu, 'Settings')).toHaveAttribute('data-highlighted', '')
-    // A row draws no ring: its fill is its focus mark.
-    await expect(rowOf(menu, 'Settings')).toHaveCSS('outline-style', 'none')
+    // The row the pointer is on is the highlighted one, and the ring goes with the highlight.
+    await expect(rowOf(menu, 'Settings')).toHaveCSS('outline-style', 'solid')
+    await expect(menu).toHaveCSS('outline-style', 'none')
   })
 
   test('opened from the keyboard, a menu the pointer then leaves holds the focus and draws its ring inside its own box', async ({ page }) => {
@@ -286,6 +287,40 @@ test.describe('where the focus is drawn', () => {
     await closed(page)
     await expect(triggerOf(page, 'Empty', '#hostile')).toBeFocused()
   })
+})
+
+/** A box as a clip of the page. */
+async function clipOf(target: Locator): Promise<Clip> {
+  const box = await target.boundingBox()
+  if (!box) throw new Error('nothing to measure')
+  return box
+}
+
+// R-5.6-1: the fill of a highlighted row is 1.1 to 1.2:1 against the menu, so the ring is the mark the keyboard sees.
+test.describe('the row the keyboard is on is ringed', () => {
+  for (const mode of MODES) {
+    for (const direction of DIRECTIONS) {
+      test(`${mode} ${direction}: a ring inside its edge at 3:1 against the menu, on no other row`, async ({ page }) => {
+        const menu = await open(page, 'dropdown--basic', { mode, direction, by: 'keyboard' })
+        await press(page, 'ArrowDown', 'Settings')
+        const row = rowOf(menu, 'Settings')
+        await expect(row).toBeFocused()
+        await expect(row).toHaveCSS('outline-style', 'solid')
+        await expect(row).toHaveCSS('outline-width', '2px')
+        await expect(row).toHaveCSS('outline-offset', '-2px')
+        const radius = await row.evaluate((el) => Number.parseFloat(getComputedStyle(el).borderTopLeftRadius))
+        const [surface] = await fillOf(page, rowOf(menu, 'Duplicate'), direction)
+        if (!surface) throw new Error('no pixel of the menu was read')
+        for (const [side, band] of Object.entries(insideRing(await clipOf(row), radius))) {
+          const pixels = await pixelsOf(page, band)
+          expect(inkOn(pixels, surface), `pixels of ring at 3:1 along the ${side} edge`).toBeGreaterThan(pixels.length * 0.9)
+        }
+        for (const [side, band] of Object.entries(insideRing(await clipOf(rowOf(menu, 'Duplicate')), radius))) {
+          expect(inkOn(await pixelsOf(page, band), surface), `pixels of ring along the ${side} edge of another row`).toBe(0)
+        }
+      })
+    }
+  }
 })
 
 /** Where a menu must land, written out: on its own side while there is room, on the opposite one at that edge. */

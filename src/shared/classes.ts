@@ -119,9 +119,16 @@ export const OVERLAY_SURFACE = `rounded-box bg-surface-raised text-body ${BORDER
 /** One row of a menu or a list, at least --tc-row-height tall. Its highlight is its focus mark. */
 export const ROW = 'flex min-h-(--tc-row-height) w-full items-center gap-2 rounded-control px-3 text-start text-sm outline-none'
 
-/** The row the keyboard or the pointer is on. Forced colours erase a fill, so there it takes the
- * system pair and paints it itself: left adjusted, Chromium lays a backplate over the label. */
-export const ROW_HIGHLIGHT = 'data-highlighted:bg-primary-soft data-highlighted:text-primary-on-soft forced-colors:data-highlighted:forced-color-adjust-none forced-colors:data-highlighted:bg-[Highlight] forced-colors:data-highlighted:text-[HighlightText]'
+/** The row the keyboard or the pointer is on: a fill, and the ring inside its edge, since the fill alone
+ * is under 3:1 against the popup. Forced colours erase a fill, so there it paints the system pair itself,
+ * the ring in HighlightText: left adjusted, Chromium lays a backplate over the label. */
+export const ROW_HIGHLIGHT = [
+  'data-highlighted:bg-primary-soft data-highlighted:text-primary-on-soft',
+  'data-highlighted:outline-solid data-highlighted:outline-(length:--tc-ring-width)',
+  'data-highlighted:-outline-offset-(length:--tc-ring-width) data-highlighted:outline-ring',
+  'forced-colors:data-highlighted:forced-color-adjust-none forced-colors:data-highlighted:bg-[Highlight]',
+  'forced-colors:data-highlighted:text-[HighlightText] forced-colors:data-highlighted:outline-[HighlightText]',
+].join(' ')
 
 /** At most --tc-list-rows rows, and never past the room Base UI measured. It counts rows and not
  * the padding or the gaps, so the last row shown is cut short: a cut row says there is more. */

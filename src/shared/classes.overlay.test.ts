@@ -70,17 +70,25 @@ describe('a row of a menu and its highlight', () => {
     ])
   })
 
-  it('ROW_HIGHLIGHT fills on the attribute Base UI sets, and takes the system pair under forced colours', () => {
+  it('ROW_HIGHLIGHT fills and rings the row on the attribute Base UI sets, and takes the system pair under forced colours', () => {
     expect(list(ROW_HIGHLIGHT)).toEqual([
       'data-highlighted:bg-primary-soft', 'data-highlighted:text-primary-on-soft',
-      'forced-colors:data-highlighted:forced-color-adjust-none',
-      'forced-colors:data-highlighted:bg-[Highlight]', 'forced-colors:data-highlighted:text-[HighlightText]',
+      'data-highlighted:outline-solid', 'data-highlighted:outline-(length:--tc-ring-width)',
+      'data-highlighted:-outline-offset-(length:--tc-ring-width)', 'data-highlighted:outline-ring',
+      'forced-colors:data-highlighted:forced-color-adjust-none', 'forced-colors:data-highlighted:bg-[Highlight]',
+      'forced-colors:data-highlighted:text-[HighlightText]', 'forced-colors:data-highlighted:outline-[HighlightText]',
     ])
+  })
+
+  // R-5.6-1: the fill is 1.1 to 1.2:1 against the popup, so the ring is the mark the keyboard can see.
+  it('draws the ring of the focus inside the row, where the scroll container of a menu cannot cut it', () => {
+    expect(list(ROW_HIGHLIGHT)).toContain('data-highlighted:outline-ring')
+    expect(list(ROW_HIGHLIGHT)).toContain('data-highlighted:-outline-offset-(length:--tc-ring-width)')
   })
 
   it('writes a system colour only behind forced-colors', () => {
     const system = list(ROW_HIGHLIGHT).filter((cls) => cls.includes('[Highlight') || cls.includes('forced-color-adjust'))
-    expect(system).toHaveLength(3)
+    expect(system).toHaveLength(4)
     expect(system.filter((cls) => !cls.startsWith('forced-colors:'))).toEqual([])
   })
 
