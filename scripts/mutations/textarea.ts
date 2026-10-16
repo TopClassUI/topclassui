@@ -134,4 +134,10 @@ export const MUTATIONS: Mutation[] = [
     from: 'return () => { for (const [box, top] of held) box.scrollTop = top }',
     to: 'return () => undefined',
   },
+  {
+    label: 'the textarea measure counts the touch floor as text, so one empty row under a finger is drawn two rows tall',
+    file: HOOK,
+    from: '  if (field.scrollHeight <= field.clientHeight) { restore(); return }\n',
+    to: '',
+  },
 ]

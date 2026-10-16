@@ -18,6 +18,8 @@ function fit(field: HTMLTextAreaElement, rows: number, maxRows: number): void {
   // The field shrinks for the measure, and a page scrolled to its foot is clamped by it: restored after.
   const restore = holdScroll(field)
   field.rows = rows
+  // Text that fits the caller's rows needs no more, whatever height the touch floor gives the box.
+  if (field.scrollHeight <= field.clientHeight) { restore(); return }
   const style = getComputedStyle(field)
   const padding = Number.parseFloat(style.paddingTop) + Number.parseFloat(style.paddingBottom)
   // A line-height of normal reads as no number: take the browser's usual 1.2 of the font size.

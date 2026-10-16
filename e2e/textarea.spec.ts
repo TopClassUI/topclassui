@@ -236,6 +236,29 @@ test.describe('live: the rows follow the text', () => {
     }
   }
 
+  for (const pointer of ['fine', 'coarse'] as const) {
+    test(`${pointer} pointer: one row at every size is the box of a plain field, under the touch floor too, and still grows to two lines`, async ({ browser }) => {
+      const page = await browser.newPage(pointer === 'coarse' ? COARSE : {})
+      await openLive(page, 'separator--horizontal')
+      await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/textarea-rows.tsx' })
+      await expect(page.locator('#rows textarea')).toHaveCount(10)
+      const heights = () => Promise.all(['xs', 'sm', 'md', 'lg', 'xl'].map(async (size) => [
+        size, (await boxOf(field(page, `${size} plain`))).height, (await boxOf(field(page, `${size} autosize`))).height,
+      ]))
+      // A single row of xs and sm is under 44 px, so under a finger the floor is the box.
+      expect(await heights()).toEqual(pointer === 'coarse'
+        ? [['xs', 44, 44], ['sm', 44, 44], ['md', 44.8, 44.8], ['lg', 50, 50], ['xl', 58, 58]]
+        : [['xs', 30, 30], ['sm', 34, 34], ['md', 42, 42], ['lg', 50, 50], ['xl', 58, 58]])
+      for (const size of ['xs', 'sm']) {
+        const grows = field(page, `${size} autosize`)
+        await grows.fill('One\nTwo')
+        await expect.poll(() => grows.evaluate((el: HTMLTextAreaElement) => [el.rows, el.scrollHeight <= el.clientHeight])).toEqual([2, true])
+      }
+      expect(await liveErrors(page)).toEqual([])
+      await page.close()
+    })
+  }
+
   test('a field pre-filled past six rows has the same height on the server and once hydrated', async ({ page }) => {
     await page.goto(urlFor('textarea--autosize', 'light', 'ltr'))
     const served = (await boxOf(field(page, 'Past six rows'))).height

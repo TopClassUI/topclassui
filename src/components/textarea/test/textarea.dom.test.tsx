@@ -114,6 +114,17 @@ describe('the rows a field with autosize is given', () => {
     expect([field.getAttribute('rows'), box.scrollTop]).toEqual(['6', 40])
   })
 
+  it('counts no touch floor as text: one row under a floor taller than a row stays one row, and grows past it', async () => {
+    render(<Textarea aria-label="Bio" autosize rows={1} />)
+    const field = screen.getByRole<HTMLTextAreaElement>('textbox')
+    layOut(field, 1, { floor: 44 })
+    await userEvent.type(field, 'x')
+    expect(field.getAttribute('rows')).toBe('1')
+    layOut(field, 3, { floor: 44 })
+    await userEvent.type(field, 'y')
+    expect(field.getAttribute('rows')).toBe('3')
+  })
+
   it('starts from the caller rows, and a ref reaches the textarea itself', () => {
     let node: HTMLTextAreaElement | null = null
     render(<Textarea aria-label="Bio" autosize rows={2} ref={(el) => { node = el }} />)
