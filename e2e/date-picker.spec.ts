@@ -786,18 +786,36 @@ test.describe('live: focus, forced colours and motion', () => {
     await reduced.close()
   })
 
+  /** Each day whose digits leave under 2 px to the next day's, measured as laid out: closer, "10" and "11" read as one number. */
+  const spilledDays = (popup: Locator) => popup.locator('tbody button').evaluateAll((all) => all.filter((el) => {
+    const text = document.createRange()
+    text.selectNodeContents(el)
+    return text.getBoundingClientRect().width + 2 > el.getBoundingClientRect().width
+  }).map((el) => el.textContent))
+
   for (const direction of DIRECTIONS) {
-    test(`text zoom, ${direction}: at a root of 32 px the open calendar at 320 px scrolls itself, stays on screen, and no day outgrows its button`, async ({ page }) => {
+    for (const digits of ['Latin', 'Arabic-Indic'] as const) {
+      test(`text zoom, ${direction}, ${digits} digits: at a root of 32 px the open calendar at 320 px scrolls itself, stays on screen, and no day outgrows its button`, async ({ page }) => {
+        await page.setViewportSize({ width: 320, height: 640 })
+        if (digits === 'Latin') await openLive(page, 'date-picker--basic', { direction })
+        else await fixture(page, 'date-picker-hostile', { direction })
+        await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
+        const popup = await openCalendar(page, digits === 'Latin' ? trigger(page) : trigger(page, 'Arabic digits'))
+        await atRest(popup)
+        await expectInsideViewport(popup, 'the calendar', 8)
+        await expectNothingSideways(popup)
+        await expectNoSidewaysScroll(page)
+        expect(await spilledDays(popup), 'days whose digits run past their button').toEqual([])
+      })
+    }
+
+    test(`${direction}: at the normal root the popup keeps the 16 px it is drawn with on a 320 px phone, and its days are as wide as their columns`, async ({ page }) => {
       await page.setViewportSize({ width: 320, height: 640 })
       await openLive(page, 'date-picker--basic', { direction })
-      await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
       const popup = await openCalendar(page, trigger(page))
       await atRest(popup)
-      await expectInsideViewport(popup, 'the calendar', 8)
-      await expectNothingSideways(popup)
-      await expectNoSidewaysScroll(page)
-      const spilled = await popup.locator('tbody button').evaluateAll((all) => all.filter((el) => el.scrollWidth > el.clientWidth).map((el) => el.textContent))
-      expect(spilled, 'days whose digits run past their button').toEqual([])
+      const chosen = await boxOf(popup.locator('tbody button[data-selected]'))
+      expect([await css(popup, 'padding'), (await boxOf(popup)).width, Math.round(chosen.width)]).toEqual(['16px', 280, 35])
     })
   }
 })

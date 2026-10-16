@@ -109,10 +109,13 @@ describe('a day', () => {
     expect(mediaOf(`${forced}[data-selected]`)).toBe('@media (forced-colors: active)')
   })
 
-  it('the paddings of the popup and the cell stop at 16 and 2 px, so a 32 px root leaves two digits room', () => {
-    expect(ruleOf(selectorOf('p-[min(1rem,16px)]'))).toBe('padding: min(1rem, 16px);')
-    expect(ruleOf(selectorOf('p-[min(0.125rem,2px)]'))).toBe('padding: min(0.125rem, 2px);')
-    expect([DATE_PICKER_POPUP.split(' ').includes('p-[min(1rem,16px)]'), DATE_PICKER_CELL.split(' ')]).toEqual([true, ['p-[min(0.125rem,2px)]', 'text-center']])
+  it('a day is as wide as its column, and the popup gives up side padding to a narrow screen, so a 32 px root leaves two digits room', () => {
+    const side = 'px-[clamp(4px,calc(1rem-(17.5rem*var(--tc-density)-var(--available-width,100vw))/2),min(1rem,16px))]'
+    expect(ruleOf(selectorOf(side))).toBe('padding-inline: clamp(4px, calc(1rem - (17.5rem * var(--tc-density) - var(--available-width,100vw)) / 2), min(1rem, 16px));')
+    expect(ruleOf(selectorOf('py-[min(1rem,16px)]'))).toBe('padding-block: min(1rem, 16px);')
+    expect(ruleOf(selectorOf('py-[min(0.125rem,2px)]'))).toBe('padding-block: min(0.125rem, 2px);')
+    expect(DATE_PICKER_POPUP.split(' ').filter((cls) => /^p[xy]?-/.test(cls))).toEqual(['py-[min(1rem,16px)]', side])
+    expect(DATE_PICKER_CELL.split(' ')).toEqual(['px-0', 'py-[min(0.125rem,2px)]', 'text-center'])
   })
 
   it('today is a weight and an underline, never a fill', () => {

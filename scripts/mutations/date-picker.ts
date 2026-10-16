@@ -201,15 +201,21 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
-    label: 'the date picker popup padding grows with the root again, so at 32 px two digits overflow their day',
+    label: 'the date picker popup keeps its full side padding on a narrow screen, so at a 32 px root two digits overflow their day',
     file: CLASSES,
-    from: 'gap-3 p-[min(1rem,16px)] tone-neutral',
-    to: 'gap-3 p-4 tone-neutral',
+    from: 'px-[clamp(4px,calc(1rem-(17.5rem*var(--tc-density)-var(--available-width,100vw))/2),min(1rem,16px))]',
+    to: 'px-[min(1rem,16px)]',
   },
   {
-    label: 'the date picker cell padding grows with the root again, so at 32 px two digits overflow their day',
+    label: 'the date picker popup block padding grows with the root again, 32 px above and below the month at a 32 px root',
     file: CLASSES,
-    from: 'export const DATE_PICKER_CELL = \'p-[min(0.125rem,2px)] text-center\'',
-    to: 'export const DATE_PICKER_CELL = \'p-0.5 text-center\'',
+    from: "'py-[min(1rem,16px)] px-[clamp(",
+    to: "'p-4 px-[clamp(",
+  },
+  {
+    label: 'the date picker cell keeps a side padding, so a day is narrower than its column and two digits overflow at a 32 px root',
+    file: CLASSES,
+    from: "export const DATE_PICKER_CELL = 'px-0 py-[min(0.125rem,2px)] text-center'",
+    to: "export const DATE_PICKER_CELL = 'p-[min(0.125rem,2px)] text-center'",
   },
 ]
