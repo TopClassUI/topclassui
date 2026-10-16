@@ -20,12 +20,14 @@ export const SEGMENTED_ROOT_SIZE = { xs: 'min-h-control-xs', sm: 'min-h-control-
 /** Merged after the track by cn(): w-full replaces w-fit, and the segments share the width. */
 export const SEGMENTED_FULL = 'w-full *:flex-1'
 
-/** The selected segment is raised and heavier. Forced colours erase both, so there it takes the system pair. */
+/** The selected segment is raised and heavier. Forced colours erase both, so there it takes the system pair, and
+ * GrayText when disabled, which the browser gives every other disabled segment. */
 export const SEGMENTED_ITEM = [
   'inline-flex shrink-0 items-center justify-center-safe gap-1.5 overflow-hidden whitespace-nowrap rounded-control font-medium text-muted',
   'data-checked:bg-surface-raised data-checked:font-semibold data-checked:text-body data-checked:shadow-sm',
   'forced-colors:data-checked:forced-color-adjust-none forced-colors:data-checked:bg-[Highlight] forced-colors:data-checked:text-[HighlightText]',
   'forced-colors:data-checked:shadow-none forced-colors:data-checked:[--tc-ring:HighlightText]',
+  'forced-colors:data-checked:data-disabled:bg-[GrayText] forced-colors:data-checked:data-disabled:text-[Canvas]',
   CONTAIN, FOCUS_RING_INSET, TOUCH_TARGET, TRANSITION, DISABLED,
 ].join(' ')
 

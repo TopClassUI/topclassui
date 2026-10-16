@@ -202,6 +202,22 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(contrast(rgbOf(await css(page.getByRole('radiogroup', { name: 'Read-only' }), 'border-top-color')), canvas)).toBeGreaterThanOrEqual(3)
     })
 
+    // SEGMENTED-1: painted on a canvas and read back, so the test measures the colour and not its spelling.
+    test('a disabled selected segment takes GrayText and Canvas, apart from a live selected one', async ({ page }) => {
+      await page.goto(urlFor('segmented-control--states', 'light', 'ltr'))
+      const painted = (colour: string) => page.evaluate((value) => {
+        const pen = document.createElement('canvas').getContext('2d')
+        if (!pen) throw new Error('no canvas')
+        pen.fillStyle = value
+        pen.fillRect(0, 0, 1, 1)
+        return [...pen.getImageData(0, 0, 1, 1).data].slice(0, 3).join()
+      }, colour)
+      const disabled = segmentIn(page, 'Disabled, selected')
+      expect([await painted(await css(disabled, 'background-color')), await painted(await css(disabled, 'color'))])
+        .toEqual([await painted(await resolve(page, 'GrayText')), await painted(await resolve(page, 'Canvas'))])
+      expect(await painted(await css(disabled, 'background-color'))).not.toBe(await painted(await resolve(page, 'Highlight')))
+    })
+
     test('invalid thickens the line to 2 px; disabled dims; no segment has an outline at rest', async ({ page }) => {
       await page.goto(urlFor('segmented-control--states', 'light', 'ltr'))
       expect(await css(page.getByRole('radiogroup', { name: 'Invalid' }), 'border-top-width')).toBe('2px')

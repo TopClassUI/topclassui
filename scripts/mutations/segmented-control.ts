@@ -211,4 +211,10 @@ export const MUTATIONS: Mutation[] = [
     from: '    picked.current = next\n',
     to: '',
   },
+  {
+    label: 'the segmented control disabled selected segment keeps the live highlight under forced colours, told apart by a fainter fill only',
+    file: CLASSES,
+    from: "  'forced-colors:data-checked:data-disabled:bg-[GrayText] forced-colors:data-checked:data-disabled:text-[Canvas]',\n",
+    to: '',
+  },
 ]
