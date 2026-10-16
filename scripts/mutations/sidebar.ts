@@ -428,6 +428,12 @@ export const MUTATIONS: Mutation[] = [
     to: '<SidebarLink icon={<Icon name="palette" />}>Theming</SidebarLink>',
   },
   {
+    label: 'the sidebar README import line drops the Icon its sample draws, so the sample does not compile as pasted',
+    file: 'src/components/sidebar/README.md',
+    from: 'import { Icon, SidebarBody,',
+    to: 'import { SidebarBody,',
+  },
+  {
     label: 'a plain sidebar link no longer needs an href, so a row can go nowhere',
     file: 'src/components/sidebar/types.ts',
     from: '  /** Where the row goes. */\n  href: string\n',

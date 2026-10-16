@@ -11,20 +11,31 @@ const FOLDER = join(ROOT, 'src', 'components', 'sidebar')
 const slash = (path: string) => path.replace(/\\/g, '/')
 const probePath = (name: string) => slash(join(FOLDER, 'test', `sidebar-probe-${name}.tsx`))
 
-/** The five parts the README imports, and the toggle, which a header draws by itself. */
+/** The five parts the README imports beside Icon. */
 const PARTS = 'SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoot'
 
-/** What a page that pastes a sample has in scope: the parts, the toggle and the server Icon. */
+/** What a probe of this file has in scope: the parts, the toggle and the server Icon. A README sample has only its own import line. */
 const PRELUDE = [
   `import { ${PARTS}, SidebarTrigger } from '../index.js'`,
   "import { Icon } from '#components/icon/index.js'",
   `export const used = [${PARTS}, SidebarTrigger, Icon]`,
 ].join('\n')
 
-/** The import line compiles as a module that uses what it imports, any other sample as JSX a page would paste. */
+/** Where a name imported from 'topclassui' lives in this repo, which has no package index yet. */
+const HOME: Record<string, string> = { Icon: '#components/icon/index.js' }
+
+const IMPORT_LINE = /^import \{([^}]*)\} from 'topclassui'\r?\n?/
+
+const jsx = (code: string) => `export const sample = (\n<>\n${code}\n</>\n)\n`
+
+/** An import line, name by name from where each lives, then the JSX after it; a probe with no import line gets the PRELUDE. */
 function wrap(code: string): string {
-  if (code.startsWith('import ')) return `${code.replace("'topclassui'", "'../index.js'")}\nexport const imported = [${PARTS}]\n`
-  return `${PRELUDE}\nexport const sample = (\n<>\n${code}\n</>\n)\n`
+  const line = IMPORT_LINE.exec(code)
+  if (line === null) return `${PRELUDE}\n${jsx(code)}`
+  const names = (line[1] ?? '').split(',').map((name) => name.trim()).filter(Boolean)
+  const imports = names.map((name) => `import { ${name} } from '${HOME[name] ?? '../index.js'}'`).join('\n')
+  const rest = code.slice(line[0].length).trim()
+  return `${imports}\nexport const imported = [${names.join(', ')}]\n${rest === '' ? '' : jsx(rest)}`
 }
 
 /**
@@ -71,7 +82,8 @@ const rail = (root: string, link = ' href="/home"') => `<SidebarRoot${root}><Sid
 
 const verdict = compile({
   readmeImport: sample(0),
-  readmeSample: sample(1),
+  // As a reader pastes it: the README's own import line, then the sample, and nothing else in scope.
+  readmeSample: `${sample(0)}${sample(1)}`,
   // What the parts do take.
   uncontrolled: rail(' defaultOpen={false} aria-label="Documentation" id="rail"'),
   controlled: rail(' open onOpenChange={(open) => { void open.valueOf() }}'),
@@ -97,16 +109,16 @@ const verdict = compile({
 describe('the samples in the README compile as written', () => {
   it('finds the import line and the sample, so an empty extraction cannot pass', () => {
     expect(SAMPLES).toHaveLength(2)
-    expect(SAMPLES[0]).toBe("import { SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoot } from 'topclassui'\n")
+    expect(SAMPLES[0]).toBe("import { Icon, SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoot } from 'topclassui'\n")
     expect(SAMPLES[1]).toContain('<SidebarLink href="/docs/theming" icon={<Icon name="palette" />}>Theming</SidebarLink>')
     expect(SAMPLES[1]).toContain('<main className="min-w-0 flex-1 overflow-y-auto">Your page</main>')
   })
 
-  it('the import line names five exports that exist, where the generated one names a Sidebar that does not', () => {
+  it('the import line names six exports that exist, the Icon its sample draws among them', () => {
     expect(verdict['readmeImport']).toEqual([])
   })
 
-  it('the sample: a rail in a flex row, a header, a named group of two links, one of them current', () => {
+  it('the sample, pasted under that import line alone: a rail in a flex row, a header, a named group of two links, one of them current', () => {
     expect(verdict['readmeSample']).toEqual([])
   })
 })
