@@ -57,6 +57,17 @@ describe('the zone', () => {
     expect([ruleOf(selector), queryOf(selector)]).toEqual(['border-color: Highlight;', '@media (forced-colors: active)'])
   })
 
+  it('the prompt and the hint wrap a word with no space to break at, and stay inside it', () => {
+    expect([CLASSES_OF.FILE_UPLOAD_PROMPT, CLASSES_OF.FILE_UPLOAD_HINT].map((cls) => ['wrap-anywhere', 'max-w-full'].every((name) => cls.split(' ').includes(name)))).toEqual([true, true])
+    expect(ruleOf(selectorOf('wrap-anywhere'))).toBe('overflow-wrap: anywhere;')
+    expect(ruleOf(selectorOf('max-w-full'))).toBe('max-width: 100%;')
+  })
+
+  it('a link or a button in the hint is lifted over the input', () => {
+    const lifted = (cls: string) => ruleOf(`${selectorOf(cls)} a, ${selectorOf(cls)} button`)
+    expect([lifted('[&_a,&_button]:relative'), lifted('[&_a,&_button]:z-1')]).toEqual(['position: relative;', 'z-index: 1;'])
+  })
+
   it('the input covers it, unseen', () => {
     expect(ruleOf(selectorOf('opacity-0'))).toBe('opacity: 0%;')
     expect(ruleOf(selectorOf('inset-0'))).toBe('inset: 0px;')

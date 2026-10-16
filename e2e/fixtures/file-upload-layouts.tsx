@@ -1,6 +1,6 @@
 // Loaded into a live page by e2e/file-upload.spec.ts: an upload where a real page puts one, beside a real Input. Alone
 // as a grid item, in a wrapper in a grid track, in a flex-1 column, in a w-fit parent, in a table cell, in a label row
-// inside a column that aligns to the start; apart, an upload of two rows. Inline styles, since the harness
+// inside a column that aligns to the start; apart, two rows and a link in the hint. Inline styles, since the harness
 // compiles only the classes under src/.
 import type { CSSProperties } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -45,7 +45,9 @@ function Fixture() {
         </div>
       </div>
       <div id="two-rows" style={{ padding: 16 }}>
-        <FileUpload aria-label="Two rows" maxFiles={100} visibleRows={2} />
+        <FileUpload aria-label="Two rows" maxFiles={100} visibleRows={2}>
+          Up to 100 files. <a id="two-rows-link" href="#rules">Read the rules</a>
+        </FileUpload>
       </div>
     </TopClassProvider>
   )

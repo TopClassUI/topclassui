@@ -148,7 +148,7 @@ describe('lib.ts is pure', () => {
 describe('classes.ts builds every string from the shared constants (R-5.2-4)', () => {
   it('takes the lines, the rings, the invalid mark, the row floor, the scroll area and the icon button from src/shared', () => {
     expect(importedNames(read('classes.ts'), '#shared/classes.js')).toEqual([
-      'BORDER', 'BORDER_STRONG', 'DISABLED', 'FIELD_INVALID_WITHIN', 'FOCUS_RING_INSET', 'FOCUS_RING_WITHIN', 'HOVER', 'ICON_BUTTON', 'LABEL',
+      'BORDER', 'BORDER_STRONG', 'CONTAIN', 'DISABLED', 'FIELD_INVALID_WITHIN', 'FOCUS_RING_INSET', 'FOCUS_RING_WITHIN', 'HOVER', 'ICON_BUTTON', 'LABEL',
       'ROW_TOUCH', 'SCROLL_AREA', 'TRANSITION',
     ])
   })

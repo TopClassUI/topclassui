@@ -23,7 +23,7 @@ type Owned = 'type' | 'multiple' | 'value' | 'defaultValue' | 'onChange' | 'size
 export type FileUploadProps = Omit<ComponentPropsWithoutRef<'input'>, Owned>
   & FileUploadDesignProps
   & {
-    /** The hint inside the zone, such as "PDF or PNG, up to 5 MB": it describes the input. */
+    /** The hint inside the zone, such as "PDF or PNG, up to 5 MB": it describes the input; a link in it takes its own click. */
     children?: ReactNode | undefined
     /** The accepted files after each pick, drop or remove. */
     onValueChange?: ((files: readonly File[]) => void) | undefined

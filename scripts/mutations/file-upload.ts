@@ -206,6 +206,24 @@ export const MUTATIONS: Mutation[] = [
     to: 'pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-coarse,44px)+',
   },
   {
+    label: 'the file upload hint keeps a word with no space to break at whole, so the page scrolls sideways',
+    file: CLASSES,
+    from: 'primary-on-soft wrap-anywhere ${CONTAIN} [&_a',
+    to: 'primary-on-soft ${CONTAIN} [&_a',
+  },
+  {
+    label: 'the file upload prompt keeps a long word whole and runs past the zone',
+    file: CLASSES,
+    from: 'font-medium wrap-anywhere ${CONTAIN}`',
+    to: 'font-medium`',
+  },
+  {
+    label: 'the file upload hint leaves its links under the input, so a click on one opens the picker',
+    file: CLASSES,
+    from: ' [&_a,&_button]:relative [&_a,&_button]:z-1',
+    to: '',
+  },
+  {
     label: 'the file upload remove of a disabled upload looks enabled',
     file: CLASSES,
     from: '${HOVER.ghost} ${DISABLED}`',

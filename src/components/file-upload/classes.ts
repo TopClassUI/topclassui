@@ -1,6 +1,6 @@
 // R-5.12-4: the class strings of the file upload, built from the shared constants (unit-5.md, FileUpload).
 import {
-  BORDER, BORDER_STRONG, DISABLED, FIELD_INVALID_WITHIN, FOCUS_RING_INSET, FOCUS_RING_WITHIN, HOVER, ICON_BUTTON, LABEL, ROW_TOUCH,
+  BORDER, BORDER_STRONG, CONTAIN, DISABLED, FIELD_INVALID_WITHIN, FOCUS_RING_INSET, FOCUS_RING_WITHIN, HOVER, ICON_BUTTON, LABEL, ROW_TOUCH,
   SCROLL_AREA, TRANSITION,
 } from '#shared/classes.js'
 
@@ -16,11 +16,13 @@ export const FILE_UPLOAD_INPUT = 'absolute inset-0 size-full cursor-pointer opac
 
 export const FILE_UPLOAD_ICON = 'flex text-muted group-data-dragging/zone:text-primary-on-soft'
 
-export const FILE_UPLOAD_PROMPT = 'flex flex-col items-center gap-0.5 text-sm font-medium'
+/** CONTAIN and wrap-anywhere: a word with no space to break at wraps inside the zone instead of widening the page. */
+export const FILE_UPLOAD_PROMPT = `flex flex-col items-center gap-0.5 text-sm font-medium wrap-anywhere ${CONTAIN}`
 
 export const FILE_UPLOAD_BROWSE = 'text-primary-on-soft underline underline-offset-2'
 
-export const FILE_UPLOAD_HINT = 'text-xs text-muted group-data-dragging/zone:text-primary-on-soft'
+/** As the prompt; a link or a button in it is lifted over the input, which takes every other pointer on the zone. */
+export const FILE_UPLOAD_HINT = `text-xs text-muted group-data-dragging/zone:text-primary-on-soft wrap-anywhere ${CONTAIN} [&_a,&_button]:relative [&_a,&_button]:z-1`
 
 /** At most --tc-list-rows whole rows and their gaps, then it scrolls inside itself. A row is its remove or its name with
  * padding and line, or --tc-row-height if taller, which ROW_TOUCH replaces under a coarse pointer. auto-rows-max: a row

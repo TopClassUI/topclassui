@@ -344,6 +344,43 @@ test.describe('live: hostile content', () => {
     await page.getByLabel('Two rows', { exact: true }).setInputFiles(['a', 'b', 'c', 'd', 'e'].map((name) => pdf(`${name}.pdf`)))
     expect(await shownIn(page.locator('#two-rows ul'))).toEqual({ whole: 2, rowHeights: [40], scrolls: true })
   })
+
+  test('a link in the hint takes the pointer from the input over the zone; the hint\'s words leave it to the input', async ({ page }) => {
+    await fixture(page)
+    const hit = (x: number, y: number) => page.evaluate(([px, py]) => {
+      const at = document.elementFromPoint(px ?? 0, py ?? 0)
+      return at?.id === 'two-rows-link' ? 'link' : at?.tagName ?? ''
+    }, [x, y])
+    await page.locator('#two-rows').scrollIntoViewIfNeeded()
+    const [link, hint] = [await boxOf(page.locator('#two-rows-link')), await boxOf(page.locator('#two-rows-link').locator('xpath=..'))]
+    expect([await hit(link.left + link.width / 2, link.top + link.height / 2), await hit(hint.left + 2, hint.top + hint.height / 2)]).toEqual(['link', 'INPUT'])
+    await page.locator('#two-rows-link').click()
+    expect(await page.evaluate(() => location.hash)).toBe('#rules')
+  })
+
+  for (const direction of DIRECTIONS) {
+    test(`${direction}, 320 px: a hint and a prompt with no space to break at wrap inside the zone, and nothing crosses either edge of the page`, async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 480 })
+      await openLive(page, 'file-upload--basic', { direction })
+      const zone = zoneOf(inputIn(page))
+      for (const hint of ['image/png,image/jpeg,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'x'.repeat(300)]) {
+        await page.evaluate((text) => {
+          const hintSpan = document.querySelector('#demo [id$="-hint"]')
+          const drop = document.querySelector('#demo input[type="file"]')?.parentElement?.querySelectorAll('span span')[0]
+          if (!hintSpan || !drop) throw new Error('no hint or prompt')
+          hintSpan.textContent = text
+          drop.textContent = 'y'.repeat(120)
+        }, hint)
+        const outside = await zone.evaluate((el) => {
+          const z = el.getBoundingClientRect()
+          return [...el.querySelectorAll('span')].map((span) => span.getBoundingClientRect())
+            .filter((r) => r.left < z.left - 0.5 || r.right > z.right + 0.5 || r.left < 0).length
+        })
+        expect(outside, hint.slice(0, 12)).toBe(0)
+        await expectNoSidewaysScroll(page)
+      }
+    })
+  }
 })
 
 test.describe('live: a long list under a coarse pointer', () => {
