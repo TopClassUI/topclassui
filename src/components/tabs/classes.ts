@@ -14,13 +14,15 @@ export const TABS_ROOT = 'grid grid-cols-1'
 export const TABS_LIST_LINE = 'shadow-[inset_0_calc(var(--tc-line-width)*-1)_var(--tc-line)] forced-colors:border-b-(length:--tc-line-width)'
 
 /** Base UI brings a tab into view by whole pixels measured from its offset parent, and Chromium
- * stops an RTL list a fraction short of its end: the list is that parent, keeps a pixel of scroll
- * padding and a pixel after its last tab, so no tab the keyboard reaches is cut (0.72 px was). */
+ * stops an RTL list a fraction short of its end: the list is that parent and keeps a pixel of scroll
+ * padding, so no tab the keyboard reaches is cut (0.72 px was). */
 export const TABS_LIST_SCROLL = `relative scroll-px-px ${SCROLL_X}`
 
-/** R-5.2-3: the list of each look. Both scroll sideways inside themselves when the tabs do not fit. */
+/** R-5.2-3: the list of each look. Both scroll sideways inside themselves when the tabs do not fit, and
+ * both keep at least a pixel before the first tab and after the last: the scroll padding is then met where the
+ * server drew them, so hydration scrolls no RTL list (it moved by 1 px), and an RTL list reaches its end. */
 export const TABS_LIST = {
-  line: `flex items-center gap-6 pe-px ${TABS_LIST_LINE} ${TABS_LIST_SCROLL}`,
+  line: `flex items-center gap-6 px-px ${TABS_LIST_LINE} ${TABS_LIST_SCROLL}`,
   enclosed: `flex w-fit max-w-full items-center gap-1 rounded-control bg-surface p-1 ${FORCED_EDGE} ${TABS_LIST_SCROLL}`,
 } as const satisfies Record<TabsVariant, string>
 
@@ -36,7 +38,7 @@ export const TABS_TAB_DISABLED = [
  * box, because the list clips too. Content that fits is centred; content that does not starts
  * at the start edge, so the beginning of a label is never the part that is cut. */
 const TAB = [
-  'inline-flex shrink-0 items-center justify-center-safe gap-2 overflow-hidden whitespace-nowrap font-medium text-muted',
+  'inline-flex shrink-0 items-center justify-center-safe gap-2 overflow-hidden whitespace-nowrap font-normal text-muted',
   'data-active:font-semibold data-active:text-body',
   CONTAIN,
   FOCUS_RING_INSET,
@@ -49,17 +51,18 @@ const TAB = [
  * not active takes the colour of the page, and the active one the system's highlight. */
 export const TABS_BAR = 'border-b-2 border-transparent data-active:border-primary-solid forced-colors:border-[Canvas] forced-colors:data-active:border-[Highlight]'
 
-/** Forced colours erase a fill and a shadow, so there the active tab takes the system pair
- * and paints it itself, with a ring that shows on that fill. */
+/** The raised fill is 1.04:1 against the list, so an edge of 3:1 is what tells the active tab (WCAG 1.4.11).
+ * Forced colours erase a fill and a shadow: there it takes the system pair, with a ring that shows on it. */
 export const TABS_RAISED = [
   'rounded-control data-active:bg-surface-raised data-active:shadow-sm',
+  'not-forced-colors:data-active:inset-ring-(length:--tc-line-width) not-forced-colors:data-active:inset-ring-line-strong',
   'forced-colors:data-active:forced-color-adjust-none forced-colors:data-active:bg-[Highlight]',
   'forced-colors:data-active:text-[HighlightText] forced-colors:data-active:shadow-none',
   'forced-colors:data-active:[--tc-ring:HighlightText]',
 ].join(' ')
 
-/** R-5.2-3: the active tab is told by a bar or by a raised surface, and by its weight too
- * wherever the font draws 500 and 600 apart: Windows' own draws them as one face. */
+/** R-5.2-3: the active tab is told by a bar or by an edged, raised surface, and by its weight:
+ * 400 at rest, since Windows' own font draws 500 and 600 as one face. */
 export const TABS_TAB = {
   line: `${TAB} ${TABS_BAR}`,
   enclosed: `${TAB} ${TABS_RAISED}`,

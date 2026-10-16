@@ -7,8 +7,9 @@ import type { Size } from '#shared/contracts/size.js'
 /** The scrim, on the dialog layer. It fades; the page behind is locked by Base UI. */
 export const DIALOG_BACKDROP = `${SCRIM} z-(--tc-z-dialog) ${FADE_MOTION}`
 
-/** The whole screen, with the inset every edge keeps clear. It centres the popup. */
-export const DIALOG_VIEWPORT = 'fixed inset-0 z-(--tc-z-dialog) grid place-items-center p-(--tc-overlay-inset)'
+/** The whole screen, with the inset every edge keeps clear. It centres the popup, and it is the
+ * size container DIALOG_BODY_SHORT asks, since a container query reads rem from the root. */
+export const DIALOG_VIEWPORT = 'fixed inset-0 z-(--tc-z-dialog) grid place-items-center p-(--tc-overlay-inset) [container-type:size]'
 
 /** A column no taller than the screen less the inset, so the body is what scrolls. It scrolls
  * itself only where the three bars cannot fit, and it breaks a word too long for its width.
@@ -41,10 +42,10 @@ export const DIALOG_TITLE = 'text-base font-semibold text-body'
 
 export const DIALOG_DESCRIPTION = 'text-sm text-muted'
 
-/** On a screen under 17rem tall (272 px) a header, a footer and the inset leave the body four
- * lines or fewer. There it stops scrolling and the popup scrolls as one, or a wheel that
- * starts on the body would end inside it and never reach the actions. */
-export const DIALOG_BODY_SHORT = '[@media(height<17rem)]:shrink-0 [@media(height<17rem)]:overflow-y-visible'
+/** Where the viewport, less its inset, is under 15rem tall (272 px of screen at a 16 px root) the body
+ * has four lines or fewer. It stops scrolling and the popup scrolls as one, or a wheel that starts on
+ * the body ends inside it. Not @media: there rem stays 16 px, while the bars grow with the root. */
+export const DIALOG_BODY_SHORT = '[@container(height<15rem)]:shrink-0 [@container(height<15rem)]:overflow-y-visible'
 
 /** R-10.5-1: the scroll container. Never shorter than one line of text and its padding, and
  * its ring is drawn inside its box, because the popup clips whatever is outside it. */
