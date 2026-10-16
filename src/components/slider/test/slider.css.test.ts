@@ -116,8 +116,10 @@ describe('the track, the fill and the knob', () => {
     expect(mediaOf(selectorOf('forced-colors:bg-[Highlight]'))).toBe('@media (forced-colors: active)')
   })
 
-  it('the track keeps an outline under forced colours, where its fill is erased', () => {
-    expect(ruleOf(selectorOf('forced-colors:outline-(length:--tc-line-width)'))).toBe('outline-style: var(--tw-outline-style); outline-width: var(--tc-line-width);')
+  it('the track has a line-strong edge at rest, which also keeps it under forced colours, where its fill is erased', () => {
+    expect(ruleOf(selectorOf('outline-solid'))).toBe('--tw-outline-style: solid; outline-style: solid;')
+    expect(ruleOf(selectorOf('outline-(length:--tc-line-width)'))).toBe('outline-style: var(--tw-outline-style); outline-width: var(--tc-line-width);')
+    expect(ruleOf(selectorOf('outline-line-strong'))).toBe('outline-color: var(--tc-line-strong);')
   })
 
   it('the knob: a 2 px primary line on the raised surface, round', () => {
@@ -148,10 +150,7 @@ describe('invalid sits on the group, and is told by more than hue', () => {
     expect(mediaOf(`${selectorOf(forced)}${INVALID}`)).toBe('@media (forced-colors: active)')
   })
 
-  it('a danger line is drawn around the track, and thickens under forced colours', () => {
-    expect(ruleOf(`${selectorOf('group-aria-invalid/slider:outline-solid')}${INVALID}`)).toBe('--tw-outline-style: solid; outline-style: solid;')
-    expect(ruleOf(`${selectorOf('group-aria-invalid/slider:outline-(length:--tc-line-width)')}${INVALID}`))
-      .toBe('outline-style: var(--tw-outline-style); outline-width: var(--tc-line-width);')
+  it('the line around the track turns to danger, and thickens under forced colours', () => {
     expect(ruleOf(`${selectorOf('group-aria-invalid/slider:outline-danger-solid')}${INVALID}`)).toBe('outline-color: var(--tc-danger-solid);')
     const forced = 'forced-colors:group-aria-invalid/slider:outline-(length:--tc-ring-width)'
     expect(ruleOf(`${selectorOf(forced)}${INVALID}`)).toBe('outline-style: var(--tw-outline-style); outline-width: var(--tc-ring-width);')

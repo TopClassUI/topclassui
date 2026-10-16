@@ -73,8 +73,13 @@ its own line, so the track keeps at least two thirds of the slider, and a longer
 
 **`invalid`**, or an `aria-invalid` a Field passes, sets `aria-invalid` on the group and, from
 hydration, on each range input, the element a screen reader lands on: point `aria-describedby`
-at the error text too. The fill and the knob turn red, and a line is drawn around the track. **`disabled`** dims it and disables every range input, so the form sends
-nothing; a disabled `<fieldset>` around it dims it too, and a press on its track moves nothing. A slider has no read-only state.
+at the error text too. The fill and the knob turn red, and so does the line around the track.
+**`disabled`** dims it and disables every range input, so the form sends nothing; a disabled
+`<fieldset>` around it dims it too, and a press on its track moves nothing. A slider has no
+read-only state.
+
+**The track** has a line around it, `--tc-line-strong`, at 3:1 on the page in every mode: its
+soft fill alone is 1.2:1, too faint to show where the range ends.
 
 **The width** is an Input's of the same `size` (`--tc-input-width`), and it shrinks in a narrow
 track. **`fullWidth`** fills the parent, but in a parent that sizes to its content (a `w-fit`
@@ -124,7 +129,7 @@ Every prop below is optional and falls back to the default shown.
 | `aria-labelledby` | no | `string` | - | The id of the visible text that names the group. |
 | `className` | no | `string` | - | Merged last, so a consumer class wins a conflict with the slider's own. |
 | `fullWidth` | no | `boolean` | `false` | Fills its parent instead of taking the width of an Input of its size. |
-| `invalid` | no | `boolean` | `false` | Marks the value as wrong: sets aria-invalid on the group and on each range input, and the fill, the knob and a line around the track turn to danger. |
+| `invalid` | no | `boolean` | `false` | Marks the value as wrong: sets aria-invalid on the group and on each range input, and the fill, the knob and the line around the track turn to danger. |
 | `largeStep` | no | `number`, min 0.000001, max 1000000000000000 | `10` | What Page Up, Page Down and Shift with an arrow move; clamped to at least the step, so they always move. |
 | `max` | no | `number`, min -1000000000000000, max 1000000000000000 | `100` | The highest value; clamped to plus or minus 1e15. |
 | `min` | no | `number`, min -1000000000000000, max 1000000000000000 | `0` | The lowest value, and the value of a slider with no default; clamped to plus or minus 1e15. |

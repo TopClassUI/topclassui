@@ -253,15 +253,15 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
-    label: 'the slider track loses its forced-colours line, so the empty track vanishes there',
+    label: 'the slider track loses its line-strong edge, so the empty track is 1.2:1 on the page and vanishes in forced colours',
     file: CLASSES,
-    from: 'bg-neutral-soft ${FORCED_EDGE} ',
+    from: 'bg-neutral-soft outline-solid outline-(length:--tc-line-width) outline-line-strong ',
     to: 'bg-neutral-soft ',
   },
   {
-    label: 'the slider invalid track loses its danger line, so invalid is told by hue alone',
+    label: 'the slider invalid track keeps its grey line, so invalid is told by the hue of the fill alone',
     file: CLASSES,
-    from: ' group-aria-invalid/slider:outline-solid group-aria-invalid/slider:outline-(length:--tc-line-width)',
+    from: ' group-aria-invalid/slider:outline-danger-solid',
     to: '',
   },
   {

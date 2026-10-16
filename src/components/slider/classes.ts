@@ -1,6 +1,6 @@
 // R-5.12-4: the class strings of the slider (unit-4.md, Slider), built from the shared field and target constants.
 import {
-  DISABLED, FIELD_HOLDER, FIELD_HOLDER_FULL, FIELD_TEXT, FORCED_EDGE, TARGET_HEIGHT, TOGGLE_SIZE, TOUCH_TARGET,
+  DISABLED, FIELD_HOLDER, FIELD_HOLDER_FULL, FIELD_TEXT, TARGET_HEIGHT, TOGGLE_SIZE, TOUCH_TARGET,
 } from '#shared/classes.js'
 
 /** The box that owns the width. No type step here: FIELD_TEXT[size] gives it, so the em of the width is an Input's.
@@ -33,8 +33,9 @@ export const SLIDER_CONTROL_SIZE = {
   custom: '',
 } as const
 
-/** Invalid adds a line around the track: the red fill alone is a cue by hue. */
-export const SLIDER_TRACK = `w-full rounded-full bg-neutral-soft ${FORCED_EDGE} group-aria-invalid/slider:outline-solid group-aria-invalid/slider:outline-(length:--tc-line-width) group-aria-invalid/slider:outline-danger-solid forced-colors:group-aria-invalid/slider:outline-(length:--tc-ring-width)`
+/** The soft fill is 1.2:1 on the page, so a line-strong edge at 3:1 shows where the range ends, in forced colours too.
+ * Invalid turns that line to danger: the red fill alone is a cue by hue. */
+export const SLIDER_TRACK = 'w-full rounded-full bg-neutral-soft outline-solid outline-(length:--tc-line-width) outline-line-strong group-aria-invalid/slider:outline-danger-solid forced-colors:group-aria-invalid/slider:outline-(length:--tc-ring-width)'
 
 export const SLIDER_TRACK_SIZE = { xs: 'h-1', sm: 'h-1', md: 'h-1.5', lg: 'h-2', xl: 'h-2', custom: '' } as const
 

@@ -108,14 +108,15 @@ test.describe('the server HTML, before any script runs', () => {
 })
 
 test.describe('the states, on the static page', () => {
-  test('primary: the fill, and the knob\'s 2 px line on the raised surface', async ({ page }) => {
+  test('primary: the fill, the knob\'s 2 px line on the raised surface, and a 1 px line-strong edge around the track', async ({ page }) => {
     await page.goto(urlFor('slider--states', 'light', 'ltr'))
     const primary = await resolve(page, 'var(--tc-primary-solid)')
     const live = thumbIn(page, 'Live')
     expect(await css(fillOf(live), 'background-color')).toBe(primary)
     expect([await css(knobOf(live), 'border-top-color'), await css(knobOf(live), 'border-top-width')]).toEqual([primary, '2px'])
     expect(await css(knobOf(live), 'background-color')).toBe(await resolve(page, 'var(--tc-surface-raised)'))
-    expect(await css(trackOf(live), 'outline-style')).toBe('none')
+    expect([await css(trackOf(live), 'outline-style'), await css(trackOf(live), 'outline-width'), await css(trackOf(live), 'outline-color')])
+      .toEqual(['solid', '1px', await resolve(page, 'var(--tc-line-strong)')])
   })
 
   test('invalid: the fill and the knob turn to danger, and a danger line is drawn around the track, not hue alone', async ({ page }) => {
@@ -135,6 +136,21 @@ test.describe('the states, on the static page', () => {
     const opacity = (name: string) => thumbIn(page, name).evaluate((el) => getComputedStyle(el.closest('[role="group"]') as Element).opacity)
     expect([await opacity('Disabled'), await opacity('Live'), await opacity('Invalid')]).toEqual(['0.5', '1', '1'])
   })
+})
+
+test.describe('the edge of the empty track, read from the pixels a page painted', () => {
+  for (const mode of ['light', 'dark', 'ocean'] as const) {
+    test(`${mode}: a line at 3:1 against the page runs along the empty track, so the end of the range can be seen`, async ({ page }) => {
+      await page.goto(urlFor('slider--states', mode, 'ltr'))
+      const input = thumbIn(page, 'Live')
+      const [thumb, track] = [await boxOf(thumbOf(input)), await boxOf(trackOf(input))]
+      const [x, width] = [Math.round(thumb.right + 4), Math.round(track.right - thumb.right - 12)]
+      // The page itself, 6 px above the track inside the slider's own box, where nothing is painted.
+      const [backdrop] = await pixelsOf(page, { x, y: Math.round(track.top - 6), width: 1, height: 1 })
+      const edge = await pixelsOf(page, { x, y: Math.round(track.top - 2), width, height: 3 })
+      expect(inkOn(edge, backdrop ?? [0, 0, 0]), `${String(width)} columns`).toBeGreaterThanOrEqual(width)
+    })
+  }
 })
 
 for (const scheme of ['light', 'dark'] as const) {
