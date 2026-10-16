@@ -67,7 +67,9 @@ form action that settles brings the slider back to its `defaultValue` of the lat
 to `min`; a controlled slider keeps its owner's value. A reset calls no `onValueChange`.
 
 **`showValue`** writes the value after the track, in the provider's locale and digits, or in
-your `locale` and `format`. A `format` of `percent` multiplies: give it values from 0 to 1.
+your `locale` and `format`. A `format` of `percent` multiplies: give it values from 0 to 1. A
+value too long to sit beside the track, such as a currency range, moves below it to the end of
+its own line, so the track keeps at least two thirds of the slider, and a longer one wraps.
 
 **`invalid`**, or an `aria-invalid` a Field passes, sets `aria-invalid` on the group and, from
 hydration, on each range input, the element a screen reader lands on: point `aria-describedby`

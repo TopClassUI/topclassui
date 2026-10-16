@@ -84,6 +84,14 @@ describe('the box that owns the width', () => {
     expect(SLIDER_CONTROL_SIZE.custom).toBe('')
   })
 
+  it('showValue: a value too long for the line moves below the track, which keeps two thirds of the row, and wraps there', () => {
+    expect(ruleOf(selectorOf('flex-wrap'))).toBe('flex-wrap: wrap;')
+    expect(ruleOf(selectorOf('gap-y-1'))).toBe('row-gap: var(--spacing);')
+    expect(ruleOf(selectorOf('min-w-2/3'))).toBe('min-width: calc(2 / 3 * 100%);')
+    expect(ruleOf(selectorOf('ms-auto'))).toBe('margin-inline-start: auto;')
+    expect(ruleOf(selectorOf('wrap-anywhere'))).toBe('overflow-wrap: anywhere;')
+  })
+
   it('a drag on the control never scrolls the page or selects its text', () => {
     expect(ruleOf(selectorOf('touch-none'))).toBe('touch-action: none;')
     expect(ruleOf(selectorOf('select-none'))).toBe('-webkit-user-select: none; user-select: none;')

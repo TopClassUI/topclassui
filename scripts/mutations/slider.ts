@@ -79,6 +79,24 @@ export const MUTATIONS: Mutation[] = [
     to: "  md: 'px-[calc(var(--tc-target-min,24px)/2)]",
   },
   {
+    label: 'the slider row never wraps, so a long showValue eats the track down to 2 px',
+    file: CLASSES,
+    from: "export const SLIDER_ROW = 'flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1'",
+    to: "export const SLIDER_ROW = 'flex min-w-0 items-center gap-x-3 gap-y-1'",
+  },
+  {
+    label: 'the slider control loses its floor of two thirds, so a long showValue squeezes the track beside it',
+    file: CLASSES,
+    from: 'relative flex min-w-2/3 flex-1',
+    to: 'relative flex min-w-0 flex-1',
+  },
+  {
+    label: 'the slider value never wraps, so a value longer than the slider scrolls the page',
+    file: CLASSES,
+    from: ' tabular-nums text-muted wrap-anywhere',
+    to: ' tabular-nums text-muted',
+  },
+  {
     label: 'the slider hands Base UI defaultValue again, so a form reset leaves the thumb where it was',
     file: CLIENT,
     from: '      value={slider.value as Value}\n      onValueChange={slider.onValueChange}\n',

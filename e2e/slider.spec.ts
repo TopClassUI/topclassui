@@ -217,7 +217,7 @@ test.describe('text', () => {
     })
   }
 
-  test('WCAG 1.4.12 spacing: the value moves, the knob keeps its size, and the value never covers the track', async ({ page }) => {
+  test('WCAG 1.4.12 spacing: the value moves, beside the track or below it, the knob keeps its size, and the value never covers the track', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 480 })
     await page.goto(urlFor('slider--show-value', 'light', 'ltr'))
     await page.addStyleTag({ content: '* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-block-end: 2em !important; }' })
@@ -225,7 +225,9 @@ test.describe('text', () => {
       const input = thumbIn(page, name)
       expect((await boxOf(knobOf(input))).width).toBe(20)
       const output = input.locator('xpath=ancestor::*[@role="group"]//output')
-      expect((await boxOf(output)).left, name).toBeGreaterThanOrEqual((await boxOf(trackOf(input))).right)
+      const [value, track] = [await boxOf(output), await boxOf(trackOf(input))]
+      // Beside the track, or on its own line below it when the wider letters no longer fit beside it.
+      expect(value.left >= track.right || value.top >= track.bottom, name).toBe(true)
     }
     await expectNoSidewaysScroll(page)
   })
@@ -545,6 +547,30 @@ for (const pointer of ['fine', 'coarse'] as const) {
           expect(past).toEqual(Array.from({ length: 10 }, () => 0))
         })
       }
+    }
+  })
+}
+
+for (const [width, pointer] of [[320, 'coarse'], [390, 'coarse'], [1280, 'fine'], [1280, 'coarse']] as const) {
+  test.describe(`live: showValue, ${String(width)} px, ${pointer} pointer`, () => {
+    test.use({ ...(pointer === 'coarse' ? COARSE : {}), viewport: { width, height: 800 } })
+    test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
+
+    for (const direction of DIRECTIONS) {
+      test(`${direction}: a long value moves below the track instead of eating it; the track holds its thumbs and nothing leaves the slider`, async ({ page }) => {
+        await openLive(page, 'separator--horizontal', { direction })
+        await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/slider-values.tsx' })
+        await expect(page.locator('#slider-values output').first()).toBeVisible()
+        const rows = await page.locator('#slider-values [role="group"]').evaluateAll((all) => all.map((group) => {
+          const box = (el: Element | null) => el?.getBoundingClientRect() ?? new DOMRect()
+          const [g, track, output] = [box(group), box(group.querySelector('[data-index]')?.parentElement ?? null), box(group.querySelector('output'))]
+          const thumbs = [...group.querySelectorAll('[data-index]')].reduce((sum, thumb) => sum + thumb.getBoundingClientRect().width, 0)
+          const inside = output.left >= g.left - 0.5 && output.right <= g.right + 0.5 && track.left >= g.left - 0.5 && track.right <= g.right + 0.5
+          return { holds: track.width > thumbs, inside, overlap: output.top < track.bottom && output.bottom > track.top && output.left < track.right && output.right > track.left }
+        }))
+        expect(rows).toEqual(Array.from({ length: 5 }, () => ({ holds: true, inside: true, overlap: false })))
+        await expectNoSidewaysScroll(page)
+      })
     }
   })
 }

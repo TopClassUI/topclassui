@@ -16,11 +16,11 @@ export const SLIDER_FULL = FIELD_HOLDER_FULL
 /** The knob, of the toggle scale: 14, 16, 20, 24 and 28 px. */
 export const SLIDER_KNOB_SIZE = TOGGLE_SIZE
 
-/** The one item of that grid: the control, and the value after it. */
-export const SLIDER_ROW = 'flex min-w-0 items-center gap-3'
+/** The one item of that grid: the control, and the value after it, or below it when the value would eat the track. */
+export const SLIDER_ROW = 'flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1'
 
 /** Padded by half a target on each side, so a thumb at 0 or at 100 stays inside the box; custom keeps this. */
-export const SLIDER_CONTROL = `relative flex min-w-0 flex-1 touch-none select-none items-center px-[calc(var(--tc-target-min,24px)/2)] pointer-coarse:px-[calc(var(--tc-target-coarse,44px)/2)] ${TARGET_HEIGHT}`
+export const SLIDER_CONTROL = `relative flex min-w-2/3 flex-1 touch-none select-none items-center px-[calc(var(--tc-target-min,24px)/2)] pointer-coarse:px-[calc(var(--tc-target-coarse,44px)/2)] ${TARGET_HEIGHT}`
 
 /** Merged after the control: half the knob plus its focus ring when that is more than half a target, as at xl or a
  * 32 px root, so the ring of a thumb at either end stays inside the box too. custom keeps the control's own. */
@@ -47,4 +47,5 @@ export const SLIDER_THUMB = `group/thumb flex items-center justify-center ${TOUC
 /** The drawn knob, with the ring of the input that has the focus beside it. */
 export const SLIDER_KNOB = 'block rounded-full border-(length:--tc-ring-width) border-primary-solid bg-surface-raised group-aria-invalid/slider:border-danger-solid group-has-focus-visible/thumb:outline-solid group-has-focus-visible/thumb:outline-(length:--tc-ring-width) group-has-focus-visible/thumb:outline-offset-(length:--tc-ring-offset) group-has-focus-visible/thumb:outline-ring'
 
-export const SLIDER_VALUE = 'min-w-[3ch] shrink-0 text-end text-sm tabular-nums text-muted'
+/** At the end of its line, beside the track or below it; a value longer than the slider wraps rather than leaving it. */
+export const SLIDER_VALUE = 'ms-auto min-w-[3ch] max-w-full text-end text-sm tabular-nums text-muted wrap-anywhere'

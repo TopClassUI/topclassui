@@ -192,7 +192,7 @@ describe('what reaches the root', () => {
   })
 
   it('showValue writes an output after the control, inside the row; without it there is none', () => {
-    expect(volume({ showValue: true })).toMatch(/<\/div><\/div><output [^>]*class="min-w-\[3ch\][^"]*">60<\/output><\/div><\/div>$/)
+    expect(volume({ showValue: true })).toMatch(/<\/div><\/div><output [^>]*class="ms-auto min-w-\[3ch\][^"]*">60<\/output><\/div><\/div>$/)
     expect(volume()).not.toContain('<output')
   })
 
