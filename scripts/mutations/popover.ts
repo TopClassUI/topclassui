@@ -329,6 +329,12 @@ export const MUTATIONS: Mutation[] = [
     to: '      <PopoverPopup render={<form />}>\n',
   },
   {
+    label: 'the popover form demo loses onSubmit, so Save sends the page to itself and reloads it with ?name= on it',
+    file: `${DUMMY}/with-form.tsx`,
+    from: '<form className="grid gap-3" onSubmit={save}>',
+    to: '<form className="grid gap-3">',
+  },
+  {
     label: 'the popover long-content demo writes a tabIndex by hand, which the popup takes for itself only while it scrolls',
     file: `${DUMMY}/long-content.tsx`,
     from: '      <PopoverPopup>\n',

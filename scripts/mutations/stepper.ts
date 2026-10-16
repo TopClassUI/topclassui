@@ -17,8 +17,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the stepper connector loses inset-s-1/2, so it starts at the inline start and not at the centre of its circle',
     file: 'src/components/stepper/classes.ts',
-    from: 'absolute top-1/2 inset-s-1/2 w-full',
-    to: 'absolute top-1/2 w-full',
+    from: 'export const STEPPER_CONNECTOR = `${HALF_LINE} inset-s-1/2`',
+    to: 'export const STEPPER_CONNECTOR = `${HALF_LINE}`',
   },
   {
     label: 'the stepper ol loses role="list", which Safari with VoiceOver needs to say "2 of 4"',
@@ -75,10 +75,10 @@ export const MUTATIONS: Mutation[] = [
     to: "export const STEPPER_TITLE = 'max-w-full'",
   },
   {
-    label: 'the stepper step loses min-w-0, so a long title widens its column and the connectors leave the centres',
+    label: 'the stepper step loses its floor of one circle, so past a few steps the circles overlap and hide their numbers',
     file: 'src/components/stepper/classes.ts',
-    from: "'relative flex min-w-0 flex-1 flex-col",
-    to: "'relative flex flex-1 flex-col",
+    from: "'relative flex min-w-(--tc-stepper-mark) flex-1 flex-col",
+    to: "'relative flex min-w-0 flex-1 flex-col",
   },
   {
     label: 'the stepper filled circle keeps its theme fill under forced colours, which can match the canvas',
@@ -89,7 +89,49 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the stepper md circle is the control size, 40 px, and not the drawn 32',
     file: 'src/components/stepper/classes.ts',
-    from: "md: 'size-control-sm text-sm',",
-    to: "md: 'size-control-md text-sm',",
+    from: "md: '[--tc-stepper-mark:var(--spacing-control-sm)]',",
+    to: "md: '[--tc-stepper-mark:var(--spacing-control-md)]',",
+  },
+  {
+    label: 'the stepper writes aria-current from the status alone, so a step with an error of its own at value is never current',
+    file: 'src/components/stepper/index.tsx',
+    from: "aria-current={item.id === value || status === 'current' ? 'step' : undefined}",
+    to: "aria-current={status === 'current' ? 'step' : undefined}",
+  },
+  {
+    label: 'the stepper circle stops reading --tc-stepper-mark, so a custom stepper draws 300 x 165 ticks',
+    file: 'src/components/stepper/classes.ts',
+    from: 'relative inline-flex size-(--tc-stepper-mark) shrink-0',
+    to: 'relative inline-flex shrink-0',
+  },
+  {
+    label: 'the stepper list stops setting its circle size, so every size draws the default circle',
+    file: 'src/components/stepper/index.tsx',
+    from: 'cn(STEPPER_ROOT, STEPPER_ROOT_SIZE[size], className)',
+    to: 'cn(STEPPER_ROOT, className)',
+  },
+  {
+    label: 'the stepper sets a circle size for custom, so a caller --tc-stepper-mark on an ancestor is overridden',
+    file: 'src/components/stepper/classes.ts',
+    from: "xl: '[--tc-stepper-mark:var(--spacing-control-lg)]',\n  custom: '',",
+    to: "xl: '[--tc-stepper-mark:var(--spacing-control-lg)]',\n  custom: '[--tc-stepper-mark:var(--spacing-control-sm)]',",
+  },
+  {
+    label: 'the stepper list stops wrapping, so steps that do not fit overlap or push the page sideways',
+    file: 'src/components/stepper/classes.ts',
+    from: "'flex w-full min-w-0 flex-wrap items-start gap-y-4'",
+    to: "'flex w-full min-w-0 items-start gap-y-4'",
+  },
+  {
+    label: 'the stepper half before a step takes that step\'s own state, so the line into a current step is half done',
+    file: 'src/components/stepper/index.tsx',
+    from: "data-done={statuses[index - 1] === 'done' ? '' : undefined}",
+    to: "data-done={status === 'done' ? '' : undefined}",
+  },
+  {
+    label: 'the stepper draws a half line before the first step, from the list edge to a circle with nothing before it',
+    file: 'src/components/stepper/index.tsx',
+    from: '{index === 0\n',
+    to: '{index === -1\n',
   },
 ]

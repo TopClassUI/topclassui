@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { arrangeCommands, filterCommands, keyOfEntry, matchesShortcut, runsOf } from '../lib.js'
+import { arrangeCommands, filterCommands, keyOfEntry, matchesShortcut, runsOf, withActiveRow } from '../lib.js'
 
 interface Entry { id: string, label: string, group?: string }
 
@@ -43,19 +43,19 @@ describe('filterCommands', () => {
 })
 
 describe('arrangeCommands', () => {
-  it('flat: Base UI is given the items themselves, and each item is one row at its own index', () => {
+  it('flat: Base UI is given the items themselves, and each item is one row at its own index, its place in the whole list', () => {
     const arranged = arrangeCommands(ITEMS, key)
     expect(arranged.base).toBe(ITEMS)
     expect(arranged.entries).toEqual([
-      { kind: 'item', key: 'item:button', row: 0, group: undefined, item: BUTTON, index: 0 },
-      { kind: 'item', key: 'item:button-group', row: 1, group: undefined, item: GROUP, index: 1 },
-      { kind: 'item', key: 'item:icon-button', row: 2, group: undefined, item: ICON, index: 2 },
-      { kind: 'item', key: 'item:dialog', row: 3, group: undefined, item: DIALOG, index: 3 },
+      { kind: 'item', key: 'item:button', row: 0, group: undefined, item: BUTTON, index: 0, position: 1, size: 4 },
+      { kind: 'item', key: 'item:button-group', row: 1, group: undefined, item: GROUP, index: 1, position: 2, size: 4 },
+      { kind: 'item', key: 'item:icon-button', row: 2, group: undefined, item: ICON, index: 2, position: 3, size: 4 },
+      { kind: 'item', key: 'item:dialog', row: 3, group: undefined, item: DIALOG, index: 3, position: 4, size: 4 },
     ])
     expect(arranged.rowOfItem).toEqual([0, 1, 2, 3])
   })
 
-  it('grouped: rows with no heading first, then each group where its first item stood, a heading row before it', () => {
+  it('grouped: rows with no heading first, then each group where its first item stood, a heading row before it; an item counts its place in its group', () => {
     const save = { id: 'save', label: 'Save', group: 'Files' }
     const theme = { id: 'theme', label: 'Theme', group: 'Preferences' }
     const open = { id: 'open', label: 'Open', group: 'Files' }
@@ -68,14 +68,15 @@ describe('arrangeCommands', () => {
       { value: 'Files', items: [save, open] },
       { value: 'Preferences', items: [theme] },
     ])
-    expect(arranged.entries.map((entry) => `${String(entry.row)} ${entry.key} ${entry.kind === 'item' ? String(entry.index) : '-'}`)).toEqual([
-      '0 item:help 0',
-      '1 item:blank 1',
+    const place = (entry: (typeof arranged.entries)[number]) => entry.kind === 'item' ? `${String(entry.index)} ${String(entry.position)}/${String(entry.size)}` : '-'
+    expect(arranged.entries.map((entry) => `${String(entry.row)} ${entry.key} ${place(entry)}`)).toEqual([
+      '0 item:help 0 1/2',
+      '1 item:blank 1 2/2',
       '2 group:Files -',
-      '3 item:save 2',
-      '4 item:open 3',
+      '3 item:save 2 1/2',
+      '4 item:open 3 2/2',
       '5 group:Preferences -',
-      '6 item:theme 4',
+      '6 item:theme 4 1/1',
     ])
     // Base UI's index of an item, flattened group by group, against the row it is drawn on.
     expect(arranged.rowOfItem).toEqual([0, 1, 3, 4, 6])
@@ -116,6 +117,33 @@ describe('runsOf', () => {
     expect(runs[0]?.items.map((item) => item.key)).toEqual(['item:button', 'item:button-group', 'item:icon-button', 'item:dialog'])
     expect(runsOf([])).toEqual([])
   })
+
+  it('each run knows the row it starts at and the row after its end, and a missing row starts a new run', () => {
+    const flat = arrangeCommands(ITEMS, key).entries
+    const [a, b, c, d] = flat
+    expect(runsOf([a, b, d].filter((entry) => entry !== undefined)).map((run) => [run.start, run.end, run.items.map((item) => item.key)])).toEqual([
+      [0, 2, ['item:button', 'item:button-group']],
+      [3, 4, ['item:dialog']],
+    ])
+    expect(runsOf([c].filter((entry) => entry !== undefined)).map((run) => [run.start, run.end])).toEqual([[2, 3]])
+    expect(runsOf(files.slice(2)).map((run) => [run.start, run.end])).toEqual([[2, 3], [3, 5]])
+  })
+})
+
+describe('withActiveRow', () => {
+  const flat = arrangeCommands(ITEMS, key).entries
+  const keys = (entries: readonly { key: string }[]) => entries.map((entry) => entry.key)
+
+  it('adds the active row in its place when the window has scrolled away from it, above or below', () => {
+    expect(keys(withActiveRow(flat.slice(2, 4), flat, 0))).toEqual(['item:button', 'item:icon-button', 'item:dialog'])
+    expect(keys(withActiveRow(flat.slice(0, 2), flat, 3))).toEqual(['item:button', 'item:button-group', 'item:dialog'])
+  })
+
+  it('adds nothing when the active row is in the window, when nothing is active, or past the end', () => {
+    expect(keys(withActiveRow(flat.slice(0, 2), flat, 1))).toEqual(['item:button', 'item:button-group'])
+    expect(keys(withActiveRow(flat.slice(0, 2), flat, -1))).toEqual(['item:button', 'item:button-group'])
+    expect(keys(withActiveRow(flat.slice(0, 2), flat, 9))).toEqual(['item:button', 'item:button-group'])
+  })
 })
 
 describe('matchesShortcut', () => {
@@ -139,6 +167,15 @@ describe('matchesShortcut', () => {
   it('under an Arabic layout the K key types its own letter, and its place on the keyboard still matches', () => {
     expect(matchesShortcut(press('ن', 'KeyK', { ctrlKey: true }), 'k')).toBe(true)
     expect(matchesShortcut(press('ن', 'KeyJ', { ctrlKey: true }), 'k')).toBe(false)
+  })
+
+  it('a Latin layout that types another letter at the K key keeps that letter: Colemak Ctrl+E, Dvorak Ctrl+T, AZERTY Ctrl+Q', () => {
+    expect(matchesShortcut(press('e', 'KeyK', { ctrlKey: true }), 'k')).toBe(false)
+    expect(matchesShortcut(press('t', 'KeyK', { ctrlKey: true }), 'k')).toBe(false)
+    expect(matchesShortcut(press('q', 'KeyA', { ctrlKey: true }), 'a')).toBe(false)
+    expect(matchesShortcut(press('7', 'KeyK', { ctrlKey: true }), 'k')).toBe(false)
+    // Dvorak's K sits at the V key: its name finds it there.
+    expect(matchesShortcut(press('k', 'KeyV', { ctrlKey: true }), 'k')).toBe(true)
   })
 
   it('a digit and a key with no letter match by name, and an empty code never matches a key with no place', () => {

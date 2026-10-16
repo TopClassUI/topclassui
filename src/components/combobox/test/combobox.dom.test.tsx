@@ -17,6 +17,29 @@ const hidden = () => document.querySelector<HTMLInputElement>('input[name="frame
 // Base UI's live regions end their text in a word joiner, so a repeat of the same words is announced again.
 const statuses = () => screen.getAllByRole('status').map((status) => status.textContent.replace('⁠', ''))
 
+describe('named by a <label for>', () => {
+  // Base UI aria-hides that label while the list is open, so its text is copied onto the input then, and only then.
+  it('the text is on the input while open only, and a label renamed while closed names it the next time', async () => {
+    render(<><label htmlFor="fw">Framework</label><Combobox id="fw" items={FRAMEWORKS} /></>)
+    const box = screen.getByRole('combobox')
+    expect(box.hasAttribute('aria-label')).toBe(false)
+    await userEvent.click(box)
+    expect(box.getAttribute('aria-label')).toBe('Framework')
+    await userEvent.keyboard('{Escape}')
+    expect(box.hasAttribute('aria-label')).toBe(false)
+    const label = document.querySelector('label')
+    if (label) label.textContent = 'Framework (required)'
+    expect(box.hasAttribute('aria-label')).toBe(false)
+    await userEvent.click(box)
+    expect(box.getAttribute('aria-label')).toBe('Framework (required)')
+  })
+
+  it('open from the start, the text is copied too', () => {
+    render(<><label htmlFor="fw">Framework</label><Combobox id="fw" items={FRAMEWORKS} defaultOpen /></>)
+    expect(screen.getByRole('combobox', { hidden: true }).getAttribute('aria-label')).toBe('Framework')
+  })
+})
+
 describe('typing filters, and Enter chooses', () => {
   it('typing narrows the list by "contains", in any case', async () => {
     render(<Combobox aria-label="Framework" items={FRAMEWORKS} />)

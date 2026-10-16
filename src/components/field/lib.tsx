@@ -67,7 +67,7 @@ export function renderField({
 }
 
 /** The form a control inside the root belongs to, as useFormValue finds it: its `form`, else the closest one. */
-function formOf(root: HTMLElement): HTMLFormElement | null {
+export function formOf(root: HTMLElement): HTMLFormElement | null {
   for (const element of root.querySelectorAll('input, textarea, select, button')) {
     const owner = (element as HTMLInputElement).form
     if (owner) return owner

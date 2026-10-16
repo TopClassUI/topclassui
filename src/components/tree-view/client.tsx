@@ -16,12 +16,12 @@ import type { TreeViewProps } from './types.js'
 export function TreeView({
   items, value, defaultValue, onValueChange, expanded, defaultExpanded, onExpandedChange, visibleRows, virtualize, hasMore,
   loadMore, loadMoreThreshold, status, loadingFallback, emptyFallback, className, style, ref, onKeyDown, onFocus, onBlur,
-  onPointerDown, onClick, ...rest
+  onPointerDown, onPointerUp, onPointerCancel, onClick, ...rest
 }: TreeViewProps) {
   const tree = useTreeView({
     items, value, defaultValue, onValueChange, expanded, defaultExpanded, onExpandedChange, visibleRows, virtualize,
     hasMore, loadMore, loadMoreThreshold, status, loadingFallback, emptyFallback, ref, style, onKeyDown, onFocus, onBlur,
-    onPointerDown, onClick,
+    onPointerDown, onPointerUp, onPointerCancel, onClick,
   })
   return (
     <div className={TREE_VIEW_ROOT}>
@@ -32,12 +32,15 @@ export function TreeView({
         tabIndex={tree.tabIndex}
         aria-activedescendant={tree.activeDescendant}
         aria-busy={tree.busy}
+        data-highlight-hidden={tree.outOfView ? '' : undefined}
         style={tree.style}
         className={cn(TREE_VIEW_TREE, className)}
         onKeyDown={tree.onKeyDown}
         onFocus={tree.onFocus}
         onBlur={tree.onBlur}
         onPointerDown={tree.onPointerDown}
+        onPointerUp={tree.onPointerUp}
+        onPointerCancel={tree.onPointerCancel}
         onClick={tree.onClick}
       >
         {tree.rows.map(({ item: row, index, key }) => (

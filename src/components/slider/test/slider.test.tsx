@@ -134,15 +134,36 @@ describe('limits, clamped (R-5.7-7)', () => {
 describe('what reaches the root', () => {
   it('a div with role group, its size, and the classes of the box that owns the width', () => {
     const html = volume()
-    expect(root(html)).toMatch(/^<div data-orientation="horizontal" id="[^"]+" role="group" data-size="md" class="/)
+    expect(root(html)).toMatch(/^<div data-orientation="horizontal" id="[^"]+" role="group" dir="ltr" data-size="md" class="/)
     expect(attr(root(html), 'class')?.split(' ')).toEqual(expect.arrayContaining(['group/slider', 'grid', 'w-fit', 'grid-cols-[minmax(0,var(--tc-input-width))]', 'text-sm']))
   })
 
-  it('invalid sets aria-invalid on the group and nowhere else; off, a caller aria-invalid survives', () => {
+  it('the root carries the direction Base UI runs its keys and pointer in, so the thumb is drawn the same way', () => {
+    expect(attr(root(volume()), 'dir')).toBe('ltr')
+    const group = tag(markup(<TopClassProvider direction="rtl" locale="ar"><Slider aria-label="Volume" /></TopClassProvider>), 'div').filter((div) => div.includes('role="group"'))
+    expect(group.map((div) => attr(div, 'dir'))).toEqual(['rtl'])
+    expect(attr(root(volume({ dir: 'rtl' })), 'dir')).toBe('ltr')
+  })
+
+  it('in the server HTML invalid sets aria-invalid on the group only, the range inputs take it at hydration; off, a caller aria-invalid survives', () => {
     expect(attr(root(volume({ invalid: true })), 'aria-invalid')).toBe('true')
     expect(inputs(volume({ invalid: true })).filter((input) => input.includes('aria-invalid'))).toEqual([])
     expect(attr(root(volume()), 'aria-invalid')).toBeUndefined()
     expect(attr(root(volume({ 'aria-invalid': true })), 'aria-invalid')).toBe('true')
+  })
+
+  it('the control takes the padding of its size over half a target; custom keeps half a target', () => {
+    const padding = (html: string) => attr(tag(html, 'div').find((div) => div.includes('data-base-ui-swipe-ignore')) ?? '', 'class')?.split(' ').filter((cls) => /^(pointer-coarse:)?px-/.test(cls))
+    expect(padding(volume({ size: 'xl' }))).toEqual([
+      'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-toggle-xl)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
+      'pointer-coarse:px-[max(calc(var(--tc-target-coarse,44px)/2),calc(var(--spacing-toggle-xl)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
+    ])
+    expect(padding(volume({ size: 'custom' }))).toEqual(['px-[calc(var(--tc-target-min,24px)/2)]', 'pointer-coarse:px-[calc(var(--tc-target-coarse,44px)/2)]'])
+  })
+
+  it('the control carries Base UI\'s swipe marker, so a thumb dragged inside a Drawer never swipes it shut', () => {
+    const control = tag(volume(), 'div').filter((div) => div.includes('data-base-ui-swipe-ignore'))
+    expect(control.map((div) => attr(div, 'class')?.split(' ')[0])).toEqual(['relative'])
   })
 
   it('required is accepted and lands on no element: Base UI has none', () => {
@@ -159,7 +180,7 @@ describe('what reaches the root', () => {
     expect(volume({ size: 'xl' })).toContain('size-toggle-xl')
     expect(volume({ size: 'xl' })).toMatch(/<div data-orientation="horizontal" style="position:relative" class="w-full [^"]* h-2">/)
     expect(attr(root(volume({ size: 'xs' })), 'class')).toContain(' text-xs ')
-    expect(attr(root(volume({ size: 'lg' })), 'class')?.endsWith(' text-base')).toBe(true)
+    expect(attr(root(volume({ size: 'lg' })), 'class')?.endsWith(' text-base pointer-coarse:text-[max(1rem,16px)]')).toBe(true)
     const custom = volume({ size: 'custom' })
     expect(custom).not.toMatch(/size-toggle-|text-(xs|sm|base)|h-1\b|h-1\.5|h-2\b/)
   })
@@ -171,7 +192,7 @@ describe('what reaches the root', () => {
   })
 
   it('showValue writes an output after the control, inside the row; without it there is none', () => {
-    expect(volume({ showValue: true })).toMatch(/<\/div><\/div><output [^>]*class="min-w-\[3ch\][^"]*">60<\/output><\/div><\/div>$/)
+    expect(volume({ showValue: true })).toMatch(/<\/div><\/div><output [^>]*class="ms-auto min-w-\[3ch\][^"]*">60<\/output><\/div><\/div>$/)
     expect(volume()).not.toContain('<output')
   })
 

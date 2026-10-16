@@ -54,7 +54,9 @@ is the real attribute, so the switch leaves the tab order and the form sends not
 **`readOnly`** keeps it in the form and says so to a screen reader; it has no look of its own.
 
 **The target is 24 px, 44 px under a finger**, whatever `size` draws: the focus ring is around
-the track. `size="custom"` draws no track size: give the track one from your own CSS.
+the track. `size="custom"` draws no track size: give the track one from your own CSS (it is
+the root's only child, so `className="*:h-6 *:w-12"` does). The thumb is as tall as the inside
+of the track and slides by what is left of its width, in either direction.
 
 **In right-to-left** the thumb starts at the right and slides left.
 
@@ -93,14 +95,14 @@ import { Switch } from 'topclassui'
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `aria-label` or `aria-labelledby` or `id`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `aria-label` | no | `string` | - | The name read out when no visible label names the control. |
-| `aria-labelledby` | no | `string` | - | The id of the visible text that names the control. |
+| `aria-label` | **yes**, or `aria-labelledby` or `id` | `string` | - | The name read out when no visible label names the control. |
+| `aria-labelledby` | **yes**, or `aria-label` or `id` | `string` | - | The id of the visible text that names the control. |
+| `id` | **yes**, or `aria-label` or `aria-labelledby` | `string` | - | The id a `<label htmlFor>` points at. |
 | `className` | no | `string` | - | Merged last, so a consumer class wins a conflict with the switch's own. |
-| `id` | no | `string` | - | The id a `<label htmlFor>` points at. |
 | `invalid` | no | `boolean` | `false` | Marks the value as wrong: sets aria-invalid, and the line of the track turns to danger and thickens. |
 | `ref` | no | `Ref<HTMLButtonElement>` | - | The root element, which is a `<button>`. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The toggle scale of the track and its thumb; custom emits no size classes. |

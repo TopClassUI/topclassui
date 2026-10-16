@@ -90,6 +90,18 @@ for (const [width, pair, label] of [[320, 140, 133.5], [390, 175, 203.5]] as con
   }
 }
 
+test.describe('390 px, a coarse pointer, a root of 10 px', () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })
+
+  test('at every size the type step is 16 px and the box is an Input wide, so typed text never zooms the page', async ({ page }) => {
+    await fixture(page)
+    await page.evaluate(() => { document.documentElement.style.fontSize = '10px' })
+    const sizes = ['xs', 'sm', 'md', 'lg', 'xl'].map((size) => `#size-${size}`)
+    expect(await Promise.all(sizes.map((id) => style(page, id, 'font-size')))).toEqual(Array(5).fill('16px'))
+    expect(await Promise.all(sizes.map(async (id) => (await sizeOf(page, id))[0]))).toEqual(Array(5).fill(220.8))
+  })
+})
+
 for (const scheme of ['light', 'dark'] as const) {
   test.describe(`forced colours, ${scheme} palette`, () => {
     test.use({ forcedColors: 'active', colorScheme: scheme })

@@ -40,6 +40,12 @@ describe('resolveMeterRange', () => {
     expect(resolveMeterRange(0, -1e308, 1e308)).toEqual({ min: -1e15, max: 1e15, value: 0 })
   })
 
+  it('gives a NaN end its default, never the guard rail clamp() would return for it', () => {
+    expect(resolveMeterRange(30, 0, Number.NaN)).toEqual({ min: 0, max: 100, value: 30 })
+    expect(resolveMeterRange(50, Number.NaN, 100)).toEqual({ min: 0, max: 100, value: 50 })
+    expect(resolveMeterRange(50, 200, Number.NaN)).toEqual({ min: 200, max: 200, value: 200 })
+  })
+
   it('turns a NaN value into min', () => {
     expect(resolveMeterRange(Number.NaN, 20, 40)).toEqual({ min: 20, max: 40, value: 20 })
   })

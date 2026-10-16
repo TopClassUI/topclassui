@@ -31,10 +31,11 @@ export function DatePicker({
   ...rest
 }: DatePickerProps) {
   const picker = useDatePicker({
-    value, defaultValue, onValueChange, onOpenChange, placeholder, minDate, maxDate, required, 'aria-describedby': describedBy,
+    value, defaultValue, onValueChange, open, defaultOpen, onOpenChange, placeholder, minDate, maxDate, required,
+    'aria-describedby': describedBy,
   })
   return (
-    <Base.Root modal="trap-focus" open={open} defaultOpen={defaultOpen} onOpenChange={picker.onOpenChange} actionsRef={picker.actionsRef}>
+    <Base.Root modal="trap-focus" open={picker.open} onOpenChange={picker.onOpenChange} actionsRef={picker.actionsRef}>
       <span className={cn(DATE_PICKER_ROOT, FIELD_TEXT[size], fullWidth && FIELD_HOLDER_FULL)}>
         <Base.Trigger
           {...rest}

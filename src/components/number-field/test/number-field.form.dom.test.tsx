@@ -43,6 +43,20 @@ describe('from the server HTML, before any script runs', () => {
       .toEqual([['b', '2']])
   })
 
+  it('a NaN bound or step is no bound and step 1, and a max under min is raised to it, so the form stays valid', () => {
+    const host = document.createElement('div')
+    host.innerHTML = renderToString(inForm(<>
+      <NumberField aria-label="A" name="a" defaultValue={5} min={Number.NaN} max={Number.NaN} step={Number.NaN} />
+      <NumberField aria-label="B" name="b" defaultValue={5} min={10} max={2} />
+    </>))
+    document.body.appendChild(host)
+    const hidden = [...host.querySelectorAll<HTMLInputElement>('input[type="number"]')]
+    expect(hidden.map((el) => [el.value, el.getAttribute('min'), el.getAttribute('max'), el.getAttribute('step')]))
+      .toEqual([['5', null, null, '1'], ['10', '10', '10', '1']])
+    expect(formOf().checkValidity()).toBe(true)
+    host.remove()
+  })
+
   it('a field without a name sends nothing', () => {
     expect(served(<NumberField aria-label="A" defaultValue={1} />)).toEqual([])
   })
@@ -55,6 +69,16 @@ describe('after a change', () => {
     expect(entries(formOf())).toEqual([['guests', '3']])
     await userEvent.clear(field())
     expect(entries(formOf())).toEqual([['guests', '']])
+  })
+
+  it('a Latin 1,234 typed under Arabic-Indic digits and sent with Enter, still focused, sends 1234 and not 1', async () => {
+    const sent = vi.fn()
+    render(<form onSubmit={(event) => { event.preventDefault(); sent(entries(event.currentTarget)) }}>
+      <NumberField aria-label="A" name="guests" locale="ar-u-nu-arab" /><button type="submit">Send</button>
+    </form>)
+    await userEvent.type(field(), '1,234{Enter}')
+    expect(sent.mock.calls).toEqual([[[['guests', '1234']]]])
+    expect(document.activeElement).toBe(field())
   })
 })
 

@@ -66,14 +66,18 @@ default once the script runs, so the screen and the form agree.
 **Digits.** The field formats with your `locale` and `format`, else the provider's locale and
 numbering system, so the server and the browser print the same text. A `-u-nu-` in your
 `locale` counts: `locale="ar-u-nu-arab"` shows and takes Arabic-Indic digits. Arabic-Indic digits
-are read in any locale, and a pasted `1,234.5` is 1234.5 there as well.
+are read in any locale, and a `1,234.5` typed or pasted is 1234.5 there as well.
 
 **`invalid`** sets `aria-invalid` on the input: the line of the field turns red and thickens.
-**`disabled`** dims the whole field. **`readOnly`** keeps the number in the form, tints the
-field and dims both steppers. A stepper at its limit is disabled and dimmed.
+**`disabled`** dims the whole field, and so does a disabled `<fieldset>` around it.
+**`readOnly`** keeps the number in the form, tints the field and dims both steppers. A stepper at
+its limit is disabled and dimmed.
 
 **The width of an Input**, and the steppers keep their 24 px (44 under a finger) whatever the
-size: a narrow field takes the room from the number. A NumberField wants about 130 px. In
+size: a narrow field takes the room from the number. A NumberField wants about 130 px. **At 200%
+text** (a 32 px root) the steppers give way down to those floors before they are cut, so a field
+needs about 2 x 44 px plus its digits: with less the digits clip, and with less than the two
+floors increase is cut too. Let a row of them wrap. In
 right-to-left increase sits at the left and the number stays left-to-right. The input comes
 first in the markup, so a `<label>` that wraps the field focuses the input, not a stepper.
 
@@ -107,22 +111,22 @@ import { NumberField } from 'topclassui'
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `aria-label` or `aria-labelledby` or `id`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `aria-label` | no | `string` | - | The name read out when no visible label names the control. |
-| `aria-labelledby` | no | `string` | - | The id of the visible text that names the control. |
+| `aria-label` | **yes**, or `aria-labelledby` or `id` | `string` | - | The name read out when no visible label names the control. |
+| `aria-labelledby` | **yes**, or `aria-label` or `id` | `string` | - | The id of the visible text that names the control. |
+| `id` | **yes**, or `aria-label` or `aria-labelledby` | `string` | - | The id a `<label htmlFor>` points at. |
 | `className` | no | `string` | - | Merged last, so a consumer class wins a conflict with the field's own. |
 | `fullWidth` | no | `boolean` | `false` | Fills the width of its parent instead of taking the width of an Input. |
-| `id` | no | `string` | - | The id a `<label htmlFor>` points at. |
 | `invalid` | no | `boolean` | `false` | Marks the value as wrong: sets aria-invalid on the input, and the line of the field turns to danger and thickens. |
-| `max` | no | `number`, min -1000000000000000, max 1000000000000000 | - | The largest value. End goes to it; a default or a value over it is lowered to it. Clamped to 1e15. |
-| `min` | no | `number`, min -1000000000000000, max 1000000000000000 | - | The smallest value. Home goes to it; a default or a value under it is raised to it. Clamped to -1e15. |
+| `max` | no | `number`, min -1000000000000000, max 1000000000000000 | - | The largest value. End goes to it; a default or a value over it is lowered to it. Clamped to 1e15; NaN reads as none, and under min it is raised to min. |
+| `min` | no | `number`, min -1000000000000000, max 1000000000000000 | - | The smallest value. Home goes to it; a default or a value under it is raised to it. Clamped to -1e15; NaN reads as none. |
 | `placeholder` | no | `string` | - | Shown in the input while it is empty. |
 | `ref` | no | `Ref<HTMLDivElement>` | - | The root element, the `<div>` that owns the width. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The control scale: the height of the field and its type step; custom emits no size classes. |
-| `step` | no | `unknown` | `1` | What an arrow key and a stepper add or take away, and the step the form validates against; any turns that check off. |
+| `step` | no | `unknown` | `1` | What an arrow key and a stepper add or take away, and the step the form validates against; any turns that check off. NaN reads as 1. |
 
 Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 

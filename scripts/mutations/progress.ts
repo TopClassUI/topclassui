@@ -23,14 +23,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the progress className is passed first, so w-16 loses to w-full and a bar in a file row stretches',
     file: 'src/components/progress/index.tsx',
-    from: "        'w-full overflow-hidden rounded-control bg-neutral-soft forced-color-adjust-none',\n        TRACK_HEIGHT[size],\n        className,\n",
-    to: "        className,\n        'w-full overflow-hidden rounded-control bg-neutral-soft forced-color-adjust-none',\n        TRACK_HEIGHT[size],\n",
+    from: '        TRACK,\n        TRACK_HEIGHT[size],\n        className,\n',
+    to: '        className,\n        TRACK,\n        TRACK_HEIGHT[size],\n',
   },
   {
     label: 'a progress className replaces the track classes instead of merging, so the track loses its fill and height',
     file: 'src/components/progress/index.tsx',
-    from: "      className={cn(\n        'w-full",
-    to: "      className={className ?? cn(\n        'w-full",
+    from: '      className={cn(\n        TRACK,',
+    to: '      className={className ?? cn(\n        TRACK,',
   },
   {
     label: 'an indeterminate progress still announces a value, so a wait of unknown length reads as 0',
@@ -40,9 +40,9 @@ export const MUTATIONS: Mutation[] = [
   },
   {
     label: 'the progress track loses forced-color-adjust-none, so forced colours repaint both fills to nothing',
-    file: 'src/components/progress/index.tsx',
-    from: "bg-neutral-soft forced-color-adjust-none'",
-    to: "bg-neutral-soft'",
+    file: 'src/components/progress/classes.ts',
+    from: ' forced-color-adjust-none forced-colors:bg-[Canvas]',
+    to: ' forced-colors:bg-[Canvas]',
   },
   {
     label: 'the progress bar stops reading the variable, so every bar draws full whatever its value',
@@ -53,8 +53,32 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a warning progress bar paints in primary',
     file: 'src/components/progress/classes.ts',
-    from: "  warning: 'bg-warning-solid',",
-    to: "  warning: 'bg-primary-solid',",
+    from: "  warning: 'bg-warning-on-soft',",
+    to: "  warning: 'bg-primary-on-soft',",
+  },
+  {
+    label: 'the progress warning bar goes back to the solid fill, 1.77:1 on its track',
+    file: 'src/components/progress/classes.ts',
+    from: "  warning: 'bg-warning-on-soft',",
+    to: "  warning: 'bg-warning-solid',",
+  },
+  {
+    label: 'the progress track loses its line-strong outline, so the end of the range is 1.2:1 on the page',
+    file: 'src/components/progress/classes.ts',
+    from: ' outline-solid outline-(length:--tc-line-width) outline-line-strong',
+    to: '',
+  },
+  {
+    label: 'the progress track keeps its theme fill under forced colours, 1.2:1 on a canvas of the same polarity',
+    file: 'src/components/progress/classes.ts',
+    from: ' forced-colors:bg-[Canvas] ',
+    to: ' ',
+  },
+  {
+    label: 'the progress bar keeps its theme fill under forced colours',
+    file: 'src/components/progress/index.tsx',
+    from: "'h-full rounded-control forced-colors:bg-[CanvasText]'",
+    to: "'h-full rounded-control'",
   },
   {
     label: 'the xs progress track takes the sm height, the drawn 4 px instead of the 2 px token',

@@ -59,18 +59,19 @@ export function ViewField(control: { id: string, name: string, required: boolean
 The arrows move to the next segment and select it, skip a disabled one, and wrap at both ends.
 Under an RTL `TopClassProvider`, ArrowRight goes to the segment before. Space selects. Enter does
 not, and there is no Home or End (Base UI's). Before the page hydrates the selected segment is
-the one tab stop. A disabled segment is a disabled button: it leaves the tab and arrow order.
+the one tab stop; with none selected it is the first enabled segment among the children, as Base
+UI makes it once hydrated. A disabled segment is a disabled button: it leaves the tab and arrow order.
 
 **The form.** With a `name` the form sends `name=<value>`; before the page hydrates it sends the
 default. Without a `name` it is a view switch and sends nothing. **A form reset**, a reset
 button or a React 19 form action that settles brings the track back to its `defaultValue` of the
 latest render, on screen and in the form; a controlled track keeps its owner's value. A reset
-calls no `onValueChange`. `required` never blocks a submit: a segment is always selected.
+calls no `onValueChange`. `required` blocks a submit only when the value matches no segment.
 
 **`invalid`** sets `aria-invalid` on the track: its line turns red and thickens. **`disabled`**
 on the track or on a segment is the real attribute, so the form sends nothing for it.
-**`readOnly`** keeps the value in the form and says so to a screen reader; it has no look of its
-own.
+**`readOnly`** keeps the value in the form and sets `aria-readonly` on the track, which Chromium does
+not announce; it has no look of its own either, so say it in the text beside the track.
 
 **The look.** The selected segment is raised, with a shadow, and its text is heavier and darker;
 under forced colours it takes the system highlight. The focus ring is drawn inside the focused
@@ -78,7 +79,7 @@ segment, since the track clips. Each segment is 24 px tall at least, 44 px under
 
 **When the segments do not fit**, the track scrolls sideways inside itself and the page does
 not; an arrow key brings the next segment into view. A label longer than the track ends in an
-ellipsis, and is cut at 100 characters. **`fullWidth`** fills the parent and shares it equally:
+ellipsis, an element given as the label too, and text is cut at 100 characters. **`fullWidth`** fills the parent and shares it equally:
 it is for a few short segments, since seven long ones on a phone are cut to nothing. In a parent
 that sizes to its content (a table cell, a `w-fit` box) it is as wide as its segments.
 
@@ -116,20 +117,20 @@ import {
 
 ## Props
 
-Required: `value` on `SegmentedControlItem`. Every other prop below is optional.
+Required: `aria-label` or `aria-labelledby` on `SegmentedControlRoot`, `defaultValue` or `value` on `SegmentedControlRoot`, `value` on `SegmentedControlItem`. Every other prop below is optional.
 
 ### SegmentedControlRoot
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `aria-label` | no | `string` | - | The name read out when no visible text names the group. |
-| `aria-labelledby` | no | `string` | - | The id of the visible text that names the group. |
-| `defaultValue` | no | `string` | - | The segment selected when the page opens, and after a form reset. |
+| `aria-label` | **yes**, or `aria-labelledby` | `string` | - | The name read out when no visible text names the group. |
+| `aria-labelledby` | **yes**, or `aria-label` | `string` | - | The id of the visible text that names the group. |
+| `defaultValue` | **yes**, or `value` | `string` | - | The segment selected when the page opens, and after a form reset. |
+| `value` | **yes**, or `defaultValue` | `string` | - | The selected segment, held by its owner. |
 | `fullWidth` | no | `boolean` | `false` | SegmentedControlRoot: the track fills its parent and its segments share it equally. For a few short segments. |
 | `invalid` | no | `boolean` | `false` | SegmentedControlRoot: marks the choice as wrong: sets aria-invalid on the track, whose line turns to danger and thickens. |
 | `ref` | no | `Ref<HTMLDivElement>` | - | The track, the element with role="radiogroup". |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | SegmentedControlRoot: the height of the track and the padding and type step of every segment; custom emits none. |
-| `value` | no | `string` | - | The selected segment, held by its owner. |
 
 ### SegmentedControlItem
 

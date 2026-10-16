@@ -1,6 +1,7 @@
 // Loaded into a live page by e2e/stepper.spec.ts: a stepper where a real page puts one (U3-BUILD.md, "Measure"). Alone
 // as a grid item, in a wrapper in a grid track, in a flex-1 column, in a w-fit parent and in a table cell; then hostile
-// content: a 300-character word, an element where text is expected, an empty title, twelve steps and sixty steps.
+// content: a 300-character word, an element where text is expected, an empty title, an error step being fixed, twelve
+// steps and sixty steps.
 // Inline styles: the harness compiles only classes under src/.
 import type { CSSProperties } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -44,6 +45,9 @@ function Fixture() {
           value="f"
           aria-label="Elements and an empty title"
         />
+      </div>
+      <div data-case="fixing">
+        <Stepper items={FOUR.map((step) => (step.id === 'b' ? { ...step, status: 'error' as const } : step))} value="b" aria-label="Fixing a step" />
       </div>
       <div data-case="twelve"><Stepper items={many(12)} value="s5" aria-label="Twelve steps" /></div>
       <div data-case="sixty"><Stepper items={many(60)} value="s30" aria-label="Sixty steps" /></div>

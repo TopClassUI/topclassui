@@ -11,8 +11,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the meter track loses forced-color-adjust-none, so forced colours repaint the bar to nothing',
     file: 'src/components/meter/classes.ts',
-    from: "'w-full overflow-hidden rounded-control bg-neutral-soft forced-color-adjust-none'",
-    to: "'w-full overflow-hidden rounded-control bg-neutral-soft'",
+    from: ' forced-color-adjust-none forced-colors:bg-[Canvas]',
+    to: ' forced-colors:bg-[Canvas]',
   },
   {
     label: 'the meter divides by zero when max equals min, instead of drawing a full track',
@@ -23,8 +23,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the meter keeps a max below min, so the range runs backwards',
     file: 'src/components/meter/lib.ts',
-    from: 'const high = Math.max(clamp(max, METER_BOUNDARIES.limitMin, METER_BOUNDARIES.limitMax), low)',
-    to: 'const high = clamp(max, METER_BOUNDARIES.limitMin, METER_BOUNDARIES.limitMax)',
+    from: 'const high = Math.max(bound(max, METER_DEFAULTS.max), low)',
+    to: 'const high = bound(max, METER_DEFAULTS.max)',
   },
   {
     label: 'the meter announces and draws an unclamped value, past max or NaN',
@@ -35,8 +35,20 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the meter lets a stray 1e308 min through the guard rail',
     file: 'src/components/meter/lib.ts',
-    from: 'const low = clamp(min, METER_BOUNDARIES.limitMin, METER_BOUNDARIES.limitMax)',
-    to: 'const low = min',
+    from: 'const low = bound(min, METER_DEFAULTS.min)',
+    to: 'const low = Number.isNaN(min) ? METER_DEFAULTS.min : min',
+  },
+  {
+    label: 'the meter clamps a NaN min or max to the guard rail, so a NaN max draws a full bar and reads 0 of 0',
+    file: 'src/components/meter/lib.ts',
+    from: 'return clamp(Number.isNaN(end) ? fallback : end,',
+    to: 'return clamp(end,',
+  },
+  {
+    label: 'the meter gives a NaN max the default min, so the range collapses to one point',
+    file: 'src/components/meter/lib.ts',
+    from: 'bound(max, METER_DEFAULTS.max)',
+    to: 'bound(max, METER_DEFAULTS.min)',
   },
   {
     label: 'the meter spreads the rest last, so a caller aria-valuenow or role beats the clamp',
@@ -59,8 +71,50 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the meter warning bar is painted in primary',
     file: 'src/components/meter/classes.ts',
-    from: "warning: 'bg-warning-solid',",
-    to: "warning: 'bg-primary-solid',",
+    from: "warning: 'bg-warning-on-soft',",
+    to: "warning: 'bg-primary-on-soft',",
+  },
+  {
+    label: 'the meter warning bar goes back to the solid fill, 1.77:1 on its track',
+    file: 'src/components/meter/classes.ts',
+    from: "warning: 'bg-warning-on-soft',",
+    to: "warning: 'bg-warning-solid',",
+  },
+  {
+    label: 'the meter track loses its line-strong outline, so the end of the range is 1.2:1 on the page',
+    file: 'src/components/meter/classes.ts',
+    from: ' outline-solid outline-(length:--tc-line-width) outline-line-strong',
+    to: '',
+  },
+  {
+    label: 'the meter track keeps its theme fill under forced colours, 1.2:1 on a canvas of the same polarity',
+    file: 'src/components/meter/classes.ts',
+    from: ' forced-colors:bg-[Canvas] ',
+    to: ' ',
+  },
+  {
+    label: 'the meter track edge keeps its theme colour under forced colours',
+    file: 'src/components/meter/classes.ts',
+    from: ' forced-colors:outline-[CanvasText]',
+    to: '',
+  },
+  {
+    label: 'the meter bar keeps its theme fill under forced colours, 1.77:1 on its track in a matching palette',
+    file: 'src/components/meter/classes.ts',
+    from: "rounded-control forced-colors:bg-[CanvasText]'",
+    to: "rounded-control'",
+  },
+  {
+    label: 'check-contrast stops measuring the bar of Meter and Progress on its neutral track',
+    file: 'scripts/lib/contrast-checks.ts',
+    from: 'worst(onSoft, track), 3)',
+    to: 'worst(onSoft, track), 1)',
+  },
+  {
+    label: 'the meter track loses its 4rem floor, so a w-fit parent draws it 0 px wide while it is announced',
+    file: 'src/components/meter/classes.ts',
+    from: "'w-full min-w-16 overflow-hidden",
+    to: "'w-full overflow-hidden",
   },
   {
     label: 'the meter xs track is as tall as sm',

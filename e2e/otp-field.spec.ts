@@ -236,12 +236,21 @@ test.describe('text', () => {
   test.use({ reducedMotion: 'reduce' })
 
   for (const direction of DIRECTIONS) {
-    test(`${direction}: at a root of 32 px a cell doubles; at 320 px the cells give up width and the page does not scroll`, async ({ page }) => {
+    // At 320 px the demo's parent is 177 px, under the 224 px floor of six cells and 16 px gaps: the row breaks, never overflows.
+    test(`${direction}: at a root of 32 px a cell doubles; at 320 px the row breaks inside its parent and the page does not scroll`, async ({ page }) => {
       await page.goto(urlFor('otp-field--basic', 'light', direction))
       await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
       expect(await fields(page)).toEqual([{ cells: '80x80', font: '36px', rows: '6' }])
       await page.setViewportSize({ width: 320, height: 480 })
-      expect((await fields(page))[0]?.cells).toMatch(/^\d+(\.\d)?x80$/)
+      expect(await fields(page)).toEqual([{ cells: '32.3x80 80x80', font: '36px', rows: '4+2' }])
+      const outside = await page.locator('#demo [role="group"]').evaluate((group) => {
+        const parent = (group.parentElement as HTMLElement).getBoundingClientRect()
+        return [...group.querySelectorAll('input')].filter((cell) => {
+          const r = cell.getBoundingClientRect()
+          return r.left < parent.left - 0.5 || r.right > parent.right + 0.5
+        }).length
+      })
+      expect(outside, 'cells painted past the parent').toBe(0)
       await expectNoSidewaysScroll(page)
     })
   }
@@ -390,6 +399,14 @@ test.describe('live: a form reset', () => {
     await send.click()
     await expect.poll(() => sent(page, 'echo')).toEqual([[['again', '129']], [['again', '129']]])
   })
+
+  test('autoSubmit sends the field\'s own form, or the one its form attribute names, never the form of a field mounted after it', async ({ page }) => {
+    await typeInto(page, 'Auto', '4321')
+    await expect.poll(() => sent(page, 'auto')).toEqual([[['auto', '4321']]])
+    await typeInto(page, 'Tied', '8765')
+    await expect.poll(() => sent(page, 'tied')).toEqual([[['tied', '8765']]])
+    expect([await sent(page, 'outer'), await sent(page, 'later')]).toEqual([[], []])
+  })
 })
 
 test.describe('live: where a page puts a code field', () => {
@@ -398,10 +415,26 @@ test.describe('live: where a page puts a code field', () => {
     await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/otp-field-layouts.tsx' })
     await expect(page.locator('#layouts [role="group"]').first()).toBeVisible()
   }
-  /** The distinct cell boxes of the fields in every case. */
+  /** The distinct cell boxes of the fields in every case, and its lines of cells when a field breaks. */
   const cases = (page: Page) => page.locator('#layouts [data-case]').evaluateAll((all) => all.map((holder) => {
     const cells = [...holder.querySelectorAll('[role="group"] input')].map((cell) => cell.getBoundingClientRect())
-    return `${holder.getAttribute('data-case') ?? ''}: ${[...new Set(cells.map((r) => `${String(Math.round(r.width * 10) / 10)}x${String(r.height)}`))].join(' ')}`
+    const lines = [...holder.querySelectorAll('[role="group"]')].map((group) => {
+      const tops = [...group.querySelectorAll('input')].map((cell) => Math.round(cell.getBoundingClientRect().top))
+      return [...new Set(tops)].map((top) => tops.filter((t) => t === top).length).join('+')
+    })
+    const broken = lines.some((line) => line.includes('+')) ? ` in ${[...new Set(lines)].join(' ')}` : ''
+    return `${holder.getAttribute('data-case') ?? ''}: ${[...new Set(cells.map((r) => `${String(Math.round(r.width * 10) / 10)}x${String(r.height)}`))].join(' ')}${broken}`
+  }))
+  /** Every cell painted outside its own group, or over the text that names a field. */
+  const strays = (page: Page) => page.locator('#layouts [role="group"]').evaluateAll((groups) => groups.flatMap((group) => {
+    const box = group.getBoundingClientRect()
+    const label = document.getElementById(group.querySelector('input')?.getAttribute('aria-labelledby') ?? '')?.getBoundingClientRect()
+    return [...group.querySelectorAll('input')].flatMap((cell, index) => {
+      const r = cell.getBoundingClientRect()
+      const outside = r.left < box.left - 0.5 || r.right > box.right + 0.5 || r.top < box.top - 0.5 || r.bottom > box.bottom + 0.5
+      const over = label !== undefined && r.left < label.right - 0.5 && r.right > label.left + 0.5 && r.top < label.bottom - 0.5 && r.bottom > label.top + 0.5
+      return [outside ? `${group.getAttribute('aria-labelledby') ?? ''} cell ${String(index + 1)} outside its group` : '', over ? `${group.getAttribute('aria-labelledby') ?? ''} cell ${String(index + 1)} over its label` : ''].filter(Boolean)
+    })
   }))
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 
@@ -409,7 +442,8 @@ test.describe('live: where a page puts a code field', () => {
     test(`1280 px, ${direction}: every case holds six cells of 40 x 40 px`, async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 800 })
       await fixture(page, { direction })
-      expect(await cases(page)).toEqual(['block', 'grid', 'track', 'flex-column', 'label-row', 'flex-1', 'w-fit', 'cell', 'auto-1fr', 'pair'].map((name) => `${name}: 40x40`))
+      expect(await cases(page)).toEqual(['block', 'grid', 'track', 'flex-column', 'label-row', 'flex-1', 'w-fit', 'cell', 'auto-1fr', 'pair', 'halves', 'halves-direct'].map((name) => `${name}: 40x40`))
+      expect(await strays(page)).toEqual([])
       await expectNoSidewaysScroll(page)
     })
   }
@@ -419,12 +453,14 @@ test.describe('live: where a page puts a code field', () => {
 
     for (const direction of DIRECTIONS) {
       // 288 px inside the fixture's padding: a parent that sizes to its content counts a cell as 24 px, so the field shrinks.
-      test(`${direction}: every cell keeps 44 px of height and at least 24 of width, and the page does not scroll sideways`, async ({ page }) => {
+      // A column of 140 px is under the 184 px floor of six cells, so the field breaks there: 4 + 2, the last two at their cap.
+      test(`${direction}: every cell keeps 44 px of height and at least 24 of width, inside its group, and the page does not scroll sideways`, async ({ page }) => {
         await fixture(page, { direction })
         expect(await cases(page)).toEqual([
-          'block: 41.3x44', 'grid: 41.3x44', 'track: 24x44', 'flex-column: 41.3x44', 'label-row: 33.8x44', 'flex-1: 26.7x44',
-          'w-fit: 41.3x44', 'cell: 29.3x44', 'auto-1fr: 24x44', 'pair: 41.3x44',
+          'block: 41.3x44', 'grid: 41.3x44', 'track: 29x44 44x44 in 4+2', 'flex-column: 41.3x44', 'label-row: 33.8x44', 'flex-1: 26.7x44',
+          'w-fit: 41.3x44', 'cell: 29.3x44', 'auto-1fr: 30.3x44 44x44 in 5+1', 'pair: 41.3x44', 'halves: 29x44 44x44 in 4+2', 'halves-direct: 29x44 44x44 in 4+2',
         ])
+        expect(await strays(page)).toEqual([])
         await expectNoSidewaysScroll(page)
       })
     }

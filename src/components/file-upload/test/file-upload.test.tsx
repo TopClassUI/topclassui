@@ -28,6 +28,11 @@ describe('the native input carries the form props', () => {
     expect(html).toMatch(new RegExp(`id="${hint}"[^>]*>PDF only</span>`))
   })
 
+  it('carries an empty title, so Chromium shows no "No file chosen" tooltip of its own over the zone; a caller\'s title wins', () => {
+    expect(attr(input, 'title')).toBe('')
+    expect(attr(inputOf(markup(<FileUpload aria-label="Docs" title="Pick the files" />)), 'title')).toBe('Pick the files')
+  })
+
   it('is the last child of the zone, after the icon, the prompt and the hint', () => {
     expect(html).toMatch(/<div class="group\/zone [^"]*"><span aria-hidden="true"[^>]*>.*<\/span><span class="flex flex-col[^"]*"><span>Drop files here<\/span><span class="[^"]*">Browse<\/span><\/span><span id="[^"]*"[^>]*>PDF only<\/span><input [^>]*><\/div>/)
   })

@@ -1,7 +1,7 @@
 // Loaded into a live page by e2e/meter.spec.ts: a meter where a real page puts one. Alone as a grid item, in a wrapper
 // in a grid track, in a flex-1 column, in a w-fit parent (bare and with a width of its own), in a table cell (bare and
 // with a width of its own), in a flex row beside its label; then hostile input: a 300-character label, values past the
-// range, NaN and infinities, a max below its min. Inline styles: the harness compiles only classes under src/.
+// range, NaN and infinities, a max below its min, a NaN max, a NaN min. Inline styles: the harness compiles only src/.
 import type { CSSProperties } from 'react'
 import { createRoot } from 'react-dom/client'
 
@@ -9,6 +9,8 @@ import { Meter } from '#components/meter/index.js'
 
 const PAGE: CSSProperties = { display: 'grid', gap: 24, padding: 16, alignContent: 'start' }
 const CELL: CSSProperties = { border: '1px solid GrayText', padding: 8 }
+// A label column of its own width, so the share the table gives the meter does not hang on a font's word width.
+const LABEL_CELL: CSSProperties = { ...CELL, width: 80 }
 const PAIR: CSSProperties = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }
 const WORD = 'Supercalifragilistic'.repeat(15)
 
@@ -24,7 +26,7 @@ function Fixture() {
       <div data-case="w-fit" style={{ width: 'fit-content' }}><Meter value={50} aria-label="In a w-fit parent" /></div>
       <div data-case="w-fit-sized" style={{ width: 'fit-content' }}><Meter value={50} style={{ width: 160 }} aria-label="Sized, in a w-fit parent" /></div>
       <table data-case="cell" style={{ borderCollapse: 'collapse', width: '100%' }}>
-        <tbody><tr><td style={CELL}>Disk</td><td style={CELL}><Meter value={50} aria-label="In a table cell" /></td></tr></tbody>
+        <tbody><tr><td style={LABEL_CELL}>Disk</td><td style={CELL}><Meter value={50} aria-label="In a table cell" /></td></tr></tbody>
       </table>
       <table data-case="cell-sized" style={{ borderCollapse: 'collapse', width: '100%' }}>
         <tbody><tr><td style={CELL}>Disk</td><td style={CELL}><Meter value={50} style={{ width: 160 }} aria-label="Sized, in a table cell" /></td></tr></tbody>
@@ -43,6 +45,8 @@ function Fixture() {
         <Meter value={Number.NaN} aria-label="Not a number" />
         <Meter min={Number.NEGATIVE_INFINITY} max={Number.POSITIVE_INFINITY} value={0} aria-label="Infinite range" />
         <Meter min={10} max={5} value={7} aria-label="Max below min" />
+        <Meter max={Number.NaN} value={50} aria-label="A NaN max" />
+        <Meter min={Number.NaN} value={50} aria-label="A NaN min" />
       </div>
     </div>
   )

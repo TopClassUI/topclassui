@@ -13,12 +13,16 @@ export const TRACK_HEIGHT = {
   custom: '',
 } as const satisfies Record<Size, string>
 
-/** R-5.2-3: a lookup of complete class strings, never a name built from an expression. */
+/** An outline, not a border, marks the full range at 3:1 and takes no room from a 2 px track;
+ * forced colours paint the track, its edge and the bar in system colours. */
+export const TRACK = 'w-full overflow-hidden rounded-control bg-neutral-soft outline-solid outline-(length:--tc-line-width) outline-line-strong forced-color-adjust-none forced-colors:bg-[Canvas] forced-colors:outline-[CanvasText]'
+
+/** R-5.2-3: complete strings. The tone's text colour, which check-contrast holds at 3:1 on the track. */
 export const BAR_FILL = {
-  primary: 'bg-primary-solid',
-  neutral: 'bg-neutral-solid',
-  success: 'bg-success-solid',
-  warning: 'bg-warning-solid',
-  danger: 'bg-danger-solid',
-  info: 'bg-info-solid',
+  primary: 'bg-primary-on-soft',
+  neutral: 'bg-neutral-on-soft',
+  success: 'bg-success-on-soft',
+  warning: 'bg-warning-on-soft',
+  danger: 'bg-danger-on-soft',
+  info: 'bg-info-on-soft',
 } as const satisfies Record<Tone, string>

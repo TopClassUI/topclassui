@@ -13,19 +13,29 @@ import {
 } from './lib.js'
 import type {
   DateParts, DatePickerActions, DatePickerCalendarProps, DatePickerDay, DatePickerFocusEvent, DatePickerKeyEvent,
-  DatePickerStateProps,
+  DatePickerChangeDetails, DatePickerStateProps,
 } from './types.js'
 
 /** The trigger's half: the value a form reset brings back, its text in the provider's locale and digits, the ids the
  * trigger is described by, the Escape scope of this root, and what the calendar part is handed when it loads. */
 export function useDatePicker({
-  value, defaultValue, onValueChange, onOpenChange, placeholder, minDate, maxDate, required, 'aria-describedby': describedBy,
+  value, defaultValue, onValueChange, open, defaultOpen, onOpenChange, placeholder, minDate, maxDate, required,
+  'aria-describedby': describedBy,
 }: DatePickerStateProps) {
   const { value: current, setValue, inputRef } = useFormValue({
     value: value === undefined ? undefined : toValue(value),
     defaultValue: toValue(defaultValue),
   })
-  const root = useOverlayRoot(onOpenChange)
+  const [ownOpen, setOwnOpen] = useState(defaultOpen === true)
+  const shown = open ?? ownOpen
+  // Whether this root's calendar part has mounted: until it has, a close leaves nothing to animate out.
+  const ready = useRef(false)
+  const opened = useRef(shown)
+  const onMount = useCallback(() => { ready.current = true }, [])
+  const root = useOverlayRoot((next: boolean, details: DatePickerChangeDetails) => {
+    onOpenChange?.(next, details)
+    if (!details.isCanceled) setOwnOpen(next)
+  })
   const portal = usePortalLocale()
   const labels = useLabels()
   const locale = useLocale()
@@ -36,6 +46,12 @@ export function useDatePicker({
   const requiredId = useId()
   const actionsRef = useRef(null as DatePickerActions | null)
   const announce = useRef(false)
+
+  // Closed before the part arrived: Base UI would wait forever for its exit and mount the part later, hidden, with the focus.
+  useEffect(() => {
+    if (shown) opened.current = true
+    else if (opened.current && !ready.current) actionsRef.current?.unmount()
+  }, [shown])
 
   // A value written by script fires no event: once the chosen day is in the input, it says so, as a typed one would.
   useEffect(() => {
@@ -57,6 +73,7 @@ export function useDatePicker({
   return {
     ...portal,
     scope: root.scope,
+    open: shown,
     onOpenChange: root.onOpenChange,
     actionsRef,
     inputRef,
@@ -68,7 +85,7 @@ export function useDatePicker({
     requiredText: labels.common.required,
     // The value first, so the date is heard after the label; then the required word, which no button can carry.
     describedBy: [valueId, required === true ? requiredId : '', describedBy ?? ''].filter(Boolean).join(' '),
-    calendar: { value: current, range, formats, choose },
+    calendar: { value: current, range, formats, choose, onMount },
     // React refuses a value with no handler; the input changes only through the value.
     onInputChange: () => undefined,
     // Once hydrated, the browser's required check lands on the trigger, not on the input nobody sees.
@@ -77,7 +94,7 @@ export function useDatePicker({
 }
 
 /** The calendar's half: the active day and the keys that move it, the month it shows, today, and each cell's name. */
-export function useDatePickerCalendar({ value, range, formats, firstDayOfWeek, choose, placement }: DatePickerCalendarProps) {
+export function useDatePickerCalendar({ value, range, formats, firstDayOfWeek, choose, placement, onMount }: DatePickerCalendarProps) {
   const labels = useLabels()
   const locale = useLocale()
   const numbers = useNumberFormat()
@@ -89,6 +106,8 @@ export function useDatePickerCalendar({ value, range, formats, firstDayOfWeek, c
   const [active, setActive] = useState(() => value ?? clampIso(today, range.min, range.max))
   const grid = useRef(null as HTMLTableElement | null)
   const focusing = useRef('mount' as 'mount' | 'key' | null)
+
+  useEffect(() => { onMount() }, [onMount])
 
   // On mount and after a key: the focus follows the active day, into the month the grid now shows.
   useEffect(() => {
@@ -136,8 +155,9 @@ export function useDatePickerCalendar({ value, range, formats, firstDayOfWeek, c
     labels: { previous: labels.datePicker.previousMonth, next: labels.datePicker.nextMonth, close: labels.common.close },
     weekdays: Array.from({ length: 7 }, (_, at) => ({ key: at, ...formats.weekday(((weekStart - 1 + at) % 7) + 1) })),
     weeks: Array.from({ length: 6 }, (_, row) => ({ key: row, days: cells.slice(row * 7, row * 7 + 7) })),
-    previous: { disabled: ends.atFirst, onClick: () => { setActive(shiftMonth(active, -1, range)) } },
-    next: { disabled: ends.atLast, onClick: () => { setActive(shiftMonth(active, 1, range)) } },
+    // aria-disabled, never disabled: a disabled button drops the focus to the body, where no Escape guard can place the key.
+    previous: { disabled: ends.atFirst, onClick: () => { if (!ends.atFirst) setActive(shiftMonth(active, -1, range)) } },
+    next: { disabled: ends.atLast, onClick: () => { if (!ends.atLast) setActive(shiftMonth(active, 1, range)) } },
     gridRef: grid,
     onKeyDown,
     pick: (iso: string) => { if (iso >= range.min && iso <= range.max) choose(iso) },

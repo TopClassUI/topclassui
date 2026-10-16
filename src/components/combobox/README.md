@@ -23,8 +23,9 @@ import { Combobox } from 'topclassui'
 **A name is required.** `id` for a `<label htmlFor>` (the root hands it to the input), or
 `aria-label`, or `aria-labelledby`; the type refuses a Combobox with none. While the list is open
 Base UI hides everything else from assistive technology, the label too, and Chrome then gives the
-input no name; so once the page hydrates the input carries the label's text as `aria-label`, read
-again at each open. Pass `aria-label` or `aria-labelledby` yourself and nothing is copied.
+input no name; so while the list is open the input carries the label's text as `aria-label`, read at
+each open and dropped at each close, when the label names it again. Pass `aria-label` or
+`aria-labelledby` yourself and nothing is copied.
 
 **`items` is plain data**, `{ value, label, disabled? }`, so a server page renders a Combobox with
 no function crossing to the browser. `value` is what the form receives, unique in its list; `label`
@@ -134,13 +135,14 @@ import { Combobox } from 'topclassui'
 
 ## Props
 
-Required: `items`. Every other prop below is optional.
+Required: `items`, `aria-label` or `aria-labelledby` or `id`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
 | `items` | **yes** | `readonly ListOption[]` | - | The options, as plain data a Server Component can pass. Keep the array stable between renders. |
-| `aria-label` | no | `string` | - | The name read out when no visible label names the control. |
-| `aria-labelledby` | no | `string` | - | The id of the visible text that names the control. |
+| `aria-label` | **yes**, or `aria-labelledby` or `id` | `string` | - | The name read out when no visible label names the control. |
+| `aria-labelledby` | **yes**, or `aria-label` or `id` | `string` | - | The id of the visible text that names the control. |
+| `id` | **yes**, or `aria-label` or `aria-labelledby` | `string` | - | The id a `<label htmlFor>` points at. |
 | `className` | no | `string` | - | On the input, merged last. |
 | `container` | no | `Base.Portal.Props['container']` | - | Where the list mounts; the body when left out. |
 | `defaultValue` | no | `string \| null` | - | The value the page opens on, and the one a form reset returns to. |

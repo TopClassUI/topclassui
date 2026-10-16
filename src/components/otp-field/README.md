@@ -56,7 +56,7 @@ its label. A Base UI `DirectionProvider` inside the field does it.
 
 **`length`** is 6 by default and is clamped to a whole number between 1 and 12. **`groupSize`**
 draws a bar after every that many cells (0, the default, draws none). Past eight items, cells and
-bars together, the row wraps, so twelve cells stay 44 px on a phone.
+bars together, the row breaks at whole cells, so twelve cells stay 44 px on a phone.
 
 **The form.** With a `name`, the hidden input sends what is typed so far, a partial code too, and
 `name=` when empty. `form` ties it to a form it is not inside. Before the page hydrates the form
@@ -73,6 +73,10 @@ the form; it has no look of its own.
 and 44 px tall under a finger. It gives up width where the row does not fit: on a 320 px phone
 six cells are 36 px wide (choice 38). `size="custom"` draws no size: give the cells one from your
 own CSS.
+
+**The floor.** n cells need n x 24 px plus 8 px between them: 184 px for six. A parent narrower
+than that breaks the row instead of scrolling the page: two six-cell fields in a grid of `1fr 1fr`
+at 320 px break 4 + 2. On a phone, give a six-cell field a row of its own.
 
 **A wrapper** takes `OTPFieldProps`. `Omit<OTPFieldProps, 'x'>` merges the two ways to name
 the field into one where none is required.
@@ -100,28 +104,28 @@ a read-only look, the invalid ring that is always on, a skeleton (use `Skeleton`
 ## Import
 
 ```tsx
-import { OtpField } from 'topclassui'
+import { OTPField } from 'topclassui'
 ```
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `aria-labelledby` or `id`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
+| `aria-labelledby` | **yes**, or `id` | `string` | - | The id of the visible text that names the first cell. |
+| `id` | **yes**, or `aria-labelledby` | `string` | - | The id of the first cell, which a `<label htmlFor>` points at; the others are `<id>-2`, `<id>-3`. |
 | `aria-describedby` | no | `string` | - | On the first cell, beside its name: the id of a hint or an error text. |
 | `aria-invalid` | no | `boolean \| 'true' \| 'false' \| 'grammar' \| 'spe...` | - | On every cell; `invalid` sets it to true, and when `invalid` is off a Field's own value survives. |
 | `aria-label` | no | `undefined` | - | Refused: Base UI drops it on the first cell. Name the field by `id` or `aria-labelledby`. |
-| `aria-labelledby` | no | `string` | - | The id of the visible text that names the first cell. |
 | `className` | no | `string` | - | Merged last, so a consumer class wins a conflict with the group's own. |
 | `groupSize` | no | `integer`, min 0, max 12 | `0` | Draws a separator after every this many cells; 0 draws none. Clamped between 0 and length. |
-| `id` | no | `string` | - | The id of the first cell, which a `<label htmlFor>` points at; the others are `<id>-2`, `<id>-3`. |
 | `invalid` | no | `boolean` | `false` | Marks the code as wrong: sets aria-invalid on every cell, whose line turns to danger and thickens. |
 | `length` | no | `integer`, min 1, max 12 | `6` | The number of cells, one character each. Clamped between 1 and 12; past eight items the row wraps. |
 | `ref` | no | `Ref<HTMLDivElement>` | - | The `<div role="group">` around the cells. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The control scale of each square cell and its type step; custom emits no size classes. |
 
-Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
+Anything else on `OTPField` is passed to the element it draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
 

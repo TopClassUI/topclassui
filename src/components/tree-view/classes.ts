@@ -4,11 +4,12 @@ import { BORDER, HOVER, LABEL, SCROLL_AREA, TRANSITION } from '#shared/classes.j
 /** The box: one column, so the tree scrolls inside it and never widens its parent. No gap: the note brings its own room. */
 export const TREE_VIEW_ROOT = 'grid min-w-0 grid-cols-1'
 
-/** The one tab stop and the scroll container; its own ring shows only while no mounted row holds the highlight. No gap:
- * the spacers count whole rows. With no row it is not drawn, so no empty tree is announced or outlined. */
+/** The one tab stop and the scroll container; its own ring shows while no row holding the highlight is mounted or in
+ * sight. No gap: the spacers count whole rows. With no row it is not drawn, so no empty tree is announced or outlined. */
 export const TREE_VIEW_TREE = [
   'group/tree relative flex flex-col rounded-box bg-surface-raised p-2 outline-none tone-neutral empty:hidden',
   'focus-visible:not-has-data-highlighted:outline-solid focus-visible:not-has-data-highlighted:outline-(length:--tc-ring-width) focus-visible:not-has-data-highlighted:-outline-offset-(length:--tc-ring-width) focus-visible:not-has-data-highlighted:outline-ring',
+  'focus-visible:data-highlight-hidden:outline-solid focus-visible:data-highlight-hidden:outline-(length:--tc-ring-width) focus-visible:data-highlight-hidden:-outline-offset-(length:--tc-ring-width) focus-visible:data-highlight-hidden:outline-ring',
   'max-h-[calc(var(--tc-list-rows)*var(--tc-row-height))]',
   'pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-coarse,44px)))]',
   'before:h-(--tc-list-pad-start) before:shrink-0 after:h-(--tc-list-pad-end) after:shrink-0',

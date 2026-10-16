@@ -83,8 +83,8 @@ describe('the demos the plan names', () => {
 
   it('states: the two invalid sliders say so on the group, and the disabled one disables its input', async () => {
     const html = await render('states')
-    expect(html.match(/role="group" (aria-label="Invalid range" )?aria-invalid="true"/g)).toEqual([
-      'role="group" aria-invalid="true"', 'role="group" aria-label="Invalid range" aria-invalid="true"',
+    expect(html.match(/role="group" (aria-label="Invalid range" )?dir="ltr" aria-invalid="true"/g)).toEqual([
+      'role="group" dir="ltr" aria-invalid="true"', 'role="group" aria-label="Invalid range" dir="ltr" aria-invalid="true"',
     ])
     expect(html).toMatch(/<div data-disabled="" [^>]*role="group"/)
     expect(html.match(/<input [^>]*disabled=""/g)).toHaveLength(1)

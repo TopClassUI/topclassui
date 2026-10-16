@@ -21,11 +21,17 @@ the type refuses a Meter with neither. `aria-valuetext` is passed through, so a 
 reader can say "512 GB of 1 TB" instead of "512".
 
 **Clamped.** `min` and `max` stay within -1e15 and 1e15, `max` is raised to `min` when it
-is below it, and `value` is held between the two (`NaN` reads as `min`).
+is below it, and `value` is held between the two (`NaN` reads as `min`). A `NaN` `min` or
+`max`, as from a total that has not loaded, takes its default of 0 or 100.
 
-**Width.** The track fills its container. In a `w-fit` parent it has nothing to fill and
-is 0 px wide, and in a table cell it gets what the other columns leave: give it a width of
-its own with `className`, as `w-40`.
+**Contrast.** The bar takes the tone's text colour (`<tone>-on-soft`), at least 5.6:1 on
+the track in every mode, and a `line-strong` outline marks the end of the range at 4.7:1
+or more on the page. Under forced colours the track is `Canvas` and the bar `CanvasText`.
+
+**Width.** The track fills its container and is never narrower than 4rem, so in a `w-fit`
+parent, which gives it nothing to fill, it is 4rem wide instead of 0 px. In a table cell it
+gets what the other columns leave, at least 4rem: give it a width of its own with
+`className`, as `w-40`, and add `min-w-0` for one narrower than 4rem.
 
 **Not built:** Base UI's meter (it names itself only after hydration), a label or value
 part, `low`, `high` and `optimum` bands, an indeterminate state (that is Progress), `format`
@@ -41,10 +47,12 @@ import { Meter } from 'topclassui'
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `aria-label` or `aria-labelledby`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
+| `aria-label` | **yes**, or `aria-labelledby` | `string` | - | The name read out when no visible text names the meter. |
+| `aria-labelledby` | **yes**, or `aria-label` | `string` | - | The id of the visible text that names the meter. |
 | `max` | no | `number`, min -1000000000000000, max 1000000000000000 | `100` | The high end of the range, where the track is full; raised to min when below it. |
 | `min` | no | `number`, min -1000000000000000, max 1000000000000000 | `0` | The low end of the range, where the track is empty. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The shared size scale, which sets the track height; custom emits none. |

@@ -28,6 +28,7 @@ const CONTROLS: Record<string, string[]> = {
     'div: View | SegmentedControl hint SegmentedControl error | invalid | ',
     'input: Volume | Slider hint Slider error |  | ',
     'input: Guests | NumberField hint NumberField error | invalid | ',
+    'div: Code |  |  | ',
     'input: Code | OTPField hint OTPField error | invalid | ',
     'button: Country | Select hint Select error | invalid | required',
     'input: City | Combobox hint Combobox error | invalid | ',
@@ -110,6 +111,12 @@ describe('what a demo must not write by hand', () => {
 
   it('only the live demo is a client file: Field is a server component', () => {
     expect(sources.filter(([, source]) => source.startsWith("'use client'")).map(([file]) => file)).toEqual(['live'])
+  })
+
+  it('every row of a demo wraps: one that cannot widens the column it sits in past a 320 px screen at a 32 px root', () => {
+    expect(sources.flatMap(([file, source]) => [...source.matchAll(/className="([^"]*)"/g)]
+      .filter(([, classes]) => /(^| )flex( |$)/.test(classes ?? '') && !/(^| )(flex-wrap|flex-col)( |$)/.test(classes ?? ''))
+      .map(([, classes]) => `${file}: ${classes ?? ''}`))).toEqual([])
   })
 
   it('no button of a form demo is named reset, which would hide form.reset', () => {

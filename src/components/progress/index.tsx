@@ -4,7 +4,7 @@ import { cn } from '#shared/cn.js'
 // Named here as well, so a consumer program that never compiles shared/ gets the --tc-* keys.
 import type {} from '#shared/style-tokens.js'
 import { PROGRESS_BOUNDARIES } from './boundaries.js'
-import { BAR_FILL, TRACK_HEIGHT } from './classes.js'
+import { BAR_FILL, TRACK, TRACK_HEIGHT } from './classes.js'
 import { PROGRESS_DEFAULTS } from './constants.js'
 import type { ProgressProps } from './types.js'
 
@@ -37,14 +37,14 @@ export function Progress({
       data-indeterminate={indeterminate ? '' : undefined}
       style={{ ...style, '--tc-progress-value': `${String(percent)}%` }}
       className={cn(
-        'w-full overflow-hidden rounded-control bg-neutral-soft forced-color-adjust-none',
+        TRACK,
         TRACK_HEIGHT[size],
         className,
       )}
     >
       <div
         className={cn(
-          'h-full rounded-control',
+          'h-full rounded-control forced-colors:bg-[CanvasText]',
           indeterminate ? 'w-1/3 animate-pulse motion-reduce:animate-none' : 'w-(--tc-progress-value)',
           BAR_FILL[tone],
         )}

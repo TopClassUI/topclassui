@@ -7,6 +7,11 @@ export const optionAccessors = {
   getLabel: (option: ListOption) => option.label,
 }
 
+/** Base UI asks it only for a value no loaded option holds: the input then shows nothing, not the raw value. */
+export function labelOfUnknown(): string {
+  return ''
+}
+
 /** The key windowing tells two rows apart by. Module scope, so useCollection's memo holds. */
 export function keyOfOption(option: ListOption): string {
   return option.value

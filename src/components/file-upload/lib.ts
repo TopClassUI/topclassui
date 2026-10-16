@@ -36,7 +36,8 @@ export function formatBytes(bytes: number, locale: string, numberingSystem: stri
   if (bytes < 1024) return new Intl.NumberFormat(locale, { style: 'unit', unit: 'byte', unitDisplay: 'long', numberingSystem }).format(bytes)
   let value = bytes / 1024
   let step = 0
-  while (value >= 1024 && step < FILE_UPLOAD_UNITS.length - 1) {
+  // Rounded first, as the format rounds it: 1,023.96 kB would print 1,024 kB.
+  while (Math.round(value * 10) / 10 >= 1024 && step < FILE_UPLOAD_UNITS.length - 1) {
     value /= 1024
     step += 1
   }

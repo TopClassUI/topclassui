@@ -108,4 +108,28 @@ export const MUTATIONS: Mutation[] = [
     from: "export const CHECKBOX_MARK = 'flex size-full items-center justify-center'",
     to: "export const CHECKBOX_MARK = 'flex size-full items-center'",
   },
+  {
+    label: 'the checkbox paints a disabled mixed box Highlight under forced colours, told from an enabled one by opacity alone',
+    file: CLASSES,
+    from: ' forced-colors:group-disabled/toggle:group-data-indeterminate/toggle:border-[GrayText] forced-colors:group-disabled/toggle:group-data-indeterminate/toggle:bg-[GrayText]',
+    to: '',
+  },
+  {
+    label: 'the checkbox hands Base UI its value while mixed, so a pressed mixed box sends name=on behind the dash',
+    file: HOOK,
+    from: '    checked: indeterminate ? false : state.value,',
+    to: '    checked: state.value,',
+  },
+  {
+    label: 'the checkbox keeps uncheckedValue while mixed, so a mixed box sends its unchecked string',
+    file: HOOK,
+    from: '    uncheckedValue: indeterminate ? undefined : uncheckedValue,',
+    to: '    uncheckedValue,',
+  },
+  {
+    label: 'the checkbox reset writes the default into the hidden input of a mixed box, so after a reset it sends name=on',
+    file: HOOK,
+    from: 'syncChecked(value && !indeterminate, input)',
+    to: 'syncChecked(value, input)',
+  },
 ]

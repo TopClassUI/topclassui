@@ -13,6 +13,12 @@ export const MUTATIONS: Mutation[] = [
     to: '<FormErrorsContext value={undefined}>',
   },
   {
+    label: 'form: FormAction provides an empty record before its first answer, so its readers no longer read the undefined of the plan',
+    file: CLIENT,
+    from: '<FormErrorsContext value={state.errors}>',
+    to: '<FormErrorsContext value={state.errors ?? {}}>',
+  },
+  {
     label: 'form: the focus effect is removed, so after errors the focus stays on the submit button',
     file: HOOK,
     from: '    focusFirstInvalid(form.current)\n',

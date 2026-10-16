@@ -7,7 +7,7 @@ import { serverEntries } from './form.js'
 import { type LiveOptions, expectNoSidewaysScroll, liveErrors, openLive } from './live.js'
 import { boxOf } from './overlay.js'
 import { urlFor } from './pages.js'
-import { FORCED_CANVAS, contrast, pixelsOf, rgbOf } from './pixels.js'
+import { FORCED_CANVAS, contrast, inkOn, pixelsOf, rgbOf, ringRow } from './pixels.js'
 
 // What happy-dom cannot lay out or press: the target around the track, where the thumb lands in each direction,
 // the ring, forced colours, the screens, and the form a real browser sends, before hydration and after a reset.
@@ -117,6 +117,35 @@ test.describe('invalid, on the static page', () => {
   })
 })
 
+test.describe('the off thumb against its track, on the static page', () => {
+  test.use({ reducedMotion: 'reduce' })
+
+  /** The thumb's centre against the fill halfway between it and the far end of the track, clear of the line and its edge. */
+  const thumbOnTrack = async (page: Page, control: Locator, direction: Direction) => {
+    const [track, thumb] = [await boxOf(trackOf(control)), await boxOf(control.locator('span span'))]
+    const y = Math.round(thumb.top + thumb.height / 2)
+    const far = direction === 'ltr' ? (thumb.right + track.right) / 2 : (thumb.left + track.left) / 2
+    const [knob] = await pixelsOf(page, { x: Math.round(thumb.left + thumb.width / 2), y, width: 1, height: 1 })
+    const [fill] = await pixelsOf(page, { x: Math.round(far), y, width: 1, height: 1 })
+    return contrast(knob ?? [0, 0, 0], fill ?? [0, 0, 0])
+  }
+
+  for (const mode of ['light', 'dark', 'ocean'] as const) {
+    test(`${mode}: the thumb that shows the state stands 3:1 off the track around it (WCAG 1.4.11), at every size`, async ({ page }) => {
+      await page.goto(urlFor('switch--states', mode, 'ltr'))
+      expect(await thumbOnTrack(page, switchOf(page, 'Off'), 'ltr')).toBeGreaterThanOrEqual(3)
+      expect(await thumbOnTrack(page, switchOf(page, 'Invalid'), 'ltr')).toBeGreaterThanOrEqual(3)
+      // The sizes demo is on: turned off by hand on the static page, where no script puts it back.
+      await page.goto(urlFor('switch--sizes', mode, 'rtl'))
+      for (const size of SIZES) {
+        const control = switchOf(page, NAMES[size])
+        await control.evaluate((el) => { el.removeAttribute('data-checked'); el.setAttribute('data-unchecked', '') })
+        expect(await thumbOnTrack(page, control, 'rtl'), size).toBeGreaterThanOrEqual(3)
+      }
+    })
+  }
+})
+
 for (const scheme of ['light', 'dark'] as const) {
   test.describe(`forced colours, ${scheme} palette`, () => {
     test.use({ forcedColors: 'active', colorScheme: scheme, reducedMotion: 'reduce' })
@@ -147,6 +176,55 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(await gaps(on, 'ltr')).toMatchObject({ end: 2 })
       expect(await gaps(off, 'ltr')).toMatchObject({ start: 2 })
     })
+
+    test('invalid and on: a CanvasText line and no author red; disabled and on, prop or fieldset: GrayText under its thumb', async ({ page }) => {
+      await page.goto(urlFor('switch--states', 'light', 'ltr'))
+      const system = (colour: string) => page.evaluate((value) => {
+        const probe = document.createElement('span')
+        probe.style.setProperty('forced-color-adjust', 'none')
+        probe.style.backgroundColor = value
+        document.body.appendChild(probe)
+        return getComputedStyle(probe).backgroundColor
+      }, colour)
+      const [canvasText, grayText] = [await system('CanvasText'), await system('GrayText')]
+      expect(await css(trackOf(switchOf(page, 'Invalid, on')), 'border-top-color')).toBe(canvasText)
+      expect(await css(trackOf(switchOf(page, 'Invalid, on')), 'box-shadow')).not.toMatch(/[1-9]px inset/)
+      // The static page runs no script: an on switch moved into a disabled fieldset.
+      await switchOf(page, 'On').evaluate((el) => {
+        const fieldset = document.createElement('fieldset')
+        fieldset.disabled = true
+        el.before(fieldset)
+        fieldset.append(el)
+      })
+      for (const name of ['Disabled, on', 'On']) {
+        expect(await css(trackOf(switchOf(page, name)), 'background-color'), name).toBe(grayText)
+        expect(await css(trackOf(switchOf(page, name)), 'border-top-color'), name).toBe(grayText)
+        const thumb = rgbOf(await css(switchOf(page, name).locator('span span'), 'background-color'))
+        expect(contrast(thumb, rgbOf(grayText)), name).toBeGreaterThanOrEqual(3)
+      }
+    })
+
+    // The page in the other theme, where --tc-ring fell to 2.85:1 on Canvas: only a system colour holds in both.
+    for (const mode of scheme === 'light' ? ['dark'] as const : ['light', 'ocean'] as const) {
+      test(`${mode} page: the ring of a focused switch is the user's CanvasText, 3:1 on Canvas, on and invalid too`, async ({ page }) => {
+        await page.goto(urlFor('switch--states', mode, 'ltr'))
+        const canvasText = await page.evaluate(() => {
+          const probe = document.createElement('span')
+          probe.style.setProperty('forced-color-adjust', 'none')
+          probe.style.color = 'CanvasText'
+          document.body.appendChild(probe)
+          return getComputedStyle(probe).color
+        })
+        for (const name of ['Off', 'On', 'Invalid, on', 'Read-only']) {
+          await switchOf(page, name).focus()
+          expect(await css(trackOf(switchOf(page, name)), 'outline-color'), name).toBe(canvasText)
+          // A pill: the ring runs straight only between the two half circles.
+          const track = await boxOf(trackOf(switchOf(page, name)))
+          const row = await ringRow(page, { left: track.left + track.height / 2, top: track.top, width: track.width - track.height })
+          expect(inkOn(row, FORCED_CANVAS[scheme]), name).toBe(row.length)
+        }
+      })
+    }
 
     test('invalid thickens the line to 2 px; disabled dims the whole switch; no target has an outline at rest', async ({ page }) => {
       await page.goto(urlFor('switch--states', 'light', 'ltr'))
@@ -358,8 +436,24 @@ test.describe('live: where a page puts a switch', () => {
       expect(await cases(page)).toEqual([
         ['grid', [35, 24], [35, 20]], ['track', [35, 24], [35, 20]], ['flex-1', [35, 24], [35, 20]], ['w-fit', [35, 24], [35, 20]],
         ['cell', [35, 24], [35, 20]], ['label-row', [35, 24], [35, 20]], ['long', [28, 24], [28, 16]], ['no-label', [42, 24], [42, 24]],
+        ['custom', [48, 24], [48, 24]],
       ])
       await expectNoSidewaysScroll(page)
+    })
+
+    test(`${direction}: size="custom" sized by the caller's CSS has a thumb as tall as its inside, at the start off and at the end on`, async ({ page }) => {
+      await fixture(page, { direction })
+      expect(await shape(switchOf(page, 'Custom, off'))).toMatchObject({ track: [48, 24], thumb: [20, 20] })
+      await expect.poll(() => gaps(switchOf(page, 'Custom, off'), direction)).toEqual({ start: 2, end: 26 })
+      await expect.poll(() => gaps(switchOf(page, 'Custom, on'), direction)).toEqual({ start: 26, end: 2 })
+      await switchOf(page, 'Custom, off').click()
+      await expect.poll(() => gaps(switchOf(page, 'Custom, off'), direction)).toEqual({ start: 26, end: 2 })
+      await switchOf(page, 'Custom, on').click()
+      await expect.poll(() => gaps(switchOf(page, 'Custom, on'), direction)).toEqual({ start: 2, end: 26 })
+      // At a root of 32 px a track sized in rem doubles, and the thumb still lands 2 px from the end.
+      await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
+      await expect.poll(() => shape(switchOf(page, 'Custom in rem, on')).then(({ track }) => track)).toEqual([96, 40])
+      await expect.poll(() => gaps(switchOf(page, 'Custom in rem, on'), direction)).toEqual({ start: 58, end: 2 })
     })
   }
 
@@ -372,6 +466,7 @@ test.describe('live: where a page puts a switch', () => {
         expect(await cases(page)).toEqual([
           ['grid', [44, 44], [35, 20]], ['track', [44, 44], [35, 20]], ['flex-1', [44, 44], [35, 20]], ['w-fit', [44, 44], [35, 20]],
           ['cell', [44, 44], [35, 20]], ['label-row', [44, 44], [35, 20]], ['long', [44, 44], [28, 16]], ['no-label', [44, 44], [42, 24]],
+          ['custom', [48, 44], [48, 24]],
         ])
         await expectNoSidewaysScroll(page)
       })
@@ -384,7 +479,7 @@ test.describe('live: where a page puts a switch', () => {
       const results = await new AxeBuilder({ page }).include('#layouts').analyze()
       expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([])
       // A native button with the role is named as a button: axe reads the switch through button-name, which passed.
-      expect(results.passes.find((pass) => pass.id === 'button-name')?.nodes).toHaveLength(8)
+      expect(results.passes.find((pass) => pass.id === 'button-name')?.nodes).toHaveLength(11)
     })
   }
 })

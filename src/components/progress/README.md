@@ -23,6 +23,10 @@ cannot say "one of two", which is why it is said here. `value` is clamped to 0-1
 it reaches ARIA or the bar, and an `indeterminate` bar announces no value at all. The track
 fills its container; give it a fixed width with `className`, as a bar in a file row does.
 
+**Contrast.** The bar takes the tone's text colour (`<tone>-on-soft`), at least 5.6:1 on
+the track in every mode, and a `line-strong` outline marks the end of the range at 4.7:1
+or more on the page. Under forced colours the track is `Canvas` and the bar `CanvasText`.
+
 <!-- /hand-written -->
 
 ## Import
@@ -33,10 +37,12 @@ import { Progress } from 'topclassui'
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `aria-label` or `aria-labelledby`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
+| `aria-label` | **yes**, or `aria-labelledby` | `string` | - | The name read out when no visible text names the bar. |
+| `aria-labelledby` | **yes**, or `aria-label` | `string` | - | The id of the visible text that names the bar. |
 | `indeterminate` | no | `boolean` | `false` | For a wait of unknown length: no value is announced and a short bar pulses. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The shared size scale, which sets the track height; custom emits none. |
 | `tone` | no | `primary` \| `neutral` \| `success` \| `warning` \| `danger` \| `info` | `"primary"` | The colour of the bar; the track stays neutral in every tone. |
