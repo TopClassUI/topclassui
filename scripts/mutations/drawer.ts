@@ -107,8 +107,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the lifted escape scope is written before the rest props of the drawer popup, so a data-overlay of the caller breaks its guard',
     file: CLIENT,
-    from: '          {...rest}\n          data-overlay={scope}\n',
-    to: '          data-overlay={scope}\n          {...rest}\n',
+    from: '            {...rest}\n            data-overlay={scope}\n',
+    to: '            data-overlay={scope}\n            {...rest}\n',
   },
   {
     label: 'the lifted escape scope of a drawer root is not handed to its popup, so every sheet carries an empty one',
@@ -197,8 +197,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the drawer popup drops the rest props, so ref, id, lang and initialFocus never reach it',
     file: CLIENT,
-    from: '          data-size={size}\n          {...rest}\n',
-    to: '          data-size={size}\n',
+    from: '            data-size={size}\n            {...rest}\n',
+    to: '            data-size={size}\n',
   },
   {
     label: 'the drawer popup no longer reports its placement, so nothing outside it can tell a bottom sheet from a side sheet',
@@ -221,8 +221,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the drawer x comes before the content in the markup, so it is the first stop of Tab and not the last',
     file: CLIENT,
-    from: '          {children}\n          <DrawerClose className={DRAWER_X[placement]} />\n',
-    to: '          <DrawerClose className={DRAWER_X[placement]} />\n          {children}\n',
+    from: '            {children}\n            <DrawerClose className={DRAWER_X[placement]} />\n',
+    to: '            <DrawerClose className={DRAWER_X[placement]} />\n            {children}\n',
   },
   {
     label: 'the drawer popup renders no x, so a sheet can only be closed by a drag or a key (WCAG 2.5.7)',
@@ -237,16 +237,16 @@ export const MUTATIONS: Mutation[] = [
     to: '<DrawerClose />',
   },
   {
-    label: 'a bottom drawer is no longer wrapped in the keyboard provider, so a tap on a field under the keyboard of a phone is left to the browser',
+    label: 'the drawer keyboard provider renders its children alone, so a tap on a field under the keyboard of a phone is left to the browser',
     file: CLIENT,
-    from: "return placement === 'bottom' ? <Base.VirtualKeyboardProvider>{portal}</Base.VirtualKeyboardProvider> : portal",
-    to: 'return portal',
+    from: "import { Drawer as Base } from '@base-ui/react/drawer'\n",
+    to: "import { Drawer as BaseUi } from '@base-ui/react/drawer'\nconst Base = { ...BaseUi, VirtualKeyboardProvider: ({ children }) => children }\n",
   },
   {
-    label: 'every drawer is wrapped in the keyboard provider, so a side sheet takes over the taps on its fields too',
+    label: 'the drawer keyboard provider is keyed by the placement, so an open sheet moved across a breakpoint is remounted and loses what was typed in it',
     file: CLIENT,
-    from: "return placement === 'bottom' ? <Base.VirtualKeyboardProvider>{portal}</Base.VirtualKeyboardProvider> : portal",
-    to: 'return <Base.VirtualKeyboardProvider>{portal}</Base.VirtualKeyboardProvider>',
+    from: '    <Base.VirtualKeyboardProvider>\n',
+    to: '    <Base.VirtualKeyboardProvider key={placement}>\n',
   },
   {
     label: 'the drawer popup never hands container to its portal, so it always mounts at the end of the body',
@@ -465,7 +465,7 @@ export const MUTATIONS: Mutation[] = [
     to: "placement: 'start',",
   },
   {
-    label: 'the drawer form demo is a side sheet, so the one demo of a field has no keyboard provider around it',
+    label: 'the drawer form demo is a side sheet, so the one demo of a field is not the bottom sheet a phone opens',
     file: `${DUMMY}/with-form.tsx`,
     from: '<DrawerRoot placement="bottom">',
     to: '<DrawerRoot>',
