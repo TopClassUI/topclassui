@@ -48,10 +48,10 @@ describe('on the server', () => {
     ])
   })
 
-  it('the caller aria-labelledby is on the first cell and not on the group', () => {
-    const out = markup(<OTPField aria-labelledby="code-label" />)
+  it('the caller aria-labelledby is on the first cell and on the group, so a tab stop on a later cell is in a named group', () => {
+    const out = markup(<OTPField aria-labelledby="code-label" defaultValue="12" />)
     expect(each(out, 'aria-labelledby')).toEqual(['code-label', undefined, undefined, undefined, undefined, undefined])
-    expect(root(out)).not.toContain('aria-labelledby')
+    expect(attr(root(out), 'aria-labelledby')).toBe('code-label')
   })
 
   it('aria-describedby is on the first cell only', () => {

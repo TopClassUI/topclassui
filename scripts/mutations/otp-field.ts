@@ -62,6 +62,12 @@ export const MUTATIONS: Mutation[] = [
     to: 'aria-describedby={ariaDescribedBy}',
   },
   {
+    label: 'the otp field group loses the caller aria-labelledby, so a tab stop on a later cell sits in an unnamed group',
+    file: CLIENT,
+    from: '        aria-labelledby={ariaLabelledBy}\n',
+    to: '',
+  },
+  {
     label: 'the otp field autoSubmit sends the last form on the page, not the field\'s own',
     file: HOOK,
     from: "if (autoSubmit) state.rootRef.current?.querySelector('input')?.form?.requestSubmit()",

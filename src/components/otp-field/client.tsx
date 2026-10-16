@@ -48,6 +48,7 @@ export function OTPField({
         onValueChange={otp.onValueChange}
         onValueComplete={otp.onValueComplete}
         dir="ltr"
+        aria-labelledby={ariaLabelledBy}
         data-size={size}
         className={cn(OTP_ROOT, otp.wraps && OTP_WRAP, className)}
       >
