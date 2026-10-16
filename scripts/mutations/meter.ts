@@ -11,8 +11,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the meter track loses forced-color-adjust-none, so forced colours repaint the bar to nothing',
     file: 'src/components/meter/classes.ts',
-    from: "'w-full overflow-hidden rounded-control bg-neutral-soft forced-color-adjust-none'",
-    to: "'w-full overflow-hidden rounded-control bg-neutral-soft'",
+    from: ' forced-color-adjust-none forced-colors:bg-[Canvas]',
+    to: ' forced-colors:bg-[Canvas]',
   },
   {
     label: 'the meter divides by zero when max equals min, instead of drawing a full track',
@@ -59,8 +59,44 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the meter warning bar is painted in primary',
     file: 'src/components/meter/classes.ts',
-    from: "warning: 'bg-warning-solid',",
-    to: "warning: 'bg-primary-solid',",
+    from: "warning: 'bg-warning-on-soft',",
+    to: "warning: 'bg-primary-on-soft',",
+  },
+  {
+    label: 'the meter warning bar goes back to the solid fill, 1.77:1 on its track',
+    file: 'src/components/meter/classes.ts',
+    from: "warning: 'bg-warning-on-soft',",
+    to: "warning: 'bg-warning-solid',",
+  },
+  {
+    label: 'the meter track loses its line-strong outline, so the end of the range is 1.2:1 on the page',
+    file: 'src/components/meter/classes.ts',
+    from: ' outline-solid outline-(length:--tc-line-width) outline-line-strong',
+    to: '',
+  },
+  {
+    label: 'the meter track keeps its theme fill under forced colours, 1.2:1 on a canvas of the same polarity',
+    file: 'src/components/meter/classes.ts',
+    from: ' forced-colors:bg-[Canvas] ',
+    to: ' ',
+  },
+  {
+    label: 'the meter track edge keeps its theme colour under forced colours',
+    file: 'src/components/meter/classes.ts',
+    from: ' forced-colors:outline-[CanvasText]',
+    to: '',
+  },
+  {
+    label: 'the meter bar keeps its theme fill under forced colours, 1.77:1 on its track in a matching palette',
+    file: 'src/components/meter/classes.ts',
+    from: "rounded-control forced-colors:bg-[CanvasText]'",
+    to: "rounded-control'",
+  },
+  {
+    label: 'check-contrast stops measuring the bar of Meter and Progress on its neutral track',
+    file: 'scripts/lib/contrast-checks.ts',
+    from: 'worst(onSoft, track), 3)',
+    to: 'worst(onSoft, track), 1)',
   },
   {
     label: 'the meter xs track is as tall as sm',

@@ -23,6 +23,10 @@ cannot say "one of two", which is why it is said here. `value` is clamped to 0-1
 it reaches ARIA or the bar, and an `indeterminate` bar announces no value at all. The track
 fills its container; give it a fixed width with `className`, as a bar in a file row does.
 
+**Contrast.** The bar takes the tone's text colour (`<tone>-on-soft`), at least 5.6:1 on
+the track in every mode, and a `line-strong` outline marks the end of the range at 4.7:1
+or more on the page. Under forced colours the track is `Canvas` and the bar `CanvasText`.
+
 <!-- /hand-written -->
 
 ## Import

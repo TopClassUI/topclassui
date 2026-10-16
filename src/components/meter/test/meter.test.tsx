@@ -9,8 +9,9 @@ const html = (props: MeterDesignProps = {}) => markup(<Meter aria-label="Battery
 /** The whole default render, written out, so an extra attribute or element also fails. */
 const DEFAULT = '<div aria-label="Battery" role="meter" aria-valuemin="0" aria-valuemax="100"'
   + ' aria-valuenow="0" data-tone="primary" data-size="md" style="--tc-meter-value:0%"'
-  + ' class="w-full overflow-hidden rounded-control bg-neutral-soft forced-color-adjust-none h-pad-y-md">'
-  + '<div class="h-full w-(--tc-meter-value) rounded-control bg-primary-solid"></div></div>'
+  + ' class="w-full overflow-hidden rounded-control bg-neutral-soft outline-solid outline-(length:--tc-line-width)'
+  + ' outline-line-strong forced-color-adjust-none forced-colors:bg-[Canvas] forced-colors:outline-[CanvasText] h-pad-y-md">'
+  + '<div class="h-full w-(--tc-meter-value) rounded-control forced-colors:bg-[CanvasText] bg-primary-on-soft"></div></div>'
 
 describe('the element it renders', () => {
   it('is a track div holding exactly one bar div, and nothing else', () => {

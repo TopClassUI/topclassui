@@ -28,12 +28,12 @@ describe('checkTokens', () => {
   })
 
   it('measures the number of pairs it claims; change this only on purpose', () => {
-    expect(run(css).pairs).toBe(339)
+    expect(run(css).pairs).toBe(357)
   })
 
   it('reports how many readings are distinct, since light and ocean share most tokens', () => {
     const report = run(css)
-    expect(report.distinct).toBe(205)
+    expect(report.distinct).toBe(216)
     expect(report.distinct).toBeLessThan(report.pairs)
   })
 })
@@ -98,6 +98,11 @@ describe('the thresholds bite', () => {
     const text = failures(broken)
     expect(text).toMatch(/--tc-soft-hover could not be resolved/)
     expect(text).not.toMatch(/--tc-soft-active could not be resolved/)
+  })
+
+  it('catches a Meter or Progress bar that fades into its neutral track', () => {
+    const faded = mutateMode('dark', '--tc-warning-on-soft: var(--color-amber-400);', '--tc-warning-on-soft: var(--color-neutral-700);')
+    expect(failures(faded)).toMatch(/dark: warning bar on the neutral track/)
   })
 
   it('names a missing surface instead of crashing', () => {

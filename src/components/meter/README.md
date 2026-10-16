@@ -23,6 +23,10 @@ reader can say "512 GB of 1 TB" instead of "512".
 **Clamped.** `min` and `max` stay within -1e15 and 1e15, `max` is raised to `min` when it
 is below it, and `value` is held between the two (`NaN` reads as `min`).
 
+**Contrast.** The bar takes the tone's text colour (`<tone>-on-soft`), at least 5.6:1 on
+the track in every mode, and a `line-strong` outline marks the end of the range at 4.7:1
+or more on the page. Under forced colours the track is `Canvas` and the bar `CanvasText`.
+
 **Width.** The track fills its container. In a `w-fit` parent it has nothing to fill and
 is 0 px wide, and in a table cell it gets what the other columns leave: give it a width of
 its own with `className`, as `w-40`.

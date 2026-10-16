@@ -1,19 +1,12 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { DIRECTIONS, MODES } from '../scripts/lib/harness.js'
+import { DIRECTIONS } from '../scripts/lib/harness.js'
 import { expectNoSidewaysScroll, liveErrors, openLive, type LiveOptions } from './live.js'
 import { urlFor } from './pages.js'
-import { contrast, pixelsOf, type Rgb } from './pixels.js'
+import { describeBarContrast } from './bar-contrast.js'
 
 // The static pages are the server HTML with no script: everything a Meter promises is in that HTML.
 const DEMOS = ['basic', 'custom-size', 'range', 'rtl', 'sizes', 'tones'] as const
-
-/** One painted pixel. */
-async function pixel(page: Page, x: number, y: number): Promise<Rgb> {
-  const [found] = await pixelsOf(page, { x: Math.floor(x), y: Math.floor(y), width: 1, height: 1 })
-  if (!found) throw new Error('no pixel')
-  return found
-}
 
 /** Each meter of the page: its track, its bar, and the ARIA a reader hears. */
 const meters = (page: Page) => page.locator('#demo [role="meter"]').evaluateAll((all) => all.map((meter) => {
@@ -25,19 +18,6 @@ const meters = (page: Page) => page.locator('#demo [role="meter"]').evaluateAll(
     bar: { left: bar.left, right: bar.right, width: bar.width, height: bar.height },
   }
 }))
-
-/** The bar and the track of each meter, sampled at a fifth and at nine tenths of the track. */
-async function fills(page: Page) {
-  const found = []
-  for (const meter of await page.locator('#demo [role="meter"]').all()) {
-    const box = await meter.boundingBox()
-    if (!box) throw new Error('a meter has no box')
-    const middle = box.y + box.height / 2
-    const inline = (share: number) => box.x + box.width * (share)
-    found.push({ bar: await pixel(page, inline(0.2), middle), track: await pixel(page, inline(0.9), middle) })
-  }
-  return found
-}
 
 test.describe('the bar sits where the range says', () => {
   for (const direction of DIRECTIONS) {
@@ -89,37 +69,7 @@ test.describe('the heights follow padding-y', () => {
   })
 })
 
-test.describe('the bar is painted', () => {
-  for (const mode of MODES) {
-    test(`${mode}: every tone paints a bar that differs from its track`, async ({ page }) => {
-      await page.goto(urlFor('meter--tones', mode, 'ltr'))
-      const found = await fills(page)
-      expect(found).toHaveLength(6)
-      // 1.5 is a floor for "painted at all": the 3:1 of WCAG 1.4.11 is not met by every tone (see the report).
-      for (const [index, { bar, track }] of found.entries()) expect(contrast(bar, track), `tone ${String(index)}`).toBeGreaterThan(1.5)
-    })
-  }
-
-  const FORCED = [
-    { theme: 'light', palette: 'dark', canvas: [0, 0, 0] },
-    { theme: 'dark', palette: 'light', canvas: [255, 255, 255] },
-  ] as const
-
-  for (const { theme, palette, canvas } of FORCED) {
-    test(`forced colours, a ${palette} palette over the ${theme} theme: the bar and the track keep their fills`, async ({ page }) => {
-      await page.emulateMedia({ forcedColors: 'active', colorScheme: palette })
-      await page.goto(urlFor('meter--tones', theme, 'ltr'))
-      // The palette's canvas and not the theme's page, or this measures nothing new.
-      expect(await pixel(page, 1, 1)).toEqual(canvas)
-      const found = await fills(page)
-      expect(found).toHaveLength(6)
-      for (const [index, { bar, track }] of found.entries()) {
-        expect(contrast(bar, track), `bar on track, tone ${String(index)}`).toBeGreaterThan(1.5)
-        expect(contrast(track, canvas), `track on canvas, tone ${String(index)}`).toBeGreaterThan(3)
-      }
-    })
-  }
-})
+describeBarContrast('meter', 'meter')
 
 test.describe('it takes no focus and does not move', () => {
   test('Tab passes over every meter of the page', async ({ page }) => {
