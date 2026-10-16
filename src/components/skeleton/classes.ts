@@ -1,8 +1,10 @@
 // R-5.12-4: Skeleton's own class tables. The radii and the control height are the shared knobs.
+import { FORCED_EDGE } from '#shared/classes.js'
 import type { SkeletonVariant } from './types.js'
 
-/** The fill Figma binds; the pulse is always on, as ButtonSkeleton's is, and reduced motion stops it. */
-export const SKELETON_FILL = 'bg-neutral-soft animate-pulse motion-reduce:animate-none'
+/** The fill Figma binds; the pulse is always on, as ButtonSkeleton's is, and reduced motion stops it.
+ * The fill is the whole shape, so it carries the line forced colours leave of it. */
+export const SKELETON_FILL = ['bg-neutral-soft animate-pulse motion-reduce:animate-none', FORCED_EDGE].join(' ')
 
 /** R-5.2-3: complete strings per shape. text is only a column; its rows carry the fill. */
 export const SKELETON_SHAPE = {

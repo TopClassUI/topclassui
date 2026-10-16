@@ -14,7 +14,7 @@ const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 const EXPECTED = ['counts', 'custom-size', 'four', 'in-table', 'linked', 'many', 'max', 'on-card', 'overflow', 'rtl', 'sizes', 'two']
 
 /** inline-flex and then the focus ring of the library, written out class by class. */
-const RINGED_LINK = 'inline-flex outline-hidden focus-visible:outline-solid focus-visible:outline-(length:--tc-ring-width)'
+const RINGED_LINK = 'inline-flex outline-none focus-visible:outline-solid focus-visible:outline-(length:--tc-ring-width)'
   + ' focus-visible:outline-offset-(length:--tc-ring-offset) focus-visible:outline-ring'
 
 const render = async (file: string) => {

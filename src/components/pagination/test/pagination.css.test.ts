@@ -119,3 +119,29 @@ describe('hover and pressed win over the resting fill', () => {
     expect(ruleOf('.tone-primary')).toContain('--tc-hover: var(--tc-primary-hover);')
   })
 })
+
+describe('the current page under forced colours', () => {
+  /** From the forced-colours query on. With no query this is one character, and every line below fails. */
+  const forced = () => css.slice(css.indexOf('@media (forced-colors: active)'))
+
+  it('paints the system pair and opts out of the adjustment that would repaint it', () => {
+    expect(forced()).toContain(`${selectorOf('forced-colors:bg-[Highlight]')} {\n      background-color: Highlight;`)
+    expect(forced()).toContain(`${selectorOf('forced-colors:text-[HighlightText]')} {\n      color: HighlightText;`)
+    expect(forced()).toContain(`${selectorOf('forced-colors:forced-color-adjust-none')} {\n      forced-color-adjust: none;`)
+  })
+
+  it('points the ring at the same system colour, since nothing forces it on this cell', () => {
+    expect(forced()).toContain(`${selectorOf('forced-colors:[--tc-ring:Highlight]')} {\n      --tc-ring: Highlight;`)
+  })
+
+  it('puts the forced fill after the hover and pressed fills, so it is the one painted under a pointer', () => {
+    const hover = css.indexOf(`${selectorOf('hover:bg-(--tc-hover)')}:hover`)
+    const pressed = css.indexOf(`${selectorOf('active:bg-(--tc-active)')}:active`)
+    const forcedHover = css.indexOf(`${selectorOf('forced-colors:hover:bg-[Highlight]')}:hover {\n        background-color: Highlight;`)
+    const forcedPressed = css.indexOf(`${selectorOf('forced-colors:active:bg-[Highlight]')}:active {\n      background-color: Highlight;`)
+    expect(hover, 'the hover fill is not emitted').toBeGreaterThan(-1)
+    expect(pressed, 'the pressed fill is not emitted after the hover one').toBeGreaterThan(hover)
+    expect(forcedHover, 'the forced hover fill is not emitted after the pressed one').toBeGreaterThan(pressed)
+    expect(forcedPressed, 'the forced pressed fill is not emitted after the forced hover one').toBeGreaterThan(forcedHover)
+  })
+})

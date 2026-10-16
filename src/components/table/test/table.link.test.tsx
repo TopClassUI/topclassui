@@ -31,7 +31,7 @@ const classesOf = (source: string, tag: string) =>
 
 const RING = [
   'focus-visible:outline-(length:--tc-ring-width)', 'focus-visible:outline-offset-(length:--tc-ring-offset)',
-  'focus-visible:outline-ring', 'focus-visible:outline-solid', 'outline-hidden',
+  'focus-visible:outline-ring', 'focus-visible:outline-solid', 'outline-none',
 ]
 
 describe('a sortable header is a real link', () => {
@@ -91,7 +91,7 @@ describe('the link prop: one element every sort link is cloned from (R-5.7-4)', 
   it('keeps the look and the words of the sort link, and merges the caller class last', () => {
     const html_ = html({ link: <Link href="" className="no-underline justify-center" />, sort: { key: 'amount', direction: 'descending' } })
     const [first] = anchors(html_)
-    expect(classList(first ?? '')).toEqual(expect.arrayContaining(['inline-flex', '-my-1', 'max-w-full', 'outline-hidden', 'no-underline', 'justify-center']))
+    expect(classList(first ?? '')).toEqual(expect.arrayContaining(['inline-flex', '-my-1', 'max-w-full', 'outline-none', 'no-underline', 'justify-center']))
     expect(classList(first ?? '')).not.toContain('justify-start')
     expect(html_).toContain('<span class="sr-only">Sort by </span>')
     expect(html_.split('<svg').length - 1).toBe(1)

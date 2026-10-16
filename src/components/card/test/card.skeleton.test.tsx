@@ -7,15 +7,20 @@ import type { CardSkeletonProps } from '../types.js'
 const html = (props: CardSkeletonProps = {}) => markup(<CardSkeleton {...props} />)
 const classes = (props: CardSkeletonProps = {}) => classList(html(props)).sort()
 
-/** The Build this classes plus the skeleton fill and pulse, sorted and written out. */
+/** The Build this classes plus the skeleton fill, its pulse and its forced-colours line, sorted and written out. */
 const EXACT = [
-  'animate-pulse', 'aspect-5/2', 'bg-neutral-soft', 'block',
+  'animate-pulse', 'aspect-5/2', 'bg-neutral-soft', 'block', 'forced-colors:outline-(length:--tc-line-width)',
   'motion-reduce:animate-none', 'rounded-box', 'w-full',
 ]
 
 describe('CardSkeleton', () => {
   it('carries exactly the card box, the fill Figma binds and the pulse', () => {
     expect(classes()).toEqual(EXACT)
+  })
+
+  // e2e/skeleton.spec measures it: with the fill erased, the box painted nothing at all.
+  it('keeps one line under forced colours, and no outline outside them', () => {
+    expect(classes().filter((c) => c.includes('outline'))).toEqual(['forced-colors:outline-(length:--tc-line-width)'])
   })
 
   it('is one empty div, because the ratio and not a line of text gives it its height', () => {
@@ -30,14 +35,14 @@ describe('CardSkeleton', () => {
 
   it('takes the real height from className and keeps the ratio as the fallback', () => {
     expect(classes({ className: 'h-40' })).toEqual([
-      'animate-pulse', 'aspect-5/2', 'bg-neutral-soft', 'block',
+      'animate-pulse', 'aspect-5/2', 'bg-neutral-soft', 'block', 'forced-colors:outline-(length:--tc-line-width)',
       'h-40', 'motion-reduce:animate-none', 'rounded-box', 'w-full',
     ])
   })
 
   it('lets every conflicting consumer class win, because className is passed last', () => {
     expect(classes({ className: 'rounded-chip w-16 aspect-video bg-surface' })).toEqual([
-      'animate-pulse', 'aspect-video', 'bg-surface', 'block',
+      'animate-pulse', 'aspect-video', 'bg-surface', 'block', 'forced-colors:outline-(length:--tc-line-width)',
       'motion-reduce:animate-none', 'rounded-chip', 'w-16',
     ])
   })

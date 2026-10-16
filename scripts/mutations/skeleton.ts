@@ -80,4 +80,10 @@ export const MUTATIONS: Mutation[] = [
     from: '          key={row}\n',
     to: '          key={row}\n          {...rest}\n',
   },
+  {
+    label: 'the skeleton fill loses its line, so every shape and every row paints nothing in forced colours',
+    file: 'src/components/skeleton/classes.ts',
+    from: "['bg-neutral-soft animate-pulse motion-reduce:animate-none', FORCED_EDGE].join(' ')",
+    to: "'bg-neutral-soft animate-pulse motion-reduce:animate-none'",
+  },
 ]
