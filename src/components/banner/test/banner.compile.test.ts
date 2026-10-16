@@ -18,6 +18,8 @@ const PRELUDE = [
   "import { Svg } from '#components/svg/index.js'",
   "import { bell } from '#icons/data/bell.js'",
   'export const used = [Banner, Button, Svg, bell]',
+  'declare const flag: boolean',
+  'export const decided = flag',
 ].join('\n')
 
 const wrap = (code: string) => `${PRELUDE}\nexport const sample = (\n<>\n${code}\n</>\n)\n`
@@ -65,6 +67,9 @@ const verdict = compile({
   handlerAlone: '<Banner aria-label="N" onDismiss={() => undefined}>Out.</Banner>',
   plainWithId: '<Banner aria-label="N" id="a">Out.</Banner>',
   numberId: '<Banner aria-label="N" dismissible id={2}>Out.</Banner>',
+  flagWithId: '<Banner aria-label="N" dismissible={flag} id="a" onDismiss={() => undefined}>Out.</Banner>',
+  flagNoId: '<Banner aria-label="N" dismissible={flag}>Out.</Banner>',
+  handlerWithIdAlone: '<Banner aria-label="N" id="a" onDismiss={() => undefined}>Out.</Banner>',
 })
 
 describe('the samples in the README compile as written', () => {
@@ -95,6 +100,13 @@ describe('the id rule is a type', () => {
 
   it('refuses onDismiss on a banner that has no x', () => {
     expect(verdict['handlerAlone']).toHaveLength(1)
+    expect(verdict['handlerWithIdAlone']).toHaveLength(1)
+  })
+
+  it('takes a boolean decided at runtime, which needs the id whatever its value (R-5.7-1)', () => {
+    expect(verdict['flagWithId']).toEqual([])
+    expect(verdict['flagNoId']).toHaveLength(1)
+    expect(verdict['flagNoId']?.[0]).toContain("dismissible: boolean; }' is not assignable to type 'IntrinsicAttributes & BannerProps'")
   })
 
   it('leaves the id optional on a plain banner, and a string everywhere', () => {
