@@ -114,6 +114,26 @@ describe('an error from the nearest FormAction', () => {
     expect(shown()['Email']).toBe('')
   })
 
+  it('goes from every Field of a name its form shares once one of them changes, and from no other name or form (choice 33)', async () => {
+    const box = (label: string, value: string) => (
+      <FieldLive name="contact" label={label} inline>{(control) => <Checkbox {...control} value={value} />}</FieldLive>
+    )
+    render(
+      <FormErrorsContext value={{ contact: 'Pick one', note: 'Add a note' }}>
+        <form>
+          {box('Email me', 'email')}{box('Text me', 'sms')}
+          <FieldLive name="note" label="Note">{(control) => <Input {...control} />}</FieldLive>
+        </form>
+        <form>{box('Call me', 'call')}</form>
+      </FormErrorsContext>,
+    )
+    await settle()
+    expect(shown()).toEqual({ 'Email me': 'Pick one (invalid)', 'Text me': 'Pick one (invalid)', Note: 'Add a note (invalid)', 'Call me': 'Pick one (invalid)' })
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Email me' }))
+    await frame()
+    expect(shown()).toEqual({ 'Email me': '', 'Text me': '', Note: 'Add a note (invalid)', 'Call me': 'Pick one (invalid)' })
+  })
+
   it('a second answer with no errors clears every field', async () => {
     const view = render(inForm(ERRORS))
     await settle()

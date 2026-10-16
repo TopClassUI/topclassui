@@ -422,6 +422,39 @@ test.describe('live: FieldLive under a React 19 form action', () => {
   })
 })
 
+test.describe('live: one name on several FieldLive, under a React 19 form action (choice 33)', () => {
+  const FORM = '#field-shared-name'
+  /** By label: the error text the field shows, and whether its control is invalid. */
+  const shown = (page: Page) => page.locator(`${FORM} label[id$="-label"]`).evaluateAll((labels) => labels.map((label) => {
+    const control = document.querySelector(`[aria-labelledby="${label.id}"]`)
+    const error = document.getElementById(`${label.id.slice(0, -'-label'.length)}-err`)?.textContent ?? ''
+    return `${label.textContent} | ${error} | ${control?.getAttribute('aria-invalid') === 'true' ? 'invalid' : ''}`
+  }))
+  const send = async (page: Page, answers: string) => {
+    await page.getByRole('button', { name: 'Send' }).click()
+    await expect(page.locator(FORM)).toHaveAttribute('data-answers', answers)
+  }
+  test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
+
+  for (const how of ['a click', 'the space bar'] as const) {
+    test(`${how} on one box clears the group's error from every box of the name, and from no other field`, async ({ page }) => {
+      await openLive(page, 'separator--horizontal')
+      await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/field-shared-name.tsx' })
+      await expect(page.locator(FORM)).toHaveAttribute('data-answers', '0')
+      await send(page, '1')
+      await expect.poll(() => shown(page)).toEqual(['Email me | Pick one | invalid', 'Text me | Pick one | invalid', 'Note | Add a note | invalid'])
+      const email = page.getByRole('checkbox', { name: 'Email me' })
+      if (how === 'a click') await email.click()
+      else { await email.focus(); await page.keyboard.press('Space') }
+      await expect(email).toBeChecked()
+      await expect.poll(() => shown(page)).toEqual(['Email me |  | ', 'Text me |  | ', 'Note | Add a note | invalid'])
+      await send(page, '2')
+      await expect.poll(() => shown(page)).toEqual(['Email me | Pick one | invalid', 'Text me | Pick one | invalid', 'Note | Add a note | invalid'])
+      await expect(email).toBeChecked()
+    })
+  }
+})
+
 test.describe('live: a reset', () => {
   test('form.reset() and the reset button put the server defaults back; Field keeps every id and reference', async ({ page }) => {
     await openLive(page, 'field--form')

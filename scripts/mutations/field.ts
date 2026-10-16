@@ -59,14 +59,26 @@ export const MUTATIONS: Mutation[] = [
   {
     label: "field: FieldLive's error no longer goes after a change of the field's value",
     file: HOOK,
-    from: 'if (before !== null && !sameEntries(before, entriesOf(rootRef.current, name))) setAnswered(errors)',
-    to: 'if (before !== null && !sameEntries(before, entriesOf(rootRef.current, name))) void before',
+    from: '    if (before === null || sameEntries(before, entriesOf(rootRef.current, name))) return false\n    setAnswered(errors)\n',
+    to: '    if (before === null || sameEntries(before, entriesOf(rootRef.current, name))) return false\n',
   },
   {
     label: "field: FieldLive's error goes after any click, one that changes nothing included",
     file: HOOK,
-    from: 'if (before !== null && !sameEntries(before, entriesOf(rootRef.current, name))) setAnswered(errors)',
-    to: 'if (before !== null) setAnswered(errors)',
+    from: 'if (before === null || sameEntries(before, entriesOf(rootRef.current, name))) return false',
+    to: 'if (before === null) return false',
+  },
+  {
+    label: 'field: a change tells no other FieldLive of the form, so a second box of the same name stays invalid after the answer',
+    file: HOOK,
+    from: 'if (answer() && root) formOf(root)?.dispatchEvent(new Event(FIELD_CHANGE_EVENT))',
+    to: 'if (answer() && root) void formOf(root)',
+  },
+  {
+    label: "field: a FieldLive told of a change drops its error without reading its own entries, so a field of another name clears too",
+    file: HOOK,
+    from: 'const recheck = () => { answer() }',
+    to: 'const recheck = () => { setAnswered(errors) }',
   },
   {
     label: "field: FieldLive keys the answered error on nothing, so the action's next answer does not bring it back",

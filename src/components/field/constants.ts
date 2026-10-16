@@ -12,3 +12,6 @@ export const FIELD_ID_SUFFIX = {
   hint: '-hint',
   error: '-err',
 } as const
+
+/** Dispatched on the form when a FieldLive's entries change, so every other FieldLive in it reads its own again. */
+export const FIELD_CHANGE_EVENT = 'tc-field-change'
