@@ -117,8 +117,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the radio group checked circle loses its inset ring, so checked is a 1 px line',
     file: CLASSES,
-    from: ' group-data-checked/toggle:inset-ring-[calc(var(--tc-ring-width)-var(--tc-line-width))] group-data-checked/toggle:inset-ring-primary-solid',
-    to: ' group-data-checked/toggle:inset-ring-primary-solid',
+    from: ' group-data-checked/toggle:inset-ring-[calc(var(--tc-ring-width)-var(--tc-line-width))] group-data-checked/toggle:inset-ring-primary-on-soft',
+    to: ' group-data-checked/toggle:inset-ring-primary-on-soft',
   },
   {
     label: 'the radio group invalid checked circle loses its danger line, so the primary line hides that it is wrong',
@@ -197,5 +197,17 @@ export const MUTATIONS: Mutation[] = [
     file: HOOK,
     from: '    picked.current = next\n',
     to: '',
+  },
+  {
+    label: 'the radio group dot is primary-solid again, 2.57:1 on the dark fill, under the 3:1 of R-5.6-4',
+    file: CLASSES,
+    from: ' text-primary-on-soft ',
+    to: ' text-primary-solid ',
+  },
+  {
+    label: 'the radio group checked line is primary-solid again, a colour apart from its dot',
+    file: CLASSES,
+    from: 'toggle:border-primary-on-soft',
+    to: 'toggle:border-primary-solid',
   },
 ]
