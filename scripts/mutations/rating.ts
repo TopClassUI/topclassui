@@ -87,6 +87,12 @@ export const MUTATIONS: Mutation[] = [
     to: 'flex overflow-hidden text-warning-solid',
   },
   {
+    label: 'rating: a change keeps the hover preview, so the arrows move the value but not the stars',
+    file: 'src/components/rating/hook.ts',
+    from: '=> { setHovered(null); setChecked(Number(event.currentTarget.value)) }',
+    to: '=> { setChecked(Number(event.currentTarget.value)) }',
+  },
+  {
     label: 'rating: a read-only rating renders the client half, so a page of stars hydrates',
     file: 'src/components/rating/index.tsx',
     from: "return props.readOnly === false ? <Editable {...props} /> : <ReadOnly {...props} />",

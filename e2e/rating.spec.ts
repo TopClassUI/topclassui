@@ -186,6 +186,19 @@ test.describe('the keyboard is the browser\'s own radio group', () => {
 })
 
 test.describe('the pointer', () => {
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: after a click the arrows move the fill, though the pointer still rests on the clicked star`, async ({ page }) => {
+      await openLive(page, 'rating--editable', { direction })
+      await group(page).locator('label').nth(1).click()
+      expect(await fills(group(page))).toEqual([1, 1, 0, 0, 0])
+      const next = direction === 'ltr' ? 'ArrowRight' : 'ArrowLeft'
+      await page.keyboard.press(next)
+      await page.keyboard.press(next)
+      expect(await where(page)).toEqual({ focus: 4, checked: 4 })
+      expect(await fills(group(page))).toEqual([1, 1, 1, 1, 0])
+    })
+  }
+
   test('fills up to the hovered star, and leaving puts the value back', async ({ page }) => {
     await openLive(page, 'rating--editable')
     const steps = group(page).locator('label')

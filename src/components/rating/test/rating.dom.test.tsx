@@ -92,6 +92,20 @@ describe('the pointer fills up to the star it is on', () => {
     expect(fills(group)).toEqual([1, 1, 0, 0, 0])
   })
 
+  it('a change while the pointer rests on a star shows the checked step, not the hovered one', () => {
+    render(<Rating readOnly={false} aria-label="Stay" />)
+    const group = screen.getByRole('radiogroup')
+    fireEvent.pointerEnter(group.querySelectorAll('label')[1] as HTMLLabelElement)
+    fireEvent.click(radios()[1] as HTMLInputElement)
+    expect(fills(group)).toEqual([1, 1, 0, 0, 0])
+    // An arrow key checks another radio with no pointer event: the pointer is still on star 2.
+    fireEvent.click(radios()[3] as HTMLInputElement)
+    expect(checkedStep()).toBe(4)
+    expect(fills(group)).toEqual([1, 1, 1, 1, 0])
+    fireEvent.pointerEnter(group.querySelectorAll('label')[0] as HTMLLabelElement)
+    expect(fills(group), 'the next star the pointer enters previews again').toEqual([1, 0, 0, 0, 0])
+  })
+
   it('still calls the caller\'s onPointerLeave', () => {
     const onPointerLeave = vi.fn()
     render(<Rating readOnly={false} aria-label="Stay" onPointerLeave={onPointerLeave} />)

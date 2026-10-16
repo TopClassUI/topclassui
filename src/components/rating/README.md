@@ -36,7 +36,8 @@ import { Rating } from 'topclassui'
 - **Keyboard.** The browser's own radio group. Tab enters on the checked star, or on the
   first when none is; the arrows move and select; Tab leaves. In Arabic, Chromium moves
   with the eye: the right arrow goes to the star at the right, which is the lower one.
-- **Pointer.** The stars fill up to the one under the pointer and go back on leaving.
+- **Pointer.** The stars fill up to the one under the pointer and go back on leaving. A
+  change, by click or by key, shows the checked step until the pointer moves to another star.
 - **Disabled.** Dimmed; no key, no click, no fill on hover, and nothing is submitted.
 - **Size.** The star follows the icon scale, 16 to 40 px; `custom` draws it at 1em. Each
   editing star is at least 24 px to press, and 44 px under a coarse pointer.
