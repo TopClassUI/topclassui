@@ -134,8 +134,15 @@ describe('limits, clamped (R-5.7-7)', () => {
 describe('what reaches the root', () => {
   it('a div with role group, its size, and the classes of the box that owns the width', () => {
     const html = volume()
-    expect(root(html)).toMatch(/^<div data-orientation="horizontal" id="[^"]+" role="group" data-size="md" class="/)
+    expect(root(html)).toMatch(/^<div data-orientation="horizontal" id="[^"]+" role="group" dir="ltr" data-size="md" class="/)
     expect(attr(root(html), 'class')?.split(' ')).toEqual(expect.arrayContaining(['group/slider', 'grid', 'w-fit', 'grid-cols-[minmax(0,var(--tc-input-width))]', 'text-sm']))
+  })
+
+  it('the root carries the direction Base UI runs its keys and pointer in, so the thumb is drawn the same way', () => {
+    expect(attr(root(volume()), 'dir')).toBe('ltr')
+    const group = tag(markup(<TopClassProvider direction="rtl" locale="ar"><Slider aria-label="Volume" /></TopClassProvider>), 'div').filter((div) => div.includes('role="group"'))
+    expect(group.map((div) => attr(div, 'dir'))).toEqual(['rtl'])
+    expect(attr(root(volume({ dir: 'rtl' })), 'dir')).toBe('ltr')
   })
 
   it('in the server HTML invalid sets aria-invalid on the group only, the range inputs take it at hydration; off, a caller aria-invalid survives', () => {

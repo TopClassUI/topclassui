@@ -1,5 +1,6 @@
 'use client'
 
+import { useDirection } from '@base-ui/react/direction-provider'
 import { useCallback, useImperativeHandle, useMemo } from 'react'
 
 import { clamp } from '#shared/clamp.js'
@@ -59,6 +60,8 @@ export function useSlider(props: SliderStateProps) {
     }))
 
   return {
+    // Base UI's keys and pointer follow its provider while the thumb's inset follows the CSS direction: one dir for both.
+    dir: useDirection(),
     value: state.value,
     onValueChange: onChange,
     rootRef: state.rootRef,

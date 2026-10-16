@@ -43,6 +43,12 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
+    label: 'the slider root loses its dir, so with no provider on an rtl page the thumb is drawn off its value',
+    file: CLIENT,
+    from: '      dir={slider.dir}\n',
+    to: '',
+  },
+  {
     label: 'the slider hands Base UI defaultValue again, so a form reset leaves the thumb where it was',
     file: CLIENT,
     from: '      value={slider.value as Value}\n      onValueChange={slider.onValueChange}\n',

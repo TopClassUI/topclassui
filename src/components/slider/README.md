@@ -50,7 +50,8 @@ ArrowRight and ArrowUp add a `step`, ArrowLeft and ArrowDown take one away, Page
 Down or Shift with an arrow move by `largeStep` (10), Home and End go to `min` and `max`, or to
 the other thumb of a range. **Under an RTL `TopClassProvider` the track runs from the right**:
 ArrowLeft adds a step and ArrowRight takes one away, and a value of 30 sits 30% in from the
-right. A demo with no provider keeps the LTR keys whatever its `dir`. A press on the track moves
+right. With no provider the slider runs left to right, its keys and its drawing alike, whatever
+the page's `dir`: its root carries the provider's direction. A press on the track moves
 the nearest thumb there; a drag moves it with the pointer.
 
 **`min`, `max` and `step`** are Base UI's 0, 100 and 1, clamped to plus or minus 1e15 and a

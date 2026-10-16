@@ -48,6 +48,7 @@ export function Slider<Value extends SliderValue = number>({
       {...rest}
       {...slider.root}
       ref={slider.rootRef}
+      dir={slider.dir}
       value={slider.value as Value}
       onValueChange={slider.onValueChange}
       min={slider.limits.min}

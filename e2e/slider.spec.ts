@@ -387,6 +387,24 @@ test.describe('live: a press and a drag', () => {
     })
   }
 
+  for (const pointer of ['fine', 'coarse'] as const) {
+    test.describe(`no provider on an rtl page, ${pointer} pointer`, () => {
+      test.use(pointer === 'coarse' ? COARSE : {})
+
+      test('the slider runs left to right as its keys do: the thumb of 30 sits 30% from the left, and a press lands under the finger', async ({ page }) => {
+        await openLive(page, 'separator--horizontal', { direction: 'rtl' })
+        await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/slider-no-provider.tsx' })
+        const input = thumbIn(page, 'No provider')
+        await expect(input).toBeVisible()
+        expect(await fromLeft(input)).toBe(30)
+        const at = await pointOn(input, 0.75)
+        if (pointer === 'fine') await page.mouse.click(at.x, at.y)
+        else await page.touchscreen.tap(at.x, at.y)
+        expect([await valueOf(input), await fromLeft(input)]).toEqual(['75', 75])
+      })
+    })
+  }
+
   test('an rtl island on an ltr page: the thumb of 30 sits 30% in from the right', async ({ page }) => {
     await openLive(page, 'slider--rtl', { direction: 'ltr' })
     expect(await fromLeft(thumbIn(page, 'مستوى الصوت'))).toBe(70)
