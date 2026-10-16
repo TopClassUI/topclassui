@@ -232,9 +232,13 @@
     color-scheme: dark;
   }
 
-  /* font-family inherits resolved, so only setting the property works when nested. */
-  :lang(ar) {
+  /* The element that carries lang only: :lang() also matches every descendant and would undo a font-mono beneath it. */
+  [lang|='ar'] {
     font-family: var(--tc-font-arabic);
+  }
+
+  /* R-5.3-3: every Arabic descendant, since spaced letters no longer join. */
+  :lang(ar) {
     letter-spacing: 0;
   }
 
