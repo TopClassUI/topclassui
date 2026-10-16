@@ -134,13 +134,14 @@ import { Combobox } from 'topclassui'
 
 ## Props
 
-Required: `items`. Every other prop below is optional.
+Required: `items`, `aria-label` or `aria-labelledby` or `id`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
 | `items` | **yes** | `readonly ListOption[]` | - | The options, as plain data a Server Component can pass. Keep the array stable between renders. |
-| `aria-label` | no | `string` | - | The name read out when no visible label names the control. |
-| `aria-labelledby` | no | `string` | - | The id of the visible text that names the control. |
+| `aria-label` | **yes**, or `aria-labelledby` or `id` | `string` | - | The name read out when no visible label names the control. |
+| `aria-labelledby` | **yes**, or `aria-label` or `id` | `string` | - | The id of the visible text that names the control. |
+| `id` | **yes**, or `aria-label` or `aria-labelledby` | `string` | - | The id a `<label htmlFor>` points at. |
 | `className` | no | `string` | - | On the input, merged last. |
 | `container` | no | `Base.Portal.Props['container']` | - | Where the list mounts; the body when left out. |
 | `defaultValue` | no | `string \| null` | - | The value the page opens on, and the one a form reset returns to. |
