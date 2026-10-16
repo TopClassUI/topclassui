@@ -189,6 +189,9 @@
   --tc-danger-soft-active: color-mix(in oklch, var(--tc-danger-solid) calc(var(--tc-danger-mix) + 16%), var(--tc-page));
   --tc-info-soft-hover: color-mix(in oklch, var(--tc-info-solid) calc(var(--tc-info-mix) + 8%), var(--tc-page));
   --tc-info-soft-active: color-mix(in oklch, var(--tc-info-solid) calc(var(--tc-info-mix) + 16%), var(--tc-page));
+
+  /* A scrollbar thumb on the neutral fill: halfway, so it stands 3:1 off both the fill and a ring in the on-solid colour. */
+  --tc-neutral-solid-thumb: color-mix(in oklch, var(--tc-neutral-on-solid) 50%, var(--tc-neutral-solid));
 }
 
 /* Both blocks: these inherit, so an ltr island in an rtl page needs its own reset. */

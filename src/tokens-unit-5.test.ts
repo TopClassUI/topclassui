@@ -45,3 +45,13 @@ describe('the unit 5 tokens on the root', () => {
     expect(findUndefinedReferences(definedTokens(css), [reader])).toEqual([])
   })
 })
+
+// e2e/code-block.spec.ts measures it 3:1 off the fill and off the on-solid ring in every mode, over a real scrollbar.
+describe('the scrollbar thumb on the neutral fill', () => {
+  it('is halfway between the fill and its text, on every themed element, so a nested theme recomputes it', () => {
+    const themed = blocks.filter((block) => block.decls.has('--tc-neutral-solid-thumb'))
+    expect(themed.map((block) => [block.selector.replace(/\s+/g, ' '), block.decls.get('--tc-neutral-solid-thumb')])).toEqual([
+      [':root, [data-theme]', 'color-mix(in oklch, var(--tc-neutral-on-solid) 50%, var(--tc-neutral-solid))'],
+    ])
+  })
+})

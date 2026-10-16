@@ -140,6 +140,18 @@ export const MUTATIONS: Mutation[] = [
     to: '${FOCUS_RING_INSET}`',
   },
   {
+    label: 'the code block scrollbar is drawn in the page scheme, so the pre ring bottom side lands on a track of its own colour',
+    file: CLASSES,
+    from: ' [scrollbar-color:var(--tc-neutral-solid-thumb)_var(--tc-neutral-solid)]',
+    to: '',
+  },
+  {
+    label: 'tokens: the thumb on the neutral fill is the on-solid colour, so the pre ring bottom side vanishes along it',
+    file: 'src/tokens.css',
+    from: '--tc-neutral-solid-thumb: color-mix(in oklch, var(--tc-neutral-on-solid) 50%, var(--tc-neutral-solid));',
+    to: '--tc-neutral-solid-thumb: var(--tc-neutral-on-solid);',
+  },
+  {
     label: 'the code block root loses its one column, so a long line widens a grid or flex parent',
     file: CLASSES,
     from: 'relative grid min-w-0 grid-cols-1 rounded-box',

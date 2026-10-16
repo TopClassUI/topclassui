@@ -55,6 +55,11 @@ describe('what the rules set', () => {
     expect(blockOf('bg-neutral-solid')).toContain('var(--tc-neutral-solid)')
   })
 
+  it('a classic scrollbar on the pre takes the block colours: the halfway thumb on the block fill, never the page scheme', () => {
+    expect(blockOf('[scrollbar-color:var(--tc-neutral-solid-thumb)_var(--tc-neutral-solid)]'))
+      .toContain('scrollbar-color: var(--tc-neutral-solid-thumb) var(--tc-neutral-solid)')
+  })
+
   it('the code keeps its spaces, a tab is two columns, and it scrolls sideways', () => {
     expect(blockOf('whitespace-pre')).toContain('white-space: pre')
     expect(blockOf('tab-2')).toContain('tab-size: 2')
