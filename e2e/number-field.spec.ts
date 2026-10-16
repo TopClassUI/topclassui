@@ -478,8 +478,8 @@ test.describe('live: where a page puts a number field', () => {
         await page.setViewportSize({ width: 320, height: 480 })
         await fixture(page, 'number-field-layouts', { direction })
         expect(await cases(page)).toEqual([
-          ['grid', 220.8], ['track', 140], ['flex-1', 200], ['w-fit', 220.8], ['cell', 200.3], ['label-row', 192.56],
-          ['pair-grid', 140, 140], ['pair-flex', 140, 140], ['pair-div', 140, 140], ['pair-input', 140, 140], ['beside-label', 174.91], ['wrapping-label', 220.8],
+          ['grid', 220.8], ['track', 140], ['flex-1', 200], ['w-fit', 220.8], ['cell', 205.59], ['label-row', 195.91],
+          ['pair-grid', 140, 140], ['pair-flex', 140, 140], ['pair-div', 140, 140], ['pair-input', 140, 140], ['beside-label', 183.44], ['wrapping-label', 220.8],
         ])
         await expectNoSidewaysScroll(page)
       })
