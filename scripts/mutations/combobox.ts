@@ -57,10 +57,16 @@ export const MUTATIONS: Mutation[] = [
     to: '    loadMoreThreshold: props.loadMoreThreshold ?? COMBOBOX_DEFAULTS.loadMoreThreshold,',
   },
   {
-    label: 'the combobox asks for a page before useCollection has read the list, which it holds as at its end',
+    label: 'the combobox pages while closed, so a list kept mounted asks for one page after another nobody sees',
     file: HOOK,
-    from: '    hasMore: hasMore && counted === filtered.length,',
+    from: '    hasMore: hasMore && open,',
     to: '    hasMore,',
+  },
+  {
+    label: 'the combobox counts a page by the matches of the query, so a page with no new match stops the paging and typing asks again',
+    file: HOOK,
+    from: '    loadedCount: loaded,\n',
+    to: '',
   },
   {
     label: 'the combobox stops copying the text of its label onto the input, which then has no name while the list is open',

@@ -33,8 +33,10 @@ export function useCombobox(props: ComboboxValueProps) {
   const named = props['aria-label'] !== undefined || props['aria-labelledby'] !== undefined
   const [spoken, setSpoken] = useState(undefined as string | undefined)
   useEffect(() => { if (!named) setSpoken(nameFromLabels(input.current)) }, [named])
+  const [opened, setOpened] = useState(props.defaultOpen ?? false)
   const onOpen = (next: boolean, details: ComboboxChangeDetails) => {
     props.onOpenChange?.(next, details)
+    if (!details.isCanceled) setOpened(next)
     if (next && !named) setSpoken(nameFromLabels(input.current))
   }
 
@@ -56,6 +58,8 @@ export function useCombobox(props: ComboboxValueProps) {
     onValueChange: onChange,
     onItemHighlighted: onHighlight,
     onOpenChange: onOpen,
+    open: props.open ?? opened,
+    loaded: items.length,
     inputRef: state.inputRef,
     ref: input,
     label: props['aria-label'] ?? spoken,
@@ -79,15 +83,18 @@ export function useCombobox(props: ComboboxValueProps) {
 
 /** The list, windowed by the shared hook (R-8.5-1): the matches Base UI filtered, the rows to mount, the spacers that
  * stand for the rest, and the scroller the root calls with the index of a highlighted row. */
-export function useComboboxList({ scroller, virtualize, hasMore, loadMore, loadMoreThreshold, rows, selected }: ComboboxListProps) {
+export function useComboboxList({
+  scroller, virtualize, hasMore, open, loaded, loadMore, loadMoreThreshold, rows, selected,
+}: ComboboxListProps) {
   const filtered: readonly ListOption[] = Base.useFilteredItems()
   const [unit, setUnit] = useState(COMBOBOX_ROW_ESTIMATE)
   const collection = useCollection({
     items: filtered,
     getKey: keyOfOption,
     virtualize,
-    hasMore,
+    hasMore: hasMore && open,
     loadMore,
+    loadedCount: loaded,
     loadMoreThreshold,
     estimateRowHeight: unit,
   })

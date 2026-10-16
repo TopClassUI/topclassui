@@ -39,7 +39,12 @@ function edgesOf(node: HTMLElement) {
 /** useLayoutEffect warns during a server render, and there is nothing to measure there. */
 const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
-export function useCollection<T>(props: CollectionProps<T>): UseCollectionResult<T> {
+export interface UseCollectionOptions<T> extends CollectionProps<T> {
+  /** How many items are loaded, when `items` is a filtered view of them: one page is asked per value of it. */
+  loadedCount?: number | undefined
+}
+
+export function useCollection<T>(props: UseCollectionOptions<T>): UseCollectionResult<T> {
   const defaults = useCollectionDefaults()
   const {
     items,
@@ -52,6 +57,7 @@ export function useCollection<T>(props: CollectionProps<T>): UseCollectionResult
   } = props
 
   const count = items.length
+  const loaded = props.loadedCount ?? count
   const virtualized =
     virtualize === true || (virtualize === 'auto' && count > defaults.virtualizeAbove)
 
@@ -153,14 +159,14 @@ export function useCollection<T>(props: CollectionProps<T>): UseCollectionResult
     ? shouldLoadMore(end, count, loadMoreThreshold, hasMore)
     : hasMore && edge.atEnd)
 
-  // Asked once per page: the guard only clears when items grows or the promise rejects.
+  // Asked once per page: the guard only clears when the loaded count grows or the promise rejects.
   const askedAt = useRef(-1)
   useEffect(() => {
     if (!loadMore || !wantsMore) return
-    if (askedAt.current === count) return
-    askedAt.current = count
+    if (askedAt.current === loaded) return
+    askedAt.current = loaded
     void Promise.resolve(loadMore()).catch(() => { askedAt.current = -1 })
-  }, [loadMore, wantsMore, count])
+  }, [loadMore, wantsMore, loaded])
 
   const scrollToIndex = useCallback(
     (index: number, block: ScrollBlock = 'nearest') => {

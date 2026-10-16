@@ -373,6 +373,39 @@ test.describe('live: paging, through load-more', () => {
     await expect(asked).toHaveText('Pages asked for: 3, loaded: 4')
   })
 
+  test('a query whose matches sit on later pages keeps asking, one page per length of items, and reaches them', async ({ page }) => {
+    await openLive(page, 'combobox--load-more')
+    const asked = page.getByTestId('asked')
+    await inputOf(page, 'Search results').click()
+    await atRest(popupOf(page))
+    await inputOf(page, 'Search results').fill('Result 15')
+    // Page 2 holds no new match: the list stays one row long, at its end, and the next page is still asked for.
+    await expect(asked).toHaveText('Pages asked for: 3, loaded: 4')
+    await expect(page.getByRole('option')).toHaveText(['Result 15', ...Array.from({ length: 10 }, (_, n) => `Result ${String(150 + n)}`)])
+    await page.evaluate(() => new Promise((done) => { setTimeout(done, 400) }))
+    await expect(asked).toHaveText('Pages asked for: 3, loaded: 4')
+  })
+
+  test('typing while a page loads asks for nothing more: the next ask waits for the page', async ({ page }) => {
+    await openLive(page, 'combobox--load-more')
+    const asked = page.getByTestId('asked')
+    await inputOf(page, 'Search results').click()
+    await atRest(popupOf(page))
+    // Each change of the line, as pages asked for less pages loaded: one page in flight at most reads 0.
+    await asked.evaluate((node) => {
+      const ahead: number[] = []
+      const read = () => { const [ask = 0, have = 0] = (node.textContent.match(/\d+/g) ?? []).map(Number); ahead.push(ask - have) }
+      new MutationObserver(read).observe(node, { childList: true, characterData: true, subtree: true })
+      Object.assign(window, { ahead })
+    })
+    await page.keyboard.type('Result 199')
+    await expect(asked).toHaveText('Pages asked for: 3, loaded: 4')
+    await expect(page.getByRole('option')).toHaveText(['Result 199'])
+    await page.evaluate(() => new Promise((done) => { setTimeout(done, 400) }))
+    await expect(asked).toHaveText('Pages asked for: 3, loaded: 4')
+    expect(Math.max(...await page.evaluate(() => (window as unknown as { ahead: number[] }).ahead))).toBe(0)
+  })
+
   test('status: loading turns the caret into a spinner, says Loading in the list, and marks the input busy', async ({ page }) => {
     await open(page, 'combobox--status', 'City, loading')
     expect(await inputOf(page, 'City, loading').getAttribute('aria-busy')).toBe('true')

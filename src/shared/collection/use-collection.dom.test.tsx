@@ -129,6 +129,17 @@ describe('loading more', () => {
     expect(loadMore).not.toHaveBeenCalled()
   })
 
+  it('with loadedCount, a page is asked per loaded count: a page that adds no row still asks for the next, and a new view of the same pages asks nothing', () => {
+    const loadMore = vi.fn()
+    const one = makeItems(1)
+    const { rerender } = render(<List items={one} loadedCount={50} hasMore loadMore={loadMore} />)
+    expect(loadMore).toHaveBeenCalledTimes(1)
+    rerender(<List items={makeItems(2)} loadedCount={50} hasMore loadMore={loadMore} />)
+    expect(loadMore).toHaveBeenCalledTimes(1)
+    rerender(<List items={makeItems(2)} loadedCount={100} hasMore loadMore={loadMore} />)
+    expect(loadMore).toHaveBeenCalledTimes(2)
+  })
+
   it('allows another attempt after a rejection', async () => {
     const loadMore = vi.fn().mockRejectedValue(new Error('offline'))
     const { rerender } = render(<List items={makeItems(20)} hasMore loadMore={loadMore} />)

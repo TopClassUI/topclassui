@@ -3,13 +3,12 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import type * as Shared from '#shared/collection/use-collection.js'
-import type { CollectionProps } from '#shared/contracts/collection.js'
 
 // What the list part hands the shared hook (R-8.5-1, R-5.7-7), read by a spy that passes every call through.
-const seen: CollectionProps<unknown>[] = []
+const seen: Shared.UseCollectionOptions<unknown>[] = []
 vi.mock('#shared/collection/use-collection.js', async (load) => {
   const real = await load<typeof Shared>()
-  return { useCollection: (props: CollectionProps<unknown>) => { seen.push(props); return real.useCollection(props) } }
+  return { useCollection: (props: Shared.UseCollectionOptions<unknown>) => { seen.push(props); return real.useCollection(props) } }
 })
 
 const { Combobox } = await import('../index.js')
@@ -53,6 +52,23 @@ describe('the list is the shared collection', () => {
     await userEvent.click(screen.getByRole('combobox'))
     expect(seen[0]?.hasMore).toBe(true)
     expect(seen[0]?.loadMore).toBe(loadMore)
+  })
+
+  it('a page is counted by the options loaded, not by the matches the query leaves', async () => {
+    render(<Combobox aria-label="L" items={ITEMS} hasMore loadMore={() => undefined} />)
+    await userEvent.click(screen.getByRole('combobox'))
+    await userEvent.type(screen.getByRole('combobox'), 'Br')
+    expect(last()?.items).toHaveLength(1)
+    expect(last()?.loadedCount).toBe(2)
+  })
+
+  it('kept mounted while closed, the list asks for nothing; open, it asks', async () => {
+    const loadMore = vi.fn()
+    render(<Combobox aria-label="L" items={ITEMS} hasMore loadMore={loadMore} keepMounted />)
+    expect(screen.getAllByRole('option', { hidden: true })).toHaveLength(2)
+    expect(loadMore).not.toHaveBeenCalled()
+    await userEvent.click(screen.getByRole('combobox'))
+    expect(loadMore).toHaveBeenCalledTimes(1)
   })
 
   it('visibleRows is clamped to 1 and 20 and set on the list as --tc-list-rows; left out, no style is written', async () => {

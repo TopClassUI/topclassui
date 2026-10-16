@@ -62,4 +62,10 @@ export const MUTATIONS: Mutation[] = [
     from: '  }, [container, reach, count])',
     to: '  }, [container, reach])',
   },
+  {
+    label: 'the shared collection pages by the rows it shows and not by the loaded count it is given',
+    file: 'src/shared/collection/use-collection.ts',
+    from: 'const loaded = props.loadedCount ?? count',
+    to: 'const loaded = count',
+  },
 ]
