@@ -4,6 +4,7 @@ import type { Mutation } from '../lib/mutate.js'
 const CLIENT = 'src/components/select/client.tsx'
 const HOOK = 'src/components/select/hook.ts'
 const CLASSES = 'src/components/select/classes.ts'
+const LIB = 'src/components/select/lib.ts'
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -107,5 +108,29 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: 'max-w-[round(down,var(--available-width),1px)]',
     to: 'max-w-(--available-width)',
+  },
+  {
+    label: 'the select list loses the name of its field, so a reader hears the options with no name',
+    file: CLIENT,
+    from: '              aria-label={select.listLabel}\n',
+    to: '',
+  },
+  {
+    label: 'the select list loses the aria-labelledby of its caller, so a heading names the trigger only',
+    file: CLIENT,
+    from: '              aria-labelledby={select.listLabelledBy}\n',
+    to: '',
+  },
+  {
+    label: 'the select reads a wrapping label whole, so the value it shows joins the name of the list',
+    file: LIB,
+    from: "  if (node === skip) return ''\n",
+    to: '',
+  },
+  {
+    label: 'the select reads its label only once, so a label changed later is not the name of the list',
+    file: HOOK,
+    from: '    if (next && !named) setSpoken(readNameFromLabels(trigger.current))\n',
+    to: '',
   },
 ]

@@ -565,6 +565,42 @@ test.describe('live: the page behind, and a Dialog around it', () => {
   })
 })
 
+test.describe('live: the open list carries the name of its field', () => {
+  test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
+
+  /** The name Chromium gives the open listbox in its own accessibility tree, the one a screen reader reads. */
+  const chromiumName = async (page: Page) => {
+    const cdp = await page.context().newCDPSession(page)
+    const { nodes } = await cdp.send('Accessibility.getFullAXTree') as { nodes: { role?: { value?: string }, name?: { value?: string } }[] }
+    return nodes.filter((node) => node.role?.value === 'listbox').map((node) => node.name?.value ?? '')
+  }
+
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: a <label for> names the list as it names the trigger, and the value never does`, async ({ page }) => {
+      await openLive(page, 'select--phase-4-form', { direction })
+      const popup = await openList(page, combo(page, 'Country'), 'keyboard')
+      await expect(popup.getByRole('listbox')).toHaveAccessibleName('Country')
+      expect(await chromiumName(page)).toEqual(['Country'])
+      await expect(combo(page, 'Country')).toHaveAccessibleName('Country')
+    })
+  }
+
+  test('in Arabic, the label of the RTL demo names its list', async ({ page }) => {
+    await openLive(page, 'select--rtl', { direction: 'rtl' })
+    const popup = await openList(page, combo(page))
+    await expect(popup.getByRole('listbox')).toHaveAccessibleName('الدولة')
+  })
+
+  for (const [name, how] of [['Wrapped label', 'a label around it'], ['Heading name', 'aria-labelledby'], ['Plain name', 'aria-label']] as const) {
+    test(`${how}: the list is named "${name}", not by the value`, async ({ page }) => {
+      await fixture(page, 'select-names')
+      const popup = await openList(page, combo(page, name))
+      await expect(popup.getByRole('listbox')).toHaveAccessibleName(name)
+      expect(await chromiumName(page)).toEqual([name])
+    })
+  }
+})
+
 test.describe('live: focus, forced colours and motion', () => {
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 
