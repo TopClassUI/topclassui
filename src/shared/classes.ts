@@ -151,15 +151,17 @@ export const FOCUS_RING_WITHIN = 'outline-none has-focus-visible:outline-solid h
 
 /** On the bar that holds an overlay's actions. An action is the decision, so its label wraps where
  * Button alone would end it in an ellipsis. A Button of one of the five sizes grows from its own height,
- * and never drops under the 44 px a finger needs; a custom one keeps the height its caller gave it. */
+ * and never drops under the 44 px a finger needs; a custom one keeps the height its caller gave it.
+ * Only a button or a link is an action: a Badge, a Progress or a Spinner beside them keeps its own size. */
 export const ACTIONS_WRAP = [
-  '**:whitespace-normal *:data-size:text-center',
-  '*:data-size:not-data-[size=custom]:h-auto *:data-size:not-data-[size=custom]:py-1',
-  '*:data-[size=xs]:min-h-control-xs *:data-[size=sm]:min-h-control-sm *:data-[size=md]:min-h-control-md',
-  '*:data-[size=lg]:min-h-control-lg *:data-[size=xl]:min-h-control-xl',
-  'pointer-coarse:*:data-[size=xs]:min-h-[var(--tc-target-coarse,44px)]',
-  'pointer-coarse:*:data-[size=sm]:min-h-[var(--tc-target-coarse,44px)]',
-  'pointer-coarse:*:data-[size=md]:min-h-[var(--tc-target-coarse,44px)]',
+  '**:whitespace-normal *:[&:is(button,a)]:data-size:text-center',
+  '*:[&:is(button,a)]:data-size:not-data-[size=custom]:h-auto *:[&:is(button,a)]:data-size:not-data-[size=custom]:py-1',
+  '*:[&:is(button,a)]:data-[size=xs]:min-h-control-xs *:[&:is(button,a)]:data-[size=sm]:min-h-control-sm',
+  '*:[&:is(button,a)]:data-[size=md]:min-h-control-md *:[&:is(button,a)]:data-[size=lg]:min-h-control-lg',
+  '*:[&:is(button,a)]:data-[size=xl]:min-h-control-xl',
+  'pointer-coarse:*:[&:is(button,a)]:data-[size=xs]:min-h-[var(--tc-target-coarse,44px)]',
+  'pointer-coarse:*:[&:is(button,a)]:data-[size=sm]:min-h-[var(--tc-target-coarse,44px)]',
+  'pointer-coarse:*:[&:is(button,a)]:data-[size=md]:min-h-[var(--tc-target-coarse,44px)]',
 ].join(' ')
 
 /** An overlay that is not modal leaves the page usable: the viewport that covers the screen for
