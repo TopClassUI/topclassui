@@ -66,4 +66,16 @@ export const MUTATIONS: Mutation[] = [
     from: 'rounded-full bg-line-strong group-data-checked/toggle:bg-primary-on-solid',
     to: 'rounded-full bg-surface-raised group-data-checked/toggle:bg-primary-on-solid',
   },
+  {
+    label: 'the switch custom slide is empty again, so a custom switch sized from CSS keeps its thumb at the start when on',
+    file: CLASSES,
+    from: "  custom: 'group-data-checked/toggle:translate-x-[calc((100cqw-100%)*var(--tc-dir))]',",
+    to: "  custom: '',",
+  },
+  {
+    label: 'the switch custom track is no container, so its thumb measures the viewport and leaves the track',
+    file: CLASSES,
+    from: "  custom: '@container',",
+    to: "  custom: '',",
+  },
 ]

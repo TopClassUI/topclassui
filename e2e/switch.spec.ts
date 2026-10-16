@@ -436,8 +436,24 @@ test.describe('live: where a page puts a switch', () => {
       expect(await cases(page)).toEqual([
         ['grid', [35, 24], [35, 20]], ['track', [35, 24], [35, 20]], ['flex-1', [35, 24], [35, 20]], ['w-fit', [35, 24], [35, 20]],
         ['cell', [35, 24], [35, 20]], ['label-row', [35, 24], [35, 20]], ['long', [28, 24], [28, 16]], ['no-label', [42, 24], [42, 24]],
+        ['custom', [48, 24], [48, 24]],
       ])
       await expectNoSidewaysScroll(page)
+    })
+
+    test(`${direction}: size="custom" sized by the caller's CSS has a thumb as tall as its inside, at the start off and at the end on`, async ({ page }) => {
+      await fixture(page, { direction })
+      expect(await shape(switchOf(page, 'Custom, off'))).toMatchObject({ track: [48, 24], thumb: [20, 20] })
+      await expect.poll(() => gaps(switchOf(page, 'Custom, off'), direction)).toEqual({ start: 2, end: 26 })
+      await expect.poll(() => gaps(switchOf(page, 'Custom, on'), direction)).toEqual({ start: 26, end: 2 })
+      await switchOf(page, 'Custom, off').click()
+      await expect.poll(() => gaps(switchOf(page, 'Custom, off'), direction)).toEqual({ start: 26, end: 2 })
+      await switchOf(page, 'Custom, on').click()
+      await expect.poll(() => gaps(switchOf(page, 'Custom, on'), direction)).toEqual({ start: 2, end: 26 })
+      // At a root of 32 px a track sized in rem doubles, and the thumb still lands 2 px from the end.
+      await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
+      await expect.poll(() => shape(switchOf(page, 'Custom in rem, on')).then(({ track }) => track)).toEqual([96, 40])
+      await expect.poll(() => gaps(switchOf(page, 'Custom in rem, on'), direction)).toEqual({ start: 58, end: 2 })
     })
   }
 
@@ -450,6 +466,7 @@ test.describe('live: where a page puts a switch', () => {
         expect(await cases(page)).toEqual([
           ['grid', [44, 44], [35, 20]], ['track', [44, 44], [35, 20]], ['flex-1', [44, 44], [35, 20]], ['w-fit', [44, 44], [35, 20]],
           ['cell', [44, 44], [35, 20]], ['label-row', [44, 44], [35, 20]], ['long', [44, 44], [28, 16]], ['no-label', [44, 44], [42, 24]],
+          ['custom', [48, 44], [48, 24]],
         ])
         await expectNoSidewaysScroll(page)
       })
@@ -462,7 +479,7 @@ test.describe('live: where a page puts a switch', () => {
       const results = await new AxeBuilder({ page }).include('#layouts').analyze()
       expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([])
       // A native button with the role is named as a button: axe reads the switch through button-name, which passed.
-      expect(results.passes.find((pass) => pass.id === 'button-name')?.nodes).toHaveLength(8)
+      expect(results.passes.find((pass) => pass.id === 'button-name')?.nodes).toHaveLength(11)
     })
   }
 })
