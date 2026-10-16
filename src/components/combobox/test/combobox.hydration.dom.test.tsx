@@ -47,14 +47,14 @@ describe('a server-rendered Combobox hydrates cleanly', () => {
     done()
   })
 
-  it('named by a label, the server HTML has no aria-label, and once hydrated the input carries the label\'s text', async () => {
+  it('named by a label, neither the server HTML nor the closed input once hydrated carries an aria-label: the label names it', async () => {
     const element = createElement('div', null,
       createElement('label', { htmlFor: 'fw' }, 'Framework'),
       createElement(Combobox, { id: 'fw', items: ITEMS }))
     const { errors, before, container, done } = await hydrate(element)
     expect(before).not.toContain('aria-label')
     expect(errors).toEqual([])
-    expect(input(container).getAttribute('aria-label')).toBe('Framework')
+    expect(input(container).hasAttribute('aria-label')).toBe(false)
     done()
   })
 

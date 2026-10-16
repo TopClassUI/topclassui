@@ -12,14 +12,18 @@ function syncChecked(value: boolean, input: HTMLInputElement | null): void {
 }
 
 /** The value of a checkbox, held here so a form reset brings it back to its latest default (unit-4.md, "A form
- * reset"). Base UI always gets the controlled pair and never a default; a caller's inputRef follows ours. */
+ * reset"). Base UI always gets the controlled pair and never a default; a caller's inputRef follows ours. A mixed
+ * box sends nothing (unit-4.md, "What the form receives"): Base UI is told it is unticked, and has no uncheckedValue. */
 export function useCheckbox({
   checked,
   defaultChecked = CHECKBOX_DEFAULTS.defaultChecked,
   onCheckedChange,
   inputRef,
+  indeterminate = false,
+  uncheckedValue,
 }: CheckboxValueProps) {
-  const state = useFormValue({ value: checked, defaultValue: defaultChecked, sync: syncChecked })
+  const sync = (value: boolean, input: HTMLInputElement | null) => { syncChecked(value && !indeterminate, input) }
+  const state = useFormValue({ value: checked, defaultValue: defaultChecked, sync })
   useImperativeHandle(inputRef, () => state.inputRef.current as HTMLInputElement, [state.inputRef])
 
   // The caller first, with Base UI's details, so details.cancel() still keeps the box as it was.
@@ -28,5 +32,10 @@ export function useCheckbox({
     if (!details.isCanceled) state.setValue(next)
   }
 
-  return { checked: state.value, onCheckedChange: onChange, inputRef: state.inputRef }
+  return {
+    checked: indeterminate ? false : state.value,
+    uncheckedValue: indeterminate ? undefined : uncheckedValue,
+    onCheckedChange: onChange,
+    inputRef: state.inputRef,
+  }
 }

@@ -11,9 +11,10 @@ export const NAVBAR_ROOT = [
   'bg-surface-raised border-b-(length:--tc-line-width) border-line',
 ].join(' ')
 
-/** R-5.2-3: a bar that sticks clears the top safe area too; one that scrolls away starts under it. */
+/** R-5.2-3: a bar that sticks clears the top safe area too; one that scrolls away starts under it.
+ * The hook marks a sticky bar too tall for the screen, which then scrolls away with the page. */
 export const NAVBAR_TOP = {
-  sticky: `${STICKY_TOP} pt-[calc(0.375rem+var(--tc-safe-top))]`,
+  sticky: `${STICKY_TOP} data-unstuck:static pt-[calc(0.375rem+var(--tc-safe-top))]`,
   flow: 'pt-1.5',
 } as const satisfies Record<NavbarTop, string>
 
@@ -38,15 +39,17 @@ export const NAVBAR_LINKS = 'grid min-w-0 grow basis-24 grid-cols-1'
 export const NAVBAR_LIST_ROOM = '-m-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+1px)] p-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+1px)]'
 
 /** Tab does not scroll a link that is half in view: Chromium leaves it cut, by 31 px measured.
- * The list therefore snaps, to the one link that has the keyboard focus: with none, it scrolls freely. */
-export const NAVBAR_LIST = `flex items-center gap-5 snap-x snap-mandatory ${NAVBAR_LIST_ROOM} ${SCROLL_X}`
+ * The list therefore snaps, to the one link that has the keyboard focus: with none, it scrolls freely.
+ * Under the pointer it never snaps, or a wheel would spring back to a link that keeps the focus. */
+export const NAVBAR_LIST = `flex items-center gap-5 snap-x snap-mandatory hover:snap-none ${NAVBAR_LIST_ROOM} ${SCROLL_X}`
 
 /** Never squeezed by its neighbours, and never wider than the room the list shows. */
 export const NAVBAR_ITEM = `flex shrink-0 ${CONTAIN}`
 
 /** The page being read is heavier as well as darker: colour alone is no cue (WCAG 1.4.1).
- * Forced colours paint every link in one colour, so there it is underlined as well. */
-export const NAVBAR_CURRENT = 'aria-[current=page]:font-semibold aria-[current=page]:text-body forced-colors:aria-[current=page]:underline'
+ * Forced colours paint every link in one colour, so there it is underlined as well. The list
+ * opens scrolled to it, so on a phone the mark is in view; a browser without the property ignores it. */
+export const NAVBAR_CURRENT = 'aria-[current=page]:font-semibold aria-[current=page]:text-body forced-colors:aria-[current=page]:underline aria-[current=page]:[scroll-initial-target:nearest]'
 
 /** Its text is centred, so under a finger a short link grows to 44 px evenly; content that
  * does not fit starts at the start edge and is cut at the end. The link that has the keyboard
