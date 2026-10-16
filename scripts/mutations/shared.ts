@@ -141,10 +141,28 @@ export const MUTATIONS: Mutation[] = [
     to: 'text.slice(0, maxLength)',
   },
   {
-    label: 'the shared label cut span loses dir="auto", so an English-first label in an RTL page is cut at its start',
+    label: 'the shared label cut span loses its dir, so an English-first label in an RTL page is cut at its start',
     file: 'src/shared/truncate-label.tsx',
-    from: ' dir="auto" className={LABEL}>',
+    from: ' dir={resolveLabelDir(text)} className={LABEL}>',
     to: ' className={LABEL}>',
+  },
+  {
+    label: 'the shared label cut span takes dir="auto" for every run again, so "Wi-Fi متصل" reads Wi-Fi last in an Arabic page',
+    file: 'src/shared/truncate-label.tsx',
+    from: ' dir={resolveLabelDir(text)} className={LABEL}>',
+    to: ' dir="auto" className={LABEL}>',
+  },
+  {
+    label: 'the shared label direction calls a label mixed when it has letters of either direction, so an English one in an RTL page loses dir="auto"',
+    file: 'src/shared/truncate-label.tsx',
+    from: 'return rtlLetter.test(text) && ltrLetter.test(text) ? undefined',
+    to: 'return rtlLetter.test(text) || ltrLetter.test(text) ? undefined',
+  },
+  {
+    label: 'the shared label direction counts an Arabic-Indic digit as an Arabic letter, so "Page ١٢" loses dir="auto"',
+    file: 'src/shared/truncate-label.tsx',
+    from: 'const rtlLetter = /(?=\\p{L})[',
+    to: 'const rtlLetter = /[',
   },
   {
     label: 'each text child gets its own span, so the gap opens inside the words',
@@ -175,6 +193,18 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/shared/provider/provider.tsx',
     from: '<Tooltip.Provider>{isolated}</Tooltip.Provider>',
     to: '{isolated}',
+  },
+  {
+    label: 'the provider hands client halves Latin digits when given no numbering system, so ar-u-nu-arab prints 12 there and ١٢ in a server half',
+    file: 'src/shared/provider/provider.tsx',
+    from: '    numberingSystem,\n    adaptive,',
+    to: "    numberingSystem = 'latn',\n    adaptive,",
+  },
+  {
+    label: 'the provider reports the numbering system it was given, not the one its formatter writes',
+    file: 'src/shared/provider/provider.tsx',
+    from: 'numberingSystem: numberFormat.resolvedOptions().numberingSystem,',
+    to: "numberingSystem: numberingSystem ?? 'latn',",
   },
   {
     label: 'a nested provider starts its own delay group, splitting an RTL island off the page',
@@ -343,5 +373,23 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/tokens.css',
     from: '    scroll-padding-block: var(--tc-sticky-top) var(--tc-sticky-bottom);\n',
     to: '',
+  },
+  {
+    label: 'the drawer leaves the one overlay layer for 40, so a sheet opened from a dialog or a popover is drawn under it',
+    file: 'src/tokens.css',
+    from: '  --tc-z-drawer: var(--tc-z-popup);',
+    to: '  --tc-z-drawer: 40;',
+  },
+  {
+    label: 'the dialog leaves the one overlay layer for 50, so a dialog opened from a popover or a menu is drawn under it',
+    file: 'src/tokens.css',
+    from: '  --tc-z-dialog: var(--tc-z-popup);',
+    to: '  --tc-z-dialog: 50;',
+  },
+  {
+    label: 'the one overlay layer rises to the toast at 70, so a toast added over an open sheet can be drawn under it',
+    file: 'src/tokens.css',
+    from: '  --tc-z-popup: 60;',
+    to: '  --tc-z-popup: 70;',
   },
 ]

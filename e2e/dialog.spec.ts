@@ -607,7 +607,7 @@ test.describe('inside the viewport', () => {
     })
     // max-w-100, the screen less two insets, rounded-box, the line, shadow-lg, wrap-anywhere, --tc-z-dialog, --tc-overlay-inset.
     expect(styles).toEqual({
-      maxWidth: '400px', maxHeight: '688px', radius: '12px', line: '1px', raised: true, wrap: 'anywhere', layer: '50 50',
+      maxWidth: '400px', maxHeight: '688px', radius: '12px', line: '1px', raised: true, wrap: 'anywhere', layer: '60 60',
       inset: '16px', scrim: true, fixed: 'fixed fixed',
     })
   })

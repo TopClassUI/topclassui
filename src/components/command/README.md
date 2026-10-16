@@ -109,7 +109,7 @@ Required: `getKey`, `getLabel`, `items`, `onSelect`. Every other prop below is o
 | `open` | no | `boolean` | - | Whether it is open. Use with onOpenChange when controlled. |
 | `renderItem` | no | `((item: T) => ReactNode)` | - | What a row holds in place of its label. It stays one row tall. |
 | `shortcut` | no | `unknown` | `"k"` | The key that opens it with Ctrl or Cmd, wherever focus is; null for none. |
-| `status` | no | `Status` | - |  |
+| `status` | no | `Exclude<Status, 'error' \| 'loading-more'>` | - | 'idle', 'loading' or 'empty'. Never 'error': with no errorFallback, a failed fetch would read as No results. |
 | `virtualize` | no | `unknown` | `"auto"` | Windowing: auto mounts only the rows in view above the provider threshold (200). |
 | `visibleRows` | no | `integer`, min 1, max 100 | `7` | Rows the list shows before it scrolls, clamped to 1 to 100; left out, the --tc-list-rows knob. |
 
