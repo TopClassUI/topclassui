@@ -105,14 +105,15 @@ describe('hook.ts holds the value of the field (R-5.12-1)', () => {
     expect(source.startsWith("'use client'\n")).toBe(true)
   })
 
-  it('builds on the shared form value and the provider, and takes three hooks from React', () => {
+  it('builds on the shared form value and the provider, and takes three hooks from React and flushSync from React DOM', () => {
     expect(importedModules(source)).toEqual([
-      'react', '#shared/provider/context.js', '#shared/use-form-value.js', './constants.js', './lib.js', './types.js',
+      'react', 'react-dom', '#shared/provider/context.js', '#shared/use-form-value.js', './constants.js', './lib.js', './types.js',
     ])
     expect(importedNames(source, 'react')).toEqual(['useEffect', 'useImperativeHandle', 'useRef'])
+    expect(importedNames(source, 'react-dom')).toEqual(['flushSync'])
     expect(hooksByPart(source)).toEqual({
       writeText: [],
-      useNumberField: ['useLabels', 'useLocale', 'useNumberFormat', 'useRef', 'useRef', 'useFormValue', 'useImperativeHandle', 'useEffect'],
+      useNumberField: ['useLabels', 'useLocale', 'useNumberFormat', 'useRef', 'useRef', 'useFormValue', 'useImperativeHandle', 'useEffect', 'useEffect'],
     })
   })
 
