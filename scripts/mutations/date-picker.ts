@@ -185,8 +185,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the date picker day button loses aria-pressed, so the focused chosen day reads as a plain button',
     file: PART,
-    from: '                        aria-pressed={day.selected}
-',
+    from: '                        aria-pressed={day.selected}\n',
     to: '',
   },
 ]
