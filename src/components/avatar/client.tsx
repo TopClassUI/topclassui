@@ -9,8 +9,8 @@ import type { AvatarImageProps } from './types.js'
 
 /** The picture, filling the circle over the fallback: a plain img, or the element in `render`,
  * such as next/image. One that fails turns transparent and stays, so its alt still names it. */
-export function AvatarImage({ alt, className, render, ref, onError, ...rest }: AvatarImageProps) {
-  const image = useAvatarImage(readSource(rest.src, render), ref, onError)
+export function AvatarImage({ alt, className, render, ref, onError, onLoad, ...rest }: AvatarImageProps) {
+  const image = useAvatarImage(readSource(rest, render), { ref, onError, onLoad })
   return renderElement(render ?? <img />, {
     alt,
     className: cn(AVATAR_IMAGE, className),
@@ -18,5 +18,6 @@ export function AvatarImage({ alt, className, render, ref, onError, ...rest }: A
     'data-error': image.failed ? '' : undefined,
     ref: image.ref,
     onError: image.onError,
+    onLoad: image.onLoad,
   })
 }

@@ -120,6 +120,19 @@ test.describe('opening and closing', () => {
     await expect(inputOf(page)).toBeFocused()
   })
 
+  // Colemak types e at the K key, Dvorak t: Ctrl+E and Ctrl+T there belong to the page, not to the palette.
+  test('under a Latin layout that types another letter at the K key, Ctrl with it is left to the page', async ({ page }) => {
+    await openLive(page, 'command--basic')
+    const taken = await page.evaluate(() => ['e', 't'].map((key) => {
+      const event = new KeyboardEvent('keydown', { key, code: 'KeyK', ctrlKey: true, bubbles: true, cancelable: true })
+      document.body.dispatchEvent(event)
+      return event.defaultPrevented
+    }))
+    expect(taken).toEqual([false, false])
+    await page.evaluate(() => new Promise((resolve) => { requestAnimationFrame(() => { requestAnimationFrame(resolve) }) }))
+    await expect(page.locator('[role="dialog"]')).toHaveCount(0)
+  })
+
   test('Ctrl+Shift+K and Ctrl+Alt+K are left to the browser and the system, and Ctrl+K after them still opens it', async ({ page }) => {
     await open(page, 'command--basic')
     await page.keyboard.press('Escape')
@@ -267,12 +280,34 @@ test.describe('ten thousand rows, windowed', () => {
     await page.keyboard.press('ArrowUp')
     await expect.poll(() => activeOf(page)).toMatchObject({ text: 'Pin page 10000', highlighted: true, whole: true })
     expect((await activeOf(page)).id?.endsWith('-9999')).toBe(true)
+    // 13 of 10,000 are mounted, so each says its place: a reader hears 10000 of 10000, not 13 of 13.
+    const last = page.getByRole('option', { name: 'Pin page 10000' })
+    await expect(last).toHaveAttribute('aria-posinset', '10000')
+    await expect(last).toHaveAttribute('aria-setsize', '10000')
     expect(await afterLast(page)).toBe(6)
     await page.keyboard.press('ArrowUp')
     await expect.poll(() => activeOf(page)).toMatchObject({ text: 'Duplicate page 9999', whole: true })
     expect((await activeOf(page)).mounted).toBeLessThan(30)
     await page.keyboard.press('Enter')
     await expect(ranOf(page)).toHaveText('Ran Duplicate page 9999.')
+  })
+
+  test('a scroll the keyboard did not make leaves the active row mounted in its place: axe passes and Enter runs it', async ({ page }) => {
+    await open(page, 'command--ten-thousand')
+    await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('ArrowDown')
+    expect(await activeOf(page)).toMatchObject({ text: 'Close report 2', highlighted: true })
+    const height = await listOf(page).evaluate((list) => list.scrollHeight)
+    // The scrollbar's own move: a hundred rows down, with the highlight left where it was.
+    await listOf(page).evaluate((list) => { list.scrollTop = 4000 })
+    await expect(page.getByRole('option', { name: 'Close report 2' })).not.toBeInViewport()
+    await expect.poll(() => page.getByRole('option').nth(1).textContent()).not.toBe('Open report 3')
+    expect(await activeOf(page)).toMatchObject({ text: 'Close report 2', highlighted: true, whole: false })
+    expect(await listOf(page).evaluate((list) => list.scrollHeight), 'the kept row takes the place of one unit of spacer').toBe(height)
+    expect((await axe(page)).violations).toEqual([])
+    await page.keyboard.press('Enter')
+    await expectClosed(page)
+    await expect(ranOf(page)).toHaveText('Ran Close report 2.')
   })
 
   test('a wheel scrolls to the last row with fewer than a hundred rows mounted at every step, and the page stays put', async ({ page }) => {
@@ -364,6 +399,19 @@ test.describe('ten thousand rows, windowed', () => {
       await expect(page.getByRole('option').first()).not.toHaveText('Open report 1')
       expect((await activeOf(page)).mounted).toBeLessThan(100)
       expect(await scrollY(page)).toBe(before)
+    })
+
+    test('the first match stays mounted while a finger drags the list away from it, and Enter runs it', async ({ page }) => {
+      await open(page, 'command--ten-thousand', { by: 'tap' })
+      await page.keyboard.type('open')
+      expect(await activeOf(page)).toMatchObject({ text: 'Open report 1', highlighted: true })
+      const list = await boxOf(listOf(page))
+      for (let drag = 0; drag < 3; drag++) await touchDrag(page, list.left + 60, list.bottom - 20, list.top + 20)
+      expect(await listOf(page).evaluate((element) => element.scrollTop)).toBeGreaterThan(400)
+      expect(await activeOf(page)).toMatchObject({ text: 'Open report 1', highlighted: true, whole: false })
+      await page.keyboard.press('Enter')
+      await expectClosed(page)
+      await expect(ranOf(page)).toHaveText('Ran Open report 1.')
     })
 
     test('sixty rows: drags reach the last one, and the page behind never moves', async ({ page }) => {
