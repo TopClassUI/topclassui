@@ -42,6 +42,15 @@ export type AvatarImageProps =
 /** The event an img that fails hands its onError: what useAvatarImage passes on to the caller's. */
 export type AvatarImageError = Parameters<NonNullable<AvatarImageProps['onError']>>[0]
 
+/** The event an img that loads hands its onLoad. */
+export type AvatarImageLoad = Parameters<NonNullable<AvatarImageProps['onLoad']>>[0]
+
+/** What useAvatarImage keeps a failure against: the src and srcSet the img renders with. */
+export interface AvatarImageSource { src: unknown, srcSet: unknown }
+
+/** The caller's ref and handlers, which useAvatarImage takes over and still calls. */
+export type AvatarImageHandlers = Pick<AvatarImageProps, 'ref' | 'onError' | 'onLoad'>
+
 /** R-8.3-4: the avatar's own size prop, so the two cannot describe different boxes. */
 export type AvatarSkeletonProps =
   Omit<ComponentPropsWithRef<'span'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>

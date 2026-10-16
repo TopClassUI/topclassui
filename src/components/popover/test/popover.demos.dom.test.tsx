@@ -1,7 +1,7 @@
 import { readdirSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ComponentType } from 'react'
 import { describe, expect, it } from 'vitest'
@@ -109,6 +109,16 @@ describe('what the demos show of the props', () => {
   it('with-form: the first focus is in the field', async () => {
     const popup = await openFirst('with-form')
     await waitFor(() => { expect(document.activeElement).toBe(popup.querySelector('input[name="name"]')) })
+  })
+
+  // POPOVER-1. A submit nothing prevents is the browser's own: it reloads the page with ?name= on it.
+  it('with-form: Save is handled by the form, which closes the popover instead of sending the page', async () => {
+    const popup = await openFirst('with-form')
+    const sent: boolean[] = []
+    window.addEventListener('submit', (event) => { sent.push(event.defaultPrevented) }, { once: true })
+    await userEvent.click(within(popup).getByRole('button', { name: 'Save' }))
+    expect(sent).toEqual([true])
+    await waitFor(() => { expect(screen.queryByRole('dialog')).toBeNull() })
   })
 
   it('with-close: the x sits in a row with the title, after it', async () => {

@@ -91,4 +91,10 @@ export const MUTATIONS: Mutation[] = [
     from: 'return { label: useLabels().tag.remove }',
     to: "return { label: useLabels() === undefined ? '' : 'Remove' }",
   },
+  {
+    label: 'the tag README sample stops moving the focus, so a reader who copies it drops the keyboard on the page body',
+    file: 'src/components/tag/README.md',
+    from: '    next?.focus()\n',
+    to: '',
+  },
 ]

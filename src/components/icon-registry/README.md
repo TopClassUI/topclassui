@@ -20,7 +20,7 @@ when you genuinely need a name-to-icon lookup in the browser.
 ## Import
 
 ```tsx
-import { IconRegistry } from 'topclassui'
+import { registerIcons, registeredIcons, Icon } from 'topclassui'
 ```
 
 ## Props
@@ -29,7 +29,7 @@ Every prop below is optional and falls back to the default shown.
 
 This component takes no design props of its own.
 
-Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
+Anything else on `Icon` is passed to the element it draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Verified against
 

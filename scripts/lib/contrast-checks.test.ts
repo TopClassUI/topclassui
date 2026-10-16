@@ -28,12 +28,12 @@ describe('checkTokens', () => {
   })
 
   it('measures the number of pairs it claims; change this only on purpose', () => {
-    expect(run(css).pairs).toBe(339)
+    expect(run(css).pairs).toBe(357)
   })
 
   it('reports how many readings are distinct, since light and ocean share most tokens', () => {
     const report = run(css)
-    expect(report.distinct).toBe(205)
+    expect(report.distinct).toBe(220)
     expect(report.distinct).toBeLessThan(report.pairs)
   })
 })
@@ -189,6 +189,18 @@ describe('the label on the hovered and pressed tint', () => {
         `--tc-${tone}-soft-active: var(--tc-${tone}-solid);`,
       )
       expect(failures(broken), tone).toMatch(new RegExp(`${tone} text on its soft-active tint`))
+    }
+  })
+})
+
+describe('the ring on a tint', () => {
+  // A highlighted row of a menu is a tint with the ring drawn inside its edge.
+  it('is measured on the tint of every tone, in every mode', () => {
+    const faint = css.replace('--tc-ring: var(--tc-primary-on-soft);', '--tc-ring: var(--tc-primary-soft);')
+    expect(faint, 'the ring declaration moved').not.toBe(css)
+    const text = failures(faint)
+    for (const tone of ['primary', 'neutral', 'success', 'warning', 'danger', 'info']) {
+      expect(text, tone).toMatch(new RegExp(`light: ring on the ${tone} tint`))
     }
   })
 })
