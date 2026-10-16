@@ -14,7 +14,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the navbar hook stops setting the variable, so an anchor and a focused link land under the sticky bar',
     file: HOOK,
-    from: '      root.style.setProperty(NAVBAR_OFFSET_VARIABLE, `${String(Math.ceil(bar.getBoundingClientRect().height))}px`)\n',
+    from: '      root.style.setProperty(NAVBAR_OFFSET_VARIABLE, `${String(unstuck ? 0 : height)}px`)\n',
     to: '',
   },
   {
@@ -44,8 +44,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the navbar hook waits for a resize before it writes anything, so a bar that never resizes writes nothing',
     file: HOOK,
-    from: "    sizes.observe(bar, { box: 'border-box' })\n    publish()\n",
-    to: "    sizes.observe(bar, { box: 'border-box' })\n",
+    from: "    view.addEventListener('resize', publish)\n    publish()\n",
+    to: "    view.addEventListener('resize', publish)\n",
   },
   {
     label: 'the navbar hook watches the content box, which a growing safe area does not always change',
@@ -58,6 +58,54 @@ export const MUTATIONS: Mutation[] = [
     file: HOOK,
     from: 'const bar = ref.current?.parentElement',
     to: 'const bar = ref.current',
+  },
+  {
+    label: 'the navbar hook never lets go of the top, so at a 32 px root three rows cover two thirds of a phone',
+    file: HOOK,
+    from: 'const unstuck = height > view.innerHeight * NAVBAR_STICKY_SHARE',
+    to: 'const unstuck = false && height > view.innerHeight * NAVBAR_STICKY_SHARE',
+  },
+  {
+    label: 'the navbar hook lets go of a bar of exactly its share of the screen',
+    file: HOOK,
+    from: 'height > view.innerHeight * NAVBAR_STICKY_SHARE',
+    to: 'height >= view.innerHeight * NAVBAR_STICKY_SHARE',
+  },
+  {
+    label: 'the navbar may cover half the screen before it lets go',
+    file: CONSTANTS,
+    from: 'export const NAVBAR_STICKY_SHARE = 1 / 3',
+    to: 'export const NAVBAR_STICKY_SHARE = 1 / 2',
+  },
+  {
+    label: 'the navbar hook writes the height of a bar that has let go, so the page keeps room clear for a bar that is not there',
+    file: HOOK,
+    from: '`${String(unstuck ? 0 : height)}px`',
+    to: '`${String(height)}px`',
+  },
+  {
+    label: 'the navbar hook does not follow the window, so a screen that grows shorter keeps a bar that covers half of it',
+    file: HOOK,
+    from: "    view.addEventListener('resize', publish)\n",
+    to: '',
+  },
+  {
+    label: 'the navbar hook keeps listening to the window after the bar unmounts',
+    file: HOOK,
+    from: "      view.removeEventListener('resize', publish)\n",
+    to: '',
+  },
+  {
+    label: 'the navbar hook leaves data-unstuck on a bar that stops being sticky',
+    file: HOOK,
+    from: "      bar.removeAttribute('data-unstuck')\n",
+    to: '',
+  },
+  {
+    label: 'a navbar marked unstuck still sticks, and covers the page',
+    file: CLASSES,
+    from: ' data-unstuck:static ',
+    to: ' ',
   },
   {
     label: 'the navbar writes its height to the variable of a bottom bar, which the top of the page never reads',
@@ -129,8 +177,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the navbar bar is no longer on the sticky layer, so page content can paint over it',
     file: CLASSES,
-    from: 'sticky: `${STICKY_TOP} pt-',
-    to: "sticky: `sticky top-0 pt-",
+    from: 'sticky: `${STICKY_TOP} ',
+    to: "sticky: `sticky top-0 ",
   },
   // The brand.
   {

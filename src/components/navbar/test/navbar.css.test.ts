@@ -27,6 +27,7 @@ const DECLARATION: Record<string, string> = {
   'sticky': 'position: sticky;',
   'top-0': 'top: 0px;',
   'z-(--tc-z-sticky)': 'z-index: var(--tc-z-sticky);',
+  'data-unstuck:static': 'position: static;',
   'pt-[calc(0.375rem+var(--tc-safe-top))]': 'padding-top: calc(0.375rem + var(--tc-safe-top));',
   'pt-1.5': 'padding-top: calc(var(--spacing) * 1.5);',
   // The brand and a link.
@@ -82,6 +83,7 @@ const SCOPE: Record<string, string> = {
   'aria-[current=page]:text-body': '[aria-current="page"] {',
   'forced-colors:aria-[current=page]:underline': '[aria-current="page"] {',
   'aria-[current=page]:[scroll-initial-target:nearest]': '[aria-current="page"] {',
+  'data-unstuck:static': '[data-unstuck] {',
   'focus-visible:snap-center': ':focus-visible {',
   'hover:snap-none': ':hover {',
   'focus-visible:outline-solid': ':focus-visible {',
@@ -118,7 +120,7 @@ describe('every class Navbar writes compiles with the installed Tailwind', () =>
       NAVBAR_ROOT, ...Object.values(NAVBAR_TOP), NAVBAR_BRAND, NAVBAR_LINKS, NAVBAR_LIST, NAVBAR_ITEM, NAVBAR_LINK, NAVBAR_ACTIONS,
     ])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(60)
+    expect(all).toHaveLength(61)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

@@ -981,13 +981,61 @@ test.describe('text that is made larger or spaced out', () => {
       expect({ overlapping: layout.overlapping, outside: layout.outside }).toEqual({ overlapping: [], outside: [] })
       expect(await spills(page)).toEqual([])
       await expect(linksOf(root).first()).toHaveCSS('font-size', '28px')
-      // The variable follows a bar that is now several rows tall.
-      await expect.poll(async () => (await sticky(page)).variable).toBe(`${String(Math.ceil(layout.height))}px`)
+      // Three rows, 321 px, are more than a third of 844: the bar lets go of the top and keeps nothing clear.
+      expect(layout.height).toBe(321)
+      await expect(root).toHaveAttribute('data-unstuck', '')
+      expect(await sticky(page)).toEqual({ variable: '0px', padding: '0px' })
       await brandOf(root).focus()
       for (const name of SIX) {
         await press(page, 'Tab', name)
         expect(await cutOf(listOf(root)), name).toEqual({ left: 0, right: 0 })
       }
+    })
+
+    // Three rows would cover most of a phone while the page scrolls: past a third of the screen the bar goes with the page.
+    test(`${direction}: with the root at 32 px on a 320 x 480 phone the bar is more than a third of the screen, so it scrolls away and writes 0px; at 16 px it sticks again`, async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 480 })
+      await openLive(page, 'navbar--tall-page', { direction })
+      const root = bar(page)
+      await page.addStyleTag({ content: 'html { font-size: 32px !important }' })
+      await expect(root).toHaveAttribute('data-unstuck', '')
+      expect((await boxOf(root)).height, 'px of a 480 px screen').toBeGreaterThan(160)
+      await expect(root).toHaveCSS('position', 'static')
+      expect(await sticky(page)).toEqual({ variable: '0px', padding: '0px' })
+      await page.evaluate(() => { scrollTo(0, 1500) })
+      expect((await boxOf(root)).bottom, 'the bar has scrolled off the top').toBeLessThanOrEqual(0)
+      await linksOf(root).filter({ hasText: 'Theming' }).evaluate((link) => { (link as HTMLElement).click() })
+      await expect(page).toHaveURL(/#theming$/)
+      expect(await page.locator('#theming').evaluate((heading) => Math.round(heading.getBoundingClientRect().top)), 'nothing covers the heading').toBe(0)
+
+      await page.locator('style').last().evaluate((style) => { style.remove() })
+      await expect(root).not.toHaveAttribute('data-unstuck')
+      await expect(root).toHaveCSS('position', 'sticky')
+      const height = Math.ceil((await boxOf(root)).height)
+      expect(height).toBeLessThanOrEqual(160)
+      expect(await sticky(page)).toEqual({ variable: `${String(height)}px`, padding: `${String(height)}px` })
+    })
+
+    test(`${direction}: at 32 px the bar of a page sticks on a 390 x 844 phone at 225 px, and lets go when the phone turns to 844 x 390`, async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 })
+      await openLive(page, 'navbar--tall-page', { direction })
+      const root = bar(page)
+      await page.addStyleTag({ content: 'html { font-size: 32px !important }' })
+      await expect.poll(async () => (await sticky(page)).variable).toBe('225px')
+      await expect(root).toHaveCSS('position', 'sticky')
+      await page.setViewportSize({ width: 844, height: 390 })
+      await expect(root).toHaveAttribute('data-unstuck', '')
+      expect((await boxOf(root)).height, 'px of a 390 px screen').toBeGreaterThan(130)
+      expect(await sticky(page)).toEqual({ variable: '0px', padding: '0px' })
+      await page.setViewportSize({ width: 390, height: 844 })
+      await expect(root).not.toHaveAttribute('data-unstuck')
+      await expect(root).toHaveCSS('position', 'sticky')
+      expect(await sticky(page)).toEqual({ variable: '225px', padding: '225px' })
+      // A screen that only grows shorter leaves the bar at 225 px, so only the resize of the window can tell.
+      await page.setViewportSize({ width: 390, height: 600 })
+      await expect(root).toHaveAttribute('data-unstuck', '')
+      expect((await boxOf(root)).height).toBe(225)
+      expect(await sticky(page)).toEqual({ variable: '0px', padding: '0px' })
     })
 
     test(`${direction}: with the spacing of WCAG 1.4.12 no label leaves its link and the page does not scroll sideways`, async ({ page }) => {

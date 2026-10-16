@@ -49,6 +49,9 @@ In Next.js, pass the framework link as `render`:
   `--tc-sticky-top` on `<html>`. The tokens file reads it into `scroll-padding`, so an
   `#anchor` target, or a link that Tab reaches, stops below the bar and not under it. It
   follows the bar when the bar wraps, and it is removed when the bar unmounts.
+- **A bar too tall for the screen.** Past a third of the screen's height, as with text at
+  200 % on a phone (three rows, 321 px of 480), the bar scrolls away with the page and
+  writes `0px`. It sticks again when the screen has room, turned or resized.
 - **Before the script runs** the variable is `0px`. A page opened at `/docs#install` lands
   with that heading under the bar (60 px under, measured) and stays there until the reader
   follows another link. To avoid it, give the height in your own CSS:

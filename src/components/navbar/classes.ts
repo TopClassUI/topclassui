@@ -11,9 +11,10 @@ export const NAVBAR_ROOT = [
   'bg-surface-raised border-b-(length:--tc-line-width) border-line',
 ].join(' ')
 
-/** R-5.2-3: a bar that sticks clears the top safe area too; one that scrolls away starts under it. */
+/** R-5.2-3: a bar that sticks clears the top safe area too; one that scrolls away starts under it.
+ * The hook marks a sticky bar too tall for the screen, which then scrolls away with the page. */
 export const NAVBAR_TOP = {
-  sticky: `${STICKY_TOP} pt-[calc(0.375rem+var(--tc-safe-top))]`,
+  sticky: `${STICKY_TOP} data-unstuck:static pt-[calc(0.375rem+var(--tc-safe-top))]`,
   flow: 'pt-1.5',
 } as const satisfies Record<NavbarTop, string>
 

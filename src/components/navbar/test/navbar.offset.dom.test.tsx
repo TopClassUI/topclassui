@@ -125,6 +125,62 @@ describe('the variable goes when the bar goes', () => {
   })
 })
 
+// At a 32 px root a phone's bar wraps to three rows: 321 px of a 480 px screen, measured. It stops sticking past a third.
+describe('a bar too tall for the screen stops sticking', () => {
+  const header = (container: HTMLElement) => container.querySelector('header')
+  const screen = (to: number) => { vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(to) }
+  const turn = (to: number) => { screen(to); act(() => { window.dispatchEvent(new Event('resize')) }) }
+
+  it('a bar of 161 px on a 480 px screen is marked unstuck and writes 0px: nothing stays over the page', () => {
+    screen(480)
+    height = 161
+    const { container } = render(bar())
+    expect(header(container)?.hasAttribute('data-unstuck')).toBe(true)
+    expect(variable()).toBe('0px')
+  })
+
+  it('a bar of a third of the screen, 160 px of 480, still sticks and writes its height', () => {
+    screen(480)
+    height = 160
+    const { container } = render(bar())
+    expect(header(container)?.hasAttribute('data-unstuck')).toBe(false)
+    expect(variable()).toBe('160px')
+  })
+
+  it('follows the bar as it grows past its share and back', () => {
+    screen(480)
+    const { container } = render(bar())
+    resize(321)
+    expect([header(container)?.hasAttribute('data-unstuck'), variable()]).toEqual([true, '0px'])
+    resize(85)
+    expect([header(container)?.hasAttribute('data-unstuck'), variable()]).toEqual([false, '85px'])
+  })
+
+  it('follows the screen when it turns, though the bar keeps its height', () => {
+    screen(844)
+    height = 225
+    const { container } = render(bar())
+    expect([header(container)?.hasAttribute('data-unstuck'), variable()]).toEqual([false, '225px'])
+    turn(390)
+    expect([header(container)?.hasAttribute('data-unstuck'), variable()]).toEqual([true, '0px'])
+    turn(844)
+    expect([header(container)?.hasAttribute('data-unstuck'), variable()]).toEqual([false, '225px'])
+  })
+
+  it('leaves no mark on a bar that stops being sticky, and no listener once it unmounts', () => {
+    screen(480)
+    height = 321
+    const { container, rerender, unmount } = render(bar())
+    expect(header(container)?.hasAttribute('data-unstuck')).toBe(true)
+    rerender(bar(false))
+    expect(header(container)?.hasAttribute('data-unstuck')).toBe(false)
+    rerender(bar())
+    unmount()
+    turn(844)
+    expect(variable()).toBe('')
+  })
+})
+
 describe('a bar that is not sticky', () => {
   it('writes nothing and watches nothing: it has no client part', () => {
     const { container } = render(bar(false))

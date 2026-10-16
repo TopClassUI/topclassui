@@ -27,9 +27,9 @@ const BAR = [
 ]
 
 describe('every part carries exactly the classes written here', () => {
-  it('NavbarRoot, sticky: the bar, then the three classes that make it stick and its top padding with the safe area', () => {
+  it('NavbarRoot, sticky: the bar, then the three classes that make it stick, the one that lets a bar too tall for the screen go, and its top padding with the safe area', () => {
     expect(classesOf(<NavbarRoot />, 'header')).toEqual([
-      ...BAR, 'sticky', 'top-0', 'z-(--tc-z-sticky)', 'pt-[calc(0.375rem+var(--tc-safe-top))]',
+      ...BAR, 'sticky', 'top-0', 'z-(--tc-z-sticky)', 'data-unstuck:static', 'pt-[calc(0.375rem+var(--tc-safe-top))]',
     ])
   })
 
