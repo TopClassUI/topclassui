@@ -77,3 +77,19 @@ export function paintedRgb(target: Locator, property: string): Promise<Rgb> {
     return [r, g, b] as const
   }, property)
 }
+
+/** The straight runs of the two pixels just inside each edge of a rounded box, where an inset ring 2 px wide
+ * is drawn whole: past the curve of each corner, so a pill keeps only the middle of its two ends. */
+export function insideRing(box: Clip, radius: number): Record<string, Clip> {
+  const [left, top] = [Math.ceil(box.x), Math.ceil(box.y)]
+  const [right, bottom] = [Math.floor(box.x + box.width), Math.floor(box.y + box.height)]
+  const curve = Math.ceil(Math.min(radius, (bottom - top) / 2, (right - left) / 2))
+  const run = Math.max(4, bottom - top - 2 * curve)
+  const middle = Math.round((top + bottom - run) / 2)
+  return {
+    top: { x: left + curve, y: top, width: right - left - 2 * curve, height: 2 },
+    bottom: { x: left + curve, y: bottom - 2, width: right - left - 2 * curve, height: 2 },
+    start: { x: left, y: middle, width: 2, height: run },
+    end: { x: right - 2, y: middle, width: 2, height: run },
+  }
+}

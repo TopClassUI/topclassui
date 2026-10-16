@@ -13,29 +13,29 @@ const DECLARATION: Record<string, string> = {
   '[@media(height<17rem)]:shrink-0': 'flex-shrink: 0;',
   '[@media(height<17rem)]:overflow-y-visible': 'overflow-y: visible;',
   '**:whitespace-normal': 'white-space: normal;',
-  '*:data-size:text-center': 'text-align: center;',
-  '*:data-size:not-data-[size=custom]:h-auto': 'height: auto;',
-  '*:data-size:not-data-[size=custom]:py-1': 'padding-block: var(--spacing);',
-  '*:data-[size=xs]:min-h-control-xs': 'min-height: calc(1.75rem * var(--tc-density));',
-  '*:data-[size=sm]:min-h-control-sm': 'min-height: calc(2rem * var(--tc-density));',
-  '*:data-[size=md]:min-h-control-md': 'min-height: calc(2.5rem * var(--tc-density));',
-  '*:data-[size=lg]:min-h-control-lg': 'min-height: calc(3rem * var(--tc-density));',
-  '*:data-[size=xl]:min-h-control-xl': 'min-height: calc(3.5rem * var(--tc-density));',
-  'pointer-coarse:*:data-[size=xs]:min-h-[var(--tc-target-coarse,44px)]': COARSE,
-  'pointer-coarse:*:data-[size=sm]:min-h-[var(--tc-target-coarse,44px)]': COARSE,
-  'pointer-coarse:*:data-[size=md]:min-h-[var(--tc-target-coarse,44px)]': COARSE,
+  '*:[&:is(button,a)]:data-size:text-center': 'text-align: center;',
+  '*:[&:is(button,a)]:data-size:not-data-[size=custom]:h-auto': 'height: auto;',
+  '*:[&:is(button,a)]:data-size:not-data-[size=custom]:py-1': 'padding-block: var(--spacing);',
+  '*:[&:is(button,a)]:data-[size=xs]:min-h-control-xs': 'min-height: calc(1.75rem * var(--tc-density));',
+  '*:[&:is(button,a)]:data-[size=sm]:min-h-control-sm': 'min-height: calc(2rem * var(--tc-density));',
+  '*:[&:is(button,a)]:data-[size=md]:min-h-control-md': 'min-height: calc(2.5rem * var(--tc-density));',
+  '*:[&:is(button,a)]:data-[size=lg]:min-h-control-lg': 'min-height: calc(3rem * var(--tc-density));',
+  '*:[&:is(button,a)]:data-[size=xl]:min-h-control-xl': 'min-height: calc(3.5rem * var(--tc-density));',
+  'pointer-coarse:*:[&:is(button,a)]:data-[size=xs]:min-h-[var(--tc-target-coarse,44px)]': COARSE,
+  'pointer-coarse:*:[&:is(button,a)]:data-[size=sm]:min-h-[var(--tc-target-coarse,44px)]': COARSE,
+  'pointer-coarse:*:[&:is(button,a)]:data-[size=md]:min-h-[var(--tc-target-coarse,44px)]': COARSE,
 }
 
 /** What each selector must end in: the child it reaches, written out as Tailwind writes it. */
 const REACHES: Record<string, string> = {
   '**:whitespace-normal': ' *) {',
-  '*:data-size:text-center': ' > *)[data-size] {',
-  '*:data-size:not-data-[size=custom]:h-auto': ' > *)[data-size]:not([data-size="custom"]) {',
-  '*:data-size:not-data-[size=custom]:py-1': ' > *)[data-size]:not([data-size="custom"]) {',
-  '*:data-[size=xs]:min-h-control-xs': ' > *)[data-size="xs"] {',
-  '*:data-[size=md]:min-h-control-md': ' > *)[data-size="md"] {',
-  '*:data-[size=xl]:min-h-control-xl': ' > *)[data-size="xl"] {',
-  'pointer-coarse:*:data-[size=md]:min-h-[var(--tc-target-coarse,44px)]': ' > *)[data-size="md"] {',
+  '*:[&:is(button,a)]:data-size:text-center': ' > *):is(button, a)[data-size] {',
+  '*:[&:is(button,a)]:data-size:not-data-[size=custom]:h-auto': ' > *):is(button, a)[data-size]:not([data-size="custom"]) {',
+  '*:[&:is(button,a)]:data-size:not-data-[size=custom]:py-1': ' > *):is(button, a)[data-size]:not([data-size="custom"]) {',
+  '*:[&:is(button,a)]:data-[size=xs]:min-h-control-xs': ' > *):is(button, a)[data-size="xs"] {',
+  '*:[&:is(button,a)]:data-[size=md]:min-h-control-md': ' > *):is(button, a)[data-size="md"] {',
+  '*:[&:is(button,a)]:data-[size=xl]:min-h-control-xl': ' > *):is(button, a)[data-size="xl"] {',
+  'pointer-coarse:*:[&:is(button,a)]:data-[size=md]:min-h-[var(--tc-target-coarse,44px)]': ' > *):is(button, a)[data-size="md"] {',
 }
 
 /** The classes of Button that the footer has to beat or leave standing, compiled beside its own. */
@@ -90,7 +90,7 @@ describe('the classes of the footer actions, the short screen and the dialog tha
 
   it('the three coarse floors sit inside the coarse-pointer query, so a mouse keeps the height of the size', async () => {
     const sheet = await css
-    const cls = 'pointer-coarse:*:data-[size=md]:min-h-[var(--tc-target-coarse,44px)]'
+    const cls = 'pointer-coarse:*:[&:is(button,a)]:data-[size=md]:min-h-[var(--tc-target-coarse,44px)]'
     const before = sheet.slice(sheet.lastIndexOf('@media (', at(sheet, cls)), at(sheet, cls)).replace(/\s+/g, ' ')
     expect(before.slice(0, 27)).toBe('@media (pointer: coarse) { ')
     expect(before.split('{').length - before.split('}').length).toBe(1)
@@ -112,9 +112,9 @@ describe('the order the cascade needs', () => {
   })
 
   it('under a finger the 44 px floor comes after the height of the size, and so wins it', async () => {
-    await follows('pointer-coarse:*:data-[size=md]:min-h-[var(--tc-target-coarse,44px)]', '*:data-[size=md]:min-h-control-md')
-    await follows('pointer-coarse:*:data-[size=xs]:min-h-[var(--tc-target-coarse,44px)]', '*:data-[size=xs]:min-h-control-xs')
-    await follows('pointer-coarse:*:data-[size=sm]:min-h-[var(--tc-target-coarse,44px)]', '*:data-[size=sm]:min-h-control-sm')
+    await follows('pointer-coarse:*:[&:is(button,a)]:data-[size=md]:min-h-[var(--tc-target-coarse,44px)]', '*:[&:is(button,a)]:data-[size=md]:min-h-control-md')
+    await follows('pointer-coarse:*:[&:is(button,a)]:data-[size=xs]:min-h-[var(--tc-target-coarse,44px)]', '*:[&:is(button,a)]:data-[size=xs]:min-h-control-xs')
+    await follows('pointer-coarse:*:[&:is(button,a)]:data-[size=sm]:min-h-[var(--tc-target-coarse,44px)]', '*:[&:is(button,a)]:data-[size=sm]:min-h-control-sm')
   })
 
   it('on a short screen the body stops shrinking and stops scrolling after flex-1 and overflow-y-auto said otherwise', async () => {
@@ -125,6 +125,6 @@ describe('the order the cascade needs', () => {
   it('the height a footer gives an action outweighs Button own, whatever the order: two conditions against one class', async () => {
     const sheet = await css
     expect(ruleFor(sheet, 'h-control-md')).toBe('.h-control-md {\n    height: calc(2.5rem * var(--tc-density));\n  }')
-    expect(ruleFor(sheet, '*:data-size:not-data-[size=custom]:h-auto')).toContain('[data-size]:not([data-size="custom"])')
+    expect(ruleFor(sheet, '*:[&:is(button,a)]:data-size:not-data-[size=custom]:h-auto')).toContain('[data-size]:not([data-size="custom"])')
   })
 })

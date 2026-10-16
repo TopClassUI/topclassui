@@ -110,8 +110,9 @@ export const FADE_MOTION = 'transition-opacity duration-(--tc-duration) ease-out
 /** A popup grows from the side that faces its anchor: Base UI measures --transform-origin. */
 export const POPUP_MOTION = 'origin-(--transform-origin) transition-[opacity,scale] duration-(--tc-duration) ease-out data-starting-style:scale-95 data-starting-style:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0'
 
-/** A panel that slides. A swipe follows the finger, so nothing eases while one holds it. */
-export const SLIDE_MOTION = 'transition-[translate,opacity] duration-(--tc-duration-slow) ease-out data-swiping:transition-none'
+/** A panel that slides, by transform: the property Base UI moves a swiped sheet by. It switches the
+ * transition off itself, inline, for as long as a finger holds the sheet. */
+export const SLIDE_MOTION = 'transition-transform duration-(--tc-duration-slow) ease-out'
 
 /** The box of a dialog, a popup and a toast. Forced colours drop the shadow and keep the line. */
 export const OVERLAY_SURFACE = `rounded-box bg-surface-raised text-body ${BORDER} shadow-lg`
@@ -119,9 +120,16 @@ export const OVERLAY_SURFACE = `rounded-box bg-surface-raised text-body ${BORDER
 /** One row of a menu or a list, at least --tc-row-height tall. Its highlight is its focus mark. */
 export const ROW = 'flex min-h-(--tc-row-height) w-full items-center gap-2 rounded-control px-3 text-start text-sm outline-none'
 
-/** The row the keyboard or the pointer is on. Forced colours erase a fill, so there it takes the
- * system pair and paints it itself: left adjusted, Chromium lays a backplate over the label. */
-export const ROW_HIGHLIGHT = 'data-highlighted:bg-primary-soft data-highlighted:text-primary-on-soft forced-colors:data-highlighted:forced-color-adjust-none forced-colors:data-highlighted:bg-[Highlight] forced-colors:data-highlighted:text-[HighlightText]'
+/** The row the keyboard or the pointer is on: a fill, and the ring inside its edge, since the fill alone
+ * is under 3:1 against the popup. Forced colours erase a fill, so there it paints the system pair itself,
+ * the ring in HighlightText: left adjusted, Chromium lays a backplate over the label. */
+export const ROW_HIGHLIGHT = [
+  'data-highlighted:bg-primary-soft data-highlighted:text-primary-on-soft',
+  'data-highlighted:outline-solid data-highlighted:outline-(length:--tc-ring-width)',
+  'data-highlighted:-outline-offset-(length:--tc-ring-width) data-highlighted:outline-ring',
+  'forced-colors:data-highlighted:forced-color-adjust-none forced-colors:data-highlighted:bg-[Highlight]',
+  'forced-colors:data-highlighted:text-[HighlightText] forced-colors:data-highlighted:outline-[HighlightText]',
+].join(' ')
 
 /** At most --tc-list-rows rows, and never past the room Base UI measured. It counts rows and not
  * the padding or the gaps, so the last row shown is cut short: a cut row says there is more. */
@@ -142,17 +150,18 @@ export const FOCUS_RING_INSET = 'outline-none focus-visible:outline-solid focus-
 /** The ring on a wrapper whose focused element is hidden: a label around a native radio. */
 export const FOCUS_RING_WITHIN = 'outline-none has-focus-visible:outline-solid has-focus-visible:outline-(length:--tc-ring-width) has-focus-visible:outline-offset-(length:--tc-ring-offset) has-focus-visible:outline-ring'
 
-/** On the bar that holds an overlay's actions. An action is the decision, so its label wraps where
- * Button alone would end it in an ellipsis. A Button of one of the five sizes grows from its own height,
- * and never drops under the 44 px a finger needs; a custom one keeps the height its caller gave it. */
+/** On the bar of an overlay's actions: an action's label wraps rather than ending in an ellipsis. A button
+ * or a link of the five sizes grows from its height, never under the 44 px of a finger; a custom one keeps
+ * its caller's. A Badge, a Progress or a Spinner beside them is no action, and keeps its own size. */
 export const ACTIONS_WRAP = [
-  '**:whitespace-normal *:data-size:text-center',
-  '*:data-size:not-data-[size=custom]:h-auto *:data-size:not-data-[size=custom]:py-1',
-  '*:data-[size=xs]:min-h-control-xs *:data-[size=sm]:min-h-control-sm *:data-[size=md]:min-h-control-md',
-  '*:data-[size=lg]:min-h-control-lg *:data-[size=xl]:min-h-control-xl',
-  'pointer-coarse:*:data-[size=xs]:min-h-[var(--tc-target-coarse,44px)]',
-  'pointer-coarse:*:data-[size=sm]:min-h-[var(--tc-target-coarse,44px)]',
-  'pointer-coarse:*:data-[size=md]:min-h-[var(--tc-target-coarse,44px)]',
+  '**:whitespace-normal *:[&:is(button,a)]:data-size:text-center',
+  '*:[&:is(button,a)]:data-size:not-data-[size=custom]:h-auto *:[&:is(button,a)]:data-size:not-data-[size=custom]:py-1',
+  '*:[&:is(button,a)]:data-[size=xs]:min-h-control-xs *:[&:is(button,a)]:data-[size=sm]:min-h-control-sm',
+  '*:[&:is(button,a)]:data-[size=md]:min-h-control-md *:[&:is(button,a)]:data-[size=lg]:min-h-control-lg',
+  '*:[&:is(button,a)]:data-[size=xl]:min-h-control-xl',
+  'pointer-coarse:*:[&:is(button,a)]:data-[size=xs]:min-h-[var(--tc-target-coarse,44px)]',
+  'pointer-coarse:*:[&:is(button,a)]:data-[size=sm]:min-h-[var(--tc-target-coarse,44px)]',
+  'pointer-coarse:*:[&:is(button,a)]:data-[size=md]:min-h-[var(--tc-target-coarse,44px)]',
 ].join(' ')
 
 /** An overlay that is not modal leaves the page usable: the viewport that covers the screen for

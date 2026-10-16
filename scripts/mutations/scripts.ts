@@ -21,6 +21,12 @@ export const MUTATIONS: Mutation[] = [
     to: '    return contrastRange(a, b).max',
   },
   {
+    label: 'the contrast sweep stops measuring the ring on a tint, where a highlighted row of a menu draws it',
+    file: 'scripts/lib/contrast-checks.ts',
+    from: "      check(`${mode}: ring on the ${tone} tint`, soft && ring && worst(ring, soft), 3)\n",
+    to: '',
+  },
+  {
     label: 'the import graph stops walking past the first hop',
     file: 'scripts/lib/module-graph.ts',
     from: '      for (const edge of edges.get(next) ?? []) queue.push(edge)',
