@@ -311,10 +311,11 @@ test.describe('text and motion', () => {
   for (const direction of DIRECTIONS) {
     test(`${direction}: at a root of 32 px nothing overlaps and nothing scrolls sideways on a 320 px screen`, async ({ page }) => {
       await page.setViewportSize({ width: 320, height: 480 })
-      for (const demo of ['field--hint-error', 'field--inline', 'field--required']) {
+      for (const demo of ['field--controls', 'field--form', 'field--hint-error', 'field--inline', 'field--required']) {
         await page.goto(urlFor(demo, 'light', direction))
         await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
         await expectNoSidewaysScroll(page)
+        expect(await offScreen(page), demo).toEqual([])
         expect(await overlaps(page), demo).toEqual([])
       }
     })
@@ -341,6 +342,23 @@ test.describe('text and motion', () => {
     }
   })
 })
+
+/** Every element of the demo that starts before the screen's left edge or ends past its right, by tag and text: a page
+ * in RTL overflows to the left, where the scroll width does not see it. An element its own scroller clips is skipped. */
+function offScreen(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const demo = document.getElementById('demo')
+    const width = document.documentElement.clientWidth
+    const clipped = (el: Element) => {
+      for (let up = el.parentElement; up && up !== demo; up = up.parentElement) if (getComputedStyle(up).overflowX !== 'visible') return true
+      return false
+    }
+    return [...document.querySelectorAll('#demo *')].filter((el) => {
+      const r = el.getBoundingClientRect()
+      return r.width > 0 && (r.left < -0.5 || r.right > width + 0.5) && !clipped(el)
+    }).map((el) => `${el.tagName.toLowerCase()} ${el.textContent.slice(0, 20)}`)
+  })
+}
 
 /** Every pair of a Field's parts (label, control, hint, error) whose boxes cross, by the text of the first. */
 function overlaps(page: Page): Promise<string[]> {

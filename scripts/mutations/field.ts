@@ -6,6 +6,7 @@ const INDEX = 'src/components/field/index.tsx'
 const HOOK = 'src/components/field/hook.ts'
 const LIB = 'src/components/field/lib.tsx'
 const CLASSES = 'src/components/field/classes.ts'
+const FORM_DEMO = 'src/components/field/dummy/form.tsx'
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -103,5 +104,11 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: "export const FIELD_LABEL_INLINE = 'col-start-2 row-start-1 font-normal'",
     to: "export const FIELD_LABEL_INLINE = 'font-normal'",
+  },
+  {
+    label: 'field: the button row of field--form no longer wraps, so at a 32 px root it widens every field past a 320 px screen',
+    file: FORM_DEMO,
+    from: '<div className="flex flex-wrap gap-2">',
+    to: '<div className="flex gap-2">',
   },
 ]
