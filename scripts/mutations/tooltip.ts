@@ -1,4 +1,4 @@
-// The mutations of src/components/tooltip. Found by scripts/mutations/index.ts.
+// The mutations of src/components/tooltip, and of the shared trigger helper as Tooltip uses it. Found by scripts/mutations/index.ts.
 import type { Mutation } from '../lib/mutate.js'
 
 export const MUTATIONS: Mutation[] = [
@@ -89,25 +89,25 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a className on the tooltip trigger never reaches the element passed as render',
     file: 'src/components/tooltip/client.tsx',
-    from: 'render={own ? cloneElement(own, { className: cn(own.props.className, className) }) : render}',
+    from: 'render={trigger.render}',
     to: 'render={render}',
   },
   {
     label: 'a className on a tooltip trigger with a render function, or no render, never reaches the element',
     file: 'src/components/tooltip/client.tsx',
-    from: '      className={own ? undefined : className}\n',
+    from: '      className={trigger.className}\n',
     to: '',
   },
   {
     label: "a tooltip trigger className is only appended to a server-built Button's classes, so the Button's own background still wins",
-    file: 'src/components/tooltip/client.tsx',
+    file: 'src/shared/render-trigger.ts',
     from: 'cn(own.props.className, className)',
     to: "[own.props.className, className].join(' ')",
   },
   {
     label: 'a tooltip trigger never unwraps the lazy element Flight hands over, so its className is only appended',
-    file: 'src/components/tooltip/client.tsx',
-    from: 'Children.toArray(render)[0]',
+    file: 'src/shared/render-trigger.ts',
+    from: 'Children.toArray(render as ReactNode)[0]',
     to: 'undefined',
   },
   {
