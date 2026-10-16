@@ -20,7 +20,7 @@ if (chosen.length === 0) {
 const missing = readAnchors(ROOT, chosen.filter((m) => m.to !== null))
 if (missing.length > 0) {
   for (const m of missing) console.error(`error ${m}`)
-  console.error(`\nmutate: ${String(missing.length)} mutation(s) no longer match the source.`)
+  console.error(`\nmutate: ${String(missing.length)} mutation(s) do not find their anchor exactly once.`)
   process.exit(1)
 }
 

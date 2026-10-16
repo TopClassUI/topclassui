@@ -92,4 +92,10 @@ export const MUTATIONS: Mutation[] = [
     from: "return [...source.matchAll(re)].map((m) => m[1] ?? '')",
     to: 'return []',
   },
+  {
+    label: 'the mutation runner accepts an anchor found twice, so a row mutates only the first copy and the second goes untested',
+    file: 'scripts/lib/mutate.ts',
+    from: '    else if (found > 1) missing.push(',
+    to: '    else if (found < 0) missing.push(',
+  },
 ]

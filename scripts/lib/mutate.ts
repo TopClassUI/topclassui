@@ -36,12 +36,14 @@ export async function collectMutations(dir: string): Promise<Mutation[]> {
   return rows
 }
 
-/** Every mutation must still find its anchor, or it silently tests nothing. */
+/** Every mutation must find its anchor exactly once: a missing one tests nothing, and of a repeated
+ * one only the first copy is ever mutated. */
 export function readAnchors(root: string, mutations: readonly Mutation[]): string[] {
   const missing: string[] = []
   for (const m of mutations) {
-    const source = readFileSync(join(root, m.file), 'utf8')
-    if (!source.includes(m.from)) missing.push(`${m.label}: "${m.from.slice(0, 60)}" is not in ${m.file}`)
+    const found = readFileSync(join(root, m.file), 'utf8').split(m.from).length - 1
+    if (found === 0) missing.push(`${m.label}: "${m.from.slice(0, 60)}" is not in ${m.file}`)
+    else if (found > 1) missing.push(`${m.label}: "${m.from.slice(0, 60)}" is in ${m.file} ${String(found)} times, and only the first is mutated`)
   }
   return missing
 }

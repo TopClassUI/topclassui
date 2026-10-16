@@ -11,8 +11,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the tag renders its children bare, so a long label has no span to truncate and no bound',
     file: 'src/components/tag/index.tsx',
-    from: '{truncateLabel(children, TAG_BOUNDARIES.labelMaxLength)}',
-    to: '{children}',
+    from: '>\n      {truncateLabel(children, TAG_BOUNDARIES.labelMaxLength)}',
+    to: '>\n      {children}',
   },
   {
     label: 'the tag loses CONTAIN, so a long label pushes it past its container',

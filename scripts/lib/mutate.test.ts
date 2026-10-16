@@ -6,7 +6,7 @@ import { pathToFileURL } from 'node:url'
 import { afterAll, describe, expect, it } from 'vitest'
 
 import { MUTATIONS } from '../mutations/index.js'
-import { type Mutation, collectMutations, mutationFiles } from './mutate.js'
+import { type Mutation, collectMutations, mutationFiles, readAnchors } from './mutate.js'
 
 const made: string[] = []
 afterAll(() => { for (const dir of made) rmSync(dir, { recursive: true, force: true }) })
@@ -52,6 +52,23 @@ describe('finding the mutation files', () => {
   it('refuses a file that exports no rows, by name, rather than skipping it', async () => {
     const dir = folder({ 'card.ts': rows('fine'), 'table.ts': 'export const ROWS = []\n' })
     await expect(collectMutations(dir)).rejects.toThrow('table.ts must export MUTATIONS')
+  })
+})
+
+describe('reading the anchors', () => {
+  const dir = folder({ 'a.ts': 'const x = 1; const y = 1; const z = 2\n' })
+  const at = (from: string): Mutation => ({ label: from, file: 'a.ts', from, to: '' })
+
+  it('passes an anchor found exactly once', () => {
+    expect(readAnchors(dir, [at('const z = 2')])).toEqual([])
+  })
+
+  it('reports an anchor that is gone, by label and file', () => {
+    expect(readAnchors(dir, [at('const w = 3')])).toEqual(['const w = 3: "const w = 3" is not in a.ts'])
+  })
+
+  it('reports an anchor found twice, since only its first copy would ever be mutated', () => {
+    expect(readAnchors(dir, [at(' = 1')])).toEqual([' = 1: " = 1" is in a.ts 2 times, and only the first is mutated'])
   })
 })
 
