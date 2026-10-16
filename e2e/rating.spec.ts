@@ -4,7 +4,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
 import { DIRECTIONS, MODES } from '../scripts/lib/harness.js'
 import { expectNoSidewaysScroll, openLive } from './live.js'
 import { urlFor } from './pages.js'
-import { type Rgb, paintedIn, pixelsOf } from './pixels.js'
+import { type Rgb, contrast, paintedIn, pixelsOf } from './pixels.js'
 
 // What happy-dom cannot lay out or paint: which half of a half star is filled in each direction, what forced
 // colours leave of a fill, the browser's own radio group under the keyboard, the pointer's fill, the size of a
@@ -36,7 +36,7 @@ const formData = (page: Page) => page.evaluate(() => {
 })
 
 /** A computed colour as the screen paints it: Tailwind writes oklch, which a canvas turns into rgb. */
-const paintedColour = (target: Locator, property: 'color' | 'outlineColor') => target.evaluate((element, name): Rgb => {
+const paintedColour = (target: Locator, property: 'color' | 'outlineColor' | 'backgroundColor') => target.evaluate((element, name): Rgb => {
   const pen = document.createElement('canvas').getContext('2d')
   if (!pen) throw new Error('no canvas')
   pen.fillStyle = getComputedStyle(element)[name]
@@ -82,6 +82,19 @@ test.describe('half a star is clipped from the inline start: its right half is f
       const other = filled === 'left' ? 'right' : 'left'
       expect(painted[filled], `the ${filled} half is filled`).toBeGreaterThanOrEqual(60)
       expect(painted[other], `the ${other} half is not`).toBeLessThanOrEqual(4)
+    })
+  }
+})
+
+test.describe('a filled star is an icon, so it keeps 3:1 against the page in every mode', () => {
+  for (const mode of MODES) {
+    test(mode, async ({ page }) => {
+      await openLive(page, 'rating--read-only', { mode })
+      const fill = page.locator('#demo [role="img"]').nth(1).locator(':scope > span > span').first()
+      // The harness paints the page on the body with bg-page.
+      const ratio = contrast(await paintedColour(fill, 'color'), await paintedColour(page.locator('body'), 'backgroundColor'))
+      // warning-solid, amber-500, measured 2.13:1 on the white page of light and ocean.
+      expect(ratio, 'filled star on the page').toBeGreaterThanOrEqual(3)
     })
   }
 })
@@ -173,6 +186,19 @@ test.describe('the keyboard is the browser\'s own radio group', () => {
 })
 
 test.describe('the pointer', () => {
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: after a click the arrows move the fill, though the pointer still rests on the clicked star`, async ({ page }) => {
+      await openLive(page, 'rating--editable', { direction })
+      await group(page).locator('label').nth(1).click()
+      expect(await fills(group(page))).toEqual([1, 1, 0, 0, 0])
+      const next = direction === 'ltr' ? 'ArrowRight' : 'ArrowLeft'
+      await page.keyboard.press(next)
+      await page.keyboard.press(next)
+      expect(await where(page)).toEqual({ focus: 4, checked: 4 })
+      expect(await fills(group(page))).toEqual([1, 1, 1, 1, 0])
+    })
+  }
+
   test('fills up to the hovered star, and leaving puts the value back', async ({ page }) => {
     await openLive(page, 'rating--editable')
     const steps = group(page).locator('label')
@@ -237,6 +263,28 @@ test.describe('a form', () => {
     })
     await page.getByRole('button', { name: 'Send' }).click()
     await expect(page.locator('#demo form')).toHaveAttribute('data-sent', 'stay=1')
+  })
+})
+
+test.describe('a rating with no name', () => {
+  test('inside a form it submits nothing, and is still one radio group under the keyboard', async ({ page }) => {
+    await openLive(page, 'rating--editable')
+    // A GET filter form around the demo, with one named field of its own.
+    await page.evaluate(() => {
+      const demo = document.querySelector('#demo')
+      const form = document.createElement('form')
+      const q = Object.assign(document.createElement('input'), { name: 'q', value: 'hotel' })
+      demo?.before(form)
+      if (demo) form.append(q, demo)
+    })
+    expect(await page.evaluate(() => [...new FormData(document.querySelector('form') ?? undefined)].map(([k, v]) => `${k}=${v as string}`))).toEqual(['q=hotel'])
+    await page.locator('#demo h2').click()
+    await page.keyboard.press('Tab')
+    expect(await where(page)).toEqual({ focus: 3, checked: 3 })
+    await page.keyboard.press('ArrowDown')
+    expect(await where(page)).toEqual({ focus: 4, checked: 4 })
+    await page.keyboard.press('Tab')
+    expect((await where(page)).focus, 'one tab stop for the group').toBe(0)
   })
 })
 

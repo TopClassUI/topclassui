@@ -122,7 +122,7 @@ describe('SidebarHeader on the server', () => {
   it('is a div holding the toggle and then the title in a span of its own', () => {
     const html = rail()
     const header = html.slice(html.indexOf('<div'), html.indexOf('</div>') + 6)
-    expect(header).toMatch(/^<div class="[^"]*"><button [^>]*><svg [^>]*><path [^>]*><\/path><\/svg><\/button><span class="[^"]*">Workspace<\/span><\/div>$/)
+    expect(header).toMatch(/^<div class="[^"]*"><button [^>]*><svg [^>]*><path [^>]*><\/path><\/svg><\/button><span dir="auto" class="[^"]*">Workspace<\/span><\/div>$/)
   })
 
   it('leaves the span out when it has no title, a false or an empty string', () => {
