@@ -13,4 +13,6 @@ export const SLIDER_DEFAULTS = {
   min: 0,
   max: 100,
   step: 1,
+  largeStep: 10,
+  minStepsBetweenValues: 0,
 } as const

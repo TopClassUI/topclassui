@@ -164,6 +164,7 @@ describe('a toggle: the target takes the press, the box inside it draws the rest
     expect(TOGGLE_RING.split(' ')).toEqual([
       'group-focus-visible/toggle:outline-solid', 'group-focus-visible/toggle:outline-(length:--tc-ring-width)',
       'group-focus-visible/toggle:outline-offset-(length:--tc-ring-offset)', 'group-focus-visible/toggle:outline-ring',
+      'forced-colors:group-focus-visible/toggle:outline-[CanvasText]',
     ])
     for (const cls of TOGGLE_RING.split(' ')) expect(has(TOGGLE_BOX, cls), cls).toBe(true)
     expect(TOGGLE_TARGET).not.toContain('focus-visible')
@@ -193,5 +194,14 @@ describe('a toggle: the target takes the press, the box inside it draws the rest
       'group-aria-invalid/toggle:inset-ring-[calc(var(--tc-ring-width)-var(--tc-line-width))]',
       'group-aria-invalid/toggle:inset-ring-danger-solid', 'forced-colors:group-aria-invalid/toggle:border-(length:--tc-ring-width)',
     ]) expect(has(TOGGLE_INVALID, cls), cls).toBe(true)
+  })
+
+  it('under forced colours, where a checked box keeps author colours, paints invalid CanvasText and disabled GrayText', () => {
+    for (const cls of ['forced-colors:group-aria-invalid/toggle:group-data-checked/toggle:border-[CanvasText]', 'forced-colors:group-aria-invalid/toggle:inset-ring-0']) {
+      expect(has(TOGGLE_INVALID, cls), cls).toBe(true)
+    }
+    for (const cls of ['forced-colors:group-disabled/toggle:group-data-checked/toggle:border-[GrayText]', 'forced-colors:group-disabled/toggle:group-data-checked/toggle:bg-[GrayText]']) {
+      expect(has(TOGGLE_ON, cls), cls).toBe(true)
+    }
   })
 })

@@ -26,4 +26,10 @@ export const MUTATIONS: Mutation[] = [
     from: '        if (event.defaultPrevented) return\n',
     to: '',
   },
+  {
+    label: 'the shared form value binds the first form it finds for good, so after the form prop changes the new form resets nothing and the old one still does',
+    file: 'src/shared/use-form-value.ts',
+    from: '    if (bound.current?.form === form) return\n',
+    to: '    if (bound.current) return\n',
+  },
 ]
