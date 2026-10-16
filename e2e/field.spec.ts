@@ -54,6 +54,9 @@ const CONTROLS_TREE = [
   'combobox City | Combobox hint Combobox error | invalid | ',
 ]
 
+/** Base UI writes no aria-invalid on the range input, so the Slider sets it from an effect: invalid once hydrated. */
+const HYDRATED_TREE = CONTROLS_TREE.map((row) => (row.startsWith('slider ') ? 'slider Volume | Slider hint Slider error | invalid | ' : row))
+
 /** Opens a live page with its script held back, so what is read first is the server HTML alone; release() hydrates it. */
 async function heldBack(page: Page, demo: string, options: LiveOptions = {}) {
   let release: () => void = () => undefined
@@ -75,7 +78,7 @@ test.describe('the accessibility tree: every control named, described and invali
       expect(await page.evaluate(() => document.documentElement.dataset['harness'])).not.toBe('hydrated')
       expect(await controlsInTree(page, CONTROL_NAMES), 'before hydration').toEqual(CONTROLS_TREE)
       await hydrate()
-      expect(await controlsInTree(page, CONTROL_NAMES), 'after hydration').toEqual(CONTROLS_TREE)
+      expect(await controlsInTree(page, CONTROL_NAMES), 'after hydration').toEqual(HYDRATED_TREE)
       expect(await liveErrors(page)).toEqual([])
     })
   }
