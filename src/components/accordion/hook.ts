@@ -16,7 +16,7 @@ function scrollerOf(element: Element): Element {
 
 /** A press closes the open panel, which gives its room back when its fade ends; when that panel is above, its
  * scroller follows the pressed trigger, so it stays under the pointer. Scroll anchoring missed one still on screen. */
-function holdTrigger(event: MouseEvent<HTMLButtonElement>) {
+function holdTrigger(event: MouseEvent) {
   const trigger = event.currentTarget
   // The trigger sits in a heading, in an item, in the root: the box that grows and shrinks.
   const root = trigger.parentElement?.parentElement?.parentElement
