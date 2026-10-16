@@ -104,6 +104,8 @@ title wraps beside it:
 - **`delay`, `closeDelay`.** Milliseconds, 0 to 10000. Left out: 300 and 0. Give
   `closeDelay` 200 or so when the popover holds a link, so the pointer can reach it.
 - **Focus.** A popover the pointer opened does not take the focus.
+  The first Tab from the trigger then rests once on a hidden focus guard of Base UI
+  1.8.0, with no ring; the second reaches the popover.
 
 ### What Base UI gives
 
