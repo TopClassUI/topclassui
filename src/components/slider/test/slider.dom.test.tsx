@@ -78,6 +78,34 @@ describe('disabled', () => {
   })
 })
 
+describe('invalid reaches the range input a screen reader lands on', () => {
+  const marks = () => screen.getAllByRole('slider').map((input) => input.getAttribute('aria-invalid'))
+
+  it('one thumb and both thumbs of a range, from invalid', () => {
+    render(<><Slider aria-label="Volume" invalid defaultValue={50} /><Slider aria-label="Price" invalid defaultValue={[20, 80]} /></>)
+    expect(marks()).toEqual(['true', 'true', 'true'])
+  })
+
+  it('from the aria-invalid a Field passes, true or "true"; "false" and none leave it off', () => {
+    render(<>
+      <Slider aria-label="A" aria-invalid defaultValue={50} />
+      <Slider aria-label="B" aria-invalid="true" defaultValue={50} />
+      <Slider aria-label="C" aria-invalid="false" defaultValue={50} />
+      <Slider aria-label="D" defaultValue={50} />
+    </>)
+    expect(marks()).toEqual(['true', 'true', null, null])
+  })
+
+  it('follows the prop when it turns off and on, and survives a key', async () => {
+    const { rerender } = render(<Slider aria-label="Volume" invalid defaultValue={50} />)
+    rerender(<Slider aria-label="Volume" invalid={false} defaultValue={50} />)
+    expect(marks()).toEqual([null])
+    rerender(<Slider aria-label="Volume" invalid defaultValue={50} />)
+    await press('{ArrowUp}')
+    expect([now(), ...marks()]).toEqual(['51', 'true'])
+  })
+})
+
 describe('what reaches each element', () => {
   it('className merged last on the group, so it wins a conflict with its own width', () => {
     render(<Slider aria-label="Volume" className="w-40" />)

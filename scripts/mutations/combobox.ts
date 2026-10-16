@@ -57,16 +57,28 @@ export const MUTATIONS: Mutation[] = [
     to: '    loadMoreThreshold: props.loadMoreThreshold ?? COMBOBOX_DEFAULTS.loadMoreThreshold,',
   },
   {
-    label: 'the combobox asks for a page before useCollection has read the list, which it holds as at its end',
+    label: 'the combobox pages while closed, so a list kept mounted asks for one page after another nobody sees',
     file: HOOK,
-    from: '    hasMore: hasMore && counted === filtered.length,',
+    from: '    hasMore: hasMore && open,',
     to: '    hasMore,',
+  },
+  {
+    label: 'the combobox counts a page by the matches of the query, so a page with no new match stops the paging and typing asks again',
+    file: HOOK,
+    from: '    loadedCount: loaded,\n',
+    to: '',
   },
   {
     label: 'the combobox stops copying the text of its label onto the input, which then has no name while the list is open',
     file: HOOK,
-    from: '  useEffect(() => { if (!named) setSpoken(nameFromLabels(input.current)) }, [named])',
+    from: '  useEffect(() => { setSpoken(open && !named ? nameFromLabels(input.current) : undefined) }, [open, named])',
     to: '',
+  },
+  {
+    label: 'the combobox keeps the copied text of its label while closed, so a label renamed then names the input with its old text',
+    file: HOOK,
+    from: 'setSpoken(open && !named ? nameFromLabels(input.current) : undefined)',
+    to: 'setSpoken(!named ? nameFromLabels(input.current) : undefined)',
   },
   {
     label: 'the combobox says No results while its first page loads',
@@ -121,5 +133,29 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: "export const COMBOBOX_ACTIVE = 'data-highlighted:outline-solid ",
     to: "export const COMBOBOX_ACTIVE = '",
+  },
+  {
+    label: 'the combobox shows the raw value of an option in no loaded page, so the input reads an internal id',
+    file: HOOK,
+    from: '    labelOfUnknown,\n',
+    to: '    labelOfUnknown: undefined,\n',
+  },
+  {
+    label: 'the combobox scrolls to the chosen row before its unit is measured, so a reopen under a finger or at a 32 px root lands far short of it',
+    file: HOOK,
+    from: '      setUnit(height)\n      return\n',
+    to: '      setUnit(height)\n',
+  },
+  {
+    label: 'the combobox centres the chosen row once, before the popup cuts the list to fit, so at a 32 px root on a phone the row is half hidden',
+    file: HOOK,
+    from: '    if (node && target?.top === node.scrollTop && target.height !== node.clientHeight) {',
+    to: '    if (node && target !== null && target.height < 0) {',
+  },
+  {
+    label: 'the combobox centres the chosen row again after it was scrolled away, so a resize pulls the list back from where the user took it',
+    file: HOOK,
+    from: '    if (node && target?.top === node.scrollTop && target.height !== node.clientHeight) {',
+    to: '    if (node && target && target.height !== node.clientHeight) {',
   },
 ]

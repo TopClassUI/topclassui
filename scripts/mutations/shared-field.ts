@@ -29,4 +29,10 @@ export const MUTATIONS: Mutation[] = [
     from: '  md: `text-sm ${FIELD_TEXT_COARSE}`,',
     to: "  md: '',",
   },
+  {
+    label: 'the shared field text loses the coarse floor at lg and xl, so under a 10 px root a NumberField types at 10 px and iOS zooms',
+    file: CLASSES,
+    from: '  lg: `text-base ${FIELD_TEXT_COARSE}`,\n  xl: `text-base ${FIELD_TEXT_COARSE}`,',
+    to: "  lg: 'text-base',\n  xl: 'text-base',",
+  },
 ]

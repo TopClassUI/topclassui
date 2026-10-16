@@ -38,14 +38,15 @@ export function Combobox({
   ...rest
 }: ComboboxProps) {
   const combobox = useCombobox({
-    items, value, defaultValue, onValueChange, onItemHighlighted, onOpenChange, inputRef, ref, maxLength, visibleRows,
-    loadMoreThreshold, status, emptyFallback, 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby,
+    items, value, defaultValue, onValueChange, onItemHighlighted, open, defaultOpen, onOpenChange, inputRef, ref, maxLength,
+    visibleRows, loadMoreThreshold, status, emptyFallback, 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby,
   })
   const { side, align } = toSideAlign(placement)
   return (
     <span className={cn(COMBOBOX_ROOT, FIELD_TEXT[size], fullWidth ? COMBOBOX_WIDTH.full : COMBOBOX_WIDTH.own)}>
       <Base.Root
         items={combobox.items}
+        itemToStringLabel={combobox.labelOfUnknown}
         value={combobox.value}
         onValueChange={combobox.onValueChange}
         onItemHighlighted={combobox.onItemHighlighted}
@@ -107,6 +108,8 @@ export function Combobox({
                 scroller={combobox.scroller}
                 virtualize={virtualize}
                 hasMore={hasMore}
+                open={combobox.open}
+                loaded={combobox.loaded}
                 loadMore={loadMore}
                 loadMoreThreshold={combobox.loadMoreThreshold}
                 rows={combobox.rows}

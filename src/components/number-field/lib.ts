@@ -1,6 +1,7 @@
 // R-5.12-1: the pure helpers of the number field. No React, so a node test reads them as they are.
 import { clamp } from '#shared/clamp.js'
 import { NUMBER_FIELD_BOUNDARIES as BOUNDS } from './boundaries.js'
+import { NUMBER_FIELD_DEFAULTS } from './constants.js'
 
 export interface NumberFieldLimits {
   min: number | undefined
@@ -8,13 +9,22 @@ export interface NumberFieldLimits {
   step: number | 'any'
 }
 
-/** R-5.7-7: `min` and `max` between the two limits, a numeric `step` from `stepMin` up. An absent bound stays absent. */
+/** R-5.7-7: `min` and `max` between the two limits, a numeric `step` from `stepMin` up. An absent or NaN bound stays
+ * absent and a NaN step is the default, since clamp() reads NaN as its floor; a `max` under `min` is raised to it, as
+ * clamp() does for the value, so the hidden input can still submit. */
 export function resolveLimits(min: number | undefined, max: number | undefined, step: number | 'any'): NumberFieldLimits {
+  const low = isBound(min) ? clamp(min, BOUNDS.limitMin, BOUNDS.limitMax) : undefined
+  const high = isBound(max) ? clamp(max, BOUNDS.limitMin, BOUNDS.limitMax) : undefined
   return {
-    min: min === undefined ? undefined : clamp(min, BOUNDS.limitMin, BOUNDS.limitMax),
-    max: max === undefined ? undefined : clamp(max, BOUNDS.limitMin, BOUNDS.limitMax),
-    step: step === 'any' ? 'any' : clamp(step, BOUNDS.stepMin, BOUNDS.limitMax),
+    min: low,
+    max: low !== undefined && high !== undefined && high < low ? low : high,
+    step: step === 'any' ? 'any' : Number.isNaN(step) ? NUMBER_FIELD_DEFAULTS.step : clamp(step, BOUNDS.stepMin, BOUNDS.limitMax),
   }
+}
+
+/** A bound the caller set: NaN reads as none, ±Infinity is pulled to a limit. */
+function isBound(n: number | undefined): n is number {
+  return n !== undefined && !Number.isNaN(n)
 }
 
 /** Base UI clamps what is typed, not what it is given: `defaultValue={50}` with `max={10}` would render and send 50. */

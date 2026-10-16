@@ -98,6 +98,65 @@ describe('windowing, above the threshold', () => {
     expect(last?.hasAttribute('aria-labelledby')).toBe(false)
   })
 
+  it('a scroll that is not the keyboard leaves the active row mounted in its place: aria-activedescendant names it and Enter runs it', async () => {
+    const onSelect = vi.fn()
+    render(<Palette onSelect={onSelect} />)
+    await ready()
+    await userEvent.keyboard('{ArrowDown}{ArrowDown}')
+    const active = () => document.getElementById(input().getAttribute('aria-activedescendant') ?? '')
+    await waitFor(() => { expect(active()?.textContent).toBe('Command 2') })
+    // A finger or the scrollbar: the window moves a hundred rows down, the highlight stays.
+    list().scrollTop = 4000
+    fireEvent.scroll(list())
+    await waitFor(() => { expect(screen.getAllByRole('option')[1]?.getAttribute('data-command-row')).not.toBe('2') })
+    expect(active()?.textContent).toBe('Command 2')
+    expect(active()?.hasAttribute('data-highlighted')).toBe(true)
+    expect(screen.getAllByRole('option')[0]).toBe(active())
+    // One unit above it stands for Command 1, and the spacers and the rows still count ten thousand.
+    const counts = spacers().map((spacer) => Number(spacer.style.getPropertyValue('--tc-list-rows')))
+    expect(counts[0]).toBe(1)
+    expect(counts.reduce((sum, count) => sum + count, 0) + screen.getAllByRole('option').length).toBe(10_000)
+    await userEvent.keyboard('{Enter}')
+    expect(onSelect).toHaveBeenCalledTimes(1)
+    expect(onSelect).toHaveBeenCalledWith({ id: 'c1', label: 'Command 2', area: 'Area 1' })
+  })
+
+  it('the first match a query highlights stays mounted too, so Enter runs it after the list is scrolled', async () => {
+    const onSelect = vi.fn()
+    render(<Palette onSelect={onSelect} />)
+    await ready()
+    await userEvent.type(input(), 'command 1')
+    await waitFor(() => { expect(screen.getAllByRole('option')[0]?.hasAttribute('data-highlighted')).toBe(true) })
+    list().scrollTop = 4000
+    fireEvent.scroll(list())
+    await waitFor(() => { expect(screen.getAllByRole('option')[1]?.getAttribute('data-command-row')).not.toBe('1') })
+    expect(document.getElementById(input().getAttribute('aria-activedescendant') ?? '')?.textContent).toBe('Command 1')
+    await userEvent.keyboard('{Enter}')
+    expect(onSelect).toHaveBeenCalledWith({ id: 'c0', label: 'Command 1', area: 'Area 1' })
+  })
+
+  it('every mounted option says its place and the size of its set, which a reader cannot count from the rows mounted', async () => {
+    render(<Palette />)
+    await ready()
+    const place = (option: Element | undefined) => `${option?.getAttribute('aria-posinset') ?? '-'} of ${option?.getAttribute('aria-setsize') ?? '-'}`
+    expect(place(screen.getAllByRole('option')[0])).toBe('1 of 10000')
+    await userEvent.type(input(), 'command')
+    await userEvent.keyboard('{ArrowUp}')
+    fireEvent.scroll(list())
+    await waitFor(() => { expect(place(screen.queryByRole('option', { name: 'Command 10000' }) ?? undefined)).toBe('10000 of 10000') })
+  })
+
+  it('grouped, an option counts its place in its own group', async () => {
+    render(<Palette getGroup={(entry) => entry.area} />)
+    await ready()
+    const place = (name: string) => {
+      const option = screen.getByRole('option', { name })
+      return `${option.getAttribute('aria-posinset') ?? '-'} of ${option.getAttribute('aria-setsize') ?? '-'}`
+    }
+    expect(place('Command 1')).toBe('1 of 100')
+    expect(place('Command 2')).toBe('2 of 100')
+  })
+
   it('a new query starts the list from its top again', async () => {
     render(<Palette />)
     await ready()

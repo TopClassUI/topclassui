@@ -137,11 +137,11 @@ describe('hook.ts holds the value, the collection, the window and the locale of 
     expect(hooksByPart(source)).toEqual({
       useCombobox: [
         'useFormValue', 'useImperativeHandle', 'useRef', 'useImperativeHandle', 'useMemo', 'useRef', 'useLabels', 'useState',
-        'useEffect', 'usePortalLocale',
+        'useState', 'useEffect', 'usePortalLocale',
       ],
       useComboboxList: [
-        'useFilteredItems', 'useState', 'useState', 'useRef', 'useCollection', 'useRef', 'useRef', 'useRef', 'useCallback',
-        'useCallback', 'useLayoutEffect', 'useEffect',
+        'useFilteredItems', 'useState', 'useCollection', 'useRef', 'useRef', 'useRef', 'useRef', 'useCallback', 'useCallback',
+        'useLayoutEffect', 'useEffect',
       ],
     })
   })

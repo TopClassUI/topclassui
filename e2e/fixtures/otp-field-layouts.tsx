@@ -1,7 +1,7 @@
 // Loaded into a live page by e2e/otp-field.spec.ts: a code field where a real page puts one. In a block, alone as a grid
 // item, in a wrapper in a grid track, in a flex column, in a label row, in a flex-1 column, in a w-fit parent, in a table
-// cell, beside a label in a grid of `auto 1fr`, and two side by side in a flex row that wraps. Inline styles: the harness
-// compiles only src/.
+// cell, beside a label in a grid of `auto 1fr`, two side by side in a flex row that wraps, and two in a grid of `1fr 1fr`,
+// in wrappers and as grid items. Inline styles: the harness compiles only src/.
 import type { CSSProperties, ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 
@@ -57,6 +57,15 @@ function Fixture() {
         <Case name="pair" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           <div><Six name="First of two" /></div>
           <div><Six name="Second of two" /></div>
+        </Case>
+        {/* A column of 140 px at 320 px, under the 184 px floor of six cells: each field wraps inside its own column. */}
+        <Case name="halves" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          <div><Six name="Left half" /></div>
+          <div><Six name="Right half" /></div>
+        </Case>
+        <Case name="halves-direct" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          <OTPField aria-labelledby="layouts-left-half" />
+          <OTPField aria-labelledby="layouts-right-half" />
         </Case>
       </div>
     </TopClassProvider>

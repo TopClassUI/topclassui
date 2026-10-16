@@ -96,7 +96,37 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the manager of the toast provider gains a client directive, so a server module gets a reference and no add()',
     file: 'src/shared/toast/manager.ts',
-    from: "import { Toast } from '@base-ui/react/toast'\n",
-    to: "'use client'\n\nimport { Toast } from '@base-ui/react/toast'\n",
+    from: "import type { ToastManager, ToastManagerEvent } from '@base-ui/react/toast'\n",
+    to: "'use client'\n\nimport type { ToastManager, ToastManagerEvent } from '@base-ui/react/toast'\n",
+  },
+  {
+    label: 'the toast manager keeps no queue, so a toast a page adds in its mount effect is lost (TOAST-1)',
+    file: 'src/shared/toast/manager.ts',
+    from: "  else if (typeof document !== 'undefined') pending.push(event)\n",
+    to: '',
+  },
+  {
+    label: 'the toast manager queues on the server too, where no provider ever listens and the queue only grows',
+    file: 'src/shared/toast/manager.ts',
+    from: "  else if (typeof document !== 'undefined') pending.push(event)",
+    to: '  else pending.push(event)',
+  },
+  {
+    label: 'the toast manager replays its queue to every listener, so a second provider draws an early toast twice',
+    file: 'src/shared/toast/manager.ts',
+    from: 'for (const event of pending.splice(0)) listener(event)',
+    to: 'for (const event of pending) listener(event)',
+  },
+  {
+    label: 'the toast manager leaves the copy of a queued promise uncaught, so its rejection is reported unhandled',
+    file: 'src/shared/toast/manager.ts',
+    from: '      if (returned) handled.catch(() => undefined)\n      else handed = handled',
+    to: '      handed = handled',
+  },
+  {
+    label: "the toast manager reuses an empty id, so two toasts added with id '' are one",
+    file: 'src/shared/toast/manager.ts',
+    from: "options.id === undefined || options.id === '' ?",
+    to: 'options.id === undefined ?',
   },
 ]

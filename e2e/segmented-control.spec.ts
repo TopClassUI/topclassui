@@ -202,6 +202,22 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(contrast(rgbOf(await css(page.getByRole('radiogroup', { name: 'Read-only' }), 'border-top-color')), canvas)).toBeGreaterThanOrEqual(3)
     })
 
+    // SEGMENTED-1: painted on a canvas and read back, so the test measures the colour and not its spelling.
+    test('a disabled selected segment takes GrayText and Canvas, apart from a live selected one', async ({ page }) => {
+      await page.goto(urlFor('segmented-control--states', 'light', 'ltr'))
+      const painted = (colour: string) => page.evaluate((value) => {
+        const pen = document.createElement('canvas').getContext('2d')
+        if (!pen) throw new Error('no canvas')
+        pen.fillStyle = value
+        pen.fillRect(0, 0, 1, 1)
+        return [...pen.getImageData(0, 0, 1, 1).data].slice(0, 3).join()
+      }, colour)
+      const disabled = segmentIn(page, 'Disabled, selected')
+      expect([await painted(await css(disabled, 'background-color')), await painted(await css(disabled, 'color'))])
+        .toEqual([await painted(await resolve(page, 'GrayText')), await painted(await resolve(page, 'Canvas'))])
+      expect(await painted(await css(disabled, 'background-color'))).not.toBe(await painted(await resolve(page, 'Highlight')))
+    })
+
     test('invalid thickens the line to 2 px; disabled dims; no segment has an outline at rest', async ({ page }) => {
       await page.goto(urlFor('segmented-control--states', 'light', 'ltr'))
       expect(await css(page.getByRole('radiogroup', { name: 'Invalid' }), 'border-top-width')).toBe('2px')
@@ -419,6 +435,9 @@ test.describe('live: a form reset', () => {
 
   const sent = (page: Page, form: string) => page.evaluate((name) => window.segmentedSent?.[name] ?? [], form)
   const selected = (page: Page, name: string) => selectedIn(page.getByRole('radiogroup', { name }))
+  // RG-2: the APG tab stop is the selected segment, and Base UI picks it only on mount.
+  const stops = (page: Page, names: string[]) => Promise.all(names.map((name) => page.getByRole('radiogroup', { name })
+    .locator('[role="radio"][tabindex="0"]').evaluateAll((all) => all.map((el) => el.textContent))))
 
   for (const how of ['form.reset()', 'a reset button'] as const) {
     test(`after ${how}, each track is back at its default on screen and in the form; a controlled one keeps its owner's value`, async ({ page }) => {
@@ -430,6 +449,7 @@ test.describe('live: a form reset', () => {
       expect([await selected(page, 'Owned'), await selected(page, 'Far')]).toEqual([['Owned B'], ['Far A']])
       await expect(page.locator('#owner')).toHaveText('b')
       expect(await serverEntries(page, '#plain')).toEqual([['plan', 'a'], ['owned', 'b'], ['far', 'a']])
+      expect(await stops(page, ['Plan', 'Owned'])).toEqual([['Plan A'], ['Owned B']])
     })
   }
 
@@ -439,6 +459,7 @@ test.describe('live: a form reset', () => {
     await expect.poll(() => sent(page, 'action')).toEqual([[['pick', 'b']]])
     await expect.poll(() => selected(page, 'Pick')).toEqual(['Pick A'])
     expect(await serverEntries(page, '#action')).toEqual([['pick', 'a']])
+    expect(await stops(page, ['Pick'])).toEqual([['Pick A']])
   })
 
   test('with the action\'s answer as the new default, the choice stays, on screen and in the form, and is sent again', async ({ page }) => {
@@ -535,6 +556,11 @@ test.describe('live: hostile content', () => {
         const box = await boxOf(word)
         expect(box.left).toBeGreaterThanOrEqual(0)
         expect(box.right).toBeLessThanOrEqual(320)
+        // SEGMENTED-2: an element for a label ends in an ellipsis too, and stays inside its segment in both directions.
+        const element = page.locator('#hostile [role="radio"] > strong')
+        expect([await css(element, 'text-overflow'), await element.evaluate((el) => el.scrollWidth > el.clientWidth)]).toEqual(['ellipsis', true])
+        const [inner, outer] = [await boxOf(element), await boxOf(element.locator('..'))]
+        expect([inner.left >= outer.left, inner.right <= outer.right]).toEqual([true, true])
         for (const name of ['Ten', 'Sixty']) {
           expect(await page.getByRole('radiogroup', { name }).evaluate((el) => el.scrollWidth > el.clientWidth), name).toBe(true)
         }

@@ -4,7 +4,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
 import { DIRECTIONS, MODES, type Direction } from '../scripts/lib/harness.js'
 import { type LiveOptions, expectNoSidewaysScroll, liveErrors, liveUrl, openLive } from './live.js'
 import { urlFor } from './pages.js'
-import { FORCED_CANVAS, type Rgb, inkOn, pixelsOf, rgbOf } from './pixels.js'
+import { FORCED_CANVAS, type Rgb, inkOn, paintedRgb, pixelsOf } from './pixels.js'
 
 // The client half of Banner on the live harness: the x, what it remembers, what a reload shows before and after the
 // script runs, where focus goes, and the x among hostile content and real layouts.
@@ -173,9 +173,9 @@ test.describe('the x', () => {
     })
   })
 
-  for (const direction of DIRECTIONS) {
-    test(`${direction}: the focus ring is drawn whole on the banner's fill, all four sides`, async ({ page }) => {
-      await openLive(page, DEMO, { direction })
+  for (const mode of MODES) for (const direction of DIRECTIONS) {
+    test(`${mode} ${direction}: the focus ring is drawn whole on the banner's fill, all four sides`, async ({ page }) => {
+      await openLive(page, DEMO, { mode, direction })
       await tabToX(page, direction)
       const ring = await xOf(release(page)).evaluate((x) => {
         const style = getComputedStyle(x)
@@ -185,23 +185,32 @@ test.describe('the x', () => {
         for (let at = x.parentElement; at && at !== document.body; at = at.parentElement) {
           if (getComputedStyle(at).overflow !== 'visible') clipped++
         }
-        const fill = getComputedStyle(x.parentElement as Element).backgroundColor
-        return { style: style.outlineStyle, width: parseFloat(style.outlineWidth), reach, box: box.toJSON() as DOMRect, clipped, fill }
+        return { style: style.outlineStyle, width: parseFloat(style.outlineWidth), reach, radius: parseFloat(style.borderTopLeftRadius), box: box.toJSON() as DOMRect, clipped }
       })
       expect(ring.style).toBe('solid')
       expect(ring.clipped).toBe(0)
       const { x, y, width, height } = ring.box
-      const fill = rgbOf(ring.fill)
-      const band = async (clip: { x: number, y: number, width: number, height: number }) => inkOn(await pixelsOf(page, clip), fill)
-      const sides = {
-        top: await band({ x, y: y - ring.reach, width, height: ring.width }),
-        bottom: await band({ x, y: y + height + ring.reach - ring.width, width, height: ring.width }),
-        start: await band({ x: x - ring.reach, y, width: ring.width, height }),
-        end: await band({ x: x + width + ring.reach - ring.width, y, width: ring.width, height }),
+      // The fill as painted: its computed value is oklch, whose digits are not channels.
+      const fill = await paintedRgb(release(page), 'background-color')
+      // The straight run of each side, between the corners the ring rounds with the x's own radius; a pill has none, so 2 px.
+      const corner = Math.min(ring.radius, width / 2 - 1, height / 2 - 1)
+      const run = { x: x + corner, y: y + corner, width: width - 2 * corner, height: height - 2 * corner }
+      const sides = async () => {
+        const band = async (clip: { x: number, y: number, width: number, height: number }) => inkOn(await pixelsOf(page, clip), fill)
+        return {
+          top: await band({ x: run.x, y: y - ring.reach, width: run.width, height: ring.width }),
+          bottom: await band({ x: run.x, y: y + height + ring.reach - ring.width, width: run.width, height: ring.width }),
+          left: await band({ x: x - ring.reach, y: run.y, width: ring.width, height: run.height }),
+          right: await band({ x: x + width + ring.reach - ring.width, y: run.y, width: ring.width, height: run.height }),
+        }
       }
-      // Every pixel of each side, at 3:1 on the fill: 24 px long and the ring's width deep.
-      const whole = 24 * ring.width
-      expect(sides).toEqual({ top: whole, bottom: whole, start: whole, end: whole })
+      // Every pixel of each run at 3:1 on the fill, 2 px deep: 8 px between the 8 px corners of a 24 px x, 2 px on a pill.
+      expect([ring.width, width, height]).toEqual([2, 24, 24])
+      const whole = { light: 16, dark: 16, ocean: 4 }[mode]
+      expect(await sides()).toEqual({ top: whole, bottom: whole, left: whole, right: whole })
+      // The same bands with no focus hold nothing, so a backdrop that counts every pixel fails above.
+      await page.evaluate(() => { (document.activeElement as HTMLElement | null)?.blur() })
+      expect(await sides()).toEqual({ top: 0, bottom: 0, left: 0, right: 0 })
     })
   }
 })
@@ -275,15 +284,18 @@ test.describe('text made larger or spaced out', () => {
   for (const direction of DIRECTIONS) {
     test(`${direction}: with the root at 32 px the x grows with the text and still covers nothing`, async ({ page }) => {
       await openFixture(page, { direction })
-      // Not the layouts: a 85 px grid track and a table cell widen to the 80 px of padding and the action's 160 px,
-      // dismissible or not. That is the server half's minimum width, reported, not this x.
-      await page.addStyleTag({ content: 'html { font-size: 32px !important } #layouts { display: none }' })
+      // Not the table: an auto-layout cell widens to the min-content of what it holds; table-layout: fixed is the caller's.
+      await page.addStyleTag({ content: 'html { font-size: 32px !important } #layouts table { display: none }' })
       await expectNoSidewaysScroll(page)
       const found = await page.evaluate(geometry, '#banner-fixture')
       expect(found.map((banner) => banner.name)).toEqual(FIXTURE_NAMES)
       for (const banner of found.slice(0, 4)) {
         // px-5 is 1.25rem, so 40 px at a 32 px root.
         expect(banner, banner.name).toEqual({ ...banner, endGap: 40, inBanner: true, inParent: true, onChild: 0, onText: 0 })
+      }
+      // min-w-0 on the root: a 96 px grid track keeps its width, and the banner and its x stay inside it.
+      for (const banner of found.slice(4, 7)) {
+        expect(banner, banner.name).toEqual({ ...banner, inBanner: true, inParent: true, onChild: 0, onText: 0 })
       }
       const box = await page.locator('#counted [role="region"] > button').boundingBox()
       expect(box?.width).toBe(28)

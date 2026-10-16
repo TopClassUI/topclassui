@@ -9,7 +9,7 @@ import { z } from 'zod'
 import type { ComponentMeta } from '../src/shared/meta.js'
 import type { JsonSchemaObject } from './lib/readme.js'
 import { handWrittenOf, mergeRows, renderReadme, rowsFromJsonSchema } from './lib/readme.js'
-import { familyOf, openTypeProgram, ownPropsOf, valueExportsOf } from './lib/readme-types.js'
+import { familyOf, openTypeProgram, ownPropsOf, reachOf, valueExportsOf } from './lib/readme-types.js'
 
 const ROOT = process.cwd()
 const COMPONENTS = join(ROOT, 'src', 'components')
@@ -65,6 +65,9 @@ for (const slug of folders) {
   const family = exported.includes(root) && existsSync(typeFile)
     ? familyOf(program, typeFile, exported, root, fromSchema)
     : undefined
+  // A single component is imported by its bare name; one without, such as Toast, by every value it exports.
+  const named = exported.includes(meta.name) ? [meta.name] : exported
+  const surface = named.map((name) => ({ name, reach: existsSync(typeFile) ? reachOf(program, typeFile, name) : null }))
 
   const demoDir = join(dir, 'dummy')
   const demos = existsSync(demoDir)
@@ -79,6 +82,7 @@ for (const slug of folders) {
     demos,
     handWritten: handWrittenOf(existing),
     family,
+    surface,
   })
 
   if (existing === next) continue

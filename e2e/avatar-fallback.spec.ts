@@ -168,6 +168,27 @@ for (const direction of DIRECTIONS) {
     await expect(img).toHaveAttribute('data-error', '')
     expect(await painted(page, root), 'good to bad again').toEqual(FALLBACK_ONLY)
   })
+
+  test(`srcSet ${direction}: a picture given by srcSet alone starts again when its srcSet changes`, async ({ page }) => {
+    await serveImages(page)
+    await openFixture(page, direction)
+    const root = page.locator('#srcset')
+    const img = root.locator('img')
+    const setSrcSet = (srcSet: string) => page.evaluate((to) => { window.__avatarSrcSet?.(to) }, srcSet)
+    const loaded = () => img.evaluate((el) => (el as HTMLImageElement).complete && (el as HTMLImageElement).naturalWidth > 0)
+
+    await expect.poll(loaded).toBe(true)
+    expect(await img.getAttribute('src'), 'the picture has a srcSet and no src').toBeNull()
+
+    await setSrcSet('/__avatar/broken-srcset.png 1x')
+    await expect(img).toHaveAttribute('data-error', '')
+    expect(await painted(page, root), 'good to bad').toEqual(FALLBACK_ONLY)
+
+    await setSrcSet('/__avatar/ok.svg 1x')
+    await expect(img).not.toHaveAttribute('data-error')
+    await expect.poll(loaded).toBe(true)
+    expect(await painted(page, root), 'bad to good').toEqual(PICTURE_ONLY)
+  })
 }
 
 test('slow: the fallback shows while the picture loads, then the picture', async ({ page }) => {

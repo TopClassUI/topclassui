@@ -46,8 +46,8 @@ export type OtpFieldProps = Omit<Base.Root.Props, Owned>
 /** The export is `OTPField`; the README generator looks up `${meta.name}Props`, and meta.name is `OtpField`. */
 export type OTPFieldProps = OtpFieldProps
 
-/** What the hook holds and decides: the value, its handler, the root, and how Base UI filters a character. */
-export type OtpFieldValueProps = Pick<Base.Root.Props, 'value' | 'defaultValue' | 'onValueChange' | 'validationType' | 'normalizeValue' | 'inputMode'> & {
+/** What the hook holds and decides: the value, its handlers, the submit, the root, and how Base UI filters a character. */
+export type OtpFieldValueProps = Pick<Base.Root.Props, 'value' | 'defaultValue' | 'onValueChange' | 'onValueComplete' | 'autoSubmit' | 'validationType' | 'normalizeValue' | 'inputMode'> & {
   length: number
   groupSize: number
   ref?: Ref<HTMLDivElement> | undefined
@@ -55,6 +55,9 @@ export type OtpFieldValueProps = Pick<Base.Root.Props, 'value' | 'defaultValue' 
 
 /** What Base UI hands a change handler: the reason, the event, and cancel(). */
 export type OtpFieldChangeDetails = Base.Root.ChangeEventDetails
+
+/** What Base UI hands onValueComplete: the reason and the event. */
+export type OtpFieldCompleteDetails = Base.Root.CompleteEventDetails
 
 /** Which characters Base UI keeps; `numeric` is ours, so Arabic-Indic and Persian digits count (choice 21). */
 export type OtpFieldValidationType = Base.Root.ValidationType

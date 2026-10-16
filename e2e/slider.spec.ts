@@ -108,14 +108,15 @@ test.describe('the server HTML, before any script runs', () => {
 })
 
 test.describe('the states, on the static page', () => {
-  test('primary: the fill, and the knob\'s 2 px line on the raised surface', async ({ page }) => {
+  test('primary: the fill, the knob\'s 2 px line on the raised surface, and a 1 px line-strong edge around the track', async ({ page }) => {
     await page.goto(urlFor('slider--states', 'light', 'ltr'))
     const primary = await resolve(page, 'var(--tc-primary-solid)')
     const live = thumbIn(page, 'Live')
     expect(await css(fillOf(live), 'background-color')).toBe(primary)
     expect([await css(knobOf(live), 'border-top-color'), await css(knobOf(live), 'border-top-width')]).toEqual([primary, '2px'])
     expect(await css(knobOf(live), 'background-color')).toBe(await resolve(page, 'var(--tc-surface-raised)'))
-    expect(await css(trackOf(live), 'outline-style')).toBe('none')
+    expect([await css(trackOf(live), 'outline-style'), await css(trackOf(live), 'outline-width'), await css(trackOf(live), 'outline-color')])
+      .toEqual(['solid', '1px', await resolve(page, 'var(--tc-line-strong)')])
   })
 
   test('invalid: the fill and the knob turn to danger, and a danger line is drawn around the track, not hue alone', async ({ page }) => {
@@ -135,6 +136,21 @@ test.describe('the states, on the static page', () => {
     const opacity = (name: string) => thumbIn(page, name).evaluate((el) => getComputedStyle(el.closest('[role="group"]') as Element).opacity)
     expect([await opacity('Disabled'), await opacity('Live'), await opacity('Invalid')]).toEqual(['0.5', '1', '1'])
   })
+})
+
+test.describe('the edge of the empty track, read from the pixels a page painted', () => {
+  for (const mode of ['light', 'dark', 'ocean'] as const) {
+    test(`${mode}: a line at 3:1 against the page runs along the empty track, so the end of the range can be seen`, async ({ page }) => {
+      await page.goto(urlFor('slider--states', mode, 'ltr'))
+      const input = thumbIn(page, 'Live')
+      const [thumb, track] = [await boxOf(thumbOf(input)), await boxOf(trackOf(input))]
+      const [x, width] = [Math.round(thumb.right + 4), Math.round(track.right - thumb.right - 12)]
+      // The page itself, 6 px above the track inside the slider's own box, where nothing is painted.
+      const [backdrop] = await pixelsOf(page, { x, y: Math.round(track.top - 6), width: 1, height: 1 })
+      const edge = await pixelsOf(page, { x, y: Math.round(track.top - 2), width, height: 3 })
+      expect(inkOn(edge, backdrop ?? [0, 0, 0]), `${String(width)} columns`).toBeGreaterThanOrEqual(width)
+    })
+  }
 })
 
 for (const scheme of ['light', 'dark'] as const) {
@@ -161,6 +177,9 @@ for (const scheme of ['light', 'dark'] as const) {
       await page.goto(urlFor('slider--states', 'light', 'ltr'))
       expect(await css(trackOf(thumbIn(page, 'Invalid')), 'outline-width')).toBe('2px')
       expect(await css(trackOf(thumbIn(page, 'Live')), 'outline-width')).toBe('1px')
+      // The user's palette, not the author's red: the 2 px line already tells invalid apart.
+      const highlight = await resolve(page, 'Highlight')
+      expect(await Promise.all(['Invalid', 'Minimum', 'Maximum'].map((name) => css(fillOf(thumbIn(page, name)), 'background-color')))).toEqual([highlight, highlight, highlight])
       const outlines = await page.locator('#demo input').evaluateAll((all) => all.map((el) => getComputedStyle(el).outlineStyle))
       expect(new Set(outlines)).toEqual(new Set(['none']))
     })
@@ -214,7 +233,7 @@ test.describe('text', () => {
     })
   }
 
-  test('WCAG 1.4.12 spacing: the value moves, the knob keeps its size, and the value never covers the track', async ({ page }) => {
+  test('WCAG 1.4.12 spacing: the value moves, beside the track or below it, the knob keeps its size, and the value never covers the track', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 480 })
     await page.goto(urlFor('slider--show-value', 'light', 'ltr'))
     await page.addStyleTag({ content: '* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-block-end: 2em !important; }' })
@@ -222,7 +241,9 @@ test.describe('text', () => {
       const input = thumbIn(page, name)
       expect((await boxOf(knobOf(input))).width).toBe(20)
       const output = input.locator('xpath=ancestor::*[@role="group"]//output')
-      expect((await boxOf(output)).left, name).toBeGreaterThanOrEqual((await boxOf(trackOf(input))).right)
+      const [value, track] = [await boxOf(output), await boxOf(trackOf(input))]
+      // Beside the track, or on its own line below it when the wider letters no longer fit beside it.
+      expect(value.left >= track.right || value.top >= track.bottom, name).toBe(true)
     }
     await expectNoSidewaysScroll(page)
   })
@@ -273,6 +294,19 @@ test.describe('live: the keyboard', () => {
     await expect(thumbIn(page, 'Maximum')).toBeFocused()
     await page.keyboard.press('Home')
     expect(await valueOf(thumbIn(page, 'Maximum'))).toBe('80')
+  })
+})
+
+test.describe('live: what a screen reader is handed', () => {
+  test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
+
+  test('the focused range input of an invalid slider is invalid, one thumb and both of a range; a valid one is not', async ({ page }) => {
+    await openLive(page, 'slider--states')
+    const cdp = await page.context().newCDPSession(page)
+    const { nodes } = await cdp.send('Accessibility.getFullAXTree') as { nodes: { ignored: boolean; role?: { value: string }; name?: { value: string }; properties?: { name: string; value: { value?: string | boolean } }[] }[] }
+    const sliders = nodes.filter((node) => !node.ignored && node.role?.value === 'slider')
+      .map((node) => `${String(node.name?.value)} ${String(node.properties?.find((p) => p.name === 'invalid')?.value.value ?? 'false')}`)
+    expect(sliders).toEqual(expect.arrayContaining(['Live false', 'Invalid true', 'Minimum true', 'Maximum true']))
   })
 })
 
@@ -374,11 +408,60 @@ test.describe('live: a press and a drag', () => {
     })
   }
 
+  for (const pointer of ['fine', 'coarse'] as const) {
+    test.describe(`no provider on an rtl page, ${pointer} pointer`, () => {
+      test.use(pointer === 'coarse' ? COARSE : {})
+
+      test('the slider runs left to right as its keys do: the thumb of 30 sits 30% from the left, and a press lands under the finger', async ({ page }) => {
+        await openLive(page, 'separator--horizontal', { direction: 'rtl' })
+        await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/slider-no-provider.tsx' })
+        const input = thumbIn(page, 'No provider')
+        await expect(input).toBeVisible()
+        expect(await fromLeft(input)).toBe(30)
+        const at = await pointOn(input, 0.75)
+        if (pointer === 'fine') await page.mouse.click(at.x, at.y)
+        else await page.touchscreen.tap(at.x, at.y)
+        expect([await valueOf(input), await fromLeft(input)]).toEqual(['75', 75])
+      })
+    })
+  }
+
   test('an rtl island on an ltr page: the thumb of 30 sits 30% in from the right', async ({ page }) => {
     await openLive(page, 'slider--rtl', { direction: 'ltr' })
     expect(await fromLeft(thumbIn(page, 'مستوى الصوت'))).toBe(70)
     expect([await fromLeft(thumbIn(page, 'الحد الأدنى')), await fromLeft(thumbIn(page, 'الحد الأقصى'))]).toEqual([80, 20])
   })
+})
+
+test.describe('live: a finger on a slider inside a Drawer', () => {
+  test.use(COARSE)
+  test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
+
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: dragging the thumb toward the side the sheet closes on moves the thumb, and the sheet stays`, async ({ page }) => {
+      await openLive(page, 'separator--horizontal', { direction })
+      await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/slider-drawer.tsx' })
+      const popup = page.getByRole('dialog', { name: 'Filters' })
+      await expect(popup).toBeVisible()
+      // Let the sheet finish sliding in, so its edge is still.
+      await expect.poll(() => popup.evaluate((el) => el.getAnimations({ subtree: true }).length)).toBe(0)
+      const input = thumbIn(page, 'Price')
+      const [thumb, track, before] = [await boxOf(thumbOf(input)), await boxOf(trackOf(input)), await boxOf(popup)]
+      const cdp = await page.context().newCDPSession(page)
+      const touch = (type: 'touchStart' | 'touchMove' | 'touchEnd', x: number, y: number) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y }] })
+      const [x0, y0] = [thumb.left + thumb.width / 2, thumb.top + thumb.height / 2]
+      // Past the end of the track on the side the inline-end sheet is dismissed toward: right in ltr, left in rtl.
+      const x1 = direction === 'ltr' ? track.right + 40 : track.left - 40
+      await touch('touchStart', x0, y0)
+      for (let step = 1; step <= 10; step += 1) await touch('touchMove', x0 + ((x1 - x0) * step) / 10, y0)
+      const during = await boxOf(popup)
+      await touch('touchEnd', x1, y0)
+      expect(during.left).toBe(before.left)
+      await expect(popup).toBeVisible()
+      expect(await page.evaluate(() => window.sliderDrawer ?? [])).toEqual([])
+      expect(await valueOf(input)).toBe('100')
+    })
+  }
 })
 
 test.describe('live: a form reset', () => {
@@ -436,6 +519,77 @@ test.describe('live: a form reset', () => {
     await expect.poll(() => sent(page, 'echo')).toEqual([[['again', '60']], [['again', '60']]])
   })
 })
+
+for (const pointer of ['fine', 'coarse'] as const) {
+  test.describe(`live: a disabled fieldset, ${pointer} pointer`, () => {
+    test.use(pointer === 'coarse' ? COARSE : {})
+    test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
+
+    test('the slider dims to half, a press on its track moves nothing, and the form sends nothing', async ({ page }) => {
+      await openLive(page, 'separator--horizontal')
+      await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/slider-reset.tsx' })
+      await expect(page.locator('#slider-reset')).toHaveAttribute('data-ready', '')
+      const input = thumbIn(page, 'Fenced')
+      expect(await input.evaluate((el) => getComputedStyle(el.closest('[role="group"]') as Element).opacity)).toBe('0.5')
+      const track = await boxOf(trackOf(input))
+      const [x, y] = [track.left + track.width * 0.9, track.top + track.height / 2]
+      if (pointer === 'fine') await page.mouse.click(x, y)
+      else await page.touchscreen.tap(x, y)
+      expect([await valueOf(input), await input.inputValue(), await fromLeft(input)]).toEqual(['20', '20', 20])
+      expect(await serverEntries(page, '#fenced')).toEqual([])
+    })
+  })
+}
+
+for (const pointer of ['fine', 'coarse'] as const) {
+  test.describe(`live: the two ends, ${pointer} pointer`, () => {
+    test.use(pointer === 'coarse' ? COARSE : {})
+    test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
+
+    for (const direction of DIRECTIONS) {
+      for (const rootSize of [16, 32]) {
+        test(`${direction}, a ${String(rootSize)} px root: at 0 and at 100 the knob and its focus ring stay inside the slider's box, at every size`, async ({ page }) => {
+          await openLive(page, 'separator--horizontal', { direction })
+          await page.evaluate((px) => { document.documentElement.style.fontSize = `${String(px)}px` }, rootSize)
+          await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/slider-edges.tsx' })
+          await expect(page.locator('#slider-edges [data-index]').first()).toBeVisible()
+          // How far the ring of each knob, its offset plus its width outside the knob, pokes out of its group: 0 when inside.
+          const past = await page.locator('#slider-edges [data-index] > span').evaluateAll((all) => all.map((knob) => {
+            const style = getComputedStyle(knob)
+            const ring = parseFloat(style.getPropertyValue('--tc-ring-offset')) + parseFloat(style.getPropertyValue('--tc-ring-width'))
+            const [k, g] = [knob.getBoundingClientRect(), (knob.closest('[role="group"]') as Element).getBoundingClientRect()]
+            return Math.max(0, Math.round((g.left - (k.left - ring)) * 10) / 10, Math.round((k.right + ring - g.right) * 10) / 10)
+          }))
+          expect(past).toEqual(Array.from({ length: 10 }, () => 0))
+        })
+      }
+    }
+  })
+}
+
+for (const [width, pointer] of [[320, 'coarse'], [390, 'coarse'], [1280, 'fine'], [1280, 'coarse']] as const) {
+  test.describe(`live: showValue, ${String(width)} px, ${pointer} pointer`, () => {
+    test.use({ ...(pointer === 'coarse' ? COARSE : {}), viewport: { width, height: 800 } })
+    test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
+
+    for (const direction of DIRECTIONS) {
+      test(`${direction}: a long value moves below the track instead of eating it; the track holds its thumbs and nothing leaves the slider`, async ({ page }) => {
+        await openLive(page, 'separator--horizontal', { direction })
+        await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/slider-values.tsx' })
+        await expect(page.locator('#slider-values output').first()).toBeVisible()
+        const rows = await page.locator('#slider-values [role="group"]').evaluateAll((all) => all.map((group) => {
+          const box = (el: Element | null) => el?.getBoundingClientRect() ?? new DOMRect()
+          const [g, track, output] = [box(group), box(group.querySelector('[data-index]')?.parentElement ?? null), box(group.querySelector('output'))]
+          const thumbs = [...group.querySelectorAll('[data-index]')].reduce((sum, thumb) => sum + thumb.getBoundingClientRect().width, 0)
+          const inside = output.left >= g.left - 0.5 && output.right <= g.right + 0.5 && track.left >= g.left - 0.5 && track.right <= g.right + 0.5
+          return { holds: track.width > thumbs, inside, overlap: output.top < track.bottom && output.bottom > track.top && output.left < track.right && output.right > track.left }
+        }))
+        expect(rows).toEqual(Array.from({ length: 5 }, () => ({ holds: true, inside: true, overlap: false })))
+        await expectNoSidewaysScroll(page)
+      })
+    }
+  })
+}
 
 test.describe('live: where a page puts a slider', () => {
   const fixture = async (page: Page, options: LiveOptions = {}) => {
