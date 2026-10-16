@@ -25,7 +25,6 @@ function exportedNames(source: string): string[] {
 /** Each part file and the one component it exports, named after the file (R-5.12-4). */
 const PART_FILES = {
   'avatar-fallback': ['AvatarFallback'],
-  'avatar-image': ['AvatarImage'],
   'avatar-root': ['AvatarRoot'],
 }
 
@@ -56,11 +55,17 @@ describe('index.tsx exports flat names, and no bare Avatar', () => {
   })
 })
 
-describe('parts/ holds one component per file', () => {
-  it('holds exactly the three part files', () => {
+describe('parts/ holds the server parts, one component per file', () => {
+  it('holds exactly the two server part files: the image moved to client.tsx', () => {
     expect(readdirSync(join(import.meta.dirname, '..', 'parts')).sort()).toEqual([
-      'avatar-fallback.tsx', 'avatar-image.tsx', 'avatar-root.tsx',
+      'avatar-fallback.tsx', 'avatar-root.tsx',
     ])
+  })
+
+  it('client.tsx exports the image alone, the one part that runs in the browser', async () => {
+    const loaded = await import('../client.js') as Record<string, unknown>
+    expect(Object.keys(loaded)).toEqual(['AvatarImage'])
+    expect(loaded['AvatarImage']).toBe(avatar.AvatarImage)
   })
 
   for (const [file, names] of Object.entries(PART_FILES)) {
