@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
-import { DIRECTIONS, MODES } from '../scripts/lib/harness.js'
+import { DIRECTIONS, type Direction, MODES } from '../scripts/lib/harness.js'
 import { type LiveOptions, expectNoSidewaysScroll, liveErrors, liveUrl, openLive } from './live.js'
 import { DEMOS, urlFor } from './pages.js'
 import { type Clip, type Rgb, contrast, pixelsOf, rgbOf } from './pixels.js'
@@ -586,7 +586,7 @@ test.describe('the page being read is in view when a phone opens it', () => {
   test.use({ viewport: { width: 320, height: 480 }, javaScriptEnabled: false })
 
   /** Opens many-links with the mark moved to the sixth link, past what the list shows, and returns how much of it shows. */
-  async function openOnChangelog(page: Page, direction: string, style = ''): Promise<{ shown: number, width: number, at: number, room: number }> {
+  async function openOnChangelog(page: Page, direction: Direction, style = ''): Promise<{ shown: number, width: number, at: number, room: number }> {
     await page.route(`**/navbar--many-links--light--${direction}.html*`, async (route) => {
       const response = await route.fetch()
       const body = (await response.text()).replace(' aria-current="page"', '').replace('href="/changelog"', 'href="/changelog" aria-current="page"')
