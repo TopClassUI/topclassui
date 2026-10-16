@@ -50,6 +50,8 @@ export function FileUpload({
         </span>
         {upload.hintId === undefined ? null : <span id={upload.hintId} className={FILE_UPLOAD_HINT}>{children}</span>}
         <input
+          // Blink falls back to "No file chosen", in the browser's language, only when title is absent; empty is not absent.
+          title=""
           {...rest}
           ref={upload.inputRef}
           type="file"

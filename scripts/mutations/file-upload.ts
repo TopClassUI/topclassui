@@ -187,4 +187,10 @@ export const MUTATIONS: Mutation[] = [
     from: '<span key={upload.messageKey}>',
     to: '<span>',
   },
+  {
+    label: 'the file upload input has no title, so Chromium shows its own No file chosen over the zone',
+    file: CLIENT,
+    from: '          title=""\n',
+    to: '',
+  },
 ]
