@@ -56,7 +56,7 @@ the same in Arabic.
 
 **The list** is seven rows tall (`--tc-list-rows`), or `visibleRows` (1 to 20), and scrolls inside
 itself; the page behind does not move. A row is 40 px, 44 px under a finger. It is at least as wide
-as the trigger and grows with its longest label up to the room on screen; a longer label ends in
+as the trigger when there is room, and grows with its longest label up to the room on screen; a longer label ends in
 an ellipsis, in the row and in the trigger. **It is not windowed**: Base UI mounts every option
 once the trigger takes the focus. For thousands of options use a Combobox.
 
@@ -67,7 +67,8 @@ content (a `w-fit` box, a table cell) there is nothing to fill: give the parent 
 
 **`placement`** takes the twelve shared values, `bottom-start` by default; `start` and `end` are
 the reading sides. The list opens 6 px off the trigger, flips at an edge and stays 8 px inside the
-screen. It never covers the trigger.
+screen. It never covers the trigger: beside a trigger on a phone, where the room is narrower than
+the trigger, it takes the room and its labels end in an ellipsis.
 
 **`modal`** is Base UI's:
 - `true`, the default: while the list is open the page does not scroll and a press outside only closes it.

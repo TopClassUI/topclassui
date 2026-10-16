@@ -315,6 +315,36 @@ test.describe('live: where the list opens', () => {
     }
   }
 
+  test.describe('a side placement on a phone, under a coarse pointer', () => {
+    test.use(COARSE)
+    const SIDES = ['start', 'start-top', 'start-bottom', 'end', 'end-top', 'end-bottom'] as const
+    const SPOTS = ['top-start', 'top-end', 'bottom-start', 'bottom-end', 'middle'] as const
+
+    for (const screen of [{ width: 390, height: 844 }, { width: 320, height: 480 }]) {
+      for (const direction of DIRECTIONS) {
+        test(`${String(screen.width)} x ${String(screen.height)} ${direction}: beside a trigger wider than the room, each list stays 8 px inside the screen and the page never scrolls`, async ({ page }) => {
+          await page.setViewportSize(screen)
+          await fixture(page, 'select-placements', { direction })
+          for (const placement of SIDES) {
+            for (const spot of SPOTS) {
+              const label = `${placement} at ${spot}`
+              await page.evaluate((detail) => document.dispatchEvent(new CustomEvent('select-case', { detail })), { placement, spot })
+              await expect(page.locator('#placements')).toHaveAttribute('data-case', `${placement} ${spot}`)
+              const trigger = combo(page, 'Country')
+              const popup = await openList(page, trigger, 'tap')
+              await expectInsideViewport(popup, `the list of ${label}`, 8)
+              await expectNoSidewaysScroll(page)
+              expect(await page.evaluate(() => [window.scrollX, document.documentElement.scrollWidth - document.documentElement.clientWidth]), label).toEqual([0, 0])
+              expect(sideOf(await boxOf(popup), await boxOf(trigger)), `${label}: over its trigger`).not.toBeNull()
+              await page.keyboard.press('Escape')
+              await expectClosed(page, POPUP)
+            }
+          }
+        })
+      }
+    }
+  })
+
   for (const screen of [{ width: 320, height: 480 }, { width: 844, height: 390 }]) {
     for (const direction of DIRECTIONS) {
       test(`${String(screen.width)} x ${String(screen.height)} ${direction}: at the four edges the list is whole, beside its trigger, and nothing in it scrolls sideways`, async ({ page }) => {

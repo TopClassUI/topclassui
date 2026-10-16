@@ -96,4 +96,16 @@ export const MUTATIONS: Mutation[] = [
     from: ' ${LIST_CAP} ${SCROLL_AREA}',
     to: ' ${LIST_CAP}',
   },
+  {
+    label: 'the select popup takes the trigger width as its floor again, so beside a trigger on a phone it runs off the screen',
+    file: CLASSES,
+    from: 'min-w-[min(var(--anchor-width),round(down,var(--available-width),1px))]',
+    to: 'min-w-(--anchor-width)',
+  },
+  {
+    label: 'the select popup caps its width at the room unrounded, so a list placed on a whole pixel ends 0.2 px past the 8 px',
+    file: CLASSES,
+    from: 'max-w-[round(down,var(--available-width),1px)]',
+    to: 'max-w-(--available-width)',
+  },
 ]

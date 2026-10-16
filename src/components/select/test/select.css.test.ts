@@ -62,9 +62,13 @@ describe('the popup', () => {
     expect(ruleOf(`${selectorOf('data-anchor-hidden:invisible')}[data-anchor-hidden]`)).toBe('visibility: hidden;')
   })
 
-  it('is at least as wide as its trigger, and never wider than the room Base UI measured', () => {
-    expect(ruleOf(selectorOf('min-w-(--anchor-width)'))).toBe('min-width: var(--anchor-width);')
-    expect(ruleOf(selectorOf('max-w-(--available-width)'))).toBe('max-width: var(--available-width);')
+  it('is as wide as its trigger when there is room, and never wider than the room, in whole pixels, as Base UI places it', () => {
+    expect(SELECT_POPUP.split(' ')).toEqual(expect.arrayContaining([
+      'min-w-[min(var(--anchor-width),round(down,var(--available-width),1px))]', 'max-w-[round(down,var(--available-width),1px)]',
+    ]))
+    expect(ruleOf(selectorOf('min-w-[min(var(--anchor-width),round(down,var(--available-width),1px))]')))
+      .toBe('min-width: min(var(--anchor-width), round(down, var(--available-width), 1px));')
+    expect(ruleOf(selectorOf('max-w-[round(down,var(--available-width),1px)]'))).toBe('max-width: round(down, var(--available-width), 1px);')
   })
 
   it('is never taller than the room either, its line included, so it stays 8 px from the screen\'s edge', () => {
