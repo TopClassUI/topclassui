@@ -440,6 +440,18 @@ export const MUTATIONS: Mutation[] = [
     to: '  /** Where the row goes. */\n  href?: string | undefined\n',
   },
   {
+    label: 'a plain sidebar link no longer needs a name, so an icon alone compiles and axe reports link-name',
+    file: 'src/components/sidebar/types.ts',
+    from: '  & (SidebarLinkAsElement | (SidebarLinkAsAnchor & SidebarLinkNamed))',
+    to: '  & (SidebarLinkAsElement | SidebarLinkAsAnchor)',
+  },
+  {
+    label: 'a sidebar link that is an icon alone can no longer be named by aria-label',
+    file: 'src/components/sidebar/types.ts',
+    from: "  | { 'children'?: undefined, 'aria-label': string }\n",
+    to: '',
+  },
+  {
     label: 'the sidebar schema loses the default of defaultOpen, so the props table says a rail starts as nothing',
     file: 'src/components/sidebar/schema.ts',
     from: 'z.boolean().default(SIDEBAR_DEFAULTS.defaultOpen)',

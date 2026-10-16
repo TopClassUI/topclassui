@@ -89,12 +89,15 @@ const verdict = compile({
   controlled: rail(' open onOpenChange={(open) => { void open.valueOf() }}'),
   otherWidth: rail(' className="data-open:w-72"'),
   linkRender: rail('', ' render={<a href="/home" />} icon={<Icon name="house" />} current'),
+  linkIconOnly: '<SidebarRoot><SidebarBody><SidebarGroup><SidebarLink href="/home" icon={<Icon name="house" />} aria-label="Home" /></SidebarGroup></SidebarBody></SidebarRoot>',
+  linkRenderAlone: '<SidebarRoot><SidebarBody><SidebarGroup><SidebarLink render={<a href="/home">Home</a>} /></SidebarGroup></SidebarBody></SidebarRoot>',
   linkRest: rail('', ' href="/home" target="_blank" rel="noreferrer" id="home" className="px-4" current={false}'),
   group: '<SidebarRoot><SidebarGroup label="Pages" /><SidebarGroup label={<b>Pages</b>} /><SidebarGroup /></SidebarRoot>',
   header: '<SidebarRoot><SidebarHeader>Workspace</SidebarHeader><SidebarHeader /></SidebarRoot>',
   trigger: '<SidebarRoot><SidebarTrigger aria-label="Menu" disabled onClick={(event) => { event.preventDefault() }} /></SidebarRoot>',
   // What they refuse.
   linkNowhere: rail('', ''),
+  linkUnnamed: '<SidebarRoot><SidebarBody><SidebarGroup><SidebarLink href="/home" icon={<Icon name="house" />} /></SidebarGroup></SidebarBody></SidebarRoot>',
   linkRenderFunction: rail('', ' render={() => <a href="/home" />}'),
   badCurrent: rail('', ' href="/home" current="page"'),
   badDefaultOpen: rail(' defaultOpen="yes"'),
@@ -140,6 +143,11 @@ describe('what Sidebar does take', () => {
     expect(verdict['linkRender']).toEqual([])
   })
 
+  it('a link that is an icon alone, named by aria-label, and one whose element carries its own text (R-5.6-1)', () => {
+    expect(verdict['linkIconOnly']).toEqual([])
+    expect(verdict['linkRenderAlone']).toEqual([])
+  })
+
   it('a plain link with the attributes of an anchor', () => {
     expect(verdict['linkRest']).toEqual([])
   })
@@ -158,11 +166,17 @@ describe('what Sidebar does take', () => {
 })
 
 describe('what Sidebar does not take', () => {
-  // TypeScript reports one member of the union: the way to go somewhere it says is missing is render.
-  it('refuses a link that goes nowhere, with no href and no render: the one error says a way to go is missing', () => {
+  // TypeScript reports the last member of the union, the plain anchor, so it names what that one lacks.
+  it('refuses a link that goes nowhere, with no href and no render: the one error says the href is missing', () => {
     expect(verdict['linkNowhere']).toHaveLength(1)
     expect(verdict['linkNowhere']?.[0]).toContain("is not assignable to type 'IntrinsicAttributes & SidebarLinkProps'")
-    expect(verdict['linkNowhere']?.[0]).toContain("Property 'render' is missing")
+    expect(verdict['linkNowhere']?.[0]).toContain("Property 'href' is missing")
+  })
+
+  it('refuses a link with no name, an href and an icon alone, which axe reports as link-name: the error asks for aria-label (R-5.6-1)', () => {
+    expect(verdict['linkUnnamed']).toHaveLength(1)
+    expect(verdict['linkUnnamed']?.[0]).toContain("is not assignable to type 'IntrinsicAttributes & SidebarLinkProps'")
+    expect(verdict['linkUnnamed']?.[0]).toContain("Property ''aria-label'' is missing")
   })
 
   it('refuses the function form of render: a Server Component resolves an element only (R-5.7-4)', () => {

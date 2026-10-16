@@ -74,7 +74,8 @@ import { Icon, SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoo
 | `SidebarBody` | children | The groups. It is the part that scrolls. |
 | `SidebarGroup` | `label` | The heading of the group, which names its list. |
 | `SidebarLink` | `href` or `render` | Where the row goes. One of the two is required. |
-| `SidebarLink` | `icon`, `current`, children | The icon, the current page, the label. |
+| `SidebarLink` | children or `aria-label` | The name of the row. An `href` link needs one; a `render` element may carry its own text. |
+| `SidebarLink` | `icon`, `current` | The icon, the current page. |
 
 ### Not built
 
