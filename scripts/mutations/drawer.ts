@@ -365,8 +365,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the drawer popup clips instead of scrolling, so an action below the screen of a phone on its side can never be reached',
     file: CLASSES,
-    from: '  DRAWER_MOTION,\n  SCROLL_AREA,\n',
-    to: "  DRAWER_MOTION,\n  'overflow-hidden',\n",
+    from: '  SLIDE_MOTION,\n  SCROLL_AREA,\n',
+    to: "  SLIDE_MOTION,\n  'overflow-hidden',\n",
   },
   {
     label: 'the drawer popup draws its ring outside its box, off the screen on three sides and on the scrim on the fourth',

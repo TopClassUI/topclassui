@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { ACTIONS_WRAP } from '#shared/classes.js'
+import { ACTIONS_WRAP, SLIDE_MOTION } from '#shared/classes.js'
 import { compileEntry } from '#test/stylesheet.js'
 import {
   DRAWER_BACKDROP, DRAWER_BODY, DRAWER_BODY_SHORT, DRAWER_CLOSE, DRAWER_DESCRIPTION, DRAWER_FOLLOW, DRAWER_FOOTER,
-  DRAWER_HEADER, DRAWER_MOTION, DRAWER_POPUP, DRAWER_TITLE, DRAWER_VIEWPORT, DRAWER_VIEWPORT_EDGE,
+  DRAWER_HEADER, DRAWER_POPUP, DRAWER_TITLE, DRAWER_VIEWPORT, DRAWER_VIEWPORT_EDGE,
 } from '../classes.js'
 
 // The static harness never opens a popup, so none of these classes reaches Tailwind there.
@@ -124,7 +124,7 @@ describe('every class a sheet wears at any edge compiles with the installed Tail
   it('the table names exactly the classes of the twelve strings every sheet shares, less the action wrap the shared tests hold', () => {
     const elsewhere = new Set(written([ACTIONS_WRAP]))
     const all = written([
-      DRAWER_BACKDROP, DRAWER_VIEWPORT, ...Object.values(DRAWER_VIEWPORT_EDGE), DRAWER_FOLLOW, DRAWER_MOTION, DRAWER_POPUP,
+      DRAWER_BACKDROP, DRAWER_VIEWPORT, ...Object.values(DRAWER_VIEWPORT_EDGE), DRAWER_FOLLOW, SLIDE_MOTION, DRAWER_POPUP,
       DRAWER_HEADER, DRAWER_TITLE, DRAWER_DESCRIPTION, DRAWER_BODY_SHORT, DRAWER_BODY, DRAWER_FOOTER, DRAWER_CLOSE,
     ]).filter((cls) => cls !== '' && !elsewhere.has(cls))
     expect(all).toEqual(Object.keys(DECLARATION).sort())

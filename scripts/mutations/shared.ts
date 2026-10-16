@@ -243,16 +243,16 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
-    label: 'the overlay slide keeps easing while it is swiped, so a drawer lags behind the finger',
+    label: 'the overlay slide eases the translate property, where Base UI moves a swiped sheet by transform, so the sheet jumps',
     file: 'src/shared/classes.ts',
-    from: " ease-out data-swiping:transition-none'",
-    to: " ease-out'",
+    from: "SLIDE_MOTION = 'transition-transform duration-(--tc-duration-slow)",
+    to: "SLIDE_MOTION = 'transition-[translate,opacity] duration-(--tc-duration-slow)",
   },
   {
     label: 'the overlay slide takes a fixed duration, which the motion knob cannot stop',
     file: 'src/shared/classes.ts',
-    from: 'transition-[translate,opacity] duration-(--tc-duration-slow)',
-    to: 'transition-[translate,opacity] duration-300',
+    from: 'transition-transform duration-(--tc-duration-slow)',
+    to: 'transition-transform duration-300',
   },
   {
     label: 'the overlay surface loses its hairline, so forced colours leave a popup with no edge at all',

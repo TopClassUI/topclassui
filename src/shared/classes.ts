@@ -110,8 +110,9 @@ export const FADE_MOTION = 'transition-opacity duration-(--tc-duration) ease-out
 /** A popup grows from the side that faces its anchor: Base UI measures --transform-origin. */
 export const POPUP_MOTION = 'origin-(--transform-origin) transition-[opacity,scale] duration-(--tc-duration) ease-out data-starting-style:scale-95 data-starting-style:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0'
 
-/** A panel that slides. A swipe follows the finger, so nothing eases while one holds it. */
-export const SLIDE_MOTION = 'transition-[translate,opacity] duration-(--tc-duration-slow) ease-out data-swiping:transition-none'
+/** A panel that slides, by transform: the property Base UI moves a swiped sheet by. It switches the
+ * transition off itself, inline, for as long as a finger holds the sheet. */
+export const SLIDE_MOTION = 'transition-transform duration-(--tc-duration-slow) ease-out'
 
 /** The box of a dialog, a popup and a toast. Forced colours drop the shadow and keep the line. */
 export const OVERLAY_SURFACE = `rounded-box bg-surface-raised text-body ${BORDER} shadow-lg`

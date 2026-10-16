@@ -51,10 +51,8 @@ describe('motion reads the knob and the two attributes Base UI sets', () => {
     ])
   })
 
-  it('SLIDE_MOTION is the slow step, and stops while a swipe holds the panel', () => {
-    expect(list(SLIDE_MOTION)).toEqual([
-      'transition-[translate,opacity]', 'duration-(--tc-duration-slow)', 'ease-out', 'data-swiping:transition-none',
-    ])
+  it('SLIDE_MOTION is the slow step, on transform, the property Base UI moves a swiped sheet by', () => {
+    expect(list(SLIDE_MOTION)).toEqual(['transition-transform', 'duration-(--tc-duration-slow)', 'ease-out'])
   })
 
   it('never writes a fixed duration, which --tc-motion could not stop', () => {

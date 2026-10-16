@@ -91,12 +91,8 @@ describe('motion', () => {
     expect(ruleOf(selectorOf('origin-(--transform-origin)'))).toBe('transform-origin: var(--transform-origin);')
   })
 
-  it('stops the slide while a swipe holds the panel, after the rule that starts it', () => {
-    const slides = css.indexOf(`${selectorOf('transition-[translate,opacity]')} {`)
-    const held = css.indexOf(`${selectorOf('data-swiping:transition-none')}[data-swiping] {`)
-    expect(slides).toBeGreaterThan(-1)
-    expect(held, 'data-swiping:transition-none is not emitted after the transition').toBeGreaterThan(slides)
-    expect(ruleOf(`${selectorOf('data-swiping:transition-none')}[data-swiping]`)).toBe('transition-property: none;')
+  it('slides on the transform properties, the ones Base UI moves a swiped sheet by', () => {
+    expect(ruleOf(selectorOf('transition-transform'))).toContain('transition-property: transform, translate, scale, rotate;')
   })
 })
 
