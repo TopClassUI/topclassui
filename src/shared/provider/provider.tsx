@@ -27,6 +27,7 @@ export interface TopClassProviderProps {
   locale: string
   /** Only the strings you want to change; the rest keep their defaults. */
   labels?: PartialLabels | undefined
+  /** Left out, the locale tag's own -u-nu- decides, as it does for a server half, and Latin digits otherwise. */
   numberingSystem?: NumberingSystem | undefined
   adaptive?: { query?: string | undefined } | undefined
   collection?: Partial<CollectionDefaults> | undefined
@@ -45,7 +46,7 @@ export function TopClassProvider(props: TopClassProviderProps) {
     direction,
     locale,
     labels: overrides,
-    numberingSystem = 'latn',
+    numberingSystem,
     adaptive,
     collection,
     toast,
@@ -57,12 +58,13 @@ export function TopClassProvider(props: TopClassProviderProps) {
 
   const value = useMemo<TopClassContextValue>(() => {
     const { labels } = getLabels(locale, overrides)
+    const numberFormat = createNumberFormat(locale, numberingSystem)
     return {
       direction,
       locale,
       labels,
-      numberingSystem,
-      numberFormat: createNumberFormat(locale, numberingSystem),
+      numberingSystem: numberFormat.resolvedOptions().numberingSystem,
+      numberFormat,
       adaptive: { query },
       collection: { ...COLLECTION_DEFAULTS, ...collection },
     }

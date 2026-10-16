@@ -195,6 +195,18 @@ export const MUTATIONS: Mutation[] = [
     to: '{isolated}',
   },
   {
+    label: 'the provider hands client halves Latin digits when given no numbering system, so ar-u-nu-arab prints 12 there and ١٢ in a server half',
+    file: 'src/shared/provider/provider.tsx',
+    from: '    numberingSystem,\n    adaptive,',
+    to: "    numberingSystem = 'latn',\n    adaptive,",
+  },
+  {
+    label: 'the provider reports the numbering system it was given, not the one its formatter writes',
+    file: 'src/shared/provider/provider.tsx',
+    from: 'numberingSystem: numberFormat.resolvedOptions().numberingSystem,',
+    to: "numberingSystem: numberingSystem ?? 'latn',",
+  },
+  {
     label: 'a nested provider starts its own delay group, splitting an RTL island off the page',
     file: 'src/shared/provider/provider.tsx',
     from: 'const nested = useContext(TopClassContext) !== null',
