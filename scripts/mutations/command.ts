@@ -102,9 +102,33 @@ export const MUTATIONS: Mutation[] = [
   },
   {
     label: 'command: the spacer above the window stands for nothing, so the rows jump to the top as the list scrolls',
+    file: ROWS,
+    from: '<Spacer rows={run.start - (runs[at - 1]?.end ?? 0)} />',
+    to: '<Spacer rows={0} />',
+  },
+  {
+    label: 'command: a scroll that is not the keyboard unmounts the active row, so Enter does nothing and aria-activedescendant dangles',
     file: HOOK,
-    from: 'before: collection.virtualized ? first : 0,',
-    to: 'before: 0,',
+    from: 'const mounted = collection.virtualized ? withActiveRow(windowed, arranged.entries, arranged.rowOfItem[active] ?? -1) : windowed',
+    to: 'const mounted = windowed',
+  },
+  {
+    label: 'command: only a keyboard highlight is kept mounted, so the first match of a query is lost to a finger drag',
+    file: HOOK,
+    from: "    setActive(details.index)\n    // A pointer highlights what it is over; a query highlights the first row, which a new query scrolls to.\n    if (details.reason !== 'keyboard') return\n",
+    to: "    // A pointer highlights what it is over; a query highlights the first row, which a new query scrolls to.\n    if (details.reason !== 'keyboard') return\n    setActive(details.index)\n",
+  },
+  {
+    label: 'command: the active row kept apart from the window joins the run beside it, and the spacer between them is lost',
+    file: LIB,
+    from: ' || last.end !== entry.row',
+    to: '',
+  },
+  {
+    label: 'command: the options lose aria-setsize and aria-posinset, so a reader hears 13 of 13 out of ten thousand',
+    file: ROWS,
+    from: '            aria-setsize={entry.size}\n            aria-posinset={entry.position}\n',
+    to: '',
   },
   {
     label: 'command: the search field loses its 256 cap, so a pasted file becomes the query',
