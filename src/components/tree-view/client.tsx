@@ -32,6 +32,7 @@ export function TreeView({
         tabIndex={tree.tabIndex}
         aria-activedescendant={tree.activeDescendant}
         aria-busy={tree.busy}
+        data-highlight-hidden={tree.outOfView ? '' : undefined}
         style={tree.style}
         className={cn(TREE_VIEW_TREE, className)}
         onKeyDown={tree.onKeyDown}

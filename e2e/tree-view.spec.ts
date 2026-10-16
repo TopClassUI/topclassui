@@ -183,6 +183,60 @@ test.describe('live: the keys of the Authoring Practices', () => {
   })
 })
 
+test.describe('live: a small wheel never leaves the focused tree with no ring in sight', () => {
+  test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
+
+  /** The top edge of the tree, where its own ring is drawn. */
+  const edgeOf = async (page: Page) => {
+    const box = await boxOf(treeOf(page))
+    return page.screenshot({ clip: { x: Math.floor(box.left) + 1, y: Math.floor(box.top) + 1, width: Math.floor(box.width) - 2, height: 4 } })
+  }
+
+  const cases = [
+    ...DIRECTIONS.flatMap((direction) => ['tree-view--basic', 'tree-view--long-content', 'tree-view--ten-thousand'].map((demo) => ({ demo, direction, mode: 'light' as const }))),
+    ...MODES.filter((mode) => mode !== 'light').map((mode) => ({ demo: 'tree-view--basic', direction: 'ltr' as const, mode })),
+  ]
+  for (const { demo, direction, mode } of cases) {
+    test(`${demo} ${mode} ${direction}: a 160 px wheel puts the highlighted row out of sight, and the tree draws its ring until a key brings the row back`, async ({ page }) => {
+      await openLive(page, demo, { direction, mode, tall: true })
+      await page.keyboard.press('Tab')
+      const box = await boxOf(treeOf(page))
+      await wheelAt(page, box.left + 60, box.top + 60, 160)
+      // Mounted but scrolled out: the attribute still names it, and its own ring is drawn where no one sees it.
+      expect(await stateOf(page)).toMatchObject({ named: true, whole: false, focused: true })
+      expect(await treeOf(page).evaluate((tree) => {
+        const row = tree.querySelector('[data-highlighted]')?.getBoundingClientRect()
+        const top = tree.getBoundingClientRect().top + tree.clientTop
+        return row !== undefined && (row.bottom <= top || row.top >= top + tree.clientHeight)
+      })).toBe(true)
+      expect(await ringOf(treeOf(page))).toBe('solid 2px -2px')
+      const ringed = await edgeOf(page)
+      await treeOf(page).evaluate((tree) => { tree.blur() })
+      expect(Buffer.compare(ringed, await edgeOf(page)), 'the ring changes the pixels along the top edge').not.toBe(0)
+      await treeOf(page).evaluate((tree) => { tree.focus() })
+      await page.keyboard.press('ArrowDown')
+      await expect.poll(() => stateOf(page)).toMatchObject({ whole: true, focused: true })
+      expect(await ringOf(treeOf(page))).toBe('none')
+      expect(await ringOf(page.locator('#demo [data-highlighted]'))).toBe('solid 2px -2px')
+    })
+  }
+
+  test.describe('under a finger', () => {
+    test.use({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } })
+
+    test('ten-thousand, 44 px rows: a 160 px scroll puts the row out of sight, and the tree draws its ring', async ({ page }) => {
+      await openLive(page, 'tree-view--ten-thousand', { tall: true })
+      await treeOf(page).focus()
+      await page.keyboard.press('ArrowDown')
+      await page.keyboard.press('ArrowUp')
+      await treeOf(page).evaluate((tree) => { tree.scrollTop = 160 })
+      await frames(page)
+      expect(await stateOf(page)).toMatchObject({ text: 'Folder 1', named: true, whole: false })
+      expect(await ringOf(treeOf(page))).toBe('solid 2px -2px')
+    })
+  })
+})
+
 test.describe('live: a press never scrolls the tree', () => {
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 

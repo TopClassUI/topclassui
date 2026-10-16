@@ -223,4 +223,28 @@ export const MUTATIONS: Mutation[] = [
     from: "    if (event.key.length === 1 && (event.key !== ' ' || typing)) {",
     to: "    if (event.key.length === 1 && event.key !== ' ') {",
   },
+  {
+    label: 'the tree view never notices a wheel that scrolls the highlighted row out of sight, so the focused tree shows no ring',
+    file: HOOK,
+    from: "    setOutOfView(isScrolledOut(node.querySelector('[data-highlighted]'), node))\n",
+    to: '',
+  },
+  {
+    label: 'the tree view takes a highlighted row scrolled above the box for one in sight',
+    file: LIB,
+    from: '  return box.bottom <= top || box.top >= top + tree.clientHeight',
+    to: '  return box.top >= top + tree.clientHeight',
+  },
+  {
+    label: 'the tree view takes a highlighted row scrolled below the box for one in sight',
+    file: LIB,
+    from: '  return box.bottom <= top || box.top >= top + tree.clientHeight',
+    to: '  return box.bottom <= top',
+  },
+  {
+    label: 'the tree view draws no ring of its own while the highlighted row is out of sight',
+    file: CLASSES,
+    from: "  'focus-visible:data-highlight-hidden:outline-solid ",
+    to: "  'focus-visible:data-highlight-hidden:outline-none ",
+  },
 ]

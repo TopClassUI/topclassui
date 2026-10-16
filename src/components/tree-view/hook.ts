@@ -8,7 +8,7 @@ import { COLLECTION_BOUNDARIES } from '#shared/contracts/collection.js'
 import { useDirection, useLabels } from '#shared/provider/context.js'
 import { useControllableState } from '#shared/use-controllable-state.js'
 import { TREE_VIEW_DEFAULTS, TREE_VIEW_ROW_ESTIMATE, TYPEAHEAD_MS } from './constants.js'
-import { findRow, flattenTree, keyAction, keyOfRow, rowIndexOf, toggled, typeahead } from './lib.js'
+import { findRow, flattenTree, isScrolledOut, keyAction, keyOfRow, rowIndexOf, toggled, typeahead } from './lib.js'
 import type {
   TreeFocusEvent, TreeKeyAction, TreeKeyEvent, TreeMouseEvent, TreePointerEvent, TreeViewHookProps,
 } from './types.js'
@@ -30,6 +30,7 @@ export function useTreeView(props: TreeViewHookProps) {
   const rows = useMemo(() => flattenTree(items, open), [items, open])
   const [active, setActive] = useState(null as string | null)
   const [unit, setUnit] = useState(TREE_VIEW_ROW_ESTIMATE)
+  const [outOfView, setOutOfView] = useState(false)
   // useCollection reads the tree on a scroll or a resize only: paging waits until it has read the tree at this count.
   const [counted, setCounted] = useState(-1)
   const given = useRef(false)
@@ -90,6 +91,8 @@ export function useTreeView(props: TreeViewHookProps) {
     }
     given.current = true
     if (pending.current >= 0) reveal(pending.current)
+    // Every scroll renders, as useCollection reads it: a wheel can leave the highlighted row mounted but out of sight.
+    setOutOfView(isScrolledOut(node.querySelector('[data-highlighted]'), node))
   })
 
   const direction = useDirection()
@@ -191,6 +194,7 @@ export function useTreeView(props: TreeViewHookProps) {
     idOf: (index: number) => `${base}-${String(index)}`,
     selected,
     active,
+    outOfView,
     // Absent while the highlighted row is not mounted, never an id no element has.
     activeDescendant: mounted ? `${base}-${String(mounted.index)}` : undefined,
     tabIndex: rows.length > 0 ? 0 : undefined,
