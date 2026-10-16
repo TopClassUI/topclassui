@@ -177,6 +177,33 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(await gaps(off, 'ltr')).toMatchObject({ start: 2 })
     })
 
+    test('invalid and on: a CanvasText line and no author red; disabled and on, prop or fieldset: GrayText under its thumb', async ({ page }) => {
+      await page.goto(urlFor('switch--states', 'light', 'ltr'))
+      const system = (colour: string) => page.evaluate((value) => {
+        const probe = document.createElement('span')
+        probe.style.setProperty('forced-color-adjust', 'none')
+        probe.style.backgroundColor = value
+        document.body.appendChild(probe)
+        return getComputedStyle(probe).backgroundColor
+      }, colour)
+      const [canvasText, grayText] = [await system('CanvasText'), await system('GrayText')]
+      expect(await css(trackOf(switchOf(page, 'Invalid, on')), 'border-top-color')).toBe(canvasText)
+      expect(await css(trackOf(switchOf(page, 'Invalid, on')), 'box-shadow')).not.toMatch(/[1-9]px inset/)
+      // The static page runs no script: an on switch moved into a disabled fieldset.
+      await switchOf(page, 'On').evaluate((el) => {
+        const fieldset = document.createElement('fieldset')
+        fieldset.disabled = true
+        el.before(fieldset)
+        fieldset.append(el)
+      })
+      for (const name of ['Disabled, on', 'On']) {
+        expect(await css(trackOf(switchOf(page, name)), 'background-color'), name).toBe(grayText)
+        expect(await css(trackOf(switchOf(page, name)), 'border-top-color'), name).toBe(grayText)
+        const thumb = rgbOf(await css(switchOf(page, name).locator('span span'), 'background-color'))
+        expect(contrast(thumb, rgbOf(grayText)), name).toBeGreaterThanOrEqual(3)
+      }
+    })
+
     // The page in the other theme, where --tc-ring fell to 2.85:1 on Canvas: only a system colour holds in both.
     for (const mode of scheme === 'light' ? ['dark'] as const : ['light', 'ocean'] as const) {
       test(`${mode} page: the ring of a focused switch is the user's CanvasText, 3:1 on Canvas, on and invalid too`, async ({ page }) => {

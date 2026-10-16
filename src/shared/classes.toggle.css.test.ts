@@ -71,6 +71,28 @@ describe('the box reads the target it sits in', () => {
   })
 })
 
+describe('under forced colours, where a checked box opts out of the user palette', () => {
+  /** The at-rule a selector's rule sits in. */
+  const mediaOf = (selector: string) => { const before = css.slice(0, css.indexOf(`${selector} {`)); return before.slice(before.lastIndexOf('@media')).split('{')[0]?.trim() }
+  const DISABLED = ':is(:where(.group\\/toggle):disabled *)'
+  const invalid = `${selectorOf('forced-colors:group-aria-invalid/toggle:group-data-checked/toggle:border-[CanvasText]')}${INVALID}${CHECKED}`
+  const disabled = `${selectorOf('forced-colors:group-disabled/toggle:group-data-checked/toggle:bg-[GrayText]')}${DISABLED}${CHECKED}`
+
+  it('a checked box that is invalid has a CanvasText line, after the red one it replaces, and a zero inset ring', () => {
+    expect(ruleOf(invalid)).toBe('border-color: CanvasText;')
+    expect(mediaOf(invalid)).toBe('@media (forced-colors: active)')
+    expect(css.indexOf(`${invalid} {`)).toBeGreaterThan(css.indexOf(`${selectorOf('group-aria-invalid/toggle:group-data-checked/toggle:border-danger-solid')}${INVALID}${CHECKED} {`))
+    expect(ruleOf(`${selectorOf('forced-colors:group-aria-invalid/toggle:inset-ring-0')}${INVALID}`)).toContain('--tw-inset-ring-shadow: inset 0 0 0 0px')
+  })
+
+  it('a checked box that is disabled, by the prop or a fieldset, is GrayText, after the Highlight it replaces', () => {
+    expect(ruleOf(disabled)).toBe('background-color: GrayText;')
+    expect(ruleOf(`${selectorOf('forced-colors:group-disabled/toggle:group-data-checked/toggle:border-[GrayText]')}${DISABLED}${CHECKED}`)).toBe('border-color: GrayText;')
+    expect(mediaOf(disabled)).toBe('@media (forced-colors: active)')
+    expect(css.indexOf(`${disabled} {`)).toBeGreaterThan(css.indexOf(`${selectorOf('forced-colors:group-data-checked/toggle:bg-[Highlight]')}${CHECKED} {`))
+  })
+})
+
 describe('invalid wins over checked', () => {
   const invalid = `${selectorOf('group-aria-invalid/toggle:border-danger-solid')}${INVALID}`
   const checked = `${selectorOf('group-data-checked/toggle:border-primary-solid')}${CHECKED}`

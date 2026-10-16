@@ -151,6 +151,28 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(contrast(rgbOf(await css(drawn(boxIn(page, 'Unchecked')), 'border-top-color')), FORCED_CANVAS[scheme])).toBeGreaterThanOrEqual(3)
     })
 
+    test('invalid and ticked or mixed: a CanvasText line and no author red; disabled and ticked or mixed, prop or fieldset: GrayText', async ({ page }) => {
+      await page.goto(urlFor('checkbox--states', 'light', 'ltr'))
+      const [canvasText, grayText] = [await resolve(page, 'CanvasText'), await resolve(page, 'GrayText')]
+      for (const name of ['Invalid, checked', 'Invalid, indeterminate']) {
+        expect(await css(drawn(boxIn(page, name)), 'border-top-color'), name).toBe(canvasText)
+        expect(await css(drawn(boxIn(page, name)), 'box-shadow'), name).not.toMatch(/[1-9]px inset/)
+      }
+      // The static page runs no script: a mixed box disabled by hand, and a ticked one moved into a disabled fieldset.
+      await boxIn(page, 'Indeterminate').evaluate((el) => { el.setAttribute('disabled', '') })
+      await boxIn(page, 'Checked').evaluate((el) => {
+        const fieldset = document.createElement('fieldset')
+        fieldset.disabled = true
+        el.before(fieldset)
+        fieldset.append(el)
+      })
+      for (const name of ['Disabled, checked', 'Indeterminate', 'Checked']) {
+        expect(await css(drawn(boxIn(page, name)), 'background-color'), name).toBe(grayText)
+        expect(await css(drawn(boxIn(page, name)), 'border-top-color'), name).toBe(grayText)
+        expect(contrast(rgbOf(await css(drawn(boxIn(page, name)), 'color')), rgbOf(grayText)), name).toBeGreaterThanOrEqual(3)
+      }
+    })
+
     // The page in the other theme, where --tc-ring fell to 2.85:1 on Canvas: only a system colour holds in both.
     for (const mode of scheme === 'light' ? ['dark'] as const : ['light', 'ocean'] as const) {
       test(`${mode} page: the ring of a focused box is the user's CanvasText, 3:1 on Canvas, ticked, mixed and invalid too`, async ({ page }) => {

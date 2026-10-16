@@ -108,4 +108,10 @@ export const MUTATIONS: Mutation[] = [
     from: "export const CHECKBOX_MARK = 'flex size-full items-center justify-center'",
     to: "export const CHECKBOX_MARK = 'flex size-full items-center'",
   },
+  {
+    label: 'the checkbox paints a disabled mixed box Highlight under forced colours, told from an enabled one by opacity alone',
+    file: CLASSES,
+    from: ' forced-colors:group-disabled/toggle:group-data-indeterminate/toggle:border-[GrayText] forced-colors:group-disabled/toggle:group-data-indeterminate/toggle:bg-[GrayText]',
+    to: '',
+  },
 ]

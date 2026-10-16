@@ -174,11 +174,13 @@ export const TOGGLE_RING = 'group-focus-visible/toggle:outline-solid group-focus
 /** The drawn box. It sets no fill and no justify: two classes for one property do not merge in a string. */
 export const TOGGLE_BOX = `inline-flex shrink-0 items-center ${BORDER_STRONG} ${TRANSITION} ${TOGGLE_RING}`
 
-/** Checked: the fill, and under forced colours the system pair, since a fill is erased there. */
-export const TOGGLE_ON = 'group-data-checked/toggle:border-primary-solid group-data-checked/toggle:bg-primary-solid group-data-checked/toggle:text-primary-on-solid forced-colors:group-data-checked/toggle:forced-color-adjust-none forced-colors:group-data-checked/toggle:border-[Highlight] forced-colors:group-data-checked/toggle:bg-[Highlight] forced-colors:group-data-checked/toggle:text-[HighlightText]'
+/** Checked: the fill, and under forced colours the system pair, since a fill is erased there. Opted out of forced colours, a
+ * disabled box would keep Highlight where the browser paints every other disabled control GrayText: :disabled covers a fieldset. */
+export const TOGGLE_ON = 'group-data-checked/toggle:border-primary-solid group-data-checked/toggle:bg-primary-solid group-data-checked/toggle:text-primary-on-solid forced-colors:group-data-checked/toggle:forced-color-adjust-none forced-colors:group-data-checked/toggle:border-[Highlight] forced-colors:group-data-checked/toggle:bg-[Highlight] forced-colors:group-data-checked/toggle:text-[HighlightText] forced-colors:group-disabled/toggle:group-data-checked/toggle:border-[GrayText] forced-colors:group-disabled/toggle:group-data-checked/toggle:bg-[GrayText]'
 
-/** Invalid: red and thicker, as on Input. The compound class makes it win over checked. */
-export const TOGGLE_INVALID = 'group-aria-invalid/toggle:border-danger-solid group-aria-invalid/toggle:group-data-checked/toggle:border-danger-solid group-aria-invalid/toggle:inset-ring-[calc(var(--tc-ring-width)-var(--tc-line-width))] group-aria-invalid/toggle:inset-ring-danger-solid forced-colors:group-aria-invalid/toggle:border-(length:--tc-ring-width)'
+/** Invalid: red and thicker, as on Input. The compound class makes it win over checked. Under forced colours a checked box
+ * keeps author colours, so its line turns CanvasText and the red inset ring goes: the 2 px width is the cue there. */
+export const TOGGLE_INVALID = 'group-aria-invalid/toggle:border-danger-solid group-aria-invalid/toggle:group-data-checked/toggle:border-danger-solid group-aria-invalid/toggle:inset-ring-[calc(var(--tc-ring-width)-var(--tc-line-width))] group-aria-invalid/toggle:inset-ring-danger-solid forced-colors:group-aria-invalid/toggle:border-(length:--tc-ring-width) forced-colors:group-aria-invalid/toggle:group-data-checked/toggle:border-[CanvasText] forced-colors:group-aria-invalid/toggle:inset-ring-0'
 
 // Unit 4: the fields. Input's own strings, lifted so the fields of Unit 4 share them; Input reads them under its old names.
 

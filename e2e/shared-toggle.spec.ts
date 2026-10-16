@@ -156,6 +156,18 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(await css(target(page, 'size-md'), 'outline-style')).toBe('none')
     })
 
+    test('a checked box that is invalid has a CanvasText line and no author red; one that is disabled is GrayText', async ({ page }) => {
+      await fixture(page)
+      const [canvasText, grayText] = [await resolved(page, 'color', 'CanvasText'), await resolved(page, 'color', 'GrayText')]
+      expect(await css(box(page, 'checked-invalid'), 'border-top-color')).toBe(canvasText)
+      expect(await css(box(page, 'checked-invalid'), 'border-top-width')).toBe('2px')
+      // The red inset ring is zero wide: no author colour is painted.
+      expect(await css(box(page, 'checked-invalid'), 'box-shadow')).not.toMatch(/[1-9]px inset/)
+      expect(await css(box(page, 'checked-disabled'), 'background-color')).toBe(grayText)
+      expect(await css(box(page, 'checked-disabled'), 'border-top-color')).toBe(grayText)
+      expect(await css(box(page, 'checked'), 'background-color')).toBe(await resolved(page, 'background-color', 'Highlight'))
+    })
+
     test('on a page in the other theme, a filled box rings in CanvasText, not the author ring that opting out would keep', async ({ page }) => {
       await fixture(page, { mode: scheme === 'light' ? 'dark' : 'light' })
       const canvasText = await resolved(page, 'color', 'CanvasText')

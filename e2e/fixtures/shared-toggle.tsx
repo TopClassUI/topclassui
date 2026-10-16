@@ -14,10 +14,10 @@ const BOX = `${TOGGLE_BOX} ${TOGGLE_ON} ${TOGGLE_INVALID}`
 const PAGE: CSSProperties = { display: 'grid', gap: 24, padding: 24, alignContent: 'start' }
 const ROW: CSSProperties = { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 16 }
 
-interface ToggleProps { id: string; size?: Size; checked?: boolean; invalid?: boolean; width?: number }
+interface ToggleProps { id: string; size?: Size; checked?: boolean; invalid?: boolean; disabled?: boolean; width?: number }
 
 /** The markup a Checkbox renders: a native button with the role, and Base UI's state attributes on it. */
-function Toggle({ id, size = 'md', checked = false, invalid = false, width }: ToggleProps) {
+function Toggle({ id, size = 'md', checked = false, invalid = false, disabled = false, width }: ToggleProps) {
   return (
     <button
       id={id}
@@ -26,6 +26,7 @@ function Toggle({ id, size = 'md', checked = false, invalid = false, width }: To
       aria-label={id}
       aria-checked={checked}
       aria-invalid={invalid || undefined}
+      disabled={disabled}
       data-checked={checked ? '' : undefined}
       data-unchecked={checked ? undefined : ''}
       data-size={size}
@@ -50,6 +51,7 @@ function Fixture() {
         <Toggle id="checked" checked />
         <Toggle id="invalid" invalid />
         <Toggle id="checked-invalid" checked invalid />
+        <Toggle id="checked-disabled" checked disabled />
       </div>
       {/* An accordion trigger is a bare group, and a focusable one. */}
       <div id="trigger" role="group" aria-label="An accordion trigger" tabIndex={0} className="group" style={{ padding: 8 }}>

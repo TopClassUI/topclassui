@@ -37,4 +37,16 @@ export const MUTATIONS: Mutation[] = [
     from: ' forced-colors:group-focus-visible/toggle:outline-[CanvasText]',
     to: '',
   },
+  {
+    label: 'the shared toggle keeps the author red on a checked invalid box under forced colours, where the user palette should rule',
+    file: CLASSES,
+    from: ' forced-colors:group-aria-invalid/toggle:group-data-checked/toggle:border-[CanvasText]',
+    to: '',
+  },
+  {
+    label: 'the shared toggle paints a checked disabled box Highlight under forced colours, told from an enabled one by opacity alone',
+    file: CLASSES,
+    from: ' forced-colors:group-disabled/toggle:group-data-checked/toggle:border-[GrayText] forced-colors:group-disabled/toggle:group-data-checked/toggle:bg-[GrayText]',
+    to: '',
+  },
 ]
