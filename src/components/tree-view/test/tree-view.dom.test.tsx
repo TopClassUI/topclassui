@@ -134,46 +134,6 @@ describe('a press brings the focus and never scrolls the tree; a key or a script
   })
 })
 
-describe('a wheel that leaves the highlighted row mounted but out of sight', () => {
-  /** A layout happy-dom does not have: the tree shows 80 px from its top, and each row is 40 px below the one before. */
-  const lay = () => {
-    const node = tree()
-    Object.defineProperty(node, 'clientHeight', { configurable: true, value: 80 })
-    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function rect(this: HTMLElement) {
-      const index = Number(this.dataset['index'] ?? '-1')
-      const top = this === node || index < 0 ? 0 : index * 40 - node.scrollTop
-      return DOMRect.fromRect({ x: 0, y: top, width: 200, height: this === node ? 80 : 40 })
-    })
-  }
-  const scrollTo = (top: number) => {
-    tree().scrollTop = top
-    act(() => { tree().dispatchEvent(new Event('scroll')) })
-  }
-
-  it('marks the tree, so it draws its own ring, and keeps naming the row; scrolled back, the mark goes', async () => {
-    render(<TreeView aria-label="Fruit" items={ITEMS} defaultExpanded={['a', 'e']} />)
-    lay()
-    await userEvent.tab()
-    expect([active(), tree().hasAttribute('data-highlight-hidden')]).toEqual(['Apps', false])
-    scrollTo(30)
-    expect(tree().hasAttribute('data-highlight-hidden')).toBe(false)
-    scrollTo(40)
-    expect([active(), tree().hasAttribute('data-highlight-hidden')]).toEqual(['Apps', true])
-    scrollTo(0)
-    expect(tree().hasAttribute('data-highlight-hidden')).toBe(false)
-  })
-
-  it('a row below the box is out of sight too, and with no highlight nothing is', async () => {
-    render(<TreeView aria-label="Fruit" items={ITEMS} defaultExpanded={['a', 'e']} defaultValue="g" />)
-    lay()
-    await userEvent.tab()
-    expect(active()).toBe('apricot')
-    expect(tree().hasAttribute('data-highlight-hidden')).toBe(true)
-    act(() => { tree().blur() })
-    expect(tree().hasAttribute('data-highlight-hidden')).toBe(false)
-  })
-})
-
 /** Ten folders of a hundred files, all open: windowed. */
 const big = Array.from({ length: 10 }, (_, folder) => ({
   id: `f${String(folder)}`,

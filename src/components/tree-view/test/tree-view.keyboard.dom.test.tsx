@@ -181,10 +181,7 @@ describe('controlled and uncontrolled', () => {
     const items = [{ id: 'g', label: 'New folder' }, { id: 'h', label: 'New file' }, { id: 'k', label: 'Notes' }]
     render(<TreeView aria-label="Files" items={items} defaultValue="k" onValueChange={onValueChange} />)
     await userEvent.tab()
-    for (const key of ['n', 'e', 'w', ' ', 'f', 'i', 'l']) {
-      now += 100
-      await userEvent.keyboard(key === ' ' ? '[Space]' : key)
-    }
+    for (const key of ['n', 'e', 'w', '[Space]', 'f', 'i', 'l']) { now += 100; await userEvent.keyboard(key) }
     expect([active(), onValueChange.mock.calls]).toEqual(['New file', []])
     now += 600
     await userEvent.keyboard('[Space]')
