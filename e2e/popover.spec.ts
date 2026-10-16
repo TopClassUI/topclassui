@@ -1155,6 +1155,35 @@ test.describe('a larger text', () => {
     expect(cut, 'texts wider than their box').toBe(0)
   })
 
+  // POPOVER-2. Three fixed tracks went to 0 px at 320 px, and each trigger lay over half of the next one.
+  for (const screen of [SCREENS[0], SCREENS[1]]) {
+    for (const direction of DIRECTIONS) {
+      test(`${String(screen.width)} x ${String(screen.height)} ${direction} with the root at 32 px: the twelve placement triggers wrap, and each takes its own press`, async ({ page }) => {
+        await page.setViewportSize(screen)
+        await openLive(page, 'popover--placements', { direction })
+        await page.addStyleTag({ content: 'html { font-size: 32px }' })
+        const faults = await page.locator('#demo button').evaluateAll((buttons) => {
+          const found: string[] = []
+          const boxes = buttons.map((button) => button.getBoundingClientRect())
+          boxes.forEach((one, i) => {
+            boxes.forEach((other, j) => {
+              const overlap = one.left < other.right && other.left < one.right && one.top < other.bottom && other.top < one.bottom
+              if (j > i && overlap) found.push(`${buttons[i]?.textContent ?? ''} over ${buttons[j]?.textContent ?? ''}`)
+            })
+          })
+          for (const button of buttons) {
+            button.scrollIntoView({ block: 'center', inline: 'center' })
+            const box = button.getBoundingClientRect()
+            if (!button.contains(document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2))) found.push(`${button.textContent} covered`)
+          }
+          return [String(buttons.length), ...found]
+        })
+        expect(faults).toEqual(['12'])
+        await expectNoSidewaysScroll(page)
+      })
+    }
+  }
+
   // WCAG 1.4.12: the four spacings a reader may set, all at once.
   test('with the text spacing of WCAG 1.4.12 the popup grows with its text, and nothing is cut', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 480 })
