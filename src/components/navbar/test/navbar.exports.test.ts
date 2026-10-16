@@ -43,9 +43,9 @@ const PART_FILES = {
 }
 
 describe('the folder holds exactly the files Navbar needs', () => {
-  it('a client.tsx and a hook.ts for the one client part, no variants and no skeleton', () => {
+  it('a client.tsx and a hook.ts for the one client part, a lib.ts for its pure helper, no variants and no skeleton', () => {
     expect(readdirSync(FOLDER).sort()).toEqual([
-      'README.md', 'boundaries.ts', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx',
+      'README.md', 'boundaries.ts', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'lib.ts',
       'meta.ts', 'parts', 'schema.ts', 'test', 'types.ts',
     ])
   })

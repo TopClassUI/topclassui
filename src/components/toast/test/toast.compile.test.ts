@@ -56,8 +56,12 @@ const verdict = compile({
   readmeImport: SAMPLES[0] ?? '<Missing />',
   readmeSample: SAMPLES[1] ?? '<Missing />',
   // A tone outside the six is refused, and so is a function as the label of the action.
-  badTone: "'use client'\nexport const id = toast.add({ tone: 'purple' })\n",
-  badAction: "'use client'\nexport const id = toast.add({ action: { label: () => 'Undo', onClick: () => undefined } })\n",
+  badTone: "'use client'\nexport const id = toast.add({ title: 'Saved', tone: 'purple' })\n",
+  badAction: "'use client'\nexport const id = toast.add({ title: 'Archived', action: { label: () => 'Undo', onClick: () => undefined } })\n",
+  // R-5.6-1: a toast is a dialog named by its title, so add() refuses one with none; update() changes only what it names.
+  noTitle: "'use client'\nexport const id = toast.add({ description: 'Saved two minutes ago.' })\n",
+  emptyTitles: "'use client'\nexport const ids = [toast.add({}), toast.add({ title: null }), toast.add({ title: undefined }), toast.add({ title: false })]\n",
+  partialUpdate: "'use client'\ntoast.update('upload', { description: 'Two of three files.' })\nexport const done = toast.promise(Promise.resolve(1), { loading: 'Saving', success: { title: 'Saved', duration: 0 }, error: 'Failed' })\n",
   steps: "'use client'\nexport const done = toast.promise(Promise.resolve(2), { loading: 'Wait', success: (n) => `${String(n)} done`, error: { title: 'Failed', duration: 0 } })\n",
 })
 
@@ -71,6 +75,15 @@ describe('the README', () => {
   it('the types refuse a tone outside the six and a label that is not text', () => {
     expect(verdict['badTone']?.join(' ')).toContain('"purple"')
     expect(verdict['badAction']?.length).toBeGreaterThan(0)
+  })
+
+  it('add() refuses a toast with no title, which would be a dialog with no name (TOAST-6)', () => {
+    expect(verdict['noTitle']?.join(' ')).toContain("Property 'title' is missing")
+    expect(verdict['emptyTitles']).toHaveLength(4)
+  })
+
+  it('update() takes only what it changes, and a promise step its title', () => {
+    expect(verdict['partialUpdate']).toEqual([])
   })
 
   it('a promise takes a title, a function of its value and the options as its steps', () => {
