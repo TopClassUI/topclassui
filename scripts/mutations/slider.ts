@@ -13,6 +13,12 @@ export const MUTATIONS: Mutation[] = [
     to: '<Base.Thumb key={index} {...thumb}',
   },
   {
+    label: 'the slider control loses the swipe marker, so a finger dragging a thumb inside a Drawer swipes it shut',
+    file: CLIENT,
+    from: ' data-base-ui-swipe-ignore=""',
+    to: '',
+  },
+  {
     label: 'the slider root loses FIELD_HOLDER, so in a w-fit parent the slider is as wide as its thumb',
     file: CLASSES,
     from: 'export const SLIDER_ROOT = `group/slider grid ${FIELD_HOLDER} ${DISABLED}`',

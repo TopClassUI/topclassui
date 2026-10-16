@@ -61,7 +61,8 @@ export function Slider<Value extends SliderValue = number>({
       className={cn(SLIDER_ROOT, SLIDER_TEXT[size], fullWidth && SLIDER_FULL, className)}
     >
       <div className={SLIDER_ROW}>
-        <Base.Control className={SLIDER_CONTROL}>
+        {/* Base UI's own marker: a Drawer or a Toast never takes a drag that starts on the control as a swipe. */}
+        <Base.Control className={SLIDER_CONTROL} data-base-ui-swipe-ignore="">
           <Base.Track className={cn(SLIDER_TRACK, SLIDER_TRACK_SIZE[size])}>
             <Base.Indicator className={SLIDER_INDICATOR} />
             {slider.thumbs.map((thumb, index) => (

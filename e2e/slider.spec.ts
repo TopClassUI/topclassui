@@ -381,6 +381,37 @@ test.describe('live: a press and a drag', () => {
   })
 })
 
+test.describe('live: a finger on a slider inside a Drawer', () => {
+  test.use(COARSE)
+  test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
+
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: dragging the thumb toward the side the sheet closes on moves the thumb, and the sheet stays`, async ({ page }) => {
+      await openLive(page, 'separator--horizontal', { direction })
+      await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/slider-drawer.tsx' })
+      const popup = page.getByRole('dialog', { name: 'Filters' })
+      await expect(popup).toBeVisible()
+      // Let the sheet finish sliding in, so its edge is still.
+      await expect.poll(() => popup.evaluate((el) => el.getAnimations({ subtree: true }).length)).toBe(0)
+      const input = thumbIn(page, 'Price')
+      const [thumb, track, before] = [await boxOf(thumbOf(input)), await boxOf(trackOf(input)), await boxOf(popup)]
+      const cdp = await page.context().newCDPSession(page)
+      const touch = (type: 'touchStart' | 'touchMove' | 'touchEnd', x: number, y: number) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y }] })
+      const [x0, y0] = [thumb.left + thumb.width / 2, thumb.top + thumb.height / 2]
+      // Past the end of the track on the side the inline-end sheet is dismissed toward: right in ltr, left in rtl.
+      const x1 = direction === 'ltr' ? track.right + 40 : track.left - 40
+      await touch('touchStart', x0, y0)
+      for (let step = 1; step <= 10; step += 1) await touch('touchMove', x0 + ((x1 - x0) * step) / 10, y0)
+      const during = await boxOf(popup)
+      await touch('touchEnd', x1, y0)
+      expect(during.left).toBe(before.left)
+      await expect(popup).toBeVisible()
+      expect(await page.evaluate(() => window.sliderDrawer ?? [])).toEqual([])
+      expect(await valueOf(input)).toBe('100')
+    })
+  }
+})
+
 test.describe('live: a form reset', () => {
   test.beforeEach(async ({ page }) => {
     await openLive(page, 'separator--horizontal')

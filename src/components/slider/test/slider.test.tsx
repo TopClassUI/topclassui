@@ -145,6 +145,11 @@ describe('what reaches the root', () => {
     expect(attr(root(volume({ 'aria-invalid': true })), 'aria-invalid')).toBe('true')
   })
 
+  it('the control carries Base UI\'s swipe marker, so a thumb dragged inside a Drawer never swipes it shut', () => {
+    const control = tag(volume(), 'div').filter((div) => div.includes('data-base-ui-swipe-ignore'))
+    expect(control.map((div) => attr(div, 'class')?.split(' ')[0])).toEqual(['relative'])
+  })
+
   it('required is accepted and lands on no element: Base UI has none', () => {
     expect(volume({ required: true })).not.toContain('required')
   })
