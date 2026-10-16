@@ -9,7 +9,7 @@ import { useFormValue } from '#shared/use-form-value.js'
 import { SLIDER_BOUNDARIES } from './boundaries.js'
 import type { SliderChangeDetails, SliderStateProps, SliderValue } from './types.js'
 
-const { limitMin, limitMax, stepMin } = SLIDER_BOUNDARIES
+const { limitMin, limitMax, stepMin, stepsBetweenMin } = SLIDER_BOUNDARIES
 
 /** Base UI's own value text of a range thumb is the English "20 start range": the thumb's name already says which end. */
 const formattedOnly = (formatted: string) => formatted
@@ -19,10 +19,14 @@ const formattedOnly = (formatted: string) => formatted
 export function useSlider(props: SliderStateProps) {
   const { value, defaultValue, onValueChange, ref, format } = props
   // R-5.7-7: a stray 1e308 or a step of 0 never reaches Base UI.
+  const step = clamp(props.step, stepMin, limitMax)
   const limits = {
     min: clamp(props.min, limitMin, limitMax),
     max: clamp(props.max, limitMin, limitMax),
-    step: clamp(props.step, stepMin, limitMax),
+    step,
+    // Below a step, Page Up lands back on the value it left: the large step is never smaller than the step.
+    largeStep: clamp(props.largeStep, step, limitMax),
+    minStepsBetweenValues: clamp(props.minStepsBetweenValues, stepsBetweenMin, limitMax),
   }
   const state = useFormValue({ value, defaultValue: defaultValue ?? limits.min })
   useImperativeHandle(ref, () => state.rootRef.current as HTMLDivElement, [state.rootRef])

@@ -45,6 +45,8 @@ export interface SliderStateProps {
   min: number
   max: number
   step: number
+  largeStep: number
+  minStepsBetweenValues: number
   'aria-label'?: string | undefined
   'aria-labelledby'?: string | undefined
   'aria-describedby'?: string | undefined

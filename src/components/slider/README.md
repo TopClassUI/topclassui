@@ -55,7 +55,9 @@ the page's `dir`: its root carries the provider's direction. A press on the trac
 the nearest thumb there; a drag moves it with the pointer.
 
 **`min`, `max` and `step`** are Base UI's 0, 100 and 1, clamped to plus or minus 1e15 and a
-`step` of at least 0.000001. A value outside them is shown at the limit.
+`step` of at least 0.000001. A value outside them is shown at the limit. **`largeStep`** (10) is
+clamped to at least the `step`, so Page Up always moves, and **`minStepsBetweenValues`** (0) to
+at least 0, so the thumbs of a range never cross.
 
 **The form.** With a `name`, each thumb's range input sends `name=<value>`: the minimum when
 no default is given, and the name twice for a range. **Before the page hydrates the range input
@@ -87,8 +89,8 @@ ring is around the knob.
 |---|---|
 | `Slider.Root`, `Control`, `Track`, `Indicator`, `Thumb`, `Value`, the keys, a press and a drag | as they are, as one element |
 | `value`, `defaultValue`, `onValueChange`, `onValueCommitted` | a number or a pair, pinned by the type argument; the value is held for the form reset |
-| `min`, `max`, `step` | clamped |
-| `largeStep`, `minStepsBetweenValues`, `thumbCollisionBehavior`, `orientation`, `name`, `form`, `disabled` | passed through |
+| `min`, `max`, `step`, `largeStep`, `minStepsBetweenValues` | clamped |
+| `thumbCollisionBehavior`, `orientation`, `name`, `form`, `disabled` | passed through |
 | `format`, `locale` | the provider's locale and digits unless you pass your own |
 | `thumbAlignment` | always `center`: `edge` places the thumb with an inline script, which needs a CSP nonce |
 | `Slider.Label` | not used: it names nothing until hydration |
@@ -120,8 +122,10 @@ Every prop below is optional and falls back to the default shown.
 | `className` | no | `string` | - | Merged last, so a consumer class wins a conflict with the slider's own. |
 | `fullWidth` | no | `boolean` | `false` | Fills its parent instead of taking the width of an Input of its size. |
 | `invalid` | no | `boolean` | `false` | Marks the value as wrong: sets aria-invalid on the group and on each range input, and the fill, the knob and a line around the track turn to danger. |
+| `largeStep` | no | `number`, min 0.000001, max 1000000000000000 | `10` | What Page Up, Page Down and Shift with an arrow move; clamped to at least the step, so they always move. |
 | `max` | no | `number`, min -1000000000000000, max 1000000000000000 | `100` | The highest value; clamped to plus or minus 1e15. |
 | `min` | no | `number`, min -1000000000000000, max 1000000000000000 | `0` | The lowest value, and the value of a slider with no default; clamped to plus or minus 1e15. |
+| `minStepsBetweenValues` | no | `number`, min 0, max 1000000000000000 | `0` | The fewest steps between the two thumbs of a range; clamped to at least 0, so the thumbs never cross. |
 | `ref` | no | `Ref<HTMLDivElement>` | - | The root element, the `<div role="group">`. |
 | `required` | no | `boolean` | - | Accepted so a Field can spread its object, and dropped: Base UI has none, and a slider always has a value. |
 | `showValue` | no | `boolean` | `false` | Writes the value after the track, in the locale and the digits of the provider. |

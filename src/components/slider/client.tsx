@@ -21,6 +21,8 @@ export function Slider<Value extends SliderValue = number>({
   min = SLIDER_DEFAULTS.min,
   max = SLIDER_DEFAULTS.max,
   step = SLIDER_DEFAULTS.step,
+  largeStep = SLIDER_DEFAULTS.largeStep,
+  minStepsBetweenValues = SLIDER_DEFAULTS.minStepsBetweenValues,
   value,
   defaultValue,
   onValueChange,
@@ -36,7 +38,7 @@ export function Slider<Value extends SliderValue = number>({
   ...rest
 }: SliderProps<Value>) {
   const slider = useSlider({
-    value, defaultValue, ref, min, max, step, locale, format,
+    value, defaultValue, ref, min, max, step, largeStep, minStepsBetweenValues, locale, format,
     invalid: invalid || ariaInvalid === true || ariaInvalid === 'true',
     // A number or a pair, as Value says: the generic only narrows what the caller's handler is handed.
     onValueChange: onValueChange as SliderStateProps['onValueChange'],
@@ -54,6 +56,8 @@ export function Slider<Value extends SliderValue = number>({
       min={slider.limits.min}
       max={slider.limits.max}
       step={slider.limits.step}
+      largeStep={slider.limits.largeStep}
+      minStepsBetweenValues={slider.limits.minStepsBetweenValues}
       locale={slider.locale}
       format={slider.format}
       thumbAlignment="center"

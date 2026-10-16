@@ -49,6 +49,18 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
+    label: 'the slider passes largeStep unclamped, so largeStep={-10} turns Page Up into Page Down',
+    file: HOOK,
+    from: 'largeStep: clamp(props.largeStep, step, limitMax),',
+    to: 'largeStep: props.largeStep,',
+  },
+  {
+    label: 'the slider passes minStepsBetweenValues unclamped, so NaN lets the thumbs of a range cross',
+    file: HOOK,
+    from: 'minStepsBetweenValues: clamp(props.minStepsBetweenValues, stepsBetweenMin, limitMax),',
+    to: 'minStepsBetweenValues: props.minStepsBetweenValues,',
+  },
+  {
     label: 'the slider hands Base UI defaultValue again, so a form reset leaves the thumb where it was',
     file: CLIENT,
     from: '      value={slider.value as Value}\n      onValueChange={slider.onValueChange}\n',
