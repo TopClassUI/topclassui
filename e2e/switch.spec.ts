@@ -117,6 +117,35 @@ test.describe('invalid, on the static page', () => {
   })
 })
 
+test.describe('the off thumb against its track, on the static page', () => {
+  test.use({ reducedMotion: 'reduce' })
+
+  /** The thumb's centre against the fill halfway between it and the far end of the track, clear of the line and its edge. */
+  const thumbOnTrack = async (page: Page, control: Locator, direction: Direction) => {
+    const [track, thumb] = [await boxOf(trackOf(control)), await boxOf(control.locator('span span'))]
+    const y = Math.round(thumb.top + thumb.height / 2)
+    const far = direction === 'ltr' ? (thumb.right + track.right) / 2 : (thumb.left + track.left) / 2
+    const [knob] = await pixelsOf(page, { x: Math.round(thumb.left + thumb.width / 2), y, width: 1, height: 1 })
+    const [fill] = await pixelsOf(page, { x: Math.round(far), y, width: 1, height: 1 })
+    return contrast(knob ?? [0, 0, 0], fill ?? [0, 0, 0])
+  }
+
+  for (const mode of ['light', 'dark', 'ocean'] as const) {
+    test(`${mode}: the thumb that shows the state stands 3:1 off the track around it (WCAG 1.4.11), at every size`, async ({ page }) => {
+      await page.goto(urlFor('switch--states', mode, 'ltr'))
+      expect(await thumbOnTrack(page, switchOf(page, 'Off'), 'ltr')).toBeGreaterThanOrEqual(3)
+      expect(await thumbOnTrack(page, switchOf(page, 'Invalid'), 'ltr')).toBeGreaterThanOrEqual(3)
+      // The sizes demo is on: turned off by hand on the static page, where no script puts it back.
+      await page.goto(urlFor('switch--sizes', mode, 'rtl'))
+      for (const size of SIZES) {
+        const control = switchOf(page, NAMES[size])
+        await control.evaluate((el) => { el.removeAttribute('data-checked'); el.setAttribute('data-unchecked', '') })
+        expect(await thumbOnTrack(page, control, 'rtl'), size).toBeGreaterThanOrEqual(3)
+      }
+    })
+  }
+})
+
 for (const scheme of ['light', 'dark'] as const) {
   test.describe(`forced colours, ${scheme} palette`, () => {
     test.use({ forcedColors: 'active', colorScheme: scheme, reducedMotion: 'reduce' })

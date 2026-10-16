@@ -28,12 +28,12 @@ describe('checkTokens', () => {
   })
 
   it('measures the number of pairs it claims; change this only on purpose', () => {
-    expect(run(css).pairs).toBe(339)
+    expect(run(css).pairs).toBe(342)
   })
 
   it('reports how many readings are distinct, since light and ocean share most tokens', () => {
     const report = run(css)
-    expect(report.distinct).toBe(205)
+    expect(report.distinct).toBe(207)
     expect(report.distinct).toBeLessThan(report.pairs)
   })
 })
@@ -224,6 +224,11 @@ describe('each threshold is the number R-5.6-4 names, and each one bites', () =>
     )
     expect(faint, 'the line-strong declaration moved').not.toBe(css)
     expect(failures(faint)).toMatch(/light: line-strong on page/)
+  })
+
+  it('fails a switch thumb that reads 1.2 on its off track, the drawn surface-raised', () => {
+    const pale = mutateMode('dark', '--tc-line-strong: var(--color-neutral-400);', '--tc-line-strong: var(--color-neutral-800);')
+    expect(failures(pale)).toMatch(/dark: switch thumb \(line-strong\) on its track \(neutral-soft\)/)
   })
 
   it('judges the worse gamut reading, measured through checkTokens itself', () => {

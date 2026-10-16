@@ -60,4 +60,10 @@ export const MUTATIONS: Mutation[] = [
     from: ' forced-colors:bg-[ButtonText]',
     to: '',
   },
+  {
+    label: 'the switch thumb is surface-raised again when off, 1.2:1 on its track in light and 1.08:1 in dark',
+    file: CLASSES,
+    from: 'rounded-full bg-line-strong group-data-checked/toggle:bg-primary-on-solid',
+    to: 'rounded-full bg-surface-raised group-data-checked/toggle:bg-primary-on-solid',
+  },
 ]

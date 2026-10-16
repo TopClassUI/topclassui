@@ -17,8 +17,9 @@ export const SWITCH_TRACK_SIZE = {
   custom: '',
 } as const
 
-/** As tall as the inside of the track. Forced colours erase a fill, so there it is a system colour. */
-export const SWITCH_THUMB = `block aspect-square h-full rounded-full bg-surface-raised group-data-checked/toggle:bg-primary-on-solid forced-colors:forced-color-adjust-none forced-colors:bg-[ButtonText] forced-colors:group-data-checked/toggle:bg-[HighlightText] ${TRANSITION}`
+/** As tall as the inside of the track. Off it is line-strong, 3:1 on the track, where the drawn surface-raised is 1.2:1.
+ * Forced colours erase a fill, so there it is a system colour. */
+export const SWITCH_THUMB = `block aspect-square h-full rounded-full bg-line-strong group-data-checked/toggle:bg-primary-on-solid forced-colors:forced-color-adjust-none forced-colors:bg-[ButtonText] forced-colors:group-data-checked/toggle:bg-[HighlightText] ${TRANSITION}`
 
 /** R-5.3-2: the width minus the height, toward the inline end. */
 export const SWITCH_SLIDE = {

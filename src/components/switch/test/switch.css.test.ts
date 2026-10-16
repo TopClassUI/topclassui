@@ -57,10 +57,11 @@ describe('the track', () => {
 })
 
 describe('the thumb', () => {
-  it('is a circle as tall as the inside of the track, on the raised surface, and on the on-solid colour when checked', () => {
+  it('is a circle as tall as the inside of the track, line-strong when off (3:1 on the track), and on the on-solid colour when checked', () => {
     expect(ruleOf(selectorOf('aspect-square'))).toBe('aspect-ratio: 1 / 1;')
     expect(ruleOf(selectorOf('h-full'))).toBe('height: 100%;')
-    expect(ruleOf(selectorOf('bg-surface-raised'))).toBe('background-color: var(--tc-surface-raised);')
+    expect(ruleOf(selectorOf('bg-line-strong'))).toBe('background-color: var(--tc-line-strong);')
+    expect(SWITCH_THUMB.split(' ')).not.toContain('bg-surface-raised')
     expect(ruleOf(`${selectorOf('group-data-checked/toggle:bg-primary-on-solid')}${CHECKED}`))
       .toBe('background-color: var(--tc-primary-on-solid);')
   })
