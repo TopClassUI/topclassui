@@ -108,15 +108,15 @@ import { FileUpload } from 'topclassui'
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `aria-label` or `aria-labelledby` or `id`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `aria-label` | no | `string` | - | The name read out when no visible label names the control. |
-| `aria-labelledby` | no | `string` | - | The id of the visible text that names the control. |
+| `aria-label` | **yes**, or `aria-labelledby` or `id` | `string` | - | The name read out when no visible label names the control. |
+| `aria-labelledby` | **yes**, or `aria-label` or `id` | `string` | - | The id of the visible text that names the control. |
+| `id` | **yes**, or `aria-label` or `aria-labelledby` | `string` | - | The id a `<label htmlFor>` points at. |
 | `children` | no | `ReactNode` | - | The hint inside the zone, such as "PDF or PNG, up to 5 MB": it describes the input; a link in it takes its own click. |
 | `className` | no | `string` | - | On the root, merged last. |
-| `id` | no | `string` | - | The id a `<label htmlFor>` points at. |
 | `invalid` | no | `boolean` | `false` | Marks the files as wrong: sets aria-invalid on the input, and the line of the zone turns to danger and thickens. |
 | `maxFiles` | no | `integer`, min 1, max 100 | `1` | How many files the list keeps, clamped to 1 to 100; above 1 the input takes several at once. |
 | `maxSize` | no | `integer`, min 1, max 10737418240 | `10737418240` | The largest file accepted, in bytes, clamped to 1 to 10 GiB; checked in the browser only. |
