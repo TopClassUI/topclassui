@@ -138,7 +138,7 @@ describe('what reaches the root', () => {
     expect(attr(root(html), 'class')?.split(' ')).toEqual(expect.arrayContaining(['group/slider', 'grid', 'w-fit', 'grid-cols-[minmax(0,var(--tc-input-width))]', 'text-sm']))
   })
 
-  it('invalid sets aria-invalid on the group and nowhere else; off, a caller aria-invalid survives', () => {
+  it('in the server HTML invalid sets aria-invalid on the group only, the range inputs take it at hydration; off, a caller aria-invalid survives', () => {
     expect(attr(root(volume({ invalid: true })), 'aria-invalid')).toBe('true')
     expect(inputs(volume({ invalid: true })).filter((input) => input.includes('aria-invalid'))).toEqual([])
     expect(attr(root(volume()), 'aria-invalid')).toBeUndefined()

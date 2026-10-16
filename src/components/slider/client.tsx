@@ -37,6 +37,7 @@ export function Slider<Value extends SliderValue = number>({
 }: SliderProps<Value>) {
   const slider = useSlider({
     value, defaultValue, ref, min, max, step, locale, format,
+    invalid: invalid || ariaInvalid === true || ariaInvalid === 'true',
     // A number or a pair, as Value says: the generic only narrows what the caller's handler is handed.
     onValueChange: onValueChange as SliderStateProps['onValueChange'],
     'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby, 'aria-describedby': ariaDescribedby,

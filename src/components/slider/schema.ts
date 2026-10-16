@@ -12,7 +12,7 @@ export const sliderSchema = z.object({
   size: sizeSchema.default(SLIDER_DEFAULTS.size)
     .meta({ description: 'The scale of the track and the knob, and the width of an Input of that size; custom emits no size classes.' }),
   invalid: z.boolean().default(SLIDER_DEFAULTS.invalid)
-    .meta({ description: 'Marks the value as wrong: sets aria-invalid on the group, and the fill, the knob and a line around the track turn to danger.' }),
+    .meta({ description: 'Marks the value as wrong: sets aria-invalid on the group and on each range input, and the fill, the knob and a line around the track turn to danger.' }),
   fullWidth: z.boolean().default(SLIDER_DEFAULTS.fullWidth)
     .meta({ description: 'Fills its parent instead of taking the width of an Input of its size.' }),
   showValue: z.boolean().default(SLIDER_DEFAULTS.showValue)

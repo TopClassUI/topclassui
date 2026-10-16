@@ -40,6 +40,8 @@ export interface SliderStateProps {
   defaultValue?: SliderValue | undefined
   onValueChange?: ((value: SliderValue, details: SliderChangeDetails) => void) | undefined
   ref?: Ref<HTMLDivElement> | undefined
+  /** From `invalid` or the aria-invalid a Field passes: each range input carries it too. */
+  invalid: boolean
   min: number
   max: number
   step: number

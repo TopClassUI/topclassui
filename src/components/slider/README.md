@@ -66,9 +66,9 @@ to `min`; a controlled slider keeps its owner's value. A reset calls no `onValue
 **`showValue`** writes the value after the track, in the provider's locale and digits, or in
 your `locale` and `format`. A `format` of `percent` multiplies: give it values from 0 to 1.
 
-**`invalid`** sets `aria-invalid` on the group, where a screen reader does not land: point
-`aria-describedby` at the error text. The fill and the knob turn red, and a line is drawn
-around the track. **`disabled`** dims it and disables every range input, so the form sends
+**`invalid`**, or an `aria-invalid` a Field passes, sets `aria-invalid` on the group and, from
+hydration, on each range input, the element a screen reader lands on: point `aria-describedby`
+at the error text too. The fill and the knob turn red, and a line is drawn around the track. **`disabled`** dims it and disables every range input, so the form sends
 nothing. A slider has no read-only state.
 
 **The width** is an Input's of the same `size` (`--tc-input-width`), and it shrinks in a narrow
@@ -118,7 +118,7 @@ Every prop below is optional and falls back to the default shown.
 | `aria-labelledby` | no | `string` | - | The id of the visible text that names the group. |
 | `className` | no | `string` | - | Merged last, so a consumer class wins a conflict with the slider's own. |
 | `fullWidth` | no | `boolean` | `false` | Fills its parent instead of taking the width of an Input of its size. |
-| `invalid` | no | `boolean` | `false` | Marks the value as wrong: sets aria-invalid on the group, and the fill, the knob and a line around the track turn to danger. |
+| `invalid` | no | `boolean` | `false` | Marks the value as wrong: sets aria-invalid on the group and on each range input, and the fill, the knob and a line around the track turn to danger. |
 | `max` | no | `number`, min -1000000000000000, max 1000000000000000 | `100` | The highest value; clamped to plus or minus 1e15. |
 | `min` | no | `number`, min -1000000000000000, max 1000000000000000 | `0` | The lowest value, and the value of a slider with no default; clamped to plus or minus 1e15. |
 | `ref` | no | `Ref<HTMLDivElement>` | - | The root element, the `<div role="group">`. |

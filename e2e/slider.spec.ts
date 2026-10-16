@@ -276,6 +276,19 @@ test.describe('live: the keyboard', () => {
   })
 })
 
+test.describe('live: what a screen reader is handed', () => {
+  test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
+
+  test('the focused range input of an invalid slider is invalid, one thumb and both of a range; a valid one is not', async ({ page }) => {
+    await openLive(page, 'slider--states')
+    const cdp = await page.context().newCDPSession(page)
+    const { nodes } = await cdp.send('Accessibility.getFullAXTree') as { nodes: { ignored: boolean; role?: { value: string }; name?: { value: string }; properties?: { name: string; value: { value?: string | boolean } }[] }[] }
+    const sliders = nodes.filter((node) => !node.ignored && node.role?.value === 'slider')
+      .map((node) => `${String(node.name?.value)} ${String(node.properties?.find((p) => p.name === 'invalid')?.value.value ?? 'false')}`)
+    expect(sliders).toEqual(expect.arrayContaining(['Live false', 'Invalid true', 'Minimum true', 'Maximum true']))
+  })
+})
+
 test.describe('live: a press and a drag', () => {
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 

@@ -19,6 +19,12 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
+    label: 'the slider range inputs never carry aria-invalid, so a screen reader on the focused thumb hears no error',
+    file: HOOK,
+    from: "if (invalid) input?.setAttribute('aria-invalid', 'true')",
+    to: "if (invalid) input?.removeAttribute('aria-invalid')",
+  },
+  {
     label: 'the slider root loses FIELD_HOLDER, so in a w-fit parent the slider is as wide as its thumb',
     file: CLASSES,
     from: 'export const SLIDER_ROOT = `group/slider grid ${FIELD_HOLDER} ${DISABLED}`',

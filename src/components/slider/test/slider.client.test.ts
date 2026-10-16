@@ -113,9 +113,9 @@ describe('hook.ts holds the value, the limits and the name (R-5.12-1)', () => {
     expect(importedModules(source)).toEqual([
       'react', '#shared/clamp.js', '#shared/provider/context.js', '#shared/use-form-value.js', './boundaries.js', './types.js',
     ])
-    expect(importedNames(source, 'react')).toEqual(['useImperativeHandle', 'useMemo'])
+    expect(importedNames(source, 'react')).toEqual(['useCallback', 'useImperativeHandle', 'useMemo'])
     expect(hooksByPart(source)).toEqual({
-      useSlider: ['useFormValue', 'useImperativeHandle', 'useLabels', 'useLocale', 'useNumberFormat', 'useMemo'],
+      useSlider: ['useFormValue', 'useImperativeHandle', 'useLabels', 'useLocale', 'useNumberFormat', 'useMemo', 'useCallback'],
     })
   })
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useImperativeHandle, useMemo } from 'react'
+import { useCallback, useImperativeHandle, useMemo } from 'react'
 
 import { clamp } from '#shared/clamp.js'
 import { useLabels, useLocale, useNumberFormat } from '#shared/provider/context.js'
@@ -38,16 +38,24 @@ export function useSlider(props: SliderStateProps) {
     if (!details.isCanceled) state.setValue(next)
   }
 
+  // Base UI sends no aria-invalid to the range input, the element a screen reader lands on, so it is set here.
+  const invalid = props.invalid
+  const markInvalid = useCallback((input: HTMLInputElement | null) => {
+    if (invalid) input?.setAttribute('aria-invalid', 'true')
+    else input?.removeAttribute('aria-invalid')
+  }, [invalid])
+
   const name = { 'aria-label': props['aria-label'], 'aria-labelledby': props['aria-labelledby'] }
   const describedBy = props['aria-describedby']
   const single = typeof state.value === 'number'
   // One thumb takes the slider's name; each thumb of a range its own, and the group the slider's.
   const thumbs = typeof state.value === 'number'
-    ? [{ ...name, 'aria-describedby': describedBy }]
+    ? [{ ...name, 'aria-describedby': describedBy, inputRef: markInvalid }]
     : state.value.map((_, index) => ({
       'aria-label': index === 0 ? labels.minimum : labels.maximum,
       'aria-describedby': describedBy,
       getAriaValueText: formattedOnly,
+      inputRef: markInvalid,
     }))
 
   return {
