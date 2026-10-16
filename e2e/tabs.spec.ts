@@ -41,6 +41,13 @@ const tabsIn = (list: Locator) => list.locator('[role="tab"]')
 const focusedText = (page: Page) => page.evaluate(() => document.activeElement?.textContent ?? null)
 const selectedIn = (list: Locator) => list.locator('[aria-selected="true"]').evaluateAll((all) => all.map((tab) => tab.textContent))
 
+/** The one panel shown in a root: Base UI keeps the panel it closes until its exit animation ends, a frame at least. */
+async function shownPanel(page: Page, root: string): Promise<Locator> {
+  const shown = page.locator(`${root} [role="tabpanel"]:visible`)
+  await expect(shown).toHaveCount(1)
+  return shown
+}
+
 /** Presses a key and waits until the focus rests on the tab with that text: Base UI moves it in a microtask. */
 async function press(page: Page, key: string, lands: string): Promise<void> {
   await page.keyboard.press(key)
@@ -262,7 +269,7 @@ test.describe('a panel that is not open', () => {
     await openFixture(page)
     await expect(page.locator('#unmounted [role="tabpanel"]')).toHaveCount(1)
     await page.locator('#unmounted [role="tab"]').nth(1).click()
-    await expect(page.locator('#unmounted [role="tabpanel"]:visible')).toHaveText('Heavy panel')
+    await expect(await shownPanel(page, '#unmounted')).toHaveText('Heavy panel')
   })
 })
 
@@ -328,7 +335,7 @@ for (const direction of DIRECTIONS) {
       expect(await selectedIn(list)).toEqual(['One'])
       await press(page, next, 'Three')
       await expect.poll(() => selectedIn(list)).toEqual(['Three'])
-      await expect(page.locator('#auto [role="tabpanel"]:visible')).toHaveText('Panel three')
+      await expect(await shownPanel(page, '#auto')).toHaveText('Panel three')
     })
 
     test('with loopFocus off the arrows stop at the first and at the last tab', async ({ page }) => {
@@ -380,7 +387,7 @@ test.describe('the panel is a tab stop', () => {
   test('with tabIndex={-1} on the panel, Tab goes from the tab straight to the control', async ({ page }) => {
     await openFixture(page)
     await tabsIn(listIn(page, '#controls')).nth(1).click()
-    await expect(page.locator('#controls [role="tabpanel"]:visible')).toHaveAttribute('tabindex', '-1')
+    await expect(await shownPanel(page, '#controls')).toHaveAttribute('tabindex', '-1')
     await page.keyboard.press('Tab')
     await expect(page.getByRole('button', { name: 'Inside no stop' })).toBeFocused()
   })
