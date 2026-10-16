@@ -331,6 +331,13 @@ test.describe('the keyboard', () => {
       await page.keyboard.press('Tab')
       expect(await page.evaluate(() => document.activeElement?.tagName)).not.toBe('PRE')
     })
+
+    test(`${direction}: with no title, Tab lands on a region named Code, never on a nameless box`, async ({ page }) => {
+      await openLive(page, 'code-block--no-header', { direction })
+      await page.keyboard.press('Tab')
+      await expect(page.locator(PRE)).toBeFocused()
+      await expect(page.getByRole('region', { name: 'Code', exact: true })).toBeFocused()
+    })
   }
 })
 

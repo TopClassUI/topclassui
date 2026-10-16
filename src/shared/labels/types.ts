@@ -18,6 +18,8 @@ export interface Labels {
     readonly copied: string
     /** Announced when the clipboard refuses a copy. */
     readonly copyFailed: string
+    /** Names a block of code that has no title of its own, so its tab stop is never nameless. */
+    readonly code: string
     readonly search: string
     readonly required: string
     readonly optional: string

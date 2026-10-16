@@ -35,6 +35,7 @@ export const ar = {
     copy: 'نسخ',
     copied: 'تم النسخ',
     copyFailed: 'تعذّر النسخ',
+    code: 'الشيفرة البرمجية',
     search: 'بحث',
     required: 'مطلوب',
     optional: 'اختياري',

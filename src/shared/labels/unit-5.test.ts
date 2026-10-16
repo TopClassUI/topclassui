@@ -24,6 +24,10 @@ describe('the labels of Unit 5, in English', () => {
     expect(en.common.copied).toBe('Copied')
   })
 
+  it('names a block of code that has no title', () => {
+    expect(en.common.code).toBe('Code')
+  })
+
   it('leaves the labels Unit 5 uses as they are', () => {
     expect(en.common.copy).toBe('Copy')
     expect(en.common.close).toBe('Close')
@@ -56,6 +60,10 @@ describe('the labels of Unit 5, in Arabic', () => {
   it('announces a refused copy apart from a done one', () => {
     expect(ar.common.copyFailed).toBe('تعذّر النسخ')
     expect(ar.common.copied).toBe('تم النسخ')
+  })
+
+  it('names a block of code that has no title', () => {
+    expect(ar.common.code).toBe('الشيفرة البرمجية')
   })
 })
 

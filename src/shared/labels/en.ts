@@ -12,6 +12,7 @@ export const en = {
     copy: 'Copy',
     copied: 'Copied',
     copyFailed: 'Could not copy',
+    code: 'Code',
     search: 'Search',
     required: 'required',
     optional: 'optional',

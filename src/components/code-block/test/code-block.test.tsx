@@ -55,11 +55,23 @@ describe('the tab stop and the region', () => {
     expect(attr(preOf(out), 'aria-labelledby')).toBe(id)
   })
 
-  it('without a title has no role and names nothing', () => {
+  it('without a title is still a region, named Code from labels, so its tab stop is never nameless', () => {
     for (const title of [undefined, null, false, '']) {
-      expect(attr(preOf(html({ title })), 'role'), String(title)).toBeUndefined()
-      expect(attr(preOf(html({ title })), 'aria-labelledby'), String(title)).toBeUndefined()
+      for (const showCopy of [true, false]) {
+        const pre = preOf(html({ title, showCopy }))
+        expect([attr(pre, 'role'), attr(pre, 'aria-label'), attr(pre, 'aria-labelledby')], `${String(title)} ${String(showCopy)}`).toEqual(['region', 'Code', undefined])
+      }
     }
+    expect(attr(preOf(html({ ...getLabels('ar') })), 'aria-label')).toBe('الشيفرة البرمجية')
+  })
+
+  it('with a title is named by it alone, never by the Code label too', () => {
+    expect(attr(preOf(html({ title: 'page.tsx' })), 'aria-label')).toBeUndefined()
+  })
+
+  it('with wrap and no title is no tab stop, so it is no region and names nothing', () => {
+    const pre = preOf(html({ wrap: true }))
+    expect([attr(pre, 'tabindex'), attr(pre, 'role'), attr(pre, 'aria-label'), attr(pre, 'aria-labelledby')]).toEqual([undefined, undefined, undefined, undefined])
   })
 })
 

@@ -40,8 +40,20 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the code block pre is never a region, so the title names nothing',
     file: INDEX,
-    from: "role={named ? 'region' : undefined}",
+    from: "role={named || !wrap ? 'region' : undefined}",
     to: 'role={undefined}',
+  },
+  {
+    label: 'the code block pre with no title is a tab stop with no role, so Tab lands on a nameless box',
+    file: INDEX,
+    from: "role={named || !wrap ? 'region' : undefined}",
+    to: "role={named ? 'region' : undefined}",
+  },
+  {
+    label: 'the code block pre with no title takes no name from labels',
+    file: INDEX,
+    from: 'aria-label={named || wrap ? undefined : labels.common.code}',
+    to: 'aria-label={undefined}',
   },
   {
     label: 'the code block button gets no title id, so five buttons on a page all read "Copy"',
