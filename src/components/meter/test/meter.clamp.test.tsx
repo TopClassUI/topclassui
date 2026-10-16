@@ -32,7 +32,11 @@ const CASES = [
   ['a stray 1e308 max', { max: 1e308, value: 5e14 }, ['0', '1000000000000000', '500000000000000', '--tc-meter-value:50%']],
   ['a stray -1e308 min', { min: -1e308, max: 0, value: -5e14 }, ['-1000000000000000', '0', '-500000000000000', '--tc-meter-value:50%']],
   ['an infinite range', { min: Number.NEGATIVE_INFINITY, max: Number.POSITIVE_INFINITY, value: 0 }, ['-1000000000000000', '1000000000000000', '0', '--tc-meter-value:50%']],
-  ['a NaN max', { max: Number.NaN, value: 50 }, ['0', '0', '0', '--tc-meter-value:100%']],
+  ['a NaN max', { max: Number.NaN, value: 50 }, ['0', '100', '50', '--tc-meter-value:50%']],
+  ['a NaN max under a value of 30', { max: Number.NaN, value: 30 }, ['0', '100', '30', '--tc-meter-value:30%']],
+  ['a NaN min', { min: Number.NaN, value: 50 }, ['0', '100', '50', '--tc-meter-value:50%']],
+  ['a NaN min below a max of its own', { min: Number.NaN, max: 1024, value: 512 }, ['0', '1024', '512', '--tc-meter-value:50%']],
+  ['NaN everywhere', { min: Number.NaN, max: Number.NaN, value: Number.NaN }, ['0', '100', '0', '--tc-meter-value:0%']],
 ] as const
 
 describe('the range and the value are clamped before they reach ARIA or the bar (R-5.7-7)', () => {

@@ -1,7 +1,7 @@
 // Loaded into a live page by e2e/meter.spec.ts: a meter where a real page puts one. Alone as a grid item, in a wrapper
 // in a grid track, in a flex-1 column, in a w-fit parent (bare and with a width of its own), in a table cell (bare and
 // with a width of its own), in a flex row beside its label; then hostile input: a 300-character label, values past the
-// range, NaN and infinities, a max below its min. Inline styles: the harness compiles only classes under src/.
+// range, NaN and infinities, a max below its min, a NaN max, a NaN min. Inline styles: the harness compiles only src/.
 import type { CSSProperties } from 'react'
 import { createRoot } from 'react-dom/client'
 
@@ -43,6 +43,8 @@ function Fixture() {
         <Meter value={Number.NaN} aria-label="Not a number" />
         <Meter min={Number.NEGATIVE_INFINITY} max={Number.POSITIVE_INFINITY} value={0} aria-label="Infinite range" />
         <Meter min={10} max={5} value={7} aria-label="Max below min" />
+        <Meter max={Number.NaN} value={50} aria-label="A NaN max" />
+        <Meter min={Number.NaN} value={50} aria-label="A NaN min" />
       </div>
     </div>
   )

@@ -144,7 +144,7 @@ test.describe('live: where a page puts a meter, and hostile values', () => {
     ['cell-sized', 1233, '160/80'],
     ['row', 1233, '1175.2/587.6'],
     ['word', 1233, '1233/616.5'],
-    ['hostile', 1233, '1233/1233', '1233/0', '1233/0', '1233/616.5', '1233/1233'],
+    ['hostile', 1233, '1233/1233', '1233/0', '1233/0', '1233/616.5', '1233/1233', '1233/616.5', '1233/616.5'],
   ]
   const PHONE = [
     ['grid', 273, '273/136.5'],
@@ -156,7 +156,7 @@ test.describe('live: where a page puts a meter, and hostile values', () => {
     ['cell-sized', 273, '160/80'],
     ['row', 273, '215.2/107.6'],
     ['word', 273, '273/136.5'],
-    ['hostile', 273, '273/273', '273/0', '273/0', '273/136.5', '273/273'],
+    ['hostile', 273, '273/273', '273/0', '273/0', '273/136.5', '273/273', '273/136.5', '273/136.5'],
   ]
 
   for (const direction of DIRECTIONS) {
@@ -170,7 +170,7 @@ test.describe('live: where a page puts a meter, and hostile values', () => {
     }
   }
 
-  test('hostile values reach ARIA clamped, never as NaN or 1e308', async ({ page }) => {
+  test('hostile values reach ARIA clamped, never as NaN or 1e308, and a NaN end takes its default', async ({ page }) => {
     await fixture(page)
     const read = await page.locator('#layouts [data-case="hostile"] [role="meter"]').evaluateAll((all) => all.map((m) =>
       ['aria-valuemin', 'aria-valuemax', 'aria-valuenow'].map((name) => m.getAttribute(name))))
@@ -180,6 +180,8 @@ test.describe('live: where a page puts a meter, and hostile values', () => {
       ['0', '100', '0'],
       ['-1000000000000000', '1000000000000000', '0'],
       ['10', '10', '10'],
+      ['0', '100', '50'],
+      ['0', '100', '50'],
     ])
   })
 })

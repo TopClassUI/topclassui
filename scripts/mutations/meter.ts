@@ -23,8 +23,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the meter keeps a max below min, so the range runs backwards',
     file: 'src/components/meter/lib.ts',
-    from: 'const high = Math.max(clamp(max, METER_BOUNDARIES.limitMin, METER_BOUNDARIES.limitMax), low)',
-    to: 'const high = clamp(max, METER_BOUNDARIES.limitMin, METER_BOUNDARIES.limitMax)',
+    from: 'const high = Math.max(bound(max, METER_DEFAULTS.max), low)',
+    to: 'const high = bound(max, METER_DEFAULTS.max)',
   },
   {
     label: 'the meter announces and draws an unclamped value, past max or NaN',
@@ -35,8 +35,20 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the meter lets a stray 1e308 min through the guard rail',
     file: 'src/components/meter/lib.ts',
-    from: 'const low = clamp(min, METER_BOUNDARIES.limitMin, METER_BOUNDARIES.limitMax)',
-    to: 'const low = min',
+    from: 'const low = bound(min, METER_DEFAULTS.min)',
+    to: 'const low = Number.isNaN(min) ? METER_DEFAULTS.min : min',
+  },
+  {
+    label: 'the meter clamps a NaN min or max to the guard rail, so a NaN max draws a full bar and reads 0 of 0',
+    file: 'src/components/meter/lib.ts',
+    from: 'return clamp(Number.isNaN(end) ? fallback : end,',
+    to: 'return clamp(end,',
+  },
+  {
+    label: 'the meter gives a NaN max the default min, so the range collapses to one point',
+    file: 'src/components/meter/lib.ts',
+    from: 'bound(max, METER_DEFAULTS.max)',
+    to: 'bound(max, METER_DEFAULTS.min)',
   },
   {
     label: 'the meter spreads the rest last, so a caller aria-valuenow or role beats the clamp',

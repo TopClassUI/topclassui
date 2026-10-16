@@ -21,7 +21,8 @@ the type refuses a Meter with neither. `aria-valuetext` is passed through, so a 
 reader can say "512 GB of 1 TB" instead of "512".
 
 **Clamped.** `min` and `max` stay within -1e15 and 1e15, `max` is raised to `min` when it
-is below it, and `value` is held between the two (`NaN` reads as `min`).
+is below it, and `value` is held between the two (`NaN` reads as `min`). A `NaN` `min` or
+`max`, as from a total that has not loaded, takes its default of 0 or 100.
 
 **Contrast.** The bar takes the tone's text colour (`<tone>-on-soft`), at least 5.6:1 on
 the track in every mode, and a `line-strong` outline marks the end of the range at 4.7:1
