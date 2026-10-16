@@ -74,7 +74,7 @@ describe('hook.ts and lib.ts', () => {
     expect(source.startsWith("'use client'\n")).toBe(true)
     expect(importedModules(source).sort()).toEqual(['./types.js', 'react'])
     expect(hooksPerFunction(source)).toEqual({
-      useAvatarImage: ['useRef', 'useImperativeHandle', 'useState', 'useCallback', 'useEffect', 'useCallback'],
+      useAvatarImage: ['useRef', 'useRef', 'useState', 'useCallback', 'useCallback', 'useEffect', 'useCallback', 'useCallback'],
     })
   })
 

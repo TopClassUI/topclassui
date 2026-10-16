@@ -113,10 +113,10 @@ describe('hook.ts holds the value and the look of the group (R-5.12-1)', () => {
 
   it('builds on the shared form value and the shared server tab stop', () => {
     expect(importedModules(source)).toEqual(['react', '#shared/use-form-value.js', '#shared/use-server-tab-stop.js', './constants.js', './types.js'])
-    expect(importedNames(source, 'react')).toEqual(['createContext', 'useContext', 'useImperativeHandle', 'useMemo', 'useState'])
+    expect(importedNames(source, 'react')).toEqual(['createContext', 'useContext', 'useEffect', 'useImperativeHandle', 'useMemo', 'useRef', 'useState'])
     expect(hooksByPart(source)).toEqual({
       syncRadios: [],
-      useRadioGroupRoot: ['useFormValue', 'useImperativeHandle', 'useState', 'useMemo'],
+      useRadioGroupRoot: ['useState', 'useRef', 'useFormValue', 'useImperativeHandle', 'useEffect', 'useState', 'useMemo'],
       useRadioGroupItem: ['useContext', 'useServerTabStop'],
     })
   })

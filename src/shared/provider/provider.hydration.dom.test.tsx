@@ -71,9 +71,15 @@ describe('a page inside TopClassProvider', () => {
     expect(server).toBe('<div class="isolate"><main>page</main><div class="contents"><aside>island</aside></div></div>')
   })
 
-  it('holds no toast in the server markup even when one was added before the render: the server has no listener', () => {
+  it('holds no toast in the server markup even when one was added before the render, and shows it once hydrated (TOAST-1)', async () => {
     toastManager.add({ title: 'Too early' })
     expect(renderToString(page)).not.toContain('Too early')
+    const seen: string[] = []
+    const { errors } = await hydrate(page, (container) => {
+      seen.push(container.querySelector('[data-testid="titles"]')?.textContent ?? 'missing')
+    })
+    expect(seen).toEqual(['Too early'])
+    expect(errors).toEqual([])
   })
 
   it('takes a toast once hydrated, since the provider subscribes to the manager in an effect', async () => {

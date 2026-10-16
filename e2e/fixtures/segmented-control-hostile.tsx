@@ -24,7 +24,7 @@ function Fixture() {
           <SegmentedControlItem value="blank" aria-label="Blank">{''}</SegmentedControlItem>
         </SegmentedControlRoot>
         <SegmentedControlRoot aria-label="An element" name="element" defaultValue="a">
-          <SegmentedControlItem value="a"><strong>Bold <em>and</em> nested</strong></SegmentedControlItem>
+          <SegmentedControlItem value="a"><strong>Bold <em>and</em> nested, opened by anyone in this workspace and shared with me</strong></SegmentedControlItem>
           <SegmentedControlItem value="b">Plain</SegmentedControlItem>
         </SegmentedControlRoot>
         <SegmentedControlRoot aria-label="Ten" name="ten" defaultValue="1">

@@ -9,7 +9,7 @@ export default function Demo() {
       <Textarea id="textarea-form-message" name="message" fullWidth defaultValue="Hello" required />
       <label htmlFor="textarea-form-notes" className="text-sm font-medium text-body">Notes</label>
       <Textarea id="textarea-form-notes" name="notes" fullWidth autosize showCount />
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <Button type="submit">Send</Button>
         <Button type="reset" variant="outline">Clear</Button>
       </div>

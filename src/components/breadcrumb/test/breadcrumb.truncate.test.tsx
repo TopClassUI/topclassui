@@ -73,3 +73,21 @@ describe('the bound cuts between graphemes, with the shared cut every truncating
     expect(out).toContain(`>${'x'.repeat(198)}</span></li>`)
   })
 })
+
+describe('a label takes its own direction only when it is written in one', () => {
+  it('gives an English current page in an Arabic trail dir="auto", so a cut one keeps its start', () => {
+    const out = markup(<Breadcrumb items={[{ href: '/', label: 'الرئيسية' }, { label: 'Release notes' }]} />)
+    expect(out).toContain('<span dir="auto" aria-current="page" class="truncate min-w-0 text-body font-semibold">Release notes</span>')
+  })
+
+  it('leaves a current page that mixes the two to the page, so "Wi-Fi متصل" reads Wi-Fi first in Arabic', () => {
+    const out = markup(<Breadcrumb items={[{ href: '/', label: 'الرئيسية' }, { label: 'Wi-Fi متصل' }]} />)
+    expect(out).toContain('<span aria-current="page" class="truncate min-w-0 text-body font-semibold">Wi-Fi متصل</span>')
+  })
+
+  it('does the same for a linked label and a crumb with no link', () => {
+    const out = markup(<Breadcrumb items={[{ href: '/', label: 'iPhone الجديد' }, { label: 'iPhone الجديد' }, { label: 'Now' }]} />)
+    expect(out).toContain('"><span class="truncate min-w-0">iPhone الجديد</span></a>')
+    expect(out).toContain('<span class="truncate min-w-0 text-muted">iPhone الجديد</span>')
+  })
+})

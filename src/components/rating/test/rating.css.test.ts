@@ -21,7 +21,7 @@ const DECLARATION: Record<string, string> = {
   'inset-s-0': 'inset-inline-start: 0px;',
   flex: 'display: flex;',
   'overflow-hidden': 'overflow: hidden;',
-  'text-warning-solid': 'color: var(--tc-warning-solid);',
+  'text-warning-on-soft': 'color: var(--tc-warning-on-soft);',
   'w-full': 'width: 100%;',
   'w-1/2': 'width: calc(1 / 2 * 100%);',
   'max-w-none': 'max-width: none;',
@@ -70,7 +70,11 @@ describe('the guarantees a class carries', () => {
   it('the colour of a star sits on its span: the svg inside carries none', () => {
     expect(RATING_FILL_ICON).toBe('max-w-none')
     expect(RATING_STAR.split(' ')).toContain('text-line-strong')
-    expect(RATING_FILL.split(' ')).toContain('text-warning-solid')
+    expect(RATING_FILL.split(' ')).toContain('text-warning-on-soft')
+  })
+
+  it('a filled star is warning-on-soft, which check-contrast holds above 3:1 on every surface; warning-solid is 2.13:1', () => {
+    expect(RATING_FILL.split(' ').filter((cls) => cls.startsWith('text-'))).toEqual(['text-warning-on-soft'])
   })
 
   it('the radio covers its whole label and is invisible, never sr-only', () => {

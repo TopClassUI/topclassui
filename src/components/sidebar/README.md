@@ -12,7 +12,7 @@ For the links of an app, in a rail beside the page that collapses to a column of
 Every link is in the HTML the server sends; only the rail and its toggle run in the browser.
 
 ```ts
-import { SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoot } from 'topclassui'
+import { Icon, SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoot } from 'topclassui'
 ```
 
 ```tsx
@@ -74,7 +74,8 @@ import { SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoot } fr
 | `SidebarBody` | children | The groups. It is the part that scrolls. |
 | `SidebarGroup` | `label` | The heading of the group, which names its list. |
 | `SidebarLink` | `href` or `render` | Where the row goes. One of the two is required. |
-| `SidebarLink` | `icon`, `current`, children | The icon, the current page, the label. |
+| `SidebarLink` | children or `aria-label` | The name of the row. An `href` link needs one; a `render` element may carry its own text. |
+| `SidebarLink` | `icon`, `current` | The icon, the current page. |
 
 ### Not built
 
@@ -100,7 +101,7 @@ import {
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `aria-label` or `children` or `render` on `SidebarLink`, `href` or `render` on `SidebarLink`, `aria-label` or `children` or `href` or `render` on `SidebarLink`. Every other prop below is optional.
 
 ### SidebarRoot
 
@@ -138,11 +139,12 @@ This part takes no design props of its own.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `children` | no | `ReactNode` | - | The label. It ends in an ellipsis when the rail is too narrow, and is cut at 100 characters. |
+| `aria-label` | **yes**, or `children` or `render` | `string` | - |  |
+| `children` | **yes**, or `aria-label` or `render` | `ReactNode` | - | The label. It ends in an ellipsis when the rail is too narrow, and is cut at 100 characters. |
+| `href` | **yes**, or `render` | `string` | - | Where the row goes. |
+| `render` | **yes**, or `aria-label` or `children` or `href` | `ReactElement` | - | The link as another element, such as `render={<Link href="/docs" />}`, which carries its own href. |
 | `current` | no | `boolean` | `false` | SidebarLink: the page being read. It sets aria-current="page" and draws the row filled, bold and marked. |
-| `href` | no | `string` | - | Where the row goes. |
 | `icon` | no | `ReactNode` | - | Drawn before the label, and all that is drawn while the rail is collapsed. Decorative: the label names the row. |
-| `render` | no | `ReactElement` | - | The link as another element, such as `render={<Link href="/docs" />}`, which carries its own href. |
 
 Anything else is passed to the element each part draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 

@@ -5,8 +5,8 @@ import { memoizeVariants } from '#shared/variants.js'
 import { FORCED_EDGE, ON_SOFT } from './classes.js'
 import { BANNER_DEFAULTS, BANNER_TONES } from './constants.js'
 
-// No radius and no border: the row spans the page, edge to edge. It wraps, so a long action drops under the message.
-const resolve = cva(['flex w-full flex-wrap items-center gap-3 px-5 py-3 text-sm font-medium wrap-anywhere', FORCED_EDGE], {
+// Edge to edge, so no radius or border; it wraps a long action under the message, and min-w-0 lets a track stay narrow.
+const resolve = cva(['flex w-full min-w-0 flex-wrap items-center gap-3 px-5 py-3 text-sm font-medium wrap-anywhere', FORCED_EDGE], {
   variants: {
     tone: ON_SOFT,
   },

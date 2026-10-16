@@ -123,6 +123,46 @@ test.describe('the static page: the server HTML, before any script runs', () => 
     })
   }
 
+  for (const scheme of ['light', 'dark'] as const) {
+    for (const direction of DIRECTIONS) {
+      test(`forced colours, ${scheme} ${direction}: a read-only trigger is told by a dashed line, which every other state keeps solid`, async ({ page }) => {
+        await page.emulateMedia({ forcedColors: 'active', colorScheme: scheme })
+        await page.goto(urlFor('select--states', 'light', direction))
+        const line = (name: string) => combo(page, name).evaluate((el) => {
+          const style = getComputedStyle(el)
+          return [style.borderTopStyle, style.borderInlineStartStyle, style.borderBottomStyle, style.borderInlineEndStyle, style.borderTopWidth].join(' ')
+        })
+        expect(await line('Read-only')).toBe('dashed dashed dashed dashed 1px')
+        for (const name of ['Nothing chosen', 'Disabled']) expect(await line(name), name).toBe('solid solid solid solid 1px')
+        expect(await line('Invalid')).toBe('solid solid solid solid 2px')
+        const topEdge = async (name: string) => {
+          const box = await boxOf(combo(page, name))
+          const row = await pixelsOf(page, { x: Math.round(box.left + 8), y: Math.floor(box.top), width: Math.round(box.width - 16), height: 1 })
+          return [inkOn(row, FORCED_CANVAS[scheme]), row.length]
+        }
+        const [plain, length] = await topEdge('Nothing chosen')
+        expect(plain, 'the plain line is whole').toBe(length)
+        const [dashed] = await topEdge('Read-only')
+        expect(dashed, 'the dashes are drawn').toBeGreaterThan(0)
+        expect(dashed, 'the dashes leave gaps').toBeLessThan((length ?? 0) * 0.8)
+      })
+    }
+  }
+
+  test('forced colours, after hydration: the read-only line is still dashed, and the list still opens', async ({ page }) => {
+    await page.emulateMedia({ forcedColors: 'active' })
+    await openLive(page, 'select--states')
+    expect(await css(combo(page, 'Read-only'), 'border-top-style')).toBe('dashed')
+    await openList(page, combo(page, 'Read-only'))
+    expect(await css(combo(page, 'Read-only'), 'border-top-style')).toBe('dashed')
+    expect(await liveErrors(page)).toEqual([])
+  })
+
+  test('outside forced colours the read-only line stays solid: the soft fill tells it there', async ({ page }) => {
+    await page.goto(urlFor('select--states', 'light', 'ltr'))
+    expect(await css(combo(page, 'Read-only'), 'border-top-style')).toBe('solid')
+  })
+
   for (const direction of DIRECTIONS) {
     for (const screen of SCREENS) {
       test(`${direction} ${String(screen.width)} x ${String(screen.height)}: no demo scrolls the page sideways`, async ({ page }) => {
@@ -294,6 +334,18 @@ test.describe('live: where the list opens', () => {
       expect((await boxOf(trigger)).height).toBe(44)
       await expectInsideViewport(popup, 'the list', 8)
     })
+
+    test('a row the root or the density makes taller than 44 px keeps its height: a finger raises a row, never shortens it', async ({ page }) => {
+      await openLive(page, 'select--sixty-items')
+      await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
+      let popup = await openList(page, combo(page), 'tap')
+      expect((await boxOf(popup.getByRole('option').first())).height).toBe(80)
+      await page.keyboard.press('Escape')
+      await expect(popup).toBeHidden()
+      await page.evaluate(() => { document.documentElement.style.fontSize = ''; document.documentElement.style.setProperty('--tc-density', '1.25') })
+      popup = await openList(page, combo(page), 'tap')
+      expect((await boxOf(popup.getByRole('option').first())).height).toBe(50)
+    })
   })
 
   for (const direction of DIRECTIONS) {
@@ -314,6 +366,58 @@ test.describe('live: where the list opens', () => {
       })
     }
   }
+
+  test.describe('a side placement on a phone, under a coarse pointer', () => {
+    test.use(COARSE)
+    const SIDES = ['start', 'start-top', 'start-bottom', 'end', 'end-top', 'end-bottom'] as const
+    const SPOTS = ['top-start', 'top-end', 'bottom-start', 'bottom-end', 'middle'] as const
+
+    for (const screen of [{ width: 390, height: 844 }, { width: 320, height: 480 }]) {
+      for (const direction of DIRECTIONS) {
+        test(`${String(screen.width)} x ${String(screen.height)} ${direction}: beside a trigger wider than the room, each list stays 8 px inside the screen and the page never scrolls`, async ({ page }) => {
+          await page.setViewportSize(screen)
+          await fixture(page, 'select-placements', { direction })
+          for (const placement of SIDES) {
+            for (const spot of SPOTS) {
+              const label = `${placement} at ${spot}`
+              await page.evaluate((detail) => document.dispatchEvent(new CustomEvent('select-case', { detail })), { placement, spot })
+              await expect(page.locator('#placements')).toHaveAttribute('data-case', `${placement} ${spot}`)
+              const trigger = combo(page, 'Country')
+              const popup = await openList(page, trigger, 'tap')
+              await expectInsideViewport(popup, `the list of ${label}`, 8)
+              await expectNoSidewaysScroll(page)
+              expect(await page.evaluate(() => [window.scrollX, document.documentElement.scrollWidth - document.documentElement.clientWidth]), label).toEqual([0, 0])
+              expect(sideOf(await boxOf(popup), await boxOf(trigger)), `${label}: over its trigger`).not.toBeNull()
+              await page.keyboard.press('Escape')
+              await expectClosed(page, POPUP)
+            }
+          }
+        })
+
+        test(`${String(screen.width)} x ${String(screen.height)} ${direction}: with no room on either side, a fullWidth trigger or a 32 px root, the list opens below or above, as wide as the trigger`, async ({ page }) => {
+          await page.setViewportSize(screen)
+          await fixture(page, 'select-placements', { direction })
+          for (const [spot, root] of [['full-width', '16px'], ['top-start', '32px'], ['bottom-end', '32px']] as const) {
+            await page.evaluate((size) => { document.documentElement.style.fontSize = size }, root)
+            for (const placement of SIDES) {
+              const label = `${placement} at ${spot}, root ${root}`
+              await page.evaluate((detail) => document.dispatchEvent(new CustomEvent('select-case', { detail })), { placement, spot })
+              await expect(page.locator('#placements')).toHaveAttribute('data-case', `${placement} ${spot}`)
+              const trigger = combo(page, 'Country')
+              const popup = await openList(page, trigger, 'tap')
+              await expectInsideViewport(popup, `the list of ${label}`, 8)
+              await expectNoSidewaysScroll(page)
+              const [list, box] = [await boxOf(popup), await boxOf(trigger)]
+              expect(['above', 'below'], label).toContain(sideOf(list, box)?.where)
+              expect(Math.abs(list.width - Math.min(box.width, screen.width - 16)), `${label}: as wide as the trigger`).toBeLessThan(1)
+              await page.keyboard.press('Escape')
+              await expectClosed(page, POPUP)
+            }
+          }
+        })
+      }
+    }
+  })
 
   for (const screen of [{ width: 320, height: 480 }, { width: 844, height: 390 }]) {
     for (const direction of DIRECTIONS) {
@@ -533,6 +637,42 @@ test.describe('live: the page behind, and a Dialog around it', () => {
     await page.mouse.wheel(0, 300)
     await expect.poll(() => scrollY(page)).toBeGreaterThan(before)
   })
+})
+
+test.describe('live: the open list carries the name of its field', () => {
+  test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
+
+  /** The name Chromium gives the open listbox in its own accessibility tree, the one a screen reader reads. */
+  const chromiumName = async (page: Page) => {
+    const cdp = await page.context().newCDPSession(page)
+    const { nodes } = await cdp.send('Accessibility.getFullAXTree') as { nodes: { role?: { value?: string }, name?: { value?: string } }[] }
+    return nodes.filter((node) => node.role?.value === 'listbox').map((node) => node.name?.value ?? '')
+  }
+
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: a <label for> names the list as it names the trigger, and the value never does`, async ({ page }) => {
+      await openLive(page, 'select--phase-4-form', { direction })
+      const popup = await openList(page, combo(page, 'Country'), 'keyboard')
+      await expect(popup.getByRole('listbox')).toHaveAccessibleName('Country')
+      expect(await chromiumName(page)).toEqual(['Country'])
+      await expect(combo(page, 'Country')).toHaveAccessibleName('Country')
+    })
+  }
+
+  test('in Arabic, the label of the RTL demo names its list', async ({ page }) => {
+    await openLive(page, 'select--rtl', { direction: 'rtl' })
+    const popup = await openList(page, combo(page))
+    await expect(popup.getByRole('listbox')).toHaveAccessibleName('الدولة')
+  })
+
+  for (const [name, how] of [['Wrapped label', 'a label around it'], ['Heading name', 'aria-labelledby'], ['Plain name', 'aria-label']] as const) {
+    test(`${how}: the list is named "${name}", not by the value`, async ({ page }) => {
+      await fixture(page, 'select-names')
+      const popup = await openList(page, combo(page, name))
+      await expect(popup.getByRole('listbox')).toHaveAccessibleName(name)
+      expect(await chromiumName(page)).toEqual([name])
+    })
+  }
 })
 
 test.describe('live: focus, forced colours and motion', () => {
