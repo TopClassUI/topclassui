@@ -16,3 +16,6 @@ export const SELECT_DEFAULTS = {
   fullWidth: false,
   visibleRows: COLLECTION_DEFAULTS.visibleRows,
 } as const
+
+/** Beside a trigger as wide as the screen neither side has room, so a side placement may fall back below it. */
+export const SELECT_SIDE_COLLISION_AVOIDANCE = { fallbackAxisSide: 'end' } as const

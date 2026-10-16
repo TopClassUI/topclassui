@@ -77,8 +77,8 @@ describe('the demos the plan names', () => {
     expect(html).toMatch(/<input type="number"[^>]* step="0.5"[^>]* name="hours" value="1.5"\/>/)
   })
 
-  it('row: two fields in one flex row', async () => {
-    expect(await render('row')).toMatch(/^<div class="flex gap-2">/)
+  it('row: two fields side by side, in tracks of 6.5rem at least, so at 200% text the second goes under the first', async () => {
+    expect(await render('row')).toMatch(/^<div class="grid grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,6\.5rem\),max-content\)\)\] gap-2">/)
   })
 
   it('rtl: an island that carries the direction and the language', async () => {

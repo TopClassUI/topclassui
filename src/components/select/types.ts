@@ -46,8 +46,11 @@ export type SelectProps = Omit<BaseRoot, RootRemoved>
   }
   & SelectName
 
-/** What Base UI hands a change handler: the reason, the event, and cancel(). */
+/** What Base UI hands a change handler, of the value or of the open state: the reason, the event, and cancel(). */
 export type SelectChangeDetails = Base.Root.ChangeEventDetails
 
-/** The props the hook reads: the state, its default, the two handlers, the hidden input and the row count. */
-export type SelectStateProps = Pick<SelectProps, 'value' | 'defaultValue' | 'onValueChange' | 'onOpenChange' | 'inputRef' | 'visibleRows' | 'placeholder'>
+/** The props the hook reads: the state, its default, the two handlers, the hidden input, the row count and the names. */
+export type SelectStateProps = Pick<
+  SelectProps,
+  'value' | 'defaultValue' | 'onValueChange' | 'onOpenChange' | 'inputRef' | 'visibleRows' | 'placeholder' | 'ref' | 'aria-label' | 'aria-labelledby'
+>

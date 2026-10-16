@@ -1,5 +1,5 @@
 // What a class list and a computed style cannot see: the pixels a page painted, read back for a spec.
-import type { Page } from '@playwright/test'
+import type { Locator, Page } from '@playwright/test'
 
 export interface Clip { x: number; y: number; width: number; height: number }
 export type Rgb = readonly [number, number, number]
@@ -52,8 +52,50 @@ export function paintedIn(pixels: readonly Rgb[], colour: Rgb): number {
   return pixels.length - strayOn(pixels, colour)
 }
 
-/** A computed colour as numbers: `rgb(55, 0, 110)` is [55, 0, 110]. */
+/** A computed `rgb()` or opaque `rgba()` as numbers; any other syntax throws, since its digits are not channels. */
 export function rgbOf(computed: string): Rgb {
-  const [r = 0, g = 0, b = 0] = (computed.match(/\d+/g) ?? []).map(Number)
+  const found = /^rgba?\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})(?:,\s*([\d.]+))?\)$/.exec(computed)
+  const channels = found ? [found[1], found[2], found[3]].map(Number) : []
+  const [r, g, b] = channels
+  if (r === undefined || g === undefined || b === undefined || channels.some((channel) => channel > 255)) {
+    throw new Error(`rgbOf reads rgb() only, not "${computed}": use paintedRgb for a token colour`)
+  }
+  if (found?.[4] !== undefined && Number(found[4]) !== 1) throw new Error(`rgbOf reads an opaque colour only, not "${computed}"`)
   return [r, g, b]
+}
+
+/** The row through the middle of a ring drawn `offset` px outside a box and `width` px thick, along its top edge, corners left out. */
+export function ringRow(page: Page, box: { left: number; top: number; width: number }, offset = 2, width = 2): Promise<Rgb[]> {
+  const inset = Math.ceil(width)
+  return pixelsOf(page, { x: Math.round(box.left + inset), y: Math.floor(box.top - offset - width / 2), width: Math.round(box.width - 2 * inset), height: 1 })
+}
+
+/** A computed colour in any syntax (oklch, color-mix, a system colour) as the sRGB a page paints it. */
+export function paintedRgb(target: Locator, property: string): Promise<Rgb> {
+  return target.evaluate((element, name) => {
+    const pen = document.createElement('canvas').getContext('2d')
+    if (!pen) throw new Error('no canvas')
+    const value = getComputedStyle(element).getPropertyValue(name)
+    pen.fillStyle = value
+    pen.fillRect(0, 0, 1, 1)
+    const [r = 0, g = 0, b = 0, a = 0] = pen.getImageData(0, 0, 1, 1).data
+    if (a !== 255) throw new Error(`${name} is not opaque: ${value}`)
+    return [r, g, b] as const
+  }, property)
+}
+
+/** The straight runs of the two pixels just inside each edge of a rounded box, where an inset ring 2 px wide
+ * is drawn whole: past the curve of each corner, so a pill keeps only the middle of its two ends. */
+export function insideRing(box: Clip, radius: number): Record<string, Clip> {
+  const [left, top] = [Math.ceil(box.x), Math.ceil(box.y)]
+  const [right, bottom] = [Math.floor(box.x + box.width), Math.floor(box.y + box.height)]
+  const curve = Math.ceil(Math.min(radius, (bottom - top) / 2, (right - left) / 2))
+  const run = Math.max(4, bottom - top - 2 * curve)
+  const middle = Math.round((top + bottom - run) / 2)
+  return {
+    top: { x: left + curve, y: top, width: right - left - 2 * curve, height: 2 },
+    bottom: { x: left + curve, y: bottom - 2, width: right - left - 2 * curve, height: 2 },
+    start: { x: left, y: middle, width: 2, height: run },
+    end: { x: right - 2, y: middle, width: 2, height: run },
+  }
 }

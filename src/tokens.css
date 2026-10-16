@@ -41,8 +41,9 @@
   --tc-duration: var(--tc-duration-base);
 
   --tc-z-sticky: 10;
-  --tc-z-drawer: 40;
-  --tc-z-dialog: 50;
+  /* One layer for every overlay but the toast: the portal opened last is drawn on top, whatever its kind. */
+  --tc-z-drawer: var(--tc-z-popup);
+  --tc-z-dialog: var(--tc-z-popup);
   --tc-z-popup: 60;
   --tc-z-toast: 70;
 

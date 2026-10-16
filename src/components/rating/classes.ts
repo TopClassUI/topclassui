@@ -11,8 +11,9 @@ export const RATING_GROUP = `${RATING_ROOT} ${DISABLED}`
 /** One star: the outline, in a colour of 3:1, on the span and never on the svg. */
 export const RATING_STAR = 'relative inline-flex shrink-0 text-line-strong'
 
-/** The filled star over it, clipped from the inline start, so a half fills the right half in Arabic. */
-export const RATING_FILL = 'absolute inset-y-0 inset-s-0 flex overflow-hidden text-warning-solid'
+/** The filled star over it, clipped from the inline start, so a half fills the right half in Arabic.
+ * warning-on-soft, not warning-solid: amber-500 is 2.13:1 on a white page, and an icon needs 3:1. */
+export const RATING_FILL = 'absolute inset-y-0 inset-s-0 flex overflow-hidden text-warning-on-soft'
 
 /** How much of the filled star the clip shows. */
 export const RATING_FILL_WIDTH = {

@@ -163,3 +163,36 @@ describe('the list', () => {
     expect(popup?.getAttribute('data-select')).toMatch(/\S/)
   })
 })
+
+describe('the open list is named as its field, never by the value', () => {
+  const listName = async () => {
+    await userEvent.click(trigger())
+    const list = await screen.findByRole('listbox')
+    return [list.getAttribute('aria-label'), list.getAttribute('aria-labelledby')]
+  }
+
+  it('a <label htmlFor> lends its text to the list', async () => {
+    render(<><label htmlFor="c">Country</label><Select id="c" items={ITEMS} defaultValue="jo" /></>)
+    expect(await listName()).toEqual(['Country', null])
+  })
+
+  it('a label around the Select lends its own text, without the value the trigger shows', async () => {
+    render(<label>{'  Where you live  '}<Select id="w" items={ITEMS} defaultValue="jo" /><span>, today</span></label>)
+    expect(await listName()).toEqual(['Where you live , today', null])
+  })
+
+  it('the label is read again at each open, so a changed label is the name', async () => {
+    render(<><label id="l" htmlFor="c">Country</label><Select id="c" items={ITEMS} /></>)
+    ;(document.getElementById('l') as HTMLLabelElement).textContent = 'Home country'
+    expect(await listName()).toEqual(['Home country', null])
+  })
+
+  it('aria-labelledby points the list at the same element, and aria-label is copied', async () => {
+    const { unmount } = render(<><h2 id="h">Heading</h2><Select aria-labelledby="h" items={ITEMS} /></>)
+    expect(await listName()).toEqual([null, 'h'])
+    unmount()
+    render(<Country />)
+    expect(await listName()).toEqual(['Country', null])
+  })
+})
+
