@@ -27,6 +27,7 @@ const DECLARATION: Record<string, string> = {
   'sticky': 'position: sticky;',
   'top-0': 'top: 0px;',
   'z-(--tc-z-sticky)': 'z-index: var(--tc-z-sticky);',
+  'data-unstuck:static': 'position: static;',
   'pt-[calc(0.375rem+var(--tc-safe-top))]': 'padding-top: calc(0.375rem + var(--tc-safe-top));',
   'pt-1.5': 'padding-top: calc(var(--spacing) * 1.5);',
   // The brand and a link.
@@ -44,6 +45,7 @@ const DECLARATION: Record<string, string> = {
   'aria-[current=page]:font-semibold': 'font-weight: var(--font-weight-semibold);',
   'aria-[current=page]:text-body': 'color: var(--tc-body);',
   'forced-colors:aria-[current=page]:underline': 'text-decoration-line: underline;',
+  'aria-[current=page]:[scroll-initial-target:nearest]': 'scroll-initial-target: nearest;',
   'focus-visible:snap-center': 'scroll-snap-align: center;',
   'hover:underline': 'text-decoration-line: underline;',
   'outline-none': 'outline-style: none;',
@@ -64,6 +66,7 @@ const DECLARATION: Record<string, string> = {
   'gap-5': 'gap: calc(var(--spacing) * 5);',
   'snap-x': 'scroll-snap-type: x var(--tw-scroll-snap-strictness);',
   'snap-mandatory': '--tw-scroll-snap-strictness: mandatory;',
+  'hover:snap-none': 'scroll-snap-type: none;',
   '-m-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+1px)]': `margin: calc(${REACH} * -1);`,
   'p-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+1px)]': `padding: ${REACH};`,
   'overflow-x-auto': 'overflow-x: auto;',
@@ -79,7 +82,10 @@ const SCOPE: Record<string, string> = {
   'aria-[current=page]:font-semibold': '[aria-current="page"] {',
   'aria-[current=page]:text-body': '[aria-current="page"] {',
   'forced-colors:aria-[current=page]:underline': '[aria-current="page"] {',
+  'aria-[current=page]:[scroll-initial-target:nearest]': '[aria-current="page"] {',
+  'data-unstuck:static': '[data-unstuck] {',
   'focus-visible:snap-center': ':focus-visible {',
+  'hover:snap-none': ':hover {',
   'focus-visible:outline-solid': ':focus-visible {',
   'focus-visible:outline-(length:--tc-ring-width)': ':focus-visible {',
   'focus-visible:outline-offset-(length:--tc-ring-offset)': ':focus-visible {',
@@ -114,7 +120,7 @@ describe('every class Navbar writes compiles with the installed Tailwind', () =>
       NAVBAR_ROOT, ...Object.values(NAVBAR_TOP), NAVBAR_BRAND, NAVBAR_LINKS, NAVBAR_LIST, NAVBAR_ITEM, NAVBAR_LINK, NAVBAR_ACTIONS,
     ])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(58)
+    expect(all).toHaveLength(61)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

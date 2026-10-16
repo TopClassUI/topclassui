@@ -43,16 +43,9 @@ export const COMMAND_SPACER = [
 /** A heading, at the foot of its unit so it sits on the rows it names. */
 export const COMMAND_GROUP_LABEL = `flex items-end px-3 pb-1 text-xs font-medium text-muted ${COMMAND_UNIT}`
 
-/** The active row: a fill, and a line inside its edge, since the fill alone is under 3:1 against the
- * popup. Under forced colours the line takes HighlightText, on the Highlight that ROW_HIGHLIGHT paints. */
-export const COMMAND_ACTIVE = [
-  'data-highlighted:outline-solid data-highlighted:outline-(length:--tc-ring-width)',
-  'data-highlighted:-outline-offset-(length:--tc-ring-width) data-highlighted:outline-primary-on-soft',
-  'forced-colors:data-highlighted:outline-[HighlightText]',
-].join(' ')
-
-/** One command. Its label truncates, so a long one never widens the popup. */
-export const COMMAND_ITEM = `${ROW} ${ROW_HIGHLIGHT} ${COMMAND_ACTIVE} ${DISABLED} ${COMMAND_UNIT} ${CONTAIN} cursor-default select-none`
+/** One command. Its label truncates, so a long one never widens the popup. The active row is the
+ * highlighted one, filled and ringed by ROW_HIGHLIGHT: the focus stays in the input. */
+export const COMMAND_ITEM = `${ROW} ${ROW_HIGHLIGHT} ${DISABLED} ${COMMAND_UNIT} ${CONTAIN} cursor-default select-none`
 
 /** The empty and the loading text. Base UI keeps the element mounted to announce it, so it takes no room while empty. */
 export const COMMAND_STATUS = 'px-4 py-6 text-center text-sm text-muted empty:p-0'

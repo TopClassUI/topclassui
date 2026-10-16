@@ -58,6 +58,18 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
+    label: 'a high toast is hidden from a reader while it is not focused, yet keeps its tab stop, action and x (TOAST-2)',
+    file: 'src/components/toast/client.tsx',
+    from: " aria-hidden={entry.priority === 'high' ? false : undefined}",
+    to: '',
+  },
+  {
+    label: 'toast.add takes a toast with no title again, a dialog with no name (TOAST-6)',
+    file: 'src/components/toast/types.ts',
+    from: '  title: ToastTitle\n',
+    to: '  title?: ReactNode\n',
+  },
+  {
     label: 'the toast viewport loses the direction of its provider, so an Arabic page lays its toasts out left to right',
     file: 'src/components/toast/client.tsx',
     from: '        dir={viewport.dir}\n',
@@ -122,6 +134,42 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/toast/classes.ts',
     from: 'h-auto min-h-control-sm whitespace-normal py-1',
     to: 'h-auto min-h-control-sm py-1',
+  },
+  {
+    label: 'the toast x scrolls away with its toast, so under a finger a toast taller than the screen closes by a drag alone (TOAST-3)',
+    file: 'src/components/toast/classes.ts',
+    from: ' ms-3 self-start sticky top-0`',
+    to: ' ms-3 self-start`',
+  },
+  {
+    label: 'the toast x keeps to the first row, so in a narrow toast it cannot follow the text and leaves the screen (TOAST-3)',
+    file: 'src/components/toast/classes.ts',
+    from: 'col-start-3 row-span-2 row-start-1',
+    to: 'col-start-3 row-start-1',
+  },
+  {
+    label: 'the toast viewport is no container, so at a 32px root the toast text keeps a 63 px column (TOAST-4)',
+    file: 'src/components/toast/classes.ts',
+    from: 'export const TOAST_VIEWPORT = `@container fixed',
+    to: 'export const TOAST_VIEWPORT = `fixed',
+  },
+  {
+    label: 'a narrow toast keeps its action under the text column, so its label breaks letter by letter (TOAST-4)',
+    file: 'src/components/toast/classes.ts',
+    from: ' @max-3xs:col-span-3 @max-3xs:col-start-1 @max-3xs:row-start-3',
+    to: '',
+  },
+  {
+    label: 'a narrow toast keeps its text beside the icon, a column a third of the toast (TOAST-4)',
+    file: 'src/components/toast/classes.ts',
+    from: ' @max-3xs:col-span-2 @max-3xs:col-start-1 @max-3xs:row-start-2',
+    to: '',
+  },
+  {
+    label: 'the toast action sits inside the text again, so a narrow toast cannot give it the full width (TOAST-4)',
+    file: 'src/components/toast/client.tsx',
+    from: "      </Base.Content>\n      <Base.Action className={cn(buttonVariants({ variant: 'outline', tone: 'neutral', size: 'sm' }), TOAST_ACTION)} />\n",
+    to: "        <Base.Action className={cn(buttonVariants({ variant: 'outline', tone: 'neutral', size: 'sm' }), TOAST_ACTION)} />\n      </Base.Content>\n",
   },
   {
     label: 'every toast viewport draws, so a page of two React roots has two live regions and shows each toast twice',

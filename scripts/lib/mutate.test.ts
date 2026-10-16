@@ -1,4 +1,5 @@
 import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -6,7 +7,7 @@ import { pathToFileURL } from 'node:url'
 import { afterAll, describe, expect, it } from 'vitest'
 
 import { MUTATIONS } from '../mutations/index.js'
-import { type Mutation, collectMutations, mutationFiles, readAnchors } from './mutate.js'
+import { type Mutation, type Run, caughtBy, collectMutations, mutationFiles, readAnchors } from './mutate.js'
 
 const made: string[] = []
 afterAll(() => { for (const dir of made) rmSync(dir, { recursive: true, force: true }) })
@@ -104,5 +105,26 @@ describe('scripts/mutations', () => {
       total += own.length
     }
     expect(MUTATIONS).toHaveLength(total)
+  })
+})
+
+describe('judging a run', () => {
+  const run = (status: number | null, stdout = '', extra: Partial<Run> = {}): Run => ({ status, stdout, stderr: '', ...extra })
+
+  it('counts a run with a failed test or a failed file as caught, and a clean run as survived', () => {
+    expect(caughtBy(run(1, ' Test Files  1 failed | 50 passed (51)\n      Tests  1 failed | 205 passed (206)\n'))).toBe(true)
+    expect(caughtBy(run(1, ' Test Files  1 failed | 50 passed (51)\n      Tests  205 passed (205)\n'))).toBe(true)
+    expect(caughtBy(run(0, ' Test Files  51 passed (51)\n      Tests  206 passed (206)\n'))).toBe(false)
+  })
+
+  it('throws for a run that never finished: killed by a signal, or out of buffer', () => {
+    expect(() => caughtBy(run(null, '', { signal: 'SIGKILL' }))).toThrow('vitest did not finish (signal SIGKILL)')
+    const flood = spawnSync('node', ['-e', 'process.stderr.write("x".repeat(1600000))'], { encoding: 'utf8', maxBuffer: 1024 * 1024 })
+    expect(() => caughtBy(flood)).toThrow('vitest did not finish (spawnSync node ENOBUFS)')
+  })
+
+  it('throws for a run that exited 1 with no test failed, which is the machine and not the mutant', () => {
+    expect(() => caughtBy(run(1, 'Error: Cannot find module vitest.mjs\n'))).toThrow('vitest exited 1 with no test failed')
+    expect(() => caughtBy(run(1, ' Test Files  51 passed (51)\n      Tests  206 passed (206)\n'))).toThrow('with no test failed')
   })
 })
