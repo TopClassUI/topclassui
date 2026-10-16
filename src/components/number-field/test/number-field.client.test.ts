@@ -124,7 +124,7 @@ describe('hook.ts holds the value of the field (R-5.12-1)', () => {
 
 describe('lib.ts is pure', () => {
   it('imports no React and nothing from the browser half', () => {
-    expect(importedModules(read('lib.ts'))).toEqual(['#shared/clamp.js', './boundaries.js'])
+    expect(importedModules(read('lib.ts'))).toEqual(['#shared/clamp.js', './boundaries.js', './constants.js'])
   })
 })
 

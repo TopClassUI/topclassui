@@ -97,4 +97,22 @@ export const MUTATIONS: Mutation[] = [
     from: "export const NUMBER_FIELD_DECREASE = 'order-first'",
     to: "export const NUMBER_FIELD_DECREASE = ''",
   },
+  {
+    label: 'the number field reads a NaN min or max as clamp() does, so max={NaN} becomes a limit of -1e15',
+    file: LIB,
+    from: '  return n !== undefined && !Number.isNaN(n)',
+    to: '  return n !== undefined',
+  },
+  {
+    label: 'the number field passes a NaN step to clamp(), so ArrowUp adds 0.000001',
+    file: LIB,
+    from: "step === 'any' ? 'any' : Number.isNaN(step) ? NUMBER_FIELD_DEFAULTS.step : clamp(",
+    to: "step === 'any' ? 'any' : clamp(",
+  },
+  {
+    label: 'the number field keeps a max under min, so the hidden input is never valid and the form never submits',
+    file: LIB,
+    from: '    max: low !== undefined && high !== undefined && high < low ? low : high,',
+    to: '    max: high,',
+  },
 ]

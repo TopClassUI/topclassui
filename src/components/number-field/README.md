@@ -117,12 +117,12 @@ Every prop below is optional and falls back to the default shown.
 | `fullWidth` | no | `boolean` | `false` | Fills the width of its parent instead of taking the width of an Input. |
 | `id` | no | `string` | - | The id a `<label htmlFor>` points at. |
 | `invalid` | no | `boolean` | `false` | Marks the value as wrong: sets aria-invalid on the input, and the line of the field turns to danger and thickens. |
-| `max` | no | `number`, min -1000000000000000, max 1000000000000000 | - | The largest value. End goes to it; a default or a value over it is lowered to it. Clamped to 1e15. |
-| `min` | no | `number`, min -1000000000000000, max 1000000000000000 | - | The smallest value. Home goes to it; a default or a value under it is raised to it. Clamped to -1e15. |
+| `max` | no | `number`, min -1000000000000000, max 1000000000000000 | - | The largest value. End goes to it; a default or a value over it is lowered to it. Clamped to 1e15; NaN reads as none, and under min it is raised to min. |
+| `min` | no | `number`, min -1000000000000000, max 1000000000000000 | - | The smallest value. Home goes to it; a default or a value under it is raised to it. Clamped to -1e15; NaN reads as none. |
 | `placeholder` | no | `string` | - | Shown in the input while it is empty. |
 | `ref` | no | `Ref<HTMLDivElement>` | - | The root element, the `<div>` that owns the width. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The control scale: the height of the field and its type step; custom emits no size classes. |
-| `step` | no | `unknown` | `1` | What an arrow key and a stepper add or take away, and the step the form validates against; any turns that check off. |
+| `step` | no | `unknown` | `1` | What an arrow key and a stepper add or take away, and the step the form validates against; any turns that check off. NaN reads as 1. |
 
 Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 

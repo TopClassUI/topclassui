@@ -13,6 +13,17 @@ describe('resolveLimits clamps the bounds (R-5.7-7)', () => {
     expect(resolveLimits(undefined, undefined, -3)).toEqual({ min: undefined, max: undefined, step: 0.000001 })
     expect(resolveLimits(undefined, undefined, 'any').step).toBe('any')
   })
+
+  it('reads a NaN min or max as absent and a NaN step as 1, never as -1e15 and 0.000001', () => {
+    expect(resolveLimits(Number.NaN, Number.NaN, Number.NaN)).toEqual({ min: undefined, max: undefined, step: 1 })
+    expect(resolveLimits(2, Number.NaN, 'any')).toEqual({ min: 2, max: undefined, step: 'any' })
+  })
+
+  it('raises a max under min to min, so the hidden input can still be valid', () => {
+    expect(resolveLimits(10, 2, 1)).toEqual({ min: 10, max: 10, step: 1 })
+    expect(resolveLimits(1e20, -1e20, 1)).toEqual({ min: 1e15, max: 1e15, step: 1 })
+    expect(resolveLimits(-3, -3, 1)).toEqual({ min: -3, max: -3, step: 1 })
+  })
 })
 
 describe('clampValue is the clamp at our seam', () => {
