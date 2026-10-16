@@ -101,7 +101,7 @@ import {
 
 ## Props
 
-Required: `href` or `render` on `SidebarLink`. Every other prop below is optional.
+Required: `aria-label` or `children` or `render` on `SidebarLink`, `href` or `render` on `SidebarLink`, `aria-label` or `children` or `href` or `render` on `SidebarLink`. Every other prop below is optional.
 
 ### SidebarRoot
 
@@ -139,9 +139,10 @@ This part takes no design props of its own.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
+| `aria-label` | **yes**, or `children` or `render` | `string` | - |  |
+| `children` | **yes**, or `aria-label` or `render` | `ReactNode` | - | The label. It ends in an ellipsis when the rail is too narrow, and is cut at 100 characters. |
 | `href` | **yes**, or `render` | `string` | - | Where the row goes. |
-| `render` | **yes**, or `href` | `ReactElement` | - | The link as another element, such as `render={<Link href="/docs" />}`, which carries its own href. |
-| `children` | no | `ReactNode` | - | The label. It ends in an ellipsis when the rail is too narrow, and is cut at 100 characters. |
+| `render` | **yes**, or `aria-label` or `children` or `href` | `ReactElement` | - | The link as another element, such as `render={<Link href="/docs" />}`, which carries its own href. |
 | `current` | no | `boolean` | `false` | SidebarLink: the page being read. It sets aria-current="page" and draws the row filled, bold and marked. |
 | `icon` | no | `ReactNode` | - | Drawn before the label, and all that is drawn while the rail is collapsed. Decorative: the label names the row. |
 
