@@ -165,11 +165,13 @@ describe('every class a sheet wears at any edge compiles with the installed Tail
 describe('the tokens the sheet reads are the ones the plan names', () => {
   const css = compileEntry().then((compiled) => compiled.build(Object.keys(DECLARATION)))
 
-  it('--tc-z-drawer is 40: above a sticky bar at 10 and below a dialog at 50', async () => {
+  it('--tc-z-drawer is the one overlay layer, 60: above a sticky bar at 10, level with a dialog and a popup, below a toast at 70', async () => {
     const sheet = await css
     expect(sheet).toContain('--tc-z-sticky: 10;')
-    expect(sheet).toContain('--tc-z-drawer: 40;')
-    expect(sheet).toContain('--tc-z-dialog: 50;')
+    expect(sheet).toContain('--tc-z-drawer: var(--tc-z-popup);')
+    expect(sheet).toContain('--tc-z-dialog: var(--tc-z-popup);')
+    expect(sheet).toContain('--tc-z-popup: 60;')
+    expect(sheet).toContain('--tc-z-toast: 70;')
   })
 
   it('--tc-duration-slow is 300 ms times --tc-motion, which reduced motion sets to 0', async () => {

@@ -356,4 +356,22 @@ export const MUTATIONS: Mutation[] = [
     from: '    scroll-padding-block: var(--tc-sticky-top) var(--tc-sticky-bottom);\n',
     to: '',
   },
+  {
+    label: 'the drawer leaves the one overlay layer for 40, so a sheet opened from a dialog or a popover is drawn under it',
+    file: 'src/tokens.css',
+    from: '  --tc-z-drawer: var(--tc-z-popup);',
+    to: '  --tc-z-drawer: 40;',
+  },
+  {
+    label: 'the dialog leaves the one overlay layer for 50, so a dialog opened from a popover or a menu is drawn under it',
+    file: 'src/tokens.css',
+    from: '  --tc-z-dialog: var(--tc-z-popup);',
+    to: '  --tc-z-dialog: 50;',
+  },
+  {
+    label: 'the one overlay layer rises to the toast at 70, so a toast added over an open sheet can be drawn under it',
+    file: 'src/tokens.css',
+    from: '  --tc-z-popup: 60;',
+    to: '  --tc-z-popup: 70;',
+  },
 ]
