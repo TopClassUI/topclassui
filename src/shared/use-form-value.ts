@@ -38,9 +38,21 @@ export function useFormValue<T>({ value, defaultValue, sync }: FormValueOptions<
   const latest = useRef({ value, defaultValue, sync })
   latest.current = { value, defaultValue, sync }
 
+  // Found again after every commit: a `form` prop that changed, or an input that mounted late, names another owner.
+  const bound = useRef(null as { form: HTMLFormElement; release: () => void } | null)
   useEffect(() => {
     const form = findForm(inputRef.current, rootRef.current)
-    if (!form) return
+    if (bound.current?.form === form) return
+    bound.current?.release()
+    bound.current = form ? { form, release: listen(form) } : null
+  })
+  useEffect(() => () => {
+    bound.current?.release()
+    bound.current = null
+  }, [])
+
+  /** Listens to one form's reset until the returned function is called. */
+  function listen(form: HTMLFormElement): () => void {
     let timer: ReturnType<typeof setTimeout> | undefined
 
     const onReset = (event: Event) => {
@@ -59,7 +71,7 @@ export function useFormValue<T>({ value, defaultValue, sync }: FormValueOptions<
       form.removeEventListener('reset', onReset)
       clearTimeout(timer)
     }
-  }, [setValue])
+  }
 
   return { value: current, setValue, inputRef, rootRef }
 }

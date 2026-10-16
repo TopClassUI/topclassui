@@ -167,8 +167,8 @@ describe('every file in parts/ is server markup (R-5.1-1, R-5.1-4)', () => {
     expect(importedNames(read('parts/sidebar-header.tsx'), '../client.js')).toEqual(['SidebarTrigger'])
   })
 
-  it('lib.ts imports nothing at all, React least of all', () => {
-    expect(importedModules(read('lib.ts'))).toEqual([])
+  it('lib.ts imports the shared label cut and nothing else, React least of all', () => {
+    expect(importedModules(read('lib.ts'))).toEqual(['#shared/truncate-label.js'])
   })
 })
 

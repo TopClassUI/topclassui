@@ -23,7 +23,7 @@ type Owned = 'type' | 'multiple' | 'value' | 'defaultValue' | 'onChange' | 'size
 export type FileUploadProps = Omit<ComponentPropsWithoutRef<'input'>, Owned>
   & FileUploadDesignProps
   & {
-    /** The hint inside the zone, such as "PDF or PNG, up to 5 MB": it describes the input. */
+    /** The hint inside the zone, such as "PDF or PNG, up to 5 MB": it describes the input; a link in it takes its own click. */
     children?: ReactNode | undefined
     /** The accepted files after each pick, drop or remove. */
     onValueChange?: ((files: readonly File[]) => void) | undefined
@@ -68,6 +68,8 @@ export interface FileUploadState {
   rows: readonly FileUploadRow[]
   /** The latest change cut files at maxFiles. */
   cut: boolean
+  /** How many changes maxFiles has cut: each cut writes its message anew, so a second one in a row is heard too. */
+  cuts: number
   /** The rejected rows came with the latest change, so the hidden status line reads them. */
   fresh: boolean
 }

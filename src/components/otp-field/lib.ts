@@ -23,12 +23,12 @@ export function clampLength(length: number): number {
   return Math.trunc(clamp(length, OTP_FIELD_BOUNDARIES.lengthMin, OTP_FIELD_BOUNDARIES.lengthMax))
 }
 
-/** After which cells a separator stands, and whether the row of cells and separators wraps. */
-export function layoutCells(length: number, groupSize: number): { separators: boolean[], wraps: boolean } {
+/** After which cells a separator stands, and whether the row of cells and separators breaks at whole cells. */
+export function layoutCells(length: number, groupSize: number): { separators: boolean[], whole: boolean } {
   const group = Math.trunc(clamp(groupSize, OTP_FIELD_BOUNDARIES.groupSizeMin, length))
   const separators = Array.from({ length }, (_, index) => group > 0 && index < length - 1 && (index + 1) % group === 0)
   const items = length + separators.filter(Boolean).length
-  return { separators, wraps: items > OTP_FIELD_WRAP_ABOVE }
+  return { separators, whole: items > OTP_FIELD_WRAP_ABOVE }
 }
 
 type Digits = Pick<OtpFieldValueProps, 'validationType' | 'normalizeValue' | 'inputMode'>

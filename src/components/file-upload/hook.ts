@@ -17,7 +17,7 @@ const { maxFilesMin, maxFilesMax, maxSizeMin, maxSizeMax } = FILE_UPLOAD_BOUNDAR
 const { visibleRowsMin, visibleRowsMax } = COLLECTION_BOUNDARIES
 
 /** The list nobody has touched, and the one a form reset returns to. */
-const untouched: FileUploadState = { rows: [], cut: false, fresh: false }
+const untouched: FileUploadState = { rows: [], cut: false, cuts: 0, fresh: false }
 
 const keptFiles = (rows: readonly FileUploadRow[]) => rows.filter((row) => row.reason === null).map((row) => row.file)
 
@@ -70,7 +70,7 @@ export function useFileUpload(props: FileUploadStateProps) {
     const nextKey = () => { counter.current += 1; return String(counter.current) }
     const kept = sorted.accepted.map((file): FileUploadRow => rows.find((row) => row.file === file && row.reason === null) ?? { key: nextKey(), file, reason: null })
     const refused = sorted.rejected.map(({ file, reason }): FileUploadRow => ({ key: nextKey(), file, reason }))
-    state.setValue({ rows: [...kept, ...refused], cut: sorted.cut, fresh: true })
+    state.setValue({ rows: [...kept, ...refused], cut: sorted.cut, cuts: state.value.cuts + (sorted.cut ? 1 : 0), fresh: true })
     writeFiles(state.inputRef.current, sorted.accepted)
     onValueChange?.(sorted.accepted)
   }
@@ -89,7 +89,7 @@ export function useFileUpload(props: FileUploadStateProps) {
     const removed = rows[index]
     if (!removed) return
     const next = rows.filter((row) => row.key !== key)
-    state.setValue({ rows: next, cut: false, fresh: false })
+    state.setValue({ rows: next, cut: false, cuts: state.value.cuts, fresh: false })
     focusAt.current = index
     if (removed.reason !== null) return
     const files = keptFiles(next)
@@ -164,6 +164,7 @@ export function useFileUpload(props: FileUploadStateProps) {
     rows,
     refused: state.value.fresh ? rows.filter((row) => row.rejected) : [],
     message: state.value.cut ? labels.tooMany(limits.maxFiles, format) : '',
+    messageKey: state.value.cuts,
     onChange: () => { add([...(state.inputRef.current?.files ?? [])]) },
     remove,
     zone: { onDragEnter, onDragOver, onDragLeave, onDrop },

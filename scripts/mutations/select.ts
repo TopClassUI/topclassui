@@ -4,6 +4,7 @@ import type { Mutation } from '../lib/mutate.js'
 const CLIENT = 'src/components/select/client.tsx'
 const HOOK = 'src/components/select/hook.ts'
 const CLASSES = 'src/components/select/classes.ts'
+const LIB = 'src/components/select/lib.ts'
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -95,5 +96,59 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: ' ${LIST_CAP} ${SCROLL_AREA}',
     to: ' ${LIST_CAP}',
+  },
+  {
+    label: 'the select popup takes the trigger width as its floor again, so beside a trigger on a phone it runs off the screen',
+    file: CLASSES,
+    from: 'min-w-[min(var(--anchor-width),round(down,var(--available-width),1px))]',
+    to: 'min-w-(--anchor-width)',
+  },
+  {
+    label: 'the select popup caps its width at the room unrounded, so a list placed on a whole pixel ends 0.2 px past the 8 px',
+    file: CLASSES,
+    from: 'max-w-[round(down,var(--available-width),1px)]',
+    to: 'max-w-(--available-width)',
+  },
+  {
+    label: 'the select list loses the name of its field, so a reader hears the options with no name',
+    file: CLIENT,
+    from: '              aria-label={select.listLabel}\n',
+    to: '',
+  },
+  {
+    label: 'the select list loses the aria-labelledby of its caller, so a heading names the trigger only',
+    file: CLIENT,
+    from: '              aria-labelledby={select.listLabelledBy}\n',
+    to: '',
+  },
+  {
+    label: 'the select reads a wrapping label whole, so the value it shows joins the name of the list',
+    file: LIB,
+    from: "  if (node === skip) return ''\n",
+    to: '',
+  },
+  {
+    label: 'the select reads its label only once, so a label changed later is not the name of the list',
+    file: HOOK,
+    from: '    if (next && !named) setSpoken(readNameFromLabels(trigger.current))\n',
+    to: '',
+  },
+  {
+    label: 'the select read-only trigger loses its dashed line, so forced colours draw it as an editable one',
+    file: CLASSES,
+    from: ' forced-colors:data-readonly:border-dashed',
+    to: '',
+  },
+  {
+    label: 'the select side placement never falls below, so beside a trigger as wide as a phone its list is 2 px wide',
+    file: CLIENT,
+    from: "          collisionAvoidance={side === 'top' || side === 'bottom' ? undefined : SELECT_SIDE_COLLISION_AVOIDANCE}\n",
+    to: '',
+  },
+  {
+    label: 'the select bottom placement may fall to a side too, so a list with no room above or below is squeezed beside it',
+    file: CLIENT,
+    from: "collisionAvoidance={side === 'top' || side === 'bottom' ? undefined : SELECT_SIDE_COLLISION_AVOIDANCE}",
+    to: 'collisionAvoidance={SELECT_SIDE_COLLISION_AVOIDANCE}',
   },
 ]

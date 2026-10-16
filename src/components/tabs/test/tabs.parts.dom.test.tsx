@@ -75,7 +75,7 @@ describe('className, style, ref and the rest reach the element each part renders
     expect(classes('list')).toContain('gap-2')
     expect(classes('list')).not.toContain('gap-6')
     expect(classes('tab')).toEqual(expect.arrayContaining(['font-bold', 'text-body']))
-    expect(classes('tab')).not.toContain('font-medium')
+    expect(classes('tab')).not.toContain('font-normal')
     expect(classes('tab')).not.toContain('text-muted')
     expect(classes('panel')).toContain('mt-8')
     expect(classes('panel')).not.toContain('mt-4')
