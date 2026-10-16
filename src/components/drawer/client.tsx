@@ -52,32 +52,33 @@ export function DrawerTrigger({ className, render, ...rest }: DrawerTriggerProps
 export function DrawerPopup({ container, keepMounted, className, children, ...rest }: DrawerPopupProps) {
   const { dir, lang, placement, size, modal, scope } = useDrawerPopup()
   const blocks = modal === true
-  const portal = (
-    <Base.Portal container={container} keepMounted={keepMounted}>
-      {blocks ? <Base.Backdrop className={DRAWER_BACKDROP} /> : null}
-      <Base.Viewport
-        dir={dir}
-        lang={lang}
-        className={cn(DRAWER_VIEWPORT, DRAWER_VIEWPORT_EDGE[placement], !blocks && VIEWPORT_PASSIVE)}
-      >
-        <Base.Popup
-          data-placement={placement}
-          data-size={size}
-          {...rest}
-          data-overlay={scope}
-          className={cn(
-            DRAWER_POPUP, DRAWER_EDGE[placement], isSideSheet(placement) && DRAWER_WIDTH[size], !blocks && POPUP_PASSIVE, className,
-          )}
+  // Around every placement: a wrapper that came and went with it would remount an open sheet moved across a breakpoint.
+  return (
+    <Base.VirtualKeyboardProvider>
+      <Base.Portal container={container} keepMounted={keepMounted}>
+        {blocks ? <Base.Backdrop className={DRAWER_BACKDROP} /> : null}
+        <Base.Viewport
+          dir={dir}
+          lang={lang}
+          className={cn(DRAWER_VIEWPORT, DRAWER_VIEWPORT_EDGE[placement], !blocks && VIEWPORT_PASSIVE)}
         >
-          {placement === 'bottom' ? <div aria-hidden="true" className={DRAWER_GRABBER} /> : null}
-          {children}
-          <DrawerClose className={DRAWER_X[placement]} />
-        </Base.Popup>
-      </Base.Viewport>
-    </Base.Portal>
+          <Base.Popup
+            data-placement={placement}
+            data-size={size}
+            {...rest}
+            data-overlay={scope}
+            className={cn(
+              DRAWER_POPUP, DRAWER_EDGE[placement], isSideSheet(placement) && DRAWER_WIDTH[size], !blocks && POPUP_PASSIVE, className,
+            )}
+          >
+            {placement === 'bottom' ? <div aria-hidden="true" className={DRAWER_GRABBER} /> : null}
+            {children}
+            <DrawerClose className={DRAWER_X[placement]} />
+          </Base.Popup>
+        </Base.Viewport>
+      </Base.Portal>
+    </Base.VirtualKeyboardProvider>
   )
-  // Base UI's viewport reads this provider, so it wraps the portal: a field under the keyboard is scrolled clear of it.
-  return placement === 'bottom' ? <Base.VirtualKeyboardProvider>{portal}</Base.VirtualKeyboardProvider> : portal
 }
 
 /** The bar that stays put above the body, for the title and the description. */

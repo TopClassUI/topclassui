@@ -12,7 +12,7 @@ import { useLabels } from '#shared/provider/context.js'
 import { usePortalLocale } from '#shared/provider/use-portal-locale.js'
 import { useFormValue } from '#shared/use-form-value.js'
 import { COMBOBOX_DEFAULTS, COMBOBOX_ROW_ESTIMATE } from './constants.js'
-import { isAppended, keyOfOption, nameFromLabels, optionAccessors, revealTop } from './lib.js'
+import { isAppended, keyOfOption, labelOfUnknown, nameFromLabels, optionAccessors, revealTop } from './lib.js'
 import type { ComboboxChangeDetails, ComboboxHighlightDetails, ComboboxListProps, ComboboxValueProps } from './types.js'
 
 const { visibleRowsMin, visibleRowsMax, loadMoreThresholdMin, loadMoreThresholdMax } = COLLECTION_BOUNDARIES
@@ -29,14 +29,17 @@ export function useCombobox(props: ComboboxValueProps) {
   const scroller = useRef(null as ((index: number) => void) | null)
   const labels = useLabels()
 
-  // Open, Base UI aria-hides a label pointing at the input, and Chrome names it with nothing: the text is copied onto it.
-  const named = props['aria-label'] !== undefined || props['aria-labelledby'] !== undefined
-  const [spoken, setSpoken] = useState(undefined as string | undefined)
-  useEffect(() => { if (!named) setSpoken(nameFromLabels(input.current)) }, [named])
+  const [opened, setOpened] = useState(props.defaultOpen ?? false)
+  const open = props.open ?? opened
   const onOpen = (next: boolean, details: ComboboxChangeDetails) => {
     props.onOpenChange?.(next, details)
-    if (next && !named) setSpoken(nameFromLabels(input.current))
+    if (!details.isCanceled) setOpened(next)
   }
+
+  // Open, Base UI aria-hides a label pointing at the input, and Chrome names it with nothing: the text is copied then only.
+  const named = props['aria-label'] !== undefined || props['aria-labelledby'] !== undefined
+  const [spoken, setSpoken] = useState(undefined as string | undefined)
+  useEffect(() => { setSpoken(open && !named ? nameFromLabels(input.current) : undefined) }, [open, named])
 
   // The caller first, with Base UI's details, so details.cancel() still keeps the value as it was.
   const onChange = (next: string | null, details: ComboboxChangeDetails) => {
@@ -56,10 +59,13 @@ export function useCombobox(props: ComboboxValueProps) {
     onValueChange: onChange,
     onItemHighlighted: onHighlight,
     onOpenChange: onOpen,
+    open,
+    loaded: items.length,
     inputRef: state.inputRef,
     ref: input,
     label: props['aria-label'] ?? spoken,
     items: collection,
+    labelOfUnknown,
     scroller,
     maxLength: resolveMaxLength(maxLength, 'search'),
     // Left out, the --tc-list-rows knob applies: React writes no style for an undefined value.
@@ -79,18 +85,18 @@ export function useCombobox(props: ComboboxValueProps) {
 
 /** The list, windowed by the shared hook (R-8.5-1): the matches Base UI filtered, the rows to mount, the spacers that
  * stand for the rest, and the scroller the root calls with the index of a highlighted row. */
-export function useComboboxList({ scroller, virtualize, hasMore, loadMore, loadMoreThreshold, rows, selected }: ComboboxListProps) {
+export function useComboboxList({
+  scroller, virtualize, hasMore, open, loaded, loadMore, loadMoreThreshold, rows, selected,
+}: ComboboxListProps) {
   const filtered: readonly ListOption[] = Base.useFilteredItems()
   const [unit, setUnit] = useState(COMBOBOX_ROW_ESTIMATE)
-  // useCollection reads the list on a scroll or a resize only: paging waits until it has read the list at this count.
-  const [counted, setCounted] = useState(-1)
-  const given = useRef(false)
   const collection = useCollection({
     items: filtered,
     getKey: keyOfOption,
     virtualize,
-    hasMore: hasMore && counted === filtered.length,
+    hasMore: hasMore && open,
     loadMore,
+    loadedCount: loaded,
     loadMoreThreshold,
     estimateRowHeight: unit,
   })
@@ -98,6 +104,7 @@ export function useComboboxList({ scroller, virtualize, hasMore, loadMore, loadM
   const list = useRef(null as HTMLDivElement | null)
   const pending = useRef(-1)
   const shown = useRef(null as readonly ListOption[] | null)
+  const centred = useRef(null as { index: number, height: number, top: number } | null)
 
   const listRef = useCallback((node: HTMLDivElement | null) => {
     list.current = node
@@ -124,20 +131,24 @@ export function useComboboxList({ scroller, virtualize, hasMore, loadMore, loadM
     const node = list.current
     const row = node?.querySelector('[role="option"]')
     const height = row ? Number.parseFloat(getComputedStyle(row).height) : 0
-    if (height > 0 && Math.abs(height - unit) > 0.01) setUnit(height)
+    // The scrolls wait a pass for the measured unit: a row of 44 or 80 px reached with 40 lands far short of it.
+    if (height > 0 && Math.abs(height - unit) > 0.01) {
+      setUnit(height)
+      return
+    }
     if (node && shown.current !== filtered) {
       const before = shown.current
       shown.current = filtered
       const chosen = before === null && selected !== null ? filtered.findIndex((option) => option.value === selected) : -1
-      if (chosen >= 0) scrollToIndex(chosen, 'center')
-      else if (before !== null && !isAppended(before, filtered)) node.scrollTop = 0
+      centred.current = chosen >= 0 ? { index: chosen, height: -1, top: node.scrollTop } : null
+      if (before !== null && chosen < 0 && !isAppended(before, filtered)) node.scrollTop = 0
     }
-    // A synthetic scroll makes useCollection read the list with its new rows; on mount its listener comes a commit later.
-    if (node && given.current && counted !== filtered.length) {
-      node.dispatchEvent(new Event('scroll'))
-      setCounted(filtered.length)
+    // The popup learns its available height after it opens: a list cut to fit centres the chosen row again, until scrolled.
+    const target = centred.current
+    if (node && target?.top === node.scrollTop && target.height !== node.clientHeight) {
+      scrollToIndex(target.index, 'center')
+      centred.current = { index: target.index, height: node.clientHeight, top: node.scrollTop }
     }
-    if (node) given.current = true
     if (pending.current >= 0) reveal(pending.current)
   })
 

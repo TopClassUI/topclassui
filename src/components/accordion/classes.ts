@@ -16,9 +16,10 @@ export const ACCORDION_TRIGGER_CORNERS = '[:first-child>*>&]:rounded-t-box [:las
 /** Forced colours keep the 50% of a disabled trigger, which a theme can make unreadable: it takes the system's own grey. */
 export const ACCORDION_TRIGGER_FORCED = 'forced-colors:data-disabled:text-[GrayText] forced-colors:data-disabled:opacity-100'
 
-/** A row as wide as the box. Its ring is drawn inside it, because the box clips whatever is outside. */
+/** A row as wide as the box. Its ring is drawn inside it, because the box clips whatever is outside.
+ * Where six letters of the title and the caret do not fit side by side (text at 200%), the caret wraps below. */
 export const ACCORDION_TRIGGER = [
-  'group flex w-full items-center gap-3 px-4 py-3.5 text-start text-sm font-medium text-body tone-neutral',
+  'group flex w-full flex-wrap items-center gap-3 px-4 py-3.5 text-start text-sm font-medium text-body tone-neutral',
   HOVER.ghost,
   FOCUS_RING_INSET,
   TOUCH_TARGET,
@@ -28,14 +29,14 @@ export const ACCORDION_TRIGGER = [
   ACCORDION_TRIGGER_FORCED,
 ].join(' ')
 
-/** The title gives way and wraps, so the caret keeps its place at the inline end. */
-export const ACCORDION_TITLE = 'min-w-0 flex-1'
+/** The title gives way and wraps, but never below six letters: under that the caret wraps instead (it fell to 0 px). */
+export const ACCORDION_TITLE = 'min-w-0 grow basis-[6ch]'
 
 /** The box around the caret. It turns upside down while its panel is open: the group is the trigger,
  * which Base UI marks. The colour sits here, not on the svg, where forced colours would keep it;
  * there it is the text colour of the system, and the grey of a disabled trigger has to be named. */
 export const ACCORDION_CARET = [
-  'flex shrink-0 text-muted transition-[rotate] duration-(--tc-duration) group-data-panel-open:rotate-180',
+  'ms-auto flex shrink-0 text-muted transition-[rotate] duration-(--tc-duration) group-data-panel-open:rotate-180',
   'forced-colors:group-data-disabled:text-[GrayText]',
 ].join(' ')
 

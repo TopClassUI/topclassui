@@ -11,8 +11,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the textarea cap stops going through resolveMaxLength, so a Textarea has no default limit',
     file: INDEX,
-    from: 'const cap = resolveMaxLength(maxLength, TEXTAREA_CAP_TYPE) ?? null',
-    to: 'const cap = maxLength ?? null',
+    from: 'const cap = clampCap(resolveMaxLength(maxLength, TEXTAREA_CAP_TYPE))',
+    to: 'const cap = clampCap(maxLength ?? undefined)',
   },
   {
     label: 'textarea rows are not clamped, so rows={99} draws a field taller than two screens',
@@ -127,5 +127,41 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: "TEXTAREA_HOLDER = 'grid max-w-full gap-1.5'",
     to: "TEXTAREA_HOLDER = 'max-w-full gap-1.5'",
+  },
+  {
+    label: 'the textarea measure stops putting the scroll back, so a page scrolled to the foot of an autosize field jumps on a keystroke',
+    file: HOOK,
+    from: 'return () => { for (const [box, top] of held) box.scrollTop = top }',
+    to: 'return () => undefined',
+  },
+  {
+    label: 'the textarea measure counts the touch floor as text, so one empty row under a finger is drawn two rows tall',
+    file: HOOK,
+    from: '  if (field.scrollHeight <= field.clientHeight) { restore(); return }\n',
+    to: '',
+  },
+  {
+    label: 'the lg textarea holder loses the touch floor of its text, so under a 14 px root a held field is narrower than a plain one',
+    file: CLASSES,
+    from: '  lg: `text-base ${FIELD_TEXT_COARSE}`,',
+    to: "  lg: 'text-base',",
+  },
+  {
+    label: 'the textarea cap is not clamped, so maxLength={-1} draws a danger counter on an empty field the browser leaves uncapped',
+    file: LIB,
+    from: 'return clamp(Math.floor(cap), TEXTAREA_BOUNDARIES.maxLengthMin, TEXTAREA_BOUNDARIES.maxLengthMax)',
+    to: 'return cap',
+  },
+  {
+    label: 'the textarea cap keeps its fraction, so maxLength={2.5} reads 2 / 2.5',
+    file: LIB,
+    from: 'clamp(Math.floor(cap),',
+    to: 'clamp(cap,',
+  },
+  {
+    label: 'the buttons of the textarea form demo stop wrapping, so at a 32 px root a 320 px phone scrolls sideways',
+    file: 'src/components/textarea/dummy/form.tsx',
+    from: '<div className="flex flex-wrap gap-2">',
+    to: '<div className="flex gap-2">',
   },
 ]

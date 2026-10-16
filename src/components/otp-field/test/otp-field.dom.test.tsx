@@ -174,4 +174,13 @@ describe('what reaches each element', () => {
     expect(screen.getByRole('group', { name: 'Code' })).toBe(document.querySelector('[role="group"]'))
     expect(screen.getByRole('textbox', { name: 'Character 3 of 3' })).toBe(cells()[2])
   })
+
+  it('aria-labelledby names the first cell and the group, so the tab stop on a later cell sits in a named group', () => {
+    render(<><span id="named">Code</span><OTPField aria-labelledby="named" length={4} defaultValue="12" /></>)
+    expect(first()).toBe(cells()[0])
+    expect(screen.getByRole('group', { name: 'Code' })).toBe(document.querySelector('[role="group"]'))
+    const stop = cells().find((cell) => cell.tabIndex === 0)
+    expect(stop).toBe(screen.getByRole('textbox', { name: 'Character 3 of 4' }))
+    expect(stop?.closest('[role="group"]')).toBe(screen.getByRole('group', { name: 'Code' }))
+  })
 })
