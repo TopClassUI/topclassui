@@ -50,4 +50,16 @@ export const MUTATIONS: Mutation[] = [
     from: '  --tc-list-pad-end: 0px;\n',
     to: '  --tc-list-pad-end: 0;\n',
   },
+  {
+    label: 'the shared collection reads NODE_ENV in bracket form, which no bundler inlines, so a duplicate key throws "process is not defined" in the browser',
+    file: 'src/shared/collection/use-collection.ts',
+    from: "if (process.env.NODE_ENV !== 'production' && !warnedKeys.current.has(key))",
+    to: "if (process.env['NODE_ENV'] !== 'production' && !warnedKeys.current.has(key))",
+  },
+  {
+    label: 'the shared controllable state reads NODE_ENV in bracket form, which no bundler inlines, so a switch to controlled throws in the browser',
+    file: 'src/shared/use-controllable-state.ts',
+    from: "    if (process.env.NODE_ENV !== 'production') {",
+    to: "    if (process.env['NODE_ENV'] !== 'production') {",
+  },
 ]

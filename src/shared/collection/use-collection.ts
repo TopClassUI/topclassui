@@ -135,7 +135,7 @@ export function useCollection<T>(props: CollectionProps<T>): UseCollectionResult
       const key = getKey(item)
       if (seen.has(key)) {
         // Warned once per key, not once per render: this memo recomputes on every scroll.
-        if (process.env['NODE_ENV'] !== 'production' && !warnedKeys.current.has(key)) {
+        if (process.env.NODE_ENV !== 'production' && !warnedKeys.current.has(key)) {
           warnedKeys.current.add(key)
           console.warn(`useCollection: duplicate key "${key}" at index ${String(i)}; the row was dropped.`)
         }
