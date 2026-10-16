@@ -19,6 +19,8 @@ class Observer {
 
 /** The height the stubbed layout gives every header; anything else measures 0, as in happy-dom. */
 let height = 60
+/** The top of an element on the screen, by its id: 0 for any other, as in happy-dom. */
+const tops = new Map<string, number>()
 
 const variable = () => document.documentElement.style.getPropertyValue('--tc-sticky-top')
 function resize(to: number): void {
@@ -33,7 +35,7 @@ beforeEach(() => {
   Observer.made = []
   vi.stubGlobal('ResizeObserver', Observer)
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function measure(this: HTMLElement) {
-    return { x: 0, y: 0, left: 0, top: 0, width: 320, right: 320, height: this.tagName === 'HEADER' ? height : 0, bottom: 0, toJSON: () => ({}) }
+    return { x: 0, y: 0, left: 0, top: tops.get(this.id) ?? 0, width: 320, right: 320, height: this.tagName === 'HEADER' ? height : 0, bottom: 0, toJSON: () => ({}) }
   })
 })
 
@@ -41,6 +43,8 @@ afterEach(() => {
   vi.unstubAllGlobals()
   vi.restoreAllMocks()
   document.documentElement.removeAttribute('style')
+  tops.clear()
+  history.replaceState(null, '', location.pathname)
 })
 
 const bar = (sticky?: boolean) => (
@@ -193,5 +197,52 @@ describe('a bar that is not sticky', () => {
     render(<>{bar()}{bar(false)}</>)
     expect(Observer.made).toHaveLength(1)
     expect(variable()).toBe('60px')
+  })
+})
+
+// The browser scrolls to an #anchor before the script has written the height: the hook brings it clear once.
+describe('a page opened at an #anchor', () => {
+  /** A heading with that id, put where the stubbed layout says, after the bar in the page. */
+  function openAt(hash: string, id: string, top: number) {
+    history.replaceState(null, '', `${location.pathname}${hash}`)
+    tops.set(id, top)
+    const scrolled = vi.spyOn(HTMLElement.prototype, 'scrollIntoView').mockImplementation(() => undefined)
+    const { container } = render(<>{bar()}<h2 id={id}>Theming</h2></>)
+    return { scrolled, heading: container.querySelector('h2') }
+  }
+
+  it('brings the target clear of the bar once, when it still lies where the browser put it', () => {
+    const { scrolled, heading } = openAt('#theming', 'theming', 0)
+    expect(variable()).toBe('60px')
+    expect(scrolled).toHaveBeenCalledTimes(1)
+    expect(scrolled.mock.contexts[0]).toBe(heading)
+    resize(85)
+    act(() => { window.dispatchEvent(new Event('resize')) })
+    expect(scrolled).toHaveBeenCalledTimes(1)
+  })
+
+  it('leaves a target the reader has scrolled away from, or that the page could not bring to the top', () => {
+    const { scrolled } = openAt('#theming', 'theming', 340)
+    expect(scrolled).not.toHaveBeenCalled()
+  })
+
+  it('finds an id written with escapes, as the browser does', () => {
+    const { scrolled, heading } = openAt('#caf%C3%A9', 'café', 0)
+    expect(scrolled.mock.contexts).toEqual([heading])
+  })
+
+  it('does nothing for a fragment that names nothing', () => {
+    expect(openAt('#nowhere', 'theming', 0).scrolled).not.toHaveBeenCalled()
+  })
+
+  it('does not throw on a stray %, and writes the height all the same', () => {
+    const { scrolled } = openAt('#100%', 'theming', 0)
+    expect(scrolled).not.toHaveBeenCalled()
+    expect(variable()).toBe('60px')
+  })
+
+  it('does nothing on a page opened without a fragment', () => {
+    const { scrolled } = openAt('', 'theming', 0)
+    expect(scrolled).not.toHaveBeenCalled()
   })
 })

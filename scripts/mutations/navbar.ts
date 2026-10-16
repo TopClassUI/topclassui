@@ -4,6 +4,7 @@ import type { Mutation } from '../lib/mutate.js'
 const CLASSES = 'src/components/navbar/classes.ts'
 const CONSTANTS = 'src/components/navbar/constants.ts'
 const HOOK = 'src/components/navbar/hook.ts'
+const LIB = 'src/components/navbar/lib.ts'
 const ROOT = 'src/components/navbar/parts/navbar-root.tsx'
 const BRAND = 'src/components/navbar/parts/navbar-brand.tsx'
 const LINKS = 'src/components/navbar/parts/navbar-links.tsx'
@@ -106,6 +107,30 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: ' data-unstuck:static ',
     to: ' ',
+  },
+  {
+    label: 'the navbar hook leaves a page opened at an #anchor with its heading under the bar',
+    file: HOOK,
+    from: '    if (target && landed !== undefined && Math.abs(landed - padding) < 1) target.scrollIntoView()\n',
+    to: '',
+  },
+  {
+    label: 'the navbar hook scrolls to the #anchor target though the reader has scrolled away from it',
+    file: HOOK,
+    from: 'Math.abs(landed - padding) < 1',
+    to: 'landed === landed',
+  },
+  {
+    label: 'the navbar hook reads an escaped #fragment as written, so an id with an accent is never found',
+    file: LIB,
+    from: '    return doc.getElementById(decodeURIComponent(fragment))\n',
+    to: '    return null\n',
+  },
+  {
+    label: 'the navbar hook throws on a #fragment with a stray %, and the bar never writes its height',
+    file: LIB,
+    from: '  try {\n    return doc.getElementById(decodeURIComponent(fragment))\n  } catch {\n    // A stray % is no escape: the fragment names nothing.\n    return null\n  }\n',
+    to: '  return doc.getElementById(decodeURIComponent(fragment))\n',
   },
   {
     label: 'the navbar writes its height to the variable of a bottom bar, which the top of the page never reads',

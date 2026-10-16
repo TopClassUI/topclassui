@@ -220,12 +220,25 @@ test.describe('the static pages', () => {
 })
 
 test.describe('a page opened at an #anchor, with script', () => {
-  test('still lands under the bar: the height arrives after the browser has scrolled, and it does not scroll again', async ({ page }) => {
-    await page.goto(`${liveUrl('navbar--tall-page')}#theming`)
-    await expect(page.locator('html')).toHaveAttribute('data-harness', 'hydrated')
-    expect(await sticky(page)).toEqual({ variable: '60px', padding: '60px' })
-    expect(await below(page.locator('#theming'))).toBe(-60)
-  })
+  // The browser scrolls before the height arrives; the bar then brings the target to its foot, once.
+  for (const screen of [{ width: 1280, height: 800, bar: 60 }, { width: 390, height: 844, bar: 85 }, { width: 320, height: 480, bar: 85 }]) {
+    test(`${String(screen.width)} x ${String(screen.height)}: lands at the foot of the bar of ${String(screen.bar)} px once the height arrives, with or without a height in the CSS of the app`, async ({ page }) => {
+      await page.setViewportSize(screen)
+      await page.goto(`${liveUrl('navbar--tall-page')}#theming`)
+      await expect(page.locator('html')).toHaveAttribute('data-harness', 'hydrated')
+      expect(await sticky(page)).toEqual({ variable: `${String(screen.bar)}px`, padding: `${String(screen.bar)}px` })
+      expect(await below(page.locator('#theming'))).toBe(0)
+
+      // The one-row height of the README, short of a phone's two rows by 25 px.
+      await page.route('**/navbar--tall-page--light--ltr.html', async (route) => {
+        const response = await route.fetch()
+        await route.fulfill({ response, body: (await response.text()).replace('</head>', '<style>:root { --tc-sticky-top: 3.75rem }</style></head>') })
+      })
+      await page.goto(`${liveUrl('navbar--tall-page')}#questions`)
+      await expect(page.locator('html')).toHaveAttribute('data-harness', 'hydrated')
+      expect(await below(page.locator('#questions'))).toBe(0)
+    })
+  }
 
   test('a value written in the CSS of the app is replaced by the measured one while the bar is mounted', async ({ page }) => {
     await page.route('**/navbar--tall-page--light--ltr.html', async (route) => {
