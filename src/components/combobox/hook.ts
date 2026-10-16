@@ -29,16 +29,17 @@ export function useCombobox(props: ComboboxValueProps) {
   const scroller = useRef(null as ((index: number) => void) | null)
   const labels = useLabels()
 
-  // Open, Base UI aria-hides a label pointing at the input, and Chrome names it with nothing: the text is copied onto it.
-  const named = props['aria-label'] !== undefined || props['aria-labelledby'] !== undefined
-  const [spoken, setSpoken] = useState(undefined as string | undefined)
-  useEffect(() => { if (!named) setSpoken(nameFromLabels(input.current)) }, [named])
   const [opened, setOpened] = useState(props.defaultOpen ?? false)
+  const open = props.open ?? opened
   const onOpen = (next: boolean, details: ComboboxChangeDetails) => {
     props.onOpenChange?.(next, details)
     if (!details.isCanceled) setOpened(next)
-    if (next && !named) setSpoken(nameFromLabels(input.current))
   }
+
+  // Open, Base UI aria-hides a label pointing at the input, and Chrome names it with nothing: the text is copied then only.
+  const named = props['aria-label'] !== undefined || props['aria-labelledby'] !== undefined
+  const [spoken, setSpoken] = useState(undefined as string | undefined)
+  useEffect(() => { setSpoken(open && !named ? nameFromLabels(input.current) : undefined) }, [open, named])
 
   // The caller first, with Base UI's details, so details.cancel() still keeps the value as it was.
   const onChange = (next: string | null, details: ComboboxChangeDetails) => {
@@ -58,7 +59,7 @@ export function useCombobox(props: ComboboxValueProps) {
     onValueChange: onChange,
     onItemHighlighted: onHighlight,
     onOpenChange: onOpen,
-    open: props.open ?? opened,
+    open,
     loaded: items.length,
     inputRef: state.inputRef,
     ref: input,

@@ -483,6 +483,18 @@ test.describe('live: the name, while the list is open', () => {
       expect(await chromeName(page)).toEqual([name])
     })
   }
+
+  test('closed, the live label names the input: a label renamed while closed names it at once, and again once open', async ({ page }) => {
+    await open(page, 'combobox--basic', 'Framework')
+    await page.keyboard.press('Escape')
+    await expect(popupOf(page)).toHaveCount(0)
+    expect(await page.locator('#demo input[role="combobox"]').getAttribute('aria-label')).toBeNull()
+    await page.locator('#demo label').evaluate((label) => { label.textContent = 'Framework (required)' })
+    expect(await chromeName(page)).toEqual(['Framework (required)'])
+    await page.locator('#demo input[role="combobox"]').click()
+    await atRest(popupOf(page))
+    expect(await chromeName(page)).toEqual(['Framework (required)'])
+  })
 })
 
 test.describe('live: inside the repo\'s Dialog', () => {

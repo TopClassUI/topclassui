@@ -71,8 +71,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the combobox stops copying the text of its label onto the input, which then has no name while the list is open',
     file: HOOK,
-    from: '  useEffect(() => { if (!named) setSpoken(nameFromLabels(input.current)) }, [named])',
+    from: '  useEffect(() => { setSpoken(open && !named ? nameFromLabels(input.current) : undefined) }, [open, named])',
     to: '',
+  },
+  {
+    label: 'the combobox keeps the copied text of its label while closed, so a label renamed then names the input with its old text',
+    file: HOOK,
+    from: 'setSpoken(open && !named ? nameFromLabels(input.current) : undefined)',
+    to: 'setSpoken(!named ? nameFromLabels(input.current) : undefined)',
   },
   {
     label: 'the combobox says No results while its first page loads',
