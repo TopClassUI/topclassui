@@ -74,9 +74,10 @@ describe('the order the cascade needs', () => {
 })
 
 describe('the tokens the menu reads are the ones the plan names', () => {
-  it('--tc-z-popup is 60, above a dialog at 50 and below a toast at 70', async () => {
+  it('--tc-z-popup is the one overlay layer, 60: a dialog and a drawer take it too, and a toast at 70 stays above', async () => {
     const sheet = await css
-    expect(sheet).toContain('--tc-z-dialog: 50;')
+    expect(sheet).toContain('--tc-z-drawer: var(--tc-z-popup);')
+    expect(sheet).toContain('--tc-z-dialog: var(--tc-z-popup);')
     expect(sheet).toContain('--tc-z-popup: 60;')
     expect(sheet).toContain('--tc-z-toast: 70;')
   })

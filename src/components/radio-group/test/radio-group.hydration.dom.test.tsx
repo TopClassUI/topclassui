@@ -62,11 +62,28 @@ describe('a server-rendered RadioGroup hydrates cleanly', () => {
     done()
   })
 
-  it('a group with no default has no tab stop in the server HTML, and Base UI gives the first radio one once it hydrates', async () => {
-    const { errors, before, container, done } = await hydrate(group())
-    expect(before).not.toContain('tabindex="0"')
+  // SHARED-FORMS-4: with none checked, or a default no radio has, the server HTML had no tab stop at all.
+  for (const [what, defaultValue] of [['no default', undefined], ['a default no radio has', 'stale']] as const) {
+    it(`a group with ${what} serves its tab stop on the first radio, where Base UI keeps it once it hydrates`, async () => {
+      const { errors, before, container, done } = await hydrate(group(defaultValue))
+      expect(errors).toEqual([])
+      expect(before.match(/<button [^>]*>/g)?.map((button) => /tabindex="(-?\d)"/.exec(button)?.[1])).toEqual(['0', '-1', '-1'])
+      expect(tabStops(container)).toEqual(['0', '-1', '-1'])
+      done()
+    })
+  }
+
+  it('a first radio that is disabled passes the stop to the next, before and after hydration', async () => {
+    const element = createElement(
+      RadioGroupRoot,
+      { 'aria-label': 'Plan', name: 'plan' },
+      createElement(RadioGroupItem, { value: 'free', disabled: true }, 'Free'),
+      createElement(RadioGroupItem, { value: 'pro' }, 'Pro'),
+    )
+    const { errors, before, container, done } = await hydrate(element)
     expect(errors).toEqual([])
-    expect(tabStops(container)).toEqual(['0', '-1', '-1'])
+    expect(before.match(/<button [^>]*>/g)?.map((button) => /tabindex="(-?\d)"/.exec(button)?.[1])).toEqual(['-1', '0'])
+    expect(tabStops(container)).toEqual(['-1', '0'])
     done()
   })
 

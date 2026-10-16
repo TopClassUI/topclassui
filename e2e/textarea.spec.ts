@@ -140,6 +140,22 @@ test.describe('text and motion', () => {
     })
   }
 
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: at a root of 32 px on a 320 px screen no demo scrolls sideways, nor spills past the start edge where no scrollbar shows it`, async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 480 })
+      for (const demo of DEMOS) {
+        await page.goto(urlFor(demo, 'light', direction))
+        await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
+        expect(await page.evaluate(() => document.documentElement.scrollWidth - document.body.clientWidth), `${demo} scrolls sideways`).toBeLessThanOrEqual(0)
+        const spilt = await page.locator('#demo :is(textarea, button, label, span[aria-hidden])').evaluateAll((all) => all.flatMap((el) => {
+          const { left, right } = el.getBoundingClientRect()
+          return left < 0 || right > document.documentElement.clientWidth ? [`${el.tagName} ${String(Math.round(left))}..${String(Math.round(right))}`] : []
+        }))
+        expect(spilt, demo).toEqual([])
+      }
+    })
+  }
+
   test('WCAG 1.4.12 spacing: the rows grow with the line height, and the counter and the hint stay clear of their fields', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 480 })
     await page.goto(urlFor('textarea--basic', 'light', 'ltr'))
@@ -207,6 +223,72 @@ test.describe('live: the rows follow the text', () => {
     await grows.fill('One')
     await expect.poll(height).toBe(82)
   })
+
+  for (const direction of DIRECTIONS) {
+    for (const pointer of ['fine', 'coarse'] as const) {
+      test(`${direction}, ${pointer} pointer: typing at the foot of a scrolled page, or of a scrolling box, moves neither`, async ({ browser }) => {
+        const page = await browser.newPage({ ...(pointer === 'coarse' ? COARSE : {}), viewport: { width: 390, height: 260 } })
+        await openLive(page, 'textarea--autosize', { direction })
+        const past = field(page, 'Past six rows')
+        const typeAtFoot = async (scroller: string) => {
+          await past.focus()
+          await page.keyboard.press('Control+End')
+          await page.locator(scroller).evaluate((el) => { el.scrollTop = el.scrollHeight })
+          const before = await page.locator(scroller).evaluate((el) => el.scrollTop)
+          await page.keyboard.type('x')
+          await expect(past).toHaveValue(/x$/)
+          return [before, await page.locator(scroller).evaluate((el) => el.scrollTop)]
+        }
+        const [top, after] = await typeAtFoot('html')
+        expect(top, 'the page is not scrolled at all').toBeGreaterThan(0)
+        expect(after).toBe(top)
+        await page.addStyleTag({ content: '#demo { block-size: 150px; overflow: auto }' })
+        const [boxTop, boxAfter] = await typeAtFoot('#demo')
+        expect(boxTop, 'the box does not scroll at all').toBeGreaterThan(0)
+        expect(boxAfter).toBe(boxTop)
+        expect(await liveErrors(page)).toEqual([])
+        await page.close()
+      })
+    }
+  }
+
+  for (const pointer of ['fine', 'coarse'] as const) {
+    test(`${pointer} pointer: one row at every size is the box of a plain field, under the touch floor too, and still grows to two lines`, async ({ browser }) => {
+      const page = await browser.newPage(pointer === 'coarse' ? COARSE : {})
+      await openLive(page, 'separator--horizontal')
+      await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/textarea-rows.tsx' })
+      await expect(page.locator('#rows textarea')).toHaveCount(10)
+      const heights = () => Promise.all(['xs', 'sm', 'md', 'lg', 'xl'].map(async (size) => [
+        size, (await boxOf(field(page, `${size} plain`))).height, (await boxOf(field(page, `${size} autosize`))).height,
+      ]))
+      // A single row of xs and sm is under 44 px, so under a finger the floor is the box.
+      expect(await heights()).toEqual(pointer === 'coarse'
+        ? [['xs', 44, 44], ['sm', 44, 44], ['md', 44.8, 44.8], ['lg', 50, 50], ['xl', 58, 58]]
+        : [['xs', 30, 30], ['sm', 34, 34], ['md', 42, 42], ['lg', 50, 50], ['xl', 58, 58]])
+      for (const size of ['xs', 'sm']) {
+        const grows = field(page, `${size} autosize`)
+        await grows.fill('One\nTwo')
+        await expect.poll(() => grows.evaluate((el: HTMLTextAreaElement) => [el.rows, el.scrollHeight <= el.clientHeight])).toEqual([2, true])
+      }
+      expect(await liveErrors(page)).toEqual([])
+      await page.close()
+    })
+  }
+
+  for (const direction of DIRECTIONS) {
+    test(`${direction}, coarse pointer, 14 px root: a field in its holder is as wide as a plain one at every size, lg and xl too`, async ({ browser }) => {
+      const page = await browser.newPage(COARSE)
+      await openLive(page, 'separator--horizontal', { direction })
+      await page.addStyleTag({ content: 'html { font-size: 14px }' })
+      await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/textarea-rows.tsx' })
+      await expect(page.locator('#rows textarea')).toHaveCount(10)
+      expect(await Promise.all(['xs', 'sm', 'md', 'lg', 'xl'].map(async (size) => [
+        size, (await boxOf(field(page, `${size} plain`))).width, (await boxOf(field(page, `${size} autosize`))).width,
+      ]))).toEqual([['xs', 220.8, 220.8], ['sm', 220.8, 220.8], ['md', 220.8, 220.8], ['lg', 220.8, 220.8], ['xl', 220.8, 220.8]])
+      expect(await liveErrors(page)).toEqual([])
+      await page.close()
+    })
+  }
 
   test('a field pre-filled past six rows has the same height on the server and once hydrated', async ({ page }) => {
     await page.goto(urlFor('textarea--autosize', 'light', 'ltr'))

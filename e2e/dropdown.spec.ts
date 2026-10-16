@@ -9,7 +9,7 @@ import {
   wheelAt, withScrollbar,
 } from './overlay.js'
 import { DEMOS } from './pages.js'
-import { FORCED_CANVAS, type Rgb, inkOn, paintedIn, pixelsOf, rgbOf } from './pixels.js'
+import { FORCED_CANVAS, type Clip, type Rgb, inkOn, insideRing, paintedIn, pixelsOf, rgbOf } from './pixels.js'
 
 // What happy-dom cannot lay out and the static page cannot open: the keys of the menu-button pattern in a real
 // browser, where the menu lands, what scrolls, what the page behind still does, and what forced colours leave.
@@ -262,8 +262,9 @@ test.describe('where the focus is drawn', () => {
     await rowOf(menu, 'Settings').hover()
     await expect.poll(() => focusedRow(page)).toBe('Settings')
     await expect(rowOf(menu, 'Settings')).toHaveAttribute('data-highlighted', '')
-    // A row draws no ring: its fill is its focus mark.
-    await expect(rowOf(menu, 'Settings')).toHaveCSS('outline-style', 'none')
+    // The row the pointer is on is the highlighted one, and the ring goes with the highlight.
+    await expect(rowOf(menu, 'Settings')).toHaveCSS('outline-style', 'solid')
+    await expect(menu).toHaveCSS('outline-style', 'none')
   })
 
   test('opened from the keyboard, a menu the pointer then leaves holds the focus and draws its ring inside its own box', async ({ page }) => {
@@ -286,6 +287,40 @@ test.describe('where the focus is drawn', () => {
     await closed(page)
     await expect(triggerOf(page, 'Empty', '#hostile')).toBeFocused()
   })
+})
+
+/** A box as a clip of the page. */
+async function clipOf(target: Locator): Promise<Clip> {
+  const box = await target.boundingBox()
+  if (!box) throw new Error('nothing to measure')
+  return box
+}
+
+// R-5.6-1: the fill of a highlighted row is 1.1 to 1.2:1 against the menu, so the ring is the mark the keyboard sees.
+test.describe('the row the keyboard is on is ringed', () => {
+  for (const mode of MODES) {
+    for (const direction of DIRECTIONS) {
+      test(`${mode} ${direction}: a ring inside its edge at 3:1 against the menu, on no other row`, async ({ page }) => {
+        const menu = await open(page, 'dropdown--basic', { mode, direction, by: 'keyboard' })
+        await press(page, 'ArrowDown', 'Settings')
+        const row = rowOf(menu, 'Settings')
+        await expect(row).toBeFocused()
+        await expect(row).toHaveCSS('outline-style', 'solid')
+        await expect(row).toHaveCSS('outline-width', '2px')
+        await expect(row).toHaveCSS('outline-offset', '-2px')
+        const radius = await row.evaluate((el) => Number.parseFloat(getComputedStyle(el).borderTopLeftRadius))
+        const [surface] = await fillOf(page, rowOf(menu, 'Duplicate'), direction)
+        if (!surface) throw new Error('no pixel of the menu was read')
+        for (const [side, band] of Object.entries(insideRing(await clipOf(row), radius))) {
+          const pixels = await pixelsOf(page, band)
+          expect(inkOn(pixels, surface), `pixels of ring at 3:1 along the ${side} edge`).toBeGreaterThan(pixels.length * 0.9)
+        }
+        for (const [side, band] of Object.entries(insideRing(await clipOf(rowOf(menu, 'Duplicate')), radius))) {
+          expect(inkOn(await pixelsOf(page, band), surface), `pixels of ring along the ${side} edge of another row`).toBe(0)
+        }
+      })
+    }
+  }
 })
 
 /** Where a menu must land, written out: on its own side while there is room, on the opposite one at that edge. */
@@ -579,7 +614,7 @@ test.describe('hostile content', () => {
   for (const [width, height, direction, widest] of [[1280, 800, 'ltr', 320], [320, 480, 'ltr', 289], [320, 480, 'rtl', 289]] as const) {
     const label = `${String(width)} x ${String(height)} ${direction}`
 
-    test(`${label}: a 300-character label ends in an ellipsis, its icon and its shortcut stay whole, and the menu is ${String(widest)} px wide`, async ({ page }) => {
+    test(`${label}: a 300-character label ends in an ellipsis, its icon stays whole, its shortcut gives way first, and the menu is ${String(widest)} px wide`, async ({ page }) => {
       await page.setViewportSize({ width, height })
       await fixture(page, 'dropdown-hostile', SCOPE, { direction })
       const menu = await openOverlay(page, triggerOf(page, 'Long labels', SCOPE), asMenu({ by: 'keyboard' }))
@@ -592,8 +627,9 @@ test.describe('hostile content', () => {
         expect((await boxOf(row)).height).toBe(40)
         const [icon, text, shortcut] = await partsOf(row)
         expect(icon).toEqual({ width: 14, cut: false, inside: true })
-        expect(text?.cut, 'the label is not cut').toBe(true)
-        expect(shortcut).toEqual({ width: 56, cut: false, inside: true })
+        expect(text?.cut, 'the label is cut').toBe(true)
+        // The label alone is wider than the row, so the shortcut has given up all but its 16 px of padding.
+        expect(shortcut).toEqual({ width: 16, cut: true, inside: true })
       }
       // The string itself is bounded too: 100 characters of the 300.
       expect(await rowsOf(menu).first().locator('span.min-w-0').evaluate((span) => span.textContent.length)).toBe(100)
@@ -614,9 +650,11 @@ test.describe('hostile content', () => {
       const [go, goShortcut] = await partsOf(rowsOf(menu).first())
       expect(go).toEqual({ width: 18, cut: false, inside: true })
       expect(goShortcut).toEqual({ width: cap, cut: true, inside: true })
+      // Beside a label that needs the room, the shortcut gives way under its cap and the label is whole.
       const [text, shortcut] = await partsOf(rowsOf(menu).nth(1))
-      expect(shortcut).toEqual({ width: cap, cut: true, inside: true })
-      expect(text?.width, 'px left to the label').toBeGreaterThanOrEqual(96)
+      expect(text?.cut, 'the label is cut').toBe(false)
+      expect(shortcut?.cut, 'the shortcut is cut').toBe(true)
+      expect(shortcut?.width, 'px left to the shortcut').toBeLessThan(cap)
     })
   }
 
@@ -825,6 +863,33 @@ test.describe('a larger text', () => {
     const cut = await menu.evaluate((el) => [...el.querySelectorAll('span')].filter((span) => span.scrollWidth > span.clientWidth + 1).length)
     expect(cut, 'labels and shortcuts wider than their box').toBe(0)
   })
+
+  // WCAG 1.4.4: the name of a row is what a reader needs, its shortcut a hint, so the hint gives way first.
+  for (const [width, height] of [[320, 480], [390, 844]] as const) {
+    for (const [demo, direction, name] of [
+      ['dropdown--basic', 'ltr', 'Actions'], ['dropdown--basic', 'rtl', 'Actions'], ['dropdown--rtl', 'rtl', 'الإجراءات'],
+    ] as const) {
+      test(`${String(width)} x ${String(height)} ${demo} ${direction} with the root at 32 px: a label is cut only once its shortcut has given all its room`, async ({ page }) => {
+        await page.setViewportSize({ width, height })
+        await openLive(page, demo, { direction })
+        await page.addStyleTag({ content: 'html { font-size: 32px }' })
+        const menu = await openOverlay(page, triggerOf(page, name), asMenu())
+        await expectNoSidewaysScroll(page)
+        const rows = await rowsOf(menu).evaluateAll((all) => all.flatMap((row) => {
+          const [text, hint] = [row.querySelector('span.min-w-0'), row.querySelector('span.font-mono')]
+          if (!text || !hint) return []
+          return [{ text: text.textContent, cut: text.scrollWidth > text.clientWidth, hint: Math.round(hint.getBoundingClientRect().width) }]
+        }))
+        expect(rows.length, 'rows with a shortcut').toBeGreaterThan(0)
+        for (const row of rows) {
+          if (row.cut) expect(row.hint, `the shortcut beside the cut label "${row.text}"`).toBe(32)
+        }
+        // Measured cut at 44 of 79 px beside a whole shortcut before; the Arabic label alone is wider than a 320 px row.
+        const whole = demo === 'dropdown--basic' || width === 390
+        if (whole) expect(rows.filter((row) => row.cut)).toEqual([])
+      })
+    }
+  }
 
   // WCAG 1.4.12: the four spacings a reader may set, all at once.
   test('320 x 480 with the text spacing of WCAG 1.4.12: no label and no shortcut is cut, and nothing scrolls sideways', async ({ page }) => {
@@ -1122,7 +1187,7 @@ test('the stylesheet already holds the classes of a menu nothing has rendered ye
   expect(styles).toEqual({
     minWidth: '192px', maxWidth: '320px', maxHeight: '280px', padding: '6px', gap: '2px', radius: '12px', edge: '1px',
     raised: true, wrap: 'anywhere', scrolls: 'auto contain', layer: '60',
-    row: '40px 14px 12px 8px 8px default none 0', shortcut: '12px 160px 16px 0 ellipsis', line: '4px 1px 0',
+    row: '40px 14px 12px 8px 8px default none 0', shortcut: '12px 160px 16px 10000 ellipsis', line: '4px 1px 0',
   })
 })
 

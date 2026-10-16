@@ -54,6 +54,13 @@ describe('the box and the trigger', () => {
     expect(ruleOf(`${selectorOf('data-placeholder:text-muted')}[data-placeholder]`)).toBe('color: var(--tc-muted);')
     expect(ruleOf(`${selectorOf('data-readonly:bg-neutral-soft')}[data-readonly]`)).toBe('background-color: var(--tc-neutral-soft);')
   })
+
+  it('in forced colours, which drop the fill, a read-only trigger has a dashed line instead', () => {
+    const cls = 'forced-colors:data-readonly:border-dashed'
+    expect(SELECT_TRIGGER.split(' ')).toContain(cls)
+    expect(ruleOf(`${selectorOf(cls)}[data-readonly]`)).toBe('--tw-border-style: dashed; border-style: dashed;')
+    expect(mediaOf(`${selectorOf(cls)}[data-readonly]`)).toBe('@media (forced-colors: active)')
+  })
 })
 
 describe('the popup', () => {
@@ -62,9 +69,13 @@ describe('the popup', () => {
     expect(ruleOf(`${selectorOf('data-anchor-hidden:invisible')}[data-anchor-hidden]`)).toBe('visibility: hidden;')
   })
 
-  it('is at least as wide as its trigger, and never wider than the room Base UI measured', () => {
-    expect(ruleOf(selectorOf('min-w-(--anchor-width)'))).toBe('min-width: var(--anchor-width);')
-    expect(ruleOf(selectorOf('max-w-(--available-width)'))).toBe('max-width: var(--available-width);')
+  it('is as wide as its trigger when there is room, and never wider than the room, in whole pixels, as Base UI places it', () => {
+    expect(SELECT_POPUP.split(' ')).toEqual(expect.arrayContaining([
+      'min-w-[min(var(--anchor-width),round(down,var(--available-width),1px))]', 'max-w-[round(down,var(--available-width),1px)]',
+    ]))
+    expect(ruleOf(selectorOf('min-w-[min(var(--anchor-width),round(down,var(--available-width),1px))]')))
+      .toBe('min-width: min(var(--anchor-width), round(down, var(--available-width), 1px));')
+    expect(ruleOf(selectorOf('max-w-[round(down,var(--available-width),1px)]'))).toBe('max-width: round(down, var(--available-width), 1px);')
   })
 
   it('is never taller than the room either, its line included, so it stays 8 px from the screen\'s edge', () => {

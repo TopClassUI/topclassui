@@ -47,10 +47,10 @@ function hooksByPart(source: string): Record<string, string[]> {
 }
 
 describe('the folder holds what Select needs and nothing else (R-8.1-1)', () => {
-  it('a hook.ts, and no boundaries, lib, variants or skeleton: the one bound is the shared COLLECTION_BOUNDARIES', () => {
+  it('a hook.ts and its lib.ts, and no boundaries, variants or skeleton: the one bound is the shared COLLECTION_BOUNDARIES', () => {
     expect(readdirSync(FOLDER).sort()).toEqual([
-      'README.md', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'meta.ts', 'schema.ts',
-      'test', 'types.ts',
+      'README.md', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'lib.ts', 'meta.ts',
+      'schema.ts', 'test', 'types.ts',
     ])
   })
 })
@@ -115,11 +115,11 @@ describe('hook.ts holds the value, the labels and the locale of the portal (R-5.
   it('builds on the shared form value, the Escape guard, the labels and the portal locale', () => {
     expect(importedModules(source)).toEqual([
       'react', '#shared/clamp.js', '#shared/contracts/collection.js', '#shared/overlay.js', '#shared/provider/context.js',
-      '#shared/provider/use-portal-locale.js', '#shared/use-form-value.js', './types.js',
+      '#shared/provider/use-portal-locale.js', '#shared/use-form-value.js', './lib.js', './types.js',
     ])
     expect(hooksByPart(source)).toEqual({
       toPopupSelector: [],
-      useSelect: ['useFormValue', 'useImperativeHandle', 'useId', 'useLabels', 'usePortalLocale'],
+      useSelect: ['useFormValue', 'useImperativeHandle', 'useRef', 'useImperativeHandle', 'useId', 'useLabels', 'usePortalLocale', 'useState', 'useEffect'],
     })
   })
 

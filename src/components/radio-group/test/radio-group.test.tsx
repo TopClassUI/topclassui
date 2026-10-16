@@ -42,9 +42,9 @@ describe('on the server', () => {
     expect(radios(html).map((button) => attr(button, 'aria-checked'))).toEqual(['true', 'false', 'false'])
   })
 
-  it('no value and no default: no radio is checked and none is a tab stop until hydration (choice 35)', () => {
+  it('no value and no default: no radio is checked and the first is the tab stop, as Base UI makes it once hydrated', () => {
     const html = plan()
-    expect(tabStops(html)).toEqual(['-1', '-1', '-1'])
+    expect(tabStops(html)).toEqual(['0', '-1', '-1'])
     expect(radios(html).map((button) => attr(button, 'aria-checked'))).toEqual(['false', 'false', 'false'])
     expect(html).not.toContain('<svg')
   })

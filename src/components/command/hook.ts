@@ -9,7 +9,7 @@ import { usePortalLocale } from '#shared/provider/use-portal-locale.js'
 import { useControllableState } from '#shared/use-controllable-state.js'
 import { COMMAND_BOUNDARIES } from './boundaries.js'
 import { COMMAND_DEFAULTS } from './constants.js'
-import { arrangeCommands, filterCommands, keyOfEntry, matchesShortcut, runsOf } from './lib.js'
+import { arrangeCommands, filterCommands, keyOfEntry, matchesShortcut, runsOf, withActiveRow } from './lib.js'
 import type { CommandHighlight, CommandPanelProps, CommandShellOptions } from './types.js'
 
 /** The shell: the open state, whether the panel has ever been asked for, and the shortcut on the
@@ -50,6 +50,8 @@ export function useCommandPanel(props: CommandPanelProps) {
   const list = useRef(null as HTMLDivElement | null)
   const reveal = useRef(-1)
   const [unit, setUnit] = useState(useCollectionDefaults().estimateRowHeight)
+  // Base UI's index of the highlighted item, by any means, so its row stays mounted when a scroll moves the window.
+  const [active, setActive] = useState(-1)
 
   const filtered = useMemo(() => filterCommands(items, query, getLabel), [items, query, getLabel])
   const arranged = useMemo(() => arrangeCommands(filtered, getKey, getGroup), [filtered, getKey, getGroup])
@@ -77,6 +79,7 @@ export function useCommandPanel(props: CommandPanelProps) {
   })
 
   const onItemHighlighted = useCallback((_value: unknown, details: CommandHighlight) => {
+    setActive(details.index)
     // A pointer highlights what it is over; a query highlights the first row, which a new query scrolls to.
     if (details.reason !== 'keyboard') return
     const row = arranged.rowOfItem[details.index]
@@ -99,8 +102,8 @@ export function useCommandPanel(props: CommandPanelProps) {
     onSelect(item)
   }, [onOpenChange, onSelect])
 
-  const first = collection.rows[0]?.index ?? 0
-  const last = collection.rows.at(-1)?.index ?? -1
+  const windowed = collection.rows.map((row) => row.item)
+  const mounted = collection.virtualized ? withActiveRow(windowed, arranged.entries, arranged.rowOfItem[active] ?? -1) : windowed
   const rows = visibleRows === undefined
     ? undefined
     : clamp(visibleRows, COMMAND_BOUNDARIES.visibleRowsMin, COMMAND_BOUNDARIES.visibleRowsMax)
@@ -118,9 +121,8 @@ export function useCommandPanel(props: CommandPanelProps) {
     select,
     base: arranged.base,
     virtualized: collection.virtualized,
-    runs: runsOf(collection.rows.map((row) => row.item)),
-    before: collection.virtualized ? first : 0,
-    after: collection.virtualized ? arranged.entries.length - last - 1 : 0,
+    runs: runsOf(mounted),
+    total: arranged.entries.length,
     listRef: ref,
     // Left out, the --tc-list-rows knob applies: React writes no style for an undefined value.
     rows,

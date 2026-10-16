@@ -1,6 +1,6 @@
 // R-5.12-4: one class string per element Drawer styles, built from the shared overlay constants.
 import {
-  ACTIONS_WRAP, FADE_MOTION, FOCUS_RING_INSET, FORCED_EDGE, HOVER, ICON_BUTTON, SCRIM, SCROLL_AREA,
+  ACTIONS_WRAP, FADE_MOTION, FOCUS_RING_INSET, FORCED_EDGE, HOVER, ICON_BUTTON, SCRIM, SCROLL_AREA, SLIDE_MOTION,
 } from '#shared/classes.js'
 import type { Size } from '#shared/contracts/size.js'
 import type { DrawerPlacement } from './types.js'
@@ -24,17 +24,13 @@ export const DRAWER_VIEWPORT_EDGE = {
  * 80 px of sheet for 40 px of finger. A mouse that drags the sheet by its header selects no text. */
 export const DRAWER_FOLLOW = 'transform-[translate(var(--drawer-swipe-movement-x,0px),var(--drawer-swipe-movement-y,0px))] data-swiping:select-none'
 
-/** The slide. Not SLIDE_MOTION: that one eases the translate property, and the sheet moves by
- * transform. Base UI switches the transition off itself, inline, for as long as a finger holds the sheet. */
-export const DRAWER_MOTION = 'transition-transform duration-(--tc-duration-slow) ease-out'
-
 /** A column on the raised surface. It scrolls itself only where its bars leave the body no room,
  * breaks a word too long for its width, and draws its ring inside its box: three of its edges are
  * the edges of the screen. */
 export const DRAWER_POPUP = [
   'relative flex flex-col bg-surface-raised text-body shadow-lg wrap-anywhere',
   DRAWER_FOLLOW,
-  DRAWER_MOTION,
+  SLIDE_MOTION,
   SCROLL_AREA,
   FOCUS_RING_INSET,
 ].join(' ')

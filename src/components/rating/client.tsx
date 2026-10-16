@@ -28,6 +28,7 @@ export function RatingField({
               ref={index === 0 ? field.watchForm : undefined}
               type="radio"
               name={field.name}
+              form={field.form}
               value={step}
               checked={field.checked === step}
               onChange={field.select}

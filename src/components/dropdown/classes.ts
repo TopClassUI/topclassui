@@ -51,10 +51,10 @@ export const DROPDOWN_ITEM_TONE = {
 /** The icon keeps its size while a long label gives way. */
 export const DROPDOWN_ICON = 'inline-flex shrink-0'
 
-/** At the end of the row. It never gives way to a long label; one past 10rem, or past half the room
- * Base UI measured, is cut. A length and not a share of the row: a share would cut a short row's own.
- * Muted at rest, and the colour of its row once that is highlighted, which forced colours repaint. */
-export const DROPDOWN_SHORTCUT = 'ms-auto max-w-[min(calc(var(--spacing)*40),calc(var(--available-width)/2))] shrink-0 truncate ps-4 font-mono text-xs text-muted group-data-highlighted:text-inherit'
+/** At the end of the row, never past 10rem or half the room Base UI measured. Where the row is short (a
+ * phone, a doubled text size) it gives way first, ten thousand times faster than the label, so the name
+ * of the row stays whole. Muted at rest, the colour of its row once that is highlighted. */
+export const DROPDOWN_SHORTCUT = 'ms-auto max-w-[min(calc(var(--spacing)*40),calc(var(--available-width)/2))] shrink-10000 truncate ps-4 font-mono text-xs text-muted group-data-highlighted:text-inherit'
 
 /** The rows of a group keep the gap the popup gives its own. */
 export const DROPDOWN_GROUP = 'flex shrink-0 flex-col gap-0.5'
