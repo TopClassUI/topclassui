@@ -60,7 +60,7 @@ describe('toast.add, with nothing but TopClassProvider mounted', () => {
     await shown('Invitation sent')
     const box = roots()[0]?.firstElementChild
     expect(box?.tagName).toBe('SPAN')
-    expect(box?.className).toBe('flex h-5 shrink-0 items-center text-success-on-soft')
+    expect(box?.className).toBe('col-start-1 row-start-1 me-3 flex h-5 shrink-0 items-center @max-3xs:mb-2 text-success-on-soft')
     expect(box?.querySelector('svg')?.getAttribute('class')).toBe('inline-block shrink-0')
   })
 })
@@ -133,6 +133,16 @@ describe('the limit, the x and the list', () => {
       expect(x?.getAttribute('aria-hidden')).toBe('false')
     }
     expect([...(roots()[1]?.querySelectorAll('button') ?? [])].map((b) => b.getAttribute('aria-label') ?? b.textContent)).toEqual(['Undo', 'Dismiss this notification'])
+  })
+
+  it('lays the action beside the text, not inside it, so a narrow toast can give it the full width (TOAST-4)', async () => {
+    render(app())
+    act(() => { toast.add({ title: 'Storage almost full', action: { label: 'Manage storage', onClick: () => undefined } }) })
+    await shown('Storage almost full')
+    const root = roots()[0]
+    const action = screen.getByRole('button', { name: 'Manage storage' })
+    expect(action.parentElement).toBe(root)
+    expect([...(root?.children ?? [])].map((child) => child.tagName)).toEqual(['DIV', 'BUTTON', 'BUTTON'])
   })
 
   it('leaves a high toast readable while it is not focused, since its tab stop, action and x stay (TOAST-2)', async () => {

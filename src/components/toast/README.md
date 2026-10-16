@@ -51,7 +51,8 @@ export function SaveButton() {
   `bottom-end` by default: the bottom right in English, the bottom left in Arabic. The
   newest toast is the nearest the edge. Three show at once; the next appears when one closes.
 - **The x.** Every toast ends with one, and nothing removes it: a swipe is a drag, and a
-  drag needs a second way (WCAG 2.5.7).
+  drag needs a second way (WCAG 2.5.7). It stays on the screen while any of its toast shows, even a
+  toast taller than the screen. A finger cannot scroll that toast, so keep the text short.
 - **Swipe.** Toward the block edge, and toward the inline edge the toast sits at, closes it.
   A centered toast has no sideways swipe.
 - **Keyboard.** F6 moves focus to the toasts. Tab goes to the toast, its action, its x, then
