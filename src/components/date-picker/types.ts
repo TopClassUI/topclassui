@@ -73,8 +73,11 @@ export interface DateFormats {
 }
 
 /** What the hook of the trigger reads. */
-export type DatePickerStateProps = Pick<DatePickerProps, 'value' | 'defaultValue' | 'onValueChange' | 'onOpenChange' | 'placeholder'
-  | 'minDate' | 'maxDate' | 'required' | 'aria-describedby'>
+export type DatePickerStateProps = Pick<DatePickerProps, 'value' | 'defaultValue' | 'onValueChange' | 'open' | 'defaultOpen' | 'onOpenChange'
+  | 'placeholder' | 'minDate' | 'maxDate' | 'required' | 'aria-describedby'>
+
+/** What Base UI hands the root's onOpenChange, which the hook reads for a cancel. */
+export type DatePickerChangeDetails = Base.Root.ChangeEventDetails
 
 /** What the trigger hands the calendar part, which loads on the first open. */
 export interface DatePickerCalendarProps {
@@ -84,6 +87,8 @@ export interface DatePickerCalendarProps {
   firstDayOfWeek: number | undefined
   /** Sets the day, tells the form, and closes the popup. */
   choose: (iso: string) => void
+  /** Tells the trigger the part has mounted, so a close from then on animates it out. */
+  onMount: () => void
   placement: DatePickerPlacement
   /** The root's Escape scope, which the popup writes as data-overlay. */
   scope: string

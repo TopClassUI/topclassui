@@ -212,6 +212,34 @@ test.describe('live: hydration, the lazy calendar and the words of each locale',
     expect(part, 'a second open fetches nothing more').toHaveLength(fetched)
   })
 
+  test('Escape while the calendar is still loading: the part that arrives later shows nothing, takes no focus and leaves no portal', async ({ page }) => {
+    let release = (): void => undefined
+    const held = new Promise<void>((resolve) => { release = resolve })
+    await page.route(/date-picker-calendar/, async (route) => { await held; await route.continue() })
+    await openLive(page, 'date-picker--basic')
+    const button = trigger(page)
+    await button.focus()
+    await page.keyboard.press('Enter')
+    await expect(button).toHaveAttribute('aria-expanded', 'true')
+    await page.keyboard.press('Escape')
+    await expect(button).toHaveAttribute('aria-expanded', 'false')
+    const arrived = page.waitForResponse(/date-picker-calendar/)
+    release()
+    await arrived
+    // The part's icons load after it, then it renders and focuses a frame later: nothing to poll for, so a wait.
+    await page.waitForTimeout(500)
+    expect(await page.locator('[role="dialog"]').count(), 'a calendar mounted after the close').toBe(0)
+    expect(await page.locator('[data-base-ui-portal]:empty').count(), 'Base UI still holds the closed root mounted').toBe(0)
+    await expect(button).toBeFocused()
+    await page.keyboard.press('Enter')
+    await expect(page.locator(POPUP)).toBeVisible()
+    await expect.poll(() => focused(page)).toBe('Tuesday, September 22, 2026')
+    await page.keyboard.press('ArrowRight')
+    await page.keyboard.press('Escape')
+    await expectClosed(page, POPUP)
+    expect(await hiddenValue(page)).toBe('2026-09-22')
+  })
+
   test('a click and Enter each open it with the focus on the chosen day; Escape and Close return it to the trigger', async ({ page }) => {
     await openLive(page, 'date-picker--basic')
     const button = trigger(page)
@@ -318,12 +346,33 @@ test.describe('live: the keys of the grid, the Authoring Practices date picker d
     const popup = await openCalendar(page, trigger(page))
     await press(page, 'PageUp', 'Friday, September 25, 2026')
     await press(page, 'ArrowLeft', 'Friday, September 25, 2026')
-    await expect(popup.getByRole('button', { name: 'Previous month' })).toBeDisabled()
+    await expect(popup.getByRole('button', { name: 'Previous month' })).toHaveAttribute('aria-disabled', 'true')
     const early = day(popup, 'Thursday, September 24, 2026')
     await expect(early).toHaveAttribute('aria-disabled', 'true')
     // The month changed under the pointer: the opacity transition of the new cells is let finish.
     await expect.poll(() => css(early, 'opacity')).toBe('0.5')
   })
+
+  for (const [button, ends, title] of [['Next month', 'March 2027', 'Previous month'], ['Previous month', 'September 2026', 'Next month']] as const) {
+    test(`${button} pressed into the month at the range's end keeps the focus, is dimmed, and does nothing more`, async ({ page }) => {
+      await openLive(page, 'date-picker--limits')
+      const popup = await openCalendar(page, trigger(page))
+      const month = popup.getByRole('button', { name: button })
+      await press(page, 'Tab', 'Previous month')
+      if (button === 'Next month') await press(page, 'Tab', 'Next month')
+      for (let step = 0; step < 6; step++) await page.keyboard.press('Enter')
+      await expect(popup.getByRole('heading')).toHaveText(ends)
+      await expect(month).toHaveAttribute('aria-disabled', 'true')
+      await expect(month).toBeFocused()
+      await expect.poll(() => css(month, 'opacity')).toBe('0.5')
+      await page.keyboard.press('Enter')
+      await expect(popup.getByRole('heading')).toHaveText(ends)
+      await expect(popup.getByRole('button', { name: title })).not.toHaveAttribute('aria-disabled', 'true')
+      await page.keyboard.press('Escape')
+      await expectClosed(page, POPUP)
+      await expect(trigger(page)).toBeFocused()
+    })
+  }
 
   test('no provider: it opens, formats in English, the popup takes the page\'s direction, and the keys work', async ({ page }) => {
     await openLive(page, 'separator--horizontal')
@@ -509,11 +558,11 @@ test.describe('live: hostile content', () => {
     await expect(trigger(page, 'Outside')).toHaveText('Jan 15, 2030')
     let popup = await openCalendar(page, trigger(page, 'Year one'), 'tap')
     await expect(popup.getByRole('heading')).toHaveText('January 1')
-    await expect(popup.getByRole('button', { name: 'Previous month' })).toBeDisabled()
+    await expect(popup.getByRole('button', { name: 'Previous month' })).toHaveAttribute('aria-disabled', 'true')
     await page.keyboard.press('Escape')
     await expectClosed(page, POPUP)
     popup = await openCalendar(page, trigger(page, 'Year 9999'), 'tap')
-    await expect(popup.getByRole('button', { name: 'Next month' })).toBeDisabled()
+    await expect(popup.getByRole('button', { name: 'Next month' })).toHaveAttribute('aria-disabled', 'true')
     await page.keyboard.press('Escape')
     await expectClosed(page, POPUP)
   })
@@ -611,6 +660,72 @@ test.describe('live: a Dialog around it', () => {
   })
 })
 
+test.describe('live: a month button at the end of the range, and the first load, inside a Dialog and a Drawer', () => {
+  test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
+
+  const LAYERS = [['Dialog', 'Edit booking', 'Two months in the dialog'], ['Drawer', 'Pick a night', 'Two months in the drawer']] as const
+  // A Drawer's sheet carries data-placement too; only the calendar is placed beside a side of its trigger.
+  const CALENDAR = '[role="dialog"][data-side]'
+  const layer = (page: Page) => page.locator('[role="dialog"]:not([data-side])')
+
+  for (const [kind, opener, name] of LAYERS) {
+    for (const by of ['keyboard', 'mouse'] as const) {
+      test(`${kind}, ${by}: Next month into maxDate's month keeps the focus in the calendar, so one Escape closes the calendar alone`, async ({ page }) => {
+        await fixture(page, 'date-picker-in-dialog')
+        await page.getByRole('button', { name: opener }).click()
+        const button = trigger(page, name)
+        const popup = await openOverlay(page, button, { by: 'click', popup: CALENDAR })
+        const next = popup.getByRole('button', { name: 'Next month' })
+        if (by === 'keyboard') {
+          await press(page, 'Tab', 'Previous month')
+          await press(page, 'Tab', 'Next month')
+          await page.keyboard.press('Enter')
+        } else await next.click()
+        await expect(popup.getByRole('heading')).toHaveText('October 2026')
+        await expect(next).toHaveAttribute('aria-disabled', 'true')
+        await expect(next).toBeFocused()
+        await page.keyboard.press('Escape')
+        await expectClosed(page, CALENDAR)
+        await expect(button).toBeFocused()
+        await expect(layer(page), `the Escape closed the ${kind} too`).toBeVisible()
+        await page.keyboard.press('Escape')
+        await expect(layer(page)).toHaveCount(0)
+      })
+    }
+
+    test(`${kind}: Escape while the calendar is still loading closes the calendar alone, and the part that arrives later takes no focus`, async ({ page }) => {
+      let release = (): void => undefined
+      const held = new Promise<void>((resolve) => { release = resolve })
+      await page.route(/date-picker-calendar/, async (route) => { await held; await route.continue() })
+      await fixture(page, 'date-picker-in-dialog')
+      await page.getByRole('button', { name: opener }).click()
+      const button = trigger(page, name)
+      await expect(button).toBeVisible()
+      await button.focus()
+      await page.keyboard.press('Enter')
+      await expect(button).toHaveAttribute('aria-expanded', 'true')
+      await page.keyboard.press('Escape')
+      await expect(button).toHaveAttribute('aria-expanded', 'false')
+      await expect(layer(page), `the Escape closed the ${kind} too`).toBeVisible()
+      const arrived = page.waitForResponse(/date-picker-calendar/)
+      release()
+      await arrived
+      // The part's icons load after it, then it renders and focuses a frame later: nothing to poll for, so a wait.
+      await page.waitForTimeout(500)
+      expect(await page.locator(CALENDAR).count(), 'a calendar mounted after the close').toBe(0)
+      await expect(button).toBeFocused()
+      await page.keyboard.press('ArrowRight')
+      await page.keyboard.press('Enter')
+      await expect(page.locator(CALENDAR)).toBeVisible()
+      await expect.poll(() => focused(page)).toBe('Tuesday, September 22, 2026')
+      await page.keyboard.press('Escape')
+      await expectClosed(page, CALENDAR)
+      await expect(layer(page)).toBeVisible()
+      await expect(button).toHaveText('Sep 22, 2026')
+    })
+  }
+})
+
 test.describe('live: focus, forced colours and motion', () => {
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 
@@ -667,6 +782,35 @@ test.describe('live: focus, forced colours and motion', () => {
         const pixels = await pixelsOf(page, { x: Math.floor(caret.left), y: Math.floor(caret.top), width: Math.ceil(caret.width), height: Math.ceil(caret.height) })
         expect(inkOn(pixels, FORCED_CANVAS[scheme]), 'pixels of the caret at 3:1').toBeGreaterThan(5)
       })
+
+      test('the ring on the focused chosen day is CanvasText, whichever mode the page is pinned to', async ({ page }) => {
+        for (const mode of MODES) {
+          await openLive(page, 'date-picker--basic', { mode })
+          await page.keyboard.press('Tab')
+          await page.keyboard.press('Enter')
+          await expect.poll(() => focused(page), { message: mode }).toBe('Tuesday, September 22, 2026')
+          const chosen = page.locator(':focus')
+          expect(await css(chosen, 'outline-color'), mode).toBe(await resolve(page, 'CanvasText'))
+          const box = await boxOf(chosen)
+          const ring = await pixelsOf(page, { x: Math.floor(box.left) - 4, y: Math.round(box.top + box.height / 2), width: 2, height: 1 })
+          expect(inkOn(ring, FORCED_CANVAS[scheme]), `${mode}: ring pixels at 3:1 on Canvas`).toBe(2)
+        }
+      })
+    })
+  }
+
+  for (const mode of MODES) {
+    test(`${mode}: the chosen day is told by more than its fill, an edge at 3:1 on the surface and a heavier weight`, async ({ page }) => {
+      await openLive(page, 'date-picker--basic', { mode })
+      const popup = await openCalendar(page, trigger(page))
+      await atRest(popup)
+      await press(page, 'ArrowRight', 'Wednesday, September 23, 2026')
+      const chosen = day(popup, 'Tuesday, September 22, 2026')
+      const [box, frame] = [await boxOf(chosen), await boxOf(popup)]
+      const [surface = FORCED_CANVAS.light] = await pixelsOf(page, { x: Math.round(frame.left + 8), y: Math.round(frame.bottom - 8), width: 1, height: 1 })
+      const edge = await pixelsOf(page, { x: Math.floor(box.left), y: Math.round(box.top + box.height / 2), width: 2, height: 1 })
+      expect(Math.max(...edge.map((pixel) => contrast(pixel, surface))), 'the edge of the chosen day on the surface').toBeGreaterThanOrEqual(3)
+      expect([await css(chosen, 'font-weight'), await css(day(popup, 'Monday, September 21, 2026'), 'font-weight')]).toEqual(['500', '400'])
     })
   }
 
@@ -681,16 +825,38 @@ test.describe('live: focus, forced colours and motion', () => {
     await reduced.close()
   })
 
-  test('text zoom: at a root of 32 px the open calendar at 320 px scrolls itself, stays on screen, and nothing in it scrolls sideways', async ({ page }) => {
-    await page.setViewportSize({ width: 320, height: 640 })
-    await openLive(page, 'date-picker--basic')
-    await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
-    const popup = await openCalendar(page, trigger(page))
-    await atRest(popup)
-    await expectInsideViewport(popup, 'the calendar', 8)
-    await expectNothingSideways(popup)
-    await expectNoSidewaysScroll(page)
-  })
+  /** Each day whose digits leave under 2 px to the next day's, measured as laid out: closer, "10" and "11" read as one number. */
+  const spilledDays = (popup: Locator) => popup.locator('tbody button').evaluateAll((all) => all.filter((el) => {
+    const text = document.createRange()
+    text.selectNodeContents(el)
+    return text.getBoundingClientRect().width + 2 > el.getBoundingClientRect().width
+  }).map((el) => el.textContent))
+
+  for (const direction of DIRECTIONS) {
+    for (const digits of ['Latin', 'Arabic-Indic'] as const) {
+      test(`text zoom, ${direction}, ${digits} digits: at a root of 32 px the open calendar at 320 px scrolls itself, stays on screen, and no day outgrows its button`, async ({ page }) => {
+        await page.setViewportSize({ width: 320, height: 640 })
+        if (digits === 'Latin') await openLive(page, 'date-picker--basic', { direction })
+        else await fixture(page, 'date-picker-hostile', { direction })
+        await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
+        const popup = await openCalendar(page, digits === 'Latin' ? trigger(page) : trigger(page, 'Arabic digits'))
+        await atRest(popup)
+        await expectInsideViewport(popup, 'the calendar', 8)
+        await expectNothingSideways(popup)
+        await expectNoSidewaysScroll(page)
+        expect(await spilledDays(popup), 'days whose digits run past their button').toEqual([])
+      })
+    }
+
+    test(`${direction}: at the normal root the popup keeps the 16 px it is drawn with on a 320 px phone, and its days are as wide as their columns`, async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 640 })
+      await openLive(page, 'date-picker--basic', { direction })
+      const popup = await openCalendar(page, trigger(page))
+      await atRest(popup)
+      const chosen = await boxOf(popup.locator('tbody button[data-selected]'))
+      expect([await css(popup, 'padding'), (await boxOf(popup)).width, Math.round(chosen.width)]).toEqual(['16px', 280, 35])
+    })
+  }
 })
 
 /** axe on the demo and on the portal its calendar opens in. Base UI's focus guards are aria-hidden and focusable on

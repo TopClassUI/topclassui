@@ -69,6 +69,71 @@ describe('a disabled row and a press', () => {
   })
 })
 
+/** Where the tree was asked to scroll: the label of each row scrollIntoView was called on. */
+const scrolls = () => {
+  const spy = vi.spyOn(Element.prototype, 'scrollIntoView')
+  return () => spy.mock.contexts.map((row) => (row as Element).textContent)
+}
+
+describe('a press brings the focus and never scrolls the tree; a key or a script still does', () => {
+  const OPEN = { items: ITEMS, defaultExpanded: ['a', 'e'], defaultValue: 'f' }
+
+  it('a press off a row (the padding, the scrollbar, a disabled row) highlights none and scrolls nothing', () => {
+    render(<TreeView aria-label="Fruit" {...OPEN} />)
+    const asked = scrolls()
+    fireEvent.pointerDown(tree(), { pointerType: 'mouse' })
+    act(() => { tree().focus() })
+    fireEvent.pointerUp(tree(), { pointerType: 'mouse' })
+    expect([active(), asked()]).toEqual([null, []])
+    expect(selected()).toEqual(['Fig'])
+  })
+
+  it('a press on a row highlights that row and scrolls nothing, even with the selected row elsewhere', () => {
+    render(<TreeView aria-label="Fruit" {...OPEN} />)
+    const asked = scrolls()
+    fireEvent.pointerDown(screen.getByRole('treeitem', { name: 'Banana' }), { pointerType: 'mouse' })
+    act(() => { tree().focus() })
+    expect([active(), asked()]).toEqual(['Banana', []])
+  })
+
+  it('a finger that scrolled the tree leaves no press behind: the next Tab highlights the selected row and brings it in', async () => {
+    render(<TreeView aria-label="Fruit" {...OPEN} />)
+    const asked = scrolls()
+    fireEvent.pointerDown(screen.getByRole('treeitem', { name: 'Banana' }), { pointerType: 'touch' })
+    fireEvent.pointerCancel(screen.getByRole('treeitem', { name: 'Banana' }), { pointerType: 'touch' })
+    await userEvent.tab()
+    expect([active(), asked()]).toEqual(['Fig', ['Fig']])
+  })
+
+  it('a mouse that lifted with no focus leaves no press behind', async () => {
+    render(<TreeView aria-label="Fruit" {...OPEN} />)
+    fireEvent.pointerDown(screen.getByRole('treeitem', { name: 'Banana' }), { pointerType: 'mouse' })
+    fireEvent.pointerUp(screen.getByRole('treeitem', { name: 'Banana' }), { pointerType: 'mouse' })
+    await userEvent.tab()
+    expect(active()).toBe('Fig')
+  })
+
+  it('a tap focuses after the finger lifts, and still highlights the row tapped with no scroll', () => {
+    render(<TreeView aria-label="Fruit" {...OPEN} />)
+    const asked = scrolls()
+    const banana = screen.getByRole('treeitem', { name: 'Banana' })
+    fireEvent.pointerDown(banana, { pointerType: 'touch' })
+    fireEvent.pointerUp(banana, { pointerType: 'touch' })
+    act(() => { tree().focus() })
+    fireEvent.click(banana)
+    expect([active(), asked(), selected()]).toEqual(['Banana', [], ['Banana']])
+  })
+
+  it('leaving the tree drops a press that brought no focus', async () => {
+    render(<TreeView aria-label="Fruit" {...OPEN} />)
+    await userEvent.tab()
+    fireEvent.pointerDown(screen.getByRole('treeitem', { name: 'Banana' }), { pointerType: 'pen' })
+    await userEvent.tab()
+    await userEvent.tab({ shift: true })
+    expect(active()).toBe('Fig')
+  })
+})
+
 /** Ten folders of a hundred files, all open: windowed. */
 const big = Array.from({ length: 10 }, (_, folder) => ({
   id: `f${String(folder)}`,

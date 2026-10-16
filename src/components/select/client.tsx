@@ -12,7 +12,7 @@ import {
   SELECT_ICON, SELECT_ITEM, SELECT_ITEM_TEXT, SELECT_ITEM_TICK, SELECT_LIST, SELECT_POPUP, SELECT_POSITIONER, SELECT_ROOT,
   SELECT_TRIGGER, SELECT_VALUE,
 } from './classes.js'
-import { SELECT_DEFAULTS } from './constants.js'
+import { SELECT_DEFAULTS, SELECT_SIDE_COLLISION_AVOIDANCE } from './constants.js'
 import { useSelect } from './hook.js'
 import type { SelectProps } from './types.js'
 
@@ -35,10 +35,14 @@ export function Select({
   id, name, form, autoComplete, required, readOnly, disabled, modal, highlightItemOnHover,
   open, defaultOpen, onOpenChangeComplete, actionsRef,
   className,
+  ref,
   'aria-invalid': ariaInvalid,
   ...rest
 }: SelectProps) {
-  const select = useSelect({ value, defaultValue, onValueChange, onOpenChange, inputRef, visibleRows, placeholder })
+  const select = useSelect({
+    value, defaultValue, onValueChange, onOpenChange, inputRef, visibleRows, placeholder, ref,
+    'aria-label': rest['aria-label'], 'aria-labelledby': rest['aria-labelledby'],
+  })
   const { side, align } = toSideAlign(placement)
   // Base UI never gets a default: the hook holds the value, so a form reset can bring it back.
   return (
@@ -55,6 +59,7 @@ export function Select({
       <span className={cn(SELECT_ROOT, FIELD_TEXT[size], fullWidth && FIELD_HOLDER_FULL)}>
         <Base.Trigger
           {...rest}
+          ref={select.triggerRef}
           // A Field passes aria-invalid itself, so it survives when `invalid` is off.
           aria-invalid={invalid ? true : ariaInvalid}
           data-size={size}
@@ -72,11 +77,17 @@ export function Select({
           align={align}
           sideOffset={POPUP_BOUNDS.sideOffset}
           collisionPadding={POPUP_BOUNDS.collisionPadding}
+          collisionAvoidance={side === 'top' || side === 'bottom' ? undefined : SELECT_SIDE_COLLISION_AVOIDANCE}
           alignItemWithTrigger={false}
           className={SELECT_POSITIONER}
         >
           <Base.Popup data-select={select.scope} data-placement={placement} className={SELECT_POPUP}>
-            <Base.List className={SELECT_LIST} style={{ '--tc-list-rows': select.rows }}>
+            <Base.List
+              aria-label={select.listLabel}
+              aria-labelledby={select.listLabelledBy}
+              className={SELECT_LIST}
+              style={{ '--tc-list-rows': select.rows }}
+            >
               {items.map((item) => (
                 <Base.Item key={item.value} value={item.value} label={item.label} disabled={item.disabled} className={SELECT_ITEM}>
                   <Base.ItemText className={SELECT_ITEM_TEXT}>{item.label}</Base.ItemText>

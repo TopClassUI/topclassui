@@ -9,8 +9,9 @@ const html = (props: ProgressDesignProps = {}) => markup(<Progress aria-label="U
 /** The whole default render, written out, so an extra attribute or element also fails. */
 const DEFAULT = '<div aria-label="Upload" role="progressbar" aria-valuemin="0" aria-valuemax="100"'
   + ' aria-valuenow="0" data-tone="primary" data-size="md" style="--tc-progress-value:0%"'
-  + ' class="w-full overflow-hidden rounded-control bg-neutral-soft forced-color-adjust-none h-pad-y-md">'
-  + '<div class="h-full rounded-control w-(--tc-progress-value) bg-primary-solid"></div></div>'
+  + ' class="w-full overflow-hidden rounded-control bg-neutral-soft outline-solid outline-(length:--tc-line-width)'
+  + ' outline-line-strong forced-color-adjust-none forced-colors:bg-[Canvas] forced-colors:outline-[CanvasText] h-pad-y-md">'
+  + '<div class="h-full rounded-control forced-colors:bg-[CanvasText] w-(--tc-progress-value) bg-primary-on-soft"></div></div>'
 
 describe('the element it renders', () => {
   it('is a track div holding exactly one bar div, and nothing else', () => {

@@ -9,14 +9,14 @@ const html = (props: ProgressDesignProps = {}) => markup(<Progress aria-label="U
 const bar = (props: ProgressDesignProps = {}) =>
   (/<div class="([^"]*)"><\/div><\/div>$/.exec(html(props))?.[1] ?? '').split(/\s+/).filter(Boolean).sort()
 
-/** The fill each tone paints, written out: a derived one would shrink with BAR_FILL. */
+/** The fill each tone paints, written out: a derived one would shrink with BAR_FILL. The text colour, 3:1 on the track. */
 const FILL = {
-  primary: 'bg-primary-solid',
-  neutral: 'bg-neutral-solid',
-  success: 'bg-success-solid',
-  warning: 'bg-warning-solid',
-  danger: 'bg-danger-solid',
-  info: 'bg-info-solid',
+  primary: 'bg-primary-on-soft',
+  neutral: 'bg-neutral-on-soft',
+  success: 'bg-success-on-soft',
+  warning: 'bg-warning-on-soft',
+  danger: 'bg-danger-on-soft',
+  info: 'bg-info-on-soft',
 } as const
 
 describe('every tone paints its bar and nothing else', () => {
@@ -26,12 +26,12 @@ describe('every tone paints its bar and nothing else', () => {
 
   for (const tone of ['primary', 'neutral', 'success', 'warning', 'danger', 'info'] as const) {
     it(`${tone} gives the bar exactly its fill and the bar's own classes`, () => {
-      expect(bar({ tone }), tone).toEqual([FILL[tone], 'h-full', 'rounded-control', 'w-(--tc-progress-value)'])
+      expect(bar({ tone }), tone).toEqual([FILL[tone], 'forced-colors:bg-[CanvasText]', 'h-full', 'rounded-control', 'w-(--tc-progress-value)'])
     })
 
     it(`${tone} keeps its fill when indeterminate`, () => {
       expect(bar({ tone, indeterminate: true }), tone).toEqual([
-        'animate-pulse', FILL[tone], 'h-full', 'motion-reduce:animate-none', 'rounded-control', 'w-1/3',
+        'animate-pulse', FILL[tone], 'forced-colors:bg-[CanvasText]', 'h-full', 'motion-reduce:animate-none', 'rounded-control', 'w-1/3',
       ])
     })
 

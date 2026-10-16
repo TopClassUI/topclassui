@@ -58,12 +58,18 @@ const DECLARATION: Record<string, string> = {
   'shrink-0': 'flex-shrink: 0;',
   'cursor-default': 'cursor: default;',
   'select-none': 'user-select: none;',
-  'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]': 'min-height: var(--tc-target-coarse,44px);',
+  'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]': 'min-height: max(var(--tc-row-height), var(--tc-target-coarse,44px));',
   'data-highlighted:bg-primary-soft': 'background-color: var(--tc-primary-soft);',
   'data-highlighted:text-primary-on-soft': 'color: var(--tc-primary-on-soft);',
+  // The ring of the highlighted row, inside its edge: the fill alone is under 3:1 against the menu.
+  'data-highlighted:outline-solid': 'outline-style: solid;',
+  'data-highlighted:outline-(length:--tc-ring-width)': 'outline-width: var(--tc-ring-width);',
+  'data-highlighted:-outline-offset-(length:--tc-ring-width)': 'outline-offset: calc(var(--tc-ring-width) * -1);',
+  'data-highlighted:outline-ring': 'outline-color: var(--tc-ring);',
   'forced-colors:data-highlighted:forced-color-adjust-none': 'forced-color-adjust: none;',
   'forced-colors:data-highlighted:bg-[Highlight]': 'background-color: Highlight;',
   'forced-colors:data-highlighted:text-[HighlightText]': 'color: HighlightText;',
+  'forced-colors:data-highlighted:outline-[HighlightText]': 'outline-color: HighlightText;',
   // A disabled row: what it holds is dimmed, and forced colours take the grey of the system.
   'data-disabled:pointer-events-none': 'pointer-events: none;',
   'data-disabled:*:opacity-50': 'opacity: 50%;',
@@ -76,6 +82,7 @@ const DECLARATION: Record<string, string> = {
   // The icon and the shortcut.
   'inline-flex': 'display: inline-flex;',
   'ms-auto': 'margin-inline-start: auto;',
+  'shrink-10000': 'flex-shrink: 10000;',
   'max-w-[min(calc(var(--spacing)*40),calc(var(--available-width)/2))]': 'max-width: min(calc(var(--spacing) * 40), calc(var(--available-width) / 2));',
   'truncate': 'text-overflow: ellipsis;',
   'ps-4': 'padding-inline-start: calc(var(--spacing) * 4);',
@@ -102,15 +109,19 @@ const SCOPE: Record<string, string> = {
   'data-highlighted:text-danger-on-soft': '[data-highlighted] {',
   'data-disabled:pointer-events-none': '[data-disabled] {',
   'forced-colors:data-highlighted:bg-[Highlight]': '[data-highlighted] {',
+  'data-highlighted:outline-solid': '[data-highlighted] {',
+  'data-highlighted:outline-ring': '[data-highlighted] {',
+  'forced-colors:data-highlighted:outline-[HighlightText]': '[data-highlighted] {',
   'forced-colors:data-disabled:not-data-highlighted:text-[GrayText]': '[data-disabled]:not([data-highlighted]) {',
 }
 
 /** The classes Tailwind wraps from outside, and the query that must open just before the selector. */
 const WRAPPED: Record<string, string> = {
-  'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]': '@media (pointer: coarse) { ',
+  'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]': '@media (pointer: coarse) { ',
   'forced-colors:data-highlighted:forced-color-adjust-none': '@media (forced-colors: active) { ',
   'forced-colors:data-highlighted:bg-[Highlight]': '@media (forced-colors: active) { ',
   'forced-colors:data-highlighted:text-[HighlightText]': '@media (forced-colors: active) { ',
+  'forced-colors:data-highlighted:outline-[HighlightText]': '@media (forced-colors: active) { ',
   'forced-colors:data-disabled:not-data-highlighted:text-[GrayText]': '@media (forced-colors: active) { ',
 }
 
@@ -148,7 +159,7 @@ describe('every class an open Dropdown wears compiles with the installed Tailwin
       DROPDOWN_SHORTCUT, DROPDOWN_GROUP, DROPDOWN_GROUP_LABEL, DROPDOWN_SEPARATOR,
     ])
     expect(all).toEqual([...Object.keys(DECLARATION), 'group'].sort())
-    expect(all).toHaveLength(71)
+    expect(all).toHaveLength(77)
   })
 
   it('group emits nothing of its own: it only marks the row for the shortcut inside it', async () => {

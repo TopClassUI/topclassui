@@ -69,6 +69,13 @@ test.describe('the five sizes, on the static page', () => {
       expect(await page.locator('#demo input[type="text"]').evaluateAll((all) => all.map((el) => getComputedStyle(el).fontSize))).toEqual(Array(5).fill('16px'))
     })
 
+    test('at a root of 10 px the text typed into is still 16 px at every size, and each field an Input wide', async ({ page }) => {
+      await page.goto(urlFor('number-field--sizes', 'light', 'ltr'))
+      await page.evaluate(() => { document.documentElement.style.fontSize = '10px' })
+      expect(await page.locator('#demo input[type="text"]').evaluateAll((all) => all.map((el) => getComputedStyle(el).fontSize))).toEqual(Array(5).fill('16px'))
+      expect(Object.values(await shapes(page)).map(({ field }) => field[0])).toEqual(Array(5).fill(220.8))
+    })
+
     test('number-field--row at 320 px: the two fields are 124 px each and the page does not scroll sideways', async ({ page }) => {
       await page.setViewportSize({ width: 320, height: 480 })
       await page.goto(urlFor('number-field--row', 'light', 'ltr'))
@@ -95,6 +102,19 @@ test.describe('the look of each state, on the static page', () => {
     await page.goto(urlFor('number-field--states', 'light', 'ltr'))
     const group = groupOf(input(page, 'Disabled'))
     expect([await css(group, 'opacity'), ...await group.locator('button').evaluateAll((all) => all.map((el) => getComputedStyle(el).opacity))]).toEqual(['0.5', '1', '1'])
+  })
+
+  test('in a disabled fieldset, before any script runs, the field dims as one exactly as the disabled prop dims it', async ({ page }) => {
+    await page.goto(urlFor('number-field--states', 'light', 'ltr'))
+    await groupOf(input(page, 'Empty')).evaluate((group) => {
+      const fieldset = document.createElement('fieldset')
+      fieldset.disabled = true
+      group.parentElement?.before(fieldset)
+      if (group.parentElement) fieldset.append(group.parentElement)
+    })
+    const chain = (name: string) => groupOf(input(page, name)).evaluate((group) => [group, ...group.querySelectorAll('button')].map((el) => getComputedStyle(el).opacity))
+    expect(await chain('Empty')).toEqual(['0.5', '1', '1'])
+    expect(await chain('Disabled')).toEqual(['0.5', '1', '1'])
   })
 
   test('at max in a live field the increase stepper is at 0.5, decrease at 1', async ({ page }) => {
@@ -183,6 +203,33 @@ test.describe('text', () => {
     })
   }
 
+  for (const pointer of ['fine', 'coarse'] as const) {
+    test.describe(`${pointer} pointer`, () => {
+      test.use(pointer === 'coarse' ? COARSE : {})
+
+      for (const direction of DIRECTIONS) {
+        test(`at a root of 32 px, ${direction}: at 320 and 390 px every stepper of the row and of each size is whole inside its field`, async ({ page }) => {
+          for (const width of [320, 390]) {
+            await page.setViewportSize({ width, height: 800 })
+            for (const demo of ['number-field--row', 'number-field--sizes']) {
+              await page.goto(urlFor(demo, 'light', direction))
+              await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
+              const cut = await page.locator('#demo [role="group"]').evaluateAll((groups) => groups.flatMap((group) => {
+                const box = group.getBoundingClientRect()
+                return [...group.querySelectorAll('button')].filter((button) => {
+                  const r = button.getBoundingClientRect()
+                  return r.left < box.left - 0.5 || r.right > box.right + 0.5
+                }).map((button) => `${group.querySelector('input')?.getAttribute('aria-label') ?? ''} ${button.getAttribute('aria-label') ?? ''}`)
+              }))
+              expect(cut, `${demo} at ${String(width)} px`).toEqual([])
+              await expectNoSidewaysScroll(page)
+            }
+          }
+        })
+      }
+    })
+  }
+
   test('WCAG 1.4.12 spacing: the field keeps its size and the label does not overlap it', async ({ page }) => {
     await page.goto(urlFor('number-field--basic', 'light', 'ltr'))
     await page.addStyleTag({ content: '* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-block-end: 2em !important; }' })
@@ -251,6 +298,30 @@ test.describe('live: steppers, typing and the keys', () => {
     await page.keyboard.press('Tab')
     await expect(field).toHaveValue('١٬٢٣٤٫٥')
     expect(await page.locator('input[name="guests"]').inputValue()).toBe('1234.5')
+  })
+
+  test('ar-u-nu-arab: a Latin 1,234 typed on the keyboard is 1234 once the field is left, on screen and in the form, not 1', async ({ page }) => {
+    await openLive(page, 'number-field--rtl', { direction: 'rtl' })
+    const field = input(page, 'عدد الضيوف')
+    await field.click()
+    await field.selectText()
+    await page.keyboard.type('1,234')
+    await expect(field).toHaveValue('1,234')
+    await page.keyboard.press('Tab')
+    await expect(field).toHaveValue('١٬٢٣٤')
+    expect(await page.locator('input[name="guests"]').inputValue()).toBe('1234')
+  })
+
+  test('ar-u-nu-arab: a Latin 1,234 typed and sent with Enter is 1234 in the form while the field keeps the focus, not 1', async ({ page }) => {
+    await openLive(page, 'number-field--rtl', { direction: 'rtl' })
+    const field = input(page, 'عدد الضيوف')
+    await field.click()
+    await field.selectText()
+    await page.keyboard.type('1,234')
+    expect(await page.locator('input[name="guests"]').inputValue()).toBe('1')
+    await page.keyboard.press('Enter')
+    await expect(field).toBeFocused()
+    expect(await page.locator('input[name="guests"]').inputValue()).toBe('1234')
   })
 
   for (const direction of DIRECTIONS) {
@@ -444,6 +515,19 @@ test.describe('live: where a page puts a number field', () => {
     const field = page.getByRole('textbox', { name: 'Wrapped by a label' })
     await expect(field).toBeFocused()
     await expect(field).toHaveValue('12')
+  })
+
+  test('in a disabled fieldset the field dims as one, as an Input beside it does; a stepper at its limit alone dims no box', async ({ page }) => {
+    await fixture(page, 'number-field-fieldset')
+    const chain = (name: string) => groupOf(input(page, name)).evaluate((group) => [group, ...group.querySelectorAll('button')].map((el) => getComputedStyle(el).opacity))
+    expect(await chain('In the fieldset')).toEqual(['0.5', '1', '1'])
+    expect(await chain('At max in the fieldset')).toEqual(['0.5', '1', '1'])
+    expect(await css(input(page, 'An Input in the fieldset'), 'opacity')).toBe('0.5')
+    expect(await chain('Disabled by its prop')).toEqual(['0.5', '1', '1'])
+    expect(await chain('Live at max')).toEqual(['1', '1', '0.5'])
+    await page.getByRole('button', { name: 'Toggle' }).click()
+    await expect.poll(() => chain('In the fieldset')).toEqual(['1', '1', '1'])
+    await expect.poll(() => chain('At max in the fieldset')).toEqual(['1', '1', '0.5'])
   })
 
   for (const direction of DIRECTIONS) {

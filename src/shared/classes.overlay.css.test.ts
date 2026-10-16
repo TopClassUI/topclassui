@@ -91,12 +91,8 @@ describe('motion', () => {
     expect(ruleOf(selectorOf('origin-(--transform-origin)'))).toBe('transform-origin: var(--transform-origin);')
   })
 
-  it('stops the slide while a swipe holds the panel, after the rule that starts it', () => {
-    const slides = css.indexOf(`${selectorOf('transition-[translate,opacity]')} {`)
-    const held = css.indexOf(`${selectorOf('data-swiping:transition-none')}[data-swiping] {`)
-    expect(slides).toBeGreaterThan(-1)
-    expect(held, 'data-swiping:transition-none is not emitted after the transition').toBeGreaterThan(slides)
-    expect(ruleOf(`${selectorOf('data-swiping:transition-none')}[data-swiping]`)).toBe('transition-property: none;')
+  it('slides on the transform properties, the ones Base UI moves a swiped sheet by', () => {
+    expect(ruleOf(selectorOf('transition-transform'))).toContain('transition-property: transform, translate, scale, rotate;')
   })
 })
 
@@ -117,6 +113,19 @@ describe('the highlight of a row', () => {
     expect(query).toBeGreaterThan(fill)
     expect(forcedFill).toBeGreaterThan(query)
     expect(forcedText).toBeGreaterThan(query)
+  })
+
+  it('rings the row Base UI marks, its own width inside its edge, after the reset ROW writes', () => {
+    expect(ruleOf(lit('data-highlighted:outline-solid'))).toContain('outline-style: solid;')
+    expect(ruleOf(lit('data-highlighted:outline-(length:--tc-ring-width)'))).toContain('outline-width: var(--tc-ring-width);')
+    expect(ruleOf(lit('data-highlighted:-outline-offset-(length:--tc-ring-width)'))).toBe('outline-offset: calc(var(--tc-ring-width) * -1);')
+    expect(ruleOf(lit('data-highlighted:outline-ring'))).toBe('outline-color: var(--tc-ring);')
+    expect(css.indexOf(`${lit('data-highlighted:outline-solid')} {`)).toBeGreaterThan(css.indexOf('.outline-none {'))
+  })
+
+  it('draws that ring in HighlightText under forced colours, on the Highlight the row paints itself', () => {
+    const rule = `${lit('forced-colors:data-highlighted:outline-[HighlightText]')} {\n      outline-color: HighlightText;`
+    expect(css.indexOf(rule)).toBeGreaterThan(css.indexOf('@media (forced-colors: active)'))
   })
 
   it('opts the highlighted row out of the adjustment that would lay a backplate under its label', () => {

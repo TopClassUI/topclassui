@@ -1,13 +1,19 @@
 // Pure helpers: no React here, so the arithmetic is tested on its own.
 import { clamp } from '#shared/clamp.js'
 import { METER_BOUNDARIES } from './boundaries.js'
+import { METER_DEFAULTS } from './constants.js'
 
 export interface MeterRange { min: number; max: number; value: number }
 
+/** One end inside the guard rail. clamp() turns NaN into the rail's own -1e15, so a NaN end takes its default. */
+function bound(end: number, fallback: number): number {
+  return clamp(Number.isNaN(end) ? fallback : end, METER_BOUNDARIES.limitMin, METER_BOUNDARIES.limitMax)
+}
+
 /** R-5.7-7: both ends inside the guard rail, `max` raised to `min` when below it, and the value inside the result. */
 export function resolveMeterRange(value: number, min: number, max: number): MeterRange {
-  const low = clamp(min, METER_BOUNDARIES.limitMin, METER_BOUNDARIES.limitMax)
-  const high = Math.max(clamp(max, METER_BOUNDARIES.limitMin, METER_BOUNDARIES.limitMax), low)
+  const low = bound(min, METER_DEFAULTS.min)
+  const high = Math.max(bound(max, METER_DEFAULTS.max), low)
   return { min: low, max: high, value: clamp(value, low, high) }
 }
 

@@ -6,7 +6,7 @@ export const OTP_FIELD_SIZES = SIZES
 /** The zero of each digit range a numeric field reads as 0 to 9: Arabic-Indic (U+0660) and Persian (U+06F0). */
 export const OTP_FIELD_DIGIT_ZEROS = [0x660, 0x6f0] as const
 
-/** Past this many items, cells and separators together, a row cannot shrink enough at 320 px, so it wraps. */
+/** Past this many items, cells and separators together, a row breaks at whole cells, so on a phone each keeps 44 px. */
 export const OTP_FIELD_WRAP_ABOVE = 8
 
 /** Every prop's starting value. A caller overrides any of them by passing the prop. */

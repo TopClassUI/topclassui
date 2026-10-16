@@ -86,6 +86,12 @@ describe('on the server', () => {
     expect(attr(tree(html()), 'style')).not.toContain('--tc-list-rows')
   })
 
+  it('a windowed tree fills the rows its box is drawn to show before anything is measured, up to visibleRows of 20', () => {
+    const many = Array.from({ length: 1000 }, (_, index) => ({ id: `n${String(index)}`, label: `Node ${String(index)}` }))
+    expect(rows(html({ items: many, visibleRows: 20 })).length).toBeGreaterThanOrEqual(20)
+    expect(rows(html({ items: many, visibleRows: 99 })).length).toBeLessThan(40)
+  })
+
   it('status: busy while loading, the note says so outside the tree, and idle writes nothing', () => {
     const note = (out: string) => /<div role="status" class="[^"]*">(.*?)<\/div>/.exec(out)?.[1]
     expect(attr(tree(html({ status: 'loading' })), 'aria-busy')).toBe('true')

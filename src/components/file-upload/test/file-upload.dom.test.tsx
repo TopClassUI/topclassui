@@ -36,6 +36,17 @@ describe('a pick', () => {
     expect(sent()).toEqual(['a.pdf', 'b.pdf'])
   })
 
+  it('a second cut in a row writes the message again as a new node, so the live region is heard again', () => {
+    render(<FileUpload aria-label="Files" maxFiles={2} />)
+    pick([fileOf('a.pdf'), fileOf('b.pdf'), fileOf('c.pdf')])
+    const region = document.querySelectorAll('[role="status"]')[0] as HTMLElement
+    const first = region.firstChild
+    pick([fileOf('d.pdf')])
+    expect([rows(), message()]).toEqual([['a.pdf10 bytes', 'b.pdf10 bytes'], 'Only 2 files allowed'])
+    expect(region.firstChild).not.toBe(first)
+    expect(region.childNodes).toHaveLength(1)
+  })
+
   it('files add up across picks, and the input sends all of them', () => {
     render(<FileUpload aria-label="Files" maxFiles={5} />)
     pick([fileOf('a.pdf')])

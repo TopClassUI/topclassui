@@ -38,8 +38,8 @@ describe('clampLength (R-5.7-7)', () => {
 })
 
 describe('layoutCells', () => {
-  it('no separator by default, and six cells do not wrap', () => {
-    expect(layoutCells(6, 0)).toEqual({ separators: [false, false, false, false, false, false], wraps: false })
+  it('no separator by default, and six cells are not past eight items', () => {
+    expect(layoutCells(6, 0)).toEqual({ separators: [false, false, false, false, false, false], whole: false })
   })
 
   it('a separator after every group but the last', () => {
@@ -53,8 +53,8 @@ describe('layoutCells', () => {
     expect(layoutCells(4, -2).separators).toEqual([false, false, false, false])
   })
 
-  it('more than eight items wrap, separators counted', () => {
-    expect([layoutCells(8, 0).wraps, layoutCells(9, 0).wraps, layoutCells(6, 2).wraps, layoutCells(8, 4).wraps]).toEqual([false, true, false, true])
+  it('more than eight items break at whole cells, separators counted', () => {
+    expect([layoutCells(8, 0).whole, layoutCells(9, 0).whole, layoutCells(6, 2).whole, layoutCells(8, 4).whole]).toEqual([false, true, false, true])
   })
 })
 

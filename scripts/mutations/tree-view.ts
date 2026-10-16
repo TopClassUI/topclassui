@@ -52,7 +52,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the tree view type-ahead never joins letters typed within 500 ms',
     file: HOOK,
-    from: '      const text = now - typed.current.at > TYPEAHEAD_MS ? event.key : typed.current.text + event.key',
+    from: '      const text = typing ? typed.current.text + event.key : event.key',
     to: '      const text = event.key',
   },
   {
@@ -186,5 +186,71 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: "text-muted empty:p-0'",
     to: "text-muted empty:hidden'",
+  },
+  {
+    label: 'a press on the tree view is taken for a key, so a press on a row, the padding or the scrollbar scrolls back to the selected row',
+    file: HOOK,
+    from: '    if (press !== null) {\n      setActive(rows[press]?.node.id ?? null)\n      return\n    }\n',
+    to: '',
+  },
+  {
+    label: 'a finger that scrolls the tree view leaves its press behind, so the next Tab highlights the row it started on',
+    file: HOOK,
+    from: '    props.onPointerCancel?.(event)\n    pressed.current = null\n',
+    to: '    props.onPointerCancel?.(event)\n',
+  },
+  {
+    label: 'a mouse that lifts off the tree view with no focus leaves its press behind',
+    file: HOOK,
+    from: "    if (event.pointerType === 'mouse') pressed.current = null\n",
+    to: '',
+  },
+  {
+    label: 'a finger that lifts off the tree view drops its press before the focus it brings, so a tap scrolls to the selected row',
+    file: HOOK,
+    from: "    if (event.pointerType === 'mouse') pressed.current = null\n",
+    to: '    pressed.current = null\n',
+  },
+  {
+    label: 'leaving the tree view keeps a press that brought no focus',
+    file: HOOK,
+    from: '    pressed.current = null\n    if (event.target === event.currentTarget) setActive(null)\n',
+    to: '    if (event.target === event.currentTarget) setActive(null)\n',
+  },
+  {
+    label: 'a space typed inside a tree view type-ahead selects the row and ends the query',
+    file: HOOK,
+    from: "    if (event.key.length === 1 && (event.key !== ' ' || typing)) {",
+    to: "    if (event.key.length === 1 && event.key !== ' ') {",
+  },
+  {
+    label: 'the tree view never notices a wheel that scrolls the highlighted row out of sight, so the focused tree shows no ring',
+    file: HOOK,
+    from: "    setOutOfView(isScrolledOut(node.querySelector('[data-highlighted]'), node))\n",
+    to: '',
+  },
+  {
+    label: 'the tree view takes a highlighted row scrolled above the box for one in sight',
+    file: LIB,
+    from: '  return box.bottom <= top || box.top >= top + tree.clientHeight',
+    to: '  return box.top >= top + tree.clientHeight',
+  },
+  {
+    label: 'the tree view takes a highlighted row scrolled below the box for one in sight',
+    file: LIB,
+    from: '  return box.bottom <= top || box.top >= top + tree.clientHeight',
+    to: '  return box.bottom <= top',
+  },
+  {
+    label: 'the tree view draws no ring of its own while the highlighted row is out of sight',
+    file: CLASSES,
+    from: "  'focus-visible:data-highlight-hidden:outline-solid ",
+    to: "  'focus-visible:data-highlight-hidden:outline-none ",
+  },
+  {
+    label: 'the tree view windows its server rows to the default count, not its visibleRows, so a taller box is blank until hydration',
+    file: HOOK,
+    from: '    visibleRows: rowsCap,\n',
+    to: '',
   },
 ]

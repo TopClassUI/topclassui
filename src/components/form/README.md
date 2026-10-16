@@ -59,7 +59,9 @@ required when a key of your state is. The form carries `aria-busy` while the act
 
 **React resets the form when an action settles, errors or not.** So an action that returns errors
 returns the submitted values too, and the fields take them back as their defaults through the
-function child, as above: `children(state, pending)`. Every control then shows what was typed.
+function child, as above: `children(state, pending)`. Every control then shows what was typed,
+except a FileUpload: the reset empties its list and its input, and it has no default to take
+back, so the user picks the files again. Say so in the error the action returns.
 
 **The focus** goes to the first control in the form with `aria-invalid="true"` after an answer
 with errors, never on the first render. A group that takes no focus itself (RadioGroupRoot,
