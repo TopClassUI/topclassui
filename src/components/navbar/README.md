@@ -40,7 +40,9 @@ In Next.js, pass the framework link as `render`:
   `NavbarLink` passes them to the link.
 - **`render`.** On `NavbarBrand` and `NavbarLink`. An element only, never a function.
 - **The page being read.** `current` on one `NavbarLink` sets `aria-current="page"`. The
-  link is heavier and darker, and underlined too under forced colours.
+  link is heavier and darker, and underlined too under forced colours. On a narrow screen
+  the list opens scrolled to it, so the mark is in view; a browser without
+  `scroll-initial-target` opens the list at its start.
 - **Sticky.** On by default. `sticky={false}` lets the bar scroll away, and then it sends
   no JavaScript to the browser.
 - **What sticky does.** One small client part writes the height of the bar to

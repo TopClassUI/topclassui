@@ -282,14 +282,20 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the current navbar link is told by its colour alone',
     file: CLASSES,
-    from: "'aria-[current=page]:font-semibold aria-[current=page]:text-body forced-colors:aria-[current=page]:underline'",
-    to: "'aria-[current=page]:text-body forced-colors:aria-[current=page]:underline'",
+    from: "'aria-[current=page]:font-semibold aria-[current=page]:text-body ",
+    to: "'aria-[current=page]:text-body ",
   },
   {
     label: 'the current navbar link has no underline under forced colours, where every link is one colour',
     file: CLASSES,
-    from: "'aria-[current=page]:font-semibold aria-[current=page]:text-body forced-colors:aria-[current=page]:underline'",
-    to: "'aria-[current=page]:font-semibold aria-[current=page]:text-body'",
+    from: ' forced-colors:aria-[current=page]:underline ',
+    to: ' ',
+  },
+  {
+    label: 'a navbar list opens at its start, so on a phone the link of the page being read can be out of view',
+    file: CLASSES,
+    from: ' aria-[current=page]:[scroll-initial-target:nearest]',
+    to: '',
   },
   {
     label: 'a navbar link loses its focus ring',

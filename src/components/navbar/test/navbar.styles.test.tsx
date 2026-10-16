@@ -64,6 +64,7 @@ describe('every part carries exactly the classes written here', () => {
     expect(classesOf(<NavbarLink href="/docs">Docs</NavbarLink>, 'a')).toEqual([
       'inline-flex', 'items-center', 'justify-center-safe', 'overflow-hidden', 'rounded-control', 'text-sm', 'text-muted',
       'aria-[current=page]:font-semibold', 'aria-[current=page]:text-body', 'forced-colors:aria-[current=page]:underline',
+      'aria-[current=page]:[scroll-initial-target:nearest]',
       'focus-visible:snap-center', 'max-w-full', 'hover:underline', ...RING, ...TARGET,
     ])
   })

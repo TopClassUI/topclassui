@@ -44,6 +44,7 @@ const DECLARATION: Record<string, string> = {
   'aria-[current=page]:font-semibold': 'font-weight: var(--font-weight-semibold);',
   'aria-[current=page]:text-body': 'color: var(--tc-body);',
   'forced-colors:aria-[current=page]:underline': 'text-decoration-line: underline;',
+  'aria-[current=page]:[scroll-initial-target:nearest]': 'scroll-initial-target: nearest;',
   'focus-visible:snap-center': 'scroll-snap-align: center;',
   'hover:underline': 'text-decoration-line: underline;',
   'outline-none': 'outline-style: none;',
@@ -80,6 +81,7 @@ const SCOPE: Record<string, string> = {
   'aria-[current=page]:font-semibold': '[aria-current="page"] {',
   'aria-[current=page]:text-body': '[aria-current="page"] {',
   'forced-colors:aria-[current=page]:underline': '[aria-current="page"] {',
+  'aria-[current=page]:[scroll-initial-target:nearest]': '[aria-current="page"] {',
   'focus-visible:snap-center': ':focus-visible {',
   'hover:snap-none': ':hover {',
   'focus-visible:outline-solid': ':focus-visible {',
@@ -116,7 +118,7 @@ describe('every class Navbar writes compiles with the installed Tailwind', () =>
       NAVBAR_ROOT, ...Object.values(NAVBAR_TOP), NAVBAR_BRAND, NAVBAR_LINKS, NAVBAR_LIST, NAVBAR_ITEM, NAVBAR_LINK, NAVBAR_ACTIONS,
     ])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(59)
+    expect(all).toHaveLength(60)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

@@ -46,8 +46,9 @@ export const NAVBAR_LIST = `flex items-center gap-5 snap-x snap-mandatory hover:
 export const NAVBAR_ITEM = `flex shrink-0 ${CONTAIN}`
 
 /** The page being read is heavier as well as darker: colour alone is no cue (WCAG 1.4.1).
- * Forced colours paint every link in one colour, so there it is underlined as well. */
-export const NAVBAR_CURRENT = 'aria-[current=page]:font-semibold aria-[current=page]:text-body forced-colors:aria-[current=page]:underline'
+ * Forced colours paint every link in one colour, so there it is underlined as well. The list
+ * opens scrolled to it, so on a phone the mark is in view; a browser without the property ignores it. */
+export const NAVBAR_CURRENT = 'aria-[current=page]:font-semibold aria-[current=page]:text-body forced-colors:aria-[current=page]:underline aria-[current=page]:[scroll-initial-target:nearest]'
 
 /** Its text is centred, so under a finger a short link grows to 44 px evenly; content that
  * does not fit starts at the start edge and is cut at the end. The link that has the keyboard

@@ -581,6 +581,43 @@ test.describe('six links on a 320 px screen', () => {
   }
 })
 
+// On the server HTML, before any script: the list opens on the link of the page being read.
+test.describe('the page being read is in view when a phone opens it', () => {
+  test.use({ viewport: { width: 320, height: 480 }, javaScriptEnabled: false })
+
+  /** Opens many-links with the mark moved to the sixth link, past what the list shows, and returns how much of it shows. */
+  async function openOnChangelog(page: Page, direction: string, style = ''): Promise<{ shown: number, width: number, at: number, room: number }> {
+    await page.route(`**/navbar--many-links--light--${direction}.html*`, async (route) => {
+      const response = await route.fetch()
+      const body = (await response.text()).replace(' aria-current="page"', '').replace('href="/changelog"', 'href="/changelog" aria-current="page"')
+      await route.fulfill({ response, body: body.replace('</head>', `<style>${style}</style></head>`) })
+    })
+    await page.goto(liveUrl('navbar--many-links', { direction }))
+    const list = listOf(bar(page))
+    await expect(list.locator('[aria-current="page"]')).toHaveText('Changelog')
+    const shown = await list.evaluate((element) => {
+      const current = element.querySelector('[aria-current="page"]')
+      if (!current) throw new Error('no current link')
+      const [frame, box] = [element.getBoundingClientRect(), current.getBoundingClientRect()]
+      return { shown: Math.round(Math.max(0, Math.min(frame.right, box.right) - Math.max(frame.left, box.left))), width: Math.round(box.width) }
+    })
+    return { ...shown, ...await scrollOf(list) }
+  }
+
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: with the sixth link current the list opens scrolled to it, whole; the control: without the property it is out of view`, async ({ page }) => {
+      const control = await openOnChangelog(page, direction, '#demo nav a { scroll-initial-target: none !important }')
+      expect(control.at, 'the control opens at the start of the list').toBe(0)
+      expect(control.shown, 'px of the current link in view, without the property').toBe(0)
+
+      const built = await openOnChangelog(page, direction)
+      expect(built.shown, 'px of the current link in view').toBe(built.width)
+      expect(Math.abs(built.at)).toBe(built.room)
+      expect(await page.evaluate(() => [window.scrollX, window.scrollY]), 'the page itself does not move').toEqual([0, 0])
+    })
+  }
+})
+
 test.describe('under a finger', () => {
   test.use({ hasTouch: true, isMobile: true, viewport: { width: 320, height: 480 } })
 
