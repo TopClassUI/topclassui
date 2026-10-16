@@ -95,14 +95,14 @@ import { Switch } from 'topclassui'
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `aria-label` or `aria-labelledby` or `id`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `aria-label` | no | `string` | - | The name read out when no visible label names the control. |
-| `aria-labelledby` | no | `string` | - | The id of the visible text that names the control. |
+| `aria-label` | **yes**, or `aria-labelledby` or `id` | `string` | - | The name read out when no visible label names the control. |
+| `aria-labelledby` | **yes**, or `aria-label` or `id` | `string` | - | The id of the visible text that names the control. |
+| `id` | **yes**, or `aria-label` or `aria-labelledby` | `string` | - | The id a `<label htmlFor>` points at. |
 | `className` | no | `string` | - | Merged last, so a consumer class wins a conflict with the switch's own. |
-| `id` | no | `string` | - | The id a `<label htmlFor>` points at. |
 | `invalid` | no | `boolean` | `false` | Marks the value as wrong: sets aria-invalid, and the line of the track turns to danger and thickens. |
 | `ref` | no | `Ref<HTMLButtonElement>` | - | The root element, which is a `<button>`. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The toggle scale of the track and its thumb; custom emits no size classes. |
