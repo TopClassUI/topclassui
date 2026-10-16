@@ -87,7 +87,7 @@ import {
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `aria-label` or `aria-labelledby` on `TabsList`. Every other prop below is optional.
 
 ### TabsRoot
 
@@ -100,8 +100,8 @@ Every prop below is optional and falls back to the default shown.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `aria-label` | no | `string` | - | The name read out when no visible text names the group. |
-| `aria-labelledby` | no | `string` | - | The id of the visible text that names the group. |
+| `aria-label` | **yes**, or `aria-labelledby` | `string` | - | The name read out when no visible text names the group. |
+| `aria-labelledby` | **yes**, or `aria-label` | `string` | - | The id of the visible text that names the group. |
 
 ### TabsPanel
 

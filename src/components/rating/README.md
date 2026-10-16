@@ -31,16 +31,20 @@ import { Rating } from 'topclassui'
   "5 stars". The type requires `aria-label` or `aria-labelledby` for the group.
 - **In a form.** `name` submits the checked step, "1" to `max`, before any script runs.
   A form reset goes back to the step the page was served with, and calls `onValueChange`.
+  Without `name` a rating takes no part in a form: nothing is submitted and a reset leaves it.
 - **Controlled.** `value` with `onValueChange` needs a `'use client'` file: a server page
   cannot pass a function. `defaultValue` works from a server page.
 - **Keyboard.** The browser's own radio group. Tab enters on the checked star, or on the
   first when none is; the arrows move and select; Tab leaves. In Arabic, Chromium moves
   with the eye: the right arrow goes to the star at the right, which is the lower one.
-- **Pointer.** The stars fill up to the one under the pointer and go back on leaving.
+- **Pointer.** The stars fill up to the one under the pointer and go back on leaving. A
+  change, by click or by key, shows the checked step until the pointer moves to another star.
 - **Disabled.** Dimmed; no key, no click, no fill on hover, and nothing is submitted.
 - **Size.** The star follows the icon scale, 16 to 40 px; `custom` draws it at 1em. Each
   editing star is at least 24 px to press, and 44 px under a coarse pointer.
 - **Narrow boxes.** The row wraps rather than scroll the page: ten `xl` stars are 436 px.
+- **Colour.** A filled star is `warning-on-soft`, 3:1 or more on every surface in every mode;
+  `warning-solid` is 2.13:1 on a white page.
 - **Forced colours.** Both stars turn to the text colour: a filled one stays solid and an
   empty one an outline, so they still differ by shape.
 - **Arabic.** `{...getLabels('ar')}` passes `labels` and `locale`. Numbers are written in
@@ -69,16 +73,18 @@ import { Rating } from 'topclassui'
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `aria-label` or `aria-labelledby` when `readOnly={false}`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
+| `aria-label` | **yes**, or `aria-labelledby` when `readOnly={false}` | `string` | - |  |
+| `aria-labelledby` | **yes**, or `aria-label` when `readOnly={false}` | `string` | - |  |
 | `defaultValue` | no | `number`, min 0, max 10 | `0` | Editing only: the step checked at first when value is not passed, rounded to a whole star. 0 checks none. |
 | `disabled` | no | `boolean` | `false` | Editing only: every radio is disabled, so it takes no key, no click and is not submitted. |
 | `labels` | no | `Labels` | - | The built-in strings: `labels.rating.value` names a read-only rating, `labels.rating.stars` each step. Defaults to English. |
 | `locale` | no | `string` | - | The BCP 47 tag the numbers in those names are formatted in. Defaults to `en`. |
 | `max` | no | `integer`, min 1, max 10 | `5` | How many stars, rounded and clamped to 1-10. |
-| `name` | no | `string` | - | The field name in a form. Each radio submits its step, "1" to max. Defaults to an id of its own. |
+| `name` | no | `string` | - | The field name in a form. Each radio submits its step, "1" to max. Without one the rating is in no form: not submitted, not reset. |
 | `onValueChange` | no | `((value: number) => void)` | - | Called with the step a click or an arrow key checked, and on a form reset with the step it returns to. |
 | `readOnly` | no | `boolean` | `true` | true renders stars on the server and ships no script. false renders a radio group, which hydrates. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The star, from the icon scale: 16, 20, 24, 32 or 40 px. custom draws it at 1em, so it follows your font size. |

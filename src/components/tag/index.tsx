@@ -11,7 +11,7 @@ import type { TagProps, TagRemovableProps } from './types.js'
 import { tagVariants } from './variants.js'
 
 /** A label chip for a topic or a category. No role: the text carries the meaning. Without
- * onRemove it calls no hook and renders no client part, so it ships nothing to the browser. */
+ * onRemove it calls no hook and renders no client part, though this file still imports the x. */
 export function Tag({
   tone = TAG_DEFAULTS.tone,
   size = TAG_DEFAULTS.size,

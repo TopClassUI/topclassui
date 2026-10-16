@@ -100,8 +100,8 @@ describe('what each demo shows', () => {
 
   it('long-content: a title of 300 letters, a title that is an element, a table and an accordion in a panel', async () => {
     const html = await render('long-content')
-    expect(html).toContain(`<span class="min-w-0 flex-1">${'a'.repeat(300)}</span>`)
-    expect(html).toMatch(/<span class="min-w-0 flex-1"><span class="flex flex-wrap items-center gap-2"><span>Invoices<\/span><span data-variant=/)
+    expect(html).toContain(`<span class="min-w-0 grow basis-[6ch]">${'a'.repeat(300)}</span>`)
+    expect(html).toMatch(/<span class="min-w-0 grow basis-\[6ch\]"><span class="flex flex-wrap items-center gap-2"><span>Invoices<\/span><span data-variant=/)
     expect(html.match(/<table /g)).toHaveLength(1)
     expect(html.match(/<h3 /g)).toHaveLength(2)
     // The one link of the demo is a Button, as the target-size spec needs.
