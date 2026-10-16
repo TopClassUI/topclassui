@@ -92,4 +92,16 @@ export const MUTATIONS: Mutation[] = [
     from: "return [...source.matchAll(re)].map((m) => m[1] ?? '')",
     to: 'return []',
   },
+  {
+    label: 'the mutation runner judges a run that was killed or ran out of buffer',
+    file: 'scripts/lib/mutate.ts',
+    from: '  if (run.error || run.status === null) {',
+    to: '  if (run.error) {',
+  },
+  {
+    label: 'the mutation runner counts any failed run as a caught mutant, a crash included',
+    file: 'scripts/lib/mutate.ts',
+    from: '  if (/^\\s*Test(?: Files|s)\\s+\\d+ failed/m.test(output)) return true',
+    to: '  return true',
+  },
 ]
