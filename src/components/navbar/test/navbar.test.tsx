@@ -47,12 +47,12 @@ describe('NavbarRoot', () => {
 describe('NavbarBrand', () => {
   it('is a plain anchor that takes its href, with its text in a span of its own', () => {
     const html = markup(<NavbarBrand href="/">TopClass UI</NavbarBrand>)
-    expect(html).toMatch(/^<a class="[^"]+" href="\/"><span class="truncate min-w-0">TopClass UI<\/span><\/a>$/)
+    expect(html).toMatch(/^<a class="[^"]+" href="\/"><span dir="auto" class="truncate min-w-0">TopClass UI<\/span><\/a>$/)
   })
 
   it('keeps an element it is given beside its text: a logo is not wrapped', () => {
     const html = markup(<NavbarBrand href="/"><svg data-logo="" />TopClass UI</NavbarBrand>)
-    expect(html).toContain('<svg data-logo=""></svg><span class="truncate min-w-0">TopClass UI</span>')
+    expect(html).toContain('<svg data-logo=""></svg><span dir="auto" class="truncate min-w-0">TopClass UI</span>')
   })
 
   it('cuts a name of 300 characters at 100: the bound is a guard rail, not a width', () => {
@@ -88,7 +88,7 @@ describe('NavbarLinks', () => {
 describe('NavbarLink', () => {
   it('is a list item holding one anchor, with its text in a span of its own', () => {
     const html = markup(<NavbarLink href="/docs">Docs</NavbarLink>)
-    expect(html).toMatch(/^<li class="[^"]+"><a class="[^"]+" href="\/docs"><span class="truncate min-w-0">Docs<\/span><\/a><\/li>$/)
+    expect(html).toMatch(/^<li class="[^"]+"><a class="[^"]+" href="\/docs"><span dir="auto" class="truncate min-w-0">Docs<\/span><\/a><\/li>$/)
   })
 
   it('is not the current page unless told so', () => {
@@ -123,7 +123,7 @@ describe('NavbarLink', () => {
 
   it('keeps elements where text is expected, and wraps only the text between them', () => {
     const html = markup(<NavbarLink href="/e"><strong>Bold</strong> and <em>italic</em></NavbarLink>)
-    expect(html).toContain('<strong>Bold</strong><span class="truncate min-w-0"> and </span><em>italic</em>')
+    expect(html).toContain('<strong>Bold</strong><span dir="auto" class="truncate min-w-0"> and </span><em>italic</em>')
   })
 })
 

@@ -109,7 +109,7 @@ describe('the props beside the items', () => {
   it('the trigger is the element given, with its label inside', () => {
     render(<DropdownMenu trigger={<Button variant="outline">Account</Button>} title="Account" items={items} />)
     expect(trigger().getAttribute('data-variant')).toBe('outline')
-    expect(trigger().innerHTML).toBe('<span class="truncate min-w-0">Account</span>')
+    expect(trigger().innerHTML).toBe('<span dir="auto" class="truncate min-w-0">Account</span>')
   })
 
   it('a trigger Flight delivered in a lazy wrapper opens the menu just the same', async () => {

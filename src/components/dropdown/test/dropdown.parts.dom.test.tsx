@@ -39,7 +39,7 @@ describe('DropdownItem', () => {
 
   it('puts the label in the span that truncates it, and neither icon nor shortcut when none is given', async () => {
     await popup(<DropdownItem>Profile</DropdownItem>)
-    expect(row('Profile').innerHTML).toBe('<span class="truncate min-w-0">Profile</span>')
+    expect(row('Profile').innerHTML).toBe('<span dir="auto" class="truncate min-w-0">Profile</span>')
   })
 
   it('cuts a label at 100 characters, the bound of boundaries.ts', async () => {
@@ -156,6 +156,6 @@ describe('DropdownLinkItem', () => {
     const link = row('Contact support')
     expect(link.getAttribute('data-link')).toBe('app')
     expect(link.getAttribute('href')).toBe('/support')
-    expect(link.innerHTML).toBe('<span class="truncate min-w-0">Contact support</span>')
+    expect(link.innerHTML).toBe('<span dir="auto" class="truncate min-w-0">Contact support</span>')
   })
 })
