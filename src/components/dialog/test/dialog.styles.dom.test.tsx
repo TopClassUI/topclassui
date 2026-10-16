@@ -72,13 +72,13 @@ const RING_INSET = [
 
 /** What the footer asks of the actions in it: wrap the label, grow from the height of the size, 44 px under a finger. */
 const ACTION_WRAP = [
-  '**:whitespace-normal', '*:data-size:text-center',
-  '*:data-size:not-data-[size=custom]:h-auto', '*:data-size:not-data-[size=custom]:py-1',
-  '*:data-[size=xs]:min-h-control-xs', '*:data-[size=sm]:min-h-control-sm', '*:data-[size=md]:min-h-control-md',
-  '*:data-[size=lg]:min-h-control-lg', '*:data-[size=xl]:min-h-control-xl',
-  'pointer-coarse:*:data-[size=xs]:min-h-[var(--tc-target-coarse,44px)]',
-  'pointer-coarse:*:data-[size=sm]:min-h-[var(--tc-target-coarse,44px)]',
-  'pointer-coarse:*:data-[size=md]:min-h-[var(--tc-target-coarse,44px)]',
+  '**:whitespace-normal', '*:[&:is(button,a)]:data-size:text-center',
+  '*:[&:is(button,a)]:data-size:not-data-[size=custom]:h-auto', '*:[&:is(button,a)]:data-size:not-data-[size=custom]:py-1',
+  '*:[&:is(button,a)]:data-[size=xs]:min-h-control-xs', '*:[&:is(button,a)]:data-[size=sm]:min-h-control-sm', '*:[&:is(button,a)]:data-[size=md]:min-h-control-md',
+  '*:[&:is(button,a)]:data-[size=lg]:min-h-control-lg', '*:[&:is(button,a)]:data-[size=xl]:min-h-control-xl',
+  'pointer-coarse:*:[&:is(button,a)]:data-[size=xs]:min-h-[var(--tc-target-coarse,44px)]',
+  'pointer-coarse:*:[&:is(button,a)]:data-[size=sm]:min-h-[var(--tc-target-coarse,44px)]',
+  'pointer-coarse:*:[&:is(button,a)]:data-[size=md]:min-h-[var(--tc-target-coarse,44px)]',
 ]
 
 describe('every element carries exactly the classes the spec names', () => {

@@ -51,10 +51,10 @@ const rail = (props: Partial<SidebarRootProps> = {}) => createElement(SidebarRoo
   createElement(SidebarHeader, null, 'Workspace'),
   createElement(SidebarBody, null,
     createElement(SidebarGroup, { label: 'Pages' },
-      createElement(SidebarLink, { href: '/home', current: true }, 'Home'),
-      createElement(SidebarLink, { href: '/team' }, 'Team'),
+      createElement(SidebarLink, { href: '/home', current: true, children: 'Home' }),
+      createElement(SidebarLink, { href: '/team', children: 'Team' }),
     ),
-    createElement(SidebarGroup, { label: 'Account' }, createElement(SidebarLink, { href: '/settings' }, 'Settings')),
+    createElement(SidebarGroup, { label: 'Account' }, createElement(SidebarLink, { href: '/settings', children: 'Settings' })),
   ),
 )
 

@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
-import { DIRECTIONS, MODES } from '../scripts/lib/harness.js'
+import { DIRECTIONS, type Direction, MODES } from '../scripts/lib/harness.js'
 import { type LiveOptions, expectNoSidewaysScroll, liveErrors, liveUrl, openLive } from './live.js'
 import { DEMOS, urlFor } from './pages.js'
 import { type Clip, type Rgb, contrast, pixelsOf, rgbOf } from './pixels.js'
@@ -220,12 +220,25 @@ test.describe('the static pages', () => {
 })
 
 test.describe('a page opened at an #anchor, with script', () => {
-  test('still lands under the bar: the height arrives after the browser has scrolled, and it does not scroll again', async ({ page }) => {
-    await page.goto(`${liveUrl('navbar--tall-page')}#theming`)
-    await expect(page.locator('html')).toHaveAttribute('data-harness', 'hydrated')
-    expect(await sticky(page)).toEqual({ variable: '60px', padding: '60px' })
-    expect(await below(page.locator('#theming'))).toBe(-60)
-  })
+  // The browser scrolls before the height arrives; the bar then brings the target to its foot, once.
+  for (const screen of [{ width: 1280, height: 800, bar: 60 }, { width: 390, height: 844, bar: 85 }, { width: 320, height: 480, bar: 85 }]) {
+    test(`${String(screen.width)} x ${String(screen.height)}: lands at the foot of the bar of ${String(screen.bar)} px once the height arrives, with or without a height in the CSS of the app`, async ({ page }) => {
+      await page.setViewportSize(screen)
+      await page.goto(`${liveUrl('navbar--tall-page')}#theming`)
+      await expect(page.locator('html')).toHaveAttribute('data-harness', 'hydrated')
+      expect(await sticky(page)).toEqual({ variable: `${String(screen.bar)}px`, padding: `${String(screen.bar)}px` })
+      expect(await below(page.locator('#theming'))).toBe(0)
+
+      // The one-row height of the README, short of a phone's two rows by 25 px.
+      await page.route('**/navbar--tall-page--light--ltr.html', async (route) => {
+        const response = await route.fetch()
+        await route.fulfill({ response, body: (await response.text()).replace('</head>', '<style>:root { --tc-sticky-top: 3.75rem }</style></head>') })
+      })
+      await page.goto(`${liveUrl('navbar--tall-page')}#questions`)
+      await expect(page.locator('html')).toHaveAttribute('data-harness', 'hydrated')
+      expect(await below(page.locator('#questions'))).toBe(0)
+    })
+  }
 
   test('a value written in the CSS of the app is replaced by the measured one while the bar is mounted', async ({ page }) => {
     await page.route('**/navbar--tall-page--light--ltr.html', async (route) => {
@@ -545,6 +558,75 @@ test.describe('six links on a 320 px screen', () => {
       expect(await page.evaluate(() => window.scrollX)).toBe(0)
       // With no link focused the list snaps to nothing: it stays where the wheel left it.
       expect(Math.abs((await scrollOf(list)).at)).toBeGreaterThan(200)
+    })
+
+    // A link keeps the focus after Enter, as on a client navigation, and is then the one snap area of the list.
+    test(`${direction}: with a link focused, a wheel over the list still scrolls it and it stays; the control: snapping under the pointer springs it back`, async ({ page }) => {
+      await openLive(page, 'navbar--many-links', { direction })
+      const root = bar(page)
+      const list = listOf(root)
+      const towardsEnd = direction === 'rtl' ? -4000 : 4000
+      const settle = () => page.evaluate(() => new Promise<void>((resolve) => { setTimeout(resolve, 600) }))
+      /** Tabs onto Docs with the pointer off the bar, then turns the wheel over the list and lets it settle. */
+      const wheelPastTheFocus = async () => {
+        await page.mouse.move(5, 470)
+        await brandOf(root).focus()
+        await press(page, 'Tab', 'Docs')
+        expect((await scrollOf(list)).at).toBe(0)
+        const frame = await boxOf(list)
+        await page.mouse.move(frame.left + frame.width / 2, frame.top + frame.height / 2)
+        await page.mouse.wheel(towardsEnd, 0)
+        await settle()
+        return Math.abs((await scrollOf(list)).at)
+      }
+
+      await page.addStyleTag({ content: '#demo nav ul:hover { scroll-snap-type: x mandatory !important }' })
+      expect(await wheelPastTheFocus(), 'px the list kept, snapping under the pointer').toBe(0)
+
+      await page.locator('style').last().evaluate((style) => { style.remove() })
+      expect(await wheelPastTheFocus(), 'px the list kept, as built').toBe((await scrollOf(list)).room)
+      await expect(page.locator('#demo nav a').filter({ hasText: 'Docs' })).toBeFocused()
+      // The price: once the pointer leaves, the list snaps to the focused link again.
+      await page.mouse.move(5, 470)
+      await settle()
+      expect((await scrollOf(list)).at).toBe(0)
+    })
+  }
+})
+
+// On the server HTML, before any script: the list opens on the link of the page being read.
+test.describe('the page being read is in view when a phone opens it', () => {
+  test.use({ viewport: { width: 320, height: 480 }, javaScriptEnabled: false })
+
+  /** Opens many-links with the mark moved to the sixth link, past what the list shows, and returns how much of it shows. */
+  async function openOnChangelog(page: Page, direction: Direction, style = ''): Promise<{ shown: number, width: number, at: number, room: number }> {
+    await page.route(`**/navbar--many-links--light--${direction}.html*`, async (route) => {
+      const response = await route.fetch()
+      const body = (await response.text()).replace(' aria-current="page"', '').replace('href="/changelog"', 'href="/changelog" aria-current="page"')
+      await route.fulfill({ response, body: body.replace('</head>', `<style>${style}</style></head>`) })
+    })
+    await page.goto(liveUrl('navbar--many-links', { direction }))
+    const list = listOf(bar(page))
+    await expect(list.locator('[aria-current="page"]')).toHaveText('Changelog')
+    const shown = await list.evaluate((element) => {
+      const current = element.querySelector('[aria-current="page"]')
+      if (!current) throw new Error('no current link')
+      const [frame, box] = [element.getBoundingClientRect(), current.getBoundingClientRect()]
+      return { shown: Math.round(Math.max(0, Math.min(frame.right, box.right) - Math.max(frame.left, box.left))), width: Math.round(box.width) }
+    })
+    return { ...shown, ...await scrollOf(list) }
+  }
+
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: with the sixth link current the list opens scrolled to it, whole; the control: without the property it is out of view`, async ({ page }) => {
+      const control = await openOnChangelog(page, direction, '#demo nav a { scroll-initial-target: none !important }')
+      expect(control.at, 'the control opens at the start of the list').toBe(0)
+      expect(control.shown, 'px of the current link in view, without the property').toBe(0)
+
+      const built = await openOnChangelog(page, direction)
+      expect(built.shown, 'px of the current link in view').toBe(built.width)
+      expect(Math.abs(built.at)).toBe(built.room)
+      expect(await page.evaluate(() => [window.scrollX, window.scrollY]), 'the page itself does not move').toEqual([0, 0])
     })
   }
 })
@@ -912,13 +994,61 @@ test.describe('text that is made larger or spaced out', () => {
       expect({ overlapping: layout.overlapping, outside: layout.outside }).toEqual({ overlapping: [], outside: [] })
       expect(await spills(page)).toEqual([])
       await expect(linksOf(root).first()).toHaveCSS('font-size', '28px')
-      // The variable follows a bar that is now several rows tall.
-      await expect.poll(async () => (await sticky(page)).variable).toBe(`${String(Math.ceil(layout.height))}px`)
+      // Three rows, 321 px, are more than a third of 844: the bar lets go of the top and keeps nothing clear.
+      expect(layout.height).toBe(321)
+      await expect(root).toHaveAttribute('data-unstuck', '')
+      expect(await sticky(page)).toEqual({ variable: '0px', padding: '0px' })
       await brandOf(root).focus()
       for (const name of SIX) {
         await press(page, 'Tab', name)
         expect(await cutOf(listOf(root)), name).toEqual({ left: 0, right: 0 })
       }
+    })
+
+    // Three rows would cover most of a phone while the page scrolls: past a third of the screen the bar goes with the page.
+    test(`${direction}: with the root at 32 px on a 320 x 480 phone the bar is more than a third of the screen, so it scrolls away and writes 0px; at 16 px it sticks again`, async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 480 })
+      await openLive(page, 'navbar--tall-page', { direction })
+      const root = bar(page)
+      await page.addStyleTag({ content: 'html { font-size: 32px !important }' })
+      await expect(root).toHaveAttribute('data-unstuck', '')
+      expect((await boxOf(root)).height, 'px of a 480 px screen').toBeGreaterThan(160)
+      await expect(root).toHaveCSS('position', 'static')
+      expect(await sticky(page)).toEqual({ variable: '0px', padding: '0px' })
+      await page.evaluate(() => { scrollTo(0, 1500) })
+      expect((await boxOf(root)).bottom, 'the bar has scrolled off the top').toBeLessThanOrEqual(0)
+      await linksOf(root).filter({ hasText: 'Theming' }).evaluate((link) => { (link as HTMLElement).click() })
+      await expect(page).toHaveURL(/#theming$/)
+      expect(await page.locator('#theming').evaluate((heading) => Math.round(heading.getBoundingClientRect().top)), 'nothing covers the heading').toBe(0)
+
+      await page.locator('style').last().evaluate((style) => { style.remove() })
+      await expect(root).not.toHaveAttribute('data-unstuck')
+      await expect(root).toHaveCSS('position', 'sticky')
+      const height = Math.ceil((await boxOf(root)).height)
+      expect(height).toBeLessThanOrEqual(160)
+      expect(await sticky(page)).toEqual({ variable: `${String(height)}px`, padding: `${String(height)}px` })
+    })
+
+    test(`${direction}: at 32 px the bar of a page sticks on a 390 x 844 phone at 225 px, and lets go when the phone turns to 844 x 390`, async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 })
+      await openLive(page, 'navbar--tall-page', { direction })
+      const root = bar(page)
+      await page.addStyleTag({ content: 'html { font-size: 32px !important }' })
+      await expect.poll(async () => (await sticky(page)).variable).toBe('225px')
+      await expect(root).toHaveCSS('position', 'sticky')
+      await page.setViewportSize({ width: 844, height: 390 })
+      await expect(root).toHaveAttribute('data-unstuck', '')
+      expect((await boxOf(root)).height, 'px of a 390 px screen').toBeGreaterThan(130)
+      expect(await sticky(page)).toEqual({ variable: '0px', padding: '0px' })
+      await page.setViewportSize({ width: 390, height: 844 })
+      await expect(root).not.toHaveAttribute('data-unstuck')
+      await expect(root).toHaveCSS('position', 'sticky')
+      expect(await sticky(page)).toEqual({ variable: '225px', padding: '225px' })
+      // A screen that only grows shorter leaves the bar at 225 px, so only the resize of the window can tell.
+      await page.setViewportSize({ width: 390, height: 600 })
+      await expect(root).toHaveAttribute('data-unstuck', '')
+      expect((await boxOf(root)).height).toBe(225)
+      expect(await sticky(page)).toEqual({ variable: '0px', padding: '0px' })
     })
 
     test(`${direction}: with the spacing of WCAG 1.4.12 no label leaves its link and the page does not scroll sideways`, async ({ page }) => {

@@ -6,6 +6,7 @@ const CLASSES = 'src/components/accordion/classes.ts'
 const CONSTANTS = 'src/components/accordion/constants.ts'
 const TYPES = 'src/components/accordion/types.ts'
 const LIB = 'src/components/accordion/lib.ts'
+const HOOK = 'src/components/accordion/hook.ts'
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -147,10 +148,28 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
-    label: 'the accordion title no longer takes the room, so the caret follows the text instead of the inline end',
+    label: 'the accordion title no longer takes the room, so it wraps at six letters however wide its trigger is',
     file: CLASSES,
-    from: "'min-w-0 flex-1'",
-    to: "'min-w-0'",
+    from: "'min-w-0 grow basis-[6ch]'",
+    to: "'min-w-0 basis-[6ch]'",
+  },
+  {
+    label: 'the accordion title may shrink to nothing, so at 320 px and text at 200% a nested title is 0 px and one letter a line',
+    file: CLASSES,
+    from: "'min-w-0 grow basis-[6ch]'",
+    to: "'min-w-0 grow basis-0'",
+  },
+  {
+    label: 'an accordion trigger never wraps, so where its title and caret do not fit side by side the title is squeezed to 0 px',
+    file: CLASSES,
+    from: "'group flex w-full flex-wrap items-center",
+    to: "'group flex w-full items-center",
+  },
+  {
+    label: 'an accordion caret that wraps below its title sits at the inline start, under the first letter',
+    file: CLASSES,
+    from: "'ms-auto flex shrink-0 text-muted",
+    to: "'flex shrink-0 text-muted",
   },
   {
     label: 'an accordion item keeps its line above when it is the first, doubling the edge of the box',
@@ -187,5 +206,35 @@ export const MUTATIONS: Mutation[] = [
     file: TYPES,
     from: '    value: string\n',
     to: '    value?: string\n',
+  },
+  {
+    label: 'an accordion trigger is not held, so closing a long answer above throws the pressed trigger and its focus off the screen',
+    file: CLIENT,
+    from: ' onClick={item.onClick}',
+    to: '',
+  },
+  {
+    label: 'the accordion hold scrolls the page by the wrong sign, so a pressed trigger runs twice as far off the screen',
+    file: HOOK,
+    from: 'scroller.scrollBy(0, moved)',
+    to: 'scroller.scrollBy(0, -moved)',
+  },
+  {
+    label: 'the accordion hold always scrolls the page, so a trigger in a box that scrolls is left to run off it',
+    file: HOOK,
+    from: "if ((overflowY === 'auto' || overflowY === 'scroll') && node.scrollHeight > node.clientHeight) return node",
+    to: "if (overflowY === 'never') return node",
+  },
+  {
+    label: 'the accordion hold forgets where the reader scrolled, so a scroll during the fade is undone',
+    file: HOOK,
+    from: "document.addEventListener('scroll', scrolled, { capture: true, passive: true })",
+    to: '',
+  },
+  {
+    label: 'the accordion hold never lets go, so a panel that resizes minutes later still scrolls the page',
+    file: HOOK,
+    from: '    sizes.disconnect()\n',
+    to: '',
   },
 ]

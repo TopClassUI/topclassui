@@ -55,3 +55,18 @@ export function summarise(outcomes: readonly Outcome[]): string {
     : `mutate: ${String(survived.length)} of ${String(outcomes.length)} survived.`)
   return lines.join('\n')
 }
+
+/** What spawnSync returns for a vitest run, as much of it as the verdict reads. */
+export interface Run { status: number | null; signal?: string | null; error?: Error | undefined; stdout: string; stderr: string }
+
+/** Whether a run failed a test. A run that crashed, or exited 1 with no test failed, throws: it measured nothing. */
+export function caughtBy(run: Run): boolean {
+  if (run.error || run.status === null) {
+    throw new Error(`mutate: vitest did not finish (${run.error?.message ?? `signal ${String(run.signal)}`})`)
+  }
+  if (run.status === 0) return false
+  // The runner sets NO_COLOR, so the summary line reads as plain text.
+  const output = `${run.stdout}\n${run.stderr}`
+  if (/^\s*Test(?: Files|s)\s+\d+ failed/m.test(output)) return true
+  throw new Error(`mutate: vitest exited ${String(run.status)} with no test failed:\n${output.slice(-2000)}`)
+}

@@ -172,11 +172,12 @@ describe('every class an open Dialog wears compiles with the installed Tailwind'
 describe('the tokens the popup reads are the ones the plan names', () => {
   const css = compileEntry().then((compiled) => compiled.build(Object.keys(DECLARATION)))
 
-  it('--tc-z-dialog is 50, above a drawer at 40 and below a popup at 60', async () => {
+  it('--tc-z-dialog is the one overlay layer, 60: level with a drawer and a popup, below a toast at 70', async () => {
     const sheet = await css
-    expect(sheet).toContain('--tc-z-drawer: 40;')
-    expect(sheet).toContain('--tc-z-dialog: 50;')
+    expect(sheet).toContain('--tc-z-drawer: var(--tc-z-popup);')
+    expect(sheet).toContain('--tc-z-dialog: var(--tc-z-popup);')
     expect(sheet).toContain('--tc-z-popup: 60;')
+    expect(sheet).toContain('--tc-z-toast: 70;')
   })
 
   it('--tc-overlay-inset is 1rem, the room the popup leaves on every side', async () => {
