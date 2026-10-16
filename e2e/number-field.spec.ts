@@ -69,6 +69,13 @@ test.describe('the five sizes, on the static page', () => {
       expect(await page.locator('#demo input[type="text"]').evaluateAll((all) => all.map((el) => getComputedStyle(el).fontSize))).toEqual(Array(5).fill('16px'))
     })
 
+    test('at a root of 10 px the text typed into is still 16 px at every size, and each field an Input wide', async ({ page }) => {
+      await page.goto(urlFor('number-field--sizes', 'light', 'ltr'))
+      await page.evaluate(() => { document.documentElement.style.fontSize = '10px' })
+      expect(await page.locator('#demo input[type="text"]').evaluateAll((all) => all.map((el) => getComputedStyle(el).fontSize))).toEqual(Array(5).fill('16px'))
+      expect(Object.values(await shapes(page)).map(({ field }) => field[0])).toEqual(Array(5).fill(220.8))
+    })
+
     test('number-field--row at 320 px: the two fields are 124 px each and the page does not scroll sideways', async ({ page }) => {
       await page.setViewportSize({ width: 320, height: 480 })
       await page.goto(urlFor('number-field--row', 'light', 'ltr'))
