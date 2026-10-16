@@ -1151,7 +1151,7 @@ test.describe('inside the screen', () => {
     })
     // max-w-80, h-dvh, the line on the inline start only, shadow-lg, wrap-anywhere, --tc-z-drawer, a row that ends.
     expect(styles).toEqual({
-      maxWidth: '320px', height: '720px', line: '1px 0px', raised: true, wrap: 'anywhere', layer: '40 40',
+      maxWidth: '320px', height: '720px', line: '1px 0px', raised: true, wrap: 'anywhere', layer: '60 60',
       seat: 'flex flex-end', scrim: true, fixed: 'fixed fixed', placement: 'end',
     })
   })
