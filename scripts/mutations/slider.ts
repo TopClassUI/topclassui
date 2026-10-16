@@ -61,6 +61,12 @@ export const MUTATIONS: Mutation[] = [
     to: 'minStepsBetweenValues: props.minStepsBetweenValues,',
   },
   {
+    label: 'the slider invalid fill keeps the author red under forced colours, not Highlight',
+    file: CLASSES,
+    from: ' forced-colors:group-aria-invalid/slider:bg-[Highlight]',
+    to: '',
+  },
+  {
     label: 'the slider hands Base UI defaultValue again, so a form reset leaves the thumb where it was',
     file: CLIENT,
     from: '      value={slider.value as Value}\n      onValueChange={slider.onValueChange}\n',

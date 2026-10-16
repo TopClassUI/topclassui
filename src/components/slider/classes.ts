@@ -27,7 +27,8 @@ export const SLIDER_TRACK = `w-full rounded-full bg-neutral-soft ${FORCED_EDGE} 
 
 export const SLIDER_TRACK_SIZE = { xs: 'h-1', sm: 'h-1', md: 'h-1.5', lg: 'h-2', xl: 'h-2', custom: '' } as const
 
-export const SLIDER_INDICATOR = 'rounded-full bg-primary-solid group-aria-invalid/slider:bg-danger-solid forced-colors:forced-color-adjust-none forced-colors:bg-[Highlight]'
+/** Under forced colours the fill is Highlight, invalid too: its red would paint an author colour in the user's palette. */
+export const SLIDER_INDICATOR = 'rounded-full bg-primary-solid group-aria-invalid/slider:bg-danger-solid forced-colors:forced-color-adjust-none forced-colors:bg-[Highlight] forced-colors:group-aria-invalid/slider:bg-[Highlight]'
 
 /** The thumb is the target. The hidden range input fills it, and the shared spec measures that input. */
 export const SLIDER_THUMB = `group/thumb flex items-center justify-center ${TOUCH_TARGET}`

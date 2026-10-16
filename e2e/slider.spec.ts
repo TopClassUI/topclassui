@@ -161,6 +161,9 @@ for (const scheme of ['light', 'dark'] as const) {
       await page.goto(urlFor('slider--states', 'light', 'ltr'))
       expect(await css(trackOf(thumbIn(page, 'Invalid')), 'outline-width')).toBe('2px')
       expect(await css(trackOf(thumbIn(page, 'Live')), 'outline-width')).toBe('1px')
+      // The user's palette, not the author's red: the 2 px line already tells invalid apart.
+      const highlight = await resolve(page, 'Highlight')
+      expect(await Promise.all(['Invalid', 'Minimum', 'Maximum'].map((name) => css(fillOf(thumbIn(page, name)), 'background-color')))).toEqual([highlight, highlight, highlight])
       const outlines = await page.locator('#demo input').evaluateAll((all) => all.map((el) => getComputedStyle(el).outlineStyle))
       expect(new Set(outlines)).toEqual(new Set(['none']))
     })

@@ -118,6 +118,12 @@ describe('invalid sits on the group, and is told by more than hue', () => {
     expect(ruleOf(`${selectorOf('group-aria-invalid/slider:border-danger-solid')}${INVALID}`)).toBe('border-color: var(--tc-danger-solid);')
   })
 
+  it('under forced colours an invalid fill is Highlight too, never the author red', () => {
+    const forced = 'forced-colors:group-aria-invalid/slider:bg-[Highlight]'
+    expect(ruleOf(`${selectorOf(forced)}${INVALID}`)).toBe('background-color: Highlight;')
+    expect(mediaOf(`${selectorOf(forced)}${INVALID}`)).toBe('@media (forced-colors: active)')
+  })
+
   it('a danger line is drawn around the track, and thickens under forced colours', () => {
     expect(ruleOf(`${selectorOf('group-aria-invalid/slider:outline-solid')}${INVALID}`)).toBe('--tw-outline-style: solid; outline-style: solid;')
     expect(ruleOf(`${selectorOf('group-aria-invalid/slider:outline-(length:--tc-line-width)')}${INVALID}`))
