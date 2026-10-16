@@ -44,8 +44,8 @@ import {
 - **Labels.** Two forms work, on `DialogTrigger` and on `DialogClose`:
   `render={<Button>Publish</Button>}`, and `render={<Button />}` with `Publish` as children.
   On a server page only the first keeps the ellipsis of a long label, so the demos use it.
-- **Disabled.** Write `disabled` on the Button passed to `render`. Written on the part
-  alone, a Button from a server page looks disabled but is announced as enabled.
+- **Disabled.** `disabled` on `DialogTrigger` or `DialogClose` disables the Button passed
+  to `render`. So does `disabled` on that Button itself.
 - **A name.** `DialogTitle` names the dialog. With no title, pass `aria-label` to
   `DialogPopup`.
 - **Size.** `size` on `DialogPopup` is the widest it grows: 320, 360, 400, 512 or 640 px.

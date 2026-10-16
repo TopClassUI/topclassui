@@ -3,7 +3,6 @@ import type { Mutation } from '../lib/mutate.js'
 
 const CLIENT = 'src/components/dialog/client.tsx'
 const CLASSES = 'src/components/dialog/classes.ts'
-const LIB = 'src/components/dialog/lib.ts'
 const HOOK = 'src/components/dialog/hook.ts'
 const DUMMY = 'src/components/dialog/dummy'
 
@@ -96,28 +95,10 @@ export const MUTATIONS: Mutation[] = [
     to: '`text-muted tone-neutral ${HOVER.ghost}`',
   },
   {
-    label: 'the dialog footer stops lifting nowrap from its actions, so a long action ends in an ellipsis on a phone',
+    label: 'the dialog footer no longer wears the shared action wrap, so a long action ends in an ellipsis on a phone',
     file: CLASSES,
-    from: "'**:whitespace-normal *:data-size:text-center',",
-    to: "'*:data-size:text-center',",
-  },
-  {
-    label: 'the dialog footer lets a label wrap but keeps the button at the height of its size, so the second line spills out of it',
-    file: CLASSES,
-    from: "'*:data-size:not-data-[size=custom]:h-auto *:data-size:not-data-[size=custom]:py-1',",
-    to: "'*:data-size:not-data-[size=custom]:py-1',",
-  },
-  {
-    label: 'the dialog footer drops the 44 px floor of a medium action under a finger, so it is 40 px tall on a phone',
-    file: CLASSES,
-    from: "  'pointer-coarse:*:data-[size=md]:min-h-[var(--tc-target-coarse,44px)]',\n",
-    to: '',
-  },
-  {
-    label: 'the dialog footer gives a medium action the floor of a small one, so it is 32 px tall where it was 40',
-    file: CLASSES,
-    from: '*:data-[size=md]:min-h-control-md',
-    to: '*:data-[size=md]:min-h-control-sm',
+    from: 'border-line px-5 py-4 ${ACTIONS_WRAP}`',
+    to: 'border-line px-5 py-4`',
   },
   {
     label: 'the dialog viewport loses the direction of its provider, so the dialog of an RTL island has its x on the right and its text left-aligned',
@@ -182,13 +163,13 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the viewport of a dialog that is not modal still catches every press, so nothing on the page behind can be pressed',
     file: CLIENT,
-    from: 'className={cn(DIALOG_VIEWPORT, !blocks && DIALOG_VIEWPORT_PASSIVE)}',
+    from: 'className={cn(DIALOG_VIEWPORT, !blocks && VIEWPORT_PASSIVE)}',
     to: 'className={DIALOG_VIEWPORT}',
   },
   {
     label: 'the popup of a dialog that is not modal never takes its presses back from its viewport, so its own buttons are dead',
     file: CLIENT,
-    from: 'cn(DIALOG_POPUP, !blocks && DIALOG_POPUP_PASSIVE, DIALOG_WIDTH[size], className)',
+    from: 'cn(DIALOG_POPUP, !blocks && POPUP_PASSIVE, DIALOG_WIDTH[size], className)',
     to: 'cn(DIALOG_POPUP, DIALOG_WIDTH[size], className)',
   },
   {
@@ -222,34 +203,16 @@ export const MUTATIONS: Mutation[] = [
     to: 'onOpenChange={onOpenChange}',
   },
   {
-    label: 'the dialog Escape guard cancels the close but lets Base UI stop the key, so the tooltip never hears it and stays open',
-    file: LIB,
-    from: "      // Base UI stops the key at the popup; the tooltip listens on the document, further up.\n      details.allowPropagation()\n",
-    to: '',
-  },
-  {
-    label: 'the dialog Escape guard cancels every Escape, whether or not a popup is open inside, so the key never closes a dialog',
-    file: LIB,
-    from: " && holdsOpenPopup(details.event.target)) {",
-    to: ') {',
-  },
-  {
-    label: 'the dialog Escape guard also cancels a press outside while a tooltip is open, so the scrim stops closing the dialog',
-    file: LIB,
-    from: "if (!open && details.reason === 'escape-key' && holdsOpenPopup(",
-    to: 'if (!open && holdsOpenPopup(',
-  },
-  {
     label: "the dialog popup's own classes beat a consumer className",
     file: CLIENT,
-    from: 'cn(DIALOG_POPUP, !blocks && DIALOG_POPUP_PASSIVE, DIALOG_WIDTH[size], className)',
-    to: 'cn(className, DIALOG_POPUP, !blocks && DIALOG_POPUP_PASSIVE, DIALOG_WIDTH[size])',
+    from: 'cn(DIALOG_POPUP, !blocks && POPUP_PASSIVE, DIALOG_WIDTH[size], className)',
+    to: 'cn(className, DIALOG_POPUP, !blocks && POPUP_PASSIVE, DIALOG_WIDTH[size])',
   },
   {
     label: 'the dialog popup ignores its size, so every dialog is 400 px wide',
     file: CLIENT,
-    from: 'DIALOG_POPUP_PASSIVE, DIALOG_WIDTH[size], className)',
-    to: 'DIALOG_POPUP_PASSIVE, DIALOG_WIDTH.md, className)',
+    from: 'POPUP_PASSIVE, DIALOG_WIDTH[size], className)',
+    to: 'POPUP_PASSIVE, DIALOG_WIDTH.md, className)',
   },
   {
     label: 'the dialog popup drops the rest props, so ref, id, lang, initialFocus and its children never reach it',
@@ -316,18 +279,6 @@ export const MUTATIONS: Mutation[] = [
     file: CLIENT,
     from: 'if (render !== undefined || hasContent(children)) {',
     to: 'if (render !== undefined || children != null) {',
-  },
-  {
-    label: 'hasContent counts a boolean as content, so a dialog close around {saving && label} is an empty button while saving is false',
-    file: LIB,
-    from: " && typeof children !== 'boolean' && children !== ''",
-    to: " && children !== ''",
-  },
-  {
-    label: 'hasContent reads a list as content whatever it holds, so a dialog close around two blank children is an empty button',
-    file: LIB,
-    from: '  if (Array.isArray(children)) return children.some(hasContent)\n',
-    to: '',
   },
   {
     label: 'a className on the dialog trigger never reaches the element passed as render',

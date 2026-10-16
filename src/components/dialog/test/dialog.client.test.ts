@@ -48,10 +48,10 @@ function hooksByPart(source: string): Record<string, string[]> {
 
 // The first modal folder of Unit 3: Drawer, Command and the popups copy this half of the contract.
 describe('the folder is the client template', () => {
-  it('holds exactly the files Dialog needs: a hook.ts and a lib.ts, and no boundaries, variants or skeleton', () => {
+  it('holds exactly the files Dialog needs: a hook.ts, and no lib, boundaries, variants or skeleton', () => {
     expect(readdirSync(FOLDER).sort()).toEqual([
-      'README.md', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'lib.ts', 'meta.ts',
-      'schema.ts', 'test', 'types.ts',
+      'README.md', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'meta.ts', 'schema.ts',
+      'test', 'types.ts',
     ])
   })
 })
@@ -118,8 +118,12 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
     expect(importedModules(source).filter((m) => m.includes('use-scroll-tab-stop') || m.includes('use-portal-locale'))).toEqual([])
   })
 
-  it('takes its two pure helpers from lib.ts, so no logic is written between the tags', () => {
-    expect(importedNames(source, './lib.js')).toEqual(['guardEscape', 'hasContent'])
+  it('takes its two pure helpers from src/shared, where the next overlay finds them, so no logic is written between the tags', () => {
+    expect(importedNames(source, '#shared/overlay.js')).toEqual(['guardEscape'])
+    expect(importedNames(source, '#shared/render-trigger.js')).toEqual(['hasContent', 'renderTrigger'])
+    expect(importedModules(source).filter((m) => m.startsWith('./')).sort()).toEqual([
+      './classes.js', './constants.js', './hook.js', './types.js',
+    ])
   })
 
   it('the scan sees a bare hook, a member hook and use, a second call in one part, and not a word that starts with use', () => {
@@ -174,12 +178,15 @@ describe('hook.ts holds what the parts read from the provider (R-5.12-1)', () =>
   })
 })
 
-describe('lib.ts holds the pure helpers (R-8.1-1)', () => {
-  const source = read('lib.ts')
+describe('classes.ts builds every string from the shared constants (R-5.2-4)', () => {
+  const source = read('classes.ts')
 
-  it('imports no React and no client code: only the types it shares with the parts', () => {
-    expect(hasUseClient(source)).toBe(false)
-    expect(importedModules(source)).toEqual(['./types.js'])
-    expect(hookCallsIn(parse(source))).toEqual([])
+  it('takes the action wrap of its footer from src/shared, and keeps no copy of it or of the two passive classes', () => {
+    expect(importedNames(source, '#shared/classes.js')).toEqual([
+      'ACTIONS_WRAP', 'FADE_MOTION', 'FOCUS_RING_INSET', 'HOVER', 'ICON_BUTTON', 'OVERLAY_SURFACE', 'POPUP_MOTION', 'SCRIM',
+      'SCROLL_AREA',
+    ])
+    expect(source).not.toContain('whitespace-normal')
+    expect(source).not.toContain('pointer-events-')
   })
 })
