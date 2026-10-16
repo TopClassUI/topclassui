@@ -6,6 +6,27 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-16 - The deep review of Unit 3, and what it changed
+
+**Decision.** An independent review measured all of Unit 3 in a browser and found 73 faults that every gate had passed: 2 blockers (a Drawer opened from a Dialog drawn under it; a filled Rating star at 2.13:1), 33 major and 38 minor. Each was reproduced before it was fixed, and each fix carries a test proven to fail without it. The fixes are the fourteen `fix/*-review` pull requests after `feat/command`; the whole chain passes `pnpm check`. What the fixes decided:
+
+- **One overlay layer.** `--tc-z-drawer` and `--tc-z-dialog` now alias `--tc-z-popup` (60), so the overlay opened last is on top whatever its kind; the toast stays at 70. PLAN 620-622 and unit-3.md 161 keep the old three numbers as history. A `keepMounted` overlay reopened after another keeps its first place in the DOM and can be drawn under it: no demo does this.
+- **Every Drawer sits in Base UI's `VirtualKeyboardProvider`**, not only a bottom sheet, so changing `placement` while open keeps the sheet and what was typed.
+- **A highlighted list or menu row carries the focus ring** (it follows `data-highlighted`), so the keyboard mark is 3:1 and not a 1.1:1 fill. A row under the mouse is ringed as well.
+- **The filled Rating star is `warning-on-soft`** (amber-800 in light and ocean, amber-400 in dark), 4.5:1 on every surface; the drawn amber-500 is 2.13:1 (R-5.6-4).
+- **Tabs**: inactive labels are regular, not medium (Windows draws 500 and 600 alike, and the docs stage says Regular), and the active enclosed tab gains a `line-strong` edge.
+- **Navbar**: a bar taller than a third of the screen scrolls away instead of sticking (`NAVBAR_STICKY_SHARE`); this only happens with large text.
+- **A label carries `dir="auto"` only when it is written in one direction**; a label that mixes directions takes the page direction. This amends the 2026-10-14 line below.
+- **The test helpers measure**: `rgbOf` reads oklch, `expectNoSidewaysScroll` sees overflow past the inline start, `viewportBox` fails for an element that is not rendered, and the mutation runner checks the unmutated suite first and no longer counts a crash as caught. Playwright defaults to 4 workers (`TC_E2E_WORKERS` lowers it) so a full check fits this laptop.
+- **Accepted from Base UI 1.8.0**: a popover opened by the pointer has its focus manager off, so the first Tab from its trigger rests once on a hidden focus guard; a spec pins it, so an upstream fix shows.
+- **README generator**: imports what `index.tsx` exports, and marks a prop required by another prop's literal or required boolean.
+
+Left for Omar, each built as the first option: the dark `--tc-line` that equals the Accordion's surface (keep, or `line-strong`); a Dropdown label wider than its row at a 32 px root (one line with an ellipsis, or two lines); a plain Tag loads its x's code (about 3 KB) because `<Tag onRemove>` must render it; `onDismiss` of a Banner runs while the banner is still in the page; DropdownMenu takes no `...rest` or `ref`; the Navbar list springs back to the focused link after a hover (CSS only, or a `scrollIntoView`); 4 Playwright workers by default; digits for a bare Arabic tag (the question of 2026-10-14, still open). A mutation row that only a browser can catch is still caught only by its class pins: running Playwright per mutant is the next step for `test:mutation`.
+
+**Why.** Each line answers a reproduced fault; the findings, reproductions and fixes are in the pull requests.
+
+---
+
 ## 2026-10-15 - Unit 5: where it departs from its plan
 
 **Decision.** Unit 5 is built as `docs/figma/unit-5.md` asks, on top of the local Units 3 and 4 stack, with these departures. Omar has not answered its "Choices for Omar"; every open choice is built as its "Built as" column.
@@ -57,9 +78,9 @@ From the shared set:
 
 - **The focus ring is `outline-none`, not `outline-hidden`.** Under forced colours `outline-hidden` painted a 2 px outline on every control at rest.
 - **Toast ships with the provider.** The provider mounts `ToastViewport`, the one planned exception to CLOUD-PLAN 9. Every app now loads Button, Svg, six icons and cva with it.
-- **One Escape closes one layer.** `guardEscape` takes a selector; `useOverlayRoot` (src/shared/overlay-scope.ts) scopes it to its own root. Dialog uses it; Popover, Dropdown and Command use their own scopes. Drawer does not yet: a drawer inside a dialog still loses its first Escape once focus is back on its trigger.
+- **One Escape closes one layer.** `guardEscape` takes a selector; `useOverlayRoot` (src/shared/overlay-scope.ts) scopes it to its own root. Dialog and Drawer use it (Drawer since `fix/drawer-escape-scope`); Popover, Dropdown and Command use their own scopes.
 - **Digits follow the locale tag** (`ar-u-nu-arab`) when no numbering system is passed: choice A of a question Omar has not answered.
-- **A label is cut between graphemes** and its span carries `dir="auto"`.
+- **A label is cut between graphemes** and its span carries `dir="auto"` when the label is written in one direction (amended by the review, 2026-10-16).
 
 From the builders, each measured in Chromium:
 
@@ -68,7 +89,9 @@ From the builders, each measured in Chromium:
 - **Command.** Windowed with `useCollection` (10,000 rows, 14 mounted, open in 50 to 80 ms); every row one unit tall; the first lazy open waits one commit so it animates.
 - **Navbar.** The bar wraps to a second row on a phone; the links scroll inside a grid column; a link half in view snaps whole on Tab.
 - **Sidebar.** The current row is bold plus a bar, not a fill alone; a collapsed rail is 65 px under a finger; `relative` on the body stops `sr-only` labels growing the page.
-- **Rating, Tag, Avatar, Banner.** Each client half is imported only when used, so a plain one stays server HTML. Rating's row wraps; a removable Tag is a grid; a failed avatar image is confirmed by `decode()`; a dismissed Banner shows until the script runs (choice 24).
+- **Accordion.** A `hook.ts` after all, for the scroll tab stop of a wide panel; the region role sits on an inner div, so a closed panel is no landmark; 4 px above the content for a control's ring; a one-column grid, so a wide table cannot widen a fit-content parent; `wrap-anywhere` for a 300-letter title.
+- **Tabs.** A disabled tab is an arrow-key stop: Base UI 1.8.0 makes it focusable and gives no way to skip it. It is announced as disabled and cannot be opened.
+- **Rating, Tag, Avatar, Banner.** Each renders server HTML when its client half is not needed; Rating, Avatar and Banner import that half only when used, while a plain Tag still loads its x's code, because `index.tsx` must be able to render it. Rating's row wraps; a removable Tag is a grid; a failed avatar image is confirmed by `decode()`; a dismissed Banner shows until the script runs (choice 24).
 
 **Why.** Each line answers a measurement or a rule; the numbers are in the builders' reports and the specs.
 
