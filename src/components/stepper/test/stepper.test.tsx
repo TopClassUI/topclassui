@@ -115,6 +115,18 @@ describe('the current step', () => {
     expect(marks(out)).toEqual(['tick', 'x', 'tick', '4'])
     expect(spoken(out)).toEqual(['Completed', 'Needs attention', 'Completed', 'Not started'])
   })
+
+  it('is still the current step when value names a step with a status of its own, which keeps its word', () => {
+    const items: StepperItem[] = [
+      { id: 'a', title: 'A' },
+      { id: 'b', title: 'B', status: 'error' },
+      { id: 'c', title: 'C' },
+    ]
+    const out = markup(<Stepper items={items} value="b" />)
+    expect(rows(out).map((row) => attr(row, 'data-status'))).toEqual(['done', 'error', 'todo'])
+    expect(rows(out).map((row) => attr(row, 'aria-current'))).toEqual([undefined, 'step', undefined])
+    expect(spoken(out)).toEqual(['Completed', 'Needs attention', 'Not started'])
+  })
 })
 
 describe('the connector', () => {

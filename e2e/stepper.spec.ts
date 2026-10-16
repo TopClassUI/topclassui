@@ -273,6 +273,19 @@ test.describe('live: where a page puts a stepper, and hostile content', () => {
       }
     })
 
+    test(`${direction}: a step value names is current even with an error of its own, after hydration too`, async ({ page }) => {
+      await fixture(page, { direction })
+      const list = page.locator('#layouts [data-case="fixing"] ol')
+      await expect(list).toMatchAriaSnapshot(`
+        - list "Fixing a step":
+          - listitem: Account Completed
+          - listitem: Profile Needs attention
+          - listitem: Team Not started
+          - listitem: Done Not started
+      `)
+      expect(await list.locator('li[aria-current="step"] [dir="auto"]').allInnerTexts()).toEqual(['Profile'])
+    })
+
     test(`${direction}: axe finds nothing in any layout or hostile case`, async ({ page }) => {
       await fixture(page, { direction })
       const results = await new AxeBuilder({ page }).include('#layouts').analyze()

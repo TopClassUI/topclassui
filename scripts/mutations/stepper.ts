@@ -92,4 +92,10 @@ export const MUTATIONS: Mutation[] = [
     from: "md: 'size-control-sm text-sm',",
     to: "md: 'size-control-md text-sm',",
   },
+  {
+    label: 'the stepper writes aria-current from the status alone, so a step with an error of its own at value is never current',
+    file: 'src/components/stepper/index.tsx',
+    from: "aria-current={item.id === value || status === 'current' ? 'step' : undefined}",
+    to: "aria-current={status === 'current' ? 'step' : undefined}",
+  },
 ]

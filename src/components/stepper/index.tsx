@@ -43,7 +43,8 @@ export function Stepper({
           <li
             key={item.id}
             data-status={status}
-            aria-current={status === 'current' ? 'step' : undefined}
+            // The step value names is where the user is, whatever status it carries: an error being fixed is current too.
+            aria-current={item.id === value || status === 'current' ? 'step' : undefined}
             className={STEPPER_STEP}
           >
             <div className={STEPPER_MARK_ROW}>
