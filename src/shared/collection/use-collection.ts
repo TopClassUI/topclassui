@@ -49,6 +49,7 @@ export function useCollection<T>(props: CollectionProps<T>): UseCollectionResult
     hasMore = false,
     loadMore,
     loadMoreThreshold = defaults.loadMoreThreshold,
+    visibleRows = defaults.visibleRows,
   } = props
 
   const count = items.length
@@ -112,13 +113,14 @@ export function useCollection<T>(props: CollectionProps<T>): UseCollectionResult
     if (!virtualized) return EMPTY
     return getWindow({
       scrollTop,
-      viewportHeight,
+      // Unmeasured, on the server and until the first read, the window fills the rows the box is drawn to show.
+      viewportHeight: viewportHeight > 0 ? viewportHeight : visibleRows * estimateRowHeight,
       count,
       estimateRowHeight,
       overscan: defaults.overscan,
       measured: measuredRef.current,
     })
-  }, [virtualized, scrollTop, viewportHeight, count, estimateRowHeight, defaults.overscan, measuredVersion])
+  }, [virtualized, scrollTop, viewportHeight, visibleRows, count, estimateRowHeight, defaults.overscan, measuredVersion])
 
   const start = virtualized ? windowed.start : 0
   const end = virtualized ? windowed.end : count

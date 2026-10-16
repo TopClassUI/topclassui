@@ -49,6 +49,7 @@ export function useTreeView(props: TreeViewHookProps) {
     return Promise.resolve(loadMore()).catch((error: unknown) => { askedAt.current = -1; throw error })
   }, [loadMore, items.length])
 
+  const rowsCap = props.visibleRows === undefined ? undefined : clamp(props.visibleRows, visibleRowsMin, visibleRowsMax)
   const collection = useCollection({
     items: rows,
     getKey: keyOfRow,
@@ -57,6 +58,7 @@ export function useTreeView(props: TreeViewHookProps) {
     hasMore: hasMore && counted === rows.length,
     loadMore: loadMore ? ask : undefined,
     loadMoreThreshold: clamp(props.loadMoreThreshold ?? TREE_VIEW_DEFAULTS.loadMoreThreshold, loadMoreThresholdMin, loadMoreThresholdMax),
+    visibleRows: rowsCap,
   })
   const { scrollRef, scrollToIndex } = collection
 
@@ -186,7 +188,6 @@ export function useTreeView(props: TreeViewHookProps) {
 
   const base = useId()
   const mounted = collection.rows.find((row) => row.key === active)
-  const rowsCap = props.visibleRows === undefined ? undefined : clamp(props.visibleRows, visibleRowsMin, visibleRowsMax)
 
   return {
     treeRef,

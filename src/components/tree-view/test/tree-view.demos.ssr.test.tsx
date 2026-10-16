@@ -21,7 +21,7 @@ const TREES: Record<string, string[]> = {
   'rtl': ['الملفات 0: المستندات, التقرير السنوي.pdf, الميزانية.xlsx, الصور, ملاحظات.txt'],
   'selected': ['Project 0: app, layout.tsx, page.tsx, docs, next.config.ts'],
   'status': ['Files, loading -: ', 'Files, empty -: '],
-  'ten-thousand': ['Ten thousand files 0: Folder 1, File 1.ts, File 2.ts, File 3.ts, File 4.ts, File 5.ts, File 6.ts'],
+  'ten-thousand': ['Ten thousand files 0: Folder 1, File 1.ts, File 2.ts, File 3.ts, File 4.ts, File 5.ts, File 6.ts, File 7.ts'],
 }
 
 const render = async (file: string) => {
@@ -72,6 +72,14 @@ describe('the demos the plan names', () => {
 
   it('rtl: an island that carries the direction and the language', async () => {
     expect(await render('rtl')).toMatch(/^<div class="isolate"><div dir="rtl" lang="ar"><div class="grid/)
+  })
+
+  it('ten-thousand: the server fills the 12-row box it draws, so no row of it stays blank until hydration', async () => {
+    const html = await render('ten-thousand')
+    expect(html).toContain('--tc-list-rows:12')
+    const rows = [...html.matchAll(/role="treeitem"/g)].length
+    expect(rows).toBeGreaterThanOrEqual(12)
+    expect(rows).toBeLessThan(30)
   })
 
   it('status: the loading tree is busy and says Loading; the empty one says Nothing here yet', async () => {

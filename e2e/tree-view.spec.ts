@@ -74,6 +74,26 @@ test.describe('static, before any script', () => {
   }
 })
 
+test.describe('static, before any script: the windowed tree', () => {
+  for (const direction of DIRECTIONS) {
+    for (const coarse of [false, true]) {
+      test(`${direction}${coarse ? ', under a finger' : ''}: ten-thousand fills its 12-row box with rows, none of it blank`, async ({ browser }) => {
+        const context = await browser.newContext(coarse ? { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } : {})
+        const page = await context.newPage()
+        await page.goto(urlFor('tree-view--ten-thousand', 'light', direction))
+        const fill = await treeOf(page).evaluate((tree) => {
+          const rows = [...tree.querySelectorAll('[role="treeitem"]')]
+          const box = tree.getBoundingClientRect()
+          return { rows: rows.length, below: Math.round(box.top + tree.clientTop + tree.clientHeight - (rows.at(-1)?.getBoundingClientRect().bottom ?? 0)) }
+        })
+        expect(fill.rows).toBeGreaterThanOrEqual(12)
+        expect(fill.below, 'the last server row reaches past the bottom of the box').toBeLessThanOrEqual(0)
+        await context.close()
+      })
+    }
+  }
+})
+
 test.describe('live: the keys of the Authoring Practices', () => {
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 

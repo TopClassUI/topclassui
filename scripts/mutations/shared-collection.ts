@@ -62,4 +62,10 @@ export const MUTATIONS: Mutation[] = [
     from: "    if (process.env.NODE_ENV !== 'production') {",
     to: "    if (process.env['NODE_ENV'] !== 'production') {",
   },
+  {
+    label: 'the shared collection windows an unmeasured list to its overscan alone, so a server-rendered list shows blank rows until hydration',
+    file: 'src/shared/collection/use-collection.ts',
+    from: '      viewportHeight: viewportHeight > 0 ? viewportHeight : visibleRows * estimateRowHeight,',
+    to: '      viewportHeight,',
+  },
 ]

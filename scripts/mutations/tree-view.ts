@@ -247,4 +247,10 @@ export const MUTATIONS: Mutation[] = [
     from: "  'focus-visible:data-highlight-hidden:outline-solid ",
     to: "  'focus-visible:data-highlight-hidden:outline-none ",
   },
+  {
+    label: 'the tree view windows its server rows to the default count, not its visibleRows, so a taller box is blank until hydration',
+    file: HOOK,
+    from: '    visibleRows: rowsCap,\n',
+    to: '',
+  },
 ]
