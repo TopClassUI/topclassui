@@ -5,7 +5,8 @@ import type { Tone } from '#shared/contracts/tone.js'
 
 /** Progress's track, copied: no component imports another. An outline, not a border, marks the full
  * range at 3:1 and takes no room from a 2 px track; forced colours paint both in system colours. */
-export const METER_TRACK = 'w-full overflow-hidden rounded-control bg-neutral-soft outline-solid outline-(length:--tc-line-width) outline-line-strong forced-color-adjust-none forced-colors:bg-[Canvas] forced-colors:outline-[CanvasText]'
+// min-w-16: a w-fit parent gives w-full nothing to fill, and a 0 px meter is still announced.
+export const METER_TRACK = 'w-full min-w-16 overflow-hidden rounded-control bg-neutral-soft outline-solid outline-(length:--tc-line-width) outline-line-strong forced-color-adjust-none forced-colors:bg-[Canvas] forced-colors:outline-[CanvasText]'
 
 /** Height follows padding-y, as the Progress frame says: 2 to 10 px, so it scales with density. */
 export const METER_TRACK_HEIGHT = {

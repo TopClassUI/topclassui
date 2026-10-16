@@ -111,6 +111,12 @@ export const MUTATIONS: Mutation[] = [
     to: 'worst(onSoft, track), 1)',
   },
   {
+    label: 'the meter track loses its 4rem floor, so a w-fit parent draws it 0 px wide while it is announced',
+    file: 'src/components/meter/classes.ts',
+    from: "'w-full min-w-16 overflow-hidden",
+    to: "'w-full overflow-hidden",
+  },
+  {
     label: 'the meter xs track is as tall as sm',
     file: 'src/components/meter/classes.ts',
     from: "xs: 'h-pad-y-xs',",

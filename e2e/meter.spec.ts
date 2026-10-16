@@ -133,14 +133,14 @@ test.describe('live: where a page puts a meter, and hostile values', () => {
   }))
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 
-  // A w-fit parent gives a track nothing to fill: 0 px, which the README says. Given a width, it keeps it.
+  // A w-fit parent gives a track nothing to fill, so it takes its 4rem floor. Given a width, it keeps it.
   const WIDE = [
     ['grid', 1233, '1233/616.5'],
     ['track', 1233, '612.5/306.3'],
     ['flex-1', 1233, '1145/572.5'],
-    ['w-fit', 0, '0/0'],
+    ['w-fit', 64, '64/32'],
     ['w-fit-sized', 160, '160/80'],
-    ['cell', 1233, '311.1/155.5'],
+    ['cell', 1233, '1135/567.5'],
     ['cell-sized', 1233, '160/80'],
     ['row', 1233, '1175.2/587.6'],
     ['word', 1233, '1233/616.5'],
@@ -150,9 +150,9 @@ test.describe('live: where a page puts a meter, and hostile values', () => {
     ['grid', 273, '273/136.5'],
     ['track', 273, '132.5/66.3'],
     ['flex-1', 273, '185/92.5'],
-    ['w-fit', 0, '0/0'],
+    ['w-fit', 64, '64/32'],
     ['w-fit-sized', 160, '160/80'],
-    ['cell', 273, '55.4/27.7'],
+    ['cell', 273, '175/87.5'],
     ['cell-sized', 273, '160/80'],
     ['row', 273, '215.2/107.6'],
     ['word', 273, '273/136.5'],

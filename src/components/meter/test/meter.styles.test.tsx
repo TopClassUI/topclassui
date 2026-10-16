@@ -14,12 +14,12 @@ const bar = (props: Props = {}) =>
 
 /** Every class on the track, per size and sorted: an extra or a missing one both fail. */
 const TRACK = {
-  xs: ['bg-neutral-soft', 'forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]', 'h-pad-y-xs', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-control', 'w-full'],
-  sm: ['bg-neutral-soft', 'forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]', 'h-pad-y-sm', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-control', 'w-full'],
-  md: ['bg-neutral-soft', 'forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]', 'h-pad-y-md', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-control', 'w-full'],
-  lg: ['bg-neutral-soft', 'forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]', 'h-pad-y-lg', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-control', 'w-full'],
-  xl: ['bg-neutral-soft', 'forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]', 'h-pad-y-xl', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-control', 'w-full'],
-  custom: ['bg-neutral-soft', 'forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-control', 'w-full'],
+  xs: ['bg-neutral-soft', 'forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]', 'h-pad-y-xs', 'min-w-16', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-control', 'w-full'],
+  sm: ['bg-neutral-soft', 'forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]', 'h-pad-y-sm', 'min-w-16', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-control', 'w-full'],
+  md: ['bg-neutral-soft', 'forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]', 'h-pad-y-md', 'min-w-16', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-control', 'w-full'],
+  lg: ['bg-neutral-soft', 'forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]', 'h-pad-y-lg', 'min-w-16', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-control', 'w-full'],
+  xl: ['bg-neutral-soft', 'forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]', 'h-pad-y-xl', 'min-w-16', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-control', 'w-full'],
+  custom: ['bg-neutral-soft', 'forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]', 'min-w-16', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-control', 'w-full'],
 } as const
 
 /** The fill each tone paints, written out: a derived one would shrink with METER_FILL. The text colour, 3:1 on the track. */
@@ -44,6 +44,10 @@ describe('the track', () => {
   it('keeps both fills when forced colours would repaint them to nothing, in system colours that hold in every palette', () => {
     expect(track().filter((c) => c.startsWith('forced-'))).toEqual(['forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]'])
     expect(bar().filter((c) => c.startsWith('forced-'))).toEqual(['forced-colors:bg-[CanvasText]'])
+  })
+
+  it('never shrinks below 4rem, so a w-fit parent cannot hide a reading a reader still hears', () => {
+    expect(track().filter((c) => c.startsWith('min-'))).toEqual(['min-w-16'])
   })
 
   it('marks the full range with a line-strong outline, which takes no room from a 2 px track', () => {
@@ -103,7 +107,7 @@ describe('className lands on the track, last', () => {
   it('keeps a consumer utility beside every class of its own, so it merges and never replaces', () => {
     expect(track({ className: 'ms-2' })).toEqual([
       'bg-neutral-soft', 'forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]', 'h-pad-y-md',
-      'ms-2', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-control', 'w-full',
+      'min-w-16', 'ms-2', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-control', 'w-full',
     ])
   })
 
@@ -117,7 +121,7 @@ describe('className lands on the track, last', () => {
     const list = track({ size: 'md', className: 'h-2 rounded-box bg-surface' })
     expect(list).toEqual([
       'bg-surface', 'forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]', 'h-2',
-      'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-box', 'w-full',
+      'min-w-16', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-box', 'w-full',
     ])
   })
 
