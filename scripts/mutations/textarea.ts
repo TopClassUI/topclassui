@@ -158,4 +158,10 @@ export const MUTATIONS: Mutation[] = [
     from: 'clamp(Math.floor(cap),',
     to: 'clamp(cap,',
   },
+  {
+    label: 'the buttons of the textarea form demo stop wrapping, so at a 32 px root a 320 px phone scrolls sideways',
+    file: 'src/components/textarea/dummy/form.tsx',
+    from: '<div className="flex flex-wrap gap-2">',
+    to: '<div className="flex gap-2">',
+  },
 ]

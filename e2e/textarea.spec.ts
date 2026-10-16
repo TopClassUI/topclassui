@@ -140,6 +140,22 @@ test.describe('text and motion', () => {
     })
   }
 
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: at a root of 32 px on a 320 px screen no demo scrolls sideways, nor spills past the start edge where no scrollbar shows it`, async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 480 })
+      for (const demo of DEMOS) {
+        await page.goto(urlFor(demo, 'light', direction))
+        await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
+        expect(await page.evaluate(() => document.documentElement.scrollWidth - document.body.clientWidth), `${demo} scrolls sideways`).toBeLessThanOrEqual(0)
+        const spilt = await page.locator('#demo :is(textarea, button, label, span[aria-hidden])').evaluateAll((all) => all.flatMap((el) => {
+          const { left, right } = el.getBoundingClientRect()
+          return left < 0 || right > document.documentElement.clientWidth ? [`${el.tagName} ${String(Math.round(left))}..${String(Math.round(right))}`] : []
+        }))
+        expect(spilt, demo).toEqual([])
+      }
+    })
+  }
+
   test('WCAG 1.4.12 spacing: the rows grow with the line height, and the counter and the hint stay clear of their fields', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 480 })
     await page.goto(urlFor('textarea--basic', 'light', 'ltr'))
