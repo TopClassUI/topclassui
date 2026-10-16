@@ -38,7 +38,7 @@ function crossings(node: ReactNode, found: Crossing[] = []): Crossing[] {
   return found
 }
 
-/** What of a client part's props Flight cannot serialize: a function is the one a server page cannot send. */
+/** What of a client part's props Flight cannot serialize: a function, unless it is a Server Action. */
 const unserializable = ({ part, props }: Crossing) => Object.entries(props)
   .filter(([, value]) => typeof value === 'function' || typeof value === 'symbol')
   .map(([key]) => `${part}.${key}`)
@@ -47,7 +47,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const demos = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 const isClient = (name: string) => readFileSync(join(DUMMY, `${name}.tsx`), 'utf8').startsWith("'use client'")
 
-describe('a tag with no onRemove is a Server Component that ships nothing', () => {
+describe('a tag with no onRemove is a Server Component that renders no client part', () => {
   it('runs with no hook and returns the span itself', () => {
     ids.calls = 0
     const element = Tag({ children: 'React' }) as ReactElement<Props>
@@ -79,8 +79,8 @@ describe('a tag with onRemove renders the x, a client part', () => {
     expect(props['id']).not.toBe(props['labelId'])
   })
 
-  // R-5.1-3: Next.js refuses a function on a client part's props, so a server page wraps the list in a client component.
-  it('hands it a function, which a Server Component page cannot send: the one prop that cannot cross', () => {
+  // R-5.1-3: a server page can send a function only as a Server Action; a list kept in state needs a client component.
+  it('hands it a function, the one prop a Server Component can send only as a Server Action', () => {
     expect(found.flatMap(unserializable)).toEqual(['TagRemove.onRemove'])
   })
 

@@ -40,7 +40,8 @@ import {
   `DialogFooter` and `DialogClose`. Each part passes the rest of its props to the element
   it draws. `DialogRoot` draws none.
 - **Scrolling.** `DialogBody` scrolls. The header and the footer stay put. On a screen
-  under 272 px tall the whole popup scrolls instead.
+  under 272 px tall the whole popup scrolls instead. That height grows with the root font
+  size: at a 32 px root it is 544 px.
 - **Labels.** Two forms work, on `DialogTrigger` and on `DialogClose`:
   `render={<Button>Publish</Button>}`, and `render={<Button />}` with `Publish` as children.
   On a server page only the first keeps the ellipsis of a long label, so the demos use it.

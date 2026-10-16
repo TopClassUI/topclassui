@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { cutLabel } from './truncate-label.js'
+import { cutLabel, resolveLabelDir } from './truncate-label.js'
 
 describe('cutLabel cuts between graphemes, never inside one', () => {
   it('keeps a family emoji whole: its zero-width joiners are inside it', () => {
@@ -39,5 +39,28 @@ describe('cutLabel is still a bound in UTF-16 units', () => {
 
   it('stops a megabyte at the bound', () => {
     expect(cutLabel('y'.repeat(1_000_000), 200)).toHaveLength(200)
+  })
+})
+
+describe('resolveLabelDir gives a label its own direction only when it is written in one', () => {
+  it('lets a label in one script take its own direction, so a cut one keeps its start', () => {
+    expect(resolveLabelDir('Release notes')).toBe('auto')
+    expect(resolveLabelDir('مساحة العمل')).toBe('auto')
+    expect(resolveLabelDir('שלום')).toBe('auto')
+  })
+
+  it('leaves a label that mixes the two to the page, which reads its words in order', () => {
+    expect(resolveLabelDir('Wi-Fi متصل')).toBeUndefined()
+    expect(resolveLabelDir('iPhone الجديد متوفر')).toBeUndefined()
+    expect(resolveLabelDir('Release notes ملاحظات الإصدار')).toBeUndefined()
+    expect(resolveLabelDir('שלום world')).toBeUndefined()
+  })
+
+  it('counts letters only: digits, harakat, emoji and punctuation decide nothing', () => {
+    expect(resolveLabelDir('2024 تقرير')).toBe('auto')
+    expect(resolveLabelDir('Page ١٢')).toBe('auto')
+    expect(resolveLabelDir('مُحَمَّد')).toBe('auto')
+    expect(resolveLabelDir('😀 Reports!')).toBe('auto')
+    expect(resolveLabelDir('١٢٣')).toBe('auto')
   })
 })

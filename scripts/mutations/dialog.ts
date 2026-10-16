@@ -37,8 +37,20 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog body stops scrolling on a short screen but may still shrink, so it is cut at 60 px with no way to its end',
     file: CLASSES,
-    from: "'[@media(height<17rem)]:shrink-0 [@media(height<17rem)]:overflow-y-visible'",
-    to: "'[@media(height<17rem)]:overflow-y-visible'",
+    from: "'[@container(height<15rem)]:shrink-0 [@container(height<15rem)]:overflow-y-visible'",
+    to: "'[@container(height<15rem)]:overflow-y-visible'",
+  },
+  {
+    label: 'the dialog short-screen rule goes back to a media query, whose rem ignores text zoom, so at a 32 px root body and popup both scroll',
+    file: CLASSES,
+    from: "'[@container(height<15rem)]:shrink-0 [@container(height<15rem)]:overflow-y-visible'",
+    to: "'[@media(height<17rem)]:shrink-0 [@media(height<17rem)]:overflow-y-visible'",
+  },
+  {
+    label: 'the dialog viewport is no size container, so the short-screen query of the body never matches on any screen',
+    file: CLASSES,
+    from: ' p-(--tc-overlay-inset) [container-type:size]',
+    to: ' p-(--tc-overlay-inset)',
   },
   {
     label: 'the dialog popup clips instead of scrolling, so an action below the screen of a small phone can never be reached',

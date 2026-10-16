@@ -24,10 +24,11 @@ export type BannerName =
     'aria-labelledby': string
   }
 
-/** A banner the visitor can dismiss needs an id: the dismissal is remembered by it. */
+/** A banner the visitor can dismiss needs an id: the dismissal is remembered by it.
+ * A boolean decided at runtime takes this branch too, so it needs the id whatever its value. */
 export type BannerDismissal =
   | {
-    dismissible: true
+    dismissible: boolean
     /** The key the dismissal is remembered under, and the element's id. Required with `dismissible`. */
     id: string
     /** Called once when the x is pressed. A function, so only a client caller can pass it. */

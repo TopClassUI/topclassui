@@ -4,13 +4,13 @@ import { beforeAll, describe, expect, it } from 'vitest'
 
 import { compileEntry } from '#test/stylesheet.js'
 import {
-  SLIDER_CONTROL, SLIDER_FULL, SLIDER_INDICATOR, SLIDER_KNOB, SLIDER_KNOB_SIZE, SLIDER_ROOT, SLIDER_ROW, SLIDER_TEXT, SLIDER_THUMB,
+  SLIDER_CONTROL, SLIDER_CONTROL_SIZE, SLIDER_FULL, SLIDER_INDICATOR, SLIDER_KNOB, SLIDER_KNOB_SIZE, SLIDER_ROOT, SLIDER_ROW, SLIDER_TEXT, SLIDER_THUMB,
   SLIDER_TRACK, SLIDER_TRACK_SIZE, SLIDER_VALUE,
 } from '../classes.js'
 
 const OWN = [
   SLIDER_CONTROL, SLIDER_FULL, SLIDER_INDICATOR, SLIDER_KNOB, SLIDER_ROOT, SLIDER_ROW, SLIDER_THUMB, SLIDER_TRACK, SLIDER_VALUE,
-  ...Object.values(SLIDER_KNOB_SIZE), ...Object.values(SLIDER_TEXT), ...Object.values(SLIDER_TRACK_SIZE),
+  ...Object.values(SLIDER_CONTROL_SIZE), ...Object.values(SLIDER_KNOB_SIZE), ...Object.values(SLIDER_TEXT), ...Object.values(SLIDER_TRACK_SIZE),
 ]
 const CLASSES = [...new Set(OWN.join(' ').split(' ').filter(Boolean))]
 
@@ -56,11 +56,40 @@ describe('the box that owns the width', () => {
     expect(ruleOf(selectorOf('grid-cols-1'))).toBe('grid-template-columns: repeat(1, minmax(0, 1fr));')
   })
 
+  it('a range input disabled by a fieldset, which Base UI does not know, dims the root and stops a press on its track', () => {
+    expect(ruleOf(`${selectorOf('has-disabled:pointer-events-none')}:has(:disabled)`)).toBe('pointer-events: none;')
+    expect(ruleOf(`${selectorOf('has-disabled:opacity-50')}:has(:disabled)`)).toBe('opacity: 50%;')
+  })
+
   it('the control is padded by half a target, 12 px, and 22 under a finger', () => {
     expect(ruleOf(selectorOf('px-[calc(var(--tc-target-min,24px)/2)]'))).toBe('padding-inline: calc(var(--tc-target-min,24px) / 2);')
     const coarse = 'pointer-coarse:px-[calc(var(--tc-target-coarse,44px)/2)]'
     expect(ruleOf(selectorOf(coarse))).toBe('padding-inline: calc(var(--tc-target-coarse,44px) / 2);')
     expect(mediaOf(selectorOf(coarse))).toBe('@media (pointer: coarse)')
+  })
+
+  it('at each size the control pads by half the knob and its focus ring when that is more than half a target', () => {
+    const [fine, coarse] = SLIDER_CONTROL_SIZE.md.split(' ')
+    expect(ruleOf(selectorOf(fine ?? ''))).toBe(
+      'padding-inline: max(calc(var(--tc-target-min,24px) / 2), calc(var(--spacing-toggle-md) / 2 + var(--tc-ring-offset) + var(--tc-ring-width)));',
+    )
+    expect(ruleOf(selectorOf(coarse ?? ''))).toBe(
+      'padding-inline: max(calc(var(--tc-target-coarse,44px) / 2), calc(var(--spacing-toggle-md) / 2 + var(--tc-ring-offset) + var(--tc-ring-width)));',
+    )
+    expect(mediaOf(selectorOf(coarse ?? ''))).toBe('@media (pointer: coarse)')
+    for (const size of ['xs', 'sm', 'lg', 'xl'] as const) {
+      expect(SLIDER_CONTROL_SIZE[size].split(' ').map((cls) => ruleOf(selectorOf(cls)).includes(`var(--spacing-toggle-${size}) / 2 + var(--tc-ring-offset)`)), size)
+        .toEqual([true, true])
+    }
+    expect(SLIDER_CONTROL_SIZE.custom).toBe('')
+  })
+
+  it('showValue: a value too long for the line moves below the track, which keeps two thirds of the row, and wraps there', () => {
+    expect(ruleOf(selectorOf('flex-wrap'))).toBe('flex-wrap: wrap;')
+    expect(ruleOf(selectorOf('gap-y-1'))).toBe('row-gap: var(--spacing);')
+    expect(ruleOf(selectorOf('min-w-2/3'))).toBe('min-width: calc(2 / 3 * 100%);')
+    expect(ruleOf(selectorOf('ms-auto'))).toBe('margin-inline-start: auto;')
+    expect(ruleOf(selectorOf('wrap-anywhere'))).toBe('overflow-wrap: anywhere;')
   })
 
   it('a drag on the control never scrolls the page or selects its text', () => {
@@ -87,8 +116,10 @@ describe('the track, the fill and the knob', () => {
     expect(mediaOf(selectorOf('forced-colors:bg-[Highlight]'))).toBe('@media (forced-colors: active)')
   })
 
-  it('the track keeps an outline under forced colours, where its fill is erased', () => {
-    expect(ruleOf(selectorOf('forced-colors:outline-(length:--tc-line-width)'))).toBe('outline-style: var(--tw-outline-style); outline-width: var(--tc-line-width);')
+  it('the track has a line-strong edge at rest, which also keeps it under forced colours, where its fill is erased', () => {
+    expect(ruleOf(selectorOf('outline-solid'))).toBe('--tw-outline-style: solid; outline-style: solid;')
+    expect(ruleOf(selectorOf('outline-(length:--tc-line-width)'))).toBe('outline-style: var(--tw-outline-style); outline-width: var(--tc-line-width);')
+    expect(ruleOf(selectorOf('outline-line-strong'))).toBe('outline-color: var(--tc-line-strong);')
   })
 
   it('the knob: a 2 px primary line on the raised surface, round', () => {
@@ -113,10 +144,13 @@ describe('invalid sits on the group, and is told by more than hue', () => {
     expect(ruleOf(`${selectorOf('group-aria-invalid/slider:border-danger-solid')}${INVALID}`)).toBe('border-color: var(--tc-danger-solid);')
   })
 
-  it('a danger line is drawn around the track, and thickens under forced colours', () => {
-    expect(ruleOf(`${selectorOf('group-aria-invalid/slider:outline-solid')}${INVALID}`)).toBe('--tw-outline-style: solid; outline-style: solid;')
-    expect(ruleOf(`${selectorOf('group-aria-invalid/slider:outline-(length:--tc-line-width)')}${INVALID}`))
-      .toBe('outline-style: var(--tw-outline-style); outline-width: var(--tc-line-width);')
+  it('under forced colours an invalid fill is Highlight too, never the author red', () => {
+    const forced = 'forced-colors:group-aria-invalid/slider:bg-[Highlight]'
+    expect(ruleOf(`${selectorOf(forced)}${INVALID}`)).toBe('background-color: Highlight;')
+    expect(mediaOf(`${selectorOf(forced)}${INVALID}`)).toBe('@media (forced-colors: active)')
+  })
+
+  it('the line around the track turns to danger, and thickens under forced colours', () => {
     expect(ruleOf(`${selectorOf('group-aria-invalid/slider:outline-danger-solid')}${INVALID}`)).toBe('outline-color: var(--tc-danger-solid);')
     const forced = 'forced-colors:group-aria-invalid/slider:outline-(length:--tc-ring-width)'
     expect(ruleOf(`${selectorOf(forced)}${INVALID}`)).toBe('outline-style: var(--tw-outline-style); outline-width: var(--tc-ring-width);')
