@@ -77,23 +77,64 @@ describe('a new src starts again', () => {
     expect(screen.getByRole('img').hasAttribute('data-error')).toBe(false)
   })
 
-  it('reads the src off the render element when the part was given none', () => {
-    expect(readSource('/a.jpg', undefined)).toBe('/a.jpg')
-    expect(readSource(undefined, { props: { src: '/b.jpg' } })).toBe('/b.jpg')
-    expect(readSource('/a.jpg', { props: { src: '/b.jpg' } })).toBe('/a.jpg')
-    expect(readSource(undefined, { props: {} })).toBeUndefined()
-    expect(readSource(undefined, { props: null })).toBeUndefined()
+  it('reads the src and srcSet the img renders with: the render element first, as renderElement merges them', () => {
+    expect(readSource({ src: '/a.jpg' }, undefined)).toEqual({ src: '/a.jpg', srcSet: undefined })
+    expect(readSource({}, { props: { src: '/b.jpg', srcSet: '/b.jpg 1x' } })).toEqual({ src: '/b.jpg', srcSet: '/b.jpg 1x' })
+    expect(readSource({ src: '/a.jpg' }, { props: { src: '/b.jpg' } })).toEqual({ src: '/b.jpg', srcSet: undefined })
+    expect(readSource({ src: '/a.jpg', srcSet: '/a.jpg 1x' }, { props: { src: undefined } })).toEqual({ src: '/a.jpg', srcSet: '/a.jpg 1x' })
+    expect(readSource({}, { props: {} })).toEqual({ src: undefined, srcSet: undefined })
+    expect(readSource({}, { props: null })).toEqual({ src: undefined, srcSet: undefined })
+  })
+
+  it('a render element given a new src after a failure starts again', () => {
+    decodes('resolve')
+    const { rerender } = render(<AvatarImage render={<img src="/bad.jpg" alt="A" />} />)
+    const image = screen.getByRole('img')
+    fireEvent.error(image)
+    expect(image.getAttribute('data-error')).toBe('')
+    rerender(<AvatarImage render={<img src="/good.jpg" alt="A" />} />)
+    expect(image.getAttribute('src')).toBe('/good.jpg')
+    expect(image.hasAttribute('data-error')).toBe(false)
+  })
+
+  it('a picture given by srcSet alone starts again on a new srcSet', () => {
+    decodes('resolve')
+    const { rerender } = render(<AvatarImage srcSet="/bad.jpg 1x" alt="A" />)
+    const image = screen.getByRole('img')
+    fireEvent.error(image)
+    expect(image.getAttribute('data-error')).toBe('')
+    rerender(<AvatarImage srcSet="/good.jpg 1x" alt="A" />)
+    expect(image.hasAttribute('data-error')).toBe(false)
+  })
+
+  it("a picture that loads is shown again, as when another srcset candidate loads, and the caller's onLoad runs", () => {
+    decodes('resolve')
+    const onLoad = vi.fn()
+    render(<AvatarImage srcSet="/a.jpg 1x, /a@2x.jpg 2x" alt="A" onLoad={onLoad} />)
+    const image = screen.getByRole('img')
+    fireEvent.error(image)
+    expect(image.getAttribute('data-error')).toBe('')
+    fireEvent.load(image)
+    expect(image.hasAttribute('data-error')).toBe(false)
+    expect(onLoad).toHaveBeenCalledTimes(1)
   })
 })
 
 /** Server HTML, then hydration: the img failed before React was there to hear it. */
-async function hydrated(src: string) {
+async function hydrated(src: string, extra: Record<string, unknown> = {}) {
   const container = document.createElement('div')
-  container.innerHTML = renderToString(avatar(src))
+  container.innerHTML = renderToString(avatar(src, extra))
   document.body.appendChild(container)
   const image = container.querySelector('img')
-  await act(() => { hydrateRoot(container, avatar(src)); return Promise.resolve() })
+  await act(() => { hydrateRoot(container, avatar(src, extra)); return Promise.resolve() })
   return { image, done: () => { container.remove() } }
+}
+
+/** Chromium's decode(): pending while the picture loads, then refused only if it is broken. */
+function decodesLikeChromium() {
+  const loading = vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockReturnValue(false)
+  const decode = vi.spyOn(HTMLImageElement.prototype, 'decode').mockImplementation(() => new Promise(() => undefined))
+  return { decode, loading }
 }
 
 describe('an image that failed before the script ran', () => {
@@ -105,6 +146,34 @@ describe('an image that failed before the script ran', () => {
     done()
   })
 
+  it("calls the caller's onError once, with an error event on the img, as a failure after hydration would", async () => {
+    decodes('reject')
+    const heard: unknown[][] = []
+    const onError = (event: { type: string, currentTarget: unknown }) => { heard.push([event.type, event.currentTarget]) }
+    const { image, done } = await hydrated('/team/omar.jpg', { onError })
+    expect(heard).toEqual([['error', image]])
+    done()
+  })
+
+  it("calls no onError when decode() accepts the picture", async () => {
+    decodes('resolve')
+    const onError = vi.fn()
+    const { done } = await hydrated('/team/omar.svg', { onError })
+    expect(onError).not.toHaveBeenCalled()
+    done()
+  })
+
+  it('fires no second error when the img already reported its own before decode() refused it', async () => {
+    let refuse: (reason: Error) => void = () => undefined
+    vi.spyOn(HTMLImageElement.prototype, 'decode').mockImplementation(() => new Promise((_, reject) => { refuse = reject }))
+    const onError = vi.fn()
+    const { image, done } = await hydrated('/team/omar.jpg', { onError })
+    if (image) fireEvent.error(image)
+    await act(() => { refuse(new Error('EncodingError')); return Promise.resolve() })
+    expect(onError).toHaveBeenCalledTimes(1)
+    done()
+  })
+
   it('is left alone when decode() accepts it, though it reads complete and 0 px wide', async () => {
     decodes('resolve')
     const { image, done } = await hydrated('/team/omar.svg')
@@ -112,9 +181,9 @@ describe('an image that failed before the script ran', () => {
     done()
   })
 
+  // A real decode() waits for the load; asking it of every loading picture is work, not a fault.
   it('is left alone while it is still loading, and decode() is not even asked', async () => {
-    const decode = decodes('reject')
-    vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockReturnValue(false)
+    const { decode } = decodesLikeChromium()
     const { image, done } = await hydrated('/team/omar.jpg')
     expect(image?.hasAttribute('data-error')).toBe(false)
     expect(decode).not.toHaveBeenCalled()
@@ -138,5 +207,34 @@ describe('ref', () => {
     const ref = { current: null as HTMLImageElement | null }
     render(avatar('/a.jpg', { ref }))
     expect(ref.current).toBe(screen.getByRole('img'))
+  })
+
+  it('a stable callback ref is called once per node, as on a plain img, though the picture fails and renders again', () => {
+    decodes('resolve')
+    const calls: string[] = []
+    const ref = (node: HTMLImageElement | null) => { calls.push(node ? 'node' : 'null') }
+    const { rerender, unmount } = render(avatar('/a.jpg', { ref }))
+    fireEvent.error(screen.getByRole('img'))
+    rerender(avatar('/b.jpg', { ref }))
+    expect(calls).toEqual(['node'])
+    unmount()
+    expect(calls).toEqual(['node', 'null'])
+  })
+
+  it("runs the cleanup a callback ref returns, instead of calling it with null", () => {
+    decodes('resolve')
+    const calls: string[] = []
+    const ref = (node: HTMLImageElement | null) => { calls.push(node ? 'node' : 'null'); return () => { calls.push('cleanup') } }
+    const { unmount } = render(avatar('/a.jpg', { ref }))
+    unmount()
+    expect(calls).toEqual(['node', 'cleanup'])
+  })
+
+  it('an object ref is emptied when the img goes', () => {
+    decodes('resolve')
+    const ref = { current: null as HTMLImageElement | null }
+    const { unmount } = render(avatar('/a.jpg', { ref }))
+    unmount()
+    expect(ref.current).toBeNull()
   })
 })

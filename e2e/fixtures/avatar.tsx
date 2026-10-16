@@ -23,7 +23,22 @@ const SECTION: CSSProperties = { marginBlock: 24 }
 const CELL: CSSProperties = { paddingInline: 8, paddingBlock: 4 }
 
 declare global {
-  interface Window { __avatarSrc?: (src: string) => void }
+  interface Window { __avatarSrc?: (src: string) => void, __avatarSrcSet?: (srcSet: string) => void }
+}
+
+/** One avatar given by srcSet alone, with no src, which the spec changes from outside. */
+function SrcSet() {
+  const [srcSet, setSrcSet] = useState(`${OK} 1x`)
+  useEffect(() => {
+    window.__avatarSrcSet = setSrcSet
+    return () => { delete window.__avatarSrcSet }
+  }, [])
+  return (
+    <AvatarRoot id="srcset" size="xl">
+      <AvatarImage srcSet={srcSet} alt="Omar Abed" />
+      <AvatarFallback>OA</AvatarFallback>
+    </AvatarRoot>
+  )
 }
 
 /** One avatar whose src the spec changes from outside, as a list that reuses a row would. */
@@ -48,6 +63,7 @@ function Fixture() {
   return (
     <div ref={root} id="avatar-fixture">
       <section style={SECTION}><Switch /></section>
+      <section style={SECTION}><SrcSet /></section>
       <section style={SECTION}>
         <AvatarRoot id="slow" size="xl">
           <AvatarImage src="/__avatar/slow.svg" alt="Sara Khalil" />
