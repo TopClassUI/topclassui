@@ -439,6 +439,30 @@ test.describe('focus', () => {
     expect(await popup.evaluate((el) => `${el.tagName} ${el.getAttribute('role') ?? ''}`)).toBe('DIV dialog')
   })
 
+  // POPOVER-1. A form with no action and no onSubmit is sent by the browser: the page reloads with ?name= on it.
+  for (const how of ['a press on Save', 'Enter in the field'] as const) {
+    test(`the form popover saves on ${how}: it closes, the focus is back on its trigger, and the page does not reload`, async ({ page }) => {
+      const popup = await open(page, 'popover--with-form', { by: 'keyboard' })
+      const address = page.url()
+      let loads = 0
+      page.on('framenavigated', (frame) => { if (frame === page.mainFrame()) loads++ })
+      await popup.locator('input[name="name"]').fill('New name')
+      if (how === 'Enter in the field') await page.keyboard.press('Enter')
+      else await popup.getByRole('button', { name: 'Save' }).click()
+      await expectClosed(page)
+      await expect(triggerOf(page, 'Rename')).toBeFocused()
+      expect({ address: page.url(), loads }).toEqual({ address, loads: 0 })
+    })
+  }
+
+  test('the form popover stays open on Save with the field empty, since the field is required', async ({ page }) => {
+    const popup = await open(page, 'popover--with-form', { by: 'keyboard' })
+    await popup.locator('input[name="name"]').fill('')
+    await popup.getByRole('button', { name: 'Save' }).click()
+    await expect(popup.locator('input[name="name"]:invalid')).toBeFocused()
+    await expect(openPopups(page)).toHaveCount(1)
+  })
+
   // The order of Tab is the order of the document, which does not turn with the direction.
   for (const direction of DIRECTIONS) {
     test(`${direction}: it is not modal: Tab past the last control closes it and goes on to the next control of the page`, async ({ page }) => {
