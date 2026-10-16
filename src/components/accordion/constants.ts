@@ -10,3 +10,6 @@ export const ACCORDION_DEFAULTS = {
   // Base UI's own header is an h3.
   headingLevel: 3,
 } as const
+
+/** How long a press holds its trigger in place: well past the fade, after which the panel that closes gives its room back. */
+export const ACCORDION_HOLD_MS = 1000

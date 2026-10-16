@@ -58,15 +58,17 @@ import { Banner } from 'topclassui'
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `aria-label` or `aria-labelledby`, `id` when `dismissible`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
+| `aria-label` | **yes**, or `aria-labelledby` | `string` | - | The name of the landmark, such as "Release announcement". |
+| `aria-labelledby` | **yes**, or `aria-label` | `string` | - | The id of the visible text that names the landmark. |
+| `id` | **yes** when `dismissible` | `string` | - | The key the dismissal is remembered under, and the element's id. Required with `dismissible`. |
 | `action` | no | `ReactNode` | - | The caller's link or Button, after the message. |
 | `children` | no | `ReactNode` | - | The message: a sentence that wraps and is never cut. |
 | `dismissible` | no | `boolean` | `false` | Adds an x that hides the banner and remembers it in this browser. Requires `id`. |
 | `icon` | no | `ReactNode` | - | Shown before the message, such as a 16 px Svg. Leave it out for none. |
-| `id` | no | `string` | - | The key the dismissal is remembered under, and the element's id. Required with `dismissible`. |
 | `onDismiss` | no | `(() => void)` | - | Called once when the x is pressed. A function, so only a client caller can pass it. |
 | `tone` | no | `primary` \| `neutral` \| `success` \| `warning` \| `danger` \| `info` | `"primary"` | What the message means, which picks the soft fill and the text colour on it. |
 

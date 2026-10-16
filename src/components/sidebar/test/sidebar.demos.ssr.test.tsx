@@ -101,14 +101,14 @@ describe('what the demos show', () => {
     const parents: Record<string, string> = {}
     for (const file of files) parents[file] = /class="([^"]*)"[^>]*><nav /.exec(await render(file))?.[1] ?? ''
     expect(parents).toEqual({
-      'basic': 'h-96', 'collapsed': 'h-96', 'controlled': 'flex h-96 gap-4', 'groups': 'h-112',
+      'basic': 'h-96', 'collapsed': 'h-96', 'controlled': 'flex h-96 flex-wrap gap-4', 'groups': 'h-112',
       'in-a-layout': 'flex h-[calc(100dvh-4rem)]', 'long-list': 'h-[calc(100dvh-4rem)]', 'rtl': 'h-96',
     })
   })
 
   it('groups names its two lists Workspace and Account', async () => {
     const html = await render('groups')
-    expect([...html.matchAll(/<p id="[^"]+" class="[^"]*">([^<]*)<\/p>/g)].map((match) => match[1])).toEqual(['Workspace', 'Account'])
+    expect([...html.matchAll(/<p id="[^"]+" dir="auto" class="[^"]*">([^<]*)<\/p>/g)].map((match) => match[1])).toEqual(['Workspace', 'Account'])
   })
 
   it('long-list holds sixty links in one list, the first of them current', async () => {
@@ -116,6 +116,11 @@ describe('what the demos show', () => {
     expect(all.map((row) => row.label).slice(0, 2)).toEqual(['Page 1', 'Page 2'])
     expect(all.at(-1)?.label).toBe('Page 60')
     expect(attr(all.at(-1)?.tag ?? '', 'href')).toBe('#page-60')
+  })
+
+  it('controlled puts a column of at least 160 px beside the rail, which wraps under it where the row has no room', async () => {
+    const html = await render('controlled')
+    expect(html).toContain('</nav><div class="grid min-w-0 grow basis-40 content-start gap-3">')
   })
 
   it('in-a-layout puts a column that can shrink beside the rail, holding a table', async () => {

@@ -9,11 +9,13 @@ const INTERACTIVE = 'button, a[href], [role="button"], input, select, textarea'
 
 // A skeleton demo has nothing interactive by design, so the guard that the
 // selector works at all is one count across the whole set, not one per demo.
+// It stops at the first demo with a target: loading all 204 took 37 s on a busy machine, past the 30 s limit.
 test('the selector finds interactive elements somewhere in the set', async ({ page }) => {
   let total = 0
   for (const demo of DEMOS) {
     await page.goto(urlFor(demo, 'light', 'ltr'))
     total += await page.locator(INTERACTIVE).count()
+    if (total > 0) break
   }
   expect(total).toBeGreaterThan(0)
 })

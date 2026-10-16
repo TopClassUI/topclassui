@@ -206,7 +206,19 @@ test.describe('with a toast open', () => {
     await page.locator('#demo button').click()
     const alert = page.getByRole('alert')
     await expect(alert).toHaveText('Payment failedYour card was declined.')
-    await expect(page.locator('[role="region"] > [role="alertdialog"]')).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  test('priority high, not focused: the toast, its action and its x stay in the tree, and axe passes (TOAST-2)', async ({ page }) => {
+    await openToasts(page)
+    await add(page, { tone: 'danger', priority: 'high', title: 'Payment failed', description: 'Your card was declined.', action: 'Retry', duration: 0 })
+    const root = page.locator('[role="region"] > [role="alertdialog"]')
+    await expect(root).toHaveAttribute('aria-hidden', 'false')
+    expect(await root.evaluate((el) => el.contains(document.activeElement))).toBe(false)
+    const tree = await page.locator('body').ariaSnapshot()
+    expect(tree).toContain('- region "Notifications":\n  - alertdialog "Payment failed":\n    - heading "Payment failed" [level=2]')
+    expect(tree).toContain('    - paragraph: Your card was declined.\n    - button "Retry"\n    - button "Dismiss this notification"')
+    const results = await new AxeBuilder({ page }).include('#demo').include('[data-base-ui-portal]').analyze()
+    expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([])
   })
 
   test('F6 reaches the viewport; Tab goes toast, action, x, then back to the page; Enter on the x returns focus to the trigger', async ({ page }) => {
@@ -545,6 +557,24 @@ test.describe('under a coarse pointer', () => {
       await expect(page.locator(ROOTS)).toHaveCount(left)
     }
   })
+
+  for (const screen of [{ width: 320, height: 480 }, { width: 844, height: 390 }]) {
+    for (const direction of DIRECTIONS) {
+      test(`${String(screen.width)}x${String(screen.height)} ${direction}: a toast taller than the screen keeps its x on it, and one tap closes it (TOAST-3)`, async ({ page }) => {
+        await page.setViewportSize(screen)
+        await openToasts(page, 'basic', { direction })
+        const toast = await add(page, { tone: 'info', title: 'Report ready', description: `${'a'.repeat(300)} ${'More text follows here. '.repeat(20)}`, action: 'Open report', duration: 0 })
+        // The finger cannot scroll a toast, so its top is above the screen for good.
+        expect((await boxOf(toast)).top).toBeLessThan(0)
+        const x = await boxOf(xOf(toast))
+        expect(x.top).toBeGreaterThanOrEqual(0)
+        expect(x.bottom).toBeLessThanOrEqual(screen.height)
+        // The touchscreen, not Locator.tap, which would scroll the x into view first.
+        await page.touchscreen.tap(x.left + x.width / 2, x.top + x.height / 2)
+        await expect(page.locator(ROOTS)).toHaveCount(0)
+      })
+    }
+  }
 })
 
 test.describe('reduced motion', () => {
@@ -574,6 +604,34 @@ test.describe('text zoom and spacing', () => {
     expect(x.right).toBeLessThanOrEqual(390)
     await expectNoSidewaysScroll(page)
   })
+
+  for (const direction of DIRECTIONS) {
+    test(`root at 32px on a 320 px screen, ${direction}: the text keeps 40% of the toast, and the action breaks only between words (TOAST-4)`, async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 480 })
+      await openToasts(page, 'basic', { direction })
+      await page.addStyleTag({ content: 'html { font-size: 32px !important }' })
+      const toast = await add(page, { tone: 'warning', title: 'Storage almost full', description: 'Delete old files to free room.', action: 'Manage storage', duration: 0 })
+      const frame = await boxOf(toast)
+      const text = await boxOf(toast.locator('h2').locator('..'))
+      expect(text.width / frame.width).toBeGreaterThanOrEqual(0.4)
+      // Each line of the label, read letter by letter from where the browser drew it.
+      const lines = await toast.getByRole('button', { name: 'Manage storage' }).evaluate((button) => {
+        const node = [...button.childNodes].find((child) => child.nodeType === Node.TEXT_NODE)
+        const out = new Map<number, string>()
+        for (let at = 0; at < (node?.textContent?.length ?? 0); at++) {
+          const range = document.createRange()
+          range.setStart(node as Text, at)
+          range.setEnd(node as Text, at + 1)
+          const top = Math.round(range.getBoundingClientRect().top)
+          out.set(top, (out.get(top) ?? '') + (node?.textContent?.[at] ?? ''))
+        }
+        return [...out.values()].map((line) => line.trim())
+      })
+      expect(lines).toEqual(['Manage', 'storage'])
+      await expectNothingSideways(toast)
+      await expectNoSidewaysScroll(page)
+    })
+  }
 
   test('WCAG 1.4.12 spacing: nothing leaves the toast', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
