@@ -109,6 +109,12 @@ describe('a day', () => {
     expect(mediaOf(`${forced}[data-selected]`)).toBe('@media (forced-colors: active)')
   })
 
+  it('the paddings of the popup and the cell stop at 16 and 2 px, so a 32 px root leaves two digits room', () => {
+    expect(ruleOf(selectorOf('p-[min(1rem,16px)]'))).toBe('padding: min(1rem, 16px);')
+    expect(ruleOf(selectorOf('p-[min(0.125rem,2px)]'))).toBe('padding: min(0.125rem, 2px);')
+    expect([DATE_PICKER_POPUP.split(' ').includes('p-[min(1rem,16px)]'), DATE_PICKER_CELL.split(' ')]).toEqual([true, ['p-[min(0.125rem,2px)]', 'text-center']])
+  })
+
   it('today is a weight and an underline, never a fill', () => {
     expect(ruleOf(`${selectorOf('aria-[current=date]:underline')}[aria-current="date"]`)).toBe('text-decoration-line: underline;')
     expect(ruleOf(`${selectorOf('aria-[current=date]:font-semibold')}[aria-current="date"]`)).toContain('font-weight: var(--font-weight-semibold);')

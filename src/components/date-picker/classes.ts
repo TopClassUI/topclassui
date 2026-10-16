@@ -14,7 +14,8 @@ export const DATE_PICKER_INPUT = 'sr-only'
 export const DATE_PICKER_POSITIONER = 'z-(--tc-z-popup) data-anchor-hidden:invisible'
 /** 280 px as drawn, never wider than the room Base UI measured; on a short screen it scrolls itself. */
 export const DATE_PICKER_POPUP = [
-  'flex w-[calc(17.5rem*var(--tc-density))] max-w-(--available-width) max-h-(--available-height) flex-col gap-3 p-4 tone-neutral',
+  // Capped in px: at a 32 px root a rem padding left two digits 26 px.
+  'flex w-[calc(17.5rem*var(--tc-density))] max-w-(--available-width) max-h-(--available-height) flex-col gap-3 p-[min(1rem,16px)] tone-neutral',
   '*:shrink-0',
   SCROLL_AREA,
   OVERLAY_SURFACE,
@@ -30,7 +31,7 @@ const ARIA_DISABLED = 'aria-disabled:pointer-events-none aria-disabled:opacity-5
 export const DATE_PICKER_NAV = `${ICON_BUTTON} text-body ${HOVER.ghost} ${ARIA_DISABLED}`
 export const DATE_PICKER_GRID = 'w-full table-fixed border-collapse'
 export const DATE_PICKER_WEEKDAY = 'pb-1 text-center text-xs font-medium text-muted'
-export const DATE_PICKER_CELL = 'p-0.5 text-center'
+export const DATE_PICKER_CELL = 'p-[min(0.125rem,2px)] text-center'
 /** A day: 32 px tall and 44 under a finger, as wide as its column. Selected is a fill, a weight and an inset line at 3:1
  * on the surface in every mode, where the dark fill alone is 2.57:1; today an underline. */
 export const DATE_PICKER_DAY = [

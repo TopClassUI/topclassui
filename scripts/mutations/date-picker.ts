@@ -200,4 +200,16 @@ export const MUTATIONS: Mutation[] = [
     from: '  \'forced-colors:data-selected:[--tc-ring:CanvasText]\',\n',
     to: '',
   },
+  {
+    label: 'the date picker popup padding grows with the root again, so at 32 px two digits overflow their day',
+    file: CLASSES,
+    from: 'gap-3 p-[min(1rem,16px)] tone-neutral',
+    to: 'gap-3 p-4 tone-neutral',
+  },
+  {
+    label: 'the date picker cell padding grows with the root again, so at 32 px two digits overflow their day',
+    file: CLASSES,
+    from: 'export const DATE_PICKER_CELL = \'p-[min(0.125rem,2px)] text-center\'',
+    to: 'export const DATE_PICKER_CELL = \'p-0.5 text-center\'',
+  },
 ]

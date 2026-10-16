@@ -786,16 +786,20 @@ test.describe('live: focus, forced colours and motion', () => {
     await reduced.close()
   })
 
-  test('text zoom: at a root of 32 px the open calendar at 320 px scrolls itself, stays on screen, and nothing in it scrolls sideways', async ({ page }) => {
-    await page.setViewportSize({ width: 320, height: 640 })
-    await openLive(page, 'date-picker--basic')
-    await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
-    const popup = await openCalendar(page, trigger(page))
-    await atRest(popup)
-    await expectInsideViewport(popup, 'the calendar', 8)
-    await expectNothingSideways(popup)
-    await expectNoSidewaysScroll(page)
-  })
+  for (const direction of DIRECTIONS) {
+    test(`text zoom, ${direction}: at a root of 32 px the open calendar at 320 px scrolls itself, stays on screen, and no day outgrows its button`, async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 640 })
+      await openLive(page, 'date-picker--basic', { direction })
+      await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
+      const popup = await openCalendar(page, trigger(page))
+      await atRest(popup)
+      await expectInsideViewport(popup, 'the calendar', 8)
+      await expectNothingSideways(popup)
+      await expectNoSidewaysScroll(page)
+      const spilled = await popup.locator('tbody button').evaluateAll((all) => all.filter((el) => el.scrollWidth > el.clientWidth).map((el) => el.textContent))
+      expect(spilled, 'days whose digits run past their button').toEqual([])
+    })
+  }
 })
 
 /** axe on the demo and on the portal its calendar opens in. Base UI's focus guards are aria-hidden and focusable on
