@@ -419,6 +419,9 @@ test.describe('live: a form reset', () => {
 
   const sent = (page: Page, form: string) => page.evaluate((name) => window.segmentedSent?.[name] ?? [], form)
   const selected = (page: Page, name: string) => selectedIn(page.getByRole('radiogroup', { name }))
+  // RG-2: the APG tab stop is the selected segment, and Base UI picks it only on mount.
+  const stops = (page: Page, names: string[]) => Promise.all(names.map((name) => page.getByRole('radiogroup', { name })
+    .locator('[role="radio"][tabindex="0"]').evaluateAll((all) => all.map((el) => el.textContent))))
 
   for (const how of ['form.reset()', 'a reset button'] as const) {
     test(`after ${how}, each track is back at its default on screen and in the form; a controlled one keeps its owner's value`, async ({ page }) => {
@@ -430,6 +433,7 @@ test.describe('live: a form reset', () => {
       expect([await selected(page, 'Owned'), await selected(page, 'Far')]).toEqual([['Owned B'], ['Far A']])
       await expect(page.locator('#owner')).toHaveText('b')
       expect(await serverEntries(page, '#plain')).toEqual([['plan', 'a'], ['owned', 'b'], ['far', 'a']])
+      expect(await stops(page, ['Plan', 'Owned'])).toEqual([['Plan A'], ['Owned B']])
     })
   }
 
@@ -439,6 +443,7 @@ test.describe('live: a form reset', () => {
     await expect.poll(() => sent(page, 'action')).toEqual([[['pick', 'b']]])
     await expect.poll(() => selected(page, 'Pick')).toEqual(['Pick A'])
     expect(await serverEntries(page, '#action')).toEqual([['pick', 'a']])
+    expect(await stops(page, ['Pick'])).toEqual([['Pick A']])
   })
 
   test('with the action\'s answer as the new default, the choice stays, on screen and in the form, and is sent again', async ({ page }) => {

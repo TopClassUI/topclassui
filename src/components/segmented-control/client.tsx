@@ -35,6 +35,7 @@ export function SegmentedControlRoot({
     <SegmentedControlLookContext value={track.look}>
       <div className={cn(SEGMENTED_HOLDER, fullWidth && SEGMENTED_HOLDER_FULL)}>
         <Base
+          key={track.resetKey}
           {...rest}
           ref={track.rootRef}
           value={track.value}

@@ -378,6 +378,9 @@ test.describe('live: a form reset', () => {
 
   const sent = (page: Page, form: string) => page.evaluate((name) => window.radioGroupSent?.[name] ?? [], form)
   const checked = (page: Page, name: string) => checkedIn(page.getByRole('radiogroup', { name }))
+  // RG-2: the APG tab stop is the checked radio, else the first, and Base UI picks it only on mount.
+  const stops = (page: Page, names: string[]) => Promise.all(names.map((name) => page.getByRole('radiogroup', { name })
+    .locator('[role="radio"][tabindex="0"]').evaluateAll((all) => all.map((el) => el.closest('label')?.textContent ?? ''))))
 
   for (const how of ['form.reset()', 'a reset button'] as const) {
     test(`after ${how}, each group is back at its default on screen and in the form; one with none is empty; a controlled one keeps its owner's value`, async ({ page }) => {
@@ -389,6 +392,7 @@ test.describe('live: a form reset', () => {
       expect([await checked(page, 'Empty'), await checked(page, 'Owned'), await checked(page, 'Far')]).toEqual([[], ['Owned B'], ['Far A']])
       await expect(page.locator('#owner')).toHaveText('b')
       expect(await serverEntries(page, '#plain')).toEqual([['plan', 'a'], ['owned', 'b'], ['far', 'a']])
+      expect(await stops(page, ['Plan', 'Empty', 'Owned'])).toEqual([['Plan A'], ['Empty A'], ['Owned B']])
     })
   }
 
@@ -398,6 +402,7 @@ test.describe('live: a form reset', () => {
     await expect.poll(() => sent(page, 'action')).toEqual([[['pick', 'b']]])
     await expect.poll(() => checked(page, 'Pick')).toEqual(['Pick A'])
     expect(await serverEntries(page, '#action')).toEqual([['pick', 'a']])
+    expect(await stops(page, ['Pick'])).toEqual([['Pick A']])
   })
 
   test('with the action\'s answer as the new default, the choice stays, on screen and in the form, and is sent again', async ({ page }) => {

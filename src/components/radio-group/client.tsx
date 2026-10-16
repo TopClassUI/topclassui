@@ -32,6 +32,7 @@ export function RadioGroupRoot({
   return (
     <RadioGroupLookContext value={group.look}>
       <Base
+        key={group.resetKey}
         {...rest}
         ref={group.rootRef}
         value={group.value}

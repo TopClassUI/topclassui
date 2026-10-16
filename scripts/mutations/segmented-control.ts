@@ -46,8 +46,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the segmented control ignores details.cancel(), so a handler that cancels still moves the selection',
     file: HOOK,
-    from: '    if (!details.isCanceled) state.setValue(next)',
-    to: '    state.setValue(next)',
+    from: '    if (details.isCanceled) return\n',
+    to: '',
   },
   {
     label: 'the segmented control never calls the caller handler, so onValueChange hears nothing',
@@ -58,14 +58,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the segmented control drops the caller ref, which then never holds the radiogroup',
     file: HOOK,
-    from: '  useImperativeHandle(ref, () => state.rootRef.current as HTMLDivElement, [state.rootRef])\n',
+    from: '  useImperativeHandle(ref, () => state.rootRef.current as HTMLDivElement, [state.rootRef, resetKey])\n',
     to: '  void ref\n',
   },
   {
     label: 'the segmented control stops writing its radio inputs after a reset, so a controlled one sends the first default',
     file: HOOK,
-    from: 'sync: syncRadios })',
-    to: '})',
+    from: '    syncRadios(next, input, root)\n',
+    to: '',
   },
   {
     label: 'the segmented control checks every radio input after a reset, so the form sends the last segment and not the value',
@@ -180,5 +180,35 @@ export const MUTATIONS: Mutation[] = [
     file: BOUNDARIES,
     from: 'labelMaxLength: 100,',
     to: 'labelMaxLength: 1000,',
+  },
+  {
+    label: 'the segmented control no longer remounts Base UI after a reset, so Tab enters on the segment the user last picked, now unchecked',
+    file: CLIENT,
+    from: '          key={track.resetKey}\n',
+    to: '',
+  },
+  {
+    label: 'the segmented control remounts after a reset with the focus inside it, so the focus falls to the page',
+    file: HOOK,
+    from: '    if (!root?.contains(document.activeElement)) setResetKey',
+    to: '    setResetKey',
+  },
+  {
+    label: 'the segmented control keeps the caller ref on the element a reset removed',
+    file: HOOK,
+    from: '[state.rootRef, resetKey])',
+    to: '[state.rootRef])',
+  },
+  {
+    label: 'the segmented control ignores a controlled value its owner set, so Tab enters on the segment the user last picked',
+    file: HOOK,
+    from: '    if (value === picked.current) return\n',
+    to: '    return\n',
+  },
+  {
+    label: 'the segmented control forgets the value it picked itself, so a controlled pick remounts it and every child under it',
+    file: HOOK,
+    from: '    picked.current = next\n',
+    to: '',
   },
 ]

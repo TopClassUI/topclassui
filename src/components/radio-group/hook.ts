@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useImperativeHandle, useMemo, useState } from 'react'
+import { createContext, useContext, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 
 import { useFormValue } from '#shared/use-form-value.js'
 import { useServerTabStop } from '#shared/use-server-tab-stop.js'
@@ -22,8 +22,25 @@ function syncRadios(value: string | null, _input: HTMLInputElement | null, root:
 /** The value of a radio group, held here so a form reset brings it back to its latest default (unit-4.md, "A form
  * reset"), and the look its radios read. Base UI always gets the controlled pair, with null for no radio checked. */
 export function useRadioGroupRoot(size: RadioGroupLook['size'], { value, defaultValue, onValueChange, ref }: RadioGroupValueProps) {
-  const state = useFormValue({ value, defaultValue: defaultValue ?? null, sync: syncRadios })
-  useImperativeHandle(ref, () => state.rootRef.current as HTMLDivElement, [state.rootRef])
+  // Base UI puts its tab stop on the checked radio only on mount, so a value set from outside remounts it, focus allowing.
+  const [resetKey, setResetKey] = useState(0)
+  const picked = useRef(value)
+  const remount = (root: HTMLDivElement | null) => {
+    if (!root?.contains(document.activeElement)) setResetKey((key) => key + 1)
+  }
+  const sync = (next: string | null, input: HTMLInputElement | null, root: HTMLDivElement | null) => {
+    syncRadios(next, input, root)
+    remount(root)
+  }
+  const state = useFormValue({ value, defaultValue: defaultValue ?? null, sync })
+  useImperativeHandle(ref, () => state.rootRef.current as HTMLDivElement, [state.rootRef, resetKey])
+
+  // A controlled value its owner changed, not one the group picked.
+  useEffect(() => {
+    if (value === picked.current) return
+    picked.current = value
+    if (!state.rootRef.current?.contains(document.activeElement)) setResetKey((key) => key + 1)
+  }, [value, state.rootRef])
 
   // Read once: the server HTML and the render that hydrates must agree on the one tab stop.
   const [opensOn] = useState(() => value ?? defaultValue ?? null)
@@ -34,10 +51,12 @@ export function useRadioGroupRoot(size: RadioGroupLook['size'], { value, default
     // Base UI calls this with the value of a radio only; null is our own word for none checked.
     if (next === null) return
     onValueChange?.(next, details)
-    if (!details.isCanceled) state.setValue(next)
+    if (details.isCanceled) return
+    picked.current = next
+    state.setValue(next)
   }
 
-  return { value: state.value, onValueChange: onChange, rootRef: state.rootRef, look }
+  return { value: state.value, onValueChange: onChange, rootRef: state.rootRef, look, resetKey }
 }
 
 /** What a radio reads: the size of its group, and a tab stop for the server HTML alone on the radio the page opens
