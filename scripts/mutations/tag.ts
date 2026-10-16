@@ -11,8 +11,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the tag renders its children bare, so a long label has no span to truncate and no bound',
     file: 'src/components/tag/index.tsx',
-    from: '{truncateLabel(children, TAG_BOUNDARIES.labelMaxLength)}',
-    to: '{children}',
+    from: '>\n      {truncateLabel(children, TAG_BOUNDARIES.labelMaxLength)}',
+    to: '>\n      {children}',
   },
   {
     label: 'the tag loses CONTAIN, so a long label pushes it past its container',
@@ -73,5 +73,11 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/tag/dummy/long-label.tsx',
     from: '<Tag className="shrink" tone="success">{LONG}</Tag>',
     to: '<Tag tone="success">{LONG}</Tag>',
+  },
+  {
+    label: 'the tag README promises again that a plain Tag ships no JavaScript, though index.tsx still imports the x',
+    file: 'src/components/tag/README.md',
+    from: 'Tag renders on the server, with no client part.',
+    to: 'Tag renders on the server and ships no JavaScript.',
   },
 ]
