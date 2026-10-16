@@ -18,7 +18,7 @@ describe('the errors a form action returned', () => {
     expect(onRead.mock.lastCall?.[0]).toEqual({ email: 'Enter an email', tags: ['Too many', 'Too long'], name: undefined })
   })
 
-  it('are undefined with no provider, so a field outside a form action can tell it from a form with no errors', () => {
+  it('are undefined with no provider, as the plan writes the context; FormAction too provides undefined until an answer holds errors', () => {
     const onRead = vi.fn()
     render(<Reader onRead={onRead} />)
     expect(onRead.mock.lastCall).toEqual([undefined])

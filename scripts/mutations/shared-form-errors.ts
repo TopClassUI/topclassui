@@ -9,7 +9,7 @@ export const MUTATIONS: Mutation[] = [
     to: '  return undefined',
   },
   {
-    label: 'shared form errors: the context defaults to an empty record, so a field outside a form action reads as one with no errors',
+    label: 'shared form errors: the context defaults to an empty record, not the undefined the plan writes for a reader with no provider',
     file: 'src/shared/form-errors.ts',
     from: 'createContext<FormErrors | undefined>(undefined)',
     to: 'createContext<FormErrors | undefined>({})',

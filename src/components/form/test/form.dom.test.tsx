@@ -86,6 +86,20 @@ describe('FormAction runs a React 19 action', () => {
     render(<Says name="email" />)
     expect(screen.getByText('(none)')).toBeTruthy()
   })
+
+  it("provides the answer's errors as they are: before the first answer, and after one without errors, a reader reads undefined, as outside one", async () => {
+    const { calls, action } = deferred()
+    const seen: unknown[] = []
+    function Reader() {
+      seen.push(useFormErrors())
+      return <button type="submit">Send</button>
+    }
+    render(<FormAction action={action}><Reader /></FormAction>)
+    expect(seen.at(-1)).toBeUndefined()
+    await submit()
+    await settle(() => { calls[0]?.answer({ message: 'Done' }) })
+    expect(seen.at(-1)).toBeUndefined()
+  })
 })
 
 describe('after an answer with errors the focus moves to the first invalid control', () => {
