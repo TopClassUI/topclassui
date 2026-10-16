@@ -119,9 +119,11 @@ export function useTreeView(props: TreeViewHookProps) {
     props.onKeyDown?.(event)
     if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return
     const index = findRow(rows, active)
-    if (event.key.length === 1 && event.key !== ' ') {
-      const now = Date.now()
-      const text = now - typed.current.at > TYPEAHEAD_MS ? event.key : typed.current.text + event.key
+    const now = Date.now()
+    // A space inside a query is text, as Base UI's typeahead keeps it; only after the query lapses does it select.
+    const typing = typed.current.text !== '' && now - typed.current.at <= TYPEAHEAD_MS
+    if (event.key.length === 1 && (event.key !== ' ' || typing)) {
+      const text = typing ? typed.current.text + event.key : event.key
       typed.current = { text, at: now }
       const found = typeahead(rows, index, text)
       if (found >= 0) highlight(found)

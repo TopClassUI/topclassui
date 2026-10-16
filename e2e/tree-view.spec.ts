@@ -146,6 +146,14 @@ test.describe('live: the keys of the Authoring Practices', () => {
     expect((await stateOf(page)).text).toBe('رحلة العقبة.jpg')
   })
 
+  test('a space typed inside a type-ahead is part of the query, and selects nothing', async ({ page }) => {
+    await openLive(page, 'tree-view--long-content', { tall: true })
+    await page.keyboard.press('Tab')
+    await page.keyboard.type('sixty i', { delay: 40 })
+    await expect.poll(() => stateOf(page)).toMatchObject({ text: 'Sixty items', highlighted: 'Sixty items', whole: true })
+    await expect(page.getByRole('treeitem', { name: 'Sixty items' })).toHaveAttribute('aria-selected', 'false')
+  })
+
   test('the ring is on the highlighted row after a key and not after a press', async ({ page }) => {
     await openLive(page, 'tree-view--basic')
     const tree = treeOf(page)

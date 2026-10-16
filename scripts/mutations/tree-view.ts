@@ -52,7 +52,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the tree view type-ahead never joins letters typed within 500 ms',
     file: HOOK,
-    from: '      const text = now - typed.current.at > TYPEAHEAD_MS ? event.key : typed.current.text + event.key',
+    from: '      const text = typing ? typed.current.text + event.key : event.key',
     to: '      const text = event.key',
   },
   {
@@ -216,5 +216,11 @@ export const MUTATIONS: Mutation[] = [
     file: HOOK,
     from: '    pressed.current = null\n    if (event.target === event.currentTarget) setActive(null)\n',
     to: '    if (event.target === event.currentTarget) setActive(null)\n',
+  },
+  {
+    label: 'a space typed inside a tree view type-ahead selects the row and ends the query',
+    file: HOOK,
+    from: "    if (event.key.length === 1 && (event.key !== ' ' || typing)) {",
+    to: "    if (event.key.length === 1 && event.key !== ' ') {",
   },
 ]

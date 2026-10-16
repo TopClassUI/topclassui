@@ -174,6 +174,23 @@ describe('controlled and uncontrolled', () => {
     expect(shown()).toEqual(['Apps', 'Elder', 'apricot'])
   })
 
+  it('a space typed within 500 ms of a letter is part of the query, and selects only once the query has lapsed', async () => {
+    let now = 10_000
+    vi.spyOn(Date, 'now').mockImplementation(() => now)
+    const onValueChange = vi.fn()
+    const items = [{ id: 'g', label: 'New folder' }, { id: 'h', label: 'New file' }, { id: 'k', label: 'Notes' }]
+    render(<TreeView aria-label="Files" items={items} defaultValue="k" onValueChange={onValueChange} />)
+    await userEvent.tab()
+    for (const key of ['n', 'e', 'w', ' ', 'f', 'i', 'l']) {
+      now += 100
+      await userEvent.keyboard(key === ' ' ? '[Space]' : key)
+    }
+    expect([active(), onValueChange.mock.calls]).toEqual(['New file', []])
+    now += 600
+    await userEvent.keyboard('[Space]')
+    expect([active(), onValueChange.mock.calls]).toEqual(['New file', [['h']]])
+  })
+
   it('with the selected row inside a closed branch, the focus highlights the first visible row', async () => {
     mount('ltr', { defaultValue: 'c' })
     await userEvent.tab()
