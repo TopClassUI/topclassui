@@ -10,8 +10,8 @@ const COARSE = 'min-height: var(--tc-target-coarse,44px);'
 const DECLARATION: Record<string, string> = {
   'pointer-events-none': 'pointer-events: none;',
   'pointer-events-auto': 'pointer-events: auto;',
-  '[@media(height<17rem)]:shrink-0': 'flex-shrink: 0;',
-  '[@media(height<17rem)]:overflow-y-visible': 'overflow-y: visible;',
+  '[@container(height<15rem)]:shrink-0': 'flex-shrink: 0;',
+  '[@container(height<15rem)]:overflow-y-visible': 'overflow-y: visible;',
   '**:whitespace-normal': 'white-space: normal;',
   '*:data-size:text-center': 'text-align: center;',
   '*:data-size:not-data-[size=custom]:h-auto': 'height: auto;',
@@ -78,12 +78,12 @@ describe('the classes of the footer actions, the short screen and the dialog tha
     })
   }
 
-  it('the two short-screen classes sit inside the query for a screen under 17rem tall', async () => {
+  it('the two short-screen classes sit inside the query for a container under 15rem tall, whose rem follows the root', async () => {
     const sheet = await css
-    for (const cls of ['[@media(height<17rem)]:shrink-0', '[@media(height<17rem)]:overflow-y-visible']) {
-      // '@media (', with its space: the class name itself holds an escaped @media.
-      const before = sheet.slice(sheet.lastIndexOf('@media (', at(sheet, cls)), at(sheet, cls)).replace(/\s+/g, ' ')
-      expect(before.slice(0, 24), cls).toBe('@media (height<17rem) { ')
+    for (const cls of ['[@container(height<15rem)]:shrink-0', '[@container(height<15rem)]:overflow-y-visible']) {
+      // '@container (', with its space: the class name itself holds an escaped @container.
+      const before = sheet.slice(sheet.lastIndexOf('@container (', at(sheet, cls)), at(sheet, cls)).replace(/\s+/g, ' ')
+      expect(before.slice(0, 28), cls).toBe('@container (height<15rem) { ')
       expect(before.split('{').length - before.split('}').length, cls).toBe(1)
     }
   })
@@ -118,8 +118,8 @@ describe('the order the cascade needs', () => {
   })
 
   it('on a short screen the body stops shrinking and stops scrolling after flex-1 and overflow-y-auto said otherwise', async () => {
-    await follows('[@media(height<17rem)]:shrink-0', 'flex-1')
-    await follows('[@media(height<17rem)]:overflow-y-visible', 'overflow-y-auto')
+    await follows('[@container(height<15rem)]:shrink-0', 'flex-1')
+    await follows('[@container(height<15rem)]:overflow-y-visible', 'overflow-y-auto')
   })
 
   it('the height a footer gives an action outweighs Button own, whatever the order: two conditions against one class', async () => {
