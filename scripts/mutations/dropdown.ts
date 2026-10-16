@@ -164,6 +164,12 @@ export const MUTATIONS: Mutation[] = [
     to: 'max-w-1/2',
   },
   {
+    label: 'a dropdown link item drops the colour of its tone, so a destructive link looks like any other',
+    file: CLIENT,
+    from: '<Base.LinkItem closeOnClick {...rest} data-tone={tone} className={cn(DROPDOWN_ITEM, DROPDOWN_ITEM_TONE[tone], className)}>',
+    to: '<Base.LinkItem closeOnClick {...rest} data-tone={tone} className={cn(DROPDOWN_ITEM, className)}>',
+  },
+  {
     label: 'a dropdown shortcut keeps its width beside a label it cuts, so at a doubled text size a row loses its name',
     file: CLASSES,
     from: ' shrink-10000 truncate ps-4',

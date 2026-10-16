@@ -144,6 +144,20 @@ describe('DropdownLinkItem', () => {
     expect(row('Status').getAttribute('data-tone')).toBe('danger')
   })
 
+  it('paints a danger link as a danger row, at rest and highlighted, and a neutral one as any row', async () => {
+    await popup(
+      <>
+        <DropdownLinkItem href="#x" tone="danger">Delete account</DropdownLinkItem>
+        <DropdownLinkItem href="#y">Settings</DropdownLinkItem>
+      </>,
+    )
+    const danger = classes(row('Delete account'))
+    for (const cls of ['text-danger-on-soft', 'data-highlighted:bg-danger-soft', 'data-highlighted:text-danger-on-soft']) {
+      expect(danger, cls).toContain(cls)
+    }
+    expect(classes(row('Settings')).filter((cls) => cls.includes('danger'))).toEqual([])
+  })
+
   it('closes the menu on a press, which Base UI alone would leave open', async () => {
     await popup(<DropdownLinkItem href="#docs">Documentation</DropdownLinkItem>)
     await userEvent.click(row('Documentation'))
