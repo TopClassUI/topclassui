@@ -1,14 +1,14 @@
 # Where things stand
 
-Read this first in a new session, then `docs/PLAN.md` for the specification and `docs/DECISIONS.md` (newest entries at the top). The newest DECISIONS entry is from 10 October 2026 and records where Unit 2 left its design file.
+Read this first in a new session, then `docs/PLAN.md` for the specification and `docs/DECISIONS.md` (newest entries at the top). The newest DECISIONS entry is from 16 October 2026 and records what the deep reviews of Units 4 and 5 changed.
 
-Last updated: 15 October 2026 (Units 3, 4 and 5 built on local branches, waiting for review and merge; `main` is still Unit 2). The build order is `docs/CLOUD-PLAN.md`: the site's 46, the server set first. The design of each unit is written out in `docs/figma/unit-1.md` and `docs/figma/unit-2.md`, because the session that builds them has no Figma access.
+Last updated: 16 October 2026 (Units 1 and 2 on `main`; Unit 3 and its review fixes being merged; Units 4 and 5 built, reviewed, fixed and verified twice on local branches). The build order is `docs/CLOUD-PLAN.md`: the site's 46, the server set first. The design of each unit is written out in `docs/figma/unit-1.md` to `docs/figma/unit-5.md`, because the session that builds them has no Figma access.
 
 ---
 
 ## The one-line version
 
-The design system and the documentation site exist in Figma. **20 of the 46 components are on `main`**: Button, then Unit 1 (Badge, Kbd, Separator, Spinner, Skeleton, EmptyState, Alert, Card, Progress, Tooltip), then Unit 2 (Input, Tag, Avatar, AvatarGroup, Breadcrumb, Pagination, Timeline, Table, Banner). `pnpm check` is green on the merged tree: 5201 unit tests in 290 files, 1463 Playwright tests over 924 harness pages (154 demos, three modes, two directions), and 289 mutations in `pnpm test:mutation` [lead: write the final caught count of the run on main]. Next is Unit 3, the overlays.
+The design system and the documentation site exist in Figma. **20 of the 46 components are on `main`**: Button, then Unit 1 (Badge, Kbd, Separator, Spinner, Skeleton, EmptyState, Alert, Card, Progress, Tooltip), then Unit 2 (Input, Tag, Avatar, AvatarGroup, Breadcrumb, Pagination, Timeline, Table, Banner). `pnpm check` is green on the merged tree: 5201 unit tests in 290 files, 1463 Playwright tests over 924 harness pages (154 demos, three modes, two directions), and 289 mutations in `pnpm test:mutation`. All 46 components of the site are built: the other 26 are in Units 3 to 5 on local branches (below).
 
 ## What is on main
 
@@ -24,21 +24,21 @@ Every component is `status: 'beta'`. None is `stable`: PLAN 20 asks for the visu
 
 **Where Unit 2 differs from its design file** is one entry in `docs/DECISIONS.md`, dated 10 October. The short list: a `link` prop on Breadcrumb, Pagination and Table for Next.js; Input has its own width and keeps Latin values left-to-right; Table cells stay on one line and the table scrolls inside itself; Pagination defaults to `md`; Timeline says its status in words; Rating moved to Unit 3.
 
-## Built, not merged yet (15 October)
+## Built, not merged yet (16 October)
 
-**Unit 3**, all built and checked on local branches: Dialog, Drawer, Popover, Toast, Dropdown, Command, Tabs, Accordion, Navbar, Sidebar; and the second part: Rating, Tag's remove button, Avatar's image fallback, Banner's dismiss. Its departures are one entry in `docs/DECISIONS.md`, dated 14 October. Plan: `docs/figma/unit-3.md`.
+**Unit 3**, all built and checked: Dialog, Drawer, Popover, Toast, Dropdown, Command, Tabs, Accordion, Navbar, Sidebar; and the second part: Rating, Tag's remove button, Avatar's image fallback, Banner's dismiss. Its departures are one entry in `docs/DECISIONS.md`, dated 14 October; its deep review found 73 faults, fixed in fourteen `fix/*-review` branches (16 October entry). Unit 3 and those fixes are pull requests #38 to #82, being merged now. Plan: `docs/figma/unit-3.md`.
 
-**Unit 4**, all ten built on top: the shared pieces 1 to 9, then Switch, Checkbox, RadioGroup, SegmentedControl, Textarea, Slider, NumberField, OTPField, Select and Combobox. Plan: `docs/figma/unit-4.md`.
+**Unit 4**, all ten built on top: the shared pieces 1 to 9, then Switch, Checkbox, RadioGroup, SegmentedControl, Textarea, Slider, NumberField, OTPField, Select and Combobox. Its departures are one entry in `docs/DECISIONS.md`, dated 15 October. Plan: `docs/figma/unit-4.md`.
 
-**Unit 5**, the last unit, built on top: the shared labels, tokens and form errors, then Meter, Stepper, CodeBlock, Field, Form, FileUpload, TreeView and DatePicker. Its departures are one entry in `docs/DECISIONS.md`, dated 15 October. Plan: `docs/figma/unit-5.md`.
+**Unit 5**, the last unit, built on top: the shared labels, tokens and form errors, then Meter, Stepper, CodeBlock, Field, Form, TreeView, FileUpload and DatePicker. Its departures are one entry in `docs/DECISIONS.md`, dated 15 October. Plan: `docs/figma/unit-5.md`.
 
-**Next:** the independent review of Units 3 to 5, then merge in stack order.
+**Units 4 and 5 are reviewed, fixed and verified twice.** The deep reviews found 56 faults in Unit 4 and 40 in Unit 5, three blockers each. Each was fixed with a test that fails without it, in eight `fix/*-review` branches after `feat/combobox` and six after `feat/date-picker`, and the fixes were checked a second time on Omar's laptop. What they changed, and what is left for Omar, is the 16 October entry.
 
-**Small shared fixes, built in Unit 3** (each its own branch): the focus ring at rest under forced colours, digits from the locale tag, the README of a part family, the grapheme label cut with `dir="auto"`, the table skeleton's edge, the Escape guard. Still open from the list below:
-- The page-scroll checks in `e2e/table.spec.ts` and `e2e/pagination.spec.ts` compare with `documentElement.clientWidth`, which is 15 px lenient under `scrollbar-gutter: stable`.
-- One mutation file per component, so ten branches stop meeting in `scripts/mutations/index.ts`.
+**Next:** the pull requests of Units 4 and 5 and their review fixes, in stack order, once Unit 3 is merged.
+
+**Small shared fixes, built in Unit 3** (each its own branch): the focus ring at rest under forced colours, digits from the locale tag, the README of a part family, the grapheme label cut with `dir="auto"`, the table skeleton's edge, the Escape guard. Still open:
+- The page-scroll check in `e2e/pagination.spec.ts` compares with `documentElement.clientWidth`, which is 15 px lenient under `scrollbar-gutter: stable` (`e2e/table.spec.ts` reads `document.body.clientWidth` since 79f7a6e).
 - `--tc-line` is faint in dark.
-- From the review of the whole unit on 10 October: the lint lets a named colour such as `bg-[red]` through, so "system colours behind `forced-colors:` only" is review, not a gate; `InputSkeleton` is full width and 28 to 40 px tall where a default Input is 13.8em wide and 44 px tall under a coarse pointer (`ButtonSkeleton` shares the height half); the Table README sets `--tc-table-sticky-width` through `style`, which compiles only when `#shared/style-tokens.js` is in the program, and only Progress imports it; `TableSkeleton` stops at 100 rows while PLAN 18.2 offers a page of 500.
 
 **Not built on purpose, and waiting for a reason:** Table's sticky header, loading and error states and row class hook; Pagination's page-size selector (it needs Select); AvatarGroup's `total` and a ring that follows the surface of a Card; `useCollection` in Table and Timeline.
 
@@ -170,7 +170,7 @@ Deliberate departures from PLAN.md sections 4, 6 and 7 are recorded in `docs/DEC
 
 ## What is not done
 
-- **26 components.** Unit 3 (ten, plus Rating and three client halves), Unit 4 (the form controls) and Unit 5.
+- **26 components are not on `main` yet.** Unit 3 (ten, plus Rating and three client halves), Unit 4 (the form controls) and Unit 5 are built and reviewed, waiting to merge.
 - **The docs site** is not built, only designed. The harness pages under `.harness/` stand in for it in the browser tests.
 - **`pnpm test:visual` and `pnpm size`** do not exist, so no component can be `stable`.
 - **The components page** (`Docs site - LTR`, 46 cards) has not been reviewed. It is the largest frame in the file and the most important one left.

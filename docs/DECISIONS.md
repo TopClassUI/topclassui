@@ -6,6 +6,65 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-16 - The deep reviews of Units 4 and 5, and what they changed
+
+**Decision.** Two independent reviews measured Units 4 and 5 in a browser and found faults that every gate had passed. Unit 4: 56, of them 3 blockers (a Slider drag inside a Drawer swiped the Drawer shut; the checked radio dot at 2.57:1 in dark; an OTPField `autoSubmit` that sent another form), 27 major and 26 minor. Unit 5: 40, of them 3 blockers (an Escape during the DatePicker's first load left an invisible calendar that took the focus; a month button disabled under the focus, so one Escape also closed the Dialog around it; code in an Arabic page that was not monospace), 16 major and 21 minor. Each was reproduced before it was fixed, and each fix carries a test that fails without it. The fixes are the `fix/*-review` branches after `feat/combobox` (otp-field, slider, radio-segmented, toggles, number-field, textarea, select, combobox) and after `feat/date-picker` (date-picker, file-upload, tree-view, stepper-meter, field-form, code-block). OTPField's and Slider's were made on Omar's laptop; every other fix was verified a second time there, by a fresh agent, which fixed what did not hold on every path (SELECT-1 with a full-width trigger, SC-1 at a 32 px root on a 320 px screen, NF-3 on Enter) and two test faults (a Textarea fixture that followed the fonts, two stale mutation anchors). Some new mutation rows were run against their component's own tests only, to spare the laptop's memory. The Unit 5 entry below is amended where these fixes change it. What the fixes decided:
+
+Unit 4:
+
+- **Switch: the off thumb is `line-strong`**, not the drawn `surface-raised`, which was 1.2:1 on its track (1.08 in dark). It is now 3.94:1 in light and ocean and 6.31 in dark, and `check:contrast` measures it.
+- **RadioGroup: the checked dot and line are `primary-on-soft`** (the ring colour), not the drawn primary/solid: the dark dot was 2.57:1 on its fill, now 5.31.
+- **Toggles under forced colours** (`TOGGLE_RING`, `TOGGLE_ON`, `TOGGLE_INVALID`): the ring of a focused filled box is CanvasText; a checked invalid box turns its line CanvasText and drops the red inset ring, so the 2 px width is the cue; a checked disabled box is GrayText. A disabled selected segment takes GrayText too.
+- **A mixed Checkbox sends nothing**, before and after hydration and through a reset, as unit-4.md says; it sent `on` after a press.
+- **`useFormValue` follows the form a control names now**, so a changed `form` prop resets the right form.
+- **The server tab stop.** A RadioGroup or SegmentedControl with nothing checked, or with a default that names no item, puts it on the first enabled item in the server HTML, so hydration no longer moves it: choice 35 now takes its other option. A reset or a value set from outside puts it back on the checked radio (the group remounts).
+- **Slider.** The control carries Base UI's `data-base-ui-swipe-ignore`, so a drag inside a Drawer moves the thumb. `aria-invalid` reaches each range input from hydration on; the server HTML has it on the group only. The root carries Base UI's direction, so with no provider it is a working LTR slider. It dims and refuses presses inside a disabled fieldset (`has-disabled:`). `largeStep` and `minStepsBetweenValues` are clamped. It is padded by half the knob and its ring, so the track inset is 14 px at md and 18 at xl (choice 18 said 12). A long `showValue` moves below the track. The track has a `line-strong` outline, 3:1 in every mode.
+- **`FIELD_TEXT` lg and xl take the 16 px floor under a coarse pointer**, as xs to md do. unit-4.md 717-718 keep the old block as history.
+- **NumberField.** A NaN `min`, `max` or `step` is unset, and a `max` under `min` is raised to `min`. Inside a disabled fieldset the whole field dims. A Latin `1,234` typed under Arabic-Indic digits is 1234 on blur and on the Enter that submits; after Enter it shows the Latin text until blur. The steppers give way at 200% text.
+- **Textarea.** Autosize keeps the scroll of the page and of every box around it. `maxLength` is clamped to a whole number from 0 to 2,147,483,647. A one-row field stays one row under the touch floor, and the holder of a lg or xl field takes the touch floor of its text.
+- **OTPField.** `autoSubmit` is ours: it calls `requestSubmit()` on the field's own form, or the one its `form` attribute names; Base UI's could submit another. `aria-labelledby` names the group too. The row wraps: cells have a 24 px basis, so a parent narrower than six cells' 184 px breaks the row (4 + 2 in a 1fr 1fr grid at 320 px) instead of scrolling the page. Choice 38's one row holds only where it fits; twelve cells still break at whole 44 px cells.
+- **Select.** A side placement with no room beside the trigger opens below or above, at the trigger's width: on a 390 or 320 px phone every side placement does. The open list is named after its field. Read-only is a dashed line under forced colours.
+- **Combobox and `useCollection`.** `useCollection` asks for a page only once the list is read at its count, not on mount and not again when a page lands. A Combobox counts a page by the options loaded, not the matches, and asks for none while closed, so a short filtered list keeps asking until `hasMore` is false (three asks where it asked one), as unit-4.md says. A value whose option is in no loaded page shows an empty input. The label's text is on the input only while the list is open. The chosen row is centred once its height is measured, and again when Base UI cuts the list to fit.
+- **A row under a finger is raised to 44 px, never shortened** below the row height a 32 px root or a density sets (`ROW_TOUCH`, and Dropdown's row in Unit 3).
+- **The focused option of a Select** (SELECT-2, in Unit 3's code) is ringed by Unit 3's fix of the highlighted row (`fix/menu-rows-review`), recorded in the entry below.
+
+Unit 5:
+
+- **Meter and Progress paint the bar in `<tone>-on-soft`, not `<tone>-solid`**, with a `line-strong` outline on the track: the bar is 5.64:1 or more on the track, the edge 4.74 (7.66 in dark) on the page. Under forced colours the bar is CanvasText on a Canvas track. `check:contrast` holds the bar on the track at 3:1. A Meter's track is at least 4rem wide, so a `w-fit` parent no longer hides it, and a NaN `min` or `max` takes its default.
+- **The Arabic font is set only where `lang` is written** (`[lang|='ar']`, not `:lang(ar)`), so a `font-mono` beneath it, code or a keycap, stays monospace. Letter spacing stays 0 for every Arabic descendant (`R-5.3-3`).
+- **CodeBlock.** A classic scrollbar is drawn in the block's colours (a new token, `--tc-neutral-solid-thumb`), so the pre's ring keeps its bottom side. A pre with no title is a region named by a new label, `common.code` ("Code", Arabic "الشيفرة البرمجية"). Each press writes its status words in a new node, so a repeat failure is read again.
+- **Stepper.** Steps that do not fit wrap onto another row, 16 px apart, rather than scroll sideways as the reviewer suggested. Every circle is sized from a new token, `--tc-stepper-mark`, so a custom Stepper takes the caller's size. The step `value` names is current even when it carries its own status.
+- **DatePicker.** A close before the lazy part arrives unmounts the root. The month buttons at the end of the range are `aria-disabled`, not `disabled`, so the focus stays on them and one Escape closes one layer. The chosen day's button is `aria-pressed`. The chosen day carries an inset line at 3:1 (the dark fill alone is 2.57:1), and its ring under forced colours is CanvasText. The popup and cell paddings stop at 16 and 2 px and a day fills its column, so two digits fit at a 32 px root.
+- **TreeView.** A press brings the focus without scrolling; a press off a row, or on a disabled row, highlights nothing. While a wheel leaves the highlighted row out of sight, the tree draws its own ring. A space inside a type-ahead query is text.
+- **Shared, from TreeView.** An unmeasured collection windows the rows its box shows, so a server-rendered list has no blank rows. A dev warning reads `process.env.NODE_ENV` in the dot form every bundler inlines, so it never throws in the browser.
+- **FileUpload.** The list is capped at `visibleRows` whole rows, gaps and the coarse row included, and a row never shrinks. A disabled upload dims its remove buttons. The input has an empty `title`, so Chromium shows no "No file chosen" tooltip. Each over-limit cut writes its message anew. A size is rounded before its unit is picked (1 MB, not 1,024 kB). A long word wraps, and a link in the hint is lifted over the input.
+- **Field and Form.** A form error is cleared from every FieldLive of a name once one of them changes. The errors context holds `undefined` until an answer holds errors: the test was reworded, the code did not change (SHARED5-3). The Form README says a FileUpload loses its files when an action resets the form. The buttons of two form demos wrap, so a 32 px root never scrolls a 320 px page.
+
+Left for Omar, each built as the first option:
+
+- OTPField under its 184 px floor: the drawn 8 px gap, so a 1fr 1fr pair breaks 4 + 2 at 320 px and 5 + 1 at 390; or a 6 or 4 px gap, which keeps the 390 pair on one line but departs from the drawing.
+- An OTPField in equal 1fr 1fr halves beside a short span: it breaks 4 + 2; or no wrap for eight cells or fewer, which brings the page scroll back.
+- The Slider in dark (SLIDER-9, the one finding only partly fixed): the fill stays primary/solid as drawn, 2.76:1 on the empty track, with the knob face 2.57 on the fill; or the fill and the knob line take `--tc-ring`, 5.31 or better everywhere but a shade darker than Figma in light and ocean.
+- The Slider's `aria-invalid` before hydration: on the group only; or Base UI's Field.Root around the slider, which hides an outer Field context.
+- A NumberField `min` or `max` of plus or minus Infinity: pulled to 1e15, so End jumps there; or read as unset.
+- A RadioGroup whose `defaultValue` names a disabled radio: Base UI puts the only tab stop on it, so Tab skips the group, now after a reset too; or a `highlightedIndex`.
+- An element given as a label ends in an ellipsis inside SegmentedControl only; or the shared `truncateLabel` wraps an element child too.
+- The Switch's off thumb in Figma: still `surface-raised`; parity needs `line-strong` there too.
+- Select: every side placement on a phone opens below; confirm.
+- TreeView: a press on a disabled row highlights nothing, where the plan says a disabled row takes the highlight; confirm. With duplicate ids (a broken contract), ArrowDown stops at the row before the dropped one.
+- Stepper: wrap; or the reviewer's sideways scroller. Meter and Progress: `<tone>-on-soft` fills; or solid fills with darker solids.
+- The form errors context: `undefined` until an answer holds errors; or FormAction provides a frozen `{}`, a code change with its own entry here.
+- `field--controls` in RTL at a 32 px root on a 320 px screen: the segmented control's "Table" radio starts at x = -7 inside its own scroller, as before the review; for SegmentedControl's next look.
+- Under forced colours a classic scrollbar thumb crosses the bottom row of the CodeBlock ring at 1.39:1 (1.46 in dark): the browser's own limit, the same before the fix.
+- After the Slider fix, `e2e/field.spec.ts:50` and the Slider row of the Field README on the Unit 5 branches still put `aria-invalid` on the group; they change when Unit 5 is stacked on the fixed Unit 4.
+- Housekeeping: old agent worktrees hold stale local copies of seven fix branches (toggles, select, field-form, stepper-meter and tree-view with uncommitted edits; date-picker and combobox behind the pushed tip); the pushed branches are the verified ones. Three files pass the 200-line warning: tree-view `hook.ts` (217), `slider.test.tsx` (216) and `file-upload.dom.test.tsx` (207). On some bases `scripts/mutate.ts` still lacks Unit 3's runner fix; it arrives with the stack.
+
+SELECT-5, the two merges on `feat/select` that keep git's default message ("Merge branch 'feat/slider' into feat/select" and the same for `feat/number-field`), stays as history.
+
+**Why.** Each line answers a reproduced fault; the findings, reproductions and fixes are in `handoff/review-4`, `handoff/review-5` and the pull requests.
+
+---
+
 ## 2026-10-16 - The deep review of Unit 3, and what it changed
 
 **Decision.** An independent review measured all of Unit 3 in a browser and found 73 faults that every gate had passed: 2 blockers (a Drawer opened from a Dialog drawn under it; a filled Rating star at 2.13:1), 33 major and 38 minor. Each was reproduced before it was fixed, and each fix carries a test proven to fail without it. The fixes are the fourteen `fix/*-review` pull requests after `feat/command`; the whole chain passes `pnpm check`. What the fixes decided:
@@ -37,24 +96,73 @@ From the plan itself:
 - Field's control object gains `aria-labelledby`; its ids come from `useId()` unless `id` is given.
 - FieldLive and FormAction use neither Base UI's Field nor its Form. FormAction keeps the browser's own validation and takes a function child that gets the action's state.
 - Stepper is a server component. CodeBlock has no highlighter and its own copy part.
-- TreeView writes its own two rings. DatePicker is built on `Intl` (2026-10-03); its grid is Gregorian, six rows, with a Close button.
-- The FileUpload list is not windowed. TreeView and FileUpload take no `error` status. FileUpload, TreeView, CodeBlock and Field take no `size`.
+- CodeBlock's copy button writes its own hover, a 10% tint of neutral/on-solid, because `HOVER.ghost` reads the page's neutral/soft beside the block's text colour (`R-5.2-4`). Its rings stay the shared ones.
+- TreeView writes its own two rings (`R-5.2-4`). DatePicker is built on `Intl` (2026-10-03); its grid is Gregorian, six rows, with a Close button. PLAN 2 and 18.4 still name react-day-picker; this line corrects them.
+- The FileUpload list is not windowed, and its rest props reach the `<input>`, not the root (`R-5.7-3`). TreeView takes no `getKey`, `selectedItem` or request ids (8.5). TreeView and FileUpload take no `error` status. FileUpload, TreeView, CodeBlock and Field take no `size`.
 - `expanded`, `defaultExpanded` and `onExpandedChange` join the vocabulary.
 - Not built in v0.1: ErrorState, ErrorBoundary, IconButton, Heading, Text, Container, Stack, Grid.
 - New infrastructure: nine label keys, three tokens, `src/shared/form-errors.ts`.
 
 From the builders, each measured in Chromium:
 
-- **Meter.** Some tones fill the bar at under 3:1 against the track (warning in light and ocean, primary and info in dark): Progress's tokens too, a token decision for Omar. A meter in a `w-fit` parent is 0 px wide, as Progress.
-- **Stepper.** `defaultValue` is refused by the type. Past about 8 steps at md on a 320 px phone the circles overlap; the page never scrolls.
+- **Shared.** The tokens' mutation file is `shared-unit-5-tokens.ts`; the plan said `shared-tokens.ts`.
+- **Meter.** As built, some tones filled the bar at under 3:1 against the track, and a meter in a `w-fit` parent was 0 px wide, as Progress; the review changed both (2026-10-16). The rtl demo is a `dir` and `lang` div, not a provider.
+- **Stepper.** `defaultValue` is refused by the type. `data-size` sits on the `<ol>`; an unknown status is ignored; the rtl demo is inside a provider. As built, past about 8 steps at md on a 320 px phone the circles overlapped; since the review they wrap (2026-10-16).
 - **CodeBlock.** Copy reports "Could not copy" when there is no clipboard (the plan's optional chain reported success).
-- **Field.** All eleven Unit 4 controls work inside a Field before and after hydration. Found in other folders: Slider puts `aria-invalid` on its group, not its range input.
-- **Form.** `method`, `encType` and `target` are not FormAction props (React writes them). `initialState` is required unless every key is optional.
-- **FileUpload.** The empty message line is `sr-only`, not hidden (a live region); a drag also turns the line solid; refused rows stay until the next pick.
-- **TreeView.** The note is a live region kept in the tree when empty; the selected row's ring under forced colours is fixed by specificity.
+- **Field.** All eleven Unit 4 controls work inside a Field before and after hydration. Found in other folders: Slider put `aria-invalid` on its group, not its range input (fixed by the review, 2026-10-16); Checkbox's `aria-required` is not in Chromium's tree; OTPField's group gets `aria-labelledby` only after hydration (since the review, in the server HTML too).
+- **Form.** `method`, `encType` and `target` are not FormAction props (React writes them). `initialState` is required unless every key is optional. The permalink is proven only with a hand-made Server Action reference.
+- **FileUpload.** The empty message line is `sr-only`, not hidden (a live region); a drag also turns the line solid; refused rows stay until the next pick. A form reset rewrites `input.files`; files picked before hydration join the list; native input props are refused by the type.
+- **TreeView.** The note is a live region kept in the tree when empty; the tree itself is `empty:hidden`; the selected row's ring under forced colours is fixed by specificity.
 - **DatePicker.** The whole Positioner and Popup live in the lazy part, inside the Portal (a popup that grew after mounting made Base UI flip it inside a ResizeObserver callback). Focus moves to the day one frame after the popup is placed. Home and End stay inside the visible month. Days are 31 px wide on a 320 px phone (choice 19). The modal popup hides the caller's label while open, as Combobox's does.
 
 **Why.** Each line answers a measurement or a rule; the numbers are in `handoff/LOG-5.md` and the specs.
+
+---
+
+## 2026-10-15 - Unit 4: where it departs from its plan
+
+**Decision.** Unit 4 is built as `docs/figma/unit-4.md` asks, on top of the local Unit 3 stack (`feat/command`), with these departures. Omar has not answered its "Choices for Omar"; every open choice is built as its "Built as" column, and each builder's list of the choices it took is in `handoff/LOG-2.md`.
+
+From the plan itself:
+
+- Field, Label and Form are not built with the form controls; the two Phase 4 clauses about server Fields, `FormAction` and `FieldLive` stay open for Unit 5.
+- Switch and Checkbox keep Base UI's `checked`, `defaultChecked` and `onCheckedChange` (`R-5.7-1` says `value` and `onValueChange`). The recommendation is asked as choice 2, before the session, not on Switch's pull request.
+- Select is not windowed and takes no `CollectionProps`; the ten thousand options of Phase 4 are Combobox's. Options are plain `{ value, label, disabled }` data, with no `getKey`. `selectedItem`, a stale `loadMore` dropped by request id and the error row with a retry are not built. A Select does not warn for two options with one `value`; a Combobox does.
+- The shared target spec no longer measures an input hidden from assistive technology and out of the tab order, or an `<input type="hidden">` (`R-5.6-2`).
+- At 320 px under a coarse pointer a six-cell OTPField's cells are 36 px wide (33 with a separator), and seven or eight cells are under 44 px wide at 390 px too (`R-5.6-2`).
+- Five controls do not spread the rest onto their outermost element (`R-5.7-3`): `RadioGroupItem`, Select, Combobox, a held Textarea and `SegmentedControlRoot`.
+- Select and Combobox clamp with the shared `COLLECTION_BOUNDARIES` and have no `boundaries.ts` (`R-8.3-6`). A Combobox input has the cap of a search field and no counter (`R-5.7-8`).
+- The shared `INVALID` of PLAN 5.2 is `FIELD_INVALID`: a border and an inset ring, no outline.
+- Select and Combobox are data-driven only, RadioGroup and SegmentedControl parts only (9.1). SegmentedControl is built on Base UI's radio group. OTPField does not use Base UI's `Separator`, and `length` has a default.
+- A Textarea that renders no client code has no counter (`R-5.7-8`), and the `zod/mini` validator is still unwritten. Nine of the ten have no `skeleton.tsx`. A radio label wraps (`R-5.2-7`).
+- "Form controls require a label through Field" (5.6) is "a name is required by the type". Combobox renders Base UI's English "Dismiss" (`R-5.11-1`). The adaptive Select and Combobox (11) are not built.
+- New infrastructure: the name contract, the option contract, the toggle and field class constants, the server tab stop, `src/shared/use-form-value.ts`, two tokens, seven label keys, `e2e/form.ts` and `scripts/lib/targets.ts`.
+
+From the shared pull requests 1 to 9:
+
+- **Target spec (1).** Its "finds interactive elements" test stops at the first demo with a target instead of loading all 204 in one 30 s test.
+- **Toggle and field styles (3, 4).** The plan's classes are kept character for character, and Input's class lists are identical once sorted. `src/shared/classes.ts` passes the 200-line warning (243 lines after 7).
+- **Labels (5).** The English of the two ratio labels is chosen: `Character {place} of {length}` and `{length} of {max} characters`.
+- **Server tab stop (6).** Three expectations in `tabs.client.test.ts`, which pin hook imports, changed; no behaviour test did.
+- **Option contract (7).** `ListOption`, `COLLECTION_BOUNDARIES`, `ROW_TOUCH` and `ROW_SELECTED`.
+- **Collection popup (8).** `offsetForIndex` takes `scrollTop`, so `'nearest'` is the nearest edge; `scrollToIndex` reads the padding and the scroll padding; two tokens, `--tc-list-pad-start` and `--tc-list-pad-end`. Command was not re-run against it; the stacked check covers it.
+- **Form value (9).** `rootRef` is typed `HTMLDivElement`, since every Base UI root that takes it is a div; a cancelled reset is ignored.
+
+From the builders, each measured in Chromium:
+
+- **Switch.** Its README recommends keeping `checked`, `defaultChecked` and `onCheckedChange` (choice 2).
+- **Checkbox.** Base UI leaves `indeterminate` to the owner. As built, a mixed box sent `name=on` after a press while it still showed the dash; the review changed that (2026-10-16).
+- **RadioGroup.** Base UI's RadioGroup takes no `rootRef`; the value is typed `string` and `null` is handled. A disabled radio leaves the tab and arrow order. The generated README import names `RadioGroup` (its `meta.name`), which is not an export; Tabs has the same generator fault.
+- **SegmentedControl.** `SEGMENTED_HOLDER_FULL` and a `SegmentedControlSelection` type are added; in a narrow parent the segments scroll inside the track.
+- **Textarea.** lg and xl get the 16 px text floor under a coarse pointer (the plan left it off: 14 px measured). The skeleton has a height floor, the holder hears a form reset, `rowsFor` subtracts 1 px and the counter groups thousands (5,000). The README prints the type of `maxLength` as `unknown`: the generator does not read zod's nullable.
+- **Slider.** The range is built (choice 17). In RTL ArrowLeft raises the value. One thumb carries the name; a range's group does. Before hydration the range input moves the value but not the thumb.
+- **NumberField.** The input comes first in the markup and Decrease takes `order-first`, because a wrapping label pointed at the button. It has a `lib.ts`. A Latin grouped paste under Arabic digits is fixed (Base UI parses "1,234.5" as 1); a focused reset writes the default; `-u-nu-` in the caller's locale is honoured; `step` stops at 1e15; NaN is empty. At a 32 px root on 320 px the digits clip (README).
+- **OTPField.** Built on Base UI's otp-field (Root, Input). The cells stay LTR in RTL, Arabic-Indic digits are stored as ASCII (choice 21), and the coarse text is `max(own step, 16px)` from md to xl. It found two test-helper faults that the Unit 3 review fixed: `rgbOf` read only `rgb()`, and `expectNoSidewaysScroll` could not see overflow past the inline start.
+- **Select.** The popup has its own `max-h` (8 px padding). The trigger types drop `render` and `nativeButton`; `ListOption` is not re-exported; the Escape guard is wired but cannot be tested. Base UI facts: read-only still opens, a value of `''` means nothing chosen, and `alignItemWithTrigger` still defaults to true. Two merges on `feat/select` keep git's default messages.
+- **Combobox.** 10,000 options: 14 rows mounted, open in 48 to 213 ms, a key in 23 to 35 ms; a wrap to row 10,000 is named by `aria-activedescendant`. Base UI's modal popup hides the caller's `<label for>` while open, so the label's text is copied to the input's `aria-label` (only while open since the review). `useCollection` asked for pages on open and twice per page, so Combobox gated `hasMore`; the review moved the fix into `useCollection` (2026-10-16).
+- **The stack.** One conflict, in `shared-labels.ts`, with both sides kept. The Drawer's mouse-drag test now holds 400 ms before release: Base UI dismisses at 0.5 px/ms or more, and the test failed on any idle machine from `feat/drawer` on.
+
+**Why.** Each line answers a measurement or a rule; the numbers are in `handoff/LOG-2.md` and the specs.
 
 ---
 
