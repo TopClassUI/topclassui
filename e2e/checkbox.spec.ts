@@ -7,7 +7,7 @@ import { serverEntries } from './form.js'
 import { type LiveOptions, expectNoSidewaysScroll, liveErrors, openLive } from './live.js'
 import { boxOf } from './overlay.js'
 import { urlFor } from './pages.js'
-import { FORCED_CANVAS, contrast, inkOn, paintedIn, pixelsOf, rgbOf } from './pixels.js'
+import { FORCED_CANVAS, contrast, inkOn, paintedIn, pixelsOf, rgbOf, ringRow } from './pixels.js'
 
 // What happy-dom cannot lay out or press: the target around the box, the mark inside it, the ring, forced colours,
 // the screens, a wrapping label, and the form a real browser sends, before hydration and after a reset.
@@ -150,6 +150,20 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(paintedIn((await rows(page, boxIn(page, 'Unchecked'))).flat(), highlight)).toBe(0)
       expect(contrast(rgbOf(await css(drawn(boxIn(page, 'Unchecked')), 'border-top-color')), FORCED_CANVAS[scheme])).toBeGreaterThanOrEqual(3)
     })
+
+    // The page in the other theme, where --tc-ring fell to 2.85:1 on Canvas: only a system colour holds in both.
+    for (const mode of scheme === 'light' ? ['dark'] as const : ['light', 'ocean'] as const) {
+      test(`${mode} page: the ring of a focused box is the user's CanvasText, 3:1 on Canvas, ticked, mixed and invalid too`, async ({ page }) => {
+        await page.goto(urlFor('checkbox--states', mode, 'ltr'))
+        const canvasText = await resolve(page, 'CanvasText')
+        for (const name of ['Unchecked', 'Checked', 'Indeterminate', 'Invalid, checked', 'Invalid, indeterminate', 'Read-only']) {
+          await boxIn(page, name).focus()
+          expect(await css(drawn(boxIn(page, name)), 'outline-color'), name).toBe(canvasText)
+          const row = await ringRow(page, await boxOf(drawn(boxIn(page, name))))
+          expect(inkOn(row, FORCED_CANVAS[scheme]), name).toBe(row.length)
+        }
+      })
+    }
 
     test('invalid thickens the line to 2 px; disabled dims the whole box; no target has an outline at rest', async ({ page }) => {
       await page.goto(urlFor('checkbox--states', 'light', 'ltr'))

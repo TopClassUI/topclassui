@@ -164,6 +164,7 @@ describe('a toggle: the target takes the press, the box inside it draws the rest
     expect(TOGGLE_RING.split(' ')).toEqual([
       'group-focus-visible/toggle:outline-solid', 'group-focus-visible/toggle:outline-(length:--tc-ring-width)',
       'group-focus-visible/toggle:outline-offset-(length:--tc-ring-offset)', 'group-focus-visible/toggle:outline-ring',
+      'forced-colors:group-focus-visible/toggle:outline-[CanvasText]',
     ])
     for (const cls of TOGGLE_RING.split(' ')) expect(has(TOGGLE_BOX, cls), cls).toBe(true)
     expect(TOGGLE_TARGET).not.toContain('focus-visible')

@@ -52,6 +52,13 @@ describe('the box reads the target it sits in', () => {
     expect(ruleOf(`${selectorOf('group-focus-visible/toggle:outline-ring')}${FOCUSED}`)).toBe('outline-color: var(--tc-ring);')
   })
 
+  it('paints the ring CanvasText under forced colours, after the author ring, so a filled box that opts out keeps the user palette', () => {
+    const forced = `${selectorOf('forced-colors:group-focus-visible/toggle:outline-[CanvasText]')}${FOCUSED}`
+    expect(ruleOf(forced)).toBe('outline-color: CanvasText;')
+    expect(css.slice(0, css.indexOf(`${forced} {`))).toMatch(/@media \(forced-colors: active\) \{\s*$/)
+    expect(css.indexOf(`${forced} {`)).toBeGreaterThan(css.indexOf(`${selectorOf('group-focus-visible/toggle:outline-ring')}${FOCUSED} {`))
+  })
+
   it('reads no bare group anywhere, which an accordion trigger around the toggle would match', () => {
     expect(css).not.toContain(':where(.group):')
     expect(css).not.toContain(':where(.group)[')

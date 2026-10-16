@@ -31,4 +31,10 @@ export const MUTATIONS: Mutation[] = [
     from: ' group-aria-invalid/toggle:group-data-checked/toggle:border-danger-solid',
     to: '',
   },
+  {
+    label: 'the shared toggle ring loses its forced-colours CanvasText, so a ticked box rings in the author violet at 2.85:1 on Canvas',
+    file: CLASSES,
+    from: ' forced-colors:group-focus-visible/toggle:outline-[CanvasText]',
+    to: '',
+  },
 ]

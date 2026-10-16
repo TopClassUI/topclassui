@@ -7,7 +7,7 @@ import { serverEntries } from './form.js'
 import { type LiveOptions, expectNoSidewaysScroll, liveErrors, openLive } from './live.js'
 import { boxOf } from './overlay.js'
 import { urlFor } from './pages.js'
-import { FORCED_CANVAS, contrast, pixelsOf, rgbOf } from './pixels.js'
+import { FORCED_CANVAS, contrast, inkOn, pixelsOf, rgbOf, ringRow } from './pixels.js'
 
 // What happy-dom cannot lay out or press: the target around the track, where the thumb lands in each direction,
 // the ring, forced colours, the screens, and the form a real browser sends, before hydration and after a reset.
@@ -176,6 +176,28 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(await gaps(on, 'ltr')).toMatchObject({ end: 2 })
       expect(await gaps(off, 'ltr')).toMatchObject({ start: 2 })
     })
+
+    // The page in the other theme, where --tc-ring fell to 2.85:1 on Canvas: only a system colour holds in both.
+    for (const mode of scheme === 'light' ? ['dark'] as const : ['light', 'ocean'] as const) {
+      test(`${mode} page: the ring of a focused switch is the user's CanvasText, 3:1 on Canvas, on and invalid too`, async ({ page }) => {
+        await page.goto(urlFor('switch--states', mode, 'ltr'))
+        const canvasText = await page.evaluate(() => {
+          const probe = document.createElement('span')
+          probe.style.setProperty('forced-color-adjust', 'none')
+          probe.style.color = 'CanvasText'
+          document.body.appendChild(probe)
+          return getComputedStyle(probe).color
+        })
+        for (const name of ['Off', 'On', 'Invalid, on', 'Read-only']) {
+          await switchOf(page, name).focus()
+          expect(await css(trackOf(switchOf(page, name)), 'outline-color'), name).toBe(canvasText)
+          // A pill: the ring runs straight only between the two half circles.
+          const track = await boxOf(trackOf(switchOf(page, name)))
+          const row = await ringRow(page, { left: track.left + track.height / 2, top: track.top, width: track.width - track.height })
+          expect(inkOn(row, FORCED_CANVAS[scheme]), name).toBe(row.length)
+        }
+      })
+    }
 
     test('invalid thickens the line to 2 px; disabled dims the whole switch; no target has an outline at rest', async ({ page }) => {
       await page.goto(urlFor('switch--states', 'light', 'ltr'))

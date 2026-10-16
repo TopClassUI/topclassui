@@ -57,3 +57,9 @@ export function rgbOf(computed: string): Rgb {
   const [r = 0, g = 0, b = 0] = (computed.match(/\d+/g) ?? []).map(Number)
   return [r, g, b]
 }
+
+/** The row through the middle of a ring drawn `offset` px outside a box and `width` px thick, along its top edge, corners left out. */
+export function ringRow(page: Page, box: { left: number; top: number; width: number }, offset = 2, width = 2): Promise<Rgb[]> {
+  const inset = Math.ceil(width)
+  return pixelsOf(page, { x: Math.round(box.left + inset), y: Math.floor(box.top - offset - width / 2), width: Math.round(box.width - 2 * inset), height: 1 })
+}
