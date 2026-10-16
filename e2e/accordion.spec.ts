@@ -886,7 +886,9 @@ const faultsOf = (page: Page, scope = '#demo') => page.evaluate((within) => {
       }
       if (title.scrollWidth > title.clientWidth + 1) faults.push(`the title of ${name} is wider than its room`)
       const [text, mark] = [title.getBoundingClientRect(), caret.getBoundingClientRect()]
-      if (text.right > mark.left + 0.5 && mark.right > text.left + 0.5) faults.push(`the title of ${name} lies over its caret`)
+      // On both axes: where the caret has wrapped below its title, the two share columns and no pixel.
+      const across = text.right > mark.left + 0.5 && mark.right > text.left + 0.5
+      if (across && text.bottom > mark.top + 0.5 && mark.bottom > text.top + 0.5) faults.push(`the title of ${name} lies over its caret`)
       if (panel.getBoundingClientRect().top < heading.getBoundingClientRect().bottom - 0.5) faults.push(`the panel of ${name} lies over its trigger`)
     }
   }
@@ -926,10 +928,12 @@ test.describe('on every screen, in both directions', () => {
       title.textContent = 'a title that no longer wraps and is far wider than the room it was given'
     })
     await triggers(page).nth(1).evaluate((button) => { button.style.marginInlineStart = '-40px' })
+    await triggers(page).nth(2).evaluate((button) => { (button.lastElementChild as HTMLElement).style.marginInlineStart = '-20px' })
     expect(await faultsOf(page)).toEqual([
       'the title of "a title that no " is wider than its room',
       'the button of "Does it work in " crosses its box',
       'the title of "Does it work in " crosses its box',
+      'the title of "How big is the b" lies over its caret',
     ])
     await page.locator('#demo [data-orientation]').first().evaluate((box: HTMLElement) => { box.style.width = '400px' })
     expect(await faultsOf(page)).toContain('a box crosses the padding of the page')
@@ -1226,7 +1230,7 @@ test.describe('axe on a 320 x 480 phone', () => {
 })
 
 test.describe('larger text', () => {
-  for (const screen of [{ width: 1280, height: 800 }, { width: 390, height: 844 }]) {
+  for (const screen of [{ width: 1280, height: 800 }, { width: 390, height: 844 }, { width: 320, height: 480 }]) {
     test(`${String(screen.width)} px, text at 200% (root 32 px): every trigger grows with its title, and nothing leaves its box`, async ({ page }) => {
       await page.setViewportSize(screen)
       for (const demo of ['accordion--basic', 'accordion--long-content', 'accordion--rtl']) {
@@ -1240,6 +1244,12 @@ test.describe('larger text', () => {
         if (screen.width === 1280 && demo === 'accordion--basic') expect(heights).toEqual([96, 96, 96])
         const caret = await boxOf(triggers(page).first().locator('xpath=./span[last()]'))
         expect({ width: caret.width, height: caret.height }).toEqual({ width: 28, height: 28 })
+        // Beside its title or wrapped below it, each caret keeps 32 px (px-4) from the inline end of its trigger.
+        const ends = await triggers(page).evaluateAll((all) => all.map((one) => {
+          const [row, mark] = [one.getBoundingClientRect(), one.lastElementChild?.getBoundingClientRect()]
+          return mark ? Math.round(getComputedStyle(one).direction === 'rtl' ? mark.left - row.left : row.right - mark.right) : -1
+        }))
+        expect([...new Set(ends)], demo).toEqual([32])
       }
     })
   }
