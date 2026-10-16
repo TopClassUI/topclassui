@@ -66,7 +66,7 @@ default once the script runs, so the screen and the form agree.
 **Digits.** The field formats with your `locale` and `format`, else the provider's locale and
 numbering system, so the server and the browser print the same text. A `-u-nu-` in your
 `locale` counts: `locale="ar-u-nu-arab"` shows and takes Arabic-Indic digits. Arabic-Indic digits
-are read in any locale, and a pasted `1,234.5` is 1234.5 there as well.
+are read in any locale, and a `1,234.5` typed or pasted is 1234.5 there as well.
 
 **`invalid`** sets `aria-invalid` on the input: the line of the field turns red and thickens.
 **`disabled`** dims the whole field. **`readOnly`** keeps the number in the form, tints the

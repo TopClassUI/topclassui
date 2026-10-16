@@ -115,4 +115,10 @@ export const MUTATIONS: Mutation[] = [
     from: '    max: low !== undefined && high !== undefined && high < low ? low : high,',
     to: '    max: high,',
   },
+  {
+    label: 'the number field leaves a typed Latin 1,234 to Base UI, which reads it as 1 under Arabic-Indic digits',
+    file: HOOK,
+    from: "    input.addEventListener('focusout', leave)\n",
+    to: '',
+  },
 ]
