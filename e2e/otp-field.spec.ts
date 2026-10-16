@@ -390,6 +390,14 @@ test.describe('live: a form reset', () => {
     await send.click()
     await expect.poll(() => sent(page, 'echo')).toEqual([[['again', '129']], [['again', '129']]])
   })
+
+  test('autoSubmit sends the field\'s own form, or the one its form attribute names, never the form of a field mounted after it', async ({ page }) => {
+    await typeInto(page, 'Auto', '4321')
+    await expect.poll(() => sent(page, 'auto')).toEqual([[['auto', '4321']]])
+    await typeInto(page, 'Tied', '8765')
+    await expect.poll(() => sent(page, 'tied')).toEqual([[['tied', '8765']]])
+    expect([await sent(page, 'outer'), await sent(page, 'later')]).toEqual([[], []])
+  })
 })
 
 test.describe('live: where a page puts a code field', () => {

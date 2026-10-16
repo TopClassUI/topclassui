@@ -62,6 +62,24 @@ export const MUTATIONS: Mutation[] = [
     to: 'aria-describedby={ariaDescribedBy}',
   },
   {
+    label: 'the otp field autoSubmit sends the last form on the page, not the field\'s own',
+    file: HOOK,
+    from: "if (autoSubmit) state.rootRef.current?.querySelector('input')?.form?.requestSubmit()",
+    to: 'if (autoSubmit) [...document.forms].at(-1)?.requestSubmit()',
+  },
+  {
+    label: 'the otp field never hands Base UI its completion handler, so autoSubmit sends nothing',
+    file: CLIENT,
+    from: '        onValueComplete={otp.onValueComplete}\n',
+    to: '',
+  },
+  {
+    label: 'the otp field completion never reaches the caller, so onValueComplete hears nothing',
+    file: HOOK,
+    from: '    onValueComplete?.(code, details)\n',
+    to: '',
+  },
+  {
     label: 'the otp field ignores details.cancel(), so a handler that cancels still changes the code',
     file: HOOK,
     from: '    if (!details.isCanceled) state.setValue(next)',

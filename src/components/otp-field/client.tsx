@@ -19,6 +19,8 @@ export function OTPField({
   value,
   defaultValue,
   onValueChange,
+  onValueComplete,
+  autoSubmit,
   validationType,
   normalizeValue,
   inputMode,
@@ -29,7 +31,9 @@ export function OTPField({
   'aria-invalid': ariaInvalid,
   ...rest
 }: OtpFieldProps) {
-  const otp = useOtpField({ length, groupSize, value, defaultValue, onValueChange, validationType, normalizeValue, inputMode, ref })
+  const otp = useOtpField({
+    length, groupSize, value, defaultValue, onValueChange, onValueComplete, autoSubmit, validationType, normalizeValue, inputMode, ref,
+  })
   // A Field passes aria-invalid itself, so it survives when `invalid` is off.
   const cellInvalid = invalid ? true : ariaInvalid
   // A code reads left to right: without the provider an Arabic page would run the arrows against the cells.
@@ -42,6 +46,7 @@ export function OTPField({
         length={otp.length}
         value={otp.value}
         onValueChange={otp.onValueChange}
+        onValueComplete={otp.onValueComplete}
         dir="ltr"
         data-size={size}
         className={cn(OTP_ROOT, otp.wraps && OTP_WRAP, className)}
