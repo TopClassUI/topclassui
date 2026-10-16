@@ -259,6 +259,21 @@ test.describe('live: the rows follow the text', () => {
     })
   }
 
+  for (const direction of DIRECTIONS) {
+    test(`${direction}, coarse pointer, 14 px root: a field in its holder is as wide as a plain one at every size, lg and xl too`, async ({ browser }) => {
+      const page = await browser.newPage(COARSE)
+      await openLive(page, 'separator--horizontal', { direction })
+      await page.addStyleTag({ content: 'html { font-size: 14px }' })
+      await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/textarea-rows.tsx' })
+      await expect(page.locator('#rows textarea')).toHaveCount(10)
+      expect(await Promise.all(['xs', 'sm', 'md', 'lg', 'xl'].map(async (size) => [
+        size, (await boxOf(field(page, `${size} plain`))).width, (await boxOf(field(page, `${size} autosize`))).width,
+      ]))).toEqual([['xs', 220.8, 220.8], ['sm', 220.8, 220.8], ['md', 220.8, 220.8], ['lg', 220.8, 220.8], ['xl', 220.8, 220.8]])
+      expect(await liveErrors(page)).toEqual([])
+      await page.close()
+    })
+  }
+
   test('a field pre-filled past six rows has the same height on the server and once hydrated', async ({ page }) => {
     await page.goto(urlFor('textarea--autosize', 'light', 'ltr'))
     const served = (await boxOf(field(page, 'Past six rows'))).height

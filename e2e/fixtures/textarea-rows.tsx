@@ -1,4 +1,4 @@
-// Loaded into a live page by e2e/textarea.spec.ts: a plain textarea and an autosize one of a single row, side by side at
+// Loaded into a live page by e2e/textarea.spec.ts: a plain textarea and an autosize one of a single row, one above the other at
 // each size. The server writes the autosize one as the plain one, so the two must stay the same box once hydrated.
 import { createRoot } from 'react-dom/client'
 
@@ -14,7 +14,7 @@ function Fixture() {
     <TopClassProvider direction={direction} locale={direction === 'rtl' ? 'ar' : 'en'}>
       <div id="rows" style={{ display: 'grid', gap: 8, padding: 16, justifyItems: 'start' }}>
         {SIZES.map((size) => (
-          <div key={size} data-size={size} style={{ display: 'flex', gap: 8, alignItems: 'start' }}>
+          <div key={size} data-size={size} style={{ display: 'grid', gap: 8, justifyItems: 'start' }}>
             <Textarea aria-label={`${size} plain`} size={size} rows={1} />
             <Textarea aria-label={`${size} autosize`} size={size} rows={1} autosize />
           </div>

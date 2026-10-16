@@ -140,4 +140,10 @@ export const MUTATIONS: Mutation[] = [
     from: '  if (field.scrollHeight <= field.clientHeight) { restore(); return }\n',
     to: '',
   },
+  {
+    label: 'the lg textarea holder loses the touch floor of its text, so under a 14 px root a held field is narrower than a plain one',
+    file: CLASSES,
+    from: '  lg: `text-base ${FIELD_TEXT_COARSE}`,',
+    to: "  lg: 'text-base',",
+  },
 ]
