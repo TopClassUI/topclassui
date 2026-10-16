@@ -28,6 +28,8 @@ export const SEGMENTED_ITEM = [
   'forced-colors:data-checked:forced-color-adjust-none forced-colors:data-checked:bg-[Highlight] forced-colors:data-checked:text-[HighlightText]',
   'forced-colors:data-checked:shadow-none forced-colors:data-checked:[--tc-ring:HighlightText]',
   'forced-colors:data-checked:data-disabled:bg-[GrayText] forced-colors:data-checked:data-disabled:text-[Canvas]',
+  // R-5.2-7: an element given as the label is a flex item of its own, so it truncates as a run of text does.
+  '*:min-w-0 *:truncate',
   CONTAIN, FOCUS_RING_INSET, TOUCH_TARGET, TRANSITION, DISABLED,
 ].join(' ')
 

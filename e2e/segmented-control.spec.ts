@@ -556,6 +556,11 @@ test.describe('live: hostile content', () => {
         const box = await boxOf(word)
         expect(box.left).toBeGreaterThanOrEqual(0)
         expect(box.right).toBeLessThanOrEqual(320)
+        // SEGMENTED-2: an element for a label ends in an ellipsis too, and stays inside its segment in both directions.
+        const element = page.locator('#hostile [role="radio"] > strong')
+        expect([await css(element, 'text-overflow'), await element.evaluate((el) => el.scrollWidth > el.clientWidth)]).toEqual(['ellipsis', true])
+        const [inner, outer] = [await boxOf(element), await boxOf(element.locator('..'))]
+        expect([inner.left >= outer.left, inner.right <= outer.right]).toEqual([true, true])
         for (const name of ['Ten', 'Sixty']) {
           expect(await page.getByRole('radiogroup', { name }).evaluate((el) => el.scrollWidth > el.clientWidth), name).toBe(true)
         }

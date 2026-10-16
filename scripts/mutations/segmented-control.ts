@@ -217,4 +217,10 @@ export const MUTATIONS: Mutation[] = [
     from: "  'forced-colors:data-checked:data-disabled:bg-[GrayText] forced-colors:data-checked:data-disabled:text-[Canvas]',\n",
     to: '',
   },
+  {
+    label: 'the segmented control lets an element label sit in the segment as it is, cut with no ellipsis and past the segment in rtl',
+    file: CLASSES,
+    from: "  '*:min-w-0 *:truncate',\n",
+    to: '',
+  },
 ]

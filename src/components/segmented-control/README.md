@@ -78,7 +78,7 @@ segment, since the track clips. Each segment is 24 px tall at least, 44 px under
 
 **When the segments do not fit**, the track scrolls sideways inside itself and the page does
 not; an arrow key brings the next segment into view. A label longer than the track ends in an
-ellipsis, and is cut at 100 characters. **`fullWidth`** fills the parent and shares it equally:
+ellipsis, an element given as the label too, and text is cut at 100 characters. **`fullWidth`** fills the parent and shares it equally:
 it is for a few short segments, since seven long ones on a phone are cut to nothing. In a parent
 that sizes to its content (a table cell, a `w-fit` box) it is as wide as its segments.
 
