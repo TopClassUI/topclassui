@@ -51,7 +51,7 @@ describe('the line look, the default', () => {
   it('the list is a row that scrolls sideways inside itself and is the offset parent of its tabs', () => {
     render(tabs())
     expect(classes('list')).toEqual(expect.arrayContaining([
-      'relative', 'scroll-px-px', 'flex', 'items-center', 'gap-6', 'pe-px', 'overflow-x-auto', 'overscroll-x-contain',
+      'relative', 'scroll-px-px', 'flex', 'items-center', 'gap-6', 'px-px', 'overflow-x-auto', 'overscroll-x-contain',
     ]))
   })
 
@@ -85,9 +85,12 @@ describe('the enclosed look', () => {
     expect(classes('list')).not.toContain('gap-6')
   })
 
-  it('the active tab is lifted onto the raised surface, and carries no bar', () => {
+  it('the active tab is lifted onto the raised surface inside an edge of 3:1, and carries no bar', () => {
     render(tabs({ variant: 'enclosed' }))
-    expect(classes('tab')).toEqual(expect.arrayContaining(['rounded-control', 'data-active:bg-surface-raised', 'data-active:shadow-sm']))
+    expect(classes('tab')).toEqual(expect.arrayContaining([
+      'rounded-control', 'data-active:bg-surface-raised', 'data-active:shadow-sm',
+      'not-forced-colors:data-active:inset-ring-(length:--tc-line-width)', 'not-forced-colors:data-active:inset-ring-line-strong',
+    ]))
     expect(classes('tab')).not.toContain('border-b-2')
   })
 
@@ -103,9 +106,9 @@ describe('the enclosed look', () => {
 
 describe('a tab of either look', () => {
   for (const variant of ['line', 'enclosed'] as const) {
-    it(`${variant}: is muted and medium at rest, and takes the body colour and the semibold weight when active`, () => {
+    it(`${variant}: is muted and regular at rest, and takes the body colour and the semibold weight when active`, () => {
       render(tabs({ variant }))
-      expect(classes('tab')).toEqual(expect.arrayContaining(['font-medium', 'text-muted', 'data-active:font-semibold', 'data-active:text-body']))
+      expect(classes('tab')).toEqual(expect.arrayContaining(['font-normal', 'text-muted', 'data-active:font-semibold', 'data-active:text-body']))
     })
 
     it(`${variant}: never shrinks, never wraps and is never wider than its list, and clips what it holds`, () => {

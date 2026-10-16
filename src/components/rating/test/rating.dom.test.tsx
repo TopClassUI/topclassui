@@ -92,6 +92,20 @@ describe('the pointer fills up to the star it is on', () => {
     expect(fills(group)).toEqual([1, 1, 0, 0, 0])
   })
 
+  it('a change while the pointer rests on a star shows the checked step, not the hovered one', () => {
+    render(<Rating readOnly={false} aria-label="Stay" />)
+    const group = screen.getByRole('radiogroup')
+    fireEvent.pointerEnter(group.querySelectorAll('label')[1] as HTMLLabelElement)
+    fireEvent.click(radios()[1] as HTMLInputElement)
+    expect(fills(group)).toEqual([1, 1, 0, 0, 0])
+    // An arrow key checks another radio with no pointer event: the pointer is still on star 2.
+    fireEvent.click(radios()[3] as HTMLInputElement)
+    expect(checkedStep()).toBe(4)
+    expect(fills(group)).toEqual([1, 1, 1, 1, 0])
+    fireEvent.pointerEnter(group.querySelectorAll('label')[0] as HTMLLabelElement)
+    expect(fills(group), 'the next star the pointer enters previews again').toEqual([1, 0, 0, 0, 0])
+  })
+
   it('still calls the caller\'s onPointerLeave', () => {
     const onPointerLeave = vi.fn()
     render(<Rating readOnly={false} aria-label="Stay" onPointerLeave={onPointerLeave} />)
@@ -129,6 +143,23 @@ describe('in a form', () => {
     expect(checkedStep()).toBe(4)
     expect(fills(screen.getByRole('radiogroup'))).toEqual([1, 1, 1, 1, 0])
     expect(onValueChange.mock.calls).toEqual([[1], [4]])
+  })
+
+  // happy-dom ignores the form attribute in FormData; e2e/rating.spec measures what Chromium submits.
+  it('with no name each radio names a form that does not exist, so it has no form owner, yet they stay one group', async () => {
+    render(<form aria-label="Review"><Rating readOnly={false} aria-label="Stay" defaultValue={3} /></form>)
+    const owners = radios().map((radio) => radio.getAttribute('form'))
+    expect(new Set(owners).size).toBe(1)
+    expect(owners[0]).toMatch(/^_[rR]_\w+_-none$/)
+    expect(document.getElementById(owners[0] ?? '')).toBeNull()
+    expect(new Set(radios().map((radio) => radio.name)).size).toBe(1)
+    await userEvent.click(radios()[1] as HTMLInputElement)
+    expect(checkedStep()).toBe(2)
+  })
+
+  it('with a name the radios belong to the form around them, with no form attribute', () => {
+    render(<form aria-label="Review"><Rating readOnly={false} aria-label="Stay" name="stay" /></form>)
+    expect(radios().map((radio) => radio.hasAttribute('form'))).toEqual([false, false, false, false, false])
   })
 
   it('a disabled rating submits nothing', () => {

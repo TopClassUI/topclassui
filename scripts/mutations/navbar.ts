@@ -4,6 +4,7 @@ import type { Mutation } from '../lib/mutate.js'
 const CLASSES = 'src/components/navbar/classes.ts'
 const CONSTANTS = 'src/components/navbar/constants.ts'
 const HOOK = 'src/components/navbar/hook.ts'
+const LIB = 'src/components/navbar/lib.ts'
 const ROOT = 'src/components/navbar/parts/navbar-root.tsx'
 const BRAND = 'src/components/navbar/parts/navbar-brand.tsx'
 const LINKS = 'src/components/navbar/parts/navbar-links.tsx'
@@ -14,7 +15,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the navbar hook stops setting the variable, so an anchor and a focused link land under the sticky bar',
     file: HOOK,
-    from: '      root.style.setProperty(NAVBAR_OFFSET_VARIABLE, `${String(Math.ceil(bar.getBoundingClientRect().height))}px`)\n',
+    from: '      root.style.setProperty(NAVBAR_OFFSET_VARIABLE, `${String(unstuck ? 0 : height)}px`)\n',
     to: '',
   },
   {
@@ -44,8 +45,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the navbar hook waits for a resize before it writes anything, so a bar that never resizes writes nothing',
     file: HOOK,
-    from: "    sizes.observe(bar, { box: 'border-box' })\n    publish()\n",
-    to: "    sizes.observe(bar, { box: 'border-box' })\n",
+    from: "    view.addEventListener('resize', publish)\n    publish()\n",
+    to: "    view.addEventListener('resize', publish)\n",
   },
   {
     label: 'the navbar hook watches the content box, which a growing safe area does not always change',
@@ -58,6 +59,84 @@ export const MUTATIONS: Mutation[] = [
     file: HOOK,
     from: 'const bar = ref.current?.parentElement',
     to: 'const bar = ref.current',
+  },
+  {
+    label: 'the navbar hook never lets go of the top, so at a 32 px root three rows cover two thirds of a phone',
+    file: HOOK,
+    from: 'const unstuck = height > root.clientHeight * NAVBAR_STICKY_SHARE',
+    to: 'const unstuck = false && height > root.clientHeight * NAVBAR_STICKY_SHARE',
+  },
+  {
+    label: 'the navbar hook lets go of a bar of exactly its share of the screen',
+    file: HOOK,
+    from: 'height > root.clientHeight * NAVBAR_STICKY_SHARE',
+    to: 'height >= root.clientHeight * NAVBAR_STICKY_SHARE',
+  },
+  {
+    label: 'the navbar hook measures the window, which grows as a phone hides its address bar, so the bar sticks and lets go as the page scrolls',
+    file: HOOK,
+    from: 'height > root.clientHeight * NAVBAR_STICKY_SHARE',
+    to: 'height > view.innerHeight * NAVBAR_STICKY_SHARE',
+  },
+  {
+    label: 'the navbar may cover half the screen before it lets go',
+    file: CONSTANTS,
+    from: 'export const NAVBAR_STICKY_SHARE = 1 / 3',
+    to: 'export const NAVBAR_STICKY_SHARE = 1 / 2',
+  },
+  {
+    label: 'the navbar hook writes the height of a bar that has let go, so the page keeps room clear for a bar that is not there',
+    file: HOOK,
+    from: '`${String(unstuck ? 0 : height)}px`',
+    to: '`${String(height)}px`',
+  },
+  {
+    label: 'the navbar hook does not follow the window, so a screen that grows shorter keeps a bar that covers half of it',
+    file: HOOK,
+    from: "    view.addEventListener('resize', publish)\n",
+    to: '',
+  },
+  {
+    label: 'the navbar hook keeps listening to the window after the bar unmounts',
+    file: HOOK,
+    from: "      view.removeEventListener('resize', publish)\n",
+    to: '',
+  },
+  {
+    label: 'the navbar hook leaves data-unstuck on a bar that stops being sticky',
+    file: HOOK,
+    from: "      bar.removeAttribute('data-unstuck')\n",
+    to: '',
+  },
+  {
+    label: 'a navbar marked unstuck still sticks, and covers the page',
+    file: CLASSES,
+    from: ' data-unstuck:static ',
+    to: ' ',
+  },
+  {
+    label: 'the navbar hook leaves a page opened at an #anchor with its heading under the bar',
+    file: HOOK,
+    from: '    if (target && landed !== undefined && Math.abs(landed - padding) < 1) target.scrollIntoView()\n',
+    to: '',
+  },
+  {
+    label: 'the navbar hook scrolls to the #anchor target though the reader has scrolled away from it',
+    file: HOOK,
+    from: 'Math.abs(landed - padding) < 1',
+    to: 'landed === landed',
+  },
+  {
+    label: 'the navbar hook reads an escaped #fragment as written, so an id with an accent is never found',
+    file: LIB,
+    from: '    return doc.getElementById(decodeURIComponent(fragment))\n',
+    to: '    return null\n',
+  },
+  {
+    label: 'the navbar hook throws on a #fragment with a stray %, and the bar never writes its height',
+    file: LIB,
+    from: '  try {\n    return doc.getElementById(decodeURIComponent(fragment))\n  } catch {\n    // A stray % is no escape: the fragment names nothing.\n    return null\n  }\n',
+    to: '  return doc.getElementById(decodeURIComponent(fragment))\n',
   },
   {
     label: 'the navbar writes its height to the variable of a bottom bar, which the top of the page never reads',
@@ -129,8 +208,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the navbar bar is no longer on the sticky layer, so page content can paint over it',
     file: CLASSES,
-    from: 'sticky: `${STICKY_TOP} pt-',
-    to: "sticky: `sticky top-0 pt-",
+    from: 'sticky: `${STICKY_TOP} ',
+    to: "sticky: `sticky top-0 ",
   },
   // The brand.
   {
@@ -185,14 +264,20 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the navbar list no longer scrolls sideways, so six links push a phone page wide',
     file: CLASSES,
-    from: 'snap-x snap-mandatory ${NAVBAR_LIST_ROOM} ${SCROLL_X}`',
-    to: 'snap-x snap-mandatory ${NAVBAR_LIST_ROOM}`',
+    from: 'hover:snap-none ${NAVBAR_LIST_ROOM} ${SCROLL_X}`',
+    to: 'hover:snap-none ${NAVBAR_LIST_ROOM}`',
   },
   {
     label: 'the navbar list no longer snaps, so Tab leaves a link that was half in view cut in half',
     file: CLASSES,
-    from: 'flex items-center gap-5 snap-x snap-mandatory ',
+    from: 'flex items-center gap-5 snap-x snap-mandatory hover:snap-none ',
     to: 'flex items-center gap-5 ',
+  },
+  {
+    label: 'the navbar list snaps under the pointer too, so a wheel springs back to a link that keeps the focus',
+    file: CLASSES,
+    from: 'snap-x snap-mandatory hover:snap-none ',
+    to: 'snap-x snap-mandatory ',
   },
   {
     label: 'a focused navbar link is no snap area, so the list that snaps has nothing to snap to',
@@ -276,14 +361,20 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the current navbar link is told by its colour alone',
     file: CLASSES,
-    from: "'aria-[current=page]:font-semibold aria-[current=page]:text-body forced-colors:aria-[current=page]:underline'",
-    to: "'aria-[current=page]:text-body forced-colors:aria-[current=page]:underline'",
+    from: "'aria-[current=page]:font-semibold aria-[current=page]:text-body ",
+    to: "'aria-[current=page]:text-body ",
   },
   {
     label: 'the current navbar link has no underline under forced colours, where every link is one colour',
     file: CLASSES,
-    from: "'aria-[current=page]:font-semibold aria-[current=page]:text-body forced-colors:aria-[current=page]:underline'",
-    to: "'aria-[current=page]:font-semibold aria-[current=page]:text-body'",
+    from: ' forced-colors:aria-[current=page]:underline ',
+    to: ' ',
+  },
+  {
+    label: 'a navbar list opens at its start, so on a phone the link of the page being read can be out of view',
+    file: CLASSES,
+    from: ' aria-[current=page]:[scroll-initial-target:nearest]',
+    to: '',
   },
   {
     label: 'a navbar link loses its focus ring',

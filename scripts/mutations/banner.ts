@@ -41,8 +41,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the banner row stops wrapping, so a long action squeezes the message to nothing instead of dropping under it',
     file: 'src/components/banner/variants.ts',
-    from: "'flex w-full flex-wrap items-center",
-    to: "'flex w-full items-center",
+    from: "'flex w-full min-w-0 flex-wrap items-center",
+    to: "'flex w-full min-w-0 items-center",
+  },
+  {
+    label: 'the banner root loses min-w-0, so in a grid or flex track it widens the track to its action and the page scrolls sideways',
+    file: 'src/components/banner/variants.ts',
+    from: "'flex w-full min-w-0 flex-wrap",
+    to: "'flex w-full flex-wrap",
   },
   {
     label: 'the banner message loses its basis, so beside a long action it is one letter wide',
