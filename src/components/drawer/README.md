@@ -71,7 +71,9 @@ import {
 - **Escape.** It closes one thing: a tooltip open inside the sheet first, then the sheet.
 - **A phone.** The sheet pads the notch and the home indicator on the screen edges it
   touches. A phone reports them only to a page whose viewport meta has `viewport-fit=cover`.
-- **A keyboard on a phone.** A bottom sheet scrolls the field you type in clear of it.
+- **A keyboard on a phone.** Every sheet scrolls the field you type in clear of it.
+- **A new placement while open.** A side sheet on a desktop can become a bottom sheet on a
+  phone while it is open: it stays the same sheet, with what was typed in it and the focus.
 - **Arabic inside an English page.** The sheet takes its direction, its language and its
   swipe from the nearest `TopClassProvider`. Mount it: with none the sheet is laid out as
   the page is, but it swipes as a left-to-right page does.
