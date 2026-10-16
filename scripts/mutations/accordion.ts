@@ -6,6 +6,7 @@ const CLASSES = 'src/components/accordion/classes.ts'
 const CONSTANTS = 'src/components/accordion/constants.ts'
 const TYPES = 'src/components/accordion/types.ts'
 const LIB = 'src/components/accordion/lib.ts'
+const HOOK = 'src/components/accordion/hook.ts'
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -187,5 +188,35 @@ export const MUTATIONS: Mutation[] = [
     file: TYPES,
     from: '    value: string\n',
     to: '    value?: string\n',
+  },
+  {
+    label: 'an accordion trigger is not held, so closing a long answer above throws the pressed trigger and its focus off the screen',
+    file: CLIENT,
+    from: ' onClick={item.onClick}',
+    to: '',
+  },
+  {
+    label: 'the accordion hold scrolls the page by the wrong sign, so a pressed trigger runs twice as far off the screen',
+    file: HOOK,
+    from: 'scroller.scrollBy(0, moved)',
+    to: 'scroller.scrollBy(0, -moved)',
+  },
+  {
+    label: 'the accordion hold always scrolls the page, so a trigger in a box that scrolls is left to run off it',
+    file: HOOK,
+    from: "if ((overflowY === 'auto' || overflowY === 'scroll') && node.scrollHeight > node.clientHeight) return node",
+    to: "if (overflowY === 'never') return node",
+  },
+  {
+    label: 'the accordion hold forgets where the reader scrolled, so a scroll during the fade is undone',
+    file: HOOK,
+    from: "document.addEventListener('scroll', scrolled, { capture: true, passive: true })",
+    to: '',
+  },
+  {
+    label: 'the accordion hold never lets go, so a panel that resizes minutes later still scrolls the page',
+    file: HOOK,
+    from: '    sizes.disconnect()\n',
+    to: '',
   },
 ]

@@ -802,6 +802,56 @@ test.describe('how many can be open', () => {
 })
 
 /**
+ * Sixty items on a phone, the answer to question 3 some 640 px long and open, and the scroller moved so question 4
+ * starts `at` px below its top: with 100, the end of that answer is still on screen; with -10, all of it is above.
+ */
+async function readTo(page: Page, at: number, scroller: 'page' | 'box'): Promise<void> {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await openLive(page, 'accordion--many-items')
+  if (scroller === 'box') await page.locator('#demo').evaluate((demo) => { Object.assign(demo.style, { height: '600px', overflowY: 'auto' }) })
+  const third = triggers(page).nth(2)
+  await regionOf(third).evaluate((region) => {
+    for (let line = 1; line <= 30; line++) region.append(Object.assign(document.createElement('p'), { textContent: `Line ${String(line)} of a long answer.` }))
+  })
+  await third.click()
+  await atRest(page)
+  await triggers(page).nth(3).evaluate((fourth, [to, inBox]) => {
+    const box = inBox ? document.querySelector('#demo') : document.scrollingElement
+    if (!box) throw new Error('no scroller')
+    box.scrollBy(0, fourth.getBoundingClientRect().top - (inBox ? box.getBoundingClientRect().top : 0) - to)
+  }, [at, scroller === 'box'] as const)
+  expect(await panelOf(third).evaluate((panel) => panel.getBoundingClientRect().height)).toBeGreaterThan(600)
+}
+
+// One at a time, the answer above closes when its fade ends: Chromium's scroll anchoring holds the page only when it is off screen.
+test.describe('a press keeps its trigger where it was while the answer above closes', () => {
+  const CASES = [
+    { name: 'a click, the end of the answer above still on screen', at: 100, scroller: 'page', key: false },
+    { name: 'Enter, the end of the answer above still on screen', at: 100, scroller: 'page', key: true },
+    { name: 'a click, the answer above all off screen, where the browser anchors too', at: -10, scroller: 'page', key: false },
+    { name: 'a click, in a box that scrolls and not the page', at: 100, scroller: 'box', key: false },
+  ] as const
+  for (const { name, at, scroller, key } of CASES) {
+    test(name, async ({ page }) => {
+      await readTo(page, at, scroller)
+      const seventh = triggers(page).nth(6)
+      const before = await boxOf(seventh)
+      if (key) {
+        await seventh.focus()
+        await page.keyboard.press('Enter')
+      } else {
+        await seventh.click()
+      }
+      await atRest(page)
+      expect((await expanded(page)).slice(0, 7)).toEqual(['false', 'false', 'false', 'false', 'false', 'false', 'true'])
+      await expect(seventh).toBeFocused()
+      const after = await boxOf(seventh)
+      expect(Math.abs(after.top - before.top), `question 7 at ${String(before.top)} before and ${String(after.top)} after`).toBeLessThanOrEqual(1)
+    })
+  }
+})
+
+/**
  * Everything wrong with how the accordions under a scope are laid out, in words: a part that crosses the left or
  * right edge of its own box, an item or a panel that lies over the one before it, a title that lies over its
  * caret or is wider than its room, and a box that crosses the padding of the page.
