@@ -187,4 +187,34 @@ export const MUTATIONS: Mutation[] = [
     from: "text-muted empty:p-0'",
     to: "text-muted empty:hidden'",
   },
+  {
+    label: 'a press on the tree view is taken for a key, so a press on a row, the padding or the scrollbar scrolls back to the selected row',
+    file: HOOK,
+    from: '    if (press !== null) {\n      setActive(rows[press]?.node.id ?? null)\n      return\n    }\n',
+    to: '',
+  },
+  {
+    label: 'a finger that scrolls the tree view leaves its press behind, so the next Tab highlights the row it started on',
+    file: HOOK,
+    from: '    props.onPointerCancel?.(event)\n    pressed.current = null\n',
+    to: '    props.onPointerCancel?.(event)\n',
+  },
+  {
+    label: 'a mouse that lifts off the tree view with no focus leaves its press behind',
+    file: HOOK,
+    from: "    if (event.pointerType === 'mouse') pressed.current = null\n",
+    to: '',
+  },
+  {
+    label: 'a finger that lifts off the tree view drops its press before the focus it brings, so a tap scrolls to the selected row',
+    file: HOOK,
+    from: "    if (event.pointerType === 'mouse') pressed.current = null\n",
+    to: '    pressed.current = null\n',
+  },
+  {
+    label: 'leaving the tree view keeps a press that brought no focus',
+    file: HOOK,
+    from: '    pressed.current = null\n    if (event.target === event.currentTarget) setActive(null)\n',
+    to: '    if (event.target === event.currentTarget) setActive(null)\n',
+  },
 ]

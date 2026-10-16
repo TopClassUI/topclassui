@@ -175,6 +175,49 @@ test.describe('live: the keys of the Authoring Practices', () => {
   })
 })
 
+test.describe('live: a press never scrolls the tree', () => {
+  test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
+
+  /** Where the tree is scrolled, the row it highlights and the one selected, and whether it holds the focus. */
+  const placeOf = (page: Page) => treeOf(page).evaluate((tree) => ({
+    scrollTop: Math.round(tree.scrollTop),
+    highlighted: tree.querySelector('[data-highlighted]')?.textContent ?? null,
+    selected: tree.querySelector('[aria-selected="true"]')?.textContent.slice(0, 12) ?? null,
+    focused: document.activeElement === tree,
+  }))
+
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: a press on the padding or on a row, with the selected row far above, leaves the tree where it was`, async ({ page }) => {
+      await openLive(page, 'tree-view--long-content', { direction, tall: true })
+      await treeOf(page).evaluate((tree) => { tree.scrollTop = 1500 })
+      const box = await boxOf(treeOf(page))
+      const start = direction === 'ltr' ? box.left + 4 : box.right - 4
+      await page.mouse.click(start, (box.top + box.bottom) / 2)
+      expect(await placeOf(page)).toEqual({ scrollTop: 1500, highlighted: null, selected: 'Supercalifra', focused: true })
+      await page.keyboard.press('Tab')
+      // By coordinates: a locator's click scrolls its row into view first, which is the very thing measured.
+      const middle = (box.top + box.bottom) / 2
+      const pressed = await page.evaluate(([x, y]) => document.elementFromPoint(x ?? 0, y ?? 0)?.closest('[role="treeitem"]')?.textContent ?? null, [box.left + box.width / 2, middle])
+      expect(pressed).toMatch(/^Item \d+$/)
+      await page.mouse.click(box.left + box.width / 2, middle)
+      expect(await placeOf(page)).toEqual({ scrollTop: 1500, highlighted: pressed, selected: pressed, focused: true })
+    })
+  }
+
+  test('a press on a disabled row, which takes no pointer, leaves the tree where it was and selects nothing', async ({ page }) => {
+    await openLive(page, 'tree-view--selected', { tall: true })
+    await page.getByRole('treeitem', { name: 'docs' }).click()
+    await page.locator('body').click({ position: { x: 2, y: 2 } })
+    await treeOf(page).evaluate((tree) => { tree.style.setProperty('--tc-list-rows', '2'); tree.scrollTop = tree.scrollHeight })
+    const before = await placeOf(page)
+    expect(before).toMatchObject({ selected: 'docs', focused: false })
+    expect(before.scrollTop).toBeGreaterThan(100)
+    const faq = await boxOf(page.getByRole('treeitem', { name: 'faq.md' }))
+    await page.mouse.click(faq.left + 40, (faq.top + faq.bottom) / 2)
+    expect(await placeOf(page)).toEqual({ ...before, focused: true })
+  })
+})
+
 test.describe('live: ten thousand rows, windowed', () => {
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 
@@ -287,6 +330,17 @@ test.describe('live: ten thousand rows, windowed', () => {
       expect(await scrollY(page)).toBe(0)
       const heights = await page.getByRole('treeitem').evaluateAll((rows) => rows.map((row) => row.getBoundingClientRect().height))
       expect(new Set(heights)).toEqual(new Set([44]))
+    })
+
+    test('a drag leaves no press behind: the next Tab highlights the selected row, not the row the finger started on', async ({ page }) => {
+      await openLive(page, 'tree-view--long-content', { tall: true })
+      const box = await boxOf(treeOf(page))
+      await drag(page, box.left + 60, box.bottom - 20, box.top + 20)
+      expect(await treeOf(page).evaluate((tree) => tree.scrollTop)).toBeGreaterThan(100)
+      await expect(treeOf(page)).not.toBeFocused()
+      await page.keyboard.press('Tab')
+      await expect(treeOf(page)).toBeFocused()
+      await expect.poll(() => stateOf(page)).toMatchObject({ highlighted: 'Supercalifragilistic'.repeat(15), whole: true })
     })
 
     test('sixty siblings: drags reach the last one, and the page never moves', async ({ page }) => {

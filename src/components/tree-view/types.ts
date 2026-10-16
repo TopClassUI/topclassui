@@ -88,5 +88,6 @@ export type TreeViewHookProps = Pick<
   TreeViewProps,
   | 'items' | 'value' | 'defaultValue' | 'onValueChange' | 'expanded' | 'defaultExpanded' | 'onExpandedChange'
   | 'visibleRows' | 'virtualize' | 'hasMore' | 'loadMore' | 'loadMoreThreshold' | 'status' | 'loadingFallback'
-  | 'emptyFallback' | 'ref' | 'style' | 'onKeyDown' | 'onFocus' | 'onBlur' | 'onPointerDown' | 'onClick'
+  | 'emptyFallback' | 'ref' | 'style' | 'onKeyDown' | 'onFocus' | 'onBlur' | 'onPointerDown' | 'onPointerUp' | 'onPointerCancel'
+  | 'onClick'
 >

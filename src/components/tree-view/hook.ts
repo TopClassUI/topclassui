@@ -35,7 +35,8 @@ export function useTreeView(props: TreeViewHookProps) {
   const given = useRef(false)
   const tree = useRef(null as HTMLDivElement | null)
   const pending = useRef(-1)
-  const pressed = useRef(-1)
+  // The row a pointer pressed, -1 off a row, until the focus it brings; null when no press is on its way.
+  const pressed = useRef(null as number | null)
   const typed = useRef({ text: '', at: 0 })
   // A page is asked for once per length of the root list, so opening a branch near the end never asks for it again.
   const askedAt = useRef(-1)
@@ -133,13 +134,13 @@ export function useTreeView(props: TreeViewHookProps) {
     run(action)
   }
 
-  // Focus by a key or a script highlights the selected row when it is visible, else the first; a press, the row pressed.
+  // A key or a script highlights the selected row when visible, else the first; a press, the row pressed or none, unscrolled.
   const onFocus = (event: TreeFocusEvent) => {
     props.onFocus?.(event)
     if (event.target !== event.currentTarget) return
     const press = pressed.current
-    pressed.current = -1
-    if (press >= 0) {
+    pressed.current = null
+    if (press !== null) {
       setActive(rows[press]?.node.id ?? null)
       return
     }
@@ -149,12 +150,24 @@ export function useTreeView(props: TreeViewHookProps) {
 
   const onBlur = (event: TreeFocusEvent) => {
     props.onBlur?.(event)
+    pressed.current = null
     if (event.target === event.currentTarget) setActive(null)
   }
 
   const onPointerDown = (event: TreePointerEvent) => {
     props.onPointerDown?.(event)
     pressed.current = rowIndexOf(event.target)
+  }
+
+  // A mouse focuses before it lifts; a finger after, and then clicks. A finger that scrolls is cancelled, and never focuses.
+  const onPointerUp = (event: TreePointerEvent) => {
+    props.onPointerUp?.(event)
+    if (event.pointerType === 'mouse') pressed.current = null
+  }
+
+  const onPointerCancel = (event: TreePointerEvent) => {
+    props.onPointerCancel?.(event)
+    pressed.current = null
   }
 
   // A press does what Enter does. A disabled row takes no pointer, and is refused here as well.
@@ -191,6 +204,6 @@ export function useTreeView(props: TreeViewHookProps) {
       // Left out, the --tc-list-rows knob applies: React writes no style for an undefined value.
       '--tc-list-rows': rowsCap,
     },
-    onKeyDown, onFocus, onBlur, onPointerDown, onClick,
+    onKeyDown, onFocus, onBlur, onPointerDown, onPointerUp, onPointerCancel, onClick,
   }
 }
