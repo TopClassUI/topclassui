@@ -398,6 +398,18 @@ export const MUTATIONS: Mutation[] = [
     to: '<TopClassProvider direction="rtl" locale="en">',
   },
   {
+    label: 'the controlled sidebar demo row no longer wraps, so at 320 px its button scrolls the page sideways',
+    file: 'src/components/sidebar/dummy/controlled.tsx',
+    from: '<div className="flex h-96 flex-wrap gap-4">',
+    to: '<div className="flex h-96 gap-4">',
+  },
+  {
+    label: 'the controlled sidebar demo column has no 160 px basis, so it never wraps under the rail',
+    file: 'src/components/sidebar/dummy/controlled.tsx',
+    from: '<div className="grid min-w-0 grow basis-40 content-start gap-3">',
+    to: '<div className="grid min-w-0 flex-1 content-start gap-3">',
+  },
+  {
     label: 'the long-list sidebar demo gives its rail no height, so its sixty links scroll the page',
     file: 'src/components/sidebar/dummy/long-list.tsx',
     from: '<div className="h-[calc(100dvh-4rem)]">',
