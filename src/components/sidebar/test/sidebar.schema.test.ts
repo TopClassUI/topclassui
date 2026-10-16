@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { SIDEBAR_BOUNDARIES } from '../boundaries.js'
 import { SIDEBAR_ICON, SIDEBAR_LINK_STATE } from '../classes.js'
 import { SIDEBAR_DEFAULTS } from '../constants.js'
-import { boundLabel } from '../lib.js'
+import { boundLabel, resolveDir } from '../lib.js'
 import { sidebarSchema } from '../schema.js'
 
 // R-8.3-3: the props table, the playground and registry.json all read this output.
@@ -95,5 +95,30 @@ describe('the one bound', () => {
     expect(boundLabel(12345, 2)).toBe(12345)
     expect(boundLabel(undefined, 100)).toBeUndefined()
     expect(boundLabel(null, 100)).toBeNull()
+  })
+
+  it('boundLabel cuts between graphemes, so an emoji across the bound is left out whole and no half of it is written', () => {
+    expect(boundLabel(`${'a'.repeat(99)}😀tail`, 100)).toBe('a'.repeat(99))
+    expect(boundLabel('ab🇯🇴', 3)).toBe('ab')
+    expect(boundLabel('abé', 3)).toBe('ab')
+  })
+})
+
+describe('the direction of a label', () => {
+  it('is its own for text in one script, so an English label in an Arabic rail keeps its start', () => {
+    expect(resolveDir('Workspace')).toBe('auto')
+    expect(resolveDir('مساحة العمل')).toBe('auto')
+    expect(resolveDir(['Inbox ', 3])).toBe('auto')
+    expect(resolveDir(12)).toBe('auto')
+  })
+
+  it("is the page's for text that mixes the two, so an Arabic label that starts with a brand reads it first", () => {
+    expect(resolveDir('Wi-Fi متصل')).toBeUndefined()
+    expect(resolveDir(['iPhone ', 'الجديد'])).toBeUndefined()
+  })
+
+  it("is the page's for a label that holds an element, which is the caller's own markup", () => {
+    expect(resolveDir({ type: 'strong', props: { children: 'Bold' } })).toBeUndefined()
+    expect(resolveDir(['Inbox ', { type: 'b', props: {} }])).toBeUndefined()
   })
 })

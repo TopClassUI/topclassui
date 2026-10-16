@@ -78,6 +78,6 @@ describe('a read-only Rating is one span on the server', () => {
   it('a filled star is the outline plus one filled icon in a clip: two icons, no third', () => {
     const html = markup(<Rating value={0.5} max={1} />)
     expect(html.match(/<svg/g)).toHaveLength(2)
-    expect(html).toContain('<span aria-hidden="true" class="absolute inset-y-0 inset-s-0 flex overflow-hidden text-warning-solid w-1/2">')
+    expect(html).toContain('<span aria-hidden="true" class="absolute inset-y-0 inset-s-0 flex overflow-hidden text-warning-on-soft w-1/2">')
   })
 })

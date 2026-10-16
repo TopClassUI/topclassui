@@ -6,7 +6,7 @@ import {
 } from '#shared/classes.js'
 import { compileEntry } from '#test/stylesheet.js'
 import {
-  COMMAND_ACTIVE, COMMAND_BACKDROP, COMMAND_GROUP_LABEL, COMMAND_INPUT, COMMAND_ITEM, COMMAND_LIST, COMMAND_POPUP,
+  COMMAND_BACKDROP, COMMAND_GROUP_LABEL, COMMAND_INPUT, COMMAND_ITEM, COMMAND_LIST, COMMAND_POPUP,
   COMMAND_SEARCH, COMMAND_SPACER, COMMAND_STATUS, COMMAND_TITLE, COMMAND_UNIT, COMMAND_VIEWPORT,
 } from '../classes.js'
 
@@ -50,12 +50,6 @@ const DECLARATION: Record<string, string> = {
   'pb-1': 'padding-bottom: var(--spacing);',
   'text-xs': 'font-size: var(--text-xs);',
   'font-medium': 'font-weight: var(--font-weight-medium);',
-  // The active row: a line inside its edge besides the fill.
-  'data-highlighted:outline-solid': 'outline-style: solid;',
-  'data-highlighted:outline-(length:--tc-ring-width)': 'outline-width: var(--tc-ring-width);',
-  'data-highlighted:-outline-offset-(length:--tc-ring-width)': 'outline-offset: calc(var(--tc-ring-width) * -1);',
-  'data-highlighted:outline-primary-on-soft': 'outline-color: var(--tc-primary-on-soft);',
-  'forced-colors:data-highlighted:outline-[HighlightText]': 'outline-color: HighlightText;',
   'cursor-default': 'cursor: default;',
   'select-none': 'user-select: none;',
   // The empty and the loading text, and the title only a reader reads.
@@ -69,11 +63,6 @@ const DECLARATION: Record<string, string> = {
 const SCOPE: Record<string, string> = {
   'placeholder:text-muted': '::placeholder {',
   'data-empty:hidden': '[data-empty] {',
-  'data-highlighted:outline-solid': '[data-highlighted] {',
-  'data-highlighted:outline-(length:--tc-ring-width)': '[data-highlighted] {',
-  'data-highlighted:-outline-offset-(length:--tc-ring-width)': '[data-highlighted] {',
-  'data-highlighted:outline-primary-on-soft': '[data-highlighted] {',
-  'forced-colors:data-highlighted:outline-[HighlightText]': '[data-highlighted] {',
   'empty:p-0': ':empty {',
 }
 
@@ -81,7 +70,6 @@ const SCOPE: Record<string, string> = {
 const WRAPPED: Record<string, string> = {
   'pointer-coarse:h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]': '@media (pointer: coarse) { ',
   'pointer-coarse:h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-coarse,44px)))]': '@media (pointer: coarse) { ',
-  'forced-colors:data-highlighted:outline-[HighlightText]': '@media (forced-colors: active) { ',
 }
 
 const escape = (cls: string) => cls.replace(/[^a-zA-Z0-9_-]/g, '\\$&')
@@ -110,10 +98,10 @@ describe('every class an open Command wears compiles with the installed Tailwind
     ]))
     const own = written([
       COMMAND_BACKDROP, COMMAND_VIEWPORT, COMMAND_POPUP, COMMAND_SEARCH, COMMAND_INPUT, COMMAND_LIST, COMMAND_UNIT,
-      COMMAND_SPACER, COMMAND_GROUP_LABEL, COMMAND_ACTIVE, COMMAND_ITEM, COMMAND_STATUS, COMMAND_TITLE,
+      COMMAND_SPACER, COMMAND_GROUP_LABEL, COMMAND_ITEM, COMMAND_STATUS, COMMAND_TITLE,
     ]).filter((cls) => !shared.has(cls))
     expect(own).toEqual(Object.keys(DECLARATION).sort())
-    expect(own).toHaveLength(43)
+    expect(own).toHaveLength(38)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {
@@ -163,9 +151,9 @@ describe('the guarantees a class carries', () => {
     expect(COMMAND_SPACER).toContain('shrink-0 h-[calc(var(--tc-list-rows)*var(--tc-row-height))]')
   })
 
-  it('the active row has a line besides its fill, which forced colours draw in HighlightText', () => {
+  it('the active row wears the shared highlight, the fill and the ring inside its edge, and no line of its own', () => {
     expect(COMMAND_ITEM).toContain(ROW_HIGHLIGHT)
-    expect(COMMAND_ITEM).toContain(COMMAND_ACTIVE)
+    expect(COMMAND_ITEM.split(' ').filter((cls) => cls.includes('outline-') && !ROW_HIGHLIGHT.includes(cls) && !ROW.includes(cls))).toEqual([])
   })
 
   it('the empty text takes no room while Base UI keeps its live region mounted and empty', () => {

@@ -11,20 +11,31 @@ const FOLDER = join(ROOT, 'src', 'components', 'sidebar')
 const slash = (path: string) => path.replace(/\\/g, '/')
 const probePath = (name: string) => slash(join(FOLDER, 'test', `sidebar-probe-${name}.tsx`))
 
-/** The five parts the README imports, and the toggle, which a header draws by itself. */
+/** The five parts the README imports beside Icon. */
 const PARTS = 'SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoot'
 
-/** What a page that pastes a sample has in scope: the parts, the toggle and the server Icon. */
+/** What a probe of this file has in scope: the parts, the toggle and the server Icon. A README sample has only its own import line. */
 const PRELUDE = [
   `import { ${PARTS}, SidebarTrigger } from '../index.js'`,
   "import { Icon } from '#components/icon/index.js'",
   `export const used = [${PARTS}, SidebarTrigger, Icon]`,
 ].join('\n')
 
-/** The import line compiles as a module that uses what it imports, any other sample as JSX a page would paste. */
+/** Where a name imported from 'topclassui' lives in this repo, which has no package index yet. */
+const HOME: Record<string, string> = { Icon: '#components/icon/index.js' }
+
+const IMPORT_LINE = /^import \{([^}]*)\} from 'topclassui'\r?\n?/
+
+const jsx = (code: string) => `export const sample = (\n<>\n${code}\n</>\n)\n`
+
+/** An import line, name by name from where each lives, then the JSX after it; a probe with no import line gets the PRELUDE. */
 function wrap(code: string): string {
-  if (code.startsWith('import ')) return `${code.replace("'topclassui'", "'../index.js'")}\nexport const imported = [${PARTS}]\n`
-  return `${PRELUDE}\nexport const sample = (\n<>\n${code}\n</>\n)\n`
+  const line = IMPORT_LINE.exec(code)
+  if (line === null) return `${PRELUDE}\n${jsx(code)}`
+  const names = (line[1] ?? '').split(',').map((name) => name.trim()).filter(Boolean)
+  const imports = names.map((name) => `import { ${name} } from '${HOME[name] ?? '../index.js'}'`).join('\n')
+  const rest = code.slice(line[0].length).trim()
+  return `${imports}\nexport const imported = [${names.join(', ')}]\n${rest === '' ? '' : jsx(rest)}`
 }
 
 /**
@@ -71,18 +82,22 @@ const rail = (root: string, link = ' href="/home"') => `<SidebarRoot${root}><Sid
 
 const verdict = compile({
   readmeImport: sample(0),
-  readmeSample: sample(1),
+  // As a reader pastes it: the README's own import line, then the sample, and nothing else in scope.
+  readmeSample: `${sample(0)}${sample(1)}`,
   // What the parts do take.
   uncontrolled: rail(' defaultOpen={false} aria-label="Documentation" id="rail"'),
   controlled: rail(' open onOpenChange={(open) => { void open.valueOf() }}'),
   otherWidth: rail(' className="data-open:w-72"'),
   linkRender: rail('', ' render={<a href="/home" />} icon={<Icon name="house" />} current'),
+  linkIconOnly: '<SidebarRoot><SidebarBody><SidebarGroup><SidebarLink href="/home" icon={<Icon name="house" />} aria-label="Home" /></SidebarGroup></SidebarBody></SidebarRoot>',
+  linkRenderAlone: '<SidebarRoot><SidebarBody><SidebarGroup><SidebarLink render={<a href="/home">Home</a>} /></SidebarGroup></SidebarBody></SidebarRoot>',
   linkRest: rail('', ' href="/home" target="_blank" rel="noreferrer" id="home" className="px-4" current={false}'),
   group: '<SidebarRoot><SidebarGroup label="Pages" /><SidebarGroup label={<b>Pages</b>} /><SidebarGroup /></SidebarRoot>',
   header: '<SidebarRoot><SidebarHeader>Workspace</SidebarHeader><SidebarHeader /></SidebarRoot>',
   trigger: '<SidebarRoot><SidebarTrigger aria-label="Menu" disabled onClick={(event) => { event.preventDefault() }} /></SidebarRoot>',
   // What they refuse.
   linkNowhere: rail('', ''),
+  linkUnnamed: '<SidebarRoot><SidebarBody><SidebarGroup><SidebarLink href="/home" icon={<Icon name="house" />} /></SidebarGroup></SidebarBody></SidebarRoot>',
   linkRenderFunction: rail('', ' render={() => <a href="/home" />}'),
   badCurrent: rail('', ' href="/home" current="page"'),
   badDefaultOpen: rail(' defaultOpen="yes"'),
@@ -97,16 +112,16 @@ const verdict = compile({
 describe('the samples in the README compile as written', () => {
   it('finds the import line and the sample, so an empty extraction cannot pass', () => {
     expect(SAMPLES).toHaveLength(2)
-    expect(SAMPLES[0]).toBe("import { SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoot } from 'topclassui'\n")
+    expect(SAMPLES[0]).toBe("import { Icon, SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoot } from 'topclassui'\n")
     expect(SAMPLES[1]).toContain('<SidebarLink href="/docs/theming" icon={<Icon name="palette" />}>Theming</SidebarLink>')
     expect(SAMPLES[1]).toContain('<main className="min-w-0 flex-1 overflow-y-auto">Your page</main>')
   })
 
-  it('the import line names five exports that exist, where the generated one names a Sidebar that does not', () => {
+  it('the import line names six exports that exist, the Icon its sample draws among them', () => {
     expect(verdict['readmeImport']).toEqual([])
   })
 
-  it('the sample: a rail in a flex row, a header, a named group of two links, one of them current', () => {
+  it('the sample, pasted under that import line alone: a rail in a flex row, a header, a named group of two links, one of them current', () => {
     expect(verdict['readmeSample']).toEqual([])
   })
 })
@@ -128,6 +143,11 @@ describe('what Sidebar does take', () => {
     expect(verdict['linkRender']).toEqual([])
   })
 
+  it('a link that is an icon alone, named by aria-label, and one whose element carries its own text (R-5.6-1)', () => {
+    expect(verdict['linkIconOnly']).toEqual([])
+    expect(verdict['linkRenderAlone']).toEqual([])
+  })
+
   it('a plain link with the attributes of an anchor', () => {
     expect(verdict['linkRest']).toEqual([])
   })
@@ -146,11 +166,17 @@ describe('what Sidebar does take', () => {
 })
 
 describe('what Sidebar does not take', () => {
-  // TypeScript reports one member of the union: the way to go somewhere it says is missing is render.
-  it('refuses a link that goes nowhere, with no href and no render: the one error says a way to go is missing', () => {
+  // TypeScript reports the last member of the union, the plain anchor, so it names what that one lacks.
+  it('refuses a link that goes nowhere, with no href and no render: the one error says the href is missing', () => {
     expect(verdict['linkNowhere']).toHaveLength(1)
     expect(verdict['linkNowhere']?.[0]).toContain("is not assignable to type 'IntrinsicAttributes & SidebarLinkProps'")
-    expect(verdict['linkNowhere']?.[0]).toContain("Property 'render' is missing")
+    expect(verdict['linkNowhere']?.[0]).toContain("Property 'href' is missing")
+  })
+
+  it('refuses a link with no name, an href and an icon alone, which axe reports as link-name: the error asks for aria-label (R-5.6-1)', () => {
+    expect(verdict['linkUnnamed']).toHaveLength(1)
+    expect(verdict['linkUnnamed']?.[0]).toContain("is not assignable to type 'IntrinsicAttributes & SidebarLinkProps'")
+    expect(verdict['linkUnnamed']?.[0]).toContain("Property ''aria-label'' is missing")
   })
 
   it('refuses the function form of render: a Server Component resolves an element only (R-5.7-4)', () => {
