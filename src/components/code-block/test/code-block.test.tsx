@@ -103,10 +103,10 @@ describe('the copy button in the server HTML', () => {
     expect(attr(button, 'aria-labelledby')).toBeUndefined()
   })
 
-  it('holds the copy icon, at rest and not copied, and an empty polite status beside it', () => {
+  it('holds the copy icon, at rest and not copied, and an empty polite status beside it, its words in a node of their own', () => {
     const out = html()
     expect(attr(buttonOf(out), 'data-copied')).toBeUndefined()
-    expect(out).toContain('<span role="status" class="sr-only"></span>')
+    expect(out).toContain('<span role="status" class="sr-only"><span></span></span>')
   })
 
   it('takes its name from labels, so a server page in Arabic needs no provider', () => {

@@ -6,11 +6,12 @@ import { COPY_RESET_MS } from './constants.js'
 
 type CopyResult = 'idle' | 'copied' | 'failed'
 
-/** The button's id, the result of the last press, and the press itself. A missing clipboard (an
- * insecure context), a throw and a refusal all say failed. Each result clears after COPY_RESET_MS. */
+/** The button's id, the result of the last press, a count of presses, and the press itself. A missing clipboard
+ * (an insecure context), a throw and a refusal all say failed. Each result clears after COPY_RESET_MS. */
 export function useCodeBlockCopy(code: string) {
   const id = useId()
   const [result, setResult] = useState('idle' as CopyResult)
+  const [presses, setPresses] = useState(0)
   // A browser timer id is never 0, so clearing 0 clears nothing.
   const timer = useRef(0)
 
@@ -18,8 +19,9 @@ export function useCodeBlockCopy(code: string) {
 
   const copy = async () => {
     window.clearTimeout(timer.current)
-    // Emptied first, so a second press within the time is announced again.
+    // Emptied first; when no await runs below both land in one render, so the count gives the words a new node to read again.
     setResult('idle')
+    setPresses((count) => count + 1)
     let next: CopyResult = 'failed'
     try {
       // Undefined outside a secure context, though the DOM types say it always exists.
@@ -35,5 +37,5 @@ export function useCodeBlockCopy(code: string) {
     timer.current = window.setTimeout(() => { setResult('idle') }, COPY_RESET_MS)
   }
 
-  return { id, result, copy }
+  return { id, result, presses, copy }
 }

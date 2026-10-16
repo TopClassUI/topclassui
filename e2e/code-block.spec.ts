@@ -383,6 +383,17 @@ test.describe('the copy, with no clipboard, as on plain http', () => {
     await expect(page.getByRole('status')).toHaveText('Could not copy')
     expect(await button.locator('path').getAttribute('d')).toBe(icon)
     await expect(button).not.toHaveAttribute('data-copied')
+
+    // Within the 2 s nothing is awaited: the same words must come back as a new node, or the live region has nothing to read.
+    await page.getByRole('status').evaluate((status) => {
+      const added: string[] = []
+      Object.assign(window, { added })
+      new MutationObserver((records) => { added.push(...records.flatMap((record) => [...record.addedNodes].map((node) => node.textContent ?? ''))) })
+        .observe(status, { childList: true, subtree: true, characterData: true })
+    })
+    await button.click()
+    await expect.poll(() => page.evaluate(() => (window as unknown as { added: string[] }).added)).toEqual(['Could not copy'])
+    await expect(page.getByRole('status')).toHaveText('Could not copy')
   })
 })
 

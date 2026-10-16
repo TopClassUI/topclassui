@@ -106,8 +106,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the code block does not empty its status before a second press',
     file: HOOK,
-    from: "    setResult('idle')\n    let next",
-    to: '    let next',
+    from: "    setResult('idle')\n    setPresses",
+    to: '    setPresses',
+  },
+  {
+    label: 'the code block status keeps one node for its words, so a repeat failed press changes nothing a screen reader hears',
+    file: CLIENT,
+    from: '<span key={button.presses}>',
+    to: '<span>',
   },
   {
     label: 'the code block leaves its timer running after unmount',
