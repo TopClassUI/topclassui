@@ -194,4 +194,10 @@ export const MUTATIONS: Mutation[] = [
     from: '  \'data-selected:inset-ring-(length:--tc-line-width) data-selected:inset-ring-primary-on-soft\',\n',
     to: '',
   },
+  {
+    label: 'the date picker chosen day keeps the theme ring under forced colours, 2.9:1 on a Canvas of the other lightness',
+    file: CLASSES,
+    from: '  \'forced-colors:data-selected:[--tc-ring:CanvasText]\',\n',
+    to: '',
+  },
 ]

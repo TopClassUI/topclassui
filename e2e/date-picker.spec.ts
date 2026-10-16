@@ -744,6 +744,19 @@ test.describe('live: focus, forced colours and motion', () => {
         expect(inkOn(pixels, FORCED_CANVAS[scheme]), 'pixels of the caret at 3:1').toBeGreaterThan(5)
       })
 
+      test('the ring on the focused chosen day is CanvasText, whichever mode the page is pinned to', async ({ page }) => {
+        for (const mode of MODES) {
+          await openLive(page, 'date-picker--basic', { mode })
+          await page.keyboard.press('Tab')
+          await page.keyboard.press('Enter')
+          await expect.poll(() => focused(page), { message: mode }).toBe('Tuesday, September 22, 2026')
+          const chosen = page.locator(':focus')
+          expect(await css(chosen, 'outline-color'), mode).toBe(await resolve(page, 'CanvasText'))
+          const box = await boxOf(chosen)
+          const ring = await pixelsOf(page, { x: Math.floor(box.left) - 4, y: Math.round(box.top + box.height / 2), width: 2, height: 1 })
+          expect(inkOn(ring, FORCED_CANVAS[scheme]), `${mode}: ring pixels at 3:1 on Canvas`).toBe(2)
+        }
+      })
     })
   }
 

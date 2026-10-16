@@ -43,6 +43,8 @@ export const DATE_PICKER_DAY = [
   'data-selected:inset-ring-(length:--tc-line-width) data-selected:inset-ring-primary-on-soft',
   'forced-colors:data-selected:forced-color-adjust-none forced-colors:data-selected:bg-[Highlight] forced-colors:data-selected:text-[HighlightText]',
   'forced-colors:data-selected:inset-ring-[color:Highlight]',
+  // Opted out of forced colours, the ring would keep the theme's violet: 2.9:1 on a Canvas of the other lightness.
+  'forced-colors:data-selected:[--tc-ring:CanvasText]',
   'aria-[current=date]:font-semibold aria-[current=date]:underline aria-[current=date]:underline-offset-4',
   ARIA_DISABLED,
 ].join(' ')
