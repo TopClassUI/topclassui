@@ -94,47 +94,48 @@ describe('duplicate keys', () => {
 })
 
 describe('loading more', () => {
-  it('asks once when the window is near the end', () => {
+  // happy-dom lays out nothing: a box of 0 px is at its end, so each length is asked for once it is read.
+  it('asks once when the list is at its end', () => {
     const loadMore = vi.fn()
-    renderHook(() => useCollection<Row>({ items: makeItems(20), getKey, hasMore: true, loadMore }))
+    render(<List items={makeItems(20)} hasMore loadMore={loadMore} />)
     expect(loadMore).toHaveBeenCalledTimes(1)
   })
 
   it('does not ask again for the same items', () => {
     const loadMore = vi.fn()
-    const { rerender } = renderHook(() =>
-      useCollection<Row>({ items: makeItems(20), getKey, hasMore: true, loadMore }),
-    )
-    rerender()
-    rerender()
+    const items = makeItems(20)
+    const { rerender } = render(<List items={items} hasMore loadMore={loadMore} />)
+    rerender(<List items={items} hasMore loadMore={loadMore} />)
+    rerender(<List items={items} hasMore loadMore={loadMore} />)
     expect(loadMore).toHaveBeenCalledTimes(1)
   })
 
   it('asks again once more items arrive', () => {
     const loadMore = vi.fn()
-    const { rerender } = renderHook(
-      ({ n }: { n: number }) =>
-        useCollection<Row>({ items: makeItems(n), getKey, hasMore: true, loadMore }),
-      { initialProps: { n: 20 } },
-    )
-    rerender({ n: 40 })
+    const { rerender } = render(<List items={makeItems(20)} hasMore loadMore={loadMore} />)
+    rerender(<List items={makeItems(40)} hasMore loadMore={loadMore} />)
     expect(loadMore).toHaveBeenCalledTimes(2)
   })
 
   it('never asks when there is no more to load', () => {
     const loadMore = vi.fn()
-    renderHook(() => useCollection<Row>({ items: makeItems(20), getKey, hasMore: false, loadMore }))
+    render(<List items={makeItems(20)} hasMore={false} loadMore={loadMore} />)
+    expect(loadMore).not.toHaveBeenCalled()
+  })
+
+  it('with no scroll container it asks for nothing: there is no end to be near', () => {
+    const loadMore = vi.fn()
+    renderHook(() => useCollection<Row>({ items: makeItems(20), getKey, hasMore: true, loadMore }))
     expect(loadMore).not.toHaveBeenCalled()
   })
 
   it('allows another attempt after a rejection', async () => {
     const loadMore = vi.fn().mockRejectedValue(new Error('offline'))
-    const { rerender } = renderHook(() =>
-      useCollection<Row>({ items: makeItems(20), getKey, hasMore: true, loadMore }),
-    )
+    const { rerender } = render(<List items={makeItems(20)} hasMore loadMore={loadMore} />)
     await act(async () => { await Promise.resolve() })
-    rerender()
-    expect(loadMore.mock.calls.length).toBeGreaterThanOrEqual(1)
+    rerender(<List items={makeItems(20)} hasMore={false} loadMore={loadMore} />)
+    rerender(<List items={makeItems(20)} hasMore loadMore={loadMore} />)
+    expect(loadMore).toHaveBeenCalledTimes(2)
   })
 })
 
@@ -204,44 +205,51 @@ function measure(node: HTMLElement, clientHeight: number, scrollHeight: number, 
 }
 
 describe('paging an unvirtualized list', () => {
-  it('stops asking once there is content below the fold, instead of draining the dataset', () => {
-    const loadMore = vi.fn()
-    let node: HTMLElement | null = null
-    const Harness = ({ n }: { n: number }) => {
-      const c = useCollection<Row>({ items: makeItems(n), getKey, hasMore: true, loadMore })
-      return <div data-testid="s" ref={(el) => { node = el; c.scrollRef(el) }} />
+  /** Rows of 40 px in a box of `box` px. Set before the hook sees the node, and never by a scroll
+   * event after a rerender: a page that lands has to be read by the hook itself. */
+  function Paged({ n, box, loadMore }: { n: number; box: number; loadMore: () => void }) {
+    const c = useCollection<Row>({ items: makeItems(n), getKey, hasMore: true, loadMore, estimateRowHeight: 40 })
+    const attach = (node: HTMLElement | null) => {
+      if (node && !Object.hasOwn(node, 'clientHeight')) {
+        Object.defineProperty(node, 'clientHeight', { value: box, configurable: true })
+        Object.defineProperty(node, 'scrollHeight', { get: () => node.childElementCount * 40, configurable: true })
+        Object.defineProperty(node, 'scrollTop', { value: 0, writable: true, configurable: true })
+      }
+      c.scrollRef(node)
     }
-    const { rerender, getByTestId } = render(<Harness n={20} />)
-    node = getByTestId('s')
+    return <div data-testid="s" ref={attach}>{c.rows.map((row) => <div key={row.key} />)}</div>
+  }
 
-    // 20 rows of content in a 360px viewport: the user is at the top with more below.
-    measure(node, 360, 4000, 0)
-    act(() => { node?.dispatchEvent(new Event('scroll')) })
-    const askedBefore = loadMore.mock.calls.length
-
-    rerender(<Harness n={40} />)
-    act(() => { node?.dispatchEvent(new Event('scroll')) })
-    expect(loadMore.mock.calls.length).toBe(askedBefore)
+  it('a list longer than its box asks for nothing on mount', () => {
+    const loadMore = vi.fn()
+    render(<Paged n={50} box={290} loadMore={loadMore} />)
+    expect(loadMore).toHaveBeenCalledTimes(0)
   })
 
-  it('asks for the next page once the user reaches the bottom', () => {
+  it('a list shorter than its box asks once per page with no scroll, and stops once a page fills it', () => {
     const loadMore = vi.fn()
-    let node: HTMLElement | null = null
-    const Harness = ({ n }: { n: number }) => {
-      const c = useCollection<Row>({ items: makeItems(n), getKey, hasMore: true, loadMore })
-      return <div data-testid="s" ref={(el) => { node = el; c.scrollRef(el) }} />
-    }
-    const { rerender, getByTestId } = render(<Harness n={20} />)
-    node = getByTestId('s')
+    const { rerender } = render(<Paged n={3} box={360} loadMore={loadMore} />)
+    expect(loadMore).toHaveBeenCalledTimes(1)
+    rerender(<Paged n={6} box={360} loadMore={loadMore} />)
+    expect(loadMore).toHaveBeenCalledTimes(2)
+    // 20 rows are 800 px: 440 px below a 360 px box is more than ten rows of 40 px, so nothing more is asked.
+    rerender(<Paged n={20} box={360} loadMore={loadMore} />)
+    expect(loadMore).toHaveBeenCalledTimes(2)
+  })
 
-    // Scrolled to the bottom, so the next page is wanted the moment one can be asked for.
-    measure(node, 360, 4000, 3640)
-    act(() => { node?.dispatchEvent(new Event('scroll')) })
-    const asked = loadMore.mock.calls.length
-
-    rerender(<Harness n={40} />)
-    act(() => { node?.dispatchEvent(new Event('scroll')) })
-    expect(loadMore.mock.calls.length).toBeGreaterThan(asked)
+  it('scrolled to the end, it asks once; the page that lands below that end is not followed by another', () => {
+    const loadMore = vi.fn()
+    const { rerender, getByTestId } = render(<Paged n={20} box={360} loadMore={loadMore} />)
+    expect(loadMore).toHaveBeenCalledTimes(0)
+    const node = getByTestId('s')
+    node.scrollTop = 440
+    act(() => { node.dispatchEvent(new Event('scroll')) })
+    expect(loadMore).toHaveBeenCalledTimes(1)
+    rerender(<Paged n={40} box={360} loadMore={loadMore} />)
+    expect(loadMore).toHaveBeenCalledTimes(1)
+    node.scrollTop = 1240
+    act(() => { node.dispatchEvent(new Event('scroll')) })
+    expect(loadMore).toHaveBeenCalledTimes(2)
   })
 })
 

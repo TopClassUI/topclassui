@@ -50,4 +50,16 @@ export const MUTATIONS: Mutation[] = [
     from: '  --tc-list-pad-end: 0px;\n',
     to: '  --tc-list-pad-end: 0;\n',
   },
+  {
+    label: 'the shared collection pages before it has read the list, so a list longer than its box asks on mount',
+    file: 'src/shared/collection/use-collection.ts',
+    from: 'const wantsMore = edge.count === count && (virtualized',
+    to: 'const wantsMore = (virtualized',
+  },
+  {
+    label: 'the shared collection pages without reading the list a page has grown, so the end it was at asks for one page after another',
+    file: 'src/shared/collection/use-collection.ts',
+    from: '  }, [container, reach, count])',
+    to: '  }, [container, reach])',
+  },
 ]

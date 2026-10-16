@@ -82,14 +82,11 @@ export function useCombobox(props: ComboboxValueProps) {
 export function useComboboxList({ scroller, virtualize, hasMore, loadMore, loadMoreThreshold, rows, selected }: ComboboxListProps) {
   const filtered: readonly ListOption[] = Base.useFilteredItems()
   const [unit, setUnit] = useState(COMBOBOX_ROW_ESTIMATE)
-  // useCollection reads the list on a scroll or a resize only: paging waits until it has read the list at this count.
-  const [counted, setCounted] = useState(-1)
-  const given = useRef(false)
   const collection = useCollection({
     items: filtered,
     getKey: keyOfOption,
     virtualize,
-    hasMore: hasMore && counted === filtered.length,
+    hasMore,
     loadMore,
     loadMoreThreshold,
     estimateRowHeight: unit,
@@ -132,12 +129,6 @@ export function useComboboxList({ scroller, virtualize, hasMore, loadMore, loadM
       if (chosen >= 0) scrollToIndex(chosen, 'center')
       else if (before !== null && !isAppended(before, filtered)) node.scrollTop = 0
     }
-    // A synthetic scroll makes useCollection read the list with its new rows; on mount its listener comes a commit later.
-    if (node && given.current && counted !== filtered.length) {
-      node.dispatchEvent(new Event('scroll'))
-      setCounted(filtered.length)
-    }
-    if (node) given.current = true
     if (pending.current >= 0) reveal(pending.current)
   })
 

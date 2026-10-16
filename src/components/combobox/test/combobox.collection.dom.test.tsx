@@ -47,11 +47,12 @@ describe('the list is the shared collection', () => {
     expect(last()?.items).toEqual([ITEMS[1]])
   })
 
-  it('hasMore reaches it only once the list has been read at its count, so an unmeasured list asks for nothing', async () => {
-    render(<Combobox aria-label="L" items={ITEMS} hasMore loadMore={() => undefined} />)
+  it('hasMore and loadMore reach it from the first render: the shared hook itself waits until it has read the list', async () => {
+    const loadMore = () => undefined
+    render(<Combobox aria-label="L" items={ITEMS} hasMore loadMore={loadMore} />)
     await userEvent.click(screen.getByRole('combobox'))
-    expect(seen[0]?.hasMore).toBe(false)
-    expect(last()?.hasMore).toBe(true)
+    expect(seen[0]?.hasMore).toBe(true)
+    expect(seen[0]?.loadMore).toBe(loadMore)
   })
 
   it('visibleRows is clamped to 1 and 20 and set on the list as --tc-list-rows; left out, no style is written', async () => {

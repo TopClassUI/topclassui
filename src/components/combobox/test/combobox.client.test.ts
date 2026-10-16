@@ -140,8 +140,8 @@ describe('hook.ts holds the value, the collection, the window and the locale of 
         'useEffect', 'usePortalLocale',
       ],
       useComboboxList: [
-        'useFilteredItems', 'useState', 'useState', 'useRef', 'useCollection', 'useRef', 'useRef', 'useRef', 'useCallback',
-        'useCallback', 'useLayoutEffect', 'useEffect',
+        'useFilteredItems', 'useState', 'useCollection', 'useRef', 'useRef', 'useRef', 'useCallback', 'useCallback',
+        'useLayoutEffect', 'useEffect',
       ],
     })
   })
