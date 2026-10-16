@@ -141,6 +141,15 @@ describe('matchesShortcut', () => {
     expect(matchesShortcut(press('ن', 'KeyJ', { ctrlKey: true }), 'k')).toBe(false)
   })
 
+  it('a Latin layout that types another letter at the K key keeps that letter: Colemak Ctrl+E, Dvorak Ctrl+T, AZERTY Ctrl+Q', () => {
+    expect(matchesShortcut(press('e', 'KeyK', { ctrlKey: true }), 'k')).toBe(false)
+    expect(matchesShortcut(press('t', 'KeyK', { ctrlKey: true }), 'k')).toBe(false)
+    expect(matchesShortcut(press('q', 'KeyA', { ctrlKey: true }), 'a')).toBe(false)
+    expect(matchesShortcut(press('7', 'KeyK', { ctrlKey: true }), 'k')).toBe(false)
+    // Dvorak's K sits at the V key: its name finds it there.
+    expect(matchesShortcut(press('k', 'KeyV', { ctrlKey: true }), 'k')).toBe(true)
+  })
+
   it('a digit and a key with no letter match by name, and an empty code never matches a key with no place', () => {
     expect(matchesShortcut(press('1', 'Digit1', { ctrlKey: true }), '1')).toBe(true)
     expect(matchesShortcut(press('/', 'Slash', { metaKey: true }), '/')).toBe(true)

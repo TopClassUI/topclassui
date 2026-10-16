@@ -30,7 +30,13 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'command: the shortcut stops matching the key by its place, so Ctrl+K does nothing under an Arabic layout',
     file: LIB,
-    from: ' || (code !== undefined && press.code === code)',
+    from: 'return code !== undefined && press.code === code',
+    to: 'return false',
+  },
+  {
+    label: 'command: the shortcut matches the K key by its place under Colemak too, and takes Ctrl+E from the page',
+    file: LIB,
+    from: "  if (/^[a-z0-9]$/.test(named)) return false\n",
     to: '',
   },
   {

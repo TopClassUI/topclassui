@@ -71,10 +71,14 @@ function codeOf(key: string): string | undefined {
   return undefined
 }
 
-/** Ctrl or Cmd with the shortcut, and neither Alt nor Shift, which the browser and the system keep. */
+/** Ctrl or Cmd with the shortcut, and neither Alt nor Shift, which the browser and the system keep.
+ * The key's place counts only when it types no Latin letter or digit: Colemak's Ctrl+E stays Ctrl+E. */
 export function matchesShortcut(press: CommandKeyPress, shortcut: string): boolean {
   if (!(press.ctrlKey || press.metaKey) || press.altKey || press.shiftKey) return false
   const key = shortcut.toLowerCase()
+  const named = press.key.toLowerCase()
+  if (named === key) return true
+  if (/^[a-z0-9]$/.test(named)) return false
   const code = codeOf(key)
-  return press.key.toLowerCase() === key || (code !== undefined && press.code === code)
+  return code !== undefined && press.code === code
 }
