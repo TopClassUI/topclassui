@@ -1,9 +1,11 @@
 import { Tooltip } from '@base-ui/react/tooltip'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { useContext } from 'react'
 import { describe, expect, it } from 'vitest'
 
 import {
+  TopClassContext,
   useCollectionDefaults,
   useDirection,
   useLabels,
@@ -22,6 +24,16 @@ function Probe() {
       <li data-testid="close">{labels.common.close}</li>
       <li data-testid="results">{labels.collection.results(3, fmt)}</li>
       <li data-testid="rows">{useCollectionDefaults().visibleRows}</li>
+    </ul>
+  )
+}
+
+/** Twelve in the provider's digits, and the numbering system it says it uses. */
+function System() {
+  return (
+    <ul>
+      <li data-testid="twelve">{useNumberFormat().format(12)}</li>
+      <li data-testid="system">{useContext(TopClassContext)?.numberingSystem}</li>
     </ul>
   )
 }
@@ -59,6 +71,26 @@ describe('TopClassProvider', () => {
       <TopClassProvider direction="rtl" locale="ar" numberingSystem="arab"><Probe /></TopClassProvider>,
     )
     expect(text(container, 'results')).toBe('٣ نتائج')
+  })
+
+  it('follows a -u-nu- in its locale tag when given no numbering system, as every server half does', () => {
+    const { container } = render(
+      <TopClassProvider direction="rtl" locale="ar-u-nu-arab"><Probe /><System /></TopClassProvider>,
+    )
+    expect(text(container, 'results')).toBe('٣ نتائج')
+    expect(text(container, 'twelve')).toBe('١٢')
+    expect(text(container, 'system')).toBe('arab')
+  })
+
+  it('keeps Latin digits for a tag with no -u-nu-, and lets a numbering system it is given win over the tag', () => {
+    const { container } = render(
+      <>
+        <TopClassProvider direction="rtl" locale="ar"><System /></TopClassProvider>
+        <TopClassProvider direction="rtl" locale="ar-u-nu-arab" numberingSystem="latn"><System /></TopClassProvider>
+      </>,
+    )
+    expect([...container.querySelectorAll('[data-testid="twelve"]')].map((cell) => cell.textContent)).toEqual(['12', '12'])
+    expect([...container.querySelectorAll('[data-testid="system"]')].map((cell) => cell.textContent)).toEqual(['latn', 'latn'])
   })
 
   it('applies a label override and keeps the rest of the group', () => {
