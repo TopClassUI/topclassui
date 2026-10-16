@@ -33,7 +33,7 @@ export function DatePickerCalendar(props: DatePickerCalendarProps) {
           <button
             type="button"
             aria-label={calendar.labels.previous}
-            disabled={calendar.previous.disabled}
+            aria-disabled={calendar.previous.disabled ? true : undefined}
             onClick={calendar.previous.onClick}
             className={DATE_PICKER_NAV}
           >
@@ -43,7 +43,7 @@ export function DatePickerCalendar(props: DatePickerCalendarProps) {
           <button
             type="button"
             aria-label={calendar.labels.next}
-            disabled={calendar.next.disabled}
+            aria-disabled={calendar.next.disabled ? true : undefined}
             onClick={calendar.next.onClick}
             className={DATE_PICKER_NAV}
           >

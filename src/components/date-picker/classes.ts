@@ -1,6 +1,6 @@
 // R-5.12-4: the class strings of the DatePicker, built from the shared field and overlay constants (unit-5.md, DatePicker).
 import {
-  DISABLED, FIELD_BOX, FIELD_HOLDER, FOCUS_RING, FOCUS_RING_INSET, HOVER, ICON_BUTTON, LABEL, OVERLAY_SURFACE, POPUP_MOTION,
+  FIELD_BOX, FIELD_HOLDER, FOCUS_RING, FOCUS_RING_INSET, HOVER, ICON_BUTTON, LABEL, OVERLAY_SURFACE, POPUP_MOTION,
   SCROLL_AREA, TARGET_HEIGHT, TRANSITION,
 } from '#shared/classes.js'
 
@@ -24,8 +24,10 @@ export const DATE_PICKER_POPUP = [
 export const DATE_PICKER_HEADER = 'flex items-center gap-2'
 /** Three 44 px buttons under a finger leave about 92 px at 320 px: the month wraps, never cut. */
 export const DATE_PICKER_TITLE = 'min-w-0 flex-1 text-center text-sm font-semibold text-body wrap-anywhere'
+/** Dimmed and deaf to the pointer, and still focusable: a month button at the range's end keeps the focus it had. */
+const ARIA_DISABLED = 'aria-disabled:pointer-events-none aria-disabled:opacity-50'
 /** Previous, next and close: 24 px, 44 under a finger, where the drawing has bare 14 px carets. */
-export const DATE_PICKER_NAV = `${ICON_BUTTON} text-body ${HOVER.ghost} ${DISABLED}`
+export const DATE_PICKER_NAV = `${ICON_BUTTON} text-body ${HOVER.ghost} ${ARIA_DISABLED}`
 export const DATE_PICKER_GRID = 'w-full table-fixed border-collapse'
 export const DATE_PICKER_WEEKDAY = 'pb-1 text-center text-xs font-medium text-muted'
 export const DATE_PICKER_CELL = 'p-0.5 text-center'
@@ -39,5 +41,5 @@ export const DATE_PICKER_DAY = [
   'data-selected:bg-primary-solid data-selected:font-medium data-selected:text-primary-on-solid',
   'forced-colors:data-selected:forced-color-adjust-none forced-colors:data-selected:bg-[Highlight] forced-colors:data-selected:text-[HighlightText]',
   'aria-[current=date]:font-semibold aria-[current=date]:underline aria-[current=date]:underline-offset-4',
-  'aria-disabled:pointer-events-none aria-disabled:opacity-50',
+  ARIA_DISABLED,
 ].join(' ')

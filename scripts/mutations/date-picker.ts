@@ -152,4 +152,34 @@ export const MUTATIONS: Mutation[] = [
     from: '    else if (opened.current && !ready.current) actionsRef.current?.unmount()',
     to: '    else if (opened.current && !ready.current) void actionsRef',
   },
+  {
+    label: 'the date picker next month button is natively disabled at maxDate, so the focus it held drops to the body',
+    file: PART,
+    from: 'aria-disabled={calendar.next.disabled ? true : undefined}',
+    to: 'disabled={calendar.next.disabled}',
+  },
+  {
+    label: 'the date picker previous month button is natively disabled at minDate, so the focus it held drops to the body',
+    file: PART,
+    from: 'aria-disabled={calendar.previous.disabled ? true : undefined}',
+    to: 'disabled={calendar.previous.disabled}',
+  },
+  {
+    label: 'the date picker next month button still acts while aria-disabled, so it moves the tab stop to the last day',
+    file: HOOK,
+    from: 'onClick: () => { if (!ends.atLast) setActive(',
+    to: 'onClick: () => { setActive(',
+  },
+  {
+    label: 'the date picker previous month button still acts while aria-disabled, so it moves the tab stop to the first day',
+    file: HOOK,
+    from: 'onClick: () => { if (!ends.atFirst) setActive(',
+    to: 'onClick: () => { setActive(',
+  },
+  {
+    label: 'the date picker month buttons lose their aria-disabled dimming, so one at the range end looks pressable',
+    file: CLASSES,
+    from: 'export const DATE_PICKER_NAV = `${ICON_BUTTON} text-body ${HOVER.ghost} ${ARIA_DISABLED}`',
+    to: 'export const DATE_PICKER_NAV = `${ICON_BUTTON} text-body ${HOVER.ghost}`',
+  },
 ]

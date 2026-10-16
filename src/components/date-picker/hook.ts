@@ -156,8 +156,9 @@ export function useDatePickerCalendar({ value, range, formats, firstDayOfWeek, c
     labels: { previous: labels.datePicker.previousMonth, next: labels.datePicker.nextMonth, close: labels.common.close },
     weekdays: Array.from({ length: 7 }, (_, at) => ({ key: at, ...formats.weekday(((weekStart - 1 + at) % 7) + 1) })),
     weeks: Array.from({ length: 6 }, (_, row) => ({ key: row, days: cells.slice(row * 7, row * 7 + 7) })),
-    previous: { disabled: ends.atFirst, onClick: () => { setActive(shiftMonth(active, -1, range)) } },
-    next: { disabled: ends.atLast, onClick: () => { setActive(shiftMonth(active, 1, range)) } },
+    // aria-disabled, never disabled: a disabled button drops the focus to the body, where no Escape guard can place the key.
+    previous: { disabled: ends.atFirst, onClick: () => { if (!ends.atFirst) setActive(shiftMonth(active, -1, range)) } },
+    next: { disabled: ends.atLast, onClick: () => { if (!ends.atLast) setActive(shiftMonth(active, 1, range)) } },
     gridRef: grid,
     onKeyDown,
     pick: (iso: string) => { if (iso >= range.min && iso <= range.max) choose(iso) },

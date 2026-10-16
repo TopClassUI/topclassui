@@ -161,12 +161,23 @@ describe('the month buttons', () => {
     expect(screen.getByRole('heading').textContent).toBe('August 2026')
   })
 
-  it('previous is disabled in minDate\'s month and next in maxDate\'s', async () => {
+  it('previous is aria-disabled in minDate\'s month and next in maxDate\'s, never disabled, so the focus stays on it', async () => {
     render(<CheckIn defaultValue="2026-09-30" minDate="2026-09-25" maxDate="2026-10-31" />)
     await open()
-    expect(screen.getByRole('button', { name: 'Previous month' }).hasAttribute('disabled')).toBe(true)
-    await userEvent.click(screen.getByRole('button', { name: 'Next month' }))
-    expect(screen.getByRole('button', { name: 'Next month' }).hasAttribute('disabled')).toBe(true)
+    const [previous, next] = [screen.getByRole('button', { name: 'Previous month' }), screen.getByRole('button', { name: 'Next month' })]
+    expect([previous.getAttribute('aria-disabled'), previous.hasAttribute('disabled')]).toEqual(['true', false])
+    const stop = () => screen.getByRole('grid').querySelector('button[tabindex="0"]')?.getAttribute('aria-label')
+    await userEvent.click(previous)
+    expect([screen.getByRole('heading').textContent, stop()]).toEqual(['September 2026', 'Wednesday, September 30, 2026'])
+    expect(document.activeElement).toBe(previous)
+    await userEvent.click(next)
+    expect(screen.getByRole('heading').textContent).toBe('October 2026')
+    expect([next.getAttribute('aria-disabled'), next.hasAttribute('disabled')]).toEqual(['true', false])
+    expect(document.activeElement).toBe(next)
+    expect(stop()).toBe('Friday, October 30, 2026')
+    await userEvent.keyboard('{Enter}')
+    expect([screen.getByRole('heading').textContent, stop()]).toEqual(['October 2026', 'Friday, October 30, 2026'])
+    expect(document.activeElement).toBe(next)
   })
 
   it('with container inside a form, a press on next month does not submit it', async () => {

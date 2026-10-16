@@ -346,12 +346,33 @@ test.describe('live: the keys of the grid, the Authoring Practices date picker d
     const popup = await openCalendar(page, trigger(page))
     await press(page, 'PageUp', 'Friday, September 25, 2026')
     await press(page, 'ArrowLeft', 'Friday, September 25, 2026')
-    await expect(popup.getByRole('button', { name: 'Previous month' })).toBeDisabled()
+    await expect(popup.getByRole('button', { name: 'Previous month' })).toHaveAttribute('aria-disabled', 'true')
     const early = day(popup, 'Thursday, September 24, 2026')
     await expect(early).toHaveAttribute('aria-disabled', 'true')
     // The month changed under the pointer: the opacity transition of the new cells is let finish.
     await expect.poll(() => css(early, 'opacity')).toBe('0.5')
   })
+
+  for (const [button, ends, title] of [['Next month', 'March 2027', 'Previous month'], ['Previous month', 'September 2026', 'Next month']] as const) {
+    test(`${button} pressed into the month at the range's end keeps the focus, is dimmed, and does nothing more`, async ({ page }) => {
+      await openLive(page, 'date-picker--limits')
+      const popup = await openCalendar(page, trigger(page))
+      const month = popup.getByRole('button', { name: button })
+      await press(page, 'Tab', 'Previous month')
+      if (button === 'Next month') await press(page, 'Tab', 'Next month')
+      for (let step = 0; step < 6; step++) await page.keyboard.press('Enter')
+      await expect(popup.getByRole('heading')).toHaveText(ends)
+      await expect(month).toHaveAttribute('aria-disabled', 'true')
+      await expect(month).toBeFocused()
+      await expect.poll(() => css(month, 'opacity')).toBe('0.5')
+      await page.keyboard.press('Enter')
+      await expect(popup.getByRole('heading')).toHaveText(ends)
+      await expect(popup.getByRole('button', { name: title })).not.toHaveAttribute('aria-disabled', 'true')
+      await page.keyboard.press('Escape')
+      await expectClosed(page, POPUP)
+      await expect(trigger(page)).toBeFocused()
+    })
+  }
 
   test('no provider: it opens, formats in English, the popup takes the page\'s direction, and the keys work', async ({ page }) => {
     await openLive(page, 'separator--horizontal')
@@ -537,11 +558,11 @@ test.describe('live: hostile content', () => {
     await expect(trigger(page, 'Outside')).toHaveText('Jan 15, 2030')
     let popup = await openCalendar(page, trigger(page, 'Year one'), 'tap')
     await expect(popup.getByRole('heading')).toHaveText('January 1')
-    await expect(popup.getByRole('button', { name: 'Previous month' })).toBeDisabled()
+    await expect(popup.getByRole('button', { name: 'Previous month' })).toHaveAttribute('aria-disabled', 'true')
     await page.keyboard.press('Escape')
     await expectClosed(page, POPUP)
     popup = await openCalendar(page, trigger(page, 'Year 9999'), 'tap')
-    await expect(popup.getByRole('button', { name: 'Next month' })).toBeDisabled()
+    await expect(popup.getByRole('button', { name: 'Next month' })).toHaveAttribute('aria-disabled', 'true')
     await page.keyboard.press('Escape')
     await expectClosed(page, POPUP)
   })
@@ -637,6 +658,33 @@ test.describe('live: a Dialog around it', () => {
     await page.mouse.wheel(0, 300)
     await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(before)
   })
+})
+
+test.describe('live: a month button at the end of the range, inside a Dialog', () => {
+  test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
+
+  for (const by of ['keyboard', 'mouse'] as const) {
+    test(`${by}: Next month into maxDate's month keeps the focus in the calendar, so one Escape closes the calendar alone`, async ({ page }) => {
+      await openLive(page, 'separator--horizontal')
+      await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/date-picker-in-dialog.tsx' })
+      await page.getByRole('button', { name: 'Edit booking' }).click()
+      const button = trigger(page, 'Two months in the dialog')
+      const popup = await openCalendar(page, button)
+      const next = popup.getByRole('button', { name: 'Next month' })
+      if (by === 'keyboard') {
+        await press(page, 'Tab', 'Previous month')
+        await press(page, 'Tab', 'Next month')
+        await page.keyboard.press('Enter')
+      } else await next.click()
+      await expect(popup.getByRole('heading')).toHaveText('October 2026')
+      await expect(next).toHaveAttribute('aria-disabled', 'true')
+      await expect(next).toBeFocused()
+      await page.keyboard.press('Escape')
+      await expectClosed(page, POPUP)
+      await expect(button).toBeFocused()
+      await expect(page.locator('[role="dialog"]:visible'), 'the Escape closed the Dialog too').toHaveCount(1)
+    })
+  }
 })
 
 test.describe('live: focus, forced colours and motion', () => {

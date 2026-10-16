@@ -112,6 +112,10 @@ describe('a day', () => {
 describe('the three buttons of the header', () => {
   it('are 24 px and 44 under a finger, where the drawing has bare 14 px carets', () => {
     expect(DATE_PICKER_NAV.split(' ')).toEqual(expect.arrayContaining(['min-h-[var(--tc-target-min,24px)]', 'min-w-[var(--tc-target-min,24px)]', 'pointer-coarse:min-w-[var(--tc-target-coarse,44px)]']))
-    expect(ruleOf(`${selectorOf('disabled:opacity-50')}:disabled`)).toBe('opacity: 50%;')
+  })
+
+  it('a month button at the range\'s end dims by aria-disabled, never by disabled, which would drop the focus', () => {
+    expect(DATE_PICKER_NAV.split(' ')).toEqual(expect.arrayContaining(['aria-disabled:opacity-50', 'aria-disabled:pointer-events-none']))
+    expect(DATE_PICKER_NAV.split(' ').filter((cls) => cls.startsWith('disabled:'))).toEqual([])
   })
 })
