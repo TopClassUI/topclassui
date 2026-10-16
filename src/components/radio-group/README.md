@@ -67,8 +67,8 @@ sends the focus of a blocked submit to a hidden input, a box of 1 px.
 
 **`invalid`** sets `aria-invalid` on the group: every circle turns red and its line thickens,
 checked or not. **`disabled`** is the real attribute on every radio, so the form sends nothing.
-**`readOnly`** keeps the value in the form and says so to a screen reader; it has no look of its
-own.
+**`readOnly`** keeps the value in the form and sets `aria-readonly` on the group, which Chromium does
+not announce; it has no look of its own either, so say it in the text beside the group.
 
 **`orientation`** is `vertical` (a column) or `horizontal` (a row that wraps). It is layout only:
 the arrows are the same in both.
