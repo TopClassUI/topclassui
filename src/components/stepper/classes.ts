@@ -1,17 +1,24 @@
 // R-5.12-4: Stepper's own class tables. The stroke of a todo circle is the shared knob.
 import { BORDER_STRONG } from '#shared/classes.js'
 
-/** Equal columns, so each connector runs from one centre to the next. */
-export const STEPPER_ROOT = 'flex w-full min-w-0 items-start'
+/** Equal columns that wrap onto another row when the circles no longer fit, so none overlaps and the page never scrolls. */
+export const STEPPER_ROOT = 'flex w-full min-w-0 flex-wrap items-start gap-y-4'
 
-/** relative: the hidden status word sits inside it (an sr-only span outside one grew the Sidebar page). */
-export const STEPPER_STEP = 'relative flex min-w-0 flex-1 flex-col items-center gap-2 text-center'
+/** relative: the hidden status word sits inside it (an sr-only span outside one grew the Sidebar page).
+ * Never narrower than its circle; the title wraps to the column instead. */
+export const STEPPER_STEP = 'relative flex min-w-(--tc-stepper-mark) flex-1 flex-col items-center gap-2 text-center'
 
 /** The mark and the line behind it share one row, so the line is level with the centre at every size. */
 export const STEPPER_MARK_ROW = 'relative flex w-full justify-center'
 
-/** From this centre to the next. A border, not a fill: forced colours repaint a border and erase a fill. */
-export const STEPPER_CONNECTOR = 'absolute top-1/2 inset-s-1/2 w-full -translate-y-1/2 border-t-(length:--tc-line-width) border-line data-done:border-primary-solid'
+/** Half a line: each step draws its own, so a row that wraps ends at the list's edge. A border, not a fill: forced colours erase a fill. */
+const HALF_LINE = 'absolute top-1/2 w-1/2 -translate-y-1/2 border-t-(length:--tc-line-width) border-line data-done:border-primary-solid'
+
+/** From this centre to the end of the column, where the next step's half takes over. */
+export const STEPPER_CONNECTOR = `${HALF_LINE} inset-s-1/2`
+
+/** From the start of the column to this centre, done when the step before it is. */
+export const STEPPER_CONNECTOR_BEFORE = `${HALF_LINE} inset-s-0`
 
 /** The circle's size, set on the list, one step under the control scale: md is the drawn 32 px. custom sets
  * none, so the circle reads the caller's --tc-stepper-mark, or the default of tokens.css. */

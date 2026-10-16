@@ -6,7 +6,7 @@ import { cn } from '#shared/cn.js'
 import { en } from '#shared/labels/en.js'
 import { createNumberFormat } from '#shared/labels/get-labels.js'
 import {
-  STEPPER_CONNECTOR, STEPPER_MARK, STEPPER_MARK_ROW, STEPPER_MARK_SIZE, STEPPER_MARK_STATUS, STEPPER_ROOT,
+  STEPPER_CONNECTOR, STEPPER_CONNECTOR_BEFORE, STEPPER_MARK, STEPPER_MARK_ROW, STEPPER_MARK_SIZE, STEPPER_MARK_STATUS, STEPPER_ROOT,
   STEPPER_ROOT_SIZE, STEPPER_STATUS_TEXT, STEPPER_STEP, STEPPER_TITLE, STEPPER_TITLE_SIZE, STEPPER_TITLE_STATUS,
 } from './classes.js'
 import { STEPPER_DEFAULTS } from './constants.js'
@@ -48,6 +48,9 @@ export function Stepper({
             className={STEPPER_STEP}
           >
             <div className={STEPPER_MARK_ROW}>
+              {index === 0
+                ? null
+                : <span aria-hidden="true" data-done={statuses[index - 1] === 'done' ? '' : undefined} className={STEPPER_CONNECTOR_BEFORE} />}
               {index === last
                 ? null
                 : <span aria-hidden="true" data-done={status === 'done' ? '' : undefined} className={STEPPER_CONNECTOR} />}

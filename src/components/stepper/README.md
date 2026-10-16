@@ -28,7 +28,7 @@ To show where a reader is in a task of a few steps: a sign-up, a checkout, a set
 - **Server first.** `items` is plain data and nothing here runs in the browser, so a server page passes it as it is.
 - **Arabic.** `{...getLabels('ar')}` says each status in Arabic with Latin digits; `{...getLabels('ar-u-nu-arab')}` writes the numbers in Arabic-Indic digits. The steps run from the right by themselves.
 - **A long title** wraps inside its column and is never cut.
-- **How many steps.** Each step gets an equal column, so the circles stay apart while a column is at least one circle wide: about 8 steps at `md` on a 320 px phone. Past that the circles overlap.
+- **How many steps.** Each step gets an equal column, never narrower than its circle. Steps that do not fit across wrap onto another row, 16 px below, and each row's line stops at the edge of the list: at `md` on a 320 px phone that is 8 or 9 steps a row, and 4 at a 32 px root. Nothing overlaps and the page never scrolls sideways, in a table cell or a `w-fit` parent too.
 - **`size="custom"`** sets no circle size: the circle reads `--tc-stepper-mark`, 32 px unless you set it, through `style={{ '--tc-stepper-mark': '3.5rem' }}` or a class such as `[--tc-stepper-mark:3.5rem]`. The tick and the x stay 55% of the circle; the number and the title take the list's own text size.
 - **No steps** renders nothing.
 

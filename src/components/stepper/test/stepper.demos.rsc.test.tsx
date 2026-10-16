@@ -64,8 +64,8 @@ describe('Stepper renders in a Server Component (R-5.1-1)', () => {
     expect(hosts(<Stepper items={STEPS} value="c" />)).toEqual([
       'ol',
       'li', 'div', 'span', 'span', 'svg', 'path', 'span', 'span',
-      'li', 'div', 'span', 'span', 'svg', 'path', 'span', 'span',
-      'li', 'div', 'span', 'span',
+      'li', 'div', 'span', 'span', 'span', 'svg', 'path', 'span', 'span',
+      'li', 'div', 'span', 'span', 'span',
     ])
   })
 })

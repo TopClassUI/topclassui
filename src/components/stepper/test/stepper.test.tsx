@@ -28,7 +28,7 @@ const CONNECTOR = 'absolute top-1/2'
 
 describe('the element it renders', () => {
   it('is an ordered list with one item per step, in the order given', () => {
-    expect(html()).toMatch(/^<ol data-size="md" class="flex w-full min-w-0 items-start \[--tc-stepper-mark:var\(--spacing-control-sm\)\]" role="list"><li /)
+    expect(html()).toMatch(/^<ol data-size="md" class="flex w-full min-w-0 flex-wrap items-start gap-y-4 \[--tc-stepper-mark:var\(--spacing-control-sm\)\]" role="list"><li /)
     expect(html()).toMatch(/<\/ol>$/)
     expect(rows(html())).toHaveLength(4)
   })
@@ -130,17 +130,19 @@ describe('the current step', () => {
 })
 
 describe('the connector', () => {
-  it('joins every step to the next and is absent on the last', () => {
-    expect(rows(html()).map((row) => row.includes(CONNECTOR))).toEqual([true, true, true, false])
+  it('is drawn in two halves: one after every step but the last, one before every step but the first', () => {
+    expect(rows(html()).map((row) => [/class="absolute [^"]* inset-s-1\/2"/.test(row), /class="absolute [^"]* inset-s-0"/.test(row)]))
+      .toEqual([[true, false], [true, true], [true, true], [false, true]])
   })
 
   it('is absent on a single step, which has nothing to connect to', () => {
     expect(markup(<Stepper items={[{ id: 'a', title: 'Only' }]} />)).not.toContain(CONNECTOR)
   })
 
-  it('carries data-done after a done step only, and is hidden from a screen reader', () => {
+  it('carries data-done on both halves after a done step only, and is hidden from a screen reader', () => {
     const connectors = [...html().matchAll(/<span aria-hidden="true"( data-done="")? class="absolute/g)]
-    expect(connectors.map((m) => m[1] !== undefined)).toEqual([true, false, false])
+    // Account done: its half after, and Profile's half before; then Profile and Team, which are not.
+    expect(connectors.map((m) => m[1] !== undefined)).toEqual([true, true, false, false, false, false])
   })
 })
 
