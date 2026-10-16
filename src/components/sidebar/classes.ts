@@ -45,8 +45,9 @@ export const SIDEBAR_BODY = `relative flex flex-1 flex-col gap-1 ${SCROLL_AREA} 
 
 export const SIDEBAR_GROUP = 'flex flex-col gap-1'
 
-/** One line that ends in an ellipsis. Collapsed, it is hidden and still names its list. */
-export const SIDEBAR_GROUP_LABEL = 'truncate px-3 py-1 text-xs font-medium text-muted group-data-closed/sidebar:sr-only'
+/** One line that ends in an ellipsis. Collapsed, it is hidden and still names its list. As wide as its text and
+ * at the start of the rail, so a label in its own direction, an English one in an Arabic rail, sits where the rows do. */
+export const SIDEBAR_GROUP_LABEL = `self-start ${CONTAIN} truncate px-3 py-1 text-xs font-medium text-muted group-data-closed/sidebar:sr-only`
 
 export const SIDEBAR_LIST = 'flex flex-col gap-1'
 
