@@ -411,9 +411,9 @@ test.describe('live: a long list under a coarse pointer', () => {
         return { visible: el.matches(':focus-visible'), inside: b.top - reach >= l.top - 0.5 && b.bottom + reach <= l.bottom + 0.5 }
       })
       expect(ring).toEqual({ visible: true, inside: true })
-      // At a 32 px root the coarse row is its 44 px remove and a padding that doubled, never --tc-row-height.
+      // At a 32 px root the coarse row is --tc-row-height, the floor ROW_TOUCH keeps, and seven of them still fit.
       await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
-      expect(await shownIn(list)).toEqual({ whole: 7, rowHeights: [62], scrolls: true })
+      expect(await shownIn(list)).toEqual({ whole: 7, rowHeights: [80], scrolls: true })
     })
   }
 })
