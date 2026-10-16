@@ -69,10 +69,13 @@ import { Textarea } from 'topclassui'
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `aria-label` or `aria-labelledby` or `id`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
+| `aria-label` | **yes**, or `aria-labelledby` or `id` | `string` | - | The name read out when no visible label names the control. |
+| `aria-labelledby` | **yes**, or `aria-label` or `id` | `string` | - | The id of the visible text that names the control. |
+| `id` | **yes**, or `aria-label` or `aria-labelledby` | `string` | - | The id a `<label htmlFor>` points at. |
 | `autosize` | no | `boolean` | `false` | Grows with the text from rows up to maxRows once the page has hydrated; loads the small client half. |
 | `fullWidth` | no | `boolean` | `false` | Stretches the textarea, and the box around it with autosize or showCount, to the width of its container. |
 | `invalid` | no | `boolean` | `false` | Marks the value as wrong: sets aria-invalid, and the border turns to danger and thickens. |

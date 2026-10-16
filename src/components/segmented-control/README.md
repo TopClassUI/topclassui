@@ -116,20 +116,20 @@ import {
 
 ## Props
 
-Required: `value` on `SegmentedControlItem`. Every other prop below is optional.
+Required: `aria-label` or `aria-labelledby` on `SegmentedControlRoot`, `defaultValue` or `value` on `SegmentedControlRoot`, `value` on `SegmentedControlItem`. Every other prop below is optional.
 
 ### SegmentedControlRoot
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `aria-label` | no | `string` | - | The name read out when no visible text names the group. |
-| `aria-labelledby` | no | `string` | - | The id of the visible text that names the group. |
-| `defaultValue` | no | `string` | - | The segment selected when the page opens, and after a form reset. |
+| `aria-label` | **yes**, or `aria-labelledby` | `string` | - | The name read out when no visible text names the group. |
+| `aria-labelledby` | **yes**, or `aria-label` | `string` | - | The id of the visible text that names the group. |
+| `defaultValue` | **yes**, or `value` | `string` | - | The segment selected when the page opens, and after a form reset. |
+| `value` | **yes**, or `defaultValue` | `string` | - | The selected segment, held by its owner. |
 | `fullWidth` | no | `boolean` | `false` | SegmentedControlRoot: the track fills its parent and its segments share it equally. For a few short segments. |
 | `invalid` | no | `boolean` | `false` | SegmentedControlRoot: marks the choice as wrong: sets aria-invalid on the track, whose line turns to danger and thickens. |
 | `ref` | no | `Ref<HTMLDivElement>` | - | The track, the element with role="radiogroup". |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | SegmentedControlRoot: the height of the track and the padding and type step of every segment; custom emits none. |
-| `value` | no | `string` | - | The selected segment, held by its owner. |
 
 ### SegmentedControlItem
 
