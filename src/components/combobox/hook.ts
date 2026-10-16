@@ -130,7 +130,11 @@ export function useComboboxList({
     const node = list.current
     const row = node?.querySelector('[role="option"]')
     const height = row ? Number.parseFloat(getComputedStyle(row).height) : 0
-    if (height > 0 && Math.abs(height - unit) > 0.01) setUnit(height)
+    // The scrolls wait a pass for the measured unit: a row of 44 or 80 px reached with 40 lands far short of it.
+    if (height > 0 && Math.abs(height - unit) > 0.01) {
+      setUnit(height)
+      return
+    }
     if (node && shown.current !== filtered) {
       const before = shown.current
       shown.current = filtered

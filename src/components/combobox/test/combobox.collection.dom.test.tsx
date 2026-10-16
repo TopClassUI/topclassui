@@ -4,16 +4,27 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import type * as Shared from '#shared/collection/use-collection.js'
 
-// What the list part hands the shared hook (R-8.5-1, R-5.7-7), read by a spy that passes every call through.
+// What the list part hands the shared hook (R-8.5-1, R-5.7-7), and each scroll to a row with the row height of its render.
 const seen: Shared.UseCollectionOptions<unknown>[] = []
+const scrolled: { index: number; block: string | undefined; unit: number | undefined }[] = []
 vi.mock('#shared/collection/use-collection.js', async (load) => {
   const real = await load<typeof Shared>()
-  return { useCollection: (props: Shared.UseCollectionOptions<unknown>) => { seen.push(props); return real.useCollection(props) } }
+  return {
+    useCollection: (props: Shared.UseCollectionOptions<unknown>) => {
+      seen.push(props)
+      const result = real.useCollection(props)
+      const scrollToIndex: typeof result.scrollToIndex = (index, block) => {
+        scrolled.push({ index, block, unit: props.estimateRowHeight })
+        result.scrollToIndex(index, block)
+      }
+      return { ...result, scrollToIndex }
+    },
+  }
 })
 
 const { Combobox } = await import('../index.js')
 
-afterEach(() => { seen.length = 0 })
+afterEach(() => { seen.length = 0; scrolled.length = 0 })
 
 const ITEMS = [{ value: 'a', label: 'Alpha' }, { value: 'b', label: 'Bravo' }]
 const last = () => seen.at(-1)
@@ -69,6 +80,15 @@ describe('the list is the shared collection', () => {
     expect(loadMore).not.toHaveBeenCalled()
     await userEvent.click(screen.getByRole('combobox'))
     expect(loadMore).toHaveBeenCalledTimes(1)
+  })
+
+  it('opened on the chosen value, the list scrolls to it with the measured row height, never the 40 px estimate', async () => {
+    const style = document.head.appendChild(document.createElement('style'))
+    style.textContent = '[role="option"] { height: 44px }'
+    render(<Combobox aria-label="L" items={ITEMS} defaultValue="b" />)
+    await userEvent.click(screen.getByRole('combobox'))
+    style.remove()
+    expect(scrolled).toEqual([{ index: 1, block: 'center', unit: 44 }])
   })
 
   it('visibleRows is clamped to 1 and 20 and set on the list as --tc-list-rows; left out, no style is written', async () => {

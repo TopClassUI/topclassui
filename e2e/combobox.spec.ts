@@ -180,6 +180,27 @@ test.describe('live: the keyboard, as the editable combobox of the Authoring Pra
   })
 })
 
+/** Chooses Option 9997 by the keys, closes the list by a click outside, opens it again, and says where the chosen row is. */
+async function reopenOnChosen(page: Page) {
+  const input = inputOf(page, 'Ten thousand options')
+  await input.click()
+  await atRest(popupOf(page))
+  for (const key of ['ArrowDown', 'ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowUp']) await page.keyboard.press(key)
+  await expect.poll(() => activeOf(page)).toMatchObject({ text: 'Option 9997' })
+  await page.keyboard.press('Enter')
+  await expect(input).toHaveValue('Option 9997')
+  await page.mouse.click(2, 2)
+  await expect(popupOf(page)).toHaveCount(0)
+  await input.click()
+  await atRest(popupOf(page))
+  return listOf(page).evaluate((list) => {
+    const row = list.querySelector('[data-selected]')
+    const frame = list.getBoundingClientRect()
+    const box = row?.getBoundingClientRect()
+    return { text: row?.textContent ?? null, whole: box !== undefined && box.top >= frame.top - 0.5 && box.bottom <= frame.bottom + 0.5 }
+  })
+}
+
 test.describe('live: ten thousand options, windowed', () => {
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 
@@ -319,6 +340,11 @@ test.describe('live: ten thousand options, windowed', () => {
       expect(await listOf(page).evaluate((el) => el.scrollHeight)).toBe(440_012)
     })
 
+    test('opened again on a row chosen far down, the list shows that row whole: the window counts 44 px rows', async ({ page }) => {
+      await openLive(page, 'combobox--ten-thousand')
+      expect(await reopenOnChosen(page)).toEqual({ text: 'Option 9997', whole: true })
+    })
+
     test('a drag scrolls the windowed list and mounts the rows it reaches, and never the page', async ({ page }) => {
       await openLive(page, 'combobox--ten-thousand', { tall: true })
       await touchDrag(page, 195, 700, 660)
@@ -332,6 +358,12 @@ test.describe('live: ten thousand options, windowed', () => {
       expect((await activeOf(page)).mounted).toBeLessThan(100)
       expect(await scrollY(page)).toBe(before)
     })
+  })
+
+  test('at a 32 px root, opened again on a row chosen far down, the list shows that row whole: the window counts 80 px rows', async ({ page }) => {
+    await openLive(page, 'combobox--ten-thousand')
+    await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
+    expect(await reopenOnChosen(page)).toEqual({ text: 'Option 9997', whole: true })
   })
 
   test('at a 32 px root on a phone: rows of 80 px, the popup fits, and the last of ten thousand still lands whole', async ({ page }) => {

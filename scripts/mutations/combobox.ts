@@ -140,4 +140,10 @@ export const MUTATIONS: Mutation[] = [
     from: '    labelOfUnknown,\n',
     to: '    labelOfUnknown: undefined,\n',
   },
+  {
+    label: 'the combobox scrolls to the chosen row before its unit is measured, so a reopen under a finger or at a 32 px root lands far short of it',
+    file: HOOK,
+    from: '      setUnit(height)\n      return\n',
+    to: '      setUnit(height)\n',
+  },
 ]
