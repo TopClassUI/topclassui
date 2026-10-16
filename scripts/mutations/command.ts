@@ -7,6 +7,7 @@ const HOOK = 'src/components/command/hook.ts'
 const LIB = 'src/components/command/lib.ts'
 const PANEL = 'src/components/command/parts/command-panel.tsx'
 const ROWS = 'src/components/command/parts/command-rows.tsx'
+const TYPES = 'src/components/command/types.ts'
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -32,6 +33,12 @@ export const MUTATIONS: Mutation[] = [
     file: LIB,
     from: 'return code !== undefined && press.code === code',
     to: 'return false',
+  },
+  {
+    label: 'command: status takes error again, and a failed fetch is announced as No results',
+    file: TYPES,
+    from: "  status?: Exclude<Status, 'error' | 'loading-more'> | undefined",
+    to: '  status?: Status | undefined',
   },
   {
     label: 'command: the shortcut matches the K key by its place under Colemak too, and takes Ctrl+E from the page',

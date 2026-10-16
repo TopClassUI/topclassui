@@ -2,6 +2,7 @@ import type { Dialog as Base } from '@base-ui/react/dialog'
 import type { ReactNode } from 'react'
 
 import type { CollectionProps } from '#shared/contracts/collection.js'
+import type { Status } from '#shared/contracts/state.js'
 import type { CommandSchemaInput } from './schema.js'
 
 // R-8.3-4: derived from the schema, so the props and the validation cannot drift apart.
@@ -10,7 +11,10 @@ export type CommandDesignProps = {
 }
 
 /** The part of the shared collection contract the palette takes: no loadMore, no errorFallback. */
-type CommandCollection<T> = Pick<CollectionProps<T>, 'items' | 'getKey' | 'status' | 'emptyFallback' | 'loadingFallback'>
+type CommandCollection<T> = Pick<CollectionProps<T>, 'items' | 'getKey' | 'emptyFallback' | 'loadingFallback'> & {
+  /** 'idle', 'loading' or 'empty'. Never 'error': with no errorFallback, a failed fetch would read as No results. */
+  status?: Exclude<Status, 'error' | 'loading-more'> | undefined
+}
 
 // R-5.7-5: the popup's own props reach Base UI's popup, with the two of the portal around it.
 type CommandPopupProps = Omit<Base.Popup.Props, 'className' | 'children' | 'render' | 'onSelect'>
