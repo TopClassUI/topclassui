@@ -135,6 +135,18 @@ describe('the limit, the x and the list', () => {
     expect([...(roots()[1]?.querySelectorAll('button') ?? [])].map((b) => b.getAttribute('aria-label') ?? b.textContent)).toEqual(['Undo', 'Dismiss this notification'])
   })
 
+  it('leaves a high toast readable while it is not focused, since its tab stop, action and x stay (TOAST-2)', async () => {
+    render(app())
+    act(() => { toast.add({ priority: 'high', title: 'Payment failed', action: { label: 'Retry', onClick: () => undefined } }); toast.add({ title: 'Low' }) })
+    await shown('Payment failed')
+    const [low, high] = roots()
+    expect(high?.getAttribute('role')).toBe('alertdialog')
+    expect(high?.contains(document.activeElement)).toBe(false)
+    expect(high?.getAttribute('aria-hidden')).toBe('false')
+    expect(high?.getAttribute('tabindex')).toBe('0')
+    expect(low?.hasAttribute('aria-hidden')).toBe(false)
+  })
+
   it('a click on the action runs its onClick and leaves the toast open', async () => {
     const onClick = vi.fn()
     render(app())

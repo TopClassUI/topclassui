@@ -58,6 +58,12 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
+    label: 'a high toast is hidden from a reader while it is not focused, yet keeps its tab stop, action and x (TOAST-2)',
+    file: 'src/components/toast/client.tsx',
+    from: " aria-hidden={entry.priority === 'high' ? false : undefined}",
+    to: '',
+  },
+  {
     label: 'toast.add takes a toast with no title again, a dialog with no name (TOAST-6)',
     file: 'src/components/toast/types.ts',
     from: '  title: ToastTitle\n',

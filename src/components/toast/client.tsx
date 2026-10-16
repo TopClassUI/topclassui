@@ -18,8 +18,9 @@ import type { ToastItemProps, ToastViewportProps } from './types.js'
 /** One toast. A Root for every entry, an ending one too: Base UI drops an entry only when its Root has faded out. */
 function ToastItem({ entry, swipeDirection, closeLabel }: ToastItemProps) {
   const icon = iconTypeOf(entry.type)
+  // WCAG 4.1.2: Base UI hides an unfocused high toast from a reader, yet it keeps its tab stop, action and x.
   return (
-    <Base.Root toast={entry} swipeDirection={swipeDirection} className={TOAST_ROOT}>
+    <Base.Root toast={entry} swipeDirection={swipeDirection} aria-hidden={entry.priority === 'high' ? false : undefined} className={TOAST_ROOT}>
       {icon === null ? null : (
         <span className={cn(TOAST_ICON, TOAST_ICON_TONE[icon])}>
           <Svg icon={TOAST_ICONS[icon]} className={TOAST_ICON_SVG[icon]} />

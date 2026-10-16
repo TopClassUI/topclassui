@@ -206,7 +206,19 @@ test.describe('with a toast open', () => {
     await page.locator('#demo button').click()
     const alert = page.getByRole('alert')
     await expect(alert).toHaveText('Payment failedYour card was declined.')
-    await expect(page.locator('[role="region"] > [role="alertdialog"]')).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  test('priority high, not focused: the toast, its action and its x stay in the tree, and axe passes (TOAST-2)', async ({ page }) => {
+    await openToasts(page)
+    await add(page, { tone: 'danger', priority: 'high', title: 'Payment failed', description: 'Your card was declined.', action: 'Retry', duration: 0 })
+    const root = page.locator('[role="region"] > [role="alertdialog"]')
+    await expect(root).toHaveAttribute('aria-hidden', 'false')
+    expect(await root.evaluate((el) => el.contains(document.activeElement))).toBe(false)
+    const tree = await page.locator('body').ariaSnapshot()
+    expect(tree).toContain('- region "Notifications":\n  - alertdialog "Payment failed":\n    - heading "Payment failed" [level=2]')
+    expect(tree).toContain('    - paragraph: Your card was declined.\n    - button "Retry"\n    - button "Dismiss this notification"')
+    const results = await new AxeBuilder({ page }).include('#demo').include('[data-base-ui-portal]').analyze()
+    expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([])
   })
 
   test('F6 reaches the viewport; Tab goes toast, action, x, then back to the page; Enter on the x returns focus to the trigger', async ({ page }) => {
