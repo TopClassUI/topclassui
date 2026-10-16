@@ -28,6 +28,7 @@ const CONTROLS: Record<string, string[]> = {
     'div: View | SegmentedControl hint SegmentedControl error | invalid | ',
     'input: Volume | Slider hint Slider error |  | ',
     'input: Guests | NumberField hint NumberField error | invalid | ',
+    'div: Code |  |  | ',
     'input: Code | OTPField hint OTPField error | invalid | ',
     'button: Country | Select hint Select error | invalid | required',
     'input: City | Combobox hint Combobox error | invalid | ',

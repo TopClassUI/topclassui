@@ -59,13 +59,13 @@ import { TreeView } from 'topclassui'
 
 ## Props
 
-Required: `items`. Every other prop below is optional.
+Required: `items`, `aria-label` or `aria-labelledby`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
 | `items` | **yes** | `readonly TreeNode[]` | - | The nodes, as plain data. Keep the array stable between renders. |
-| `aria-label` | no | `string` | - | The name read out when no visible text names the group. |
-| `aria-labelledby` | no | `string` | - | The id of the visible text that names the group. |
+| `aria-label` | **yes**, or `aria-labelledby` | `string` | - | The name read out when no visible text names the group. |
+| `aria-labelledby` | **yes**, or `aria-label` | `string` | - | The id of the visible text that names the group. |
 | `className` | no | `string` | - | On the element with role tree, merged last. |
 | `defaultExpanded` | no | `readonly string[]` | - | The ids open when the tree mounts. |
 | `defaultValue` | no | `string \| null` | - | The id selected when the tree mounts. |
