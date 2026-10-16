@@ -41,10 +41,12 @@ import { Meter } from 'topclassui'
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `aria-label` or `aria-labelledby`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
+| `aria-label` | **yes**, or `aria-labelledby` | `string` | - | The name read out when no visible text names the meter. |
+| `aria-labelledby` | **yes**, or `aria-label` | `string` | - | The id of the visible text that names the meter. |
 | `max` | no | `number`, min -1000000000000000, max 1000000000000000 | `100` | The high end of the range, where the track is full; raised to min when below it. |
 | `min` | no | `number`, min -1000000000000000, max 1000000000000000 | `0` | The low end of the range, where the track is empty. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The shared size scale, which sets the track height; custom emits none. |
