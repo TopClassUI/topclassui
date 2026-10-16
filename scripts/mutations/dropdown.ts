@@ -164,6 +164,18 @@ export const MUTATIONS: Mutation[] = [
     to: 'max-w-1/2',
   },
   {
+    label: 'a dropdown shortcut keeps its width beside a label it cuts, so at a doubled text size a row loses its name',
+    file: CLASSES,
+    from: ' shrink-10000 truncate ps-4',
+    to: ' shrink-0 truncate ps-4',
+  },
+  {
+    label: 'a dropdown shortcut gives way only as fast as its label, so both are cut where the hint alone could give the room',
+    file: CLASSES,
+    from: ' shrink-10000 truncate ps-4',
+    to: ' truncate ps-4',
+  },
+  {
     label: 'a dropdown shortcut stays muted on a highlighted row, and grey on the system highlight under forced colours',
     file: CLASSES,
     from: ' group-data-highlighted:text-inherit',

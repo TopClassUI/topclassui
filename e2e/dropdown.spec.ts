@@ -614,7 +614,7 @@ test.describe('hostile content', () => {
   for (const [width, height, direction, widest] of [[1280, 800, 'ltr', 320], [320, 480, 'ltr', 289], [320, 480, 'rtl', 289]] as const) {
     const label = `${String(width)} x ${String(height)} ${direction}`
 
-    test(`${label}: a 300-character label ends in an ellipsis, its icon and its shortcut stay whole, and the menu is ${String(widest)} px wide`, async ({ page }) => {
+    test(`${label}: a 300-character label ends in an ellipsis, its icon stays whole, its shortcut gives way first, and the menu is ${String(widest)} px wide`, async ({ page }) => {
       await page.setViewportSize({ width, height })
       await fixture(page, 'dropdown-hostile', SCOPE, { direction })
       const menu = await openOverlay(page, triggerOf(page, 'Long labels', SCOPE), asMenu({ by: 'keyboard' }))
@@ -627,8 +627,9 @@ test.describe('hostile content', () => {
         expect((await boxOf(row)).height).toBe(40)
         const [icon, text, shortcut] = await partsOf(row)
         expect(icon).toEqual({ width: 14, cut: false, inside: true })
-        expect(text?.cut, 'the label is not cut').toBe(true)
-        expect(shortcut).toEqual({ width: 56, cut: false, inside: true })
+        expect(text?.cut, 'the label is cut').toBe(true)
+        // The label alone is wider than the row, so the shortcut has given up all but its 16 px of padding.
+        expect(shortcut).toEqual({ width: 16, cut: true, inside: true })
       }
       // The string itself is bounded too: 100 characters of the 300.
       expect(await rowsOf(menu).first().locator('span.min-w-0').evaluate((span) => span.textContent.length)).toBe(100)
@@ -649,9 +650,11 @@ test.describe('hostile content', () => {
       const [go, goShortcut] = await partsOf(rowsOf(menu).first())
       expect(go).toEqual({ width: 18, cut: false, inside: true })
       expect(goShortcut).toEqual({ width: cap, cut: true, inside: true })
+      // Beside a label that needs the room, the shortcut gives way under its cap and the label is whole.
       const [text, shortcut] = await partsOf(rowsOf(menu).nth(1))
-      expect(shortcut).toEqual({ width: cap, cut: true, inside: true })
-      expect(text?.width, 'px left to the label').toBeGreaterThanOrEqual(96)
+      expect(text?.cut, 'the label is cut').toBe(false)
+      expect(shortcut?.cut, 'the shortcut is cut').toBe(true)
+      expect(shortcut?.width, 'px left to the shortcut').toBeLessThan(cap)
     })
   }
 
@@ -845,6 +848,33 @@ test.describe('a larger text', () => {
     const cut = await menu.evaluate((el) => [...el.querySelectorAll('span')].filter((span) => span.scrollWidth > span.clientWidth + 1).length)
     expect(cut, 'labels and shortcuts wider than their box').toBe(0)
   })
+
+  // WCAG 1.4.4: the name of a row is what a reader needs, its shortcut a hint, so the hint gives way first.
+  for (const [width, height] of [[320, 480], [390, 844]] as const) {
+    for (const [demo, direction, name] of [
+      ['dropdown--basic', 'ltr', 'Actions'], ['dropdown--basic', 'rtl', 'Actions'], ['dropdown--rtl', 'rtl', 'الإجراءات'],
+    ] as const) {
+      test(`${String(width)} x ${String(height)} ${demo} ${direction} with the root at 32 px: a label is cut only once its shortcut has given all its room`, async ({ page }) => {
+        await page.setViewportSize({ width, height })
+        await openLive(page, demo, { direction })
+        await page.addStyleTag({ content: 'html { font-size: 32px }' })
+        const menu = await openOverlay(page, triggerOf(page, name), asMenu())
+        await expectNoSidewaysScroll(page)
+        const rows = await rowsOf(menu).evaluateAll((all) => all.flatMap((row) => {
+          const [text, hint] = [row.querySelector('span.min-w-0'), row.querySelector('span.font-mono')]
+          if (!text || !hint) return []
+          return [{ text: text.textContent, cut: text.scrollWidth > text.clientWidth, hint: Math.round(hint.getBoundingClientRect().width) }]
+        }))
+        expect(rows.length, 'rows with a shortcut').toBeGreaterThan(0)
+        for (const row of rows) {
+          if (row.cut) expect(row.hint, `the shortcut beside the cut label "${row.text}"`).toBe(32)
+        }
+        // Measured cut at 44 of 79 px beside a whole shortcut before; the Arabic label alone is wider than a 320 px row.
+        const whole = demo === 'dropdown--basic' || width === 390
+        if (whole) expect(rows.filter((row) => row.cut)).toEqual([])
+      })
+    }
+  }
 
   // WCAG 1.4.12: the four spacings a reader may set, all at once.
   test('320 x 480 with the text spacing of WCAG 1.4.12: no label and no shortcut is cut, and nothing scrolls sideways', async ({ page }) => {

@@ -82,6 +82,7 @@ const DECLARATION: Record<string, string> = {
   // The icon and the shortcut.
   'inline-flex': 'display: inline-flex;',
   'ms-auto': 'margin-inline-start: auto;',
+  'shrink-10000': 'flex-shrink: 10000;',
   'max-w-[min(calc(var(--spacing)*40),calc(var(--available-width)/2))]': 'max-width: min(calc(var(--spacing) * 40), calc(var(--available-width) / 2));',
   'truncate': 'text-overflow: ellipsis;',
   'ps-4': 'padding-inline-start: calc(var(--spacing) * 4);',
@@ -158,7 +159,7 @@ describe('every class an open Dropdown wears compiles with the installed Tailwin
       DROPDOWN_SHORTCUT, DROPDOWN_GROUP, DROPDOWN_GROUP_LABEL, DROPDOWN_SEPARATOR,
     ])
     expect(all).toEqual([...Object.keys(DECLARATION), 'group'].sort())
-    expect(all).toHaveLength(76)
+    expect(all).toHaveLength(77)
   })
 
   it('group emits nothing of its own: it only marks the row for the shortcut inside it', async () => {
