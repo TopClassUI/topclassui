@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { openLive } from './live.js'
+import { DIRECTIONS } from '../scripts/lib/harness.js'
+import { expectInsideViewport, expectNoSidewaysScroll, openLive, viewportBox } from './live.js'
 import { paintedRgb, pixelsOf, rgbOf } from './pixels.js'
 
 // The measuring helpers themselves: each one fails on the case it exists to catch, so a spec built on it can fail too.
@@ -55,4 +56,33 @@ test.describe('paintedRgb', () => {
     await addBox(page, 'background-color: transparent')
     await expect(paintedRgb(page.locator('#probe'), 'background-color')).rejects.toThrow(/not opaque/)
   })
+})
+
+test.describe('viewportBox', () => {
+  test('throws for a box that is not rendered, whose zeros would read as inside', async ({ page }) => {
+    await openLive(page, 'tooltip--basic')
+    await addBox(page, 'display: none; position: fixed; left: -5000px; width: 9000px')
+    await expect(viewportBox(page.locator('#probe'))).rejects.toThrow(/not rendered/)
+    await expect(expectInsideViewport(page.locator('#probe'))).rejects.toThrow(/not rendered/)
+  })
+})
+
+test.describe('expectNoSidewaysScroll', () => {
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: fails for a box lost past the inline start, which scrollWidth never counts`, async ({ page }) => {
+      await openLive(page, 'tooltip--basic', { direction })
+      await expectNoSidewaysScroll(page)
+      await addBox(page, 'width: 600px; height: 40px; margin-inline-start: -400px')
+      await expect(expectNoSidewaysScroll(page)).rejects.toThrow(/lost past the inline start[\s\S]*div#probe/)
+    })
+
+    test(`${direction}: passes for the same box inside a scroll container or clipped away`, async ({ page }) => {
+      await openLive(page, 'tooltip--basic', { direction })
+      await addBox(page, 'width: 600px; height: 40px; margin-inline-start: -400px', 'overflow-x: auto')
+      await expectNoSidewaysScroll(page)
+      await page.locator('#probe').evaluate((box) => { box.parentElement?.remove() })
+      await addBox(page, 'width: 600px; height: 40px; margin-inline-start: -400px; clip-path: inset(50%)')
+      await expectNoSidewaysScroll(page)
+    })
+  }
 })
