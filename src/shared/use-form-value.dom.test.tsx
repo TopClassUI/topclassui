@@ -76,6 +76,37 @@ describe('a reset returns an uncontrolled value to its default', () => {
   })
 })
 
+describe('a control whose form changes', () => {
+  const two = (owner: string) => <><form id="fa" /><form id="fb" /><Box defaultValue={false} form={owner} /></>
+  const reset = (container: HTMLElement, id: string) => { (container.ownerDocument.getElementById(id) as HTMLFormElement).reset() }
+
+  it('follows the new form on its reset, and no longer answers the old one', async () => {
+    const { container, rerender } = render(two('fa'))
+    rerender(two('fb'))
+    press(container)
+    reset(container, 'fa')
+    await settle()
+    expect(shown(container)).toBe('true')
+    reset(container, 'fb')
+    await settle()
+    expect(shown(container)).toBe('false')
+  })
+
+  it('starts listening once it joins a form, and stops once it leaves every form', async () => {
+    const { container, rerender } = render(two('none'))
+    rerender(two('fa'))
+    press(container)
+    reset(container, 'fa')
+    await settle()
+    expect(shown(container)).toBe('false')
+    rerender(two('none'))
+    press(container)
+    reset(container, 'fa')
+    await settle()
+    expect(shown(container)).toBe('true')
+  })
+})
+
 describe('a controlled value', () => {
   it('stays through a reset, and sync gets the value its owner holds', async () => {
     const sync = vi.fn()
