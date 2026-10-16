@@ -45,6 +45,12 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
+    label: 'the banner dismiss x calls onDismiss after the banner has left, not while it is still in the page as the README says',
+    file: HOOK,
+    from: '      onDismiss?.()\n',
+    to: '      setTimeout(() => onDismiss?.())\n',
+  },
+  {
     label: 'the banner dismiss shell renders for a banner that is not dismissible, whenever it has an id',
     file: INDEX,
     from: 'if (dismissible && rest.id !== undefined) {',
