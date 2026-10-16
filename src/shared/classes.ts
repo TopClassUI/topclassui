@@ -150,10 +150,9 @@ export const FOCUS_RING_INSET = 'outline-none focus-visible:outline-solid focus-
 /** The ring on a wrapper whose focused element is hidden: a label around a native radio. */
 export const FOCUS_RING_WITHIN = 'outline-none has-focus-visible:outline-solid has-focus-visible:outline-(length:--tc-ring-width) has-focus-visible:outline-offset-(length:--tc-ring-offset) has-focus-visible:outline-ring'
 
-/** On the bar that holds an overlay's actions. An action is the decision, so its label wraps where
- * Button alone would end it in an ellipsis. A Button of one of the five sizes grows from its own height,
- * and never drops under the 44 px a finger needs; a custom one keeps the height its caller gave it.
- * Only a button or a link is an action: a Badge, a Progress or a Spinner beside them keeps its own size. */
+/** On the bar of an overlay's actions: an action's label wraps rather than ending in an ellipsis. A button
+ * or a link of the five sizes grows from its height, never under the 44 px of a finger; a custom one keeps
+ * its caller's. A Badge, a Progress or a Spinner beside them is no action, and keeps its own size. */
 export const ACTIONS_WRAP = [
   '**:whitespace-normal *:[&:is(button,a)]:data-size:text-center',
   '*:[&:is(button,a)]:data-size:not-data-[size=custom]:h-auto *:[&:is(button,a)]:data-size:not-data-[size=custom]:py-1',

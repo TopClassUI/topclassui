@@ -1082,10 +1082,10 @@ test.describe('motion', () => {
 
 // The wrap of the footer is for its actions: a Badge, a Tag, a Spinner or a Progress writes data-size too.
 test.describe('what a footer holds besides its actions', () => {
-  const heightsOf = (scope: Locator) => scope.locator('[data-kind]').evaluateAll((all) => Object.fromEntries(
+  const heightsOf = (scope: Locator): Promise<Record<string, string>> => scope.locator('[data-kind]').evaluateAll(
     // The computed height and not the box: a turning spinner's box is as tall as its diagonal.
-    all.map((el) => [el.getAttribute('data-kind'), getComputedStyle(el).height]),
-  ))
+    (all) => Object.fromEntries(all.map((el) => [el.getAttribute('data-kind') ?? '', getComputedStyle(el).height])),
+  )
 
   for (const coarse of [false, true]) {
     test.describe(coarse ? 'under a finger' : 'under a mouse', () => {
