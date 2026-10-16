@@ -231,5 +231,7 @@
 
   html {
     scrollbar-gutter: stable;
+    /* R-10.5-3: a sticky bar sets these to its own height, so a target or a focused control never lands under it. */
+    scroll-padding-block: var(--tc-sticky-top) var(--tc-sticky-bottom);
   }
 }

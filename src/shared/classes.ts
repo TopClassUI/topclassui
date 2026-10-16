@@ -97,3 +97,46 @@ export const CONTAIN = 'max-w-full'
 /** The label truncates, so the control shrinks rather than the page. It needs its
  * own element: `text-overflow` never applies to an anonymous flex item. */
 export const LABEL = 'truncate min-w-0'
+
+// Unit 3: what the overlays, the menus and the bars share. A state class reads the attribute Base UI sets.
+
+/** The dimmed layer behind a modal. It sets no z-index: each overlay brings its own from the scale. */
+export const SCRIM = 'fixed inset-0 bg-overlay'
+
+/** Fades on the two attributes Base UI sets for one frame on the way in and for the way out. */
+export const FADE_MOTION = 'transition-opacity duration-(--tc-duration) ease-out data-starting-style:opacity-0 data-ending-style:opacity-0'
+
+/** A popup grows from the side that faces its anchor: Base UI measures --transform-origin. */
+export const POPUP_MOTION = 'origin-(--transform-origin) transition-[opacity,scale] duration-(--tc-duration) ease-out data-starting-style:scale-95 data-starting-style:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0'
+
+/** A panel that slides. A swipe follows the finger, so nothing eases while one holds it. */
+export const SLIDE_MOTION = 'transition-[translate,opacity] duration-(--tc-duration-slow) ease-out data-swiping:transition-none'
+
+/** The box of a dialog, a popup and a toast. Forced colours drop the shadow and keep the line. */
+export const OVERLAY_SURFACE = `rounded-box bg-surface-raised text-body ${BORDER} shadow-lg`
+
+/** One row of a menu or a list, at least --tc-row-height tall. Its highlight is its focus mark. */
+export const ROW = 'flex min-h-(--tc-row-height) w-full items-center gap-2 rounded-control px-3 text-start text-sm outline-none'
+
+/** The row the keyboard or the pointer is on. Forced colours erase a fill, so there it takes the
+ * system pair and paints it itself: left adjusted, Chromium lays a backplate over the label. */
+export const ROW_HIGHLIGHT = 'data-highlighted:bg-primary-soft data-highlighted:text-primary-on-soft forced-colors:data-highlighted:forced-color-adjust-none forced-colors:data-highlighted:bg-[Highlight] forced-colors:data-highlighted:text-[HighlightText]'
+
+/** At most --tc-list-rows rows, and never past the room Base UI measured. It counts rows and not
+ * the padding or the gaps, so the last row shown is cut short: a cut row says there is more. */
+export const LIST_CAP = 'max-h-[min(var(--available-height,100dvh),calc(var(--tc-list-rows)*var(--tc-row-height)))]'
+
+/** Scrolls sideways inside its own box, so the page never grows wider than the screen. */
+export const SCROLL_X = 'overflow-x-auto overscroll-x-contain'
+
+/** R-10.5-3: a bar that sticks to the top. Whoever wears it sets --tc-sticky-top to its height. */
+export const STICKY_TOP = 'sticky top-0 z-(--tc-z-sticky)'
+
+/** A control that holds one icon and no text: the x of an overlay, the toggle of a sidebar. */
+export const ICON_BUTTON = `inline-flex shrink-0 items-center justify-center rounded-control ${TOUCH_TARGET} ${FOCUS_RING} ${TRANSITION}`
+
+/** The ring drawn inside the box, for a control flush against an edge that clips it. */
+export const FOCUS_RING_INSET = 'outline-none focus-visible:outline-solid focus-visible:outline-(length:--tc-ring-width) focus-visible:-outline-offset-(length:--tc-ring-width) focus-visible:outline-ring'
+
+/** The ring on a wrapper whose focused element is hidden: a label around a native radio. */
+export const FOCUS_RING_WITHIN = 'outline-none has-focus-visible:outline-solid has-focus-visible:outline-(length:--tc-ring-width) has-focus-visible:outline-offset-(length:--tc-ring-offset) has-focus-visible:outline-ring'
