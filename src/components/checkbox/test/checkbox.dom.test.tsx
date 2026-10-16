@@ -55,7 +55,8 @@ describe('indeterminate', () => {
     expect(onCheckedChange.mock.calls.map((call) => call[0])).toEqual([true])
     expect(theBox().getAttribute('aria-checked')).toBe('mixed')
     expect(mark(container)).toBe('dash')
-    expect(hidden(container).checked).toBe(true)
+    // unit-4.md, "What the form receives": a mixed box sends nothing, so its hidden input stays unticked.
+    expect(hidden(container).checked).toBe(false)
   })
 
   it('a parent that clears indeterminate on change turns the dash into a tick', async () => {

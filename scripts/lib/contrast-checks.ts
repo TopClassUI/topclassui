@@ -53,7 +53,7 @@ export function checkTokens(css: string, palette: Map<string, Color>): Report {
     const tokens = tokensFor(blocks, mode)
     const get = (name: string) => resolve(name, tokens, palette)
     const surfaces = SURFACES.map((s) => ({ name: s, color: get(`--tc-${s}`) }))
-    const track = get('--tc-neutral-soft')
+    const ring = get('--tc-ring')
 
     for (const surface of surfaces) {
       if (!surface.color) { failures.push(`${mode}: --tc-${surface.name} missing`); continue }
@@ -71,6 +71,11 @@ export function checkTokens(css: string, palette: Map<string, Color>): Report {
       }
     }
 
+    // A switch that is off shows its state by a line-strong thumb on its neutral-soft track (WCAG 1.4.11).
+    const track = get('--tc-neutral-soft')
+    const thumb = get('--tc-line-strong')
+    check(`${mode}: switch thumb (line-strong) on its track (neutral-soft)`, track && thumb && worst(thumb, track), 3)
+
     for (const tone of TONES) {
       const solid = get(`--tc-${tone}-solid`)
       const onSolid = get(`--tc-${tone}-on-solid`)
@@ -81,6 +86,8 @@ export function checkTokens(css: string, palette: Map<string, Color>): Report {
       check(`${mode}: ${tone} text on its tint`, soft && onSoft && worst(onSoft, soft), 4.5)
       // Meter and Progress paint the bar in the text colour on the neutral track: a graphic, so 3:1.
       check(`${mode}: ${tone} bar on the neutral track`, onSoft && track && worst(onSoft, track), 3)
+      // The highlighted row of a menu draws the ring inside its edge, on its tint.
+      check(`${mode}: ring on the ${tone} tint`, soft && ring && worst(ring, soft), 3)
 
       if (!soft) { failures.push(`${mode}: --tc-${tone}-soft could not be resolved`); continue }
       if (!solid) { failures.push(`${mode}: --tc-${tone}-solid could not be resolved`); continue }

@@ -31,6 +31,13 @@ const rowsIn = (page: Page, scope = '#demo') => page.locator(`${scope} li`).eval
   return `${name ?? ''} | ${note ?? ''}`
 }))
 const statusIn = (page: Page, scope = '#demo') => page.locator(`${scope} [role="status"]`).allTextContents()
+/** How many rows a list shows whole, the heights its first and last rows are drawn at, and whether it scrolls. */
+const shownIn = (list: Locator) => list.evaluate((el) => {
+  const box = el.getBoundingClientRect()
+  const rows = [...el.querySelectorAll('li')].map((row) => row.getBoundingClientRect())
+  const heights = [...new Set([rows[0], rows.at(-1)].map((r) => Math.round(r?.height ?? 0)))]
+  return { whole: rows.filter((r) => r.top >= box.top - 0.5 && r.bottom <= box.bottom + 0.5).length, rowHeights: heights, scrolls: el.scrollHeight > el.clientHeight }
+})
 
 /** A computed colour as sRGB numbers, painted on a canvas: the tokens compute to oklch, which rgbOf cannot read. */
 const srgb = (page: Page, computed: string) => page.evaluate((colour): [number, number, number] => {
@@ -321,16 +328,109 @@ test.describe('live: hostile content', () => {
     }
   }
 
-  test('sixty files: the list shows seven rows and scrolls inside itself, and becomes a tab stop while it does', async ({ page }) => {
+  test('sixty files: the list shows seven whole rows and scrolls inside itself, and becomes a tab stop while it does', async ({ page }) => {
     await fixture(page)
     const input = page.getByLabel('In a grid', { exact: true })
     await input.setInputFiles(Array.from({ length: 60 }, (_, index) => pdf(`file-${String(index + 1)}.pdf`)))
     const list = page.locator('#grid ul')
     expect(await list.locator('li').count()).toBe(60)
     await expect(list).toHaveAttribute('tabindex', '0')
-    const { height, scrolls } = await list.evaluate((el) => ({ height: el.getBoundingClientRect().height, scrolls: el.scrollHeight > el.clientHeight }))
-    expect([height, scrolls]).toEqual([280, true])
+    expect(await shownIn(list)).toEqual({ whole: 7, rowHeights: [40], scrolls: true })
     await expectNoSidewaysScroll(page)
+  })
+
+  test('visibleRows 2: two whole rows', async ({ page }) => {
+    await fixture(page)
+    await page.getByLabel('Two rows', { exact: true }).setInputFiles(['a', 'b', 'c', 'd', 'e'].map((name) => pdf(`${name}.pdf`)))
+    expect(await shownIn(page.locator('#two-rows ul'))).toEqual({ whole: 2, rowHeights: [40], scrolls: true })
+  })
+
+  test('a link in the hint takes the pointer from the input over the zone; the hint\'s words leave it to the input', async ({ page }) => {
+    await fixture(page)
+    const hit = (x: number, y: number) => page.evaluate(([px, py]) => {
+      const at = document.elementFromPoint(px ?? 0, py ?? 0)
+      return at?.id === 'two-rows-link' ? 'link' : at?.tagName ?? ''
+    }, [x, y])
+    await page.locator('#two-rows').scrollIntoViewIfNeeded()
+    const [link, hint] = [await boxOf(page.locator('#two-rows-link')), await boxOf(page.locator('#two-rows-link').locator('xpath=..'))]
+    expect([await hit(link.left + link.width / 2, link.top + link.height / 2), await hit(hint.left + 2, hint.top + hint.height / 2)]).toEqual(['link', 'INPUT'])
+    await page.locator('#two-rows-link').click()
+    expect(await page.evaluate(() => location.hash)).toBe('#rules')
+  })
+
+  for (const direction of DIRECTIONS) {
+    test(`${direction}, 320 px: a hint and a prompt with no space to break at wrap inside the zone, and nothing crosses either edge of the page`, async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 480 })
+      await openLive(page, 'file-upload--basic', { direction })
+      const zone = zoneOf(inputIn(page))
+      for (const hint of ['image/png,image/jpeg,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'x'.repeat(300)]) {
+        await page.evaluate((text) => {
+          const hintSpan = document.querySelector('#demo [id$="-hint"]')
+          const drop = document.querySelector('#demo input[type="file"]')?.parentElement?.querySelectorAll('span span')[0]
+          if (!hintSpan || !drop) throw new Error('no hint or prompt')
+          hintSpan.textContent = text
+          drop.textContent = 'y'.repeat(120)
+        }, hint)
+        const outside = await zone.evaluate((el) => {
+          const z = el.getBoundingClientRect()
+          return [...el.querySelectorAll('span')].map((span) => span.getBoundingClientRect())
+            .filter((r) => r.left < z.left - 0.5 || r.right > z.right + 0.5 || r.left < 0).length
+        })
+        expect(outside, hint.slice(0, 12)).toBe(0)
+        await expectNoSidewaysScroll(page)
+      }
+    })
+  }
+})
+
+test.describe('live: a long list under a coarse pointer', () => {
+  test.use(COARSE)
+
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: seven whole rows of 54 px; each remove sits inside its row, and the first remove's ring inside the list`, async ({ page }) => {
+      await openLive(page, 'separator--horizontal', { direction })
+      await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/file-upload-layouts.tsx' })
+      await expect(page.locator('#layouts input[type="file"]').first()).toBeAttached()
+      await page.locator('#grid input[type="file"]').setInputFiles(Array.from({ length: 12 }, (_, index) => pdf(`f${String(index)}.pdf`)))
+      const list = page.locator('#grid ul')
+      expect(await shownIn(list)).toEqual({ whole: 7, rowHeights: [54], scrolls: true })
+      const outside = await list.locator('li').evaluateAll((rows) => rows.filter((row) => {
+        const [r, b] = [row.getBoundingClientRect(), (row.querySelector('button') as HTMLElement).getBoundingClientRect()]
+        return b.top <= r.top || b.bottom >= r.bottom
+      }).length)
+      expect(outside).toBe(0)
+      await page.locator('#grid input[type="file"]').focus()
+      await page.keyboard.press('Tab')
+      await page.keyboard.press('Tab')
+      const first = list.locator('button').first()
+      await expect(first).toBeFocused()
+      const ring = await first.evaluate((el) => {
+        const style = getComputedStyle(el)
+        const reach = Number.parseFloat(style.outlineWidth) + Number.parseFloat(style.outlineOffset)
+        const [b, l] = [el.getBoundingClientRect(), (el.closest('ul') as HTMLElement).getBoundingClientRect()]
+        return { visible: el.matches(':focus-visible'), inside: b.top - reach >= l.top - 0.5 && b.bottom + reach <= l.bottom + 0.5 }
+      })
+      expect(ring).toEqual({ visible: true, inside: true })
+      // At a 32 px root the coarse row is its 44 px remove and a padding that doubled, never --tc-row-height.
+      await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
+      expect(await shownIn(list)).toEqual({ whole: 7, rowHeights: [62], scrolls: true })
+    })
+  }
+})
+
+test.describe('live: a disabled upload that already holds files', () => {
+  test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
+
+  test('its remove buttons dim with the zone and take no pointer', async ({ page }) => {
+    await openLive(page, 'file-upload--states')
+    const input = page.locator('#file-upload-disabled')
+    // A form disables the upload while it sends: the rows are there first. Lifted in the DOM only, React's prop stays.
+    await input.evaluate((el) => { (el as HTMLInputElement).disabled = false })
+    await input.setInputFiles([pdf('report.pdf')])
+    await input.evaluate((el) => { (el as HTMLInputElement).disabled = true })
+    const remove = page.getByRole('button', { name: 'Remove report.pdf' })
+    await expect(remove).toBeDisabled()
+    expect([await css(remove, 'opacity'), await css(remove, 'pointer-events')]).toEqual(['0.5', 'none'])
   })
 })
 

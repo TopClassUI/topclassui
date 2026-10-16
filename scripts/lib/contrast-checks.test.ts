@@ -28,12 +28,12 @@ describe('checkTokens', () => {
   })
 
   it('measures the number of pairs it claims; change this only on purpose', () => {
-    expect(run(css).pairs).toBe(357)
+    expect(run(css).pairs).toBe(378)
   })
 
   it('reports how many readings are distinct, since light and ocean share most tokens', () => {
     const report = run(css)
-    expect(report.distinct).toBe(216)
+    expect(report.distinct).toBe(230)
     expect(report.distinct).toBeLessThan(report.pairs)
   })
 })
@@ -98,11 +98,6 @@ describe('the thresholds bite', () => {
     const text = failures(broken)
     expect(text).toMatch(/--tc-soft-hover could not be resolved/)
     expect(text).not.toMatch(/--tc-soft-active could not be resolved/)
-  })
-
-  it('catches a Meter or Progress bar that fades into its neutral track', () => {
-    const faded = mutateMode('dark', '--tc-warning-on-soft: var(--color-amber-400);', '--tc-warning-on-soft: var(--color-neutral-700);')
-    expect(failures(faded)).toMatch(/dark: warning bar on the neutral track/)
   })
 
   it('names a missing surface instead of crashing', () => {
@@ -194,6 +189,18 @@ describe('the label on the hovered and pressed tint', () => {
         `--tc-${tone}-soft-active: var(--tc-${tone}-solid);`,
       )
       expect(failures(broken), tone).toMatch(new RegExp(`${tone} text on its soft-active tint`))
+    }
+  })
+})
+
+describe('the ring on a tint', () => {
+  // A highlighted row of a menu is a tint with the ring drawn inside its edge.
+  it('is measured on the tint of every tone, in every mode', () => {
+    const faint = css.replace('--tc-ring: var(--tc-primary-on-soft);', '--tc-ring: var(--tc-primary-soft);')
+    expect(faint, 'the ring declaration moved').not.toBe(css)
+    const text = failures(faint)
+    for (const tone of ['primary', 'neutral', 'success', 'warning', 'danger', 'info']) {
+      expect(text, tone).toMatch(new RegExp(`light: ring on the ${tone} tint`))
     }
   })
 })

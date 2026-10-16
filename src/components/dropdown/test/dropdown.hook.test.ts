@@ -86,9 +86,9 @@ describe('lib.tsx is pure, and classes.ts builds every string from the shared co
     expect(importedNames(source, '#shared/truncate-label.js')).toEqual(['truncateLabel'])
   })
 
-  it('classes.ts takes the row, its highlight, the cap, the surface, the motion, the scroll area and the inset ring from src/shared', () => {
+  it('classes.ts takes the row, its highlight, its touch floor, the cap, the surface, the motion, the scroll area and the inset ring from src/shared', () => {
     expect(importedNames(read('classes.ts'), '#shared/classes.js')).toEqual([
-      'CONTAIN', 'FOCUS_RING_INSET', 'LIST_CAP', 'OVERLAY_SURFACE', 'POPUP_MOTION', 'ROW', 'ROW_HIGHLIGHT', 'SCROLL_AREA',
+      'CONTAIN', 'FOCUS_RING_INSET', 'LIST_CAP', 'OVERLAY_SURFACE', 'POPUP_MOTION', 'ROW', 'ROW_HIGHLIGHT', 'ROW_TOUCH', 'SCROLL_AREA',
     ])
   })
 

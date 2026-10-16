@@ -27,11 +27,12 @@ export function RadioGroupRoot({
   'aria-invalid': ariaInvalid,
   ...rest
 }: RadioGroupRootProps) {
-  const group = useRadioGroupRoot(size, { value, defaultValue, onValueChange, ref })
+  const group = useRadioGroupRoot(size, { value, defaultValue, onValueChange, ref, children: rest.children, disabled: rest.disabled })
   // The rest goes first, so the controlled pair, the root ref and the design attributes are never overwritten.
   return (
     <RadioGroupLookContext value={group.look}>
       <Base
+        key={group.resetKey}
         {...rest}
         ref={group.rootRef}
         value={group.value}

@@ -120,6 +120,12 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
+    label: 'the title of a sidebar header loses its dir, so an English title in an Arabic rail is cut at its start',
+    file: HEADER,
+    from: '<span dir={resolveDir(children)} className={SIDEBAR_TITLE}>',
+    to: '<span className={SIDEBAR_TITLE}>',
+  },
+  {
     label: 'the title of a sidebar header is no longer cut at 100 characters',
     file: HEADER,
     from: '{boundLabel(children, SIDEBAR_BOUNDARIES.labelMaxLength)}',
@@ -150,6 +156,30 @@ export const MUTATIONS: Mutation[] = [
     to: '<ul ',
   },
   {
+    label: 'the label of a sidebar group loses its dir, so an English label in an Arabic rail is cut at its start',
+    file: GROUP,
+    from: '<p id={id} dir={resolveDir(label)} className={SIDEBAR_GROUP_LABEL}>',
+    to: '<p id={id} className={SIDEBAR_GROUP_LABEL}>',
+  },
+  {
+    label: 'the label of a sidebar group fills the rail again, so an English one in an Arabic rail sits at the far side from its rows',
+    file: CLASSES,
+    from: "export const SIDEBAR_GROUP_LABEL = `self-start ${CONTAIN} truncate",
+    to: "export const SIDEBAR_GROUP_LABEL = `truncate",
+  },
+  {
+    label: 'a sidebar label is cut by UTF-16 unit again, so an emoji across the bound leaves a lone surrogate in its name',
+    file: 'src/components/sidebar/lib.ts',
+    from: "? cutLabel(label, maxLength) : label",
+    to: "? label.slice(0, maxLength) : label",
+  },
+  {
+    label: 'a sidebar label that holds an element takes dir="auto" from the text around it, and leaves the direction of the rail',
+    file: 'src/components/sidebar/lib.ts',
+    from: "return parts.every(isText) ? resolveLabelDir(parts.join('')) : undefined",
+    to: "return resolveLabelDir(parts.filter(isText).join(''))",
+  },
+  {
     label: 'the label of a sidebar group is no longer cut at 100 characters',
     file: GROUP,
     from: '{boundLabel(label, SIDEBAR_BOUNDARIES.labelMaxLength)}',
@@ -170,8 +200,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the label of a sidebar link loses its own element, so a collapsed rail has nothing to hide',
     file: LINK,
-    from: '? <span className={SIDEBAR_LINK_LABEL}>{boundLabel(label, SIDEBAR_BOUNDARIES.labelMaxLength)}</span>',
+    from: '? <span dir={resolveDir(label)} className={SIDEBAR_LINK_LABEL}>{boundLabel(label, SIDEBAR_BOUNDARIES.labelMaxLength)}</span>',
     to: '? boundLabel(label, SIDEBAR_BOUNDARIES.labelMaxLength)',
+  },
+  {
+    label: 'the label of a sidebar link loses its dir, so an English label in an Arabic rail is cut at its start',
+    file: LINK,
+    from: '<span dir={resolveDir(label)} className={SIDEBAR_LINK_LABEL}>',
+    to: '<span className={SIDEBAR_LINK_LABEL}>',
   },
   {
     label: 'the label of a sidebar link is no longer cut at 100 characters',
@@ -398,6 +434,18 @@ export const MUTATIONS: Mutation[] = [
     to: '<TopClassProvider direction="rtl" locale="en">',
   },
   {
+    label: 'the controlled sidebar demo row no longer wraps, so at 320 px its button scrolls the page sideways',
+    file: 'src/components/sidebar/dummy/controlled.tsx',
+    from: '<div className="flex h-96 flex-wrap gap-4">',
+    to: '<div className="flex h-96 gap-4">',
+  },
+  {
+    label: 'the controlled sidebar demo column has no 160 px basis, so it never wraps under the rail',
+    file: 'src/components/sidebar/dummy/controlled.tsx',
+    from: '<div className="grid min-w-0 grow basis-40 content-start gap-3">',
+    to: '<div className="grid min-w-0 flex-1 content-start gap-3">',
+  },
+  {
     label: 'the long-list sidebar demo gives its rail no height, so its sixty links scroll the page',
     file: 'src/components/sidebar/dummy/long-list.tsx',
     from: '<div className="h-[calc(100dvh-4rem)]">',
@@ -416,10 +464,28 @@ export const MUTATIONS: Mutation[] = [
     to: '<SidebarLink icon={<Icon name="palette" />}>Theming</SidebarLink>',
   },
   {
+    label: 'the sidebar README import line drops the Icon its sample draws, so the sample does not compile as pasted',
+    file: 'src/components/sidebar/README.md',
+    from: 'import { Icon, SidebarBody,',
+    to: 'import { SidebarBody,',
+  },
+  {
     label: 'a plain sidebar link no longer needs an href, so a row can go nowhere',
     file: 'src/components/sidebar/types.ts',
     from: '  /** Where the row goes. */\n  href: string\n',
     to: '  /** Where the row goes. */\n  href?: string | undefined\n',
+  },
+  {
+    label: 'a plain sidebar link no longer needs a name, so an icon alone compiles and axe reports link-name',
+    file: 'src/components/sidebar/types.ts',
+    from: '  & (SidebarLinkAsElement | (SidebarLinkAsAnchor & SidebarLinkNamed))',
+    to: '  & (SidebarLinkAsElement | SidebarLinkAsAnchor)',
+  },
+  {
+    label: 'a sidebar link that is an icon alone can no longer be named by aria-label',
+    file: 'src/components/sidebar/types.ts',
+    from: "  | { 'children'?: undefined, 'aria-label': string }\n",
+    to: '',
   },
   {
     label: 'the sidebar schema loses the default of defaultOpen, so the props table says a rail starts as nothing',

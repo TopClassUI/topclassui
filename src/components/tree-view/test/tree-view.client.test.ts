@@ -110,8 +110,8 @@ describe('hook.ts holds the state, the window and the keys (R-5.12-1)', () => {
     ])
     expect(hooksByPart(source)).toEqual({
       useTreeView: [
-        'useControllableState', 'useControllableState', 'useMemo', 'useState', 'useState', 'useState', 'useRef', 'useRef',
-        'useRef', 'useRef', 'useRef', 'useRef', 'useImperativeHandle', 'useCallback', 'useCollection', 'useCallback',
+        'useControllableState', 'useControllableState', 'useMemo', 'useState', 'useState', 'useState', 'useState', 'useRef',
+        'useRef', 'useRef', 'useRef', 'useRef', 'useRef', 'useImperativeHandle', 'useCallback', 'useCollection', 'useCallback',
         'useCallback', 'useLayoutEffect', 'useDirection', 'useLabels', 'useId',
       ],
     })

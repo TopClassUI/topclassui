@@ -108,6 +108,26 @@ describe('a pasted "1,234.5"', () => {
   })
 })
 
+describe('a typed "1,234.5"', () => {
+  it('reads as 1234.5 on blur under Arabic-Indic digits, on screen, in the form and for the caller, where Base UI alone reads 1', async () => {
+    const onValueChange = handler()
+    const { container } = render(<NumberField aria-label="A" name="a" locale="ar-u-nu-arab" step="any" onValueChange={onValueChange} />)
+    await userEvent.type(field(), '1,234.5')
+    act(() => { field().blur() })
+    expect(hidden(container).value).toBe('1234.5')
+    expect(field().value).toBe('١٬٢٣٤٫٥')
+    expect(onValueChange.mock.lastCall?.[0]).toBe(1234.5)
+  })
+
+  it('reads as 1234 under Latin digits, as Base UI reads it', async () => {
+    const { container } = render(<NumberField aria-label="A" name="a" />)
+    await userEvent.type(field(), '1,234')
+    act(() => { field().blur() })
+    expect(hidden(container).value).toBe('1234')
+    expect(field().value).toBe('1,234')
+  })
+})
+
 describe('controlled', () => {
   it('stays where its owner holds it, and tells the owner what was asked', async () => {
     const onValueChange = handler()

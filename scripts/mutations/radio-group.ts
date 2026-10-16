@@ -15,8 +15,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the radio group puts its server tab stop on the default alone, so a controlled group serves it on the wrong radio',
     file: HOOK,
-    from: 'useState(() => value ?? defaultValue ?? null)',
-    to: 'useState(() => defaultValue ?? null)',
+    from: 'serveTabStopOn(children, value ?? defaultValue ?? null, disabled)',
+    to: 'serveTabStopOn(children, defaultValue ?? null, disabled)',
   },
   {
     label: 'the radio group hands Base UI defaultValue again, so a form reset leaves it as it was while the form sends the default',
@@ -33,8 +33,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the radio group ignores details.cancel(), so a handler that cancels still moves the check',
     file: HOOK,
-    from: '    if (!details.isCanceled) state.setValue(next)',
-    to: '    state.setValue(next)',
+    from: '    if (details.isCanceled) return\n',
+    to: '',
   },
   {
     label: 'the radio group never calls the caller handler, so onValueChange hears nothing',
@@ -45,14 +45,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the radio group drops the caller ref, which then never holds the radiogroup',
     file: HOOK,
-    from: '  useImperativeHandle(ref, () => state.rootRef.current as HTMLDivElement, [state.rootRef])\n',
+    from: '  useImperativeHandle(ref, () => state.rootRef.current as HTMLDivElement, [state.rootRef, resetKey])\n',
     to: '  void ref\n',
   },
   {
     label: 'the radio group stops writing its radio inputs after a reset, so a controlled one sends the first default',
     file: HOOK,
-    from: 'sync: syncRadios })',
-    to: '})',
+    from: '    syncRadios(next, input, root)\n',
+    to: '',
   },
   {
     label: 'the radio group checks every radio input after a reset, so the form sends the last radio and not the default',
@@ -117,8 +117,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the radio group checked circle loses its inset ring, so checked is a 1 px line',
     file: CLASSES,
-    from: ' group-data-checked/toggle:inset-ring-[calc(var(--tc-ring-width)-var(--tc-line-width))] group-data-checked/toggle:inset-ring-primary-solid',
-    to: ' group-data-checked/toggle:inset-ring-primary-solid',
+    from: ' group-data-checked/toggle:inset-ring-[calc(var(--tc-ring-width)-var(--tc-line-width))] group-data-checked/toggle:inset-ring-primary-on-soft',
+    to: ' group-data-checked/toggle:inset-ring-primary-on-soft',
   },
   {
     label: 'the radio group invalid checked circle loses its danger line, so the primary line hides that it is wrong',
@@ -167,5 +167,53 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: "export const RADIO_DOT = 'flex size-full items-center justify-center'",
     to: "export const RADIO_DOT = 'flex size-full items-center'",
+  },
+  {
+    label: 'the radio group no longer remounts Base UI after a reset, so Tab enters on the radio the user last picked, now unchecked',
+    file: CLIENT,
+    from: '        key={group.resetKey}\n',
+    to: '',
+  },
+  {
+    label: 'the radio group remounts after a reset with the focus inside it, so the focus falls to the page',
+    file: HOOK,
+    from: '    if (!root?.contains(document.activeElement)) setResetKey',
+    to: '    setResetKey',
+  },
+  {
+    label: 'the radio group keeps the caller ref on the element a reset removed',
+    file: HOOK,
+    from: '[state.rootRef, resetKey])',
+    to: '[state.rootRef])',
+  },
+  {
+    label: 'the radio group ignores a controlled value its owner set, so Tab enters on the radio the user last picked',
+    file: HOOK,
+    from: '    if (value === picked.current) return\n',
+    to: '    return\n',
+  },
+  {
+    label: 'the radio group forgets the value it picked itself, so a controlled pick remounts it and every child under it',
+    file: HOOK,
+    from: '    picked.current = next\n',
+    to: '',
+  },
+  {
+    label: 'the radio group dot is primary-solid again, 2.57:1 on the dark fill, under the 3:1 of R-5.6-4',
+    file: CLASSES,
+    from: ' text-primary-on-soft ',
+    to: ' text-primary-solid ',
+  },
+  {
+    label: 'the radio group checked line is primary-solid again, a colour apart from its dot',
+    file: CLASSES,
+    from: 'toggle:border-primary-on-soft',
+    to: 'toggle:border-primary-solid',
+  },
+  {
+    label: 'the radio group reads no children for its server tab stop, so with nothing checked the server HTML has none',
+    file: HOOK,
+    from: 'useState(() => serveTabStopOn(children, value ?? defaultValue ?? null, disabled))',
+    to: 'useState(() => value ?? defaultValue ?? null)',
   },
 ]

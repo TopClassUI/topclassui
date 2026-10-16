@@ -28,11 +28,14 @@ Initials are one or two characters: a longer string is cut at the edge of the ci
 **A picture that fails.** `AvatarImage` is the one client part. Once the page hydrates, a
 picture that fails, before or after the script ran, takes `data-error` and turns
 transparent: the img stays, so its `alt` still names the avatar, and the fallback shows. A
-new `src` starts again. Before hydration the browser's broken mark shows in the corner, and
-the alt text is never drawn. Your own `onError` and `ref` still reach the img.
+new `src` or `srcSet` starts again, and so does a picture that loads. Before hydration the
+browser's broken mark shows in the corner, and the alt text is never drawn. Your own
+`onError`, `onLoad` and `ref` still reach the img, and `onError` runs once for a picture
+that failed before the script ran too.
 
-**What it costs.** An avatar of initials or an icon stays server HTML and ships no
-JavaScript. Every avatar with an image hydrates: a table of fifty rows with pictures is fifty
+**What it costs.** An avatar of initials or an icon stays server HTML, with no client part.
+The avatar re-exports `AvatarImage`, so a page that imports it may still load that one small
+file. Every avatar with an image hydrates: a table of fifty rows with pictures is fifty
 client parts.
 
 **A picture with transparency.** The initials show through it. Leave `AvatarFallback` out, or
@@ -84,7 +87,7 @@ import {
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `alt` or `render` on `AvatarImage`. Every other prop below is optional.
 
 ### AvatarRoot
 
@@ -97,8 +100,8 @@ Every prop below is optional and falls back to the default shown.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `alt` | no | `string` | - | Who the picture shows. Pass an empty string when the name is written beside it. |
-| `render` | no | `ReactElement` | - | Render the picture as another element, such as next/image, which carries its own src and alt. |
+| `alt` | **yes**, or `render` | `string` | - | Who the picture shows. Pass an empty string when the name is written beside it. |
+| `render` | **yes**, or `alt` | `ReactElement` | - | Render the picture as another element, such as next/image, which carries its own src and alt. |
 
 ### AvatarFallback
 

@@ -9,7 +9,7 @@ import { FileUpload } from '../index.js'
 
 // Which element wears which string, in the server HTML: the static specs measure exactly this markup.
 const html = markup(<FileUpload aria-label="Files" className="p-1">Hint</FileUpload>)
-const classes = [...html.matchAll(/<(\w+)[^>]* class="([^"]*)"/g)].map(([, tag, cls]) => [tag, cls])
+const classes = [...html.matchAll(/<(\w+)[^>]* class="([^"]*)"/g)].map(([, tag, cls]) => [tag, cls?.replaceAll('&amp;', '&')])
 
 describe('each element wears its own string', () => {
   it('in document order, the svg aside', () => {

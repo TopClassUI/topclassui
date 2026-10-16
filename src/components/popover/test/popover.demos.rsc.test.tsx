@@ -59,11 +59,12 @@ describe('every demo is a Server Component that only hands the parts what can cr
     expect(names).toEqual(['basic', 'hover', 'long-content', 'modal', 'placements', 'rtl', 'with-close', 'with-form'])
   })
 
-  it('none of them is a client file: a popover needs no state of the page to open', () => {
-    expect(names.filter((name) => readFileSync(join(DUMMY, `${name}.tsx`), 'utf8').startsWith("'use client'"))).toEqual([])
+  // A popover needs no state of the page to open. Closing it when its form is saved does: open and onOpenChange.
+  it('none of them is a client file but with-form, whose Save closes the popover', () => {
+    expect(names.filter((name) => readFileSync(join(DUMMY, `${name}.tsx`), 'utf8').startsWith("'use client'"))).toEqual(['with-form'])
   })
 
-  for (const name of names) {
+  for (const name of names.filter((demo) => demo !== 'with-form')) {
     it(`${name}: runs with no hook and no context, and returns an element`, async () => {
       const Demo = await load(name)
       expect(isValidElement(Demo())).toBe(true)
