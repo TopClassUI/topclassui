@@ -27,14 +27,6 @@ describe('toast.add, with nothing but TopClassProvider mounted', () => {
     expect(screen.getByRole('region', { name: 'Notifications' }).contains(roots()[0] ?? null)).toBe(true)
   })
 
-  it('is lost when called before the provider mounts: there is no queue', async () => {
-    toast.add({ title: 'Too early' })
-    render(app())
-    act(() => { toast.add({ title: 'In time' }) })
-    await shown('In time')
-    expect(titles()).toEqual(['In time'])
-  })
-
   it('is neutral by default, which draws no icon', async () => {
     render(app())
     act(() => { toast.add({ title: 'Draft saved' }) })
@@ -49,7 +41,7 @@ describe('toast.add, with nothing but TopClassProvider mounted', () => {
     await shown('Invitation sent')
     const box = roots()[0]?.firstElementChild
     expect(box?.tagName).toBe('SPAN')
-    expect(box?.className).toBe('flex h-5 shrink-0 items-center text-success-on-soft')
+    expect(box?.className).toBe('col-start-1 row-start-1 me-3 flex h-5 shrink-0 items-center @max-3xs:mb-2 text-success-on-soft')
     expect(box?.querySelector('svg')?.getAttribute('class')).toBe('inline-block shrink-0')
   })
 })

@@ -14,6 +14,9 @@ const WORD = 'W'.repeat(300)
 const SECTION: CSSProperties = { marginBlock: 24 }
 const TALL: CSSProperties = { height: 320 }
 const NAMES = ['Home', 'Projects', 'Team', 'Settings']
+const SENTENCE = 'Start of the label: settings for the whole workspace and every team in it, end'
+const MIXED = 'Wi-Fi متصل بالشبكة اللاسلكية في المكتب الرئيسي وفي كل الفروع الأخرى'
+const EMOJI = `${'a'.repeat(99)}\u{1F600}tail`
 
 const page = <Svg icon={fileText} />
 
@@ -157,6 +160,23 @@ function Fixture() {
             <SidebarGroup label="Getting started">
               <SidebarLink href="#install">Install</SidebarLink>
               <SidebarLink href="#theming" current>Theming</SidebarLink>
+            </SidebarGroup>
+          </SidebarBody>
+        </SidebarRoot>
+      </section>
+
+      {/* Labels in the other script, in two scripts, and one whose bound falls inside an emoji. */}
+      <section id="cut" style={{ ...SECTION, ...TALL }}>
+        <SidebarRoot id="cut-rail">
+          <SidebarHeader>{SENTENCE}</SidebarHeader>
+          <SidebarBody>
+            <SidebarGroup label={SENTENCE}>
+              <SidebarLink id="cut-sentence" href="#cut-sentence" icon={page}>{SENTENCE}</SidebarLink>
+              <SidebarLink id="cut-mixed" href="#cut-mixed" icon={page}>{MIXED}</SidebarLink>
+              <SidebarLink id="cut-emoji" href="#cut-emoji" icon={page}>{EMOJI}</SidebarLink>
+            </SidebarGroup>
+            <SidebarGroup id="cut-short" label="Settings">
+              <SidebarLink href="#cut-short" icon={page}>Home</SidebarLink>
             </SidebarGroup>
           </SidebarBody>
         </SidebarRoot>
