@@ -133,4 +133,10 @@ export const MUTATIONS: Mutation[] = [
     from: '    if (next && !named) setSpoken(readNameFromLabels(trigger.current))\n',
     to: '',
   },
+  {
+    label: 'the select read-only trigger loses its dashed line, so forced colours draw it as an editable one',
+    file: CLASSES,
+    from: ' forced-colors:data-readonly:border-dashed',
+    to: '',
+  },
 ]

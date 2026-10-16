@@ -6,7 +6,8 @@ import {
 
 /** The box that owns the width. The trigger fills it, whatever its label is. */
 export const SELECT_ROOT = `inline-grid align-middle ${FIELD_HOLDER}`
-export const SELECT_TRIGGER = `inline-flex w-full items-center justify-between gap-2 text-start ${FIELD_BOX} data-readonly:bg-neutral-soft`
+/** Read-only takes the soft fill; forced colours drop a fill, so there its line is dashed. */
+export const SELECT_TRIGGER = `inline-flex w-full items-center justify-between gap-2 text-start ${FIELD_BOX} data-readonly:bg-neutral-soft forced-colors:data-readonly:border-dashed`
 export const SELECT_VALUE = `${LABEL} flex-1 data-placeholder:text-muted`
 export const SELECT_ICON = 'flex shrink-0 text-muted'
 export const SELECT_POSITIONER = 'z-(--tc-z-popup) data-anchor-hidden:invisible'

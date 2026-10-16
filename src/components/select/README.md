@@ -78,7 +78,8 @@ the trigger, it takes the room and its labels end in an ellipsis.
 
 **`invalid`** sets `aria-invalid` on the trigger: its line turns red and thickens. **`disabled`**
 is the real attribute, so the form sends nothing. **`readOnly`** keeps the value in the form and
-takes the soft fill; the list opens but no option can be chosen.
+takes the soft fill, and in forced colours, which drop a fill, a dashed line; the list opens but
+no option can be chosen.
 
 **Arabic.** The caret and the tick sit at the left, and `bottom-start` lines the list up with the
 right edge of the trigger. The list takes its direction and language from the nearest

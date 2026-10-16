@@ -123,6 +123,46 @@ test.describe('the static page: the server HTML, before any script runs', () => 
     })
   }
 
+  for (const scheme of ['light', 'dark'] as const) {
+    for (const direction of DIRECTIONS) {
+      test(`forced colours, ${scheme} ${direction}: a read-only trigger is told by a dashed line, which every other state keeps solid`, async ({ page }) => {
+        await page.emulateMedia({ forcedColors: 'active', colorScheme: scheme })
+        await page.goto(urlFor('select--states', 'light', direction))
+        const line = (name: string) => combo(page, name).evaluate((el) => {
+          const style = getComputedStyle(el)
+          return [style.borderTopStyle, style.borderInlineStartStyle, style.borderBottomStyle, style.borderInlineEndStyle, style.borderTopWidth].join(' ')
+        })
+        expect(await line('Read-only')).toBe('dashed dashed dashed dashed 1px')
+        for (const name of ['Nothing chosen', 'Disabled']) expect(await line(name), name).toBe('solid solid solid solid 1px')
+        expect(await line('Invalid')).toBe('solid solid solid solid 2px')
+        const topEdge = async (name: string) => {
+          const box = await boxOf(combo(page, name))
+          const row = await pixelsOf(page, { x: Math.round(box.left + 8), y: Math.floor(box.top), width: Math.round(box.width - 16), height: 1 })
+          return [inkOn(row, FORCED_CANVAS[scheme]), row.length]
+        }
+        const [plain, length] = await topEdge('Nothing chosen')
+        expect(plain, 'the plain line is whole').toBe(length)
+        const [dashed] = await topEdge('Read-only')
+        expect(dashed, 'the dashes are drawn').toBeGreaterThan(0)
+        expect(dashed, 'the dashes leave gaps').toBeLessThan((length ?? 0) * 0.8)
+      })
+    }
+  }
+
+  test('forced colours, after hydration: the read-only line is still dashed, and the list still opens', async ({ page }) => {
+    await page.emulateMedia({ forcedColors: 'active' })
+    await openLive(page, 'select--states')
+    expect(await css(combo(page, 'Read-only'), 'border-top-style')).toBe('dashed')
+    await openList(page, combo(page, 'Read-only'))
+    expect(await css(combo(page, 'Read-only'), 'border-top-style')).toBe('dashed')
+    expect(await liveErrors(page)).toEqual([])
+  })
+
+  test('outside forced colours the read-only line stays solid: the soft fill tells it there', async ({ page }) => {
+    await page.goto(urlFor('select--states', 'light', 'ltr'))
+    expect(await css(combo(page, 'Read-only'), 'border-top-style')).toBe('solid')
+  })
+
   for (const direction of DIRECTIONS) {
     for (const screen of SCREENS) {
       test(`${direction} ${String(screen.width)} x ${String(screen.height)}: no demo scrolls the page sideways`, async ({ page }) => {

@@ -54,6 +54,13 @@ describe('the box and the trigger', () => {
     expect(ruleOf(`${selectorOf('data-placeholder:text-muted')}[data-placeholder]`)).toBe('color: var(--tc-muted);')
     expect(ruleOf(`${selectorOf('data-readonly:bg-neutral-soft')}[data-readonly]`)).toBe('background-color: var(--tc-neutral-soft);')
   })
+
+  it('in forced colours, which drop the fill, a read-only trigger has a dashed line instead', () => {
+    const cls = 'forced-colors:data-readonly:border-dashed'
+    expect(SELECT_TRIGGER.split(' ')).toContain(cls)
+    expect(ruleOf(`${selectorOf(cls)}[data-readonly]`)).toBe('--tw-border-style: dashed; border-style: dashed;')
+    expect(mediaOf(`${selectorOf(cls)}[data-readonly]`)).toBe('@media (forced-colors: active)')
+  })
 })
 
 describe('the popup', () => {
