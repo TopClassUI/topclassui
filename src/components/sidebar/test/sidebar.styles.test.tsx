@@ -108,8 +108,8 @@ describe('a group', () => {
     expect(list).toEqual(['flex', 'flex-col', 'gap-1'])
   })
 
-  it('its label is one muted line that ends in an ellipsis, hidden with sr-only in a collapsed rail', () => {
-    expect(label).toEqual(['truncate', 'px-3', 'py-1', 'text-xs', 'font-medium', 'text-muted', 'group-data-closed/sidebar:sr-only'])
+  it('its label is one muted line as wide as its text at the start of the rail, that ends in an ellipsis, hidden with sr-only in a collapsed rail', () => {
+    expect(label).toEqual(['self-start', 'max-w-full', 'truncate', 'px-3', 'py-1', 'text-xs', 'font-medium', 'text-muted', 'group-data-closed/sidebar:sr-only'])
   })
 })
 
