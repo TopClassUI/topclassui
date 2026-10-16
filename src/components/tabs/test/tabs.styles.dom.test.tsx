@@ -51,7 +51,7 @@ describe('the line look, the default', () => {
   it('the list is a row that scrolls sideways inside itself and is the offset parent of its tabs', () => {
     render(tabs())
     expect(classes('list')).toEqual(expect.arrayContaining([
-      'relative', 'scroll-px-px', 'flex', 'items-center', 'gap-6', 'pe-px', 'overflow-x-auto', 'overscroll-x-contain',
+      'relative', 'scroll-px-px', 'flex', 'items-center', 'gap-6', 'px-px', 'overflow-x-auto', 'overscroll-x-contain',
     ]))
   })
 

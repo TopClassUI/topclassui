@@ -56,8 +56,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the line tabs list ends flush with its last tab, which an RTL list then stops short of',
     file: CLASSES,
-    from: 'gap-6 pe-px ${TABS_LIST_LINE}',
-    to: 'gap-6 ${TABS_LIST_LINE}',
+    from: 'gap-6 px-px ${TABS_LIST_LINE}',
+    to: 'gap-6 ps-px ${TABS_LIST_LINE}',
+  },
+  {
+    label: 'the line tabs list starts flush with its first tab, so hydration scrolls an RTL list by a pixel and every tab jumps',
+    file: CLASSES,
+    from: 'gap-6 px-px ${TABS_LIST_LINE}',
+    to: 'gap-6 pe-px ${TABS_LIST_LINE}',
   },
   {
     label: 'the enclosed tabs list is inline-flex, so inside the grid of its root it stretches to the full width',

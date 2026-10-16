@@ -15,7 +15,7 @@ const DECLARATION: Record<string, string> = {
   'flex': 'display: flex;',
   'items-center': 'align-items: center;',
   'gap-6': 'gap: calc(var(--spacing) * 6);',
-  'pe-px': 'padding-inline-end: 1px;',
+  'px-px': 'padding-inline: 1px;',
   'scroll-px-px': 'scroll-padding-inline: 1px;',
   'shadow-[inset_0_calc(var(--tc-line-width)*-1)_var(--tc-line)]':
     '--tw-shadow: inset 0 calc(var(--tc-line-width) * -1) var(--tw-shadow-color, var(--tc-line));',

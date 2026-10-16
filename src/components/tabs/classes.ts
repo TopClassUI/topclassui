@@ -14,13 +14,15 @@ export const TABS_ROOT = 'grid grid-cols-1'
 export const TABS_LIST_LINE = 'shadow-[inset_0_calc(var(--tc-line-width)*-1)_var(--tc-line)] forced-colors:border-b-(length:--tc-line-width)'
 
 /** Base UI brings a tab into view by whole pixels measured from its offset parent, and Chromium
- * stops an RTL list a fraction short of its end: the list is that parent, keeps a pixel of scroll
- * padding and a pixel after its last tab, so no tab the keyboard reaches is cut (0.72 px was). */
+ * stops an RTL list a fraction short of its end: the list is that parent and keeps a pixel of scroll
+ * padding, so no tab the keyboard reaches is cut (0.72 px was). */
 export const TABS_LIST_SCROLL = `relative scroll-px-px ${SCROLL_X}`
 
-/** R-5.2-3: the list of each look. Both scroll sideways inside themselves when the tabs do not fit. */
+/** R-5.2-3: the list of each look. Both scroll sideways inside themselves when the tabs do not fit, and
+ * both keep at least a pixel before the first tab and after the last: the scroll padding is then met where the
+ * server drew them, so hydration scrolls no RTL list (it moved by 1 px), and an RTL list reaches its end. */
 export const TABS_LIST = {
-  line: `flex items-center gap-6 pe-px ${TABS_LIST_LINE} ${TABS_LIST_SCROLL}`,
+  line: `flex items-center gap-6 px-px ${TABS_LIST_LINE} ${TABS_LIST_SCROLL}`,
   enclosed: `flex w-fit max-w-full items-center gap-1 rounded-control bg-surface p-1 ${FORCED_EDGE} ${TABS_LIST_SCROLL}`,
 } as const satisfies Record<TabsVariant, string>
 

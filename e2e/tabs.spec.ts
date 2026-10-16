@@ -476,6 +476,22 @@ test.describe('eight tabs on a 320 px screen', () => {
       await page.mouse.wheel(towardsEnd, 0)
       expect(await page.evaluate(() => window.scrollX)).toBe(0)
     })
+
+    test(`${direction}: hydration leaves both lists where the server HTML drew them, and no tab moves`, async ({ browser, page }) => {
+      const where = (into: Page) => into.locator('#demo [role="tablist"]').evaluateAll((lists) => lists.map((list) => {
+        const first = list.querySelector('[role="tab"]')?.getBoundingClientRect()
+        return `scrollLeft ${String(list.scrollLeft)}, first tab ${String(first?.left)}..${String(first?.right)}`
+      }))
+      const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 320, height: 480 } })
+      const served = await context.newPage()
+      await served.goto(liveUrl('tabs--many', { direction }))
+      const before = await where(served)
+      await context.close()
+      await openLive(page, 'tabs--many', { direction })
+      await atRest(page)
+      expect(before).toHaveLength(2)
+      expect(await where(page)).toEqual(before)
+    })
   }
 })
 
