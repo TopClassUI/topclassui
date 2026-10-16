@@ -185,14 +185,20 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the navbar list no longer scrolls sideways, so six links push a phone page wide',
     file: CLASSES,
-    from: 'snap-x snap-mandatory ${NAVBAR_LIST_ROOM} ${SCROLL_X}`',
-    to: 'snap-x snap-mandatory ${NAVBAR_LIST_ROOM}`',
+    from: 'hover:snap-none ${NAVBAR_LIST_ROOM} ${SCROLL_X}`',
+    to: 'hover:snap-none ${NAVBAR_LIST_ROOM}`',
   },
   {
     label: 'the navbar list no longer snaps, so Tab leaves a link that was half in view cut in half',
     file: CLASSES,
-    from: 'flex items-center gap-5 snap-x snap-mandatory ',
+    from: 'flex items-center gap-5 snap-x snap-mandatory hover:snap-none ',
     to: 'flex items-center gap-5 ',
+  },
+  {
+    label: 'the navbar list snaps under the pointer too, so a wheel springs back to a link that keeps the focus',
+    file: CLASSES,
+    from: 'snap-x snap-mandatory hover:snap-none ',
+    to: 'snap-x snap-mandatory ',
   },
   {
     label: 'a focused navbar link is no snap area, so the list that snaps has nothing to snap to',

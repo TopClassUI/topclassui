@@ -546,6 +546,38 @@ test.describe('six links on a 320 px screen', () => {
       // With no link focused the list snaps to nothing: it stays where the wheel left it.
       expect(Math.abs((await scrollOf(list)).at)).toBeGreaterThan(200)
     })
+
+    // A link keeps the focus after Enter, as on a client navigation, and is then the one snap area of the list.
+    test(`${direction}: with a link focused, a wheel over the list still scrolls it and it stays; the control: snapping under the pointer springs it back`, async ({ page }) => {
+      await openLive(page, 'navbar--many-links', { direction })
+      const root = bar(page)
+      const list = listOf(root)
+      const towardsEnd = direction === 'rtl' ? -4000 : 4000
+      const settle = () => page.evaluate(() => new Promise<void>((resolve) => { setTimeout(resolve, 600) }))
+      /** Tabs onto Docs with the pointer off the bar, then turns the wheel over the list and lets it settle. */
+      const wheelPastTheFocus = async () => {
+        await page.mouse.move(5, 470)
+        await brandOf(root).focus()
+        await press(page, 'Tab', 'Docs')
+        expect((await scrollOf(list)).at).toBe(0)
+        const frame = await boxOf(list)
+        await page.mouse.move(frame.left + frame.width / 2, frame.top + frame.height / 2)
+        await page.mouse.wheel(towardsEnd, 0)
+        await settle()
+        return Math.abs((await scrollOf(list)).at)
+      }
+
+      await page.addStyleTag({ content: '#demo nav ul:hover { scroll-snap-type: x mandatory !important }' })
+      expect(await wheelPastTheFocus(), 'px the list kept, snapping under the pointer').toBe(0)
+
+      await page.locator('style').last().evaluate((style) => { style.remove() })
+      expect(await wheelPastTheFocus(), 'px the list kept, as built').toBe((await scrollOf(list)).room)
+      await expect(page.locator('#demo nav a').filter({ hasText: 'Docs' })).toBeFocused()
+      // The price: once the pointer leaves, the list snaps to the focused link again.
+      await page.mouse.move(5, 470)
+      await settle()
+      expect((await scrollOf(list)).at).toBe(0)
+    })
   }
 })
 

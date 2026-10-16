@@ -38,8 +38,9 @@ export const NAVBAR_LINKS = 'grid min-w-0 grow basis-24 grid-cols-1'
 export const NAVBAR_LIST_ROOM = '-m-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+1px)] p-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+1px)]'
 
 /** Tab does not scroll a link that is half in view: Chromium leaves it cut, by 31 px measured.
- * The list therefore snaps, to the one link that has the keyboard focus: with none, it scrolls freely. */
-export const NAVBAR_LIST = `flex items-center gap-5 snap-x snap-mandatory ${NAVBAR_LIST_ROOM} ${SCROLL_X}`
+ * The list therefore snaps, to the one link that has the keyboard focus: with none, it scrolls freely.
+ * Under the pointer it never snaps, or a wheel would spring back to a link that keeps the focus. */
+export const NAVBAR_LIST = `flex items-center gap-5 snap-x snap-mandatory hover:snap-none ${NAVBAR_LIST_ROOM} ${SCROLL_X}`
 
 /** Never squeezed by its neighbours, and never wider than the room the list shows. */
 export const NAVBAR_ITEM = `flex shrink-0 ${CONTAIN}`

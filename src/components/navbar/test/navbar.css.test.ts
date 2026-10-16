@@ -64,6 +64,7 @@ const DECLARATION: Record<string, string> = {
   'gap-5': 'gap: calc(var(--spacing) * 5);',
   'snap-x': 'scroll-snap-type: x var(--tw-scroll-snap-strictness);',
   'snap-mandatory': '--tw-scroll-snap-strictness: mandatory;',
+  'hover:snap-none': 'scroll-snap-type: none;',
   '-m-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+1px)]': `margin: calc(${REACH} * -1);`,
   'p-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+1px)]': `padding: ${REACH};`,
   'overflow-x-auto': 'overflow-x: auto;',
@@ -80,6 +81,7 @@ const SCOPE: Record<string, string> = {
   'aria-[current=page]:text-body': '[aria-current="page"] {',
   'forced-colors:aria-[current=page]:underline': '[aria-current="page"] {',
   'focus-visible:snap-center': ':focus-visible {',
+  'hover:snap-none': ':hover {',
   'focus-visible:outline-solid': ':focus-visible {',
   'focus-visible:outline-(length:--tc-ring-width)': ':focus-visible {',
   'focus-visible:outline-offset-(length:--tc-ring-offset)': ':focus-visible {',
@@ -114,7 +116,7 @@ describe('every class Navbar writes compiles with the installed Tailwind', () =>
       NAVBAR_ROOT, ...Object.values(NAVBAR_TOP), NAVBAR_BRAND, NAVBAR_LINKS, NAVBAR_LIST, NAVBAR_ITEM, NAVBAR_LINK, NAVBAR_ACTIONS,
     ])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(58)
+    expect(all).toHaveLength(59)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {
