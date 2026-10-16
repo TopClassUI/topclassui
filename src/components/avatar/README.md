@@ -28,11 +28,14 @@ Initials are one or two characters: a longer string is cut at the edge of the ci
 **A picture that fails.** `AvatarImage` is the one client part. Once the page hydrates, a
 picture that fails, before or after the script ran, takes `data-error` and turns
 transparent: the img stays, so its `alt` still names the avatar, and the fallback shows. A
-new `src` starts again. Before hydration the browser's broken mark shows in the corner, and
-the alt text is never drawn. Your own `onError` and `ref` still reach the img.
+new `src` or `srcSet` starts again, and so does a picture that loads. Before hydration the
+browser's broken mark shows in the corner, and the alt text is never drawn. Your own
+`onError`, `onLoad` and `ref` still reach the img, and `onError` runs once for a picture
+that failed before the script ran too.
 
-**What it costs.** An avatar of initials or an icon stays server HTML and ships no
-JavaScript. Every avatar with an image hydrates: a table of fifty rows with pictures is fifty
+**What it costs.** An avatar of initials or an icon stays server HTML, with no client part.
+The avatar re-exports `AvatarImage`, so a page that imports it may still load that one small
+file. Every avatar with an image hydrates: a table of fifty rows with pictures is fifty
 client parts.
 
 **A picture with transparency.** The initials show through it. Leave `AvatarFallback` out, or
