@@ -196,6 +196,33 @@ test.describe('text', () => {
     })
   }
 
+  for (const pointer of ['fine', 'coarse'] as const) {
+    test.describe(`${pointer} pointer`, () => {
+      test.use(pointer === 'coarse' ? COARSE : {})
+
+      for (const direction of DIRECTIONS) {
+        test(`at a root of 32 px, ${direction}: at 320 and 390 px every stepper of the row and of each size is whole inside its field`, async ({ page }) => {
+          for (const width of [320, 390]) {
+            await page.setViewportSize({ width, height: 800 })
+            for (const demo of ['number-field--row', 'number-field--sizes']) {
+              await page.goto(urlFor(demo, 'light', direction))
+              await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
+              const cut = await page.locator('#demo [role="group"]').evaluateAll((groups) => groups.flatMap((group) => {
+                const box = group.getBoundingClientRect()
+                return [...group.querySelectorAll('button')].filter((button) => {
+                  const r = button.getBoundingClientRect()
+                  return r.left < box.left - 0.5 || r.right > box.right + 0.5
+                }).map((button) => `${group.querySelector('input')?.getAttribute('aria-label') ?? ''} ${button.getAttribute('aria-label') ?? ''}`)
+              }))
+              expect(cut, `${demo} at ${String(width)} px`).toEqual([])
+              await expectNoSidewaysScroll(page)
+            }
+          }
+        })
+      }
+    })
+  }
+
   test('WCAG 1.4.12 spacing: the field keeps its size and the label does not overlap it', async ({ page }) => {
     await page.goto(urlFor('number-field--basic', 'light', 'ltr'))
     await page.addStyleTag({ content: '* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-block-end: 2em !important; }' })
@@ -444,8 +471,8 @@ test.describe('live: where a page puts a number field', () => {
         await page.setViewportSize({ width: 320, height: 480 })
         await fixture(page, 'number-field-layouts', { direction })
         expect(await cases(page)).toEqual([
-          ['grid', 220.8], ['track', 140], ['flex-1', 200], ['w-fit', 220.8], ['cell', 205.59], ['label-row', 195.91],
-          ['pair-grid', 140, 140], ['pair-flex', 140, 140], ['pair-div', 140, 140], ['pair-input', 140, 140], ['beside-label', 183.44], ['wrapping-label', 220.8],
+          ['grid', 220.8], ['track', 140], ['flex-1', 200], ['w-fit', 220.8], ['cell', 200.3], ['label-row', 192.56],
+          ['pair-grid', 140, 140], ['pair-flex', 140, 140], ['pair-div', 140, 140], ['pair-input', 140, 140], ['beside-label', 174.91], ['wrapping-label', 220.8],
         ])
         await expectNoSidewaysScroll(page)
       })

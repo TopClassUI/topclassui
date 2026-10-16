@@ -17,4 +17,4 @@ export const NUMBER_FIELD_INPUT = `-my-(--tc-line-width) min-w-0 flex-1 bg-trans
 export const NUMBER_FIELD_DECREASE = 'order-first'
 
 /** DISABLED dims a stepper at its limit. In a disabled field the box already dims it, and opacity multiplies. A read-only stepper has no disabled attribute, so it is dimmed by name. */
-export const NUMBER_FIELD_STEP = `-my-(--tc-line-width) inline-flex aspect-square shrink-0 items-center justify-center text-body tone-neutral ${HOVER.ghost} ${FOCUS_RING_INSET} ${TOUCH_TARGET} ${TRANSITION} ${DISABLED} data-readonly:pointer-events-none data-readonly:opacity-50 group-data-disabled/number:disabled:opacity-100 group-has-[input:disabled]/number:disabled:opacity-100`
+export const NUMBER_FIELD_STEP = `-my-(--tc-line-width) inline-flex aspect-square shrink items-center justify-center text-body tone-neutral ${HOVER.ghost} ${FOCUS_RING_INSET} ${TOUCH_TARGET} ${TRANSITION} ${DISABLED} data-readonly:pointer-events-none data-readonly:opacity-50 group-data-disabled/number:disabled:opacity-100 group-has-[input:disabled]/number:disabled:opacity-100`

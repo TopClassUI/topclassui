@@ -74,7 +74,10 @@ are read in any locale, and a `1,234.5` typed or pasted is 1234.5 there as well.
 its limit is disabled and dimmed.
 
 **The width of an Input**, and the steppers keep their 24 px (44 under a finger) whatever the
-size: a narrow field takes the room from the number. A NumberField wants about 130 px. In
+size: a narrow field takes the room from the number. A NumberField wants about 130 px. **At 200%
+text** (a 32 px root) the steppers give way down to those floors before they are cut, so a field
+needs about 2 x 44 px plus its digits: with less the digits clip, and with less than the two
+floors increase is cut too. Let a row of them wrap. In
 right-to-left increase sits at the left and the number stays left-to-right. The input comes
 first in the markup, so a `<label>` that wraps the field focuses the input, not a stepper.
 

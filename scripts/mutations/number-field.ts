@@ -133,4 +133,10 @@ export const MUTATIONS: Mutation[] = [
     from: ' group-has-[input:disabled]/number:disabled:opacity-100',
     to: '',
   },
+  {
+    label: 'the number field stepper is shrink-0 again, so at a 32 px root the increase stepper of a large field is cut',
+    file: CLASSES,
+    from: 'aspect-square shrink items-center',
+    to: 'aspect-square shrink-0 items-center',
+  },
 ]
