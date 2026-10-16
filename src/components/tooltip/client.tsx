@@ -9,6 +9,7 @@ import { renderTrigger } from '#shared/render-trigger.js'
 import { TOOLTIP_BOUNDARIES } from './boundaries.js'
 import { TOOLTIP_ARROW, TOOLTIP_POPUP, TOOLTIP_POSITIONER } from './classes.js'
 import { TOOLTIP_ARROW_HEIGHT, TOOLTIP_COLLISION_AVOIDANCE, TOOLTIP_DEFAULTS } from './constants.js'
+import { useTooltipPopup } from './hook.js'
 import type { TooltipPopupProps, TooltipRootProps, TooltipTriggerProps } from './types.js'
 
 const { delayMin, delayMax } = TOOLTIP_BOUNDARIES
@@ -49,9 +50,11 @@ export function TooltipPopup({
   ...rest
 }: TooltipPopupProps) {
   const { side, align } = toSideAlign(placement)
+  const { direction } = useTooltipPopup()
   return (
     <Base.Portal>
       <Base.Positioner
+        dir={direction}
         side={side}
         align={align}
         sideOffset={POPUP_BOUNDS.sideOffset + TOOLTIP_ARROW_HEIGHT}
