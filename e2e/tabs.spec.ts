@@ -752,6 +752,32 @@ for (const mode of MODES) {
       expect((await boxOf(list)).height).toBe(48)
     })
 
+    // WCAG 1.4.11: the raised fill is near the tint of the list, so the state needs an edge of its own.
+    test('enclosed: the active tab has an edge of 3:1 against the list, and its label is heavier than the same label at rest', async ({ page }) => {
+      await openLive(page, 'tabs--enclosed', { mode })
+      await atRest(page)
+      const list = listIn(page, '#demo')
+      const [frame, active, other] = [await boxOf(list), await boxOf(tabsIn(list).nth(0)), await boxOf(tabsIn(list).nth(1))]
+      const tint = await pixelAt(page, frame.left + 2, frame.top + frame.height / 2)
+      const edges = {
+        top: await pixelAt(page, active.left + active.width / 2, active.top),
+        bottom: await pixelAt(page, active.left + active.width / 2, active.bottom - 1),
+        start: await pixelAt(page, active.left, active.top + active.height / 2),
+        end: await pixelAt(page, active.right - 1, active.top + active.height / 2),
+      }
+      for (const [side, pixel] of Object.entries(edges)) {
+        expect(contrast(pixel, tint), `${side} edge ${pixel.join(',')} on the list ${tint.join(',')}`).toBeGreaterThanOrEqual(3)
+      }
+      const rest = await pixelAt(page, other.left + other.width / 2, other.top)
+      expect(contrast(rest, tint), `a tab at rest has no edge: ${rest.join(',')}`).toBeLessThan(1.1)
+
+      const label = (index: number) => tabsIn(list).nth(index).locator('span').evaluate((element) => element.getBoundingClientRect().width)
+      const wide = await label(0)
+      await tabsIn(list).nth(1).click()
+      await atRest(page)
+      expect(wide - await label(0), 'px the same label loses when its tab is no longer active').toBeGreaterThanOrEqual(1)
+    })
+
     for (const look of LOOKS) {
       test(`${look}: the ring of a focused disabled tab keeps 3:1 against what is beside it, while its label is dimmed`, async ({ page }) => {
         await openLive(page, 'tabs--disabled', { mode })

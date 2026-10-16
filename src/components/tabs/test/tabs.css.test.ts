@@ -36,7 +36,7 @@ const DECLARATION: Record<string, string> = {
   'gap-2': 'gap: calc(var(--spacing) * 2);',
   'overflow-hidden': 'overflow: hidden;',
   'whitespace-nowrap': 'white-space: nowrap;',
-  'font-medium': 'font-weight: var(--font-weight-medium);',
+  'font-normal': 'font-weight: var(--font-weight-normal);',
   'text-muted': 'color: var(--tc-muted);',
   'data-active:font-semibold': 'font-weight: var(--font-weight-semibold);',
   'data-active:text-body': 'color: var(--tc-body);',
@@ -65,6 +65,8 @@ const DECLARATION: Record<string, string> = {
   'forced-colors:data-active:border-[Highlight]': 'border-color: Highlight;',
   'data-active:bg-surface-raised': 'background-color: var(--tc-surface-raised);',
   'data-active:shadow-sm': SHADOW,
+  'not-forced-colors:data-active:inset-ring-(length:--tc-line-width)': '--tw-inset-ring-shadow: inset 0 0 0 var(--tc-line-width) var(--tw-inset-ring-color, currentcolor);',
+  'not-forced-colors:data-active:inset-ring-line-strong': '--tw-inset-ring-color: var(--tc-line-strong);',
   'forced-colors:data-active:forced-color-adjust-none': 'forced-color-adjust: none;',
   'forced-colors:data-active:bg-[Highlight]': 'background-color: Highlight;',
   'forced-colors:data-active:text-[HighlightText]': 'color: HighlightText;',
@@ -97,6 +99,8 @@ const SCOPE: Record<string, string> = {
   'data-active:border-primary-solid': '[data-active] {',
   'data-active:bg-surface-raised': '[data-active] {',
   'data-active:shadow-sm': '[data-active] {',
+  'not-forced-colors:data-active:inset-ring-(length:--tc-line-width)': '[data-active] {',
+  'not-forced-colors:data-active:inset-ring-line-strong': '[data-active] {',
   'data-disabled:pointer-events-none': '[data-disabled] {',
   'data-disabled:*:opacity-50': '[data-disabled] > *) {',
   'forced-colors:data-disabled:*:opacity-100': '[data-disabled] > *) {',
@@ -133,7 +137,7 @@ describe('every class Tabs writes compiles with the installed Tailwind', () => {
   it('the table names exactly the classes of the root, the lists, the tabs, the panel and the size scale', () => {
     const all = written([TABS_ROOT, ...Object.values(TABS_LIST), ...Object.values(TABS_TAB), TABS_PANEL, ...Object.values(CONTROL_SIZE)])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(73)
+    expect(all).toHaveLength(75)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

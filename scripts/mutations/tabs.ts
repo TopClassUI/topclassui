@@ -156,6 +156,24 @@ export const MUTATIONS: Mutation[] = [
     to: "'rounded-control',",
   },
   {
+    label: 'a tabs tab at rest is medium, which Windows draws as the semibold of the active one, so only its colour tells them apart',
+    file: CLASSES,
+    from: 'whitespace-nowrap font-normal text-muted',
+    to: 'whitespace-nowrap font-medium text-muted',
+  },
+  {
+    label: 'the active enclosed tabs tab has no edge, so a fill of 1.04:1 against the list is all that tells it from the others',
+    file: CLASSES,
+    from: "  'not-forced-colors:data-active:inset-ring-(length:--tc-line-width) not-forced-colors:data-active:inset-ring-line-strong',\n",
+    to: '',
+  },
+  {
+    label: 'the edge of the active enclosed tabs tab is painted under forced colours too, over the highlight that already tells it',
+    file: CLASSES,
+    from: "'not-forced-colors:data-active:inset-ring-(length:--tc-line-width) not-forced-colors:data-active:inset-ring-line-strong'",
+    to: "'data-active:inset-ring-(length:--tc-line-width) data-active:inset-ring-line-strong'",
+  },
+  {
     label: 'the active enclosed tabs tab takes no highlight under forced colours, where its fill is erased',
     file: CLASSES,
     from: "  'forced-colors:data-active:forced-color-adjust-none forced-colors:data-active:bg-[Highlight]',\n",
