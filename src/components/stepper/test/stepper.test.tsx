@@ -28,7 +28,7 @@ const CONNECTOR = 'absolute top-1/2'
 
 describe('the element it renders', () => {
   it('is an ordered list with one item per step, in the order given', () => {
-    expect(html()).toMatch(/^<ol data-size="md" class="flex w-full min-w-0 items-start" role="list"><li /)
+    expect(html()).toMatch(/^<ol data-size="md" class="flex w-full min-w-0 items-start \[--tc-stepper-mark:var\(--spacing-control-sm\)\]" role="list"><li /)
     expect(html()).toMatch(/<\/ol>$/)
     expect(rows(html())).toHaveLength(4)
   })

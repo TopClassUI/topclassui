@@ -13,16 +13,27 @@ export const STEPPER_MARK_ROW = 'relative flex w-full justify-center'
 /** From this centre to the next. A border, not a fill: forced colours repaint a border and erase a fill. */
 export const STEPPER_CONNECTOR = 'absolute top-1/2 inset-s-1/2 w-full -translate-y-1/2 border-t-(length:--tc-line-width) border-line data-done:border-primary-solid'
 
-/** Painted after the line, so it covers the line's ends. A circle is a shape, not a radius knob. */
-export const STEPPER_MARK = 'relative inline-flex shrink-0 items-center justify-center rounded-full font-medium tabular-nums'
+/** The circle's size, set on the list, one step under the control scale: md is the drawn 32 px. custom sets
+ * none, so the circle reads the caller's --tc-stepper-mark, or the default of tokens.css. */
+export const STEPPER_ROOT_SIZE = {
+  xs: '[--tc-stepper-mark:calc(1.5rem*var(--tc-density))]',
+  sm: '[--tc-stepper-mark:var(--spacing-control-xs)]',
+  md: '[--tc-stepper-mark:var(--spacing-control-sm)]',
+  lg: '[--tc-stepper-mark:var(--spacing-control-md)]',
+  xl: '[--tc-stepper-mark:var(--spacing-control-lg)]',
+  custom: '',
+} as const
 
-/** One step under the control scale: md is the drawn 32 px. */
+/** Painted after the line, so it covers the line's ends. A circle is a shape, not a radius knob. */
+export const STEPPER_MARK = 'relative inline-flex size-(--tc-stepper-mark) shrink-0 items-center justify-center rounded-full font-medium tabular-nums'
+
+/** The number's type step, beside the circle of each size. */
 export const STEPPER_MARK_SIZE = {
-  xs: 'size-[calc(1.5rem*var(--tc-density))] text-xs',
-  sm: 'size-control-xs text-xs',
-  md: 'size-control-sm text-sm',
-  lg: 'size-control-md text-sm',
-  xl: 'size-control-lg text-base',
+  xs: 'text-xs',
+  sm: 'text-xs',
+  md: 'text-sm',
+  lg: 'text-sm',
+  xl: 'text-base',
   custom: '',
 } as const
 

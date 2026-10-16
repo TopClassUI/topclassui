@@ -89,13 +89,31 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the stepper md circle is the control size, 40 px, and not the drawn 32',
     file: 'src/components/stepper/classes.ts',
-    from: "md: 'size-control-sm text-sm',",
-    to: "md: 'size-control-md text-sm',",
+    from: "md: '[--tc-stepper-mark:var(--spacing-control-sm)]',",
+    to: "md: '[--tc-stepper-mark:var(--spacing-control-md)]',",
   },
   {
     label: 'the stepper writes aria-current from the status alone, so a step with an error of its own at value is never current',
     file: 'src/components/stepper/index.tsx',
     from: "aria-current={item.id === value || status === 'current' ? 'step' : undefined}",
     to: "aria-current={status === 'current' ? 'step' : undefined}",
+  },
+  {
+    label: 'the stepper circle stops reading --tc-stepper-mark, so a custom stepper draws 300 x 165 ticks',
+    file: 'src/components/stepper/classes.ts',
+    from: 'relative inline-flex size-(--tc-stepper-mark) shrink-0',
+    to: 'relative inline-flex shrink-0',
+  },
+  {
+    label: 'the stepper list stops setting its circle size, so every size draws the default circle',
+    file: 'src/components/stepper/index.tsx',
+    from: 'cn(STEPPER_ROOT, STEPPER_ROOT_SIZE[size], className)',
+    to: 'cn(STEPPER_ROOT, className)',
+  },
+  {
+    label: 'the stepper sets a circle size for custom, so a caller --tc-stepper-mark on an ancestor is overridden',
+    file: 'src/components/stepper/classes.ts',
+    from: "xl: '[--tc-stepper-mark:var(--spacing-control-lg)]',\n  custom: '',",
+    to: "xl: '[--tc-stepper-mark:var(--spacing-control-lg)]',\n  custom: '[--tc-stepper-mark:var(--spacing-control-sm)]',",
   },
 ]

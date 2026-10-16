@@ -57,7 +57,7 @@ function expectClearCircles({ steps, list }: Geometry, label: string) {
 }
 
 const WIDTHS = [[320, 480], [390, 844], [1280, 800], [844, 390]] as const
-const DEMOS = ['stepper--basic', 'stepper--sizes', 'stepper--statuses', 'stepper--long-content', 'stepper--arabic-digits'] as const
+const DEMOS = ['stepper--basic', 'stepper--sizes', 'stepper--statuses', 'stepper--long-content', 'stepper--arabic-digits', 'stepper--custom-size'] as const
 
 for (const direction of DIRECTIONS) {
   for (const [width, height] of WIDTHS) {
@@ -157,6 +157,21 @@ for (const [palette, canvas] of Object.entries(FORCED_CANVAS)) {
     expect(inkOn(todo.glyph, canvas), 'the number on the canvas').toBeGreaterThan(10)
     expect(inkOn(todo.whole, canvas) - inkOn(todo.glyph, canvas), 'the line round it').toBeGreaterThan(40)
     expect(done.glyph, 'a tick is not a number').not.toEqual(current.glyph)
+  })
+}
+
+for (const direction of DIRECTIONS) {
+  test(`${direction}: custom takes the circle from --tc-stepper-mark, 32 px by default, and the tick and the x stay 55% of it`, async ({ page }) => {
+    await page.goto(urlFor('stepper--custom-size', 'light', direction))
+    for (const [index, side, icon] of [[0, 32, 17.6], [1, 56, 30.8]] as const) {
+      const list = page.locator('#demo ol').nth(index)
+      const geometry = await geometryOf(list)
+      expect(geometry.steps.map(({ mark }) => [mark.width, mark.height]), `list ${String(index)}`).toEqual([[side, side], [side, side], [side, side], [side, side]])
+      const icons = await list.locator('.rounded-full svg').evaluateAll((all) => all.map((svg) => Math.round(svg.getBoundingClientRect().width * 10) / 10))
+      expect(icons, `list ${String(index)}: the tick and the x`).toEqual([icon, icon])
+      expect(offsets(geometry)).toBeLessThanOrEqual(1)
+      expectClearCircles(geometry, `list ${String(index)}`)
+    }
   })
 }
 

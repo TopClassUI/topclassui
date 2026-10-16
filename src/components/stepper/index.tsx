@@ -7,7 +7,7 @@ import { en } from '#shared/labels/en.js'
 import { createNumberFormat } from '#shared/labels/get-labels.js'
 import {
   STEPPER_CONNECTOR, STEPPER_MARK, STEPPER_MARK_ROW, STEPPER_MARK_SIZE, STEPPER_MARK_STATUS, STEPPER_ROOT,
-  STEPPER_STATUS_TEXT, STEPPER_STEP, STEPPER_TITLE, STEPPER_TITLE_SIZE, STEPPER_TITLE_STATUS,
+  STEPPER_ROOT_SIZE, STEPPER_STATUS_TEXT, STEPPER_STEP, STEPPER_TITLE, STEPPER_TITLE_SIZE, STEPPER_TITLE_STATUS,
 } from './classes.js'
 import { STEPPER_DEFAULTS } from './constants.js'
 import { statusOf } from './lib.js'
@@ -32,7 +32,7 @@ export function Stepper({
   return (
     <ol
       data-size={size}
-      className={cn(STEPPER_ROOT, className)}
+      className={cn(STEPPER_ROOT, STEPPER_ROOT_SIZE[size], className)}
       {...rest}
       // After the rest: with list-style none, Safari with VoiceOver drops the list unless the role is written.
       role="list"

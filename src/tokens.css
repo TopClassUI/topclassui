@@ -46,6 +46,8 @@
   --tc-z-popup: 60;
   --tc-z-toast: 70;
 
+  /* A Stepper circle: each size sets it on the list; a custom Stepper reads the caller's, or this md 32 px. */
+  --tc-stepper-mark: calc(2rem * var(--tc-density));
   /* Set inline by Progress from its clamped value; declared here so R-4-2 can see it. */
   --tc-progress-value: 0%;
   /* Set inline by a windowed list to the spacers of useCollection, read by two spacers and never by its padding. */
