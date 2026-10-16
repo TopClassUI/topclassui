@@ -162,7 +162,7 @@ import {
 
 ## Props
 
-Required: `items` on `DropdownMenu`, `title` on `DropdownMenu`, `trigger` on `DropdownMenu`. Every other prop below is optional.
+Required: `aria-label` or `children` on `DropdownItem`, `aria-label` or `children` on `DropdownLinkItem`, `items` on `DropdownMenu`, `title` on `DropdownMenu`, `trigger` on `DropdownMenu`. Every other prop below is optional.
 
 ### DropdownRoot
 
@@ -182,7 +182,8 @@ This part takes no design props of its own.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `children` | no | `ReactNode` | - |  |
+| `aria-label` | **yes**, or `children` | `string` | - |  |
+| `children` | **yes**, or `aria-label` | `ReactNode` | - |  |
 | `icon` | no | `ReactNode` | - | Drawn before the label. An element, such as `<Svg icon={trash} />`: it is not a name. |
 | `shortcut` | no | `string` | - | Shown at the end of the row, such as `Ctrl P`. It is read out after the label. |
 | `tone` | no | `neutral` \| `danger` | `"neutral"` | DropdownItem, DropdownLinkItem: danger colours a destructive row; its label still has to say so. |
@@ -191,7 +192,8 @@ This part takes no design props of its own.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `children` | no | `ReactNode` | - |  |
+| `aria-label` | **yes**, or `children` | `string` | - |  |
+| `children` | **yes**, or `aria-label` | `ReactNode` | - |  |
 | `icon` | no | `ReactNode` | - | Drawn before the label. An element, such as `<Svg icon={trash} />`: it is not a name. |
 | `shortcut` | no | `string` | - | Shown at the end of the row, such as `Ctrl P`. It is read out after the label. |
 | `tone` | no | `neutral` \| `danger` | `"neutral"` | DropdownItem, DropdownLinkItem: danger colours a destructive row; its label still has to say so. |

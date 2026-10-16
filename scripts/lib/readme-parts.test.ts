@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import type { ComponentMeta } from '../../src/shared/meta.js'
-import { renderReadme } from './readme.js'
+import { mergeRows, renderReadme } from './readme.js'
 import { type PartFamily, type Reach, reachLine } from './readme-parts.js'
 
 const meta: ComponentMeta = {
@@ -56,6 +56,33 @@ describe('a part family lists its props part by part', () => {
   it('names a required prop with the part it belongs to', () => {
     const required = render({ parts: [{ name: 'SheetRoot', rows: [{ ...CHILDREN, required: true }], reach: 'none' }] })
     expect(required).toContain('Required: `children` on `SheetRoot`. Every other prop below is optional.')
+  })
+})
+
+describe('a prop one of two others can stand in for', () => {
+  const LABEL = { name: 'aria-label', required: false, type: '`string`', default: '-', description: 'Name.', oneOf: ['aria-labelledby'] }
+  const BY = { name: 'aria-labelledby', required: false, type: '`string`', default: '-', description: 'Id.', oneOf: ['aria-label'] }
+  const out = render({ parts: [{ name: 'SheetList', rows: [LABEL, BY, SIZE], reach: 'element' }] })
+
+  it('is named above the table as the pair, once, with its part', () => {
+    expect(out).toContain('Required: `aria-label` or `aria-labelledby` on `SheetList`. Every other prop below is optional.')
+    expect(out).not.toContain('Every prop below is optional')
+  })
+
+  it('says in its row what stands in for it, never a plain no', () => {
+    expect(out).toContain('| `aria-label` | **yes**, or `aria-labelledby` | `string` |')
+    expect(out).toContain('| `aria-labelledby` | **yes**, or `aria-label` | `string` |')
+  })
+
+  it('names the literal that asks for it, in the row and above the table', () => {
+    const when = render({ parts: [{ name: 'SheetList', rows: [{ ...LABEL, when: '`open`' }], reach: 'element' }] })
+    expect(when).toContain('Required: `aria-label` or `aria-labelledby` when `open` on `SheetList`.')
+    expect(when).toContain('| `aria-label` | **yes**, or `aria-labelledby` when `open` | `string` |')
+  })
+
+  it('sorts after the required props and before the optional ones', () => {
+    expect(mergeRows([SIZE], [BY, { ...CHILDREN, required: true }, LABEL]).map((r) => r.name))
+      .toEqual(['children', 'aria-label', 'aria-labelledby', 'size'])
   })
 })
 

@@ -84,7 +84,7 @@ import {
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `alt` or `render` on `AvatarImage`. Every other prop below is optional.
 
 ### AvatarRoot
 
@@ -97,8 +97,8 @@ Every prop below is optional and falls back to the default shown.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `alt` | no | `string` | - | Who the picture shows. Pass an empty string when the name is written beside it. |
-| `render` | no | `ReactElement` | - | Render the picture as another element, such as next/image, which carries its own src and alt. |
+| `alt` | **yes**, or `render` | `string` | - | Who the picture shows. Pass an empty string when the name is written beside it. |
+| `render` | **yes**, or `alt` | `ReactElement` | - | Render the picture as another element, such as next/image, which carries its own src and alt. |
 
 ### AvatarFallback
 

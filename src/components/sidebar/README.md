@@ -100,7 +100,7 @@ import {
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `href` or `render` on `SidebarLink`. Every other prop below is optional.
 
 ### SidebarRoot
 
@@ -138,11 +138,11 @@ This part takes no design props of its own.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
+| `href` | **yes**, or `render` | `string` | - | Where the row goes. |
+| `render` | **yes**, or `href` | `ReactElement` | - | The link as another element, such as `render={<Link href="/docs" />}`, which carries its own href. |
 | `children` | no | `ReactNode` | - | The label. It ends in an ellipsis when the rail is too narrow, and is cut at 100 characters. |
 | `current` | no | `boolean` | `false` | SidebarLink: the page being read. It sets aria-current="page" and draws the row filled, bold and marked. |
-| `href` | no | `string` | - | Where the row goes. |
 | `icon` | no | `ReactNode` | - | Drawn before the label, and all that is drawn while the rail is collapsed. Decorative: the label names the row. |
-| `render` | no | `ReactElement` | - | The link as another element, such as `render={<Link href="/docs" />}`, which carries its own href. |
 
 Anything else is passed to the element each part draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 

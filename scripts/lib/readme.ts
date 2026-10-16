@@ -1,7 +1,7 @@
 // R-8.3-3: the props table is generated, never written by hand, so it cannot tell a
 // reader that a prop is optional when the schema says otherwise.
 import type { ComponentMeta, Rendering } from '../../src/shared/meta.js'
-import { type PartFamily, type Surface, familyImport, familyProps, reachLine } from './readme-parts.js'
+import { type PartFamily, type Surface, familyImport, familyProps, reachLine, requiredOf } from './readme-parts.js'
 
 export const HAND_START = '<!-- hand-written -->'
 export const HAND_END = '<!-- /hand-written -->'
@@ -16,6 +16,10 @@ export interface PropRow {
   type: string
   default: string
   description: string
+  /** The props that may stand in for this one, such as `aria-labelledby` for `aria-label`. */
+  oneOf?: string[] | undefined
+  /** The literal that makes this prop required, such as `readOnly={false}`; absent, it always is. */
+  when?: string | undefined
 }
 
 export interface ReadmeInput {
@@ -80,13 +84,11 @@ export function mergeRows(fromSchema: PropRow[], fromTypes: PropRow[]): PropRow[
   for (const row of fromTypes) {
     const existing = byName.get(row.name)
     // The schema is richer where both describe a prop; the type only adds what it knows.
-    if (existing) byName.set(row.name, { ...existing, required: row.required })
+    if (existing) byName.set(row.name, { ...existing, required: row.required, oneOf: row.oneOf, when: row.when })
     else byName.set(row.name, row)
   }
-  return [...byName.values()].sort((a, b) => {
-    if (a.required !== b.required) return a.required ? -1 : 1
-    return a.name.localeCompare(b.name)
-  })
+  const rank = (row: PropRow) => (row.required ? 0 : row.oneOf !== undefined || row.when !== undefined ? 1 : 2)
+  return [...byName.values()].sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name))
 }
 
 /** Whatever a human wrote between the markers, or the placeholder on a first run. */
@@ -102,16 +104,23 @@ export function handWrittenOf(existing: string | null): string {
 /** A bare pipe would end the cell, and a printed union type is full of them. */
 const cell = (text: string) => text.split('|').join('\\|')
 
+function requiredCell(row: PropRow): string {
+  if (row.required) return '**yes**'
+  if (row.oneOf === undefined && row.when === undefined) return 'no'
+  const or = row.oneOf === undefined ? '' : `, or ${row.oneOf.map((name) => `\`${name}\``).join(' or ')}`
+  return `**yes**${or}${row.when === undefined ? '' : ` when ${row.when}`}`
+}
+
 function propsTable(rows: PropRow[]): string {
   if (rows.length === 0) return 'This component takes no design props of its own.'
   const head = '| Prop | Required | Type | Default | What it does |\n|---|---|---|---|---|'
   const body = rows.map((r) =>
-    `| \`${r.name}\` | ${r.required ? '**yes**' : 'no'} | ${cell(r.type)} | ${cell(r.default)} | ${cell(r.description)} |`)
+    `| \`${r.name}\` | ${requiredCell(r)} | ${cell(r.type)} | ${cell(r.default)} | ${cell(r.description)} |`)
   return [head, ...body].join('\n')
 }
 
 function singleProps(props: PropRow[], surface: Surface, whole: 'single' | 'surface'): string[] {
-  const required = props.filter((p) => p.required).map((p) => `\`${p.name}\``)
+  const required = requiredOf(props)
   const reach = reachLine(surface, whole)
   return [
     required.length === 0

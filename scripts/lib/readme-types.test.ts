@@ -3,13 +3,15 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import type { PropRow } from './readme.js'
-import { familyOf, openTypeProgram, propNamesOf, reachOf, valueExportsOf } from './readme-types.js'
+import { familyOf, openTypeProgram, ownPropsOf, propNamesOf, reachOf, valueExportsOf } from './readme-types.js'
 
 const ROOT = process.cwd()
 const at = (slug: string, file: string) => join(ROOT, 'src', 'components', slug, file)
 const program = openTypeProgram(ROOT, [
   at('dialog', 'types.ts'), at('dialog', 'index.tsx'), at('card', 'types.ts'), at('card', 'index.tsx'),
-  at('dropdown', 'types.ts'), at('toast', 'types.ts'),
+  at('tabs', 'types.ts'), at('avatar', 'types.ts'), at('banner', 'types.ts'), at('dropdown', 'types.ts'),
+  at('toast', 'types.ts'), at('rating', 'types.ts'),
+  at('button', 'types.ts'),
 ])
 
 const row = (name: string): PropRow => ({ name, required: false, type: '`boolean`', default: '-', description: name })
@@ -61,5 +63,47 @@ describe('what each part passes on is read from its own type', () => {
   it('ToastViewport takes a className alone, and the toast function has no props type at all', () => {
     expect(reachOf(program, at('toast', 'types.ts'), 'ToastViewport')).toBe('className')
     expect(reachOf(program, at('toast', 'types.ts'), 'toast')).toBe(null)
+  })
+})
+
+describe('a prop the union requires in some branches', () => {
+  const rows = (slug: string, type: string) =>
+    Object.fromEntries(ownPropsOf(program, at(slug, 'types.ts'), type).map((r) => [r.name, [r.required, r.oneOf, r.when]]))
+
+  it('is one of a pair when the pair covers every branch: TabsList needs a name', () => {
+    expect(rows('tabs', 'TabsListProps')).toMatchObject({
+      'aria-label': [false, ['aria-labelledby'], undefined],
+      'aria-labelledby': [false, ['aria-label'], undefined],
+    })
+  })
+
+  it('is one of a pair for AvatarImage: alt, or a render that carries its own', () => {
+    expect(rows('avatar', 'AvatarImageProps')).toMatchObject({ alt: [false, ['render'], undefined], render: [false, ['alt'], undefined] })
+  })
+
+  it('is seen where React declares the same attribute first: Banner needs a name too', () => {
+    expect(rows('banner', 'BannerProps')).toMatchObject({
+      'aria-label': [false, ['aria-labelledby'], undefined],
+      'aria-labelledby': [false, ['aria-label'], undefined],
+    })
+  })
+
+  it('is required when the literal that picks its branches is set: a Banner id with dismissible', () => {
+    expect(rows('banner', 'BannerProps')).toMatchObject({
+      id: [false, undefined, '`dismissible`'],
+      dismissible: [false, undefined, undefined],
+    })
+  })
+
+  it('is one of a pair when the literal picks the branches the pair covers: an editable Rating needs a name', () => {
+    expect(rows('rating', 'RatingProps')).toMatchObject({
+      'aria-label': [false, ['aria-labelledby'], '`readOnly={false}`'],
+      'aria-labelledby': [false, ['aria-label'], '`readOnly={false}`'],
+      'readOnly': [false, undefined, undefined],
+    })
+  })
+
+  it('stays optional when nothing stands in for it and no literal asks for it: Button render', () => {
+    expect(rows('button', 'ButtonProps')).toMatchObject({ render: [false, undefined, undefined] })
   })
 })

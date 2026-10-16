@@ -36,9 +36,21 @@ function listOf(names: string[]): string {
   return coded.length < 2 ? coded.join('') : `${coded.slice(0, -1).join(', ')} and ${coded.at(-1) ?? ''}`
 }
 
+/** The required props, then each group as `a` or `b`, with the literal that asks for it, each once. */
+export function requiredOf(rows: PropRow[]): string[] {
+  const groups = new Set<string>()
+  for (const row of rows) {
+    if (row.required) groups.add(code(row.name))
+    else if (row.oneOf !== undefined || row.when !== undefined) {
+      const names = [row.name, ...row.oneOf ?? []].sort().map(code).join(' or ')
+      groups.add(row.when === undefined ? names : `${names} when ${row.when}`)
+    }
+  }
+  return [...groups]
+}
+
 function requiredLine(family: PartFamily): string {
-  const required = family.parts.flatMap((part) =>
-    part.rows.filter((row) => row.required).map((row) => `${code(row.name)} on \`${part.name}\``))
+  const required = family.parts.flatMap((part) => requiredOf(part.rows).map((names) => `${names} on \`${part.name}\``))
   return required.length === 0
     ? 'Every prop below is optional and falls back to the default shown.'
     : `Required: ${required.join(', ')}. Every other prop below is optional.`

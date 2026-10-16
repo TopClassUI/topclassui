@@ -99,6 +99,42 @@ export const MUTATIONS: Mutation[] = [
     to: "family ? familyImport(family) : `import { ${meta.name} } from 'topclassui'`,",
   },
   {
+    label: 'the README marks a prop required that only one branch of its union requires',
+    file: 'scripts/lib/readme-types.ts',
+    from: 'required: info.requiredIn.size === all.size,',
+    to: 'required: info.requiredIn.size > 0,',
+  },
+  {
+    label: 'the README loses a prop React declares first, such as the aria-label a Banner requires',
+    file: 'scripts/lib/readme-types.ts',
+    from: "member.declarations?.find((d) => d.getSourceFile().fileName.includes('/src/'))",
+    to: "member.declarations?.slice(0, 1).find((d) => d.getSourceFile().fileName.includes('/src/'))",
+  },
+  {
+    label: 'the README calls each prop of a one-of pair, such as aria-label or aria-labelledby, optional',
+    file: 'scripts/lib/readme-types.ts',
+    from: 'const oneOf = others.length > 0 ? { oneOf: others } : {}',
+    to: 'const oneOf = {}',
+  },
+  {
+    label: 'the README stops naming the literal that makes a prop required, such as readOnly={false}',
+    file: 'scripts/lib/readme-types.ts',
+    from: 'if (picker === undefined) return {}',
+    to: 'return {}',
+  },
+  {
+    label: 'the README writes no in the row of a prop a one-of pair requires',
+    file: 'scripts/lib/readme.ts',
+    from: "if (row.oneOf === undefined && row.when === undefined) return 'no'",
+    to: "return 'no'",
+  },
+  {
+    label: 'the README says every prop is optional above a table with a one-of pair in it',
+    file: 'scripts/lib/readme-parts.ts',
+    from: 'else if (row.oneOf !== undefined || row.when !== undefined) {',
+    to: "else if (row.name === '') {",
+  },
+  {
     label: 'the README of a part family lists every schema prop under every part',
     file: 'scripts/lib/readme-types.ts',
     from: 'fromSchema.filter((row) => accepts.has(row.name))',
