@@ -71,13 +71,13 @@ describe('the pieces of a field made of more than one element', () => {
     ])
   })
 
-  it('gives a wrapper the type step of each size, so the em of --tc-input-width is the em of an Input of that size', () => {
+  it('gives a wrapper the type step of each size and the 16 px floor on touch at every size, so the em of --tc-input-width is the em of an Input of that size', () => {
     expect(FIELD_TEXT).toEqual({
       xs: 'text-xs pointer-coarse:text-[max(1rem,16px)]',
       sm: 'text-sm pointer-coarse:text-[max(1rem,16px)]',
       md: 'text-sm pointer-coarse:text-[max(1rem,16px)]',
-      lg: 'text-base',
-      xl: 'text-base',
+      lg: 'text-base pointer-coarse:text-[max(1rem,16px)]',
+      xl: 'text-base pointer-coarse:text-[max(1rem,16px)]',
       custom: '',
     })
   })

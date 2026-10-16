@@ -77,11 +77,11 @@ describe('each demo shows what its name says', () => {
     expect(out).toContain('>A step-by-step guide to moving every component to logical properties</span></li>')
   })
 
-  it('mixed-label puts two labels that start in English and go on in Arabic inside a narrow box', async () => {
+  it('mixed-label puts two labels that start in English and go on in Arabic inside a narrow box, in the page direction', async () => {
     const out = await load('mixed-label')
     expect(out).toMatch(/^<div class="[^"]*w-60[^"]*">/)
-    expect(out).toContain('<span dir="auto" class="truncate min-w-0">Release notes ملاحظات الإصدار لكل مكوّن في المكتبة</span></a>')
-    expect(out).toContain('<span dir="auto" aria-current="page" class="truncate min-w-0 text-body font-semibold">Logical properties')
+    expect(out).toContain('"><span class="truncate min-w-0">Release notes ملاحظات الإصدار لكل مكوّن في المكتبة</span></a>')
+    expect(out).toContain('<span aria-current="page" class="truncate min-w-0 text-body font-semibold">Logical properties')
   })
 
   it('rtl sets the direction, names the nav in Arabic and keeps the flipping caret', async () => {

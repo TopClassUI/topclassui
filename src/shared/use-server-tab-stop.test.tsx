@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 
-import { useServerTabStop } from './use-server-tab-stop.js'
+import { serveTabStopOn, useServerTabStop } from './use-server-tab-stop.js'
 
 /** An item of a roving list: the stop is spread first, as Tabs does, so the caller's props win. */
 function Item({ isStop, label }: { isStop: boolean; label: string }) {
@@ -41,6 +41,28 @@ describe('in the server render', () => {
     )
     expect(html.match(/tabindex="0"/g)).toEqual(['tabindex="0"'])
     expect(html).toContain('<button type="button" tabindex="0" data-item="">Pro</button>')
+  })
+})
+
+// SHARED-FORMS-4: with no item to open on, the server HTML had no tab stop, and hydration then moved the tab order.
+describe('serveTabStopOn', () => {
+  const V = ({ value }: { value: string, disabled?: boolean }) => <i>{value}</i>
+  const three = [<V key="a" value="a" disabled />, <div key="w"><><V value="b" /></></div>, <V key="c" value="c" />]
+
+  it('keeps the value the page opens on when an item has it, disabled or not', () => {
+    expect(serveTabStopOn(three, 'c')).toBe('c')
+    expect(serveTabStopOn(three, 'a')).toBe('a')
+  })
+
+  it('gives the first enabled item the stop when none is checked, or the value names no item, under any wrapper', () => {
+    expect(serveTabStopOn(three, null)).toBe('b')
+    expect(serveTabStopOn(three, 'stale')).toBe('b')
+  })
+
+  it('changes nothing when it sees no item, no item is enabled, or the group is disabled', () => {
+    expect(serveTabStopOn(<p>text</p>, null)).toBeNull()
+    expect(serveTabStopOn([<V key="a" value="a" disabled />], 'stale')).toBe('stale')
+    expect(serveTabStopOn(three, null, true)).toBeNull()
   })
 })
 

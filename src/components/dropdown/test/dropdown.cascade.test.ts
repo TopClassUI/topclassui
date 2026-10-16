@@ -62,8 +62,8 @@ describe('the order the cascade needs', () => {
     expect(await before('data-disabled:*:opacity-50', 'forced-colors:data-disabled:*:opacity-100')).toBe(true)
   })
 
-  it('the 44 px of a finger is emitted after the row height, and the grey of the system after the danger colour', async () => {
-    expect(await before('min-h-(--tc-row-height)', 'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]')).toBe(true)
+  it('the floor of a finger is emitted after the row height, and the grey of the system after the danger colour', async () => {
+    expect(await before('min-h-(--tc-row-height)', 'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]')).toBe(true)
     expect(await before('text-danger-on-soft', 'forced-colors:data-disabled:not-data-highlighted:text-[GrayText]')).toBe(true)
   })
 
@@ -74,9 +74,10 @@ describe('the order the cascade needs', () => {
 })
 
 describe('the tokens the menu reads are the ones the plan names', () => {
-  it('--tc-z-popup is 60, above a dialog at 50 and below a toast at 70', async () => {
+  it('--tc-z-popup is the one overlay layer, 60: a dialog and a drawer take it too, and a toast at 70 stays above', async () => {
     const sheet = await css
-    expect(sheet).toContain('--tc-z-dialog: 50;')
+    expect(sheet).toContain('--tc-z-drawer: var(--tc-z-popup);')
+    expect(sheet).toContain('--tc-z-dialog: var(--tc-z-popup);')
     expect(sheet).toContain('--tc-z-popup: 60;')
     expect(sheet).toContain('--tc-z-toast: 70;')
   })

@@ -45,6 +45,12 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
+    label: 'the banner dismiss x calls onDismiss after the banner has left, not while it is still in the page as the README says',
+    file: HOOK,
+    from: '      onDismiss?.()\n',
+    to: '      setTimeout(() => onDismiss?.())\n',
+  },
+  {
     label: 'the banner dismiss shell renders for a banner that is not dismissible, whenever it has an id',
     file: INDEX,
     from: 'if (dismissible && rest.id !== undefined) {',
@@ -103,5 +109,11 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/banner/types.ts',
     from: "    /** The key the dismissal is remembered under, and the element's id. Required with `dismissible`. */\n    id: string\n",
     to: "    /** The key the dismissal is remembered under, and the element's id. Required with `dismissible`. */\n    id?: string | undefined\n",
+  },
+  {
+    label: 'the banner dismiss type takes only a literal true, so a boolean decided at runtime is refused even with an id',
+    file: 'src/components/banner/types.ts',
+    from: '    dismissible: boolean\n',
+    to: '    dismissible: true\n',
   },
 ]

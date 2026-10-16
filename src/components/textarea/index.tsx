@@ -9,7 +9,7 @@ import type {} from '#shared/style-tokens.js'
 import { TEXTAREA_BOX, TEXTAREA_RESIZE, TEXTAREA_SIZE } from './classes.js'
 import { TextareaField } from './client.js'
 import { TEXTAREA_CAP_TYPE, TEXTAREA_DEFAULTS } from './constants.js'
-import { clampMaxRows, clampRows, estimateRows, joinIds } from './lib.js'
+import { clampCap, clampMaxRows, clampRows, estimateRows, joinIds } from './lib.js'
 import type { TextareaProps } from './types.js'
 
 /** A native textarea with the field look, which sends what is typed with no script at all. With
@@ -32,7 +32,7 @@ export function Textarea({
   const counterId = useId()
   const rows = clampRows(givenRows)
   const maxRows = clampMaxRows(givenMaxRows, rows)
-  const cap = resolveMaxLength(maxLength, TEXTAREA_CAP_TYPE) ?? null
+  const cap = clampCap(resolveMaxLength(maxLength, TEXTAREA_CAP_TYPE))
   const held = autosize || showCount
   const text = String(rest.value ?? rest.defaultValue ?? '')
 

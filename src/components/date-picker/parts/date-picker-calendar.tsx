@@ -33,7 +33,7 @@ export function DatePickerCalendar(props: DatePickerCalendarProps) {
           <button
             type="button"
             aria-label={calendar.labels.previous}
-            disabled={calendar.previous.disabled}
+            aria-disabled={calendar.previous.disabled ? true : undefined}
             onClick={calendar.previous.onClick}
             className={DATE_PICKER_NAV}
           >
@@ -43,7 +43,7 @@ export function DatePickerCalendar(props: DatePickerCalendarProps) {
           <button
             type="button"
             aria-label={calendar.labels.next}
-            disabled={calendar.next.disabled}
+            aria-disabled={calendar.next.disabled ? true : undefined}
             onClick={calendar.next.onClick}
             className={DATE_PICKER_NAV}
           >
@@ -70,6 +70,8 @@ export function DatePickerCalendar(props: DatePickerCalendarProps) {
                         tabIndex={day.active ? 0 : -1}
                         aria-label={day.label}
                         aria-current={day.today ? 'date' : undefined}
+                        // The focus is on the button, not the cell, so the button says it is the chosen day too.
+                        aria-pressed={day.selected}
                         aria-disabled={day.disabled ? true : undefined}
                         data-selected={day.selected ? '' : undefined}
                         onClick={() => { calendar.pick(day.iso ?? '') }}

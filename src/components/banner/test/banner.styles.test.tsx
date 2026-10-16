@@ -12,7 +12,7 @@ describe('each part wears exactly the classes the spec names', () => {
   it('the root is a full-width centred row that wraps, 20 px inline and 12 px block, in medium at the small step', () => {
     expect(classes().sort()).toEqual([
       'bg-primary-soft', 'flex', 'flex-wrap', 'font-medium', 'forced-colors:border-b-(length:--tc-line-width)',
-      'gap-3', 'items-center', 'px-5', 'py-3', 'text-primary-on-soft', 'text-sm', 'w-full', 'wrap-anywhere',
+      'gap-3', 'items-center', 'min-w-0', 'px-5', 'py-3', 'text-primary-on-soft', 'text-sm', 'w-full', 'wrap-anywhere',
     ])
   })
 
@@ -22,6 +22,10 @@ describe('each part wears exactly the classes the spec names', () => {
 
   it('has no radius and no border, because it spans the page; forced colours alone draw a bottom edge', () => {
     expect(classes().filter((c) => /(^|:)(rounded|border)/.test(c))).toEqual(['forced-colors:border-b-(length:--tc-line-width)'])
+  })
+
+  it('may shrink below its content, so a grid or flex track holding it is not widened to the action', () => {
+    expect(classes()).toContain('min-w-0')
   })
 
   it('breaks a word that has no space, so a URL stays inside the row', () => {

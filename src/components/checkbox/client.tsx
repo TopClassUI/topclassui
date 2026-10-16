@@ -22,11 +22,12 @@ export function Checkbox({
   onCheckedChange,
   inputRef,
   indeterminate,
+  uncheckedValue,
   className,
   'aria-invalid': ariaInvalid,
   ...rest
 }: CheckboxProps) {
-  const value = useCheckbox({ checked, defaultChecked, onCheckedChange, inputRef })
+  const value = useCheckbox({ checked, defaultChecked, onCheckedChange, inputRef, indeterminate, uncheckedValue })
   // The rest goes first, so the button, the controlled pair and the design attributes are never overwritten.
   return (
     <Base.Root
@@ -36,6 +37,7 @@ export function Checkbox({
       checked={value.checked}
       onCheckedChange={value.onCheckedChange}
       inputRef={value.inputRef}
+      uncheckedValue={value.uncheckedValue}
       indeterminate={indeterminate}
       // A Field passes aria-invalid itself, so it survives when `invalid` is off.
       aria-invalid={invalid ? true : ariaInvalid}

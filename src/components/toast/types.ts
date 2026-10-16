@@ -31,12 +31,18 @@ export interface ToastAction {
   onClick: () => void
 }
 
-/** What `toast.add` takes. Every key is optional; a toast with neither text is an empty box. */
+/** R-5.6-1: a toast is a dialog and its title is its name, so a title is never left out, null or a boolean. */
+export type ToastTitle = Exclude<ReactNode, null | undefined | boolean>
+
+/** What `toast.add` takes: a title, and every other key optional. */
 export type ToastOptions = ToastDesignProps & {
-  title?: ReactNode
+  title: ToastTitle
   description?: ReactNode
   action?: ToastAction | undefined
 }
+
+/** What `toast.update` takes: only the keys it changes, the title included. */
+export type ToastUpdate = Partial<ToastOptions>
 
 /** One step of `toast.promise`: a title, or the options. Its icon is the step's own, so it takes no tone. */
 export type ToastStep = string | Omit<ToastOptions, 'tone'>

@@ -117,3 +117,43 @@ describe('a reset brings it back to its default, on screen and in the form', () 
     expect(entries(formOf())).toEqual([['far', 'board']])
   })
 })
+
+// RG-2: Base UI picks its tab stop on the selected segment only on mount, and the APG puts it there.
+describe('after a value set from outside the track, the one tab stop is on the selected segment', () => {
+  const stops = () => screen.getAllByRole('radio').map((one) => one.getAttribute('tabindex'))
+
+  it('after a reset button, a reset to none selected, and a reset while the focus is inside', async () => {
+    render(inForm(<><View defaultValue="table" /><View name="none" defaultValue={undefined} /></>))
+    await userEvent.click(screen.getAllByRole('radio', { name: 'Calendar' })[0] as HTMLElement)
+    await userEvent.click(screen.getAllByRole('radio', { name: 'Table' })[1] as HTMLElement)
+    expect(stops()).toEqual(['-1', '-1', '0', '-1', '0', '-1'])
+    await userEvent.click(screen.getByRole('button', { name: 'Reset' }))
+    await settle()
+    expect(stops()).toEqual(['-1', '0', '-1', '0', '-1', '-1'])
+
+    const board = screen.getAllByRole('radio', { name: 'Board' })[0] as HTMLElement
+    await userEvent.click(board)
+    act(() => { formOf().reset() })
+    await settle()
+    expect(document.activeElement).toBe(board)
+  })
+
+  it('after its owner sets the value, and the ref still names the live track', async () => {
+    const ref = { current: null as HTMLDivElement | null }
+    function Owner() {
+      const [value, setValue] = useState('board')
+      return <><button type="button" onClick={() => { setValue('calendar') }}>Calendar, please</button><View ref={ref} value={value} onValueChange={setValue} /></>
+    }
+    render(inForm(<Owner />))
+    const track = screen.getByRole('radiogroup')
+    // A click that leaves the focus outside, on a value the track picked itself, remounts nothing.
+    act(() => { screen.getByRole('radio', { name: 'Table' }).click() })
+    expect(states()).toEqual(['false', 'true', 'false'])
+    expect(screen.getByRole('radiogroup')).toBe(track)
+    await userEvent.click(screen.getByRole('button', { name: 'Calendar, please' }))
+    expect(stops()).toEqual(['-1', '-1', '0'])
+    await userEvent.click(screen.getByRole('button', { name: 'Reset' }))
+    await settle()
+    expect(ref.current).toBe(screen.getByRole('radiogroup'))
+  })
+})

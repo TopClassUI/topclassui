@@ -38,7 +38,7 @@ export function AccordionItem({
   return (
     <Base.Item {...rest} className={cn(ACCORDION_ITEM, className)}>
       <Base.Header render={<Heading />}>
-        <Base.Trigger id={item.triggerId} className={ACCORDION_TRIGGER}>
+        <Base.Trigger id={item.triggerId} onClick={item.onClick} className={ACCORDION_TRIGGER}>
           <span className={ACCORDION_TITLE}>{title}</span>
           <span className={ACCORDION_CARET}><Svg icon={caretDown} flipRtl={false} /></span>
         </Base.Trigger>

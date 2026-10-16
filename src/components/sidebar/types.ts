@@ -58,10 +58,15 @@ interface SidebarLinkAsElement {
   href?: string | undefined
 }
 
+/** R-5.6-1: a plain anchor is named by its label, or by aria-label when it is an icon alone. An element names itself. */
+type SidebarLinkNamed =
+  | { children: ReactNode }
+  | { 'children'?: undefined, 'aria-label': string }
+
 /** Everything but the parts below reaches the link itself, not the list item around it. */
 export type SidebarLinkProps =
   Omit<ComponentPropsWithRef<'a'>, 'children' | 'href' | 'aria-current'>
-  & (SidebarLinkAsAnchor | SidebarLinkAsElement)
+  & (SidebarLinkAsElement | (SidebarLinkAsAnchor & SidebarLinkNamed))
   & Pick<SidebarDesignProps, 'current'>
   & {
     /** Drawn before the label, and all that is drawn while the rail is collapsed. Decorative: the label names the row. */

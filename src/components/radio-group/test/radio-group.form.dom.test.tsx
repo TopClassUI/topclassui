@@ -124,3 +124,50 @@ describe('a reset brings it back to its default, on screen and in the form', () 
     expect(entries(formOf())).toEqual([['far', 'free']])
   })
 })
+
+// RG-2: Base UI picks its tab stop on the checked radio only on mount, and the APG puts it there.
+describe('after a value set from outside the group, the one tab stop is on the checked radio', () => {
+  const stops = () => screen.getAllByRole('radio').map((one) => one.getAttribute('tabindex'))
+
+  it('after a reset button, a reset to none checked, and a reset while the focus is inside', async () => {
+    render(inForm(<Plan defaultValue="pro" />))
+    await userEvent.click(screen.getByRole('radio', { name: 'Free' }))
+    expect(stops()).toEqual(['0', '-1'])
+    await userEvent.click(screen.getByRole('button', { name: 'Reset' }))
+    await settle()
+    expect(stops()).toEqual(['-1', '0'])
+
+    await userEvent.click(screen.getByRole('radio', { name: 'Free' }))
+    act(() => { formOf().reset() })
+    await settle()
+    expect(document.activeElement).toBe(screen.getByRole('radio', { name: 'Free' }))
+  })
+
+  it('a group with no default goes back to its first radio', async () => {
+    render(inForm(<Plan />))
+    await userEvent.click(screen.getByRole('radio', { name: 'Pro' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Reset' }))
+    await settle()
+    expect(stops()).toEqual(['0', '-1'])
+  })
+
+  it('after its owner sets the value, and the ref still names the live group', async () => {
+    const ref = { current: null as HTMLDivElement | null }
+    function Owner() {
+      const [value, setValue] = useState('free')
+      return <><button type="button" onClick={() => { setValue('pro') }}>Pro, please</button><Plan ref={ref} value={value} onValueChange={setValue} /></>
+    }
+    render(inForm(<Owner />))
+    const group = screen.getByRole('radiogroup')
+    // A click on the text leaves the focus outside, and a value the group picked itself remounts nothing.
+    act(() => { screen.getByText('Pro').click() })
+    expect(states()).toEqual(['false', 'true'])
+    expect(screen.getByRole('radiogroup')).toBe(group)
+    act(() => { screen.getByText('Free').click() })
+    await userEvent.click(screen.getByRole('button', { name: 'Pro, please' }))
+    expect(stops()).toEqual(['-1', '0'])
+    await userEvent.click(screen.getByRole('button', { name: 'Reset' }))
+    await settle()
+    expect(ref.current).toBe(screen.getByRole('radiogroup'))
+  })
+})
