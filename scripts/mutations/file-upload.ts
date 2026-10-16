@@ -188,6 +188,12 @@ export const MUTATIONS: Mutation[] = [
     to: '<span>',
   },
   {
+    label: 'the file upload remove of a disabled upload looks enabled',
+    file: CLASSES,
+    from: '${HOVER.ghost} ${DISABLED}`',
+    to: '${HOVER.ghost}`',
+  },
+  {
     label: 'the file upload input has no title, so Chromium shows its own No file chosen over the zone',
     file: CLIENT,
     from: '          title=""\n',

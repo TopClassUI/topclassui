@@ -1,6 +1,6 @@
 // R-5.12-4: the class strings of the file upload, built from the shared constants (unit-5.md, FileUpload).
 import {
-  BORDER, BORDER_STRONG, FIELD_INVALID_WITHIN, FOCUS_RING_INSET, FOCUS_RING_WITHIN, HOVER, ICON_BUTTON, LABEL, ROW_TOUCH,
+  BORDER, BORDER_STRONG, DISABLED, FIELD_INVALID_WITHIN, FOCUS_RING_INSET, FOCUS_RING_WITHIN, HOVER, ICON_BUTTON, LABEL, ROW_TOUCH,
   SCROLL_AREA, TRANSITION,
 } from '#shared/classes.js'
 
@@ -37,8 +37,8 @@ export const FILE_UPLOAD_SIZE = 'shrink-0 text-xs text-muted tabular-nums'
 
 export const FILE_UPLOAD_REASON = 'shrink-0 text-xs text-danger-on-soft'
 
-/** The x: an icon button on the neutral ramp, as Popover's close. */
-export const FILE_UPLOAD_REMOVE = `${ICON_BUTTON} text-muted tone-neutral ${HOVER.ghost}`
+/** The x: an icon button on the neutral ramp, as Popover's close, dimmed with the upload when it is disabled. */
+export const FILE_UPLOAD_REMOVE = `${ICON_BUTTON} text-muted tone-neutral ${HOVER.ghost} ${DISABLED}`
 
 /** Out of the grid while empty, and still in the accessibility tree: a live region that is display none is not heard. */
 export const FILE_UPLOAD_MESSAGE = 'text-sm text-danger-on-soft empty:sr-only'
