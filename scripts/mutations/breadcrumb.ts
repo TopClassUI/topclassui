@@ -111,9 +111,15 @@ export const MUTATIONS: Mutation[] = [
     to: '{item.label.slice(0, max)}',
   },
   {
-    label: 'the breadcrumb current page loses dir="auto", so an English-first label in an RTL page is cut at its start',
+    label: 'the breadcrumb current page loses its dir, so an English-first label in an RTL page is cut at its start',
     file: 'src/components/breadcrumb/index.tsx',
-    from: '<span dir="auto" aria-current',
+    from: '<span dir={resolveLabelDir(item.label)} aria-current',
     to: '<span aria-current',
+  },
+  {
+    label: 'the breadcrumb current page takes dir="auto" again, so "Wi-Fi متصل" reads Wi-Fi last in an Arabic page',
+    file: 'src/components/breadcrumb/index.tsx',
+    from: '<span dir={resolveLabelDir(item.label)} aria-current',
+    to: '<span dir="auto" aria-current',
   },
 ]

@@ -607,7 +607,7 @@ test.describe('inside the viewport', () => {
     })
     // max-w-100, the screen less two insets, rounded-box, the line, shadow-lg, wrap-anywhere, --tc-z-dialog, --tc-overlay-inset.
     expect(styles).toEqual({
-      maxWidth: '400px', maxHeight: '688px', radius: '12px', line: '1px', raised: true, wrap: 'anywhere', layer: '50 50',
+      maxWidth: '400px', maxHeight: '688px', radius: '12px', line: '1px', raised: true, wrap: 'anywhere', layer: '60 60',
       inset: '16px', scrim: true, fixed: 'fixed fixed',
     })
   })
@@ -658,6 +658,26 @@ test.describe('a screen under 272 px tall', () => {
     expect(parts.footer.bottom).toBe(parts.popup.bottom - 1)
     expect(await popup.evaluate((el) => el.scrollHeight - el.clientHeight)).toBe(0)
   })
+})
+
+// DIALOG-1. Text zoom grows the bars but not the rem of a media query, so the rule is a container query on the viewport.
+test.describe('the root at 32 px', () => {
+  for (const [width, height, short] of [[844, 390, true], [568, 320, true], [320, 480, true], [390, 844, false]] as const) {
+    test(`${String(width)} x ${String(height)}: ${short ? 'the popup' : 'the body'} is the one scroller, and a wheel over the popup reaches the last action`, async ({ page }) => {
+      await page.setViewportSize({ width, height })
+      await openLive(page, 'dialog--long-body')
+      await page.addStyleTag({ content: 'html { font-size: 32px !important }' })
+      const popup = await openOverlay(page, triggerOf(page, 'Read the terms'))
+      await expect(bodyOf(popup)).toHaveCSS('overflow-y', short ? 'visible' : 'auto')
+      expect(await scrollersOf(popup), 'boxes that scroll').toBe(1)
+
+      const frame = await boxOf(popup)
+      for (let turn = 0; turn < 30; turn++) await wheelAt(page, frame.left + frame.width / 2, frame.top + frame.height / 2, 1000)
+      const parts = await partsOf(popup)
+      expect(parts.footer.bottom, 'the end of the footer, against the end of the popup').toBe(parts.popup.bottom - 1)
+      await expectNoSidewaysScroll(page)
+    })
+  }
 })
 
 test.describe('each value of modal', () => {
@@ -1078,4 +1098,32 @@ test.describe('motion', () => {
       await expect(page.locator('[role="dialog"][data-open]')).toHaveCSS('opacity', '1')
     })
   })
+})
+
+// The wrap of the footer is for its actions: a Badge, a Tag, a Spinner or a Progress writes data-size too.
+test.describe('what a footer holds besides its actions', () => {
+  const heightsOf = (scope: Locator): Promise<Record<string, string>> => scope.locator('[data-kind]').evaluateAll(
+    // The computed height and not the box: a turning spinner's box is as tall as its diagonal.
+    (all) => Object.fromEntries(all.map((el) => [el.getAttribute('data-kind') ?? '', getComputedStyle(el).height])),
+  )
+
+  for (const coarse of [false, true]) {
+    test.describe(coarse ? 'under a finger' : 'under a mouse', () => {
+      test.use(coarse ? { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } : {})
+
+      test('keeps the height it has on the page, and only a Button grows to the floor of its size', async ({ page }) => {
+        await openLive(page, 'separator--horizontal')
+        await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/dialog-footer-kinds.tsx' })
+        const trigger = page.locator('#footer-kinds button').filter({ hasText: 'Footer' })
+        await expect(trigger).toBeVisible()
+        const alone = await heightsOf(page.locator('#footer-kinds'))
+        const popup = await openOverlay(page, trigger, { by: 'keyboard' })
+        const footer = popup.locator('[data-kind="badge"]').locator('..')
+        const inside = await heightsOf(footer)
+        expect(Object.keys(inside).sort()).toEqual(['badge', 'button', 'progress', 'spinner', 'tag'])
+        for (const kind of ['badge', 'tag', 'spinner', 'progress']) expect(inside[kind], kind).toBe(alone[kind])
+        await expect(footer.locator('[data-kind="button"]')).toHaveCSS('min-height', coarse ? '44px' : '40px')
+      })
+    })
+  }
 })
