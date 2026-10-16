@@ -40,17 +40,25 @@ In Next.js, pass the framework link as `render`:
   `NavbarLink` passes them to the link.
 - **`render`.** On `NavbarBrand` and `NavbarLink`. An element only, never a function.
 - **The page being read.** `current` on one `NavbarLink` sets `aria-current="page"`. The
-  link is heavier and darker, and underlined too under forced colours.
+  link is heavier and darker, and underlined too under forced colours. On a narrow screen
+  the list opens scrolled to it, so the mark is in view; a browser without
+  `scroll-initial-target` opens the list at its start.
 - **Sticky.** On by default. `sticky={false}` lets the bar scroll away, and then it sends
   no JavaScript to the browser.
 - **What sticky does.** One small client part writes the height of the bar to
   `--tc-sticky-top` on `<html>`. The tokens file reads it into `scroll-padding`, so an
   `#anchor` target, or a link that Tab reaches, stops below the bar and not under it. It
   follows the bar when the bar wraps, and it is removed when the bar unmounts.
-- **Before the script runs** the variable is `0px`. A page opened at `/docs#install` lands
-  with that heading under the bar (60 px under, measured) and stays there until the reader
-  follows another link. To avoid it, give the height in your own CSS:
-  `:root { --tc-sticky-top: 3.75rem }`. The bar replaces it with the measured value.
+- **A bar too tall for the screen.** Past a third of the screen's height, as with text at
+  200 % on a phone (three rows, 321 px of 480), the bar scrolls away with the page and
+  writes `0px`. It sticks again when the screen has room, turned or resized.
+- **A page opened at `/docs#install`.** The browser scrolls before the script has written
+  the height, so the heading starts under the bar. Once the height is written the bar brings
+  it to its foot, unless the reader has scrolled since.
+- **Without script** the variable stays `0px` and the heading stays under the bar. Give a
+  height in your own CSS: `:root { --tc-sticky-top: 3.75rem }` is one row. On a phone the bar
+  wraps to two rows, 85 px (`5.3125rem`), so give that below the width where yours wraps.
+  The bar replaces either with the measured value.
 - **One sticky bar a page.** Two would write the same variable: give the second one
   `sticky={false}`.
 - **A page that scrolls inside a box.** The window reads the variable by itself. A box of

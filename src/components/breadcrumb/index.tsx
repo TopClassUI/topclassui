@@ -3,7 +3,7 @@ import { caretRight } from '#icons/data/caret-right.js'
 import { cn } from '#shared/cn.js'
 import { en } from '#shared/labels/en.js'
 import { renderLink } from '#shared/link.js'
-import { cutLabel, truncateLabel } from '#shared/truncate-label.js'
+import { cutLabel, resolveLabelDir, truncateLabel } from '#shared/truncate-label.js'
 import { Svg } from '#components/svg/index.js'
 import { BREADCRUMB_BOUNDARIES } from './boundaries.js'
 import { CURRENT, ITEM, LINK, LIST, ROOT, TEXT } from './classes.js'
@@ -47,7 +47,7 @@ export function Breadcrumb({
               {/* Svg hides an unlabelled icon and flips a directional one under dir="rtl". */}
               {index === 0 ? null : <Svg icon={caretRight} />}
               {item.href === undefined ? (
-                <span dir="auto" aria-current={current ? 'page' : undefined} className={current ? CURRENT : TEXT}>
+                <span dir={resolveLabelDir(item.label)} aria-current={current ? 'page' : undefined} className={current ? CURRENT : TEXT}>
                   {cutLabel(item.label, max)}
                 </span>
               ) : renderLink('Breadcrumb', link, item.href, { className: LINK, children: truncateLabel(item.label, max) })}

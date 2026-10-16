@@ -942,6 +942,53 @@ test.describe('content no demo should show', () => {
   })
 })
 
+/** Runs in the page: a label's direction, whether its first character is painted inside its box, and at which side. */
+const startOf = (label: Locator) => label.evaluate((element) => {
+  const box = element.getBoundingClientRect()
+  const text = element.firstChild
+  if (!text) throw new Error('the label holds no text')
+  const range = document.createRange()
+  range.setStart(text, 0)
+  range.setEnd(text, 1)
+  const first = range.getBoundingClientRect()
+  return {
+    direction: getComputedStyle(element).direction,
+    firstShown: first.left >= box.left - 0.5 && first.right <= box.right + 0.5,
+    firstAt: box.right - first.right < first.left - box.left ? 'right' : 'left',
+  }
+})
+
+test.describe('a label in the other script, or in two', () => {
+  for (const direction of DIRECTIONS) {
+    test(`${direction} page: an English title, group label and link keep their start; a label in two scripts reads in the page direction`, async ({ page }) => {
+      await openFixture(page, { direction })
+      const rail = page.locator('#cut-rail')
+      const english = { direction: 'ltr', firstShown: true, firstAt: 'left' }
+      expect(await startOf(headerOf(rail).locator('span')), 'the title').toEqual(english)
+      expect(await startOf(rail.locator('p').first()), 'the group label').toEqual(english)
+      expect(await startOf(page.locator('#cut-sentence > span').last()), 'the link').toEqual(english)
+      // "Wi-Fi متصل ...": in an Arabic page Wi-Fi is on the right, read first; dir="auto" would put it on the left.
+      expect(await startOf(page.locator('#cut-mixed > span').last()), 'the label in two scripts')
+        .toEqual({ direction, firstShown: true, firstAt: direction === 'rtl' ? 'right' : 'left' })
+    })
+
+    test(`${direction} page: a short English group label sits at the start of the rail, where its rows begin`, async ({ page }) => {
+      await openFixture(page, { direction })
+      const group = page.locator('#cut-short')
+      const [label, list] = [await boxOf(group.locator('p')), await boxOf(group.locator('ul'))]
+      expect(label.width).toBeLessThan(list.width / 2)
+      expect(direction === 'rtl' ? list.right - label.right : label.left - list.left).toBe(0)
+    })
+  }
+
+  test('a label whose 100th unit is half an emoji is cut before the emoji, and its name holds no half of one', async ({ page }) => {
+    await openFixture(page)
+    const name = await page.locator('#cut-emoji').textContent()
+    expect(name).toBe('a'.repeat(99))
+    await expect(page.getByRole('link', { name: 'a'.repeat(99), exact: true })).toHaveAttribute('href', '#cut-emoji')
+  })
+})
+
 test.describe('direction', () => {
   /** Where the 1 px line of a rail is painted, and where its toggle, its first icon and its first label start. */
   const layoutOf = async (page: Page, rail: Locator) => {
@@ -1297,6 +1344,58 @@ test.describe('text that is made larger or spaced out', () => {
       expect(spills).toHaveLength(9)
       expect(spills.filter((spill) => spill > 0.5)).toEqual([])
     })
+  }
+
+  // The rail gives way to its parent at a 32 px root; a column beside it must give way too, by going under it.
+  for (const { width, page: room, rail: railWidth } of [{ width: 320, page: 305, rail: 177 }, { width: 390, page: 375, rail: 247 }]) {
+    for (const direction of DIRECTIONS) {
+      test(`${String(width)} px ${direction} with the root at 32 px: the controlled demo's button goes under the rail, whole on the page, expanded and collapsed`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 480 })
+        await openLive(page, 'sidebar--controlled', { direction })
+        await page.addStyleTag({ content: 'html { font-size: 32px !important }' })
+        const rail = railOf(page)
+        expect(await page.evaluate(() => document.body.clientWidth)).toBe(room)
+        for (const [name, expected] of [['Hide the labels', railWidth], ['Show the labels', 120]] as const) {
+          const button = page.getByRole('button', { name })
+          expect(await widthOf(rail)).toBe(expected)
+          const [frame, box] = [await boxOf(rail), await boxOf(button)]
+          expect(box.top, `"${name}" starts under the rail`).toBeGreaterThanOrEqual(frame.bottom)
+          expect([box.left >= 0, box.right <= room], `"${name}" is whole between the edges of the page`).toEqual([true, true])
+          await expectNoSidewaysScroll(page)
+          await button.click()
+        }
+      })
+
+      test(`${String(width)} px ${direction} with the root at 32 px: in a layout the column stays beside the rail, whole on the page, and the page does not scroll sideways`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 480 })
+        await openLive(page, 'sidebar--in-a-layout', { direction })
+        await page.addStyleTag({ content: 'html { font-size: 32px !important }' })
+        const column = await boxOf(page.locator('#demo nav + div'))
+        expect([column.left >= 0, column.right <= room], 'the column is whole between the edges of the page').toEqual([true, true])
+        await expectNoSidewaysScroll(page)
+        expect(await faultsOf(railOf(page))).toEqual([])
+      })
+    }
+  }
+})
+
+// A mouse keeps the page's scrollbar gutter, 15 px that isMobile has not: 320 px is the reflow width of WCAG 1.4.10.
+test.describe('a mouse at 320 x 480, with the scrollbar gutter', () => {
+  test.use({ viewport: { width: 320, height: 480 } })
+
+  for (const demo of Object.keys(SIDEBARS)) {
+    for (const direction of DIRECTIONS) {
+      test(`${demo} ${direction}: the page does not scroll sideways, expanded or collapsed`, async ({ page }) => {
+        await openLive(page, demo, { direction })
+        const rail = railOf(page)
+        expect(await page.evaluate(() => document.body.clientWidth), 'px of page beside the gutter').toBe(305)
+        for (let press = 0; press < 2; press++) {
+          await expectNoSidewaysScroll(page)
+          expect(await faultsOf(rail)).toEqual([])
+          await triggerOf(rail).click()
+        }
+      })
+    }
   }
 })
 

@@ -86,14 +86,25 @@ async function tapField(tree: ReactNode) {
 }
 
 // Base UI's viewport reads the provider: around the children of the popup alone, the viewport never hears of it.
-describe('a bottom sheet is wrapped in Base UI’s keyboard provider, around its viewport', () => {
-  it('a tap on a field of a bottom sheet is taken by the provider, which focuses the field and clicks it itself', async () => {
-    expect(await tapField(sheet({ placement: 'bottom' }))).toEqual({ clicks: 1, focused: true })
-  })
-
-  for (const placement of ['start', 'end', 'top'] as const) {
-    it(`a ${placement} sheet has no provider: the tap is left to the browser`, async () => {
-      expect(await tapField(sheet({ placement }))).toEqual({ clicks: 0, focused: false })
+describe('every sheet is wrapped in Base UI’s keyboard provider, around its viewport', () => {
+  for (const placement of ['bottom', 'start', 'end', 'top'] as const) {
+    it(`a tap on a field of a ${placement} sheet is taken by the provider, which focuses the field and clicks it itself`, async () => {
+      expect(await tapField(sheet({ placement }))).toEqual({ clicks: 1, focused: true })
     })
   }
+})
+
+// A side sheet on a desktop and a bottom sheet on a phone: an app moves an open sheet across its breakpoint.
+describe('a placement changed while the sheet is open keeps the sheet', () => {
+  it('bottom, end, start, top and bottom again: the same popup, with the text typed in its field', async () => {
+    const view = render(ltr(sheet({ placement: 'bottom' })))
+    const popup = await screen.findByRole('dialog')
+    fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'half a sentence' } })
+    for (const placement of ['end', 'start', 'top', 'bottom'] as const) {
+      view.rerender(ltr(sheet({ placement })))
+      expect(screen.getByRole('dialog')).toBe(popup)
+      expect(popup.getAttribute('data-placement')).toBe(placement)
+      expect(screen.getByLabelText('Name')).toHaveProperty('value', 'half a sentence')
+    }
+  })
 })

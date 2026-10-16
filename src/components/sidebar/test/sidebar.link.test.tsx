@@ -20,7 +20,7 @@ function Link({ href, children, ...rest }: { href: string, children?: ReactNode,
 describe('SidebarGroup on the server', () => {
   it('is a div holding a paragraph and the list it names, through an id React makes', () => {
     const html = markup(<SidebarGroup label="Workspace"><li>Row</li></SidebarGroup>)
-    expect(html).toMatch(/^<div class="[^"]*"><p id="[^"]+" class="[^"]*">Workspace<\/p><ul role="list" aria-labelledby="[^"]+" class="[^"]*"><li>Row<\/li><\/ul><\/div>$/)
+    expect(html).toMatch(/^<div class="[^"]*"><p id="[^"]+" dir="auto" class="[^"]*">Workspace<\/p><ul role="list" aria-labelledby="[^"]+" class="[^"]*"><li>Row<\/li><\/ul><\/div>$/)
     expect(attr(tag(html, 'ul'), 'aria-labelledby')).toBe(attr(tag(html, 'p'), 'id'))
     expect(attr(tag(html, 'p'), 'id')?.length).toBeGreaterThan(1)
   })
@@ -65,7 +65,7 @@ describe('SidebarLink on the server', () => {
     markup(<SidebarLink href="/home" icon={icon} {...props}>{label}</SidebarLink>)
 
   it('is a list item around a real link: the icon in a span, then the label in a span of its own', () => {
-    expect(row()).toMatch(/^<li><a class="[^"]*" href="\/home"><span class="[^"]*"><svg [^>]*><path [^>]*><\/path><\/svg><\/span><span class="[^"]*">Home<\/span><\/a><\/li>$/)
+    expect(row()).toMatch(/^<li><a class="[^"]*" href="\/home"><span class="[^"]*"><svg [^>]*><path [^>]*><\/path><\/svg><\/span><span dir="auto" class="[^"]*">Home<\/span><\/a><\/li>$/)
   })
 
   it('the list item carries nothing: every prop goes to the link', () => {
@@ -94,7 +94,7 @@ describe('SidebarLink on the server', () => {
   })
 
   it('with no icon it writes no wrapper for one, and with no label no span for one', () => {
-    expect(markup(<SidebarLink href="/home">Home</SidebarLink>)).toMatch(/^<li><a class="[^"]*" href="\/home"><span class="[^"]*">Home<\/span><\/a><\/li>$/)
+    expect(markup(<SidebarLink href="/home">Home</SidebarLink>)).toMatch(/^<li><a class="[^"]*" href="\/home"><span dir="auto" class="[^"]*">Home<\/span><\/a><\/li>$/)
     expect(markup(<SidebarLink href="/home" icon={false}>Home</SidebarLink>).match(/<span/g)).toHaveLength(1)
     expect(markup(<SidebarLink href="/home" icon={icon} aria-label="Home" />)).toMatch(/^<li><a class="[^"]*" href="\/home" aria-label="Home"><span class="[^"]*"><svg [^>]*><path [^>]*><\/path><\/svg><\/span><\/a><\/li>$/)
   })
@@ -114,12 +114,12 @@ describe('SidebarLink on the server', () => {
 describe('SidebarLink with render (R-5.7-4)', () => {
   it('renders the element it was given, with the href and the attributes that element was written with', () => {
     const html = markup(<SidebarLink render={<Link href="/docs" />} icon={icon} current>Docs</SidebarLink>)
-    expect(html).toMatch(/^<li><a href="\/docs" data-framework="" class="[^"]*" aria-current="page"><span class="[^"]*"><svg [^>]*><path [^>]*><\/path><\/svg><\/span><span class="[^"]*">Docs<\/span><\/a><\/li>$/)
+    expect(html).toMatch(/^<li><a href="\/docs" data-framework="" class="[^"]*" aria-current="page"><span class="[^"]*"><svg [^>]*><path [^>]*><\/path><\/svg><\/span><span dir="auto" class="[^"]*">Docs<\/span><\/a><\/li>$/)
   })
 
   it('an element written with its own children keeps them, inside the label that can hide, with the icon before it', () => {
     const html = markup(<SidebarLink render={<Link href="/docs">Docs</Link>} icon={icon} />)
-    expect(html).toMatch(/<\/svg><\/span><span class="[^"]*">Docs<\/span><\/a><\/li>$/)
+    expect(html).toMatch(/<\/svg><\/span><span dir="auto" class="[^"]*">Docs<\/span><\/a><\/li>$/)
     expect(html.match(/<span/g)).toHaveLength(2)
   })
 
@@ -140,5 +140,26 @@ describe('SidebarLink with render (R-5.7-4)', () => {
   it('throws on a render that is not an element, in the words of renderElement', () => {
     expect(() => markup(<SidebarLink render={'a' as never}>Docs</SidebarLink>)).toThrow('render must be an element')
     expect(() => markup(<SidebarLink render={<></>}>Docs</SidebarLink>)).toThrow('not a fragment')
+  })
+})
+
+describe('the label, the title and the group label take their own direction only when written in one', () => {
+  const html = markup(
+    <SidebarGroup label="Settings">
+      <SidebarLink href="/a" icon={icon}>Projects</SidebarLink>
+      <SidebarLink href="/b" icon={icon}>Wi-Fi متصل</SidebarLink>
+      <SidebarLink href="/c" icon={icon}><strong>Bold</strong> label</SidebarLink>
+    </SidebarGroup>,
+  )
+
+  it('an English group label and link label in an Arabic rail carry dir="auto", so a cut one keeps its start', () => {
+    expect(html).toMatch(/<p id="[^"]+" dir="auto" class="[^"]*">Settings<\/p>/)
+    expect(html).toMatch(/<span dir="auto" class="[^"]*">Projects<\/span>/)
+  })
+
+  it('a label in two scripts, or one that holds an element, carries no dir and follows the rail', () => {
+    expect(html).toMatch(/<\/span><span class="[^"]*">Wi-Fi متصل<\/span>/)
+    expect(html).toMatch(/<\/span><span class="[^"]*"><strong>Bold<\/strong> label<\/span>/)
+    expect(markup(<SidebarGroup label="Wi-Fi متصل" />)).toMatch(/<p id="[^"]+" class="[^"]*">Wi-Fi متصل<\/p>/)
   })
 })
