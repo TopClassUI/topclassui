@@ -28,8 +28,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the segmented control puts its server tab stop on the default alone, so a controlled track serves it on the wrong segment',
     file: HOOK,
-    from: 'useState(() => value ?? defaultValue ?? null)',
-    to: 'useState(() => defaultValue ?? null)',
+    from: 'serveTabStopOn(children, value ?? defaultValue ?? null, disabled)',
+    to: 'serveTabStopOn(children, defaultValue ?? null, disabled)',
   },
   {
     label: 'the segmented control hands Base UI defaultValue again, so a form reset leaves it as it was while the form sends the default',

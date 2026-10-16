@@ -15,8 +15,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the radio group puts its server tab stop on the default alone, so a controlled group serves it on the wrong radio',
     file: HOOK,
-    from: 'useState(() => value ?? defaultValue ?? null)',
-    to: 'useState(() => defaultValue ?? null)',
+    from: 'serveTabStopOn(children, value ?? defaultValue ?? null, disabled)',
+    to: 'serveTabStopOn(children, defaultValue ?? null, disabled)',
   },
   {
     label: 'the radio group hands Base UI defaultValue again, so a form reset leaves it as it was while the form sends the default',
