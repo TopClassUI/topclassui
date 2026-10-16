@@ -31,8 +31,9 @@ transparent: the img stays, so its `alt` still names the avatar, and the fallbac
 new `src` starts again. Before hydration the browser's broken mark shows in the corner, and
 the alt text is never drawn. Your own `onError` and `ref` still reach the img.
 
-**What it costs.** An avatar of initials or an icon stays server HTML and ships no
-JavaScript. Every avatar with an image hydrates: a table of fifty rows with pictures is fifty
+**What it costs.** An avatar of initials or an icon stays server HTML, with no client part.
+The avatar re-exports `AvatarImage`, so a page that imports it may still load that one small
+file. Every avatar with an image hydrates: a table of fifty rows with pictures is fifty
 client parts.
 
 **A picture with transparency.** The initials show through it. Leave `AvatarFallback` out, or
