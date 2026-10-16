@@ -5,7 +5,8 @@ import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 
 import { hasUseClient, importedModules, importedNames } from '../../../../scripts/lib/source-checks.js'
-import { DRAWER_MOTION, DRAWER_POPUP } from '../classes.js'
+import { SLIDE_MOTION } from '#shared/classes.js'
+import { DRAWER_POPUP } from '../classes.js'
 
 const FOLDER = join(import.meta.dirname, '..')
 const read = (file: string) => readFileSync(join(FOLDER, file), 'utf8')
@@ -88,21 +89,22 @@ describe('lib.ts is pure (R-5.12-1)', () => {
 describe('classes.ts builds every string from the shared constants (R-5.2-4)', () => {
   const source = read('classes.ts')
 
-  it('takes the scrim, the fade, the rings, the x, the scroll area and the action wrap from src/shared', () => {
+  it('takes the scrim, the fade, the slide, the rings, the x, the scroll area and the action wrap from src/shared', () => {
     expect(importedNames(source, '#shared/classes.js')).toEqual([
       'ACTIONS_WRAP', 'FADE_MOTION', 'FOCUS_RING_INSET', 'FORCED_EDGE', 'HOVER', 'ICON_BUTTON', 'SCRIM', 'SCROLL_AREA',
+      'SLIDE_MOTION',
     ])
     expect(source).not.toContain('whitespace-normal')
     expect(source).not.toContain('pointer-events-')
   })
 
   // Measured in e2e/drawer.spec.ts: on the translate property the sheet ran twice as far as the finger.
-  it('does not wear SLIDE_MOTION, and moves the sheet by transform, the property Base UI moves it by', () => {
+  it('wears SLIDE_MOTION, and moves the sheet by transform, the property Base UI moves it by', () => {
     const worn = DRAWER_POPUP.split(' ')
     expect(worn).not.toContain('data-swiping:transition-none')
     expect(worn.filter((cls) => cls.includes('translate-x-') || cls.includes('translate-y-') || cls.startsWith('transition-['))).toEqual([])
     expect(worn.filter((cls) => cls.startsWith('transition-') || cls.startsWith('duration-') || cls.startsWith('ease-')))
       .toEqual(['transition-transform', 'duration-(--tc-duration-slow)', 'ease-out'])
-    expect(DRAWER_MOTION).toBe('transition-transform duration-(--tc-duration-slow) ease-out')
+    expect(DRAWER_POPUP).toContain(SLIDE_MOTION)
   })
 })

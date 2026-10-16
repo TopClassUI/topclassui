@@ -2,5 +2,6 @@
 export { ToastViewport } from './client.js'
 export { toast } from './lib.js'
 export type {
-  ToastAction, ToastDesignProps, ToastOptions, ToastPlacement, ToastPromiseSteps, ToastStep, ToastTone, ToastViewportProps,
+  ToastAction, ToastDesignProps, ToastOptions, ToastPlacement, ToastPromiseSteps, ToastStep, ToastTitle, ToastTone, ToastUpdate,
+  ToastViewportProps,
 } from './types.js'

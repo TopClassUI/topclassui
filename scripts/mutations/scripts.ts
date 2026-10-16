@@ -21,6 +21,12 @@ export const MUTATIONS: Mutation[] = [
     to: '    return contrastRange(a, b).max',
   },
   {
+    label: 'the contrast sweep stops measuring the ring on a tint, where a highlighted row of a menu draws it',
+    file: 'scripts/lib/contrast-checks.ts',
+    from: "      check(`${mode}: ring on the ${tone} tint`, soft && ring && worst(ring, soft), 3)\n",
+    to: '',
+  },
+  {
     label: 'the import graph stops walking past the first hop',
     file: 'scripts/lib/module-graph.ts',
     from: '      for (const edge of edges.get(next) ?? []) queue.push(edge)',
@@ -91,5 +97,17 @@ export const MUTATIONS: Mutation[] = [
     file: 'scripts/lib/source-checks.ts',
     from: "return [...source.matchAll(re)].map((m) => m[1] ?? '')",
     to: 'return []',
+  },
+  {
+    label: 'the mutation runner judges a run that was killed or ran out of buffer',
+    file: 'scripts/lib/mutate.ts',
+    from: '  if (run.error || run.status === null) {',
+    to: '  if (run.error) {',
+  },
+  {
+    label: 'the mutation runner counts any failed run as a caught mutant, a crash included',
+    file: 'scripts/lib/mutate.ts',
+    from: '  if (/^\\s*Test(?: Files|s)\\s+\\d+ failed/m.test(output)) return true',
+    to: '  return true',
   },
 ]

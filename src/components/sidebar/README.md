@@ -12,7 +12,7 @@ For the links of an app, in a rail beside the page that collapses to a column of
 Every link is in the HTML the server sends; only the rail and its toggle run in the browser.
 
 ```ts
-import { SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoot } from 'topclassui'
+import { Icon, SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoot } from 'topclassui'
 ```
 
 ```tsx
@@ -74,7 +74,8 @@ import { SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoot } fr
 | `SidebarBody` | children | The groups. It is the part that scrolls. |
 | `SidebarGroup` | `label` | The heading of the group, which names its list. |
 | `SidebarLink` | `href` or `render` | Where the row goes. One of the two is required. |
-| `SidebarLink` | `icon`, `current`, children | The icon, the current page, the label. |
+| `SidebarLink` | children or `aria-label` | The name of the row. An `href` link needs one; a `render` element may carry its own text. |
+| `SidebarLink` | `icon`, `current` | The icon, the current page. |
 
 ### Not built
 
