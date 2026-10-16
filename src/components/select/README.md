@@ -117,13 +117,14 @@ import { Select } from 'topclassui'
 
 ## Props
 
-Required: `items`. Every other prop below is optional.
+Required: `items`, `aria-label` or `aria-labelledby` or `id`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
 | `items` | **yes** | `readonly ListOption[]` | - | Plain data, so a Server Component can render a Select: one option per row, in order. |
-| `aria-label` | no | `string` | - | The name read out when no visible label names the control. |
-| `aria-labelledby` | no | `string` | - | The id of the visible text that names the control. |
+| `aria-label` | **yes**, or `aria-labelledby` or `id` | `string` | - | The name read out when no visible label names the control. |
+| `aria-labelledby` | **yes**, or `aria-label` or `id` | `string` | - | The id of the visible text that names the control. |
+| `id` | **yes**, or `aria-label` or `aria-labelledby` | `string` | - | The id a `<label htmlFor>` points at. |
 | `className` | no | `string` | - | On the trigger, merged last, so a consumer class wins a conflict with its own. |
 | `container` | no | `Base.Portal.Props['container']` | - | Where the list mounts; `<body>` by default. |
 | `fullWidth` | no | `boolean` | `false` | Select: the box fills the width of its parent instead of taking the width of an Input. |

@@ -119,19 +119,19 @@ import { DatePicker } from 'topclassui'
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `aria-label` or `aria-labelledby` or `id`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `aria-label` | no | `string` | - | The name read out when no visible label names the control. |
-| `aria-labelledby` | no | `string` | - | The id of the visible text that names the control. |
+| `aria-label` | **yes**, or `aria-labelledby` or `id` | `string` | - | The name read out when no visible label names the control. |
+| `aria-labelledby` | **yes**, or `aria-label` or `id` | `string` | - | The id of the visible text that names the control. |
+| `id` | **yes**, or `aria-label` or `aria-labelledby` | `string` | - | The id a `<label htmlFor>` points at. |
 | `className` | no | `string` | - | On the trigger, merged last, so a consumer class wins a conflict with its own. |
 | `container` | no | `Base.Portal.Props['container']` | - | Where the calendar mounts; `<body>` by default. |
 | `defaultValue` | no | `string \| null` | - | The day of the first render, and the one a form reset brings back. |
 | `firstDayOfWeek` | no | `number`, min 1, max 7 | - | DatePicker: the first column, 1 (Monday) to 7 (Sunday), rounded and clamped; left out, the locale's. |
 | `form` | no | `string` | - | The id of a form elsewhere on the page that the form input belongs to. |
 | `fullWidth` | no | `boolean` | `false` | DatePicker: the box fills the width of its parent instead of taking the width of an Input. |
-| `id` | no | `string` | - | The id a `<label htmlFor>` points at. |
 | `invalid` | no | `boolean` | `false` | DatePicker: marks the date as wrong: sets aria-invalid on the trigger, whose line turns to danger and thickens. |
 | `maxDate` | no | `string` | `"9999-12-31"` | DatePicker: the last day that can be chosen, clamped like minDate and raised to it when below. |
 | `minDate` | no | `string` | `"0001-01-01"` | DatePicker: the first day that can be chosen, an ISO date clamped to 0001-01-01 to 9999-12-31. |
