@@ -13,6 +13,12 @@ export function clampMaxRows(maxRows: number, rows: number): number {
   return Math.max(clamp(Math.round(maxRows), TEXTAREA_BOUNDARIES.maxRowsMin, TEXTAREA_BOUNDARIES.maxRowsMax), rows)
 }
 
+/** R-5.7-7: the resolved cap as a whole number the browser keeps, or null for none. A fraction rounds down. */
+export function clampCap(cap: number | undefined): number | null {
+  if (cap === undefined) return null
+  return clamp(Math.floor(cap), TEXTAREA_BOUNDARIES.maxLengthMin, TEXTAREA_BOUNDARIES.maxLengthMax)
+}
+
 /** The server cannot measure a wrapped line: a row per line break, clamped. */
 export function estimateRows(text: string, rows: number, maxRows: number): number {
   return clamp(text.split('\n').length, rows, maxRows)

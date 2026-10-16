@@ -35,6 +35,13 @@ describe('the counter', () => {
     expect(field.hasAttribute('aria-invalid')).toBe(false)
   })
 
+  it('counts against the clamped cap the browser holds: -1 is 0 and 2.5 is 2, so neither is drawn in danger', () => {
+    render(<><Textarea aria-label="Neg" showCount maxLength={-1} /><Textarea aria-label="Frac" showCount maxLength={2.5} defaultValue="ab" /></>)
+    const [neg, frac] = [screen.getByRole('textbox', { name: 'Neg' }), screen.getByRole('textbox', { name: 'Frac' })]
+    expect([neg.getAttribute('maxlength'), counterOf(neg)]).toEqual(['0', { seen: '0 / 0', read: '0 of 0 characters', state: 'at' }])
+    expect([frac.getAttribute('maxlength'), counterOf(frac)]).toEqual(['2', { seen: '2 / 2', read: '2 of 2 characters', state: 'at' }])
+  })
+
   it('with autosize alone stays empty until nine tenths of the cap, then shows', async () => {
     render(<Textarea aria-label="Bio" autosize maxLength={10} />)
     const field = screen.getByRole('textbox', { name: 'Bio' })

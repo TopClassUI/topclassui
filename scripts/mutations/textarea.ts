@@ -11,8 +11,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the textarea cap stops going through resolveMaxLength, so a Textarea has no default limit',
     file: INDEX,
-    from: 'const cap = resolveMaxLength(maxLength, TEXTAREA_CAP_TYPE) ?? null',
-    to: 'const cap = maxLength ?? null',
+    from: 'const cap = clampCap(resolveMaxLength(maxLength, TEXTAREA_CAP_TYPE))',
+    to: 'const cap = clampCap(maxLength ?? undefined)',
   },
   {
     label: 'textarea rows are not clamped, so rows={99} draws a field taller than two screens',
@@ -145,5 +145,17 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: '  lg: `text-base ${FIELD_TEXT_COARSE}`,',
     to: "  lg: 'text-base',",
+  },
+  {
+    label: 'the textarea cap is not clamped, so maxLength={-1} draws a danger counter on an empty field the browser leaves uncapped',
+    file: LIB,
+    from: 'return clamp(Math.floor(cap), TEXTAREA_BOUNDARIES.maxLengthMin, TEXTAREA_BOUNDARIES.maxLengthMax)',
+    to: 'return cap',
+  },
+  {
+    label: 'the textarea cap keeps its fraction, so maxLength={2.5} reads 2 / 2.5',
+    file: LIB,
+    from: 'clamp(Math.floor(cap),',
+    to: 'clamp(cap,',
   },
 ]

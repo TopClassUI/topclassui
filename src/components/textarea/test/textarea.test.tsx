@@ -57,6 +57,10 @@ describe('the cap (R-5.7-8)', () => {
     expect(on({ maxLength: 500 }, 'maxLength')).toBe('500')
     expect(tagOf(html({ maxLength: null }))).not.toContain('maxLength')
   })
+
+  it('is clamped (R-5.7-7): under 0 is 0, a fraction rounds down, and past 2^31 - 1, where Chromium drops it, is that', () => {
+    expect([-1, 2.5, 2 ** 31].map((maxLength) => on({ maxLength }, 'maxLength'))).toEqual(['0', '2', '2147483647'])
+  })
 })
 
 describe('with autosize or showCount, a holder around the same textarea', () => {
