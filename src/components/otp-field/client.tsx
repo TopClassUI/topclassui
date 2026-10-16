@@ -4,7 +4,7 @@ import { DirectionProvider } from '@base-ui/react/direction-provider'
 import { OTPField as Base } from '@base-ui/react/otp-field'
 
 import { cn } from '#shared/cn.js'
-import { OTP_CELL, OTP_CELL_SIZE, OTP_ROOT, OTP_SEPARATOR, OTP_WRAP } from './classes.js'
+import { OTP_CELL, OTP_CELL_FIT, OTP_CELL_SIZE, OTP_CELL_WHOLE, OTP_ROOT, OTP_SEPARATOR } from './classes.js'
 import { OTP_FIELD_DEFAULTS } from './constants.js'
 import { useOtpField } from './hook.js'
 import type { OtpFieldProps } from './types.js'
@@ -50,7 +50,7 @@ export function OTPField({
         dir="ltr"
         aria-labelledby={ariaLabelledBy}
         data-size={size}
-        className={cn(OTP_ROOT, otp.wraps && OTP_WRAP, className)}
+        className={cn(OTP_ROOT, className)}
       >
         {otp.cells.flatMap(({ label, separator }, index) => {
           const cell = (
@@ -60,7 +60,7 @@ export function OTPField({
               aria-labelledby={index === 0 ? ariaLabelledBy : undefined}
               aria-describedby={index === 0 ? ariaDescribedBy : undefined}
               aria-invalid={cellInvalid}
-              className={cn(OTP_CELL, OTP_CELL_SIZE[size])}
+              className={cn(OTP_CELL, otp.whole ? OTP_CELL_WHOLE : OTP_CELL_FIT, OTP_CELL_SIZE[size])}
             />
           )
           return separator ? [cell, <span key={`separator-${String(index)}`} aria-hidden className={OTP_SEPARATOR} />] : [cell]

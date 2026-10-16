@@ -30,7 +30,7 @@ export function useOtpField({
   const fmt = useNumberFormat()
 
   const length = clampLength(given)
-  const { separators, wraps } = layoutCells(length, groupSize)
+  const { separators, whole } = layoutCells(length, groupSize)
   const cells = separators.map((separator, index) => ({
     separator,
     label: index === 0 ? undefined : labels.otp.character(index + 1, length, fmt),
@@ -55,7 +55,7 @@ export function useOtpField({
     rootRef: state.rootRef,
     length,
     cells,
-    wraps,
+    whole,
     digits: digitRules({ validationType, normalizeValue, inputMode }),
   }
 }

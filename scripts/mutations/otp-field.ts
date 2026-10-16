@@ -20,10 +20,28 @@ export const MUTATIONS: Mutation[] = [
     to: 'const cellInvalid = invalid ? true : undefined',
   },
   {
-    label: 'the otp field root never takes OTP_WRAP, so twelve cells scroll a phone sideways',
+    label: 'the otp field root never wraps, so two fields side by side scroll a phone sideways',
+    file: CLASSES,
+    from: "'flex w-fit min-w-0 max-w-full flex-wrap items-center gap-2'",
+    to: "'flex w-fit min-w-0 max-w-full items-center gap-2'",
+  },
+  {
+    label: 'the otp field cells of a long row start from the floor, so twelve cells squeeze to 26 px under a finger',
     file: CLIENT,
-    from: 'cn(OTP_ROOT, otp.wraps && OTP_WRAP, className)',
-    to: 'cn(OTP_ROOT, className)',
+    from: 'otp.whole ? OTP_CELL_WHOLE : OTP_CELL_FIT',
+    to: 'OTP_CELL_FIT',
+  },
+  {
+    label: 'the otp field cells of a short row break at whole cells, so six cells at 320 px break 5 + 1',
+    file: CLIENT,
+    from: 'otp.whole ? OTP_CELL_WHOLE : OTP_CELL_FIT',
+    to: 'OTP_CELL_WHOLE',
+  },
+  {
+    label: 'the otp field cells of a short row never grow, so in a block they stay 24 px wide',
+    file: CLASSES,
+    from: "OTP_CELL_FIT = 'basis-[var(--tc-target-min,24px)] grow'",
+    to: "OTP_CELL_FIT = 'basis-[var(--tc-target-min,24px)]'",
   },
   {
     label: 'the otp field cell takes a basis in place of its max-w, so a table cell counts it as 40 px',
@@ -136,14 +154,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the otp field puts the caller className first, so its own gap wins a conflict',
     file: CLIENT,
-    from: 'cn(OTP_ROOT, otp.wraps && OTP_WRAP, className)',
-    to: 'cn(className, OTP_ROOT, otp.wraps && OTP_WRAP)',
+    from: 'cn(OTP_ROOT, className)',
+    to: 'cn(className, OTP_ROOT)',
   },
   {
     label: 'the otp field cell loses its size, so every size draws the same cell',
     file: CLIENT,
-    from: 'cn(OTP_CELL, OTP_CELL_SIZE[size])',
-    to: 'OTP_CELL',
+    from: 'cn(OTP_CELL, otp.whole ? OTP_CELL_WHOLE : OTP_CELL_FIT, OTP_CELL_SIZE[size])',
+    to: 'cn(OTP_CELL, otp.whole ? OTP_CELL_WHOLE : OTP_CELL_FIT)',
   },
   {
     label: 'the otp field stops writing data-size',
@@ -166,8 +184,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the otp field cell loses its 24 px floor, so a narrow parent squeezes it under the target size',
     file: CLASSES,
-    from: 'w-full min-w-[var(--tc-target-min,24px)] shrink',
-    to: 'w-full min-w-0 shrink',
+    from: '`min-w-[var(--tc-target-min,24px)] shrink',
+    to: '`min-w-0 shrink',
   },
   {
     label: 'the otp field cell loses its height floor, so under a finger it is 40 px tall',
