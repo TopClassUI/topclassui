@@ -29,12 +29,13 @@ export function SaveButton() {
 
 - **Nothing to mount.** `TopClassProvider` mounts the one viewport. Do not mount
   `ToastViewport` yourself.
-- **Before the provider.** A `toast.add()` called before `TopClassProvider` has mounted is
-  lost. There is no queue.
+- **Before the provider.** A `toast.add()` made before `TopClassProvider` listens, such as
+  one in a page's mount effect, waits and shows once it does.
 - **Outside React.** `toast` is four plain functions: `add`, `update`, `close` and
   `promise`. Call them from a click handler, a fetch callback or any browser module.
 - **The table below** lists the options of `toast.add`, not props. Besides them it takes
-  `title`, `description` and `action: { label, onClick }`.
+  `title`, which is required (it names the toast for a screen reader), `description` and
+  `action: { label, onClick }`.
 - **Tone.** `neutral` by default, with no icon. `success`, `warning`, `danger` and `info`
   draw an icon, so the meaning never rests on colour alone. `primary` has no icon either.
 - **Duration.** Clamped to 0 to 600000 ms. `0` stays until it is closed. Left out, the
@@ -50,7 +51,8 @@ export function SaveButton() {
   `bottom-end` by default: the bottom right in English, the bottom left in Arabic. The
   newest toast is the nearest the edge. Three show at once; the next appears when one closes.
 - **The x.** Every toast ends with one, and nothing removes it: a swipe is a drag, and a
-  drag needs a second way (WCAG 2.5.7).
+  drag needs a second way (WCAG 2.5.7). It stays on the screen while any of its toast shows, even a
+  toast taller than the screen. A finger cannot scroll that toast, so keep the text short.
 - **Swipe.** Toward the block edge, and toward the inline edge the toast sits at, closes it.
   A centered toast has no sideways swipe.
 - **Keyboard.** F6 moves focus to the toasts. Tab goes to the toast, its action, its x, then
@@ -93,7 +95,7 @@ provider mounts.
 ## Import
 
 ```tsx
-import { Toast } from 'topclassui'
+import { ToastViewport, toast } from 'topclassui'
 ```
 
 ## Props
@@ -106,7 +108,7 @@ Every prop below is optional and falls back to the default shown.
 | `priority` | no | `low` \| `high` | `"low"` | toast.add: high is announced at once, as an alert; low waits for the reader to finish. |
 | `tone` | no | `primary` \| `neutral` \| `success` \| `warning` \| `danger` \| `info` | `"neutral"` | toast.add: what the toast means. success, warning, danger and info draw an icon; neutral and primary none. |
 
-Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
+`ToastViewport` takes no attribute but `className`, which is merged last, and no `ref`.
 
 ## Examples
 

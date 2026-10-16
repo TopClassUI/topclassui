@@ -7,7 +7,7 @@ import { textareaSchema } from '../schema.js'
 
 // R-8.3-3: the props table, the playground and registry.json all read this output.
 const json = z.toJSONSchema(textareaSchema, { io: 'input' }) as {
-  properties?: Record<string, { description?: string; default?: unknown; enum?: unknown[]; minimum?: number; maximum?: number }>
+  properties?: Record<string, { description?: string; default?: unknown; enum?: unknown[]; minimum?: number; maximum?: number; anyOf?: { minimum?: number; maximum?: number }[] }>
 }
 
 const KEYS = ['autosize', 'fullWidth', 'invalid', 'maxLength', 'maxRows', 'rows', 'showCount', 'size']
@@ -33,7 +33,9 @@ describe('the schema is the documentation', () => {
   it('records the bounds the component clamps to (R-5.7-7), from boundaries.ts', () => {
     expect([json.properties?.['rows']?.minimum, json.properties?.['rows']?.maximum]).toEqual([1, 40])
     expect([json.properties?.['maxRows']?.minimum, json.properties?.['maxRows']?.maximum]).toEqual([1, 40])
-    expect(TEXTAREA_BOUNDARIES).toEqual({ rowsMin: 1, rowsMax: 40, maxRowsMin: 1, maxRowsMax: 40 })
+    // Nullable, so the number is one branch of anyOf and null the other.
+    expect(json.properties?.['maxLength']?.anyOf?.[0]).toEqual({ type: 'integer', minimum: 0, maximum: 2147483647 })
+    expect(TEXTAREA_BOUNDARIES).toEqual({ rowsMin: 1, rowsMax: 40, maxRowsMin: 1, maxRowsMax: 40, maxLengthMin: 0, maxLengthMax: 2147483647 })
   })
 })
 

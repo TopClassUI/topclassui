@@ -33,10 +33,12 @@ import { Progress } from 'topclassui'
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `aria-label` or `aria-labelledby`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
+| `aria-label` | **yes**, or `aria-labelledby` | `string` | - | The name read out when no visible text names the bar. |
+| `aria-labelledby` | **yes**, or `aria-label` | `string` | - | The id of the visible text that names the bar. |
 | `indeterminate` | no | `boolean` | `false` | For a wait of unknown length: no value is announced and a short bar pulses. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The shared size scale, which sets the track height; custom emits none. |
 | `tone` | no | `primary` \| `neutral` \| `success` \| `warning` \| `danger` \| `info` | `"primary"` | The colour of the bar; the track stays neutral in every tone. |

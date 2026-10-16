@@ -180,6 +180,27 @@ test.describe('live: the keyboard, as the editable combobox of the Authoring Pra
   })
 })
 
+/** Chooses Option 9997 by the keys, closes the list by a click outside, opens it again, and says where the chosen row is. */
+async function reopenOnChosen(page: Page) {
+  const input = inputOf(page, 'Ten thousand options')
+  await input.click()
+  await atRest(popupOf(page))
+  for (const key of ['ArrowDown', 'ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowUp']) await page.keyboard.press(key)
+  await expect.poll(() => activeOf(page)).toMatchObject({ text: 'Option 9997' })
+  await page.keyboard.press('Enter')
+  await expect(input).toHaveValue('Option 9997')
+  await page.mouse.click(2, 2)
+  await expect(popupOf(page)).toHaveCount(0)
+  await input.click()
+  await atRest(popupOf(page))
+  return listOf(page).evaluate((list) => {
+    const row = list.querySelector('[data-selected]')
+    const frame = list.getBoundingClientRect()
+    const box = row?.getBoundingClientRect()
+    return { text: row?.textContent ?? null, whole: box !== undefined && box.top >= frame.top - 0.5 && box.bottom <= frame.bottom + 0.5 }
+  })
+}
+
 test.describe('live: ten thousand options, windowed', () => {
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 
@@ -319,6 +340,11 @@ test.describe('live: ten thousand options, windowed', () => {
       expect(await listOf(page).evaluate((el) => el.scrollHeight)).toBe(440_012)
     })
 
+    test('opened again on a row chosen far down, the list shows that row whole: the window counts 44 px rows', async ({ page }) => {
+      await openLive(page, 'combobox--ten-thousand')
+      expect(await reopenOnChosen(page)).toEqual({ text: 'Option 9997', whole: true })
+    })
+
     test('a drag scrolls the windowed list and mounts the rows it reaches, and never the page', async ({ page }) => {
       await openLive(page, 'combobox--ten-thousand', { tall: true })
       await touchDrag(page, 195, 700, 660)
@@ -332,6 +358,19 @@ test.describe('live: ten thousand options, windowed', () => {
       expect((await activeOf(page)).mounted).toBeLessThan(100)
       expect(await scrollY(page)).toBe(before)
     })
+  })
+
+  test('at a 32 px root, opened again on a row chosen far down, the list shows that row whole: the window counts 80 px rows', async ({ page }) => {
+    await openLive(page, 'combobox--ten-thousand')
+    await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
+    expect(await reopenOnChosen(page)).toEqual({ text: 'Option 9997', whole: true })
+  })
+
+  test('at a 32 px root on a phone, opened again on a row chosen far down, the list cut to fit still shows that row whole', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 480 })
+    await openLive(page, 'combobox--ten-thousand')
+    await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
+    expect(await reopenOnChosen(page)).toEqual({ text: 'Option 9997', whole: true })
   })
 
   test('at a 32 px root on a phone: rows of 80 px, the popup fits, and the last of ten thousand still lands whole', async ({ page }) => {
@@ -371,6 +410,39 @@ test.describe('live: paging, through load-more', () => {
     await expect(page.getByRole('option', { name: 'Result 200' })).toBeVisible()
     await page.evaluate(() => new Promise((done) => { setTimeout(done, 400) }))
     await expect(asked).toHaveText('Pages asked for: 3, loaded: 4')
+  })
+
+  test('a query whose matches sit on later pages keeps asking, one page per length of items, and reaches them', async ({ page }) => {
+    await openLive(page, 'combobox--load-more')
+    const asked = page.getByTestId('asked')
+    await inputOf(page, 'Search results').click()
+    await atRest(popupOf(page))
+    await inputOf(page, 'Search results').fill('Result 15')
+    // Page 2 holds no new match: the list stays one row long, at its end, and the next page is still asked for.
+    await expect(asked).toHaveText('Pages asked for: 3, loaded: 4')
+    await expect(page.getByRole('option')).toHaveText(['Result 15', ...Array.from({ length: 10 }, (_, n) => `Result ${String(150 + n)}`)])
+    await page.evaluate(() => new Promise((done) => { setTimeout(done, 400) }))
+    await expect(asked).toHaveText('Pages asked for: 3, loaded: 4')
+  })
+
+  test('typing while a page loads asks for nothing more: the next ask waits for the page', async ({ page }) => {
+    await openLive(page, 'combobox--load-more')
+    const asked = page.getByTestId('asked')
+    await inputOf(page, 'Search results').click()
+    await atRest(popupOf(page))
+    // Each change of the line, as pages asked for less pages loaded: one page in flight at most reads 0.
+    await asked.evaluate((node) => {
+      const ahead: number[] = []
+      const read = () => { const [ask = 0, have = 0] = (node.textContent.match(/\d+/g) ?? []).map(Number); ahead.push(ask - have) }
+      new MutationObserver(read).observe(node, { childList: true, characterData: true, subtree: true })
+      Object.assign(window, { ahead })
+    })
+    await page.keyboard.type('Result 199')
+    await expect(asked).toHaveText('Pages asked for: 3, loaded: 4')
+    await expect(page.getByRole('option')).toHaveText(['Result 199'])
+    await page.evaluate(() => new Promise((done) => { setTimeout(done, 400) }))
+    await expect(asked).toHaveText('Pages asked for: 3, loaded: 4')
+    expect(Math.max(...await page.evaluate(() => (window as unknown as { ahead: number[] }).ahead))).toBe(0)
   })
 
   test('status: loading turns the caret into a spinner, says Loading in the list, and marks the input busy', async ({ page }) => {
@@ -450,6 +522,18 @@ test.describe('live: the name, while the list is open', () => {
       expect(await chromeName(page)).toEqual([name])
     })
   }
+
+  test('closed, the live label names the input: a label renamed while closed names it at once, and again once open', async ({ page }) => {
+    await open(page, 'combobox--basic', 'Framework')
+    await page.keyboard.press('Escape')
+    await expect(popupOf(page)).toHaveCount(0)
+    expect(await page.locator('#demo input[role="combobox"]').getAttribute('aria-label')).toBeNull()
+    await page.locator('#demo label').evaluate((label) => { label.textContent = 'Framework (required)' })
+    expect(await chromeName(page)).toEqual(['Framework (required)'])
+    await page.locator('#demo input[role="combobox"]').click()
+    await atRest(popupOf(page))
+    expect(await chromeName(page)).toEqual(['Framework (required)'])
+  })
 })
 
 test.describe('live: inside the repo\'s Dialog', () => {

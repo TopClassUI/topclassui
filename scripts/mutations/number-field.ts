@@ -97,4 +97,52 @@ export const MUTATIONS: Mutation[] = [
     from: "export const NUMBER_FIELD_DECREASE = 'order-first'",
     to: "export const NUMBER_FIELD_DECREASE = ''",
   },
+  {
+    label: 'the number field reads a NaN min or max as clamp() does, so max={NaN} becomes a limit of -1e15',
+    file: LIB,
+    from: '  return n !== undefined && !Number.isNaN(n)',
+    to: '  return n !== undefined',
+  },
+  {
+    label: 'the number field passes a NaN step to clamp(), so ArrowUp adds 0.000001',
+    file: LIB,
+    from: "step === 'any' ? 'any' : Number.isNaN(step) ? NUMBER_FIELD_DEFAULTS.step : clamp(",
+    to: "step === 'any' ? 'any' : clamp(",
+  },
+  {
+    label: 'the number field keeps a max under min, so the hidden input is never valid and the form never submits',
+    file: LIB,
+    from: '    max: low !== undefined && high !== undefined && high < low ? low : high,',
+    to: '    max: high,',
+  },
+  {
+    label: 'the number field leaves a typed Latin 1,234 to Base UI, which reads it as 1 under Arabic-Indic digits',
+    file: HOOK,
+    from: "    input.addEventListener('focusout', leave)\n",
+    to: '',
+  },
+  {
+    label: 'the number field box loses has-[input:disabled]:opacity-50, so in a disabled fieldset it stays at full ink',
+    file: CLASSES,
+    from: ' has-[input:disabled]:opacity-50',
+    to: '',
+  },
+  {
+    label: 'the number field stepper loses group-has-[input:disabled]/number:disabled:opacity-100, so a disabled fieldset paints it at a quarter',
+    file: CLASSES,
+    from: ' group-has-[input:disabled]/number:disabled:opacity-100',
+    to: '',
+  },
+  {
+    label: 'the number field stepper is shrink-0 again, so at a 32 px root the increase stepper of a large field is cut',
+    file: CLASSES,
+    from: 'aspect-square shrink items-center',
+    to: 'aspect-square shrink-0 items-center',
+  },
+  {
+    label: 'the number field reads a typed Latin 1,234 only on blur, so Enter under Arabic-Indic digits submits 1',
+    file: HOOK,
+    from: "    input.addEventListener('keydown', enter)\n",
+    to: '',
+  },
 ]

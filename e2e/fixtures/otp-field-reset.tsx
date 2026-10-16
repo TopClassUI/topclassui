@@ -1,6 +1,7 @@
 // Loaded into a live page by e2e/otp-field.spec.ts: the reset cases of Switch, repeated for a code field (unit-4.md,
 // "Fixtures"). A plain form with a reset button, a form with a function action, and one whose action returns the
-// next defaults; a field with no default, a controlled field, and one outside its form tied to it by `form`.
+// next defaults; a field with no default, a controlled field, and one outside its form tied to it by `form`. Last, two
+// fields with autoSubmit, each followed by a form whose field mounts after it: only the field's own form is sent.
 import { useActionState, useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 
@@ -68,6 +69,18 @@ function Echo() {
   )
 }
 
+/** autoSubmit sends the field's form through its action: the one it sits in, or the one its `form` names. */
+function Auto() {
+  return (
+    <>
+      <form id="auto" action={(data) => { record('auto', data) }}><Code label="Auto" name="auto" autoSubmit /></form>
+      <form id="outer" action={(data) => { record('outer', data) }}><Code label="Tied" name="tied" form="tied" autoSubmit /></form>
+      <form id="tied" action={(data) => { record('tied', data) }} />
+      <form id="later" action={(data) => { record('later', data) }}><Code label="Later" name="later" /></form>
+    </>
+  )
+}
+
 function Fixture() {
   const root = useRef(null as HTMLDivElement | null)
   // The spec waits for this: the effects of the fields, which are children, have run by now.
@@ -78,6 +91,7 @@ function Fixture() {
         <Plain />
         <Action />
         <Echo />
+        <Auto />
       </div>
     </TopClassProvider>
   )

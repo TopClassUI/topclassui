@@ -3,9 +3,9 @@
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import { compileEntry } from '#test/stylesheet.js'
-import { OTP_CELL, OTP_CELL_SIZE, OTP_ROOT, OTP_SEPARATOR, OTP_WRAP } from '../classes.js'
+import { OTP_CELL, OTP_CELL_FIT, OTP_CELL_SIZE, OTP_CELL_WHOLE, OTP_ROOT, OTP_SEPARATOR } from '../classes.js'
 
-const OWN = [OTP_CELL, OTP_ROOT, OTP_SEPARATOR, OTP_WRAP, ...Object.values(OTP_CELL_SIZE)]
+const OWN = [OTP_CELL, OTP_CELL_FIT, OTP_CELL_WHOLE, OTP_ROOT, OTP_SEPARATOR, ...Object.values(OTP_CELL_SIZE)]
 const CLASSES = [...new Set(OWN.join(' ').split(' ').filter(Boolean))]
 
 let css = ''
@@ -45,21 +45,30 @@ describe('the row', () => {
       .toEqual(['display: flex;', 'width: fit-content;', 'min-width: 0px;', 'max-width: 100%;'])
   })
 
-  it('wraps only where it is told to', () => {
-    expect(ruleOf(selectorOf(OTP_WRAP))).toBe('flex-wrap: wrap;')
-    expect(OTP_ROOT).not.toContain('flex-wrap')
+  it('wraps, so a parent under the floor of its cells gets a second line and never a sideways scroll', () => {
+    expect(OTP_ROOT.split(' ')).toContain('flex-wrap')
+    expect(ruleOf(selectorOf('flex-wrap'))).toBe('flex-wrap: wrap;')
   })
 })
 
 describe('a cell', () => {
-  it('fills up to its cap and gives up width, never below the 24 px floor, and never grows', () => {
-    expect(['w-full', 'min-w-[var(--tc-target-min,24px)]', 'shrink', 'grow-0'].map((cls) => ruleOf(selectorOf(cls))))
-      .toEqual(['width: 100%;', 'min-width: var(--tc-target-min,24px);', 'flex-shrink: 1;', 'flex-grow: 0;'])
+  it('gives up width, never below the 24 px floor', () => {
+    expect(['min-w-[var(--tc-target-min,24px)]', 'shrink'].map((cls) => ruleOf(selectorOf(cls))))
+      .toEqual(['min-width: var(--tc-target-min,24px);', 'flex-shrink: 1;'])
   })
 
-  it('is sized by a max-w under w-full, never by a basis: a basis is a floor in a table cell (a css rule a mutation reaches)', () => {
-    expect(OWN.join(' ')).not.toMatch(/\bbasis-/)
-    expect(css).not.toMatch(/flex-basis/)
+  it('up to eight items starts from the 24 px floor and grows to its cap, so a line breaks only where 24 px cells do not fit', () => {
+    expect(OTP_CELL_FIT.split(' ').map((cls) => ruleOf(selectorOf(cls))))
+      .toEqual(['flex-basis: var(--tc-target-min,24px);', 'flex-grow: 1;'])
+  })
+
+  it('past eight items fills up to its cap and never grows, so a line breaks at whole cells', () => {
+    expect(OTP_CELL_WHOLE.split(' ').map((cls) => ruleOf(selectorOf(cls)))).toEqual(['width: 100%;', 'flex-grow: 0;'])
+  })
+
+  it('has no basis but the 24 px floor: a larger one is a floor a table cell counts (a css rule a mutation reaches)', () => {
+    expect(OWN.join(' ').match(/\bbasis-\S+/g)).toEqual(['basis-[var(--tc-target-min,24px)]'])
+    expect(css.match(/flex-basis: [^;]+;/g)).toEqual(['flex-basis: var(--tc-target-min,24px);'])
   })
 
   it('is a square of the control scale at each size, with its type step; custom draws none', () => {

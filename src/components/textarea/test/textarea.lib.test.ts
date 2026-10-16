@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { clampMaxRows, clampRows, countText, estimateRows, isCounted, joinIds, limitOf, rowsFor } from '../lib.js'
+import { clampCap, clampMaxRows, clampRows, countText, estimateRows, isCounted, joinIds, limitOf, rowsFor } from '../lib.js'
 
 const latn = new Intl.NumberFormat('en', { numberingSystem: 'latn' })
 const arab = new Intl.NumberFormat('ar', { numberingSystem: 'arab' })
@@ -12,6 +12,13 @@ describe('clampRows and clampMaxRows (R-5.7-7)', () => {
 
   it('keeps maxRows between 1 and 40 and never under rows', () => {
     expect([clampMaxRows(6, 3), clampMaxRows(2, 3), clampMaxRows(99, 3), clampMaxRows(0, 1), clampMaxRows(10, 40)]).toEqual([6, 3, 40, 1, 40])
+  })
+})
+
+describe('clampCap (R-5.7-7)', () => {
+  it('keeps the cap a whole number from 0 to the 2147483647 Chromium keeps, rounded down, and none as null', () => {
+    expect([clampCap(500), clampCap(-1), clampCap(2.5), clampCap(2_147_483_648), clampCap(Infinity), clampCap(undefined)])
+      .toEqual([500, 0, 2, 2147483647, 2147483647, null])
   })
 })
 

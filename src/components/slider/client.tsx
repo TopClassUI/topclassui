@@ -4,7 +4,7 @@ import { Slider as Base } from '@base-ui/react/slider'
 
 import { cn } from '#shared/cn.js'
 import {
-  SLIDER_CONTROL, SLIDER_FULL, SLIDER_INDICATOR, SLIDER_KNOB, SLIDER_KNOB_SIZE, SLIDER_ROOT, SLIDER_ROW, SLIDER_TEXT,
+  SLIDER_CONTROL, SLIDER_CONTROL_SIZE, SLIDER_FULL, SLIDER_INDICATOR, SLIDER_KNOB, SLIDER_KNOB_SIZE, SLIDER_ROOT, SLIDER_ROW, SLIDER_TEXT,
   SLIDER_THUMB, SLIDER_TRACK, SLIDER_TRACK_SIZE, SLIDER_VALUE,
 } from './classes.js'
 import { SLIDER_DEFAULTS } from './constants.js'
@@ -21,6 +21,8 @@ export function Slider<Value extends SliderValue = number>({
   min = SLIDER_DEFAULTS.min,
   max = SLIDER_DEFAULTS.max,
   step = SLIDER_DEFAULTS.step,
+  largeStep = SLIDER_DEFAULTS.largeStep,
+  minStepsBetweenValues = SLIDER_DEFAULTS.minStepsBetweenValues,
   value,
   defaultValue,
   onValueChange,
@@ -36,7 +38,8 @@ export function Slider<Value extends SliderValue = number>({
   ...rest
 }: SliderProps<Value>) {
   const slider = useSlider({
-    value, defaultValue, ref, min, max, step, locale, format,
+    value, defaultValue, ref, min, max, step, largeStep, minStepsBetweenValues, locale, format,
+    invalid: invalid || ariaInvalid === true || ariaInvalid === 'true',
     // A number or a pair, as Value says: the generic only narrows what the caller's handler is handed.
     onValueChange: onValueChange as SliderStateProps['onValueChange'],
     'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby, 'aria-describedby': ariaDescribedby,
@@ -47,11 +50,14 @@ export function Slider<Value extends SliderValue = number>({
       {...rest}
       {...slider.root}
       ref={slider.rootRef}
+      dir={slider.dir}
       value={slider.value as Value}
       onValueChange={slider.onValueChange}
       min={slider.limits.min}
       max={slider.limits.max}
       step={slider.limits.step}
+      largeStep={slider.limits.largeStep}
+      minStepsBetweenValues={slider.limits.minStepsBetweenValues}
       locale={slider.locale}
       format={slider.format}
       thumbAlignment="center"
@@ -61,7 +67,8 @@ export function Slider<Value extends SliderValue = number>({
       className={cn(SLIDER_ROOT, SLIDER_TEXT[size], fullWidth && SLIDER_FULL, className)}
     >
       <div className={SLIDER_ROW}>
-        <Base.Control className={SLIDER_CONTROL}>
+        {/* Base UI's own marker: a Drawer or a Toast never takes a drag that starts on the control as a swipe. */}
+        <Base.Control className={cn(SLIDER_CONTROL, SLIDER_CONTROL_SIZE[size])} data-base-ui-swipe-ignore="">
           <Base.Track className={cn(SLIDER_TRACK, SLIDER_TRACK_SIZE[size])}>
             <Base.Indicator className={SLIDER_INDICATOR} />
             {slider.thumbs.map((thumb, index) => (
