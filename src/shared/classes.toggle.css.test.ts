@@ -52,6 +52,13 @@ describe('the box reads the target it sits in', () => {
     expect(ruleOf(`${selectorOf('group-focus-visible/toggle:outline-ring')}${FOCUSED}`)).toBe('outline-color: var(--tc-ring);')
   })
 
+  it('paints the ring CanvasText under forced colours, after the author ring, so a filled box that opts out keeps the user palette', () => {
+    const forced = `${selectorOf('forced-colors:group-focus-visible/toggle:outline-[CanvasText]')}${FOCUSED}`
+    expect(ruleOf(forced)).toBe('outline-color: CanvasText;')
+    expect(css.slice(0, css.indexOf(`${forced} {`))).toMatch(/@media \(forced-colors: active\) \{\s*$/)
+    expect(css.indexOf(`${forced} {`)).toBeGreaterThan(css.indexOf(`${selectorOf('group-focus-visible/toggle:outline-ring')}${FOCUSED} {`))
+  })
+
   it('reads no bare group anywhere, which an accordion trigger around the toggle would match', () => {
     expect(css).not.toContain(':where(.group):')
     expect(css).not.toContain(':where(.group)[')
@@ -61,6 +68,28 @@ describe('the box reads the target it sits in', () => {
     expect(ruleOf(`${selectorOf('group-data-checked/toggle:bg-primary-solid')}${CHECKED}`)).toBe('background-color: var(--tc-primary-solid);')
     expect(ruleOf(`${selectorOf('group-aria-invalid/toggle:inset-ring-[calc(var(--tc-ring-width)-var(--tc-line-width))]')}${INVALID}`))
       .toContain('inset 0 0 0 calc(var(--tc-ring-width) - var(--tc-line-width))')
+  })
+})
+
+describe('under forced colours, where a checked box opts out of the user palette', () => {
+  /** The at-rule a selector's rule sits in. */
+  const mediaOf = (selector: string) => { const before = css.slice(0, css.indexOf(`${selector} {`)); return before.slice(before.lastIndexOf('@media')).split('{')[0]?.trim() }
+  const DISABLED = ':is(:where(.group\\/toggle):disabled *)'
+  const invalid = `${selectorOf('forced-colors:group-aria-invalid/toggle:group-data-checked/toggle:border-[CanvasText]')}${INVALID}${CHECKED}`
+  const disabled = `${selectorOf('forced-colors:group-disabled/toggle:group-data-checked/toggle:bg-[GrayText]')}${DISABLED}${CHECKED}`
+
+  it('a checked box that is invalid has a CanvasText line, after the red one it replaces, and a zero inset ring', () => {
+    expect(ruleOf(invalid)).toBe('border-color: CanvasText;')
+    expect(mediaOf(invalid)).toBe('@media (forced-colors: active)')
+    expect(css.indexOf(`${invalid} {`)).toBeGreaterThan(css.indexOf(`${selectorOf('group-aria-invalid/toggle:group-data-checked/toggle:border-danger-solid')}${INVALID}${CHECKED} {`))
+    expect(ruleOf(`${selectorOf('forced-colors:group-aria-invalid/toggle:inset-ring-0')}${INVALID}`)).toContain('--tw-inset-ring-shadow: inset 0 0 0 0px')
+  })
+
+  it('a checked box that is disabled, by the prop or a fieldset, is GrayText, after the Highlight it replaces', () => {
+    expect(ruleOf(disabled)).toBe('background-color: GrayText;')
+    expect(ruleOf(`${selectorOf('forced-colors:group-disabled/toggle:group-data-checked/toggle:border-[GrayText]')}${DISABLED}${CHECKED}`)).toBe('border-color: GrayText;')
+    expect(mediaOf(disabled)).toBe('@media (forced-colors: active)')
+    expect(css.indexOf(`${disabled} {`)).toBeGreaterThan(css.indexOf(`${selectorOf('forced-colors:group-data-checked/toggle:bg-[Highlight]')}${CHECKED} {`))
   })
 })
 

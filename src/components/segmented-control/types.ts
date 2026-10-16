@@ -63,8 +63,8 @@ export interface SegmentedControlLook {
   opensOn: string | null
 }
 
-/** The four props the hook holds: the state, its default, the handler and the track. */
-export type SegmentedControlValueProps = Pick<BaseRoot, 'value' | 'defaultValue' | 'onValueChange'> & {
+/** What the hook reads: the state, its default, the handler and the track, and the segments that take the server tab stop. */
+export type SegmentedControlValueProps = Pick<BaseRoot, 'value' | 'defaultValue' | 'onValueChange' | 'children' | 'disabled'> & {
   ref?: Ref<HTMLDivElement> | undefined
 }
 

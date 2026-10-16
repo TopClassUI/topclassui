@@ -24,6 +24,7 @@ const DECLARATION: Record<string, string> = {
   // The trigger.
   'group': '',
   'flex': 'display: flex;',
+  'flex-wrap': 'flex-wrap: wrap;',
   'w-full': 'width: 100%;',
   'items-center': 'align-items: center;',
   'gap-3': 'gap: calc(var(--spacing) * 3);',
@@ -58,7 +59,9 @@ const DECLARATION: Record<string, string> = {
   'forced-colors:data-disabled:opacity-100': 'opacity: 100%;',
   // The title and the caret.
   'min-w-0': 'min-width: 0px;',
-  'flex-1': 'flex: 1;',
+  'grow': 'flex-grow: 1;',
+  'basis-[6ch]': 'flex-basis: 6ch;',
+  'ms-auto': 'margin-inline-start: auto;',
   'shrink-0': 'flex-shrink: 0;',
   'text-muted': 'color: var(--tc-muted);',
   'transition-[rotate]': 'transition-property: rotate;',
@@ -99,7 +102,7 @@ describe('every class an Accordion wears compiles with the installed Tailwind', 
       ACCORDION_ROOT, ACCORDION_ITEM, ACCORDION_TRIGGER, ACCORDION_TITLE, ACCORDION_CARET, ACCORDION_PANEL, ACCORDION_CONTENT,
     ])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(59)
+    expect(all).toHaveLength(62)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

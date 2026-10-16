@@ -1,6 +1,6 @@
 import { SegmentedControlItem, SegmentedControlRoot } from '../index.js'
 
-/** The states a server can render. A read-only track looks like a live one: it says so to a screen reader only. */
+/** The states a server can render. A read-only track looks like a live one, and its aria-readonly is not announced. */
 export default function Demo() {
   return (
     <div className="grid justify-items-start gap-4">

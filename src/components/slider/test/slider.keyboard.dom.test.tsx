@@ -113,3 +113,27 @@ describe('without a provider the arrows keep their LTR meaning, whatever the dir
     expect(await after('{ArrowRight}')).toBe('55')
   })
 })
+
+describe('largeStep and minStepsBetweenValues are clamped (R-5.7-7), so the keyboard path always works', () => {
+  for (const largeStep of [-10, 0, Number.NaN, 2]) {
+    it(`a largeStep of ${String(largeStep)} becomes the step: Page Up and Shift with an arrow still raise the value`, async () => {
+      render(<Slider aria-label="Volume" defaultValue={50} step={5} largeStep={largeStep} />)
+      expect(await after('{PageUp}')).toBe('55')
+      expect(await after('{Shift>}{ArrowRight}{/Shift}')).toBe('60')
+      expect(await after('{PageDown}')).toBe('55')
+    })
+  }
+
+  it('a largeStep past a quadrillion stops at it, and Page Up goes to max', async () => {
+    render(<Slider aria-label="Volume" defaultValue={50} largeStep={1e300} />)
+    expect(await after('{PageUp}')).toBe('100')
+  })
+
+  for (const gap of [-5, Number.NaN]) {
+    it(`a minStepsBetweenValues of ${String(gap)} becomes 0: the two thumbs of a range meet and never cross`, async () => {
+      render(<Slider aria-label="Price" defaultValue={[20, 80]} minStepsBetweenValues={gap} />)
+      expect(await after('{End}', 'Minimum')).toBe('80')
+      expect(await after('{ArrowRight}', 'Minimum')).toBe('80')
+    })
+  }
+})

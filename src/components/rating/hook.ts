@@ -23,11 +23,14 @@ export function useRatingField({ value, defaultValue, onValueChange, name, disab
 
   return {
     name: name ?? own,
+    /** Unnamed, the radios name a form that does not exist: still one group, but never submitted or reset. */
+    form: name === undefined ? `${own}-none` : undefined,
     checked,
     /** What the stars show: the hovered step while the pointer is on one, the checked step otherwise. */
     shown: hovered ?? checked,
     watchForm,
-    select: (event: RatingRadioChange) => { setChecked(Number(event.currentTarget.value)) },
+    // A change by key leaves the pointer resting on a star, so the preview gives way to the checked step.
+    select: (event: RatingRadioChange) => { setHovered(null); setChecked(Number(event.currentTarget.value)) },
     enter: (step: number) => () => { if (!disabled) setHovered(step) },
     leave: (event: RatingRowLeave) => { setHovered(null); onPointerLeave?.(event) },
   }
