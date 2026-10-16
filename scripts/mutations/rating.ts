@@ -93,6 +93,12 @@ export const MUTATIONS: Mutation[] = [
     to: '=> { setChecked(Number(event.currentTarget.value)) }',
   },
   {
+    label: 'rating: an unnamed rating joins the form around it and submits under its generated id',
+    file: 'src/components/rating/hook.ts',
+    from: 'form: name === undefined ? `${own}-none` : undefined,',
+    to: 'form: undefined,',
+  },
+  {
     label: 'rating: a read-only rating renders the client half, so a page of stars hydrates',
     file: 'src/components/rating/index.tsx',
     from: "return props.readOnly === false ? <Editable {...props} /> : <ReadOnly {...props} />",

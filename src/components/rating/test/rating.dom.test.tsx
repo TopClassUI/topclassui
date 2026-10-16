@@ -145,6 +145,23 @@ describe('in a form', () => {
     expect(onValueChange.mock.calls).toEqual([[1], [4]])
   })
 
+  // happy-dom ignores the form attribute in FormData; e2e/rating.spec measures what Chromium submits.
+  it('with no name each radio names a form that does not exist, so it has no form owner, yet they stay one group', async () => {
+    render(<form aria-label="Review"><Rating readOnly={false} aria-label="Stay" defaultValue={3} /></form>)
+    const owners = radios().map((radio) => radio.getAttribute('form'))
+    expect(new Set(owners).size).toBe(1)
+    expect(owners[0]).toMatch(/^_[rR]_\w+_-none$/)
+    expect(document.getElementById(owners[0] ?? '')).toBeNull()
+    expect(new Set(radios().map((radio) => radio.name)).size).toBe(1)
+    await userEvent.click(radios()[1] as HTMLInputElement)
+    expect(checkedStep()).toBe(2)
+  })
+
+  it('with a name the radios belong to the form around them, with no form attribute', () => {
+    render(<form aria-label="Review"><Rating readOnly={false} aria-label="Stay" name="stay" /></form>)
+    expect(radios().map((radio) => radio.hasAttribute('form'))).toEqual([false, false, false, false, false])
+  })
+
   it('a disabled rating submits nothing', () => {
     render(<form aria-label="Review"><Rating readOnly={false} aria-label="Stay" name="stay" defaultValue={3} disabled /></form>)
     expect(sent(screen.getByRole<HTMLFormElement>('form'))).toEqual([])

@@ -266,6 +266,28 @@ test.describe('a form', () => {
   })
 })
 
+test.describe('a rating with no name', () => {
+  test('inside a form it submits nothing, and is still one radio group under the keyboard', async ({ page }) => {
+    await openLive(page, 'rating--editable')
+    // A GET filter form around the demo, with one named field of its own.
+    await page.evaluate(() => {
+      const demo = document.querySelector('#demo')
+      const form = document.createElement('form')
+      const q = Object.assign(document.createElement('input'), { name: 'q', value: 'hotel' })
+      demo?.before(form)
+      if (demo) form.append(q, demo)
+    })
+    expect(await page.evaluate(() => [...new FormData(document.querySelector('form') ?? undefined)].map(([k, v]) => `${k}=${v as string}`))).toEqual(['q=hotel'])
+    await page.locator('#demo h2').click()
+    await page.keyboard.press('Tab')
+    expect(await where(page)).toEqual({ focus: 3, checked: 3 })
+    await page.keyboard.press('ArrowDown')
+    expect(await where(page)).toEqual({ focus: 4, checked: 4 })
+    await page.keyboard.press('Tab')
+    expect((await where(page)).focus, 'one tab stop for the group').toBe(0)
+  })
+})
+
 test.describe('every step is a target', () => {
   const DEMOS = ['rating--sizes', 'rating--editable', 'rating--max-ten'] as const
   const sizes = (page: Page) => page.locator('#demo label:has(> input[type="radio"]), #demo input[type="radio"]').evaluateAll((all) =>
