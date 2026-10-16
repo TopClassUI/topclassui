@@ -381,6 +381,28 @@ test.describe('live: where the list opens', () => {
             }
           }
         })
+
+        test(`${String(screen.width)} x ${String(screen.height)} ${direction}: with no room on either side, a fullWidth trigger or a 32 px root, the list opens below or above, as wide as the trigger`, async ({ page }) => {
+          await page.setViewportSize(screen)
+          await fixture(page, 'select-placements', { direction })
+          for (const [spot, root] of [['full-width', '16px'], ['top-start', '32px'], ['bottom-end', '32px']] as const) {
+            await page.evaluate((size) => { document.documentElement.style.fontSize = size }, root)
+            for (const placement of SIDES) {
+              const label = `${placement} at ${spot}, root ${root}`
+              await page.evaluate((detail) => document.dispatchEvent(new CustomEvent('select-case', { detail })), { placement, spot })
+              await expect(page.locator('#placements')).toHaveAttribute('data-case', `${placement} ${spot}`)
+              const trigger = combo(page, 'Country')
+              const popup = await openList(page, trigger, 'tap')
+              await expectInsideViewport(popup, `the list of ${label}`, 8)
+              await expectNoSidewaysScroll(page)
+              const [list, box] = [await boxOf(popup), await boxOf(trigger)]
+              expect(['above', 'below'], label).toContain(sideOf(list, box)?.where)
+              expect(Math.abs(list.width - Math.min(box.width, screen.width - 16)), `${label}: as wide as the trigger`).toBeLessThan(1)
+              await page.keyboard.press('Escape')
+              await expectClosed(page, POPUP)
+            }
+          }
+        })
       }
     }
   })

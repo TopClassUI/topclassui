@@ -67,8 +67,8 @@ content (a `w-fit` box, a table cell) there is nothing to fill: give the parent 
 
 **`placement`** takes the twelve shared values, `bottom-start` by default; `start` and `end` are
 the reading sides. The list opens 6 px off the trigger, flips at an edge and stays 8 px inside the
-screen. It never covers the trigger: beside a trigger on a phone, where the room is narrower than
-the trigger, it takes the room and its labels end in an ellipsis.
+screen. It never covers the trigger: a side placement whose list does not fit beside the trigger, as
+beside one on a phone, opens below it, or above, as wide as the trigger.
 
 **`modal`** is Base UI's:
 - `true`, the default: while the list is open the page does not scroll and a press outside only closes it.

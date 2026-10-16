@@ -12,7 +12,7 @@ import {
   SELECT_ICON, SELECT_ITEM, SELECT_ITEM_TEXT, SELECT_ITEM_TICK, SELECT_LIST, SELECT_POPUP, SELECT_POSITIONER, SELECT_ROOT,
   SELECT_TRIGGER, SELECT_VALUE,
 } from './classes.js'
-import { SELECT_DEFAULTS } from './constants.js'
+import { SELECT_DEFAULTS, SELECT_SIDE_COLLISION_AVOIDANCE } from './constants.js'
 import { useSelect } from './hook.js'
 import type { SelectProps } from './types.js'
 
@@ -77,6 +77,7 @@ export function Select({
           align={align}
           sideOffset={POPUP_BOUNDS.sideOffset}
           collisionPadding={POPUP_BOUNDS.collisionPadding}
+          collisionAvoidance={side === 'top' || side === 'bottom' ? undefined : SELECT_SIDE_COLLISION_AVOIDANCE}
           alignItemWithTrigger={false}
           className={SELECT_POSITIONER}
         >

@@ -139,4 +139,16 @@ export const MUTATIONS: Mutation[] = [
     from: ' forced-colors:data-readonly:border-dashed',
     to: '',
   },
+  {
+    label: 'the select side placement never falls below, so beside a trigger as wide as a phone its list is 2 px wide',
+    file: CLIENT,
+    from: "          collisionAvoidance={side === 'top' || side === 'bottom' ? undefined : SELECT_SIDE_COLLISION_AVOIDANCE}\n",
+    to: '',
+  },
+  {
+    label: 'the select bottom placement may fall to a side too, so a list with no room above or below is squeezed beside it',
+    file: CLIENT,
+    from: "collisionAvoidance={side === 'top' || side === 'bottom' ? undefined : SELECT_SIDE_COLLISION_AVOIDANCE}",
+    to: 'collisionAvoidance={SELECT_SIDE_COLLISION_AVOIDANCE}',
+  },
 ]
