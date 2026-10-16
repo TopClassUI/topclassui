@@ -1,6 +1,6 @@
 // R-5.12-4: one class string per element Dropdown styles, built from the shared overlay constants.
 import {
-  CONTAIN, FOCUS_RING_INSET, LIST_CAP, OVERLAY_SURFACE, POPUP_MOTION, ROW, ROW_HIGHLIGHT, SCROLL_AREA,
+  CONTAIN, FOCUS_RING_INSET, LIST_CAP, OVERLAY_SURFACE, POPUP_MOTION, ROW, ROW_HIGHLIGHT, ROW_TOUCH, SCROLL_AREA,
 } from '#shared/classes.js'
 import type { DropdownItemTone } from './types.js'
 
@@ -31,14 +31,15 @@ export const DROPDOWN_ITEM_DISABLED = [
   'forced-colors:data-disabled:*:opacity-100 forced-colors:data-disabled:not-data-highlighted:text-[GrayText]',
 ].join(' ')
 
-/** R-5.6-2: a row is --tc-row-height tall, 40 px, and 44 under a finger. It never shrinks:
+/** R-5.6-2: a row is --tc-row-height tall, 40 px, and at least 44 under a finger. It never shrinks:
  * a flex item gives up its height before its container scrolls. */
 export const DROPDOWN_ITEM = [
   ROW,
   ROW_HIGHLIGHT,
   DROPDOWN_ITEM_DISABLED,
   CONTAIN,
-  'group shrink-0 cursor-default select-none pointer-coarse:min-h-[var(--tc-target-coarse,44px)]',
+  'group shrink-0 cursor-default select-none',
+  ROW_TOUCH,
 ].join(' ')
 
 /** R-5.2-3: the colour of each tone. Forced colours erase it: there a danger row is its label. */

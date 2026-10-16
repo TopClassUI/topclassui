@@ -62,7 +62,7 @@ describe('DropdownItem', () => {
     for (const cls of [
       'flex', 'min-h-(--tc-row-height)', 'w-full', 'items-center', 'gap-2', 'rounded-control', 'px-3', 'text-sm', 'outline-none',
       'data-highlighted:bg-primary-soft', 'data-highlighted:text-primary-on-soft', 'forced-colors:data-highlighted:bg-[Highlight]',
-      'max-w-full', 'group', 'shrink-0', 'cursor-default', 'select-none', 'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]',
+      'max-w-full', 'group', 'shrink-0', 'cursor-default', 'select-none', 'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]',
     ]) expect(list, cls).toContain(cls)
   })
 

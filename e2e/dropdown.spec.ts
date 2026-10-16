@@ -783,6 +783,21 @@ test.describe('under a coarse pointer', () => {
     })
   }
 
+  test('a row the root or the density makes taller than 44 px keeps its height: a finger raises a row, never shortens it', async ({ page }) => {
+    await openLive(page, 'dropdown--basic')
+    const shortest = async () => {
+      const menu = await openOverlay(page, triggerOf(page, 'Actions'), asMenu({ by: 'tap' }))
+      const heights = await rowsOf(menu).evaluateAll((rows) => rows.map((row) => row.getBoundingClientRect().height))
+      await page.keyboard.press('Escape')
+      await closed(page)
+      return Math.min(...heights)
+    }
+    await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
+    expect(await shortest()).toBeGreaterThanOrEqual(80)
+    await page.evaluate(() => { document.documentElement.style.fontSize = ''; document.documentElement.style.setProperty('--tc-density', '1.25') })
+    expect(await shortest()).toBeGreaterThanOrEqual(50)
+  })
+
   test('a tap puts the focus on the menu itself, and a tap on a row runs it', async ({ page }) => {
     await fixture(page, 'dropdown-kinds', '#kinds')
     const menu = await openOverlay(page, triggerOf(page, 'Kinds', '#kinds'), asMenu({ by: 'tap' }))

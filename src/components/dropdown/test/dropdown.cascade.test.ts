@@ -62,8 +62,8 @@ describe('the order the cascade needs', () => {
     expect(await before('data-disabled:*:opacity-50', 'forced-colors:data-disabled:*:opacity-100')).toBe(true)
   })
 
-  it('the 44 px of a finger is emitted after the row height, and the grey of the system after the danger colour', async () => {
-    expect(await before('min-h-(--tc-row-height)', 'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]')).toBe(true)
+  it('the floor of a finger is emitted after the row height, and the grey of the system after the danger colour', async () => {
+    expect(await before('min-h-(--tc-row-height)', 'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]')).toBe(true)
     expect(await before('text-danger-on-soft', 'forced-colors:data-disabled:not-data-highlighted:text-[GrayText]')).toBe(true)
   })
 

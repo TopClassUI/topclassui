@@ -58,7 +58,7 @@ const DECLARATION: Record<string, string> = {
   'shrink-0': 'flex-shrink: 0;',
   'cursor-default': 'cursor: default;',
   'select-none': 'user-select: none;',
-  'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]': 'min-height: var(--tc-target-coarse,44px);',
+  'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]': 'min-height: max(var(--tc-row-height), var(--tc-target-coarse,44px));',
   'data-highlighted:bg-primary-soft': 'background-color: var(--tc-primary-soft);',
   'data-highlighted:text-primary-on-soft': 'color: var(--tc-primary-on-soft);',
   'forced-colors:data-highlighted:forced-color-adjust-none': 'forced-color-adjust: none;',
@@ -107,7 +107,7 @@ const SCOPE: Record<string, string> = {
 
 /** The classes Tailwind wraps from outside, and the query that must open just before the selector. */
 const WRAPPED: Record<string, string> = {
-  'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]': '@media (pointer: coarse) { ',
+  'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]': '@media (pointer: coarse) { ',
   'forced-colors:data-highlighted:forced-color-adjust-none': '@media (forced-colors: active) { ',
   'forced-colors:data-highlighted:bg-[Highlight]': '@media (forced-colors: active) { ',
   'forced-colors:data-highlighted:text-[HighlightText]': '@media (forced-colors: active) { ',
