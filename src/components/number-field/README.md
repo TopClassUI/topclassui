@@ -111,15 +111,15 @@ import { NumberField } from 'topclassui'
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `aria-label` or `aria-labelledby` or `id`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `aria-label` | no | `string` | - | The name read out when no visible label names the control. |
-| `aria-labelledby` | no | `string` | - | The id of the visible text that names the control. |
+| `aria-label` | **yes**, or `aria-labelledby` or `id` | `string` | - | The name read out when no visible label names the control. |
+| `aria-labelledby` | **yes**, or `aria-label` or `id` | `string` | - | The id of the visible text that names the control. |
+| `id` | **yes**, or `aria-label` or `aria-labelledby` | `string` | - | The id a `<label htmlFor>` points at. |
 | `className` | no | `string` | - | Merged last, so a consumer class wins a conflict with the field's own. |
 | `fullWidth` | no | `boolean` | `false` | Fills the width of its parent instead of taking the width of an Input. |
-| `id` | no | `string` | - | The id a `<label htmlFor>` points at. |
 | `invalid` | no | `boolean` | `false` | Marks the value as wrong: sets aria-invalid on the input, and the line of the field turns to danger and thickens. |
 | `max` | no | `number`, min -1000000000000000, max 1000000000000000 | - | The largest value. End goes to it; a default or a value over it is lowered to it. Clamped to 1e15; NaN reads as none, and under min it is raised to min. |
 | `min` | no | `number`, min -1000000000000000, max 1000000000000000 | - | The smallest value. Home goes to it; a default or a value under it is raised to it. Clamped to -1e15; NaN reads as none. |
