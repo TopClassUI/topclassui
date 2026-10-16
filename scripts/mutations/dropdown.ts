@@ -164,6 +164,24 @@ export const MUTATIONS: Mutation[] = [
     to: 'max-w-1/2',
   },
   {
+    label: 'a dropdown link item drops the colour of its tone, so a destructive link looks like any other',
+    file: CLIENT,
+    from: '<Base.LinkItem closeOnClick {...rest} data-tone={tone} className={cn(DROPDOWN_ITEM, DROPDOWN_ITEM_TONE[tone], className)}>',
+    to: '<Base.LinkItem closeOnClick {...rest} data-tone={tone} className={cn(DROPDOWN_ITEM, className)}>',
+  },
+  {
+    label: 'a dropdown shortcut keeps its width beside a label it cuts, so at a doubled text size a row loses its name',
+    file: CLASSES,
+    from: ' shrink-10000 truncate ps-4',
+    to: ' shrink-0 truncate ps-4',
+  },
+  {
+    label: 'a dropdown shortcut gives way only as fast as its label, so both are cut where the hint alone could give the room',
+    file: CLASSES,
+    from: ' shrink-10000 truncate ps-4',
+    to: ' truncate ps-4',
+  },
+  {
     label: 'a dropdown shortcut stays muted on a highlighted row, and grey on the system highlight under forced colours',
     file: CLASSES,
     from: ' group-data-highlighted:text-inherit',
@@ -198,6 +216,12 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: "'z-(--tc-z-popup) data-anchor-hidden:invisible'",
     to: "'z-(--tc-z-popup)'",
+  },
+  {
+    label: 'a dropdown row drops the shared highlight, so the row the keyboard is on has neither fill nor ring',
+    file: CLASSES,
+    from: '  ROW,\n  ROW_HIGHLIGHT,\n',
+    to: '  ROW,\n',
   },
   {
     label: 'the dropdown icon is read out with the label',

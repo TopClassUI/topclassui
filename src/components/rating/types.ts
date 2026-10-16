@@ -45,7 +45,7 @@ export type RatingEditableProps = RatingShared & Named & Pick<RatingDesignProps,
   readOnly: false
   /** Called with the step a click or an arrow key checked, and on a form reset with the step it returns to. */
   onValueChange?: ((value: number) => void) | undefined
-  /** The field name in a form. Each radio submits its step, "1" to max. Defaults to an id of its own. */
+  /** The field name in a form. Each radio submits its step, "1" to max. Without one the rating is in no form: not submitted, not reset. */
   name?: string | undefined
 }
 

@@ -69,6 +69,9 @@ const verdict = compile({
   childrenGiven: palette(' children="x"'),
   classFunction: palette(" className={() => 'p-4'}"),
   badVirtualize: palette(' virtualize="always"'),
+  statusError: palette(' status="error"'),
+  statusMore: palette(' status="loading-more"'),
+  statusEmpty: palette(' status="empty"'),
 })
 
 describe('the samples in the README compile as written', () => {
@@ -99,5 +102,11 @@ describe('what Command takes', () => {
     expect(verdict['childrenGiven']).not.toEqual([])
     expect(verdict['classFunction']).not.toEqual([])
     expect(verdict['badVirtualize']).not.toEqual([])
+  })
+
+  it('refuses status error and loading-more, which it cannot draw, and takes empty', () => {
+    expect(verdict['statusError']?.join(' ')).toContain('"error"')
+    expect(verdict['statusMore']?.join(' ')).toContain('"loading-more"')
+    expect(verdict['statusEmpty']).toEqual([])
   })
 })
