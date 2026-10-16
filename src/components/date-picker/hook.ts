@@ -47,8 +47,7 @@ export function useDatePicker({
   const actionsRef = useRef(null as DatePickerActions | null)
   const announce = useRef(false)
 
-  // Closed before the part arrived: Base UI waits for a popup that never mounted to animate out and would mount the part
-  // later, hidden and holding the focus. Unmounted now, the portal renders nothing when the part arrives.
+  // Closed before the part arrived: Base UI would wait forever for its exit and mount the part later, hidden, with the focus.
   useEffect(() => {
     if (shown) opened.current = true
     else if (opened.current && !ready.current) actionsRef.current?.unmount()
