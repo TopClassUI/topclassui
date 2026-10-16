@@ -29,8 +29,8 @@ export function SaveButton() {
 
 - **Nothing to mount.** `TopClassProvider` mounts the one viewport. Do not mount
   `ToastViewport` yourself.
-- **Before the provider.** A `toast.add()` called before `TopClassProvider` has mounted is
-  lost. There is no queue.
+- **Before the provider.** A `toast.add()` made before `TopClassProvider` listens, such as
+  one in a page's mount effect, waits and shows once it does.
 - **Outside React.** `toast` is four plain functions: `add`, `update`, `close` and
   `promise`. Call them from a click handler, a fetch callback or any browser module.
 - **The table below** lists the options of `toast.add`, not props. Besides them it takes

@@ -55,7 +55,7 @@ function promise<Value>(waiting: Promise<Value>, steps: ToastPromiseSteps<Value>
   })
 }
 
-/** The four calls over the one manager the provider listens to. A call made before it mounts is lost. */
+/** The four calls over the one manager the provider listens to. A call made before it listens waits for it. */
 export const toast = { add, update, close, promise }
 
 /** The icon a Base UI type draws, or null for one that draws none: neutral, primary, or a type of the caller's. */

@@ -1,5 +1,6 @@
 import { Toast as BaseToast } from '@base-ui/react/toast'
 import { act, render, screen, waitFor } from '@testing-library/react'
+import { useEffect } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { TopClassProvider } from '#shared/provider/provider.js'
@@ -27,12 +28,22 @@ describe('toast.add, with nothing but TopClassProvider mounted', () => {
     expect(screen.getByRole('region', { name: 'Notifications' }).contains(roots()[0] ?? null)).toBe(true)
   })
 
-  it('is lost when called before the provider mounts: there is no queue', async () => {
-    toast.add({ title: 'Too early' })
+  it('waits for the provider when called before it mounts, and keeps the order', async () => {
+    toast.add({ title: 'Early' })
     render(app())
     act(() => { toast.add({ title: 'In time' }) })
     await shown('In time')
-    expect(titles()).toEqual(['In time'])
+    expect(titles()).toEqual(['In time', 'Early'])
+  })
+
+  it('shows a toast a page adds in its mount effect, which runs before the provider listens (TOAST-1)', async () => {
+    function SignedIn() {
+      useEffect(() => { toast.add({ title: 'Welcome back' }) }, [])
+      return <p>page</p>
+    }
+    render(<TopClassProvider direction="ltr" locale="en"><SignedIn /></TopClassProvider>)
+    expect(await shown('Welcome back')).toBeTruthy()
+    expect(titles()).toEqual(['Welcome back'])
   })
 
   it('is neutral by default, which draws no icon', async () => {
