@@ -38,7 +38,7 @@ describe('on the server', () => {
   })
 
   it('the title sits in a span of its own beside the caret, which is hidden from a screen reader', () => {
-    expect(html).toContain('<span class="min-w-0 flex-1">How do I install it?</span>')
+    expect(html).toContain('<span class="min-w-0 grow basis-[6ch]">How do I install it?</span>')
     const caret = tag(html, /<svg [^>]*>/)
     expect(attr(caret, 'aria-hidden')).toBe('true')
     expect(attr(caret, 'width')).toBe('1em')
@@ -89,6 +89,6 @@ describe('on the server', () => {
 
   it('renders a title that is an element as it was given', () => {
     const rich = one({ value: 'invoices', title: <><strong>Invoices</strong> <em>3 new</em></> })
-    expect(rich).toContain('<span class="min-w-0 flex-1"><strong>Invoices</strong> <em>3 new</em></span>')
+    expect(rich).toContain('<span class="min-w-0 grow basis-[6ch]"><strong>Invoices</strong> <em>3 new</em></span>')
   })
 })

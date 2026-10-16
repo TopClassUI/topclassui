@@ -57,8 +57,14 @@ describe('dismissal (the client half)', () => {
     expectTypeOf<Accepts<BannerProps, Named & { dismissible: true; id: string }>>().toEqualTypeOf<true>()
   })
 
+  it('takes a boolean decided at runtime with an id, and refuses it without one', () => {
+    expectTypeOf<Accepts<BannerProps, Named & { dismissible: boolean; id: string }>>().toEqualTypeOf<true>()
+    expectTypeOf<Accepts<BannerProps, Named & { dismissible: boolean }>>().toEqualTypeOf<false>()
+  })
+
   it('takes onDismiss only with dismissible, where it has an x to answer', () => {
     expectTypeOf<Accepts<BannerProps, Named & { onDismiss: () => void }>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<BannerProps, Named & { id: string; onDismiss: () => void }>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<BannerProps, Named & { dismissible: true; id: string; onDismiss: () => void }>>().toEqualTypeOf<true>()
   })
 
@@ -68,7 +74,7 @@ describe('dismissal (the client half)', () => {
   })
 
   it('takes a callback of no argument that returns nothing', () => {
-    expectTypeOf<Extract<BannerProps, { dismissible: true }>['onDismiss']>().toEqualTypeOf<(() => void) | undefined>()
+    expectTypeOf<Extract<BannerProps, { dismissible: boolean }>['onDismiss']>().toEqualTypeOf<(() => void) | undefined>()
   })
 })
 
