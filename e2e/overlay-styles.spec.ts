@@ -5,7 +5,7 @@ import {
   FOCUS_RING, FOCUS_RING_INSET, FOCUS_RING_WITHIN, LIST_CAP, OVERLAY_SURFACE, ROW, ROW_HIGHLIGHT, SCROLL_AREA,
   STICKY_TOP,
 } from '../src/shared/classes.js'
-import { type Clip, type Rgb, contrast, inkOn, paintedIn, pixelsOf, rgbOf, strayOn } from './pixels.js'
+import { type Clip, type Rgb, contrast, inkOn, insideRing, paintedIn, pixelsOf, rgbOf, strayOn } from './pixels.js'
 
 // The class constants every overlay of Unit 3 shares, measured before a component wears one:
 // a class compiles on its own, and that says nothing of what two of them paint together.
@@ -21,6 +21,10 @@ async function boxOf(page: Page, selector: string): Promise<Clip> {
   if (!box) throw new Error(`nothing to measure at ${selector}`)
   return box
 }
+
+/** The radius of a box's corners, in px. */
+const radiusOf = (page: Page, selector: string) =>
+  page.locator(selector).evaluate((el) => Number.parseFloat(getComputedStyle(el).borderTopLeftRadius))
 
 /** One painted pixel. */
 async function pixelAt(page: Page, x: number, y: number): Promise<Rgb> {
@@ -98,7 +102,7 @@ for (const mode of MODES) {
 
     // A soft tint on the raised surface: measured 1.19 in light, 1.11 in dark and 1.18 in ocean.
     const surface = await pixelAt(page, plain.x + 2, plain.y + 2)
-    const fill = await pixelAt(page, lit.x + 2, lit.y + lit.height / 2)
+    const fill = await pixelAt(page, lit.x + lit.width - 12, lit.y + lit.height / 2)
     expect(contrast(fill, surface), 'the fill against the surface of the menu').toBeGreaterThan(1.05)
     expect(paintedIn(await pixelsOf(page, lit), fill), 'pixels of fill in the highlighted row').toBeGreaterThan(lit.width * lit.height * 0.8)
     expect(paintedIn(await pixelsOf(page, plain), fill), 'pixels of fill in another row').toBe(0)
@@ -109,6 +113,24 @@ for (const mode of MODES) {
     expect(colours[1]).not.toBe(colours[0])
     const label = await pixelsOf(page, await textOf(page, '#duplicate'))
     expect(inkOn(label, fill, 4.5), 'pixels of label at 4.5:1 on the fill').toBeGreaterThan(40)
+  })
+
+  // R-5.6-1: the fill is 1.1 to 1.2:1 against the surface, too faint to be the only mark of the focus.
+  test(`${mode}: the highlighted row is ringed inside its edge at 3:1 against the menu, and no other row is`, async ({ page }) => {
+    await scratch(page, MENU, mode)
+    await expect(page.locator('#duplicate')).toHaveCSS('outline-style', 'solid')
+    await expect(page.locator('#duplicate')).toHaveCSS('outline-offset', '-2px')
+    await expect(page.locator('#rename')).toHaveCSS('outline-style', 'none')
+    const [plain, lit] = [await boxOf(page, '#rename'), await boxOf(page, '#duplicate')]
+    const radius = await radiusOf(page, '#duplicate')
+    const surface = await pixelAt(page, plain.x + 2, plain.y + 2)
+    for (const [side, band] of Object.entries(insideRing(lit, radius))) {
+      const pixels = await pixelsOf(page, band)
+      expect(inkOn(pixels, surface), `pixels of ring at 3:1 along the ${side} edge`).toBeGreaterThan(pixels.length * 0.9)
+    }
+    for (const [side, band] of Object.entries(insideRing(plain, radius))) {
+      expect(inkOn(await pixelsOf(page, band), surface), `pixels of ring along the ${side} edge of another row`).toBe(0)
+    }
   })
 
   test(`${mode}: the inset ring is whole inside a parent that clips, where the ring with an offset is cut`, async ({ page }) => {
@@ -147,6 +169,17 @@ for (const scheme of ['light', 'dark'] as const) {
       const label = await pixelsOf(page, await textOf(page, '#duplicate'))
       expect(paintedIn(label, fill), 'pixels of fill around the label').toBeGreaterThan(200)
       expect(inkOn(label, fill, 4.5), 'pixels of label at 4.5:1 on the fill').toBeGreaterThan(40)
+    })
+
+    test('the ring of a highlighted row is HighlightText, drawn inside its edge on the Highlight', async ({ page }) => {
+      await scratch(page, MENU)
+      const pair = await systemPair(page)
+      await expect(page.locator('#duplicate')).toHaveCSS('outline-color', pair.text)
+      const lit = await boxOf(page, '#duplicate')
+      for (const [side, band] of Object.entries(insideRing(lit, await radiusOf(page, '#duplicate')))) {
+        const pixels = await pixelsOf(page, band)
+        expect(inkOn(pixels, rgbOf(pair.fill)), `pixels of ring at 3:1 along the ${side} edge`).toBeGreaterThan(pixels.length * 0.9)
+      }
     })
 
     test('the inset ring is whole inside a parent that clips', async ({ page }) => {
