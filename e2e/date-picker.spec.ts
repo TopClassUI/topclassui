@@ -660,29 +660,68 @@ test.describe('live: a Dialog around it', () => {
   })
 })
 
-test.describe('live: a month button at the end of the range, inside a Dialog', () => {
+test.describe('live: a month button at the end of the range, and the first load, inside a Dialog and a Drawer', () => {
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 
-  for (const by of ['keyboard', 'mouse'] as const) {
-    test(`${by}: Next month into maxDate's month keeps the focus in the calendar, so one Escape closes the calendar alone`, async ({ page }) => {
-      await openLive(page, 'separator--horizontal')
-      await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/date-picker-in-dialog.tsx' })
-      await page.getByRole('button', { name: 'Edit booking' }).click()
-      const button = trigger(page, 'Two months in the dialog')
-      const popup = await openCalendar(page, button)
-      const next = popup.getByRole('button', { name: 'Next month' })
-      if (by === 'keyboard') {
-        await press(page, 'Tab', 'Previous month')
-        await press(page, 'Tab', 'Next month')
-        await page.keyboard.press('Enter')
-      } else await next.click()
-      await expect(popup.getByRole('heading')).toHaveText('October 2026')
-      await expect(next).toHaveAttribute('aria-disabled', 'true')
-      await expect(next).toBeFocused()
+  const LAYERS = [['Dialog', 'Edit booking', 'Two months in the dialog'], ['Drawer', 'Pick a night', 'Two months in the drawer']] as const
+  // A Drawer's sheet carries data-placement too; only the calendar is placed beside a side of its trigger.
+  const CALENDAR = '[role="dialog"][data-side]'
+  const layer = (page: Page) => page.locator('[role="dialog"]:not([data-side])')
+
+  for (const [kind, opener, name] of LAYERS) {
+    for (const by of ['keyboard', 'mouse'] as const) {
+      test(`${kind}, ${by}: Next month into maxDate's month keeps the focus in the calendar, so one Escape closes the calendar alone`, async ({ page }) => {
+        await fixture(page, 'date-picker-in-dialog')
+        await page.getByRole('button', { name: opener }).click()
+        const button = trigger(page, name)
+        const popup = await openOverlay(page, button, { by: 'click', popup: CALENDAR })
+        const next = popup.getByRole('button', { name: 'Next month' })
+        if (by === 'keyboard') {
+          await press(page, 'Tab', 'Previous month')
+          await press(page, 'Tab', 'Next month')
+          await page.keyboard.press('Enter')
+        } else await next.click()
+        await expect(popup.getByRole('heading')).toHaveText('October 2026')
+        await expect(next).toHaveAttribute('aria-disabled', 'true')
+        await expect(next).toBeFocused()
+        await page.keyboard.press('Escape')
+        await expectClosed(page, CALENDAR)
+        await expect(button).toBeFocused()
+        await expect(layer(page), `the Escape closed the ${kind} too`).toBeVisible()
+        await page.keyboard.press('Escape')
+        await expect(layer(page)).toHaveCount(0)
+      })
+    }
+
+    test(`${kind}: Escape while the calendar is still loading closes the calendar alone, and the part that arrives later takes no focus`, async ({ page }) => {
+      let release = (): void => undefined
+      const held = new Promise<void>((resolve) => { release = resolve })
+      await page.route(/date-picker-calendar/, async (route) => { await held; await route.continue() })
+      await fixture(page, 'date-picker-in-dialog')
+      await page.getByRole('button', { name: opener }).click()
+      const button = trigger(page, name)
+      await expect(button).toBeVisible()
+      await button.focus()
+      await page.keyboard.press('Enter')
+      await expect(button).toHaveAttribute('aria-expanded', 'true')
       await page.keyboard.press('Escape')
-      await expectClosed(page, POPUP)
+      await expect(button).toHaveAttribute('aria-expanded', 'false')
+      await expect(layer(page), `the Escape closed the ${kind} too`).toBeVisible()
+      const arrived = page.waitForResponse(/date-picker-calendar/)
+      release()
+      await arrived
+      // The part's icons load after it, then it renders and focuses a frame later: nothing to poll for, so a wait.
+      await page.waitForTimeout(500)
+      expect(await page.locator(CALENDAR).count(), 'a calendar mounted after the close').toBe(0)
       await expect(button).toBeFocused()
-      await expect(page.locator('[role="dialog"]:visible'), 'the Escape closed the Dialog too').toHaveCount(1)
+      await page.keyboard.press('ArrowRight')
+      await page.keyboard.press('Enter')
+      await expect(page.locator(CALENDAR)).toBeVisible()
+      await expect.poll(() => focused(page)).toBe('Tuesday, September 22, 2026')
+      await page.keyboard.press('Escape')
+      await expectClosed(page, CALENDAR)
+      await expect(layer(page)).toBeVisible()
+      await expect(button).toHaveText('Sep 22, 2026')
     })
   }
 })
