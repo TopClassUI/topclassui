@@ -55,7 +55,7 @@ async function hydrate(element: ReactElement, then: (container: HTMLElement) => 
 describe('a page inside TopClassProvider', () => {
   it('renders no element for the toast provider: no viewport is mounted until the Toast component adds it', () => {
     expect(renderToString(page))
-      .toBe('<div class="isolate contents"><main>page</main><p data-testid="titles"></p></div>')
+      .toBe('<div class="isolate"><main>page</main><p data-testid="titles"></p></div>')
   })
 
   it('hydrates with no recoverable error and no console error, and leaves the markup as the server wrote it', async () => {
@@ -68,7 +68,7 @@ describe('a page inside TopClassProvider', () => {
     const { errors, server, hydrated } = await hydrate(island)
     expect(errors).toEqual([])
     expect(hydrated).toBe(server)
-    expect(server).toBe('<div class="isolate contents"><main>page</main><div class="isolate contents"><aside>island</aside></div></div>')
+    expect(server).toBe('<div class="isolate"><main>page</main><div class="contents"><aside>island</aside></div></div>')
   })
 
   it('holds no toast in the server markup even when one was added before the render: the server has no listener', () => {
