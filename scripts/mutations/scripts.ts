@@ -71,14 +71,32 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the README of a part family says a Root that draws nothing passes attributes to its element',
     file: 'scripts/lib/readme-parts.ts',
-    from: 'return family.rootDraws',
-    to: 'return true',
+    from: "const none = named('none')",
+    to: 'const none: string[] = []',
   },
   {
-    label: 'the README of a part family takes every Root for one that draws an element',
+    label: 'the README says a part that takes only a className passes attributes to its element',
+    file: 'scripts/lib/readme-parts.ts',
+    from: "const className = named('className')",
+    to: 'const className: string[] = []',
+  },
+  {
+    label: 'the README takes every part for one that draws an element',
     file: 'scripts/lib/readme-types.ts',
-    from: ".has('className') }",
-    to: ".has('className') || true }",
+    from: "if (accepts.has('id')) return 'element'",
+    to: "return 'element'",
+  },
+  {
+    label: 'the README takes a part with a className and no id, such as DropdownMenu, for one that draws nothing',
+    file: 'scripts/lib/readme-types.ts',
+    from: "return accepts.has('className') ? 'className' : 'none'",
+    to: "return 'none'",
+  },
+  {
+    label: 'the README of a component with no bare <Name> export, such as Toast, imports that name anyway',
+    file: 'scripts/lib/readme.ts',
+    from: 'family ? familyImport(family) : singleImport(surface),',
+    to: "family ? familyImport(family) : `import { ${meta.name} } from 'topclassui'`,",
   },
   {
     label: 'the README of a part family lists every schema prop under every part',

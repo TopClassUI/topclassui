@@ -1,7 +1,7 @@
 // R-8.3-3: the props table is generated, never written by hand, so it cannot tell a
 // reader that a prop is optional when the schema says otherwise.
 import type { ComponentMeta, Rendering } from '../../src/shared/meta.js'
-import { type PartFamily, familyImport, familyProps } from './readme-parts.js'
+import { type PartFamily, type Surface, familyImport, familyProps, reachLine } from './readme-parts.js'
 
 export const HAND_START = '<!-- hand-written -->'
 export const HAND_END = '<!-- /hand-written -->'
@@ -26,6 +26,8 @@ export interface ReadmeInput {
   handWritten: string
   /** A part family (R-9.2-4): its flat names and its props part by part, in place of `props`. */
   family?: PartFamily | undefined
+  /** What a single component imports, when index.tsx exports no bare <Name>, as Toast does. */
+  surface?: Surface | undefined
 }
 
 const RENDERING_LINE: Record<Rendering, string> = {
@@ -108,22 +110,27 @@ function propsTable(rows: PropRow[]): string {
   return [head, ...body].join('\n')
 }
 
-function singleProps(props: PropRow[]): string[] {
-  const required = props.filter((p) => p.required)
+function singleProps(props: PropRow[], surface: Surface, whole: 'single' | 'surface'): string[] {
+  const required = props.filter((p) => p.required).map((p) => `\`${p.name}\``)
+  const reach = reachLine(surface, whole)
   return [
     required.length === 0
       ? 'Every prop below is optional and falls back to the default shown.'
-      : `Required: ${required.map((p) => `\`${p.name}\``).join(', ')}. Every other prop below is optional.`,
+      : `Required: ${required.join(', ')}. Every other prop below is optional.`,
     '',
     propsTable(props),
     '',
-    `Anything else is passed to the root element, so standard attributes (\`onClick\`, \`aria-*\`, \`data-*\`, \`id\`) work. \`className\` is merged last, so yours wins a conflict, and \`ref\` is a normal prop.`,
-    '',
+    ...(reach === '' ? [] : [reach, '']),
   ]
 }
 
+/** One name on one line; several, as Toast's viewport and its calls, on one line too. */
+const singleImport = (surface: Surface) => `import { ${surface.map((part) => part.name).join(', ')} } from 'topclassui'`
+
 export function renderReadme(input: ReadmeInput): string {
   const { meta, props, demos, handWritten, family } = input
+  const surface = input.surface ?? [{ name: meta.name, reach: 'element' }]
+  const whole = surface.length === 1 && surface[0]?.name === meta.name ? 'single' : 'surface'
   const category = meta.category.replace(/-/g, ' ')
 
   const lines = [
@@ -142,12 +149,12 @@ export function renderReadme(input: ReadmeInput): string {
     '## Import',
     '',
     '```tsx',
-    family ? familyImport(family) : `import { ${meta.name} } from 'topclassui'`,
+    family ? familyImport(family) : singleImport(surface),
     '```',
     '',
     '## Props',
     '',
-    ...(family ? familyProps(family, propsTable) : singleProps(props)),
+    ...(family ? familyProps(family, propsTable) : singleProps(props, surface, whole)),
   ]
 
   if (demos.length > 0) {

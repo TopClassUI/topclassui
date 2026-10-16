@@ -3,12 +3,13 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import type { PropRow } from './readme.js'
-import { familyOf, openTypeProgram, propNamesOf, valueExportsOf } from './readme-types.js'
+import { familyOf, openTypeProgram, propNamesOf, reachOf, valueExportsOf } from './readme-types.js'
 
 const ROOT = process.cwd()
 const at = (slug: string, file: string) => join(ROOT, 'src', 'components', slug, file)
 const program = openTypeProgram(ROOT, [
   at('dialog', 'types.ts'), at('dialog', 'index.tsx'), at('card', 'types.ts'), at('card', 'index.tsx'),
+  at('dropdown', 'types.ts'), at('toast', 'types.ts'),
 ])
 
 const row = (name: string): PropRow => ({ name, required: false, type: '`boolean`', default: '-', description: name })
@@ -42,11 +43,23 @@ describe('each part is documented with what its own type accepts', () => {
 
   it('reads every prop a type accepts, Base UI\'s too, so a Root without className is seen to draw nothing', () => {
     expect(propNamesOf(program, at('dialog', 'types.ts'), 'DialogRootProps').has('onOpenChange')).toBe(true)
-    expect(dialog.rootDraws).toBe(false)
+    expect(dialog.parts[0]?.reach).toBe('none')
   })
 
   it('sees that CardRoot draws a div', () => {
     const card = familyOf(program, at('card', 'types.ts'), ['CardRoot', 'CardBody'], 'CardRoot', [])
-    expect(card.rootDraws).toBe(true)
+    expect(card.parts[0]?.reach).toBe('element')
+  })
+})
+
+describe('what each part passes on is read from its own type', () => {
+  it('DropdownMenu takes a className and no id or ref, so it is never said to take attributes', () => {
+    expect(reachOf(program, at('dropdown', 'types.ts'), 'DropdownMenu')).toBe('className')
+    expect(reachOf(program, at('dropdown', 'types.ts'), 'DropdownPopup')).toBe('element')
+  })
+
+  it('ToastViewport takes a className alone, and the toast function has no props type at all', () => {
+    expect(reachOf(program, at('toast', 'types.ts'), 'ToastViewport')).toBe('className')
+    expect(reachOf(program, at('toast', 'types.ts'), 'toast')).toBe(null)
   })
 })

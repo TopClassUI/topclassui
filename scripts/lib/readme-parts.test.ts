@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { ComponentMeta } from '../../src/shared/meta.js'
 import { renderReadme } from './readme.js'
-import type { PartFamily } from './readme-parts.js'
+import { type PartFamily, type Reach, reachLine } from './readme-parts.js'
 
 const meta: ComponentMeta = {
   name: 'Sheet',
@@ -19,18 +19,17 @@ const meta: ComponentMeta = {
 const SIZE = { name: 'size', required: false, type: '`sm` | `md`', default: '`"md"`', description: 'SheetPopup: the widest it grows.' }
 const CHILDREN = { name: 'children', required: false, type: '`ReactNode`', default: '-', description: 'The trigger and the popup.' }
 
-const family = (over: Partial<PartFamily> = {}): PartFamily => ({
+const family = (over: Partial<PartFamily> = {}, rootReach: Reach = 'none'): PartFamily => ({
   parts: [
-    { name: 'SheetRoot', rows: [CHILDREN] },
-    { name: 'SheetTrigger', rows: [] },
-    { name: 'SheetPopup', rows: [SIZE] },
+    { name: 'SheetRoot', rows: [CHILDREN], reach: rootReach },
+    { name: 'SheetTrigger', rows: [], reach: 'element' },
+    { name: 'SheetPopup', rows: [SIZE], reach: 'element' },
   ],
-  rootDraws: false,
   ...over,
 })
 
-const render = (over: Partial<PartFamily> = {}) =>
-  renderReadme({ meta, props: [], demos: [], handWritten: 'prose', family: family(over) })
+const render = (over: Partial<PartFamily> = {}, rootReach: Reach = 'none') =>
+  renderReadme({ meta, props: [], demos: [], handWritten: 'prose', family: family(over, rootReach) })
 
 describe('a part family is imported by its flat names', () => {
   it('lists every part, one per line, and never the bare name', () => {
@@ -55,12 +54,12 @@ describe('a part family lists its props part by part', () => {
   })
 
   it('names a required prop with the part it belongs to', () => {
-    const required = render({ parts: [{ name: 'SheetRoot', rows: [{ ...CHILDREN, required: true }] }] })
+    const required = render({ parts: [{ name: 'SheetRoot', rows: [{ ...CHILDREN, required: true }], reach: 'none' }] })
     expect(required).toContain('Required: `children` on `SheetRoot`. Every other prop below is optional.')
   })
 })
 
-describe('the closing line follows what the root draws', () => {
+describe('the closing line follows what each part passes on', () => {
   it('a root that draws no element is never said to take attributes', () => {
     const out = render()
     expect(out).toContain('`SheetRoot` draws no element, so it takes no `className`, `style` or `ref`. Anything else on another part is passed to the element it draws')
@@ -68,18 +67,45 @@ describe('the closing line follows what the root draws', () => {
   })
 
   it('a root that draws one passes the rest of each part to its own element', () => {
-    const out = render({ rootDraws: true })
+    const out = render({}, 'element')
     expect(out).toContain('Anything else is passed to the element each part draws, so standard attributes')
     expect(out).not.toContain('draws no element')
     expect(out).not.toContain('passed to the root element')
   })
+
+  it('a part that takes a className and nothing else is said to, and not to take attributes', () => {
+    const out = render({ parts: [...family().parts, { name: 'SheetMenu', rows: [], reach: 'className' }] })
+    expect(out).toContain('`SheetMenu` takes no attribute but `className`, which is merged last, and no `ref`. Anything else on another part')
+  })
+
+  it('names nothing for an export that has no props type, such as a function', () => {
+    expect(reachLine([{ name: 'toast', reach: null }], 'surface')).toBe('')
+  })
 })
 
-describe('a single component is untouched', () => {
+describe('a single component', () => {
   it('still imports its one name and passes the rest to its root element', () => {
     const out = renderReadme({ meta, props: [SIZE], demos: [], handWritten: 'prose' })
     expect(out).toContain("import { Sheet } from 'topclassui'")
     expect(out).toContain('Anything else is passed to the root element')
     expect(out).not.toContain('###')
+  })
+
+  it('without a bare <Name> export is imported by the names it has, and promises only what they take', () => {
+    const out = renderReadme({
+      meta, props: [SIZE], demos: [], handWritten: 'prose',
+      surface: [{ name: 'SheetViewport', reach: 'className' }, { name: 'sheet', reach: null }],
+    })
+    expect(out).toContain("```tsx\nimport { SheetViewport, sheet } from 'topclassui'\n```")
+    expect(out).toContain('`SheetViewport` takes no attribute but `className`, which is merged last, and no `ref`.\n')
+    expect(out).not.toContain('Anything else')
+  })
+
+  it('names the elements that take attributes when it is not one component', () => {
+    const out = renderReadme({
+      meta, props: [], demos: [], handWritten: 'prose',
+      surface: [{ name: 'register', reach: null }, { name: 'Glyph', reach: 'element' }],
+    })
+    expect(out).toContain('Anything else on `Glyph` is passed to the element it draws, so standard attributes')
   })
 })

@@ -5,7 +5,7 @@ import { join } from 'node:path'
 import ts from 'typescript'
 
 import { type PropRow, mergeRows } from './readme.js'
-import type { PartFamily } from './readme-parts.js'
+import type { PartFamily, Reach } from './readme-parts.js'
 
 /** One program for every component, because creating one per folder costs seconds each. */
 export function openTypeProgram(root: string, files: string[]): ts.Program {
@@ -101,12 +101,24 @@ export function valueExportsOf(program: ts.Program, file: string): string[] {
 
 /** Every prop a type accepts, wherever it is declared, Base UI's included. */
 export function propNamesOf(program: ts.Program, file: string, exportName: string): Set<string> {
+  return propNamesOrNull(program, file, exportName) ?? new Set()
+}
+
+function propNamesOrNull(program: ts.Program, file: string, exportName: string): Set<string> | null {
   const checker = program.getTypeChecker()
   const found = exportsOf(program, file).find((e) => e.name === exportName)
-  if (!found) return new Set()
+  if (!found) return null
   const declared = checker.getDeclaredTypeOfSymbol(found)
   const branches = declared.isUnion() ? declared.types : [declared]
   return new Set(branches.flatMap((branch) => checker.getPropertiesOfType(branch).map((p) => p.name)))
+}
+
+/** What `<name>Props` passes on: element attributes, a className alone, nothing, or null with no such type. */
+export function reachOf(program: ts.Program, file: string, name: string): Reach | null {
+  const accepts = propNamesOrNull(program, file, `${name}Props`)
+  if (accepts === null) return null
+  if (accepts.has('id')) return 'element'
+  return accepts.has('className') ? 'className' : 'none'
 }
 
 /**
@@ -122,10 +134,10 @@ export function familyOf(
     const schemaRows = fromSchema.filter((row) => accepts.has(row.name))
     for (const row of schemaRows) claimed.add(row.name)
     const rows = mergeRows(schemaRows, ownPropsOf(program, typeFile, `${name}Props`))
-    return { name, rows: rows.filter((row) => row.name !== 'className') }
+    return { name, rows: rows.filter((row) => row.name !== 'className'), reach: reachOf(program, typeFile, name) }
   })
   const orphans = fromSchema.filter((row) => !claimed.has(row.name))
   const first = parts[0]
   if (first && orphans.length > 0) parts[0] = { ...first, rows: mergeRows(orphans, first.rows) }
-  return { parts, rootDraws: propNamesOf(program, typeFile, `${root}Props`).has('className') }
+  return { parts }
 }
