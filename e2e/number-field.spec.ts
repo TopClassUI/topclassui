@@ -312,6 +312,18 @@ test.describe('live: steppers, typing and the keys', () => {
     expect(await page.locator('input[name="guests"]').inputValue()).toBe('1234')
   })
 
+  test('ar-u-nu-arab: a Latin 1,234 typed and sent with Enter is 1234 in the form while the field keeps the focus, not 1', async ({ page }) => {
+    await openLive(page, 'number-field--rtl', { direction: 'rtl' })
+    const field = input(page, 'عدد الضيوف')
+    await field.click()
+    await field.selectText()
+    await page.keyboard.type('1,234')
+    expect(await page.locator('input[name="guests"]').inputValue()).toBe('1')
+    await page.keyboard.press('Enter')
+    await expect(field).toBeFocused()
+    expect(await page.locator('input[name="guests"]').inputValue()).toBe('1234')
+  })
+
   for (const direction of DIRECTIONS) {
     test(`the rtl demo on a ${direction} page: increase at the left, and a typed negative number keeps its sign at the left`, async ({ page }) => {
       await openLive(page, 'number-field--rtl', { direction })

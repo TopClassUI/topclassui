@@ -139,4 +139,10 @@ export const MUTATIONS: Mutation[] = [
     from: 'aspect-square shrink items-center',
     to: 'aspect-square shrink-0 items-center',
   },
+  {
+    label: 'the number field reads a typed Latin 1,234 only on blur, so Enter under Arabic-Indic digits submits 1',
+    file: HOOK,
+    from: "    input.addEventListener('keydown', enter)\n",
+    to: '',
+  },
 ]

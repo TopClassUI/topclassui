@@ -70,6 +70,16 @@ describe('after a change', () => {
     await userEvent.clear(field())
     expect(entries(formOf())).toEqual([['guests', '']])
   })
+
+  it('a Latin 1,234 typed under Arabic-Indic digits and sent with Enter, still focused, sends 1234 and not 1', async () => {
+    const sent = vi.fn()
+    render(<form onSubmit={(event) => { event.preventDefault(); sent(entries(event.currentTarget)) }}>
+      <NumberField aria-label="A" name="guests" locale="ar-u-nu-arab" /><button type="submit">Send</button>
+    </form>)
+    await userEvent.type(field(), '1,234{Enter}')
+    expect(sent.mock.calls).toEqual([[[['guests', '1234']]]])
+    expect(document.activeElement).toBe(field())
+  })
 })
 
 describe('a reset brings it back to its default, on screen and in the form', () => {
