@@ -175,4 +175,16 @@ export const MUTATIONS: Mutation[] = [
     from: 'while (Math.round(value * 10) / 10 >= 1024 &&',
     to: 'while (value >= 1024 &&',
   },
+  {
+    label: 'the file upload counts no cut, so a second over-limit pick in a row is silent',
+    file: HOOK,
+    from: 'cuts: state.value.cuts + (sorted.cut ? 1 : 0)',
+    to: 'cuts: state.value.cuts',
+  },
+  {
+    label: 'the file upload message keeps its node across cuts, so a second over-limit pick in a row is silent',
+    file: CLIENT,
+    from: '<span key={upload.messageKey}>',
+    to: '<span>',
+  },
 ]

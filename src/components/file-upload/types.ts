@@ -68,6 +68,8 @@ export interface FileUploadState {
   rows: readonly FileUploadRow[]
   /** The latest change cut files at maxFiles. */
   cut: boolean
+  /** How many changes maxFiles has cut: each cut writes its message anew, so a second one in a row is heard too. */
+  cuts: number
   /** The rejected rows came with the latest change, so the hidden status line reads them. */
   fresh: boolean
 }

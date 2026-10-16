@@ -85,7 +85,8 @@ export function FileUpload({
           </li>
         ))}
       </ul>
-      <div role="status" className={FILE_UPLOAD_MESSAGE}>{upload.message}</div>
+      {/* A new node per cut: the same words written again into the same node change nothing, and are not heard. */}
+      <div role="status" className={FILE_UPLOAD_MESSAGE}>{upload.message === '' ? null : <span key={upload.messageKey}>{upload.message}</span>}</div>
       <div role="status" className={FILE_UPLOAD_ANNOUNCE}>
         {upload.refused.map((row) => (
           <div key={row.key}><span dir="auto">{row.name}</span> <span>{row.note}</span></div>
