@@ -366,6 +366,13 @@ test.describe('live: ten thousand options, windowed', () => {
     expect(await reopenOnChosen(page)).toEqual({ text: 'Option 9997', whole: true })
   })
 
+  test('at a 32 px root on a phone, opened again on a row chosen far down, the list cut to fit still shows that row whole', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 480 })
+    await openLive(page, 'combobox--ten-thousand')
+    await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
+    expect(await reopenOnChosen(page)).toEqual({ text: 'Option 9997', whole: true })
+  })
+
   test('at a 32 px root on a phone: rows of 80 px, the popup fits, and the last of ten thousand still lands whole', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 480 })
     await openLive(page, 'combobox--ten-thousand')

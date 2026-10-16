@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -89,6 +89,19 @@ describe('the list is the shared collection', () => {
     await userEvent.click(screen.getByRole('combobox'))
     style.remove()
     expect(scrolled).toEqual([{ index: 1, block: 'center', unit: 44 }])
+  })
+
+  it('cut to fit once open, the list centres the chosen row again; scrolled first, it is left where it is', async () => {
+    render(<Combobox aria-label="L" items={ITEMS} defaultValue="b" />)
+    await userEvent.click(screen.getByRole('combobox'))
+    const list = screen.getByRole('listbox')
+    Object.defineProperty(list, 'clientHeight', { configurable: true, value: 232 })
+    act(() => { list.dispatchEvent(new Event('scroll')) })
+    expect(scrolled.map((scroll) => scroll.index)).toEqual([1, 1])
+    Object.defineProperty(list, 'scrollTop', { configurable: true, get: () => 300, set: () => undefined })
+    Object.defineProperty(list, 'clientHeight', { configurable: true, value: 180 })
+    act(() => { list.dispatchEvent(new Event('scroll')) })
+    expect(scrolled.map((scroll) => scroll.index)).toEqual([1, 1])
   })
 
   it('visibleRows is clamped to 1 and 20 and set on the list as --tc-list-rows; left out, no style is written', async () => {

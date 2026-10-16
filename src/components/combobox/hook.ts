@@ -104,6 +104,7 @@ export function useComboboxList({
   const list = useRef(null as HTMLDivElement | null)
   const pending = useRef(-1)
   const shown = useRef(null as readonly ListOption[] | null)
+  const centred = useRef(null as { index: number, height: number, top: number } | null)
 
   const listRef = useCallback((node: HTMLDivElement | null) => {
     list.current = node
@@ -139,8 +140,14 @@ export function useComboboxList({
       const before = shown.current
       shown.current = filtered
       const chosen = before === null && selected !== null ? filtered.findIndex((option) => option.value === selected) : -1
-      if (chosen >= 0) scrollToIndex(chosen, 'center')
-      else if (before !== null && !isAppended(before, filtered)) node.scrollTop = 0
+      centred.current = chosen >= 0 ? { index: chosen, height: -1, top: node.scrollTop } : null
+      if (before !== null && chosen < 0 && !isAppended(before, filtered)) node.scrollTop = 0
+    }
+    // The popup learns its available height after it opens: a list cut to fit centres the chosen row again, until scrolled.
+    const target = centred.current
+    if (node && target?.top === node.scrollTop && target.height !== node.clientHeight) {
+      scrollToIndex(target.index, 'center')
+      centred.current = { index: target.index, height: node.clientHeight, top: node.scrollTop }
     }
     if (pending.current >= 0) reveal(pending.current)
   })

@@ -146,4 +146,16 @@ export const MUTATIONS: Mutation[] = [
     from: '      setUnit(height)\n      return\n',
     to: '      setUnit(height)\n',
   },
+  {
+    label: 'the combobox centres the chosen row once, before the popup cuts the list to fit, so at a 32 px root on a phone the row is half hidden',
+    file: HOOK,
+    from: '    if (node && target?.top === node.scrollTop && target.height !== node.clientHeight) {',
+    to: '    if (node && target !== null && target.height < 0) {',
+  },
+  {
+    label: 'the combobox centres the chosen row again after it was scrolled away, so a resize pulls the list back from where the user took it',
+    file: HOOK,
+    from: '    if (node && target?.top === node.scrollTop && target.height !== node.clientHeight) {',
+    to: '    if (node && target && target.height !== node.clientHeight) {',
+  },
 ]
