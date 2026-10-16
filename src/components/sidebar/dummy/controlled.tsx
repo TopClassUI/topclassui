@@ -14,7 +14,7 @@ export default function Demo() {
   const [open, setOpen] = useState(true)
   const [changes, setChanges] = useState(0)
   return (
-    <div className="flex h-96 gap-4">
+    <div className="flex h-96 flex-wrap gap-4">
       <SidebarRoot open={open} onOpenChange={(next) => { setOpen(next); setChanges((count) => count + 1) }}>
         <SidebarHeader>Workspace</SidebarHeader>
         <SidebarBody>
@@ -24,7 +24,7 @@ export default function Demo() {
           </SidebarGroup>
         </SidebarBody>
       </SidebarRoot>
-      <div className="grid min-w-0 flex-1 content-start gap-3">
+      <div className="grid min-w-0 grow basis-40 content-start gap-3">
         <Button variant="outline" className="justify-self-start" onClick={() => { setOpen((current) => !current) }}>
           {open ? 'Hide the labels' : 'Show the labels'}
         </Button>

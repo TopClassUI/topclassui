@@ -802,6 +802,56 @@ test.describe('how many can be open', () => {
 })
 
 /**
+ * Sixty items on a phone, the answer to question 3 some 640 px long and open, and the scroller moved so question 4
+ * starts `at` px below its top: with 100, the end of that answer is still on screen; with -10, all of it is above.
+ */
+async function readTo(page: Page, at: number, scroller: 'page' | 'box'): Promise<void> {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await openLive(page, 'accordion--many-items')
+  if (scroller === 'box') await page.locator('#demo').evaluate((demo) => { Object.assign(demo.style, { height: '600px', overflowY: 'auto' }) })
+  const third = triggers(page).nth(2)
+  await regionOf(third).evaluate((region) => {
+    for (let line = 1; line <= 30; line++) region.append(Object.assign(document.createElement('p'), { textContent: `Line ${String(line)} of a long answer.` }))
+  })
+  await third.click()
+  await atRest(page)
+  await triggers(page).nth(3).evaluate((fourth, [to, inBox]) => {
+    const box = inBox ? document.querySelector('#demo') : document.scrollingElement
+    if (!box) throw new Error('no scroller')
+    box.scrollBy(0, fourth.getBoundingClientRect().top - (inBox ? box.getBoundingClientRect().top : 0) - to)
+  }, [at, scroller === 'box'] as const)
+  expect(await panelOf(third).evaluate((panel) => panel.getBoundingClientRect().height)).toBeGreaterThan(600)
+}
+
+// One at a time, the answer above closes when its fade ends: Chromium's scroll anchoring holds the page only when it is off screen.
+test.describe('a press keeps its trigger where it was while the answer above closes', () => {
+  const CASES = [
+    { name: 'a click, the end of the answer above still on screen', at: 100, scroller: 'page', key: false },
+    { name: 'Enter, the end of the answer above still on screen', at: 100, scroller: 'page', key: true },
+    { name: 'a click, the answer above all off screen, where the browser anchors too', at: -10, scroller: 'page', key: false },
+    { name: 'a click, in a box that scrolls and not the page', at: 100, scroller: 'box', key: false },
+  ] as const
+  for (const { name, at, scroller, key } of CASES) {
+    test(name, async ({ page }) => {
+      await readTo(page, at, scroller)
+      const seventh = triggers(page).nth(6)
+      const before = await boxOf(seventh)
+      if (key) {
+        await seventh.focus()
+        await page.keyboard.press('Enter')
+      } else {
+        await seventh.click()
+      }
+      await atRest(page)
+      expect((await expanded(page)).slice(0, 7)).toEqual(['false', 'false', 'false', 'false', 'false', 'false', 'true'])
+      await expect(seventh).toBeFocused()
+      const after = await boxOf(seventh)
+      expect(Math.abs(after.top - before.top), `question 7 at ${String(before.top)} before and ${String(after.top)} after`).toBeLessThanOrEqual(1)
+    })
+  }
+})
+
+/**
  * Everything wrong with how the accordions under a scope are laid out, in words: a part that crosses the left or
  * right edge of its own box, an item or a panel that lies over the one before it, a title that lies over its
  * caret or is wider than its room, and a box that crosses the padding of the page.
@@ -836,7 +886,9 @@ const faultsOf = (page: Page, scope = '#demo') => page.evaluate((within) => {
       }
       if (title.scrollWidth > title.clientWidth + 1) faults.push(`the title of ${name} is wider than its room`)
       const [text, mark] = [title.getBoundingClientRect(), caret.getBoundingClientRect()]
-      if (text.right > mark.left + 0.5 && mark.right > text.left + 0.5) faults.push(`the title of ${name} lies over its caret`)
+      // On both axes: where the caret has wrapped below its title, the two share columns and no pixel.
+      const across = text.right > mark.left + 0.5 && mark.right > text.left + 0.5
+      if (across && text.bottom > mark.top + 0.5 && mark.bottom > text.top + 0.5) faults.push(`the title of ${name} lies over its caret`)
       if (panel.getBoundingClientRect().top < heading.getBoundingClientRect().bottom - 0.5) faults.push(`the panel of ${name} lies over its trigger`)
     }
   }
@@ -876,10 +928,12 @@ test.describe('on every screen, in both directions', () => {
       title.textContent = 'a title that no longer wraps and is far wider than the room it was given'
     })
     await triggers(page).nth(1).evaluate((button) => { button.style.marginInlineStart = '-40px' })
+    await triggers(page).nth(2).evaluate((button) => { (button.lastElementChild as HTMLElement).style.marginInlineStart = '-20px' })
     expect(await faultsOf(page)).toEqual([
       'the title of "a title that no " is wider than its room',
       'the button of "Does it work in " crosses its box',
       'the title of "Does it work in " crosses its box',
+      'the title of "How big is the b" lies over its caret',
     ])
     await page.locator('#demo [data-orientation]').first().evaluate((box: HTMLElement) => { box.style.width = '400px' })
     expect(await faultsOf(page)).toContain('a box crosses the padding of the page')
@@ -1176,7 +1230,7 @@ test.describe('axe on a 320 x 480 phone', () => {
 })
 
 test.describe('larger text', () => {
-  for (const screen of [{ width: 1280, height: 800 }, { width: 390, height: 844 }]) {
+  for (const screen of [{ width: 1280, height: 800 }, { width: 390, height: 844 }, { width: 320, height: 480 }]) {
     test(`${String(screen.width)} px, text at 200% (root 32 px): every trigger grows with its title, and nothing leaves its box`, async ({ page }) => {
       await page.setViewportSize(screen)
       for (const demo of ['accordion--basic', 'accordion--long-content', 'accordion--rtl']) {
@@ -1190,6 +1244,12 @@ test.describe('larger text', () => {
         if (screen.width === 1280 && demo === 'accordion--basic') expect(heights).toEqual([96, 96, 96])
         const caret = await boxOf(triggers(page).first().locator('xpath=./span[last()]'))
         expect({ width: caret.width, height: caret.height }).toEqual({ width: 28, height: 28 })
+        // Beside its title or wrapped below it, each caret keeps 32 px (px-4) from the inline end of its trigger.
+        const ends = await triggers(page).evaluateAll((all) => all.map((one) => {
+          const [row, mark] = [one.getBoundingClientRect(), one.lastElementChild?.getBoundingClientRect()]
+          return mark ? Math.round(getComputedStyle(one).direction === 'rtl' ? mark.left - row.left : row.right - mark.right) : -1
+        }))
+        expect([...new Set(ends)], demo).toEqual([32])
       }
     })
   }

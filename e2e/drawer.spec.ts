@@ -577,17 +577,29 @@ test.describe('a bottom sheet on a phone', () => {
   })
 })
 
-// Base UI's keyboard provider, around the portal of a bottom sheet: its viewport is what hands it the touches.
+/** A software keyboard, as a phone reports one: the visual viewport loses its lower part and says so. */
+const keyboardUp = (page: Page, visible: number) => page.evaluate((height) => {
+  const viewport = window.visualViewport
+  if (!viewport) throw new Error('no visual viewport')
+  Object.defineProperty(viewport, 'height', { configurable: true, get: () => height })
+  viewport.dispatchEvent(new Event('resize'))
+}, visible)
+
+/** Twenty more copies of the first field of a body, #f0 to #f19, so the body scrolls. */
+const twentyMoreFields = (popup: Locator) => bodyOf(popup).evaluate((body) => {
+  const field = body.querySelector('input')
+  if (!field) throw new Error('the body holds no field')
+  for (let index = 0; index < 20; index++) {
+    const copy = field.cloneNode(true) as HTMLInputElement
+    copy.id = `f${String(index)}`
+    copy.name = copy.id
+    body.append(copy)
+  }
+})
+
+// Base UI's keyboard provider, around the portal of every sheet: its viewport is what hands it the touches.
 test.describe('a field in a bottom sheet, and the keyboard of a phone', () => {
   test.use(PHONE)
-
-  /** A software keyboard, as a phone reports one: the visual viewport loses its lower part and says so. */
-  const keyboardUp = (page: Page, visible: number) => page.evaluate((height) => {
-    const viewport = window.visualViewport
-    if (!viewport) throw new Error('no visual viewport')
-    Object.defineProperty(viewport, 'height', { configurable: true, get: () => height })
-    viewport.dispatchEvent(new Event('resize'))
-  }, visible)
 
   test('a tap on a field is taken by the provider, which focuses it without letting the page scroll: the click is its own', async ({ page }) => {
     const popup = await open(page, 'drawer--with-form', { by: 'tap' })
@@ -613,22 +625,70 @@ test.describe('a field in a bottom sheet, and the keyboard of a phone', () => {
 
   test('twenty-two fields: the body scrolls the field with the focus up from under the keyboard', async ({ page }) => {
     const popup = await open(page, 'drawer--with-form', { by: 'tap' })
-    await bodyOf(popup).evaluate((body) => {
-      const field = body.querySelector('input')
-      if (!field) throw new Error('the body holds no field')
-      for (let index = 0; index < 20; index++) {
-        const copy = field.cloneNode(true) as HTMLInputElement
-        copy.id = `f${String(index)}`
-        copy.name = copy.id
-        body.append(copy)
-      }
-    })
+    await twentyMoreFields(popup)
     const field = popup.locator('#f15')
     await field.scrollIntoViewIfNeeded()
     await field.tap()
     await keyboardUp(page, 400)
     await expect.poll(async () => (await boxOf(field)).bottom, { message: 'the foot of the field' }).toBeLessThan(400)
     expect((await partsOf(popup)).scrollTop, 'px the body scrolled to bring it there').toBeGreaterThan(300)
+  })
+})
+
+// "A side sheet on desktop and a bottom sheet on a phone": an app moves an open sheet across its breakpoint.
+test.describe('a sheet whose placement changes while it is open', () => {
+  type Placement = 'start' | 'end' | 'top' | 'bottom'
+
+  /** e2e/fixtures/drawer-placement.tsx, its sheet placed, then opened. */
+  async function placed(page: Page, placement: Placement, options: LiveOptions & OpenOptions = {}): Promise<Locator> {
+    await openLive(page, 'separator--horizontal', options)
+    await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/drawer-placement.tsx' })
+    await expect(page.locator('#placement-drawer')).toBeVisible()
+    await place(page, placement)
+    return openOverlay(page, triggerOf(page, 'Note', '#placement-drawer'), options)
+  }
+
+  const place = (page: Page, placement: Placement) => page.evaluate((detail) => {
+    window.dispatchEvent(new CustomEvent('placement', { detail }))
+  }, placement)
+
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: bottom, end, start, top and bottom again: the same sheet, with the text typed in it and the focus`, async ({ page }) => {
+      const popup = await placed(page, 'bottom', { direction })
+      const field = popup.locator('#note')
+      await field.click()
+      await page.keyboard.type('half a sentence')
+      await popup.evaluate((element) => { element.dataset['kept'] = 'yes' })
+
+      for (const placement of ['end', 'start', 'top', 'bottom'] as const) {
+        await place(page, placement)
+        await expect(popup).toHaveAttribute('data-placement', placement)
+        await expect(popup, `the sheet, moved to ${placement}`).toHaveAttribute('data-kept', 'yes')
+        await expect(field).toHaveValue('half a sentence')
+        await expect(field).toBeFocused()
+      }
+      expect(await liveErrors(page)).toEqual([])
+    })
+  }
+
+  test.describe('on a phone', () => {
+    test.use(PHONE)
+
+    test('a side sheet takes the keyboard provider too: a tap on its field is the provider own, and the body scrolls it from under the keyboard', async ({ page }) => {
+      const popup = await placed(page, 'end', { by: 'tap' })
+      await twentyMoreFields(popup)
+      const field = popup.locator('#f15')
+      await field.evaluate((input) => {
+        input.addEventListener('click', (event) => { input.dataset['trusted'] = String(event.isTrusted) })
+      })
+      await field.scrollIntoViewIfNeeded()
+      await field.tap()
+      await expect(field).toBeFocused()
+      await expect(field).toHaveAttribute('data-trusted', 'false')
+      await keyboardUp(page, 400)
+      await expect.poll(async () => (await boxOf(field)).bottom, { message: 'the foot of the field' }).toBeLessThan(400)
+      expect(await liveErrors(page)).toEqual([])
+    })
   })
 })
 
@@ -726,7 +786,15 @@ test.describe('a sheet inside a dialog', () => {
     await escape(page, [])
   })
 
-  // From the keyboard: the dialog's viewport stands above every sheet (--tc-z-dialog over --tc-z-drawer) and takes the pointer.
+  test('with a mouse: the sheet is drawn above the dialog, its x takes the press and closes the sheet alone', async ({ page }) => {
+    const sheet = await nested(page)
+    const x = xOf(sheet)
+    const box = await boxOf(x)
+    expect(await page.evaluate(([cx, cy]) => document.elementFromPoint(cx, cy)?.closest('button')?.getAttribute('aria-label'), [box.left + box.width / 2, box.top + box.height / 2] as const)).toBe(CLOSE.en)
+    await x.click()
+    await expect.poll(() => titles(page)).toEqual(['Project settings'])
+  })
+
   test('a tooltip open inside the sheet closes first, then the sheet, then the dialog', async ({ page }) => {
     const sheet = await nested(page)
     await page.keyboard.press('Tab')
@@ -1083,7 +1151,7 @@ test.describe('inside the screen', () => {
     })
     // max-w-80, h-dvh, the line on the inline start only, shadow-lg, wrap-anywhere, --tc-z-drawer, a row that ends.
     expect(styles).toEqual({
-      maxWidth: '320px', height: '720px', line: '1px 0px', raised: true, wrap: 'anywhere', layer: '40 40',
+      maxWidth: '320px', height: '720px', line: '1px 0px', raised: true, wrap: 'anywhere', layer: '60 60',
       seat: 'flex flex-end', scrim: true, fixed: 'fixed fixed', placement: 'end',
     })
   })
