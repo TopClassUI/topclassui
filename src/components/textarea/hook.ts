@@ -6,14 +6,24 @@ import { useLabels, useNumberFormat } from '#shared/provider/context.js'
 import { countText, isCounted, limitOf, rowsFor } from './lib.js'
 import type { TextareaFieldValueProps } from './types.js'
 
+/** The scroll offset of every box around the field, the page included, and a call that puts them back. */
+function holdScroll(field: HTMLElement): () => void {
+  const held: [Element, number][] = []
+  for (let up = field.parentElement; up; up = up.parentElement) if (up.scrollTop > 0) held.push([up, up.scrollTop])
+  return () => { for (const [box, top] of held) box.scrollTop = top }
+}
+
 /** Sets rows back to the caller's, reads what the text needs, and sets that, up to maxRows. */
 function fit(field: HTMLTextAreaElement, rows: number, maxRows: number): void {
+  // The field shrinks for the measure, and a page scrolled to its foot is clamped by it: restored after.
+  const restore = holdScroll(field)
   field.rows = rows
   const style = getComputedStyle(field)
   const padding = Number.parseFloat(style.paddingTop) + Number.parseFloat(style.paddingBottom)
   // A line-height of normal reads as no number: take the browser's usual 1.2 of the font size.
   const line = Number.parseFloat(style.lineHeight) || Number.parseFloat(style.fontSize) * 1.2
   field.rows = rowsFor(field.scrollHeight, padding, line, rows, maxRows)
+  restore()
 }
 
 /** The holder's one hook: it finds the textarea inside its div, writes its rows and counts its text. */

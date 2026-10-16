@@ -90,7 +90,30 @@ describe('aria-describedby', () => {
   })
 })
 
+/** The layout happy-dom has none of: rows of 20 px inside 20 px of padding, a floor under the box, and the text's lines.
+ * `onMeasure` hears each read of scrollHeight with the rows the field has at that moment. */
+function layOut(field: HTMLTextAreaElement, lines: number, { floor = 0, onMeasure }: { floor?: number; onMeasure?: (rows: number) => void } = {}) {
+  field.style.paddingTop = '10px'
+  field.style.paddingBottom = '10px'
+  field.style.lineHeight = '20px'
+  // happy-dom reads rows back as a string, so the attribute is read instead.
+  const rows = () => Number(field.getAttribute('rows'))
+  const client = () => Math.max(rows() * 20 + 20, floor)
+  Object.defineProperty(field, 'clientHeight', { configurable: true, get: client })
+  Object.defineProperty(field, 'scrollHeight', { configurable: true, get: () => { onMeasure?.(rows()); return Math.max(lines * 20 + 20, client()) } })
+}
+
 describe('the rows a field with autosize is given', () => {
+  it('puts back the scroll a measure clamps: the field shrinks for a moment, which a box scrolled to its foot follows', async () => {
+    render(<div data-testid="box"><Textarea aria-label="Bio" autosize defaultValue={'1\n2\n3\n4\n5\n6\n7\n8'} /></div>)
+    const [box, field] = [screen.getByTestId('box'), screen.getByRole<HTMLTextAreaElement>('textbox')]
+    // What Chromium does: the box gets shorter while the field is at three rows, and its scrollTop is clamped to fit.
+    layOut(field, 8, { onMeasure: (rows) => { if (rows < 6) box.scrollTop = 7 } })
+    box.scrollTop = 40
+    await userEvent.type(field, 'x')
+    expect([field.getAttribute('rows'), box.scrollTop]).toEqual(['6', 40])
+  })
+
   it('starts from the caller rows, and a ref reaches the textarea itself', () => {
     let node: HTMLTextAreaElement | null = null
     render(<Textarea aria-label="Bio" autosize rows={2} ref={(el) => { node = el }} />)

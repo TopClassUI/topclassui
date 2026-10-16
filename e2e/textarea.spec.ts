@@ -208,6 +208,34 @@ test.describe('live: the rows follow the text', () => {
     await expect.poll(height).toBe(82)
   })
 
+  for (const direction of DIRECTIONS) {
+    for (const pointer of ['fine', 'coarse'] as const) {
+      test(`${direction}, ${pointer} pointer: typing at the foot of a scrolled page, or of a scrolling box, moves neither`, async ({ browser }) => {
+        const page = await browser.newPage({ ...(pointer === 'coarse' ? COARSE : {}), viewport: { width: 390, height: 260 } })
+        await openLive(page, 'textarea--autosize', { direction })
+        const past = field(page, 'Past six rows')
+        const typeAtFoot = async (scroller: string) => {
+          await past.focus()
+          await page.keyboard.press('Control+End')
+          await page.locator(scroller).evaluate((el) => { el.scrollTop = el.scrollHeight })
+          const before = await page.locator(scroller).evaluate((el) => el.scrollTop)
+          await page.keyboard.type('x')
+          await expect(past).toHaveValue(/x$/)
+          return [before, await page.locator(scroller).evaluate((el) => el.scrollTop)]
+        }
+        const [top, after] = await typeAtFoot('html')
+        expect(top, 'the page is not scrolled at all').toBeGreaterThan(0)
+        expect(after).toBe(top)
+        await page.addStyleTag({ content: '#demo { block-size: 150px; overflow: auto }' })
+        const [boxTop, boxAfter] = await typeAtFoot('#demo')
+        expect(boxTop, 'the box does not scroll at all').toBeGreaterThan(0)
+        expect(boxAfter).toBe(boxTop)
+        expect(await liveErrors(page)).toEqual([])
+        await page.close()
+      })
+    }
+  }
+
   test('a field pre-filled past six rows has the same height on the server and once hydrated', async ({ page }) => {
     await page.goto(urlFor('textarea--autosize', 'light', 'ltr'))
     const served = (await boxOf(field(page, 'Past six rows'))).height

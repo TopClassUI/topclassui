@@ -128,4 +128,10 @@ export const MUTATIONS: Mutation[] = [
     from: "TEXTAREA_HOLDER = 'grid max-w-full gap-1.5'",
     to: "TEXTAREA_HOLDER = 'max-w-full gap-1.5'",
   },
+  {
+    label: 'the textarea measure stops putting the scroll back, so a page scrolled to the foot of an autosize field jumps on a keystroke',
+    file: HOOK,
+    from: 'return () => { for (const [box, top] of held) box.scrollTop = top }',
+    to: 'return () => undefined',
+  },
 ]
