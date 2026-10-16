@@ -108,7 +108,7 @@ describe('what the demos show', () => {
 
   it('groups names its two lists Workspace and Account', async () => {
     const html = await render('groups')
-    expect([...html.matchAll(/<p id="[^"]+" class="[^"]*">([^<]*)<\/p>/g)].map((match) => match[1])).toEqual(['Workspace', 'Account'])
+    expect([...html.matchAll(/<p id="[^"]+" dir="auto" class="[^"]*">([^<]*)<\/p>/g)].map((match) => match[1])).toEqual(['Workspace', 'Account'])
   })
 
   it('long-list holds sixty links in one list, the first of them current', async () => {
