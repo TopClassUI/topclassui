@@ -16,11 +16,11 @@ export const numberFieldSchema = z.object({
   fullWidth: z.boolean().default(NUMBER_FIELD_DEFAULTS.fullWidth)
     .meta({ description: 'Fills the width of its parent instead of taking the width of an Input.' }),
   min: limit.optional()
-    .meta({ description: 'The smallest value. Home goes to it; a default or a value under it is raised to it. Clamped to -1e15.' }),
+    .meta({ description: 'The smallest value. Home goes to it; a default or a value under it is raised to it. Clamped to -1e15; NaN reads as none.' }),
   max: limit.optional()
-    .meta({ description: 'The largest value. End goes to it; a default or a value over it is lowered to it. Clamped to 1e15.' }),
+    .meta({ description: 'The largest value. End goes to it; a default or a value over it is lowered to it. Clamped to 1e15; NaN reads as none, and under min it is raised to min.' }),
   step: z.union([z.number().min(BOUNDS.stepMin).max(BOUNDS.limitMax), z.literal('any')]).default(NUMBER_FIELD_DEFAULTS.step)
-    .meta({ description: 'What an arrow key and a stepper add or take away, and the step the form validates against; any turns that check off.' }),
-})
+    .meta({ description: 'What an arrow key and a stepper add or take away, and the step the form validates against; any turns that check off. NaN reads as 1.' }),
+}).refine(({ min, max }) => min === undefined || max === undefined || min <= max, { path: ['max'], message: 'max is under min' })
 
 export type NumberFieldSchemaInput = z.input<typeof numberFieldSchema>

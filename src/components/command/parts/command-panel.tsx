@@ -61,8 +61,7 @@ export function CommandPanel(props: CommandPanelProps) {
               <Autocomplete.List ref={panel.listRef} style={{ '--tc-list-rows': panel.rows }} className={COMMAND_LIST}>
                 <CommandRows
                   runs={panel.runs}
-                  before={panel.before}
-                  after={panel.after}
+                  total={panel.total}
                   getLabel={getLabel}
                   renderItem={renderItem}
                   select={panel.select}

@@ -4,11 +4,13 @@ import { tmpdir } from 'node:os'
 import { join, sep } from 'node:path'
 import { spawnSync } from 'node:child_process'
 
-import { type Outcome, readAnchors, summarise } from './lib/mutate.js'
+import { type Mutation, type Outcome, caughtBy, readAnchors, summarise } from './lib/mutate.js'
 import { MUTATIONS } from './mutations/index.js'
 
 const ROOT = process.cwd()
 const only = process.argv.slice(2).find((a) => !a.startsWith('-'))
+// Flags go to vitest, so a crowded machine can ask for fewer workers: pnpm test:mutation tag --maxWorkers=2.
+const flags = process.argv.slice(2).filter((a) => a.startsWith('-'))
 const chosen = only ? MUTATIONS.filter((m) => m.label.includes(only)) : MUTATIONS
 
 if (chosen.length === 0) {
@@ -20,13 +22,12 @@ if (chosen.length === 0) {
 const missing = readAnchors(ROOT, chosen.filter((m) => m.to !== null))
 if (missing.length > 0) {
   for (const m of missing) console.error(`error ${m}`)
-  console.error(`\nmutate: ${String(missing.length)} mutation(s) no longer match the source.`)
+  console.error(`\nmutate: ${String(missing.length)} mutation(s) do not find their anchor exactly once.`)
   process.exit(1)
 }
 
-const outcomes: Outcome[] = []
-
-for (const mutation of chosen) {
+/** Copies the repository, applies the mutation if there is one, and judges a vitest run of the copy. */
+function caughtIn(mutation: Mutation | null): boolean {
   const dir = mkdtempSync(join(tmpdir(), 'tc-mutate-'))
   try {
     // join, not a literal slash: on Windows the separator is \ and the filter never matched,
@@ -39,19 +40,35 @@ for (const mutation of chosen) {
     // A junction needs no elevation on Windows, unlike a symlink.
     symlinkSync(join(ROOT, 'node_modules'), join(dir, 'node_modules'), 'junction')
 
-    const target = join(dir, mutation.file)
-    if (mutation.to === null) unlinkSync(target)
-    else writeFileSync(target, readFileSync(target, 'utf8').replace(mutation.from, mutation.to))
+    if (mutation) {
+      const target = join(dir, mutation.file)
+      if (mutation.to === null) unlinkSync(target)
+      else writeFileSync(target, readFileSync(target, 'utf8').replace(mutation.from, mutation.to))
+    }
 
-    const run = spawnSync('node', [join(ROOT, 'node_modules/vitest/vitest.mjs'), 'run'], {
+    return caughtBy(spawnSync('node', [join(ROOT, 'node_modules/vitest/vitest.mjs'), 'run', ...flags], {
       cwd: dir,
       encoding: 'utf8',
-    })
-    outcomes.push({ label: mutation.label, caught: run.status !== 0 })
-    console.log(`${run.status === 0 ? 'SURVIVED' : '  caught'}  ${mutation.label}`)
+      env: { ...process.env, NO_COLOR: '1' },
+      maxBuffer: 1 << 28,
+    }))
   } finally {
     rmSync(dir, { recursive: true, force: true })
   }
+}
+
+// A suite that already fails would catch every mutant, so it runs once untouched first.
+if (caughtIn(null)) {
+  console.error('mutate: the unmutated suite fails, so no mutant can be judged. Run pnpm test.')
+  process.exit(1)
+}
+
+const outcomes: Outcome[] = []
+
+for (const mutation of chosen) {
+  const caught = caughtIn(mutation)
+  outcomes.push({ label: mutation.label, caught })
+  console.log(`${caught ? '  caught' : 'SURVIVED'}  ${mutation.label}`)
 }
 
 console.log(`\n${summarise(outcomes).split('\n').slice(-1).join('')}`)

@@ -57,6 +57,10 @@ describe('the cap (R-5.7-8)', () => {
     expect(on({ maxLength: 500 }, 'maxLength')).toBe('500')
     expect(tagOf(html({ maxLength: null }))).not.toContain('maxLength')
   })
+
+  it('is clamped (R-5.7-7): under 0 is 0, a fraction rounds down, and past 2^31 - 1, where Chromium drops it, is that', () => {
+    expect([-1, 2.5, 2 ** 31].map((maxLength) => on({ maxLength }, 'maxLength'))).toEqual(['0', '2', '2147483647'])
+  })
 })
 
 describe('with autosize or showCount, a holder around the same textarea', () => {
@@ -154,9 +158,9 @@ describe('the classes each guarantee rests on, written out', () => {
     expect((['xs', 'sm', 'md', 'lg', 'xl'] as const).map((size) => classesOf({ size }).find((cls) => cls.startsWith('py-')))).toEqual(['py-1.5', 'py-1.5', 'py-2.5', 'py-3', 'py-4'])
   })
 
-  it('the holder is one grid column with its type step; the counter sits at its inline end, hidden while empty', () => {
+  it('the holder is one grid column with its type step, the touch floor of lg and xl included; the counter sits at its inline end, hidden while empty', () => {
     const out = html({ autosize: true, size: 'lg' })
-    expect(attr(out, 'class')?.split(' ')).toEqual(['grid', 'max-w-full', 'gap-1.5', 'text-base', 'w-[min(100%,var(--tc-input-width))]'])
+    expect(attr(out, 'class')?.split(' ')).toEqual(['grid', 'max-w-full', 'gap-1.5', 'text-base', COARSE, 'w-[min(100%,var(--tc-input-width))]'])
     const counter = /<span id="[^"]+" class="([^"]*)"/.exec(out)?.[1]?.split(' ')
     expect(counter).toEqual(expect.arrayContaining(['justify-self-end', 'empty:hidden', 'data-at-limit:font-semibold', 'data-over-limit:text-danger-on-soft']))
   })

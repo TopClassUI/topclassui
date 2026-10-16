@@ -52,15 +52,17 @@ describe('the track', () => {
       lg: ['height: calc(1.5rem * var(--tc-density));', 'width: calc(2.625rem * var(--tc-density));'],
       xl: ['height: calc(1.75rem * var(--tc-density));', 'width: calc(3.0625rem * var(--tc-density));'],
     })
-    expect(SWITCH_TRACK_SIZE.custom).toBe('')
+    expect(SWITCH_TRACK_SIZE.custom).toBe('@container')
+    expect(ruleOf(selectorOf('@container'))).toBe('container-type: inline-size;')
   })
 })
 
 describe('the thumb', () => {
-  it('is a circle as tall as the inside of the track, on the raised surface, and on the on-solid colour when checked', () => {
+  it('is a circle as tall as the inside of the track, line-strong when off (3:1 on the track), and on the on-solid colour when checked', () => {
     expect(ruleOf(selectorOf('aspect-square'))).toBe('aspect-ratio: 1 / 1;')
     expect(ruleOf(selectorOf('h-full'))).toBe('height: 100%;')
-    expect(ruleOf(selectorOf('bg-surface-raised'))).toBe('background-color: var(--tc-surface-raised);')
+    expect(ruleOf(selectorOf('bg-line-strong'))).toBe('background-color: var(--tc-line-strong);')
+    expect(SWITCH_THUMB.split(' ')).not.toContain('bg-surface-raised')
     expect(ruleOf(`${selectorOf('group-data-checked/toggle:bg-primary-on-solid')}${CHECKED}`))
       .toBe('background-color: var(--tc-primary-on-solid);')
   })
@@ -72,7 +74,9 @@ describe('the thumb', () => {
       .map(([size, cls]) => [size, ruleOf(`${selectorOf(cls)}${CHECKED}`)]))
     const step = (rem: string) => `--tw-translate-x: calc(${rem}rem * var(--tc-density) * var(--tc-dir)); translate: var(--tw-translate-x) var(--tw-translate-y);`
     expect(slides).toEqual({ xs: step('0.65625'), sm: step('0.75'), md: step('0.9375'), lg: step('1.125'), xl: step('1.3125') })
-    expect(SWITCH_SLIDE.custom).toBe('')
+    // Custom has no size to subtract: the track's inside (100cqw) less the thumb's own width (100%).
+    expect(ruleOf(`${selectorOf(SWITCH_SLIDE.custom)}${CHECKED}`))
+      .toBe('--tw-translate-x: calc((100cqw - 100%) * var(--tc-dir)); translate: var(--tw-translate-x) var(--tw-translate-y);')
   })
 
   it('takes a system colour under forced colours, ButtonText off and HighlightText on, and paints it itself', () => {

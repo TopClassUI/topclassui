@@ -57,7 +57,7 @@ describe('what the demos show of the props', () => {
     expect(form?.contains(popup.lastElementChild)).toBe(false)
   })
 
-  it('with-form: it is a bottom sheet, so the keyboard of a phone has Base UI to answer to', async () => {
+  it('with-form: it is a bottom sheet, the one a phone opens, with its grabber first', async () => {
     const popup = await openFirst('with-form')
     expect(popup.getAttribute('data-placement')).toBe('bottom')
     expect(popup.firstElementChild?.getAttribute('aria-hidden')).toBe('true')

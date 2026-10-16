@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
-import { DIRECTIONS } from '../scripts/lib/harness.js'
+import { DIRECTIONS, MODES } from '../scripts/lib/harness.js'
 import { TARGETS } from '../scripts/lib/targets.js'
 import { serverEntries } from './form.js'
 import { type LiveOptions, expectNoSidewaysScroll, liveErrors, openLive } from './live.js'
@@ -42,6 +42,16 @@ const resolve = (page: Page, value: string) => page.evaluate((colour) => {
   document.body.appendChild(probe)
   return getComputedStyle(probe).backgroundColor
 }, value)
+
+/** A computed colour as the screen paints it: drawn on a canvas and read back, so an oklch token is measured too. */
+const painted = (page: Page, colour: string) => page.evaluate((value) => {
+  const pen = document.createElement('canvas').getContext('2d')
+  if (!pen) throw new Error('no canvas')
+  pen.fillStyle = value
+  pen.fillRect(0, 0, 1, 1)
+  const [r = 0, g = 0, b = 0] = pen.getImageData(0, 0, 1, 1).data
+  return [r, g, b] as const
+}, colour)
 
 test.describe('the five sizes, on the static page', () => {
   test.use({ reducedMotion: 'reduce' })
@@ -118,7 +128,7 @@ test.describe('the states, on the static page', () => {
 
   test('checked: the line turns primary and is 2 px; the fill does not change; the dot is primary', async ({ page }) => {
     await page.goto(urlFor('radio-group--basic', 'light', 'ltr'))
-    const primary = await resolve(page, 'var(--tc-primary-solid)')
+    const primary = await resolve(page, 'var(--tc-primary-on-soft)')
     const [on, off] = [drawn(radioIn(page, 'Yearly')), drawn(radioIn(page, 'Monthly'))]
     expect(await css(on, 'border-top-color')).toBe(primary)
     expect(await css(on, 'box-shadow')).toContain(`${primary} 0px 0px 0px 1px inset`)
@@ -127,6 +137,19 @@ test.describe('the states, on the static page', () => {
     expect(await css(on.locator('svg'), 'color')).toBe(primary)
     expect(await css(off, 'box-shadow')).not.toContain('inset')
   })
+
+  // RG-1: primary-solid was 2.57:1 on the dark fill, and the old test compared the token in light mode alone.
+  for (const mode of MODES) {
+    test(`${mode}: the dot and the checked line reach 3:1 on the fill, and the line on the page (R-5.6-4)`, async ({ page }) => {
+      await page.goto(urlFor('radio-group--basic', mode, 'ltr'))
+      const on = drawn(radioIn(page, 'Yearly'))
+      const dot = await painted(page, await css(on.locator('svg'), 'color'))
+      const line = await painted(page, await css(on, 'border-top-color'))
+      const fill = await painted(page, await css(on, 'background-color'))
+      const behind = await painted(page, await resolve(page, 'var(--tc-page)'))
+      expect([contrast(dot, fill), contrast(line, fill), contrast(line, behind)].map((ratio) => ratio >= 3)).toEqual([true, true, true])
+    })
+  }
 
   test('invalid: every circle of the group turns to danger and is 2 px thick, checked or not', async ({ page }) => {
     await page.goto(urlFor('radio-group--states', 'light', 'ltr'))
@@ -197,7 +220,7 @@ test.describe('motion', () => {
       const control = radioIn(page, 'Monthly')
       expect(await css(drawn(control), 'transition-duration')).toBe('0s')
       await control.click()
-      expect(await css(drawn(control), 'border-top-color')).toBe(await resolve(page, 'var(--tc-primary-solid)'))
+      expect(await css(drawn(control), 'border-top-color')).toBe(await resolve(page, 'var(--tc-primary-on-soft)'))
     })
   })
 })
@@ -378,6 +401,9 @@ test.describe('live: a form reset', () => {
 
   const sent = (page: Page, form: string) => page.evaluate((name) => window.radioGroupSent?.[name] ?? [], form)
   const checked = (page: Page, name: string) => checkedIn(page.getByRole('radiogroup', { name }))
+  // RG-2: the APG tab stop is the checked radio, else the first, and Base UI picks it only on mount.
+  const stops = (page: Page, names: string[]) => Promise.all(names.map((name) => page.getByRole('radiogroup', { name })
+    .locator('[role="radio"][tabindex="0"]').evaluateAll((all) => all.map((el) => el.closest('label')?.textContent ?? ''))))
 
   for (const how of ['form.reset()', 'a reset button'] as const) {
     test(`after ${how}, each group is back at its default on screen and in the form; one with none is empty; a controlled one keeps its owner's value`, async ({ page }) => {
@@ -389,6 +415,7 @@ test.describe('live: a form reset', () => {
       expect([await checked(page, 'Empty'), await checked(page, 'Owned'), await checked(page, 'Far')]).toEqual([[], ['Owned B'], ['Far A']])
       await expect(page.locator('#owner')).toHaveText('b')
       expect(await serverEntries(page, '#plain')).toEqual([['plan', 'a'], ['owned', 'b'], ['far', 'a']])
+      expect(await stops(page, ['Plan', 'Empty', 'Owned'])).toEqual([['Plan A'], ['Empty A'], ['Owned B']])
     })
   }
 
@@ -398,6 +425,7 @@ test.describe('live: a form reset', () => {
     await expect.poll(() => sent(page, 'action')).toEqual([[['pick', 'b']]])
     await expect.poll(() => checked(page, 'Pick')).toEqual(['Pick A'])
     expect(await serverEntries(page, '#action')).toEqual([['pick', 'a']])
+    expect(await stops(page, ['Pick'])).toEqual([['Pick A']])
   })
 
   test('with the action\'s answer as the new default, the choice stays, on screen and in the form, and is sent again', async ({ page }) => {

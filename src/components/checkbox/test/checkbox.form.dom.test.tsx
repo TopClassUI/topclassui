@@ -35,6 +35,11 @@ describe('from the server HTML, before any script runs', () => {
       .toEqual([['a', 'yes'], ['b', 'no']])
   })
 
+  it('a mixed box sends nothing before any script runs, checked by default or with an uncheckedValue', () => {
+    expect(served(<><Checkbox aria-label="A" name="a" indeterminate defaultChecked /><Checkbox aria-label="B" name="b" indeterminate uncheckedValue="no" /></>))
+      .toEqual([])
+  })
+
   it('a disabled box sends nothing, and a read-only one still sends', () => {
     expect(served(<><Checkbox aria-label="A" name="a" disabled defaultChecked /><Checkbox aria-label="B" name="b" readOnly defaultChecked /></>))
       .toEqual([['b', 'on']])
@@ -108,13 +113,28 @@ describe('a reset brings it back to its default, on screen and in the form', () 
     expect(entries(formOf())).toEqual([])
   })
 
-  it('an indeterminate box stays mixed through a reset and is sent again as its default', async () => {
-    render(inForm(<Checkbox aria-label="A" name="all" indeterminate />))
-    await userEvent.click(screen.getByRole('checkbox'))
-    expect(entries(formOf())).toEqual([['all', 'on']])
+  it('a mixed box sends nothing however often it is pressed, through a reset too, and sends its value once the dash goes', async () => {
+    const { rerender } = render(inForm(<Checkbox aria-label="A" name="all" indeterminate />))
+    for (const press of ['first', 'second']) {
+      await userEvent.click(screen.getByRole('checkbox'))
+      expect(screen.getByRole('checkbox').getAttribute('aria-checked'), press).toBe('mixed')
+      expect(entries(formOf()), press).toEqual([])
+    }
     act(() => { formOf().reset() })
     await settle()
     expect(screen.getByRole('checkbox').getAttribute('aria-checked')).toBe('mixed')
+    expect(entries(formOf())).toEqual([])
+    await userEvent.click(screen.getByRole('checkbox'))
+    rerender(inForm(<Checkbox aria-label="A" name="all" />))
+    expect(screen.getByRole('checkbox').getAttribute('aria-checked')).toBe('true')
+    expect(entries(formOf())).toEqual([['all', 'on']])
+  })
+
+  it('a mixed box that is checked by default, or has an uncheckedValue, sends nothing either, and a reset keeps it so', async () => {
+    render(inForm(<><Checkbox aria-label="A" name="a" indeterminate defaultChecked /><Checkbox aria-label="B" name="b" indeterminate uncheckedValue="no" /></>))
+    expect(entries(formOf())).toEqual([])
+    act(() => { formOf().reset() })
+    await settle()
     expect(entries(formOf())).toEqual([])
   })
 })
