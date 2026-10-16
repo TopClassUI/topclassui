@@ -10,14 +10,20 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the shared option row touch floor is emptied, so a row under a finger is 40 px tall, under the 44 px target',
     file: CLASSES,
-    from: "export const ROW_TOUCH = 'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]'",
+    from: "export const ROW_TOUCH = 'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]'",
     to: "export const ROW_TOUCH = ''",
   },
   {
     label: 'the shared option row touch floor loses its pointer query, so every row is 44 px under a mouse too',
     file: CLASSES,
-    from: "export const ROW_TOUCH = 'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]'",
-    to: "export const ROW_TOUCH = 'min-h-[var(--tc-target-coarse,44px)]'",
+    from: "export const ROW_TOUCH = 'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]'",
+    to: "export const ROW_TOUCH = 'min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]'",
+  },
+  {
+    label: 'the shared option row touch floor replaces the row height instead of raising it, so a row at a 32 px root shrinks to 44 px under a finger',
+    file: CLASSES,
+    from: "export const ROW_TOUCH = 'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]'",
+    to: "export const ROW_TOUCH = 'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]'",
   },
   {
     label: 'the shared option selected row is emptied, so the chosen row is told by its tick alone',
