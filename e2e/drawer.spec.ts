@@ -726,7 +726,15 @@ test.describe('a sheet inside a dialog', () => {
     await escape(page, [])
   })
 
-  // From the keyboard: the dialog's viewport stands above every sheet (--tc-z-dialog over --tc-z-drawer) and takes the pointer.
+  test('with a mouse: the sheet is drawn above the dialog, its x takes the press and closes the sheet alone', async ({ page }) => {
+    const sheet = await nested(page)
+    const x = xOf(sheet)
+    const box = await boxOf(x)
+    expect(await page.evaluate(([cx, cy]) => document.elementFromPoint(cx, cy)?.closest('button')?.getAttribute('aria-label'), [box.left + box.width / 2, box.top + box.height / 2] as const)).toBe(CLOSE.en)
+    await x.click()
+    await expect.poll(() => titles(page)).toEqual(['Project settings'])
+  })
+
   test('a tooltip open inside the sheet closes first, then the sheet, then the dialog', async ({ page }) => {
     const sheet = await nested(page)
     await page.keyboard.press('Tab')
