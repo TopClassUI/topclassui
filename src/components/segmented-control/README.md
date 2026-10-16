@@ -65,12 +65,12 @@ the one tab stop. A disabled segment is a disabled button: it leaves the tab and
 default. Without a `name` it is a view switch and sends nothing. **A form reset**, a reset
 button or a React 19 form action that settles brings the track back to its `defaultValue` of the
 latest render, on screen and in the form; a controlled track keeps its owner's value. A reset
-calls no `onValueChange`. `required` never blocks a submit: a segment is always selected.
+calls no `onValueChange`. `required` blocks a submit only when the value matches no segment.
 
 **`invalid`** sets `aria-invalid` on the track: its line turns red and thickens. **`disabled`**
 on the track or on a segment is the real attribute, so the form sends nothing for it.
-**`readOnly`** keeps the value in the form and says so to a screen reader; it has no look of its
-own.
+**`readOnly`** keeps the value in the form and sets `aria-readonly` on the track, which Chromium does
+not announce; it has no look of its own either, so say it in the text beside the track.
 
 **The look.** The selected segment is raised, with a shadow, and its text is heavier and darker;
 under forced colours it takes the system highlight. The focus ring is drawn inside the focused
