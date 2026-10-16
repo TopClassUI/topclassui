@@ -41,9 +41,9 @@ Pass `checked` to control it. Your handler runs first, with Base UI's details, s
 `details.cancel()` leaves the box as it was.
 
 **`indeterminate`** draws a dash and sets `aria-checked="mixed"`, for a box whose list is partly
-picked. It is yours to clear: a press calls `onCheckedChange` with the opposite of `checked`, and
-the box stays mixed until you drop `indeterminate`. The form sends `checked`, not the dash: a mixed
-box that is not checked sends nothing.
+picked. It is yours to clear: a press calls `onCheckedChange(true)`, and the box stays mixed until
+you drop `indeterminate`. A mixed box sends nothing, not even its `uncheckedValue`, before the page
+hydrates and after; it sends its value once you drop `indeterminate`.
 
 ```tsx
 export function SelectAll({ all, some, onAll }: { all: boolean, some: boolean, onAll: (next: boolean) => void }) {

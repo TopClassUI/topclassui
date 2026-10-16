@@ -351,7 +351,8 @@ test.describe('live: a form reset', () => {
   for (const how of ['form.reset()', 'a reset button'] as const) {
     test(`after ${how}, each box is back at its default on screen and in the form; a controlled one keeps its owner's value; a mixed one stays mixed`, async ({ page }) => {
       for (const name of ['Terms', 'News', 'Owned', 'Mixed', 'Far']) await boxIn(page, name).click()
-      expect(await serverEntries(page, '#plain')).toEqual([['news', 'on'], ['owned', 'on'], ['mixed', 'on'], ['far', 'on']])
+      // A mixed box sends nothing while it shows the dash, pressed or not.
+      expect(await serverEntries(page, '#plain')).toEqual([['news', 'on'], ['owned', 'on'], ['far', 'on']])
       expect(await state(page, 'Mixed')).toBe('mixed')
       if (how === 'form.reset()') await page.locator('#plain').evaluate((node) => { (node as HTMLFormElement).reset() })
       else await page.getByRole('button', { name: 'Reset' }).click()
