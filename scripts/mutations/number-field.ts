@@ -121,4 +121,16 @@ export const MUTATIONS: Mutation[] = [
     from: "    input.addEventListener('focusout', leave)\n",
     to: '',
   },
+  {
+    label: 'the number field box loses has-[input:disabled]:opacity-50, so in a disabled fieldset it stays at full ink',
+    file: CLASSES,
+    from: ' has-[input:disabled]:opacity-50',
+    to: '',
+  },
+  {
+    label: 'the number field stepper loses group-has-[input:disabled]/number:disabled:opacity-100, so a disabled fieldset paints it at a quarter',
+    file: CLASSES,
+    from: ' group-has-[input:disabled]/number:disabled:opacity-100',
+    to: '',
+  },
 ]

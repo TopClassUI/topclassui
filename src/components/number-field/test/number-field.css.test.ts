@@ -54,6 +54,11 @@ describe('the box', () => {
     expect(ruleOf(`${selectorOf('data-readonly:bg-neutral-soft')}[data-readonly]`)).toBe('background-color: var(--tc-neutral-soft);')
   })
 
+  it('dims as a whole when a disabled fieldset disables its input, and not when only a stepper at its limit is disabled', () => {
+    expect(selectorLine('has-[input:disabled]:opacity-50')).toBe('.has-\\[input\\:disabled\\]\\:opacity-50:has(:is(input:disabled))')
+    expect(ruleOf(selectorLine('has-[input:disabled]:opacity-50'))).toBe('opacity: 50%;')
+  })
+
   it('turns to danger and thickens while the input inside it is invalid', () => {
     expect(selectorLine('has-aria-invalid:border-danger-solid')).toBe('.has-aria-invalid\\:border-danger-solid:has([aria-invalid="true"])')
   })
@@ -73,6 +78,8 @@ describe('the input and the steppers', () => {
     expect(ruleOf(selectorOf('aspect-square'))).toBe('aspect-ratio: 1 / 1;')
     expect(selectorLine('group-data-disabled/number:disabled:opacity-100')).toMatch(/:is\(:where\(\.group\\\/number\)\[data-disabled\] \*\):disabled$/)
     expect(ruleOf(selectorLine('group-data-disabled/number:disabled:opacity-100'))).toBe('opacity: 100%;')
+    expect(selectorLine('group-has-[input:disabled]/number:disabled:opacity-100')).toContain(String.raw`:where(.group\/number):has(:is(input:disabled)) *):disabled`)
+    expect(ruleOf(selectorLine('group-has-[input:disabled]/number:disabled:opacity-100'))).toBe('opacity: 100%;')
   })
 
   it('decrease comes after the input in the markup and before it on screen', () => {

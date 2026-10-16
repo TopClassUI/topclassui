@@ -97,6 +97,19 @@ test.describe('the look of each state, on the static page', () => {
     expect([await css(group, 'opacity'), ...await group.locator('button').evaluateAll((all) => all.map((el) => getComputedStyle(el).opacity))]).toEqual(['0.5', '1', '1'])
   })
 
+  test('in a disabled fieldset, before any script runs, the field dims as one exactly as the disabled prop dims it', async ({ page }) => {
+    await page.goto(urlFor('number-field--states', 'light', 'ltr'))
+    await groupOf(input(page, 'Empty')).evaluate((group) => {
+      const fieldset = document.createElement('fieldset')
+      fieldset.disabled = true
+      group.parentElement?.before(fieldset)
+      if (group.parentElement) fieldset.append(group.parentElement)
+    })
+    const chain = (name: string) => groupOf(input(page, name)).evaluate((group) => [group, ...group.querySelectorAll('button')].map((el) => getComputedStyle(el).opacity))
+    expect(await chain('Empty')).toEqual(['0.5', '1', '1'])
+    expect(await chain('Disabled')).toEqual(['0.5', '1', '1'])
+  })
+
   test('at max in a live field the increase stepper is at 0.5, decrease at 1', async ({ page }) => {
     await page.goto(urlFor('number-field--limits', 'light', 'ltr'))
     const group = groupOf(input(page, 'Seats'))
@@ -456,6 +469,19 @@ test.describe('live: where a page puts a number field', () => {
     const field = page.getByRole('textbox', { name: 'Wrapped by a label' })
     await expect(field).toBeFocused()
     await expect(field).toHaveValue('12')
+  })
+
+  test('in a disabled fieldset the field dims as one, as an Input beside it does; a stepper at its limit alone dims no box', async ({ page }) => {
+    await fixture(page, 'number-field-fieldset')
+    const chain = (name: string) => groupOf(input(page, name)).evaluate((group) => [group, ...group.querySelectorAll('button')].map((el) => getComputedStyle(el).opacity))
+    expect(await chain('In the fieldset')).toEqual(['0.5', '1', '1'])
+    expect(await chain('At max in the fieldset')).toEqual(['0.5', '1', '1'])
+    expect(await css(input(page, 'An Input in the fieldset'), 'opacity')).toBe('0.5')
+    expect(await chain('Disabled by its prop')).toEqual(['0.5', '1', '1'])
+    expect(await chain('Live at max')).toEqual(['1', '1', '0.5'])
+    await page.getByRole('button', { name: 'Toggle' }).click()
+    await expect.poll(() => chain('In the fieldset')).toEqual(['1', '1', '1'])
+    await expect.poll(() => chain('At max in the fieldset')).toEqual(['1', '1', '0.5'])
   })
 
   for (const direction of DIRECTIONS) {

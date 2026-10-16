@@ -69,8 +69,9 @@ numbering system, so the server and the browser print the same text. A `-u-nu-` 
 are read in any locale, and a `1,234.5` typed or pasted is 1234.5 there as well.
 
 **`invalid`** sets `aria-invalid` on the input: the line of the field turns red and thickens.
-**`disabled`** dims the whole field. **`readOnly`** keeps the number in the form, tints the
-field and dims both steppers. A stepper at its limit is disabled and dimmed.
+**`disabled`** dims the whole field, and so does a disabled `<fieldset>` around it.
+**`readOnly`** keeps the number in the form, tints the field and dims both steppers. A stepper at
+its limit is disabled and dimmed.
 
 **The width of an Input**, and the steppers keep their 24 px (44 under a finger) whatever the
 size: a narrow field takes the room from the number. A NumberField wants about 130 px. In
