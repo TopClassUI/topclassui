@@ -108,6 +108,16 @@ describe('the distance and the edges: the shared bounds, not the item aligned ov
     expect(opened.transform).toBe('translate(500px, 594px)')
   })
 
+  it('opens below a trigger as wide as the screen when a side placement has room on neither side', async () => {
+    layout(box(16, 300, 992, 40))
+    expect((await open('end-top')).side).toBe('bottom')
+  })
+
+  it('never falls to a side when neither the bottom nor the top has room: a list squeezed beside it is no list', async () => {
+    layout(box(500, 8, 200, 752))
+    expect(['bottom', 'top']).toContain((await open('bottom-start')).side)
+  })
+
   it('aligns bottom-start to the right edge when the page runs right to left', async () => {
     document.body.style.direction = 'rtl'
     layout(box(500, 300, 240, 40))

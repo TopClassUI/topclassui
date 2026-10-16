@@ -41,7 +41,7 @@ describe('the circle', () => {
   it('is round in every mode (choice 13), on the raised surface, and its dot takes the primary colour from it', () => {
     expect(ruleOf(selectorOf('rounded-full'))).toBe('border-radius: calc(infinity * 1px);')
     expect(ruleOf(selectorOf('bg-surface-raised'))).toBe('background-color: var(--tc-surface-raised);')
-    expect(ruleOf(selectorOf('text-primary-solid'))).toBe('color: var(--tc-primary-solid);')
+    expect(ruleOf(selectorOf('text-primary-on-soft'))).toBe('color: var(--tc-primary-on-soft);')
   })
 
   it('is a circle of the toggle scale at each size, and custom draws none', () => {
@@ -53,9 +53,9 @@ describe('the circle', () => {
   })
 
   it('checked: the line turns primary and an inset ring makes it 2 px; the fill does not change', () => {
-    expect(ruleOf(`${selectorOf('group-data-checked/toggle:border-primary-solid')}${CHECKED}`)).toBe('border-color: var(--tc-primary-solid);')
+    expect(ruleOf(`${selectorOf('group-data-checked/toggle:border-primary-on-soft')}${CHECKED}`)).toBe('border-color: var(--tc-primary-on-soft);')
     expect(ruleOf(`${selectorOf('group-data-checked/toggle:inset-ring-[calc(var(--tc-ring-width)-var(--tc-line-width))]')}${CHECKED}`)).toContain(INSET)
-    expect(ruleOf(`${selectorOf('group-data-checked/toggle:inset-ring-primary-solid')}${CHECKED}`)).toBe('--tw-inset-ring-color: var(--tc-primary-solid);')
+    expect(ruleOf(`${selectorOf('group-data-checked/toggle:inset-ring-primary-on-soft')}${CHECKED}`)).toBe('--tw-inset-ring-color: var(--tc-primary-on-soft);')
     expect(RADIO_BOX).not.toMatch(/group-data-checked\/toggle:bg-/)
   })
 })

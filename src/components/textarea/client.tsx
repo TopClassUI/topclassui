@@ -1,8 +1,8 @@
 'use client'
 
 import { cn } from '#shared/cn.js'
-import { FIELD_OWN_WIDTH, FIELD_TEXT } from '#shared/classes.js'
-import { TEXTAREA_COUNT, TEXTAREA_HOLDER } from './classes.js'
+import { FIELD_OWN_WIDTH } from '#shared/classes.js'
+import { TEXTAREA_COUNT, TEXTAREA_HOLDER, TEXTAREA_HOLDER_TEXT } from './classes.js'
 import { useTextareaField } from './hook.js'
 import type { TextareaFieldProps } from './types.js'
 
@@ -16,7 +16,7 @@ export function TextareaField({
     <div
       ref={field.ref}
       onInput={field.onInput}
-      className={cn(TEXTAREA_HOLDER, FIELD_TEXT[size], fullWidth ? 'w-full' : FIELD_OWN_WIDTH)}
+      className={cn(TEXTAREA_HOLDER, TEXTAREA_HOLDER_TEXT[size], fullWidth ? 'w-full' : FIELD_OWN_WIDTH)}
     >
       {children}
       {/* The description of the field, not a live region: it is read when the field is reached. */}

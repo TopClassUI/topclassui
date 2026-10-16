@@ -13,7 +13,7 @@ const PLACES: PopoverPlacement[] = [
  * popup is titled by the same word. start and end are the inline sides, so they mirror. */
 export default function Demo() {
   return (
-    <div className="grid grid-cols-3 gap-3 p-12">
+    <div className="grid max-w-[31.5rem] grid-cols-[repeat(auto-fill,minmax(min(100%,8rem),1fr))] gap-3 p-4 sm:p-12">
       {PLACES.map((place) => (
         <PopoverRoot key={place}>
           <PopoverTrigger render={<Button variant="outline" size="sm">{place}</Button>} />

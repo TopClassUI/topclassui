@@ -56,7 +56,7 @@ its label. A Base UI `DirectionProvider` inside the field does it.
 
 **`length`** is 6 by default and is clamped to a whole number between 1 and 12. **`groupSize`**
 draws a bar after every that many cells (0, the default, draws none). Past eight items, cells and
-bars together, the row wraps, so twelve cells stay 44 px on a phone.
+bars together, the row breaks at whole cells, so twelve cells stay 44 px on a phone.
 
 **The form.** With a `name`, the hidden input sends what is typed so far, a partial code too, and
 `name=` when empty. `form` ties it to a form it is not inside. Before the page hydrates the form
@@ -73,6 +73,10 @@ the form; it has no look of its own.
 and 44 px tall under a finger. It gives up width where the row does not fit: on a 320 px phone
 six cells are 36 px wide (choice 38). `size="custom"` draws no size: give the cells one from your
 own CSS.
+
+**The floor.** n cells need n x 24 px plus 8 px between them: 184 px for six. A parent narrower
+than that breaks the row instead of scrolling the page: two six-cell fields in a grid of `1fr 1fr`
+at 320 px break 4 + 2. On a phone, give a six-cell field a row of its own.
 
 **A wrapper** takes `OTPFieldProps`. `Omit<OTPFieldProps, 'x'>` merges the two ways to name
 the field into one where none is required.
