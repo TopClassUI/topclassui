@@ -56,7 +56,7 @@ the same in Arabic.
 
 **The list** is seven rows tall (`--tc-list-rows`), or `visibleRows` (1 to 20), and scrolls inside
 itself; the page behind does not move. A row is 40 px, 44 px under a finger. It is at least as wide
-as the trigger and grows with its longest label up to the room on screen; a longer label ends in
+as the trigger when there is room, and grows with its longest label up to the room on screen; a longer label ends in
 an ellipsis, in the row and in the trigger. **It is not windowed**: Base UI mounts every option
 once the trigger takes the focus. For thousands of options use a Combobox.
 
@@ -67,7 +67,8 @@ content (a `w-fit` box, a table cell) there is nothing to fill: give the parent 
 
 **`placement`** takes the twelve shared values, `bottom-start` by default; `start` and `end` are
 the reading sides. The list opens 6 px off the trigger, flips at an edge and stays 8 px inside the
-screen. It never covers the trigger.
+screen. It never covers the trigger: a side placement whose list does not fit beside the trigger, as
+beside one on a phone, opens below it, or above, as wide as the trigger.
 
 **`modal`** is Base UI's:
 - `true`, the default: while the list is open the page does not scroll and a press outside only closes it.
@@ -77,7 +78,8 @@ screen. It never covers the trigger.
 
 **`invalid`** sets `aria-invalid` on the trigger: its line turns red and thickens. **`disabled`**
 is the real attribute, so the form sends nothing. **`readOnly`** keeps the value in the form and
-takes the soft fill; the list opens but no option can be chosen.
+takes the soft fill, and in forced colours, which drop a fill, a dashed line; the list opens but
+no option can be chosen.
 
 **Arabic.** The caret and the tick sit at the left, and `bottom-start` lines the list up with the
 right edge of the trigger. The list takes its direction and language from the nearest

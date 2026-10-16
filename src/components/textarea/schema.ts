@@ -20,8 +20,9 @@ export const textareaSchema = z.object({
   maxRows: z.number().int().min(TEXTAREA_BOUNDARIES.maxRowsMin).max(TEXTAREA_BOUNDARIES.maxRowsMax)
     .default(TEXTAREA_DEFAULTS.maxRows)
     .meta({ description: 'With autosize, the most lines it grows to before it scrolls; clamped to 1-40 and never under rows.' }),
-  maxLength: z.number().int().min(0).nullable().default(TEXT_MAX_LENGTH.textarea)
-    .meta({ description: 'The character cap: your number, 5000 by default, or null for none.' }),
+  maxLength: z.number().int().min(TEXTAREA_BOUNDARIES.maxLengthMin).max(TEXTAREA_BOUNDARIES.maxLengthMax)
+    .nullable().default(TEXT_MAX_LENGTH.textarea)
+    .meta({ description: 'The character cap: your number, 5000 by default, or null for none; clamped to 0-2147483647 and rounded down.' }),
   autosize: z.boolean().default(TEXTAREA_DEFAULTS.autosize)
     .meta({ description: 'Grows with the text from rows up to maxRows once the page has hydrated; loads the small client half.' }),
   showCount: z.boolean().default(TEXTAREA_DEFAULTS.showCount)

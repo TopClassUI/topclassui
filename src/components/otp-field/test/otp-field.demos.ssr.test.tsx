@@ -19,7 +19,7 @@ const FIELDS: Record<string, string[]> = {
   'basic': ['Verification code: ^______'],
   'form': ['Verification code: ^______'],
   'grouped': ['Verification code: ^___|___'],
-  'long': ['Recovery code: ^____________ wraps'],
+  'long': ['Recovery code: ^____________ whole cells'],
   'rtl': ['رمز التحقق: ^______'],
   'sizes': ['Extra small: 482^___', 'Small: 482^___', 'Medium: 482^___', 'Large: 482^___', 'Extra large: 482^___'],
   'states': ['Invalid: 48291^3 invalid', 'Disabled: 482^___ disabled', 'Read-only: 48291^3 read-only'],
@@ -49,7 +49,7 @@ function fieldsIn(html: string): string[] {
       first.includes('aria-invalid="true"') ? 'invalid' : '',
       first.includes('disabled=""') ? 'disabled' : '',
       first.includes('readOnly=""') ? 'read-only' : '',
-      /^[^>]*class="[^"]*flex-wrap/.test(part) ? 'wraps' : '',
+      /class="[^"]*\bgrow-0\b/.test(first) ? 'whole cells' : '',
     ].filter(Boolean)
     return [`${name ?? '(no name)'}: ${items.join('')}`, ...states].join(' ')
   })

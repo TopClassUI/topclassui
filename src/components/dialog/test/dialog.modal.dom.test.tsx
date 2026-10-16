@@ -61,7 +61,8 @@ describe('each value of modal', () => {
     render(<TopClassProvider direction="rtl" locale="ar"><Panel defaultOpen modal={false} /></TopClassProvider>)
     const viewport = (await screen.findByRole('dialog')).parentElement
     expect(classes(viewport)).toEqual([
-      'fixed', 'inset-0', 'z-(--tc-z-dialog)', 'grid', 'place-items-center', 'p-(--tc-overlay-inset)', 'pointer-events-none',
+      'fixed', 'inset-0', 'z-(--tc-z-dialog)', 'grid', 'place-items-center', 'p-(--tc-overlay-inset)', '[container-type:size]',
+      'pointer-events-none',
     ])
     expect([viewport?.getAttribute('dir'), viewport?.getAttribute('lang')]).toEqual(['rtl', 'ar'])
   })

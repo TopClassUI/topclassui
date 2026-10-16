@@ -29,12 +29,13 @@ export function SegmentedControlRoot({
   'aria-invalid': ariaInvalid,
   ...rest
 }: SegmentedControlRootProps) {
-  const track = useSegmentedControlRoot(size, { value, defaultValue, onValueChange, ref })
+  const track = useSegmentedControlRoot(size, { value, defaultValue, onValueChange, ref, children: rest.children, disabled: rest.disabled })
   // The holder takes nothing from the caller; on the track the rest goes first, so nothing of ours is overwritten.
   return (
     <SegmentedControlLookContext value={track.look}>
       <div className={cn(SEGMENTED_HOLDER, fullWidth && SEGMENTED_HOLDER_FULL)}>
         <Base
+          key={track.resetKey}
           {...rest}
           ref={track.rootRef}
           value={track.value}

@@ -1,6 +1,7 @@
 // Loaded into a live page by e2e/slider.spec.ts: the reset cases of Switch, repeated for a slider (unit-4.md,
 // "Fixtures"). A plain form with a reset button, a form with a function action, and one whose action returns the next
-// defaults; one thumb, a range, a slider with no default, a controlled one, and one outside its form tied to it by `form`.
+// defaults; one thumb, a range, a slider with no default, a controlled one, and one outside its form tied to it by `form`;
+// and one inside a disabled fieldset.
 import { useActionState, useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 
@@ -57,6 +58,15 @@ function Echo() {
   )
 }
 
+/** A slider inside a disabled fieldset: the range input is disabled by the browser, which Base UI does not know. */
+function Fenced() {
+  return (
+    <form id="fenced">
+      <fieldset disabled><Slider aria-label="Fenced" name="fenced" defaultValue={20} /></fieldset>
+    </form>
+  )
+}
+
 function Fixture() {
   const root = useRef(null as HTMLDivElement | null)
   // The spec waits for this: the effects of the sliders, which are children, have run by now.
@@ -67,6 +77,7 @@ function Fixture() {
         <Plain />
         <Action />
         <Echo />
+        <Fenced />
       </div>
     </TopClassProvider>
   )

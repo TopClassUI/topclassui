@@ -72,7 +72,8 @@ export type ComboboxScroller = RefObject<((index: number) => void) | null>
 export type ComboboxValueProps = Pick<
   ComboboxProps,
   'items' | 'value' | 'defaultValue' | 'onValueChange' | 'onItemHighlighted' | 'inputRef' | 'maxLength' | 'visibleRows'
-  | 'loadMoreThreshold' | 'status' | 'emptyFallback' | 'onOpenChange' | 'ref' | 'aria-label' | 'aria-labelledby'
+  | 'loadMoreThreshold' | 'status' | 'emptyFallback' | 'open' | 'defaultOpen' | 'onOpenChange' | 'ref' | 'aria-label'
+  | 'aria-labelledby'
 >
 
 /** What the list part takes from the root: the scroller to fill, and the paging. */
@@ -80,6 +81,10 @@ export interface ComboboxListProps {
   scroller: ComboboxScroller
   virtualize: 'auto' | boolean
   hasMore: boolean
+  /** Whether the popup is open: a list kept mounted while closed asks for nothing. */
+  open: boolean
+  /** How many options are loaded: one page is asked per length of items, whatever the query leaves of them. */
+  loaded: number
   loadMore?: (() => void | Promise<void>) | undefined
   loadMoreThreshold: number
   /** --tc-list-rows when visibleRows was passed, or undefined so the knob applies. */

@@ -73,27 +73,35 @@ test.describe('the same twelve crumbs on a desktop 1280 px wide', () => {
   })
 })
 
-/** Runs in the page: for each label that is cut, its direction and the side its hidden text runs off,
- * which is the side the ellipsis takes the place of. */
+/** Runs in the page: for each label that is cut, its direction, the side its hidden text runs off,
+ * which is the side the ellipsis takes the place of, and the side its first word is painted at. */
 function cutSides() {
   return [...document.querySelectorAll('nav li > span, nav li > a > span')].flatMap((label) => {
-    if (label.scrollWidth <= label.clientWidth) return []
+    if (label.scrollWidth <= label.clientWidth || !label.firstChild) return []
     const box = label.getBoundingClientRect()
     const range = document.createRange()
     range.selectNodeContents(label)
     const text = range.getBoundingClientRect()
     const side = text.right > box.right + 1 ? 'right' : text.left < box.left - 1 ? 'left' : 'none'
-    return [{ direction: getComputedStyle(label).direction, ellipsis: getComputedStyle(label).textOverflow, side }]
+    range.setStart(label.firstChild, 0)
+    range.setEnd(label.firstChild, label.textContent.indexOf(' '))
+    const first = range.getBoundingClientRect()
+    const firstWord = box.right - first.right < first.left - box.left ? 'right' : 'left'
+    return [{ direction: getComputedStyle(label).direction, ellipsis: getComputedStyle(label).textOverflow, side, firstWord }]
   })
 }
 
-// dir="auto": an English-first label in an RTL page was cut on its left, the ellipsis eating its start.
+// A label in two scripts is in the page's language with a foreign word in it: dir="auto" would follow its
+// first letter, and in an Arabic page read "Release notes" last, on the left.
 test.describe('a label that starts in English and goes on in Arabic', () => {
+  const EXPECTED = {
+    ltr: { direction: 'ltr', ellipsis: 'ellipsis', side: 'right', firstWord: 'left' },
+    rtl: { direction: 'rtl', ellipsis: 'ellipsis', side: 'left', firstWord: 'right' },
+  }
   for (const direction of DIRECTIONS) {
-    test(`${direction} page: both cut labels keep their start and end in an ellipsis on the right`, async ({ page }) => {
+    test(`${direction} page: both cut labels run in the page direction, the English word first and the ellipsis at the end`, async ({ page }) => {
       await page.goto(urlFor('breadcrumb--mixed-label', 'light', direction))
-      const expected = { direction: 'ltr', ellipsis: 'ellipsis', side: 'right' }
-      expect(await page.evaluate(cutSides)).toEqual([expected, expected])
+      expect(await page.evaluate(cutSides)).toEqual([EXPECTED[direction], EXPECTED[direction]])
     })
   }
 })
