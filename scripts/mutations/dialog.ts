@@ -121,8 +121,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog popup hook reads the direction of its provider and forgets the language',
     file: HOOK,
-    from: 'return { ...usePortalLocale(), modal: useContext(DialogModalContext) }',
-    to: 'return { dir: usePortalLocale().dir, lang: undefined, modal: useContext(DialogModalContext) }',
+    from: 'return { ...usePortalLocale(), modal: useContext(DialogModalContext), scope: useOverlayScope() }',
+    to: 'return { dir: usePortalLocale().dir, lang: undefined, modal: useContext(DialogModalContext), scope: useOverlayScope() }',
   },
   {
     label: 'the dialog body takes no tabIndex from its hook, so a long text with no control in it is out of reach of the keyboard',
@@ -193,14 +193,32 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog root forwards only its children, so open, defaultOpen and disablePointerDismissal never reach Base UI',
     file: CLIENT,
-    from: '<Base.Root {...props} modal={modal} onOpenChange={guardEscape(onOpenChange)} />',
-    to: '<Base.Root modal={modal} onOpenChange={guardEscape(onOpenChange)}>{props.children}</Base.Root>',
+    from: '<Base.Root {...props} modal={modal} onOpenChange={root.onOpenChange} />',
+    to: '<Base.Root modal={modal} onOpenChange={root.onOpenChange}>{props.children}</Base.Root>',
   },
   {
     label: 'the dialog root drops its Escape guard, so one key closes a tooltip opened by hover and the dialog under it',
     file: CLIENT,
-    from: 'onOpenChange={guardEscape(onOpenChange)}',
+    from: 'onOpenChange={root.onOpenChange}',
     to: 'onOpenChange={onOpenChange}',
+  },
+  {
+    label: 'the lifted escape scope never reaches the dialog popup, so its guard looks for a popup that is not there',
+    file: CLIENT,
+    from: '          data-overlay={scope}\n',
+    to: '',
+  },
+  {
+    label: 'the lifted escape scope is written before the rest props of the dialog popup, so a data-overlay of the caller breaks its guard',
+    file: CLIENT,
+    from: '          {...rest}\n          data-overlay={scope}\n',
+    to: '          data-overlay={scope}\n          {...rest}\n',
+  },
+  {
+    label: 'the lifted escape scope of a dialog root is not handed to its popup, so every dialog popup carries an empty one',
+    file: CLIENT,
+    from: '<OverlayScopeContext value={root.scope}>',
+    to: '<OverlayScopeContext value="">',
   },
   {
     label: "the dialog popup's own classes beat a consumer className",
@@ -295,8 +313,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog popup gains a second hook call, where a part may hold only the one from hook.ts (R-5.12-1)',
     file: CLIENT,
-    from: '  const { dir, lang, modal } = useDialogPopup()\n',
-    to: '  const { dir, lang, modal } = useDialogPopup()\n  useDialogClose()\n',
+    from: '  const { dir, lang, modal, scope } = useDialogPopup()\n',
+    to: '  const { dir, lang, modal, scope } = useDialogPopup()\n  useDialogClose()\n',
   },
   {
     label: 'the dialog default size becomes lg, so a dialog with no size is 512 px wide',

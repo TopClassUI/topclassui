@@ -1,5 +1,5 @@
 /** What the guard reads of the details Base UI hands the onOpenChange of every overlay root. */
-interface CloseDetails {
+export interface CloseDetails {
   reason: string
   event: { target: EventTarget | null }
   cancel: () => void
@@ -16,7 +16,7 @@ function holdsOpenPopup(target: EventTarget | null, popups: string): boolean {
 
 /** One Escape closes one thing. A tooltip opened by hover is not in Base UI's tree of popups,
  * so its key would close the overlay too: while a trigger inside `popups` shows its popup open,
- * the overlay cancels its own close and lets the key travel on. A menu passes its own selector. */
+ * the overlay cancels its own close and lets the key travel on. A root passes its own popup: useOverlayRoot. */
 export function guardEscape<Details extends CloseDetails>(
   onOpenChange: ((open: boolean, details: Details) => void) | undefined,
   popups = '[role="dialog"], [role="alertdialog"]',
@@ -30,4 +30,10 @@ export function guardEscape<Details extends CloseDetails>(
     }
     onOpenChange?.(open, details)
   }
+}
+
+/** The selector of one root's own popup, by the scope the root made and the popup writes as data-overlay.
+ * The roles of every dialog are not enough: an overlay's trigger can sit in another dialog, and is itself open. */
+export function toScopeSelector(scope: string): string {
+  return `[data-overlay="${scope}"]`
 }
