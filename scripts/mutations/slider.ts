@@ -67,6 +67,18 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
+    label: 'the slider control loses the padding of its size, so at xl the ring of a thumb at 0 pokes out of the box',
+    file: CLIENT,
+    from: 'className={cn(SLIDER_CONTROL, SLIDER_CONTROL_SIZE[size])}',
+    to: 'className={SLIDER_CONTROL}',
+  },
+  {
+    label: 'the slider control pads by half a target only, so the knob and its ring at either end leave the box',
+    file: CLASSES,
+    from: "  md: 'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-toggle-md)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]",
+    to: "  md: 'px-[calc(var(--tc-target-min,24px)/2)]",
+  },
+  {
     label: 'the slider hands Base UI defaultValue again, so a form reset leaves the thumb where it was',
     file: CLIENT,
     from: '      value={slider.value as Value}\n      onValueChange={slider.onValueChange}\n',

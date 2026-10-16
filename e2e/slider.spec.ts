@@ -523,6 +523,32 @@ for (const pointer of ['fine', 'coarse'] as const) {
   })
 }
 
+for (const pointer of ['fine', 'coarse'] as const) {
+  test.describe(`live: the two ends, ${pointer} pointer`, () => {
+    test.use(pointer === 'coarse' ? COARSE : {})
+    test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
+
+    for (const direction of DIRECTIONS) {
+      for (const rootSize of [16, 32]) {
+        test(`${direction}, a ${String(rootSize)} px root: at 0 and at 100 the knob and its focus ring stay inside the slider's box, at every size`, async ({ page }) => {
+          await openLive(page, 'separator--horizontal', { direction })
+          await page.evaluate((px) => { document.documentElement.style.fontSize = `${String(px)}px` }, rootSize)
+          await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/slider-edges.tsx' })
+          await expect(page.locator('#slider-edges [data-index]').first()).toBeVisible()
+          // How far the ring of each knob, its offset plus its width outside the knob, pokes out of its group: 0 when inside.
+          const past = await page.locator('#slider-edges [data-index] > span').evaluateAll((all) => all.map((knob) => {
+            const style = getComputedStyle(knob)
+            const ring = parseFloat(style.getPropertyValue('--tc-ring-offset')) + parseFloat(style.getPropertyValue('--tc-ring-width'))
+            const [k, g] = [knob.getBoundingClientRect(), (knob.closest('[role="group"]') as Element).getBoundingClientRect()]
+            return Math.max(0, Math.round((g.left - (k.left - ring)) * 10) / 10, Math.round((k.right + ring - g.right) * 10) / 10)
+          }))
+          expect(past).toEqual(Array.from({ length: 10 }, () => 0))
+        })
+      }
+    }
+  })
+}
+
 test.describe('live: where a page puts a slider', () => {
   const fixture = async (page: Page, options: LiveOptions = {}) => {
     await openLive(page, 'separator--horizontal', options)

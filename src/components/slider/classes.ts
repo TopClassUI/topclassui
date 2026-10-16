@@ -19,8 +19,19 @@ export const SLIDER_KNOB_SIZE = TOGGLE_SIZE
 /** The one item of that grid: the control, and the value after it. */
 export const SLIDER_ROW = 'flex min-w-0 items-center gap-3'
 
-/** Padded by half a target on each side, so a thumb at 0 or at 100 stays inside the box. */
+/** Padded by half a target on each side, so a thumb at 0 or at 100 stays inside the box; custom keeps this. */
 export const SLIDER_CONTROL = `relative flex min-w-0 flex-1 touch-none select-none items-center px-[calc(var(--tc-target-min,24px)/2)] pointer-coarse:px-[calc(var(--tc-target-coarse,44px)/2)] ${TARGET_HEIGHT}`
+
+/** Merged after the control: half the knob plus its focus ring when that is more than half a target, as at xl or a
+ * 32 px root, so the ring of a thumb at either end stays inside the box too. custom keeps the control's own. */
+export const SLIDER_CONTROL_SIZE = {
+  xs: 'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-toggle-xs)/2+var(--tc-ring-offset)+var(--tc-ring-width)))] pointer-coarse:px-[max(calc(var(--tc-target-coarse,44px)/2),calc(var(--spacing-toggle-xs)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
+  sm: 'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-toggle-sm)/2+var(--tc-ring-offset)+var(--tc-ring-width)))] pointer-coarse:px-[max(calc(var(--tc-target-coarse,44px)/2),calc(var(--spacing-toggle-sm)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
+  md: 'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-toggle-md)/2+var(--tc-ring-offset)+var(--tc-ring-width)))] pointer-coarse:px-[max(calc(var(--tc-target-coarse,44px)/2),calc(var(--spacing-toggle-md)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
+  lg: 'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-toggle-lg)/2+var(--tc-ring-offset)+var(--tc-ring-width)))] pointer-coarse:px-[max(calc(var(--tc-target-coarse,44px)/2),calc(var(--spacing-toggle-lg)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
+  xl: 'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-toggle-xl)/2+var(--tc-ring-offset)+var(--tc-ring-width)))] pointer-coarse:px-[max(calc(var(--tc-target-coarse,44px)/2),calc(var(--spacing-toggle-xl)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
+  custom: '',
+} as const
 
 /** Invalid adds a line around the track: the red fill alone is a cue by hue. */
 export const SLIDER_TRACK = `w-full rounded-full bg-neutral-soft ${FORCED_EDGE} group-aria-invalid/slider:outline-solid group-aria-invalid/slider:outline-(length:--tc-line-width) group-aria-invalid/slider:outline-danger-solid forced-colors:group-aria-invalid/slider:outline-(length:--tc-ring-width)`

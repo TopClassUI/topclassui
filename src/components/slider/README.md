@@ -77,8 +77,9 @@ nothing; a disabled `<fieldset>` around it dims it too, and a press on its track
 **The width** is an Input's of the same `size` (`--tc-input-width`), and it shrinks in a narrow
 track. **`fullWidth`** fills the parent, but in a parent that sizes to its content (a `w-fit`
 box, a table cell) there is nothing to fill and the slider is as wide as its thumb, 24 px, 44 on
-touch. The track is inset by half a target, 12 px, 22 on touch, so a thumb at either end stays
-inside the box: its ends do not line up with a field above it.
+touch. The track is inset by half a target, 12 px, 22 on touch, or by half the knob and its focus ring
+when that is more (14 px at `md`, 18 at `xl`, more at a larger root), so a thumb and its ring at
+either end stay inside the box: its ends do not line up with a field above it.
 
 **The thumb is the target**: 24 px, 44 under a finger, whatever `size` draws the knob. The focus
 ring is around the knob.

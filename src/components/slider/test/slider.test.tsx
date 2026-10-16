@@ -152,6 +152,15 @@ describe('what reaches the root', () => {
     expect(attr(root(volume({ 'aria-invalid': true })), 'aria-invalid')).toBe('true')
   })
 
+  it('the control takes the padding of its size over half a target; custom keeps half a target', () => {
+    const padding = (html: string) => attr(tag(html, 'div').find((div) => div.includes('data-base-ui-swipe-ignore')) ?? '', 'class')?.split(' ').filter((cls) => /^(pointer-coarse:)?px-/.test(cls))
+    expect(padding(volume({ size: 'xl' }))).toEqual([
+      'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-toggle-xl)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
+      'pointer-coarse:px-[max(calc(var(--tc-target-coarse,44px)/2),calc(var(--spacing-toggle-xl)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
+    ])
+    expect(padding(volume({ size: 'custom' }))).toEqual(['px-[calc(var(--tc-target-min,24px)/2)]', 'pointer-coarse:px-[calc(var(--tc-target-coarse,44px)/2)]'])
+  })
+
   it('the control carries Base UI\'s swipe marker, so a thumb dragged inside a Drawer never swipes it shut', () => {
     const control = tag(volume(), 'div').filter((div) => div.includes('data-base-ui-swipe-ignore'))
     expect(control.map((div) => attr(div, 'class')?.split(' ')[0])).toEqual(['relative'])

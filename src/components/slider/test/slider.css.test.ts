@@ -4,13 +4,13 @@ import { beforeAll, describe, expect, it } from 'vitest'
 
 import { compileEntry } from '#test/stylesheet.js'
 import {
-  SLIDER_CONTROL, SLIDER_FULL, SLIDER_INDICATOR, SLIDER_KNOB, SLIDER_KNOB_SIZE, SLIDER_ROOT, SLIDER_ROW, SLIDER_TEXT, SLIDER_THUMB,
+  SLIDER_CONTROL, SLIDER_CONTROL_SIZE, SLIDER_FULL, SLIDER_INDICATOR, SLIDER_KNOB, SLIDER_KNOB_SIZE, SLIDER_ROOT, SLIDER_ROW, SLIDER_TEXT, SLIDER_THUMB,
   SLIDER_TRACK, SLIDER_TRACK_SIZE, SLIDER_VALUE,
 } from '../classes.js'
 
 const OWN = [
   SLIDER_CONTROL, SLIDER_FULL, SLIDER_INDICATOR, SLIDER_KNOB, SLIDER_ROOT, SLIDER_ROW, SLIDER_THUMB, SLIDER_TRACK, SLIDER_VALUE,
-  ...Object.values(SLIDER_KNOB_SIZE), ...Object.values(SLIDER_TEXT), ...Object.values(SLIDER_TRACK_SIZE),
+  ...Object.values(SLIDER_CONTROL_SIZE), ...Object.values(SLIDER_KNOB_SIZE), ...Object.values(SLIDER_TEXT), ...Object.values(SLIDER_TRACK_SIZE),
 ]
 const CLASSES = [...new Set(OWN.join(' ').split(' ').filter(Boolean))]
 
@@ -66,6 +66,22 @@ describe('the box that owns the width', () => {
     const coarse = 'pointer-coarse:px-[calc(var(--tc-target-coarse,44px)/2)]'
     expect(ruleOf(selectorOf(coarse))).toBe('padding-inline: calc(var(--tc-target-coarse,44px) / 2);')
     expect(mediaOf(selectorOf(coarse))).toBe('@media (pointer: coarse)')
+  })
+
+  it('at each size the control pads by half the knob and its focus ring when that is more than half a target', () => {
+    const [fine, coarse] = SLIDER_CONTROL_SIZE.md.split(' ')
+    expect(ruleOf(selectorOf(fine ?? ''))).toBe(
+      'padding-inline: max(calc(var(--tc-target-min,24px) / 2), calc(var(--spacing-toggle-md) / 2 + var(--tc-ring-offset) + var(--tc-ring-width)));',
+    )
+    expect(ruleOf(selectorOf(coarse ?? ''))).toBe(
+      'padding-inline: max(calc(var(--tc-target-coarse,44px) / 2), calc(var(--spacing-toggle-md) / 2 + var(--tc-ring-offset) + var(--tc-ring-width)));',
+    )
+    expect(mediaOf(selectorOf(coarse ?? ''))).toBe('@media (pointer: coarse)')
+    for (const size of ['xs', 'sm', 'lg', 'xl'] as const) {
+      expect(SLIDER_CONTROL_SIZE[size].split(' ').map((cls) => ruleOf(selectorOf(cls)).includes(`var(--spacing-toggle-${size}) / 2 + var(--tc-ring-offset)`)), size)
+        .toEqual([true, true])
+    }
+    expect(SLIDER_CONTROL_SIZE.custom).toBe('')
   })
 
   it('a drag on the control never scrolls the page or selects its text', () => {
