@@ -104,4 +104,10 @@ export const MUTATIONS: Mutation[] = [
     from: "    /** The key the dismissal is remembered under, and the element's id. Required with `dismissible`. */\n    id: string\n",
     to: "    /** The key the dismissal is remembered under, and the element's id. Required with `dismissible`. */\n    id?: string | undefined\n",
   },
+  {
+    label: 'the banner dismiss type takes only a literal true, so a boolean decided at runtime is refused even with an id',
+    file: 'src/components/banner/types.ts',
+    from: '    dismissible: boolean\n',
+    to: '    dismissible: true\n',
+  },
 ]
