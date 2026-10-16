@@ -30,7 +30,7 @@ export const MUTATIONS: Mutation[] = [
     label: 'rating: the fill colour moves onto the svg, where forced colours do not reach it',
     file: 'src/components/rating/classes.ts',
     from: "export const RATING_FILL_ICON = 'max-w-none'",
-    to: "export const RATING_FILL_ICON = 'max-w-none text-warning-solid'",
+    to: "export const RATING_FILL_ICON = 'max-w-none text-warning-on-soft'",
   },
   {
     label: 'rating: the radio is sr-only, a 1 px target',
@@ -79,6 +79,12 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/rating/hook.ts',
     from: 'if (!disabled) setHovered(step)',
     to: 'setHovered(step)',
+  },
+  {
+    label: 'rating: a filled star goes back to warning-solid, 2.13:1 on a white page',
+    file: 'src/components/rating/classes.ts',
+    from: 'flex overflow-hidden text-warning-on-soft',
+    to: 'flex overflow-hidden text-warning-solid',
   },
   {
     label: 'rating: a read-only rating renders the client half, so a page of stars hydrates',

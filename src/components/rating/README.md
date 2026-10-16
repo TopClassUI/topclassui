@@ -41,6 +41,8 @@ import { Rating } from 'topclassui'
 - **Size.** The star follows the icon scale, 16 to 40 px; `custom` draws it at 1em. Each
   editing star is at least 24 px to press, and 44 px under a coarse pointer.
 - **Narrow boxes.** The row wraps rather than scroll the page: ten `xl` stars are 436 px.
+- **Colour.** A filled star is `warning-on-soft`, 3:1 or more on every surface in every mode;
+  `warning-solid` is 2.13:1 on a white page.
 - **Forced colours.** Both stars turn to the text colour: a filled one stays solid and an
   empty one an outline, so they still differ by shape.
 - **Arabic.** `{...getLabels('ar')}` passes `labels` and `locale`. Numbers are written in

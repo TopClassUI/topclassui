@@ -4,7 +4,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
 import { DIRECTIONS, MODES } from '../scripts/lib/harness.js'
 import { expectNoSidewaysScroll, openLive } from './live.js'
 import { urlFor } from './pages.js'
-import { type Rgb, paintedIn, pixelsOf } from './pixels.js'
+import { type Rgb, contrast, paintedIn, pixelsOf } from './pixels.js'
 
 // What happy-dom cannot lay out or paint: which half of a half star is filled in each direction, what forced
 // colours leave of a fill, the browser's own radio group under the keyboard, the pointer's fill, the size of a
@@ -36,7 +36,7 @@ const formData = (page: Page) => page.evaluate(() => {
 })
 
 /** A computed colour as the screen paints it: Tailwind writes oklch, which a canvas turns into rgb. */
-const paintedColour = (target: Locator, property: 'color' | 'outlineColor') => target.evaluate((element, name): Rgb => {
+const paintedColour = (target: Locator, property: 'color' | 'outlineColor' | 'backgroundColor') => target.evaluate((element, name): Rgb => {
   const pen = document.createElement('canvas').getContext('2d')
   if (!pen) throw new Error('no canvas')
   pen.fillStyle = getComputedStyle(element)[name]
@@ -82,6 +82,19 @@ test.describe('half a star is clipped from the inline start: its right half is f
       const other = filled === 'left' ? 'right' : 'left'
       expect(painted[filled], `the ${filled} half is filled`).toBeGreaterThanOrEqual(60)
       expect(painted[other], `the ${other} half is not`).toBeLessThanOrEqual(4)
+    })
+  }
+})
+
+test.describe('a filled star is an icon, so it keeps 3:1 against the page in every mode', () => {
+  for (const mode of MODES) {
+    test(mode, async ({ page }) => {
+      await openLive(page, 'rating--read-only', { mode })
+      const fill = page.locator('#demo [role="img"]').nth(1).locator(':scope > span > span').first()
+      // The harness paints the page on the body with bg-page.
+      const ratio = contrast(await paintedColour(fill, 'color'), await paintedColour(page.locator('body'), 'backgroundColor'))
+      // warning-solid, amber-500, measured 2.13:1 on the white page of light and ocean.
+      expect(ratio, 'filled star on the page').toBeGreaterThanOrEqual(3)
     })
   }
 })
