@@ -121,12 +121,12 @@ import { Slider } from 'topclassui'
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `aria-label` or `aria-labelledby`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `aria-label` | no | `string` | - | The name read out when no visible text names the group. |
-| `aria-labelledby` | no | `string` | - | The id of the visible text that names the group. |
+| `aria-label` | **yes**, or `aria-labelledby` | `string` | - | The name read out when no visible text names the group. |
+| `aria-labelledby` | **yes**, or `aria-label` | `string` | - | The id of the visible text that names the group. |
 | `className` | no | `string` | - | Merged last, so a consumer class wins a conflict with the slider's own. |
 | `fullWidth` | no | `boolean` | `false` | Fills its parent instead of taking the width of an Input of its size. |
 | `invalid` | no | `boolean` | `false` | Marks the value as wrong: sets aria-invalid on the group and on each range input, and the fill, the knob and the line around the track turn to danger. |
