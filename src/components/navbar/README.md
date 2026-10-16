@@ -87,20 +87,56 @@ transparent variant, `size`, `bordered`, and a search part: put an `Input` in
 ## Import
 
 ```tsx
-import { Navbar } from 'topclassui'
+import {
+  NavbarRoot,
+  NavbarBrand,
+  NavbarLinks,
+  NavbarLink,
+  NavbarActions,
+} from 'topclassui'
 ```
 
 ## Props
 
 Every prop below is optional and falls back to the default shown.
 
+### NavbarRoot
+
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
 | `children` | no | `ReactNode` | - | The parts, in order: NavbarBrand, NavbarLinks and NavbarActions. Each one is optional. |
-| `current` | no | `boolean` | `false` | NavbarLink: the link of the page being read. It sets aria-current="page" and draws the link heavier. |
 | `sticky` | no | `boolean` | `true` | NavbarRoot: the bar stays at the top while the page scrolls, and publishes its height as --tc-sticky-top. |
 
-Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
+### NavbarBrand
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `children` | no | `ReactNode` | - | The name of the site, with a logo before it if there is one. |
+| `render` | no | `ReactElement` | - | The element the brand is drawn as, such as `render={<Link href="/" />}`. A plain anchor without it. |
+
+### NavbarLinks
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `children` | no | `ReactNode` | - | The links: one NavbarLink each. |
+| `labels` | no | `Labels` | - | The built-in strings; the nav is named by `labels.navbar.label`. Defaults to English. |
+| `locale` | no | `string` | - | Accepted so `{...getLabels(locale)}` spreads cleanly. Nothing here formats a number, so it never reaches the element. |
+
+### NavbarLink
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `children` | no | `ReactNode` | - | The text of the link. |
+| `current` | no | `boolean` | `false` | NavbarLink: the link of the page being read. It sets aria-current="page" and draws the link heavier. |
+| `render` | no | `ReactElement` | - | The element the link is drawn as, such as `render={<Link href="/docs" />}`. A plain anchor without it. |
+
+### NavbarActions
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `children` | no | `ReactNode` | - | What sits at the end of the bar: a Button, a search Input, an Avatar. |
+
+Anything else is passed to the element each part draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
 

@@ -147,22 +147,86 @@ and a trigger outside its `DropdownRoot` (Base UI's `handle`).
 ## Import
 
 ```tsx
-import { Dropdown } from 'topclassui'
+import {
+  DropdownRoot,
+  DropdownGroup,
+  DropdownGroupLabel,
+  DropdownItem,
+  DropdownLinkItem,
+  DropdownMenu,
+  DropdownPopup,
+  DropdownSeparator,
+  DropdownTrigger,
+} from 'topclassui'
 ```
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `items` on `DropdownMenu`, `title` on `DropdownMenu`, `trigger` on `DropdownMenu`. Every other prop below is optional.
+
+### DropdownRoot
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
 | `children` | no | `ReactNode` | - | The trigger and the popup. With no trigger, hold `open` in a client file. |
-| `closeDelay` | no | `number`, min 0, max 10000 | `0` | DropdownTrigger, with openOnHover: milliseconds it stays open after the pointer leaves, clamped. |
-| `delay` | no | `number`, min 0, max 10000 | `100` | DropdownTrigger, with openOnHover: milliseconds of hover before it opens, clamped. |
-| `placement` | no | `top` \| `top-start` \| `top-end` \| `bottom` \| `bottom-start` \| `bottom-end` \| `start` \| `start-top` \| `start-bottom` \| `end` \| `end-top` \| `end-bottom` | `"bottom-start"` | DropdownPopup, DropdownMenu: the side and alignment it opens at; start and end mirror in Arabic. |
+
+### DropdownGroup
+
+This part takes no design props of its own.
+
+### DropdownGroupLabel
+
+This part takes no design props of its own.
+
+### DropdownItem
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `children` | no | `ReactNode` | - |  |
+| `icon` | no | `ReactNode` | - | Drawn before the label. An element, such as `<Svg icon={trash} />`: it is not a name. |
+| `shortcut` | no | `string` | - | Shown at the end of the row, such as `Ctrl P`. It is read out after the label. |
 | `tone` | no | `neutral` \| `danger` | `"neutral"` | DropdownItem, DropdownLinkItem: danger colours a destructive row; its label still has to say so. |
 
-Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
+### DropdownLinkItem
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `children` | no | `ReactNode` | - |  |
+| `icon` | no | `ReactNode` | - | Drawn before the label. An element, such as `<Svg icon={trash} />`: it is not a name. |
+| `shortcut` | no | `string` | - | Shown at the end of the row, such as `Ctrl P`. It is read out after the label. |
+| `tone` | no | `neutral` \| `danger` | `"neutral"` | DropdownItem, DropdownLinkItem: danger colours a destructive row; its label still has to say so. |
+
+### DropdownMenu
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `items` | **yes** | `readonly MenuItem[]` | - |  |
+| `title` | **yes** | `string` | - | The name of the menu, which labels its group of items. |
+| `trigger` | **yes** | `ReactElement` | - | The element that opens the menu, such as a Button. |
+| `defaultOpen` | no | `boolean` | - |  |
+| `link` | no | `ReactElement` | - | The element every `href` item is cloned from, such as `link={<Link href="" />}`; its href is replaced with the item's. |
+| `onOpenChange` | no | `((open: boolean) => void)` | - | Client only, like `onSelect`. |
+| `open` | no | `boolean` | - |  |
+| `placement` | no | `top` \| `top-start` \| `top-end` \| `bottom` \| `bottom-start` \| `bottom-end` \| `start` \| `start-top` \| `start-bottom` \| `end` \| `end-top` \| `end-bottom` | `"bottom-start"` | DropdownPopup, DropdownMenu: the side and alignment it opens at; start and end mirror in Arabic. |
+
+### DropdownPopup
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `placement` | no | `top` \| `top-start` \| `top-end` \| `bottom` \| `bottom-start` \| `bottom-end` \| `start` \| `start-top` \| `start-bottom` \| `end` \| `end-top` \| `end-bottom` | `"bottom-start"` | DropdownPopup, DropdownMenu: the side and alignment it opens at; start and end mirror in Arabic. |
+
+### DropdownSeparator
+
+This part takes no design props of its own.
+
+### DropdownTrigger
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `closeDelay` | no | `number`, min 0, max 10000 | `0` | DropdownTrigger, with openOnHover: milliseconds it stays open after the pointer leaves, clamped. |
+| `delay` | no | `number`, min 0, max 10000 | `100` | DropdownTrigger, with openOnHover: milliseconds of hover before it opens, clamped. |
+
+`DropdownRoot` draws no element, so it takes no `className`, `style` or `ref`. Anything else on another part is passed to the element it draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
 
