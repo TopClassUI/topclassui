@@ -109,14 +109,14 @@ import {
 
 ## Props
 
-Required: `value` on `RadioGroupItem`. Every other prop below is optional.
+Required: `aria-label` or `aria-labelledby` on `RadioGroupRoot`, `value` on `RadioGroupItem`. Every other prop below is optional.
 
 ### RadioGroupRoot
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `aria-label` | no | `string` | - | The name read out when no visible text names the group. |
-| `aria-labelledby` | no | `string` | - | The id of the visible text that names the group. |
+| `aria-label` | **yes**, or `aria-labelledby` | `string` | - | The name read out when no visible text names the group. |
+| `aria-labelledby` | **yes**, or `aria-label` | `string` | - | The id of the visible text that names the group. |
 | `invalid` | no | `boolean` | `false` | RadioGroupRoot: marks the choice as wrong: sets aria-invalid on the group, and every circle turns to danger and thickens. |
 | `orientation` | no | `vertical` \| `horizontal` | `"vertical"` | RadioGroupRoot: a column, or a row that wraps. Layout only, written as data-orientation; the arrow keys do not change. |
 | `ref` | no | `Ref<HTMLDivElement>` | - | The element with role="radiogroup". |
