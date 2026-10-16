@@ -188,6 +188,24 @@ export const MUTATIONS: Mutation[] = [
     to: '<span>',
   },
   {
+    label: 'the file upload list lets a row shrink under its content once it scrolls',
+    file: CLASSES,
+    from: 'grid grid-cols-1 auto-rows-max gap-1.5',
+    to: 'grid grid-cols-1 gap-1.5',
+  },
+  {
+    label: 'the file upload list cap leaves out the gaps, so it shows one row fewer than visibleRows',
+    file: CLASSES,
+    from: '*var(--spacing)*1.5)] pointer-coarse:',
+    to: '*0)] pointer-coarse:',
+  },
+  {
+    label: 'the file upload coarse cap counts --tc-row-height, which ROW_TOUCH replaces, so a 32 px root shows an extra row',
+    file: CLASSES,
+    from: 'pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-target-coarse,44px)+',
+    to: 'pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-coarse,44px)+',
+  },
+  {
     label: 'the file upload remove of a disabled upload looks enabled',
     file: CLASSES,
     from: '${HOVER.ghost} ${DISABLED}`',

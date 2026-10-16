@@ -64,10 +64,12 @@ describe('the zone', () => {
 })
 
 describe('the list and the status lines', () => {
-  it('the list is at most --tc-list-rows rows, 44 px rows under a coarse pointer, and nothing at all while empty', () => {
-    expect(ruleOf(selectorOf('max-h-[calc(var(--tc-list-rows)*var(--tc-row-height))]'))).toBe('max-height: calc(var(--tc-list-rows) * var(--tc-row-height));')
-    const coarse = selectorOf('pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-coarse,44px)))]')
-    expect([ruleOf(coarse), queryOf(coarse)]).toEqual(['max-height: calc(var(--tc-list-rows) * max(var(--tc-row-height), var(--tc-target-coarse,44px)));', '@media (pointer: coarse)'])
+  it('the list is at most --tc-list-rows whole rows and their gaps, 54 px rows under a coarse pointer, and nothing while empty', () => {
+    const fine = selectorOf('max-h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-min,24px)+var(--spacing)*2+var(--tc-line-width)*2,var(--text-sm)*var(--text-sm--line-height)+var(--spacing)*2+var(--tc-line-width)*2)+(var(--tc-list-rows)-1)*var(--spacing)*1.5)]')
+    expect(ruleOf(fine)).toBe('max-height: calc(var(--tc-list-rows) * max(var(--tc-row-height), var(--tc-target-min,24px) + var(--spacing) * 2 + var(--tc-line-width) * 2, var(--text-sm) * var(--text-sm--line-height) + var(--spacing) * 2 + var(--tc-line-width) * 2) + (var(--tc-list-rows) - 1) * var(--spacing) * 1.5);')
+    const coarse = selectorOf('pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-target-coarse,44px)+var(--spacing)*2+var(--tc-line-width)*2,var(--text-sm)*var(--text-sm--line-height)+var(--spacing)*2+var(--tc-line-width)*2)+(var(--tc-list-rows)-1)*var(--spacing)*1.5)]')
+    expect([ruleOf(coarse), queryOf(coarse)]).toEqual(['max-height: calc(var(--tc-list-rows) * max(var(--tc-target-coarse,44px) + var(--spacing) * 2 + var(--tc-line-width) * 2, var(--text-sm) * var(--text-sm--line-height) + var(--spacing) * 2 + var(--tc-line-width) * 2) + (var(--tc-list-rows) - 1) * var(--spacing) * 1.5);', '@media (pointer: coarse)'])
+    expect(ruleOf(selectorOf('auto-rows-max'))).toBe('grid-auto-rows: max-content;')
     expect(ruleOf(`${selectorOf('empty:hidden')}:empty`)).toBe('display: none;')
   })
 
