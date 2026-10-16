@@ -128,4 +128,10 @@ export const MUTATIONS: Mutation[] = [
     from: "export const COMBOBOX_ACTIVE = 'data-highlighted:outline-solid ",
     to: "export const COMBOBOX_ACTIVE = '",
   },
+  {
+    label: 'the combobox shows the raw value of an option in no loaded page, so the input reads an internal id',
+    file: HOOK,
+    from: '    labelOfUnknown,\n',
+    to: '    labelOfUnknown: undefined,\n',
+  },
 ]

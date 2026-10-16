@@ -12,7 +12,7 @@ import { useLabels } from '#shared/provider/context.js'
 import { usePortalLocale } from '#shared/provider/use-portal-locale.js'
 import { useFormValue } from '#shared/use-form-value.js'
 import { COMBOBOX_DEFAULTS, COMBOBOX_ROW_ESTIMATE } from './constants.js'
-import { isAppended, keyOfOption, nameFromLabels, optionAccessors, revealTop } from './lib.js'
+import { isAppended, keyOfOption, labelOfUnknown, nameFromLabels, optionAccessors, revealTop } from './lib.js'
 import type { ComboboxChangeDetails, ComboboxHighlightDetails, ComboboxListProps, ComboboxValueProps } from './types.js'
 
 const { visibleRowsMin, visibleRowsMax, loadMoreThresholdMin, loadMoreThresholdMax } = COLLECTION_BOUNDARIES
@@ -64,6 +64,7 @@ export function useCombobox(props: ComboboxValueProps) {
     ref: input,
     label: props['aria-label'] ?? spoken,
     items: collection,
+    labelOfUnknown,
     scroller,
     maxLength: resolveMaxLength(maxLength, 'search'),
     // Left out, the --tc-list-rows knob applies: React writes no style for an undefined value.

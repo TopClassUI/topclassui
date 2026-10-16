@@ -46,6 +46,7 @@ export function Combobox({
     <span className={cn(COMBOBOX_ROOT, FIELD_TEXT[size], fullWidth ? COMBOBOX_WIDTH.full : COMBOBOX_WIDTH.own)}>
       <Base.Root
         items={combobox.items}
+        itemToStringLabel={combobox.labelOfUnknown}
         value={combobox.value}
         onValueChange={combobox.onValueChange}
         onItemHighlighted={combobox.onItemHighlighted}
