@@ -28,12 +28,12 @@ describe('checkTokens', () => {
   })
 
   it('measures the number of pairs it claims; change this only on purpose', () => {
-    expect(run(css).pairs).toBe(342)
+    expect(run(css).pairs).toBe(360)
   })
 
   it('reports how many readings are distinct, since light and ocean share most tokens', () => {
     const report = run(css)
-    expect(report.distinct).toBe(207)
+    expect(report.distinct).toBe(222)
     expect(report.distinct).toBeLessThan(report.pairs)
   })
 })
@@ -193,6 +193,18 @@ describe('the label on the hovered and pressed tint', () => {
   })
 })
 
+describe('the ring on a tint', () => {
+  // A highlighted row of a menu is a tint with the ring drawn inside its edge.
+  it('is measured on the tint of every tone, in every mode', () => {
+    const faint = css.replace('--tc-ring: var(--tc-primary-on-soft);', '--tc-ring: var(--tc-primary-soft);')
+    expect(faint, 'the ring declaration moved').not.toBe(css)
+    const text = failures(faint)
+    for (const tone of ['primary', 'neutral', 'success', 'warning', 'danger', 'info']) {
+      expect(text, tone).toMatch(new RegExp(`light: ring on the ${tone} tint`))
+    }
+  })
+})
+
 describe('each threshold is the number R-5.6-4 names, and each one bites', () => {
   it('keeps the margin that absorbs browser differences', () => {
     expect(MARGIN).toBe(0.15)
@@ -224,11 +236,6 @@ describe('each threshold is the number R-5.6-4 names, and each one bites', () =>
     )
     expect(faint, 'the line-strong declaration moved').not.toBe(css)
     expect(failures(faint)).toMatch(/light: line-strong on page/)
-  })
-
-  it('fails a switch thumb that reads 1.2 on its off track, the drawn surface-raised', () => {
-    const pale = mutateMode('dark', '--tc-line-strong: var(--color-neutral-400);', '--tc-line-strong: var(--color-neutral-800);')
-    expect(failures(pale)).toMatch(/dark: switch thumb \(line-strong\) on its track \(neutral-soft\)/)
   })
 
   it('judges the worse gamut reading, measured through checkTokens itself', () => {

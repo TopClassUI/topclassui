@@ -48,10 +48,10 @@ describe('on the server', () => {
     ])
   })
 
-  it('the caller aria-labelledby is on the first cell and not on the group', () => {
-    const out = markup(<OTPField aria-labelledby="code-label" />)
+  it('the caller aria-labelledby is on the first cell and on the group, so a tab stop on a later cell is in a named group', () => {
+    const out = markup(<OTPField aria-labelledby="code-label" defaultValue="12" />)
     expect(each(out, 'aria-labelledby')).toEqual(['code-label', undefined, undefined, undefined, undefined, undefined])
-    expect(root(out)).not.toContain('aria-labelledby')
+    expect(attr(root(out), 'aria-labelledby')).toBe('code-label')
   })
 
   it('aria-describedby is on the first cell only', () => {
@@ -68,12 +68,18 @@ describe('on the server', () => {
     expect(each(html(), 'aria-invalid')).toEqual([undefined, undefined, undefined, undefined, undefined, undefined])
   })
 
-  it('a row of more than eight items wraps: nine cells do, eight do not, and separators count', () => {
-    const wraps = (props: Partial<OtpFieldProps>) => (attr(root(html(props)), 'class') ?? '').split(' ').includes('flex-wrap')
-    expect(wraps({ length: 9 })).toBe(true)
-    expect(wraps({ length: 8 })).toBe(false)
-    expect(wraps({ length: 6, groupSize: 2 })).toBe(false)
-    expect(wraps({ length: 8, groupSize: 4 })).toBe(true)
+  it('every row may break; past eight items, separators counted, it breaks at whole cells, and up to eight at the 24 px floor', () => {
+    const classes = (props: Partial<OtpFieldProps>) => {
+      const out = html(props)
+      const cell = (attr(cells(out)[0] ?? '', 'class') ?? '').split(' ')
+      const fit = cell.includes('basis-[var(--tc-target-min,24px)]') && cell.includes('grow')
+      const whole = cell.includes('w-full') && cell.includes('grow-0')
+      return [(attr(root(out), 'class') ?? '').split(' ').includes('flex-wrap'), fit ? 'fit' : whole ? 'whole' : 'neither']
+    }
+    expect(classes({ length: 9 })).toEqual([true, 'whole'])
+    expect(classes({ length: 8 })).toEqual([true, 'fit'])
+    expect(classes({ length: 6, groupSize: 2 })).toEqual([true, 'fit'])
+    expect(classes({ length: 8, groupSize: 4 })).toEqual([true, 'whole'])
   })
 
   it('groupSize draws an aria-hidden bar after every group but the last, and is clamped between 0 and length', () => {

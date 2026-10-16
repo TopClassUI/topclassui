@@ -4,4 +4,5 @@ export const SLIDER_BOUNDARIES = {
   limitMin: -1e15,
   limitMax: 1e15,
   stepMin: 0.000001,
+  stepsBetweenMin: 0,
 } as const

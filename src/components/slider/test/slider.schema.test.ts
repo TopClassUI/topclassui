@@ -9,10 +9,10 @@ import { sliderSchema } from '../schema.js'
 const json = z.toJSONSchema(sliderSchema, { io: 'input' }) as {
   properties?: Record<string, { description?: string; default?: unknown; enum?: unknown[]; minimum?: number; maximum?: number }>
 }
-const KEYS = ['fullWidth', 'invalid', 'max', 'min', 'showValue', 'size', 'step']
+const KEYS = ['fullWidth', 'invalid', 'largeStep', 'max', 'min', 'minStepsBetweenValues', 'showValue', 'size', 'step']
 
 describe('the schema is the documentation', () => {
-  it('covers the seven props Slider adds or bounds and no other: the rest are Base UI\'s', () => {
+  it('covers the nine props Slider adds or bounds and no other: the rest are Base UI\'s', () => {
     expect(Object.keys(sliderSchema.shape).sort()).toEqual(KEYS)
     expect(Object.keys(json.properties ?? {}).sort()).toEqual(KEYS)
   })
@@ -23,26 +23,30 @@ describe('the schema is the documentation', () => {
     })
   }
 
-  it('records the defaults: md, false three times, and Base UI\'s 0, 100 and 1', () => {
+  it('records the defaults: md, false three times, and Base UI\'s 0, 100, 1, 10 and 0', () => {
     expect(Object.fromEntries(KEYS.map((key) => [key, json.properties?.[key]?.default])))
-      .toEqual({ fullWidth: false, invalid: false, max: 100, min: 0, showValue: false, size: 'md', step: 1 })
+      .toEqual({ fullWidth: false, invalid: false, largeStep: 10, max: 100, min: 0, minStepsBetweenValues: 0, showValue: false, size: 'md', step: 1 })
     expect(json.properties?.['size']?.enum).toEqual(['xs', 'sm', 'md', 'lg', 'xl', 'custom'])
   })
 
   it('records min and max for every numeric prop (R-5.7-7)', () => {
-    expect(['min', 'max', 'step'].map((key) => [json.properties?.[key]?.minimum, json.properties?.[key]?.maximum]))
-      .toEqual([[-1e15, 1e15], [-1e15, 1e15], [0.000001, 1e15]])
+    expect(['min', 'max', 'step', 'largeStep', 'minStepsBetweenValues'].map((key) => [json.properties?.[key]?.minimum, json.properties?.[key]?.maximum]))
+      .toEqual([[-1e15, 1e15], [-1e15, 1e15], [0.000001, 1e15], [0.000001, 1e15], [0, 1e15]])
   })
 })
 
 describe('the schema, the bounds and the constants agree', () => {
   it('fills every default from constants.ts', () => {
-    expect(sliderSchema.parse({})).toEqual({ size: 'md', invalid: false, fullWidth: false, showValue: false, min: 0, max: 100, step: 1 })
+    expect(sliderSchema.parse({})).toEqual({
+      size: 'md', invalid: false, fullWidth: false, showValue: false, min: 0, max: 100, step: 1, largeStep: 10, minStepsBetweenValues: 0,
+    })
   })
 
   it('names the defaults and the bounds the spec gives, so a changed constant is a failure here', () => {
-    expect(SLIDER_DEFAULTS).toEqual({ size: 'md', invalid: false, fullWidth: false, showValue: false, min: 0, max: 100, step: 1 })
-    expect(SLIDER_BOUNDARIES).toEqual({ limitMin: -1e15, limitMax: 1e15, stepMin: 0.000001 })
+    expect(SLIDER_DEFAULTS).toEqual({
+      size: 'md', invalid: false, fullWidth: false, showValue: false, min: 0, max: 100, step: 1, largeStep: 10, minStepsBetweenValues: 0,
+    })
+    expect(SLIDER_BOUNDARIES).toEqual({ limitMin: -1e15, limitMax: 1e15, stepMin: 0.000001, stepsBetweenMin: 0 })
     expect(SLIDER_SIZES).toEqual(['xs', 'sm', 'md', 'lg', 'xl', 'custom'])
   })
 
@@ -51,6 +55,8 @@ describe('the schema, the bounds and the constants agree', () => {
     expect(sliderSchema.safeParse({ step: 0 }).success).toBe(false)
     expect(sliderSchema.safeParse({ max: 1e16 }).success).toBe(false)
     expect(sliderSchema.safeParse({ min: -1e16 }).success).toBe(false)
+    expect(sliderSchema.safeParse({ largeStep: 0 }).success).toBe(false)
+    expect(sliderSchema.safeParse({ minStepsBetweenValues: -1 }).success).toBe(false)
   })
 
   it('keeps what is not built out of the schema: no tone, no variant, no thumbAlignment, no readOnly', () => {

@@ -56,6 +56,7 @@ describe('every element carries exactly the classes the spec names', () => {
       'duration-(--tc-duration)',
       'ease-out',
       'flex',
+      'flex-wrap',
       'focus-visible:-outline-offset-(length:--tc-ring-width)',
       'focus-visible:outline-(length:--tc-ring-width)',
       'focus-visible:outline-ring',
@@ -83,16 +84,17 @@ describe('every element carries exactly the classes the spec names', () => {
     ])
   })
 
-  it('the trigger has no justify-between and no truncate: the title takes the room and wraps', () => {
+  it('the trigger has no justify-between and no truncate: the title takes the room and wraps, and under six letters the caret wraps instead', () => {
     const { trigger, title } = opened()
     expect(classes(trigger)).not.toContain('justify-between')
-    expect(classes(title)).toEqual(['flex-1', 'min-w-0'])
+    expect(classes(title)).toEqual(['basis-[6ch]', 'grow', 'min-w-0'])
+    expect(classes(trigger)).toContain('flex-wrap')
   })
 
-  it('the caret box: muted, turned by the open trigger, and the grey of the system when that is disabled', () => {
+  it('the caret box: at the inline end on a line of its own too, muted, turned by the open trigger, and the grey of the system when that is disabled', () => {
     expect(classes(opened().caret)).toEqual([
       'duration-(--tc-duration)', 'flex', 'forced-colors:group-data-disabled:text-[GrayText]',
-      'group-data-panel-open:rotate-180', 'shrink-0', 'text-muted', 'transition-[rotate]',
+      'group-data-panel-open:rotate-180', 'ms-auto', 'shrink-0', 'text-muted', 'transition-[rotate]',
     ])
   })
 

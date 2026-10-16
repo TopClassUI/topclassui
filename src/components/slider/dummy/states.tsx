@@ -1,6 +1,6 @@
 import { Slider } from '../index.js'
 
-/** The states a server can render. Invalid draws a line around the track as well as the red. A slider has no read-only
+/** The states a server can render. Invalid turns the line around the track red as well as the fill. A slider has no read-only
  * state: Base UI has none. */
 export default function Demo() {
   return (
