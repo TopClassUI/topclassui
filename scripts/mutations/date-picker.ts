@@ -146,4 +146,10 @@ export const MUTATIONS: Mutation[] = [
     from: '  return { atFirst: first <= range.min, atLast: last >= range.max }',
     to: '  return { atFirst: false, atLast: last >= range.max }',
   },
+  {
+    label: 'the date picker leaves Base UI mounted after a close during the first load, so the part arrives hidden and takes the focus',
+    file: HOOK,
+    from: '    else if (opened.current && !ready.current) actionsRef.current?.unmount()',
+    to: '    else if (opened.current && !ready.current) void actionsRef',
+  },
 ]

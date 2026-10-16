@@ -212,6 +212,34 @@ test.describe('live: hydration, the lazy calendar and the words of each locale',
     expect(part, 'a second open fetches nothing more').toHaveLength(fetched)
   })
 
+  test('Escape while the calendar is still loading: the part that arrives later shows nothing, takes no focus and leaves no portal', async ({ page }) => {
+    let release = (): void => undefined
+    const held = new Promise<void>((resolve) => { release = resolve })
+    await page.route(/date-picker-calendar/, async (route) => { await held; await route.continue() })
+    await openLive(page, 'date-picker--basic')
+    const button = trigger(page)
+    await button.focus()
+    await page.keyboard.press('Enter')
+    await expect(button).toHaveAttribute('aria-expanded', 'true')
+    await page.keyboard.press('Escape')
+    await expect(button).toHaveAttribute('aria-expanded', 'false')
+    const arrived = page.waitForResponse(/date-picker-calendar/)
+    release()
+    await arrived
+    // The part's icons load after it, then it renders and focuses a frame later: nothing to poll for, so a wait.
+    await page.waitForTimeout(500)
+    expect(await page.locator('[role="dialog"]').count(), 'a calendar mounted after the close').toBe(0)
+    expect(await page.locator('[data-base-ui-portal]:empty').count(), 'Base UI still holds the closed root mounted').toBe(0)
+    await expect(button).toBeFocused()
+    await page.keyboard.press('Enter')
+    await expect(page.locator(POPUP)).toBeVisible()
+    await expect.poll(() => focused(page)).toBe('Tuesday, September 22, 2026')
+    await page.keyboard.press('ArrowRight')
+    await page.keyboard.press('Escape')
+    await expectClosed(page, POPUP)
+    expect(await hiddenValue(page)).toBe('2026-09-22')
+  })
+
   test('a click and Enter each open it with the focus on the chosen day; Escape and Close return it to the trigger', async ({ page }) => {
     await openLive(page, 'date-picker--basic')
     const button = trigger(page)
