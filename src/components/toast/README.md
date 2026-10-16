@@ -34,7 +34,8 @@ export function SaveButton() {
 - **Outside React.** `toast` is four plain functions: `add`, `update`, `close` and
   `promise`. Call them from a click handler, a fetch callback or any browser module.
 - **The table below** lists the options of `toast.add`, not props. Besides them it takes
-  `title`, `description` and `action: { label, onClick }`.
+  `title`, which is required (it names the toast for a screen reader), `description` and
+  `action: { label, onClick }`.
 - **Tone.** `neutral` by default, with no icon. `success`, `warning`, `danger` and `info`
   draw an icon, so the meaning never rests on colour alone. `primary` has no icon either.
 - **Duration.** Clamped to 0 to 600000 ms. `0` stays until it is closed. Left out, the

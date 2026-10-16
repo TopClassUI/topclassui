@@ -5,7 +5,7 @@ import { toastManager } from '#shared/toast/manager.js'
 import { TOAST_BOUNDARIES } from './boundaries.js'
 import { TOAST_DEFAULTS, TOAST_ICONS } from './constants.js'
 import type {
-  ToastIconType, ToastOptions, ToastPlacement, ToastPromiseSteps, ToastStep, ToastSwipeDirection,
+  ToastIconType, ToastOptions, ToastPlacement, ToastPromiseSteps, ToastStep, ToastSwipeDirection, ToastUpdate,
 } from './types.js'
 
 type BaseAdd = Parameters<typeof toastManager.add>[0]
@@ -17,7 +17,7 @@ export function clampDuration(duration: number): number | undefined {
 }
 
 /** Our names to Base UI's: tone is its type, duration its timeout, action its actionProps. A key left out stays out. */
-export function toBaseOptions(options: Omit<ToastOptions, 'tone'> & { tone?: string | undefined }): BaseUpdate {
+export function toBaseOptions(options: Omit<ToastUpdate, 'tone'> & { tone?: string | undefined }): BaseUpdate {
   const out: BaseUpdate = {}
   if (options.title !== undefined) out.title = options.title
   if (options.description !== undefined) out.description = options.description
@@ -32,12 +32,12 @@ export function toBaseOptions(options: Omit<ToastOptions, 'tone'> & { tone?: str
 /** A step of a promise: a string is its title. */
 const toStep = (step: ToastStep): BaseUpdate => toBaseOptions(typeof step === 'string' ? { title: step } : step)
 
-function add(options: ToastOptions = {}): string {
+function add(options: ToastOptions): string {
   const given: BaseAdd = toBaseOptions(options)
   return toastManager.add({ ...given, type: options.tone ?? TOAST_DEFAULTS.tone })
 }
 
-function update(id: string, options: ToastOptions): void {
+function update(id: string, options: ToastUpdate): void {
   toastManager.update(id, toBaseOptions(options))
 }
 

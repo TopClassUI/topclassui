@@ -58,6 +58,12 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
+    label: 'toast.add takes a toast with no title again, a dialog with no name (TOAST-6)',
+    file: 'src/components/toast/types.ts',
+    from: '  title: ToastTitle\n',
+    to: '  title?: ReactNode\n',
+  },
+  {
     label: 'the toast viewport loses the direction of its provider, so an Arabic page lays its toasts out left to right',
     file: 'src/components/toast/client.tsx',
     from: '        dir={viewport.dir}\n',
