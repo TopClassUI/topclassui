@@ -95,9 +95,10 @@ export interface ViewportBox {
   inside: boolean
 }
 
-/** Where a box lies and whether all of it is inside the viewport. */
+/** Where a box lies and whether all of it is inside the viewport. A box that is not rendered throws: zeros would pass. */
 export function viewportBox(target: Locator): Promise<ViewportBox> {
   return target.evaluate((element) => {
+    if (element.getClientRects().length === 0) throw new Error('viewportBox: the box is not rendered')
     const { left, top, right, bottom } = element.getBoundingClientRect()
     const viewport = { width: document.documentElement.clientWidth, height: document.documentElement.clientHeight }
     return {
@@ -118,9 +119,30 @@ export async function expectInsideViewport(target: Locator, label = 'the box', m
 
 /** Against the body: the page keeps a scrollbar gutter, which the root's clientWidth still counts when no bar is drawn. */
 export async function expectNoSidewaysScroll(page: Page): Promise<void> {
-  const { scrollWidth, pageWidth } = await page.evaluate(() => ({
-    scrollWidth: document.documentElement.scrollWidth,
-    pageWidth: document.body.clientWidth,
-  }))
+  const { scrollWidth, pageWidth, lostAtStart } = await page.evaluate(() => {
+    const rtl = getComputedStyle(document.documentElement).direction === 'rtl'
+    const width = document.documentElement.clientWidth
+    const hidden = (style: CSSStyleDeclaration) => style.clipPath !== 'none' || style.getPropertyValue('clip') !== 'auto'
+    // Past the inline start a page never scrolls, so scrollWidth cannot see it: each box is read instead.
+    const lost = [...document.body.querySelectorAll('*')].filter((element) => {
+      const box = element.getBoundingClientRect()
+      if (box.width === 0 || box.height === 0 || !(rtl ? box.right > width + 0.5 : box.left < -0.5)) return false
+      if (hidden(getComputedStyle(element))) return false
+      for (let at = element.parentElement; at && at !== document.body; at = at.parentElement) {
+        const style = getComputedStyle(at)
+        if (style.overflowX !== 'visible' || hidden(style)) return false
+      }
+      return true
+    })
+    return {
+      scrollWidth: document.documentElement.scrollWidth,
+      pageWidth: document.body.clientWidth,
+      lostAtStart: lost.map((element) => {
+        const { left, right } = element.getBoundingClientRect()
+        return `${element.tagName.toLowerCase()}${element.id ? `#${element.id}` : ''} ${String(Math.round(left))}..${String(Math.round(right))}`
+      }),
+    }
+  })
   expect(scrollWidth, 'the page scrolls sideways').toBeLessThanOrEqual(pageWidth)
+  expect(lostAtStart, 'boxes lost past the inline start, where no scroll reaches').toEqual([])
 }

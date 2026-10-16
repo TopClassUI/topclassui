@@ -67,6 +67,17 @@ describe('a server-rendered SegmentedControl hydrates cleanly', () => {
     done()
   })
 
+  // SHARED-FORMS-4: with none selected (a caller in plain JavaScript), or a value no segment has, no tab stop was served.
+  for (const [what, value] of [['no default', {} as { defaultValue: string }], ['a default no segment has', { defaultValue: 'stale' }]] as const) {
+    it(`a track with ${what} serves its tab stop on the first segment, where Base UI keeps it once it hydrates`, async () => {
+      const { errors, before, container, done } = await hydrate(track(value))
+      expect(errors).toEqual([])
+      expect(before.match(/<button [^>]*>/g)?.map((button) => /tabindex="(-?\d)"/.exec(button)?.[1])).toEqual(['0', '-1', '-1'])
+      expect(tabStops(container)).toEqual(['0', '-1', '-1'])
+      done()
+    })
+  }
+
   it('a press after hydration selects', async () => {
     const { container, done } = await hydrate(track({ defaultValue: 'table' }))
     act(() => { container.querySelectorAll('button')[2]?.click() })

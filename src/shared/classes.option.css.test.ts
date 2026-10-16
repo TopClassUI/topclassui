@@ -31,22 +31,22 @@ const mediaOf = (selector: string) => {
   return between.split('{').length - between.split('}').length === 1 ? between.slice(0, between.indexOf('{')).trim() : ''
 }
 
-const COARSE = selectorOf('pointer-coarse:min-h-[var(--tc-target-coarse,44px)]')
+const COARSE = selectorOf('pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]')
 
 describe('every class of a row of options paints something', () => {
   it('finds each one in the sheet, so a typo cannot ship silently', () => {
-    expect(CLASSES).toContain('pointer-coarse:min-h-[var(--tc-target-coarse,44px)]')
+    expect(CLASSES).toContain('pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]')
     expect(CLASSES.filter((cls) => !css.includes(selectorOf(cls)))).toEqual([])
   })
 })
 
 describe('a row under a finger', () => {
-  it('is at least the coarse target token, 44 px by its fallback, and only under a coarse pointer', () => {
-    expect(ruleOf(COARSE)).toBe('min-height: var(--tc-target-coarse,44px);')
+  it('is the larger of the row height and the coarse target, 44 px by its fallback, and only under a coarse pointer', () => {
+    expect(ruleOf(COARSE)).toBe('min-height: max(var(--tc-row-height), var(--tc-target-coarse,44px));')
     expect(mediaOf(COARSE)).toBe('@media (pointer: coarse)')
   })
 
-  it('comes after the row height in the sheet, so on a phone the 44 px floor wins over the 40 px row', () => {
+  it('comes after the row height in the sheet, so on a phone the larger floor wins and a taller row is never shortened', () => {
     const row = css.indexOf(`${selectorOf('min-h-(--tc-row-height)')} {`)
     expect(row).toBeGreaterThan(-1)
     expect(css.indexOf(`${COARSE} {`)).toBeGreaterThan(row)

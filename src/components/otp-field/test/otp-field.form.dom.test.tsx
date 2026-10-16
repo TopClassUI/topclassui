@@ -115,3 +115,36 @@ describe('a reset brings it back to its default, on screen and in the form', () 
     expect(entries(formOf())).toEqual([['far', '5']])
   })
 })
+
+describe('autoSubmit sends the field\'s own form, whatever else is on the page', () => {
+  const sent: [string, (string | undefined)[][]][] = []
+  const record = (event: { preventDefault: () => void, currentTarget: HTMLFormElement }) => {
+    event.preventDefault()
+    sent.push([event.currentTarget.id, entries(event.currentTarget)])
+  }
+  afterEach(() => { sent.length = 0 })
+
+  it('with another field mounted after it in a second form, only its own form is sent, with the code', async () => {
+    render(<>
+      <form id="a" onSubmit={record}><OTPField aria-labelledby="a" name="a" length={4} autoSubmit /></form>
+      <form id="b" onSubmit={record}><OTPField aria-labelledby="b" name="b" length={4} /></form>
+    </>)
+    await userEvent.click(screen.getAllByRole('textbox')[0] as HTMLElement)
+    await userEvent.keyboard('4321')
+    expect(sent).toEqual([['a', [['a', '4321']]]])
+  })
+
+  it('tied to a form by form, it sends that form; without autoSubmit a full code sends nothing', async () => {
+    render(<>
+      <form id="far" onSubmit={record} />
+      <OTPField aria-labelledby="x" name="x" form="far" length={2} autoSubmit />
+      <form id="still" onSubmit={record}><OTPField aria-labelledby="y" name="y" length={2} /></form>
+    </>)
+    const [x, , y] = screen.getAllByRole('textbox')
+    await userEvent.click(x as HTMLElement)
+    await userEvent.keyboard('12')
+    await userEvent.click(y as HTMLElement)
+    await userEvent.keyboard('34')
+    expect(sent).toEqual([['far', [['x', '12']]]])
+  })
+})

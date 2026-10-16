@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useImperativeHandle, useRef } from 'react'
+import { flushSync } from 'react-dom'
 
 import { useLabels, useLocale, useNumberFormat } from '#shared/provider/context.js'
 import { useFormValue } from '#shared/use-form-value.js'
@@ -58,6 +59,24 @@ export function useNumberField({
     const input = field.current
     if (input && input.value !== input.defaultValue) input.value = input.defaultValue
   }, [])
+
+  // A typed "1,234" as latinPaste reads it, on leaving or on the Enter that submits: both run before React's at the root.
+  useEffect(() => {
+    const input = field.current
+    if (!input) return
+    const leave = () => {
+      if (input.readOnly || input.disabled) return
+      const plain = latinPaste(input.value, resolvedLocale, numberFormat)
+      if (plain !== null) flushSync(() => { writeText(input, plain) })
+    }
+    const enter = (event: KeyboardEvent) => { if (event.key === 'Enter') leave() }
+    input.addEventListener('focusout', leave)
+    input.addEventListener('keydown', enter)
+    return () => {
+      input.removeEventListener('focusout', leave)
+      input.removeEventListener('keydown', enter)
+    }
+  })
 
   // The caller first, with Base UI's details, so details.cancel() still keeps the field as it was. A reset calls no one.
   const onChange = (next: number | null, details: NumberFieldChangeDetails) => {

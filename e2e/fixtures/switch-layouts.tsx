@@ -1,7 +1,7 @@
 // Loaded into a live page by e2e/switch.spec.ts: a switch where a real page puts one, and with hostile content
 // around it. Alone as a grid item, in a wrapper in a grid track, in a flex-1 column, in a w-fit parent, in a table
 // cell, in a label row inside a column that aligns to the start, beside a 300-character label, named by aria-label
-// alone. Inline styles, since the harness compiles only the classes it finds under src/.
+// alone, and size="custom" sized by the caller. Inline styles, since the harness compiles only the classes it finds under src/.
 import type { CSSProperties } from 'react'
 import { createRoot } from 'react-dom/client'
 
@@ -50,6 +50,13 @@ function Fixture() {
           <label htmlFor="layouts-long" style={{ minWidth: 0, overflowWrap: 'anywhere' }}>{LONG}</label>
         </div>
         <div data-case="no-label"><Switch aria-label="Named by aria-label alone" size="lg" /></div>
+        {/* size="custom" sized as its README says, from the caller's own CSS: once in px, once in rem. */}
+        <style>{'[data-case="custom"] > [data-size="custom"] > span { width: 48px; height: 24px } [data-case="custom"] > [data-size="custom"].rem > span { width: 3rem; height: 1.25rem }'}</style>
+        <div data-case="custom" style={ROW}>
+          <Switch aria-label="Custom, off" size="custom" />
+          <Switch aria-label="Custom, on" size="custom" defaultChecked />
+          <Switch aria-label="Custom in rem, on" size="custom" className="rem" defaultChecked />
+        </div>
       </div>
     </TopClassProvider>
   )

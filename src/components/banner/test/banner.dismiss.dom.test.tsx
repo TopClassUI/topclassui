@@ -50,6 +50,25 @@ describe('dismissing', () => {
     expect(localStorage.getItem(`tc-banner-dismissed:${id}`)).toBe('1')
   })
 
+  it('calls onDismiss while the banner is still in the page, where it can move focus, as the README says', async () => {
+    const id = fresh()
+    const seen: boolean[] = []
+    const onDismiss = () => {
+      seen.push(document.getElementById(id) !== null)
+      screen.getByRole('button', { name: 'Next' }).focus()
+    }
+    render(
+      <>
+        <Banner aria-label="Notice" dismissible id={id} onDismiss={onDismiss}>Out.</Banner>
+        <button type="button">Next</button>
+      </>,
+    )
+    await userEvent.click(dismiss())
+    expect(seen).toEqual([true])
+    expect(document.getElementById(id)).toBeNull()
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Next' }))
+  })
+
   for (const key of ['{Enter}', ' '] as const) {
     it(`works from the keyboard: Tab then ${key === ' ' ? 'Space' : 'Enter'}`, async () => {
       render(<Banner aria-label="Notice" dismissible id={fresh()}>Out.</Banner>)

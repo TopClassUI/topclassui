@@ -27,9 +27,9 @@ const BAR = [
 ]
 
 describe('every part carries exactly the classes written here', () => {
-  it('NavbarRoot, sticky: the bar, then the three classes that make it stick and its top padding with the safe area', () => {
+  it('NavbarRoot, sticky: the bar, then the three classes that make it stick, the one that lets a bar too tall for the screen go, and its top padding with the safe area', () => {
     expect(classesOf(<NavbarRoot />, 'header')).toEqual([
-      ...BAR, 'sticky', 'top-0', 'z-(--tc-z-sticky)', 'pt-[calc(0.375rem+var(--tc-safe-top))]',
+      ...BAR, 'sticky', 'top-0', 'z-(--tc-z-sticky)', 'data-unstuck:static', 'pt-[calc(0.375rem+var(--tc-safe-top))]',
     ])
   })
 
@@ -48,9 +48,9 @@ describe('every part carries exactly the classes written here', () => {
     expect(classesOf(<NavbarLinks />, 'nav')).toEqual(['grid', 'min-w-0', 'grow', 'basis-24', 'grid-cols-1'])
   })
 
-  it('the list scrolls sideways, snaps, and keeps the reach of a ring clear on every side', () => {
+  it('the list scrolls sideways, snaps but not under the pointer, and keeps the reach of a ring clear on every side', () => {
     expect(classesOf(<NavbarLinks />, 'ul')).toEqual([
-      'flex', 'items-center', 'gap-5', 'snap-x', 'snap-mandatory',
+      'flex', 'items-center', 'gap-5', 'snap-x', 'snap-mandatory', 'hover:snap-none',
       '-m-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+1px)]', 'p-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+1px)]',
       'overflow-x-auto', 'overscroll-x-contain',
     ])
@@ -64,6 +64,7 @@ describe('every part carries exactly the classes written here', () => {
     expect(classesOf(<NavbarLink href="/docs">Docs</NavbarLink>, 'a')).toEqual([
       'inline-flex', 'items-center', 'justify-center-safe', 'overflow-hidden', 'rounded-control', 'text-sm', 'text-muted',
       'aria-[current=page]:font-semibold', 'aria-[current=page]:text-body', 'forced-colors:aria-[current=page]:underline',
+      'aria-[current=page]:[scroll-initial-target:nearest]',
       'focus-visible:snap-center', 'max-w-full', 'hover:underline', ...RING, ...TARGET,
     ])
   })
