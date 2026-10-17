@@ -104,4 +104,28 @@ export const MUTATIONS: Mutation[] = [
     from: "return props.readOnly === false ? <Editable {...props} /> : <ReadOnly {...props} />",
     to: "return props.readOnly === true ? <ReadOnly {...props} /> : <Editable {...(props as RatingEditableProps)} aria-label=\"x\" readOnly={false} />",
   },
+  {
+    label: 'the rating skeleton lets a caller un-hide it',
+    file: 'src/components/rating/skeleton.tsx',
+    from: '{...rest} aria-hidden>',
+    to: 'aria-hidden {...rest}>',
+  },
+  {
+    label: 'the rating skeleton stops clamping max, so max={99} draws 99 stars beside a rating of ten',
+    file: 'src/components/rating/skeleton.tsx',
+    from: '{stepsOf(toMax(max)).map(',
+    to: '{stepsOf(Math.round(max)).map(',
+  },
+  {
+    label: 'the rating skeleton draws one size for all five, so an xl rating loads in md circles',
+    file: 'src/components/rating/skeleton.tsx',
+    from: 'cn(RATING_SKELETON_STAR, RATING_SKELETON_SIZE[size])',
+    to: 'cn(RATING_SKELETON_STAR, RATING_SKELETON_SIZE.md)',
+  },
+  {
+    label: 'the rating skeleton star loses its forced-colours edge, so a loading rating is nothing there',
+    file: 'src/components/rating/classes.ts',
+    from: 'bg-neutral-soft animate-pulse motion-reduce:animate-none ${FORCED_EDGE}`',
+    to: 'bg-neutral-soft animate-pulse motion-reduce:animate-none`',
+  },
 ]

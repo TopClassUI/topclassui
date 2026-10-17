@@ -42,7 +42,7 @@ const sent = (container: HTMLElement) => {
 
 describe('every demo renders and hydrates', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(DEMOS.map(([name]) => name)).toEqual(['controlled', 'disabled', 'editable', 'in-form', 'max-ten', 'read-only', 'rtl', 'sizes'])
+    expect(DEMOS.map(([name]) => name)).toEqual(['controlled', 'disabled', 'editable', 'in-form', 'max-ten', 'read-only', 'rtl', 'sizes', 'skeleton'])
   })
 
   for (const [name, Demo] of DEMOS) {

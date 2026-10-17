@@ -69,3 +69,8 @@ export type RatingFieldOptions = Pick<RatingFieldProps, 'value' | 'defaultValue'
 /** The events the hook answers, named here so hook.ts writes no angle bracket. */
 export type RatingRadioChange = ChangeEvent<HTMLInputElement>
 export type RatingRowLeave = PointerEvent<HTMLSpanElement>
+
+/** No content and no way to un-hide it: the placeholder holds the read-only row's shape at its size and max. */
+export type RatingSkeletonProps =
+  Omit<ComponentPropsWithRef<'span'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
+  & Pick<RatingDesignProps, 'max' | 'size'>

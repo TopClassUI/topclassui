@@ -85,7 +85,7 @@ describe('readOnly={false} renders the client half, handed only what can cross (
   })
 
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(every).toEqual(['controlled', 'disabled', 'editable', 'in-form', 'max-ten', 'read-only', 'rtl', 'sizes'])
+    expect(every).toEqual(['controlled', 'disabled', 'editable', 'in-form', 'max-ten', 'read-only', 'rtl', 'sizes', 'skeleton'])
     expect(every.filter(isClient)).toEqual(['controlled'])
   })
 
@@ -102,5 +102,6 @@ describe('readOnly={false} renders the client half, handed only what can cross (
     expect(await parts('max-ten')).toEqual(['RatingField'])
     expect(await parts('sizes')).toEqual(['RatingField', 'RatingField'])
     expect(await parts('rtl')).toEqual(['TopClassProvider', 'RatingField'])
+    expect(await parts('skeleton')).toEqual([])
   })
 })

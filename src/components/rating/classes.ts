@@ -1,5 +1,6 @@
 // R-5.12-4: this component's own class tables, built from the shared constants.
-import { CONTAIN, DISABLED, FOCUS_RING_WITHIN, TOUCH_TARGET } from '#shared/classes.js'
+import { CONTAIN, DISABLED, FOCUS_RING_WITHIN, FORCED_EDGE, TOUCH_TARGET } from '#shared/classes.js'
+import type { Size } from '#shared/contracts/size.js'
 import type { RatingFill } from './types.js'
 
 /** The row, read-only or editing. Ten xl stars are 436 px, so a row that meets a narrow box wraps. */
@@ -29,3 +30,16 @@ export const RATING_STEP = `relative inline-flex cursor-pointer items-center jus
 
 /** The native radio, over the whole label: not sr-only, or it is a 1 px target. */
 export const RATING_RADIO = 'absolute inset-0 size-full cursor-pointer appearance-none opacity-0'
+
+/** A circle is a shape, not a radius knob, and a star fills about the circle of its box. */
+export const RATING_SKELETON_STAR = `block shrink-0 rounded-full bg-neutral-soft animate-pulse motion-reduce:animate-none ${FORCED_EDGE}`
+
+/** R-5.2-3: the px of ICON_SIZE, which Svg writes as its width and height; custom is 1em, as iconSizeOf makes it. */
+export const RATING_SKELETON_SIZE = {
+  xs: 'size-[16px]',
+  sm: 'size-[20px]',
+  md: 'size-[24px]',
+  lg: 'size-[32px]',
+  xl: 'size-[40px]',
+  custom: 'size-[1em]',
+} as const satisfies Record<Size, string>

@@ -7,10 +7,10 @@ import * as rating from '../index.js'
 
 const source = (file: string) => readFileSync(join(import.meta.dirname, '..', file), 'utf8')
 
-describe('index.tsx adds one public name, Rating', () => {
-  it('exports Rating and nothing else at runtime: the client half is internal', () => {
-    expect(Object.keys(rating)).toEqual(['Rating'])
-    expect(typeof rating.Rating).toBe('function')
+describe('index.tsx adds two public names, Rating and its skeleton', () => {
+  it('exports Rating and RatingSkeleton and nothing else at runtime: the client half is internal', () => {
+    expect(Object.keys(rating).sort()).toEqual(['Rating', 'RatingSkeleton'])
+    expect([typeof rating.Rating, typeof rating.RatingSkeleton]).toEqual(['function', 'function'])
   })
 
   it('has no client directive, and imports the client half from ./client.js only', () => {

@@ -53,6 +53,7 @@ export function Rating(props: RatingProps) {
   return props.readOnly === false ? <Editable {...props} /> : <ReadOnly {...props} />
 }
 
+export { RatingSkeleton } from './skeleton.js'
 export type {
-  RatingDesignProps, RatingEditableProps, RatingFill, RatingProps, RatingReadOnlyProps,
+  RatingDesignProps, RatingEditableProps, RatingFill, RatingProps, RatingReadOnlyProps, RatingSkeletonProps,
 } from './types.js'
