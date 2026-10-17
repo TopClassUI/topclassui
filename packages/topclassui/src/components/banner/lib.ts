@@ -1,4 +1,5 @@
 // The store behind useBannerDismiss: localStorage, and memory for a browser that refuses it.
+import { findNeighbour } from '#shared/focus-neighbour.js'
 import { BANNER_STORAGE_PREFIX } from './constants.js'
 
 const memory = new Set([] as string[])
@@ -36,4 +37,9 @@ export function subscribeDismissed(listener: () => void): () => void {
     listeners.delete(listener)
     removeEventListener('storage', listener)
   }
+}
+
+/** Where the focus goes once a banner leaves under it: the next tab stop after its region, else the one before. */
+export function neighbourOf(x: Element): HTMLElement | null {
+  return findNeighbour(x.closest('[role="region"]') ?? x)
 }

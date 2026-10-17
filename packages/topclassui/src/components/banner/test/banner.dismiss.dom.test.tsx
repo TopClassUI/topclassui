@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -101,6 +101,55 @@ describe('dismissing', () => {
     )
     await userEvent.click(screen.getAllByRole('button', { name: 'Dismiss' })[0] as HTMLElement)
     expect(screen.queryAllByRole('region')).toEqual([])
+  })
+})
+
+// APG "Persistence of focus": the x leaves with its banner, so the focus it held goes on to a neighbour, never the body.
+describe('the focus after a dismissal', () => {
+  /** Two banners between a control before and a control after them. */
+  const page = (onDismiss?: () => void) => render(
+    <>
+      <button type="button">Before</button>
+      <Banner aria-label="First" dismissible id={fresh()} onDismiss={onDismiss}>One.</Banner>
+      <Banner aria-label="Second" dismissible id={fresh()}>Two.</Banner>
+      <button type="button">After</button>
+    </>,
+  )
+  const xOf = (name: string) => within(screen.getByRole('region', { name })).getByRole('button')
+
+  it('goes from the x of the first banner to the next tab stop, the x of the second', async () => {
+    page()
+    xOf('First').focus()
+    await userEvent.keyboard('{Enter}')
+    expect(screen.queryByRole('region', { name: 'First' })).toBeNull()
+    expect(document.activeElement).toBe(xOf('Second'))
+  })
+
+  it('goes to the tab stop after the last banner, and to the one before when nothing follows', async () => {
+    const { unmount } = page()
+    xOf('Second').focus()
+    await userEvent.keyboard('{Enter}')
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'After' }))
+    unmount()
+    render(<><button type="button">Before</button><Banner aria-label="Last" dismissible id={fresh()}>Out.</Banner></>)
+    within(screen.getByRole('region', { name: 'Last' })).getByRole('button').focus()
+    await userEvent.keyboard(' ')
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Before' }))
+  })
+
+  it('leaves the focus where onDismiss put it', async () => {
+    page(() => { screen.getByRole('button', { name: 'Before' }).focus() })
+    xOf('First').focus()
+    await userEvent.keyboard('{Enter}')
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Before' }))
+  })
+
+  it('moves nothing when the x did not hold the focus', () => {
+    page()
+    screen.getByRole('button', { name: 'After' }).focus()
+    fireEvent.click(xOf('First'))
+    expect(screen.queryByRole('region', { name: 'First' })).toBeNull()
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'After' }))
   })
 })
 

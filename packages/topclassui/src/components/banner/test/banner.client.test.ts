@@ -46,15 +46,16 @@ describe('client.tsx is markup and one hook call (R-5.12-1)', () => {
 })
 
 describe('hook.ts and lib.ts', () => {
-  it("hook.ts starts with 'use client' and keeps the store in lib.ts", () => {
+  it("hook.ts starts with 'use client' and keeps the store and the neighbour in lib.ts", () => {
     const source = read('hook.ts')
     expect(source.startsWith("'use client'\n")).toBe(true)
-    expect(importedNames(source, 'react')).toEqual(['useSyncExternalStore'])
-    expect(importedNames(source, './lib.js').sort()).toEqual(['readDismissed', 'subscribeDismissed', 'writeDismissed'])
+    expect(importedNames(source, 'react')).toEqual(['useEffect', 'useRef', 'useSyncExternalStore'])
+    expect(importedNames(source, './lib.js').sort()).toEqual(['neighbourOf', 'readDismissed', 'subscribeDismissed', 'writeDismissed'])
+    expect(importedNames(source, '#shared/focus-neighbour.js')).toEqual(['restoreFocus'])
   })
 
-  it('lib.ts imports no React, so the store is plain code', () => {
-    expect(importedModules(read('lib.ts'))).toEqual(['./constants.js'])
+  it('lib.ts imports no React, so the store and the neighbour are plain code', () => {
+    expect(importedModules(read('lib.ts'))).toEqual(['#shared/focus-neighbour.js', './constants.js'])
   })
 })
 

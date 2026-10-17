@@ -43,7 +43,7 @@ two names. The generated table below cannot say "one of two", which is why it is
 - **Blocked storage** (a private window, a full quota): the x still hides the banner, for this page only.
 - **`onDismiss`** is a function, so only a `'use client'` file can pass it. It is called once, when the x is pressed; the banner is still in the page while it runs and leaves right after.
 - **The next page shows it until the script runs.** The server cannot read `localStorage`, so the HTML has the banner and hydration removes it: the page below moves up by its height (120 px for the demo at 390 px). Off by default for that reason.
-- **Focus.** The x leaves with the banner, so focus falls to `<body>`; in Chromium the next Tab goes on from where the banner was. To put focus somewhere, move it in `onDismiss`.
+- **Focus.** When the x that holds the focus leaves with its banner, the focus goes to the next control after the banner, else the one before it; never to `<body>`. A focus moved in `onDismiss` stays where it was put.
 - **The x** sits at the inline end of the line it wraps to: 24 px, 44 px on a touch screen. Under forced colours a hovered x draws an outline.
 
 **Not built:** `sticky`, `placement`, `variant`.

@@ -116,4 +116,40 @@ export const MUTATIONS: Mutation[] = [
     from: '    dismissible: boolean\n',
     to: '    dismissible: true\n',
   },
+  {
+    label: 'the banner dismiss hook never moves the focus, so a dismissed banner drops it on the body',
+    file: HOOK,
+    from: '    restoreFocus(next.current.to, next.current.visible)\n',
+    to: '',
+  },
+  {
+    label: 'the banner dismiss hook records no neighbour, so the focus of its x falls to the body',
+    file: HOOK,
+    from: 'if (x === x.ownerDocument.activeElement) next.current =',
+    to: 'if (x === x.ownerDocument.body) next.current =',
+  },
+  {
+    label: 'the banner neighbour is the next stop after the x, which is inside the banner that leaves',
+    file: LIB,
+    from: "return findNeighbour(x.closest('[role=\"region\"]') ?? x)",
+    to: 'return findNeighbour(x)',
+  },
+  {
+    label: 'the shared neighbour of a banner or a tag takes a stop inside the element that leaves',
+    file: 'src/shared/focus-neighbour.ts',
+    from: 'const outside = candidates.filter((candidate) => !gone.contains(candidate))',
+    to: 'const outside = [...candidates]',
+  },
+  {
+    label: 'the shared neighbour of a banner or a tag never looks back, so the last one leaves the focus on the body',
+    file: 'src/shared/focus-neighbour.ts',
+    from: 'return after ?? outside.reverse()',
+    to: 'return after ?? [].reverse()',
+  },
+  {
+    label: 'the shared focus return of a banner or a tag overrides the focus its caller moved',
+    file: 'src/shared/focus-neighbour.ts',
+    from: '  if (!next?.isConnected || (active !== null && active !== undefined && active !== next.ownerDocument.body)) return\n',
+    to: '  if (!next?.isConnected) return\n',
+  },
 ]
