@@ -51,7 +51,7 @@ describe('a server-rendered TreeView hydrates cleanly', () => {
 
 describe('every demo renders and hydrates', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'load-more', 'long-content', 'rtl', 'selected', 'status', 'ten-thousand'])
+    expect(names).toEqual(['basic', 'load-more', 'long-content', 'playground', 'rtl', 'selected', 'states', 'status', 'ten-thousand'])
   })
 
   for (const [name, Demo] of DEMOS) {
