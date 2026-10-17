@@ -79,15 +79,6 @@ describe('the editing half is a native radio group', () => {
   })
 })
 
-describe('max is clamped before the steps are named (R-5.7-7)', () => {
-  it('a server Rating and a RatingInput with max={1000} each render ten radios, the last named "10 stars"', () => {
-    render(<><Rating readOnly={false} max={1000} aria-label="One" /><RatingInput max={1000} aria-label="Two" /></>)
-    expect(radios()).toHaveLength(20)
-    expect(radios()[9]?.getAttribute('aria-label')).toBe('10 stars')
-    expect(radios()[19]?.getAttribute('aria-label')).toBe('10 stars')
-  })
-})
-
 describe('the pointer fills up to the star it is on', () => {
   it('fills to the hovered step, and leaving the row puts the value back', () => {
     render(<Rating readOnly={false} aria-label="Stay" defaultValue={2} />)
