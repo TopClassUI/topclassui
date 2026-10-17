@@ -134,16 +134,17 @@ describe('hook.ts holds the context that carries the look, and the tab stop of t
     expect(source.startsWith("'use client'\n")).toBe(true)
   })
 
-  it('imports React, the defaults and a type, and no Base UI: which tab is active stays with Base UI', () => {
-    expect(importedModules(source).sort()).toEqual(['./constants.js', './types.js', 'react'])
-    expect(importedNames(source, 'react').sort()).toEqual(['createContext', 'useContext', 'useMemo', 'useState', 'useSyncExternalStore'])
+  it('imports React, the shared server tab stop, the defaults and a type, and no Base UI: which tab is active stays with Base UI', () => {
+    expect(importedModules(source).sort()).toEqual(['#shared/use-server-tab-stop.js', './constants.js', './types.js', 'react'])
+    expect(importedNames(source, 'react').sort()).toEqual(['createContext', 'useContext', 'useMemo', 'useState'])
+    expect(importedNames(source, '#shared/use-server-tab-stop.js')).toEqual(['useServerTabStop'])
   })
 
   it('the root keeps the value it opens on and memoizes what it provides; a list and a tab read it', () => {
     expect(hooksPerFunction(source)).toEqual({
       useTabsRoot: ['useState', 'useMemo'],
       useTabsLook: ['useContext'],
-      useTabsTab: ['useContext', 'useSyncExternalStore'],
+      useTabsTab: ['useContext', 'useServerTabStop'],
     })
   })
 

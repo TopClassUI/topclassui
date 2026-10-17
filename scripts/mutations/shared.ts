@@ -375,6 +375,30 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
+    label: 'the server tab stop is never written, so a list Base UI serves at tabindex -1 cannot be reached by the keyboard before the page hydrates',
+    file: 'src/shared/use-server-tab-stop.ts',
+    from: 'return served && isStop ? stop : none',
+    to: 'return none',
+  },
+  {
+    label: 'the server tab stop outlives hydration, so two items of a roving list are stops once the arrow keys move',
+    file: 'src/shared/use-server-tab-stop.ts',
+    from: 'useSyncExternalStore(subscribe, () => false, () => true)',
+    to: 'useSyncExternalStore(subscribe, () => true, () => true)',
+  },
+  {
+    label: 'the server tab stop is missing from the server render, where it is the only stop the list has',
+    file: 'src/shared/use-server-tab-stop.ts',
+    from: 'useSyncExternalStore(subscribe, () => false, () => true)',
+    to: 'useSyncExternalStore(subscribe, () => false, () => false)',
+  },
+  {
+    label: 'the server tab stop ignores isStop, so every item of the list is a stop in the server HTML',
+    file: 'src/shared/use-server-tab-stop.ts',
+    from: 'return served && isStop ? stop : none',
+    to: 'return served ? stop : none',
+  },
+  {
     label: 'the name contract: ControlName stops asking for a name, so an unlabelled Input compiles',
     file: 'src/shared/contracts/name.ts',
     from: "    id: string\n    'aria-label'?: string | undefined",

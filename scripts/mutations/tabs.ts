@@ -228,16 +228,16 @@ export const MUTATIONS: Mutation[] = [
     to: 'useMemo(() => ({ variant, size, opensOn }), [opensOn])',
   },
   {
-    label: 'the server HTML of tabs keeps no tab in the tab order, so a list that scrolls cannot be reached by the keyboard before the page hydrates',
+    label: 'the server HTML of tabs asks for a tab stop on no tab, so a list that scrolls cannot be reached by the keyboard before the page hydrates',
     file: 'src/components/tabs/hook.ts',
-    from: 'stop: served && value === opensOn ? stop : none',
-    to: 'stop: none',
+    from: 'useServerTabStop(value === opensOn)',
+    to: 'useServerTabStop(false)',
   },
   {
-    label: 'the tab stop the server wrote for tabs outlives hydration, so two tabs are stops once the arrow keys move',
+    label: 'the server HTML of tabs asks for a tab stop on every tab, so Tab walks the whole list before the page hydrates',
     file: 'src/components/tabs/hook.ts',
-    from: 'useSyncExternalStore(subscribe, () => false, () => true)',
-    to: 'useSyncExternalStore(subscribe, () => true, () => true)',
+    from: 'useServerTabStop(value === opensOn)',
+    to: 'useServerTabStop(true)',
   },
   {
     label: 'a controlled tabs root serves its tab stop on its defaultValue and not on its value',
