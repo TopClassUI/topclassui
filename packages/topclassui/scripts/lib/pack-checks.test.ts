@@ -92,12 +92,12 @@ describe('manifestProblems', () => {
 })
 
 describe('sizeProblems', () => {
-  it('starts the budget at 1.5 MB', () => {
-    expect(SIZE_BUDGET_BYTES).toBe(1_500_000)
+  it('pins the budget to the first measured tarball plus 10 %', () => {
+    expect(SIZE_BUDGET_BYTES).toBe(1_300_000)
   })
 
   it('passes at the budget and fails one byte over', () => {
-    expect(sizeProblems(1_500_000)).toEqual([])
-    expect(sizeProblems(1_500_001)).toEqual(['unpacked size 1500001 bytes is over the 1500000 byte budget'])
+    expect(sizeProblems(1_300_000)).toEqual([])
+    expect(sizeProblems(1_300_001)).toEqual(['unpacked size 1300001 bytes is over the 1300000 byte budget'])
   })
 })
