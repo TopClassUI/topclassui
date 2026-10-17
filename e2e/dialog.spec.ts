@@ -1079,3 +1079,31 @@ test.describe('motion', () => {
     })
   })
 })
+
+// The wrap of the footer is for its actions: a Badge, a Tag, a Spinner or a Progress writes data-size too.
+test.describe('what a footer holds besides its actions', () => {
+  const heightsOf = (scope: Locator): Promise<Record<string, string>> => scope.locator('[data-kind]').evaluateAll(
+    // The computed height and not the box: a turning spinner's box is as tall as its diagonal.
+    (all) => Object.fromEntries(all.map((el) => [el.getAttribute('data-kind') ?? '', getComputedStyle(el).height])),
+  )
+
+  for (const coarse of [false, true]) {
+    test.describe(coarse ? 'under a finger' : 'under a mouse', () => {
+      test.use(coarse ? { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } : {})
+
+      test('keeps the height it has on the page, and only a Button grows to the floor of its size', async ({ page }) => {
+        await openLive(page, 'separator--horizontal')
+        await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/dialog-footer-kinds.tsx' })
+        const trigger = page.locator('#footer-kinds button').filter({ hasText: 'Footer' })
+        await expect(trigger).toBeVisible()
+        const alone = await heightsOf(page.locator('#footer-kinds'))
+        const popup = await openOverlay(page, trigger, { by: 'keyboard' })
+        const footer = popup.locator('[data-kind="badge"]').locator('..')
+        const inside = await heightsOf(footer)
+        expect(Object.keys(inside).sort()).toEqual(['badge', 'button', 'progress', 'spinner', 'tag'])
+        for (const kind of ['badge', 'tag', 'spinner', 'progress']) expect(inside[kind], kind).toBe(alone[kind])
+        await expect(footer.locator('[data-kind="button"]')).toHaveCSS('min-height', coarse ? '44px' : '40px')
+      })
+    })
+  }
+})

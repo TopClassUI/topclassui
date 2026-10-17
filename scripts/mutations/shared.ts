@@ -273,16 +273,16 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
-    label: 'the overlay slide keeps easing while it is swiped, so a drawer lags behind the finger',
+    label: 'the overlay slide eases the translate property, where Base UI moves a swiped sheet by transform, so the sheet jumps',
     file: 'src/shared/classes.ts',
-    from: " ease-out data-swiping:transition-none'",
-    to: " ease-out'",
+    from: "SLIDE_MOTION = 'transition-transform duration-(--tc-duration-slow)",
+    to: "SLIDE_MOTION = 'transition-[translate,opacity] duration-(--tc-duration-slow)",
   },
   {
     label: 'the overlay slide takes a fixed duration, which the motion knob cannot stop',
     file: 'src/shared/classes.ts',
-    from: 'transition-[translate,opacity] duration-(--tc-duration-slow)',
-    to: 'transition-[translate,opacity] duration-300',
+    from: 'transition-transform duration-(--tc-duration-slow)',
+    to: 'transition-transform duration-300',
   },
   {
     label: 'the overlay surface loses its hairline, so forced colours leave a popup with no edge at all',
@@ -305,14 +305,32 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the overlay row highlight loses the system pair, so no row is told from the others once a fill is erased',
     file: 'src/shared/classes.ts',
-    from: " forced-colors:data-highlighted:bg-[Highlight] forced-colors:data-highlighted:text-[HighlightText]'",
-    to: "'",
+    from: " forced-colors:data-highlighted:bg-[Highlight]',\n  'forced-colors:data-highlighted:text-[HighlightText] ",
+    to: "',\n  '",
   },
   {
     label: 'the overlay row highlight stays adjusted, so a backplate hides the label of the highlighted row',
     file: 'src/shared/classes.ts',
-    from: ' forced-colors:data-highlighted:forced-color-adjust-none',
+    from: "'forced-colors:data-highlighted:forced-color-adjust-none ",
+    to: "'",
+  },
+  {
+    label: 'the overlay row highlight loses its ring, so the row the keyboard is on is told by a fill at 1.1:1',
+    file: 'src/shared/classes.ts',
+    from: "  'data-highlighted:outline-solid data-highlighted:outline-(length:--tc-ring-width)',\n  'data-highlighted:-outline-offset-(length:--tc-ring-width) data-highlighted:outline-ring',\n",
     to: '',
+  },
+  {
+    label: 'the overlay row highlight draws its ring outside the row, where the scroll container of a menu cuts it',
+    file: 'src/shared/classes.ts',
+    from: "'data-highlighted:-outline-offset-(length:--tc-ring-width) data-highlighted:outline-ring'",
+    to: "'data-highlighted:outline-ring'",
+  },
+  {
+    label: 'the overlay row highlight keeps the ring colour under forced colours, an authored colour on the system Highlight',
+    file: 'src/shared/classes.ts',
+    from: " forced-colors:data-highlighted:outline-[HighlightText]'",
+    to: "'",
   },
   {
     label: 'the overlay list cap forgets the room Base UI measured, so a long list runs off a short screen',
