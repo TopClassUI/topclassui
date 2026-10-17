@@ -1,4 +1,7 @@
 // Helpers for the keyboard specs (R-5.6-1, R-5.6-3): the ring a focused control paints, and the stops Tab walks.
+import { existsSync, readdirSync } from 'node:fs'
+import { join } from 'node:path'
+
 import { expect, type Locator, type Page } from '@playwright/test'
 
 /** The outline an element paints now. */
@@ -36,3 +39,11 @@ export async function walk(page: Page, stops: number, key: 'Tab' | 'Shift+Tab' =
 
 /** The tabindex of each element, so a roving tab stop can be read off in one line. */
 export const tabIndexes = (items: Locator) => items.evaluateAll((all) => all.map((element) => element.getAttribute('tabindex')))
+
+/** The component folders under `root` with neither their own `e2e/keyboard-<slug>.spec.ts` nor a reason for having none. */
+export const foldersWithoutKeyboardSpec = (root: string, reasons: Readonly<Record<string, string>>): string[] =>
+  readdirSync(join(root, 'src', 'components'), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .filter((slug) => !existsSync(join(root, 'e2e', `keyboard-${slug}.spec.ts`)) && !(slug in reasons))
+    .sort()
