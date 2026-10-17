@@ -1,6 +1,6 @@
 // R-5.12-4: one class string per element Tabs styles, built from the shared constants.
 import {
-  CONTAIN, FOCUS_RING, FOCUS_RING_INSET, FORCED_EDGE, SCROLL_X, TOUCH_TARGET, TRANSITION,
+  CONTAIN, FOCUS_RING, FOCUS_RING_INSET, FORCED_EDGE, SCROLL_X, TARGET_HEIGHT, TOUCH_TARGET, TRANSITION,
 } from '#shared/classes.js'
 import type { TabsVariant } from './types.js'
 
@@ -71,3 +71,20 @@ export const TABS_TAB = {
 /** A margin and not a padding: the ring of a focused panel reaches 4 px outside its box,
  * and the list above would paint over a ring that lay on it. A long word breaks. */
 export const TABS_PANEL = `mt-4 wrap-anywhere ${FOCUS_RING}`
+
+/** R-5.2-3: the list of each look without its scroll: the placeholder has no tab stop, so nothing in it may need one. */
+export const TABS_SKELETON_LIST = {
+  line: `flex items-center gap-6 overflow-hidden px-px ${TABS_LIST_LINE}`,
+  enclosed: `flex w-fit max-w-full items-center gap-1 overflow-hidden rounded-control bg-surface p-1 ${FORCED_EDGE}`,
+} as const satisfies Record<TabsVariant, string>
+
+/** A tab's box with nothing to press: its height, its floor under a finger and the bar or the radius of its look. */
+const SKELETON_TAB = `inline-flex shrink-0 items-center justify-center ${TARGET_HEIGHT}`
+
+export const TABS_SKELETON_TAB = {
+  line: `${SKELETON_TAB} ${TABS_BAR}`,
+  enclosed: `${SKELETON_TAB} rounded-control`,
+} as const satisfies Record<TabsVariant, string>
+
+/** One line of nothing where the label goes: as tall as the type, with margins making up the line height. */
+export const TABS_SKELETON_BAR = `block h-[1em] my-[calc((1lh-1em)/2)] w-16 rounded-chip bg-neutral-soft animate-pulse motion-reduce:animate-none ${FORCED_EDGE}`

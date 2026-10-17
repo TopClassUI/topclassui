@@ -13,3 +13,8 @@ export const TABS_DEFAULTS = {
   // Not Base UI's false: a panel that stays mounted is in the server HTML, so its text is indexed.
   keepMounted: true,
 } as const
+
+/** The placeholder's starting shape: the three tabs Figma draws on its stage. */
+export const TABS_SKELETON_DEFAULTS = {
+  tabs: 3,
+} as const

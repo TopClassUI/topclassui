@@ -329,4 +329,28 @@ export const MUTATIONS: Mutation[] = [
     from: '  <TabsList aria-label="Project">\n    <TabsTab value="overview">Overview</TabsTab>\n    <TabsTab value="activity">Activity</TabsTab>',
     to: '  <TabsList>\n    <TabsTab value="overview">Overview</TabsTab>\n    <TabsTab value="activity">Activity</TabsTab>',
   },
+  {
+    label: 'the tabs skeleton lets a caller un-hide it',
+    file: 'src/components/tabs/skeleton.tsx',
+    from: '{...rest} aria-hidden>',
+    to: 'aria-hidden {...rest}>',
+  },
+  {
+    label: 'the tabs skeleton tab loses the finger floor, so under a coarse pointer it is shorter than the tab',
+    file: 'src/components/tabs/classes.ts',
+    from: 'const SKELETON_TAB = `inline-flex shrink-0 items-center justify-center ${TARGET_HEIGHT}`',
+    to: 'const SKELETON_TAB = `inline-flex shrink-0 items-center justify-center`',
+  },
+  {
+    label: 'the tabs skeleton line tab loses the bar of a line tab, so forced colours paint no edge where the tab paints one',
+    file: 'src/components/tabs/classes.ts',
+    from: '  line: `${SKELETON_TAB} ${TABS_BAR}`,',
+    to: '  line: SKELETON_TAB,',
+  },
+  {
+    label: 'the tabs skeleton stops clamping its count, so tabs={999} draws 999 tabs',
+    file: 'src/components/tabs/skeleton.tsx',
+    from: 'Math.trunc(clamp(tabs, TABS_BOUNDARIES.skeletonTabsMin, TABS_BOUNDARIES.skeletonTabsMax))',
+    to: 'Math.trunc(tabs)',
+  },
 ]

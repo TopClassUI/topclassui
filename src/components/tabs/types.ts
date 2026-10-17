@@ -1,4 +1,5 @@
 import type { Tabs as Base } from '@base-ui/react/tabs'
+import type { ComponentPropsWithRef } from 'react'
 
 import type { GroupName } from '#shared/contracts/name.js'
 import type { Size } from '#shared/contracts/size.js'
@@ -44,3 +45,8 @@ export type TabsTabProps = Omit<Base.Tab.Props, 'className'> & OwnClassName
 export type TabsPanelProps = Omit<Base.Panel.Props, 'className' | 'keepMounted'>
   & Pick<TabsDesignProps, 'keepMounted'>
   & OwnClassName
+
+/** No content and no way to un-hide it: the placeholder only holds the list's shape, in the root's own look. */
+export type TabsSkeletonProps =
+  Omit<ComponentPropsWithRef<'div'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
+  & Pick<TabsDesignProps, 'variant' | 'size' | 'tabs'>

@@ -24,8 +24,8 @@ function exportedNames(source: string): string[] {
 
 // The root-part lint reads declarations, and index.tsx declares nothing, so this is the guard.
 describe('index.tsx exports flat names, with no bare Tabs (R-9.2-3, R-9.2-4)', () => {
-  it('exports exactly the four parts', () => {
-    expect(Object.keys(tabs).sort()).toEqual(['TabsList', 'TabsPanel', 'TabsRoot', 'TabsTab'])
+  it('exports exactly the four parts and the skeleton', () => {
+    expect(Object.keys(tabs).sort()).toEqual(['TabsList', 'TabsPanel', 'TabsRoot', 'TabsSkeleton', 'TabsTab'])
   })
 
   it('exports each one as a function component, never an object a server file would dot into', () => {
@@ -37,7 +37,7 @@ describe('index.tsx exports flat names, with no bare Tabs (R-9.2-3, R-9.2-4)', (
     const source = readFileSync(join(import.meta.dirname, '..', 'index.tsx'), 'utf8')
     expect(exportedNames(source).sort()).toEqual([
       'TabsDesignProps', 'TabsList', 'TabsListName', 'TabsListProps', 'TabsPanel', 'TabsPanelProps', 'TabsRoot',
-      'TabsRootProps', 'TabsTab', 'TabsTabProps', 'TabsVariant',
+      'TabsRootProps', 'TabsSkeleton', 'TabsSkeletonProps', 'TabsTab', 'TabsTabProps', 'TabsVariant',
     ])
   })
 

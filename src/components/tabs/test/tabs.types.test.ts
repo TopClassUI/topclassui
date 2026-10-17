@@ -29,8 +29,8 @@ describe('the look is on the root', () => {
     expectTypeOf<Accepts<keyof TabsPanelProps, 'size'>>().toEqualTypeOf<false>()
   })
 
-  it('the design props are the three of the schema, each optional', () => {
-    expectTypeOf<keyof TabsDesignProps>().toEqualTypeOf<'variant' | 'size' | 'keepMounted'>()
+  it('the design props are the four of the schema, each optional', () => {
+    expectTypeOf<keyof TabsDesignProps>().toEqualTypeOf<'variant' | 'size' | 'keepMounted' | 'tabs'>()
     expectTypeOf<Accepts<TabsDesignProps, Record<string, never>>>().toEqualTypeOf<true>()
   })
 })

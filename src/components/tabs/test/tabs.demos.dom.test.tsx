@@ -24,6 +24,10 @@ const LISTS: Record<string, string[]> = {
     'line xs', 'line sm', 'line md', 'line lg', 'line xl', 'line custom',
     'enclosed xs', 'enclosed sm', 'enclosed md', 'enclosed lg', 'enclosed xl', 'enclosed custom',
   ],
+  'skeleton': [
+    'line xs', 'line sm', 'line md', 'line lg', 'line xl',
+    'enclosed xs', 'enclosed sm', 'enclosed md', 'enclosed lg', 'enclosed xl',
+  ],
 }
 
 const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { default: ComponentType }).default

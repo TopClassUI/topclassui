@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['basic', 'controlled', 'disabled', 'enclosed', 'long-label', 'many', 'rtl', 'server-content', 'sizes']
+const EXPECTED = ['basic', 'controlled', 'disabled', 'enclosed', 'long-label', 'many', 'rtl', 'server-content', 'sizes', 'skeleton']
 
 /** How many roots each demo holds, and its tabs and panels: every panel is rendered, one per root is shown. */
 const COUNTS: Record<string, { roots: number, tabs: number, panels: number }> = {
@@ -24,6 +24,7 @@ const COUNTS: Record<string, { roots: number, tabs: number, panels: number }> = 
   'rtl': { roots: 1, tabs: 3, panels: 3 },
   'server-content': { roots: 1, tabs: 2, panels: 2 },
   'sizes': { roots: 12, tabs: 24, panels: 24 },
+  'skeleton': { roots: 10, tabs: 30, panels: 30 },
 }
 
 /** A sentence each demo keeps in a panel that is not the one it opens on. */
@@ -37,6 +38,7 @@ const HIDDEN_TEXT: Record<string, string> = {
   'rtl': 'لا يعيد تسمية المشروع أو يحذفه إلا مالكه.',
   'server-content': '<li>Yousef Nasser</li>',
   'sizes': 'Props of your own size.',
+  'skeleton': 'A11y of xl.',
 }
 
 const render = async (file: string) => {

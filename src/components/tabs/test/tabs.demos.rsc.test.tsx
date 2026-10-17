@@ -63,7 +63,7 @@ const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { 
 
 describe('every demo is a Server Component that only hands the parts what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'disabled', 'enclosed', 'long-label', 'many', 'rtl', 'server-content', 'sizes'])
+    expect(names).toEqual(['basic', 'disabled', 'enclosed', 'long-label', 'many', 'rtl', 'server-content', 'sizes', 'skeleton'])
   })
 
   it('leaves out the one demo that is a client file, which cannot run here: it calls useState', async () => {

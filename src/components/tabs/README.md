@@ -82,6 +82,7 @@ import {
   TabsList,
   TabsPanel,
   TabsTab,
+  TabsSkeleton,
 } from 'topclassui'
 ```
 
@@ -113,6 +114,14 @@ Required: `aria-label` or `aria-labelledby` on `TabsList`. Every other prop belo
 
 This part takes no design props of its own.
 
+### TabsSkeleton
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | TabsRoot: the height, padding and type step of every tab; custom emits none. |
+| `tabs` | no | `integer`, min 1, max 50 | `3` | TabsSkeleton: how many tabs the placeholder holds, clamped to 1 and 50. |
+| `variant` | no | `line` \| `enclosed` | `"line"` | TabsRoot: line underlines the active tab, enclosed lifts it onto a raised surface. |
+
 Anything else is passed to the element each part draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
@@ -126,6 +135,7 @@ Anything else is passed to the element each part draws, so standard attributes (
 - `dummy/rtl.tsx`
 - `dummy/server-content.tsx`
 - `dummy/sizes.tsx`
+- `dummy/skeleton.tsx`
 
 ## Verified against
 

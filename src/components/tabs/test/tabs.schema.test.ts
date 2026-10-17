@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { CONTROL_SIZE } from '#shared/classes.js'
 import { TABS_BOUNDARIES } from '../boundaries.js'
 import { TABS_LIST, TABS_TAB } from '../classes.js'
-import { TABS_DEFAULTS, TABS_SIZES, TABS_VARIANTS } from '../constants.js'
+import { TABS_DEFAULTS, TABS_SIZES, TABS_SKELETON_DEFAULTS, TABS_VARIANTS } from '../constants.js'
 import { tabsSchema } from '../schema.js'
 
 // R-8.3-3: the props table, the playground and registry.json all read this output.
@@ -16,18 +16,18 @@ describe('the schema is the documentation', () => {
   const keys = Object.keys(tabsSchema.shape)
 
   it('covers every design prop and no other', () => {
-    expect(keys.sort()).toEqual(['keepMounted', 'size', 'variant'])
+    expect(keys.sort()).toEqual(['keepMounted', 'size', 'tabs', 'variant'])
   })
 
   it('converts to JSON Schema at all', () => {
-    expect(Object.keys(json.properties ?? {}).sort()).toEqual(['keepMounted', 'size', 'variant'])
+    expect(Object.keys(json.properties ?? {}).sort()).toEqual(['keepMounted', 'size', 'tabs', 'variant'])
   })
 
   for (const key of keys) {
     it(`${key} carries a description that names the part taking it`, () => {
       const description = json.properties?.[key]?.description ?? ''
       expect(description.length, key).toBeGreaterThan(30)
-      expect(description, key).toMatch(/^Tabs(Root|Panel): /)
+      expect(description, key).toMatch(/^Tabs(Root|Panel|Skeleton): /)
     })
   }
 
@@ -46,11 +46,12 @@ describe('the schema is the documentation', () => {
 
 describe('the schema and the constants agree', () => {
   it('fills every default from constants.ts', () => {
-    expect(tabsSchema.parse({})).toEqual({ variant: 'line', size: 'md', keepMounted: true })
+    expect(tabsSchema.parse({})).toEqual({ variant: 'line', size: 'md', keepMounted: true, tabs: 3 })
   })
 
   it('names the defaults the spec gives, so a changed constant is a failure here', () => {
     expect(TABS_DEFAULTS).toEqual({ variant: 'line', size: 'md', keepMounted: true })
+    expect(TABS_SKELETON_DEFAULTS).toEqual({ tabs: 3 })
   })
 
   it('offers the two looks and the shared size scale', () => {
@@ -84,8 +85,12 @@ describe('every look and every size has its classes', () => {
   })
 })
 
-describe('the one bound', () => {
-  it('cuts a label at 100 characters: far above any real tab, far below a pasted file', () => {
-    expect(TABS_BOUNDARIES).toEqual({ labelMaxLength: 100 })
+describe('the bounds', () => {
+  it('cuts a label at 100 characters: far above any real tab, far below a pasted file; and a placeholder holds 1 to 50 tabs', () => {
+    expect(TABS_BOUNDARIES).toEqual({ labelMaxLength: 100, skeletonTabsMin: 1, skeletonTabsMax: 50 })
+  })
+
+  it('declares the count of the skeleton with the same numbers it is clamped to (R-8.3-6)', () => {
+    expect(json.properties?.['tabs']).toMatchObject({ type: 'integer', minimum: 1, maximum: 50, default: 3 })
   })
 })
