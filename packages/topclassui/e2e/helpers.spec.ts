@@ -5,6 +5,7 @@ import { join } from 'node:path'
 import { expect, test, type Page } from '@playwright/test'
 
 import { DIRECTIONS } from '../scripts/lib/harness.js'
+import { expectRing, focusName, ringOfFocus } from './keys.js'
 import { expectInsideViewport, expectNoSidewaysScroll, openLive, viewportBox } from './live.js'
 import { demoListProblem, newerSource } from './pages.js'
 import { paintedRgb, pixelsOf, rgbOf } from './pixels.js'
@@ -90,6 +91,85 @@ test.describe('expectNoSidewaysScroll', () => {
       await expectNoSidewaysScroll(page)
     })
   }
+})
+
+test.describe('expectRing', () => {
+  /** A page of one button in #demo, with the CSS given, and the focus put on the button by Tab. */
+  const tabTo = async (page: Page, css: string, around = '<button>Go</button>') => {
+    await page.setContent(`<style>button { outline: none; margin: 8px } ${css}</style><div id="demo">${around}</div>`)
+    await page.keyboard.press('Tab')
+    await expect(page.locator('button')).toBeFocused()
+  }
+
+  test('passes for a solid 2 px ring the focus draws, on the button or on the zone around it', async ({ page }) => {
+    await tabTo(page, 'button:focus-visible { outline: 2px solid rgb(0, 90, 200) }')
+    await expectRing(page, 'own ring')
+    expect(await ringOfFocus(page)).toEqual({ visible: true, on: 'button', style: 'solid', width: 2, alpha: 1, idle: 'none', cut: null })
+    await tabTo(page, 'div:has(> button:focus-visible) { outline: 2px solid oklch(0.5 0.2 250) }', '<div><button>Go</button></div>')
+    await expectRing(page, 'the zone')
+    expect((await ringOfFocus(page))?.on).toBe('div')
+    await tabTo(page, 'div:has(> button:focus-visible) { outline: 2px solid rgb(0, 90, 200) } i { display: inline-block; width: 8px; height: 8px; outline: 1px solid rgb(90, 90, 90) }', '<div><button>Go <i></i></button></div>')
+    await expectRing(page, 'the zone, past an outline that stays inside the button')
+    expect((await ringOfFocus(page))?.on).toBe('div')
+  })
+
+  test('fails when nothing draws a ring', async ({ page }) => {
+    await tabTo(page, '')
+    await expect(expectRing(page, 'bare')).rejects.toThrow(/bare: no outline on \(none\)/)
+  })
+
+  test('fails for a 1 px ring, and for a ring on a focus the browser did not mark visible', async ({ page }) => {
+    await tabTo(page, 'button:focus-visible { outline: 1px solid rgb(0, 90, 200) }')
+    await expect(expectRing(page, 'thin')).rejects.toThrow(/thin: outline width on button/)
+    await tabTo(page, 'button:focus { outline: 2px solid rgb(0, 90, 200) }')
+    await page.locator('body').click({ position: { x: 300, y: 300 } })
+    await page.locator('button').click()
+    await expect(expectRing(page, 'clicked')).rejects.toThrow(/clicked: not :focus-visible/)
+  })
+
+  test('fails for a ring that is drawn but transparent, in any colour syntax', async ({ page }) => {
+    await tabTo(page, 'button:focus-visible { outline: 2px solid transparent }')
+    await expect(expectRing(page, 'clear')).rejects.toThrow(/clear: the outline on button is transparent/)
+    await tabTo(page, 'button:focus-visible { outline: 2px solid oklch(0.5 0.2 250 / 0) }')
+    await expect(expectRing(page, 'oklch')).rejects.toThrow(/oklch: the outline on button is transparent/)
+  })
+
+  test('fails for an outline a sibling draws all the time, which the focus never asked for', async ({ page }) => {
+    await tabTo(page, 'span { display: inline-block; width: 20px; height: 20px; outline: 2px solid rgb(200, 0, 0) }', '<button>Go</button><span></span>')
+    await expect(expectRing(page, 'sibling')).rejects.toThrow(/sibling: the outline on span stays without the focus/)
+  })
+
+  test('fails for a ring a parent with overflow hidden cuts, on one side only, and passes once the ring is drawn inside', async ({ page }) => {
+    const box = '<div style="overflow: hidden; width: 120px; padding: 0 8px"><button style="margin: 0; width: 100%">Go</button></div>'
+    await tabTo(page, 'button:focus-visible { outline: 2px solid rgb(0, 90, 200); outline-offset: 2px }', box)
+    await expect(expectRing(page, 'clipped')).rejects.toThrow(/clipped: the ring on button is cut/)
+    expect((await ringOfFocus(page))?.cut).toBe('div (overflow hidden hidden)')
+    await tabTo(page, 'button:focus-visible { outline: 2px solid rgb(0, 90, 200); outline-offset: -2px }', box)
+    await expectRing(page, 'inset')
+  })
+
+  test('the probe sends no focus event to the page, so a widget that resets on blur keeps its state', async ({ page }) => {
+    await tabTo(page, 'button:focus-visible { outline: 2px solid rgb(0, 90, 200) }')
+    await page.evaluate(() => {
+      for (const kind of ['focus', 'blur', 'focusin', 'focusout']) document.addEventListener(kind, () => { document.body.dataset['heard'] = kind }, true)
+    })
+    await expectRing(page, 'quiet')
+    expect(await page.evaluate(() => document.body.dataset['heard'] ?? 'nothing')).toBe('nothing')
+    await expect(page.locator('button')).toBeFocused()
+  })
+})
+
+test.describe('focusName', () => {
+  test('reads aria-labelledby, then aria-label, then a label, then the text, and names the body when nothing is focused', async ({ page }) => {
+    await page.setContent('<span id="a">Check</span><span id="b">in</span><button aria-labelledby="a b" aria-label="x">1</button><button aria-label="Close">2</button><label for="c">Email</label><input id="c"><button>Send</button>')
+    expect(await focusName(page)).toBe('(body)')
+    const names: string[] = []
+    for (let step = 0; step < 4; step++) {
+      await page.keyboard.press('Tab')
+      names.push(await focusName(page))
+    }
+    expect(names).toEqual(['Check in', 'Close', 'Email', 'Send'])
+  })
 })
 
 test.describe('the static page list', () => {
