@@ -1,0 +1,4 @@
+.generated/
+public/search/
+.next/
+*.tsbuildinfo

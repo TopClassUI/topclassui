@@ -8,6 +8,28 @@ importers:
 
   .: {}
 
+  apps/docs:
+    dependencies:
+      topclassui:
+        specifier: workspace:*
+        version: link:../../packages/topclassui
+    devDependencies:
+      '@types/node':
+        specifier: 22.14.0
+        version: 22.14.0
+      tsx:
+        specifier: 4.23.15
+        version: 4.23.15
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: 5.0.3
+        version: 5.0.3(@types/node@22.14.0)(happy-dom@20.14.5)(vite@8.3.2(@types/node@22.14.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15))
+      zod:
+        specifier: 4.6.5
+        version: 4.6.5
+
   packages/topclassui:
     dependencies:
       '@base-ui/react':
