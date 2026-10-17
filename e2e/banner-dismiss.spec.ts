@@ -284,15 +284,18 @@ test.describe('text made larger or spaced out', () => {
   for (const direction of DIRECTIONS) {
     test(`${direction}: with the root at 32 px the x grows with the text and still covers nothing`, async ({ page }) => {
       await openFixture(page, { direction })
-      // Not the layouts: a 85 px grid track and a table cell widen to the 80 px of padding and the action's 160 px,
-      // dismissible or not. That is the server half's minimum width, reported, not this x.
-      await page.addStyleTag({ content: 'html { font-size: 32px !important } #layouts { display: none }' })
+      // Not the table: an auto-layout cell widens to the min-content of what it holds; table-layout: fixed is the caller's.
+      await page.addStyleTag({ content: 'html { font-size: 32px !important } #layouts table { display: none }' })
       await expectNoSidewaysScroll(page)
       const found = await page.evaluate(geometry, '#banner-fixture')
       expect(found.map((banner) => banner.name)).toEqual(FIXTURE_NAMES)
       for (const banner of found.slice(0, 4)) {
         // px-5 is 1.25rem, so 40 px at a 32 px root.
         expect(banner, banner.name).toEqual({ ...banner, endGap: 40, inBanner: true, inParent: true, onChild: 0, onText: 0 })
+      }
+      // min-w-0 on the root: a 96 px grid track keeps its width, and the banner and its x stay inside it.
+      for (const banner of found.slice(4, 7)) {
+        expect(banner, banner.name).toEqual({ ...banner, inBanner: true, inParent: true, onChild: 0, onText: 0 })
       }
       const box = await page.locator('#counted [role="region"] > button').boundingBox()
       expect(box?.width).toBe(28)

@@ -92,9 +92,10 @@ function groupOf(name: string, seen: Map<string, Seen>, all: Set<number>): { one
   return { ...oneOf, when: info.literal === 'true' ? `\`${key}\`` : `\`${key}={${info.literal ?? ''}}\`` }
 }
 
-/** `false` for `readOnly: false` under `src/`: a literal that picks a branch of the union. */
+/** `false` for `readOnly: false` under `src/`: a literal that picks a branch; a required `boolean` picks it when set. */
 function literalOf(decl: ts.Declaration): string | undefined {
   if (!decl.getSourceFile().fileName.includes('/src/') || !ts.isPropertySignature(decl)) return undefined
+  if (decl.type?.kind === ts.SyntaxKind.BooleanKeyword) return 'true'
   return decl.type !== undefined && ts.isLiteralTypeNode(decl.type) ? decl.type.getText() : undefined
 }
 

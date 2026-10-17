@@ -105,6 +105,12 @@ export const MUTATIONS: Mutation[] = [
     to: "family ? familyImport(family) : `import { ${meta.name} } from 'topclassui'`,",
   },
   {
+    label: 'the README forgets that a Banner id is required with dismissible once dismissible takes a boolean',
+    file: 'scripts/lib/readme-types.ts',
+    from: "if (decl.type?.kind === ts.SyntaxKind.BooleanKeyword) return 'true'",
+    to: '',
+  },
+  {
     label: 'the README marks a prop required that only one branch of its union requires',
     file: 'scripts/lib/readme-types.ts',
     from: 'required: info.requiredIn.size === all.size,',
