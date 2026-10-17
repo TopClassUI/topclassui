@@ -54,7 +54,9 @@ is the real attribute, so the switch leaves the tab order and the form sends not
 **`readOnly`** keeps it in the form and says so to a screen reader; it has no look of its own.
 
 **The target is 24 px, 44 px under a finger**, whatever `size` draws: the focus ring is around
-the track. `size="custom"` draws no track size: give the track one from your own CSS.
+the track. `size="custom"` draws no track size: give the track one from your own CSS (it is
+the root's only child, so `className="*:h-6 *:w-12"` does). The thumb is as tall as the inside
+of the track and slides by what is left of its width, in either direction.
 
 **In right-to-left** the thumb starts at the right and slides left.
 

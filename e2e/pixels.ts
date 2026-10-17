@@ -64,6 +64,12 @@ export function rgbOf(computed: string): Rgb {
   return [r, g, b]
 }
 
+/** The row through the middle of a ring drawn `offset` px outside a box and `width` px thick, along its top edge, corners left out. */
+export function ringRow(page: Page, box: { left: number; top: number; width: number }, offset = 2, width = 2): Promise<Rgb[]> {
+  const inset = Math.ceil(width)
+  return pixelsOf(page, { x: Math.round(box.left + inset), y: Math.floor(box.top - offset - width / 2), width: Math.round(box.width - 2 * inset), height: 1 })
+}
+
 /** A computed colour in any syntax (oklch, color-mix, a system colour) as the sRGB a page paints it. */
 export function paintedRgb(target: Locator, property: string): Promise<Rgb> {
   return target.evaluate((element, name) => {

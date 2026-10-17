@@ -71,6 +71,11 @@ export function checkTokens(css: string, palette: Map<string, Color>): Report {
       }
     }
 
+    // A switch that is off shows its state by a line-strong thumb on its neutral-soft track (WCAG 1.4.11).
+    const track = get('--tc-neutral-soft')
+    const thumb = get('--tc-line-strong')
+    check(`${mode}: switch thumb (line-strong) on its track (neutral-soft)`, track && thumb && worst(thumb, track), 3)
+
     for (const tone of TONES) {
       const solid = get(`--tc-${tone}-solid`)
       const onSolid = get(`--tc-${tone}-on-solid`)

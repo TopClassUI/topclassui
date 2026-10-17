@@ -41,9 +41,9 @@ Pass `checked` to control it. Your handler runs first, with Base UI's details, s
 `details.cancel()` leaves the box as it was.
 
 **`indeterminate`** draws a dash and sets `aria-checked="mixed"`, for a box whose list is partly
-picked. It is yours to clear: a press calls `onCheckedChange` with the opposite of `checked`, and
-the box stays mixed until you drop `indeterminate`. The form sends `checked`, not the dash: a mixed
-box that is not checked sends nothing.
+picked. It is yours to clear: a press calls `onCheckedChange(true)`, and the box stays mixed until
+you drop `indeterminate`. A mixed box sends nothing, not even its `uncheckedValue`, before the page
+hydrates and after; it sends its value once you drop `indeterminate`.
 
 ```tsx
 export function SelectAll({ all, some, onAll }: { all: boolean, some: boolean, onAll: (next: boolean) => void }) {
@@ -72,7 +72,7 @@ browser sends the focus of a blocked submit to the hidden input, a box of 1 px.
 the box. `size="custom"` draws no box size: give the box one from your own CSS.
 
 **The radius is `rounded-chip`**: 4 px, and 8 px in Ocean, where the `xs` and `sm` boxes are
-circles until they are ticked.
+circles, ticked or not: only the tick or the dash tells them from a radio.
 
 **`parent`** reaches Base UI, but does nothing without a `CheckboxGroup`, which is not built.
 
