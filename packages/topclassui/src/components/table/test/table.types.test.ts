@@ -42,7 +42,7 @@ describe('the unions come from the constants', () => {
   })
 
   it('names the defaults and the bounds, each written out', () => {
-    expect(TABLE_DEFAULTS).toEqual({ captionVisible: false, striped: false, stickyFirstColumn: false })
+    expect(TABLE_DEFAULTS).toEqual({ captionVisible: false, striped: false, stickyFirstColumn: false, visibleRows: 7, virtualize: 'auto', loadMoreThreshold: 10 })
     expect(TABLE_COLUMN_DEFAULTS).toEqual({ align: 'start' })
     expect(TABLE_SKELETON_DEFAULTS).toEqual({ rows: 5, columns: 4 })
     expect(TABLE_BOUNDARIES).toEqual({ skeletonRowsMin: 1, skeletonRowsMax: 500, skeletonColumnsMin: 1, skeletonColumnsMax: 50 })
@@ -154,8 +154,6 @@ describe('the props follow the vocabulary', () => {
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'density'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'variant'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'size'>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<keyof TableProps<Invoice>, 'hasMore'>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<keyof TableProps<Invoice>, 'loadMore'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'selectedKeys'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'stickyHeader'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'loading'>>().toEqualTypeOf<false>()
@@ -163,12 +161,17 @@ describe('the props follow the vocabulary', () => {
 })
 
 describe('the design props and the schema cannot drift', () => {
-  it('is derived from the schema input: three optional booleans', () => {
+  it('is derived from the schema input: three optional booleans and the collection knobs', () => {
     expectTypeOf<TableDesignProps>().toEqualTypeOf<{
       captionVisible?: boolean | undefined
       striped?: boolean | undefined
       stickyFirstColumn?: boolean | undefined
+      visibleRows?: number | undefined
+      virtualize?: boolean | 'auto' | undefined
+      loadMoreThreshold?: number | undefined
     }>()
+    // R-8.5-1: the paging half of the shared contract; loadMore is a Server Action on a server page.
+    expectTypeOf<Pick<TableProps<Invoice>, 'hasMore' | 'loadMore'>>().toEqualTypeOf<{ hasMore?: boolean | undefined; loadMore?: (() => void | Promise<void>) | undefined }>()
   })
 
   it('is a subset of the component props, so every design prop is settable', () => {

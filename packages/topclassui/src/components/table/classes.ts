@@ -8,9 +8,25 @@ import type { TableAlign } from './types.js'
  * grid grid-cols-1: a grid or flex parent can shrink the box instead of being widened by it. */
 export const BOX = `relative isolate grid grid-cols-1 overflow-x-auto rounded-box bg-surface-raised ${SCROLLBAR}`
 
-/** Chromium leaves a focused control where it is while any of it is in view, and centres it
- * only when none is. 2rem off each edge is what counts as in view: the least a control shows. */
-export const FOCUS_ROOM = 'scroll-ps-8 scroll-pe-8'
+/** R-8.5-1: overflow-x auto scrolls the block axis too. The header row and --tc-list-rows body rows, each its padding, one line of text and its line, then the
+ * body scrolls under the header. A visible caption scrolls away with the rows, so it adds a row's height. */
+export const BOX_CAP = {
+  hidden: 'max-h-[calc(var(--spacing)*9+var(--tc-list-rows)*(var(--spacing)*11+var(--tc-line-width)))]',
+  visible: 'max-h-[calc(var(--spacing)*20+var(--tc-line-width)+var(--tc-list-rows)*(var(--spacing)*11+var(--tc-line-width)))]',
+} as const
+
+/** The header stays at the top of the box while the body scrolls, over every body cell, the stuck one too. */
+export const HEAD = 'sticky top-0 z-[calc(var(--tc-z-sticky)+1)]'
+
+/** The rows windowing left out above and below, as tall as the hook measured them. */
+export const SPACER = {
+  start: 'h-(--tc-list-pad-start) p-0',
+  end: 'h-(--tc-list-pad-end) p-0',
+} as const
+
+/** Chromium leaves a focused control where it is while any of it is in view, and centres it only when none is. 2rem
+ * off each edge is what counts as in view; the top keeps the sticky header's height clear. */
+export const FOCUS_ROOM = 'scroll-ps-8 scroll-pe-8 scroll-pt-[calc(var(--spacing)*9)]'
 
 /** SC 2.4.11: the same room measured from the stuck column, which is never wider than this,
  * so a focused control is never under it. It replaces the start half of FOCUS_ROOM. */

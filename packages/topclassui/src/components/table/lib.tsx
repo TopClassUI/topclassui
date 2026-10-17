@@ -1,5 +1,5 @@
 import { SORT_ICONS } from './constants.js'
-import type { TableColumn, TableColumns, TableSort, TableSortDirection } from './types.js'
+import type { TableColumn, TableColumns, TableRow, TableSort, TableSortDirection } from './types.js'
 
 /** A JS caller can pass a direction no list holds: the column reads as unsorted, not a crash. */
 export const directionOf = (sort: TableSort | undefined, key: string): TableSortDirection | undefined =>
@@ -8,3 +8,6 @@ export const directionOf = (sort: TableSort | undefined, key: string): TableSort
 /** The entries that are columns, in the order they were written. */
 export const columnsOf = <T,>(columns: TableColumns<T>): TableColumn<T>[] =>
   columns.filter((column): column is TableColumn<T> => Boolean(column))
+
+/** A body row's key, which the server made from getKey. */
+export const keyOfRow = (row: TableRow): string => row.key

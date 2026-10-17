@@ -8,29 +8,42 @@ import { tableSchema, tableSkeletonSchema } from '../schema.js'
 
 // R-8.3-3: the props table, the playground and registry.json all read this output.
 const json = z.toJSONSchema(tableSchema, { io: 'input' }) as {
-  properties?: Record<string, { description?: string; default?: unknown; type?: string }>
+  properties?: Record<string, { description?: string; default?: unknown; type?: string; minimum?: number; maximum?: number }>
 }
 
 describe('the schema is the documentation', () => {
   const keys = Object.keys(tableSchema.shape)
 
-  it('covers the three toggles, and none of the data: items and columns are not design props', () => {
+  const ALL = ['captionVisible', 'loadMoreThreshold', 'stickyFirstColumn', 'striped', 'virtualize', 'visibleRows']
+  const TOGGLES = ['captionVisible', 'stickyFirstColumn', 'striped']
+
+  it('covers the three toggles and the three collection knobs, and none of the data: items and columns are not design props', () => {
     // Named, or a key dropped from TABLE_DEFAULTS drops from the expectation too.
-    expect(keys.sort()).toEqual(['captionVisible', 'stickyFirstColumn', 'striped'])
+    expect([...keys].sort()).toEqual(ALL)
   })
 
   it('converts to JSON Schema at all', () => {
-    expect(Object.keys(json.properties ?? {}).sort()).toEqual(['captionVisible', 'stickyFirstColumn', 'striped'])
+    expect(Object.keys(json.properties ?? {}).sort()).toEqual(ALL)
   })
 
-  for (const key of keys) {
+  it('bounds the two counts with the shared collection bounds, written out here (R-5.7-7)', () => {
+    const counts = json.properties
+    expect(counts?.['visibleRows']).toMatchObject({ minimum: 1, maximum: 20, default: 7 })
+    expect(counts?.['loadMoreThreshold']).toMatchObject({ minimum: 0, maximum: 200, default: 10 })
+    expect(tableSchema.safeParse({ visibleRows: 21 }).success).toBe(false)
+    expect(tableSchema.safeParse({ virtualize: 'always' }).success).toBe(false)
+  })
+
+  for (const key of ALL) {
     it(`${key} carries a description into the JSON Schema output`, () => {
       const description = json.properties?.[key]?.description
       expect(typeof description, key).toBe('string')
       expect((description ?? '').length, key).toBeGreaterThan(10)
       expect(description ?? '', key).not.toContain('TODO')
     })
+  }
 
+  for (const key of TOGGLES) {
     it(`${key} is a boolean that carries the default from constants.ts, not a second copy`, () => {
       expect(json.properties?.[key]?.type, key).toBe('boolean')
       expect(json.properties?.[key]?.default, key)
@@ -39,7 +52,9 @@ describe('the schema is the documentation', () => {
   }
 
   it('starts with every toggle off, which is the table the frame draws', () => {
-    expect(tableSchema.parse({})).toEqual({ captionVisible: false, striped: false, stickyFirstColumn: false })
+    expect(tableSchema.parse({})).toEqual({
+      captionVisible: false, striped: false, stickyFirstColumn: false, visibleRows: 7, virtualize: 'auto', loadMoreThreshold: 10,
+    })
   })
 
   it('refuses anything that is not a boolean', () => {
@@ -49,7 +64,7 @@ describe('the schema is the documentation', () => {
   })
 
   it('has none of the props the spec leaves unbuilt', () => {
-    for (const key of ['pageSize', 'density', 'variant', 'hasMore', 'sortable', 'selectable', 'size', 'tone']) {
+    for (const key of ['pageSize', 'density', 'variant', 'sortable', 'selectable', 'size', 'tone']) {
       expect(keys, key).not.toContain(key)
     }
   })
