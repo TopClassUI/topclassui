@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
 import { DIRECTIONS } from '../scripts/lib/harness.js'
-import { expectNoRing, expectRing, walk } from './keyboard.js'
+import { expectNoRing, expectRing, walk } from './ring.js'
 import { liveErrors, openLive } from './live.js'
 
 // R-5.6-1, the Authoring Practices spin button in Chromium, the same in both directions: ArrowUp increases, ArrowDown

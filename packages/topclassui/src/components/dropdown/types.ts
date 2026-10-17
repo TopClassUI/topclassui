@@ -34,7 +34,7 @@ type Named =
   | { 'children'?: undefined, 'aria-label': string }
 
 // R-5.7-5: derived at the seam. No handle: nothing here creates one, so a trigger sits inside its root.
-export type DropdownRootProps = Omit<Base.Root.Props, 'handle' | 'children'> & {
+export type DropdownRootProps = Omit<Base.Root.Props, 'className' | 'handle' | 'children'> & {
   /** The trigger and the popup. With no trigger, hold `open` in a client file. */
   children?: ReactNode | undefined
 }
@@ -65,5 +65,5 @@ export type DropdownGroupLabelProps = Omit<Base.GroupLabel.Props, 'className'> &
 
 export type DropdownSeparatorProps = Omit<Base.Separator.Props, 'className'> & OwnClassName
 
-/** The shared menu contract, so a Drawer menu takes the same data, plus where the popup opens. */
-export type DropdownMenuProps = MenuContract & Pick<DropdownDesignProps, 'placement'> & OwnClassName
+/** The shared menu contract, so a Drawer menu takes the same data; the rest, the className and the ref reach the popup. */
+export type DropdownMenuProps = MenuContract & Omit<DropdownPopupProps, keyof MenuContract | 'children' | 'container' | 'keepMounted' | 'render'>

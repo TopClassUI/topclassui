@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
 import { DIRECTIONS } from '../scripts/lib/harness.js'
-import { expectNoRing, expectRing, focusedName, tabIndexes, walk } from './keyboard.js'
+import { expectNoRing, expectRing, focusedName, tabIndexes, walk } from './ring.js'
 import { liveErrors, openLive } from './live.js'
 
 // R-5.6-1, a segmented control is the Authoring Practices radio group, in Chromium: one tab stop that roves, every

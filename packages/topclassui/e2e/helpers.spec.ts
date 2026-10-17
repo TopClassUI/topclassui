@@ -5,7 +5,7 @@ import { join } from 'node:path'
 import { expect, test, type Page } from '@playwright/test'
 
 import { DIRECTIONS } from '../scripts/lib/harness.js'
-import { expectNoRing, expectRing, walk } from './keyboard.js'
+import { expectNoRing, expectRing, walk } from './ring.js'
 import { expectInsideViewport, expectNoSidewaysScroll, openLive, viewportBox } from './live.js'
 import { demoListProblem, newerSource } from './pages.js'
 import { paintedRgb, pixelsOf, rgbOf } from './pixels.js'
