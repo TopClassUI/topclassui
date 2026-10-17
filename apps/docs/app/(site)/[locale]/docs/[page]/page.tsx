@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import type { ComponentType } from 'react'
 import type { MDXComponents } from 'mdx/types'
 
+import { guideComponents } from '../../../../../components/guides/guide-map'
 import { JsonLd } from '../../../../../components/json-ld'
 import { mdxComponents } from '../../../../../components/mdx/mdx-map'
 import { DocsShell } from '../../../../../components/shell/docs-shell'
@@ -56,7 +57,7 @@ export default async function GuidePage({ params }: { params: Params }) {
         }}
       />
       <DocsShell locale={locale} entry={entry} labels={labelsFor(locale)}>
-        <Content components={mdxComponents(locale)} />
+        <Content components={{ ...mdxComponents(locale), ...guideComponents(locale) }} />
       </DocsShell>
     </SitePage>
   )
