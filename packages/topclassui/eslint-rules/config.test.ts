@@ -17,8 +17,8 @@ describe('eslint.config.ts arms the custom rules', () => {
     expect(src).toBeDefined()
   })
 
-  it('declares thirteen rules, so a new one cannot be forgotten silently', () => {
-    expect(RULE_NAMES).toHaveLength(13)
+  it('declares twenty-one rules, so a new one cannot be forgotten silently', () => {
+    expect(RULE_NAMES).toHaveLength(21)
   })
 
   for (const name of RULE_NAMES) {
@@ -47,11 +47,22 @@ describe('eslint.config.ts arms the custom rules', () => {
     // Each of these rules is written "inside src/", and a test or a demo is inside src/:
     // one has to write the banned string to prove the rule, the other to show real usage.
     expect([...new Set(off)].sort()).toEqual([
+      'topclass/dir-aware-transforms',
       'topclass/logical-properties-only',
+      'topclass/no-fetch-in-components',
+      'topclass/no-physical-placement',
       'topclass/semantic-classes-only',
       'topclass/shared-class-constants',
       'topclass/style-sets-tokens-only',
       'topclass/text-comes-from-labels',
     ])
+  })
+})
+
+describe('R-5.3-4: the placement exemption stops at tests', () => {
+  it('leaves no-physical-placement armed on demos, which show real usage', () => {
+    const demoOff = blocks.filter((b) => (b.files ?? []).some((f) => f.includes('dummy'))
+      && b.rules?.['topclass/no-physical-placement'] === 'off')
+    expect(demoOff).toEqual([])
   })
 })
