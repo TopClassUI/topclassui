@@ -4,6 +4,7 @@ import type { Mutation } from '../lib/mutate.js'
 const CLIENT = 'src/components/radio-group/client.tsx'
 const HOOK = 'src/components/radio-group/hook.ts'
 const CLASSES = 'src/components/radio-group/classes.ts'
+const SKELETON = 'src/components/radio-group/skeleton.tsx'
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -215,5 +216,29 @@ export const MUTATIONS: Mutation[] = [
     file: HOOK,
     from: 'useState(() => serveTabStopOn(children, value ?? defaultValue ?? null, disabled))',
     to: 'useState(() => value ?? defaultValue ?? null)',
+  },
+  {
+    label: 'the radio group skeleton draws md circles at every size, so an xl group jumps when it arrives',
+    file: SKELETON,
+    from: 'RADIO_SIZE[size]',
+    to: 'RADIO_SIZE.md',
+  },
+  {
+    label: 'the radio group skeleton stops clamping its count, so items={1000} draws a thousand rows and items={0} none',
+    file: SKELETON,
+    from: 'Math.trunc(clamp(items, RADIO_GROUP_BOUNDARIES.skeletonItemsMin, RADIO_GROUP_BOUNDARIES.skeletonItemsMax))',
+    to: 'Math.trunc(items)',
+  },
+  {
+    label: 'the radio group skeleton loses the target floor, so under a finger each row is 20 px shorter than its radio',
+    file: CLASSES,
+    from: 'items-center justify-center ${TOUCH_TARGET}`',
+    to: 'items-center justify-center`',
+  },
+  {
+    label: 'the radio group skeleton takes aria-hidden from the caller, so a placeholder can be read out',
+    file: SKELETON,
+    from: '{...rest} aria-hidden>',
+    to: 'aria-hidden {...rest}>',
   },
 ]

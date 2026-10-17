@@ -1,8 +1,9 @@
 import { z } from 'zod'
 import { describe, expect, it } from 'vitest'
 
-import { RADIO_GROUP_DEFAULTS, RADIO_GROUP_ORIENTATIONS, RADIO_GROUP_SIZES } from '../constants.js'
-import { radioGroupSchema } from '../schema.js'
+import { RADIO_GROUP_BOUNDARIES } from '../boundaries.js'
+import { RADIO_GROUP_DEFAULTS, RADIO_GROUP_ORIENTATIONS, RADIO_GROUP_SIZES, RADIO_GROUP_SKELETON_DEFAULTS } from '../constants.js'
+import { radioGroupSchema, radioGroupSkeletonSchema } from '../schema.js'
 
 // R-8.3-3: the props table, the playground and registry.json all read this output.
 const json = z.toJSONSchema(radioGroupSchema, { io: 'input' }) as {
@@ -50,5 +51,25 @@ describe('the schema and the constants agree', () => {
 
   it('keeps what is not built out of the schema: no tone, no variant, no items, no loading', () => {
     for (const key of ['tone', 'variant', 'items', 'loading']) expect(Object.keys(radioGroupSchema.shape), key).not.toContain(key)
+  })
+})
+
+describe('the skeleton schema bounds its one count (R-5.7-7, R-8.3-6)', () => {
+  const skeleton = z.toJSONSchema(radioGroupSkeletonSchema, { io: 'input' }) as {
+    properties?: Record<string, { description?: string; default?: unknown; minimum?: number; maximum?: number }>
+  }
+
+  it('holds items alone, three by default, from 1 to 100, the numbers boundaries.ts holds', () => {
+    expect(Object.keys(radioGroupSkeletonSchema.shape)).toEqual(['items'])
+    expect(RADIO_GROUP_SKELETON_DEFAULTS).toEqual({ items: 3 })
+    expect(RADIO_GROUP_BOUNDARIES).toEqual({ skeletonItemsMin: 1, skeletonItemsMax: 100 })
+    expect([skeleton.properties?.['items']?.default, skeleton.properties?.['items']?.minimum, skeleton.properties?.['items']?.maximum])
+      .toEqual([3, 1, 100])
+    expect((skeleton.properties?.['items']?.description ?? '').length).toBeGreaterThan(30)
+  })
+
+  it('refuses no radio, a hundred and one, and half a radio', () => {
+    for (const items of [0, 101, 2.5]) expect(radioGroupSkeletonSchema.safeParse({ items }).success, String(items)).toBe(false)
+    expect(radioGroupSkeletonSchema.parse({})).toEqual({ items: 3 })
   })
 })

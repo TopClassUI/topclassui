@@ -23,6 +23,7 @@ const AFTER: Record<string, string[]> = {
   'long-content': ['Pick up'],
   'rtl': ['مدى الحياة'],
   'sizes': ['Off', 'Off', 'Off', 'Off', 'Off'],
+  'skeleton': ['Lifetime', 'Lifetime', 'Lifetime', 'Lifetime', 'Lifetime'],
   'states': ['Invalid', 'Disabled, checked', 'Live', 'Read-only, checked'],
 }
 

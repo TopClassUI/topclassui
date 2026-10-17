@@ -2,7 +2,8 @@
 import { z } from 'zod'
 
 import { sizeSchema } from '#shared/contracts/size.schema.js'
-import { RADIO_GROUP_DEFAULTS, RADIO_GROUP_ORIENTATIONS } from './constants.js'
+import { RADIO_GROUP_BOUNDARIES } from './boundaries.js'
+import { RADIO_GROUP_DEFAULTS, RADIO_GROUP_ORIENTATIONS, RADIO_GROUP_SKELETON_DEFAULTS } from './constants.js'
 
 // R-8.3-3: .meta() is last in each chain, or zod drops it from the JSON Schema output.
 export const radioGroupSchema = z.object({
@@ -15,3 +16,12 @@ export const radioGroupSchema = z.object({
 })
 
 export type RadioGroupSchemaInput = z.input<typeof radioGroupSchema>
+
+/** R-5.7-7: the count of RadioGroupSkeleton, bounded here and clamped where it is read. */
+export const radioGroupSkeletonSchema = z.object({
+  items: z.number().int().min(RADIO_GROUP_BOUNDARIES.skeletonItemsMin).max(RADIO_GROUP_BOUNDARIES.skeletonItemsMax)
+    .default(RADIO_GROUP_SKELETON_DEFAULTS.items)
+    .meta({ description: 'How many radios the placeholder holds, clamped to the bounds: pass the count of the group it stands in for.' }),
+})
+
+export type RadioGroupSkeletonSchemaInput = z.input<typeof radioGroupSkeletonSchema>

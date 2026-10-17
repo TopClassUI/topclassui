@@ -18,17 +18,18 @@ function exportedNames(source: string): string[] {
 }
 
 describe('index.tsx exports flat names, the root named Root (R-9.2-3, R-9.2-4)', () => {
-  it('exports exactly RadioGroupItem and RadioGroupRoot, two function components', () => {
-    expect(Object.keys(radios).sort()).toEqual(['RadioGroupItem', 'RadioGroupRoot'])
+  it('exports exactly RadioGroupItem, RadioGroupRoot and RadioGroupSkeleton, three function components', () => {
+    expect(Object.keys(radios).sort()).toEqual(['RadioGroupItem', 'RadioGroupRoot', 'RadioGroupSkeleton'])
     expect(typeof radios.RadioGroupRoot).toBe('function')
     expect(typeof radios.RadioGroupItem).toBe('function')
+    expect(typeof radios.RadioGroupSkeleton).toBe('function')
   })
 
   it('has no Base UI type name, no context and no hook in its surface', () => {
     const source = readFileSync(join(import.meta.dirname, '..', 'index.tsx'), 'utf8')
     expect(exportedNames(source).sort()).toEqual([
       'RadioGroupDesignProps', 'RadioGroupItem', 'RadioGroupItemProps', 'RadioGroupName', 'RadioGroupOrientation', 'RadioGroupRoot',
-      'RadioGroupRootProps',
+      'RadioGroupRootProps', 'RadioGroupSkeleton', 'RadioGroupSkeletonProps',
     ])
   })
 

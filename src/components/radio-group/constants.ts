@@ -1,4 +1,4 @@
-// R-8.3-2: the value lists and the defaults. RadioGroup bounds nothing, so it has no boundaries.ts (R-8.3-6).
+// R-8.3-2: the value lists and the defaults. The skeleton's bound lives in boundaries.ts (R-8.3-6).
 import { DEFAULT_SIZE, SIZES } from '#shared/contracts/size.js'
 
 export const RADIO_GROUP_SIZES = SIZES
@@ -11,4 +11,9 @@ export const RADIO_GROUP_DEFAULTS = {
   size: DEFAULT_SIZE,
   orientation: 'vertical',
   invalid: false,
+} as const
+
+/** The placeholder's starting shape: the docs stage draws three radios. */
+export const RADIO_GROUP_SKELETON_DEFAULTS = {
+  items: 3,
 } as const

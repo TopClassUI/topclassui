@@ -1,5 +1,5 @@
 // R-5.12-4: the class strings of the radio group, built from the shared toggle constants (unit-4.md, RadioGroup).
-import { TOGGLE_BOX, TOGGLE_SIZE, TOGGLE_TARGET } from '#shared/classes.js'
+import { FORCED_EDGE, TOGGLE_BOX, TOGGLE_SIZE, TOGGLE_TARGET, TOUCH_TARGET } from '#shared/classes.js'
 
 /** A column, or a row that wraps. The group is named, so a radio in a nested group reads its own. */
 export const RADIO_GROUP = {
@@ -29,3 +29,13 @@ export const RADIO_DOT = 'flex size-full items-center justify-center'
 
 /** A choice is read whole, so its text wraps. */
 export const RADIO_LABEL = 'min-w-0 wrap-anywhere peer-disabled:opacity-50'
+
+/** The skeleton's target: the floor of the radio it stands in for, 24 px and 44 under a finger, around the circle. */
+export const RADIO_GROUP_SKELETON_TARGET = `inline-flex w-fit shrink-0 items-center justify-center ${TOUCH_TARGET}`
+
+/** The circle in the neutral fill, which pulses. Its size is RADIO_SIZE, as the radio's is. */
+export const RADIO_GROUP_SKELETON_CIRCLE = `block rounded-full bg-neutral-soft animate-pulse motion-reduce:animate-none ${FORCED_EDGE}`
+
+/** One line of the label's type step, 1em tall with margins making up the line height. Its width is a guess of 6em:
+ * the caller's text cannot be measured before it arrives. */
+export const RADIO_GROUP_SKELETON_LINE = `block h-[1em] my-[calc((1lh-1em)/2)] w-[6em] rounded-chip bg-neutral-soft animate-pulse motion-reduce:animate-none ${FORCED_EDGE}`

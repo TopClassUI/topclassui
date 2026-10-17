@@ -14,7 +14,7 @@ import { FORCED_CANVAS, contrast, inkOn, pixelsOf, rgbOf } from './pixels.js'
 
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['basic', 'form', 'horizontal', 'long-content', 'rtl', 'sizes', 'states'].map((demo) => `radio-group--${demo}`)
+const DEMOS = ['basic', 'form', 'horizontal', 'long-content', 'rtl', 'sizes', 'skeleton', 'states'].map((demo) => `radio-group--${demo}`)
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 const NAMES = { xs: 'Extra small', sm: 'Small', md: 'Medium', lg: 'Large', xl: 'Extra large' } as const
 
@@ -550,5 +550,42 @@ test.describe('axe on the hydrated demos', () => {
         expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([])
       })
     }
+  }
+})
+
+test.describe('the skeleton', () => {
+  for (const pointer of ['fine', 'coarse'] as const) {
+    test.describe(`${pointer} pointer`, () => {
+      test.use(pointer === 'coarse' ? COARSE : {})
+
+      // A label is the caller's text, so its width is a guess: the heights, the targets and the circles must agree.
+      test('is the box of the group it stands in for at every size: its height, each row, target and circle', async ({ page }) => {
+        await page.goto(urlFor('radio-group--skeleton', 'light', 'ltr'))
+        const pairs = await page.locator('[data-pair]').evaluateAll((all) => all.map((pair) => {
+          const round = (px: number) => Math.round(px * 10) / 10
+          const height = (el: Element | null) => round(el?.getBoundingClientRect().height ?? 0)
+          const size = (el: Element | null) => { const r = el?.getBoundingClientRect() ?? new DOMRect(); return [round(r.width), round(r.height)] }
+          const radius = (el: Element | null) => (el ? getComputedStyle(el).borderTopLeftRadius : '')
+          const group = pair.querySelector('[role="radiogroup"]')
+          const skeleton = pair.querySelector('span[aria-hidden]')
+          const real = [...(group?.querySelectorAll(':scope > label') ?? [])].map((row) => {
+            const target = row.querySelector('[role="radio"]')
+            const circle = target?.querySelector(':scope > span') ?? null
+            return [height(row), size(target), size(circle), radius(circle)]
+          })
+          const bones = [...(skeleton?.children ?? [])].map((row) => {
+            const target = row.firstElementChild
+            const circle = target?.firstElementChild ?? null
+            return [height(row), size(target), size(circle), radius(circle)]
+          })
+          return [pair.getAttribute('data-pair'), [height(group), real], [height(skeleton), bones]]
+        }))
+        expect(pairs.map(([name]) => name)).toEqual([...SIZES])
+        for (const [name, real, skeleton] of pairs) expect(skeleton, String(name)).toEqual(real)
+        const [, [, rows]] = pairs[0] as [string, [number, [number, number[]][]]]
+        expect(rows.length).toBe(3)
+        expect(rows[0]?.[1]?.[1]).toBe(pointer === 'coarse' ? 44 : 24)
+      })
+    })
   }
 })

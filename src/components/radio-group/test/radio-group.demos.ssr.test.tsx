@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'horizontal', 'long-content', 'rtl', 'sizes', 'states']
+const EXPECTED = ['basic', 'form', 'horizontal', 'long-content', 'rtl', 'sizes', 'skeleton', 'states']
 
 /** Each group of each demo as the server writes it: its name, then each radio's text, a star on the checked one and a
  * caret on the one tab stop. */
@@ -22,6 +22,10 @@ const GROUPS: Record<string, string[]> = {
   'long-content': ['Delivery: Standard delivery *^ | https | Pick up'],
   'rtl': ['الفوترة: شهريًا | سنويًا *^ | مدى الحياة'],
   'sizes': ['Extra small: Extra small *^ | Off', 'Small: Small *^ | Off', 'Medium: Medium *^ | Off', 'Large: Large *^ | Off', 'Extra large: Extra large *^ | Off'],
+  'skeleton': [
+    'Billing, xs: Monthly | Yearly *^ | Lifetime', 'Billing, sm: Monthly | Yearly *^ | Lifetime', 'Billing, md: Monthly | Yearly *^ | Lifetime',
+    'Billing, lg: Monthly | Yearly *^ | Lifetime', 'Billing, xl: Monthly | Yearly *^ | Lifetime',
+  ],
   'states': [
     'Invalid: Invalid, checked *^ | Invalid', 'Disabled: Disabled, checked *^ | Disabled',
     'One disabled: Live, checked *^ | One disabled | Live', 'Read-only: Read-only, checked *^ | Read-only',
@@ -51,7 +55,7 @@ function groupsIn(html: string): string[] {
 }
 
 describe('every demo renders on the server', () => {
-  it('holds exactly the seven demos asked for, so none can be deleted silently', () => {
+  it('holds exactly the eight demos asked for, so none can be deleted silently', () => {
     expect(files).toEqual(EXPECTED)
   })
 
@@ -83,6 +87,13 @@ describe('the demos the plan names', () => {
 
   it('horizontal: a row that wraps', async () => {
     expect(await render('horizontal')).toMatch(/^<div role="radiogroup" [^>]*data-orientation="horizontal" class="[^"]*flex-row flex-wrap/)
+  })
+
+  it('skeleton: each group beside a hidden skeleton of three radios, five pairs', async () => {
+    const html = await render('skeleton')
+    expect([...html.matchAll(/data-pair="([^"]*)"/g)].map(([, size]) => size)).toEqual(['xs', 'sm', 'md', 'lg', 'xl'])
+    const skeletons = html.match(/<span class="[^"]*" aria-hidden="true">(<span class="[^"]*"><span class="[^"]*"><span class="[^"]*"><\/span><\/span><span class="[^"]*"><\/span><\/span>){3}<\/span>/g)
+    expect(skeletons).toHaveLength(5)
   })
 
   it('rtl: an island that carries the direction and the language', async () => {

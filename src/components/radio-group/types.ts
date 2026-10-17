@@ -1,6 +1,6 @@
 import type { Radio } from '@base-ui/react/radio'
 import type { RadioGroup as Base } from '@base-ui/react/radio-group'
-import type { CSSProperties, Ref } from 'react'
+import type { ComponentPropsWithRef, CSSProperties, Ref } from 'react'
 
 import type { GroupName } from '#shared/contracts/name.js'
 import type { Size } from '#shared/contracts/size.js'
@@ -58,3 +58,12 @@ export type RadioGroupValueProps = Pick<BaseRoot, 'value' | 'defaultValue' | 'on
 
 /** What Base UI hands a change handler: the reason, the event, and cancel(). */
 export type RadioGroupChangeDetails = Base.ChangeEventDetails
+
+/** R-8.3-4: the group's own size and orientation and a count of radios, so the two cannot describe different boxes. */
+export type RadioGroupSkeletonProps =
+  Omit<ComponentPropsWithRef<'span'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
+  & Pick<RadioGroupDesignProps, 'size' | 'orientation'>
+  & {
+    /** How many radios it holds, 3 by default, clamped to 1-100: pass the count of the group it stands in for. */
+    items?: number | undefined
+  }

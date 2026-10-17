@@ -91,11 +91,15 @@ radio button. On the group they go to the `radiogroup`.
 | a radio's `disabled`, `readOnly`, `inputRef` | passed through |
 | a `<span>` radio, every radio `tabindex="-1"` in the server HTML | a native `<button>`, and one tab stop in the server HTML |
 
+**`RadioGroupSkeleton`** is the box of the group: give it the same `size` and `orientation`, and
+the count of radios as `items` (3 by default, 1 to 100). Each row is the target, the circle and
+one line of text 6em wide: a label is your text, so only its height is reserved exactly.
+
 ### Not built
 
-`tone` (one is drawn), `RadioCards` (its own catalog row), a group that takes `items`, a
-description under a radio's text, Home and End, a hover look, a read-only look, the invalid ring
-that is always on, a skeleton (use `Skeleton`).
+`tone` (one is drawn), `RadioCards` (its own catalog row), a group that takes its radios as
+data, a description under a radio's text, Home and End, a hover look, a read-only look, the
+invalid ring that is always on.
 
 <!-- /hand-written -->
 
@@ -105,6 +109,7 @@ that is always on, a skeleton (use `Skeleton`).
 import {
   RadioGroupRoot,
   RadioGroupItem,
+  RadioGroupSkeleton,
 } from 'topclassui'
 ```
 
@@ -131,6 +136,14 @@ Required: `aria-label` or `aria-labelledby` on `RadioGroupRoot`, `value` on `Rad
 | `ref` | no | `Ref<HTMLButtonElement>` | - | The radio itself, which is a `<button>`. |
 | `style` | no | `CSSProperties` | - | On the `<label>` around the radio and its text. |
 
+### RadioGroupSkeleton
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `items` | no | `number` | - | How many radios it holds, 3 by default, clamped to 1-100: pass the count of the group it stands in for. |
+| `orientation` | no | `vertical` \| `horizontal` | `"vertical"` | RadioGroupRoot: a column, or a row that wraps. Layout only, written as data-orientation; the arrow keys do not change. |
+| `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | RadioGroupRoot: the toggle scale of every circle and the type step of its label; custom emits no size classes. |
+
 Anything else is passed to the element each part draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
@@ -141,6 +154,7 @@ Anything else is passed to the element each part draws, so standard attributes (
 - `dummy/long-content.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`
+- `dummy/skeleton.tsx`
 - `dummy/states.tsx`
 
 ## Verified against

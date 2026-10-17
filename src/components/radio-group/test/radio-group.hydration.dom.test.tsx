@@ -97,7 +97,7 @@ describe('a server-rendered RadioGroup hydrates cleanly', () => {
 
 describe('every demo renders and hydrates', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'form', 'horizontal', 'long-content', 'rtl', 'sizes', 'states'])
+    expect(names).toEqual(['basic', 'form', 'horizontal', 'long-content', 'rtl', 'sizes', 'skeleton', 'states'])
   })
 
   for (const [name, Demo] of DEMOS) {
