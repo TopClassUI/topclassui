@@ -1,0 +1,810 @@
+# next-app: the copied tree
+components/button/boundaries.ts  4b900072876a
+components/button/classes.ts  504a928f6608
+components/button/constants.ts  89ccb1d42dbe
+components/button/dummy/as-link.tsx  8bb77316b28e
+components/button/dummy/custom-size.tsx  9b0caf6811f4
+components/button/dummy/full-width.tsx  8c54e92f0b39
+components/button/dummy/long-label.tsx  42882a416d4d
+components/button/dummy/rtl.tsx  98f037d4b5f5
+components/button/dummy/sizes.tsx  8a7e5088189e
+components/button/dummy/skeleton.tsx  ed9eedb88af3
+components/button/dummy/states.tsx  9019a3645541
+components/button/dummy/tones.tsx  f9b5b57e18cd
+components/button/dummy/variants.tsx  c5a4f3f312eb
+components/button/dummy/with-icon.tsx  204b7b16a78d
+components/button/index.tsx  7b85b4826e00
+components/button/schema.ts  6f97e263ea6f
+components/button/skeleton.tsx  acb869d6cc10
+components/button/types.ts  4d790d19e519
+components/button/variants.ts  ec77eabeee0b
+components/dialog/classes.ts  e0e06db161fc
+components/dialog/client.tsx  a985b92f4206
+components/dialog/constants.ts  31f59af76a25
+components/dialog/dummy/basic.tsx  6c1d3739f8b1
+components/dialog/dummy/confirm.tsx  9642dedef3b5
+components/dialog/dummy/long-body.tsx  cf9b3c31efbe
+components/dialog/dummy/long-content.tsx  8702edc7b593
+components/dialog/dummy/no-close-button.tsx  c29c3e21914e
+components/dialog/dummy/non-modal.tsx  d492ef948279
+components/dialog/dummy/rtl.tsx  e72cae528c9a
+components/dialog/dummy/sizes.tsx  94813dbb37c3
+components/dialog/dummy/trap-focus.tsx  b6694b11f20a
+components/dialog/hook.ts  bdc9906f1013
+components/dialog/index.tsx  b8a7a05b303c
+components/dialog/schema.ts  1c80e945de0a
+components/dialog/types.ts  deb92234388c
+components/select/classes.ts  11e76755da1d
+components/select/client.tsx  11f22211dd85
+components/select/constants.ts  39c27146b041
+components/select/dummy/basic.tsx  9dd3a3d4158b
+components/select/dummy/form.tsx  9b8024353d8d
+components/select/dummy/four-rows.tsx  31eea2abee3c
+components/select/dummy/long-content.tsx  f0008342f0b2
+components/select/dummy/rtl.tsx  8fbe331778e7
+components/select/dummy/sixty-items.tsx  77e331d56e4b
+components/select/dummy/sizes.tsx  3fdf04a1a943
+components/select/dummy/states.tsx  9ea233ed5335
+components/select/hook.ts  61e5c33f6278
+components/select/index.tsx  868fe09ae951
+components/select/lib.ts  0b340b3c1dfd
+components/select/schema.ts  5875ca7c4258
+components/select/types.ts  fbc10b83e616
+components/svg/index.tsx  3514a90657b9
+components/svg/types.ts  421e3ef8a60e
+components/toast/boundaries.ts  b37fcce899bc
+components/toast/classes.ts  b205f9d71c76
+components/toast/client.tsx  887adaa4a24a
+components/toast/constants.ts  0472a018a44a
+components/toast/dummy/basic.tsx  a42a181b767b
+components/toast/dummy/high-priority.tsx  3368c84d08bf
+components/toast/dummy/long-content.tsx  05141b5693a0
+components/toast/dummy/many.tsx  9a0b9ad778e3
+components/toast/dummy/over-dialog.tsx  2d9e75e85dca
+components/toast/dummy/promise.tsx  d69abe119fc8
+components/toast/dummy/rtl.tsx  3b53436238c3
+components/toast/dummy/sticky.tsx  290de6d3d020
+components/toast/dummy/tones.tsx  843a68cb5389
+components/toast/dummy/with-action.tsx  95a0e3776099
+components/toast/dummy/with-description.tsx  fdd4d2bbd262
+components/toast/hook.ts  72e58a72f09a
+components/toast/index.tsx  a5919d63b8b9
+components/toast/lib.ts  a575a93db718
+components/toast/schema.ts  869e99757f9b
+components/toast/types.ts  2ae76450ab31
+icons/data/arrow-right.ts  d67ac346403c
+icons/data/caret-down.ts  f3bef6ce0c56
+icons/data/check-circle.ts  f92cd7a67d51
+icons/data/check.ts  ccd3d5cba890
+icons/data/info.ts  f3890305195e
+icons/data/spinner.ts  f88ce50b490f
+icons/data/warning-circle.ts  ec73f7eb735f
+icons/data/warning.ts  86d00a38a890
+icons/data/x.ts  5c80cfbdedb1
+icons/directional.generated.ts  981e391a7782
+icons/index.ts  b8744a634965
+icons/names.generated.ts  6e75fbfcbedd
+icons/types.ts  665dcdb1986a
+icons/version.generated.ts  83f89f52f392
+shared/adaptive/create-adaptive.tsx  fdd65fc2ada8
+shared/adaptive/use-adaptive-mode.ts  146507fafb88
+shared/clamp.ts  8b3357d9b629
+shared/classes.ts  2e36759fcf77
+shared/cn.ts  4a507659c948
+shared/collection/use-collection.ts  31fc141393f1
+shared/collection/window.ts  9413500304ac
+shared/contracts/boundaries.ts  994e1c4698ae
+shared/contracts/collection.ts  6de20d98af91
+shared/contracts/menu.ts  a6eae4b439c6
+shared/contracts/name.ts  8fe01c9d5d4c
+shared/contracts/option.ts  57dd97bed5dd
+shared/contracts/size.schema.ts  be807d3806a7
+shared/contracts/size.ts  17a08d728121
+shared/contracts/state.ts  8f39e25fa2ff
+shared/contracts/toast.schema.ts  d97a33f73a3f
+shared/contracts/toast.ts  993c3b9b6432
+shared/contracts/tone.ts  1f5cec0766d3
+shared/floating.ts  962b169a7b0b
+shared/form-errors.ts  976865bbbfcc
+shared/labels/ar.ts  ac3552b5142a
+shared/labels/en.ts  f1746707c6c2
+shared/labels/get-labels.ts  4507cefd9c4f
+shared/labels/types.ts  f8900290dfbb
+shared/link.tsx  533ea6fb7b33
+shared/overlay-scope.ts  0cf8ef4c9101
+shared/overlay.ts  5fbd5963f4ca
+shared/provider/context.ts  75c127b04cfc
+shared/provider/provider.tsx  9bf2f76f7dc1
+shared/provider/use-portal-locale.ts  fd4ee65b0c75
+shared/render-trigger.ts  4752ce629ec1
+shared/render.ts  25b333500f9a
+shared/style-tokens.ts  c01e8d1ce97d
+shared/theme/script.ts  e0a8a401b2df
+shared/theme/theme-script.tsx  4fbb364a0a0e
+shared/toast/manager.ts  91fe953395d8
+shared/truncate-label.tsx  c6f1bd58465f
+shared/use-controllable-state.ts  af0e97de7065
+shared/use-form-value.ts  be3abdc2985f
+shared/use-scroll-tab-stop.ts  f09ca0b220d6
+shared/use-server-tab-stop.ts  2da8fb70c356
+shared/variants.ts  778d6eff0e54
+styles.css  e6a22a2f13e6
+tokens.css  8c65e5933637
+# src/app/globals.css
+@import "tailwindcss";
+@import "../topclassui/tokens.css";
+@import "../topclassui/styles.css";
+
+body {
+  margin: 0;
+}
+
+# topclassui.json
+{
+  "version": 1,
+  "framework": "next-app",
+  "css": "src/app/globals.css",
+  "dir": "src/topclassui",
+  "imports": "relative",
+  "packageManager": "npm",
+  "lock": {
+    "registry": "0.0.0",
+    "files": {
+      "components/button/boundaries.ts": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "4b900072876aa2f7af4bbb2d0901f6a1227950eaafb85cbf47648e81be5d12ed"
+      },
+      "components/button/classes.ts": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "504a928f6608f6c80eef33b94e20dd5178d2cb57a36d5c9d420ff54e1f90900a"
+      },
+      "components/button/constants.ts": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "89ccb1d42dbe3442a98c1aa4ea56664fad3959c7a323cdaaea4a7fba57919e3b"
+      },
+      "components/button/dummy/as-link.tsx": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "8bb77316b28e823bd96e0f85a15e6e0ce03e0f5db5206294b04bc167f4cb96fe"
+      },
+      "components/button/dummy/custom-size.tsx": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "9b0caf6811f4db6f41f7e235fcce3a29add8afab83262d16f3119d0c0d72e3de"
+      },
+      "components/button/dummy/full-width.tsx": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "8c54e92f0b390e299ca65ceb40027f9ffd0e1f897498f847a273708e90a55dc8"
+      },
+      "components/button/dummy/long-label.tsx": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "42882a416d4dc7639da898d2cfd16fa11aba286847c9d76a63dbc0a754462670"
+      },
+      "components/button/dummy/rtl.tsx": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "98f037d4b5f526de69343132b29ad46aa6599bfbdb92138701b4516669b32116"
+      },
+      "components/button/dummy/sizes.tsx": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "8a7e5088189e2757a8f88bdfa76a7c939763a9907e6daf6de6f2e1d2dc8749eb"
+      },
+      "components/button/dummy/skeleton.tsx": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "ed9eedb88af34609947829d1a260e8ba740e7ab7de6f892536dfe094bbc1b73b"
+      },
+      "components/button/dummy/states.tsx": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "9019a3645541ecde86fcb2eae65c43dc0bc1500839c63f732208cb0ac79c8af4"
+      },
+      "components/button/dummy/tones.tsx": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "f9b5b57e18cd3f2525c2b64cede4af2a1dff52f11bb5479cbf0bbb77aabe4f1d"
+      },
+      "components/button/dummy/variants.tsx": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "c5a4f3f312eb9bc4bfbb5c32d38e39b879b3061748b341fa751d68f97944fa98"
+      },
+      "components/button/dummy/with-icon.tsx": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "204b7b16a78d70a2c55ae5ff1dc8d1be8f6376ef22bcf6cc1dab2b094a57344a"
+      },
+      "components/button/index.tsx": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "7b85b4826e0094123e50179df26d4f92623f9b6cd8c64516f3688f280bd87dbd"
+      },
+      "components/button/schema.ts": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "6f97e263ea6f75f9eaf8536b255fcae0b5595d96d0270bd1cbe28474630c6fba"
+      },
+      "components/button/skeleton.tsx": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "acb869d6cc10f7fccb37979b6074c4d7026444af0b23c03abe580ff50ea957c5"
+      },
+      "components/button/types.ts": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "4d790d19e519beb0e02f66d06a71b8840045c5b7d87d64099358d6b65a50b171"
+      },
+      "components/button/variants.ts": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "ec77eabeee0be047c88eeec415d9b4c0a4dff5f52af6da78c173cf18a5d625c3"
+      },
+      "components/dialog/classes.ts": {
+        "from": "dialog",
+        "version": "0.0.0",
+        "sha256": "e0e06db161fc5cfa6ffd27204435e735cb353d6ff72d0205522a41ed1b8b088e"
+      },
+      "components/dialog/client.tsx": {
+        "from": "dialog",
+        "version": "0.0.0",
+        "sha256": "a985b92f4206b3c5708fa5538e144f20156a5bf895efac76147d681639e36f45"
+      },
+      "components/dialog/constants.ts": {
+        "from": "dialog",
+        "version": "0.0.0",
+        "sha256": "31f59af76a2519e2aa2a3f010f5ab4d64430d4458acac23e2c7ef3fa78e82370"
+      },
+      "components/dialog/dummy/basic.tsx": {
+        "from": "dialog",
+        "version": "0.0.0",
+        "sha256": "6c1d3739f8b1ac339b55b37714e11c81872e9d374600601fe3c35171c9788d4d"
+      },
+      "components/dialog/dummy/confirm.tsx": {
+        "from": "dialog",
+        "version": "0.0.0",
+        "sha256": "9642dedef3b5ace3913a0c8b6c87ac785d6899e3545161b5657a17904a3ee356"
+      },
+      "components/dialog/dummy/long-body.tsx": {
+        "from": "dialog",
+        "version": "0.0.0",
+        "sha256": "cf9b3c31efbe38dad67676385052eca561623cd2bc97c51ff1a82db6a1dc503c"
+      },
+      "components/dialog/dummy/long-content.tsx": {
+        "from": "dialog",
+        "version": "0.0.0",
+        "sha256": "8702edc7b5937b32d69ca360c57973ffead283a3fa731848674ce60108a6e498"
+      },
+      "components/dialog/dummy/no-close-button.tsx": {
+        "from": "dialog",
+        "version": "0.0.0",
+        "sha256": "c29c3e21914e4fa52be105f43b88bdfae5437a18575100145d4c5ff659880860"
+      },
+      "components/dialog/dummy/non-modal.tsx": {
+        "from": "dialog",
+        "version": "0.0.0",
+        "sha256": "d492ef948279c4356dd8c7ef16810ccbcd16fd6aba4a5d7e28347e8c44488876"
+      },
+      "components/dialog/dummy/rtl.tsx": {
+        "from": "dialog",
+        "version": "0.0.0",
+        "sha256": "e72cae528c9a573a826e9ac965218884d6d45d54f23d565212ac46238f106915"
+      },
+      "components/dialog/dummy/sizes.tsx": {
+        "from": "dialog",
+        "version": "0.0.0",
+        "sha256": "94813dbb37c3f5ef4a5874b2155d2244c0097385ebd2d7e00e499408bd28e998"
+      },
+      "components/dialog/dummy/trap-focus.tsx": {
+        "from": "dialog",
+        "version": "0.0.0",
+        "sha256": "b6694b11f20a35f7371127dee9df9a2d813ea66168004f05626b2867f3624f7e"
+      },
+      "components/dialog/hook.ts": {
+        "from": "dialog",
+        "version": "0.0.0",
+        "sha256": "bdc9906f10136dc8579ccb042aa8fc3fdb006e8467eba0270429cb351858d510"
+      },
+      "components/dialog/index.tsx": {
+        "from": "dialog",
+        "version": "0.0.0",
+        "sha256": "b8a7a05b303c81ceed3e6424a1d7cc8661143f7d46bb85a3ea487aa8fc3adf77"
+      },
+      "components/dialog/schema.ts": {
+        "from": "dialog",
+        "version": "0.0.0",
+        "sha256": "1c80e945de0a927fe570a3f0cdfa74c304ce2fe94a42341d2ac1cc82705e55b2"
+      },
+      "components/dialog/types.ts": {
+        "from": "dialog",
+        "version": "0.0.0",
+        "sha256": "deb92234388ca33af2e72604389ffa772513b35361c5d121e4b70bb39d1e3bbc"
+      },
+      "components/select/classes.ts": {
+        "from": "select",
+        "version": "0.0.0",
+        "sha256": "11e76755da1dbbed1d135b9c7fded3dd8968fde8b4baadbe9fb53c172b201d95"
+      },
+      "components/select/client.tsx": {
+        "from": "select",
+        "version": "0.0.0",
+        "sha256": "11f22211dd852e95e6b6860f2468bf6e5714e294fddff4d6480a9135a9f8d8ba"
+      },
+      "components/select/constants.ts": {
+        "from": "select",
+        "version": "0.0.0",
+        "sha256": "39c27146b0413c38ec99cefb4f0a70f1e161c08a63f9c067af57e7978a93fbbf"
+      },
+      "components/select/dummy/basic.tsx": {
+        "from": "select",
+        "version": "0.0.0",
+        "sha256": "9dd3a3d4158bce085659cd87d13743913e83ed059e3c4fe31a2bcae143a9db9e"
+      },
+      "components/select/dummy/form.tsx": {
+        "from": "select",
+        "version": "0.0.0",
+        "sha256": "9b8024353d8d96d25d22d522fff6ab07eb56667fc177053f2bb8ed1b88bffe56"
+      },
+      "components/select/dummy/four-rows.tsx": {
+        "from": "select",
+        "version": "0.0.0",
+        "sha256": "31eea2abee3c8b5ae88d18aa6ce4ce2e01c7ba0f1542c1d6be83a6c7b97283f3"
+      },
+      "components/select/dummy/long-content.tsx": {
+        "from": "select",
+        "version": "0.0.0",
+        "sha256": "f0008342f0b22586f212d2cf9f04b319ab7f3392355cbd798f5c3ff4deeb061b"
+      },
+      "components/select/dummy/rtl.tsx": {
+        "from": "select",
+        "version": "0.0.0",
+        "sha256": "8fbe331778e7518a3c79fb030e68757a0a7ef48cb96456d74f792a16705c0624"
+      },
+      "components/select/dummy/sixty-items.tsx": {
+        "from": "select",
+        "version": "0.0.0",
+        "sha256": "77e331d56e4b330b7297951cc9354046deceb709967d531cb57740a31a14b929"
+      },
+      "components/select/dummy/sizes.tsx": {
+        "from": "select",
+        "version": "0.0.0",
+        "sha256": "3fdf04a1a943d94b64702e5cb5512c9a79b284e876737c9d3265e7c0c999353b"
+      },
+      "components/select/dummy/states.tsx": {
+        "from": "select",
+        "version": "0.0.0",
+        "sha256": "9ea233ed5335146b372424a8179ecd669631a284d45eda417f089dbe1a71311f"
+      },
+      "components/select/hook.ts": {
+        "from": "select",
+        "version": "0.0.0",
+        "sha256": "61e5c33f6278d34c3af8f590dc6dccddaeb56805ad28986b6b6956699b80ffff"
+      },
+      "components/select/index.tsx": {
+        "from": "select",
+        "version": "0.0.0",
+        "sha256": "868fe09ae951f3863c4a1f3c6d4cf6fba171a94cebfb0c29d9f5ee1c397262f6"
+      },
+      "components/select/lib.ts": {
+        "from": "select",
+        "version": "0.0.0",
+        "sha256": "0b340b3c1dfd16a99805aae3ebc3570c5d86a39e06d732ceea2dc6f2ec3b0926"
+      },
+      "components/select/schema.ts": {
+        "from": "select",
+        "version": "0.0.0",
+        "sha256": "5875ca7c42588d26cb5c3771c330dfde4385aa7c399038314115cc9f59c7f72e"
+      },
+      "components/select/types.ts": {
+        "from": "select",
+        "version": "0.0.0",
+        "sha256": "fbc10b83e6163895368ff042c5e673f36948f422dc646f7725c9d7c3e5d92c1c"
+      },
+      "components/svg/index.tsx": {
+        "from": "svg",
+        "version": "0.0.0",
+        "sha256": "3514a90657b9e00a20ecdbc169e13096a47a6270e820bfc75b978bab90cab72d"
+      },
+      "components/svg/types.ts": {
+        "from": "svg",
+        "version": "0.0.0",
+        "sha256": "421e3ef8a60ec9e899ed8af7f052661b19fff4cc21157af450ea0549fc6cb33a"
+      },
+      "components/toast/boundaries.ts": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "b37fcce899bc5997097edc5e199829b60fe4742bdcac724c8091c7d0b3e4dd30"
+      },
+      "components/toast/classes.ts": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "b205f9d71c76084a25eaafd16ef12d794d79f35c7018965144c5a799ad88285d"
+      },
+      "components/toast/client.tsx": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "887adaa4a24ace38d97582d89f92412bc3032c90a9a05f74d48d759ac327595f"
+      },
+      "components/toast/constants.ts": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "0472a018a44a1a83becfc78bdb40ee6a6131046428cd2305a7b7101f291e5ac6"
+      },
+      "components/toast/dummy/basic.tsx": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "a42a181b767b9e508ca5a8a6d0b353e0ec3a563b77fe41b390e4399baab82f8a"
+      },
+      "components/toast/dummy/high-priority.tsx": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "3368c84d08bf8260af97dd3d2a324fdaee345bbe06ae206bfde7d12719defa43"
+      },
+      "components/toast/dummy/long-content.tsx": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "05141b5693a0a16d42d547700506af4b26485f8b06062c317049288f6a7bc023"
+      },
+      "components/toast/dummy/many.tsx": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "9a0b9ad778e3a595cf8be0bbb470e02e3bedc964287b9f2ef67776e52e7ea9ea"
+      },
+      "components/toast/dummy/over-dialog.tsx": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "2d9e75e85dcaa05b2affb42c3e4c1000d483b97fe5fc02cfc7ac82bbd1c05822"
+      },
+      "components/toast/dummy/promise.tsx": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "d69abe119fc8c316f633ce70eadd4b6d9c4d32bf031758a4897c982f38e08b82"
+      },
+      "components/toast/dummy/rtl.tsx": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "3b53436238c39367187e7ba78f6cedb905fec9d73fa8cabca606d10d38188e21"
+      },
+      "components/toast/dummy/sticky.tsx": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "290de6d3d0205eb99ac4d34ac9f55a89a86a3c67eb7d82984c3c267aba2c7c0a"
+      },
+      "components/toast/dummy/tones.tsx": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "843a68cb53898b58336bf9b0e8fd2d842a3ebf06f480eeb178a31e78bccfab0d"
+      },
+      "components/toast/dummy/with-action.tsx": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "95a0e37760990e45b8c98f6ac9b139f8a05fbbfc843aa6b0bfa3a2e777e7f47c"
+      },
+      "components/toast/dummy/with-description.tsx": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "fdd4d2bbd26206bff17e598c316e444b4d01cf1ff3c11d97897d2ac27b9beaeb"
+      },
+      "components/toast/hook.ts": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "72e58a72f09a6031d6627b8ba454e3244c76cff778efe10ccc1a375b3781ab6c"
+      },
+      "components/toast/index.tsx": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "a5919d63b8b9bee6bd7531dbdabaaeacaeae98c833051944bca0a357866599ce"
+      },
+      "components/toast/lib.ts": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "a575a93db718fb9b5fed8d921c43396a5b72055ce0b3c1b355928647d8b98680"
+      },
+      "components/toast/schema.ts": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "869e99757f9be3839ee788a0b974399661ae660d5a1116aa9d912d500fa0e9f3"
+      },
+      "components/toast/types.ts": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "2ae76450ab31475b458211f12c17844a59a8db45b5647a6acd88a1ecfbb6d3fe"
+      },
+      "icons/data/arrow-right.ts": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "d67ac346403c836a26dcb105c42113eb4c9c03ddbf2326dd1e39bf0f41efd628"
+      },
+      "icons/data/caret-down.ts": {
+        "from": "select",
+        "version": "0.0.0",
+        "sha256": "f3bef6ce0c56c498ae0475582b79e953ee905ced06e9d4a90c971b06f11546ea"
+      },
+      "icons/data/check-circle.ts": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "f92cd7a67d51f6f92133f1f5cc7ded04b597e507fbcb834033654af42af3d5d5"
+      },
+      "icons/data/check.ts": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "ccd3d5cba89069c9c203b177bca8dc6daeb92c0d4d25fb5a8d3242cfe8fb07d0"
+      },
+      "icons/data/info.ts": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "f3890305195e31a249d84ebb6dabcc0e69f1a594c0b16a9801596b9f91513f63"
+      },
+      "icons/data/spinner.ts": {
+        "from": "button",
+        "version": "0.0.0",
+        "sha256": "f88ce50b490f65aa48e3d5f9e6dc4ef93320ad0ba13053683874c200e0ef2749"
+      },
+      "icons/data/warning-circle.ts": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "ec73f7eb735fa8d289bada6926c791b2e70ace999f815cd5984cf897cdf121a7"
+      },
+      "icons/data/warning.ts": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "86d00a38a890a4c86f27551c0648153b3102e0dd871c8fe7e8ae134ad5c85e9d"
+      },
+      "icons/data/x.ts": {
+        "from": "toast",
+        "version": "0.0.0",
+        "sha256": "5c80cfbdedb1dd3b3ccabe0cd291d57222243abfcc0fcae45b575587ef10fa5c"
+      },
+      "icons/directional.generated.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "981e391a77824eeb563e9461cf32465ccc9fde2fd5bbc31be5028b50334f11d3"
+      },
+      "icons/index.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "b8744a634965c1bcb9423b447c110531ceaafbf750309fddff1e1d8beeaa2966"
+      },
+      "icons/names.generated.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "6e75fbfcbedd78cc457d310942021b748150f7f6421bd94fac8e3eaad8cd3163"
+      },
+      "icons/types.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "665dcdb1986a8696ab6f763d80b2beafa5c9412c6ab10a06e4f2c0f6bb4177b7"
+      },
+      "icons/version.generated.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "83f89f52f39231e9a311681671923981447d94774afb7eb6b7d93a3881e841d3"
+      },
+      "shared/adaptive/create-adaptive.tsx": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "fdd65fc2ada8fb81b4ef25a1a505c0462f7e566de43e4b23f8b9670daf530044"
+      },
+      "shared/adaptive/use-adaptive-mode.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "146507fafb887e89936034036290416b8e6d181d2c385287ef6b96f22b631e93"
+      },
+      "shared/clamp.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "8b3357d9b629541c23b8946d94d3e4da2e917fbcc7265f4a45bc60c9a9cc8cc6"
+      },
+      "shared/classes.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "2e36759fcf77b9973fbb5dd5aa5d327b476463bf7f9ad99d5aecda1ba273acba"
+      },
+      "shared/cn.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "4a507659c948ad6ab5d32b5616455cd79b4a51d8becd4552b56cf91147c97271"
+      },
+      "shared/collection/use-collection.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "31fc141393f1309c7138abbf40161801015f0851b9841ae6695d4fbb4e542879"
+      },
+      "shared/collection/window.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "9413500304acedc08d3537eee417749c703769b47435fcb369dfed135bc97a63"
+      },
+      "shared/contracts/boundaries.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "994e1c4698ae21a2a4da75b93f4939309ed058ef1208cd0ad07de6ea1e4af78e"
+      },
+      "shared/contracts/collection.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "6de20d98af91773e206cfd574dadedc1e868b9c1a68a80e3ea0781414982b873"
+      },
+      "shared/contracts/menu.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "a6eae4b439c6256e2f0282fc5daa305968406a1b7c9e0a44ff8e0cfe0b563be8"
+      },
+      "shared/contracts/name.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "8fe01c9d5d4c9dc01f87de84f6f8cddddd869b5c5533c7ebf6715ab36967ca5c"
+      },
+      "shared/contracts/option.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "57dd97bed5dd6a275cfd2cf525fd559d18f90438c1f05bd04c4176a3fa3c4f8f"
+      },
+      "shared/contracts/size.schema.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "be807d3806a755fb00db8fd63123bc8f6101f642246da4e2ddf8f1f59fa51969"
+      },
+      "shared/contracts/size.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "17a08d72812102324873fef331e8818ee73618c9200d8022c94c231f3400a485"
+      },
+      "shared/contracts/state.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "8f39e25fa2ff163d012db15989383faf704727a9eb6b83034b22a6d55a5f5928"
+      },
+      "shared/contracts/toast.schema.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "d97a33f73a3ffab14002f0fcb1840f7dae16fe89cce230b0ddef123fa2555eb5"
+      },
+      "shared/contracts/toast.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "993c3b9b643215acc590d1dd4b05de710fa8cf532b63d5a2030266ae9389c020"
+      },
+      "shared/contracts/tone.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "1f5cec0766d3b7f15d1dd6a360c250d097bc69c8b37277e593c6cd2797cde88b"
+      },
+      "shared/floating.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "962b169a7b0b84842ac3e33f372205906c6681b86c00bb4bb69ca3b56ac9aee9"
+      },
+      "shared/form-errors.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "976865bbbfccd3109c0793d7787a2a07fab5a5d5106c90340145bf06ee10f604"
+      },
+      "shared/labels/ar.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "ac3552b5142a91dc56d7987cc7c5e8ed748a9b33526b92e04b6a3051ca04edfa"
+      },
+      "shared/labels/en.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "f1746707c6c241cee714db8b5800acfe7011f9fbd348cfc50748a95c93ea81c7"
+      },
+      "shared/labels/get-labels.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "4507cefd9c4fb616bf8df98aa6b7558882d35aeb4ff84481cf89da955b977234"
+      },
+      "shared/labels/types.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "f8900290dfbb0ca539baf67a7943b6eae3ac3595fd09da6d6cc491eaf194acf6"
+      },
+      "shared/link.tsx": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "533ea6fb7b33b5e71cf687995f26188c9ea74b6813a15020a6f08b922073f28c"
+      },
+      "shared/overlay-scope.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "0cf8ef4c9101f430b7c67a29e25b676612e50eaff28ebf0325b7ea414f445b1b"
+      },
+      "shared/overlay.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "5fbd5963f4ca4e9537ed9a1b2fe4d37706f6b887cfd0c0e7b1cc377cddffb911"
+      },
+      "shared/provider/context.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "75c127b04cfcc72e2009599aa039442306e7f27602027c48a64b410693ea8bb4"
+      },
+      "shared/provider/provider.tsx": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "9bf2f76f7dc197d6257ffad4c0acdfcf2ee4de2e786e3c0729a87dc41af8fb45"
+      },
+      "shared/provider/use-portal-locale.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "fd4ee65b0c75efb912ea325d28591cddf3bd7ff416bef3fe053259fe00a8d60c"
+      },
+      "shared/render-trigger.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "4752ce629ec1705d7e828a6583c4fe3fed91e80c19b2df547c9af5620fa7edb1"
+      },
+      "shared/render.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "25b333500f9a658815e49e2bbc25ac55c109e0bea125620d7727d18c5d759231"
+      },
+      "shared/style-tokens.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "c01e8d1ce97dd31e21bffa3b46849ee6c9bc66eed2e3a16eade5a954ba95daf5"
+      },
+      "shared/theme/script.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "e0a8a401b2df17e3d30d0f1b0dabcdc082e770035aeeba6032530f1214849535"
+      },
+      "shared/theme/theme-script.tsx": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "4fbb364a0a0e1dc56cf975bcaeb344db991bb1096791bdb29c8c6e219ed02024"
+      },
+      "shared/toast/manager.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "91fe953395d8383f3712f4477baf77ee0974ac59007a2642eee9710963ff6746"
+      },
+      "shared/truncate-label.tsx": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "c6f1bd58465f4bd912caf466364a656441829d9d52a33dffdd636340a8199e11"
+      },
+      "shared/use-controllable-state.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "af0e97de7065c297d547ee92457c904fc64f0b23fdd6f0f028548aae576b811c"
+      },
+      "shared/use-form-value.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "be3abdc2985fdd6a3da16769a3530885879f93c7e3e012e0a4ad5c0b92d02e49"
+      },
+      "shared/use-scroll-tab-stop.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "f09ca0b220d69cac1bcb8f27d0a72074c012f5d64db63902cb5eb117948a7853"
+      },
+      "shared/use-server-tab-stop.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "2da8fb70c3569fc2085f12f3ef521a0bde7effeae1d3611d1ab537c86c4f9d95"
+      },
+      "shared/variants.ts": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "778d6eff0e547bc24c800cbe52f6555ec6602ea4adc1339cb57c889404bc4200"
+      },
+      "styles.css": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "e6a22a2f13e6866cd180f162c5aefcec88b078f8efb4be7be7886c1ba964a55a"
+      },
+      "tokens.css": {
+        "from": "base",
+        "version": "0.0.0",
+        "sha256": "8c65e5933637dffa5d5abe32091ee4add068fef4a812cc8b30345e189b952637"
+      }
+    }
+  }
+}

@@ -70,7 +70,9 @@ describe('the registry of the library in this repository', () => {
   it('writes items in the shadcn shape, ranges included', () => {
     const dialog = registry.items.find((i) => i.name === 'dialog')
     expect(dialog?.$schema).toBe('https://ui.shadcn.com/schema/registry-item.json')
-    expect(dialog?.dependencies).toEqual(['@base-ui/react@1.8.0', 'react', 'zod@4.6.5'])
+    // Each package carries the library's own range; react is a peer, so it carries none.
+    expect(dialog?.dependencies.map((d) => d.replace(/(?<=.)@.*$/, ''))).toEqual(['@base-ui/react', 'react', 'zod'])
+    expect(dialog?.dependencies.filter((d) => /^[^@]+@|^@[^@]+@/.test(d))).toHaveLength(2)
     expect(dialog?.files[0]?.target).toBe('~/topclassui/components/dialog/classes.ts')
     expect(dialog?.files[0]?.content).toContain('#shared/')
   })
