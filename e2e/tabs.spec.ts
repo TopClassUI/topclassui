@@ -17,9 +17,11 @@ const TABS: Record<string, number> = {
   'tabs--enclosed': 1,
   'tabs--long-label': 2,
   'tabs--many': 2,
+  'tabs--playground': 1,
   'tabs--rtl': 1,
   'tabs--server-content': 1,
   'tabs--sizes': 12,
+  'tabs--states': 2,
 }
 
 /** The three screens Unit 3 measures at, and a phone on its side. */
@@ -153,7 +155,7 @@ test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) 
 
 test('the table names every tabs demo', () => {
   expect(Object.keys(TABS).sort()).toEqual(DEMOS.filter((demo) => demo.startsWith('tabs--')).sort())
-  expect(Object.keys(TABS)).toHaveLength(9)
+  expect(Object.keys(TABS)).toHaveLength(11)
 })
 
 // PLAN 19, Phase 6: accepted on the HTML the server sends, before any script has run.
