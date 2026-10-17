@@ -71,9 +71,8 @@ for (const direction of DIRECTIONS) {
       await page.keyboard.press('Tab')
       await page.keyboard.type('a')
       await opened(page)
-      await page.keyboard.press('ArrowDown')
-      const row = await active(page)
-      for (const key of ['ArrowLeft', 'ArrowRight', 'Home', 'End']) expect(await press(page, key), key).toBe(row)
+      expect(await press(page, 'ArrowDown')).toBe('Astro')
+      for (const key of ['ArrowLeft', 'ArrowRight', 'Home', 'End']) expect(await press(page, key), key).toBe('Astro')
       await expect(popupOf(page)).toBeVisible()
       await expect(inputOf(page)).toHaveValue('a')
     })
@@ -105,6 +104,27 @@ for (const direction of DIRECTIONS) {
       await expect(inputOf(page)).toHaveValue('Next.js')
       await page.keyboard.press('Escape')
       await expect(inputOf(page)).toHaveValue('')
+    })
+
+    // AriaCombobox.js:1014: read-only locks the value, not the browsing; ComboboxInput.js:294 stops the Enter.
+    test('a read-only input opens on the arrows and the highlight moves and wraps, but Enter, a letter and Backspace change nothing', async ({ page }) => {
+      await openLive(page, 'combobox--states', { direction })
+      await walk(page, 2)
+      const name = 'Read-only'
+      await expect(inputOf(page, name)).toHaveValue('Saudi Arabia')
+      expect(await press(page, 'ArrowDown', name)).toBe('Saudi Arabia')
+      await opened(page)
+      expect([await press(page, 'ArrowDown', name), await press(page, 'ArrowDown', name), await press(page, 'ArrowUp', name)]).toEqual([null, 'Jordan', null])
+      expect(await press(page, 'ArrowUp', name)).toBe('Saudi Arabia')
+      expect(await press(page, 'ArrowUp', name)).toBe('Morocco')
+      await page.keyboard.press('Enter')
+      await page.keyboard.type('x')
+      await page.keyboard.press('Backspace')
+      await expect(inputOf(page, name)).toHaveValue('Saudi Arabia')
+      await page.keyboard.press('Escape')
+      await expectClosed(page, POPUP)
+      await expect(inputOf(page, name)).toBeFocused()
+      await expect(inputOf(page, name)).toHaveValue('Saudi Arabia')
     })
 
     test('a disabled option takes the highlight and Enter does not choose it', async ({ page }) => {
