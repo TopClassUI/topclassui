@@ -50,11 +50,14 @@ ArrowRight and ArrowUp add a `step`, ArrowLeft and ArrowDown take one away, Page
 Down or Shift with an arrow move by `largeStep` (10), Home and End go to `min` and `max`, or to
 the other thumb of a range. **Under an RTL `TopClassProvider` the track runs from the right**:
 ArrowLeft adds a step and ArrowRight takes one away, and a value of 30 sits 30% in from the
-right. A demo with no provider keeps the LTR keys whatever its `dir`. A press on the track moves
+right. With no provider the slider runs left to right, its keys and its drawing alike, whatever
+the page's `dir`: its root carries the provider's direction. A press on the track moves
 the nearest thumb there; a drag moves it with the pointer.
 
 **`min`, `max` and `step`** are Base UI's 0, 100 and 1, clamped to plus or minus 1e15 and a
-`step` of at least 0.000001. A value outside them is shown at the limit.
+`step` of at least 0.000001. A value outside them is shown at the limit. **`largeStep`** (10) is
+clamped to at least the `step`, so Page Up always moves, and **`minStepsBetweenValues`** (0) to
+at least 0, so the thumbs of a range never cross.
 
 **The form.** With a `name`, each thumb's range input sends `name=<value>`: the minimum when
 no default is given, and the name twice for a range. **Before the page hydrates the range input
@@ -64,18 +67,26 @@ form action that settles brings the slider back to its `defaultValue` of the lat
 to `min`; a controlled slider keeps its owner's value. A reset calls no `onValueChange`.
 
 **`showValue`** writes the value after the track, in the provider's locale and digits, or in
-your `locale` and `format`. A `format` of `percent` multiplies: give it values from 0 to 1.
+your `locale` and `format`. A `format` of `percent` multiplies: give it values from 0 to 1. A
+value too long to sit beside the track, such as a currency range, moves below it to the end of
+its own line, so the track keeps at least two thirds of the slider, and a longer one wraps.
 
-**`invalid`** sets `aria-invalid` on the group, where a screen reader does not land: point
-`aria-describedby` at the error text. The fill and the knob turn red, and a line is drawn
-around the track. **`disabled`** dims it and disables every range input, so the form sends
-nothing. A slider has no read-only state.
+**`invalid`**, or an `aria-invalid` a Field passes, sets `aria-invalid` on the group and, from
+hydration, on each range input, the element a screen reader lands on: point `aria-describedby`
+at the error text too. The fill and the knob turn red, and so does the line around the track.
+**`disabled`** dims it and disables every range input, so the form sends nothing; a disabled
+`<fieldset>` around it dims it too, and a press on its track moves nothing. A slider has no
+read-only state.
+
+**The track** has a line around it, `--tc-line-strong`, at 3:1 on the page in every mode: its
+soft fill alone is 1.2:1, too faint to show where the range ends.
 
 **The width** is an Input's of the same `size` (`--tc-input-width`), and it shrinks in a narrow
 track. **`fullWidth`** fills the parent, but in a parent that sizes to its content (a `w-fit`
 box, a table cell) there is nothing to fill and the slider is as wide as its thumb, 24 px, 44 on
-touch. The track is inset by half a target, 12 px, 22 on touch, so a thumb at either end stays
-inside the box: its ends do not line up with a field above it.
+touch. The track is inset by half a target, 12 px, 22 on touch, or by half the knob and its focus ring
+when that is more (14 px at `md`, 18 at `xl`, more at a larger root), so a thumb and its ring at
+either end stay inside the box: its ends do not line up with a field above it.
 
 **The thumb is the target**: 24 px, 44 under a finger, whatever `size` draws the knob. The focus
 ring is around the knob.
@@ -86,8 +97,8 @@ ring is around the knob.
 |---|---|
 | `Slider.Root`, `Control`, `Track`, `Indicator`, `Thumb`, `Value`, the keys, a press and a drag | as they are, as one element |
 | `value`, `defaultValue`, `onValueChange`, `onValueCommitted` | a number or a pair, pinned by the type argument; the value is held for the form reset |
-| `min`, `max`, `step` | clamped |
-| `largeStep`, `minStepsBetweenValues`, `thumbCollisionBehavior`, `orientation`, `name`, `form`, `disabled` | passed through |
+| `min`, `max`, `step`, `largeStep`, `minStepsBetweenValues` | clamped |
+| `thumbCollisionBehavior`, `orientation`, `name`, `form`, `disabled` | passed through |
 | `format`, `locale` | the provider's locale and digits unless you pass your own |
 | `thumbAlignment` | always `center`: `edge` places the thumb with an inline script, which needs a CSP nonce |
 | `Slider.Label` | not used: it names nothing until hydration |
@@ -118,9 +129,11 @@ Required: `aria-label` or `aria-labelledby`. Every other prop below is optional.
 | `aria-labelledby` | **yes**, or `aria-label` | `string` | - | The id of the visible text that names the group. |
 | `className` | no | `string` | - | Merged last, so a consumer class wins a conflict with the slider's own. |
 | `fullWidth` | no | `boolean` | `false` | Fills its parent instead of taking the width of an Input of its size. |
-| `invalid` | no | `boolean` | `false` | Marks the value as wrong: sets aria-invalid on the group, and the fill, the knob and a line around the track turn to danger. |
+| `invalid` | no | `boolean` | `false` | Marks the value as wrong: sets aria-invalid on the group and on each range input, and the fill, the knob and the line around the track turn to danger. |
+| `largeStep` | no | `number`, min 0.000001, max 1000000000000000 | `10` | What Page Up, Page Down and Shift with an arrow move; clamped to at least the step, so they always move. |
 | `max` | no | `number`, min -1000000000000000, max 1000000000000000 | `100` | The highest value; clamped to plus or minus 1e15. |
 | `min` | no | `number`, min -1000000000000000, max 1000000000000000 | `0` | The lowest value, and the value of a slider with no default; clamped to plus or minus 1e15. |
+| `minStepsBetweenValues` | no | `number`, min 0, max 1000000000000000 | `0` | The fewest steps between the two thumbs of a range; clamped to at least 0, so the thumbs never cross. |
 | `ref` | no | `Ref<HTMLDivElement>` | - | The root element, the `<div role="group">`. |
 | `required` | no | `boolean` | - | Accepted so a Field can spread its object, and dropped: Base UI has none, and a slider always has a value. |
 | `showValue` | no | `boolean` | `false` | Writes the value after the track, in the locale and the digits of the provider. |
