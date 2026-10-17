@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['custom-size', 'inherit-color', 'rtl', 'sizes', 'tones', 'with-text']
+const EXPECTED = ['custom-size', 'inherit-color', 'playground', 'rtl', 'sizes', 'states', 'tones', 'with-text']
 
 describe('every demo renders on the server', () => {
   it('holds exactly the demos PLAN 20 asks for, so none can be deleted silently', () => {

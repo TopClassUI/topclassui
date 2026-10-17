@@ -8,7 +8,7 @@ export default function Demo() {
   return (
     <Banner
       tone="info"
-      aria-label="Release announcement"
+      aria-label="New version announcement"
       icon={<Svg icon={bell} size="xs" />}
       action={<Button size="sm" variant="outline" tone="info" render={<a href="/changelog" />}>Read more</Button>}
     >
