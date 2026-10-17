@@ -20,7 +20,7 @@ import { FOCUS_RING, TOUCH_TARGET } from 'topclassui/classes'
 
 ## حجم الهدف
 
-لا يقل أي عنصر تفاعلي عن <span dir="ltr">24 × 24</span> بكسل <span dir="ltr">CSS</span>، ويكبر إلى 44 على شاشات اللمس وغيرها من المؤشرات غير الدقيقة.
+لا يقل أي عنصر تفاعلي عن <span dir="ltr">24 × 24</span> بكسل <span dir="ltr">CSS</span>، ويكبر إلى 44 مع مؤشر اللمس وغيره من المؤشرات غير الدقيقة.
 
 ```tsx check
 import { TOUCH_TARGET } from 'topclassui/classes'
@@ -81,7 +81,7 @@ export function Email() {
 | الفحص | الطريقة | التوقيت |
 |---|---|---|
 | التباين | <span dir="ltr">`check-contrast.ts`</span> | في كل تشغيل لـ <span dir="ltr">`pnpm check`</span> |
-| <span dir="ltr">ARIA</span> والأدوار | <span dir="ltr">axe-core</span> في كل عرض توضيحي | في كل تشغيل لـ <span dir="ltr">`pnpm check`</span> |
+| <span dir="ltr">ARIA</span> والأدوار | <span dir="ltr">axe-core</span> في كل مثال | في كل تشغيل لـ <span dir="ltr">`pnpm check`</span> |
 | حجم الهدف | اختبار في المتصفح يقيس كل عنصر قابل للتركيز | في كل تشغيل لـ <span dir="ltr">`pnpm check`</span> |
 | سلوك لوحة المفاتيح | اختبار لكل مكوّن تفاعلي، وفق ممارسات <span dir="ltr">ARIA</span> للتأليف (<span dir="ltr">ARIA Authoring Practices</span>) | في كل تشغيل لـ <span dir="ltr">`pnpm check`</span> |
 | قارئ الشاشة | <span dir="ltr">NVDA</span> و<span dir="ltr">VoiceOver</span>، يدويًا | قبل كل إصدار |
@@ -89,6 +89,6 @@ export function Email() {
 
 ## الثغرات المعروفة
 
-يُقاس التباين في كل بناء. وتُفحص <span dir="ltr">axe</span> وحجم الهدف وحلقة التركيز والنص الطويل داخل عنصر التحكم في متصفح حقيقي على كل عرض توضيحي، في 3 أوضاع واتجاهين، وللمكوّنات التفاعلية اختبارات للوحة المفاتيح. أما قارئات الشاشة (<span dir="ltr">NVDA</span> و<span dir="ltr">VoiceOver</span>) والألوان القسرية فتُفحص يدويًا، ولم يُنجز ذلك بعد.
+يُقاس التباين في كل بناء. وتُفحص <span dir="ltr">axe</span> وحجم الهدف وحلقة التركيز والنص الطويل داخل عنصر التحكم في متصفح حقيقي على كل مثال، في 3 أوضاع واتجاهين، وللمكوّنات التفاعلية اختبارات للوحة المفاتيح. أما قارئات الشاشة (<span dir="ltr">NVDA</span> و<span dir="ltr">VoiceOver</span>) والألوان القسرية فتُفحص يدويًا، ولم يُنجز ذلك بعد.
 
 <Callout tone="warning">وضع الألوان القسرية فحص يدوي. فالتخطيط الذي يعتمد على تعبئة الخلفيات يختفي فيه، لذلك يُرسم كل مكوّن بحدود.</Callout>
