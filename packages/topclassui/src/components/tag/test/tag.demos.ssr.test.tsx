@@ -18,8 +18,8 @@ const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
 const EXPECTED = [
-  'custom-size', 'element-label', 'link', 'long-label', 'removable', 'removable-sizes', 'rtl', 'sizes', 'tones',
-  'topics', 'with-icon',
+  'custom-size', 'element-label', 'link', 'long-label', 'playground', 'removable', 'removable-sizes', 'rtl', 'sizes',
+  'states', 'tones', 'topics', 'with-icon',
 ]
 
 /** The link demo holds no Tag: its chips are anchors wearing tagVariants(). */

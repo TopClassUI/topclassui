@@ -18,6 +18,7 @@ const AFTER: Record<string, string[]> = {
   'full-width': ['Month'],
   'long-content': ['Shared with me'],
   'many': ['Notifications'],
+  'playground': ['Calendar'],
   'rtl': ['تقويم'],
   'sizes': ['Off', 'Off', 'Off', 'Off', 'Off'],
   'states': ['Invalid', 'Disabled, selected', 'Live', 'Read-only, selected'],
