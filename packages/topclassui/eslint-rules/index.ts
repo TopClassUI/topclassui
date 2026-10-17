@@ -636,6 +636,87 @@ const rules = {
       }
     },
   },
+
+  'client-shape': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-5.12-1: client.tsx is markup plus at most one hook from hook.ts per component.' },
+      schema: [],
+      messages: {
+        state: 'R-5.12-1: {{name}} is state or an effect, which lives in hook.ts; client.tsx only calls the hook that returns it.',
+        foreign: 'R-5.12-1: {{name}} does not come from hook.ts. The component hook there calls it and returns what the markup needs.',
+        second: 'R-5.12-1: {{name}} is a second hook call in {{component}}. Its one hook from hook.ts returns everything.',
+        helper: 'R-5.12-1: {{name}} is not a component. A pure helper lives in lib.ts and a hook in hook.ts.',
+      },
+    },
+    create(ctx: Context) {
+      const file = String(ctx.filename ?? ctx.getFilename?.() ?? '').replace(/\\/g, '/')
+      const body = ctx.sourceCode?.ast?.body ?? ctx.getSourceCode?.().ast?.body ?? []
+      const first = body[0]
+      const directive = first?.type === 'ExpressionStatement' && first.directive === 'use client'
+      // A 'use client' part is client.tsx split up by R-5.12-2, so it keeps the same shape.
+      if (!file.endsWith('/client.tsx') && !(file.includes('/parts/') && directive)) return {}
+      const STATE = new Set(['useState', 'useEffect', 'useLayoutEffect', 'useInsertionEffect', 'useReducer', 'useRef', 'useMemo', 'useCallback'])
+      const isHook = (name: string) => /^use[A-Z]/.test(name)
+      const isComponent = (name: string) => /^[A-Z][A-Za-z0-9]*$/.test(name)
+      const fromHook = new Set<string>()
+      const reactHolders = new Set<string>()
+      const calls = new Map<Node, number>()
+      /** The top-level function a call sits in: the component it belongs to. */
+      const componentOf = (node: Node) => {
+        let outer: Node = null
+        for (let n = node.parent; n; n = n.parent) {
+          if (/Function/.test(String(n.type))) outer = n
+        }
+        return outer
+      }
+      const nameOf = (fn: Node) => String(fn?.id?.name ?? (fn?.parent?.type === 'VariableDeclarator' ? fn.parent.id?.name : '') ?? '')
+      const count = (node: Node, name: string) => {
+        const component = componentOf(node)
+        if (!component) return
+        const seen = (calls.get(component) ?? 0) + 1
+        calls.set(component, seen)
+        if (seen > 1) ctx.report({ node, messageId: 'second', data: { name, component: nameOf(component) || 'this component' } })
+      }
+      const helper = (node: Node, name: string) => {
+        if (name && !isComponent(name)) ctx.report({ node, messageId: 'helper', data: { name } })
+      }
+      return {
+        ImportDeclaration(node: Node) {
+          const source = String(node.source?.value ?? '')
+          for (const spec of node.specifiers ?? []) {
+            const local = String(spec.local?.name ?? '')
+            if (/^\.\.?\/hook\.js$/.test(source)) fromHook.add(local)
+            if (source === 'react' && spec.type !== 'ImportSpecifier') reactHolders.add(local)
+          }
+        },
+        CallExpression(node: Node) {
+          const callee = node.callee
+          if (callee?.type === 'Identifier' && isHook(String(callee.name))) {
+            const name = String(callee.name)
+            if (STATE.has(name)) ctx.report({ node, messageId: 'state', data: { name } })
+            else if (!fromHook.has(name)) ctx.report({ node, messageId: 'foreign', data: { name } })
+            count(node, name)
+            return
+          }
+          if (callee?.type === 'MemberExpression' && isHook(String(callee.property?.name ?? ''))) {
+            const name = String(callee.property.name)
+            const holder = String(callee.object?.name ?? '')
+            const messageId = reactHolders.has(holder) && STATE.has(name) ? 'state' : 'foreign'
+            ctx.report({ node, messageId, data: { name: `${holder}.${name}` } })
+            count(node, name)
+          }
+        },
+        'Program > FunctionDeclaration, Program > ExportNamedDeclaration > FunctionDeclaration'(node: Node) {
+          helper(node, String(node.id?.name ?? ''))
+        },
+        'Program > VariableDeclaration > VariableDeclarator, Program > ExportNamedDeclaration > VariableDeclaration > VariableDeclarator'(node: Node) {
+          if (!/^(Arrow)?Function/.test(String(node.init?.type ?? ''))) return
+          helper(node, String(node.id?.name ?? ''))
+        },
+      }
+    },
+  },
 }
 
 export default { rules } satisfies ESLint.Plugin
