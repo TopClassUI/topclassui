@@ -1,4 +1,5 @@
 import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { createServer } from 'node:net'
 import { spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -7,7 +8,9 @@ import { pathToFileURL } from 'node:url'
 import { afterAll, describe, expect, it } from 'vitest'
 
 import { MUTATIONS } from '../mutations/index.js'
-import { type Mutation, type Run, caughtBy, collectMutations, mutationFiles, readAnchors } from './mutate.js'
+import {
+  type Mutation, type Run, caughtBy, caughtByE2e, collectMutations, e2eArgs, freePort, mutationFiles, readAnchors, summarise,
+} from './mutate.js'
 
 const made: string[] = []
 afterAll(() => { for (const dir of made) rmSync(dir, { recursive: true, force: true }) })
@@ -88,6 +91,24 @@ describe('reading the anchors', () => {
   })
 })
 
+describe('reading the e2e of a row', () => {
+  const dir = folder({ 'a.ts': 'const z = 2\n', 'a.spec.ts': "test('a long word (300 characters) stays inside', () => {})\n" })
+  const at = (spec: string, grep: string): Mutation => ({ label: 'row', file: 'a.ts', from: 'const z = 2', to: '', e2e: { spec, grep } })
+
+  it('passes a spec that exists and a grep its source holds', () => {
+    expect(readAnchors(dir, [at('a.spec.ts', 'a long word (300 characters)')])).toEqual([])
+  })
+
+  it('reports a spec that is gone, which Playwright would read as no test found', () => {
+    expect(readAnchors(dir, [at('b.spec.ts', 'a long word')])).toEqual(['row: the spec b.spec.ts does not exist'])
+  })
+
+  it('reports a grep no title holds, and an empty one, which runs the whole spec', () => {
+    expect(readAnchors(dir, [at('a.spec.ts', 'a short word')])).toEqual(['row: "a short word" is not in a.spec.ts'])
+    expect(readAnchors(dir, [at('a.spec.ts', ' ')])).toEqual(['row: the grep is empty, so it runs all of a.spec.ts'])
+  })
+})
+
 describe('scripts/mutations', () => {
   const FOLDER = join(process.cwd(), 'scripts', 'mutations')
   const labels = MUTATIONS.map((m) => m.label)
@@ -107,6 +128,12 @@ describe('scripts/mutations', () => {
   // pnpm check never runs a mutant, so this is what catches a row whose anchor a fix moved.
   it('finds the anchor of every row exactly once in its file, deletions included', () => {
     expect(readAnchors(process.cwd(), MUTATIONS)).toEqual([])
+  })
+
+  it('judges at least five rows in a browser, each by a spec under e2e/', () => {
+    const browser = MUTATIONS.flatMap((m) => (m.e2e ? [m.e2e.spec] : []))
+    expect(browser.length).toBeGreaterThanOrEqual(5)
+    expect(browser.filter((spec) => !/^e2e\/[a-z0-9-]+\.spec\.ts$/.test(spec))).toEqual([])
   })
 
   it('never repeats a label, because the filter and the report both name a row by it', () => {
@@ -146,5 +173,67 @@ describe('judging a run', () => {
   it('throws for a run that exited 1 with no test failed, which is the machine and not the mutant', () => {
     expect(() => caughtBy(run(1, 'Error: Cannot find module vitest.mjs\n'))).toThrow('vitest exited 1 with no test failed')
     expect(() => caughtBy(run(1, ' Test Files  51 passed (51)\n      Tests  206 passed (206)\n'))).toThrow('with no test failed')
+  })
+})
+
+describe('judging a Playwright run', () => {
+  const run = (status: number | null, stdout = '', extra: Partial<Run> = {}): Run => ({ status, stdout, stderr: '', ...extra })
+
+  it('counts a run with a failed test as caught, and a clean run as survived', () => {
+    const failed = '  \u2718  1 [chromium] \u203a e2e/dialog.spec.ts:528:7 \u203a 320 x 480 ltr (6.1s)\n\n  1 failed\n    [chromium] \u203a e2e/dialog.spec.ts:528:7\n  5 passed (28.7s)\n'
+    expect(caughtByE2e(run(1, failed))).toBe(true)
+    expect(caughtByE2e(run(0, '  6 passed (28.7s)\n'))).toBe(false)
+  })
+
+  it('throws for a run that never finished, which is the runner failing and not the row caught', () => {
+    expect(() => caughtByE2e(run(null, '', { signal: 'SIGKILL' }))).toThrow('playwright did not finish (signal SIGKILL)')
+    expect(() => caughtByE2e(run(null, '', { error: new Error('spawnSync node ENOENT') }))).toThrow('playwright did not finish (spawnSync node ENOENT)')
+  })
+
+  it('throws for a run that exited 1 with no test failed: no test found, or a server that never started', () => {
+    expect(() => caughtByE2e(run(1, 'Error: No tests found\n'))).toThrow('playwright exited 1 with no test failed')
+    const server = 'Error: Timed out waiting 120000ms from config.webServer.\n'
+    expect(() => caughtByE2e(run(1, '', { stderr: server }))).toThrow('config.webServer')
+  })
+
+  it('reads a title that merely says failed as no count of failures', () => {
+    expect(() => caughtByE2e(run(1, '  \u2713  1 the upload reports 2 failed files (1.2s)\n'))).toThrow('with no test failed')
+  })
+})
+
+describe('running a row in Playwright', () => {
+  it('runs one spec on one worker with the list reporter, the grep escaped to a literal', () => {
+    expect(e2eArgs({ spec: 'e2e/dialog.spec.ts', grep: 'a 300-character word (lg)?' })).toEqual([
+      'test', 'e2e/dialog.spec.ts', '-g', 'a 300-character word \\(lg\\)\\?', '--workers=1', '--reporter=list',
+    ])
+  })
+
+  it('finds a port nothing listens on, one a server can then take', async () => {
+    const port = await freePort()
+    expect(port).toBeGreaterThanOrEqual(1024)
+    expect(port).toBeLessThanOrEqual(65535)
+    const server = createServer()
+    await new Promise<void>((resolve, reject) => { server.once('error', reject); server.listen(port, '127.0.0.1', resolve) })
+    await new Promise((resolve) => server.close(resolve))
+  })
+})
+
+describe('the summary', () => {
+  it('counts a row the runner failed on as neither caught nor survived', () => {
+    const text = summarise([
+      { label: 'one', caught: true },
+      { label: 'two', caught: false, error: 'mutate: playwright did not finish (signal SIGKILL)' },
+    ])
+    expect(text).toBe([
+      '  caught  one',
+      '   ERROR  two: mutate: playwright did not finish (signal SIGKILL)',
+      '',
+      'mutate: the runner failed on 1 of 2, which were never judged.',
+    ].join('\n'))
+  })
+
+  it('says ok only when every row was judged and caught, and counts the survivors apart', () => {
+    expect(summarise([{ label: 'one', caught: true }]).split('\n').at(-1)).toBe('mutate: ok, all 1 mutations were caught')
+    expect(summarise([{ label: 'one', caught: false }, { label: 'two', caught: true }]).split('\n').at(-1)).toBe('mutate: 1 of 2 survived.')
   })
 })
