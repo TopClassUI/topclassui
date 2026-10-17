@@ -26,7 +26,9 @@ const failures: string[] = []
 
 function sh(cwd: string, command: string, args: string[]): string {
   console.log(`\n$ ${[command, ...args].join(' ')}   (in ${cwd})`)
-  const result = spawnSync(command, args, { cwd, encoding: 'utf8', env: { ...process.env, CI: '1' }, maxBuffer: 1 << 26 })
+  // npm and npx are .cmd shims on Windows, which only a shell can start; node never needs one. No argument holds a space.
+  const shell = process.platform === 'win32' && command !== 'node'
+  const result = spawnSync(command, args, { cwd, encoding: 'utf8', shell, env: { ...process.env, CI: '1' }, maxBuffer: 1 << 26 })
   const out = `${result.stdout}${result.stderr}`
   console.log(out.trimEnd())
   if (result.status !== 0) throw new Error(`${command} ${args.join(' ')} exited with ${String(result.status)}`)
