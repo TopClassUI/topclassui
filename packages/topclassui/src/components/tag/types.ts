@@ -1,6 +1,5 @@
 import type { ComponentPropsWithRef, ReactNode } from 'react'
 
-import type { Size } from '#shared/contracts/size.js'
 import type { Tone } from '#shared/contracts/tone.js'
 import type { TagSchemaInput } from './schema.js'
 
@@ -16,18 +15,10 @@ export interface TagProps
   extends Omit<ComponentPropsWithRef<'span'>, 'children'>, TagDesignProps {
   /** The label, and any icon beside it. The text carries the meaning; colour never does alone. */
   children?: ReactNode | undefined
-  /** Shows a remove button that calls this; taking the tag out of the list is the caller's. Passed from a client component. */
-  onRemove?: (() => void) | undefined
 }
 
-/** What the server half hands its button: two ids from useId, the look and the handler. Internal. */
-export interface TagRemoveProps {
-  id: string
-  labelId: string
-  tone: Tone
-  size: Size
+/** A Tag with an x. A client export: a client component passes the handler, a Server Component only a Server Action. */
+export interface TagRemovableProps extends TagProps {
+  /** Called with nothing when the x is pressed; taking the tag out of the list is the caller's. */
   onRemove: () => void
 }
-
-/** The removable tag, once its tone and size are settled. Internal. */
-export type TagRemovableProps = Omit<TagProps, 'tone' | 'size' | 'onRemove'> & Pick<TagRemoveProps, 'tone' | 'size' | 'onRemove'>

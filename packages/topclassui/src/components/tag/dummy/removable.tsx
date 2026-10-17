@@ -3,12 +3,13 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { Button } from '#components/button/index.js'
-import { Tag } from '../index.js'
+import { TagRemovable } from '../index.js'
 
 const TOPICS = ['Design systems', 'Accessibility', 'React', 'Tailwind', 'Right to left', 'Server Components']
 
-/** onRemove needs a client file. The caller owns the list: it takes the topic out, then moves the
- * focus to the x that took its place, the one before it, or the button that brings the list back. */
+/** TagRemovable takes a handler, so a client file renders it. The caller owns the list: it takes
+ * the topic out, then moves the focus to the x that took its place, the one before it, or the
+ * button that brings the list back. */
 export default function Demo() {
   const [topics, setTopics] = useState(TOPICS)
   const list = useRef<HTMLUListElement>(null)
@@ -29,9 +30,9 @@ export default function Demo() {
       <ul ref={list} aria-label="Topics" className="flex flex-wrap gap-2">
         {topics.map((topic, index) => (
           <li key={topic} className="flex max-w-full">
-            <Tag onRemove={() => { removed.current = index; setTopics(topics.filter((other) => other !== topic)) }}>
+            <TagRemovable onRemove={() => { removed.current = index; setTopics(topics.filter((other) => other !== topic)) }}>
               {topic}
-            </Tag>
+            </TagRemovable>
           </li>
         ))}
       </ul>

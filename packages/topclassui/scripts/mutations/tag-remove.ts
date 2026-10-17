@@ -1,7 +1,6 @@
-// The mutations of the removable half of src/components/tag. Found by scripts/mutations/index.ts.
+// The mutations of TagRemovable, the client export of src/components/tag. Found by scripts/mutations/index.ts.
 import type { Mutation } from '../lib/mutate.js'
 
-const INDEX = 'src/components/tag/index.tsx'
 const CLIENT = 'src/components/tag/client.tsx'
 const CLASSES = 'src/components/tag/classes.ts'
 const HOOK = 'src/components/tag/hook.ts'
@@ -10,7 +9,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the tag remove button loses aria-labelledby, so it reads "Remove" and not which tag',
     file: CLIENT,
-    from: '      aria-labelledby={`${id} ${labelId}`}\n',
+    from: '        aria-labelledby={`${tag.id} ${tag.labelId}`}\n',
     to: '',
   },
   {
@@ -22,30 +21,36 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the tag remove button loses type="button", so inside a form it submits the form',
     file: CLIENT,
-    from: '      type="button"\n',
+    from: '        type="button"\n',
     to: '',
   },
   {
     label: 'the tag remove label takes the id of the button, so the button names itself and no tag',
-    file: INDEX,
+    file: HOOK,
     from: '  const labelId = useId()',
     to: '  const labelId = id',
   },
   {
-    label: 'the tag remove path is taken by a plain tag too, so a tag with no onRemove renders a client button',
-    file: INDEX,
-    from: '  if (onRemove) {',
-    to: '  if (onRemove ?? children !== undefined) {',
+    label: 'the tag remove chip drops the rest props, so its ref, id and title never reach the root span',
+    file: CLIENT,
+    from: '      {...rest}\n',
+    to: '',
+  },
+  {
+    label: 'the tag remove chip loses the look of a Tag, so the removable one has no tone, size or chip',
+    file: CLIENT,
+    from: 'cn(tagVariants({ tone, size }), REMOVABLE,',
+    to: 'cn(REMOVABLE,',
   },
   {
     label: 'the tag remove label loses its bound, so a pasted file reaches the DOM',
-    file: INDEX,
+    file: CLIENT,
     from: 'className={TAG_LABEL}>{truncateLabel(children, TAG_BOUNDARIES.labelMaxLength)}</span>',
     to: 'className={TAG_LABEL}>{children}</span>',
   },
   {
     label: 'the tag remove chip keeps its end padding, so the x sits a full padding from the edge',
-    file: INDEX,
+    file: CLIENT,
     from: 'REMOVABLE, REMOVABLE_END[size], className',
     to: 'REMOVABLE, className',
   },
@@ -88,8 +93,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the tag remove button is named in English whatever the provider says',
     file: HOOK,
-    from: 'return { label: useLabels().tag.remove }',
-    to: "return { label: useLabels() === undefined ? '' : 'Remove' }",
+    from: 'label: useLabels().tag.remove }',
+    to: "label: useLabels() === undefined ? '' : 'Remove' }",
   },
   {
     label: 'the tag README sample stops moving the focus, so a reader who copies it drops the keyboard on the page body',
