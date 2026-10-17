@@ -21,16 +21,17 @@ type CommandPopupProps = Omit<Base.Popup.Props, 'className' | 'children' | 'rend
   & Pick<Base.Portal.Props, 'container' | 'keepMounted'>
 
 export type CommandProps<T> = CommandCollection<T> & CommandDesignProps & CommandPopupProps & {
-  /** The text a row shows and the query is matched against, word by word. */
+  /** The text a row shows and the query is matched against, word by word. Client-only, as is every function here. */
   getLabel: (item: T) => string
-  /** Called with the chosen item, by a press or by Enter; the palette has closed by then. */
+  /** Called with the chosen item, by a press or by Enter; the palette has closed by then. Client-only. */
   onSelect: (item: T) => void
-  /** The heading a row sits under; rows with none come first, in a group with no heading. */
+  /** The heading a row sits under; rows with none come first, in a group with no heading. Client-only. */
   getGroup?: ((item: T) => string | undefined) | undefined
-  /** What a row holds in place of its label. It stays one row tall. */
+  /** What a row holds in place of its label. It stays one row tall. Client-only. */
   renderItem?: ((item: T) => ReactNode) | undefined
   /** Whether it is open. Use with onOpenChange when controlled. */
   open?: boolean | undefined
+  /** Called with the open state the palette asks for. Client-only. */
   onOpenChange?: ((open: boolean) => void) | undefined
   /** Merged last onto the popup, so a consumer class wins a conflict with its own. */
   className?: string | undefined

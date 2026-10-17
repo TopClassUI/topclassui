@@ -120,7 +120,7 @@ Required: `aria-label` or `aria-labelledby` or `id`. Every other prop below is o
 | `invalid` | no | `boolean` | `false` | Marks the files as wrong: sets aria-invalid on the input, and the line of the zone turns to danger and thickens. |
 | `maxFiles` | no | `integer`, min 1, max 100 | `1` | How many files the list keeps, clamped to 1 to 100; above 1 the input takes several at once. |
 | `maxSize` | no | `integer`, min 1, max 10737418240 | `10737418240` | The largest file accepted, in bytes, clamped to 1 to 10 GiB; checked in the browser only. |
-| `onValueChange` | no | `((files: readonly File[]) => void)` | - | The accepted files after each pick, drop or remove. |
+| `onValueChange` | no | `((files: readonly File[]) => void)` | - | The accepted files after each pick, drop or remove. Client-only. |
 | `ref` | no | `Ref<HTMLDivElement>` | - | The root element, a `<div>`. |
 | `style` | no | `CSSProperties` | - | On the root. |
 | `visibleRows` | no | `number`, min 1, max 20 | `7` | Rows the list shows before it scrolls, clamped; left out, the --tc-list-rows knob applies. |

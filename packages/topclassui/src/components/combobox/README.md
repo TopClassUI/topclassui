@@ -151,10 +151,10 @@ Required: `items`, `aria-label` or `aria-labelledby` or `id`. Every other prop b
 | `hasMore` | no | `boolean` | `false` | More pages exist, so loadMore is called when the open list nears its end. |
 | `invalid` | no | `boolean` | `false` | Marks the value as wrong: sets aria-invalid on the input, whose line turns to danger and thickens. |
 | `keepMounted` | no | `boolean` | - | Keeps the list mounted while it is closed. |
-| `loadMore` | no | `(() => void \| Promise<void>)` | - | Called with no argument when the list nears its end while hasMore is set. Never while it is closed. |
+| `loadMore` | no | `(() => void \| Promise<void>)` | - | Called with no argument when the list nears its end while hasMore is set, never while closed. Client-only, or a Server Action. |
 | `loadMoreThreshold` | no | `integer`, min 0, max 200 | `10` | How many rows from the end loadMore is called, clamped. |
 | `maxLength` | no | `unknown` | `256` | The cap on the typed query, 256 by default; null removes it. No counter is drawn. |
-| `onValueChange` | no | `((value: string \| null, details: ComboboxChan...` | - | Called with the value of the chosen option, or null when the choice is cleared. |
+| `onValueChange` | no | `((value: string \| null, details: ComboboxChan...` | - | Called with the value of the chosen option, or null when the choice is cleared. Client-only. |
 | `placement` | no | `top` \| `top-start` \| `top-end` \| `bottom` \| `bottom-start` \| `bottom-end` \| `start` \| `start-top` \| `start-bottom` \| `end` \| `end-top` \| `end-bottom` | `"bottom-start"` | The side and alignment the list opens at; start and end mirror in Arabic. |
 | `ref` | no | `Ref<HTMLInputElement>` | - | The visible input. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The height, padding and type step of the input; custom emits no size classes. |

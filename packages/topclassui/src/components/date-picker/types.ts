@@ -28,7 +28,7 @@ export type DatePickerProps = Omit<Base.Trigger.Props, TriggerRemoved>
     value?: string | null | undefined
     /** The day of the first render, and the one a form reset brings back. */
     defaultValue?: string | null | undefined
-    /** Called with the ISO date of the day chosen. */
+    /** Called with the ISO date of the day chosen. Client-only. */
     onValueChange?: ((value: string) => void) | undefined
     /** The text of an empty trigger. Left out, the provider's `datePicker.placeholder`. */
     placeholder?: string | undefined

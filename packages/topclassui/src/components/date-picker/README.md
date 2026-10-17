@@ -136,7 +136,7 @@ Required: `aria-label` or `aria-labelledby` or `id`. Every other prop below is o
 | `maxDate` | no | `string` | `"9999-12-31"` | DatePicker: the last day that can be chosen, clamped like minDate and raised to it when below. |
 | `minDate` | no | `string` | `"0001-01-01"` | DatePicker: the first day that can be chosen, an ISO date clamped to 0001-01-01 to 9999-12-31. |
 | `name` | no | `string` | - | The form input's name: the form sends `name=YYYY-MM-DD`, and `name=` when empty. |
-| `onValueChange` | no | `((value: string) => void)` | - | Called with the ISO date of the day chosen. |
+| `onValueChange` | no | `((value: string) => void)` | - | Called with the ISO date of the day chosen. Client-only. |
 | `placeholder` | no | `string` | - | The text of an empty trigger. Left out, the provider's `datePicker.placeholder`. |
 | `placement` | no | `top` \| `top-start` \| `top-end` \| `bottom` \| `bottom-start` \| `bottom-end` \| `start` \| `start-top` \| `start-bottom` \| `end` \| `end-top` \| `end-bottom` | `"bottom-start"` | DatePicker: the side and alignment the calendar opens at; start and end mirror in Arabic. |
 | `ref` | no | `Ref<HTMLButtonElement>` | - | The trigger, a `<button aria-haspopup="dialog">`. |

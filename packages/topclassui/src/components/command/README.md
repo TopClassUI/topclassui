@@ -96,18 +96,18 @@ Required: `getKey`, `getLabel`, `items`, `onSelect`. Every other prop below is o
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `getKey` | **yes** | `(item: T) => string` | - | Stable identity across pages, so a row keeps its place when a page is prepended. |
-| `getLabel` | **yes** | `(item: T) => string` | - | The text a row shows and the query is matched against, word by word. |
+| `getKey` | **yes** | `(item: T) => string` | - | Stable identity across pages, so a row keeps its place when a page is prepended. Client-only. |
+| `getLabel` | **yes** | `(item: T) => string` | - | The text a row shows and the query is matched against, word by word. Client-only, as is every function here. |
 | `items` | **yes** | `readonly T[]` | - |  |
-| `onSelect` | **yes** | `(item: T) => void` | - | Called with the chosen item, by a press or by Enter; the palette has closed by then. |
+| `onSelect` | **yes** | `(item: T) => void` | - | Called with the chosen item, by a press or by Enter; the palette has closed by then. Client-only. |
 | `className` | no | `string` | - | Merged last onto the popup, so a consumer class wins a conflict with its own. |
 | `defaultOpen` | no | `boolean` | `false` | Whether it starts open, when open is not controlled. |
 | `emptyFallback` | no | `ReactNode` | - |  |
-| `getGroup` | no | `((item: T) => string \| undefined)` | - | The heading a row sits under; rows with none come first, in a group with no heading. |
+| `getGroup` | no | `((item: T) => string \| undefined)` | - | The heading a row sits under; rows with none come first, in a group with no heading. Client-only. |
 | `loadingFallback` | no | `ReactNode` | - |  |
-| `onOpenChange` | no | `((open: boolean) => void)` | - |  |
+| `onOpenChange` | no | `((open: boolean) => void)` | - | Called with the open state the palette asks for. Client-only. |
 | `open` | no | `boolean` | - | Whether it is open. Use with onOpenChange when controlled. |
-| `renderItem` | no | `((item: T) => ReactNode)` | - | What a row holds in place of its label. It stays one row tall. |
+| `renderItem` | no | `((item: T) => ReactNode)` | - | What a row holds in place of its label. It stays one row tall. Client-only. |
 | `shortcut` | no | `unknown` | `"k"` | The key that opens it with Ctrl or Cmd, wherever focus is; null for none. |
 | `status` | no | `Exclude<Status, 'error' \| 'loading-more'>` | - | 'idle', 'loading' or 'empty'. Never 'error': with no errorFallback, a failed fetch would read as No results. |
 | `virtualize` | no | `unknown` | `"auto"` | Windowing: auto mounts only the rows in view above the provider threshold (200). |

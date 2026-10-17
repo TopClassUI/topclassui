@@ -3,7 +3,7 @@ import type { StateProps } from './state.js'
 /** R-8.5-1: every component that renders items takes these, so behaviour is identical everywhere. */
 export interface CollectionProps<T> extends StateProps {
   items: readonly T[]
-  /** Stable identity across pages, so a row keeps its place when a page is prepended. */
+  /** Stable identity across pages, so a row keeps its place when a page is prepended. Client-only. */
   getKey: (item: T) => string
   /** Rows before scrolling; defaults to the --tc-list-rows knob. */
   visibleRows?: number | undefined
