@@ -1,5 +1,5 @@
 // pnpm test:mutation - the gate on the gates. See scripts/mutations/index.ts.
-import { cpSync, mkdtempSync, readFileSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs'
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, sep } from 'node:path'
 import { spawnSync } from 'node:child_process'
@@ -28,8 +28,12 @@ if (missing.length > 0) {
 
 /** Copies the repository, applies the mutation if there is one, and judges a vitest run of the copy. */
 function caughtIn(mutation: Mutation | null): boolean {
-  const dir = mkdtempSync(join(tmpdir(), 'tc-mutate-'))
+  // The copy keeps the repo layout, so a test that reads docs/ (meta.test reads PLAN 18) finds it.
+  const base = mkdtempSync(join(tmpdir(), 'tc-mutate-'))
+  const dir = join(base, 'packages', 'topclassui')
   try {
+    mkdirSync(dir, { recursive: true })
+    symlinkSync(join(ROOT, '..', '..', 'docs'), join(base, 'docs'), 'junction')
     // join, not a literal slash: on Windows the separator is \ and the filter never matched,
     // so cpSync walked into pnpm's symlink store and failed with EPERM.
     const skip = ['node_modules', '.git', '.harness', 'dist', '.pack'].map((name) => join(ROOT, name))
@@ -53,7 +57,7 @@ function caughtIn(mutation: Mutation | null): boolean {
       maxBuffer: 1 << 28,
     }))
   } finally {
-    rmSync(dir, { recursive: true, force: true })
+    rmSync(base, { recursive: true, force: true })
   }
 }
 
