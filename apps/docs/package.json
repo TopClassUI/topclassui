@@ -1,0 +1,21 @@
+{
+  "name": "@topclassui/docs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "docs:data": "tsx scripts/docs-data.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "topclassui": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "22.14.0",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "vitest": "5.0.3",
+    "zod": "4.6.5"
+  }
+}
