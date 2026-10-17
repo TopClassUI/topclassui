@@ -56,7 +56,7 @@ They arrive with the phases that need them.
 ### R-5.1-2 Client components re-export through index
 **Rule:** for a C component or a connector, `index.tsx` holds no markup: it re-exports the client parts, the prop types, the variants and the skeleton.
 **Why:** `exports` resolves `*/index.js`, and a directive-less re-export of a client module is safe.
-**Enforced by:** `scripts/check-structure.ts`, for every folder whose `meta.ts` says `rendering: 'client'` and every folder under `src/connectors/`: each statement of `index.tsx` is an `export ... from './...'` or an `import type`
+**Enforced by:** `scripts/check-structure.ts`, for every folder whose `meta.ts` says `rendering: 'client'` and every folder under `src/connectors/`: each statement of `index.tsx` is an `import type` or a re-export from its own folder, values only from `client`, `variants`, `skeleton`, `lib.ts` or a `'use client'` file; `src/shared/meta.test` ties `rendering` to PLAN 18
 
 ### R-5.1-3 Only serializable props cross the boundary
 **Rule:** only serializable props cross the boundary: strings, numbers, booleans, plain objects, arrays and `ReactNode` children; functions never, except Server Actions.
