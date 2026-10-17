@@ -9,6 +9,8 @@
   "scripts": {
     "lint": "pnpm --filter topclassui lint",
     "typecheck": "pnpm --filter topclassui typecheck",
+    "build": "pnpm --filter topclassui build",
+    "build:watch": "pnpm --filter topclassui build:watch",
     "test": "pnpm --filter topclassui test",
     "check:structure": "pnpm --filter topclassui check:structure",
     "check:boundaries": "pnpm --filter topclassui check:boundaries",
