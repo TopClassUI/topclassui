@@ -28,6 +28,7 @@ const config = [
       'topclass/flat-part-exports': 'error',
       'topclass/root-part-is-named-root': 'error',
       'topclass/text-comes-from-labels': 'error',
+      'topclass/tooltip-content-is-text': 'error',
     },
   },
 ] as unknown as Linter.Config[]
@@ -614,6 +615,48 @@ describe('R-5.11-1: built-in text comes from labels', () => {
   for (const code of good) {
     it(`allows ${code}`, () => {
       expect(ids(code).filter((r) => r?.startsWith('topclass/')), code).toEqual([])
+    })
+  }
+})
+
+describe('R-10.5-2: a tooltip is plain text', () => {
+  const tooltip = (code: string) => ids(code).filter((r) => r === 'topclass/tooltip-content-is-text')
+
+  const bad: [string, string][] = [
+    ['a link', '<TooltipPopup>Read the <a href="/docs">docs</a></TooltipPopup>'],
+    ['a control', '<TooltipPopup><button>Undo</button></TooltipPopup>'],
+    ['a component', '<TooltipPopup><Kbd>K</Kbd></TooltipPopup>'],
+    ['a fragment', '<TooltipPopup><>Copy</></TooltipPopup>'],
+    ['an element behind a condition', '<TooltipPopup>{ok && <strong>Saved</strong>}</TooltipPopup>'],
+    ['elements from a map', '<TooltipPopup>{rows.map((r) => <p key={r}>{r}</p>)}</TooltipPopup>'],
+    ['an element passed as the children prop', '<TooltipPopup children={<a href="/">Home</a>} />'],
+    ['an element spread in as children', '<TooltipPopup {...{ children: <a href="/">Home</a> }} />'],
+    ['an import renamed on the way in', 'import { TooltipPopup as Tip } from "x"\nconst t = <Tip><a href="/">Home</a></Tip>'],
+  ]
+  for (const [label, code] of bad) {
+    it(`fails on ${label}`, () => {
+      expect(tooltip(code), code).toEqual(['topclass/tooltip-content-is-text'])
+    })
+  }
+
+  it('names the element and the way out in the message', () => {
+    const [message] = lint('<TooltipPopup><a href="/">Home</a></TooltipPopup>')
+      .filter((m) => m.ruleId === 'topclass/tooltip-content-is-text')
+    expect(message?.message).toBe(
+      'R-10.5-2: <a> inside TooltipPopup makes it more than text. A link, a control or rich content belongs in a Popover.')
+  })
+
+  const good = [
+    '<TooltipPopup>Copy link</TooltipPopup>',
+    '<TooltipPopup>Delete {count} rows</TooltipPopup>',
+    '<TooltipPopup placement="bottom-start">{FILE}</TooltipPopup>',
+    '<TooltipPopup>{labels.copy}</TooltipPopup>',
+    '<TooltipTrigger render={<Button>Save</Button>} />',
+    '<PopoverPopup><a href="/docs">Docs</a></PopoverPopup>',
+  ]
+  for (const code of good) {
+    it(`allows ${code}`, () => {
+      expect(tooltip(code), code).toEqual([])
     })
   }
 })
