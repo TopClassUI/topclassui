@@ -1,5 +1,5 @@
 import type { OTPField as Base } from '@base-ui/react/otp-field'
-import type { Ref } from 'react'
+import type { Ref, RefObject } from 'react'
 
 import type { OtpFieldSchemaInput } from './schema.js'
 
@@ -66,4 +66,19 @@ export type OtpFieldValidationType = Base.Root.ValidationType
 export interface OtpFieldCell {
   label: string | undefined
   separator: boolean
+}
+
+/** How Base UI filters a character: the three props digitRules reads and writes. */
+export type OtpFieldDigitRules = Pick<OtpFieldValueProps, 'validationType' | 'normalizeValue' | 'inputMode'>
+
+/** What the hook hands the markup: the controlled pair, the root, the clamped length, the cells and the digit filter. */
+export interface OtpFieldHookResult {
+  value: string
+  onValueChange: (next: string, details: OtpFieldChangeDetails) => void
+  onValueComplete: (code: string, details: OtpFieldCompleteDetails) => void
+  rootRef: RefObject<HTMLDivElement | null>
+  length: number
+  cells: OtpFieldCell[]
+  whole: boolean
+  digits: OtpFieldDigitRules
 }

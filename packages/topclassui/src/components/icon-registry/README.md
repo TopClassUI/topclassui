@@ -20,7 +20,7 @@ when you genuinely need a name-to-icon lookup in the browser.
 ## Import
 
 ```tsx
-import { registerIcons, registeredIcons, Icon } from 'topclassui'
+import { registerIcons, registeredIcons, Icon } from 'topclassui/icon-registry'
 ```
 
 ## Props

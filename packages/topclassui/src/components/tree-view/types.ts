@@ -1,5 +1,6 @@
-import type { ComponentPropsWithRef, FocusEvent, KeyboardEvent, MouseEvent, PointerEvent, ReactNode } from 'react'
+import type { CSSProperties, ComponentPropsWithRef, FocusEvent, KeyboardEvent, MouseEvent, PointerEvent, ReactNode } from 'react'
 
+import type { UseCollectionResult } from '#shared/collection/use-collection.js'
 import type { GroupName } from '#shared/contracts/name.js'
 import type { TREE_VIEW_STATUSES } from './constants.js'
 import type { TreeViewSchemaInput } from './schema.js'
@@ -91,3 +92,26 @@ export type TreeViewHookProps = Pick<
   | 'emptyFallback' | 'ref' | 'style' | 'onKeyDown' | 'onFocus' | 'onBlur' | 'onPointerDown' | 'onPointerUp' | 'onPointerCancel'
   | 'onClick'
 >
+
+/** What the hook hands the markup: the windowed rows, the tree's own attributes and the listeners it wraps. */
+export interface TreeViewHookResult {
+  treeRef: (node: HTMLDivElement | null) => void
+  rows: UseCollectionResult<TreeRow>['rows']
+  idOf: (index: number) => string
+  selected: string | null
+  active: string | null
+  outOfView: boolean
+  activeDescendant: string | undefined
+  tabIndex: number | undefined
+  busy: boolean | undefined
+  /** Null while idle, never undefined: the status element always has something to say or an explicit nothing. */
+  note: Exclude<ReactNode, undefined>
+  style: CSSProperties & { '--tc-list-pad-start': string, '--tc-list-pad-end': string, '--tc-list-rows': number | undefined }
+  onKeyDown: (event: TreeKeyEvent) => void
+  onFocus: (event: TreeFocusEvent) => void
+  onBlur: (event: TreeFocusEvent) => void
+  onPointerDown: (event: TreePointerEvent) => void
+  onPointerUp: (event: TreePointerEvent) => void
+  onPointerCancel: (event: TreePointerEvent) => void
+  onClick: (event: TreeMouseEvent) => void
+}

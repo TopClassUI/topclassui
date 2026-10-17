@@ -9,6 +9,8 @@
   "scripts": {
     "lint": "pnpm --filter topclassui lint",
     "typecheck": "pnpm --filter topclassui typecheck",
+    "build": "pnpm --filter topclassui build",
+    "build:watch": "pnpm --filter topclassui build:watch",
     "test": "pnpm --filter topclassui test",
     "check:structure": "pnpm --filter topclassui check:structure",
     "check:boundaries": "pnpm --filter topclassui check:boundaries",
@@ -24,7 +26,9 @@
     "harness:serve": "pnpm --filter topclassui harness:serve",
     "test:e2e": "pnpm --filter topclassui test:e2e",
     "readme:build": "pnpm --filter topclassui readme:build",
-    "check:readme": "pnpm --filter topclassui check:readme"
+    "check:readme": "pnpm --filter topclassui check:readme",
+    "check:package": "pnpm --filter topclassui check:package",
+    "test:consumers": "pnpm --filter topclassui test:consumers"
   },
   "devDependencies": {
     "@changesets/cli": "3.0.3"
