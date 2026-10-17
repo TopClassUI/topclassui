@@ -12,7 +12,8 @@ This plan is for a builder agent with no memory. Do the steps in order. Each ste
 2. **This plan reconciles them.** The repo becomes a pnpm workspace. The one published package, `topclassui`, lives in `packages/react/` (the folder name PLAN 4 uses). Tokens and icons stay inside it, as DECISIONS says. `apps/docs` joins later. Section 9 gives the three-package layout as the alternative, with its extra cost.
 3. **What 0.1.0-beta.0 ships.** All 52 folders under `src/components/` that have an `index.tsx` (the site's 46 plus helpers such as `icon`, `icon-registry` and `svg`) as subpath imports: `import { Button } from 'topclassui/button'`. This reverses DECISIONS 2 Oct point 4 ("the package ships zero components"), because the CLI that was meant to deliver them is not built. The CLI comes later and can import from the package.
 4. **Every default here that departs from PLAN or DECISIONS is written into one DECISIONS entry in step R1, before any code moves.** CLAUDE.md requires that.
-5. **Not verified yet, and checked in the step named:** that publint accepts an `imports` field pointing into an unshipped `src/` (R5); that Tailwind accepts `@source "./connectors"` when `dist/connectors/` does not exist (R7); whether npm also points `latest` at a first version published with `--tag beta` (R9).
+5. **Not verified yet, and checked in the step named:** that Tailwind accepts `@source "./connectors"` when `dist/connectors/` does not exist (R7); whether npm also points `latest` at a first version published with `--tag beta` (R9). Settled by the review: pnpm 10.28.2 applies `publishConfig.imports` to the packed manifest, so the tarball's `imports` point at `dist`, not at an unshipped `src/` (R5).
+6. **Reviewed on 17 October 2026.** A copy of `src` was emitted, rewritten and packed: 967 `.js`, 963 `.d.ts`, 1,153 files, 318 KB packed, 1.17 MB unpacked; all 66 tried entries resolve in Node; a consumer page type-checks under `bundler` and `node16`. The probes are in `handoff/release-plan/review-release/`. What the review changed is folded into R2, R4, R5, R6 and R9.
 
 ---
 
@@ -58,7 +59,7 @@ topclassui/                      the repository (private package.json, not publi
 | R3 | `chore/workspace` | The move into `packages/react`, the root workspace | 2 to 3 h | `pnpm check` + `pnpm test:mutation` |
 | R4 | `feat/build` | `pnpm build`: tsc, specifier rewrite, CSS copy, watch mode | 3 h | `pnpm check` + `pnpm build` |
 | R5 | `feat/package-manifest` | exports, files, deps, engines; publint, attw, `check:package` in `pnpm check` | 3 to 4 h | `pnpm check` (now builds and packs) |
-| R6 | `fix/readme-subpath-imports` | READMEs and shipped strings name `topclassui/<slug>` | 1 to 2 h | `pnpm check` |
+| R6 | `fix/readme-subpath-imports` | READMEs, their compile tests and shipped strings name `topclassui/<slug>` | 3 h | `pnpm check` + `pnpm test:mutation` |
 | R7 | `test/consumers` | A Next.js app and a Vite app built from the packed tarball | 3 to 4 h | `pnpm test:consumers` + `pnpm check` |
 | R8 | `chore/release-0.1.0-beta.0` | Changesets, package README, LICENSE, CHANGELOG, version | 2 h | `pnpm check` + `pnpm test:consumers` |
 | R9 | none (owner) | npm account, org, login, dry run, publish | 45 min | the runbook's own checks |
@@ -90,6 +91,10 @@ Add one entry at the top of `docs/DECISIONS.md`, dated the day it lands: "Releas
 8. Dependency ranges: exact `@base-ui/react` (every `meta.ts` names `baseUiRange: '1.8.0'`), caret for the rest.
 9. The first version is `0.1.0-beta.0` on the `beta` tag, published by hand from the laptop, with no provenance, because GitHub Actions is off (PLAN 17.4 and the 25 Sep publishing entry assume Actions). Trusted publishing comes when the repo is public and Actions runs.
 10. size-limit waits for STATUS open question 6.
+11. The build emits with `module` and `moduleResolution` `NodeNext` (PLAN's `library.json`), so every specifier TypeScript writes into a `.d.ts` carries `.js`; the repo's own `tsconfig.json` keeps `bundler`.
+12. The published manifest maps `imports` to `dist` through `publishConfig.imports`; the repo's `imports` keep pointing at `src`.
+13. The install line stays `npm i topclassui zod` (2 Oct point 1), written `npm i topclassui@beta zod` while only betas exist.
+14. `shared/classes.ts` is a public subpath, `topclassui/classes` (C18): the lint rule tells every author to use `FOCUS_RING`, `HOVER` and `TOUCH_TARGET`, and the docs site is the first author outside `src/` (PLAN 4 drew it as part of `./utils`).
 
 Update `docs/STATUS.md`: a "Release" section pointing at this file. Docs only; `pnpm check` still runs `rules:sync --check`.
 
@@ -104,7 +109,7 @@ A dry `tsc` emit fails on declarations in four files (facts 2.3). Add an explici
 | `src/components/field/hook.ts` | 12 | `useFieldLive` | TS4058: names `UNDEFINED_VOID_ONLY` from `@types/react` |
 | `src/components/form/hook.ts` | 31 | `useFormAction` | TS4058: same |
 
-The return types go in each component's `types.ts` (R-8.3-4). No behaviour changes, so no test changes; the type tests that exist must still pass. Prove it with a throwaway emit, set up as facts 2.3 did and not committed: a temp config that extends `tsconfig.json` with `noEmit: false`, `declaration: true`, `emitDeclarationOnly: true`, `allowImportingTsExtensions: false`, `rootDir: src`, `outDir` in the scratch folder, `include: ["src"]` and the tests excluded. It must end with no error. Run it in a real checkout, not only through a `node_modules` junction.
+The return types go in each component's `types.ts` (R-8.3-4). No behaviour changes, so no test changes; the type tests that exist must still pass. Prove it with a throwaway emit, set up as facts 2.3 did and not committed: a temp config that extends `tsconfig.json` with `module` and `moduleResolution` `NodeNext` (as R4 builds), `noEmit: false`, `declaration: true`, `emitDeclarationOnly: true`, `allowImportingTsExtensions: false`, `rootDir: src`, `outDir` in the scratch folder, `include: ["src"]` and the tests excluded. It must end with no error. Run it in a real checkout, not only through a `node_modules` junction.
 
 ### R3. The move to a workspace
 
@@ -171,7 +176,7 @@ Nothing else changes: `tsconfig.json`, `eslint.config.ts`, `vitest.config.ts`, `
 
 New files in `packages/react/`:
 
-- **`tsconfig.build.json`**: `extends: ./tsconfig.json`; `noEmit: false`, `allowImportingTsExtensions: false`, `declaration: true`, `declarationMap: false`, `sourceMap: false`, `rootDir: src`, `outDir: dist`; `include: ["src"]`; `exclude: ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/test/**", "src/test/**"]`. Resolution stays `bundler`, as the dry emit used; relative imports already carry `.js` (R-5.12-5). `dummy/` is compiled on purpose: the docs app renders it from `dist` (21 Sep "consumes dist" entry).
+- **`tsconfig.build.json`**: `extends: ./tsconfig.json`; `module: NodeNext`, `moduleResolution: NodeNext`, `noEmit: false`, `allowImportingTsExtensions: false`, `declaration: true`, `declarationMap: false`, `sourceMap: false`, `rootDir: src`, `outDir: dist`; `include: ["src"]`; `exclude: ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/test/**", "src/test/**"]`. Why `NodeNext` and not the repo's `bundler`: the specifiers we write already carry `.js` (R-5.12-5), but the ones TypeScript writes itself for inferred types do not under `bundler` (`dist/components/toast/constants.d.ts` held `import("../../icons").IconData` six times, and a `node16` consumer failed with TS2834). Under `NodeNext` they become `import("../../icons/types.js")`, the errors are the same four of R2, and the `.js` output is the same as under `bundler` (review, `tsc-nn.log`). `dummy/` is compiled on purpose: the docs app renders it from `dist` (21 Sep "consumes dist" entry).
 - **`scripts/build.ts`**, about 60 lines, no dependency:
   1. delete `dist` (`rmSync`);
   2. run `tsc -p tsconfig.build.json`, fail on any error;
@@ -184,7 +189,7 @@ New files in `packages/react/`:
 
 Why rewrite instead of pointing `imports` at `dist`: after the rewrite nothing in the tarball depends on the `imports` field, so every resolver reads it, TypeScript's old `node` resolution included, and no tool in the repo needs a custom condition. The alternative is choice C5.
 
-Expected output (facts 2.3): about 967 `.js` and 963 `.d.ts`; JS outside `dummy/` about 670 KB unminified; `.d.ts` about 545 KB; about 30 s. `pnpm build` is not in `pnpm check` yet; R5 puts it there.
+Expected output (facts 2.3, the review): about 967 `.js` and 963 `.d.ts`; JS outside `dummy/` about 670 KB unminified; `.d.ts` about 545 KB; 17 to 30 s; about 933 `#` specifiers rewritten in 422 files. `pnpm build` is not in `pnpm check` yet; R5 puts it there.
 
 ### R5. The manifest and the package checks
 
@@ -204,7 +209,14 @@ Expected output (facts 2.3): about 967 `.js` and 963 `.d.ts`; JS outside `dummy/
   "sideEffects": ["**/*.css"],
   "engines": { "node": ">=20.9" },
   "files": ["dist", "!dist/**/dummy"],
-  "publishConfig": { "access": "public" },
+  "publishConfig": {
+    "access": "public",
+    "imports": {
+      "#shared/*": "./dist/shared/*",
+      "#icons/*": "./dist/icons/*",
+      "#components/*": "./dist/components/*"
+    }
+  },
   "dependencies": {
     "@base-ui/react": "1.8.0",
     "class-variance-authority": "^0.7.1",
@@ -218,11 +230,11 @@ Expected output (facts 2.3): about 967 `.js` and 963 `.d.ts`; JS outside `dummy/
 ```
 
 - Remove `"private": true`; npm refuses to publish with it. The root `topclassui-repo` stays private.
-- `imports` stays as it is: the repo needs it, and after R4 `dist` never uses it.
+- `imports` stays as it is for the repo (it points at `src`). `publishConfig.imports` replaces it in the packed manifest, without `#test/*`, so the tarball never names a folder it does not ship. pnpm 10.28.2 applies it (review probe `pc/`); npm ignores it. That is why every check below reads the tarball `pnpm pack` writes, never one `npm pack` writes. After R4, `dist` does not use `imports` at all; the mapping only keeps the manifest true.
 - `version` stays `0.0.0` here; Changesets sets it in R8.
 - No optional peers: DECISIONS 3 Oct says v0.1 has none. No `bin`: the CLI does not exist.
 - `.npmrc` has `save-exact=true`; the caret ranges are typed by hand, and only in `dependencies`.
-- Check each dependency's own `engines` against `>=20.9` (`npm view @base-ui/react engines`, and the others).
+- Each dependency's own `engines` fits `>=20.9` (checked in the review: `@base-ui/react` needs `>=14`, `clsx` `>=6`, the rest name none; Base UI's `date-fns` peers are optional).
 - `README.md`, `LICENSE` and `package.json` are always packed by npm; `CHANGELOG.md` must be added to `files` once it exists (R8).
 
 **New scripts and checks** (each named with its purpose and size; the sizes are each package's own unpacked size from `npm view`, dependencies not counted, facts 2.6):
@@ -235,14 +247,20 @@ Expected output (facts 2.3): about 967 `.js` and 963 `.d.ts`; JS outside `dummy/
 | `scripts/list-entrypoints.ts` | the concrete subpath list attw needs, because it skips patterns with `*` (PLAN 4) | ours | add now |
 | `size-limit` + `@size-limit/preset-small-lib` | client JS budgets of PLAN 14 | 14.2.0, 50 KB + 3 KB, pulls esbuild | later (C9) |
 
-- **`check-pack`** runs `pnpm pack --pack-destination .pack`, reads the file list, and fails when: any path is outside `dist/` (bar `package.json`, `README.md`, `LICENSE`, `CHANGELOG.md`); any path contains `/dummy/`, `/test/`, `.test.` or `.map`; any `.js` or `.d.ts` still holds a `#` specifier; any `exports` target is missing from the tarball; `dist/styles.css` or `dist/tokens.css` is missing; the tarball is over a size budget (start at 1.5 MB unpacked, then pin to the measured size plus 10 %). Its logic lives in `scripts/lib/pack-checks.ts` with written-out tests.
-- **`check:package`** = `pnpm build && publint --strict && attw --pack . --profile esm-only --exclude-entrypoints styles.css tokens.css --include-entrypoints <list> && tsx scripts/check-pack.ts`. Add it to `check` right after `typecheck`. Cost: about 30 s for the build plus about a minute for the checks; small against 30 minutes.
-- **First thing to try in this step:** run `publint --strict` with `imports` still pointing into `src`. If it fails on that, keep `imports` for `#test/*` only in the repo by moving test helpers to relative imports, or map the other three conditionally (C5), and record what you chose.
+- **`check-pack`** runs `pnpm pack --pack-destination .pack`, reads the file list, and fails when: any path is outside `dist/` (bar `package.json`, `README.md`, `LICENSE`, `CHANGELOG.md`); any path contains `/dummy/`, `/test/`, `.test.` or `.map`; any `.js` or `.d.ts` still holds a `#` specifier; any relative specifier in a `.js` or `.d.ts` (`from './x'`, `import('./x')`, `import("./x").T`) does not end in `.js`; the packed `package.json` has an `imports` target outside `dist/`; any `exports` target is missing from the tarball; `dist/styles.css` or `dist/tokens.css` is missing; the tarball is over a size budget (start at 1.5 MB unpacked, then pin to the measured size plus 10 %). Its logic lives in `scripts/lib/pack-checks.ts` with written-out tests.
+- **`check:package`** = `pnpm build && tsx scripts/check-pack.ts && attw .pack/topclassui-<version>.tgz --profile esm-only --exclude-entrypoints styles.css tokens.css --include-entrypoints <list> && publint` on the same pnpm pack. `check-pack` writes the tarball first; attw then reads that file, not `--pack .` (which packs with npm and so ignores `publishConfig`). For publint, read the installed version's `--help` and use its option that packs with pnpm, or the one that reads a tarball; write down which in the pull request. Add `check:package` to `check` right after `typecheck`. Cost: about 30 s for the build plus about a minute for the checks; small against 30 minutes.
+- **First thing to try in this step:** run attw on the tarball and confirm it passes the `node16` rows. If a row fails on a specifier without `.js`, R4's `NodeNext` setting is missing.
 - `"prepublishOnly": "pnpm check:package"`: a guard for anyone who publishes from the folder. The runbook publishes the checked tarball instead.
 
 ### R6. Imports in READMEs and shipped strings
 
-- `scripts/lib/readme.ts:137` and `scripts/lib/readme-parts.ts:30` write `import { X } from 'topclassui'`, a root barrel that does not exist (PLAN 4: "There is no root barrel file"). Change both to `'topclassui/<slug>'` from `meta.slug`. Update `scripts/lib/readme-parts.test.ts:36,116,126`. Run `pnpm readme:build`; all 52 component READMEs change.
+The bare `'topclassui'` is pinned in more places than the READMEs. Counted on 9fb1288, outside `dummy/`: 2 generators, 1 mutation row, 32 test files and 30 hand-written README blocks. Change them in one pull request, in this order.
+
+- **The generators.** `scripts/lib/readme.ts:137` (`singleImport`) and `scripts/lib/readme-parts.ts:30` (`familyImport`) write `import { X } from 'topclassui'`, a root barrel that does not exist (PLAN 4: "There is no root barrel file"). Change both to `'topclassui/<slug>'` from `meta.slug`. Update `scripts/lib/readme-parts.test.ts:36,116,126`.
+- **The mutation row.** `scripts/mutations/scripts.ts:105` writes `` from 'topclassui'` `` as its `to:`. Rewrite its `from:` and `to:` to the new generator text, or the row no longer applies and `pnpm test:mutation` fails on it.
+- **The hand-written README blocks.** 30 READMEs import from `'topclassui'` between the `<!-- hand-written -->` markers, which `readme:build` never rewrites. Edit them by hand. A line that imports names from two folders becomes two lines: Sidebar's `import { Icon, SidebarBody, ... } from 'topclassui'` becomes `import { Icon } from 'topclassui/icon'` and `import { SidebarBody, ... } from 'topclassui/sidebar'`. Then run `pnpm readme:build`; all 52 component READMEs change.
+- **The compile tests.** 29 `*.compile.test.ts` files type-check the README samples. 28 of them do `code.replace("'topclassui'", "'../index.js'")`; Sidebar maps names through its own `HOME` table. After this step that replace matches nothing, and once R5 adds `exports`, TypeScript resolves `'topclassui/<slug>'` as the package importing itself, into `dist/`: the tests would check stale build output, or fail when `dist` is missing. Add one helper, `src/test/samples.ts`, `importsFromRepo(code)`: it rewrites every `'topclassui/<x>'` to `'#components/<x>/index.js'` and throws when any `'topclassui` specifier is left. All 29 tests call it, and Sidebar's `HOME` table goes. Give the helper a test with written-out expectations (R-17-1).
+- **The pinned expectations.** Update the expected strings in those 29 tests (for example `accordion.compile.test.ts:92`) and in `code-block/test/code-block.demos.dom.test.tsx:15` and `code-block.demos.ssr.test.tsx:72`.
 - `src/components/icon-registry/index.tsx:35` tells users `import { x } from 'topclassui/icons/<name>'`, which R5 makes true. Line 37 tells them to run `npx topclassui icons scan`, which does not exist: drop that line until the CLI ships, and update any test that pins the message.
 - Demos are not shipped, so `dummy/` text (`code-block/dummy/highlighted.tsx`, `no-header.tsx`, `accordion/dummy/first-open.tsx`) changes only where it shows `from 'topclassui'`; make those subpaths too.
 
@@ -269,9 +287,11 @@ This is the proof PLAN 19 Phase 7 asks for: "the package installs and works in a
 
 Do this once, slowly. Nothing here is automated.
 
+**Use Git Bash, not PowerShell.** The commands below are bash: Windows PowerShell 5.1, the laptop's default, has no `&&` and no `head`. Git Bash comes with Git for Windows and is already on the laptop. Open it in the repository folder.
+
 **A. Account and organisation (once, about 20 minutes).**
 1. Create an account at https://www.npmjs.com/signup. Verify the email.
-2. Turn on two-factor authentication: Account, then Two-Factor Authentication, mode "Authorization and writes". Save the recovery codes offline.
+2. Turn on two-factor authentication with a security key or a passkey (WebAuthn), mode "Authorization and writes". Save the recovery codes offline. npm no longer lets a new account set up an authenticator-app code (TOTP); it is being phased out ([GitHub changelog, 10 Oct 2025](https://github.blog/changelog/2025-10-10-strengthening-npm-security-important-changes-to-authentication-and-token-management)).
 3. Create the free organisation `topclassui`: https://www.npmjs.com/org/create, plan "Unlimited public packages" (free). The unscoped package does not need it; it reserves the scope `@topclassui/` for `@topclassui/next` and `@topclassui/vite`, which the plan still names.
 4. In a terminal: `npm login` (it opens the browser), then `npm whoami` prints your user name.
 
@@ -286,12 +306,12 @@ Do this once, slowly. Nothing here is automated.
 ```sh
 npm publish ../../.pack/topclassui-0.1.0-beta.0.tgz --tag beta --access public
 ```
-npm asks for the one-time code from your authenticator (or pass `--otp=123456`). Publishing the `.tgz` publishes exactly what you inspected; it does not rebuild.
+npm prints an approval URL (or opens it in the browser). Open it, approve with your passkey or security key, and npm finishes the publish. If npm prints any other next step, do what it says and note it for R10. Publishing the `.tgz` publishes exactly what you inspected; it does not rebuild.
 
 **D. Check right after (15 minutes).**
 1. `npm view topclassui` shows `0.1.0-beta.0`; `npm dist-tag ls topclassui` shows `beta: 0.1.0-beta.0`. If it also shows `latest: 0.1.0-beta.0`, that is npm giving a new package a `latest`; it is harmless, because there is no other version.
 2. Open https://www.npmjs.com/package/topclassui: the README renders, the license says MIT, the repository link works (it 404s for visitors while the repo is private).
-3. In an empty folder outside the repo: `npx create-next-app@latest probe --ts --app --tailwind --eslint --no-src-dir --use-npm`, then `cd probe && npm i topclassui@beta`, paste the three CSS lines into `app/globals.css`, the provider into `app/layout.tsx`, `<Button>Hi</Button>` into `app/page.tsx`, run `npm run build && npm start`, open http://localhost:3000 and see a styled button. Add `<Button variant="nope" />` and see `npx tsc --noEmit` fail.
+3. In an empty folder outside the repo: `npx create-next-app@latest probe --ts --app --tailwind --eslint --no-src-dir --use-npm`, then `cd probe && npm i topclassui@beta zod`, paste the three CSS lines into `app/globals.css`, the provider into `app/layout.tsx`, `<Button>Hi</Button>` into `app/page.tsx`, run `npm run build && npm start`, open http://localhost:3000 and see a styled button. Add `<Button variant="nope" />` and see `npx tsc --noEmit` fail.
 4. Tag the commit: `git tag topclassui@0.1.0-beta.0 && git push origin topclassui@0.1.0-beta.0`.
 
 **E. Undo, if something is wrong.**
@@ -301,7 +321,7 @@ npm asks for the one-time code from your authenticator (or pass `--otp=123456`).
 
 ### R10. After the publish
 
-One DECISIONS entry: the published version, the date, the tarball's file count and size, what the probe app showed, and that this release has no provenance. STATUS: "On npm: `topclassui@0.1.0-beta.0` (beta tag)". The install line on the site and in the docs is `npm i topclassui@beta` until 0.1.0 is on `latest`.
+One DECISIONS entry: the published version, the date, the tarball's file count and size, what the probe app showed, and that this release has no provenance. STATUS: "On npm: `topclassui@0.1.0-beta.0` (beta tag)". The install line on the site and in the docs is `npm i topclassui@beta zod` until 0.1.0 is on `latest`, then `npm i topclassui zod`.
 
 ### Later, not in this plan's pull requests
 
@@ -324,6 +344,7 @@ Concrete subpaths first, patterns last. `types` first in every condition object.
   "./provider": { "types": "./dist/shared/provider/provider.d.ts", "default": "./dist/shared/provider/provider.js" },
   "./theme": { "types": "./dist/shared/theme/theme-script.d.ts", "default": "./dist/shared/theme/theme-script.js" },
   "./cn": { "types": "./dist/shared/cn.d.ts", "default": "./dist/shared/cn.js" },
+  "./classes": { "types": "./dist/shared/classes.d.ts", "default": "./dist/shared/classes.js" },
   "./labels/*": { "types": "./dist/shared/labels/*.d.ts", "default": "./dist/shared/labels/*.js" },
   "./icons": { "types": "./dist/icons/index.d.ts", "default": "./dist/icons/index.js" },
   "./icons/*": { "types": "./dist/icons/data/*.d.ts", "default": "./dist/icons/data/*.js" },
@@ -337,8 +358,8 @@ Concrete subpaths first, patterns last. `types` first in every condition object.
 - **The server-only entry.** `topclassui/icon` is the async `<Icon name>`; its `index.js` imports `server-only`, so importing it from a client file fails the build, as intended (R-5.1-5). Browser-only apps use `topclassui/icon-registry` (sync `<Icon>` and `registerIcons`) and `topclassui/icons/<name>` for the data. `topclassui/svg` works everywhere.
 - **The CSS files.** Plain string targets, so Tailwind's resolver (which asks for the `style` condition) and every bundler resolve them. `sideEffects: ["**/*.css"]` keeps them from being dropped.
 - **Pattern precedence.** Node picks the longest matching key, so `topclassui/icons/check` hits `./icons/*`, `topclassui/labels/ar` hits `./labels/*`, and `topclassui/button` hits `./*`. The exact key `./icons` stops `./*` from sending `topclassui/icons` to a missing `dist/components/icons/`.
-- **Left out of 0.1.0:** `./adaptive` and `./connectors/*` (connectors are tier 2; `src/connectors/` holds only a README), `./demos/*` (PLAN 4's name; demos are `dummy/` and not shipped), `./utils` (PLAN 4's name; nothing in `src/shared/` is called that, so it is `./cn`).
-- **attw list.** `scripts/list-entrypoints.ts` prints `provider theme cn labels/en labels/ar labels/get-labels labels/types icons icons/check` plus one entry per folder in `src/components/` that has an `index.tsx` (52 today), plus `schemas/button` and `meta/button` as samples.
+- **Left out of 0.1.0:** `./adaptive` and `./connectors/*` (connectors are tier 2; `src/connectors/` holds only a README), `./demos/*` (PLAN 4's name; demos are `dummy/` and not shipped), `./utils` (PLAN 4's name; nothing in `src/shared/` is called that, so its two halves are `./cn` and `./classes`).
+- **attw list.** `scripts/list-entrypoints.ts` prints `provider theme cn classes labels/en labels/ar labels/get-labels labels/types icons icons/check` plus one entry per folder in `src/components/` that has an `index.tsx` (52 today), plus `schemas/button` and `meta/button` as samples.
 
 ---
 
@@ -347,7 +368,7 @@ Concrete subpaths first, patterns last. `types` first in every condition object.
 **Next.js 15 or 16 (App Router).**
 
 ```sh
-npm i topclassui@beta
+npm i topclassui@beta zod
 npm i -D tailwindcss @tailwindcss/postcss
 ```
 
@@ -389,7 +410,7 @@ export default function Page() {
 }
 ```
 
-No `transpilePackages`: the package is plain ESM JavaScript. `zod` installs with the package (it is a dependency); add it to your own `package.json` only to write schemas yourself.
+No `transpilePackages`: the package is plain ESM JavaScript. `zod` is a dependency of the package too; naming it in the install line puts it in your own `package.json`, so your code can import it for your own schemas (DECISIONS 2 Oct point 1, R-8.3-1).
 
 **Vite with React 19 (tier 2).** Same install with `@tailwindcss/vite` instead of the PostCSS plugin, the same three CSS lines, `TopClassProvider` around the app in `main.tsx`, and icons through the registry:
 
@@ -410,7 +431,7 @@ R7 builds exactly these two setups from the packed tarball before every publish.
 
 - Semver, 0.x: a breaking change may land in a minor, always with a migration note in the changelog (PLAN 17.4).
 - Pre-release line: `0.1.0-beta.0`, `0.1.0-beta.1`, ... on the `beta` tag, through Changesets pre mode. `0.1.0` goes to `latest` with the docs site.
-- **Content:** the 52 component entries (every one `status: 'beta'`, STATUS), the provider, the theme script, the English and Arabic labels, `cn`, the 84 icons as modules, `tokens.css` and `styles.css`, the schemas and the meta files.
+- **Content:** the 52 component entries (every one `status: 'beta'`, STATUS), the provider, the theme script, the English and Arabic labels, `cn`, the class constants (`topclassui/classes`), the 84 icons as modules, `tokens.css` and `styles.css`, the schemas and the meta files.
 - **Not in it:** the CLI (`npx topclassui add`), connectors, `@topclassui/next`, `@topclassui/vite`, size budgets, provenance, `stable` status for any component (PLAN 20 needs the visual matrix, the docs page and Figma parity).
 
 ---
@@ -427,6 +448,8 @@ R7 builds exactly these two setups from the packed tarball before every publish.
 | Stale `dist` published | the runbook publishes the tarball `check:package` just built; `prepublishOnly` guards the folder path |
 | The name is taken before the first publish | the runbook checks `npm view topclassui` right before; publish soon after R8 |
 | R3 breaks a gate quietly | the gate table in R3, plus a full `pnpm check` and a full `pnpm test:mutation` |
+| A README compile test quietly checks `dist` instead of `src` (the package importing itself) | `importsFromRepo` in R6 maps every `'topclassui/<x>'` and throws on any left |
+| A `node16` consumer cannot read a `.d.ts` | R4 emits with `NodeNext`; `check-pack` fails on a relative specifier without `.js`; attw reads the pnpm tarball |
 | The laptop runs short of memory | gates run one at a time as today; the consumer builds run one after the other, never beside Playwright |
 
 ---
@@ -454,6 +477,8 @@ Each row is built as its "Default" unless the owner says otherwise before the st
 | C15 | License | MIT, as `LICENSE` says | none other planned (PLAN O4) | R8 |
 | C16 | Consumer smoke test | before every publish, not in `pnpm check` (needs the network, minutes) | inside `pnpm check` | R7 |
 | C17 | Demos (`dummy/`) | compiled into `dist` for the docs app, not packed | not compiled at all (the docs app would need another way to load them) | R4 |
+| C18 | The shared class constants (`FOCUS_RING`, `HOVER`, `TOUCH_TARGET`, ...) | public as `topclassui/classes`, so the docs site and users' own components follow the same lint rule | private; the site copies the strings it needs into its own `classes.ts` | R5 |
+| C19 | The install line | `npm i topclassui@beta zod` during the betas, then `npm i topclassui zod` (DECISIONS 2 Oct) | `npm i topclassui@beta`, since `zod` installs with the package anyway | R8 |
 
 ---
 

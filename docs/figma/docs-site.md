@@ -39,6 +39,12 @@ output, the glows on Home) is out of date. The site never writes a colour by han
   except the scope rows asked before the first step (Build order, step 0).
 - The site's code lives in `apps/docs`. No step changes the library's components, except the
   `dummy/` additions of step 3, which are library pull requests of their own.
+- **Paths.** The release plan (`docs/plan/release.md`, R3) moves the library into
+  `packages/react/`. Every library path in this file (`src/`, `scripts/`, `raw/`,
+  `docs/icons.md`) is relative to `packages/react/`, the same rule `docs/RULES.md` gets in R3.
+  Site paths start with `apps/docs/`.
+- **Reviewed on 17 October 2026** against the repo and the release plan. The fixes are folded
+  into the sections below; nothing here is a second list to reconcile.
 
 ## What the site is, in one table
 
@@ -47,11 +53,11 @@ output, the glows on Home) is out of date. The site never writes a colour by han
 | Where | `apps/docs`, a pnpm workspace member beside the library | PLAN 4, PLAN 16 |
 | Framework | Next.js 16 App Router, `next` 16.3.8 pinned exactly (choice 1), React 19.3.0 as installed | PLAN 2 |
 | Rendering | Fully static: every page from `generateStaticParams`, `dynamicParams = false`, no `searchParams`, `cookies()`, `headers()` or `connection()`. Cache Components off | PLAN 15.3, DECISIONS 2026-09-21 (Cache Components stays off) |
-| The library | `"topclassui": "workspace:*"`, resolved through its `exports` map to `dist`, never to `src`. `tsc --watch` beside `next dev` | PLAN 4, DECISIONS 2026-09-21 (the docs app consumes `dist`) |
+| The library | `"topclassui": "workspace:*"`, resolved through its `exports` map to `dist`, never to `src`. The library's `build:watch` beside `next dev` | PLAN 4, DECISIONS 2026-09-21 (the docs app consumes `dist`) |
 | Content | MDX for prose pages; typed TypeScript data for the 46 components; the component's own `meta.ts`, `schema.ts`, `types.ts` and `dummy/` files for everything generated | PLAN 16 |
 | Code highlighting | Shiki at build time, in a server component, passed to `CodeBlock`'s `highlighted` prop | PLAN 15.3, unit-5 choice 12 |
 | Locales | `/en/...` and `/ar/...`, English slugs in both, `/` redirects to `/en` | PLAN 15.3 |
-| Modes | Light, Dark, Ocean; the site opens in the visitor's system mode, dark when the system says nothing (choice 9) | DECISIONS 2026-09-25 (dark first) |
+| Modes | Light, Dark, Ocean; the site opens in the visitor's system mode, light when the system does not say dark (choice 9) | DECISIONS 2026-09-25 (dark first) |
 | Hosting | Vercel, on `topclassui.com` | PLAN O5 |
 | Search | A build-time JSON index in the library's `Command` palette, loaded on first open | choice 6 |
 
@@ -157,10 +163,20 @@ wins for that page only.
    navigation part on the site is a library component imported from the package, as a user
    imports it. Where the library has no component for a need (S12 lists them), the site uses
    plain HTML with the library's semantic classes and a `{/* TODO(tc): ... */}` marker, as
-   PLAN 16 says. The site never imports from `src/` or `#shared/*`.
+   PLAN 16 says. The site never imports from `src/` or `#shared/*`. The site's own interactive
+   pieces take their focus ring, hover and target size from `topclassui/classes` (release
+   plan C18), as a component does.
 2. **Tokens only.** No hex, no palette class, no `dark:`; the same rules as `src/`
-   (R-5.2-1 to R-5.2-5, R-5.3-1, R-5.3-3). `apps/docs` is linted with the repo's ESLint config,
-   custom rules included. The glows on Home are `color-mix()` of `--tc-primary-solid` and
+   (R-5.2-1 to R-5.2-5, R-5.3-1, R-5.3-3). The repo's config does not reach the site: after
+   the release's R3 it sits in `packages/react/`, and its custom rules apply to `src/**` only.
+   So `apps/docs` has its own `eslint.config.ts` that imports the plugin from
+   `../../packages/react/eslint-rules/index.ts` and turns on, for `app/**`, `components/**` and
+   `lib/**`: `logical-properties-only`, `semantic-classes-only`, `no-dynamic-class-names`,
+   `shared-class-constants`, `style-sets-tokens-only`, `presence-state-attributes`, `no-enum`,
+   `one-line-comments` and `text-comes-from-labels`, plus `no-derived-expectations` on the
+   site's tests. `icon-loaders-stay-server` is left off: the site imports `topclassui/icon`,
+   never the loader map. A test in step 1 lints one bad file per rule and expects each error,
+   so a rule that silently does not run fails the step. The glows on Home are `color-mix()` of `--tc-primary-solid` and
    friends, never Figma's raw hex.
 3. **Logical CSS.** `ps-`, `pe-`, `ms-`, `me-`, `inset-s-`, `text-start`; never `left` or
    `right`. Every page renders correctly at `dir="rtl"` without a second stylesheet.
@@ -212,12 +228,15 @@ Repo: tsconfig.json already excludes "apps"; eslint.config.ts already ignores ap
 
 **Build this.**
 
-- **The workspace.** `pnpm-workspace.yaml` gains `packages` with the library and `apps/*`
-  (the library's own entry follows the release plan's layout; root or `packages/topclassui`).
+- **The workspace.** The release plan's R3 already writes `pnpm-workspace.yaml` with
+  `packages/*` and `apps/*`, and puts the library in `packages/react/`; nothing to add.
   `apps/docs/package.json` is private, named `@topclassui/docs`, and depends on
-  `"topclassui": "workspace:*"`. Scripts at the root: `docs:dev` (the library's `tsc --watch`
-  beside `next dev -p 4610`), `docs:build` (library `build`, then `docs:data`, then
-  `next build`), `docs:check` (S13).
+  `"topclassui": "workspace:*"`. pnpm does not hoist, so the app names its own `next`,
+  `react` and `react-dom` (19.3.0, as the library), `tailwindcss` and `@tailwindcss/postcss`
+  (both 4.3.3), `typescript`, `vitest`, `tsx`, `eslint`, `typescript-eslint`, `@eslint/js` and `jiti` (the
+  library's versions). Scripts
+  at the root: `docs:dev` (`pnpm --filter topclassui build:watch` beside `next dev -p 4610`),
+  `docs:build` (library `build`, then `docs:data`, then `next build`), `docs:check` (S13).
 - **Folders.**
 
   ```text
@@ -225,15 +244,19 @@ Repo: tsconfig.json already excludes "apps"; eslint.config.ts already ignores ap
     app/
       (site)/[locale]/layout.tsx        the root layout: html lang dir data-theme, fonts, provider
       (site)/[locale]/page.tsx          Home
+      (site)/[locale]/opengraph-image.tsx               Home's image
       (site)/[locale]/docs/[page]/page.tsx              the guide pages, from the registry
+      (site)/[locale]/docs/[page]/opengraph-image.tsx   one image per guide page
       (site)/[locale]/docs/components/page.tsx          the catalog
       (site)/[locale]/docs/components/[slug]/page.tsx   one page per component
       (site)/[locale]/docs/components/[slug]/opengraph-image.tsx
       (site)/[locale]/changelog/page.tsx
-      (site)/[locale]/not-found.tsx
+      (site)/[locale]/not-found.tsx                     a 404 inside a locale (page 20)
       (preview)/preview/[theme]/[dir]/layout.tsx        the second root layout
       (preview)/preview/[theme]/[dir]/[component]/[demo]/page.tsx
-      sitemap.ts  robots.ts  manifest.ts  llms.txt/route.ts
+      global-not-found.tsx              a 404 for a URL outside both root layouts (page 20)
+      sitemap.ts  robots.ts  manifest.ts
+      llms.txt/route.ts                 exports dynamic = 'force-static'
     content/
       pages.ts                  the page registry
       en/<page>.mdx  ar/<page>.mdx
@@ -242,17 +265,24 @@ Repo: tsconfig.json already excludes "apps"; eslint.config.ts already ignores ap
     components/                 the site's own pieces: Shell, Previewer, Playground, ...
     labels/en.ts  labels/ar.ts  the site's strings
     lib/                        pure helpers: rewrite imports, highlight, metadata, json-ld
+    scripts/docs-data.ts        docs:data, run with tsx (S7)
     .generated/                 written by docs:data, git-ignored
+    public/search/<locale>.json written by docs:data, git-ignored (S5)
+    assets/fonts/               TTF or WOFF files for the Open Graph images (S6)
     mdx-components.tsx  next.config.ts  tsconfig.json
+    postcss.config.mjs          { plugins: { '@tailwindcss/postcss': {} } }
+    eslint.config.ts            the site's lint, rule 2
   ```
 
   File names are kebab-case, as R-5.12-4; components PascalCase; one component per file in
   `components/`; each file under 300 lines (R-5.12-2 applies to the site too).
-- **`next.config.ts`.** `redirects()`: `/` to `/en`, permanent. `pageExtensions` adds `mdx`.
-  The MDX plugin with `remark-gfm` for tables. A resolve alias that maps `@demos/*` to the
-  library's built `dist/components/*/dummy/*.js` and `@meta/*` to `dist/components/*/meta.js`
-  (choice 7), with the Turbopack root set to the repository root so files outside `apps/docs`
-  resolve. No `transpilePackages`, no `cacheComponents`. Check every option name against the
+- **`next.config.ts`.** `redirects()`: `/` to `/en`, and `/:locale(en|ar)/docs` to
+  `/:locale/docs/installation`, both permanent (there is no page at `/en/docs`). `pageExtensions`
+  adds `mdx`. The MDX plugin with `remark-gfm` for tables. A resolve alias that maps `@demos/*`
+  to the library's built `packages/react/dist/components/*/dummy/*.js` (choice 7), with the
+  Turbopack root set to the repository root so files outside `apps/docs` resolve. A
+  component's meta comes from the package's own `topclassui/meta/<slug>` export, so it needs no
+  alias. No `transpilePackages`, no `cacheComponents`. Check every option name against the
   installed Next types first.
 - **`tsconfig.json`** extends the PLAN's `nextjs.json` settings: `moduleResolution: bundler`,
   `noEmit`, `exactOptionalPropertyTypes: true`, `isolatedModules`, the `next` plugin.
@@ -275,8 +305,13 @@ Repo: tsconfig.json already excludes "apps"; eslint.config.ts already ignores ap
   its description): `next` 16.3.8 (186 MB unpacked, dev and runtime of the app only),
   `@next/mdx` 16.3.8 (15 KB), `@mdx-js/loader` 3.1.1 (15 KB), `@mdx-js/react` 3.1.1 (14 KB),
   `@types/mdx` 2.0.14 (10 KB), `remark-gfm` 4.0.1 (22 KB), `shiki` 4.5.0 (602 KB, about
-  11.4 MB with its dependencies; build time only), `schema-dts` 2.1.0 (1 MB, types only).
-  All in `apps/docs`; the library's dependencies do not change. Not needed: `@shikijs/rehype`
+  11.4 MB with its dependencies; build time only), `schema-dts` 2.1.0 (1 MB, types only),
+  `@tailwindcss/postcss` 4.3.3, the same version as `tailwindcss` (100 KB unpacked, plus
+  `@tailwindcss/node` and the native `@tailwindcss/oxide` binary; build time only; without it
+  Next cannot compile the three `@import` lines and the site renders unstyled). The library's
+  devDependencies already hold the tooling the app names (`tsx`, `typescript`, `vitest`, the
+  ESLint set); the app pins the same versions, so the lockfile gains no new tooling package. All in `apps/docs`; the library's dependencies do not
+  change. Not needed: `@shikijs/rehype`
   (MDX code goes through the same highlighter as the demos, S3), Turborepo (one app, one
   package: `pnpm --filter` is enough), a search service.
 
@@ -357,7 +392,8 @@ Footer 1440x321  V g0
   `clamp()`. Inter Regular, Medium and Semi Bold only (choice 8 for the Arabic font).
 - **Navbar.** The library's `Navbar` (split; its client part is the mobile menu), sticky,
   publishing `--tc-sticky-top`. Left to right in LTR: brand ("TopClass UI" and the palette
-  icon, a link to Home), links Docs, Components, Icons, Theming (Blog only once it is live),
+  icon, a link to Home), links Docs (to `/{locale}/docs/installation`, the first guide page),
+  Components, Icons, Theming (Blog only once it is live),
   the search button ("Search" and the keys `Ctrl K` in `Kbd`), the mode switch (S4), the
   language switch (S4), the GitHub link (an icon link named "GitHub", shown only when the
   repository is public, choice 12). Under 48rem the links and the search label collapse into
@@ -387,7 +423,8 @@ Footer 1440x321  V g0
   Links that point at nothing yet are left out, not greyed: "Figma library", "Component
   registry" and "llms.txt for AI tools" only once they exist (choice 12); YouTube and X only
   if the handles exist. "v0.1.0" reads the package version. "Icons", not "The install command
-  and this site". The install line is a `CodeBlock` with its copy button.
+  and this site". The install line is a `CodeBlock` with its copy button, from the one install
+  constant (S8).
 - **Skip link.** First in `body`, "Skip to content", to `#main`, visible on focus. Plain HTML
   with a `TODO(tc)` marker until SkipLink exists (S12).
 
@@ -409,7 +446,7 @@ cards        "block" of 2 to 4 "card" frames: title | sentence
 | Drawn | Built with | MDX |
 |---|---|---|
 | code block | `CodeBlock` with `highlighted` from Shiki, the copy button its own, the title "terminal" or the file name | a fenced block; the info string carries `title="app/globals.css"` |
-| tabbed code (npm, pnpm, yarn, bun) | `Tabs` (`keepMounted`, so every tab is in the HTML) over one `CodeBlock` per tab | `<PackageManagers command="add topclassui zod" />`, which writes the four lines |
+| tabbed code (npm, pnpm, yarn, bun) | `Tabs` (`keepMounted`, so every tab is in the HTML) over one `CodeBlock` per tab | `<PackageManagers />`, which writes the four lines from the one install constant (S8) |
 | table | `Table` (server) | a GFM table |
 | callout | `Alert`, tone `info` or `warning`, with its icon | `<Callout tone="info">` |
 | wrong/right | two `CodeBlock`s side by side (stacked under 48rem) with "Wrong" and "Right" titles, the warning and check icons | `<WrongRight>` with two fences |
@@ -457,7 +494,10 @@ Repo: THEME_SCRIPT reads localStorage 'tc-theme'; with nothing stored it follows
   library ships `useTheme` (S12).
 - **The default mode.** `<html data-theme="dark" suppressHydrationWarning>` in the server
   HTML, and `<ThemeScript />` first in `<head>`. The script as built follows the system when
-  nothing is stored (choice 9).
+  nothing is stored, and picks light when the system does not say dark
+  (`src/shared/theme/script.ts`). So a first visitor with no preference, Lighthouse and most
+  crawlers get light; the server's `dark` shows only without JavaScript. DECISIONS 2026-09-25
+  wants dark first; that needs the library change of choice 9.
 - **Language switch.** Where Figma draws LTR/RTL: two links, "English" and "العربية", each
   with `hreflang` and `lang`, to the same page in the other locale; the current one carries
   `aria-current="page"`. A server component: 0 KB. It is the LanguageSwitcher of PLAN 18,
@@ -475,8 +515,8 @@ PLAN: nothing decided. Command is built: client, lazy, a collection with getKey,
 
 **Build this.**
 
-- **The index.** `docs:data` writes `.generated/search.<locale>.json`, served as a static
-  file: every live page (title, lead, each `##` heading with its anchor), every component
+- **The index.** `docs:data` writes `apps/docs/public/search/<locale>.json` (git-ignored;
+  Next serves files only from `public/`), fetched as `/search/<locale>.json`: every live page (title, lead, each `##` heading with its anchor), every component
   (name, title, description, section, and its props by name), and the 84 icon names pointing
   at the Icons page's anchors. About 150 page entries and 84 icons per locale; a few tens of
   KB. Grouped Pages, Components, Icons.
@@ -522,18 +562,23 @@ Repo: Breadcrumb already emits BreadcrumbList JSON-LD with baseUrl. No JsonLd co
   `Breadcrumb` (it already emits it; do not emit a second), `SoftwareSourceCode` and
   `Organization` on Home (`codeRepository` only once the repository is public). No FAQPage in
   the first release.
-- **Open Graph images.** `opengraph-image.tsx` for Home, each guide page and each component,
-  in both locales, with `next/og` (part of Next, no dependency). 1200x630, the page
+- **Open Graph images.** `opengraph-image.tsx` for Home, each guide page and each component
+  (the three files in S1's tree), in both locales, with `next/og` (part of Next, no
+  dependency), each with `generateStaticParams` so it is built once. 1200x630, the page
   background of the dark mode, the name, the chip and one line. Fonts loaded from files
-  committed under `apps/docs/assets/fonts` (Inter and Noto Sans Arabic, the weights used;
-  measure their size before committing). In Arabic the Latin name sits on its own line and
-  the Arabic line on its own line with `direction: rtl`. One Arabic image is checked by eye
-  before launch (PLAN 19, Phase 7).
+  committed under `apps/docs/assets/fonts` (Inter and Noto Sans Arabic, the weights used) as
+  TTF or WOFF, never WOFF2: `next/og` (Satori) does not read WOFF2. Write each file's size in
+  the pull request. In Arabic the Latin name sits on its own line and the Arabic line on its
+  own line with `direction: rtl`. Satori's Arabic shaping and bidi are not reliable, so one
+  Arabic image is checked by eye before launch (PLAN 19, Phase 7); if it is wrong, the `/ar`
+  pages use one static template image per locale instead (PLAN 15.3's fallback).
 - **`sitemap.ts`**: every live page in both locales, each with its `alternates.languages`;
   no `/preview`. **`robots.ts`**: allow all, disallow `/preview/`, the sitemap URL.
   **`manifest.ts`**: name, short name, the dark page colour, the icon.
   **`llms.txt`**: generated from the registry and the component file: one line per page and
-  per component, title, URL, description.
+  per component, title, URL, description. Its `route.ts` exports `dynamic = 'force-static'`:
+  since Next 15 a `GET` route handler is dynamic unless it opts out (rule 4). The later RSS
+  route does the same.
 - **Internal links.** Every component page links to the other components of its section,
   to Field when it is a form control, and to Right to left and Theming (PLAN 15.3).
 - **After launch** (not a pull request): verify the domain in Google Search Console and Bing
@@ -551,9 +596,18 @@ DECISIONS 2026-10-06: R-8.3-3 still stands for the site's props table, "a differ
   from the same two sources" as the README.
 ```
 
-**Build this.** One script, `scripts/docs-data.ts` at the root (it reuses `scripts/lib`),
-run by `docs:build` and `docs:dev` before Next, writing `apps/docs/.generated/components.json`
-and the search files. A unit test runs it against the repo and pins its output's shape.
+**Build this.** One script, `apps/docs/scripts/docs-data.ts`, run with `tsx` by
+`docs:build` and `docs:dev` before Next, writing `apps/docs/.generated/components.json` and
+the search files. It imports `../../../packages/react/scripts/lib/*.js` (tsx maps `.js` to
+`.ts`, and the library's own `imports` resolve `#shared/*` for those files). A unit test runs
+it against the repo and pins its output's shape.
+
+- **The one door.** Everything the site reads from the library's `src/`, `scripts/lib/`,
+  `raw/` or `docs/icons.md` (tokens, contrast results, the utility list, the icon counts,
+  props, demo sources) is read by `docs:data` under tsx and written to `.generated/*.json`.
+  `apps/docs` itself imports only `.generated/`, the `topclassui` package and the `@demos/*`
+  alias. Next cannot import the library's scripts or source: they are `.ts` files behind
+  `#shared/*`, and Turbopack does not resolve `.js` to `.ts` (PLAN 4, DECISIONS).
 
 - **Per component** it collects:
   - from `meta.ts`: `name`, `slug`, `rendering`, `status`, `baseUi`, `tier`;
@@ -561,8 +615,8 @@ and the search files. A unit test runs it against the repo and pins its output's
     category is not used for the catalog, because it is PLAN 18's grouping, not the
     site's), and its order;
   - from `content/components/<slug>.ts`: the human title, the one-line description, the
-    note, the keyboard rows, the RTL note and the related slugs, in `en` and `ar`, and which
-    demos the page shows, in order;
+    note, the keyboard rows, the RTL note and the related slugs, in `en` and `ar`, which
+    demos the page shows, in order, and the stage's reserved height, `stageHeight` (S8);
   - **props**: the README generator's rows (`rowsFromJsonSchema` over `z.toJSONSchema` of
     the schema, `ownPropsOf` over `types.ts`, `mergeRows`), per part for a part family
     (`familyOf`). Same sources as the README, so the two never disagree. This reads
@@ -584,8 +638,9 @@ and the search files. A unit test runs it against the repo and pins its output's
   subpath. If the release plan picks another import shape, only this file changes.
 - **The demos run from `dist`.** The site imports a demo as `@demos/<slug>/<demo>` (S1's
   alias to `dist/components/<slug>/dummy/<demo>.js`), so a demo's `../index.js` is the same
-  module the site gets from `topclassui/<slug>`, and `#shared/*` resolves through the
-  package's own `imports`. The release plan decides whether `dummy/` ships to npm (choice 7);
+  module the site gets from `topclassui/<slug>`. The library's build has already rewritten
+  every `#shared/*` in `dist` to a relative path (release plan R4), so nothing needs the
+  `imports` field. The release plan decides whether `dummy/` ships to npm (choice 7);
   either way it exists in the workspace's `dist`.
 - **Checks** (unit tests in `apps/docs`): `sections.ts` holds exactly the 46 slugs of
   the catalog, each once; every slug with a component page has a content file with both
@@ -650,13 +705,18 @@ every component page, and by nothing else. Its five parts in Figma's order.
   so the docs and the tests never disagree (PLAN 16).
 - **Install.** The release plan's paths. With its defaults: one row, "Import from the
   package", `import { Button } from 'topclassui/button'` with a copy button named "Copy the
-  import for Button", and one line: "Install once: npm i topclassui zod" linking to the
-  Install page. The second half, "Copy the source" with `npx topclassui add <slug>`, appears
+  import for Button", and one line: "Install once:" with the release plan's install line
+  (`npm i topclassui@beta zod` during the betas, `npm i topclassui zod` after; one constant in
+  the site's labels, used by every install line on the site) linking to the Install page. The second half, "Copy the source" with `npx topclassui add <slug>`, appears
   when the CLI ships (choice 11).
 - **Lazy.** Server parts (head, code, states, a server component's stage) are plain server
   HTML. A client stage and the Try it panel mount when the card comes within one viewport
-  of the screen, through a small site island that renders the component's own `skeleton`
-  until then (each component ships one) and keeps the card's height, so nothing shifts.
+  of the screen, through a small site island. The island reserves the height itself: a
+  `min-block-size` from the content file's `stageHeight` (rem), filled with one neutral
+  library `Skeleton` block until the component mounts, so nothing shifts. It does not rely on
+  a component skeleton: only seven components ship one (avatar, badge, button, card, input,
+  table, textarea), and none of the 20 client ones does. The S13 Playwright run measures the
+  layout shift of the catalog while it scrolls, and a `stageHeight` that is too small fails it.
 - **RTL.** The card mirrors as a whole on `/ar`: Try it on the inline start, states in
   reading order. The control labels are Arabic and the values stay Latin, as the Arabic frame
   draws; prop names stay Latin and left to right.
@@ -841,19 +901,24 @@ each merge (GitHub Actions is off). It is separate from `pnpm check`, which stay
 library's gate, because `next build` of about 2,500 pages is slow and heavy.
 
 1. `tsc --noEmit -p apps/docs`.
-2. ESLint over `apps/docs` with the repo's config and its custom rules.
+2. ESLint over `apps/docs` with the site's `eslint.config.ts` and the library's custom rules
+   it turns on (rule 2), including its test that each rule fires.
 3. The site's unit tests (vitest, node project): the pipeline, the import rewrite, the
    registry, metadata uniqueness and length, the sitemap's alternates, the Shiki contrast,
    and the guide pages' code samples type-checked against the package (a sample that does
    not compile fails the step).
-4. `pnpm docs:build`.
+4. `pnpm docs:build`, then a check over its route list: every route is static or SSG (no
+   route marked dynamic), `/search/en.json` and `/search/ar.json` exist in the output, and
+   `/llms.txt` is prerendered. Read the marks from the installed Next's build output.
 5. Playwright against `next start -p 4611`, both locales, a sample of pages (Home, every
    guide page, the catalog, five component pages, `not-found`): axe, the library's target
    size and focus ring checks, no horizontal scroll at 390 px, the sticky-bar test of PLAN
    10.5 rule 11 (the last link before the footer is fully visible when focused), an anchor
    clears the navbar, hreflang and canonical present and reciprocal, the JSON-LD parses,
    the mode switch persists across a reload with no flash (`data-theme` before first paint),
-   the language switch keeps the path.
+   the language switch keeps the path, the catalog's layout shift while scrolling stays under
+   0.02, an unknown URL (`/fr/x`, `/random`) returns 404 with the global not-found page,
+   `/en/docs` redirects to `/en/docs/installation`.
 6. The `TODO(tc)` list, printed.
 7. Lighthouse, by hand before launch and after big changes: `@lhci/cli` 0.15.1 (98 KB,
    choice 16), five mobile runs, median, against `next start`, never a Vercel preview
@@ -1257,8 +1322,8 @@ next: "Provider"
 
 **Build this.** As drawn, with the release plan's two CSS subpaths in place of
 `topclassui/tokens.css` and `topclassui/styles.css` if they differ. "The utility names you get"
-is generated from `src/styles.css`'s `@theme inline` block at build time, so it cannot fall
-behind. The override sample's emerald stays (it is an example of a user's own colour). The
+is generated from `src/styles.css`'s `@theme inline` block by `docs:data` (S7), so it cannot
+fall behind. The override sample's emerald stays (it is an example of a user's own colour). The
 Vite section links to page 2 instead of repeating its code.
 
 ### 5. Provider: `/en/docs/provider`
@@ -1543,11 +1608,12 @@ next: "Icons"
 from the real tokens, not from the drawing:
 
 - "The three layers" sample says `blue-600`, not `violet-600`.
-- "Every class" and "The six tones": generated at build time from `src/tokens.css` (the
-  library's `scripts/lib/tokens.ts` parser) in all three modes. Each swatch is a live element
+- "Every class" and "The six tones": generated by `docs:data` (S7) from `src/tokens.css`
+  (the library's `scripts/lib/tokens.ts` parser) in all three modes. Each swatch is a live element
   painted with the token, not a picture, and shows its shade name in the current mode.
-- Contrast badges beside each pair, computed at build time with `scripts/lib/contrast-checks.ts`
-  and `color.ts`, the same code `check:contrast` runs (PLAN 6.4).
+- Contrast badges beside each pair, computed by `docs:data` with `scripts/lib/contrast-checks.ts`
+  and `color.ts`, the same code `check:contrast` runs (PLAN 6.4), and read from
+  `.generated/` by the page.
 - Live controls at the top (PLAN 6.4): mode, direction, radius, density, changing the page.
   Mode is the page's mode switch; radius and density are `Slider`s writing `--tc-radius` and
   `--tc-density` on the page's `main`; direction is not offered on an English page (S4).
@@ -1626,7 +1692,8 @@ TOC: The set | A sample of the set | Two ways to render | Sizes | What flips in 
 
 **Build this.** The second page that attracts search traffic.
 
-- "The set": the counts generated from `raw/` and `directional.generated.ts`.
+- "The set": the counts, written by `docs:data` (S7) from `raw/` and
+  `directional.generated.ts`.
 - "The whole set" (one name for the section, the heading and the On this page row,
   surprise 16): all 84 icons, rendered at build time with `<Icon name>` on the server, each
   tile a button that copies `<Icon name="..." />` and is named "Copy the code for {icon}".
@@ -1677,8 +1744,8 @@ Section: What is deliberately not themeable  [16]"The type scale, the spacing sc
 next: "Right to left"
 ```
 
-**Build this.** As drawn. The knobs table is generated from `tokens.css` (names and
-defaults). The ocean sample is read from `tokens.css`. Add one live example: a `section` with
+**Build this.** As drawn. The knobs table is generated by `docs:data` (S7) from `tokens.css`
+(names and defaults). The ocean sample is read from `tokens.css` the same way. Add one live example: a `section` with
 `data-theme="ocean"` holding a Button and an Input, beside the same pair in the page's mode.
 
 ### 10. Right to left: `/en/docs/rtl`
@@ -1856,7 +1923,7 @@ stale lines change:
 - "Automatic and manual": the "When" column says "every `pnpm check`", not "every CI run"
   (CI is off).
 - "Labels are enforced by the types": the IconButton sentence goes (IconButton is not built).
-- `TOUCH_TARGET` and `FOCUS_RING` are read from `src/shared/classes.ts` at build time, not
+- `TOUCH_TARGET` and `FOCUS_RING` are imported from `topclassui/classes` and printed, not
   typed.
 
 ### 13. Components (the catalog): `/en/docs/components`
@@ -2200,8 +2267,8 @@ PLAN 20: "The docs page exists in English and Arabic, with a props table generat
 **Build this.** The template, generated for all 46 cards, and for Field, Form and Meter
 (choice 5). Sections in this order, each an `h2` in On this page:
 
-1. **Head**: the breadcrumb (Docs > Components > {Title}, the library's `Breadcrumb`, which
-   emits the BreadcrumbList), the `h1` (the human title), the description, the chip.
+1. **Head**: the breadcrumb (Home > Components > {Title}, the library's `Breadcrumb` with
+   its `baseUrl`, which emits the BreadcrumbList; every crumb is a page that exists), the `h1` (the human title), the description, the chip.
 2. **The Previewer card** (S8), whole.
 3. **Examples**: the demos the content file lists, a grid of two columns at 64rem and up, one
    below. Each demo is a `Tabs` with "Preview" and "Code" (`keepMounted`, so the code is in
@@ -2504,9 +2571,16 @@ section on the Accessibility or Server first page once `test:visual` exists.
 
 ### 20. Not found
 
-**Build this.** `app/(site)/[locale]/not-found.tsx`, in both locales, inside the shell:
-"This page does not exist", a link to Home, a link to the components, and the search
-button. `noindex`. Not drawn.
+**Build this.** Two files, neither drawn.
+
+- `app/(site)/[locale]/not-found.tsx`, in both locales, inside the shell: "This page does not
+  exist", a link to Home, a link to the components, and the search button. `noindex`. It
+  answers a `notFound()` inside a locale, such as `/en/docs/components/nope`.
+- `app/global-not-found.tsx`, for a URL no root layout matches (`/fr/x`, `/random`): there is
+  no `app/layout.tsx` (PLAN 15.3), so the locale one cannot render. Its own
+  `<html lang="en" dir="ltr">`, the same CSS, `noindex`, one line and a link to `/en`. Check
+  against the installed Next types whether `experimental.globalNotFound` is still needed in
+  `next.config.ts`, and record the answer in DECISIONS.
 
 ## Build order
 
@@ -2517,7 +2591,8 @@ button. `noindex`. Not drawn.
 1. **The shell and Home**, two pull requests.
    1. `apps/docs` scaffold (S1), the shell (S2), the content blocks (S3), the mode and
       language switches (S4), the SEO kit (S6) without Open Graph images, the site's labels,
-      `not-found`, `docs:check` (S13). One placeholder guide page proves the shell.
+      both not-found pages (page 20), the redirects, `postcss.config.mjs`, the site's
+      `eslint.config.ts` (rule 2), `docs:check` (S13). One placeholder guide page proves the shell.
    2. Home (page 1), its Open Graph image, `sitemap.ts`, `robots.ts`, `manifest.ts`.
 2. **The getting-started pages**, one pull request: Install the package, CSS entry, Provider,
    Your first component (pages 2, 4, 5, 6), in both locales, with the compile test of their
@@ -2528,7 +2603,7 @@ button. `noindex`. Not drawn.
    library's `pnpm check` (the harness renders and axe-checks the new demos in 3 modes and 2
    directions). Can run beside step 2: no shared file.
 4. **The component page template**, generated for all 46, in three pull requests:
-   1. The pipeline (S7): `scripts/docs-data.ts`, `content/sections.ts`, the import rewrite,
+   1. The pipeline (S7): `apps/docs/scripts/docs-data.ts`, `content/sections.ts`, the import rewrite,
       the props rows, the playground controls, with their tests.
    2. The Previewer (S8), the component page (page 14) and the `/preview` route (S9), with
       the content files of one section (Actions, four components) to prove them.
@@ -2557,7 +2632,7 @@ decide the scope and are asked before step 1.
 | 6 | Search | a build-time JSON index in the library's `Command`, no dependency | `pagefind` 1.5.2 (dev only, a 58 MB binary on disk) for full-text search; or a hosted service |
 | 7 | How the site reaches the demos | a resolve alias to the workspace's `dist/components/*/dummy`, and `dummy/` left out of the npm package | publish `./dummy/*` and `./meta/*` as PLAN 4's exports say, which puts demo classes into every user's Tailwind scan |
 | 8 | Arabic type | Noto Sans Arabic, three weights, the type scale's line-heights | a taller Arabic line-height, decided by looking at `/ar` pages (STATUS: "a design call") |
-| 9 | The default mode | the system's mode, dark when the system says nothing; the server HTML says dark; no library change | dark for every first visit: a `fallback` option on `ThemeScript`, a library change with its own hash |
+| 9 | The default mode | the system's mode, light when the system does not say dark (so Lighthouse and crawlers see light); no library change | dark for every first visit: a `fallback` option on `ThemeScript`, a library change with its own hash |
 | 10 | Arabic pages | every live page in Arabic from the first release; the planner drafts, Omar corrects | Arabic for the component pages only at first, the guide pages one by one (hreflang then pairs only those) |
 | 11 | What the first release leaves out | the CLI page and every "Copy the source" half, the Connectors page and Home's AdaptiveMenu panel, the Theme builder, the Blog | ship them marked "coming", which search engines index as thin pages |
 | 12 | Links to things that may not exist | shown only when they exist: GitHub (public repository), YouTube, X, the Figma library, the registry | drawn as in Figma |
@@ -2568,6 +2643,7 @@ decide the scope and are asked before step 1.
 | 17 | The hero line | Figma's "Top-class UI. Built for Next.js." | DECISIONS' "The React UI kit that reads both ways" |
 | 18 | The catalog's weight | one page of 46 cards, client parts mounted near the viewport | seven section pages if the lab budgets fail |
 | 19 | Analytics | none in the first release; Search Console and Bing only | Vercel Web Analytics (`@vercel/analytics` 2.0.1, 497 KB on disk; its page script measured against TBT), cookie-free as PLAN asks |
+| 20 | The site's focus ring, hover and target size | imported from `topclassui/classes` (release plan C18) | if C18 stays private: the site copies the strings into `apps/docs/components/classes.ts`, two copies to keep in step |
 
 ## Where this file departs from docs/PLAN.md
 
