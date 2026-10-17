@@ -30,7 +30,7 @@ export type NumberFieldProps = Omit<Base.Root.Props, Owned>
   & NumberFieldName
 
 /** What the hook holds and resolves: the value and its handler, the hidden input, the bounds, and the locale. */
-export type NumberFieldValueProps = Pick<Base.Root.Props, 'value' | 'defaultValue' | 'onValueChange' | 'inputRef' | 'allowOutOfRange' | 'locale' | 'format'>
+export type NumberFieldValueProps = Pick<NumberFieldProps, 'value' | 'defaultValue' | 'onValueChange' | 'inputRef' | 'allowOutOfRange' | 'locale' | 'format'>
   & Pick<NumberFieldDesignProps, 'min' | 'max' | 'step'>
 
 /** What Base UI hands a change handler: the reason, the event, and cancel(). */
