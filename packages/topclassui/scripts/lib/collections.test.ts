@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import {
-  COLLECTION_EXEMPT, callsUseCollection, collectionErrors, rendersItems, takesCollectionProps, takesLoadMore,
+  COLLECTION_EXEMPT, callsUseCollection, collectionErrors, rendersItems, takesCollectionProps, takesListRows, takesLoadMore,
 } from './collections.js'
 
 const COMPONENTS = join(process.cwd(), 'src', 'components')
@@ -35,6 +35,19 @@ describe('rendersItems', () => {
   it('ignores items in a comment, and a prop that only ends in items', () => {
     expect(rendersItems('/** the items: every row */\n// items: none\ntype P = { value: string }')).toBe(false)
     expect(rendersItems('type P = {\n  menuItems: Row[]\n}')).toBe(false)
+  })
+})
+
+describe('takesListRows', () => {
+  it('sees a list by its knob, whatever its items are called: a visibleRows prop, or --tc-list-rows in the code', () => {
+    expect(takesListRows('export interface P {\n  visibleRows: number | undefined\n}')).toBe(true)
+    expect(takesListRows("const LIST = 'max-h-[calc(var(--tc-list-rows)*2rem)]'")).toBe(true)
+    expect(takesListRows("<ul style={{ '--tc-list-rows': rows }} />")).toBe(true)
+  })
+
+  it('ignores the knob named in a comment, and a prop that only ends in visibleRows', () => {
+    expect(takesListRows('/** shows about --tc-list-rows rows */\n// visibleRows: 7\nconst A = 1')).toBe(false)
+    expect(takesListRows('type P = {\n  maxVisibleRows: number\n}')).toBe(false)
   })
 })
 
@@ -96,6 +109,14 @@ describe('collectionErrors', () => {
     expect(collectionErrors({ slug: 'list', types, hook: null }, { list: 'a reason' })).toEqual(['its props take CollectionProps, which no exemption covers'])
   })
 
+  it('rejects a list found only by its knob, as a file list that renders File rows with no items prop', () => {
+    const types = 'export interface UploadState {\n  visibleRows: number | undefined\n}'
+    const hook = 'export function useUpload() { return { rows: [] } }'
+    expect(collectionErrors({ slug: 'upload', types, hook })).toEqual(['renders items and its hook.ts never calls useCollection'])
+    expect(collectionErrors({ slug: 'upload', types: 'type P = {}', hook, rest: "const L = 'max-h-(--tc-list-rows)'" }))
+      .toEqual(['renders items and its hook.ts never calls useCollection'])
+  })
+
   it('an exemption that no longer holds is an error, so the table cannot grow stale', () => {
     expect(collectionErrors({ slug: 'list', types: ITEMS, hook: HOOK }, { list: 'a reason' })).toEqual(['calls useCollection and is still exempt; remove it from COLLECTION_EXEMPT'])
     expect(collectionErrors({ slug: 'list', types: 'type P = {}', hook: null }, { list: 'a reason' })).toEqual(['renders no items and is still exempt; remove it from COLLECTION_EXEMPT'])
@@ -105,17 +126,20 @@ describe('collectionErrors', () => {
 
 describe('the components in src', () => {
   const slugs = readdirSync(COMPONENTS, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name)
-  const folder = (slug: string) => ({ slug, types: read(slug, 'types.ts'), hook: read(slug, 'hook.ts') })
+  const rest = (slug: string) => ['schema.ts', 'classes.ts', 'client.tsx'].map((file) => read(slug, file) ?? '').join('\n')
+  const folder = (slug: string) => ({ slug, types: read(slug, 'types.ts'), hook: read(slug, 'hook.ts'), rest: rest(slug) })
 
-  it('the three windowed lists call useCollection in their hook', () => {
+  it('the six collections call useCollection in their hook', () => {
     const windowed = slugs.filter((slug) => callsUseCollection(read(slug, 'hook.ts') ?? '')).sort()
-    expect(windowed).toEqual(['combobox', 'command', 'tree-view'])
+    expect(windowed).toEqual(['combobox', 'command', 'file-upload', 'select', 'table', 'tree-view'])
   })
 
   it('every component that renders items is windowed or exempt by name', () => {
     const rendering = slugs.filter((slug) => rendersItems(read(slug, 'types.ts') ?? '')).sort()
     expect(rendering).toEqual(['breadcrumb', 'combobox', 'command', 'dropdown', 'select', 'stepper', 'table', 'timeline', 'tree-view'])
-    expect(Object.keys(COLLECTION_EXEMPT).sort()).toEqual(['breadcrumb', 'dropdown', 'select', 'stepper', 'table', 'timeline'])
+    const byKnob = slugs.filter((slug) => !rendering.includes(slug) && takesListRows(`${read(slug, 'types.ts') ?? ''}\n${rest(slug)}`))
+    expect(byKnob).toEqual(['file-upload'])
+    expect(Object.keys(COLLECTION_EXEMPT).sort()).toEqual(['breadcrumb', 'dropdown', 'stepper', 'timeline'])
   })
 
   it('no folder breaks the rule', () => {
@@ -124,6 +148,11 @@ describe('the components in src', () => {
 
   it('a collection that took the contract and dropped useCollection would fail', () => {
     const broken = { ...folder('command'), hook: (read('command', 'hook.ts') ?? '').replace(/useCollection\(/g, 'useRows(') }
+    expect(collectionErrors(broken)).toEqual(['renders items and its hook.ts never calls useCollection'])
+  })
+
+  it('the file list, which has no items prop, would fail the same way without useCollection', () => {
+    const broken = { ...folder('file-upload'), hook: (read('file-upload', 'hook.ts') ?? '').replace(/useCollection\(/g, 'useRows(') }
     expect(collectionErrors(broken)).toEqual(['renders items and its hook.ts never calls useCollection'])
   })
 })

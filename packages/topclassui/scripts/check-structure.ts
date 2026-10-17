@@ -130,7 +130,8 @@ function checkComponentFolder(dir: string, slug: string) {
 
   // R-8.5-1: a component that renders items windows them through useCollection in its hook, or is exempt by decision.
   const source = (f: string) => (files.includes(f) ? readFileSync(join(dir, f), 'utf8') : null)
-  for (const error of collectionErrors({ slug, types: source('types.ts'), hook: source('hook.ts') })) {
+  const rest = ['schema.ts', 'classes.ts', 'client.tsx'].map((f) => source(f) ?? '').join('\n')
+  for (const error of collectionErrors({ slug, types: source('types.ts'), hook: source('hook.ts'), rest })) {
     errors.push(`${rel(dir)}: ${error} (R-8.5-1).`)
   }
 
