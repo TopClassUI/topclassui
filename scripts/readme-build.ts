@@ -44,7 +44,9 @@ for (const slug of folders) {
 
   if (existsSync(schemaFile)) {
     const loaded = (await import(pathToFileURL(schemaFile).href)) as Record<string, unknown>
-    const schema = Object.values(loaded).find((v) => v instanceof z.ZodType)
+    // By name, not the first one found: a schema.ts may also hold a skeleton's, which is not the component's props.
+    const own = loaded[`${slug.replace(/-(\w)/g, (_, c: string) => c.toUpperCase())}Schema`]
+    const schema = own instanceof z.ZodType ? own : undefined
     if (schema) {
       // zod types the payload generically; the fields the table needs are a subset.
       const json = z.toJSONSchema(schema, { io: 'input' }) as JsonSchemaObject
