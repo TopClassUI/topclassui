@@ -119,6 +119,38 @@ pasted the numbers:
   `e2e/<slug>.spec.ts`, and a mutation row that `vitest run` catches. Prove it once by
   putting the old line back.
 
+### What Dialog settled
+
+Dialog was built first, measured by its builder, reviewed by three independent reviewers and
+fixed. Every later overlay copies what follows and does not rediscover it:
+
+- **A portaled part reads `usePortalLocale()`** (`src/shared/provider/use-portal-locale.ts`)
+  through its `hook.ts`, and puts `dir` and `lang` on the outermost element inside the portal:
+  the Viewport of a modal, the Positioner of a popup. With no provider both are undefined, so
+  the popup inherits from the page. Never `useDirection()` for this.
+- **A scroll container** carries `SCROLL_AREA`, which keeps room for the focus ring of a control
+  it scrolls into view, and `FOCUS_RING_INSET`. It is a tab stop only while it scrolls:
+  `useScrollTabStop(ref)` from `src/shared/use-scroll-tab-stop.ts`, called from a
+  `use<Name>Body()` hook. No demo writes `tabIndex`.
+- **A popup on a scrim takes the inset ring.** A ring outside it is drawn on the scrim, at
+  1.82:1 in Light. It also takes `wrap-anywhere`, and scrolls itself as a last resort when its
+  header and footer leave the body no room (a short landscape phone).
+- **No part is a form by `render`.** `role="dialog"` on a `<form>` fails axe: the form goes
+  inside, as `<form className="contents">`.
+- **`modal` does what it says.** The scrim and the page lock exist only for `modal={true}`;
+  `"trap-focus"` and `false` leave the page live. One README line per value.
+- **A label on a trigger survives.** A Button that a Server Component rendered does not drop
+  it: Flight deletes undefined keys. Demos still put the label inside the Button, which keeps
+  its truncating span.
+- **Footer actions wrap** at 320 px instead of being cut with an ellipsis.
+- **Escape closes one layer.** A tooltip opened inside a dialog closes first; the guard is
+  shared.
+- **Not in the public types:** `handle` and `payload`. **Forwarded to the Portal:** `container`
+  and `keepMounted`.
+- **Tests wait for the overlay to be at rest** (`openOverlay`, `atRest`, `expectClosed` in
+  `e2e/overlay.ts`): every running animation finished, never a fixed time, never a bare popup
+  selector.
+
 Conventions Unit 2 settled, which this file follows:
 
 - **A link built from data takes one element prop named `link`** on the component
@@ -139,8 +171,8 @@ Conventions Unit 2 settled, which this file follows:
 - **`client.tsx` is markup.** No `useState`, `useEffect`, `useRef`, `useMemo` or
   `useCallback` (`R-5.12-1`). A part that needs state, a label or the direction calls one
   `use<Name>...()` from `hook.ts`, and `useLabels()`, `useDirection()` and
-  `useControllableState()` are called there. A component whose state is all Base UI's has
-  no `hook.ts`.
+  `useControllableState()` are called there. A portaled part still has a `hook.ts`, for
+  `usePortalLocale()`, even when its state is all Base UI's (Tooltip does).
 - **Types are derived at the seam** (`R-5.7-5`): `Omit<Base.X.Props, 'className'>` plus a
   string `className`, as `tooltip/types.ts` does. Every Base UI prop passes through
   untouched. A Build this block lists only the props we add or change.
@@ -184,8 +216,8 @@ Conventions Unit 2 settled, which this file follows:
   provider on a left-to-right page, a popup therefore takes the body's direction: its
   logical classes resolve the wrong way, its text is laid out left-to-right and its arrow
   points away from the trigger (measured on Tooltip with the live harness: the arrow 76 px
-  from the facing edge). Every part that renders a Portal puts `dir={direction}` from
-  `useDirection()` on the element it positions, through `hook.ts`, and its spec runs the
+  from the facing edge). Every part that renders a Portal puts `dir` and `lang` from
+  `usePortalLocale()` on the element it positions, through `hook.ts`, and its spec runs the
   island case: `rtl.tsx` opened on the LTR page as well as on the `--rtl` page.
 - **The live harness** is `pnpm harness:serve` and `e2e/live.ts`: `openLive(page, demo,
   { mode, direction, edge, tall })` waits for hydration and throws on any console or
@@ -392,7 +424,7 @@ Needs shared pull request 6. Base UI `dialog` (`baseUi: 'dialog'`): `Root`, `Tri
 - **`DialogTrigger`.** Base UI's Trigger with `render`, through
   `#shared/render-trigger.js`. No class of its own. It sets `data-popup-open`.
 - **`DialogPopup`** renders Portal, Backdrop, Viewport and Popup. `size`: the six `SIZES`,
-  default `md`, as `data-size`. `render` passes to Base UI, so `render={<form />}` works.
+  default `md`, as `data-size`. `render` passes to Base UI, but not for a form: `role="dialog"` on a `<form>` fails axe, so a form goes inside the popup.
   - Backdrop: `SCRIM z-(--tc-z-dialog)` and `FADE_MOTION`.
   - Viewport: `fixed inset-0 z-(--tc-z-dialog) grid place-items-center
     p-(--tc-overlay-inset)`.
