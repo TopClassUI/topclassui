@@ -22,6 +22,7 @@ export default defineConfig(
     plugins: { topclass },
     rules: {
       'topclass/logical-properties-only': 'error',
+      'topclass/dir-aware-transforms': 'error',
       'topclass/semantic-classes-only': 'error',
       'topclass/no-dynamic-class-names': 'error',
       'topclass/shared-class-constants': 'error',
@@ -53,6 +54,7 @@ export default defineConfig(
       'topclass/semantic-classes-only': 'off',
       'topclass/shared-class-constants': 'off',
       'topclass/logical-properties-only': 'off',
+      'topclass/dir-aware-transforms': 'off',
       'topclass/style-sets-tokens-only': 'off',
       'topclass/text-comes-from-labels': 'off',
     },

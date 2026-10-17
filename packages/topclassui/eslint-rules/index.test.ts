@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+
 import { Linter } from 'eslint'
 import tseslint from 'typescript-eslint'
 import { describe, expect, it } from 'vitest'
@@ -16,6 +18,7 @@ const config = [
     },
     rules: {
       'topclass/logical-properties-only': 'error',
+      'topclass/dir-aware-transforms': 'error',
       'topclass/semantic-classes-only': 'error',
       'topclass/no-dynamic-class-names': 'error',
       'topclass/shared-class-constants': 'error',
@@ -653,4 +656,89 @@ describe('the new rules leave real component code alone', () => {
   it('still catches a spread that is not the consumer style', () => {
     expect(ids('<div style={{ ...theme }} />')).toContain('topclass/style-sets-tokens-only')
   })
+})
+
+describe('R-5.3-2: directional motion follows --tc-dir', () => {
+  const RULE = 'topclass/dir-aware-transforms'
+  const fails: [string, string][] = [
+    ['translate-x-full', '<div className="translate-x-full" />'],
+    ['a negative translate-x', '<div className="-translate-x-1/2" />'],
+    ['translate-x behind a variant', '<div className="data-open:translate-x-4" />'],
+    ['translate on both axes', '<div className="translate-1/2" />'],
+    ['an arbitrary translate-x', '<div className="translate-x-[12px]" />'],
+    ['a translate-x variable', '<div className="translate-x-(--offset)" />'],
+    ['an arbitrary pair with a physical x', '<div className="translate-[10px_0]" />'],
+    ['translateX in an arbitrary transform', '<div className="transform-[translateX(100%)]" />'],
+    ['translate() in an arbitrary transform', '<div className="transform-[translate(100%,0)]" />'],
+    ['translate3d in a property', '<div className="[transform:translate3d(4px,0,0)]" />'],
+    ['the translate property', '<div className="[translate:4px_0]" />'],
+    ['origin-left', '<div className="origin-left" />'],
+    ['origin-right', '<div className="origin-right" />'],
+    ['origin-top-left', '<div className="origin-top-left" />'],
+    ['an arbitrary origin on a side', '<div className="origin-[left_top]" />'],
+    ['a transform-origin property on a side', '<div className="[transform-origin:right]" />'],
+    ['bg-linear-to-r', '<div className="bg-linear-to-r" />'],
+    ['bg-linear-to-l', '<div className="bg-linear-to-l" />'],
+    ['bg-linear-to-tr', '<div className="bg-linear-to-tr" />'],
+    ['bg-gradient-to-r', '<div className="bg-gradient-to-r" />'],
+    ['bg-gradient-to-l', '<div className="bg-gradient-to-l" />'],
+    ['an inline-axis angle', '<div className="bg-linear-90" />'],
+    ['a negative angle', '<div className="-bg-linear-45" />'],
+    ['an arbitrary angle', '<div className="bg-linear-[45deg,var(--a),var(--b)]" />'],
+    ['a linear-gradient to a side', '<div className="bg-[linear-gradient(to_right,var(--a),var(--b))]" />'],
+    ['rtl: on a margin', '<div className="rtl:ms-2" />'],
+    ['rtl: on a translate', '<div className="rtl:-translate-x-full" />'],
+    ['ltr: on anything', '<div className="ltr:rotate-180" />'],
+    ['an arbitrary dir variant', '<div className="[[dir=rtl]_&]:ms-2" />'],
+    ['a :dir() variant', '<div className="[&:dir(rtl)]:scale-x-[-1]" />'],
+    ['a mirror other than the icon flip', '<div className="rtl:-scale-x-50" />'],
+    ['object-left with no rtl mirror', '<img className="object-left" />'],
+    ['bg-right with no rtl mirror', '<div className="bg-right" />'],
+    ['a class list in a const', 'const SLIDE = "transition-transform translate-x-full"'],
+  ]
+  for (const [label, code] of fails) {
+    it(`fails on ${label}`, () => {
+      expect(ids(code), code).toContain(RULE)
+    })
+  }
+
+  const passes: [string, string][] = [
+    ['a translate-x times --tc-dir', '<div className="translate-x-[calc(100%*var(--tc-dir))]" />'],
+    ['the switch thumb', '<span className="group-data-checked/toggle:translate-x-[calc((100cqw-100%)*var(--tc-dir))]" />'],
+    ['the drawer sheet', '<div className="data-starting-style:transform-[translateX(calc(100%*var(--tc-dir)))]" />'],
+    ['a block-axis translate', '<div className="-translate-y-1/2 translate-y-full" />'],
+    ['a block-axis translate function', '<div className="transform-[translateY(100%)]" />'],
+    ['a zero translate', '<div className="translate-x-0 translate-none" />'],
+    ['the swipe offset Base UI measures', '<div className="transform-[translate(var(--drawer-swipe-movement-x,0px),var(--drawer-swipe-movement-y,0px))]" />'],
+    ['the origin Base UI measures', '<div className="origin-(--transform-origin)" />'],
+    ['a centre or block-edge origin', '<div className="origin-center origin-top origin-bottom" />'],
+    ['a vertical gradient', '<div className="bg-linear-to-b bg-gradient-to-t bg-linear-180" />'],
+    ['a gradient angle times --tc-dir', '<div className="bg-linear-[calc(90deg*var(--tc-dir)),var(--a),var(--b)]" />'],
+    ['the icon mirror of PLAN section 7', '<svg className="inline-block shrink-0 rtl:-scale-x-100" />'],
+    ['an object position with its rtl mirror', '<img className="object-left rtl:object-right" />'],
+    ['a bg position with its rtl mirror', '<div className="bg-left-top rtl:bg-right-top" />'],
+    ['a direction-neutral position', '<img className="object-center bg-top" />'],
+    ['the data-ltr attribute variant, which is not ltr:', '<input className="data-ltr:text-match-parent" />'],
+    ['a block-axis rotation', '<div className="group-data-panel-open:rotate-180" />'],
+  ]
+  for (const [label, code] of passes) {
+    it(`allows ${label}`, () => {
+      expect(ids(code), code).not.toContain(RULE)
+    })
+  }
+})
+
+describe('R-5.3-2 rejects the real sources once their direction is taken out', () => {
+  const RULE = 'topclass/dir-aware-transforms'
+  const sources = ['src/components/drawer/classes.ts', 'src/components/switch/classes.ts', 'src/components/svg/index.tsx']
+  for (const file of sources) {
+    const code = readFileSync(new URL(`../${file}`, import.meta.url), 'utf8')
+    it(`${file} passes as written`, () => {
+      expect(ids(code, file)).not.toContain(RULE)
+    })
+    it(`${file} fails with --tc-dir removed or the mirror widened`, () => {
+      const broken = code.replaceAll('*var(--tc-dir)', '').replaceAll('rtl:-scale-x-100', 'rtl:-scale-x-100 rtl:rotate-180')
+      expect(ids(broken, file)).toContain(RULE)
+    })
+  }
 })
