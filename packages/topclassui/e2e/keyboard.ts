@@ -72,3 +72,16 @@ export async function expectRowRing(row: Locator, label: string): Promise<void> 
   await expect.poll(() => rowRingOf(row), { message: `${label}: the highlighted row has no ring` })
     .toEqual({ visible: true, style: 'solid', width: '2px' })
 }
+
+/** The name of the button addSentinel puts after the demo. */
+export const SENTINEL = 'After the demo'
+
+/** A button after the demo, outside React's root, so Tab out of a popup has a page control to go on to. */
+export async function addSentinel(page: Page): Promise<void> {
+  await page.evaluate((name) => {
+    const button = document.createElement('button')
+    button.type = 'button'
+    button.textContent = name
+    document.getElementById('demo')?.after(button)
+  }, SENTINEL)
+}
