@@ -4,10 +4,7 @@ import { DIRECTIONS } from '../scripts/lib/harness.js'
 import { liveErrors, openLive } from './live.js'
 import { atRest, openOverlay, scrollPageTo, wheelAt } from './overlay.js'
 
-// R-10.5-1 and R-10.5-3 across every overlay and bar at once, by what the browser computes: the spec of each
-// component proves its own details. A scrolling overlay scrolls its Body between a header and a footer that
-// keep their boxes; an anchored popup sits where POPUP_BOUNDS puts it, inside the room Base UI measured, and its list by
-// the row cap; every scroll container in an overlay stops at its own edge; a sticky bar publishes its height.
+// R-10.5-1 and R-10.5-3 across every overlay and bar, by what the browser computes; each component's spec has its details.
 
 /** Every element in an open portal that scrolls on the block axis, and how it ends a scroll. */
 interface Scroller { name: string, overscroll: string, scrolls: boolean }
@@ -108,39 +105,56 @@ for (const { demo, trigger } of WITH_BODY) {
       expect((await scrollersIn(page)).filter((s) => s.overscroll !== 'contain'), 'every scroll container in the overlay stops at its edge').toEqual([])
     })
   }
+
+  // DECISIONS 2026-10-17: at WCAG 1.4.10's 320 x 256 the bars leave the Body four lines, so the popup scrolls as one.
+  test(`${demo}, on a 320 x 256 screen: the Body stops scrolling and the popup scrolls as one, inside the screen`, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 256 })
+    const popup = await openWithBody(page, demo, trigger)
+    const { parts, popupScrolls } = await partsOf(popup)
+    expect(parts[1], 'the Body no longer scrolls').toMatchObject({ overflow: 'visible', scrolls: false })
+    expect(popupScrolls, 'the popup does').toBe(true)
+    expect(await wheelToEnd(page, popup), 'the page behind never scrolled').toBe(20)
+    expect(await popup.evaluate((element) => Math.round(element.scrollTop)), 'the popup moved').toBeGreaterThan(100)
+    const box = await popup.boundingBox()
+    expect(box && box.y >= 0 && box.y + box.height <= 256.5, 'the popup fits the screen').toBe(true)
+    expect((await scrollersIn(page)).filter((s) => s.overscroll !== 'contain'), 'every scroll container in the overlay stops at its edge').toEqual([])
+  })
 }
 
-// R-10.5-1 for an anchored popup: POPUP_BOUNDS of src/shared/floating.ts gives the positioner its 6 px offset and
-// its 8 px collision padding, the popup's own classes hold it to --available-height, and a list to --tc-list-rows.
+// R-10.5-1 for an anchored popup: FLOATING of src/shared/floating.ts gives the positioner its 6 px offset and its 8 px
+// collision padding, POPUP_BOUNDS of src/shared/classes.ts holds the popup to the room, and a list to --tc-list-rows.
 /** From src/shared/floating.ts, written out: an expectation is never read from the code under test (R-17-1). */
 const SIDE_OFFSET = 6
 const COLLISION_PADDING = 8
 
-/** short: the popup fits a desktop screen, so a 220 px one is what makes it scroll. */
-interface Popup { demo: string, trigger: (page: Page) => Locator, list: string | null, rows: boolean, short?: boolean }
+/** zoomed: the calendar fits any screen above its 20rem short mode whole, so text zoomed to a 32 px root makes it scroll. */
+interface Popup { demo: string, trigger: (page: Page) => Locator, list: string | null, rows: boolean, zoomed?: boolean }
 
 const POPUPS: Popup[] = [
   { demo: 'popover--long-content', trigger: (page) => page.getByRole('button', { name: 'Change log' }), list: null, rows: false },
   { demo: 'dropdown--sixty-items', trigger: (page) => page.getByRole('button', { name: 'Time zone' }), list: null, rows: true },
   { demo: 'select--sixty-items', trigger: (page) => page.getByRole('combobox', { name: 'Sixty options' }), list: '[role="listbox"]', rows: true },
   { demo: 'combobox--ten-thousand', trigger: (page) => page.getByRole('combobox', { name: 'Ten thousand options' }), list: '[role="listbox"]', rows: true },
-  { demo: 'date-picker--basic', trigger: (page) => page.getByRole('button', { name: /Check-in/ }), list: null, rows: false, short: true },
+  { demo: 'date-picker--basic', trigger: (page) => page.getByRole('button', { name: /Check-in/ }), list: 'div:has(> [role="grid"])', rows: false, zoomed: true },
 ]
 
 /** The positioner Base UI measured the room on, and the popup it holds. */
 const positionerOf = (page: Page) => page.locator('[data-base-ui-portal] [style*="--available-height"]').last()
 
-for (const { demo, trigger, list, rows, short = false } of POPUPS) {
+for (const { demo, trigger, list, rows, zoomed = false } of POPUPS) {
   for (const edge of ['top', 'bottom'] as const) {
     test(`${demo}, at the ${edge} edge: bounded by the room Base UI measured${rows ? ' and the row cap' : ''}, scrolling inside itself`, async ({ page }) => {
-      if (short) await page.setViewportSize({ width: 1280, height: 220 })
+      if (zoomed) await page.setViewportSize({ width: 1280, height: 400 })
       await openLive(page, demo, { edge, tall: true })
+      if (zoomed) await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
       await trigger(page).click()
       const positioner = positionerOf(page)
       const popup = positioner.locator(':scope > :not([data-base-ui-focus-guard])').first()
       await expect(popup).toBeVisible()
       await expect(popup).toHaveAttribute('data-open', '')
       await atRest(popup)
+      // Base UI seeds the variable with 100vh until its size() middleware has measured the room.
+      await expect.poll(() => positioner.evaluate((element) => element.style.getPropertyValue('--available-height'))).toMatch(/^[\d.]+px$/)
 
       const room = await positioner.evaluate((element) => ({
         height: Number.parseFloat(element.style.getPropertyValue('--available-height')),
@@ -187,6 +201,20 @@ for (const { demo, trigger, list, rows, short = false } of POPUPS) {
   }
 }
 
+// DECISIONS 2026-10-17: under 20rem of screen the room beside the trigger leaves the grid a row, so the calendar scrolls as one.
+test('date-picker--basic, on a 220 px screen: the grid stops scrolling and the calendar scrolls as one, inside the room', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 220 })
+  await openLive(page, 'date-picker--basic', { edge: 'top', tall: true })
+  await page.getByRole('button', { name: /Check-in/ }).click()
+  const popup = positionerOf(page).locator(':scope > :not([data-base-ui-focus-guard])').first()
+  await atRest(popup)
+  const grid = popup.locator('div:has(> [role="grid"])')
+  expect(await grid.evaluate((element) => getComputedStyle(element).overflowY), 'the grid no longer scrolls').toBe('visible')
+  expect(await popup.evaluate((element) => element.scrollHeight > element.clientHeight + 1), 'the calendar does').toBe(true)
+  expect(await wheelToEnd(page, popup), 'a wheel at its end never scrolls the page').toBe(0)
+  expect((await scrollersIn(page)).filter((s) => s.overscroll !== 'contain')).toEqual([])
+})
+
 // Command is a dialog with a list, not an anchored popup: the row cap holds its list, and its input stays out of it.
 test('command--thousand: the list is capped at --tc-list-rows, scrolls under a search input that stays, and stops at its edge', async ({ page }) => {
   await openLive(page, 'command--thousand', { tall: true })
@@ -218,10 +246,10 @@ test('toast--many: the viewport that holds the stack stops a scroll at its own e
 })
 
 // R-10.5-3: the bar writes its height, and the page reads both edges into scroll-padding-block.
-const padding = (page: Page) => page.evaluate(() => {
+const padding = (page: Page, variable = '--tc-sticky-top') => page.evaluate((name) => {
   const html = getComputedStyle(document.documentElement)
-  return { top: html.scrollPaddingTop, bottom: html.scrollPaddingBottom, variable: document.documentElement.style.getPropertyValue('--tc-sticky-top') }
-})
+  return { top: html.scrollPaddingTop, bottom: html.scrollPaddingBottom, variable: document.documentElement.style.getPropertyValue(name) }
+}, variable)
 
 for (const direction of DIRECTIONS) {
   test(`navbar--tall-page, ${direction}: the sticky bar sets --tc-sticky-top to its height, and the page reads it into scroll-padding`, async ({ page }) => {
@@ -240,11 +268,42 @@ test('navbar--not-sticky: a bar in the flow publishes nothing, and the page keep
   expect(await padding(page)).toEqual({ top: '0px', bottom: '0px', variable: '' })
 })
 
-test('a bar at the bottom: --tc-sticky-bottom reaches scroll-padding-block, so Tab never hides a control under it', async ({ page }) => {
-  await openLive(page, 'navbar--tall-page')
-  await page.evaluate(() => { document.documentElement.style.setProperty('--tc-sticky-bottom', '48px') })
-  expect((await padding(page)).bottom).toBe('48px')
-})
+/** Opens the tall page on a phone, where the stack spans the screen, under a toast that stays, and returns the stack
+ * once it has published its height. */
+async function underToast(page: Page, direction: 'ltr' | 'rtl' = 'ltr'): Promise<Locator> {
+  await page.setViewportSize({ width: 360, height: 640 })
+  await openLive(page, 'toast--tall-page', { direction })
+  expect((await padding(page, '--tc-sticky-bottom')).variable, 'no toast, no padding').toBe('')
+  await page.getByRole('button', { name: 'Go offline' }).click()
+  const stack = page.getByRole('region').filter({ has: page.getByText('You are offline') })
+  await expect(stack).toBeVisible()
+  await expect.poll(async () => (await padding(page, '--tc-sticky-bottom')).variable).not.toBe('')
+  return stack
+}
+
+/** Scrolls the last link of the page under the stack, Tabs to it from the link before, and returns how far its bottom
+ * then is above the stack's top. On screen but under the stack, it is scrolled only if the padding takes that strip. */
+async function tabToLastLink(page: Page, stack: Locator): Promise<number> {
+  await page.getByRole('link', { name: 'Read about Theming' }).focus()
+  const last = page.getByRole('link', { name: 'Read about Questions' })
+  await last.evaluate((element) => { window.scrollBy(0, element.getBoundingClientRect().bottom - window.innerHeight + 8) })
+  await page.keyboard.press('Tab')
+  await expect(last).toBeFocused()
+  const [link, bar] = [await last.boundingBox(), await stack.boundingBox()]
+  if (!link || !bar) throw new Error('the link or the stack has no box')
+  return bar.y - (link.y + link.height)
+}
+
+for (const direction of DIRECTIONS) {
+  test(`toast--tall-page, ${direction}: the stack sets --tc-sticky-bottom to its height, and Tab leaves the last link clear of it`, async ({ page }) => {
+    const stack = await underToast(page, direction)
+    const height = Math.ceil((await stack.boundingBox())?.height ?? 0)
+    expect(await padding(page, '--tc-sticky-bottom')).toEqual({ top: '0px', bottom: `${String(height)}px`, variable: `${String(height)}px` })
+    expect(await tabToLastLink(page, stack), 'the focused link sits above the stack').toBeGreaterThanOrEqual(0)
+    await stack.getByRole('button').click()
+    await expect.poll(async () => (await padding(page, '--tc-sticky-bottom')).variable, 'an empty stack publishes nothing').toBe('')
+  })
+}
 
 // The measures above, each shown a deliberately broken overlay or bar: a measure that passes these proves nothing.
 test.describe('the measures reject a broken sample', () => {
@@ -274,9 +333,16 @@ test.describe('the measures reject a broken sample', () => {
     const popup = positionerOf(page).locator(':scope > :not([data-base-ui-focus-guard])').first()
     await expect(popup).toBeVisible()
     await atRest(popup)
+    await expect.poll(() => positionerOf(page).evaluate((element) => element.style.getPropertyValue('--available-height'))).toMatch(/px$/)
     expect(await maxHeightOf(popup)).toBeNull()
     const room = await positionerOf(page).evaluate((element) => Number.parseFloat(element.style.getPropertyValue('--available-height')))
     expect((await popup.boundingBox())?.height).toBeGreaterThan(room)
+  })
+
+  test('a page that drops --tc-sticky-bottom from scroll-padding: Tab leaves the last link under the toast', async ({ page }) => {
+    const stack = await underToast(page)
+    await page.addStyleTag({ content: 'html { scroll-padding-block: 0px !important }' })
+    expect(await tabToLastLink(page, stack)).toBeLessThan(0)
   })
 
   test('a page that drops the sticky variables from scroll-padding: the padding no longer matches the bar', async ({ page }) => {
