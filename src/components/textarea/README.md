@@ -79,7 +79,7 @@ Required: `aria-label` or `aria-labelledby` or `id`. Every other prop below is o
 | `autosize` | no | `boolean` | `false` | Grows with the text from rows up to maxRows once the page has hydrated; loads the small client half. |
 | `fullWidth` | no | `boolean` | `false` | Stretches the textarea, and the box around it with autosize or showCount, to the width of its container. |
 | `invalid` | no | `boolean` | `false` | Marks the value as wrong: sets aria-invalid, and the border turns to danger and thickens. |
-| `maxLength` | no | `unknown` | `5000` | The character cap: your number, 5000 by default, or null for none. |
+| `maxLength` | no | `unknown` | `5000` | The character cap: your number, 5000 by default, or null for none; clamped to 0-2147483647 and rounded down. |
 | `maxRows` | no | `integer`, min 1, max 40 | `6` | With autosize, the most lines it grows to before it scrolls; clamped to 1-40 and never under rows. |
 | `rows` | no | `integer`, min 1, max 40 | `3` | The lines it shows, and the least it shrinks to with autosize; clamped to 1-40. |
 | `showCount` | no | `boolean` | `false` | Always shows the count against the cap under the field; with autosize alone it shows from nine tenths of it. |

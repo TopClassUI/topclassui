@@ -71,11 +71,12 @@ describe('what a demo must not write by hand', () => {
 })
 
 describe('the demos the plan names', () => {
-  it('form: a plain form with a submit and a reset button', async () => {
+  it('form: a plain form with a submit and a reset button, in a row that wraps, or a 32 px root scrolls a phone sideways', async () => {
     const html = await render('form')
     expect(html).toMatch(/^<form class="[^"]*">/)
     expect(html).toContain('type="submit"')
     expect(html).toContain('type="reset"')
+    expect(html).toContain('<div class="flex flex-wrap gap-2"><button')
   })
 
   it('rtl: the counter reads Arabic-Indic digits in the server HTML, in left-to-right order', async () => {
