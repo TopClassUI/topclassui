@@ -131,12 +131,13 @@ describe('hook.ts holds the value, the collection, the window and the locale of 
     expect(importedModules(source)).toEqual([
       '@base-ui/react/combobox', 'react', '#shared/clamp.js', '#shared/collection/use-collection.js',
       '#shared/contracts/boundaries.js', '#shared/contracts/collection.js', '#shared/contracts/option.js',
-      '#shared/provider/context.js', '#shared/provider/use-portal-locale.js', '#shared/use-form-value.js', './constants.js',
+      '#shared/provider/context.js', '#shared/provider/use-portal-locale.js', '#shared/use-form-value.js',
+      '#shared/value-check/hook.js', './constants.js',
       './lib.js', './types.js',
     ])
     expect(hooksByPart(source)).toEqual({
       useCombobox: [
-        'useFormValue', 'useImperativeHandle', 'useRef', 'useImperativeHandle', 'useMemo', 'useRef', 'useLabels', 'useState',
+        'useFormValue', 'useImperativeHandle', 'useRef', 'useImperativeHandle', 'useMemo', 'useRef', 'useLabels', 'useValueCheck', 'useState',
         'useState', 'useEffect', 'usePortalLocale',
       ],
       useComboboxList: [

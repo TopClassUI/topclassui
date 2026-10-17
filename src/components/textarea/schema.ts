@@ -27,6 +27,8 @@ export const textareaSchema = z.object({
     .meta({ description: 'Grows with the text from rows up to maxRows once the page has hydrated; loads the small client half.' }),
   showCount: z.boolean().default(TEXTAREA_DEFAULTS.showCount)
     .meta({ description: 'Always shows the count against the cap under the field; with autosize alone it shows from nine tenths of it.' }),
+  validate: z.boolean().default(TEXTAREA_DEFAULTS.validate)
+    .meta({ description: 'Holds a pasted or scripted value to the cap after hydration and stops the submit; autosize and showCount do it already.' }),
 })
 
 export type TextareaSchemaInput = z.input<typeof textareaSchema>

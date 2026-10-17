@@ -13,7 +13,7 @@ const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
 const EXPECTED = [
   'custom-size', 'full-width', 'labelled', 'row', 'rtl', 'sizes', 'skeleton', 'skeleton-match', 'states',
-  'types',
+  'types', 'validate',
 ]
 
 const render = async (file: string) => {
@@ -124,6 +124,14 @@ describe('the demos cover what PLAN 20 asks for', () => {
     const spans = (await render('skeleton')).match(/<span class="[^"]*"/g) ?? []
     expect(spans.map((tag) => / w-full"/.test(tag))).toEqual([false, false, false, true])
     expect(spans.map((tag) => / w-\[min\(100%,var\(--tc-input-width\)\)\]"/.test(tag))).toEqual([true, true, true, false])
+  })
+
+  it('shows the check: a cap, a pattern and a number, each input alone in a holder that draws no box', async () => {
+    const html = await render('validate')
+    expect(html.match(/<span class="contents"><input [^>]*\/><\/span>/g)?.length).toBe(3)
+    const tags = inputs(html)
+    expect(tags.map((tag) => [attr(tag, 'maxLength'), attr(tag, 'pattern'), attr(tag, 'max')]))
+      .toEqual([['12', undefined, undefined], ['512', '[0-9]{5}', undefined], [undefined, undefined, '8']])
   })
 
   it('ties the hint to the labelled input', async () => {

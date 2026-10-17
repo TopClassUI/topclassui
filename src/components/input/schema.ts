@@ -12,6 +12,8 @@ export const inputSchema = z.object({
     .meta({ description: 'Marks the value as wrong: sets aria-invalid, and the border turns to danger and thickens.' }),
   fullWidth: z.boolean().default(INPUT_DEFAULTS.fullWidth)
     .meta({ description: 'Stretches the input to the width of its container.' }),
+  validate: z.boolean().default(INPUT_DEFAULTS.validate)
+    .meta({ description: 'Holds a pasted or scripted value to maxLength, pattern, min, max and step after hydration, and stops the submit; loads a small client half.' }),
 })
 
 export type InputSchemaInput = z.input<typeof inputSchema>

@@ -1,7 +1,8 @@
 // Pure helpers of the code field: the digit filter, the clamps and the layout of the row. No React here.
 import { clamp } from '#shared/clamp.js'
+import type { ValueRules } from '#shared/value-check/lib.js'
 import { OTP_FIELD_BOUNDARIES } from './boundaries.js'
-import { OTP_FIELD_DIGIT_ZEROS, OTP_FIELD_WRAP_ABOVE } from './constants.js'
+import { OTP_FIELD_DIGIT_ZEROS, OTP_FIELD_KEPT, OTP_FIELD_WRAP_ABOVE } from './constants.js'
 import type { OtpFieldValueProps } from './types.js'
 
 const [arabicIndic, persian] = OTP_FIELD_DIGIT_ZEROS
@@ -38,4 +39,20 @@ type Digits = Pick<OtpFieldValueProps, 'validationType' | 'normalizeValue' | 'in
 export function digitRules({ validationType = 'numeric', normalizeValue, inputMode }: Digits): Digits {
   if (validationType !== 'numeric' || normalizeValue) return { validationType, normalizeValue, inputMode }
   return { validationType: 'none', normalizeValue: toAsciiDigits, inputMode: inputMode ?? 'numeric' }
+}
+
+/** What the sent code is held to: no more characters than cells, each of the kind the field keeps. */
+export function checkRules(length: number, validationType: OtpFieldValueProps['validationType'] = 'numeric'): ValueRules {
+  return { maxLength: length, pattern: OTP_FIELD_KEPT[validationType] }
+}
+
+/** Base UI renders the input the form sends just after the group of cells. */
+export function sentInput(root: HTMLDivElement | null): HTMLInputElement | null {
+  const next = root?.nextElementSibling
+  return next instanceof HTMLInputElement ? next : null
+}
+
+/** The cells the reader sees, which carry the mark of a broken rule; the sent input is hidden from them. */
+export function cellsOf(root: HTMLDivElement | null): HTMLInputElement[] {
+  return root ? [...root.querySelectorAll('input')] : []
 }

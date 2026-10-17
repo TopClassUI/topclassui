@@ -3,6 +3,7 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 
 import { useLabels, useNumberFormat } from '#shared/provider/context.js'
+import { useValueCheck } from '#shared/value-check/hook.js'
 import { countText, isCounted, limitOf, rowsFor } from './lib.js'
 import type { TextareaFieldValueProps } from './types.js'
 
@@ -35,6 +36,8 @@ export function useTextareaField({ rows, maxRows, autosize, showCount, cap, leng
   const [count, setCount] = useState(length)
   const labels = useLabels()
   const format = useNumberFormat()
+  // A paste past a removed maxlength, or a value set by code, still answers to the cap.
+  useValueCheck({ field: () => ref.current?.querySelector('textarea'), rules: { maxLength: cap } })
 
   const measure = () => {
     const field = ref.current?.querySelector('textarea')

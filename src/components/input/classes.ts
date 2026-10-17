@@ -18,6 +18,9 @@ export const INPUT_READ_ONLY = FIELD_READ_ONLY
 /** The shared scale plus the touch floor for the text. `custom` still emits nothing. */
 export const INPUT_SIZE = FIELD_SIZE satisfies Record<Size, string>
 
+/** The holder of the check draws no box, so the input lays out as if it stood alone. */
+export const INPUT_CHECK = 'contents'
+
 /** The field's box model around one line of nothing: its border width, its floor and its
  * baseline, so a flex row or a line of text lays the placeholder out as it lays the field. */
 export const INPUT_SKELETON = [

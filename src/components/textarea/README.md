@@ -28,6 +28,11 @@ the type refuses a Textarea with none of the three.
 **`maxLength` is 5000 by default.** Pass your own number, or `maxLength={null}` for no cap. It is
 the native `maxlength`, so the browser stops typing and pasting there.
 
+**The client half checks the cap again.** `maxlength` stops typing, but not a value set by script or a
+paste after the attribute is removed. With `autosize`, `showCount` or `validate` the value is held to the
+cap on every input and blur, marked with `aria-invalid` and a message, and the submit is stopped until it
+is back inside. `validate` alone loads the holder for that and nothing else. Your server still checks.
+
 **`autosize` and `showCount` load a small client half.** Without them a Textarea renders no client
 code. With `autosize` the rows follow the text from `rows` up to `maxRows`, then it scrolls; the
 server counts line breaks, so a long first line that wraps grows once the page hydrates. `maxRows`
@@ -56,7 +61,7 @@ textarea of the page, not only this one); a field with no default keeps what was
 
 The `variant` prop (one is drawn), a live region for the counter, a counter on a Textarea with no
 client half, a count by grapheme (it counts UTF-16 code units, as `maxlength` does), danger at the
-limit, a check written with `zod/mini`. Two clauses of Phase 4 wait for a Field: a Textarea in a
+limit. Two clauses of Phase 4 wait for a Field: a Textarea in a
 server Field posted with JavaScript off, and the same with `FormAction` and `FieldLive`.
 
 <!-- /hand-written -->
@@ -84,6 +89,7 @@ Required: `aria-label` or `aria-labelledby` or `id`. Every other prop below is o
 | `rows` | no | `integer`, min 1, max 40 | `3` | The lines it shows, and the least it shrinks to with autosize; clamped to 1-40. |
 | `showCount` | no | `boolean` | `false` | Always shows the count against the cap under the field; with autosize alone it shows from nine tenths of it. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The shared control scale: the padding and the type step. custom emits no size classes. |
+| `validate` | no | `boolean` | `false` | Holds a pasted or scripted value to the cap after hydration and stops the submit; autosize and showCount do it already. |
 
 Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 

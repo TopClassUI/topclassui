@@ -1,5 +1,6 @@
 // R-5.12-1: the pure helpers of the number field. No React, so a node test reads them as they are.
 import { clamp } from '#shared/clamp.js'
+import type { ValueRules } from '#shared/value-check/lib.js'
 import { NUMBER_FIELD_BOUNDARIES as BOUNDS } from './boundaries.js'
 import { NUMBER_FIELD_DEFAULTS } from './constants.js'
 
@@ -65,5 +66,17 @@ export function latinPaste(text: string, locale: Intl.LocalesArgument, format: I
     return latin ? null : trimmed.replace(/,/g, '')
   } catch {
     return null
+  }
+}
+
+/** What the sent number is held to: the bounds unless out of range is allowed, and the step from `min`. With no `min`
+ * the base is the value attribute, which React keeps equal to the value, so the browser checks no step: neither does this. */
+export function checkRules(limits: NumberFieldLimits, allowOutOfRange = false): ValueRules {
+  return {
+    numeric: true,
+    min: allowOutOfRange ? undefined : limits.min,
+    max: allowOutOfRange ? undefined : limits.max,
+    step: limits.min === undefined ? undefined : limits.step,
+    stepBase: limits.min,
   }
 }

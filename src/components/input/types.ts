@@ -1,6 +1,7 @@
-import type { ComponentPropsWithRef } from 'react'
+import type { ComponentPropsWithRef, ReactElement } from 'react'
 
 import type { ControlName } from '#shared/contracts/name.js'
+import type { ValueRules } from '#shared/value-check/lib.js'
 import type { InputSchemaInput } from './schema.js'
 
 // R-8.3-4: derived from the schema, so the props and the validation cannot drift apart.
@@ -33,3 +34,12 @@ export type InputProps =
 export type InputSkeletonProps =
   Omit<ComponentPropsWithRef<'span'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
   & Pick<InputDesignProps, 'size' | 'fullWidth'>
+
+/** What crosses from the server half to the holder of the check: the rules as plain values and the one input. */
+export interface InputCheckProps {
+  rules: ValueRules
+  children: ReactElement
+}
+
+/** What the holder's hook reads. */
+export type InputCheckValueProps = Pick<InputCheckProps, 'rules'>

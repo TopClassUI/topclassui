@@ -1,4 +1,4 @@
-// No 'use client': the native textarea is server HTML. Only autosize and the counter load client.tsx.
+// No 'use client': the native textarea is server HTML. Only autosize, the counter and the check load client.tsx.
 import { useId } from 'react'
 
 import { cn } from '#shared/cn.js'
@@ -12,8 +12,8 @@ import { TEXTAREA_CAP_TYPE, TEXTAREA_DEFAULTS } from './constants.js'
 import { clampCap, clampMaxRows, clampRows, estimateRows, joinIds } from './lib.js'
 import type { TextareaProps } from './types.js'
 
-/** A native textarea with the field look, which sends what is typed with no script at all. With
- * `autosize` or `showCount` it sits in a small client holder that grows it and counts against the cap. */
+/** A native textarea with the field look, which sends what is typed with no script at all. With `autosize`,
+ * `showCount` or `validate` it sits in a small client holder that grows it, counts and holds it to the cap. */
 export function Textarea({
   size = TEXTAREA_DEFAULTS.size,
   invalid = TEXTAREA_DEFAULTS.invalid,
@@ -22,6 +22,7 @@ export function Textarea({
   maxRows: givenMaxRows = TEXTAREA_DEFAULTS.maxRows,
   autosize = TEXTAREA_DEFAULTS.autosize,
   showCount = TEXTAREA_DEFAULTS.showCount,
+  validate = TEXTAREA_DEFAULTS.validate,
   maxLength,
   readOnly,
   className,
@@ -33,7 +34,7 @@ export function Textarea({
   const rows = clampRows(givenRows)
   const maxRows = clampMaxRows(givenMaxRows, rows)
   const cap = clampCap(resolveMaxLength(maxLength, TEXTAREA_CAP_TYPE))
-  const held = autosize || showCount
+  const held = autosize || showCount || validate
   const text = String(rest.value ?? rest.defaultValue ?? '')
 
   // The rest goes first, so the clamped rows, the resolved cap and the design attributes are never overwritten.

@@ -12,6 +12,7 @@ export const TEXTAREA_DEFAULTS = {
   maxRows: 6,
   autosize: false,
   showCount: false,
+  validate: false,
 } as const
 
 /** The key of TEXT_MAX_LENGTH a textarea takes its default cap from. */

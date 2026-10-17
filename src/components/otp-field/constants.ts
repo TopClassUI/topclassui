@@ -6,6 +6,9 @@ export const OTP_FIELD_SIZES = SIZES
 /** The zero of each digit range a numeric field reads as 0 to 9: Arabic-Indic (U+0660) and Persian (U+06F0). */
 export const OTP_FIELD_DIGIT_ZEROS = [0x660, 0x6f0] as const
 
+/** The characters each of Base UI's types keeps, as a pattern; numeric is ASCII, since our filter stores it so. */
+export const OTP_FIELD_KEPT = { numeric: '[0-9]*', alpha: '[a-zA-Z]*', alphanumeric: '[a-zA-Z0-9]*', none: undefined } as const
+
 /** Past this many items, cells and separators together, a row breaks at whole cells, so on a phone each keeps 44 px. */
 export const OTP_FIELD_WRAP_ABOVE = 8
 

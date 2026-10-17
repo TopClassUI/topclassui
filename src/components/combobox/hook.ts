@@ -11,6 +11,7 @@ import type { ListOption } from '#shared/contracts/option.js'
 import { useLabels } from '#shared/provider/context.js'
 import { usePortalLocale } from '#shared/provider/use-portal-locale.js'
 import { useFormValue } from '#shared/use-form-value.js'
+import { useValueCheck } from '#shared/value-check/hook.js'
 import { COMBOBOX_DEFAULTS, COMBOBOX_ROW_ESTIMATE } from './constants.js'
 import { isAppended, keyOfOption, labelOfUnknown, nameFromLabels, optionAccessors, revealTop } from './lib.js'
 import type { ComboboxChangeDetails, ComboboxHighlightDetails, ComboboxListProps, ComboboxValueProps } from './types.js'
@@ -28,6 +29,9 @@ export function useCombobox(props: ComboboxValueProps) {
   const collection = useMemo(() => Base.createItems(items, optionAccessors), [items])
   const scroller = useRef(null as ((index: number) => void) | null)
   const labels = useLabels()
+  const cap = resolveMaxLength(maxLength, 'search')
+  // A query pasted past a removed maxlength, or set by code, still answers to the cap.
+  useValueCheck({ field: () => input.current, rules: { maxLength: cap } })
 
   const [opened, setOpened] = useState(props.defaultOpen ?? false)
   const open = props.open ?? opened
@@ -67,7 +71,7 @@ export function useCombobox(props: ComboboxValueProps) {
     items: collection,
     labelOfUnknown,
     scroller,
-    maxLength: resolveMaxLength(maxLength, 'search'),
+    maxLength: cap,
     // Left out, the --tc-list-rows knob applies: React writes no style for an undefined value.
     rows: visibleRows === undefined ? undefined : clamp(visibleRows, visibleRowsMin, visibleRowsMax),
     loadMoreThreshold: clamp(

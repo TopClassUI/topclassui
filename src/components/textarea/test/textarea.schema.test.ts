@@ -10,10 +10,10 @@ const json = z.toJSONSchema(textareaSchema, { io: 'input' }) as {
   properties?: Record<string, { description?: string; default?: unknown; enum?: unknown[]; minimum?: number; maximum?: number; anyOf?: { minimum?: number; maximum?: number }[] }>
 }
 
-const KEYS = ['autosize', 'fullWidth', 'invalid', 'maxLength', 'maxRows', 'rows', 'showCount', 'size']
+const KEYS = ['autosize', 'fullWidth', 'invalid', 'maxLength', 'maxRows', 'rows', 'showCount', 'size', 'validate']
 
 describe('the schema is the documentation', () => {
-  it('covers the eight props the plan names and no other', () => {
+  it('covers the nine props: the eight the plan names and the check', () => {
     expect(Object.keys(textareaSchema.shape).sort()).toEqual(KEYS)
     expect(Object.keys(json.properties ?? {}).sort()).toEqual(KEYS)
   })
@@ -27,6 +27,7 @@ describe('the schema is the documentation', () => {
   it('records the defaults: md, three rows, six at most, a cap of 5000, every switch off', () => {
     expect(textareaSchema.parse({})).toEqual({
       size: 'md', invalid: false, fullWidth: false, rows: 3, maxRows: 6, maxLength: 5000, autosize: false, showCount: false,
+      validate: false,
     })
   })
 
@@ -41,7 +42,7 @@ describe('the schema is the documentation', () => {
 
 describe('the schema and the constants agree', () => {
   it('names the defaults the spec gives, so a changed constant is a failure here', () => {
-    expect(TEXTAREA_DEFAULTS).toEqual({ size: 'md', invalid: false, fullWidth: false, rows: 3, maxRows: 6, autosize: false, showCount: false })
+    expect(TEXTAREA_DEFAULTS).toEqual({ size: 'md', invalid: false, fullWidth: false, rows: 3, maxRows: 6, autosize: false, showCount: false, validate: false })
     expect(TEXTAREA_SIZES).toEqual(['xs', 'sm', 'md', 'lg', 'xl', 'custom'])
   })
 

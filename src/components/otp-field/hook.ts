@@ -4,8 +4,9 @@ import { useImperativeHandle } from 'react'
 
 import { useLabels, useNumberFormat } from '#shared/provider/context.js'
 import { useFormValue } from '#shared/use-form-value.js'
+import { useValueCheck } from '#shared/value-check/hook.js'
 import { OTP_FIELD_DEFAULTS } from './constants.js'
-import { clampLength, digitRules, layoutCells } from './lib.js'
+import { cellsOf, checkRules, clampLength, digitRules, layoutCells, sentInput } from './lib.js'
 import type { OtpFieldChangeDetails, OtpFieldCompleteDetails, OtpFieldValueProps } from './types.js'
 
 /** The code, held here so a form reset brings it back to its latest default (unit-4.md, "A form reset"), the clamped
@@ -30,6 +31,12 @@ export function useOtpField({
   const fmt = useNumberFormat()
 
   const length = clampLength(given)
+  // A code written into the sent input by script still answers to the cells and the kind of character.
+  useValueCheck({
+    field: () => sentInput(state.rootRef.current),
+    marks: () => cellsOf(state.rootRef.current),
+    rules: checkRules(length, validationType),
+  })
   const { separators, whole } = layoutCells(length, groupSize)
   const cells = separators.map((separator, index) => ({
     separator,

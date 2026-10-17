@@ -28,11 +28,13 @@ describe('the counter', () => {
     expect(counterOf(field)).toEqual({ seen: '8 / 8', read: '8 of 8 characters', state: 'at' })
   })
 
-  it('is over the limit only when code sets a longer value, and the field is not marked invalid by it', () => {
+  it('is over the limit only when code sets a longer value, and the check marks the field invalid for it', () => {
     render(<Textarea aria-label="Bio" showCount maxLength={4} value="Too long" onChange={() => undefined} />)
-    const field = screen.getByRole('textbox', { name: 'Bio' })
+    const field = screen.getByRole<HTMLTextAreaElement>('textbox', { name: 'Bio' })
     expect(counterOf(field)).toEqual({ seen: '8 / 4', read: '8 of 4 characters', state: 'over' })
-    expect(field.hasAttribute('aria-invalid')).toBe(false)
+    expect(field.getAttribute('aria-invalid')).toBe('true')
+    expect(field.getAttribute('data-value-fault')).toBe('tooLong')
+    expect(field.validationMessage).toBe('Use at most 4 characters')
   })
 
   it('counts against the clamped cap the browser holds: -1 is 0 and 2.5 is 2, so neither is drawn in danger', () => {

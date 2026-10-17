@@ -8,7 +8,8 @@ export const meta = {
   tier: 1,
   // PLAN 20 is not met until the visual matrix and the docs page exist.
   status: 'beta',
-  rendering: 'server',
+  // The native input is server HTML; the check with `validate` is the only client part.
+  rendering: 'split',
   baseUi: null,
   baseUiRange: null,
   optionalDeps: [],

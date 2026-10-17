@@ -8,6 +8,7 @@ export const INPUT_DEFAULTS = {
   size: DEFAULT_SIZE,
   invalid: false,
   fullWidth: false,
+  validate: false,
 } as const
 
 /** The native default, written out so the type is always in the markup. */

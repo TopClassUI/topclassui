@@ -14,11 +14,11 @@ describe('the schema is the documentation', () => {
 
   it('covers every design prop, and none the spec leaves unbuilt', () => {
     // Named, or a key dropped from INPUT_DEFAULTS drops from the expectation too.
-    expect(keys.sort()).toEqual(['fullWidth', 'invalid', 'size'])
+    expect(keys.sort()).toEqual(['fullWidth', 'invalid', 'size', 'validate'])
   })
 
   it('converts to JSON Schema at all', () => {
-    expect(Object.keys(json.properties ?? {}).sort()).toEqual(['fullWidth', 'invalid', 'size'])
+    expect(Object.keys(json.properties ?? {}).sort()).toEqual(['fullWidth', 'invalid', 'size', 'validate'])
   })
 
   for (const key of keys) {
@@ -38,11 +38,11 @@ describe('the schema is the documentation', () => {
 
 describe('the schema and the constants cannot drift', () => {
   it('agrees with the defaults the spec names', () => {
-    expect(INPUT_DEFAULTS).toEqual({ size: 'md', invalid: false, fullWidth: false })
+    expect(INPUT_DEFAULTS).toEqual({ size: 'md', invalid: false, fullWidth: false, validate: false })
   })
 
   it('fills every default', () => {
-    expect(inputSchema.parse({})).toEqual({ size: 'md', invalid: false, fullWidth: false })
+    expect(inputSchema.parse({})).toEqual({ size: 'md', invalid: false, fullWidth: false, validate: false })
   })
 
   it('accepts every size the constants list', () => {

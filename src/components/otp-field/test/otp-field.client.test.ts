@@ -111,9 +111,10 @@ describe('hook.ts holds the value, the names and the layout (R-5.12-1)', () => {
 
   it('builds on the shared form value and reads the labels and the number format of the provider', () => {
     expect(importedModules(source)).toEqual([
-      'react', '#shared/provider/context.js', '#shared/use-form-value.js', './constants.js', './lib.js', './types.js',
+      'react', '#shared/provider/context.js', '#shared/use-form-value.js', '#shared/value-check/hook.js', './constants.js', './lib.js',
+      './types.js',
     ])
-    expect(hooksByPart(source)).toEqual({ useOtpField: ['useFormValue', 'useImperativeHandle', 'useLabels', 'useNumberFormat'] })
+    expect(hooksByPart(source)).toEqual({ useOtpField: ['useFormValue', 'useImperativeHandle', 'useLabels', 'useNumberFormat', 'useValueCheck'] })
   })
 
   // check-boundaries reads a `<Letter` in hook.ts as JSX.
@@ -124,7 +125,7 @@ describe('hook.ts holds the value, the names and the layout (R-5.12-1)', () => {
 
 describe('lib.ts is pure', () => {
   it('imports no React', () => {
-    expect(importedModules(read('lib.ts'))).toEqual(['#shared/clamp.js', './boundaries.js', './constants.js', './types.js'])
+    expect(importedModules(read('lib.ts'))).toEqual(['#shared/clamp.js', '#shared/value-check/lib.js', './boundaries.js', './constants.js', './types.js'])
   })
 })
 

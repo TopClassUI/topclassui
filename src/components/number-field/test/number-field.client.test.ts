@@ -107,13 +107,14 @@ describe('hook.ts holds the value of the field (R-5.12-1)', () => {
 
   it('builds on the shared form value and the provider, and takes three hooks from React and flushSync from React DOM', () => {
     expect(importedModules(source)).toEqual([
-      'react', 'react-dom', '#shared/provider/context.js', '#shared/use-form-value.js', './constants.js', './lib.js', './types.js',
+      'react', 'react-dom', '#shared/provider/context.js', '#shared/use-form-value.js', '#shared/value-check/hook.js', './constants.js',
+      './lib.js', './types.js',
     ])
     expect(importedNames(source, 'react')).toEqual(['useEffect', 'useImperativeHandle', 'useRef'])
     expect(importedNames(source, 'react-dom')).toEqual(['flushSync'])
     expect(hooksByPart(source)).toEqual({
       writeText: [],
-      useNumberField: ['useLabels', 'useLocale', 'useNumberFormat', 'useRef', 'useRef', 'useFormValue', 'useImperativeHandle', 'useEffect', 'useEffect'],
+      useNumberField: ['useLabels', 'useLocale', 'useNumberFormat', 'useRef', 'useRef', 'useFormValue', 'useImperativeHandle', 'useValueCheck', 'useEffect', 'useEffect'],
     })
   })
 
@@ -125,7 +126,7 @@ describe('hook.ts holds the value of the field (R-5.12-1)', () => {
 
 describe('lib.ts is pure', () => {
   it('imports no React and nothing from the browser half', () => {
-    expect(importedModules(read('lib.ts'))).toEqual(['#shared/clamp.js', './boundaries.js', './constants.js'])
+    expect(importedModules(read('lib.ts'))).toEqual(['#shared/clamp.js', '#shared/value-check/lib.js', './boundaries.js', './constants.js'])
   })
 })
 

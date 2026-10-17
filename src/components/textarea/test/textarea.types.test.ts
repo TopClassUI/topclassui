@@ -9,8 +9,8 @@ import type {
 type Accepts<Union, Candidate> = Candidate extends Union ? true : false
 
 describe('the design props', () => {
-  it('are the seven the schema holds besides the cap', () => {
-    expectTypeOf<keyof TextareaDesignProps>().toEqualTypeOf<'size' | 'invalid' | 'fullWidth' | 'rows' | 'maxRows' | 'autosize' | 'showCount'>()
+  it('are the eight the schema holds besides the cap', () => {
+    expectTypeOf<keyof TextareaDesignProps>().toEqualTypeOf<'size' | 'invalid' | 'fullWidth' | 'rows' | 'maxRows' | 'autosize' | 'showCount' | 'validate'>()
   })
 
   it('size is the shared scale including custom', () => {

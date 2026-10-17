@@ -5,8 +5,9 @@ import { flushSync } from 'react-dom'
 
 import { useLabels, useLocale, useNumberFormat } from '#shared/provider/context.js'
 import { useFormValue } from '#shared/use-form-value.js'
+import { useValueCheck } from '#shared/value-check/hook.js'
 import { NUMBER_FIELD_DEFAULTS } from './constants.js'
-import { clampValue, formatValue, latinPaste, numberingSystemOf, resolveLimits } from './lib.js'
+import { checkRules, clampValue, formatValue, latinPaste, numberingSystemOf, resolveLimits } from './lib.js'
 import type { NumberFieldChangeDetails, NumberFieldPasteEvent, NumberFieldValueProps } from './types.js'
 
 /** Writes the text of the input through the native setter, so React and Base UI read it as typing. */
@@ -53,6 +54,12 @@ export function useNumberField({
     sync: syncText,
   })
   useImperativeHandle(inputRef, () => state.inputRef.current as HTMLInputElement, [state.inputRef])
+  // A number written into the sent input by script still answers to the bounds and the step; the mark is on the visible one.
+  useValueCheck({
+    field: () => state.inputRef.current,
+    marks: () => (field.current ? [field.current] : []),
+    rules: checkRules(limits, allowOutOfRange),
+  })
 
   // Typed before hydration, the text stays while Base UI and the hidden input keep the default: put the default back.
   useEffect(() => {
