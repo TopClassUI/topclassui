@@ -38,3 +38,10 @@ export type NumberFieldChangeDetails = Base.Root.ChangeEventDetails
 
 /** A paste into the visible input, named here: hook.ts writes no type argument in angle brackets. */
 export type NumberFieldPasteEvent = ClipboardEvent<HTMLInputElement>
+
+/** The resolved `min`, `max` and `step`; an absent bound stays absent. */
+export interface NumberFieldLimits {
+  min: number | undefined
+  max: number | undefined
+  step: number | 'any'
+}
