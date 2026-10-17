@@ -45,6 +45,17 @@ describe('paging (R-8.5-1, PLAN 8.5): on scroll and on search, never while close
     expect(loadMore).not.toHaveBeenCalled()
   })
 
+  it('kept mounted while closed, the list is still there but asks for nothing until the palette opens again', async () => {
+    const loadMore = vi.fn()
+    const { rerender } = render(<Palette items={few} keepMounted open />)
+    await ready()
+    rerender(<Palette items={few} keepMounted open={false} />)
+    await waitFor(() => { expect(screen.queryByRole('dialog')).toBeNull() })
+    rerender(<Palette items={few} keepMounted open={false} hasMore loadMore={loadMore} />)
+    await new Promise((resolve) => { setTimeout(resolve, 50) })
+    expect(loadMore).not.toHaveBeenCalled()
+  })
+
   it('a new query reaches onQueryChange, and loading-more sets aria-busy on the list', async () => {
     const onQueryChange = vi.fn<(query: string) => void>()
     render(<Palette items={few} status="loading-more" onQueryChange={onQueryChange} />)
