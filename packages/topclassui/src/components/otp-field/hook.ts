@@ -6,7 +6,7 @@ import { useLabels, useNumberFormat } from '#shared/provider/context.js'
 import { useFormValue } from '#shared/use-form-value.js'
 import { OTP_FIELD_DEFAULTS } from './constants.js'
 import { clampLength, digitRules, layoutCells } from './lib.js'
-import type { OtpFieldChangeDetails, OtpFieldCompleteDetails, OtpFieldValueProps } from './types.js'
+import type { OtpFieldChangeDetails, OtpFieldCompleteDetails, OtpFieldHookResult, OtpFieldValueProps } from './types.js'
 
 /** The code, held here so a form reset brings it back to its latest default (unit-4.md, "A form reset"), the clamped
  * length, the name of each cell after the first, and the separators. Base UI always gets the controlled pair. */
@@ -22,7 +22,7 @@ export function useOtpField({
   normalizeValue,
   inputMode,
   ref,
-}: OtpFieldValueProps) {
+}: OtpFieldValueProps): OtpFieldHookResult {
   // The hidden text input needs no sync: after a reset it holds what the state holds.
   const state = useFormValue({ value, defaultValue })
   useImperativeHandle(ref, () => state.rootRef.current as HTMLDivElement, [state.rootRef])

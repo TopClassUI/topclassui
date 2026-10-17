@@ -5,11 +5,13 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { type FormErrors, useFormErrors } from '#shared/form-errors.js'
 import { FIELD_CHANGE_EVENT } from './constants.js'
 import { entriesOf, formOf, messagesOf, sameEntries, toFieldIds } from './lib.js'
-import type { FieldChangeEvent, FieldClickEvent, FieldInputEvent, FieldKeyEvent, FieldLiveHookProps } from './types.js'
+import type {
+  FieldChangeEvent, FieldClickEvent, FieldInputEvent, FieldKeyEvent, FieldLiveHookProps, FieldLiveHookResult,
+} from './types.js'
 
 /** FieldLive's one hook: the ids as Field makes them, and the error of the prop, else of the nearest FormAction.
  * A form's error goes once the field's value changes, and comes back with the action's next answer. */
-export function useFieldLive({ id, name, error, ref, onInput, onChange, onClick, onKeyUp }: FieldLiveHookProps) {
+export function useFieldLive({ id, name, error, ref, onInput, onChange, onClick, onKeyUp }: FieldLiveHookProps): FieldLiveHookResult {
   const generated = useId()
   const errors = useFormErrors()
   // The errors object whose message for this field the user has since answered by changing the value.
