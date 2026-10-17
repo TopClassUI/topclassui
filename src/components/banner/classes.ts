@@ -17,7 +17,7 @@ export const BANNER_SKELETON = `${BANNER_BOX} bg-surface`
 const PULSE = `bg-neutral-soft animate-pulse motion-reduce:animate-none ${FORCED_OUTLINE}`
 
 /** One line of nothing where the message goes: as tall as the type, with margins making up the line height. */
-export const BANNER_SKELETON_BAR = `block h-[1em] my-[calc((1lh-1em)/2)] w-full max-w-80 rounded-chip ${PULSE}`
+export const BANNER_SKELETON_BAR = `block h-[1em] my-[calc((1lh-1em)/2)] min-w-0 flex-1 max-w-80 rounded-chip ${PULSE}`
 
 /** The box of the x: its floor under every pointer, at the inline end, so a dismissible banner keeps its height. */
 export const BANNER_SKELETON_DISMISS = `inline-flex shrink-0 ms-auto rounded-control ${TOUCH_TARGET} ${PULSE}`

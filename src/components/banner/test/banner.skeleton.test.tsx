@@ -14,7 +14,7 @@ const BOX = ['flex', 'flex-wrap', 'forced-colors:border-b-(length:--tc-line-widt
 
 const PULSE = ['animate-pulse', 'bg-neutral-soft', 'forced-colors:outline-(length:--tc-line-width)', 'motion-reduce:animate-none']
 
-const BAR = [...PULSE, 'block', 'h-[1em]', 'max-w-80', 'my-[calc((1lh-1em)/2)]', 'rounded-chip', 'w-full'].sort()
+const BAR = [...PULSE, 'block', 'h-[1em]', 'flex-1', 'max-w-80', 'min-w-0', 'my-[calc((1lh-1em)/2)]', 'rounded-chip'].sort()
 
 const DISMISS = [
   ...PULSE, 'inline-flex', 'min-h-[var(--tc-target-min,24px)]', 'min-w-[var(--tc-target-min,24px)]', 'ms-auto',
