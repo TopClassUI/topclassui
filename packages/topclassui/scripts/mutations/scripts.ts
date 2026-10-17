@@ -71,7 +71,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the README of a part family imports the bare name again, which index.tsx does not export',
     file: 'scripts/lib/readme.ts',
-    from: 'family ? familyImport(family) : ',
+    from: 'family ? familyImport(family, meta.slug) : ',
     to: '',
   },
   {
@@ -101,8 +101,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the README of a component with no bare <Name> export, such as Toast, imports that name anyway',
     file: 'scripts/lib/readme.ts',
-    from: 'family ? familyImport(family) : singleImport(surface),',
-    to: "family ? familyImport(family) : `import { ${meta.name} } from 'topclassui'`,",
+    from: 'family ? familyImport(family, meta.slug) : singleImport(surface, meta.slug),',
+    to: "family ? familyImport(family, meta.slug) : `import { ${meta.name} } from 'topclassui/${meta.slug}'`,",
   },
   {
     label: 'the README forgets that a Banner id is required with dismissible once dismissible takes a boolean',
@@ -187,5 +187,41 @@ export const MUTATIONS: Mutation[] = [
     file: 'scripts/lib/mutate.ts',
     from: '  if (/^\\s*Test(?: Files|s)\\s+\\d+ failed/m.test(output)) return true',
     to: '  return true',
+  },
+  {
+    label: 'the tarball check accepts a relative specifier without .js, which a node16 consumer cannot resolve',
+    file: 'scripts/lib/pack-checks.ts',
+    from: "&& !specifier.endsWith('.js')) {",
+    to: "&& specifier.endsWith('.jsx')) {",
+  },
+  {
+    label: 'the tarball check lets a demo folder ship',
+    file: 'scripts/lib/pack-checks.ts',
+    from: "if (path.includes('/dummy/')) problems.push",
+    to: "if (path.includes('/dummy/dummy/')) problems.push",
+  },
+  {
+    label: 'the tarball check lets an imports target point outside dist',
+    file: 'scripts/lib/pack-checks.ts',
+    from: "!target.startsWith('./dist/')",
+    to: "!target.startsWith('./')",
+  },
+  {
+    label: 'the tarball check counts a pattern exports target as present without matching a file',
+    file: 'scripts/lib/pack-checks.ts',
+    from: 'paths.some((path) => patternOf(target).test(path))',
+    to: 'true',
+  },
+  {
+    label: 'the tarball size budget is never enforced',
+    file: 'scripts/lib/pack-checks.ts',
+    from: 'return unpackedBytes > budget ?',
+    to: 'return unpackedBytes > budget * 2 ?',
+  },
+  {
+    label: 'the attw entry list drops every component folder',
+    file: 'scripts/lib/entrypoints.ts',
+    from: '...[...componentSlugs].sort(), ',
+    to: '',
   },
 ]

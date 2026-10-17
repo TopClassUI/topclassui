@@ -26,6 +26,7 @@
     "harness:serve": "pnpm --filter topclassui harness:serve",
     "test:e2e": "pnpm --filter topclassui test:e2e",
     "readme:build": "pnpm --filter topclassui readme:build",
-    "check:readme": "pnpm --filter topclassui check:readme"
+    "check:readme": "pnpm --filter topclassui check:readme",
+    "check:package": "pnpm --filter topclassui check:package"
   }
 }
