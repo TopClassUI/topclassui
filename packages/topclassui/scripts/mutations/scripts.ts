@@ -182,4 +182,40 @@ export const MUTATIONS: Mutation[] = [
     from: '  if (/^\\s*Test(?: Files|s)\\s+\\d+ failed/m.test(output)) return true',
     to: '  return true',
   },
+  {
+    label: 'the tarball check accepts a relative specifier without .js, which a node16 consumer cannot resolve',
+    file: 'scripts/lib/pack-checks.ts',
+    from: "&& !specifier.endsWith('.js')) {",
+    to: "&& specifier.endsWith('.jsx')) {",
+  },
+  {
+    label: 'the tarball check lets a demo folder ship',
+    file: 'scripts/lib/pack-checks.ts',
+    from: "if (path.includes('/dummy/')) problems.push",
+    to: "if (path.includes('/dummy/dummy/')) problems.push",
+  },
+  {
+    label: 'the tarball check lets an imports target point outside dist',
+    file: 'scripts/lib/pack-checks.ts',
+    from: "!target.startsWith('./dist/')",
+    to: "!target.startsWith('./')",
+  },
+  {
+    label: 'the tarball check counts a pattern exports target as present without matching a file',
+    file: 'scripts/lib/pack-checks.ts',
+    from: 'paths.some((path) => patternOf(target).test(path))',
+    to: 'true',
+  },
+  {
+    label: 'the tarball size budget is never enforced',
+    file: 'scripts/lib/pack-checks.ts',
+    from: 'return unpackedBytes > budget ?',
+    to: 'return unpackedBytes > budget * 2 ?',
+  },
+  {
+    label: 'the attw entry list drops every component folder',
+    file: 'scripts/lib/entrypoints.ts',
+    from: '...[...componentSlugs].sort(), ',
+    to: '',
+  },
 ]
