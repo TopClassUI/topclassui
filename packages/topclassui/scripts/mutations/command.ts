@@ -102,9 +102,9 @@ export const MUTATIONS: Mutation[] = [
   },
   {
     label: 'command: the spacer above the window stands for nothing, so the rows jump to the top as the list scrolls',
-    file: ROWS,
-    from: '<Spacer rows={run.start - (runs[at - 1]?.end ?? 0)} />',
-    to: '<Spacer rows={0} />',
+    file: LIB,
+    from: 'gap: run.start - (runs[at - 1]?.end ?? 0)',
+    to: 'gap: 0',
   },
   {
     label: 'command: a scroll that is not the keyboard unmounts the active row, so Enter does nothing and aria-activedescendant dangles',

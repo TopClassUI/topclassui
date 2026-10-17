@@ -5,6 +5,7 @@ import { Fragment } from 'react'
 
 import { LABEL } from '#shared/classes.js'
 import { COMMAND_GROUP_LABEL, COMMAND_ITEM, COMMAND_SPACER } from '../classes.js'
+import { toRunViews } from '../lib.js'
 import type { CommandRowsProps } from '../types.js'
 
 /** The rows windowing left out between two runs, as many units tall as the rows it stands for. */
@@ -17,10 +18,10 @@ function Spacer({ rows }: { rows: number }) {
  * before each run and after the last for the rows windowing left out. A run whose heading is not
  * mounted keeps the heading's name as its own label, so a reader still hears which group a row is in. */
 export function CommandRows({ runs, total, getLabel, renderItem, select }: CommandRowsProps) {
-  const seen = new Map<string | undefined, number>()
+  const { views, tail } = toRunViews(runs, total)
   return (
     <>
-      {runs.map((run, at) => {
+      {views.map(({ run, key, gap: rows }) => {
         const items = run.items.map((entry) => (
           <Autocomplete.Item
             key={entry.key}
@@ -35,11 +36,7 @@ export function CommandRows({ runs, total, getLabel, renderItem, select }: Comma
             {renderItem ? renderItem(entry.item) : <span className={LABEL}>{getLabel(entry.item)}</span>}
           </Autocomplete.Item>
         ))
-        // The active row kept apart from the window makes a second run of its group.
-        const nth = seen.get(run.group) ?? 0
-        seen.set(run.group, nth + 1)
-        const key = `${run.group === undefined ? 'ungrouped' : `group:${run.group}`}:${String(nth)}`
-        const gap = <Spacer rows={run.start - (runs[at - 1]?.end ?? 0)} />
+        const gap = <Spacer rows={rows} />
         if (run.group === undefined) return <Fragment key={key}>{gap}{items}</Fragment>
         return (
           <Fragment key={key}>
@@ -55,7 +52,7 @@ export function CommandRows({ runs, total, getLabel, renderItem, select }: Comma
           </Fragment>
         )
       })}
-      <Spacer rows={total - (runs.at(-1)?.end ?? 0)} />
+      <Spacer rows={tail} />
     </>
   )
 }

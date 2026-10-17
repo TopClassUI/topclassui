@@ -68,6 +68,13 @@ export interface CommandRun {
   end: number
 }
 
+/** A run as the rows part draws it: a key no other run of the list holds, and the rows left out before it. */
+export interface CommandRunView {
+  run: CommandRun
+  key: string
+  gap: number
+}
+
 /** What the rows part draws: the runs of mounted rows, the spacers around them, and each row. */
 export interface CommandRowsProps {
   runs: readonly CommandRun[]
