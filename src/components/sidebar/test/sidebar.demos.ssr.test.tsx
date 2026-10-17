@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['basic', 'collapsed', 'controlled', 'groups', 'in-a-layout', 'long-list', 'rtl']
+const EXPECTED = ['basic', 'collapsed', 'controlled', 'groups', 'in-a-layout', 'long-list', 'rtl', 'skeleton', 'skeleton-collapsed']
 
 /** What each demo holds: its links, its lists that have a name, the row that is the current page, and its title. */
 const SHOWS: Record<string, { links: number, named: number, current: string, title: string }> = {
@@ -22,6 +22,8 @@ const SHOWS: Record<string, { links: number, named: number, current: string, tit
   'in-a-layout': { links: 4, named: 0, current: 'Orders', title: 'Workspace' },
   'long-list': { links: 60, named: 1, current: 'Page 1', title: 'Handbook' },
   'rtl': { links: 4, named: 1, current: 'الرئيسية', title: 'مساحة العمل' },
+  'skeleton': { links: 4, named: 0, current: 'Home', title: 'Workspace' },
+  'skeleton-collapsed': { links: 4, named: 0, current: 'Home', title: 'Workspace' },
 }
 
 const render = async (file: string) => {
@@ -89,20 +91,22 @@ describe('every demo renders on the server', () => {
 })
 
 describe('what the demos show', () => {
-  it('six are expanded in the HTML the server sends, and collapsed is collapsed there too', async () => {
+  it('seven are expanded in the HTML the server sends, and the two collapsed ones are collapsed there too', async () => {
     for (const file of files) {
       const nav = tags(await render(file), 'nav')[0] ?? ''
-      expect(attr(nav, 'data-closed') === '', file).toBe(file === 'collapsed')
-      expect(attr(nav, 'data-open') === '', file).toBe(file !== 'collapsed')
+      expect(attr(nav, 'data-closed') === '', file).toBe(file.endsWith('collapsed'))
+      expect(attr(nav, 'data-open') === '', file).toBe(!file.endsWith('collapsed'))
     }
   })
 
+  // A skeleton's pair is the exception: both rails take the height of what they hold, so the two can be compared.
   it('each rail sits in a parent that gives it a height, or its body could not scroll', async () => {
     const parents: Record<string, string> = {}
     for (const file of files) parents[file] = /class="([^"]*)"[^>]*><nav /.exec(await render(file))?.[1] ?? ''
     expect(parents).toEqual({
       'basic': 'h-96', 'collapsed': 'h-96', 'controlled': 'flex h-96 flex-wrap gap-4', 'groups': 'h-112',
       'in-a-layout': 'flex h-[calc(100dvh-4rem)]', 'long-list': 'h-[calc(100dvh-4rem)]', 'rtl': 'h-96',
+      'skeleton': '', 'skeleton-collapsed': '',
     })
   })
 
@@ -149,7 +153,7 @@ describe('what the demos show', () => {
     for (const file of files.filter((name) => name !== 'rtl')) {
       const html = await render(file)
       expect(attr(tags(html, 'nav')[0] ?? '', 'aria-label'), file).toBe('Sidebar')
-      expect(attr(tags(html, 'button')[0] ?? '', 'aria-label'), file).toBe(file === 'collapsed' ? 'Expand the sidebar' : 'Collapse the sidebar')
+      expect(attr(tags(html, 'button')[0] ?? '', 'aria-label'), file).toBe(file.endsWith('collapsed') ? 'Expand the sidebar' : 'Collapse the sidebar')
     }
   })
 })

@@ -4,7 +4,8 @@ export { SidebarHeader } from './parts/sidebar-header.js'
 export { SidebarBody } from './parts/sidebar-body.js'
 export { SidebarGroup } from './parts/sidebar-group.js'
 export { SidebarLink } from './parts/sidebar-link.js'
+export { SidebarSkeleton } from './skeleton.js'
 export type {
   SidebarBodyProps, SidebarDesignProps, SidebarGroupProps, SidebarHeaderProps, SidebarLinkProps, SidebarRootProps,
-  SidebarTriggerProps,
+  SidebarSkeletonProps, SidebarTriggerProps,
 } from './types.js'

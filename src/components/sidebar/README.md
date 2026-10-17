@@ -96,6 +96,7 @@ import {
   SidebarBody,
   SidebarGroup,
   SidebarLink,
+  SidebarSkeleton,
 } from 'topclassui'
 ```
 
@@ -146,6 +147,13 @@ This part takes no design props of its own.
 | `current` | no | `boolean` | `false` | SidebarLink: the page being read. It sets aria-current="page" and draws the row filled, bold and marked. |
 | `icon` | no | `ReactNode` | - | Drawn before the label, and all that is drawn while the rail is collapsed. Decorative: the label names the row. |
 
+### SidebarSkeleton
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `expanded` | no | `boolean` | `true` | SidebarSkeleton: whether the rail it stands in for is expanded. Pass what its defaultOpen or open will be. |
+| `links` | no | `integer`, min 1, max 200 | `4` | SidebarSkeleton: how many link rows the placeholder holds, clamped to 1 and 200. |
+
 Anything else is passed to the element each part draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
@@ -157,6 +165,8 @@ Anything else is passed to the element each part draws, so standard attributes (
 - `dummy/in-a-layout.tsx`
 - `dummy/long-list.tsx`
 - `dummy/rtl.tsx`
+- `dummy/skeleton.tsx`
+- `dummy/skeleton-collapsed.tsx`
 
 ## Verified against
 

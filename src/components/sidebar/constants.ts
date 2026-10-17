@@ -6,3 +6,9 @@ export const SIDEBAR_DEFAULTS = {
   defaultOpen: true,
   current: false,
 } as const
+
+/** The placeholder's starting shape: the four links Figma draws, on a rail expanded as defaultOpen starts one. */
+export const SIDEBAR_SKELETON_DEFAULTS = {
+  expanded: true,
+  links: 4,
+} as const

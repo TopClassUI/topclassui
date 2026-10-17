@@ -64,7 +64,7 @@ const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { 
 
 describe('every demo is a Server Component that only hands the client parts what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'collapsed', 'groups', 'in-a-layout', 'long-list', 'rtl'])
+    expect(names).toEqual(['basic', 'collapsed', 'groups', 'in-a-layout', 'long-list', 'rtl', 'skeleton', 'skeleton-collapsed'])
   })
 
   it('leaves out the one demo that is a client file, which cannot run here: it calls useState', async () => {
@@ -101,7 +101,7 @@ describe('the parts a demo is built from', () => {
   it('the rail is handed its state as a boolean or nothing, and its children as elements', async () => {
     for (const name of names) {
       const root = crossings((await load(name))()).find((crossing) => crossing.part === 'SidebarRoot')
-      expect(Object.keys(root?.props ?? {}).sort(), name).toEqual(name === 'collapsed' ? ['children', 'defaultOpen'] : ['children'])
+      expect(Object.keys(root?.props ?? {}).sort(), name).toEqual(name.endsWith('collapsed') ? ['children', 'defaultOpen'] : ['children'])
     }
     const collapsed = crossings((await load('collapsed'))()).find((crossing) => crossing.part === 'SidebarRoot')
     expect(collapsed?.props['defaultOpen']).toBe(false)

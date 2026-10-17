@@ -74,3 +74,8 @@ export type SidebarLinkProps =
     /** The label. It ends in an ellipsis when the rail is too narrow, and is cut at 100 characters. */
     children?: ReactNode | undefined
   }
+
+/** No content and no way to un-hide it: the placeholder only holds the rail's shape, expanded or as a column of icons. */
+export type SidebarSkeletonProps =
+  Omit<ComponentPropsWithRef<'div'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
+  & Pick<SidebarDesignProps, 'expanded' | 'links'>

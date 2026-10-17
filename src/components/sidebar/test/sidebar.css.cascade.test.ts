@@ -30,11 +30,11 @@ function queryOf(css: string, cls: string): string {
 const css = compileEntry().then((compiled) => compiled.build(WRITTEN))
 
 describe('a class that only applies under a query sits inside it', () => {
-  it('the four forced-colors classes of the current row sit inside the forced-colours query, and no other class does', async () => {
+  it('the four forced-colors classes of the current row and the line of a skeleton shape sit inside the forced-colours query, and no other class does', async () => {
     const sheet = await css
     expect(WRITTEN.filter((cls) => queryOf(sheet, cls) === '@media (forced-colors: active)').sort()).toEqual([
       'forced-colors:[--tc-ring:CanvasText]', 'forced-colors:bg-[Highlight]', 'forced-colors:forced-color-adjust-none',
-      'forced-colors:text-[HighlightText]',
+      'forced-colors:outline-(length:--tc-line-width)', 'forced-colors:text-[HighlightText]',
     ])
   })
 

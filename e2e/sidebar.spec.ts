@@ -19,6 +19,8 @@ const SIDEBARS: Record<string, { open: boolean, links: number }> = {
   'sidebar--in-a-layout': { open: true, links: 4 },
   'sidebar--long-list': { open: true, links: 60 },
   'sidebar--rtl': { open: true, links: 4 },
+  'sidebar--skeleton': { open: true, links: 4 },
+  'sidebar--skeleton-collapsed': { open: false, links: 4 },
 }
 
 /** The three screens Unit 3 measures at, and a phone on its side. */
@@ -225,7 +227,7 @@ test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) 
 
 test('the table names every sidebar demo', () => {
   expect(Object.keys(SIDEBARS).sort()).toEqual(DEMOS.filter((demo) => demo.startsWith('sidebar--')).sort())
-  expect(Object.keys(SIDEBARS)).toHaveLength(7)
+  expect(Object.keys(SIDEBARS)).toHaveLength(9)
 })
 
 // PLAN 19, Phase 6: accepted on the HTML the server sends, before any script has run.

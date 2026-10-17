@@ -1,5 +1,7 @@
 // R-5.12-4: one class string per element Sidebar styles, built from the shared constants.
-import { CONTAIN, FOCUS_RING, HOVER, ICON_BUTTON, LABEL, ROW, SCROLL_AREA, TOUCH_TARGET, TRANSITION } from '#shared/classes.js'
+import {
+  CONTAIN, FOCUS_RING, FORCED_EDGE, HOVER, ICON_BUTTON, LABEL, ROW, SCROLL_AREA, TARGET_HEIGHT, TOUCH_TARGET, TRANSITION,
+} from '#shared/classes.js'
 
 /** 220 px expanded and 60 collapsed. A server part cannot read context (R-5.1-4): every part
  * under the rail learns its state from this group and the attribute the root sets on it. */
@@ -93,3 +95,23 @@ export const SIDEBAR_ICON = {
 
 /** An element of its own, so a long label ends in an ellipsis and a collapsed one can hide. */
 export const SIDEBAR_LINK_LABEL = `${LABEL} group-data-closed/sidebar:sr-only`
+
+/** What every shape of the placeholder wears: the fill, a pulse that reduced motion stops, and a line under forced colours. */
+const SKELETON_FILL = `bg-neutral-soft animate-pulse motion-reduce:animate-none ${FORCED_EDGE}`
+
+/** The toggle's box with nothing to press: its floor on every pointer, and its radius. */
+export const SIDEBAR_SKELETON_TRIGGER = `block shrink-0 rounded-control ${TOUCH_TARGET} ${SKELETON_FILL}`
+
+/** Where the title and a link's label go: the type step, and one line of nothing inside it. */
+export const SIDEBAR_SKELETON_TEXT = 'block min-w-0 flex-1 text-sm'
+
+export const SIDEBAR_SKELETON_BAR = `block h-[1em] my-[calc((1lh-1em)/2)] w-24 max-w-full rounded-chip ${SKELETON_FILL}`
+
+/** The rows without the scroll of the body: the placeholder has no tab stop, so nothing in it may need one. */
+export const SIDEBAR_SKELETON_BODY = 'flex flex-1 flex-col gap-1 overflow-hidden'
+
+/** A link's row with nothing to follow: the same floors in the same order, merged by cn() as a link's are, which keeps the row height over 24 px. */
+export const SIDEBAR_SKELETON_ROW = `${TARGET_HEIGHT} ${ROW} group-data-closed/sidebar:justify-center`
+
+/** The icon is 1em of the row's type step, as the Svg of a link is. */
+export const SIDEBAR_SKELETON_ICON = `block size-[1em] shrink-0 rounded-chip ${SKELETON_FILL}`

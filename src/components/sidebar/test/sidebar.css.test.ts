@@ -89,6 +89,17 @@ const DECLARATION: Record<string, string> = {
   'forced-colors:bg-[Highlight]': 'background-color: Highlight;',
   'forced-colors:text-[HighlightText]': 'color: HighlightText;',
   'forced-colors:[--tc-ring:CanvasText]': '--tc-ring: CanvasText;',
+  // The skeleton: its shapes, each a fill that pulses and keeps a line under forced colours.
+  'block': 'display: block;',
+  'bg-neutral-soft': 'background-color: var(--tc-neutral-soft);',
+  'animate-pulse': 'animation: var(--animate-pulse);',
+  'motion-reduce:animate-none': 'animation: none;',
+  'forced-colors:outline-(length:--tc-line-width)': 'outline-width: var(--tc-line-width);',
+  'h-[1em]': 'height: 1em;',
+  'my-[calc((1lh-1em)/2)]': 'margin-block: calc((1lh - 1em) / 2);',
+  'rounded-chip': 'border-radius: min(calc(var(--tc-radius) * 0.5), 0.5rem);',
+  'size-[1em]': 'width: 1em;',
+  'w-24': 'width: calc(var(--spacing) * 24);',
 }
 
 /** The attribute, the state or the pseudo-element each variant class must be scoped to, or it would paint everywhere. */
@@ -133,7 +144,7 @@ describe('every class Sidebar writes compiles with the installed Tailwind', () =
 
   it('the table names exactly the classes of classes.ts, and the one that only marks the group', () => {
     expect(written).toEqual([...Object.keys(DECLARATION), 'group/sidebar'].sort())
-    expect(written).toHaveLength(74)
+    expect(written).toHaveLength(84)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

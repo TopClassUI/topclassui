@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import { SIDEBAR_BOUNDARIES } from '../boundaries.js'
 import { SIDEBAR_ICON, SIDEBAR_LINK_STATE } from '../classes.js'
-import { SIDEBAR_DEFAULTS } from '../constants.js'
+import { SIDEBAR_DEFAULTS, SIDEBAR_SKELETON_DEFAULTS } from '../constants.js'
 import { boundLabel, resolveDir } from '../lib.js'
 import { sidebarSchema } from '../schema.js'
 
@@ -16,18 +16,18 @@ describe('the schema is the documentation', () => {
   const keys = Object.keys(sidebarSchema.shape)
 
   it('covers every design prop and no other', () => {
-    expect(keys.sort()).toEqual(['current', 'defaultOpen', 'open'])
+    expect(keys.sort()).toEqual(['current', 'defaultOpen', 'expanded', 'links', 'open'])
   })
 
   it('converts to JSON Schema at all', () => {
-    expect(Object.keys(json.properties ?? {}).sort()).toEqual(['current', 'defaultOpen', 'open'])
+    expect(Object.keys(json.properties ?? {}).sort()).toEqual(['current', 'defaultOpen', 'expanded', 'links', 'open'])
   })
 
   for (const key of keys) {
     it(`${key} carries a description that names the part taking it`, () => {
       const description = json.properties?.[key]?.description ?? ''
       expect(description.length, key).toBeGreaterThan(30)
-      expect(description, key).toMatch(/^Sidebar(Root|Link): /)
+      expect(description, key).toMatch(/^Sidebar(Root|Link|Skeleton): /)
     })
   }
 
@@ -41,23 +41,24 @@ describe('the schema is the documentation', () => {
     expect(sidebarSchema.parse({})).not.toHaveProperty('open')
   })
 
-  it('types all three as booleans', () => {
-    for (const key of ['current', 'defaultOpen', 'open']) expect(json.properties?.[key]?.type, key).toBe('boolean')
+  it('types the four states as booleans', () => {
+    for (const key of ['current', 'defaultOpen', 'expanded', 'open']) expect(json.properties?.[key]?.type, key).toBe('boolean')
   })
 })
 
 describe('the schema and the constants agree', () => {
   it('fills every default from constants.ts', () => {
-    expect(sidebarSchema.parse({})).toEqual({ defaultOpen: true, current: false })
+    expect(sidebarSchema.parse({})).toEqual({ defaultOpen: true, current: false, expanded: true, links: 4 })
   })
 
   it('names the defaults the spec gives, so a changed constant is a failure here', () => {
     expect(SIDEBAR_DEFAULTS).toEqual({ defaultOpen: true, current: false })
+    expect(SIDEBAR_SKELETON_DEFAULTS).toEqual({ expanded: true, links: 4 })
   })
 
   it('accepts both values of each prop', () => {
     for (const value of [true, false]) {
-      expect(sidebarSchema.parse({ defaultOpen: value, open: value, current: value })).toEqual({ defaultOpen: value, open: value, current: value })
+      expect(sidebarSchema.parse({ defaultOpen: value, open: value, current: value })).toEqual({ defaultOpen: value, open: value, current: value, expanded: true, links: 4 })
     }
   })
 
@@ -75,9 +76,13 @@ describe('a row has classes for each value of current', () => {
   })
 })
 
-describe('the one bound', () => {
-  it('cuts a label at 100 characters: far above any real page name, far below a pasted file', () => {
-    expect(SIDEBAR_BOUNDARIES).toEqual({ labelMaxLength: 100 })
+describe('the bounds', () => {
+  it('cuts a label at 100 characters: far above any real page name, far below a pasted file; and a placeholder holds 1 to 200 rows', () => {
+    expect(SIDEBAR_BOUNDARIES).toEqual({ labelMaxLength: 100, skeletonLinksMin: 1, skeletonLinksMax: 200 })
+  })
+
+  it('declares the count of the skeleton with the same numbers it is clamped to (R-8.3-6)', () => {
+    expect(json.properties?.['links']).toMatchObject({ type: 'integer', minimum: 1, maximum: 200, default: 4 })
   })
 
   it('boundLabel cuts a string at the bound and leaves a shorter one whole', () => {

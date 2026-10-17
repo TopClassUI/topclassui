@@ -24,9 +24,9 @@ function exportedNames(source: string): string[] {
 
 // The root-part lint reads declarations, and index.tsx declares nothing, so this is the guard.
 describe('index.tsx exports flat names, with no bare Sidebar (R-9.2-3, R-9.2-4)', () => {
-  it('exports exactly the six parts: the rail, its toggle and the four server parts', () => {
+  it('exports exactly the six parts: the rail, its toggle and the four server parts; and the skeleton', () => {
     expect(Object.keys(sidebar).sort()).toEqual([
-      'SidebarBody', 'SidebarGroup', 'SidebarHeader', 'SidebarLink', 'SidebarRoot', 'SidebarTrigger',
+      'SidebarBody', 'SidebarGroup', 'SidebarHeader', 'SidebarLink', 'SidebarRoot', 'SidebarSkeleton', 'SidebarTrigger',
     ])
   })
 
@@ -39,8 +39,8 @@ describe('index.tsx exports flat names, with no bare Sidebar (R-9.2-3, R-9.2-4)'
     const source = readFileSync(join(import.meta.dirname, '..', 'index.tsx'), 'utf8')
     expect(exportedNames(source).sort()).toEqual([
       'SidebarBody', 'SidebarBodyProps', 'SidebarDesignProps', 'SidebarGroup', 'SidebarGroupProps', 'SidebarHeader',
-      'SidebarHeaderProps', 'SidebarLink', 'SidebarLinkProps', 'SidebarRoot', 'SidebarRootProps', 'SidebarTrigger',
-      'SidebarTriggerProps',
+      'SidebarHeaderProps', 'SidebarLink', 'SidebarLinkProps', 'SidebarRoot', 'SidebarRootProps', 'SidebarSkeleton',
+      'SidebarSkeletonProps', 'SidebarTrigger', 'SidebarTriggerProps',
     ])
   })
 

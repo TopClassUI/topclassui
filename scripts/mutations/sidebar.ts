@@ -493,4 +493,40 @@ export const MUTATIONS: Mutation[] = [
     from: 'z.boolean().default(SIDEBAR_DEFAULTS.defaultOpen)',
     to: 'z.boolean().optional()',
   },
+  {
+    label: 'the sidebar skeleton lets a caller un-hide it',
+    file: 'src/components/sidebar/skeleton.tsx',
+    from: '      {...rest}\n      aria-hidden\n',
+    to: '      aria-hidden\n      {...rest}\n',
+  },
+  {
+    label: 'the sidebar skeleton row loses the finger floor, so under a coarse pointer it is shorter than a link',
+    file: 'src/components/sidebar/classes.ts',
+    from: 'export const SIDEBAR_SKELETON_ROW = `${TARGET_HEIGHT} ${ROW}',
+    to: 'export const SIDEBAR_SKELETON_ROW = `${ROW}',
+  },
+  {
+    label: 'the sidebar skeleton toggle loses its floor, so its header is shorter than the header of the rail',
+    file: 'src/components/sidebar/classes.ts',
+    from: 'export const SIDEBAR_SKELETON_TRIGGER = `block shrink-0 rounded-control ${TOUCH_TARGET} ${SKELETON_FILL}`',
+    to: 'export const SIDEBAR_SKELETON_TRIGGER = `block shrink-0 rounded-control ${SKELETON_FILL}`',
+  },
+  {
+    label: 'the sidebar skeleton stops clamping its count, so links={999} draws 999 rows',
+    file: 'src/components/sidebar/skeleton.tsx',
+    from: 'Math.trunc(clamp(links, SIDEBAR_BOUNDARIES.skeletonLinksMin, SIDEBAR_BOUNDARIES.skeletonLinksMax))',
+    to: 'Math.trunc(links)',
+  },
+  {
+    label: 'the sidebar skeleton never collapses, so it stands 220 px wide beside a 60 px rail',
+    file: 'src/components/sidebar/skeleton.tsx',
+    from: "      data-closed={expanded ? undefined : ''}\n",
+    to: '',
+  },
+  {
+    label: 'the sidebar skeleton keeps the labels of a collapsed rail, so its rows are wider than the icons they stand for',
+    file: 'src/components/sidebar/skeleton.tsx',
+    from: '            {expanded ? <span className={SIDEBAR_SKELETON_TEXT}>',
+    to: '            {true ? <span className={SIDEBAR_SKELETON_TEXT}>',
+  },
 ]

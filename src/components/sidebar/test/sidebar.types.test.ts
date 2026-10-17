@@ -18,8 +18,8 @@ describe('the state is on the root', () => {
     expectTypeOf<SidebarRootProps['onOpenChange']>().toEqualTypeOf<((open: boolean) => void) | undefined>()
   })
 
-  it('the design props are the three of the schema, each optional', () => {
-    expectTypeOf<keyof SidebarDesignProps>().toEqualTypeOf<'open' | 'defaultOpen' | 'current'>()
+  it('the design props are the five of the schema, each optional', () => {
+    expectTypeOf<keyof SidebarDesignProps>().toEqualTypeOf<'open' | 'defaultOpen' | 'current' | 'expanded' | 'links'>()
     expectTypeOf<Accepts<SidebarDesignProps, Record<string, never>>>().toEqualTypeOf<true>()
   })
 
@@ -28,6 +28,7 @@ describe('the state is on the root', () => {
     expectTypeOf<Accepts<keyof SidebarRootProps, 'width'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof SidebarRootProps, 'size'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof SidebarRootProps, 'variant'>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<keyof SidebarRootProps, 'links' | 'expanded'>>().toEqualTypeOf<false>()
   })
 
   it('what it shares with its toggle is the state and the way to ask for another', () => {

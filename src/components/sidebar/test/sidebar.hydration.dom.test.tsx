@@ -106,9 +106,12 @@ describe('a server-rendered rail hydrates cleanly', () => {
   })
 })
 
+/** The demos whose rail starts collapsed; the skeleton beside one is collapsed too. */
+const COLLAPSED = ['collapsed', 'skeleton-collapsed']
+
 describe('every demo renders and hydrates', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(DEMOS.map(([name]) => name)).toEqual(['basic', 'collapsed', 'controlled', 'groups', 'in-a-layout', 'long-list', 'rtl'])
+    expect(DEMOS.map(([name]) => name)).toEqual(['basic', 'collapsed', 'controlled', 'groups', 'in-a-layout', 'long-list', 'rtl', 'skeleton', 'skeleton-collapsed'])
   })
 
   for (const [name, Demo] of DEMOS) {
@@ -119,8 +122,8 @@ describe('every demo renders and hydrates', () => {
     it(`${name} hydrates with no recoverable error, in the state the server sent`, async () => {
       const { errors, html, container } = await hydrate(createElement(Demo))
       expect(errors).toEqual([])
-      expect(states(container)).toEqual([name === 'collapsed' ? 'closed' : 'open'])
-      expect(html.includes(' data-closed=""')).toBe(name === 'collapsed')
+      expect(states(container)).toEqual([COLLAPSED.includes(name) ? 'closed' : 'open'])
+      expect(html.includes(' data-closed=""')).toBe(COLLAPSED.includes(name))
     })
   }
 })

@@ -48,10 +48,10 @@ function hooksPerFunction(source: string): Record<string, string[]> {
 }
 
 describe('the folder is a split component: a client shell and its toggle around server parts', () => {
-  it('holds exactly the files Sidebar needs: no variants and no skeleton', () => {
+  it('holds exactly the files Sidebar needs: a skeleton, and no variants', () => {
     expect(readdirSync(FOLDER).sort()).toEqual([
       'README.md', 'boundaries.ts', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'lib.ts',
-      'meta.ts', 'parts', 'schema.ts', 'test', 'types.ts',
+      'meta.ts', 'parts', 'schema.ts', 'skeleton.tsx', 'test', 'types.ts',
     ])
     expect(readdirSync(join(FOLDER, 'parts')).sort().map((file) => `parts/${file}`)).toEqual(PARTS)
   })
@@ -69,9 +69,10 @@ describe('index.tsx re-exports and holds no markup (R-5.1-2)', () => {
     expect(nonReexports(source)).toEqual([])
   })
 
-  it('takes the two client parts from client.tsx, each server part from its own file, and the types from types.ts', () => {
+  it('takes the two client parts from client.tsx, each server part and the skeleton from its own file, and the types from types.ts', () => {
     expect(importedModules(source).sort()).toEqual([
-      './client.js', './parts/sidebar-body.js', './parts/sidebar-group.js', './parts/sidebar-header.js', './parts/sidebar-link.js', './types.js',
+      './client.js', './parts/sidebar-body.js', './parts/sidebar-group.js', './parts/sidebar-header.js', './parts/sidebar-link.js',
+      './skeleton.js', './types.js',
     ])
     expect(source.split('\n')).toContain("export { SidebarRoot, SidebarTrigger } from './client.js'")
   })
