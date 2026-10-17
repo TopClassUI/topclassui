@@ -5,7 +5,8 @@ import { expectRing } from './keys.js'
 import { liveErrors, openLive } from './live.js'
 
 // R-5.6-1 for Field, which has no keys of its own: that it takes none from the eleven controls it wraps. Each is one
-// tab stop with its ring, in order both ways, and the keys of the composite ones still work inside it, mirrored in RTL.
+// tab stop with its ring, in order both ways, and the keys of the composite ones (the radios, the slider, the number
+// field and the select) still work inside it, mirrored in RTL.
 // field.spec.ts has the labels, Space on a checkbox in a form, and that no ring is cut.
 
 const STOPS = [
@@ -59,6 +60,37 @@ test.describe('live: every control keeps its keys inside a Field', () => {
       await expect(stop(page, ['radio', 'Table'])).toBeChecked()
       await page.keyboard.press('Shift+Tab')
       await expect(stop(page, ['radio', 'Pro']), 'Shift+Tab comes back to the checked radio').toBeFocused()
+      await page.keyboard.press('ArrowDown')
+      await expect(stop(page, ['radio', 'Free'])).toBeChecked()
+      await page.keyboard.press('ArrowUp')
+      await expect(stop(page, ['radio', 'Pro'])).toBeChecked()
+      await expectRing(page, 'Pro, after ArrowUp')
+    })
+
+    test(`${direction}: the slider, the number field and the select keep their own keys inside the Field, mirrored in RTL`, async ({ page }) => {
+      await openLive(page, 'field--controls', { direction })
+      const slider = stop(page, ['slider', 'Volume'])
+      await slider.focus()
+      await page.keyboard.press('ArrowRight')
+      await expect(slider).toHaveAttribute('aria-valuenow', direction === 'ltr' ? '41' : '39')
+      await page.keyboard.press('End')
+      await expect(slider).toHaveAttribute('aria-valuenow', '100')
+      await expectRing(page, 'Volume, after End')
+      const guests = stop(page, ['textbox', 'Guests'])
+      await guests.focus()
+      await page.keyboard.press('ArrowUp')
+      await expect(guests).toHaveValue('3')
+      await expectRing(page, 'Guests, after ArrowUp')
+      const country = stop(page, ['combobox', 'Country'])
+      await country.focus()
+      await page.keyboard.press('ArrowDown')
+      await expect(country).toHaveAttribute('aria-expanded', 'true')
+      await expect(page.getByRole('listbox')).toBeVisible()
+      await page.keyboard.press('Escape')
+      await expect(country).toHaveAttribute('aria-expanded', 'false')
+      await expect(page.getByRole('listbox')).toHaveCount(0)
+      await expect(country).toBeFocused()
+      await expectRing(page, 'Country, after Escape')
     })
   }
 })
