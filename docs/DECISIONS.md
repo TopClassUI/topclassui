@@ -6,6 +6,14 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-17 - R-5.2-2's lint lets a caller's class follow the consumer's className
+
+**Decision.** `topclass/cn-class-name-last` reports a `cn()` call where `className`, `props.className` or `props['className']` is followed by any argument that is not itself a `className` read (`className`, or the `className` key of any object). So `cn(BUTTON, className)` passes, `cn(className, BUTTON)` fails, and `cn(props['className'], own['className'])` in `renderElement` (`src/shared/render.ts`) passes with no lint disable.
+
+**Why.** The rule exists so a component's own classes never beat the consumer's. In `renderElement`, `props` is the component's finished prop set, already holding the consumer's `className` merged after the component's classes, and `own` is the element the same caller wrote in `render={<a className="..." />}`, which is the more specific of the two and has to win; swapping the arguments would invert that. Two classes the caller wrote are ordered by specificity, not by this rule. The narrowing is shape-only and keeps the package's zero-disable policy; an own class after the pair (`cn(props.className, own.className, 'flex')`) is still reported.
+
+**Affects.** R-5.2-2, `eslint-rules/index.ts`, `src/shared/render.ts`.
+
 ## 2026-10-17 - One thin themed scrollbar for every scroll area
 
 **Decision.** `SCROLLBAR` in `src/shared/classes.ts` is `scrollbar-width: thin` and `scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track)`. `SCROLL_AREA` and `SCROLL_X` carry it, so every dialog and drawer body, popover, dropdown, command, select and combobox list, date picker, tree view, file upload list, toast viewport, sidebar body, accordion region, tabs list, navbar links, segmented control and code block wears it; the table box and the textarea, which scroll without those two, add it by hand. The thumb is neutral-500 in light and ocean and neutral-400 in dark, on a transparent track, so it stands on the surface beneath it: 4.53 to 4.73:1 in light, 5.83 to 7.63 in dark, and 3.93 / 6.27 on a read-only field. `check:contrast` measures it on every surface and on its track whenever the track is not transparent. The code block sets the two tokens to its own fill and halfway thumb, as before. The collapsed Sidebar still hides its bar. Two widths follow from the thinner bar, measured under a mouse: an expanded Sidebar's bar is 10 px (15 before), and a Textarea that takes the browser's own width, in a `w-fit` parent or beside a label, is 173 px (178 before; unit-4.md says 178), since Chromium reserves the vertical bar in it.

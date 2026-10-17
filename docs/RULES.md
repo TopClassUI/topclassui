@@ -10,7 +10,7 @@ Each rule has an id, one line of rule, one line of reason, and what enforces it.
 
 ```
 pnpm check            every gate below, in order
-pnpm lint             eslint, including the thirteen custom rules
+pnpm lint             eslint, including the fourteen custom rules
 pnpm typecheck        tsc --noEmit
 pnpm test             vitest, four projects: node, dom, rsc, ssr
 pnpm check:structure  the folder contract and file sizes
@@ -93,7 +93,7 @@ They arrive with the phases that need them.
 ### R-5.2-2 Merge with the configured cn()
 **Rule:** merge classes with `cn()` from `shared/cn.ts`, which uses `extendTailwindMerge`; the consumer's `className` is passed last.
 **Why:** tailwind-merge does not know the custom spacing and radius keys, so the default `twMerge` would keep both conflicting classes.
-**Enforced by:** unit test (`shared/cn.test.ts`); the argument order is not linted
+**Enforced by:** unit test (`shared/cn.test.ts`) for the merge; eslint (`topclass/cn-class-name-last`) for the argument order
 
 ### R-5.2-3 Never build class names dynamically
 **Rule:** no `` `bg-${tone}` ``; use a lookup object or cva variants.
