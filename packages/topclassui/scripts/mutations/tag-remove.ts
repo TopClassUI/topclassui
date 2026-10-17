@@ -5,6 +5,7 @@ const INDEX = 'src/components/tag/index.tsx'
 const CLIENT = 'src/components/tag/client.tsx'
 const CLASSES = 'src/components/tag/classes.ts'
 const HOOK = 'src/components/tag/hook.ts'
+const LIB = 'src/components/tag/lib.ts'
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -15,9 +16,9 @@ export const MUTATIONS: Mutation[] = [
   },
   {
     label: 'the tag remove button stops calling onRemove',
-    file: CLIENT,
-    from: 'onClick={() => { onRemove() }}',
-    to: 'onClick={() => undefined}',
+    file: HOOK,
+    from: '      onRemove()\n',
+    to: '',
   },
   {
     label: 'the tag remove button loses type="button", so inside a form it submits the form',
@@ -88,13 +89,43 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the tag remove button is named in English whatever the provider says',
     file: HOOK,
-    from: 'return { label: useLabels().tag.remove }',
-    to: "return { label: useLabels() === undefined ? '' : 'Remove' }",
+    from: '    label: useLabels().tag.remove,',
+    to: "    label: useLabels() === undefined ? '' : 'Remove',",
   },
   {
-    label: 'the tag README sample stops moving the focus, so a reader who copies it drops the keyboard on the page body',
+    label: 'the tag README sample moves the focus by hand again, so a reader who copies it fights the x',
     file: 'src/components/tag/README.md',
-    from: '    next?.focus()\n',
+    from: "          <Tag onRemove={() => { setTopics(topics.filter((other) => other !== topic)) }}>{topic}</Tag>",
+    to: "          <Tag onRemove={() => { document.body.focus(); setTopics(topics.filter((other) => other !== topic)) }}>{topic}</Tag>",
+  },
+  {
+    label: 'the tag remove hook never moves the focus, so a removed tag drops it on the body',
+    file: HOOK,
+    from: '    return () => { restoreFocus(leaving.current.to, leaving.current.visible) }\n',
+    to: '    return () => undefined\n',
+  },
+  {
+    label: 'the tag remove hook records no neighbour, so the focus of its x falls to the body',
+    file: HOOK,
+    from: 'if (x === x.ownerDocument.activeElement) next.current =',
+    to: 'if (x === x.ownerDocument.body) next.current =',
+  },
+  {
+    label: 'the tag remove neighbour skips the other x and goes to the next tab stop of the page',
+    file: LIB,
+    from: 'return nearestOf(x, others) ?? findNeighbour(x)',
+    to: 'return findNeighbour(x)',
+  },
+  {
+    label: 'the tag remove neighbour looks for the next x across the page, outside its own list',
+    file: LIB,
+    from: "const list = x.closest('ul, ol, [role=\"list\"]') ?? x.ownerDocument",
+    to: 'const list = x.ownerDocument',
+  },
+  {
+    label: 'the tag remove button loses data-tag-remove, so no other x is found as its neighbour',
+    file: CLIENT,
+    from: '      data-tag-remove=""\n',
     to: '',
   },
 ]

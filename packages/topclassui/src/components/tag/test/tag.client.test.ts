@@ -10,10 +10,10 @@ const FOLDER = join(import.meta.dirname, '..')
 const read = (file: string) => readFileSync(join(FOLDER, file), 'utf8')
 
 describe('the folder is a split component: a server Tag and its client x', () => {
-  it('holds the server files of Unit 2, plus client.tsx and hook.ts', () => {
+  it('holds the server files of Unit 2, plus client.tsx, hook.ts and lib.ts', () => {
     expect(readdirSync(FOLDER).sort()).toEqual([
       'README.md', 'boundaries.ts', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx',
-      'meta.ts', 'schema.ts', 'test', 'types.ts', 'variants.ts',
+      'lib.ts', 'meta.ts', 'schema.ts', 'test', 'types.ts', 'variants.ts',
     ])
   })
 
@@ -55,13 +55,19 @@ describe('client.tsx is markup plus one hook (R-5.12-1)', () => {
   })
 })
 
-describe('hook.ts reads the label of the provider', () => {
+describe('hook.ts reads the label of the provider and moves the focus', () => {
   const source = read('hook.ts')
 
-  it("starts with 'use client' and imports only the provider's labels", () => {
+  it("starts with 'use client' and imports the provider's labels, the focus return and the neighbour", () => {
     expect(source.startsWith("'use client'\n")).toBe(true)
-    expect(importedModules(source)).toEqual(['#shared/provider/context.js'])
+    expect(importedModules(source)).toEqual(['react', '#shared/focus-neighbour.js', '#shared/provider/context.js', './lib.js', './types.js'])
+    expect(importedNames(source, 'react')).toEqual(['useEffect', 'useRef'])
     expect(importedNames(source, '#shared/provider/context.js')).toEqual(['useLabels'])
+    expect(importedNames(source, './lib.js')).toEqual(['neighbourOf'])
+  })
+
+  it('lib.ts imports no React, so the neighbour is plain code', () => {
+    expect(importedModules(read('lib.ts'))).toEqual(['#shared/focus-neighbour.js'])
   })
 
   it('writes no type argument in angle brackets', () => {

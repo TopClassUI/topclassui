@@ -9,17 +9,18 @@ import { useTagRemove } from './hook.js'
 import type { TagRemoveProps } from './types.js'
 
 /** The x of a removable Tag, internal. Named by itself then the label, so it reads "Remove React".
- * It calls onRemove with nothing; the caller takes the tag out of its list. */
+ * It calls onRemove with nothing; the caller takes the tag out of its list, and the hook moves the focus. */
 export function TagRemove({ id, labelId, tone, size, onRemove }: TagRemoveProps) {
-  const { label } = useTagRemove()
+  const { label, remove } = useTagRemove(onRemove)
   return (
     <button
       type="button"
       id={id}
       aria-label={label}
       aria-labelledby={`${id} ${labelId}`}
+      data-tag-remove=""
       className={cn(TAG_REMOVE, TONE_CLASS[tone], REMOVE_SIZE[size])}
-      onClick={() => { onRemove() }}
+      onClick={remove}
     >
       <Svg icon={x} />
     </button>

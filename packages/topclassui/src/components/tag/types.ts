@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef, ReactNode } from 'react'
+import type { ComponentPropsWithRef, MouseEvent, ReactNode } from 'react'
 
 import type { Size } from '#shared/contracts/size.js'
 import type { Tone } from '#shared/contracts/tone.js'
@@ -28,6 +28,9 @@ export interface TagRemoveProps {
   size: Size
   onRemove: () => void
 }
+
+/** The press on the x, which the hook reads to know whether the x held the focus. Internal. */
+export type TagRemoveEvent = MouseEvent<HTMLButtonElement>
 
 /** The removable tag, once its tone and size are settled. Internal. */
 export type TagRemovableProps = Omit<TagProps, 'tone' | 'size' | 'onRemove'> & Pick<TagRemoveProps, 'tone' | 'size' | 'onRemove'>
