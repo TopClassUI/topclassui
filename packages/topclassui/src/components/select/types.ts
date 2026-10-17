@@ -58,5 +58,5 @@ export type SelectChangeDetails = Base.Root.ChangeEventDetails
 export type SelectStateProps = Pick<
   SelectProps,
   'value' | 'defaultValue' | 'onValueChange' | 'onOpenChange' | 'inputRef' | 'visibleRows' | 'placeholder' | 'ref' | 'aria-label' | 'aria-labelledby'
-  | 'items' | 'hasMore' | 'loadMore' | 'loadMoreThreshold' | 'open' | 'defaultOpen'
+  | 'items' | 'hasMore' | 'loadMore' | 'loadMoreThreshold'
 >

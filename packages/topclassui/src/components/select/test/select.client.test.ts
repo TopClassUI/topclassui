@@ -120,7 +120,7 @@ describe('hook.ts holds the value, the labels and the locale of the portal (R-5.
     ])
     expect(hooksByPart(source)).toEqual({
       toPopupSelector: [],
-      useSelect: ['useFormValue', 'useImperativeHandle', 'useRef', 'useImperativeHandle', 'useId', 'useLabels', 'usePortalLocale', 'useState', 'useEffect', 'useState', 'useCollection', 'useCollectionDefaults', 'useEffect'],
+      useSelect: ['useFormValue', 'useImperativeHandle', 'useRef', 'useImperativeHandle', 'useId', 'useLabels', 'usePortalLocale', 'useState', 'useEffect', 'useCollection', 'useCollectionDefaults', 'useEffect'],
     })
   })
 

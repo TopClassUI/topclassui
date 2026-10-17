@@ -37,21 +37,19 @@ export function useSelect(props: SelectStateProps) {
   const named = props['aria-label'] !== undefined || props['aria-labelledby'] !== undefined
   const [spoken, setSpoken] = useState(undefined as string | undefined)
   useEffect(() => { if (!named) setSpoken(readNameFromLabels(trigger.current)) }, [named])
-  const [opened, setOpened] = useState(props.defaultOpen ?? false)
   const onOpen = guardEscape((next: boolean, details: SelectChangeDetails) => {
     if (next && !named) setSpoken(readNameFromLabels(trigger.current))
     props.onOpenChange?.(next, details)
-    if (!details.isCanceled) setOpened(next)
   }, toPopupSelector(scope))
 
   const rows = visibleRows === undefined ? undefined : clamp(visibleRows, visibleRowsMin, visibleRowsMax)
-  // R-8.5-1 without windowing: Base UI moves real focus over the mounted items (SelectRoot.js:292-306).
+  // R-8.5-1 without windowing: Base UI focuses the mounted items (SelectRoot.js:292-306); closed, no list asks.
   const collection = useCollection({
     items,
     getKey: keyOfOption,
     virtualize: false,
     visibleRows: rows,
-    hasMore: (props.hasMore ?? false) && (props.open ?? opened),
+    hasMore: props.hasMore,
     loadMore: props.loadMore,
     loadMoreThreshold: clamp(props.loadMoreThreshold ?? SELECT_DEFAULTS.loadMoreThreshold, loadMoreThresholdMin, loadMoreThresholdMax),
   })

@@ -43,7 +43,7 @@ export function Select({
   ...rest
 }: SelectProps) {
   const select = useSelect({
-    items, hasMore, loadMore, loadMoreThreshold, open, defaultOpen,
+    items, hasMore, loadMore, loadMoreThreshold,
     value, defaultValue, onValueChange, onOpenChange, inputRef, visibleRows, placeholder, ref,
     'aria-label': rest['aria-label'], 'aria-labelledby': rest['aria-labelledby'],
   })
