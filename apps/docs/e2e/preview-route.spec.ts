@@ -11,14 +11,14 @@ const DEMOS = components.filter((entry) => entry.page && entry.content !== null)
 const THEMES = ['light', 'dark', 'ocean'] as const
 const DIRS = [{ dir: 'ltr', lang: 'en' }, { dir: 'rtl', lang: 'ar' }] as const
 
-test('the route has every demo of the four Actions components', () => {
-  expect(DEMOS.length).toBe(40)
+test('the route has every demo of the Actions and Display components', () => {
+  expect(DEMOS.length).toBe(105)
 })
 
 for (const theme of THEMES) {
   for (const { dir, lang } of DIRS) {
     test(`every demo renders alone in ${theme} ${dir}, noindex, and passes axe`, async ({ page }) => {
-      test.setTimeout(240_000)
+      test.setTimeout(600_000)
       for (const key of DEMOS) {
         const response = await page.goto(`/preview/${theme}/${dir}/${key}`)
         expect(response?.status(), key).toBe(200)
