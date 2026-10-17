@@ -10,7 +10,7 @@ Each rule has an id, one line of rule, one line of reason, and what enforces it.
 
 ```
 pnpm check            every gate below, in order
-pnpm lint             eslint, including the thirteen custom rules
+pnpm lint             eslint, including the fourteen custom rules
 pnpm typecheck        tsc --noEmit
 pnpm test             vitest, four projects: node, dom, rsc, ssr
 pnpm check:structure  the folder contract and file sizes
@@ -280,7 +280,7 @@ They arrive with the phases that need them.
 ### R-5.12-1 Logic is separate from markup
 **Rule:** `client.tsx` is JSX plus at most one call to `useXxx()` from `hook.ts`; it holds no `useState`, `useEffect`, `useReducer`, `useRef`, `useMemo` or `useCallback`. Pure helpers live in `lib.ts`.
 **Why:** markup and behaviour change for different reasons and are tested differently.
-**Enforced by:** not yet - planned: `eslint` + `check-structure`
+**Enforced by:** `eslint` (`client-shape`, per component and in every `'use client'` part) + `check-structure` (only a client file imports `hook.ts`)
 
 ### R-5.12-2 Files stay small
 **Rule:** `check-structure` warns at 200 lines and fails at 300; a component that needs more files gets a `parts/` folder with one component per file.

@@ -8,7 +8,7 @@ Read docs/STATUS.md first for where things stand. The full specification is docs
 
 ```
 pnpm check            every gate below, in order
-pnpm lint             eslint, including the thirteen custom rules
+pnpm lint             eslint, including the fourteen custom rules
 pnpm typecheck        tsc --noEmit
 pnpm test             vitest, four projects: node, dom, rsc, ssr
 pnpm check:structure  the folder contract and file sizes
@@ -110,7 +110,7 @@ They arrive with the phases that need them.
 
 ## 8. Code structure
 
-- **R-5.12-1** `client.tsx` is JSX plus at most one call to `useXxx()` from `hook.ts`; it holds no `useState`, `useEffect`, `useReducer`, `useRef`, `useMemo` or `useCallback`. Pure helpers live in `lib.ts`. _(not yet - planned: eslint + check-structure)_
+- **R-5.12-1** `client.tsx` is JSX plus at most one call to `useXxx()` from `hook.ts`; it holds no `useState`, `useEffect`, `useReducer`, `useRef`, `useMemo` or `useCallback`. Pure helpers live in `lib.ts`. _(eslint + check-structure)_
 - **R-5.12-2** `check-structure` warns at 200 lines and fails at 300; a component that needs more files gets a `parts/` folder with one component per file. _(check-structure)_
 - **R-5.12-3** One line maximum, only for what the code cannot say (a browser quirk, a spec reference, a non-local constraint). No paragraph comments, no commented-out code, no narration of the next line. A `/** ... */` block documenting an export may run to three lines of prose and no more; past that it is an article and belongs in `docs/DECISIONS.md`. `scripts/`, `eslint-rules/` and config files are outside the check. _(eslint under src/; the JSDoc exemption and everything outside src/ are manual)_
 - **R-5.12-4** Kebab-case files and folders, PascalCase components, `useThing` hooks, verb-first pure functions, `SCREAMING_CASE` constants in `constants.ts` or `classes.ts` inside a component folder; a shared contract under `shared/` may declare its own. A file in `parts/` exports one component named after the file. _(check-structure for the kebab-case names and for a SCREAMING_CASE table declared outside constants or classes; the rest is manual)_
