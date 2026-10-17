@@ -761,7 +761,7 @@ test.describe('focus', () => {
 // and cancelled the sheet's own close, so the key closed nothing. Each root now looks inside its own popup only.
 test.describe('a sheet inside a dialog', () => {
   const titles = (page: Page) => page.locator('[role="dialog"][data-open] h2').allTextContents()
-  const tooltip = (page: Page) => page.locator('[data-placement][data-open]:not([role])')
+  const tooltip = (page: Page) => page.locator('[role="tooltip"][data-open]')
   const escape = async (page: Page, left: string[]) => {
     await page.keyboard.press('Escape')
     await expect.poll(() => titles(page)).toEqual(left)

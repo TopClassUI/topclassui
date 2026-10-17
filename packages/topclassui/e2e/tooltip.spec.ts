@@ -1,3 +1,4 @@
+import AxeBuilder from '@axe-core/playwright'
 import { expect, test, type Page } from '@playwright/test'
 
 import { DIRECTIONS, type Direction } from '../scripts/lib/harness.js'
@@ -137,19 +138,42 @@ test('focus on the trigger opens the tooltip, and Escape closes it without movin
   await expect(popup).toHaveText('Copy link')
   await expect(popup).toBeVisible()
   await expect(popup).toHaveAttribute('data-placement', 'top')
+  // R-5.6-1: the open popup is a tooltip, and the trigger names it as its description.
+  await expect(popup).toHaveAttribute('role', 'tooltip')
+  await expect(popup).toHaveAttribute('id', /^_[rR]_[0-9a-zA-Z]+_$/)
+  await expect(trigger).toHaveAttribute('aria-describedby', await popup.getAttribute('id') ?? 'none')
+  await expect(page.getByRole('tooltip')).toHaveText('Copy link')
+  await expect(trigger).toHaveAccessibleDescription('Copy link')
 
   await page.keyboard.press('Escape')
   await expect(popup).toHaveCount(0)
   await expect(trigger).toBeFocused()
+  await expect(trigger).not.toHaveAttribute('aria-describedby')
+})
+
+// The static pages axe.spec reads never open a popup, so the role and the link are checked here, open.
+test('axe finds nothing on the page while a tooltip is open, the trigger described by it', async ({ page }) => {
+  await openLive(page, 'tooltip--basic')
+  await page.keyboard.press('Tab')
+  await expect(page.getByRole('tooltip')).toHaveText('Copy link')
+  // The portal sits in <body>, outside the demo axe.spec scopes to; landmarks are the docs app's, as there.
+  const results = await new AxeBuilder({ page }).disableRules(['region']).analyze()
+  expect(results.violations.map((v) => `${v.id}: ${String(v.nodes.length)} node(s)`)).toEqual([])
+  expect(results.passes.map((rule) => rule.id)).toEqual(expect.arrayContaining(['aria-allowed-role', 'aria-valid-attr-value']))
 })
 
 test('hover opens it, and the pointer leaving closes it', async ({ page }) => {
   await openLive(page, 'tooltip--delays')
   // delay={0}: the other two wait 600 ms, which is the provider's business and a unit test's.
-  await page.getByRole('button', { name: 'Copy', exact: true }).hover()
+  const copy = page.getByRole('button', { name: 'Copy', exact: true })
+  await expect(copy).not.toHaveAttribute('aria-describedby')
+  await copy.hover()
   await expect(openPopup(page)).toHaveText('Copy')
+  await expect(openPopup(page)).toHaveAttribute('role', 'tooltip')
+  await expect(copy).toHaveAttribute('aria-describedby', await openPopup(page).getAttribute('id') ?? 'none')
   await page.mouse.move(600, 600)
   await expect(openPopup(page)).toHaveCount(0)
+  await expect(copy).not.toHaveAttribute('aria-describedby')
 })
 
 test('a disabled tooltip stays shut under focus and under the pointer', async ({ page }) => {

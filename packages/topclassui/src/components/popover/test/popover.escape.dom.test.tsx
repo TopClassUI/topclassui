@@ -28,7 +28,7 @@ function Share(props: PopoverRootProps) {
 
 /** The titles of every popover and dialog that is open, outermost first. */
 const open = () => [...document.querySelectorAll('[role="dialog"][data-open] h2')].map((title) => title.textContent)
-const tooltip = () => document.querySelector('[data-placement][data-open]:not([role])')
+const tooltip = () => document.querySelector('[role="tooltip"][data-open]')
 const button = (name: string) => screen.getByRole('button', { name, hidden: true })
 
 /** A real hover: Base UI times its delay from the pointer resting, which needs a move. Focus stays where it was. */

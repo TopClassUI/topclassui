@@ -85,9 +85,11 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
     expect(hooks).toEqual([])
   })
 
-  it('calls one hook and no other: its own, from hook.ts, for the direction a portaled popup cannot inherit', () => {
-    expect(hookCalls(source)).toEqual(['useTooltipPopup'])
-    expect(importedNames(source, './hook.js')).toEqual(['useTooltipPopup'])
+  it('calls one hook per part and no other, each its own from hook.ts: the root id, the described trigger, the popup', () => {
+    expect(hookCalls(source)).toEqual(['useTooltipRoot', 'useTooltipTriggerElement', 'useTooltipPopup'])
+    expect(importedNames(source, './hook.js')).toEqual([
+      'TooltipPopupIdContext', 'useTooltipPopup', 'useTooltipRoot', 'useTooltipTriggerElement',
+    ])
   })
 
   it('the call scan sees a bare hook, a member hook and use, and not a word that starts with use', () => {
@@ -107,7 +109,7 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
   })
 })
 
-describe('hook.ts holds what a part reads from the provider, and nothing else (R-5.12-1)', () => {
+describe('hook.ts holds the popup id and what a part reads from the provider, and nothing else (R-5.12-1)', () => {
   const source = read('hook.ts')
 
   it("starts with 'use client', as every module that calls a hook does", () => {
@@ -115,11 +117,16 @@ describe('hook.ts holds what a part reads from the provider, and nothing else (R
     expect(source.startsWith("'use client'\n")).toBe(true)
   })
 
-  it('imports the shared portal hook and nothing else: no React, so no state of its own', () => {
-    expect(importedModules(source)).toEqual(['#shared/provider/use-portal-locale.js'])
+  it("imports Base UI's useRender, React's id and context, the shared portal hook and its own types", () => {
+    expect(importedModules(source)).toEqual([
+      '@base-ui/react/use-render', 'react', '#shared/provider/use-portal-locale.js', './types.js',
+    ])
+    expect(importedNames(source, 'react')).toEqual(['createContext', 'useContext', 'useId', 'useLayoutEffect', 'useMemo', 'useState'])
   })
 
-  it('calls usePortalLocale, which every portaled part calls, and no other hook', () => {
-    expect(hookCalls(source)).toEqual(['usePortalLocale'])
+  it("calls the id, context and render hooks and one state, the caller's popup id: Base UI holds the open state", () => {
+    expect(hookCalls(source)).toEqual([
+      'useId', 'useState', 'useMemo', 'useContext', 'useRender', 'useContext', 'useLayoutEffect', 'usePortalLocale',
+    ])
   })
 })
