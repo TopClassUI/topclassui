@@ -4,17 +4,47 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "pnpm docs:data && next dev -p 4610",
+    "build": "next build",
+    "start": "next start -p 4611",
     "docs:data": "tsx scripts/docs-data.ts",
+    "docs:build": "pnpm --filter topclassui --if-present run build && pnpm docs:data && next build",
+    "docs:check": "pnpm docs:data && pnpm typecheck && pnpm lint && pnpm test && pnpm docs:build && pnpm check:static && pnpm test:e2e && pnpm list:todo",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "next typegen && tsc --noEmit",
+    "lint": "eslint .",
+    "check:static": "tsx scripts/check-static.ts",
+    "list:todo": "tsx scripts/list-todo-tc.ts",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@mdx-js/loader": "3.1.1",
+    "@mdx-js/react": "3.1.1",
+    "@next/mdx": "16.3.8",
+    "next": "16.3.8",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "remark-frontmatter": "5.0.0",
+    "remark-gfm": "4.0.1",
     "topclassui": "workspace:*"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.63.0",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/mdx": "2.0.14",
     "@types/node": "22.14.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "eslint": "10.12.0",
+    "jiti": "2.7.0",
+    "schema-dts": "2.1.0",
+    "shiki": "4.5.0",
+    "tailwindcss": "4.3.3",
     "tsx": "4.23.15",
     "typescript": "6.0.3",
+    "typescript-eslint": "8.71.0",
     "vitest": "5.0.3",
     "zod": "4.6.5"
   }
