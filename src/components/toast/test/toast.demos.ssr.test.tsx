@@ -17,8 +17,13 @@ const BUTTONS: Record<string, string[]> = {
   'long-content': ['One long word', 'Three tall toasts'],
   'many': ['Twenty messages', 'Close all'],
   'over-dialog': ['Open settings'],
+  'playground': ['Show a toast'],
   'promise': ['Upload', 'Upload and fail'],
   'rtl': ['دعوة'],
+  'states': [
+    'Neutral', 'Primary', 'Success', 'Warning', 'Danger', 'Info',
+    'With description', 'With action', 'Sticky', 'High priority', 'Loading',
+  ],
   'sticky': ['Go offline'],
   'tones': ['Neutral', 'Primary', 'Success', 'Warning', 'Danger', 'Info'],
   'with-action': ['Archive'],
@@ -28,7 +33,7 @@ const BUTTONS: Record<string, string[]> = {
 const load = async (name: string) => ((await import(`../dummy/${name}.tsx`)) as { default: ComponentType }).default
 
 describe('the demos', () => {
-  it('are the eleven the brief names', () => {
+  it('are the thirteen the brief names', () => {
     expect(files).toEqual(Object.keys(BUTTONS).sort())
   })
 
