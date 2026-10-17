@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form-action', 'server-errors']
+const EXPECTED = ['basic', 'form-action', 'rtl', 'server-errors']
 
 const render = async (file: string) => {
   const loaded = await import(`../dummy/${file}.tsx`) as { default: ComponentType }
@@ -29,7 +29,7 @@ function controlsIn(html: string): string[] {
 }
 
 describe('every demo renders on the server', () => {
-  it('holds exactly the three demos asked for, so none can be deleted silently', () => {
+  it('holds exactly the four demos asked for, so none can be deleted silently', () => {
     expect(files).toEqual(EXPECTED)
   })
 
@@ -44,6 +44,12 @@ describe('every demo renders on the server', () => {
     const html = await render('server-errors')
     expect(html).toMatch(/^<form class="[^"]*" action="\/contact" method="post">/)
     expect(controlsIn(html)).toEqual(['email: Email: required: invalid', 'message: Message: invalid'])
+  })
+
+  it('rtl: the subscribe form in Arabic, inside an island that carries the direction and the language', async () => {
+    const html = await render('rtl')
+    expect(html).toMatch(/^<div class="isolate"><div dir="rtl" lang="ar"><form class="[^"]*" action="\/subscribe" method="post">/)
+    expect(controlsIn(html)).toEqual(['name: الاسم', 'email: البريد الإلكتروني: required'])
   })
 
   it('form-action: the same fields in the server HTML, none invalid yet, and no aria-busy', async () => {
