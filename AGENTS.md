@@ -73,7 +73,7 @@ They arrive with the phases that need them.
 - **R-5.3-2** Translate, transform origin and gradient direction multiply by `--tc-dir`; `object-*` and `bg-*` positions use an `rtl:` variant, since no logical form exists. _(not yet - planned: eslint)_
 - **R-5.3-3** No `tracking-*` anywhere inside `src/`. _(eslint)_
 - **R-5.3-4** Use the `placement` prop, which maps to Base UI's `side` and `align`; never `left` or `right` as a side. _(type; the eslint half does not exist)_
-- **R-13-1** The app mounts `TopClassProvider` at the root layout with `direction` and `locale` as props from the layout, never read from `document.dir` in an effect. _(src/shared/provider/provider.warning.dom.test and .ssr.test, which prove the provider warns once in development when the layout leaves out direction or locale, never in production and never on the server; an app with no provider at all is review)_
+- **R-13-1** The app mounts `TopClassProvider` at the root layout with `direction` and `locale` as props from the layout, never read from `document.dir` in an effect. _(src/shared/provider/provider.warning.dom.test, provider.presence.dom.test and provider.warning.ssr.test, which prove a warning once in development when the layout leaves out direction or locale, when no provider is mounted, or when direction disagrees with <html dir>, never in production and never on the server; src/shared/no-document-dir.test, which fails on any read of the page's dir in src but that one comparison; "at the root layout" is review)_
 
 ## 4. API conventions
 
