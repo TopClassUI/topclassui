@@ -177,7 +177,7 @@ export const POPUP_PASSIVE = 'pointer-events-auto'
 export const TOGGLE_TARGET = `group/toggle relative inline-flex w-fit shrink-0 items-center justify-center outline-none ${TOUCH_TARGET} ${DISABLED}`
 
 /** The ring of a focused target, drawn on the box inside it. The group is named: a bare one would match an accordion trigger around it.
- * A filled box opts out of forced colours, which would keep --tc-ring at 2.85:1 on Canvas: CanvasText follows the user's palette. */
+ * A filled box opts out of forced colours, which would keep --tc-ring at 2.4:1 on Canvas: CanvasText follows the user's palette. */
 export const TOGGLE_RING = 'group-focus-visible/toggle:outline-solid group-focus-visible/toggle:outline-(length:--tc-ring-width) group-focus-visible/toggle:outline-offset-(length:--tc-ring-offset) group-focus-visible/toggle:outline-ring forced-colors:group-focus-visible/toggle:outline-[CanvasText]'
 
 /** The drawn box. It sets no fill and no justify: two classes for one property do not merge in a string. */

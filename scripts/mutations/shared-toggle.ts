@@ -5,7 +5,7 @@ import type { Mutation } from '../lib/mutate.js'
 const CLASSES = 'src/shared/classes.ts'
 
 const RING = "'group-focus-visible/toggle:outline-solid group-focus-visible/toggle:outline-(length:--tc-ring-width) group-focus-visible/toggle:outline-offset-(length:--tc-ring-offset) group-focus-visible/toggle:outline-ring forced-colors:group-focus-visible/toggle:outline-[CanvasText]'"
-const RING_NOTE = "/** The ring of a focused target, drawn on the box inside it. The group is named: a bare one would match an accordion trigger around it.\n * A filled box opts out of forced colours, which would keep --tc-ring at 2.85:1 on Canvas: CanvasText follows the user's palette. */"
+const RING_NOTE = "/** The ring of a focused target, drawn on the box inside it. The group is named: a bare one would match an accordion trigger around it.\n * A filled box opts out of forced colours, which would keep --tc-ring at 2.4:1 on Canvas: CanvasText follows the user's palette. */"
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -33,7 +33,7 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
-    label: 'the shared toggle ring loses its forced-colours CanvasText, so a ticked box rings in the author violet at 2.85:1 on Canvas',
+    label: 'the shared toggle ring loses its forced-colours CanvasText, so a ticked box rings in the author blue at 2.4:1 on Canvas',
     file: CLASSES,
     from: ' forced-colors:group-focus-visible/toggle:outline-[CanvasText]',
     to: '',

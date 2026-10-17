@@ -103,7 +103,7 @@ describe('a day', () => {
     expect(ruleOf(`${selectorOf('forced-colors:data-selected:inset-ring-[color:Highlight]')}[data-selected]`)).toBe('--tw-inset-ring-color: Highlight;')
   })
 
-  it('under forced colours the chosen day, opted out of them, rings in CanvasText rather than the violet of the theme', () => {
+  it('under forced colours the chosen day, opted out of them, rings in CanvasText rather than the blue of the theme', () => {
     const forced = selectorOf('forced-colors:data-selected:[--tc-ring:CanvasText]')
     expect(ruleOf(`${forced}[data-selected]`)).toBe('--tc-ring: CanvasText;')
     expect(mediaOf(`${forced}[data-selected]`)).toBe('@media (forced-colors: active)')

@@ -28,7 +28,7 @@ export const CELL_CURRENT_FORCED = [
   'forced-colors:bg-[Highlight]',
   'forced-colors:text-[HighlightText]',
   'forced-colors:[--tc-ring:Highlight]',
-  // Opted out, so nothing forces HOVER.solid either: the theme's violet under a black digit measured 2.9:1.
+  // Opted out, so nothing forces HOVER.solid either: the theme's blue under a black digit measures 3.1:1.
   'forced-colors:hover:bg-[Highlight]',
   'forced-colors:active:bg-[Highlight]',
 ].join(' ')

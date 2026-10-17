@@ -100,7 +100,7 @@ describe('a row', () => {
   it('selected: a tint and a heavier weight; under forced colours the system pair, the ring and the marks in HighlightText', () => {
     expect(ruleOf(`${selectorOf('aria-selected:font-medium')}[aria-selected="true"]`)).toContain('font-weight: var(--font-weight-medium);')
     expect(ruleOf(`${selectorOf('forced-colors:aria-selected:bg-[Highlight]')}[aria-selected="true"]`)).toBe('background-color: Highlight;')
-    // Written with the ring's own condition, or the ring's colour wins on specificity (measured: the token's violet on Highlight).
+    // Written with the ring's own condition, or the ring's colour wins on specificity (measured: the token's primary on Highlight).
     expect(ruleOf(`${selectorOf('forced-colors:aria-selected:group-focus-visible/tree:data-highlighted:outline-[HighlightText]')}[aria-selected="true"]:is(:where(.group\\/tree):focus-visible *)[data-highlighted]`))
       .toBe('outline-color: HighlightText;')
     expect(ruleOf(`${selectorOf('forced-colors:group-aria-selected/row:text-[HighlightText]')}:is(:where(.group\\/row)[aria-selected="true"] *)`))

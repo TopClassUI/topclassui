@@ -74,9 +74,10 @@
   --tc-line-strong: var(--color-neutral-500);
   --tc-overlay: oklch(0 0 0 / 0.5);
 
-  --tc-primary-solid: var(--color-violet-600);
+  --tc-primary-solid: var(--color-blue-600);
   --tc-primary-on-solid: var(--color-white);
-  --tc-primary-on-soft: var(--color-violet-700);
+  /* blue-800 not blue-700: blue-700 measures 4.62:1 on primary-soft-active, inside the margin. */
+  --tc-primary-on-soft: var(--color-blue-800);
   --tc-neutral-solid: var(--color-neutral-900);
   --tc-neutral-on-solid: var(--color-white);
   --tc-neutral-on-soft: var(--color-neutral-900);
@@ -106,8 +107,8 @@
   --tc-info-mix: 12%;
 
   /* Away from the tone's own label, not the page, so a white label survives both modes. */
-  --tc-primary-hover: var(--color-violet-700);
-  --tc-primary-active: var(--color-violet-800);
+  --tc-primary-hover: var(--color-blue-700);
+  --tc-primary-active: var(--color-blue-800);
   --tc-danger-hover: var(--color-red-700);
   --tc-danger-active: var(--color-red-800);
   --tc-success-hover: var(--color-emerald-800);
@@ -136,7 +137,7 @@
   --tc-neutral-solid: var(--color-neutral-100);
   --tc-neutral-on-solid: var(--color-neutral-950);
   --tc-neutral-on-soft: var(--color-neutral-200);
-  --tc-primary-on-soft: var(--color-violet-400);
+  --tc-primary-on-soft: var(--color-blue-400);
   --tc-success-on-soft: var(--color-emerald-400);
   --tc-warning-on-soft: var(--color-amber-400);
   --tc-danger-on-soft: var(--color-red-400);
@@ -169,7 +170,7 @@
 /* On every themed element, not only :root, so a nested section recomputes these. */
 :root,
 [data-theme] {
-  /* Not --tc-primary-solid: violet-600 measures 2.57:1 on a dark raised surface. */
+  /* Not --tc-primary-solid: blue-600 measures 2.88:1 on a dark raised surface. */
   --tc-ring: var(--tc-primary-on-soft);
 
   --tc-primary-soft: color-mix(in oklch, var(--tc-primary-solid) var(--tc-primary-mix), var(--tc-page));

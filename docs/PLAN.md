@@ -142,7 +142,7 @@ React Native, Vue or other frameworks; styling systems other than Tailwind; CSS-
 | # | Question | Default |
 |----|-------------------------------|------------------------------------------|
 | O1 | Icon library | Phosphor: the regular weight, plus the three solid variants named in docs/icons.md |
-| O2 | Brand colour | Tailwind `violet` as a placeholder |
+| O2 | Brand colour | Tailwind `blue`, chosen on 17 October 2026 (`violet` until then) |
 | O3 | Fonts (docs site only; the library ships none) | Inter + Noto Sans Arabic via `next/font`; the docs set `--tc-font-latin` and `--tc-font-arabic` from those variables |
 | O4 | Licence | MIT |
 | O5 | Docs hosting | Vercel |
@@ -637,9 +637,9 @@ The tokens package holds only these variables, the mode blocks and its `@layer b
   --tc-line-strong: var(--color-neutral-500);   /* control boundaries, 4.73:1 on white */
   --tc-overlay: oklch(0 0 0 / 0.5);
 
-  --tc-primary-solid: var(--color-violet-600);
+  --tc-primary-solid: var(--color-blue-600);
   --tc-primary-on-solid: var(--color-white);
-  --tc-primary-on-soft: var(--color-violet-700);
+  --tc-primary-on-soft: var(--color-blue-800);
   --tc-neutral-solid: var(--color-neutral-900);
   --tc-neutral-on-solid: var(--color-white);
   --tc-neutral-on-soft: var(--color-neutral-900);
@@ -681,7 +681,7 @@ The tokens package holds only these variables, the mode blocks and its `@layer b
   --tc-neutral-solid: var(--color-neutral-100);
   --tc-neutral-on-solid: var(--color-neutral-950);
   --tc-neutral-on-soft: var(--color-neutral-200);
-  --tc-primary-on-soft: var(--color-violet-400);
+  --tc-primary-on-soft: var(--color-blue-400);
   --tc-success-on-soft: var(--color-emerald-400);
   --tc-warning-on-soft: var(--color-amber-400);
   --tc-danger-on-soft: var(--color-red-400);
@@ -713,7 +713,7 @@ The tokens package holds only these variables, the mode blocks and its `@layer b
    not only :root, so a nested section recomputes it from its own values. */
 :root,
 [data-theme] {
-  /* Not var(--tc-primary-solid): violet-600 measures 2.57:1 on a dark raised surface. */
+  /* Not var(--tc-primary-solid): blue-600 measures 2.88:1 on a dark raised surface. */
   --tc-ring: var(--tc-primary-on-soft);
   --tc-primary-soft: color-mix(in oklch, var(--tc-primary-solid) var(--tc-primary-mix), var(--tc-page));
   --tc-neutral-soft: color-mix(in oklch, var(--tc-neutral-solid) var(--tc-neutral-mix), var(--tc-page));
@@ -725,8 +725,8 @@ The tokens package holds only these variables, the mode blocks and its `@layer b
      steps away from that label in every mode. Each tone sets these three; the values
      here are the primary tone. Mixing toward black instead would keep darkening on a
      dark page, and stepping toward the page would drop white text below 4.5:1. */
-  --tc-hover: var(--color-violet-700);
-  --tc-active: var(--color-violet-800);
+  --tc-hover: var(--color-blue-700);
+  --tc-active: var(--color-blue-800);
   --tc-soft-hover: color-mix(in oklch, var(--tc-primary-solid) calc(var(--tc-primary-mix) + 8%), var(--tc-page));
   --tc-soft-active: color-mix(in oklch, var(--tc-primary-solid) calc(var(--tc-primary-mix) + 16%), var(--tc-page));
 }
@@ -742,7 +742,7 @@ The tokens package holds only these variables, the mode blocks and its `@layer b
 
 | Tone | hover | active | Why |
 |------|-------|--------|-----|
-| primary | violet-700 | violet-800 | White label in every mode, so the step is the same in every mode |
+| primary | blue-700 | blue-800 | White label in every mode, so the step is the same in every mode |
 | danger | red-700 | red-800 | Same |
 | neutral | light: neutral-800 then 700; dark: neutral-200 then 300 | | Its solid is already near-black or near-white, so it steps toward the middle and its label flips with it |
 

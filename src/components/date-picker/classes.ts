@@ -34,7 +34,7 @@ export const DATE_PICKER_GRID = 'w-full table-fixed border-collapse'
 export const DATE_PICKER_WEEKDAY = 'pb-1 text-center text-xs font-medium text-muted'
 export const DATE_PICKER_CELL = 'px-0 py-[min(0.125rem,2px)] text-center'
 /** A day: 32 px tall and 44 under a finger, as wide as its column. Selected is a fill, a weight and an inset line at 3:1
- * on the surface in every mode, where the dark fill alone is 2.57:1; today an underline. */
+ * on the surface in every mode, where the dark fill alone is 2.88:1; today an underline. */
 export const DATE_PICKER_DAY = [
   'inline-flex h-control-sm w-full items-center justify-center rounded-control text-sm tabular-nums text-body',
   TARGET_HEIGHT,
@@ -45,7 +45,7 @@ export const DATE_PICKER_DAY = [
   'data-selected:inset-ring-(length:--tc-line-width) data-selected:inset-ring-primary-on-soft',
   'forced-colors:data-selected:forced-color-adjust-none forced-colors:data-selected:bg-[Highlight] forced-colors:data-selected:text-[HighlightText]',
   'forced-colors:data-selected:inset-ring-[color:Highlight]',
-  // Opted out of forced colours, the ring would keep the theme's violet: 2.9:1 on a Canvas of the other lightness.
+  // Opted out of forced colours, the ring would keep the theme's blue: 2.4:1 on a Canvas of the other lightness.
   'forced-colors:data-selected:[--tc-ring:CanvasText]',
   'aria-[current=date]:font-semibold aria-[current=date]:underline aria-[current=date]:underline-offset-4',
   ARIA_DISABLED,

@@ -138,7 +138,7 @@ test.describe('the states, on the static page', () => {
     expect(await css(off, 'box-shadow')).not.toContain('inset')
   })
 
-  // RG-1: primary-solid was 2.57:1 on the dark fill, and the old test compared the token in light mode alone.
+  // RG-1: primary-solid is 2.88:1 on the dark fill, and the old test compared the token in light mode alone.
   for (const mode of MODES) {
     test(`${mode}: the dot and the checked line reach 3:1 on the fill, and the line on the page (R-5.6-4)`, async ({ page }) => {
       await page.goto(urlFor('radio-group--basic', mode, 'ltr'))

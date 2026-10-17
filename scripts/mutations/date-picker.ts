@@ -189,13 +189,13 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
-    label: 'the date picker chosen day loses its inset line, so in dark mode its 2.57:1 fill alone tells it',
+    label: 'the date picker chosen day loses its inset line, so in dark mode its 2.88:1 fill alone tells it',
     file: CLASSES,
     from: '  \'data-selected:inset-ring-(length:--tc-line-width) data-selected:inset-ring-primary-on-soft\',\n',
     to: '',
   },
   {
-    label: 'the date picker chosen day keeps the theme ring under forced colours, 2.9:1 on a Canvas of the other lightness',
+    label: 'the date picker chosen day keeps the theme ring under forced colours, 2.4:1 on a Canvas of the other lightness',
     file: CLASSES,
     from: '  \'forced-colors:data-selected:[--tc-ring:CanvasText]\',\n',
     to: '',
