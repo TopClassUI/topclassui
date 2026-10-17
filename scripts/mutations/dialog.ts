@@ -67,13 +67,13 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: 'w-full flex-col wrap-anywhere',
     to: 'w-full flex-col',
-    e2e: { spec: SPEC, grep: 'a long title, a 300-character word and three long actions stay inside the popup' },
   },
   {
     label: 'the dialog popup loses its maximum height, so a long body runs off the bottom of the screen',
     file: CLASSES,
     from: "'flex max-h-[calc(100dvh-2*var(--tc-overlay-inset))] w-full",
     to: "'flex w-full",
+    e2e: { spec: SPEC, grep: '16 px clear of every edge' },
   },
   {
     label: 'the dialog popup draws its ring outside its box again, on the scrim, where it reads at 1.8:1',
