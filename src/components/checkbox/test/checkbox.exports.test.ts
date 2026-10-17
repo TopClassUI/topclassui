@@ -17,15 +17,17 @@ function exportedNames(source: string): string[] {
   })
 }
 
-describe('index.tsx exports one flat name (R-9.2-3)', () => {
-  it('exports exactly Checkbox, a function component', () => {
-    expect(Object.keys(checkboxes)).toEqual(['Checkbox'])
-    expect(typeof checkboxes.Checkbox).toBe('function')
+describe('index.tsx exports flat names (R-9.2-3)', () => {
+  it('exports exactly Checkbox and CheckboxSkeleton, two function components', () => {
+    expect(Object.keys(checkboxes).sort()).toEqual(['Checkbox', 'CheckboxSkeleton'])
+    expect([typeof checkboxes.Checkbox, typeof checkboxes.CheckboxSkeleton]).toEqual(['function', 'function'])
   })
 
   it('has no Base UI type name and no part in its type surface either', () => {
     const source = readFileSync(join(import.meta.dirname, '..', 'index.tsx'), 'utf8')
-    expect(exportedNames(source).sort()).toEqual(['Checkbox', 'CheckboxDesignProps', 'CheckboxName', 'CheckboxProps'])
+    expect(exportedNames(source).sort()).toEqual([
+      'Checkbox', 'CheckboxDesignProps', 'CheckboxName', 'CheckboxProps', 'CheckboxSkeleton', 'CheckboxSkeletonProps',
+    ])
   })
 
   it('the scan sees a type-only alias and a star export', () => {

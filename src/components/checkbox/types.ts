@@ -1,5 +1,5 @@
 import type { Checkbox as Base } from '@base-ui/react/checkbox'
-import type { Ref } from 'react'
+import type { ComponentPropsWithRef, Ref } from 'react'
 
 import type { ControlName } from '#shared/contracts/name.js'
 import type { CheckboxSchemaInput } from './schema.js'
@@ -31,3 +31,8 @@ export type CheckboxValueProps = Pick<Base.Root.Props, 'checked' | 'defaultCheck
 
 /** What Base UI hands a change handler: the reason, the event, and cancel(). */
 export type CheckboxChangeDetails = Base.Root.ChangeEventDetails
+
+/** R-8.3-4: the control's own size, so the two cannot describe different boxes. */
+export type CheckboxSkeletonProps =
+  Omit<ComponentPropsWithRef<'span'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
+  & Pick<CheckboxDesignProps, 'size'>

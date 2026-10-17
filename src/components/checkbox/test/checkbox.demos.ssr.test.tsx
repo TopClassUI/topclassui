@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'labelled', 'rtl', 'sizes', 'states']
+const EXPECTED = ['basic', 'form', 'labelled', 'rtl', 'sizes', 'skeleton', 'states']
 
 /** Each box of each demo, as the server writes it: its name, by aria-label, by a label[for] or by a wrapping label, and its state. */
 const BOXES: Record<string, string[]> = {
@@ -20,6 +20,7 @@ const BOXES: Record<string, string[]> = {
   'labelled': ['Named by a label that points at it: false', 'Named by a label that wraps it: false'],
   'rtl': ['أوافق على الشروط: true', 'أرسل لي أخبار المنتج: false'],
   'sizes': ['Extra small: true', 'Small: true', 'Medium: true', 'Large: true', 'Extra large: true'],
+  'skeleton': ['Terms, xs: false', 'Terms, sm: false', 'Terms, md: false', 'Terms, lg: false', 'Terms, xl: false'],
   'states': [
     'Unchecked: false', 'Checked: true', 'Indeterminate: mixed', 'Invalid: false', 'Invalid, checked: true',
     'Invalid, indeterminate: mixed', 'Disabled: false', 'Disabled, checked: true', 'Read-only: true',
@@ -43,7 +44,7 @@ function boxesIn(html: string): string[] {
 }
 
 describe('every demo renders on the server', () => {
-  it('holds exactly the six demos asked for, so none can be deleted silently', () => {
+  it('holds exactly the seven demos asked for, so none can be deleted silently', () => {
     expect(files).toEqual(EXPECTED)
   })
 
@@ -78,6 +79,12 @@ describe('the demos the plan names', () => {
     const html = await render('labelled')
     expect(html).toContain('<label for="checkbox-labelled-for"')
     expect(html).toMatch(/<label class="[^"]*"><button [^>]*id="checkbox-labelled-wrap"/)
+  })
+
+  it('skeleton: each checkbox beside a hidden skeleton of the same size, five pairs', async () => {
+    const html = await render('skeleton')
+    expect([...html.matchAll(/data-pair="([^"]*)"/g)].map(([, size]) => size)).toEqual(['xs', 'sm', 'md', 'lg', 'xl'])
+    expect(html.match(/<span class="[^"]*" aria-hidden="true"><span class="[^"]*"><\/span><\/span>/g)).toHaveLength(5)
   })
 
   it('rtl: an island that carries the direction and the language', async () => {

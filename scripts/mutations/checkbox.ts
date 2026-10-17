@@ -4,6 +4,7 @@ import type { Mutation } from '../lib/mutate.js'
 const CLIENT = 'src/components/checkbox/client.tsx'
 const HOOK = 'src/components/checkbox/hook.ts'
 const CLASSES = 'src/components/checkbox/classes.ts'
+const SKELETON = 'src/components/checkbox/skeleton.tsx'
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -131,5 +132,29 @@ export const MUTATIONS: Mutation[] = [
     file: HOOK,
     from: 'syncChecked(value && !indeterminate, input)',
     to: 'syncChecked(value, input)',
+  },
+  {
+    label: 'the checkbox skeleton draws an md box at every size, so an xl checkbox jumps when it arrives',
+    file: SKELETON,
+    from: 'CHECKBOX_SIZE[size]',
+    to: 'CHECKBOX_SIZE.md',
+  },
+  {
+    label: 'the checkbox skeleton loses the target floor, so under a finger it is 20 px shorter than its checkbox',
+    file: CLASSES,
+    from: 'items-center justify-center ${TOUCH_TARGET}`',
+    to: 'items-center justify-center`',
+  },
+  {
+    label: 'the checkbox skeleton is round, so it stands in for a radio rather than a checkbox',
+    file: CLASSES,
+    from: 'block rounded-chip bg-neutral-soft',
+    to: 'block rounded-full bg-neutral-soft',
+  },
+  {
+    label: 'the checkbox skeleton takes aria-hidden from the caller, so a placeholder can be read out',
+    file: SKELETON,
+    from: '{...rest} aria-hidden>',
+    to: 'aria-hidden {...rest}>',
   },
 ]

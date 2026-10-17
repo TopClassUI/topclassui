@@ -89,11 +89,14 @@ box into one where none is required.
 | `indeterminate`, `name`, `value`, `uncheckedValue`, `form`, `required`, `disabled`, `readOnly`, `parent`, `inputRef` | passed through |
 | a `<span>` root | always a native `<button>`: `nativeButton` and `render` are not props |
 
+**`CheckboxSkeleton`** is the box of the checkbox: give it the same `size`. It is the target of
+24 px (44 under a finger) around the drawn square with its radius, and renders on the server.
+
 ### Not built
 
 `CheckboxGroup` and the parent box that goes with it (their own catalog row), `tone` (one is
 drawn), a label child, a hint and a required mark (a Field's), a hover look, a read-only look,
-the invalid ring that is always on, a skeleton (use `Skeleton`).
+the invalid ring that is always on.
 
 <!-- /hand-written -->
 
@@ -126,6 +129,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/labelled.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`
+- `dummy/skeleton.tsx`
 - `dummy/states.tsx`
 
 ## Verified against

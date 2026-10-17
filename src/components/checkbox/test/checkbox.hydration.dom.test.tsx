@@ -62,7 +62,7 @@ describe('a server-rendered Checkbox hydrates cleanly', () => {
 
 describe('every demo renders and hydrates', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'form', 'labelled', 'rtl', 'sizes', 'states'])
+    expect(names).toEqual(['basic', 'form', 'labelled', 'rtl', 'sizes', 'skeleton', 'states'])
   })
 
   for (const [name, Demo] of DEMOS) {

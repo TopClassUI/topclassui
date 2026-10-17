@@ -19,6 +19,7 @@ const AFTER: Record<string, string[] | 'browser'> = {
   'labelled': 'browser',
   'rtl': ['false', 'true'],
   'sizes': ['false', 'false', 'false', 'false', 'false'],
+  'skeleton': ['true', 'true', 'true', 'true', 'true'],
   'states': ['true', 'false', 'mixed', 'true', 'false', 'mixed', 'false', 'true', 'true'],
 }
 
