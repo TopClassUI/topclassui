@@ -34,7 +34,7 @@ type Named =
   | { 'children'?: undefined, 'aria-label': string }
 
 // R-5.7-5: derived at the seam. No handle: nothing here creates one, so a trigger sits inside its root.
-export type DropdownRootProps = Omit<Base.Root.Props, 'handle' | 'children'> & {
+export type DropdownRootProps = Omit<Base.Root.Props, 'className' | 'handle' | 'children'> & {
   /** The trigger and the popup. With no trigger, hold `open` in a client file. */
   children?: ReactNode | undefined
 }
