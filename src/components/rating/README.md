@@ -73,10 +73,12 @@ import { Rating } from 'topclassui'
 
 ## Props
 
-Every prop below is optional and falls back to the default shown.
+Required: `aria-label` or `aria-labelledby` when `readOnly={false}`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
+| `aria-label` | **yes**, or `aria-labelledby` when `readOnly={false}` | `string` | - |  |
+| `aria-labelledby` | **yes**, or `aria-label` when `readOnly={false}` | `string` | - |  |
 | `defaultValue` | no | `number`, min 0, max 10 | `0` | Editing only: the step checked at first when value is not passed, rounded to a whole star. 0 checks none. |
 | `disabled` | no | `boolean` | `false` | Editing only: every radio is disabled, so it takes no key, no click and is not submitted. |
 | `labels` | no | `Labels` | - | The built-in strings: `labels.rating.value` names a read-only rating, `labels.rating.stars` each step. Defaults to English. |
