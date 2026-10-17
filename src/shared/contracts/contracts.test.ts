@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { COLLECTION_DEFAULTS } from './collection.js'
+import { COLLECTION_BOUNDARIES, COLLECTION_DEFAULTS } from './collection.js'
 import { DEFAULT_SIZE, SIZES } from './size.js'
 import { STATUSES } from './state.js'
 
@@ -19,6 +19,14 @@ describe('the contracts other code depends on', () => {
     expect(COLLECTION_DEFAULTS.visibleRows).toBe(7)
     expect(COLLECTION_DEFAULTS.virtualizeAbove).toBe(200)
     expect(COLLECTION_DEFAULTS.loadMoreThreshold).toBe(10)
+  })
+
+  it('bounds the two numeric props every collection takes, with each default inside its bounds', () => {
+    expect(COLLECTION_BOUNDARIES).toEqual({ visibleRowsMin: 1, visibleRowsMax: 20, loadMoreThresholdMin: 0, loadMoreThresholdMax: 200 })
+    expect(COLLECTION_DEFAULTS.visibleRows).toBeGreaterThanOrEqual(COLLECTION_BOUNDARIES.visibleRowsMin)
+    expect(COLLECTION_DEFAULTS.visibleRows).toBeLessThanOrEqual(COLLECTION_BOUNDARIES.visibleRowsMax)
+    expect(COLLECTION_DEFAULTS.loadMoreThreshold).toBeGreaterThanOrEqual(COLLECTION_BOUNDARIES.loadMoreThresholdMin)
+    expect(COLLECTION_DEFAULTS.loadMoreThreshold).toBeLessThanOrEqual(COLLECTION_BOUNDARIES.loadMoreThresholdMax)
   })
 
   it('keeps every default positive, since each one sizes or counts something', () => {

@@ -242,3 +242,11 @@ export const FIELD_SIZE = {
   xl: `${CONTROL_SIZE.xl} ${FIELD_TEXT_COARSE}`,
   custom: '',
 } as const
+
+// Unit 4: the rows of a list of options, for Select and Combobox. Each is added to ROW and ROW_HIGHLIGHT.
+
+/** A row under a finger: ROW is 40 px tall and has no floor of its own. */
+export const ROW_TOUCH = 'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]'
+
+/** The chosen row differs by weight as well as by its tick. */
+export const ROW_SELECTED = 'data-selected:font-medium'

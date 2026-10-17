@@ -34,3 +34,12 @@ export const COLLECTION_DEFAULTS: CollectionDefaults = {
   estimateRowHeight: 36,
   overscan: 6,
 }
+
+/** R-5.7-7: the bounds of the two numeric props every collection takes, so no folder copies them. A component
+ * clamps with them and its schema names the same numbers. loadMoreThreshold counts rows, not pixels. */
+export const COLLECTION_BOUNDARIES = {
+  visibleRowsMin: 1,
+  visibleRowsMax: 20,
+  loadMoreThresholdMin: 0,
+  loadMoreThresholdMax: 200,
+} as const
