@@ -54,7 +54,6 @@ export default defineConfig(
       'topclass/semantic-classes-only': 'off',
       'topclass/shared-class-constants': 'off',
       'topclass/logical-properties-only': 'off',
-      'topclass/dir-aware-transforms': 'off',
       'topclass/style-sets-tokens-only': 'off',
       'topclass/text-comes-from-labels': 'off',
     },
