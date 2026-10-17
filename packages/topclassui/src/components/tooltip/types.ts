@@ -26,7 +26,7 @@ export type TooltipTriggerProps<Payload = unknown> =
   }
 
 export type TooltipPopupProps =
-  Omit<Base.Popup.Props, 'className' | 'children' | 'render'>
+  Omit<Base.Popup.Props, 'className' | 'children' | 'render' | 'dangerouslySetInnerHTML'>
   & Pick<TooltipDesignProps, 'placement'>
   & {
     /** Merged last, so a consumer class wins a conflict with the popup's own. */
