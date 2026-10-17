@@ -20,9 +20,9 @@ describe('index.tsx adds one public name, Rating', () => {
     expect(index).toContain("import { RatingField } from './client.js'")
   })
 
-  it('client.tsx and hook.ts start with the directive; lib.tsx, which the server half imports, does not', () => {
+  it('client.tsx and hook.ts start with the directive; the star part, which the server half imports, does not', () => {
     expect(source('client.tsx').startsWith("'use client'")).toBe(true)
     expect(source('hook.ts').startsWith("'use client'")).toBe(true)
-    expect(source('lib.tsx').startsWith("'use client'")).toBe(false)
+    expect(source('parts/rating-star.tsx').startsWith("'use client'")).toBe(false)
   })
 })

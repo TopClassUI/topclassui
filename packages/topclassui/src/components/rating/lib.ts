@@ -1,12 +1,6 @@
-// Both halves draw their stars here: no 'use client', so the read-only half stays on the server.
-import { Svg } from '#components/svg/index.js'
-import { star } from '#icons/data/star.js'
-import { starFill } from '#icons/data/star-fill.js'
 import { clamp } from '#shared/clamp.js'
-import { cn } from '#shared/cn.js'
 import type { Size } from '#shared/contracts/size.js'
 import { RATING_BOUNDARIES } from './boundaries.js'
-import { RATING_FILL, RATING_FILL_ICON, RATING_FILL_WIDTH, RATING_STAR } from './classes.js'
 import type { RatingFill } from './types.js'
 
 /** R-5.7-7: a whole number of stars, from 1 to 10. */
@@ -37,17 +31,3 @@ export function fillOf(step: number, value: number): RatingFill {
 
 /** custom follows the font size, as an icon with no size does. */
 export const iconSizeOf = (size: Size) => (size === 'custom' ? '1em' : size)
-
-/** One star: the outline, and over it the filled icon in a clip as wide as the fill. */
-export function Star({ fill, size }: { fill: RatingFill; size: Size }) {
-  return (
-    <span className={RATING_STAR}>
-      <Svg icon={star} size={iconSizeOf(size)} />
-      {fill === 'none' ? null : (
-        <span aria-hidden className={cn(RATING_FILL, RATING_FILL_WIDTH[fill])}>
-          <Svg icon={starFill} size={iconSizeOf(size)} className={RATING_FILL_ICON} />
-        </span>
-      )}
-    </span>
-  )
-}

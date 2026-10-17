@@ -4,19 +4,19 @@ import type { Mutation } from '../lib/mutate.js'
 export const MUTATIONS: Mutation[] = [
   {
     label: 'rating: the fill rule ignores the value, so every star is drawn full',
-    file: 'src/components/rating/lib.tsx',
+    file: 'src/components/rating/lib.ts',
     from: "  if (value >= step) return 'full'\n  return value >= step - 0.5 ? 'half' : 'none'",
     to: "  return step > 0 ? 'full' : 'none'",
   },
   {
     label: 'rating: a read-only value is no longer rounded to the nearest half',
-    file: 'src/components/rating/lib.tsx',
+    file: 'src/components/rating/lib.ts',
     from: 'return Math.round(clamp(value, 0, max) * 2) / 2',
     to: 'return clamp(value, 0, max)',
   },
   {
     label: 'rating: max is no longer clamped, so a thousand stars render',
-    file: 'src/components/rating/lib.tsx',
+    file: 'src/components/rating/lib.ts',
     from: 'return Math.round(clamp(max, RATING_BOUNDARIES.maxMin, RATING_BOUNDARIES.maxMax))',
     to: 'return Math.round(max)',
   },
