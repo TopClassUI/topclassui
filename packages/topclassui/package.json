@@ -31,6 +31,8 @@
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "build": "tsx scripts/build.ts",
+    "build:watch": "tsx scripts/build.ts --watch",
     "test": "vitest run",
     "check:structure": "tsx scripts/check-structure.ts",
     "check:boundaries": "tsx scripts/check-boundaries.ts",
