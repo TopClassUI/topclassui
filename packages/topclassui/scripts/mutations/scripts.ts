@@ -71,7 +71,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the README of a part family imports the bare name again, which index.tsx does not export',
     file: 'scripts/lib/readme.ts',
-    from: 'family ? familyImport(family) : ',
+    from: 'family ? familyImport(family, meta.slug) : ',
     to: '',
   },
   {
@@ -101,8 +101,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the README of a component with no bare <Name> export, such as Toast, imports that name anyway',
     file: 'scripts/lib/readme.ts',
-    from: 'family ? familyImport(family) : singleImport(surface),',
-    to: "family ? familyImport(family) : `import { ${meta.name} } from 'topclassui'`,",
+    from: 'family ? familyImport(family, meta.slug) : singleImport(surface, meta.slug),',
+    to: "family ? familyImport(family, meta.slug) : `import { ${meta.name} } from 'topclassui/${meta.slug}'`,",
   },
   {
     label: 'the README forgets that a Banner id is required with dismissible once dismissible takes a boolean',
