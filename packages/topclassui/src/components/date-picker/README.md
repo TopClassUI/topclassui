@@ -58,8 +58,8 @@ on the locale's first day, read in the browser (Sunday in `en`, Monday in `en-GB
 
 **The keyboard** (the Authoring Practices date picker dialog). The calendar opens with the focus
 on the chosen day, else on today. The arrows move a day and a week; in Arabic ArrowLeft is the
-next day. Home and End go to the first and the last day of the row, within the month. PageUp and
-PageDown move a month, with Shift a year, keeping the day inside the month (31 March back is
+next day. Home and End go to the first and the last day of the week, turning the month when the
+week crosses it. PageUp and PageDown move a month, with Shift a year, keeping the day inside the month (31 March back is
 28 February). Enter or Space chooses and closes; Escape closes with no change; the focus returns
 to the button. Tab goes round previous, next, close and the grid.
 

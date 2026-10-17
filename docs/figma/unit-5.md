@@ -1864,7 +1864,7 @@ PLAN 2 and 18.4 still name; choice 15).
   |---|---|
   | ArrowRight, ArrowLeft | the next, the previous day; swapped in RTL |
   | ArrowDown, ArrowUp | the same day next week, last week |
-  | Home, End | the first, the last day of the active day's row |
+  | Home, End | the first, the last day of the active day's week, turning the month |
   | PageUp, PageDown | the same day last month, next month, kept inside the month |
   | Shift with PageUp, PageDown | the same day last year, next year |
   | Enter, Space | choose the day, close, the focus back on the trigger |

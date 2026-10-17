@@ -39,6 +39,18 @@ export const MUTATIONS: Mutation[] = [
     to: '  return new Date(Date.UTC(year, month - 1, day))',
   },
   {
+    label: 'the date picker Home is kept inside the month again, so Home from 3 September stops at the 1st, not on Monday 31 August',
+    file: LIB,
+    from: '    Home: () => addDays(parts, -back),',
+    to: '    Home: () => ({ ...parts, day: Math.max(1, parts.day - back) }),',
+  },
+  {
+    label: 'the date picker End is kept inside the month again, so End from 29 September stops at the 30th, not on Sunday 4 October',
+    file: LIB,
+    from: '    End: () => addDays(parts, 6 - back),',
+    to: '    End: () => ({ ...parts, day: Math.min(daysInMonth(parts.year, parts.month), parts.day + 6 - back) }),',
+  },
+  {
     label: 'the date picker keys stop clamping into the range, so ArrowLeft walks past minDate',
     file: LIB,
     from: '  return move ? clampIso(toIsoDate(move()), range.min, range.max) : null',
