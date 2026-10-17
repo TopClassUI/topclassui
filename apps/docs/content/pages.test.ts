@@ -17,14 +17,17 @@ describe('the page registry', () => {
     }
   })
 
-  it('routes Home and the placeholder guide page today', () => {
-    expect(LIVE_PAGES.map((page) => page.slug)).toEqual(['home', 'page-blocks'])
-    expect(LIVE_GUIDES.map((page) => page.slug)).toEqual(['page-blocks'])
+  it('routes Home and the four getting-started pages today', () => {
+    expect(LIVE_PAGES.map((page) => page.slug)).toEqual(['home', 'installation', 'css', 'provider', 'first-component'])
+    expect(LIVE_GUIDES.map((page) => page.slug)).toEqual(['installation', 'css', 'provider', 'first-component'])
   })
 
-  it('derives next from the live order and stops after the last', () => {
-    expect(nextPage('home')?.slug).toBe('page-blocks')
-    expect(nextPage('page-blocks')).toBeUndefined()
+  it('derives next from the live order, skipping a later page, and stops after the last', () => {
+    expect(nextPage('home')?.slug).toBe('installation')
+    expect(nextPage('installation')?.slug).toBe('css')
+    expect(nextPage('css')?.slug).toBe('provider')
+    expect(nextPage('provider')?.slug).toBe('first-component')
+    expect(nextPage('first-component')).toBeUndefined()
   })
 
   it('builds the route under the locale', () => {
