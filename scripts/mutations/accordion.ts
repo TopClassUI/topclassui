@@ -237,4 +237,28 @@ export const MUTATIONS: Mutation[] = [
     from: '    sizes.disconnect()\n',
     to: '',
   },
+  {
+    label: 'the accordion skeleton lets a caller un-hide it',
+    file: 'src/components/accordion/skeleton.tsx',
+    from: '{...rest} aria-hidden>',
+    to: 'aria-hidden {...rest}>',
+  },
+  {
+    label: 'the accordion skeleton row loses the finger floor, so under a coarse pointer it can fall short of the trigger',
+    file: 'src/components/accordion/classes.ts',
+    from: 'px-4 py-3.5 text-sm ${TARGET_HEIGHT}`',
+    to: 'px-4 py-3.5 text-sm`',
+  },
+  {
+    label: 'the accordion skeleton row loses its block padding, so it is 28 px shorter than a closed item',
+    file: 'src/components/accordion/classes.ts',
+    from: 'export const ACCORDION_SKELETON_ROW = `flex items-center gap-3 px-4 py-3.5 text-sm',
+    to: 'export const ACCORDION_SKELETON_ROW = `flex items-center gap-3 px-4 text-sm',
+  },
+  {
+    label: 'the accordion skeleton stops clamping its count, so items={999} draws 999 rows',
+    file: 'src/components/accordion/skeleton.tsx',
+    from: 'Math.trunc(clamp(items, ACCORDION_BOUNDARIES.skeletonItemsMin, ACCORDION_BOUNDARIES.skeletonItemsMax))',
+    to: 'Math.trunc(items)',
+  },
 ]

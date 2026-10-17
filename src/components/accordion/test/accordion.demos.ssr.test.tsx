@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['basic', 'disabled', 'first-open', 'long-content', 'many-items', 'multiple', 'rtl']
+const EXPECTED = ['basic', 'disabled', 'first-open', 'long-content', 'many-items', 'multiple', 'rtl', 'skeleton']
 
 /** How many triggers a demo holds, and which of them are open in the server HTML, by position. */
 const TRIGGERS: Record<string, { count: number, open: number[] }> = {
@@ -23,6 +23,8 @@ const TRIGGERS: Record<string, { count: number, open: number[] }> = {
   'many-items': { count: 60, open: [] },
   'multiple': { count: 3, open: [0, 1] },
   'rtl': { count: 3, open: [0] },
+  // The skeletons themselves have no trigger: these are the closed accordions beside them.
+  'skeleton': { count: 4, open: [] },
 }
 
 const render = async (file: string) => {

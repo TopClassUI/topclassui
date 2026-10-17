@@ -82,7 +82,7 @@ describe('headingFor', () => {
   })
 
   it('the bounds and the table name the same five levels', () => {
-    expect(ACCORDION_BOUNDARIES).toEqual({ headingLevelMin: 2, headingLevelMax: 6 })
+    expect(ACCORDION_BOUNDARIES).toEqual({ headingLevelMin: 2, headingLevelMax: 6, skeletonItemsMin: 1, skeletonItemsMax: 100 })
     expect(ACCORDION_HEADINGS).toEqual({ 2: 'h2', 3: 'h3', 4: 'h4', 5: 'h5', 6: 'h6' })
   })
 })

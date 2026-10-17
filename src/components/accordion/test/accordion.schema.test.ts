@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { describe, expect, it } from 'vitest'
 
 import { ACCORDION_BOUNDARIES } from '../boundaries.js'
-import { ACCORDION_DEFAULTS } from '../constants.js'
+import { ACCORDION_DEFAULTS, ACCORDION_SKELETON_DEFAULTS } from '../constants.js'
 import { accordionSchema } from '../schema.js'
 
 // R-8.3-3: the props table, the playground and registry.json all read this output.
@@ -13,16 +13,16 @@ const json = z.toJSONSchema(accordionSchema, { io: 'input' }) as {
 describe('the schema is the documentation', () => {
   const keys = Object.keys(accordionSchema.shape)
 
-  it('covers the two props whose default or bounds are ours, and no other', () => {
-    expect(keys.sort()).toEqual(['headingLevel', 'hiddenUntilFound'])
-    expect(Object.keys(json.properties ?? {}).sort()).toEqual(['headingLevel', 'hiddenUntilFound'])
+  it('covers the three props whose default or bounds are ours, and no other', () => {
+    expect(keys.sort()).toEqual(['headingLevel', 'hiddenUntilFound', 'items'])
+    expect(Object.keys(json.properties ?? {}).sort()).toEqual(['headingLevel', 'hiddenUntilFound', 'items'])
   })
 
   for (const key of keys) {
     it(`${key} carries a description that names the part taking it`, () => {
       const description = json.properties?.[key]?.description ?? ''
       expect(description.length, key).toBeGreaterThan(30)
-      expect(description, key).toMatch(/^Accordion(Root|Item): /)
+      expect(description, key).toMatch(/^Accordion(Root|Item|Skeleton): /)
     })
   }
 
@@ -39,12 +39,14 @@ describe('the schema is the documentation', () => {
 
 describe('the schema, the constants and the bounds agree', () => {
   it('fills every default from constants.ts', () => {
-    expect(accordionSchema.parse({})).toEqual({ hiddenUntilFound: true, headingLevel: 3 })
+    expect(accordionSchema.parse({})).toEqual({ hiddenUntilFound: true, headingLevel: 3, items: 3 })
   })
 
   it('names the defaults and the bounds the spec gives, so a changed number is a failure here', () => {
     expect(ACCORDION_DEFAULTS).toEqual({ hiddenUntilFound: true, headingLevel: 3 })
-    expect(ACCORDION_BOUNDARIES).toEqual({ headingLevelMin: 2, headingLevelMax: 6 })
+    expect(ACCORDION_BOUNDARIES).toEqual({ headingLevelMin: 2, headingLevelMax: 6, skeletonItemsMin: 1, skeletonItemsMax: 100 })
+    expect(ACCORDION_SKELETON_DEFAULTS).toEqual({ items: 3 })
+    expect(json.properties?.['items']).toMatchObject({ type: 'integer', minimum: 1, maximum: 100, default: 3 })
   })
 
   it('accepts each of the five levels and both values of hiddenUntilFound', () => {

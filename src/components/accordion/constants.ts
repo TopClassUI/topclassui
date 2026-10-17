@@ -11,5 +11,10 @@ export const ACCORDION_DEFAULTS = {
   headingLevel: 3,
 } as const
 
+/** The placeholder's starting shape: the three items Figma draws. */
+export const ACCORDION_SKELETON_DEFAULTS = {
+  items: 3,
+} as const
+
 /** How long a press holds its trigger in place: well past the fade, after which the panel that closes gives its room back. */
 export const ACCORDION_HOLD_MS = 1000

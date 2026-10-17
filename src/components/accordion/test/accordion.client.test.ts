@@ -47,10 +47,10 @@ function hooksByPart(source: string): Record<string, string[]> {
 }
 
 describe('the folder is a split component', () => {
-  it('holds exactly the files Accordion needs: a hook.ts and a lib.ts, and no variants or skeleton', () => {
+  it('holds exactly the files Accordion needs: a hook.ts, a lib.ts and a skeleton, and no variants', () => {
     expect(readdirSync(FOLDER).sort()).toEqual([
       'README.md', 'boundaries.ts', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'lib.ts',
-      'meta.ts', 'schema.ts', 'test', 'types.ts',
+      'meta.ts', 'schema.ts', 'skeleton.tsx', 'test', 'types.ts',
     ])
   })
 })
@@ -67,8 +67,8 @@ describe('index.tsx re-exports and holds no markup (R-5.1-2)', () => {
     expect(nonReexports(source)).toEqual([])
   })
 
-  it('takes the parts from client.tsx and the types from types.ts, and nothing else', () => {
-    expect(importedModules(source).sort()).toEqual(['./client.js', './types.js'])
+  it('takes the parts from client.tsx, the skeleton from skeleton.tsx and the types from types.ts, and nothing else', () => {
+    expect(importedModules(source).sort()).toEqual(['./client.js', './skeleton.js', './types.js'])
   })
 
   it('the scan sees a function, a constant and an import as not re-exports', () => {

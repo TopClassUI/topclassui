@@ -78,7 +78,7 @@ describe('a server-rendered Accordion hydrates cleanly', () => {
 
 describe('every demo renders and hydrates', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(DEMOS.map(([name]) => name)).toEqual(['basic', 'disabled', 'first-open', 'long-content', 'many-items', 'multiple', 'rtl'])
+    expect(DEMOS.map(([name]) => name)).toEqual(['basic', 'disabled', 'first-open', 'long-content', 'many-items', 'multiple', 'rtl', 'skeleton'])
   })
 
   for (const [name, Demo] of DEMOS) {

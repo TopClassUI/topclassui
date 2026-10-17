@@ -24,8 +24,8 @@ function exportedNames(source: string): string[] {
 
 // The root-part lint reads declarations, and index.tsx declares nothing, so this is the guard.
 describe('index.tsx exports flat names, with no bare Accordion (R-9.2-3, R-9.2-4)', () => {
-  it('exports exactly the two parts', () => {
-    expect(Object.keys(accordion).sort()).toEqual(['AccordionItem', 'AccordionRoot'])
+  it('exports exactly the two parts and the skeleton', () => {
+    expect(Object.keys(accordion).sort()).toEqual(['AccordionItem', 'AccordionRoot', 'AccordionSkeleton'])
   })
 
   it('exports each one as a function component, never an object a server file would dot into', () => {
@@ -37,7 +37,7 @@ describe('index.tsx exports flat names, with no bare Accordion (R-9.2-3, R-9.2-4
     const source = readFileSync(join(import.meta.dirname, '..', 'index.tsx'), 'utf8')
     expect(exportedNames(source).sort()).toEqual([
       'AccordionDesignProps', 'AccordionHeading', 'AccordionHeadingLevel', 'AccordionItem', 'AccordionItemProps',
-      'AccordionRoot', 'AccordionRootProps',
+      'AccordionRoot', 'AccordionRootProps', 'AccordionSkeleton', 'AccordionSkeletonProps',
     ])
   })
 

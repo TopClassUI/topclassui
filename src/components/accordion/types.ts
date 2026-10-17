@@ -1,5 +1,5 @@
 import type { Accordion as Base } from '@base-ui/react/accordion'
-import type { ReactNode } from 'react'
+import type { ComponentPropsWithRef, ReactNode } from 'react'
 
 import type { ACCORDION_HEADINGS } from './constants.js'
 import type { AccordionSchemaInput } from './schema.js'
@@ -36,3 +36,8 @@ export type AccordionItemProps = Omit<Base.Item.Props, 'className' | 'value' | '
     /** What the panel holds. It stays in the HTML while the panel is closed. */
     children?: ReactNode | undefined
   }
+
+/** No content and no way to un-hide it: the placeholder only holds the shape of closed items. */
+export type AccordionSkeletonProps =
+  Omit<ComponentPropsWithRef<'div'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
+  & Pick<AccordionDesignProps, 'items'>

@@ -85,6 +85,7 @@ closed), `variant`, a data-driven `Accordion`, one `headingLevel` for a whole ro
 import {
   AccordionRoot,
   AccordionItem,
+  AccordionSkeleton,
 } from 'topclassui'
 ```
 
@@ -107,6 +108,12 @@ Required: `title` on `AccordionItem`, `value` on `AccordionItem`. Every other pr
 | `children` | no | `ReactNode` | - | What the panel holds. It stays in the HTML while the panel is closed. |
 | `headingLevel` | no | `integer`, min 2, max 6 | `3` | AccordionItem: the level of the heading its trigger sits in, clamped to h2 through h6. |
 
+### AccordionSkeleton
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `items` | no | `integer`, min 1, max 100 | `3` | AccordionSkeleton: how many closed items the placeholder holds, clamped to 1 and 100. |
+
 Anything else is passed to the element each part draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
@@ -118,6 +125,7 @@ Anything else is passed to the element each part draws, so standard attributes (
 - `dummy/many-items.tsx`
 - `dummy/multiple.tsx`
 - `dummy/rtl.tsx`
+- `dummy/skeleton.tsx`
 
 ## Verified against
 

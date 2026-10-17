@@ -1,6 +1,6 @@
 // R-5.12-4: one class string per element Accordion styles, built from the shared constants.
 import {
-  BORDER, DISABLED, FADE_MOTION, FOCUS_RING_INSET, HOVER, SCROLL_X, TOUCH_TARGET, TRANSITION,
+  BORDER, DISABLED, FADE_MOTION, FOCUS_RING_INSET, FORCED_EDGE, HOVER, SCROLL_X, TARGET_HEIGHT, TOUCH_TARGET, TRANSITION,
 } from '#shared/classes.js'
 
 /** The box. It clips, so a hover fill ends at its rounded corners, and it breaks a word too long
@@ -46,3 +46,14 @@ export const ACCORDION_PANEL = `text-sm text-muted ${FADE_MOTION}`
 /** What a panel holds. It scrolls sideways under a table wider than the box, and its ring is drawn
  * inside it. The 4 px above keep the ring of a control on its first line from being cut. */
 export const ACCORDION_CONTENT = `px-4 pt-1 pb-4 ${SCROLL_X} ${FOCUS_RING_INSET} [:last-child>*>&]:rounded-b-box`
+
+/** A closed trigger's box with nothing to press: its padding, its type step and its floor under a finger. */
+export const ACCORDION_SKELETON_ROW = `flex items-center gap-3 px-4 py-3.5 text-sm ${TARGET_HEIGHT}`
+
+const SKELETON_FILL = `rounded-chip bg-neutral-soft animate-pulse motion-reduce:animate-none ${FORCED_EDGE}`
+
+/** One line of nothing where the title goes: as tall as the type, with margins making up the line height. */
+export const ACCORDION_SKELETON_TITLE = `block h-[1em] my-[calc((1lh-1em)/2)] w-48 min-w-0 shrink ${SKELETON_FILL}`
+
+/** Where the caret goes, at the 1em the Svg draws it. */
+export const ACCORDION_SKELETON_CARET = `ms-auto block size-[1em] shrink-0 ${SKELETON_FILL}`

@@ -93,8 +93,8 @@ describe('the item', () => {
 })
 
 describe('the design props and the heading', () => {
-  it('are the two the schema holds, both optional', () => {
-    expectTypeOf<keyof AccordionDesignProps>().toEqualTypeOf<'hiddenUntilFound' | 'headingLevel'>()
+  it('are the three the schema holds, each optional', () => {
+    expectTypeOf<keyof AccordionDesignProps>().toEqualTypeOf<'hiddenUntilFound' | 'headingLevel' | 'items'>()
     expectTypeOf<AccordionDesignProps['hiddenUntilFound']>().toEqualTypeOf<boolean | undefined>()
   })
 

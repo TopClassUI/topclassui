@@ -19,6 +19,7 @@ const TITLES: Record<string, readonly string[]> = {
   'accordion--many-items': Array.from({ length: 60 }, (_, index) => `Question ${String(index + 1)}`),
   'accordion--multiple': ['Plan', 'Seats', 'Invoices'],
   'accordion--rtl': ['ما هو مكوّن الخادم؟', 'هل يعمل بالعربية؟', 'ما حجم الحزمة؟'],
+  'accordion--skeleton': ['Plan', 'Plan', 'Seats', 'Invoices'],
 }
 
 /** A small phone, a phone, a desktop and a phone on its side. */
@@ -138,7 +139,7 @@ test('the table names every accordion demo', () => {
   const found = DEMOS.filter((demo) => demo.startsWith('accordion--')).sort()
   expect(found).toEqual([
     'accordion--basic', 'accordion--disabled', 'accordion--first-open', 'accordion--long-content', 'accordion--many-items',
-    'accordion--multiple', 'accordion--rtl',
+    'accordion--multiple', 'accordion--rtl', 'accordion--skeleton',
   ])
   expect(Object.keys(TITLES).sort()).toEqual(found)
 })
