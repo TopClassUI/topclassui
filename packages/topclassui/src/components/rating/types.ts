@@ -52,7 +52,7 @@ export type RatingEditableProps = RatingEditing & {
 
 /** The same radio group, with a handler. A client export: a Server Component passes onValueChange only as a Server Action. */
 export type RatingInputProps = RatingEditing & {
-  /** Called with the step a click or an arrow key checked, and on a form reset with the step it returns to. */
+  /** Client-only, or a Server Action: called with the step a click or an arrow key checked, and on a form reset with the step it returns to. */
   onValueChange?: ((value: number) => void) | undefined
 }
 

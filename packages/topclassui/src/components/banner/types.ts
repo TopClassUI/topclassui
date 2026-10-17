@@ -65,7 +65,7 @@ export type BannerDismissibleProps =
   & {
     /** The key the dismissal is remembered under, and the element's id. */
     id: string
-    /** Called once when the x is pressed, while the banner is still in the page. */
+    /** Client-only, or a Server Action: called once when the x is pressed, while the banner is still in the page. */
     onDismiss?: (() => void) | undefined
   }
 

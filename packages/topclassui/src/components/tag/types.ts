@@ -19,6 +19,6 @@ export interface TagProps
 
 /** A Tag with an x. A client export: a client component passes the handler, a Server Component only a Server Action. */
 export interface TagRemovableProps extends TagProps {
-  /** Called with nothing when the x is pressed; taking the tag out of the list is the caller's. */
+  /** Client-only, or a Server Action: called with nothing when the x is pressed; taking the tag out of the list is the caller's. */
   onRemove: () => void
 }
