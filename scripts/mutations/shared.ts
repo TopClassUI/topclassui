@@ -399,6 +399,30 @@ export const MUTATIONS: Mutation[] = [
     to: 'return served ? stop : none',
   },
   {
+    label: 'the server tab stop finds no first item, so a group with nothing checked has no tab stop before it hydrates',
+    file: 'src/shared/use-server-tab-stop.ts',
+    from: '  return enabled[0] ?? opensOn\n',
+    to: '  return opensOn\n',
+  },
+  {
+    label: 'the server tab stop looks at the top level only, so a radio inside a wrapper is never found',
+    file: 'src/shared/use-server-tab-stop.ts',
+    from: "      if (typeof value !== 'string') { walk(inner); return }",
+    to: "      if (typeof value !== 'string') return",
+  },
+  {
+    label: 'the server tab stop gives the first item the stop over a disabled one, which Base UI then moves once hydrated',
+    file: 'src/shared/use-server-tab-stop.ts',
+    from: '      if (off !== true) enabled.push(value)',
+    to: '      enabled.push(value)',
+  },
+  {
+    label: 'the server tab stop overrides the value the page opens on, so the checked radio is not the stop',
+    file: 'src/shared/use-server-tab-stop.ts',
+    from: '(opensOn !== null && all.includes(opensOn))',
+    to: 'false',
+  },
+  {
     label: 'the name contract: ControlName stops asking for a name, so an unlabelled Input compiles',
     file: 'src/shared/contracts/name.ts',
     from: "    id: string\n    'aria-label'?: string | undefined",

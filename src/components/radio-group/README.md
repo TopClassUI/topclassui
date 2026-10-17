@@ -52,9 +52,10 @@ export function PlanField(control: { id: string, name: string, required: boolean
 arrows move to the next radio and select it, skip a disabled one, and wrap at both ends. Under
 an RTL `TopClassProvider`, ArrowRight goes to the radio before. Space selects. Enter does not, and
 there is no Home or End (Base UI's). Before the page hydrates the radio of `value`, else of
-`defaultValue`, is the one tab stop. **A group with neither has no tab stop until hydration**:
-the group cannot know its first radio on the server. A disabled radio is a disabled button, so
-it leaves the tab order and the arrow order.
+`defaultValue`, is the one tab stop. A group with neither, or with a value no radio has, serves
+it on the first enabled radio it finds among its children, where Base UI keeps it once hydrated;
+a radio a component of yours renders is not found. A disabled radio is a disabled button, so it
+leaves the tab order and the arrow order.
 
 **The form.** With a `name`, each radio has a hidden radio input: the form sends `name=<value>`,
 and nothing while no radio is checked. Before the page hydrates it sends the default.
@@ -67,8 +68,8 @@ sends the focus of a blocked submit to a hidden input, a box of 1 px.
 
 **`invalid`** sets `aria-invalid` on the group: every circle turns red and its line thickens,
 checked or not. **`disabled`** is the real attribute on every radio, so the form sends nothing.
-**`readOnly`** keeps the value in the form and says so to a screen reader; it has no look of its
-own.
+**`readOnly`** keeps the value in the form and sets `aria-readonly` on the group, which Chromium does
+not announce; it has no look of its own either, so say it in the text beside the group.
 
 **`orientation`** is `vertical` (a column) or `horizontal` (a row that wraps). It is layout only:
 the arrows are the same in both.
