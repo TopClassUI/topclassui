@@ -10,7 +10,7 @@ export const combobox = {
     ar: 'حقل نص يصفّي قائمة أثناء الكتابة. يعرض الصفوف الظاهرة فقط بعد 200 خيار، ويستدعي loadMore لجلب الصفحة التالية.',
   },
   demos: ['basic', 'form', 'sizes', 'load-more', 'status', 'ten-thousand', 'long-content', 'rtl'],
-  stageHeight: 5,
+  stageHeight: 7,
   note: {
     en: 'Filtering runs over the options loaded so far; the next page arrives through `hasMore` and `loadMore`.',
     ar: 'تجري التصفية على الخيارات المحمّلة حتى الآن؛ وتصل الصفحة التالية عبر `hasMore` و`loadMore`.',
