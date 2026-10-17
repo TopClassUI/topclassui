@@ -11,8 +11,8 @@ const DEMOS = components.filter((entry) => entry.page && entry.content !== null)
 const THEMES = ['light', 'dark', 'ocean'] as const
 const DIRS = [{ dir: 'ltr', lang: 'en' }, { dir: 'rtl', lang: 'ar' }] as const
 
-test('the route has every demo of the four Actions components', () => {
-  expect(DEMOS.length).toBe(40)
+test('the route has every demo of the four Actions and the six Navigation components', () => {
+  expect(DEMOS.length).toBe(96)
 })
 
 for (const theme of THEMES) {
@@ -27,7 +27,7 @@ for (const theme of THEMES) {
         await expect(html).toHaveAttribute('dir', dir)
         await expect(html).toHaveAttribute('lang', lang)
         await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow')
-        await expect(page.locator('nav, header, footer, aside')).toHaveCount(0)
+        await expect(page.locator(':is(nav, header, footer, aside):not(main *)')).toHaveCount(0)
         expect(await page.locator('main > *').count(), key).toBeGreaterThan(1)
         const results = await new AxeBuilder({ page }).analyze()
         expect(results.violations.map((v) => `${key} ${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([])
