@@ -6,6 +6,7 @@ import type { ExportsMap } from '../lib/rewrite-imports.js'
 import { collect } from './lib/collect.js'
 import { lastCommitDate, newestOf } from './lib/dates.js'
 import { demoMapSource } from './lib/demo-map.js'
+import { libraryFacts } from './lib/facts.js'
 import { COMPONENTS, LIBRARY } from './lib/library.js'
 import { PLANNED_EXPORTS } from './lib/planned-exports.js'
 import { generatedProblems } from './lib/shape.js'
@@ -47,6 +48,7 @@ writeFileSync(join(OUT, 'components.json'), `${JSON.stringify(generated.componen
 writeFileSync(join(OUT, 'toc.json'), `${JSON.stringify(generated.toc, null, 2)}\n`)
 writeFileSync(join(OUT, 'dates.json'), `${JSON.stringify(generated.dates, null, 2)}\n`)
 writeFileSync(join(OUT, 'demos.ts'), demos)
+writeFileSync(join(OUT, 'library.json'), `${JSON.stringify(libraryFacts(), null, 2)}\n`)
 
 for (const issue of issues) console.warn(`${strict ? 'error' : 'warn'} ${issue.slug} ${issue.kind}: ${issue.detail}`)
 const demoCount = file.components.reduce((sum, entry) => sum + entry.demos.length, 0)
