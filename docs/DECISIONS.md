@@ -6,6 +6,14 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-17 - R-5.1-2 is checked, and icon-registry is its one exemption
+
+**Decision.** `check-structure` enforces R-5.1-2 (`scripts/lib/index-markup.ts`). A folder is C when its `meta.ts` says `rendering: 'client'`, PLAN 18's C; every folder under `src/connectors/` is covered whatever its meta says. Re-exporting `./client.js` does not mark a folder as C, because split components (Banner, Tag, Rating) do it beside their server markup. For a covered folder, every top-level statement of `index.tsx` is a re-export from a file of its own folder (`export ... from './...'`) or an `import type`; anything else is reported, as `markup` when it holds JSX. Twenty C folders already passed; `icon-registry` did not, and is exempt by name in `INDEX_MARKUP_EXEMPT`.
+
+**Why the exemption.** `icon-registry` is an entry point, not a catalog row (the 2026-09-25 and 2026-10-05 entries), and is `rendering: 'client'` because its registry is module state, not because it is a `'use client'` module. Its `<Icon>` and `registerIcons()` must share that module and stay directive-less: a `'use client'` file would turn `registerIcons` into a client reference that a server file cannot call. Moving `<Icon>` into a `client.tsx` would need that directive or an R-8.1-1 exception for a directive-less `client.tsx`. A test fails if the exempt entry ever stops holding markup, so the exemption cannot outlive its reason.
+
+**Affects** `scripts/check-structure.ts`, `scripts/lib/index-markup.ts` and its test, and `docs/RULES.md`.
+
 ## 2026-10-17 - One thin themed scrollbar for every scroll area
 
 **Decision.** `SCROLLBAR` in `src/shared/classes.ts` is `scrollbar-width: thin` and `scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track)`. `SCROLL_AREA` and `SCROLL_X` carry it, so every dialog and drawer body, popover, dropdown, command, select and combobox list, date picker, tree view, file upload list, toast viewport, sidebar body, accordion region, tabs list, navbar links, segmented control and code block wears it; the table box and the textarea, which scroll without those two, add it by hand. The thumb is neutral-500 in light and ocean and neutral-400 in dark, on a transparent track, so it stands on the surface beneath it: 4.53 to 4.73:1 in light, 5.83 to 7.63 in dark, and 3.93 / 6.27 on a read-only field. `check:contrast` measures it on every surface and on its track whenever the track is not transparent. The code block sets the two tokens to its own fill and halfway thumb, as before. The collapsed Sidebar still hides its bar. Two widths follow from the thinner bar, measured under a mouse: an expanded Sidebar's bar is 10 px (15 before), and a Textarea that takes the browser's own width, in a `w-fit` parent or beside a label, is 173 px (178 before; unit-4.md says 178), since Chromium reserves the vertical bar in it.
