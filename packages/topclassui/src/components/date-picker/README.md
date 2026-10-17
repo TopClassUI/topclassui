@@ -88,15 +88,15 @@ popup cannot reach 44 px each.
 
 **On the element.** `className`, `style`, `ref`, `aria-describedby`, `aria-invalid` and the rest go
 to the button. `invalid` sets `aria-invalid`: the line turns red and thickens. `disabled` is the real
-attribute, on the button and the input, so the form sends nothing. `open`, `defaultOpen` and
-`onOpenChange` are Base UI's, on the root.
+attribute, on the button and the input, so the form sends nothing. `open`, `defaultOpen`,
+`onOpenChange` and `onOpenChangeComplete` are Base UI's, on the root.
 
 ### What Base UI gives
 
 | Base UI | Here |
 |---|---|
 | `Popover.Root`, `Trigger`, `Portal`, `Positioner`, `Popup`, `Title`, `Close` | one `DatePicker` |
-| `open`, `defaultOpen`, `onOpenChange` | passed through; Escape is guarded per root |
+| `open`, `defaultOpen`, `onOpenChange`, `onOpenChangeComplete` | passed through; Escape is guarded per root |
 | `modal` | always `'trap-focus'`, with the `Close` part that makes the trap work |
 | `side`, `align`, `sideOffset`, `collisionPadding` | `placement` and the shared offsets |
 | `container` on the Portal | passed through |
