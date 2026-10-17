@@ -12,7 +12,7 @@ export default function Demo(props: Omit<BannerDesignProps, 'dismissible'> & { d
       id="banner-playground"
       aria-label="Version 2 announcement"
       icon={<Svg icon={bell} size="xs" />}
-      action={<Button size="sm" variant="outline" tone="neutral" render={<a href="/changelog" />}>Read more</Button>}
+      action={<Button size="sm" variant="outline" tone="neutral" render={<a href="/changelog" />}>Read the changelog</Button>}
     >
       Version 2 is out, with faster builds and a new theme editor.
     </Banner>
