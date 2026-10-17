@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { MODES } from '../scripts/lib/harness.js'
+import { DIRECTIONS, MODES } from '../scripts/lib/harness.js'
 import { DEMOS, urlFor } from './pages.js'
 import { type Clip, FORCED_CANVAS, inkOn, pixelsOf, strayOn } from './pixels.js'
 
@@ -44,6 +44,17 @@ const INTERACTIVE = 'button, a[href], [role="button"], [role="link"], input, sel
 
 /** Where a ring sits over a box: the five rows that end one pixel above its top edge. */
 const bandOver = (box: Clip): Clip => ({ x: box.x - 6, y: box.y - 6, width: box.width + 12, height: 5 })
+
+/** The seven Unit 4 controls whose ring no component spec reads in pixels: the demo, what takes the focus, what paints the ring. */
+const UNIT_4_RINGS = [
+  { demo: 'slider--basic', focus: '#demo input[type="range"]', holder: 'xpath=../span' },
+  { demo: 'radio-group--basic', focus: '#demo [role="radio"][aria-checked="true"]', holder: ':scope > span' },
+  { demo: 'number-field--basic', focus: '#demo input', holder: 'xpath=..' },
+  { demo: 'otp-field--basic', focus: '#demo [role="group"] input', holder: null },
+  { demo: 'select--basic', focus: '#demo [role="combobox"]', holder: null },
+  { demo: 'combobox--basic', focus: '#demo [role="combobox"]', holder: null },
+  { demo: 'textarea--basic', focus: '#demo textarea', holder: null },
+] as const
 
 // Forced colours paint a transparent outline. FOCUS_RING once reset with Tailwind's
 // outline-hidden, which is `outline: 2px solid transparent` there: every control of the
@@ -89,5 +100,24 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(controls).toBeGreaterThan(100)
       expect(outlined).toEqual([])
     })
+
+    for (const direction of DIRECTIONS) {
+      for (const { demo, focus, holder } of UNIT_4_RINGS) {
+        test(`${direction}: ${demo} has no ring at rest, and the focused control a ring at 3:1 or more`, async ({ page }) => {
+          await page.goto(urlFor(demo, 'light', direction))
+          const target = page.locator(focus).first()
+          const ringed = holder === null ? target : target.locator(holder)
+          const box = await ringed.boundingBox()
+          if (!box) throw new Error(`no ${demo} control to measure`)
+          const canvas = FORCED_CANVAS[scheme]
+          expect(inkOn(await pixelsOf(page, bandOver(box)), canvas), 'pixels of ring over the control at rest').toBe(0)
+
+          await page.keyboard.press('Tab')
+          await expect(target).toBeFocused()
+          const ring = inkOn(await pixelsOf(page, bandOver(box)), canvas)
+          expect(ring, 'pixels of ring at 3:1 over the focused control').toBeGreaterThanOrEqual(Math.floor(box.width))
+        })
+      }
+    }
   })
 }

@@ -1,5 +1,4 @@
 // Helpers for the keyboard specs (R-5.6-1, R-5.6-3): the ring a focused control paints, and the stops Tab walks.
-// The ring is read as outline style and width, not as pixels: a forced-colours pixel read needs the matching browser.
 import { expect, type Locator, type Page } from '@playwright/test'
 
 /** The outline an element paints now. */
