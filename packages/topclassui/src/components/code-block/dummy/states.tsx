@@ -12,7 +12,7 @@ export default function Demo() {
   return (
     <div className="grid gap-6 text-sm text-muted">
       <div className="grid gap-2">
-        <CodeBlock lang="tsx" title="page.tsx">{CODE}</CodeBlock>
+        <CodeBlock lang="tsx" title="app/page.tsx">{CODE}</CodeBlock>
         <span>Idle</span>
       </div>
       <div className="grid gap-2">
@@ -20,8 +20,8 @@ export default function Demo() {
         <span>Wrapped</span>
       </div>
       <div className="grid gap-2">
-        <CodeBlock lang="tsx" showCopy={false}>{CODE}</CodeBlock>
-        <span>No header</span>
+        <CodeBlock lang="tsx" title="app/reports/page.tsx" showCopy={false}>{CODE}</CodeBlock>
+        <span>No copy button</span>
       </div>
     </div>
   )
