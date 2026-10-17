@@ -5,7 +5,8 @@ import { useEffect, useState, useSyncExternalStore } from 'react'
 
 import { useDirection, useLabels, useToastSettings } from '#shared/provider/context.js'
 import { usePortalLocale } from '#shared/provider/use-portal-locale.js'
-import { claimViewport, drawingViewport, subscribeViewports, toSwipeDirections } from './lib.js'
+import { claimViewport, drawingViewport, subscribeViewports } from '#shared/toast/viewports.js'
+import { toSwipeDirections } from './lib.js'
 
 /** Everything the one viewport reads: Base UI's list, the provider's labels and placement, the dir and the
  * lang its portal cannot inherit, the swipes that close a toast in the direction of that provider, and
