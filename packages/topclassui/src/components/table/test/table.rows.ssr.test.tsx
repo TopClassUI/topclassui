@@ -1,6 +1,6 @@
 import { createElement, type ReactElement } from 'react'
 import { renderToString } from 'react-dom/server'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 
 import type { TableProps, TableRowsProps } from '../types.js'
 
@@ -30,6 +30,7 @@ describe('the body is the one client part', () => {
   })
 
   it('no function crosses but loadMore, which a server page passes as a Server Action', () => {
+    expectTypeOf<Pick<TableProps<Row>, 'hasMore' | 'loadMore'>>().toEqualTypeOf<{ hasMore?: boolean | undefined; loadMore?: (() => void | Promise<void>) | undefined }>()
     const props = body({ hasMore: true, loadMore: () => Promise.resolve() }) ?? {}
     expect(Object.entries(props).filter(([, value]) => typeof value === 'function').map(([key]) => key)).toEqual(['loadMore'])
   })

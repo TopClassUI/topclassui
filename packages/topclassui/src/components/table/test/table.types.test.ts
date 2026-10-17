@@ -170,8 +170,6 @@ describe('the design props and the schema cannot drift', () => {
       virtualize?: boolean | 'auto' | undefined
       loadMoreThreshold?: number | undefined
     }>()
-    // R-8.5-1: the paging half of the shared contract; loadMore is a Server Action on a server page.
-    expectTypeOf<Pick<TableProps<Invoice>, 'hasMore' | 'loadMore'>>().toEqualTypeOf<{ hasMore?: boolean | undefined; loadMore?: (() => void | Promise<void>) | undefined }>()
   })
 
   it('is a subset of the component props, so every design prop is settable', () => {
