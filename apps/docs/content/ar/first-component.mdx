@@ -1,0 +1,110 @@
+---
+slug: first-component
+title: مكوّنك الأول
+description: نموذج يُعرض على الخادم ويُرسل إلى إجراء خادم. لا JavaScript لبنيته.
+---
+
+## ما الذي ستبنيه
+
+نموذج اشتراك: حقل نص <span dir="ltr">`Input`</span> داخل <span dir="ltr">`Field`</span>، وزر <span dir="ltr">`Button`</span>.
+
+<Callout tone="info">[ثبّت الحزمة](/ar/docs/installation) أولًا.</Callout>
+
+## 1. الإجراء
+
+يتحقّق Zod من البيانات على الخادم، فلا يمكن تجاوزه ولا يكلّف المتصفح شيئًا. تخرج <span dir="ltr">`fieldErrors`</span> مفهرسة باسم الحقل، وهذا ما يتوقّعه <span dir="ltr">`Field`</span>. الوسيط الأول هو الجواب السابق، وتقرؤه الخطوة 4.
+
+```ts title="app/subscribe/actions.ts" check
+'use server'
+import { z } from 'zod'
+import type { FormActionState } from 'topclassui/form'
+
+const schema = z.object({ email: z.email('Enter a valid email') })
+
+export async function subscribe(_state: FormActionState, formData: FormData): Promise<FormActionState> {
+  const parsed = schema.safeParse(Object.fromEntries(formData))
+  if (!parsed.success) return { errors: z.flattenError(parsed.error).fieldErrors }
+
+  await saveSubscriber(parsed.data.email)
+  return {}
+}
+```
+
+## 2. الصفحة
+
+يربط <span dir="ltr">`Field`</span> التسمية والنص المساعد ورسالة الخطأ بعنصر الإدخال. و<span dir="ltr">`Input`</span> حقل إدخال أصلي، فيعمل قبل تحميل أي JavaScript.
+
+```tsx title="app/subscribe/page.tsx" check
+import { Field } from 'topclassui/field'
+import { Input } from 'topclassui/input'
+import { Button } from 'topclassui/button'
+import { Form } from 'topclassui/form'
+import { subscribe } from './actions'
+
+export default function Page() {
+  async function send(formData: FormData) {
+    'use server'
+    await subscribe({}, formData)
+  }
+
+  return (
+    <Form action={send} className="flex flex-col gap-4">
+      <Field name="email" label="Email" hint="We never share it" required>
+        {(control) => <Input {...control} type="email" autoComplete="email" />}
+      </Field>
+      <Button type="submit">Subscribe</Button>
+    </Form>
+  )
+}
+```
+
+## 3. ما الذي يجب أن تراه
+
+1. **حقل نص له تسمية، وزر، بتنسيق الوضع الحالي.** إذا ظهرا بلا تنسيق، فمدخل CSS ينقصه سطر أو ترتيبه خاطئ.
+2. **عطّل JavaScript وأرسل النموذج.** يُرسل النموذج مع ذلك، ويعمل الإجراء، وتُعاد تحميل الصفحة. هذا إجراء الخادم يؤدي عمله؛ أما الأخطاء التي يعيدها فتظهر في الخطوة 4.
+3. **افتح لوحة الشبكة.** لا سكربت للنموذج. <span dir="ltr">`Input`</span> و<span dir="ltr">`Button`</span> و<span dir="ltr">`Field`</span> كلها تُشحن هنا بحجم 0 KB.
+
+## 4. اعرض الخطأ بلا إعادة تحميل
+
+انقل النموذج إلى ملف عميل واستخدم <span dir="ltr">`FormAction`</span>. تصل الأخطاء إلى الحقل المطابق.
+
+```tsx title="app/subscribe/subscribe-form.tsx" check
+'use client'
+import { FormAction } from 'topclassui/form'
+import { FieldLive } from 'topclassui/field'
+import { Input } from 'topclassui/input'
+import { Button } from 'topclassui/button'
+import type { subscribe } from './actions'
+
+export function SubscribeForm({ action }: { action: typeof subscribe }) {
+  return (
+    <FormAction action={action}>
+      <FieldLive name="email" label="Email" required>
+        {(control) => <Input {...control} type="email" />}
+      </FieldLive>
+      <Button type="submit">Subscribe</Button>
+    </FormAction>
+  )
+}
+```
+
+```tsx title="app/subscribe/page.tsx" check
+import { subscribe } from './actions'
+import { SubscribeForm } from './subscribe-form'
+
+export default function Page() {
+  return <SubscribeForm action={subscribe} />
+}
+```
+
+## مع Vite
+
+النموذج نفسه مع دالة غير متزامنة عادية. هذا النموذج لا يعمل إلا بعد أن تحمّل الصفحة ملفات JavaScript الخاصة بها.
+
+```tsx
+async function subscribe(formData: FormData) {
+  await fetch('/api/subscribe', { method: 'POST', body: formData })
+}
+
+<form action={subscribe}>…</form>
+```

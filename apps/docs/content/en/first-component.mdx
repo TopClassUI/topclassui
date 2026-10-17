@@ -1,0 +1,110 @@
+---
+slug: first-component
+title: Your first component
+description: A form that renders on the server and posts to a Server Action. No JavaScript for its markup.
+---
+
+## What you will build
+
+A subscribe form: an `Input` inside a `Field`, and a `Button`.
+
+<Callout tone="info">[Install the package](/en/docs/installation) first.</Callout>
+
+## 1. The action
+
+Zod validates on the server, so it cannot be bypassed and costs the browser nothing. `fieldErrors` comes out keyed by field name, which is what `Field` expects. The first argument is the last answer, which step 4 reads.
+
+```ts title="app/subscribe/actions.ts" check
+'use server'
+import { z } from 'zod'
+import type { FormActionState } from 'topclassui/form'
+
+const schema = z.object({ email: z.email('Enter a valid email') })
+
+export async function subscribe(_state: FormActionState, formData: FormData): Promise<FormActionState> {
+  const parsed = schema.safeParse(Object.fromEntries(formData))
+  if (!parsed.success) return { errors: z.flattenError(parsed.error).fieldErrors }
+
+  await saveSubscriber(parsed.data.email)
+  return {}
+}
+```
+
+## 2. The page
+
+`Field` wires the label, hint and error to the control. `Input` is a native input, so it works before any JavaScript.
+
+```tsx title="app/subscribe/page.tsx" check
+import { Field } from 'topclassui/field'
+import { Input } from 'topclassui/input'
+import { Button } from 'topclassui/button'
+import { Form } from 'topclassui/form'
+import { subscribe } from './actions'
+
+export default function Page() {
+  async function send(formData: FormData) {
+    'use server'
+    await subscribe({}, formData)
+  }
+
+  return (
+    <Form action={send} className="flex flex-col gap-4">
+      <Field name="email" label="Email" hint="We never share it" required>
+        {(control) => <Input {...control} type="email" autoComplete="email" />}
+      </Field>
+      <Button type="submit">Subscribe</Button>
+    </Form>
+  )
+}
+```
+
+## 3. What you should see
+
+1. **A labelled input and a button, styled in the current mode.** If they are unstyled, the CSS entry is missing a line or the order is wrong.
+2. **Disable JavaScript and submit.** The form still posts, the action runs and the page reloads. That is the Server Action doing its job; the returned errors appear in step 4.
+3. **Open the network panel.** No script for the form. `Input`, `Button` and `Field` all ship 0 KB here.
+
+## 4. Show the error without a reload
+
+Move the form into a client file and use `FormAction`. Errors land on the matching field.
+
+```tsx title="app/subscribe/subscribe-form.tsx" check
+'use client'
+import { FormAction } from 'topclassui/form'
+import { FieldLive } from 'topclassui/field'
+import { Input } from 'topclassui/input'
+import { Button } from 'topclassui/button'
+import type { subscribe } from './actions'
+
+export function SubscribeForm({ action }: { action: typeof subscribe }) {
+  return (
+    <FormAction action={action}>
+      <FieldLive name="email" label="Email" required>
+        {(control) => <Input {...control} type="email" />}
+      </FieldLive>
+      <Button type="submit">Subscribe</Button>
+    </FormAction>
+  )
+}
+```
+
+```tsx title="app/subscribe/page.tsx" check
+import { subscribe } from './actions'
+import { SubscribeForm } from './subscribe-form'
+
+export default function Page() {
+  return <SubscribeForm action={subscribe} />
+}
+```
+
+## On Vite
+
+The same form with a plain async function. This one works only after the page has loaded its JavaScript.
+
+```tsx
+async function subscribe(formData: FormData) {
+  await fetch('/api/subscribe', { method: 'POST', body: formData })
+}
+
+<form action={subscribe}>…</form>
+```
