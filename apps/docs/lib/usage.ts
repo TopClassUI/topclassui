@@ -48,15 +48,40 @@ export function changedProps(values: Readonly<Record<string, PropValue>>, defaul
 
 const attributeNamed = (name: string) => new RegExp(`(\\s)${name}=(?:\\{[^{}]*\\}|"[^"]*")`, 'g')
 
-/** The usage with the given props written in: over an attribute of the same name wherever the tree has one
- * (a pass-through or a literal), else where the spread was; a pass-through left unset is dropped. */
+/** The root element's opening tag with every brace's contents blanked, so only its own attributes can match. */
+function rootTagOf(jsx: string): string {
+  let depth = 0
+  let quote: string | null = null
+  let tag = ''
+  for (const char of jsx) {
+    if (quote !== null) {
+      if (char === quote) quote = null
+    } else if (depth === 0 && (char === '"' || char === "'")) quote = char
+    else if (char === '{') depth += 1
+    else if (char === '}') depth -= 1
+    else if (char === '>' && depth === 0) return `${tag}>`
+    tag += depth > 1 || (depth === 1 && char !== '{') ? ' ' : char
+  }
+  return tag
+}
+
+/** The usage with the given props written in: over a pass-through of the same name wherever it is (a part's
+ * `current={current}`), over a literal on the root itself (`value={6}`), else where the spread was; unset pass-throughs are dropped. */
 export function snippetOf(usage: Usage, props: readonly [string, PropValue][]): string {
   let jsx = usage.jsx
   const spread: string[] = []
   for (const [name, value] of props) {
-    const pattern = attributeNamed(name)
-    if (pattern.test(jsx)) jsx = jsx.replace(pattern, (_, space: string) => `${space}${attributeOf(name, value)}`)
-    else spread.push(` ${attributeOf(name, value)}`)
+    const attribute = ` ${attributeOf(name, value)}`
+    const root = rootTagOf(jsx)
+    const literal = [...root.matchAll(attributeNamed(name))][0]
+    if (passThrough(name).test(jsx)) jsx = jsx.replace(passThrough(name), attribute)
+    else if (literal === undefined) spread.push(attribute)
+    else {
+      // The blanked tag keeps every offset, so the match's place in it is its place in the tree.
+      const start = literal.index + (literal[1]?.length ?? 0)
+      const length = literal[0].length - (literal[1]?.length ?? 0)
+      jsx = `${jsx.slice(0, start)}${attributeOf(name, value)}${jsx.slice(start + length)}`
+    }
   }
   jsx = usage.passed.reduce((tree, name) => tree.replace(passThrough(name), ''), jsx)
   jsx = jsx.replace(/[ \t]+(\w+)=\{\1\}/g, '').replace(SPREAD, spread.join(''))
