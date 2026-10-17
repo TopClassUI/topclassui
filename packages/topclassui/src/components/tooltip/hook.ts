@@ -6,9 +6,10 @@ import { createContext, useContext, useId, useLayoutEffect, useMemo, useState } 
 import { usePortalLocale } from '#shared/provider/use-portal-locale.js'
 import type { TooltipPopupId, TooltipTriggerElementProps } from './types.js'
 
+const noPopup: TooltipPopupId = { popupId: undefined, setOwnId: () => undefined }
 /** The popup id of the nearest TooltipRoot, which its trigger names while open, and the popup's way to
  * hand over an id of the caller's. */
-export const TooltipPopupIdContext = createContext<TooltipPopupId>({ popupId: undefined, setOwnId: () => undefined })
+export const TooltipPopupIdContext = createContext(noPopup)
 
 /** One popup id per root, so two tooltips never describe each other's trigger; a caller's id wins. */
 export function useTooltipRoot() {
