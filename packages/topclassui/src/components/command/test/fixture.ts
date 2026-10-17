@@ -7,6 +7,6 @@ export const fixture: RootPropsFixture<typeof Index> = {
     props: {
       defaultOpen: true, items: ['probe'], getKey: (item) => String(item), getLabel: (item) => String(item), onSelect: () => undefined,
     },
-    portal: true,
+    portal: { root: '[role="dialog"]', decision: '2026-10-17 - A popup part lands on the popup, inside the presentation boxes Base UI wraps it in' },
   },
 }
