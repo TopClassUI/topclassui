@@ -5,13 +5,14 @@ import type { ComponentType } from 'react'
 import { describe, expect, it } from 'vitest'
 
 import { markup } from '#test/markup.js'
+import type { SelectDesignProps } from '../types.js'
 
 // PLAN 17.1: the demos are the docs code tab and the visual baselines, so each must render.
 const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'four-rows', 'long-content', 'phase-4-form', 'rtl', 'sixty-items', 'sizes', 'states']
+const EXPECTED = ['basic', 'form', 'four-rows', 'long-content', 'phase-4-form', 'playground', 'rtl', 'sixty-items', 'sizes', 'states']
 
 /** Each Select of each demo as the server writes it: its name, then what its trigger shows. */
 const SELECTS: Record<string, string[]> = {
@@ -20,6 +21,7 @@ const SELECTS: Record<string, string[]> = {
   'four-rows': ['Month: March'],
   'long-content': ['Office: Department of Regional Planning'],
   'phase-4-form': ['Country: Jordan'],
+  'playground': ['Country: Jordan'],
   'rtl': ['الدولة: الأردن'],
   'sixty-items': ['Sixty options: Option 30'],
   'sizes': ['Extra small: Pro', 'Small: Pro', 'Medium: Pro', 'Large: Pro', 'Extra large: Pro'],
@@ -71,6 +73,13 @@ describe('the demos the plan names', () => {
     const html = await render('form')
     expect(html).toMatch(/^<form class="[^"]*">/)
     expect(html).toMatch(/<input [^>]*name="country" value="jo"/)
+  })
+
+  it('playground: the schema props a Try it control sets reach the trigger', async () => {
+    const loaded = await import('../dummy/playground.tsx') as { default: ComponentType<SelectDesignProps> }
+    const html = markup(<loaded.default size="lg" invalid />)
+    expect(html).toMatch(/<button [^>]*aria-invalid="true"/)
+    expect(html).toContain('data-size="lg"')
   })
 
   it('rtl: an island that carries the direction and the language', async () => {
