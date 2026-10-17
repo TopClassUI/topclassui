@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright'
 import { type Page, expect, test } from '@playwright/test'
 
-const SLUGS = ['button', 'tag', 'kbd', 'segmented-control'] as const
+const SLUGS = ['button', 'tag', 'kbd', 'segmented-control', 'alert', 'toast', 'banner', 'progress', 'spinner', 'empty-state'] as const
 const LOCALES = [{ locale: 'en', dir: 'ltr' }, { locale: 'ar', dir: 'rtl' }] as const
 const MODES = ['light', 'dark', 'ocean'] as const
 
