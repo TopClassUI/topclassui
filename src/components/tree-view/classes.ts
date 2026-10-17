@@ -1,5 +1,5 @@
 // R-5.12-4: one class string per element TreeView styles, built from the shared constants.
-import { BORDER, HOVER, LABEL, SCROLL_AREA, TRANSITION } from '#shared/classes.js'
+import { BORDER, FORCED_EDGE, HOVER, LABEL, SCROLL_AREA, TRANSITION } from '#shared/classes.js'
 
 /** The box: one column, so the tree scrolls inside it and never widens its parent. No gap: the note brings its own room. */
 export const TREE_VIEW_ROOT = 'grid min-w-0 grid-cols-1'
@@ -45,3 +45,26 @@ export const TREE_VIEW_LABEL = `${LABEL} flex-1`
 
 /** The loading and the empty text, outside the tree. A live region stays in the page so its first words are read; empty, it takes no room. */
 export const TREE_VIEW_NOTE = 'px-3 py-2 text-sm text-muted empty:p-0'
+
+/** The tree's box with no tab stop, no ring and no scrolling: a placeholder has nothing to reach, so it cuts what the knob would scroll. */
+export const TREE_VIEW_SKELETON_BOX = [
+  'flex min-w-0 flex-col overflow-hidden rounded-box bg-surface-raised p-2',
+  'max-h-[calc(var(--tc-list-rows)*var(--tc-row-height))]',
+  'pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-coarse,44px)))]',
+  BORDER,
+].join(' ')
+
+/** A row of the tree: one unit tall, 44 px under a finger, one indent further in per level. */
+export const TREE_VIEW_SKELETON_ROW = [
+  'flex shrink-0 items-center gap-1.5 text-sm h-(--tc-row-height)',
+  'pointer-coarse:h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]',
+  'ps-[calc(0.5rem+var(--tc-tree-level)*var(--tc-tree-indent))] pe-2',
+].join(' ')
+
+/** Two bars a row, as drawn: the icon's square and the label's line. Forced colours erase the fill, so each keeps a line there. */
+const SKELETON_FILL = `animate-pulse rounded-chip bg-neutral-soft motion-reduce:animate-none ${FORCED_EDGE}`
+export const TREE_VIEW_SKELETON_ICON = `block size-3.5 shrink-0 ${SKELETON_FILL}`
+export const TREE_VIEW_SKELETON_LABEL = `block h-[1em] flex-1 ${SKELETON_FILL}`
+
+/** The label bars' widths in turn, repeating; a cap, so a narrow box squeezes them and never overflows. */
+export const TREE_VIEW_SKELETON_WIDTH = ['max-w-32', 'max-w-24', 'max-w-28', 'max-w-40', 'max-w-20'] as const

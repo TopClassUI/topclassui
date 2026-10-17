@@ -18,6 +18,7 @@ const AFTER: Record<string, (string | null)[]> = {
   'long-content': ['Item 60'],
   'rtl': ['ملاحظات.txt'],
   'selected': ['next.config.ts'],
+  'skeleton': ['README.md'],
   'status': [],
   'ten-thousand': ['File 10000.ts'],
 }

@@ -12,8 +12,10 @@ const slash = (path: string) => path.replace(/\\/g, '/')
 const probePath = (name: string) => slash(join(FOLDER, 'test', `tree-view-probe-${name}.tsx`))
 
 const PRELUDE = [
-  "import { TreeView, type TreeNode, type TreeViewProps } from '../index.js'",
-  'export const used = [TreeView]',
+  "import { Suspense } from 'react'",
+  "import { TreeView, TreeViewSkeleton, type TreeNode, type TreeViewProps } from '../index.js'",
+  'export const FileTree = () => null',
+  'export const used = [TreeView, TreeViewSkeleton, Suspense]',
   'export type Used = [TreeViewProps, TreeNode]',
   "const ITEMS = [{ id: 'app', label: 'app', children: [{ id: 'page', label: 'page.tsx' }] }]",
   'export const items = ITEMS',
@@ -65,6 +67,10 @@ const sample = (index: number) => SAMPLES[index] ?? '<Missing />'
 const verdict = compile({
   readmeImport: sample(0),
   readmeFirst: sample(1),
+  readmeSkeleton: sample(2),
+  skeletonRest: '<TreeViewSkeleton rows={12} id="s" className="mt-2" style={{ \'--tc-list-rows\': 12 }} ref={(node: HTMLDivElement | null) => { void node }} />',
+  skeletonSize: '<TreeViewSkeleton size="sm" />',
+  skeletonChildren: '<TreeViewSkeleton>Files</TreeViewSkeleton>',
   byAriaLabel: '<TreeView aria-label="Files" items={ITEMS} />',
   byLabelledBy: '<TreeView aria-labelledby="files-heading" items={ITEMS} />',
   controlled: '<TreeView aria-label="F" items={ITEMS} value={null} onValueChange={(id) => { void (id satisfies string) }} expanded={[]} onExpandedChange={(ids) => { void (ids satisfies readonly string[]) }} />',
@@ -91,12 +97,13 @@ const verdict = compile({
 
 describe('the samples in the README compile as written', () => {
   it('finds the import line and the sample, so an empty extraction cannot pass', () => {
-    expect(SAMPLES).toHaveLength(2)
+    expect(SAMPLES).toHaveLength(3)
     expect(SAMPLES[0]).toContain("import { TreeView } from 'topclassui'")
     expect(SAMPLES[1]).toContain('<TreeView\n  aria-label="Files"')
+    expect(SAMPLES[2]).toContain('<Suspense fallback={<TreeViewSkeleton rows={8} />}>')
   })
 
-  for (const name of ['readmeImport', 'readmeFirst']) {
+  for (const name of ['readmeImport', 'readmeFirst', 'readmeSkeleton']) {
     it(`${name} compiles`, () => { expect(verdict[name]).toEqual([]) })
   }
 })
@@ -132,5 +139,16 @@ describe('what a TreeView refuses', () => {
   it('a className function and a ref to another element', () => {
     expect(said('classFunction')).toContain("is not assignable to type 'string'")
     expect(said('wrongRef')).toContain('HTMLDivElement')
+  })
+})
+
+describe('what a TreeViewSkeleton takes and refuses', () => {
+  it('rows and the rest of a div, ref and a --tc-* style included', () => {
+    expect(verdict['skeletonRest']).toEqual([])
+  })
+
+  it('no size, since the tree has none, and no children', () => {
+    expect((verdict['skeletonSize'] ?? []).join(' ')).toContain("Property 'size' does not exist")
+    expect((verdict['skeletonChildren'] ?? []).join(' ')).toMatch(/children/)
   })
 })

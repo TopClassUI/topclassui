@@ -2,7 +2,7 @@
 import { z } from 'zod'
 
 import { COLLECTION_BOUNDARIES } from '#shared/contracts/collection.js'
-import { TREE_VIEW_DEFAULTS, TREE_VIEW_STATUSES } from './constants.js'
+import { TREE_VIEW_DEFAULTS, TREE_VIEW_SKELETON_DEFAULTS, TREE_VIEW_STATUSES } from './constants.js'
 
 const { visibleRowsMin, visibleRowsMax, loadMoreThresholdMin, loadMoreThresholdMax } = COLLECTION_BOUNDARIES
 
@@ -20,3 +20,11 @@ export const treeViewSchema = z.object({
 })
 
 export type TreeViewSchemaInput = z.input<typeof treeViewSchema>
+
+/** R-5.7-7: TreeViewSkeleton's one count, bounded as visibleRows is, since the tree shows no more before it scrolls. */
+export const treeViewSkeletonSchema = z.object({
+  rows: z.number().int().min(visibleRowsMin).max(visibleRowsMax).default(TREE_VIEW_SKELETON_DEFAULTS.rows)
+    .meta({ description: 'How many rows the placeholder holds, clamped: pass the rows the tree will show.' }),
+})
+
+export type TreeViewSkeletonSchemaInput = z.input<typeof treeViewSkeletonSchema>

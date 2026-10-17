@@ -17,15 +17,19 @@ function exportedNames(source: string): string[] {
   })
 }
 
-describe('index.tsx exports one flat name (R-9.2-3), no Root since TreeView is not a family', () => {
-  it('exports exactly TreeView, a function component', () => {
-    expect(Object.keys(treeView)).toEqual(['TreeView'])
+describe('index.tsx exports flat names (R-9.2-3), no Root since TreeView is not a family', () => {
+  it('exports exactly TreeView and TreeViewSkeleton, two function components', () => {
+    expect(Object.keys(treeView)).toEqual(['TreeView', 'TreeViewSkeleton'])
     expect(typeof treeView.TreeView).toBe('function')
+    expect(typeof treeView.TreeViewSkeleton).toBe('function')
   })
 
   it('has no hook, no lib helper and no row type in its surface', () => {
     const source = readFileSync(join(import.meta.dirname, '..', 'index.tsx'), 'utf8')
-    expect(exportedNames(source).sort()).toEqual(['TreeNode', 'TreeView', 'TreeViewDesignProps', 'TreeViewName', 'TreeViewProps', 'TreeViewStatus'])
+    expect(exportedNames(source).sort()).toEqual([
+      'TreeNode', 'TreeView', 'TreeViewDesignProps', 'TreeViewName', 'TreeViewProps', 'TreeViewSkeleton', 'TreeViewSkeletonDesignProps',
+      'TreeViewSkeletonProps', 'TreeViewStatus',
+    ])
   })
 
   it('the scan sees a type-only alias and a star export', () => {

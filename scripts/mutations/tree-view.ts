@@ -5,6 +5,7 @@ const CLIENT = 'src/components/tree-view/client.tsx'
 const HOOK = 'src/components/tree-view/hook.ts'
 const LIB = 'src/components/tree-view/lib.ts'
 const CLASSES = 'src/components/tree-view/classes.ts'
+const SKELETON = 'src/components/tree-view/skeleton.tsx'
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -252,5 +253,35 @@ export const MUTATIONS: Mutation[] = [
     file: HOOK,
     from: '    visibleRows: rowsCap,\n',
     to: '',
+  },
+  {
+    label: 'the tree view skeleton spreads the rest after aria-hidden, so a caller can un-hide a placeholder',
+    file: SKELETON,
+    from: '{...rest} aria-hidden>',
+    to: 'aria-hidden {...rest}>',
+  },
+  {
+    label: 'the tree view skeleton bars lose their forced-colours edge, so a loading tree is an empty box there',
+    file: CLASSES,
+    from: ' motion-reduce:animate-none ${FORCED_EDGE}`',
+    to: ' motion-reduce:animate-none`',
+  },
+  {
+    label: 'the tree view skeleton rows lose their level, so the placeholder reads as a flat list',
+    file: SKELETON,
+    from: "          style={{ '--tc-tree-level': TREE_VIEW_SKELETON_LEVELS[row % TREE_VIEW_SKELETON_LEVELS.length] }}\n",
+    to: '',
+  },
+  {
+    label: 'a tree view skeleton row is no longer 44 px under a finger, so the tree moves the page when it arrives on a phone',
+    file: CLASSES,
+    from: "  'pointer-coarse:h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]',\n  'ps-[calc",
+    to: "  'ps-[calc",
+  },
+  {
+    label: 'the tree view skeleton is not cut where the tree scrolls, so twenty rows stand in for a box of seven',
+    file: CLASSES,
+    from: "'flex min-w-0 flex-col overflow-hidden rounded-box bg-surface-raised p-2',\n  'max-h-[calc(var(--tc-list-rows)*var(--tc-row-height))]',\n",
+    to: "'flex min-w-0 flex-col overflow-hidden rounded-box bg-surface-raised p-2',\n",
   },
 ]

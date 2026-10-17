@@ -47,7 +47,18 @@ import { TreeView } from 'topclassui'
 
 The tree is the one tab stop and keeps the focus; `aria-activedescendant` names the row the keys are on.
 
-**Not built:** multi-select and checkboxes, `selectionMode`, `showLines`, the folder and folder-open swap, `*` to open every sibling, drag to reorder, links in rows, an `error` status, `selectedItem`, an `indent` prop (the `--tc-tree-indent` token is the knob), `size`, skeleton rows, a loading row inside a branch.
+## While it loads
+
+```tsx
+<Suspense fallback={<TreeViewSkeleton rows={8} />}>
+  <FileTree />
+</Suspense>
+```
+
+- **Same box, same rows**: the tree's border, padding and row height, 44 px under a finger, and rows indented as a tree, so nothing moves when the tree arrives. Pass the rows the tree will show as `rows`, up to 20; past the `--tc-list-rows` knob the box is cut where the tree would scroll.
+- **For the first load only.** While a tree on the page waits for its next page, `status="loading-more"` says so under it.
+
+**Not built:** multi-select and checkboxes, `selectionMode`, `showLines`, the folder and folder-open swap, `*` to open every sibling, drag to reorder, links in rows, an `error` status, `selectedItem`, an `indent` prop (the `--tc-tree-indent` token is the knob), `size`, a loading row inside a branch.
 
 <!-- /hand-written -->
 
@@ -91,6 +102,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/long-content.tsx`
 - `dummy/rtl.tsx`
 - `dummy/selected.tsx`
+- `dummy/skeleton.tsx`
 - `dummy/status.tsx`
 - `dummy/ten-thousand.tsx`
 

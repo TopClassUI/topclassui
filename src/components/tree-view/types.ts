@@ -2,7 +2,7 @@ import type { ComponentPropsWithRef, FocusEvent, KeyboardEvent, MouseEvent, Poin
 
 import type { GroupName } from '#shared/contracts/name.js'
 import type { TREE_VIEW_STATUSES } from './constants.js'
-import type { TreeViewSchemaInput } from './schema.js'
+import type { TreeViewSchemaInput, TreeViewSkeletonSchemaInput } from './schema.js'
 
 export type TreeViewStatus = (typeof TREE_VIEW_STATUSES)[number]
 
@@ -76,6 +76,16 @@ export type TreeViewProps = Omit<ComponentPropsWithRef<'div'>, DivOwned> & TreeV
   /** On the element with role tree, merged last. */
   className?: string | undefined
 } & TreeViewName
+
+// R-8.3-4: derived from the schema, as the design props of the tree are.
+export type TreeViewSkeletonDesignProps = {
+  [K in keyof TreeViewSkeletonSchemaInput]?: TreeViewSkeletonSchemaInput[K] | undefined
+}
+
+/** No content and no way to un-hide it: the placeholder only holds the tree's shape. */
+export type TreeViewSkeletonProps =
+  Omit<ComponentPropsWithRef<'div'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
+  & TreeViewSkeletonDesignProps
 
 /** The events the tree handles, named here so hook.ts writes no type argument. */
 export type TreeKeyEvent = KeyboardEvent<HTMLDivElement>

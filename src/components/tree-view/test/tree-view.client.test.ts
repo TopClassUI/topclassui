@@ -47,10 +47,10 @@ function hooksByPart(source: string): Record<string, string[]> {
 }
 
 describe('the folder holds what TreeView needs and nothing else (R-8.1-1)', () => {
-  it('a hook.ts and a lib.ts, and no boundaries (the bounds are shared), variants, skeleton or parts', () => {
+  it('a hook.ts, a lib.ts and a skeleton.tsx, and no boundaries (the bounds are shared), variants or parts', () => {
     expect(readdirSync(FOLDER).sort()).toEqual([
       'README.md', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'lib.ts', 'meta.ts', 'schema.ts',
-      'test', 'types.ts',
+      'skeleton.tsx', 'test', 'types.ts',
     ])
   })
 })
@@ -63,9 +63,9 @@ describe('index.tsx re-exports and holds no markup (R-5.1-2)', () => {
     expect(hasLateUseClient(source)).toBe(false)
   })
 
-  it('is nothing but export-from lines, from client.tsx and types.ts', () => {
+  it('is nothing but export-from lines, from client.tsx, skeleton.tsx and types.ts', () => {
     expect(nonReexports(source)).toEqual([])
-    expect(importedModules(source).sort()).toEqual(['./client.js', './types.js'])
+    expect(importedModules(source).sort()).toEqual(['./client.js', './skeleton.js', './types.js'])
   })
 })
 
@@ -128,8 +128,8 @@ describe('lib.ts and classes.ts', () => {
     expect(importedModules(read('lib.ts'))).toEqual(['./types.js'])
   })
 
-  it('classes.ts takes the line, the hover, the label, the scroll area and the transition from src/shared', () => {
-    expect(importedNames(read('classes.ts'), '#shared/classes.js')).toEqual(['BORDER', 'HOVER', 'LABEL', 'SCROLL_AREA', 'TRANSITION'])
+  it('classes.ts takes the line, the forced edge, the hover, the label, the scroll area and the transition from src/shared', () => {
+    expect(importedNames(read('classes.ts'), '#shared/classes.js')).toEqual(['BORDER', 'FORCED_EDGE', 'HOVER', 'LABEL', 'SCROLL_AREA', 'TRANSITION'])
   })
 
   it('classes.ts names no physical side', () => {

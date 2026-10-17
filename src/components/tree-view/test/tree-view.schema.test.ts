@@ -1,8 +1,10 @@
 import { z } from 'zod'
 import { describe, expect, it } from 'vitest'
 
-import { TREE_VIEW_DEFAULTS, TREE_VIEW_ROW_ESTIMATE, TREE_VIEW_STATUSES, TYPEAHEAD_MS } from '../constants.js'
-import { treeViewSchema } from '../schema.js'
+import {
+  TREE_VIEW_DEFAULTS, TREE_VIEW_ROW_ESTIMATE, TREE_VIEW_SKELETON_DEFAULTS, TREE_VIEW_SKELETON_LEVELS, TREE_VIEW_STATUSES, TYPEAHEAD_MS,
+} from '../constants.js'
+import { treeViewSchema, treeViewSkeletonSchema } from '../schema.js'
 
 // R-8.3-3: the props table, the playground and registry.json all read this output.
 interface Property { description?: string, default?: unknown, enum?: unknown[], minimum?: number, maximum?: number }
@@ -58,5 +60,21 @@ describe('the schema and the constants agree', () => {
 
   it('keeps what is not built out of the schema: no size, no selectionMode, no indent', () => {
     for (const key of ['size', 'selectionMode', 'indent', 'showLines']) expect(Object.keys(treeViewSchema.shape), key).not.toContain(key)
+  })
+})
+
+describe('the skeleton schema', () => {
+  const skeleton = z.toJSONSchema(treeViewSkeletonSchema, { io: 'input' }) as { properties?: Record<string, Property & { type?: string }> }
+
+  it('documents one prop, rows: an integer bounded as visibleRows is, five by default (R-5.7-7)', () => {
+    expect(Object.keys(skeleton.properties ?? {})).toEqual(['rows'])
+    expect(skeleton.properties?.['rows']).toMatchObject({ type: 'integer', minimum: 1, maximum: 20, default: 5 })
+    expect((skeleton.properties?.['rows']?.description ?? '').length).toBeGreaterThan(30)
+  })
+
+  it('names the defaults and the levels it draws, so a changed constant is a failure here', () => {
+    expect(TREE_VIEW_SKELETON_DEFAULTS).toEqual({ rows: 5 })
+    expect(TREE_VIEW_SKELETON_LEVELS).toEqual([0, 1, 1, 0, 0])
+    expect(treeViewSkeletonSchema.parse({})).toEqual({ rows: 5 })
   })
 })

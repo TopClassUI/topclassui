@@ -12,7 +12,7 @@ import { FORCED_CANVAS, inkOn, pixelsOf } from './pixels.js'
 
 const DEMOS = [
   'tree-view--basic', 'tree-view--load-more', 'tree-view--long-content', 'tree-view--rtl', 'tree-view--selected',
-  'tree-view--status', 'tree-view--ten-thousand',
+  'tree-view--skeleton', 'tree-view--status', 'tree-view--ten-thousand',
 ]
 const SCREENS = [
   { width: 320, height: 480 }, { width: 390, height: 844 }, { width: 1280, height: 800 }, { width: 844, height: 390 },
