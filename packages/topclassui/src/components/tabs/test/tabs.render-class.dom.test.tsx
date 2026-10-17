@@ -9,7 +9,7 @@ describe("R-5.2-2: a render element's class follows the part's own and the consu
   it('the root, the list, the tab and the panel take the class their element was written with', () => {
     const { container } = render(
       <TabsRoot defaultValue="a" className="grid-cols-2" render={<section className="grid-cols-3" />}>
-        <TabsList render={<div className="gap-2" />}>
+        <TabsList aria-label="Settings" render={<div className="gap-2" />}>
           <TabsTab value="a" render={<button type="button" className="font-bold" />}>Account</TabsTab>
         </TabsList>
         <TabsPanel value="a" className="mt-2" render={<article className="mt-8" />}>Settings</TabsPanel>

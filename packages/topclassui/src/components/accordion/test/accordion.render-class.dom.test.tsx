@@ -9,7 +9,7 @@ describe("R-5.2-2: a render element's class follows the part's own and the consu
   it('the root and the item take the class their element was written with', () => {
     const { container } = render(
       <AccordionRoot className="bg-surface" render={<section className="bg-page" />}>
-        <AccordionItem title="Shipping" className="border-t-0" render={<article className="first:border-t" />}>Two days.</AccordionItem>
+        <AccordionItem value="shipping" title="Shipping" className="border-t-0" render={<article className="first:border-t" />}>Two days.</AccordionItem>
       </AccordionRoot>,
     )
     const root = container.querySelector('section')
