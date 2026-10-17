@@ -93,7 +93,7 @@ They arrive with the phases that need them.
 ### R-5.2-2 Merge with the configured cn()
 **Rule:** merge classes with `cn()` from `shared/cn.ts`, which uses `extendTailwindMerge`; the consumer's `className` is passed last.
 **Why:** tailwind-merge does not know the custom spacing and radius keys, so the default `twMerge` would keep both conflicting classes.
-**Enforced by:** unit test (`shared/cn.test.ts`) for the merge; eslint (`topclass/cn-class-name-last`) for the argument order
+**Enforced by:** unit test (`shared/cn.test.ts`) for the merge; eslint (`topclass/cn-class-name-last`) for the argument order; `shared/render-part.test.tsx` and a `render-class` test per part family for a `render` element's class
 
 ### R-5.2-3 Never build class names dynamically
 **Rule:** no `` `bg-${tone}` ``; use a lookup object or cva variants.
