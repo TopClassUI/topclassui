@@ -146,7 +146,7 @@ They arrive with the phases that need them.
 ### R-5.3-2 Directional motion uses --tc-dir
 **Rule:** translate, transform origin and gradient direction multiply by `--tc-dir`; `object-*` and `bg-*` positions use an `rtl:` variant, since no logical form exists.
 **Why:** these properties have no logical equivalent.
-**Enforced by:** `eslint` (`topclass/dir-aware-transforms`; the icon mirror, Base UI's measured origin and swipe offset are allowed, DECISIONS 2026-10-17)
+**Enforced by:** `eslint` (`topclass/dir-aware-transforms`; Base UI's measured origin and swipe offset are allowed, DECISIONS 2026-10-17)
 
 ### R-5.3-3 No letter-spacing
 **Rule:** no `tracking-*` anywhere inside `src/`.

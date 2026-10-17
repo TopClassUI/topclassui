@@ -208,9 +208,6 @@ function isConsumerStyle(node: Node): boolean {
  * A sibling export that is not a part: a skeleton or a state stands beside the component
  * rather than inside it, so `Card` next to `CardSkeleton` needs no `Root`.
  */
-/** R-5.3-2: the one rtl: class PLAN section 7 writes out, the mirror of a directional icon. */
-const ICON_MIRROR = 'rtl:-scale-x-100'
-
 /** An x that needs no direction: none, a zero, or the pointer offset Base UI measures in physical px. */
 const NEUTRAL_X = /^(-?0(px|%|rem)?|none|3d|var\(--[a-z]+-swipe-movement-x\b.*)$/
 
@@ -258,7 +255,7 @@ function findPhysicalMotion(value: string): { cls: string; hint: string } | unde
     const variants = splitAtColons(cls)
     const utility = (variants.pop() ?? '').replace(/^!/, '')
     if (variants.some((v) => DIR_VARIANT.test(v))) {
-      if (cls !== ICON_MIRROR && !POSITION.test(utility)) {
+      if (!POSITION.test(utility)) {
         return { cls, hint: 'uses a direction variant; only object-* and bg-* positions may, everything else multiplies by --tc-dir' }
       }
       continue
