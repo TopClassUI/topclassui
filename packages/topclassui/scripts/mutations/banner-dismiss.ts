@@ -4,31 +4,30 @@ import type { Mutation } from '../lib/mutate.js'
 const INDEX = 'src/components/banner/index.tsx'
 const CLIENT = 'src/components/banner/client.tsx'
 const HOOK = 'src/components/banner/hook.ts'
-const LIB = 'src/components/banner/lib.ts'
 const CLASSES = 'src/components/banner/classes.ts'
 
 export const MUTATIONS: Mutation[] = [
   {
     label: 'the banner dismiss hook stops reading the stored value, so a dismissed banner comes back on every page',
-    file: LIB,
+    file: HOOK,
     from: '    return localStorage.getItem(keyOf(id)) !== null',
     to: '    return false',
   },
   {
     label: 'the banner dismiss store writes without a guard, so blocked storage throws from the x',
-    file: LIB,
+    file: HOOK,
     from: "  try {\n    localStorage.setItem(keyOf(id), '1')\n  } catch {",
     to: "  localStorage.setItem(keyOf(id), '1')\n  try {\n    void 0\n  } catch {",
   },
   {
     label: 'the banner dismiss store keeps no memory, so with blocked storage the x hides nothing',
-    file: LIB,
+    file: HOOK,
     from: '  memory.add(id)\n',
     to: '',
   },
   {
     label: 'the banner dismiss store ignores the storage event, so a dismissal in another tab never reaches this one',
-    file: LIB,
+    file: HOOK,
     from: "  addEventListener('storage', listener)\n",
     to: '',
   },
