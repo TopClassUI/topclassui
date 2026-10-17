@@ -339,7 +339,7 @@ They arrive with the phases that need them.
 ### R-5.6-1 WCAG 2.2 AA
 **Rule:** keyboard behaviour follows the ARIA Authoring Practices; a visible `focus-visible` ring on every interactive element; types enforce labels.
 **Why:** it is a promise of the library, not an extra.
-**Enforced by:** `e2e/keyboard-<slug>.spec.ts` for the interactive components of Units 3 to 5, which press every key the Authoring Practices pattern lists in both directions and read the computed `focus-visible` ring on each stop; `e2e/focus-ring.spec.ts` for Button; `axe` covers the ARIA attributes in `test:e2e`; the rest of Units 1 and 2 is manual
+**Enforced by:** `e2e/keyboard-<slug>.spec.ts` for the interactive components of Units 3 to 5, which press every key the Authoring Practices pattern lists in both directions and read the computed `focus-visible` ring on each stop; `e2e/input.spec.ts` and `e2e/table.spec.ts` for Input and Table; `e2e/focus-ring.spec.ts` for Button; `scripts/lib/keyboard-proof.test` fails when an interactive component of Unit 5 has no such spec; `axe` covers the ARIA attributes in `test:e2e`; the rest of Units 1 and 2 is manual
 
 ### R-5.6-2 Target size
 **Rule:** every interactive element is at least 24x24 CSS px on every pointer type and 44px under `pointer-coarse`. The floor is a px token with a px fallback, never a rem step, because the success criterion is written in CSS px.
