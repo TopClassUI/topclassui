@@ -68,7 +68,7 @@ describe('a server-rendered NumberField hydrates cleanly', () => {
 
 describe('every demo renders and hydrates', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'form', 'limits', 'row', 'rtl', 'sizes', 'states'])
+    expect(names).toEqual(['basic', 'form', 'limits', 'playground', 'row', 'rtl', 'sizes', 'states'])
   })
 
   for (const [name, Demo] of DEMOS) {

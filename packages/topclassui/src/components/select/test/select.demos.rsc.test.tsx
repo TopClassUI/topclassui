@@ -57,7 +57,7 @@ const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { 
 
 describe('every demo is a Server Component that only hands the Select what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'form', 'four-rows', 'long-content', 'phase-4-form', 'rtl', 'sixty-items', 'sizes', 'states'])
+    expect(names).toEqual(['basic', 'form', 'four-rows', 'long-content', 'phase-4-form', 'playground', 'rtl', 'sixty-items', 'sizes', 'states'])
   })
 
   for (const name of names) {

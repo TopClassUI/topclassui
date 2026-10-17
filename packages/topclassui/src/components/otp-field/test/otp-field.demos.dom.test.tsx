@@ -14,6 +14,7 @@ const names = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
  * tab stop to its length, a numeric one drops the letters, and a disabled or read-only one keeps its default. */
 const AFTER: Record<string, string[]> = {
   'basic': ['482193'],
+  'playground': ['482193'],
   'form': ['482193'],
   'grouped': ['482193'],
   'long': ['4821930ab'],

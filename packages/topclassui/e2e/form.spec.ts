@@ -11,7 +11,7 @@ import { urlFor } from './pages.js'
 // What happy-dom cannot do: post a form with no script and read what the browser sent, React's reset in a real
 // browser, the focus after an answer, a submit replayed after a late script, and where the fields land on a screen.
 
-const DEMOS = ['basic', 'form-action', 'server-errors'].map((name) => `form--${name}`)
+const DEMOS = ['basic', 'form-action', 'rtl', 'server-errors'].map((name) => `form--${name}`)
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
 
 const field = (page: Page, name: string) => page.getByRole('textbox', { name, exact: true })

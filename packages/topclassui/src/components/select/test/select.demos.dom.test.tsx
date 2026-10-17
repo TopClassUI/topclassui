@@ -18,6 +18,7 @@ const AFTER: Record<string, string[]> = {
   'four-rows': ['December'],
   'long-content': ['Southern office'],
   'phase-4-form': ['Morocco'],
+  'playground': ['Saudi Arabia'],
   'rtl': ['السعودية'],
   'sixty-items': ['Option 60'],
   'sizes': ['Team', 'Team', 'Team', 'Team', 'Team'],
