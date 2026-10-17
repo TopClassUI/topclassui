@@ -47,10 +47,10 @@ function hooksByPart(source: string): Record<string, string[]> {
 }
 
 describe('the folder holds what Switch needs and nothing else (R-8.1-1)', () => {
-  it('a hook.ts, and no boundaries, lib, variants or skeleton', () => {
+  it('a hook.ts and a skeleton, and no boundaries, lib or variants', () => {
     expect(readdirSync(FOLDER).sort()).toEqual([
       'README.md', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'meta.ts', 'schema.ts',
-      'test', 'types.ts',
+      'skeleton.tsx', 'test', 'types.ts',
     ])
   })
 })
@@ -63,9 +63,22 @@ describe('index.tsx re-exports and holds no markup (R-5.1-2)', () => {
     expect(hasLateUseClient(source)).toBe(false)
   })
 
-  it('is nothing but export-from lines, from client.tsx and types.ts', () => {
+  it('is nothing but export-from lines, from client.tsx, skeleton.tsx and types.ts', () => {
     expect(nonReexports(source)).toEqual([])
-    expect(importedModules(source).sort()).toEqual(['./client.js', './types.js'])
+    expect(importedModules(source).sort()).toEqual(['./client.js', './skeleton.js', './types.js'])
+  })
+})
+
+describe('skeleton.tsx is a server file (R-5.7-3)', () => {
+  const source = read('skeleton.tsx')
+
+  it('has no use client and calls no hook, so a Server Component can render it as a fallback', () => {
+    expect(hasUseClient(source)).toBe(false)
+    expect(hooksByPart(source)).toEqual({ SwitchSkeleton: [] })
+  })
+
+  it('imports nothing from client.tsx, hook.ts or Base UI, so no script ships with it', () => {
+    expect(importedModules(source).filter((m) => m.includes('client') || m.includes('hook') || m.startsWith('@base-ui/'))).toEqual([])
   })
 })
 
@@ -127,7 +140,7 @@ describe('hook.ts holds the value of the switch (R-5.12-1)', () => {
 describe('classes.ts builds every string from the shared toggle constants (R-5.2-4)', () => {
   it('takes the target, the box, the checked fill, the invalid line and the transition from src/shared', () => {
     expect(importedNames(read('classes.ts'), '#shared/classes.js')).toEqual([
-      'TOGGLE_BOX', 'TOGGLE_INVALID', 'TOGGLE_ON', 'TOGGLE_TARGET', 'TRANSITION',
+      'FORCED_EDGE', 'TOGGLE_BOX', 'TOGGLE_INVALID', 'TOGGLE_ON', 'TOGGLE_TARGET', 'TOUCH_TARGET', 'TRANSITION',
     ])
   })
 

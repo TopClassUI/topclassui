@@ -14,7 +14,7 @@ import { FORCED_CANVAS, contrast, inkOn, pixelsOf, rgbOf, ringRow } from './pixe
 
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['switch--basic', 'switch--form', 'switch--rtl', 'switch--sizes', 'switch--states', 'switch--unchecked-value'] as const
+const DEMOS = ['switch--basic', 'switch--form', 'switch--rtl', 'switch--sizes', 'switch--skeleton', 'switch--states', 'switch--unchecked-value'] as const
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 
 const switchOf = (page: Page, name: string) => page.getByRole('switch', { name, exact: true })
@@ -493,5 +493,26 @@ test.describe('axe on the hydrated demos', () => {
         expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([])
       })
     }
+  }
+})
+
+test.describe('the skeleton', () => {
+  for (const pointer of ['fine', 'coarse'] as const) {
+    test.describe(`${pointer} pointer`, () => {
+      test.use(pointer === 'coarse' ? COARSE : {})
+
+      test('is the box of the switch it stands in for at every size: the target and the track', async ({ page }) => {
+        await page.goto(urlFor('switch--skeleton', 'light', 'ltr'))
+        const pairs = await page.locator('[data-pair]').evaluateAll((all) => all.map((pair) => {
+          const size = (el: Element | null) => { const r = el?.getBoundingClientRect() ?? new DOMRect(); return [Math.round(r.width * 10) / 10, Math.round(r.height * 10) / 10] }
+          const real = pair.querySelector('[role="switch"]')
+          const skeleton = pair.querySelector('span[aria-hidden]')
+          return [pair.getAttribute('data-pair'), [size(real), size(real?.querySelector(':scope > span') ?? null)], [size(skeleton), size(skeleton?.querySelector('span') ?? null)]]
+        }))
+        expect(pairs.map(([name]) => name)).toEqual([...SIZES])
+        for (const [name, real, skeleton] of pairs) expect(skeleton, String(name)).toEqual(real)
+        expect((pairs[0]?.[1] as number[][])[0]?.[1]).toBe(pointer === 'coarse' ? 44 : 24)
+      })
+    })
   }
 })

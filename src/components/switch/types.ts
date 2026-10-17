@@ -1,5 +1,5 @@
 import type { Switch as Base } from '@base-ui/react/switch'
-import type { Ref } from 'react'
+import type { ComponentPropsWithRef, Ref } from 'react'
 
 import type { ControlName } from '#shared/contracts/name.js'
 import type { SwitchSchemaInput } from './schema.js'
@@ -31,3 +31,8 @@ export type SwitchValueProps = Pick<Base.Root.Props, 'checked' | 'defaultChecked
 
 /** What Base UI hands a change handler: the reason, the event, and cancel(). */
 export type SwitchChangeDetails = Base.Root.ChangeEventDetails
+
+/** R-8.3-4: the control's own size, so the two cannot describe different boxes. */
+export type SwitchSkeletonProps =
+  Omit<ComponentPropsWithRef<'span'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
+  & Pick<SwitchDesignProps, 'size'>

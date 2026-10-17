@@ -4,6 +4,7 @@ import type { Mutation } from '../lib/mutate.js'
 const CLIENT = 'src/components/switch/client.tsx'
 const HOOK = 'src/components/switch/hook.ts'
 const CLASSES = 'src/components/switch/classes.ts'
+const SKELETON = 'src/components/switch/skeleton.tsx'
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -77,5 +78,23 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: "  custom: '@container',",
     to: "  custom: '',",
+  },
+  {
+    label: 'the switch skeleton draws an md track at every size, so an xl switch jumps when it arrives',
+    file: SKELETON,
+    from: 'SWITCH_TRACK_SIZE[size]',
+    to: 'SWITCH_TRACK_SIZE.md',
+  },
+  {
+    label: 'the switch skeleton loses the target floor, so under a finger it is 20 px shorter than its switch',
+    file: CLASSES,
+    from: 'items-center justify-center ${TOUCH_TARGET}`',
+    to: 'items-center justify-center`',
+  },
+  {
+    label: 'the switch skeleton takes aria-hidden from the caller, so a placeholder can be read out',
+    file: SKELETON,
+    from: '{...rest} aria-hidden>',
+    to: 'aria-hidden {...rest}>',
   },
 ]

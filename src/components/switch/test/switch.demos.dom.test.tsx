@@ -16,6 +16,7 @@ const AFTER: Record<string, string[]> = {
   'form': ['false'],
   'rtl': ['false', 'true'],
   'sizes': ['false', 'false', 'false', 'false', 'false'],
+  'skeleton': ['true', 'true', 'true', 'true', 'true'],
   'states': ['true', 'false', 'true', 'false', 'false', 'true', 'true'],
   'unchecked-value': ['true'],
 }

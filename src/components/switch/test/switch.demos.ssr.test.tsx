@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'rtl', 'sizes', 'states', 'unchecked-value']
+const EXPECTED = ['basic', 'form', 'rtl', 'sizes', 'skeleton', 'states', 'unchecked-value']
 
 /** Each switch of each demo, as the server writes it: its name, by aria-label or by the label that points at its id, and its state. */
 const SWITCHES: Record<string, string[]> = {
@@ -19,6 +19,7 @@ const SWITCHES: Record<string, string[]> = {
   'form': ['Weekly digest: true'],
   'rtl': ['الملخص الأسبوعي: true', 'راسلني عند الإشارة إليّ: false'],
   'sizes': ['Extra small: true', 'Small: true', 'Medium: true', 'Large: true', 'Extra large: true'],
+  'skeleton': ['Notifications, xs: false', 'Notifications, sm: false', 'Notifications, md: false', 'Notifications, lg: false', 'Notifications, xl: false'],
   'states': ['Off: false', 'On: true', 'Invalid: false', 'Invalid, on: true', 'Disabled: false', 'Disabled, on: true', 'Read-only: true'],
   'unchecked-value': ['Product news: false'],
 }
@@ -71,6 +72,12 @@ describe('the demos the plan names', () => {
 
   it('unchecked-value: an off switch with an input of type hidden that sends no', async () => {
     expect(await render('unchecked-value')).toContain('<input type="hidden" name="news" value="no"/>')
+  })
+
+  it('skeleton: each switch beside a hidden skeleton of the same size, five pairs', async () => {
+    const html = await render('skeleton')
+    expect([...html.matchAll(/data-pair="([^"]*)"/g)].map(([, size]) => size)).toEqual(['xs', 'sm', 'md', 'lg', 'xl'])
+    expect(html.match(/<span class="[^"]*" aria-hidden="true"><span class="[^"]*"><\/span><\/span>/g)).toHaveLength(5)
   })
 
   it('rtl: an island that carries the direction and the language', async () => {

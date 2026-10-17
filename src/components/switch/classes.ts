@@ -1,5 +1,5 @@
 // R-5.12-4: the class strings of the switch, built from the shared toggle constants (unit-4.md, Switch).
-import { TOGGLE_BOX, TOGGLE_INVALID, TOGGLE_ON, TOGGLE_TARGET, TRANSITION } from '#shared/classes.js'
+import { FORCED_EDGE, TOGGLE_BOX, TOGGLE_INVALID, TOGGLE_ON, TOGGLE_TARGET, TOUCH_TARGET, TRANSITION } from '#shared/classes.js'
 
 /** The button that takes the press: 24 px, 44 under a coarse pointer, as wide as its track. */
 export const SWITCH_ROOT = TOGGLE_TARGET
@@ -31,3 +31,9 @@ export const SWITCH_SLIDE = {
   xl: 'group-data-checked/toggle:translate-x-[calc(1.3125rem*var(--tc-density)*var(--tc-dir))]',
   custom: 'group-data-checked/toggle:translate-x-[calc((100cqw-100%)*var(--tc-dir))]',
 } as const
+
+/** The skeleton's target: the floor of the button it stands in for, 24 px and 44 under a finger, around the track. */
+export const SWITCH_SKELETON = `inline-flex w-fit shrink-0 items-center justify-center ${TOUCH_TARGET}`
+
+/** The track's own box in the neutral fill, which pulses. Its size is SWITCH_TRACK_SIZE, as the switch's is. */
+export const SWITCH_SKELETON_TRACK = `block rounded-full bg-neutral-soft animate-pulse motion-reduce:animate-none ${FORCED_EDGE}`
