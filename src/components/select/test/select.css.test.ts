@@ -94,9 +94,9 @@ describe('the list (R-10.5-1)', () => {
 })
 
 describe('a row', () => {
-  it('is 44 px under a finger', () => {
-    const cls = 'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]'
-    expect(ruleOf(selectorOf(cls))).toBe('min-height: var(--tc-target-coarse,44px);')
+  it('is at least 44 px under a finger, and never shorter than its row height', () => {
+    const cls = 'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]'
+    expect(ruleOf(selectorOf(cls))).toBe('min-height: max(var(--tc-row-height), var(--tc-target-coarse,44px));')
     expect(mediaOf(selectorOf(cls))).toBe('@media (pointer: coarse)')
     expect(SELECT_ITEM.split(' ')).toContain(cls)
   })

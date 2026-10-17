@@ -33,6 +33,14 @@ describe('on the server', () => {
     expect(hidden(out)).toContain('tabindex="-1"')
   })
 
+  it('a value whose option is in no loaded page shows an empty input, and the hidden input still sends it', () => {
+    const out = html({ name: 'framework', defaultValue: 'zz-not-loaded' })
+    expect(attr(input(out), 'value')).toBe('')
+    expect(hidden(out)).toMatch(/name="framework" value="zz-not-loaded"/)
+    expect(attr(input(html({ value: 'zz-not-loaded' })), 'value')).toBe('')
+    expect(attr(input(html({ value: 'astro' })), 'value')).toBe('Astro')
+  })
+
   it('caps the typed query at 256 by default (R-5.7-8); the caller\'s number wins, and null removes the cap', () => {
     expect(attr(input(html()), 'maxLength')).toBe('256')
     expect(attr(input(html({ maxLength: 40 })), 'maxLength')).toBe('40')

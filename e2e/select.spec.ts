@@ -334,6 +334,18 @@ test.describe('live: where the list opens', () => {
       expect((await boxOf(trigger)).height).toBe(44)
       await expectInsideViewport(popup, 'the list', 8)
     })
+
+    test('a row the root or the density makes taller than 44 px keeps its height: a finger raises a row, never shortens it', async ({ page }) => {
+      await openLive(page, 'select--sixty-items')
+      await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
+      let popup = await openList(page, combo(page), 'tap')
+      expect((await boxOf(popup.getByRole('option').first())).height).toBe(80)
+      await page.keyboard.press('Escape')
+      await expect(popup).toBeHidden()
+      await page.evaluate(() => { document.documentElement.style.fontSize = ''; document.documentElement.style.setProperty('--tc-density', '1.25') })
+      popup = await openList(page, combo(page), 'tap')
+      expect((await boxOf(popup.getByRole('option').first())).height).toBe(50)
+    })
   })
 
   for (const direction of DIRECTIONS) {
