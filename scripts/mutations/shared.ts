@@ -375,6 +375,18 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
+    label: 'the name contract: ControlName stops asking for a name, so an unlabelled Input compiles',
+    file: 'src/shared/contracts/name.ts',
+    from: "    id: string\n    'aria-label'?: string | undefined",
+    to: "    id?: string | undefined\n    'aria-label'?: string | undefined",
+  },
+  {
+    label: 'the name contract: GroupName makes both names optional, so an unnamed tabs list compiles',
+    file: 'src/shared/contracts/name.ts',
+    from: "    'aria-label'?: string | undefined\n    /** The id of the visible text that names the group. */\n    'aria-labelledby': string",
+    to: "    'aria-label'?: string | undefined\n    /** The id of the visible text that names the group. */\n    'aria-labelledby'?: string | undefined",
+  },
+  {
     label: 'the drawer leaves the one overlay layer for 40, so a sheet opened from a dialog or a popover is drawn under it',
     file: 'src/tokens.css',
     from: '  --tc-z-drawer: var(--tc-z-popup);',

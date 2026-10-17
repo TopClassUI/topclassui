@@ -33,12 +33,6 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
-    label: 'the Input type stops asking for a name, so an unlabelled one compiles',
-    file: 'src/components/input/types.ts',
-    from: "    id: string\n    'aria-label'?: string | undefined",
-    to: "    id?: string | undefined\n    'aria-label'?: string | undefined",
-  },
-  {
     label: 'the input skeleton is full width again, so it is three times the field it stands in for',
     file: 'src/components/input/skeleton.tsx',
     from: "fullWidth ? 'w-full' : INPUT_OWN_WIDTH,",

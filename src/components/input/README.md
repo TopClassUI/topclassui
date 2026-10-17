@@ -75,8 +75,8 @@ Required: `aria-label` or `aria-labelledby` or `id`. Every other prop below is o
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `aria-label` | **yes**, or `aria-labelledby` or `id` | `string` | - | The name read out when no visible label names the input. |
-| `aria-labelledby` | **yes**, or `aria-label` or `id` | `string` | - | The id of the visible text that names the input. |
+| `aria-label` | **yes**, or `aria-labelledby` or `id` | `string` | - | The name read out when no visible label names the control. |
+| `aria-labelledby` | **yes**, or `aria-label` or `id` | `string` | - | The id of the visible text that names the control. |
 | `id` | **yes**, or `aria-label` or `aria-labelledby` | `string` | - | The id a `<label htmlFor>` points at. |
 | `fullWidth` | no | `boolean` | `false` | Stretches the input to the width of its container. |
 | `invalid` | no | `boolean` | `false` | Marks the value as wrong: sets aria-invalid, and the border turns to danger and thickens. |

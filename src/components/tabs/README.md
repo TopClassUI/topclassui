@@ -100,8 +100,8 @@ Required: `aria-label` or `aria-labelledby` on `TabsList`. Every other prop belo
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `aria-label` | **yes**, or `aria-labelledby` | `string` | - | The name read out when no visible text names the tabs. |
-| `aria-labelledby` | **yes**, or `aria-label` | `string` | - | The id of the visible text that names the tabs. |
+| `aria-label` | **yes**, or `aria-labelledby` | `string` | - | The name read out when no visible text names the group. |
+| `aria-labelledby` | **yes**, or `aria-label` | `string` | - | The id of the visible text that names the group. |
 
 ### TabsPanel
 

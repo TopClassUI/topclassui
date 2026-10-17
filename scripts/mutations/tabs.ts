@@ -300,12 +300,6 @@ export const MUTATIONS: Mutation[] = [
     to: 'className={cn(className, TABS_PANEL)}',
   },
   {
-    label: 'a tabs list no longer needs a name: both aria-label and aria-labelledby are optional',
-    file: 'src/components/tabs/types.ts',
-    from: "    'aria-label'?: string | undefined\n    /** The id of the visible text that names the tabs. */\n    'aria-labelledby': string",
-    to: "    'aria-label'?: string | undefined\n    /** The id of the visible text that names the tabs. */\n    'aria-labelledby'?: string | undefined",
-  },
-  {
     label: 'tabs default to the enclosed look instead of the line one',
     file: 'src/components/tabs/constants.ts',
     from: "  variant: 'line',",
