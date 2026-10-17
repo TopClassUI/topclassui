@@ -22,6 +22,7 @@ const config = [
       'topclass/semantic-classes-only': 'error',
       'topclass/no-dynamic-class-names': 'error',
       'topclass/shared-class-constants': 'error',
+      'topclass/bare-data-variants': 'error',
       'topclass/no-enum': 'error',
       'topclass/one-line-comments': 'error',
       'topclass/icon-loaders-stay-server': 'error',
@@ -551,6 +552,39 @@ describe('R-5.7-6: states are presence attributes', () => {
   for (const code of good) {
     it(`allows ${code}`, () => {
       expect(ids(code).filter((r) => r?.startsWith('topclass/')), code).toEqual([])
+    })
+  }
+})
+
+describe('R-5.2-6: data and aria variants are bare', () => {
+  const bad: [string, string, string][] = [
+    ['data-[open]:', '<div className="data-[open]:opacity-100" />', '"data-open:"'],
+    ['aria-[busy]:', '<div className="aria-[busy]:cursor-progress" />', '"aria-busy:"'],
+    ['group-data-[panel-open]:', '<div className="group-data-[panel-open]:block" />', '"group-data-panel-open:"'],
+    ['peer-aria-[invalid]:', 'const c = cn("peer-aria-[invalid]:text-danger")', '"peer-aria-invalid:"'],
+    ['a named group', '<div className="group-data-[open]/item:block" />', '"group-data-open/item:"'],
+    ['a stacked variant', 'const BOX_CLASSES = "p-2 rtl:data-[disabled]:opacity-50"', '"data-disabled:"'],
+    ['a class list outside a class context', 'const x = { root: "flex data-[highlighted]:bg-hover" }', '"data-highlighted:"'],
+  ]
+  for (const [label, code, hint] of bad) {
+    it(`fails on ${label} and names the bare form`, () => {
+      const messages = lint(code).filter((m) => m.ruleId === 'topclass/bare-data-variants')
+      expect(messages, code).toHaveLength(1)
+      expect(messages[0]?.message, code).toContain(hint)
+    })
+  }
+
+  const good = [
+    '<div className="data-open:opacity-100 aria-busy:cursor-progress group-data-panel-open:block" />',
+    '<div className="data-[state=open]:block" />',
+    '<div className="data-[size=custom]:h-auto aria-[current=page]:font-medium" />',
+    '<div className="group-data-[side=top]/item:block" />',
+    '<div className="[&[data-open]]:block" />',
+    '<div className="data-open:[--tc-x:1]" />',
+  ]
+  for (const code of good) {
+    it(`allows ${code}`, () => {
+      expect(ids(code).filter((r) => r === 'topclass/bare-data-variants'), code).toEqual([])
     })
   }
 })

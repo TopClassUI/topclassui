@@ -6,6 +6,14 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-17 - R-5.1-2 is checked, and icon-registry is its one exemption
+
+**Decision.** `check-structure` enforces R-5.1-2 (`scripts/lib/index-markup.ts`). A folder is C when its `meta.ts` says `rendering: 'client'`, PLAN 18's C; every folder under `src/connectors/` is covered whatever its meta says. Re-exporting `./client.js` does not mark a folder as C, because split components (Banner, Tag, Rating) do it beside their server markup. For a covered folder, every top-level statement of `index.tsx` is a re-export from a file of its own folder (`export ... from './...'`) or an `import type`; anything else is reported, as `markup` when it holds JSX. Twenty C folders already passed; `icon-registry` did not, and is exempt by name in `INDEX_MARKUP_EXEMPT`.
+
+**Why the exemption.** `icon-registry` is an entry point, not a catalog row (the 2026-09-25 and 2026-10-05 entries), and is `rendering: 'client'` because its registry is module state, not because it is a `'use client'` module. Its `<Icon>` and `registerIcons()` must share that module and stay directive-less: a `'use client'` file would turn `registerIcons` into a client reference that a server file cannot call. Moving `<Icon>` into a `client.tsx` would need that directive or an R-8.1-1 exception for a directive-less `client.tsx`. A test fails if the exempt entry ever stops holding markup, so the exemption cannot outlive its reason.
+
+**Affects** `scripts/check-structure.ts`, `scripts/lib/index-markup.ts` and its test, and `docs/RULES.md`.
+
 ## 2026-10-17 - R-5.3-2 is linted, with three allowances
 
 **Decision.** `topclass/dir-aware-transforms` rejects, in any class string under `src/`: a `translate-x-*` or two-axis `translate-*` whose x does not multiply by `--tc-dir`, the same inside an arbitrary `translateX()`, `translate()`, `translate3d()` or `[translate:]`; an origin on a physical side (`origin-left`, `origin-right`, `origin-top-left` and the arbitrary forms); a gradient pointed at a physical side (`bg-linear-to-r`, `bg-linear-to-l`, `bg-gradient-to-r`, `bg-gradient-to-l`, the diagonals, and an inline-axis angle unless it multiplies by `--tc-dir`); a direction variant (`rtl:`, `ltr:`, `[dir=rtl]`, `:dir()`) on anything but an `object-*` or `bg-*` position; and a physical `object-*` or `bg-*` position with no `rtl:` mirror in the same string. Three things pass by name: `rtl:-scale-x-100`, the mirror of a directional icon that PLAN section 7 writes out (Svg, Icon); an x of `var(--*-swipe-movement-x)`, the pointer offset Base UI measures in physical px for the swiped Drawer and Toast; and `origin-(--transform-origin)`, which Base UI measures from the anchor. A zero x and block-axis motion (`translate-y-*`, `translateY()`, `bg-linear-to-b`, 0 and 180 degrees) need no direction. Tests and demos are exempt, as for the other class rules.
