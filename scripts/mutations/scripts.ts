@@ -99,6 +99,12 @@ export const MUTATIONS: Mutation[] = [
     to: 'return []',
   },
   {
+    label: 'the mutation runner accepts an anchor found twice, so a row mutates only the first copy and the second goes untested',
+    file: 'scripts/lib/mutate.ts',
+    from: '    else if (found > 1) missing.push(',
+    to: '    else if (found < 0) missing.push(',
+  },
+  {
     label: 'the mutation runner judges a run that was killed or ran out of buffer',
     file: 'scripts/lib/mutate.ts',
     from: '  if (run.error || run.status === null) {',
