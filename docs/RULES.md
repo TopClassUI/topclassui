@@ -10,7 +10,7 @@ Each rule has an id, one line of rule, one line of reason, and what enforces it.
 
 ```
 pnpm check            every gate below, in order
-pnpm lint             eslint, including the thirteen custom rules
+pnpm lint             eslint, including the fifteen custom rules
 pnpm typecheck        tsc --noEmit
 pnpm test             vitest, four projects: node, dom, rsc, ssr
 pnpm check:structure  the folder contract and file sizes
@@ -56,7 +56,7 @@ They arrive with the phases that need them.
 ### R-5.1-2 Client components re-export through index
 **Rule:** for a C component or a connector, `index.tsx` holds no markup: it re-exports the client parts, the prop types, the variants and the skeleton.
 **Why:** `exports` resolves `*/index.js`, and a directive-less re-export of a client module is safe.
-**Enforced by:** not yet - planned: `check-structure`
+**Enforced by:** `scripts/check-structure.ts`, for every folder whose `meta.ts` says `rendering: 'client'` and every folder under `src/connectors/`: each statement of `index.tsx` is an `export ... from './...'` or an `import type`
 
 ### R-5.1-3 Only serializable props cross the boundary
 **Rule:** only serializable props cross the boundary: strings, numbers, booleans, plain objects, arrays and `ReactNode` children; functions never, except Server Actions.
@@ -113,7 +113,7 @@ They arrive with the phases that need them.
 ### R-5.2-6 Bare data and aria variants
 **Rule:** write `data-open:`, `group-data-panel-open:`, `aria-busy:`; brackets only for values.
 **Why:** it is the v4 idiom and the upgrade tool rewrites the bracket form.
-**Enforced by:** not yet - planned: `eslint`
+**Enforced by:** `eslint`
 
 ### R-4-1 Every authored rule sits in a cascade layer
 **Rule:** only custom-property declarations and `@keyframes` may be unlayered; other rules go in `@layer base` (tokens) or `@layer components` (react). `@utility` and `@custom-variant` count as layered, because Tailwind emits them into its own layers.
@@ -146,7 +146,7 @@ They arrive with the phases that need them.
 ### R-5.3-2 Directional motion uses --tc-dir
 **Rule:** translate, transform origin and gradient direction multiply by `--tc-dir`; `object-*` and `bg-*` positions use an `rtl:` variant, since no logical form exists.
 **Why:** these properties have no logical equivalent.
-**Enforced by:** not yet - planned: `eslint`
+**Enforced by:** `eslint` (`topclass/dir-aware-transforms`; the icon mirror, Base UI's measured origin and swipe offset are allowed, DECISIONS 2026-10-17)
 
 ### R-5.3-3 No letter-spacing
 **Rule:** no `tracking-*` anywhere inside `src/`.
@@ -183,7 +183,7 @@ They arrive with the phases that need them.
 ### R-5.7-4 Polymorphism through render
 **Rule:** server components accept the element form only, implemented with `renderElement`; client components may also accept the function form through `useRender`.
 **Why:** `useRender` calls hooks, so it can never appear in `index.tsx`.
-**Enforced by:** not yet - planned: `check-boundaries`
+**Enforced by:** `scripts/check-boundaries.ts`, which rejects a runtime `useRender` in any file without `'use client'` and a server file that takes `render` without `renderElement`; `tsc` keeps that `render` to the element form, since `renderElement` accepts only a `ReactElement`
 
 ### R-5.7-5 Public types are aliases derived at the seam
 **Rule:** `export type DialogRootProps = Omit<Base.Root.Props, 'className'> & OwnProps`; never re-export a Base UI type name and never hand-copy a primitive's prop list.

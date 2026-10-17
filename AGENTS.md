@@ -8,7 +8,7 @@ Read docs/STATUS.md first for where things stand. The full specification is docs
 
 ```
 pnpm check            every gate below, in order
-pnpm lint             eslint, including the thirteen custom rules
+pnpm lint             eslint, including the fifteen custom rules
 pnpm typecheck        tsc --noEmit
 pnpm test             vitest, four projects: node, dom, rsc, ssr
 pnpm check:structure  the folder contract and file sizes
@@ -47,7 +47,7 @@ They arrive with the phases that need them.
 ## 1. Server and client
 
 - **R-5.1-1** `index.tsx` never contains `'use client'`, never imports a React client hook (only `useId` and `use` are allowed) and never imports `./hook.js`. _(check-boundaries)_
-- **R-5.1-2** For a C component or a connector, `index.tsx` holds no markup: it re-exports the client parts, the prop types, the variants and the skeleton. _(not yet - planned: check-structure)_
+- **R-5.1-2** For a C component or a connector, `index.tsx` holds no markup: it re-exports the client parts, the prop types, the variants and the skeleton. _(check-structure, for every folder whose meta says rendering: 'client' and every folder under src/connectors/: each statement of index.tsx is an export ... from './...' or an import type)_
 - **R-5.1-3** Only serializable props cross the boundary: strings, numbers, booleans, plain objects, arrays and `ReactNode` children; functions never, except Server Actions. _(manual)_
 - **R-5.1-4** No React context in Server Components: direction and theme come from `dir` and `data-theme` on the HTML, and labels come from props. _(check-boundaries)_
 - **R-5.1-5** Only `components/icon/index.tsx` may be async or import `server-only`; every other `index.tsx` renders in a non-RSC React tree, and the sync `<Icon>` from `icon-registry` carries the identical props for browser-only trees. _(check-boundaries)_
@@ -61,7 +61,7 @@ They arrive with the phases that need them.
 - **R-5.2-3** No `` `bg-${tone}` ``; use a lookup object or cva variants. _(eslint)_
 - **R-5.2-4** Sizes, radius, border width, the focus ring, hover, transitions and scroll classes come from the knobs and `shared/classes.ts`; never `rounded-md`, `h-10`, `outline-2`, `border-2`, `duration-200`, or a hand-written `hover:` or `focus-visible:`. _(eslint)_
 - **R-5.2-5** `style` is only for setting a `--tc-*` variable. _(eslint)_
-- **R-5.2-6** Write `data-open:`, `group-data-panel-open:`, `aria-busy:`; brackets only for values. _(not yet - planned: eslint)_
+- **R-5.2-6** Write `data-open:`, `group-data-panel-open:`, `aria-busy:`; brackets only for values. _(eslint)_
 - **R-4-1** Only custom-property declarations and `@keyframes` may be unlayered; other rules go in `@layer base` (tokens) or `@layer components` (react). `@utility` and `@custom-variant` count as layered, because Tailwind emits them into its own layers. _(check-css)_
 - **R-4-2** Every `--tc-*` name referenced anywhere in `src/` is declared in `src/tokens.css`. _(check-css)_
 - **R-4-3** R-5.12-3 applies to `.css` files; no comment spans more than one line. _(check-css)_
@@ -70,7 +70,7 @@ They arrive with the phases that need them.
 ## 3. RTL
 
 - **R-5.3-1** `ps-`, `pe-`, `ms-`, `me-`, `inset-s-`, `inset-e-`, `text-start`, `border-s`, `rounded-s`; never physical `left`/`right`, never the deprecated `start-*`/`end-*`, never `space-x` or `divide-x`. _(eslint)_
-- **R-5.3-2** Translate, transform origin and gradient direction multiply by `--tc-dir`; `object-*` and `bg-*` positions use an `rtl:` variant, since no logical form exists. _(not yet - planned: eslint)_
+- **R-5.3-2** Translate, transform origin and gradient direction multiply by `--tc-dir`; `object-*` and `bg-*` positions use an `rtl:` variant, since no logical form exists. _(eslint)_
 - **R-5.3-3** No `tracking-*` anywhere inside `src/`. _(eslint)_
 - **R-5.3-4** Use the `placement` prop, which maps to Base UI's `side` and `align`; never `left` or `right` as a side. _(type; the eslint half does not exist)_
 - **R-13-1** The app mounts `TopClassProvider` at the root layout with `direction` and `locale` as props from the layout, never read from `document.dir` in an effect. _(not yet - the provider has a silent fallback instead of a warning)_
@@ -80,7 +80,7 @@ They arrive with the phases that need them.
 - **R-5.7-1** `variant`, `tone`, `size`, positive booleans (`disabled`, `loading`, `fullWidth`); events are `onValueChange` and `onOpenChange`; controlled pairs are `value`/`defaultValue` and `open`/`defaultOpen`. _(manual + type tests)_
 - **R-5.7-2** `size` is `xs | sm | md | lg | xl | custom`, default `md`, on every component that has a visual scale; `custom` emits no size classes. `<Icon>` takes the same five names against its own pixel values (`ICON_SIZE`: 16, 20, 24, 32, 40) and any CSS length, and is the only component whose default is `1em` rather than `md`. _(shared/contracts/size + type tests)_
 - **R-5.7-3** Every component accepts them and spreads the rest onto its root element; `ref` is a normal prop, never `forwardRef`. A skeleton is a component too. _(type tests and a render test per component; no check proves all 46 have one)_
-- **R-5.7-4** Server components accept the element form only, implemented with `renderElement`; client components may also accept the function form through `useRender`. _(not yet - planned: check-boundaries)_
+- **R-5.7-4** Server components accept the element form only, implemented with `renderElement`; client components may also accept the function form through `useRender`. _(check-boundaries, which rejects a runtime useRender in any file without 'use client' and a server file that takes render without renderElement; tsc keeps that render to the element form, since renderElement accepts only a ReactElement)_
 - **R-5.7-5** `export type DialogRootProps = Omit<Base.Root.Props, 'className'> & OwnProps`; never re-export a Base UI type name and never hand-copy a primitive's prop list. _(review; not linted)_
 - **R-5.7-6** Boolean presence attributes (`data-open`, `data-loading`, `data-disabled`), never `data-state="..."`; enumerated design props are value attributes (`data-variant`, `data-size`, `data-tone`). _(eslint)_
 - **R-5.7-7** Numeric props have `min` and `max` in the schema and are clamped at runtime with `clamp()`. _(unit test)_
