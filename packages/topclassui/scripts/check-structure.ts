@@ -1,8 +1,9 @@
-// R-8.1-1, R-5.12-2, R-5.12-4, R-9.2-4: the folder contract, file size and naming.
+// R-8.1-1, R-5.12-2, R-5.12-4, R-9.2-4, R-10.5-1, R-10.5-3: the folder contract, file size, naming and overlay parts.
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, posix, relative, sep } from 'node:path'
 
 import { FAIL_LINES, WARN_LINES, countLines, sizeVerdict, sourceFilesUnder } from './lib/file-sizes.js'
+import { categoryOf, exportedValueNames, missingBody, unpublishedStickyEdges } from './lib/overlay-parts.js'
 import { inlinePropInterfaces, screamingConstants } from './lib/source-checks.js'
 
 const ROOT = process.cwd()
@@ -125,6 +126,20 @@ function checkComponentFolder(dir: string, slug: string) {
         + ' A prop interface lives in types.ts and is re-exported (R-8.3-4).',
       )
     }
+  }
+
+  // R-9.2-4: a scrolling overlay exports the Body that scrolls.
+  if (files.includes('index.tsx')) {
+    const meta = files.includes('meta.ts') ? readFileSync(join(dir, 'meta.ts'), 'utf8') : ''
+    const problem = missingBody(slug, categoryOf(meta), exportedValueNames(readFileSync(join(dir, 'index.tsx'), 'utf8')))
+    if (problem) errors.push(`${rel(dir)}: ${problem}`)
+  }
+
+  // R-10.5-3: a folder that wears a sticky edge writes that edge's variable somewhere in its sources.
+  const sources = [...files.filter((f) => /\.tsx?$/.test(f) && !/\.test\.tsx?$/.test(f)).map((f) => join(dir, f)),
+    ...(dirs.includes('parts') ? listDir(join(dir, 'parts')).filter((e) => e.isFile()).map((e) => join(dir, 'parts', e.name)) : [])]
+  for (const variable of unpublishedStickyEdges(sources.map((f) => readFileSync(f, 'utf8')))) {
+    errors.push(`${rel(dir)}: wears a sticky edge and never writes ${variable}, which the page reads into scroll-padding-block (R-10.5-3).`)
   }
 
   // parts/: one component per file, named after the file.
