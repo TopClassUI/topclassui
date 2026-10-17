@@ -12,7 +12,8 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
-    "docs:check": "pnpm docs:data && pnpm typecheck && pnpm lint && pnpm test && next build && pnpm test:e2e"
+    "docs:check": "pnpm docs:data && pnpm typecheck && pnpm lint && pnpm test && next build && pnpm check:routes && pnpm test:e2e",
+    "check:routes": "tsx scripts/check-routes.ts"
   },
   "dependencies": {
     "next": "16.3.8",
