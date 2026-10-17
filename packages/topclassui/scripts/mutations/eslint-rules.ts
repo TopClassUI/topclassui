@@ -38,4 +38,22 @@ export const MUTATIONS: Mutation[] = [
     from: "if (kind === 'system' && variants.includes('forced-colors')) continue",
     to: "if (variants.includes('forced-colors')) continue",
   },
+  {
+    label: 'the tooltip rule stops looking inside expressions, so {ok && <a />} passes R-10.5-2',
+    file: 'eslint-rules/index.ts',
+    from: "if (node.type === 'JSXElement' || node.type === 'JSXFragment') return node",
+    to: "if (depth === 0 && (node.type === 'JSXElement' || node.type === 'JSXFragment')) return node",
+  },
+  {
+    label: 'the tooltip rule forgets renamed imports, so <Tip><a /></Tip> passes R-10.5-2',
+    file: 'eslint-rules/index.ts',
+    from: "if (names.has(String(node.imported?.name ?? ''))) names.add(String(node.local?.name ?? ''))",
+    to: "if (false) names.add(String(node.local?.name ?? ''))",
+  },
+  {
+    label: 'the tooltip rule ignores the children prop, so children={<a />} passes R-10.5-2',
+    file: 'eslint-rules/index.ts',
+    from: "if (attribute.type === 'JSXAttribute' && attribute.name?.name === 'children') flag(attribute.value, name)",
+    to: "if (false) flag(attribute.value, name)",
+  },
 ]

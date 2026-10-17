@@ -10,7 +10,7 @@ Each rule has an id, one line of rule, one line of reason, and what enforces it.
 
 ```
 pnpm check            every gate below, in order
-pnpm lint             eslint, including the fourteen custom rules
+pnpm lint             eslint, including the eighteen custom rules
 pnpm typecheck        tsc --noEmit
 pnpm test             vitest, four projects: node, dom, rsc, ssr
 pnpm check:structure  the folder contract and file sizes
@@ -56,7 +56,7 @@ They arrive with the phases that need them.
 ### R-5.1-2 Client components re-export through index
 **Rule:** for a C component or a connector, `index.tsx` holds no markup: it re-exports the client parts, the prop types, the variants and the skeleton.
 **Why:** `exports` resolves `*/index.js`, and a directive-less re-export of a client module is safe.
-**Enforced by:** not yet - planned: `check-structure`
+**Enforced by:** `scripts/check-structure.ts`, for every folder whose `meta.ts` says `rendering: 'client'` and every folder under `src/connectors/`: each statement of `index.tsx` is an `export ... from './...'` or an `import type`
 
 ### R-5.1-3 Only serializable props cross the boundary
 **Rule:** only serializable props cross the boundary: strings, numbers, booleans, plain objects, arrays and `ReactNode` children; functions never, except Server Actions.
@@ -81,7 +81,7 @@ They arrive with the phases that need them.
 ### R-9.2-4 The root of a part family is `<Name>Root`
 **Rule:** a component split into parts names its root `<Name>Root` without exception (`CardRoot`, `DialogRoot`, `AvatarRoot`), and a scrolling overlay names its parts `<Name>Header`, `<Name>Body` and `<Name>Footer`, where the Body is the scroll container R-10.5-1 requires.
 **Why:** one family naming its root `Card` while ten others use `XxxRoot` is the drift a cross-file audit catches and an author never does; an overlay without a Body has nothing to scroll.
-**Enforced by:** `eslint`, which reads the exported names; the `parts/` half is manual
+**Enforced by:** `eslint`, which reads the exported names; `check-structure`, which fails a scrolling overlay (Dialog, AlertDialog, Drawer, or any overlay exporting a Header or a Footer) whose `index.tsx` exports no `<Name>Body`; the `parts/` half is manual
 
 ## 2. Styling
 
@@ -113,7 +113,7 @@ They arrive with the phases that need them.
 ### R-5.2-6 Bare data and aria variants
 **Rule:** write `data-open:`, `group-data-panel-open:`, `aria-busy:`; brackets only for values.
 **Why:** it is the v4 idiom and the upgrade tool rewrites the bracket form.
-**Enforced by:** not yet - planned: `eslint`
+**Enforced by:** `eslint`
 
 ### R-4-1 Every authored rule sits in a cascade layer
 **Rule:** only custom-property declarations and `@keyframes` may be unlayered; other rules go in `@layer base` (tokens) or `@layer components` (react). `@utility` and `@custom-variant` count as layered, because Tailwind emits them into its own layers.
@@ -146,7 +146,7 @@ They arrive with the phases that need them.
 ### R-5.3-2 Directional motion uses --tc-dir
 **Rule:** translate, transform origin and gradient direction multiply by `--tc-dir`; `object-*` and `bg-*` positions use an `rtl:` variant, since no logical form exists.
 **Why:** these properties have no logical equivalent.
-**Enforced by:** not yet - planned: `eslint`
+**Enforced by:** `eslint` (`topclass/dir-aware-transforms`; the icon mirror, Base UI's measured origin and swipe offset are allowed, DECISIONS 2026-10-17)
 
 ### R-5.3-3 No letter-spacing
 **Rule:** no `tracking-*` anywhere inside `src/`.
@@ -183,7 +183,7 @@ They arrive with the phases that need them.
 ### R-5.7-4 Polymorphism through render
 **Rule:** server components accept the element form only, implemented with `renderElement`; client components may also accept the function form through `useRender`.
 **Why:** `useRender` calls hooks, so it can never appear in `index.tsx`.
-**Enforced by:** not yet - planned: `check-boundaries`
+**Enforced by:** `scripts/check-boundaries.ts`, which rejects a runtime `useRender` in any file without `'use client'` and a server file that takes `render` without `renderElement`; `tsc` keeps that `render` to the element form, since `renderElement` accepts only a `ReactElement`
 
 ### R-5.7-5 Public types are aliases derived at the seam
 **Rule:** `export type DialogRootProps = Omit<Base.Root.Props, 'className'> & OwnProps`; never re-export a Base UI type name and never hand-copy a primitive's prop list.
@@ -253,27 +253,27 @@ They arrive with the phases that need them.
 ### R-8.5-1 Lists use the collection contract
 **Rule:** any component that renders items uses `CollectionProps` and `useCollection`: the `--tc-list-rows` knob, windowing above the threshold, and optional page-by-page loading.
 **Why:** a component must never create ten thousand DOM nodes, and the app must not be forced to hand over every item at once.
-**Enforced by:** not yet - planned: `check-structure` + Playwright
+**Enforced by:** `check-structure`, which requires `useCollection` in the `hook.ts` of every folder whose props take `items`, `CollectionProps` or `MenuContract`, less the exemptions `docs/DECISIONS.md` records; `e2e/collections.spec.ts`, which keeps fewer than a hundred of ten thousand rows mounted and sees `loadMore` called at the end
 
 ### R-8.5-2 The app owns the data
 **Rule:** components never fetch, cache or paginate; they call `loadMore()` and render what they are given.
 **Why:** data belongs to the application, not to the design system.
-**Enforced by:** not yet - planned: `eslint`
+**Enforced by:** `eslint` (`topclass/no-fetch-in-components`, under `src/components`, `src/connectors` and `src/shared`)
 
 ### R-10.5-1 Overlays scroll inside themselves
 **Rule:** popups use `POPUP_BOUNDS` and the row cap, dialogs and drawers scroll their body with sticky header and footer, and every scroll container inside an overlay sets `overscroll-behavior: contain`.
 **Why:** the page must never scroll behind an open overlay.
-**Enforced by:** not yet - no overlay component exists yet
+**Enforced by:** `e2e/overlay-scroll.spec`, which proves in a browser that the Body of Dialog and Drawer is the scroll container between a header and a footer that keep their boxes, that Popover, Dropdown, Select, Combobox and DatePicker sit at the offset and the collision padding of `POPUP_BOUNDS` inside the room Base UI measured, with their lists inside the row cap, that Command caps its list under its input, and that every scroll container in an open overlay, the Toast viewport included, sets `overscroll-behavior: contain`; `check-structure` requires the Body
 
 ### R-10.5-2 Tooltips never scroll
 **Rule:** a tooltip is one or two lines of plain text; anything larger, or anything with a link or control, is a Popover.
 **Why:** a scrolling tooltip cannot be reached by pointer or keyboard.
-**Enforced by:** not yet - planned: `eslint`
+**Enforced by:** type (`TooltipPopupProps['children']` is `TooltipText`) + `eslint` (`tooltip-content-is-text`, on src, demos and the harness)
 
 ### R-10.5-3 Sticky bars set the scroll padding
 **Rule:** a sticky or fixed bar sets `--tc-sticky-top` or `--tc-sticky-bottom`, and the scroll container reads them into `scroll-padding-block`.
 **Why:** WCAG 2.4.11: a focused element must not be hidden behind a bar.
-**Enforced by:** not yet - no sticky or fixed bar exists yet
+**Enforced by:** `e2e/overlay-scroll.spec`, which proves that the sticky Navbar writes its height to `--tc-sticky-top` and the page reads both variables into `scroll-padding-block`; `check-structure`, which fails a folder that wears `STICKY_TOP` or `STICKY_BOTTOM` and never writes the matching variable
 
 ## 8. Code structure
 
