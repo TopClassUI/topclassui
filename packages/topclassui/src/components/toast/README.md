@@ -117,8 +117,10 @@ Every prop below is optional and falls back to the default shown.
 - `dummy/long-content.tsx`
 - `dummy/many.tsx`
 - `dummy/over-dialog.tsx`
+- `dummy/playground.tsx`
 - `dummy/promise.tsx`
 - `dummy/rtl.tsx`
+- `dummy/states.tsx`
 - `dummy/sticky.tsx`
 - `dummy/tones.tsx`
 - `dummy/with-action.tsx`

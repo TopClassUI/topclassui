@@ -11,7 +11,9 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['basic', 'dismissible', 'long-action', 'long-text', 'minimal', 'rtl', 'tones', 'with-action']
+const EXPECTED = [
+  'basic', 'dismissible', 'long-action', 'long-text', 'minimal', 'playground', 'rtl', 'states', 'tones', 'with-action',
+]
 
 // Rendered here, not inside a test: the first import is cold and can outlast the 5 s timeout.
 const HTML = new Map(await Promise.all(files.map(async (file) => {
