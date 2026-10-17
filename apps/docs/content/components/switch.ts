@@ -1,5 +1,5 @@
 // The hand-written data of one component page (docs-site S7), in en and ar.
-export const switchContent = {
+export const switchControl = {
   slug: 'switch',
   title: {
     en: 'Switch',

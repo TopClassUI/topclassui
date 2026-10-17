@@ -9,7 +9,7 @@ export const select = {
     en: 'One choice from a list of plain data. The popup stays inside the viewport and scrolls itself, seven rows tall by default.',
     ar: 'اختيار واحد من قائمة بيانات بسيطة. تبقى القائمة المنبثقة داخل الشاشة وتمرّر نفسها، بارتفاع سبعة صفوف افتراضيًا.',
   },
-  demos: ['basic', 'form', 'sizes', 'four-rows', 'sixty-items', 'long-content', 'phase-4-form', 'rtl'],
+  demos: ['basic', 'form', 'sizes', 'four-rows', 'sixty-items', 'long-content', 'rtl'],
   stageHeight: 5,
   note: {
     en: '`items` is plain data, so a server page can render a Select: no function crosses to the browser.',
