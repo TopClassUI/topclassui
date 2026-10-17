@@ -117,6 +117,19 @@ test('a live example hydrates: a segmented control in the examples answers a cli
   await expect(radios.nth(1)).toHaveAttribute('aria-checked', 'true')
 })
 
+test('Kbd: the keys of an English sentence keep its order on the Arabic page', async ({ page }) => {
+  await page.goto('/ar/docs/components/kbd')
+  const sentences = page.locator('section[aria-labelledby="examples"] p', { hasText: 'Press' })
+  await expect(sentences).toHaveCount(4)
+  for (const sentence of await sentences.all()) {
+    const keys = sentence.locator('kbd kbd, kbd:not(:has(kbd))')
+    const lefts = await keys.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().left))
+    const text = await sentence.textContent() ?? ''
+    expect(lefts, text).toHaveLength(2)
+    expect(lefts[0], text).toBeLessThan(lefts[1] ?? 0)
+  }
+})
+
 test('the density knob writes --tc-density on the examples only', async ({ page }) => {
   await page.goto('/en/docs/components/button')
   await page.getByRole('radiogroup', { name: 'Density' }).getByRole('radio', { name: 'Compact' }).click()
