@@ -130,7 +130,7 @@ are the final edit's):
   request creates (two label groups and nine keys, three tokens, `form-errors.ts`) does not
   exist yet. Among them, what the reviews made the file lean on: `useId` in the server
   `index.tsx` of Table, Tag and Textarea; `textarea.demos.rsc.test.tsx`, and none for
-  Progress; Rating's `lib.tsx` alone, tested as `rating.lib.test.ts`; Timeline's
+  Progress; Rating's `lib.ts` and its shared `parts/rating-star.tsx`, tested as `rating.lib.test.ts`; Timeline's
   `role="list"`; the `askedAt.current === count` guard of `useCollection`; Command's
   `hook.ts` imported by both `client.tsx` and its lazy part; `--color-ring` read through
   `@theme inline`; `common.close` and `common.required`; and react-dom 19.3.0's
@@ -322,14 +322,14 @@ Only what changes how these eight are built. The long forms are in the earlier f
   | Split | CodeBlock, Field, Form | Tag (CodeBlock imports its client part only when used), Textarea | the server markup, and `export { X } from './client.js'` for the client export |
   | Client | DatePicker, FileUpload, TreeView | Select (DatePicker's box and popup), Switch (the form tests), Combobox and Command (TreeView's window) | re-exports only (`R-5.1-2`) |
 
-  `client.tsx` is markup plus at most one hook call per part (`R-5.12-1`); a part in `parts/`
-  starts with `'use client'`, exports one component named after its file, is not
+  `client.tsx` is markup plus at most one hook call per part (`R-5.12-1`); a part that holds
+  client markup starts with `'use client'`, a part shared by both halves has no directive and
+  calls no hook but `useId` and `use`; a part exports one component named after its file, is not
   re-exported by `index.tsx`, and its hook calls count in `<slug>.client.test.ts`. `hook.ts`
-  writes no type argument in angle brackets. `lib.ts` imports no React; a helper that returns
-  JSX goes in `lib.tsx`. A folder then keeps every helper in that `lib.tsx`: it has `lib.ts`
-  or `lib.tsx`, never both, because `./lib.js` resolves to `lib.ts` first and the two would
-  compile to one `lib.js` (measured with the repo's `tsc`; Rating's `lib.tsx` is the model,
-  tested as `rating.lib.test.ts`). A folder whose only bounds are shared has no
+  writes no type argument in angle brackets. `lib.ts` imports no React; markup both halves
+  draw, such as Rating's star or Field's frame, is a part in `parts/`, never a helper in
+  `lib.ts`, and there is no `lib.tsx` (`./lib.js` would resolve to `lib.ts` first, and the
+  two would compile to one `lib.js`). A folder whose only bounds are shared has no
   `boundaries.ts`. No `variants.ts`: a lookup is a plain object in `classes.ts`. No
   `skeleton.tsx` (see Deferred).
 - **Folders, exports and `meta.ts`.** Every export is flat (`R-9.2-3`). None of the eight is
@@ -1012,7 +1012,7 @@ The look is this file's: nothing is drawn.
   types refuse the five without it. On the others it names what the label already names.
   `aria-describedby` lists the hint's id and then the error's, only those rendered.
   `aria-invalid` is `true` or absent.
-- **Ids.** `toFieldIds(controlId)` in `lib.tsx`, where `controlId` is `id ?? useId()`: the
+- **Ids.** `toFieldIds(controlId)` in `lib.ts`, where `controlId` is `id ?? useId()`: the
   label `<controlId>-label`, the hint `-hint`, the error `-err`. `R-5.1-1` allows `useId` in
   `index.tsx`, and Table, Tag and Textarea already call it there; React's server renderer
   and the client agree on it, so FieldLive hydrates with the same ids. Never from `name`
@@ -1035,7 +1035,7 @@ The look is this file's: nothing is drawn.
   | DatePicker | everything on the trigger button | both |
   | FileUpload | everything on the native file input | both |
 
-- **Markup**, written once in `renderField()` in `lib.tsx`, which both halves call: a `<div>`
+- **Markup**, written once in the part `FieldFrame` (`parts/field-frame.tsx`, no directive), which both halves render: a `<div>`
   with `FIELD_ROOT` and `FIELD_STACK` (or `FIELD_INLINE`). In it `<label id htmlFor>` with
   `FIELD_LABEL` (and `FIELD_LABEL_INLINE`), holding the label and, when `required`, a
   `<span aria-hidden="true">` with `FIELD_REQUIRED` and `<Svg icon={asterisk}
@@ -1072,7 +1072,7 @@ The look is this file's: nothing is drawn.
   ```
 
 - **FieldLive.** It calls one hook, `useFieldLive({ id, name, error })` in `hook.ts`, and
-  then `renderField()`. The hook makes the ids as Field does and takes the error from the
+  then renders `FieldFrame`. The hook makes the ids as Field does and takes the error from the
   prop, else from `useFormErrors()?.[name]`. An error from the form goes once the field's
   value changes, and comes back with the next result of the action, as Base UI's `errors`
   prop does; the hook keys that on the identity of the errors object. When new errors
@@ -1095,8 +1095,8 @@ The look is this file's: nothing is drawn.
   static page.
 - **RTL.** A grid and logical classes: with `inline` the control sits at the inline start.
 - **Files.** `index.tsx` (`Field`), `client.tsx` (`FieldLive`), `hook.ts` (`useFieldLive`),
-  `lib.tsx` (`toFieldIds`, `messagesOf`, `renderField`; no `lib.ts`: `./lib.js` resolves to
-  `lib.ts` first, and the two would compile to one `lib.js`), `classes.ts`,
+  `lib.ts` (`toFieldIds`, `messagesOf`, `describedByOf` and the form readers),
+  `parts/field-frame.tsx` (`FieldFrame`), `classes.ts`,
   `constants.ts` (`FIELD_DEFAULTS`), `schema.ts` (`required`, `inline`, `invalid`), `types.ts`
   (`FieldControl`, `FieldProps`, `FieldLiveProps`), `meta.ts`, `README.md`. No
   `boundaries.ts`. Demos: `basic` (an Input), `hint-error`, `required`, `inline` (a Checkbox
@@ -1121,7 +1121,7 @@ The look is this file's: nothing is drawn.
   of `1fr`, a `flex-1` column and a table cell; under forced colours the asterisk and the
   error icon are visible. Live: a click on the label of the `inline` Checkbox toggles it; a
   click on the label of an Input focuses it.
-- **Mutation.** `renderField` leaves the error's id out of `aria-describedby`: the server
+- **Mutation.** `describedByOf` leaves the error's id out of `aria-describedby`: the server
   render test catches it. A second row: FieldLive's error no longer goes after a change (the
   dom test). A third: the ids are built from `name` again (the server render test with two
   Fields of one name).

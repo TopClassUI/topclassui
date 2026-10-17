@@ -1173,7 +1173,7 @@ Surprising:
   scale, default `md`, passed to `Svg`. `readOnly`: default `true`. `labels?: Labels`,
   `locale?: string`. When `readOnly` is `false`: `defaultValue`, `onValueChange`, `name`,
   `disabled`, and a type that requires `aria-label` or `aria-labelledby`.
-- **One star**, from `lib.tsx`, used by both halves: a `<span>` with `relative inline-flex
+- **One star**, `RatingStar` in `parts/rating-star.tsx` (no directive), used by both halves: a `<span>` with `relative inline-flex
   shrink-0 text-line-strong` holding `<Svg icon={star} />`, and over it, for a full or a
   half star, a `<span aria-hidden>` with `absolute inset-y-0 inset-s-0 flex overflow-hidden
   text-warning-solid` and `w-full` or `w-1/2`, holding `<Svg icon={starFill} />` with
