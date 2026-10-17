@@ -1,8 +1,10 @@
-// R-8.1-1, R-5.12-2, R-5.12-4, R-9.2-4, R-10.5-1, R-10.5-3: the folder contract, file size, naming and overlay parts.
+// R-8.1-1, R-5.1-2, R-5.12-2, R-5.12-4, R-9.2-4, R-8.5-1, R-10.5-1, R-10.5-3: the folder contract, file size, naming, the collection contract and overlay parts.
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, posix, relative, sep } from 'node:path'
 
+import { collectionErrors } from './lib/collections.js'
 import { FAIL_LINES, WARN_LINES, countLines, sizeVerdict, sourceFilesUnder } from './lib/file-sizes.js'
+import { INDEX_MARKUP_EXEMPT, indexMarkupViolations, isClientRendering } from './lib/index-markup.js'
 import { categoryOf, exportedValueNames, missingBody, unpublishedStickyEdges } from './lib/overlay-parts.js'
 import { inlinePropInterfaces, screamingConstants } from './lib/source-checks.js'
 
@@ -126,6 +128,24 @@ function checkComponentFolder(dir: string, slug: string) {
         + ' A prop interface lives in types.ts and is re-exported (R-8.3-4).',
       )
     }
+  }
+
+  // R-5.1-2: a C component or a connector keeps its markup out of index.tsx.
+  const isClient = dir.startsWith(CONNECTORS)
+    || (files.includes('meta.ts') && isClientRendering(readFileSync(join(dir, 'meta.ts'), 'utf8')))
+  if (isClient && files.includes('index.tsx') && !INDEX_MARKUP_EXEMPT.has(slug)) {
+    for (const v of indexMarkupViolations(readFileSync(join(dir, 'index.tsx'), 'utf8'))) {
+      errors.push(
+        `${rel(join(dir, 'index.tsx'))}: ${v}.`
+        + ' A C component or a connector re-exports its client parts, types, variants and skeleton (R-5.1-2).',
+      )
+    }
+  }
+
+  // R-8.5-1: a component that renders items windows them through useCollection in its hook, or is exempt by decision.
+  const source = (f: string) => (files.includes(f) ? readFileSync(join(dir, f), 'utf8') : null)
+  for (const error of collectionErrors({ slug, types: source('types.ts'), hook: source('hook.ts') })) {
+    errors.push(`${rel(dir)}: ${error} (R-8.5-1).`)
   }
 
   // R-9.2-4: a scrolling overlay exports the Body that scrolls.
