@@ -697,6 +697,50 @@ test.describe('focus', () => {
   }
 })
 
+// The sheet's trigger sits in the dialog and is itself open: a guard that read the role of every dialog found it there
+// and cancelled the sheet's own close, so the key closed nothing. Each root now looks inside its own popup only.
+test.describe('a sheet inside a dialog', () => {
+  const titles = (page: Page) => page.locator('[role="dialog"][data-open] h2').allTextContents()
+  const tooltip = (page: Page) => page.locator('[data-placement][data-open]:not([role])')
+  const escape = async (page: Page, left: string[]) => {
+    await page.keyboard.press('Escape')
+    await expect.poll(() => titles(page)).toEqual(left)
+  }
+
+  /** e2e/fixtures/drawer-nested.tsx with its dialog open and, inside it, its sheet: both from the keyboard. */
+  async function nested(page: Page): Promise<Locator> {
+    await openLive(page, 'separator--horizontal')
+    await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/drawer-nested.tsx' })
+    await openOverlay(page, triggerOf(page, 'Settings', '#nested-drawer'), { by: 'keyboard' })
+    const sheet = await openOverlay(page, triggerOf(page, 'Share', 'body'), { by: 'keyboard' })
+    expect(await titles(page)).toEqual(['Project settings', 'Share this project'])
+    return sheet
+  }
+
+  test('focus back on its trigger: the first Escape closes the sheet and leaves the dialog open, the second the dialog', async ({ page }) => {
+    await nested(page)
+    await page.keyboard.press('Shift+Tab')
+    await expect(triggerOf(page, 'Share', 'body')).toBeFocused()
+
+    await escape(page, ['Project settings'])
+    await escape(page, [])
+  })
+
+  // From the keyboard: the dialog's viewport stands above every sheet (--tc-z-dialog over --tc-z-drawer) and takes the pointer.
+  test('a tooltip open inside the sheet closes first, then the sheet, then the dialog', async ({ page }) => {
+    const sheet = await nested(page)
+    await page.keyboard.press('Tab')
+    await expect(sheet.locator('button[aria-label="Copy link"]')).toBeFocused()
+    await expect(tooltip(page)).toHaveText('Copy link')
+
+    await page.keyboard.press('Escape')
+    await expect(tooltip(page)).toHaveCount(0)
+    expect(await titles(page)).toEqual(['Project settings', 'Share this project'])
+    await escape(page, ['Project settings'])
+    await escape(page, [])
+  })
+})
+
 test.describe('a mouse', () => {
   test('dragged on the header it moves the sheet and selects no text; dragged in the body it selects text and the sheet stays', async ({ page }) => {
     const popup = await open(page, 'drawer--end')
@@ -706,6 +750,8 @@ test.describe('a mouse', () => {
     await page.mouse.move(frame.left + 100, 27, { steps: 8 })
     expect((await boxOf(popup)).left, 'the sheet follows the mouse').toBeGreaterThan(frame.left + 40)
     expect(await page.evaluate(() => String(getSelection())), 'text selected on the way').toBe('')
+    // Base UI dismisses a drag faster than 0.5 px/ms start to release: held, 80 px reads as a slow drop.
+    await page.waitForTimeout(400)
     await page.mouse.up()
     await atRest(popup)
     expect(await boxOf(popup)).toEqual(frame)
