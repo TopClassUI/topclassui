@@ -19,41 +19,46 @@ const render = async (file: string) => {
 interface Shape {
   /** Every href in the demo, in the order the keyboard reaches them. */
   hrefs: string[]
-  /** The href of the link marked as the page being read, or null. */
-  current: string | null
-  /** The name of the nav. */
-  nav: string
-  /** Whether the bar holds its client part. */
-  sticky: boolean
+  /** The hrefs of the links marked as the page being read, one a bar at most. */
+  current: string[]
+  /** The name of each nav, one a bar. */
+  navs: string[]
+  /** How many of the bars hold their client part. */
+  sticky: number
 }
 
 /** Written out per demo, so a demo that changes, or a part that stops rendering a link, fails here. */
 const DEMOS: Record<string, Shape> = {
-  'basic': { hrefs: ['/', '/docs', '/components', '/icons', '/theming', '/login'], current: '/docs', nav: 'Main', sticky: true },
+  'basic': { hrefs: ['/', '/docs', '/components', '/icons', '/theming', '/login'], current: ['/docs'], navs: ['Main'], sticky: 1 },
   'many-links': {
     hrefs: ['/', '/docs', '/components', '/icons', '/theming', '/connectors', '/changelog', 'https://github.com/TopClassUI/topclassui', '/login'],
-    current: '/components', nav: 'Main', sticky: true,
+    current: ['/components'], navs: ['Main'], sticky: 1,
   },
-  'not-sticky': { hrefs: ['/', '/docs', '/blog', '/changelog'], current: '/blog', nav: 'Main', sticky: false },
-  'rtl': { hrefs: ['/', '/docs', '/components', '/icons', '/theming', '/login'], current: '/docs', nav: 'التنقل الرئيسي', sticky: true },
+  'not-sticky': { hrefs: ['/', '/docs', '/blog', '/changelog'], current: ['/blog'], navs: ['Main'], sticky: 0 },
+  'playground': { hrefs: ['/', '/docs', '/components', '/icons', '/login'], current: [], navs: ['Main'], sticky: 1 },
+  'rtl': { hrefs: ['/', '/docs', '/components', '/icons', '/theming', '/login'], current: ['/docs'], navs: ['التنقل الرئيسي'], sticky: 1 },
   'tall-page': {
     hrefs: ['#install', '#install', '#usage', '#theming', '#questions', '/handbook/edit', '#usage', '#theming', '#questions', '#install'],
-    current: null, nav: 'On this page', sticky: true,
+    current: [], navs: ['On this page'], sticky: 1,
   },
-  'with-search': { hrefs: ['/', '/docs', '/components', '/icons'], current: '/docs', nav: 'Main', sticky: true },
+  'states': {
+    hrefs: ['/', '/docs', '/components', '/icons', '/theming', '/login', '/', '/blog', '/changelog'],
+    current: ['/docs'], navs: ['Sticky, Docs being read', 'In the flow, nothing being read'], sticky: 1,
+  },
+  'with-search': { hrefs: ['/', '/docs', '/components', '/icons'], current: ['/docs'], navs: ['Main'], sticky: 1 },
 }
 
 describe('every demo renders on the server', () => {
-  it('holds exactly the six demos the brief asks for, so none can be deleted silently', () => {
-    expect(files).toEqual(['basic', 'many-links', 'not-sticky', 'rtl', 'tall-page', 'with-search'])
+  it('holds exactly the demos the brief asks for, so none can be deleted silently', () => {
+    expect(files).toEqual(['basic', 'many-links', 'not-sticky', 'playground', 'rtl', 'states', 'tall-page', 'with-search'])
     expect(Object.keys(DEMOS).sort()).toEqual(files)
   })
 
   for (const [file, shape] of Object.entries(DEMOS)) {
-    it(`${file}.tsx: one header and one nav, named ${shape.nav}`, async () => {
+    it(`${file}.tsx: one header and one nav a bar, named ${shape.navs.join(', ')}`, async () => {
       const html = await render(file)
-      expect(html.match(/<header /g), file).toHaveLength(1)
-      expect([...html.matchAll(/<nav aria-label="([^"]*)"/g)].map((match) => match[1]), file).toEqual([shape.nav])
+      expect(html.match(/<header /g), file).toHaveLength(shape.navs.length)
+      expect([...html.matchAll(/<nav aria-label="([^"]*)"/g)].map((match) => match[1]), file).toEqual(shape.navs)
     })
 
     it(`${file}.tsx: every link is a real anchor, with the hrefs written here`, async () => {
@@ -64,13 +69,13 @@ describe('every demo renders on the server', () => {
       expect(html, file).not.toContain('role="link"')
     })
 
-    it(`${file}.tsx: ${shape.current === null ? 'no link' : shape.current} is the page being read`, async () => {
+    it(`${file}.tsx: ${shape.current.length === 0 ? 'no link' : shape.current.join(' and ')} is the page being read`, async () => {
       const marked = [...(await render(file)).matchAll(/<a aria-current="page" [^>]*href="([^"]*)"/g)].map((match) => match[1])
-      expect(marked, file).toEqual(shape.current === null ? [] : [shape.current])
+      expect(marked, file).toEqual(shape.current)
     })
 
-    it(`${file}.tsx: ${shape.sticky ? 'holds its one client part, which draws nothing' : 'holds no client part'}`, async () => {
-      expect((await render(file)).match(/<span hidden=""><\/span><\/header>/g) ?? [], file).toHaveLength(shape.sticky ? 1 : 0)
+    it(`${file}.tsx: ${String(shape.sticky)} of its bars hold the one client part, which draws nothing`, async () => {
+      expect((await render(file)).match(/<span hidden=""><\/span><\/header>/g) ?? [], file).toHaveLength(shape.sticky)
     })
 
     it(`${file}.tsx writes no tabIndex: every stop is a link, a button or a field`, () => {

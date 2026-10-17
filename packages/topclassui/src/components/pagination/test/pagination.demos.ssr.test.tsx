@@ -12,7 +12,8 @@ const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
 const EXPECTED = [
-  'custom-size', 'first-page', 'last-page', 'many-pages', 'middle', 'rtl', 'sizes', 'two-navs', 'wide-numbers',
+  'custom-size', 'first-page', 'last-page', 'many-pages', 'middle', 'playground', 'rtl', 'sizes', 'states', 'two-navs',
+  'wide-numbers',
 ]
 
 const load = async (file: string) => {
@@ -46,6 +47,20 @@ describe('each demo shows the state its name promises', () => {
     const Demo = await load(file)
     return Demo ? markup(<Demo />) : ''
   }
+
+  it('playground: with nothing passed, page 6 of 12 between two gaps, like middle', async () => {
+    const html = await render('playground')
+    expect(pages(html)).toEqual(['1', '5', '6', '7', '12'])
+    expect(html).toContain('aria-label="Page 6 of 12" aria-current="page"')
+  })
+
+  it('states: four navs, each named, with the spans each one leaves where there is nowhere to go', async () => {
+    const html = await render('states')
+    expect([...html.matchAll(/<nav aria-label="([^"]*)"/g)].map((m) => m[1])).toEqual(['On the first page', 'In the middle', 'On the last page', 'A single page'])
+    expect([...html.matchAll(/<span [^>]*aria-label="([^"]*)"/g)].map((m) => m[1])).toEqual([
+      'First page', 'Previous', 'Next', 'Last page', 'First page', 'Previous', 'Next', 'Last page',
+    ])
+  })
 
   it('first-page: page 1 is current, and first and previous are the two spans', async () => {
     const html = await render('first-page')

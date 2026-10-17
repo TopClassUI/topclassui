@@ -12,8 +12,8 @@ const DEMOS = components.filter((entry) => entry.page && entry.content !== null)
 const THEMES = ['light', 'dark', 'ocean'] as const
 const DIRS = [{ dir: 'ltr', lang: 'en' }, { dir: 'rtl', lang: 'ar' }] as const
 
-test('the route has every demo of the Actions, Forms, Display, Data, Feedback and Overlays components', () => {
-  expect(DEMOS.length).toBe(388)
+test('the route has every demo of every live component page', () => {
+  expect(DEMOS.length).toBe(444)
 })
 
 for (const theme of THEMES) {
@@ -28,7 +28,7 @@ for (const theme of THEMES) {
         await expect(html).toHaveAttribute('dir', dir)
         await expect(html).toHaveAttribute('lang', lang)
         await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow')
-        await expect(page.locator('nav, header, footer, aside')).toHaveCount(0)
+        await expect(page.locator(':is(nav, header, footer, aside):not(main *)')).toHaveCount(0)
         expect(await page.locator('main > *').count(), key).toBeGreaterThan(1)
         expect((await axeViolations(page)).map((violation) => `${key} ${violation}`)).toEqual([])
       }
