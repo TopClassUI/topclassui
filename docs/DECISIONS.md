@@ -6,6 +6,12 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-17 - R-10.5-2 is a type and a lint rule
+
+**Decision.** A tooltip's text-only rule has two halves. The type, already in `tooltip/types.ts`, makes `TooltipPopup`'s `children` `TooltipText | readonly TooltipText[]` and takes no `render`, so tsc rejects an element, an array holding one and a boolean (`tooltip.types.test.ts`). The lint rule `tooltip-content-is-text` reports a JSX element or fragment anywhere in a `TooltipPopup`'s children: a direct child, inside an expression (`{ok && <a />}`, a `map`), in a `children` prop or a spread, and under a renamed import. It is on for `src/` (so the demos too), `e2e/**/*.tsx` and `scripts/**/*.tsx` (the harness and its fixtures). "One or two lines" stays with the CSS: `max-w-xs` and wrapping; a length cap in lint would fail the long-label demo, which is the case Tooltip exists for.
+
+**Why.** The type alone is beaten by a cast or a spread, and it says nothing about Popover; the lint message names the way out. Every existing tooltip in `src/`, the demos and `e2e/fixtures` was plain text, so nothing needed fixing and nothing is exempt.
+
 ## 2026-10-17 - One thin themed scrollbar for every scroll area
 
 **Decision.** `SCROLLBAR` in `src/shared/classes.ts` is `scrollbar-width: thin` and `scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track)`. `SCROLL_AREA` and `SCROLL_X` carry it, so every dialog and drawer body, popover, dropdown, command, select and combobox list, date picker, tree view, file upload list, toast viewport, sidebar body, accordion region, tabs list, navbar links, segmented control and code block wears it; the table box and the textarea, which scroll without those two, add it by hand. The thumb is neutral-500 in light and ocean and neutral-400 in dark, on a transparent track, so it stands on the surface beneath it: 4.53 to 4.73:1 in light, 5.83 to 7.63 in dark, and 3.93 / 6.27 on a read-only field. `check:contrast` measures it on every surface and on its track whenever the track is not transparent. The code block sets the two tokens to its own fill and halfway thumb, as before. The collapsed Sidebar still hides its bar. Two widths follow from the thinner bar, measured under a mouse: an expanded Sidebar's bar is 10 px (15 before), and a Textarea that takes the browser's own width, in a `w-fit` parent or beside a label, is 173 px (178 before; unit-4.md says 178), since Chromium reserves the vertical bar in it.
