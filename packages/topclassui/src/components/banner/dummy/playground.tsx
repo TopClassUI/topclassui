@@ -11,7 +11,7 @@ export default function Demo({ tone, dismissible = false }: BannerDesignProps = 
       tone={tone}
       dismissible={dismissible}
       id="banner-playground"
-      aria-label="Release announcement"
+      aria-label="Version 2 announcement"
       icon={<Svg icon={bell} size="xs" />}
       action={<Button size="sm" variant="outline" tone={tone} render={<a href="/changelog" />}>Read more</Button>}
     >
