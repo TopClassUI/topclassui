@@ -3,6 +3,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, posix, relative, sep } from 'node:path'
 
 import { FAIL_LINES, WARN_LINES, countLines, sizeVerdict, sourceFilesUnder } from './lib/file-sizes.js'
+import { missingFixture } from './lib/root-props-fixture.js'
 import { inlinePropInterfaces, screamingConstants } from './lib/source-checks.js'
 
 const ROOT = process.cwd()
@@ -84,6 +85,8 @@ function checkComponentFolder(dir: string, slug: string) {
   if (ownTests.length + folderTests.length === 0) {
     errors.push(`${rel(dir)}: has no test file, in the folder or in test/ (R-8.1-1).`)
   }
+  const fixtureError = missingFixture(rel(dir), dirs.includes('test') ? listDir(join(dir, 'test')).filter((e) => e.isFile()).map((e) => e.name) : [])
+  if (fixtureError) errors.push(fixtureError)
 
   for (const name of [...files, ...dirs]) {
     const replacement = RESERVED.get(name)
