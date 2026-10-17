@@ -12,7 +12,7 @@ This plan is for a builder with no memory. It follows the shape of `docs/plan/re
 2. **What it is:** `npx topclassui init` once, then `npx topclassui add <slug>`. Each `add` copies a component's source, the components it imports and the shared files they need into one `topclassui/` folder in the consumer's project. After that, nothing in the copied tree imports the `topclassui` package.
 3. **The defaults in one line.** The CLI ships inside the `topclassui` package as a `bin`, with no runtime dependency. The component sources travel in the same tarball, as registry JSON generated at build time, so the CLI makes no network call of its own. Imports are rewritten to relative paths. A lock section in `topclassui.json` records a hash of every file written, so `add` and `diff` can tell your edits from upstream changes.
 4. **It settles STATUS open question 1 the other way from its recommendation.** STATUS recommended that copied components import `shared/` from the package. This plan copies `shared/` too (section 3.3, choice K2). The reason: two copies of the provider context would silently disagree (fact F9).
-5. **Every departure from DECISIONS goes into one entry in step K1, before any code.** CLAUDE.md requires it. The departures are listed in K1.
+5. **Every departure from DECISIONS goes into one entry in step K1, before any code.** `docs/RULES.md` requires it. The departures are listed in K1.
 6. **Not verified yet, and checked in the step named:**
    - whether Turbopack (Next.js 16's default bundler) resolves a `./x.js` specifier to `x.ts` (K7; the design does not depend on it, because it strips `.js`);
    - whether `vite build` warns once per copied `'use client'` file (K7; the design strips the directive in Vite projects anyway);
