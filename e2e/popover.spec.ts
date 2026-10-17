@@ -439,6 +439,30 @@ test.describe('focus', () => {
     expect(await popup.evaluate((el) => `${el.tagName} ${el.getAttribute('role') ?? ''}`)).toBe('DIV dialog')
   })
 
+  // POPOVER-1. A form with no action and no onSubmit is sent by the browser: the page reloads with ?name= on it.
+  for (const how of ['a press on Save', 'Enter in the field'] as const) {
+    test(`the form popover saves on ${how}: it closes, the focus is back on its trigger, and the page does not reload`, async ({ page }) => {
+      const popup = await open(page, 'popover--with-form', { by: 'keyboard' })
+      const address = page.url()
+      let loads = 0
+      page.on('framenavigated', (frame) => { if (frame === page.mainFrame()) loads++ })
+      await popup.locator('input[name="name"]').fill('New name')
+      if (how === 'Enter in the field') await page.keyboard.press('Enter')
+      else await popup.getByRole('button', { name: 'Save' }).click()
+      await expectClosed(page)
+      await expect(triggerOf(page, 'Rename')).toBeFocused()
+      expect({ address: page.url(), loads }).toEqual({ address, loads: 0 })
+    })
+  }
+
+  test('the form popover stays open on Save with the field empty, since the field is required', async ({ page }) => {
+    const popup = await open(page, 'popover--with-form', { by: 'keyboard' })
+    await popup.locator('input[name="name"]').fill('')
+    await popup.getByRole('button', { name: 'Save' }).click()
+    await expect(popup.locator('input[name="name"]:invalid')).toBeFocused()
+    await expect(openPopups(page)).toHaveCount(1)
+  })
+
   // The order of Tab is the order of the document, which does not turn with the direction.
   for (const direction of DIRECTIONS) {
     test(`${direction}: it is not modal: Tab past the last control closes it and goes on to the next control of the page`, async ({ page }) => {
@@ -1130,6 +1154,35 @@ test.describe('a larger text', () => {
     const cut = await popup.evaluate((el) => [...el.querySelectorAll('h2, p, span')].filter((text) => text.scrollWidth > text.clientWidth + 1).length)
     expect(cut, 'texts wider than their box').toBe(0)
   })
+
+  // POPOVER-2. Three fixed tracks went to 0 px at 320 px, and each trigger lay over half of the next one.
+  for (const screen of [SCREENS[0], SCREENS[1]]) {
+    for (const direction of DIRECTIONS) {
+      test(`${String(screen.width)} x ${String(screen.height)} ${direction} with the root at 32 px: the twelve placement triggers wrap, and each takes its own press`, async ({ page }) => {
+        await page.setViewportSize(screen)
+        await openLive(page, 'popover--placements', { direction })
+        await page.addStyleTag({ content: 'html { font-size: 32px }' })
+        const faults = await page.locator('#demo button').evaluateAll((buttons) => {
+          const found: string[] = []
+          const boxes = buttons.map((button) => button.getBoundingClientRect())
+          boxes.forEach((one, i) => {
+            boxes.forEach((other, j) => {
+              const overlap = one.left < other.right && other.left < one.right && one.top < other.bottom && other.top < one.bottom
+              if (j > i && overlap) found.push(`${buttons[i]?.textContent ?? ''} over ${buttons[j]?.textContent ?? ''}`)
+            })
+          })
+          for (const button of buttons) {
+            button.scrollIntoView({ block: 'center', inline: 'center' })
+            const box = button.getBoundingClientRect()
+            if (!button.contains(document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2))) found.push(`${button.textContent} covered`)
+          }
+          return [String(buttons.length), ...found]
+        })
+        expect(faults).toEqual(['12'])
+        await expectNoSidewaysScroll(page)
+      })
+    }
+  }
 
   // WCAG 1.4.12: the four spacings a reader may set, all at once.
   test('with the text spacing of WCAG 1.4.12 the popup grows with its text, and nothing is cut', async ({ page }) => {

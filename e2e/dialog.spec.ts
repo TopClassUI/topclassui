@@ -660,6 +660,26 @@ test.describe('a screen under 272 px tall', () => {
   })
 })
 
+// DIALOG-1. Text zoom grows the bars but not the rem of a media query, so the rule is a container query on the viewport.
+test.describe('the root at 32 px', () => {
+  for (const [width, height, short] of [[844, 390, true], [568, 320, true], [320, 480, true], [390, 844, false]] as const) {
+    test(`${String(width)} x ${String(height)}: ${short ? 'the popup' : 'the body'} is the one scroller, and a wheel over the popup reaches the last action`, async ({ page }) => {
+      await page.setViewportSize({ width, height })
+      await openLive(page, 'dialog--long-body')
+      await page.addStyleTag({ content: 'html { font-size: 32px !important }' })
+      const popup = await openOverlay(page, triggerOf(page, 'Read the terms'))
+      await expect(bodyOf(popup)).toHaveCSS('overflow-y', short ? 'visible' : 'auto')
+      expect(await scrollersOf(popup), 'boxes that scroll').toBe(1)
+
+      const frame = await boxOf(popup)
+      for (let turn = 0; turn < 30; turn++) await wheelAt(page, frame.left + frame.width / 2, frame.top + frame.height / 2, 1000)
+      const parts = await partsOf(popup)
+      expect(parts.footer.bottom, 'the end of the footer, against the end of the popup').toBe(parts.popup.bottom - 1)
+      await expectNoSidewaysScroll(page)
+    })
+  }
+})
+
 test.describe('each value of modal', () => {
   const behind = (page: Page) => triggerOf(page, 'Behind the panel')
   const scrims = (page: Page) => page.locator('[data-base-ui-portal] .bg-overlay')

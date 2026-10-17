@@ -17,6 +17,7 @@ const DECLARATION: Record<string, string> = {
   'grid': 'display: grid;',
   'place-items-center': 'place-items: center;',
   'p-(--tc-overlay-inset)': 'padding: var(--tc-overlay-inset);',
+  '[container-type:size]': 'container-type: size;',
   // The two motions, which read the duration that --tc-motion scales.
   'transition-opacity': 'transition-property: opacity;',
   'transition-[opacity,scale]': 'transition-property: opacity,scale;',
@@ -135,7 +136,7 @@ describe('every class an open Dialog wears compiles with the installed Tailwind'
       DIALOG_TITLE, DIALOG_DESCRIPTION, DIALOG_BODY, DIALOG_FOOTER, DIALOG_CLOSE,
     ]).filter((cls) => cls !== '' && !elsewhere.has(cls))
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(71)
+    expect(all).toHaveLength(72)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {
