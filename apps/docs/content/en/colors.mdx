@@ -1,0 +1,136 @@
+---
+title: Colors
+description: "Color has three layers: a palette you never use directly, semantic tokens you always use, and the utility classes Tailwind generates from those tokens."
+---
+
+<PageControls />
+
+## The three layers
+
+A component never names a color. It names a role, and the role resolves differently in each mode.
+
+The palette is the Tailwind v4 oklch ramp. The semantic layer maps each role to a shade, and `@theme inline` turns each one into a utility class.
+
+```css
+/* palette - never referenced by a component */
+--color-blue-600: oklch(54.6% 0.245 262.881);
+
+/* semantic - what a component means */
+--tc-primary-solid: var(--color-blue-600);
+--tc-primary-on-solid: var(--color-white);
+
+/* utility - what Tailwind generates */
+@theme inline {
+  --color-primary-solid: var(--tc-primary-solid);
+}
+
+/* what you write */
+className="bg-primary-solid text-primary-on-solid"
+```
+
+Every component uses the semantic layer only, so a new mode never needs a component change.
+
+## Every class
+
+One class per role. These are the names components use, and the ones you use beside them.
+
+| Class | Variable | What it is for |
+|---|---|---|
+| `bg-page` | `--tc-page` | The page behind everything |
+| `bg-surface` | `--tc-surface` | A recessed or striped surface |
+| `bg-surface-raised` | `--tc-surface-raised` | A card, a popup, an input |
+| `text-body` | `--tc-body` | Body text |
+| `text-muted` | `--tc-muted` | Secondary text |
+| `border-line` | `--tc-line` | A decorative hairline |
+| `border-line-strong` | `--tc-line-strong` | A control boundary, must reach 3:1 |
+| `outline-ring` | `--tc-ring` | The focus ring |
+| `bg-primary-solid` | `--tc-primary-solid` | A filled control |
+| `text-primary-on-solid` | `--tc-primary-on-solid` | Text on that fill |
+| `bg-primary-soft` | `--tc-primary-soft` | A tint, for a chip or a hovered row |
+| `text-primary-on-soft` | `--tc-primary-on-soft` | Text and icons on that tint |
+
+## The six tones
+
+Every tone has the same set of roles, so a Badge, an Alert and a Button all use a tone in the same way.
+
+<ToneSwatches>
+
+| Role | What it is for |
+|---|---|
+| `primary/solid` | A filled control with a white label |
+| `primary/soft` | A tint, for a chip or a hovered row |
+| `primary/on-soft` | Text and icons on that tint |
+| `success/solid` | A filled control with a white label |
+| `warning/solid` | Its label is near-black, not white |
+| `danger/solid` | Destructive actions |
+| `info/solid` | Neutral information |
+| `neutral/solid` | Flips with the mode |
+
+</ToneSwatches>
+
+Shown in the page's mode. Each row is a live variable, not a picture of one.
+
+## Where each color is used
+
+One screen, every role labelled.
+
+<RoleBoard>
+
+- `bg-surface`: The top bar. A box sitting on the page.
+- `border-line`: The hairline under the bar and around the card.
+- `text-body`: Titles and normal text.
+- `text-muted`: The grey description line.
+- `bg-primary-solid` + `text-primary-on-solid`: The Save button.
+- `bg-primary-soft` + `text-primary-on-soft`: The selected row in the dropdown.
+- `bg-surface-raised`: The dropdown, floating above the card. One step lighter, with a shadow.
+- `bg-page`: The whole screen, behind everything.
+
+</RoleBoard>
+
+## The three modes
+
+Light, dark and ocean are three CSS blocks that set the same variable names. This site follows your system's mode until you pick one.
+
+Ocean is light mode with a cyan primary and a pill radius. A custom mode needs nothing more than one CSS block.
+
+<TokensSample mode="dark" />
+
+## What the contrast check enforces
+
+Contrast is checked on every change to the library, and a failure blocks the change. It uses CSS Color 4 gamut mapping, because some shades sit outside sRGB.
+
+| What | Threshold | Measured against |
+|---|---|---|
+| Text, including a tone text on its own tint | 4.5:1 | The surface it sits on |
+| `line-strong`, `ring` and icons | 3:1 | All three surfaces, not only the page |
+| A soft tint | 1.06 step | All three surfaces |
+| `line` | exempt | Decorative hairline, WCAG 1.4.11 |
+
+## Add your own theme
+
+Add one CSS block and set `data-theme="brand"` on the element it covers. A mode can change knobs as well as colors.
+
+<Callout tone="warning">A mode that sets `--tc-primary-solid` must also set `--tc-primary-on-solid`, or its label can fall below 4.5:1 on the new fill.</Callout>
+
+```css title="app/globals.css"
+/* after the three imports */
+[data-theme="brand"] {
+  color-scheme: dark;
+
+  --tc-page: var(--color-slate-950);
+  --tc-surface: var(--color-slate-900);
+  --tc-surface-raised: var(--color-slate-800);
+  --tc-body: var(--color-slate-50);
+  --tc-muted: var(--color-slate-400);
+  --tc-line: var(--color-slate-800);
+  --tc-line-strong: var(--color-slate-600);
+
+  --tc-primary-solid: var(--color-teal-500);
+  --tc-primary-on-solid: var(--color-slate-950);
+  --tc-primary-on-soft: var(--color-teal-300);
+
+  --tc-radius: 1rem;
+}
+```
+
+<Callout tone="info">`ThemeScript` stores only `light`, `dark` and `ocean`, so a custom mode goes on a section, or on `html` in a layout that does not render `ThemeScript`.</Callout>

@@ -1,0 +1,89 @@
+---
+title: Icons
+description: 84 icons, inlined as SVG. Only the ones you render are loaded.
+---
+
+## The set
+
+Phosphor at regular weight, plus three solid variants where a filled shape carries meaning.
+
+| Group | Count | What it covers |
+|---|---|---|
+| Arrows and carets | 13 | Every direction, plus the double carets pagination needs |
+| Actions | 19 | Copy, edit, delete, download, search, filter |
+| Status and feedback | 13 | One icon for each of the six tones, plus a spinner |
+| Objects and places | 36 | Files, folders, users, devices, brands |
+| Solid variants | 3 | Filled shapes, where the fill carries meaning |
+
+## The whole set
+
+All 84, grouped. Amber marks a directional icon - it mirrors itself in Arabic.
+
+<IconGrid />
+
+## Two ways to render
+
+`Icon` takes a name and resolves it on the server. `Svg` takes an imported icon object and works anywhere.
+
+This is what keeps unused icons out of your bundle. One big map would pull them all in.
+
+<WrongRight>
+
+```tsx
+'use client'
+import { Icon } from 'topclassui/icon'
+
+// server-only, so this fails at build time
+<Icon name="spinner" />
+```
+
+```tsx check
+'use client'
+import { Svg } from 'topclassui/svg'
+import { spinner } from 'topclassui/icons/spinner'
+
+<Svg icon={spinner} />
+```
+
+</WrongRight>
+
+## Sizes
+
+`Icon` defaults to `1em` so it matches the text beside it. Use a size name when it stands alone.
+
+| Name | Pixels | Where it fits |
+|---|---|---|
+| (default) | `1em` | Inline with text - a key cap, a link, a button label |
+| `xs` | 16 | A dense table row |
+| `sm` | 20 | A control at `sm` |
+| `md` | 24 | A control at `md` |
+| `lg` | 32 | An empty state |
+| `xl` | 40 | A feature block |
+
+## What flips in right to left
+
+16 of the 84 mirror in right-to-left. Direction means something for an arrow, not for a magnifying glass.
+
+<Cards>
+  <Card title="Flips">Every arrow and caret, plus `sign-out`, `paper-plane-tilt` and `sidebar-simple`.</Card>
+  <Card title="Does not flip">`magnifying-glass`, `check-circle`, `gear`, `clock`. A mirrored clock is a broken clock.</Card>
+  <Card title="Why a list">A name is not a reliable signal. `arrow-square-out` flips; `arrows-clockwise` does not.</Card>
+</Cards>
+
+## Adding icons
+
+Any single-path SVG works with `Svg`: give it the `viewBox` and the path.
+
+```tsx check title="my-logo.tsx"
+import { Svg } from 'topclassui/svg'
+import type { IconData } from 'topclassui/icons'
+
+// one of your own, no CLI needed
+const myLogo: IconData = {
+  viewBox: '0 0 24 24',
+  path: 'M12 2 22 12 12 22 2 12Z',
+  directional: false,
+}
+
+export const Logo = () => <Svg icon={myLogo} size="md" />
+```

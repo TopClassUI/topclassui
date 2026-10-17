@@ -1,0 +1,118 @@
+---
+title: Right to left
+description: Every component mirrors in Arabic without a code change, because no component is allowed to say left or right.
+---
+
+## The rule
+
+Direction is set once, on the `html` element. Components read it through logical CSS, never through JavaScript.
+
+```tsx check title="app/layout.tsx"
+import { TopClassProvider } from 'topclassui/provider'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="ar" dir="rtl">
+      <body>
+        {/* the provider forwards direction to Base UI and to gestures */}
+        <TopClassProvider direction="rtl" locale="ar">{children}</TopClassProvider>
+      </body>
+    </html>
+  )
+}
+```
+
+<DirectionPair ltr="pagination/middle" rtl="pagination/rtl" />
+
+## Logical classes only
+
+Tailwind still ships the physical utilities. This library never uses them; the logical form does the work instead.
+
+| Banned | Use instead |
+|---|---|
+| `ml-*` `mr-*` | `ms-*` `me-*` |
+| `pl-*` `pr-*` | `ps-*` `pe-*` |
+| `left-*` `right-*` | `inset-s-*` `inset-e-*` |
+| `start-*` `end-*` | `inset-s-*` `inset-e-*` |
+| `text-left` `text-right` | `text-start` `text-end` |
+| `border-l` `border-r` | `border-s` `border-e` |
+| `rounded-l-*` `rounded-r-*` | `rounded-s-*` `rounded-e-*` |
+| `space-x-*` `divide-x-*` | `gap-*` and `border-s` on the item |
+| `tracking-*` | nothing - Arabic script does not use letter-spacing |
+
+## Transforms and gestures
+
+A translate, a transform origin, a gradient or a swipe has no logical form in CSS. These multiply by `--tc-dir`, which is `1` in LTR and `-1` in RTL.
+
+```css
+[dir="rtl"] { --tc-dir: -1; }
+
+/* the switch thumb */
+--tc-slide: calc(1rem * var(--tc-dir));
+className="translate-x-(--tc-slide)"
+
+/* object and background positions have no logical form */
+className="object-left rtl:object-right"
+```
+
+## Placement, not side
+
+Every overlay takes a `placement` instead of a `side`. `start` and `end` resolve to inline-start and inline-end, so a menu opens correctly in both directions.
+
+<WrongRight>
+
+```tsx
+<PopoverPopup side="left" align="start" />
+```
+
+```tsx check
+import { PopoverPopup } from 'topclassui/popover'
+
+<PopoverPopup placement="start-top" />
+
+// start   -> inline-start, mirrors
+// bottom  -> bottom, does not
+```
+
+</WrongRight>
+
+## Type, plurals and digits
+
+Arabic text takes `--tc-font-arabic` through a `[lang|='ar']` rule, so you never swap a font variable. A label with a count is a function of that count.
+
+```tsx
+// labels/ar.ts
+const plural = new Intl.PluralRules('ar')
+
+selected: (n, fmt) => {
+  const rule = plural.select(n)
+  const value = fmt.format(n)
+  if (rule === 'zero') return 'لم يتم تحديد شيء'
+  if (rule === 'one') return 'عنصر واحد محدد'
+  if (rule === 'two') return 'عنصران محددان'
+  if (rule === 'few') return `${value} عناصر محددة`
+  if (rule === 'many') return `${value} عنصرًا محددًا`
+  return `${value} عنصر محدد`
+}
+
+<TopClassProvider direction="rtl" locale="ar" numberingSystem="arab">
+```
+
+## What the lint rule catches
+
+The rule runs on every class string in the library and fails the lint on a physical class. It catches the deprecated aliases too.
+
+<WrongRight>
+
+```tsx
+className="pl-4 text-left"
+
+// R-5.3-1: "pl-4" is physical. use ps- or pe-.
+// one error per class string: fix it, and the next run names text-left
+```
+
+```tsx
+className="ps-4 text-start"
+```
+
+</WrongRight>
