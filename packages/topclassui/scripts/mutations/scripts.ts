@@ -182,4 +182,28 @@ export const MUTATIONS: Mutation[] = [
     from: '  if (/^\\s*Test(?: Files|s)\\s+\\d+ failed/m.test(output)) return true',
     to: '  return true',
   },
+  {
+    label: 'R-8.5-1: an exemption covers props that take CollectionProps',
+    file: 'scripts/lib/collections.ts',
+    from: "    if (types !== null && takesCollectionProps(types)) return ['its props take CollectionProps, which no exemption covers']\n",
+    to: '',
+  },
+  {
+    label: 'R-8.5-1: importing useCollection counts as calling it',
+    file: 'scripts/lib/collections.ts',
+    from: "    && /\\buseCollection\\s*(<[^>]*>)?\\s*\\(/.test(code)",
+    to: '    && true',
+  },
+  {
+    label: 'R-8.5-1: a menu of items stops counting as a list',
+    file: 'scripts/lib/collections.ts',
+    from: ' || /\\bMenuContract\\b/.test(code)',
+    to: '',
+  },
+  {
+    label: 'R-8.5-1: a list with no hook passes',
+    file: 'scripts/lib/collections.ts',
+    from: "  if (hook === null) return ['renders items and has no hook.ts to call useCollection in']",
+    to: '  if (hook === null) return []',
+  },
 ]
