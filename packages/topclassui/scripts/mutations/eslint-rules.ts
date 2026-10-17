@@ -38,4 +38,16 @@ export const MUTATIONS: Mutation[] = [
     from: "if (kind === 'system' && variants.includes('forced-colors')) continue",
     to: "if (variants.includes('forced-colors')) continue",
   },
+  {
+    label: 'eslint R-5.7-5 lets a Pick of Base UI props through, so a hand-picked list hides every new prop',
+    file: 'eslint-rules/index.ts',
+    from: "if (generic === 'Pick') ctx.report({ node, messageId: 'pick', data: { name: label } })",
+    to: "if (generic === String(Symbol())) ctx.report({ node, messageId: 'pick', data: { name: label } })",
+  },
+  {
+    label: 'eslint R-5.7-5 pins only a direct alias, so an alias of an alias exports Base UI props whole',
+    file: 'eslint-rules/index.ts',
+    from: 'if (pinned.has(name) || !isBaseProps(ref)) continue',
+    to: 'if (pinned.has(name) || !isBasePropsName(ref, base)) continue',
+  },
 ]

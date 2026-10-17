@@ -188,7 +188,7 @@ They arrive with the phases that need them.
 ### R-5.7-5 Public types are aliases derived at the seam
 **Rule:** `export type DialogRootProps = Omit<Base.Root.Props, 'className'> & OwnProps`; never re-export a Base UI type name and never hand-copy a primitive's prop list.
 **Why:** a hand-copied list hides new props and drifts; the alias is the one line that changes if the primitive changes.
-**Enforced by:** `eslint` (no Base UI re-export anywhere; in `types.ts` a Base UI `.Props` is only omitted with `'className'`, picked without it, indexed or keyed); a hand-copied prop list is review
+**Enforced by:** `eslint` (no Base UI re-export anywhere; in every file under `src/` but tests and demos, a Base UI `.Props`, or a private alias of it, is only omitted with `'className'`, indexed or keyed, never picked); a hand-copied list of single props is review
 
 ### R-5.7-6 Base UI state attribute grammar
 **Rule:** boolean presence attributes (`data-open`, `data-loading`, `data-disabled`), never `data-state="..."`; enumerated design props are value attributes (`data-variant`, `data-size`, `data-tone`).

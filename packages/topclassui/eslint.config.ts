@@ -47,7 +47,8 @@ export default defineConfig(
 
   // A test has to write the banned string to prove the rule or the merge works,
   // and a demo exists to show real usage. Neither is published. R-5.11-1 exempts
-  // demos by name, and a test needs a real scroll box with a height and an overflow.
+  // demos by name, a test needs a real scroll box with a height and an overflow,
+  // and a type test compares ours against Base UI's raw props on purpose (R-5.7-5).
   {
     files: ['src/**/*.test.{ts,tsx}', 'src/**/test/**/*.{ts,tsx}', 'src/**/dummy/**/*.tsx'],
     rules: {
@@ -56,6 +57,7 @@ export default defineConfig(
       'topclass/logical-properties-only': 'off',
       'topclass/style-sets-tokens-only': 'off',
       'topclass/text-comes-from-labels': 'off',
+      'topclass/props-derived-at-the-seam': 'off',
     },
   },
 
