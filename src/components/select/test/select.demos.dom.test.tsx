@@ -21,6 +21,7 @@ const AFTER: Record<string, string[]> = {
   'rtl': ['السعودية'],
   'sixty-items': ['Option 60'],
   'sizes': ['Team', 'Team', 'Team', 'Team', 'Team'],
+  'skeleton': ['Team', 'Team', 'Team', 'Team', 'Team', 'Team'],
   'states': ['Team', 'Team', 'Pro', 'Team'],
 }
 

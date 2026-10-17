@@ -17,15 +17,15 @@ function exportedNames(source: string): string[] {
   })
 }
 
-describe('index.tsx exports one flat name (R-9.2-3), the parts being choice 7', () => {
-  it('exports exactly Select, a function component', () => {
-    expect(Object.keys(select)).toEqual(['Select'])
-    expect(typeof select.Select).toBe('function')
+describe('index.tsx exports flat names (R-9.2-3), the parts being choice 7', () => {
+  it('exports exactly Select and SelectSkeleton, two function components', () => {
+    expect(Object.keys(select).sort()).toEqual(['Select', 'SelectSkeleton'])
+    expect([typeof select.Select, typeof select.SelectSkeleton]).toEqual(['function', 'function'])
   })
 
   it('has no Base UI type name, no context and no hook in its surface', () => {
     const source = readFileSync(join(import.meta.dirname, '..', 'index.tsx'), 'utf8')
-    expect(exportedNames(source).sort()).toEqual(['Select', 'SelectDesignProps', 'SelectName', 'SelectPlacement', 'SelectProps'])
+    expect(exportedNames(source).sort()).toEqual(['Select', 'SelectDesignProps', 'SelectName', 'SelectPlacement', 'SelectProps', 'SelectSkeleton', 'SelectSkeletonProps'])
   })
 
   it('the scan sees a type-only alias and a star export', () => {

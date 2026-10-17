@@ -1,5 +1,5 @@
 import type { Select as Base } from '@base-ui/react/select'
-import type { Ref } from 'react'
+import type { ComponentPropsWithRef, Ref } from 'react'
 
 import type { ControlName } from '#shared/contracts/name.js'
 import type { ListOption } from '#shared/contracts/option.js'
@@ -54,3 +54,8 @@ export type SelectStateProps = Pick<
   SelectProps,
   'value' | 'defaultValue' | 'onValueChange' | 'onOpenChange' | 'inputRef' | 'visibleRows' | 'placeholder' | 'ref' | 'aria-label' | 'aria-labelledby'
 >
+
+/** R-8.3-4: the control's own size and width props, so the two cannot describe different boxes. */
+export type SelectSkeletonProps =
+  Omit<ComponentPropsWithRef<'span'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
+  & Pick<SelectDesignProps, 'size' | 'fullWidth'>

@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'four-rows', 'long-content', 'phase-4-form', 'rtl', 'sixty-items', 'sizes', 'states']
+const EXPECTED = ['basic', 'form', 'four-rows', 'long-content', 'phase-4-form', 'rtl', 'sixty-items', 'sizes', 'skeleton', 'states']
 
 /** Each Select of each demo as the server writes it: its name, then what its trigger shows. */
 const SELECTS: Record<string, string[]> = {
@@ -23,6 +23,7 @@ const SELECTS: Record<string, string[]> = {
   'rtl': ['الدولة: الأردن'],
   'sixty-items': ['Sixty options: Option 30'],
   'sizes': ['Extra small: Pro', 'Small: Pro', 'Medium: Pro', 'Large: Pro', 'Extra large: Pro'],
+  'skeleton': ['Plan, xs: Pro', 'Plan, sm: Pro', 'Plan, md: Pro', 'Plan, lg: Pro', 'Plan, xl: Pro', 'Plan, full width: Pro'],
   'states': ['Nothing chosen: Select', 'Invalid: Free', 'Disabled: Pro', 'Read-only: Team'],
 }
 
@@ -71,6 +72,12 @@ describe('the demos the plan names', () => {
     const html = await render('form')
     expect(html).toMatch(/^<form class="[^"]*">/)
     expect(html).toMatch(/<input [^>]*name="country" value="jo"/)
+  })
+
+  it('skeleton: each Select above a hidden skeleton of the same size, five pairs and a full-width one', async () => {
+    const html = await render('skeleton')
+    expect([...html.matchAll(/data-pair="([^"]*)"/g)].map(([, size]) => size)).toEqual(['xs', 'sm', 'md', 'lg', 'xl', 'full'])
+    expect(html.match(/<span class="[^"]*" aria-hidden="true"><span class="[^"]*">\xa0<\/span><\/span>/g)).toHaveLength(6)
   })
 
   it('rtl: an island that carries the direction and the language', async () => {

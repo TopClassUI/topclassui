@@ -4,6 +4,7 @@ import type { Mutation } from '../lib/mutate.js'
 const CLIENT = 'src/components/select/client.tsx'
 const HOOK = 'src/components/select/hook.ts'
 const CLASSES = 'src/components/select/classes.ts'
+const SKELETON = 'src/components/select/skeleton.tsx'
 const LIB = 'src/components/select/lib.ts'
 
 export const MUTATIONS: Mutation[] = [
@@ -150,5 +151,29 @@ export const MUTATIONS: Mutation[] = [
     file: CLIENT,
     from: "collisionAvoidance={side === 'top' || side === 'bottom' ? undefined : SELECT_SIDE_COLLISION_AVOIDANCE}",
     to: 'collisionAvoidance={SELECT_SIDE_COLLISION_AVOIDANCE}',
+  },
+  {
+    label: 'the select skeleton draws an md trigger at every size, so an xl Select jumps when it arrives',
+    file: SKELETON,
+    from: 'FIELD_SIZE[size]',
+    to: 'FIELD_SIZE.md',
+  },
+  {
+    label: 'the select skeleton box keeps the md type step at every size, so its width in em is not the width of an xl Select',
+    file: SKELETON,
+    from: 'FIELD_TEXT[size], fullWidth && FIELD_HOLDER_FULL)} aria-hidden>',
+    to: 'FIELD_TEXT.md, fullWidth && FIELD_HOLDER_FULL)} aria-hidden>',
+  },
+  {
+    label: 'the select skeleton loses the target floor, so under a finger it is shorter than its Select',
+    file: CLASSES,
+    from: "  CONTAIN,\n  TOUCH_TARGET,\n  'animate-pulse",
+    to: "  CONTAIN,\n  'animate-pulse",
+  },
+  {
+    label: 'the select skeleton is no longer hidden, so a placeholder can be read out',
+    file: SKELETON,
+    from: ')} aria-hidden>',
+    to: ')}>',
   },
 ]

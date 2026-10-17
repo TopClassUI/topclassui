@@ -1,7 +1,7 @@
 // R-5.12-4: the class strings of the Select, built from the shared field and overlay constants (unit-4.md, Select).
 import {
-  DISABLED, FIELD_BOX, FIELD_HOLDER, LABEL, LIST_CAP, OVERLAY_SURFACE, POPUP_MOTION, ROW, ROW_HIGHLIGHT, ROW_SELECTED,
-  ROW_TOUCH, SCROLL_AREA,
+  BORDER_WIDTH, CONTAIN, DISABLED, FIELD_BOX, FIELD_HOLDER, LABEL, LIST_CAP, OVERLAY_SURFACE, POPUP_MOTION, ROW, ROW_HIGHLIGHT,
+  ROW_SELECTED, ROW_TOUCH, SCROLL_AREA, TOUCH_TARGET,
 } from '#shared/classes.js'
 
 /** The box that owns the width. The trigger fills it, whatever its label is. */
@@ -18,3 +18,13 @@ export const SELECT_LIST = `flex flex-col gap-0.5 p-1.5 outline-none ${LIST_CAP}
 export const SELECT_ITEM = `cursor-default select-none ${ROW} ${ROW_HIGHLIGHT} ${ROW_TOUCH} ${ROW_SELECTED} ${DISABLED}`
 export const SELECT_ITEM_TEXT = `${LABEL} flex-1`
 export const SELECT_ITEM_TICK = 'ms-auto flex shrink-0'
+
+/** The skeleton's trigger, in the box SELECT_ROOT draws: the field's border width in no colour, its floor and its
+ * radius, in the neutral fill, which pulses. Its height, padding and type step are FIELD_SIZE, as the trigger's are. */
+export const SELECT_SKELETON_TRIGGER = [
+  'inline-flex w-full items-center',
+  `${BORDER_WIDTH} border-transparent`,
+  CONTAIN,
+  TOUCH_TARGET,
+  'animate-pulse rounded-control bg-neutral-soft motion-reduce:animate-none',
+].join(' ')
