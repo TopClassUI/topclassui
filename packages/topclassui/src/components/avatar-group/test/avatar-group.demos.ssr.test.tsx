@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['counts', 'custom-size', 'four', 'in-table', 'linked', 'many', 'max', 'on-card', 'overflow', 'rtl', 'sizes', 'two']
+const EXPECTED = ['counts', 'custom-size', 'four', 'in-table', 'linked', 'many', 'max', 'on-card', 'overflow', 'playground', 'rtl', 'sizes', 'states', 'two']
 
 /** inline-flex and then the focus ring of the library, written out class by class. */
 const RINGED_LINK = 'inline-flex outline-none focus-visible:outline-solid focus-visible:outline-(length:--tc-ring-width)'

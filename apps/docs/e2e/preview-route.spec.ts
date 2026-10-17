@@ -12,8 +12,8 @@ const DEMOS = components.filter((entry) => entry.page && entry.content !== null)
 const THEMES = ['light', 'dark', 'ocean'] as const
 const DIRS = [{ dir: 'ltr', lang: 'en' }, { dir: 'rtl', lang: 'ar' }] as const
 
-test('the route has every demo of the four Actions and the thirteen Forms components', () => {
-  expect(DEMOS.length).toBe(154)
+test('the route has every demo of the Actions, Forms and Display components', () => {
+  expect(DEMOS.length).toBe(219)
 })
 
 for (const theme of THEMES) {

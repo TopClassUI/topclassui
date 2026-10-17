@@ -123,9 +123,11 @@ Anything else is passed to the element each part draws, so standard attributes (
 - `dummy/custom-size.tsx`
 - `dummy/failed.tsx`
 - `dummy/icon.tsx`
+- `dummy/playground.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`
 - `dummy/skeleton.tsx`
+- `dummy/states.tsx`
 - `dummy/with-name.tsx`
 
 ## Verified against
