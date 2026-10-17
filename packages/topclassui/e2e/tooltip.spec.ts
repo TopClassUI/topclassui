@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Locator, type Page } from '@playwright/test'
 
 import { DIRECTIONS, type Direction } from '../scripts/lib/harness.js'
 import { EDGES, type Edge } from '../scripts/lib/live-harness.js'
@@ -56,6 +56,17 @@ const SIDES: ReadonlyArray<{ demo: string, direction: Direction, edge: Edge, nam
 
 interface Box { left: number, top: number, right: number, bottom: number }
 interface Placed { popup: Box, arrow: Box, trigger: Box, where: Where }
+
+/** R-10.5-2: the popup holds at most two lines of its own line height, and nothing inside it scrolls. */
+async function expectTwoLinesAtMost(popup: Locator, name: string) {
+  const box = await popup.evaluate((element) => {
+    const style = getComputedStyle(element)
+    const padding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom)
+    return { height: element.clientHeight, scroll: element.scrollHeight, cap: 2 * parseFloat(style.lineHeight) + padding }
+  })
+  expect(box.height, `"${name}" runs past two lines`).toBeLessThanOrEqual(box.cap)
+  expect(box.scroll, `"${name}" scrolls`).toBe(box.height)
+}
 
 /** The one open popup. A popup on its way out has lost data-open, and may stay in the page for a frame or two. */
 const openPopup = (page: Page) => page.locator('[data-placement][data-open]')
@@ -198,6 +209,7 @@ test.describe('with the trigger flush against an edge', () => {
             const placed = await openNext(page, name)
             // The shared collision padding: 8 px clear of every edge, not merely inside.
             await expectInsideViewport(openPopup(page), `the tooltip "${name}"`, 8)
+            await expectTwoLinesAtMost(openPopup(page), name)
             await expectNoSidewaysScroll(page)
 
             const written = SIDES.find((row) => row.demo === demo && row.direction === direction && row.edge === edge && row.name === name)
