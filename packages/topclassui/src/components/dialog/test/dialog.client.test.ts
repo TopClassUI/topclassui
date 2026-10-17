@@ -109,9 +109,9 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
     })
   })
 
-  it('takes its four hooks and the modal context from hook.ts, and calls no hook from anywhere else', () => {
+  it('takes only its four hooks from hook.ts, and calls no hook from anywhere else', () => {
     expect(importedNames(source, './hook.js')).toEqual([
-      'DialogModalContext', 'useDialogBody', 'useDialogClose', 'useDialogPopup', 'useDialogRoot',
+      'useDialogBody', 'useDialogClose', 'useDialogPopup', 'useDialogRoot',
     ])
     expect(hookCallsIn(parse(source)).sort()).toEqual(['useDialogBody', 'useDialogClose', 'useDialogPopup', 'useDialogRoot'])
   })

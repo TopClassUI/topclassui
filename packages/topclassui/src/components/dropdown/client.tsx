@@ -13,7 +13,7 @@ import {
   DROPDOWN_GROUP, DROPDOWN_ITEM, DROPDOWN_ITEM_TONE, DROPDOWN_POPUP, DROPDOWN_POSITIONER, DROPDOWN_SEPARATOR,
 } from './classes.js'
 import { DROPDOWN_DEFAULTS } from './constants.js'
-import { DropdownScopeContext, useDropdownMenu, useDropdownPopup, useDropdownPositioner, useDropdownRoot } from './hook.js'
+import { useDropdownMenu, useDropdownPopup, useDropdownPositioner, useDropdownRoot } from './hook.js'
 import { renderRow, toLinkElement, toRowProps } from './lib.js'
 import { DropdownGroupLabel } from './parts/dropdown-group-label.js'
 import type {
@@ -30,11 +30,11 @@ export { DropdownGroupLabel }
  * ref, and Base UI holds the open state. An Escape meant for a popup opened inside its own menu
  * does not close it: the guard looks at this root's popup and at no dialog around its trigger. */
 export function DropdownRoot({ onOpenChange, ...props }: DropdownRootProps) {
-  const { scope, popups } = useDropdownRoot()
+  const { scope, popups, Context } = useDropdownRoot()
   return (
-    <DropdownScopeContext value={scope}>
+    <Context value={scope}>
       <Base.Root {...props} onOpenChange={guardEscape(onOpenChange, popups)} />
-    </DropdownScopeContext>
+    </Context>
   )
 }
 

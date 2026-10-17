@@ -13,7 +13,7 @@ import {
   DRAWER_HEADER, DRAWER_POPUP, DRAWER_TITLE, DRAWER_VIEWPORT, DRAWER_VIEWPORT_EDGE, DRAWER_WIDTH, DRAWER_X,
 } from './classes.js'
 import { DRAWER_DEFAULTS } from './constants.js'
-import { DrawerContext, useDrawerBody, useDrawerClose, useDrawerPopup, useDrawerRoot } from './hook.js'
+import { useDrawerBody, useDrawerClose, useDrawerPopup, useDrawerRoot } from './hook.js'
 import { isSideSheet } from './lib.js'
 import type {
   DrawerBodyProps, DrawerCloseProps, DrawerDescriptionProps, DrawerFooterProps, DrawerHeaderProps, DrawerPopupProps,
@@ -33,9 +33,9 @@ export function DrawerRoot({
   const root = useDrawerRoot(placement, size, modal, onOpenChange)
   return (
     <OverlayScopeContext value={root.scope}>
-      <DrawerContext value={root.settings}>
+      <root.Context value={root.settings}>
         <Base.Root {...props} modal={modal} swipeDirection={root.swipeDirection} onOpenChange={root.onOpenChange} />
-      </DrawerContext>
+      </root.Context>
     </OverlayScopeContext>
   )
 }

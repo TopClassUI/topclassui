@@ -83,8 +83,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the drawer root never shares its settings with its popup, so every sheet is an end sheet of size md',
     file: CLIENT,
-    from: '<DrawerContext value={root.settings}>',
-    to: '<DrawerContext value={DRAWER_DEFAULTS}>',
+    from: '<root.Context value={root.settings}>',
+    to: '<root.Context value={DRAWER_DEFAULTS}>',
   },
   {
     label: 'the drawer root shares modal with its popup but never hands it to Base UI, so a sheet with no scrim still locks and hides the page',

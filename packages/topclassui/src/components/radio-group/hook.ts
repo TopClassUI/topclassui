@@ -10,7 +10,7 @@ import type { RadioGroupChangeDetails, RadioGroupLook, RadioGroupValueProps } fr
 const fallback: RadioGroupLook = { size: RADIO_GROUP_DEFAULTS.size, opensOn: null }
 
 /** The look of the nearest RadioGroupRoot. Base UI tells its radios nothing of ours. */
-export const RadioGroupLookContext = createContext(fallback)
+const RadioGroupLookContext = createContext(fallback)
 
 /** A reset puts each radio input back to its first default, and React writes `checked` only when its state changes. */
 function syncRadios(value: string | null, _input: HTMLInputElement | null, root: HTMLDivElement | null): void {
@@ -56,7 +56,7 @@ export function useRadioGroupRoot(size: RadioGroupLook['size'], { value, default
     state.setValue(next)
   }
 
-  return { value: state.value, onValueChange: onChange, rootRef: state.rootRef, look, resetKey }
+  return { value: state.value, onValueChange: onChange, rootRef: state.rootRef, look, resetKey, Context: RadioGroupLookContext }
 }
 
 /** What a radio reads: the size of its group, and a tab stop for the server HTML alone on the radio the page opens

@@ -139,8 +139,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the popover root never shares its scope with its popup, so the guard finds no popup of its own and never waits for a tooltip',
     file: CLIENT,
-    from: '<PopoverScopeContext value={scope}>',
-    to: '<PopoverScopeContext value="">',
+    from: '<Context value={scope}>',
+    to: '<Context value="">',
   },
   {
     label: 'the popover popup writes its scope under another attribute than the one its guard looks for',

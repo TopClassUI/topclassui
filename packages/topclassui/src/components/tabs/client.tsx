@@ -8,7 +8,7 @@ import { truncateLabel } from '#shared/truncate-label.js'
 import { TABS_BOUNDARIES } from './boundaries.js'
 import { TABS_LIST, TABS_PANEL, TABS_ROOT, TABS_TAB } from './classes.js'
 import { TABS_DEFAULTS } from './constants.js'
-import { TabsLookContext, useTabsLook, useTabsRoot, useTabsTab } from './hook.js'
+import { useTabsLook, useTabsRoot, useTabsTab } from './hook.js'
 import type { TabsListProps, TabsPanelProps, TabsRootProps, TabsTabProps } from './types.js'
 
 /** Groups one list of tabs with their panels. Base UI holds which tab is active; the root
@@ -19,11 +19,11 @@ export function TabsRoot({
   className,
   ...rest
 }: TabsRootProps) {
-  const look = useTabsRoot(variant, size, rest.value, rest.defaultValue)
+  const root = useTabsRoot(variant, size, rest.value, rest.defaultValue)
   return (
-    <TabsLookContext value={look}>
+    <root.Context value={root.look}>
       <Base.Root data-variant={variant} data-size={size} {...rest} className={cn(TABS_ROOT, className)} />
-    </TabsLookContext>
+    </root.Context>
   )
 }
 

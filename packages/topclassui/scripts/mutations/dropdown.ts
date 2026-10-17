@@ -64,8 +64,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dropdown root never shares its scope with its menu, so the guard finds no menu of its own',
     file: CLIENT,
-    from: '<DropdownScopeContext value={scope}>',
-    to: '<DropdownScopeContext value="">',
+    from: '<Context value={scope}>',
+    to: '<Context value="">',
   },
   {
     label: 'the dropdown menu writes its scope under another attribute than the one its guard looks for',

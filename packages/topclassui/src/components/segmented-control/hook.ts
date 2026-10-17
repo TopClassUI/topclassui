@@ -10,7 +10,7 @@ import type { SegmentedControlChangeDetails, SegmentedControlLook, SegmentedCont
 const fallback: SegmentedControlLook = { size: SEGMENTED_CONTROL_DEFAULTS.size, opensOn: null }
 
 /** The look of the nearest SegmentedControlRoot. Base UI tells its radios nothing of ours. */
-export const SegmentedControlLookContext = createContext(fallback)
+const SegmentedControlLookContext = createContext(fallback)
 
 /** A reset puts each radio input back to its first default, and React writes `checked` only when its state changes. */
 function syncRadios(value: string | null, _input: HTMLInputElement | null, root: HTMLDivElement | null): void {
@@ -56,7 +56,7 @@ export function useSegmentedControlRoot(size: SegmentedControlLook['size'], { va
     state.setValue(next)
   }
 
-  return { value: state.value, onValueChange: onChange, rootRef: state.rootRef, look, resetKey }
+  return { value: state.value, onValueChange: onChange, rootRef: state.rootRef, look, resetKey, Context: SegmentedControlLookContext }
 }
 
 /** What a segment reads: the size of its track, and a tab stop for the server HTML alone on the segment the page
