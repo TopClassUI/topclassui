@@ -36,3 +36,17 @@ export function parseDemoMap(source: string): { key: string; file: string }[] {
   return [...source.matchAll(/^ {2}'([^']+)': \(\) => import\('([^']+)'\),$/gm)]
     .map((match) => ({ key: match[1] ?? '', file: match[2] ?? '' }))
 }
+
+/** The source of playgrounds.ts: only the Try it stages, the one map a client island imports, so no other demo joins its bundle. */
+export function playgroundMapSource(slugs: readonly string[]): string {
+  const lines = slugs.map((slug) => `  '${slug}': () => import('${TO_ROOT}/${distFileOf({ slug, name: 'playground' })}'),`)
+  return [
+    '// Written by pnpm docs:data. Do not edit.',
+    'export const PLAYGROUNDS = {',
+    ...lines,
+    '} as const',
+    '',
+    'export type PlaygroundSlug = keyof typeof PLAYGROUNDS',
+    '',
+  ].join('\n')
+}

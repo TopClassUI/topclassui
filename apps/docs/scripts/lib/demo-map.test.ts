@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { demoMapSource, parseDemoMap } from './demo-map.js'
+import { demoMapSource, parseDemoMap, playgroundMapSource } from './demo-map.js'
 
 const demos = [{ slug: 'button', name: 'variants' }, { slug: 'segmented-control', name: 'rtl' }]
 
@@ -34,5 +34,20 @@ describe('parseDemoMap', () => {
       { key: 'button/variants', file: '../../../packages/topclassui/dist/components/button/dummy/variants.js' },
       { key: 'segmented-control/rtl', file: '../../../packages/topclassui/dist/components/segmented-control/dummy/rtl.js' },
     ])
+  })
+})
+
+describe('playgroundMapSource', () => {
+  it('writes one literal import per playground stage, keyed by slug', () => {
+    expect(playgroundMapSource(['button', 'tag'])).toBe([
+      '// Written by pnpm docs:data. Do not edit.',
+      'export const PLAYGROUNDS = {',
+      "  'button': () => import('../../../packages/topclassui/dist/components/button/dummy/playground.js'),",
+      "  'tag': () => import('../../../packages/topclassui/dist/components/tag/dummy/playground.js'),",
+      '} as const',
+      '',
+      'export type PlaygroundSlug = keyof typeof PLAYGROUNDS',
+      '',
+    ].join('\n'))
   })
 })
