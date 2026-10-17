@@ -27,7 +27,7 @@ function Project(props: DropdownRootProps) {
 
 const menus = () => [...document.querySelectorAll('[role="menu"][data-open]')]
 const dialogs = () => [...document.querySelectorAll('[role="dialog"][data-open]')]
-const tooltip = () => document.querySelector('[data-placement][data-open]:not([role])')
+const tooltip = () => document.querySelector('[role="tooltip"][data-open]')
 const row = (name: string) => screen.getByRole('menuitem', { name, hidden: true })
 
 /** A real hover: Base UI times its delay from the pointer resting, which needs a move. */
