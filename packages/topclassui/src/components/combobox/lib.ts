@@ -2,12 +2,12 @@
 import type { ListOption } from '#shared/contracts/option.js'
 
 /** How Base UI reads an option's value, which is what is chosen and sent. */
-export function valueOfOption(option: ListOption): string {
+export function getOptionValue(option: ListOption): string {
   return option.value
 }
 
 /** How Base UI reads an option's label, which is what is shown and matched. */
-export function labelOfOption(option: ListOption): string {
+export function getOptionLabel(option: ListOption): string {
   return option.label
 }
 
