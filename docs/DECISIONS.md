@@ -6,13 +6,19 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
-## 2026-10-17 - R-5.1-2 is checked, and icon-registry is its one exemption
+## 2026-10-17 - R-5.1-2 is checked, with no exemption
 
-**Decision.** `check-structure` enforces R-5.1-2 (`scripts/lib/index-markup.ts`). A folder is C when its `meta.ts` says `rendering: 'client'`, PLAN 18's C; every folder under `src/connectors/` is covered whatever its meta says. Re-exporting `./client.js` does not mark a folder as C, because split components (Banner, Tag, Rating) do it beside their server markup. For a covered folder, every top-level statement of `index.tsx` is a re-export from a file of its own folder (`export ... from './...'`) or an `import type`; anything else is reported, as `markup` when it holds JSX. Twenty C folders already passed; `icon-registry` did not, and is exempt by name in `INDEX_MARKUP_EXEMPT`.
+**Decision.** `check-structure` enforces R-5.1-2 (`scripts/lib/index-markup.ts`). A folder is covered when it sits under `src/connectors/`, whatever its meta says, or when its `meta.ts` sets `rendering: 'client'`, read from the TypeScript syntax tree so a comment does not count. Re-exporting `./client.js` does not mark a folder as C, because split components (Banner, Tag, Rating) do it beside their server markup. For a covered folder, every top-level statement of `index.tsx` is an `import type` or a re-export from a file of its own folder (`./x.js` or `./parts/x.js`, never a `..` step). A type re-export may name any such file; a value re-export only `client.tsx`, `variants.ts`, `skeleton.tsx`, `lib.ts` (not `lib.tsx`, which may hold JSX) or a file whose first statement is `'use client'`. Anything else is reported, as `markup` when it holds JSX. All twenty C folders pass, `icon-registry` included.
 
-**Why the exemption.** `icon-registry` is an entry point, not a catalog row (the 2026-09-25 and 2026-10-05 entries), and is `rendering: 'client'` because its registry is module state, not because it is a `'use client'` module. Its `<Icon>` and `registerIcons()` must share that module and stay directive-less: a `'use client'` file would turn `registerIcons` into a client reference that a server file cannot call. Moving `<Icon>` into a `client.tsx` would need that directive or an R-8.1-1 exception for a directive-less `client.tsx`. A test fails if the exempt entry ever stops holding markup, so the exemption cannot outlive its reason.
+**icon-registry follows the rule.** Its registry `Map`, `registerIcons()`, `registeredIcons()` and `resolveIcon()` live in a directive-less `lib.ts` with no React import; `<Icon>` is a `'use client'` `client.tsx` that renders `<Svg icon={resolveIcon(name)}>`; `index.tsx` re-exports the two. Registration and render must run in the same module graph, which is the only use the entry point has: a browser-only tree (R-5.1-5, the 2026-09-25 entry), where `client.tsx` reads the same `lib.ts` instance; an RSC app uses the server `<Icon>`. Toast has the same shape: a client viewport and a `lib.ts` store, re-exported side by side. PLAN 18 has no IconRegistry row; its C comes from its meta.
 
-**Affects** `scripts/check-structure.ts`, `scripts/lib/index-markup.ts` and its test, and `docs/RULES.md`.
+**meta.rendering is tied to PLAN 18.** `src/shared/meta.test.ts` parses the Rendering column of PLAN 18 and fails when a folder's `rendering` differs from its row, so a C component cannot leave R-5.1-2 by calling itself split. The departures are written out in the test: `stepper` is `server` (the Unit 5 entry, "Stepper is a server component") and `avatar-group` is `server` (the entry below); `icon-registry` has no row.
+
+**Affects** `scripts/check-structure.ts`, `scripts/lib/index-markup.ts` and its test, `src/shared/meta.test.ts`, `src/components/icon-registry/{index.tsx,client.tsx,lib.ts}` and `docs/RULES.md`.
+
+## 2026-10-17 - AvatarGroup is a server component
+
+**Decision.** PLAN 18 gives "Avatar, AvatarGroup" one row, Sp. Avatar is split (its image fallback needs the client); AvatarGroup only lays out avatars and counts the rest as "+N", so it has no client half and its meta says `server`. `src/shared/meta.test.ts` records it as a departure.
 
 ## 2026-10-17 - R-5.3-2 is linted, with two allowances
 

@@ -1,10 +1,10 @@
 // R-8.1-1, R-5.1-2, R-5.12-1, R-5.12-2, R-5.12-4, R-9.2-4, R-8.5-1, R-10.5-1, R-10.5-3: the folder contract, file size, naming, the client boundary, the collection contract and overlay parts.
-import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, posix, relative, sep } from 'node:path'
 
 import { collectionErrors } from './lib/collections.js'
 import { FAIL_LINES, WARN_LINES, countLines, sizeVerdict, sourceFilesUnder } from './lib/file-sizes.js'
-import { INDEX_MARKUP_EXEMPT, indexMarkupViolations, isClientRendering } from './lib/index-markup.js'
+import { indexMarkupViolations, isCoveredFolder } from './lib/index-markup.js'
 import { categoryOf, exportedValueNames, missingBody, unpublishedStickyEdges } from './lib/overlay-parts.js'
 import {
   NAMING_EXEMPTIONS, SCROLLING_OVERLAYS, hookFileProblems, libFileProblems, overlayPartProblems, partFileProblems,
@@ -148,10 +148,10 @@ function checkComponentFolder(dir: string, slug: string) {
   }
 
   // R-5.1-2: a C component or a connector keeps its markup out of index.tsx.
-  const isClient = dir.startsWith(CONNECTORS)
-    || (files.includes('meta.ts') && isClientRendering(readFileSync(join(dir, 'meta.ts'), 'utf8')))
-  if (isClient && files.includes('index.tsx') && !INDEX_MARKUP_EXEMPT.has(slug)) {
-    for (const v of indexMarkupViolations(readFileSync(join(dir, 'index.tsx'), 'utf8'))) {
+  const metaSource = files.includes('meta.ts') ? readFileSync(join(dir, 'meta.ts'), 'utf8') : undefined
+  if (isCoveredFolder(rel(dir), metaSource) && files.includes('index.tsx')) {
+    const readSibling = (p: string) => (existsSync(join(dir, p)) ? readFileSync(join(dir, p), 'utf8') : undefined)
+    for (const v of indexMarkupViolations(readFileSync(join(dir, 'index.tsx'), 'utf8'), readSibling)) {
       errors.push(
         `${rel(join(dir, 'index.tsx'))}: ${v}.`
         + ' A C component or a connector re-exports its client parts, types, variants and skeleton (R-5.1-2).',

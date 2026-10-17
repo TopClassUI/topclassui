@@ -21,6 +21,36 @@ export const MUTATIONS: Mutation[] = [
     to: "    if (names.some((name) => /^type useRender\\b/.test(name))) return true",
   },
   {
+    label: 'R-5.1-2: a ./ specifier may step out of the folder with ..',
+    file: 'scripts/lib/index-markup.ts',
+    from: "const OWN_FILE = /^\\.\\/((?:parts\\/)?[\\w-]+)\\.js$/",
+    to: "const OWN_FILE = /^\\.\\/([\\w./-]+)\\.js$/",
+  },
+  {
+    label: 'R-5.1-2: a value re-export from any file of the folder is allowed',
+    file: 'scripts/lib/index-markup.ts',
+    from: '  if (isTypeOnlyExport(statement) || VALUE_SOURCES.has(file)) return undefined',
+    to: '  return undefined',
+  },
+  {
+    label: 'R-5.1-2: a comment that names client marks a folder C',
+    file: 'scripts/lib/index-markup.ts',
+    from: '  return visit(parse(\'meta.ts\', metaSource))',
+    to: '  return visit(parse(\'meta.ts\', metaSource)) || /rendering\\s*:\\s*\'client\'/.test(metaSource)',
+  },
+  {
+    label: 'R-5.1-2: connectors leave the check',
+    file: 'scripts/lib/index-markup.ts',
+    from: "  if (relDir.startsWith('src/connectors/')) return true",
+    to: '',
+  },
+  {
+    label: 'R-5.1-2: the icon registry forgets what was registered',
+    file: 'src/components/icon-registry/lib.ts',
+    from: '    if (data) registry.set(name, data)',
+    to: '',
+  },
+  {
     label: 'the contrast margin that absorbs browser differences is removed',
     file: 'scripts/lib/contrast-checks.ts',
     from: 'export const MARGIN = 0.15',
