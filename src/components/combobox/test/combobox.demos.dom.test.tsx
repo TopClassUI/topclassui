@@ -17,6 +17,7 @@ const AFTER: Record<string, string[]> = {
   'form': ['Next.js'],
   'load-more': ['Result 1'],
   'long-content': ['Supercalifragilistic'.repeat(15), 'Supercalifragilistic'.repeat(15)],
+  'playground': ['Next.js'],
   'rtl': ['عمّان'],
   'sizes': ['Apple', 'Apple', 'Apple', 'Apple', 'Apple'],
   'states': ['Jordan', 'Egypt', 'Saudi Arabia', 'Jordan'],

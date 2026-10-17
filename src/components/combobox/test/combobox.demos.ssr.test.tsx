@@ -5,13 +5,14 @@ import type { ComponentType } from 'react'
 import { describe, expect, it } from 'vitest'
 
 import { markup } from '#test/markup.js'
+import type { ComboboxDesignProps } from '../types.js'
 
 // PLAN 17.1: the demos are the docs code tab and the visual baselines, so each must render.
 const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'load-more', 'long-content', 'rtl', 'sizes', 'states', 'status', 'ten-thousand']
+const EXPECTED = ['basic', 'form', 'load-more', 'long-content', 'playground', 'rtl', 'sizes', 'states', 'status', 'ten-thousand']
 
 /** Each Combobox of each demo as the server writes it: its name, then the first twenty letters its input shows. */
 const COMBOBOXES: Record<string, string[]> = {
@@ -19,6 +20,7 @@ const COMBOBOXES: Record<string, string[]> = {
   'form': ['Framework: Next.js'],
   'load-more': ['Search results: '],
   'long-content': ['Long, own width: Supercalifragilistic', 'Long, full width: A label long enough '],
+  'playground': ['Framework: '],
   'rtl': ['المدينة: عمّان'],
   'sizes': ['Fruit, extra small: Apple', 'Fruit, small: Banana', 'Fruit, medium: Cherry', 'Fruit, large: Date', 'Fruit, extra large: '],
   'states': ['Invalid: Jordan', 'Disabled: Egypt', 'Read-only: Saudi Arabia', 'One option disabled: '],
@@ -70,6 +72,13 @@ describe('the demos the plan names', () => {
     const html = await render('form')
     expect(html).toMatch(/^<form class="[^"]*">/)
     expect(html).toMatch(/<input [^>]*name="framework" value="next"/)
+  })
+
+  it('playground: the schema props a Try it control sets reach the input', async () => {
+    const loaded = await import('../dummy/playground.tsx') as { default: ComponentType<ComboboxDesignProps> }
+    const html = markup(<loaded.default size="lg" invalid />)
+    expect(html).toMatch(/<input [^>]*aria-invalid="true"/)
+    expect(html).toContain('data-size="lg"')
   })
 
   it('rtl: an island that carries the direction and the language', async () => {
