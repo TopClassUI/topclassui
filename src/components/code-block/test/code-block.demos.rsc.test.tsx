@@ -80,7 +80,7 @@ describe('CodeBlock renders in a Server Component (R-5.1-1)', () => {
 
 describe('every demo is a Server Component that only hands client parts what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'highlighted', 'long-line', 'no-copy', 'no-header', 'rtl', 'wrap'])
+    expect(names).toEqual(['basic', 'highlighted', 'long-line', 'no-copy', 'no-header', 'playground', 'rtl', 'states', 'wrap'])
   })
 
   for (const name of names) {
@@ -94,7 +94,7 @@ describe('every demo is a Server Component that only hands client parts what can
   it('only the demos with a copy button load it', async () => {
     const counts = await Promise.all(names.map(async (name) => [name, crossings((await load(name))()).filter(({ part }) => part === 'CodeBlockCopy').length]))
     expect(Object.fromEntries(counts)).toEqual({
-      'basic': 1, 'highlighted': 1, 'long-line': 1, 'no-copy': 0, 'no-header': 0, 'rtl': 1, 'wrap': 1,
+      'basic': 1, 'highlighted': 1, 'long-line': 1, 'no-copy': 0, 'no-header': 0, 'playground': 1, 'rtl': 1, 'states': 2, 'wrap': 1,
     })
   })
 

@@ -53,8 +53,10 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/beside-text.tsx`
 - `dummy/custom-size.tsx`
 - `dummy/media-object.tsx`
+- `dummy/playground.tsx`
 - `dummy/rows.tsx`
 - `dummy/rtl.tsx`
+- `dummy/states.tsx`
 - `dummy/variants.tsx`
 
 ## Verified against
