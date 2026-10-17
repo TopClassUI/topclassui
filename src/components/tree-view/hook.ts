@@ -8,7 +8,7 @@ import { COLLECTION_BOUNDARIES } from '#shared/contracts/collection.js'
 import { useDirection, useLabels } from '#shared/provider/context.js'
 import { useControllableState } from '#shared/use-controllable-state.js'
 import { TREE_VIEW_DEFAULTS, TREE_VIEW_ROW_ESTIMATE, TYPEAHEAD_MS } from './constants.js'
-import { findRow, flattenTree, keyAction, keyOfRow, rowIndexOf, toggled, typeahead } from './lib.js'
+import { findRow, flattenTree, isScrolledOut, keyAction, keyOfRow, rowIndexOf, toggled, typeahead } from './lib.js'
 import type {
   TreeFocusEvent, TreeKeyAction, TreeKeyEvent, TreeMouseEvent, TreePointerEvent, TreeViewHookProps,
 } from './types.js'
@@ -30,12 +30,14 @@ export function useTreeView(props: TreeViewHookProps) {
   const rows = useMemo(() => flattenTree(items, open), [items, open])
   const [active, setActive] = useState(null as string | null)
   const [unit, setUnit] = useState(TREE_VIEW_ROW_ESTIMATE)
+  const [outOfView, setOutOfView] = useState(false)
   // useCollection reads the tree on a scroll or a resize only: paging waits until it has read the tree at this count.
   const [counted, setCounted] = useState(-1)
   const given = useRef(false)
   const tree = useRef(null as HTMLDivElement | null)
   const pending = useRef(-1)
-  const pressed = useRef(-1)
+  // The row a pointer pressed, -1 off a row, until the focus it brings; null when no press is on its way.
+  const pressed = useRef(null as number | null)
   const typed = useRef({ text: '', at: 0 })
   // A page is asked for once per length of the root list, so opening a branch near the end never asks for it again.
   const askedAt = useRef(-1)
@@ -47,6 +49,7 @@ export function useTreeView(props: TreeViewHookProps) {
     return Promise.resolve(loadMore()).catch((error: unknown) => { askedAt.current = -1; throw error })
   }, [loadMore, items.length])
 
+  const rowsCap = props.visibleRows === undefined ? undefined : clamp(props.visibleRows, visibleRowsMin, visibleRowsMax)
   const collection = useCollection({
     items: rows,
     getKey: keyOfRow,
@@ -55,6 +58,7 @@ export function useTreeView(props: TreeViewHookProps) {
     hasMore: hasMore && counted === rows.length,
     loadMore: loadMore ? ask : undefined,
     loadMoreThreshold: clamp(props.loadMoreThreshold ?? TREE_VIEW_DEFAULTS.loadMoreThreshold, loadMoreThresholdMin, loadMoreThresholdMax),
+    visibleRows: rowsCap,
   })
   const { scrollRef, scrollToIndex } = collection
 
@@ -89,6 +93,8 @@ export function useTreeView(props: TreeViewHookProps) {
     }
     given.current = true
     if (pending.current >= 0) reveal(pending.current)
+    // Every scroll renders, as useCollection reads it: a wheel can leave the highlighted row mounted but out of sight.
+    setOutOfView(isScrolledOut(node.querySelector('[data-highlighted]'), node))
   })
 
   const direction = useDirection()
@@ -118,9 +124,11 @@ export function useTreeView(props: TreeViewHookProps) {
     props.onKeyDown?.(event)
     if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return
     const index = findRow(rows, active)
-    if (event.key.length === 1 && event.key !== ' ') {
-      const now = Date.now()
-      const text = now - typed.current.at > TYPEAHEAD_MS ? event.key : typed.current.text + event.key
+    const now = Date.now()
+    // A space inside a query is text, as Base UI's typeahead keeps it; only after the query lapses does it select.
+    const typing = typed.current.text !== '' && now - typed.current.at <= TYPEAHEAD_MS
+    if (event.key.length === 1 && (event.key !== ' ' || typing)) {
+      const text = typing ? typed.current.text + event.key : event.key
       typed.current = { text, at: now }
       const found = typeahead(rows, index, text)
       if (found >= 0) highlight(found)
@@ -133,13 +141,13 @@ export function useTreeView(props: TreeViewHookProps) {
     run(action)
   }
 
-  // Focus by a key or a script highlights the selected row when it is visible, else the first; a press, the row pressed.
+  // A key or a script highlights the selected row when visible, else the first; a press, the row pressed or none, unscrolled.
   const onFocus = (event: TreeFocusEvent) => {
     props.onFocus?.(event)
     if (event.target !== event.currentTarget) return
     const press = pressed.current
-    pressed.current = -1
-    if (press >= 0) {
+    pressed.current = null
+    if (press !== null) {
       setActive(rows[press]?.node.id ?? null)
       return
     }
@@ -149,12 +157,24 @@ export function useTreeView(props: TreeViewHookProps) {
 
   const onBlur = (event: TreeFocusEvent) => {
     props.onBlur?.(event)
+    pressed.current = null
     if (event.target === event.currentTarget) setActive(null)
   }
 
   const onPointerDown = (event: TreePointerEvent) => {
     props.onPointerDown?.(event)
     pressed.current = rowIndexOf(event.target)
+  }
+
+  // A mouse focuses before it lifts; a finger after, and then clicks. A finger that scrolls is cancelled, and never focuses.
+  const onPointerUp = (event: TreePointerEvent) => {
+    props.onPointerUp?.(event)
+    if (event.pointerType === 'mouse') pressed.current = null
+  }
+
+  const onPointerCancel = (event: TreePointerEvent) => {
+    props.onPointerCancel?.(event)
+    pressed.current = null
   }
 
   // A press does what Enter does. A disabled row takes no pointer, and is refused here as well.
@@ -168,7 +188,6 @@ export function useTreeView(props: TreeViewHookProps) {
 
   const base = useId()
   const mounted = collection.rows.find((row) => row.key === active)
-  const rowsCap = props.visibleRows === undefined ? undefined : clamp(props.visibleRows, visibleRowsMin, visibleRowsMax)
 
   return {
     treeRef,
@@ -176,6 +195,7 @@ export function useTreeView(props: TreeViewHookProps) {
     idOf: (index: number) => `${base}-${String(index)}`,
     selected,
     active,
+    outOfView,
     // Absent while the highlighted row is not mounted, never an id no element has.
     activeDescendant: mounted ? `${base}-${String(mounted.index)}` : undefined,
     tabIndex: rows.length > 0 ? 0 : undefined,
@@ -191,6 +211,6 @@ export function useTreeView(props: TreeViewHookProps) {
       // Left out, the --tc-list-rows knob applies: React writes no style for an undefined value.
       '--tc-list-rows': rowsCap,
     },
-    onKeyDown, onFocus, onBlur, onPointerDown, onClick,
+    onKeyDown, onFocus, onBlur, onPointerDown, onPointerUp, onPointerCancel, onClick,
   }
 }

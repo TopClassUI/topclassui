@@ -54,6 +54,7 @@ export function useCollection<T>(props: UseCollectionOptions<T>): UseCollectionR
     hasMore = false,
     loadMore,
     loadMoreThreshold = defaults.loadMoreThreshold,
+    visibleRows = defaults.visibleRows,
   } = props
 
   const count = items.length
@@ -119,13 +120,14 @@ export function useCollection<T>(props: UseCollectionOptions<T>): UseCollectionR
     if (!virtualized) return EMPTY
     return getWindow({
       scrollTop,
-      viewportHeight,
+      // Unmeasured, on the server and until the first read, the window fills the rows the box is drawn to show.
+      viewportHeight: viewportHeight > 0 ? viewportHeight : visibleRows * estimateRowHeight,
       count,
       estimateRowHeight,
       overscan: defaults.overscan,
       measured: measuredRef.current,
     })
-  }, [virtualized, scrollTop, viewportHeight, count, estimateRowHeight, defaults.overscan, measuredVersion])
+  }, [virtualized, scrollTop, viewportHeight, visibleRows, count, estimateRowHeight, defaults.overscan, measuredVersion])
 
   const start = virtualized ? windowed.start : 0
   const end = virtualized ? windowed.end : count
@@ -142,7 +144,7 @@ export function useCollection<T>(props: UseCollectionOptions<T>): UseCollectionR
       const key = getKey(item)
       if (seen.has(key)) {
         // Warned once per key, not once per render: this memo recomputes on every scroll.
-        if (process.env['NODE_ENV'] !== 'production' && !warnedKeys.current.has(key)) {
+        if (process.env.NODE_ENV !== 'production' && !warnedKeys.current.has(key)) {
           warnedKeys.current.add(key)
           console.warn(`useCollection: duplicate key "${key}" at index ${String(i)}; the row was dropped.`)
         }

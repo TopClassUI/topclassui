@@ -94,6 +94,14 @@ export function rowIndexOf(target: EventTarget): number {
   return Number(target.closest('[role="treeitem"]')?.getAttribute('data-index') ?? '-1')
 }
 
+/** Whether a row lies wholly outside the box the tree shows, as a wheel can leave it; no row never is. */
+export function isScrolledOut(row: Element | null, tree: Element): boolean {
+  const box = row?.getBoundingClientRect()
+  if (!box) return false
+  const top = tree.getBoundingClientRect().top + tree.clientTop
+  return box.bottom <= top || box.top >= top + tree.clientHeight
+}
+
 /** The open ids after a branch opens or closes; the same array when nothing changes. */
 export function toggled(expanded: readonly string[], id: string, open: boolean): readonly string[] {
   const has = expanded.includes(id)

@@ -51,6 +51,24 @@ export const MUTATIONS: Mutation[] = [
     to: '  --tc-list-pad-end: 0;\n',
   },
   {
+    label: 'the shared collection reads NODE_ENV in bracket form, which no bundler inlines, so a duplicate key throws "process is not defined" in the browser',
+    file: 'src/shared/collection/use-collection.ts',
+    from: "if (process.env.NODE_ENV !== 'production' && !warnedKeys.current.has(key))",
+    to: "if (process.env['NODE_ENV'] !== 'production' && !warnedKeys.current.has(key))",
+  },
+  {
+    label: 'the shared controllable state reads NODE_ENV in bracket form, which no bundler inlines, so a switch to controlled throws in the browser',
+    file: 'src/shared/use-controllable-state.ts',
+    from: "    if (process.env.NODE_ENV !== 'production') {",
+    to: "    if (process.env['NODE_ENV'] !== 'production') {",
+  },
+  {
+    label: 'the shared collection windows an unmeasured list to its overscan alone, so a server-rendered list shows blank rows until hydration',
+    file: 'src/shared/collection/use-collection.ts',
+    from: '      viewportHeight: viewportHeight > 0 ? viewportHeight : visibleRows * estimateRowHeight,',
+    to: '      viewportHeight,',
+  },
+  {
     label: 'the shared collection pages before it has read the list, so a list longer than its box asks on mount',
     file: 'src/shared/collection/use-collection.ts',
     from: 'const wantsMore = edge.count === count && (virtualized',

@@ -66,6 +66,14 @@ describe('the tree', () => {
       .toBe('outline-offset: calc(var(--tc-ring-width) * -1);')
   })
 
+  it('draws its own ring too while the row holding the highlight is mounted but scrolled out of sight', () => {
+    const at = (cls: string) => ruleOf(`${selectorOf(`focus-visible:data-highlight-hidden:${cls}`)}:focus-visible[data-highlight-hidden]`)
+    expect(at('outline-solid')).toContain('outline-style: solid;')
+    expect(at('outline-(length:--tc-ring-width)')).toContain('outline-width: var(--tc-ring-width);')
+    expect(at('-outline-offset-(length:--tc-ring-width)')).toBe('outline-offset: calc(var(--tc-ring-width) * -1);')
+    expect(at('outline-ring')).toBe('outline-color: var(--tc-ring);')
+  })
+
   it('with no row it is not drawn', () => {
     expect(ruleOf(`${selectorOf('empty:hidden')}:empty`)).toBe('display: none;')
   })
