@@ -13,14 +13,14 @@ function Link({ href, prefetch, className, children, ...rest }: LinkProps) {
 
 // R-5.7-4: the element form, so a Server Component can pass a framework link.
 describe('<NavbarLink render>', () => {
-  it('renders the element it is given inside the list item, with its own href', () => {
+  it('renders the element it is given, with its own href', () => {
     const html = markup(<NavbarLink render={<Link href="/docs" />}>Docs</NavbarLink>)
-    expect(html).toMatch(/^<li class="[^"]+"><a href="\/docs" data-prefetch="on" class="[^"]+"><span dir="auto" class="truncate min-w-0">Docs<\/span><\/a><\/li>$/)
+    expect(html).toMatch(/^<a href="\/docs" data-prefetch="on" class="[^"]+"><span dir="auto" class="truncate min-w-0">Docs<\/span><\/a>$/)
   })
 
   it('gives it the classes of a link, so it looks like the anchor it replaces', () => {
-    const framework = classList(markup(<NavbarLink render={<Link href="/docs" />}>Docs</NavbarLink>).replace(/^<li[^>]*>/, ''))
-    const plain = classList(markup(<NavbarLink href="/docs">Docs</NavbarLink>).replace(/^<li[^>]*>/, ''))
+    const framework = classList(markup(<NavbarLink render={<Link href="/docs" />}>Docs</NavbarLink>))
+    const plain = classList(markup(<NavbarLink href="/docs">Docs</NavbarLink>))
     expect(framework).toEqual(plain)
     expect(framework).toContain('text-muted')
   })
@@ -39,7 +39,7 @@ describe('<NavbarLink render>', () => {
 
   it('merges className: the part, then the caller on the part, then the element, which wins', () => {
     const html = markup(<NavbarLink className="text-body" render={<Link href="/docs" className="text-primary-solid" />}>Docs</NavbarLink>)
-    const classes = classList(html.replace(/^<li[^>]*>/, ''))
+    const classes = classList(html)
     expect(classes).toContain('text-primary-solid')
     expect(classes).not.toContain('text-body')
     expect(classes).not.toContain('text-muted')
