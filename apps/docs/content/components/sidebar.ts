@@ -57,7 +57,7 @@ export const sidebar = {
     ar: 'مع dir="rtl" يكون خط الشريط على يساره وزر الطي على يمينه، وأيقونته معكوسة. `TopClassProvider` مع locale="ar" يسمّي الاثنين بالعربية.',
   },
   related: {
-    components: ['navbar', 'breadcrumb', 'tabs', 'drawer', 'icon'],
+    components: ['navbar', 'breadcrumb', 'tabs', 'drawer'],
     pages: ['server-first', 'rtl', 'icons'],
   },
 } as const
