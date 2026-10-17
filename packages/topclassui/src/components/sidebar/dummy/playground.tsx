@@ -6,10 +6,10 @@ import type { SidebarDesignProps } from '../types.js'
 import { SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoot } from '../index.js'
 
 /** The rail the docs' Try it drives: defaultOpen and open go to the root, and current marks Home. */
-export default function Demo({ defaultOpen, open, current }: SidebarDesignProps = {}) {
+export default function Demo({ current, ...props }: SidebarDesignProps = {}) {
   return (
     <div className="h-96">
-      <SidebarRoot defaultOpen={defaultOpen} open={open}>
+      <SidebarRoot {...props}>
         <SidebarHeader>Workspace</SidebarHeader>
         <SidebarBody>
           <SidebarGroup>
