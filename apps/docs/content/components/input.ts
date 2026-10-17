@@ -10,7 +10,7 @@ export const input = {
     ar: 'حقل إدخال أصلي يُعرض على الخادم ولا يشحن أي JavaScript. الأنواع ترفض حقلًا بلا اسم.',
   },
   demos: ['labelled', 'types', 'sizes', 'full-width', 'row', 'custom-size', 'skeleton', 'rtl'],
-  stageHeight: 6,
+  stageHeight: 7,
   note: {
     en: 'Outside a Field, Input needs `id`, `aria-label` or `aria-labelledby`: the types reject an unlabelled one.',
     ar: 'خارج Field يحتاج Input إلى `id` أو `aria-label` أو `aria-labelledby`: الأنواع ترفض حقلًا بلا تسمية.',
