@@ -1,11 +1,11 @@
 import type { AccordionDesignProps } from '../types.js'
 import { AccordionItem, AccordionRoot } from '../index.js'
 
-/** The accordion the docs' Try it drives: hiddenUntilFound goes to the root, headingLevel to every
- * item. The stage opens on h2, not the schema's h3, because the page's own title is the h1. */
-export default function Demo({ hiddenUntilFound = true, headingLevel = 2 }: AccordionDesignProps = {}) {
+/** The accordion the docs' Try it drives: hiddenUntilFound goes to the root, headingLevel to every item,
+ * which open on h2 under the harness h1 rather than the schema's h3. */
+export default function Demo({ headingLevel = 2, ...props }: AccordionDesignProps = {}) {
   return (
-    <AccordionRoot hiddenUntilFound={hiddenUntilFound} className="max-w-105">
+    <AccordionRoot {...props} className="max-w-105">
       <AccordionItem value="server" title="What is a server component?" headingLevel={headingLevel}>
         <p>A component that renders on the server and sends HTML, with no JavaScript of its own.</p>
       </AccordionItem>
