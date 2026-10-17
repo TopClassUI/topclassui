@@ -83,9 +83,9 @@ describe('a group has a label and its rows', () => {
 
 describe('a row must go somewhere (R-5.6-1)', () => {
   it('takes an href, or an element to render, or both', () => {
-    expectTypeOf<Accepts<SidebarLinkProps, { href: string }>>().toEqualTypeOf<true>()
+    expectTypeOf<Accepts<SidebarLinkProps, { href: string, children: string }>>().toEqualTypeOf<true>()
     expectTypeOf<Accepts<SidebarLinkProps, { render: ReactElement }>>().toEqualTypeOf<true>()
-    expectTypeOf<Accepts<SidebarLinkProps, { render: ReactElement, href: string }>>().toEqualTypeOf<true>()
+    expectTypeOf<Accepts<SidebarLinkProps, { render: ReactElement, href: string, children: string }>>().toEqualTypeOf<true>()
   })
 
   it('refuses neither, an href that may be undefined, and the function form of render (R-5.7-4)', () => {
@@ -100,7 +100,17 @@ describe('a row must go somewhere (R-5.6-1)', () => {
     expectTypeOf<Accepts<keyof SidebarLinkProps, 'aria-current'>>().toEqualTypeOf<false>()
   })
 
+  it('is named by its label, by aria-label when it is an icon alone, or by the element it renders', () => {
+    expectTypeOf<Accepts<SidebarLinkProps, { href: string, icon: ReactNode, 'aria-label': string }>>().toEqualTypeOf<true>()
+    expectTypeOf<Accepts<SidebarLinkProps, { render: ReactElement, icon: ReactNode }>>().toEqualTypeOf<true>()
+  })
+
+  it('refuses a row with no name: an href alone, or an href and an icon', () => {
+    expectTypeOf<Accepts<SidebarLinkProps, { href: string }>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<SidebarLinkProps, { href: string, icon: ReactNode }>>().toEqualTypeOf<false>()
+  })
+
   it('takes what an anchor takes: a target, a rel and a download', () => {
-    expectTypeOf<Accepts<SidebarLinkProps, { href: string, target: string, rel: string, download: boolean }>>().toEqualTypeOf<true>()
+    expectTypeOf<Accepts<SidebarLinkProps, { href: string, children: string, target: string, rel: string, download: boolean }>>().toEqualTypeOf<true>()
   })
 })

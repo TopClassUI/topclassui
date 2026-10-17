@@ -434,6 +434,18 @@ export const MUTATIONS: Mutation[] = [
     to: '<TopClassProvider direction="rtl" locale="en">',
   },
   {
+    label: 'the controlled sidebar demo row no longer wraps, so at 320 px its button scrolls the page sideways',
+    file: 'src/components/sidebar/dummy/controlled.tsx',
+    from: '<div className="flex h-96 flex-wrap gap-4">',
+    to: '<div className="flex h-96 gap-4">',
+  },
+  {
+    label: 'the controlled sidebar demo column has no 160 px basis, so it never wraps under the rail',
+    file: 'src/components/sidebar/dummy/controlled.tsx',
+    from: '<div className="grid min-w-0 grow basis-40 content-start gap-3">',
+    to: '<div className="grid min-w-0 flex-1 content-start gap-3">',
+  },
+  {
     label: 'the long-list sidebar demo gives its rail no height, so its sixty links scroll the page',
     file: 'src/components/sidebar/dummy/long-list.tsx',
     from: '<div className="h-[calc(100dvh-4rem)]">',
@@ -452,10 +464,28 @@ export const MUTATIONS: Mutation[] = [
     to: '<SidebarLink icon={<Icon name="palette" />}>Theming</SidebarLink>',
   },
   {
+    label: 'the sidebar README import line drops the Icon its sample draws, so the sample does not compile as pasted',
+    file: 'src/components/sidebar/README.md',
+    from: 'import { Icon, SidebarBody,',
+    to: 'import { SidebarBody,',
+  },
+  {
     label: 'a plain sidebar link no longer needs an href, so a row can go nowhere',
     file: 'src/components/sidebar/types.ts',
     from: '  /** Where the row goes. */\n  href: string\n',
     to: '  /** Where the row goes. */\n  href?: string | undefined\n',
+  },
+  {
+    label: 'a plain sidebar link no longer needs a name, so an icon alone compiles and axe reports link-name',
+    file: 'src/components/sidebar/types.ts',
+    from: '  & (SidebarLinkAsElement | (SidebarLinkAsAnchor & SidebarLinkNamed))',
+    to: '  & (SidebarLinkAsElement | SidebarLinkAsAnchor)',
+  },
+  {
+    label: 'a sidebar link that is an icon alone can no longer be named by aria-label',
+    file: 'src/components/sidebar/types.ts',
+    from: "  | { 'children'?: undefined, 'aria-label': string }\n",
+    to: '',
   },
   {
     label: 'the sidebar schema loses the default of defaultOpen, so the props table says a rail starts as nothing',

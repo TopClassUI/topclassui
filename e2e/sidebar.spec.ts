@@ -1345,6 +1345,58 @@ test.describe('text that is made larger or spaced out', () => {
       expect(spills.filter((spill) => spill > 0.5)).toEqual([])
     })
   }
+
+  // The rail gives way to its parent at a 32 px root; a column beside it must give way too, by going under it.
+  for (const { width, page: room, rail: railWidth } of [{ width: 320, page: 305, rail: 177 }, { width: 390, page: 375, rail: 247 }]) {
+    for (const direction of DIRECTIONS) {
+      test(`${String(width)} px ${direction} with the root at 32 px: the controlled demo's button goes under the rail, whole on the page, expanded and collapsed`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 480 })
+        await openLive(page, 'sidebar--controlled', { direction })
+        await page.addStyleTag({ content: 'html { font-size: 32px !important }' })
+        const rail = railOf(page)
+        expect(await page.evaluate(() => document.body.clientWidth)).toBe(room)
+        for (const [name, expected] of [['Hide the labels', railWidth], ['Show the labels', 120]] as const) {
+          const button = page.getByRole('button', { name })
+          expect(await widthOf(rail)).toBe(expected)
+          const [frame, box] = [await boxOf(rail), await boxOf(button)]
+          expect(box.top, `"${name}" starts under the rail`).toBeGreaterThanOrEqual(frame.bottom)
+          expect([box.left >= 0, box.right <= room], `"${name}" is whole between the edges of the page`).toEqual([true, true])
+          await expectNoSidewaysScroll(page)
+          await button.click()
+        }
+      })
+
+      test(`${String(width)} px ${direction} with the root at 32 px: in a layout the column stays beside the rail, whole on the page, and the page does not scroll sideways`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 480 })
+        await openLive(page, 'sidebar--in-a-layout', { direction })
+        await page.addStyleTag({ content: 'html { font-size: 32px !important }' })
+        const column = await boxOf(page.locator('#demo nav + div'))
+        expect([column.left >= 0, column.right <= room], 'the column is whole between the edges of the page').toEqual([true, true])
+        await expectNoSidewaysScroll(page)
+        expect(await faultsOf(railOf(page))).toEqual([])
+      })
+    }
+  }
+})
+
+// A mouse keeps the page's scrollbar gutter, 15 px that isMobile has not: 320 px is the reflow width of WCAG 1.4.10.
+test.describe('a mouse at 320 x 480, with the scrollbar gutter', () => {
+  test.use({ viewport: { width: 320, height: 480 } })
+
+  for (const demo of Object.keys(SIDEBARS)) {
+    for (const direction of DIRECTIONS) {
+      test(`${demo} ${direction}: the page does not scroll sideways, expanded or collapsed`, async ({ page }) => {
+        await openLive(page, demo, { direction })
+        const rail = railOf(page)
+        expect(await page.evaluate(() => document.body.clientWidth), 'px of page beside the gutter').toBe(305)
+        for (let press = 0; press < 2; press++) {
+          await expectNoSidewaysScroll(page)
+          expect(await faultsOf(rail)).toEqual([])
+          await triggerOf(rail).click()
+        }
+      })
+    }
+  }
 })
 
 test.describe('motion', () => {
