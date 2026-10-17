@@ -109,6 +109,7 @@
     "test:e2e": "pnpm harness:build && playwright test",
     "readme:build": "tsx scripts/readme-build.ts",
     "check:readme": "tsx scripts/readme-build.ts --check",
+    "test:consumers": "tsx scripts/consumer-smoke.ts",
     "prepublishOnly": "pnpm check:package"
   },
   "devDependencies": {
