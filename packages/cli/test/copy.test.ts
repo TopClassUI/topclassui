@@ -103,8 +103,12 @@ describe.each(FIXTURES)('%s', (fixture) => {
   })
 
   it('writes the tree, the CSS entry and topclassui.json of the snapshot', async () => {
+    // The library version and the file hashes change every release; the snapshot pins the shape, not them.
     const config = readFileSync(join(app, 'topclassui.json'), 'utf8')
-    const snapshot = [`# ${fixture}: the copied tree`, tree(folder), `# ${css}`, readFileSync(join(app, css), 'utf8'), '# topclassui.json', config].join('\n')
+      .replace(/"(version|registry)": "[^"]+"/g, '"$1": "<library version>"')
+      .replace(/"sha256": "[0-9a-f]{64}"/g, '"sha256": "<sha256>"')
+    const copied = tree(folder).replace(/^(styles\.css\s+)[0-9a-f]{12}$/m, '$1<hash>')
+    const snapshot = [`# ${fixture}: the copied tree`, copied, `# ${css}`, readFileSync(join(app, css), 'utf8'), '# topclassui.json', config].join('\n')
     await expect(snapshot).toMatchFileSnapshot(`snapshots/${fixture}.txt`)
   })
 
