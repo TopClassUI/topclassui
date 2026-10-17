@@ -10,7 +10,7 @@ export const textarea = {
     ar: 'مربع نص أصلي يُعرض على الخادم. التمدد التلقائي والعدّاد الحي هما الجزآن الوحيدان اللذان يُحمَّلان في المتصفح.',
   },
   demos: ['basic', 'autosize', 'show-count', 'sizes', 'form', 'row', 'long-content', 'skeleton', 'rtl'],
-  stageHeight: 9,
+  stageHeight: 10,
   note: {
     en: 'On its own it is server HTML; `autosize` or `showCount` is what loads the small client half.',
     ar: 'وحده هو HTML من الخادم؛ `autosize` أو `showCount` هو ما يحمّل نصف العميل الصغير.',
