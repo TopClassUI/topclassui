@@ -79,11 +79,14 @@ A boolean `value` would need that string under a new name and a hand-written han
 | `name`, `value`, `uncheckedValue`, `form`, `required`, `disabled`, `readOnly`, `inputRef` | passed through |
 | a `<span>` root | always a native `<button>`: `nativeButton` and `render` are not props |
 
+**`SwitchSkeleton`** is the box of the switch: give it the same `size`. It is the target of
+24 px (44 under a finger) around the track of that size, and renders on the server.
+
 ### Not built
 
 `tone` (one is drawn), a label, a hint and a required mark (a Field's), a hover look, a
 read-only look, the invalid ring that is always on, text or an icon in the thumb, a loading
-state, a skeleton (use `Skeleton`).
+state.
 
 <!-- /hand-written -->
 
