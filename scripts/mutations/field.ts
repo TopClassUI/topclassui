@@ -6,6 +6,7 @@ const INDEX = 'src/components/field/index.tsx'
 const HOOK = 'src/components/field/hook.ts'
 const LIB = 'src/components/field/lib.tsx'
 const CLASSES = 'src/components/field/classes.ts'
+const FORM_DEMO = 'src/components/field/dummy/form.tsx'
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -59,14 +60,26 @@ export const MUTATIONS: Mutation[] = [
   {
     label: "field: FieldLive's error no longer goes after a change of the field's value",
     file: HOOK,
-    from: 'if (before !== null && !sameEntries(before, entriesOf(rootRef.current, name))) setAnswered(errors)',
-    to: 'if (before !== null && !sameEntries(before, entriesOf(rootRef.current, name))) void before',
+    from: '    if (before === null || sameEntries(before, entriesOf(rootRef.current, name))) return false\n    setAnswered(errors)\n',
+    to: '    if (before === null || sameEntries(before, entriesOf(rootRef.current, name))) return false\n',
   },
   {
     label: "field: FieldLive's error goes after any click, one that changes nothing included",
     file: HOOK,
-    from: 'if (before !== null && !sameEntries(before, entriesOf(rootRef.current, name))) setAnswered(errors)',
-    to: 'if (before !== null) setAnswered(errors)',
+    from: 'if (before === null || sameEntries(before, entriesOf(rootRef.current, name))) return false',
+    to: 'if (before === null) return false',
+  },
+  {
+    label: 'field: a change tells no other FieldLive of the form, so a second box of the same name stays invalid after the answer',
+    file: HOOK,
+    from: 'if (answer() && root) formOf(root)?.dispatchEvent(new Event(FIELD_CHANGE_EVENT))',
+    to: 'if (answer() && root) void formOf(root)',
+  },
+  {
+    label: "field: a FieldLive told of a change drops its error without reading its own entries, so a field of another name clears too",
+    file: HOOK,
+    from: 'const recheck = () => { answer() }',
+    to: 'const recheck = () => { setAnswered(errors) }',
   },
   {
     label: "field: FieldLive keys the answered error on nothing, so the action's next answer does not bring it back",
@@ -91,5 +104,11 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: "export const FIELD_LABEL_INLINE = 'col-start-2 row-start-1 font-normal'",
     to: "export const FIELD_LABEL_INLINE = 'font-normal'",
+  },
+  {
+    label: 'field: the button row of field--form no longer wraps, so at a 32 px root it widens every field past a 320 px screen',
+    file: FORM_DEMO,
+    from: '<div className="flex flex-wrap gap-2">',
+    to: '<div className="flex gap-2">',
   },
 ]

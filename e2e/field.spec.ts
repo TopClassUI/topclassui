@@ -314,10 +314,11 @@ test.describe('text and motion', () => {
   for (const direction of DIRECTIONS) {
     test(`${direction}: at a root of 32 px nothing overlaps and nothing scrolls sideways on a 320 px screen`, async ({ page }) => {
       await page.setViewportSize({ width: 320, height: 480 })
-      for (const demo of ['field--hint-error', 'field--inline', 'field--required']) {
+      for (const demo of ['field--controls', 'field--form', 'field--hint-error', 'field--inline', 'field--required']) {
         await page.goto(urlFor(demo, 'light', direction))
         await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
         await expectNoSidewaysScroll(page)
+        expect(await offScreen(page), demo).toEqual([])
         expect(await overlaps(page), demo).toEqual([])
       }
     })
@@ -344,6 +345,23 @@ test.describe('text and motion', () => {
     }
   })
 })
+
+/** Every element of the demo that starts before the screen's left edge or ends past its right, by tag and text: a page
+ * in RTL overflows to the left, where the scroll width does not see it. An element its own scroller clips is skipped. */
+function offScreen(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const demo = document.getElementById('demo')
+    const width = document.documentElement.clientWidth
+    const clipped = (el: Element) => {
+      for (let up = el.parentElement; up && up !== demo; up = up.parentElement) if (getComputedStyle(up).overflowX !== 'visible') return true
+      return false
+    }
+    return [...document.querySelectorAll('#demo *')].filter((el) => {
+      const r = el.getBoundingClientRect()
+      return r.width > 0 && (r.left < -0.5 || r.right > width + 0.5) && !clipped(el)
+    }).map((el) => `${el.tagName.toLowerCase()} ${el.textContent.slice(0, 20)}`)
+  })
+}
 
 /** Every pair of a Field's parts (label, control, hint, error) whose boxes cross, by the text of the first. */
 function overlaps(page: Page): Promise<string[]> {
@@ -423,6 +441,39 @@ test.describe('live: FieldLive under a React 19 form action', () => {
     expect((await page.evaluate(() => window.fieldSent))?.[1]).toEqual([['email', 'second@example.com'], ['country', 'jo']])
     await expect(page.getByRole('textbox', { name: 'Email' })).toHaveValue('second@example.com')
   })
+})
+
+test.describe('live: one name on several FieldLive, under a React 19 form action (choice 33)', () => {
+  const FORM = '#field-shared-name'
+  /** By label: the error text the field shows, and whether its control is invalid. */
+  const shown = (page: Page) => page.locator(`${FORM} label[id$="-label"]`).evaluateAll((labels) => labels.map((label) => {
+    const control = document.querySelector(`[aria-labelledby="${label.id}"]`)
+    const error = document.getElementById(`${label.id.slice(0, -'-label'.length)}-err`)?.textContent ?? ''
+    return `${label.textContent} | ${error} | ${control?.getAttribute('aria-invalid') === 'true' ? 'invalid' : ''}`
+  }))
+  const send = async (page: Page, answers: string) => {
+    await page.getByRole('button', { name: 'Send' }).click()
+    await expect(page.locator(FORM)).toHaveAttribute('data-answers', answers)
+  }
+  test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
+
+  for (const how of ['a click', 'the space bar'] as const) {
+    test(`${how} on one box clears the group's error from every box of the name, and from no other field`, async ({ page }) => {
+      await openLive(page, 'separator--horizontal')
+      await page.addScriptTag({ type: 'module', url: '/e2e/fixtures/field-shared-name.tsx' })
+      await expect(page.locator(FORM)).toHaveAttribute('data-answers', '0')
+      await send(page, '1')
+      await expect.poll(() => shown(page)).toEqual(['Email me | Pick one | invalid', 'Text me | Pick one | invalid', 'Note | Add a note | invalid'])
+      const email = page.getByRole('checkbox', { name: 'Email me' })
+      if (how === 'a click') await email.click()
+      else { await email.focus(); await page.keyboard.press('Space') }
+      await expect(email).toBeChecked()
+      await expect.poll(() => shown(page)).toEqual(['Email me |  | ', 'Text me |  | ', 'Note | Add a note | invalid'])
+      await send(page, '2')
+      await expect.poll(() => shown(page)).toEqual(['Email me | Pick one | invalid', 'Text me | Pick one | invalid', 'Note | Add a note | invalid'])
+      await expect(email).toBeChecked()
+    })
+  }
 })
 
 test.describe('live: a reset', () => {
