@@ -10,7 +10,7 @@ import { type Clip, type Rgb, contrast, pixelsOf, rgbOf } from './pixels.js'
 // the bar, a ring a clipping box could cut, a bar that wraps instead of pushing the page wide, and forced colours.
 
 /** Every demo. Written out, so a renamed demo fails here. */
-const NAVBARS = ['navbar--basic', 'navbar--many-links', 'navbar--not-sticky', 'navbar--rtl', 'navbar--tall-page', 'navbar--with-search']
+const NAVBARS = ['navbar--basic', 'navbar--many-links', 'navbar--not-sticky', 'navbar--rtl', 'navbar--skeleton', 'navbar--tall-page', 'navbar--with-search']
 
 /** The three screens Unit 3 measures at, and a phone on its side. */
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 1280, height: 800 }, { width: 844, height: 390 }] as const
@@ -158,7 +158,7 @@ test.afterEach(async ({ page }) => {
 
 test('the table names every navbar demo', () => {
   expect([...NAVBARS].sort()).toEqual(DEMOS.filter((demo) => demo.startsWith('navbar--')).sort())
-  expect(NAVBARS).toHaveLength(6)
+  expect(NAVBARS).toHaveLength(7)
 })
 
 // PLAN 19: a server-first bar is accepted on the HTML the server sends, before any script has run.

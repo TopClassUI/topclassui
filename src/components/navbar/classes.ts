@@ -1,5 +1,5 @@
 // R-5.12-4: one class string per element Navbar styles, built from the shared constants.
-import { CONTAIN, FOCUS_RING, HOVER, SCROLL_X, STICKY_TOP, TOUCH_TARGET } from '#shared/classes.js'
+import { CONTAIN, CONTROL_HEIGHT, FOCUS_RING, FORCED_EDGE, HOVER, SCROLL_X, STICKY_TOP, TARGET_HEIGHT, TOUCH_TARGET } from '#shared/classes.js'
 import type { NavbarTop } from './types.js'
 
 /** The bar. One row while its parts fit; when they do not, a part drops to a row of its own
@@ -66,3 +66,25 @@ export const NAVBAR_LINK = [
 
 /** At the end of the bar. It wraps what it holds before it grows wider than the bar. */
 export const NAVBAR_ACTIONS = `ms-auto flex flex-wrap items-center justify-end gap-2 ${CONTAIN}`
+
+/** The fill of every placeholder shape; reduced motion stops the pulse, and forced colours keep a line of it. */
+const SKELETON_FILL = `bg-neutral-soft animate-pulse motion-reduce:animate-none ${FORCED_EDGE}`
+
+/** One line of nothing: as tall as the type, with margins making up the line height. */
+const SKELETON_BAR = `block h-[1em] my-[calc((1lh-1em)/2)] rounded-chip ${SKELETON_FILL}`
+
+/** The brand's box with nothing to press: its type step and its floor under a finger, around one bar. */
+export const NAVBAR_SKELETON_BRAND = `inline-flex shrink-0 items-center text-base ${TARGET_HEIGHT}`
+
+/** The list without its scroll: the placeholder has no tab stop, so nothing in it may need one. */
+export const NAVBAR_SKELETON_LIST = 'flex items-center gap-5 overflow-hidden'
+
+/** A link's box with nothing to press: its type step and its floor under a finger. */
+export const NAVBAR_SKELETON_LINK = `inline-flex shrink-0 items-center text-sm ${TARGET_HEIGHT}`
+
+export const NAVBAR_SKELETON_BRAND_BAR = `${SKELETON_BAR} w-24`
+
+export const NAVBAR_SKELETON_LINK_BAR = `${SKELETON_BAR} w-16`
+
+/** Where a Button md would be: its height, its floor under a finger and its radius. */
+export const NAVBAR_SKELETON_ACTION = `block w-20 rounded-control ${CONTROL_HEIGHT.md} ${TARGET_HEIGHT} ${SKELETON_FILL}`

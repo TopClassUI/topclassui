@@ -12,7 +12,7 @@ type Accepts<Union, Candidate> = Candidate extends Union ? true : false
 
 describe('the two design props', () => {
   it('are optional booleans, each on the part that takes it', () => {
-    expectTypeOf<NavbarDesignProps>().toEqualTypeOf<{ sticky?: boolean | undefined, current?: boolean | undefined }>()
+    expectTypeOf<NavbarDesignProps>().toEqualTypeOf<{ sticky?: boolean | undefined, current?: boolean | undefined, links?: number | undefined }>()
     expectTypeOf<NavbarRootProps['sticky']>().toEqualTypeOf<boolean | undefined>()
     expectTypeOf<NavbarLinkProps['current']>().toEqualTypeOf<boolean | undefined>()
   })
@@ -20,6 +20,7 @@ describe('the two design props', () => {
   it('sticky is not a prop of a link, and current is not a prop of the root', () => {
     expectTypeOf<Accepts<keyof NavbarLinkProps, 'sticky'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof NavbarRootProps, 'current'>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<keyof NavbarRootProps, 'links'>>().toEqualTypeOf<false>()
   })
 
   it('what is not built is not in the types: size, bordered, variant and a collapsible bar', () => {

@@ -101,6 +101,7 @@ import {
   NavbarLinks,
   NavbarLink,
   NavbarActions,
+  NavbarSkeleton,
 } from 'topclassui'
 ```
 
@@ -144,6 +145,13 @@ Every prop below is optional and falls back to the default shown.
 |---|---|---|---|---|
 | `children` | no | `ReactNode` | - | What sits at the end of the bar: a Button, a search Input, an Avatar. |
 
+### NavbarSkeleton
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `links` | no | `integer`, min 1, max 50 | `4` | NavbarSkeleton: how many links the placeholder holds, clamped to 1 and 50. |
+| `sticky` | no | `boolean` | `true` | NavbarRoot: the bar stays at the top while the page scrolls, and publishes its height as --tc-sticky-top. |
+
 Anything else is passed to the element each part draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
@@ -152,6 +160,7 @@ Anything else is passed to the element each part draws, so standard attributes (
 - `dummy/many-links.tsx`
 - `dummy/not-sticky.tsx`
 - `dummy/rtl.tsx`
+- `dummy/skeleton.tsx`
 - `dummy/tall-page.tsx`
 - `dummy/with-search.tsx`
 

@@ -43,10 +43,10 @@ const PART_FILES = {
 }
 
 describe('the folder holds exactly the files Navbar needs', () => {
-  it('a client.tsx and a hook.ts for the one client part, a lib.ts for its pure helper, no variants and no skeleton', () => {
+  it('a client.tsx and a hook.ts for the one client part, a lib.ts for its pure helper, a skeleton and no variants', () => {
     expect(readdirSync(FOLDER).sort()).toEqual([
       'README.md', 'boundaries.ts', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'lib.ts',
-      'meta.ts', 'parts', 'schema.ts', 'test', 'types.ts',
+      'meta.ts', 'parts', 'schema.ts', 'skeleton.tsx', 'test', 'types.ts',
     ])
   })
 })
@@ -56,7 +56,7 @@ describe('index.tsx exports flat names, and no bare Navbar', () => {
   const source = readFileSync(join(FOLDER, 'index.tsx'), 'utf8')
 
   it('exports exactly the five parts', () => {
-    expect(Object.keys(navbar).sort()).toEqual(['NavbarActions', 'NavbarBrand', 'NavbarLink', 'NavbarLinks', 'NavbarRoot'])
+    expect(Object.keys(navbar).sort()).toEqual(['NavbarActions', 'NavbarBrand', 'NavbarLink', 'NavbarLinks', 'NavbarRoot', 'NavbarSkeleton'])
   })
 
   it('exports each one as a function component, never an object a server file would dot into', () => {
@@ -74,7 +74,8 @@ describe('index.tsx exports flat names, and no bare Navbar', () => {
   it('has no Navbar in its type surface either', () => {
     expect(exportedNames(source).sort()).toEqual([
       'NavbarActions', 'NavbarActionsProps', 'NavbarBrand', 'NavbarBrandProps', 'NavbarDesignProps', 'NavbarLink',
-      'NavbarLinkProps', 'NavbarLinks', 'NavbarLinksProps', 'NavbarRoot', 'NavbarRootProps',
+      'NavbarLinkProps', 'NavbarLinks', 'NavbarLinksProps', 'NavbarRoot', 'NavbarRootProps', 'NavbarSkeleton',
+      'NavbarSkeletonProps',
     ])
   })
 
@@ -82,7 +83,7 @@ describe('index.tsx exports flat names, and no bare Navbar', () => {
     expect(nonReexports(source)).toEqual([])
     expect(importedModules(source).sort()).toEqual([
       './parts/navbar-actions.js', './parts/navbar-brand.js', './parts/navbar-link.js', './parts/navbar-links.js',
-      './parts/navbar-root.js', './types.js',
+      './parts/navbar-root.js', './skeleton.js', './types.js',
     ])
   })
 

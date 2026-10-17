@@ -12,3 +12,8 @@ export const NAVBAR_OFFSET_VARIABLE = '--tc-sticky-top'
 /** The most of the screen's height a sticky bar may cover. A taller one, as at a 32 px root on a
  * phone, scrolls away with the page; the bar measures 7 to 18 % at 16 px. */
 export const NAVBAR_STICKY_SHARE = 1 / 3
+
+/** The placeholder's starting shape: the four links Figma draws in the bar. */
+export const NAVBAR_SKELETON_DEFAULTS = {
+  links: 4,
+} as const

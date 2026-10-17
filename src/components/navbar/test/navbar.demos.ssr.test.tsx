@@ -44,9 +44,19 @@ const DEMOS: Record<string, Shape> = {
 }
 
 describe('every demo renders on the server', () => {
-  it('holds exactly the six demos the brief asks for, so none can be deleted silently', () => {
-    expect(files).toEqual(['basic', 'many-links', 'not-sticky', 'rtl', 'tall-page', 'with-search'])
-    expect(Object.keys(DEMOS).sort()).toEqual(files)
+  it('holds exactly the six demos the brief asks for and the skeleton, so none can be deleted silently', () => {
+    expect(files).toEqual(['basic', 'many-links', 'not-sticky', 'rtl', 'skeleton', 'tall-page', 'with-search'])
+    expect([...Object.keys(DEMOS), 'skeleton'].sort()).toEqual(files)
+  })
+
+  it('skeleton.tsx: one bar beside its skeleton, neither sticky, with real links and no tab stop in the skeleton', async () => {
+    const html = await render('skeleton')
+    expect(html.match(/<header /g)).toHaveLength(1)
+    expect([...html.matchAll(/<nav aria-label="([^"]*)"/g)].map((match) => match[1])).toEqual(['Main'])
+    expect([...html.matchAll(/<a [^>]*href="([^"]*)"/g)].map((match) => match[1])).toEqual(['/', '/docs', '/components', '/icons', '/theming', '/login'])
+    expect(html).not.toContain('<span hidden=""></span></header>')
+    expect(html.match(/ aria-hidden="true"/g)).toHaveLength(1)
+    expect(html.match(/data-pair="/g)).toHaveLength(1)
   })
 
   for (const [file, shape] of Object.entries(DEMOS)) {

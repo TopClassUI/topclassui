@@ -461,4 +461,34 @@ export const MUTATIONS: Mutation[] = [
     from: "    .meta({ description: 'NavbarRoot: the bar stays at the top while the page scrolls, and publishes its height as --tc-sticky-top.' }),",
     to: "    .meta({ description: '' }),",
   },
+  {
+    label: 'the navbar skeleton lets a caller un-hide it',
+    file: 'src/components/navbar/skeleton.tsx',
+    from: '{...rest} aria-hidden>',
+    to: 'aria-hidden {...rest}>',
+  },
+  {
+    label: 'the navbar skeleton loses the bar box, so it is shorter than the 60 px bar it stands in for',
+    file: 'src/components/navbar/skeleton.tsx',
+    from: 'className={cn(NAVBAR_ROOT, NAVBAR_TOP',
+    to: 'className={cn(NAVBAR_TOP',
+  },
+  {
+    label: 'the navbar skeleton link loses the finger floor, so under a coarse pointer it is shorter than the link',
+    file: 'src/components/navbar/classes.ts',
+    from: 'export const NAVBAR_SKELETON_LINK = `inline-flex shrink-0 items-center text-sm ${TARGET_HEIGHT}`',
+    to: 'export const NAVBAR_SKELETON_LINK = `inline-flex shrink-0 items-center text-sm`',
+  },
+  {
+    label: 'the navbar skeleton stops clamping its count, so links={999} draws 999 links',
+    file: 'src/components/navbar/skeleton.tsx',
+    from: 'Math.trunc(clamp(links, NAVBAR_BOUNDARIES.skeletonLinksMin, NAVBAR_BOUNDARIES.skeletonLinksMax))',
+    to: 'Math.trunc(links)',
+  },
+  {
+    label: 'the navbar skeleton no longer sticks by default, so it scrolls away where the bar stays',
+    file: 'src/components/navbar/skeleton.tsx',
+    from: '  sticky = NAVBAR_DEFAULTS.sticky,\n  links',
+    to: '  sticky = false,\n  links',
+  },
 ]

@@ -46,3 +46,8 @@ export interface NavbarActionsProps extends Omit<ComponentPropsWithRef<'div'>, '
   /** What sits at the end of the bar: a Button, a search Input, an Avatar. */
   children?: ReactNode | undefined
 }
+
+/** No content and no way to un-hide it: the placeholder only holds the bar's shape. */
+export type NavbarSkeletonProps =
+  Omit<ComponentPropsWithRef<'div'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
+  & Pick<NavbarDesignProps, 'sticky' | 'links'>
