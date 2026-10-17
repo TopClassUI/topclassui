@@ -1073,3 +1073,11 @@ The second audit proposed about ninety more. They were declined and listed at th
 **Why.** Git for Windows has `core.autocrlf=true` in the system config, so without this file Omar's checkout and Linux CI would differ, breaking Prettier, the `'use client'` first-line check and the icon content hash.
 
 **Affects.** Every file. Committed before the plan revision.
+
+## 2026-10-18 - The tarball budget covers the CLI registry
+
+`SIZE_BUDGET_BYTES` in `scripts/lib/pack-checks.ts` rises from 1,300,000 to 3,050,000: the build with the CLI and its registry inside packs 2,769,859 bytes unpacked, and the budget is that plus 10 %, rounded up.
+
+**Why.** The CLI plan (K1) ships the component sources once, as the registry JSON in `dist/registry/`, so `npx topclassui add` reads its own installed version with no network; the registry is 1.48 MB unpacked (one item per component with its demos, one base item for `shared/` and `icons/`). The 1.3 MB budget was written for the components-only tarball of release R5.
+
+**Affects.** `pack-checks.ts`, its test, and every later release: a tarball over 3.05 MB needs a new entry here, not a bigger number.
