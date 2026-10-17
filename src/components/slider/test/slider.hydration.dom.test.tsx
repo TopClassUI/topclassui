@@ -63,7 +63,7 @@ describe('a server-rendered Slider hydrates cleanly', () => {
 
 describe('every demo renders and hydrates', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'form', 'range', 'rtl', 'show-value', 'sizes', 'states'])
+    expect(names).toEqual(['basic', 'form', 'range', 'rtl', 'show-value', 'sizes', 'skeleton', 'states'])
   })
 
   for (const [name, Demo] of DEMOS) {

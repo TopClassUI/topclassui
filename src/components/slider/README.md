@@ -91,6 +91,11 @@ either end stay inside the box: its ends do not line up with a field above it.
 **The thumb is the target**: 24 px, 44 under a finger, whatever `size` draws the knob. The focus
 ring is around the knob.
 
+**While it loads**, `<SliderSkeleton size="sm" />` holds the place of a slider: an Input's
+width, or its parent's with `fullWidth`, the padded target and the track, at every size and
+pointer. It draws no knob, since the knob sits at a value not known yet, and keeps no room for
+`showValue`. It is hidden from screen readers and renders on the server. See `dummy/skeleton.tsx`.
+
 ### What Base UI gives
 
 | Base UI | Here |
@@ -108,8 +113,7 @@ ring is around the knob.
 
 `tone` (one is drawn), a vertical look (`orientation` reaches Base UI, but no class reads it),
 `thumbAlignment`, more than two thumbs, tick marks, labels for the two ends, a tooltip on the
-thumb, a hover look, a read-only state, the invalid ring that is always on, a skeleton (use
-`Skeleton`).
+thumb, a hover look, a read-only state, the invalid ring that is always on.
 
 <!-- /hand-written -->
 
@@ -150,6 +154,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/rtl.tsx`
 - `dummy/show-value.tsx`
 - `dummy/sizes.tsx`
+- `dummy/skeleton.tsx`
 - `dummy/states.tsx`
 
 ## Verified against

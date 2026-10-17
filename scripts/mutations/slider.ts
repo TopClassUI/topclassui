@@ -4,6 +4,7 @@ import type { Mutation } from '../lib/mutate.js'
 const CLIENT = 'src/components/slider/client.tsx'
 const HOOK = 'src/components/slider/hook.ts'
 const CLASSES = 'src/components/slider/classes.ts'
+const SKELETON = 'src/components/slider/skeleton.tsx'
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -275,5 +276,29 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: ' group-has-focus-visible/thumb:outline-solid',
     to: '',
+  },
+  {
+    label: 'the slider skeleton draws an md track at every size, so an xl track grows when it arrives',
+    file: SKELETON,
+    from: 'SLIDER_TRACK_SIZE[size]',
+    to: 'SLIDER_TRACK_SIZE.md',
+  },
+  {
+    label: 'the slider skeleton loses the type step of its size, so its width is not the width of an Input of that size',
+    file: SKELETON,
+    from: 'cn(SLIDER_SKELETON, SLIDER_TEXT[size], ',
+    to: 'cn(SLIDER_SKELETON, ',
+  },
+  {
+    label: 'the slider skeleton ignores fullWidth, so a full-width slider arrives wider than its placeholder',
+    file: SKELETON,
+    from: ', fullWidth && SLIDER_FULL, className)',
+    to: ', className)',
+  },
+  {
+    label: 'the slider skeleton takes aria-hidden from the caller, so a placeholder can be read out',
+    file: SKELETON,
+    from: '{...rest} aria-hidden>',
+    to: 'aria-hidden {...rest}>',
   },
 ]

@@ -1,5 +1,5 @@
 import type { Slider as Base } from '@base-ui/react/slider'
-import type { Ref } from 'react'
+import type { ComponentPropsWithRef, Ref } from 'react'
 
 import type { GroupName } from '#shared/contracts/name.js'
 import type { SliderSchemaInput } from './schema.js'
@@ -53,3 +53,8 @@ export interface SliderStateProps {
   locale?: Intl.LocalesArgument | undefined
   format?: Intl.NumberFormatOptions | undefined
 }
+
+/** R-8.3-4: the slider's own size and width, so the two cannot describe different boxes. */
+export type SliderSkeletonProps =
+  Omit<ComponentPropsWithRef<'span'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
+  & Pick<SliderDesignProps, 'size' | 'fullWidth'>

@@ -17,15 +17,15 @@ function exportedNames(source: string): string[] {
   })
 }
 
-describe('index.tsx exports one flat name (R-9.2-3)', () => {
-  it('exports exactly Slider, a function component', () => {
-    expect(Object.keys(slider)).toEqual(['Slider'])
-    expect(typeof slider.Slider).toBe('function')
+describe('index.tsx exports flat names (R-9.2-3)', () => {
+  it('exports exactly Slider and SliderSkeleton, two function components', () => {
+    expect(Object.keys(slider).sort()).toEqual(['Slider', 'SliderSkeleton'])
+    expect([typeof slider.Slider, typeof slider.SliderSkeleton]).toEqual(['function', 'function'])
   })
 
   it('has no Base UI type name, no hook and no class table in its surface', () => {
     const source = readFileSync(join(import.meta.dirname, '..', 'index.tsx'), 'utf8')
-    expect(exportedNames(source).sort()).toEqual(['Slider', 'SliderDesignProps', 'SliderName', 'SliderProps', 'SliderValue'])
+    expect(exportedNames(source).sort()).toEqual(['Slider', 'SliderDesignProps', 'SliderName', 'SliderProps', 'SliderSkeleton', 'SliderSkeletonProps', 'SliderValue'])
   })
 
   it('the scan sees a type-only alias and a star export', () => {

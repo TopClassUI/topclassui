@@ -50,7 +50,7 @@ describe('the folder holds what Slider needs and nothing else (R-8.1-1)', () => 
   it('a hook.ts and a boundaries.ts, and no lib, variants or skeleton', () => {
     expect(readdirSync(FOLDER).sort()).toEqual([
       'README.md', 'boundaries.ts', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'meta.ts',
-      'schema.ts', 'test', 'types.ts',
+      'schema.ts', 'skeleton.tsx', 'test', 'types.ts',
     ])
   })
 })
@@ -65,7 +65,20 @@ describe('index.tsx re-exports and holds no markup (R-5.1-2)', () => {
 
   it('is nothing but export-from lines, from client.tsx and types.ts', () => {
     expect(nonReexports(source)).toEqual([])
-    expect(importedModules(source).sort()).toEqual(['./client.js', './types.js'])
+    expect(importedModules(source).sort()).toEqual(['./client.js', './skeleton.js', './types.js'])
+  })
+})
+
+describe('skeleton.tsx is a server file (R-5.7-3)', () => {
+  const source = read('skeleton.tsx')
+
+  it('has no use client and calls no hook, so a Server Component can render it as a fallback', () => {
+    expect(hasUseClient(source)).toBe(false)
+    expect(hooksByPart(source)).toEqual({ SliderSkeleton: [] })
+  })
+
+  it('imports nothing from client.tsx, hook.ts or Base UI, so no script ships with it', () => {
+    expect(importedModules(source).filter((m) => m.includes('client') || m.includes('hook') || m.startsWith('@base-ui/'))).toEqual([])
   })
 })
 
@@ -128,7 +141,7 @@ describe('hook.ts holds the value, the limits and the name (R-5.12-1)', () => {
 describe('classes.ts builds every string from the shared constants (R-5.2-4)', () => {
   it('takes the holder, the type step, the target and the knob sizes from src/shared; its own line-strong edge needs no FORCED_EDGE', () => {
     expect(importedNames(read('classes.ts'), '#shared/classes.js')).toEqual([
-      'DISABLED', 'FIELD_HOLDER', 'FIELD_HOLDER_FULL', 'FIELD_TEXT', 'TARGET_HEIGHT', 'TOGGLE_SIZE', 'TOUCH_TARGET',
+      'DISABLED', 'FIELD_HOLDER', 'FIELD_HOLDER_FULL', 'FIELD_TEXT', 'FORCED_EDGE', 'TARGET_HEIGHT', 'TOGGLE_SIZE', 'TOUCH_TARGET',
     ])
   })
 

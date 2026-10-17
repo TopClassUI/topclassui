@@ -15,7 +15,7 @@ import { FORCED_CANVAS, contrast, inkOn, pixelsOf, rgbOf } from './pixels.js'
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const NAMES = { xs: 'Extra small', sm: 'Small', md: 'Medium', lg: 'Large', xl: 'Extra large' } as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['basic', 'form', 'range', 'rtl', 'show-value', 'sizes', 'states'].map((demo) => `slider--${demo}`)
+const DEMOS = ['basic', 'form', 'range', 'rtl', 'show-value', 'sizes', 'skeleton', 'states'].map((demo) => `slider--${demo}`)
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 
 /** The range input of a thumb, named as a screen reader names it. */
@@ -663,5 +663,33 @@ test.describe('axe on the hydrated demos', () => {
         expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([])
       })
     }
+  }
+})
+
+test.describe('the skeleton', () => {
+  for (const pointer of ['fine', 'coarse'] as const) {
+    test.describe(`${pointer} pointer`, () => {
+      test.use(pointer === 'coarse' ? COARSE : {})
+
+      for (const direction of DIRECTIONS) {
+        test(`${direction}: is the box of the slider it stands in for at every size: the width, the padded control and the track`, async ({ page }) => {
+          await page.goto(urlFor('slider--skeleton', 'light', direction))
+          const pairs = await page.locator('[data-pair]').evaluateAll((all) => all.map((pair) => {
+            const box = (el: Element | null) => {
+              const r = el?.getBoundingClientRect() ?? new DOMRect()
+              return [Math.round(r.x * 10) / 10, Math.round(r.width * 10) / 10, Math.round(r.height * 10) / 10]
+            }
+            const root = pair.querySelector('[role="group"]')
+            const control = root?.querySelector('[data-base-ui-swipe-ignore]') ?? null
+            const skeleton = pair.querySelector('span[aria-hidden]')
+            const inner = skeleton?.querySelector('span') ?? null
+            return [pair.getAttribute('data-pair'), [box(root), box(control), box(control?.firstElementChild ?? null)], [box(skeleton), box(inner), box(inner?.querySelector('span') ?? null)]]
+          }))
+          expect(pairs.map(([name]) => name)).toEqual([...SIZES, 'full'])
+          for (const [name, real, skeleton] of pairs) expect(skeleton, String(name)).toEqual(real)
+          expect((pairs[0]?.[1] as number[][])[1]?.[2]).toBe(pointer === 'coarse' ? 44 : 24)
+        })
+      }
+    })
   }
 })

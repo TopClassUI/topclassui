@@ -1,6 +1,6 @@
 // R-5.12-4: the class strings of the slider (unit-4.md, Slider), built from the shared field and target constants.
 import {
-  DISABLED, FIELD_HOLDER, FIELD_HOLDER_FULL, FIELD_TEXT, TARGET_HEIGHT, TOGGLE_SIZE, TOUCH_TARGET,
+  DISABLED, FIELD_HOLDER, FIELD_HOLDER_FULL, FIELD_TEXT, FORCED_EDGE, TARGET_HEIGHT, TOGGLE_SIZE, TOUCH_TARGET,
 } from '#shared/classes.js'
 
 /** The box that owns the width. No type step here: FIELD_TEXT[size] gives it, so the em of the width is an Input's.
@@ -50,3 +50,9 @@ export const SLIDER_KNOB = 'block rounded-full border-(length:--tc-ring-width) b
 
 /** At the end of its line, beside the track or below it; a value longer than the slider wraps rather than leaving it. */
 export const SLIDER_VALUE = 'ms-auto min-w-[3ch] max-w-full text-end text-sm tabular-nums text-muted wrap-anywhere'
+
+/** The skeleton's box: the grid that owns the width, as SLIDER_ROOT is. Its type step is SLIDER_TEXT, as the root's is. */
+export const SLIDER_SKELETON = `grid ${FIELD_HOLDER}`
+
+/** The track's own box in the neutral fill, which pulses. Its height is SLIDER_TRACK_SIZE, as the slider's is. */
+export const SLIDER_SKELETON_TRACK = `block w-full rounded-full bg-neutral-soft animate-pulse motion-reduce:animate-none ${FORCED_EDGE}`
