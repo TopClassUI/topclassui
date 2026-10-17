@@ -31,7 +31,8 @@ const load = async (folder: Folder, file: 'index.tsx' | 'skeleton.tsx' | 'test/f
     : await import(`../connectors/${folder.slug}/${file}`) as Module
 }
 
-const repoRoot = findRepoRoot(process.cwd(), existsSync) ?? process.cwd()
+// pnpm test:mutation runs a copy of the package outside the repo and names the repo in TC_REPO_ROOT.
+const repoRoot = process.env['TC_REPO_ROOT'] ?? findRepoRoot(process.cwd(), existsSync) ?? process.cwd()
 /** Each entry of docs/DECISIONS.md by its heading, so a recorded departure must point at a real one. */
 const decisions = new Map(
   readFileSync(join(repoRoot, 'docs', 'DECISIONS.md'), 'utf8').split(/^## /m).slice(1)
