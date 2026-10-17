@@ -56,5 +56,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # A row with e2e is judged by Playwright, which cannot launch a browser that is not downloaded.
+      - name: Playwright browsers
+        run: npx playwright install --with-deps chromium
+
       # A test suite that passes while the code is wrong is the failure this catches.
       - run: pnpm test:mutation
