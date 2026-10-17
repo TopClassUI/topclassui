@@ -25,7 +25,7 @@ export function CodeBlockCopy({ code, label, copied, failed, titleId }: CodeBloc
         <Svg icon={button.result === 'copied' ? check : copy} size="0.875rem" />
       </button>
       <span role="status" className={CODE_BLOCK_STATUS}>
-        {button.result === 'copied' ? copied : button.result === 'failed' ? failed : ''}
+        <span key={button.presses}>{button.result === 'copied' ? copied : button.result === 'failed' ? failed : ''}</span>
       </span>
     </>
   )

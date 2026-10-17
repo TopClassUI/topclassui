@@ -192,6 +192,9 @@
   --tc-danger-soft-active: color-mix(in oklch, var(--tc-danger-solid) calc(var(--tc-danger-mix) + 16%), var(--tc-page));
   --tc-info-soft-hover: color-mix(in oklch, var(--tc-info-solid) calc(var(--tc-info-mix) + 8%), var(--tc-page));
   --tc-info-soft-active: color-mix(in oklch, var(--tc-info-solid) calc(var(--tc-info-mix) + 16%), var(--tc-page));
+
+  /* A scrollbar thumb on the neutral fill: halfway, so it stands 3:1 off both the fill and a ring in the on-solid colour. */
+  --tc-neutral-solid-thumb: color-mix(in oklch, var(--tc-neutral-on-solid) 50%, var(--tc-neutral-solid));
 }
 
 /* Both blocks: these inherit, so an ltr island in an rtl page needs its own reset. */
@@ -235,9 +238,13 @@
     color-scheme: dark;
   }
 
-  /* font-family inherits resolved, so only setting the property works when nested. */
-  :lang(ar) {
+  /* The element that carries lang only: :lang() also matches every descendant and would undo a font-mono beneath it. */
+  [lang|='ar'] {
     font-family: var(--tc-font-arabic);
+  }
+
+  /* R-5.3-3: every Arabic descendant, since spaced letters no longer join. */
+  :lang(ar) {
     letter-spacing: 0;
   }
 

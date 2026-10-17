@@ -375,6 +375,18 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
+    label: 'tokens: the Arabic font is set on every element in Arabic, so the code in a CodeBlock or a Kbd is drawn in a proportional font',
+    file: 'src/tokens.css',
+    from: "  [lang|='ar'] {\n    font-family: var(--tc-font-arabic);",
+    to: '  :lang(ar) {\n    font-family: var(--tc-font-arabic);',
+  },
+  {
+    label: 'tokens: the Arabic letter-spacing reset reaches only the element that carries lang, so a spaced ancestor pulls the letters apart',
+    file: 'src/tokens.css',
+    from: '  :lang(ar) {\n    letter-spacing: 0;',
+    to: "  [lang|='ar'] {\n    letter-spacing: 0;",
+  },
+  {
     label: 'the server tab stop is never written, so a list Base UI serves at tabindex -1 cannot be reached by the keyboard before the page hydrates',
     file: 'src/shared/use-server-tab-stop.ts',
     from: 'return served && isStop ? stop : none',

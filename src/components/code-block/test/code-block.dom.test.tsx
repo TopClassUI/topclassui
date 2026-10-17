@@ -130,6 +130,25 @@ describe('a press that fails', () => {
     expect(statusText()).toBe('Could not copy')
     expect(thrown).toEqual([])
   })
+
+  // No await runs on these two, so the empty status and the result land in one render: the words come back as a new node.
+  for (const [how, write] of [['no clipboard', undefined], ['a write that throws at once', () => { throw new Error('thrown') }]] as const) {
+    it(`with ${how}, a second press within the time puts the words back as a new node, which a live region reads again`, async () => {
+      stubClipboard(write)
+      render(<CodeBlock>{CODE}</CodeBlock>)
+      const button = screen.getByRole('button')
+      await press(button)
+      act(() => { vi.advanceTimersByTime(1500) })
+      const added: (string | null)[] = []
+      const watch = new MutationObserver((records) => { added.push(...records.flatMap((record) => [...record.addedNodes].map((node) => node.textContent))) })
+      watch.observe(screen.getByRole('status'), { childList: true, characterData: true, subtree: true })
+      await press(button)
+      await act(() => Promise.resolve())
+      watch.disconnect()
+      expect(added).toEqual(['Could not copy'])
+      expect(statusText()).toBe('Could not copy')
+    })
+  }
 })
 
 describe('the timer', () => {

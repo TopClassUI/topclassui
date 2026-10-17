@@ -3,6 +3,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
 
 import { DIRECTIONS, MODES } from '../scripts/lib/harness.js'
 import { type LiveOptions, expectNoSidewaysScroll, liveErrors, openLive } from './live.js'
+import { withScrollbar } from './overlay.js'
 import { DEMOS, urlFor } from './pages.js'
 import { type Clip, type Rgb, contrast, pixelsOf } from './pixels.js'
 
@@ -258,6 +259,53 @@ test.describe('the rings, on the block', () => {
   }
 })
 
+/** Under a classic scrollbar, at 390 px: the colour the pre's bottom ring row is painted in when focused, and the colour of the
+ * bar just inside it, over the thumb and over the track, with the block's own fill to tell the two apart. */
+async function ringOnBar(page: Page, block: Rgb) {
+  const pre = page.locator(PRE)
+  const bar = await pre.evaluate((element) => (element as HTMLElement).offsetHeight - element.clientHeight)
+  const { left, top, width, height } = await boxOf(pre)
+  const clip: Clip = { x: Math.ceil(left), y: Math.ceil(top), width: Math.floor(width) - 1, height: Math.floor(height) - 1 }
+  await pre.focus()
+  await atRest(page)
+  const lit = await pixelsOf(page, clip)
+  const at = (column: number, row: number): Rgb => lit[row * clip.width + column] ?? [0, 0, 0]
+  // The middle row of the bar: a thumb column is any that is not the block's fill. The ends hold the corners and the ring.
+  const middle = clip.height - Math.ceil(bar / 2)
+  const inner = Array.from({ length: clip.width - 16 }, (_, index) => index + 8)
+  const thumb = inner.filter((column) => contrast(at(column, middle), block) >= 1.5)
+  const track = inner.filter((column) => contrast(at(column, middle), block) < 1.05)
+  const pair = (columns: number[]) => {
+    const column = columns[Math.floor(columns.length / 2)] ?? 0
+    return { ring: at(column, clip.height - 1), bar: at(column, clip.height - 4) }
+  }
+  return { bar, thumb: thumb.length > 0 ? pair(thumb) : null, track: track.length > 0 ? pair(track) : null }
+}
+
+test.describe('the pre ring over a classic scrollbar', () => {
+  for (const mode of MODES) {
+    withScrollbar(`${mode}: the bar takes the block's colours, so the ring's bottom side stands 3:1 off its track and its thumb`, async ({ barPage: page }) => {
+      await page.setViewportSize({ width: 390, height: 844 })
+      for (const demo of ['code-block--long-line', 'code-block--basic']) {
+        for (const direction of DIRECTIONS) {
+          await page.goto(urlFor(demo, mode, direction))
+          const block = await paint(page, [await css(page.locator('[data-lang]'), 'background-color')])
+          const read = await ringOnBar(page, block)
+          const where = `${demo} ${direction}`
+          expect(read.bar, `${where}: the browser draws no classic bar`).toBeGreaterThan(0)
+          expect([read.thumb !== null, read.track !== null], `${where}: a thumb and a track`).toEqual([true, true])
+          if (read.thumb === null || read.track === null) continue
+          expect({
+            ringOnTrack: contrast(read.track.ring, read.track.bar) >= 3,
+            ringOnThumb: contrast(read.thumb.ring, read.thumb.bar) >= 3,
+            thumbOnTrack: contrast(read.thumb.bar, read.track.bar) >= 3,
+          }, where).toEqual({ ringOnTrack: true, ringOnThumb: true, thumbOnTrack: true })
+        }
+      }
+    })
+  }
+})
+
 test.describe('the header text and the icons, against the block', () => {
   for (const mode of MODES) {
     test(`${mode}: the 70% title 4.5:1, the icon 3:1 at rest, and 3:1 on the 10% hover tint`, async ({ page }) => {
@@ -331,6 +379,13 @@ test.describe('the keyboard', () => {
       await page.keyboard.press('Tab')
       expect(await page.evaluate(() => document.activeElement?.tagName)).not.toBe('PRE')
     })
+
+    test(`${direction}: with no title, Tab lands on a region named Code, never on a nameless box`, async ({ page }) => {
+      await openLive(page, 'code-block--no-header', { direction })
+      await page.keyboard.press('Tab')
+      await expect(page.locator(PRE)).toBeFocused()
+      await expect(page.getByRole('region', { name: 'Code', exact: true })).toBeFocused()
+    })
   }
 })
 
@@ -383,6 +438,17 @@ test.describe('the copy, with no clipboard, as on plain http', () => {
     await expect(page.getByRole('status')).toHaveText('Could not copy')
     expect(await button.locator('path').getAttribute('d')).toBe(icon)
     await expect(button).not.toHaveAttribute('data-copied')
+
+    // Within the 2 s nothing is awaited: the same words must come back as a new node, or the live region has nothing to read.
+    await page.getByRole('status').evaluate((status) => {
+      const added: string[] = []
+      Object.assign(window, { added })
+      new MutationObserver((records) => { added.push(...records.flatMap((record) => [...record.addedNodes].map((node) => node.textContent ?? ''))) })
+        .observe(status, { childList: true, subtree: true, characterData: true })
+    })
+    await button.click()
+    await expect.poll(() => page.evaluate(() => (window as unknown as { added: string[] }).added)).toEqual(['Could not copy'])
+    await expect(page.getByRole('status')).toHaveText('Could not copy')
   })
 })
 

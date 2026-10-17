@@ -40,8 +40,20 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the code block pre is never a region, so the title names nothing',
     file: INDEX,
-    from: "role={named ? 'region' : undefined}",
+    from: "role={named || !wrap ? 'region' : undefined}",
     to: 'role={undefined}',
+  },
+  {
+    label: 'the code block pre with no title is a tab stop with no role, so Tab lands on a nameless box',
+    file: INDEX,
+    from: "role={named || !wrap ? 'region' : undefined}",
+    to: "role={named ? 'region' : undefined}",
+  },
+  {
+    label: 'the code block pre with no title takes no name from labels',
+    file: INDEX,
+    from: 'aria-label={named || wrap ? undefined : labels.common.code}',
+    to: 'aria-label={undefined}',
   },
   {
     label: 'the code block button gets no title id, so five buttons on a page all read "Copy"',
@@ -106,8 +118,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the code block does not empty its status before a second press',
     file: HOOK,
-    from: "    setResult('idle')\n    let next",
-    to: '    let next',
+    from: "    setResult('idle')\n    setPresses",
+    to: '    setPresses',
+  },
+  {
+    label: 'the code block status keeps one node for its words, so a repeat failed press changes nothing a screen reader hears',
+    file: CLIENT,
+    from: '<span key={button.presses}>',
+    to: '<span>',
   },
   {
     label: 'the code block leaves its timer running after unmount',
@@ -120,6 +138,18 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: '${FOCUS_RING_INSET} ${SCROLL_X}`',
     to: '${FOCUS_RING_INSET}`',
+  },
+  {
+    label: 'the code block scrollbar is drawn in the page scheme, so the pre ring bottom side lands on a track of its own colour',
+    file: CLASSES,
+    from: ' [scrollbar-color:var(--tc-neutral-solid-thumb)_var(--tc-neutral-solid)]',
+    to: '',
+  },
+  {
+    label: 'tokens: the thumb on the neutral fill is the on-solid colour, so the pre ring bottom side vanishes along it',
+    file: 'src/tokens.css',
+    from: '--tc-neutral-solid-thumb: color-mix(in oklch, var(--tc-neutral-on-solid) 50%, var(--tc-neutral-solid));',
+    to: '--tc-neutral-solid-thumb: var(--tc-neutral-on-solid);',
   },
   {
     label: 'the code block root loses its one column, so a long line widens a grid or flex parent',

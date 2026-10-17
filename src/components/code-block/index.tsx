@@ -58,8 +58,10 @@ export function CodeBlock({
         className={cn(CODE_BLOCK_PRE, header ? null : CODE_BLOCK_PRE_ALONE, wrap ? CODE_BLOCK_WRAP : null)}
         // The server cannot measure whether a line overflows, so the box is always reachable to scroll, as Table's is.
         tabIndex={wrap ? undefined : 0}
-        role={named ? 'region' : undefined}
+        // A tab stop with no title is still a named region, so Tab never lands on a nameless box.
+        role={named || !wrap ? 'region' : undefined}
         aria-labelledby={named ? titleId : undefined}
+        aria-label={named || wrap ? undefined : labels.common.code}
       >
         <code>{hasContent(highlighted) ? highlighted : children}</code>
       </pre>

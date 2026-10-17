@@ -74,7 +74,7 @@ describe('client.tsx is markup plus one hook call (R-5.12-1)', () => {
     expect(hooksByPart(read('client.tsx'))).toEqual({ CodeBlockCopy: ['useCodeBlockCopy'] })
   })
 
-  it('the hook makes the id, holds the result, and clears its timer on unmount', () => {
-    expect(hooksByPart(read('hook.ts'))).toEqual({ useCodeBlockCopy: ['useId', 'useState', 'useRef', 'useEffect'] })
+  it('the hook makes the id, holds the result and the count of presses, and clears its timer on unmount', () => {
+    expect(hooksByPart(read('hook.ts'))).toEqual({ useCodeBlockCopy: ['useId', 'useState', 'useState', 'useRef', 'useEffect'] })
   })
 })
