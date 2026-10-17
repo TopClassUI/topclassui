@@ -6,6 +6,7 @@ const PART = 'src/components/combobox/parts/combobox-list.tsx'
 const HOOK = 'src/components/combobox/hook.ts'
 const LIB = 'src/components/combobox/lib.ts'
 const CLASSES = 'src/components/combobox/classes.ts'
+const SKELETON = 'src/components/combobox/skeleton.tsx'
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -157,5 +158,29 @@ export const MUTATIONS: Mutation[] = [
     file: HOOK,
     from: '    if (node && target?.top === node.scrollTop && target.height !== node.clientHeight) {',
     to: '    if (node && target && target.height !== node.clientHeight) {',
+  },
+  {
+    label: 'the combobox skeleton draws an md input at every size, so an xl Combobox jumps when it arrives',
+    file: SKELETON,
+    from: 'FIELD_SIZE[size]',
+    to: 'FIELD_SIZE.md',
+  },
+  {
+    label: "the combobox skeleton ignores fullWidth, so it holds an Input's width where its Combobox fills the row",
+    file: SKELETON,
+    from: 'fullWidth ? COMBOBOX_WIDTH.full : COMBOBOX_WIDTH.own)} aria-hidden>',
+    to: 'COMBOBOX_WIDTH.own)} aria-hidden>',
+  },
+  {
+    label: 'the combobox skeleton loses the target floor, so under a finger it is shorter than its Combobox',
+    file: CLASSES,
+    from: "  CONTAIN,\n  TOUCH_TARGET,\n  'animate-pulse",
+    to: "  CONTAIN,\n  'animate-pulse",
+  },
+  {
+    label: 'the combobox skeleton is no longer hidden, so a placeholder can be read out',
+    file: SKELETON,
+    from: ')} aria-hidden>',
+    to: ')}>',
   },
 ]

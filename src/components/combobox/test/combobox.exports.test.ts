@@ -17,16 +17,17 @@ function exportedNames(source: string): string[] {
   })
 }
 
-describe('index.tsx exports one flat name (R-9.2-3), the parts being choice 7', () => {
-  it('exports exactly Combobox, a function component', () => {
-    expect(Object.keys(combobox)).toEqual(['Combobox'])
-    expect(typeof combobox.Combobox).toBe('function')
+describe('index.tsx exports flat names (R-9.2-3), the parts being choice 7', () => {
+  it('exports exactly Combobox and ComboboxSkeleton, two function components', () => {
+    expect(Object.keys(combobox).sort()).toEqual(['Combobox', 'ComboboxSkeleton'])
+    expect([typeof combobox.Combobox, typeof combobox.ComboboxSkeleton]).toEqual(['function', 'function'])
   })
 
   it('has no Base UI type name, no context, no hook and no list part in its surface', () => {
     const source = readFileSync(join(import.meta.dirname, '..', 'index.tsx'), 'utf8')
     expect(exportedNames(source).sort()).toEqual([
-      'Combobox', 'ComboboxDesignProps', 'ComboboxName', 'ComboboxPlacement', 'ComboboxProps', 'ComboboxStatus',
+      'Combobox', 'ComboboxDesignProps', 'ComboboxName', 'ComboboxPlacement', 'ComboboxProps', 'ComboboxSkeleton',
+      'ComboboxSkeletonProps', 'ComboboxStatus',
     ])
   })
 

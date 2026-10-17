@@ -1,7 +1,7 @@
 // R-5.12-4: one class string per element Combobox styles, built from the shared field and overlay constants.
 import {
-  DISABLED, FIELD_BOX, FIELD_OWN_WIDTH, LABEL, LIST_CAP, OVERLAY_SURFACE, POPUP_MOTION, ROW, ROW_HIGHLIGHT, ROW_SELECTED,
-  ROW_TOUCH, SCROLL_AREA,
+  BORDER_WIDTH, CONTAIN, DISABLED, FIELD_BOX, FIELD_OWN_WIDTH, LABEL, LIST_CAP, OVERLAY_SURFACE, POPUP_MOTION, ROW,
+  ROW_HIGHLIGHT, ROW_SELECTED, ROW_TOUCH, SCROLL_AREA, TOUCH_TARGET,
 } from '#shared/classes.js'
 
 /** The box that owns the width. The input fills it and the caret sits over its end. */
@@ -41,3 +41,13 @@ export const COMBOBOX_ITEM_TICK = 'ms-auto flex shrink-0'
 
 /** The empty text and the status line. Live regions stay mounted and visible, so with nothing to say they take no room. */
 export const COMBOBOX_NOTE = 'px-3 py-2 text-sm text-muted empty:p-0'
+
+/** The skeleton's input, in the box COMBOBOX_ROOT draws: the field's border width in no colour, its floor, its radius
+ * and one centred line, so it sits on the baseline the input does. Its height, padding and type step are FIELD_SIZE. */
+export const COMBOBOX_SKELETON_INPUT = [
+  'inline-flex w-full items-center',
+  `${BORDER_WIDTH} border-transparent`,
+  CONTAIN,
+  TOUCH_TARGET,
+  'animate-pulse rounded-control bg-neutral-soft motion-reduce:animate-none',
+].join(' ')

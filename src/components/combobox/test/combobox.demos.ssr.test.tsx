@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'load-more', 'long-content', 'rtl', 'sizes', 'states', 'status', 'ten-thousand']
+const EXPECTED = ['basic', 'form', 'load-more', 'long-content', 'rtl', 'sizes', 'skeleton', 'states', 'status', 'ten-thousand']
 
 /** Each Combobox of each demo as the server writes it: its name, then the first twenty letters its input shows. */
 const COMBOBOXES: Record<string, string[]> = {
@@ -21,6 +21,7 @@ const COMBOBOXES: Record<string, string[]> = {
   'long-content': ['Long, own width: Supercalifragilistic', 'Long, full width: A label long enough '],
   'rtl': ['المدينة: عمّان'],
   'sizes': ['Fruit, extra small: Apple', 'Fruit, small: Banana', 'Fruit, medium: Cherry', 'Fruit, large: Date', 'Fruit, extra large: '],
+  'skeleton': ['Fruit, xs: Banana', 'Fruit, sm: Banana', 'Fruit, md: Banana', 'Fruit, lg: Banana', 'Fruit, xl: Banana', 'Fruit, full width: Banana'],
   'states': ['Invalid: Jordan', 'Disabled: Egypt', 'Read-only: Saudi Arabia', 'One option disabled: '],
   'status': ['City, loading: ', 'City, loading more: '],
   'ten-thousand': ['Ten thousand options: '],
@@ -70,6 +71,12 @@ describe('the demos the plan names', () => {
     const html = await render('form')
     expect(html).toMatch(/^<form class="[^"]*">/)
     expect(html).toMatch(/<input [^>]*name="framework" value="next"/)
+  })
+
+  it('skeleton: each Combobox above a hidden skeleton of the same size, five pairs and a full-width one', async () => {
+    const html = await render('skeleton')
+    expect([...html.matchAll(/data-pair="([^"]*)"/g)].map(([, size]) => size)).toEqual(['xs', 'sm', 'md', 'lg', 'xl', 'full'])
+    expect(html.match(/<span class="[^"]*" aria-hidden="true"><span class="[^"]*">\xa0<\/span><\/span>/g)).toHaveLength(6)
   })
 
   it('rtl: an island that carries the direction and the language', async () => {

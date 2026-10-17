@@ -19,6 +19,7 @@ const AFTER: Record<string, string[]> = {
   'long-content': ['Supercalifragilistic'.repeat(15), 'Supercalifragilistic'.repeat(15)],
   'rtl': ['عمّان'],
   'sizes': ['Apple', 'Apple', 'Apple', 'Apple', 'Apple'],
+  'skeleton': ['Apple', 'Apple', 'Apple', 'Apple', 'Apple', 'Apple'],
   'states': ['Jordan', 'Egypt', 'Saudi Arabia', 'Jordan'],
   'status': ['', 'Aleppo'],
   'ten-thousand': ['Option 1'],

@@ -47,10 +47,10 @@ function hooksByPart(source: string): Record<string, string[]> {
 }
 
 describe('the folder holds what Combobox needs and nothing else (R-8.1-1)', () => {
-  it('a hook.ts, a lib.ts for its pure helpers, the list in parts/, and no boundaries, variants or skeleton', () => {
+  it('a hook.ts, a lib.ts for its pure helpers, the list in parts/, a skeleton, and no boundaries or variants', () => {
     expect(readdirSync(FOLDER).sort()).toEqual([
       'README.md', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'lib.ts', 'meta.ts', 'parts',
-      'schema.ts', 'test', 'types.ts',
+      'schema.ts', 'skeleton.tsx', 'test', 'types.ts',
     ])
     expect(readdirSync(join(FOLDER, 'parts'))).toEqual(['combobox-list.tsx'])
   })
@@ -64,9 +64,22 @@ describe('index.tsx re-exports and holds no markup (R-5.1-2)', () => {
     expect(hasLateUseClient(source)).toBe(false)
   })
 
-  it('is nothing but export-from lines, from client.tsx and types.ts', () => {
+  it('is nothing but export-from lines, from client.tsx, skeleton.tsx and types.ts', () => {
     expect(nonReexports(source)).toEqual([])
-    expect(importedModules(source).sort()).toEqual(['./client.js', './types.js'])
+    expect(importedModules(source).sort()).toEqual(['./client.js', './skeleton.js', './types.js'])
+  })
+})
+
+describe('skeleton.tsx is a server file (R-5.7-3)', () => {
+  const source = read('skeleton.tsx')
+
+  it('has no use client and calls no hook, so a Server Component can render it as a fallback', () => {
+    expect(hasUseClient(source)).toBe(false)
+    expect(hooksByPart(source)).toEqual({ ComboboxSkeleton: [] })
+  })
+
+  it('imports nothing from client.tsx, hook.ts or Base UI, so no script ships with it', () => {
+    expect(importedModules(source).filter((m) => m.includes('client') || m.includes('hook') || m.startsWith('@base-ui/'))).toEqual([])
   })
 })
 
@@ -155,8 +168,8 @@ describe('hook.ts holds the value, the collection, the window and the locale of 
 describe('classes.ts builds every string from the shared constants (R-5.2-4)', () => {
   it('takes the field box, the width, the rows and the popup from src/shared', () => {
     expect(importedNames(read('classes.ts'), '#shared/classes.js')).toEqual([
-      'DISABLED', 'FIELD_BOX', 'FIELD_OWN_WIDTH', 'LABEL', 'LIST_CAP', 'OVERLAY_SURFACE', 'POPUP_MOTION', 'ROW', 'ROW_HIGHLIGHT',
-      'ROW_SELECTED', 'ROW_TOUCH', 'SCROLL_AREA',
+      'BORDER_WIDTH', 'CONTAIN', 'DISABLED', 'FIELD_BOX', 'FIELD_OWN_WIDTH', 'LABEL', 'LIST_CAP', 'OVERLAY_SURFACE', 'POPUP_MOTION',
+      'ROW', 'ROW_HIGHLIGHT', 'ROW_SELECTED', 'ROW_TOUCH', 'SCROLL_AREA', 'TOUCH_TARGET',
     ])
   })
 

@@ -54,7 +54,7 @@ const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { 
 
 describe('every server demo only hands the Combobox what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'form', 'load-more', 'long-content', 'rtl', 'sizes', 'states', 'status', 'ten-thousand'])
+    expect(names).toEqual(['basic', 'form', 'load-more', 'long-content', 'rtl', 'sizes', 'skeleton', 'states', 'status', 'ten-thousand'])
   })
 
   for (const name of names.filter((one) => !CLIENT.includes(one))) {

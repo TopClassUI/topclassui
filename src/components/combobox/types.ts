@@ -1,5 +1,5 @@
 import type { Combobox as Base } from '@base-ui/react/combobox'
-import type { ReactNode, Ref, RefObject } from 'react'
+import type { ComponentPropsWithRef, ReactNode, Ref, RefObject } from 'react'
 
 import type { ControlName } from '#shared/contracts/name.js'
 import type { ListOption } from '#shared/contracts/option.js'
@@ -92,3 +92,8 @@ export interface ComboboxListProps {
   /** The chosen value, whose row the list opens on. */
   selected: string | null
 }
+
+/** R-8.3-4: the control's own size and width props, so the two cannot describe different boxes. */
+export type ComboboxSkeletonProps =
+  Omit<ComponentPropsWithRef<'span'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
+  & Pick<ComboboxDesignProps, 'size' | 'fullWidth'>

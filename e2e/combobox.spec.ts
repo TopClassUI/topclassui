@@ -13,7 +13,7 @@ import { FORCED_CANVAS, contrast, rgbOf } from './pixels.js'
 // What happy-dom cannot lay out or open: the windowed list in a real popup, the highlight on rows that are not mounted,
 // where the popup lands, what a finger and a zoomed page get, the server HTML a form sends, and a form reset.
 
-const DEMOS = ['basic', 'form', 'load-more', 'long-content', 'rtl', 'sizes', 'states', 'status', 'ten-thousand'].map((demo) => `combobox--${demo}`)
+const DEMOS = ['basic', 'form', 'load-more', 'long-content', 'rtl', 'sizes', 'skeleton', 'states', 'status', 'ten-thousand'].map((demo) => `combobox--${demo}`)
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 const POPUP = '[data-placement]'
@@ -801,4 +801,25 @@ test.describe('axe on the open popup', () => {
       })
     }
   })
+})
+
+test.describe('the skeleton', () => {
+  for (const pointer of ['fine', 'coarse'] as const) {
+    test.describe(`${pointer} pointer`, () => {
+      test.use(pointer === 'coarse' ? COARSE : {})
+
+      test('is the box of the closed Combobox it stands in for at every size and full width: the box and the input', async ({ page }) => {
+        await page.goto(urlFor('combobox--skeleton', 'light', 'ltr'))
+        const pairs = await page.locator('[data-pair]').evaluateAll((all) => all.map((pair) => {
+          const size = (el: Element | null) => { const r = el?.getBoundingClientRect() ?? new DOMRect(); return [Math.round(r.width * 10) / 10, Math.round(r.height * 10) / 10] }
+          const input = pair.querySelector('[role="combobox"]')
+          const skeleton = pair.querySelector(':scope > div:last-child > span[aria-hidden]')
+          return [pair.getAttribute('data-pair'), [size(input?.parentElement ?? null), size(input)], [size(skeleton), size(skeleton?.querySelector('span') ?? null)]]
+        }))
+        expect(pairs.map(([name]) => name)).toEqual(['xs', 'sm', 'md', 'lg', 'xl', 'full'])
+        for (const [name, real, skeleton] of pairs) expect(skeleton, String(name)).toEqual(real)
+        expect((pairs[0]?.[1] as number[][])[1]).toEqual(pointer === 'coarse' ? [220.8, 44] : [165.6, 28])
+      })
+    })
+  }
 })
