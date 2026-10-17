@@ -10,7 +10,7 @@ Each rule has an id, one line of rule, one line of reason, and what enforces it.
 
 ```
 pnpm check            every gate below, in order
-pnpm lint             eslint, including the thirteen custom rules
+pnpm lint             eslint, including the fourteen custom rules
 pnpm typecheck        tsc --noEmit
 pnpm test             vitest, four projects: node, dom, rsc, ssr
 pnpm check:structure  the folder contract and file sizes
@@ -146,7 +146,7 @@ They arrive with the phases that need them.
 ### R-5.3-2 Directional motion uses --tc-dir
 **Rule:** translate, transform origin and gradient direction multiply by `--tc-dir`; `object-*` and `bg-*` positions use an `rtl:` variant, since no logical form exists.
 **Why:** these properties have no logical equivalent.
-**Enforced by:** not yet - planned: `eslint`
+**Enforced by:** `eslint` (`topclass/dir-aware-transforms`; the icon mirror, Base UI's measured origin and swipe offset are allowed, DECISIONS 2026-10-17)
 
 ### R-5.3-3 No letter-spacing
 **Rule:** no `tracking-*` anywhere inside `src/`.

@@ -13,7 +13,7 @@ Read docs/STATUS.md first for where things stand. The full specification is docs
 
 ```
 pnpm check            every gate below, in order
-pnpm lint             eslint, including the thirteen custom rules
+pnpm lint             eslint, including the fourteen custom rules
 pnpm typecheck        tsc --noEmit
 pnpm test             vitest, four projects: node, dom, rsc, ssr
 pnpm check:structure  the folder contract and file sizes
@@ -75,7 +75,7 @@ They arrive with the phases that need them.
 ## 3. RTL
 
 - **R-5.3-1** `ps-`, `pe-`, `ms-`, `me-`, `inset-s-`, `inset-e-`, `text-start`, `border-s`, `rounded-s`; never physical `left`/`right`, never the deprecated `start-*`/`end-*`, never `space-x` or `divide-x`. _(eslint)_
-- **R-5.3-2** Translate, transform origin and gradient direction multiply by `--tc-dir`; `object-*` and `bg-*` positions use an `rtl:` variant, since no logical form exists. _(not yet - planned: eslint)_
+- **R-5.3-2** Translate, transform origin and gradient direction multiply by `--tc-dir`; `object-*` and `bg-*` positions use an `rtl:` variant, since no logical form exists. _(eslint)_
 - **R-5.3-3** No `tracking-*` anywhere inside `src/`. _(eslint)_
 - **R-5.3-4** Use the `placement` prop, which maps to Base UI's `side` and `align`; never `left` or `right` as a side. _(type; the eslint half does not exist)_
 - **R-13-1** The app mounts `TopClassProvider` at the root layout with `direction` and `locale` as props from the layout, never read from `document.dir` in an effect. _(not yet - the provider has a silent fallback instead of a warning)_
