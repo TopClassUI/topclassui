@@ -1,0 +1,92 @@
+{
+  "name": "topclassui",
+  "version": "0.0.0",
+  "private": true,
+  "description": "RTL-first, server-first React components for Next.js and Tailwind CSS v4.",
+  "license": "MIT",
+  "author": "Omar Abed",
+  "homepage": "https://topclassui.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TopClassUI/topclassui.git",
+    "directory": "packages/topclassui"
+  },
+  "bugs": "https://github.com/TopClassUI/topclassui/issues",
+  "keywords": [
+    "react",
+    "nextjs",
+    "tailwindcss",
+    "design-system",
+    "component-library",
+    "rtl",
+    "arabic",
+    "server-components",
+    "accessibility"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22.14"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "check:structure": "tsx scripts/check-structure.ts",
+    "check:boundaries": "tsx scripts/check-boundaries.ts",
+    "check:contrast": "tsx scripts/check-contrast.ts",
+    "rules:sync": "tsx scripts/rules-sync.ts",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm check:structure && pnpm check:boundaries && pnpm check:css && pnpm check:icons && pnpm check:readme && pnpm check:contrast && pnpm test:e2e && pnpm rules:sync --check",
+    "check:css": "tsx scripts/check-css.ts",
+    "icons:build": "tsx scripts/icons-build.ts",
+    "check:icons": "tsx scripts/icons-build.ts --check",
+    "new:component": "tsx scripts/new-component.ts",
+    "test:mutation": "tsx scripts/mutate.ts",
+    "harness:build": "tsx scripts/build-harness.tsx",
+    "harness:serve": "tsx scripts/serve-harness.ts",
+    "test:e2e": "pnpm harness:build && playwright test",
+    "readme:build": "tsx scripts/readme-build.ts",
+    "check:readme": "tsx scripts/readme-build.ts --check"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.63.0",
+    "@testing-library/dom": "10.4.2",
+    "@testing-library/react": "16.3.3",
+    "@testing-library/user-event": "14.6.7",
+    "@types/node": "22.14.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "axe-core": "4.14.0",
+    "eslint": "10.12.0",
+    "happy-dom": "20.14.5",
+    "jiti": "2.7.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "tailwindcss": "4.3.3",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.0",
+    "vitest": "5.0.3"
+  },
+  "dependencies": {
+    "@base-ui/react": "1.8.0",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "server-only": "0.0.1",
+    "tailwind-merge": "3.7.0",
+    "zod": "4.6.5"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwindcss": "^4.2.0"
+  },
+  "imports": {
+    "#shared/*": "./src/shared/*",
+    "#icons/*": "./src/icons/*",
+    "#components/*": "./src/components/*",
+    "#test/*": "./src/test/*"
+  }
+}

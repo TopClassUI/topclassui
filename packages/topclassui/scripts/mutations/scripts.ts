@@ -159,6 +159,12 @@ export const MUTATIONS: Mutation[] = [
     to: 'return []',
   },
   {
+    label: 'rules-sync takes the package folder for the repo root, so the generated rule files land beside the package',
+    file: 'scripts/lib/repo-root.ts',
+    from: '    if (exists(join(dir, WORKSPACE_FILE))) return dir',
+    to: '    return dir',
+  },
+  {
     label: 'the mutation runner accepts an anchor found twice, so a row mutates only the first copy and the second goes untested',
     file: 'scripts/lib/mutate.ts',
     from: '    else if (found > 1) missing.push(',
