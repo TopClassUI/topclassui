@@ -5,13 +5,14 @@ import type { ComponentType } from 'react'
 import { describe, expect, it } from 'vitest'
 
 import { markup } from '#test/markup.js'
+import type { DatePickerDesignProps } from '../types.js'
 
 // PLAN 17.1: the demos are the docs code tab and the visual baselines, so each must render.
 const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['basic', 'form', 'in-field', 'limits', 'rtl', 'sizes', 'states', 'week-start']
+const EXPECTED = ['basic', 'form', 'in-field', 'limits', 'playground', 'rtl', 'sizes', 'states', 'week-start']
 
 /** Each DatePicker of each demo as the server writes it: its name, then what its trigger shows. */
 const PICKERS: Record<string, string[]> = {
@@ -19,6 +20,7 @@ const PICKERS: Record<string, string[]> = {
   'form': ['Check-in: Oct 2, 2026'],
   'in-field': ['Check-in: Oct 2, 2026'],
   'limits': ['Check-in: Oct 2, 2026'],
+  'playground': ['Check-in: Sep 22, 2026'],
   'rtl': ['تاريخ الوصول: 22/09/2026'.replaceAll('/', `${String.fromCodePoint(0x200f)}/`)],
   'sizes': ['Extra small: Sep 22, 2026', 'Small: Sep 22, 2026', 'Medium: Sep 22, 2026', 'Large: Sep 22, 2026', 'Extra large: Sep 22, 2026'],
   'states': ['Nothing chosen: Pick a date', 'Invalid: Sep 22, 2026', 'Disabled: Sep 22, 2026'],
@@ -70,6 +72,13 @@ describe('the demos the plan names', () => {
     const html = await render('form')
     expect(html).toMatch(/^<form class="[^"]*">/)
     expect(html).toMatch(/<input [^>]*name="checkIn" value="2026-10-02"/)
+  })
+
+  it('playground: the schema props a Try it control sets reach the DatePicker', async () => {
+    const loaded = await import('../dummy/playground.tsx') as { default: ComponentType<DatePickerDesignProps> }
+    const html = markup(<loaded.default size="lg" invalid />)
+    expect(html).toContain('data-size="lg"')
+    expect(html).toContain('aria-invalid="true"')
   })
 
   it('rtl: an island that carries the direction and the language', async () => {
