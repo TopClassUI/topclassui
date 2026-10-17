@@ -150,6 +150,7 @@ Anything else is passed to the element each part draws, so standard attributes (
 - `dummy/full-width.tsx`
 - `dummy/long-content.tsx`
 - `dummy/many.tsx`
+- `dummy/playground.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`
 - `dummy/states.tsx`

@@ -60,7 +60,7 @@ describe('a tag with no onRemove is a Server Component that renders no client pa
   })
 
   it('every demo a server page renders is such a tree; only the removable demos are client files', async () => {
-    expect(demos.filter(isClient)).toEqual(['removable', 'removable-sizes'])
+    expect(demos.filter(isClient)).toEqual(['removable', 'removable-sizes', 'states'])
     for (const name of demos.filter((demo) => !isClient(demo))) {
       const Demo = (await import(`../dummy/${name}.tsx`) as { default: () => ReactNode }).default
       expect(crossings(Demo()), name).toEqual([])
