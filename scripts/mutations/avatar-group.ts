@@ -119,7 +119,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the AvatarGroup in-table demo is deleted, so no page measures a team in a table cell',
     file: 'src/components/avatar-group/dummy/in-table.tsx',
-    from: '',
+    from: 'export default function Demo() {',
     to: null,
   },
   {

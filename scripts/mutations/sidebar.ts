@@ -339,8 +339,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the label of a group stays drawn in a collapsed sidebar',
     file: CLASSES,
-    from: "text-muted group-data-closed/sidebar:sr-only'",
-    to: "text-muted'",
+    from: 'text-muted group-data-closed/sidebar:sr-only`',
+    to: 'text-muted`',
   },
   {
     label: 'a collapsed sidebar row is not centred, so its icon starts 12 px in and sits off the middle',

@@ -4,7 +4,8 @@ import type { Mutation } from '../lib/mutate.js'
 
 const CLASSES = 'src/shared/classes.ts'
 
-const RING = "'group-focus-visible/toggle:outline-solid group-focus-visible/toggle:outline-(length:--tc-ring-width) group-focus-visible/toggle:outline-offset-(length:--tc-ring-offset) group-focus-visible/toggle:outline-ring'"
+const RING = "'group-focus-visible/toggle:outline-solid group-focus-visible/toggle:outline-(length:--tc-ring-width) group-focus-visible/toggle:outline-offset-(length:--tc-ring-offset) group-focus-visible/toggle:outline-ring forced-colors:group-focus-visible/toggle:outline-[CanvasText]'"
+const RING_NOTE = "/** The ring of a focused target, drawn on the box inside it. The group is named: a bare one would match an accordion trigger around it.\n * A filled box opts out of forced colours, which would keep --tc-ring at 2.85:1 on Canvas: CanvasText follows the user's palette. */"
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -22,8 +23,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the shared toggle ring moves back to the target, so on a phone it rings 44 px around a 20 px box',
     file: CLASSES,
-    from: `justify-center outline-none \${TOUCH_TARGET} \${DISABLED}\`\n\n/** The ring of a focused target, drawn on the box inside it. The group is named: a bare one would match an accordion trigger around it. */\nexport const TOGGLE_RING = ${RING}`,
-    to: `justify-center \${FOCUS_RING} \${TOUCH_TARGET} \${DISABLED}\`\n\n/** The ring of a focused target, drawn on the box inside it. The group is named: a bare one would match an accordion trigger around it. */\nexport const TOGGLE_RING = ''`,
+    from: `justify-center outline-none \${TOUCH_TARGET} \${DISABLED}\`\n\n${RING_NOTE}\nexport const TOGGLE_RING = ${RING}`,
+    to: `justify-center \${FOCUS_RING} \${TOUCH_TARGET} \${DISABLED}\`\n\n${RING_NOTE}\nexport const TOGGLE_RING = ''`,
   },
   {
     label: 'the shared toggle loses the compound invalid class, so a checked box that is invalid keeps the primary line',

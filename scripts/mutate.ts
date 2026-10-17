@@ -19,7 +19,7 @@ if (chosen.length === 0) {
 }
 
 // A mutation whose anchor has moved silently tests nothing, which is the whole point.
-const missing = readAnchors(ROOT, chosen.filter((m) => m.to !== null))
+const missing = readAnchors(ROOT, chosen)
 if (missing.length > 0) {
   for (const m of missing) console.error(`error ${m}`)
   console.error(`\nmutate: ${String(missing.length)} mutation(s) do not find their anchor exactly once.`)

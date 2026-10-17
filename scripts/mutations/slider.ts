@@ -27,8 +27,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the slider root loses FIELD_HOLDER, so in a w-fit parent the slider is as wide as its thumb',
     file: CLASSES,
-    from: 'export const SLIDER_ROOT = `group/slider grid ${FIELD_HOLDER} ${DISABLED}`',
-    to: 'export const SLIDER_ROOT = `group/slider grid ${DISABLED}`',
+    from: 'export const SLIDER_ROOT = `group/slider grid ${FIELD_HOLDER} ${DISABLED}',
+    to: 'export const SLIDER_ROOT = `group/slider grid ${DISABLED}',
   },
   {
     label: 'the slider root loses has-disabled, so inside a disabled fieldset a press on the track still moves the thumb',
@@ -129,8 +129,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the slider passes step unclamped, so step={0} reaches Base UI',
     file: HOOK,
-    from: 'step: clamp(props.step, stepMin, limitMax)',
-    to: 'step: props.step',
+    from: 'const step = clamp(props.step, stepMin, limitMax)',
+    to: 'const step = props.step',
   },
   {
     label: 'the slider passes max unclamped, so max={1e308} reaches Base UI',
@@ -159,8 +159,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the slider single thumb loses its name, so the range input is unnamed',
     file: HOOK,
-    from: "? [{ ...name, 'aria-describedby': describedBy }]",
-    to: "? [{ 'aria-describedby': describedBy }]",
+    from: "? [{ ...name, 'aria-describedby': describedBy, inputRef: markInvalid }]",
+    to: "? [{ 'aria-describedby': describedBy, inputRef: markInvalid }]",
   },
   {
     label: 'the slider puts the name of one thumb on the group too',
@@ -243,8 +243,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the slider control loses touch-none, so a finger dragging the thumb scrolls the page',
     file: CLASSES,
-    from: 'relative flex min-w-0 flex-1 touch-none select-none',
-    to: 'relative flex min-w-0 flex-1 select-none',
+    from: 'flex-1 touch-none select-none',
+    to: 'flex-1 select-none',
   },
   {
     label: 'the slider control loses half a target of padding under a finger, so a thumb at 0 pokes out of the box',

@@ -71,6 +71,21 @@ describe('reading the anchors', () => {
   it('reports an anchor found twice, since only its first copy would ever be mutated', () => {
     expect(readAnchors(dir, [at(' = 1')])).toEqual([' = 1: " = 1" is in a.ts 2 times, and only the first is mutated'])
   })
+
+  it('reports an empty anchor, which matches anywhere, a deletion row too', () => {
+    const empty: Mutation = { label: 'a demo is deleted', file: 'a.ts', from: '', to: null }
+    expect(readAnchors(dir, [empty])).toEqual(['a demo is deleted: the anchor is empty, so it matches anywhere in a.ts'])
+  })
+
+  it('reports a row whose file is gone, by label, instead of throwing', () => {
+    const gone: Mutation = { label: 'gone', file: 'b.ts', from: 'const z = 2', to: '' }
+    expect(readAnchors(dir, [gone])).toEqual(['gone: b.ts does not exist'])
+  })
+
+  it('reads a deletion row as any other, so its anchor names a line the file still holds', () => {
+    const deletion = (from: string): Mutation => ({ label: from, file: 'a.ts', from, to: null })
+    expect(readAnchors(dir, [deletion('const z = 2'), deletion('const w = 3')])).toEqual(['const w = 3: "const w = 3" is not in a.ts'])
+  })
 })
 
 describe('scripts/mutations', () => {
@@ -87,6 +102,11 @@ describe('scripts/mutations', () => {
     expect(under('src/shared/')).toBeGreaterThanOrEqual(26)
     expect(under('scripts/lib/')).toBeGreaterThanOrEqual(10)
     expect(under('eslint-rules/')).toBeGreaterThanOrEqual(3)
+  })
+
+  // pnpm check never runs a mutant, so this is what catches a row whose anchor a fix moved.
+  it('finds the anchor of every row exactly once in its file, deletions included', () => {
+    expect(readAnchors(process.cwd(), MUTATIONS)).toEqual([])
   })
 
   it('never repeats a label, because the filter and the report both name a row by it', () => {
