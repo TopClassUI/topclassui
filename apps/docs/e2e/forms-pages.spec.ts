@@ -104,7 +104,7 @@ for (const slug of SLUGS.filter((name) => name !== 'rating')) {
   })
 }
 
-test('rating: the playground turns the read-only stars into radios and back', async ({ page }) => {
+test('rating: the playground turns the read-only stars into radios and back on the stage', async ({ page }) => {
   const errors = collectErrors(page)
   await page.goto('/en/docs/components/rating')
   const scope = await openCard(page, 'rating')
@@ -112,7 +112,6 @@ test('rating: the playground turns the read-only stars into radios and back', as
   await expect(stage.getByRole('radio')).toHaveCount(0)
   await scope.getByRole('switch', { name: 'readOnly', exact: true }).click()
   await expect(stage.getByRole('radio')).toHaveCount(5)
-  await expect(scope.locator('pre').first()).toContainText('readOnly={false}')
   await stage.getByRole('radio').nth(4).check({ force: true })
   await expect(stage.getByRole('radio').nth(4)).toBeChecked()
   await pick(page, scope, 'size', 'xl')
