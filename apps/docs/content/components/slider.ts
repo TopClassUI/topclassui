@@ -10,7 +10,7 @@ export const slider = {
     ar: 'قيمة واحدة أو نطاق من قيمتين. مفاتيح الأسهم والضغط على المسار يصلان إلى النتيجة نفسها التي يصل إليها السحب.',
   },
   demos: ['basic', 'range', 'show-value', 'form', 'sizes', 'rtl'],
-  stageHeight: 6,
+  stageHeight: 7,
   note: {
     en: 'A hidden range input carries the value, so the slider submits with its form; the thumb moves once the page hydrates.',
     ar: 'حقل نطاق مخفي يحمل القيمة، فيُرسل الشريط مع نموذجه؛ ويتحرك المقبض بعد ترطيب الصفحة.',

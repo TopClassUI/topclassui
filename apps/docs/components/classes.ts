@@ -24,6 +24,16 @@ export const PLAY_ROW = 'grid min-w-0 md:grid-cols-[minmax(0,1fr)_15.5rem]'
 export const TRY_IT = 'grid content-start gap-3.5 border-t-(length:--tc-line-width) border-line bg-page p-4.5 text-body md:border-t-0 md:border-s-(length:--tc-line-width)'
 export const CONTROL = 'grid gap-1.5'
 export const CONTROL_LABEL = 'font-mono text-xs text-muted'
+/** The box each Try it control is reserved before it mounts, as tall as the sm control it stands for, so the column never shifts. */
+export const CONTROL_RESERVE = {
+  select: 'h-8 pointer-coarse:h-11',
+  segmented: 'h-8 pointer-coarse:h-13',
+  switch: 'h-6 w-10 pointer-coarse:h-11',
+  slider: 'h-6 pointer-coarse:h-11',
+  number: 'h-8 pointer-coarse:h-11',
+} as const
+/** A placeholder that fills the stage's content box, inside its padding, rather than its own min-height on top of it. */
+export const STAGE_RESERVE = 'self-stretch justify-self-stretch'
 export const STATE_SCOPE = 'min-w-0 overflow-x-auto rounded-box bg-page p-4 text-body'
 /** Two demos per row at 64rem and up, one below (page 14). */
 export const DEMO_GRID = 'grid min-w-0 gap-4 lg:grid-cols-2'
