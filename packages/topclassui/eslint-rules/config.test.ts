@@ -17,8 +17,8 @@ describe('eslint.config.ts arms the custom rules', () => {
     expect(src).toBeDefined()
   })
 
-  it('declares thirteen rules, so a new one cannot be forgotten silently', () => {
-    expect(RULE_NAMES).toHaveLength(13)
+  it('declares eighteen rules, so a new one cannot be forgotten silently', () => {
+    expect(RULE_NAMES).toHaveLength(18)
   })
 
   for (const name of RULE_NAMES) {
@@ -47,7 +47,9 @@ describe('eslint.config.ts arms the custom rules', () => {
     // Each of these rules is written "inside src/", and a test or a demo is inside src/:
     // one has to write the banned string to prove the rule, the other to show real usage.
     expect([...new Set(off)].sort()).toEqual([
+      'topclass/dir-aware-transforms',
       'topclass/logical-properties-only',
+      'topclass/no-fetch-in-components',
       'topclass/semantic-classes-only',
       'topclass/shared-class-constants',
       'topclass/style-sets-tokens-only',
