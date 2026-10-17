@@ -12,15 +12,15 @@ describe('createMetadata', () => {
   })
 
   it('names Home and a guide page as the plan writes them', () => {
-    const [home, blocks] = PAGES
+    const [home, install] = PAGES
     expect(titleOf(home, 'en')).toBe('TopClass UI - React components for Next.js, RTL-first and server-first')
-    expect(titleOf(blocks, 'en')).toBe('Page blocks - TopClass UI')
+    expect(titleOf(install, 'en')).toBe('Install the package - TopClass UI')
   })
 
   it('points the canonical at the page itself and pairs both languages with x-default', () => {
-    const blocks = PAGES[1]
-    const meta = createMetadata(blocks, 'ar')
-    expect(meta.alternates?.canonical).toBe('/ar/docs/page-blocks')
-    expect(alternatesOf(blocks)).toEqual({ en: '/en/docs/page-blocks', ar: '/ar/docs/page-blocks', 'x-default': '/en/docs/page-blocks' })
+    const install = PAGES[1]
+    const meta = createMetadata(install, 'ar')
+    expect(meta.alternates?.canonical).toBe('/ar/docs/installation')
+    expect(alternatesOf(install)).toEqual({ en: '/en/docs/installation', ar: '/ar/docs/installation', 'x-default': '/en/docs/installation' })
   })
 })

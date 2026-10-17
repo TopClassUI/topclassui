@@ -8,6 +8,7 @@ import { collect } from './lib/collect.js'
 import { lastCommitDate, newestOf } from './lib/dates.js'
 import { demoMapSource } from './lib/demo-map.js'
 import { libraryFacts } from './lib/facts.js'
+import { guideFacts as startFacts, guidesFileSchema } from './lib/guide-facts.js'
 import { guideFacts } from './lib/guides.js'
 import { COMPONENTS, LIBRARY } from './lib/library.js'
 import { PLANNED_EXPORTS } from './lib/planned-exports.js'
@@ -45,6 +46,9 @@ const problems = generatedProblems(generated, (key) => {
   const [slug = '', name = ''] = key.split('/')
   return existsSync(join(COMPONENTS, slug, 'dummy', `${name}.tsx`))
 })
+const start = startFacts()
+const guideShape = guidesFileSchema.safeParse(start)
+if (!guideShape.success) for (const issue of guideShape.error.issues) problems.push(`guides.json ${issue.path.join('.')}: ${issue.message}`)
 if (problems.length > 0) {
   for (const problem of problems) console.error(`error ${problem}`)
   console.error(`\ndocs:data: ${String(problems.length)} shape problem${problems.length === 1 ? '' : 's'}; nothing written.`)
@@ -57,7 +61,7 @@ writeFileSync(join(OUT, 'toc.json'), `${JSON.stringify(generated.toc, null, 2)}\
 writeFileSync(join(OUT, 'dates.json'), `${JSON.stringify(generated.dates, null, 2)}\n`)
 writeFileSync(join(OUT, 'demos.ts'), demos)
 writeFileSync(join(OUT, 'library.json'), `${JSON.stringify(libraryFacts(), null, 2)}\n`)
-writeFileSync(join(OUT, 'guides.json'), `${JSON.stringify(guideFacts(), null, 2)}\n`)
+writeFileSync(join(OUT, 'guides.json'), `${JSON.stringify({ ...start, ...guideFacts() }, null, 2)}\n`)
 writeFileSync(join(OUT, 'changelog.json'), `${JSON.stringify(changelog, null, 2)}\n`)
 
 for (const issue of issues) console.warn(`${strict ? 'error' : 'warn'} ${issue.slug} ${issue.kind}: ${issue.detail}`)

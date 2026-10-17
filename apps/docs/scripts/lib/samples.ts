@@ -34,14 +34,23 @@ export function checkedSamples(file: string, mdx: string): Sample[] {
   return samples
 }
 
-/** The diagnostics of each sample, compiled with the app's own tsconfig from inside the app. */
-export function compileSamples(app: string, samples: Sample[]): string[] {
+const pathOf = (app: string, sample: Sample) =>
+  join(app, '.samples', sample.file.replace(/\.mdx$/, ''), sample.title ?? `sample-${String(sample.index)}.${sample.lang}`)
+
+/**
+ * The sets of files to compile together. A title shown twice on one page (step 4 rewrites `page.tsx`) is the later file
+ * among its neighbours, and each earlier one is compiled again in its place, so no sample is shadowed unchecked.
+ */
+export function programsOf(app: string, samples: Sample[]): Map<string, string>[] {
+  const latest = new Map(samples.map((sample) => [pathOf(app, sample), sample]))
+  const shadowed = samples.filter((sample) => latest.get(pathOf(app, sample)) !== sample)
+  const files = (chosen: Map<string, Sample>) => new Map([...chosen].map(([path, sample]) => [path, `${PREAMBLE}\n${sample.code}`]))
+  return [latest, ...shadowed.map((sample) => new Map(latest).set(pathOf(app, sample), sample))].map(files)
+}
+
+function diagnosticsOf(app: string, virtual: Map<string, string>): string[] {
   const configFile = ts.readConfigFile(join(app, 'tsconfig.json'), (path) => ts.sys.readFile(path))
   const parsed = ts.parseJsonConfigFileContent(configFile.config, ts.sys, app)
-  const virtual = new Map(samples.map((sample) => [
-    join(app, '.samples', sample.file.replace(/\.mdx$/, ''), sample.title ?? `sample-${String(sample.index)}.${sample.lang}`),
-    `${PREAMBLE}\n${sample.code}`,
-  ]))
   const host = ts.createCompilerHost(parsed.options)
   const readFile = host.readFile.bind(host)
   const fileExists = host.fileExists.bind(host)
@@ -53,6 +62,11 @@ export function compileSamples(app: string, samples: Sample[]): string[] {
   return ts.getPreEmitDiagnostics(program)
     .filter((d) => d.file !== undefined && virtual.has(d.file.fileName))
     .map((d) => `${d.file?.fileName ?? ''}: ${ts.flattenDiagnosticMessageText(d.messageText, '\n')}`)
+}
+
+/** The diagnostics of each sample, compiled with the app's own tsconfig from inside the app. */
+export function compileSamples(app: string, samples: Sample[]): string[] {
+  return [...new Set(programsOf(app, samples).flatMap((virtual) => diagnosticsOf(app, virtual)))]
 }
 
 export function samplesOf(content: string, pages: readonly string[], locales: readonly string[]): Sample[] {

@@ -9,8 +9,14 @@ describe('sitemap', () => {
     expect(entries.map((entry) => entry.url)).toEqual([
       'https://topclassui.com/en',
       'https://topclassui.com/ar',
-      'https://topclassui.com/en/docs/page-blocks',
-      'https://topclassui.com/ar/docs/page-blocks',
+      'https://topclassui.com/en/docs/installation',
+      'https://topclassui.com/ar/docs/installation',
+      'https://topclassui.com/en/docs/css',
+      'https://topclassui.com/ar/docs/css',
+      'https://topclassui.com/en/docs/provider',
+      'https://topclassui.com/ar/docs/provider',
+      'https://topclassui.com/en/docs/first-component',
+      'https://topclassui.com/ar/docs/first-component',
       'https://topclassui.com/en/docs/colors',
       'https://topclassui.com/ar/docs/colors',
       'https://topclassui.com/en/docs/icons',
@@ -30,9 +36,9 @@ describe('sitemap', () => {
 
   it('pairs every URL with its other language and x-default', () => {
     expect(entries[3]?.alternates?.languages).toEqual({
-      en: 'https://topclassui.com/en/docs/page-blocks',
-      ar: 'https://topclassui.com/ar/docs/page-blocks',
-      'x-default': 'https://topclassui.com/en/docs/page-blocks',
+      en: 'https://topclassui.com/en/docs/installation',
+      ar: 'https://topclassui.com/ar/docs/installation',
+      'x-default': 'https://topclassui.com/en/docs/installation',
     })
   })
 })

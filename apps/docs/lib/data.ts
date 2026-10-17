@@ -1,6 +1,7 @@
 // The site's one way into .generated/, which docs:data writes from the library (docs-site S7).
 import components from '../.generated/components.json' with { type: 'json' }
 import dates from '../.generated/dates.json' with { type: 'json' }
+import guides from '../.generated/guides.json' with { type: 'json' }
 import library from '../.generated/library.json' with { type: 'json' }
 import toc from '../.generated/toc.json' with { type: 'json' }
 import type { Locale } from '../content/pages'
@@ -33,6 +34,21 @@ export const CARDS: readonly CardEntry[] = components.sections.flatMap((section)
 )
 
 export const FACTS: LibraryFacts = library
+
+export interface ProviderPropRow {
+  name: string
+  required: boolean
+  type: string
+  default: string
+}
+
+/** What the getting-started pages print from the library: the provider's props, the utility names, the theme script. */
+export const GUIDES: {
+  provider: readonly ProviderPropRow[]
+  utilities: readonly { tokens: readonly string[]; utilities: readonly string[] }[]
+  themeScript: string
+  themeScriptHash: string
+} = guides
 
 export function cardBySlug(slug: string): CardEntry | undefined {
   return CARDS.find((card) => card.slug === slug)

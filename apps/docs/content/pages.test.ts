@@ -17,14 +17,17 @@ describe('the page registry', () => {
     }
   })
 
-  it('routes Home, the placeholder guide page, the foundation pages and the changelog today', () => {
-    expect(LIVE_PAGES.map((page) => page.slug)).toEqual(['home', 'page-blocks', 'colors', 'icons', 'theming', 'rtl', 'server-first', 'accessibility', 'changelog'])
-    expect(LIVE_GUIDES.map((page) => page.slug)).toEqual(['page-blocks', 'colors', 'icons', 'theming', 'rtl', 'server-first', 'accessibility'])
+  it('routes Home, the four getting-started pages, the foundation pages and the changelog today', () => {
+    expect(LIVE_PAGES.map((page) => page.slug)).toEqual(['home', 'installation', 'css', 'provider', 'first-component', 'colors', 'icons', 'theming', 'rtl', 'server-first', 'accessibility', 'changelog'])
+    expect(LIVE_GUIDES.map((page) => page.slug)).toEqual(['installation', 'css', 'provider', 'first-component', 'colors', 'icons', 'theming', 'rtl', 'server-first', 'accessibility'])
   })
 
-  it('derives next from the live order and stops after the last', () => {
-    expect(nextPage('home')?.slug).toBe('page-blocks')
-    expect(nextPage('page-blocks')?.slug).toBe('colors')
+  it('derives next from the live order, skipping a later page, and stops after the last', () => {
+    expect(nextPage('home')?.slug).toBe('installation')
+    expect(nextPage('installation')?.slug).toBe('css')
+    expect(nextPage('css')?.slug).toBe('provider')
+    expect(nextPage('provider')?.slug).toBe('first-component')
+    expect(nextPage('first-component')?.slug).toBe('colors')
     expect(nextPage('accessibility')?.slug).toBe('changelog')
     expect(nextPage('changelog')).toBeUndefined()
   })
