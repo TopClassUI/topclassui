@@ -46,7 +46,8 @@
     "harness:serve": "tsx scripts/serve-harness.ts",
     "test:e2e": "pnpm harness:build && playwright test",
     "readme:build": "tsx scripts/readme-build.ts",
-    "check:readme": "tsx scripts/readme-build.ts --check"
+    "check:readme": "tsx scripts/readme-build.ts --check",
+    "test:consumers": "tsx scripts/consumer-smoke.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
