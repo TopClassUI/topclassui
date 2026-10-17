@@ -51,8 +51,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the checkbox stops writing its hidden checkbox after a reset, so a controlled one sends the first default',
     file: HOOK,
-    from: 'sync: syncChecked })',
-    to: '})',
+    from: 'defaultValue: defaultChecked, sync })',
+    to: 'defaultValue: defaultChecked })',
   },
   {
     label: 'the checkbox drops invalid, so aria-invalid and the danger line never appear',
@@ -93,8 +93,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the checkbox invalid mixed box loses its danger line, so the fill hides that it is wrong',
     file: CLASSES,
-    from: " group-aria-invalid/toggle:group-data-indeterminate/toggle:border-danger-solid'",
-    to: "'",
+    from: ' group-aria-invalid/toggle:group-data-indeterminate/toggle:border-danger-solid ',
+    to: ' ',
   },
   {
     label: 'the checkbox box is round, so it looks like a radio in every mode',

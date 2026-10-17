@@ -74,7 +74,7 @@ export const MUTATIONS: Mutation[] = [
     from: "    .meta({ description: 'Stretches the button to the width of its container.' }),",
     to: '',
   },
-  { label: 'a demo is deleted', file: 'src/components/button/dummy/rtl.tsx', from: '', to: null },
+  { label: 'a demo is deleted', file: 'src/components/button/dummy/rtl.tsx', from: 'export default function Demo() {', to: null },
   {
     label: 'a demo stops rendering the component',
     file: 'src/components/button/dummy/tones.tsx',

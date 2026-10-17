@@ -30,8 +30,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the accordion trigger loses the id its region is named by, so the name points at nothing',
     file: CLIENT,
-    from: ' id={item.triggerId} className={ACCORDION_TRIGGER}',
-    to: ' className={ACCORDION_TRIGGER}',
+    from: '<Base.Trigger id={item.triggerId} onClick={item.onClick}',
+    to: '<Base.Trigger onClick={item.onClick}',
   },
   {
     label: 'the region of an accordion panel is never a tab stop, so the keyboard cannot scroll a wide table',

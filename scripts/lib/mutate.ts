@@ -1,6 +1,6 @@
 // Mutation testing: break the code on purpose, run the suite, and fail if it
 // still passes. A test that survives its own mutation is measuring nothing.
-import { readdirSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
@@ -9,7 +9,7 @@ export interface Mutation {
   label: string
   /** Repository-relative file to change, or to delete when `to` is null. */
   file: string
-  /** The exact text to replace. `null` for `to` deletes the file instead. */
+  /** The exact text to replace, found once. When `to` is null the file is deleted, and this is a line it must hold. */
   from: string
   to: string | null
 }
@@ -36,12 +36,15 @@ export async function collectMutations(dir: string): Promise<Mutation[]> {
   return rows
 }
 
-/** Every mutation must find its anchor exactly once: a missing one tests nothing, and of a repeated
- * one only the first copy is ever mutated. */
+/** Every mutation must find its anchor exactly once: a missing one tests nothing, of a repeated one only the first
+ * copy is ever mutated, and an empty one matches anywhere. A deletion's anchor proves the file still holds what it names. */
 export function readAnchors(root: string, mutations: readonly Mutation[]): string[] {
   const missing: string[] = []
   for (const m of mutations) {
-    const found = readFileSync(join(root, m.file), 'utf8').split(m.from).length - 1
+    const path = join(root, m.file)
+    if (!existsSync(path)) { missing.push(`${m.label}: ${m.file} does not exist`); continue }
+    if (m.from === '') { missing.push(`${m.label}: the anchor is empty, so it matches anywhere in ${m.file}`); continue }
+    const found = readFileSync(path, 'utf8').split(m.from).length - 1
     if (found === 0) missing.push(`${m.label}: "${m.from.slice(0, 60)}" is not in ${m.file}`)
     else if (found > 1) missing.push(`${m.label}: "${m.from.slice(0, 60)}" is in ${m.file} ${String(found)} times, and only the first is mutated`)
   }

@@ -16,8 +16,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the number field stepper loses group-data-disabled/number:disabled:opacity-100, so a disabled field paints it at a quarter',
     file: CLASSES,
-    from: ' group-data-disabled/number:disabled:opacity-100`',
-    to: '`',
+    from: ' group-data-disabled/number:disabled:opacity-100 group-has-',
+    to: ' group-has-',
   },
   {
     label: 'the number field stepper loses its two data-readonly classes, so a read-only stepper looks live and takes the hover',
@@ -40,8 +40,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the number field bounds are not clamped, so min, max and step past the limits reach Base UI',
     file: LIB,
-    from: '    min: min === undefined ? undefined : clamp(min, BOUNDS.limitMin, BOUNDS.limitMax),',
-    to: '    min,',
+    from: '  const low = isBound(min) ? clamp(min, BOUNDS.limitMin, BOUNDS.limitMax) : undefined',
+    to: '  const low = isBound(min) ? min : undefined',
   },
   {
     label: 'the number field ignores details.cancel(), so a handler that cancels still moves it',

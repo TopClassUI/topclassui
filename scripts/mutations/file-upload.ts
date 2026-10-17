@@ -200,10 +200,10 @@ export const MUTATIONS: Mutation[] = [
     to: '*0)] pointer-coarse:',
   },
   {
-    label: 'the file upload coarse cap counts --tc-row-height, which ROW_TOUCH replaces, so a 32 px root shows an extra row',
+    label: 'the file upload coarse cap drops --tc-row-height, which ROW_TOUCH keeps, so at a 32 px root the list shows fewer rows than it should',
     file: CLASSES,
-    from: 'pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-target-coarse,44px)+',
-    to: 'pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-coarse,44px)+',
+    from: 'pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-coarse,44px)+',
+    to: 'pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-target-coarse,44px)+',
   },
   {
     label: 'the file upload hint keeps a word with no space to break at whole, so the page scrolls sideways',
