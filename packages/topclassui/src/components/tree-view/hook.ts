@@ -10,14 +10,14 @@ import { useControllableState } from '#shared/use-controllable-state.js'
 import { TREE_VIEW_DEFAULTS, TREE_VIEW_ROW_ESTIMATE, TYPEAHEAD_MS } from './constants.js'
 import { findRow, flattenTree, isScrolledOut, keyAction, keyOfRow, rowIndexOf, toggled, typeahead } from './lib.js'
 import type {
-  TreeFocusEvent, TreeKeyAction, TreeKeyEvent, TreeMouseEvent, TreePointerEvent, TreeViewHookProps,
+  TreeFocusEvent, TreeKeyAction, TreeKeyEvent, TreeMouseEvent, TreePointerEvent, TreeViewHookProps, TreeViewHookResult,
 } from './types.js'
 
 const { visibleRowsMin, visibleRowsMax, loadMoreThresholdMin, loadMoreThresholdMax } = COLLECTION_BOUNDARIES
 
 /** The selection, the open branches and the visible rows they leave, windowed by the shared hook (R-8.5-1), with the
  * row the keys are on kept in view. The focus stays on the tree; aria-activedescendant names a mounted row only. */
-export function useTreeView(props: TreeViewHookProps) {
+export function useTreeView(props: TreeViewHookProps): TreeViewHookResult {
   const { items, hasMore = TREE_VIEW_DEFAULTS.hasMore, loadMore, status = TREE_VIEW_DEFAULTS.status } = props
   const [selected, setSelected] = useControllableState({
     value: props.value,

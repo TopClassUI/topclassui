@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef, ReactNode } from 'react'
+import type { ComponentPropsWithRef, ReactNode, RefCallback } from 'react'
 
 import type { FieldSchemaInput } from './schema.js'
 
@@ -77,3 +77,16 @@ export type FieldInputEvent = Parameters<NonNullable<FieldLiveProps['onInput']>>
 export type FieldChangeEvent = Parameters<NonNullable<FieldLiveProps['onChange']>>[0]
 export type FieldClickEvent = Parameters<NonNullable<FieldLiveProps['onClick']>>[0]
 export type FieldKeyEvent = Parameters<NonNullable<FieldLiveProps['onKeyUp']>>[0]
+
+/** What the hook hands the markup: the ids, the error that applies, and the root's ref and listeners, wrapped. */
+export interface FieldLiveHookResult {
+  ids: FieldIds
+  error: FieldError | undefined
+  root: {
+    ref: RefCallback<HTMLDivElement>
+    onInput: (event: FieldInputEvent) => void
+    onChange: (event: FieldChangeEvent) => void
+    onClick: (event: FieldClickEvent) => void
+    onKeyUp: (event: FieldKeyEvent) => void
+  }
+}

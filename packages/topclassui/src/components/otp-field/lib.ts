@@ -2,7 +2,7 @@
 import { clamp } from '#shared/clamp.js'
 import { OTP_FIELD_BOUNDARIES } from './boundaries.js'
 import { OTP_FIELD_DIGIT_ZEROS, OTP_FIELD_WRAP_ABOVE } from './constants.js'
-import type { OtpFieldValueProps } from './types.js'
+import type { OtpFieldDigitRules } from './types.js'
 
 const [arabicIndic, persian] = OTP_FIELD_DIGIT_ZEROS
 
@@ -31,11 +31,9 @@ export function layoutCells(length: number, groupSize: number): { separators: bo
   return { separators, whole: items > OTP_FIELD_WRAP_ABOVE }
 }
 
-type Digits = Pick<OtpFieldValueProps, 'validationType' | 'normalizeValue' | 'inputMode'>
-
 /** Base UI's numeric type is ASCII only, so an Arabic keyboard could not fill the field: numeric becomes none with
  * our filter as the only gate (choice 21). A caller's own normalizeValue, or another type, passes through. */
-export function digitRules({ validationType = 'numeric', normalizeValue, inputMode }: Digits): Digits {
+export function digitRules({ validationType = 'numeric', normalizeValue, inputMode }: OtpFieldDigitRules): OtpFieldDigitRules {
   if (validationType !== 'numeric' || normalizeValue) return { validationType, normalizeValue, inputMode }
   return { validationType: 'none', normalizeValue: toAsciiDigits, inputMode: inputMode ?? 'numeric' }
 }

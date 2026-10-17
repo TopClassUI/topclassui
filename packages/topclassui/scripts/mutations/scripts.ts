@@ -165,6 +165,12 @@ export const MUTATIONS: Mutation[] = [
     to: '    return dir',
   },
   {
+    label: 'the build measures the climb from the file instead of its folder, so every rewritten specifier is one ../ too deep',
+    file: 'scripts/lib/specifiers.ts',
+    from: '  const relative = posix.relative(posix.dirname(toPosix(file)), target)',
+    to: '  const relative = posix.relative(toPosix(file), target)',
+  },
+  {
     label: 'the mutation runner accepts an anchor found twice, so a row mutates only the first copy and the second goes untested',
     file: 'scripts/lib/mutate.ts',
     from: '    else if (found > 1) missing.push(',
