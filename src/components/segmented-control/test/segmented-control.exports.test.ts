@@ -18,17 +18,19 @@ function exportedNames(source: string): string[] {
 }
 
 describe('index.tsx exports flat names, the root named Root (R-9.2-3, R-9.2-4)', () => {
-  it('exports exactly SegmentedControlItem and SegmentedControlRoot, two function components', () => {
-    expect(Object.keys(segmented).sort()).toEqual(['SegmentedControlItem', 'SegmentedControlRoot'])
+  it('exports exactly SegmentedControlItem, SegmentedControlRoot and SegmentedControlSkeleton, three function components', () => {
+    expect(Object.keys(segmented).sort()).toEqual(['SegmentedControlItem', 'SegmentedControlRoot', 'SegmentedControlSkeleton'])
     expect(typeof segmented.SegmentedControlRoot).toBe('function')
     expect(typeof segmented.SegmentedControlItem).toBe('function')
+    expect(typeof segmented.SegmentedControlSkeleton).toBe('function')
   })
 
   it('has no Base UI type name, no context and no hook in its surface', () => {
     const source = readFileSync(join(import.meta.dirname, '..', 'index.tsx'), 'utf8')
     expect(exportedNames(source).sort()).toEqual([
       'SegmentedControlDesignProps', 'SegmentedControlItem', 'SegmentedControlItemProps', 'SegmentedControlName',
-      'SegmentedControlRoot', 'SegmentedControlRootProps', 'SegmentedControlSelection',
+      'SegmentedControlRoot', 'SegmentedControlRootProps', 'SegmentedControlSelection', 'SegmentedControlSkeleton',
+      'SegmentedControlSkeletonProps',
     ])
   })
 

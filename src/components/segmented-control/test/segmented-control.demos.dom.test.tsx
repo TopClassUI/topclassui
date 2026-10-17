@@ -20,6 +20,7 @@ const AFTER: Record<string, string[]> = {
   'many': ['Notifications'],
   'rtl': ['تقويم'],
   'sizes': ['Off', 'Off', 'Off', 'Off', 'Off'],
+  'skeleton': ['Month', 'Month', 'Month', 'Month', 'Month', 'Month'],
   'states': ['Invalid', 'Disabled, selected', 'Live', 'Read-only, selected'],
   'with-icons': ['System'],
 }

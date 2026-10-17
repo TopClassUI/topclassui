@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'full-width', 'long-content', 'many', 'rtl', 'sizes', 'states', 'with-icons']
+const EXPECTED = ['basic', 'form', 'full-width', 'long-content', 'many', 'rtl', 'sizes', 'skeleton', 'states', 'with-icons']
 
 /** Each track of each demo as the server writes it: its name, then each segment's text, a star on the selected one and a
  * caret on the one tab stop. */
@@ -23,6 +23,10 @@ const TRACKS: Record<string, string[]> = {
   'many': ['Workspace: Overview *^ | Activity log | Team members | Billing and invoices | Integrations | Security settings | Notifications'],
   'rtl': ['طريقة العرض: لوحة | جدول *^ | تقويم'],
   'sizes': ['Extra small: Extra small *^ | Off', 'Small: Small *^ | Off', 'Medium: Medium *^ | Off', 'Large: Large *^ | Off', 'Extra large: Extra large *^ | Off'],
+  'skeleton': [
+    'Range, xs: Day *^ | Week | Month', 'Range, sm: Day *^ | Week | Month', 'Range, md: Day *^ | Week | Month',
+    'Range, lg: Day *^ | Week | Month', 'Range, xl: Day *^ | Week | Month', 'Range, full: Day *^ | Week | Month',
+  ],
   'states': [
     'Invalid: Invalid, selected *^ | Invalid', 'Disabled: Disabled, selected *^ | Disabled',
     'One disabled: Live, selected *^ | One disabled | Live', 'Read-only: Read-only, selected *^ | Read-only',
@@ -51,7 +55,7 @@ function tracksIn(html: string): string[] {
 }
 
 describe('every demo renders on the server', () => {
-  it('holds exactly the nine demos asked for, so none can be deleted silently', () => {
+  it('holds exactly the ten demos asked for, so none can be deleted silently', () => {
     expect(files).toEqual(EXPECTED)
   })
 
@@ -89,6 +93,13 @@ describe('the demos the plan names', () => {
     const html = await render('full-width')
     expect(html).toContain('<div class="grid grid-cols-1 w-full"><div role="radiogroup"')
     expect(html).toMatch(/role="radiogroup"[^>]*class="[^"]* w-full \*:flex-1/)
+  })
+
+  it('skeleton: each track beside a hidden skeleton of three empty segments, five sizes and a full width', async () => {
+    const html = await render('skeleton')
+    expect([...html.matchAll(/data-pair="([^"]*)"/g)].map(([, pair]) => pair)).toEqual(['xs', 'sm', 'md', 'lg', 'xl', 'full'])
+    const segment = '<span class="[^"]*"><span class="[^"]*"></span></span>'
+    expect(html.match(new RegExp(`<span class="[^"]*" aria-hidden="true"><span class="[^"]*" aria-hidden="true">(?:${segment}){3}</span></span>`, 'g'))).toHaveLength(6)
   })
 
   it('with-icons: each segment has its icon before its label, hidden from a screen reader', async () => {

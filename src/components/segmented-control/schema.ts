@@ -2,7 +2,8 @@
 import { z } from 'zod'
 
 import { sizeSchema } from '#shared/contracts/size.schema.js'
-import { SEGMENTED_CONTROL_DEFAULTS } from './constants.js'
+import { SEGMENTED_CONTROL_BOUNDARIES } from './boundaries.js'
+import { SEGMENTED_CONTROL_DEFAULTS, SEGMENTED_CONTROL_SKELETON_DEFAULTS } from './constants.js'
 
 // R-8.3-3: .meta() is last in each chain, or zod drops it from the JSON Schema output.
 export const segmentedControlSchema = z.object({
@@ -15,3 +16,11 @@ export const segmentedControlSchema = z.object({
 })
 
 export type SegmentedControlSchemaInput = z.input<typeof segmentedControlSchema>
+
+export const segmentedControlSkeletonSchema = z.object({
+  items: z.number().int().min(SEGMENTED_CONTROL_BOUNDARIES.skeletonItemsMin).max(SEGMENTED_CONTROL_BOUNDARIES.skeletonItemsMax)
+    .default(SEGMENTED_CONTROL_SKELETON_DEFAULTS.items)
+    .meta({ description: 'SegmentedControlSkeleton: how many segments the placeholder holds, clamped to the bounds.' }),
+})
+
+export type SegmentedControlSkeletonSchemaInput = z.input<typeof segmentedControlSkeletonSchema>

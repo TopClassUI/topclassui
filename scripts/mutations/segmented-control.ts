@@ -5,6 +5,7 @@ const CLIENT = 'src/components/segmented-control/client.tsx'
 const HOOK = 'src/components/segmented-control/hook.ts'
 const CLASSES = 'src/components/segmented-control/classes.ts'
 const BOUNDARIES = 'src/components/segmented-control/boundaries.ts'
+const SKELETON = 'src/components/segmented-control/skeleton.tsx'
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -228,5 +229,29 @@ export const MUTATIONS: Mutation[] = [
     file: HOOK,
     from: 'useState(() => serveTabStopOn(children, value ?? defaultValue ?? null, disabled))',
     to: 'useState(() => value ?? defaultValue ?? null)',
+  },
+  {
+    label: 'the segmented control skeleton draws an md track at every size, so an xl track jumps when it arrives',
+    file: SKELETON,
+    from: 'SEGMENTED_ROOT_SIZE[size]',
+    to: 'SEGMENTED_ROOT_SIZE.md',
+  },
+  {
+    label: 'the segmented control skeleton leaves its holder, so a skeleton too wide for a phone scrolls the page sideways',
+    file: SKELETON,
+    from: 'cn(SEGMENTED_HOLDER, fullWidth && SEGMENTED_HOLDER_FULL)',
+    to: 'cn(fullWidth && SEGMENTED_HOLDER_FULL)',
+  },
+  {
+    label: 'the segmented control skeleton ignores fullWidth on its track, so a full track arrives wider than its placeholder',
+    file: SKELETON,
+    from: ', fullWidth && SEGMENTED_FULL, className)',
+    to: ', className)',
+  },
+  {
+    label: 'the segmented control skeleton takes aria-hidden from the caller, so a placeholder can be read out',
+    file: SKELETON,
+    from: '{...rest} aria-hidden>',
+    to: 'aria-hidden {...rest}>',
   },
 ]

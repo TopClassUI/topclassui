@@ -88,6 +88,11 @@ that sizes to its content (a table cell, a `w-fit` box) it is as wide as its seg
 **Where things go.** On the root, `className`, `style`, `ref` and the rest go to the track, the
 `radiogroup`; the holder around it takes nothing. On a segment they go to its button.
 
+**While it loads**, `<SegmentedControlSkeleton size="sm" items={3} />` holds the place of a
+track: its height and its segments' height at every size and pointer, and with `fullWidth` its
+width. A label is your text, so each segment reserves four em of its type step. It is hidden
+from screen readers and renders on the server. See `dummy/skeleton.tsx`.
+
 ### What Base UI gives
 
 | Base UI | Here |
@@ -102,7 +107,7 @@ that sizes to its content (a table cell, a `w-fit` box) it is as wide as its seg
 
 `tone` (neutral is the only one drawn), `orientation` (no vertical track), a sliding indicator,
 a ring around the whole track, a toggle-group flavour that can be empty, a hover look, a
-read-only look, a line around the selected segment, a skeleton (use `Skeleton`).
+read-only look, a line around the selected segment.
 
 <!-- /hand-written -->
 
@@ -112,6 +117,7 @@ read-only look, a line around the selected segment, a skeleton (use `Skeleton`).
 import {
   SegmentedControlRoot,
   SegmentedControlItem,
+  SegmentedControlSkeleton,
 } from 'topclassui'
 ```
 
@@ -141,6 +147,14 @@ Required: `aria-label` or `aria-labelledby` on `SegmentedControlRoot`, `defaultV
 | `ref` | no | `Ref<HTMLButtonElement>` | - | The segment itself, which is a `<button>`. |
 | `style` | no | `CSSProperties` | - |  |
 
+### SegmentedControlSkeleton
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `fullWidth` | no | `boolean` | `false` | SegmentedControlRoot: the track fills its parent and its segments share it equally. For a few short segments. |
+| `items` | no | `number` | - |  |
+| `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | SegmentedControlRoot: the height of the track and the padding and type step of every segment; custom emits none. |
+
 Anything else is passed to the element each part draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
@@ -152,6 +166,7 @@ Anything else is passed to the element each part draws, so standard attributes (
 - `dummy/many.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`
+- `dummy/skeleton.tsx`
 - `dummy/states.tsx`
 - `dummy/with-icons.tsx`
 

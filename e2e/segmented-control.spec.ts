@@ -15,7 +15,7 @@ import { FORCED_CANVAS, contrast, rgbOf } from './pixels.js'
 
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['basic', 'form', 'full-width', 'long-content', 'many', 'rtl', 'sizes', 'states', 'with-icons'].map((demo) => `segmented-control--${demo}`)
+const DEMOS = ['basic', 'form', 'full-width', 'long-content', 'many', 'rtl', 'sizes', 'skeleton', 'states', 'with-icons'].map((demo) => `segmented-control--${demo}`)
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 const NAMES = { xs: 'Extra small', sm: 'Small', md: 'Medium', lg: 'Large', xl: 'Extra large' } as const
 
@@ -605,5 +605,32 @@ test.describe('axe on the hydrated demos', () => {
         expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([])
       })
     }
+  }
+})
+
+test.describe('the skeleton', () => {
+  for (const pointer of ['fine', 'coarse'] as const) {
+    test.describe(`${pointer} pointer`, () => {
+      test.use(pointer === 'coarse' ? COARSE : {})
+
+      test('is the box of the track it stands in for at every size: its height and its segments\' height, and with fullWidth its widths', async ({ page }) => {
+        await page.goto(urlFor('segmented-control--skeleton', 'light', 'ltr'))
+        const pairs = await page.locator('[data-pair]').evaluateAll((all) => all.map((pair) => {
+          const size = (el: Element) => { const r = el.getBoundingClientRect(); return [Math.round(r.width * 10) / 10, Math.round(r.height * 10) / 10] as const }
+          const real = pair.querySelector('[role="radiogroup"]')
+          const skeleton = pair.querySelector('span[aria-hidden] > span')
+          const shapes = (track: Element | null) => (track ? [size(track), ...[...track.children].filter((el) => el.tagName !== 'INPUT').map(size)] : [])
+          return { pair: pair.getAttribute('data-pair'), real: shapes(real), skeleton: shapes(skeleton) }
+        }))
+        expect(pairs.map(({ pair }) => pair)).toEqual([...SIZES, 'full'])
+        for (const { pair, real, skeleton } of pairs) {
+          expect(skeleton.length, String(pair)).toBe(4)
+          // A label is caller text, so only the full-width pair has a width the skeleton can know.
+          const seen = (shapes: (readonly [number, number])[]) => shapes.map(([width, height]) => (pair === 'full' ? [width, height] : height))
+          expect(seen(skeleton), String(pair)).toEqual(seen(real))
+        }
+        expect(pairs[0]?.real[1]?.[1]).toBe(pointer === 'coarse' ? 44 : 24)
+      })
+    })
   }
 })

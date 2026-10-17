@@ -9,3 +9,8 @@ export const SEGMENTED_CONTROL_DEFAULTS = {
   fullWidth: false,
   invalid: false,
 } as const
+
+/** The placeholder's starting shape: the design draws each track with three segments. */
+export const SEGMENTED_CONTROL_SKELETON_DEFAULTS = {
+  items: 3,
+} as const

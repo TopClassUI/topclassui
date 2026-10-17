@@ -1,10 +1,10 @@
 import type { Radio } from '@base-ui/react/radio'
 import type { RadioGroup as Base } from '@base-ui/react/radio-group'
-import type { CSSProperties, ReactNode, Ref } from 'react'
+import type { ComponentPropsWithRef, CSSProperties, ReactNode, Ref } from 'react'
 
 import type { GroupName } from '#shared/contracts/name.js'
 import type { Size } from '#shared/contracts/size.js'
-import type { SegmentedControlSchemaInput } from './schema.js'
+import type { SegmentedControlSchemaInput, SegmentedControlSkeletonSchemaInput } from './schema.js'
 
 // R-8.3-4: derived from the schema, so the props and the validation cannot drift apart.
 export type SegmentedControlDesignProps = {
@@ -70,3 +70,9 @@ export type SegmentedControlValueProps = Pick<BaseRoot, 'value' | 'defaultValue'
 
 /** What Base UI hands a change handler: the reason, the event, and cancel(). */
 export type SegmentedControlChangeDetails = Base.ChangeEventDetails
+
+/** R-8.3-4: the control's own size and width, so the two cannot describe different boxes, and a count of segments. */
+export type SegmentedControlSkeletonProps =
+  Omit<ComponentPropsWithRef<'span'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
+  & Pick<SegmentedControlDesignProps, 'size' | 'fullWidth'>
+  & { [K in keyof SegmentedControlSkeletonSchemaInput]?: SegmentedControlSkeletonSchemaInput[K] | undefined }

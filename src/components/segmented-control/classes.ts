@@ -1,6 +1,6 @@
 // R-5.12-4: the class strings of the segmented control, built from the shared constants (unit-4.md, SegmentedControl).
 import {
-  BORDER, CONTAIN, DISABLED, FIELD_INVALID, FOCUS_RING_INSET, SCROLL_X, TOUCH_TARGET, TRANSITION,
+  BORDER, BORDER_WIDTH, CONTAIN, DISABLED, FIELD_INVALID, FOCUS_RING_INSET, FORCED_EDGE, SCROLL_X, TOUCH_TARGET, TRANSITION,
 } from '#shared/classes.js'
 
 /** A grid of one column that may shrink to nothing, as TABS_ROOT is: a track that scrolls would otherwise widen a
@@ -38,3 +38,13 @@ export const SEGMENTED_ITEM_SIZE = { xs: 'px-2 text-xs', sm: 'px-2.5 text-sm', m
 
 /** The icon before the label keeps its size when the label is cut. */
 export const SEGMENTED_ICON = 'flex shrink-0'
+
+/** The skeleton's track, in SEGMENTED_HOLDER as the track is: the box, line, padding and gap of SEGMENTED_ROOT in the
+ * neutral fill, which pulses. Its height is SEGMENTED_ROOT_SIZE and its width SEGMENTED_FULL; it clips what does not fit. */
+export const SEGMENTED_SKELETON = `flex w-fit max-w-full items-stretch gap-0.5 overflow-hidden rounded-control p-0.75 ${BORDER_WIDTH} border-transparent bg-neutral-soft animate-pulse motion-reduce:animate-none ${FORCED_EDGE}`
+
+/** A segment's box: the floor of a segment, 24 px and 44 under a finger. Its padding is SEGMENTED_ITEM_SIZE. */
+export const SEGMENTED_SKELETON_ITEM = `flex shrink-0 overflow-hidden ${TOUCH_TARGET}`
+
+/** A label is caller text of a width no server can know, so each segment reserves four em of its type step. */
+export const SEGMENTED_SKELETON_LABEL = 'block w-[4em] shrink-0'

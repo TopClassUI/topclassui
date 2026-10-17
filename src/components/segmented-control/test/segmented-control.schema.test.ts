@@ -41,8 +41,8 @@ describe('the schema, the constants and the bound agree', () => {
     expect(SEGMENTED_CONTROL_SIZES).toEqual(['xs', 'sm', 'md', 'lg', 'xl', 'custom'])
   })
 
-  it('bounds a label at 100 characters, as Tabs does (R-8.3-6)', () => {
-    expect(SEGMENTED_CONTROL_BOUNDARIES).toEqual({ labelMaxLength: 100 })
+  it('bounds a label at 100 characters, as Tabs does, and a skeleton at 1 to 50 segments (R-8.3-6)', () => {
+    expect(SEGMENTED_CONTROL_BOUNDARIES).toEqual({ labelMaxLength: 100, skeletonItemsMin: 1, skeletonItemsMax: 50 })
   })
 
   it('refuses a size outside the six, and a fullWidth or an invalid that is not a boolean', () => {
