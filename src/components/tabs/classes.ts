@@ -75,7 +75,7 @@ export const TABS_PANEL = `mt-4 wrap-anywhere ${FOCUS_RING}`
 /** R-5.2-3: the list of each look without its scroll: the placeholder has no tab stop, so nothing in it may need one. */
 export const TABS_SKELETON_LIST = {
   line: `flex items-center gap-6 overflow-hidden px-px ${TABS_LIST_LINE}`,
-  enclosed: `flex w-fit max-w-full items-center gap-1 overflow-hidden rounded-control bg-surface p-1 ${FORCED_EDGE}`,
+  enclosed: `flex overflow-hidden w-fit max-w-full items-center gap-1 rounded-control bg-surface p-1 ${FORCED_EDGE}`,
 } as const satisfies Record<TabsVariant, string>
 
 /** A tab's box with nothing to press: its height, its floor under a finger and the bar or the radius of its look. */
