@@ -55,4 +55,15 @@ describe('eslint.config.ts arms the custom rules', () => {
       'topclass/text-comes-from-labels',
     ])
   })
+
+  it('keeps R-8.5-2 on for demos, which ship', () => {
+    const dummy = blocks.filter((b) => (b.files ?? []).some((f) => f.includes('dummy')))
+    expect(dummy.map((b) => b.rules?.['topclass/no-fetch-in-components'])).toEqual([undefined])
+  })
+
+  it('lets the Banner store, and only it, use localStorage', () => {
+    const allowing = blocks.filter((b) => Array.isArray(b.rules?.['topclass/no-fetch-in-components']))
+    expect(allowing.map((b) => b.files)).toEqual([['src/components/banner/lib.ts']])
+    expect(allowing[0]?.rules?.['topclass/no-fetch-in-components']).toEqual(['error', { allow: ['localStorage'] }])
+  })
 })
