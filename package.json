@@ -25,5 +25,8 @@
     "test:e2e": "pnpm --filter topclassui test:e2e",
     "readme:build": "pnpm --filter topclassui readme:build",
     "check:readme": "pnpm --filter topclassui check:readme"
+  },
+  "devDependencies": {
+    "@changesets/cli": "3.0.3"
   }
 }
