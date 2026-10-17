@@ -96,10 +96,28 @@ export function screamingConstants(source: string): string[] {
   return [...source.matchAll(re)].map((m) => m[1] ?? '')
 }
 
+/** Whether the file imports its own folder's hook.ts, from the folder or from parts/. */
+export function importsOwnHook(source: string): boolean {
+  return importedModules(source).some((spec) => /^\.\.?\/hook\.js$/.test(spec))
+}
+
+/** Hooks a Server Component may call. Everything else needs 'use client'. */
+const SERVER_SAFE_HOOKS = new Set(['useId', 'use'])
+
+/** R-5.1-1: the React hooks a server file takes beyond useId and use, named or through a namespace. */
+export function serverUnsafeHooks(source: string): string[] {
+  const hooks = [...importedNames(source, 'react'), ...memberHookCalls(source, namespaceNamesOf(source, 'react'))]
+  return [...new Set(hooks)].filter((name) => name.startsWith('use') && !SERVER_SAFE_HOOKS.has(name))
+}
+
+/** R-5.1-1: a part with no 'use client' renders in whichever half imports it, index.tsx included. */
+export function isServerPart(pathFromSrc: string, source: string): boolean {
+  return /(^|\/)parts\/[^/]+\.tsx$/.test(pathFromSrc) && !hasUseClient(source)
+}
+
 /** R-5.12-1: hook.ts sits behind the client boundary, so only client.tsx or a 'use client' part imports it. */
 export function strayHookImport(pathInFolder: string, source: string): boolean {
-  const own = importedModules(source).some((spec) => /^\.\.?\/hook\.js$/.test(spec))
-  if (!own) return false
+  if (!importsOwnHook(source)) return false
   if (pathInFolder === 'client.tsx') return false
   return !(pathInFolder.startsWith('parts/') && hasUseClient(source))
 }

@@ -15,7 +15,6 @@ const ALLOWED_FILES = new Set([
   'client.tsx',
   'hook.ts',
   'lib.ts',
-  'lib.tsx',
   'variants.ts',
   'classes.ts',
   'constants.ts',
@@ -101,7 +100,7 @@ function checkComponentFolder(dir: string, slug: string) {
   }
 
   if (files.includes('hook.ts') && !files.includes('client.tsx')) {
-    errors.push(`${rel(dir)}: hook.ts exists with no client.tsx. Only client.tsx may import it (R-8.1-1).`)
+    errors.push(`${rel(dir)}: hook.ts exists with no client.tsx. Only client.tsx and its 'use client' parts may import it (R-8.1-1).`)
   }
 
   // R-5.12-1: the logic in hook.ts reaches markup only through a client file; the lint checks that file's shape.
