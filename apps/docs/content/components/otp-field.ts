@@ -10,7 +10,7 @@ export const otpField = {
     ar: 'رمز يُستخدم مرة واحدة، حرف في كل خانة. اللصق يملأ كل الخانات، وحقل مخفي واحد يحمل الرمز إلى النموذج.',
   },
   demos: ['basic', 'grouped', 'form', 'sizes', 'long', 'rtl'],
-  stageHeight: 6,
+  stageHeight: 7,
   note: {
     en: 'The export is `OTPField`. In a form the hidden input sends what is typed so far, a partial code too.',
     ar: 'اسم التصدير هو `OTPField`. داخل نموذج يرسل الحقل المخفي ما كُتب حتى الآن، حتى لو كان الرمز ناقصًا.',
