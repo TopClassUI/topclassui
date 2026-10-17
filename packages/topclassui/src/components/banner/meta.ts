@@ -8,7 +8,7 @@ export const meta = {
   tier: 2,
   // PLAN 20 is not met until the visual matrix and the docs page exist.
   status: 'beta',
-  // A plain banner is server HTML; only a dismissible one renders the client shell.
+  // A plain banner is server HTML; a dismissible one renders the client shell, and BannerDismissible is the client export.
   rendering: 'split',
   baseUi: null,
   baseUiRange: null,

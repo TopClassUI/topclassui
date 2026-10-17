@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { TopClassProvider } from '#shared/provider/provider.js'
-import { Banner } from '../index.js'
+import { Banner, BannerDismissible } from '../index.js'
 
 afterEach(() => {
   vi.restoreAllMocks()
@@ -43,7 +43,7 @@ describe('dismissing', () => {
   it('hides the banner, calls onDismiss once and stores the id', async () => {
     const id = fresh()
     const onDismiss = vi.fn()
-    render(<Banner aria-label="Notice" dismissible id={id} onDismiss={onDismiss}>Out.</Banner>)
+    render(<BannerDismissible aria-label="Notice" id={id} onDismiss={onDismiss}>Out.</BannerDismissible>)
     await userEvent.click(dismiss())
     expect(screen.queryByRole('region')).toBeNull()
     expect(onDismiss).toHaveBeenCalledTimes(1)
@@ -59,7 +59,7 @@ describe('dismissing', () => {
     }
     render(
       <>
-        <Banner aria-label="Notice" dismissible id={id} onDismiss={onDismiss}>Out.</Banner>
+        <BannerDismissible aria-label="Notice" id={id} onDismiss={onDismiss}>Out.</BannerDismissible>
         <button type="button">Next</button>
       </>,
     )
@@ -153,7 +153,7 @@ describe('storage that throws', () => {
     refuse()
     const id = fresh()
     const onDismiss = vi.fn()
-    const { unmount } = render(<Banner aria-label="Notice" dismissible id={id} onDismiss={onDismiss}>Out.</Banner>)
+    const { unmount } = render(<BannerDismissible aria-label="Notice" id={id} onDismiss={onDismiss}>Out.</BannerDismissible>)
     expect(screen.getByRole('region').textContent).toContain('Out.')
     await userEvent.click(dismiss())
     expect(screen.queryByRole('region')).toBeNull()
@@ -185,5 +185,28 @@ describe('the root', () => {
     render(<Banner aria-label="Notice" dismissible id={fresh()}>Out.</Banner>)
     fireEvent.click(screen.getByRole('region'))
     expect(screen.getByRole('region')).not.toBeNull()
+  })
+})
+
+describe('BannerDismissible, the client export', () => {
+  it('renders the region, the message and the x of a dismissible Banner, in the same order', () => {
+    render(<BannerDismissible aria-label="Notice" tone="warning" id={fresh()} action={<a href="#more">More</a>}>Out.</BannerDismissible>)
+    const region = screen.getByRole('region', { name: 'Notice' })
+    expect(region.getAttribute('data-tone')).toBe('warning')
+    expect([...region.children].map((child) => child.tagName)).toEqual(['DIV', 'A', 'BUTTON'])
+    expect(region.firstElementChild?.textContent).toBe('Out.')
+  })
+
+  it('opens no gap for an empty message, as Banner does', () => {
+    render(<BannerDismissible aria-label="Notice" id={fresh()} />)
+    expect([...screen.getByRole('region').children].map((child) => child.tagName)).toEqual(['BUTTON'])
+  })
+
+  it('takes the ref and the rest, and the caller className wins a conflict', () => {
+    const ref = { current: null as HTMLDivElement | null }
+    render(<BannerDismissible ref={ref} aria-label="Notice" id={fresh()} data-testid="b" className="px-2">Out.</BannerDismissible>)
+    expect(ref.current?.getAttribute('data-testid')).toBe('b')
+    expect(ref.current?.className.split(' ')).toContain('px-2')
+    expect(ref.current?.className.split(' ')).not.toContain('px-5')
   })
 })

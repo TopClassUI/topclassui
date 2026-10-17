@@ -26,9 +26,11 @@ describe('index.tsx stays a Server Component (R-5.1-1)', () => {
     expect(hasLateUseClient(source)).toBe(false)
   })
 
-  it('takes the shell from client.tsx and nothing from hook.ts or lib.ts', () => {
+  it('takes the shell from client.tsx, re-exports BannerDismissible, and nothing from hook.ts', () => {
     expect(importedNames(source, './client.js')).toEqual(['BannerShell'])
-    expect(importedModules(source).filter((m) => m === './hook.js' || m === './lib.js')).toEqual([])
+    expect(source).toContain("export { BannerDismissible } from './client.js'")
+    expect(importedModules(source).filter((m) => m === './hook.js')).toEqual([])
+    expect(importedNames(source, './lib.js')).toEqual(['isEmpty'])
   })
 })
 
@@ -53,7 +55,7 @@ describe('hook.ts and lib.ts', () => {
     expect(importedNames(source, './lib.js').sort()).toEqual(['readDismissed', 'subscribeDismissed', 'writeDismissed'])
   })
 
-  it('lib.ts imports no React, so the store is plain code', () => {
+  it('lib.ts imports no React, so the store and the message test are plain code', () => {
     expect(importedModules(read('lib.ts'))).toEqual(['./constants.js'])
   })
 })
