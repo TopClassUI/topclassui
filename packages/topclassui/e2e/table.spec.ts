@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
 import { DIRECTIONS } from '../scripts/lib/harness.js'
+import { expectRing } from './keys.js'
 import { DEMOS, urlFor } from './pages.js'
 
 // What a class list cannot show, each measured failing before it was fixed: a hidden
@@ -193,6 +194,7 @@ for (const demo of STUCK) {
 
       // The keys are how a keyboard gets here at all, so prove they scroll before relying on it.
       await box.focus()
+      await expectRing(page, 'the scrolling region')
       await expect(async () => {
         await page.keyboard.press(rtl ? 'ArrowLeft' : 'ArrowRight')
         expect(Math.abs(await box.evaluate((el) => el.scrollLeft))).toBeGreaterThan(30)

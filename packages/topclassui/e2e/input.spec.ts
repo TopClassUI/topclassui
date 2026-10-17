@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
-import { MODES } from '../scripts/lib/harness.js'
+import { DIRECTIONS, MODES } from '../scripts/lib/harness.js'
+import { expectRing } from './keys.js'
 import { urlFor } from './pages.js'
 
 // What a class list cannot show: whether a row of inputs fits a phone, whether the
@@ -231,9 +232,9 @@ test('rtl: an email and a number read left-to-right, on the side the form starts
 })
 
 // e2e/focus-ring.spec measures a button; this is the same ring on the first form control.
-for (const mode of MODES) {
-  test(`${mode}: tabbing to an input paints a ring outside its box`, async ({ page }) => {
-    await page.goto(urlFor('input--states', mode, 'ltr'))
+for (const [mode, direction] of MODES.flatMap((one) => DIRECTIONS.map((side) => [one, side] as const))) {
+  test(`${mode} ${direction}: tabbing to an input paints a ring outside its box`, async ({ page }) => {
+    await page.goto(urlFor('input--states', mode, direction))
     const first = page.locator('input').first()
     const box = await boxOf(first)
 
@@ -246,5 +247,6 @@ for (const mode of MODES) {
     expect(Buffer.compare(before, await shot(page, above)), 'nothing was painted outside the box').not.toBe(0)
     await expect(first).toHaveCSS('outline-style', 'solid')
     await expect(first).toHaveCSS('outline-width', '2px')
+    await expectRing(page, 'the first input')
   })
 }
