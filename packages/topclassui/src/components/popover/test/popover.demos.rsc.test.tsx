@@ -56,7 +56,9 @@ const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { 
 
 describe('every demo is a Server Component that only hands the parts what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'hover', 'long-content', 'modal', 'placements', 'rtl', 'with-close', 'with-form'])
+    expect(names).toEqual([
+      'basic', 'hover', 'long-content', 'modal', 'placements', 'playground', 'rtl', 'states', 'with-close', 'with-form',
+    ])
   })
 
   // A popover needs no state of the page to open. Closing it when its form is saved does: open and onOpenChange.

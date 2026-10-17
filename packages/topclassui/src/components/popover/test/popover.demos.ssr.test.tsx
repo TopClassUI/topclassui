@@ -12,7 +12,9 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['basic', 'hover', 'long-content', 'modal', 'placements', 'rtl', 'with-close', 'with-form']
+const EXPECTED = [
+  'basic', 'hover', 'long-content', 'modal', 'placements', 'playground', 'rtl', 'states', 'with-close', 'with-form',
+]
 
 /** The label of each trigger a demo holds, every one of them a Button. */
 const TRIGGERS: Record<string, string[]> = {
@@ -24,7 +26,9 @@ const TRIGGERS: Record<string, string[]> = {
     'top-start', 'top', 'top-end', 'start-top', 'start', 'start-bottom',
     'end-top', 'end', 'end-bottom', 'bottom-start', 'bottom', 'bottom-end',
   ],
+  'playground': ['Share'],
   'rtl': ['مشاركة', 'التفاصيل', 'الإعدادات'],
+  'states': ['Open', 'Above', 'With close', 'Modal', 'On hover'],
   'with-close': ['Notifications'],
   'with-form': ['Rename'],
 }

@@ -24,7 +24,9 @@ const POPOVERS: Record<string, readonly string[]> = {
     'top-start', 'top', 'top-end', 'start-top', 'start', 'start-bottom',
     'end-top', 'end', 'end-bottom', 'bottom-start', 'bottom', 'bottom-end',
   ],
+  'popover--playground': ['Share'],
   'popover--rtl': ['مشاركة', 'التفاصيل', 'الإعدادات'],
+  'popover--states': ['Open', 'Above', 'With close', 'Modal', 'On hover'],
   'popover--with-close': ['Notifications'],
   'popover--with-form': ['Rename'],
 }
@@ -81,7 +83,7 @@ const scrollOf = (popup: Locator) => popup.evaluate((element) => ({
 
 test('the table names every popover demo', () => {
   expect(Object.keys(POPOVERS).sort()).toEqual(DEMOS.filter((demo) => demo.startsWith('popover--')).sort())
-  expect(Object.keys(POPOVERS)).toHaveLength(8)
+  expect(Object.keys(POPOVERS)).toHaveLength(10)
 })
 
 /** Where a popup must land, written out: on its own side while there is room, on the opposite one at that edge. */
