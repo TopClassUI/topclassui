@@ -72,4 +72,21 @@ describe('snippetOf', () => {
     expect(snippetOf({ imports: [], jsx: '<Button {...props}>Save</Button>' }, [['variant', 'soft'], ['loading', true]]))
       .toBe('<Button variant="soft" loading>Save</Button>')
   })
+
+  const NAVBAR = '<NavbarRoot {...props}>\n  <NavbarLink href="/docs" current={current}>Docs</NavbarLink>\n</NavbarRoot>'
+
+  it('drops a part\'s unset prop at rest', () => {
+    expect(snippetOf({ imports: [], jsx: NAVBAR }, []))
+      .toBe('<NavbarRoot>\n  <NavbarLink href="/docs">Docs</NavbarLink>\n</NavbarRoot>')
+  })
+
+  it('writes a part\'s prop on that part, and the root\'s where the spread was', () => {
+    expect(snippetOf({ imports: [], jsx: NAVBAR }, [['sticky', false], ['current', true]]))
+      .toBe('<NavbarRoot sticky={false}>\n  <NavbarLink href="/docs" current>Docs</NavbarLink>\n</NavbarRoot>')
+  })
+
+  it('writes a changed value over the literal the tree already passes', () => {
+    expect(snippetOf({ imports: [], jsx: '<Pagination value={6} pageCount={12} {...props} />' }, [['value', 8], ['size', 'lg']]))
+      .toBe('<Pagination value={8} pageCount={12} size="lg" />')
+  })
 })
