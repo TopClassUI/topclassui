@@ -1,0 +1,16 @@
+// Feeds the docs navigation and the registry.json generated after v0.1.
+import type { ComponentMeta } from '#shared/meta.js'
+
+export const meta = {
+  name: 'CodeBlock',
+  slug: 'code-block',
+  category: 'typography-and-layout',
+  tier: 2,
+  // PLAN 20 is not met until the visual matrix and the docs page exist.
+  status: 'beta',
+  // The block stays on the server; showCopy adds the one client button.
+  rendering: 'split',
+  baseUi: null,
+  baseUiRange: null,
+  optionalDeps: [],
+} satisfies ComponentMeta
