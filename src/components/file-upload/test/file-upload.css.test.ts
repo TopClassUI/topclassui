@@ -57,6 +57,17 @@ describe('the zone', () => {
     expect([ruleOf(selector), queryOf(selector)]).toEqual(['border-color: Highlight;', '@media (forced-colors: active)'])
   })
 
+  it('the prompt and the hint wrap a word with no space to break at, and stay inside it', () => {
+    expect([CLASSES_OF.FILE_UPLOAD_PROMPT, CLASSES_OF.FILE_UPLOAD_HINT].map((cls) => ['wrap-anywhere', 'max-w-full'].every((name) => cls.split(' ').includes(name)))).toEqual([true, true])
+    expect(ruleOf(selectorOf('wrap-anywhere'))).toBe('overflow-wrap: anywhere;')
+    expect(ruleOf(selectorOf('max-w-full'))).toBe('max-width: 100%;')
+  })
+
+  it('a link or a button in the hint is lifted over the input', () => {
+    const lifted = (cls: string) => ruleOf(`${selectorOf(cls)} a, ${selectorOf(cls)} button`)
+    expect([lifted('[&_a,&_button]:relative'), lifted('[&_a,&_button]:z-1')]).toEqual(['position: relative;', 'z-index: 1;'])
+  })
+
   it('the input covers it, unseen', () => {
     expect(ruleOf(selectorOf('opacity-0'))).toBe('opacity: 0%;')
     expect(ruleOf(selectorOf('inset-0'))).toBe('inset: 0px;')
@@ -64,11 +75,18 @@ describe('the zone', () => {
 })
 
 describe('the list and the status lines', () => {
-  it('the list is at most --tc-list-rows rows, 44 px rows under a coarse pointer, and nothing at all while empty', () => {
-    expect(ruleOf(selectorOf('max-h-[calc(var(--tc-list-rows)*var(--tc-row-height))]'))).toBe('max-height: calc(var(--tc-list-rows) * var(--tc-row-height));')
-    const coarse = selectorOf('pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-coarse,44px)))]')
-    expect([ruleOf(coarse), queryOf(coarse)]).toEqual(['max-height: calc(var(--tc-list-rows) * max(var(--tc-row-height), var(--tc-target-coarse,44px)));', '@media (pointer: coarse)'])
+  it('the list is at most --tc-list-rows whole rows and their gaps, 54 px rows under a coarse pointer, and nothing while empty', () => {
+    const fine = selectorOf('max-h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-min,24px)+var(--spacing)*2+var(--tc-line-width)*2,var(--text-sm)*var(--text-sm--line-height)+var(--spacing)*2+var(--tc-line-width)*2)+(var(--tc-list-rows)-1)*var(--spacing)*1.5)]')
+    expect(ruleOf(fine)).toBe('max-height: calc(var(--tc-list-rows) * max(var(--tc-row-height), var(--tc-target-min,24px) + var(--spacing) * 2 + var(--tc-line-width) * 2, var(--text-sm) * var(--text-sm--line-height) + var(--spacing) * 2 + var(--tc-line-width) * 2) + (var(--tc-list-rows) - 1) * var(--spacing) * 1.5);')
+    const coarse = selectorOf('pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-coarse,44px)+var(--spacing)*2+var(--tc-line-width)*2,var(--text-sm)*var(--text-sm--line-height)+var(--spacing)*2+var(--tc-line-width)*2)+(var(--tc-list-rows)-1)*var(--spacing)*1.5)]')
+    expect([ruleOf(coarse), queryOf(coarse)]).toEqual(['max-height: calc(var(--tc-list-rows) * max(var(--tc-row-height), var(--tc-target-coarse,44px) + var(--spacing) * 2 + var(--tc-line-width) * 2, var(--text-sm) * var(--text-sm--line-height) + var(--spacing) * 2 + var(--tc-line-width) * 2) + (var(--tc-list-rows) - 1) * var(--spacing) * 1.5);', '@media (pointer: coarse)'])
+    expect(ruleOf(selectorOf('auto-rows-max'))).toBe('grid-auto-rows: max-content;')
     expect(ruleOf(`${selectorOf('empty:hidden')}:empty`)).toBe('display: none;')
+  })
+
+  it('a remove of a disabled upload dims with the zone and takes no pointer', () => {
+    expect(['disabled:opacity-50', 'disabled:pointer-events-none'].filter((cls) => !CLASSES_OF.FILE_UPLOAD_REMOVE.split(' ').includes(cls))).toEqual([])
+    expect([ruleOf(`${selectorOf('disabled:opacity-50')}:disabled`), ruleOf(`${selectorOf('disabled:pointer-events-none')}:disabled`)]).toEqual(['opacity: 50%;', 'pointer-events: none;'])
   })
 
   it('the message line leaves the grid while empty and stays in the accessibility tree: sr-only, never display none', () => {

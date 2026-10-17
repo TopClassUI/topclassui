@@ -102,6 +102,13 @@ describe('formatBytes', () => {
     expect(formatBytes(1.5 * 1024 * MB, 'en', 'latn')).toBe('1.5 GB')
   })
 
+  it('a size that rounds to 1,024 of a unit is written in the next unit up', () => {
+    expect(formatBytes(1_048_575, 'en', 'latn')).toBe('1 MB')
+    expect(formatBytes(1_073_741_823, 'en', 'latn')).toBe('1 GB')
+    expect(formatBytes(1_048_575, 'ar', 'arab')).toBe('١ م.ب')
+    expect(formatBytes(1_048_514, 'en', 'latn')).toBe('1,023.9 kB')
+  })
+
   it('stays in gigabytes past 1024 of them', () => {
     expect(formatBytes(2048 * 1024 * MB, 'en', 'latn')).toBe('2,048 GB')
   })

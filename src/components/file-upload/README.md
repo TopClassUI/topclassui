@@ -26,7 +26,9 @@ import { FileUpload } from 'topclassui'
 
 **A name is required.** Pass `id` (for a `<label htmlFor>`), `aria-label` or
 `aria-labelledby`; the type refuses an upload with none. The children are the hint inside the
-zone, and describe the input: its id comes first in `aria-describedby`, then yours.
+zone, and describe the input: its id comes first in `aria-describedby`, then yours. A link or a
+button in the hint sits over the input and takes its own click, and the zone draws its ring while
+it has the keyboard; every other point of the zone opens the picker.
 
 **Inside a Field** the control object spreads as it is: `{(control) => <FileUpload {...control} />}`.
 The input then reads the zone's hint, the Field's hint and its error, in that order, and a
@@ -113,7 +115,7 @@ Required: `aria-label` or `aria-labelledby` or `id`. Every other prop below is o
 | `aria-label` | **yes**, or `aria-labelledby` or `id` | `string` | - | The name read out when no visible label names the control. |
 | `aria-labelledby` | **yes**, or `aria-label` or `id` | `string` | - | The id of the visible text that names the control. |
 | `id` | **yes**, or `aria-label` or `aria-labelledby` | `string` | - | The id a `<label htmlFor>` points at. |
-| `children` | no | `ReactNode` | - | The hint inside the zone, such as "PDF or PNG, up to 5 MB": it describes the input. |
+| `children` | no | `ReactNode` | - | The hint inside the zone, such as "PDF or PNG, up to 5 MB": it describes the input; a link in it takes its own click. |
 | `className` | no | `string` | - | On the root, merged last. |
 | `invalid` | no | `boolean` | `false` | Marks the files as wrong: sets aria-invalid on the input, and the line of the zone turns to danger and thickens. |
 | `maxFiles` | no | `integer`, min 1, max 100 | `1` | How many files the list keeps, clamped to 1 to 100; above 1 the input takes several at once. |
