@@ -16,7 +16,11 @@ export function ringOfFocus(page: Page): Promise<Ring | null> {
   return page.evaluate(() => {
     const focused = document.activeElement
     if (!(focused instanceof HTMLElement) || focused === document.body) return null
-    const drawn = (element: Element) => getComputedStyle(element).outlineStyle !== 'none'
+    // An element at opacity 0, as a file input over its zone, keeps the browser's outline and paints none of it.
+    const drawn = (element: Element) => {
+      const style = getComputedStyle(element)
+      return style.outlineStyle !== 'none' && style.opacity !== '0' && style.visibility === 'visible'
+    }
     const inside = [...focused.querySelectorAll('*')].find(drawn)
     let around: Element | null = null
     for (let up = focused.parentElement; up && up.id !== 'demo'; up = up.parentElement) if (drawn(up)) { around = up; break }
@@ -40,14 +44,17 @@ export async function expectRing(page: Page, label: string): Promise<void> {
   expect(ring?.width, `${label}: outline width on ${String(ring?.on)}`).toBeGreaterThanOrEqual(2)
 }
 
-/** The focused element as a reader hears it: its aria-label, its labelling element, its text, else its tag and role. */
+/** The focused element's name in the accname order: aria-labelledby, aria-label, a label for it, its text, else tag and role. */
 export function focusName(page: Page): Promise<string> {
   return page.evaluate(() => {
     const at = document.activeElement
     if (!at || at === document.body) return '(body)'
-    const by = at.getAttribute('aria-labelledby')?.split(' ').map((id) => document.getElementById(id)?.textContent ?? '').join(' ').trim()
-    const label = at.id ? document.querySelector(`label[for="${CSS.escape(at.id)}"]`)?.textContent?.trim() : undefined
-    return at.getAttribute('aria-label') ?? (by || label || at.textContent?.trim() || `${at.tagName.toLowerCase()} ${at.getAttribute('role') ?? ''}`.trim())
+    // A button may name itself among its labelling ids, by its own aria-label.
+    const by = at.getAttribute('aria-labelledby')?.split(' ')
+      .map((id) => { const part = document.getElementById(id); return part?.getAttribute('aria-label') ?? part?.textContent ?? '' })
+      .join(' ').trim()
+    const label = at.id ? document.querySelector(`label[for="${CSS.escape(at.id)}"]`)?.textContent.trim() : undefined
+    return by || at.getAttribute('aria-label') || label || at.textContent?.trim() || `${at.tagName.toLowerCase()} ${at.getAttribute('role') ?? ''}`.trim()
   })
 }
 
