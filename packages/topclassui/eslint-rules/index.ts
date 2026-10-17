@@ -197,17 +197,34 @@ const NOT_A_PART = /^(Skeleton|EmptyState|ErrorState|Client|Provider|Context|Var
 const PLACEMENT_PROPS = new Set(['side', 'align', 'placement'])
 const PHYSICAL_SIDE = /(^|-)(left|right)(-|$)/
 
-/** Every string an expression can evaluate to without running it: each branch, each cast. */
-function possibleStrings(node: Node): { node: Node; value: string }[] {
-  if (!node) return []
+/** The initialiser of a same-file `const` the identifier names, or nothing. */
+function constInit(ctx: Context, node: Node): Node {
+  let scope = ctx.sourceCode.getScope(node)
+  while (scope) {
+    const variable = scope.set.get(node.name)
+    if (variable) {
+      const def = variable.defs[0]
+      return def?.type === 'Variable' && def.parent?.kind === 'const' ? def.node.init : null
+    }
+    scope = scope.upper
+  }
+  return null
+}
+
+/** Every string an expression can evaluate to without running it: each branch, each cast, each local const. */
+function possibleStrings(node: Node, ctx: Context, seen = new Set<Node>()): { node: Node; value: string }[] {
+  if (!node || seen.has(node)) return []
+  seen.add(node)
+  const recur = (n: Node) => possibleStrings(n, ctx, seen)
+  if (node.type === 'Identifier') return recur(constInit(ctx, node))
   if (node.type === 'Literal') return typeof node.value === 'string' ? [{ node, value: node.value }] : []
   if (node.type === 'TemplateLiteral') {
     return node.quasis.map((q: Node) => ({ node: q, value: String(q.value?.cooked ?? '') }))
   }
-  if (node.type === 'JSXExpressionContainer') return possibleStrings(node.expression)
-  if (node.type === 'ConditionalExpression') return [...possibleStrings(node.consequent), ...possibleStrings(node.alternate)]
-  if (node.type === 'LogicalExpression') return [...possibleStrings(node.left), ...possibleStrings(node.right)]
-  if (node.type === 'TSAsExpression' || node.type === 'TSSatisfiesExpression') return possibleStrings(node.expression)
+  if (node.type === 'JSXExpressionContainer') return recur(node.expression)
+  if (node.type === 'ConditionalExpression') return [...recur(node.consequent), ...recur(node.alternate)]
+  if (node.type === 'LogicalExpression') return [...recur(node.left), ...recur(node.right)]
+  if (node.type === 'TSAsExpression' || node.type === 'TSSatisfiesExpression') return recur(node.expression)
   return []
 }
 
@@ -665,7 +682,7 @@ const rules = {
     create(ctx: Context) {
       const check = (prop: string, value: Node) => {
         if (!PLACEMENT_PROPS.has(prop)) return
-        for (const found of possibleStrings(value)) {
+        for (const found of possibleStrings(value, ctx)) {
           if (PHYSICAL_SIDE.test(found.value)) {
             ctx.report({ node: found.node, messageId: 'physical', data: { prop, value: found.value } })
           }
@@ -676,8 +693,8 @@ const rules = {
           check(String(node.name?.name ?? ''), node.value)
         },
         Property(node: Node) {
-          if (node.computed) return
-          check(String(node.key?.name ?? node.key?.value ?? ''), node.value)
+          if (node.computed && node.key?.type !== 'Literal') return
+          check(String(node.computed ? node.key.value : node.key?.name ?? node.key?.value ?? ''), node.value)
         },
       }
     },

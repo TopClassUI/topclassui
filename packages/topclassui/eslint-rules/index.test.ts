@@ -671,6 +671,9 @@ describe('R-5.3-4: never left or right as a side', () => {
     ['a cast that hides the type error', '<PopoverRoot placement={"left" as Placement} />'],
     ['an object property', 'const settings = { placement: "bottom-left" }'],
     ['a side in a settings object', 'const positioner = { side: "right", align: "start" }'],
+    ['a computed key written as a string', 'const positioner = { ["side"]: "left" }'],
+    ['a local const it names', 'const s = "left"; <Popover.Positioner side={s} />'],
+    ['a local const holding a conditional', 'const p = rtl ? "start" : "right"; <PopoverRoot placement={p} />'],
   ]
   for (const [label, code] of bad) {
     it(`fails on ${label}`, () => {
@@ -684,6 +687,7 @@ describe('R-5.3-4: never left or right as a side', () => {
     '<DrawerRoot placement="start" />',
     '<Popover.Positioner side="inline-end" align="center" />',
     '<Popover.Positioner side={side} align={align} />',
+    'const s = pick(); <Popover.Positioner side={s} />',
     '<DrawerRoot swipeDirection="left" />',
     'const inlineEnd = direction === "rtl" ? "left" : "right"',
     'const copy = { title: "Bright lights" }',
