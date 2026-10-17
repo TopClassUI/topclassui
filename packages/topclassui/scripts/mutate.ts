@@ -1,13 +1,16 @@
 // pnpm test:mutation - the gate on the gates. See scripts/mutations/index.ts.
-import { cpSync, mkdtempSync, readFileSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs'
+import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, sep } from 'node:path'
 import { spawnSync } from 'node:child_process'
 
 import { type Mutation, type Outcome, caughtBy, readAnchors, summarise } from './lib/mutate.js'
+import { findRepoRoot } from './lib/repo-root.js'
 import { MUTATIONS } from './mutations/index.js'
 
 const ROOT = process.cwd()
+// The copy holds the package only, so a test that reads the repo's docs finds them through this.
+const REPO_ROOT = findRepoRoot(ROOT, existsSync) ?? ROOT
 const only = process.argv.slice(2).find((a) => !a.startsWith('-'))
 // Flags go to vitest, so a crowded machine can ask for fewer workers: pnpm test:mutation tag --maxWorkers=2.
 const flags = process.argv.slice(2).filter((a) => a.startsWith('-'))
@@ -49,7 +52,7 @@ function caughtIn(mutation: Mutation | null): boolean {
     return caughtBy(spawnSync('node', [join(ROOT, 'node_modules/vitest/vitest.mjs'), 'run', ...flags], {
       cwd: dir,
       encoding: 'utf8',
-      env: { ...process.env, NO_COLOR: '1' },
+      env: { ...process.env, NO_COLOR: '1', TC_REPO_ROOT: REPO_ROOT },
       maxBuffer: 1 << 28,
     }))
   } finally {
