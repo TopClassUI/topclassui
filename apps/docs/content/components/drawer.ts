@@ -1,0 +1,50 @@
+export const drawer = {
+  slug: 'drawer',
+  demos: [
+    'end',
+    'start',
+    'bottom',
+    'top',
+    'sizes',
+    'with-form',
+    'long-body',
+    'non-modal',
+    'trap-focus',
+    'rtl',
+  ],
+  stageDemo: 'end',
+  stageHeight: 12,
+  related: ['dialog', 'popover', 'sidebar', 'navbar', 'button'],
+  en: {
+    title: 'Drawer',
+    description: 'A dialog that slides in from a logical edge, so it mirrors in Arabic with no code change. A swipe or the x closes it.',
+    note: '`placement` is logical: `start` opens from the left in English and from the right in Arabic. Never `left` or `right`.',
+    keyboard: [
+      { keys: 'Enter or Space', action: 'On the trigger, opens the sheet. Focus lands on the sheet, and Tab goes to its first control.' },
+      { keys: 'Tab, Shift+Tab', action: 'Move through the sheet. Focus stays inside it.' },
+      { keys: 'Escape', action: 'Closes a tooltip open inside first, then the sheet. Focus returns to the trigger.' },
+    ],
+    accessibility: [
+      'Every sheet ends with an x that nothing removes: a swipe is a drag, and a drag needs a second way (WCAG 2.5.7).',
+      '`DrawerTitle` names the sheet. With no title, pass `aria-label` to `DrawerPopup`.',
+      'While `DrawerBody` scrolls it is a tab stop, so the keyboard reaches a long text with no control in it.',
+    ],
+    rtl: '`start` opens from the right and `end` from the left, and each closes by a swipe toward its own edge. Mount a `TopClassProvider`: without one the swipe follows left to right.',
+  },
+  ar: {
+    title: 'درج',
+    description: 'مربع حوار ينزلق من حافة منطقية، فينعكس في العربية دون أي تعديل في الشيفرة. يُغلق بالسحب أو بزر الإغلاق.',
+    note: '`placement` منطقي: `start` يفتح من اليسار في الإنجليزية ومن اليمين في العربية. لا `left` ولا `right` أبدًا.',
+    keyboard: [
+      { keys: 'Enter أو Space', action: 'على المشغّل، يفتح الدرج. ينتقل التركيز إلى الدرج نفسه، ثم ينقله Tab إلى أول عنصر تحكم.' },
+      { keys: 'Tab, Shift+Tab', action: 'يتنقّلان داخل الدرج. يبقى التركيز داخله.' },
+      { keys: 'Escape', action: 'يغلق أولًا تلميحًا مفتوحًا داخله، ثم الدرج. يعود التركيز إلى المشغّل.' },
+    ],
+    accessibility: [
+      'كل درج ينتهي بزر إغلاق لا يمكن إزالته: السحب حركة جرّ، والجرّ يحتاج طريقة ثانية (WCAG 2.5.7).',
+      '`DrawerTitle` يسمّي الدرج. إن لم يكن له عنوان، مرّر `aria-label` إلى `DrawerPopup`.',
+      'ما دام `DrawerBody` يتمرّر فهو محطة لمفتاح Tab، فتصل لوحة المفاتيح إلى نص طويل لا عنصر تحكم فيه.',
+    ],
+    rtl: '`start` يفتح من اليمين و`end` من اليسار، ويُغلق كل منهما بالسحب نحو حافته. ركّب `TopClassProvider`: من دونه يتبع السحب اتجاه اليسار إلى اليمين.',
+  },
+} as const

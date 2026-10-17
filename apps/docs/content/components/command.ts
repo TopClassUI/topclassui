@@ -1,0 +1,51 @@
+export const command = {
+  slug: 'command',
+  demos: [
+    'basic',
+    'groups',
+    'with-shortcuts',
+    'empty-state',
+    'loading',
+    'thousand',
+    'ten-thousand',
+    'with-tooltip',
+    'rtl',
+  ],
+  stageDemo: 'basic',
+  stageHeight: 12,
+  related: ['dialog', 'dropdown', 'combobox', 'kbd'],
+  en: {
+    title: 'Command palette',
+    description: 'A searchable palette of actions, opened with Ctrl+K or Cmd+K. It loads on its first open, never with the page.',
+    note: '`getKey`, `getLabel` and `onSelect` are functions, so the palette is configured inside a client file.',
+    keyboard: [
+      { keys: 'Ctrl+K or Cmd+K', action: 'Opens the palette from anywhere, with focus in the input. `shortcut` changes the key; `null` removes it.' },
+      { keys: 'ArrowDown, ArrowUp', action: 'Move the active row. The first match is active as you type.' },
+      { keys: 'Enter', action: 'Closes the palette, then runs the active row once.' },
+      { keys: 'Escape', action: 'Closes a tooltip open inside first, then the palette. Focus returns to what had it before.' },
+    ],
+    accessibility: [
+      'The input is a combobox over a listbox, with `aria-activedescendant` on the active row.',
+      'With no match the list is removed and the empty text shows, so no empty listbox is left to land in.',
+      'Home and End stay with the input, for its caret.',
+    ],
+    rtl: 'The glass sits at the right of the input and the rows align right. Ctrl+K also works under an Arabic keyboard layout, because the key is matched by its place too.',
+  },
+  ar: {
+    title: 'لوحة الأوامر',
+    description: 'لوحة أوامر قابلة للبحث تُفتح بـ Ctrl+K أو Cmd+K. تُحمَّل عند أول فتح لها، لا مع الصفحة أبدًا.',
+    note: '`getKey` و`getLabel` و`onSelect` دوال، لذا تُضبط اللوحة داخل ملف عميل.',
+    keyboard: [
+      { keys: 'Ctrl+K أو Cmd+K', action: 'يفتح اللوحة من أي مكان، والتركيز في حقل البحث. `shortcut` يغيّر المفتاح، و`null` يلغيه.' },
+      { keys: 'ArrowDown, ArrowUp', action: 'يحرّكان الصف النشط. أول نتيجة مطابقة تصبح نشطة أثناء الكتابة.' },
+      { keys: 'Enter', action: 'يغلق اللوحة، ثم ينفّذ الصف النشط مرة واحدة.' },
+      { keys: 'Escape', action: 'يغلق أولًا تلميحًا مفتوحًا داخلها، ثم اللوحة. يعود التركيز إلى حيث كان.' },
+    ],
+    accessibility: [
+      'حقل البحث combobox فوق listbox، و`aria-activedescendant` يشير إلى الصف النشط.',
+      'إن لم تطابق أي نتيجة تُزال القائمة ويظهر نص الفراغ، فلا تبقى listbox فارغة يقع فيها القارئ.',
+      'يبقى Home وEnd لحقل البحث، لتحريك المؤشر فيه.',
+    ],
+    rtl: 'تقع العدسة على يمين حقل البحث وتُحاذى الصفوف إلى اليمين. يعمل Ctrl+K أيضًا مع لوحة مفاتيح عربية، لأن المفتاح يُطابق بموضعه أيضًا.',
+  },
+} as const

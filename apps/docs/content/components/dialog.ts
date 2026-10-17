@@ -1,0 +1,51 @@
+export const dialog = {
+  slug: 'dialog',
+  demos: [
+    'basic',
+    'confirm',
+    'with-form',
+    'close-on-success',
+    'long-body',
+    'sizes',
+    'no-close-button',
+    'non-modal',
+    'trap-focus',
+    'with-tooltip',
+    'rtl',
+  ],
+  stageDemo: 'basic',
+  stageHeight: 12,
+  related: ['drawer', 'popover', 'command', 'button', 'form'],
+  en: {
+    title: 'Dialog',
+    description: 'A modal dialog whose body scrolls between a sticky header and footer, while the page behind it stays still.',
+    note: 'Wrap the parts in a form with the class `contents`, and a Server Action submits from the footer with no client handler.',
+    keyboard: [
+      { keys: 'Enter or Space', action: 'On the trigger, opens the dialog. Focus lands on the x.' },
+      { keys: 'Tab, Shift+Tab', action: 'Move through the dialog. Focus stays inside it.' },
+      { keys: 'Escape', action: 'Closes a tooltip open inside first, then the dialog. Focus returns to the trigger.' },
+    ],
+    accessibility: [
+      '`DialogTitle` names the dialog. With no title, pass `aria-label` to `DialogPopup`.',
+      'Remove the x with `closeButton={false}` only when a `DialogClose` sits in the footer: a touch screen reader has no Escape key.',
+      'While `DialogBody` scrolls it is a tab stop, so the keyboard reaches a long text with no control in it.',
+    ],
+    rtl: 'The x moves to the left, the text aligns right and the actions end at the left. The popup takes its direction from the nearest `TopClassProvider`.',
+  },
+  ar: {
+    title: 'مربع حوار',
+    description: 'مربع حوار يحجب الصفحة، يتمرّر متنه بين رأس وتذييل ثابتين، بينما تبقى الصفحة خلفه ساكنة.',
+    note: 'غلّف الأجزاء بنموذج يحمل الصنف `contents`، فيُرسل Server Action من التذييل دون أي معالج في المتصفح.',
+    keyboard: [
+      { keys: 'Enter أو Space', action: 'على المشغّل، يفتح مربع الحوار. ينتقل التركيز إلى زر الإغلاق.' },
+      { keys: 'Tab, Shift+Tab', action: 'يتنقّلان داخل مربع الحوار. يبقى التركيز داخله.' },
+      { keys: 'Escape', action: 'يغلق أولًا تلميحًا مفتوحًا داخله، ثم مربع الحوار. يعود التركيز إلى المشغّل.' },
+    ],
+    accessibility: [
+      '`DialogTitle` يسمّي مربع الحوار. إن لم يكن له عنوان، مرّر `aria-label` إلى `DialogPopup`.',
+      'لا تُزل زر الإغلاق بـ `closeButton={false}` إلا إذا وُضع `DialogClose` في التذييل: قارئ الشاشة على شاشة لمس لا يملك مفتاح Escape.',
+      'ما دام `DialogBody` يتمرّر فهو محطة لمفتاح Tab، فتصل لوحة المفاتيح إلى نص طويل لا عنصر تحكم فيه.',
+    ],
+    rtl: 'ينتقل زر الإغلاق إلى اليسار، ويُحاذى النص إلى اليمين، وتنتهي الإجراءات عند اليسار. يأخذ المربع اتجاهه من أقرب `TopClassProvider`.',
+  },
+} as const

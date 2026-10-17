@@ -1,0 +1,50 @@
+export const popover = {
+  slug: 'popover',
+  demos: [
+    'basic',
+    'with-close',
+    'hover',
+    'with-form',
+    'modal',
+    'placements',
+    'long-content',
+    'rtl',
+  ],
+  stageDemo: 'basic',
+  stageHeight: 12,
+  related: ['tooltip', 'dropdown', 'dialog', 'button'],
+  en: {
+    title: 'Popover',
+    description: 'An anchored panel for a link, a field or an action. It flips and shrinks to the room it has instead of overflowing.',
+    note: 'A tooltip is plain text only: its children are typed as text. Anything with a link or a control is a Popover.',
+    keyboard: [
+      { keys: 'Enter or Space', action: 'On the trigger, opens the popover. Focus lands on the first control, or on the popup.' },
+      { keys: 'Tab', action: 'Past the last control, closes the popover and goes on down the page.' },
+      { keys: 'Shift+Tab', action: 'From the first control, goes back to the trigger.' },
+      { keys: 'Escape', action: 'Closes a tooltip open inside first, then the popover. Focus returns to the trigger.' },
+    ],
+    accessibility: [
+      '`PopoverTitle` names the popover and `PopoverDescription` describes it. With no title, pass `aria-label` to `PopoverPopup`.',
+      'A touch screen reader has no Escape key: give a popover with more than a line of text a `PopoverClose`.',
+      'While the popup scrolls it is a tab stop, so the keyboard reaches a long text with no control in it.',
+    ],
+    rtl: '`start` opens on the right and `end` on the left, and `bottom-start` lines up the right edges. The popup takes its direction from the nearest `TopClassProvider`.',
+  },
+  ar: {
+    title: 'نافذة منبثقة',
+    description: 'لوحة مثبّتة بجانب مشغّلها لرابط أو حقل أو إجراء. تنقلب وتتقلّص إلى المساحة المتاحة بدلًا من أن تفيض.',
+    note: 'التلميح نص فقط: أبناؤه مكتوبون كنص. كل ما فيه رابط أو عنصر تحكم هو نافذة منبثقة.',
+    keyboard: [
+      { keys: 'Enter أو Space', action: 'على المشغّل، يفتح النافذة. ينتقل التركيز إلى أول عنصر تحكم، أو إلى النافذة.' },
+      { keys: 'Tab', action: 'بعد آخر عنصر تحكم، يغلق النافذة ويتابع في الصفحة.' },
+      { keys: 'Shift+Tab', action: 'من أول عنصر تحكم، يعود إلى المشغّل.' },
+      { keys: 'Escape', action: 'يغلق أولًا تلميحًا مفتوحًا داخلها، ثم النافذة. يعود التركيز إلى المشغّل.' },
+    ],
+    accessibility: [
+      '`PopoverTitle` يسمّي النافذة و`PopoverDescription` يصفها. إن لم يكن لها عنوان، مرّر `aria-label` إلى `PopoverPopup`.',
+      'قارئ الشاشة على شاشة لمس لا يملك مفتاح Escape: أعطِ النافذة التي تحمل أكثر من سطر `PopoverClose`.',
+      'ما دامت النافذة تتمرّر فهي محطة لمفتاح Tab، فتصل لوحة المفاتيح إلى نص طويل لا عنصر تحكم فيه.',
+    ],
+    rtl: '`start` تفتح على اليمين و`end` على اليسار، و`bottom-start` تحاذي الحواف اليمنى. تأخذ النافذة اتجاهها من أقرب `TopClassProvider`.',
+  },
+} as const
