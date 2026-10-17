@@ -14,7 +14,7 @@ export default function Demo(props: TableDesignProps) {
   return (
     <Table
       {...props}
-      caption="Revenue by region"
+      caption="Quarterly revenue by region"
       items={regions}
       getKey={(region) => region.name}
       columns={[
