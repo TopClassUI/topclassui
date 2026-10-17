@@ -61,26 +61,28 @@ test.describe('live: the tree view by keyboard', () => {
     })
   }
 
-  test('the tree is the one tab stop, from either side: Shift+Tab comes back to the selected row, with the ring', async ({ page }) => {
-    await openLive(page, 'tree-view--selected')
-    const focusable = await page.locator('#demo [role="treeitem"]').evaluateAll((all) => all.filter((row) => (row as HTMLElement).tabIndex >= 0).length)
-    expect(focusable, 'a row that takes a tab stop of its own').toBe(0)
-    await page.keyboard.press('Tab')
-    await expect(tree(page)).toBeFocused()
-    expect(await highlighted(page)).toBe('page.tsx')
-    await expectRing(page, 'Tab in')
-    await page.keyboard.press('ArrowDown')
-    await page.keyboard.press('Tab')
-    await expect(tree(page)).not.toBeFocused()
-    await page.keyboard.press('Shift+Tab')
-    await expect(tree(page)).toBeFocused()
-    expect(await highlighted(page)).toBe('page.tsx')
-    await expectRing(page, 'Shift+Tab back')
-  })
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: the tree is the one tab stop, from either side: Shift+Tab comes back to the selected row, with the ring`, async ({ page }) => {
+      await openLive(page, 'tree-view--selected', { direction })
+      const focusable = await page.locator('#demo [role="treeitem"]').evaluateAll((all) => all.filter((row) => (row as HTMLElement).tabIndex >= 0).length)
+      expect(focusable, 'a row that takes a tab stop of its own').toBe(0)
+      await page.keyboard.press('Tab')
+      await expect(tree(page)).toBeFocused()
+      expect(await highlighted(page)).toBe('page.tsx')
+      await expectRing(page, 'Tab in')
+      await page.keyboard.press('ArrowDown')
+      await page.keyboard.press('Tab')
+      await expect(tree(page)).not.toBeFocused()
+      await page.keyboard.press('Shift+Tab')
+      await expect(tree(page)).toBeFocused()
+      expect(await highlighted(page)).toBe('page.tsx')
+      await expectRing(page, 'Shift+Tab back')
+    })
 
-  test('a tree with nothing in it, loading or empty, is no tab stop at all', async ({ page }) => {
-    await page.goto(urlFor('tree-view--status', 'light', 'ltr'))
-    await page.keyboard.press('Tab')
-    expect(await page.evaluate(() => document.activeElement?.closest('#demo') ?? null)).toBeNull()
-  })
+    test(`${direction}: a tree with nothing in it, loading or empty, is no tab stop at all`, async ({ page }) => {
+      await page.goto(urlFor('tree-view--status', 'light', direction))
+      await page.keyboard.press('Tab')
+      expect(await page.evaluate(() => document.activeElement?.closest('#demo') ?? null)).toBeNull()
+    })
+  }
 })
