@@ -12,6 +12,9 @@
     "directory": "packages/topclassui"
   },
   "bugs": "https://github.com/TopClassUI/topclassui/issues",
+  "bin": {
+    "topclassui": "./dist/cli/index.js"
+  },
   "keywords": [
     "react",
     "nextjs",
@@ -44,6 +47,7 @@
     "test:mutation": "tsx scripts/mutate.ts",
     "harness:build": "tsx scripts/build-harness.tsx",
     "harness:serve": "tsx scripts/serve-harness.ts",
+    "postbuild": "pnpm --filter @topclassui/cli build --out ../topclassui/dist",
     "test:e2e": "pnpm harness:build && playwright test",
     "readme:build": "tsx scripts/readme-build.ts",
     "check:readme": "tsx scripts/readme-build.ts --check"
