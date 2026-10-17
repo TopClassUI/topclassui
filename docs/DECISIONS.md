@@ -6,6 +6,16 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-17 - The keyboard specs of Unit 3
+
+**Decision.** R-5.6-1 and R-5.6-3 are proved for Unit 3 by sixteen Playwright specs, `e2e/keyboard-<slug>.spec.ts`, on the live harness in both directions, with the helpers in `e2e/keyboard.ts`. The ring is read as the computed outline (`solid`, 2 px, on an element that matches `:focus-visible`, or on a highlighted row for a menu or a list), not as pixels: the pixel and forced-colours reads stay in `focus-ring.spec` and each component's own spec.
+
+**Found and fixed.** A toast reached by Tab, not by F6, then closed by Escape or by its x, left the focus on the body: Base UI records where the focus came from only on F6. The viewport now keeps it on a keyboard focus from outside and gives it back once the toast is gone, when nothing else took it.
+
+**Written down as they are, not changed.** The specs hold these as the contract: a non-modal Popover closes on its trigger when Tab leaves its last control, and stays open when Shift+Tab goes back to the trigger (Base UI's focus manager); a disabled Dropdown item is an arrow stop that neither Enter nor Space picks, as the Authoring Practices allow; the Accordion has no arrow keys, the Drawer focuses its sheet, a dismissed Banner leaves the focus on the body, and a removed Tag hands the focus to its caller, all decided before. Left for Omar: Base UI gives the Tooltip popup no `role="tooltip"` and the trigger no `aria-describedby`; the trigger's own name carries the text.
+
+**Affects.** R-5.6-1 and R-5.6-3 in `docs/RULES.md` (Unit 3 only; Units 4 and 5 are their own jobs). `src/components/toast/hook.ts` and `client.tsx`.
+
 ## 2026-10-17 - One thin themed scrollbar for every scroll area
 
 **Decision.** `SCROLLBAR` in `src/shared/classes.ts` is `scrollbar-width: thin` and `scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track)`. `SCROLL_AREA` and `SCROLL_X` carry it, so every dialog and drawer body, popover, dropdown, command, select and combobox list, date picker, tree view, file upload list, toast viewport, sidebar body, accordion region, tabs list, navbar links, segmented control and code block wears it; the table box and the textarea, which scroll without those two, add it by hand. The thumb is neutral-500 in light and ocean and neutral-400 in dark, on a transparent track, so it stands on the surface beneath it: 4.53 to 4.73:1 in light, 5.83 to 7.63 in dark, and 3.93 / 6.27 on a read-only field. `check:contrast` measures it on every surface and on its track whenever the track is not transparent. The code block sets the two tokens to its own fill and halfway thumb, as before. The collapsed Sidebar still hides its bar. Two widths follow from the thinner bar, measured under a mouse: an expanded Sidebar's bar is 10 px (15 before), and a Textarea that takes the browser's own width, in a `w-fit` parent or beside a label, is 173 px (178 before; unit-4.md says 178), since Chromium reserves the vertical bar in it.
