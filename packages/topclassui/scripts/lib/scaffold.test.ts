@@ -36,6 +36,7 @@ describe('what it writes', () => {
       'index.tsx',
       'meta.ts',
       'schema.ts',
+      'test/fixture.ts',
       'test/icon-button.test.tsx',
       'types.ts',
       'variants.ts',
@@ -83,6 +84,11 @@ describe('what it writes', () => {
   it('ships a test, so a scaffolded component is never untested', () => {
     expect(written.get('test/icon-button.test.tsx')).toContain('describe(')
     expect(written.get('test/icon-button.test.tsx')).toContain('expect(')
+  })
+
+  it('writes the root-props fixture check-structure requires, with a case for the component', () => {
+    expect(written.get('test/fixture.ts')).toContain('export const fixture: RootPropsFixture<typeof Index> = {')
+    expect(written.get('test/fixture.ts')).toContain('  IconButton: { props: {} },')
   })
 
   it('keeps every comment to one line, which R-5.12-3 requires', () => {

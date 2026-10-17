@@ -1,3 +1,6 @@
+import { readdirSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
 import { Linter } from 'eslint'
 import tseslint from 'typescript-eslint'
 import { describe, expect, it } from 'vitest'
@@ -16,9 +19,11 @@ const config = [
     },
     rules: {
       'topclass/logical-properties-only': 'error',
+      'topclass/dir-aware-transforms': 'error',
       'topclass/semantic-classes-only': 'error',
       'topclass/no-dynamic-class-names': 'error',
       'topclass/shared-class-constants': 'error',
+      'topclass/bare-data-variants': 'error',
       'topclass/no-enum': 'error',
       'topclass/one-line-comments': 'error',
       'topclass/icon-loaders-stay-server': 'error',
@@ -28,6 +33,9 @@ const config = [
       'topclass/flat-part-exports': 'error',
       'topclass/root-part-is-named-root': 'error',
       'topclass/text-comes-from-labels': 'error',
+      'topclass/no-fetch-in-components': 'error',
+      'topclass/tooltip-content-is-text': 'error',
+      'topclass/client-shape': 'error',
       'topclass/props-derived-at-the-seam': 'error',
     },
   },
@@ -553,6 +561,39 @@ describe('R-5.7-6: states are presence attributes', () => {
   }
 })
 
+describe('R-5.2-6: data and aria variants are bare', () => {
+  const bad: [string, string, string][] = [
+    ['data-[open]:', '<div className="data-[open]:opacity-100" />', '"data-open:"'],
+    ['aria-[busy]:', '<div className="aria-[busy]:cursor-progress" />', '"aria-busy:"'],
+    ['group-data-[panel-open]:', '<div className="group-data-[panel-open]:block" />', '"group-data-panel-open:"'],
+    ['peer-aria-[invalid]:', 'const c = cn("peer-aria-[invalid]:text-danger")', '"peer-aria-invalid:"'],
+    ['a named group', '<div className="group-data-[open]/item:block" />', '"group-data-open/item:"'],
+    ['a stacked variant', 'const BOX_CLASSES = "p-2 rtl:data-[disabled]:opacity-50"', '"data-disabled:"'],
+    ['a class list outside a class context', 'const x = { root: "flex data-[highlighted]:bg-hover" }', '"data-highlighted:"'],
+  ]
+  for (const [label, code, hint] of bad) {
+    it(`fails on ${label} and names the bare form`, () => {
+      const messages = lint(code).filter((m) => m.ruleId === 'topclass/bare-data-variants')
+      expect(messages, code).toHaveLength(1)
+      expect(messages[0]?.message, code).toContain(hint)
+    })
+  }
+
+  const good = [
+    '<div className="data-open:opacity-100 aria-busy:cursor-progress group-data-panel-open:block" />',
+    '<div className="data-[state=open]:block" />',
+    '<div className="data-[size=custom]:h-auto aria-[current=page]:font-medium" />',
+    '<div className="group-data-[side=top]/item:block" />',
+    '<div className="[&[data-open]]:block" />',
+    '<div className="data-open:[--tc-x:1]" />',
+  ]
+  for (const code of good) {
+    it(`allows ${code}`, () => {
+      expect(ids(code).filter((r) => r === 'topclass/bare-data-variants'), code).toEqual([])
+    })
+  }
+})
+
 describe('R-9.2-3: parts are exported flat', () => {
   it('fails on an object of components', () => {
     const code = 'const Dialog = { Root: DialogRoot, Header: DialogHeader }'
@@ -615,6 +656,48 @@ describe('R-5.11-1: built-in text comes from labels', () => {
   for (const code of good) {
     it(`allows ${code}`, () => {
       expect(ids(code).filter((r) => r?.startsWith('topclass/')), code).toEqual([])
+    })
+  }
+})
+
+describe('R-10.5-2: a tooltip is plain text', () => {
+  const tooltip = (code: string) => ids(code).filter((r) => r === 'topclass/tooltip-content-is-text')
+
+  const bad: [string, string][] = [
+    ['a link', '<TooltipPopup>Read the <a href="/docs">docs</a></TooltipPopup>'],
+    ['a control', '<TooltipPopup><button>Undo</button></TooltipPopup>'],
+    ['a component', '<TooltipPopup><Kbd>K</Kbd></TooltipPopup>'],
+    ['a fragment', '<TooltipPopup><>Copy</></TooltipPopup>'],
+    ['an element behind a condition', '<TooltipPopup>{ok && <strong>Saved</strong>}</TooltipPopup>'],
+    ['elements from a map', '<TooltipPopup>{rows.map((r) => <p key={r}>{r}</p>)}</TooltipPopup>'],
+    ['an element passed as the children prop', '<TooltipPopup children={<a href="/">Home</a>} />'],
+    ['an element spread in as children', '<TooltipPopup {...{ children: <a href="/">Home</a> }} />'],
+    ['an import renamed on the way in', 'import { TooltipPopup as Tip } from "x"\nconst t = <Tip><a href="/">Home</a></Tip>'],
+  ]
+  for (const [label, code] of bad) {
+    it(`fails on ${label}`, () => {
+      expect(tooltip(code), code).toEqual(['topclass/tooltip-content-is-text'])
+    })
+  }
+
+  it('names the element and the way out in the message', () => {
+    const [message] = lint('<TooltipPopup><a href="/">Home</a></TooltipPopup>')
+      .filter((m) => m.ruleId === 'topclass/tooltip-content-is-text')
+    expect(message?.message).toBe(
+      'R-10.5-2: <a> inside TooltipPopup makes it more than text. A link, a control or rich content belongs in a Popover.')
+  })
+
+  const good = [
+    '<TooltipPopup>Copy link</TooltipPopup>',
+    '<TooltipPopup>Delete {count} rows</TooltipPopup>',
+    '<TooltipPopup placement="bottom-start">{FILE}</TooltipPopup>',
+    '<TooltipPopup>{labels.copy}</TooltipPopup>',
+    '<TooltipTrigger render={<Button>Save</Button>} />',
+    '<PopoverPopup><a href="/docs">Docs</a></PopoverPopup>',
+  ]
+  for (const code of good) {
+    it(`allows ${code}`, () => {
+      expect(tooltip(code), code).toEqual([])
     })
   }
 })
@@ -709,5 +792,238 @@ describe('the new rules leave real component code alone', () => {
 
   it('still catches a spread that is not the consumer style', () => {
     expect(ids('<div style={{ ...theme }} />')).toContain('topclass/style-sets-tokens-only')
+  })
+})
+
+describe('R-5.3-2: directional motion follows --tc-dir', () => {
+  const RULE = 'topclass/dir-aware-transforms'
+  const fails: [string, string][] = [
+    ['translate-x-full', '<div className="translate-x-full" />'],
+    ['a negative translate-x', '<div className="-translate-x-1/2" />'],
+    ['translate-x behind a variant', '<div className="data-open:translate-x-4" />'],
+    ['translate on both axes', '<div className="translate-1/2" />'],
+    ['an arbitrary translate-x', '<div className="translate-x-[12px]" />'],
+    ['a translate-x variable', '<div className="translate-x-(--offset)" />'],
+    ['an arbitrary pair with a physical x', '<div className="translate-[10px_0]" />'],
+    ['translateX in an arbitrary transform', '<div className="transform-[translateX(100%)]" />'],
+    ['translate() in an arbitrary transform', '<div className="transform-[translate(100%,0)]" />'],
+    ['translate3d in a property', '<div className="[transform:translate3d(4px,0,0)]" />'],
+    ['the translate property', '<div className="[translate:4px_0]" />'],
+    ['origin-left', '<div className="origin-left" />'],
+    ['origin-right', '<div className="origin-right" />'],
+    ['origin-top-left', '<div className="origin-top-left" />'],
+    ['an arbitrary origin on a side', '<div className="origin-[left_top]" />'],
+    ['a transform-origin property on a side', '<div className="[transform-origin:right]" />'],
+    ['bg-linear-to-r', '<div className="bg-linear-to-r" />'],
+    ['bg-linear-to-l', '<div className="bg-linear-to-l" />'],
+    ['bg-linear-to-tr', '<div className="bg-linear-to-tr" />'],
+    ['bg-gradient-to-r', '<div className="bg-gradient-to-r" />'],
+    ['bg-gradient-to-l', '<div className="bg-gradient-to-l" />'],
+    ['an inline-axis angle', '<div className="bg-linear-90" />'],
+    ['a negative angle', '<div className="-bg-linear-45" />'],
+    ['an arbitrary angle', '<div className="bg-linear-[45deg,var(--a),var(--b)]" />'],
+    ['a linear-gradient to a side', '<div className="bg-[linear-gradient(to_right,var(--a),var(--b))]" />'],
+    ['rtl: on a margin', '<div className="rtl:ms-2" />'],
+    ['rtl: on a translate', '<div className="rtl:-translate-x-full" />'],
+    ['ltr: on anything', '<div className="ltr:rotate-180" />'],
+    ['an arbitrary dir variant', '<div className="[[dir=rtl]_&]:ms-2" />'],
+    ['a :dir() variant', '<div className="[&:dir(rtl)]:scale-x-[-1]" />'],
+    ['a mirror other than the icon flip', '<div className="rtl:-scale-x-50" />'],
+    ['object-left with no rtl mirror', '<img className="object-left" />'],
+    ['bg-right with no rtl mirror', '<div className="bg-right" />'],
+    ['a class list in a const', 'const SLIDE = "transition-transform translate-x-full"'],
+  ]
+  for (const [label, code] of fails) {
+    it(`fails on ${label}`, () => {
+      expect(ids(code), code).toContain(RULE)
+    })
+  }
+
+  const passes: [string, string][] = [
+    ['a translate-x times --tc-dir', '<div className="translate-x-[calc(100%*var(--tc-dir))]" />'],
+    ['the switch thumb', '<span className="group-data-checked/toggle:translate-x-[calc((100cqw-100%)*var(--tc-dir))]" />'],
+    ['the drawer sheet', '<div className="data-starting-style:transform-[translateX(calc(100%*var(--tc-dir)))]" />'],
+    ['a block-axis translate', '<div className="-translate-y-1/2 translate-y-full" />'],
+    ['a block-axis translate function', '<div className="transform-[translateY(100%)]" />'],
+    ['a zero translate', '<div className="translate-x-0 translate-none" />'],
+    ['the swipe offset Base UI measures', '<div className="transform-[translate(var(--drawer-swipe-movement-x,0px),var(--drawer-swipe-movement-y,0px))]" />'],
+    ['the origin Base UI measures', '<div className="origin-(--transform-origin)" />'],
+    ['a centre or block-edge origin', '<div className="origin-center origin-top origin-bottom" />'],
+    ['a vertical gradient', '<div className="bg-linear-to-b bg-gradient-to-t bg-linear-180" />'],
+    ['a gradient angle times --tc-dir', '<div className="bg-linear-[calc(90deg*var(--tc-dir)),var(--a),var(--b)]" />'],
+    ['the icon mirror of PLAN section 7', '<svg className="inline-block shrink-0 rtl:-scale-x-100" />'],
+    ['an object position with its rtl mirror', '<img className="object-left rtl:object-right" />'],
+    ['a bg position with its rtl mirror', '<div className="bg-left-top rtl:bg-right-top" />'],
+    ['a direction-neutral position', '<img className="object-center bg-top" />'],
+    ['the data-ltr attribute variant, which is not ltr:', '<input className="data-ltr:text-match-parent" />'],
+    ['a block-axis rotation', '<div className="group-data-panel-open:rotate-180" />'],
+  ]
+  for (const [label, code] of passes) {
+    it(`allows ${label}`, () => {
+      expect(ids(code), code).not.toContain(RULE)
+    })
+  }
+})
+
+describe('R-5.3-2 rejects the real sources once their direction is taken out', () => {
+  const RULE = 'topclass/dir-aware-transforms'
+  const sources = ['src/components/drawer/classes.ts', 'src/components/switch/classes.ts', 'src/components/svg/index.tsx']
+  for (const file of sources) {
+    const code = readFileSync(new URL(`../${file}`, import.meta.url), 'utf8')
+    it(`${file} passes as written`, () => {
+      expect(ids(code, file)).not.toContain(RULE)
+    })
+    it(`${file} fails with --tc-dir removed or the mirror widened`, () => {
+      const broken = code.replaceAll('*var(--tc-dir)', '').replaceAll('rtl:-scale-x-100', 'rtl:-scale-x-100 rtl:rotate-180')
+      expect(ids(broken, file)).toContain(RULE)
+    })
+  }
+})
+
+describe('R-8.5-2: components never fetch, cache or paginate', () => {
+  const RULE = 'topclass/no-fetch-in-components'
+  const only = (code: string, file = 'src/components/list/hook.ts') =>
+    lint(code, file).filter((m) => m.ruleId === RULE)
+
+  const bad: [string, string][] = [
+    ['fetch()', "export const load = () => fetch('/api/items')"],
+    ['window.fetch()', "export const load = () => window.fetch('/api/items')"],
+    ['globalThis.fetch()', "export const load = () => globalThis.fetch('/api/items')"],
+    ['XMLHttpRequest', 'export const x = new XMLHttpRequest()'],
+    ['new Request()', "export const r = new Request('/api/items')"],
+    ['localStorage', "export const v = localStorage.getItem('k')"],
+    ['window.localStorage', "export const v = window.localStorage.getItem('k')"],
+    ['sessionStorage', "sessionStorage.setItem('k', 'v')"],
+    ['indexedDB', "export const db = indexedDB.open('items')"],
+    ['caches', "export const c = caches.open('items')"],
+    ["React's cache imported", "import { cache } from 'react'\nexport const get = cache(() => 1)"],
+    ["React's cache renamed", "import { cache as memo } from 'react'\nexport const get = memo(() => 1)"],
+    ['React.cache()', "import * as React from 'react'\nexport const get = React.cache(() => 1)"],
+    ['an import from next/cache', "import { revalidateTag } from 'next/cache'\nexport const r = revalidateTag"],
+    ['unstable_cache used', 'export const get = unstable_cache(async () => 1)'],
+  ]
+  for (const [label, code] of bad) {
+    it(`fails on ${label}`, () => {
+      expect(only(code), code).toHaveLength(1)
+      expect(only(code)[0]?.message, code).toMatch(/R-8.5-2/)
+    })
+  }
+
+  it('covers components, connectors and shared, and nothing else', () => {
+    const code = "export const load = () => fetch('/api/items')"
+    expect(only(code, 'src/components/combobox/hook.ts')).toHaveLength(1)
+    expect(only(code, 'src/connectors/adaptive-menu/client.tsx')).toHaveLength(1)
+    expect(only(code, 'src/shared/collection/use-collection.ts')).toHaveLength(1)
+    expect(only(code, 'scripts/check-icons.ts')).toEqual([])
+    expect(only(code, 'e2e/select.spec.ts')).toEqual([])
+  })
+
+  it('lets one name through where the config allows it, and only that name', () => {
+    const allowed = [
+      {
+        files: ['**/*.ts'],
+        plugins: { topclass },
+        languageOptions: { parser: tseslint.parser },
+        rules: { [RULE]: ['error', { allow: ['localStorage'] }] },
+      },
+    ] as unknown as Linter.Config[]
+    const file = 'src/components/banner/lib.ts'
+    expect(linter.verify("export const v = localStorage.getItem('k')", allowed, file)).toEqual([])
+    expect(linter.verify("export const v = sessionStorage.getItem('k')", allowed, file)).toHaveLength(1)
+    expect(linter.verify("export const v = fetch('/k')", allowed, file)).toHaveLength(1)
+  })
+
+  const good: [string, string][] = [
+    ['calling loadMore', 'export function next(props: { loadMore: () => void }) { props.loadMore() }'],
+    ['a prop named fetch is a member, not the global', 'export const run = (p: { fetch: () => void }) => p.fetch()'],
+    ['a key named localStorage', "export const KEYS = { localStorage: 'tc' }"],
+    ['the word in a string', "export const NOTE = 'never touches localStorage'"],
+    ['other React imports', "import { use, useId } from 'react'\nexport const a = [use, useId]"],
+    ['a Response built from data, not a request', "export const r = new Response('ok')"],
+  ]
+  for (const [label, code] of good) {
+    it(`allows ${label}`, () => {
+      expect(only(code), code).toEqual([])
+    })
+  }
+})
+
+describe('R-5.12-1: client.tsx is markup plus one hook from hook.ts', () => {
+  const CLIENT = 'src/components/thing/client.tsx'
+  const PART = 'src/components/thing/parts/thing-list.tsx'
+  const shape = (code: string, filename = CLIENT) => ids(code, filename).filter((r) => r === 'topclass/client-shape')
+
+  it('allows one hook from hook.ts in each component of the file', () => {
+    const code = [
+      "'use client'",
+      "import { useThingRoot, useThingItem } from './hook.js'",
+      'export function ThingRoot() { const root = useThingRoot(); return <div id={root.id} /> }',
+      'export function ThingItem() { const item = useThingItem(); return <button onClick={() => { item.run() }} /> }',
+    ].join('\n')
+    expect(shape(code), code).toEqual([])
+  })
+
+  it('allows a component that calls no hook at all', () => {
+    expect(shape("'use client'\nexport function ThingBody() { return <div /> }")).toEqual([])
+  })
+
+  const banned: [string, string][] = [
+    ['useState', "import { useState } from 'react'\nexport function Thing() { const [v] = useState(0); return <i>{v}</i> }"],
+    ['useEffect', "import { useEffect } from 'react'\nexport function Thing() { useEffect(() => {}); return <i /> }"],
+    ['useReducer', "import { useReducer } from 'react'\nexport function Thing() { useReducer((s: number) => s, 0); return <i /> }"],
+    ['useRef', "import { useRef } from 'react'\nexport function Thing() { const r = useRef(null); return <i ref={r} /> }"],
+    ['useMemo', "import { useMemo } from 'react'\nexport function Thing() { useMemo(() => 1, []); return <i /> }"],
+    ['useCallback', "import { useCallback } from 'react'\nexport function Thing() { useCallback(() => 1, []); return <i /> }"],
+    ['React.useState', "import * as React from 'react'\nexport function Thing() { React.useState(0); return <i /> }"],
+    ['an aliased import', "import { useState as useLocal } from 'react'\nexport function Thing() { useLocal(0); return <i /> }"],
+  ]
+  for (const [name, code] of banned) {
+    it(`rejects ${name} in client.tsx`, () => {
+      expect(shape(`'use client'\n${code}`), code).toEqual(['topclass/client-shape'])
+    })
+  }
+
+  it('rejects a hook that does not come from hook.ts', () => {
+    const code = "'use client'\nimport { useCollection } from '#shared/collection.js'\nexport function Thing() { useCollection(); return <i /> }"
+    expect(shape(code), code).toEqual(['topclass/client-shape'])
+  })
+
+  it('rejects a second hook call in one component, even when both come from hook.ts', () => {
+    const code = "'use client'\nimport { useA, useB } from './hook.js'\nexport function Thing() { useA(); useB(); return <i /> }"
+    expect(shape(code), code).toEqual(['topclass/client-shape'])
+  })
+
+  it('rejects a helper declared beside the components, in either form', () => {
+    const code = "'use client'\nfunction toLabel(s: string) { return s }\nexport const toKey = (s: string) => s\nexport function Thing() { return <i /> }"
+    expect(shape(code), code).toEqual(['topclass/client-shape', 'topclass/client-shape'])
+  })
+
+  it('rejects a hook declared in client.tsx instead of hook.ts', () => {
+    const code = "'use client'\nfunction useThing() { return 1 }\nexport function Thing() { return <i /> }"
+    expect(shape(code), code).toEqual(['topclass/client-shape'])
+  })
+
+  it('holds a use client part to the same shape as client.tsx', () => {
+    const code = "'use client'\nimport { useState } from 'react'\nexport function ThingList() { useState(0); return <i /> }"
+    expect(shape(code, PART), code).toEqual(['topclass/client-shape'])
+  })
+
+  it('leaves a server part and every other file alone', () => {
+    const code = "import { useId } from 'react'\nexport function ThingGroup() { const id = useId(); return <i id={id} /> }"
+    expect(shape(code, PART), code).toEqual([])
+    const hook = "import { useState } from 'react'\nexport function useThing() { return useState(0) }"
+    expect(shape(hook, 'src/components/thing/hook.ts'), hook).toEqual([])
+  })
+
+  it('passes every client file the library ships', () => {
+    const files = readdirSync('src', { recursive: true, encoding: 'utf8' })
+      .map((f) => f.replace(/\\/g, '/'))
+      .filter((f) => /^(components|connectors)\/[^/]+\/(client\.tsx|parts\/[^/]+\.tsx)$/.test(f))
+    const offending = files.flatMap((f) =>
+      lint(readFileSync(join('src', f), 'utf8'), `src/${f}`)
+        .filter((m) => m.ruleId === 'topclass/client-shape')
+        .map((m) => `${f}:${m.line} ${m.message}`))
+    expect(files.filter((f) => f.endsWith('/client.tsx')).length).toBeGreaterThan(30)
+    expect(offending).toEqual([])
   })
 })

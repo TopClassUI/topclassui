@@ -22,9 +22,11 @@ export default defineConfig(
     plugins: { topclass },
     rules: {
       'topclass/logical-properties-only': 'error',
+      'topclass/dir-aware-transforms': 'error',
       'topclass/semantic-classes-only': 'error',
       'topclass/no-dynamic-class-names': 'error',
       'topclass/shared-class-constants': 'error',
+      'topclass/bare-data-variants': 'error',
       'topclass/no-enum': 'error',
       'topclass/one-line-comments': 'error',
       'topclass/icon-loaders-stay-server': 'error',
@@ -34,6 +36,9 @@ export default defineConfig(
       'topclass/flat-part-exports': 'error',
       'topclass/root-part-is-named-root': 'error',
       'topclass/text-comes-from-labels': 'error',
+      'topclass/no-fetch-in-components': 'error',
+      'topclass/tooltip-content-is-text': 'error',
+      'topclass/client-shape': 'error',
       'topclass/props-derived-at-the-seam': 'error',
 
       '@typescript-eslint/no-explicit-any': 'error',
@@ -54,9 +59,25 @@ export default defineConfig(
       'topclass/semantic-classes-only': 'off',
       'topclass/shared-class-constants': 'off',
       'topclass/logical-properties-only': 'off',
+      'topclass/dir-aware-transforms': 'off',
       'topclass/style-sets-tokens-only': 'off',
       'topclass/text-comes-from-labels': 'off',
+      'topclass/no-fetch-in-components': 'off',
     },
+  },
+
+  // R-8.5-2: a dismissed Banner is remembered across pages, which is UI state rather
+  // than data; that file may read and write localStorage and nothing else (DECISIONS).
+  {
+    files: ['src/components/banner/lib.ts'],
+    rules: { 'topclass/no-fetch-in-components': ['error', { allow: ['localStorage'] }] },
+  },
+
+  // R-10.5-2 is about every tooltip a page renders, so it also covers the harness pages and fixtures.
+  {
+    files: ['e2e/**/*.tsx', 'scripts/**/*.tsx'],
+    plugins: { topclass },
+    rules: { 'topclass/tooltip-content-is-text': 'error' },
   },
 
   // Tooling runs in Node, never ships, and walks untyped ESLint AST nodes.

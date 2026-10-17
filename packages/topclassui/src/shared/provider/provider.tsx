@@ -17,6 +17,7 @@ import { ToastViewport } from '../../components/toast/client.js'
 import {
   type Direction, ToastSettingsContext, TopClassContext, type TopClassContextValue,
 } from './context.js'
+import { useProviderLocale } from './use-provider-locale.js'
 
 export interface TopClassProviderProps {
   children?: ReactNode
@@ -43,14 +44,13 @@ export function TopClassProvider(props: TopClassProviderProps) {
   const {
     children,
     className,
-    direction,
-    locale,
     labels: overrides,
     numberingSystem,
     adaptive,
     collection,
     toast,
   } = props
+  const { direction, locale } = useProviderLocale(props.direction, props.locale)
 
   const query = adaptive?.query ?? DEFAULT_ADAPTIVE_QUERY
   // A nested provider, such as an RTL island, joins the outer root, delay group and toasts.
