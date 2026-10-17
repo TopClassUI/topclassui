@@ -55,7 +55,7 @@ The format is: date, decision, why, and what it affects.
 
 **Why.** The rules were marked `not yet` while no overlay existed; nine now do. Four of the spec's tests break an overlay or a bar on purpose (a Body that no longer scrolls, a container that chains, a popup freed of its max-height, a page that drops the variables from `scroll-padding-block`) to prove each measure can fail. The dialogs' and drawers' header and footer are flex items that never shrink, not `position: sticky`: the spec proves the effect, that both keep their boxes while the Body scrolls to its end and the page behind does not move.
 
-**What it affects.** The status lines of R-9.2-4, R-10.5-1 and R-10.5-3. A future AlertDialog is already a scrolling overlay to `check-structure`. The page test of PLAN 10.5 rule 11 near all four edges stays in each component's own spec; this one opens the anchored popups at the top and the bottom edge. `maxHeightVar` and `maxWidthVar` in `POPUP_BOUNDS` are read by nothing.
+**What it affects.** The status lines of R-9.2-4, R-10.5-1 and R-10.5-3. A future AlertDialog is already a scrolling overlay to `check-structure`. The page test of PLAN 10.5 rule 11 near all four edges stays in each component's own spec; this one opens the anchored popups at the top and the bottom edge. `POPUP_BOUNDS` no longer carries `maxHeightVar` and `maxWidthVar`, which nothing read.
 
 ## 2026-10-17 - The provider warns when the layout leaves out direction or locale
 
