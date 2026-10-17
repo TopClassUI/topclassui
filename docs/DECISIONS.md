@@ -6,20 +6,36 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
-## 2026-10-17 - Every export is proven to pass className, ref and data-* on, and where they land instead
+## 2026-10-17 - A popup part lands on the popup, inside the presentation boxes Base UI wraps it in
 
-**Decision.** `R-5.7-3` is proven by `src/test/root-props.dom.test.tsx`: it walks every component folder, renders each component that `index.tsx` and `skeleton.tsx` export with the required props from that folder's `test/fixture.ts`, and checks that one `className`, one `ref` and one unknown `data-*` attribute land on one element, and that the element is the outermost one the component renders. `check-structure` requires the fixture. A skeleton with no case in its fixture is rendered with no props, so one merged from another branch is covered at once. A case may only depart from the root by naming the props that land elsewhere and the heading of the entry here that records it, which must name the export; the test reads this file.
+**Decision.** A part that renders into a portal takes className, style, ref and the rest on the element that carries its role, not on the outermost box of the portal. `src/test/root-props.ts` holds each such case to the selector it records, to a Base UI portal, and to `role="presentation"` on every box between the two.
 
-**Departures this records** (`R-5.7-3`), each the narrowest the test allows:
+- `DialogPopup`, `DrawerPopup` and `Command` land on `[role="dialog"]` inside Base UI's Viewport, which is `role="presentation"` (`@base-ui/react` dialog/viewport/DialogViewport.js:50; the role is the Popup's, dialog/popup/DialogPopup.js:75). `PopoverPopup` (`[role="dialog"]`, popover/popup/PopoverPopup.js:91), `DropdownPopup` and `DropdownMenu` (`[role="menu"]`, menu/root/MenuRoot.js:426) and `TooltipPopup` land on the popup inside the Positioner, which is `role="presentation"` (utils/usePositioner.js:33). `ToastViewport` is the `[role="region"]` the portal holds directly (toast/viewport/ToastViewport.js:186). The Viewport and the Positioner place the popup and own no role a caller could want to name, style or measure (`R-5.7-3`).
+- The parts inside a popup are no departure: their place is compared with a slot the same Root and Popup hold, from the page body down.
 
-- `DialogRoot`, `DrawerRoot`, `PopoverRoot`, `TooltipRoot` and `DropdownRoot` are Base UI Roots that render no element, so there is nothing to spread onto. The test proves they still render none.
-- `NavbarLink` and `SidebarLink` render a list item around the link; className, ref and the rest reach the link, which carries the `href`. The `<li>` keeps the list a list.
-- `DatePicker` is held in a span with its hidden input, as Select is; className, ref and the rest reach the trigger button.
-- `TreeView` is held in a div with its live status note; className, ref and the rest reach the element with `role="tree"`, which is the scroll container and the tab stop.
+**Why.** Round 5 found that `portal: true` skipped the place of the root, so any portaled part could spread onto any inner element, and that the Popups' landing was nowhere recorded.
 
-**What it fixed.** `ToastViewport` took a className alone, and `DropdownMenu` the menu contract, placement and className alone; both now take the rest and the ref. The viewport keeps its own `dir`, `lang`, name and toasts; `DropdownMenu` spreads onto its popup, where its className already went, and takes no `children`, `container`, `keepMounted` or `render`.
+## 2026-10-17 - Every export is proven to pass className, style, ref and data-* on, and where they land instead
+
+**Decision.** `R-5.7-3` is proven by `src/test/root-props.dom.test.tsx`: it walks every component folder, renders each component that `index.tsx` and `skeleton.tsx` export with the required props from that folder's `test/fixture.ts`, and checks that one `className`, one `style` (a `--tc-*` variable, as `R-5.2-5` allows), one `ref` and one unknown `data-*` attribute land on one element, and that the element sits where a slot the same parents hold sits, so it is the outermost one the component renders. The parents in a case's `wrap` must render no element with the classes of that root. A fixture entry may be a list of cases, one per branch a prop opens. `check-structure` requires the fixture. A skeleton with no case in its fixture is rendered with no props, so one merged from another branch is covered at once. A case may only depart from the root by naming the props that land elsewhere, each as a selector written against `:scope`, the outermost element, which must find that element first, and the heading of the entry here that records it; one bullet of that entry must name the export as a whole word and `R-5.7-3`. The test reads this file. A headless root must render no element at all.
+
+**Departures this records**, each the narrowest the test allows:
+
+- `DialogRoot`, `DrawerRoot`, `PopoverRoot`, `TooltipRoot` and `DropdownRoot` are Base UI Roots that render no element, so there is nothing to spread onto (`R-5.7-3`). Base UI says so ("Doesn't render its own HTML element.", dialog/root/DialogRoot.d.ts:8, drawer/root/DrawerRoot.d.ts:9, popover/root/PopoverRoot.d.ts:8, tooltip/root/TooltipRoot.d.ts:8, menu/root/MenuRoot.d.ts:12), and no prop makes one render. The test proves they render no element of their own.
+- `DatePicker` is held in a span with its hidden input and its required note; className, style, ref and the rest reach the trigger button, the span's first child (`R-5.7-3`). A box with no width of its own needs a holder to be as wide as an Input in a `w-fit` parent (`src/shared/classes.ts`, `FIELD_HOLDER`), and the holder is a grid track, which sizes the content box: on the button its padding and border would add to that width. `e2e/date-picker.spec.ts` pins the Input's width.
+- `TreeView` is held in a div with its live status note; className, style, ref and the rest reach the `role="tree"` element, the div's first child, which is the scroll container and the tab stop (`R-5.7-3`). The note cannot sit inside the tree, which owns only `group` and `treeitem` (WAI-ARIA 1.2), and as a sibling of the tree in a fragment it would be a second item of the caller's flex or grid.
+
+**What it fixed.** `ToastViewport` took a className alone, and `DropdownMenu` the menu contract, placement and className alone; both now take the rest and the ref. The viewport keeps its own `dir`, `lang`, name and toasts; `DropdownMenu` spreads onto its popup, where its className already went, and takes no `children`, `container`, `keepMounted` or `render`. Round 6 moved the list item of `NavbarLink` and `SidebarLink` into the list (the entry below).
 
 **Why.** "No check proves all 46 have one" was the gap. A recorded departure is still measured, so a part that moves its props again fails.
+
+## 2026-10-17 - A list gives each of its links a list item
+
+**Decision.** `NavbarLinks` and `SidebarGroup` put each direct child in a `<li>` of their own, and `NavbarLink` and `SidebarLink` render the link alone, so className, style, ref and the rest reach the outermost element they render (`R-5.7-3`). A child that renders nothing (`null`, `false`) gets no item. `docs/figma/unit-3.md` put the list item in the link; this corrects it.
+
+- Each direct child is one item (`R-5.7-3`): a component child that renders several `NavbarLink` or `SidebarLink` elements, or a fragment of them, becomes one `<li>` holding them all. Write the links, or an array of them, straight into the list.
+
+**Why.** The `<li>` is ours and the list that owns it can render it; no Base UI part is involved.
 
 ## 2026-10-17 - One thin themed scrollbar for every scroll area
 
@@ -128,7 +144,8 @@ From the plan itself:
 - Stepper is a server component. CodeBlock has no highlighter and its own copy part.
 - CodeBlock's copy button writes its own hover, a 10% tint of neutral/on-solid, because `HOVER.ghost` reads the page's neutral/soft beside the block's text colour (`R-5.2-4`). Its rings stay the shared ones.
 - TreeView writes its own two rings (`R-5.2-4`). DatePicker is built on `Intl` (2026-10-03); its grid is Gregorian, six rows, with a Close button. PLAN 2 and 18.4 still name react-day-picker; this line corrects them.
-- The FileUpload list is not windowed, and its rest props reach the `<input>`, not the root (`R-5.7-3`). TreeView takes no `getKey`, `selectedItem` or request ids (8.5). TreeView and FileUpload take no `error` status. FileUpload, TreeView, CodeBlock and Field take no `size`.
+- The FileUpload list is not windowed. `FileUpload`'s rest is the input's own attributes (`ComponentPropsWithoutRef<'input'>`) and reaches the `<input type="file">`, which is void, so the zone, prompt and hint cannot sit inside it; className, style and ref reach the root (`R-5.7-3`).
+- TreeView takes no `getKey`, `selectedItem` or request ids (8.5). TreeView and FileUpload take no `error` status. FileUpload, TreeView, CodeBlock and Field take no `size`.
 - `expanded`, `defaultExpanded` and `onExpandedChange` join the vocabulary.
 - Not built in v0.1: ErrorState, ErrorBoundary, IconButton, Heading, Text, Container, Stack, Grid.
 - New infrastructure: nine label keys, three tokens, `src/shared/form-errors.ts`.
@@ -160,7 +177,11 @@ From the plan itself:
 - Select is not windowed and takes no `CollectionProps`; the ten thousand options of Phase 4 are Combobox's. Options are plain `{ value, label, disabled }` data, with no `getKey`. `selectedItem`, a stale `loadMore` dropped by request id and the error row with a retry are not built. A Select does not warn for two options with one `value`; a Combobox does.
 - The shared target spec no longer measures an input hidden from assistive technology and out of the tab order, or an `<input type="hidden">` (`R-5.6-2`).
 - As built, at 320 px under a coarse pointer a six-cell OTPField's cells were 36 px wide (33 with a separator), and seven or eight cells were under 44 px wide at 390 px too (`R-5.6-2`). Since the review the row wraps under its floor, and six cells in a block are 41.3 px wide at 320 px (2026-10-16).
-- Five controls do not spread the rest onto their outermost element (`R-5.7-3`): `RadioGroupItem`, Select, Combobox, a held Textarea and `SegmentedControlRoot`.
+- `RadioGroupItem` takes className and style on its `<label>`, and the ref and the rest on the radio button (`R-5.7-3`). Base UI's Radio renders the button and its hidden input as siblings (radio/root/RadioRoot.js:211-222), so no one Base UI element holds both; the label names the radio and takes the click, while the circle keeps its own 24 px target and ring.
+- `Select` is held in a span; className, style, ref and the rest reach its trigger, `role="combobox"` (`R-5.7-3`). Base UI's Select.Root renders no box (select/root/SelectRoot.js:390-398), and the button cannot own a content-sized grid track without changing its border-box width, as `DatePicker`'s cannot (2026-10-17). `e2e/select.spec.ts` pins the width in eight parents.
+- `Combobox` is held in a positioned span; className, style, ref and the rest reach the `<input>` (`R-5.7-3`). The input is void, so the caret and the spinner need a box around it, and Base UI puts `role="combobox"` and its ARIA on the input (combobox/root/AriaCombobox.js:999), so the name, the id and the ref must reach it.
+- A held `Textarea` (with `autosize` or `showCount`) is a div holding the textarea and the counter; className, style, ref and the rest reach the `<textarea>`, its first child, which holds text only (`R-5.7-3`).
+- `SegmentedControlRoot` is held in a div of one column; className, style, ref and the rest reach the track, `role="radiogroup"`, its first child (`R-5.7-3`). The track draws the line and scrolls, and it must be the radiogroup: Base UI scrolls the segment the arrows reach into view inside the element its radio group renders (internals/composite/root/useCompositeRoot.js:46 and :95 call `scrollIntoViewIfNeeded(rootRef.current, …)`). Round 6 made the radiogroup the holder, with the track inside it; the radiogroup then no longer scrolled, and in `e2e/segmented-control.spec.ts` ("many", 320 px, coarse) three segments the arrows reached stayed cut by the track in both directions, so it was put back. The holder is a grid of one column so that a long track never widens a table cell or a `w-fit` parent.
 - Select and Combobox clamp with the shared `COLLECTION_BOUNDARIES` and have no `boundaries.ts` (`R-8.3-6`). A Combobox input has the cap of a search field and no counter (`R-5.7-8`).
 - The shared `INVALID` of PLAN 5.2 is `FIELD_INVALID`: a border and an inset ring, no outline.
 - Select and Combobox are data-driven only, RadioGroup and SegmentedControl parts only (9.1). SegmentedControl is built on Base UI's radio group. OTPField does not use Base UI's `Separator`, and `length` has a default.
