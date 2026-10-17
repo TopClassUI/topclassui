@@ -1,9 +1,16 @@
 // R-23: docs/RULES.md is the single source; CLAUDE.md, AGENTS.md and the Cursor
 // rules are generated from it, and `--check` fails when any of them has drifted.
-import { readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const ROOT = process.cwd()
+import { findRepoRoot } from './lib/repo-root.js'
+
+// The script runs from packages/topclassui; the source and the generated files sit at the repo root.
+const ROOT = findRepoRoot(process.cwd(), existsSync)
+if (ROOT === null) {
+  console.error(`rules-sync: no pnpm-workspace.yaml at or above ${process.cwd()}`)
+  process.exit(1)
+}
 const SOURCE = join(ROOT, 'docs', 'RULES.md')
 
 const TARGETS = [

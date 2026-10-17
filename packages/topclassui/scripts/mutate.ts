@@ -32,7 +32,7 @@ function caughtIn(mutation: Mutation | null): boolean {
   try {
     // join, not a literal slash: on Windows the separator is \ and the filter never matched,
     // so cpSync walked into pnpm's symlink store and failed with EPERM.
-    const skip = [join(ROOT, 'node_modules'), join(ROOT, '.git'), join(ROOT, '.harness')]
+    const skip = ['node_modules', '.git', '.harness', 'dist', '.pack'].map((name) => join(ROOT, name))
     cpSync(ROOT, dir, {
       recursive: true,
       filter: (src) => !skip.some((prefix) => src === prefix || src.startsWith(prefix + sep)),

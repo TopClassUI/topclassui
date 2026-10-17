@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef, ReactNode, Ref } from 'react'
+import type { ComponentPropsWithRef, ReactNode, Ref, RefCallback } from 'react'
 
 import type { FormErrors } from '#shared/form-errors.js'
 
@@ -42,4 +42,12 @@ export interface FormActionHookProps {
   initialState: FormActionState
   permalink: string | undefined
   ref: Ref<HTMLFormElement> | undefined
+}
+
+/** What the hook hands the markup: React's action state and dispatch, `pending`, and the ref that wraps the caller's. */
+export interface FormActionHookResult {
+  state: FormActionState
+  formAction: (formData: FormData) => void
+  pending: boolean
+  ref: RefCallback<HTMLFormElement>
 }
