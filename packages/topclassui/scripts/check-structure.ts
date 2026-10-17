@@ -1,12 +1,16 @@
-// R-8.1-1, R-5.12-2, R-5.12-4, R-9.2-4: the folder contract, file size and naming.
+// R-8.1-1, R-5.1-2, R-5.12-1, R-5.12-2, R-5.12-4, R-9.2-4, R-8.5-1, R-10.5-1, R-10.5-3: the folder contract, file size, naming, the client boundary, the collection contract and overlay parts.
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, posix, relative, sep } from 'node:path'
 
+import { collectionErrors } from './lib/collections.js'
 import { FAIL_LINES, WARN_LINES, countLines, sizeVerdict, sourceFilesUnder } from './lib/file-sizes.js'
+import { INDEX_MARKUP_EXEMPT, indexMarkupViolations, isClientRendering } from './lib/index-markup.js'
+import { categoryOf, exportedValueNames, missingBody, unpublishedStickyEdges } from './lib/overlay-parts.js'
 import {
   NAMING_EXEMPTIONS, SCROLLING_OVERLAYS, hookFileProblems, libFileProblems, overlayPartProblems, partFileProblems,
 } from './lib/part-names.js'
-import { inlinePropInterfaces, screamingConstants } from './lib/source-checks.js'
+import { missingFixture } from './lib/root-props-fixture.js'
+import { inlinePropInterfaces, screamingConstants, strayHookImport } from './lib/source-checks.js'
 
 const ROOT = process.cwd()
 const COMPONENTS = join(ROOT, 'src', 'components')
@@ -87,6 +91,8 @@ function checkComponentFolder(dir: string, slug: string) {
   if (ownTests.length + folderTests.length === 0) {
     errors.push(`${rel(dir)}: has no test file, in the folder or in test/ (R-8.1-1).`)
   }
+  const fixtureError = missingFixture(rel(dir), dirs.includes('test') ? listDir(join(dir, 'test')).filter((e) => e.isFile()).map((e) => e.name) : [])
+  if (fixtureError) errors.push(fixtureError)
 
   for (const name of [...files, ...dirs]) {
     const replacement = RESERVED.get(name)
@@ -105,6 +111,17 @@ function checkComponentFolder(dir: string, slug: string) {
 
   if (files.includes('hook.ts') && !files.includes('client.tsx')) {
     errors.push(`${rel(dir)}: hook.ts exists with no client.tsx. Only client.tsx may import it (R-8.1-1).`)
+  }
+
+  // R-5.12-1: the logic in hook.ts reaches markup only through a client file; the lint checks that file's shape.
+  const partFiles = dirs.includes('parts')
+    ? listDir(join(dir, 'parts')).filter((e) => e.isFile()).map((e) => `parts/${e.name}`)
+    : []
+  for (const f of [...files, ...partFiles]) {
+    if (!/\.tsx?$/.test(f) || /\.test\.tsx?$/.test(f) || f === 'hook.ts') continue
+    if (strayHookImport(f, readFileSync(join(dir, f), 'utf8'))) {
+      errors.push(`${rel(join(dir, f))}: imports hook.ts, which only client.tsx or a 'use client' part may import (R-5.12-1).`)
+    }
   }
 
   // R-5.12-4: a SCREAMING_CASE table is data or classes, so it lives in the file for that.
@@ -130,9 +147,41 @@ function checkComponentFolder(dir: string, slug: string) {
     }
   }
 
+  // R-5.1-2: a C component or a connector keeps its markup out of index.tsx.
+  const isClient = dir.startsWith(CONNECTORS)
+    || (files.includes('meta.ts') && isClientRendering(readFileSync(join(dir, 'meta.ts'), 'utf8')))
+  if (isClient && files.includes('index.tsx') && !INDEX_MARKUP_EXEMPT.has(slug)) {
+    for (const v of indexMarkupViolations(readFileSync(join(dir, 'index.tsx'), 'utf8'))) {
+      errors.push(
+        `${rel(join(dir, 'index.tsx'))}: ${v}.`
+        + ' A C component or a connector re-exports its client parts, types, variants and skeleton (R-5.1-2).',
+      )
+    }
+  }
+
+  // R-8.5-1: a component that renders items windows them through useCollection in its hook, or is exempt by decision.
+  const source = (f: string) => (files.includes(f) ? readFileSync(join(dir, f), 'utf8') : null)
+  for (const error of collectionErrors({ slug, types: source('types.ts'), hook: source('hook.ts') })) {
+    errors.push(`${rel(dir)}: ${error} (R-8.5-1).`)
+  }
+
+  // R-9.2-4: a scrolling overlay exports the Body that scrolls.
+  if (files.includes('index.tsx')) {
+    const meta = files.includes('meta.ts') ? readFileSync(join(dir, 'meta.ts'), 'utf8') : ''
+    const problem = missingBody(slug, categoryOf(meta), exportedValueNames(readFileSync(join(dir, 'index.tsx'), 'utf8')))
+    if (problem) errors.push(`${rel(dir)}: ${problem}`)
+  }
+
+  // R-10.5-3: a folder that wears a sticky edge writes that edge's variable somewhere in its sources.
+  const sources = [...files.filter((f) => /\.tsx?$/.test(f) && !/\.test\.tsx?$/.test(f)).map((f) => join(dir, f)),
+    ...(dirs.includes('parts') ? listDir(join(dir, 'parts')).filter((e) => e.isFile()).map((e) => join(dir, 'parts', e.name)) : [])]
+  for (const variable of unpublishedStickyEdges(sources.map((f) => readFileSync(f, 'utf8')))) {
+    errors.push(`${rel(dir)}: wears a sticky edge and never writes ${variable}, which the page reads into scroll-padding-block (R-10.5-3).`)
+  }
+
   // parts/: one component per file, named after the file.
-  const partFiles = dirs.includes('parts') ? listDir(join(dir, 'parts')) : []
-  for (const e of partFiles) {
+  const partEntries = dirs.includes('parts') ? listDir(join(dir, 'parts')) : []
+  for (const e of partEntries) {
     const path = join(dir, 'parts', e.name)
     if (!e.isFile()) { errors.push(`${rel(path)}: parts/ holds files, not folders (R-8.1-1).`); continue }
     if (!isKebab(e.name.replace(/\.tsx?$/, ''))) errors.push(`${rel(path)}: part files are kebab-case (R-5.12-4).`)
@@ -152,7 +201,7 @@ function checkComponentFolder(dir: string, slug: string) {
 
   // A scrolling overlay names its parts Root, Header, Body and Footer (R-9.2-4).
   if ((SCROLLING_OVERLAYS as readonly string[]).includes(slug) && files.includes('index.tsx')) {
-    const names = dirs.includes('parts') ? partFiles.filter((e) => e.isFile()).map((e) => e.name) : null
+    const names = dirs.includes('parts') ? partEntries.filter((e) => e.isFile()).map((e) => e.name) : null
     for (const p of overlayPartProblems(slug, readFileSync(join(dir, 'index.tsx'), 'utf8'), names)) {
       errors.push(`${rel(dir)}: ${p} (R-9.2-4)`)
     }

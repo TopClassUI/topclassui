@@ -1,8 +1,9 @@
-// R-5.1-1, R-5.1-4, R-5.1-5, R-7-1: what may cross the server and client boundary.
+// R-5.1-1, R-5.1-4, R-5.1-5, R-5.7-4, R-7-1: what may cross the server and client boundary.
 import { readdirSync, readFileSync } from 'node:fs'
 import { join, posix, relative, sep } from 'node:path'
 
 import {
+  acceptsRenderProp,
   exportsAsync,
   hasLateUseClient,
   hasUseClient,
@@ -10,7 +11,9 @@ import {
   importedNames,
   memberHookCalls,
   namespaceNamesOf,
+  importsRenderElement,
   relativeImportsMissingExtension,
+  runtimeUseRender,
 } from './lib/source-checks.js'
 
 const ROOT = process.cwd()
@@ -76,6 +79,18 @@ for (const file of files) {
     }
     if (r !== RSC_ONLY && exportsAsync(source)) {
       errors.push(`${r}: only ${RSC_ONLY} may be async; every other index.tsx must render in a non-RSC tree (R-5.1-5).`)
+    }
+  }
+
+  // Demos and tests are not components, so they neither ship a render prop nor run in a server tree.
+  const isComponentSource = !/\.test\.tsx?$/.test(r) && !/(^|\/)(dummy|test)\//.test(r)
+
+  if (isComponentSource && !hasUseClient(source)) {
+    if (runtimeUseRender(source)) {
+      errors.push(`${r}: useRender calls hooks, so only a 'use client' file may import it; a server file takes the element form through renderElement (R-5.7-4).`)
+    }
+    if (acceptsRenderProp(source) && !importsRenderElement(source)) {
+      errors.push(`${r}: takes a render prop without renderElement from #shared/render.js, the one hook-free form a server component may use (R-5.7-4).`)
     }
   }
 
