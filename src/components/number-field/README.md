@@ -95,11 +95,13 @@ name a field into one where none is required.
 | `locale`, `format` | passed through, with the provider's locale and numbering system when absent |
 | the English names of the steppers and the input | from `labels.numberField` |
 
+**`NumberFieldSkeleton`** is the box of the field, steppers included: give it the same `size` and
+`fullWidth`.
+
 ### Not built
 
 `NumberField.ScrubArea`, a prefix, a suffix or a unit, the `variant` prop, danger at the limit,
-steppers stacked at one end, Page Up and Page Down, the always-on invalid ring, a skeleton (use
-`InputSkeleton`).
+steppers stacked at one end, Page Up and Page Down, the always-on invalid ring.
 
 <!-- /hand-written -->
 
@@ -138,6 +140,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/row.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`
+- `dummy/skeleton.tsx`
 - `dummy/states.tsx`
 
 ## Verified against

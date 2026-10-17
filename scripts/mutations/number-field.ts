@@ -5,6 +5,7 @@ const CLIENT = 'src/components/number-field/client.tsx'
 const HOOK = 'src/components/number-field/hook.ts'
 const LIB = 'src/components/number-field/lib.ts'
 const CLASSES = 'src/components/number-field/classes.ts'
+const SKELETON = 'src/components/number-field/skeleton.tsx'
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -144,5 +145,29 @@ export const MUTATIONS: Mutation[] = [
     file: HOOK,
     from: "    input.addEventListener('keydown', enter)\n",
     to: '',
+  },
+  {
+    label: 'the number field skeleton draws an md box at every size, so an xl field jumps when it arrives',
+    file: SKELETON,
+    from: 'CONTROL_HEIGHT[size]',
+    to: 'CONTROL_HEIGHT.md',
+  },
+  {
+    label: 'the number field skeleton loses the type step of its size, so its width in em is an md width at xs and xl',
+    file: SKELETON,
+    from: 'FIELD_TEXT[size]',
+    to: 'FIELD_TEXT.md',
+  },
+  {
+    label: 'the number field skeleton loses the target floor, so under a finger it is 16 px shorter than its field',
+    file: CLASSES,
+    from: 'rounded-control ${TARGET_HEIGHT} bg-neutral-soft',
+    to: 'rounded-control bg-neutral-soft',
+  },
+  {
+    label: 'the number field skeleton takes aria-hidden from the caller, so a placeholder can be read out',
+    file: SKELETON,
+    from: '{...rest} aria-hidden>',
+    to: 'aria-hidden {...rest}>',
   },
 ]

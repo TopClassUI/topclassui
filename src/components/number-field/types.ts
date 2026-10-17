@@ -1,5 +1,5 @@
 import type { NumberField as Base } from '@base-ui/react/number-field'
-import type { ClipboardEvent, Ref } from 'react'
+import type { ClipboardEvent, ComponentPropsWithRef, Ref } from 'react'
 
 import type { ControlName } from '#shared/contracts/name.js'
 import type { NumberFieldSchemaInput } from './schema.js'
@@ -38,3 +38,8 @@ export type NumberFieldChangeDetails = Base.Root.ChangeEventDetails
 
 /** A paste into the visible input, named here: hook.ts writes no type argument in angle brackets. */
 export type NumberFieldPasteEvent = ClipboardEvent<HTMLInputElement>
+
+/** R-8.3-4: the field's own size and width, so the two cannot describe different boxes. */
+export type NumberFieldSkeletonProps =
+  Omit<ComponentPropsWithRef<'span'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
+  & Pick<NumberFieldDesignProps, 'size' | 'fullWidth'>

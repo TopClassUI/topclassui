@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'limits', 'row', 'rtl', 'sizes', 'states']
+const EXPECTED = ['basic', 'form', 'limits', 'row', 'rtl', 'sizes', 'skeleton', 'states']
 
 /** Each field of each demo, as the server writes it: its name, by aria-label or by the label that points at its id, and the text it shows. */
 const FIELDS: Record<string, string[]> = {
@@ -21,6 +21,7 @@ const FIELDS: Record<string, string[]> = {
   row: ['Adults: 2', 'Children: 0'],
   rtl: ['الفرق: ‎-5', 'عدد الضيوف: ١٬٢٣٤٫٥'],
   sizes: ['Extra small: 12', 'Small: 12', 'Medium: 12', 'Large: 12', 'Extra large: 12'],
+  skeleton: ['Guests, xs: 12', 'Guests, sm: 12', 'Guests, md: 12', 'Guests, lg: 12', 'Guests, xl: 12', 'Guests, full width: 12'],
   states: ['Empty: ', 'Invalid: 12', 'Disabled: 12', 'Read-only: 12'],
 }
 
@@ -40,7 +41,7 @@ function fieldsIn(html: string): string[] {
 }
 
 describe('every demo renders on the server', () => {
-  it('holds exactly the seven demos asked for, so none can be deleted silently', () => {
+  it('holds exactly the eight demos asked for, so none can be deleted silently', () => {
     expect(files).toEqual(EXPECTED)
   })
 
@@ -79,6 +80,12 @@ describe('the demos the plan names', () => {
 
   it('row: two fields side by side, in tracks of 6.5rem at least, so at 200% text the second goes under the first', async () => {
     expect(await render('row')).toMatch(/^<div class="grid grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,6\.5rem\),max-content\)\)\] gap-2">/)
+  })
+
+  it('skeleton: each field above a hidden skeleton of the same size, five pairs and a full-width one', async () => {
+    const html = await render('skeleton')
+    expect([...html.matchAll(/data-pair="([^"]*)"/g)].map(([, pair]) => pair)).toEqual(['xs', 'sm', 'md', 'lg', 'xl', 'full'])
+    expect(html.match(/<span class="[^"]*" aria-hidden="true"><span class="[^"]*"><\/span><\/span>/g)).toHaveLength(6)
   })
 
   it('rtl: an island that carries the direction and the language', async () => {
