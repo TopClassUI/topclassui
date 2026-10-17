@@ -1,9 +1,9 @@
-// R-8.1-1, R-5.12-2, R-5.12-4, R-9.2-4: the folder contract, file size and naming.
+// R-8.1-1, R-5.12-1, R-5.12-2, R-5.12-4, R-9.2-4: the folder contract, file size and naming.
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, posix, relative, sep } from 'node:path'
 
 import { FAIL_LINES, WARN_LINES, countLines, sizeVerdict, sourceFilesUnder } from './lib/file-sizes.js'
-import { inlinePropInterfaces, screamingConstants } from './lib/source-checks.js'
+import { inlinePropInterfaces, screamingConstants, strayHookImport } from './lib/source-checks.js'
 
 const ROOT = process.cwd()
 const COMPONENTS = join(ROOT, 'src', 'components')
@@ -102,6 +102,17 @@ function checkComponentFolder(dir: string, slug: string) {
 
   if (files.includes('hook.ts') && !files.includes('client.tsx')) {
     errors.push(`${rel(dir)}: hook.ts exists with no client.tsx. Only client.tsx may import it (R-8.1-1).`)
+  }
+
+  // R-5.12-1: the logic in hook.ts reaches markup only through a client file; the lint checks that file's shape.
+  const partFiles = dirs.includes('parts')
+    ? listDir(join(dir, 'parts')).filter((e) => e.isFile()).map((e) => `parts/${e.name}`)
+    : []
+  for (const f of [...files, ...partFiles]) {
+    if (!/\.tsx?$/.test(f) || /\.test\.tsx?$/.test(f) || f === 'hook.ts') continue
+    if (strayHookImport(f, readFileSync(join(dir, f), 'utf8'))) {
+      errors.push(`${rel(join(dir, f))}: imports hook.ts, which only client.tsx or a 'use client' part may import (R-5.12-1).`)
+    }
   }
 
   // R-5.12-4: a SCREAMING_CASE table is data or classes, so it lives in the file for that.

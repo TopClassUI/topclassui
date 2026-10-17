@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   hasLateUseClient, hasUseClient, importedModules, importedNames, inlinePropInterfaces,
-  relativeImportsMissingExtension, screamingConstants,
+  relativeImportsMissingExtension, screamingConstants, strayHookImport,
 } from './source-checks.js'
 
 /** The same source with Windows line endings, so a CRLF checkout cannot change a result. */
@@ -172,5 +172,33 @@ describe('a computed constant is not a table', () => {
     expect(screamingConstants("const UNFILLED: Variant[] = ['a']")).toEqual(['UNFILLED'])
     expect(screamingConstants("const PREFIX = 'tc-'")).toEqual(['PREFIX'])
     expect(screamingConstants('const WARN_LINES = 200')).toEqual(['WARN_LINES'])
+  })
+})
+
+describe('strayHookImport (R-5.12-1)', () => {
+  const HOOK = "import { useThing } from './hook.js'\n"
+  const PART_HOOK = "import { useThingList } from '../hook.js'\n"
+
+  it('lets client.tsx import its hook', () => {
+    expect(strayHookImport('client.tsx', `'use client'\n${HOOK}`)).toBe(false)
+  })
+
+  it('lets a use client part import it', () => {
+    expect(strayHookImport('parts/thing-list.tsx', `'use client'\n${PART_HOOK}`)).toBe(false)
+  })
+
+  it('rejects index.tsx, lib.ts and a server part importing it', () => {
+    expect(strayHookImport('index.tsx', HOOK)).toBe(true)
+    expect(strayHookImport('lib.ts', HOOK)).toBe(true)
+    expect(strayHookImport('parts/thing-list.tsx', PART_HOOK)).toBe(true)
+  })
+
+  it('catches a re-export and a dynamic import, not only a named import', () => {
+    expect(strayHookImport('variants.ts', "export { useThing } from './hook.js'\n")).toBe(true)
+    expect(strayHookImport('skeleton.tsx', "const m = import('./hook.js')\n")).toBe(true)
+  })
+
+  it('ignores a file that does not import it', () => {
+    expect(strayHookImport('index.tsx', "import { cn } from '#shared/cn.js'\n")).toBe(false)
   })
 })
