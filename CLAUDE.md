@@ -103,7 +103,7 @@ They arrive with the phases that need them.
 ## 7. Collections and scrolling
 
 - **R-8.5-1** Any component that renders items uses `CollectionProps` and `useCollection`: the `--tc-list-rows` knob, windowing above the threshold, and optional page-by-page loading. _(not yet - planned: check-structure + Playwright)_
-- **R-8.5-2** Components never fetch, cache or paginate; they call `loadMore()` and render what they are given. _(eslint)_
+- **R-8.5-2** Components never fetch, cache or paginate; they call `loadMore()` and render what they are given. _(eslint for fetch, storage and cache ; paginate is manual)_
 - **R-10.5-1** Popups use `POPUP_BOUNDS` and the row cap, dialogs and drawers scroll their body with sticky header and footer, and every scroll container inside an overlay sets `overscroll-behavior: contain`. _(not yet - no overlay component exists yet)_
 - **R-10.5-2** A tooltip is one or two lines of plain text; anything larger, or anything with a link or control, is a Popover. _(not yet - planned: eslint)_
 - **R-10.5-3** A sticky or fixed bar sets `--tc-sticky-top` or `--tc-sticky-bottom`, and the scroll container reads them into `scroll-padding-block`. _(not yet - no sticky or fixed bar exists yet)_
