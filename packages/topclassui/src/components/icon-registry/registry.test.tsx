@@ -100,13 +100,13 @@ describe('size', () => {
 
 describe('direction', () => {
   it('mirrors a directional icon in RTL and leaves the rest alone', () => {
-    expect(markup(<Icon name="arrow-left" />)).toContain('rtl:-scale-x-100')
-    expect(markup(<Icon name="check" />)).not.toContain('rtl:-scale-x-100')
+    expect(markup(<Icon name="arrow-left" />)).toContain('scale-x-(--tc-dir)')
+    expect(markup(<Icon name="check" />)).not.toContain('scale-x-(--tc-dir)')
   })
 
   it('lets flipRtl override the default both ways', () => {
-    expect(markup(<Icon name="arrow-left" flipRtl={false} />)).not.toContain('rtl:-scale-x-100')
-    expect(markup(<Icon name="check" flipRtl />)).toContain('rtl:-scale-x-100')
+    expect(markup(<Icon name="arrow-left" flipRtl={false} />)).not.toContain('scale-x-(--tc-dir)')
+    expect(markup(<Icon name="check" flipRtl />)).toContain('scale-x-(--tc-dir)')
   })
 })
 

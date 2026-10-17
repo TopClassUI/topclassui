@@ -691,7 +691,8 @@ describe('R-5.3-2: directional motion follows --tc-dir', () => {
     ['ltr: on anything', '<div className="ltr:rotate-180" />'],
     ['an arbitrary dir variant', '<div className="[[dir=rtl]_&]:ms-2" />'],
     ['a :dir() variant', '<div className="[&:dir(rtl)]:scale-x-[-1]" />'],
-    ['a mirror other than the icon flip', '<div className="rtl:-scale-x-50" />'],
+    ['a mirror on rtl:', '<div className="rtl:-scale-x-50" />'],
+    ['the icon mirror on rtl: rather than --tc-dir', '<svg className="inline-block shrink-0 rtl:-scale-x-100" />'],
     ['object-left with no rtl mirror', '<img className="object-left" />'],
     ['bg-right with no rtl mirror', '<div className="bg-right" />'],
     ['a class list in a const', 'const SLIDE = "transition-transform translate-x-full"'],
@@ -714,7 +715,7 @@ describe('R-5.3-2: directional motion follows --tc-dir', () => {
     ['a centre or block-edge origin', '<div className="origin-center origin-top origin-bottom" />'],
     ['a vertical gradient', '<div className="bg-linear-to-b bg-gradient-to-t bg-linear-180" />'],
     ['a gradient angle times --tc-dir', '<div className="bg-linear-[calc(90deg*var(--tc-dir)),var(--a),var(--b)]" />'],
-    ['the icon mirror of PLAN section 7', '<svg className="inline-block shrink-0 rtl:-scale-x-100" />'],
+    ['the icon mirror times --tc-dir', '<svg className="inline-block shrink-0 scale-x-(--tc-dir)" />'],
     ['an object position with its rtl mirror', '<img className="object-left rtl:object-right" />'],
     ['a bg position with its rtl mirror', '<div className="bg-left-top rtl:bg-right-top" />'],
     ['a direction-neutral position', '<img className="object-center bg-top" />'],
@@ -736,8 +737,8 @@ describe('R-5.3-2 rejects the real sources once their direction is taken out', (
     it(`${file} passes as written`, () => {
       expect(ids(code, file)).not.toContain(RULE)
     })
-    it(`${file} fails with --tc-dir removed or the mirror widened`, () => {
-      const broken = code.replaceAll('*var(--tc-dir)', '').replaceAll('rtl:-scale-x-100', 'rtl:-scale-x-100 rtl:rotate-180')
+    it(`${file} fails with --tc-dir removed or the mirror put back on rtl:`, () => {
+      const broken = code.replaceAll('*var(--tc-dir)', '').replaceAll('scale-x-(--tc-dir)', 'rtl:-scale-x-100')
       expect(ids(broken, file)).toContain(RULE)
     })
   }
