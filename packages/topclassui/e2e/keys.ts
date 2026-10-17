@@ -59,7 +59,7 @@ export function focusName(page: Page): Promise<string> {
       .map((id) => { const part = document.getElementById(id); return part?.getAttribute('aria-label') ?? part?.textContent ?? '' })
       .join(' ').trim()
     const label = at.id ? document.querySelector(`label[for="${CSS.escape(at.id)}"]`)?.textContent.trim() : undefined
-    return by || at.getAttribute('aria-label') || label || at.textContent?.trim() || `${at.tagName.toLowerCase()} ${at.getAttribute('role') ?? ''}`.trim()
+    return by || at.getAttribute('aria-label') || label || at.textContent.trim() || `${at.tagName.toLowerCase()} ${at.getAttribute('role') ?? ''}`.trim()
   })
 }
 
