@@ -2,12 +2,7 @@
 import { clamp } from '#shared/clamp.js'
 import { NUMBER_FIELD_BOUNDARIES as BOUNDS } from './boundaries.js'
 import { NUMBER_FIELD_DEFAULTS } from './constants.js'
-
-export interface NumberFieldLimits {
-  min: number | undefined
-  max: number | undefined
-  step: number | 'any'
-}
+import type { NumberFieldLimits } from './types.js'
 
 /** R-5.7-7: `min` and `max` between the two limits, a numeric `step` from `stepMin` up. An absent or NaN bound stays
  * absent and a NaN step is the default, since clamp() reads NaN as its floor; a `max` under `min` is raised to it, as

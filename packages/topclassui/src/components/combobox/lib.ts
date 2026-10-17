@@ -1,10 +1,14 @@
 // R-5.12-1: the pure helpers of the hooks, with no React in them.
 import type { ListOption } from '#shared/contracts/option.js'
 
-/** How Base UI reads an option: its value is what is chosen and sent, its label what is shown and matched. */
-export const optionAccessors = {
-  getValue: (option: ListOption) => option.value,
-  getLabel: (option: ListOption) => option.label,
+/** How Base UI reads an option's value, which is what is chosen and sent. */
+export function valueOfOption(option: ListOption): string {
+  return option.value
+}
+
+/** How Base UI reads an option's label, which is what is shown and matched. */
+export function labelOfOption(option: ListOption): string {
+  return option.label
 }
 
 /** Base UI asks it only for a value no loaded option holds: the input then shows nothing, not the raw value. */

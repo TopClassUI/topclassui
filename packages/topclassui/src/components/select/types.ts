@@ -20,7 +20,7 @@ export type SelectName = ControlName
 type BaseRoot = Base.Root.Props<string>
 
 /** A value is a string, so none of the object helpers; one value, so no `multiple`; the options are data, not children. */
-type RootRemoved = 'multiple' | 'itemToStringLabel' | 'itemToStringValue' | 'isItemEqualToValue' | 'children' | 'items'
+type RootRemoved = 'className' | 'multiple' | 'itemToStringLabel' | 'itemToStringValue' | 'isItemEqualToValue' | 'children' | 'items'
 
 /** The trigger's own props, less every name the root owns and what is fixed here. Its `value` would refuse `value={null}`. */
 type TriggerRest = Omit<

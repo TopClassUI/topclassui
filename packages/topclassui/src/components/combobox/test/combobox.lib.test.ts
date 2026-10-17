@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { isAppended, keyOfOption, optionAccessors, revealTop } from '../lib.js'
+import { isAppended, keyOfOption, labelOfOption, revealTop, valueOfOption } from '../lib.js'
 
 const A = { value: 'a', label: 'Alpha' }
 const B = { value: 'b', label: 'Bravo' }
@@ -42,7 +42,7 @@ describe('isAppended: a page arrived, or the query changed', () => {
 describe('how an option is read', () => {
   it('its value is its key and what is chosen, its label what is shown', () => {
     expect(keyOfOption(B)).toBe('b')
-    expect(optionAccessors.getValue(C)).toBe('c')
-    expect(optionAccessors.getLabel(C)).toBe('Charlie')
+    expect(valueOfOption(C)).toBe('c')
+    expect(labelOfOption(C)).toBe('Charlie')
   })
 })
