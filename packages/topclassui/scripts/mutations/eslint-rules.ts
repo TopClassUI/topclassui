@@ -38,4 +38,22 @@ export const MUTATIONS: Mutation[] = [
     from: "if (kind === 'system' && variants.includes('forced-colors')) continue",
     to: "if (variants.includes('forced-colors')) continue",
   },
+  {
+    label: 'R-5.3-4 stops following a local const, so side={s} with s = "left" passes',
+    file: 'eslint-rules/index.ts',
+    from: "if (node.type === 'Identifier') return recur(constInit(ctx, node))",
+    to: "if (node.type === 'Identifier') return []",
+  },
+  {
+    label: 'R-5.3-4 skips every computed key again, so { ["side"]: "left" } passes',
+    file: 'eslint-rules/index.ts',
+    from: "if (node.computed && node.key?.type !== 'Literal') return",
+    to: 'if (node.computed) return',
+  },
+  {
+    label: 'R-5.3-4 is switched off for every test again, so a dom test may name a physical side',
+    file: 'eslint.config.ts',
+    from: "files: ['src/**/*.schema.test.ts', 'src/shared/contracts/toast.test.ts'],",
+    to: "files: ['src/**/*.test.{ts,tsx}', 'src/**/test/**/*.{ts,tsx}'],",
+  },
 ]
