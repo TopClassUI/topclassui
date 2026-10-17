@@ -1,14 +1,14 @@
 'use client'
 
-import { createContext, useContext, useImperativeHandle, useMemo, useRef } from 'react'
+import { createContext, useCallback, useContext, useImperativeHandle, useMemo, useRef } from 'react'
 
 import { useOverlayRoot, useOverlayScope } from '#shared/overlay-scope.js'
 import { useDirection, useLabels } from '#shared/provider/context.js'
 import { usePortalLocale } from '#shared/provider/use-portal-locale.js'
 import { useScrollTabStop } from '#shared/use-scroll-tab-stop.js'
 import { DRAWER_DEFAULTS } from './constants.js'
-import { toSwipeDirection } from './lib.js'
-import type { DrawerBodyProps, DrawerRootProps, DrawerSettings } from './types.js'
+import { firstFocusOf, toSwipeDirection } from './lib.js'
+import type { DrawerBodyProps, DrawerPopupProps, DrawerRootProps, DrawerSettings } from './types.js'
 
 /** The placement, the size and how modal the nearest DrawerRoot is. The root provides them,
  * because it owns the gesture and Base UI tells the popup nothing of the three. */
@@ -25,10 +25,19 @@ export function useDrawerRoot(
   return { settings, swipeDirection: toSwipeDirection(placement, direction), ...useOverlayRoot(onOpenChange) }
 }
 
-/** What DrawerPopup reads: the dir and the lang of the provider, which its portal in the body
- * cannot inherit and its viewport therefore carries, the settings of its root, and the root's scope. */
-export function useDrawerPopup() {
-  return { ...usePortalLocale(), ...useContext(DrawerContext), scope: useOverlayScope() }
+/** What DrawerPopup reads: the portal's dir and lang, its root's settings and scope, its ref, which the caller's
+ * follows, and the first focus of lib's firstFocusOf (R-5.6-1), which a caller's initialFocus replaces. */
+export function useDrawerPopup(forwarded: DrawerPopupProps['ref'], initialFocus: DrawerPopupProps['initialFocus']) {
+  const popup = useRef(null as HTMLDivElement | null)
+  const ref = useCallback((node: HTMLDivElement | null) => {
+    popup.current = node
+    if (typeof forwarded === 'function') forwarded(node)
+    else if (forwarded) forwarded.current = node
+  }, [forwarded])
+  const firstFocus = useCallback((type: string) => firstFocusOf(popup.current, type), [])
+  return {
+    ...usePortalLocale(), ...useContext(DrawerContext), scope: useOverlayScope(), ref, initialFocus: initialFocus ?? firstFocus,
+  }
 }
 
 /** The body's own ref, which the caller's ref follows, and the tabIndex it needs: 0 only while

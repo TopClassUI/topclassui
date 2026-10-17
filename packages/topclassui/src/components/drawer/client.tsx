@@ -49,8 +49,8 @@ export function DrawerTrigger({ className, render, ...rest }: DrawerTriggerProps
 /** The portal, the scrim, the viewport and the sheet in one part. Rest props reach the sheet; the
  * viewport carries the dir and the lang of the provider, which a portal cannot inherit. A bottom
  * sheet starts with its grabber, and every sheet ends with the x: a swipe is a drag (WCAG 2.5.7). */
-export function DrawerPopup({ container, keepMounted, className, children, ...rest }: DrawerPopupProps) {
-  const { dir, lang, placement, size, modal, scope } = useDrawerPopup()
+export function DrawerPopup({ container, keepMounted, ref, initialFocus, className, children, ...rest }: DrawerPopupProps) {
+  const { dir, lang, placement, size, modal, scope, ...focus } = useDrawerPopup(ref, initialFocus)
   const blocks = modal === true
   // Around every placement: a wrapper that came and went with it would remount an open sheet moved across a breakpoint.
   return (
@@ -65,6 +65,8 @@ export function DrawerPopup({ container, keepMounted, className, children, ...re
           <Base.Popup
             data-placement={placement}
             data-size={size}
+            ref={focus.ref}
+            initialFocus={focus.initialFocus}
             {...rest}
             data-overlay={scope}
             className={cn(

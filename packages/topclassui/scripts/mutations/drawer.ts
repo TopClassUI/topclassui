@@ -47,8 +47,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the drawer popup hook reads the direction of its provider and forgets the language',
     file: HOOK,
-    from: 'return { ...usePortalLocale(), ...useContext(DrawerContext),',
-    to: 'return { dir: usePortalLocale().dir, lang: undefined, ...useContext(DrawerContext),',
+    from: '    ...usePortalLocale(), ...useContext(DrawerContext),',
+    to: '    dir: usePortalLocale().dir, lang: undefined, ...useContext(DrawerContext),',
   },
   {
     label: 'the drawer body is a tab stop whether or not it scrolls, so Tab stops on every one-line body',
@@ -119,8 +119,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the drawer popup hook forgets the scope of its root, so the sheet writes no data-overlay for the guard to find',
     file: HOOK,
-    from: '...useContext(DrawerContext), scope: useOverlayScope() }',
-    to: '...useContext(DrawerContext) }',
+    from: '...useContext(DrawerContext), scope: useOverlayScope(), ref,',
+    to: '...useContext(DrawerContext), ref,',
   },
   {
     label: 'the drawer viewport loses the direction of its provider, so the sheet of an RTL island is laid out left to right',
@@ -195,10 +195,40 @@ export const MUTATIONS: Mutation[] = [
     to: '            className, DRAWER_POPUP, DRAWER_EDGE[placement], isSideSheet(placement) && DRAWER_WIDTH[size], !blocks && POPUP_PASSIVE,',
   },
   {
-    label: 'the drawer popup drops the rest props, so ref, id, lang and initialFocus never reach it',
+    label: 'the drawer popup drops the rest props, so id, lang and the aria props of the caller never reach it',
     file: CLIENT,
-    from: '            data-size={size}\n            {...rest}\n',
-    to: '            data-size={size}\n',
+    from: '            initialFocus={focus.initialFocus}\n            {...rest}\n',
+    to: '            initialFocus={focus.initialFocus}\n',
+  },
+  {
+    label: 'the drawer forgets the first focus of a Dialog and starts on the sheet itself, as Base UI\'s Drawer does',
+    file: HOOK,
+    from: 'initialFocus: initialFocus ?? firstFocus,',
+    to: 'initialFocus: initialFocus ?? popup,',
+  },
+  {
+    label: 'the drawer popup ignores the initialFocus of its caller',
+    file: HOOK,
+    from: 'initialFocus: initialFocus ?? firstFocus,',
+    to: 'initialFocus: firstFocus,',
+  },
+  {
+    label: 'the drawer popup keeps a ref object of its caller empty',
+    file: HOOK,
+    from: '    else if (forwarded) forwarded.current = node\n',
+    to: '',
+  },
+  {
+    label: 'a drawer opened by a tap starts on its first control, so a field there raises the virtual keyboard',
+    file: LIB,
+    from: "if (type === 'touch' || (sheet",
+    to: "if ((sheet",
+  },
+  {
+    label: 'a drawer whose sheet itself scrolls starts on its first control, so its top scrolls out of view',
+    file: LIB,
+    from: '(sheet !== null && sheet.scrollHeight - sheet.clientHeight > 1)',
+    to: 'false',
   },
   {
     label: 'the drawer popup no longer reports its placement, so nothing outside it can tell a bottom sheet from a side sheet',
