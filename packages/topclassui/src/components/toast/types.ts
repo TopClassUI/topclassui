@@ -1,5 +1,5 @@
 import type { Toast as Base } from '@base-ui/react/toast'
-import type { ReactNode } from 'react'
+import type { FocusEvent, ReactNode } from 'react'
 
 import type { ToastPlacement } from '#shared/contracts/toast.js'
 import type { Tone } from '#shared/contracts/tone.js'
@@ -65,3 +65,6 @@ export interface ToastViewportProps {
   /** Merged last, so a consumer class wins a conflict with the viewport's own. */
   className?: string | undefined
 }
+
+/** A focus event on the viewport, where the hook reads where the keyboard came from. */
+export type ToastViewportFocus = FocusEvent<HTMLElement>

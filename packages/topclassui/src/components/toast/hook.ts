@@ -1,11 +1,12 @@
 'use client'
 
 import { Toast } from '@base-ui/react/toast'
-import { useEffect, useState, useSyncExternalStore } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 
 import { useDirection, useLabels, useToastSettings } from '#shared/provider/context.js'
 import { usePortalLocale } from '#shared/provider/use-portal-locale.js'
 import { claimViewport, drawingViewport, subscribeViewports, toSwipeDirections } from './lib.js'
+import type { ToastViewportFocus } from './types.js'
 
 /** Everything the one viewport reads: Base UI's list, the provider's labels and placement, the dir and the
  * lang its portal cannot inherit, the swipes that close a toast in the direction of that provider, and
@@ -18,10 +19,38 @@ export function useToastViewport() {
   const { placement } = useToastSettings()
   return {
     ...usePortalLocale(),
+    ...useFocusReturn(toasts),
     draws,
     toasts,
     labels: useLabels().toast,
     placement,
     swipeDirection: toSwipeDirections(placement, useDirection()),
+  }
+}
+
+/** R-5.6-1: Base UI gives the focus back after the last focused toast closes only when F6 brought it in. A Tab
+ * brought it in too, so where the keyboard came from is kept here and focused once the toast is gone. */
+function useFocusReturn(toasts: readonly unknown[]) {
+  const from = useRef(null as HTMLElement | null)
+  const holds = useRef(false)
+  useEffect(() => {
+    const back = from.current
+    if (!holds.current || !back?.isConnected || (document.activeElement !== null && document.activeElement !== document.body)) return
+    holds.current = false
+    back.focus({ focusVisible: true })
+  }, [toasts])
+  return {
+    onFocus: (event: ToastViewportFocus) => {
+      const came = event.relatedTarget
+      if (came instanceof HTMLElement && !event.currentTarget.contains(came)) from.current = came
+      holds.current = event.target.matches(':focus-visible')
+    },
+    onBlur: (event: ToastViewportFocus) => {
+      const went = event.relatedTarget
+      if (went instanceof Node && event.currentTarget.contains(went)) return
+      const left = event.target
+      // Read after the commit: a toast that closed under the focus is gone from the page; a click elsewhere left it there.
+      queueMicrotask(() => { if (went !== null || left.isConnected) holds.current = false })
+    },
   }
 }
