@@ -8,7 +8,7 @@ Read docs/STATUS.md first for where things stand. The full specification is docs
 
 ```
 pnpm check            every gate below, in order
-pnpm lint             eslint, including the thirteen custom rules
+pnpm lint             eslint, including the fourteen custom rules
 pnpm typecheck        tsc --noEmit
 pnpm test             vitest, four projects: node, dom, rsc, ssr
 pnpm check:structure  the folder contract and file sizes
@@ -81,7 +81,7 @@ They arrive with the phases that need them.
 - **R-5.7-2** `size` is `xs | sm | md | lg | xl | custom`, default `md`, on every component that has a visual scale; `custom` emits no size classes. `<Icon>` takes the same five names against its own pixel values (`ICON_SIZE`: 16, 20, 24, 32, 40) and any CSS length, and is the only component whose default is `1em` rather than `md`. _(shared/contracts/size + type tests)_
 - **R-5.7-3** Every component accepts them and spreads the rest onto its root element; `ref` is a normal prop, never `forwardRef`. A skeleton is a component too. _(type tests and a render test per component; no check proves all 46 have one)_
 - **R-5.7-4** Server components accept the element form only, implemented with `renderElement`; client components may also accept the function form through `useRender`. _(not yet - planned: check-boundaries)_
-- **R-5.7-5** `export type DialogRootProps = Omit<Base.Root.Props, 'className'> & OwnProps`; never re-export a Base UI type name and never hand-copy a primitive's prop list. _(review; not linted)_
+- **R-5.7-5** `export type DialogRootProps = Omit<Base.Root.Props, 'className'> & OwnProps`; never re-export a Base UI type name and never hand-copy a primitive's prop list. _(eslint ; a hand-copied prop list is review)_
 - **R-5.7-6** Boolean presence attributes (`data-open`, `data-loading`, `data-disabled`), never `data-state="..."`; enumerated design props are value attributes (`data-variant`, `data-size`, `data-tone`). _(eslint)_
 - **R-5.7-7** Numeric props have `min` and `max` in the schema and are clamped at runtime with `clamp()`. _(unit test)_
 

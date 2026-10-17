@@ -10,7 +10,7 @@ Each rule has an id, one line of rule, one line of reason, and what enforces it.
 
 ```
 pnpm check            every gate below, in order
-pnpm lint             eslint, including the thirteen custom rules
+pnpm lint             eslint, including the fourteen custom rules
 pnpm typecheck        tsc --noEmit
 pnpm test             vitest, four projects: node, dom, rsc, ssr
 pnpm check:structure  the folder contract and file sizes
@@ -188,7 +188,7 @@ They arrive with the phases that need them.
 ### R-5.7-5 Public types are aliases derived at the seam
 **Rule:** `export type DialogRootProps = Omit<Base.Root.Props, 'className'> & OwnProps`; never re-export a Base UI type name and never hand-copy a primitive's prop list.
 **Why:** a hand-copied list hides new props and drifts; the alias is the one line that changes if the primitive changes.
-**Enforced by:** review; not linted
+**Enforced by:** `eslint` (no Base UI re-export anywhere; in `types.ts` a Base UI `.Props` is only omitted with `'className'`, picked without it, indexed or keyed); a hand-copied prop list is review
 
 ### R-5.7-6 Base UI state attribute grammar
 **Rule:** boolean presence attributes (`data-open`, `data-loading`, `data-disabled`), never `data-state="..."`; enumerated design props are value attributes (`data-variant`, `data-size`, `data-tone`).

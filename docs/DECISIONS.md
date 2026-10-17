@@ -1073,3 +1073,11 @@ The second audit proposed about ninety more. They were declined and listed at th
 **Why.** Git for Windows has `core.autocrlf=true` in the system config, so without this file Omar's checkout and Linux CI would differ, breaking Prettier, the `'use client'` first-line check and the icon content hash.
 
 **Affects.** Every file. Committed before the plan revision.
+
+## 2026-10-17 - What counts as derived at the seam (R-5.7-5)
+
+**Decision.** In `types.ts` a Base UI `.Props` may be omitted from with `'className'` among the keys, picked from without `'className'`, read by index (`Props['modal']`), taken with `keyof`, or pinned to its generics in a private alias that is then used in one of those ways. Used whole, in an intersection, in an `extends` or in an exported alias, it is refused. A headless root with no `className` (Select, Combobox, Menu) still names it in its `Omit`, so a later Base UI release cannot add one unmerged.
+
+**Why.** A `Pick` of named props and an indexed prop type are derivations too; neither copies a list nor carries Base UI's `className`. A hand-copied list cannot be told from a list of our own props by syntax, so it stays review.
+
+**Affects.** R-5.7-5, `eslint-rules/index.ts` (`props-derived-at-the-seam`).
