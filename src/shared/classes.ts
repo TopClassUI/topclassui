@@ -170,3 +170,20 @@ export const VIEWPORT_PASSIVE = 'pointer-events-none'
 
 /** And the popup inside that viewport takes its own presses back. */
 export const POPUP_PASSIVE = 'pointer-events-auto'
+
+// Unit 4: the toggles. The element that takes the press is a group; the drawn box inside it reads the group's state.
+
+/** What takes the press: 24 px, 44 under a coarse pointer, whatever size the drawn box is. w-fit: laid straight into a grid it would fill the track. */
+export const TOGGLE_TARGET = `group/toggle relative inline-flex w-fit shrink-0 items-center justify-center outline-none ${TOUCH_TARGET} ${DISABLED}`
+
+/** The ring of a focused target, drawn on the box inside it. The group is named: a bare one would match an accordion trigger around it. */
+export const TOGGLE_RING = 'group-focus-visible/toggle:outline-solid group-focus-visible/toggle:outline-(length:--tc-ring-width) group-focus-visible/toggle:outline-offset-(length:--tc-ring-offset) group-focus-visible/toggle:outline-ring'
+
+/** The drawn box. It sets no fill and no justify: two classes for one property do not merge in a string. */
+export const TOGGLE_BOX = `inline-flex shrink-0 items-center ${BORDER_STRONG} ${TRANSITION} ${TOGGLE_RING}`
+
+/** Checked: the fill, and under forced colours the system pair, since a fill is erased there. */
+export const TOGGLE_ON = 'group-data-checked/toggle:border-primary-solid group-data-checked/toggle:bg-primary-solid group-data-checked/toggle:text-primary-on-solid forced-colors:group-data-checked/toggle:forced-color-adjust-none forced-colors:group-data-checked/toggle:border-[Highlight] forced-colors:group-data-checked/toggle:bg-[Highlight] forced-colors:group-data-checked/toggle:text-[HighlightText]'
+
+/** Invalid: red and thicker, as on Input. The compound class makes it win over checked. */
+export const TOGGLE_INVALID = 'group-aria-invalid/toggle:border-danger-solid group-aria-invalid/toggle:group-data-checked/toggle:border-danger-solid group-aria-invalid/toggle:inset-ring-[calc(var(--tc-ring-width)-var(--tc-line-width))] group-aria-invalid/toggle:inset-ring-danger-solid forced-colors:group-aria-invalid/toggle:border-(length:--tc-ring-width)'
