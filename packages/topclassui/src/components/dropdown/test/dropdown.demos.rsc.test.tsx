@@ -67,7 +67,10 @@ const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { 
 
 describe('every demo is a Server Component that only hands the parts what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'danger-item', 'data-driven', 'groups', 'in-dialog', 'placements', 'rtl', 'sixty-items', 'with-links'])
+    expect(names).toEqual([
+      'basic', 'danger-item', 'data-driven', 'groups', 'in-dialog', 'placements', 'playground', 'rtl', 'sixty-items',
+      'states', 'with-links',
+    ])
   })
 
   it('none of them is a client file: a menu needs no state of the page to open', () => {

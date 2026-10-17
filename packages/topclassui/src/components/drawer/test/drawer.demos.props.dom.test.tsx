@@ -89,7 +89,7 @@ describe('what the demos show of the props', () => {
     const byHand = /tabIndex|<Drawer\w+[^>]*\slang=|swipeDirection|placement="(left|right)"/
     const DUMMY = join(import.meta.dirname, '..', 'dummy')
     const files = readdirSync(DUMMY).filter((file) => file.endsWith('.tsx'))
-    expect(files).toHaveLength(11)
+    expect(files).toHaveLength(13)
     expect(files.filter((file) => byHand.test(readFileSync(join(DUMMY, file), 'utf8')))).toEqual([])
     expect(byHand.test('<DrawerPopup lang="ar">')).toBe(true)
     expect(byHand.test('<DrawerBody tabIndex={0}>')).toBe(true)

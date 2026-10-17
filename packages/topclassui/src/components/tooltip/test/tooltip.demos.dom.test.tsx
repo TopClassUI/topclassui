@@ -25,7 +25,9 @@ const SHOWN: Record<string, (string | null)[]> = {
     'end-top', 'end', 'end-bottom',
     'bottom-start', 'bottom', 'bottom-end',
   ],
+  'playground': ['Copy link'],
   'rtl': ['نسخ الرابط', 'حذف هذا الصف'],
+  'states': ['Top', 'Bottom', 'Delayed', null],
   'with-count': ['Delete 3 rows'],
 }
 

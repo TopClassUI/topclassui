@@ -12,7 +12,10 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['basic', 'danger-item', 'data-driven', 'groups', 'in-dialog', 'placements', 'rtl', 'sixty-items', 'with-links']
+const EXPECTED = [
+  'basic', 'danger-item', 'data-driven', 'groups', 'in-dialog', 'placements', 'playground', 'rtl', 'sixty-items', 'states',
+  'with-links',
+]
 
 /** The label of each menu trigger a demo serves, every one of them a Button. */
 const TRIGGERS: Record<string, string[]> = {
@@ -26,8 +29,10 @@ const TRIGGERS: Record<string, string[]> = {
     'top-start', 'top', 'top-end', 'start-top', 'start', 'start-bottom',
     'end-top', 'end', 'end-bottom', 'bottom-start', 'bottom', 'bottom-end',
   ],
+  'playground': ['Actions'],
   'rtl': ['الإجراءات', 'المزيد'],
   'sixty-items': ['Time zone'],
+  'states': ['Open', 'Disabled row', 'Danger row', 'Grouped'],
   'with-links': ['Help'],
 }
 

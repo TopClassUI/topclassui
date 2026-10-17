@@ -61,7 +61,7 @@ describe('what the demos show of the props', () => {
     const byHand = /tabIndex|<Dialog\w+[^>]*\slang=/
     const DUMMY = join(import.meta.dirname, '..', 'dummy')
     const files = readdirSync(DUMMY).filter((file) => file.endsWith('.tsx'))
-    expect(files).toHaveLength(12)
+    expect(files).toHaveLength(14)
     expect(files.filter((file) => byHand.test(readFileSync(join(DUMMY, file), 'utf8')))).toEqual([])
     expect(byHand.test('<DialogPopup size="xs" lang="ar">')).toBe(true)
     expect(byHand.test('<DialogBody tabIndex={0}>')).toBe(true)

@@ -98,7 +98,7 @@ describe('a server-rendered Dropdown hydrates cleanly', () => {
 
 describe('every demo renders and hydrates', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(DEMOS).toHaveLength(9)
+    expect(DEMOS).toHaveLength(11)
   })
 
   for (const [name, Demo] of DEMOS) {

@@ -40,6 +40,7 @@ const SHOWN: Record<string, Shown[]> = {
     controls: ['Keep it where it is', 'Move a copy and keep the original', 'Move everything to the archive', X],
   }],
   'non-modal': [{ trigger: 'Outline', title: 'Outline', placement: 'end', controls: ['Done', X] }],
+  'playground': [{ trigger: 'Filters', title: 'Filters', placement: 'end', controls: ['Reset', 'Apply', X] }],
   'rtl': [
     { trigger: 'القائمة', title: 'تصفّح', placement: 'start', controls: ['إغلاق هذه اللوحة'] },
     { trigger: 'التصفية', title: 'عوامل التصفية', placement: 'end', controls: ['إعادة ضبط', 'تطبيق', 'إغلاق هذه اللوحة'] },
@@ -54,6 +55,13 @@ const SHOWN: Record<string, Shown[]> = {
   ],
   'start': [{ trigger: 'Menu', title: 'Browse', placement: 'start', controls: ['Documentation', 'Components', 'Changelog', X] }],
   'top': [{ trigger: 'What is new', title: 'Version 2.4', placement: 'top', controls: ['Got it', X] }],
+  'states': [
+    { trigger: 'Side sheet', title: 'Side sheet', placement: 'end', controls: ['Done', X] },
+    { trigger: 'Bottom sheet', title: 'Bottom sheet', placement: 'bottom', controls: ['Done', X] },
+    { trigger: 'Scrolled', title: 'Scrolled', placement: 'end', controls: ['Done', X] },
+    { trigger: 'Focus trapped', title: 'Focus trapped', placement: 'end', controls: ['Done', X] },
+    { trigger: 'Non-modal', title: 'Non-modal', placement: 'end', controls: ['Done', X] },
+  ],
   'trap-focus': [{ trigger: 'Inspect', title: 'Inspector', placement: 'end', controls: ['Done', X] }],
   'with-form': [{ trigger: 'Invite', title: 'Invite a teammate', placement: 'bottom', controls: ['Name', 'Email', 'Cancel', 'Send', X] }],
 }
