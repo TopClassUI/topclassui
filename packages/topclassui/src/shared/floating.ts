@@ -44,6 +44,4 @@ export function toSideAlign(placement: Placement = DEFAULT_PLACEMENT): { side: S
 export const POPUP_BOUNDS = {
   collisionPadding: 8,
   sideOffset: 6,
-  maxHeightVar: '--available-height',
-  maxWidthVar: '--available-width',
 } as const
