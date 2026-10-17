@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { ICON_SIZE } from '#shared/contracts/size.js'
 import { attr, classList, markup } from '#test/markup.js'
-import { Svg } from './index.js'
+import { Svg } from '../index.js'
 
 const icon = { path: 'M0 0h8v8H0z', viewBox: '0 0 256 256', directional: false }
 const arrow = { ...icon, directional: true }

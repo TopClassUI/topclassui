@@ -26,7 +26,7 @@ describe('no library file reads the process global in a form a bundler leaves in
   it('finds files to check, and the dev warnings that read NODE_ENV', () => {
     expect(files.length).toBeGreaterThan(0)
     const readers = files.filter((file) => withoutComments(readFileSync(file, 'utf8')).includes('process.env.NODE_ENV')).map(relative)
-    expect(readers).toEqual(expect.arrayContaining(['shared/collection/use-collection.ts', 'shared/use-controllable-state.ts']))
+    expect(readers).toEqual(expect.arrayContaining(['shared/collection/use-collection.ts', 'shared/provider/use-provider-locale.ts', 'shared/use-controllable-state.ts']))
   })
 
   for (const file of files) {

@@ -128,12 +128,12 @@ export function DropdownSeparator({ className, ...rest }: DropdownSeparatorProps
 /** The same menu from data: one group named by title. An href row is a link, cloned from link
  * when one is passed; any other row runs its onSelect or its Server Action on a press. A
  * disabled href row is a plain row, since Base UI gives a link item no disabled. */
-export function DropdownMenu({ trigger, title, items, link, placement, className, open, defaultOpen, onOpenChange }: DropdownMenuProps) {
+export function DropdownMenu({ trigger, title, items, link, open, defaultOpen, onOpenChange, ...rest }: DropdownMenuProps) {
   const menu = useDropdownMenu()
   return (
     <DropdownRoot open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
       <DropdownTrigger render={trigger} />
-      <DropdownPopup placement={placement} className={className}>
+      <DropdownPopup {...rest}>
         <DropdownGroup>
           <DropdownGroupLabel>{title}</DropdownGroupLabel>
           {items.map((item) => (
