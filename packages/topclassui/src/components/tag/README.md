@@ -24,16 +24,17 @@ that imports Tag may still load that one small file (about 3 KB gzipped).
 
 ## A removable tag
 
-Pass `onRemove` and the tag gets an x button. The x only calls `onRemove`: you take the tag
-out of your list. A Server Component can pass `onRemove` only as a Server Action
-(`onRemove={removeTopic.bind(null, id)}`). To keep the list in state, put it in a client
-component, and move the focus before the x goes:
+`TagRemovable` is the Tag with an x button, and takes every Tag prop plus `onRemove`. The x
+only calls `onRemove`: you take the tag out of your list. It is the client export, because
+`Tag` takes no function: a Server Component page renders `Tag` as it is, and passes a
+`TagRemovable` its `onRemove` only as a Server Action (`onRemove={removeTopic.bind(null, id)}`).
+To keep the list in state, put it in a client component, and move the focus before the x goes:
 
 ```tsx
 'use client'
 
 import { useRef, useState } from 'react'
-import { Tag } from 'topclassui'
+import { TagRemovable } from 'topclassui'
 
 export function Topics({ initial }: { initial: string[] }) {
   const [topics, setTopics] = useState(initial)
@@ -50,7 +51,7 @@ export function Topics({ initial }: { initial: string[] }) {
     <ul ref={list} aria-label="Topics" className="flex flex-wrap gap-2">
       {topics.map((topic, index) => (
         <li key={topic}>
-          <Tag onRemove={() => { remove(topic, index) }}>{topic}</Tag>
+          <TagRemovable onRemove={() => { remove(topic, index) }}>{topic}</TagRemovable>
         </li>
       ))}
     </ul>
@@ -67,7 +68,7 @@ Your server page renders `<Topics initial={['React', 'Tailwind']} />`: strings c
 
 Base UI: not used; the x is a plain `<button type="button">`.
 
-Not built: a `removable` boolean (the handler is the switch), `disabled`, and the hover, active and focus states of the whole tag: only the x is interactive.
+Not built: a `removable` boolean on Tag (TagRemovable is the switch), `disabled`, and the hover, active and focus states of the whole tag: only the x is interactive.
 
 ## Long labels
 
@@ -106,7 +107,6 @@ Every prop below is optional and falls back to the default shown.
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
 | `children` | no | `ReactNode` | - | The label, and any icon beside it. The text carries the meaning; colour never does alone. |
-| `onRemove` | no | `(() => void)` | - | Shows a remove button that calls this; taking the tag out of the list is the caller's. Passed from a client component. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The shared size scale; custom emits no size classes. |
 | `tone` | no | `primary` \| `neutral` \| `success` \| `warning` \| `danger` \| `info` | `"neutral"` | The meaning it signals, which picks the soft tint and its label colour. |
 

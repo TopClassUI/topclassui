@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { TopClassProvider } from '#shared/provider/provider.js'
-import { Banner } from '../index.js'
+import { Banner, BannerDismissible } from '../index.js'
 
 afterEach(() => {
   vi.restoreAllMocks()
@@ -43,7 +43,7 @@ describe('dismissing', () => {
   it('hides the banner, calls onDismiss once and stores the id', async () => {
     const id = fresh()
     const onDismiss = vi.fn()
-    render(<Banner aria-label="Notice" dismissible id={id} onDismiss={onDismiss}>Out.</Banner>)
+    render(<BannerDismissible aria-label="Notice" id={id} onDismiss={onDismiss}>Out.</BannerDismissible>)
     await userEvent.click(dismiss())
     expect(screen.queryByRole('region')).toBeNull()
     expect(onDismiss).toHaveBeenCalledTimes(1)
@@ -59,7 +59,7 @@ describe('dismissing', () => {
     }
     render(
       <>
-        <Banner aria-label="Notice" dismissible id={id} onDismiss={onDismiss}>Out.</Banner>
+        <BannerDismissible aria-label="Notice" id={id} onDismiss={onDismiss}>Out.</BannerDismissible>
         <button type="button">Next</button>
       </>,
     )
@@ -153,7 +153,7 @@ describe('storage that throws', () => {
     refuse()
     const id = fresh()
     const onDismiss = vi.fn()
-    const { unmount } = render(<Banner aria-label="Notice" dismissible id={id} onDismiss={onDismiss}>Out.</Banner>)
+    const { unmount } = render(<BannerDismissible aria-label="Notice" id={id} onDismiss={onDismiss}>Out.</BannerDismissible>)
     expect(screen.getByRole('region').textContent).toContain('Out.')
     await userEvent.click(dismiss())
     expect(screen.queryByRole('region')).toBeNull()

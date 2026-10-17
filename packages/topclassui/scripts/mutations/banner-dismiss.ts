@@ -59,14 +59,32 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the banner dismiss shell writes its role before the rest props, so a caller can turn the landmark into something else',
     file: INDEX,
-    from: '{...rest} id={rest.id} role="region" onDismiss',
-    to: 'role="region" {...rest} id={rest.id} onDismiss',
+    from: '{...rest} id={rest.id} role="region">',
+    to: 'role="region" {...rest} id={rest.id}>',
   },
   {
     label: 'the banner dismiss shell passes className first, so the consumer loses every conflict',
     file: INDEX,
     from: 'const look = cn(bannerVariants({ tone }), className)',
     to: 'const look = cn(className, bannerVariants({ tone }))',
+  },
+  {
+    label: 'the banner dismiss client export stops handing onDismiss to the shell, so the callback never runs',
+    file: CLIENT,
+    from: 'role="region" onDismiss={onDismiss}>',
+    to: 'role="region">',
+  },
+  {
+    label: 'the banner dismiss client export passes className first, so the consumer loses every conflict',
+    file: CLIENT,
+    from: 'className={cn(bannerVariants({ tone }), className)} {...rest}',
+    to: 'className={cn(className, bannerVariants({ tone }))} {...rest}',
+  },
+  {
+    label: 'the banner dismiss client export drops the message wrapper test, so an empty message opens a gap',
+    file: CLIENT,
+    from: '{isEmpty(children) ? null : <div className={MESSAGE}>{children}</div>}',
+    to: '<div className={MESSAGE}>{children}</div>',
   },
   {
     label: 'the banner dismiss x has no name',

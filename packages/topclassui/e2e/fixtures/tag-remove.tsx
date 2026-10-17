@@ -5,7 +5,7 @@ import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from 
 import { createRoot } from 'react-dom/client'
 
 import { TopClassProvider } from '#shared/provider/provider.js'
-import { Tag } from '#components/tag/index.js'
+import { Tag, TagRemovable } from '#components/tag/index.js'
 
 declare global {
   interface Window { __tagRemoved?: string[] }
@@ -33,7 +33,7 @@ function Unmanaged() {
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
       {topics.map((topic) => (
-        <Tag key={topic} onRemove={() => { setTopics(topics.filter((other) => other !== topic)) }}>{topic}</Tag>
+        <TagRemovable key={topic} onRemove={() => { setTopics(topics.filter((other) => other !== topic)) }}>{topic}</TagRemovable>
       ))}
     </div>
   )
@@ -48,39 +48,39 @@ function Fixture() {
         {SIZES.map((size) => (
           <div key={size} style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', gap: 8, marginBlock: 8 }}>
             <Tag id={`plain-${size}`} size={size}>Plain</Tag>
-            <Tag id={`size-${size}`} size={size} onRemove={record(size)}>Removable</Tag>
+            <TagRemovable id={`size-${size}`} size={size} onRemove={record(size)}>Removable</TagRemovable>
           </div>
         ))}
-        <Tag id="size-custom" size="custom" onRemove={record('custom')}>Custom</Tag>
+        <TagRemovable id="size-custom" size="custom" onRemove={record('custom')}>Custom</TagRemovable>
       </Section>
-      <Section id="word"><Tag id="word-tag" onRemove={record('word')}>{WORD}</Tag></Section>
+      <Section id="word"><TagRemovable id="word-tag" onRemove={record('word')}>{WORD}</TagRemovable></Section>
       <Section id="element">
-        <Tag id="element-tag" onRemove={record('element')}><strong>{WORD}</strong></Tag>
+        <TagRemovable id="element-tag" onRemove={record('element')}><strong>{WORD}</strong></TagRemovable>
       </Section>
       <Section id="sixty">
         <div id="sixty-row" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, width: 320, maxWidth: '100%' }}>
-          {SIXTY.map((topic) => <Tag key={topic} onRemove={record(topic)}>{topic}</Tag>)}
+          {SIXTY.map((topic) => <TagRemovable key={topic} onRemove={record(topic)}>{topic}</TagRemovable>)}
         </div>
       </Section>
       <Section id="grid">
         <div style={{ display: 'grid', gridTemplateColumns: '96px 1fr', gap: 8 }}>
           <div>Side</div>
-          <Tag id="grid-tag" onRemove={record('grid')}>{WORD}</Tag>
+          <TagRemovable id="grid-tag" onRemove={record('grid')}>{WORD}</TagRemovable>
         </div>
       </Section>
       <Section id="flex">
         <div style={{ display: 'flex', gap: 8 }}>
           <div style={SIDE}>Side</div>
-          <div style={{ flex: 1 }}><Tag id="flex-tag" onRemove={record('flex')}>{WORD}</Tag></div>
+          <div style={{ flex: 1 }}><TagRemovable id="flex-tag" onRemove={record('flex')}>{WORD}</TagRemovable></div>
         </div>
       </Section>
       <Section id="fit">
-        <div style={{ width: 'fit-content' }}><Tag id="fit-tag" onRemove={record('fit')}>{WORD}</Tag></div>
-        <div style={{ width: 'fit-content' }}><Tag id="fit-short" onRemove={record('fit short')}>Short</Tag></div>
+        <div style={{ width: 'fit-content' }}><TagRemovable id="fit-tag" onRemove={record('fit')}>{WORD}</TagRemovable></div>
+        <div style={{ width: 'fit-content' }}><TagRemovable id="fit-short" onRemove={record('fit short')}>Short</TagRemovable></div>
       </Section>
       <Section id="cell">
         <table>
-          <tbody><tr><td>Side</td><td><Tag id="cell-tag" onRemove={record('cell')}>{WORD}</Tag></td></tr></tbody>
+          <tbody><tr><td>Side</td><td><TagRemovable id="cell-tag" onRemove={record('cell')}>{WORD}</TagRemovable></td></tr></tbody>
         </table>
       </Section>
       <Section id="unmanaged"><Unmanaged /></Section>

@@ -104,4 +104,16 @@ export const MUTATIONS: Mutation[] = [
     from: "return props.readOnly === false ? <Editable {...props} /> : <ReadOnly {...props} />",
     to: "return props.readOnly === true ? <ReadOnly {...props} /> : <Editable {...(props as RatingEditableProps)} aria-label=\"x\" readOnly={false} />",
   },
+  {
+    label: 'rating: RatingInput drops its handler on the way to the radio group, so onValueChange never runs',
+    file: 'src/components/rating/client.tsx',
+    from: 'return <RatingField {...toField(props)} />',
+    to: 'return <RatingField {...toField({ ...props, onValueChange: undefined })} />',
+  },
+  {
+    label: 'rating: an editing rating names a step for every star of an unclamped max, so max={1000} renders a thousand radios',
+    file: 'src/components/rating/lib.tsx',
+    from: 'names: stepsOf(max).map((step) => labels.rating.stars(step, fmt)),',
+    to: 'names: stepsOf(rawMax).map((step) => labels.rating.stars(step, fmt)),',
+  },
 ]

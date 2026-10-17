@@ -5,9 +5,12 @@ import { starFill } from '#icons/data/star-fill.js'
 import { clamp } from '#shared/clamp.js'
 import { cn } from '#shared/cn.js'
 import type { Size } from '#shared/contracts/size.js'
+import { en } from '#shared/labels/en.js'
+import { createNumberFormat } from '#shared/labels/get-labels.js'
 import { RATING_BOUNDARIES } from './boundaries.js'
 import { RATING_FILL, RATING_FILL_ICON, RATING_FILL_WIDTH, RATING_STAR } from './classes.js'
-import type { RatingFill } from './types.js'
+import { RATING_DEFAULTS } from './constants.js'
+import type { RatingEditableProps, RatingFieldProps, RatingFill, RatingInputProps } from './types.js'
 
 /** R-5.7-7: a whole number of stars, from 1 to 10. */
 export function toMax(max: number): number {
@@ -50,4 +53,21 @@ export function Star({ fill, size }: { fill: RatingFill; size: Size }) {
       )}
     </span>
   )
+}
+
+/** The radio group's props from either editing export: the defaults, clamped numbers, each step named. */
+export function toField({
+  value, defaultValue = RATING_DEFAULTS.value, max: rawMax = RATING_DEFAULTS.max, size = RATING_DEFAULTS.size,
+  disabled = RATING_DEFAULTS.disabled, labels = en, locale = RATING_DEFAULTS.locale, ...rest
+}: Omit<RatingEditableProps | RatingInputProps, 'readOnly'>): RatingFieldProps {
+  const max = toMax(rawMax)
+  const fmt = createNumberFormat(locale)
+  return {
+    ...rest,
+    value: value === undefined ? undefined : toStep(value, max),
+    defaultValue: toStep(defaultValue, max),
+    size,
+    disabled,
+    names: stepsOf(max).map((step) => labels.rating.stars(step, fmt)),
+  }
 }

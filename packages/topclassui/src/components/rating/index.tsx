@@ -5,7 +5,7 @@ import { createNumberFormat } from '#shared/labels/get-labels.js'
 import { RATING_ROOT } from './classes.js'
 import { RatingField } from './client.js'
 import { RATING_DEFAULTS } from './constants.js'
-import { Star, fillOf, stepsOf, toMax, toShown, toStep } from './lib.js'
+import { Star, fillOf, stepsOf, toField, toMax, toShown } from './lib.js'
 import type { RatingEditableProps, RatingProps, RatingReadOnlyProps } from './types.js'
 
 /** Stars that show a value, named "4 out of 5" unless the caller names them. */
@@ -29,30 +29,17 @@ function ReadOnly({
 }
 
 /** The client half, handed only what can cross: clamped numbers and the name of each step. */
-function Editable({
-  value, defaultValue = RATING_DEFAULTS.value, max: rawMax = RATING_DEFAULTS.max, size = RATING_DEFAULTS.size,
-  disabled = RATING_DEFAULTS.disabled, labels = en, locale = RATING_DEFAULTS.locale, readOnly: _readOnly, ...rest
-}: RatingEditableProps) {
-  const max = toMax(rawMax)
-  const fmt = createNumberFormat(locale)
-  return (
-    <RatingField
-      {...rest}
-      value={value === undefined ? undefined : toStep(value, max)}
-      defaultValue={toStep(defaultValue, max)}
-      size={size}
-      disabled={disabled}
-      names={stepsOf(max).map((step) => labels.rating.stars(step, fmt))}
-    />
-  )
+function Editable({ readOnly: _readOnly, ...props }: RatingEditableProps) {
+  return <RatingField {...toField(props)} />
 }
 
 /** A row of stars. Read-only by default, which renders on the server and ships no script;
- * readOnly={false} renders a native radio group, the one part that hydrates. */
+ * readOnly={false} renders a native radio group, the one part that hydrates. It takes no function: RatingInput does. */
 export function Rating(props: RatingProps) {
   return props.readOnly === false ? <Editable {...props} /> : <ReadOnly {...props} />
 }
 
+export { RatingInput } from './client.js'
 export type {
-  RatingDesignProps, RatingEditableProps, RatingFill, RatingProps, RatingReadOnlyProps,
+  RatingDesignProps, RatingEditableProps, RatingFill, RatingInputProps, RatingProps, RatingReadOnlyProps,
 } from './types.js'

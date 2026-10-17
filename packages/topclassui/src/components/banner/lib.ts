@@ -1,5 +1,10 @@
-// The store behind useBannerDismiss: localStorage, and memory for a browser that refuses it.
+// The store behind useBannerDismiss, localStorage and memory for a browser that refuses it, and the message test.
 import { BANNER_STORAGE_PREFIX } from './constants.js'
+
+/** These render nothing, so a message holding one gets no element and opens no gap. */
+export function isEmpty(node: unknown): boolean {
+  return node == null || typeof node === 'boolean' || node === '' || (Array.isArray(node) && node.every(isEmpty))
+}
 
 const memory = new Set([] as string[])
 const listeners = new Set([] as (() => void)[])
