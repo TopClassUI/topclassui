@@ -50,8 +50,8 @@ describe('the element it renders', () => {
     expect(source).toMatch(/^<div [^>]*style="opacity:0.5"/)
   })
 
-  it('exports the component and its class string, and no part', () => {
-    expect(Object.keys(entry).sort()).toEqual(['Banner', 'bannerVariants'])
+  it('exports the component, its skeleton and its class string, and no part', () => {
+    expect(Object.keys(entry).sort()).toEqual(['Banner', 'BannerSkeleton', 'bannerVariants'])
   })
 })
 

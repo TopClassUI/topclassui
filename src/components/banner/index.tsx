@@ -55,6 +55,7 @@ export function Banner({
 }
 
 export { bannerVariants } from './variants.js'
+export { BannerSkeleton } from './skeleton.js'
 export type {
-  BannerDesignProps, BannerDismissal, BannerName, BannerOwnProps, BannerProps, BannerTone,
+  BannerDesignProps, BannerDismissal, BannerName, BannerOwnProps, BannerProps, BannerSkeletonProps, BannerTone,
 } from './types.js'

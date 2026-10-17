@@ -82,6 +82,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/long-text.tsx`
 - `dummy/minimal.tsx`
 - `dummy/rtl.tsx`
+- `dummy/skeleton.tsx`
 - `dummy/tones.tsx`
 - `dummy/with-action.tsx`
 

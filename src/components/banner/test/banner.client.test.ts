@@ -10,10 +10,10 @@ const FOLDER = join(import.meta.dirname, '..')
 const read = (file: string) => readFileSync(join(FOLDER, file), 'utf8')
 
 describe('the folder is split: a server root and a client shell', () => {
-  it('holds the server files plus client.tsx, hook.ts and lib.ts, and nothing else', () => {
+  it('holds the server files plus client.tsx, hook.ts and lib.ts, and a skeleton, and nothing else', () => {
     expect(readdirSync(FOLDER).sort()).toEqual([
       'README.md', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'lib.ts',
-      'meta.ts', 'schema.ts', 'test', 'types.ts', 'variants.ts',
+      'meta.ts', 'schema.ts', 'skeleton.tsx', 'test', 'types.ts', 'variants.ts',
     ])
   })
 })

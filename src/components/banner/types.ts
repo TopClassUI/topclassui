@@ -65,3 +65,11 @@ export type BannerShellProps = Omit<ComponentPropsWithRef<'div'>, 'id'> & {
   'data-tone': BannerTone
   'onDismiss'?: (() => void) | undefined
 }
+
+/** No content, no tone and no way to un-hide it: the placeholder only holds the banner's box. */
+export type BannerSkeletonProps =
+  Omit<ComponentPropsWithRef<'div'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
+  & {
+    /** Holds the place of the x too, so a dismissible banner keeps its height. Defaults to false, as on Banner. */
+    dismissible?: boolean | undefined
+  }

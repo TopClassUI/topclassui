@@ -11,8 +11,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the banner loses wrap-anywhere, so a long URL runs out of the row',
     file: 'src/components/banner/variants.ts',
-    from: "text-sm font-medium wrap-anywhere'",
-    to: "text-sm font-medium'",
+    from: "'font-medium wrap-anywhere'",
+    to: "'font-medium'",
   },
   {
     label: 'the banner message loses min-w-0, so it cannot shrink below its longest word beside an action',
@@ -40,15 +40,15 @@ export const MUTATIONS: Mutation[] = [
   },
   {
     label: 'the banner row stops wrapping, so a long action squeezes the message to nothing instead of dropping under it',
-    file: 'src/components/banner/variants.ts',
-    from: "'flex w-full min-w-0 flex-wrap items-center",
-    to: "'flex w-full min-w-0 items-center",
+    file: 'src/components/banner/classes.ts',
+    from: '`flex w-full min-w-0 flex-wrap items-center',
+    to: '`flex w-full min-w-0 items-center',
   },
   {
     label: 'the banner root loses min-w-0, so in a grid or flex track it widens the track to its action and the page scrolls sideways',
-    file: 'src/components/banner/variants.ts',
-    from: "'flex w-full min-w-0 flex-wrap",
-    to: "'flex w-full flex-wrap",
+    file: 'src/components/banner/classes.ts',
+    from: '`flex w-full min-w-0 flex-wrap',
+    to: '`flex w-full flex-wrap',
   },
   {
     label: 'the banner message loses its basis, so beside a long action it is one letter wide',
@@ -61,5 +61,35 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/banner/classes.ts',
     from: "FORCED_EDGE = 'forced-colors:border-b-(length:--tc-line-width)'",
     to: "FORCED_EDGE = ''",
+  },
+  {
+    label: 'the banner skeleton lets a caller un-hide it',
+    file: 'src/components/banner/skeleton.tsx',
+    from: '{...rest} aria-hidden>',
+    to: 'aria-hidden {...rest}>',
+  },
+  {
+    label: 'the banner skeleton drops the box of the x, so a dismissible banner arrives taller than its placeholder',
+    file: 'src/components/banner/skeleton.tsx',
+    from: '{dismissible ? <span className={BANNER_SKELETON_DISMISS} /> : null}',
+    to: 'null',
+  },
+  {
+    label: 'the banner skeleton box of the x loses its finger floor, so under a coarse pointer it is 20 px short',
+    file: 'src/components/banner/classes.ts',
+    from: 'inline-flex shrink-0 ms-auto rounded-control ${TOUCH_TARGET} ${PULSE}',
+    to: 'inline-flex shrink-0 ms-auto rounded-control ${PULSE}',
+  },
+  {
+    label: 'the banner skeleton and the banner lose their block padding, so a loading banner is 24 px short',
+    file: 'src/components/banner/classes.ts',
+    from: 'gap-3 px-5 py-3 text-sm',
+    to: 'gap-3 px-5 text-sm',
+  },
+  {
+    label: 'the banner skeleton passes className first, so the consumer loses every conflict',
+    file: 'src/components/banner/skeleton.tsx',
+    from: 'cn(BANNER_SKELETON, className)',
+    to: 'cn(className, BANNER_SKELETON)',
   },
 ]
