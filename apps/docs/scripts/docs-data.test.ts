@@ -23,11 +23,11 @@ describe('docs:data against the repo', () => {
     expect(run.status, log).toBe(0)
   })
 
-  it('reads all 52 component folders and lists the 46 catalog cards and the 395 demos', () => {
-    expect(log).toMatch(/^docs:data: 52 folders, 46 catalog cards, 395 demos, \d+ issues?$/m)
+  it('reads all 52 component folders and lists the 46 catalog cards and the 407 demos', () => {
+    expect(log).toMatch(/^docs:data: 52 folders, 46 catalog cards, 407 demos, \d+ issues?$/m)
     expect(components.components).toHaveLength(52)
     expect(components.components.filter((entry) => entry.card)).toHaveLength(46)
-    expect(parseDemoMap(demos)).toHaveLength(395)
+    expect(parseDemoMap(demos)).toHaveLength(407)
   })
 
   it('writes four files that pass every shape and cross check', () => {
