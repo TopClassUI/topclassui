@@ -339,7 +339,7 @@ They arrive with the phases that need them.
 ### R-5.6-1 WCAG 2.2 AA
 **Rule:** keyboard behaviour follows the ARIA Authoring Practices; a visible `focus-visible` ring on every interactive element; types enforce labels.
 **Why:** it is a promise of the library, not an extra.
-**Enforced by:** manual; `axe` covers the ARIA attributes in `test:e2e`, not the keyboard behaviour
+**Enforced by:** `e2e/keyboard-<slug>.spec.ts`, one per interactive component, which presses every key of its Authoring Practices pattern in both directions and reads the ring's outline style and width on the element that takes the focus; `axe` covers the ARIA attributes; the labels are type tests
 
 ### R-5.6-2 Target size
 **Rule:** every interactive element is at least 24x24 CSS px on every pointer type and 44px under `pointer-coarse`. The floor is a px token with a px fallback, never a rem step, because the success criterion is written in CSS px.
@@ -349,7 +349,7 @@ They arrive with the phases that need them.
 ### R-5.6-3 Every drag has an alternative
 **Rule:** Slider, Drawer and Toast swipe, Carousel, Resizable, sortable lists and the editor kit each provide a keyboard or button path to the same result.
 **Why:** WCAG 2.5.7.
-**Enforced by:** manual; the keyboard tests do not exist yet
+**Enforced by:** `e2e/keyboard-slider.spec.ts`, where the keys reach every value a drag reaches, and the Drawer and Toast keyboard specs; Carousel, Resizable, sortable lists and the editor kit are not built yet
 
 ### R-5.6-4 Contrast
 **Rule:** 4.5:1 for text, including a tone's text colour on its own soft tint; 3:1 for `--tc-line-strong`, `--tc-ring` and icons. `--tc-line` is decorative and exempt.
