@@ -10,7 +10,7 @@ export const datePicker = {
     ar: 'يوم واحد يُختار من شهر. يُحمَّل التقويم عند فتحه أول مرة، وكل اسم شهر وكل رقم يأتي من Intl.',
   },
   demos: ['basic', 'in-field', 'limits', 'week-start', 'form', 'sizes', 'rtl'],
-  stageHeight: 5,
+  stageHeight: 7,
   note: {
     en: 'The value is an ISO date string, YYYY-MM-DD; the shown format comes from the provider\'s locale.',
     ar: 'القيمة تاريخ بصيغة ISO، أي YYYY-MM-DD؛ والصيغة المعروضة تأتي من لغة المزوّد.',
