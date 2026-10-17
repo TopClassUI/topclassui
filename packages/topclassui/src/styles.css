@@ -1,8 +1,9 @@
 /* Relative to this file, so they work from inside node_modules and ignore .gitignore. */
 @source "./components";
-@source "./connectors";
 /* shared/classes.ts holds the class constants every component spreads. */
 @source "./shared";
+/* In dist a .d.ts only repeats the strings of its .js, so scanning it is wasted work. */
+@source not "./**/*.d.ts";
 
 /* The forced attribute lets the docs show every state; hover keeps its media guard. */
 @custom-variant hover {

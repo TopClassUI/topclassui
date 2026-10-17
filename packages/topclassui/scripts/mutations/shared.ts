@@ -495,4 +495,10 @@ export const MUTATIONS: Mutation[] = [
     from: '  --tc-z-popup: 60;',
     to: '  --tc-z-popup: 70;',
   },
+  {
+    label: 'a README sample that still imports the bare topclassui passes its compile test instead of failing',
+    file: 'src/test/samples.ts',
+    from: '  if (left !== null) {',
+    to: '  if (left !== null && left.index < 0) {',
+  },
 ]

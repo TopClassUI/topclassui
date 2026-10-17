@@ -37,7 +37,7 @@ jobs:
 
       # pnpm check runs test:e2e, which cannot launch a browser that is not downloaded.
       - name: Playwright browsers
-        run: npx playwright install --with-deps chromium
+        run: pnpm --filter topclassui exec playwright install --with-deps chromium
 
       - run: pnpm check
 

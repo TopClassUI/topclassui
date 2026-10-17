@@ -1,8 +1,7 @@
 {
   "name": "topclassui",
   "version": "0.0.0",
-  "private": true,
-  "description": "RTL-first, server-first React components for Next.js and Tailwind CSS v4.",
+  "description": "RTL-first, server-first React components for Next.js and Tailwind CSS v4. Beta.",
   "license": "MIT",
   "author": "Omar Abed",
   "homepage": "https://topclassui.com",
@@ -24,19 +23,82 @@
     "accessibility"
   ],
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "**/*.css"
+  ],
   "engines": {
-    "node": ">=22.14"
+    "node": ">=20.9"
+  },
+  "files": [
+    "dist",
+    "!dist/**/dummy"
+  ],
+  "exports": {
+    "./package.json": "./package.json",
+    "./styles.css": "./dist/styles.css",
+    "./tokens.css": "./dist/tokens.css",
+    "./provider": {
+      "types": "./dist/shared/provider/provider.d.ts",
+      "default": "./dist/shared/provider/provider.js"
+    },
+    "./theme": {
+      "types": "./dist/shared/theme/theme-script.d.ts",
+      "default": "./dist/shared/theme/theme-script.js"
+    },
+    "./cn": {
+      "types": "./dist/shared/cn.d.ts",
+      "default": "./dist/shared/cn.js"
+    },
+    "./classes": {
+      "types": "./dist/shared/classes.d.ts",
+      "default": "./dist/shared/classes.js"
+    },
+    "./labels/*": {
+      "types": "./dist/shared/labels/*.d.ts",
+      "default": "./dist/shared/labels/*.js"
+    },
+    "./icons": {
+      "types": "./dist/icons/index.d.ts",
+      "default": "./dist/icons/index.js"
+    },
+    "./icons/*": {
+      "types": "./dist/icons/data/*.d.ts",
+      "default": "./dist/icons/data/*.js"
+    },
+    "./schemas/*": {
+      "types": "./dist/components/*/schema.d.ts",
+      "default": "./dist/components/*/schema.js"
+    },
+    "./meta/*": {
+      "types": "./dist/components/*/meta.d.ts",
+      "default": "./dist/components/*/meta.js"
+    },
+    "./*": {
+      "types": "./dist/components/*/index.d.ts",
+      "default": "./dist/components/*/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "imports": {
+      "#shared/*": "./dist/shared/*",
+      "#icons/*": "./dist/icons/*",
+      "#components/*": "./dist/components/*"
+    }
   },
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "build": "tsx scripts/build.ts",
+    "build:watch": "tsx scripts/build.ts --watch",
     "test": "vitest run",
     "check:structure": "tsx scripts/check-structure.ts",
     "check:boundaries": "tsx scripts/check-boundaries.ts",
     "check:contrast": "tsx scripts/check-contrast.ts",
+    "check:package": "tsx scripts/check-package.ts",
+    "check:pack": "tsx scripts/check-pack.ts",
     "rules:sync": "tsx scripts/rules-sync.ts",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm check:structure && pnpm check:boundaries && pnpm check:css && pnpm check:icons && pnpm check:readme && pnpm check:contrast && pnpm test:e2e && pnpm rules:sync --check",
+    "check": "pnpm lint && pnpm typecheck && pnpm check:package && pnpm test && pnpm check:structure && pnpm check:boundaries && pnpm check:css && pnpm check:icons && pnpm check:readme && pnpm check:contrast && pnpm test:e2e && pnpm rules:sync --check",
     "check:css": "tsx scripts/check-css.ts",
     "icons:build": "tsx scripts/icons-build.ts",
     "check:icons": "tsx scripts/icons-build.ts --check",
@@ -47,9 +109,11 @@
     "test:e2e": "pnpm harness:build && playwright test",
     "readme:build": "tsx scripts/readme-build.ts",
     "check:readme": "tsx scripts/readme-build.ts --check",
-    "test:consumers": "tsx scripts/consumer-smoke.ts"
+    "test:consumers": "tsx scripts/consumer-smoke.ts",
+    "prepublishOnly": "pnpm check:package"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "0.18.5",
     "@axe-core/playwright": "4.13.0",
     "@eslint/js": "10.0.1",
     "@playwright/test": "1.63.0",
@@ -63,6 +127,7 @@
     "eslint": "10.12.0",
     "happy-dom": "20.14.5",
     "jiti": "2.7.0",
+    "publint": "0.3.25",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "tailwindcss": "4.3.3",
@@ -73,11 +138,11 @@
   },
   "dependencies": {
     "@base-ui/react": "1.8.0",
-    "class-variance-authority": "0.7.1",
-    "clsx": "2.1.1",
-    "server-only": "0.0.1",
-    "tailwind-merge": "3.7.0",
-    "zod": "4.6.5"
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "server-only": "^0.0.1",
+    "tailwind-merge": "^3.7.0",
+    "zod": "^4.6.5"
   },
   "peerDependencies": {
     "react": "^19.0.0",

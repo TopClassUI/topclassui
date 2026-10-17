@@ -3,7 +3,7 @@
 import { useActionState, useCallback, useEffect, useRef } from 'react'
 
 import type { FormErrors } from '#shared/form-errors.js'
-import type { FormActionHookProps } from './types.js'
+import type { FormActionHookProps, FormActionHookResult } from './types.js'
 
 /** True when any field holds a message: an empty string or an empty list is no error. */
 function hasErrors(errors: FormErrors | undefined): boolean {
@@ -28,7 +28,7 @@ function focusFirstInvalid(form: HTMLFormElement): void {
 }
 
 /** FormAction's one hook: React's action state, the form's ref, and the focus on the first invalid control after an answer with errors. */
-export function useFormAction({ action, initialState, permalink, ref: forwarded }: FormActionHookProps) {
+export function useFormAction({ action, initialState, permalink, ref: forwarded }: FormActionHookProps): FormActionHookResult {
   const [state, formAction, pending] = useActionState(action, initialState, permalink)
   const form = useRef(null as HTMLFormElement | null)
   // The state the page was rendered with: no answer has come yet, so nothing moves the focus.
