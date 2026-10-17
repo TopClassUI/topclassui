@@ -95,3 +95,63 @@ export function screamingConstants(source: string): string[] {
   const re = new RegExp(String.raw`^(?:export\s+)?const\s+${name}\s*(?::[^=]+)?=\s*${literal}`, 'gm')
   return [...source.matchAll(re)].map((m) => m[1] ?? '')
 }
+
+/** The two ids that hand out Base UI's useRender: its own subpath and the barrel. */
+const USE_RENDER_HOME = '@base-ui/react/use-render'
+const BASE_UI_BARREL = '@base-ui/react'
+
+/** A useRender that survives compilation (R-5.7-4); `import type` and `{ type useRender }` erase. */
+export function runtimeUseRender(source: string): boolean {
+  const quoted = (id: string) => String.raw`['"]` + id.replace(/[/@.-]/g, '\\$&') + String.raw`['"]`
+  const home = quoted(USE_RENDER_HOME)
+  const barrel = quoted(BASE_UI_BARREL)
+  const named = new RegExp(String.raw`import\s+(?!type\s)(?:[\w$]+\s*,\s*)?\{([^}]*)\}\s*from\s*(?:${home}|${barrel})`, 'g')
+  for (const m of source.matchAll(named)) {
+    const names = (m[1] ?? '').split(',').map((part) => part.trim())
+    if (names.some((name) => /^useRender\b/.test(name))) return true
+  }
+  // A default, namespace, side-effect, dynamic or require form of the subpath runs it too.
+  const whole = new RegExp(String.raw`(?:\bimport\s+(?!type\s)(?:[\w$*][^'"{}]*?\s+from\s*)?|\bimport\s*\(\s*|\brequire\s*\(\s*)${home}`)
+  if (whole.test(source)) return true
+  return memberHookCalls(source, namespaceNamesOf(source, BASE_UI_BARREL)).includes('useRender')
+}
+
+/** The source with comments and string contents blanked, so a brace inside either is not counted. */
+function codeOnly(source: string): string {
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .replace(/\/\/.*$/gm, ' ')
+    .replace(/'(?:\\.|[^'\\\r\n])*'|"(?:\\.|[^"\\\r\n])*"/g, "''")
+}
+
+/** Each parameter destructured straight from a props type: the text between `({` and `}: XProps`. */
+function destructuredProps(code: string): string[] {
+  const out: string[] = []
+  for (const m of code.matchAll(/\(\s*\{/g)) {
+    const body = m.index + m[0].length
+    let depth = 0
+    for (let i = body - 1; i < code.length; i++) {
+      if (code[i] === '{') depth++
+      else if (code[i] === '}' && --depth === 0) {
+        if (/^\s*:\s*[\w$.]*Props\b/.test(code.slice(i + 1))) out.push(code.slice(body, i))
+        break
+      }
+    }
+  }
+  return out
+}
+
+/** A component that takes `render` from its props, by destructuring or by member access. */
+export function acceptsRenderProp(source: string): boolean {
+  const code = codeOnly(source)
+  // Only the top level of the pattern: a nested `{ render }` is some other object's key.
+  const topLevel = (body: string) => body.replace(/\{[^{}]*\}/g, '').replace(/\{[^{}]*\}/g, '')
+  return destructuredProps(code).some((body) => /(?:^|,)\s*render\s*(?:[,=:]|$)/.test(topLevel(body)))
+    || /\bprops\s*\.\s*render\b/.test(code)
+}
+
+/** renderElement imported at runtime from shared/render, by alias or by relative path. */
+export function importsRenderElement(source: string): boolean {
+  const re = /import\s+(?!type\s)\{([^}]*)\}\s*from\s*['"](?:#shared\/render\.js|(?:\.{1,2}\/)+(?:shared\/)?render\.js)['"]/g
+  return [...source.matchAll(re)].some((m) => (m[1] ?? '').split(',').some((part) => part.trim().split(/\s+as\s+/)[0] === 'renderElement'))
+}

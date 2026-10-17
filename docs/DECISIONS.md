@@ -6,6 +6,30 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-17 - R-5.1-2 is checked, and icon-registry is its one exemption
+
+**Decision.** `check-structure` enforces R-5.1-2 (`scripts/lib/index-markup.ts`). A folder is C when its `meta.ts` says `rendering: 'client'`, PLAN 18's C; every folder under `src/connectors/` is covered whatever its meta says. Re-exporting `./client.js` does not mark a folder as C, because split components (Banner, Tag, Rating) do it beside their server markup. For a covered folder, every top-level statement of `index.tsx` is a re-export from a file of its own folder (`export ... from './...'`) or an `import type`; anything else is reported, as `markup` when it holds JSX. Twenty C folders already passed; `icon-registry` did not, and is exempt by name in `INDEX_MARKUP_EXEMPT`.
+
+**Why the exemption.** `icon-registry` is an entry point, not a catalog row (the 2026-09-25 and 2026-10-05 entries), and is `rendering: 'client'` because its registry is module state, not because it is a `'use client'` module. Its `<Icon>` and `registerIcons()` must share that module and stay directive-less: a `'use client'` file would turn `registerIcons` into a client reference that a server file cannot call. Moving `<Icon>` into a `client.tsx` would need that directive or an R-8.1-1 exception for a directive-less `client.tsx`. A test fails if the exempt entry ever stops holding markup, so the exemption cannot outlive its reason.
+
+**Affects** `scripts/check-structure.ts`, `scripts/lib/index-markup.ts` and its test, and `docs/RULES.md`.
+
+## 2026-10-17 - R-5.3-2 is linted, with three allowances
+
+**Decision.** `topclass/dir-aware-transforms` rejects, in any class string under `src/`: a `translate-x-*` or two-axis `translate-*` whose x does not multiply by `--tc-dir`, the same inside an arbitrary `translateX()`, `translate()`, `translate3d()` or `[translate:]`; an origin on a physical side (`origin-left`, `origin-right`, `origin-top-left` and the arbitrary forms); a gradient pointed at a physical side (`bg-linear-to-r`, `bg-linear-to-l`, `bg-gradient-to-r`, `bg-gradient-to-l`, the diagonals, and an inline-axis angle unless it multiplies by `--tc-dir`); a direction variant (`rtl:`, `ltr:`, `[dir=rtl]`, `:dir()`) on anything but an `object-*` or `bg-*` position; and a physical `object-*` or `bg-*` position with no `rtl:` mirror in the same string. Three things pass by name: `rtl:-scale-x-100`, the mirror of a directional icon that PLAN section 7 writes out (Svg, Icon); an x of `var(--*-swipe-movement-x)`, the pointer offset Base UI measures in physical px for the swiped Drawer and Toast; and `origin-(--transform-origin)`, which Base UI measures from the anchor. A zero x and block-axis motion (`translate-y-*`, `translateY()`, `bg-linear-to-b`, 0 and 180 degrees) need no direction. Tests and demos are exempt, as for the other class rules.
+
+**Why.** Each allowance is already a physical value computed for the current direction, so multiplying it by `--tc-dir` would mirror it twice. The icon mirror stays the one `rtl:` class rather than `scale-x-(--tc-dir)`, because PLAN section 7 specifies it and ten test files and the breadcrumb spec pin it. No component in `src/` broke the rule when it was armed.
+
+**What it affects.** CSS files are outside ESLint; none of them translates, sets an origin or draws a gradient today. A percentage `object-[25%_75%]` or `bg-position-[...]` is not read for its x.
+
+## 2026-10-17 - R-8.5-1 is checked, and six lists are exempt by name
+
+**Decision.** `check-structure` requires `useCollection` in the `hook.ts` of every component folder whose `types.ts` takes an `items` prop, `CollectionProps` (whole or picked) or `MenuContract` (`scripts/lib/collections.ts`). Combobox, Command and TreeView pass. Six folders render items without it and are named in `COLLECTION_EXEMPT`, each by a decision: Select (2026-10-15), Dropdown (2026-10-14), Table and Timeline (2026-10-10), and, new here, Breadcrumb and Stepper, a trail of links and a handful of steps, both rendered on the server, where a hook cannot run and a list never grows long enough to window. An exemption never covers props that take `CollectionProps`, and one that no longer holds (the folder calls `useCollection`, or renders no items) fails the check, so the table cannot grow stale. `e2e/collections.spec.ts` drives every folder whose hook calls `useCollection`: its `ten-thousand` demo keeps fewer than a hundred rows mounted at the top, the middle and the end, and when its props take `loadMore`, its `load-more` demo asks once at the end.
+
+**Why.** The rule was "not yet" while three lists already windowed and six did not, each for a recorded reason; a check that names the six keeps the next list honest without forcing windowing on a breadcrumb. FileUpload's list renders the files it holds, not an `items` prop, at most `maxFiles` (100, under the 200 threshold) and unwindowed by the 2026-10-14 entry, so the check does not see it. Tabs, Sidebar, Navbar, Accordion, RadioGroup and SegmentedControl are composed from parts, not data, and Pagination draws a bounded run of page cells.
+
+**Affects.** `scripts/check-structure.ts`, `scripts/lib/collections.ts` and its test, four rows in `scripts/mutations/scripts.ts`, `e2e/collections.spec.ts`, and R-8.5-1 in `docs/RULES.md`.
+
 ## 2026-10-17 - R-8.5-2 is linted, and the Banner keeps its dismissal in localStorage
 
 **Decision.** `topclass/no-fetch-in-components` refuses `fetch()`, `XMLHttpRequest`, `new Request()`, `localStorage`, `sessionStorage`, `indexedDB`, `caches`, React's `cache()`, `unstable_cache` and any import from `next/cache` under `src/components`, `src/connectors` and `src/shared`; tests and `dummy/` are exempt. One exemption: `src/components/banner/lib.ts` may use `localStorage` and nothing else on the list, through the rule's `allow` option in `eslint.config.ts`.
