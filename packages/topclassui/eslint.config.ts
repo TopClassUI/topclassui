@@ -34,6 +34,7 @@ export default defineConfig(
       'topclass/flat-part-exports': 'error',
       'topclass/root-part-is-named-root': 'error',
       'topclass/text-comes-from-labels': 'error',
+      'topclass/props-derived-at-the-seam': 'error',
 
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/ban-ts-comment': 'error',

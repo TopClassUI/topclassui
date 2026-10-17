@@ -28,6 +28,7 @@ const config = [
       'topclass/flat-part-exports': 'error',
       'topclass/root-part-is-named-root': 'error',
       'topclass/text-comes-from-labels': 'error',
+      'topclass/props-derived-at-the-seam': 'error',
     },
   },
 ] as unknown as Linter.Config[]
@@ -616,6 +617,62 @@ describe('R-5.11-1: built-in text comes from labels', () => {
       expect(ids(code).filter((r) => r?.startsWith('topclass/')), code).toEqual([])
     })
   }
+})
+
+describe('R-5.7-5: public types are derived from Base UI at the seam', () => {
+  const RULE = 'topclass/props-derived-at-the-seam'
+  const IMPORT = "import type { Dialog as Base } from '@base-ui/react/dialog'\n"
+  const own = (code: string, filename = 'src/components/x/types.ts') =>
+    lint(code, filename).filter((m) => m.ruleId === RULE).map((m) => m.messageId)
+
+  const bad: [string, string, string][] = [
+    ['a type re-exported from Base UI', "export type { DialogRootProps } from '@base-ui/react/dialog'", 'reexport'],
+    ['a namespace re-exported from Base UI', "export * from '@base-ui/react/dialog'", 'reexport'],
+    ['an imported Base UI name exported again', `${IMPORT}export type { Base }`, 'reexport'],
+    ['the props aliased whole', `${IMPORT}export type DialogRootProps = Base.Root.Props`, 'bare'],
+    ['the props in an intersection', `${IMPORT}export type DialogRootProps = Base.Root.Props & { size?: string }`, 'bare'],
+    ['an interface that extends the props', `${IMPORT}export interface DialogRootProps extends Base.Root.Props {}`, 'bare'],
+    ['an Omit that keeps className', `${IMPORT}export type DialogRootProps = Omit<Base.Root.Props, 'handle'>`, 'omit'],
+    ['an Omit whose alias of keys keeps className', `${IMPORT}type Owned = 'handle' | 'children'\nexport type P = Omit<Base.Root.Props, Owned>`, 'omit'],
+    ['a pinned alias omitted without className', `${IMPORT}type BaseRoot = Base.Root.Props<string>\nexport type P = Omit<BaseRoot, 'children'>`, 'omit'],
+    ['a pinned alias that is exported', `${IMPORT}export type BaseRoot = Base.Root.Props<string>`, 'bare'],
+    ['a Pick that takes className', `${IMPORT}export type P = Pick<Base.Root.Props, 'open' | 'className'>`, 'pick'],
+    ['a namespace with Props directly on it', "import type { RadioGroup } from '@base-ui/react/radio-group'\nexport type P = RadioGroup.Props & {}", 'bare'],
+  ]
+  for (const [label, code, messageId] of bad) {
+    it(`fails on ${label}`, () => {
+      expect(own(code), code).toEqual([messageId])
+    })
+  }
+
+  const good: [string, string][] = [
+    ['the alias the rule names', `${IMPORT}export type DialogRootProps = Omit<Base.Root.Props, 'className'> & { size?: string }`],
+    ['className among other omitted keys', `${IMPORT}export type P = Omit<Base.Trigger.Props, 'className' | 'handle' | 'payload'>`],
+    ['className through a local alias of keys', `${IMPORT}type Removed = 'handle'\ntype Owned = 'className' | Removed\nexport type P = Omit<Base.Root.Props, Owned>`],
+    ['a key alias declared after its use', `${IMPORT}export type P = Omit<Base.Root.Props, Owned>\ntype Owned = 'className' | 'ref'`],
+    ['a private alias that pins the generics', `${IMPORT}type BaseRoot = Base.Root.Props<string>\nexport type P = Omit<BaseRoot, 'className'>`],
+    ['a Pick of named props', `${IMPORT}export type P = Pick<Base.Portal.Props, 'container' | 'keepMounted'>`],
+    ['one prop read by index', `${IMPORT}export type DialogModal = NonNullable<Base.Root.Props['modal']>`],
+    ['the keys of the props', `${IMPORT}type Owned = keyof Base.Root.Props`],
+    ['an interface that extends the Omit', `${IMPORT}export interface P extends Omit<Base.Root.Props, 'className'> {}`],
+    ['an alias of a Base UI type that is not props', `${IMPORT}export type DialogChangeDetails = Base.Root.ChangeEventDetails`],
+    ['a Props name from anywhere but Base UI', "import type { Thing } from './thing.js'\nexport type P = Thing.Props"],
+  ]
+  for (const [label, code] of good) {
+    it(`allows ${label}`, () => {
+      expect(own(code), code).toEqual([])
+    })
+  }
+
+  it('reads only types.ts for the derivation, where R-8.3-4 puts every prop type', () => {
+    const code = `${IMPORT}export type P = Base.Root.Props`
+    expect(own(code, 'src/shared/overlay.ts')).toEqual([])
+  })
+
+  it('refuses a Base UI re-export in any file, not only types.ts', () => {
+    const code = "export type { DialogRootProps } from '@base-ui/react/dialog'"
+    expect(own(code, 'src/components/dialog/index.tsx')).toEqual(['reexport'])
+  })
 })
 
 // Each of these is legitimate code a component will contain, and each was a false
