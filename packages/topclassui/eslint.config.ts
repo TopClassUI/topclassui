@@ -16,7 +16,7 @@ export default defineConfig(
   },
 
   // The library itself. Every rule in docs/RULES.md that a linter can enforce
-  // applies here and nowhere else: demos and scripts are deliberately exempt.
+  // applies here; tooltip-content-is-text also covers demos, e2e and scripts (below).
   {
     files: ['src/**/*.{ts,tsx}'],
     plugins: { topclass },
