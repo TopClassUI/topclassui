@@ -107,7 +107,7 @@ They arrive with the phases that need them.
 
 ## 7. Collections and scrolling
 
-- **R-8.5-1** Any component that renders items uses `CollectionProps` and `useCollection`: the `--tc-list-rows` knob, windowing above the threshold, and optional page-by-page loading. _(check-structure, which requires useCollection in the hook of every folder whose props take items, CollectionProps or MenuContract, less the exemptions docs/DECISIONS.md records; e2e/collections.spec, which keeps fewer than a hundred of ten thousand rows mounted and sees loadMore called at the end)_
+- **R-8.5-1** Any component that renders items uses `CollectionProps` and `useCollection`: the `--tc-list-rows` knob, windowing above the threshold, and optional page-by-page loading. _(check-structure, which requires useCollection in the hook of every folder whose props take items, CollectionProps, MenuContract or visibleRows, or whose code reads --tc-list-rows, less the exemptions docs/DECISIONS.md records; e2e/collections.spec, which keeps fewer than a hundred of ten thousand rows mounted in every windowed list and sees loadMore called at the end of every list whose props take it)_
 - **R-8.5-2** Components never fetch, cache or paginate; they call `loadMore()` and render what they are given. _(not yet - planned: eslint)_
 - **R-10.5-1** Popups use `POPUP_BOUNDS` and the row cap, dialogs and drawers scroll their body with sticky header and footer, and every scroll container inside an overlay sets `overscroll-behavior: contain`. _(not yet - no overlay component exists yet)_
 - **R-10.5-2** A tooltip is one or two lines of plain text; anything larger, or anything with a link or control, is a Popover. _(not yet - planned: eslint)_
