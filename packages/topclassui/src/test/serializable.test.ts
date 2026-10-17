@@ -51,31 +51,74 @@ describe('the keys a prop type lets cross that it should not', () => {
       .toEqualTypeOf<'onChange'>()
     expectTypeOf<UnserializableKeys<Span & { at: Date; render: () => ReactNode }>>().toEqualTypeOf<'at' | 'render'>()
   })
+
+  it('fails closed on any and unknown, and sets aside only the attributes React itself types as any', () => {
+    expectTypeOf<HoldsUnserializable<unknown>>().toEqualTypeOf<true>()
+    expectTypeOf<HoldsUnserializable<ReturnType<typeof JSON.parse>>>().toEqualTypeOf<true>()
+    expectTypeOf<HoldsUnserializable<{ data: unknown }>>().toEqualTypeOf<true>()
+    expectTypeOf<UnserializableKeys<ComponentPropsWithRef<'a'>>>().toEqualTypeOf<never>()
+    expectTypeOf<UnserializableKeys<Span & { data: unknown; raw: ReturnType<typeof JSON.parse> }>>().toEqualTypeOf<'data' | 'raw'>()
+    expectTypeOf<UnserializableKeys<Omit<ComponentPropsWithRef<'a'>, 'download'> & { download: () => void }>>()
+      .toEqualTypeOf<'download'>()
+  })
 })
 
 const COMPONENTS = new URL('../components/', import.meta.url).pathname
 
-/** The folders whose index.tsx defines a component, read from the source rather than assumed. */
+/** What index.tsx renders itself or re-exports from a server part or its skeleton; client.js re-exports are not these. */
+function serverNames(source: string): string[] {
+  const own = [...source.matchAll(/^export (?:default )?(?:async )?function ([A-Z]\w*)|^export const ([A-Z][a-z]\w*)/gm)]
+    .map((match) => match[1] ?? match[2] ?? '')
+  const parts = [...source.matchAll(/^export \{([^}]*)\} from '\.\/(?:parts\/[\w-]+|skeleton)\.js'/gm)]
+    .flatMap((match) => (match[1] ?? '').split(',').map((name) => name.trim()).filter(Boolean))
+  return [...own, ...parts]
+}
+
+/** The names whose props the test file never hands to UnserializableKeys. */
+function unchecked(names: readonly string[], test: string): string[] {
+  return names.filter((name) => !new RegExp(`expectTypeOf<UnserializableKeys<${name}Props[<>]`).test(test))
+}
+
+const source = (slug: string) => readFileSync(join(COMPONENTS, slug, 'index.tsx'), 'utf8')
+
+/** The folders whose index.tsx defines or re-exports a server renderer, read from the source rather than assumed. */
 const rendering = readdirSync(COMPONENTS, { withFileTypes: true })
   .filter((entry) => entry.isDirectory())
   .map((entry) => entry.name)
-  .filter((slug) => /^export (async )?function [A-Z]/m.test(readFileSync(join(COMPONENTS, slug, 'index.tsx'), 'utf8')))
+  .filter((slug) => serverNames(source(slug)).length > 0)
+
+describe('the names the coverage reads, on fixtures', () => {
+  it('reads every form of a server export and leaves the client re-exports and constants out', () => {
+    const fixture = [
+      'export function Alpha() {}', 'export async function Beta() {}', 'export default function Gamma() {}',
+      'export const Delta = () => null', 'export const DELTA_SIZE = 4', "export { EpsRoot, EpsPart } from './parts/eps-root.js'",
+      "export { EpsSkeleton } from './skeleton.js'", "export { EpsLive } from './client.js'", "export { epsVariants } from './variants.js'",
+    ].join('\n')
+    expect(serverNames(fixture)).toEqual(['Alpha', 'Beta', 'Gamma', 'Delta', 'EpsRoot', 'EpsPart', 'EpsSkeleton'])
+  })
+
+  it('counts an assertion only, never a comment or a longer name', () => {
+    const test = [
+      '// UnserializableKeys<AlphaProps> is pinned below', 'expectTypeOf<UnserializableKeys<BetaPropsX>>()',
+      'expectTypeOf<UnserializableKeys<GammaProps>>()', 'expectTypeOf<UnserializableKeys<DeltaProps<{ a: 1 }>>>()',
+    ].join('\n')
+    expect(unchecked(['Alpha', 'Beta', 'Gamma', 'Delta'], test)).toEqual(['Alpha', 'Beta'])
+  })
+})
 
 describe('every server component has its serializable-props test', () => {
-  it('finds the components that render in index.tsx, so an empty list cannot pass', () => {
+  it('finds the components that render or re-export a server part, so an empty list cannot pass', () => {
     expect(rendering).toEqual([
-      'alert', 'avatar-group', 'badge', 'banner', 'breadcrumb', 'button', 'code-block', 'empty-state', 'field',
-      'form', 'icon', 'icon-registry', 'input', 'kbd', 'meter', 'pagination', 'progress', 'rating', 'separator',
-      'skeleton', 'spinner', 'stepper', 'svg', 'table', 'tag', 'textarea', 'timeline',
+      'alert', 'avatar', 'avatar-group', 'badge', 'banner', 'breadcrumb', 'button', 'card', 'code-block', 'empty-state',
+      'field', 'form', 'icon', 'icon-registry', 'input', 'kbd', 'meter', 'navbar', 'pagination', 'progress', 'rating',
+      'separator', 'sidebar', 'skeleton', 'spinner', 'stepper', 'svg', 'table', 'tag', 'textarea', 'timeline',
     ])
   })
 
   for (const slug of rendering) {
-    it(`${slug}: test/${slug}.serializable.test.ts checks the props of what index.tsx renders`, () => {
-      const source = readFileSync(join(COMPONENTS, slug, 'index.tsx'), 'utf8')
-      const names = [...source.matchAll(/^export (?:async )?function ([A-Z]\w*)/gm)].map((match) => match[1] ?? '')
+    it(`${slug}: test/${slug}.serializable.test.ts checks the props of every server renderer index.tsx exports`, () => {
       const test = readFileSync(join(COMPONENTS, slug, 'test', `${slug}.serializable.test.ts`), 'utf8')
-      expect(names.filter((name) => !test.includes(`UnserializableKeys<${name}Props`)), slug).toEqual([])
+      expect(unchecked(serverNames(source(slug)), test), slug).toEqual([])
     })
   }
 })
