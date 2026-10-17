@@ -1,6 +1,12 @@
+import { existsSync } from 'node:fs'
+
 import { defineConfig, devices } from '@playwright/test'
 
 import { URL_ENV } from '../lib/consumer-smoke.js'
+
+// The container ships one Chromium build; a pinned Playwright may expect another (as in ../../playwright.config.ts).
+const INSTALLED = '/opt/pw-browsers/chromium'
+const launch = existsSync(INSTALLED) ? { executablePath: INSTALLED } : {}
 
 const baseURL = process.env[URL_ENV]
 if (!baseURL) throw new Error(`consumer-smoke: ${URL_ENV} is not set. pnpm test:consumers sets it and starts the app it names.`)
@@ -14,5 +20,5 @@ export default defineConfig({
   retries: 0,
   timeout: 60_000,
   reporter: 'list',
-  use: { ...devices['Desktop Chrome'], baseURL },
+  use: { ...devices['Desktop Chrome'], baseURL, launchOptions: launch },
 })
