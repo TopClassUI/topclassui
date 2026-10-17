@@ -27,6 +27,15 @@ export interface UseCollectionResult<T> {
 
 const EMPTY: WindowResult = { start: 0, end: 0, paddingStart: 0, paddingEnd: 0, totalHeight: 0 }
 
+/** A computed length in px; `auto` and an empty value are 0. */
+const px = (value: string) => Number.parseFloat(value) || 0
+
+/** Where the first row starts inside the list, and the room scroll-padding keeps at each edge. */
+function edgesOf(node: HTMLElement) {
+  const style = getComputedStyle(node)
+  return { padding: px(style.paddingTop), start: px(style.scrollPaddingTop), end: px(style.scrollPaddingBottom) }
+}
+
 /** useLayoutEffect warns during a server render, and there is nothing to measure there. */
 const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
@@ -156,9 +165,13 @@ export function useCollection<T>(props: CollectionProps<T>): UseCollectionResult
     (index: number, block: ScrollBlock = 'nearest') => {
       const node = containerRef.current
       if (!node) return
-      node.scrollTop = offsetForIndex(index, {
+      const edge = edgesOf(node)
+      // The rows start below the list's own padding, and the edges are where scroll-padding puts them, as scrollIntoView does.
+      const shift = edge.padding - edge.start
+      node.scrollTop = shift + offsetForIndex(index, {
+        scrollTop: node.scrollTop - shift,
         count,
-        viewportHeight: node.clientHeight,
+        viewportHeight: Math.max(0, node.clientHeight - edge.start - edge.end),
         estimateRowHeight,
         overscan: defaults.overscan,
         measured: measuredRef.current,

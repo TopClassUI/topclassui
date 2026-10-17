@@ -89,12 +89,13 @@ export function getWindow(input: WindowInput): WindowResult {
   }
 }
 
-/** Scroll offset that brings a row into view, for scrollToIndex and scrollToKey. */
+/** Scroll offset that brings a row into view, for scrollToIndex and scrollToKey. `nearest` reads
+ * `scrollTop`: a row above the view goes to the top edge, one below to the bottom, one in view stays. */
 export function offsetForIndex(
   index: number,
-  input: Omit<WindowInput, 'scrollTop'> & { block?: 'start' | 'center' | 'nearest' },
+  input: WindowInput & { block?: 'start' | 'center' | 'nearest' },
 ): number {
-  const { count, viewportHeight, block = 'nearest' } = input
+  const { count, viewportHeight, scrollTop, block = 'nearest' } = input
   const estimate = Math.max(1, input.estimateRowHeight)
   if (count <= 0) return 0
 
@@ -103,12 +104,13 @@ export function offsetForIndex(
   const rowStart = startAt(starts, clamped)
   const rowHeight = heightOf(clamped, estimate, input.measured)
   const maxScroll = Math.max(0, startAt(starts, count) - viewportHeight)
+  const within = (offset: number) => Math.min(Math.max(0, offset), maxScroll)
 
-  if (block === 'start') return Math.min(rowStart, maxScroll)
-  if (block === 'center') {
-    return Math.min(Math.max(0, rowStart - (viewportHeight - rowHeight) / 2), maxScroll)
-  }
-  return Math.min(Math.max(0, rowStart - viewportHeight + rowHeight), maxScroll)
+  if (block === 'start') return within(rowStart)
+  if (block === 'center') return within(rowStart - (viewportHeight - rowHeight) / 2)
+  if (rowStart < scrollTop) return within(rowStart)
+  if (rowStart + rowHeight > scrollTop + viewportHeight) return within(rowStart + rowHeight - viewportHeight)
+  return scrollTop
 }
 
 /** R-8.5-1: ask for the next page once, when the window is within the threshold of the end. */

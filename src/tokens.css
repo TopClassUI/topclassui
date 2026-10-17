@@ -49,6 +49,9 @@
 
   /* Set inline by Progress from its clamped value; declared here so R-4-2 can see it. */
   --tc-progress-value: 0%;
+  /* Set inline by a windowed list to the spacers of useCollection, read by two spacers and never by its padding. */
+  --tc-list-pad-start: 0px;
+  --tc-list-pad-end: 0px;
 }
 
 /* Both selectors, so a light island inside a dark page resets every colour. */
