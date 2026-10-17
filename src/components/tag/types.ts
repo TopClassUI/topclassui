@@ -31,3 +31,8 @@ export interface TagRemoveProps {
 
 /** The removable tag, once its tone and size are settled. Internal. */
 export type TagRemovableProps = Omit<TagProps, 'tone' | 'size' | 'onRemove'> & Pick<TagRemoveProps, 'tone' | 'size' | 'onRemove'>
+
+/** R-8.3-4: the tag's own size prop, so the two cannot describe different boxes. */
+export type TagSkeletonProps =
+  Omit<ComponentPropsWithRef<'span'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
+  & Pick<TagDesignProps, 'size'>

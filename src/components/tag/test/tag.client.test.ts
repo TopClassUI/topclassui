@@ -10,15 +10,15 @@ const FOLDER = join(import.meta.dirname, '..')
 const read = (file: string) => readFileSync(join(FOLDER, file), 'utf8')
 
 describe('the folder is a split component: a server Tag and its client x', () => {
-  it('holds the server files of Unit 2, plus client.tsx and hook.ts', () => {
+  it('holds the server files of Unit 2, plus client.tsx, hook.ts and the skeleton', () => {
     expect(readdirSync(FOLDER).sort()).toEqual([
       'README.md', 'boundaries.ts', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx',
-      'meta.ts', 'schema.ts', 'test', 'types.ts', 'variants.ts',
+      'meta.ts', 'schema.ts', 'skeleton.tsx', 'test', 'types.ts', 'variants.ts',
     ])
   })
 
-  it('adds no public name: the x is internal, so a page exports what it did before', () => {
-    expect(Object.keys(tag).sort()).toEqual(['Tag', 'tagVariants'])
+  it('adds no public name for the x, which is internal: only the skeleton beside the tag', () => {
+    expect(Object.keys(tag).sort()).toEqual(['Tag', 'TagSkeleton', 'tagVariants'])
   })
 })
 

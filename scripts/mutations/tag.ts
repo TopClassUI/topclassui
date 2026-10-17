@@ -80,4 +80,28 @@ export const MUTATIONS: Mutation[] = [
     from: 'Tag renders on the server, with no client part.',
     to: 'Tag renders on the server and ships no JavaScript.',
   },
+  {
+    label: 'the tag skeleton loses its border width, so it is 2 px shorter than the tag',
+    file: 'src/components/tag/skeleton.tsx',
+    from: '        BORDER_WIDTH,\n',
+    to: '',
+  },
+  {
+    label: 'the tag skeleton lets a caller un-hide it',
+    file: 'src/components/tag/skeleton.tsx',
+    from: '      {...rest}\n      aria-hidden\n',
+    to: '      aria-hidden\n      {...rest}\n',
+  },
+  {
+    label: 'the tag skeleton passes className first, so the consumer loses every conflict',
+    file: 'src/components/tag/skeleton.tsx',
+    from: "      className={cn(\n        'inline-flex animate-pulse rounded-chip border-transparent bg-neutral-soft motion-reduce:animate-none',\n        BORDER_WIDTH,\n        TAG_SIZE[size],\n        SKELETON_WIDTH[size],\n        className,\n      )}",
+    to: "      className={cn(\n        className,\n        'inline-flex animate-pulse rounded-chip border-transparent bg-neutral-soft motion-reduce:animate-none',\n        BORDER_WIDTH,\n        TAG_SIZE[size],\n        SKELETON_WIDTH[size],\n      )}",
+  },
+  {
+    label: 'a tag skeleton className replaces its classes instead of merging, so the box disappears',
+    file: 'src/components/tag/skeleton.tsx',
+    from: "      className={cn(\n        'inline-flex",
+    to: "      className={className ?? cn(\n        'inline-flex",
+  },
 ]

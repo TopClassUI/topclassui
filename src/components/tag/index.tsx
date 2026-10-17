@@ -53,4 +53,5 @@ function Removable({ tone, size, className, children, onRemove, ...rest }: TagRe
 }
 
 export { tagVariants } from './variants.js'
-export type { TagDesignProps, TagProps, TagTone } from './types.js'
+export { TagSkeleton } from './skeleton.js'
+export type { TagDesignProps, TagProps, TagSkeletonProps, TagTone } from './types.js'

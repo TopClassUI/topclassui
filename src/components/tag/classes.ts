@@ -62,3 +62,8 @@ export const REMOVE_SIZE = {
   xl: '-my-[calc(var(--spacing-pad-y-xl)+var(--tc-line-width))]',
   custom: '',
 } as const satisfies Record<Size, string>
+
+/** Width only: the height comes from TAG_SIZE, so the two cannot drift apart. */
+export const SKELETON_WIDTH = {
+  xs: 'w-12', sm: 'w-14', md: 'w-16', lg: 'w-20', xl: 'w-24', custom: '',
+} as const satisfies Record<Size, string>
