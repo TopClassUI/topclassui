@@ -183,4 +183,18 @@ export const ar = {
     todo: 'لم يبدأ',
     error: 'يحتاج إلى مراجعة',
   },
+  valueCheck: {
+    tooLong: byCount({
+      zero: 'لا يُسمح بأي حرف',
+      one: 'حرف واحد على الأكثر',
+      two: 'حرفان على الأكثر',
+      few: (n) => `${n} أحرف على الأكثر`,
+      many: (n) => `${n} حرفًا على الأكثر`,
+      other: (n) => `${n} حرف على الأكثر`,
+    }),
+    patternMismatch: 'استخدم الصيغة المطلوبة',
+    rangeUnderflow: (n, fmt) => `أدخل ${fmt.format(n)} أو أكثر`,
+    rangeOverflow: (n, fmt) => `أدخل ${fmt.format(n)} أو أقل`,
+    stepMismatch: 'أدخل إحدى القيم المسموح بها',
+  },
 } satisfies Labels

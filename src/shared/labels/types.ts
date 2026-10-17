@@ -142,6 +142,14 @@ export interface Labels {
     readonly todo: string
     readonly error: string
   }
+  /** The message a text control reports when a value set by code or a paste breaks a rule its attribute promised. */
+  readonly valueCheck: {
+    readonly tooLong: CountLabel
+    readonly patternMismatch: string
+    readonly rangeUnderflow: CountLabel
+    readonly rangeOverflow: CountLabel
+    readonly stepMismatch: string
+  }
 }
 
 /** Only the keys a consumer wants to change; everything else keeps its default. */

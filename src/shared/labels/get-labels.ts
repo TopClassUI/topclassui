@@ -45,6 +45,7 @@ function withOverrides(base: Labels, overrides?: PartialLabels): Labels {
     textarea: group(base.textarea, overrides.textarea),
     datePicker: group(base.datePicker, overrides.datePicker),
     stepper: group(base.stepper, overrides.stepper),
+    valueCheck: group(base.valueCheck, overrides.valueCheck),
   }
 }
 

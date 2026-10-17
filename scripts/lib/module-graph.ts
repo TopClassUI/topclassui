@@ -79,19 +79,29 @@ export interface Graph {
   packages: (entry: string) => Set<string>
   /** The bare specifiers as written, so `zod/mini` is not collapsed to `zod`. */
   specifiers: (entry: string) => Set<string>
+  /** The same, without entering a 'use client' file other than `entry`: what the server half itself runs. */
+  serverSpecifiers: (entry: string) => Set<string>
+}
+
+/** A file whose first statement is the directive, which a bundler serves to the server as a reference only. */
+export function isClientModule(source: string): boolean {
+  return /^\s*(['"])use client\1/.test(blankComments(source))
 }
 
 export function buildGraph(files: readonly string[], root: string): Graph {
   const edges = new Map<string, string[]>()
   const bare = new Map<string, string[]>()
   const written = new Map<string, string[]>()
+  const client = new Set<string>()
   const subpaths = readSubpaths(root)
 
   for (const file of files) {
     const local: string[] = []
     const external: string[] = []
     const exact: string[] = []
-    for (const specifier of valueImports(readFileSync(file, 'utf8'))) {
+    const source = readFileSync(file, 'utf8')
+    if (isClientModule(source)) client.add(file)
+    for (const specifier of valueImports(source)) {
       const target = resolveSpecifier(specifier, file, root, subpaths)
       if (target === null) { external.push(packageName(specifier)); exact.push(specifier) }
       else if (target.startsWith(UNKNOWN_SUBPATH)) external.push(target)
@@ -102,29 +112,37 @@ export function buildGraph(files: readonly string[], root: string): Graph {
     written.set(file, exact)
   }
 
-  const walk = (entry: string) => {
+  const walk = (entry: string, stopAtClient = false) => {
     const seen = new Set<string>()
     const queue = [entry]
     while (queue.length > 0) {
       const next = queue.pop()
       if (next === undefined || seen.has(next)) continue
       seen.add(next)
+      if (stopAtClient && next !== entry && client.has(next)) continue
       for (const edge of edges.get(next) ?? []) queue.push(edge)
     }
     return seen
   }
+  const specifiersOf = (files: Set<string>) => {
+    const out = new Set<string>()
+    for (const file of files) for (const name of written.get(file) ?? []) out.add(name)
+    return out
+  }
 
   return {
-    reachable: walk,
+    reachable: (entry) => walk(entry),
     packages: (entry) => {
       const out = new Set<string>()
       for (const file of walk(entry)) for (const name of bare.get(file) ?? []) out.add(name)
       return out
     },
-    specifiers: (entry) => {
-      const out = new Set<string>()
-      for (const file of walk(entry)) for (const name of written.get(file) ?? []) out.add(name)
-      return out
+    specifiers: (entry) => specifiersOf(walk(entry)),
+    serverSpecifiers: (entry) => {
+      // The client file itself is served as a reference; what it imports never runs on the server.
+      const files = walk(entry, true)
+      for (const file of files) if (file !== entry && client.has(file)) files.delete(file)
+      return specifiersOf(files)
     },
   }
 }

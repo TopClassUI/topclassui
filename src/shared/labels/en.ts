@@ -125,4 +125,11 @@ export const en = {
     todo: 'Not started',
     error: 'Needs attention',
   },
+  valueCheck: {
+    tooLong: (n, fmt) => (n === 1 ? 'Use at most 1 character' : `Use at most ${fmt.format(n)} characters`),
+    patternMismatch: 'Use the format asked for',
+    rangeUnderflow: (n, fmt) => `Enter ${fmt.format(n)} or more`,
+    rangeOverflow: (n, fmt) => `Enter ${fmt.format(n)} or less`,
+    stepMismatch: 'Enter one of the allowed values',
+  },
 } satisfies Labels
