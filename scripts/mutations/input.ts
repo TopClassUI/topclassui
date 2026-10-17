@@ -5,8 +5,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'every Input type gets a character cap, though HTML allows maxlength on six text types only',
     file: 'src/components/input/index.tsx',
-    from: 'maxLength={capped ? resolveMaxLength(maxLength, kind) : undefined}',
-    to: 'maxLength={resolveMaxLength(maxLength, kind)}',
+    from: 'const cap = capped ? resolveMaxLength(maxLength, kind) : undefined',
+    to: 'const cap = resolveMaxLength(maxLength, kind)',
   },
   {
     label: 'every Input takes the text cap, so an email field accepts 512 characters instead of 254',

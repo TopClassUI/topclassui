@@ -20,6 +20,8 @@ vi.mock('react', async (original) => ({ ...await original<typeof ReactModule>(),
 vi.mock('#shared/provider/provider.js', () => ({ TopClassProvider: reference('TopClassProvider') }))
 vi.mock('#components/button/index.js', () => ({ Button: reference('Button') }))
 vi.mock('../../textarea/client.js', () => ({ TextareaField: reference('TextareaField') }))
+// Input's server half imports its 'use client' holder for validate, so here it is a reference too.
+vi.mock('#components/input/client.js', () => ({ InputCheck: reference('InputCheck') }))
 vi.mock('#components/checkbox/index.js', () => ({ Checkbox: reference('Checkbox') }))
 vi.mock('#components/switch/index.js', () => ({ Switch: reference('Switch') }))
 vi.mock('#components/radio-group/index.js', () => ({ RadioGroupRoot: reference('RadioGroupRoot'), RadioGroupItem: reference('RadioGroupItem') }))

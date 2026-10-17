@@ -47,8 +47,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the combobox input loses its default cap of 256',
     file: HOOK,
-    from: "    maxLength: resolveMaxLength(maxLength, 'search'),",
-    to: '    maxLength: maxLength ?? undefined,',
+    from: "  const cap = resolveMaxLength(maxLength, 'search')",
+    to: '  const cap = maxLength ?? undefined',
   },
   {
     label: 'the combobox hands loadMoreThreshold to useCollection unclamped',

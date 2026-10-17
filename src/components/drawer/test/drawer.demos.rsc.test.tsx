@@ -17,6 +17,8 @@ vi.mock('../client.js', () => Object.fromEntries([
   'DrawerTitle', 'DrawerTrigger',
 ].map((name) => [name, reference(name)])))
 vi.mock('#shared/provider/provider.js', () => ({ TopClassProvider: reference('TopClassProvider') }))
+// Input's server half imports its 'use client' holder for validate, so here it is a reference too.
+vi.mock('#components/input/client.js', () => ({ InputCheck: reference('InputCheck') }))
 
 const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const every = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()

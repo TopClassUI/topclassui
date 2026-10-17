@@ -17,6 +17,8 @@ const reference = (name: string): Part => Object.assign(() => { throw new Error(
 vi.mock('../client.js', () => ({ FormAction: reference('FormAction') }))
 vi.mock('#components/field/client.js', () => ({ FieldLive: reference('FieldLive') }))
 vi.mock('#components/textarea/client.js', () => ({ TextareaField: reference('TextareaField') }))
+// Input's server half imports its 'use client' holder for validate, so here it is a reference too.
+vi.mock('#components/input/client.js', () => ({ InputCheck: reference('InputCheck') }))
 vi.mock('#components/button/index.js', () => ({ Button: reference('Button') }))
 // useId is the one hook the react-server build keeps, and it needs a render to run in: this walk calls the parts by hand.
 vi.mock('react', async (original) => ({ ...await original<typeof ReactModule>(), useId: () => '_r_rsc_' }))

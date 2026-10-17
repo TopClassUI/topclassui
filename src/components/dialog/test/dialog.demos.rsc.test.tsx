@@ -17,6 +17,8 @@ vi.mock('../client.js', () => Object.fromEntries([
   'DialogTitle', 'DialogTrigger',
 ].map((name) => [name, reference(name)])))
 vi.mock('#shared/provider/provider.js', () => ({ TopClassProvider: reference('TopClassProvider') }))
+// Input's server half imports its 'use client' holder for validate, so here it is a reference too.
+vi.mock('#components/input/client.js', () => ({ InputCheck: reference('InputCheck') }))
 vi.mock('#components/tooltip/client.js', () => Object.fromEntries(
   ['TooltipPopup', 'TooltipRoot', 'TooltipTrigger'].map((name) => [name, reference(name)]),
 ))
