@@ -1011,7 +1011,7 @@ export async function Icon({ name, size = '1em', label, flipRtl, className, ...r
       aria-label={label}
       aria-hidden={label ? undefined : true}
       focusable="false"
-      className={cn('inline-block shrink-0', flip && 'rtl:-scale-x-100', className)}
+      className={cn('inline-block shrink-0', flip && 'scale-x-(--tc-dir)', className)}
       {...rest}
     >
       <path d={icon.path} fill="currentColor" />
