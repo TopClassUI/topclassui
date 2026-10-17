@@ -53,8 +53,8 @@ describe('the element it renders', () => {
     expect(markup(<Timeline items={EVENTS} getKey={key} style={{ opacity: 0.5 }} />)).toMatch(/^<ol [^>]*style="opacity:0.5"/)
   })
 
-  it('exports one component and no variants function, because the root has no design prop', () => {
-    expect(Object.keys(entry)).toEqual(['Timeline'])
+  it('exports the component and its skeleton, and no variants function, because the root has no design prop', () => {
+    expect(Object.keys(entry).sort()).toEqual(['Timeline', 'TimelineSkeleton'])
   })
 
   it('asks getKey once for each item, so the key is the identity the caller gives', () => {

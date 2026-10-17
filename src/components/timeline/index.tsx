@@ -77,4 +77,7 @@ export function Timeline<T extends TimelineItem = TimelineItem>({
   )
 }
 
-export type { TimelineItem, TimelineProps, TimelineStatus, TimelineTone } from './types.js'
+export { TimelineSkeleton } from './skeleton.js'
+export type {
+  TimelineItem, TimelineProps, TimelineSkeletonProps, TimelineStatus, TimelineTone,
+} from './types.js'

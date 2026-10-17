@@ -3,6 +3,7 @@ import type { ComponentPropsWithRef, ReactNode } from 'react'
 import type { Tone } from '#shared/contracts/tone.js'
 import type { Labels } from '#shared/labels/types.js'
 import type { TIMELINE_STATUSES } from './constants.js'
+import type { TimelineSkeletonSchemaInput } from './schema.js'
 
 export type TimelineStatus = (typeof TIMELINE_STATUSES)[number]
 
@@ -39,3 +40,13 @@ export interface TimelineProps<T extends TimelineItem = TimelineItem>
   /** Accepted so `{...getLabels(locale)}` spreads cleanly. Nothing here formats a number, so it is not used and never reaches the element. */
   locale?: string | undefined
 }
+
+// R-8.3-4: derived from the schema, so the bound and the type cannot drift apart.
+export type TimelineSkeletonDesignProps = {
+  [K in keyof TimelineSkeletonSchemaInput]?: TimelineSkeletonSchemaInput[K] | undefined
+}
+
+/** No content and no way to un-hide it: the placeholder only holds the rail's shape. */
+export type TimelineSkeletonProps =
+  Omit<ComponentPropsWithRef<'div'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
+  & TimelineSkeletonDesignProps

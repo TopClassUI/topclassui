@@ -1,5 +1,5 @@
 // R-5.12-4: Timeline's own class tables. The stroke of every dot is the shared knob.
-import { BORDER_STRONG } from '#shared/classes.js'
+import { BORDER_STRONG, FORCED_EDGE } from '#shared/classes.js'
 import type { Tone } from '#shared/contracts/tone.js'
 
 /** As tall as the first line of the title (text-sm is 20 px), so the marker centres on it. */
@@ -64,3 +64,16 @@ export const TIMELINE_CONNECTOR = 'block w-0.5 flex-1 bg-line border-s-(length:-
 export const TIMELINE_TITLE = 'min-h-5 text-sm font-medium text-body'
 
 export const TIMELINE_TIME = 'text-xs text-muted'
+
+/** The fill of every skeleton shape; forced colours erase it, so the shape keeps a line there. */
+const SKELETON_FILL = `bg-neutral-soft animate-pulse motion-reduce:animate-none ${FORCED_EDGE}`
+
+/** The dot's own 12 px circle, filled, where a marker goes. */
+export const TIMELINE_SKELETON_DOT = `${DOT} ${SKELETON_FILL}`
+
+/** One line of nothing: as tall as the type, with margins making up the line height. */
+const SKELETON_BAR = `block h-[1em] my-[calc((1lh-1em)/2)] w-full rounded-chip ${SKELETON_FILL}`
+
+export const TIMELINE_SKELETON_TITLE = `${SKELETON_BAR} max-w-48`
+
+export const TIMELINE_SKELETON_TIME = `${SKELETON_BAR} max-w-24`

@@ -92,4 +92,28 @@ export const MUTATIONS: Mutation[] = [
     from: '{isBlank(item.icon)',
     to: '{item.icon == null',
   },
+  {
+    label: 'the timeline skeleton lets a caller un-hide it',
+    file: 'src/components/timeline/skeleton.tsx',
+    from: '{...rest} aria-hidden>',
+    to: 'aria-hidden {...rest}>',
+  },
+  {
+    label: 'the timeline skeleton keeps a connector after its last row, so the rail runs on past the end',
+    file: 'src/components/timeline/skeleton.tsx',
+    from: '{row === last ? null : <span className={TIMELINE_CONNECTOR} />}',
+    to: '<span className={TIMELINE_CONNECTOR} />',
+  },
+  {
+    label: 'the timeline skeleton stops clamping its count, so rows={9999} draws 9999 rows',
+    file: 'src/components/timeline/skeleton.tsx',
+    from: 'Math.trunc(clamp(rows, TIMELINE_BOUNDARIES.skeletonRowsMin, TIMELINE_BOUNDARIES.skeletonRowsMax))',
+    to: 'Math.trunc(rows)',
+  },
+  {
+    label: 'the timeline skeleton title loses the line height of a title, so a row is shorter than an event',
+    file: 'src/components/timeline/skeleton.tsx',
+    from: '<div className={TIMELINE_TITLE}><span',
+    to: '<div><span',
+  },
 ]

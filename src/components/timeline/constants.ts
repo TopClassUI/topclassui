@@ -1,4 +1,4 @@
-// R-8.3-2: the value lists and the defaults. Timeline bounds nothing, so it has no boundaries.ts.
+// R-8.3-2: the value lists and the defaults. The bounds of the skeleton live in boundaries.ts.
 import { DEFAULT_TONE, TONES, type Tone } from '#shared/contracts/tone.js'
 
 export const TIMELINE_STATUSES = ['done', 'current', 'todo'] as const
@@ -16,3 +16,8 @@ export const TIMELINE_STATUS_TONES = {
   done: 'success',
   current: 'primary',
 } as const satisfies Partial<Record<(typeof TIMELINE_STATUSES)[number], Tone>>
+
+/** The placeholder's starting shape: three events, as the drawn rail has before its todo. */
+export const TIMELINE_SKELETON_DEFAULTS = {
+  rows: 3,
+} as const
