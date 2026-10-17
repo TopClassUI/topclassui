@@ -75,7 +75,7 @@ describe('the demos the plan names', () => {
   })
 
   it('playground: the schema props a Try it control sets reach the DatePicker', async () => {
-    const loaded = await import('../dummy/playground.tsx') as { default: ComponentType<DatePickerDesignProps> }
+    const loaded = await import('../dummy/playground.js') as { default: ComponentType<DatePickerDesignProps> }
     const html = markup(<loaded.default size="lg" invalid />)
     expect(html).toContain('data-size="lg"')
     expect(html).toContain('aria-invalid="true"')

@@ -72,7 +72,7 @@ describe('the demos the plan names', () => {
   })
 
   it('playground: the schema props a Try it control sets reach the slider', async () => {
-    const loaded = await import('../dummy/playground.tsx') as { default: ComponentType<{ size?: string, showValue?: boolean }> }
+    const loaded = await import('../dummy/playground.js') as { default: ComponentType<{ size?: string, showValue?: boolean }> }
     const html = markup(<loaded.default size="lg" showValue />)
     expect(html).toContain('data-size="lg"')
     expect(html).toContain('>60</output>')

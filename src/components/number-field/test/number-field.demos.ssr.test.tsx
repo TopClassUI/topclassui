@@ -79,7 +79,7 @@ describe('the demos the plan names', () => {
   })
 
   it('playground: the schema props a Try it control sets reach the field', async () => {
-    const loaded = await import('../dummy/playground.tsx') as { default: ComponentType<{ size?: string, step?: number }> }
+    const loaded = await import('../dummy/playground.js') as { default: ComponentType<{ size?: string, step?: number }> }
     const html = markup(<loaded.default size="lg" step={0.5} />)
     expect(html).toContain('data-size="lg"')
     expect(html).toMatch(/<input type="number"[^>]* step="0.5"/)

@@ -75,7 +75,7 @@ describe('the demos the plan names', () => {
   })
 
   it('playground: the schema props a Try it control sets reach the input', async () => {
-    const loaded = await import('../dummy/playground.tsx') as { default: ComponentType<ComboboxDesignProps> }
+    const loaded = await import('../dummy/playground.js') as { default: ComponentType<ComboboxDesignProps> }
     const html = markup(<loaded.default size="lg" invalid />)
     expect(html).toMatch(/<input [^>]*aria-invalid="true"/)
     expect(html).toContain('data-size="lg"')

@@ -83,7 +83,7 @@ describe('the demos the plan names', () => {
   })
 
   it('playground: the schema props a Try it control sets reach the group', async () => {
-    const loaded = await import('../dummy/playground.tsx') as { default: ComponentType<{ orientation?: string, invalid?: boolean }> }
+    const loaded = await import('../dummy/playground.js') as { default: ComponentType<{ orientation?: string, invalid?: boolean }> }
     const html = markup(<loaded.default orientation="horizontal" invalid />)
     expect(html).toContain('data-orientation="horizontal"')
     expect(html).toContain('aria-invalid="true"')

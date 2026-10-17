@@ -81,7 +81,7 @@ describe('the demos the plan names', () => {
   })
 
   it('playground: the schema props a Try it control sets reach the textarea', async () => {
-    const loaded = await import('../dummy/playground.tsx') as { default: ComponentType<{ rows?: number, invalid?: boolean }> }
+    const loaded = await import('../dummy/playground.js') as { default: ComponentType<{ rows?: number, invalid?: boolean }> }
     const html = markup(<loaded.default rows={5} invalid />)
     expect(html).toContain('rows="5"')
     expect(html).toContain('aria-invalid="true"')

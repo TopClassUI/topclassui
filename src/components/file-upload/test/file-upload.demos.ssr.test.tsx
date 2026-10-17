@@ -79,7 +79,7 @@ describe('the demos the plan names', () => {
   })
 
   it('playground: the schema props a Try it control sets reach the upload', async () => {
-    const loaded = await import('../dummy/playground.tsx') as { default: ComponentType<{ maxFiles?: number, invalid?: boolean }> }
+    const loaded = await import('../dummy/playground.js') as { default: ComponentType<{ maxFiles?: number, invalid?: boolean }> }
     expect(inputsIn(markup(<loaded.default maxFiles={3} invalid />))).toEqual(['Attachment: attachment, multiple, accept .png,.jpg,.jpeg,.pdf, invalid'])
   })
 
