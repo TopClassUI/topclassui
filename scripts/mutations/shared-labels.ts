@@ -1,4 +1,4 @@
-// The mutations of the labels Unit 3 added to src/shared/labels. Found by scripts/mutations/index.ts.
+// The mutations of the labels Units 3 and 4 added to src/shared/labels. Found by scripts/mutations/index.ts.
 import type { Mutation } from '../lib/mutate.js'
 
 export const MUTATIONS: Mutation[] = [
@@ -49,6 +49,48 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/shared/labels/en.ts',
     from: "(n === 1 ? '1 star' : `${fmt.format(n)} stars`)",
     to: '`${fmt.format(n)} stars`',
+  },
+  {
+    label: 'unit 4: a numberfield label override is dropped on the way through getLabels, so a caller cannot reword a stepper',
+    file: 'src/shared/labels/get-labels.ts',
+    from: '    numberField: group(base.numberField, overrides.numberField),',
+    to: '    numberField: base.numberField,',
+  },
+  {
+    label: 'unit 4: a slider label override is dropped on the way through getLabels, so a caller cannot rename a thumb',
+    file: 'src/shared/labels/get-labels.ts',
+    from: '    slider: group(base.slider, overrides.slider),',
+    to: '    slider: base.slider,',
+  },
+  {
+    label: 'unit 4: an otp label override is dropped on the way through getLabels, so a caller cannot rename a cell',
+    file: 'src/shared/labels/get-labels.ts',
+    from: '    otp: group(base.otp, overrides.otp),',
+    to: '    otp: base.otp,',
+  },
+  {
+    label: 'unit 4: a textarea label override is dropped on the way through getLabels, so a caller cannot reword the count',
+    file: 'src/shared/labels/get-labels.ts',
+    from: '    textarea: group(base.textarea, overrides.textarea),',
+    to: '    textarea: base.textarea,',
+  },
+  {
+    label: 'unit 4: the otp cell label skips the formatter for its place, so an Arabic page reads a Latin digit',
+    file: 'src/shared/labels/en.ts',
+    from: '`Character ${fmt.format(place)} of',
+    to: '`Character ${String(place)} of',
+  },
+  {
+    label: 'unit 4: the textarea count skips the formatter for its cap, so 5000 loses its separator',
+    file: 'src/shared/labels/en.ts',
+    from: 'of ${fmt.format(max)} characters`',
+    to: 'of ${String(max)} characters`',
+  },
+  {
+    label: 'unit 4: the Arabic textarea count reads the cap before the length',
+    file: 'src/shared/labels/ar.ts',
+    from: '`عدد الأحرف: ${fmt.format(length)} من ${fmt.format(max)}`',
+    to: '`عدد الأحرف: ${fmt.format(max)} من ${fmt.format(length)}`',
   },
   {
     label: 'the shared number format ignores the -u-nu- extension of its tag, so ar-u-nu-arab still prints Latin digits',

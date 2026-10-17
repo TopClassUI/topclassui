@@ -39,6 +39,10 @@ function withOverrides(base: Labels, overrides?: PartialLabels): Labels {
     sidebar: group(base.sidebar, overrides.sidebar),
     tag: group(base.tag, overrides.tag),
     banner: group(base.banner, overrides.banner),
+    numberField: group(base.numberField, overrides.numberField),
+    slider: group(base.slider, overrides.slider),
+    otp: group(base.otp, overrides.otp),
+    textarea: group(base.textarea, overrides.textarea),
   }
 }
 
