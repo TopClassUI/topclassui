@@ -632,6 +632,17 @@ describe('R-10.5-2: a tooltip is plain text', () => {
     ['an element passed as the children prop', '<TooltipPopup children={<a href="/">Home</a>} />'],
     ['an element spread in as children', '<TooltipPopup {...{ children: <a href="/">Home</a> }} />'],
     ['an import renamed on the way in', 'import { TooltipPopup as Tip } from "x"\nconst t = <Tip><a href="/">Home</a></Tip>'],
+    ['Base UI\'s own popup', 'import { Tooltip } from "@base-ui/react/tooltip"\nconst t = <Tooltip.Popup><a href="/">Home</a></Tooltip.Popup>'],
+    ['Base UI\'s popup renamed, from the package root', 'import { Tooltip as Base } from "@base-ui/react"\nconst t = <Base.Popup><a href="/">Home</a></Base.Popup>'],
+    ['Base UI\'s viewport under a namespace import', 'import * as B from "@base-ui/react"\nconst t = <B.Tooltip.Viewport><a href="/">Home</a></B.Tooltip.Viewport>'],
+    ['an element as Base UI\'s render', 'import { Tooltip as Base } from "@base-ui/react/tooltip"\nconst t = <Base.Popup render={<a href="/">Home</a>} />'],
+    ['an element as the render prop', '<TooltipPopup render={<a href="/">Home</a>} />'],
+    ['an element thirty levels into an expression', `<TooltipPopup>{<a href="/">Home</a> + ${Array.from({ length: 30 }, () => "'a'").join(' + ')}}</TooltipPopup>`],
+    ['a cast', '<TooltipPopup>{link as unknown as string}</TooltipPopup>'],
+    ['a cast in a wrapper', '<TooltipPopup {...rest}>{children as TooltipText}</TooltipPopup>'],
+    ['a satisfies in the children prop', '<TooltipPopup children={label satisfies string} />'],
+    ['dangerouslySetInnerHTML', '<TooltipPopup dangerouslySetInnerHTML={{ __html: html }} />'],
+    ['dangerouslySetInnerHTML on Base UI\'s popup', 'import { Tooltip as Base } from "@base-ui/react/tooltip"\nconst t = <Base.Popup dangerouslySetInnerHTML={{ __html: html }} />'],
   ]
   for (const [label, code] of bad) {
     it(`fails on ${label}`, () => {
@@ -646,8 +657,21 @@ describe('R-10.5-2: a tooltip is plain text', () => {
       'R-10.5-2: <a> inside TooltipPopup makes it more than text. A link, a control or rich content belongs in a Popover.')
   })
 
+  it('names a cast and dangerouslySetInnerHTML for what they are', () => {
+    const messages = (code: string) => lint(code)
+      .filter((m) => m.ruleId === 'topclass/tooltip-content-is-text').map((m) => m.message)
+    expect(messages('<TooltipPopup>{link as unknown as string}</TooltipPopup>')).toEqual([
+      'R-10.5-2: a cast hides what the tooltip renders. Give TooltipPopup text, or use a Popover.',
+    ])
+    expect(messages('<TooltipPopup dangerouslySetInnerHTML={{ __html: html }} />')).toEqual([
+      'R-10.5-2: dangerouslySetInnerHTML puts markup in TooltipPopup. Rich content belongs in a Popover.',
+    ])
+  })
+
   const good = [
     '<TooltipPopup>Copy link</TooltipPopup>',
+    '<TooltipPopup>{"Copy" as const}</TooltipPopup>',
+    'import { Popover as Base } from "@base-ui/react/popover"\nconst p = <Base.Popup><a href="/docs">Docs</a></Base.Popup>',
     '<TooltipPopup>Delete {count} rows</TooltipPopup>',
     '<TooltipPopup placement="bottom-start">{FILE}</TooltipPopup>',
     '<TooltipPopup>{labels.copy}</TooltipPopup>',
@@ -676,6 +700,8 @@ describe('the new rules leave real component code alone', () => {
     ['a class lookup that happens to use PascalCase keys', 'const Tone = { Primary: "tone-primary", Danger: "tone-danger" }'],
     ['a numeric data attribute that is not a state', '<div data-index="2" />'],
     ['an entity rather than prose', '<span>&times;</span>'],
+    ['the tooltip popup with its arrow, as the component writes it',
+      'import { Tooltip as Base } from "@base-ui/react/tooltip"\nconst t = <Base.Popup data-placement={placement} {...rest} className={cn(POPUP, className)}>{children}<Base.Arrow className={ARROW} /></Base.Popup>'],
   ]
   for (const [label, code] of allowed) {
     it(`allows ${label}`, () => {

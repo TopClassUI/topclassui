@@ -643,22 +643,45 @@ const rules = {
       schema: [],
       messages: {
         element: 'R-10.5-2: <{{child}}> inside {{name}} makes it more than text. A link, a control or rich content belongs in a Popover.',
+        cast: 'R-10.5-2: a cast hides what the tooltip renders. Give {{name}} text, or use a Popover.',
+        markup: 'R-10.5-2: dangerouslySetInnerHTML puts markup in {{name}}. Rich content belongs in a Popover.',
       },
     },
     create(ctx: Context) {
       const names = new Set(['TooltipPopup'])
-      /** The first JSX node in an expression, so `{ok && <a />}` and `{rows.map(...)}` are seen. */
-      const findJsx = (node: Node, depth = 0): Node => {
-        if (!node || typeof node.type !== 'string' || depth > 20) return null
+      /** Local names of Base UI's Tooltip namespace, and of a namespace import that holds it as `.Tooltip`. */
+      const bases = new Set<string>()
+      const roots = new Set<string>()
+      const SOURCES = new Set(['@base-ui/react', '@base-ui/react/tooltip'])
+      const CASTS = new Set(['TSAsExpression', 'TSTypeAssertion', 'TSSatisfiesExpression'])
+      const isConst = (node: Node) => node.typeAnnotation?.type === 'TSTypeReference' && node.typeAnnotation.typeName?.name === 'const'
+      const isCast = (node: Node) => CASTS.has(String(node.type)) && !isConst(node)
+      /** The first JSX node or cast in an expression, so `{ok && <a />}` and `{rows.map(...)}` are seen. */
+      const findHidden = (node: Node): Node => {
+        if (!node || typeof node.type !== 'string') return null
         if (node.type === 'JSXElement' || node.type === 'JSXFragment') return node
+        if (isCast(node)) return node
         for (const key of ctx.sourceCode.visitorKeys[node.type] ?? []) {
           const value = node[key]
           for (const child of Array.isArray(value) ? value : [value]) {
-            const hit = findJsx(child, depth + 1)
+            const hit = findHidden(child)
             if (hit) return hit
           }
         }
         return null
+      }
+      /** The Base UI part a JSX name points at, such as `Popup` for `<Base.Popup>` or `<B.Tooltip.Popup>`. */
+      const basePart = (name: Node): string => {
+        if (name?.type !== 'JSXMemberExpression') return ''
+        const object = name.object
+        const fromBase = object?.type === 'JSXIdentifier'
+          ? bases.has(String(object.name))
+          : object?.type === 'JSXMemberExpression' && roots.has(String(object.object?.name)) && object.property?.name === 'Tooltip'
+        return fromBase ? String(name.property?.name ?? '') : ''
+      }
+      const isPopup = (name: Node) => {
+        const part = basePart(name)
+        return part === 'Popup' || part === 'Viewport' || names.has(String(name?.name ?? name?.property?.name ?? ''))
       }
       const label = (jsx: Node) => {
         if (jsx.type === 'JSXFragment') return 'fragment'
@@ -666,21 +689,37 @@ const rules = {
         return String(name?.name ?? name?.property?.name ?? 'element')
       }
       const flag = (node: Node, name: string) => {
-        const jsx = findJsx(node)
-        if (jsx) ctx.report({ node: jsx, messageId: 'element', data: { name, child: label(jsx) } })
+        const hit = findHidden(node)
+        if (!hit) return
+        if (CASTS.has(String(hit.type))) ctx.report({ node: hit, messageId: 'cast', data: { name } })
+        else ctx.report({ node: hit, messageId: 'element', data: { name, child: label(hit) } })
       }
       return {
-        ImportSpecifier(node: Node) {
-          if (names.has(String(node.imported?.name ?? ''))) names.add(String(node.local?.name ?? ''))
+        ImportDeclaration(node: Node) {
+          const fromBase = SOURCES.has(String(node.source?.value))
+          for (const specifier of node.specifiers ?? []) {
+            const imported = String(specifier.imported?.name ?? '')
+            const local = String(specifier.local?.name ?? '')
+            if (names.has(imported)) names.add(local)
+            if (fromBase && imported === 'Tooltip') bases.add(local)
+            if (fromBase && specifier.type === 'ImportNamespaceSpecifier') roots.add(local)
+          }
         },
         JSXElement(node: Node) {
           const opening = node.openingElement
-          const name = String(opening?.name?.name ?? opening?.name?.property?.name ?? '')
-          if (!names.has(name)) return
-          for (const child of node.children ?? []) flag(child, name)
+          if (!isPopup(opening?.name)) return
+          const name = ctx.sourceCode.getText(opening.name)
+          for (const child of node.children ?? []) {
+            // The arrow is decoration Base UI draws against the anchor, and it carries no children.
+            if (child.type === 'JSXElement' && basePart(child.openingElement?.name) === 'Arrow') continue
+            flag(child, name)
+          }
           for (const attribute of opening.attributes ?? []) {
-            if (attribute.type === 'JSXAttribute' && attribute.name?.name === 'children') flag(attribute.value, name)
             if (attribute.type === 'JSXSpreadAttribute') flag(attribute.argument, name)
+            if (attribute.type !== 'JSXAttribute') continue
+            const prop = String(attribute.name?.name ?? '')
+            if (prop === 'dangerouslySetInnerHTML') ctx.report({ node: attribute, messageId: 'markup', data: { name } })
+            if (prop === 'children' || prop === 'render') flag(attribute.value, name)
           }
         },
       }
