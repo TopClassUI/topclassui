@@ -10,7 +10,7 @@ export const numberField = {
     ar: 'رقم بين حدود معروفة، يُكتب أو يُزاد خطوة خطوة. حقل مخفي يحمل الرقم المجرد، فيُرسل النموذج قبل الترطيب.',
   },
   demos: ['basic', 'limits', 'form', 'sizes', 'row', 'rtl'],
-  stageHeight: 5,
+  stageHeight: 7,
   note: {
     en: '`min`, `max` and `step` are clamped at runtime, so a typed or passed value cannot break the field.',
     ar: '`min` و`max` و`step` تُحصر أثناء التشغيل، فلا تستطيع قيمة مكتوبة أو ممرَّرة أن تكسر الحقل.',
