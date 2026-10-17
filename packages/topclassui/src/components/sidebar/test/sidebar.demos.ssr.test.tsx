@@ -11,17 +11,20 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['basic', 'collapsed', 'controlled', 'groups', 'in-a-layout', 'long-list', 'rtl']
+const EXPECTED = ['basic', 'collapsed', 'controlled', 'groups', 'in-a-layout', 'long-list', 'playground', 'rtl', 'states']
 
-/** What each demo holds: its links, its lists that have a name, the row that is the current page, and its title. */
-const SHOWS: Record<string, { links: number, named: number, current: string, title: string }> = {
-  'basic': { links: 4, named: 0, current: 'Home', title: 'Workspace' },
-  'collapsed': { links: 4, named: 0, current: 'Home', title: 'Workspace' },
-  'controlled': { links: 2, named: 0, current: 'Home', title: 'Workspace' },
-  'groups': { links: 6, named: 2, current: 'Projects', title: 'Acme' },
-  'in-a-layout': { links: 4, named: 0, current: 'Orders', title: 'Workspace' },
-  'long-list': { links: 60, named: 1, current: 'Page 1', title: 'Handbook' },
-  'rtl': { links: 4, named: 1, current: 'الرئيسية', title: 'مساحة العمل' },
+/** What each demo holds: its rails, its links, its lists that have a name, the rows that are the current page, and its title. */
+const SHOWS: Record<string, { rails: number, links: number, named: number, current: string[], title: string }> = {
+  'basic': { rails: 1, links: 4, named: 0, current: ['Home'], title: 'Workspace' },
+  'collapsed': { rails: 1, links: 4, named: 0, current: ['Home'], title: 'Workspace' },
+  'controlled': { rails: 1, links: 2, named: 0, current: ['Home'], title: 'Workspace' },
+  'groups': { rails: 1, links: 6, named: 2, current: ['Projects'], title: 'Acme' },
+  'in-a-layout': { rails: 1, links: 4, named: 0, current: ['Orders'], title: 'Workspace' },
+  'long-list': { rails: 1, links: 60, named: 1, current: ['Page 1'], title: 'Handbook' },
+  // The Try it rail, with nothing passed: no row is current until the reader turns current on.
+  'playground': { rails: 1, links: 3, named: 0, current: [], title: 'Workspace' },
+  'rtl': { rails: 1, links: 4, named: 1, current: ['الرئيسية'], title: 'مساحة العمل' },
+  'states': { rails: 2, links: 6, named: 0, current: ['Home', 'Projects'], title: 'Workspace' },
 }
 
 const render = async (file: string) => {
@@ -48,10 +51,10 @@ describe('every demo renders on the server', () => {
       expect(typeof loaded.default, file).toBe('function')
     })
 
-    it(`${file}.tsx renders one rail, its toggle, its title and every one of its links, each a link inside a list item`, async () => {
+    it(`${file}.tsx renders its rails, a toggle each, its title and every one of its links, each a link inside a list item`, async () => {
       const html = await render(file)
-      expect(tags(html, 'nav'), file).toHaveLength(1)
-      expect(html.match(/<button [^>]*aria-expanded="(true|false)"/g), file).toHaveLength(1)
+      expect(tags(html, 'nav'), file).toHaveLength(SHOWS[file]?.rails ?? -1)
+      expect(html.match(/<button [^>]*aria-expanded="(true|false)"/g), file).toHaveLength(SHOWS[file]?.rails ?? -1)
       expect(rows(html).length, file).toBe(SHOWS[file]?.links)
       // No anchor outside a row: a link beside the rail in a demo would be a Button.
       expect(tags(html, 'a').length, file).toBe(SHOWS[file]?.links)
@@ -66,9 +69,9 @@ describe('every demo renders on the server', () => {
       expect((await render(file)).match(/<a [^>]*><span class="[^"]*"><svg /g)?.length, file).toBe(SHOWS[file]?.links)
     })
 
-    it(`${file}.tsx marks one row as the page being read`, async () => {
+    it(`${file}.tsx marks one row a rail at most as the page being read`, async () => {
       const current = rows(await render(file)).filter((row) => attr(row.tag, 'aria-current') === 'page')
-      expect(current.map((row) => row.label), file).toEqual([SHOWS[file]?.current])
+      expect(current.map((row) => row.label), file).toEqual(SHOWS[file]?.current)
     })
 
     it(`${file}.tsx names each list that has a label, by an id that exists`, async () => {
@@ -89,12 +92,15 @@ describe('every demo renders on the server', () => {
 })
 
 describe('what the demos show', () => {
-  it('six are expanded in the HTML the server sends, and collapsed is collapsed there too', async () => {
+  it('every rail is expanded in the HTML the server sends but the collapsed ones, which are collapsed there too', async () => {
+    const found: Record<string, string[]> = {}
     for (const file of files) {
-      const nav = tags(await render(file), 'nav')[0] ?? ''
-      expect(attr(nav, 'data-closed') === '', file).toBe(file === 'collapsed')
-      expect(attr(nav, 'data-open') === '', file).toBe(file !== 'collapsed')
+      found[file] = tags(await render(file), 'nav').map((nav) => (attr(nav, 'data-closed') === '' ? 'closed' : attr(nav, 'data-open') === '' ? 'open' : '?'))
     }
+    expect(found).toEqual({
+      'basic': ['open'], 'collapsed': ['closed'], 'controlled': ['open'], 'groups': ['open'], 'in-a-layout': ['open'],
+      'long-list': ['open'], 'playground': ['open'], 'rtl': ['open'], 'states': ['open', 'closed'],
+    })
   })
 
   it('each rail sits in a parent that gives it a height, or its body could not scroll', async () => {
@@ -102,7 +108,8 @@ describe('what the demos show', () => {
     for (const file of files) parents[file] = /class="([^"]*)"[^>]*><nav /.exec(await render(file))?.[1] ?? ''
     expect(parents).toEqual({
       'basic': 'h-96', 'collapsed': 'h-96', 'controlled': 'flex h-96 flex-wrap gap-4', 'groups': 'h-112',
-      'in-a-layout': 'flex h-[calc(100dvh-4rem)]', 'long-list': 'h-[calc(100dvh-4rem)]', 'rtl': 'h-96',
+      'in-a-layout': 'flex h-[calc(100dvh-4rem)]', 'long-list': 'h-[calc(100dvh-4rem)]', 'playground': 'h-96', 'rtl': 'h-96',
+      'states': 'flex h-96 flex-wrap gap-6',
     })
   })
 
@@ -145,8 +152,14 @@ describe('what the demos show', () => {
     expect(rows(html).map((row) => row.label)).toEqual(['الرئيسية', 'المشاريع', 'الفريق', 'الإعدادات'])
   })
 
+  it('states names each of its two rails, so a page can hold both, and each toggle in English', async () => {
+    const html = await render('states')
+    expect(tags(html, 'nav').map((nav) => attr(nav, 'aria-label'))).toEqual(['Expanded', 'Collapsed'])
+    expect(tags(html, 'button').map((button) => attr(button, 'aria-label'))).toEqual(['Collapse the sidebar', 'Expand the sidebar'])
+  })
+
   it('every other demo names its rail and its toggle in English', async () => {
-    for (const file of files.filter((name) => name !== 'rtl')) {
+    for (const file of files.filter((name) => name !== 'rtl' && name !== 'states')) {
       const html = await render(file)
       expect(attr(tags(html, 'nav')[0] ?? '', 'aria-label'), file).toBe('Sidebar')
       expect(attr(tags(html, 'button')[0] ?? '', 'aria-label'), file).toBe(file === 'collapsed' ? 'Expand the sidebar' : 'Collapse the sidebar')

@@ -10,7 +10,7 @@ import { type Clip, type Rgb, contrast, pixelsOf, rgbOf } from './pixels.js'
 // What happy-dom cannot lay out: two widths, a list that scrolls inside the rail, a ring a scrolling box could
 // cut, the keys in a real browser, what forced colours leave of a fill, and a page that must not grow.
 
-/** Every demo: whether its rail starts expanded, and how many links it holds. Written out, so a renamed demo fails here. */
+/** Every demo: whether its first rail starts expanded, and how many links it holds. Written out, so a renamed demo fails here. */
 const SIDEBARS: Record<string, { open: boolean, links: number }> = {
   'sidebar--basic': { open: true, links: 4 },
   'sidebar--collapsed': { open: false, links: 4 },
@@ -18,7 +18,10 @@ const SIDEBARS: Record<string, { open: boolean, links: number }> = {
   'sidebar--groups': { open: true, links: 6 },
   'sidebar--in-a-layout': { open: true, links: 4 },
   'sidebar--long-list': { open: true, links: 60 },
+  'sidebar--playground': { open: true, links: 3 },
   'sidebar--rtl': { open: true, links: 4 },
+  // Two rails, the expanded one first: what a test reads of the first rail is that one.
+  'sidebar--states': { open: true, links: 6 },
 }
 
 /** The three screens Unit 3 measures at, and a phone on its side. */
@@ -225,7 +228,7 @@ test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) 
 
 test('the table names every sidebar demo', () => {
   expect(Object.keys(SIDEBARS).sort()).toEqual(DEMOS.filter((demo) => demo.startsWith('sidebar--')).sort())
-  expect(Object.keys(SIDEBARS)).toHaveLength(7)
+  expect(Object.keys(SIDEBARS)).toHaveLength(9)
 })
 
 // PLAN 19, Phase 6: accepted on the HTML the server sends, before any script has run.

@@ -80,7 +80,7 @@ describe('a server-rendered Navbar hydrates cleanly', () => {
 
 describe('every demo renders and hydrates', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(DEMOS.map(([name]) => name)).toEqual(['basic', 'many-links', 'not-sticky', 'rtl', 'tall-page', 'with-search'])
+    expect(DEMOS.map(([name]) => name)).toEqual(['basic', 'many-links', 'not-sticky', 'playground', 'rtl', 'states', 'tall-page', 'with-search'])
   })
 
   for (const [name, Demo] of DEMOS) {

@@ -64,7 +64,7 @@ const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { 
 
 describe('every demo is a Server Component that only hands the client parts what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'collapsed', 'groups', 'in-a-layout', 'long-list', 'rtl'])
+    expect(names).toEqual(['basic', 'collapsed', 'groups', 'in-a-layout', 'long-list', 'playground', 'rtl', 'states'])
   })
 
   it('leaves out the one demo that is a client file, which cannot run here: it calls useState', async () => {
@@ -90,8 +90,9 @@ describe('every demo is a Server Component that only hands the client parts what
 describe('the parts a demo is built from', () => {
   const parts = async (name: string) => crossings((await load(name))()).map((crossing) => crossing.part)
 
-  it('two client parts and no more: the rail, and the toggle its header draws. Every link is server markup', async () => {
-    for (const name of names.filter((demo) => demo !== 'rtl')) expect(await parts(name), name).toEqual(['SidebarRoot', 'SidebarTrigger'])
+  it('two client parts a rail and no more: the rail, and the toggle its header draws. Every link is server markup', async () => {
+    for (const name of names.filter((demo) => demo !== 'rtl' && demo !== 'states')) expect(await parts(name), name).toEqual(['SidebarRoot', 'SidebarTrigger'])
+    expect(await parts('states')).toEqual(['SidebarRoot', 'SidebarTrigger', 'SidebarRoot', 'SidebarTrigger'])
   })
 
   it('rtl: the same two inside the provider an island mounts', async () => {
@@ -99,10 +100,17 @@ describe('the parts a demo is built from', () => {
   })
 
   it('the rail is handed its state as a boolean or nothing, and its children as elements', async () => {
+    const handed: Record<string, Props[]> = {}
     for (const name of names) {
-      const root = crossings((await load(name))()).find((crossing) => crossing.part === 'SidebarRoot')
-      expect(Object.keys(root?.props ?? {}).sort(), name).toEqual(name === 'collapsed' ? ['children', 'defaultOpen'] : ['children'])
+      handed[name] = crossings((await load(name))()).filter((crossing) => crossing.part === 'SidebarRoot')
+        .map(({ props }) => Object.fromEntries(Object.entries(props).filter(([key]) => key !== 'children')))
     }
+    expect(handed).toEqual({
+      'basic': [{}], 'collapsed': [{ defaultOpen: false }], 'groups': [{}], 'in-a-layout': [{}], 'long-list': [{}],
+      // The Try it rail hands on what the controls pass, which is nothing until one is set.
+      'playground': [{ defaultOpen: undefined, open: undefined }], 'rtl': [{}],
+      'states': [{ 'aria-label': 'Expanded' }, { 'aria-label': 'Collapsed', 'defaultOpen': false }],
+    })
     const collapsed = crossings((await load('collapsed'))()).find((crossing) => crossing.part === 'SidebarRoot')
     expect(collapsed?.props['defaultOpen']).toBe(false)
   })

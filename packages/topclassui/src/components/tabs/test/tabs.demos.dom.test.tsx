@@ -18,12 +18,14 @@ const LISTS: Record<string, string[]> = {
   'enclosed': ['Project'],
   'long-label': ['Report', 'Report, enclosed'],
   'many': ['Workspace', 'Workspace, enclosed'],
+  'playground': ['Project'],
   'rtl': ['المشروع'],
   'server-content': ['Team'],
   'sizes': [
     'line xs', 'line sm', 'line md', 'line lg', 'line xl', 'line custom',
     'enclosed xs', 'enclosed sm', 'enclosed md', 'enclosed lg', 'enclosed xl', 'enclosed custom',
   ],
+  'states': ['Line', 'Enclosed'],
 }
 
 const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { default: ComponentType }).default
