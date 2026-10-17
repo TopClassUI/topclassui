@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  hasLateUseClient, hasUseClient, importedModules, importedNames, inlinePropInterfaces,
-  relativeImportsMissingExtension, screamingConstants,
+  acceptsRenderProp, hasLateUseClient, hasUseClient, importedModules, importedNames, importsRenderElement,
+  inlinePropInterfaces, relativeImportsMissingExtension, runtimeUseRender, screamingConstants,
 } from './source-checks.js'
 
 /** The same source with Windows line endings, so a CRLF checkout cannot change a result. */
@@ -172,5 +172,69 @@ describe('a computed constant is not a table', () => {
     expect(screamingConstants("const UNFILLED: Variant[] = ['a']")).toEqual(['UNFILLED'])
     expect(screamingConstants("const PREFIX = 'tc-'")).toEqual(['PREFIX'])
     expect(screamingConstants('const WARN_LINES = 200')).toEqual(['WARN_LINES'])
+  })
+})
+
+describe('runtimeUseRender (R-5.7-4)', () => {
+  it('catches a named import from the subpath and from the barrel', () => {
+    expect(runtimeUseRender("import { useRender } from '@base-ui/react/use-render'")).toBe(true)
+    expect(runtimeUseRender("import { mergeProps, useRender as r } from '@base-ui/react'")).toBe(true)
+  })
+
+  it('catches the subpath in a default, namespace, dynamic or require form', () => {
+    expect(runtimeUseRender("import * as R from '@base-ui/react/use-render'")).toBe(true)
+    expect(runtimeUseRender("import R from '@base-ui/react/use-render'")).toBe(true)
+    expect(runtimeUseRender("const R = await import('@base-ui/react/use-render')")).toBe(true)
+    expect(runtimeUseRender("const R = require('@base-ui/react/use-render')")).toBe(true)
+  })
+
+  it('catches a member call on a namespace of the barrel', () => {
+    expect(runtimeUseRender("import * as Base from '@base-ui/react'\nBase.useRender({ render })")).toBe(true)
+  })
+
+  it('lets a type-only import through, which erases', () => {
+    expect(runtimeUseRender("import type { useRender } from '@base-ui/react/use-render'")).toBe(false)
+    expect(runtimeUseRender("import { type useRender } from '@base-ui/react/use-render'")).toBe(false)
+  })
+
+  it('leaves other Base UI imports alone', () => {
+    expect(runtimeUseRender("import { mergeProps } from '@base-ui/react/merge-props'")).toBe(false)
+    expect(runtimeUseRender("import { Dialog } from '@base-ui/react/dialog'")).toBe(false)
+  })
+})
+
+describe('acceptsRenderProp (R-5.7-4)', () => {
+  it('sees render destructured from the props, on its own line or among others', () => {
+    expect(acceptsRenderProp('export function A({ render, ...rest }: AProps) {}')).toBe(true)
+    expect(acceptsRenderProp('export function A({\n  size = SIZE,\n  render,\n}: AProps) {}')).toBe(true)
+    expect(acceptsRenderProp('export function A({ render = <a />, ...rest }: AProps) {}')).toBe(true)
+    expect(acceptsRenderProp('export function A({ render: as }: AProps) {}')).toBe(true)
+  })
+
+  it('sees render read from a props object', () => {
+    expect(acceptsRenderProp('export function A(props: AProps) { return props.render }')).toBe(true)
+  })
+
+  it('does not count a render attribute, a nested key or a renderItem prop', () => {
+    expect(acceptsRenderProp('export function A({ to }: AProps) { return <B render={<a href={to} />} /> }')).toBe(false)
+    expect(acceptsRenderProp('export function A({ slots = { render: 1 } }: AProps) {}')).toBe(false)
+    expect(acceptsRenderProp('export function A({ renderItem }: AProps) {}')).toBe(false)
+  })
+
+  it('does not read a comment or a string as a prop', () => {
+    expect(acceptsRenderProp("// ({ render }: AProps)\nexport const s = '({ render }: AProps)'")).toBe(false)
+  })
+})
+
+describe('importsRenderElement (R-5.7-4)', () => {
+  it('finds it by alias and by relative path', () => {
+    expect(importsRenderElement("import { renderElement } from '#shared/render.js'")).toBe(true)
+    expect(importsRenderElement("import { renderElement } from '../../shared/render.js'")).toBe(true)
+    expect(importsRenderElement("import { renderElement } from './render.js'")).toBe(true)
+  })
+
+  it('does not count a type import or another module', () => {
+    expect(importsRenderElement("import type { renderElement } from '#shared/render.js'")).toBe(false)
+    expect(importsRenderElement("import { renderElement } from './elsewhere.js'")).toBe(false)
   })
 })

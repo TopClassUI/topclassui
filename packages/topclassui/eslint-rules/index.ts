@@ -168,6 +168,22 @@ function findArbitraryColor(value: string): { cls: string; kind: 'arbitrary' | '
   return undefined
 }
 
+/** `data-[open]:` or `group-aria-[busy]/item:`: a bracket around a bare name, which v4 writes bare. */
+const BRACKETED_VARIANT = /^((?:[a-z][a-z0-9-]*-)?(?:data|aria))-\[([^\]]*)\](\/[\w-]+)?$/
+
+function findBracketedName(value: string): { cls: string; bare: string } | undefined {
+  for (const cls of value.split(/\s+/)) {
+    const variants = splitAtColons(cls)
+    variants.pop()
+    for (const variant of variants) {
+      const m = BRACKETED_VARIANT.exec(variant)
+      if (!m || m[2]?.includes('=')) continue
+      return { cls: `${variant}:`, bare: `${m[1] ?? ''}-${m[2] ?? ''}${m[3] ?? ''}:` }
+    }
+  }
+  return undefined
+}
+
 const BANNED_SCALE = [
   [/(^|[\s:])rounded-(none|xs|sm|md|lg|xl|2xl|3xl|4xl|full)(\s|$)/, 'use rounded-control, rounded-box or rounded-chip'],
   [/(^|[\s:])h-\d+(\s|$)/, 'use h-control-xs .. h-control-xl from the size scale'],
@@ -192,6 +208,96 @@ function isConsumerStyle(node: Node): boolean {
  * A sibling export that is not a part: a skeleton or a state stands beside the component
  * rather than inside it, so `Card` next to `CardSkeleton` needs no `Root`.
  */
+/** R-5.3-2: the one rtl: class PLAN section 7 writes out, the mirror of a directional icon. */
+const ICON_MIRROR = 'rtl:-scale-x-100'
+
+/** An x that needs no direction: none, a zero, or the pointer offset Base UI measures in physical px. */
+const NEUTRAL_X = /^(-?0(px|%|rem)?|none|3d|var\(--[a-z]+-swipe-movement-x\b.*)$/
+
+/** The arguments of the parenthesis that opens at `open`, split at its top-level commas. */
+function callArguments(text: string, open: number): string[] {
+  const args: string[] = []
+  let depth = 0
+  let start = open + 1
+  for (let i = open; i < text.length; i++) {
+    const ch = text[i]
+    if (ch === '(') depth++
+    else if (ch === ')' && --depth === 0) return [...args, text.slice(start, i)]
+    else if (ch === ',' && depth === 1) {
+      args.push(text.slice(start, i))
+      start = i + 1
+    }
+  }
+  return [...args, text.slice(start)]
+}
+
+const dirAware = (x: string) => x.includes('--tc-dir') || NEUTRAL_X.test(x.trim())
+
+/** A gradient angle along the block axis reads the same in both directions. */
+function physicalGradient(spec: string): boolean {
+  if (spec.includes('--tc-dir')) return false
+  if (/(^|[\s_-])(left|right)(?![a-z])/.test(spec)) return true
+  const angles = [...spec.matchAll(/(-?[\d.]+)(deg|turn|rad|grad)/g)]
+  const half = { deg: 180, turn: 0.5, rad: Math.PI, grad: 200 } as const
+  return angles.some(([, n, unit]) => Number(n) % half[unit as keyof typeof half] !== 0)
+}
+
+const POSITION = /^(object|bg)-(top|bottom|left|right|center)(-(top|bottom|left|right))?$|^object-[[(]|^bg-position-[[(]|^bg-\[position:/
+const PHYSICAL_POSITION = /^(object|bg)-((left|right)(-(top|bottom))?|(top|bottom)-(left|right))$/
+const DIR_VARIANT = /^(rtl|ltr)$|dir=["']?(rtl|ltr)|:dir\(/
+
+/** Why a class string breaks R-5.3-2, with the offending class, or undefined when it keeps it. */
+function findPhysicalMotion(value: string): { cls: string; hint: string } | undefined {
+  const tokens = value.split(/\s+/).filter(Boolean)
+  const hasDirPosition = tokens.some((cls) => {
+    const variants = splitAtColons(cls)
+    const utility = variants.pop() ?? ''
+    return variants.some((v) => DIR_VARIANT.test(v)) && POSITION.test(utility)
+  })
+  for (const cls of tokens) {
+    const variants = splitAtColons(cls)
+    const utility = (variants.pop() ?? '').replace(/^!/, '')
+    if (variants.some((v) => DIR_VARIANT.test(v))) {
+      if (cls !== ICON_MIRROR && !POSITION.test(utility)) {
+        return { cls, hint: 'uses a direction variant; only object-* and bg-* positions may, everything else multiplies by --tc-dir' }
+      }
+      continue
+    }
+    const translate = /^-?translate-(x-)?(.+)$/.exec(utility)
+    if (translate && !/^[yz]-/.test(translate[2] ?? '')) {
+      const value = translate[2] ?? ''
+      const x = translate[1] || !value.startsWith('[') ? value : (value.slice(1, -1).split('_')[0] ?? '')
+      if (!dirAware(x)) return { cls, hint: 'moves along a physical x; multiply it by --tc-dir, as translate-x-[calc(100%*var(--tc-dir))]' }
+    }
+    for (const m of utility.matchAll(/translate(X|3d)?\(/g)) {
+      const x = callArguments(utility, m.index + m[0].length - 1)[0] ?? ''
+      if (!dirAware(x)) return { cls, hint: 'translates along a physical x; multiply it by --tc-dir, as translateX(calc(100%*var(--tc-dir)))' }
+    }
+    const property = /^\[translate:([^_\]]+)/.exec(utility)
+    if (property && !dirAware(property[1] ?? '')) return { cls, hint: 'translates along a physical x; multiply it by --tc-dir' }
+    if (/^(origin-|\[transform-origin:)/.test(utility) && /(^|[-_[:])(left|right)(?![a-z])/.test(utility)) {
+      return { cls, hint: 'pins the transform origin to a physical side; use one Base UI measures, as origin-(--transform-origin), or a centre or block edge' }
+    }
+    const gradient = /^-?bg-(linear|gradient)-(.+)$/.exec(utility)
+    if (gradient) {
+      const spec = gradient[2] ?? ''
+      const side = /^to-(r|l|tr|tl|br|bl)$/.test(spec)
+      const angle = /^\d+$/.test(spec) && Number(spec) % 180 !== 0
+      if (side || angle || (/^[[(]/.test(spec) && physicalGradient(spec))) {
+        return { cls, hint: 'points the gradient at a physical side; multiply the angle by --tc-dir, as bg-linear-[calc(90deg*var(--tc-dir))]' }
+      }
+    }
+    for (const m of utility.matchAll(/linear-gradient\(/g)) {
+      const first = callArguments(utility, m.index + m[0].length - 1)[0] ?? ''
+      if (physicalGradient(first)) return { cls, hint: 'points the gradient at a physical side; multiply the angle by --tc-dir' }
+    }
+    if (PHYSICAL_POSITION.test(utility) && !hasDirPosition) {
+      return { cls, hint: 'is a physical position with no logical form; pair it with its rtl: mirror' }
+    }
+  }
+  return undefined
+}
+
 const NOT_A_PART = /^(Skeleton|EmptyState|ErrorState|Client|Provider|Context|Variants|Props)$/
 
 const rules = {
@@ -211,6 +317,21 @@ const rules = {
             return
           }
         }
+      })
+    },
+  },
+
+  'dir-aware-transforms': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-5.3-2: translate, transform origin and gradient direction follow --tc-dir; rtl: is for object-* and bg-* positions.' },
+      schema: [],
+      messages: { physical: 'R-5.3-2: "{{cls}}" {{hint}}.' },
+    },
+    create(ctx: Context) {
+      return eachClassString((node, value) => {
+        const found = findPhysicalMotion(value)
+        if (found) ctx.report({ node, messageId: 'physical', data: found })
       })
     },
   },
@@ -295,6 +416,21 @@ const rules = {
             data: { cls: s[0].trim(), hint: 'use HOVER, FOCUS_RING or the shared state constants' },
           })
         }
+      })
+    },
+  },
+
+  'bare-data-variants': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-5.2-6: data and aria variants are written bare; brackets only hold name=value.' },
+      schema: [],
+      messages: { bracketed: 'R-5.2-6: "{{cls}}" brackets a bare name. Write "{{bare}}"; brackets only hold name=value.' },
+    },
+    create(ctx: Context) {
+      return eachClassString((node, value) => {
+        const b = findBracketedName(value)
+        if (b) ctx.report({ node, messageId: 'bracketed', data: b })
       })
     },
   },
@@ -636,6 +772,81 @@ const rules = {
       }
     },
   },
+  'no-fetch-in-components': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-8.5-2: components never fetch, cache or paginate; the app owns the data.' },
+      schema: [
+        {
+          type: 'object',
+          properties: { allow: { type: 'array', items: { type: 'string' } } },
+          additionalProperties: false,
+        },
+      ],
+      messages: {
+        data:
+          'R-8.5-2: {{what}} makes the component own data. The app fetches, caches and pages; '
+          + 'take the data as props and call loadMore().',
+      },
+    },
+    create(ctx: Context) {
+      const file = String(ctx.filename ?? ctx.getFilename()).replace(/\\/g, '/')
+      if (!/(^|\/)src\/(components|connectors|shared)\//.test(file)) return {}
+      const allow = new Set((ctx.options?.[0]?.allow ?? []) as string[])
+      const GLOBALS = new Set(['XMLHttpRequest', 'localStorage', 'sessionStorage', 'indexedDB', 'caches', 'unstable_cache'])
+      const HOSTS = new Set(['window', 'globalThis', 'self'])
+
+      const report = (node: Node, name: string, what = name) => {
+        if (!allow.has(name)) ctx.report({ node, messageId: 'data', data: { what } })
+      }
+      /** A property key or a non-computed member name is not a reference to the global. */
+      const isReference = (node: Node) => {
+        const p = node.parent
+        if (p?.type === 'MemberExpression' && p.property === node && !p.computed) return false
+        if ((p?.type === 'Property' || p?.type === 'MethodDefinition' || p?.type === 'PropertyDefinition') && p.key === node && !p.computed) return false
+        if (p?.type === 'TSPropertySignature' && p.key === node) return false
+        return !/^Import|^Export/.test(String(p?.type))
+      }
+      const calleeName = (callee: Node): string | undefined => {
+        if (callee?.type === 'Identifier') return callee.name
+        if (callee?.type === 'MemberExpression' && !callee.computed && HOSTS.has(callee.object?.name)) return callee.property?.name
+        return undefined
+      }
+
+      return {
+        ImportDeclaration(node: Node) {
+          const source = node.source?.value
+          if (source === 'next/cache') report(node, 'next/cache', '"next/cache"')
+          if (source !== 'react') return
+          for (const s of node.specifiers ?? []) {
+            if (s.type === 'ImportSpecifier' && (s.imported?.name ?? s.imported?.value) === 'cache') {
+              report(s, 'cache', "React's cache()")
+            }
+          }
+        },
+        Identifier(node: Node) {
+          if (GLOBALS.has(node.name) && isReference(node)) report(node, node.name)
+        },
+        MemberExpression(node: Node) {
+          const name = node.property?.name
+          if (node.computed || !HOSTS.has(node.object?.name) || !GLOBALS.has(name)) return
+          report(node.property, name, `${node.object.name}.${name}`)
+        },
+        CallExpression(node: Node) {
+          const name = calleeName(node.callee)
+          if (name === 'fetch') report(node, 'fetch', 'fetch()')
+          const c = node.callee
+          if (c?.type === 'MemberExpression' && c.object?.name === 'React' && c.property?.name === 'cache') {
+            report(node, 'cache', "React's cache()")
+          }
+        },
+        NewExpression(node: Node) {
+          if (calleeName(node.callee) === 'Request') report(node, 'Request', 'new Request()')
+        },
+      }
+    },
+  },
+
   'tooltip-content-is-text': {
     meta: {
       type: 'problem' as const,

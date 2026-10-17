@@ -3,6 +3,24 @@ import type { Mutation } from '../lib/mutate.js'
 
 export const MUTATIONS: Mutation[] = [
   {
+    label: 'check-boundaries stops looking for useRender in a server file',
+    file: 'scripts/check-boundaries.ts',
+    from: '    if (runtimeUseRender(source)) {',
+    to: '    if (false && runtimeUseRender(source)) {',
+  },
+  {
+    label: 'check-boundaries accepts a server render prop without renderElement',
+    file: 'scripts/check-boundaries.ts',
+    from: '    if (acceptsRenderProp(source) && !importsRenderElement(source)) {',
+    to: '    if (acceptsRenderProp(source) && importsRenderElement(source)) {',
+  },
+  {
+    label: 'the named-import scan no longer recognises useRender',
+    file: 'scripts/lib/source-checks.ts',
+    from: "    if (names.some((name) => /^useRender\\b/.test(name))) return true",
+    to: "    if (names.some((name) => /^type useRender\\b/.test(name))) return true",
+  },
+  {
     label: 'the contrast margin that absorbs browser differences is removed',
     file: 'scripts/lib/contrast-checks.ts',
     from: 'export const MARGIN = 0.15',
@@ -181,5 +199,29 @@ export const MUTATIONS: Mutation[] = [
     file: 'scripts/lib/mutate.ts',
     from: '  if (/^\\s*Test(?: Files|s)\\s+\\d+ failed/m.test(output)) return true',
     to: '  return true',
+  },
+  {
+    label: 'R-8.5-1: an exemption covers props that take CollectionProps',
+    file: 'scripts/lib/collections.ts',
+    from: "    if (types !== null && takesCollectionProps(types)) return ['its props take CollectionProps, which no exemption covers']\n",
+    to: '',
+  },
+  {
+    label: 'R-8.5-1: importing useCollection counts as calling it',
+    file: 'scripts/lib/collections.ts',
+    from: "    && /\\buseCollection\\s*(<[^>]*>)?\\s*\\(/.test(code)",
+    to: '    && true',
+  },
+  {
+    label: 'R-8.5-1: a menu of items stops counting as a list',
+    file: 'scripts/lib/collections.ts',
+    from: ' || /\\bMenuContract\\b/.test(code)',
+    to: '',
+  },
+  {
+    label: 'R-8.5-1: a list with no hook passes',
+    file: 'scripts/lib/collections.ts',
+    from: "  if (hook === null) return ['renders items and has no hook.ts to call useCollection in']",
+    to: '  if (hook === null) return []',
   },
 ]
