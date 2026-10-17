@@ -5,7 +5,7 @@ import tseslint from 'typescript-eslint'
 import topclass from './eslint-rules/index.ts'
 
 export default defineConfig(
-  { ignores: ['node_modules', 'dist', '.next', 'apps/**/.next', 'apps/docs/content', 'coverage'] },
+  { ignores: ['node_modules', 'dist', '.next', 'apps/**/.next', 'coverage'] },
 
   js.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
