@@ -7,7 +7,7 @@ import { clamp } from '#shared/clamp.js'
 import { cn } from '#shared/cn.js'
 import { POPUP_BOUNDS, toSideAlign } from '#shared/floating.js'
 import { guardEscape } from '#shared/overlay.js'
-import { renderTrigger } from '#shared/render-trigger.js'
+import { renderPart, renderTrigger } from '#shared/render-trigger.js'
 import { DROPDOWN_BOUNDARIES } from './boundaries.js'
 import {
   DROPDOWN_GROUP, DROPDOWN_ITEM, DROPDOWN_ITEM_TONE, DROPDOWN_POPUP, DROPDOWN_POSITIONER, DROPDOWN_SEPARATOR,
@@ -97,9 +97,10 @@ function DropdownSurface({ ref, className, ...rest }: DropdownPopupProps) {
 }
 
 /** One row: the icon, the label in the span that truncates it, then the shortcut. */
-export function DropdownItem({ icon, shortcut, tone = DROPDOWN_DEFAULTS.tone, className, children, ...rest }: DropdownItemProps) {
+export function DropdownItem({ icon, shortcut, tone = DROPDOWN_DEFAULTS.tone, className, render, children, ...rest }: DropdownItemProps) {
+  const part = renderPart(render, cn(DROPDOWN_ITEM, DROPDOWN_ITEM_TONE[tone], className))
   return (
-    <Base.Item {...rest} data-tone={tone} className={cn(DROPDOWN_ITEM, DROPDOWN_ITEM_TONE[tone], className)}>
+    <Base.Item {...rest} data-tone={tone} render={part.render} className={part.className}>
       {renderRow(icon, children, shortcut)}
     </Base.Item>
   )
@@ -107,22 +108,25 @@ export function DropdownItem({ icon, shortcut, tone = DROPDOWN_DEFAULTS.tone, cl
 
 /** The same row as a real anchor, so open-in-new-tab and middle-click work. It closes the
  * menu on a press, which Base UI leaves open: a client-side navigation keeps the page. */
-export function DropdownLinkItem({ icon, shortcut, tone = DROPDOWN_DEFAULTS.tone, className, children, ...rest }: DropdownLinkItemProps) {
+export function DropdownLinkItem({ icon, shortcut, tone = DROPDOWN_DEFAULTS.tone, className, render, children, ...rest }: DropdownLinkItemProps) {
+  const part = renderPart(render, cn(DROPDOWN_ITEM, DROPDOWN_ITEM_TONE[tone], className))
   return (
-    <Base.LinkItem closeOnClick {...rest} data-tone={tone} className={cn(DROPDOWN_ITEM, DROPDOWN_ITEM_TONE[tone], className)}>
+    <Base.LinkItem closeOnClick {...rest} data-tone={tone} render={part.render} className={part.className}>
       {renderRow(icon, children, shortcut)}
     </Base.LinkItem>
   )
 }
 
 /** Base UI's group, named by the DropdownGroupLabel inside it. */
-export function DropdownGroup({ className, ...rest }: DropdownGroupProps) {
-  return <Base.Group {...rest} className={cn(DROPDOWN_GROUP, className)} />
+export function DropdownGroup({ className, render, ...rest }: DropdownGroupProps) {
+  const part = renderPart(render, cn(DROPDOWN_GROUP, className))
+  return <Base.Group {...rest} render={part.render} className={part.className} />
 }
 
 /** A line between two sets of rows, which a screen reader announces as a separator. */
-export function DropdownSeparator({ className, ...rest }: DropdownSeparatorProps) {
-  return <Base.Separator {...rest} className={cn(DROPDOWN_SEPARATOR, className)} />
+export function DropdownSeparator({ className, render, ...rest }: DropdownSeparatorProps) {
+  const part = renderPart(render, cn(DROPDOWN_SEPARATOR, className))
+  return <Base.Separator {...rest} render={part.render} className={part.className} />
 }
 
 /** The same menu from data: one group named by title. An href row is a link, cloned from link

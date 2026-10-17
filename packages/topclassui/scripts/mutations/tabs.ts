@@ -14,8 +14,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a tabs panel never hands keepMounted to Base UI, whose own default unmounts it',
     file: CLIENT,
-    from: '<Base.Panel {...rest} keepMounted={keepMounted} className',
-    to: '<Base.Panel {...rest} className',
+    from: '<Base.Panel {...rest} keepMounted={keepMounted} render',
+    to: '<Base.Panel {...rest} render',
   },
   {
     label: 'the tabs root is a plain block, so a list that scrolls widens a grid track or a table cell to the width of all its tabs',
@@ -278,14 +278,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: "the tabs root's own classes beat a consumer className",
     file: CLIENT,
-    from: 'className={cn(TABS_ROOT, className)}',
-    to: 'className={cn(className, TABS_ROOT)}',
+    from: 'renderPart(render, cn(TABS_ROOT, className))',
+    to: 'renderPart(render, cn(className, TABS_ROOT))',
   },
   {
     label: "the tabs list's own classes beat a consumer className",
     file: CLIENT,
-    from: 'className={cn(TABS_LIST[variant], className)}',
-    to: 'className={cn(className, TABS_LIST[variant])}',
+    from: 'renderPart(render, cn(TABS_LIST[variant], className))',
+    to: 'renderPart(render, cn(className, TABS_LIST[variant]))',
   },
   {
     label: "a tabs tab's own classes beat a consumer className",
@@ -296,8 +296,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: "a tabs panel's own classes beat a consumer className",
     file: CLIENT,
-    from: 'className={cn(TABS_PANEL, className)}',
-    to: 'className={cn(className, TABS_PANEL)}',
+    from: 'renderPart(render, cn(TABS_PANEL, className))',
+    to: 'renderPart(render, cn(className, TABS_PANEL))',
   },
   {
     label: 'tabs default to the enclosed look instead of the line one',

@@ -7,7 +7,7 @@ import { clamp } from '#shared/clamp.js'
 import { cn } from '#shared/cn.js'
 import { POPUP_BOUNDS, toSideAlign } from '#shared/floating.js'
 import { guardEscape } from '#shared/overlay.js'
-import { hasContent, renderTrigger } from '#shared/render-trigger.js'
+import { hasContent, renderPart, renderTrigger } from '#shared/render-trigger.js'
 import { Svg } from '#components/svg/index.js'
 import { POPOVER_BOUNDARIES } from './boundaries.js'
 import { POPOVER_CLOSE, POPOVER_DESCRIPTION, POPOVER_POPUP, POPOVER_POSITIONER, POPOVER_TITLE } from './classes.js'
@@ -90,13 +90,15 @@ function PopoverSurface({ ref, className, ...rest }: PopoverPopupProps) {
 }
 
 /** Base UI's title, an h2 that names the popup. */
-export function PopoverTitle({ className, ...rest }: PopoverTitleProps) {
-  return <Base.Title {...rest} className={cn(POPOVER_TITLE, className)} />
+export function PopoverTitle({ className, render, ...rest }: PopoverTitleProps) {
+  const part = renderPart(render, cn(POPOVER_TITLE, className))
+  return <Base.Title {...rest} render={part.render} className={part.className} />
 }
 
 /** Base UI's description, a paragraph the popup is described by. */
-export function PopoverDescription({ className, ...rest }: PopoverDescriptionProps) {
-  return <Base.Description {...rest} className={cn(POPOVER_DESCRIPTION, className)} />
+export function PopoverDescription({ className, render, ...rest }: PopoverDescriptionProps) {
+  const part = renderPart(render, cn(POPOVER_DESCRIPTION, className))
+  return <Base.Description {...rest} render={part.render} className={part.className} />
 }
 
 /** Base UI's close. With render, or children that draw something, it is that control, with
