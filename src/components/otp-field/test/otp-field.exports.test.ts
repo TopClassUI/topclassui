@@ -17,17 +17,19 @@ function exportedNames(source: string): string[] {
   })
 }
 
-describe('index.tsx exports one flat name (R-9.2-3)', () => {
-  it('exports exactly OTPField, a function component; OtpField, the folder\'s spelling, is not an export (choice 24)', () => {
-    expect(Object.keys(otp)).toEqual(['OTPField'])
-    expect(typeof otp.OTPField).toBe('function')
+describe('index.tsx exports flat names (R-9.2-3)', () => {
+  it('exports exactly OTPField and OTPFieldSkeleton, two function components; OtpField, the folder\'s spelling, is not an export (choice 24)', () => {
+    expect(Object.keys(otp).sort()).toEqual(['OTPField', 'OTPFieldSkeleton'])
+    expect([typeof otp.OTPField, typeof otp.OTPFieldSkeleton]).toEqual(['function', 'function'])
     expect('OtpField' in otp).toBe(false)
+    expect('OtpFieldSkeleton' in otp).toBe(false)
   })
 
   it('has no Base UI type name, no context and no hook in its surface', () => {
     const source = readFileSync(join(import.meta.dirname, '..', 'index.tsx'), 'utf8')
     expect(exportedNames(source).sort()).toEqual([
-      'OTPField', 'OTPFieldProps', 'OtpFieldDesignProps', 'OtpFieldName', 'OtpFieldProps', 'OtpFieldValidationType',
+      'OTPField', 'OTPFieldProps', 'OTPFieldSkeleton', 'OTPFieldSkeletonProps', 'OtpFieldDesignProps', 'OtpFieldName', 'OtpFieldProps',
+      'OtpFieldValidationType',
     ])
   })
 

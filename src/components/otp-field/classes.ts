@@ -1,6 +1,6 @@
 // R-5.12-4: the class strings of the code field, built from the shared constants (unit-4.md, OTPField).
 import {
-  BORDER_STRONG, DISABLED, FIELD_INVALID, FIELD_TEXT_COARSE, FOCUS_RING, TARGET_HEIGHT, TRANSITION,
+  BORDER_STRONG, DISABLED, FIELD_INVALID, FIELD_TEXT_COARSE, FOCUS_RING, FORCED_EDGE, TARGET_HEIGHT, TRANSITION,
 } from '#shared/classes.js'
 
 /** As wide as its cells, so in an Arabic form the group sits at the start, beside its label, while the cells run left to right.
@@ -28,3 +28,13 @@ export const OTP_CELL_SIZE = {
 
 /** Decoration between groups: a 10 x 2 bar, which forced colours would erase as a fill. */
 export const OTP_SEPARATOR = 'h-0.5 w-2.5 shrink-0 rounded-full bg-line-strong forced-colors:bg-[CanvasText]'
+
+/** The skeleton's cell: the floor, the shrink and the radius of a cell, in the neutral fill, which pulses. Its size,
+ * its basis and its growth are the cell's own: OTP_CELL_SIZE and OTP_CELL_FIT or OTP_CELL_WHOLE. */
+export const OTP_SKELETON_CELL = `block rounded-control min-w-[var(--tc-target-min,24px)] shrink ${TARGET_HEIGHT} bg-neutral-soft animate-pulse motion-reduce:animate-none ${FORCED_EDGE}`
+
+/** An input is as wide as the browser makes it, past any cell's max-w, which cuts it down; an empty span is not, so it gets that width. */
+export const OTP_SKELETON_CELL_WIDTH = 'w-(--tc-input-width)'
+
+/** Merged after OTP_SEPARATOR: the same bar, in the skeleton's fill. */
+export const OTP_SKELETON_SEPARATOR = 'bg-neutral-soft animate-pulse motion-reduce:animate-none'

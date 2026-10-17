@@ -14,7 +14,7 @@ import { FORCED_CANVAS, contrast, inkOn, pixelsOf } from './pixels.js'
 // and the form, before hydration and after a reset.
 
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['basic', 'form', 'grouped', 'long', 'rtl', 'sizes', 'states'].map((demo) => `otp-field--${demo}`)
+const DEMOS = ['basic', 'form', 'grouped', 'long', 'rtl', 'sizes', 'skeleton', 'states'].map((demo) => `otp-field--${demo}`)
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 
 const css = (element: Locator, property: string) => element.evaluate((el, name) => getComputedStyle(el).getPropertyValue(name), property)
@@ -515,5 +515,41 @@ test.describe('axe on the hydrated demos', () => {
         expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([])
       })
     }
+  }
+})
+
+test.describe('the skeleton', () => {
+  for (const pointer of ['fine', 'coarse'] as const) {
+    test.describe(`${pointer} pointer`, () => {
+      test.use(pointer === 'coarse' ? COARSE : {})
+
+      test('is the box of the field it stands in for at every size and length: the row, and each cell and separator where it sits', async ({ page }) => {
+        await page.goto(urlFor('otp-field--skeleton', 'light', 'ltr'))
+        const measure = () => page.locator('[data-pair]').evaluateAll((all) => all.map((pair) => {
+          const round = (n: number) => Math.round(n * 10) / 10
+          /** The row's width and height, then each item's offset from the row and its size. */
+          const layout = (row: Element | null) => {
+            const box = row?.getBoundingClientRect() ?? new DOMRect()
+            return [[round(box.width), round(box.height)], ...[...row?.children ?? []].map((item) => {
+              const r = item.getBoundingClientRect()
+              return [round(r.left - box.left), round(r.top - box.top), round(r.width), round(r.height)]
+            })]
+          }
+          return [pair.getAttribute('data-pair'), layout(pair.querySelector('[role="group"]')), layout(pair.querySelector(':scope > div > span[aria-hidden]'))]
+        }))
+        const pairs = await measure()
+        expect(pairs.map(([name]) => name)).toEqual(['xs', 'sm', 'md', 'lg', 'xl', 'four', 'grouped', 'twelve'])
+        for (const [name, real, skeleton] of pairs) expect(skeleton, String(name)).toEqual(real)
+        const [, md] = pairs[2] as [string, number[][]]
+        expect([md.length, md[1]?.[2], md[1]?.[3]]).toEqual([7, ...pointer === 'coarse' ? [44, 44] : [40, 40]])
+        expect((pairs[7]?.[1] as number[][]).length).toBe(13)
+        if (pointer === 'fine') return
+        // Choice 38: at 320 px the cells give up width, and twelve wrap; the skeleton does the same.
+        await page.setViewportSize({ width: 320, height: 640 })
+        const narrow = await measure()
+        for (const [name, real, skeleton] of narrow) expect(skeleton, `${String(name)} at 320 px`).toEqual(real)
+        expect((narrow[2]?.[1] as number[][])[1]?.slice(2)).toEqual([36, 44])
+      })
+    })
   }
 })

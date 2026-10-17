@@ -1,5 +1,5 @@
 import type { OTPField as Base } from '@base-ui/react/otp-field'
-import type { Ref } from 'react'
+import type { ComponentPropsWithRef, Ref } from 'react'
 
 import type { OtpFieldSchemaInput } from './schema.js'
 
@@ -67,3 +67,8 @@ export interface OtpFieldCell {
   label: string | undefined
   separator: boolean
 }
+
+/** R-8.3-4: the field's own length, groups and size, so the two cannot describe different boxes. Named after the export. */
+export type OTPFieldSkeletonProps =
+  Omit<ComponentPropsWithRef<'span'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
+  & Pick<OtpFieldDesignProps, 'length' | 'groupSize' | 'size'>

@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'grouped', 'long', 'rtl', 'sizes', 'states']
+const EXPECTED = ['basic', 'form', 'grouped', 'long', 'rtl', 'sizes', 'skeleton', 'states']
 
 /** Each field of each demo as the server writes it: the name its first cell gets with no script, its cells (a digit,
  * or _ when empty, | for a separator, ^ after the one tab stop), and its states. */
@@ -22,6 +22,10 @@ const FIELDS: Record<string, string[]> = {
   'long': ['Recovery code: ^____________ whole cells'],
   'rtl': ['رمز التحقق: ^______'],
   'sizes': ['Extra small: 482^___', 'Small: 482^___', 'Medium: 482^___', 'Large: 482^___', 'Extra large: 482^___'],
+  'skeleton': [
+    'Code, xs: ^______', 'Code, sm: ^______', 'Code, md: ^______', 'Code, lg: ^______', 'Code, xl: ^______',
+    'Code, four: ^____', 'Code, grouped: ^___|___', 'Code, twelve: ^____________ whole cells',
+  ],
   'states': ['Invalid: 48291^3 invalid', 'Disabled: 482^___ disabled', 'Read-only: 48291^3 read-only'],
 }
 
@@ -56,7 +60,7 @@ function fieldsIn(html: string): string[] {
 }
 
 describe('every demo renders on the server', () => {
-  it('holds exactly the seven demos asked for, so none can be deleted silently', () => {
+  it('holds exactly the eight demos asked for, so none can be deleted silently', () => {
     expect(files).toEqual(EXPECTED)
   })
 
@@ -91,6 +95,13 @@ describe('the demos the plan names', () => {
     expect(html).toMatch(/^<div class="isolate"><div dir="rtl" lang="ar">/)
     expect(html).toMatch(/<div role="group" dir="ltr" /)
     expect(html).toContain('aria-label="الخانة 6 من 6"')
+  })
+
+  it('skeleton: each field above a hidden skeleton with as many cells and separators, eight pairs', async () => {
+    const html = await render('skeleton')
+    expect([...html.matchAll(/data-pair="([^"]*)"/g)].map(([, pair]) => pair)).toEqual(['xs', 'sm', 'md', 'lg', 'xl', 'four', 'grouped', 'twelve'])
+    const skeletons = [...html.matchAll(/<span class="[^"]*" aria-hidden="true">((?:<span class="[^"]*"><\/span>)*)<\/span>/g)]
+    expect(skeletons.map(([, inner = '']) => inner.match(/<span/g)?.length)).toEqual([6, 6, 6, 6, 6, 4, 7, 12])
   })
 
   it('basic: the hint describes the first cell', async () => {

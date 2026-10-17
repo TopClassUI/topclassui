@@ -93,18 +93,20 @@ the field into one where none is required.
 | `aria-labelledby`, `aria-describedby`, `aria-invalid` on the group | on the cells |
 | `Separator` | not used: `groupSize` draws a bar that is decoration |
 
+**`OTPFieldSkeleton`** is the row of cells: give it the same `length`, `groupSize` and `size`.
+
 ### Not built
 
 The drawn 2 px border as the focus mark (choice 23: the shared ring, outside the cell), cells
 that hug their text, a separator as a part, a `pattern` on numeric cells, `tone`, a hover look,
-a read-only look, the invalid ring that is always on, a skeleton (use `Skeleton`).
+a read-only look, the invalid ring that is always on.
 
 <!-- /hand-written -->
 
 ## Import
 
 ```tsx
-import { OTPField } from 'topclassui'
+import { OTPField, OTPFieldSkeleton } from 'topclassui'
 ```
 
 ## Props
@@ -125,7 +127,7 @@ Required: `aria-labelledby` or `id`. Every other prop below is optional.
 | `ref` | no | `Ref<HTMLDivElement>` | - | The `<div role="group">` around the cells. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The control scale of each square cell and its type step; custom emits no size classes. |
 
-Anything else on `OTPField` is passed to the element it draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
+Anything else on `OTPField` and `OTPFieldSkeleton` is passed to the element it draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
 
@@ -135,6 +137,7 @@ Anything else on `OTPField` is passed to the element it draws, so standard attri
 - `dummy/long.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`
+- `dummy/skeleton.tsx`
 - `dummy/states.tsx`
 
 ## Verified against

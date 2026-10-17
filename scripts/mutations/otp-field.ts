@@ -5,6 +5,7 @@ const CLIENT = 'src/components/otp-field/client.tsx'
 const HOOK = 'src/components/otp-field/hook.ts'
 const LIB = 'src/components/otp-field/lib.ts'
 const CLASSES = 'src/components/otp-field/classes.ts'
+const SKELETON = 'src/components/otp-field/skeleton.tsx'
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -210,5 +211,29 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: " forced-colors:bg-[CanvasText]'",
     to: "'",
+  },
+  {
+    label: 'the otp field skeleton draws md cells at every size, so an xl field jumps when it arrives',
+    file: SKELETON,
+    from: 'OTP_CELL_SIZE[size]',
+    to: 'OTP_CELL_SIZE.md',
+  },
+  {
+    label: 'the otp field skeleton does not clamp its length, so length 99 draws 99 cells where the field draws 12',
+    file: SKELETON,
+    from: 'layoutCells(clampLength(length), groupSize)',
+    to: 'layoutCells(length, groupSize)',
+  },
+  {
+    label: 'the otp field skeleton always breaks at whole cells, so six cells at 320 px wrap where the field shrinks',
+    file: SKELETON,
+    from: 'whole ? OTP_CELL_WHOLE : OTP_CELL_FIT',
+    to: 'OTP_CELL_WHOLE',
+  },
+  {
+    label: 'the otp field skeleton cell has no width of its own, so the row is six cells of 24 px beside a field of 40 px cells',
+    file: CLASSES,
+    from: "OTP_SKELETON_CELL_WIDTH = 'w-(--tc-input-width)'",
+    to: "OTP_SKELETON_CELL_WIDTH = ''",
   },
 ]
