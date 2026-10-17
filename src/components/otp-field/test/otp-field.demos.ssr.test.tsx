@@ -5,13 +5,14 @@ import type { ComponentType } from 'react'
 import { describe, expect, it } from 'vitest'
 
 import { markup } from '#test/markup.js'
+import type { OtpFieldDesignProps } from '../types.js'
 
 // PLAN 17.1: the demos are the docs code tab and the visual baselines, so each must render.
 const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'grouped', 'long', 'rtl', 'sizes', 'states']
+const EXPECTED = ['basic', 'form', 'grouped', 'long', 'playground', 'rtl', 'sizes', 'states']
 
 /** Each field of each demo as the server writes it: the name its first cell gets with no script, its cells (a digit,
  * or _ when empty, | for a separator, ^ after the one tab stop), and its states. */
@@ -20,6 +21,7 @@ const FIELDS: Record<string, string[]> = {
   'form': ['Verification code: ^______'],
   'grouped': ['Verification code: ^___|___'],
   'long': ['Recovery code: ^____________ whole cells'],
+  'playground': ['Verification code: ^______'],
   'rtl': ['رمز التحقق: ^______'],
   'sizes': ['Extra small: 482^___', 'Small: 482^___', 'Medium: 482^___', 'Large: 482^___', 'Extra large: 482^___'],
   'states': ['Invalid: 48291^3 invalid', 'Disabled: 482^___ disabled', 'Read-only: 48291^3 read-only'],
@@ -56,7 +58,7 @@ function fieldsIn(html: string): string[] {
 }
 
 describe('every demo renders on the server', () => {
-  it('holds exactly the seven demos asked for, so none can be deleted silently', () => {
+  it('holds exactly the eight demos asked for, so none can be deleted silently', () => {
     expect(files).toEqual(EXPECTED)
   })
 
@@ -91,6 +93,14 @@ describe('the demos the plan names', () => {
     expect(html).toMatch(/^<div class="isolate"><div dir="rtl" lang="ar">/)
     expect(html).toMatch(/<div role="group" dir="ltr" /)
     expect(html).toContain('aria-label="الخانة 6 من 6"')
+  })
+
+  it('playground: the schema props a Try it control sets reach the field', async () => {
+    const loaded = await import('../dummy/playground.tsx') as { default: ComponentType<OtpFieldDesignProps> }
+    const html = markup(<loaded.default length={4} size="lg" invalid />)
+    expect(html).toContain('data-size="lg"')
+    expect(html.match(/aria-invalid="true"/g)).toHaveLength(4)
+    expect(html).toContain('aria-label="Character 4 of 4"')
   })
 
   it('basic: the hint describes the first cell', async () => {
