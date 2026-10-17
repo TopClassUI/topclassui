@@ -59,6 +59,19 @@ for (const direction of DIRECTIONS) {
       })
     }
 
+    // 55.12: an entry from nowhere (relatedTarget null) forgets the trigger an earlier Tab came from.
+    test('reached again from no element, Escape gives the focus to no stale trigger from an earlier visit', async ({ page }) => {
+      await raise(page, 'toast--sticky', direction, 'Go offline')
+      await pressTo(page, 'Tab', OFFLINE)
+      await page.evaluate(() => { (document.activeElement as HTMLElement).blur() })
+      expect(await focused(page)).toBe('(nothing)')
+      await page.locator(`:is(${ROOTS}):visible`).first().evaluate((toast) => { (toast as HTMLElement).focus() })
+      expect(await focused(page)).toBe(OFFLINE)
+      await page.keyboard.press('Escape')
+      await expect(shown(page)).toHaveCount(0)
+      await expect.poll(() => focused(page)).toBe('(nothing)')
+    })
+
     test('reached by F6, Escape closes it and the focus goes back to where it was', async ({ page }) => {
       await raise(page, 'toast--sticky', direction, 'Go offline')
       await page.keyboard.press('F6')
@@ -76,10 +89,9 @@ for (const direction of DIRECTIONS) {
       await page.keyboard.press('Escape')
       await expect(shown(page)).toHaveCount(3)
       await page.keyboard.press('F6')
-      await page.keyboard.press('Tab')
-      const first = await focused(page)
+      await pressTo(page, 'Tab', 'Message 20')
       await page.keyboard.press('Escape')
-      await expect.poll(() => focused(page)).not.toBe(first)
+      await expect.poll(() => focused(page)).toBe('Message 19')
       expect(await page.evaluate(() => document.activeElement?.closest('[role="region"]') !== null)).toBe(true)
       await expectRing(page, 'the next toast')
     })

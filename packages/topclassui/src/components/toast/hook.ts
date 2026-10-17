@@ -43,6 +43,7 @@ function useFocusReturn(toasts: readonly unknown[]) {
     onFocus: (event: ToastViewportFocus) => {
       const came = event.relatedTarget
       if (came instanceof HTMLElement && !event.currentTarget.contains(came)) from.current = came
+      else if (came === null) from.current = null
       holds.current = event.target.matches(':focus-visible')
     },
     onBlur: (event: ToastViewportFocus) => {
