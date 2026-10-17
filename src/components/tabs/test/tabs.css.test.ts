@@ -22,6 +22,8 @@ const DECLARATION: Record<string, string> = {
   'forced-colors:border-b-(length:--tc-line-width)': 'border-bottom-width: var(--tc-line-width);',
   'overflow-x-auto': 'overflow-x: auto;',
   'overscroll-x-contain': 'overscroll-behavior-x: contain;',
+  '[scrollbar-width:thin]': 'scrollbar-width: thin;',
+  '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]': 'scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track);',
   'w-fit': 'width: fit-content;',
   'max-w-full': 'max-width: 100%;',
   'gap-1': 'gap: var(--spacing);',
@@ -137,7 +139,7 @@ describe('every class Tabs writes compiles with the installed Tailwind', () => {
   it('the table names exactly the classes of the root, the lists, the tabs, the panel and the size scale', () => {
     const all = written([TABS_ROOT, ...Object.values(TABS_LIST), ...Object.values(TABS_TAB), TABS_PANEL, ...Object.values(CONTROL_SIZE)])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(75)
+    expect(all).toHaveLength(77)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

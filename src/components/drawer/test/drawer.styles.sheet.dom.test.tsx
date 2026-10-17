@@ -58,7 +58,7 @@ const SHEET = [
   'bg-surface-raised', 'data-swiping:select-none', 'duration-(--tc-duration-slow)', 'ease-out', 'flex', 'flex-col',
   'overflow-y-auto', 'overscroll-contain', 'relative', 'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]',
   'shadow-lg', 'text-body', 'transform-[translate(var(--drawer-swipe-movement-x,0px),var(--drawer-swipe-movement-y,0px))]',
-  'transition-transform', 'w-full', 'wrap-anywhere', 'border-line',
+  'transition-transform', 'w-full', 'wrap-anywhere', 'border-line', '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]', '[scrollbar-width:thin]',
 ]
 
 /** The first row keeps the corner of the x clear: of a side or a top sheet, its first child. */

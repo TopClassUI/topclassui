@@ -1,12 +1,12 @@
 /** R-5.12-4: Table's own class tables. A cell reads its alignment from one and a sticky
  * cell its fill from another, so the columns scrolling under it never show through. */
-import { CONTAIN, FOCUS_RING, FORCED_EDGE, HOVER, TOUCH_TARGET } from '#shared/classes.js'
+import { CONTAIN, FOCUS_RING, FORCED_EDGE, HOVER, SCROLLBAR, TOUCH_TARGET } from '#shared/classes.js'
 import type { TableAlign } from './types.js'
 
 /** relative: the box contains every sr-only span, or one in a far column widens the page.
  * isolate: the z-index of a stuck cell stays inside, under any sticky bar of the page.
  * grid grid-cols-1: a grid or flex parent can shrink the box instead of being widened by it. */
-export const BOX = 'relative isolate grid grid-cols-1 overflow-x-auto rounded-box bg-surface-raised'
+export const BOX = `relative isolate grid grid-cols-1 overflow-x-auto rounded-box bg-surface-raised ${SCROLLBAR}`
 
 /** Chromium leaves a focused control where it is while any of it is in view, and centres it
  * only when none is. 2rem off each edge is what counts as in view: the least a control shows. */

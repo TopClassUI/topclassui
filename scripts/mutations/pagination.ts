@@ -75,7 +75,7 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
-    label: 'the pagination current page keeps the ring of its theme, 2.9:1 on a black canvas in forced colours',
+    label: 'the pagination current page keeps the ring of its theme, 2.4:1 on a black canvas in forced colours',
     file: 'src/components/pagination/classes.ts',
     from: "  'forced-colors:[--tc-ring:Highlight]',\n",
     to: '',

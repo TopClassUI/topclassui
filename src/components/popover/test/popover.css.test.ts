@@ -21,6 +21,8 @@ const DECLARATION: Record<string, string> = {
   '*:shrink-0': 'flex-shrink: 0;',
   'overflow-y-auto': 'overflow-y: auto;',
   'overscroll-contain': 'overscroll-behavior: contain;',
+  '[scrollbar-width:thin]': 'scrollbar-width: thin;',
+  '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]': 'scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track);',
   'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]': 'scroll-padding-block: calc(var(--tc-ring-width) + var(--tc-ring-offset));',
   'rounded-box': 'border-radius: min(calc(var(--tc-radius) * 1.5), 1.5rem);',
   'bg-surface-raised': 'background-color: var(--tc-surface-raised);',
@@ -106,7 +108,7 @@ describe('every class an open Popover wears compiles with the installed Tailwind
   it('the table names exactly the classes of the five strings in classes.ts', () => {
     const all = written([POPOVER_POSITIONER, POPOVER_POPUP, POPOVER_TITLE, POPOVER_DESCRIPTION, POPOVER_CLOSE])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(50)
+    expect(all).toHaveLength(52)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

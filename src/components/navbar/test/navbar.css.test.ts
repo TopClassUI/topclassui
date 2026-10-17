@@ -71,6 +71,8 @@ const DECLARATION: Record<string, string> = {
   'p-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+1px)]': `padding: ${REACH};`,
   'overflow-x-auto': 'overflow-x: auto;',
   'overscroll-x-contain': 'overscroll-behavior-x: contain;',
+  '[scrollbar-width:thin]': 'scrollbar-width: thin;',
+  '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]': 'scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track);',
   'shrink-0': 'flex-shrink: 0;',
   // The actions.
   'ms-auto': 'margin-inline-start: auto;',
@@ -120,7 +122,7 @@ describe('every class Navbar writes compiles with the installed Tailwind', () =>
       NAVBAR_ROOT, ...Object.values(NAVBAR_TOP), NAVBAR_BRAND, NAVBAR_LINKS, NAVBAR_LIST, NAVBAR_ITEM, NAVBAR_LINK, NAVBAR_ACTIONS,
     ])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(61)
+    expect(all).toHaveLength(63)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

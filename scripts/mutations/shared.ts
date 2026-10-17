@@ -341,8 +341,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the overlay sideways scroll loses its containment, so a swipe past the end pulls the page behind it',
     file: 'src/shared/classes.ts',
-    from: "export const SCROLL_X = 'overflow-x-auto overscroll-x-contain'",
-    to: "export const SCROLL_X = 'overflow-x-auto'",
+    from: 'export const SCROLL_X = `overflow-x-auto overscroll-x-contain ${SCROLLBAR}`',
+    to: 'export const SCROLL_X = `overflow-x-auto ${SCROLLBAR}`',
   },
   {
     label: 'the overlay sticky bar loses its z-index, so a positioned element scrolls over it',

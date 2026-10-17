@@ -52,7 +52,7 @@ describe('every part carries exactly the classes written here', () => {
     expect(classesOf(<NavbarLinks />, 'ul')).toEqual([
       'flex', 'items-center', 'gap-5', 'snap-x', 'snap-mandatory', 'hover:snap-none',
       '-m-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+1px)]', 'p-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+1px)]',
-      'overflow-x-auto', 'overscroll-x-contain',
+      'overflow-x-auto', 'overscroll-x-contain', '[scrollbar-width:thin]', '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]',
     ])
   })
 

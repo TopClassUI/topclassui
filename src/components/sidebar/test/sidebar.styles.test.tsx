@@ -90,15 +90,19 @@ describe('the body', () => {
   })
 
   it('keeps the reach of a ring clear on every side: scroll padding for a row Tab brings in, and padding it takes back as margin', () => {
-    expect(body?.slice(7, 10)).toEqual([
-      'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]',
+    expect(body?.slice(7, 8)).toEqual(['scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]'])
+    expect(body?.slice(10, 12)).toEqual([
       '-m-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]',
       'p-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]',
     ])
   })
 
+  it('wears the shared thin scrollbar in the theme colours, right after the scroll area', () => {
+    expect(body?.slice(8, 10)).toEqual(['[scrollbar-width:thin]', '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]'])
+  })
+
   it('draws no scrollbar while the rail is collapsed, and that is the last of its classes', () => {
-    expect(body?.slice(10)).toEqual(['group-data-closed/sidebar:[scrollbar-width:none]'])
+    expect(body?.slice(12)).toEqual(['group-data-closed/sidebar:[scrollbar-width:none]'])
   })
 })
 

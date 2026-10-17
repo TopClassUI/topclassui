@@ -21,7 +21,7 @@ export const RADIO_TARGET = `peer ${TOGGLE_TARGET}`
 /** aria-invalid sits on the group: role="radio" does not take it. */
 export const RADIO_INVALID = 'group-aria-invalid/radios:border-danger-solid group-aria-invalid/radios:group-data-checked/toggle:border-danger-solid group-aria-invalid/radios:inset-ring-[calc(var(--tc-ring-width)-var(--tc-line-width))] group-aria-invalid/radios:inset-ring-danger-solid group-aria-invalid/radios:group-data-checked/toggle:inset-ring-danger-solid forced-colors:group-aria-invalid/radios:border-(length:--tc-ring-width)'
 
-/** Checked: a line 2 px thick and the dot, in primary-on-soft: primary-solid is 2.57:1 on the dark fill (R-5.6-4). */
+/** Checked: a line 2 px thick and the dot, in primary-on-soft: primary-solid is 2.88:1 on the dark fill (R-5.6-4). */
 export const RADIO_BOX = `rounded-full bg-surface-raised text-primary-on-soft ${TOGGLE_BOX} group-data-checked/toggle:border-primary-on-soft group-data-checked/toggle:inset-ring-[calc(var(--tc-ring-width)-var(--tc-line-width))] group-data-checked/toggle:inset-ring-primary-on-soft ${RADIO_INVALID}`
 
 /** Base UI's Indicator, mounted only while the radio is checked: it centres the dot. */

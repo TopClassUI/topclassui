@@ -76,9 +76,13 @@ export const TOGGLE_SIZE = {
   custom: '',
 } as const
 
+/** The native scrollbar, thin and in the theme's two colours. Forced colours compute scrollbar-color to auto,
+ * so there the browser draws its system colours; a component sets the two tokens, never the property. */
+export const SCROLLBAR = '[scrollbar-width:thin] [scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]'
+
 /** R-10.5-1: a scroll container inside an overlay never scrolls the page behind it. A control that
  * Tab scrolls into view lands flush with its edge, so the area keeps the reach of the focus ring clear. */
-export const SCROLL_AREA = 'overflow-y-auto overscroll-contain scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]'
+export const SCROLL_AREA = `overflow-y-auto overscroll-contain scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))] ${SCROLLBAR}`
 
 /** Disabled is opacity plus no pointer events; loading keeps full colour so it never reads as disabled. */
 // data-disabled carries it for an element with no disabled attribute, such as an anchor.
@@ -136,7 +140,7 @@ export const ROW_HIGHLIGHT = [
 export const LIST_CAP = 'max-h-[min(var(--available-height,100dvh),calc(var(--tc-list-rows)*var(--tc-row-height)))]'
 
 /** Scrolls sideways inside its own box, so the page never grows wider than the screen. */
-export const SCROLL_X = 'overflow-x-auto overscroll-x-contain'
+export const SCROLL_X = `overflow-x-auto overscroll-x-contain ${SCROLLBAR}`
 
 /** R-10.5-3: a bar that sticks to the top. Whoever wears it sets --tc-sticky-top to its height. */
 export const STICKY_TOP = 'sticky top-0 z-(--tc-z-sticky)'
@@ -177,7 +181,7 @@ export const POPUP_PASSIVE = 'pointer-events-auto'
 export const TOGGLE_TARGET = `group/toggle relative inline-flex w-fit shrink-0 items-center justify-center outline-none ${TOUCH_TARGET} ${DISABLED}`
 
 /** The ring of a focused target, drawn on the box inside it. The group is named: a bare one would match an accordion trigger around it.
- * A filled box opts out of forced colours, which would keep --tc-ring at 2.85:1 on Canvas: CanvasText follows the user's palette. */
+ * A filled box opts out of forced colours, which would keep --tc-ring at 2.4:1 on Canvas: CanvasText follows the user's palette. */
 export const TOGGLE_RING = 'group-focus-visible/toggle:outline-solid group-focus-visible/toggle:outline-(length:--tc-ring-width) group-focus-visible/toggle:outline-offset-(length:--tc-ring-offset) group-focus-visible/toggle:outline-ring forced-colors:group-focus-visible/toggle:outline-[CanvasText]'
 
 /** The drawn box. It sets no fill and no justify: two classes for one property do not merge in a string. */

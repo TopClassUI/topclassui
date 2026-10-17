@@ -102,7 +102,7 @@ describe('every element carries exactly the classes the spec names', () => {
       ...RING_INSET,
       '[@media(height<17rem)]:flex-none', '[@media(height<17rem)]:overflow-y-visible', 'flex-1', 'min-h-13',
       'overflow-y-auto', 'overscroll-contain', 'px-4', 'py-4', 'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]',
-      'text-sm',
+      'text-sm', '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]', '[scrollbar-width:thin]',
     ].sort())
   })
 

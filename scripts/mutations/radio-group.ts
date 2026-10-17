@@ -199,7 +199,7 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
-    label: 'the radio group dot is primary-solid again, 2.57:1 on the dark fill, under the 3:1 of R-5.6-4',
+    label: 'the radio group dot is primary-solid again, 2.88:1 on the dark fill, under the 3:1 of R-5.6-4',
     file: CLASSES,
     from: ' text-primary-on-soft ',
     to: ' text-primary-solid ',

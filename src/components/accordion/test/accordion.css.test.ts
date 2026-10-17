@@ -75,6 +75,8 @@ const DECLARATION: Record<string, string> = {
   'pb-4': 'padding-bottom: calc(var(--spacing) * 4);',
   'overflow-x-auto': 'overflow-x: auto;',
   'overscroll-x-contain': 'overscroll-behavior-x: contain;',
+  '[scrollbar-width:thin]': 'scrollbar-width: thin;',
+  '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]': 'scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track);',
   '[:last-child>*>&]:rounded-b-box': 'border-bottom-left-radius: min(calc(var(--tc-radius) * 1.5), 1.5rem);',
 }
 
@@ -102,7 +104,7 @@ describe('every class an Accordion wears compiles with the installed Tailwind', 
       ACCORDION_ROOT, ACCORDION_ITEM, ACCORDION_TRIGGER, ACCORDION_TITLE, ACCORDION_CARET, ACCORDION_PANEL, ACCORDION_CONTENT,
     ])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(62)
+    expect(all).toHaveLength(64)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

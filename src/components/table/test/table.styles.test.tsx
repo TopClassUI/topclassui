@@ -38,6 +38,7 @@ describe('each part wears exactly the classes it needs', () => {
     expect(classList(html()).sort()).toEqual([
       'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line', ...RING,
       'grid', 'grid-cols-1', 'isolate', 'overflow-x-auto', 'relative', 'rounded-box', 'scroll-pe-8', 'scroll-ps-8',
+      '[scrollbar-width:thin]', '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]',
     ].sort())
   })
 

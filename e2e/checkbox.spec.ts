@@ -173,7 +173,7 @@ for (const scheme of ['light', 'dark'] as const) {
       }
     })
 
-    // The page in the other theme, where --tc-ring fell to 2.85:1 on Canvas: only a system colour holds in both.
+    // The page in the other theme, where --tc-ring falls to 2.4:1 on Canvas: only a system colour holds in both.
     for (const mode of scheme === 'light' ? ['dark'] as const : ['light', 'ocean'] as const) {
       test(`${mode} page: the ring of a focused box is the user's CanvasText, 3:1 on Canvas, ticked, mixed and invalid too`, async ({ page }) => {
         await page.goto(urlFor('checkbox--states', mode, 'ltr'))

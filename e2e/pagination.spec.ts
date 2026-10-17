@@ -64,7 +64,7 @@ const CURRENT = 'nav a[aria-current="page"]'
 
 // Forced colours erase a fill, and the fill was all that marked the current page. Measured,
 // because a class list cannot see what went wrong on the way: a backplate that hid the digit,
-// the theme's hover fill back under a pointer, and a ring at 2.9:1 on a black canvas.
+// the theme's hover fill back under a pointer, and a ring at 2.4:1 on a black canvas.
 for (const scheme of ['light', 'dark'] as const) {
   test.describe(`forced colours, ${scheme} palette`, () => {
     // No motion, so a fill under the pointer is the settled one and not a frame of its transition.
@@ -138,8 +138,8 @@ test('outside forced colours the current page keeps the fill of its theme, and n
   await page.goto(urlFor('pagination--middle', 'light', 'ltr'))
   expect(await page.evaluate(() => matchMedia('(forced-colors: active)').matches)).toBe(false)
   const current = page.locator(CURRENT)
-  // violet-600 with a white digit, as Tailwind writes them.
-  await expect(current).toHaveCSS('background-color', 'oklch(0.541 0.281 293.009)')
+  // blue-600 with a white digit, as Tailwind writes them.
+  await expect(current).toHaveCSS('background-color', 'oklch(0.546 0.245 262.881)')
   await expect(current).toHaveCSS('color', 'rgb(255, 255, 255)')
   await expect(current).toHaveCSS('forced-color-adjust', 'auto')
 })
