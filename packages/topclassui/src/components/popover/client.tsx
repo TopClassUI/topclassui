@@ -5,7 +5,7 @@ import { Popover as Base } from '@base-ui/react/popover'
 import { x } from '#icons/data/x.js'
 import { clamp } from '#shared/clamp.js'
 import { cn } from '#shared/cn.js'
-import { POPUP_BOUNDS, toSideAlign } from '#shared/floating.js'
+import { FLOATING, toSideAlign } from '#shared/floating.js'
 import { guardEscape } from '#shared/overlay.js'
 import { hasContent, renderTrigger } from '#shared/render-trigger.js'
 import { Svg } from '#components/svg/index.js'
@@ -64,8 +64,8 @@ export function PopoverPopup({
         lang={lang}
         side={side}
         align={align}
-        sideOffset={POPUP_BOUNDS.sideOffset}
-        collisionPadding={POPUP_BOUNDS.collisionPadding}
+        sideOffset={FLOATING.sideOffset}
+        collisionPadding={FLOATING.collisionPadding}
         className={POPOVER_POSITIONER}
       >
         <PopoverSurface data-placement={placement} {...rest} />

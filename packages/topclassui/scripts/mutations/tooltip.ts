@@ -65,13 +65,13 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the tooltip forgets its arrow and sits 6 px off the trigger, so the arrow tip touches it',
     file: 'src/components/tooltip/client.tsx',
-    from: 'sideOffset={POPUP_BOUNDS.sideOffset + TOOLTIP_ARROW_HEIGHT}',
-    to: 'sideOffset={POPUP_BOUNDS.sideOffset}',
+    from: 'sideOffset={FLOATING.sideOffset + TOOLTIP_ARROW_HEIGHT}',
+    to: 'sideOffset={FLOATING.sideOffset}',
   },
   {
     label: "the tooltip falls back to Base UI's 5 px collision padding instead of the shared 8",
     file: 'src/components/tooltip/client.tsx',
-    from: '        collisionPadding={POPUP_BOUNDS.collisionPadding}\n',
+    from: '        collisionPadding={FLOATING.collisionPadding}\n',
     to: '',
   },
   {

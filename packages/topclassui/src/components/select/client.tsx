@@ -6,7 +6,7 @@ import { caretDown } from '#icons/data/caret-down.js'
 import { check } from '#icons/data/check.js'
 import { FIELD_HOLDER_FULL, FIELD_SIZE, FIELD_TEXT } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
-import { POPUP_BOUNDS, toSideAlign } from '#shared/floating.js'
+import { FLOATING, toSideAlign } from '#shared/floating.js'
 import { Svg } from '#components/svg/index.js'
 import {
   SELECT_ICON, SELECT_ITEM, SELECT_ITEM_TEXT, SELECT_ITEM_TICK, SELECT_LIST, SELECT_POPUP, SELECT_POSITIONER, SELECT_ROOT,
@@ -75,8 +75,8 @@ export function Select({
           lang={select.lang}
           side={side}
           align={align}
-          sideOffset={POPUP_BOUNDS.sideOffset}
-          collisionPadding={POPUP_BOUNDS.collisionPadding}
+          sideOffset={FLOATING.sideOffset}
+          collisionPadding={FLOATING.collisionPadding}
           collisionAvoidance={side === 'top' || side === 'bottom' ? undefined : SELECT_SIDE_COLLISION_AVOIDANCE}
           alignItemWithTrigger={false}
           className={SELECT_POSITIONER}

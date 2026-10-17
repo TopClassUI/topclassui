@@ -40,8 +40,8 @@ export function toSideAlign(placement: Placement = DEFAULT_PLACEMENT): { side: S
   return { side, align }
 }
 
-/** R-10.5-1: a popup is never cut off and never taller than the viewport allows. */
-export const POPUP_BOUNDS = {
+/** PLAN 10.1: where every anchored popup sits. Its size is POPUP_BOUNDS, in shared/classes.ts. */
+export const FLOATING = {
   collisionPadding: 8,
   sideOffset: 6,
 } as const

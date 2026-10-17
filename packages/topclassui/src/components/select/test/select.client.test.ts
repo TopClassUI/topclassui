@@ -100,8 +100,8 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
 
   it('keeps the shared bounds: the item never aligned over the trigger (docs/DECISIONS.md, 2026-09-21)', () => {
     expect(source).toContain('alignItemWithTrigger={false}')
-    expect(source).toContain('sideOffset={POPUP_BOUNDS.sideOffset}')
-    expect(source).toContain('collisionPadding={POPUP_BOUNDS.collisionPadding}')
+    expect(source).toContain('sideOffset={FLOATING.sideOffset}')
+    expect(source).toContain('collisionPadding={FLOATING.collisionPadding}')
   })
 })
 
@@ -132,7 +132,7 @@ describe('hook.ts holds the value, the labels and the locale of the portal (R-5.
 describe('classes.ts builds every string from the shared constants (R-5.2-4)', () => {
   it('takes the field box, the holder, the rows and the popup from src/shared', () => {
     expect(importedNames(read('classes.ts'), '#shared/classes.js')).toEqual(expect.arrayContaining([
-      'DISABLED', 'FIELD_BOX', 'FIELD_HOLDER', 'LABEL', 'LIST_CAP', 'OVERLAY_SURFACE', 'POPUP_MOTION', 'ROW', 'ROW_HIGHLIGHT',
+      'DISABLED', 'FIELD_BOX', 'FIELD_HOLDER', 'LABEL', 'LIST_CAP', 'OVERLAY_SURFACE', 'POPUP_BOUNDS', 'POPUP_MOTION', 'ROW', 'ROW_HIGHLIGHT',
       'ROW_SELECTED', 'ROW_TOUCH', 'SCROLL_AREA',
     ]))
   })

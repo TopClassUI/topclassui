@@ -72,7 +72,7 @@ describe('DropdownPopup', () => {
     expect(classes(element)).toContain('max-w-96')
     expect(classes(element)).toContain('p-2')
     expect(classes(element)).not.toContain('p-1.5')
-    expect(classes(element)).not.toContain('max-w-[min(calc(var(--spacing)*80),var(--available-width))]')
+    expect(classes(element)).not.toContain('max-w-[min(calc(var(--spacing)*80),round(down,var(--available-width),1px))]')
   })
 
   it('wears the surface, the row cap, the scroll area, the width bounds and the inset ring', async () => {
@@ -80,7 +80,7 @@ describe('DropdownPopup', () => {
     for (const cls of [
       'flex', 'flex-col', 'gap-0.5', 'p-1.5', 'wrap-anywhere', 'overflow-y-auto', 'overscroll-contain', 'rounded-box', 'bg-surface-raised',
       'shadow-lg', 'max-h-[min(var(--available-height,100dvh),calc(var(--tc-list-rows)*var(--tc-row-height)))]',
-      'min-w-[min(calc(var(--spacing)*48),var(--available-width))]', 'max-w-[min(calc(var(--spacing)*80),var(--available-width))]',
+      'min-w-[min(calc(var(--spacing)*48),round(down,var(--available-width),1px))]', 'max-w-[min(calc(var(--spacing)*80),round(down,var(--available-width),1px))]',
       'origin-(--transform-origin)', 'focus-visible:-outline-offset-(length:--tc-ring-width)',
     ]) expect(list, cls).toContain(cls)
   })

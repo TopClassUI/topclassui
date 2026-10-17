@@ -115,7 +115,7 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
   it('takes its pure helpers from src/shared and imports them, never a copy', () => {
     expect(importedNames(source, '#shared/overlay.js')).toEqual(['guardEscape'])
     expect(importedNames(source, '#shared/render-trigger.js')).toEqual(['renderTrigger'])
-    expect(importedNames(source, '#shared/floating.js')).toEqual(['POPUP_BOUNDS', 'toSideAlign'])
+    expect(importedNames(source, '#shared/floating.js')).toEqual(['FLOATING', 'toSideAlign'])
     expect(importedNames(source, '#shared/clamp.js')).toEqual(['clamp'])
     expect(importedModules(source).filter((m) => m.startsWith('./')).sort()).toEqual([
       './boundaries.js', './classes.js', './constants.js', './hook.js', './lib.js', './parts/dropdown-group-label.js', './types.js',
