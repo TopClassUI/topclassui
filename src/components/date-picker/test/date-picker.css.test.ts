@@ -97,6 +97,27 @@ describe('a day', () => {
     expect(ruleOf(`${selectorOf('forced-colors:data-selected:forced-color-adjust-none')}[data-selected]`)).toBe('forced-color-adjust: none;')
   })
 
+  it('the chosen day also has an inset line in the tone of the ring, which reaches 3:1 on the surface where the dark fill does not', () => {
+    expect(ruleOf(`${selectorOf('data-selected:inset-ring-(length:--tc-line-width)')}[data-selected]`)).toContain('--tw-inset-ring-shadow: inset 0 0 0 var(--tc-line-width)')
+    expect(ruleOf(`${selectorOf('data-selected:inset-ring-primary-on-soft')}[data-selected]`)).toBe('--tw-inset-ring-color: var(--tc-primary-on-soft);')
+    expect(ruleOf(`${selectorOf('forced-colors:data-selected:inset-ring-[color:Highlight]')}[data-selected]`)).toBe('--tw-inset-ring-color: Highlight;')
+  })
+
+  it('under forced colours the chosen day, opted out of them, rings in CanvasText rather than the violet of the theme', () => {
+    const forced = selectorOf('forced-colors:data-selected:[--tc-ring:CanvasText]')
+    expect(ruleOf(`${forced}[data-selected]`)).toBe('--tc-ring: CanvasText;')
+    expect(mediaOf(`${forced}[data-selected]`)).toBe('@media (forced-colors: active)')
+  })
+
+  it('a day is as wide as its column, and the popup gives up side padding to a narrow screen, so a 32 px root leaves two digits room', () => {
+    const side = 'px-[clamp(4px,calc(1rem-(17.5rem*var(--tc-density)-var(--available-width,100vw))/2),min(1rem,16px))]'
+    expect(ruleOf(selectorOf(side))).toBe('padding-inline: clamp(4px, calc(1rem - (17.5rem * var(--tc-density) - var(--available-width,100vw)) / 2), min(1rem, 16px));')
+    expect(ruleOf(selectorOf('py-[min(1rem,16px)]'))).toBe('padding-block: min(1rem, 16px);')
+    expect(ruleOf(selectorOf('py-[min(0.125rem,2px)]'))).toBe('padding-block: min(0.125rem, 2px);')
+    expect(DATE_PICKER_POPUP.split(' ').filter((cls) => /^p[xy]?-/.test(cls))).toEqual(['py-[min(1rem,16px)]', side])
+    expect(DATE_PICKER_CELL.split(' ')).toEqual(['px-0', 'py-[min(0.125rem,2px)]', 'text-center'])
+  })
+
   it('today is a weight and an underline, never a fill', () => {
     expect(ruleOf(`${selectorOf('aria-[current=date]:underline')}[aria-current="date"]`)).toBe('text-decoration-line: underline;')
     expect(ruleOf(`${selectorOf('aria-[current=date]:font-semibold')}[aria-current="date"]`)).toContain('font-weight: var(--font-weight-semibold);')
@@ -112,6 +133,10 @@ describe('a day', () => {
 describe('the three buttons of the header', () => {
   it('are 24 px and 44 under a finger, where the drawing has bare 14 px carets', () => {
     expect(DATE_PICKER_NAV.split(' ')).toEqual(expect.arrayContaining(['min-h-[var(--tc-target-min,24px)]', 'min-w-[var(--tc-target-min,24px)]', 'pointer-coarse:min-w-[var(--tc-target-coarse,44px)]']))
-    expect(ruleOf(`${selectorOf('disabled:opacity-50')}:disabled`)).toBe('opacity: 50%;')
+  })
+
+  it('a month button at the range\'s end dims by aria-disabled, never by disabled, which would drop the focus', () => {
+    expect(DATE_PICKER_NAV.split(' ')).toEqual(expect.arrayContaining(['aria-disabled:opacity-50', 'aria-disabled:pointer-events-none']))
+    expect(DATE_PICKER_NAV.split(' ').filter((cls) => cls.startsWith('disabled:'))).toEqual([])
   })
 })
