@@ -6,13 +6,13 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
-## 2026-10-17 - R-5.3-4 is linted everywhere in src but the tests
+## 2026-10-17 - R-5.3-4 is linted everywhere in src but the rejection tests
 
-**Decision.** `topclass/no-physical-placement` flags `left` or `right` in a `side`, `align` or `placement` value, as a JSX attribute or an object property, through every branch of a conditional, a `??` fallback and an `as` cast. It is on for every file under `src/`, demos included, and off for test files only (`*.test.*` and `test/`), in a block of its own in `eslint.config.ts`. A swipe direction is not covered: Base UI's swipe is physical, and Drawer computes it from the direction (PLAN 10.1).
+**Decision.** `topclass/no-physical-placement` flags `left` or `right` in a `side`, `align` or `placement` value, as a JSX attribute or an object property (a computed key written as a string literal included), through every branch of a conditional, a `??` fallback, an `as` cast and a same-file `const` it names. It is on for every file under `src/`, demos, dom tests and `src/test/` helpers included, and off only for `src/**/*.schema.test.ts` and `src/shared/contracts/toast.test.ts`, in a block of its own in `eslint.config.ts`. A swipe direction is not covered: Base UI's swipe is physical, and Drawer and Toast compute theirs from the direction (PLAN 10.2).
 
-**Why.** The first run over `src/` found eleven hits and every one was a test: the combobox, date picker, drawer, dropdown, popover, select and tooltip schema tests, and the toast contract test, each passing `left`, `right` or `bottom-right` to prove the schema refuses it. No component and no demo names a physical side. A demo shows real usage, so it stays covered, and `eslint-rules/config.test.ts` fails if the exemption ever reaches `dummy/`. A config block instead of an inline disable, because the repo has no lint disables.
+**Why.** Forcing the rule on over every test, test helper and demo finds ten hits, every one a rejection input: the combobox, date picker, drawer (two), dropdown, popover, select and tooltip schema tests, and the toast contract test (two), each passing `left`, `right` or `bottom-right` to prove the schema or the resolver refuses it. A rejection test cannot avoid the value. A shared fixture of physical placements would only pass by hiding the string behind an identifier, which the rule now follows, and the repo has no lint disables, so the exemption is a config block naming those files. No component, demo or dom test names a physical side. `eslint-rules/config.test.ts` fails if any other block turns the rule off or the block's files change.
 
-**Affects.** R-5.3-4, `eslint.config.ts`, `eslint-rules/config.test.ts`.
+**Affects.** R-5.3-4, `eslint.config.ts`, `eslint-rules/index.ts`, `eslint-rules/config.test.ts`.
 
 ## 2026-10-17 - One thin themed scrollbar for every scroll area
 

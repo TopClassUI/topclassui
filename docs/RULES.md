@@ -156,7 +156,7 @@ They arrive with the phases that need them.
 ### R-5.3-4 Logical overlay placement
 **Rule:** use the `placement` prop, which maps to Base UI's `side` and `align`; never `left` or `right` as a side.
 **Why:** `align` and the `inline-*` sides flip in RTL automatically.
-**Enforced by:** type + `eslint` (`no-physical-placement`, which bans `left` and `right` in `side`, `align` and `placement` across `src/`, demos included)
+**Enforced by:** type + `eslint` (`no-physical-placement`, which bans `left` and `right` in `side`, `align` and `placement` across `src/`, demos and dom tests included, through local consts; off only for the schema and toast contract tests that prove the value is refused)
 
 ### R-13-1 TopClassProvider is required
 **Rule:** the app mounts `TopClassProvider` at the root layout with `direction` and `locale` as props from the layout, never read from `document.dir` in an effect.
