@@ -677,6 +677,24 @@ describe('R-8.5-2: components never fetch, cache or paginate', () => {
     ['React.cache()', "import * as React from 'react'\nexport const get = React.cache(() => 1)"],
     ['an import from next/cache', "import { revalidateTag } from 'next/cache'\nexport const r = revalidateTag"],
     ['unstable_cache used', 'export const get = unstable_cache(async () => 1)'],
+    ['localStorage destructured off window', 'export const { localStorage: ls } = window'],
+    ['localStorage destructured shorthand', 'export const { localStorage } = globalThis'],
+    ['a nested host', "export const v = globalThis.window.localStorage.getItem('k')"],
+    ['a computed host member', "export const v = window['localStorage'].getItem('k')"],
+    ['a bare fetch reference', "export const all = ['/a'].map(fetch)"],
+    ["React's cache through a renamed namespace", "import * as R from 'react'\nexport const get = R.cache(() => 1)"],
+    ['new WebSocket()', "export const s = new WebSocket('wss://x')"],
+    ['new EventSource()', "export const s = new EventSource('/events')"],
+    ['navigator.sendBeacon()', "export const b = () => navigator.sendBeacon('/log')"],
+    ['document.cookie', 'export const c = () => document.cookie'],
+    ['cookie destructured off document', 'export const { cookie } = document'],
+    ['an import from axios', "import axios from 'axios'\nexport const a = axios"],
+    ['an import from swr', "import useSWR from 'swr'\nexport const a = useSWR"],
+    ['an import from @tanstack/react-query', "import { useQuery } from '@tanstack/react-query'\nexport const a = useQuery"],
+    ['an import from @apollo/client', "import { useQuery } from '@apollo/client'\nexport const a = useQuery"],
+    ['an import from ky', "import ky from 'ky'\nexport const a = ky"],
+    ['a subpath import from swr', "import useSWRInfinite from 'swr/infinite'\nexport const a = useSWRInfinite"],
+    ['a dynamic import of axios', "export const a = () => import('axios')"],
   ]
   for (const [label, code] of bad) {
     it(`fails on ${label}`, () => {
@@ -685,11 +703,13 @@ describe('R-8.5-2: components never fetch, cache or paginate', () => {
     })
   }
 
-  it('covers components, connectors and shared, and nothing else', () => {
+  it('covers everything under src, and nothing else', () => {
     const code = "export const load = () => fetch('/api/items')"
     expect(only(code, 'src/components/combobox/hook.ts')).toHaveLength(1)
     expect(only(code, 'src/connectors/adaptive-menu/client.tsx')).toHaveLength(1)
     expect(only(code, 'src/shared/collection/use-collection.ts')).toHaveLength(1)
+    expect(only(code, 'src/icons/x.ts')).toHaveLength(1)
+    expect(only(code, 'src/index.ts')).toHaveLength(1)
     expect(only(code, 'scripts/check-icons.ts')).toEqual([])
     expect(only(code, 'e2e/select.spec.ts')).toEqual([])
   })
@@ -716,6 +736,10 @@ describe('R-8.5-2: components never fetch, cache or paginate', () => {
     ['the word in a string', "export const NOTE = 'never touches localStorage'"],
     ['other React imports', "import { use, useId } from 'react'\nexport const a = [use, useId]"],
     ['a Response built from data, not a request', "export const r = new Response('ok')"],
+    ['a key destructured off a plain object', 'export const { localStorage: ls } = { localStorage: 1 }'],
+    ['other members of document and navigator', 'export const t = () => [document.title, navigator.language]'],
+    ['a WebSocket in a type, which opens nothing', 'export type Socket = { ws: WebSocket; f: typeof fetch }'],
+    ['a member of React other than cache', "import * as R from 'react'\nexport const a = R.useId"],
   ]
   for (const [label, code] of good) {
     it(`allows ${label}`, () => {

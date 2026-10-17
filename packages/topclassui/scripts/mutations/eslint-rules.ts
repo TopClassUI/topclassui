@@ -38,4 +38,10 @@ export const MUTATIONS: Mutation[] = [
     from: "if (kind === 'system' && variants.includes('forced-colors')) continue",
     to: "if (variants.includes('forced-colors')) continue",
   },
+  {
+    label: 'the fetch rule stops reading through a nested host, so globalThis.window.localStorage passes R-8.5-2',
+    file: 'eslint-rules/index.ts',
+    from: "if (node?.type === 'MemberExpression' && HOSTS.has(globalName(node.object) ?? '')) return keyName(node.property, node.computed)",
+    to: "if (false) return keyName(node.property, node.computed)",
+  },
 ]

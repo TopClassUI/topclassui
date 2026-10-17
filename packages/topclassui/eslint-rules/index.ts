@@ -655,57 +655,89 @@ const rules = {
     },
     create(ctx: Context) {
       const file = String(ctx.filename ?? ctx.getFilename()).replace(/\\/g, '/')
-      if (!/(^|\/)src\/(components|connectors|shared)\//.test(file)) return {}
+      if (!/(^|\/)src\//.test(file)) return {}
       const allow = new Set((ctx.options?.[0]?.allow ?? []) as string[])
-      const GLOBALS = new Set(['XMLHttpRequest', 'localStorage', 'sessionStorage', 'indexedDB', 'caches', 'unstable_cache'])
+      const GLOBALS = new Set([
+        'fetch', 'XMLHttpRequest', 'WebSocket', 'EventSource',
+        'localStorage', 'sessionStorage', 'indexedDB', 'caches', 'unstable_cache',
+      ])
       const HOSTS = new Set(['window', 'globalThis', 'self'])
+      const MEMBERS: Record<string, string[]> = { navigator: ['sendBeacon'], document: ['cookie'] }
+      const BANNED_SOURCES = ['next/cache', 'axios', 'swr', '@tanstack/react-query', '@apollo/client', 'ky']
+      const reactNames = new Set([] as string[])
 
       const report = (node: Node, name: string, what = name) => {
         if (!allow.has(name)) ctx.report({ node, messageId: 'data', data: { what } })
       }
-      /** A property key or a non-computed member name is not a reference to the global. */
+      /** A property key, a non-computed member name or a type is not a reference to the global. */
       const isReference = (node: Node) => {
         const p = node.parent
         if (p?.type === 'MemberExpression' && p.property === node && !p.computed) return false
         if ((p?.type === 'Property' || p?.type === 'MethodDefinition' || p?.type === 'PropertyDefinition') && p.key === node && !p.computed) return false
         if (p?.type === 'TSPropertySignature' && p.key === node) return false
+        if (p?.type === 'TSTypeReference' || p?.type === 'TSQualifiedName' || p?.type === 'TSTypeQuery') return false
         return !/^Import|^Export/.test(String(p?.type))
       }
-      const calleeName = (callee: Node): string | undefined => {
-        if (callee?.type === 'Identifier') return callee.name
-        if (callee?.type === 'MemberExpression' && !callee.computed && HOSTS.has(callee.object?.name)) return callee.property?.name
+      /** `a.b`, `a['b']` and `a[`b`]` all name `b`. */
+      const keyName = (key: Node, computed: boolean): string | undefined => {
+        if (!computed && key?.type === 'Identifier') return key.name
+        if (key?.type === 'Literal' && typeof key.value === 'string') return key.value
+        if (key?.type === 'TemplateLiteral' && key.expressions.length === 0) return key.quasis[0]?.value?.cooked
         return undefined
+      }
+      /** `window`, `self.window` or `globalThis['document']`, read as the global it names. */
+      const globalName = (node: Node): string | undefined => {
+        if (node?.type === 'Identifier') return node.name
+        if (node?.type === 'MemberExpression' && HOSTS.has(globalName(node.object) ?? '')) return keyName(node.property, node.computed)
+        return undefined
+      }
+      const checkMember = (node: Node, owner: string | undefined, name: string | undefined) => {
+        if (owner === undefined || name === undefined) return
+        if (HOSTS.has(owner) && GLOBALS.has(name)) report(node, name, `${owner}.${name}`)
+        if (MEMBERS[owner]?.includes(name)) report(node, name, `${owner}.${name}`)
+        if (reactNames.has(owner) && name === 'cache') report(node, 'cache', "React's cache()")
+      }
+      const checkSource = (node: Node) => {
+        const source = node.source?.value
+        if (typeof source !== 'string') return
+        const banned = BANNED_SOURCES.find((s) => source === s || source.startsWith(`${s}/`))
+        if (banned !== undefined) report(node, banned, `"${source}"`)
       }
 
       return {
         ImportDeclaration(node: Node) {
-          const source = node.source?.value
-          if (source === 'next/cache') report(node, 'next/cache', '"next/cache"')
-          if (source !== 'react') return
+          checkSource(node)
+          if (node.source?.value !== 'react') return
           for (const s of node.specifiers ?? []) {
             if (s.type === 'ImportSpecifier' && (s.imported?.name ?? s.imported?.value) === 'cache') {
               report(s, 'cache', "React's cache()")
             }
+            if (s.type === 'ImportNamespaceSpecifier' || s.type === 'ImportDefaultSpecifier') reactNames.add(s.local.name)
           }
         },
+        ImportExpression: checkSource,
+        ExportNamedDeclaration: checkSource,
+        ExportAllDeclaration: checkSource,
         Identifier(node: Node) {
           if (GLOBALS.has(node.name) && isReference(node)) report(node, node.name)
         },
         MemberExpression(node: Node) {
-          const name = node.property?.name
-          if (node.computed || !HOSTS.has(node.object?.name) || !GLOBALS.has(name)) return
-          report(node.property, name, `${node.object.name}.${name}`)
+          checkMember(node.property, globalName(node.object), keyName(node.property, node.computed))
         },
-        CallExpression(node: Node) {
-          const name = calleeName(node.callee)
-          if (name === 'fetch') report(node, 'fetch', 'fetch()')
-          const c = node.callee
-          if (c?.type === 'MemberExpression' && c.object?.name === 'React' && c.property?.name === 'cache') {
-            report(node, 'cache', "React's cache()")
+        ObjectPattern(node: Node) {
+          const p = node.parent
+          const source = p?.type === 'VariableDeclarator' ? p.init : p?.type === 'AssignmentExpression' ? p.right : undefined
+          const owner = globalName(source)
+          for (const prop of node.properties ?? []) {
+            const name = keyName(prop.key, prop.computed)
+            // A shorthand global's value is a local of that name, which the Identifier visitor reports.
+            if (prop.type === 'Property' && !(prop.shorthand && GLOBALS.has(name ?? ''))) checkMember(prop.key, owner, name)
           }
         },
         NewExpression(node: Node) {
-          if (calleeName(node.callee) === 'Request') report(node, 'Request', 'new Request()')
+          const c = node.callee
+          const name = c?.type === 'Identifier' ? c.name : HOSTS.has(globalName(c?.object) ?? '') ? keyName(c.property, c.computed) : undefined
+          if (name === 'Request') report(node, 'Request', 'new Request()')
         },
       }
     },
