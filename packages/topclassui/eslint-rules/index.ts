@@ -29,6 +29,8 @@ function inClassContext(node: Node): boolean {
 }
 
 const CLASSY_TOKEN = /^-?[a-z0-9][a-z0-9:_\-./[\]()%&>*]*$/
+/** `[&[data-open]]:block` or `aria-[busy="true"]:x`: a variant token, which may open on `[` and quote a value. */
+const VARIANT_TOKEN = /^(-?[a-z0-9]|\[)[a-z0-9:_\-./[\]()%&>*='"]*$/
 
 /**
  * A class list is recognisable on its own, so a plain const, an object value or a
@@ -40,7 +42,7 @@ function looksLikeClassList(value: string): boolean {
   // A path or a URL is never a class list, and both can carry a hyphen.
   if (trimmed.includes('://') || trimmed.startsWith('/') || trimmed.startsWith('.')) return false
   const tokens = trimmed.split(/\s+/)
-  if (!tokens.every((t) => CLASSY_TOKEN.test(t))) return false
+  if (!tokens.every((t) => CLASSY_TOKEN.test(t) || (t.includes(']:') && VARIANT_TOKEN.test(t)))) return false
   // Half or more must be utility-shaped, or prose that merely names a class is flagged.
   const utilities = tokens.filter((t) => t.includes('-') || t.includes(':')).length
   return utilities > 0 && utilities * 2 >= tokens.length
@@ -169,19 +171,51 @@ function findArbitraryColor(value: string): { cls: string; kind: 'arbitrary' | '
 }
 
 /** `data-[open]:` or `group-aria-[busy]/item:`: a bracket around a bare name, which v4 writes bare. */
-const BRACKETED_VARIANT = /^((?:[a-z][a-z0-9-]*-)?(?:data|aria))-\[([^\]]*)\](\/[\w-]+)?$/
+const BRACKETED_VARIANT = /^((?:[a-z][a-z0-9-]*-)?(data|aria))-\[([^\]]*)\](\/[\w-]+)?$/
+const ATTR = String.raw`\[(data|aria)-([a-z0-9_-]+)(?:=(true|"true"|'true'))?\]`
+/** `[&[data-open]]:`, `[&:has([data-open])]:`, `[[data-open]_&]:`: an arbitrary selector over a bare name. */
+const ARBITRARY_VARIANT = [
+  [new RegExp(`^\\[&${ATTR}\\]$`), ''],
+  [new RegExp(`^\\[&:has\\(${ATTR}\\)\\]$`), 'has-'],
+  [new RegExp(`^\\[&:not\\(${ATTR}\\)\\]$`), 'not-'],
+  [new RegExp(`^\\[${ATTR}_&\\]$`), 'in-'],
+] as const
+/** `has-[[data-open]]:` or `group-not-[[aria-busy]]:`: a compound variant over a bracketed bare name. */
+const COMPOUND_VARIANT = new RegExp(`^((?:[a-z][a-z0-9-]*-)?(?:has|not|in)-)\\[${ATTR}\\]$`)
 
-function findBracketedName(value: string): { cls: string; bare: string } | undefined {
+type BracketedName = { cls: string; bare: string; attr: string; kind: 'bracketed' | 'aria' | 'in' }
+
+function bareForm(variant: string): Omit<BracketedName, 'cls'> | undefined {
+  const kindOf = (stem: string) => (stem === 'aria' ? 'aria' : 'bracketed')
+  const m = BRACKETED_VARIANT.exec(variant)
+  if (m) {
+    const [, head = '', stem = '', inner = '', group = ''] = m
+    const isTrue = /^[^=]*=(true|"true"|'true')$/.test(inner)
+    if (inner.includes('=') && !(stem === 'aria' && isTrue)) return undefined
+    const name = inner.split('=')[0]?.replace(/^_+|_+$/g, '') ?? ''
+    if (!name) return undefined
+    return { bare: `${head}-${name}${group}:`, attr: `${stem}-${name}`, kind: kindOf(stem) }
+  }
+  const arbitrary = ARBITRARY_VARIANT.map(([re, prefix]) => [re.exec(variant), prefix] as const).find(([a]) => a)
+  const c = arbitrary?.[0] ?? COMPOUND_VARIANT.exec(variant)
+  const prefix = arbitrary ? arbitrary[1] : (c?.[1] ?? '')
+  const [stem = '', name = '', value] = (arbitrary ? c?.slice(1) : c?.slice(2)) ?? []
+  if (!c || (value && stem !== 'aria')) return undefined
+  const kind = arbitrary?.[1] === 'in-' ? 'in' : kindOf(stem)
+  return { bare: `${prefix}${stem}-${name}:`, attr: `${stem}-${name}`, kind }
+}
+
+function findBracketedNames(value: string): BracketedName[] {
+  const hits: BracketedName[] = []
   for (const cls of value.split(/\s+/)) {
     const variants = splitAtColons(cls)
     variants.pop()
     for (const variant of variants) {
-      const m = BRACKETED_VARIANT.exec(variant)
-      if (!m || m[2]?.includes('=')) continue
-      return { cls: `${variant}:`, bare: `${m[1] ?? ''}-${m[2] ?? ''}${m[3] ?? ''}:` }
+      const b = bareForm(variant)
+      if (b) hits.push({ cls: `${variant}:`, ...b })
     }
   }
-  return undefined
+  return hits
 }
 
 const BANNED_SCALE = [
@@ -320,12 +354,15 @@ const rules = {
       type: 'problem' as const,
       docs: { description: 'R-5.2-6: data and aria variants are written bare; brackets only hold name=value.' },
       schema: [],
-      messages: { bracketed: 'R-5.2-6: "{{cls}}" brackets a bare name. Write "{{bare}}"; brackets only hold name=value.' },
+      messages: {
+        bracketed: 'R-5.2-6: "{{cls}}" brackets a bare name. Write "{{bare}}"; brackets only hold name=value.',
+        aria: 'R-5.2-6: "{{cls}}" brackets a bare name. Write "{{bare}}", which matches {{attr}}="true"; set the attribute only as "true" or absent.',
+        in: 'R-5.2-6: "{{cls}}" brackets a bare name. Write "{{bare}}"; it emits :where(), so the selector loses its 0,1,0 specificity.',
+      },
     },
     create(ctx: Context) {
       return eachClassString((node, value) => {
-        const b = findBracketedName(value)
-        if (b) ctx.report({ node, messageId: 'bracketed', data: b })
+        for (const b of findBracketedNames(value)) ctx.report({ node, messageId: b.kind, data: b })
       })
     },
   },

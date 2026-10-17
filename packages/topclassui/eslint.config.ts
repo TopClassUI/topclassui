@@ -16,7 +16,7 @@ export default defineConfig(
   },
 
   // The library itself. Every rule in docs/RULES.md that a linter can enforce
-  // applies here and nowhere else: demos and scripts are deliberately exempt.
+  // applies here; outside src/ only the rules without an "inside src/" clause do.
   {
     files: ['src/**/*.{ts,tsx}'],
     plugins: { topclass },
@@ -43,6 +43,14 @@ export default defineConfig(
       // A prop named beside ...rest is being kept off the element, which is a use.
       '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true }],
     },
+  },
+
+  // R-5.2-6 has no "inside src/" clause, so the e2e fixtures and the harness page
+  // follow it too. scripts/mutations is left out: it injects broken source on purpose.
+  {
+    files: ['e2e/**/*.{ts,tsx}', 'scripts/build-harness.tsx'],
+    plugins: { topclass },
+    rules: { 'topclass/bare-data-variants': 'error' },
   },
 
   // A test has to write the banned string to prove the rule or the merge works,

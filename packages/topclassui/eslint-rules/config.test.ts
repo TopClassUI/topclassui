@@ -1,4 +1,5 @@
 // The rules existing is not the same as the project arming them, and nothing else checks it.
+import { ESLint } from 'eslint'
 import { describe, expect, it } from 'vitest'
 
 import config from '../eslint.config.js'
@@ -53,5 +54,18 @@ describe('eslint.config.ts arms the custom rules', () => {
       'topclass/style-sets-tokens-only',
       'topclass/text-comes-from-labels',
     ])
+  })
+
+  // R-5.2-6 has no "inside src/" clause, so the files outside src/ that carry className follow it too.
+  for (const file of ['e2e/fixtures/accordion.tsx', 'e2e/axe.spec.ts', 'scripts/build-harness.tsx']) {
+    it(`arms bare-data-variants on ${file}`, async () => {
+      const resolved = (await new ESLint({ cwd: import.meta.dirname + '/..' }).calculateConfigForFile(file)) as Entry
+      expect(resolved.rules?.['topclass/bare-data-variants'], file).toEqual([2])
+    })
+  }
+
+  it('leaves the injected broken source of scripts/mutations unlinted for it', async () => {
+    const resolved = (await new ESLint({ cwd: import.meta.dirname + '/..' }).calculateConfigForFile('scripts/mutations/x.ts')) as Entry
+    expect(resolved.rules?.['topclass/bare-data-variants']).toBeUndefined()
   })
 })
