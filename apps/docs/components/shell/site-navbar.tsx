@@ -7,6 +7,7 @@ import { ICON_BUTTON } from 'topclassui/classes'
 import { LIVE_GUIDES, hrefOf, pageBySlug, type Locale } from '../../content/pages'
 import type { SiteLabels } from '../../labels/index'
 import { GITHUB_URL } from '../../lib/site'
+import { SearchButton } from '../search/search-button'
 import { LanguageSwitch } from './language-switch'
 import { MobileMenu } from './mobile-menu'
 import { ModeSwitch } from './mode-switch'
@@ -48,6 +49,7 @@ export function SiteNavbar({ locale, current, path, labels }: SiteNavbarProps) {
         ))}
       </NavbarLinks>
       <NavbarActions>
+        <SearchButton locale={locale} labels={labels.search} />
         <ModeSwitch label={labels.mode.label} names={{ light: labels.mode.light, dark: labels.mode.dark, ocean: labels.mode.ocean }} />
         <LanguageSwitch locale={locale} path={path} label={labels.language.label} />
         {GITHUB_URL === null ? null : (

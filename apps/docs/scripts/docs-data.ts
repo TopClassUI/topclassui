@@ -2,7 +2,8 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 
-import { CATALOG_LABELS } from '../labels/catalog.js'
+import { LIVE_PAGES, hrefOf } from '../content/pages.js'
+import { labelsFor } from '../labels/index.js'
 import type { ExportsMap } from '../lib/rewrite-imports.js'
 import { changelogFacts, releaseToc } from './lib/changelog.js'
 import { collect } from './lib/collect.js'
@@ -12,7 +13,6 @@ import { libraryFacts } from './lib/facts.js'
 import { guideFacts as startFacts, guidesFileSchema } from './lib/guide-facts.js'
 import { guideFacts } from './lib/guides.js'
 import { COMPONENTS, LIBRARY } from './lib/library.js'
-import { ogColors } from './lib/og-colors.js'
 import { PLANNED_EXPORTS } from './lib/planned-exports.js'
 import { type SearchPage, searchIndexOf } from './lib/search.js'
 import { generatedProblems } from './lib/shape.js'
@@ -50,6 +50,8 @@ const problems = generatedProblems(generated, (key) => {
   return existsSync(join(COMPONENTS, slug, 'dummy', `${name}.tsx`))
 })
 const start = startFacts()
+const guides = guideFacts()
+const { icons } = guides
 const guideShape = guidesFileSchema.safeParse(start)
 if (!guideShape.success) for (const issue of guideShape.error.issues) problems.push(`guides.json ${issue.path.join('.')}: ${issue.message}`)
 if (problems.length > 0) {
@@ -63,23 +65,34 @@ writeFileSync(join(OUT, 'components.json'), `${JSON.stringify(generated.componen
 writeFileSync(join(OUT, 'toc.json'), `${JSON.stringify(generated.toc, null, 2)}\n`)
 writeFileSync(join(OUT, 'dates.json'), `${JSON.stringify(generated.dates, null, 2)}\n`)
 writeFileSync(join(OUT, 'demos.ts'), demos)
-writeFileSync(join(OUT, 'og.json'), `${JSON.stringify(ogColors(), null, 2)}\n`)
-// The catalog is the one guide-like page on this branch; the shell's registry adds the rest, and the Icons page its icons.
+// The catalog's headings are not in an MDX file, so it brings its own; every other live page reads toc.json.
 const catalogOf = (locale: (typeof LOCALES)[number]): SearchPage => ({
-  title: CATALOG_LABELS[locale].title,
+  title: labelsFor(locale).catalog.title,
   href: `/${locale}/docs/components`,
   headings: [
-    { id: 'before-you-start', text: CATALOG_LABELS[locale].beforeTitle },
-    { id: 'how-to-read-a-card', text: CATALOG_LABELS[locale].legendTitle },
+    { id: 'before-you-start', text: labelsFor(locale).catalog.beforeTitle },
+    { id: 'how-to-read-a-card', text: labelsFor(locale).catalog.legendTitle },
     ...file.sections.map((section) => ({ id: section.id, text: section.title[locale] })),
   ],
 })
+const pagesOf = (locale: (typeof LOCALES)[number]): SearchPage[] => LIVE_PAGES.map((page) => (page.kind === 'catalog' ? catalogOf(locale) : {
+  title: page.title[locale],
+  href: hrefOf(page, locale),
+  headings: toc[locale][page.slug] ?? [],
+}))
+// Each of the Icons page's names points at its grid, the page's second heading.
+const iconsOf = (locale: (typeof LOCALES)[number]): SearchPage[] => {
+  const page = LIVE_PAGES.find((entry) => entry.slug === 'icons')
+  const grid = toc[locale]['icons']?.[1]
+  if (page === undefined || grid === undefined) return []
+  return icons.all.map((icon) => ({ title: icon.name, href: `${hrefOf(page, locale)}#${grid.id}`, headings: [] }))
+}
 const SEARCH = outFlag === -1 ? join(APP, 'public', 'search') : join(OUT, 'search')
 mkdirSync(SEARCH, { recursive: true })
-for (const locale of LOCALES) writeFileSync(join(SEARCH, `${locale}.json`), `${JSON.stringify(searchIndexOf(file, locale, [catalogOf(locale)]))}\n`)
+for (const locale of LOCALES) writeFileSync(join(SEARCH, `${locale}.json`), `${JSON.stringify(searchIndexOf(file, locale, pagesOf(locale), iconsOf(locale)))}\n`)
 writeFileSync(join(OUT, 'playgrounds.ts'), playgroundMapSource(file.components.filter((entry) => entry.files.playground).map((entry) => entry.slug)))
 writeFileSync(join(OUT, 'library.json'), `${JSON.stringify(libraryFacts(), null, 2)}\n`)
-writeFileSync(join(OUT, 'guides.json'), `${JSON.stringify({ ...start, ...guideFacts() }, null, 2)}\n`)
+writeFileSync(join(OUT, 'guides.json'), `${JSON.stringify({ ...start, ...guides }, null, 2)}\n`)
 writeFileSync(join(OUT, 'changelog.json'), `${JSON.stringify(changelog, null, 2)}\n`)
 
 for (const issue of issues) console.warn(`${strict ? 'error' : 'warn'} ${issue.slug} ${issue.kind}: ${issue.detail}`)

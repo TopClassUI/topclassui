@@ -5,8 +5,10 @@ import { join } from 'node:path'
 import { ImageResponse } from 'next/og'
 
 import { FACTS } from './data'
+import { SITE_URL } from './site'
 
 export const OG_SIZE = { width: 1200, height: 630 }
+export const OG_TYPE = 'image/png'
 
 async function font(file: string) {
   return readFile(join(process.cwd(), 'assets', 'fonts', file))
@@ -19,6 +21,11 @@ export interface OgCard {
   /** The page's line in English. Satori cannot shape Arabic (GSUB lookup type 5 format 3), so an /ar image
    * takes PLAN 15.3's fallback: the Latin name, the chip and the page's address, no Arabic line. */
   line: string
+}
+
+/** Satori fails on Noto Sans Arabic, so an /ar image's line is the page's address. */
+export function ogLineOf(locale: string, path: string, english: string): string {
+  return locale === 'ar' ? `${SITE_URL.replace('https://', '')}${path}` : english
 }
 
 export async function ogImage({ name, chip, line }: OgCard): Promise<ImageResponse> {

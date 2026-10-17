@@ -17,8 +17,8 @@ describe('the page registry', () => {
     }
   })
 
-  it('routes Home, the four getting-started pages, the foundation pages and the changelog today', () => {
-    expect(LIVE_PAGES.map((page) => page.slug)).toEqual(['home', 'installation', 'css', 'provider', 'first-component', 'colors', 'icons', 'theming', 'rtl', 'server-first', 'accessibility', 'changelog'])
+  it('routes Home, the four getting-started pages, the foundation pages, the catalog and the changelog today', () => {
+    expect(LIVE_PAGES.map((page) => page.slug)).toEqual(['home', 'installation', 'css', 'provider', 'first-component', 'colors', 'icons', 'theming', 'rtl', 'server-first', 'accessibility', 'components', 'changelog'])
     expect(LIVE_GUIDES.map((page) => page.slug)).toEqual(['installation', 'css', 'provider', 'first-component', 'colors', 'icons', 'theming', 'rtl', 'server-first', 'accessibility'])
   })
 
@@ -28,7 +28,8 @@ describe('the page registry', () => {
     expect(nextPage('css')?.slug).toBe('provider')
     expect(nextPage('provider')?.slug).toBe('first-component')
     expect(nextPage('first-component')?.slug).toBe('colors')
-    expect(nextPage('accessibility')?.slug).toBe('changelog')
+    expect(nextPage('accessibility')?.slug).toBe('components')
+    expect(nextPage('components')?.slug).toBe('changelog')
     expect(nextPage('changelog')).toBeUndefined()
   })
 

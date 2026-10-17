@@ -6,18 +6,18 @@ import { useEffect, useMemo, useState } from 'react'
 import { Command } from 'topclassui/command'
 import { TopClassProvider } from 'topclassui/provider'
 
-import { SEARCH_LABELS } from '../../labels/search'
+import type { SearchLabels } from '../../labels/types'
 import { DIRECTION, type Locale } from '../../lib/locales'
 import type { SearchEntry } from '../../scripts/lib/search'
 
 export interface SearchPaletteProps {
   locale: Locale
+  labels: SearchLabels
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export default function SearchPalette({ locale, open, onOpenChange }: SearchPaletteProps) {
-  const t = SEARCH_LABELS[locale]
+export default function SearchPalette({ locale, labels: t, open, onOpenChange }: SearchPaletteProps) {
   const router = useRouter()
   const [items, setItems] = useState<SearchEntry[] | null>(null)
   const labels = useMemo(() => ({ command: { label: t.title, placeholder: t.placeholder } }), [t])
@@ -33,7 +33,7 @@ export default function SearchPalette({ locale, open, onOpenChange }: SearchPale
       <Command
         items={items ?? []}
         status={items === null ? 'loading' : 'idle'}
-        getKey={(entry) => entry.href}
+        getKey={(entry) => `${entry.group} ${entry.label}`}
         getLabel={(entry) => entry.label}
         getGroup={(entry) => t.groups[entry.group]}
         renderItem={(entry) => (

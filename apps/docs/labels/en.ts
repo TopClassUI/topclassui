@@ -171,4 +171,52 @@ export const en: SiteLabels = {
       tailwind: { name: 'Tailwind CSS', line: 'Configured in CSS with three import lines. No config file.' },
     },
   },
+  catalog: {
+    title: 'Components',
+    lead: (count) => `${String(count)} components, each with a live preview: every state at once, a playground wired to the real props, and the import line.`,
+    metaTitle: 'Components - TopClass UI',
+    description: 'Every TopClass UI component on one page, with a live preview, a playground on the real props, every state and its import line.',
+    beforeTitle: 'Before you start',
+    beforeOnce: 'once per app',
+    beforeLead: 'Every card below shows an import line. These three steps make it work.',
+    steps: {
+      install: {
+        title: '1. Install the package',
+        note: 'Three peer dependencies: react, react-dom and Tailwind CSS 4.2 or later. Your project already has them, and zod installs with the package.',
+      },
+      css: {
+        title: '2. The Tailwind CSS v4 entry',
+        note: 'Three lines, in this order, and no tailwind.config.js. The third carries the mapping that gives Tailwind the semantic class names.',
+      },
+      layout: {
+        title: '3. The root layout',
+        note: 'Pass direction and locale to TopClassProvider as props from your layout; never read them from document.dir in an effect. ThemeScript goes first in <head>: it sets data-theme before the first paint.',
+      },
+    },
+    legendTitle: 'How to read a card',
+    legendLead: 'Every component below is laid out the same way, so you learn it once. Five parts, top to bottom.',
+    legend: [
+      { title: 'The stage', text: 'The component in its most common configuration, on the page background, so you see it in context.' },
+      { title: 'Try it', text: 'Every prop you can change, with its allowed values.' },
+      { title: 'The code', text: 'The JSX that produces the preview above it. Copy it, paste it and it runs.' },
+      { title: 'Every state', text: 'Hover, focus, disabled, loading, error - all at once. You never hover to review a state.' },
+      { title: 'Import it', text: 'The one import line from the package, and the install command.' },
+    ],
+    sectionCount: (n) => (n === 1 ? '1 component' : `${String(n)} components`),
+    startHere: 'Start here',
+    sectionsHeading: 'Sections',
+    installHeading: 'Before you start',
+  },
+  search: {
+    button: 'Search',
+    title: 'Search the docs',
+    placeholder: 'Search pages and components',
+    groups: { pages: 'Pages', components: 'Components', icons: 'Icons' },
+    shortcut: { pc: 'Ctrl K', mac: '⌘ K' },
+  },
+  llms: {
+    summary: 'React components for Next.js, RTL-first and server-first, built on Tailwind CSS v4 and Base UI.',
+    docs: 'Docs',
+    components: 'Components',
+  },
 }

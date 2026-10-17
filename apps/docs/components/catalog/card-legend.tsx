@@ -1,12 +1,12 @@
 // How to read a card (page 13): the five parts of every Previewer, top to bottom.
-import { CATALOG_LABELS } from '../../labels/catalog'
+import { labelsFor } from '../../labels/index'
 import { COMPONENT_PAGE_LABELS } from '../../labels/component-page'
 import type { Locale } from '../../lib/locales'
 import { CARD, CARD_HEAD, H3, SECTION, SMALL } from '../classes'
 import { SectionHeading } from '../section-heading'
 
 export function CardLegend({ id, locale }: { id: string; locale: Locale }) {
-  const t = CATALOG_LABELS[locale]
+  const t = labelsFor(locale).catalog
   return (
     <section aria-labelledby={id} className={SECTION}>
       <SectionHeading id={id} anchorLabel={COMPONENT_PAGE_LABELS[locale].anchor(t.legendTitle)}>{t.legendTitle}</SectionHeading>

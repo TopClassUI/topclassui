@@ -63,8 +63,8 @@ describe('docs:data against the repo', () => {
     expect(linked?.source).toContain("from 'topclassui/avatar-group'")
   })
 
-  it('reports, as issues and not as shape problems, only what other branches bring', () => {
+  it('reports no issue now that the release exports map is in', () => {
     const issues = log.split('\n').filter((line) => line.startsWith('warn ')).filter((line) => !line.includes(' content-missing: '))
-    expect(issues).toEqual(["warn code-block bare-root: dummy/highlighted.tsx shows 'topclassui' with no subpath"])
+    expect(issues).toEqual([])
   })
 })

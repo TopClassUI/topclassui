@@ -1,5 +1,5 @@
 // Before you start (page 13): the steps that make every card's import line work, once per app.
-import { CATALOG_LABELS } from '../../labels/catalog'
+import { labelsFor } from '../../labels/index'
 import { COMPONENT_PAGE_LABELS } from '../../labels/component-page'
 import { INSTALL_LINE } from '../../lib/install'
 import type { Locale } from '../../lib/locales'
@@ -26,7 +26,7 @@ return (
 )`
 
 export function BeforeYouStart({ id, locale }: { id: string; locale: Locale }) {
-  const t = CATALOG_LABELS[locale]
+  const t = labelsFor(locale).catalog
   const copy = COMPONENT_PAGE_LABELS[locale].copyCode
   const steps: { key: string; title: string; note: string; code: string; file: string; lang: CodeLang }[] = [
     { key: 'install', ...t.steps.install, code: INSTALL_LINE, file: 'terminal', lang: 'bash' },

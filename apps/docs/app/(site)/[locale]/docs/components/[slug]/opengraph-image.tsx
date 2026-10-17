@@ -5,7 +5,7 @@ import { COMPONENT_PAGE_LABELS } from '../../../../../../labels/component-page'
 import { chipOf } from '../../../../../../lib/chip'
 import { pagedComponentOf, pagedComponents } from '../../../../../../lib/components'
 import { LOCALES } from '../../../../../../lib/locales'
-import { OG_SIZE, OG_TYPE, ogImage, ogLineOf } from '../../../../../../lib/og-card'
+import { OG_SIZE, OG_TYPE, ogImage, ogLineOf } from '../../../../../../lib/og'
 
 export const size = OG_SIZE
 export const contentType = OG_TYPE
