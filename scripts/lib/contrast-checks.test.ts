@@ -28,12 +28,12 @@ describe('checkTokens', () => {
   })
 
   it('measures the number of pairs it claims; change this only on purpose', () => {
-    expect(run(css).pairs).toBe(360)
+    expect(run(css).pairs).toBe(378)
   })
 
   it('reports how many readings are distinct, since light and ocean share most tokens', () => {
     const report = run(css)
-    expect(report.distinct).toBe(222)
+    expect(report.distinct).toBe(230)
     expect(report.distinct).toBeLessThan(report.pairs)
   })
 })

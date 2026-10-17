@@ -24,11 +24,12 @@ To show where a reader is in a task of a few steps: a sign-up, a checkout, a set
 
 - **A step** is `{ id, title, status? }`: `id` a string, `title` any node, `status` one of `done`, `current`, `todo`, `error`.
 - **`value`** is the id of the current step. Steps before it are done (a tick), steps after it todo (a number on a line). With no `value` the first step is current; a `value` no step has leaves every step todo.
-- **`status`** on a step wins over `value`: `error` draws an x and is read as "Needs attention".
+- **`status`** on a step wins over `value`: `error` draws an x and is read as "Needs attention". The step `value` names still carries `aria-current="step"`, so a reader sent back to fix it hears that it is the current one.
 - **Server first.** `items` is plain data and nothing here runs in the browser, so a server page passes it as it is.
 - **Arabic.** `{...getLabels('ar')}` says each status in Arabic with Latin digits; `{...getLabels('ar-u-nu-arab')}` writes the numbers in Arabic-Indic digits. The steps run from the right by themselves.
 - **A long title** wraps inside its column and is never cut.
-- **How many steps.** Each step gets an equal column, so the circles stay apart while a column is at least one circle wide: about 8 steps at `md` on a 320 px phone. Past that the circles overlap.
+- **How many steps.** Each step gets an equal column, never narrower than its circle. Steps that do not fit across wrap onto another row, 16 px below, and each row's line stops at the edge of the list: at `md` on a 320 px phone that is 8 or 9 steps a row, and 4 at a 32 px root. Nothing overlaps and the page never scrolls sideways, in a table cell or a `w-fit` parent too.
+- **`size="custom"`** sets no circle size: the circle reads `--tc-stepper-mark`, 32 px unless you set it, through `style={{ '--tc-stepper-mark': '3.5rem' }}` or a class such as `[--tc-stepper-mark:3.5rem]`. The tick and the x stay 55% of the circle; the number and the title take the list's own text size.
 - **No steps** renders nothing.
 
 ## What the platform gives
@@ -71,6 +72,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 
 - `dummy/arabic-digits.tsx`
 - `dummy/basic.tsx`
+- `dummy/custom-size.tsx`
 - `dummy/long-content.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`

@@ -84,6 +84,8 @@ export function checkTokens(css: string, palette: Map<string, Color>): Report {
 
       check(`${mode}: ${tone} label on its fill`, solid && onSolid && worst(onSolid, solid), 4.5)
       check(`${mode}: ${tone} text on its tint`, soft && onSoft && worst(onSoft, soft), 4.5)
+      // Meter and Progress paint the bar in the text colour on the neutral track: a graphic, so 3:1.
+      check(`${mode}: ${tone} bar on the neutral track`, onSoft && track && worst(onSoft, track), 3)
       // The highlighted row of a menu draws the ring inside its edge, on its tint.
       check(`${mode}: ring on the ${tone} tint`, soft && ring && worst(ring, soft), 3)
 

@@ -14,17 +14,17 @@ const bar = (props: Props = {}) =>
 
 /** Every class on the track, per size and sorted: an extra or a missing one both fail. */
 const TRACK = {
-  xs: ['bg-neutral-soft', 'forced-color-adjust-none', 'h-pad-y-xs', 'overflow-hidden', 'rounded-control', 'w-full'],
-  sm: ['bg-neutral-soft', 'forced-color-adjust-none', 'h-pad-y-sm', 'overflow-hidden', 'rounded-control', 'w-full'],
-  md: ['bg-neutral-soft', 'forced-color-adjust-none', 'h-pad-y-md', 'overflow-hidden', 'rounded-control', 'w-full'],
-  lg: ['bg-neutral-soft', 'forced-color-adjust-none', 'h-pad-y-lg', 'overflow-hidden', 'rounded-control', 'w-full'],
-  xl: ['bg-neutral-soft', 'forced-color-adjust-none', 'h-pad-y-xl', 'overflow-hidden', 'rounded-control', 'w-full'],
-  custom: ['bg-neutral-soft', 'forced-color-adjust-none', 'overflow-hidden', 'rounded-control', 'w-full'],
+  xs: ['bg-neutral-soft', 'forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]', 'h-pad-y-xs', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-control', 'w-full'],
+  sm: ['bg-neutral-soft', 'forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]', 'h-pad-y-sm', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-control', 'w-full'],
+  md: ['bg-neutral-soft', 'forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]', 'h-pad-y-md', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-control', 'w-full'],
+  lg: ['bg-neutral-soft', 'forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]', 'h-pad-y-lg', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-control', 'w-full'],
+  xl: ['bg-neutral-soft', 'forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]', 'h-pad-y-xl', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-control', 'w-full'],
+  custom: ['bg-neutral-soft', 'forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-control', 'w-full'],
 } as const
 
-const BAR = ['bg-primary-solid', 'h-full', 'rounded-control', 'w-(--tc-progress-value)']
+const BAR = ['bg-primary-on-soft', 'forced-colors:bg-[CanvasText]', 'h-full', 'rounded-control', 'w-(--tc-progress-value)']
 const BAR_INDETERMINATE = [
-  'animate-pulse', 'bg-primary-solid', 'h-full', 'motion-reduce:animate-none', 'rounded-control', 'w-1/3',
+  'animate-pulse', 'bg-primary-on-soft', 'forced-colors:bg-[CanvasText]', 'h-full', 'motion-reduce:animate-none', 'rounded-control', 'w-1/3',
 ]
 
 describe('the track', () => {
@@ -34,8 +34,15 @@ describe('the track', () => {
     })
   }
 
-  it('keeps every fill when forced colours would repaint both to nothing', () => {
-    expect(track()).toContain('forced-color-adjust-none')
+  it('keeps every fill when forced colours would repaint both to nothing, in system colours that hold in every palette', () => {
+    expect(track().filter((c) => c.startsWith('forced-'))).toEqual(['forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]'])
+    expect(bar().filter((c) => c.startsWith('forced-'))).toEqual(['forced-colors:bg-[CanvasText]'])
+  })
+
+  it('marks the full range with a line-strong outline, which takes no room from a 2 px track', () => {
+    expect(track({ size: 'xs' }).filter((c) => c.startsWith('outline-') || c.startsWith('border'))).toEqual([
+      'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid',
+    ])
   })
 
   it('is the same neutral track under every tone; only the bar changes', () => {
@@ -70,7 +77,7 @@ describe('the parts stay simple', () => {
   })
 
   it('is not interactive, so it carries no ring, hover, transition or touch target', () => {
-    const interactive = /^(hover:|active:|focus-visible:|outline-|transition|duration-|min-[hw]-|disabled:|data-disabled:)/
+    const interactive = /^(hover:|active:|focus-visible:|outline-offset|outline-ring|transition|duration-|min-[hw]-|disabled:|data-disabled:)/
     expect([...track(), ...bar()].filter((c) => interactive.test(c))).toEqual([])
     expect(html()).not.toContain('tabindex')
   })
@@ -83,8 +90,8 @@ describe('the parts stay simple', () => {
 describe('className lands on the track, last', () => {
   it('keeps a consumer utility beside every class of its own, so it merges and never replaces', () => {
     expect(track({ className: 'ms-2' })).toEqual([
-      'bg-neutral-soft', 'forced-color-adjust-none', 'h-pad-y-md', 'ms-2', 'overflow-hidden',
-      'rounded-control', 'w-full',
+      'bg-neutral-soft', 'forced-color-adjust-none', 'forced-colors:bg-[Canvas]', 'forced-colors:outline-[CanvasText]', 'h-pad-y-md',
+      'ms-2', 'outline-(length:--tc-line-width)', 'outline-line-strong', 'outline-solid', 'overflow-hidden', 'rounded-control', 'w-full',
     ])
   })
 

@@ -23,27 +23,27 @@ const MARK = /class="relative inline-flex/
 const TITLE = /dir="auto"/
 
 describe('each part wears exactly the classes the spec names', () => {
-  it('the root is a full-width row of equal columns', () => {
-    expect(classList(html())).toEqual(['flex', 'w-full', 'min-w-0', 'items-start'])
+  it('the root is a full-width row of equal columns that wraps, 16 px between rows, and sets the size of its circles', () => {
+    expect(classList(html())).toEqual(['flex', 'w-full', 'min-w-0', 'flex-wrap', 'items-start', 'gap-y-4', '[--tc-stepper-mark:var(--spacing-control-sm)]'])
   })
 
-  it('a step is a centred column that may shrink, with 8 px between the circle and the title', () => {
-    expect(all(html(), /^<li /)[0]).toEqual(['flex', 'flex-1', 'flex-col', 'gap-2', 'items-center', 'min-w-0', 'relative', 'text-center'])
+  it('a step is a centred column that shrinks to its circle and no further, with 8 px between the circle and the title', () => {
+    expect(all(html(), /^<li /)[0]).toEqual(['flex', 'flex-1', 'flex-col', 'gap-2', 'items-center', 'min-w-(--tc-stepper-mark)', 'relative', 'text-center'])
   })
 
   it('the row holding the circle and the line is as wide as its step', () => {
     expect(all(html(), /^<div /)[0]).toEqual(['flex', 'justify-center', 'relative', 'w-full'])
   })
 
-  it('the connector runs from this centre to the next, a 1 px border level with the circle', () => {
-    expect(all(html(), /class="absolute/)[0]).toEqual([
-      '-translate-y-1/2', 'absolute', 'border-line', 'border-t-(length:--tc-line-width)', 'data-done:border-primary-solid',
-      'inset-s-1/2', 'top-1/2', 'w-full',
-    ])
+  it('the line is two halves, centre to column end and column start to centre, a 1 px border level with the circle', () => {
+    const half = ['-translate-y-1/2', 'absolute', 'border-line', 'border-t-(length:--tc-line-width)', 'data-done:border-primary-solid', 'top-1/2', 'w-1/2']
+    const [after, before] = all(html(), /class="absolute/)
+    expect(after).toEqual([...half, 'inset-s-1/2'].sort())
+    expect(before).toEqual([...half, 'inset-s-0'].sort())
   })
 
   it('the circle of each status: a fill for done, current and error, the strong line on the surface for todo', () => {
-    const shared = ['font-medium', 'inline-flex', 'items-center', 'justify-center', 'relative', 'rounded-full', 'shrink-0', 'size-control-sm', 'tabular-nums', 'text-sm']
+    const shared = ['font-medium', 'inline-flex', 'items-center', 'justify-center', 'relative', 'rounded-full', 'shrink-0', 'size-(--tc-stepper-mark)', 'tabular-nums', 'text-sm']
     const filled = ['forced-color-adjust-none', 'forced-colors:bg-[CanvasText]', 'forced-colors:text-[Canvas]']
     expect(all(html(), MARK)).toEqual([
       [...shared, ...filled, 'bg-primary-solid', 'text-primary-on-solid'].sort(),
@@ -69,18 +69,28 @@ describe('each part wears exactly the classes the spec names', () => {
 })
 
 describe('the five sizes', () => {
-  const at = (size: StepperProps['size']) => [all(html({ size }), MARK)[0]?.filter((c) => /^(size-|text-(xs|sm|base))/.test(c)), all(html({ size }), TITLE)[0]?.filter((c) => /^text-(xs|sm|base)$/.test(c))]
+  /** The size the list sets, then the type steps of the number and of the title. */
+  const at = (size: StepperProps['size']) => [
+    classList(html({ size })).filter((c) => c.startsWith('[--tc-stepper-mark')),
+    all(html({ size }), MARK)[0]?.filter((c) => /^text-(xs|sm|base)$/.test(c)),
+    all(html({ size }), TITLE)[0]?.filter((c) => /^text-(xs|sm|base)$/.test(c)),
+  ]
 
   it('one step under the control scale, md the drawn 32 px', () => {
-    expect(at('xs')).toEqual([['size-[calc(1.5rem*var(--tc-density))]', 'text-xs'], ['text-xs']])
-    expect(at('sm')).toEqual([['size-control-xs', 'text-xs'], ['text-xs']])
-    expect(at('md')).toEqual([['size-control-sm', 'text-sm'], ['text-xs']])
-    expect(at('lg')).toEqual([['size-control-md', 'text-sm'], ['text-sm']])
-    expect(at('xl')).toEqual([['size-control-lg', 'text-base'], ['text-base']])
+    expect(at('xs')).toEqual([['[--tc-stepper-mark:calc(1.5rem*var(--tc-density))]'], ['text-xs'], ['text-xs']])
+    expect(at('sm')).toEqual([['[--tc-stepper-mark:var(--spacing-control-xs)]'], ['text-xs'], ['text-xs']])
+    expect(at('md')).toEqual([['[--tc-stepper-mark:var(--spacing-control-sm)]'], ['text-sm'], ['text-xs']])
+    expect(at('lg')).toEqual([['[--tc-stepper-mark:var(--spacing-control-md)]'], ['text-sm'], ['text-sm']])
+    expect(at('xl')).toEqual([['[--tc-stepper-mark:var(--spacing-control-lg)]'], ['text-base'], ['text-base']])
   })
 
-  it('custom emits no size class', () => {
-    expect(at('custom')).toEqual([[], []])
+  it('custom emits no size class, and every circle reads its size from the one variable', () => {
+    expect(at('custom')).toEqual([[], [], []])
+    expect(all(html({ size: 'custom' }), MARK).every((list) => list.includes('size-(--tc-stepper-mark)'))).toBe(true)
+  })
+
+  it('lets a caller class set the circle of any size, since className is merged last', () => {
+    expect(classList(html({ className: '[--tc-stepper-mark:3rem]' })).filter((c) => c.startsWith('[--tc'))).toEqual(['[--tc-stepper-mark:3rem]'])
   })
 })
 
@@ -115,10 +125,10 @@ describe('a stepper is not interactive', () => {
 
 describe('className is merged last, so the consumer wins every conflict', () => {
   it('keeps a consumer utility that conflicts with nothing', () => {
-    expect(classList(html({ className: 'mt-4' }))).toEqual(['flex', 'w-full', 'min-w-0', 'items-start', 'mt-4'])
+    expect(classList(html({ className: 'mt-4' }))).toEqual(['flex', 'w-full', 'min-w-0', 'flex-wrap', 'items-start', 'gap-y-4', '[--tc-stepper-mark:var(--spacing-control-sm)]', 'mt-4'])
   })
 
   it('replaces the width of the root', () => {
-    expect(classList(html({ className: 'w-96' }))).toEqual(['flex', 'min-w-0', 'items-start', 'w-96'])
+    expect(classList(html({ className: 'w-96' }))).toEqual(['flex', 'min-w-0', 'flex-wrap', 'items-start', 'gap-y-4', '[--tc-stepper-mark:var(--spacing-control-sm)]', 'w-96'])
   })
 })
