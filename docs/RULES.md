@@ -253,7 +253,7 @@ They arrive with the phases that need them.
 ### R-8.5-1 Lists use the collection contract
 **Rule:** any component that renders items uses `CollectionProps` and `useCollection`: the `--tc-list-rows` knob, windowing above the threshold, and optional page-by-page loading.
 **Why:** a component must never create ten thousand DOM nodes, and the app must not be forced to hand over every item at once.
-**Enforced by:** not yet - planned: `check-structure` + Playwright
+**Enforced by:** `check-structure`, which requires `useCollection` in the `hook.ts` of every folder whose props take `items`, `CollectionProps` or `MenuContract`, less the exemptions `docs/DECISIONS.md` records; `e2e/collections.spec.ts`, which keeps fewer than a hundred of ten thousand rows mounted and sees `loadMore` called at the end
 
 ### R-8.5-2 The app owns the data
 **Rule:** components never fetch, cache or paginate; they call `loadMore()` and render what they are given.
