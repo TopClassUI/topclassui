@@ -180,7 +180,7 @@ describe('what reaches the root', () => {
     expect(volume({ size: 'xl' })).toContain('size-toggle-xl')
     expect(volume({ size: 'xl' })).toMatch(/<div data-orientation="horizontal" style="position:relative" class="w-full [^"]* h-2">/)
     expect(attr(root(volume({ size: 'xs' })), 'class')).toContain(' text-xs ')
-    expect(attr(root(volume({ size: 'lg' })), 'class')?.endsWith(' text-base')).toBe(true)
+    expect(attr(root(volume({ size: 'lg' })), 'class')?.endsWith(' text-base pointer-coarse:text-[max(1rem,16px)]')).toBe(true)
     const custom = volume({ size: 'custom' })
     expect(custom).not.toMatch(/size-toggle-|text-(xs|sm|base)|h-1\b|h-1\.5|h-2\b/)
   })

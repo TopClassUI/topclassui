@@ -231,8 +231,8 @@ export const FIELD_TEXT = {
   xs: `text-xs ${FIELD_TEXT_COARSE}`,
   sm: `text-sm ${FIELD_TEXT_COARSE}`,
   md: `text-sm ${FIELD_TEXT_COARSE}`,
-  lg: 'text-base',
-  xl: 'text-base',
+  lg: `text-base ${FIELD_TEXT_COARSE}`,
+  xl: `text-base ${FIELD_TEXT_COARSE}`,
   custom: '',
 } as const
 

@@ -156,7 +156,7 @@ describe('the classes each guarantee rests on, written out', () => {
 
   it('the holder is one grid column with its type step; the counter sits at its inline end, hidden while empty', () => {
     const out = html({ autosize: true, size: 'lg' })
-    expect(attr(out, 'class')?.split(' ')).toEqual(['grid', 'max-w-full', 'gap-1.5', 'text-base', 'w-[min(100%,var(--tc-input-width))]'])
+    expect(attr(out, 'class')?.split(' ')).toEqual(['grid', 'max-w-full', 'gap-1.5', 'text-base', 'pointer-coarse:text-[max(1rem,16px)]', 'w-[min(100%,var(--tc-input-width))]'])
     const counter = /<span id="[^"]+" class="([^"]*)"/.exec(out)?.[1]?.split(' ')
     expect(counter).toEqual(expect.arrayContaining(['justify-self-end', 'empty:hidden', 'data-at-limit:font-semibold', 'data-over-limit:text-danger-on-soft']))
   })
