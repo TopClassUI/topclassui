@@ -52,7 +52,7 @@ export type ComboboxProps = ComboboxRootProps & InputProps & ComboboxDesignProps
   /** Where the list mounts; the body when left out. */
   container?: Base.Portal.Props['container']
   /** Keeps the list mounted while it is closed. */
-  keepMounted?: boolean | undefined
+  keepMounted?: Base.Portal.Props['keepMounted']
   /** On the input, merged last. */
   className?: string | undefined
   /** The visible input. */

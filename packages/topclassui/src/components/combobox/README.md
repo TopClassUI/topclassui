@@ -150,7 +150,7 @@ Required: `items`, `aria-label` or `aria-labelledby` or `id`. Every other prop b
 | `fullWidth` | no | `boolean` | `false` | Fills its parent instead of taking the width of an Input. |
 | `hasMore` | no | `boolean` | `false` | More pages exist, so loadMore is called when the open list nears its end. |
 | `invalid` | no | `boolean` | `false` | Marks the value as wrong: sets aria-invalid on the input, whose line turns to danger and thickens. |
-| `keepMounted` | no | `boolean` | - | Keeps the list mounted while it is closed. |
+| `keepMounted` | no | `Base.Portal.Props['keepMounted']` | - | Keeps the list mounted while it is closed. |
 | `loadMore` | no | `(() => void \| Promise<void>)` | - | Called with no argument when the list nears its end while hasMore is set. Never while it is closed. |
 | `loadMoreThreshold` | no | `integer`, min 0, max 200 | `10` | How many rows from the end loadMore is called, clamped. |
 | `maxLength` | no | `unknown` | `256` | The cap on the typed query, 256 by default; null removes it. No counter is drawn. |
