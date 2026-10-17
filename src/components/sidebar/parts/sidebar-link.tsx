@@ -6,7 +6,7 @@ import { hasContent } from '#shared/render-trigger.js'
 import { SIDEBAR_BOUNDARIES } from '../boundaries.js'
 import { SIDEBAR_ICON, SIDEBAR_LINK, SIDEBAR_LINK_LABEL, SIDEBAR_LINK_STATE } from '../classes.js'
 import { SIDEBAR_DEFAULTS } from '../constants.js'
-import { boundLabel } from '../lib.js'
+import { boundLabel, resolveDir } from '../lib.js'
 import type { SidebarLinkProps } from '../types.js'
 
 /** One row: a list item around a real link. The label has an element of its own, which a
@@ -25,7 +25,7 @@ export function SidebarLink({
     <>
       {hasContent(icon) ? <span className={SIDEBAR_ICON[state]}>{icon}</span> : null}
       {hasContent(label)
-        ? <span className={SIDEBAR_LINK_LABEL}>{boundLabel(label, SIDEBAR_BOUNDARIES.labelMaxLength)}</span>
+        ? <span dir={resolveDir(label)} className={SIDEBAR_LINK_LABEL}>{boundLabel(label, SIDEBAR_BOUNDARIES.labelMaxLength)}</span>
         : null}
     </>
   )
