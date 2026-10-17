@@ -47,12 +47,12 @@ function hooksByPart(source: string): Record<string, string[]> {
 }
 
 describe('the folder holds what Dropdown needs and nothing else (R-8.1-1)', () => {
-  it('a hook.ts, a lib.tsx, a boundaries.ts and one part file, and no variants or skeleton', () => {
+  it('a hook.ts, a lib.ts, a boundaries.ts and two part files, and no variants or skeleton', () => {
     expect(readdirSync(FOLDER).sort()).toEqual([
-      'README.md', 'boundaries.ts', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'lib.tsx',
+      'README.md', 'boundaries.ts', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'lib.ts',
       'meta.ts', 'parts', 'schema.ts', 'test', 'types.ts',
     ])
-    expect(readdirSync(join(FOLDER, 'parts'))).toEqual(['dropdown-group-label.tsx'])
+    expect(readdirSync(join(FOLDER, 'parts')).sort()).toEqual(['dropdown-group-label.tsx', 'dropdown-row.tsx'])
   })
 })
 
@@ -118,7 +118,8 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
     expect(importedNames(source, '#shared/floating.js')).toEqual(['POPUP_BOUNDS', 'toSideAlign'])
     expect(importedNames(source, '#shared/clamp.js')).toEqual(['clamp'])
     expect(importedModules(source).filter((m) => m.startsWith('./')).sort()).toEqual([
-      './boundaries.js', './classes.js', './constants.js', './hook.js', './lib.js', './parts/dropdown-group-label.js', './types.js',
+      './boundaries.js', './classes.js', './constants.js', './hook.js', './lib.js', './parts/dropdown-group-label.js', './parts/dropdown-row.js',
+      './types.js',
     ])
   })
 

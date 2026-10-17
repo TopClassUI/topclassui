@@ -4,7 +4,9 @@ import type { Mutation } from '../lib/mutate.js'
 const CLIENT = 'src/components/dropdown/client.tsx'
 const CLASSES = 'src/components/dropdown/classes.ts'
 const HOOK = 'src/components/dropdown/hook.ts'
-const LIB = 'src/components/dropdown/lib.tsx'
+const LIB = 'src/components/dropdown/lib.ts'
+const ROW = 'src/components/dropdown/parts/dropdown-row.tsx'
+const LINK = 'src/shared/link.tsx'
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -33,15 +35,15 @@ export const MUTATIONS: Mutation[] = [
   },
   {
     label: 'a dropdown link element delivered by Flight as a lazy wrapper is not unwrapped, and the menu throws',
-    file: LIB,
+    file: LINK,
     from: 'Children.toArray(link as ReactNode)[0]',
     to: 'link',
   },
   {
     label: 'a dropdown link row keeps the empty children key of renderLink, which erases its label',
-    file: LIB,
-    from: "return renderTrigger(renderLink('DropdownMenu', unwrapped as ReactElement | undefined, href, {}), undefined).render",
-    to: "return renderLink('DropdownMenu', unwrapped as ReactElement | undefined, href, {})",
+    file: LINK,
+    from: 'return renderTrigger(renderLink(component, unwrapped as ReactElement | undefined, href, {}), undefined).render',
+    to: 'return renderLink(component, unwrapped as ReactElement | undefined, href, {})',
   },
   {
     label: 'the dropdown link item no longer closes the menu on a press, so a client-side navigation leaves it open',
@@ -231,7 +233,7 @@ export const MUTATIONS: Mutation[] = [
   },
   {
     label: 'the dropdown icon is read out with the label',
-    file: LIB,
+    file: ROW,
     from: '<span aria-hidden="true" className={DROPDOWN_ICON}>',
     to: '<span className={DROPDOWN_ICON}>',
   },
