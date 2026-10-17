@@ -81,7 +81,9 @@ This part takes no design props of its own.
 - `dummy/disabled.tsx`
 - `dummy/long-label.tsx`
 - `dummy/placements.tsx`
+- `dummy/playground.tsx`
 - `dummy/rtl.tsx`
+- `dummy/states.tsx`
 - `dummy/with-count.tsx`
 
 ## Verified against

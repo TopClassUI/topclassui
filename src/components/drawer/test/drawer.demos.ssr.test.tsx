@@ -13,7 +13,8 @@ const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
 const EXPECTED = [
-  'bottom', 'end', 'long-body', 'long-content', 'non-modal', 'rtl', 'sizes', 'start', 'top', 'trap-focus', 'with-form',
+  'bottom', 'end', 'long-body', 'long-content', 'non-modal', 'playground', 'rtl', 'sizes', 'start', 'states', 'top',
+  'trap-focus', 'with-form',
 ]
 
 /** The label of each trigger a demo holds, every one of them a Button. */
@@ -23,9 +24,11 @@ const TRIGGERS: Record<string, string[]> = {
   'long-body': ['Activity'],
   'long-content': ['Move to the archive'],
   'non-modal': ['Outline'],
+  'playground': ['Filters'],
   'rtl': ['القائمة', 'التصفية'],
   'sizes': ['xs', 'sm', 'md', 'lg', 'xl', 'custom'],
   'start': ['Menu'],
+  'states': ['Side sheet', 'Bottom sheet', 'Scrolled', 'Focus trapped', 'Non-modal'],
   'top': ['What is new'],
   'trap-focus': ['Inspect'],
   'with-form': ['Invite'],

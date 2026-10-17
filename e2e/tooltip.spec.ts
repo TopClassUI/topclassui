@@ -20,7 +20,9 @@ const TOOLTIPS: Record<string, readonly string[]> = {
     'top-start', 'top', 'top-end', 'start-top', 'start', 'start-bottom',
     'end-top', 'end', 'end-bottom', 'bottom-start', 'bottom', 'bottom-end',
   ],
+  'tooltip--playground': ['Copy link'],
   'tooltip--rtl': ['نسخ الرابط', 'حذف هذا الصف'],
+  'tooltip--states': ['Top', 'Bottom', 'Delayed'],
   'tooltip--with-count': ['Delete 3 rows'],
 }
 
@@ -119,7 +121,7 @@ test('the tables name every tooltip demo but the one that never opens, and only 
   const found = DEMOS.filter((demo) => demo.startsWith('tooltip--')).sort()
   expect(found).toEqual([
     'tooltip--basic', 'tooltip--delays', 'tooltip--disabled', 'tooltip--long-label',
-    'tooltip--placements', 'tooltip--rtl', 'tooltip--with-count',
+    'tooltip--placements', 'tooltip--playground', 'tooltip--rtl', 'tooltip--states', 'tooltip--with-count',
   ])
   expect(Object.keys(TOOLTIPS).sort()).toEqual(found.filter((demo) => demo !== 'tooltip--disabled'))
   // A row for a trigger the loop below never opens would be an expectation nobody checks.
