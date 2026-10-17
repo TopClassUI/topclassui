@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 import { DIRECTIONS } from '../scripts/lib/harness.js'
-import { expectRing, focused, pressTo } from './keyboard.js'
+import { SENTINEL, addSentinel, expectRing, focused, pressTo } from './keyboard.js'
 import { openLive } from './live.js'
 
 // R-5.6-1: a navigation landmark of plain links. The Authoring Practices give it no keys of its own: Tab and
@@ -44,10 +44,12 @@ for (const direction of DIRECTIONS) {
 
     test('with a search field: Tab reaches it after the links, and the avatar is no stop', async ({ page }) => {
       await openLive(page, 'navbar--with-search', { direction })
+      await addSentinel(page)
       for (const name of ['TopClass UI', 'Docs', 'Components', 'Icons', 'Search the docs']) await pressTo(page, 'Tab', name)
       await expectRing(page, 'the search field')
-      await page.keyboard.press('Tab')
-      expect(await focused(page)).not.toBe('Omar Abed')
+      await pressTo(page, 'Tab', SENTINEL)
+      expect(await page.getByLabel('Omar Abed').evaluate((avatar) => ({ tabIndex: (avatar as HTMLElement).tabIndex, focused: avatar === document.activeElement })))
+        .toEqual({ tabIndex: -1, focused: false })
     })
   })
 }

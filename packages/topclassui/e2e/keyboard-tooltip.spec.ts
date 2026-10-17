@@ -35,12 +35,10 @@ for (const direction of DIRECTIONS) {
 
     test('nothing in the tooltip takes the focus: Tab goes from one trigger to the next', async ({ page }) => {
       await openLive(page, 'tooltip--placements', { direction })
-      await page.keyboard.press('Tab')
-      const first = await focused(page)
+      await pressTo(page, 'Tab', 'top-start')
       await expect(shown(page)).toHaveCount(1)
-      await page.keyboard.press('Tab')
+      await pressTo(page, 'Tab', 'top')
       const second = await focused(page)
-      expect(second).not.toBe(first)
       expect(await page.evaluate(() => document.activeElement?.closest('[data-placement]') ?? null)).toBeNull()
       await expectRing(page, second)
     })

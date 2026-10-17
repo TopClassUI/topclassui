@@ -81,6 +81,31 @@ for (const direction of DIRECTIONS) {
       await expectRing(page, 'the trigger after Escape')
     })
 
+    test('groups: the arrows pass over the headings, from the last command of one group to the first of the next, and wrap', async ({ page }) => {
+      await openLive(page, 'command--groups', { direction })
+      await pressTo(page, 'Tab', 'Commands by group')
+      await page.keyboard.press('Enter')
+      await expect.poll(() => focused(page)).toBe(input)
+      const order = ['New file', 'Open recent', 'Save all', 'Change the theme', 'Keyboard shortcuts', 'Read the docs', 'Report a problem']
+      for (const name of order) {
+        await page.keyboard.press('ArrowDown')
+        await expect(active(page)).toHaveText(name)
+      }
+      await page.keyboard.press('ArrowDown')
+      await expect(active(page)).toHaveText('New file')
+      await page.keyboard.press('ArrowUp')
+      await expect(active(page)).toHaveText('Report a problem')
+      await page.keyboard.press('ArrowUp')
+      await page.keyboard.press('ArrowUp')
+      await expect(active(page)).toHaveText('Keyboard shortcuts')
+      await expectRowRing(active(page), 'a row of the second group')
+      expect(await focused(page)).toBe(input)
+      await page.keyboard.press('Enter')
+      await expectClosed(page)
+      await expect(ran(page)).toHaveText('Ran Keyboard shortcuts.')
+      await expect.poll(() => focused(page)).toBe('Commands by group')
+    })
+
     test('the trigger opens it with Enter as well as Ctrl+K', async ({ page }) => {
       await openLive(page, 'command--basic', { direction })
       await pressTo(page, 'Tab', 'Search')
