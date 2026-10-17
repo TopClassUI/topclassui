@@ -35,6 +35,12 @@ export default defineConfig(
     },
   },
 
+  // Satori draws the Open Graph images from inline styles alone; no stylesheet reaches them.
+  {
+    files: ['app/**/opengraph-image.tsx', 'lib/og-card.tsx'],
+    rules: { 'topclass/style-sets-tokens-only': 'off' },
+  },
+
   {
     files: ['**/*.test.ts', 'e2e/**/*.ts'],
     plugins: { topclass },

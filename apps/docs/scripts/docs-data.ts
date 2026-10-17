@@ -8,6 +8,7 @@ import { collect } from './lib/collect.js'
 import { lastCommitDate, newestOf } from './lib/dates.js'
 import { demoMapSource, playgroundMapSource } from './lib/demo-map.js'
 import { COMPONENTS, LIBRARY } from './lib/library.js'
+import { ogColors } from './lib/og-colors.js'
 import { PLANNED_EXPORTS } from './lib/planned-exports.js'
 import { type SearchPage, searchIndexOf } from './lib/search.js'
 import { generatedProblems } from './lib/shape.js'
@@ -49,6 +50,7 @@ writeFileSync(join(OUT, 'components.json'), `${JSON.stringify(generated.componen
 writeFileSync(join(OUT, 'toc.json'), `${JSON.stringify(generated.toc, null, 2)}\n`)
 writeFileSync(join(OUT, 'dates.json'), `${JSON.stringify(generated.dates, null, 2)}\n`)
 writeFileSync(join(OUT, 'demos.ts'), demos)
+writeFileSync(join(OUT, 'og.json'), `${JSON.stringify(ogColors(), null, 2)}\n`)
 // The catalog is the one guide-like page on this branch; the shell's registry adds the rest, and the Icons page its icons.
 const catalogOf = (locale: (typeof LOCALES)[number]): SearchPage => ({
   title: CATALOG_LABELS[locale].title,
