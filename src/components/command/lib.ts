@@ -1,0 +1,80 @@
+// Pure helpers: the filter, the order of the rows and the shortcut, with no React in them.
+import type { CommandEntry, CommandGroup, CommandKeyPress, CommandRun } from './types.js'
+
+/** The items whose label holds every word of the query, in any case and anywhere, in their own order. */
+export function filterCommands<T>(items: readonly T[], query: string, getLabel: (item: T) => string): readonly T[] {
+  const words = query.toLowerCase().split(/\s+/).filter((word) => word !== '')
+  if (words.length === 0) return items
+  return items.filter((item) => {
+    const label = getLabel(item).toLowerCase()
+    return words.every((word) => label.includes(word))
+  })
+}
+
+/** What Base UI is given, the rows windowing counts, and the row of each item. Grouped, the
+ * rows with no heading come first, then each group where its first item stood. */
+export function arrangeCommands<T>(
+  items: readonly T[],
+  getKey: (item: T) => string,
+  getGroup?: (item: T) => string | undefined,
+): { base: readonly T[] | readonly CommandGroup[], entries: CommandEntry[], rowOfItem: number[] } {
+  const entries: CommandEntry[] = []
+  const rowOfItem: number[] = []
+  const add = (item: T, group: string | undefined) => {
+    rowOfItem.push(entries.length)
+    entries.push({ kind: 'item', key: `item:${getKey(item)}`, row: entries.length, group, item, index: rowOfItem.length - 1 })
+  }
+  if (!getGroup) {
+    for (const item of items) add(item, undefined)
+    return { base: items, entries, rowOfItem }
+  }
+  const byGroup = new Map<string | undefined, T[]>([[undefined, []]])
+  for (const item of items) {
+    const group = getGroup(item) || undefined
+    const list = byGroup.get(group)
+    if (list) list.push(item)
+    else byGroup.set(group, [item])
+  }
+  const base: CommandGroup[] = []
+  for (const [group, list] of byGroup) {
+    if (list.length === 0) continue
+    base.push({ value: group, items: list })
+    if (group !== undefined) entries.push({ kind: 'label', key: `group:${group}`, row: entries.length, group })
+    for (const item of list) add(item, group)
+  }
+  return { base, entries, rowOfItem }
+}
+
+/** The key windowing tells two rows apart by. */
+export function keyOfEntry(entry: CommandEntry): string {
+  return entry.key
+}
+
+/** The mounted rows cut into runs of one group, so each run sits in a group element of its own. */
+export function runsOf(entries: readonly CommandEntry[]): CommandRun[] {
+  const runs: CommandRun[] = []
+  for (const entry of entries) {
+    const last = runs.at(-1)
+    if (last === undefined || last.group !== entry.group || entry.kind === 'label') {
+      runs.push({ group: entry.group, label: entry.kind === 'label' ? entry : undefined, items: [] })
+    }
+    const run = runs.at(-1)
+    if (run && entry.kind === 'item') run.items.push(entry)
+  }
+  return runs
+}
+
+/** The key's place on a keyboard, so Ctrl+K still opens it under an Arabic layout, where K types a letter of its own. */
+function codeOf(key: string): string | undefined {
+  if (/^[a-z]$/.test(key)) return `Key${key.toUpperCase()}`
+  if (/^[0-9]$/.test(key)) return `Digit${key}`
+  return undefined
+}
+
+/** Ctrl or Cmd with the shortcut, and neither Alt nor Shift, which the browser and the system keep. */
+export function matchesShortcut(press: CommandKeyPress, shortcut: string): boolean {
+  if (!(press.ctrlKey || press.metaKey) || press.altKey || press.shiftKey) return false
+  const key = shortcut.toLowerCase()
+  const code = codeOf(key)
+  return press.key.toLowerCase() === key || (code !== undefined && press.code === code)
+}
