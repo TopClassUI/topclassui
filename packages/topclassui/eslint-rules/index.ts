@@ -636,6 +636,51 @@ const rules = {
       }
     },
   },
+
+  'cn-class-name-last': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: "R-5.2-2: the consumer's className is the last argument to cn()." },
+      schema: [],
+      messages: {
+        notLast: "R-5.2-2: {{name}} is the consumer's class, so it is the last argument to cn() and wins every conflict.",
+      },
+    },
+    create(ctx: Context) {
+      const unwrap = (arg: Node): Node => {
+        let n = arg
+        while (n.type === 'TSAsExpression' || n.type === 'TSNonNullExpression' || n.type === 'TSSatisfiesExpression') {
+          n = n.expression
+        }
+        return n
+      }
+      /** The `className` key of any object, so `own.className` counts as a caller's class too. */
+      const readsClassName = (n: Node): boolean =>
+        n.type === 'MemberExpression' && (n.computed ? n.property?.value : n.property?.name) === 'className'
+      const consumerClass = (arg: Node): string | null => {
+        const n = unwrap(arg)
+        if (n.type === 'Identifier' && n.name === 'className') return 'className'
+        return readsClassName(n) && n.object?.type === 'Identifier' && n.object.name === 'props' ? 'props.className' : null
+      }
+      const isCallerClass = (arg: Node) => {
+        const n = unwrap(arg)
+        return (n.type === 'Identifier' && n.name === 'className') || readsClassName(n)
+      }
+      return {
+        CallExpression(node: Node) {
+          if (node.callee?.type !== 'Identifier' || node.callee.name !== 'cn') return
+          const args: Node[] = node.arguments
+          args.forEach((arg, i) => {
+            const name = consumerClass(arg)
+            // Only a component's own class after the consumer's is a problem; renderElement orders two callers' classes.
+            if (name !== null && !args.slice(i + 1).every(isCallerClass)) {
+              ctx.report({ node: arg, messageId: 'notLast', data: { name } })
+            }
+          })
+        },
+      }
+    },
+  },
 }
 
 export default { rules } satisfies ESLint.Plugin

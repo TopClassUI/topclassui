@@ -28,6 +28,7 @@ const config = [
       'topclass/flat-part-exports': 'error',
       'topclass/root-part-is-named-root': 'error',
       'topclass/text-comes-from-labels': 'error',
+      'topclass/cn-class-name-last': 'error',
     },
   },
 ] as unknown as Linter.Config[]
@@ -653,4 +654,44 @@ describe('the new rules leave real component code alone', () => {
   it('still catches a spread that is not the consumer style', () => {
     expect(ids('<div style={{ ...theme }} />')).toContain('topclass/style-sets-tokens-only')
   })
+})
+
+describe("R-5.2-2: the consumer's className is the last argument to cn()", () => {
+  const rejected: [string, string][] = [
+    ['className before an own class', 'cn(className, BUTTON)'],
+    ['className in the middle', 'cn(BUTTON, className, BUTTON_SIZE[size])'],
+    ['props.className before an own class', 'cn(props.className, "flex")'],
+    ['a computed props["className"]', 'cn(props["className"], own)'],
+    ['className under a type assertion', 'cn(className as string, "flex")'],
+    ['className inside JSX', '<div className={cn(className, CARD)} />'],
+  ]
+  for (const [label, code] of rejected) {
+    it(`rejects ${label}`, () => {
+      expect(ids(code), code).toContain('topclass/cn-class-name-last')
+    })
+  }
+
+  it('still rejects an own class after two caller classes', () => {
+    expect(ids('cn(props.className, own.className, "flex")')).toContain('topclass/cn-class-name-last')
+  })
+
+  it('reports each misplaced argument once', () => {
+    expect(ids('cn(className, props.className, "flex")').filter((r) => r === 'topclass/cn-class-name-last'))
+      .toEqual(['topclass/cn-class-name-last', 'topclass/cn-class-name-last'])
+  })
+
+  const allowed: [string, string][] = [
+    ['className last', 'cn(BUTTON, BUTTON_SIZE[size], className)'],
+    ['props.className last', 'cn("flex", props.className)'],
+    ['className alone', 'cn(className)'],
+    ['no consumer class at all', 'cn(SWITCH_TRACK, SWITCH_TRACK_SIZE[size])'],
+    ['another object that happens to hold a className', 'cn(own.className, "flex")'],
+    ['a function other than cn', 'clsx(className, "flex")'],
+    ['the render= element class after the props class, as renderElement does', 'cn(props["className"] as never, own["className"] as never)'],
+  ]
+  for (const [label, code] of allowed) {
+    it(`allows ${label}`, () => {
+      expect(ids(code), code).not.toContain('topclass/cn-class-name-last')
+    })
+  }
 })
