@@ -1,13 +1,15 @@
 // pnpm test:mutation - the gate on the gates. See scripts/mutations/index.ts.
-import { cpSync, mkdtempSync, readFileSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs'
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join, sep } from 'node:path'
+import { join, relative, sep } from 'node:path'
 import { spawnSync } from 'node:child_process'
 
 import { type Mutation, type Outcome, caughtBy, readAnchors, summarise } from './lib/mutate.js'
+import { WORKSPACE_FILE, findRepoRoot } from './lib/repo-root.js'
 import { MUTATIONS } from './mutations/index.js'
 
 const ROOT = process.cwd()
+const REPO = findRepoRoot(ROOT, existsSync)
 const only = process.argv.slice(2).find((a) => !a.startsWith('-'))
 // Flags go to vitest, so a crowded machine can ask for fewer workers: pnpm test:mutation tag --maxWorkers=2.
 const flags = process.argv.slice(2).filter((a) => a.startsWith('-'))
@@ -28,8 +30,15 @@ if (missing.length > 0) {
 
 /** Copies the repository, applies the mutation if there is one, and judges a vitest run of the copy. */
 function caughtIn(mutation: Mutation | null): boolean {
-  const dir = mkdtempSync(join(tmpdir(), 'tc-mutate-'))
+  const repo = mkdtempSync(join(tmpdir(), 'tc-mutate-'))
+  // The copy keeps the repository's shape, so the root-props walk finds docs/DECISIONS.md above the package.
+  const dir = REPO ? join(repo, relative(REPO, ROOT)) : repo
   try {
+    if (REPO) {
+      mkdirSync(join(repo, 'docs'), { recursive: true })
+      cpSync(join(REPO, WORKSPACE_FILE), join(repo, WORKSPACE_FILE))
+      cpSync(join(REPO, 'docs', 'DECISIONS.md'), join(repo, 'docs', 'DECISIONS.md'))
+    }
     // join, not a literal slash: on Windows the separator is \ and the filter never matched,
     // so cpSync walked into pnpm's symlink store and failed with EPERM.
     const skip = ['node_modules', '.git', '.harness', 'dist', '.pack'].map((name) => join(ROOT, name))
@@ -53,7 +62,7 @@ function caughtIn(mutation: Mutation | null): boolean {
       maxBuffer: 1 << 28,
     }))
   } finally {
-    rmSync(dir, { recursive: true, force: true })
+    rmSync(repo, { recursive: true, force: true })
   }
 }
 
