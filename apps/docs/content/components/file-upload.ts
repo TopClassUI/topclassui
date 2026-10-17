@@ -10,7 +10,7 @@ export const fileUpload = {
     ar: 'منطقة إفلات هي حقل ملفات حقيقي، فتعمل وتُرسل قبل تشغيل أي سكربت. والملفات المختارة تظهر في قائمة.',
   },
   demos: ['basic', 'multiple', 'in-field', 'form', 'rtl'],
-  stageHeight: 12,
+  stageHeight: 14,
   note: {
     en: '`maxSize` is in bytes and checked in the browser only: check it again in the action.',
     ar: '`maxSize` بالبايت، ويُتحقق منه في المتصفح فقط: تحقّق منه مجددًا في الإجراء.',
