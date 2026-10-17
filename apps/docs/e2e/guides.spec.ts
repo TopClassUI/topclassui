@@ -12,7 +12,7 @@ const NEXT = {
   '/docs/theming': '/docs/rtl',
   '/docs/rtl': '/docs/server-first',
   '/docs/server-first': '/docs/accessibility',
-  '/docs/accessibility': '/changelog',
+  '/docs/accessibility': '/docs/components',
   '/changelog': null,
 } as const satisfies Record<(typeof ROUTES)[number], string | null>
 
