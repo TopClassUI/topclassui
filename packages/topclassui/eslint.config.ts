@@ -59,9 +59,9 @@ export default defineConfig(
     },
   },
 
-  // R-5.3-4 binds demos, which show real usage; a schema test passes "left" to prove it is refused.
+  // R-5.3-4 binds every other file; a schema or contract test passes "left" to prove it is refused.
   {
-    files: ['src/**/*.test.{ts,tsx}', 'src/**/test/**/*.{ts,tsx}'],
+    files: ['src/**/*.schema.test.ts', 'src/shared/contracts/toast.test.ts'],
     rules: { 'topclass/no-physical-placement': 'off' },
   },
 

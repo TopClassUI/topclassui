@@ -57,10 +57,9 @@ describe('eslint.config.ts arms the custom rules', () => {
   })
 })
 
-describe('R-5.3-4: the placement exemption stops at tests', () => {
-  it('leaves no-physical-placement armed on demos, which show real usage', () => {
-    const demoOff = blocks.filter((b) => (b.files ?? []).some((f) => f.includes('dummy'))
-      && b.rules?.['topclass/no-physical-placement'] === 'off')
-    expect(demoOff).toEqual([])
+describe('R-5.3-4: the placement exemption stops at the rejection tests', () => {
+  it('turns no-physical-placement off in one block, for the schema and toast contract tests only', () => {
+    const off = blocks.filter((b) => b.rules?.['topclass/no-physical-placement'] === 'off').map((b) => b.files)
+    expect(off).toEqual([['src/**/*.schema.test.ts', 'src/shared/contracts/toast.test.ts']])
   })
 })
