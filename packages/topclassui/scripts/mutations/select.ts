@@ -151,4 +151,22 @@ export const MUTATIONS: Mutation[] = [
     from: "collisionAvoidance={side === 'top' || side === 'bottom' ? undefined : SELECT_SIDE_COLLISION_AVOIDANCE}",
     to: 'collisionAvoidance={SELECT_SIDE_COLLISION_AVOIDANCE}',
   },
+  {
+    label: 'the select asks for the next page while it is closed, so every page loads behind a closed trigger',
+    file: HOOK,
+    from: '(props.hasMore ?? false) && (props.open ?? opened)',
+    to: '(props.hasMore ?? false)',
+  },
+  {
+    label: 'the select draws its options from the props again, so a duplicate value is drawn twice',
+    file: CLIENT,
+    from: '{select.options.map(({ item, key }) => (',
+    to: '{items.map((item) => ({ item, key: item.value })).map(({ item, key }) => (',
+  },
+  {
+    label: 'the select stops warning above the windowing threshold, so ten thousand mounted options go unnoticed',
+    file: HOOK,
+    from: 'items.length > virtualizeAbove',
+    to: 'false',
+  },
 ]

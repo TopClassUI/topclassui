@@ -57,8 +57,12 @@ the same in Arabic.
 **The list** is seven rows tall (`--tc-list-rows`), or `visibleRows` (1 to 20), and scrolls inside
 itself; the page behind does not move. A row is 40 px, 44 px under a finger. It is at least as wide
 as the trigger when there is room, and grows with its longest label up to the room on screen; a longer label ends in
-an ellipsis, in the row and in the trigger. **It is not windowed**: Base UI mounts every option
-once the trigger takes the focus. For thousands of options use a Combobox.
+an ellipsis, in the row and in the trigger. **It is not windowed**: Base UI moves real focus over
+the mounted options, so every option is mounted once the trigger takes the focus; above 200 it warns
+in development. For thousands of options use a Combobox.
+
+**Paging.** With `hasMore`, `loadMore` (a Server Action on a server page) is called once as the open
+list nears its end, `loadMoreThreshold` rows away (10, clamped to 0 to 200); never while it is closed.
 
 **The width** belongs to a box around the trigger: the width of an Input of the same `size`, and
 less when the parent is narrower. `fullWidth` fills the parent. A width class in `className` lands
@@ -128,7 +132,10 @@ Required: `items`, `aria-label` or `aria-labelledby` or `id`. Every other prop b
 | `className` | no | `string` | - | On the trigger, merged last, so a consumer class wins a conflict with its own. |
 | `container` | no | `Base.Portal.Props['container']` | - | Where the list mounts; `<body>` by default. |
 | `fullWidth` | no | `boolean` | `false` | Select: the box fills the width of its parent instead of taking the width of an Input. |
+| `hasMore` | no | `boolean` | - |  |
 | `invalid` | no | `boolean` | `false` | Select: marks the choice as wrong: sets aria-invalid on the trigger, whose line turns to danger and thickens. |
+| `loadMore` | no | `(() => void \| Promise<void>)` | - | Client-only, or a Server Action. Called once when the window nears the end. |
+| `loadMoreThreshold` | no | `integer`, min 0, max 200 | `10` | Select: rows from the end of the open list at which loadMore is called, clamped to 0 to 200. |
 | `placeholder` | no | `string` | - | The text of an empty trigger. Left out, the provider's `select.placeholder`. |
 | `placement` | no | `top` \| `top-start` \| `top-end` \| `bottom` \| `bottom-start` \| `bottom-end` \| `start` \| `start-top` \| `start-bottom` \| `end` \| `end-top` \| `end-bottom` | `"bottom-start"` | Select: the side and alignment the list opens at; start and end mirror in Arabic. |
 | `ref` | no | `Ref<HTMLButtonElement>` | - | The trigger, a `<button role="combobox">`. |
@@ -142,6 +149,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/basic.tsx`
 - `dummy/form.tsx`
 - `dummy/four-rows.tsx`
+- `dummy/load-more.tsx`
 - `dummy/long-content.tsx`
 - `dummy/phase-4-form.tsx`
 - `dummy/rtl.tsx`
