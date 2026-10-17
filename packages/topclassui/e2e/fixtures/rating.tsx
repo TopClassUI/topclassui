@@ -4,7 +4,7 @@
 import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 
-import { Rating } from '#components/rating/index.js'
+import { Rating, RatingInput } from '#components/rating/index.js'
 
 const CASE: CSSProperties = { marginBlockEnd: 24 }
 
@@ -26,7 +26,7 @@ function Counting() {
   const [calls, setCalls] = useState([] as number[])
   return (
     <div id="counting" data-calls={calls.join(',')}>
-      <Rating readOnly={false} aria-label="Counted" onValueChange={(next) => { setCalls((all) => [...all, next]) }} />
+      <RatingInput aria-label="Counted" onValueChange={(next) => { setCalls((all) => [...all, next]) }} />
     </div>
   )
 }

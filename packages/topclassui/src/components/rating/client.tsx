@@ -3,8 +3,13 @@
 import { cn } from '#shared/cn.js'
 import { RATING_GROUP, RATING_RADIO, RATING_STEP } from './classes.js'
 import { useRatingField } from './hook.js'
-import { Star, fillOf } from './lib.js'
-import type { RatingFieldProps } from './types.js'
+import { Star, fillOf, toField } from './lib.js'
+import type { RatingFieldProps, RatingInputProps } from './types.js'
+
+/** An editable Rating for a client caller: the radio group of `<Rating readOnly={false}>`, and onValueChange. */
+export function RatingInput(props: RatingInputProps) {
+  return <RatingField {...toField(props)} />
+}
 
 /** The editing half: a native radio group, so the arrows, Tab and a form work before any script runs. */
 export function RatingField({
