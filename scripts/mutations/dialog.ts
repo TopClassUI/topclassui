@@ -5,6 +5,7 @@ const CLIENT = 'src/components/dialog/client.tsx'
 const CLASSES = 'src/components/dialog/classes.ts'
 const HOOK = 'src/components/dialog/hook.ts'
 const DUMMY = 'src/components/dialog/dummy'
+const SPEC = 'e2e/dialog.spec.ts'
 
 /** The ring drawn outside the box, as FOCUS_RING writes it: what the popup wore before it was moved inside. */
 const RING_OUTSIDE = 'outline-none focus-visible:outline-solid focus-visible:outline-(length:--tc-ring-width) focus-visible:outline-offset-(length:--tc-ring-offset) focus-visible:outline-ring'
@@ -33,6 +34,7 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: ' ${FOCUS_RING_INSET} ${DIALOG_BODY_SHORT}`',
     to: ' ${FOCUS_RING_INSET}`',
+    e2e: { spec: SPEC, grep: 'the popup is the one scroller, so a wheel that starts on the body reaches the last action' },
   },
   {
     label: 'the dialog body stops scrolling on a short screen but may still shrink, so it is cut at 60 px with no way to its end',
@@ -45,12 +47,14 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: "'[@container(height<15rem)]:shrink-0 [@container(height<15rem)]:overflow-y-visible'",
     to: "'[@media(height<17rem)]:shrink-0 [@media(height<17rem)]:overflow-y-visible'",
+    e2e: { spec: SPEC, grep: 'is the one scroller, and a wheel over the popup reaches the last action' },
   },
   {
     label: 'the dialog viewport is no size container, so the short-screen query of the body never matches on any screen',
     file: CLASSES,
     from: ' p-(--tc-overlay-inset) [container-type:size]',
     to: ' p-(--tc-overlay-inset)',
+    e2e: { spec: SPEC, grep: 'the popup is the one scroller, so a wheel that starts on the body reaches the last action' },
   },
   {
     label: 'the dialog popup clips instead of scrolling, so an action below the screen of a small phone can never be reached',
@@ -63,6 +67,7 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: 'w-full flex-col wrap-anywhere',
     to: 'w-full flex-col',
+    e2e: { spec: SPEC, grep: 'a long title, a 300-character word and three long actions stay inside the popup' },
   },
   {
     label: 'the dialog popup loses its maximum height, so a long body runs off the bottom of the screen',
@@ -75,12 +80,14 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: "  POPUP_MOTION,\n  FOCUS_RING_INSET,\n",
     to: `  POPUP_MOTION,\n  '${RING_OUTSIDE}',\n`,
+    e2e: { spec: SPEC, grep: 'the ring of the popup is drawn inside it, on its own surface, and not on the scrim' },
   },
   {
     label: 'the dialog viewport loses its inset, so the popup touches the edges of a phone',
     file: CLASSES,
     from: 'grid place-items-center p-(--tc-overlay-inset)',
     to: 'grid place-items-center',
+    e2e: { spec: SPEC, grep: '16 px clear of every edge' },
   },
   {
     label: 'the dialog scrim leaves the dialog layer, so a sticky bar of the page paints over it',
