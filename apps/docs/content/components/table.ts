@@ -1,0 +1,59 @@
+// The hand-written data of the Table page and card (docs-site S7), in English and Arabic.
+export const table = {
+  slug: 'table',
+  demos: [
+    'basic', 'sorted', 'sticky-first-column', 'row-actions', 'striped', 'caption', 'column-classes', 'empty',
+    'skeleton', 'in-a-layout', 'rtl',
+  ],
+  stageDemo: null,
+  stageHeight: 22,
+  related: ['pagination', 'tree-view', 'empty-state', 'skeleton'],
+  en: {
+    title: 'Table',
+    description: 'A real HTML table rendered on the server: sorting is a link per header, the first column can stick, and it ships no JavaScript.',
+    note: 'Sorting is a link the server answers with the rows in their new order, so a sorted table costs no JavaScript.',
+    notes: [
+      '`caption` is required, in real words: it is the only name of the table. It is read out but not drawn; `captionVisible` draws it.',
+      'A column with `sortHref` makes its header a link. Sort the rows on the server and pass `sort` to mark the column; in Next.js pass `link={<Link href="" />}`.',
+      'Table renders the `items` it is given, already sorted and paged; Pagination moves between pages.',
+      'Cells stay on one line, so a narrow screen scrolls the table sideways instead of stacking words. A column of prose opts out with its own `className`.',
+      '`stickyFirstColumn` keeps the first column in view, cut with an ellipsis past `--tc-table-sticky-width`.',
+      '`columns` and `getKey` hold functions, so build the columns where you render the table, not in a Server Component that passes them to a Client Component.',
+    ],
+    keyboard: [
+      { keys: 'Tab', does: 'reaches the scrolling box, then each sort link and each control in the cells' },
+      { keys: 'ArrowLeft, ArrowRight', does: 'scroll the focused box sideways' },
+      { keys: 'Enter', does: 'follows a sort link' },
+    ],
+    a11y: [
+      'A real `<table>`: a screen reader moves through it by row and by column. Mark the column that identifies a row with `rowHeader: true`.',
+      'The sorted column carries `aria-sort`, and its caret says the direction in words, because `aria-sort` is not read out everywhere.',
+      'Name a row action by its row, such as "Refund order 1042", never a bare "Refund" repeated on every row.',
+    ],
+    rtl: 'The first column sticks to the right edge, an end-aligned amount sits on the left, and the built-in words come from `labels`.',
+  },
+  ar: {
+    title: 'جدول',
+    description: 'جدول HTML حقيقي يُعرض على الخادم: الترتيب رابط في كل عنوان عمود، والعمود الأول يمكن تثبيته، ولا يشحن أي JavaScript.',
+    note: 'الترتيب رابط يجيب عنه الخادم بالصفوف في ترتيبها الجديد، فلا يكلّف الجدول المرتّب أي JavaScript.',
+    notes: [
+      '`caption` مطلوب، بكلمات حقيقية: هو الاسم الوحيد للجدول. يُقرأ ولا يُرسم، و`captionVisible` يرسمه.',
+      'العمود الذي يحمل `sortHref` يصبح عنوانه رابطًا. رتّب الصفوف على الخادم ومرّر `sort` لتمييز العمود، وفي Next.js مرّر `link={<Link href="" />}`.',
+      'يعرض الجدول `items` كما تصله، مرتّبة ومقسّمة إلى صفحات مسبقًا، وPagination هو ما ينتقل بين الصفحات.',
+      'تبقى الخلايا على سطر واحد، فيُمرَّر الجدول أفقيًا على الشاشة الضيقة بدل أن تتكدّس الكلمات. عمود النص الطويل يستثني نفسه بـ `className` خاص به.',
+      '`stickyFirstColumn` يُبقي العمود الأول ظاهرًا، ويُقصّ بعلامة حذف بعد `--tc-table-sticky-width`.',
+      '`columns` و`getKey` يحملان دوالّ، فابنِ الأعمدة حيث تعرض الجدول، لا في مكوّن خادم يمرّرها إلى مكوّن عميل.',
+    ],
+    keyboard: [
+      { keys: 'Tab', does: 'يصل إلى الصندوق القابل للتمرير، ثم إلى كل رابط ترتيب وكل عنصر تحكم في الخلايا' },
+      { keys: 'ArrowLeft, ArrowRight', does: 'تمرّر الصندوق المركَّز عليه أفقيًا' },
+      { keys: 'Enter', does: 'يتبع رابط الترتيب' },
+    ],
+    a11y: [
+      'جدول `<table>` حقيقي: يتنقّل فيه قارئ الشاشة صفًا صفًا وعمودًا عمودًا. ميّز العمود الذي يعرّف الصف بـ `rowHeader: true`.',
+      'العمود المرتّب يحمل `aria-sort`، والسهم فيه يقول الاتجاه بالكلمات، لأن `aria-sort` لا يُقرأ في كل مكان.',
+      'سمِّ إجراء الصف باسم صفه، مثل «استرداد الطلب 1042»، لا «استرداد» وحدها مكرّرة في كل صف.',
+    ],
+    rtl: 'يلتصق العمود الأول بالحافة اليمنى، ويقع المبلغ المحاذى إلى النهاية على اليسار، والكلمات المدمجة تأتي من `labels`.',
+  },
+} as const
