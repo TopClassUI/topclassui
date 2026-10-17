@@ -11,20 +11,25 @@ export interface Ring {
   width: number
 }
 
-/** The ring of the focused element: its own outline, else the first descendant's, else the nearest ancestor's inside #demo. */
+/** The ring of the focused element: its own outline, else a descendant's, a sibling's, or the nearest ancestor's inside #demo. */
 export function ringOfFocus(page: Page): Promise<Ring | null> {
   return page.evaluate(() => {
     const focused = document.activeElement
     if (!(focused instanceof HTMLElement) || focused === document.body) return null
-    // An element at opacity 0, as a file input over its zone, keeps the browser's outline and paints none of it.
+    // A file input at opacity 0 over its zone, or a slider's clipped range input, keeps the browser's outline and paints none of it.
     const drawn = (element: Element) => {
       const style = getComputedStyle(element)
-      return style.outlineStyle !== 'none' && style.opacity !== '0' && style.visibility === 'visible'
+      const box = element.getBoundingClientRect()
+      const hidden = style.opacity === '0' || style.visibility !== 'visible' || box.width <= 1 || box.height <= 1
+        || style.clipPath !== 'none' || style.getPropertyValue('clip') !== 'auto'
+      return style.outlineStyle !== 'none' && !hidden
     }
     const inside = [...focused.querySelectorAll('*')].find(drawn)
+    // A slider's knob, beside its range input, draws the ring the input's focus asks for.
+    const beside = [...(focused.parentElement?.children ?? [])].filter((el) => el !== focused).flatMap((el) => [el, ...el.querySelectorAll('*')]).find(drawn)
     let around: Element | null = null
     for (let up = focused.parentElement; up && up.id !== 'demo'; up = up.parentElement) if (drawn(up)) { around = up; break }
-    const ring = drawn(focused) ? focused : inside ?? around
+    const ring = drawn(focused) ? focused : inside ?? beside ?? around
     const style = ring ? getComputedStyle(ring) : null
     return {
       visible: focused.matches(':focus-visible'),
