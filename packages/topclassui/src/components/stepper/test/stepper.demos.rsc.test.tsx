@@ -72,7 +72,7 @@ describe('Stepper renders in a Server Component (R-5.1-1)', () => {
 
 describe('every demo is a Server Component (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['arabic-digits', 'basic', 'custom-size', 'long-content', 'rtl', 'sizes', 'statuses'])
+    expect(names).toEqual(['arabic-digits', 'basic', 'custom-size', 'long-content', 'playground', 'rtl', 'sizes', 'states', 'statuses'])
   })
 
   for (const name of names) {
