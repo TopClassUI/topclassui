@@ -1,7 +1,6 @@
 {
   "name": "topclassui",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0-beta.0",
   "description": "RTL-first, server-first React components for Next.js and Tailwind CSS v4.",
   "license": "MIT",
   "author": "Omar Abed",
@@ -28,6 +27,11 @@
   "engines": {
     "node": ">=22.14"
   },
+  "files": [
+    "dist",
+    "!dist/**/dummy",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
