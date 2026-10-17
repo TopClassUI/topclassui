@@ -4,8 +4,7 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import {
-  NAMING_EXEMPTIONS, SCROLLING_OVERLAYS, exportsOf, hookFileProblems, libFileProblems, overlayPartProblems,
-  partFileProblems, pascalOf,
+  SCROLLING_OVERLAYS, exportsOf, hookFileProblems, libFileProblems, overlayPartProblems, partFileProblems, pascalOf,
 } from './part-names.js'
 
 const COMPONENTS = join(process.cwd(), 'src', 'components')
@@ -95,8 +94,14 @@ describe('a file in parts/', () => {
 })
 
 describe('hook.ts', () => {
-  it('passes hooks and the contexts they read', () => {
-    expect(hookFileProblems('export function useA() {}\nexport const AContext = createContext(0)')).toEqual([])
+  it('passes hooks, and a context kept module-private for its root hook to return', () => {
+    expect(hookFileProblems('const AContext = createContext(0)\nexport function useA() { return { Context: AContext } }')).toEqual([])
+  })
+
+  it('rejects an exported context, however it is named', () => {
+    expect(hookFileProblems('export const AContext = createContext(0)')).toEqual([
+      'exports AContext (context); hook.ts exports only use* hooks.',
+    ])
   })
 
   it('rejects a helper, a table, a type and a re-export', () => {
@@ -108,17 +113,17 @@ describe('hook.ts', () => {
       'export const NotAContextName = createContext(0)',
     ].join('\n')
     expect(hookFileProblems(source)).toEqual([
-      'exports toA (function); hook.ts exports only use* hooks and the contexts they read.',
-      'exports A (value); hook.ts exports only use* hooks and the contexts they read.',
-      'exports B (type); hook.ts exports only use* hooks and the contexts they read.',
-      'exports useC (re-export); hook.ts exports only use* hooks and the contexts they read.',
-      'exports NotAContextName (context); hook.ts exports only use* hooks and the contexts they read.',
+      'exports toA (function); hook.ts exports only use* hooks.',
+      'exports A (value); hook.ts exports only use* hooks.',
+      'exports B (type); hook.ts exports only use* hooks.',
+      'exports useC (re-export); hook.ts exports only use* hooks.',
+      'exports NotAContextName (context); hook.ts exports only use* hooks.',
     ])
   })
 
   it('rejects a name that only starts with use', () => {
     expect(hookFileProblems('export function user() {}')).toEqual([
-      'exports user (function); hook.ts exports only use* hooks and the contexts they read.',
+      'exports user (function); hook.ts exports only use* hooks.',
     ])
   })
 })
@@ -137,9 +142,8 @@ describe('lib.ts', () => {
     ])
   })
 
-  it('lets through the one exempt name and nothing beside it', () => {
-    const source = 'export const toast = { add }\nexport const other = { add }'
-    expect(libFileProblems('lib.ts', source, ['toast'])).toEqual(['exports other (value); lib.ts exports only functions.'])
+  it('rejects a call object such as toast, which lives in shared/toast/toast.ts', () => {
+    expect(libFileProblems('lib.ts', 'export const toast = { add }')).toEqual(['exports toast (value); lib.ts exports only functions.'])
   })
 })
 
@@ -170,9 +174,5 @@ describe('the lists the check reads', () => {
   it('names the overlays R-10.5-1 makes scroll a body', () => {
     expect([...SCROLLING_OVERLAYS]).toEqual(['dialog', 'drawer'])
     for (const slug of SCROLLING_OVERLAYS) expect(folders).toContain(slug)
-  })
-
-  it('exempts only the toast call object, recorded in docs/DECISIONS.md', () => {
-    expect(NAMING_EXEMPTIONS).toEqual({ 'toast/lib.ts': ['toast'] })
   })
 })

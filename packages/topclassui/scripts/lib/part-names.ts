@@ -9,14 +9,6 @@ export interface ExportedName { name: string; kind: ExportKind }
 /** The overlays that scroll a body between a sticky header and footer (R-10.5-1). */
 export const SCROLLING_OVERLAYS = ['dialog', 'drawer'] as const
 
-/**
- * Exports R-5.12-4 would refuse that are a decision instead, each recorded in docs/DECISIONS.md.
- * Keyed by `<slug>/<file>`; nothing else in the file is exempt.
- */
-export const NAMING_EXEMPTIONS: Readonly<Record<string, readonly string[]>> = {
-  'toast/lib.ts': ['toast'],
-}
-
 const hasExport = (node: ts.Node) =>
   ts.canHaveModifiers(node) && (ts.getModifiers(node) ?? []).some((m) => m.kind === ts.SyntaxKind.ExportKeyword)
 
@@ -95,19 +87,17 @@ export function partFileProblems(fileName: string, source: string): string[] {
   return problems
 }
 
-/** hook.ts exports only `use*` hooks, plus the contexts its own hooks read (docs/DECISIONS.md). */
-export function hookFileProblems(source: string, exempt: readonly string[] = []): string[] {
+/** hook.ts exports only `use*` hooks; a context stays module-private and the root's hook returns it. */
+export function hookFileProblems(source: string): string[] {
   return exportsOf(source, 'hook.ts')
-    .filter((n) => !exempt.includes(n.name))
     .filter((n) => !(n.kind === 'function' && /^use[A-Z]/.test(n.name)))
-    .filter((n) => !(n.kind === 'context' && /^[A-Z]\w*Context$/.test(n.name)))
-    .map((n) => `exports ${n.name} (${n.kind}); hook.ts exports only use* hooks and the contexts they read.`)
+    .map((n) => `exports ${n.name} (${n.kind}); hook.ts exports only use* hooks.`)
 }
 
 /** lib.ts and lib.tsx export only functions; a type goes in types.ts and a table in constants.ts. */
-export function libFileProblems(fileName: string, source: string, exempt: readonly string[] = []): string[] {
+export function libFileProblems(fileName: string, source: string): string[] {
   return exportsOf(source, fileName)
-    .filter((n) => !exempt.includes(n.name) && n.kind !== 'function')
+    .filter((n) => n.kind !== 'function')
     .map((n) => `exports ${n.name} (${n.kind}); ${fileName} exports only functions.`)
 }
 

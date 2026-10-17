@@ -182,4 +182,28 @@ export const MUTATIONS: Mutation[] = [
     from: '  if (/^\\s*Test(?: Files|s)\\s+\\d+ failed/m.test(output)) return true',
     to: '  return true',
   },
+  {
+    label: 'check-structure reads lib.ts only, so a table exported from lib.tsx passes',
+    file: 'scripts/check-structure.ts',
+    from: ": f === 'lib.ts' || f === 'lib.tsx' ? libFileProblems(f, source())",
+    to: ": f === 'lib.ts' ? libFileProblems(f, source())",
+  },
+  {
+    label: 'check-structure never asks a scrolling overlay for its Header, Body and Footer',
+    file: 'scripts/check-structure.ts',
+    from: "for (const p of overlayPartProblems(slug, readFileSync(join(dir, 'index.tsx'), 'utf8'), names)) {",
+    to: 'for (const p of [] as string[]) {',
+  },
+  {
+    label: 'hook.ts may export a context again beside its hooks',
+    file: 'scripts/lib/part-names.ts',
+    from: '    .filter((n) => !(n.kind === \'function\' && /^use[A-Z]/.test(n.name)))',
+    to: '    .filter((n) => n.kind !== \'context\' && !(n.kind === \'function\' && /^use[A-Z]/.test(n.name)))',
+  },
+  {
+    label: 'check-structure skips a test inside parts/ without a word',
+    file: 'scripts/check-structure.ts',
+    from: "{ errors.push(`${rel(path)}: tests live in test/, not parts/ (R-8.1-1).`); continue }",
+    to: '{ continue }',
+  },
 ]
