@@ -21,6 +21,7 @@ const AFTER: Record<string, string[]> = {
   'form': ['Team'],
   'horizontal': ['Extra large'],
   'long-content': ['Pick up'],
+  'playground': ['Lifetime'],
   'rtl': ['مدى الحياة'],
   'sizes': ['Off', 'Off', 'Off', 'Off', 'Off'],
   'states': ['Invalid', 'Disabled, checked', 'Live', 'Read-only, checked'],

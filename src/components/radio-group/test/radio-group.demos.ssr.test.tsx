@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'horizontal', 'long-content', 'rtl', 'sizes', 'states']
+const EXPECTED = ['basic', 'form', 'horizontal', 'long-content', 'playground', 'rtl', 'sizes', 'states']
 
 /** Each group of each demo as the server writes it: its name, then each radio's text, a star on the checked one and a
  * caret on the one tab stop. */
@@ -20,6 +20,7 @@ const GROUPS: Record<string, string[]> = {
   'form': ['Plan: Free | Pro *^ | Team'],
   'horizontal': ['Size: Small | Medium *^ | Large | Extra large'],
   'long-content': ['Delivery: Standard delivery *^ | https | Pick up'],
+  'playground': ['Billing: Monthly | Yearly *^ | Lifetime'],
   'rtl': ['الفوترة: شهريًا | سنويًا *^ | مدى الحياة'],
   'sizes': ['Extra small: Extra small *^ | Off', 'Small: Small *^ | Off', 'Medium: Medium *^ | Off', 'Large: Large *^ | Off', 'Extra large: Extra large *^ | Off'],
   'states': [
@@ -51,7 +52,7 @@ function groupsIn(html: string): string[] {
 }
 
 describe('every demo renders on the server', () => {
-  it('holds exactly the seven demos asked for, so none can be deleted silently', () => {
+  it('holds exactly the eight demos asked for, so none can be deleted silently', () => {
     expect(files).toEqual(EXPECTED)
   })
 
@@ -79,6 +80,13 @@ describe('the demos the plan names', () => {
     const html = await render('form')
     expect(html).toMatch(/^<form class="[^"]*">/)
     expect(html).toContain('name="plan" checked="" value="pro"')
+  })
+
+  it('playground: the schema props a Try it control sets reach the group', async () => {
+    const loaded = await import('../dummy/playground.tsx') as { default: ComponentType<{ orientation?: string, invalid?: boolean }> }
+    const html = markup(<loaded.default orientation="horizontal" invalid />)
+    expect(html).toContain('data-orientation="horizontal"')
+    expect(html).toContain('aria-invalid="true"')
   })
 
   it('horizontal: a row that wraps', async () => {
