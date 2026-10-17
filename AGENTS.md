@@ -127,7 +127,7 @@ They arrive with the phases that need them.
 
 ## 10. Accessibility
 
-- **R-5.6-1** Keyboard behaviour follows the ARIA Authoring Practices; a visible `focus-visible` ring on every interactive element; types enforce labels. _(manual; axe covers the ARIA attributes in test:e2e, not the keyboard behaviour)_
+- **R-5.6-1** Keyboard behaviour follows the ARIA Authoring Practices; a visible `focus-visible` ring on every interactive element; types enforce labels. _(e2e/keyboard-<slug>.spec for the interactive components of Units 3 to 5, which press every key the Authoring Practices pattern lists in both directions and read the computed focus-visible ring on each stop; e2e/focus-ring.spec for Button; axe covers the ARIA attributes in test:e2e; the rest of Units 1 and 2 is manual)_
 - **R-5.6-2** Every interactive element is at least 24x24 CSS px on every pointer type and 44px under `pointer-coarse`. The floor is a px token with a px fallback, never a rem step, because the success criterion is written in CSS px. _(e2e/target-size.spec, which measures every interactive box in a real browser at both pointer types)_
 - **R-5.6-3** Slider, Drawer and Toast swipe, Carousel, Resizable, sortable lists and the editor kit each provide a keyboard or button path to the same result. _(manual; the keyboard tests do not exist yet)_
 - **R-5.6-4** 4.5:1 for text, including a tone's text colour on its own soft tint; 3:1 for `--tc-line-strong`, `--tc-ring` and icons. `--tc-line` is decorative and exempt. _(check-contrast)_
