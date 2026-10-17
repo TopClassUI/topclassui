@@ -1,0 +1,91 @@
+---
+slug: server-first
+title: Server first
+description: A component ships JavaScript only when it has to listen for something. The rest add none.
+---
+
+## The three kinds
+
+Every component is one of three kinds. The kind is shown on the chip beside its name.
+
+| Kind | Chip | What it means |
+|---|---|---|
+| S - server | server - 0 KB | Renders on the server. No hooks, no event handlers, no client JavaScript |
+| C - client | client - size not measured yet | Needs the browser: a popup, a drag, a keyboard listener |
+| Sp - split | split - 0 KB server + size not measured yet | The markup renders on the server and one small part hydrates. Tag is a server component until you pass `onRemove` |
+
+## What may cross the boundary
+
+Only what React can serialise: strings, numbers, booleans, plain objects, arrays and children. A function never crosses, except a Server Action.
+
+<WrongRight>
+
+```tsx
+// app/page.tsx - a Server Component
+<Command items={commands} getKey={(c) => c.id} getLabel={(c) => c.label} onSelect={run} />
+// getKey, getLabel and onSelect are functions: they cannot cross
+```
+
+```tsx check
+'use client'
+// the file that configures a palette is a client file
+import { Command } from 'topclassui/command'
+
+export function Search({ commands }: { commands: { id: string, label: string }[] }) {
+  return (
+    <Command
+      items={commands}
+      getKey={(command) => command.id}
+      getLabel={(command) => command.label}
+      onSelect={(command) => { window.location.assign(`/docs/${command.id}`) }}
+    />
+  )
+}
+```
+
+</WrongRight>
+
+## Why index.tsx has no hooks
+
+Markup lives in `index.tsx`, behaviour in `hook.ts`. `index.tsx` never contains `'use client'` and never imports `hook.ts`. A build check enforces it.
+
+```tsx title="index.tsx"
+// index.tsx - server
+import { useId } from 'react'   // allowed
+import { use } from 'react'     // allowed
+
+// anything else fails check-boundaries:
+// useState, useEffect, useRef, useMemo, useCallback
+```
+
+The two hooks a Server Component is allowed to call.
+
+## How a split component works
+
+The server half renders the markup and resolves anything needing the server, such as icon names. The client half adds the one behaviour.
+
+```tsx title="tag/index.tsx"
+// tag/index.tsx - server
+export function Tag({ onRemove, children, ...rest }: TagProps) {
+  if (onRemove) {
+    return <Removable onRemove={onRemove} {...rest}>{children}</Removable> // the x is a client part
+  }
+  return <span {...rest}>{children}</span> // still server
+}
+```
+
+## How sizes are checked
+
+Every component has a size budget. The check that fails the build when a budget is crossed is not built yet.
+
+<Callout tone="info">The chips show each component's kind. Until the first measured build, a client or split chip says "size not measured yet" instead of a number.</Callout>
+
+## What it costs you
+
+Server-first comes with constraints. These are the ones you will notice.
+
+<Cards>
+  <Card title="No onClick on a server component">A Button rendered on the server submits a form or follows a link. If it must run code in the browser, it lives in a client file.</Card>
+  <Card title="A command palette needs a client file">`getKey`, `getLabel` and `onSelect` are functions, so Command must be configured in a file marked `'use client'`. Select and Combobox take plain data and render from a server file.</Card>
+  <Card title="Some controls wait for hydration">Checkbox, Switch and Select submit their default value until JavaScript loads. Input and Textarea need no JavaScript at all.</Card>
+</Cards>
