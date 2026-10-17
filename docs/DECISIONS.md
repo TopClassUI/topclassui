@@ -6,6 +6,14 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-17 - R-5.3-4 is linted everywhere in src but the tests
+
+**Decision.** `topclass/no-physical-placement` flags `left` or `right` in a `side`, `align` or `placement` value, as a JSX attribute or an object property, through every branch of a conditional, a `??` fallback and an `as` cast. It is on for every file under `src/`, demos included, and off for test files only (`*.test.*` and `test/`), in a block of its own in `eslint.config.ts`. A swipe direction is not covered: Base UI's swipe is physical, and Drawer computes it from the direction (PLAN 10.1).
+
+**Why.** The first run over `src/` found eleven hits and every one was a test: the combobox, date picker, drawer, dropdown, popover, select and tooltip schema tests, and the toast contract test, each passing `left`, `right` or `bottom-right` to prove the schema refuses it. No component and no demo names a physical side. A demo shows real usage, so it stays covered, and `eslint-rules/config.test.ts` fails if the exemption ever reaches `dummy/`. A config block instead of an inline disable, because the repo has no lint disables.
+
+**Affects.** R-5.3-4, `eslint.config.ts`, `eslint-rules/config.test.ts`.
+
 ## 2026-10-17 - One thin themed scrollbar for every scroll area
 
 **Decision.** `SCROLLBAR` in `src/shared/classes.ts` is `scrollbar-width: thin` and `scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track)`. `SCROLL_AREA` and `SCROLL_X` carry it, so every dialog and drawer body, popover, dropdown, command, select and combobox list, date picker, tree view, file upload list, toast viewport, sidebar body, accordion region, tabs list, navbar links, segmented control and code block wears it; the table box and the textarea, which scroll without those two, add it by hand. The thumb is neutral-500 in light and ocean and neutral-400 in dark, on a transparent track, so it stands on the surface beneath it: 4.53 to 4.73:1 in light, 5.83 to 7.63 in dark, and 3.93 / 6.27 on a read-only field. `check:contrast` measures it on every surface and on its track whenever the track is not transparent. The code block sets the two tokens to its own fill and halfway thumb, as before. The collapsed Sidebar still hides its bar. Two widths follow from the thinner bar, measured under a mouse: an expanded Sidebar's bar is 10 px (15 before), and a Textarea that takes the browser's own width, in a `w-fit` parent or beside a label, is 173 px (178 before; unit-4.md says 178), since Chromium reserves the vertical bar in it.

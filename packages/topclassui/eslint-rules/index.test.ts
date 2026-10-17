@@ -28,6 +28,7 @@ const config = [
       'topclass/flat-part-exports': 'error',
       'topclass/root-part-is-named-root': 'error',
       'topclass/text-comes-from-labels': 'error',
+      'topclass/no-physical-placement': 'error',
     },
   },
 ] as unknown as Linter.Config[]
@@ -653,4 +654,44 @@ describe('the new rules leave real component code alone', () => {
   it('still catches a spread that is not the consumer style', () => {
     expect(ids('<div style={{ ...theme }} />')).toContain('topclass/style-sets-tokens-only')
   })
+})
+
+describe('R-5.3-4: never left or right as a side', () => {
+  const bad: [string, string][] = [
+    ['side="left" on a positioner', '<Popover.Positioner side="left" />'],
+    ['side="right" on a positioner', '<Popover.Positioner side="right" />'],
+    ['align="left"', '<Tooltip.Positioner align="left" />'],
+    ['align="right" in braces', '<Tooltip.Positioner align={"right"} />'],
+    ['a placement ending in right', '<PopoverRoot placement="bottom-right" />'],
+    ['a placement starting with left', '<DropdownRoot placement="left-start" />'],
+    ['a bare placement of left', '<DrawerRoot placement="left" />'],
+    ['a template literal', '<PopoverRoot placement={`top-left`} />'],
+    ['either branch of a conditional', '<PopoverRoot placement={rtl ? "start" : "right"} />'],
+    ['the fallback of a logical expression', '<PopoverRoot placement={given ?? "left"} />'],
+    ['a cast that hides the type error', '<PopoverRoot placement={"left" as Placement} />'],
+    ['an object property', 'const settings = { placement: "bottom-left" }'],
+    ['a side in a settings object', 'const positioner = { side: "right", align: "start" }'],
+  ]
+  for (const [label, code] of bad) {
+    it(`fails on ${label}`, () => {
+      expect(ids(code), code).toContain('topclass/no-physical-placement')
+    })
+  }
+
+  const good = [
+    '<PopoverRoot placement="bottom-start" />',
+    '<PopoverRoot placement="end-top" />',
+    '<DrawerRoot placement="start" />',
+    '<Popover.Positioner side="inline-end" align="center" />',
+    '<Popover.Positioner side={side} align={align} />',
+    '<DrawerRoot swipeDirection="left" />',
+    'const inlineEnd = direction === "rtl" ? "left" : "right"',
+    'const copy = { title: "Bright lights" }',
+    'const lookup = { [side]: "left" }',
+  ]
+  for (const code of good) {
+    it(`allows ${code}`, () => {
+      expect(ids(code).filter((r) => r?.startsWith('topclass/')), code).toEqual([])
+    })
+  }
 })

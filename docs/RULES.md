@@ -10,7 +10,7 @@ Each rule has an id, one line of rule, one line of reason, and what enforces it.
 
 ```
 pnpm check            every gate below, in order
-pnpm lint             eslint, including the thirteen custom rules
+pnpm lint             eslint, including the fourteen custom rules
 pnpm typecheck        tsc --noEmit
 pnpm test             vitest, four projects: node, dom, rsc, ssr
 pnpm check:structure  the folder contract and file sizes
@@ -156,7 +156,7 @@ They arrive with the phases that need them.
 ### R-5.3-4 Logical overlay placement
 **Rule:** use the `placement` prop, which maps to Base UI's `side` and `align`; never `left` or `right` as a side.
 **Why:** `align` and the `inline-*` sides flip in RTL automatically.
-**Enforced by:** type; the `eslint` half does not exist
+**Enforced by:** type + `eslint` (`no-physical-placement`, which bans `left` and `right` in `side`, `align` and `placement` across `src/`, demos included)
 
 ### R-13-1 TopClassProvider is required
 **Rule:** the app mounts `TopClassProvider` at the root layout with `direction` and `locale` as props from the layout, never read from `document.dir` in an effect.

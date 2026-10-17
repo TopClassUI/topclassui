@@ -34,6 +34,7 @@ export default defineConfig(
       'topclass/flat-part-exports': 'error',
       'topclass/root-part-is-named-root': 'error',
       'topclass/text-comes-from-labels': 'error',
+      'topclass/no-physical-placement': 'error',
 
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/ban-ts-comment': 'error',
@@ -56,6 +57,12 @@ export default defineConfig(
       'topclass/style-sets-tokens-only': 'off',
       'topclass/text-comes-from-labels': 'off',
     },
+  },
+
+  // R-5.3-4 binds demos, which show real usage; a schema test passes "left" to prove it is refused.
+  {
+    files: ['src/**/*.test.{ts,tsx}', 'src/**/test/**/*.{ts,tsx}'],
+    rules: { 'topclass/no-physical-placement': 'off' },
   },
 
   // Tooling runs in Node, never ships, and walks untyped ESLint AST nodes.
