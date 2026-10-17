@@ -14,6 +14,8 @@ Every component is one of three kinds. The kind is shown on the chip beside its 
 | C - client | client - size not measured yet | Needs the browser: a popup, a drag, a keyboard listener |
 | Sp - split | split - 0 KB server + size not measured yet | The markup renders on the server and one small part hydrates. Tag is a server component until you pass `onRemove` |
 
+<KindCounts />
+
 ## What may cross the boundary
 
 Only what React can serialise: strings, numbers, booleans, plain objects, arrays and children. A function never crosses, except a Server Action.

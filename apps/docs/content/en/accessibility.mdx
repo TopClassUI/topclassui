@@ -22,7 +22,7 @@ Contrast is measured from the real token values in every mode, as part of the bu
 
 Every interactive element is at least 24 by 24 CSS pixels, and grows to 44 on touch and other coarse pointers.
 
-```tsx check
+```tsx check title="save-button.tsx"
 import { TOUCH_TARGET } from 'topclassui/classes'
 
 export function SaveButton() {
@@ -40,7 +40,7 @@ WCAG 2.5.7. A Slider takes arrow keys. A Drawer and a Toast always render a clos
 
 One focus ring on every control: a CSS outline with an offset, so the gap shows the real background on any surface. `--tc-ring` reaches 3:1 on every surface.
 
-```tsx check
+```tsx check title="home-link.tsx"
 import { FOCUS_RING } from 'topclassui/classes'
 
 export function HomeLink() {

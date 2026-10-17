@@ -4,6 +4,8 @@ title: Changelog
 description: Every release of TopClass UI, newest first, with what changed in it and how to move to it.
 ---
 
+<Releases />
+
 ## Version policy
 
 TopClass UI follows semantic versioning. One package, one version number. A peer dependency range only widens in a minor release, never narrows.
@@ -11,24 +13,3 @@ TopClass UI follows semantic versioning. One package, one version number. A peer
 ## Breaking changes
 
 A breaking change means a major version bump, marked in the entry with migration steps. Before 1.0 a minor release may contain one.
-
-## 0.1.0-beta.0
-
-The first release, on the `beta` tag.
-
-```bash title="terminal"
-npm i topclassui@beta zod
-```
-
-- 46 components, plus Field, Form and Meter. Each one is its own import: `import { Button } from 'topclassui/button'`.
-- Next.js App Router first, on React 19. A Vite app works too, without a server render: import Icon from `topclassui/icon-registry` there.
-- Tailwind CSS v4.2 or later. Three CSS lines: Tailwind, `tokens.css` and `styles.css`.
-- Server first: of the 52 imports, 20 render on the server and add no JavaScript, 12 render on the server and hydrate one part, and 20 run in the browser.
-- English and Arabic, right to left with no code change. `TopClassProvider` takes the direction and the locale.
-- Light, dark and ocean modes. `ThemeScript` sets the mode before the first paint. The primary colour is blue.
-- 84 icons, one module each: `topclassui/icons/<name>`.
-- `cn` and the shared class constants, `topclassui/cn` and `topclassui/classes`.
-- Accessibility checked on every build: contrast in every mode; axe, target size and the focus ring in a real browser, in both directions.
-- Every component is beta: its API can still change in a minor release, with a migration note here.
-
-Not in this release: the CLI (`npx topclassui add`) and the connectors.

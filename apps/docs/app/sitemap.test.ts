@@ -11,6 +11,20 @@ describe('sitemap', () => {
       'https://topclassui.com/ar',
       'https://topclassui.com/en/docs/page-blocks',
       'https://topclassui.com/ar/docs/page-blocks',
+      'https://topclassui.com/en/docs/colors',
+      'https://topclassui.com/ar/docs/colors',
+      'https://topclassui.com/en/docs/icons',
+      'https://topclassui.com/ar/docs/icons',
+      'https://topclassui.com/en/docs/theming',
+      'https://topclassui.com/ar/docs/theming',
+      'https://topclassui.com/en/docs/rtl',
+      'https://topclassui.com/ar/docs/rtl',
+      'https://topclassui.com/en/docs/server-first',
+      'https://topclassui.com/ar/docs/server-first',
+      'https://topclassui.com/en/docs/accessibility',
+      'https://topclassui.com/ar/docs/accessibility',
+      'https://topclassui.com/en/changelog',
+      'https://topclassui.com/ar/changelog',
     ])
   })
 

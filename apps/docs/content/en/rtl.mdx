@@ -44,7 +44,7 @@ Tailwind still ships the physical utilities. This library never uses them; the l
 
 A translate, a transform origin, a gradient or a swipe has no logical form in CSS. These multiply by `--tc-dir`, which is `1` in LTR and `-1` in RTL.
 
-```css
+```css title="styles.css"
 [dir="rtl"] { --tc-dir: -1; }
 
 /* the switch thumb */
@@ -80,7 +80,7 @@ import { PopoverPopup } from 'topclassui/popover'
 
 Arabic text takes `--tc-font-arabic` through a `[lang|='ar']` rule, so you never swap a font variable. A label with a count is a function of that count.
 
-```tsx
+```tsx title="labels/ar.ts"
 // labels/ar.ts
 const plural = new Intl.PluralRules('ar')
 
@@ -102,17 +102,12 @@ selected: (n, fmt) => {
 
 The rule runs on every class string in the library and fails the lint on a physical class. It catches the deprecated aliases too.
 
-<WrongRight>
-
-```tsx
+```tsx title="lint-probe.tsx"
+// wrong: one error per class string
 className="pl-4 text-left"
+// R-5.3-1: "pl-" is physical. use ps- or pe-.
+// fix it, and the next run names text-left
 
-// R-5.3-1: "pl-4" is physical. use ps- or pe-.
-// one error per class string: fix it, and the next run names text-left
-```
-
-```tsx
+// right
 className="ps-4 text-start"
 ```
-
-</WrongRight>
