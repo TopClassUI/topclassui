@@ -112,6 +112,8 @@ describe('every element carries exactly the classes the spec names', () => {
   it('the region: the padding, 4 px above for a ring, a sideways scroll and the inset ring of a tab stop', () => {
     expect(classes(opened().content)).toEqual([
       '[:last-child>*>&]:rounded-b-box',
+      '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]',
+      '[scrollbar-width:thin]',
       'focus-visible:-outline-offset-(length:--tc-ring-width)',
       'focus-visible:outline-(length:--tc-ring-width)',
       'focus-visible:outline-ring',

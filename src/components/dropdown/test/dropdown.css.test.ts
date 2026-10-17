@@ -23,6 +23,8 @@ const DECLARATION: Record<string, string> = {
     'max-height: min(var(--available-height,100dvh), calc(var(--tc-list-rows) * var(--tc-row-height)));',
   'overflow-y-auto': 'overflow-y: auto;',
   'overscroll-contain': 'overscroll-behavior: contain;',
+  '[scrollbar-width:thin]': 'scrollbar-width: thin;',
+  '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]': 'scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track);',
   'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]': 'scroll-padding-block: calc(var(--tc-ring-width) + var(--tc-ring-offset));',
   'rounded-box': 'border-radius: min(calc(var(--tc-radius) * 1.5), 1.5rem);',
   'bg-surface-raised': 'background-color: var(--tc-surface-raised);',
@@ -159,7 +161,7 @@ describe('every class an open Dropdown wears compiles with the installed Tailwin
       DROPDOWN_SHORTCUT, DROPDOWN_GROUP, DROPDOWN_GROUP_LABEL, DROPDOWN_SEPARATOR,
     ])
     expect(all).toEqual([...Object.keys(DECLARATION), 'group'].sort())
-    expect(all).toHaveLength(77)
+    expect(all).toHaveLength(79)
   })
 
   it('group emits nothing of its own: it only marks the row for the shortcut inside it', async () => {

@@ -711,13 +711,13 @@ test.describe('sixty links', () => {
 
   test.describe('with a classic scrollbar', () => {
     for (const direction of DIRECTIONS) {
-      withScrollbar(`${direction}: expanded, the bar takes 15 px of the body; collapsed, no bar is drawn, the icons stay under the toggle and the wheel still scrolls`, async ({ barPage: page }) => {
+      withScrollbar(`${direction}: expanded, the thin bar takes 10 px of the body; collapsed, no bar is drawn, the icons stay under the toggle and the wheel still scrolls`, async ({ barPage: page }) => {
         await openLive(page, 'sidebar--long-list', { direction })
         const rail = railOf(page)
         const body = bodyOf(rail)
         const bar = () => body.evaluate((element) => element.getBoundingClientRect().width - element.clientWidth)
-        expect(await bar()).toBe(15)
-        expect(await widthOf(linksOf(rail).first())).toBe(184)
+        expect(await bar()).toBe(10)
+        expect(await widthOf(linksOf(rail).first())).toBe(189)
 
         await triggerOf(rail).click()
         expect(await bar()).toBe(0)

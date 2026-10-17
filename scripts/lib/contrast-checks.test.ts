@@ -28,7 +28,7 @@ describe('checkTokens', () => {
   })
 
   it('measures the number of pairs it claims; change this only on purpose', () => {
-    expect(run(css).pairs).toBe(378)
+    expect(run(css).pairs).toBe(390)
   })
 
   it('reports how many readings are distinct, since light and ocean share most tokens', () => {
@@ -245,5 +245,35 @@ describe('each threshold is the number R-5.6-4 names, and each one bites', () =>
       '--tc-success-on-soft: oklch(46% 0.4 150);')
     expect(wide, 'the on-soft declaration moved').not.toBe(css)
     expect(failures(wide)).toMatch(/light: success text on its tint/)
+  })
+})
+
+describe('the scrollbar thumb', () => {
+  it('fails a thumb that reads 2.2 on the light page, and on the read-only fill a textarea can have', () => {
+    // Measured at 2.23 on the light page, the reading line-strong is seeded with above.
+    const faint = css.replace('--tc-scrollbar-thumb: var(--color-neutral-500);', '--tc-scrollbar-thumb: oklch(75% 0 0);')
+    expect(faint, 'the thumb declaration moved').not.toBe(css)
+    const text = failures(faint)
+    expect(text).toMatch(/light: scrollbar-thumb on page/)
+    expect(text).toMatch(/light: scrollbar thumb on a read-only field \(neutral-soft\)/)
+  })
+
+  it('is measured inside the dark block on its own', () => {
+    const dark = mutateMode('dark', '--tc-scrollbar-thumb: var(--color-neutral-400);', '--tc-scrollbar-thumb: var(--color-neutral-700);')
+    expect(failures(dark)).toMatch(/dark: scrollbar-thumb on surface-raised/)
+  })
+
+  it('measures a track that is a colour rather than transparent', () => {
+    const solid = css.replace('--tc-scrollbar-track: transparent;', '--tc-scrollbar-track: var(--color-neutral-400);')
+    expect(solid, 'the track declaration moved').not.toBe(css)
+    expect(failures(solid)).toMatch(/light: scrollbar thumb on its track/)
+    expect(run(css).failures.join('|')).not.toMatch(/scrollbar thumb on its track/)
+  })
+
+  it('reports a thumb or a track it cannot resolve rather than passing it over', () => {
+    expect(failures(css.replace('--tc-scrollbar-thumb: var(--color-neutral-500);', '--tc-scrollbar-thumb: spaghetti;')))
+      .toMatch(/light: scrollbar-thumb on page: could not be resolved/)
+    expect(failures(css.replace('--tc-scrollbar-track: transparent;', '--tc-scrollbar-track: spaghetti;')))
+      .toMatch(/light: scrollbar thumb on its track: could not be resolved/)
   })
 })

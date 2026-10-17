@@ -38,6 +38,8 @@ const DECLARATION: Record<string, string> = {
   'ease-out': 'transition-timing-function: var(--ease-out);',
   'overflow-y-auto': 'overflow-y: auto;',
   'overscroll-contain': 'overscroll-behavior: contain;',
+  '[scrollbar-width:thin]': 'scrollbar-width: thin;',
+  '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]': 'scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track);',
   'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]': 'scroll-padding-block: calc(var(--tc-ring-width) + var(--tc-ring-offset));',
   // The ring, outside the x and inside the sheet and the body.
   'outline-none': 'outline-style: none;',
@@ -128,7 +130,7 @@ describe('every class a sheet wears at any edge compiles with the installed Tail
       DRAWER_HEADER, DRAWER_TITLE, DRAWER_DESCRIPTION, DRAWER_BODY_SHORT, DRAWER_BODY, DRAWER_FOOTER, DRAWER_CLOSE,
     ]).filter((cls) => cls !== '' && !elsewhere.has(cls))
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(63)
+    expect(all).toHaveLength(65)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

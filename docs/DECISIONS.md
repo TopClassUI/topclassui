@@ -6,6 +6,12 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-17 - One thin themed scrollbar for every scroll area
+
+**Decision.** `SCROLLBAR` in `src/shared/classes.ts` is `scrollbar-width: thin` and `scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track)`. `SCROLL_AREA` and `SCROLL_X` carry it, so every dialog and drawer body, popover, dropdown, command, select and combobox list, date picker, tree view, file upload list, toast viewport, sidebar body, accordion region, tabs list, navbar links, segmented control and code block wears it; the table box and the textarea, which scroll without those two, add it by hand. The thumb is neutral-500 in light and ocean and neutral-400 in dark, on a transparent track, so it stands on the surface beneath it: 4.53 to 4.73:1 in light, 5.83 to 7.63 in dark, and 3.93 / 6.27 on a read-only field. `check:contrast` measures it on every surface and on its track whenever the track is not transparent. The code block sets the two tokens to its own fill and halfway thumb, as before. The collapsed Sidebar still hides its bar. Two widths follow from the thinner bar, measured under a mouse: an expanded Sidebar's bar is 10 px (15 before), and a Textarea that takes the browser's own width, in a `w-fit` parent or beside a label, is 173 px (178 before; unit-4.md says 178), since Chromium reserves the vertical bar in it.
+
+**Why.** The native bar stays fast, keyboard and screen-reader neutral, and under forced colours Chromium computes `scrollbar-color` to `auto`, so the system colours win with no class of ours (`e2e/scrollbar.spec.ts` reads it). No JavaScript scrollbar. Arbitrary properties, not the `scrollbar-*` utilities of the installed Tailwind 4.3.3, which the 4.2 floor of the peer range may lack. The page's own bar is the consumer's and is left alone.
+
 ## 2026-10-17 - The primary colour is blue
 
 **Decision.** Omar chose blue over violet (PLAN O2). Light and dark: `--tc-primary-solid` blue-600, `--tc-primary-hover` blue-700, `--tc-primary-active` blue-800, `--tc-primary-on-soft` blue-800 in light and blue-400 in dark. The ring follows `--tc-primary-on-soft`, as before. Ocean keeps cyan.

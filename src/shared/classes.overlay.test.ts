@@ -102,8 +102,8 @@ describe('lists, bars and sideways scrolling', () => {
     ])
   })
 
-  it('SCROLL_X scrolls inside itself and keeps the gesture there', () => {
-    expect(list(SCROLL_X)).toEqual(['overflow-x-auto', 'overscroll-x-contain'])
+  it('SCROLL_X scrolls inside itself, keeps the gesture there and wears the shared scrollbar', () => {
+    expect(list(SCROLL_X)).toEqual(['overflow-x-auto', 'overscroll-x-contain', '[scrollbar-width:thin]', '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]'])
   })
 
   it('STICKY_TOP sticks at the top on the sticky step of the z-index scale', () => {

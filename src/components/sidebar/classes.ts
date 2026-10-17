@@ -34,7 +34,7 @@ export const SIDEBAR_TITLE = `${LABEL} text-sm font-semibold group-data-closed/s
  * the body is that much larger than its rows on every side, into the padding of the rail. */
 export const SIDEBAR_RING_ROOM = '-m-[calc(var(--tc-ring-width)+var(--tc-ring-offset))] p-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]'
 
-/** A classic scrollbar is 15 px of a collapsed rail's 39: it leaves a row 24 and pushes every
+/** Even the thin classic scrollbar is 10 px of a collapsed rail's 39: it leaves a row 29 and pushes every
  * icon off the middle. Collapsed, the bar is not drawn; the wheel, a finger and the keys still scroll. */
 export const SIDEBAR_BAR = 'group-data-closed/sidebar:[scrollbar-width:none]'
 

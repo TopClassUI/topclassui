@@ -412,10 +412,11 @@ test.describe('live: where a page puts a textarea', () => {
   ]))
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 
+  // The browser's own width reserves the vertical bar: the thin one is 10 px where the classic was 15, so 173 where it was 178.
   const WIDE = [
-    ['grid', 193.2], ['track', 193.2], ['flex-1', 193.2], ['w-fit', 178], ['cell', 193.2], ['label-row', 183.7], ['held-w-fit', 178], ['held-cell', 193.2],
+    ['grid', 193.2], ['track', 193.2], ['flex-1', 193.2], ['w-fit', 173], ['cell', 193.2], ['label-row', 180.5], ['held-w-fit', 173], ['held-cell', 193.2],
     ['pair-grid', 193.2, 193.2], ['pair-flex', 193.2, 193.2], ['pair-div', 193.2, 193.2], ['pair-held', 193.2, 193.2], ['beside-label', 193.2],
-    ['word', 193.2, 193.2, 1233], ['word-cell', 178], ['empty', 193.2], ['lines', 193.2, 193.2],
+    ['word', 193.2, 193.2, 1233], ['word-cell', 173], ['empty', 193.2], ['lines', 193.2, 193.2],
   ]
   const PHONE = (pair: number, flex: number, cell: number, beside: number, full: number) => [
     ['grid', 220.8], ['track', pair], ['flex-1', flex], ['w-fit', 185], ['cell', cell], ['label-row', 197], ['held-w-fit', 185], ['held-cell', cell],
@@ -424,7 +425,7 @@ test.describe('live: where a page puts a textarea', () => {
   ]
 
   for (const direction of DIRECTIONS) {
-    test(`1280 px, ${direction}: an Input wide in a block, the browser's 178 px where the parent sizes to its content`, async ({ page }) => {
+    test(`1280 px, ${direction}: an Input wide in a block, the browser's 173 px where the parent sizes to its content`, async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 800 })
       await fixture(page, { direction })
       expect(await cases(page)).toEqual(WIDE)

@@ -64,8 +64,8 @@ export function checkTokens(css: string, palette: Map<string, Color>): Report {
         check(`${mode}: ${text} on ${surface.name}`, c && worst(c, surface.color), 4.5)
       }
 
-      // A control boundary, the focus ring and a meaningful icon need 3:1 everywhere.
-      for (const token of ['line-strong', 'ring'] as const) {
+      // A control boundary, the focus ring, a meaningful icon and a scrollbar thumb need 3:1 everywhere.
+      for (const token of ['line-strong', 'ring', 'scrollbar-thumb'] as const) {
         const c = get(`--tc-${token}`)
         check(`${mode}: ${token} on ${surface.name}`, c && worst(c, surface.color), 3)
       }
@@ -75,6 +75,15 @@ export function checkTokens(css: string, palette: Map<string, Color>): Report {
     const track = get('--tc-neutral-soft')
     const thumb = get('--tc-line-strong')
     check(`${mode}: switch thumb (line-strong) on its track (neutral-soft)`, track && thumb && worst(thumb, track), 3)
+
+    // A read-only field is neutral-soft, so a textarea's scrollbar thumb sits on it too.
+    const bar = get('--tc-scrollbar-thumb')
+    check(`${mode}: scrollbar thumb on a read-only field (neutral-soft)`, track && bar && worst(bar, track), 3)
+    // A transparent track is the surface beneath it, which the sweep above measured; any other track is measured here.
+    if (tokens.get('--tc-scrollbar-track')?.trim() !== 'transparent') {
+      const barTrack = get('--tc-scrollbar-track')
+      check(`${mode}: scrollbar thumb on its track`, bar && barTrack && worst(bar, barTrack), 3)
+    }
 
     for (const tone of TONES) {
       const solid = get(`--tc-${tone}-solid`)

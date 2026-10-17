@@ -103,7 +103,7 @@ describe('every element carries exactly the classes the spec names', () => {
       'duration-(--tc-duration)', 'ease-out', 'flex', 'flex-col', 'max-h-[calc(100dvh-2*var(--tc-overlay-inset))]',
       'max-w-100', 'origin-(--transform-origin)', 'overflow-y-auto', 'overscroll-contain', 'rounded-box',
       'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]', 'shadow-lg', 'text-body', 'transition-[opacity,scale]',
-      'w-full', 'wrap-anywhere',
+      'w-full', 'wrap-anywhere', '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]', '[scrollbar-width:thin]',
     ].sort())
   })
 
@@ -128,7 +128,7 @@ describe('every element carries exactly the classes the spec names', () => {
       ...RING_INSET,
       '[@container(height<15rem)]:overflow-y-visible', '[@container(height<15rem)]:shrink-0', 'flex-1', 'min-h-15',
       'overflow-y-auto', 'overscroll-contain', 'px-5', 'py-5', 'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]',
-      'text-muted', 'text-sm',
+      'text-muted', 'text-sm', '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]', '[scrollbar-width:thin]',
     ].sort())
   })
 

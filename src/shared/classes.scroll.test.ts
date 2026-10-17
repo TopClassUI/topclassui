@@ -16,8 +16,8 @@ function ruleFor(css: string, cls: string): string {
 }
 
 describe('the scroll area of an overlay (R-10.5-1)', () => {
-  it('is exactly three classes: it scrolls on the block axis, keeps the scroll to itself, and leaves room for a ring', () => {
-    expect(SCROLL_AREA.split(' ')).toEqual(['overflow-y-auto', 'overscroll-contain', RING_ROOM])
+  it('is exactly five classes: it scrolls on the block axis, keeps the scroll to itself, leaves room for a ring and wears the shared scrollbar', () => {
+    expect(SCROLL_AREA.split(' ')).toEqual(['overflow-y-auto', 'overscroll-contain', RING_ROOM, '[scrollbar-width:thin]', '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]'])
   })
 
   it('names no physical side, so the room is the same in both directions', () => {

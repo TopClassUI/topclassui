@@ -71,7 +71,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the shared scroll area loses its scroll padding, so the ring of a control that Tab brings into view is cut at the edge',
     file: 'src/shared/classes.ts',
-    from: " scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]'",
-    to: "'",
+    from: ' scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))] ${SCROLLBAR}`',
+    to: ' ${SCROLLBAR}`',
   },
 ]

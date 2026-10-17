@@ -56,8 +56,18 @@ describe('what the rules set', () => {
   })
 
   it('a classic scrollbar on the pre takes the block colours: the halfway thumb on the block fill, never the page scheme', () => {
-    expect(blockOf('[scrollbar-color:var(--tc-neutral-solid-thumb)_var(--tc-neutral-solid)]'))
-      .toContain('scrollbar-color: var(--tc-neutral-solid-thumb) var(--tc-neutral-solid)')
+    expect(blockOf('[--tc-scrollbar-thumb:var(--tc-neutral-solid-thumb)]')).toContain('--tc-scrollbar-thumb: var(--tc-neutral-solid-thumb)')
+    expect(blockOf('[--tc-scrollbar-track:var(--tc-neutral-solid)]')).toContain('--tc-scrollbar-track: var(--tc-neutral-solid)')
+  })
+
+  it('the pre that sets the two tokens is the one that draws the shared bar from them', () => {
+    const pre = /<pre[^>]*class="([^"]*)"/.exec(markup(createElement(CodeBlock, { children: 'a' })))?.[1]?.split(' ') ?? []
+    expect(pre).toEqual(expect.arrayContaining([
+      '[--tc-scrollbar-thumb:var(--tc-neutral-solid-thumb)]', '[--tc-scrollbar-track:var(--tc-neutral-solid)]',
+      '[scrollbar-width:thin]', '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]',
+    ]))
+    expect(blockOf('[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]'))
+      .toContain('scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track)')
   })
 
   it('the code keeps its spaces, a tab is two columns, and it scrolls sideways', () => {

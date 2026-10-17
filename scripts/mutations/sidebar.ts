@@ -313,7 +313,7 @@ export const MUTATIONS: Mutation[] = [
     to: 'gap-1 ${SIDEBAR_RING_ROOM}',
   },
   {
-    label: 'a collapsed sidebar draws its scrollbar, which leaves a row 24 px and pushes every icon off the middle',
+    label: 'a collapsed sidebar draws its scrollbar, which leaves a row 29 px and pushes every icon off the middle',
     file: CLASSES,
     from: ' ${SIDEBAR_BAR}`',
     to: '`',

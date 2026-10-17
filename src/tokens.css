@@ -121,6 +121,10 @@
   /* Neutral's solid is already near-black, so it steps toward the middle instead. */
   --tc-neutral-hover: var(--color-neutral-800);
   --tc-neutral-active: var(--color-neutral-700);
+
+  /* The native bar: a transparent track, so the thumb stands 3:1 off whatever surface it scrolls on. */
+  --tc-scrollbar-thumb: var(--color-neutral-500);
+  --tc-scrollbar-track: transparent;
 }
 
 [data-theme='dark'] {
@@ -154,6 +158,10 @@
   /* Near-white in dark, so it steps toward the middle from the other side. */
   --tc-neutral-hover: var(--color-neutral-200);
   --tc-neutral-active: var(--color-neutral-300);
+
+  /* neutral-400 not neutral-500: on a raised card neutral-500 measured only 3.19:1. */
+  --tc-scrollbar-thumb: var(--color-neutral-400);
+  --tc-scrollbar-track: transparent;
 }
 
 /* A custom mode is one more block. It may change knobs as well as colours. */

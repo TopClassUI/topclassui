@@ -1,9 +1,9 @@
 // R-5.12-4: Textarea's own class strings. The look of a field is shared with Input (src/shared/classes.ts).
-import { BORDER_WIDTH, CONTAIN, FIELD_BOX, FIELD_TEXT, FIELD_TEXT_COARSE, TARGET_HEIGHT } from '#shared/classes.js'
+import { BORDER_WIDTH, CONTAIN, FIELD_BOX, FIELD_TEXT, FIELD_TEXT_COARSE, SCROLLBAR, TARGET_HEIGHT } from '#shared/classes.js'
 import type { Size } from '#shared/contracts/size.js'
 
-/** No FIELD_LTR: it reads data-ltr, which only an Input writes. The dir of a textarea is the caller's. */
-export const TEXTAREA_BOX = `block ${FIELD_BOX}`
+/** No FIELD_LTR: it reads data-ltr, which only an Input writes. The dir of a textarea is the caller's. A textarea scrolls by itself, so it wears the shared bar. */
+export const TEXTAREA_BOX = `block ${FIELD_BOX} ${SCROLLBAR}`
 
 /** The block padding of each size. The inline padding and the type step are the field's, and every
  * size keeps the touch floor for the text, as Input's do: text-base is 14 px under a 14 px root. */

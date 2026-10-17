@@ -61,6 +61,8 @@ const DECLARATION: Record<string, string> = {
   'flex-1': 'flex: 1;',
   'overflow-y-auto': 'overflow-y: auto;',
   'overscroll-contain': 'overscroll-behavior: contain;',
+  '[scrollbar-width:thin]': 'scrollbar-width: thin;',
+  '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]': 'scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track);',
   'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]': `scroll-padding-block: ${RING_REACH};`,
   '-m-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]': `margin: calc(${RING_REACH} * -1);`,
   'p-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]': `padding: ${RING_REACH};`,
@@ -131,7 +133,7 @@ describe('every class Sidebar writes compiles with the installed Tailwind', () =
 
   it('the table names exactly the classes of classes.ts, and the one that only marks the group', () => {
     expect(written).toEqual([...Object.keys(DECLARATION), 'group/sidebar'].sort())
-    expect(written).toHaveLength(72)
+    expect(written).toHaveLength(74)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

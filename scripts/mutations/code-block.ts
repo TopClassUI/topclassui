@@ -142,7 +142,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the code block scrollbar is drawn in the page scheme, so the pre ring bottom side lands on a track of its own colour',
     file: CLASSES,
-    from: ' [scrollbar-color:var(--tc-neutral-solid-thumb)_var(--tc-neutral-solid)]',
+    from: ' [--tc-scrollbar-thumb:var(--tc-neutral-solid-thumb)] [--tc-scrollbar-track:var(--tc-neutral-solid)]',
     to: '',
   },
   {
