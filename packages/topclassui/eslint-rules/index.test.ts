@@ -664,6 +664,8 @@ describe("R-5.2-2: the consumer's className is the last argument to cn()", () =>
     ['a computed props["className"]', 'cn(props["className"], own)'],
     ['className under a type assertion', 'cn(className as string, "flex")'],
     ['className inside JSX', '<div className={cn(className, CARD)} />'],
+    ['props.className before another object\'s className', 'cn(props.className, own.className)'],
+    ['className before a className read off a style table', 'cn(className, STYLES.className)'],
   ]
   for (const [label, code] of rejected) {
     it(`rejects ${label}`, () => {
@@ -687,7 +689,7 @@ describe("R-5.2-2: the consumer's className is the last argument to cn()", () =>
     ['no consumer class at all', 'cn(SWITCH_TRACK, SWITCH_TRACK_SIZE[size])'],
     ['another object that happens to hold a className', 'cn(own.className, "flex")'],
     ['a function other than cn', 'clsx(className, "flex")'],
-    ['the render= element class after the props class, as renderElement does', 'cn(props["className"] as never, own["className"] as never)'],
+    ['the render= element class after the component\'s finished class, as renderElement does', 'cn(base["className"] as never, own["className"] as never)'],
   ]
   for (const [label, code] of allowed) {
     it(`allows ${label}`, () => {

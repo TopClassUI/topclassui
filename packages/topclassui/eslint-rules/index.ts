@@ -654,17 +654,11 @@ const rules = {
         }
         return n
       }
-      /** The `className` key of any object, so `own.className` counts as a caller's class too. */
-      const readsClassName = (n: Node): boolean =>
-        n.type === 'MemberExpression' && (n.computed ? n.property?.value : n.property?.name) === 'className'
       const consumerClass = (arg: Node): string | null => {
         const n = unwrap(arg)
         if (n.type === 'Identifier' && n.name === 'className') return 'className'
-        return readsClassName(n) && n.object?.type === 'Identifier' && n.object.name === 'props' ? 'props.className' : null
-      }
-      const isCallerClass = (arg: Node) => {
-        const n = unwrap(arg)
-        return (n.type === 'Identifier' && n.name === 'className') || readsClassName(n)
+        const key = n.type === 'MemberExpression' && (n.computed ? n.property?.value : n.property?.name)
+        return key === 'className' && n.object?.type === 'Identifier' && n.object.name === 'props' ? 'props.className' : null
       }
       return {
         CallExpression(node: Node) {
@@ -672,8 +666,7 @@ const rules = {
           const args: Node[] = node.arguments
           args.forEach((arg, i) => {
             const name = consumerClass(arg)
-            // Only a component's own class after the consumer's is a problem; renderElement orders two callers' classes.
-            if (name !== null && !args.slice(i + 1).every(isCallerClass)) {
+            if (name !== null && i < args.length - 1) {
               ctx.report({ node: arg, messageId: 'notLast', data: { name } })
             }
           })
