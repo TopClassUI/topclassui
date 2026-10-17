@@ -15,7 +15,7 @@ import { FORCED_CANVAS, contrast, inkOn, pixelsOf, rgbOf } from './pixels.js'
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const NAMES = { xs: 'Extra small', sm: 'Small', md: 'Medium', lg: 'Large', xl: 'Extra large' } as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['basic', 'form', 'range', 'rtl', 'show-value', 'sizes', 'states'].map((demo) => `slider--${demo}`)
+const DEMOS = ['basic', 'form', 'playground', 'range', 'rtl', 'show-value', 'sizes', 'states'].map((demo) => `slider--${demo}`)
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 
 /** The range input of a thumb, named as a screen reader names it. */
