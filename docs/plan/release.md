@@ -8,8 +8,8 @@ This plan is for a builder agent with no memory. Do the steps in order. Each ste
 
 ## 0. Read this first
 
-1. **The plan and the decision log disagree.** PLAN 4 draws three packages (`packages/react`, `packages/tokens`, `packages/icons`) with Turborepo. DECISIONS (2 Oct, "One package named `topclassui`") folds them into one unscoped package, `topclassui`, and says the two were never reconciled.
-2. **This plan reconciles them.** The repo becomes a pnpm workspace. The one published package, `topclassui`, lives in `packages/react/` (the folder name PLAN 4 uses). Tokens and icons stay inside it, as DECISIONS says. `apps/docs` joins later. Section 9 gives the three-package layout as the alternative, with its extra cost.
+1. **The plan and the decision log disagree.** PLAN 4 draws three packages (`packages/topclassui`, `packages/tokens`, `packages/icons`) with Turborepo. DECISIONS (2 Oct, "One package named `topclassui`") folds them into one unscoped package, `topclassui`, and says the two were never reconciled.
+2. **This plan reconciles them.** The repo becomes a pnpm workspace. The one published package, `topclassui`, lives in `packages/topclassui/` (the folder name PLAN 4 uses). Tokens and icons stay inside it, as DECISIONS says. `apps/docs` joins later. Section 9 gives the three-package layout as the alternative, with its extra cost.
 3. **What 0.1.0-beta.0 ships.** All 52 folders under `src/components/` that have an `index.tsx` (the site's 46 plus helpers such as `icon`, `icon-registry` and `svg`) as subpath imports: `import { Button } from 'topclassui/button'`. This reverses DECISIONS 2 Oct point 4 ("the package ships zero components"), because the CLI that was meant to deliver them is not built. The CLI comes later and can import from the package.
 4. **Every default here that departs from PLAN or DECISIONS is written into one DECISIONS entry in step R1, before any code moves.** CLAUDE.md requires that.
 5. **Not verified yet, and checked in the step named:** whether npm also points `latest` at a first version published with `--tag beta` (R9 D1 reads it; R10 records it). Settled by the review: pnpm 10.28.2 applies `publishConfig.imports` to the packed manifest, so the tarball's `imports` point at `dist`, not at an unshipped `src/` (R5). The `@source "./connectors"` line is dropped in R4 until connectors exist, so no consumer build scans a folder that is not there.
@@ -21,7 +21,7 @@ This plan is for a builder agent with no memory. Do the steps in order. Each ste
 
 ```text
 topclassui/                      the repository (private package.json, not published)
-  package.json                   name "topclassui-repo", private, forwards every script to packages/react
+  package.json                   name "topclassui-repo", private, forwards every script to packages/topclassui
   pnpm-workspace.yaml            packages: packages/*, apps/*
   pnpm-lock.yaml  .npmrc  .node-version  .editorconfig  .gitattributes  .gitignore
   CLAUDE.md  AGENTS.md  .cursor/rules/topclassui.mdc   still generated from docs/RULES.md
@@ -56,7 +56,7 @@ topclassui/                      the repository (private package.json, not publi
 | R0 | none | Preconditions: the theme branch is merged, `main` is green | none | `pnpm check` on main |
 | R1 | `docs/release-decisions` | One DECISIONS entry with every departure; STATUS update | 30 min | `pnpm check` |
 | R2 | `fix/declaration-types` | Explicit return types on four hooks, so declarations emit | 1 h | `pnpm check` + a dry `tsc` emit |
-| R3 | `chore/workspace` | The move into `packages/react`, the root workspace | 2 to 3 h | `pnpm check` + `pnpm test:mutation` |
+| R3 | `chore/workspace` | The move into `packages/topclassui`, the root workspace | 2 to 3 h | `pnpm check` + `pnpm test:mutation` |
 | R4 | `feat/build` | `pnpm build`: tsc, specifier rewrite, CSS copy, watch mode | 3 h | `pnpm check` + `pnpm build` |
 | R5 | `feat/package-manifest` | exports, files, deps, engines; publint, attw, `check:package` in `pnpm check` | 3 to 4 h | `pnpm check` (now builds and packs) |
 | R6 | `fix/readme-subpath-imports` | READMEs, their compile tests and shipped strings name `topclassui/<slug>` | 3 h | `pnpm check` + `pnpm test:mutation` |
@@ -81,7 +81,7 @@ A full `pnpm check` is about 30 minutes on the laptop: Playwright alone took 23.
 
 Add one entry at the top of `docs/DECISIONS.md`, dated the day it lands: "Release 0.1.0-beta.0: one package in a workspace, components as subpaths". It records, each with its reason:
 
-1. The repo becomes a pnpm workspace. The one package `topclassui` lives in `packages/react/`; tokens and icons stay in it (closes the "Still open" of 2 Oct and STATUS open question 3). No Turborepo yet (PLAN 2, 4, 17.2).
+1. The repo becomes a pnpm workspace. The one package `topclassui` lives in `packages/topclassui/`; tokens and icons stay in it (closes the "Still open" of 2 Oct and STATUS open question 3). No Turborepo yet (PLAN 2, 4, 17.2).
 2. 0.1.0 ships the components as subpath exports (reverses 2 Oct point 4; makes the second install column on the 46 cards true again, STATUS open question 2).
 3. `#shared/`, `#components/` and `#icons/` specifiers are rewritten to relative paths in `dist` by the build (settles the 21 Sep "deferred" entry, which was overtaken when the subpath imports were added).
 4. The build is `tsc` plus a Node script, not `copyfiles` (PLAN 4 "Build and consumption"; same reasoning as the 3 Oct `check-css` entry: a short script, no dependency).
@@ -115,30 +115,30 @@ The return types go in each component's `types.ts` (R-8.3-4). No behaviour chang
 
 Do it in two commits on one branch: first the pure `git mv` (so `git log --follow` keeps history), then the edits.
 
-**Before the first command:** close the editor and stop every server (the TypeScript server, vitest, `harness:serve`, Playwright). On Windows `git mv src packages/react/src` fails with "Permission denied" when any process holds a file under `src/` open.
+**Before the first command:** close the editor and stop every server (the TypeScript server, vitest, `harness:serve`, Playwright). On Windows `git mv src packages/topclassui/src` fails with "Permission denied" when any process holds a file under `src/` open.
 
 **Commit 1: git mv, by folder.**
 
 | From (repo root) | To | Command |
 |---|---|---|
-| `src/` | `packages/react/src/` | `git mv src packages/react/src` |
-| `raw/` | `packages/react/raw/` | `git mv raw packages/react/raw` |
-| `scripts/` (all of it, `lib/` and `mutations/` included) | `packages/react/scripts/` | `git mv scripts packages/react/scripts` |
-| `eslint-rules/` | `packages/react/eslint-rules/` | `git mv eslint-rules packages/react/eslint-rules` |
-| `e2e/` (with `fixtures/`) | `packages/react/e2e/` | `git mv e2e packages/react/e2e` |
-| `test/` (`setup-dom.ts`) | `packages/react/test/` | `git mv test packages/react/test` |
-| `docs/icons.md` | `packages/react/docs/icons.md` | `git mv docs/icons.md packages/react/docs/icons.md` |
-| `tsconfig.json` | `packages/react/tsconfig.json` | `git mv` |
-| `eslint.config.ts` | `packages/react/eslint.config.ts` | `git mv` |
-| `vitest.config.ts` | `packages/react/vitest.config.ts` | `git mv` |
-| `playwright.config.ts` | `packages/react/playwright.config.ts` | `git mv` |
-| `package.json` | `packages/react/package.json` | `git mv` (a new root one is written in commit 2) |
+| `src/` | `packages/topclassui/src/` | `git mv src packages/topclassui/src` |
+| `raw/` | `packages/topclassui/raw/` | `git mv raw packages/topclassui/raw` |
+| `scripts/` (all of it, `lib/` and `mutations/` included) | `packages/topclassui/scripts/` | `git mv scripts packages/topclassui/scripts` |
+| `eslint-rules/` | `packages/topclassui/eslint-rules/` | `git mv eslint-rules packages/topclassui/eslint-rules` |
+| `e2e/` (with `fixtures/`) | `packages/topclassui/e2e/` | `git mv e2e packages/topclassui/e2e` |
+| `test/` (`setup-dom.ts`) | `packages/topclassui/test/` | `git mv test packages/topclassui/test` |
+| `docs/icons.md` | `packages/topclassui/docs/icons.md` | `git mv docs/icons.md packages/topclassui/docs/icons.md` |
+| `tsconfig.json` | `packages/topclassui/tsconfig.json` | `git mv` |
+| `eslint.config.ts` | `packages/topclassui/eslint.config.ts` | `git mv` |
+| `vitest.config.ts` | `packages/topclassui/vitest.config.ts` | `git mv` |
+| `playwright.config.ts` | `packages/topclassui/playwright.config.ts` | `git mv` |
+| `package.json` | `packages/topclassui/package.json` | `git mv` (a new root one is written in commit 2) |
 
-Create `packages/react/` first (`mkdir -p packages/react packages/react/docs`).
+Create `packages/topclassui/` first (`mkdir -p packages/topclassui packages/topclassui/docs`).
 
 **Stays at the root:** `docs/` (everything else), `.github/`, `.cursor/`, `CLAUDE.md`, `AGENTS.md`, `README.md`, `LICENSE`, `.gitattributes`, `.editorconfig`, `.gitignore`, `.npmrc`, `.node-version`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`.
 
-**Untracked output at the root, deleted, not moved:** `.harness/`, `coverage/`, `test-results/`, `node_modules/`. They regenerate under `packages/react/`. The `.gitignore` patterns (`.harness/`, `test-results/`, `coverage`, `dist`, `node_modules`, `*.tgz`) have no leading slash, so they already match inside `packages/react/`.
+**Untracked output at the root, deleted, not moved:** `.harness/`, `coverage/`, `test-results/`, `node_modules/`. They regenerate under `packages/topclassui/`. The `.gitignore` patterns (`.harness/`, `test-results/`, `coverage`, `dist`, `node_modules`, `*.tgz`) have no leading slash, so they already match inside `packages/topclassui/`.
 
 **Commit 2: the edits. This is the complete list.**
 
@@ -146,11 +146,11 @@ Create `packages/react/` first (`mkdir -p packages/react packages/react/docs`).
 |---|---|
 | `package.json` (new, root) | `{ "name": "topclassui-repo", "private": true, "type": "module", "packageManager": "pnpm@10.28.2", "engines": { "node": ">=22.14" } }` plus one forwarding script per command in CLAUDE.md, for example `"check": "pnpm --filter topclassui check"`, `"new:component": "pnpm --filter topclassui new:component"`. Same names, so every command in CLAUDE.md still works from the root. |
 | `pnpm-workspace.yaml` | Add `packages: ["packages/*", "apps/*"]` above the existing `onlyBuiltDependencies`. |
-| `packages/react/package.json` | Remove `packageManager` (root only). Add `"directory": "packages/react"` to `repository`. Add `react 19.3.0`, `react-dom 19.3.0`, `tailwindcss 4.3.3` to `devDependencies` (today they come from pnpm's auto-installed peers at the root; `scripts/lib/harness.ts:20` and `scripts/lib/source-candidates.ts:77` read `node_modules/tailwindcss` from the package folder). Everything else unchanged in this step. |
-| `packages/react/scripts/rules-sync.ts` | `ROOT` becomes the repo root, found by walking up from `process.cwd()` to the folder holding `pnpm-workspace.yaml`. The walk-up is a pure function in `scripts/lib/repo-root.ts` that takes an `exists` callback, tested with written-out expectations against a fake file list, never the real disk: `mutate.ts` copies the package into `os.tmpdir()`, where no `pnpm-workspace.yaml` sits above it, so a test that read the real file system would fail in every mutant. `docs/RULES.md`, `CLAUDE.md`, `AGENTS.md` and `.cursor/` stay at the repo root. |
-| `packages/react/scripts/mutate.ts:35` | Add `dist` and `.pack` to the skip list beside `node_modules`, `.git`, `.harness` (they exist from R4 on; copying 1,900 build files per mutant is waste). |
-| `docs/RULES.md` "Commands" | One line: commands run from the repo root and forward to `packages/react`; paths in the rules (`src/`, `scripts/`) are relative to `packages/react/`. Then `pnpm rules:sync` to regenerate `CLAUDE.md`, `AGENTS.md`, `.cursor/rules/topclassui.mdc`. |
-| `pnpm-lock.yaml` | Regenerated by `pnpm install`. Expect importers to move from `.` to `packages/react`; no version may change. Check with `git diff pnpm-lock.yaml`. |
+| `packages/topclassui/package.json` | Remove `packageManager` (root only). Add `"directory": "packages/topclassui"` to `repository`. Add `react 19.3.0`, `react-dom 19.3.0`, `tailwindcss 4.3.3` to `devDependencies` (today they come from pnpm's auto-installed peers at the root; `scripts/lib/harness.ts:20` and `scripts/lib/source-candidates.ts:77` read `node_modules/tailwindcss` from the package folder). Everything else unchanged in this step. |
+| `packages/topclassui/scripts/rules-sync.ts` | `ROOT` becomes the repo root, found by walking up from `process.cwd()` to the folder holding `pnpm-workspace.yaml`. The walk-up is a pure function in `scripts/lib/repo-root.ts` that takes an `exists` callback, tested with written-out expectations against a fake file list, never the real disk: `mutate.ts` copies the package into `os.tmpdir()`, where no `pnpm-workspace.yaml` sits above it, so a test that read the real file system would fail in every mutant. `docs/RULES.md`, `CLAUDE.md`, `AGENTS.md` and `.cursor/` stay at the repo root. |
+| `packages/topclassui/scripts/mutate.ts:35` | Add `dist` and `.pack` to the skip list beside `node_modules`, `.git`, `.harness` (they exist from R4 on; copying 1,900 build files per mutant is waste). |
+| `docs/RULES.md` "Commands" | One line: commands run from the repo root and forward to `packages/topclassui`; paths in the rules (`src/`, `scripts/`) are relative to `packages/topclassui/`. Then `pnpm rules:sync` to regenerate `CLAUDE.md`, `AGENTS.md`, `.cursor/rules/topclassui.mdc`. |
+| `pnpm-lock.yaml` | Regenerated by `pnpm install`. Expect importers to move from `.` to `packages/topclassui`; no version may change. Check with `git diff pnpm-lock.yaml`. |
 | `.github/workflows/ci.yml` | No change: `pnpm check` and `pnpm test:mutation` at the root forward. `node-version-file: .node-version` is still at the root. |
 
 Nothing else changes: `tsconfig.json`, `eslint.config.ts`, `vitest.config.ts`, `playwright.config.ts`, every script, every test and every mutation keep their text, because their paths are relative to the folder they now sit in.
@@ -159,24 +159,24 @@ Nothing else changes: `tsconfig.json`, `eslint.config.ts`, `vitest.config.ts`, `
 
 | Gate | Runs as | Why it still works |
 |---|---|---|
-| lint, with the 13 custom rules | `eslint .` in `packages/react` | `eslint.config.ts` and `eslint-rules/` moved together; globs are `src/**`, `scripts/**` |
-| typecheck | `tsc --noEmit` in `packages/react` | `include` lists folders that moved with it |
+| lint, with the 13 custom rules | `eslint .` in `packages/topclassui` | `eslint.config.ts` and `eslint-rules/` moved together; globs are `src/**`, `scripts/**` |
+| typecheck | `tsc --noEmit` in `packages/topclassui` | `include` lists folders that moved with it |
 | test, the four vitest projects (node, dom, rsc, ssr) | `vitest run` | `scripts/lib/test-projects.ts` patterns are `src/**`; `./test/setup-dom.ts` moved |
 | check:structure, check:boundaries, check:css, check:contrast | `tsx scripts/...` | `ROOT = process.cwd()` is the package folder |
 | check:icons, icons:build | `tsx scripts/icons-build.ts` | `raw/`, `src/icons` and `docs/icons.md` are all under the package |
 | check:readme, readme:build | `tsx scripts/readme-build.ts` | `src/components` under the package |
 | test:e2e, harness:build, harness:serve | `pnpm harness:build && playwright test` | Playwright runs `webServer.command` from its config folder; `.harness/` is written there |
 | rules:sync | `tsx scripts/rules-sync.ts` | the one script that learns the repo root |
-| test:mutation | `tsx scripts/mutate.ts` | copies the package folder and junctions `packages/react/node_modules`, which now holds every dev tool |
+| test:mutation | `tsx scripts/mutate.ts` | copies the package folder and junctions `packages/topclassui/node_modules`, which now holds every dev tool |
 | new:component | `tsx scripts/new-component.ts x` | spawns `node_modules/tsx/dist/cli.mjs` from the package folder |
 
 **Verify, in this order:** `pnpm install` at the root; `pnpm check`; `pnpm test:mutation` (the anchors read `src/...` from the package folder); `pnpm new:component zz-probe` then delete the folder; `pnpm test:mutation tag --maxWorkers=2` to prove arguments pass through the forwarder. Report the real output.
 
-**Worktrees.** Each worktree that links `node_modules` to the main checkout now also needs `packages/react/node_modules`. Run `pnpm install` once per worktree, or add the second junction.
+**Worktrees.** Each worktree that links `node_modules` to the main checkout now also needs `packages/topclassui/node_modules`. Run `pnpm install` once per worktree, or add the second junction.
 
 ### R4. The build
 
-New files in `packages/react/`:
+New files in `packages/topclassui/`:
 
 - **`tsconfig.build.json`**: `extends: ./tsconfig.json`; `module: NodeNext`, `moduleResolution: NodeNext`, `noEmit: false`, `allowImportingTsExtensions: false`, `declaration: true`, `declarationMap: false`, `sourceMap: false`, `rootDir: src`, `outDir: dist`; `include: ["src"]`; `exclude: ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/test/**", "src/test/**"]`. Why `NodeNext` and not the repo's `bundler`: the specifiers we write already carry `.js` (R-5.12-5), but the ones TypeScript writes itself for inferred types do not under `bundler` (`dist/components/toast/constants.d.ts` held `import("../../icons").IconData` six times, and a `node16` consumer failed with TS2834). Under `NodeNext` they become `import("../../icons/types.js")`, the errors are the same four of R2, and the `.js` output is the same as under `bundler` (review, `tsc-nn.log`). `dummy/` is compiled on purpose: the docs app renders it from `dist` (21 Sep "consumes dist" entry).
 - **`scripts/build.ts`**, about 60 lines, no dependency:
@@ -196,7 +196,7 @@ Expected output (facts 2.3, the review): about 967 `.js` and 963 `.d.ts`; JS out
 
 ### R5. The manifest and the package checks
 
-**`packages/react/package.json`, the published fields**, plus the `exports` object of section 4. `files` relies on npm's `!` negation; `check-pack` proves it worked.
+**`packages/topclassui/package.json`, the published fields**, plus the `exports` object of section 4. `files` relies on npm's `!` negation; `check-pack` proves it worked.
 
 ```json
 {
@@ -206,7 +206,7 @@ Expected output (facts 2.3, the review): about 967 `.js` and 963 `.d.ts`; JS out
   "license": "MIT",
   "author": "Omar Abed",
   "homepage": "https://topclassui.com",
-  "repository": { "type": "git", "url": "git+https://github.com/TopClassUI/topclassui.git", "directory": "packages/react" },
+  "repository": { "type": "git", "url": "git+https://github.com/TopClassUI/topclassui.git", "directory": "packages/topclassui" },
   "bugs": "https://github.com/TopClassUI/topclassui/issues",
   "type": "module",
   "sideEffects": ["**/*.css"],
@@ -272,9 +272,9 @@ The bare `'topclassui'` is pinned in more places than the READMEs. Counted on 9f
 
 This is the proof PLAN 19 Phase 7 asks for: "the package installs and works in a fresh Next.js app ... and `tsc --noEmit` in that app reports `<Button variant="nope" />` as an error".
 
-- **`packages/react/consumers/next/`**: `package.json` with every registry package pinned to an exact version (`topclassui` itself is not listed; it comes from the tarball), so a run breaks only when the library does, never because the registry moved overnight; `next.config.ts` (empty), `postcss.config.mjs` (`@tailwindcss/postcss`), `tsconfig.json` (create-next-app's), `app/globals.css` (the three imports of section 5), `app/layout.tsx` (provider and theme script, `lang="ar" dir="rtl"`), `app/page.tsx` (a Server Component with `Button`, `<Icon name="check">` from `topclassui/icon`, `Badge`, and a client `DialogRoot`), and `app/type-check.tsx` holding `// @ts-expect-error` above `<Button variant="nope" />`.
-- **`packages/react/consumers/vite/`**: React 19 SPA with `@vitejs/plugin-react` and `@tailwindcss/vite`, `src/index.css` with the same three imports, `src/main.tsx` rendering the provider, `Button`, `DialogRoot`, and `Icon` from `topclassui/icon-registry` with `registerIcons`, plus the same `@ts-expect-error` file.
-- **`packages/react/scripts/consumer-smoke.ts`** (`pnpm test:consumers`, forwarded from the root): runs `check:package`; copies each template to a fresh temp folder; `npm install` the tarball plus the template's pinned `next react react-dom tailwindcss @tailwindcss/postcss typescript @types/react @types/react-dom @types/node` (or the Vite set); runs `tsc --noEmit` (must pass, so the `@ts-expect-error` proves the bad variant is an error); runs `next build` / `vite build`; then reads the built CSS and fails unless it contains a utility only the library writes (for example the class of Button's focus ring from `shared/classes.ts`). That last check is the only proof that `@source` works from `node_modules`: the harness compiles CSS from a candidate list and never scans files. `@types/node` and `@types/react-dom` are in the list because a Next app's `tsconfig` and `next-env.d.ts` reach for both; without them `next build` stops at the type step or tries to install them itself (not tested here; the first run shows it).
+- **`packages/topclassui/consumers/next/`**: `package.json` with every registry package pinned to an exact version (`topclassui` itself is not listed; it comes from the tarball), so a run breaks only when the library does, never because the registry moved overnight; `next.config.ts` (empty), `postcss.config.mjs` (`@tailwindcss/postcss`), `tsconfig.json` (create-next-app's), `app/globals.css` (the three imports of section 5), `app/layout.tsx` (provider and theme script, `lang="ar" dir="rtl"`), `app/page.tsx` (a Server Component with `Button`, `<Icon name="check">` from `topclassui/icon`, `Badge`, and a client `DialogRoot`), and `app/type-check.tsx` holding `// @ts-expect-error` above `<Button variant="nope" />`.
+- **`packages/topclassui/consumers/vite/`**: React 19 SPA with `@vitejs/plugin-react` and `@tailwindcss/vite`, `src/index.css` with the same three imports, `src/main.tsx` rendering the provider, `Button`, `DialogRoot`, and `Icon` from `topclassui/icon-registry` with `registerIcons`, plus the same `@ts-expect-error` file.
+- **`packages/topclassui/scripts/consumer-smoke.ts`** (`pnpm test:consumers`, forwarded from the root): runs `check:package`; copies each template to a fresh temp folder; `npm install` the tarball plus the template's pinned `next react react-dom tailwindcss @tailwindcss/postcss typescript @types/react @types/react-dom @types/node` (or the Vite set); runs `tsc --noEmit` (must pass, so the `@ts-expect-error` proves the bad variant is an error); runs `next build` / `vite build`; then reads the built CSS and fails unless it contains a utility only the library writes (for example the class of Button's focus ring from `shared/classes.ts`). That last check is the only proof that `@source` works from `node_modules`: the harness compiles CSS from a candidate list and never scans files. `@types/node` and `@types/react-dom` are in the list because a Next app's `tsconfig` and `next-env.d.ts` reach for both; without them `next build` stops at the type step or tries to install them itself (not tested here; the first run shows it).
 - **Three runs, not two.** The Next template is installed twice: once at the newest versions the template pins, once at the floors the package promises (`next` 15, the latest 15.x; `react` and `react-dom` 19.0.0; `tailwindcss` and `@tailwindcss/postcss` 4.2.0), each set written in `consumers/next/floors.json`. Section 5 says "Next.js 15 or 16" and the peers say `^19.0.0` and `^4.2.0`; without the floor run, only the newest versions are ever built and the ranges are a promise nobody checked. If the floor run fails for a reason in the library, raise the peer floor to the version that passes and say so in the pull request, the README and R1's entry.
 - Uses `npm`, because the site documents `npm` (DECISIONS 2 Oct point 2). Needs the network. First run 10 to 15 minutes for the three installs (Next is about 193 MB), later runs use the npm cache. Not in `pnpm check`: it is run before every publish (C16). Ports 4610 and up if a server is ever started.
 - Add `consumers` to `ignores` in `eslint.config.ts`; `tsconfig.json` does not include it already.
@@ -282,9 +282,9 @@ This is the proof PLAN 19 Phase 7 asks for: "the package installs and works in a
 
 ### R8. Version, changelog, README, license
 
-- **Changesets** (`@changesets/cli` 3.0.3, 89 KB own size plus its dependencies; report the lockfile growth). Root devDependency. `.changeset/config.json`: `baseBranch: "main"`, `access: "public"`, `privatePackages: { version: false, tag: false }`, `changelog: "@changesets/cli/changelog"`. Then `pnpm changeset pre enter beta`, and one `minor` changeset for `topclassui` that lists what 0.1.0 holds. `pnpm changeset version` turns `0.0.0` into `0.1.0-beta.0` and writes `packages/react/CHANGELOG.md`. From here on every pull request that changes the package adds a changeset (PLAN 20, "A changeset is added").
-- **`packages/react/README.md`**, short, the npm page: one line on what it is; a beta notice ("0.x: breaking changes can land in a minor, each listed in CHANGELOG.md with a migration note", PLAN 17.4); install; the three CSS lines; the layout with `TopClassProvider` and `ThemeScript`; one example; the import list (`topclassui/<component>`, `/provider`, `/theme`, `/cn`, `/classes`, `/labels/en`, `/icons/<name>`); the Vite note (use `topclassui/icon-registry`, not `topclassui/icon`); links; license. The text of the snippets is section 5.
-- **`packages/react/LICENSE`**: a copy of the root MIT `LICENSE` ("Copyright (c) 2026 TopClassUI"). npm only packs the license inside the package folder.
+- **Changesets** (`@changesets/cli` 3.0.3, 89 KB own size plus its dependencies; report the lockfile growth). Root devDependency. `.changeset/config.json`: `baseBranch: "main"`, `access: "public"`, `privatePackages: { version: false, tag: false }`, `changelog: "@changesets/cli/changelog"`. Then `pnpm changeset pre enter beta`, and one `minor` changeset for `topclassui` that lists what 0.1.0 holds. `pnpm changeset version` turns `0.0.0` into `0.1.0-beta.0` and writes `packages/topclassui/CHANGELOG.md`. From here on every pull request that changes the package adds a changeset (PLAN 20, "A changeset is added").
+- **`packages/topclassui/README.md`**, short, the npm page: one line on what it is; a beta notice ("0.x: breaking changes can land in a minor, each listed in CHANGELOG.md with a migration note", PLAN 17.4); install; the three CSS lines; the layout with `TopClassProvider` and `ThemeScript`; one example; the import list (`topclassui/<component>`, `/provider`, `/theme`, `/cn`, `/classes`, `/labels/en`, `/icons/<name>`); the Vite note (use `topclassui/icon-registry`, not `topclassui/icon`); links; license. The text of the snippets is section 5.
+- **`packages/topclassui/LICENSE`**: a copy of the root MIT `LICENSE` ("Copyright (c) 2026 TopClassUI"). npm only packs the license inside the package folder.
 - Root `README.md` (two lines today): what the repo holds, `pnpm install`, `pnpm check`, where the package lives.
 - Gate: `pnpm check` and `pnpm test:consumers`, both green, real output in the pull request.
 
@@ -304,12 +304,12 @@ Do this once, slowly. Nothing here is automated.
 1. `git switch main && git pull`, clean tree, the R8 commit is on `main`.
 2. `pnpm install`, then `pnpm check` (green), then `pnpm test:consumers` (green).
 3. `npm view topclassui` must still say `E404`. If someone took the name, stop: the name is the one thing that cannot be changed after publishing.
-4. Do not pack again. The tarball to publish is the one `check:package` wrote during step 2's `pnpm check`: `packages/react/.pack/topclassui-0.1.0-beta.0.tgz`. Check with `ls -l packages/react/.pack/` that its time is after step 2 started. A second `pnpm pack` would make a file nothing has checked.
-5. Look inside: `tar -tzf packages/react/.pack/topclassui-0.1.0-beta.0.tgz | head -50` and `npm publish packages/react/.pack/topclassui-0.1.0-beta.0.tgz --dry-run --tag beta`. Expect `package/package.json`, `README.md`, `LICENSE`, `CHANGELOG.md`, `dist/...` and nothing else: no `src/`, no `test`, no `dummy`, no `.map`. Read the name, version, file count and unpacked size it prints.
+4. Do not pack again. The tarball to publish is the one `check:package` wrote during step 2's `pnpm check`: `packages/topclassui/.pack/topclassui-0.1.0-beta.0.tgz`. Check with `ls -l packages/topclassui/.pack/` that its time is after step 2 started. A second `pnpm pack` would make a file nothing has checked.
+5. Look inside: `tar -tzf packages/topclassui/.pack/topclassui-0.1.0-beta.0.tgz | head -50` and `npm publish packages/topclassui/.pack/topclassui-0.1.0-beta.0.tgz --dry-run --tag beta`. Expect `package/package.json`, `README.md`, `LICENSE`, `CHANGELOG.md`, `dist/...` and nothing else: no `src/`, no `test`, no `dummy`, no `.map`. Read the name, version, file count and unpacked size it prints.
 
 **C. Publish (5 minutes).**
 ```sh
-npm publish packages/react/.pack/topclassui-0.1.0-beta.0.tgz --tag beta --access public
+npm publish packages/topclassui/.pack/topclassui-0.1.0-beta.0.tgz --tag beta --access public
 ```
 npm prints an approval URL (or opens it in the browser). Open it, approve with your passkey or security key, and npm finishes the publish. If npm prints any other next step, do what it says and note it for R10. Publishing the `.tgz` publishes exactly what you inspected; it does not rebuild.
 
@@ -465,7 +465,7 @@ Each row is built as its "Default" unless the owner says otherwise before the st
 
 | # | Choice | Default (what gets built) | Alternative | Decide before |
 |---|---|---|---|---|
-| C1 | Repository layout | pnpm workspace; one package in `packages/react/`; `apps/docs` later | (a) keep the library at the root and add `apps/docs` beside it: no move, but the tarball folder is also the repo root; (b) three packages as PLAN 4 draws (section 9) | R1 |
+| C1 | Repository layout | pnpm workspace; one package in `packages/topclassui/`; `apps/docs` later | (a) keep the library at the root and add `apps/docs` beside it: no move, but the tarball folder is also the repo root; (b) three packages as PLAN 4 draws (section 9) | R1 |
 | C2 | What 0.1.0 ships | all 52 component entries as subpaths | zero components, CLI only (DECISIONS 2 Oct point 4): nothing usable until the CLI exists | R1 |
 | C3 | Package name | `topclassui`, unscoped | `@topclassui/react` | R1 |
 | C4 | Version and tag | `0.1.0-beta.0` on `beta`; `0.1.0` on `latest` with the docs site | `0.1.0` on `latest` now, beta stated in the README only | R8 |
@@ -495,6 +495,6 @@ If the owner picks C1 (b), R3 grows and two more packages are published:
 |---|---|---|
 | `src/tokens.css` | `packages/tokens/src/index.css` (`@topclassui/tokens`, `style` export, PLAN 4) | `check-css` (R-4-2: every `--tc-*` used in react must be declared in tokens) and `check-contrast` read `../tokens/src/index.css`; `contrast-checks.test.ts`, `token-refs.test.ts`, `tokens.test.ts`, `css-comments.test.ts` change paths; the harness entry in `scripts/lib/harness.ts:14` changes |
 | `raw/`, `src/icons/`, `scripts/icons-build.ts`, `scripts/lib/icons*.ts`, `docs/icons.md` | `packages/icons/` (`@topclassui/icons`) | 200 `#icons/` import lines become `@topclassui/icons/...`; `icon` and `icon-registry` depend on it; the ESLint rule that keeps the loader map server-side follows the new name; its own build and exports |
-| everything else | `packages/react/` (`@topclassui/react`) | depends on `@topclassui/icons` and peers on `@topclassui/tokens` (PLAN 4); Changesets `fixed` group for the three |
+| everything else | `packages/topclassui/` (`@topclassui/react`) | depends on `@topclassui/icons` and peers on `@topclassui/tokens` (PLAN 4); Changesets `fixed` group for the three |
 
 Cost: about a day more, three READMEs, three publishes, a scoped install line (`npm i @topclassui/react @topclassui/tokens`), and it reverses DECISIONS 2 Oct point 1 ("the install line is `npm i topclassui zod`"). Gain: icons usable without React, tokens usable without the components. Nobody needs either today, so the default is one package.

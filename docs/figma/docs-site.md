@@ -40,8 +40,8 @@ output, the glows on Home) is out of date. The site never writes a colour by han
 - The site's code lives in `apps/docs`. No step changes the library's components, except the
   `dummy/` additions of step 3, which are library pull requests of their own.
 - **Paths.** The release plan (`docs/plan/release.md`, R3) moves the library into
-  `packages/react/`. Every library path in this file (`src/`, `scripts/`, `raw/`,
-  `docs/icons.md`) is relative to `packages/react/`, the same rule `docs/RULES.md` gets in R3.
+  `packages/topclassui/`. Every library path in this file (`src/`, `scripts/`, `raw/`,
+  `docs/icons.md`) is relative to `packages/topclassui/`, the same rule `docs/RULES.md` gets in R3.
   Site paths start with `apps/docs/`.
 - **Reviewed on 17 October 2026** against the repo and the release plan. The fixes are folded
   into the sections below; nothing here is a second list to reconcile.
@@ -169,9 +169,9 @@ wins for that page only.
    plan C18), as a component does.
 2. **Tokens only.** No hex, no palette class, no `dark:`; the same rules as `src/`
    (R-5.2-1 to R-5.2-5, R-5.3-1, R-5.3-3). The repo's config does not reach the site: after
-   the release's R3 it sits in `packages/react/`, and its custom rules apply to `src/**` only.
+   the release's R3 it sits in `packages/topclassui/`, and its custom rules apply to `src/**` only.
    So `apps/docs` has its own `eslint.config.ts` that imports the plugin from
-   `../../packages/react/eslint-rules/index.ts` and turns on, for `app/**`, `components/**` and
+   `../../packages/topclassui/eslint-rules/index.ts` and turns on, for `app/**`, `components/**` and
    `lib/**`: `logical-properties-only`, `semantic-classes-only`, `no-dynamic-class-names`,
    `shared-class-constants`, `style-sets-tokens-only`, `presence-state-attributes`, `no-enum`,
    `one-line-comments` and `text-comes-from-labels`, plus `no-derived-expectations` on the
@@ -230,7 +230,7 @@ Repo: tsconfig.json already excludes "apps"; eslint.config.ts already ignores ap
 **Build this.**
 
 - **The workspace.** The release plan's R3 already writes `pnpm-workspace.yaml` with
-  `packages/*` and `apps/*`, and puts the library in `packages/react/`; nothing to add.
+  `packages/*` and `apps/*`, and puts the library in `packages/topclassui/`; nothing to add.
   `apps/docs/package.json` is private, named `@topclassui/docs`, and depends on
   `"topclassui": "workspace:*"`. pnpm does not hoist, so the app names its own `next`,
   `react` and `react-dom` (19.3.0, as the library), `tailwindcss` and `@tailwindcss/postcss`
@@ -287,7 +287,7 @@ Repo: tsconfig.json already excludes "apps"; eslint.config.ts already ignores ap
   takes no function values; check the shape against the installed `@next/mdx` types. No resolve
   alias for the demos: `docs:data` writes `.generated/demos.ts`, a map of explicit static
   imports (S7, choice 7). The Turbopack root is set to the repository root, so those relative
-  imports into `packages/react/dist` resolve from inside `apps/docs`. A component's meta comes
+  imports into `packages/topclassui/dist` resolve from inside `apps/docs`. A component's meta comes
   from the package's own `topclassui/meta/<slug>` export, so it needs no alias either. No
   `transpilePackages`, no `cacheComponents`. Check every option name against the installed Next
   types first.
@@ -662,7 +662,7 @@ DECISIONS 2026-10-06: R-8.3-3 still stands for the site's props table, "a differ
 **Build this.** One script, `apps/docs/scripts/docs-data.ts`, run with `tsx` by
 `docs:build` and `docs:dev` before Next, writing `apps/docs/.generated/components.json`,
 `toc.json`, `dates.json`, `demos.ts` and the search files. It imports
-`../../../packages/react/scripts/lib/*.js` (tsx maps `.js` to `.ts`, and the library's own
+`../../../packages/topclassui/scripts/lib/*.js` (tsx maps `.js` to `.ts`, and the library's own
 `imports` resolve `#shared/*` for those files). A unit test runs it against the repo and pins
 its output's shape, and renders every demo it lists as a Server Component (the settings of the
 library's `rsc` vitest project): only 25 of the 49 `dummy/` folders have a `demos.rsc` test
@@ -711,13 +711,13 @@ today, and the site renders all 391 demos that way.
   shape, only this file changes.
 - **The demos run from `dist`, through a generated map.** `docs:data` writes
   `.generated/demos.ts`: one line per demo, an explicit static import such as
-  `'button/variants': () => import('../../../packages/react/dist/components/button/dummy/variants.js')`,
+  `'button/variants': () => import('../../../packages/topclassui/dist/components/button/dummy/variants.js')`,
   plus the list of keys. The pages pick a demo by key and `React.lazy` or `await` it. No
   resolve alias (choice 7): an alias with two wildcards and a dynamic `import()` built from
   route params was never tested under Turbopack, while a map of literal specifiers is what
   every bundler handles, and `tsc` fails the step when a listed demo has no file. A demo's
   `../index.js` resolves to the same `dist` file the site gets from `topclassui/<slug>`
-  (the workspace link points `node_modules/topclassui` at `packages/react`). The library's
+  (the workspace link points `node_modules/topclassui` at `packages/topclassui`). The library's
   build has already rewritten every `#shared/*` in `dist` to a relative path (release plan
   R4), so nothing needs the `imports` field. `dummy/` is not packed to npm (release plan C17);
   it exists in the workspace's `dist`.
@@ -1809,7 +1809,7 @@ TOC: The set | A sample of the set | Two ways to render | Sizes | What flips in 
 **Build this.** The second page that attracts search traffic.
 
 - "The set": the five groups and their counts, written by `docs:data` (S7) from the "The set"
-  section of the library's `docs/icons.md` (`packages/react/docs/icons.md` after R3), which is
+  section of the library's `docs/icons.md` (`packages/topclassui/docs/icons.md` after R3), which is
   where the grouping lives: `raw/` is 84 flat SVGs with no group. The total comes from `raw/`
   and the flip count from `directional.generated.ts`; a test fails when the groups do not add
   up to the folder.
