@@ -5,8 +5,8 @@ import { describe, expect, it } from 'vitest'
 import { arrowLeft } from '#icons/data/arrow-left.js'
 import { check } from '#icons/data/check.js'
 import { Svg, type SvgProps } from '#components/svg/index.js'
-import { Icon, type IconProps } from './index.js'
-import { loadIcon } from './lib.js'
+import { Icon, type IconProps } from '../index.js'
+import { loadIcon } from '../lib.js'
 
 /** The element `<Icon>` returns, which is a `<Svg>` and nothing else. */
 async function resolve(props: IconProps): Promise<ReactElement<SvgProps>> {

@@ -6,6 +6,96 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-17 - R-5.1-2 is checked, and icon-registry is its one exemption
+
+**Decision.** `check-structure` enforces R-5.1-2 (`scripts/lib/index-markup.ts`). A folder is C when its `meta.ts` says `rendering: 'client'`, PLAN 18's C; every folder under `src/connectors/` is covered whatever its meta says. Re-exporting `./client.js` does not mark a folder as C, because split components (Banner, Tag, Rating) do it beside their server markup. For a covered folder, every top-level statement of `index.tsx` is a re-export from a file of its own folder (`export ... from './...'`) or an `import type`; anything else is reported, as `markup` when it holds JSX. Twenty C folders already passed; `icon-registry` did not, and is exempt by name in `INDEX_MARKUP_EXEMPT`.
+
+**Why the exemption.** `icon-registry` is an entry point, not a catalog row (the 2026-09-25 and 2026-10-05 entries), and is `rendering: 'client'` because its registry is module state, not because it is a `'use client'` module. Its `<Icon>` and `registerIcons()` must share that module and stay directive-less: a `'use client'` file would turn `registerIcons` into a client reference that a server file cannot call. Moving `<Icon>` into a `client.tsx` would need that directive or an R-8.1-1 exception for a directive-less `client.tsx`. A test fails if the exempt entry ever stops holding markup, so the exemption cannot outlive its reason.
+
+**Affects** `scripts/check-structure.ts`, `scripts/lib/index-markup.ts` and its test, and `docs/RULES.md`.
+
+## 2026-10-17 - R-5.3-2 is linted, with three allowances
+
+**Decision.** `topclass/dir-aware-transforms` rejects, in any class string under `src/`: a `translate-x-*` or two-axis `translate-*` whose x does not multiply by `--tc-dir`, the same inside an arbitrary `translateX()`, `translate()`, `translate3d()` or `[translate:]`; an origin on a physical side (`origin-left`, `origin-right`, `origin-top-left` and the arbitrary forms); a gradient pointed at a physical side (`bg-linear-to-r`, `bg-linear-to-l`, `bg-gradient-to-r`, `bg-gradient-to-l`, the diagonals, and an inline-axis angle unless it multiplies by `--tc-dir`); a direction variant (`rtl:`, `ltr:`, `[dir=rtl]`, `:dir()`) on anything but an `object-*` or `bg-*` position; and a physical `object-*` or `bg-*` position with no `rtl:` mirror in the same string. Three things pass by name: `rtl:-scale-x-100`, the mirror of a directional icon that PLAN section 7 writes out (Svg, Icon); an x of `var(--*-swipe-movement-x)`, the pointer offset Base UI measures in physical px for the swiped Drawer and Toast; and `origin-(--transform-origin)`, which Base UI measures from the anchor. A zero x and block-axis motion (`translate-y-*`, `translateY()`, `bg-linear-to-b`, 0 and 180 degrees) need no direction. Tests and demos are exempt, as for the other class rules.
+
+**Why.** Each allowance is already a physical value computed for the current direction, so multiplying it by `--tc-dir` would mirror it twice. The icon mirror stays the one `rtl:` class rather than `scale-x-(--tc-dir)`, because PLAN section 7 specifies it and ten test files and the breadcrumb spec pin it. No component in `src/` broke the rule when it was armed.
+
+**What it affects.** CSS files are outside ESLint; none of them translates, sets an origin or draws a gradient today. A percentage `object-[25%_75%]` or `bg-position-[...]` is not read for its x.
+
+## 2026-10-17 - R-8.5-1 is checked, and six lists are exempt by name
+
+**Decision.** `check-structure` requires `useCollection` in the `hook.ts` of every component folder whose `types.ts` takes an `items` prop, `CollectionProps` (whole or picked) or `MenuContract` (`scripts/lib/collections.ts`). Combobox, Command and TreeView pass. Six folders render items without it and are named in `COLLECTION_EXEMPT`, each by a decision: Select (2026-10-15), Dropdown (2026-10-14), Table and Timeline (2026-10-10), and, new here, Breadcrumb and Stepper, a trail of links and a handful of steps, both rendered on the server, where a hook cannot run and a list never grows long enough to window. An exemption never covers props that take `CollectionProps`, and one that no longer holds (the folder calls `useCollection`, or renders no items) fails the check, so the table cannot grow stale. `e2e/collections.spec.ts` drives every folder whose hook calls `useCollection`: its `ten-thousand` demo keeps fewer than a hundred rows mounted at the top, the middle and the end, and when its props take `loadMore`, its `load-more` demo asks once at the end.
+
+**Why.** The rule was "not yet" while three lists already windowed and six did not, each for a recorded reason; a check that names the six keeps the next list honest without forcing windowing on a breadcrumb. FileUpload's list renders the files it holds, not an `items` prop, at most `maxFiles` (100, under the 200 threshold) and unwindowed by the 2026-10-14 entry, so the check does not see it. Tabs, Sidebar, Navbar, Accordion, RadioGroup and SegmentedControl are composed from parts, not data, and Pagination draws a bounded run of page cells.
+
+**Affects.** `scripts/check-structure.ts`, `scripts/lib/collections.ts` and its test, four rows in `scripts/mutations/scripts.ts`, `e2e/collections.spec.ts`, and R-8.5-1 in `docs/RULES.md`.
+
+## 2026-10-17 - R-8.5-2 is linted, and the Banner keeps its dismissal in localStorage
+
+**Decision.** `topclass/no-fetch-in-components` refuses `fetch()`, `XMLHttpRequest`, `new Request()`, `localStorage`, `sessionStorage`, `indexedDB`, `caches`, React's `cache()`, `unstable_cache` and any import from `next/cache` under `src/components`, `src/connectors` and `src/shared`; tests and `dummy/` are exempt. One exemption: `src/components/banner/lib.ts` may use `localStorage` and nothing else on the list, through the rule's `allow` option in `eslint.config.ts`.
+
+**Why.** A dismissed Banner is remembered per `id` across pages (choice 24): that is the component's own UI state, not application data, and the README documents the key. The theme script in `src/shared/theme/script.ts` also reads `localStorage`, but as the text of an inline script the app injects before paint, so the rule, which reads code rather than strings, does not see it and needs no exemption.
+
+**What it affects.** A new storage, cache or network call in a component fails lint; widening the Banner's exemption needs an entry here.
+
+## 2026-10-17 - R-10.5-2 is a type and a lint rule
+
+**Decision.** A tooltip's text-only rule has two halves. The type, already in `tooltip/types.ts`, makes `TooltipPopup`'s `children` `TooltipText | readonly TooltipText[]` and takes no `render`, so tsc rejects an element, an array holding one and a boolean (`tooltip.types.test.ts`). The lint rule `tooltip-content-is-text` reports a JSX element or fragment anywhere in a `TooltipPopup`'s children: a direct child, inside an expression (`{ok && <a />}`, a `map`), in a `children` prop or a spread, and under a renamed import. It is on for `src/` (so the demos too), `e2e/**/*.tsx` and `scripts/**/*.tsx` (the harness and its fixtures). "One or two lines" stays with the CSS: `max-w-xs` and wrapping; a length cap in lint would fail the long-label demo, which is the case Tooltip exists for.
+
+**Why.** The type alone is beaten by a cast or a spread, and it says nothing about Popover; the lint message names the way out. Every existing tooltip in `src/`, the demos and `e2e/fixtures` was plain text, so nothing needed fixing and nothing is exempt.
+
+## 2026-10-17 - R-10.5-1 and R-10.5-3 are checked, and where the overlays differ from the letter
+
+**Decision.** `e2e/overlay-scroll.spec.ts` proves both rules across every overlay and bar in a real browser, and `check-structure` requires the Body of a scrolling overlay and the variable of a sticky bar. `POPUP_BOUNDS` was already in place: it is the object in `src/shared/floating.ts` that gives every anchored popup (Popover, Dropdown, Select, Combobox, DatePicker, Tooltip) its 6 px side offset and its 8 px collision padding, and the spec measures both on the first five. The height and the width each popup takes from `--available-height` and `--available-width` stay in its own `classes.ts`, because they differ, and the spec measures the result rather than the class. Where an overlay meets the rule by other means:
+
+- **Select** bounds its popup's width by `round(down, var(--available-width), 1px)`: Base UI rounds the popup's place to a whole pixel after measuring the room, so the width is rounded too (`SELECT_POPUP`).
+- **Dropdown** is a popup that is its own list: `LIST_CAP` holds it to the smaller of `--available-height` and the row cap, and `DROPDOWN_WIDTH` to the smaller of 20rem and `--available-width`.
+- **Command** is a centred dialog with no anchor, so Base UI measures no room and `POPUP_BOUNDS` does not apply: its popup is bounded by the screen (`85dvh` less the inset) and its list by `LIST_CAP`, whose `--available-height` falls back to `100dvh`.
+- **Toast** sets no `--tc-sticky-bottom`, although PLAN 10.5 rule 8 lists its viewport among the bars. It is a 360 px stack in a corner, not a bar across the page; every toast can be closed, by its x, a swipe or Escape; and a stack that grew and shrank would move the page's scroll padding with every toast. Its viewport is a scroll container, and sets `overscroll-behavior: contain` like every other.
+
+**Why.** The rules were marked `not yet` while no overlay existed; nine now do. Four of the spec's tests break an overlay or a bar on purpose (a Body that no longer scrolls, a container that chains, a popup freed of its max-height, a page that drops the variables from `scroll-padding-block`) to prove each measure can fail. The dialogs' and drawers' header and footer are flex items that never shrink, not `position: sticky`: the spec proves the effect, that both keep their boxes while the Body scrolls to its end and the page behind does not move.
+
+**What it affects.** The status lines of R-9.2-4, R-10.5-1 and R-10.5-3. A future AlertDialog is already a scrolling overlay to `check-structure`. The page test of PLAN 10.5 rule 11 near all four edges stays in each component's own spec; this one opens the anchored popups at the top and the bottom edge. `maxHeightVar` and `maxWidthVar` in `POPUP_BOUNDS` are read by nothing.
+
+## 2026-10-17 - The provider warns when the layout leaves out direction or locale
+
+**Decision.** `useProviderLocale` in `src/shared/provider/use-provider-locale.ts` gives `TopClassProvider` the direction and locale it runs on: the layout's when `direction` is `ltr` or `rtl` and `locale` is a non-empty string, `FALLBACK_CONTEXT`'s (`ltr`, `en`) otherwise. In development it warns once per page per missing prop, from an effect, so a server render never warns and a production build never does. An app that mounts no provider at all still gets no warning: every no-provider fixture and every component test renders that way on purpose.
+
+**Why.** Before, a missing locale reached the context as `undefined` and a missing direction reached Base UI in silence, so a route that lost its param rendered left to right with no sign of why. The logic lives in a hook file of its own because R-5.12-1 keeps effects out of the files that render.
+
+**Affects.** R-13-1, R-5.12-1.
+
+## 2026-10-17 - Every export is proven to pass className, ref and data-* on, and where they land instead
+
+**Decision.** `R-5.7-3` is proven by `src/test/root-props.dom.test.tsx`: it walks every component folder, renders each component that `index.tsx` and `skeleton.tsx` export with the required props from that folder's `test/fixture.ts`, and checks that one `className`, one `ref` and one unknown `data-*` attribute land on one element, and that the element is the outermost one the component renders. `check-structure` requires the fixture. A skeleton with no case in its fixture is rendered with no props, so one merged from another branch is covered at once. A case may only depart from the root by naming the props that land elsewhere and the heading of the entry here that records it, which must name the export; the test reads this file.
+
+**Departures this records** (`R-5.7-3`), each the narrowest the test allows:
+
+- `DialogRoot`, `DrawerRoot`, `PopoverRoot`, `TooltipRoot` and `DropdownRoot` are Base UI Roots that render no element, so there is nothing to spread onto. The test proves they still render none.
+- `NavbarLink` and `SidebarLink` render a list item around the link; className, ref and the rest reach the link, which carries the `href`. The `<li>` keeps the list a list.
+- `DatePicker` is held in a span with its hidden input, as Select is; className, ref and the rest reach the trigger button.
+- `TreeView` is held in a div with its live status note; className, ref and the rest reach the element with `role="tree"`, which is the scroll container and the tab stop.
+
+**What it fixed.** `ToastViewport` took a className alone, and `DropdownMenu` the menu contract, placement and className alone; both now take the rest and the ref. The viewport keeps its own `dir`, `lang`, name and toasts; `DropdownMenu` spreads onto its popup, where its className already went, and takes no `children`, `container`, `keepMounted` or `render`.
+
+**Why.** "No check proves all 46 have one" was the gap. A recorded departure is still measured, so a part that moves its props again fails.
+
+## 2026-10-17 - The parts-folder naming contract, and its two exceptions
+
+**Decision.** `check-structure` reads each fixed file's exports from the syntax tree (`scripts/lib/part-names.ts`): a file in `parts/` exports exactly one function component named after the file (`card-body.tsx` exports `CardBody`, and nothing else, not even a type); `hook.ts` exports only `use*` hooks; `lib.ts` and `lib.tsx` export only functions; and the scrolling overlays, Dialog and Drawer, export `<Name>Root`, `<Name>Header`, `<Name>Body` and `<Name>Footer` from `index.tsx`, with the three parts in `parts/<slug>-header.tsx`, `-body.tsx` and `-footer.tsx` whenever the folder has a `parts/`. The check names only the parts; that the Body is the scroll container is `check/overlay-scroll`'s. Two exports are allowed that the plain rule refuses. First, `hook.ts` may export a `<Name>Context` built by `createContext`, because the context exists only for its own hooks to read and `client.tsx` provides it (Dialog, Drawer, Dropdown, Popover, RadioGroup, SegmentedControl, Sidebar, Tabs); moving it to `lib.ts` would put React in the pure file. Second, `toast/lib.ts` exports the `toast` call object (`toast.add`, `toast.update`, `toast.close`, `toast.promise`), the imperative API callers already use; it is a client-only object of functions, not a component family a server file dots into, so R-9.2-3 does not reach it. The exemption is keyed by file and name in `NAMING_EXEMPTIONS`, and the check fails if the file it names disappears.
+
+**Why.** R-9.2-4's parts half and R-5.12-4's naming rest were manual. Running the check over `src/` found three violations, each fixed: Combobox's `optionAccessors` object became `valueOfOption` and `labelOfOption`, and Meter's `MeterRange` and Number Field's `NumberFieldLimits` moved from `lib.ts` to `types.ts` (R-8.3-4). Every existing part file already exported one component named after it.
+
+**Affects.** R-9.2-4 and R-5.12-4 in `docs/RULES.md`, which now name `check-structure`. Verb-first function names and PascalCase component names outside `parts/` stay manual.
+
+## 2026-10-17 - What counts as derived at the seam (R-5.7-5)
+
+**Decision.** In `types.ts` a Base UI `.Props` may be omitted from with `'className'` among the keys, picked from without `'className'`, read by index (`Props['modal']`), taken with `keyof`, or pinned to its generics in a private alias that is then used in one of those ways. Used whole, in an intersection, in an `extends` or in an exported alias, it is refused. A headless root with no `className` (Select, Combobox, Menu) still names it in its `Omit`, so a later Base UI release cannot add one unmerged.
+
+**Why.** A `Pick` of named props and an indexed prop type are derivations too; neither copies a list nor carries Base UI's `className`. A hand-copied list cannot be told from a list of our own props by syntax, so it stays review.
+
+**Affects.** R-5.7-5, `eslint-rules/index.ts` (`props-derived-at-the-seam`).
+
 ## 2026-10-17 - R-5.2-2's lint lets a caller's class follow the consumer's className
 
 **Decision.** `topclass/cn-class-name-last` reports a `cn()` call where `className`, `props.className` or `props['className']` is followed by any argument that is not itself a `className` read (`className`, or the `className` key of any object). So `cn(BUTTON, className)` passes, `cn(className, BUTTON)` fails, and `cn(props['className'], own['className'])` in `renderElement` (`src/shared/render.ts`) passes with no lint disable.

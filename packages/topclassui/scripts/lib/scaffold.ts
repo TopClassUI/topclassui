@@ -1,6 +1,8 @@
 // The folder contract of PLAN 8.1 as templates, so component 3 to 46 start correct
 // rather than copied and edited. Kept out of the script so the tests can drive it.
 
+import { ROOT_PROPS_FIXTURE } from './root-props-fixture.js'
+
 export interface Scaffold { slug: string; name: string; screaming: string }
 
 const KEBAB = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/
@@ -225,6 +227,16 @@ describe('${s.name}', () => {
 })
 `
 
+const fixture = (s: Scaffold) => `import type { RootPropsFixture } from '#test/root-props.js'
+
+import type * as Index from '../index.js'
+
+// R-5.7-3: the required props of each export, read by src/test/root-props.dom.test.tsx.
+export const fixture: RootPropsFixture<typeof Index> = {
+  ${s.name}: { props: {} },
+}
+`
+
 const dummy = (s: Scaffold) => `import { ${s.name} } from '../index.js'
 
 export default function Demo() {
@@ -249,6 +261,7 @@ export function files(scaffold: Scaffold): Map<string, string> {
     ['index.tsx', index(scaffold)],
     ['meta.ts', meta(scaffold)],
     [`test/${scaffold.slug}.test.tsx`, test(scaffold)],
+    [ROOT_PROPS_FIXTURE, fixture(scaffold)],
     ['dummy/basic.tsx', dummy(scaffold)],
   ])
 }

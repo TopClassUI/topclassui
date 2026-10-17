@@ -168,6 +168,22 @@ function findArbitraryColor(value: string): { cls: string; kind: 'arbitrary' | '
   return undefined
 }
 
+/** `data-[open]:` or `group-aria-[busy]/item:`: a bracket around a bare name, which v4 writes bare. */
+const BRACKETED_VARIANT = /^((?:[a-z][a-z0-9-]*-)?(?:data|aria))-\[([^\]]*)\](\/[\w-]+)?$/
+
+function findBracketedName(value: string): { cls: string; bare: string } | undefined {
+  for (const cls of value.split(/\s+/)) {
+    const variants = splitAtColons(cls)
+    variants.pop()
+    for (const variant of variants) {
+      const m = BRACKETED_VARIANT.exec(variant)
+      if (!m || m[2]?.includes('=')) continue
+      return { cls: `${variant}:`, bare: `${m[1] ?? ''}-${m[2] ?? ''}${m[3] ?? ''}:` }
+    }
+  }
+  return undefined
+}
+
 const BANNED_SCALE = [
   [/(^|[\s:])rounded-(none|xs|sm|md|lg|xl|2xl|3xl|4xl|full)(\s|$)/, 'use rounded-control, rounded-box or rounded-chip'],
   [/(^|[\s:])h-\d+(\s|$)/, 'use h-control-xs .. h-control-xl from the size scale'],
@@ -192,7 +208,130 @@ function isConsumerStyle(node: Node): boolean {
  * A sibling export that is not a part: a skeleton or a state stands beside the component
  * rather than inside it, so `Card` next to `CardSkeleton` needs no `Root`.
  */
+/** R-5.3-2: the one rtl: class PLAN section 7 writes out, the mirror of a directional icon. */
+const ICON_MIRROR = 'rtl:-scale-x-100'
+
+/** An x that needs no direction: none, a zero, or the pointer offset Base UI measures in physical px. */
+const NEUTRAL_X = /^(-?0(px|%|rem)?|none|3d|var\(--[a-z]+-swipe-movement-x\b.*)$/
+
+/** The arguments of the parenthesis that opens at `open`, split at its top-level commas. */
+function callArguments(text: string, open: number): string[] {
+  const args: string[] = []
+  let depth = 0
+  let start = open + 1
+  for (let i = open; i < text.length; i++) {
+    const ch = text[i]
+    if (ch === '(') depth++
+    else if (ch === ')' && --depth === 0) return [...args, text.slice(start, i)]
+    else if (ch === ',' && depth === 1) {
+      args.push(text.slice(start, i))
+      start = i + 1
+    }
+  }
+  return [...args, text.slice(start)]
+}
+
+const dirAware = (x: string) => x.includes('--tc-dir') || NEUTRAL_X.test(x.trim())
+
+/** A gradient angle along the block axis reads the same in both directions. */
+function physicalGradient(spec: string): boolean {
+  if (spec.includes('--tc-dir')) return false
+  if (/(^|[\s_-])(left|right)(?![a-z])/.test(spec)) return true
+  const angles = [...spec.matchAll(/(-?[\d.]+)(deg|turn|rad|grad)/g)]
+  const half = { deg: 180, turn: 0.5, rad: Math.PI, grad: 200 } as const
+  return angles.some(([, n, unit]) => Number(n) % half[unit as keyof typeof half] !== 0)
+}
+
+const POSITION = /^(object|bg)-(top|bottom|left|right|center)(-(top|bottom|left|right))?$|^object-[[(]|^bg-position-[[(]|^bg-\[position:/
+const PHYSICAL_POSITION = /^(object|bg)-((left|right)(-(top|bottom))?|(top|bottom)-(left|right))$/
+const DIR_VARIANT = /^(rtl|ltr)$|dir=["']?(rtl|ltr)|:dir\(/
+
+/** Why a class string breaks R-5.3-2, with the offending class, or undefined when it keeps it. */
+function findPhysicalMotion(value: string): { cls: string; hint: string } | undefined {
+  const tokens = value.split(/\s+/).filter(Boolean)
+  const hasDirPosition = tokens.some((cls) => {
+    const variants = splitAtColons(cls)
+    const utility = variants.pop() ?? ''
+    return variants.some((v) => DIR_VARIANT.test(v)) && POSITION.test(utility)
+  })
+  for (const cls of tokens) {
+    const variants = splitAtColons(cls)
+    const utility = (variants.pop() ?? '').replace(/^!/, '')
+    if (variants.some((v) => DIR_VARIANT.test(v))) {
+      if (cls !== ICON_MIRROR && !POSITION.test(utility)) {
+        return { cls, hint: 'uses a direction variant; only object-* and bg-* positions may, everything else multiplies by --tc-dir' }
+      }
+      continue
+    }
+    const translate = /^-?translate-(x-)?(.+)$/.exec(utility)
+    if (translate && !/^[yz]-/.test(translate[2] ?? '')) {
+      const value = translate[2] ?? ''
+      const x = translate[1] || !value.startsWith('[') ? value : (value.slice(1, -1).split('_')[0] ?? '')
+      if (!dirAware(x)) return { cls, hint: 'moves along a physical x; multiply it by --tc-dir, as translate-x-[calc(100%*var(--tc-dir))]' }
+    }
+    for (const m of utility.matchAll(/translate(X|3d)?\(/g)) {
+      const x = callArguments(utility, m.index + m[0].length - 1)[0] ?? ''
+      if (!dirAware(x)) return { cls, hint: 'translates along a physical x; multiply it by --tc-dir, as translateX(calc(100%*var(--tc-dir)))' }
+    }
+    const property = /^\[translate:([^_\]]+)/.exec(utility)
+    if (property && !dirAware(property[1] ?? '')) return { cls, hint: 'translates along a physical x; multiply it by --tc-dir' }
+    if (/^(origin-|\[transform-origin:)/.test(utility) && /(^|[-_[:])(left|right)(?![a-z])/.test(utility)) {
+      return { cls, hint: 'pins the transform origin to a physical side; use one Base UI measures, as origin-(--transform-origin), or a centre or block edge' }
+    }
+    const gradient = /^-?bg-(linear|gradient)-(.+)$/.exec(utility)
+    if (gradient) {
+      const spec = gradient[2] ?? ''
+      const side = /^to-(r|l|tr|tl|br|bl)$/.test(spec)
+      const angle = /^\d+$/.test(spec) && Number(spec) % 180 !== 0
+      if (side || angle || (/^[[(]/.test(spec) && physicalGradient(spec))) {
+        return { cls, hint: 'points the gradient at a physical side; multiply the angle by --tc-dir, as bg-linear-[calc(90deg*var(--tc-dir))]' }
+      }
+    }
+    for (const m of utility.matchAll(/linear-gradient\(/g)) {
+      const first = callArguments(utility, m.index + m[0].length - 1)[0] ?? ''
+      if (physicalGradient(first)) return { cls, hint: 'points the gradient at a physical side; multiply the angle by --tc-dir' }
+    }
+    if (PHYSICAL_POSITION.test(utility) && !hasDirPosition) {
+      return { cls, hint: 'is a physical position with no logical form; pair it with its rtl: mirror' }
+    }
+  }
+  return undefined
+}
+
 const NOT_A_PART = /^(Skeleton|EmptyState|ErrorState|Client|Provider|Context|Variants|Props)$/
+
+const isBaseUiSource = (source: unknown) => typeof source === 'string' && source.startsWith('@base-ui/')
+
+/** The binding a qualified name starts from: `Base` in `Base.Root.Props`. */
+function rootName(name: Node): string | null {
+  let n = name
+  while (n?.type === 'TSQualifiedName') n = n.left
+  while (n?.type === 'MemberExpression') n = n.object
+  return n?.type === 'Identifier' ? String(n.name) : null
+}
+
+/** `Base.Root.Props`, `Base.Props`, or a named import that ends in Props. */
+function isBasePropsName(name: Node, base: Set<string>): boolean {
+  const root = rootName(name)
+  if (root === null || !base.has(root)) return false
+  if (name.type === 'Identifier') return /Props$/.test(String(name.name))
+  const last = name.type === 'TSQualifiedName' ? name.right : name.property
+  return last?.name === 'Props'
+}
+
+/** The string keys a type spells out, through local aliases; `keyof X` and the like add none. */
+function keysOf(node: Node, aliases: Map<string, Node>, seen = new Set<string>()): string[] {
+  if (node?.type === 'TSLiteralType' && typeof node.literal?.value === 'string') return [node.literal.value]
+  if (node?.type === 'TSUnionType') return node.types.flatMap((t: Node) => keysOf(t, aliases, seen))
+  if (node?.type === 'TSTypeReference' && node.typeName?.type === 'Identifier') {
+    const name = String(node.typeName.name)
+    const alias = aliases.get(name)
+    if (!alias || seen.has(name)) return []
+    seen.add(name)
+    return keysOf(alias, aliases, seen)
+  }
+  return []
+}
 
 const rules = {
   'logical-properties-only': {
@@ -211,6 +350,21 @@ const rules = {
             return
           }
         }
+      })
+    },
+  },
+
+  'dir-aware-transforms': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-5.3-2: translate, transform origin and gradient direction follow --tc-dir; rtl: is for object-* and bg-* positions.' },
+      schema: [],
+      messages: { physical: 'R-5.3-2: "{{cls}}" {{hint}}.' },
+    },
+    create(ctx: Context) {
+      return eachClassString((node, value) => {
+        const found = findPhysicalMotion(value)
+        if (found) ctx.report({ node, messageId: 'physical', data: found })
       })
     },
   },
@@ -295,6 +449,21 @@ const rules = {
             data: { cls: s[0].trim(), hint: 'use HOVER, FOCUS_RING or the shared state constants' },
           })
         }
+      })
+    },
+  },
+
+  'bare-data-variants': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-5.2-6: data and aria variants are written bare; brackets only hold name=value.' },
+      schema: [],
+      messages: { bracketed: 'R-5.2-6: "{{cls}}" brackets a bare name. Write "{{bare}}"; brackets only hold name=value.' },
+    },
+    create(ctx: Context) {
+      return eachClassString((node, value) => {
+        const b = findBracketedName(value)
+        if (b) ctx.report({ node, messageId: 'bracketed', data: b })
       })
     },
   },
@@ -632,6 +801,289 @@ const rules = {
           if (isProse(value.value)) {
             ctx.report({ node, messageId: 'hardcoded', data: { text: value.value.slice(0, 40) } })
           }
+        },
+      }
+    },
+  },
+  'no-fetch-in-components': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-8.5-2: components never fetch, cache or paginate; the app owns the data.' },
+      schema: [
+        {
+          type: 'object',
+          properties: { allow: { type: 'array', items: { type: 'string' } } },
+          additionalProperties: false,
+        },
+      ],
+      messages: {
+        data:
+          'R-8.5-2: {{what}} makes the component own data. The app fetches, caches and pages; '
+          + 'take the data as props and call loadMore().',
+      },
+    },
+    create(ctx: Context) {
+      const file = String(ctx.filename ?? ctx.getFilename()).replace(/\\/g, '/')
+      if (!/(^|\/)src\/(components|connectors|shared)\//.test(file)) return {}
+      const allow = new Set((ctx.options?.[0]?.allow ?? []) as string[])
+      const GLOBALS = new Set(['XMLHttpRequest', 'localStorage', 'sessionStorage', 'indexedDB', 'caches', 'unstable_cache'])
+      const HOSTS = new Set(['window', 'globalThis', 'self'])
+
+      const report = (node: Node, name: string, what = name) => {
+        if (!allow.has(name)) ctx.report({ node, messageId: 'data', data: { what } })
+      }
+      /** A property key or a non-computed member name is not a reference to the global. */
+      const isReference = (node: Node) => {
+        const p = node.parent
+        if (p?.type === 'MemberExpression' && p.property === node && !p.computed) return false
+        if ((p?.type === 'Property' || p?.type === 'MethodDefinition' || p?.type === 'PropertyDefinition') && p.key === node && !p.computed) return false
+        if (p?.type === 'TSPropertySignature' && p.key === node) return false
+        return !/^Import|^Export/.test(String(p?.type))
+      }
+      const calleeName = (callee: Node): string | undefined => {
+        if (callee?.type === 'Identifier') return callee.name
+        if (callee?.type === 'MemberExpression' && !callee.computed && HOSTS.has(callee.object?.name)) return callee.property?.name
+        return undefined
+      }
+
+      return {
+        ImportDeclaration(node: Node) {
+          const source = node.source?.value
+          if (source === 'next/cache') report(node, 'next/cache', '"next/cache"')
+          if (source !== 'react') return
+          for (const s of node.specifiers ?? []) {
+            if (s.type === 'ImportSpecifier' && (s.imported?.name ?? s.imported?.value) === 'cache') {
+              report(s, 'cache', "React's cache()")
+            }
+          }
+        },
+        Identifier(node: Node) {
+          if (GLOBALS.has(node.name) && isReference(node)) report(node, node.name)
+        },
+        MemberExpression(node: Node) {
+          const name = node.property?.name
+          if (node.computed || !HOSTS.has(node.object?.name) || !GLOBALS.has(name)) return
+          report(node.property, name, `${node.object.name}.${name}`)
+        },
+        CallExpression(node: Node) {
+          const name = calleeName(node.callee)
+          if (name === 'fetch') report(node, 'fetch', 'fetch()')
+          const c = node.callee
+          if (c?.type === 'MemberExpression' && c.object?.name === 'React' && c.property?.name === 'cache') {
+            report(node, 'cache', "React's cache()")
+          }
+        },
+        NewExpression(node: Node) {
+          if (calleeName(node.callee) === 'Request') report(node, 'Request', 'new Request()')
+        },
+      }
+    },
+  },
+
+  'tooltip-content-is-text': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-10.5-2: a tooltip is one or two lines of plain text; anything else is a Popover.' },
+      schema: [],
+      messages: {
+        element: 'R-10.5-2: <{{child}}> inside {{name}} makes it more than text. A link, a control or rich content belongs in a Popover.',
+      },
+    },
+    create(ctx: Context) {
+      const names = new Set(['TooltipPopup'])
+      /** The first JSX node in an expression, so `{ok && <a />}` and `{rows.map(...)}` are seen. */
+      const findJsx = (node: Node, depth = 0): Node => {
+        if (!node || typeof node.type !== 'string' || depth > 20) return null
+        if (node.type === 'JSXElement' || node.type === 'JSXFragment') return node
+        for (const key of ctx.sourceCode.visitorKeys[node.type] ?? []) {
+          const value = node[key]
+          for (const child of Array.isArray(value) ? value : [value]) {
+            const hit = findJsx(child, depth + 1)
+            if (hit) return hit
+          }
+        }
+        return null
+      }
+      const label = (jsx: Node) => {
+        if (jsx.type === 'JSXFragment') return 'fragment'
+        const name = jsx.openingElement?.name
+        return String(name?.name ?? name?.property?.name ?? 'element')
+      }
+      const flag = (node: Node, name: string) => {
+        const jsx = findJsx(node)
+        if (jsx) ctx.report({ node: jsx, messageId: 'element', data: { name, child: label(jsx) } })
+      }
+      return {
+        ImportSpecifier(node: Node) {
+          if (names.has(String(node.imported?.name ?? ''))) names.add(String(node.local?.name ?? ''))
+        },
+        JSXElement(node: Node) {
+          const opening = node.openingElement
+          const name = String(opening?.name?.name ?? opening?.name?.property?.name ?? '')
+          if (!names.has(name)) return
+          for (const child of node.children ?? []) flag(child, name)
+          for (const attribute of opening.attributes ?? []) {
+            if (attribute.type === 'JSXAttribute' && attribute.name?.name === 'children') flag(attribute.value, name)
+            if (attribute.type === 'JSXSpreadAttribute') flag(attribute.argument, name)
+          }
+        },
+      }
+    },
+  },
+
+  'props-derived-at-the-seam': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-5.7-5: public types are aliases derived from Base UI at the seam, never its names re-exported.' },
+      schema: [],
+      messages: {
+        reexport: 'R-5.7-5: never re-export a Base UI type. Name it here: export type DialogRootProps = Omit<Base.Root.Props, \'className\'> & OwnProps.',
+        bare: 'R-5.7-5: {{name}} is used whole, so its className reaches the consumer unmerged. Derive it: Omit<{{name}}, \'className\'> & OwnProps.',
+        omit: 'R-5.7-5: Omit<{{name}}, ...> keeps className. Name \'className\' among the omitted keys, so ours is the only one.',
+        pick: 'R-5.7-5: Pick<{{name}}, ...> takes className from Base UI. Omit it there and declare our own.',
+      },
+    },
+    create(ctx: Context) {
+      const file = String(ctx.filename ?? ctx.getFilename?.() ?? '').replace(/\\/g, '/')
+      const typesFile = /(^|\/)types\.ts$/.test(file)
+      const base = new Set<string>()
+      const aliases = new Map<string, Node>()
+      const pinned = new Set<string>()
+      const uses: Node[] = []
+      const text = (node: Node) => String(ctx.sourceCode.getText(node))
+      const isBaseProps = (name: Node) =>
+        isBasePropsName(name, base) || (name?.type === 'Identifier' && pinned.has(String(name.name)))
+      const check = (node: Node) => {
+        const label = text(node)
+        const parent = node.parent
+        if (parent?.type === 'TSIndexedAccessType' && parent.objectType === node) return
+        if (parent?.type === 'TSTypeOperator' && parent.operator === 'keyof') return
+        if (parent?.type === 'TSTypeAliasDeclaration' && parent.parent?.type !== 'ExportNamedDeclaration') return
+        const holder = parent?.type === 'TSTypeParameterInstantiation' ? parent.parent : null
+        const generic = holder?.typeName?.type === 'Identifier' ? String(holder.typeName.name)
+          : holder?.expression?.type === 'Identifier' ? String(holder.expression.name) : null
+        if (holder && parent.params[0] === node && (generic === 'Omit' || generic === 'Pick')) {
+          const keys = keysOf(parent.params[1], aliases)
+          if (generic === 'Omit' && !keys.includes('className')) ctx.report({ node, messageId: 'omit', data: { name: label } })
+          if (generic === 'Pick' && keys.includes('className')) ctx.report({ node, messageId: 'pick', data: { name: label } })
+          return
+        }
+        ctx.report({ node, messageId: 'bare', data: { name: label } })
+      }
+      return {
+        ImportDeclaration(node: Node) {
+          if (!isBaseUiSource(node.source?.value)) return
+          for (const s of node.specifiers ?? []) base.add(String(s.local?.name))
+        },
+        ExportAllDeclaration(node: Node) {
+          if (isBaseUiSource(node.source?.value)) ctx.report({ node, messageId: 'reexport' })
+        },
+        ExportNamedDeclaration(node: Node) {
+          if (isBaseUiSource(node.source?.value)) return ctx.report({ node, messageId: 'reexport' })
+          if (node.source) return
+          for (const s of node.specifiers ?? []) {
+            if (base.has(String(s.local?.name))) ctx.report({ node: s, messageId: 'reexport' })
+          }
+        },
+        TSTypeAliasDeclaration(node: Node) {
+          aliases.set(String(node.id.name), node.typeAnnotation)
+          const body = node.typeAnnotation
+          // A private alias that pins Base UI's generics is Base UI's props by another name.
+          if (body?.type === 'TSTypeReference' && isBasePropsName(body.typeName, base)
+            && node.parent?.type !== 'ExportNamedDeclaration') pinned.add(String(node.id.name))
+        },
+        TSTypeReference(node: Node) {
+          if (typesFile) uses.push(node)
+        },
+        TSInterfaceHeritage(node: Node) {
+          if (typesFile) uses.push(node)
+        },
+        'Program:exit'() {
+          for (const node of uses) {
+            const name = node.type === 'TSInterfaceHeritage' ? node.expression : node.typeName
+            if (isBaseProps(name)) check(node)
+          }
+        },
+      }
+    },
+  },
+
+  'client-shape': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-5.12-1: client.tsx is markup plus at most one hook from hook.ts per component.' },
+      schema: [],
+      messages: {
+        state: 'R-5.12-1: {{name}} is state or an effect, which lives in hook.ts; client.tsx only calls the hook that returns it.',
+        foreign: 'R-5.12-1: {{name}} does not come from hook.ts. The component hook there calls it and returns what the markup needs.',
+        second: 'R-5.12-1: {{name}} is a second hook call in {{component}}. Its one hook from hook.ts returns everything.',
+        helper: 'R-5.12-1: {{name}} is not a component. A pure helper lives in lib.ts and a hook in hook.ts.',
+      },
+    },
+    create(ctx: Context) {
+      const file = String(ctx.filename ?? ctx.getFilename?.() ?? '').replace(/\\/g, '/')
+      const body = ctx.sourceCode?.ast?.body ?? ctx.getSourceCode?.().ast?.body ?? []
+      const first = body[0]
+      const directive = first?.type === 'ExpressionStatement' && first.directive === 'use client'
+      // A 'use client' part is client.tsx split up by R-5.12-2, so it keeps the same shape.
+      if (!file.endsWith('/client.tsx') && !(file.includes('/parts/') && directive)) return {}
+      const STATE = new Set(['useState', 'useEffect', 'useLayoutEffect', 'useInsertionEffect', 'useReducer', 'useRef', 'useMemo', 'useCallback'])
+      const isHook = (name: string) => /^use[A-Z]/.test(name)
+      const isComponent = (name: string) => /^[A-Z][A-Za-z0-9]*$/.test(name)
+      const fromHook = new Set<string>()
+      const reactHolders = new Set<string>()
+      const calls = new Map<Node, number>()
+      /** The top-level function a call sits in: the component it belongs to. */
+      const componentOf = (node: Node) => {
+        let outer: Node = null
+        for (let n = node.parent; n; n = n.parent) {
+          if (/Function/.test(String(n.type))) outer = n
+        }
+        return outer
+      }
+      const nameOf = (fn: Node) => String(fn?.id?.name ?? (fn?.parent?.type === 'VariableDeclarator' ? fn.parent.id?.name : '') ?? '')
+      const count = (node: Node, name: string) => {
+        const component = componentOf(node)
+        if (!component) return
+        const seen = (calls.get(component) ?? 0) + 1
+        calls.set(component, seen)
+        if (seen > 1) ctx.report({ node, messageId: 'second', data: { name, component: nameOf(component) || 'this component' } })
+      }
+      const helper = (node: Node, name: string) => {
+        if (name && !isComponent(name)) ctx.report({ node, messageId: 'helper', data: { name } })
+      }
+      return {
+        ImportDeclaration(node: Node) {
+          const source = String(node.source?.value ?? '')
+          for (const spec of node.specifiers ?? []) {
+            const local = String(spec.local?.name ?? '')
+            if (/^\.\.?\/hook\.js$/.test(source)) fromHook.add(local)
+            if (source === 'react' && spec.type !== 'ImportSpecifier') reactHolders.add(local)
+          }
+        },
+        CallExpression(node: Node) {
+          const callee = node.callee
+          if (callee?.type === 'Identifier' && isHook(String(callee.name))) {
+            const name = String(callee.name)
+            if (STATE.has(name)) ctx.report({ node, messageId: 'state', data: { name } })
+            else if (!fromHook.has(name)) ctx.report({ node, messageId: 'foreign', data: { name } })
+            count(node, name)
+            return
+          }
+          if (callee?.type === 'MemberExpression' && isHook(String(callee.property?.name ?? ''))) {
+            const name = String(callee.property.name)
+            const holder = String(callee.object?.name ?? '')
+            const messageId = reactHolders.has(holder) && STATE.has(name) ? 'state' : 'foreign'
+            ctx.report({ node, messageId, data: { name: `${holder}.${name}` } })
+            count(node, name)
+          }
+        },
+        'Program > FunctionDeclaration, Program > ExportNamedDeclaration > FunctionDeclaration'(node: Node) {
+          helper(node, String(node.id?.name ?? ''))
+        },
+        'Program > VariableDeclaration > VariableDeclarator, Program > ExportNamedDeclaration > VariableDeclaration > VariableDeclarator'(node: Node) {
+          if (!/^(Arrow)?Function/.test(String(node.init?.type ?? ''))) return
+          helper(node, String(node.id?.name ?? ''))
         },
       }
     },

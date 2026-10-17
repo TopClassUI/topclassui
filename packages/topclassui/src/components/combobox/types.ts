@@ -23,7 +23,7 @@ type BaseRoot = Base.Root.Props<string, false, ListOption>
 
 /** Ours to set, or not offered: one value, a windowed list, options as data. */
 type RootOwned =
-  | 'multiple' | 'virtualized' | 'filteredItems' | 'grid' | 'inline' | 'limit' | 'itemToStringLabel'
+  | 'className' | 'multiple' | 'virtualized' | 'filteredItems' | 'grid' | 'inline' | 'limit' | 'itemToStringLabel'
   | 'itemToStringValue' | 'isItemEqualToValue' | 'children' | 'items' | 'value' | 'defaultValue' | 'onValueChange'
 
 /** What reaches Base UI's root. Every other prop reaches the input. */
