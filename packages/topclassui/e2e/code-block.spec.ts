@@ -111,10 +111,10 @@ const rootsInside = (page: Page) => page.evaluate(() => {
 
 test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 
-test('the set holds the seven demos, so a renamed folder cannot empty the loops below', () => {
+test('the set holds the nine demos, so a renamed folder cannot empty the loops below', () => {
   expect(BLOCKS.sort()).toEqual([
     'code-block--basic', 'code-block--highlighted', 'code-block--long-line', 'code-block--no-copy', 'code-block--no-header',
-    'code-block--rtl', 'code-block--wrap',
+    'code-block--playground', 'code-block--rtl', 'code-block--states', 'code-block--wrap',
   ])
 })
 
