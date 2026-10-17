@@ -5,7 +5,7 @@ import { type BundledLanguage, type Highlighter, createHighlighter } from 'shiki
 /** CodeBlock is dark on a light page and light on a dark one; measured over every demo: 8.45:1 and 4.62:1 (choice 14). */
 export const CODE_THEMES = { onLight: 'github-dark-high-contrast', onDark: 'github-light-high-contrast' } as const
 
-const LANGS = ['tsx', 'bash'] as const satisfies readonly BundledLanguage[]
+const LANGS = ['tsx', 'bash', 'css'] as const satisfies readonly BundledLanguage[]
 export type CodeLang = (typeof LANGS)[number]
 
 let highlighter: Promise<Highlighter> | null = null

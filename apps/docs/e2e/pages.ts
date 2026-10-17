@@ -21,8 +21,13 @@ export async function openIn(page: Page, path: string, mode: string) {
 
 export const card = (page: Page, slug: string) => page.locator(`[data-component="${slug}"]`)
 
-/** axe's violations on the page, less contrast inside a disabled control: WCAG 1.4.3 exempts an inactive component. */
-export async function axeViolations(page: Page): Promise<string[]> {
+/** A landmark-unique node that is a nav inside a card or an example: a component shown many times under its default name (open for Omar). */
+const demoNav = (page: Page, selector: string) => page.locator(selector).first()
+  .evaluate((element) => element.tagName === 'NAV' && element.closest('[data-component], section[aria-labelledby="examples"]') !== null)
+
+/** axe's violations on the page, less contrast inside a disabled control: WCAG 1.4.3 exempts an inactive component.
+ * With `demoCopies`, also less landmark-unique between copies of a demo's own nav, as the Navigation pages allow. */
+export async function axeViolations(page: Page, { demoCopies = false } = {}): Promise<string[]> {
   const results = await new AxeBuilder({ page }).analyze()
   const found: string[] = []
   for (const violation of results.violations) {
@@ -30,7 +35,8 @@ export async function axeViolations(page: Page): Promise<string[]> {
       const selector = node.target.join(' ')
       const inactive = violation.id === 'color-contrast'
         && await page.locator(selector).first().evaluate((element) => element.closest('[data-disabled]') !== null)
-      if (!inactive) found.push(`${violation.id}: ${selector}`)
+      const copy = demoCopies && violation.id === 'landmark-unique' && await demoNav(page, selector)
+      if (!inactive && !copy) found.push(`${violation.id}: ${selector}`)
     }
   }
   return found
