@@ -196,4 +196,28 @@ export const MUTATIONS: Mutation[] = [
     from: 'max-w-105 flex-col wrap-anywhere',
     to: 'max-w-105 flex-col overflow-hidden wrap-anywhere',
   },
+  {
+    label: 'the command skeleton lets a caller un-hide it',
+    file: 'src/components/command/skeleton.tsx',
+    from: '{...rest} aria-hidden>',
+    to: 'aria-hidden {...rest}>',
+  },
+  {
+    label: 'the command skeleton row loses the unit, so under a finger it is shorter than a command row',
+    file: 'src/components/command/classes.ts',
+    from: 'export const COMMAND_SKELETON_ROW = `${ROW} ${COMMAND_UNIT}`',
+    to: 'export const COMMAND_SKELETON_ROW = ROW',
+  },
+  {
+    label: 'the command skeleton stops clamping its count, so rows={9999} draws 9999 rows',
+    file: 'src/components/command/skeleton.tsx',
+    from: 'Math.trunc(clamp(rows, COMMAND_BOUNDARIES.visibleRowsMin, COMMAND_BOUNDARIES.visibleRowsMax))',
+    to: 'Math.trunc(rows)',
+  },
+  {
+    label: 'the command skeleton passes className first, so the consumer loses every conflict',
+    file: 'src/components/command/skeleton.tsx',
+    from: 'cn(COMMAND_SKELETON_LIST, className)',
+    to: 'cn(className, COMMAND_SKELETON_LIST)',
+  },
 ]

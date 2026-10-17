@@ -18,6 +18,7 @@ const TRIGGERS: Record<string, string> = {
   'command--long-content': 'Every hostile case',
   'command--long-page': 'Jump to a section',
   'command--rtl': 'بحث',
+  'command--skeleton': 'Commands that load with a skeleton',
   'command--ten-thousand': 'Ten thousand commands',
   'command--thousand': 'A thousand commands',
   'command--with-shortcuts': 'Commands with shortcuts',

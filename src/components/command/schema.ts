@@ -18,3 +18,12 @@ export const commandSchema = z.object({
 })
 
 export type CommandSchemaInput = z.input<typeof commandSchema>
+
+/** R-5.7-7: the one count of CommandSkeleton, bounded as visibleRows is and clamped where it is read. */
+export const commandSkeletonSchema = z.object({
+  rows: z.number().int().min(COMMAND_BOUNDARIES.visibleRowsMin).max(COMMAND_BOUNDARIES.visibleRowsMax)
+    .default(COMMAND_DEFAULTS.visibleRows)
+    .meta({ description: 'How many rows the placeholder holds, clamped to 1 to 100: pass the visibleRows of the palette.' }),
+})
+
+export type CommandSkeletonSchemaInput = z.input<typeof commandSkeletonSchema>

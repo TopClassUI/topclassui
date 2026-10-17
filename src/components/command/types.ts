@@ -1,9 +1,9 @@
 import type { Dialog as Base } from '@base-ui/react/dialog'
-import type { ReactNode } from 'react'
+import type { ComponentPropsWithRef, ReactNode } from 'react'
 
 import type { CollectionProps } from '#shared/contracts/collection.js'
 import type { Status } from '#shared/contracts/state.js'
-import type { CommandSchemaInput } from './schema.js'
+import type { CommandSchemaInput, CommandSkeletonSchemaInput } from './schema.js'
 
 // R-8.3-4: derived from the schema, so the props and the validation cannot drift apart.
 export type CommandDesignProps = {
@@ -94,3 +94,13 @@ export interface CommandKeyPress {
   altKey: boolean
   shiftKey: boolean
 }
+
+// R-8.3-4: derived from the schema, as the design props of the palette are.
+export type CommandSkeletonDesignProps = {
+  [K in keyof CommandSkeletonSchemaInput]?: CommandSkeletonSchemaInput[K] | undefined
+}
+
+/** No content and no way to un-hide it: the placeholder only holds the rows of the list. */
+export type CommandSkeletonProps =
+  Omit<ComponentPropsWithRef<'div'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
+  & CommandSkeletonDesignProps

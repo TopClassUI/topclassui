@@ -1,6 +1,6 @@
 // R-5.12-4: one class string per element Command styles, built from the shared overlay constants.
 import {
-  CONTAIN, DISABLED, FADE_MOTION, FOCUS_RING_INSET, LIST_CAP, OVERLAY_SURFACE, POPUP_MOTION, ROW, ROW_HIGHLIGHT, SCRIM,
+  CONTAIN, DISABLED, FADE_MOTION, FOCUS_RING_INSET, FORCED_EDGE, LIST_CAP, OVERLAY_SURFACE, POPUP_MOTION, ROW, ROW_HIGHLIGHT, SCRIM,
   SCROLL_AREA,
 } from '#shared/classes.js'
 
@@ -52,3 +52,18 @@ export const COMMAND_STATUS = 'px-4 py-6 text-center text-sm text-muted empty:p-
 
 /** The title only a screen reader reads: the popup is named by it. */
 export const COMMAND_TITLE = 'sr-only'
+
+/** The list's own padding without its scroll or its cap: the placeholder has no tab stop, so nothing in it may need one. */
+export const COMMAND_SKELETON_LIST = 'flex flex-col p-1.5'
+
+/** A command row's box with nothing to press: one unit tall, 44 px at least under a finger, as an item is. */
+export const COMMAND_SKELETON_ROW = `${ROW} ${COMMAND_UNIT}`
+
+/** One line of nothing: as tall as the type, with margins making up the line height. */
+const SKELETON_BAR = `block h-[1em] my-[calc((1lh-1em)/2)] rounded-chip bg-neutral-soft animate-pulse motion-reduce:animate-none ${FORCED_EDGE}`
+
+/** R-5.2-3: the square where an icon goes, and the label beside it. */
+export const COMMAND_SKELETON_BAR = {
+  icon: `${SKELETON_BAR} w-[1em] shrink-0`,
+  label: `${SKELETON_BAR} w-1/2`,
+} as const
