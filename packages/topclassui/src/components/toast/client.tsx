@@ -47,6 +47,7 @@ export function ToastViewport({ className }: ToastViewportProps) {
   return (
     <Base.Portal>
       <Base.Viewport
+        ref={viewport.ref}
         dir={viewport.dir}
         lang={viewport.lang}
         aria-label={viewport.labels.region}

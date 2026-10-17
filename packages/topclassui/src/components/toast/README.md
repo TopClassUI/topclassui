@@ -120,6 +120,7 @@ Every prop below is optional and falls back to the default shown.
 - `dummy/promise.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sticky.tsx`
+- `dummy/tall-page.tsx`
 - `dummy/tones.tsx`
 - `dummy/with-action.tsx`
 - `dummy/with-description.tsx`
