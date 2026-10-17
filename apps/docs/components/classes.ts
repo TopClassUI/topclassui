@@ -16,3 +16,6 @@ export const EYEBROW = 'text-xs font-semibold text-primary-on-soft'
 export const SECTION_TITLE = 'text-3xl font-semibold text-body lg:text-4xl'
 
 export const LEAD = 'text-base text-muted'
+
+/** Inline code in prose and table cells: Latin, left to right, inside an Arabic sentence too. */
+export const INLINE_CODE = 'rounded-chip bg-neutral-soft px-1 font-mono text-sm text-body'
