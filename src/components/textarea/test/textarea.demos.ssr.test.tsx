@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['autosize', 'basic', 'form', 'long-content', 'row', 'rtl', 'show-count', 'sizes', 'skeleton', 'states']
+const EXPECTED = ['autosize', 'basic', 'form', 'long-content', 'playground', 'row', 'rtl', 'show-count', 'sizes', 'skeleton', 'states']
 
 /** Each textarea of each demo as the server writes it: its name, by aria-label or by the label that points at its id, and its rows. */
 const TEXTAREAS: Record<string, string[]> = {
@@ -19,6 +19,7 @@ const TEXTAREAS: Record<string, string[]> = {
   'basic': ['About you: 3'],
   'form': ['Message: 3', 'Notes: 3'],
   'long-content': ['One long word: 3', 'One long word, own width: 3', 'Sixty lines: 6'],
+  'playground': ['About you: 3'],
   'row': ['What went well: 3', 'What did not: 3', 'What went well, counted: 3', 'What did not, counted: 3'],
   'rtl': ['نبذة عنك: 3', 'ملاحظة: 3'],
   'show-count': ['Always counted: 3', 'Counted near the cap: 3', 'At the cap: 3', 'No cap: 3'],
@@ -43,7 +44,7 @@ function textareasIn(html: string): string[] {
 }
 
 describe('every demo renders on the server', () => {
-  it('holds exactly the ten demos asked for, so none can be deleted silently', () => {
+  it('holds exactly the eleven demos asked for, so none can be deleted silently', () => {
     expect(files).toEqual(EXPECTED)
   })
 
@@ -77,6 +78,13 @@ describe('the demos the plan names', () => {
     expect(html).toContain('type="submit"')
     expect(html).toContain('type="reset"')
     expect(html).toContain('<div class="flex flex-wrap gap-2"><button')
+  })
+
+  it('playground: the schema props a Try it control sets reach the textarea', async () => {
+    const loaded = await import('../dummy/playground.tsx') as { default: ComponentType<{ rows?: number, invalid?: boolean }> }
+    const html = markup(<loaded.default rows={5} invalid />)
+    expect(html).toContain('rows="5"')
+    expect(html).toContain('aria-invalid="true"')
   })
 
   it('rtl: the counter reads Arabic-Indic digits in the server HTML, in left-to-right order', async () => {
