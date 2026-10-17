@@ -6,5 +6,5 @@ export const directionOf = (sort: TableSort | undefined, key: string): TableSort
   sort?.key === key && Object.hasOwn(SORT_ICONS, sort.direction) ? sort.direction : undefined
 
 /** The entries that are columns, in the order they were written. */
-export const columnsOf = <T,>(columns: TableColumns<T>): TableColumn<T>[] =>
+export const columnsOf = <T>(columns: TableColumns<T>): TableColumn<T>[] =>
   columns.filter((column): column is TableColumn<T> => Boolean(column))

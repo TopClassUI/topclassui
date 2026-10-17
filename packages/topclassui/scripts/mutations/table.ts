@@ -4,7 +4,7 @@ import type { Mutation } from '../lib/mutate.js'
 export const MUTATIONS: Mutation[] = [
   {
     label: 'a sorted table puts aria-sort and a caret on every column, so no one of them is named',
-    file: 'src/components/table/lib.tsx',
+    file: 'src/components/table/lib.ts',
     from: 'sort?.key === key && Object.hasOwn(SORT_ICONS, sort.direction)',
     to: 'sort !== undefined && Object.hasOwn(SORT_ICONS, sort.direction)',
   },
