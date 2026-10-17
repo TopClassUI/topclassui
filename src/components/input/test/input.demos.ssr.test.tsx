@@ -12,7 +12,7 @@ const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
 const EXPECTED = [
-  'custom-size', 'full-width', 'labelled', 'row', 'rtl', 'sizes', 'skeleton', 'skeleton-match', 'states',
+  'custom-size', 'full-width', 'labelled', 'playground', 'row', 'rtl', 'sizes', 'skeleton', 'skeleton-match', 'states',
   'types',
 ]
 
@@ -124,6 +124,13 @@ describe('the demos cover what PLAN 20 asks for', () => {
     const spans = (await render('skeleton')).match(/<span class="[^"]*"/g) ?? []
     expect(spans.map((tag) => / w-full"/.test(tag))).toEqual([false, false, false, true])
     expect(spans.map((tag) => / w-\[min\(100%,var\(--tc-input-width\)\)\]"/.test(tag))).toEqual([true, true, true, false])
+  })
+
+  it('playground: the schema props a Try it control sets reach the input', async () => {
+    const loaded = await import('../dummy/playground.tsx') as { default: ComponentType<{ size?: string, invalid?: boolean }> }
+    const html = markup(<loaded.default size="lg" invalid />)
+    expect(html).toContain('data-size="lg"')
+    expect(html).toContain('aria-invalid="true"')
   })
 
   it('ties the hint to the labelled input', async () => {
