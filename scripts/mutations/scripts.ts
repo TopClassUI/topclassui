@@ -176,4 +176,28 @@ export const MUTATIONS: Mutation[] = [
     from: '  if (/^\\s*Test(?: Files|s)\\s+\\d+ failed/m.test(output)) return true',
     to: '  return true',
   },
+  {
+    label: 'the mutation runner counts any failed Playwright run as a caught mutant, a server that never started included',
+    file: 'scripts/lib/mutate.ts',
+    from: '  if (/^\\s*\\d+ failed\\s*$/m.test(output)) return true',
+    to: '  return true',
+  },
+  {
+    label: 'the mutation runner takes a grep no title holds, so a row runs no test and Playwright exits 1',
+    file: 'scripts/lib/mutate.ts',
+    from: "  if (!readFileSync(path, 'utf8').includes(e2e.grep)) return",
+    to: '  if (false) return',
+  },
+  {
+    label: 'the mutation runner hands Playwright its grep as a regular expression, so a bracket in a title matches nothing',
+    file: 'scripts/lib/mutate.ts',
+    from: "e2e.grep.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')",
+    to: 'e2e.grep',
+  },
+  {
+    label: 'the mutation summary counts a row the runner failed on as survived',
+    file: 'scripts/lib/mutate.ts',
+    from: "const survived = outcomes.filter((o) => o.error === undefined && !o.caught)",
+    to: "const survived = outcomes.filter((o) => !o.caught)",
+  },
 ]
