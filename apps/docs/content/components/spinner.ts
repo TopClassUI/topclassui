@@ -1,5 +1,5 @@
 // The hand-written data of the Spinner page (S7), in both locales.
-export const content = {
+export const spinner = {
   slug: 'spinner',
   title: { en: 'Spinner', ar: 'مؤشر التحميل' },
   description: {
@@ -25,7 +25,7 @@ export const content = {
     ],
   },
   keyboard: [],
-  a11y: {
+  accessibility: {
     en: [
       'Named but silent: an image named by `labels.common.loading`, or your own `aria-label`, with no live region.',
       'Beside text that already names the wait, pass `aria-hidden` so the wait is not read twice.',
@@ -41,5 +41,8 @@ export const content = {
     en: 'The circle turns the same way in both directions: it is never flipped. With the Arabic labels its default name is Arabic too.',
     ar: 'الدائرة تدور في الاتجاه نفسه في الاتجاهين ولا تُعكس أبدًا. ومع التسميات العربية يصبح اسمها الافتراضي عربيًا أيضًا.',
   },
-  related: ['progress', 'skeleton', 'button'],
+  related: {
+    components: ['progress', 'skeleton', 'button'],
+    pages: ['accessibility'],
+  },
 } as const

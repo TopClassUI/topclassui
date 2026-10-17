@@ -1,5 +1,5 @@
 // The hand-written data of the Banner page (S7), in both locales.
-export const content = {
+export const banner = {
   slug: 'banner',
   title: { en: 'Banner', ar: 'شريط إعلان' },
   description: {
@@ -10,7 +10,7 @@ export const content = {
     en: 'Dismissal is remembered per id in this browser, so change the id when the message changes.',
     ar: 'الإخفاء يُحفظ حسب المعرّف في هذا المتصفح، فغيّر المعرّف عندما تتغير الرسالة.',
   },
-  demos: ['basic', 'tones', 'with-action', 'dismissible', 'minimal', 'long-action', 'rtl'],
+  demos: ['basic', 'tones', 'with-action', 'dismissible', 'minimal', 'long-action', 'long-text', 'rtl'],
   stageHeight: 4,
   notes: {
     en: [
@@ -41,7 +41,7 @@ export const content = {
       },
     },
   ],
-  a11y: {
+  accessibility: {
     en: [
       'A banner is a `region` landmark, so it needs a name: pass `aria-label` or `aria-labelledby`. The type refuses a Banner with neither, and two banners on a page need two names.',
       'The x is 24 px, and 44 px on a touch screen. Under forced colours a hovered x draws an outline, and the banner draws an edge in place of its fill.',
@@ -57,5 +57,8 @@ export const content = {
     en: 'The icon sits at the start, the action at the end, and the x at the inline end of whatever line it wraps to, with no physical class to mirror.',
     ar: 'الأيقونة في البداية والإجراء في النهاية، وزر الإغلاق في نهاية السطر الذي يلتف إليه، دون أي صنف فيزيائي يحتاج إلى عكس.',
   },
-  related: ['alert', 'toast', 'navbar'],
+  related: {
+    components: ['alert', 'toast', 'navbar'],
+    pages: ['server-first', 'accessibility'],
+  },
 } as const

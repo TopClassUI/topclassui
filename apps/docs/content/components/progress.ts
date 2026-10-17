@@ -1,5 +1,5 @@
 // The hand-written data of the Progress page (S7), in both locales.
-export const content = {
+export const progress = {
   slug: 'progress',
   title: { en: 'Progress', ar: 'شريط التقدم' },
   description: {
@@ -27,7 +27,7 @@ export const content = {
     ],
   },
   keyboard: [],
-  a11y: {
+  accessibility: {
     en: [
       'A name is required: the type refuses a Progress with neither `aria-label` nor `aria-labelledby`.',
       'It writes `role="progressbar"` with a minimum of 0, a maximum of 100 and the clamped value; an indeterminate bar carries no value at all.',
@@ -43,5 +43,8 @@ export const content = {
     en: 'The bar grows from the inline start: from the right in Arabic, with no class of its own for it.',
     ar: 'الشريط ينمو من بداية السطر: من اليمين في العربية، دون صنف خاص بذلك.',
   },
-  related: ['spinner', 'meter', 'skeleton'],
+  related: {
+    components: ['spinner', 'meter', 'skeleton'],
+    pages: ['accessibility', 'rtl'],
+  },
 } as const

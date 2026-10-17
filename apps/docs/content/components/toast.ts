@@ -1,5 +1,5 @@
 // The hand-written data of the Toast page (S7), in both locales.
-export const content = {
+export const toast = {
   slug: 'toast',
   title: { en: 'Toast', ar: 'إشعار' },
   description: {
@@ -10,7 +10,7 @@ export const content = {
     en: 'TopClassProvider mounts the one viewport, so there is nothing to mount; toast.add works from any browser module, inside React or not.',
     ar: 'TopClassProvider يركّب منطقة العرض الوحيدة، فلا شيء عليك تركيبه؛ وtoast.add يعمل من أي وحدة في المتصفح، داخل React أو خارجه.',
   },
-  demos: ['with-description', 'basic', 'tones', 'with-action', 'promise', 'sticky', 'high-priority', 'many', 'over-dialog', 'rtl'],
+  demos: ['with-description', 'basic', 'tones', 'with-action', 'promise', 'sticky', 'high-priority', 'many', 'over-dialog', 'long-content', 'rtl'],
   stageHeight: 6,
   notes: {
     en: [
@@ -45,7 +45,7 @@ export const content = {
       },
     },
   ],
-  a11y: {
+  accessibility: {
     en: [
       'The viewport is a polite live region named by `labels.toast.region`. `priority="high"` is read at once, as an alert: keep it for what cannot wait.',
       'Every toast ends with an x, and nothing removes it: a swipe is a drag, and a drag needs a second way (WCAG 2.5.7).',
@@ -61,5 +61,8 @@ export const content = {
     en: '`bottom-end`, the default, is the bottom right in English and the bottom left in Arabic, and the sideways swipe follows the edge the toast sits at. An Arabic island on an English page shows its toasts in the page\'s corner, in the page\'s language.',
     ar: 'الموضع الافتراضي `bottom-end` هو أسفل اليمين في الإنجليزية وأسفل اليسار في العربية، والسحب الجانبي يتبع الحافة التي يجلس عندها الإشعار. والجزيرة العربية داخل صفحة إنجليزية تعرض إشعاراتها في زاوية الصفحة وبلغتها.',
   },
-  related: ['alert', 'banner', 'spinner', 'dialog'],
+  related: {
+    components: ['alert', 'banner', 'spinner', 'dialog'],
+    pages: ['provider', 'accessibility', 'rtl'],
+  },
 } as const

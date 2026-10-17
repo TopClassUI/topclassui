@@ -1,5 +1,5 @@
 // The hand-written data of the EmptyState page (S7), in both locales.
-export const content = {
+export const emptyState = {
   slug: 'empty-state',
   title: { en: 'Empty state', ar: 'الحالة الفارغة' },
   description: {
@@ -10,7 +10,7 @@ export const content = {
     en: 'With no props it shows the tray icon and the two labels.state strings; a title of your own drops the default description.',
     ar: 'بلا خصائص يعرض أيقونة الدُّرج ونصّي labels.state؛ وعنوانك الخاص يُسقط الوصف الافتراضي.',
   },
-  demos: ['default', 'with-action', 'filtered', 'failed', 'title-only', 'rtl'],
+  demos: ['default', 'with-action', 'filtered', 'failed', 'title-only', 'long-text', 'rtl'],
   stageDemo: 'default',
   stageHeight: 16,
   notes: {
@@ -28,7 +28,7 @@ export const content = {
     ],
   },
   keyboard: [],
-  a11y: {
+  accessibility: {
     en: [
       'It has no role and no live region: it is page content, read in place.',
       'The title is a paragraph, not a heading, so it adds nothing to the page outline.',
@@ -44,5 +44,8 @@ export const content = {
     en: 'A centred column, so nothing mirrors. With the Arabic labels the default title and description are Arabic.',
     ar: 'عمود في المنتصف، فلا شيء يُعكس. ومع التسميات العربية يصبح العنوان والوصف الافتراضيان عربيين.',
   },
-  related: ['table', 'skeleton', 'spinner'],
+  related: {
+    components: ['table', 'skeleton', 'spinner'],
+    pages: ['server-first', 'accessibility'],
+  },
 } as const

@@ -1,5 +1,5 @@
 // The hand-written data of the Alert page (S7), in both locales.
-export const content = {
+export const alert = {
   slug: 'alert',
   title: { en: 'Alert', ar: 'تنبيه' },
   description: {
@@ -10,7 +10,7 @@ export const content = {
     en: 'Not a live region: it is page content. Pass role="alert" when it appears after load, or announce the event with Toast.',
     ar: 'ليس منطقة حية: إنه جزء من محتوى الصفحة. مرّر role="alert" إذا ظهر بعد التحميل، أو أعلن الحدث بإشعار.',
   },
-  demos: ['basic', 'tones', 'variants', 'with-actions', 'minimal', 'rich-content', 'custom-icon', 'live-region', 'rtl'],
+  demos: ['basic', 'tones', 'variants', 'with-actions', 'minimal', 'rich-content', 'custom-icon', 'live-region', 'long-text', 'rtl'],
   stageHeight: 8,
   notes: {
     en: [
@@ -29,7 +29,7 @@ export const content = {
     ],
   },
   keyboard: [],
-  a11y: {
+  accessibility: {
     en: [
       'Alert has no role: it is page content, read in place, not a live region.',
       'A screen reader does not read out an alert that is already in the first HTML. Pass `role="alert"` only when it is inserted after the page has loaded and must be announced.',
@@ -45,5 +45,8 @@ export const content = {
     en: 'The icon sits at the inline start and the text and actions follow it; every spacing class is logical, so nothing is mirrored by hand.',
     ar: 'الأيقونة في بداية السطر ويتبعها النص والإجراءات؛ كل أصناف المسافات منطقية، فلا شيء يُعكس يدويًا.',
   },
-  related: ['toast', 'banner', 'empty-state'],
+  related: {
+    components: ['toast', 'banner', 'empty-state'],
+    pages: ['accessibility', 'rtl'],
+  },
 } as const
