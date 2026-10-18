@@ -5,7 +5,7 @@ import { urlFor } from './pages.js'
 
 /**
  * Measured, because a class name cannot see it: `flex-wrap`, `truncate` and
- * `rtl:-scale-x-100` were pinned as strings, while nothing proved that a long trail fits
+ * the mirror class were pinned as strings, while nothing proved that a long trail fits
  * a phone, that a label is really cut, or that the caret points the way the trail runs.
  */
 
@@ -134,7 +134,7 @@ function carets() {
 test.describe('the separator points along the trail', () => {
   test('left to right, the caret points right, at the crumb it leads to', async ({ page }) => {
     await page.goto(urlFor('breadcrumb--basic', 'light', 'ltr'))
-    const expected = { scale: 'none', points: 'right', crumbIsOnThe: 'right' }
+    const expected = { scale: '1', points: 'right', crumbIsOnThe: 'right' }
     expect(await page.evaluate(carets)).toEqual([expected, expected])
   })
 

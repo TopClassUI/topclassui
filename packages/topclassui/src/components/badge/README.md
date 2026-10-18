@@ -26,7 +26,7 @@ at the same height while data loads.
 ## Import
 
 ```tsx
-import { Badge } from 'topclassui'
+import { Badge } from 'topclassui/badge'
 ```
 
 ## Props

@@ -21,6 +21,7 @@ describe('the value is an ISO date string or null', () => {
     expectTypeOf<DatePickerProps['open']>().toEqualTypeOf<Base.Root.Props['open']>()
     expectTypeOf<DatePickerProps['defaultOpen']>().toEqualTypeOf<Base.Root.Props['defaultOpen']>()
     expectTypeOf<DatePickerProps['onOpenChange']>().toEqualTypeOf<Base.Root.Props['onOpenChange']>()
+    expectTypeOf<DatePickerProps['onOpenChangeComplete']>().toEqualTypeOf<Base.Root.Props['onOpenChangeComplete']>()
   })
 })
 

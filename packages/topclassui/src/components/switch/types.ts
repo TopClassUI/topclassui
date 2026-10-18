@@ -27,7 +27,7 @@ export type SwitchProps = Omit<Base.Root.Props, Owned>
   & SwitchName
 
 /** The four props the hook holds: the state, its default, the handler and the hidden input. */
-export type SwitchValueProps = Pick<Base.Root.Props, 'checked' | 'defaultChecked' | 'onCheckedChange' | 'inputRef'>
+export type SwitchValueProps = Pick<SwitchProps, 'checked' | 'defaultChecked' | 'onCheckedChange' | 'inputRef'>
 
 /** What Base UI hands a change handler: the reason, the event, and cancel(). */
 export type SwitchChangeDetails = Base.Root.ChangeEventDetails

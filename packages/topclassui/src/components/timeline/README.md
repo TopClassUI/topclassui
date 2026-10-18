@@ -37,7 +37,7 @@ An item is `{ title, time?, status?, tone?, icon? }`, plus any field of your own
 ## Import
 
 ```tsx
-import { Timeline } from 'topclassui'
+import { Timeline } from 'topclassui/timeline'
 ```
 
 ## Props

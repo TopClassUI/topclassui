@@ -15,7 +15,7 @@ const BUTTONS: Record<string, number> = { states: 2 }
 /** What a press of each demo's button writes to the clipboard: its first line, or null where there is no button. */
 const WRITES: Record<string, string | null> = {
   'basic': 'export default async function Page() {',
-  'highlighted': "import { CodeBlock } from 'topclassui'",
+  'highlighted': "import { CodeBlock } from 'topclassui/code-block'",
   'long-line': "const token = 'a1b2c3d4e5",
   'no-copy': null,
   'no-header': null,

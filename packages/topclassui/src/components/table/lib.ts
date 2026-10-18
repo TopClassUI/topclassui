@@ -1,0 +1,14 @@
+import { SORT_ICONS } from './constants.js'
+import type { TableColumn, TableColumns, TableRow, TableSort, TableSortDirection } from './types.js'
+
+/** A JS caller can pass a direction no list holds: the column reads as unsorted, not a crash. */
+export const directionOf = (sort: TableSort | undefined, key: string): TableSortDirection | undefined =>
+  sort?.key === key && Object.hasOwn(SORT_ICONS, sort.direction) ? sort.direction : undefined
+
+/** The entries that are columns, in the order they were written. */
+export function columnsOf<T>(columns: TableColumns<T>): TableColumn<T>[] {
+  return columns.filter((column): column is TableColumn<T> => Boolean(column))
+}
+
+/** A body row's key, which the server made from getKey. */
+export const keyOfRow = (row: TableRow): string => row.key

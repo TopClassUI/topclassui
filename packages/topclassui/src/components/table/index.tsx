@@ -2,22 +2,27 @@
 import { useId } from 'react'
 
 import { Svg } from '#components/svg/index.js'
+import { clamp } from '#shared/clamp.js'
 import { BORDER, FOCUS_RING } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
+import { COLLECTION_BOUNDARIES } from '#shared/contracts/collection.js'
 import { en } from '#shared/labels/en.js'
 import { renderLink } from '#shared/link.js'
 // Named here as well, so a consumer program that never compiles shared/ gets the --tc-* keys.
 import type {} from '#shared/style-tokens.js'
 import {
-  BODY_CELL, BOX, CAPTION, CELL_ALIGN, EMPTY_CELL, EMPTY_WORDS, FOCUS_ROOM, HEADER_CELL, HEADER_LABEL,
-  LINK_ALIGN, ROW_FILL, ROW_HEADER, SORT_LINK, STICKY_BOX, STICKY_CELL,
+  BODY_CELL, BOX, BOX_CAP, CAPTION, CELL_ALIGN, EMPTY_CELL, EMPTY_WORDS, FOCUS_ROOM, HEAD, HEADER_CELL, HEADER_LABEL,
+  LINK_ALIGN, ROW_HEADER, SORT_LINK, STICKY_BOX, STICKY_CELL,
 } from './classes.js'
+import { TableRows } from './client.js'
 import { SORT_ICONS, SORT_LABELS, TABLE_COLUMN_DEFAULTS, TABLE_DEFAULTS } from './constants.js'
 import { columnsOf, directionOf } from './lib.js'
-import type { TableCaption, TableProps } from './types.js'
+import type { TableCaption, TableCellMeta, TableProps } from './types.js'
 
-/** A real table in a box that scrolls sideways. Sorting is a link per header, so it costs
- * no JavaScript: the server answers the link with the rows in their new order. */
+const { visibleRowsMin, visibleRowsMax, loadMoreThresholdMin, loadMoreThresholdMax } = COLLECTION_BOUNDARIES
+
+/** A real table in a box that scrolls both ways under a sticky header. The server runs getKey and every cell; the
+ * body windows them in the browser (R-8.5-1). Sorting is a link per header, answered by the server. */
 export function Table<T, Caption extends TableCaption = TableCaption>({
   items,
   getKey,
@@ -28,6 +33,11 @@ export function Table<T, Caption extends TableCaption = TableCaption>({
   striped = TABLE_DEFAULTS.striped,
   stickyFirstColumn = TABLE_DEFAULTS.stickyFirstColumn,
   emptyFallback,
+  visibleRows,
+  virtualize = TABLE_DEFAULTS.virtualize,
+  loadMoreThreshold = TABLE_DEFAULTS.loadMoreThreshold,
+  hasMore,
+  loadMore,
   link,
   labels = en,
   locale: _locale,
@@ -40,6 +50,15 @@ export function Table<T, Caption extends TableCaption = TableCaption>({
   // No columns is as empty as no items: a row per item with no cell in it shows nothing.
   const empty = items.length === 0 || shown.length === 0
   const sticks = (index: number) => stickyFirstColumn && index === 0
+  const cells = shown.map((column, index): TableCellMeta => ({
+    key: column.key,
+    rowHeader: column.rowHeader === true,
+    className: cn(BODY_CELL, column.rowHeader && ROW_HEADER, CELL_ALIGN[column.align ?? TABLE_COLUMN_DEFAULTS.align], sticks(index) && STICKY_CELL),
+    sticky: sticks(index),
+    own: column.className,
+  }))
+  // Left out, the --tc-list-rows knob applies: React writes no style for an undefined value.
+  const rows = visibleRows === undefined ? undefined : clamp(visibleRows, visibleRowsMin, visibleRowsMax)
 
   // The rest goes first: the role, the name and the tab stop are what keep a scrolling box reachable.
   return (
@@ -52,13 +71,15 @@ export function Table<T, Caption extends TableCaption = TableCaption>({
       data-striped={striped ? '' : undefined}
       data-sticky-first-column={stickyFirstColumn ? '' : undefined}
       data-empty={empty ? '' : undefined}
-      className={cn(BOX, FOCUS_ROOM, BORDER, FOCUS_RING, stickyFirstColumn && STICKY_BOX, className)}
+      style={{ ...rest.style, '--tc-list-rows': rows }}
+      className={cn(BOX, BOX_CAP[captionVisible ? 'visible' : 'hidden'], FOCUS_ROOM, BORDER, FOCUS_RING, stickyFirstColumn && STICKY_BOX, className)}
     >
       {/* border-separate: under border-collapse the table paints the lines, and a sticky cell leaves its own behind. */}
-      <table className="w-full border-separate border-spacing-0">
+      {/* ARIA: -1 while more pages may come, as the count of rows is not known yet. */}
+      <table aria-rowcount={empty ? undefined : hasMore ? -1 : items.length + 1} className="w-full border-separate border-spacing-0">
         <caption id={captionId} className={captionVisible ? CAPTION.visible : CAPTION.hidden}>{caption}</caption>
-        <thead>
-          <tr>
+        <thead className={HEAD}>
+          <tr aria-rowindex={empty ? undefined : 1}>
             {shown.map((column, index) => {
               const align = column.align ?? TABLE_COLUMN_DEFAULTS.align
               const direction = directionOf(sort, column.key)
@@ -93,42 +114,26 @@ export function Table<T, Caption extends TableCaption = TableCaption>({
             })}
           </tr>
         </thead>
-        <tbody>
-          {empty ? (
+        {empty ? (
+          <tbody>
             <tr>
               <td colSpan={Math.max(shown.length, 1)} className={EMPTY_CELL}>
                 <div className={EMPTY_WORDS}>{emptyFallback ?? labels.state.empty}</div>
               </td>
             </tr>
-          ) : items.map((item, row) => {
-            const tinted = striped && row % 2 === 1
-            const fill = tinted ? ROW_FILL.striped : ROW_FILL.plain
-            return (
-              <tr key={getKey(item)} className={tinted ? fill : undefined}>
-                {shown.map((column, index) => {
-                  const Cell = column.rowHeader ? 'th' : 'td'
-                  return (
-                    <Cell
-                      key={column.key}
-                      scope={column.rowHeader ? 'row' : undefined}
-                      className={cn(
-                        BODY_CELL,
-                        column.rowHeader && ROW_HEADER,
-                        CELL_ALIGN[column.align ?? TABLE_COLUMN_DEFAULTS.align],
-                        // Its own fill: a sticky cell with none lets the columns scrolling under it show through.
-                        sticks(index) && STICKY_CELL,
-                        sticks(index) && fill,
-                        column.className,
-                      )}
-                    >
-                      {column.cell(item)}
-                    </Cell>
-                  )
-                })}
-              </tr>
-            )
-          })}
-        </tbody>
+          </tbody>
+        ) : (
+          <TableRows
+            rows={items.map((item) => ({ key: getKey(item), cells: shown.map((column) => column.cell(item)) }))}
+            columns={cells}
+            striped={striped}
+            visibleRows={rows}
+            virtualize={virtualize}
+            hasMore={hasMore}
+            loadMore={loadMore}
+            loadMoreThreshold={clamp(loadMoreThreshold, loadMoreThresholdMin, loadMoreThresholdMax)}
+          />
+        )}
       </table>
     </div>
   )

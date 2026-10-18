@@ -52,7 +52,7 @@ export interface RadioGroupLook {
 }
 
 /** What the hook reads: the state, its default, the handler and the root, and the radios that take the server tab stop. */
-export type RadioGroupValueProps = Pick<BaseRoot, 'value' | 'defaultValue' | 'onValueChange' | 'children' | 'disabled'> & {
+export type RadioGroupValueProps = Pick<RadioGroupRootProps, 'value' | 'defaultValue' | 'onValueChange' | 'children' | 'disabled'> & {
   ref?: Ref<HTMLDivElement> | undefined
 }
 

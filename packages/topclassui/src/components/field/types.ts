@@ -47,7 +47,7 @@ export type FieldProps = Omit<ComponentPropsWithRef<'div'>, Owned>
     error?: FieldError | undefined
     /** The control's id; without it `useId()` makes one. Pass it when a page links to the field. */
     id?: string | undefined
-    /** Called with the control object, which the control spreads: `(control) => <Input {...control} />`. */
+    /** Called with the control object, which the control spreads: `(control) => <Input {...control} />`. Client-only for FieldLive. */
     children: (control: FieldControl) => ReactNode
   }
 

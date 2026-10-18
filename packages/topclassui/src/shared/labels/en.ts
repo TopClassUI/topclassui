@@ -51,6 +51,7 @@ export const en = {
     browse: 'Browse',
     remove: 'Remove',
     tooMany: (n, fmt) => (n === 1 ? 'Only 1 file allowed' : `Only ${fmt.format(n)} files allowed`),
+    refusedMore: (n, fmt) => (n === 1 ? 'and 1 more file refused' : `and ${fmt.format(n)} more files refused`),
     tooLarge: 'Too large',
     wrongType: 'Not an accepted type',
   },

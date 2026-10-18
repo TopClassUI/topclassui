@@ -36,7 +36,7 @@ describe('PopoverPopup passes the rest of its props to the popup (R-5.7-3)', () 
   it('wears its own classes: the width, the two caps, the column, the scroll area and the inset ring', async () => {
     const list = classes((await popup()).element)
     for (const cls of [
-      'w-70', 'max-w-(--available-width)', 'max-h-(--available-height)', 'flex', 'flex-col', 'gap-3', 'p-4', '*:shrink-0',
+      'w-70', 'max-w-[round(down,var(--available-width),1px)]', 'max-h-(--available-height)', 'flex', 'flex-col', 'gap-3', 'p-4', '*:shrink-0',
       'wrap-anywhere', 'overflow-y-auto', 'overscroll-contain', 'rounded-box', 'bg-surface-raised', 'shadow-lg',
       'focus-visible:-outline-offset-(length:--tc-ring-width)',
     ]) expect(list, cls).toContain(cls)
