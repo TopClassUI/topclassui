@@ -1,0 +1,810 @@
+# next-app: the copied tree
+components/button/boundaries.ts  4b900072876a
+components/button/classes.ts  504a928f6608
+components/button/constants.ts  89ccb1d42dbe
+components/button/dummy/as-link.tsx  8bb77316b28e
+components/button/dummy/custom-size.tsx  9b0caf6811f4
+components/button/dummy/full-width.tsx  8c54e92f0b39
+components/button/dummy/long-label.tsx  42882a416d4d
+components/button/dummy/rtl.tsx  98f037d4b5f5
+components/button/dummy/sizes.tsx  8a7e5088189e
+components/button/dummy/skeleton.tsx  ed9eedb88af3
+components/button/dummy/states.tsx  9019a3645541
+components/button/dummy/tones.tsx  f9b5b57e18cd
+components/button/dummy/variants.tsx  c5a4f3f312eb
+components/button/dummy/with-icon.tsx  204b7b16a78d
+components/button/index.tsx  7b85b4826e00
+components/button/schema.ts  6f97e263ea6f
+components/button/skeleton.tsx  acb869d6cc10
+components/button/types.ts  4d790d19e519
+components/button/variants.ts  ec77eabeee0b
+components/dialog/classes.ts  e0e06db161fc
+components/dialog/client.tsx  a985b92f4206
+components/dialog/constants.ts  31f59af76a25
+components/dialog/dummy/basic.tsx  6c1d3739f8b1
+components/dialog/dummy/confirm.tsx  9642dedef3b5
+components/dialog/dummy/long-body.tsx  cf9b3c31efbe
+components/dialog/dummy/long-content.tsx  8702edc7b593
+components/dialog/dummy/no-close-button.tsx  c29c3e21914e
+components/dialog/dummy/non-modal.tsx  d492ef948279
+components/dialog/dummy/rtl.tsx  e72cae528c9a
+components/dialog/dummy/sizes.tsx  94813dbb37c3
+components/dialog/dummy/trap-focus.tsx  b6694b11f20a
+components/dialog/hook.ts  bdc9906f1013
+components/dialog/index.tsx  b8a7a05b303c
+components/dialog/schema.ts  1c80e945de0a
+components/dialog/types.ts  deb92234388c
+components/select/classes.ts  11e76755da1d
+components/select/client.tsx  11f22211dd85
+components/select/constants.ts  39c27146b041
+components/select/dummy/basic.tsx  9dd3a3d4158b
+components/select/dummy/form.tsx  9b8024353d8d
+components/select/dummy/four-rows.tsx  31eea2abee3c
+components/select/dummy/long-content.tsx  f0008342f0b2
+components/select/dummy/rtl.tsx  8fbe331778e7
+components/select/dummy/sixty-items.tsx  77e331d56e4b
+components/select/dummy/sizes.tsx  3fdf04a1a943
+components/select/dummy/states.tsx  9ea233ed5335
+components/select/hook.ts  61e5c33f6278
+components/select/index.tsx  868fe09ae951
+components/select/lib.ts  0b340b3c1dfd
+components/select/schema.ts  5875ca7c4258
+components/select/types.ts  fbc10b83e616
+components/svg/index.tsx  3514a90657b9
+components/svg/types.ts  421e3ef8a60e
+components/toast/boundaries.ts  b37fcce899bc
+components/toast/classes.ts  b205f9d71c76
+components/toast/client.tsx  887adaa4a24a
+components/toast/constants.ts  0472a018a44a
+components/toast/dummy/basic.tsx  a42a181b767b
+components/toast/dummy/high-priority.tsx  3368c84d08bf
+components/toast/dummy/long-content.tsx  05141b5693a0
+components/toast/dummy/many.tsx  9a0b9ad778e3
+components/toast/dummy/over-dialog.tsx  2d9e75e85dca
+components/toast/dummy/promise.tsx  d69abe119fc8
+components/toast/dummy/rtl.tsx  3b53436238c3
+components/toast/dummy/sticky.tsx  290de6d3d020
+components/toast/dummy/tones.tsx  843a68cb5389
+components/toast/dummy/with-action.tsx  95a0e3776099
+components/toast/dummy/with-description.tsx  fdd4d2bbd262
+components/toast/hook.ts  72e58a72f09a
+components/toast/index.tsx  a5919d63b8b9
+components/toast/lib.ts  a575a93db718
+components/toast/schema.ts  869e99757f9b
+components/toast/types.ts  2ae76450ab31
+icons/data/arrow-right.ts  d67ac346403c
+icons/data/caret-down.ts  f3bef6ce0c56
+icons/data/check-circle.ts  f92cd7a67d51
+icons/data/check.ts  ccd3d5cba890
+icons/data/info.ts  f3890305195e
+icons/data/spinner.ts  f88ce50b490f
+icons/data/warning-circle.ts  ec73f7eb735f
+icons/data/warning.ts  86d00a38a890
+icons/data/x.ts  5c80cfbdedb1
+icons/directional.generated.ts  981e391a7782
+icons/index.ts  b8744a634965
+icons/names.generated.ts  6e75fbfcbedd
+icons/types.ts  665dcdb1986a
+icons/version.generated.ts  83f89f52f392
+shared/adaptive/create-adaptive.tsx  fdd65fc2ada8
+shared/adaptive/use-adaptive-mode.ts  146507fafb88
+shared/clamp.ts  8b3357d9b629
+shared/classes.ts  2e36759fcf77
+shared/cn.ts  4a507659c948
+shared/collection/use-collection.ts  31fc141393f1
+shared/collection/window.ts  9413500304ac
+shared/contracts/boundaries.ts  994e1c4698ae
+shared/contracts/collection.ts  6de20d98af91
+shared/contracts/menu.ts  a6eae4b439c6
+shared/contracts/name.ts  8fe01c9d5d4c
+shared/contracts/option.ts  57dd97bed5dd
+shared/contracts/size.schema.ts  be807d3806a7
+shared/contracts/size.ts  17a08d728121
+shared/contracts/state.ts  8f39e25fa2ff
+shared/contracts/toast.schema.ts  d97a33f73a3f
+shared/contracts/toast.ts  993c3b9b6432
+shared/contracts/tone.ts  1f5cec0766d3
+shared/floating.ts  962b169a7b0b
+shared/form-errors.ts  976865bbbfcc
+shared/labels/ar.ts  ac3552b5142a
+shared/labels/en.ts  f1746707c6c2
+shared/labels/get-labels.ts  4507cefd9c4f
+shared/labels/types.ts  f8900290dfbb
+shared/link.tsx  533ea6fb7b33
+shared/overlay-scope.ts  0cf8ef4c9101
+shared/overlay.ts  5fbd5963f4ca
+shared/provider/context.ts  75c127b04cfc
+shared/provider/provider.tsx  9bf2f76f7dc1
+shared/provider/use-portal-locale.ts  fd4ee65b0c75
+shared/render-trigger.ts  4752ce629ec1
+shared/render.ts  25b333500f9a
+shared/style-tokens.ts  c01e8d1ce97d
+shared/theme/script.ts  e0a8a401b2df
+shared/theme/theme-script.tsx  4fbb364a0a0e
+shared/toast/manager.ts  91fe953395d8
+shared/truncate-label.tsx  c6f1bd58465f
+shared/use-controllable-state.ts  af0e97de7065
+shared/use-form-value.ts  be3abdc2985f
+shared/use-scroll-tab-stop.ts  f09ca0b220d6
+shared/use-server-tab-stop.ts  2da8fb70c356
+shared/variants.ts  778d6eff0e54
+styles.css  <hash>
+tokens.css  8c65e5933637
+# src/app/globals.css
+@import "tailwindcss";
+@import "../topclassui/tokens.css";
+@import "../topclassui/styles.css";
+
+body {
+  margin: 0;
+}
+
+# topclassui.json
+{
+  "version": 1,
+  "framework": "next-app",
+  "css": "src/app/globals.css",
+  "dir": "src/topclassui",
+  "imports": "relative",
+  "packageManager": "npm",
+  "lock": {
+    "registry": "<library version>",
+    "files": {
+      "components/button/boundaries.ts": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/button/classes.ts": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/button/constants.ts": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/button/dummy/as-link.tsx": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/button/dummy/custom-size.tsx": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/button/dummy/full-width.tsx": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/button/dummy/long-label.tsx": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/button/dummy/rtl.tsx": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/button/dummy/sizes.tsx": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/button/dummy/skeleton.tsx": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/button/dummy/states.tsx": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/button/dummy/tones.tsx": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/button/dummy/variants.tsx": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/button/dummy/with-icon.tsx": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/button/index.tsx": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/button/schema.ts": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/button/skeleton.tsx": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/button/types.ts": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/button/variants.ts": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/dialog/classes.ts": {
+        "from": "dialog",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/dialog/client.tsx": {
+        "from": "dialog",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/dialog/constants.ts": {
+        "from": "dialog",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/dialog/dummy/basic.tsx": {
+        "from": "dialog",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/dialog/dummy/confirm.tsx": {
+        "from": "dialog",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/dialog/dummy/long-body.tsx": {
+        "from": "dialog",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/dialog/dummy/long-content.tsx": {
+        "from": "dialog",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/dialog/dummy/no-close-button.tsx": {
+        "from": "dialog",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/dialog/dummy/non-modal.tsx": {
+        "from": "dialog",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/dialog/dummy/rtl.tsx": {
+        "from": "dialog",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/dialog/dummy/sizes.tsx": {
+        "from": "dialog",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/dialog/dummy/trap-focus.tsx": {
+        "from": "dialog",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/dialog/hook.ts": {
+        "from": "dialog",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/dialog/index.tsx": {
+        "from": "dialog",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/dialog/schema.ts": {
+        "from": "dialog",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/dialog/types.ts": {
+        "from": "dialog",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/select/classes.ts": {
+        "from": "select",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/select/client.tsx": {
+        "from": "select",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/select/constants.ts": {
+        "from": "select",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/select/dummy/basic.tsx": {
+        "from": "select",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/select/dummy/form.tsx": {
+        "from": "select",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/select/dummy/four-rows.tsx": {
+        "from": "select",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/select/dummy/long-content.tsx": {
+        "from": "select",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/select/dummy/rtl.tsx": {
+        "from": "select",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/select/dummy/sixty-items.tsx": {
+        "from": "select",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/select/dummy/sizes.tsx": {
+        "from": "select",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/select/dummy/states.tsx": {
+        "from": "select",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/select/hook.ts": {
+        "from": "select",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/select/index.tsx": {
+        "from": "select",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/select/lib.ts": {
+        "from": "select",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/select/schema.ts": {
+        "from": "select",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/select/types.ts": {
+        "from": "select",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/svg/index.tsx": {
+        "from": "svg",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/svg/types.ts": {
+        "from": "svg",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/toast/boundaries.ts": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/toast/classes.ts": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/toast/client.tsx": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/toast/constants.ts": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/toast/dummy/basic.tsx": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/toast/dummy/high-priority.tsx": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/toast/dummy/long-content.tsx": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/toast/dummy/many.tsx": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/toast/dummy/over-dialog.tsx": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/toast/dummy/promise.tsx": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/toast/dummy/rtl.tsx": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/toast/dummy/sticky.tsx": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/toast/dummy/tones.tsx": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/toast/dummy/with-action.tsx": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/toast/dummy/with-description.tsx": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/toast/hook.ts": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/toast/index.tsx": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/toast/lib.ts": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/toast/schema.ts": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/toast/types.ts": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "icons/data/arrow-right.ts": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "icons/data/caret-down.ts": {
+        "from": "select",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "icons/data/check-circle.ts": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "icons/data/check.ts": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "icons/data/info.ts": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "icons/data/spinner.ts": {
+        "from": "button",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "icons/data/warning-circle.ts": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "icons/data/warning.ts": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "icons/data/x.ts": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "icons/directional.generated.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "icons/index.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "icons/names.generated.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "icons/types.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "icons/version.generated.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/adaptive/create-adaptive.tsx": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/adaptive/use-adaptive-mode.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/clamp.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/classes.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/cn.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/collection/use-collection.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/collection/window.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/contracts/boundaries.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/contracts/collection.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/contracts/menu.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/contracts/name.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/contracts/option.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/contracts/size.schema.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/contracts/size.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/contracts/state.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/contracts/toast.schema.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/contracts/toast.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/contracts/tone.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/floating.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/form-errors.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/labels/ar.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/labels/en.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/labels/get-labels.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/labels/types.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/link.tsx": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/overlay-scope.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/overlay.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/provider/context.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/provider/provider.tsx": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/provider/use-portal-locale.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/render-trigger.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/render.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/style-tokens.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/theme/script.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/theme/theme-script.tsx": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/toast/manager.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/truncate-label.tsx": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/use-controllable-state.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/use-form-value.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/use-scroll-tab-stop.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/use-server-tab-stop.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/variants.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "styles.css": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "tokens.css": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      }
+    }
+  }
+}

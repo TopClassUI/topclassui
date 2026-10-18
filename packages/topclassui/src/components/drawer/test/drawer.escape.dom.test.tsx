@@ -40,9 +40,12 @@ async function hover(element: HTMLElement) {
   await waitFor(() => { expect(tooltip()?.textContent).toBe('Copy link') })
 }
 
+/** Waits for the first focus, on the tooltip's trigger, then moves it to Done, where no focus opens the tooltip. */
 async function ready() {
   const popup = await screen.findByRole('dialog')
-  await waitFor(() => { expect(popup.contains(document.activeElement)).toBe(true) })
+  await waitFor(() => { expect(document.activeElement).toBe(tip()) })
+  act(() => { screen.getByRole('button', { name: 'Done' }).focus() })
+  await waitFor(() => { expect(tooltip()).toBeNull() })
   return popup
 }
 

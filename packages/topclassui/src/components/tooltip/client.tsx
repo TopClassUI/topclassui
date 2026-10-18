@@ -4,20 +4,29 @@ import { Tooltip as Base } from '@base-ui/react/tooltip'
 
 import { clamp } from '#shared/clamp.js'
 import { cn } from '#shared/cn.js'
-import { POPUP_BOUNDS, toSideAlign } from '#shared/floating.js'
+import { FLOATING, toSideAlign } from '#shared/floating.js'
 import { renderTrigger } from '#shared/render-trigger.js'
 import { TOOLTIP_BOUNDARIES } from './boundaries.js'
 import { TOOLTIP_ARROW, TOOLTIP_POPUP, TOOLTIP_POSITIONER } from './classes.js'
 import { TOOLTIP_ARROW_HEIGHT, TOOLTIP_COLLISION_AVOIDANCE, TOOLTIP_DEFAULTS } from './constants.js'
-import { useTooltipPopup } from './hook.js'
-import type { TooltipPopupProps, TooltipRootProps, TooltipTriggerProps } from './types.js'
+import { useTooltipPopup, useTooltipRoot, useTooltipTriggerElement } from './hook.js'
+import type { TooltipPopupProps, TooltipRootProps, TooltipTriggerElementProps, TooltipTriggerProps } from './types.js'
 
 const { delayMin, delayMax } = TOOLTIP_BOUNDARIES
 
 /** Groups one trigger with its popup. It renders no element, so it takes no className,
  * style or ref, and Base UI holds the open state. */
 export function TooltipRoot<Payload>(props: TooltipRootProps<Payload>) {
-  return <Base.Root {...props} />
+  const { value, Context } = useTooltipRoot()
+  return (
+    <Context value={value}>
+      <Base.Root {...props} />
+    </Context>
+  )
+}
+
+function TooltipTriggerElement(props: TooltipTriggerElementProps) {
+  return useTooltipTriggerElement(props)
 }
 
 /** Base UI's trigger, styled by nothing of its own: pass the control as render. A delay
@@ -33,7 +42,8 @@ export function TooltipTrigger<Payload>({
   return (
     <Base.Trigger
       {...rest}
-      render={trigger.render}
+      // R-5.6-1: Base UI 1.8.0 links no description, so the element names the open popup itself.
+      render={(props, state) => <TooltipTriggerElement render={trigger.render} props={props} state={state} />}
       delay={delay === undefined ? undefined : clamp(delay, delayMin, delayMax)}
       closeDelay={closeDelay === undefined ? undefined : clamp(closeDelay, delayMin, delayMax)}
       className={trigger.className}
@@ -50,7 +60,7 @@ export function TooltipPopup({
   ...rest
 }: TooltipPopupProps) {
   const { side, align } = toSideAlign(placement)
-  const { dir, lang } = useTooltipPopup()
+  const { dir, lang, id } = useTooltipPopup(rest.id)
   return (
     <Base.Portal>
       <Base.Positioner
@@ -58,12 +68,12 @@ export function TooltipPopup({
         lang={lang}
         side={side}
         align={align}
-        sideOffset={POPUP_BOUNDS.sideOffset + TOOLTIP_ARROW_HEIGHT}
-        collisionPadding={POPUP_BOUNDS.collisionPadding}
+        sideOffset={FLOATING.sideOffset + TOOLTIP_ARROW_HEIGHT}
+        collisionPadding={FLOATING.collisionPadding}
         collisionAvoidance={TOOLTIP_COLLISION_AVOIDANCE}
         className={TOOLTIP_POSITIONER}
       >
-        <Base.Popup data-placement={placement} {...rest} className={cn(TOOLTIP_POPUP, className)}>
+        <Base.Popup data-placement={placement} {...rest} id={id} role="tooltip" className={cn(TOOLTIP_POPUP, className)}>
           {children}
           <Base.Arrow className={TOOLTIP_ARROW} />
         </Base.Popup>

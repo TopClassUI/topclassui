@@ -11,12 +11,12 @@ import type { DialogBodyProps, DialogModal, DialogRootProps } from './types.js'
 
 /** How modal the nearest DialogRoot is. The root provides it, because Base UI tells the popup
  * nothing: only a dialog that blocks the page may dim it and catch its presses. */
-export const DialogModalContext = createContext(DIALOG_DEFAULTS.modal as DialogModal)
+const DialogModalContext = createContext(DIALOG_DEFAULTS.modal as DialogModal)
 
 /** What DialogRoot hands on: its scope, and the Escape guard that looks inside its own popup only,
  * so a dialog nested in another still closes once focus is back on its trigger. */
 export function useDialogRoot(onOpenChange: DialogRootProps['onOpenChange']) {
-  return useOverlayRoot(onOpenChange)
+  return { ...useOverlayRoot(onOpenChange), Context: DialogModalContext }
 }
 
 /** What DialogPopup reads: the dir and the lang of the provider, which its portal in the body

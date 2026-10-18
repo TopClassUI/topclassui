@@ -260,9 +260,9 @@ a minute, the same failure found at step 11 is an hour.
    scaffold writes a `variant`, `tone` and `size` trio that most of Unit 1 does not need.
 3. **The folder contract gained three files since Button.** `boundaries.ts` holds the
    bounds and nothing else (`R-8.3-6`), `classes.ts` holds this component's class tables
-   (`R-5.12-4`), and `lib.tsx` is where a pure helper that returns JSX lives, because
-   `lib.ts` may not import React. `pnpm new:component` writes the first two; add `lib.tsx`
-   by hand when a helper returns JSX, as the `truncateLabel` of Badge does.
+   (`R-5.12-4`), and `lib.ts` holds pure helpers and may not import React: markup that
+   both halves draw is a part in `parts/` with no directive, never a `lib.tsx` (there is
+   none; 2026-10-17 entry in DECISIONS). `pnpm new:component` writes the first two.
 4. **Check the installed types before using any API** (`R-0-1`). Open
    `node_modules/@base-ui/react/<part>/` and read the `.d.ts`. Never guess a prop name.
    Anything that differs from what you expected goes in the pull request under Decisions.

@@ -12,7 +12,7 @@ const DECLARATION: Record<string, string> = {
   'flex': 'display: flex;',
   'flex-col': 'flex-direction: column;',
   'w-70': 'width: calc(var(--spacing) * 70);',
-  'max-w-(--available-width)': 'max-width: var(--available-width);',
+  'max-w-[round(down,var(--available-width),1px)]': 'max-width: round(down, var(--available-width), 1px);',
   'max-h-(--available-height)': 'max-height: var(--available-height);',
   'gap-3': 'gap: calc(var(--spacing) * 3);',
   'p-4': 'padding: calc(var(--spacing) * 4);',

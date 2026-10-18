@@ -30,7 +30,7 @@ export type NumberFieldProps = Omit<Base.Root.Props, Owned>
   & NumberFieldName
 
 /** What the hook holds and resolves: the value and its handler, the hidden input, the bounds, and the locale. */
-export type NumberFieldValueProps = Pick<Base.Root.Props, 'value' | 'defaultValue' | 'onValueChange' | 'inputRef' | 'allowOutOfRange' | 'locale' | 'format'>
+export type NumberFieldValueProps = Pick<NumberFieldProps, 'value' | 'defaultValue' | 'onValueChange' | 'inputRef' | 'allowOutOfRange' | 'locale' | 'format'>
   & Pick<NumberFieldDesignProps, 'min' | 'max' | 'step'>
 
 /** What Base UI hands a change handler: the reason, the event, and cancel(). */
@@ -38,3 +38,10 @@ export type NumberFieldChangeDetails = Base.Root.ChangeEventDetails
 
 /** A paste into the visible input, named here: hook.ts writes no type argument in angle brackets. */
 export type NumberFieldPasteEvent = ClipboardEvent<HTMLInputElement>
+
+/** The resolved `min`, `max` and `step`; an absent bound stays absent. */
+export interface NumberFieldLimits {
+  min: number | undefined
+  max: number | undefined
+  step: number | 'any'
+}

@@ -30,13 +30,19 @@ describe('the value is a string or null, never Base UI\'s any', () => {
 })
 
 describe('the props Select adds come from the schema', () => {
-  it('are size, invalid, fullWidth, placement and visibleRows, all optional', () => {
-    expectTypeOf<keyof SelectDesignProps>().toEqualTypeOf<'size' | 'invalid' | 'fullWidth' | 'placement' | 'visibleRows'>()
+  it('are size, invalid, fullWidth, placement, visibleRows and loadMoreThreshold, all optional', () => {
+    expectTypeOf<keyof SelectDesignProps>().toEqualTypeOf<'size' | 'invalid' | 'fullWidth' | 'placement' | 'visibleRows' | 'loadMoreThreshold'>()
     expectTypeOf<SelectProps['size']>().toEqualTypeOf<Sizes | undefined>()
     expectTypeOf<SelectProps['placement']>().toEqualTypeOf<SelectPlacement | undefined>()
     expectTypeOf<SelectProps['visibleRows']>().toEqualTypeOf<number | undefined>()
     expectTypeOf<SelectProps['invalid']>().toEqualTypeOf<boolean | undefined>()
     expectTypeOf<SelectProps['fullWidth']>().toEqualTypeOf<boolean | undefined>()
+    expectTypeOf<SelectProps['loadMoreThreshold']>().toEqualTypeOf<number | undefined>()
+  })
+
+  it('pages on scroll through the shared contract: hasMore and loadMore (R-8.5-1)', () => {
+    expectTypeOf<SelectProps['hasMore']>().toEqualTypeOf<boolean | undefined>()
+    expectTypeOf<SelectProps['loadMore']>().toEqualTypeOf<(() => void | Promise<void>) | undefined>()
   })
 
   it('the placeholder is text, and the container is the Portal\'s', () => {

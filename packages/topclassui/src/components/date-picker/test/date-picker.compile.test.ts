@@ -4,6 +4,8 @@ import { join } from 'node:path'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 
+import { importsFromRepo } from '#test/samples.js'
+
 const ROOT = process.cwd()
 const FOLDER = join(ROOT, 'src', 'components', 'date-picker')
 
@@ -21,7 +23,7 @@ const PRELUDE = [
 /** The import lines compile as ones that use what they import, and any other sample as JSX, the way a page would paste it. */
 function wrap(code: string): string {
   if (code.startsWith('import ')) {
-    return `${code.replace("'topclassui'", "'../index.js'").replace("'topclassui/field'", "'../../field/index.js'")}\nexport const imported = [DatePicker]\n`
+    return `${importsFromRepo(code)}\nexport const imported = [DatePicker]\n`
   }
   return `${PRELUDE}\nexport const sample = (\n<>\n${code}\n</>\n)\n`
 }
@@ -89,7 +91,7 @@ const verdict = compile({
 describe('the samples in the README compile as written', () => {
   it('finds the import line and the two samples, so an empty extraction cannot pass', () => {
     expect(SAMPLES).toHaveLength(3)
-    expect(SAMPLES[0]).toContain("import { DatePicker } from 'topclassui'")
+    expect(SAMPLES[0]).toContain("import { DatePicker } from 'topclassui/date-picker'")
     expect(SAMPLES[1]).toContain('<DatePicker id="check-in" name="checkIn"')
     expect(SAMPLES[2]).toContain('<DatePicker')
     expect(SAMPLES[2]).toContain('{...control}')

@@ -12,13 +12,14 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'four-rows', 'long-content', 'phase-4-form', 'playground', 'rtl', 'sixty-items', 'sizes', 'states']
+const EXPECTED = ['basic', 'form', 'four-rows', 'load-more', 'long-content', 'phase-4-form', 'playground', 'rtl', 'sixty-items', 'sizes', 'states']
 
 /** Each Select of each demo as the server writes it: its name, then what its trigger shows. */
 const SELECTS: Record<string, string[]> = {
   'basic': ['Country: Jordan'],
   'form': ['Country: Jordan'],
   'four-rows': ['Month: March'],
+  'load-more': ['Search results: Select'],
   'long-content': ['Office: Department of Regional Planning'],
   'phase-4-form': ['Country: Jordan'],
   'playground': ['Country: Jordan'],
@@ -63,8 +64,8 @@ describe('what a demo must not write by hand', () => {
     expect(sources.filter(([, source]) => /tabIndex|render=|getKey|=\{\(/.test(source)).map(([file]) => file)).toEqual([])
   })
 
-  it('no demo is a client file: a Select takes only data', () => {
-    expect(sources.filter(([, source]) => source.startsWith("'use client'")).map(([file]) => file)).toEqual([])
+  it('no demo is a client file but the paging one, which holds its pages: a Select takes only data and a Server Action', () => {
+    expect(sources.filter(([, source]) => source.startsWith("'use client'")).map(([file]) => file)).toEqual(['load-more'])
   })
 })
 

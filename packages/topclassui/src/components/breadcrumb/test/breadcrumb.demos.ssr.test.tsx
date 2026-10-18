@@ -89,6 +89,6 @@ describe('each demo shows what its name says', () => {
     expect(out).toMatch(/^<div dir="rtl" lang="ar">/)
     expect(out).not.toContain('aria-label="Breadcrumb"')
     expect(out).toMatch(/<nav aria-label="[^"A-Za-z]+"/)
-    expect(count(out, 'rtl:-scale-x-100')).toBe(2)
+    expect(count(out, 'scale-x-(--tc-dir)')).toBe(2)
   })
 })

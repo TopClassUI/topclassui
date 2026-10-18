@@ -25,7 +25,7 @@ key is an `<Svg>` at its `1em` default, so it follows the key's own text.
 ## Import
 
 ```tsx
-import { Kbd } from 'topclassui'
+import { Kbd } from 'topclassui/kbd'
 ```
 
 ## Props

@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react'
 
 import { Button } from '#components/button/index.js'
-import { Tag } from '../index.js'
+import { TagRemovable } from '../index.js'
 
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const NAMES = { xs: 'Extra small', sm: 'Small', md: 'Medium', lg: 'Large', xl: 'Extra large' } as const
@@ -16,9 +16,9 @@ export default function Demo() {
     <div className="flex flex-col items-start gap-3">
       <div className="flex flex-wrap items-center gap-3">
         {SIZES.filter((size) => shown.includes(size)).map((size) => (
-          <Tag key={size} size={size} tone="info" onRemove={() => { setShown(shown.filter((other) => other !== size)); back.current?.focus() }}>
+          <TagRemovable key={size} size={size} tone="info" onRemove={() => { setShown(shown.filter((other) => other !== size)); back.current?.focus() }}>
             {NAMES[size]}
-          </Tag>
+          </TagRemovable>
         ))}
       </div>
       <Button ref={back} variant="outline" size="sm" onClick={() => { setShown(SIZES) }}>Show every size</Button>

@@ -2,8 +2,7 @@
 import { clamp } from '#shared/clamp.js'
 import { METER_BOUNDARIES } from './boundaries.js'
 import { METER_DEFAULTS } from './constants.js'
-
-export interface MeterRange { min: number; max: number; value: number }
+import type { MeterRange } from './types.js'
 
 /** One end inside the guard rail. clamp() turns NaN into the rail's own -1e15, so a NaN end takes its default. */
 function bound(end: number, fallback: number): number {

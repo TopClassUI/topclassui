@@ -12,7 +12,7 @@ For one setting that takes effect as it is turned on or off. For a choice the fo
 later, a Checkbox reads better. It is one element: Base UI's switch, as a native button.
 
 ```tsx
-import { Switch } from 'topclassui'
+import { Switch } from 'topclassui/switch'
 ```
 
 ```tsx
@@ -90,7 +90,7 @@ state, a skeleton (use `Skeleton`).
 ## Import
 
 ```tsx
-import { Switch } from 'topclassui'
+import { Switch } from 'topclassui/switch'
 ```
 
 ## Props

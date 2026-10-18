@@ -6,7 +6,7 @@ import { createRoot } from 'react-dom/client'
 
 import { TopClassProvider } from '#shared/provider/provider.js'
 import { Button } from '#components/button/index.js'
-import { Banner } from '#components/banner/index.js'
+import { Banner, BannerDismissible } from '#components/banner/index.js'
 
 const direction = document.documentElement.dir === 'rtl' ? 'rtl' : 'ltr'
 const WORD = 'W'.repeat(300)
@@ -34,7 +34,7 @@ function Fixture() {
     <TopClassProvider direction={direction} locale={direction === 'rtl' ? 'ar' : 'en'}>
       <div id="banner-fixture" ref={root}>
         <section id="counted" style={SECTION}>
-          <Banner dismissible id="fixture-counted" aria-label="Counted" onDismiss={counted}>Version 2 is out.</Banner>
+          <BannerDismissible id="fixture-counted" aria-label="Counted" onDismiss={counted}>Version 2 is out.</BannerDismissible>
           <output id="dismiss-count" data-count="0" />
         </section>
         <section id="hostile" style={SECTION}>

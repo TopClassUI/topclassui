@@ -112,10 +112,10 @@ describe('hook.ts holds the value of the switch (R-5.12-1)', () => {
     expect(source.startsWith("'use client'\n")).toBe(true)
   })
 
-  it('builds on the shared form value, and takes only useImperativeHandle from React', () => {
-    expect(importedModules(source)).toEqual(['react', '#shared/use-form-value.js', './constants.js', './types.js'])
+  it('builds on the provider check and the shared form value, and takes only useImperativeHandle from React', () => {
+    expect(importedModules(source)).toEqual(['react', '#shared/provider/context.js', '#shared/use-form-value.js', './constants.js', './types.js'])
     expect(importedNames(source, 'react')).toEqual(['useImperativeHandle'])
-    expect(hooksByPart(source)).toEqual({ syncChecked: [], useSwitch: ['useFormValue', 'useImperativeHandle'] })
+    expect(hooksByPart(source)).toEqual({ syncChecked: [], useSwitch: ['useProviderPresence', 'useFormValue', 'useImperativeHandle'] })
   })
 
   // check-boundaries reads a `<Letter` in hook.ts as JSX.

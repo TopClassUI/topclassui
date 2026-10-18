@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { createRef, useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { Rating } from '../index.js'
+import { Rating, RatingInput } from '../index.js'
 
 /** How much of each star is drawn, first to last, from the width class of its clip. */
 const fills = (root: Element) => [...root.querySelectorAll('label > span')].map((star) => {
@@ -45,7 +45,7 @@ describe('the editing half is a native radio group', () => {
 
   it('a click checks the step and calls onValueChange once with it; the checked step again calls nothing', async () => {
     const onValueChange = vi.fn()
-    render(<Rating readOnly={false} aria-label="Stay" onValueChange={onValueChange} />)
+    render(<RatingInput aria-label="Stay" onValueChange={onValueChange} />)
     await userEvent.click(radios()[3] as HTMLInputElement)
     expect(onValueChange.mock.calls).toEqual([[4]])
     await userEvent.click(radios()[3] as HTMLInputElement)
@@ -59,7 +59,7 @@ describe('the editing half is a native radio group', () => {
       const [value, setValue] = useState(1)
       return (
         <>
-          <Rating readOnly={false} aria-label="Stay" value={value} onValueChange={setValue} />
+          <RatingInput aria-label="Stay" value={value} onValueChange={setValue} />
           <button type="button" onClick={() => { setValue(5) }}>All</button>
         </>
       )
@@ -136,7 +136,7 @@ describe('in a form', () => {
 
   it('a reset returns to the step it started on, and says so once', async () => {
     const onValueChange = vi.fn()
-    render(<form aria-label="Review"><Rating readOnly={false} aria-label="Stay" name="stay" defaultValue={4} onValueChange={onValueChange} /></form>)
+    render(<form aria-label="Review"><RatingInput aria-label="Stay" name="stay" defaultValue={4} onValueChange={onValueChange} /></form>)
     await userEvent.click(radios()[0] as HTMLInputElement)
     expect(checkedStep()).toBe(1)
     act(() => { (screen.getByRole<HTMLFormElement>('form')).reset() })
