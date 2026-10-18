@@ -32,7 +32,7 @@ of its parent, so it stays visible in Windows high contrast.
 ## Import
 
 ```tsx
-import { Spinner } from 'topclassui'
+import { Spinner } from 'topclassui/spinner'
 ```
 
 ## Props
