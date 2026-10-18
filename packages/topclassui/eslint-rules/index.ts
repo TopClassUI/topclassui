@@ -772,6 +772,80 @@ const rules = {
       }
     },
   },
+  'no-fetch-in-components': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-8.5-2: components never fetch, cache or paginate; the app owns the data.' },
+      schema: [
+        {
+          type: 'object',
+          properties: { allow: { type: 'array', items: { type: 'string' } } },
+          additionalProperties: false,
+        },
+      ],
+      messages: {
+        data:
+          'R-8.5-2: {{what}} makes the component own data. The app fetches, caches and pages; '
+          + 'take the data as props and call loadMore().',
+      },
+    },
+    create(ctx: Context) {
+      const file = String(ctx.filename ?? ctx.getFilename()).replace(/\\/g, '/')
+      if (!/(^|\/)src\/(components|connectors|shared)\//.test(file)) return {}
+      const allow = new Set((ctx.options?.[0]?.allow ?? []) as string[])
+      const GLOBALS = new Set(['XMLHttpRequest', 'localStorage', 'sessionStorage', 'indexedDB', 'caches', 'unstable_cache'])
+      const HOSTS = new Set(['window', 'globalThis', 'self'])
+
+      const report = (node: Node, name: string, what = name) => {
+        if (!allow.has(name)) ctx.report({ node, messageId: 'data', data: { what } })
+      }
+      /** A property key or a non-computed member name is not a reference to the global. */
+      const isReference = (node: Node) => {
+        const p = node.parent
+        if (p?.type === 'MemberExpression' && p.property === node && !p.computed) return false
+        if ((p?.type === 'Property' || p?.type === 'MethodDefinition' || p?.type === 'PropertyDefinition') && p.key === node && !p.computed) return false
+        if (p?.type === 'TSPropertySignature' && p.key === node) return false
+        return !/^Import|^Export/.test(String(p?.type))
+      }
+      const calleeName = (callee: Node): string | undefined => {
+        if (callee?.type === 'Identifier') return callee.name
+        if (callee?.type === 'MemberExpression' && !callee.computed && HOSTS.has(callee.object?.name)) return callee.property?.name
+        return undefined
+      }
+
+      return {
+        ImportDeclaration(node: Node) {
+          const source = node.source?.value
+          if (source === 'next/cache') report(node, 'next/cache', '"next/cache"')
+          if (source !== 'react') return
+          for (const s of node.specifiers ?? []) {
+            if (s.type === 'ImportSpecifier' && (s.imported?.name ?? s.imported?.value) === 'cache') {
+              report(s, 'cache', "React's cache()")
+            }
+          }
+        },
+        Identifier(node: Node) {
+          if (GLOBALS.has(node.name) && isReference(node)) report(node, node.name)
+        },
+        MemberExpression(node: Node) {
+          const name = node.property?.name
+          if (node.computed || !HOSTS.has(node.object?.name) || !GLOBALS.has(name)) return
+          report(node.property, name, `${node.object.name}.${name}`)
+        },
+        CallExpression(node: Node) {
+          const name = calleeName(node.callee)
+          if (name === 'fetch') report(node, 'fetch', 'fetch()')
+          const c = node.callee
+          if (c?.type === 'MemberExpression' && c.object?.name === 'React' && c.property?.name === 'cache') {
+            report(node, 'cache', "React's cache()")
+          }
+        },
+        NewExpression(node: Node) {
+          if (calleeName(node.callee) === 'Request') report(node, 'Request', 'new Request()')
+        },
+      }
+    },
+  },
 }
 
 export default { rules } satisfies ESLint.Plugin

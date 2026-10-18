@@ -10,7 +10,7 @@ Each rule has an id, one line of rule, one line of reason, and what enforces it.
 
 ```
 pnpm check            every gate below, in order
-pnpm lint             eslint, including the fifteen custom rules
+pnpm lint             eslint, including the sixteen custom rules
 pnpm typecheck        tsc --noEmit
 pnpm test             vitest, four projects: node, dom, rsc, ssr
 pnpm check:structure  the folder contract and file sizes
@@ -258,7 +258,7 @@ They arrive with the phases that need them.
 ### R-8.5-2 The app owns the data
 **Rule:** components never fetch, cache or paginate; they call `loadMore()` and render what they are given.
 **Why:** data belongs to the application, not to the design system.
-**Enforced by:** not yet - planned: `eslint`
+**Enforced by:** `eslint` (`topclass/no-fetch-in-components`, under `src/components`, `src/connectors` and `src/shared`)
 
 ### R-10.5-1 Overlays scroll inside themselves
 **Rule:** popups use `POPUP_BOUNDS` and the row cap, dialogs and drawers scroll their body with sticky header and footer, and every scroll container inside an overlay sets `overscroll-behavior: contain`.

@@ -13,7 +13,7 @@ Read docs/STATUS.md first for where things stand. The full specification is docs
 
 ```
 pnpm check            every gate below, in order
-pnpm lint             eslint, including the fifteen custom rules
+pnpm lint             eslint, including the sixteen custom rules
 pnpm typecheck        tsc --noEmit
 pnpm test             vitest, four projects: node, dom, rsc, ssr
 pnpm check:structure  the folder contract and file sizes
@@ -108,7 +108,7 @@ They arrive with the phases that need them.
 ## 7. Collections and scrolling
 
 - **R-8.5-1** Any component that renders items uses `CollectionProps` and `useCollection`: the `--tc-list-rows` knob, windowing above the threshold, and optional page-by-page loading. _(check-structure, which requires useCollection in the hook of every folder whose props take items, CollectionProps or MenuContract, less the exemptions docs/DECISIONS.md records; e2e/collections.spec, which keeps fewer than a hundred of ten thousand rows mounted and sees loadMore called at the end)_
-- **R-8.5-2** Components never fetch, cache or paginate; they call `loadMore()` and render what they are given. _(not yet - planned: eslint)_
+- **R-8.5-2** Components never fetch, cache or paginate; they call `loadMore()` and render what they are given. _(eslint)_
 - **R-10.5-1** Popups use `POPUP_BOUNDS` and the row cap, dialogs and drawers scroll their body with sticky header and footer, and every scroll container inside an overlay sets `overscroll-behavior: contain`. _(not yet - no overlay component exists yet)_
 - **R-10.5-2** A tooltip is one or two lines of plain text; anything larger, or anything with a link or control, is a Popover. _(not yet - planned: eslint)_
 - **R-10.5-3** A sticky or fixed bar sets `--tc-sticky-top` or `--tc-sticky-bottom`, and the scroll container reads them into `scroll-padding-block`. _(not yet - no sticky or fixed bar exists yet)_

@@ -17,8 +17,8 @@ describe('eslint.config.ts arms the custom rules', () => {
     expect(src).toBeDefined()
   })
 
-  it('declares fifteen rules, so a new one cannot be forgotten silently', () => {
-    expect(RULE_NAMES).toHaveLength(15)
+  it('declares sixteen rules, so a new one cannot be forgotten silently', () => {
+    expect(RULE_NAMES).toHaveLength(16)
   })
 
   for (const name of RULE_NAMES) {
@@ -49,6 +49,7 @@ describe('eslint.config.ts arms the custom rules', () => {
     expect([...new Set(off)].sort()).toEqual([
       'topclass/dir-aware-transforms',
       'topclass/logical-properties-only',
+      'topclass/no-fetch-in-components',
       'topclass/semantic-classes-only',
       'topclass/shared-class-constants',
       'topclass/style-sets-tokens-only',

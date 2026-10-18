@@ -32,6 +32,7 @@ const config = [
       'topclass/flat-part-exports': 'error',
       'topclass/root-part-is-named-root': 'error',
       'topclass/text-comes-from-labels': 'error',
+      'topclass/no-fetch-in-components': 'error',
     },
   },
 ] as unknown as Linter.Config[]
@@ -773,6 +774,74 @@ describe('R-5.3-2 rejects the real sources once their direction is taken out', (
     it(`${file} fails with --tc-dir removed or the mirror widened`, () => {
       const broken = code.replaceAll('*var(--tc-dir)', '').replaceAll('rtl:-scale-x-100', 'rtl:-scale-x-100 rtl:rotate-180')
       expect(ids(broken, file)).toContain(RULE)
+    })
+  }
+})
+
+describe('R-8.5-2: components never fetch, cache or paginate', () => {
+  const RULE = 'topclass/no-fetch-in-components'
+  const only = (code: string, file = 'src/components/list/hook.ts') =>
+    lint(code, file).filter((m) => m.ruleId === RULE)
+
+  const bad: [string, string][] = [
+    ['fetch()', "export const load = () => fetch('/api/items')"],
+    ['window.fetch()', "export const load = () => window.fetch('/api/items')"],
+    ['globalThis.fetch()', "export const load = () => globalThis.fetch('/api/items')"],
+    ['XMLHttpRequest', 'export const x = new XMLHttpRequest()'],
+    ['new Request()', "export const r = new Request('/api/items')"],
+    ['localStorage', "export const v = localStorage.getItem('k')"],
+    ['window.localStorage', "export const v = window.localStorage.getItem('k')"],
+    ['sessionStorage', "sessionStorage.setItem('k', 'v')"],
+    ['indexedDB', "export const db = indexedDB.open('items')"],
+    ['caches', "export const c = caches.open('items')"],
+    ["React's cache imported", "import { cache } from 'react'\nexport const get = cache(() => 1)"],
+    ["React's cache renamed", "import { cache as memo } from 'react'\nexport const get = memo(() => 1)"],
+    ['React.cache()', "import * as React from 'react'\nexport const get = React.cache(() => 1)"],
+    ['an import from next/cache', "import { revalidateTag } from 'next/cache'\nexport const r = revalidateTag"],
+    ['unstable_cache used', 'export const get = unstable_cache(async () => 1)'],
+  ]
+  for (const [label, code] of bad) {
+    it(`fails on ${label}`, () => {
+      expect(only(code), code).toHaveLength(1)
+      expect(only(code)[0]?.message, code).toMatch(/R-8.5-2/)
+    })
+  }
+
+  it('covers components, connectors and shared, and nothing else', () => {
+    const code = "export const load = () => fetch('/api/items')"
+    expect(only(code, 'src/components/combobox/hook.ts')).toHaveLength(1)
+    expect(only(code, 'src/connectors/adaptive-menu/client.tsx')).toHaveLength(1)
+    expect(only(code, 'src/shared/collection/use-collection.ts')).toHaveLength(1)
+    expect(only(code, 'scripts/check-icons.ts')).toEqual([])
+    expect(only(code, 'e2e/select.spec.ts')).toEqual([])
+  })
+
+  it('lets one name through where the config allows it, and only that name', () => {
+    const allowed = [
+      {
+        files: ['**/*.ts'],
+        plugins: { topclass },
+        languageOptions: { parser: tseslint.parser },
+        rules: { [RULE]: ['error', { allow: ['localStorage'] }] },
+      },
+    ] as unknown as Linter.Config[]
+    const file = 'src/components/banner/lib.ts'
+    expect(linter.verify("export const v = localStorage.getItem('k')", allowed, file)).toEqual([])
+    expect(linter.verify("export const v = sessionStorage.getItem('k')", allowed, file)).toHaveLength(1)
+    expect(linter.verify("export const v = fetch('/k')", allowed, file)).toHaveLength(1)
+  })
+
+  const good: [string, string][] = [
+    ['calling loadMore', 'export function next(props: { loadMore: () => void }) { props.loadMore() }'],
+    ['a prop named fetch is a member, not the global', 'export const run = (p: { fetch: () => void }) => p.fetch()'],
+    ['a key named localStorage', "export const KEYS = { localStorage: 'tc' }"],
+    ['the word in a string', "export const NOTE = 'never touches localStorage'"],
+    ['other React imports', "import { use, useId } from 'react'\nexport const a = [use, useId]"],
+    ['a Response built from data, not a request', "export const r = new Response('ok')"],
+  ]
+  for (const [label, code] of good) {
+    it(`allows ${label}`, () => {
+      expect(only(code), code).toEqual([])
     })
   }
 })

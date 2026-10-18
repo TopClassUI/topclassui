@@ -37,6 +37,7 @@ export default defineConfig(
       'topclass/flat-part-exports': 'error',
       'topclass/root-part-is-named-root': 'error',
       'topclass/text-comes-from-labels': 'error',
+      'topclass/no-fetch-in-components': 'error',
 
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/ban-ts-comment': 'error',
@@ -59,7 +60,15 @@ export default defineConfig(
       'topclass/dir-aware-transforms': 'off',
       'topclass/style-sets-tokens-only': 'off',
       'topclass/text-comes-from-labels': 'off',
+      'topclass/no-fetch-in-components': 'off',
     },
+  },
+
+  // R-8.5-2: a dismissed Banner is remembered across pages, which is UI state rather
+  // than data; that file may read and write localStorage and nothing else (DECISIONS).
+  {
+    files: ['src/components/banner/lib.ts'],
+    rules: { 'topclass/no-fetch-in-components': ['error', { allow: ['localStorage'] }] },
   },
 
   // Tooling runs in Node, never ships, and walks untyped ESLint AST nodes.

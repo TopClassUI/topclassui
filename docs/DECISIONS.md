@@ -30,6 +30,14 @@ The format is: date, decision, why, and what it affects.
 
 **Affects.** `scripts/check-structure.ts`, `scripts/lib/collections.ts` and its test, four rows in `scripts/mutations/scripts.ts`, `e2e/collections.spec.ts`, and R-8.5-1 in `docs/RULES.md`.
 
+## 2026-10-17 - R-8.5-2 is linted, and the Banner keeps its dismissal in localStorage
+
+**Decision.** `topclass/no-fetch-in-components` refuses `fetch()`, `XMLHttpRequest`, `new Request()`, `localStorage`, `sessionStorage`, `indexedDB`, `caches`, React's `cache()`, `unstable_cache` and any import from `next/cache` under `src/components`, `src/connectors` and `src/shared`; tests and `dummy/` are exempt. One exemption: `src/components/banner/lib.ts` may use `localStorage` and nothing else on the list, through the rule's `allow` option in `eslint.config.ts`.
+
+**Why.** A dismissed Banner is remembered per `id` across pages (choice 24): that is the component's own UI state, not application data, and the README documents the key. The theme script in `src/shared/theme/script.ts` also reads `localStorage`, but as the text of an inline script the app injects before paint, so the rule, which reads code rather than strings, does not see it and needs no exemption.
+
+**What it affects.** A new storage, cache or network call in a component fails lint; widening the Banner's exemption needs an entry here.
+
 ## 2026-10-17 - One thin themed scrollbar for every scroll area
 
 **Decision.** `SCROLLBAR` in `src/shared/classes.ts` is `scrollbar-width: thin` and `scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track)`. `SCROLL_AREA` and `SCROLL_X` carry it, so every dialog and drawer body, popover, dropdown, command, select and combobox list, date picker, tree view, file upload list, toast viewport, sidebar body, accordion region, tabs list, navbar links, segmented control and code block wears it; the table box and the textarea, which scroll without those two, add it by hand. The thumb is neutral-500 in light and ocean and neutral-400 in dark, on a transparent track, so it stands on the surface beneath it: 4.53 to 4.73:1 in light, 5.83 to 7.63 in dark, and 3.93 / 6.27 on a read-only field. `check:contrast` measures it on every surface and on its track whenever the track is not transparent. The code block sets the two tokens to its own fill and halfway thumb, as before. The collapsed Sidebar still hides its bar. Two widths follow from the thinner bar, measured under a mouse: an expanded Sidebar's bar is 10 px (15 before), and a Textarea that takes the browser's own width, in a `w-fit` parent or beside a label, is 173 px (178 before; unit-4.md says 178), since Chromium reserves the vertical bar in it.
