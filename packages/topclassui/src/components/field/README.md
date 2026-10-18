@@ -15,7 +15,7 @@ HTML, before any script runs. There is no Label component: the label is this pro
 **Two exports.** The generated Import block below prints `Field` alone; copy this line:
 
 ```tsx
-import { Field, FieldLive } from 'topclassui'
+import { Field, FieldLive } from 'topclassui/field'
 ```
 
 **In a server file**, `Field`. Its child is a function that receives the control object and
@@ -97,7 +97,7 @@ an "optional" word; a counter; Fieldset; any check in the browser beyond the bro
 ## Import
 
 ```tsx
-import { Field } from 'topclassui'
+import { Field } from 'topclassui/field'
 ```
 
 ## Props

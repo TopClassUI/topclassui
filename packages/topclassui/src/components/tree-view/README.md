@@ -11,7 +11,7 @@ data · tier 3 · beta · runs in the browser.
 A file tree, a folder picker, an outline: nodes in levels that open and close. Its open branches flatten into one windowed list, so 10,000 nodes stay fast.
 
 ```tsx
-import { TreeView } from 'topclassui'
+import { TreeView } from 'topclassui/tree-view'
 ```
 
 ```tsx
@@ -54,7 +54,7 @@ The tree is the one tab stop and keeps the focus; `aria-activedescendant` names 
 ## Import
 
 ```tsx
-import { TreeView } from 'topclassui'
+import { TreeView } from 'topclassui/tree-view'
 ```
 
 ## Props

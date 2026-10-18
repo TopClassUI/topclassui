@@ -4,6 +4,8 @@ import { join } from 'node:path'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 
+import { importsFromRepo } from '#test/samples.js'
+
 const ROOT = process.cwd()
 const FOLDER = join(ROOT, 'src', 'components', 'tag')
 
@@ -13,7 +15,7 @@ const probePath = (name: string) => slash(join(FOLDER, 'test', `tag-probe-${name
 
 /** A whole module is compiled as written; a line of JSX inside a module that imports both exports. */
 function wrap(code: string): string {
-  if (code.startsWith("'use client'")) return code.replace("'topclassui'", "'../index.js'")
+  if (code.startsWith("'use client'")) return importsFromRepo(code)
   return `import { Tag, TagRemovable } from '../index.js'\nexport const both = [Tag, TagRemovable]\nexport const sample = (\n<>\n${code}\n</>\n)\n`
 }
 
@@ -64,7 +66,7 @@ const verdict = compile({
 
 describe('the README sample compiles as written', () => {
   it('finds the client module, so an empty extraction cannot pass', () => {
-    expect(SAMPLE).toContain("import { TagRemovable } from 'topclassui'")
+    expect(SAMPLE).toContain("import { TagRemovable } from 'topclassui/tag'")
     expect(SAMPLE).toContain('<TagRemovable onRemove={() => { setTopics(topics.filter((other) => other !== topic)) }}>{topic}</TagRemovable>')
   })
 

@@ -12,7 +12,7 @@ For one choice out of a list a person types into, from a few options to thousand
 with nothing to type, a Select. It is one element that takes its options as data.
 
 ```tsx
-import { Combobox } from 'topclassui'
+import { Combobox } from 'topclassui/combobox'
 ```
 
 ```tsx
@@ -130,7 +130,7 @@ dropped by request id, a skeleton (use `InputSkeleton`).
 ## Import
 
 ```tsx
-import { Combobox } from 'topclassui'
+import { Combobox } from 'topclassui/combobox'
 ```
 
 ## Props

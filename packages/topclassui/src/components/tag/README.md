@@ -34,7 +34,7 @@ To keep the list in state, put it in a client component:
 'use client'
 
 import { useState } from 'react'
-import { TagRemovable } from 'topclassui'
+import { TagRemovable } from 'topclassui/tag'
 
 export function Topics({ initial }: { initial: string[] }) {
   const [topics, setTopics] = useState(initial)
@@ -89,7 +89,7 @@ a link inside a Tag: its focus ring is cut off at size `xs` and at the end of a 
 ## Import
 
 ```tsx
-import { Tag } from 'topclassui'
+import { Tag } from 'topclassui/tag'
 ```
 
 ## Props

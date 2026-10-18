@@ -1,6 +1,7 @@
 import type { Drawer as Base } from '@base-ui/react/drawer'
-import type { ComponentPropsWithRef, ReactNode } from 'react'
+import type { ComponentPropsWithRef, ReactNode, RefCallback } from 'react'
 
+import type { Direction } from '#shared/provider/context.js'
 import type { DRAWER_PLACEMENTS } from './constants.js'
 import type { DrawerSchemaInput } from './schema.js'
 
@@ -62,3 +63,12 @@ export type DrawerFooterProps = Omit<ComponentPropsWithRef<'div'>, 'className'> 
 
 /** With no render and no children that draw anything it is the x, named by labels.drawer.close. */
 export type DrawerCloseProps = Omit<Base.Close.Props, 'className'> & OwnClassName
+
+/** What useDrawerPopup hands the popup: the portal's dir and lang, its root's settings and scope, its ref and its first focus. */
+export type DrawerPopupHookResult = DrawerSettings & {
+  dir: Direction | undefined
+  lang: string | undefined
+  scope: string
+  ref: RefCallback<HTMLDivElement>
+  initialFocus: DrawerPopupProps['initialFocus']
+}

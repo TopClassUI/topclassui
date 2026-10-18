@@ -53,7 +53,7 @@ two names. The generated table below cannot say "one of two", which is why it is
 ## Import
 
 ```tsx
-import { Banner } from 'topclassui'
+import { Banner } from 'topclassui/banner'
 ```
 
 ## Props

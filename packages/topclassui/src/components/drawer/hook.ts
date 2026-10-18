@@ -8,7 +8,7 @@ import { usePortalLocale } from '#shared/provider/use-portal-locale.js'
 import { useScrollTabStop } from '#shared/use-scroll-tab-stop.js'
 import { DRAWER_DEFAULTS } from './constants.js'
 import { firstFocusOf, toSwipeDirection } from './lib.js'
-import type { DrawerBodyProps, DrawerPopupProps, DrawerRootProps, DrawerSettings } from './types.js'
+import type { DrawerBodyProps, DrawerPopupHookResult, DrawerPopupProps, DrawerRootProps, DrawerSettings } from './types.js'
 
 /** The placement, the size and how modal the nearest DrawerRoot is. The root provides them,
  * because it owns the gesture and Base UI tells the popup nothing of the three. */
@@ -27,7 +27,7 @@ export function useDrawerRoot(
 
 /** What DrawerPopup reads: the portal's dir and lang, its root's settings and scope, its ref, which the caller's
  * follows, and the first focus of lib's firstFocusOf (R-5.6-1), which a caller's initialFocus replaces. */
-export function useDrawerPopup(forwarded: DrawerPopupProps['ref'], initialFocus: DrawerPopupProps['initialFocus']) {
+export function useDrawerPopup(forwarded: DrawerPopupProps['ref'], initialFocus: DrawerPopupProps['initialFocus']): DrawerPopupHookResult {
   const popup = useRef(null as HTMLDivElement | null)
   const ref = useCallback((node: HTMLDivElement | null) => {
     popup.current = node

@@ -25,7 +25,7 @@ change.
 ## Import
 
 ```tsx
-import { Svg } from 'topclassui'
+import { Svg } from 'topclassui/svg'
 ```
 
 ## Props

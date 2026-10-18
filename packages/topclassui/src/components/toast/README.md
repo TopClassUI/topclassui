@@ -12,7 +12,7 @@ For a short notice that something happened: saved, sent, failed. It shows in a c
 leaves by itself. For something the reader must answer, use a Dialog.
 
 ```ts
-import { toast } from 'topclassui'
+import { toast } from 'topclassui/toast'
 ```
 
 ```tsx
@@ -95,7 +95,7 @@ provider mounts.
 ## Import
 
 ```tsx
-import { ToastViewport, toast } from 'topclassui'
+import { ToastViewport, toast } from 'topclassui/toast'
 ```
 
 ## Props
