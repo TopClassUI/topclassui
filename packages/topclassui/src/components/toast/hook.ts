@@ -76,7 +76,9 @@ function useFocusReturn(toasts: readonly unknown[]) {
     const back = from.current
     if (!holds.current || !back?.isConnected || (document.activeElement !== null && document.activeElement !== document.body)) return
     holds.current = false
-    back.focus({ focusVisible: true })
+    // focusVisible is in the DOM lib from TypeScript 6 only; a typed variable keeps the copy compiling on 5.x.
+    const options: FocusOptions & { focusVisible?: boolean } = { focusVisible: true }
+    back.focus(options)
   }, [toasts])
   return {
     onFocus: (event: ToastViewportFocus) => {
