@@ -55,7 +55,7 @@ export function CatalogPage({ locale }: { locale: Locale }) {
             <p className={LEAD}>{section.lead[locale]}</p>
           </div>
           {section.cards.map((entry) => (
-            <Previewer key={entry.slug} entry={entry} locale={locale} href={`/${locale}/docs/components/${entry.slug}`} headingId={`card-${entry.slug}`} />
+            <Previewer key={entry.slug} entry={entry} locale={locale} href={`/${locale}/docs/components/${entry.slug}`} headingId={`card-${entry.slug}`} deferred />
           ))}
         </section>
       ))}

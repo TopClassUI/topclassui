@@ -15,8 +15,8 @@ import { Code } from '../code'
 import { Demo } from '../demo'
 import { InlineText } from '../inline-text'
 import { InstallRow } from './install-row'
-import { PlaygroundIsland } from './playground-island'
-import { CardModeSwitch, ModeScope, PreviewerModeProvider } from './previewer-mode'
+import { CardModeSwitch, PlaygroundIsland } from './previewer-islands'
+import { ModeScope, PreviewerModeProvider } from './previewer-mode'
 
 export interface PreviewerProps {
   entry: PagedComponent
@@ -24,9 +24,11 @@ export interface PreviewerProps {
   /** On the catalog the name links to the component's page; on that page the h1 sits outside the card. */
   href?: string
   headingId?: string
+  /** On the catalog: style and layout wait until the card nears the viewport (content-visibility). */
+  deferred?: boolean
 }
 
-export function Previewer({ entry, locale, href, headingId }: PreviewerProps) {
+export function Previewer({ entry, locale, href, headingId, deferred = false }: PreviewerProps) {
   const t = COMPONENT_PAGE_LABELS[locale]
   const { content } = entry
   const title = content.title[locale]
@@ -49,7 +51,7 @@ export function Previewer({ entry, locale, href, headingId }: PreviewerProps) {
 
   return (
     <PreviewerModeProvider>
-      <article aria-labelledby={headingId} data-component={entry.slug} className={CARD}>
+      <article aria-labelledby={headingId} data-component={entry.slug} className={deferred ? `${CARD} docs-card-deferred` : CARD}>
         <header className={CARD_HEAD}>
           <div className="flex flex-wrap items-center gap-3">
             <h2 id={headingId} className={CARD_TITLE}>

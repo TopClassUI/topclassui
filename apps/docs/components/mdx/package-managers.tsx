@@ -1,10 +1,10 @@
 import { CodeBlock } from 'topclassui/code-block'
 import { getLabels } from 'topclassui/labels/get-labels'
-import { TabsList, TabsPanel, TabsRoot, TabsTab } from 'topclassui/tabs'
 
 import type { Locale } from '../../content/pages'
 import { highlight } from '../../lib/highlight'
 import { INSTALL_LINE } from '../../lib/site'
+import { CodeTabs } from './mdx-islands'
 
 /** The four install lines, each written from the one install constant (docs-site S3, S8). */
 export function installLines(line = INSTALL_LINE) {
@@ -20,16 +20,10 @@ export function installLines(line = INSTALL_LINE) {
 export async function PackageManagers({ locale, label }: { locale: Locale; label: string }) {
   const lines = installLines()
   const highlighted = await Promise.all(lines.map((entry) => highlight(entry.line, 'bash')))
-  return (
-    <TabsRoot defaultValue="npm">
-      <TabsList aria-label={label}>
-        {lines.map((entry) => <TabsTab key={entry.manager} value={entry.manager}>{entry.manager}</TabsTab>)}
-      </TabsList>
-      {lines.map((entry, index) => (
-        <TabsPanel key={entry.manager} value={entry.manager} keepMounted className="pt-3">
-          <CodeBlock {...getLabels(locale)} lang="bash" title={entry.manager} highlighted={highlighted[index] ?? undefined}>{entry.line}</CodeBlock>
-        </TabsPanel>
-      ))}
-    </TabsRoot>
-  )
+  const tabs = lines.map((entry, index) => ({
+    name: entry.manager,
+    value: entry.manager,
+    panel: <CodeBlock {...getLabels(locale)} lang="bash" title={entry.manager} highlighted={highlighted[index] ?? undefined}>{entry.line}</CodeBlock>,
+  }))
+  return <CodeTabs label={label} tabs={tabs} />
 }

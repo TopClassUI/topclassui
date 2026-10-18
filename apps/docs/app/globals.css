@@ -51,6 +51,12 @@
     content-visibility: auto;
     contain-intrinsic-size: auto 48rem;
   }
+
+  /* The catalog's 46 cards the same way: the median card is about 85rem tall at both widths. */
+  .docs-card-deferred {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 85rem;
+  }
 }
 
 @layer components {

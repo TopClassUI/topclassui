@@ -1,14 +1,11 @@
 'use client'
 
 // The page controls of page 14: density and radius, written as --tc-* knobs on the examples only.
-import { type ReactNode, useState } from 'react'
+import { useState } from 'react'
 import { SegmentedControlItem, SegmentedControlRoot } from 'topclassui/segmented-control'
 
 import { KNOB, KNOBS } from '../classes'
-
-/** Three steps each; the middle one is the token's own default (tokens.css). */
-export const DENSITY = { compact: '0.875', normal: '1', comfortable: '1.25' } as const
-export const RADIUS = { square: '0rem', rounded: '0.5rem', pill: '9999px' } as const
+import { DENSITY, KNOB_DEFAULTS, RADIUS } from './knob-values'
 
 export interface ExampleKnobsProps {
   labels: {
@@ -16,22 +13,19 @@ export interface ExampleKnobsProps {
     radius: string
     values: Record<keyof typeof DENSITY | keyof typeof RADIUS, string>
   }
-  children: ReactNode
+  /** The id of the examples' box, which the server renders with the defaults; each example hydrates on its own, so the knobs do not wrap them. */
+  target: string
 }
 
-export function ExampleKnobs({ labels, children }: ExampleKnobsProps) {
-  const [density, setDensity] = useState<keyof typeof DENSITY>('normal')
-  const [radius, setRadius] = useState<keyof typeof RADIUS>('rounded')
+export function ExampleKnobs({ labels, target }: ExampleKnobsProps) {
+  const [density, setDensity] = useState<keyof typeof DENSITY>(KNOB_DEFAULTS.density)
+  const [radius, setRadius] = useState<keyof typeof RADIUS>(KNOB_DEFAULTS.radius)
+  const write = (name: string, value: string) => { document.getElementById(target)?.style.setProperty(name, value) }
   return (
-    <>
-      <div className={KNOBS}>
-        <Knob name={labels.density} value={density} options={DENSITY} labels={labels.values} onChange={setDensity} />
-        <Knob name={labels.radius} value={radius} options={RADIUS} labels={labels.values} onChange={setRadius} />
-      </div>
-      <div style={{ '--tc-density': DENSITY[density], '--tc-radius': RADIUS[radius] }} className="grid min-w-0 gap-4">
-        {children}
-      </div>
-    </>
+    <div className={KNOBS}>
+      <Knob name={labels.density} value={density} options={DENSITY} labels={labels.values} onChange={(key) => { setDensity(key); write('--tc-density', DENSITY[key]) }} />
+      <Knob name={labels.radius} value={radius} options={RADIUS} labels={labels.values} onChange={(key) => { setRadius(key); write('--tc-radius', RADIUS[key]) }} />
+    </div>
   )
 }
 
