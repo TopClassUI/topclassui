@@ -33,7 +33,7 @@ const render = (over: Partial<PartFamily> = {}, rootReach: Reach = 'none') =>
 
 describe('a part family is imported by its flat names', () => {
   it('lists every part, one per line, and never the bare name', () => {
-    expect(render()).toContain("```tsx\nimport {\n  SheetRoot,\n  SheetTrigger,\n  SheetPopup,\n} from 'topclassui'\n```")
+    expect(render()).toContain("```tsx\nimport {\n  SheetRoot,\n  SheetTrigger,\n  SheetPopup,\n} from 'topclassui/sheet'\n```")
     expect(render()).not.toContain('import { Sheet }')
   })
 })
@@ -113,7 +113,7 @@ describe('the closing line follows what each part passes on', () => {
 describe('a single component', () => {
   it('still imports its one name and passes the rest to its root element', () => {
     const out = renderReadme({ meta, props: [SIZE], demos: [], handWritten: 'prose' })
-    expect(out).toContain("import { Sheet } from 'topclassui'")
+    expect(out).toContain("import { Sheet } from 'topclassui/sheet'")
     expect(out).toContain('Anything else is passed to the root element')
     expect(out).not.toContain('###')
   })
@@ -123,7 +123,7 @@ describe('a single component', () => {
       meta, props: [SIZE], demos: [], handWritten: 'prose',
       surface: [{ name: 'SheetViewport', reach: 'className' }, { name: 'sheet', reach: null }],
     })
-    expect(out).toContain("```tsx\nimport { SheetViewport, sheet } from 'topclassui'\n```")
+    expect(out).toContain("```tsx\nimport { SheetViewport, sheet } from 'topclassui/sheet'\n```")
     expect(out).toContain('`SheetViewport` takes no attribute but `className`, which is merged last, and no `ref`.\n')
     expect(out).not.toContain('Anything else')
   })
