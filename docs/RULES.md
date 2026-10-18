@@ -113,7 +113,7 @@ They arrive with the phases that need them.
 ### R-5.2-6 Bare data and aria variants
 **Rule:** write `data-open:`, `group-data-panel-open:`, `aria-busy:`; brackets only for values.
 **Why:** it is the v4 idiom and the upgrade tool rewrites the bracket form.
-**Enforced by:** `eslint`
+**Enforced by:** `eslint` over `src/`, `e2e/` and `scripts/build-harness.tsx`, arbitrary selectors such as `[&[data-open]]:` and `has-[[data-open]]:` included
 
 ### R-4-1 Every authored rule sits in a cascade layer
 **Rule:** only custom-property declarations and `@keyframes` may be unlayered; other rules go in `@layer base` (tokens) or `@layer components` (react). `@utility` and `@custom-variant` count as layered, because Tailwind emits them into its own layers.

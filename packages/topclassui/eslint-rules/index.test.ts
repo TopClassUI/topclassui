@@ -572,6 +572,13 @@ describe('R-5.2-6: data and aria variants are bare', () => {
     ['a named group', '<div className="group-data-[open]/item:block" />', '"group-data-open/item:"'],
     ['a stacked variant', 'const BOX_CLASSES = "p-2 rtl:data-[disabled]:opacity-50"', '"data-disabled:"'],
     ['a class list outside a class context', 'const x = { root: "flex data-[highlighted]:bg-hover" }', '"data-highlighted:"'],
+    ['an arbitrary selector', '<div className="[&[data-open]]:block" />', '"data-open:"'],
+    ['an arbitrary :has()', '<div className="[&:has([data-open])]:block" />', '"has-data-open:"'],
+    ['an arbitrary :not()', '<div className="[&:not([data-disabled])]:block" />', '"not-data-disabled:"'],
+    ['has-[[data-x]]', '<div className="has-[[data-open]]:block" />', '"has-data-open:"'],
+    ['not-[[data-x]] under a group', '<div className="group-not-[[data-open]]:block" />', '"group-not-data-open:"'],
+    ['an arbitrary selector outside a class context', 'const x = "flex [&[data-open]]:block"', '"data-open:"'],
+    ['a trailing underscore', '<div className="data-[open_]:block" />', '"data-open:"'],
   ]
   for (const [label, code, hint] of bad) {
     it(`fails on ${label} and names the bare form`, () => {
@@ -586,14 +593,58 @@ describe('R-5.2-6: data and aria variants are bare', () => {
     '<div className="data-[state=open]:block" />',
     '<div className="data-[size=custom]:h-auto aria-[current=page]:font-medium" />',
     '<div className="group-data-[side=top]/item:block" />',
-    '<div className="[&[data-open]]:block" />',
     '<div className="data-open:[--tc-x:1]" />',
+    '<div className="[&:is(button,a)]:block [&_[data-open]]:block has-[input:disabled]:opacity-50" />',
+    '<div className="[&[data-side=top]]:block aria-[sort=ascending]:font-medium" />',
+    '<div className="data-[_]:block" />',
   ]
   for (const code of good) {
     it(`allows ${code}`, () => {
       expect(ids(code).filter((r) => r === 'topclass/bare-data-variants'), code).toEqual([])
     })
   }
+})
+
+describe('R-5.2-6: what the bare form means', () => {
+  const only = (code: string) => lint(code).filter((m) => m.ruleId === 'topclass/bare-data-variants')
+
+  const ariaCases: [string, string][] = [
+    ['<div className="aria-[busy]:cursor-progress" />', '"aria-busy:"'],
+    ['<div className="aria-[busy=true]:cursor-progress" />', '"aria-busy:"'],
+    ['<div className="aria-[busy=\'true\']:cursor-progress" />', '"aria-busy:"'],
+    ['const c = cn(\'aria-[busy="true"]:cursor-progress\')', '"aria-busy:"'],
+    ['<div className="[&[aria-busy]]:cursor-progress" />', '"aria-busy:"'],
+    ['<div className="[&[aria-busy=true]]:cursor-progress" />', '"aria-busy:"'],
+  ]
+  for (const [code, hint] of ariaCases) {
+    it(`says the bare aria form matches only "true": ${code}`, () => {
+      const messages = only(code)
+      expect(messages, code).toHaveLength(1)
+      expect(messages[0]?.message, code).toContain(hint)
+      expect(messages[0]?.message, code).toContain('which matches aria-busy="true"; set the attribute only as "true" or absent')
+    })
+  }
+
+  it('warns that in- drops the specificity of [[data-x]_&]', () => {
+    const messages = only('<div className="[[data-open]_&]:block" />')
+    expect(messages).toHaveLength(1)
+    expect(messages[0]?.message).toContain('"in-data-open:"')
+    expect(messages[0]?.message).toContain('loses its 0,1,0 specificity')
+  })
+
+  it('does not call a data- rewrite anything but equivalent', () => {
+    const messages = only('<div className="data-[open]:block" />')
+    expect(messages[0]?.message).toBe('R-5.2-6: "data-[open]:" brackets a bare name. Write "data-open:"; brackets only hold name=value.')
+  })
+
+  it('reports every bracketed name in a string, not only the first', () => {
+    const messages = only('<div className="data-[open]:block aria-[busy]:opacity-50 group-data-[active]:flex" />')
+    expect(messages.map((m) => m.message.split('"')[3])).toEqual(['data-open:', 'aria-busy:', 'group-data-active:'])
+  })
+
+  it('leaves aria-[x=false] and data-[x=true], whose bare forms mean something else', () => {
+    expect(only('<div className="aria-[busy=false]:block data-[open=true]:block [&[data-open=true]]:block" />')).toEqual([])
+  })
 })
 
 describe('R-9.2-3: parts are exported flat', () => {
