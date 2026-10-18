@@ -80,7 +80,7 @@ export const PAGES = [
     },
   },
   {
-    slug: 'colors', path: '/docs/colors', kind: 'guide', group: 'foundations', icon: 'palette', status: 'later',
+    slug: 'colors', path: '/docs/colors', kind: 'guide', group: 'foundations', icon: 'palette', status: 'live',
     title: { en: 'Colors', ar: 'الألوان' },
     description: {
       en: 'Every color token, in each mode, with the contrast it is checked against.',
@@ -88,7 +88,7 @@ export const PAGES = [
     },
   },
   {
-    slug: 'icons', path: '/docs/icons', kind: 'guide', group: 'foundations', icon: 'image', status: 'later',
+    slug: 'icons', path: '/docs/icons', kind: 'guide', group: 'foundations', icon: 'image', status: 'live',
     title: { en: 'Icons', ar: 'الأيقونات' },
     description: {
       en: 'The built-in icons, by name, and the ones that flip on their own in Arabic.',
@@ -96,7 +96,7 @@ export const PAGES = [
     },
   },
   {
-    slug: 'theming', path: '/docs/theming', kind: 'guide', group: 'foundations', icon: 'moon', status: 'later',
+    slug: 'theming', path: '/docs/theming', kind: 'guide', group: 'foundations', icon: 'moon', status: 'live',
     title: { en: 'Theming', ar: 'السمات' },
     description: {
       en: 'Light, dark and your own mode from one small CSS block, without touching a component.',
@@ -104,7 +104,7 @@ export const PAGES = [
     },
   },
   {
-    slug: 'rtl', path: '/docs/rtl', kind: 'guide', group: 'foundations', icon: 'translate', status: 'later',
+    slug: 'rtl', path: '/docs/rtl', kind: 'guide', group: 'foundations', icon: 'translate', status: 'live',
     title: { en: 'Right to left', ar: 'من اليمين إلى اليسار' },
     description: {
       en: 'Arabic works without a code change: the layout, the icons and the digits follow the page.',
@@ -112,7 +112,7 @@ export const PAGES = [
     },
   },
   {
-    slug: 'server-first', path: '/docs/server-first', kind: 'guide', group: 'foundations', icon: 'globe', status: 'later',
+    slug: 'server-first', path: '/docs/server-first', kind: 'guide', group: 'foundations', icon: 'globe', status: 'live',
     title: { en: 'Server first', ar: 'الخادم أولًا' },
     description: {
       en: 'Most components render on the server and add no JavaScript. Here is which ones, and why.',
@@ -120,7 +120,7 @@ export const PAGES = [
     },
   },
   {
-    slug: 'accessibility', path: '/docs/accessibility', kind: 'guide', group: 'foundations', icon: 'check-circle', status: 'later',
+    slug: 'accessibility', path: '/docs/accessibility', kind: 'guide', group: 'foundations', icon: 'check-circle', status: 'live',
     title: { en: 'Accessibility', ar: 'إمكانية الوصول' },
     description: {
       en: 'WCAG 2.2 AA, checked in a real browser: axe, target size, the focus ring and contrast.',
@@ -136,7 +136,7 @@ export const PAGES = [
     },
   },
   {
-    slug: 'changelog', path: '/changelog', kind: 'changelog', group: 'more', icon: 'clock', status: 'later',
+    slug: 'changelog', path: '/changelog', kind: 'changelog', group: 'more', icon: 'clock', status: 'live',
     title: { en: 'Changelog', ar: 'سجل التغييرات' },
     description: {
       en: 'What changed in each release of TopClass UI, newest first, with the version it shipped in.',

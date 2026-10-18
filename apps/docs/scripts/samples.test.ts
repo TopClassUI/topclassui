@@ -17,7 +17,7 @@ describe('checkedSamples', () => {
 describe('the live guide pages', () => {
   const samples = samplesOf(resolve(APP, 'content'), LIVE_GUIDES.map((page) => page.slug), LOCALES)
 
-  it('hold twelve samples marked check: one on Install, one on Provider, four on Your first component, in each locale', () => {
+  it('hold thirty samples marked check: six on the getting-started pages and nine on the foundation pages, in each locale', () => {
     expect(samples.map((sample) => `${sample.file} ${sample.title ?? ''}`)).toEqual([
       'en/installation.mdx src/icons.ts',
       'en/provider.mdx app/[locale]/layout.tsx',
@@ -25,12 +25,30 @@ describe('the live guide pages', () => {
       'en/first-component.mdx app/subscribe/page.tsx',
       'en/first-component.mdx app/subscribe/subscribe-form.tsx',
       'en/first-component.mdx app/subscribe/page.tsx',
+      'en/icons.mdx ',
+      'en/icons.mdx my-logo.tsx',
+      'en/theming.mdx ',
+      'en/rtl.mdx app/layout.tsx',
+      'en/rtl.mdx ',
+      'en/server-first.mdx ',
+      'en/accessibility.mdx save-button.tsx',
+      'en/accessibility.mdx home-link.tsx',
+      'en/accessibility.mdx ',
       'ar/installation.mdx src/icons.ts',
       'ar/provider.mdx app/[locale]/layout.tsx',
       'ar/first-component.mdx app/subscribe/actions.ts',
       'ar/first-component.mdx app/subscribe/page.tsx',
       'ar/first-component.mdx app/subscribe/subscribe-form.tsx',
       'ar/first-component.mdx app/subscribe/page.tsx',
+      'ar/icons.mdx ',
+      'ar/icons.mdx my-logo.tsx',
+      'ar/theming.mdx ',
+      'ar/rtl.mdx app/layout.tsx',
+      'ar/rtl.mdx ',
+      'ar/server-first.mdx ',
+      'ar/accessibility.mdx save-button.tsx',
+      'ar/accessibility.mdx home-link.tsx',
+      'ar/accessibility.mdx ',
     ])
   })
 

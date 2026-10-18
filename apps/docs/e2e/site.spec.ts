@@ -103,12 +103,12 @@ for (const path of PAGES) {
   })
 }
 
-// Written out: the following live page's title in each language, none after the last.
+// Written out: the following live page's title in each language; Colors follows the four getting-started pages.
 const NEXT = {
   installation: { en: 'CSS entry', ar: 'مدخل CSS', href: 'css' },
   css: { en: 'Provider', ar: 'المزوّد', href: 'provider' },
   provider: { en: 'Your first component', ar: 'مكوّنك الأول', href: 'first-component' },
-  'first-component': null,
+  'first-component': { en: 'Colors', ar: 'الألوان', href: 'colors' },
 } as const
 
 // Written out: how many `##` sections each page has, so a heading lost from the MDX fails here.
@@ -118,14 +118,10 @@ for (const slug of GUIDES) {
   for (const locale of ['en', 'ar'] as const) {
     const path = `/${locale}/docs/${slug}`
 
-    test(`${path}: the Next card goes to the following page, or is absent after the last`, async ({ page }) => {
+    test(`${path}: the Next card goes to the following page`, async ({ page }) => {
       await page.goto(path)
       const next = NEXT[slug]
       const card = page.locator('main article > a[href]').last()
-      if (next === null) {
-        await expect(page.locator(`main a[href^="/${locale}/docs/"]`).filter({ hasText: locale === 'en' ? 'Next' : 'التالي' })).toHaveCount(0)
-        return
-      }
       await expect(card).toHaveAttribute('href', `/${locale}/docs/${next.href}`)
       await expect(card).toContainText(next[locale])
       await card.click()

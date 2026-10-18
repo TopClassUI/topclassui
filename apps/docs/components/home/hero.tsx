@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Badge } from 'topclassui/badge'
 import { Button } from 'topclassui/button'
+import { FOCUS_RING, TOUCH_TARGET } from 'topclassui/classes'
 import { CodeBlock } from 'topclassui/code-block'
 import { Icon } from 'topclassui/icon'
 import { getLabels } from 'topclassui/labels/get-labels'
@@ -20,7 +21,7 @@ export async function Hero({ locale, labels }: { locale: Locale; labels: SiteLab
   return (
     <div className="relative isolate flex flex-col items-center gap-6 pt-16 text-center md:pt-28">
       <div aria-hidden="true" className="docs-glow" />
-      {changelog === undefined ? chip : <Link href={hrefOf(changelog, locale)}>{chip}</Link>}
+      {changelog === undefined ? chip : <Link href={hrefOf(changelog, locale)} className={`inline-flex items-center justify-center rounded-chip ${TOUCH_TARGET} ${FOCUS_RING}`}>{chip}</Link>}
       <h1 className="flex flex-col text-5xl font-semibold text-body lg:text-[clamp(3rem,6vw,5.75rem)] lg:leading-none">
         <span>{hero.titleTop}</span>
         <span>{hero.titleBottom}</span>

@@ -1,0 +1,48 @@
+---
+title: Theming
+description: Six knobs change the shape of every component at once. A mode changes the colors. Nothing else is themeable, by design.
+---
+
+## The knobs
+
+A knob is one custom property that many classes read. Change it once, every component follows.
+
+<KnobsTable>
+
+| Knob | Default | What it moves |
+|---|---|---|
+| `--tc-radius` | `0.5rem` | Every corner radius: control, box and chip |
+| `--tc-density` | `1` | Every control height and its padding |
+| `--tc-motion` | `1` | Every transition, and `0` under `prefers-reduced-motion` |
+| `--tc-list-rows` | `7` | How many rows a list shows before it scrolls |
+| `--tc-ring-width` | `2px` | The focus ring |
+| `--tc-line-width` | `1px` | Every border |
+
+</KnobsTable>
+
+## A mode is one block
+
+There is no theme object and no provider prop for color. A mode is a CSS block selected by `data-theme`.
+
+<TokensSample mode="ocean" />
+
+The ocean mode in full. It changes one tone and one knob.
+
+## Scoping a theme to a section
+
+`data-theme` works on any element, not only the root. Set it on a panel and everything inside recomputes, including the soft tints and the focus ring.
+
+```tsx check
+<section data-theme="dark" className="bg-page text-body">
+  {/* every component in here is dark, including
+      its focus ring and its soft tints */}
+</section>
+```
+
+<ModeIsland mode="ocean" />
+
+## What is deliberately not themeable
+
+The type scale, the spacing scale and the component anatomy are fixed, so two components always line up in a row.
+
+<Callout tone="info">If a knob you need is missing, open an issue. Overriding a token in your own CSS works, but nothing then checks its contrast.</Callout>
