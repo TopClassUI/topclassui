@@ -4,6 +4,8 @@ import { join } from 'node:path'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 
+import { importsFromRepo } from '#test/samples.js'
+
 const ROOT = process.cwd()
 const FOLDER = join(ROOT, 'src', 'components', 'dialog')
 
@@ -32,7 +34,7 @@ function wrap(code: string): string {
   if (code.startsWith("'use client'")) {
     return `${PRELUDE}\nimport { useActionState, useState } from 'react'\nexport const hooks = [useActionState, useState]\n${code}\n`
   }
-  if (code.startsWith('import ')) return `${code.replace("'topclassui'", "'../index.js'")}\nexport const imported = [${PARTS}]\n`
+  if (code.startsWith('import ')) return `${importsFromRepo(code)}\nexport const imported = [${PARTS}]\n`
   return `${PRELUDE}\nexport const sample = (\n<>\n${code}\n</>\n)\n`
 }
 
@@ -104,7 +106,7 @@ const verdict = compile({
 describe('the samples in the README compile as written', () => {
   it('finds the import line and the three samples, so an empty extraction cannot pass', () => {
     expect(SAMPLES).toHaveLength(4)
-    expect(SAMPLES[0]).toContain("} from 'topclassui'")
+    expect(SAMPLES[0]).toContain("} from 'topclassui/dialog'")
     expect(SAMPLES[1]).toContain('<DialogTitle>Publish changes</DialogTitle>')
     expect(SAMPLES[2]).toContain('<form action={renameProject} className="contents">')
     expect(SAMPLES[3]).toContain('<DialogRoot open={open} onOpenChange={setOpen}>')

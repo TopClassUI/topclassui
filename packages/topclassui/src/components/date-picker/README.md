@@ -13,7 +13,7 @@ element: a button that shows the day, and a calendar that opens under it. No dat
 grid is ours and every word and digit comes from `Intl`.
 
 ```tsx
-import { DatePicker } from 'topclassui'
+import { DatePicker } from 'topclassui/date-picker'
 ```
 
 ```tsx
@@ -114,7 +114,7 @@ prop (the provider's), the drawn open look of the button, a skeleton (use `Input
 ## Import
 
 ```tsx
-import { DatePicker } from 'topclassui'
+import { DatePicker } from 'topclassui/date-picker'
 ```
 
 ## Props
