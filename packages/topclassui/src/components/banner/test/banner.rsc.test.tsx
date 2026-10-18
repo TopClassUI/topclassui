@@ -5,7 +5,7 @@ import { join } from 'node:path'
 import { isValidElement, type ReactElement, type ReactNode } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { Banner } from '../index.js'
+import { Banner, BannerDismissible } from '../index.js'
 
 type Props = Record<string, unknown>
 type Part = ((props: Props) => ReactNode) & { client?: string }
@@ -15,7 +15,7 @@ const { reference } = vi.hoisted(() => ({
   reference: (name: string): Part => Object.assign(() => { throw new Error(`${name} ran on the server`) }, { client: name }),
 }))
 
-vi.mock('../client.js', () => ({ BannerShell: reference('BannerShell') }))
+vi.mock('../client.js', () => ({ BannerShell: reference('BannerShell'), BannerDismissible: reference('BannerDismissible') }))
 
 interface Crossing { part: string, props: Props }
 
@@ -87,9 +87,19 @@ describe('a dismissible banner written in a Server Component, with no client wra
     expect(shell?.props['onDismiss']).toBeUndefined()
   })
 
-  it('a function in onDismiss is what a server page cannot pass, and the scan reports it', () => {
-    const leaky = Banner({ 'aria-label': 'N', 'dismissible': true, 'id': 'x', 'onDismiss': () => undefined })
-    expect(crossings(leaky).flatMap(({ part, props }) => unserializable(props, part))).toEqual(['BannerShell.onDismiss'])
+})
+
+describe('BannerDismissible is the client export, re-exported by index.tsx', () => {
+  const found = crossings(<BannerDismissible aria-label="N" id="x" onDismiss={() => undefined}>Out.</BannerDismissible>)
+
+  it('reaches a server file as the client reference itself, never run there', () => {
+    expect((BannerDismissible as unknown as Part).client).toBe('BannerDismissible')
+    expect(found.map((crossing) => crossing.part)).toEqual(['BannerDismissible'])
+  })
+
+  // R-5.1-3: a server page can send it a function only as a Server Action, and the scan reports one.
+  it('takes onDismiss, the one prop a Server Component can send only as a Server Action', () => {
+    expect(found.flatMap(({ part, props }) => unserializable(props, part))).toEqual(['BannerDismissible.onDismiss'])
   })
 })
 

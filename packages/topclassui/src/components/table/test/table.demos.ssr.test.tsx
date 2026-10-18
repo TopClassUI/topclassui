@@ -12,8 +12,8 @@ const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
 const EXPECTED = [
-  'basic', 'caption', 'column-classes', 'empty', 'in-a-layout', 'playground', 'row-actions', 'rtl', 'skeleton', 'sorted',
-  'states', 'sticky-first-column', 'striped',
+  'basic', 'caption', 'column-classes', 'empty', 'in-a-layout', 'load-more', 'playground', 'row-actions', 'rtl', 'skeleton',
+  'sorted', 'states', 'sticky-first-column', 'striped', 'ten-thousand',
 ]
 
 const render = async (file: string) => {
@@ -89,7 +89,7 @@ describe('each demo shows what its name says', () => {
 
   it('striped: six rows, the second, fourth and sixth tinted', async () => {
     const html = await render('striped')
-    const rows = [...html.slice(html.indexOf('<tbody>')).matchAll(/<tr(?: class="([^"]*)")?>/g)].map((m) => m[1])
+    const rows = [...html.slice(html.indexOf('<tbody>')).matchAll(/<tr( [^>]*)?>/g)].map((m) => / class="([^"]*)"/.exec(m[1] ?? '')?.[1])
     expect(rows).toEqual([undefined, 'bg-surface', undefined, 'bg-surface', undefined, 'bg-surface'])
   })
 

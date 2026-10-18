@@ -109,9 +109,9 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
     })
   })
 
-  it('takes its four hooks and the modal context from hook.ts, and calls no hook from anywhere else', () => {
+  it('takes only its four hooks from hook.ts, and calls no hook from anywhere else', () => {
     expect(importedNames(source, './hook.js')).toEqual([
-      'DialogModalContext', 'useDialogBody', 'useDialogClose', 'useDialogPopup', 'useDialogRoot',
+      'useDialogBody', 'useDialogClose', 'useDialogPopup', 'useDialogRoot',
     ])
     expect(hookCallsIn(parse(source)).sort()).toEqual(['useDialogBody', 'useDialogClose', 'useDialogPopup', 'useDialogRoot'])
   })
@@ -124,7 +124,7 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
     // The Escape guard comes through hook.ts with the root's own scope, which this context hands to the popup.
     expect(importedNames(source, '#shared/overlay.js')).toEqual([])
     expect(importedNames(source, '#shared/overlay-scope.js')).toEqual(['OverlayScopeContext'])
-    expect(importedNames(source, '#shared/render-trigger.js')).toEqual(['hasContent', 'renderTrigger'])
+    expect(importedNames(source, '#shared/render-trigger.js')).toEqual(['hasContent', 'renderPart', 'renderTrigger'])
     expect(importedModules(source).filter((m) => m.startsWith('./')).sort()).toEqual([
       './classes.js', './constants.js', './hook.js', './types.js',
     ])

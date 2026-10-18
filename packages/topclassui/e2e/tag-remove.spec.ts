@@ -154,16 +154,16 @@ test.describe('the keyboard', () => {
   }
 })
 
-test.describe('the caller takes the tag out, and the focus', () => {
-  test('a caller that does nothing about the focus leaves it on the body, so the next Tab starts from the top', async ({ page }) => {
+test.describe('the caller takes the tag out, and the x hands the focus on', () => {
+  test('a caller that does nothing about the focus still finds it on the next x, never the body', async ({ page }) => {
     await openFixture(page)
     await page.getByRole('button', { name: 'Remove Beta' }).focus()
     await page.keyboard.press('Enter')
     await expect(page.getByRole('button', { name: 'Remove Beta' })).toHaveCount(0)
-    expect(await page.evaluate(() => document.activeElement === document.body)).toBe(true)
+    await expect(page.getByRole('button', { name: 'Remove Gamma' })).toBeFocused()
   })
 
-  test('the demo moves it to the x that took its place, then the one before, then the button that restores the list', async ({ page }) => {
+  test('in the demo it goes to the x that took its place, then the one before, then the button the demo moves it to', async ({ page }) => {
     await openLive(page, 'tag--removable')
     await page.getByRole('button', { name: 'Remove React' }).focus()
     await page.keyboard.press('Enter')

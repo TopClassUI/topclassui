@@ -29,7 +29,6 @@ export interface RatingReadOnlyProps extends RatingShared {
   /** Leave unset, or true, for stars that only show a value. */
   readOnly?: true | undefined
   defaultValue?: undefined
-  onValueChange?: undefined
   name?: undefined
   disabled?: undefined
 }
@@ -39,19 +38,27 @@ type Named =
   | { 'aria-label': string; 'aria-labelledby'?: string | undefined }
   | { 'aria-label'?: string | undefined; 'aria-labelledby': string }
 
-/** The radio group a person picks a rating in. It hydrates, and submits in a form before any script runs. */
-export type RatingEditableProps = RatingShared & Named & Pick<RatingDesignProps, 'defaultValue' | 'disabled'> & {
-  /** false renders the radio group. */
-  readOnly: false
-  /** Called with the step a click or an arrow key checked, and on a form reset with the step it returns to. */
-  onValueChange?: ((value: number) => void) | undefined
+/** What both editing exports take: the radio group a person picks a rating in. */
+type RatingEditing = RatingShared & Named & Pick<RatingDesignProps, 'defaultValue' | 'disabled'> & {
   /** The field name in a form. Each radio submits its step, "1" to max. Without one the rating is in no form: not submitted, not reset. */
   name?: string | undefined
 }
 
+/** The radio group, written by a server page. It hydrates, and submits in a form before any script runs. */
+export type RatingEditableProps = RatingEditing & {
+  /** false renders the radio group. */
+  readOnly: false
+}
+
+/** The same radio group, with a handler. A client export: a Server Component passes onValueChange only as a Server Action. */
+export type RatingInputProps = RatingEditing & {
+  /** Client-only, or a Server Action: called with the step a click or an arrow key checked, and on a form reset with the step it returns to. */
+  onValueChange?: ((value: number) => void) | undefined
+}
+
 export type RatingProps = RatingReadOnlyProps | RatingEditableProps
 
-/** What the server half hands the client half: clamped numbers and the name of each step, all serializable. */
+/** What both editing exports hand the radio group: clamped numbers and the name of each step. */
 export interface RatingFieldProps extends Omit<ComponentPropsWithRef<'span'>, Owned> {
   value: number | undefined
   defaultValue: number
@@ -61,6 +68,12 @@ export interface RatingFieldProps extends Omit<ComponentPropsWithRef<'span'>, Ow
   name?: string | undefined
   disabled: boolean
   onValueChange?: ((value: number) => void) | undefined
+}
+
+/** One star of either half: how much of it is filled, at the row's size. */
+export interface RatingStarProps {
+  fill: RatingFill
+  size: Size
 }
 
 /** What the editing hook reads from those props. */

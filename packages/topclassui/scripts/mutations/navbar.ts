@@ -343,7 +343,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a current navbar link never says aria-current, so a screen reader is not told which page is open',
     file: LINK,
-    from: "        'aria-current': current ? 'page' : undefined,\n",
+    from: "    'aria-current': current ? 'page' : undefined,\n",
     to: '',
   },
   {
@@ -397,8 +397,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a navbar link ignores its render element, so a framework link is replaced by a plain anchor',
     file: LINK,
-    from: '{renderElement(render ?? <a />, {',
-    to: '{renderElement(<a />, {',
+    from: 'return renderElement(render ?? <a />, {',
+    to: 'return renderElement(<a />, {',
   },
   {
     label: 'a navbar link passes className first, so the consumer loses every conflict',
@@ -409,20 +409,20 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a navbar link drops the rest props, so its href never reaches the anchor',
     file: LINK,
-    from: '        ...rest,\n',
+    from: '    ...rest,\n',
     to: '',
   },
   {
-    label: 'a navbar link gives its rest props to the list item, so the href lands on an li',
-    file: LINK,
-    from: '    <li className={NAVBAR_ITEM}>',
-    to: '    <li className={NAVBAR_ITEM} {...rest}>',
+    label: 'the navbar list puts its links straight in the ul, so the list holds no list item',
+    file: LINKS,
+    from: '        {Children.toArray(children).map((child, index) => (\n          <li key={isValidElement(child) ? child.key : index} className={NAVBAR_ITEM}>{child}</li>\n        ))}',
+    to: '        {children}',
   },
   {
     label: 'a navbar link no longer bounds its label, so a pasted paragraph is rendered whole',
     file: LINK,
-    from: '        children: truncateLabel(children, NAVBAR_BOUNDARIES.labelMaxLength),',
-    to: '        children,',
+    from: '    children: truncateLabel(children, NAVBAR_BOUNDARIES.labelMaxLength),\n    ...rest,',
+    to: '    children,\n    ...rest,',
   },
   {
     label: 'the navbar label bound is 1,000 characters, ten times the guard rail',

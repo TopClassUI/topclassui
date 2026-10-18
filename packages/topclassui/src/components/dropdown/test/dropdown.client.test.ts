@@ -47,12 +47,12 @@ function hooksByPart(source: string): Record<string, string[]> {
 }
 
 describe('the folder holds what Dropdown needs and nothing else (R-8.1-1)', () => {
-  it('a hook.ts, a lib.tsx, a boundaries.ts and one part file, and no variants or skeleton', () => {
+  it('a hook.ts, a lib.ts, a boundaries.ts and two part files, and no variants or skeleton', () => {
     expect(readdirSync(FOLDER).sort()).toEqual([
-      'README.md', 'boundaries.ts', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'lib.tsx',
+      'README.md', 'boundaries.ts', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'lib.ts',
       'meta.ts', 'parts', 'schema.ts', 'test', 'types.ts',
     ])
-    expect(readdirSync(join(FOLDER, 'parts'))).toEqual(['dropdown-group-label.tsx'])
+    expect(readdirSync(join(FOLDER, 'parts')).sort()).toEqual(['dropdown-group-label.tsx', 'dropdown-row.tsx'])
   })
 })
 
@@ -103,8 +103,8 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
     })
   })
 
-  it('takes its four hooks and the scope context from hook.ts, and calls no hook from anywhere else', () => {
-    expect(importedNames(source, './hook.js')).toEqual(['DropdownScopeContext', 'useDropdownMenu', 'useDropdownPopup', 'useDropdownPositioner', 'useDropdownRoot'])
+  it('takes only its four hooks from hook.ts, and calls no hook from anywhere else', () => {
+    expect(importedNames(source, './hook.js')).toEqual(['useDropdownMenu', 'useDropdownPopup', 'useDropdownPositioner', 'useDropdownRoot'])
     expect(hookCallsIn(parse(source)).sort()).toEqual(['useDropdownMenu', 'useDropdownPopup', 'useDropdownPositioner', 'useDropdownRoot'])
   })
 
@@ -114,11 +114,12 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
 
   it('takes its pure helpers from src/shared and imports them, never a copy', () => {
     expect(importedNames(source, '#shared/overlay.js')).toEqual(['guardEscape'])
-    expect(importedNames(source, '#shared/render-trigger.js')).toEqual(['renderTrigger'])
-    expect(importedNames(source, '#shared/floating.js')).toEqual(['POPUP_BOUNDS', 'toSideAlign'])
+    expect(importedNames(source, '#shared/render-trigger.js')).toEqual(['renderPart', 'renderTrigger'])
+    expect(importedNames(source, '#shared/floating.js')).toEqual(['FLOATING', 'toSideAlign'])
     expect(importedNames(source, '#shared/clamp.js')).toEqual(['clamp'])
     expect(importedModules(source).filter((m) => m.startsWith('./')).sort()).toEqual([
-      './boundaries.js', './classes.js', './constants.js', './hook.js', './lib.js', './parts/dropdown-group-label.js', './types.js',
+      './boundaries.js', './classes.js', './constants.js', './hook.js', './lib.js', './parts/dropdown-group-label.js', './parts/dropdown-row.js',
+      './types.js',
     ])
   })
 
@@ -158,7 +159,7 @@ describe('the part file', () => {
   })
 
   it('takes Base UI from its menu entry, its class from classes.ts and its props from types.ts', () => {
-    expect(importedModules(source)).toEqual(['@base-ui/react/menu', '#shared/cn.js', '../classes.js', '../types.js'])
+    expect(importedModules(source)).toEqual(['@base-ui/react/menu', '#shared/cn.js', '#shared/render-trigger.js', '../classes.js', '../types.js'])
   })
 })
 

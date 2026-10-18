@@ -2,7 +2,8 @@
 import { readdirSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { act, createElement, type ComponentType, type ReactElement } from 'react'
+import { act } from '@testing-library/react'
+import { createElement, type ComponentType, type ReactElement } from 'react'
 import { hydrateRoot } from 'react-dom/client'
 import { renderToString } from 'react-dom/server'
 import { afterEach, describe, expect, it, vi } from 'vitest'

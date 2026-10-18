@@ -39,7 +39,7 @@ describe('the keys move the active day, and the focus with it', () => {
       await press('{ArrowUp}', 'Tuesday, September 22, 2026')
     })
 
-    it(`${direction}: Home and End go to the first and the last day of the row, PageUp and PageDown a month, with Shift a year`, async () => {
+    it(`${direction}: Home and End go to the first and the last day of the week, PageUp and PageDown a month, with Shift a year`, async () => {
       await opened({ defaultValue: '2026-09-23' }, direction)
       await press('{Home}', 'Monday, September 21, 2026')
       await press('{End}', 'Sunday, September 27, 2026')
@@ -62,13 +62,46 @@ describe('the keys move the active day, and the focus with it', () => {
     await press('{PageUp}', 'Saturday, February 28, 2026')
   })
 
-  it('Home in the first row stops at the 1st, End in the last at the month\'s last day', async () => {
-    await opened({ defaultValue: '2026-09-03' })
-    await press('{Home}', 'Tuesday, September 1, 2026')
-    await press('{PageDown}', 'Thursday, October 1, 2026')
-    await press('{ArrowDown}{ArrowDown}{ArrowDown}{ArrowDown}', 'Thursday, October 29, 2026')
-    await press('{End}', 'Saturday, October 31, 2026')
+  for (const direction of ['ltr', 'rtl'] as const) {
+    it(`${direction}: Home in the first row and End in the last cross into the month the week starts or ends in`, async () => {
+      await opened({ defaultValue: '2026-09-03' }, direction)
+      await press('{Home}', 'Monday, August 31, 2026')
+      expect(screen.getByRole('heading').textContent).toBe('August 2026')
+      await press('{End}', 'Sunday, September 6, 2026')
+      expect(screen.getByRole('heading').textContent).toBe('September 2026')
+      await press('{ArrowDown}{ArrowDown}{ArrowDown}{ArrowDown}', 'Sunday, October 4, 2026')
+      await press('{Home}', 'Monday, September 28, 2026')
+      expect(screen.getByRole('heading').textContent).toBe('September 2026')
+      await press('{End}', 'Sunday, October 4, 2026')
+      expect(screen.getByRole('heading').textContent).toBe('October 2026')
+    })
+  }
+
+  it('Home and End across the month edge still stop at minDate and maxDate', async () => {
+    await opened({ defaultValue: '2026-09-03', minDate: '2026-09-02', maxDate: '2026-10-02' })
+    await press('{Home}', 'Wednesday, September 2, 2026')
+    await press('{ArrowDown}{ArrowDown}{ArrowDown}{ArrowDown}', 'Wednesday, September 30, 2026')
+    await press('{End}', 'Friday, October 2, 2026')
   })
+
+  for (const direction of ['ltr', 'rtl'] as const) {
+    it(`${direction}: with nothing chosen the keys start from today, and Enter chooses where they end`, async () => {
+      vi.useFakeTimers({ toFake: ['Date'], now: new Date(2026, 9, 15, 12) })
+      try {
+        const onValueChange = vi.fn()
+        await opened({ onValueChange }, direction)
+        expect(focused()).toBe('Thursday, October 15, 2026')
+        await press(direction === 'ltr' ? '{ArrowRight}' : '{ArrowLeft}', 'Friday, October 16, 2026')
+        await press('{End}', 'Sunday, October 18, 2026')
+        await press('{Home}', 'Monday, October 12, 2026')
+        await userEvent.keyboard('{Enter}')
+        await waitFor(() => { expect(screen.queryByRole('dialog')).toBeNull() })
+        expect(onValueChange.mock.calls).toEqual([['2026-10-12']])
+      } finally {
+        vi.useRealTimers()
+      }
+    })
+  }
 
   it('the range stops the active day: no key moves it past minDate or maxDate', async () => {
     await opened({ defaultValue: '2026-09-26', minDate: '2026-09-25', maxDate: '2026-10-03' })

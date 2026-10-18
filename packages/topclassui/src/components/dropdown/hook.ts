@@ -9,12 +9,12 @@ import { toPopupSelector } from './lib.js'
 import type { DropdownPopupProps } from './types.js'
 
 /** The scope of the nearest DropdownRoot, which its popup writes on itself as data-dropdown. */
-export const DropdownScopeContext = createContext('')
+const DropdownScopeContext = createContext('')
 
 /** One id per root, and the selector that finds this root's popup and no other menu's. */
 export function useDropdownRoot() {
   const scope = useId()
-  return { scope, popups: toPopupSelector(scope) }
+  return { scope, popups: toPopupSelector(scope), Context: DropdownScopeContext }
 }
 
 /** What the positioner reads from the provider: the dir and the lang a portal cannot inherit.

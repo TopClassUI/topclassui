@@ -47,7 +47,7 @@ export type OtpFieldProps = Omit<Base.Root.Props, Owned>
 export type OTPFieldProps = OtpFieldProps
 
 /** What the hook holds and decides: the value, its handlers, the submit, the root, and how Base UI filters a character. */
-export type OtpFieldValueProps = Pick<Base.Root.Props, 'value' | 'defaultValue' | 'onValueChange' | 'onValueComplete' | 'autoSubmit' | 'validationType' | 'normalizeValue' | 'inputMode'> & {
+export type OtpFieldValueProps = Pick<OtpFieldProps, 'value' | 'defaultValue' | 'onValueChange' | 'onValueComplete' | 'autoSubmit' | 'validationType' | 'normalizeValue' | 'inputMode'> & {
   length: number
   groupSize: number
   ref?: Ref<HTMLDivElement> | undefined

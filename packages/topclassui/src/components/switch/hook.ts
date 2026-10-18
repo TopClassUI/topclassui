@@ -2,6 +2,7 @@
 
 import { useImperativeHandle } from 'react'
 
+import { useProviderPresence } from '#shared/provider/context.js'
 import { useFormValue } from '#shared/use-form-value.js'
 import { SWITCH_DEFAULTS } from './constants.js'
 import type { SwitchChangeDetails, SwitchValueProps } from './types.js'
@@ -19,6 +20,7 @@ export function useSwitch({
   onCheckedChange,
   inputRef,
 }: SwitchValueProps) {
+  useProviderPresence()
   const state = useFormValue({ value: checked, defaultValue: defaultChecked, sync: syncChecked })
   useImperativeHandle(inputRef, () => state.inputRef.current as HTMLInputElement, [state.inputRef])
 

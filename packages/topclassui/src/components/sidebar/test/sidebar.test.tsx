@@ -92,7 +92,7 @@ describe('SidebarTrigger on the server', () => {
     expect(button.match(/<svg /g)).toHaveLength(1)
     const svg = tag(button, 'svg')
     expect(attr(svg, 'aria-hidden')).toBe('true')
-    expect(classList(svg)).toContain('rtl:-scale-x-100')
+    expect(classList(svg)).toContain('scale-x-(--tc-dir)')
     // The path of sidebar-simple, so another icon is a failure here.
     expect(button).toContain('M216,40H40A16,16,0,0,0,24,56V200')
   })

@@ -51,7 +51,7 @@ Clickable steps, `defaultValue` and `onValueChange` (choice 10); a panel per ste
 ## Import
 
 ```tsx
-import { Stepper } from 'topclassui'
+import { Stepper } from 'topclassui/stepper'
 ```
 
 ## Props

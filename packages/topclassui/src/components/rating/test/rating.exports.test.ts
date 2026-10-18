@@ -7,22 +7,24 @@ import * as rating from '../index.js'
 
 const source = (file: string) => readFileSync(join(import.meta.dirname, '..', file), 'utf8')
 
-describe('index.tsx adds one public name, Rating', () => {
-  it('exports Rating and nothing else at runtime: the client half is internal', () => {
-    expect(Object.keys(rating)).toEqual(['Rating'])
+describe('index.tsx adds two public names, Rating and RatingInput', () => {
+  it('exports Rating and RatingInput, the client export with a handler; the radio group itself is internal', () => {
+    expect(Object.keys(rating).sort()).toEqual(['Rating', 'RatingInput'])
     expect(typeof rating.Rating).toBe('function')
+    expect(typeof rating.RatingInput).toBe('function')
   })
 
   it('has no client directive, and imports the client half from ./client.js only', () => {
     const index = source('index.tsx')
     expect(index).not.toMatch(/^['"]use client['"]/m)
-    expect(index.match(/from '\.\/client\.js'/g)).toEqual(["from './client.js'"])
+    expect(index.match(/from '\.\/client\.js'/g)).toEqual(["from './client.js'", "from './client.js'"])
     expect(index).toContain("import { RatingField } from './client.js'")
+    expect(index).toContain("export { RatingInput } from './client.js'")
   })
 
-  it('client.tsx and hook.ts start with the directive; lib.tsx, which the server half imports, does not', () => {
+  it('client.tsx and hook.ts start with the directive; the star part, which the server half imports, does not', () => {
     expect(source('client.tsx').startsWith("'use client'")).toBe(true)
     expect(source('hook.ts').startsWith("'use client'")).toBe(true)
-    expect(source('lib.tsx').startsWith("'use client'")).toBe(false)
+    expect(source('parts/rating-star.tsx').startsWith("'use client'")).toBe(false)
   })
 })

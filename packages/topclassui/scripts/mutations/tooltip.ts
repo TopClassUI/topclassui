@@ -65,13 +65,13 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the tooltip forgets its arrow and sits 6 px off the trigger, so the arrow tip touches it',
     file: 'src/components/tooltip/client.tsx',
-    from: 'sideOffset={POPUP_BOUNDS.sideOffset + TOOLTIP_ARROW_HEIGHT}',
-    to: 'sideOffset={POPUP_BOUNDS.sideOffset}',
+    from: 'sideOffset={FLOATING.sideOffset + TOOLTIP_ARROW_HEIGHT}',
+    to: 'sideOffset={FLOATING.sideOffset}',
   },
   {
     label: "the tooltip falls back to Base UI's 5 px collision padding instead of the shared 8",
     file: 'src/components/tooltip/client.tsx',
-    from: '        collisionPadding={POPUP_BOUNDS.collisionPadding}\n',
+    from: '        collisionPadding={FLOATING.collisionPadding}\n',
     to: '',
   },
   {
@@ -141,7 +141,7 @@ export const MUTATIONS: Mutation[] = [
     to: '<TooltipTrigger render={<Button />}>{LONG}</TooltipTrigger>',
   },
   {
-    label: 'the tooltip popup gains a second hook call, where client.tsx may hold only the one from hook.ts (R-5.12-1)',
+    label: 'the tooltip popup gains a second hook call, where each part of client.tsx may hold only its one from hook.ts (R-5.12-1)',
     file: 'src/components/tooltip/client.tsx',
     from: 'const { side, align } = toSideAlign(placement)',
     to: 'const { side, align } = toSideAlign(placement) ?? usePlacementState(placement)',
@@ -151,5 +151,23 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/tooltip/dummy/basic.tsx',
     from: '      <TooltipTrigger\n        render={\n          <Button variant="ghost" aria-label="Copy link">\n            <Svg icon={linkSimple} />\n          </Button>\n        }\n      />',
     to: '      <TooltipTrigger render={<Button variant="ghost" aria-label="Copy link" />}>\n        <Svg icon={linkSimple} />\n      </TooltipTrigger>',
+  },
+  {
+    label: 'the open tooltip popup loses role tooltip, so assistive technology meets a plain div',
+    file: 'src/components/tooltip/client.tsx',
+    from: ' role="tooltip"',
+    to: '',
+  },
+  {
+    label: 'the trigger of an open tooltip names no popup in aria-describedby, so its text is never its description',
+    file: 'src/components/tooltip/hook.ts',
+    from: "'aria-describedby': state.open ? popupId : undefined",
+    to: "'aria-describedby': undefined",
+  },
+  {
+    label: 'the trigger names its popup while closed too, an id that points at nothing',
+    file: 'src/components/tooltip/hook.ts',
+    from: "'aria-describedby': state.open ? popupId : undefined",
+    to: "'aria-describedby': popupId",
   },
 ]
