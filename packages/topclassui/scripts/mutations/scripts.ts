@@ -3,6 +3,24 @@ import type { Mutation } from '../lib/mutate.js'
 
 export const MUTATIONS: Mutation[] = [
   {
+    label: 'check-boundaries stops looking for useRender in a server file',
+    file: 'scripts/check-boundaries.ts',
+    from: '    if (runtimeUseRender(source)) {',
+    to: '    if (false && runtimeUseRender(source)) {',
+  },
+  {
+    label: 'check-boundaries accepts a server render prop without renderElement',
+    file: 'scripts/check-boundaries.ts',
+    from: '    if (acceptsRenderProp(source) && !importsRenderElement(source)) {',
+    to: '    if (acceptsRenderProp(source) && importsRenderElement(source)) {',
+  },
+  {
+    label: 'the named-import scan no longer recognises useRender',
+    file: 'scripts/lib/source-checks.ts',
+    from: "    if (names.some((name) => /^useRender\\b/.test(name))) return true",
+    to: "    if (names.some((name) => /^type useRender\\b/.test(name))) return true",
+  },
+  {
     label: 'the contrast margin that absorbs browser differences is removed',
     file: 'scripts/lib/contrast-checks.ts',
     from: 'export const MARGIN = 0.15',
