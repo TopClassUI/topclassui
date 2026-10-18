@@ -100,7 +100,7 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
       TabsTab: ['useTabsTab'],
       TabsPanel: [],
     })
-    expect(importedNames(source, './hook.js').sort()).toEqual(['TabsLookContext', 'useTabsLook', 'useTabsRoot', 'useTabsTab'])
+    expect(importedNames(source, './hook.js').sort()).toEqual(['useTabsLook', 'useTabsRoot', 'useTabsTab'])
   })
 
   it('the call scan sees a bare hook, a member hook and use, and not a word that starts with use', () => {

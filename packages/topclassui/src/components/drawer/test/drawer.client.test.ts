@@ -108,8 +108,8 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
     })
   })
 
-  it('takes its four hooks and the context from hook.ts, and calls no hook from anywhere else', () => {
-    expect(importedNames(source, './hook.js')).toEqual(['DrawerContext', 'useDrawerBody', 'useDrawerClose', 'useDrawerPopup', 'useDrawerRoot'])
+  it('takes only its four hooks from hook.ts, and calls no hook from anywhere else', () => {
+    expect(importedNames(source, './hook.js')).toEqual(['useDrawerBody', 'useDrawerClose', 'useDrawerPopup', 'useDrawerRoot'])
     expect(hookCallsIn(parse(source)).sort()).toEqual(['useDrawerBody', 'useDrawerClose', 'useDrawerPopup', 'useDrawerRoot'])
   })
 

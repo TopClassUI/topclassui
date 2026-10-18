@@ -5,25 +5,25 @@ import type { Mutation } from '../lib/mutate.js'
 export const MUTATIONS: Mutation[] = [
   {
     label: 'toast.add stops clamping duration, so a duration of 9000000000 keeps a toast for 104 days',
-    file: 'src/components/toast/lib.ts',
+    file: 'src/shared/toast/toast.ts',
     from: 'return Number.isNaN(duration) ? undefined : clamp(duration, TOAST_BOUNDARIES.durationMin, TOAST_BOUNDARIES.durationMax)',
     to: 'return Number.isNaN(duration) ? undefined : duration',
   },
   {
     label: 'toast.add sends a duration that is no number as given, so a NaN reaches the timer of Base UI',
-    file: 'src/components/toast/lib.ts',
+    file: 'src/shared/toast/toast.ts',
     from: 'return Number.isNaN(duration) ? undefined :',
     to: 'return Number.isNaN(duration) ? duration :',
   },
   {
     label: 'toast.add forgets the default tone, so a toast left untoned has no type at all',
-    file: 'src/components/toast/lib.ts',
+    file: 'src/shared/toast/toast.ts',
     from: 'type: options.tone ?? TOAST_DEFAULTS.tone',
     to: 'type: options.tone',
   },
   {
     label: 'toast.update writes every key, so updating the title wipes the description of the toast',
-    file: 'src/components/toast/lib.ts',
+    file: 'src/shared/toast/toast.ts',
     from: '  if (options.description !== undefined) out.description = options.description\n',
     to: '  out.description = options.description\n',
   },

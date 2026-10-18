@@ -7,6 +7,9 @@ export type ReadSibling = (path: string) => string | undefined
 /** The own-folder files a C index may re-export values from without a `'use client'` of their own. */
 const VALUE_SOURCES = new Set(['client.tsx', 'variants.ts', 'skeleton.tsx', 'lib.ts'])
 
+/** Shared modules an index may re-export by name: `toast` is plain code with no React (DECISIONS 2026-10-18). */
+const SHARED_VALUE_SOURCES = new Set(['#shared/toast/toast.js'])
+
 /** `./x.js` or `./parts/x.js`: a file of this folder, never a `..` step out of it. */
 const OWN_FILE = /^\.\/((?:parts\/)?[\w-]+)\.js$/
 
@@ -56,6 +59,7 @@ function isTypeImport(statement: ts.Statement): boolean {
 /** Why a re-export is refused, or undefined when it is allowed. */
 function reexportProblem(statement: ts.ExportDeclaration, read: ReadSibling): string | undefined {
   const spec = statement.moduleSpecifier
+  if (spec && ts.isStringLiteral(spec) && SHARED_VALUE_SOURCES.has(spec.text)) return undefined
   const stem = spec && ts.isStringLiteral(spec) ? OWN_FILE.exec(spec.text)?.[1] : undefined
   if (stem === undefined) return 'a re-export from outside the folder'
   const file = [`${stem}.ts`, `${stem}.tsx`].find((f) => read(f) !== undefined)

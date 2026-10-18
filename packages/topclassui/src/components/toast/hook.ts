@@ -5,8 +5,9 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from '
 
 import { useDirection, useLabels, useToastSettings } from '#shared/provider/context.js'
 import { usePortalLocale } from '#shared/provider/use-portal-locale.js'
+import { claimViewport, drawingViewport, subscribeViewports } from '#shared/toast/viewports.js'
 import { TOAST_OFFSET_VARIABLE, TOAST_STICKY_SHARE } from './constants.js'
-import { claimViewport, drawingViewport, subscribeViewports, toSwipeDirections } from './lib.js'
+import { toSwipeDirections } from './lib.js'
 import type { ToastViewportFocus, ToastViewportProps } from './types.js'
 
 /** R-10.5-3: while a stack shows at the bottom, its height in whole px is --tc-sticky-bottom on the root element. */

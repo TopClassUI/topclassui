@@ -87,9 +87,7 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
 
   it('calls one hook per part and no other, each its own from hook.ts: the root id, the described trigger, the popup', () => {
     expect(hookCalls(source)).toEqual(['useTooltipRoot', 'useTooltipTriggerElement', 'useTooltipPopup'])
-    expect(importedNames(source, './hook.js')).toEqual([
-      'TooltipPopupIdContext', 'useTooltipPopup', 'useTooltipRoot', 'useTooltipTriggerElement',
-    ])
+    expect(importedNames(source, './hook.js')).toEqual(['useTooltipPopup', 'useTooltipRoot', 'useTooltipTriggerElement'])
   })
 
   it('the call scan sees a bare hook, a member hook and use, and not a word that starts with use', () => {

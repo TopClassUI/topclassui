@@ -218,8 +218,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the tabs root provides no look, so an enclosed root draws line tabs',
     file: CLIENT,
-    from: '<TabsLookContext value={look}>',
-    to: '<TabsLookContext value={{ variant: TABS_DEFAULTS.variant, size: TABS_DEFAULTS.size, opensOn: look.opensOn }}>',
+    from: '<root.Context value={root.look}>',
+    to: '<root.Context value={{ variant: TABS_DEFAULTS.variant, size: TABS_DEFAULTS.size, opensOn: root.look.opensOn }}>',
   },
   {
     label: 'the look of a tabs root is computed once, so a root that changes its variant keeps drawing the old one',

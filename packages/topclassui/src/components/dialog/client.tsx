@@ -13,7 +13,7 @@ import {
   DIALOG_POPUP, DIALOG_TITLE, DIALOG_VIEWPORT, DIALOG_WIDTH,
 } from './classes.js'
 import { DIALOG_DEFAULTS } from './constants.js'
-import { DialogModalContext, useDialogBody, useDialogClose, useDialogPopup, useDialogRoot } from './hook.js'
+import { useDialogBody, useDialogClose, useDialogPopup, useDialogRoot } from './hook.js'
 import type {
   DialogBodyProps, DialogCloseProps, DialogDescriptionProps, DialogFooterProps, DialogHeaderProps, DialogPopupProps,
   DialogRootProps, DialogTitleProps, DialogTriggerProps,
@@ -26,9 +26,9 @@ export function DialogRoot({ modal = DIALOG_DEFAULTS.modal, onOpenChange, ...pro
   const root = useDialogRoot(onOpenChange)
   return (
     <OverlayScopeContext value={root.scope}>
-      <DialogModalContext value={modal}>
+      <root.Context value={modal}>
         <Base.Root {...props} modal={modal} onOpenChange={root.onOpenChange} />
-      </DialogModalContext>
+      </root.Context>
     </OverlayScopeContext>
   )
 }

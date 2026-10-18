@@ -12,7 +12,7 @@ import type { DrawerBodyProps, DrawerRootProps, DrawerSettings } from './types.j
 
 /** The placement, the size and how modal the nearest DrawerRoot is. The root provides them,
  * because it owns the gesture and Base UI tells the popup nothing of the three. */
-export const DrawerContext = createContext(DRAWER_DEFAULTS as DrawerSettings)
+const DrawerContext = createContext(DRAWER_DEFAULTS as DrawerSettings)
 
 /** What DrawerRoot hands on: its settings and its scope for the popup, the Escape guard that looks inside
  * that popup only, and the physical swipe, worked out from the direction of the provider (R-13-1). */
@@ -22,7 +22,7 @@ export function useDrawerRoot(
 ) {
   const direction = useDirection()
   const settings = useMemo(() => ({ placement, size, modal }), [placement, size, modal])
-  return { settings, swipeDirection: toSwipeDirection(placement, direction), ...useOverlayRoot(onOpenChange) }
+  return { settings, swipeDirection: toSwipeDirection(placement, direction), ...useOverlayRoot(onOpenChange), Context: DrawerContext }
 }
 
 /** What DrawerPopup reads: the dir and the lang of the provider, which its portal in the body

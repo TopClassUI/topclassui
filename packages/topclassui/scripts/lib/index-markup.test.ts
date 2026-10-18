@@ -81,6 +81,12 @@ describe.each([
       .toEqual(['line 1: a re-export from outside the folder'])
   })
 
+  it('accepts the one shared module named for it, and no other shared module', () => {
+    expect(check(["export { toast } from '#shared/toast/toast.js'"])).toEqual([])
+    expect(check(["export { renderTrigger } from '#shared/render-trigger.js'"]))
+      .toEqual(['line 1: a re-export from outside the folder'])
+  })
+
   it('rejects a ./ specifier that steps out of the folder', () => {
     expect(check([
       "export { Button } from './../button/index.js'",

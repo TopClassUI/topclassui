@@ -103,9 +103,9 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
     })
   })
 
-  it('takes its four hooks and the scope context from hook.ts, and calls no hook from anywhere else', () => {
+  it('takes only its four hooks from hook.ts, and calls no hook from anywhere else', () => {
     expect(importedNames(source, './hook.js')).toEqual([
-      'PopoverScopeContext', 'usePopoverClose', 'usePopoverPopup', 'usePopoverPositioner', 'usePopoverRoot',
+      'usePopoverClose', 'usePopoverPopup', 'usePopoverPositioner', 'usePopoverRoot',
     ])
     expect(hookCallsIn(parse(source)).sort()).toEqual(['usePopoverClose', 'usePopoverPopup', 'usePopoverPositioner', 'usePopoverRoot'])
   })

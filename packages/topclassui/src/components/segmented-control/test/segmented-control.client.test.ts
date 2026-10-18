@@ -83,7 +83,7 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
 
   it('each part calls one hook from hook.ts', () => {
     expect(hooksByPart(source)).toEqual({ SegmentedControlRoot: ['useSegmentedControlRoot'], SegmentedControlItem: ['useSegmentedControlItem'] })
-    expect(importedNames(source, './hook.js')).toEqual(['SegmentedControlLookContext', 'useSegmentedControlItem', 'useSegmentedControlRoot'])
+    expect(importedNames(source, './hook.js')).toEqual(['useSegmentedControlItem', 'useSegmentedControlRoot'])
   })
 
   it('takes Base UI from its radio and radio-group entries (no toggle group: choice 15), no other component, and no schema', () => {

@@ -12,7 +12,7 @@ import { Svg } from '#components/svg/index.js'
 import { POPOVER_BOUNDARIES } from './boundaries.js'
 import { POPOVER_CLOSE, POPOVER_DESCRIPTION, POPOVER_POPUP, POPOVER_POSITIONER, POPOVER_TITLE } from './classes.js'
 import { POPOVER_DEFAULTS } from './constants.js'
-import { PopoverScopeContext, usePopoverClose, usePopoverPopup, usePopoverPositioner, usePopoverRoot } from './hook.js'
+import { usePopoverClose, usePopoverPopup, usePopoverPositioner, usePopoverRoot } from './hook.js'
 import type {
   PopoverCloseProps, PopoverDescriptionProps, PopoverPopupProps, PopoverRootProps, PopoverTitleProps,
   PopoverTriggerProps,
@@ -24,11 +24,11 @@ const { delayMin, delayMax } = POPOVER_BOUNDARIES
  * or ref, and Base UI holds the open state. An Escape meant for a popup opened inside its own
  * popup does not close it: the guard looks at this root's popup and at no other dialog. */
 export function PopoverRoot({ onOpenChange, ...props }: PopoverRootProps) {
-  const { scope, popups } = usePopoverRoot()
+  const { scope, popups, Context } = usePopoverRoot()
   return (
-    <PopoverScopeContext value={scope}>
+    <Context value={scope}>
       <Base.Root {...props} onOpenChange={guardEscape(onOpenChange, popups)} />
-    </PopoverScopeContext>
+    </Context>
   )
 }
 

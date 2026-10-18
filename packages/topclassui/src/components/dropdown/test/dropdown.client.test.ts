@@ -103,8 +103,8 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
     })
   })
 
-  it('takes its four hooks and the scope context from hook.ts, and calls no hook from anywhere else', () => {
-    expect(importedNames(source, './hook.js')).toEqual(['DropdownScopeContext', 'useDropdownMenu', 'useDropdownPopup', 'useDropdownPositioner', 'useDropdownRoot'])
+  it('takes only its four hooks from hook.ts, and calls no hook from anywhere else', () => {
+    expect(importedNames(source, './hook.js')).toEqual(['useDropdownMenu', 'useDropdownPopup', 'useDropdownPositioner', 'useDropdownRoot'])
     expect(hookCallsIn(parse(source)).sort()).toEqual(['useDropdownMenu', 'useDropdownPopup', 'useDropdownPositioner', 'useDropdownRoot'])
   })
 

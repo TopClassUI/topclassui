@@ -9,7 +9,7 @@ import { renderTrigger } from '#shared/render-trigger.js'
 import { TOOLTIP_BOUNDARIES } from './boundaries.js'
 import { TOOLTIP_ARROW, TOOLTIP_POPUP, TOOLTIP_POSITIONER } from './classes.js'
 import { TOOLTIP_ARROW_HEIGHT, TOOLTIP_COLLISION_AVOIDANCE, TOOLTIP_DEFAULTS } from './constants.js'
-import { TooltipPopupIdContext, useTooltipPopup, useTooltipRoot, useTooltipTriggerElement } from './hook.js'
+import { useTooltipPopup, useTooltipRoot, useTooltipTriggerElement } from './hook.js'
 import type { TooltipPopupProps, TooltipRootProps, TooltipTriggerElementProps, TooltipTriggerProps } from './types.js'
 
 const { delayMin, delayMax } = TOOLTIP_BOUNDARIES
@@ -17,11 +17,11 @@ const { delayMin, delayMax } = TOOLTIP_BOUNDARIES
 /** Groups one trigger with its popup. It renders no element, so it takes no className,
  * style or ref, and Base UI holds the open state. */
 export function TooltipRoot<Payload>(props: TooltipRootProps<Payload>) {
-  const root = useTooltipRoot()
+  const { value, Context } = useTooltipRoot()
   return (
-    <TooltipPopupIdContext value={root}>
+    <Context value={value}>
       <Base.Root {...props} />
-    </TooltipPopupIdContext>
+    </Context>
   )
 }
 

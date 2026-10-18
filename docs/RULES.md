@@ -295,7 +295,7 @@ They arrive with the phases that need them.
 ### R-5.12-4 Naming
 **Rule:** kebab-case files and folders, PascalCase components, `useThing` hooks, verb-first pure functions, `SCREAMING_CASE` constants in `constants.ts` or `classes.ts` inside a component folder; a shared contract under `shared/` may declare its own. A file in `parts/` exports one component named after the file.
 **Why:** a predictable name is the cheapest documentation.
-**Enforced by:** `scripts/check-structure.ts` for the kebab-case names, for a SCREAMING_CASE table declared outside `constants.ts` or `classes.ts`, and for the parts-folder naming contract in `scripts/lib/part-names.ts`, where a `parts/` file exports one component named after it, `hook.ts` only `use*` hooks and the contexts they read, `lib.ts` only functions; verb-first and PascalCase names elsewhere are manual
+**Enforced by:** `scripts/check-structure.ts` for the kebab-case names, for a SCREAMING_CASE table declared outside `constants.ts` or `classes.ts`, and for the parts-folder naming contract in `scripts/lib/part-names.ts`, where a `parts/` file exports one component named after it, `hook.ts` only `use*` hooks (a context stays module-private and the root's hook returns it), `lib.ts` and `lib.tsx` only functions, and a test never sits in `parts/`; verb-first and PascalCase names elsewhere are manual
 
 ### R-17-1 A test expectation is named, never derived
 **Rule:** an expectation is written out, never computed from the thing under test; deleting half the implementation must not also delete half the assertion.

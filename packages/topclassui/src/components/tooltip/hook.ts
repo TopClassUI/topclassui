@@ -9,13 +9,15 @@ import type { TooltipPopupId, TooltipTriggerElementProps } from './types.js'
 const noPopup: TooltipPopupId = { popupId: undefined, setOwnId: () => undefined }
 /** The popup id of the nearest TooltipRoot, which its trigger names while open, and the popup's way to
  * hand over an id of the caller's. */
-export const TooltipPopupIdContext = createContext(noPopup)
+const TooltipPopupIdContext = createContext(noPopup)
 
-/** One popup id per root, so two tooltips never describe each other's trigger; a caller's id wins. */
+/** One popup id per root, so two tooltips never describe each other's trigger; a caller's id wins.
+ * The context it is handed down in comes with it. */
 export function useTooltipRoot() {
   const generated = useId()
   const [ownId, setOwnId] = useState(undefined as string | undefined)
-  return useMemo(() => ({ popupId: ownId ?? generated, setOwnId }), [ownId, generated])
+  const value = useMemo(() => ({ popupId: ownId ?? generated, setOwnId }), [ownId, generated])
+  return { value, Context: TooltipPopupIdContext }
 }
 
 /** The trigger's render, given Base UI's props plus an aria-describedby naming the popup while it is

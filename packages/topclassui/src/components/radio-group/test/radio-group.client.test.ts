@@ -83,7 +83,7 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
 
   it('each part calls one hook from hook.ts', () => {
     expect(hooksByPart(source)).toEqual({ RadioGroupRoot: ['useRadioGroupRoot'], RadioGroupItem: ['useRadioGroupItem'] })
-    expect(importedNames(source, './hook.js')).toEqual(['RadioGroupLookContext', 'useRadioGroupItem', 'useRadioGroupRoot'])
+    expect(importedNames(source, './hook.js')).toEqual(['useRadioGroupItem', 'useRadioGroupRoot'])
   })
 
   it('takes Base UI from its radio and radio-group entries, the svg and the dot by explicit import (R-7-1), and no schema', () => {
