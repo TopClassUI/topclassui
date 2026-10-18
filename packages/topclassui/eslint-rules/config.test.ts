@@ -48,7 +48,6 @@ describe('eslint.config.ts arms the custom rules', () => {
     // Each of these rules is written "inside src/", and a test or a demo is inside src/:
     // one has to write the banned string to prove the rule, the other to show real usage.
     expect([...new Set(off)].sort()).toEqual([
-      'topclass/dir-aware-transforms',
       'topclass/logical-properties-only',
       'topclass/no-fetch-in-components',
       'topclass/no-physical-placement',

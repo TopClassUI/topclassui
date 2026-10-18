@@ -86,4 +86,40 @@ export const MUTATIONS: Mutation[] = [
     from: "files: ['e2e/**/*.{ts,tsx}', 'scripts/build-harness.tsx'],",
     to: "files: ['e2e/none'],",
   },
+  {
+    label: 'R-5.3-2 lets an addition sit beside the --tc-dir product, so calc(100%*var(--tc-dir)+4px) passes',
+    file: 'eslint-rules/dir-aware.ts',
+    from: "    else if (ch === '+') return false",
+    to: "    else if (ch === '+') continue",
+  },
+  {
+    label: 'R-5.3-2 pairs a position with an rtl: mirror under other variants, so md:object-left rtl:object-right passes',
+    file: 'eslint-rules/dir-aware.ts',
+    from: '!mirrors.has(`${position.family}|${rest}|',
+    to: '!mirrors.has(`${position.family}||',
+  },
+  {
+    label: 'R-5.3-2 takes any origin variable as measured, so origin-(--my-origin) passes',
+    file: 'eslint-rules/dir-aware.ts',
+    from: "if (v === 'var(--transform-origin)') return false",
+    to: "if (v.startsWith('var(')) return false",
+  },
+  {
+    label: 'R-5.3-2 forgets the compound direction variants, so not-ltr:-scale-x-100 brings the icon mirror back',
+    file: 'eslint-rules/dir-aware.ts',
+    from: 'const DIR_VARIANT = /^(not-|group-|peer-|in-|has-)?(rtl|ltr)',
+    to: 'const DIR_VARIANT = /^(rtl|ltr)',
+  },
+  {
+    label: 'R-5.3-2 stops reading --tc-* style values',
+    file: 'eslint-rules/index.ts',
+    from: 'const hint = value === undefined ? undefined : findPhysicalValue(value)',
+    to: 'const hint = value === undefined ? undefined : undefined',
+  },
+  {
+    label: 'R-5.3-2 check-css stops reporting stylesheets',
+    file: 'scripts/lib/css-direction.ts',
+    from: 'if (hint) out.push(',
+    to: 'if (hint && !hint) out.push(',
+  },
 ]

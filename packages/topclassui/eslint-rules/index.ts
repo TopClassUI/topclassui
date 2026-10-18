@@ -1,6 +1,8 @@
 // The rules of docs/RULES.md that a linter can enforce. Rule ids are in the messages.
 import type { ESLint } from 'eslint'
 
+import { findPhysicalMotion, findPhysicalValue, splitAtColons } from './dir-aware.ts'
+
 type Node = any
 type Context = any
 
@@ -42,7 +44,9 @@ function looksLikeClassList(value: string): boolean {
   // A path or a URL is never a class list, and both can carry a hyphen.
   if (trimmed.includes('://') || trimmed.startsWith('/') || trimmed.startsWith('.')) return false
   const tokens = trimmed.split(/\s+/)
-  if (!tokens.every((t) => CLASSY_TOKEN.test(t) || (t.includes(']:') && VARIANT_TOKEN.test(t)))) return false
+  // Brackets hold CSS, which may name translateX() or separate its arguments with commas.
+  const classy = (t: string) => CLASSY_TOKEN.test(t.replace(/\[\S*\]/g, (b) => b.toLowerCase().replaceAll(',', '_')))
+  if (!tokens.every((t) => classy(t) || (t.includes(']:') && VARIANT_TOKEN.test(t)))) return false
   // Half or more must be utility-shaped, or prose that merely names a class is flagged.
   const utilities = tokens.filter((t) => t.includes('-') || t.includes(':')).length
   return utilities > 0 && utilities * 2 >= tokens.length
@@ -108,24 +112,6 @@ const SYSTEM_COLORS = new Set([
 ].join(' ').split(' '))
 
 const COLOR_FUNCTION = /^(rgba?|hsla?|hwb|lab|lch|oklab|oklch|color|color-mix|light-dark|contrast-color)\(/
-
-/** Splits a class at the colons between its variants, never at one inside brackets or parentheses. */
-function splitAtColons(token: string): string[] {
-  const parts: string[] = []
-  let depth = 0
-  let start = 0
-  for (let i = 0; i < token.length; i++) {
-    const ch = token[i]
-    if (ch === '[' || ch === '(') depth++
-    else if (ch === ']' || ch === ')') depth = Math.max(0, depth - 1)
-    else if (ch === ':' && depth === 0) {
-      parts.push(token.slice(start, i))
-      start = i + 1
-    }
-  }
-  parts.push(token.slice(start))
-  return parts
-}
 
 /** What sits between a bracket and its match; to the end when a template cut the class short. */
 function bracketContent(text: string, open: number): string {
@@ -238,97 +224,19 @@ function isConsumerStyle(node: Node): boolean {
   return false
 }
 
+/** The text of a `--tc-*` style value, read as one CSS value rather than a class list. */
+function tokenValueOf(node: Node): string | undefined {
+  const key = node?.parent?.type === 'Property' && node.parent.value === node ? node.parent.key : undefined
+  if (!String(key?.value ?? key?.name ?? '').startsWith('--tc-')) return undefined
+  if (node.type === 'Literal' && typeof node.value === 'string') return node.value
+  if (node.type === 'TemplateLiteral' && node.expressions.length === 0) return node.quasis[0]?.value?.cooked
+  return undefined
+}
+
 /**
  * A sibling export that is not a part: a skeleton or a state stands beside the component
  * rather than inside it, so `Card` next to `CardSkeleton` needs no `Root`.
  */
-/** An x that needs no direction: none, a zero, or the pointer offset Base UI measures in physical px. */
-const NEUTRAL_X = /^(-?0(px|%|rem)?|none|3d|var\(--[a-z]+-swipe-movement-x\b.*)$/
-
-/** The arguments of the parenthesis that opens at `open`, split at its top-level commas. */
-function callArguments(text: string, open: number): string[] {
-  const args: string[] = []
-  let depth = 0
-  let start = open + 1
-  for (let i = open; i < text.length; i++) {
-    const ch = text[i]
-    if (ch === '(') depth++
-    else if (ch === ')' && --depth === 0) return [...args, text.slice(start, i)]
-    else if (ch === ',' && depth === 1) {
-      args.push(text.slice(start, i))
-      start = i + 1
-    }
-  }
-  return [...args, text.slice(start)]
-}
-
-const dirAware = (x: string) => x.includes('--tc-dir') || NEUTRAL_X.test(x.trim())
-
-/** A gradient angle along the block axis reads the same in both directions. */
-function physicalGradient(spec: string): boolean {
-  if (spec.includes('--tc-dir')) return false
-  if (/(^|[\s_-])(left|right)(?![a-z])/.test(spec)) return true
-  const angles = [...spec.matchAll(/(-?[\d.]+)(deg|turn|rad|grad)/g)]
-  const half = { deg: 180, turn: 0.5, rad: Math.PI, grad: 200 } as const
-  return angles.some(([, n, unit]) => Number(n) % half[unit as keyof typeof half] !== 0)
-}
-
-const POSITION = /^(object|bg)-(top|bottom|left|right|center)(-(top|bottom|left|right))?$|^object-[[(]|^bg-position-[[(]|^bg-\[position:/
-const PHYSICAL_POSITION = /^(object|bg)-((left|right)(-(top|bottom))?|(top|bottom)-(left|right))$/
-const DIR_VARIANT = /^(rtl|ltr)$|dir=["']?(rtl|ltr)|:dir\(/
-
-/** Why a class string breaks R-5.3-2, with the offending class, or undefined when it keeps it. */
-function findPhysicalMotion(value: string): { cls: string; hint: string } | undefined {
-  const tokens = value.split(/\s+/).filter(Boolean)
-  const hasDirPosition = tokens.some((cls) => {
-    const variants = splitAtColons(cls)
-    const utility = variants.pop() ?? ''
-    return variants.some((v) => DIR_VARIANT.test(v)) && POSITION.test(utility)
-  })
-  for (const cls of tokens) {
-    const variants = splitAtColons(cls)
-    const utility = (variants.pop() ?? '').replace(/^!/, '')
-    if (variants.some((v) => DIR_VARIANT.test(v))) {
-      if (!POSITION.test(utility)) {
-        return { cls, hint: 'uses a direction variant; only object-* and bg-* positions may, everything else multiplies by --tc-dir' }
-      }
-      continue
-    }
-    const translate = /^-?translate-(x-)?(.+)$/.exec(utility)
-    if (translate && !/^[yz]-/.test(translate[2] ?? '')) {
-      const value = translate[2] ?? ''
-      const x = translate[1] || !value.startsWith('[') ? value : (value.slice(1, -1).split('_')[0] ?? '')
-      if (!dirAware(x)) return { cls, hint: 'moves along a physical x; multiply it by --tc-dir, as translate-x-[calc(100%*var(--tc-dir))]' }
-    }
-    for (const m of utility.matchAll(/translate(X|3d)?\(/g)) {
-      const x = callArguments(utility, m.index + m[0].length - 1)[0] ?? ''
-      if (!dirAware(x)) return { cls, hint: 'translates along a physical x; multiply it by --tc-dir, as translateX(calc(100%*var(--tc-dir)))' }
-    }
-    const property = /^\[translate:([^_\]]+)/.exec(utility)
-    if (property && !dirAware(property[1] ?? '')) return { cls, hint: 'translates along a physical x; multiply it by --tc-dir' }
-    if (/^(origin-|\[transform-origin:)/.test(utility) && /(^|[-_[:])(left|right)(?![a-z])/.test(utility)) {
-      return { cls, hint: 'pins the transform origin to a physical side; use one Base UI measures, as origin-(--transform-origin), or a centre or block edge' }
-    }
-    const gradient = /^-?bg-(linear|gradient)-(.+)$/.exec(utility)
-    if (gradient) {
-      const spec = gradient[2] ?? ''
-      const side = /^to-(r|l|tr|tl|br|bl)$/.test(spec)
-      const angle = /^\d+$/.test(spec) && Number(spec) % 180 !== 0
-      if (side || angle || (/^[[(]/.test(spec) && physicalGradient(spec))) {
-        return { cls, hint: 'points the gradient at a physical side; multiply the angle by --tc-dir, as bg-linear-[calc(90deg*var(--tc-dir))]' }
-      }
-    }
-    for (const m of utility.matchAll(/linear-gradient\(/g)) {
-      const first = callArguments(utility, m.index + m[0].length - 1)[0] ?? ''
-      if (physicalGradient(first)) return { cls, hint: 'points the gradient at a physical side; multiply the angle by --tc-dir' }
-    }
-    if (PHYSICAL_POSITION.test(utility) && !hasDirPosition) {
-      return { cls, hint: 'is a physical position with no logical form; pair it with its rtl: mirror' }
-    }
-  }
-  return undefined
-}
-
 const NOT_A_PART = /^(Skeleton|EmptyState|ErrorState|Client|Provider|Context|Variants|Props)$/
 
 const isBaseUiSource = (source: unknown) => typeof source === 'string' && source.startsWith('@base-ui/')
@@ -410,10 +318,18 @@ const rules = {
       messages: { physical: 'R-5.3-2: "{{cls}}" {{hint}}.' },
     },
     create(ctx: Context) {
-      return eachClassString((node, value) => {
-        const found = findPhysicalMotion(value)
-        if (found) ctx.report({ node, messageId: 'physical', data: found })
-      })
+      return {
+        ...eachClassString((node, value) => {
+          if (tokenValueOf(node.parent?.type === 'TemplateLiteral' ? node.parent : node) !== undefined) return
+          const found = findPhysicalMotion(value)
+          if (found) ctx.report({ node, messageId: 'physical', data: found })
+        }),
+        Property(node: Node) {
+          const value = tokenValueOf(node.value)
+          const hint = value === undefined ? undefined : findPhysicalValue(value)
+          if (hint) ctx.report({ node: node.value, messageId: 'physical', data: { cls: value, hint } })
+        },
+      }
     },
   },
 

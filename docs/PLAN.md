@@ -475,8 +475,8 @@ Use logical utilities so layout follows the text direction automatically.
 | `float-left` `float-right` | `float-start` `float-end` |
 | `scroll-ml` `scroll-pr` ... | `scroll-ms` `scroll-pe` ... |
 | `space-x-*` `divide-x-*` | `gap-*` on flex or grid; `border-s` on children |
-| `translate-x-*` `-translate-x-*` | `translate-x-(--tc-slide)` where the variable is `calc(<length> * var(--tc-dir))` |
-| `origin-left` `origin-right` `origin-top-left` ... | `origin-(--transform-origin)` on popups (Base UI sets it per side); `rtl:origin-*` elsewhere |
+| `translate-x-*` `-translate-x-*` | `translate-x-[calc(<length>*var(--tc-dir))]` |
+| `origin-left` `origin-right` `origin-top-left` ... | `origin-(--transform-origin)` on popups (Base UI sets it per side); `origin-[calc(50%-50%*var(--tc-dir))_50%]` elsewhere |
 | `bg-linear-to-r` `bg-linear-to-l` ... | `bg-linear-[calc(90deg*var(--tc-dir))]`, or a vertical direction |
 | `object-left` `object-right` `bg-left` `bg-right` | no logical form exists: `object-left rtl:object-right` |
 | `rotate-*` on a directional icon | never; the icon flips itself. Rotate only non-directional icons |
