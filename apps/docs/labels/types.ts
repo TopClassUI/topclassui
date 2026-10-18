@@ -20,6 +20,8 @@ export interface SiteLabels {
   shell: {
     skip: string
     siteNav: string
+    /** The navbar's links, named apart from the Sidebar and from every Navbar demo's default "Main". */
+    sectionsNav: string
     sidebarTitle: string
     onThisPage: string
     next: string

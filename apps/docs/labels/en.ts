@@ -10,6 +10,7 @@ export const en: SiteLabels = {
   shell: {
     skip: 'Skip to content',
     siteNav: 'Site',
+    sectionsNav: 'Site sections',
     sidebarTitle: 'Documentation',
     onThisPage: 'On this page',
     next: 'Next',
@@ -30,7 +31,7 @@ export const en: SiteLabels = {
     version: (version, beta) => (beta ? `v${version} beta` : `v${version}`),
     columns: { start: 'Get started', foundations: 'Foundations', reference: 'Components', more: 'Resources' },
     bottom: 'MIT licensed. Built in the open.',
-    install: 'Install',
+    install: 'Install TopClass UI',
   },
   blocks: {
     wrong: 'Wrong',
