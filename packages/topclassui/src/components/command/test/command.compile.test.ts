@@ -4,6 +4,8 @@ import { join } from 'node:path'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 
+import { importsFromRepo } from '#test/samples.js'
+
 const ROOT = process.cwd()
 const FOLDER = join(ROOT, 'src', 'components', 'command')
 
@@ -22,7 +24,7 @@ const PRELUDE = [
 
 /** The import line as a module that uses what it imports; anything else after the prelude. */
 function wrap(code: string): string {
-  if (code.startsWith('import ')) return `${code.replace("'topclassui'", "'../index.js'")}\nexport const imported = [Command]\n`
+  if (code.startsWith('import ')) return `${importsFromRepo(code)}\nexport const imported = [Command]\n`
   return `${PRELUDE}\n${code.replace("'use client'", '')}\n`
 }
 
@@ -77,7 +79,7 @@ const verdict = compile({
 describe('the samples in the README compile as written', () => {
   it('finds the import line and the client file, so an empty extraction cannot pass', () => {
     expect(SAMPLES).toHaveLength(2)
-    expect(SAMPLES[0]).toBe("import { Command } from 'topclassui'\n")
+    expect(SAMPLES[0]).toBe("import { Command } from 'topclassui/command'\n")
     expect(SAMPLES[1]).toContain('onOpenChange={setOpen}')
   })
 
