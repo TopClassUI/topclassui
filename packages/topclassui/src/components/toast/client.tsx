@@ -41,15 +41,19 @@ function ToastItem({ entry, swipeDirection, closeLabel }: ToastItemProps) {
 
 /** The one live region of the app. TopClassProvider mounts it: do not mount a second. Its place, its
  * labels, its dir and its lang are the outermost provider's, so an island's toast shows in the page's corner. */
-export function ToastViewport({ className }: ToastViewportProps) {
-  const viewport = useToastViewport()
+export function ToastViewport({ className, ref, ...rest }: ToastViewportProps) {
+  const viewport = useToastViewport(ref)
   if (!viewport.draws) return null
   return (
     <Base.Portal>
       <Base.Viewport
+        {...rest}
+        ref={viewport.ref}
         dir={viewport.dir}
         lang={viewport.lang}
         aria-label={viewport.labels.region}
+        onFocus={viewport.onFocus}
+        onBlur={viewport.onBlur}
         className={cn(TOAST_VIEWPORT, TOAST_PLACEMENT[viewport.placement], className)}
       >
         {viewport.toasts.map((entry) => (

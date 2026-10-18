@@ -103,9 +103,9 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
     })
   })
 
-  it('takes its four hooks and the scope context from hook.ts, and calls no hook from anywhere else', () => {
+  it('takes only its four hooks from hook.ts, and calls no hook from anywhere else', () => {
     expect(importedNames(source, './hook.js')).toEqual([
-      'PopoverScopeContext', 'usePopoverClose', 'usePopoverPopup', 'usePopoverPositioner', 'usePopoverRoot',
+      'usePopoverClose', 'usePopoverPopup', 'usePopoverPositioner', 'usePopoverRoot',
     ])
     expect(hookCallsIn(parse(source)).sort()).toEqual(['usePopoverClose', 'usePopoverPopup', 'usePopoverPositioner', 'usePopoverRoot'])
   })
@@ -117,8 +117,8 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
 
   it('takes its pure helpers from src/shared and imports them, never a copy', () => {
     expect(importedNames(source, '#shared/overlay.js')).toEqual(['guardEscape'])
-    expect(importedNames(source, '#shared/render-trigger.js')).toEqual(['hasContent', 'renderTrigger'])
-    expect(importedNames(source, '#shared/floating.js')).toEqual(['POPUP_BOUNDS', 'toSideAlign'])
+    expect(importedNames(source, '#shared/render-trigger.js')).toEqual(['hasContent', 'renderPart', 'renderTrigger'])
+    expect(importedNames(source, '#shared/floating.js')).toEqual(['FLOATING', 'toSideAlign'])
     expect(importedNames(source, '#shared/clamp.js')).toEqual(['clamp'])
     expect(importedModules(source).filter((m) => m.startsWith('./')).sort()).toEqual([
       './boundaries.js', './classes.js', './constants.js', './hook.js', './types.js',
@@ -188,7 +188,7 @@ describe('lib.ts is pure, and classes.ts builds every string from the shared con
 
   it('classes.ts takes the surface, the motion, the scroll area, the inset ring and the icon button from src/shared', () => {
     expect(importedNames(read('classes.ts'), '#shared/classes.js')).toEqual([
-      'FOCUS_RING_INSET', 'HOVER', 'ICON_BUTTON', 'OVERLAY_SURFACE', 'POPUP_MOTION', 'SCROLL_AREA',
+      'FOCUS_RING_INSET', 'HOVER', 'ICON_BUTTON', 'OVERLAY_SURFACE', 'POPUP_BOUNDS', 'POPUP_MOTION', 'SCROLL_AREA',
     ])
   })
 

@@ -47,19 +47,19 @@ describe('hook.ts holds what the parts read from the provider (R-5.12-1)', () =>
     expect(source.startsWith("'use client'\n")).toBe(true)
   })
 
-  it('imports the context, the ref and the memo hooks from React and no hook that holds state: the shared tab stop does', () => {
+  it('imports the context, the ref, the callback and the memo hooks from React and no hook that holds state: the shared tab stop does', () => {
     expect(importedModules(source)).toEqual([
       'react', '#shared/overlay-scope.js', '#shared/provider/context.js', '#shared/provider/use-portal-locale.js',
       '#shared/use-scroll-tab-stop.js', './constants.js', './lib.js', './types.js',
     ])
-    expect(importedNames(source, 'react')).toEqual(['createContext', 'useContext', 'useImperativeHandle', 'useMemo', 'useRef'])
+    expect(importedNames(source, 'react')).toEqual(['createContext', 'useCallback', 'useContext', 'useImperativeHandle', 'useMemo', 'useRef'])
     expect(importedNames(source, '#shared/overlay-scope.js')).toEqual(['useOverlayRoot', 'useOverlayScope'])
   })
 
-  it('one hook per part: the direction, the settings and the scope of the root, the locale and the scope of the portal, the ref and the tab stop of the body, the label of the x', () => {
+  it('one hook per part: the direction, the settings and the scope of the root, the locale, the scope, the ref and the first focus of the popup, the ref and the tab stop of the body, the label of the x', () => {
     expect(hooksByPart(source)).toEqual({
       useDrawerRoot: ['useDirection', 'useMemo', 'useOverlayRoot'],
-      useDrawerPopup: ['usePortalLocale', 'useContext', 'useOverlayScope'],
+      useDrawerPopup: ['useRef', 'useCallback', 'useCallback', 'usePortalLocale', 'useContext', 'useOverlayScope'],
       useDrawerBody: ['useRef', 'useImperativeHandle', 'useScrollTabStop'],
       useDrawerClose: ['useLabels'],
     })
@@ -67,7 +67,7 @@ describe('hook.ts holds what the parts read from the provider (R-5.12-1)', () =>
 
   it('reads the direction for the swipe only: what the viewport is stamped with comes from usePortalLocale, which answers nothing with no provider', () => {
     expect(importedNames(source, '#shared/provider/context.js')).toEqual(['useDirection', 'useLabels'])
-    expect(importedNames(source, './lib.js')).toEqual(['toSwipeDirection'])
+    expect(importedNames(source, './lib.js')).toEqual(['firstFocusOf', 'toSwipeDirection'])
   })
 
   it('writes no type argument in angle brackets, which check-boundaries would read as markup', () => {

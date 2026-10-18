@@ -15,6 +15,7 @@ export const SELECT_DEFAULTS = {
   invalid: false,
   fullWidth: false,
   visibleRows: COLLECTION_DEFAULTS.visibleRows,
+  loadMoreThreshold: COLLECTION_DEFAULTS.loadMoreThreshold,
 } as const
 
 /** Beside a trigger as wide as the screen neither side has room, so a side placement may fall back below it. */

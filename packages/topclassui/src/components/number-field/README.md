@@ -12,7 +12,7 @@ For a count or an amount between known bounds: guests, seats, hours. It is one e
 number field, a text input between a decrease and an increase stepper.
 
 ```tsx
-import { NumberField } from 'topclassui'
+import { NumberField } from 'topclassui/number-field'
 ```
 
 ```tsx
@@ -106,7 +106,7 @@ steppers stacked at one end, Page Up and Page Down, the always-on invalid ring, 
 ## Import
 
 ```tsx
-import { NumberField } from 'topclassui'
+import { NumberField } from 'topclassui/number-field'
 ```
 
 ## Props

@@ -37,7 +37,7 @@ describe('the element it renders', () => {
   })
 
   it('puts the caption first, then one thead and one tbody', () => {
-    expect(html()).toMatch(/<table [^>]*><caption [^>]*>Invoices<\/caption><thead><tr>.*<\/tr><\/thead><tbody>.*<\/tbody><\/table>/)
+    expect(html()).toMatch(/<table [^>]*><caption [^>]*>Invoices<\/caption><thead [^>]*><tr [^>]*>.*<\/tr><\/thead><tbody>.*<\/tbody><\/table>/)
   })
 
   it('makes every header a column header, in the order of the columns', () => {

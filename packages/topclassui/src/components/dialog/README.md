@@ -15,7 +15,7 @@ is open the page behind does not scroll, takes no press and is hidden from a scr
 import {
   DialogBody, DialogClose, DialogDescription, DialogFooter, DialogHeader, DialogPopup,
   DialogRoot, DialogTitle, DialogTrigger,
-} from 'topclassui'
+} from 'topclassui/dialog'
 ```
 
 ```tsx
@@ -190,7 +190,7 @@ import {
   DialogPopup,
   DialogTitle,
   DialogTrigger,
-} from 'topclassui'
+} from 'topclassui/dialog'
 ```
 
 ## Props

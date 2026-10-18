@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'in-field', 'multiple', 'playground', 'rtl', 'states']
+const EXPECTED = ['basic', 'form', 'in-field', 'multiple', 'playground', 'rtl', 'states', 'ten-thousand']
 
 /** Each file input of each demo, as the server writes it: its name by the label that points at its id, its form name,
  * and the attributes a form reads. */
@@ -23,6 +23,7 @@ const INPUTS: Record<string, string[]> = {
   playground: ['Attachment: attachment, one, accept .png,.jpg,.jpeg,.pdf'],
   rtl: ['المرفقات: attachments, multiple, accept application/pdf,image/png'],
   states: ['Invalid: invalid, one, invalid', 'Disabled: disabled, one, disabled'],
+  'ten-thousand': ['Ten thousand files: photos, multiple, accept image/*'],
 }
 
 const render = async (file: string) => {

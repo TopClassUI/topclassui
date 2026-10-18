@@ -19,8 +19,8 @@ function Link({ href, children, ...rest }: { href: string, children?: ReactNode,
 // None of these parts reads the rail: each renders with no SidebarRoot around it, as a Server Component must.
 describe('SidebarGroup on the server', () => {
   it('is a div holding a paragraph and the list it names, through an id React makes', () => {
-    const html = markup(<SidebarGroup label="Workspace"><li>Row</li></SidebarGroup>)
-    expect(html).toMatch(/^<div class="[^"]*"><p id="[^"]+" dir="auto" class="[^"]*">Workspace<\/p><ul role="list" aria-labelledby="[^"]+" class="[^"]*"><li>Row<\/li><\/ul><\/div>$/)
+    const html = markup(<SidebarGroup label="Workspace"><a href="#row">Row</a></SidebarGroup>)
+    expect(html).toMatch(/^<div class="[^"]*"><p id="[^"]+" dir="auto" class="[^"]*">Workspace<\/p><ul role="list" aria-labelledby="[^"]+" class="[^"]*"><li><a href="#row">Row<\/a><\/li><\/ul><\/div>$/)
     expect(attr(tag(html, 'ul'), 'aria-labelledby')).toBe(attr(tag(html, 'p'), 'id'))
     expect(attr(tag(html, 'p'), 'id')?.length).toBeGreaterThan(1)
   })
@@ -35,15 +35,16 @@ describe('SidebarGroup on the server', () => {
 
   it('with no label, a false or an empty one it is a bare list: no paragraph, and no name that points nowhere', () => {
     for (const label of [undefined, null, false, '']) {
-      const html = markup(<SidebarGroup label={label}><li>Row</li></SidebarGroup>)
-      expect(html, String(label)).toMatch(/^<div class="[^"]*"><ul role="list" class="[^"]*"><li>Row<\/li><\/ul><\/div>$/)
+      const html = markup(<SidebarGroup label={label}><a href="#row">Row</a></SidebarGroup>)
+      expect(html, String(label)).toMatch(/^<div class="[^"]*"><ul role="list" class="[^"]*"><li><a href="#row">Row<\/a><\/li><\/ul><\/div>$/)
     }
   })
 
-  it('keeps the list role Preflight costs it in Safari, and puts the rows straight into the list', () => {
-    const html = markup(<SidebarGroup><SidebarLink href="/a">A</SidebarLink><SidebarLink href="/b">B</SidebarLink></SidebarGroup>)
-    expect(html.match(/<ul role="list"[^>]*><li>/g)).toHaveLength(1)
+  it('keeps the list role Preflight costs it in Safari, and gives each row a list item of its own', () => {
+    const html = markup(<SidebarGroup><SidebarLink href="/a">A</SidebarLink>{null}{false}<SidebarLink href="/b">B</SidebarLink></SidebarGroup>)
+    expect(html.match(/<ul role="list"[^>]*><li><a /g)).toHaveLength(1)
     expect(html.match(/<li>/g)).toHaveLength(2)
+    expect(html.match(/<\/a><\/li>/g)).toHaveLength(2)
   })
 
   it('cuts a label of 300 characters at 100, and leaves an element as it came', () => {
@@ -64,13 +65,13 @@ describe('SidebarLink on the server', () => {
   const row = (props: Partial<Parameters<typeof SidebarLink>[0]> = {}, label: ReactNode = 'Home') =>
     markup(<SidebarLink href="/home" icon={icon} {...props}>{label}</SidebarLink>)
 
-  it('is a list item around a real link: the icon in a span, then the label in a span of its own', () => {
-    expect(row()).toMatch(/^<li><a class="[^"]*" href="\/home"><span class="[^"]*"><svg [^>]*><path [^>]*><\/path><\/svg><\/span><span dir="auto" class="[^"]*">Home<\/span><\/a><\/li>$/)
+  it('is a real link: the icon in a span, then the label in a span of its own', () => {
+    expect(row()).toMatch(/^<a class="[^"]*" href="\/home"><span class="[^"]*"><svg [^>]*><path [^>]*><\/path><\/svg><\/span><span dir="auto" class="[^"]*">Home<\/span><\/a>$/)
   })
 
-  it('the list item carries nothing: every prop goes to the link', () => {
+  it('every prop goes to the link, the element it returns', () => {
     const html = row({ id: 'home', target: '_blank', rel: 'noreferrer', lang: 'en', ...{ 'data-testid': 'home' } })
-    expect(html.startsWith('<li><a ')).toBe(true)
+    expect(html.startsWith('<a ')).toBe(true)
     const link = tag(html, 'a')
     expect([attr(link, 'id'), attr(link, 'target'), attr(link, 'rel'), attr(link, 'lang'), attr(link, 'data-testid')]).toEqual(['home', '_blank', 'noreferrer', 'en', 'home'])
   })
@@ -94,9 +95,9 @@ describe('SidebarLink on the server', () => {
   })
 
   it('with no icon it writes no wrapper for one, and with no label no span for one', () => {
-    expect(markup(<SidebarLink href="/home">Home</SidebarLink>)).toMatch(/^<li><a class="[^"]*" href="\/home"><span dir="auto" class="[^"]*">Home<\/span><\/a><\/li>$/)
+    expect(markup(<SidebarLink href="/home">Home</SidebarLink>)).toMatch(/^<a class="[^"]*" href="\/home"><span dir="auto" class="[^"]*">Home<\/span><\/a>$/)
     expect(markup(<SidebarLink href="/home" icon={false}>Home</SidebarLink>).match(/<span/g)).toHaveLength(1)
-    expect(markup(<SidebarLink href="/home" icon={icon} aria-label="Home" />)).toMatch(/^<li><a class="[^"]*" href="\/home" aria-label="Home"><span class="[^"]*"><svg [^>]*><path [^>]*><\/path><\/svg><\/span><\/a><\/li>$/)
+    expect(markup(<SidebarLink href="/home" icon={icon} aria-label="Home" />)).toMatch(/^<a class="[^"]*" href="\/home" aria-label="Home"><span class="[^"]*"><svg [^>]*><path [^>]*><\/path><\/svg><\/span><\/a>$/)
   })
 
   it('cuts a label of 300 characters at 100; a label made of elements keeps all of its text for a screen reader', () => {
@@ -114,12 +115,12 @@ describe('SidebarLink on the server', () => {
 describe('SidebarLink with render (R-5.7-4)', () => {
   it('renders the element it was given, with the href and the attributes that element was written with', () => {
     const html = markup(<SidebarLink render={<Link href="/docs" />} icon={icon} current>Docs</SidebarLink>)
-    expect(html).toMatch(/^<li><a href="\/docs" data-framework="" class="[^"]*" aria-current="page"><span class="[^"]*"><svg [^>]*><path [^>]*><\/path><\/svg><\/span><span dir="auto" class="[^"]*">Docs<\/span><\/a><\/li>$/)
+    expect(html).toMatch(/^<a href="\/docs" data-framework="" class="[^"]*" aria-current="page"><span class="[^"]*"><svg [^>]*><path [^>]*><\/path><\/svg><\/span><span dir="auto" class="[^"]*">Docs<\/span><\/a>$/)
   })
 
   it('an element written with its own children keeps them, inside the label that can hide, with the icon before it', () => {
     const html = markup(<SidebarLink render={<Link href="/docs">Docs</Link>} icon={icon} />)
-    expect(html).toMatch(/<\/svg><\/span><span dir="auto" class="[^"]*">Docs<\/span><\/a><\/li>$/)
+    expect(html).toMatch(/<\/svg><\/span><span dir="auto" class="[^"]*">Docs<\/span><\/a>$/)
     expect(html.match(/<span/g)).toHaveLength(2)
   })
 
@@ -131,9 +132,9 @@ describe('SidebarLink with render (R-5.7-4)', () => {
     expect(classList(link)).not.toContain('text-body')
   })
 
-  it('takes a button for a row that is an action, and still puts it in a list item', () => {
+  it('takes a button for a row that is an action', () => {
     const html = markup(<SidebarLink render={<button type="button" />} icon={icon}>Sign out</SidebarLink>)
-    expect(html).toMatch(/^<li><button type="button" class="[^"]*"><span /)
+    expect(html).toMatch(/^<button type="button" class="[^"]*"><span /)
     expect(html).not.toContain('<a')
   })
 

@@ -677,7 +677,7 @@ test.describe('each value of modal', () => {
 
 test.describe('one Escape closes one layer', () => {
   const SCOPE = '#nested'
-  const tooltip = (page: Page) => page.locator('[data-placement][data-open]:not([role])')
+  const tooltip = (page: Page) => page.locator('[role="tooltip"][data-open]')
   /** The titles of every popover and dialog still open, outermost first. */
   const titles = (page: Page) => openPopups(page).locator('h2').allTextContents()
   const escape = async (page: Page, left: string[]) => {

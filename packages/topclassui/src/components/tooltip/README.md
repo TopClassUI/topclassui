@@ -47,7 +47,7 @@ import {
   TooltipRoot,
   TooltipPopup,
   TooltipTrigger,
-} from 'topclassui'
+} from 'topclassui/tooltip'
 ```
 
 ## Props

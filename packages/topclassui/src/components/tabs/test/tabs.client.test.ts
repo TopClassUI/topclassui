@@ -100,7 +100,7 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
       TabsTab: ['useTabsTab'],
       TabsPanel: [],
     })
-    expect(importedNames(source, './hook.js').sort()).toEqual(['TabsLookContext', 'useTabsLook', 'useTabsRoot', 'useTabsTab'])
+    expect(importedNames(source, './hook.js').sort()).toEqual(['useTabsLook', 'useTabsRoot', 'useTabsTab'])
   })
 
   it('the call scan sees a bare hook, a member hook and use, and not a word that starts with use', () => {
@@ -108,9 +108,10 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
   })
 
   // Not a portal: the direction reaches Base UI through the DirectionProvider that TopClassProvider mounts.
-  it('imports nothing from the provider: Base UI reads the direction of the arrow keys itself', () => {
+  it('reads nothing from the provider but its presence: Base UI reads the direction of the arrow keys itself', () => {
     expect(importedModules(source).filter((m) => m.includes('provider'))).toEqual([])
-    expect(importedModules(read('hook.ts')).filter((m) => m.includes('provider'))).toEqual([])
+    expect(importedModules(read('hook.ts')).filter((m) => m.includes('provider'))).toEqual(['#shared/provider/context.js'])
+    expect(importedNames(read('hook.ts'), '#shared/provider/context.js')).toEqual(['useProviderPresence'])
   })
 
   it('takes Base UI from its tabs entry and no other Base UI part', () => {
@@ -134,15 +135,15 @@ describe('hook.ts holds the context that carries the look, and the tab stop of t
     expect(source.startsWith("'use client'\n")).toBe(true)
   })
 
-  it('imports React, the shared server tab stop, the defaults and a type, and no Base UI: which tab is active stays with Base UI', () => {
-    expect(importedModules(source).sort()).toEqual(['#shared/use-server-tab-stop.js', './constants.js', './types.js', 'react'])
+  it('imports React, the provider check, the shared server tab stop, the defaults and a type, and no Base UI: which tab is active stays with Base UI', () => {
+    expect(importedModules(source).sort()).toEqual(['#shared/provider/context.js', '#shared/use-server-tab-stop.js', './constants.js', './types.js', 'react'])
     expect(importedNames(source, 'react').sort()).toEqual(['createContext', 'useContext', 'useMemo', 'useState'])
     expect(importedNames(source, '#shared/use-server-tab-stop.js')).toEqual(['useServerTabStop'])
   })
 
   it('the root keeps the value it opens on and memoizes what it provides; a list and a tab read it', () => {
     expect(hooksPerFunction(source)).toEqual({
-      useTabsRoot: ['useState', 'useMemo'],
+      useTabsRoot: ['useProviderPresence', 'useState', 'useMemo'],
       useTabsLook: ['useContext'],
       useTabsTab: ['useContext', 'useServerTabStop'],
     })

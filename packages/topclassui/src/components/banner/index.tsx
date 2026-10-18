@@ -1,16 +1,11 @@
 // No 'use client': a client bundle gets it only when a client file imports it.
-import type { ReactNode } from 'react'
-
 import { cn } from '#shared/cn.js'
 import { MESSAGE } from './classes.js'
 import { BannerShell } from './client.js'
 import { BANNER_DEFAULTS } from './constants.js'
+import { isEmpty } from './lib.js'
 import type { BannerProps } from './types.js'
 import { bannerVariants } from './variants.js'
-
-/** These render nothing, so a message holding one gets no element and opens no gap. */
-const isEmpty = (node: ReactNode): boolean =>
-  node == null || typeof node === 'boolean' || node === '' || (Array.isArray(node) && node.every(isEmpty))
 
 /** A full-width message above the header, in the page flow. It is a named region, so
  * a screen reader lists it as a landmark; the icon and the action are the caller's. */
@@ -21,7 +16,6 @@ export function Banner({
   className,
   children,
   dismissible = BANNER_DEFAULTS.dismissible,
-  onDismiss,
   ...rest
 }: BannerProps) {
   const content = (
@@ -32,11 +26,11 @@ export function Banner({
     </>
   )
 
-  // Only a dismissible banner reaches the client module; a JS caller with no id gets the plain one.
+  // Only a dismissible banner reaches the client module, handed no function; a JS caller with no id gets the plain one.
   if (dismissible && rest.id !== undefined) {
     const look = cn(bannerVariants({ tone }), className)
     return (
-      <BannerShell data-tone={tone} className={look} {...rest} id={rest.id} role="region" onDismiss={onDismiss}>
+      <BannerShell data-tone={tone} className={look} {...rest} id={rest.id} role="region">
         {content}
       </BannerShell>
     )
@@ -54,7 +48,8 @@ export function Banner({
   )
 }
 
+export { BannerDismissible } from './client.js'
 export { bannerVariants } from './variants.js'
 export type {
-  BannerDesignProps, BannerDismissal, BannerName, BannerOwnProps, BannerProps, BannerTone,
+  BannerDesignProps, BannerDismissal, BannerDismissibleProps, BannerName, BannerOwnProps, BannerProps, BannerTone,
 } from './types.js'

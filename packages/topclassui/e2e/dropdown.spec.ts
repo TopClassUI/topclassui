@@ -993,7 +993,7 @@ test.describe('each value of modal', () => {
 
 test.describe('one Escape closes one layer', () => {
   const dialogs = (page: Page) => page.locator('[role="dialog"][data-open]')
-  const tooltip = (page: Page) => page.locator('[data-placement][data-open]:not([role])')
+  const tooltip = (page: Page) => page.locator('[role="tooltip"][data-open]')
 
   /** Opens the dialog of the in-dialog demo and then the menu inside it, both from the keyboard. */
   async function openRole(page: Page, options: LiveOptions = {}): Promise<Locator> {
