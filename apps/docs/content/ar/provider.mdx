@@ -1,0 +1,82 @@
+---
+slug: provider
+title: المزوّد
+description: مزوّد واحد في جذر تطبيقك، مع الاتجاه والإعداد المحلي كخصائص. وجوده إلزامي، وكل ما يفعله مذكور في هذه الصفحة.
+---
+
+## أين يوضع
+
+في التخطيط الجذري، محيطًا بكل شيء. تأتي <span dir="ltr">`direction`</span> و<span dir="ltr">`locale`</span> من المسار، ولا تُقرأ من DOM أبدًا.
+
+```tsx title="app/[locale]/layout.tsx" check
+import { TopClassProvider } from 'topclassui/provider'
+import { ThemeScript } from 'topclassui/theme'
+
+export default async function RootLayout({ children, params }: {
+  children: React.ReactNode
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  const dir = locale === 'ar' ? 'rtl' : 'ltr'
+  return (
+    <html lang={locale} dir={dir} data-theme="dark" suppressHydrationWarning>
+      <head><ThemeScript /></head>
+      <body>
+        <TopClassProvider direction={dir} locale={locale}>
+          {children}
+        </TopClassProvider>
+      </body>
+    </html>
+  )
+}
+```
+
+## الخصائص
+
+<PropsTable of="TopClassProvider" />
+
+## لماذا الاتجاه خاصية
+
+قراءة <span dir="ltr">`document.dir`</span> داخل تأثير (effect) تعطي الخادم جوابًا والمتصفح جوابًا آخر لإطار واحد، فيظهر وميض بالاتجاه الخاطئ. أما الخاصية القادمة من التخطيط فلها القيمة نفسها في المكانين.
+
+<WrongRight>
+
+```tsx
+useEffect(() => {
+  setDir(document.documentElement.dir)
+}, [])
+```
+
+```tsx
+<html dir={dir}>
+  <TopClassProvider direction={dir}>
+```
+
+</WrongRight>
+
+## ما الذي يعرضه
+
+<Cards>
+  <Card title="مزوّد الاتجاه">النوافذ المنبثقة تقرأ الاتجاه من هنا، فتُفتح قائمة <span dir="ltr">`Select`</span> في الجهة الصحيحة بالعربية.</Card>
+  <Card title="منطقة الإشعارات">منطقة حيّة واحدة، موضعها يتبع الاتجاه، مع هامش المنطقة الآمنة.</Card>
+  <Card title="مزوّد التلميحات">تأخير مشترك، فيُفتح التلميح الثاني فورًا.</Card>
+  <Card title="جذر العزل">عنصر <span dir="ltr">`div`</span> عليه <span dir="ltr">`isolation: isolate`</span>، فتتراكب الطبقات فوق صفحتك بلا تعارض في <span dir="ltr">`z-index`</span>.</Card>
+</Cards>
+
+## ThemeScript
+
+سكربت صغير مضمّن، يأتي أولًا في <span dir="ltr">`head`</span>، يقرأ التفضيل المحفوظ ويضبط <span dir="ltr">`data-theme`</span> قبل أول رسم. من دونه تُعرض الصفحة بالوضع الافتراضي ثم تتبدّل، فيظهر وميض بالوضع الخاطئ. السكربت نص ثابت، لذلك تستطيع سياسة أمان المحتوى (CSP) الصارمة أن تسمح به عبر البصمة أدناه.
+
+```tsx
+import { ThemeScript } from 'topclassui/theme'
+
+<head><ThemeScript /></head>
+```
+
+<ThemeScriptCsp />
+
+## في تطبيق صفحة واحدة
+
+في تطبيق صفحة واحدة لا يعمل أي شيء يعرضه React قبل أول رسم، لذلك يوضع السكربت نفسه في <span dir="ltr">`index.html`</span> فوق سكربت الوحدة: الصق نص <span dir="ltr">`THEME_SCRIPT`</span> من <span dir="ltr">`topclassui/theme`</span> داخل وسم <span dir="ltr">`script`</span>. وتكون القيم الأولى لـ <span dir="ltr">`lang`</span> و<span dir="ltr">`dir`</span> و<span dir="ltr">`data-theme`</span> سمات ثابتة على عنصر <span dir="ltr">`html`</span>. وعندما يغيّر الزائر اللغة، حدّث سمات <span dir="ltr">`html`</span> وخصائص المزوّد في الوقت نفسه.
+
+<ThemeScriptHtml />

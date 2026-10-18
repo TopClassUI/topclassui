@@ -50,7 +50,7 @@ export function ComponentPage({ entry, locale }: { entry: PagedComponent; locale
     </section>
   )
   return (
-    <article className="grid min-w-0 gap-8">
+    <article className="mx-auto grid w-full max-w-(--docs-column) min-w-0 gap-8">
       <header className="grid min-w-0 gap-2.5">
         <Breadcrumb
           baseUrl={SITE_URL}

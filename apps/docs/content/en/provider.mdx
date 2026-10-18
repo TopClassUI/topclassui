@@ -1,0 +1,82 @@
+---
+slug: provider
+title: Provider
+description: One provider at the root of your app, with direction and locale as props. It is required, and everything it does is listed on this page.
+---
+
+## Where it goes
+
+Your root layout, wrapping everything. `direction` and `locale` come from the route, never from the DOM.
+
+```tsx title="app/[locale]/layout.tsx" check
+import { TopClassProvider } from 'topclassui/provider'
+import { ThemeScript } from 'topclassui/theme'
+
+export default async function RootLayout({ children, params }: {
+  children: React.ReactNode
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  const dir = locale === 'ar' ? 'rtl' : 'ltr'
+  return (
+    <html lang={locale} dir={dir} data-theme="dark" suppressHydrationWarning>
+      <head><ThemeScript /></head>
+      <body>
+        <TopClassProvider direction={dir} locale={locale}>
+          {children}
+        </TopClassProvider>
+      </body>
+    </html>
+  )
+}
+```
+
+## The props
+
+<PropsTable of="TopClassProvider" />
+
+## Why direction is a prop
+
+Reading `document.dir` in an effect would give the server one answer and the browser another for one frame, which shows as a flash in the wrong direction. A prop from the layout has the same value in both places.
+
+<WrongRight>
+
+```tsx
+useEffect(() => {
+  setDir(document.documentElement.dir)
+}, [])
+```
+
+```tsx
+<html dir={dir}>
+  <TopClassProvider direction={dir}>
+```
+
+</WrongRight>
+
+## What it renders
+
+<Cards>
+  <Card title="Direction provider">Popups read the direction from here, so a Select opens on the correct side in Arabic.</Card>
+  <Card title="Toast viewport">One live region, positioned by direction, with the safe-area padding.</Card>
+  <Card title="Tooltip provider">A shared delay, so the second tooltip opens at once.</Card>
+  <Card title="Isolation root">A div with `isolation: isolate`, so overlays stack above your page without z-index conflicts.</Card>
+</Cards>
+
+## ThemeScript
+
+A small inline script, first in `head`, reads the stored preference and sets `data-theme` before the first paint. Without it the page renders in the default mode and then switches, which shows a flash of the wrong mode. The script is a constant string, so a strict Content Security Policy can allow it by the hash below.
+
+```tsx
+import { ThemeScript } from 'topclassui/theme'
+
+<head><ThemeScript /></head>
+```
+
+<ThemeScriptCsp />
+
+## In a single-page app
+
+In a single-page app nothing React renders runs before the first paint, so the same script goes in `index.html` above the module script: paste the `THEME_SCRIPT` string from `topclassui/theme` into a `script` tag. The initial `lang`, `dir` and `data-theme` are static attributes on the `html` element. When the visitor changes locale, update the `html` attributes and the provider props at the same time.
+
+<ThemeScriptHtml />
