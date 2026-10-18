@@ -4,6 +4,8 @@ import { join } from 'node:path'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 
+import { importsFromRepo } from '#test/samples.js'
+
 const ROOT = process.cwd()
 const FOLDER = join(ROOT, 'src', 'components', 'command')
 
@@ -22,7 +24,7 @@ const PRELUDE = [
 
 /** The import line as a module that uses what it imports; anything else after the prelude. */
 function wrap(code: string): string {
-  if (code.startsWith('import ')) return `${code.replace("'topclassui'", "'../index.js'")}\nexport const imported = [Command]\n`
+  if (code.startsWith('import ')) return `${importsFromRepo(code)}\nexport const imported = [Command]\n`
   return `${PRELUDE}\n${code.replace("'use client'", '')}\n`
 }
 
@@ -65,19 +67,19 @@ const verdict = compile({
   everyProp: palette(" getGroup={(c) => c.id} renderItem={(c) => <b>{c.label}</b>} visibleRows={5} virtualize shortcut={null} status=\"loading\" emptyFallback=\"None\" loadingFallback=\"Wait\" defaultOpen className=\"p-4\" id=\"palette\" finalFocus={() => document.body} keepMounted container={null}"),
   noGetLabel: "export const probe = <Command items={[{ id: 'a' }]} getKey={(c) => c.id} onSelect={() => undefined} />",
   wrongItem: palette(' renderItem={(c) => c.missing}'),
-  loadMore: palette(' loadMore={() => undefined}'),
+  paging: palette(' hasMore loadMore={() => undefined} loadMoreThreshold={4} onQueryChange={(q) => q.length} status="loading-more"'),
+  badThreshold: palette(' loadMoreThreshold="4"'),
   childrenGiven: palette(' children="x"'),
   classFunction: palette(" className={() => 'p-4'}"),
   badVirtualize: palette(' virtualize="always"'),
   statusError: palette(' status="error"'),
-  statusMore: palette(' status="loading-more"'),
   statusEmpty: palette(' status="empty"'),
 })
 
 describe('the samples in the README compile as written', () => {
   it('finds the import line and the client file, so an empty extraction cannot pass', () => {
     expect(SAMPLES).toHaveLength(2)
-    expect(SAMPLES[0]).toBe("import { Command } from 'topclassui'\n")
+    expect(SAMPLES[0]).toBe("import { Command } from 'topclassui/command'\n")
     expect(SAMPLES[1]).toContain('onOpenChange={setOpen}')
   })
 
@@ -92,10 +94,14 @@ describe('what Command takes', () => {
     expect(verdict['everyProp']).toEqual([])
   })
 
-  it('refuses a palette without getLabel, a row that reads what an item lacks, and loadMore, which is not built', () => {
+  it('refuses a palette without getLabel, and a row that reads what an item lacks', () => {
     expect(verdict['noGetLabel']?.join(' ')).toContain("Property 'getLabel' is missing")
     expect(verdict['wrongItem']?.join(' ')).toContain("Property 'missing' does not exist")
-    expect(verdict['loadMore']?.join(' ')).toContain("Property 'loadMore' does not exist")
+  })
+
+  it('pages on scroll and on search (PLAN 8.5): hasMore, loadMore, a numeric threshold, onQueryChange, loading-more', () => {
+    expect(verdict['paging']).toEqual([])
+    expect(verdict['badThreshold']?.join(' ')).toContain("'string' is not assignable to type 'number'")
   })
 
   it('refuses children, a className function and a virtualize that is not auto or a boolean', () => {
@@ -104,9 +110,8 @@ describe('what Command takes', () => {
     expect(verdict['badVirtualize']).not.toEqual([])
   })
 
-  it('refuses status error and loading-more, which it cannot draw, and takes empty', () => {
+  it('refuses status error, which it cannot draw, and takes empty', () => {
     expect(verdict['statusError']?.join(' ')).toContain('"error"')
-    expect(verdict['statusMore']?.join(' ')).toContain('"loading-more"')
     expect(verdict['statusEmpty']).toEqual([])
   })
 })

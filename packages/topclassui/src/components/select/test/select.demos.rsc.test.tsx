@@ -1,5 +1,5 @@
 // The rsc project, where React resolves its react-server build and has no client hooks.
-import { readdirSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { isValidElement, type ReactElement, type ReactNode } from 'react'
@@ -21,7 +21,10 @@ vi.mock('#components/slider/index.js', () => ({ Slider: reference('Slider') }))
 vi.mock('#components/switch/index.js', () => ({ Switch: reference('Switch') }))
 
 const DUMMY = join(import.meta.dirname, '..', 'dummy')
-const names = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
+const all = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
+/** A demo that holds pages in state is a client island; a server page hands the same Select a Server Action. */
+const islands = all.filter((name) => readFileSync(join(DUMMY, `${name}.tsx`), 'utf8').startsWith("'use client'"))
+const names = all.filter((name) => !islands.includes(name))
 
 interface Crossing { part: string, props: Props }
 
@@ -56,8 +59,9 @@ function unserializable(value: unknown, path: string, found: string[] = []): str
 const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { default: () => ReactNode }).default
 
 describe('every demo is a Server Component that only hands the Select what can cross (R-5.1-3)', () => {
-  it('found the demo folder, so an empty list cannot pass', () => {
+  it('found the demo folder, so an empty list cannot pass, and the one client island is the paging demo', () => {
     expect(names).toEqual(['basic', 'form', 'four-rows', 'long-content', 'phase-4-form', 'rtl', 'sixty-items', 'sizes', 'states'])
+    expect(islands).toEqual(['load-more'])
   })
 
   for (const name of names) {

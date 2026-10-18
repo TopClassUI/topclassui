@@ -2,7 +2,9 @@ import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import type { Size } from '#shared/contracts/size.js'
 import type { Labels } from '#shared/labels/types.js'
-import type { RatingDesignProps, RatingEditableProps, RatingProps, RatingReadOnlyProps } from '../types.js'
+import type {
+  RatingDesignProps, RatingEditableProps, RatingInputProps, RatingProps, RatingReadOnlyProps,
+} from '../types.js'
 
 /** Assignability as a value, so a rejected prop is a passing assertion. */
 type Accepts<Union, Candidate> = Candidate extends Union ? true : false
@@ -50,8 +52,15 @@ describe('editing requires a name for the group', () => {
     expectTypeOf<Accepts<RatingProps, { readOnly: false; 'aria-labelledby': 'title' }>>().toEqualTypeOf<true>()
   })
 
-  it('calls onValueChange with a number, and takes name and disabled', () => {
-    expectTypeOf<RatingEditableProps['onValueChange']>().toEqualTypeOf<((value: number) => void) | undefined>()
+  it('takes no onValueChange on Rating (R-5.1-3); RatingInput calls it with a number', () => {
+    expectTypeOf<Accepts<keyof RatingEditableProps | keyof RatingReadOnlyProps, 'onValueChange'>>().toEqualTypeOf<false>()
+    expectTypeOf<RatingInputProps['onValueChange']>().toEqualTypeOf<((value: number) => void) | undefined>()
+    expectTypeOf<Accepts<keyof RatingInputProps, 'readOnly'>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<RatingInputProps, { 'aria-label': 'Stay' }>>().toEqualTypeOf<true>()
+    expectTypeOf<Accepts<RatingInputProps, { defaultValue: 3 }>>().toEqualTypeOf<false>()
+  })
+
+  it('takes name and disabled', () => {
     expectTypeOf<RatingEditableProps['name']>().toEqualTypeOf<string | undefined>()
     expectTypeOf<RatingEditableProps['disabled']>().toEqualTypeOf<boolean | undefined>()
   })

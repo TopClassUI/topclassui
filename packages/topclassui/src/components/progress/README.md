@@ -32,7 +32,7 @@ or more on the page. Under forced colours the track is `Canvas` and the bar `Can
 ## Import
 
 ```tsx
-import { Progress } from 'topclassui'
+import { Progress } from 'topclassui/progress'
 ```
 
 ## Props

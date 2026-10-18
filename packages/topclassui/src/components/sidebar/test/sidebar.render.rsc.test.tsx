@@ -35,11 +35,9 @@ describe('the react-server build has what the server parts need, and nothing the
 })
 
 describe('<SidebarLink render> in a Server Component tree', () => {
-  const item = element(SidebarLink({ render: <Link href="/docs" />, current: true, children: 'Docs' }))
-  const link = element(item.props['children'] as ReactNode)
+  const link = element(SidebarLink({ render: <Link href="/docs" />, current: true, children: 'Docs' }))
 
-  it('returns a list item around the element it was given, so the framework link is what renders', () => {
-    expect(item.type).toBe('li')
+  it('returns the element it was given, so the framework link is what renders', () => {
     expect(link.type).toBe(Link)
   })
 
@@ -67,7 +65,7 @@ describe('<SidebarLink render> in a Server Component tree', () => {
 
 describe('<SidebarLink> with no render in a Server Component tree', () => {
   it('returns a plain anchor carrying the href, and no aria-current on a row that is not current', () => {
-    const link = element(element(SidebarLink({ href: '/team', children: 'Team' })).props['children'] as ReactNode)
+    const link = element(SidebarLink({ href: '/team', children: 'Team' }))
     expect(link.type).toBe('a')
     expect(link.props['href']).toBe('/team')
     expect(link.props['aria-current']).toBeUndefined()

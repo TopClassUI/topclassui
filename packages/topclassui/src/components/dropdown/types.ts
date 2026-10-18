@@ -29,12 +29,17 @@ interface OwnRow {
 }
 
 /** R-5.6-1: a row is named by its text. A row with no text, an icon alone, takes aria-label. */
+/** What one row draws: the icon, the label and the shortcut. */
+export interface DropdownRowProps extends OwnRow {
+  label: ReactNode
+}
+
 type Named =
   | { children: ReactNode }
   | { 'children'?: undefined, 'aria-label': string }
 
 // R-5.7-5: derived at the seam. No handle: nothing here creates one, so a trigger sits inside its root.
-export type DropdownRootProps = Omit<Base.Root.Props, 'handle' | 'children'> & {
+export type DropdownRootProps = Omit<Base.Root.Props, 'className' | 'handle' | 'children'> & {
   /** The trigger and the popup. With no trigger, hold `open` in a client file. */
   children?: ReactNode | undefined
 }
@@ -48,7 +53,7 @@ export type DropdownTriggerProps =
 /** The popup's own props, and the two of the portal around it: where it mounts, and whether
  * it stays mounted while closed. The positioner takes none, so the placement stays ours. */
 export type DropdownPopupProps = Omit<Base.Popup.Props, 'className'>
-  & Pick<Base.Portal.Props, 'container' | 'keepMounted'>
+  & Omit<Base.Portal.Props, 'className' | keyof Base.Popup.Props>
   & Pick<DropdownDesignProps, 'placement'>
   & OwnClassName
 
@@ -65,5 +70,5 @@ export type DropdownGroupLabelProps = Omit<Base.GroupLabel.Props, 'className'> &
 
 export type DropdownSeparatorProps = Omit<Base.Separator.Props, 'className'> & OwnClassName
 
-/** The shared menu contract, so a Drawer menu takes the same data, plus where the popup opens. */
-export type DropdownMenuProps = MenuContract & Pick<DropdownDesignProps, 'placement'> & OwnClassName
+/** The shared menu contract, so a Drawer menu takes the same data; the rest, the className and the ref reach the popup. */
+export type DropdownMenuProps = MenuContract & Omit<DropdownPopupProps, keyof MenuContract | 'children' | 'container' | 'keepMounted' | 'render'>

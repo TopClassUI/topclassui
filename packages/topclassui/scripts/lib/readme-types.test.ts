@@ -55,13 +55,13 @@ describe('each part is documented with what its own type accepts', () => {
 })
 
 describe('what each part passes on is read from its own type', () => {
-  it('DropdownMenu takes a className and no id or ref, so it is never said to take attributes', () => {
-    expect(reachOf(program, at('dropdown', 'types.ts'), 'DropdownMenu')).toBe('className')
+  it('DropdownMenu passes the rest to its popup, as DropdownPopup does', () => {
+    expect(reachOf(program, at('dropdown', 'types.ts'), 'DropdownMenu')).toBe('element')
     expect(reachOf(program, at('dropdown', 'types.ts'), 'DropdownPopup')).toBe('element')
   })
 
-  it('ToastViewport takes a className alone, and the toast function has no props type at all', () => {
-    expect(reachOf(program, at('toast', 'types.ts'), 'ToastViewport')).toBe('className')
+  it('ToastViewport passes the rest to the region, and the toast function has no props type at all', () => {
+    expect(reachOf(program, at('toast', 'types.ts'), 'ToastViewport')).toBe('element')
     expect(reachOf(program, at('toast', 'types.ts'), 'toast')).toBe(null)
   })
 })

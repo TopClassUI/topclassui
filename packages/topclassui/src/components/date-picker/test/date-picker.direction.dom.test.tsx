@@ -75,6 +75,6 @@ describe('Arabic: month and day names from Intl, digits from the provider', () =
   it('the carets are drawn to flip in RTL, so previous points to the inline start in both directions', async () => {
     await opened(rtl(picker))
     const carets = ['الشهر السابق', 'الشهر التالي'].map((name) => screen.getByRole('button', { name }).querySelector('svg')?.getAttribute('class') ?? '')
-    for (const caret of carets) expect(caret.split(' ')).toContain('rtl:-scale-x-100')
+    for (const caret of carets) expect(caret.split(' ')).toContain('scale-x-(--tc-dir)')
   })
 })

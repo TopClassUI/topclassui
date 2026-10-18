@@ -5,7 +5,7 @@ import { cn } from '#shared/cn.js'
 import { Svg } from '#components/svg/index.js'
 import { SIDEBAR_ROOT, SIDEBAR_TRIGGER } from './classes.js'
 import { SIDEBAR_DEFAULTS } from './constants.js'
-import { SidebarContext, useSidebarRoot, useSidebarTrigger } from './hook.js'
+import { useSidebarRoot, useSidebarTrigger } from './hook.js'
 import type { SidebarRootProps, SidebarTriggerProps } from './types.js'
 
 /** The rail: a nav named by the labels, 220 px expanded and 60 collapsed. It holds the state
@@ -21,7 +21,7 @@ export function SidebarRoot({
 }: SidebarRootProps) {
   const sidebar = useSidebarRoot(open, defaultOpen, onOpenChange, name)
   return (
-    <SidebarContext value={sidebar.state}>
+    <sidebar.Context value={sidebar.state}>
       <nav
         {...rest}
         aria-label={sidebar.label}
@@ -31,7 +31,7 @@ export function SidebarRoot({
       >
         {children}
       </nav>
-    </SidebarContext>
+    </sidebar.Context>
   )
 }
 

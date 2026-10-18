@@ -21,7 +21,7 @@ export function Svg({ icon, size = '1em', label, flipRtl, className, ...rest }: 
       aria-label={labelled ? label : undefined}
       aria-hidden={labelled ? undefined : true}
       focusable="false"
-      className={cn('inline-block shrink-0', flip && 'rtl:-scale-x-100', className)}
+      className={cn('inline-block shrink-0', flip && 'scale-x-(--tc-dir)', className)}
     >
       {icon.path === '' ? null : <path d={icon.path} fill="currentColor" />}
     </svg>

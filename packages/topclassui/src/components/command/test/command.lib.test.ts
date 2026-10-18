@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { arrangeCommands, filterCommands, keyOfEntry, matchesShortcut, runsOf, withActiveRow } from '../lib.js'
+import { arrangeCommands, filterCommands, keyOfEntry, matchesShortcut, runsOf, toRunViews, withActiveRow } from '../lib.js'
 
 interface Entry { id: string, label: string, group?: string }
 
@@ -127,6 +127,34 @@ describe('runsOf', () => {
     ])
     expect(runsOf([c].filter((entry) => entry !== undefined)).map((run) => [run.start, run.end])).toEqual([[2, 3]])
     expect(runsOf(files.slice(2)).map((run) => [run.start, run.end])).toEqual([[2, 3], [3, 5]])
+  })
+})
+
+describe('toRunViews', () => {
+  const files = arrangeCommands(
+    [{ id: 'a', label: 'A', group: 'Files' }, { id: 'b', label: 'B', group: 'Files' }, { id: 'c', label: 'C', group: 'Help' }],
+    key,
+    (entry) => entry.group,
+  ).entries
+
+  it('keys each run by its group and gives the rows left out before it and after the last', () => {
+    const { views, tail } = toRunViews(runsOf(files.slice(1, 3)), 8)
+    expect(views.map((view) => [view.key, view.gap])).toEqual([['group:Files:0', 1]])
+    expect(tail).toBe(5)
+  })
+
+  it('a second run of one group gets the next number, so no two runs share a key', () => {
+    const [heading, , b] = files
+    const split = runsOf([heading, b].filter((entry) => entry !== undefined))
+    expect(toRunViews(split, 5)).toMatchObject({
+      views: [{ key: 'group:Files:0', gap: 0 }, { key: 'group:Files:1', gap: 1 }],
+      tail: 2,
+    })
+  })
+
+  it('rows with no group are keyed ungrouped, and an empty list is all tail', () => {
+    expect(toRunViews(runsOf(arrangeCommands(ITEMS, key).entries), 4)).toMatchObject({ views: [{ key: 'ungrouped:0', gap: 0 }], tail: 0 })
+    expect(toRunViews([], 6)).toEqual({ views: [], tail: 6 })
   })
 })
 

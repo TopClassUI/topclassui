@@ -1,6 +1,16 @@
 // Pure helpers: no React, no DOM. The hook and the tests call them.
 import { FILE_UPLOAD_UNITS } from './constants.js'
-import type { FileUploadLimits, FileUploadRejection, FileUploadSorted } from './types.js'
+import type { FileUploadLimits, FileUploadRejection, FileUploadRow, FileUploadSorted } from './types.js'
+
+/** A row's key, made once when it joins the list: the collection's identity. */
+export function keyOfRow(row: FileUploadRow): string {
+  return row.key
+}
+
+/** A spacer stands for the rows and the gaps between them, less the gap the grid already puts after it; none at 0. */
+export function spacerOf(padding: number, gap: number): string | undefined {
+  return padding > 0 ? `${String(Math.max(0, padding - gap))}px` : undefined
+}
 
 /** As the picker reads accept: `.ext` by the end of the name, `type/*` by the start of the MIME type, or an exact
  * MIME type, case apart. An empty accept takes every file. */

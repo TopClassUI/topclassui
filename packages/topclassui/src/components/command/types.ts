@@ -10,27 +10,31 @@ export type CommandDesignProps = {
   [K in keyof CommandSchemaInput]?: CommandSchemaInput[K] | undefined
 }
 
-/** The part of the shared collection contract the palette takes: no loadMore, no errorFallback. */
-type CommandCollection<T> = Pick<CollectionProps<T>, 'items' | 'getKey' | 'emptyFallback' | 'loadingFallback'> & {
-  /** 'idle', 'loading' or 'empty'. Never 'error': with no errorFallback, a failed fetch would read as No results. */
-  status?: Exclude<Status, 'error' | 'loading-more'> | undefined
+/** The part of the shared collection contract the palette takes: paging on scroll and on search, no errorFallback. */
+type CommandCollection<T> = Pick<CollectionProps<T>,
+  'items' | 'getKey' | 'emptyFallback' | 'loadingFallback' | 'hasMore' | 'loadMore'> & {
+  /** Never 'error': with no errorFallback, a failed fetch would read as No results. */
+  status?: Exclude<Status, 'error'> | undefined
+  /** Called with each new query, so the caller can fetch its first page from the server. Client-only, or a Server Action. */
+  onQueryChange?: ((query: string) => void) | undefined
 }
 
 // R-5.7-5: the popup's own props reach Base UI's popup, with the two of the portal around it.
 type CommandPopupProps = Omit<Base.Popup.Props, 'className' | 'children' | 'render' | 'onSelect'>
-  & Pick<Base.Portal.Props, 'container' | 'keepMounted'>
+  & Omit<Base.Portal.Props, 'className' | keyof Base.Popup.Props>
 
 export type CommandProps<T> = CommandCollection<T> & CommandDesignProps & CommandPopupProps & {
-  /** The text a row shows and the query is matched against, word by word. */
+  /** The text a row shows and the query is matched against, word by word. Client-only, as is every function here. */
   getLabel: (item: T) => string
-  /** Called with the chosen item, by a press or by Enter; the palette has closed by then. */
+  /** Called with the chosen item, by a press or by Enter; the palette has closed by then. Client-only. */
   onSelect: (item: T) => void
-  /** The heading a row sits under; rows with none come first, in a group with no heading. */
+  /** The heading a row sits under; rows with none come first, in a group with no heading. Client-only. */
   getGroup?: ((item: T) => string | undefined) | undefined
-  /** What a row holds in place of its label. It stays one row tall. */
+  /** What a row holds in place of its label. It stays one row tall. Client-only. */
   renderItem?: ((item: T) => ReactNode) | undefined
   /** Whether it is open. Use with onOpenChange when controlled. */
   open?: boolean | undefined
+  /** Called with the open state the palette asks for. Client-only. */
   onOpenChange?: ((open: boolean) => void) | undefined
   /** Merged last onto the popup, so a consumer class wins a conflict with its own. */
   className?: string | undefined
@@ -66,6 +70,13 @@ export interface CommandRun {
   /** The row of its first entry, and the row after its last. */
   start: number
   end: number
+}
+
+/** A run as the rows part draws it: a key no other run of the list holds, and the rows left out before it. */
+export interface CommandRunView {
+  run: CommandRun
+  key: string
+  gap: number
 }
 
 /** What the rows part draws: the runs of mounted rows, the spacers around them, and each row. */

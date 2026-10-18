@@ -28,7 +28,7 @@ export type DialogTriggerProps = Omit<Base.Trigger.Props, 'className' | 'handle'
 /** The popup's own props, and the two of the portal around it: where it mounts, and whether
  * it stays mounted while closed. The scrim and the viewport take none. */
 export type DialogPopupProps = Omit<Base.Popup.Props, 'className'>
-  & Pick<Base.Portal.Props, 'container' | 'keepMounted'>
+  & Omit<Base.Portal.Props, 'className' | keyof Base.Popup.Props>
   & Pick<DialogDesignProps, 'size'>
   & OwnClassName
 

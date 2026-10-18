@@ -25,7 +25,7 @@ change.
 ## Import
 
 ```tsx
-import { Svg } from 'topclassui'
+import { Svg } from 'topclassui/svg'
 ```
 
 ## Props
@@ -40,6 +40,10 @@ Required: `icon`. Every other prop below is optional.
 | `size` | no | `IconSize \| number \| (string & {})` | - | The five names, or any CSS length. Defaults to 1em so the icon follows the text. |
 
 Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
+
+## Examples
+
+- `dummy/directional.tsx`
 
 ## Verified against
 
