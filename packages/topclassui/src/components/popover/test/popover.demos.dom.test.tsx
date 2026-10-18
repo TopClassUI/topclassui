@@ -31,10 +31,18 @@ const SHOWN: Record<string, Shown[]> = {
   'long-content': [{ trigger: 'Change log', title: 'Change log', controls: [] }],
   'modal': [{ trigger: 'Delete draft', title: 'Delete this draft?', controls: ['Close', 'Keep it', 'Delete'] }],
   'placements': PLACES.map((place) => ({ trigger: place, title: place, controls: [] })),
+  'playground': [{ trigger: 'Share', title: 'Share this page', controls: ['Copy link'] }],
   'rtl': [
     { trigger: 'مشاركة', title: 'مشاركة هذه الصفحة', controls: ['إغلاق'] },
     { trigger: 'التفاصيل', title: 'كيف تعمل الفوترة', controls: [] },
     { trigger: 'الإعدادات', title: 'إعدادات الإشعارات', controls: [] },
+  ],
+  'states': [
+    { trigger: 'Open', title: 'Open', controls: [] },
+    { trigger: 'Above', title: 'Above', controls: [] },
+    { trigger: 'With close', title: 'With close', controls: ['Close'] },
+    { trigger: 'Modal', title: 'Modal', controls: ['Close'] },
+    { trigger: 'On hover', title: 'On hover', controls: [] },
   ],
   'with-close': [{ trigger: 'Notifications', title: 'Notifications are paused', controls: ['Close'] }],
   'with-form': [{ trigger: 'Rename', title: 'Rename this project', controls: ['Name', 'Cancel', 'Save'] }],

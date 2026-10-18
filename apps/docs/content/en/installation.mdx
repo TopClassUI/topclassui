@@ -1,0 +1,60 @@
+---
+slug: installation
+title: Install the package
+description: Two steps. Install the package, then add the components you need.
+---
+
+## Pick your framework
+
+Same on every framework.
+
+<FrameworkTabs frameworks={['Next.js App Router', 'Vite', 'React Router v7']} />
+
+## Install
+
+Use whichever you already have.
+
+<PackageManagers />
+
+## Peer dependencies
+
+Three, and your project already has them.
+
+| Package | Range | Why it is required |
+|---|---|---|
+| `react` | <PeerRange name="react" /> | The components are written for React 19, where `ref` is an ordinary prop |
+| `react-dom` | <PeerRange name="react-dom" /> | Same |
+| `tailwindcss` | <PeerRange name="tailwindcss" /> | The `inset-s-*` utilities need Tailwind 4.2 or later |
+
+## Framework support
+
+Tier means feature coverage, not quality.
+
+| Framework | Tier | What changes |
+|---|---|---|
+| Next.js 15 or 16, App Router | 1 | Nothing. This is the reference setup: server components add no JavaScript, `Icon` works by name, and Server Actions are available |
+| Vite single-page app | 2 | No server render. Every component you use is in the browser bundle, and `Icon` is imported from `icon-registry` |
+
+## React without Next.js
+
+Everything works the same. Three things change.
+
+No server render, so every component you use ships in your bundle. Import `Icon` from `topclassui/icon-registry` and register the icons you use, once. Paste the theme script into `index.html` by hand, as [Provider](/en/docs/provider#in-a-single-page-app) shows.
+
+```ts title="vite.config.ts"
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+})
+```
+
+```ts title="src/icons.ts" check
+// once per app
+import { registerIcons } from 'topclassui/icon-registry'
+import { caretDown } from 'topclassui/icons/caret-down'
+
+registerIcons({ 'caret-down': caretDown })
+```

@@ -238,8 +238,10 @@ This part takes no design props of its own.
 - `dummy/groups.tsx`
 - `dummy/in-dialog.tsx`
 - `dummy/placements.tsx`
+- `dummy/playground.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sixty-items.tsx`
+- `dummy/states.tsx`
 - `dummy/with-links.tsx`
 
 ## Verified against

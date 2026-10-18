@@ -23,9 +23,11 @@ const DRAWERS: Record<string, { trigger: string, title: string }> = {
     title: 'Move the quarterly report, its eleven attachments and every comment thread to the shared archive of the finance team',
   },
   'drawer--non-modal': { trigger: 'Outline', title: 'Outline' },
+  'drawer--playground': { trigger: 'Filters', title: 'Filters' },
   'drawer--rtl': { trigger: 'القائمة', title: 'تصفّح' },
   'drawer--sizes': { trigger: 'xs', title: 'Size xs' },
   'drawer--start': { trigger: 'Menu', title: 'Browse' },
+  'drawer--states': { trigger: 'Side sheet', title: 'Side sheet' },
   'drawer--top': { trigger: 'What is new', title: 'Version 2.4' },
   'drawer--trap-focus': { trigger: 'Inspect', title: 'Inspector' },
   'drawer--with-form': { trigger: 'Invite', title: 'Invite a teammate' },
@@ -154,7 +156,7 @@ async function strokeOf(popup: Locator, physical: Physical): Promise<{ from: Poi
 
 test('the table names every drawer demo', () => {
   expect(Object.keys(DRAWERS).sort()).toEqual(DEMOS.filter((demo) => demo.startsWith('drawer--')).sort())
-  expect(Object.keys(DRAWERS)).toHaveLength(11)
+  expect(Object.keys(DRAWERS)).toHaveLength(13)
 })
 
 // A Drawer slides and never fades: a wait on its opacity would return on the first frame of the slide.

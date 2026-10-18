@@ -32,6 +32,7 @@ const SHOWN: Record<string, Shown[]> = {
   }],
   'no-close-button': [{ trigger: 'What is new', title: 'Version 2.4', controls: ['Got it'] }],
   'non-modal': [{ trigger: 'Find and replace', title: 'Find and replace', controls: ['Close this dialog', 'Done'] }],
+  'playground': [{ trigger: 'Publish', title: 'Publish changes', controls: ['Close this dialog', 'Cancel', 'Publish now'] }],
   'rtl': [{ trigger: 'نشر', title: 'نشر التغييرات', controls: ['إغلاق هذا الحوار', 'إلغاء', 'انشر الآن'] }],
   'sizes': [
     { trigger: 'xs', title: 'Size xs', controls: ['Close this dialog', 'Done'] },
@@ -40,6 +41,13 @@ const SHOWN: Record<string, Shown[]> = {
     { trigger: 'lg', title: 'Size lg', controls: ['Close this dialog', 'Done'] },
     { trigger: 'xl', title: 'Size xl', controls: ['Close this dialog', 'Done'] },
     { trigger: 'custom', title: 'Size custom', controls: ['Close this dialog', 'Done'] },
+  ],
+  'states': [
+    { trigger: 'Open', title: 'Open', controls: ['Close this dialog', 'Done'] },
+    { trigger: 'Alert', title: 'Alert', controls: ['Close this dialog', 'Cancel', 'Delete'] },
+    { trigger: 'Scrolled', title: 'Scrolled', controls: ['Close this dialog', 'Done'] },
+    { trigger: 'Focus trapped', title: 'Focus trapped', controls: ['Close this dialog', 'Done'] },
+    { trigger: 'Non-modal', title: 'Non-modal', controls: ['Close this dialog', 'Done'] },
   ],
   'trap-focus': [{ trigger: 'Inspect', title: 'Inspector', controls: ['Close this dialog', 'Done'] }],
   'with-form': [{ trigger: 'Rename', title: 'Rename this project', controls: ['Close this dialog', 'Name', 'Cancel', 'Save'] }],

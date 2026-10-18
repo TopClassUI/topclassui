@@ -81,7 +81,7 @@ describe('a server-rendered Popover hydrates cleanly', () => {
 
 describe('every demo renders and hydrates', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(DEMOS).toHaveLength(8)
+    expect(DEMOS).toHaveLength(10)
   })
 
   for (const [name, Demo] of DEMOS) {

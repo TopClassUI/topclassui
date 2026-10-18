@@ -25,8 +25,10 @@ const DIALOGS: Record<string, { trigger: string, title: string }> = {
   },
   'dialog--no-close-button': { trigger: 'What is new', title: 'Version 2.4' },
   'dialog--non-modal': { trigger: 'Find and replace', title: 'Find and replace' },
+  'dialog--playground': { trigger: 'Publish', title: 'Publish changes' },
   'dialog--rtl': { trigger: 'نشر', title: 'نشر التغييرات' },
   'dialog--sizes': { trigger: 'xs', title: 'Size xs' },
+  'dialog--states': { trigger: 'Open', title: 'Open' },
   'dialog--trap-focus': { trigger: 'Inspect', title: 'Inspector' },
   'dialog--with-form': { trigger: 'Rename', title: 'Rename this project' },
   'dialog--with-tooltip': { trigger: 'Share', title: 'Share this project' },
@@ -96,7 +98,7 @@ const scrollersOf = (popup: Locator) => popup.evaluate((element) => {
 
 test('the table names every dialog demo', () => {
   expect(Object.keys(DIALOGS).sort()).toEqual(DEMOS.filter((demo) => demo.startsWith('dialog--')).sort())
-  expect(Object.keys(DIALOGS)).toHaveLength(12)
+  expect(Object.keys(DIALOGS)).toHaveLength(14)
 })
 
 test.describe('the helper that opens every overlay', () => {

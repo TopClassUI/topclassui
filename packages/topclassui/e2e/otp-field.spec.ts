@@ -14,7 +14,7 @@ import { FORCED_CANVAS, contrast, inkOn, pixelsOf } from './pixels.js'
 // and the form, before hydration and after a reset.
 
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['basic', 'form', 'grouped', 'long', 'rtl', 'sizes', 'states'].map((demo) => `otp-field--${demo}`)
+const DEMOS = ['basic', 'form', 'grouped', 'long', 'playground', 'rtl', 'sizes', 'states'].map((demo) => `otp-field--${demo}`)
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 
 const css = (element: Locator, property: string) => element.evaluate((el, name) => getComputedStyle(el).getPropertyValue(name), property)

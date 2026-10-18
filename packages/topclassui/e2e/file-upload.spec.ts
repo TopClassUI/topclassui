@@ -14,7 +14,7 @@ import { FORCED_CANVAS, contrast, pixelsOf } from './pixels.js'
 
 const MB = 1024 * 1024
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['file-upload--basic', 'file-upload--form', 'file-upload--in-field', 'file-upload--multiple', 'file-upload--rtl', 'file-upload--states'] as const
+const DEMOS = ['file-upload--basic', 'file-upload--form', 'file-upload--in-field', 'file-upload--multiple', 'file-upload--playground', 'file-upload--rtl', 'file-upload--states'] as const
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 const LONG = `${'quarterly-report-final-'.repeat(13).slice(0, 296)}.pdf`
 

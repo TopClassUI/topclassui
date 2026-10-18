@@ -12,7 +12,7 @@ const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
 const EXPECTED = [
-  'custom-size', 'long-label', 'rtl', 'sizes', 'skeleton', 'tones', 'variants', 'with-icon',
+  'custom-size', 'long-label', 'playground', 'rtl', 'sizes', 'skeleton', 'states', 'tones', 'variants', 'with-icon',
 ]
 
 describe('every demo renders on the server', () => {
