@@ -25,7 +25,7 @@ export type FileUploadProps = Omit<ComponentPropsWithoutRef<'input'>, Owned>
   & {
     /** The hint inside the zone, such as "PDF or PNG, up to 5 MB": it describes the input; a link in it takes its own click. */
     children?: ReactNode | undefined
-    /** The accepted files after each pick, drop or remove. */
+    /** The accepted files after each pick, drop or remove. Client-only. */
     onValueChange?: ((files: readonly File[]) => void) | undefined
     /** On the root, merged last. */
     className?: string | undefined

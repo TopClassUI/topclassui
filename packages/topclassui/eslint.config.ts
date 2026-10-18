@@ -5,7 +5,8 @@ import tseslint from 'typescript-eslint'
 import topclass from './eslint-rules/index.ts'
 
 export default defineConfig(
-  { ignores: ['node_modules', 'dist', '.next', 'apps/**/.next', 'coverage'] },
+  // consumers/ holds two app templates with their own tsconfig; pnpm test:consumers builds them, this config never lints them.
+  { ignores: ['node_modules', 'dist', '.next', 'apps/**/.next', 'coverage', 'consumers'] },
 
   js.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
@@ -16,15 +17,18 @@ export default defineConfig(
   },
 
   // The library itself. Every rule in docs/RULES.md that a linter can enforce
-  // applies here and nowhere else: demos and scripts are deliberately exempt.
+  // applies here; outside src/ only the rules without an "inside src/" clause do, and
+  // tooltip-content-is-text also covers demos, e2e and scripts (below).
   {
     files: ['src/**/*.{ts,tsx}'],
     plugins: { topclass },
     rules: {
       'topclass/logical-properties-only': 'error',
+      'topclass/dir-aware-transforms': 'error',
       'topclass/semantic-classes-only': 'error',
       'topclass/no-dynamic-class-names': 'error',
       'topclass/shared-class-constants': 'error',
+      'topclass/bare-data-variants': 'error',
       'topclass/no-enum': 'error',
       'topclass/one-line-comments': 'error',
       'topclass/icon-loaders-stay-server': 'error',
@@ -34,6 +38,12 @@ export default defineConfig(
       'topclass/flat-part-exports': 'error',
       'topclass/root-part-is-named-root': 'error',
       'topclass/text-comes-from-labels': 'error',
+      'topclass/no-fetch-in-components': 'error',
+      'topclass/tooltip-content-is-text': 'error',
+      'topclass/client-shape': 'error',
+      'topclass/props-derived-at-the-seam': 'error',
+      'topclass/cn-class-name-last': 'error',
+      'topclass/no-physical-placement': 'error',
 
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/ban-ts-comment': 'error',
@@ -44,9 +54,18 @@ export default defineConfig(
     },
   },
 
+  // R-5.2-6 has no "inside src/" clause, so the e2e fixtures and the harness page
+  // follow it too. scripts/mutations is left out: it injects broken source on purpose.
+  {
+    files: ['e2e/**/*.{ts,tsx}', 'scripts/build-harness.tsx'],
+    plugins: { topclass },
+    rules: { 'topclass/bare-data-variants': 'error' },
+  },
+
   // A test has to write the banned string to prove the rule or the merge works,
   // and a demo exists to show real usage. Neither is published. R-5.11-1 exempts
-  // demos by name, and a test needs a real scroll box with a height and an overflow.
+  // demos by name, a test needs a real scroll box with a height and an overflow,
+  // and a type test compares ours against Base UI's raw props on purpose (R-5.7-5).
   {
     files: ['src/**/*.test.{ts,tsx}', 'src/**/test/**/*.{ts,tsx}', 'src/**/dummy/**/*.tsx'],
     rules: {
@@ -55,7 +74,34 @@ export default defineConfig(
       'topclass/logical-properties-only': 'off',
       'topclass/style-sets-tokens-only': 'off',
       'topclass/text-comes-from-labels': 'off',
+      'topclass/props-derived-at-the-seam': 'off',
     },
+  },
+
+  // R-8.5-2: a test seeds storage to prove the Banner remembers; a demo ships, so it plays the app in memory.
+  {
+    files: ['src/**/*.test.{ts,tsx}', 'src/**/test/**/*.{ts,tsx}'],
+    rules: { 'topclass/no-fetch-in-components': 'off' },
+  },
+
+  // R-8.5-2: a dismissed Banner is remembered across pages, which is UI state rather
+  // than data; that file may read and write localStorage and nothing else (DECISIONS).
+  {
+    files: ['src/components/banner/hook.ts'],
+    rules: { 'topclass/no-fetch-in-components': ['error', { allow: ['localStorage'] }] },
+  },
+
+  // R-10.5-2 is about every tooltip a page renders, so it also covers the harness pages and fixtures.
+  {
+    files: ['e2e/**/*.tsx', 'scripts/**/*.tsx'],
+    plugins: { topclass },
+    rules: { 'topclass/tooltip-content-is-text': 'error' },
+  },
+
+  // R-5.3-4 binds every other file; a schema or contract test passes "left" to prove it is refused.
+  {
+    files: ['src/**/*.schema.test.ts', 'src/shared/contracts/toast.test.ts'],
+    rules: { 'topclass/no-physical-placement': 'off' },
   },
 
   // Tooling runs in Node, never ships, and walks untyped ESLint AST nodes.

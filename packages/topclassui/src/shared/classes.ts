@@ -135,6 +135,15 @@ export const ROW_HIGHLIGHT = [
   'forced-colors:data-highlighted:text-[HighlightText] forced-colors:data-highlighted:outline-[HighlightText]',
 ].join(' ')
 
+/** R-10.5-1: never taller than the room Base UI measured beside the anchor. */
+export const POPUP_MAX_H = 'max-h-(--available-height)'
+
+/** Nor wider: Base UI writes the room unrounded and floating-ui places the popup on a whole pixel, so it rounds down. */
+export const POPUP_MAX_W = 'max-w-[round(down,var(--available-width),1px)]'
+
+/** The bounds of every anchored popup. No overflow: the list inside scrolls, or the popup adds SCROLL_AREA itself. */
+export const POPUP_BOUNDS = `${POPUP_MAX_H} ${POPUP_MAX_W}`
+
 /** At most --tc-list-rows rows, and never past the room Base UI measured. It counts rows and not
  * the padding or the gaps, so the last row shown is cut short: a cut row says there is more. */
 export const LIST_CAP = 'max-h-[min(var(--available-height,100dvh),calc(var(--tc-list-rows)*var(--tc-row-height)))]'

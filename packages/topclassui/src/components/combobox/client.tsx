@@ -6,7 +6,7 @@ import { caretDown } from '#icons/data/caret-down.js'
 import { spinner } from '#icons/data/spinner.js'
 import { FIELD_SIZE, FIELD_TEXT } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
-import { POPUP_BOUNDS, toSideAlign } from '#shared/floating.js'
+import { FLOATING, toSideAlign } from '#shared/floating.js'
 import { Svg } from '#components/svg/index.js'
 import {
   COMBOBOX_ICON, COMBOBOX_INPUT, COMBOBOX_INPUT_END, COMBOBOX_NOTE, COMBOBOX_POPUP, COMBOBOX_POSITIONER, COMBOBOX_ROOT,
@@ -98,8 +98,8 @@ export function Combobox({
             lang={combobox.lang}
             side={side}
             align={align}
-            sideOffset={POPUP_BOUNDS.sideOffset}
-            collisionPadding={POPUP_BOUNDS.collisionPadding}
+            sideOffset={FLOATING.sideOffset}
+            collisionPadding={FLOATING.collisionPadding}
             className={COMBOBOX_POSITIONER}
           >
             <Base.Popup data-placement={placement} className={COMBOBOX_POPUP}>

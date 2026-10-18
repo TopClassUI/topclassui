@@ -15,7 +15,7 @@ from on a phone. A swipe toward its edge closes it, and so does the x it always 
 import {
   DrawerBody, DrawerClose, DrawerDescription, DrawerFooter, DrawerHeader, DrawerPopup,
   DrawerRoot, DrawerTitle, DrawerTrigger,
-} from 'topclassui'
+} from 'topclassui/drawer'
 ```
 
 ```tsx
@@ -62,8 +62,9 @@ import {
   `DrawerPopup`.
 - **A text close.** `<DrawerClose render={<Button variant="outline">Cancel</Button>} />`.
   A `DrawerClose` with nothing in it is one more x.
-- **First focus.** It lands on the sheet itself, and Tab goes to its first control.
-  `initialFocus` on `DrawerPopup` starts on the first control instead.
+- **First focus.** As a Dialog's, it lands on the first control, a scrolling body counting as one.
+  It lands on the sheet itself after a tap, so no virtual keyboard rises, and while the sheet
+  itself scrolls, so its top stays in view. `initialFocus` on `DrawerPopup` replaces the rule.
 - **Focus back.** It returns to the trigger, after a swipe too.
 - **A long text.** While `DrawerBody` scrolls it is a tab stop, so the keyboard reaches a
   text with no control in it. You write no `tabIndex`; `tabIndex={-1}` opts out.
@@ -154,7 +155,7 @@ import {
   DrawerPopup,
   DrawerTitle,
   DrawerTrigger,
-} from 'topclassui'
+} from 'topclassui/drawer'
 ```
 
 ## Props

@@ -92,7 +92,7 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
 
   it('each part calls one hook, its own, from hook.ts', () => {
     expect(hooksPerFunction(source)).toEqual({ SidebarRoot: ['useSidebarRoot'], SidebarTrigger: ['useSidebarTrigger'] })
-    expect(importedNames(source, './hook.js').sort()).toEqual(['SidebarContext', 'useSidebarRoot', 'useSidebarTrigger'])
+    expect(importedNames(source, './hook.js').sort()).toEqual(['useSidebarRoot', 'useSidebarTrigger'])
   })
 
   it('imports no Base UI part, no schema and no zod: nothing here needs them', () => {

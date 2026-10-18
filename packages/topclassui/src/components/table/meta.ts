@@ -8,7 +8,7 @@ export const meta = {
   tier: 1,
   // PLAN 20 is not met until the visual matrix and the docs page exist.
   status: 'beta',
-  rendering: 'server',
+  rendering: 'split',
   baseUi: null,
   baseUiRange: null,
   optionalDeps: [],

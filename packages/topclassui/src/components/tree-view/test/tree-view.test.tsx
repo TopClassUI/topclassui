@@ -62,7 +62,7 @@ describe('on the server', () => {
     const out = html({ defaultExpanded: ['app'] })
     const slots = [...out.matchAll(/<span aria-hidden="true" class="flex size-3\.5[^"]*">(.*?)<\/span>/g)].map(([, inner]) => inner ?? '')
     expect(slots.map((inner) => (inner.includes('M181.66,133.66') ? 'right' : inner.includes('<svg') ? 'down' : 'none'))).toEqual(['down', 'none', 'none', 'right', 'none'])
-    expect(out).toContain('rtl:-scale-x-100')
+    expect(out).toContain('scale-x-(--tc-dir)')
   })
 
   it('the icon sits in a hidden wrapper, and the label in a span of its own direction that truncates', () => {

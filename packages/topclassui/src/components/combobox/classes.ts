@@ -1,6 +1,6 @@
 // R-5.12-4: one class string per element Combobox styles, built from the shared field and overlay constants.
 import {
-  DISABLED, FIELD_BOX, FIELD_OWN_WIDTH, LABEL, LIST_CAP, OVERLAY_SURFACE, POPUP_MOTION, ROW, ROW_HIGHLIGHT, ROW_SELECTED,
+  DISABLED, FIELD_BOX, FIELD_OWN_WIDTH, LABEL, LIST_CAP, OVERLAY_SURFACE, POPUP_BOUNDS, POPUP_MOTION, ROW, ROW_HIGHLIGHT, ROW_SELECTED,
   ROW_TOUCH, SCROLL_AREA,
 } from '#shared/classes.js'
 
@@ -22,7 +22,7 @@ export const COMBOBOX_SPIN = 'flex animate-spin motion-reduce:animate-none'
 export const COMBOBOX_POSITIONER = 'z-(--tc-z-popup) data-anchor-hidden:invisible'
 
 /** As wide as the input, and capped on both axes as Select's popup is: capped on the list alone, its line crossed the padding. */
-export const COMBOBOX_POPUP = `flex w-(--anchor-width) max-w-(--available-width) max-h-(--available-height) flex-col ${OVERLAY_SURFACE} ${POPUP_MOTION}`
+export const COMBOBOX_POPUP = `flex w-(--anchor-width) ${POPUP_BOUNDS} flex-col ${OVERLAY_SURFACE} ${POPUP_MOTION}`
 
 /** No gap between rows: the window counts rows only. The two spacers are pseudo-elements; min-h-0 lets the popup's cap shrink it. */
 export const COMBOBOX_LIST = `relative flex min-h-0 flex-col p-1.5 outline-none empty:hidden before:h-(--tc-list-pad-start) before:shrink-0 after:h-(--tc-list-pad-end) after:shrink-0 ${LIST_CAP} ${SCROLL_AREA}`

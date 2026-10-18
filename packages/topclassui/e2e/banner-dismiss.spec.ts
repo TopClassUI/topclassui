@@ -3,6 +3,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
 
 import { DIRECTIONS, MODES, type Direction } from '../scripts/lib/harness.js'
 import { type LiveOptions, expectNoSidewaysScroll, liveErrors, liveUrl, openLive } from './live.js'
+import { SENTINEL, addSentinel } from './keyboard.js'
 import { urlFor } from './pages.js'
 import { FORCED_CANVAS, type Rgb, inkOn, paintedRgb, pixelsOf } from './pixels.js'
 
@@ -69,14 +70,16 @@ test.describe('dismissing', () => {
     })
   }
 
-  test('focus falls to the body, and the next Tab goes on from where the banner was', async ({ page }) => {
+  test('the focus goes on to the next tab stop, the x of the next banner, then the control after the banners, never the body', async ({ page }) => {
     await openLive(page, DEMO)
+    await addSentinel(page)
     await tabToX(page)
     await page.keyboard.press('Enter')
     await expect(release(page)).toHaveCount(0)
-    expect(await focused(page)).toBe('BODY')
-    await page.keyboard.press('Tab')
-    expect(await focused(page)).toBe('BUTTON Dismiss Maintenance notice')
+    await expect.poll(() => focused(page)).toBe('BUTTON Dismiss Maintenance notice')
+    await page.keyboard.press('Enter')
+    await expect(maintenance(page)).toHaveCount(0)
+    await expect.poll(() => page.evaluate(() => document.activeElement?.textContent)).toBe(SENTINEL)
   })
 })
 

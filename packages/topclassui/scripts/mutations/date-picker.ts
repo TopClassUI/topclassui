@@ -39,6 +39,18 @@ export const MUTATIONS: Mutation[] = [
     to: '  return new Date(Date.UTC(year, month - 1, day))',
   },
   {
+    label: 'the date picker Home is kept inside the month again, so Home from 3 September stops at the 1st, not on Monday 31 August',
+    file: LIB,
+    from: '    Home: () => addDays(parts, -back),',
+    to: '    Home: () => ({ ...parts, day: Math.max(1, parts.day - back) }),',
+  },
+  {
+    label: 'the date picker End is kept inside the month again, so End from 29 September stops at the 30th, not on Sunday 4 October',
+    file: LIB,
+    from: '    End: () => addDays(parts, 6 - back),',
+    to: '    End: () => ({ ...parts, day: Math.min(daysInMonth(parts.year, parts.month), parts.day + 6 - back) }),',
+  },
+  {
     label: 'the date picker keys stop clamping into the range, so ArrowLeft walks past minDate',
     file: LIB,
     from: '  return move ? clampIso(toIsoDate(move()), range.min, range.max) : null',
@@ -217,5 +229,23 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: "export const DATE_PICKER_CELL = 'px-0 py-[min(0.125rem,2px)] text-center'",
     to: "export const DATE_PICKER_CELL = 'p-[min(0.125rem,2px)] text-center'",
+  },
+  {
+    label: 'the date picker month header shrinks again, so on a short screen the grid takes its room and the month buttons are squeezed',
+    file: CLASSES,
+    from: "export const DATE_PICKER_HEADER = 'flex shrink-0 items-center gap-2'",
+    to: "export const DATE_PICKER_HEADER = 'flex items-center gap-2'",
+  },
+  {
+    label: 'the date picker grid wrapper loses SCROLL_AREA, so the popup scrolls the month away with the grid',
+    file: CLASSES,
+    from: "  SCROLL_AREA,\n  FOCUS_RING_INSET,\n  DATE_PICKER_SCROLL_SHORT,\n",
+    to: "  FOCUS_RING_INSET,\n  DATE_PICKER_SCROLL_SHORT,\n",
+  },
+  {
+    label: 'the date picker grid keeps scrolling on a short screen, so a wheel that starts on one row of days ends inside it',
+    file: CLASSES,
+    from: "  DATE_PICKER_SCROLL_SHORT,\n].join(' ')",
+    to: "].join(' ')",
   },
 ]

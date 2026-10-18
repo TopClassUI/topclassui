@@ -57,7 +57,7 @@ describe('every part carries exactly the classes written here', () => {
   })
 
   it('the list item is never squeezed and never wider than the list', () => {
-    expect(classesOf(<NavbarLink href="/docs">Docs</NavbarLink>, 'li')).toEqual(['flex', 'shrink-0', 'max-w-full'])
+    expect(classesOf(<NavbarLinks><NavbarLink href="/docs">Docs</NavbarLink></NavbarLinks>, 'li')).toEqual(['flex', 'shrink-0', 'max-w-full'])
   })
 
   it('NavbarLink', () => {
@@ -107,7 +107,8 @@ describe('a className on a part wins over the part', () => {
   it('NavbarLink: the className reaches the link, not the list item', () => {
     expect(classesOf(<NavbarLink href="/docs" className="text-body">Docs</NavbarLink>, 'a')).toContain('text-body')
     expect(classesOf(<NavbarLink href="/docs" className="text-body">Docs</NavbarLink>, 'a')).not.toContain('text-muted')
-    expect(classesOf(<NavbarLink href="/docs" className="text-body">Docs</NavbarLink>, 'li')).toEqual(['flex', 'shrink-0', 'max-w-full'])
+    const inList = <NavbarLinks><NavbarLink href="/docs" className="text-body">Docs</NavbarLink></NavbarLinks>
+    expect(classesOf(inList, 'li')).toEqual(['flex', 'shrink-0', 'max-w-full'])
   })
 
   it('NavbarActions: a gap and an alignment', () => {

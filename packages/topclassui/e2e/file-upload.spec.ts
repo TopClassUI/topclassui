@@ -242,7 +242,7 @@ test.describe('live: the keyboard', () => {
     })
   }
 
-  // Space only: headless Chromium opened no picker for Enter in 2 of 6 runs, a native behaviour this page cannot change.
+  // The picker itself for Space; keyboard-file-upload.spec.ts proves Enter and Space each activate the input in both directions.
   for (const key of ['Space'] as const) {
     test(`${key} on the input opens the picker (native), and the picked file joins the list`, async ({ page }) => {
       await openLive(page, 'file-upload--basic')

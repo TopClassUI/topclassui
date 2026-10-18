@@ -193,8 +193,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog root never shares modal with its popup, so modal={false} still draws the scrim',
     file: CLIENT,
-    from: '<DialogModalContext value={modal}>',
-    to: '<DialogModalContext value={true}>',
+    from: '<root.Context value={modal}>',
+    to: '<root.Context value={true}>',
   },
   {
     label: 'the dialog root shares modal with its popup but never hands it to Base UI, so a dialog with no scrim still locks and hides the page',

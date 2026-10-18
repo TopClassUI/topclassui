@@ -23,7 +23,8 @@ import { CommandRows } from './command-rows.js'
 export function CommandPanel(props: CommandPanelProps) {
   const {
     items, getKey, getLabel, getGroup, renderItem, onSelect, visibleRows, virtualize, status, emptyFallback,
-    loadingFallback, open, onOpenChange, container, keepMounted, className, ...rest
+    loadingFallback, hasMore, loadMore, loadMoreThreshold, onQueryChange, open, onOpenChange, container, keepMounted,
+    className, ...rest
   } = props
   const panel = useCommandPanel(props)
   return (
@@ -58,7 +59,12 @@ export function CommandPanel(props: CommandPanelProps) {
                   className={COMMAND_INPUT}
                 />
               </div>
-              <Autocomplete.List ref={panel.listRef} style={{ '--tc-list-rows': panel.rows }} className={COMMAND_LIST}>
+              <Autocomplete.List
+                ref={panel.listRef}
+                aria-busy={panel.busy || undefined}
+                style={{ '--tc-list-rows': panel.rows }}
+                className={COMMAND_LIST}
+              >
                 <CommandRows
                   runs={panel.runs}
                   total={panel.total}

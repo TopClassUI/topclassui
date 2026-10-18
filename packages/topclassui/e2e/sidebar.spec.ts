@@ -1022,7 +1022,7 @@ test.describe('direction', () => {
     })
     await expect(rail).toHaveCSS('border-right-width', '1px')
     await expect(rail).toHaveCSS('border-left-width', '0px')
-    await expect(triggerOf(rail).locator('svg')).toHaveCSS('scale', 'none')
+    await expect(triggerOf(rail).locator('svg')).toHaveCSS('scale', '1')
     expect(await heavierHalf(page, rail)).toBe('left')
     expect((await boxOf(rail)).left).toBe(32)
   })

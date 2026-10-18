@@ -88,8 +88,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the select popup loses max-h-(--available-height), so its line puts it 6 px from the screen edge, not 8',
     file: CLASSES,
-    from: ' max-h-(--available-height)',
-    to: '',
+    from: ' ${POPUP_BOUNDS} flex-col',
+    to: ' max-w-[round(down,var(--available-width),1px)] flex-col',
   },
   {
     label: 'the select list loses SCROLL_AREA, so sixty options do not scroll inside the list',
@@ -106,8 +106,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the select popup caps its width at the room unrounded, so a list placed on a whole pixel ends 0.2 px past the 8 px',
     file: CLASSES,
-    from: 'max-w-[round(down,var(--available-width),1px)]',
-    to: 'max-w-(--available-width)',
+    from: ' ${POPUP_BOUNDS} flex-col',
+    to: ' max-h-(--available-height) max-w-(--available-width) flex-col',
   },
   {
     label: 'the select list loses the name of its field, so a reader hears the options with no name',
@@ -150,5 +150,17 @@ export const MUTATIONS: Mutation[] = [
     file: CLIENT,
     from: "collisionAvoidance={side === 'top' || side === 'bottom' ? undefined : SELECT_SIDE_COLLISION_AVOIDANCE}",
     to: 'collisionAvoidance={SELECT_SIDE_COLLISION_AVOIDANCE}',
+  },
+  {
+    label: 'the select draws its options from the props again, so a duplicate value is drawn twice',
+    file: CLIENT,
+    from: '{select.options.map(({ item, key }) => (',
+    to: '{items.map((item) => ({ item, key: item.value })).map(({ item, key }) => (',
+  },
+  {
+    label: 'the select stops warning above the windowing threshold, so ten thousand mounted options go unnoticed',
+    file: HOOK,
+    from: 'items.length > virtualizeAbove',
+    to: 'false',
   },
 ]

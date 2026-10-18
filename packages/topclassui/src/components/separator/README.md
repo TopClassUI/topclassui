@@ -33,7 +33,7 @@ separate, and it becomes a `separator` with its orientation.
 ## Import
 
 ```tsx
-import { Separator } from 'topclassui'
+import { Separator } from 'topclassui/separator'
 ```
 
 ## Props
