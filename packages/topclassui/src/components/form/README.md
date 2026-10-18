@@ -97,6 +97,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 
 - `dummy/basic.tsx`
 - `dummy/form-action.tsx`
+- `dummy/rtl.tsx`
 - `dummy/server-errors.tsx`
 
 ## Verified against

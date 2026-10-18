@@ -146,6 +146,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 
 - `dummy/basic.tsx`
 - `dummy/form.tsx`
+- `dummy/playground.tsx`
 - `dummy/range.tsx`
 - `dummy/rtl.tsx`
 - `dummy/show-value.tsx`

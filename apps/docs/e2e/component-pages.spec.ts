@@ -1,28 +1,11 @@
 import AxeBuilder from '@axe-core/playwright'
-import { type Page, expect, test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
+
+import { card, collectErrors, openIn } from './pages'
 
 const SLUGS = ['button', 'tag', 'kbd', 'segmented-control'] as const
 const LOCALES = [{ locale: 'en', dir: 'ltr' }, { locale: 'ar', dir: 'rtl' }] as const
 const MODES = ['light', 'dark', 'ocean'] as const
-
-/** Every console error and uncaught exception: a hydration mismatch is one of them. */
-function collectErrors(page: Page): string[] {
-  const errors: string[] = []
-  page.on('pageerror', (error) => errors.push(error.message))
-  // The site's icon is the shell's (S6 manifest.ts); until it lands the browser's own /favicon.ico request 404s.
-  page.on('console', (message) => {
-    if (message.type() === 'error' && !message.location().url.endsWith('/favicon.ico')) errors.push(`${message.text()} ${message.location().url}`)
-  })
-  return errors
-}
-
-async function openIn(page: Page, path: string, mode: string) {
-  await page.addInitScript((stored) => { localStorage.setItem('tc-theme', stored) }, mode)
-  const response = await page.goto(path)
-  expect(response?.status()).toBe(200)
-}
-
-const card = (page: Page, slug: string) => page.locator(`[data-component="${slug}"]`)
 
 for (const slug of SLUGS) {
   for (const { locale, dir } of LOCALES) {

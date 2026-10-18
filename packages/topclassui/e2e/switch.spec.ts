@@ -14,7 +14,7 @@ import { FORCED_CANVAS, contrast, inkOn, pixelsOf, rgbOf, ringRow } from './pixe
 
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['switch--basic', 'switch--form', 'switch--rtl', 'switch--sizes', 'switch--states', 'switch--unchecked-value'] as const
+const DEMOS = ['switch--basic', 'switch--form', 'switch--playground', 'switch--rtl', 'switch--sizes', 'switch--states', 'switch--unchecked-value'] as const
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 
 const switchOf = (page: Page, name: string) => page.getByRole('switch', { name, exact: true })

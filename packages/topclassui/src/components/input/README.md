@@ -90,6 +90,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/custom-size.tsx`
 - `dummy/full-width.tsx`
 - `dummy/labelled.tsx`
+- `dummy/playground.tsx`
 - `dummy/row.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`

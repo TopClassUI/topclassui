@@ -15,6 +15,7 @@ const AFTER: Record<string, number[]> = {
   form: [2],
   'in-field': [2],
   multiple: [2],
+  playground: [1],
   rtl: [2],
   states: [1, 0],
   // Images only: both PDFs are refused, and a refused file is a row too.
