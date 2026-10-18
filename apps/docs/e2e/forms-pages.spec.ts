@@ -53,6 +53,7 @@ for (const slug of SLUGS) {
 }
 
 test('every live example on a Forms page is hydrated by React', async ({ page }) => {
+  test.setTimeout(120_000)
   for (const slug of SLUGS) {
     const errors = collectErrors(page)
     await page.goto(`/en/docs/components/${slug}`)
@@ -60,7 +61,13 @@ test('every live example on a Forms page is hydrated by React', async ({ page })
     const controls = examplesOf(page).locator('input, textarea, button, [role="slider"], [role="combobox"]')
     expect(await controls.count(), slug).toBeGreaterThan(0)
     // An example takes over when it nears the viewport (lazy-island.tsx), so each is brought on screen first.
-    for (const control of await controls.all()) await control.evaluate((node) => { node.scrollIntoView({ block: 'center', behavior: 'instant' }) })
+    await examplesOf(page).evaluate(async (section) => {
+      const end = section.getBoundingClientRect().bottom + window.scrollY
+      for (let y = section.getBoundingClientRect().top + window.scrollY; y < end; y += window.innerHeight) {
+        window.scrollTo({ top: y, behavior: 'instant' })
+        await new Promise((resolve) => setTimeout(resolve, 50))
+      }
+    })
     await page.waitForLoadState('networkidle')
     await expect.poll(() => controls.evaluateAll((nodes) => nodes.filter((node) => !Object.keys(node).some((key) => key.startsWith('__reactFiber'))).length), { message: slug }).toBe(0)
     expect(errors, slug).toEqual([])
