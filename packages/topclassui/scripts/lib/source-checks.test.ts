@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  acceptsRenderProp, hasLateUseClient, hasUseClient, importedModules, importedNames, importsRenderElement,
-  inlinePropInterfaces, relativeImportsMissingExtension, runtimeUseRender, screamingConstants, strayHookImport,
+  acceptsRenderProp, handlesRenderFunction, hasLateUseClient, hasUseClient, implementsRenderProp, importedModules,
+  importedNames, importsRenderElement, inlinePropInterfaces, relativeImportsMissingExtension, runtimeUseRender, screamingConstants,
+  strayHookImport,
 } from './source-checks.js'
 
 /** The same source with Windows line endings, so a CRLF checkout cannot change a result. */
@@ -197,6 +198,23 @@ describe('runtimeUseRender (R-5.7-4)', () => {
     expect(runtimeUseRender("import { type useRender } from '@base-ui/react/use-render'")).toBe(false)
   })
 
+  it('catches a re-export, which publishes the hook from the file', () => {
+    expect(runtimeUseRender("export { useRender } from '@base-ui/react/use-render'")).toBe(true)
+    expect(runtimeUseRender("export { Dialog, useRender as r } from '@base-ui/react'")).toBe(true)
+    expect(runtimeUseRender("export * from '@base-ui/react'")).toBe(true)
+    expect(runtimeUseRender("export * as R from '@base-ui/react/use-render'")).toBe(true)
+  })
+
+  it('catches the internal hook useRender wraps, which Base UI exports too', () => {
+    expect(runtimeUseRender("import { useRenderElement } from '@base-ui/react/internals/useRenderElement'")).toBe(true)
+    expect(runtimeUseRender("import * as R from '@base-ui/react/internals/useRenderElement'")).toBe(true)
+  })
+
+  it('lets a type-only re-export through', () => {
+    expect(runtimeUseRender("export type { useRender } from '@base-ui/react/use-render'")).toBe(false)
+    expect(runtimeUseRender("export * from '@base-ui/react/dialog'")).toBe(false)
+  })
+
   it('leaves other Base UI imports alone', () => {
     expect(runtimeUseRender("import { mergeProps } from '@base-ui/react/merge-props'")).toBe(false)
     expect(runtimeUseRender("import { Dialog } from '@base-ui/react/dialog'")).toBe(false)
@@ -213,6 +231,24 @@ describe('acceptsRenderProp (R-5.7-4)', () => {
 
   it('sees render read from a props object', () => {
     expect(acceptsRenderProp('export function A(props: AProps) { return props.render }')).toBe(true)
+    expect(acceptsRenderProp('export const A = (p: AProps) => p.render')).toBe(true)
+    expect(acceptsRenderProp('export function A(p: AProps) { const { size, render } = p }')).toBe(true)
+  })
+
+  it('sees render under any annotation, not only a name ending in Props', () => {
+    expect(acceptsRenderProp("export function A({ render }: Omit<AProps, 'x'>) {}")).toBe(true)
+    expect(acceptsRenderProp('export function A({ render }: { render?: ReactElement }) {}')).toBe(true)
+  })
+
+  it('sees a link element when asked for one', () => {
+    expect(acceptsRenderProp('export function A({ items, link }: AProps) {}', 'link')).toBe(true)
+    expect(acceptsRenderProp('export function A({ items, link }: AProps) {}')).toBe(false)
+    expect(acceptsRenderProp('export function A({ items }: AProps) {}', 'link')).toBe(false)
+  })
+
+  it('does not count an object destructured from something other than a parameter', () => {
+    expect(acceptsRenderProp('export function A(p: AProps) { const { render } = other }')).toBe(false)
+    expect(acceptsRenderProp('export function A(p: AProps) { const { render } = p.slots }')).toBe(false)
   })
 
   it('does not count a render attribute, a nested key or a renderItem prop', () => {
@@ -227,15 +263,55 @@ describe('acceptsRenderProp (R-5.7-4)', () => {
 })
 
 describe('importsRenderElement (R-5.7-4)', () => {
-  it('finds it by alias and by relative path', () => {
-    expect(importsRenderElement("import { renderElement } from '#shared/render.js'")).toBe(true)
-    expect(importsRenderElement("import { renderElement } from '../../shared/render.js'")).toBe(true)
-    expect(importsRenderElement("import { renderElement } from './render.js'")).toBe(true)
+  it('finds it by alias and by a relative path that reaches src/shared/render.ts', () => {
+    expect(importsRenderElement("import { renderElement } from '#shared/render.js'", 'src/components/x/index.tsx')).toBe(true)
+    expect(importsRenderElement("import { renderElement } from '../../shared/render.js'", 'src/components/x/index.tsx')).toBe(true)
+    expect(importsRenderElement("import { renderElement } from './render.js'", 'src/shared/link.tsx')).toBe(true)
   })
 
-  it('does not count a type import or another module', () => {
-    expect(importsRenderElement("import type { renderElement } from '#shared/render.js'")).toBe(false)
-    expect(importsRenderElement("import { renderElement } from './elsewhere.js'")).toBe(false)
+  it('does not count a type import, another module or a local render.ts', () => {
+    expect(importsRenderElement("import type { renderElement } from '#shared/render.js'", 'src/components/x/index.tsx')).toBe(false)
+    expect(importsRenderElement("import { renderElement } from './elsewhere.js'", 'src/shared/link.tsx')).toBe(false)
+    expect(importsRenderElement("import { renderElement } from './render.js'", 'src/components/x/index.tsx')).toBe(false)
+  })
+})
+
+describe('implementsRenderProp (R-5.7-4)', () => {
+  const FILE = 'src/components/x/index.tsx'
+
+  it('needs a call, under whatever name the import binds', () => {
+    expect(implementsRenderProp("import { renderElement } from '#shared/render.js'\nrenderElement(render, rest)", FILE)).toBe(true)
+    expect(implementsRenderProp("import { renderElement as r } from '#shared/render.js'\nr(render, rest)", FILE)).toBe(true)
+    expect(implementsRenderProp("import { renderElement } from '#shared/render.js'\ncloneElement(render, rest)", FILE)).toBe(false)
+  })
+
+  it('accepts renderLink, which calls renderElement, for render and for link', () => {
+    const source = "import { renderLink } from '#shared/link.js'\nrenderLink('X', link, href, {})"
+    expect(implementsRenderProp(source, FILE, 'link')).toBe(true)
+    expect(implementsRenderProp(source, FILE)).toBe(true)
+    expect(implementsRenderProp("import { renderLink } from './link.js'\nrenderLink('X', link, href, {})", FILE, 'link')).toBe(false)
+  })
+
+  it('accepts render handed on unchanged, but not a link', () => {
+    expect(implementsRenderProp('return <Button render={render} />', FILE)).toBe(true)
+    expect(implementsRenderProp('return <Button render={render} />', FILE, 'link')).toBe(false)
+    expect(implementsRenderProp('return <Button render={cloneElement(render)} />', FILE)).toBe(false)
+  })
+
+  it('does not read a comment as a call', () => {
+    expect(implementsRenderProp("import { renderElement } from '#shared/render.js'\n// renderElement(render)", FILE)).toBe(false)
+  })
+})
+
+describe('handlesRenderFunction (R-5.7-4)', () => {
+  it('sees a typeof test and a call to render', () => {
+    expect(handlesRenderFunction("typeof render === 'function' ? render(p) : renderElement(render, p)")).toBe(true)
+    expect(handlesRenderFunction('if (typeof props.render !== "function") {}')).toBe(true)
+    expect(handlesRenderFunction('return props.render(state)')).toBe(true)
+  })
+
+  it('leaves renderElement, renderLink and a comment alone', () => {
+    expect(handlesRenderFunction("renderElement(render, p)\nrenderLink('X', link, h, {})\n// render(p)")).toBe(false)
   })
 })
 

@@ -1,5 +1,6 @@
 // The predicates check-boundaries runs, split out so they can be tested against
 // both line endings. Omar develops on Windows and CI runs Linux.
+import { posix } from 'node:path'
 
 /** A directive only counts as one before any statement; later it is a dead string. */
 export function hasUseClient(source: string): boolean {
@@ -96,44 +97,50 @@ export function screamingConstants(source: string): string[] {
   return [...source.matchAll(re)].map((m) => m[1] ?? '')
 }
 
-/** The two ids that hand out Base UI's useRender: its own subpath and the barrel. */
-const USE_RENDER_HOME = '@base-ui/react/use-render'
+/** The ids that hand out Base UI's render hooks: useRender's subpath, the hook it wraps, and the barrel. */
+const USE_RENDER_HOMES = ['@base-ui/react/use-render', '@base-ui/react/internals/useRenderElement']
 const BASE_UI_BARREL = '@base-ui/react'
 
 /** A useRender that survives compilation (R-5.7-4); `import type` and `{ type useRender }` erase. */
 export function runtimeUseRender(source: string): boolean {
   const quoted = (id: string) => String.raw`['"]` + id.replace(/[/@.-]/g, '\\$&') + String.raw`['"]`
-  const home = quoted(USE_RENDER_HOME)
+  const homes = `(?:${USE_RENDER_HOMES.map(quoted).join('|')})`
   const barrel = quoted(BASE_UI_BARREL)
-  const named = new RegExp(String.raw`import\s+(?!type\s)(?:[\w$]+\s*,\s*)?\{([^}]*)\}\s*from\s*(?:${home}|${barrel})`, 'g')
+  const named = new RegExp(String.raw`(?:import|export)\s+(?!type\s)(?:[\w$]+\s*,\s*)?\{([^}]*)\}\s*from\s*(?:${homes}|${barrel})`, 'g')
   for (const m of source.matchAll(named)) {
     const names = (m[1] ?? '').split(',').map((part) => part.trim())
-    if (names.some((name) => /^useRender\b/.test(name))) return true
+    if (names.some((name) => /^useRender(?:Element)?\b/.test(name))) return true
   }
-  // A default, namespace, side-effect, dynamic or require form of the subpath runs it too.
-  const whole = new RegExp(String.raw`(?:\bimport\s+(?!type\s)(?:[\w$*][^'"{}]*?\s+from\s*)?|\bimport\s*\(\s*|\brequire\s*\(\s*)${home}`)
+  // A default, namespace, side-effect, dynamic or require form of a home runs it too, and `export *` publishes it.
+  const whole = new RegExp(String.raw`(?:\bimport\s+(?!type\s)(?:[\w$*][^'"{}]*?\s+from\s*)?|\bimport\s*\(\s*|\brequire\s*\(\s*)${homes}`)
   if (whole.test(source)) return true
-  return memberHookCalls(source, namespaceNamesOf(source, BASE_UI_BARREL)).includes('useRender')
+  if (new RegExp(String.raw`\bexport\s*\*\s*(?:as\s+[\w$]+\s*)?from\s*(?:${homes}|${barrel})`).test(source)) return true
+  return memberHookCalls(source, namespaceNamesOf(source, BASE_UI_BARREL)).some((hook) => /^useRender(?:Element)?$/.test(hook))
+}
+
+/** The source with comments blanked, so a commented-out call is not counted. */
+function withoutComments(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/.*$/gm, ' ')
 }
 
 /** The source with comments and string contents blanked, so a brace inside either is not counted. */
 function codeOnly(source: string): string {
-  return source
-    .replace(/\/\*[\s\S]*?\*\//g, ' ')
-    .replace(/\/\/.*$/gm, ' ')
-    .replace(/'(?:\\.|[^'\\\r\n])*'|"(?:\\.|[^"\\\r\n])*"/g, "''")
+  return withoutComments(source).replace(/'(?:\\.|[^'\\\r\n])*'|"(?:\\.|[^"\\\r\n])*"/g, "''")
 }
 
-/** Each parameter destructured straight from a props type: the text between `({` and `}: XProps`. */
-function destructuredProps(code: string): string[] {
+/** The body of each object pattern: a typed parameter `({ ... }: T)`, or `const { ... } = name`. */
+function destructuredProps(code: string, from: string[]): string[] {
   const out: string[] = []
-  for (const m of code.matchAll(/\(\s*\{/g)) {
+  for (const m of code.matchAll(/\(\s*\{|\bconst\s*\{/g)) {
     const body = m.index + m[0].length
     let depth = 0
     for (let i = body - 1; i < code.length; i++) {
       if (code[i] === '{') depth++
       else if (code[i] === '}' && --depth === 0) {
-        if (/^\s*:\s*[\w$.]*Props\b/.test(code.slice(i + 1))) out.push(code.slice(body, i))
+        const after = code.slice(i + 1)
+        const typed = m[0].startsWith('(') && /^\s*:/.test(after)
+        const fromParam = !m[0].startsWith('(') && from.some((name) => new RegExp(String.raw`^\s*=\s*${name}\b(?!\s*[.[(])`).test(after))
+        if (typed || fromParam) out.push(code.slice(body, i))
         break
       }
     }
@@ -141,19 +148,66 @@ function destructuredProps(code: string): string[] {
   return out
 }
 
-/** A component that takes `render` from its props, by destructuring or by member access. */
-export function acceptsRenderProp(source: string): boolean {
-  const code = codeOnly(source)
-  // Only the top level of the pattern: a nested `{ render }` is some other object's key.
-  const topLevel = (body: string) => body.replace(/\{[^{}]*\}/g, '').replace(/\{[^{}]*\}/g, '')
-  return destructuredProps(code).some((body) => /(?:^|,)\s*render\s*(?:[,=:]|$)/.test(topLevel(body)))
-    || /\bprops\s*\.\s*render\b/.test(code)
+/** The name of each function's first parameter when it is a plain identifier: `function A(p` or `(p: T) =>`. */
+function firstParams(code: string): string[] {
+  const names = [
+    ...code.matchAll(/\bfunction\b\s*[\w$]*\s*(?:<[^>]*>)?\s*\(\s*([\w$]+)\s*[:,)]/g),
+    ...code.matchAll(/\(\s*([\w$]+)\s*(?::[^()]*(?:\([^()]*\)[^()]*)*)?\)\s*(?::[^=]*)?=>/g),
+  ].map((m) => (m[1] ?? '').replace(/\$/g, '\\$'))
+  return [...new Set(names)]
 }
 
-/** renderElement imported at runtime from shared/render, by alias or by relative path. */
-export function importsRenderElement(source: string): boolean {
-  const re = /import\s+(?!type\s)\{([^}]*)\}\s*from\s*['"](?:#shared\/render\.js|(?:\.{1,2}\/)+(?:shared\/)?render\.js)['"]/g
-  return [...source.matchAll(re)].some((m) => (m[1] ?? '').split(',').some((part) => part.trim().split(/\s+as\s+/)[0] === 'renderElement'))
+/** A component that takes `render` (or the `link` element of R-5.7-4) from its props, by destructuring or by member access. */
+export function acceptsRenderProp(source: string, prop: 'render' | 'link' = 'render'): boolean {
+  const code = codeOnly(source)
+  const params = firstParams(code)
+  // Only the top level of the pattern: a nested `{ render }` is some other object's key.
+  const topLevel = (body: string) => body.replace(/\{[^{}]*\}/g, '').replace(/\{[^{}]*\}/g, '')
+  const key = new RegExp(String.raw`(?:^|,)\s*${prop}\s*(?:[,=:]|$)`)
+  return destructuredProps(code, params).some((body) => key.test(topLevel(body)))
+    || params.some((name) => new RegExp(String.raw`\b${name}\s*\.\s*${prop}\b`).test(code))
+}
+
+/** The local names a runtime named import of `name` binds, when its specifier resolves to `target` under src/. */
+function importedBindings(source: string, file: string, name: string, target: string): string[] {
+  const out: string[] = []
+  for (const m of source.matchAll(/import\s+(?!type\s)\{([^}]*)\}\s*from\s*['"]([^'"]+)['"]/g)) {
+    const spec = m[2] ?? ''
+    const resolved = spec.startsWith('#shared/')
+      ? `src/shared/${spec.slice('#shared/'.length)}`
+      : spec.startsWith('.') ? posix.normalize(posix.join(posix.dirname(file), spec)) : ''
+    if (resolved.replace(/\.js$/, '') !== target) continue
+    for (const part of (m[1] ?? '').split(',')) {
+      const [imported, local] = part.trim().split(/\s+as\s+/)
+      if (imported === name) out.push(local ?? imported)
+    }
+  }
+  return out
+}
+
+/** renderElement imported at runtime from src/shared/render.ts, by alias or by a relative path that reaches it. */
+export function importsRenderElement(source: string, file: string): boolean {
+  return importedBindings(source, file, 'renderElement', 'src/shared/render').length > 0
+}
+
+/** Whether `prop` is implemented with renderElement (R-5.7-4): a call to it, or to renderLink, which
+ * calls it; `render` may also be handed on unchanged as `render={render}` to a component that does. */
+export function implementsRenderProp(source: string, file: string, prop: 'render' | 'link' = 'render'): boolean {
+  const code = codeOnly(source)
+  const locals = [
+    ...importedBindings(source, file, 'renderElement', 'src/shared/render'),
+    ...importedBindings(source, file, 'renderLink', 'src/shared/link'),
+  ]
+  if (locals.some((local) => new RegExp(String.raw`(?<![\w$.])${local.replace(/\$/g, '\\$')}\s*\(`).test(code))) return true
+  return prop === 'render' && /\brender\s*=\s*\{\s*render\s*\}/.test(code)
+}
+
+/** A function form of render handled by hand (R-5.7-4): `typeof render === 'function'` or a call to render.
+ * A backstop only; the element form is pinned by each server component's types.ts and its type tests. */
+export function handlesRenderFunction(source: string): boolean {
+  const code = withoutComments(source)
+  return /\btypeof\s+(?:[\w$]+\s*\.\s*)?render\s*[!=]==?\s*['"]function['"]/.test(code)
+    || /(?<![\w$])render\s*\(/.test(codeOnly(source))
 }
 
 /** R-5.12-1: hook.ts sits behind the client boundary, so only client.tsx or a 'use client' part imports it. */

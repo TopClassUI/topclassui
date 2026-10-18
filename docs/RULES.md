@@ -183,7 +183,7 @@ They arrive with the phases that need them.
 ### R-5.7-4 Polymorphism through render
 **Rule:** server components accept the element form only, implemented with `renderElement`; client components may also accept the function form through `useRender`.
 **Why:** `useRender` calls hooks, so it can never appear in `index.tsx`.
-**Enforced by:** `scripts/check-boundaries.ts`, which rejects a runtime `useRender` in any file without `'use client'` and a server file that takes `render` without `renderElement`; `tsc` keeps that `render` to the element form, since `renderElement` accepts only a `ReactElement`
+**Enforced by:** `scripts/check-boundaries.ts`, which rejects a runtime `useRender` (or the `useRenderElement` it wraps, or a re-export of either) in any file without `'use client'`, demos included, and a server file that takes `render` or a `link` element without calling `renderElement` (directly, through `renderLink`, or by handing `render={render}` on); `tsc` rejects a function passed to `renderElement`, and each server component's `types.ts` declares `render: ReactElement`, pinned by its type tests
 
 ### R-5.7-5 Public types are aliases derived at the seam
 **Rule:** `export type DialogRootProps = Omit<Base.Root.Props, 'className'> & OwnProps`; never re-export a Base UI type name and never hand-copy a primitive's prop list.

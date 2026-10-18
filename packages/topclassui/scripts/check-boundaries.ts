@@ -5,13 +5,14 @@ import { join, posix, relative, sep } from 'node:path'
 import {
   acceptsRenderProp,
   exportsAsync,
+  handlesRenderFunction,
   hasLateUseClient,
   hasUseClient,
+  implementsRenderProp,
   importedModules,
   importedNames,
   memberHookCalls,
   namespaceNamesOf,
-  importsRenderElement,
   relativeImportsMissingExtension,
   runtimeUseRender,
 } from './lib/source-checks.js'
@@ -82,15 +83,22 @@ for (const file of files) {
     }
   }
 
-  // Demos and tests are not components, so they neither ship a render prop nor run in a server tree.
-  const isComponentSource = !/\.test\.tsx?$/.test(r) && !/(^|\/)(dummy|test)\//.test(r)
+  // Tests run in no consumer's tree; a demo is copied into one by the CLI, so only its render props go unchecked.
+  const isTest = /\.test\.tsx?$/.test(r) || /(^|\/)test\//.test(r)
+  const isDemo = /(^|\/)dummy\//.test(r)
 
-  if (isComponentSource && !hasUseClient(source)) {
+  if (!isTest && !hasUseClient(source)) {
     if (runtimeUseRender(source)) {
       errors.push(`${r}: useRender calls hooks, so only a 'use client' file may import it; a server file takes the element form through renderElement (R-5.7-4).`)
     }
-    if (acceptsRenderProp(source) && !importsRenderElement(source)) {
-      errors.push(`${r}: takes a render prop without renderElement from #shared/render.js, the one hook-free form a server component may use (R-5.7-4).`)
+    for (const prop of isDemo ? [] : (['render', 'link'] as const)) {
+      if (!acceptsRenderProp(source, prop)) continue
+      if (!implementsRenderProp(source, r, prop)) {
+        errors.push(`${r}: takes a ${prop} prop without calling renderElement from #shared/render.js (or renderLink), the one hook-free form a server component may use (R-5.7-4).`)
+      }
+      if (prop === 'render' && handlesRenderFunction(source)) {
+        errors.push(`${r}: handles a function form of render; a server component takes the element form only (R-5.7-4).`)
+      }
     }
   }
 
