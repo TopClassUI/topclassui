@@ -81,3 +81,12 @@ describe('a read-only Rating is one span on the server', () => {
     expect(html).toContain('<span aria-hidden="true" class="absolute inset-y-0 inset-s-0 flex overflow-hidden text-warning-on-soft w-1/2">')
   })
 })
+
+describe('the playground demo', () => {
+  it('the schema props a Try it control sets reach the rating', async () => {
+    const { default: Playground } = await import('../dummy/playground.js')
+    const html = markup(<Playground value={2} max={10} size="lg" />)
+    expect(attr(html, 'aria-label')).toBe('2 out of 10')
+    expect(attr(html, 'data-size')).toBe('lg')
+  })
+})

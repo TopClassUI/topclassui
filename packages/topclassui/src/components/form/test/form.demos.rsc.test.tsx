@@ -18,6 +18,7 @@ vi.mock('../client.js', () => ({ FormAction: reference('FormAction') }))
 vi.mock('#components/field/client.js', () => ({ FieldLive: reference('FieldLive') }))
 vi.mock('#components/textarea/client.js', () => ({ TextareaField: reference('TextareaField') }))
 vi.mock('#components/button/index.js', () => ({ Button: reference('Button') }))
+vi.mock('#shared/provider/provider.js', () => ({ TopClassProvider: reference('TopClassProvider') }))
 // useId is the one hook the react-server build keeps, and it needs a render to run in: this walk calls the parts by hand.
 vi.mock('react', async (original) => ({ ...await original<typeof ReactModule>(), useId: () => '_r_rsc_' }))
 
@@ -83,14 +84,15 @@ describe('Form renders in a Server Component (R-5.1-1)', () => {
 
 describe('every server demo only hands client parts what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'form-action', 'server-errors'])
+    expect(names).toEqual(['basic', 'form-action', 'rtl', 'server-errors'])
   })
 
   for (const name of names.filter((one) => !CLIENT.includes(one))) {
     it(`${name}: runs with no client hook; Field calls its child on the server, so only the Button crosses`, async () => {
       const found = crossings((await load(name))())
-      expect(found.map(({ part }) => part), name).toEqual(['Button'])
-      expect(found.flatMap(({ props }) => unserializable(props, 'props')), name).toEqual([])
+      expect(found.map(({ part }) => part), name).toEqual(name === 'rtl' ? ['TopClassProvider', 'Button'] : ['Button'])
+      // The provider's children are walked above, part by part; the scan reads what it is handed itself.
+      expect(found.flatMap(({ part, props }) => unserializable(part === 'TopClassProvider' ? { ...props, children: undefined } : props, 'props')), name).toEqual([])
     })
   }
 

@@ -98,7 +98,9 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/long-line.tsx`
 - `dummy/no-copy.tsx`
 - `dummy/no-header.tsx`
+- `dummy/playground.tsx`
 - `dummy/rtl.tsx`
+- `dummy/states.tsx`
 - `dummy/wrap.tsx`
 
 ## Verified against

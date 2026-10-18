@@ -108,9 +108,11 @@ const CROSSES: Record<string, string[]> = {
   'custom-size': ['AvatarImage'],
   'failed': ['AvatarImage', 'AvatarImage', 'AvatarImage', 'AvatarImage', 'AvatarImage'],
   'icon': [],
+  'playground': ['AvatarImage'],
   'rtl': ['AvatarImage'],
   'sizes': [],
   'skeleton': [],
+  'states': ['AvatarImage', 'AvatarImage'],
   'with-name': ['AvatarImage'],
 }
 

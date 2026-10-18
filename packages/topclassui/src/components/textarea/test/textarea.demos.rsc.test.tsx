@@ -81,7 +81,7 @@ describe('Textarea renders in a Server Component (R-5.1-1)', () => {
 
 describe('every demo is a Server Component that only hands client parts what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['autosize', 'basic', 'form', 'long-content', 'row', 'rtl', 'show-count', 'sizes', 'skeleton', 'states'])
+    expect(names).toEqual(['autosize', 'basic', 'form', 'long-content', 'playground', 'row', 'rtl', 'show-count', 'sizes', 'skeleton', 'states'])
   })
 
   for (const name of names) {
@@ -94,7 +94,7 @@ describe('every demo is a Server Component that only hands client parts what can
   it('the demos that ask for autosize or a count are the ones that load the holder', async () => {
     const counts = await Promise.all(names.map(async (name) => [name, crossings((await load(name))()).filter(({ part }) => part === 'TextareaField').length]))
     expect(Object.fromEntries(counts)).toEqual({
-      'autosize': 2, 'basic': 0, 'form': 1, 'long-content': 1, 'row': 2, 'rtl': 1, 'show-count': 4, 'sizes': 0, 'skeleton': 0, 'states': 0,
+      'autosize': 2, 'basic': 0, 'form': 1, 'long-content': 1, 'playground': 0, 'row': 2, 'rtl': 1, 'show-count': 4, 'sizes': 0, 'skeleton': 0, 'states': 0,
     })
   })
 })

@@ -2,19 +2,25 @@ import { existsSync } from 'node:fs'
 
 import { defineConfig, devices } from '@playwright/test'
 
-// The container ships one Chromium build; a pinned Playwright may expect another.
+// The container ships one Chromium build; the pinned Playwright may expect another.
 const INSTALLED = '/opt/pw-browsers/chromium'
 const launch = existsSync(INSTALLED) ? { executablePath: INSTALLED } : {}
 
-const ORIGIN = 'http://localhost:4611'
+export const ORIGIN = 'http://localhost:4611'
 
-// S13 rule 5: against next start, never next dev, so what is measured is the static build.
+/** S13 step 5: against `next start -p 4611` after `next build`, never against next dev. */
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
   workers: Number(process.env['TC_E2E_WORKERS'] ?? 4),
+  forbidOnly: Boolean(process.env['CI']),
   retries: 0,
-  reporter: 'list',
+  reporter: process.env['CI'] ? 'github' : 'list',
   use: { ...devices['Desktop Chrome'], baseURL: ORIGIN, launchOptions: launch },
-  webServer: { command: 'pnpm exec next start -p 4611', url: `${ORIGIN}/en/docs/components/button`, reuseExistingServer: false, timeout: 120_000 },
+  webServer: {
+    command: 'pnpm start',
+    url: `${ORIGIN}/en`,
+    reuseExistingServer: false,
+    timeout: 120_000,
+  },
 })

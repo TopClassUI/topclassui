@@ -20,8 +20,8 @@ const described = (control: HTMLElement) => (control.getAttribute('aria-describe
 const invalidIn = (root: ParentNode) => [...root.querySelectorAll('[aria-invalid="true"]')].map((node) => node.getAttribute('name') ?? node.id)
 
 describe('the demos', () => {
-  it('are the three the plan names', () => {
-    expect(names).toEqual(['basic', 'form-action', 'server-errors'])
+  it('are the four the plan names', () => {
+    expect(names).toEqual(['basic', 'form-action', 'rtl', 'server-errors'])
   })
 
   it('server-errors: each error is on its own field, read after the hint, and both values come back', async () => {

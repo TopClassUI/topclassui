@@ -16,7 +16,7 @@ import { FORCED_CANVAS, contrast, inkOn, pixelsOf, rgbOf } from './pixels.js'
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const NAMES = { xs: 'Extra small', sm: 'Small', md: 'Medium', lg: 'Large', xl: 'Extra large' } as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['basic', 'form', 'four-rows', 'long-content', 'phase-4-form', 'rtl', 'sixty-items', 'sizes', 'states'].map((demo) => `select--${demo}`)
+const DEMOS = ['basic', 'form', 'four-rows', 'long-content', 'phase-4-form', 'playground', 'rtl', 'sixty-items', 'sizes', 'states'].map((demo) => `select--${demo}`)
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 /** The listbox has no data-open of its own: the popup around it carries the placement and the state. */
 const POPUP = '[data-placement]'

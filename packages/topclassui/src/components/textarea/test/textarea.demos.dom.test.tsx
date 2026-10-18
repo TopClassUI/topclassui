@@ -16,6 +16,7 @@ const AFTER: Record<string, string[]> = {
   'basic': ['taken'],
   'form': ['taken', 'taken'],
   'long-content': ['taken', 'taken', 'taken'],
+  'playground': ['taken'],
   'row': ['taken', 'taken', 'taken', 'taken'],
   'rtl': ['taken', 'taken'],
   'show-count': ['taken', 'taken', 'refused', 'taken'],
