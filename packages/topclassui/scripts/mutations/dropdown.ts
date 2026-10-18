@@ -106,13 +106,13 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dropdown forgets the shared side offset, so the menu touches its trigger',
     file: CLIENT,
-    from: '        sideOffset={POPUP_BOUNDS.sideOffset}\n',
+    from: '        sideOffset={FLOATING.sideOffset}\n',
     to: '',
   },
   {
     label: "the dropdown falls back to Base UI's 5 px collision padding instead of the shared 8",
     file: CLIENT,
-    from: '        collisionPadding={POPUP_BOUNDS.collisionPadding}\n',
+    from: '        collisionPadding={FLOATING.collisionPadding}\n',
     to: '',
   },
   {
@@ -148,13 +148,13 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dropdown menu grows to the width of the screen for one long label',
     file: CLASSES,
-    from: 'max-w-[min(calc(var(--spacing)*80),var(--available-width))]',
-    to: 'max-w-(--available-width)',
+    from: 'max-w-[min(calc(var(--spacing)*80),round(down,var(--available-width),1px))]',
+    to: 'max-w-[round(down,var(--available-width),1px)]',
   },
   {
     label: 'the dropdown menu keeps 12rem at a doubled text size, wider than a phone',
     file: CLASSES,
-    from: 'min-w-[min(calc(var(--spacing)*48),var(--available-width))]',
+    from: 'min-w-[min(calc(var(--spacing)*48),round(down,var(--available-width),1px))]',
     to: 'min-w-48',
   },
   {

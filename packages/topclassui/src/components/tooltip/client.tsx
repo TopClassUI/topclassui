@@ -4,7 +4,7 @@ import { Tooltip as Base } from '@base-ui/react/tooltip'
 
 import { clamp } from '#shared/clamp.js'
 import { cn } from '#shared/cn.js'
-import { POPUP_BOUNDS, toSideAlign } from '#shared/floating.js'
+import { FLOATING, toSideAlign } from '#shared/floating.js'
 import { renderTrigger } from '#shared/render-trigger.js'
 import { TOOLTIP_BOUNDARIES } from './boundaries.js'
 import { TOOLTIP_ARROW, TOOLTIP_POPUP, TOOLTIP_POSITIONER } from './classes.js'
@@ -68,8 +68,8 @@ export function TooltipPopup({
         lang={lang}
         side={side}
         align={align}
-        sideOffset={POPUP_BOUNDS.sideOffset + TOOLTIP_ARROW_HEIGHT}
-        collisionPadding={POPUP_BOUNDS.collisionPadding}
+        sideOffset={FLOATING.sideOffset + TOOLTIP_ARROW_HEIGHT}
+        collisionPadding={FLOATING.collisionPadding}
         collisionAvoidance={TOOLTIP_COLLISION_AVOIDANCE}
         className={TOOLTIP_POSITIONER}
       >

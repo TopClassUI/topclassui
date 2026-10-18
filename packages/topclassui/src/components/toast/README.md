@@ -120,6 +120,7 @@ Anything else on `ToastViewport` is passed to the element it draws, so standard 
 - `dummy/promise.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sticky.tsx`
+- `dummy/tall-page.tsx`
 - `dummy/tones.tsx`
 - `dummy/with-action.tsx`
 - `dummy/with-description.tsx`

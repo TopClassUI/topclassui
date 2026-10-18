@@ -5,7 +5,7 @@ import { Fragment } from 'react'
 
 import { clamp } from '#shared/clamp.js'
 import { cn } from '#shared/cn.js'
-import { POPUP_BOUNDS, toSideAlign } from '#shared/floating.js'
+import { FLOATING, toSideAlign } from '#shared/floating.js'
 import { guardEscape } from '#shared/overlay.js'
 import { renderTrigger } from '#shared/render-trigger.js'
 import { DROPDOWN_BOUNDARIES } from './boundaries.js'
@@ -70,8 +70,8 @@ export function DropdownPopup({
         lang={lang}
         side={side}
         align={align}
-        sideOffset={POPUP_BOUNDS.sideOffset}
-        collisionPadding={POPUP_BOUNDS.collisionPadding}
+        sideOffset={FLOATING.sideOffset}
+        collisionPadding={FLOATING.collisionPadding}
         className={DROPDOWN_POSITIONER}
       >
         <DropdownSurface data-placement={placement} {...rest} />

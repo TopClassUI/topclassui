@@ -201,4 +201,28 @@ export const MUTATIONS: Mutation[] = [
     from: "if (toast !== null && !oneOf(TOAST_PLACEMENTS, toast)) {",
     to: 'if (toast === "never") {',
   },
+  {
+    label: 'the toast viewport never publishes its height, so Tab leaves a control under the stack (R-10.5-3)',
+    file: 'src/components/toast/hook.ts',
+    from: "  useStickyBottom(viewport, placement.startsWith('bottom') && toasts.length > 0)\n",
+    to: '',
+  },
+  {
+    label: 'the toast viewport publishes its height at a top placement too, over the --tc-sticky-bottom of the page',
+    file: 'src/components/toast/hook.ts',
+    from: "placement.startsWith('bottom') && toasts.length > 0",
+    to: 'toasts.length > 0',
+  },
+  {
+    label: 'the toast viewport keeps its height published once the stack is empty',
+    file: 'src/components/toast/hook.ts',
+    from: "placement.startsWith('bottom') && toasts.length > 0",
+    to: "placement.startsWith('bottom')",
+  },
+  {
+    label: 'the toast viewport claims its height however tall the stack is',
+    file: 'src/components/toast/hook.ts',
+    from: 'height > root.clientHeight * TOAST_STICKY_SHARE ? 0 : height',
+    to: 'height',
+  },
 ]

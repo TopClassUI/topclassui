@@ -263,7 +263,7 @@ They arrive with the phases that need them.
 ### R-10.5-1 Overlays scroll inside themselves
 **Rule:** popups use `POPUP_BOUNDS` and the row cap, dialogs and drawers scroll their body with sticky header and footer, and every scroll container inside an overlay sets `overscroll-behavior: contain`.
 **Why:** the page must never scroll behind an open overlay.
-**Enforced by:** `e2e/overlay-scroll.spec`, which proves in a browser that the Body of Dialog and Drawer is the scroll container between a header and a footer that keep their boxes, that Popover, Dropdown, Select, Combobox and DatePicker sit at the offset and the collision padding of `POPUP_BOUNDS` inside the room Base UI measured, with their lists inside the row cap, that Command caps its list under its input, and that every scroll container in an open overlay, the Toast viewport included, sets `overscroll-behavior: contain`; `check-structure` requires the Body
+**Enforced by:** `e2e/overlay-scroll.spec`, which proves in a browser that the Body of Dialog and Drawer is the scroll container between a header and a footer that keep their boxes, and that on a 320 x 256 screen the popup scrolls as one instead, that Popover, Dropdown, Select, Combobox and DatePicker sit at the offset and the collision padding of `FLOATING` inside the room Base UI measured, with their lists inside the row cap and the DatePicker's grid scrolling under its month, that Command caps its list under its input, and that every scroll container in an open overlay, the Toast viewport included, sets `overscroll-behavior: contain`; `src/shared/classes.overlay.test`, which fails any `classes.ts` under `src/components` that writes the room as its own bound instead of `POPUP_BOUNDS`; `check-structure` requires the Body
 
 ### R-10.5-2 Tooltips never scroll
 **Rule:** a tooltip is one or two lines of plain text; anything larger, or anything with a link or control, is a Popover.
@@ -273,7 +273,7 @@ They arrive with the phases that need them.
 ### R-10.5-3 Sticky bars set the scroll padding
 **Rule:** a sticky or fixed bar sets `--tc-sticky-top` or `--tc-sticky-bottom`, and the scroll container reads them into `scroll-padding-block`.
 **Why:** WCAG 2.4.11: a focused element must not be hidden behind a bar.
-**Enforced by:** `e2e/overlay-scroll.spec`, which proves that the sticky Navbar writes its height to `--tc-sticky-top` and the page reads both variables into `scroll-padding-block`; `check-structure`, which fails a folder that wears `STICKY_TOP` or `STICKY_BOTTOM` and never writes the matching variable
+**Enforced by:** `e2e/overlay-scroll.spec`, which proves that the sticky Navbar writes its height to `--tc-sticky-top`, that a Toast stack at the bottom writes its height to `--tc-sticky-bottom` and Tab leaves the last link of the page clear of it, and that the page reads both variables into `scroll-padding-block`; `check-structure`, which fails a folder that wears `STICKY_TOP` or `STICKY_BOTTOM` and never writes the matching variable
 
 ## 8. Code structure
 
