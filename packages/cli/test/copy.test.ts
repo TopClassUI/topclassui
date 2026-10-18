@@ -122,7 +122,8 @@ describe.each(FIXTURES)('%s', (fixture) => {
     if (fixture === 'next-app') {
       expect(clients).toContain('components/dialog/client.tsx')
       expect(clients).toContain('shared/provider/provider.tsx')
-      expect(clients.length).toBe(29)
+      expect(clients).toContain('shared/provider/use-provider-locale.ts')
+      expect(clients.length).toBe(32)
     } else expect(clients).toEqual([])
   })
 
