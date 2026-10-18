@@ -228,7 +228,7 @@ This part takes no design props of its own.
 | `closeDelay` | no | `number`, min 0, max 10000 | `0` | DropdownTrigger, with openOnHover: milliseconds it stays open after the pointer leaves, clamped. |
 | `delay` | no | `number`, min 0, max 10000 | `100` | DropdownTrigger, with openOnHover: milliseconds of hover before it opens, clamped. |
 
-`DropdownRoot` draws no element, so it takes no `className`, `style` or `ref`. `DropdownMenu` takes no attribute but `className`, which is merged last, and no `ref`. Anything else on another part is passed to the element it draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
+`DropdownRoot` draws no element, so it takes no `className`, `style` or `ref`. Anything else on another part is passed to the element it draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
 

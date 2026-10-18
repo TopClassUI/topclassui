@@ -65,6 +65,21 @@ The format is: date, decision, why, and what it affects.
 
 **Affects.** R-13-1, R-5.12-1.
 
+## 2026-10-17 - Every export is proven to pass className, ref and data-* on, and where they land instead
+
+**Decision.** `R-5.7-3` is proven by `src/test/root-props.dom.test.tsx`: it walks every component folder, renders each component that `index.tsx` and `skeleton.tsx` export with the required props from that folder's `test/fixture.ts`, and checks that one `className`, one `ref` and one unknown `data-*` attribute land on one element, and that the element is the outermost one the component renders. `check-structure` requires the fixture. A skeleton with no case in its fixture is rendered with no props, so one merged from another branch is covered at once. A case may only depart from the root by naming the props that land elsewhere and the heading of the entry here that records it, which must name the export; the test reads this file.
+
+**Departures this records** (`R-5.7-3`), each the narrowest the test allows:
+
+- `DialogRoot`, `DrawerRoot`, `PopoverRoot`, `TooltipRoot` and `DropdownRoot` are Base UI Roots that render no element, so there is nothing to spread onto. The test proves they still render none.
+- `NavbarLink` and `SidebarLink` render a list item around the link; className, ref and the rest reach the link, which carries the `href`. The `<li>` keeps the list a list.
+- `DatePicker` is held in a span with its hidden input, as Select is; className, ref and the rest reach the trigger button.
+- `TreeView` is held in a div with its live status note; className, ref and the rest reach the element with `role="tree"`, which is the scroll container and the tab stop.
+
+**What it fixed.** `ToastViewport` took a className alone, and `DropdownMenu` the menu contract, placement and className alone; both now take the rest and the ref. The viewport keeps its own `dir`, `lang`, name and toasts; `DropdownMenu` spreads onto its popup, where its className already went, and takes no `children`, `container`, `keepMounted` or `render`.
+
+**Why.** "No check proves all 46 have one" was the gap. A recorded departure is still measured, so a part that moves its props again fails.
+
 ## 2026-10-17 - One thin themed scrollbar for every scroll area
 
 **Decision.** `SCROLLBAR` in `src/shared/classes.ts` is `scrollbar-width: thin` and `scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track)`. `SCROLL_AREA` and `SCROLL_X` carry it, so every dialog and drawer body, popover, dropdown, command, select and combobox list, date picker, tree view, file upload list, toast viewport, sidebar body, accordion region, tabs list, navbar links, segmented control and code block wears it; the table box and the textarea, which scroll without those two, add it by hand. The thumb is neutral-500 in light and ocean and neutral-400 in dark, on a transparent track, so it stands on the surface beneath it: 4.53 to 4.73:1 in light, 5.83 to 7.63 in dark, and 3.93 / 6.27 on a read-only field. `check:contrast` measures it on every surface and on its track whenever the track is not transparent. The code block sets the two tokens to its own fill and halfway thumb, as before. The collapsed Sidebar still hides its bar. Two widths follow from the thinner bar, measured under a mouse: an expanded Sidebar's bar is 10 px (15 before), and a Textarea that takes the browser's own width, in a `w-fit` parent or beside a label, is 173 px (178 before; unit-4.md says 178), since Chromium reserves the vertical bar in it.

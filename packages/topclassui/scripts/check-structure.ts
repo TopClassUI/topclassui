@@ -6,6 +6,7 @@ import { collectionErrors } from './lib/collections.js'
 import { FAIL_LINES, WARN_LINES, countLines, sizeVerdict, sourceFilesUnder } from './lib/file-sizes.js'
 import { INDEX_MARKUP_EXEMPT, indexMarkupViolations, isClientRendering } from './lib/index-markup.js'
 import { categoryOf, exportedValueNames, missingBody, unpublishedStickyEdges } from './lib/overlay-parts.js'
+import { missingFixture } from './lib/root-props-fixture.js'
 import { inlinePropInterfaces, screamingConstants, strayHookImport } from './lib/source-checks.js'
 
 const ROOT = process.cwd()
@@ -87,6 +88,8 @@ function checkComponentFolder(dir: string, slug: string) {
   if (ownTests.length + folderTests.length === 0) {
     errors.push(`${rel(dir)}: has no test file, in the folder or in test/ (R-8.1-1).`)
   }
+  const fixtureError = missingFixture(rel(dir), dirs.includes('test') ? listDir(join(dir, 'test')).filter((e) => e.isFile()).map((e) => e.name) : [])
+  if (fixtureError) errors.push(fixtureError)
 
   for (const name of [...files, ...dirs]) {
     const replacement = RESERVED.get(name)
