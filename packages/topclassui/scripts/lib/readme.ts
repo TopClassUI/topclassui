@@ -133,8 +133,8 @@ function singleProps(props: PropRow[], surface: Surface, whole: 'single' | 'surf
   ]
 }
 
-/** One name on one line; several, as Toast's viewport and its calls, on one line too. */
-const singleImport = (surface: Surface) => `import { ${surface.map((part) => part.name).join(', ')} } from 'topclassui'`
+/** One name on one line; several, as Toast's viewport and its calls, on one line too, from the component's own subpath: there is no root barrel. */
+const singleImport = (surface: Surface, slug: string) => `import { ${surface.map((part) => part.name).join(', ')} } from 'topclassui/${slug}'`
 
 export function renderReadme(input: ReadmeInput): string {
   const { meta, props, demos, handWritten, family } = input
@@ -158,7 +158,7 @@ export function renderReadme(input: ReadmeInput): string {
     '## Import',
     '',
     '```tsx',
-    family ? familyImport(family) : singleImport(surface),
+    family ? familyImport(family, meta.slug) : singleImport(surface, meta.slug),
     '```',
     '',
     '## Props',

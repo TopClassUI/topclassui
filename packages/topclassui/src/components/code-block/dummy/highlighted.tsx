@@ -1,6 +1,6 @@
 import { CodeBlock } from '../index.js'
 
-const CODE = `import { CodeBlock } from 'topclassui'
+const CODE = `import { CodeBlock } from 'topclassui/code-block'
 
 // Coloured by the caller, copied as plain text
 export const sample = <CodeBlock title="page.tsx">{code}</CodeBlock>`
@@ -19,7 +19,7 @@ export default function Demo() {
       highlighted={(
         <>
           <span className={KEYWORD}>import</span>{' { CodeBlock } '}<span className={KEYWORD}>from</span>{' '}
-          <span className={STRING}>{`'topclassui'`}</span>
+          <span className={STRING}>{`'topclassui/code-block'`}</span>
           {'\n\n'}
           <span className={COMMENT}>{'// Coloured by the caller, copied as plain text'}</span>
           {'\n'}

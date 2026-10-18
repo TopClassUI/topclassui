@@ -33,8 +33,7 @@ export function Icon({ name, ...rest }: IconProps) {
     console.warn(
       `[topclassui] <Icon name="${name}"> is not registered, so it renders empty.\n`
       + `  import { ${local} } from 'topclassui/icons/${name}'\n`
-      + `  registerIcons({ '${name}': ${local} })\n`
-      + '  or run npx topclassui icons scan to generate the registration file.',
+      + `  registerIcons({ '${name}': ${local} })`,
     )
   }
 

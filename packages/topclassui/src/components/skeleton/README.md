@@ -34,7 +34,7 @@ technology, so mark the loading region itself, for example with `aria-busy`.
 ## Import
 
 ```tsx
-import { Skeleton } from 'topclassui'
+import { Skeleton } from 'topclassui/skeleton'
 ```
 
 ## Props
