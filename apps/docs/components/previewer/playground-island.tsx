@@ -9,7 +9,7 @@ import { Skeleton } from 'topclassui/skeleton'
 import { PLAYGROUNDS } from '../../.generated/playgrounds'
 import type { Control } from '../../lib/components'
 import { type PropValue, type Usage, changedProps, snippetOf } from '../../lib/usage'
-import { CARD_PART, H3, PLAY_ROW, STAGE, TRY_IT } from '../classes'
+import { CARD_PART, CONTROL, CONTROL_LABEL, CONTROL_RESERVE, H3, PLAY_ROW, STAGE, STAGE_RESERVE, TRY_IT } from '../classes'
 import { ModeScope } from './previewer-mode'
 import { TryItControl } from './try-it-control'
 import { useNearViewport } from './use-near-viewport'
@@ -49,7 +49,7 @@ export function PlaygroundIsland(props: PlaygroundIslandProps) {
   const [values, setValues] = useState(start)
   const changed = changedProps(values, start)
   const Demo = useMemo(() => (slug in PLAYGROUNDS ? lazy(PLAYGROUNDS[slug as keyof typeof PLAYGROUNDS] as Loader) : null), [slug])
-  const reserve = <Skeleton variant="rect" className="size-full min-h-(--tc-stage-height)" />
+  const reserve = <Skeleton variant="rect" className={STAGE_RESERVE} />
   // A demo reads a default* prop on mount only, so changing one in Try it remounts it.
   const remountKey = changed.filter(([name]) => /^default[A-Z]/.test(name)).map(([name, value]) => `${name}=${String(value)}`).join(' ')
   const live = Demo !== null && (serverStage === null ? near : changed.length > 0)
@@ -74,7 +74,12 @@ export function PlaygroundIsland(props: PlaygroundIslandProps) {
                   onChange={(value) => { setValues((current) => ({ ...current, [control.prop]: value })) }}
                 />
               ))
-            : <Skeleton rows={controls.length * 2} />}
+            : controls.map((control) => (
+                <div key={control.prop} className={CONTROL}>
+                  <span dir="ltr" className={CONTROL_LABEL}>{control.prop}</span>
+                  <Skeleton variant="rect" className={CONTROL_RESERVE[control.kind]} />
+                </div>
+              ))}
         </div>
       </ModeScope>
       <div className={CARD_PART}>

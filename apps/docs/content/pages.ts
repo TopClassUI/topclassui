@@ -128,7 +128,7 @@ export const PAGES = [
     },
   },
   {
-    slug: 'components', path: '/docs/components', kind: 'catalog', group: 'reference', icon: 'list', status: 'later',
+    slug: 'components', path: '/docs/components', kind: 'catalog', group: 'reference', icon: 'list', status: 'live',
     title: { en: 'Components', ar: 'المكوّنات' },
     description: {
       en: 'Every component in one consistent layout: the preview, the code, every state and how to install it.',

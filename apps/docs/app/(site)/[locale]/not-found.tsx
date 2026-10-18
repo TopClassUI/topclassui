@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { locale as localeParam } from 'next/root-params'
 import { Button } from 'topclassui/button'
 
+import { SearchButton } from '../../../components/search/search-button'
 import { SitePage } from '../../../components/shell/site-page'
 import { hrefOf, isLocale, pageBySlug } from '../../../content/pages'
 import { labelsFor } from '../../../labels/index'
@@ -26,6 +27,7 @@ export default async function NotFound() {
           {catalog === undefined ? null : (
             <Button variant="outline" tone="neutral" render={<Link href={hrefOf(catalog, locale)} />}>{labels.notFound.components}</Button>
           )}
+          <SearchButton locale={locale} labels={labels.search} />
         </div>
       </main>
     </SitePage>

@@ -10,7 +10,7 @@ export const checkbox = {
     ar: 'محدد أو غير محدد أو مختلط. حقل مخفي يرسل القيمة الافتراضية قبل الترطيب، وإعادة ضبط النموذج تعيدها.',
   },
   demos: ['basic', 'labelled', 'form', 'sizes', 'rtl'],
-  stageHeight: 4,
+  stageHeight: 5.25,
   note: {
     en: 'The box is a native `<button role="checkbox">`, and a hidden checkbox beside it is what the form sends.',
     ar: 'المربع زر أصلي `<button role="checkbox">`، وبجانبه مربع اختيار مخفي هو ما يرسله النموذج.',

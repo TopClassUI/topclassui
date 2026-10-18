@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Badge } from 'topclassui/badge'
-import { BORDER, FOCUS_RING, HOVER, TRANSITION } from 'topclassui/classes'
+import { BORDER, FOCUS_RING, HOVER, TOUCH_TARGET, TRANSITION } from 'topclassui/classes'
 import { Icon } from 'topclassui/icon'
 
 import { hrefOf, pageBySlug, type Locale } from '../../content/pages'
@@ -10,7 +10,7 @@ import { TEXT_LINK } from '../classes'
 import { KIND_TONE } from './product-frame'
 
 const CHIP = `inline-flex min-h-9 items-center gap-2 rounded-control bg-surface px-3 text-sm text-body tone-neutral ${BORDER}`
-const CHIP_LINK = `${CHIP} ${HOVER.outline} ${FOCUS_RING} ${TRANSITION}`
+const CHIP_LINK = `${CHIP} ${HOVER.outline} ${FOCUS_RING} ${TOUCH_TARGET} ${TRANSITION}`
 
 /** The 46 cards as chips with S, C or Sp from meta.ts; each links to its page once the component pages are live. */
 export function CatalogChips({ locale, labels }: { locale: Locale; labels: SiteLabels }) {

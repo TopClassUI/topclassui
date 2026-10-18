@@ -151,6 +151,12 @@ describe('snippetOf', () => {
       .toBe('<NavbarRoot sticky={false}>\n  <NavbarLink href="/docs" current>Docs</NavbarLink>\n</NavbarRoot>')
   })
 
+  it('writes a root prop where the spread was, never over a nested part\'s attribute of the same name', () => {
+    const usage = { imports: [], jsx: '<Banner {...props}\n  action={<Button tone="neutral">Read</Button>}\n>\n  Out now.\n</Banner>', passed: [] }
+    expect(snippetOf(usage, [['tone', 'warning'], ['dismissible', true]]))
+      .toBe('<Banner tone="warning" dismissible\n  action={<Button tone="neutral">Read</Button>}\n>\n  Out now.\n</Banner>')
+  })
+
   it('writes a changed value over the literal the tree already passes', () => {
     expect(snippetOf({ imports: [], jsx: '<Pagination value={6} pageCount={12} {...props} />', passed: [] }, [['value', 8], ['size', 'lg']]))
       .toBe('<Pagination value={8} pageCount={12} size="lg" />')

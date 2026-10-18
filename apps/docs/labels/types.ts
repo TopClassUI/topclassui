@@ -1,4 +1,5 @@
 import type { PageGroup } from '../content/pages'
+import type { SearchGroup } from '../scripts/lib/search'
 
 export type Rendering = 'server' | 'split' | 'client'
 export type Mode = 'light' | 'dark' | 'ocean'
@@ -157,4 +158,42 @@ export interface SiteLabels {
       tailwind: { name: string; line: string }
     }
   }
+  /** The catalog (page 13). */
+  catalog: CatalogLabels
+  /** The search button and its palette (S5). */
+  search: SearchLabels
+  /** The headings of /llms.txt (S6); the summary is English, as the file's readers are. */
+  llms: LlmsLabels
 }
+
+export interface CatalogLabels {
+  title: string
+  lead: (count: number) => string
+  metaTitle: string
+  description: string
+  beforeTitle: string
+  beforeOnce: string
+  beforeLead: string
+  /** Steps 1 to 3 of Figma's four; step 4, copy the source, waits for the CLI (choice 11). */
+  steps: { install: StepLabels; css: StepLabels; layout: StepLabels }
+  legendTitle: string
+  legendLead: string
+  legend: { title: string; text: string }[]
+  sectionCount: (n: number) => string
+  startHere: string
+  sectionsHeading: string
+  installHeading: string
+}
+
+interface StepLabels { title: string; note: string }
+
+export interface SearchLabels {
+  button: string
+  /** The palette's dialog title, which names it. */
+  title: string
+  placeholder: string
+  groups: Record<SearchGroup, string>
+  shortcut: { pc: string; mac: string }
+}
+
+export interface LlmsLabels { summary: string; docs: string; components: string }

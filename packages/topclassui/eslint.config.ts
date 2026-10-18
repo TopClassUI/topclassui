@@ -5,6 +5,8 @@ import tseslint from 'typescript-eslint'
 import topclass from './eslint-rules/index.ts'
 
 export default defineConfig(
+  // consumers/ holds two app templates with their own tsconfig; pnpm test:consumers builds them, this config never lints them.
+  { ignores: ['node_modules', 'dist', '.next', 'apps/**', 'coverage', 'consumers'] },
   { ignores: ['node_modules', 'dist', '.next', 'apps/**', 'coverage'] },
   // consumers/ holds two app templates with their own tsconfig; pnpm test:consumers builds them, this config never lints them.
   { ignores: ['node_modules', 'dist', '.next', 'apps/**/.next', 'coverage', 'consumers'] },

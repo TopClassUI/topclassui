@@ -5,8 +5,11 @@ import sitemap from './sitemap.js'
 describe('sitemap', () => {
   const entries = sitemap()
 
-  it('lists every live page in both locales and nothing under /preview', () => {
-    expect(entries.map((entry) => entry.url)).toEqual([
+  it('lists every live page in both locales, then the 49 component pages, and nothing under /preview', () => {
+    expect(entries).toHaveLength(124)
+    expect(entries.map((entry) => entry.url).filter((url) => url.includes('/preview'))).toEqual([])
+    expect(entries[26]?.url).toBe('https://topclassui.com/en/docs/components/accordion')
+    expect(entries.slice(0, 26).map((entry) => entry.url)).toEqual([
       'https://topclassui.com/en',
       'https://topclassui.com/ar',
       'https://topclassui.com/en/docs/installation',
@@ -29,6 +32,8 @@ describe('sitemap', () => {
       'https://topclassui.com/ar/docs/server-first',
       'https://topclassui.com/en/docs/accessibility',
       'https://topclassui.com/ar/docs/accessibility',
+      'https://topclassui.com/en/docs/components',
+      'https://topclassui.com/ar/docs/components',
       'https://topclassui.com/en/changelog',
       'https://topclassui.com/ar/changelog',
     ])

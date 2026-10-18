@@ -11,7 +11,7 @@ export function labelsFor(locale: Locale): SiteLabels {
   return BY_LOCALE[locale]
 }
 
-export const DIRECTION = { en: 'ltr', ar: 'rtl' } as const satisfies Record<Locale, 'ltr' | 'rtl'>
+export { DIRECTION } from '../lib/locales'
 
 /** Each language named in its own script, the same in both locales. */
 export const LANGUAGE_NAMES = { en: 'English', ar: 'العربية' } as const satisfies Record<Locale, string>

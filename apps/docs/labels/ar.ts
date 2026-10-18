@@ -171,4 +171,57 @@ export const ar: SiteLabels = {
       tailwind: { name: 'Tailwind CSS', line: 'يُضبط من CSS بثلاثة أسطر استيراد. لا ملف إعدادات.' },
     },
   },
+  catalog: {
+    title: 'المكوّنات',
+    lead: (count) => `${String(count)} مكوّنًا، لكل واحد عرض حيّ: كل الحالات معًا، ومساحة تجربة موصولة بالخصائص الحقيقية، وسطر الاستيراد.`,
+    metaTitle: 'المكوّنات - TopClass UI',
+    description: 'كل مكوّنات TopClass UI في صفحة واحدة، مع عرض حيّ ومساحة تجربة على الخصائص الحقيقية وكل الحالات وسطر الاستيراد.',
+    beforeTitle: 'قبل أن تبدأ',
+    beforeOnce: 'مرة واحدة لكل تطبيق',
+    beforeLead: 'كل بطاقة أدناه تعرض سطر استيراد. هذه الخطوات الثلاث تجعله يعمل.',
+    steps: {
+      install: {
+        title: '1. ثبّت الحزمة',
+        note: 'ثلاث اعتماديات نظيرة: react وreact-dom وTailwind CSS 4.2 أو أحدث. مشروعك فيه هذه بالفعل، وzod يُثبَّت مع الحزمة.',
+      },
+      css: {
+        title: '2. مدخل Tailwind CSS v4',
+        note: 'ثلاثة أسطر، بهذا الترتيب، وبلا tailwind.config.js. السطر الثالث يحمل الربط الذي يعطي Tailwind أسماء الأصناف الدلالية.',
+      },
+      layout: {
+        title: '3. التخطيط الجذري',
+        note: 'مرّر direction وlocale إلى TopClassProvider خاصيتين من التخطيط؛ ولا تقرأهما أبدًا من document.dir داخل effect. يأتي ThemeScript أولًا في <head>: يضبط data-theme قبل أول رسم.',
+      },
+    },
+    legendTitle: 'كيف تقرأ البطاقة',
+    legendLead: 'كل مكوّن أدناه مرتّب بالطريقة نفسها، فتتعلمها مرة واحدة. خمسة أجزاء، من الأعلى إلى الأسفل.',
+    legend: [
+      { title: 'العرض', text: 'المكوّن في أكثر إعداداته شيوعًا، على خلفية الصفحة، لتراه في سياقه.' },
+      { title: 'جرّبه', text: 'كل خاصية يمكنك تغييرها، مع قيمها المسموح بها.' },
+      { title: 'الشيفرة', text: 'شيفرة JSX التي تنتج العرض فوقها. انسخها والصقها فتعمل.' },
+      { title: 'كل الحالات', text: 'التمرير والتركيز والتعطيل والتحميل والخطأ - كلها معًا. لا تحتاج إلى التمرير لمراجعة حالة.' },
+      { title: 'استورده', text: 'سطر الاستيراد الواحد من الحزمة، وأمر التثبيت.' },
+    ],
+    sectionCount: (n) => {
+      const rule = new Intl.PluralRules('ar').select(n)
+      if (rule === 'one') return 'مكوّن واحد'
+      if (rule === 'two') return 'مكوّنان'
+      return `${String(n)} ${rule === 'few' ? 'مكوّنات' : 'مكوّنًا'}`
+    },
+    startHere: 'ابدأ من هنا',
+    sectionsHeading: 'الأقسام',
+    installHeading: 'قبل أن تبدأ',
+  },
+  search: {
+    button: 'ابحث في التوثيق',
+    title: 'ابحث في التوثيق',
+    placeholder: 'ابحث في الصفحات والمكوّنات',
+    groups: { pages: 'الصفحات', components: 'المكوّنات', icons: 'الأيقونات' },
+    shortcut: { pc: 'Ctrl K', mac: '⌘ K' },
+  },
+  llms: {
+    summary: 'مكوّنات React لـ Next.js، من اليمين إلى اليسار أولًا ومن الخادم أولًا، مبنية على Tailwind CSS v4 وBase UI.',
+    docs: 'التوثيق بالعربية',
+    components: 'المكوّنات بالعربية',
+  },
 }

@@ -12,7 +12,8 @@ import { type ComponentsFile, generatedProblems } from './lib/shape.js'
 
 const APP = resolve(import.meta.dirname, '..')
 const out = mkdtempSync(join(tmpdir(), 'docs-data-'))
-const run = spawnSync(join(APP, 'node_modules', '.bin', 'tsx'), ['scripts/docs-data.ts', '--out', out], { cwd: APP, encoding: 'utf8' })
+// node runs tsx's own entry: the .bin shim is a shell script that Windows cannot start without a shell.
+const run = spawnSync(process.execPath, [join(APP, 'node_modules', 'tsx', 'dist', 'cli.mjs'), 'scripts/docs-data.ts', '--out', out], { cwd: APP, encoding: 'utf8' })
 const log = `${run.stdout}${run.stderr}`
 const read = (file: string) => readFileSync(join(out, file), 'utf8')
 const components = JSON.parse(read('components.json')) as ComponentsFile
@@ -23,11 +24,11 @@ describe('docs:data against the repo', () => {
     expect(run.status, log).toBe(0)
   })
 
-  it('reads all 52 component folders and lists the 46 catalog cards and the 464 demos', () => {
-    expect(log).toMatch(/^docs:data: 52 folders, 46 catalog cards, 464 demos, \d+ issues?$/m)
+  it('reads all 52 component folders and lists the 46 catalog cards and the 471 demos', () => {
+    expect(log).toMatch(/^docs:data: 52 folders, 46 catalog cards, 471 demos, \d+ issues?$/m)
     expect(components.components).toHaveLength(52)
     expect(components.components.filter((entry) => entry.card)).toHaveLength(46)
-    expect(parseDemoMap(demos)).toHaveLength(464)
+    expect(parseDemoMap(demos)).toHaveLength(471)
   })
 
   it('writes four files that pass every shape and cross check', () => {
@@ -63,8 +64,8 @@ describe('docs:data against the repo', () => {
     expect(linked?.source).toContain("from 'topclassui/avatar-group'")
   })
 
-  it('reports, as issues and not as shape problems, only what other branches bring', () => {
+  it('reports no issue now that the release exports map is in', () => {
     const issues = log.split('\n').filter((line) => line.startsWith('warn ')).filter((line) => !line.includes(' content-missing: '))
-    expect(issues).toEqual(["warn code-block bare-root: dummy/highlighted.tsx shows 'topclassui' with no subpath"])
+    expect(issues).toEqual([])
   })
 })

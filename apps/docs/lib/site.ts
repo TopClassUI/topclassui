@@ -3,6 +3,9 @@ import pkg from 'topclassui/package.json' with { type: 'json' }
 
 export const SITE_URL = 'https://topclassui.com'
 
+/** The product's name, the same in both languages. */
+export const SITE_NAME = 'TopClass UI'
+
 /** Choice 12: shown only once the repository is public; until then nothing links to it. */
 export const GITHUB_URL: string | null = null
 
