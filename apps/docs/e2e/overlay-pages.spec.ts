@@ -44,7 +44,7 @@ const stage = (page: Page, slug: string) => card(page, slug).locator('[style*="-
 
 /** A tooltip opens on hover; every other overlay on a press. The trigger sits mid-screen, so a popup has room on every side. */
 async function drive(slug: (typeof SLUGS)[number], trigger: Locator) {
-  await trigger.evaluate((element) => { element.scrollIntoView({ block: 'center' }) })
+  await trigger.evaluate((element) => { element.scrollIntoView({ block: 'center', behavior: 'instant' }) })
   await (slug === 'tooltip' ? trigger.hover() : trigger.click())
 }
 
@@ -215,6 +215,8 @@ test('Command: defaultOpen from Try it opens the palette with its list', async (
   const errors = collectErrors(page)
   await page.goto('/en/docs/components/command')
   await card(page, 'command').scrollIntoViewIfNeeded()
+  // Pressed once the demo has mounted, so Try it must remount it for defaultOpen to take effect.
+  await page.waitForLoadState('networkidle')
   await card(page, 'command').getByRole('switch', { name: 'defaultOpen' }).click()
   const palette = page.getByRole('dialog')
   await expect(palette).toBeVisible()

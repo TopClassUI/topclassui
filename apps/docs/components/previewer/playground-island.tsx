@@ -50,6 +50,8 @@ export function PlaygroundIsland(props: PlaygroundIslandProps) {
   const changed = changedProps(values, start)
   const Demo = useMemo(() => (slug in PLAYGROUNDS ? lazy(PLAYGROUNDS[slug as keyof typeof PLAYGROUNDS] as Loader) : null), [slug])
   const reserve = <Skeleton variant="rect" className={STAGE_RESERVE} />
+  // A demo reads a default* prop on mount only, so changing one in Try it remounts it.
+  const remountKey = changed.filter(([name]) => /^default[A-Z]/.test(name)).map(([name, value]) => `${name}=${String(value)}`).join(' ')
   const live = Demo !== null && (serverStage === null ? near : changed.length > 0)
   const copy = getLabels(locale, { common: { copy: labels.copyCode } }).labels
 
@@ -57,7 +59,7 @@ export function PlaygroundIsland(props: PlaygroundIslandProps) {
     <>
       <ModeScope className={PLAY_ROW}>
         <div ref={row} style={{ '--tc-stage-height': `${String(stageHeight)}rem` }} className={`${STAGE} min-h-(--tc-stage-height)`}>
-          {live ? <Suspense fallback={serverStage ?? reserve}><Demo {...Object.fromEntries(changed)} /></Suspense> : (serverStage ?? reserve)}
+          {live ? <Suspense fallback={serverStage ?? reserve}><Demo key={remountKey} {...Object.fromEntries(changed)} /></Suspense> : (serverStage ?? reserve)}
         </div>
         <div className={TRY_IT}>
           <h3 className={H3}>{labels.tryIt}</h3>
