@@ -33,5 +33,7 @@ export function findNeighbour(gone: Element): HTMLElement | null {
 export function restoreFocus(next: HTMLElement | null, visible: boolean): void {
   const active = next?.ownerDocument.activeElement
   if (!next?.isConnected || (active !== null && active !== undefined && active !== next.ownerDocument.body)) return
-  next.focus({ focusVisible: visible })
+  // focusVisible is in the DOM lib from TypeScript 6 only; a typed variable keeps the copy compiling on 5.x.
+  const options: FocusOptions & { focusVisible?: boolean } = { focusVisible: visible }
+  next.focus(options)
 }
