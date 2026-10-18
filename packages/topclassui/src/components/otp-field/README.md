@@ -15,7 +15,7 @@ one element, Base UI's OTP field: a group of cells and one hidden input the form
 prints `OtpField`, which is not an export: copy this line (choice 24).
 
 ```tsx
-import { OTPField } from 'topclassui'
+import { OTPField } from 'topclassui/otp-field'
 ```
 
 ```tsx
@@ -104,7 +104,7 @@ a read-only look, the invalid ring that is always on, a skeleton (use `Skeleton`
 ## Import
 
 ```tsx
-import { OTPField } from 'topclassui'
+import { OTPField } from 'topclassui/otp-field'
 ```
 
 ## Props

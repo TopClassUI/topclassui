@@ -14,7 +14,7 @@ A tooltip is plain text. Anything with a link or a control is a Popover.
 ```ts
 import {
   PopoverClose, PopoverDescription, PopoverPopup, PopoverRoot, PopoverTitle, PopoverTrigger,
-} from 'topclassui'
+} from 'topclassui/popover'
 ```
 
 ```tsx
@@ -150,7 +150,7 @@ import {
   PopoverPopup,
   PopoverTitle,
   PopoverTrigger,
-} from 'topclassui'
+} from 'topclassui/popover'
 ```
 
 ## Props

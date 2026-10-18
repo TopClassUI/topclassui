@@ -42,7 +42,7 @@ and `locale`.
 ## Import
 
 ```tsx
-import { Meter } from 'topclassui'
+import { Meter } from 'topclassui/meter'
 ```
 
 ## Props

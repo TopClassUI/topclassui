@@ -12,7 +12,7 @@ To show a score out of five stars, or to let someone give one. Shown stars are s
 and ship no script; only `readOnly={false}` hydrates.
 
 ```ts
-import { Rating } from 'topclassui'
+import { Rating } from 'topclassui/rating'
 ```
 
 ```tsx
@@ -68,7 +68,7 @@ dimmed read-only look the design draws.
 ## Import
 
 ```tsx
-import { Rating } from 'topclassui'
+import { Rating } from 'topclassui/rating'
 ```
 
 ## Props

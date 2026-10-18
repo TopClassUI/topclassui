@@ -12,7 +12,7 @@ For one choice out of a list too long to show at once. For a few short ones, a R
 thousands, or a list to type into, a Combobox. It is one element that takes its options as data.
 
 ```tsx
-import { Select } from 'topclassui'
+import { Select } from 'topclassui/select'
 ```
 
 ```tsx
@@ -112,7 +112,7 @@ windowing, the scroll arrows, `variant`, a Drawer on a phone, a clear button or 
 ## Import
 
 ```tsx
-import { Select } from 'topclassui'
+import { Select } from 'topclassui/select'
 ```
 
 ## Props

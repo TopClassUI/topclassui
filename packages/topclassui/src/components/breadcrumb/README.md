@@ -43,7 +43,7 @@ Pass `baseUrl="https://example.com"` and those URLs are absolute; the links stay
 ## Import
 
 ```tsx
-import { Breadcrumb } from 'topclassui'
+import { Breadcrumb } from 'topclassui/breadcrumb'
 ```
 
 ## Props

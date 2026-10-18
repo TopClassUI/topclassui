@@ -75,7 +75,7 @@ so a screen reader moves through it by row and by column.
 ## Import
 
 ```tsx
-import { Table } from 'topclassui'
+import { Table } from 'topclassui/table'
 ```
 
 ## Props

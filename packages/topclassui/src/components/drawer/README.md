@@ -15,7 +15,7 @@ from on a phone. A swipe toward its edge closes it, and so does the x it always 
 import {
   DrawerBody, DrawerClose, DrawerDescription, DrawerFooter, DrawerHeader, DrawerPopup,
   DrawerRoot, DrawerTitle, DrawerTrigger,
-} from 'topclassui'
+} from 'topclassui/drawer'
 ```
 
 ```tsx
@@ -154,7 +154,7 @@ import {
   DrawerPopup,
   DrawerTitle,
   DrawerTrigger,
-} from 'topclassui'
+} from 'topclassui/drawer'
 ```
 
 ## Props

@@ -26,7 +26,7 @@ icon, the title or the description, and the action is always the caller's own Bu
 ## Import
 
 ```tsx
-import { EmptyState } from 'topclassui'
+import { EmptyState } from 'topclassui/empty-state'
 ```
 
 ## Props

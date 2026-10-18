@@ -46,7 +46,7 @@ is a real link, so it works with no JavaScript and a crawler follows it.
 ## Import
 
 ```tsx
-import { Pagination } from 'topclassui'
+import { Pagination } from 'topclassui/pagination'
 ```
 
 ## Props
