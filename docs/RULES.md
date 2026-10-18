@@ -61,7 +61,7 @@ They arrive with the phases that need them.
 ### R-5.1-3 Only serializable props cross the boundary
 **Rule:** only serializable props cross the boundary: strings, numbers, booleans, plain objects, arrays and `ReactNode` children; functions never, except Server Actions.
 **Why:** React throws at render otherwise.
-**Enforced by:** `src/test/serializable.ts`, through `test/<slug>.serializable.test.ts` in every component that renders in `index.tsx` (a type test, run by `pnpm typecheck`)
+**Enforced by:** `src/test/serializable.ts`, through `test/<slug>.serializable.test.ts` in every component that renders in `index.tsx` or re-exports a server part or skeleton, and `src/shared/provider/provider.serializable.test.ts` (type tests, run by `pnpm typecheck`); `src/test/client-callbacks.test.ts` for the client-only note on each callback of a client export
 
 ### R-5.1-4 No React context in Server Components
 **Rule:** no React context in Server Components: direction and theme come from `dir` and `data-theme` on the HTML, and labels come from props.

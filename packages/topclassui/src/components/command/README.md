@@ -99,22 +99,22 @@ Required: `getKey`, `getLabel`, `items`, `onSelect`. Every other prop below is o
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `getKey` | **yes** | `(item: T) => string` | - | Stable identity across pages, so a row keeps its place when a page is prepended. |
-| `getLabel` | **yes** | `(item: T) => string` | - | The text a row shows and the query is matched against, word by word. |
+| `getKey` | **yes** | `(item: T) => string` | - | Stable identity across pages, so a row keeps its place when a page is prepended. Client-only. |
+| `getLabel` | **yes** | `(item: T) => string` | - | The text a row shows and the query is matched against, word by word. Client-only, as is every function here. |
 | `items` | **yes** | `readonly T[]` | - |  |
-| `onSelect` | **yes** | `(item: T) => void` | - | Called with the chosen item, by a press or by Enter; the palette has closed by then. |
+| `onSelect` | **yes** | `(item: T) => void` | - | Called with the chosen item, by a press or by Enter; the palette has closed by then. Client-only. |
 | `className` | no | `string` | - | Merged last onto the popup, so a consumer class wins a conflict with its own. |
 | `defaultOpen` | no | `boolean` | `false` | Whether it starts open, when open is not controlled. |
 | `emptyFallback` | no | `ReactNode` | - |  |
-| `getGroup` | no | `((item: T) => string \| undefined)` | - | The heading a row sits under; rows with none come first, in a group with no heading. |
+| `getGroup` | no | `((item: T) => string \| undefined)` | - | The heading a row sits under; rows with none come first, in a group with no heading. Client-only. |
 | `hasMore` | no | `boolean` | - |  |
 | `loadingFallback` | no | `ReactNode` | - |  |
 | `loadMore` | no | `(() => void \| Promise<void>)` | - | Client-only, or a Server Action. Called once when the window nears the end. |
 | `loadMoreThreshold` | no | `integer`, min 0, max 200 | `10` | Rows from the end at which loadMore is called, clamped to 0 to 200. |
-| `onOpenChange` | no | `((open: boolean) => void)` | - |  |
-| `onQueryChange` | no | `((query: string) => void)` | - | Called with each new query, so the caller can fetch its first page from the server. |
+| `onOpenChange` | no | `((open: boolean) => void)` | - | Called with the open state the palette asks for. Client-only. |
+| `onQueryChange` | no | `((query: string) => void)` | - | Called with each new query, so the caller can fetch its first page from the server. Client-only, or a Server Action. |
 | `open` | no | `boolean` | - | Whether it is open. Use with onOpenChange when controlled. |
-| `renderItem` | no | `((item: T) => ReactNode)` | - | What a row holds in place of its label. It stays one row tall. |
+| `renderItem` | no | `((item: T) => ReactNode)` | - | What a row holds in place of its label. It stays one row tall. Client-only. |
 | `shortcut` | no | `unknown` | `"k"` | The key that opens it with Ctrl or Cmd, wherever focus is; null for none. |
 | `status` | no | `Exclude<Status, 'error'>` | - | Never 'error': with no errorFallback, a failed fetch would read as No results. |
 | `virtualize` | no | `unknown` | `"auto"` | Windowing: auto mounts only the rows in view above the provider threshold (200). |

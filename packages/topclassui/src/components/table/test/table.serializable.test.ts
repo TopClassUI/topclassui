@@ -1,11 +1,15 @@
 import { describe, expectTypeOf, it } from 'vitest'
 
 import type { UnserializableKeys } from '#test/serializable.js'
-import type { TableProps } from '../types.js'
+import type { TableProps, TableSkeletonProps } from '../types.js'
 
 // The exemptions are the decision of 2026-10-17 in docs/DECISIONS.md; a new one fails here first.
 describe('only serializable props cross the boundary (R-5.1-3)', () => {
   it('Table: the cell of every column, getKey and labels are called on the server; loadMore is a Server Action', () => {
     expectTypeOf<UnserializableKeys<TableProps<{ name: string }>>>().toEqualTypeOf<'columns' | 'getKey' | 'labels' | 'loadMore'>()
+  })
+
+  it('TableSkeleton takes no function and no class instance', () => {
+    expectTypeOf<UnserializableKeys<TableSkeletonProps>>().toEqualTypeOf<never>()
   })
 })

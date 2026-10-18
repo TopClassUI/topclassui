@@ -150,3 +150,10 @@ export interface Labels {
 export type PartialLabels = {
   readonly [K in keyof Labels]?: Partial<Labels[K]>
 }
+
+/** The overrides a server layout can hand the provider: strings only, since a count label is a function (R-5.1-3). */
+export type ProviderLabels = {
+  readonly [K in keyof Labels]?: {
+    readonly [P in keyof Labels[K] as Labels[K][P] extends string ? P : never]?: Labels[K][P]
+  }
+}
