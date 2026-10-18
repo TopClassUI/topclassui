@@ -1,4 +1,5 @@
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
 
 import { Linter } from 'eslint'
 import tseslint from 'typescript-eslint'
@@ -34,6 +35,7 @@ const config = [
       'topclass/text-comes-from-labels': 'error',
       'topclass/no-fetch-in-components': 'error',
       'topclass/tooltip-content-is-text': 'error',
+      'topclass/client-shape': 'error',
     },
   },
 ] as unknown as Linter.Config[]
@@ -887,4 +889,84 @@ describe('R-8.5-2: components never fetch, cache or paginate', () => {
       expect(only(code), code).toEqual([])
     })
   }
+})
+
+describe('R-5.12-1: client.tsx is markup plus one hook from hook.ts', () => {
+  const CLIENT = 'src/components/thing/client.tsx'
+  const PART = 'src/components/thing/parts/thing-list.tsx'
+  const shape = (code: string, filename = CLIENT) => ids(code, filename).filter((r) => r === 'topclass/client-shape')
+
+  it('allows one hook from hook.ts in each component of the file', () => {
+    const code = [
+      "'use client'",
+      "import { useThingRoot, useThingItem } from './hook.js'",
+      'export function ThingRoot() { const root = useThingRoot(); return <div id={root.id} /> }',
+      'export function ThingItem() { const item = useThingItem(); return <button onClick={() => { item.run() }} /> }',
+    ].join('\n')
+    expect(shape(code), code).toEqual([])
+  })
+
+  it('allows a component that calls no hook at all', () => {
+    expect(shape("'use client'\nexport function ThingBody() { return <div /> }")).toEqual([])
+  })
+
+  const banned: [string, string][] = [
+    ['useState', "import { useState } from 'react'\nexport function Thing() { const [v] = useState(0); return <i>{v}</i> }"],
+    ['useEffect', "import { useEffect } from 'react'\nexport function Thing() { useEffect(() => {}); return <i /> }"],
+    ['useReducer', "import { useReducer } from 'react'\nexport function Thing() { useReducer((s: number) => s, 0); return <i /> }"],
+    ['useRef', "import { useRef } from 'react'\nexport function Thing() { const r = useRef(null); return <i ref={r} /> }"],
+    ['useMemo', "import { useMemo } from 'react'\nexport function Thing() { useMemo(() => 1, []); return <i /> }"],
+    ['useCallback', "import { useCallback } from 'react'\nexport function Thing() { useCallback(() => 1, []); return <i /> }"],
+    ['React.useState', "import * as React from 'react'\nexport function Thing() { React.useState(0); return <i /> }"],
+    ['an aliased import', "import { useState as useLocal } from 'react'\nexport function Thing() { useLocal(0); return <i /> }"],
+  ]
+  for (const [name, code] of banned) {
+    it(`rejects ${name} in client.tsx`, () => {
+      expect(shape(`'use client'\n${code}`), code).toEqual(['topclass/client-shape'])
+    })
+  }
+
+  it('rejects a hook that does not come from hook.ts', () => {
+    const code = "'use client'\nimport { useCollection } from '#shared/collection.js'\nexport function Thing() { useCollection(); return <i /> }"
+    expect(shape(code), code).toEqual(['topclass/client-shape'])
+  })
+
+  it('rejects a second hook call in one component, even when both come from hook.ts', () => {
+    const code = "'use client'\nimport { useA, useB } from './hook.js'\nexport function Thing() { useA(); useB(); return <i /> }"
+    expect(shape(code), code).toEqual(['topclass/client-shape'])
+  })
+
+  it('rejects a helper declared beside the components, in either form', () => {
+    const code = "'use client'\nfunction toLabel(s: string) { return s }\nexport const toKey = (s: string) => s\nexport function Thing() { return <i /> }"
+    expect(shape(code), code).toEqual(['topclass/client-shape', 'topclass/client-shape'])
+  })
+
+  it('rejects a hook declared in client.tsx instead of hook.ts', () => {
+    const code = "'use client'\nfunction useThing() { return 1 }\nexport function Thing() { return <i /> }"
+    expect(shape(code), code).toEqual(['topclass/client-shape'])
+  })
+
+  it('holds a use client part to the same shape as client.tsx', () => {
+    const code = "'use client'\nimport { useState } from 'react'\nexport function ThingList() { useState(0); return <i /> }"
+    expect(shape(code, PART), code).toEqual(['topclass/client-shape'])
+  })
+
+  it('leaves a server part and every other file alone', () => {
+    const code = "import { useId } from 'react'\nexport function ThingGroup() { const id = useId(); return <i id={id} /> }"
+    expect(shape(code, PART), code).toEqual([])
+    const hook = "import { useState } from 'react'\nexport function useThing() { return useState(0) }"
+    expect(shape(hook, 'src/components/thing/hook.ts'), hook).toEqual([])
+  })
+
+  it('passes every client file the library ships', () => {
+    const files = readdirSync('src', { recursive: true, encoding: 'utf8' })
+      .map((f) => f.replace(/\\/g, '/'))
+      .filter((f) => /^(components|connectors)\/[^/]+\/(client\.tsx|parts\/[^/]+\.tsx)$/.test(f))
+    const offending = files.flatMap((f) =>
+      lint(readFileSync(join('src', f), 'utf8'), `src/${f}`)
+        .filter((m) => m.ruleId === 'topclass/client-shape')
+        .map((m) => `${f}:${m.line} ${m.message}`))
+    expect(files.filter((f) => f.endsWith('/client.tsx')).length).toBeGreaterThan(30)
+    expect(offending).toEqual([])
+  })
 })

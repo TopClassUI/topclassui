@@ -39,6 +39,7 @@ export default defineConfig(
       'topclass/text-comes-from-labels': 'error',
       'topclass/no-fetch-in-components': 'error',
       'topclass/tooltip-content-is-text': 'error',
+      'topclass/client-shape': 'error',
 
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/ban-ts-comment': 'error',

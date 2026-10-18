@@ -155,3 +155,11 @@ export function importsRenderElement(source: string): boolean {
   const re = /import\s+(?!type\s)\{([^}]*)\}\s*from\s*['"](?:#shared\/render\.js|(?:\.{1,2}\/)+(?:shared\/)?render\.js)['"]/g
   return [...source.matchAll(re)].some((m) => (m[1] ?? '').split(',').some((part) => part.trim().split(/\s+as\s+/)[0] === 'renderElement'))
 }
+
+/** R-5.12-1: hook.ts sits behind the client boundary, so only client.tsx or a 'use client' part imports it. */
+export function strayHookImport(pathInFolder: string, source: string): boolean {
+  const own = importedModules(source).some((spec) => /^\.\.?\/hook\.js$/.test(spec))
+  if (!own) return false
+  if (pathInFolder === 'client.tsx') return false
+  return !(pathInFolder.startsWith('parts/') && hasUseClient(source))
+}

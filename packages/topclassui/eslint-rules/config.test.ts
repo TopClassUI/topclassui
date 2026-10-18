@@ -17,8 +17,8 @@ describe('eslint.config.ts arms the custom rules', () => {
     expect(src).toBeDefined()
   })
 
-  it('declares seventeen rules, so a new one cannot be forgotten silently', () => {
-    expect(RULE_NAMES).toHaveLength(17)
+  it('declares eighteen rules, so a new one cannot be forgotten silently', () => {
+    expect(RULE_NAMES).toHaveLength(18)
   })
 
   for (const name of RULE_NAMES) {
