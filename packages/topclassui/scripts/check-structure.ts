@@ -6,6 +6,9 @@ import { collectionErrors } from './lib/collections.js'
 import { FAIL_LINES, WARN_LINES, countLines, sizeVerdict, sourceFilesUnder } from './lib/file-sizes.js'
 import { INDEX_MARKUP_EXEMPT, indexMarkupViolations, isClientRendering } from './lib/index-markup.js'
 import { categoryOf, exportedValueNames, missingBody, unpublishedStickyEdges } from './lib/overlay-parts.js'
+import {
+  NAMING_EXEMPTIONS, SCROLLING_OVERLAYS, hookFileProblems, libFileProblems, overlayPartProblems, partFileProblems,
+} from './lib/part-names.js'
 import { missingFixture } from './lib/root-props-fixture.js'
 import { inlinePropInterfaces, screamingConstants, strayHookImport } from './lib/source-checks.js'
 
@@ -177,10 +180,30 @@ function checkComponentFolder(dir: string, slug: string) {
   }
 
   // parts/: one component per file, named after the file.
-  if (dirs.includes('parts')) {
-    for (const e of listDir(join(dir, 'parts'))) {
-      if (!e.isFile()) { errors.push(`${rel(join(dir, 'parts', e.name))}: parts/ holds files, not folders (R-8.1-1).`); continue }
-      if (!isKebab(e.name.replace(/\.tsx?$/, ''))) errors.push(`${rel(join(dir, 'parts', e.name))}: part files are kebab-case (R-5.12-4).`)
+  const partEntries = dirs.includes('parts') ? listDir(join(dir, 'parts')) : []
+  for (const e of partEntries) {
+    const path = join(dir, 'parts', e.name)
+    if (!e.isFile()) { errors.push(`${rel(path)}: parts/ holds files, not folders (R-8.1-1).`); continue }
+    if (!isKebab(e.name.replace(/\.tsx?$/, ''))) errors.push(`${rel(path)}: part files are kebab-case (R-5.12-4).`)
+    if (/\.test\.tsx?$/.test(e.name)) continue
+    for (const p of partFileProblems(e.name, readFileSync(path, 'utf8'))) errors.push(`${rel(path)}: ${p} (R-5.12-4)`)
+  }
+
+  // The parts-folder naming contract: hook.ts holds hooks, lib.ts holds functions (R-5.12-4).
+  for (const f of files) {
+    const exempt = NAMING_EXEMPTIONS[`${slug}/${f}`] ?? []
+    const source = () => readFileSync(join(dir, f), 'utf8')
+    const problems = f === 'hook.ts' ? hookFileProblems(source(), exempt)
+      : f === 'lib.ts' || f === 'lib.tsx' ? libFileProblems(f, source(), exempt)
+        : []
+    for (const p of problems) errors.push(`${rel(join(dir, f))}: ${p} (R-5.12-4)`)
+  }
+
+  // A scrolling overlay names its parts Root, Header, Body and Footer (R-9.2-4).
+  if ((SCROLLING_OVERLAYS as readonly string[]).includes(slug) && files.includes('index.tsx')) {
+    const names = dirs.includes('parts') ? partEntries.filter((e) => e.isFile()).map((e) => e.name) : null
+    for (const p of overlayPartProblems(slug, readFileSync(join(dir, 'index.tsx'), 'utf8'), names)) {
+      errors.push(`${rel(dir)}: ${p} (R-9.2-4)`)
     }
   }
 
@@ -211,6 +234,14 @@ function walk(root: string) {
 
 walk(COMPONENTS)
 walk(CONNECTORS)
+for (const slug of SCROLLING_OVERLAYS) {
+  if (!listDir(join(COMPONENTS, slug)).length) errors.push(`src/components/${slug}: listed as a scrolling overlay but missing (R-9.2-4).`)
+}
+for (const key of Object.keys(NAMING_EXEMPTIONS)) {
+  if (!listDir(join(COMPONENTS, key, '..')).some((e) => e.name === key.split('/')[1])) {
+    errors.push(`src/components/${key}: a naming exemption for a file that no longer exists (R-5.12-4).`)
+  }
+}
 for (const file of sourceFilesUnder(join(ROOT, 'src'))) checkFileSize(file)
 
 for (const w of warnings) console.warn(`warn  ${w}`)
