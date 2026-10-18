@@ -57,6 +57,14 @@ The format is: date, decision, why, and what it affects.
 
 **What it affects.** The status lines of R-9.2-4, R-10.5-1 and R-10.5-3. A future AlertDialog is already a scrolling overlay to `check-structure`. The page test of PLAN 10.5 rule 11 near all four edges stays in each component's own spec; this one opens the anchored popups at the top and the bottom edge. `maxHeightVar` and `maxWidthVar` in `POPUP_BOUNDS` are read by nothing.
 
+## 2026-10-17 - The provider warns when the layout leaves out direction or locale
+
+**Decision.** `useProviderLocale` in `src/shared/provider/use-provider-locale.ts` gives `TopClassProvider` the direction and locale it runs on: the layout's when `direction` is `ltr` or `rtl` and `locale` is a non-empty string, `FALLBACK_CONTEXT`'s (`ltr`, `en`) otherwise. In development it warns once per page per missing prop, from an effect, so a server render never warns and a production build never does. An app that mounts no provider at all still gets no warning: every no-provider fixture and every component test renders that way on purpose.
+
+**Why.** Before, a missing locale reached the context as `undefined` and a missing direction reached Base UI in silence, so a route that lost its param rendered left to right with no sign of why. The logic lives in a hook file of its own because R-5.12-1 keeps effects out of the files that render.
+
+**Affects.** R-13-1, R-5.12-1.
+
 ## 2026-10-17 - One thin themed scrollbar for every scroll area
 
 **Decision.** `SCROLLBAR` in `src/shared/classes.ts` is `scrollbar-width: thin` and `scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track)`. `SCROLL_AREA` and `SCROLL_X` carry it, so every dialog and drawer body, popover, dropdown, command, select and combobox list, date picker, tree view, file upload list, toast viewport, sidebar body, accordion region, tabs list, navbar links, segmented control and code block wears it; the table box and the textarea, which scroll without those two, add it by hand. The thumb is neutral-500 in light and ocean and neutral-400 in dark, on a transparent track, so it stands on the surface beneath it: 4.53 to 4.73:1 in light, 5.83 to 7.63 in dark, and 3.93 / 6.27 on a read-only field. `check:contrast` measures it on every surface and on its track whenever the track is not transparent. The code block sets the two tokens to its own fill and halfway thumb, as before. The collapsed Sidebar still hides its bar. Two widths follow from the thinner bar, measured under a mouse: an expanded Sidebar's bar is 10 px (15 before), and a Textarea that takes the browser's own width, in a `w-fit` parent or beside a label, is 173 px (178 before; unit-4.md says 178), since Chromium reserves the vertical bar in it.
