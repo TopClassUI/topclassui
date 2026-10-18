@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import type { ComponentPropsWithRef, ReactElement, ReactNode } from 'react'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
@@ -63,7 +64,7 @@ describe('the keys a prop type lets cross that it should not', () => {
   })
 })
 
-const COMPONENTS = new URL('../components/', import.meta.url).pathname
+const COMPONENTS = fileURLToPath(new URL('../components/', import.meta.url))
 
 /** What index.tsx renders itself or re-exports from a server part or its skeleton; client.js re-exports are not these. */
 function serverNames(source: string): string[] {
