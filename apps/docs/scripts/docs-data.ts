@@ -6,7 +6,7 @@ import type { ExportsMap } from '../lib/rewrite-imports.js'
 import { changelogFacts, releaseToc } from './lib/changelog.js'
 import { collect } from './lib/collect.js'
 import { lastCommitDate, newestOf } from './lib/dates.js'
-import { demoMapSource } from './lib/demo-map.js'
+import { demoMapSource, playgroundMapSource } from './lib/demo-map.js'
 import { libraryFacts } from './lib/facts.js'
 import { guideFacts as startFacts, guidesFileSchema } from './lib/guide-facts.js'
 import { guideFacts } from './lib/guides.js'
@@ -60,6 +60,7 @@ writeFileSync(join(OUT, 'components.json'), `${JSON.stringify(generated.componen
 writeFileSync(join(OUT, 'toc.json'), `${JSON.stringify(generated.toc, null, 2)}\n`)
 writeFileSync(join(OUT, 'dates.json'), `${JSON.stringify(generated.dates, null, 2)}\n`)
 writeFileSync(join(OUT, 'demos.ts'), demos)
+writeFileSync(join(OUT, 'playgrounds.ts'), playgroundMapSource(file.components.filter((entry) => entry.files.playground).map((entry) => entry.slug)))
 writeFileSync(join(OUT, 'library.json'), `${JSON.stringify(libraryFacts(), null, 2)}\n`)
 writeFileSync(join(OUT, 'guides.json'), `${JSON.stringify({ ...start, ...guideFacts() }, null, 2)}\n`)
 writeFileSync(join(OUT, 'changelog.json'), `${JSON.stringify(changelog, null, 2)}\n`)

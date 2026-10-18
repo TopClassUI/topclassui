@@ -11,12 +11,13 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'full-width', 'long-content', 'many', 'rtl', 'sizes', 'states', 'with-icons']
+const EXPECTED = ['basic', 'form', 'full-width', 'long-content', 'many', 'playground', 'rtl', 'sizes', 'states', 'with-icons']
 
 /** Each track of each demo as the server writes it: its name, then each segment's text, a star on the selected one and a
  * caret on the one tab stop. */
 const TRACKS: Record<string, string[]> = {
   'basic': ['View: Board *^ | Table | Calendar'],
+  'playground': ['View: Board *^ | Table | Calendar'],
   'form': ['Default view: Board | Table *^ | Calendar'],
   'full-width': ['Range: Day | Week *^ | Month'],
   'long-content': ['Files: Recently opened by anyone in this workspace *^ | Starred | Shared with me'],
@@ -51,7 +52,7 @@ function tracksIn(html: string): string[] {
 }
 
 describe('every demo renders on the server', () => {
-  it('holds exactly the nine demos asked for, so none can be deleted silently', () => {
+  it('holds exactly the ten demos asked for, so none can be deleted silently', () => {
     expect(files).toEqual(EXPECTED)
   })
 

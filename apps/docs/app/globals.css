@@ -52,3 +52,10 @@
     contain-intrinsic-size: auto 48rem;
   }
 }
+
+@layer components {
+  /* CodeBlock is dark on a light page and light on a dark one, so each token takes the colour of the opposite theme (S3). */
+  [data-code-token] {
+    color: light-dark(var(--tc-code-on-light), var(--tc-code-on-dark));
+  }
+}

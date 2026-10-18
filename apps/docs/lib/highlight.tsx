@@ -4,6 +4,8 @@ import { createHighlighter, type Highlighter } from 'shiki'
 
 import { LANGS, ON_DARK, ON_LIGHT } from './shiki-themes'
 
+export type CodeLang = (typeof LANGS)[number]
+
 let highlighter: Promise<Highlighter> | null = null
 
 function getHighlighter(): Promise<Highlighter> {

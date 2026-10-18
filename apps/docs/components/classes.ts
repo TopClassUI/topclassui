@@ -1,5 +1,5 @@
 // The site's own class strings, built from the library's shared constants (docs-site rule 1, choice 20).
-import { FOCUS_RING, HOVER, TOUCH_TARGET, TRANSITION } from 'topclassui/classes'
+import { BORDER, FOCUS_RING, HOVER, TOUCH_TARGET, TRANSITION } from 'topclassui/classes'
 
 /** A text link inside prose or a list: the library's ring and target, underlined on hover. */
 export const TEXT_LINK = `inline-flex items-center text-primary-on-soft underline-offset-4 ${HOVER.link} ${FOCUS_RING} ${TOUCH_TARGET} rounded-chip`
@@ -19,3 +19,30 @@ export const LEAD = 'text-base text-muted'
 
 /** Inline code in prose and table cells: Latin, left to right, inside an Arabic sentence too. */
 export const INLINE_CODE = 'rounded-chip bg-neutral-soft px-1 font-mono text-sm text-body'
+
+export const LINK = `inline-flex items-center rounded-control text-primary-on-soft underline-offset-4 ${HOVER.link} ${FOCUS_RING} ${TOUCH_TARGET}`
+/** Visible on focus, as S11 asks, and on hover of its heading. */
+export const ANCHOR = `inline-flex items-center justify-center rounded-control text-muted opacity-0 group-hover/heading:opacity-100 focus-visible:opacity-100 ${FOCUS_RING} ${TOUCH_TARGET}`
+export const CARD = `grid min-w-0 overflow-hidden rounded-box bg-surface ${BORDER}`
+export const CARD_PART = 'grid min-w-0 gap-3 border-t-(length:--tc-line-width) border-line p-4.5'
+export const CARD_HEAD = 'grid min-w-0 gap-3 p-4.5'
+export const SECTION = 'grid min-w-0 scroll-mt-(--tc-sticky-top,0px) gap-3'
+export const H1 = 'text-4xl font-semibold text-body'
+export const H2 = 'group/heading flex items-center gap-2 text-xl font-semibold text-body'
+export const CARD_TITLE = 'text-lg font-semibold text-body'
+export const H3 = 'text-xs font-semibold text-muted uppercase'
+export const PROSE = 'text-base text-body'
+export const SMALL = 'text-sm text-muted'
+export const LIST = 'grid list-disc gap-1 ps-5 text-base text-body'
+/** The stage holds the component on the page background, and a wide one scrolls inside it. */
+export const STAGE = 'grid min-w-0 place-items-center overflow-x-auto bg-page p-5 text-body'
+/** Try it beside the stage at 48rem and up, under it below. */
+export const PLAY_ROW = 'grid min-w-0 md:grid-cols-[minmax(0,1fr)_15.5rem]'
+export const TRY_IT = 'grid content-start gap-3.5 border-t-(length:--tc-line-width) border-line bg-page p-4.5 text-body md:border-t-0 md:border-s-(length:--tc-line-width)'
+export const CONTROL = 'grid gap-1.5'
+export const CONTROL_LABEL = 'font-mono text-xs text-muted'
+export const STATE_SCOPE = 'min-w-0 overflow-x-auto rounded-box bg-page p-4 text-body'
+/** Two demos per row at 64rem and up, one below (page 14). */
+export const DEMO_GRID = 'grid min-w-0 gap-4 lg:grid-cols-2'
+export const KNOBS = 'flex flex-wrap items-center gap-4'
+export const KNOB = 'flex items-center gap-2 text-sm text-muted'

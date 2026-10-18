@@ -110,10 +110,12 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/element-label.tsx`
 - `dummy/link.tsx`
 - `dummy/long-label.tsx`
+- `dummy/playground.tsx`
 - `dummy/removable.tsx`
 - `dummy/removable-sizes.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`
+- `dummy/states.tsx`
 - `dummy/tones.tsx`
 - `dummy/topics.tsx`
 - `dummy/with-icon.tsx`
