@@ -40,15 +40,7 @@ export const PAGES = [
     },
   },
   {
-    slug: 'page-blocks', path: '/docs/page-blocks', kind: 'guide', group: 'start', icon: 'file-text', status: 'live',
-    title: { en: 'Page blocks', ar: 'كتل الصفحة' },
-    description: {
-      en: 'Every block a guide page is built from, shown once each: code, package managers, tables, callouts, wrong and right, and cards.',
-      ar: 'كل كتلة تُبنى منها صفحات الدليل، مرة واحدة لكل منها: الشيفرة، ومديرو الحزم، والجداول، والتنبيهات، والخطأ والصواب، والبطاقات.',
-    },
-  },
-  {
-    slug: 'installation', path: '/docs/installation', kind: 'guide', group: 'start', icon: 'download-simple', status: 'later',
+    slug: 'installation', path: '/docs/installation', kind: 'guide', group: 'start', icon: 'download-simple', status: 'live',
     title: { en: 'Install the package', ar: 'تثبيت الحزمة' },
     description: {
       en: 'Two steps. Install the package, then add the components you need.',
@@ -64,7 +56,7 @@ export const PAGES = [
     },
   },
   {
-    slug: 'css', path: '/docs/css', kind: 'guide', group: 'start', icon: 'code', status: 'later',
+    slug: 'css', path: '/docs/css', kind: 'guide', group: 'start', icon: 'code', status: 'live',
     title: { en: 'CSS entry', ar: 'مدخل CSS' },
     description: {
       en: 'Three import lines, in order, and no configuration file. That is the whole Tailwind setup.',
@@ -72,7 +64,7 @@ export const PAGES = [
     },
   },
   {
-    slug: 'provider', path: '/docs/provider', kind: 'guide', group: 'start', icon: 'gear', status: 'later',
+    slug: 'provider', path: '/docs/provider', kind: 'guide', group: 'start', icon: 'gear', status: 'live',
     title: { en: 'Provider', ar: 'المزوّد' },
     description: {
       en: 'One provider at the root of your app, with direction and locale as props. It is required, and everything it does is listed on this page.',
@@ -80,7 +72,7 @@ export const PAGES = [
     },
   },
   {
-    slug: 'first-component', path: '/docs/first-component', kind: 'guide', group: 'start', icon: 'play', status: 'later',
+    slug: 'first-component', path: '/docs/first-component', kind: 'guide', group: 'start', icon: 'play', status: 'live',
     title: { en: 'Your first component', ar: 'مكوّنك الأول' },
     description: {
       en: 'A form that renders on the server and posts to a Server Action. No JavaScript for its markup.',

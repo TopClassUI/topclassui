@@ -4,7 +4,8 @@ import { expect, test, type Page } from '@playwright/test'
 import { TARGETS } from '../../../packages/topclassui/scripts/lib/targets.js'
 
 const MODES = ['light', 'dark', 'ocean'] as const
-const PAGES = ['/en', '/ar', '/en/docs/page-blocks', '/ar/docs/page-blocks'] as const
+const GUIDES = ['installation', 'css', 'provider', 'first-component'] as const
+const PAGES = ['/en', '/ar', ...GUIDES.flatMap((slug) => [`/en/docs/${slug}`, `/ar/docs/${slug}`])] as const
 
 async function openIn(page: Page, path: string, mode: (typeof MODES)[number]) {
   await page.addInitScript((value) => { localStorage.setItem('tc-theme', value) }, mode)
@@ -102,10 +103,57 @@ for (const path of PAGES) {
   })
 }
 
+// Written out: the following live page's title in each language, none after the last.
+const NEXT = {
+  installation: { en: 'CSS entry', ar: 'مدخل CSS', href: 'css' },
+  css: { en: 'Provider', ar: 'المزوّد', href: 'provider' },
+  provider: { en: 'Your first component', ar: 'مكوّنك الأول', href: 'first-component' },
+  'first-component': null,
+} as const
+
+// Written out: how many `##` sections each page has, so a heading lost from the MDX fails here.
+const SECTIONS = { installation: 5, css: 7, provider: 6, 'first-component': 6 } as const
+
+for (const slug of GUIDES) {
+  for (const locale of ['en', 'ar'] as const) {
+    const path = `/${locale}/docs/${slug}`
+
+    test(`${path}: the Next card goes to the following page, or is absent after the last`, async ({ page }) => {
+      await page.goto(path)
+      const next = NEXT[slug]
+      const card = page.locator('main article > a[href]').last()
+      if (next === null) {
+        await expect(page.locator(`main a[href^="/${locale}/docs/"]`).filter({ hasText: locale === 'en' ? 'Next' : 'التالي' })).toHaveCount(0)
+        return
+      }
+      await expect(card).toHaveAttribute('href', `/${locale}/docs/${next.href}`)
+      await expect(card).toContainText(next[locale])
+      await card.click()
+      await expect(page).toHaveURL(new RegExp(`/${locale}/docs/${next.href}$`))
+    })
+
+    test(`${path}: On this page lists every section, and each entry lands on its heading`, async ({ page }) => {
+      await page.goto(path)
+      const toc = page.getByRole('navigation', { name: locale === 'en' ? 'On this page' : 'في هذه الصفحة' })
+      const links = toc.getByRole('link')
+      await expect(links).toHaveCount(SECTIONS[slug])
+      await expect(page.locator('main h2')).toHaveCount(SECTIONS[slug])
+      for (const link of await links.all()) {
+        const href = (await link.getAttribute('href')) ?? ''
+        const heading = page.locator(`main h2[id="${decodeURIComponent(href.slice(1))}"]`)
+        await expect(heading, href).toHaveCount(1)
+        await expect(heading).toContainText((await link.textContent()) ?? '')
+      }
+      await links.last().click()
+      await expect(page.locator(`main h2[id="${decodeURIComponent(((await links.last().getAttribute('href')) ?? '').slice(1))}"]`)).toBeInViewport()
+    })
+  }
+}
+
 test('the language switch keeps the page', async ({ page }) => {
-  await page.goto('/en/docs/page-blocks')
+  await page.goto('/en/docs/provider')
   await page.getByRole('link', { name: 'العربية' }).click()
-  await expect(page).toHaveURL(/\/ar\/docs\/page-blocks$/)
+  await expect(page).toHaveURL(/\/ar\/docs\/provider$/)
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl')
   await expect(page.getByRole('link', { name: 'العربية' })).toHaveAttribute('aria-current', 'page')
 })
@@ -123,18 +171,18 @@ test('the mode switch persists across a reload, set before first paint', async (
 })
 
 test('an anchor clears the sticky navbar', async ({ page }) => {
-  await page.goto('/en/docs/page-blocks#cards')
+  await page.goto('/en/docs/provider#in-a-single-page-app')
   await page.waitForFunction(() => getComputedStyle(document.documentElement).getPropertyValue('--tc-sticky-top') !== '0px')
-  await page.evaluate(() => { document.getElementById('cards')?.scrollIntoView() })
+  await page.evaluate(() => { document.getElementById('in-a-single-page-app')?.scrollIntoView() })
   const bar = await page.locator('header').first().boundingBox()
-  const heading = await page.locator('#cards').boundingBox()
+  const heading = await page.locator('#in-a-single-page-app').boundingBox()
   expect(heading?.y ?? 0).toBeGreaterThanOrEqual((bar?.y ?? 0) + (bar?.height ?? 0) - 1)
 })
 
 test('the last link before the footer is fully visible when focused', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.setViewportSize({ width: 1280, height: 600 })
-  await page.goto('/en/docs/page-blocks')
+  await page.goto('/en/docs/first-component')
   const links = page.locator('main a[href]')
   const last = links.last()
   await last.focus()
@@ -150,14 +198,16 @@ test('under 64rem the menu opens the sidebar groups in a drawer, and a link clos
   await page.getByRole('button', { name: 'Menu' }).click()
   const drawer = page.getByRole('dialog', { name: 'Documentation' })
   await expect(drawer).toBeVisible()
-  await drawer.getByRole('link', { name: 'Page blocks' }).click()
-  await expect(page).toHaveURL(/\/en\/docs\/page-blocks$/)
+  await drawer.getByRole('link', { name: 'Install the package' }).click()
+  await expect(page).toHaveURL(/\/en\/docs\/installation$/)
   await expect(drawer).toBeHidden()
 })
 
 test('the sidebar marks the page being read', async ({ page }) => {
-  await page.goto('/en/docs/page-blocks')
-  await expect(page.getByRole('navigation', { name: 'Site' }).getByRole('link', { name: 'Page blocks' })).toHaveAttribute('aria-current', 'page')
+  for (const [slug, title] of [['installation', 'Install the package'], ['css', 'CSS entry'], ['provider', 'Provider'], ['first-component', 'Your first component']] as const) {
+    await page.goto(`/en/docs/${slug}`)
+    await expect(page.getByRole('navigation', { name: 'Site' }).getByRole('link', { name: title, exact: true })).toHaveAttribute('aria-current', 'page')
+  }
 })
 
 for (const path of ['/fr/x', '/random', '/en/docs/nope']) {
@@ -169,7 +219,7 @@ for (const path of ['/fr/x', '/random', '/en/docs/nope']) {
   })
 }
 
-for (const [from, to] of [['/', '/en'], ['/en/docs', '/en/docs/page-blocks'], ['/ar/docs', '/ar/docs/page-blocks']] as const) {
+for (const [from, to] of [['/', '/en'], ['/en/docs', '/en/docs/installation'], ['/ar/docs', '/ar/docs/installation']] as const) {
   test(`${from} redirects to ${to}`, async ({ request }) => {
     const response = await request.get(from, { maxRedirects: 0 })
     expect(response.status()).toBe(308)
