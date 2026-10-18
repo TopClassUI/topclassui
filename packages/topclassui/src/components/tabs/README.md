@@ -12,7 +12,7 @@ For two or more views of one thing, shown one at a time: a project's overview, i
 and its settings. Every panel is in the HTML the server sends, the hidden ones too.
 
 ```ts
-import { TabsList, TabsPanel, TabsRoot, TabsTab } from 'topclassui'
+import { TabsList, TabsPanel, TabsRoot, TabsTab } from 'topclassui/tabs'
 ```
 
 ```tsx
@@ -82,7 +82,7 @@ import {
   TabsList,
   TabsPanel,
   TabsTab,
-} from 'topclassui'
+} from 'topclassui/tabs'
 ```
 
 ## Props
