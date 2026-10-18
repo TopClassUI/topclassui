@@ -9,9 +9,9 @@ export type IslandWhen = 'near' | 'idle'
 
 const EAGER = ['pointerover', 'focusin', 'touchstart'] as const
 
-type Input = { kind: 'press' | 'wake'; target: Element } | { kind: 'key'; target: Element; init: KeyboardEventInit }
+type Input = { kind: 'press'; target: Element } | { kind: 'key'; target: Element; init: KeyboardEventInit }
 
-/** What each mounted island does with an input that lands on it before it has taken over. */
+/** What each mounted island does with an input that lands in it before it has taken over. */
 const claims = new Map<Element, (input: Input) => void>()
 /** Inputs on an island that has not mounted yet, as under a provider still waiting for its idle moment. */
 const early: Input[] = []
@@ -22,16 +22,13 @@ function waitingBoxOf(target: Element): Element | null {
   return target.closest('[data-island]:not([data-island-live])')
 }
 
-/** Hands the input to its island, or queues it and wakes the nearest mounted island around it. */
+/** Hands the input to the innermost mounted island waiting around it, or queues it until one mounts. */
 function route(input: Input): void {
-  const box = waitingBoxOf(input.target)
-  const claim = box === null ? undefined : claims.get(box)
-  if (claim !== undefined) { claim(input); return }
-  early.push(input)
-  for (let at = box?.parentElement?.closest('[data-island]:not([data-island-live])') ?? null; at !== null; at = at.parentElement?.closest('[data-island]:not([data-island-live])') ?? null) {
-    const outer = claims.get(at)
-    if (outer !== undefined) { outer({ kind: 'wake', target: at }); return }
+  for (let at = waitingBoxOf(input.target); at !== null; at = at.parentElement === null ? null : waitingBoxOf(at.parentElement)) {
+    const claim = claims.get(at)
+    if (claim !== undefined) { claim(input); return }
   }
+  early.push(input)
 }
 
 // Installed when this module loads, before React hydrates: a press, key or hover on HTML that no island has taken over yet is held, never lost.
@@ -129,15 +126,19 @@ export function LazyIsland<P extends object>({ load, props, when = 'near', hydra
     if (state.live) element.setAttribute('data-island-live', '')
     const open = () => { state.open() }
     for (const type of EAGER) element.addEventListener(type, open, { once: true, passive: true })
-    // An input meant for this island (the innermost one waiting around it) is kept by place; one for an island inside it only wakes this one.
+    // A swapped island replaces the HTML of every island inside it, so it keeps all their inputs; the provider hydrates, so an inner island mounts and takes its own from the queue.
     const claim = (input: Input) => {
-      if (input.kind !== 'wake' && waitingBoxOf(input.target) === element) {
+      if (!hydrate || waitingBoxOf(input.target) === element) {
         held.current.inputs.push({ kind: input.kind, path: pathOf(element, input.target), ...(input.kind === 'key' ? { init: input.init } : {}) })
-      }
+      } else early.push(input)
       open()
     }
     claims.set(element, claim)
-    for (const input of early.splice(0).filter((queued) => { if (element.contains(queued.target)) { claim(queued); return waitingBoxOf(queued.target) !== element } return true })) early.push(input)
+    const queued = early.splice(0)
+    for (const input of queued) {
+      if (element.contains(input.target)) claim(input)
+      else early.push(input)
+    }
     state.onLive = () => {
       element.setAttribute('data-island-live', '')
       claims.delete(element)
@@ -157,7 +158,6 @@ export function LazyIsland<P extends object>({ load, props, when = 'near', hydra
         }
       }
       held.current = { inputs: [], focused: null }
-      // Inputs for islands inside this one wait for them to mount: they find them in the queue.
     }
     if (state.waits && !hydrate) {
       void state.gate.then(load).then((Component) => {
