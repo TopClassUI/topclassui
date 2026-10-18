@@ -1,7 +1,8 @@
-// R-8.1-1, R-5.1-2, R-5.12-2, R-5.12-4, R-9.2-4: the folder contract, file size and naming.
+// R-8.1-1, R-5.1-2, R-5.12-2, R-5.12-4, R-9.2-4, R-8.5-1: the folder contract, file size, naming and the collection contract.
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, posix, relative, sep } from 'node:path'
 
+import { collectionErrors } from './lib/collections.js'
 import { FAIL_LINES, WARN_LINES, countLines, sizeVerdict, sourceFilesUnder } from './lib/file-sizes.js'
 import { INDEX_MARKUP_EXEMPT, indexMarkupViolations, isClientRendering } from './lib/index-markup.js'
 import { inlinePropInterfaces, screamingConstants } from './lib/source-checks.js'
@@ -138,6 +139,12 @@ function checkComponentFolder(dir: string, slug: string) {
         + ' A C component or a connector re-exports its client parts, types, variants and skeleton (R-5.1-2).',
       )
     }
+  }
+
+  // R-8.5-1: a component that renders items windows them through useCollection in its hook, or is exempt by decision.
+  const source = (f: string) => (files.includes(f) ? readFileSync(join(dir, f), 'utf8') : null)
+  for (const error of collectionErrors({ slug, types: source('types.ts'), hook: source('hook.ts') })) {
+    errors.push(`${rel(dir)}: ${error} (R-8.5-1).`)
   }
 
   // parts/: one component per file, named after the file.
