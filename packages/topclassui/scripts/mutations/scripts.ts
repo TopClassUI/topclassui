@@ -327,8 +327,6 @@ export const MUTATIONS: Mutation[] = [
     to: '{ continue }',
   },
   {
-  },
-  {
     label: 'the tarball check accepts a relative specifier without .js, which a node16 consumer cannot resolve',
     file: 'scripts/lib/pack-checks.ts',
     from: "&& !specifier.endsWith('.js')) {",
