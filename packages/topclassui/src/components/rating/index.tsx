@@ -5,7 +5,8 @@ import { createNumberFormat } from '#shared/labels/get-labels.js'
 import { RATING_ROOT } from './classes.js'
 import { RatingField } from './client.js'
 import { RATING_DEFAULTS } from './constants.js'
-import { Star, fillOf, stepsOf, toField, toMax, toShown } from './lib.js'
+import { fillOf, stepsOf, toField, toMax, toShown } from './lib.js'
+import { RatingStar } from './parts/rating-star.js'
 import type { RatingEditableProps, RatingProps, RatingReadOnlyProps } from './types.js'
 
 /** Stars that show a value, named "4 out of 5" unless the caller names them. */
@@ -23,7 +24,7 @@ function ReadOnly({
       data-size={size}
       className={cn(RATING_ROOT, className)}
     >
-      {stepsOf(max).map((step) => <Star key={step} fill={fillOf(step, shown)} size={size} />)}
+      {stepsOf(max).map((step) => <RatingStar key={step} fill={fillOf(step, shown)} size={size} />)}
     </span>
   )
 }

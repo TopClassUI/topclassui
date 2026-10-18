@@ -48,15 +48,17 @@ describe('client.tsx is markup and one hook call (R-5.12-1)', () => {
 })
 
 describe('hook.ts and lib.ts', () => {
-  it("hook.ts starts with 'use client' and keeps the store in lib.ts", () => {
+  it("hook.ts starts with 'use client' and holds the store, taking only the key from lib.ts", () => {
     const source = read('hook.ts')
     expect(source.startsWith("'use client'\n")).toBe(true)
     expect(importedNames(source, 'react')).toEqual(['useSyncExternalStore'])
-    expect(importedNames(source, './lib.js').sort()).toEqual(['readDismissed', 'subscribeDismissed', 'writeDismissed'])
+    expect(importedNames(source, './lib.js')).toEqual(['keyOf'])
   })
 
-  it('lib.ts imports no React, so the store and the message test are plain code', () => {
-    expect(importedModules(read('lib.ts'))).toEqual(['./constants.js'])
+  it('lib.ts is pure: no React, no storage, no listener, no state', () => {
+    const source = read('lib.ts')
+    expect(importedModules(source)).toEqual(['./constants.js'])
+    expect(source).not.toMatch(/localStorage\.|addEventListener\(|new Set|new Map/)
   })
 })
 

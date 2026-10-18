@@ -6,6 +6,7 @@ import { Fragment } from 'react'
 import { clamp } from '#shared/clamp.js'
 import { cn } from '#shared/cn.js'
 import { FLOATING, toSideAlign } from '#shared/floating.js'
+import { toLinkElement } from '#shared/link.js'
 import { guardEscape } from '#shared/overlay.js'
 import { renderTrigger } from '#shared/render-trigger.js'
 import { DROPDOWN_BOUNDARIES } from './boundaries.js'
@@ -14,8 +15,9 @@ import {
 } from './classes.js'
 import { DROPDOWN_DEFAULTS } from './constants.js'
 import { DropdownScopeContext, useDropdownMenu, useDropdownPopup, useDropdownPositioner, useDropdownRoot } from './hook.js'
-import { renderRow, toLinkElement, toRowProps } from './lib.js'
+import { toRowProps } from './lib.js'
 import { DropdownGroupLabel } from './parts/dropdown-group-label.js'
+import { DropdownRow } from './parts/dropdown-row.js'
 import type {
   DropdownGroupProps, DropdownItemProps, DropdownLinkItemProps, DropdownMenuProps, DropdownPopupProps,
   DropdownRootProps, DropdownSeparatorProps, DropdownTriggerProps,
@@ -100,7 +102,7 @@ function DropdownSurface({ ref, className, ...rest }: DropdownPopupProps) {
 export function DropdownItem({ icon, shortcut, tone = DROPDOWN_DEFAULTS.tone, className, children, ...rest }: DropdownItemProps) {
   return (
     <Base.Item {...rest} data-tone={tone} className={cn(DROPDOWN_ITEM, DROPDOWN_ITEM_TONE[tone], className)}>
-      {renderRow(icon, children, shortcut)}
+      <DropdownRow icon={icon} label={children} shortcut={shortcut} />
     </Base.Item>
   )
 }
@@ -110,7 +112,7 @@ export function DropdownItem({ icon, shortcut, tone = DROPDOWN_DEFAULTS.tone, cl
 export function DropdownLinkItem({ icon, shortcut, tone = DROPDOWN_DEFAULTS.tone, className, children, ...rest }: DropdownLinkItemProps) {
   return (
     <Base.LinkItem closeOnClick {...rest} data-tone={tone} className={cn(DROPDOWN_ITEM, DROPDOWN_ITEM_TONE[tone], className)}>
-      {renderRow(icon, children, shortcut)}
+      <DropdownRow icon={icon} label={children} shortcut={shortcut} />
     </Base.LinkItem>
   )
 }
@@ -140,7 +142,7 @@ export function DropdownMenu({ trigger, title, items, link, open, defaultOpen, o
             <Fragment key={item.id}>
               {item.separatorBefore === true ? <DropdownSeparator /> : null}
               {item.href !== undefined && item.disabled !== true ? (
-                <DropdownLinkItem {...toRowProps(item)} render={toLinkElement(link, item.href)}>{item.label}</DropdownLinkItem>
+                <DropdownLinkItem {...toRowProps(item)} render={toLinkElement('DropdownMenu', link, item.href)}>{item.label}</DropdownLinkItem>
               ) : (
                 <DropdownItem {...toRowProps(item)} disabled={item.disabled} onClick={() => { menu.run(item) }}>{item.label}</DropdownItem>
               )}

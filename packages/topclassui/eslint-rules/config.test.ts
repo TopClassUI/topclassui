@@ -86,7 +86,7 @@ describe('R-5.3-4: the placement exemption stops at tests', () => {
 
   it('lets the Banner store, and only it, use localStorage', () => {
     const allowing = blocks.filter((b) => Array.isArray(b.rules?.['topclass/no-fetch-in-components']))
-    expect(allowing.map((b) => b.files)).toEqual([['src/components/banner/lib.ts']])
+    expect(allowing.map((b) => b.files)).toEqual([['src/components/banner/hook.ts']])
     expect(allowing[0]?.rules?.['topclass/no-fetch-in-components']).toEqual(['error', { allow: ['localStorage'] }])
   })
 })

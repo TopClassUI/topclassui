@@ -84,7 +84,7 @@ export default defineConfig(
   // R-8.5-2: a dismissed Banner is remembered across pages, which is UI state rather
   // than data; that file may read and write localStorage and nothing else (DECISIONS).
   {
-    files: ['src/components/banner/lib.ts'],
+    files: ['src/components/banner/hook.ts'],
     rules: { 'topclass/no-fetch-in-components': ['error', { allow: ['localStorage'] }] },
   },
 

@@ -1,14 +1,8 @@
-// Both halves draw their stars here: no 'use client', so the read-only half stays on the server.
-import { Svg } from '#components/svg/index.js'
-import { star } from '#icons/data/star.js'
-import { starFill } from '#icons/data/star-fill.js'
 import { clamp } from '#shared/clamp.js'
-import { cn } from '#shared/cn.js'
 import type { Size } from '#shared/contracts/size.js'
 import { en } from '#shared/labels/en.js'
 import { createNumberFormat } from '#shared/labels/get-labels.js'
 import { RATING_BOUNDARIES } from './boundaries.js'
-import { RATING_FILL, RATING_FILL_ICON, RATING_FILL_WIDTH, RATING_STAR } from './classes.js'
 import { RATING_DEFAULTS } from './constants.js'
 import type { RatingEditableProps, RatingFieldProps, RatingFill, RatingInputProps } from './types.js'
 
@@ -40,20 +34,6 @@ export function fillOf(step: number, value: number): RatingFill {
 
 /** custom follows the font size, as an icon with no size does. */
 export const iconSizeOf = (size: Size) => (size === 'custom' ? '1em' : size)
-
-/** One star: the outline, and over it the filled icon in a clip as wide as the fill. */
-export function Star({ fill, size }: { fill: RatingFill; size: Size }) {
-  return (
-    <span className={RATING_STAR}>
-      <Svg icon={star} size={iconSizeOf(size)} />
-      {fill === 'none' ? null : (
-        <span aria-hidden className={cn(RATING_FILL, RATING_FILL_WIDTH[fill])}>
-          <Svg icon={starFill} size={iconSizeOf(size)} className={RATING_FILL_ICON} />
-        </span>
-      )}
-    </span>
-  )
-}
 
 /** The radio group's props from either editing export: the defaults, clamped numbers, each step named. */
 export function toField({

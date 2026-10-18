@@ -70,6 +70,12 @@ export interface RatingFieldProps extends Omit<ComponentPropsWithRef<'span'>, Ow
   onValueChange?: ((value: number) => void) | undefined
 }
 
+/** One star of either half: how much of it is filled, at the row's size. */
+export interface RatingStarProps {
+  fill: RatingFill
+  size: Size
+}
+
 /** What the editing hook reads from those props. */
 export type RatingFieldOptions = Pick<RatingFieldProps, 'value' | 'defaultValue' | 'onValueChange' | 'name' | 'disabled' | 'onPointerLeave'>
 

@@ -46,7 +46,7 @@ They arrive with the phases that need them.
 
 ## 1. Server and client
 
-- **R-5.1-1** `index.tsx` never contains `'use client'`, never imports a React client hook (only `useId` and `use` are allowed) and never imports `./hook.js`. _(check-boundaries)_
+- **R-5.1-1** `index.tsx` never contains `'use client'`, never imports a React client hook (only `useId` and `use` are allowed) and never imports `./hook.js`. _(check-boundaries, which holds every parts/*.tsx without 'use client' to the same hook rules, since index.tsx may render it)_
 - **R-5.1-2** For a C component or a connector, `index.tsx` holds no markup: it re-exports the client parts, the prop types, the variants and the skeleton. _(check-structure, for every folder whose meta says rendering: 'client' and every folder under src/connectors/: each statement of index.tsx is an import type or a re-export from its own folder, values only from client, variants, skeleton, lib or a 'use client' file; src/shared/meta.test ties rendering to PLAN 18)_
 - **R-5.1-3** Only serializable props cross the boundary: strings, numbers, booleans, plain objects, arrays and `ReactNode` children; functions never, except Server Actions. _(src/test/serializable, through test/<slug>.serializable.test in every component that renders in index.tsx)_
 - **R-5.1-4** No React context in Server Components: direction and theme come from `dir` and `data-theme` on the HTML, and labels come from props. _(check-boundaries)_
@@ -110,7 +110,7 @@ They arrive with the phases that need them.
 
 ## 8. Code structure
 
-- **R-5.12-1** `client.tsx` is JSX plus at most one call to `useXxx()` from `hook.ts`; it holds no `useState`, `useEffect`, `useReducer`, `useRef`, `useMemo` or `useCallback`. Pure helpers live in `lib.ts`. _(eslint + check-structure)_
+- **R-5.12-1** `client.tsx` and every `'use client'` part are JSX plus at most one call to `useXxx()` from `hook.ts` per component; they hold no `useState`, `useEffect`, `useReducer`, `useRef`, `useMemo` or `useCallback`. Pure helpers live in `lib.ts`. _(eslint + check-structure + check-boundaries)_
 - **R-5.12-2** `check-structure` warns at 200 lines and fails at 300; a component that needs more files gets a `parts/` folder with one component per file. _(check-structure)_
 - **R-5.12-3** One line maximum, only for what the code cannot say (a browser quirk, a spec reference, a non-local constraint). No paragraph comments, no commented-out code, no narration of the next line. A `/** ... */` block documenting an export may run to three lines of prose and no more; past that it is an article and belongs in `docs/DECISIONS.md`. `scripts/`, `eslint-rules/` and config files are outside the check. _(eslint under src/; the JSDoc exemption and everything outside src/ are manual)_
 - **R-5.12-4** Kebab-case files and folders, PascalCase components, `useThing` hooks, verb-first pure functions, `SCREAMING_CASE` constants in `constants.ts` or `classes.ts` inside a component folder; a shared contract under `shared/` may declare its own. A file in `parts/` exports one component named after the file. _(check-structure for the kebab-case names, for a SCREAMING_CASE table declared outside constants or classes, and for the parts-folder naming contract in lib/part-names, where a parts/ file exports one component named after it, hook only use* hooks and the contexts they read, lib only functions; verb-first and PascalCase names elsewhere are manual)_

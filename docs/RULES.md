@@ -51,7 +51,7 @@ They arrive with the phases that need them.
 ### R-5.1-1 index.tsx is server or shared
 **Rule:** `index.tsx` never contains `'use client'`, never imports a React client hook (only `useId` and `use` are allowed) and never imports `./hook.js`.
 **Why:** it is what keeps atoms at 0 KB of client JavaScript.
-**Enforced by:** `scripts/check-boundaries.ts`
+**Enforced by:** `scripts/check-boundaries.ts`, which holds every `parts/*.tsx` without `'use client'` to the same hook rules, since `index.tsx` may render it
 
 ### R-5.1-2 Client components re-export through index
 **Rule:** for a C component or a connector, `index.tsx` holds no markup: it re-exports the client parts, the prop types, the variants and the skeleton.
@@ -278,9 +278,9 @@ They arrive with the phases that need them.
 ## 8. Code structure
 
 ### R-5.12-1 Logic is separate from markup
-**Rule:** `client.tsx` is JSX plus at most one call to `useXxx()` from `hook.ts`; it holds no `useState`, `useEffect`, `useReducer`, `useRef`, `useMemo` or `useCallback`. Pure helpers live in `lib.ts`.
+**Rule:** `client.tsx` and every `'use client'` part are JSX plus at most one call to `useXxx()` from `hook.ts` per component; they hold no `useState`, `useEffect`, `useReducer`, `useRef`, `useMemo` or `useCallback`. Pure helpers live in `lib.ts`.
 **Why:** markup and behaviour change for different reasons and are tested differently.
-**Enforced by:** `eslint` (`client-shape`, per component and in every `'use client'` part) + `check-structure` (only a client file imports `hook.ts`)
+**Enforced by:** `eslint` (`client-shape`, per component and in every `'use client'` part) + `check-structure` (only `client.tsx` or a `'use client'` part imports `hook.ts`; there is no `lib.tsx`) + `check-boundaries` (`lib.ts` imports no React)
 
 ### R-5.12-2 Files stay small
 **Rule:** `check-structure` warns at 200 lines and fails at 300; a component that needs more files gets a `parts/` folder with one component per file.

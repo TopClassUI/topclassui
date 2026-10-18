@@ -1063,8 +1063,8 @@ Each component is a folder. A file exists only when the component needs it. `pnp
 | File | Role | Rule |
 |----------------|--------------------------------------|----------------------------------------|
 | `index.tsx` | The public entry. For S and Sp components, the server or shared markup; for C components and connectors, re-exports only | No `'use client'`, no hooks except `useId` and `use`, no import of `./hook.js`. Required |
-| `client.tsx` | Only the interactive parts | First line is `'use client'`. Markup plus at most one call to `useXxx()` from `hook.ts` |
-| `hook.ts` | The component's state, effects and handlers | Returns a plain object, contains no JSX, imported only by `client.tsx` |
+| `client.tsx` | Only the interactive parts | First line is `'use client'`. Markup plus at most one call to `useXxx()` from `hook.ts` per component; a `'use client'` part follows the same rule |
+| `hook.ts` | The component's state, effects and handlers | Returns a plain object, contains no JSX, imported only by `client.tsx` and its `'use client'` parts |
 | `lib.ts` | Pure helpers, unit-tested | No React imports; called by `hook.ts` and `index.tsx` |
 | `variants.ts` | cva class definitions | Exported, so other elements can reuse the look (a link styled as a button) |
 | `schema.ts` | Zod schema of the design props, with min/max | Imports `constants.ts`; components import it with `import type` only |

@@ -83,6 +83,7 @@ const NO_ROW = new Set(['icon-registry'])
 const DEPARTURES: Record<string, string> = {
   stepper: 'server',
   'avatar-group': 'server',
+  table: 'split',
 }
 
 const kebab = (name: string) => name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()

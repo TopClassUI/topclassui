@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import {
   acceptsRenderProp, handlesRenderFunction, hasLateUseClient, hasUseClient, implementsRenderProp, importedModules,
-  importedNames, importsRenderElement, inlinePropInterfaces, relativeImportsMissingExtension, runtimeUseRender, screamingConstants,
-  strayHookImport,
+  importedNames, importsOwnHook, importsRenderElement, inlinePropInterfaces, isServerPart, relativeImportsMissingExtension,
+  runtimeUseRender, screamingConstants, serverUnsafeHooks, strayHookImport,
 } from './source-checks.js'
 
 /** The same source with Windows line endings, so a CRLF checkout cannot change a result. */
@@ -340,5 +340,48 @@ describe('strayHookImport (R-5.12-1)', () => {
 
   it('ignores a file that does not import it', () => {
     expect(strayHookImport('index.tsx', "import { cn } from '#shared/cn.js'\n")).toBe(false)
+  })
+})
+
+describe('serverUnsafeHooks (R-5.1-1)', () => {
+  it('allows useId and use, and nothing else from react', () => {
+    expect(serverUnsafeHooks("import { useId, use } from 'react'\n")).toEqual([])
+    expect(serverUnsafeHooks("import { useId, useState, useMemo } from 'react'\n")).toEqual(['useState', 'useMemo'])
+  })
+
+  it('finds a hook behind a namespace or a default import', () => {
+    expect(serverUnsafeHooks("import * as React from 'react'\nReact.useEffect(() => {})\n")).toEqual(['useEffect'])
+    expect(serverUnsafeHooks("import R from 'react'\nR.useRef(null)\n")).toEqual(['useRef'])
+  })
+})
+
+describe('importsOwnHook', () => {
+  it('sees the folder hook from the folder and from parts/, and no other module', () => {
+    expect(importsOwnHook("import { useThing } from './hook.js'\n")).toBe(true)
+    expect(importsOwnHook("import { useThing } from '../hook.js'\n")).toBe(true)
+    expect(importsOwnHook("import { useThing } from './use-thing.js'\n")).toBe(false)
+  })
+})
+
+describe('isServerPart (R-5.1-1)', () => {
+  it('is a part file with no directive, which index.tsx may render', () => {
+    expect(isServerPart('src/components/card/parts/card-root.tsx', 'export function CardRoot() {}\n')).toBe(true)
+  })
+
+  it('is not a use client part, nor a file outside parts/', () => {
+    expect(isServerPart('src/components/dropdown/parts/dropdown-group-label.tsx', "'use client'\nexport function A() {}\n")).toBe(false)
+    expect(isServerPart('src/components/card/index.tsx', 'export function Card() {}\n')).toBe(false)
+    expect(isServerPart('src/components/card/parts/card-root.ts', 'export const x = 1\n')).toBe(false)
+  })
+
+  it('a server part with useState and a hook.ts import trips both checks', () => {
+    const source = "import { useState } from 'react'\nimport { useThing } from '../hook.js'\n"
+    expect(isServerPart('src/components/thing/parts/thing-list.tsx', source)).toBe(true)
+    expect(serverUnsafeHooks(source)).toEqual(['useState'])
+    expect(importsOwnHook(source)).toBe(true)
+  })
+
+  it('sidebar-group, a server part that calls useId, passes', () => {
+    expect(serverUnsafeHooks("import { useId } from 'react'\n")).toEqual([])
   })
 })

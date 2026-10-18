@@ -29,6 +29,11 @@ interface OwnRow {
 }
 
 /** R-5.6-1: a row is named by its text. A row with no text, an icon alone, takes aria-label. */
+/** What one row draws: the icon, the label and the shortcut. */
+export interface DropdownRowProps extends OwnRow {
+  label: ReactNode
+}
+
 type Named =
   | { children: ReactNode }
   | { 'children'?: undefined, 'aria-label': string }

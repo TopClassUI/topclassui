@@ -6,8 +6,9 @@ export const directionOf = (sort: TableSort | undefined, key: string): TableSort
   sort?.key === key && Object.hasOwn(SORT_ICONS, sort.direction) ? sort.direction : undefined
 
 /** The entries that are columns, in the order they were written. */
-export const columnsOf = <T,>(columns: TableColumns<T>): TableColumn<T>[] =>
-  columns.filter((column): column is TableColumn<T> => Boolean(column))
+export function columnsOf<T>(columns: TableColumns<T>): TableColumn<T>[] {
+  return columns.filter((column): column is TableColumn<T> => Boolean(column))
+}
 
 /** A body row's key, which the server made from getKey. */
 export const keyOfRow = (row: TableRow): string => row.key
