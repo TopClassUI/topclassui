@@ -846,6 +846,57 @@ const rules = {
       }
     },
   },
+
+  'tooltip-content-is-text': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-10.5-2: a tooltip is one or two lines of plain text; anything else is a Popover.' },
+      schema: [],
+      messages: {
+        element: 'R-10.5-2: <{{child}}> inside {{name}} makes it more than text. A link, a control or rich content belongs in a Popover.',
+      },
+    },
+    create(ctx: Context) {
+      const names = new Set(['TooltipPopup'])
+      /** The first JSX node in an expression, so `{ok && <a />}` and `{rows.map(...)}` are seen. */
+      const findJsx = (node: Node, depth = 0): Node => {
+        if (!node || typeof node.type !== 'string' || depth > 20) return null
+        if (node.type === 'JSXElement' || node.type === 'JSXFragment') return node
+        for (const key of ctx.sourceCode.visitorKeys[node.type] ?? []) {
+          const value = node[key]
+          for (const child of Array.isArray(value) ? value : [value]) {
+            const hit = findJsx(child, depth + 1)
+            if (hit) return hit
+          }
+        }
+        return null
+      }
+      const label = (jsx: Node) => {
+        if (jsx.type === 'JSXFragment') return 'fragment'
+        const name = jsx.openingElement?.name
+        return String(name?.name ?? name?.property?.name ?? 'element')
+      }
+      const flag = (node: Node, name: string) => {
+        const jsx = findJsx(node)
+        if (jsx) ctx.report({ node: jsx, messageId: 'element', data: { name, child: label(jsx) } })
+      }
+      return {
+        ImportSpecifier(node: Node) {
+          if (names.has(String(node.imported?.name ?? ''))) names.add(String(node.local?.name ?? ''))
+        },
+        JSXElement(node: Node) {
+          const opening = node.openingElement
+          const name = String(opening?.name?.name ?? opening?.name?.property?.name ?? '')
+          if (!names.has(name)) return
+          for (const child of node.children ?? []) flag(child, name)
+          for (const attribute of opening.attributes ?? []) {
+            if (attribute.type === 'JSXAttribute' && attribute.name?.name === 'children') flag(attribute.value, name)
+            if (attribute.type === 'JSXSpreadAttribute') flag(attribute.argument, name)
+          }
+        },
+      }
+    },
+  },
 }
 
 export default { rules } satisfies ESLint.Plugin

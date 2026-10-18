@@ -38,6 +38,7 @@ export default defineConfig(
       'topclass/root-part-is-named-root': 'error',
       'topclass/text-comes-from-labels': 'error',
       'topclass/no-fetch-in-components': 'error',
+      'topclass/tooltip-content-is-text': 'error',
 
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/ban-ts-comment': 'error',
@@ -69,6 +70,13 @@ export default defineConfig(
   {
     files: ['src/components/banner/lib.ts'],
     rules: { 'topclass/no-fetch-in-components': ['error', { allow: ['localStorage'] }] },
+  },
+
+  // R-10.5-2 is about every tooltip a page renders, so it also covers the harness pages and fixtures.
+  {
+    files: ['e2e/**/*.tsx', 'scripts/**/*.tsx'],
+    plugins: { topclass },
+    rules: { 'topclass/tooltip-content-is-text': 'error' },
   },
 
   // Tooling runs in Node, never ships, and walks untyped ESLint AST nodes.

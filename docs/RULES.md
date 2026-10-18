@@ -10,7 +10,7 @@ Each rule has an id, one line of rule, one line of reason, and what enforces it.
 
 ```
 pnpm check            every gate below, in order
-pnpm lint             eslint, including the sixteen custom rules
+pnpm lint             eslint, including the seventeen custom rules
 pnpm typecheck        tsc --noEmit
 pnpm test             vitest, four projects: node, dom, rsc, ssr
 pnpm check:structure  the folder contract and file sizes
@@ -268,7 +268,7 @@ They arrive with the phases that need them.
 ### R-10.5-2 Tooltips never scroll
 **Rule:** a tooltip is one or two lines of plain text; anything larger, or anything with a link or control, is a Popover.
 **Why:** a scrolling tooltip cannot be reached by pointer or keyboard.
-**Enforced by:** not yet - planned: `eslint`
+**Enforced by:** type (`TooltipPopupProps['children']` is `TooltipText`) + `eslint` (`tooltip-content-is-text`, on src, demos and the harness)
 
 ### R-10.5-3 Sticky bars set the scroll padding
 **Rule:** a sticky or fixed bar sets `--tc-sticky-top` or `--tc-sticky-bottom`, and the scroll container reads them into `scroll-padding-block`.
