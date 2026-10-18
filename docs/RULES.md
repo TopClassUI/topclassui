@@ -268,7 +268,7 @@ They arrive with the phases that need them.
 ### R-10.5-2 Tooltips never scroll
 **Rule:** a tooltip is one or two lines of plain text; anything larger, or anything with a link or control, is a Popover.
 **Why:** a scrolling tooltip cannot be reached by pointer or keyboard.
-**Enforced by:** type (`TooltipPopupProps['children']` is `TooltipText`) + `eslint` (`tooltip-content-is-text`, on src, demos and the harness)
+**Enforced by:** type (`TooltipPopupProps['children']` is `TooltipText`) + `eslint` (`tooltip-content-is-text`, on src, demos and the harness, including Base UI's own popup) + e2e/tooltip.spec, which proves two lines for every demo; a caller's text is held by `max-w-xs` and wrapping, a guard rail rather than a validator
 
 ### R-10.5-3 Sticky bars set the scroll padding
 **Rule:** a sticky or fixed bar sets `--tc-sticky-top` or `--tc-sticky-bottom`, and the scroll container reads them into `scroll-padding-block`.

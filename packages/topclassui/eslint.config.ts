@@ -16,7 +16,8 @@ export default defineConfig(
   },
 
   // The library itself. Every rule in docs/RULES.md that a linter can enforce
-  // applies here; outside src/ only the rules without an "inside src/" clause do.
+  // applies here; outside src/ only the rules without an "inside src/" clause do, and
+  // tooltip-content-is-text also covers demos, e2e and scripts (below).
   {
     files: ['src/**/*.{ts,tsx}'],
     plugins: { topclass },
