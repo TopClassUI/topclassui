@@ -52,7 +52,7 @@ They arrive with the phases that need them.
 - **R-5.1-4** No React context in Server Components: direction and theme come from `dir` and `data-theme` on the HTML, and labels come from props. _(check-boundaries)_
 - **R-5.1-5** Only `components/icon/index.tsx` may be async or import `server-only`; every other `index.tsx` renders in a non-RSC React tree, and the sync `<Icon>` from `icon-registry` carries the identical props for browser-only trees. _(check-boundaries)_
 - **R-9.2-3** Export flat names (`DialogRoot`), never an object (`Dialog.Root`) that a server file would dot into. _(eslint)_
-- **R-9.2-4** A component split into parts names its root `<Name>Root` without exception (`CardRoot`, `DialogRoot`, `AvatarRoot`), and a scrolling overlay names its parts `<Name>Header`, `<Name>Body` and `<Name>Footer`, where the Body is the scroll container R-10.5-1 requires. _(eslint, which reads the exported names; the parts/ half is manual)_
+- **R-9.2-4** A component split into parts names its root `<Name>Root` without exception (`CardRoot`, `DialogRoot`, `AvatarRoot`), and a scrolling overlay names its parts `<Name>Header`, `<Name>Body` and `<Name>Footer`, where the Body is the scroll container R-10.5-1 requires. _(eslint, which reads the exported names; check-structure, which fails a scrolling overlay whose index.tsx exports no <Name>Body; the parts/ half is manual)_
 
 ## 2. Styling
 
@@ -104,9 +104,9 @@ They arrive with the phases that need them.
 
 - **R-8.5-1** Any component that renders items uses `CollectionProps` and `useCollection`: the `--tc-list-rows` knob, windowing above the threshold, and optional page-by-page loading. _(check-structure, which requires useCollection in the hook of every folder whose props take items, CollectionProps or MenuContract, less the exemptions docs/DECISIONS.md records; e2e/collections.spec, which keeps fewer than a hundred of ten thousand rows mounted and sees loadMore called at the end)_
 - **R-8.5-2** Components never fetch, cache or paginate; they call `loadMore()` and render what they are given. _(eslint)_
-- **R-10.5-1** Popups use `POPUP_BOUNDS` and the row cap, dialogs and drawers scroll their body with sticky header and footer, and every scroll container inside an overlay sets `overscroll-behavior: contain`. _(not yet - no overlay component exists yet)_
+- **R-10.5-1** Popups use `POPUP_BOUNDS` and the row cap, dialogs and drawers scroll their body with sticky header and footer, and every scroll container inside an overlay sets `overscroll-behavior: contain`. _(e2e/overlay-scroll.spec, which proves in a browser that the Body of Dialog and Drawer is the scroll container between a header and a footer that keep their boxes, that Popover, Dropdown, Select, Combobox and DatePicker sit at the offset and the collision padding of POPUP_BOUNDS inside the room Base UI measured, with their lists inside the row cap, that Command caps its list under its input, and that every scroll container in an open overlay, the Toast viewport included, sets overscroll-behavior: contain; check-structure requires the Body)_
 - **R-10.5-2** A tooltip is one or two lines of plain text; anything larger, or anything with a link or control, is a Popover. _(type + eslint)_
-- **R-10.5-3** A sticky or fixed bar sets `--tc-sticky-top` or `--tc-sticky-bottom`, and the scroll container reads them into `scroll-padding-block`. _(not yet - no sticky or fixed bar exists yet)_
+- **R-10.5-3** A sticky or fixed bar sets `--tc-sticky-top` or `--tc-sticky-bottom`, and the scroll container reads them into `scroll-padding-block`. _(e2e/overlay-scroll.spec, which proves that the sticky Navbar writes its height to --tc-sticky-top and the page reads both variables into scroll-padding-block; check-structure, which fails a folder that wears STICKY_TOP or STICKY_BOTTOM and never writes the matching variable)_
 
 ## 8. Code structure
 

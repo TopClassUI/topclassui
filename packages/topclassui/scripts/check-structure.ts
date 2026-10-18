@@ -1,10 +1,11 @@
-// R-8.1-1, R-5.1-2, R-5.12-2, R-5.12-4, R-9.2-4, R-8.5-1: the folder contract, file size, naming and the collection contract.
+// R-8.1-1, R-5.1-2, R-5.12-2, R-5.12-4, R-9.2-4, R-8.5-1, R-10.5-1, R-10.5-3: the folder contract, file size, naming, the collection contract and overlay parts.
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, posix, relative, sep } from 'node:path'
 
 import { collectionErrors } from './lib/collections.js'
 import { FAIL_LINES, WARN_LINES, countLines, sizeVerdict, sourceFilesUnder } from './lib/file-sizes.js'
 import { INDEX_MARKUP_EXEMPT, indexMarkupViolations, isClientRendering } from './lib/index-markup.js'
+import { categoryOf, exportedValueNames, missingBody, unpublishedStickyEdges } from './lib/overlay-parts.js'
 import { inlinePropInterfaces, screamingConstants } from './lib/source-checks.js'
 
 const ROOT = process.cwd()
@@ -145,6 +146,20 @@ function checkComponentFolder(dir: string, slug: string) {
   const source = (f: string) => (files.includes(f) ? readFileSync(join(dir, f), 'utf8') : null)
   for (const error of collectionErrors({ slug, types: source('types.ts'), hook: source('hook.ts') })) {
     errors.push(`${rel(dir)}: ${error} (R-8.5-1).`)
+  }
+
+  // R-9.2-4: a scrolling overlay exports the Body that scrolls.
+  if (files.includes('index.tsx')) {
+    const meta = files.includes('meta.ts') ? readFileSync(join(dir, 'meta.ts'), 'utf8') : ''
+    const problem = missingBody(slug, categoryOf(meta), exportedValueNames(readFileSync(join(dir, 'index.tsx'), 'utf8')))
+    if (problem) errors.push(`${rel(dir)}: ${problem}`)
+  }
+
+  // R-10.5-3: a folder that wears a sticky edge writes that edge's variable somewhere in its sources.
+  const sources = [...files.filter((f) => /\.tsx?$/.test(f) && !/\.test\.tsx?$/.test(f)).map((f) => join(dir, f)),
+    ...(dirs.includes('parts') ? listDir(join(dir, 'parts')).filter((e) => e.isFile()).map((e) => join(dir, 'parts', e.name)) : [])]
+  for (const variable of unpublishedStickyEdges(sources.map((f) => readFileSync(f, 'utf8')))) {
+    errors.push(`${rel(dir)}: wears a sticky edge and never writes ${variable}, which the page reads into scroll-padding-block (R-10.5-3).`)
   }
 
   // parts/: one component per file, named after the file.
