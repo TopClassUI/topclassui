@@ -65,7 +65,7 @@ describe('every server component has its serializable-props test', () => {
   it('finds the components that render in index.tsx, so an empty list cannot pass', () => {
     expect(rendering).toEqual([
       'alert', 'avatar-group', 'badge', 'banner', 'breadcrumb', 'button', 'code-block', 'empty-state', 'field',
-      'form', 'icon', 'icon-registry', 'input', 'kbd', 'meter', 'pagination', 'progress', 'rating', 'separator',
+      'form', 'icon', 'input', 'kbd', 'meter', 'pagination', 'progress', 'rating', 'separator',
       'skeleton', 'spinner', 'stepper', 'svg', 'table', 'tag', 'textarea', 'timeline',
     ])
   })
