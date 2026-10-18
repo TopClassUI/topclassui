@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { locale as localeParam } from 'next/root-params'
 import { Button } from 'topclassui/button'
 
-import { SearchButton } from '../../../components/search/search-button'
+import { SearchButton } from '../../../components/shell/shell-islands'
 import { SitePage } from '../../../components/shell/site-page'
 import { hrefOf, isLocale, pageBySlug } from '../../../content/pages'
 import { labelsFor } from '../../../labels/index'

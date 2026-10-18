@@ -1,7 +1,8 @@
-import { SidebarBody, SidebarHeader, SidebarRoot } from 'topclassui/sidebar'
+import { SidebarBody, SidebarHeader } from 'topclassui/sidebar'
 
 import type { Locale } from '../../content/pages'
 import type { SiteLabels } from '../../labels/index'
+import { SidebarRoot } from './shell-islands'
 import { SidebarGroups } from './sidebar-groups'
 
 export interface SiteSidebarProps {

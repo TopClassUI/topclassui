@@ -7,10 +7,8 @@ import { ICON_BUTTON } from 'topclassui/classes'
 import { LIVE_GUIDES, hrefOf, pageBySlug, type Locale } from '../../content/pages'
 import type { SiteLabels } from '../../labels/index'
 import { GITHUB_URL } from '../../lib/site'
-import { SearchButton } from '../search/search-button'
 import { LanguageSwitch } from './language-switch'
-import { MobileMenu } from './mobile-menu'
-import { ModeSwitch } from './mode-switch'
+import { MobileMenu, ModeSwitch, SearchButton } from './shell-islands'
 import { SidebarGroups } from './sidebar-groups'
 
 export interface SiteNavbarProps {
