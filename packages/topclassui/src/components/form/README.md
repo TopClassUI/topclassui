@@ -13,7 +13,7 @@ client file: its action answers with a state, and the errors in it land on the m
 `FieldLive` without a reload.
 
 ```tsx
-import { Form, FormAction, type FormActionState } from 'topclassui'
+import { Form, FormAction, type FormActionState } from 'topclassui/form'
 ```
 
 ```tsx
@@ -82,7 +82,7 @@ values, any check in the browser beyond the browser's own.
 ## Import
 
 ```tsx
-import { Form } from 'topclassui'
+import { Form } from 'topclassui/form'
 ```
 
 ## Props

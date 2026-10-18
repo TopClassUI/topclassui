@@ -20,9 +20,9 @@ describe('the folder is the client template, with the files PLAN names for Toast
 describe('index.tsx (R-5.1-1, R-5.1-2)', () => {
   const source = read('index.tsx')
 
-  it('has no use client and takes its two names from client.tsx and lib.ts', () => {
+  it('has no use client and takes its two names from client.tsx and the shared toast calls', () => {
     expect(hasUseClient(source)).toBe(false)
-    expect(importedModules(source).sort()).toEqual(['./client.js', './lib.js', './types.js'])
+    expect(importedModules(source).sort()).toEqual(['#shared/toast/toast.js', './client.js', './types.js'])
   })
 })
 
@@ -50,14 +50,24 @@ describe('client.tsx (R-5.12-1)', () => {
   })
 })
 
-describe('lib.ts and hook.ts', () => {
-  it('lib.ts imports no React, so `toast` runs outside it', () => {
-    expect(importedModules(read('lib.ts')).filter((m) => m === 'react' || m.startsWith('react-dom'))).toEqual([])
-    expect(hasUseClient(read('lib.ts'))).toBe(false)
+describe('the toast calls, lib.ts and hook.ts', () => {
+  const calls = readFileSync(join(FOLDER, '..', '..', 'shared', 'toast', 'toast.ts'), 'utf8')
+
+  it('shared/toast/toast.ts imports no React, so `toast` runs outside it', () => {
+    expect(importedModules(calls).filter((m) => m === 'react' || m.startsWith('react-dom'))).toEqual([])
+    expect(hasUseClient(calls)).toBe(false)
   })
 
-  it('lib.ts works on the one manager the provider listens to', () => {
-    expect(importedNames(read('lib.ts'), '#shared/toast/manager.js')).toEqual(['toastManager'])
+  it('shared/toast/toast.ts works on the one manager the provider listens to', () => {
+    expect(importedNames(calls, './manager.js')).toEqual(['toastManager'])
+  })
+
+  it('lib.ts holds pure helpers: it imports no manager and no viewport registry', () => {
+    expect(importedModules(read('lib.ts')).filter((m) => m.includes('/toast/'))).toEqual([])
+  })
+
+  it('hook.ts takes the viewport registry from shared/toast/viewports.ts', () => {
+    expect(importedNames(read('hook.ts'), '#shared/toast/viewports.js')).toEqual(['claimViewport', 'drawingViewport', 'subscribeViewports'])
   })
 
   it('hook.ts takes the locale of the portal from the shared hook, never a direction of its own', () => {
@@ -68,5 +78,6 @@ describe('lib.ts and hook.ts', () => {
     for (const file of ['client.tsx', 'hook.ts', 'lib.ts', 'index.tsx', 'constants.ts', 'classes.ts']) {
       expect(importedModules(read(file)).filter((m) => m.startsWith('zod')), file).toEqual([])
     }
+    expect(importedModules(calls).filter((m) => m.startsWith('zod'))).toEqual([])
   })
 })

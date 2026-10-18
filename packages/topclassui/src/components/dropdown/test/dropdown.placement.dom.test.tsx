@@ -134,7 +134,7 @@ describe('the distance and the edges', () => {
     expect(positioner?.style.getPropertyValue('--available-height')).toBe('414px')
     expect(positioner?.style.getPropertyValue('--available-width')).toBe('1008px')
     expect(popup.className).toContain('var(--available-height,100dvh)')
-    expect(popup.className).toContain('max-w-[min(calc(var(--spacing)*80),var(--available-width))]')
+    expect(popup.className).toContain('max-w-[min(calc(var(--spacing)*80),round(down,var(--available-width),1px))]')
   })
 
   it('marks the positioner that carries the hiding class once its trigger scrolls out of view', async () => {

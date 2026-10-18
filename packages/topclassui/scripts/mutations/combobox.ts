@@ -119,8 +119,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the combobox popup is no longer capped at the room Base UI measured',
     file: CLASSES,
-    from: 'max-w-(--available-width) max-h-(--available-height) flex-col',
-    to: 'max-w-(--available-width) flex-col',
+    from: '${POPUP_BOUNDS} flex-col',
+    to: 'max-w-[round(down,var(--available-width),1px)] flex-col',
   },
   {
     label: 'the combobox box loses the width of an Input',

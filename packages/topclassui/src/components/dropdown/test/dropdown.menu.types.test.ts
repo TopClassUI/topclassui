@@ -8,10 +8,15 @@ import type {
 } from '../index.js'
 
 describe('the data-driven menu', () => {
-  it('takes the shared menu contract whole, plus placement and className, and nothing else', () => {
-    expectTypeOf<keyof DropdownMenuProps>().toEqualTypeOf<keyof MenuContract | 'placement' | 'className'>()
+  it('takes the shared menu contract whole, and the popup\'s own props beside it (R-5.7-3)', () => {
     expectTypeOf<Pick<DropdownMenuProps, keyof MenuContract>>().toEqualTypeOf<MenuContract>()
+    expectTypeOf<Extract<keyof DropdownMenuProps, 'placement' | 'className' | 'style' | 'ref' | 'id'>>()
+      .toEqualTypeOf<'placement' | 'className' | 'style' | 'ref' | 'id'>()
     expectTypeOf<DropdownMenuProps['className']>().toEqualTypeOf<string | undefined>()
+  })
+
+  it('takes no children, container, keepMounted or render: the menu draws its rows from items', () => {
+    expectTypeOf<Extract<keyof DropdownMenuProps, 'children' | 'container' | 'keepMounted' | 'render'>>().toEqualTypeOf<never>()
   })
 
   it('has no size and no modal: one row height, and the default of Base UI', () => {

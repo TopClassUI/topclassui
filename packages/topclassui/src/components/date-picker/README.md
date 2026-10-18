@@ -13,7 +13,7 @@ element: a button that shows the day, and a calendar that opens under it. No dat
 grid is ours and every word and digit comes from `Intl`.
 
 ```tsx
-import { DatePicker } from 'topclassui'
+import { DatePicker } from 'topclassui/date-picker'
 ```
 
 ```tsx
@@ -58,8 +58,8 @@ on the locale's first day, read in the browser (Sunday in `en`, Monday in `en-GB
 
 **The keyboard** (the Authoring Practices date picker dialog). The calendar opens with the focus
 on the chosen day, else on today. The arrows move a day and a week; in Arabic ArrowLeft is the
-next day. Home and End go to the first and the last day of the row, within the month. PageUp and
-PageDown move a month, with Shift a year, keeping the day inside the month (31 March back is
+next day. Home and End go to the first and the last day of the week, turning the month when the
+week crosses it. PageUp and PageDown move a month, with Shift a year, keeping the day inside the month (31 March back is
 28 February). Enter or Space chooses and closes; Escape closes with no change; the focus returns
 to the button. Tab goes round previous, next, close and the grid.
 
@@ -88,15 +88,15 @@ popup cannot reach 44 px each.
 
 **On the element.** `className`, `style`, `ref`, `aria-describedby`, `aria-invalid` and the rest go
 to the button. `invalid` sets `aria-invalid`: the line turns red and thickens. `disabled` is the real
-attribute, on the button and the input, so the form sends nothing. `open`, `defaultOpen` and
-`onOpenChange` are Base UI's, on the root.
+attribute, on the button and the input, so the form sends nothing. `open`, `defaultOpen`,
+`onOpenChange` and `onOpenChangeComplete` are Base UI's, on the root.
 
 ### What Base UI gives
 
 | Base UI | Here |
 |---|---|
 | `Popover.Root`, `Trigger`, `Portal`, `Positioner`, `Popup`, `Title`, `Close` | one `DatePicker` |
-| `open`, `defaultOpen`, `onOpenChange` | passed through; Escape is guarded per root |
+| `open`, `defaultOpen`, `onOpenChange`, `onOpenChangeComplete` | passed through; Escape is guarded per root |
 | `modal` | always `'trap-focus'`, with the `Close` part that makes the trap work |
 | `side`, `align`, `sideOffset`, `collisionPadding` | `placement` and the shared offsets |
 | `container` on the Portal | passed through |
@@ -114,7 +114,7 @@ prop (the provider's), the drawn open look of the button, a skeleton (use `Input
 ## Import
 
 ```tsx
-import { DatePicker } from 'topclassui'
+import { DatePicker } from 'topclassui/date-picker'
 ```
 
 ## Props
@@ -136,7 +136,7 @@ Required: `aria-label` or `aria-labelledby` or `id`. Every other prop below is o
 | `maxDate` | no | `string` | `"9999-12-31"` | DatePicker: the last day that can be chosen, clamped like minDate and raised to it when below. |
 | `minDate` | no | `string` | `"0001-01-01"` | DatePicker: the first day that can be chosen, an ISO date clamped to 0001-01-01 to 9999-12-31. |
 | `name` | no | `string` | - | The form input's name: the form sends `name=YYYY-MM-DD`, and `name=` when empty. |
-| `onValueChange` | no | `((value: string) => void)` | - | Called with the ISO date of the day chosen. |
+| `onValueChange` | no | `((value: string) => void)` | - | Called with the ISO date of the day chosen. Client-only. |
 | `placeholder` | no | `string` | - | The text of an empty trigger. Left out, the provider's `datePicker.placeholder`. |
 | `placement` | no | `top` \| `top-start` \| `top-end` \| `bottom` \| `bottom-start` \| `bottom-end` \| `start` \| `start-top` \| `start-bottom` \| `end` \| `end-top` \| `end-bottom` | `"bottom-start"` | DatePicker: the side and alignment the calendar opens at; start and end mirror in Arabic. |
 | `ref` | no | `Ref<HTMLButtonElement>` | - | The trigger, a `<button aria-haspopup="dialog">`. |

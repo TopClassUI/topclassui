@@ -7,9 +7,9 @@ import type { DropdownItemTone } from './types.js'
 /** Above the page, and hidden once its trigger scrolls out of view (PLAN 10.5). */
 export const DROPDOWN_POSITIONER = 'z-(--tc-z-popup) data-anchor-hidden:invisible'
 
-/** As wide as its longest row: 12rem at least and 20rem at most, and neither past the room Base UI
- * measured, so a doubled text size cannot push it off a phone. A wider label ends in an ellipsis. */
-export const DROPDOWN_WIDTH = 'min-w-[min(calc(var(--spacing)*48),var(--available-width))] max-w-[min(calc(var(--spacing)*80),var(--available-width))]'
+/** As wide as its longest row: 12rem at least and 20rem at most, and neither past the room POPUP_MAX_W rounds down
+ * to, so a doubled text size cannot push it off a phone. A wider label ends in an ellipsis. */
+export const DROPDOWN_WIDTH = 'min-w-[min(calc(var(--spacing)*48),round(down,var(--available-width),1px))] max-w-[min(calc(var(--spacing)*80),round(down,var(--available-width),1px))]'
 
 /** R-10.5-1: a column that shows about --tc-list-rows rows and scrolls inside itself. A group label
  * too long for its width breaks, and the ring of a menu that holds the focus itself is drawn inside its box. */

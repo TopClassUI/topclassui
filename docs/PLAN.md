@@ -475,8 +475,8 @@ Use logical utilities so layout follows the text direction automatically.
 | `float-left` `float-right` | `float-start` `float-end` |
 | `scroll-ml` `scroll-pr` ... | `scroll-ms` `scroll-pe` ... |
 | `space-x-*` `divide-x-*` | `gap-*` on flex or grid; `border-s` on children |
-| `translate-x-*` `-translate-x-*` | `translate-x-(--tc-slide)` where the variable is `calc(<length> * var(--tc-dir))` |
-| `origin-left` `origin-right` `origin-top-left` ... | `origin-(--transform-origin)` on popups (Base UI sets it per side); `rtl:origin-*` elsewhere |
+| `translate-x-*` `-translate-x-*` | `translate-x-[calc(<length>*var(--tc-dir))]` |
+| `origin-left` `origin-right` `origin-top-left` ... | `origin-(--transform-origin)` on popups (Base UI sets it per side); `origin-[calc(50%-50%*var(--tc-dir))_50%]` elsewhere |
 | `bg-linear-to-r` `bg-linear-to-l` ... | `bg-linear-[calc(90deg*var(--tc-dir))]`, or a vertical direction |
 | `object-left` `object-right` `bg-left` `bg-right` | no logical form exists: `object-left rtl:object-right` |
 | `rotate-*` on a directional icon | never; the icon flips itself. Rotate only non-directional icons |
@@ -1011,7 +1011,7 @@ export async function Icon({ name, size = '1em', label, flipRtl, className, ...r
       aria-label={label}
       aria-hidden={label ? undefined : true}
       focusable="false"
-      className={cn('inline-block shrink-0', flip && 'rtl:-scale-x-100', className)}
+      className={cn('inline-block shrink-0', flip && 'scale-x-(--tc-dir)', className)}
       {...rest}
     >
       <path d={icon.path} fill="currentColor" />
@@ -1063,8 +1063,8 @@ Each component is a folder. A file exists only when the component needs it. `pnp
 | File | Role | Rule |
 |----------------|--------------------------------------|----------------------------------------|
 | `index.tsx` | The public entry. For S and Sp components, the server or shared markup; for C components and connectors, re-exports only | No `'use client'`, no hooks except `useId` and `use`, no import of `./hook.js`. Required |
-| `client.tsx` | Only the interactive parts | First line is `'use client'`. Markup plus at most one call to `useXxx()` from `hook.ts` |
-| `hook.ts` | The component's state, effects and handlers | Returns a plain object, contains no JSX, imported only by `client.tsx` |
+| `client.tsx` | Only the interactive parts | First line is `'use client'`. Markup plus at most one call to `useXxx()` from `hook.ts` per component; a `'use client'` part follows the same rule |
+| `hook.ts` | The component's state, effects and handlers | Returns a plain object, contains no JSX, imported only by `client.tsx` and its `'use client'` parts |
 | `lib.ts` | Pure helpers, unit-tested | No React imports; called by `hook.ts` and `index.tsx` |
 | `variants.ts` | cva class definitions | Exported, so other elements can reuse the look (a link styled as a button) |
 | `schema.ts` | Zod schema of the design props, with min/max | Imports `constants.ts`; components import it with `import type` only |

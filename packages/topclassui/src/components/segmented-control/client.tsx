@@ -12,7 +12,7 @@ import {
   SEGMENTED_ROOT, SEGMENTED_ROOT_SIZE,
 } from './classes.js'
 import { SEGMENTED_CONTROL_DEFAULTS } from './constants.js'
-import { SegmentedControlLookContext, useSegmentedControlItem, useSegmentedControlRoot } from './hook.js'
+import { useSegmentedControlItem, useSegmentedControlRoot } from './hook.js'
 import type { SegmentedControlItemProps, SegmentedControlRootProps } from './types.js'
 
 /** A radio group drawn as one track: one tab stop, the arrows move and select. The track sits in a holder that may
@@ -32,7 +32,7 @@ export function SegmentedControlRoot({
   const track = useSegmentedControlRoot(size, { value, defaultValue, onValueChange, ref, children: rest.children, disabled: rest.disabled })
   // The holder takes nothing from the caller; on the track the rest goes first, so nothing of ours is overwritten.
   return (
-    <SegmentedControlLookContext value={track.look}>
+    <track.Context value={track.look}>
       <div className={cn(SEGMENTED_HOLDER, fullWidth && SEGMENTED_HOLDER_FULL)}>
         <Base
           key={track.resetKey}
@@ -46,7 +46,7 @@ export function SegmentedControlRoot({
           className={cn(SEGMENTED_ROOT, SEGMENTED_ROOT_SIZE[size], fullWidth && SEGMENTED_FULL, className)}
         />
       </div>
-    </SegmentedControlLookContext>
+    </track.Context>
   )
 }
 

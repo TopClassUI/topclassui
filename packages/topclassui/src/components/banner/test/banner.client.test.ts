@@ -26,9 +26,11 @@ describe('index.tsx stays a Server Component (R-5.1-1)', () => {
     expect(hasLateUseClient(source)).toBe(false)
   })
 
-  it('takes the shell from client.tsx and nothing from hook.ts or lib.ts', () => {
+  it('takes the shell from client.tsx, re-exports BannerDismissible, and nothing from hook.ts', () => {
     expect(importedNames(source, './client.js')).toEqual(['BannerShell'])
-    expect(importedModules(source).filter((m) => m === './hook.js' || m === './lib.js')).toEqual([])
+    expect(source).toContain("export { BannerDismissible } from './client.js'")
+    expect(importedModules(source).filter((m) => m === './hook.js')).toEqual([])
+    expect(importedNames(source, './lib.js')).toEqual(['isEmpty'])
   })
 })
 
@@ -46,15 +48,18 @@ describe('client.tsx is markup and one hook call (R-5.12-1)', () => {
 })
 
 describe('hook.ts and lib.ts', () => {
-  it("hook.ts starts with 'use client' and keeps the store in lib.ts", () => {
+  it("hook.ts starts with 'use client' and holds the store, taking the key and the neighbour from lib.ts", () => {
     const source = read('hook.ts')
     expect(source.startsWith("'use client'\n")).toBe(true)
-    expect(importedNames(source, 'react')).toEqual(['useSyncExternalStore'])
-    expect(importedNames(source, './lib.js').sort()).toEqual(['readDismissed', 'subscribeDismissed', 'writeDismissed'])
+    expect(importedNames(source, 'react')).toEqual(['useEffect', 'useRef', 'useSyncExternalStore'])
+    expect(importedNames(source, './lib.js')).toEqual(['keyOf', 'neighbourOf'])
+    expect(importedNames(source, '#shared/focus-neighbour.js')).toEqual(['restoreFocus'])
   })
 
-  it('lib.ts imports no React, so the store is plain code', () => {
-    expect(importedModules(read('lib.ts'))).toEqual(['./constants.js'])
+  it('lib.ts is pure: no React, no storage, no listener, no state', () => {
+    const source = read('lib.ts')
+    expect(importedModules(source)).toEqual(['#shared/focus-neighbour.js', './constants.js'])
+    expect(source).not.toMatch(/localStorage\.|addEventListener\(|new Set|new Map/)
   })
 })
 

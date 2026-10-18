@@ -32,7 +32,7 @@ export type PopoverTriggerProps =
 /** The popup's own props, and the two of the portal around it: where it mounts, and whether
  * it stays mounted while closed. The positioner takes none, so the placement stays ours. */
 export type PopoverPopupProps = Omit<Base.Popup.Props, 'className'>
-  & Pick<Base.Portal.Props, 'container' | 'keepMounted'>
+  & Omit<Base.Portal.Props, 'className' | keyof Base.Popup.Props>
   & Pick<PopoverDesignProps, 'placement'>
   & OwnClassName
 

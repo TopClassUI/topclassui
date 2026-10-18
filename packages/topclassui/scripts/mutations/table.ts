@@ -4,14 +4,14 @@ import type { Mutation } from '../lib/mutate.js'
 export const MUTATIONS: Mutation[] = [
   {
     label: 'a sorted table puts aria-sort and a caret on every column, so no one of them is named',
-    file: 'src/components/table/lib.tsx',
+    file: 'src/components/table/lib.ts',
     from: 'sort?.key === key && Object.hasOwn(SORT_ICONS, sort.direction)',
     to: 'sort !== undefined && Object.hasOwn(SORT_ICONS, sort.direction)',
   },
   {
     label: 'the sticky cell of a table loses its own fill, so the columns scrolling under it show through',
-    file: 'src/components/table/index.tsx',
-    from: '                        sticks(index) && fill,\n',
+    file: 'src/components/table/client.tsx',
+    from: 'column.sticky && fill, ',
     to: '',
   },
   {
@@ -59,8 +59,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the box of a table keeps no room for its stuck column, so a focused control can lie under it',
     file: 'src/components/table/index.tsx',
-    from: 'cn(BOX, FOCUS_ROOM, BORDER, FOCUS_RING, stickyFirstColumn && STICKY_BOX, className)',
-    to: 'cn(BOX, FOCUS_ROOM, BORDER, FOCUS_RING, className)',
+    from: 'FOCUS_RING, stickyFirstColumn && STICKY_BOX, className)',
+    to: 'FOCUS_RING, className)',
   },
   {
     label: 'a sortable table header takes "Sort by" and the caret back into its name, which is read out with every cell',
@@ -107,8 +107,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the box of a table keeps no room at its ends, so a focused control that shows one pixel past the edge is left there',
     file: 'src/components/table/index.tsx',
-    from: 'cn(BOX, FOCUS_ROOM, BORDER,',
-    to: 'cn(BOX, BORDER,',
+    from: "BOX_CAP[captionVisible ? 'visible' : 'hidden'], FOCUS_ROOM, BORDER,",
+    to: "BOX_CAP[captionVisible ? 'visible' : 'hidden'], BORDER,",
   },
   {
     label: 'the room a table keeps past its stuck column shrinks to the column itself, so a focused control can show one pixel beside it',
@@ -151,5 +151,29 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/table/classes.ts',
     from: ' motion-reduce:animate-none ${FORCED_EDGE}`',
     to: ' motion-reduce:animate-none`',
+  },
+  {
+    label: 'the table body stops windowing, so ten thousand rows are all mounted',
+    file: 'src/components/table/client.tsx',
+    from: '{body.rows.map(({ item: row, index }) => {',
+    to: '{props.rows.map((row, index) => {',
+  },
+  {
+    label: 'the table rows count from the header, so the first body row says it is the header row',
+    file: 'src/components/table/client.tsx',
+    from: 'aria-rowindex={index + 2}',
+    to: 'aria-rowindex={index + 1}',
+  },
+  {
+    label: 'the table box loses its row cap, so it never scrolls and loadMore is asked page after page',
+    file: 'src/components/table/index.tsx',
+    from: "BOX_CAP[captionVisible ? 'visible' : 'hidden'], ",
+    to: '',
+  },
+  {
+    label: 'the table hands visibleRows across unclamped, so 99 rows of box are drawn',
+    file: 'src/components/table/index.tsx',
+    from: 'clamp(visibleRows, visibleRowsMin, visibleRowsMax)',
+    to: 'visibleRows',
   },
 ]

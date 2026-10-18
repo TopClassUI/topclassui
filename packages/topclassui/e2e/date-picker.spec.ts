@@ -320,16 +320,33 @@ test.describe('live: the keys of the grid, the Authoring Practices date picker d
         await press(page, 'ArrowRight', 'الثلاثاء، 22 سبتمبر 2026')
         await press(page, 'ArrowDown', 'الثلاثاء، 29 سبتمبر 2026')
         await press(page, 'Home', 'السبت، 26 سبتمبر 2026')
-        await press(page, 'End', 'الأربعاء، 30 سبتمبر 2026')
-        await press(page, 'PageDown', 'الجمعة، 30 أكتوبر 2026')
+        await press(page, 'End', 'الجمعة، 2 أكتوبر 2026')
+        await press(page, 'PageDown', 'الاثنين، 2 نوفمبر 2026')
       }
-      await expect(popup.getByRole('heading')).toHaveText(direction === 'ltr' ? 'September 2025' : 'أكتوبر 2026')
+      await expect(popup.getByRole('heading')).toHaveText(direction === 'ltr' ? 'September 2025' : 'نوفمبر 2026')
       await page.keyboard.press('Enter')
       await expectClosed(page, POPUP)
       await expect(button).toBeFocused()
-      expect(await button.evaluate((el) => el.parentElement?.querySelector('input')?.value)).toBe(direction === 'ltr' ? '2025-09-27' : '2026-10-30')
+      expect(await button.evaluate((el) => el.parentElement?.querySelector('input')?.value)).toBe(direction === 'ltr' ? '2025-09-27' : '2026-11-02')
     })
   }
+
+  test('ltr: Home and End cross the month edge to the first and the last day of the week, and the grid turns with them', async ({ page }) => {
+    await openLive(page, 'date-picker--week-start')
+    const button = trigger(page, 'Monday first')
+    const popup = await openCalendar(page, button)
+    const heading = popup.getByRole('heading')
+    await press(page, 'PageDown', 'Thursday, October 22, 2026')
+    for (let step = 0; step < 3; step++) await page.keyboard.press('ArrowUp')
+    await expect.poll(() => focused(page)).toBe('Thursday, October 1, 2026')
+    await press(page, 'Home', 'Monday, September 28, 2026')
+    await expect(heading).toHaveText('September 2026')
+    await press(page, 'End', 'Sunday, October 4, 2026')
+    await expect(heading).toHaveText('October 2026')
+    await page.keyboard.press('Enter')
+    await expectClosed(page, POPUP)
+    expect(await button.evaluate((el) => el.parentElement?.querySelector('input')?.value)).toBe('2026-10-04')
+  })
 
   test('rtl: ArrowLeft is the next day, and the next day is drawn to the left of the active one', async ({ page }) => {
     await openLive(page, 'date-picker--rtl', { direction: 'rtl' })

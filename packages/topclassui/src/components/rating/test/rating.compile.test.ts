@@ -4,6 +4,8 @@ import { join } from 'node:path'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 
+import { importsFromRepo } from '#test/samples.js'
+
 const ROOT = process.cwd()
 const FOLDER = join(ROOT, 'src', 'components', 'rating')
 
@@ -11,11 +13,11 @@ const FOLDER = join(ROOT, 'src', 'components', 'rating')
 const slash = (path: string) => path.replace(/\\/g, '/')
 const probePath = (name: string) => slash(join(FOLDER, 'test', `rating-probe-${name}.tsx`))
 
-const PRELUDE = "import { Rating } from '../index.js'\nexport const used = [Rating]"
+const PRELUDE = "import { Rating, RatingInput } from '../index.js'\nexport const used = [Rating, RatingInput]"
 
 /** The import line compiles as a module that uses what it imports, any other sample as JSX a page would paste. */
 function wrap(code: string): string {
-  if (code.startsWith('import ')) return `${code.replace("'topclassui'", "'../index.js'")}\nexport const imported = [Rating]\n`
+  if (code.startsWith('import ')) return `${importsFromRepo(code)}\nexport const imported = [Rating]\n`
   return `${PRELUDE}\nexport const sample = (\n<>\n${code}\n</>\n)\n`
 }
 
@@ -56,7 +58,10 @@ const verdict = compile({
   readmeImport: SAMPLES[0] ?? '<Missing />',
   readmeSample: SAMPLES[1] ?? '<Missing />',
   server: '<Rating value={3.5} max={10} size="xl" labels={undefined} locale="ar" id="r" className="gap-2" />',
-  editing: '<Rating readOnly={false} aria-labelledby="t" name="stay" defaultValue={2} disabled onValueChange={(next) => { void next.toFixed() }} />',
+  editing: '<Rating readOnly={false} aria-labelledby="t" name="stay" defaultValue={2} disabled />',
+  input: '<RatingInput aria-labelledby="t" name="stay" defaultValue={2} disabled onValueChange={(next) => { void next.toFixed() }} />',
+  handlerEditable: '<Rating readOnly={false} aria-label="S" onValueChange={(next) => { void next }} />',
+  inputUnnamed: '<RatingInput defaultValue={2} />',
   unnamed: '<Rating readOnly={false} defaultValue={2} />',
   handlerReadOnly: '<Rating value={2} onValueChange={(next) => { void next }} />',
   nameReadOnly: '<Rating value={2} name="stay" />',
@@ -67,7 +72,7 @@ const verdict = compile({
 describe('the samples in the README compile as written', () => {
   it('finds the import line and the sample, so an empty extraction cannot pass', () => {
     expect(SAMPLES).toHaveLength(2)
-    expect(SAMPLES[0]).toBe("import { Rating } from 'topclassui'\n")
+    expect(SAMPLES[0]).toBe("import { Rating } from 'topclassui/rating'\n")
     expect(SAMPLES[1]).toContain('<Rating readOnly={false} name="stay" defaultValue={4} aria-label="Your stay" />')
   })
 
@@ -81,6 +86,12 @@ describe('what a Rating takes and refuses', () => {
   it('takes what a server page passes, and every editing prop with readOnly={false}', () => {
     expect(verdict['server']).toEqual([])
     expect(verdict['editing']).toEqual([])
+  })
+
+  it('takes a handler on RatingInput only: Rating takes no function (R-5.1-3)', () => {
+    expect(verdict['input']).toEqual([])
+    expect(verdict['handlerEditable']?.length).toBeGreaterThan(0)
+    expect((verdict['inputUnnamed'] ?? []).join(' ')).toMatch(/aria-label/)
   })
 
   it('refuses an editing rating with no name for its group', () => {
