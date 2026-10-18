@@ -2,6 +2,7 @@
 import { caretDown } from '#icons/data/caret-down.js'
 import { caretUp } from '#icons/data/caret-up.js'
 import type { IconData } from '#icons/types.js'
+import { COLLECTION_DEFAULTS } from '#shared/contracts/collection.js'
 import type { Labels } from '#shared/labels/types.js'
 
 export const TABLE_ALIGNS = ['start', 'end'] as const
@@ -14,6 +15,10 @@ export const TABLE_DEFAULTS = {
   captionVisible: false,
   striped: false,
   stickyFirstColumn: false,
+  // The --tc-list-rows knob, which applies whenever the prop is left out.
+  visibleRows: COLLECTION_DEFAULTS.visibleRows,
+  virtualize: 'auto',
+  loadMoreThreshold: COLLECTION_DEFAULTS.loadMoreThreshold,
 } as const
 
 /** What a column falls back to when it names no alignment. */

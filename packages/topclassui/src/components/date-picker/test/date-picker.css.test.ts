@@ -6,13 +6,13 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import { compileEntry } from '#test/stylesheet.js'
 import {
   DATE_PICKER_CELL, DATE_PICKER_DAY, DATE_PICKER_GRID, DATE_PICKER_HEADER, DATE_PICKER_ICON, DATE_PICKER_INPUT, DATE_PICKER_NAV,
-  DATE_PICKER_POPUP, DATE_PICKER_POSITIONER, DATE_PICKER_ROOT, DATE_PICKER_TITLE, DATE_PICKER_TRIGGER, DATE_PICKER_VALUE,
+  DATE_PICKER_POPUP, DATE_PICKER_POSITIONER, DATE_PICKER_ROOT, DATE_PICKER_SCROLL, DATE_PICKER_TITLE, DATE_PICKER_TRIGGER, DATE_PICKER_VALUE,
   DATE_PICKER_WEEKDAY,
 } from '../classes.js'
 
 const OWN = [
   DATE_PICKER_CELL, DATE_PICKER_DAY, DATE_PICKER_GRID, DATE_PICKER_HEADER, DATE_PICKER_ICON, DATE_PICKER_INPUT, DATE_PICKER_NAV,
-  DATE_PICKER_POPUP, DATE_PICKER_POSITIONER, DATE_PICKER_ROOT, DATE_PICKER_TITLE, DATE_PICKER_TRIGGER, DATE_PICKER_VALUE,
+  DATE_PICKER_POPUP, DATE_PICKER_POSITIONER, DATE_PICKER_ROOT, DATE_PICKER_SCROLL, DATE_PICKER_TITLE, DATE_PICKER_TRIGGER, DATE_PICKER_VALUE,
   DATE_PICKER_WEEKDAY,
 ]
 const CLASSES = [...new Set(OWN.join(' ').split(' ').filter(Boolean))]
@@ -66,12 +66,27 @@ describe('the popup', () => {
     expect(ruleOf(`${selectorOf('data-anchor-hidden:invisible')}[data-anchor-hidden]`)).toBe('visibility: hidden;')
   })
 
-  it('is 280 px at density 1, never wider or taller than the room Base UI measured, and scrolls itself', () => {
+  it('is 280 px at density 1, never wider or taller than the room Base UI measured, and scrolls as one on a short screen', () => {
     expect(ruleOf(selectorOf('w-[calc(17.5rem*var(--tc-density))]'))).toBe('width: calc(17.5rem * var(--tc-density));')
-    expect(ruleOf(selectorOf('max-w-(--available-width)'))).toBe('max-width: var(--available-width);')
+    expect(ruleOf(selectorOf('max-w-[round(down,var(--available-width),1px)]'))).toBe('max-width: round(down, var(--available-width), 1px);')
     expect(ruleOf(selectorOf('max-h-(--available-height)'))).toBe('max-height: var(--available-height);')
     expect(ruleOf(selectorOf('overscroll-contain'))).toBe('overscroll-behavior: contain;')
-    expect(css).toMatch(/\.\\\*\\:shrink-0 > \*\) \{\s*flex-shrink: 0;\s*\}/)
+    expect(DATE_PICKER_POPUP.split(' ')).not.toContain('*:shrink-0')
+  })
+
+  it('the month keeps its box while the grid scrolls in a wrapper of its own, which reaches into the padding by a ring', () => {
+    expect(DATE_PICKER_HEADER.split(' ')).toContain('shrink-0')
+    expect(DATE_PICKER_SCROLL.split(' ')).toEqual(expect.arrayContaining(['min-h-0', 'overflow-y-auto', 'overscroll-contain']))
+    expect(ruleOf(selectorOf('-m-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]')))
+      .toBe('margin: calc(calc(var(--tc-ring-width) + var(--tc-ring-offset)) * -1);')
+    expect(ruleOf(selectorOf('p-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]'))).toBe('padding: calc(var(--tc-ring-width) + var(--tc-ring-offset));')
+  })
+
+  it('under 20rem of screen the grid stops scrolling, so the popup scrolls as one', () => {
+    expect(ruleOf(selectorOf('[@media(height<20rem)]:overflow-y-visible'))).toBe('overflow-y: visible;')
+    const at = css.indexOf(`${selectorOf('[@media(height<20rem)]:overflow-y-visible')} {`)
+    expect(css.slice(css.lastIndexOf('@media (', at), at).split('{')[0]?.trim()).toBe('@media (height<20rem)')
+    expect(ruleOf(selectorOf('[@media(height<20rem)]:shrink-0'))).toBe('flex-shrink: 0;')
   })
 
   it('the month wraps rather than being cut', () => {

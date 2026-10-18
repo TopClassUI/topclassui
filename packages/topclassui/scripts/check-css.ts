@@ -1,8 +1,9 @@
-// R-4-1 every authored rule sits in a cascade layer, and no file reads a token the
-// tokens file never declares.
+// R-4-1 every authored rule sits in a cascade layer, no file reads a token the
+// tokens file never declares, and R-5.3-2 directional motion follows --tc-dir.
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join, posix, relative, sep } from 'node:path'
 
+import { findPhysicalDirection } from './lib/css-direction.js'
 import { findLongComments, findUnlayeredDeclarations } from './lib/css-layers.js'
 import { definedTokens, findUndefinedReferences } from './lib/token-refs.js'
 import { readBlocks, tokensMissingPerMode } from './lib/tokens.js'
@@ -41,6 +42,9 @@ for (const file of stylesheets) {
   }
   for (const c of findLongComments(css)) {
     errors.push(`${rel(file)}:${String(c.line)} R-5.12-3: comment spans ${String(c.span)} lines, one is the maximum`)
+  }
+  for (const d of findPhysicalDirection(css)) {
+    errors.push(`${rel(file)}:${String(d.line)} R-5.3-2: '${d.property}: ${d.value}' ${d.hint}`)
   }
 }
 

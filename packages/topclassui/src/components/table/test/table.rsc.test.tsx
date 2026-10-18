@@ -1,8 +1,11 @@
 // The rsc project, where React resolves its react-server build and has no client hooks.
 import * as React from 'react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import * as entry from '../index.js'
+
+/** What a bundler leaves of a 'use client' export on the server: a reference that is never called there. */
+vi.mock('../client.js', () => ({ TableRows: Object.assign(() => { throw new Error('TableRows ran on the server') }, { client: 'TableRows' }) }))
 
 describe('<Table> in a Server Component tree', () => {
   it('runs against the react-server build, which has no state and no effects', () => {

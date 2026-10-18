@@ -72,7 +72,7 @@ describe('the demos the plan names', () => {
   it('highlighted: the coloured nodes read as the same text the button copies', async () => {
     const html = await render('highlighted')
     expect(html).toContain('<span class="font-semibold">import</span>')
-    expect(codeText(html)).toBe("import { CodeBlock } from 'topclassui'\n\n// Coloured by the caller, copied as plain text\nexport const sample = <CodeBlock title=\"page.tsx\">{code}</CodeBlock>")
+    expect(codeText(html)).toBe("import { CodeBlock } from 'topclassui/code-block'\n\n// Coloured by the caller, copied as plain text\nexport const sample = <CodeBlock title=\"page.tsx\">{code}</CodeBlock>")
   })
 
   it('rtl: the page is right to left, and the code is not', async () => {

@@ -495,4 +495,22 @@ export const MUTATIONS: Mutation[] = [
     from: '  --tc-z-popup: 60;',
     to: '  --tc-z-popup: 70;',
   },
+  {
+    label: 'the overlay popup width bound stops rounding the room down, so a popup placed on a whole pixel ends past the 8 px',
+    file: 'src/shared/classes.ts',
+    from: "export const POPUP_MAX_W = 'max-w-[round(down,var(--available-width),1px)]'",
+    to: "export const POPUP_MAX_W = 'max-w-(--available-width)'",
+  },
+  {
+    label: 'the overlay popup bounds lose the height of the room, so a popup runs off a short screen',
+    file: 'src/shared/classes.ts',
+    from: 'export const POPUP_BOUNDS = `${POPUP_MAX_H} ${POPUP_MAX_W}`',
+    to: 'export const POPUP_BOUNDS = POPUP_MAX_W',
+  },
+  {
+    label: 'a README sample that still imports the bare topclassui passes its compile test instead of failing',
+    file: 'src/test/samples.ts',
+    from: '  if (left !== null) {',
+    to: '  if (left !== null && left.index < 0) {',
+  },
 ]

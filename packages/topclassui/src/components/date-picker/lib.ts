@@ -119,8 +119,8 @@ export function moveByKey(active: string, key: string, shift: boolean, rtl: bool
     ArrowLeft: () => addDays(parts, -ahead),
     ArrowDown: () => addDays(parts, 7),
     ArrowUp: () => addDays(parts, -7),
-    Home: () => ({ ...parts, day: Math.max(1, parts.day - back) }),
-    End: () => ({ ...parts, day: Math.min(daysInMonth(parts.year, parts.month), parts.day + 6 - back) }),
+    Home: () => addDays(parts, -back),
+    End: () => addDays(parts, 6 - back),
     PageUp: () => addMonths(parts, shift ? -12 : -1),
     PageDown: () => addMonths(parts, shift ? 12 : 1),
   }

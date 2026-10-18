@@ -4,6 +4,8 @@ import { join } from 'node:path'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 
+import { importsFromRepo } from '#test/samples.js'
+
 const ROOT = process.cwd()
 const FOLDER = join(ROOT, 'src', 'components', 'form')
 
@@ -24,7 +26,7 @@ const IMPORTS = [
 
 /** The import line compiles as one that uses what it imports; a module as it is; any other sample as JSX, the way a page would paste it. */
 function wrap(code: string): string {
-  if (code.startsWith('import ')) return `${code.replace("'topclassui'", "'../index.js'")}\nexport const imported = [Form, FormAction]\nexport type Imported = FormActionState\n`
+  if (code.startsWith('import ')) return `${importsFromRepo(code)}\nexport const imported = [Form, FormAction]\nexport type Imported = FormActionState\n`
   if (code.startsWith("'use client'") || code.startsWith('export ')) return `${IMPORTS}\n${code}\n`
   return `${IMPORTS}\ndeclare function subscribe(formData: FormData): Promise<void>\nexport const sample = (\n<>\n${code}\n</>\n)\n`
 }
@@ -87,7 +89,7 @@ const verdict = compile({
 describe('the samples in the README compile as written', () => {
   it('finds the import line and the two samples, so an empty extraction cannot pass', () => {
     expect(SAMPLES).toHaveLength(3)
-    expect(SAMPLES[0]).toContain("import { Form, FormAction, type FormActionState } from 'topclassui'")
+    expect(SAMPLES[0]).toContain("import { Form, FormAction, type FormActionState } from 'topclassui/form'")
     expect(SAMPLES[1]).toContain('<Form action={subscribe}')
     expect(SAMPLES[2]).toContain('<FormAction action={subscribe}')
   })

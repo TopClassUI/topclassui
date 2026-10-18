@@ -134,13 +134,13 @@ describe('hook.ts holds what an item needs from React (R-5.12-1)', () => {
     expect(source.startsWith("'use client'\n")).toBe(true)
   })
 
-  it('imports useId, useRef and the type of a click from React, the shared tab stop and how long a press is held: no state of its own', () => {
-    expect(importedModules(source)).toEqual(['react', '#shared/use-scroll-tab-stop.js', './constants.js'])
+  it('imports useId, useRef and the type of a click from React, the provider check, the shared tab stop and how long a press is held: no state of its own', () => {
+    expect(importedModules(source)).toEqual(['react', '#shared/provider/context.js', '#shared/use-scroll-tab-stop.js', './constants.js'])
     expect(importedNames(source, 'react')).toEqual(['MouseEvent', 'useId', 'useRef'])
   })
 
   it('one hook: the id of the trigger, the ref of the region and its tab stop; the hold of a press calls none', () => {
-    expect(hooksByPart(source)).toEqual({ holdTrigger: [], scrollerOf: [], useAccordionItem: ['useRef', 'useId', 'useScrollTabStop'] })
+    expect(hooksByPart(source)).toEqual({ holdTrigger: [], scrollerOf: [], useAccordionItem: ['useProviderPresence', 'useRef', 'useId', 'useScrollTabStop'] })
   })
 })
 

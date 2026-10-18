@@ -12,7 +12,7 @@ To show a score out of five stars, or to let someone give one. Shown stars are s
 and ship no script; only `readOnly={false}` hydrates.
 
 ```ts
-import { Rating } from 'topclassui'
+import { Rating } from 'topclassui/rating'
 ```
 
 ```tsx
@@ -32,8 +32,11 @@ import { Rating } from 'topclassui'
 - **In a form.** `name` submits the checked step, "1" to `max`, before any script runs.
   A form reset goes back to the step the page was served with, and calls `onValueChange`.
   Without `name` a rating takes no part in a form: nothing is submitted and a reset leaves it.
-- **Controlled.** `value` with `onValueChange` needs a `'use client'` file: a server page
-  cannot pass a function. `defaultValue` works from a server page.
+- **Controlled.** `onValueChange` is a prop of `RatingInput`, the client export: the same
+  radio group with every editing prop but `readOnly`, which a `'use client'` file renders as
+  `<RatingInput value={value} onValueChange={setValue} aria-label="Delivery" />`. `Rating`
+  takes no function, so a server page passes one only as a Server Action. `defaultValue` and
+  `name` work from a server page.
 - **Keyboard.** The browser's own radio group. Tab enters on the checked star, or on the
   first when none is; the arrows move and select; Tab leaves. In Arabic, Chromium moves
   with the eye: the right arrow goes to the star at the right, which is the lower one.
@@ -68,7 +71,7 @@ dimmed read-only look the design draws.
 ## Import
 
 ```tsx
-import { Rating } from 'topclassui'
+import { Rating } from 'topclassui/rating'
 ```
 
 ## Props
@@ -85,7 +88,6 @@ Required: `aria-label` or `aria-labelledby` when `readOnly={false}`. Every other
 | `locale` | no | `string` | - | The BCP 47 tag the numbers in those names are formatted in. Defaults to `en`. |
 | `max` | no | `integer`, min 1, max 10 | `5` | How many stars, rounded and clamped to 1-10. |
 | `name` | no | `string` | - | The field name in a form. Each radio submits its step, "1" to max. Without one the rating is in no form: not submitted, not reset. |
-| `onValueChange` | no | `((value: number) => void)` | - | Called with the step a click or an arrow key checked, and on a form reset with the step it returns to. |
 | `readOnly` | no | `boolean` | `true` | true renders stars on the server and ships no script. false renders a radio group, which hydrates. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The star, from the icon scale: 16, 20, 24, 32 or 40 px. custom draws it at 1em, so it follows your font size. |
 | `value` | no | `number`, min 0, max 10 | `0` | The rating shown, clamped to 0 and max. Read-only, it is drawn to the nearest half; editing, it is the checked step, and passing it makes the rating controlled. |

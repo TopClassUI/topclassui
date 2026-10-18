@@ -10,13 +10,14 @@ import { cn } from '../cn.js'
 import { COLLECTION_DEFAULTS, type CollectionDefaults } from '../contracts/collection.js'
 import { resolveToastSettings, type ToastSettingsInput } from '../contracts/toast.js'
 import { createNumberFormat, getLabels, type NumberingSystem } from '../labels/get-labels.js'
-import type { PartialLabels } from '../labels/types.js'
+import type { ProviderLabels } from '../labels/types.js'
 import { toastManager } from '../toast/manager.js'
 // The one planned exception to CLOUD-PLAN 9, a shared file importing a component: Toast ships with the provider.
 import { ToastViewport } from '../../components/toast/client.js'
 import {
   type Direction, ToastSettingsContext, TopClassContext, type TopClassContextValue,
 } from './context.js'
+import { useProviderLocale } from './use-provider-locale.js'
 
 export interface TopClassProviderProps {
   children?: ReactNode
@@ -25,8 +26,8 @@ export interface TopClassProviderProps {
   /** R-13-1: from the route, never read from document.dir in an effect. */
   direction: Direction
   locale: string
-  /** Only the strings you want to change; the rest keep their defaults. */
-  labels?: PartialLabels | undefined
+  /** Only the strings you want to change; the rest keep their defaults. A count label is set on the component. */
+  labels?: ProviderLabels | undefined
   /** Left out, the locale tag's own -u-nu- decides, as it does for a server half, and Latin digits otherwise. */
   numberingSystem?: NumberingSystem | undefined
   adaptive?: { query?: string | undefined } | undefined
@@ -43,18 +44,17 @@ export function TopClassProvider(props: TopClassProviderProps) {
   const {
     children,
     className,
-    direction,
-    locale,
     labels: overrides,
     numberingSystem,
     adaptive,
     collection,
     toast,
   } = props
-
-  const query = adaptive?.query ?? DEFAULT_ADAPTIVE_QUERY
   // A nested provider, such as an RTL island, joins the outer root, delay group and toasts.
   const nested = useContext(TopClassContext) !== null
+  const { direction, locale } = useProviderLocale(props.direction, props.locale, nested)
+
+  const query = adaptive?.query ?? DEFAULT_ADAPTIVE_QUERY
 
   const value = useMemo<TopClassContextValue>(() => {
     const { labels } = getLabels(locale, overrides)

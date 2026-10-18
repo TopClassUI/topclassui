@@ -67,7 +67,7 @@ first avatar moves back over, so `p-1` or `px-3` on the group shifts that avatar
 ## Import
 
 ```tsx
-import { AvatarGroup } from 'topclassui'
+import { AvatarGroup } from 'topclassui/avatar-group'
 ```
 
 ## Props

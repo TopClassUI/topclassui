@@ -27,7 +27,7 @@ export type CheckboxProps = Omit<Base.Root.Props, Owned>
   & CheckboxName
 
 /** The props the hook holds: the state, its default, the handler and the hidden input, and the two a mixed box overrides. */
-export type CheckboxValueProps = Pick<Base.Root.Props, 'checked' | 'defaultChecked' | 'onCheckedChange' | 'inputRef' | 'indeterminate' | 'uncheckedValue'>
+export type CheckboxValueProps = Pick<CheckboxProps, 'checked' | 'defaultChecked' | 'onCheckedChange' | 'inputRef' | 'indeterminate' | 'uncheckedValue'>
 
 /** What Base UI hands a change handler: the reason, the event, and cancel(). */
 export type CheckboxChangeDetails = Base.Root.ChangeEventDetails

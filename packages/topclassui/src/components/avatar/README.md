@@ -12,7 +12,7 @@ For a person or an account: a picture, initials or an icon in a circle. It is as
 control of the same `size`, so an avatar and a Button in one row line up.
 
 ```tsx
-import { AvatarFallback, AvatarImage, AvatarRoot, AvatarSkeleton } from 'topclassui'
+import { AvatarFallback, AvatarImage, AvatarRoot, AvatarSkeleton } from 'topclassui/avatar'
 
 <AvatarRoot size="lg">
   <AvatarImage src="/team/omar.jpg" alt="Omar Abed" />
@@ -82,7 +82,7 @@ import {
   AvatarImage,
   AvatarFallback,
   AvatarSkeleton,
-} from 'topclassui'
+} from 'topclassui/avatar'
 ```
 
 ## Props

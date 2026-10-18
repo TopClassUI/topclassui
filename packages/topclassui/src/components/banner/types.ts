@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef, ReactNode } from 'react'
+import type { ComponentPropsWithRef, MouseEvent, ReactNode } from 'react'
 
 import type { Tone } from '#shared/contracts/tone.js'
 import type { BannerSchemaInput } from './schema.js'
@@ -31,13 +31,10 @@ export type BannerDismissal =
     dismissible: boolean
     /** The key the dismissal is remembered under, and the element's id. Required with `dismissible`. */
     id: string
-    /** Called once when the x is pressed. A function, so only a client caller can pass it. */
-    onDismiss?: (() => void) | undefined
   }
   | {
     dismissible?: false | undefined
     id?: string | undefined
-    onDismiss?: undefined
   }
 
 /** The content, and the role the component writes itself. */
@@ -59,9 +56,25 @@ export type BannerProps =
   & BannerName
   & BannerDismissal
 
-/** What index.tsx hands the client shell: the root's attributes, with the id and the tone it reads. */
+/** A Banner that is always dismissible, with a handler. A client export: a Server Component passes onDismiss only as a Server Action. */
+export type BannerDismissibleProps =
+  Omit<ComponentPropsWithRef<'div'>, Owned | 'id'>
+  & Omit<BannerDesignProps, 'dismissible'>
+  & BannerOwnProps
+  & BannerName
+  & {
+    /** The key the dismissal is remembered under, and the element's id. */
+    id: string
+    /** Client-only, or a Server Action: called once when the x is pressed, while the banner is still in the page. */
+    onDismiss?: (() => void) | undefined
+  }
+
+/** What index.tsx and BannerDismissible hand the client shell: the root's attributes, with the id and the tone it reads. */
 export type BannerShellProps = Omit<ComponentPropsWithRef<'div'>, 'id'> & {
   'id': string
   'data-tone': BannerTone
   'onDismiss'?: (() => void) | undefined
 }
+
+/** The press on the x, which the hook reads to know whether the x held the focus. Internal. */
+export type BannerDismissEvent = MouseEvent<HTMLButtonElement>

@@ -4,6 +4,8 @@ import { join } from 'node:path'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 
+import { importsFromRepo } from '#test/samples.js'
+
 const ROOT = process.cwd()
 const FOLDER = join(ROOT, 'src', 'components', 'toast')
 
@@ -15,7 +17,7 @@ const probePath = (name: string) => slash(join(FOLDER, 'test', `toast-probe-${na
 const PRELUDE = "import { Button } from '../../button/index.js'\nimport { toast } from '../index.js'\n"
 
 function wrap(code: string): string {
-  if (code.startsWith('import ')) return `${code.replace("'topclassui'", "'../index.js'")}\nexport const imported = [toast]\n`
+  if (code.startsWith('import ')) return `${importsFromRepo(code)}\nexport const imported = [toast]\n`
   return `${code.replace("'use client'\n", `'use client'\n${PRELUDE}`)}\nexport const scope = [Button, toast]\n`
 }
 

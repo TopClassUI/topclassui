@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext } from 'react'
+import { createContext, useContext, useEffect } from 'react'
 
 import { COLLECTION_DEFAULTS, type CollectionDefaults } from '../contracts/collection.js'
 import { resolveToastSettings, type ToastSettings } from '../contracts/toast.js'
@@ -38,7 +38,33 @@ export const TopClassContext = createContext<TopClassContextValue | null>(null)
 /** Set by the outermost provider only, so a nested one reads the settings the one Toast.Provider runs on. */
 export const ToastSettingsContext = createContext<ToastSettings>(resolveToastSettings())
 
+type Warning = 'direction' | 'locale' | 'provider' | 'mismatch'
+const warned = new Set<Warning>()
+
+/** R-13-1: one development warning naming the kinds this page has not been warned about yet. Call it from an effect. */
+export function warnOnce<K extends Warning>(kinds: readonly K[], message: (fresh: K[]) => string): void {
+  if (process.env.NODE_ENV === 'production') return
+  const fresh = kinds.filter((kind) => !warned.has(kind))
+  if (fresh.length === 0) return
+  for (const kind of fresh) warned.add(kind)
+  console.warn(`[topclassui] ${message(fresh)}`)
+}
+
+/** R-13-1: a component with no provider above it warns once per page, in development, from an effect. */
+export function useProviderPresence(): void {
+  const provided = useContext(TopClassContext) !== null
+  useEffect(() => {
+    if (provided) return
+    warnOnce(['provider'], () => (
+      `A component rendered with no <TopClassProvider> above it, so it runs on direction="${FALLBACK_CONTEXT.direction}" `
+      + `locale="${FALLBACK_CONTEXT.locale}".\n`
+      + '  Mount one in the root layout (R-13-1): <TopClassProvider direction={dir} locale={locale}>'
+    ))
+  }, [provided])
+}
+
 function useTopClass(): TopClassContextValue {
+  useProviderPresence()
   return useContext(TopClassContext) ?? FALLBACK_CONTEXT
 }
 

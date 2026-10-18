@@ -58,17 +58,17 @@ export type TreeViewProps = Omit<ComponentPropsWithRef<'div'>, DivOwned> & TreeV
   value?: string | null | undefined
   /** The id selected when the tree mounts. */
   defaultValue?: string | null | undefined
-  /** Called with the id of the node Enter, Space or a press selects. */
+  /** Called with the id of the node Enter, Space or a press selects. Client-only. */
   onValueChange?: ((id: string) => void) | undefined
   /** The ids of the open branches. Use with onExpandedChange when controlled. */
   expanded?: readonly string[] | undefined
   /** The ids open when the tree mounts. */
   defaultExpanded?: readonly string[] | undefined
-  /** Called with every open id after a branch opens or closes: load a branch's children here. */
+  /** Called with every open id after a branch opens or closes: load a branch's children here. Client-only. */
   onExpandedChange?: ((ids: readonly string[]) => void) | undefined
   /** More root nodes exist, so loadMore is called when the tree nears its end. */
   hasMore?: boolean | undefined
-  /** Called with no argument for the next page of root nodes, once per page. It never fetches a branch. */
+  /** Called with no argument for the next page of root nodes, once per page; never for a branch. Client-only, or a Server Action. */
   loadMore?: (() => void | Promise<void>) | undefined
   /** What status loading says, in place of labels.common.loading. */
   loadingFallback?: ReactNode | undefined
