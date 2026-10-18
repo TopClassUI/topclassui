@@ -140,9 +140,8 @@ export function LazyIsland<P extends object>({ load, props, when = 'near', hydra
       if (element.contains(input.target)) claim(input)
       else early.push(input)
     }
-    state.onLive = () => {
-      element.setAttribute('data-island-live', '')
-      claims.delete(element)
+    // After the part's own effects and the render they ask for, so a press meets the state it would have met.
+    const replay = () => {
       const under = held.current.hovered === null ? (hovered !== null && element.contains(hovered) ? hovered : null) : nodeAt(element, held.current.hovered)
       if (under !== null) {
         under.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }))
@@ -160,6 +159,11 @@ export function LazyIsland<P extends object>({ load, props, when = 'near', hydra
         }
       }
       held.current = { inputs: [], focused: null, hovered: null }
+    }
+    state.onLive = () => {
+      element.setAttribute('data-island-live', '')
+      claims.delete(element)
+      setTimeout(replay, 32)
     }
     if (state.waits && !hydrate) {
       void state.gate.then(load).then((Component) => {
