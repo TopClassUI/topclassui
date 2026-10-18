@@ -38,7 +38,7 @@ description or URL wraps inside the box instead of truncating.
 ## Import
 
 ```tsx
-import { Alert } from 'topclassui'
+import { Alert } from 'topclassui/alert'
 ```
 
 ## Props

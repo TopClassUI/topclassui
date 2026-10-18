@@ -3,7 +3,9 @@ import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import { BANNER_DEFAULTS, BANNER_TONES } from '../constants.js'
 import { bannerSchema } from '../schema.js'
-import type { BannerDesignProps, BannerDismissal, BannerName, BannerProps, BannerTone } from '../types.js'
+import type {
+  BannerDesignProps, BannerDismissal, BannerDismissibleProps, BannerName, BannerProps, BannerTone,
+} from '../types.js'
 
 /** Assignability as a value, so a rejected prop is a passing assertion. */
 type Accepts<Union, Candidate> = Candidate extends Union ? true : false
@@ -62,10 +64,8 @@ describe('dismissal (the client half)', () => {
     expectTypeOf<Accepts<BannerProps, Named & { dismissible: boolean }>>().toEqualTypeOf<false>()
   })
 
-  it('takes onDismiss only with dismissible, where it has an x to answer', () => {
-    expectTypeOf<Accepts<BannerProps, Named & { onDismiss: () => void }>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<BannerProps, Named & { id: string; onDismiss: () => void }>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<BannerProps, Named & { dismissible: true; id: string; onDismiss: () => void }>>().toEqualTypeOf<true>()
+  it('takes no onDismiss at all: a function cannot cross from a Server Component (R-5.1-3)', () => {
+    expectTypeOf<Accepts<keyof BannerProps, 'onDismiss'>>().toEqualTypeOf<false>()
   })
 
   it('leaves dismissible off and the id optional on a plain banner', () => {
@@ -73,8 +73,12 @@ describe('dismissal (the client half)', () => {
     expectTypeOf<Accepts<BannerProps, Named & { id: string }>>().toEqualTypeOf<true>()
   })
 
-  it('takes a callback of no argument that returns nothing', () => {
-    expectTypeOf<Extract<BannerProps, { dismissible: boolean }>['onDismiss']>().toEqualTypeOf<(() => void) | undefined>()
+  it('BannerDismissible requires the id, takes no dismissible, and a callback of no argument that returns nothing', () => {
+    expectTypeOf<BannerDismissibleProps['onDismiss']>().toEqualTypeOf<(() => void) | undefined>()
+    expectTypeOf<BannerDismissibleProps['id']>().toEqualTypeOf<string>()
+    expectTypeOf<Accepts<keyof BannerDismissibleProps, 'dismissible'>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<BannerDismissibleProps, Named & { id: string }>>().toEqualTypeOf<true>()
+    expectTypeOf<Accepts<BannerDismissibleProps, Named>>().toEqualTypeOf<false>()
   })
 })
 

@@ -174,7 +174,7 @@ describe('direction', () => {
     for (const value of [1, 6, 12]) {
       const icons = classesOf(html({ value }), /<svg [^>]*>/g)
       expect(icons, String(value)).toHaveLength(4)
-      for (const list of icons) expect(list, String(value)).toContain('rtl:-scale-x-100')
+      for (const list of icons) expect(list, String(value)).toContain('scale-x-(--tc-dir)')
     }
   })
 })

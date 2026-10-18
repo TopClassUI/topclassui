@@ -19,16 +19,19 @@ export type DatePickerName = ControlName
 type TriggerRemoved = 'render' | 'nativeButton' | 'handle' | 'payload' | 'openOnHover' | 'delay' | 'closeDelay' | 'children'
   | 'value' | 'defaultValue' | 'type' | 'className' | 'ref' | 'id' | 'aria-label' | 'aria-labelledby' | 'name' | 'form'
 
+/** The root's open state is the consumer's; its children, handle, actions, modality and trigger ids are ours. */
+type RootRemoved = 'className' | 'children' | 'handle' | 'actionsRef' | 'modal' | 'triggerId' | 'defaultTriggerId'
+
 // R-5.7-5: derived at the seam. The root's open state, the trigger's own props, and the form's.
 export type DatePickerProps = Omit<Base.Trigger.Props, TriggerRemoved>
-  & Pick<Base.Root.Props, 'open' | 'defaultOpen' | 'onOpenChange'>
+  & Omit<Base.Root.Props, RootRemoved>
   & DatePickerDesignProps
   & {
     /** The chosen day as an ISO date, `YYYY-MM-DD`, or null. A string that is not a real day counts as null. */
     value?: string | null | undefined
     /** The day of the first render, and the one a form reset brings back. */
     defaultValue?: string | null | undefined
-    /** Called with the ISO date of the day chosen. */
+    /** Called with the ISO date of the day chosen. Client-only. */
     onValueChange?: ((value: string) => void) | undefined
     /** The text of an empty trigger. Left out, the provider's `datePicker.placeholder`. */
     placeholder?: string | undefined

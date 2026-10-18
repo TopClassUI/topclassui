@@ -12,7 +12,7 @@ For a list of questions or sections, where a reader opens the one they need. Eve
 in the HTML from the start, so a crawler reads it and the browser's search finds it.
 
 ```ts
-import { AccordionItem, AccordionRoot } from 'topclassui'
+import { AccordionItem, AccordionRoot } from 'topclassui/accordion'
 ```
 
 ```tsx
@@ -85,7 +85,7 @@ closed), `variant`, a data-driven `Accordion`, one `headingLevel` for a whole ro
 import {
   AccordionRoot,
   AccordionItem,
-} from 'topclassui'
+} from 'topclassui/accordion'
 ```
 
 ## Props

@@ -17,6 +17,7 @@ const TRIGGERS: Record<string, string> = {
   'groups': 'Commands by group',
   'loading': 'Commands that are loading',
   'long-content': 'Every hostile case',
+  'load-more': 'Search results',
   'long-page': 'Jump to a section',
   'rtl': 'بحث',
   'ten-thousand': 'Ten thousand commands',

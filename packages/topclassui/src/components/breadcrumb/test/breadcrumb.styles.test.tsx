@@ -71,7 +71,7 @@ describe('every part carries exactly its own classes', () => {
 
   // A colour set on the svg itself is kept under forced colours; an inherited one is replaced.
   it('the separator is Svg\'s own classes and the rtl flip, with no colour of its own', () => {
-    const expected = ['inline-block', 'rtl:-scale-x-100', 'shrink-0']
+    const expected = ['inline-block', 'scale-x-(--tc-dir)', 'shrink-0']
     expect(classesOf(html(), 'svg', 0)).toEqual(expected)
     expect(classesOf(html(), 'svg', 1)).toEqual(expected)
   })
@@ -161,6 +161,6 @@ describe('className is passed last, so the consumer wins every conflict', () => 
     const out = html({ className: 'mt-4' })
     expect(classesOf(out, 'ol')).toEqual(['flex', 'flex-wrap', 'gap-2', 'items-center'])
     expect(classesOf(out, 'a')).toEqual(sorted(LINK))
-    expect(classesOf(out, 'svg')).toEqual(['inline-block', 'rtl:-scale-x-100', 'shrink-0'])
+    expect(classesOf(out, 'svg')).toEqual(['inline-block', 'scale-x-(--tc-dir)', 'shrink-0'])
   })
 })

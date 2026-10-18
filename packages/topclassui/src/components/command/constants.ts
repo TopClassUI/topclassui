@@ -13,4 +13,5 @@ export const COMMAND_DEFAULTS = {
   virtualize: 'auto',
   // The --tc-list-rows knob, which applies whenever the prop is left out.
   visibleRows: COLLECTION_DEFAULTS.visibleRows,
+  loadMoreThreshold: COLLECTION_DEFAULTS.loadMoreThreshold,
 } as const

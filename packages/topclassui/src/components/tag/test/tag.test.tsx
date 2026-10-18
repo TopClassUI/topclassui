@@ -53,7 +53,7 @@ describe('the design attributes', () => {
     expect(html()).not.toMatch(/data-(state|disabled|loading|open|removable)/)
   })
 
-  it('renders no button without onRemove, because the x is the client half', () => {
+  it('renders no button, because the x is TagRemovable, the client export', () => {
     expect(html()).not.toContain('<button')
   })
 })

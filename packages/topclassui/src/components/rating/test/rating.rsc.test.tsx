@@ -11,11 +11,11 @@ type Part = ((props: Props) => ReactNode) & { client?: string }
 /** What a bundler leaves of a 'use client' export on the server: a reference that is never called there. */
 const reference = (name: string): Part => Object.assign(() => { throw new Error(`${name} ran on the server`) }, { client: name })
 
-// client.tsx starts with 'use client', so the server only ever holds a reference to RatingField.
-vi.mock('../client.js', () => ({ RatingField: reference('RatingField') }))
+// client.tsx starts with 'use client', so the server only ever holds a reference to RatingField and RatingInput.
+vi.mock('../client.js', () => ({ RatingField: reference('RatingField'), RatingInput: reference('RatingInput') }))
 vi.mock('#shared/provider/provider.js', () => ({ TopClassProvider: reference('TopClassProvider') }))
 
-const { Rating } = await import('../index.js')
+const { Rating, RatingInput } = await import('../index.js')
 
 interface Crossing { part: string, props: Props }
 
@@ -102,5 +102,19 @@ describe('readOnly={false} renders the client half, handed only what can cross (
     expect(await parts('max-ten')).toEqual(['RatingField'])
     expect(await parts('sizes')).toEqual(['RatingField', 'RatingField'])
     expect(await parts('rtl')).toEqual(['TopClassProvider', 'RatingField'])
+  })
+})
+
+describe('RatingInput is the client export, re-exported by index.tsx', () => {
+  const found = crossings(<RatingInput aria-label="Stay" onValueChange={() => undefined} />)
+
+  it('reaches a server file as the client reference itself, never run there', () => {
+    expect((RatingInput as unknown as Part).client).toBe('RatingInput')
+    expect(found.map((crossing) => crossing.part)).toEqual(['RatingInput'])
+  })
+
+  // R-5.1-3: a server page can send it a function only as a Server Action, and the scan reports one.
+  it('takes onValueChange, the one prop a Server Component can send only as a Server Action', () => {
+    expect(found.flatMap(({ part, props }) => unserializable(props, part))).toEqual(['RatingInput.onValueChange'])
   })
 })

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 
 import { clamp } from '#shared/clamp.js'
 import { useCollection } from '#shared/collection/use-collection.js'
+import { COLLECTION_BOUNDARIES } from '#shared/contracts/collection.js'
 import { useCollectionDefaults, useLabels } from '#shared/provider/context.js'
 import { usePortalLocale } from '#shared/provider/use-portal-locale.js'
 import { useControllableState } from '#shared/use-controllable-state.js'
@@ -42,7 +43,7 @@ export function useCommand({
 /** The panel: the query and what it leaves, in the rows windowing mounts, with the active row kept
  * in view. Base UI moves the highlight over every match, mounted or not; this scrolls it in. */
 export function useCommandPanel(props: CommandPanelProps) {
-  const { items, getKey, getLabel, getGroup, onSelect, onOpenChange, virtualize, visibleRows } = props
+  const { items, getKey, getLabel, getGroup, onSelect, onOpenChange, onQueryChange, virtualize, visibleRows, status } = props
   const [query, setQuery] = useState('')
   // Base UI animates no dialog that mounts open: the panel mounts closed and opens a commit later, so it fades in.
   const [primed, setPrimed] = useState(false)
@@ -55,7 +56,23 @@ export function useCommandPanel(props: CommandPanelProps) {
 
   const filtered = useMemo(() => filterCommands(items, query, getLabel), [items, query, getLabel])
   const arranged = useMemo(() => arrangeCommands(filtered, getKey, getGroup), [filtered, getKey, getGroup])
-  const collection = useCollection({ items: arranged.entries, getKey: keyOfEntry, virtualize, estimateRowHeight: unit })
+  const rows = visibleRows === undefined
+    ? undefined
+    : clamp(visibleRows, COMMAND_BOUNDARIES.visibleRowsMin, COMMAND_BOUNDARIES.visibleRowsMax)
+  const loadMoreThreshold = clamp(props.loadMoreThreshold ?? COMMAND_DEFAULTS.loadMoreThreshold,
+    COLLECTION_BOUNDARIES.loadMoreThresholdMin, COLLECTION_BOUNDARIES.loadMoreThresholdMax)
+  // The entries hold the headings and only the matches: one page is asked per count of items loaded.
+  const collection = useCollection({
+    items: arranged.entries,
+    getKey: keyOfEntry,
+    virtualize,
+    estimateRowHeight: unit,
+    visibleRows: rows,
+    hasMore: (props.hasMore ?? false) && props.open,
+    loadMore: props.loadMore,
+    loadMoreThreshold,
+    loadedCount: items.length,
+  })
   const { scrollRef, scrollToIndex } = collection
 
   const ref = useCallback((node: HTMLDivElement | null) => {
@@ -94,8 +111,9 @@ export function useCommandPanel(props: CommandPanelProps) {
 
   const onValueChange = useCallback((next: string) => {
     setQuery(next)
+    onQueryChange?.(next)
     if (list.current) list.current.scrollTop = 0
-  }, [])
+  }, [onQueryChange])
 
   const select = useCallback((item: unknown) => {
     onOpenChange(false)
@@ -104,9 +122,6 @@ export function useCommandPanel(props: CommandPanelProps) {
 
   const windowed = collection.rows.map((row) => row.item)
   const mounted = collection.virtualized ? withActiveRow(windowed, arranged.entries, arranged.rowOfItem[active] ?? -1) : windowed
-  const rows = visibleRows === undefined
-    ? undefined
-    : clamp(visibleRows, COMMAND_BOUNDARIES.visibleRowsMin, COMMAND_BOUNDARIES.visibleRowsMax)
   const labels = useLabels()
 
   return {
@@ -126,6 +141,7 @@ export function useCommandPanel(props: CommandPanelProps) {
     listRef: ref,
     // Left out, the --tc-list-rows knob applies: React writes no style for an undefined value.
     rows,
+    busy: status === 'loading' || status === 'loading-more',
     labels: {
       title: labels.command.label,
       placeholder: labels.command.placeholder,

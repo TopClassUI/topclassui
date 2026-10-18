@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatBytes, matchesAccept, sortFiles } from '../lib.js'
+import { formatBytes, matchesAccept, sortFiles, spacerOf } from '../lib.js'
 
 const MB = 1024 * 1024
 /** A file of a given size, its bytes left unset: only the size and the type are read. */
@@ -118,5 +118,13 @@ describe('formatBytes', () => {
     expect(formatBytes(512 * 1024, 'ar', 'latn')).toBe('512 كيلوبايت')
     expect(formatBytes(2.4 * MB, 'ar', 'latn')).toBe('2.4 م.ب')
     expect(formatBytes(2.4 * MB, 'ar', 'arab')).toBe('٢٫٤ م.ب')
+  })
+})
+
+describe('spacerOf', () => {
+  it('a spacer is the left-out length less the one gap the grid adds after it, and none when nothing is left out', () => {
+    expect(spacerOf(420, 6)).toBe('414px')
+    expect(spacerOf(4, 6)).toBe('0px')
+    expect(spacerOf(0, 6)).toBeUndefined()
   })
 })

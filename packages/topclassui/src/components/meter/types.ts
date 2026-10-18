@@ -32,3 +32,6 @@ export type MeterProps =
   Omit<ComponentPropsWithRef<'div'>, Owned>
   & MeterDesignProps
   & MeterName
+
+/** Both ends and the value of a meter after the guard rail, `max` never below `min`. */
+export interface MeterRange { min: number; max: number; value: number }

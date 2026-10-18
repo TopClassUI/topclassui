@@ -12,7 +12,7 @@ For text longer than a line: a message, a bio, a note. It is a native `<textarea
 field look of Input, so it is server HTML, and a form sends what is typed with no script at all.
 
 ```tsx
-import { Textarea, TextareaSkeleton } from 'topclassui'
+import { Textarea, TextareaSkeleton } from 'topclassui/textarea'
 ```
 
 ```tsx
@@ -64,7 +64,7 @@ server Field posted with JavaScript off, and the same with `FormAction` and `Fie
 ## Import
 
 ```tsx
-import { Textarea } from 'topclassui'
+import { Textarea } from 'topclassui/textarea'
 ```
 
 ## Props

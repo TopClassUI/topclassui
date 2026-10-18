@@ -16,6 +16,7 @@ const AFTER: Record<string, string[]> = {
   'basic': ['Saudi Arabia'],
   'form': ['Morocco'],
   'four-rows': ['December'],
+  'load-more': ['Result 20'],
   'long-content': ['Southern office'],
   'phase-4-form': ['Morocco'],
   'rtl': ['السعودية'],
