@@ -40,6 +40,20 @@ async function openIn(page: Page, path: string, mode: string) {
 const card = (page: Page, slug: string) => page.locator(`[data-component="${slug}"]`)
 const popup = (page: Page, slug: (typeof SLUGS)[number]) => page.locator(POPUP[slug]).last()
 
+/** Waits until nothing animates in the popup's portal, as the library's e2e does: axe reads a fading popup as low contrast. */
+async function atRest(target: Locator): Promise<void> {
+  await target.evaluate(async (element) => {
+    const layer = element.closest('[data-base-ui-portal]') ?? element
+    const running = () => layer.getAnimations({ subtree: true }).filter((animation) => {
+      const end = animation.effect?.getComputedTiming().endTime
+      return animation.playState === 'running' && typeof end === 'number' && Number.isFinite(end)
+    })
+    for (let pending = running(); pending.length > 0; pending = running()) {
+      await Promise.allSettled(pending.map((animation) => animation.finished))
+    }
+  })
+}
+
 const stage = (page: Page, slug: string) => card(page, slug).locator('[style*="--tc-stage-height"]')
 
 /** A tooltip opens on hover; every other overlay on a press. The trigger sits mid-screen, so a popup has room on every side. */
@@ -71,6 +85,7 @@ for (const slug of SLUGS) {
 
         await drive(slug, stage(page, slug).locator('button').first())
         await expect(popup(page, slug)).toBeVisible()
+        await atRest(popup(page, slug))
         expect(await popup(page, slug).evaluate((element) => getComputedStyle(element).direction)).toBe(dir)
         const open = await new AxeBuilder({ page }).include(POPUP[slug]).analyze()
         expect(open.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([])
