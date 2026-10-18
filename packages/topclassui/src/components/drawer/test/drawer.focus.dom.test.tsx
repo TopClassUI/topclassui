@@ -49,12 +49,24 @@ async function open() {
 const closed = () => waitFor(() => { expect(sheet()).toBeNull() })
 
 describe('focus', () => {
-  // Base UI's Drawer starts on the popup, where its Dialog starts on the first control: no ring on a control nobody chose.
-  it('moves to the sheet itself, not to a control in it and not to the x', async () => {
+  // Base UI's Drawer starts on the popup; ours starts as its Dialog does (APG: the first focusable element).
+  it('moves to the first control of the sheet, not to the sheet itself and not to the x', async () => {
     render(<Publish />)
     const popup = await open()
-    expect(document.activeElement).toBe(popup)
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Cancel' }))
     expect(popup.getAttribute('tabindex')).toBe('-1')
+  })
+
+  it('keeps the caller ref on the sheet while it moves the first focus', async () => {
+    const ref = { current: null as HTMLDivElement | null }
+    render(
+      <DrawerRoot defaultOpen>
+        <DrawerPopup ref={ref}><DrawerTitle>Ref</DrawerTitle><DrawerClose>First</DrawerClose></DrawerPopup>
+      </DrawerRoot>,
+    )
+    const popup = await screen.findByRole('dialog')
+    expect(ref.current).toBe(popup)
+    await waitFor(() => { expect(document.activeElement?.textContent).toBe('First') })
   })
 
   it('finds the x last when the sheet is walked: it is the last element of the popup, after the footer', async () => {
@@ -97,7 +109,7 @@ describe('focus', () => {
   })
 
   // A boolean crosses from a server page, where a function or a ref cannot.
-  it('starts on the first control with initialFocus alone, as a Dialog does: the remedy the README gives', async () => {
+  it('starts on the first control with initialFocus alone too, as a Dialog does', async () => {
     render(
       <DrawerRoot defaultOpen>
         <DrawerPopup initialFocus>

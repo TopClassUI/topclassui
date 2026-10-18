@@ -4,7 +4,9 @@ import type { Mutation } from '../lib/mutate.js'
 const CLIENT = 'src/components/dropdown/client.tsx'
 const CLASSES = 'src/components/dropdown/classes.ts'
 const HOOK = 'src/components/dropdown/hook.ts'
-const LIB = 'src/components/dropdown/lib.tsx'
+const LIB = 'src/components/dropdown/lib.ts'
+const ROW = 'src/components/dropdown/parts/dropdown-row.tsx'
+const LINK = 'src/shared/link.tsx'
 
 export const MUTATIONS: Mutation[] = [
   {
@@ -33,15 +35,15 @@ export const MUTATIONS: Mutation[] = [
   },
   {
     label: 'a dropdown link element delivered by Flight as a lazy wrapper is not unwrapped, and the menu throws',
-    file: LIB,
+    file: LINK,
     from: 'Children.toArray(link as ReactNode)[0]',
     to: 'link',
   },
   {
     label: 'a dropdown link row keeps the empty children key of renderLink, which erases its label',
-    file: LIB,
-    from: "return renderTrigger(renderLink('DropdownMenu', unwrapped as ReactElement | undefined, href, {}), undefined).render",
-    to: "return renderLink('DropdownMenu', unwrapped as ReactElement | undefined, href, {})",
+    file: LINK,
+    from: 'return renderTrigger(renderLink(component, unwrapped as ReactElement | undefined, href, {}), undefined).render',
+    to: 'return renderLink(component, unwrapped as ReactElement | undefined, href, {})',
   },
   {
     label: 'the dropdown link item no longer closes the menu on a press, so a client-side navigation leaves it open',
@@ -64,8 +66,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dropdown root never shares its scope with its menu, so the guard finds no menu of its own',
     file: CLIENT,
-    from: '<DropdownScopeContext value={scope}>',
-    to: '<DropdownScopeContext value="">',
+    from: '<Context value={scope}>',
+    to: '<Context value="">',
   },
   {
     label: 'the dropdown menu writes its scope under another attribute than the one its guard looks for',
@@ -106,13 +108,13 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dropdown forgets the shared side offset, so the menu touches its trigger',
     file: CLIENT,
-    from: '        sideOffset={POPUP_BOUNDS.sideOffset}\n',
+    from: '        sideOffset={FLOATING.sideOffset}\n',
     to: '',
   },
   {
     label: "the dropdown falls back to Base UI's 5 px collision padding instead of the shared 8",
     file: CLIENT,
-    from: '        collisionPadding={POPUP_BOUNDS.collisionPadding}\n',
+    from: '        collisionPadding={FLOATING.collisionPadding}\n',
     to: '',
   },
   {
@@ -148,13 +150,13 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dropdown menu grows to the width of the screen for one long label',
     file: CLASSES,
-    from: 'max-w-[min(calc(var(--spacing)*80),var(--available-width))]',
-    to: 'max-w-(--available-width)',
+    from: 'max-w-[min(calc(var(--spacing)*80),round(down,var(--available-width),1px))]',
+    to: 'max-w-[round(down,var(--available-width),1px)]',
   },
   {
     label: 'the dropdown menu keeps 12rem at a doubled text size, wider than a phone',
     file: CLASSES,
-    from: 'min-w-[min(calc(var(--spacing)*48),var(--available-width))]',
+    from: 'min-w-[min(calc(var(--spacing)*48),round(down,var(--available-width),1px))]',
     to: 'min-w-48',
   },
   {
@@ -166,8 +168,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a dropdown link item drops the colour of its tone, so a destructive link looks like any other',
     file: CLIENT,
-    from: '<Base.LinkItem closeOnClick {...rest} data-tone={tone} className={cn(DROPDOWN_ITEM, DROPDOWN_ITEM_TONE[tone], className)}>',
-    to: '<Base.LinkItem closeOnClick {...rest} data-tone={tone} className={cn(DROPDOWN_ITEM, className)}>',
+    from: 'cn(DROPDOWN_ITEM, DROPDOWN_ITEM_TONE[tone], className))\n  return (\n    <Base.LinkItem',
+    to: 'cn(DROPDOWN_ITEM, className))\n  return (\n    <Base.LinkItem',
   },
   {
     label: 'a dropdown shortcut keeps its width beside a label it cuts, so at a doubled text size a row loses its name',
@@ -231,7 +233,7 @@ export const MUTATIONS: Mutation[] = [
   },
   {
     label: 'the dropdown icon is read out with the label',
-    file: LIB,
+    file: ROW,
     from: '<span aria-hidden="true" className={DROPDOWN_ICON}>',
     to: '<span className={DROPDOWN_ICON}>',
   },

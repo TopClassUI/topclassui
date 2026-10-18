@@ -23,7 +23,7 @@ type BaseRoot = Base.Root.Props<string, false, ListOption>
 
 /** Ours to set, or not offered: one value, a windowed list, options as data. */
 type RootOwned =
-  | 'multiple' | 'virtualized' | 'filteredItems' | 'grid' | 'inline' | 'limit' | 'itemToStringLabel'
+  | 'className' | 'multiple' | 'virtualized' | 'filteredItems' | 'grid' | 'inline' | 'limit' | 'itemToStringLabel'
   | 'itemToStringValue' | 'isItemEqualToValue' | 'children' | 'items' | 'value' | 'defaultValue' | 'onValueChange'
 
 /** What reaches Base UI's root. Every other prop reaches the input. */
@@ -43,16 +43,16 @@ export type ComboboxProps = ComboboxRootProps & InputProps & ComboboxDesignProps
   value?: string | null | undefined
   /** The value the page opens on, and the one a form reset returns to. */
   defaultValue?: string | null | undefined
-  /** Called with the value of the chosen option, or null when the choice is cleared. */
+  /** Called with the value of the chosen option, or null when the choice is cleared. Client-only. */
   onValueChange?: ((value: string | null, details: ComboboxChangeDetails) => void) | undefined
-  /** Called with no argument when the list nears its end while hasMore is set. Never while it is closed. */
+  /** Called with no argument when the list nears its end while hasMore is set, never while closed. Client-only, or a Server Action. */
   loadMore?: (() => void | Promise<void>) | undefined
   /** What an empty list says, in place of labels.collection.noResults. */
   emptyFallback?: ReactNode | undefined
   /** Where the list mounts; the body when left out. */
   container?: Base.Portal.Props['container']
   /** Keeps the list mounted while it is closed. */
-  keepMounted?: boolean | undefined
+  keepMounted?: Base.Portal.Props['keepMounted']
   /** On the input, merged last. */
   className?: string | undefined
   /** The visible input. */

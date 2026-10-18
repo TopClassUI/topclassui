@@ -59,6 +59,8 @@ export interface Labels {
     readonly browse: string
     readonly remove: string
     readonly tooMany: CountLabel
+    /** After the first refused names, the count of the rest, so ten thousand refusals are not all read out. */
+    readonly refusedMore: CountLabel
     /** The reasons on a rejected file's row, beside its name. */
     readonly tooLarge: string
     readonly wrongType: string
@@ -147,4 +149,11 @@ export interface Labels {
 /** Only the keys a consumer wants to change; everything else keeps its default. */
 export type PartialLabels = {
   readonly [K in keyof Labels]?: Partial<Labels[K]>
+}
+
+/** The overrides a server layout can hand the provider: strings only, since a count label is a function (R-5.1-3). */
+export type ProviderLabels = {
+  readonly [K in keyof Labels]?: {
+    readonly [P in keyof Labels[K] as Labels[K][P] extends string ? P : never]?: Labels[K][P]
+  }
 }

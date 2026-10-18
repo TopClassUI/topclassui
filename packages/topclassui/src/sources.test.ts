@@ -13,6 +13,7 @@ const ROOT = process.cwd()
 const SRC = join(ROOT, 'src')
 
 let scanned: string[] = []
+let negated: string[] = []
 
 beforeAll(async () => {
   const compiled = await compileEntry()
@@ -20,6 +21,7 @@ beforeAll(async () => {
   scanned = compiled.sources
     .filter((s) => !s.negated)
     .map((s) => resolve(s.base, s.pattern.replace(/[/\\]?\*.*$/, '')))
+  negated = compiled.sources.filter((s) => s.negated).map((s) => s.pattern)
 })
 
 /** A directive names a directory, so anything under one of them is scanned too. */
@@ -45,10 +47,18 @@ describe('@source reaches every folder that writes classes', () => {
     expect(scanned.length).toBeGreaterThan(0)
   })
 
-  it('covers components, connectors and shared by name', () => {
-    for (const name of ['components', 'connectors', 'shared']) {
+  it('covers components and shared by name', () => {
+    for (const name of ['components', 'shared']) {
       expect(covered(join(SRC, name)), name).toBe(true)
     }
+  })
+
+  it('names no folder a consumer does not get, such as connectors, which hold only a README', () => {
+    expect(covered(join(SRC, 'connectors'))).toBe(false)
+  })
+
+  it('tells Tailwind to skip the declaration files dist holds beside each .js', () => {
+    expect(negated).toEqual(['./**/*.d.ts'])
   })
 
   it('covers every folder under src that actually writes classes', () => {

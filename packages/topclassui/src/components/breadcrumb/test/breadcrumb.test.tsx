@@ -160,7 +160,7 @@ describe('the separator', () => {
 
   it('is flipped under dir="rtl", because a caret points along the trail', () => {
     for (const svg of tags(html(), 'svg')) {
-      expect((attr(svg, 'class') ?? '').split(' ')).toContain('rtl:-scale-x-100')
+      expect((attr(svg, 'class') ?? '').split(' ')).toContain('scale-x-(--tc-dir)')
     }
   })
 })

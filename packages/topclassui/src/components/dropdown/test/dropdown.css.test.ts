@@ -17,8 +17,8 @@ const DECLARATION: Record<string, string> = {
   'gap-0.5': 'gap: calc(var(--spacing) * 0.5);',
   'p-1.5': 'padding: calc(var(--spacing) * 1.5);',
   'wrap-anywhere': 'overflow-wrap: anywhere;',
-  'min-w-[min(calc(var(--spacing)*48),var(--available-width))]': 'min-width: min(calc(var(--spacing) * 48), var(--available-width));',
-  'max-w-[min(calc(var(--spacing)*80),var(--available-width))]': 'max-width: min(calc(var(--spacing) * 80), var(--available-width));',
+  'min-w-[min(calc(var(--spacing)*48),round(down,var(--available-width),1px))]': 'min-width: min(calc(var(--spacing) * 48), round(down, var(--available-width), 1px));',
+  'max-w-[min(calc(var(--spacing)*80),round(down,var(--available-width),1px))]': 'max-width: min(calc(var(--spacing) * 80), round(down, var(--available-width), 1px));',
   'max-h-[min(var(--available-height,100dvh),calc(var(--tc-list-rows)*var(--tc-row-height)))]':
     'max-height: min(var(--available-height,100dvh), calc(var(--tc-list-rows) * var(--tc-row-height)));',
   'overflow-y-auto': 'overflow-y: auto;',

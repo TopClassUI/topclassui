@@ -87,7 +87,7 @@ describe('no columns', () => {
   it('renders no header cell and asks for no key', () => {
     const getKey = vi.fn(() => '1')
     const html_ = html({ items: [layla], columns: [], getKey })
-    expect(html_).toContain('<thead><tr></tr></thead>')
+    expect(html_).toMatch(/<thead class="[^"]*"><tr><\/tr><\/thead>/)
     expect(getKey).not.toHaveBeenCalled()
   })
 })

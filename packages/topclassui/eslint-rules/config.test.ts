@@ -1,4 +1,5 @@
 // The rules existing is not the same as the project arming them, and nothing else checks it.
+import { ESLint } from 'eslint'
 import { describe, expect, it } from 'vitest'
 
 import config from '../eslint.config.js'
@@ -17,8 +18,8 @@ describe('eslint.config.ts arms the custom rules', () => {
     expect(src).toBeDefined()
   })
 
-  it('declares thirteen rules, so a new one cannot be forgotten silently', () => {
-    expect(RULE_NAMES).toHaveLength(13)
+  it('declares twenty-one rules, so a new one cannot be forgotten silently', () => {
+    expect(RULE_NAMES).toHaveLength(21)
   })
 
   for (const name of RULE_NAMES) {
@@ -45,13 +46,48 @@ describe('eslint.config.ts arms the custom rules', () => {
     const off = exempt.flatMap((b) =>
       Object.entries(b.rules ?? {}).filter(([r, l]) => r.startsWith('topclass/') && l === 'off').map(([r]) => r))
     // Each of these rules is written "inside src/", and a test or a demo is inside src/:
-    // one has to write the banned string to prove the rule, the other to show real usage.
+    // one has to write the banned string to prove the rule, the other to show real usage;
+    // a type test compares against Base UI's raw props.
     expect([...new Set(off)].sort()).toEqual([
       'topclass/logical-properties-only',
+      'topclass/no-fetch-in-components',
+      'topclass/no-physical-placement',
+      'topclass/props-derived-at-the-seam',
       'topclass/semantic-classes-only',
       'topclass/shared-class-constants',
       'topclass/style-sets-tokens-only',
       'topclass/text-comes-from-labels',
     ])
+  })
+
+  // R-5.2-6 has no "inside src/" clause, so the files outside src/ that carry className follow it too.
+  for (const file of ['e2e/fixtures/accordion.tsx', 'e2e/axe.spec.ts', 'scripts/build-harness.tsx']) {
+    it(`arms bare-data-variants on ${file}`, async () => {
+      const resolved = (await new ESLint({ cwd: import.meta.dirname + '/..' }).calculateConfigForFile(file)) as Entry
+      expect(resolved.rules?.['topclass/bare-data-variants'], file).toEqual([2])
+    })
+  }
+
+  it('leaves the injected broken source of scripts/mutations unlinted for it', async () => {
+    const resolved = (await new ESLint({ cwd: import.meta.dirname + '/..' }).calculateConfigForFile('scripts/mutations/x.ts')) as Entry
+    expect(resolved.rules?.['topclass/bare-data-variants']).toBeUndefined()
+  })
+})
+
+describe('R-5.3-4: the placement exemption stops at the rejection tests', () => {
+  it('turns no-physical-placement off in one block, for the schema and toast contract tests only', () => {
+    const off = blocks.filter((b) => b.rules?.['topclass/no-physical-placement'] === 'off').map((b) => b.files)
+    expect(off).toEqual([['src/**/*.schema.test.ts', 'src/shared/contracts/toast.test.ts']])
+  })
+
+  it('keeps R-8.5-2 on for demos, which ship', () => {
+    const dummy = blocks.filter((b) => (b.files ?? []).some((f) => f.includes('dummy')))
+    expect(dummy.map((b) => b.rules?.['topclass/no-fetch-in-components'])).toEqual([undefined])
+  })
+
+  it('lets the Banner store, and only it, use localStorage', () => {
+    const allowing = blocks.filter((b) => Array.isArray(b.rules?.['topclass/no-fetch-in-components']))
+    expect(allowing.map((b) => b.files)).toEqual([['src/components/banner/hook.ts']])
+    expect(allowing[0]?.rules?.['topclass/no-fetch-in-components']).toEqual(['error', { allow: ['localStorage'] }])
   })
 })

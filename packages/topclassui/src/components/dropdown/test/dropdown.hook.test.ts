@@ -72,18 +72,16 @@ describe('hook.ts holds what the parts read from React and the provider (R-5.12-
   })
 })
 
-describe('lib.tsx is pure, and classes.ts builds every string from the shared constants (R-5.2-4)', () => {
-  it('lib.tsx imports no hook: what it takes from React builds and reads elements', () => {
-    expect(importedNames(read('lib.tsx'), 'react')).toEqual(['Children', 'isValidElement', 'ReactElement', 'ReactNode'])
-    expect(hookCallsIn(parse(read('lib.tsx')))).toEqual([])
-    expect(hasUseClient(read('lib.tsx'))).toBe(false)
+describe('lib.ts is pure, and classes.ts builds every string from the shared constants (R-5.2-4)', () => {
+  it('lib.ts imports nothing from React and calls no hook', () => {
+    expect(importedNames(read('lib.ts'), 'react')).toEqual([])
+    expect(hookCallsIn(parse(read('lib.ts')))).toEqual([])
+    expect(hasUseClient(read('lib.ts'))).toBe(false)
   })
 
-  it('lib.tsx takes the link, the trigger and the label helpers from src/shared', () => {
-    const source = read('lib.tsx')
-    expect(importedNames(source, '#shared/link.js')).toEqual(['renderLink'])
-    expect(importedNames(source, '#shared/render-trigger.js')).toEqual(['renderTrigger'])
-    expect(importedNames(source, '#shared/truncate-label.js')).toEqual(['truncateLabel'])
+  it('the row part takes the label helper from src/shared, and client.tsx the link', () => {
+    expect(importedNames(read('parts/dropdown-row.tsx'), '#shared/truncate-label.js')).toEqual(['truncateLabel'])
+    expect(importedNames(read('client.tsx'), '#shared/link.js')).toEqual(['toLinkElement'])
   })
 
   it('classes.ts takes the row, its highlight, its touch floor, the cap, the surface, the motion, the scroll area and the inset ring from src/shared', () => {

@@ -1,5 +1,5 @@
 // R-5.12-4: one class string per element Popover styles, built from the shared overlay constants.
-import { FOCUS_RING_INSET, HOVER, ICON_BUTTON, OVERLAY_SURFACE, POPUP_MOTION, SCROLL_AREA } from '#shared/classes.js'
+import { FOCUS_RING_INSET, HOVER, ICON_BUTTON, OVERLAY_SURFACE, POPUP_BOUNDS, POPUP_MOTION, SCROLL_AREA } from '#shared/classes.js'
 
 /** Above the page, and hidden once its trigger scrolls out of view (PLAN 10.5). */
 export const POPOVER_POSITIONER = 'z-(--tc-z-popup) data-anchor-hidden:invisible'
@@ -8,7 +8,8 @@ export const POPOVER_POSITIONER = 'z-(--tc-z-popup) data-anchor-hidden:invisible
  * Base UI measured beside its trigger: it shrinks to it and scrolls inside. A word too long for
  * its width breaks, and its ring is drawn inside its box, which sits 6 px from the trigger. */
 export const POPOVER_POPUP = [
-  'flex w-70 max-w-(--available-width) max-h-(--available-height) flex-col gap-3 p-4 text-sm wrap-anywhere',
+  'flex w-70 flex-col gap-3 p-4 text-sm wrap-anywhere',
+  POPUP_BOUNDS,
   // A flex item gives up its height before its container scrolls: a 32 px action was squeezed to 24.
   '*:shrink-0',
   SCROLL_AREA,

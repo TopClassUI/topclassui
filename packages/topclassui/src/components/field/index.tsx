@@ -4,7 +4,8 @@ import { useId } from 'react'
 // Named here as well, so a consumer program that never compiles shared/ gets the --tc-* keys.
 import type {} from '#shared/style-tokens.js'
 import { FIELD_DEFAULTS } from './constants.js'
-import { messagesOf, renderField, toFieldIds } from './lib.js'
+import { messagesOf, toFieldIds } from './lib.js'
+import { FieldFrame } from './parts/field-frame.js'
 import type { FieldProps } from './types.js'
 
 /** A label, a hint and an error wired to the control its child renders: `{(control) => <Input {...control} />}`. */
@@ -13,9 +14,14 @@ export function Field({
 }: FieldProps) {
   const generated = useId()
   const messages = messagesOf(error)
-  return renderField({
-    ids: toFieldIds(id ?? generated), name, label, hint, messages, invalid: invalid ?? messages.length > 0, required, inline, children, root,
-  })
+  return (
+    <FieldFrame
+      ids={toFieldIds(id ?? generated)} name={name} label={label} hint={hint} messages={messages}
+      invalid={invalid ?? messages.length > 0} required={required} inline={inline} root={root}
+    >
+      {children}
+    </FieldFrame>
+  )
 }
 
 export { FieldLive } from './client.js'
