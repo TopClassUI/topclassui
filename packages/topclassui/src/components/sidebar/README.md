@@ -12,7 +12,8 @@ For the links of an app, in a rail beside the page that collapses to a column of
 Every link is in the HTML the server sends; only the rail and its toggle run in the browser.
 
 ```ts
-import { Icon, SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoot } from 'topclassui'
+import { Icon } from 'topclassui/icon'
+import { SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoot } from 'topclassui/sidebar'
 ```
 
 ```tsx
@@ -96,7 +97,7 @@ import {
   SidebarBody,
   SidebarGroup,
   SidebarLink,
-} from 'topclassui'
+} from 'topclassui/sidebar'
 ```
 
 ## Props

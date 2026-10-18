@@ -12,7 +12,7 @@ For the bar at the top of a site: the brand, the main links and one or two actio
 stays in view while the page scrolls, and every link is a real anchor in the server HTML.
 
 ```ts
-import { NavbarActions, NavbarBrand, NavbarLink, NavbarLinks, NavbarRoot } from 'topclassui'
+import { NavbarActions, NavbarBrand, NavbarLink, NavbarLinks, NavbarRoot } from 'topclassui/navbar'
 ```
 
 ```tsx
@@ -101,7 +101,7 @@ import {
   NavbarLinks,
   NavbarLink,
   NavbarActions,
-} from 'topclassui'
+} from 'topclassui/navbar'
 ```
 
 ## Props
