@@ -41,6 +41,7 @@ export default defineConfig(
       'topclass/tooltip-content-is-text': 'error',
       'topclass/client-shape': 'error',
       'topclass/props-derived-at-the-seam': 'error',
+      'topclass/cn-class-name-last': 'error',
 
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/ban-ts-comment': 'error',
