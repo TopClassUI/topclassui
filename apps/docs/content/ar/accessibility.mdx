@@ -1,0 +1,94 @@
+---
+slug: accessibility
+title: إمكانية الوصول
+description: الهدف هو WCAG 2.2 AA. تعرض هذه الصفحة ما تفحصه الآلة، وما يفحصه الإنسان، وما لم يُغطَّ بعد.
+---
+
+import { FOCUS_RING, TOUCH_TARGET } from 'topclassui/classes'
+
+## التباين
+
+يُقاس التباين من القيم الحقيقية لمتغيّرات التصميم في كل وضع، كجزء من البناء. وكل قيمة تقع ضمن <span dir="ltr">0.15</span> من الحد تُعدّ راسبة.
+
+| العنصر | الحد الأدنى |
+|---|---|
+| النص الأساسي والنص الخافت | <span dir="ltr">4.5:1</span> |
+| نص النبرة فوق صبغتها الخفيفة | <span dir="ltr">4.5:1</span> |
+| حدود عنصر التحكم، على كل سطح يمكن أن يوضع عليه | <span dir="ltr">3:1</span> |
+| حلقة التركيز | <span dir="ltr">3:1</span> |
+| الأيقونات التي تحمل معنى | <span dir="ltr">3:1</span> |
+
+## حجم الهدف
+
+لا يقل أي عنصر تفاعلي عن <span dir="ltr">24 × 24</span> بكسل <span dir="ltr">CSS</span>، ويكبر إلى 44 مع مؤشر اللمس وغيره من المؤشرات غير الدقيقة.
+
+```tsx check title="save-button.tsx"
+import { TOUCH_TARGET } from 'topclassui/classes'
+
+export function SaveButton() {
+  return <button type="button" className={TOUCH_TARGET}>حفظ</button>
+}
+```
+
+الصنف المشترك الذي يحمله كل عنصر تحكم، ويمكن أن تحمله عناصر التحكم الخاصة بك أيضًا. قيمته: <span dir="ltr"><code>{TOUCH_TARGET}</code></span>
+
+## لكل سحب مسار عبر لوحة المفاتيح
+
+<span dir="ltr">WCAG 2.5.7</span>. يستجيب <span dir="ltr">`Slider`</span> لمفاتيح الأسهم. ويعرض كلٌّ من <span dir="ltr">`Drawer`</span> و<span dir="ltr">`Toast`</span> زر إغلاق دائمًا.
+
+## التركيز ظاهر دائمًا
+
+حلقة تركيز واحدة على كل عنصر تحكم: إطار <span dir="ltr">CSS</span> خارجي (<span dir="ltr">outline</span>) مع إزاحة، فتُظهر الفجوة الخلفية الحقيقية على أي سطح. ويبلغ <span dir="ltr">`--tc-ring`</span> تباين <span dir="ltr">3:1</span> على كل سطح.
+
+```tsx check title="home-link.tsx"
+import { FOCUS_RING } from 'topclassui/classes'
+
+export function HomeLink() {
+  return <a href="/ar" className={FOCUS_RING}>الرئيسية</a>
+}
+```
+
+قيمته: <span dir="ltr"><code>{FOCUS_RING}</code></span>
+
+## الأنواع تفرض التسميات
+
+يحتاج <span dir="ltr">`Input`</span> خارج <span dir="ltr">`Field`</span> إلى <span dir="ltr">`id`</span> أو <span dir="ltr">`aria-label`</span> أو <span dir="ltr">`aria-labelledby`</span>، ويرفض <span dir="ltr">TypeScript</span> أي حقل بدونها.
+
+<WrongRight>
+
+```tsx
+<Input placeholder="البريد الإلكتروني" />
+// Type error: id, aria-label or aria-labelledby is required
+```
+
+```tsx check
+import { Field } from 'topclassui/field'
+import { Input } from 'topclassui/input'
+
+export function Email() {
+  return (
+    <Field name="email" label="البريد الإلكتروني">
+      {(control) => <Input {...control} type="email" />}
+    </Field>
+  )
+}
+```
+
+</WrongRight>
+
+## الفحص الآلي والفحص اليدوي
+
+| الفحص | الطريقة | التوقيت |
+|---|---|---|
+| التباين | <span dir="ltr">`check-contrast.ts`</span> | في كل تشغيل لـ <span dir="ltr">`pnpm check`</span> |
+| <span dir="ltr">ARIA</span> والأدوار | <span dir="ltr">axe-core</span> في كل مثال | في كل تشغيل لـ <span dir="ltr">`pnpm check`</span> |
+| حجم الهدف | اختبار في المتصفح يقيس كل عنصر قابل للتركيز | في كل تشغيل لـ <span dir="ltr">`pnpm check`</span> |
+| سلوك لوحة المفاتيح | اختبار لكل مكوّن تفاعلي، وفق ممارسات <span dir="ltr">ARIA</span> للتأليف (<span dir="ltr">ARIA Authoring Practices</span>) | في كل تشغيل لـ <span dir="ltr">`pnpm check`</span> |
+| قارئ الشاشة | <span dir="ltr">NVDA</span> و<span dir="ltr">VoiceOver</span>، يدويًا | قبل كل إصدار |
+| الألوان القسرية | وضع التباين العالي في <span dir="ltr">Windows</span>، يدويًا | قبل كل إصدار |
+
+## الثغرات المعروفة
+
+يُقاس التباين في كل بناء. وتُفحص <span dir="ltr">axe</span> وحجم الهدف وحلقة التركيز والنص الطويل داخل عنصر التحكم في متصفح حقيقي على كل مثال، في 3 أوضاع واتجاهين، وللمكوّنات التفاعلية اختبارات للوحة المفاتيح. أما قارئات الشاشة (<span dir="ltr">NVDA</span> و<span dir="ltr">VoiceOver</span>) والألوان القسرية فتُفحص يدويًا، ولم يُنجز ذلك بعد.
+
+<Callout tone="warning">وضع الألوان القسرية فحص يدوي. فالتخطيط الذي يعتمد على تعبئة الخلفيات يختفي فيه، لذلك يُرسم كل مكوّن بحدود.</Callout>
