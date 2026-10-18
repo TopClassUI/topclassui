@@ -33,8 +33,7 @@ so a screen reader moves through it by row and by column.
 - **Leave a column out** with `isAdmin && { ... }`: false, null and undefined entries are skipped.
 - **`getKey` returns a string**: write `String(row.id)` for a numeric id.
 - **No items** shows one row with `emptyFallback`, or "Nothing here yet" from `labels`. A fallback wider than the box starts at its edge and the rest is reached by scrolling.
-- **One page at a time.** Table renders the `items` it is given; Pagination moves between pages, or `hasMore` and `loadMore` (a Server Action) ask for the next page as the box nears its end. See `dummy/load-more.tsx`.
-- **Seven rows, then the box scrolls** under a sticky header: `visibleRows` (1 to 20) or the `--tc-list-rows` knob. Above 200 rows the body windows, so only the rows in view are mounted and the table still counts every row for a screen reader; `virtualize={false}` keeps every row in the HTML. See `dummy/ten-thousand.tsx`.
+- **One page at a time.** Table renders the `items` it is given; Pagination moves between pages.
 
 ## Sticky first column
 
@@ -113,10 +112,12 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/empty.tsx`
 - `dummy/in-a-layout.tsx`
 - `dummy/load-more.tsx`
+- `dummy/playground.tsx`
 - `dummy/row-actions.tsx`
 - `dummy/rtl.tsx`
 - `dummy/skeleton.tsx`
 - `dummy/sorted.tsx`
+- `dummy/states.tsx`
 - `dummy/sticky-first-column.tsx`
 - `dummy/striped.tsx`
 - `dummy/ten-thousand.tsx`

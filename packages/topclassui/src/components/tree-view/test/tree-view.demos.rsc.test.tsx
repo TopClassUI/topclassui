@@ -56,7 +56,7 @@ const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { 
 
 describe('every server demo only hands the TreeView what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'load-more', 'long-content', 'rtl', 'selected', 'status', 'ten-thousand'])
+    expect(names).toEqual(['basic', 'load-more', 'long-content', 'playground', 'rtl', 'selected', 'states', 'status', 'ten-thousand'])
   })
 
   for (const name of names.filter((one) => !CLIENT.includes(one))) {
