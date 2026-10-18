@@ -7,7 +7,8 @@ export function lastCommitDate(paths: string[], cwd: string): string | null {
   const tracked = paths.filter((p) => existsSync(p))
   if (tracked.length === 0) return null
   const out = execFileSync('git', ['log', '-1', '--format=%cI', '--', ...tracked], { cwd, encoding: 'utf8' }).trim()
-  return out === '' ? null : out
+  // git writes UTC as +00:00 on Linux and as Z on Windows; one spelling keeps the pages and the sitemap byte-identical.
+  return out === '' ? null : new Date(out).toISOString()
 }
 
 /** The newest of several ISO dates, compared as instants because the offsets may differ. */

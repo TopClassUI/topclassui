@@ -12,7 +12,8 @@ import { type ComponentsFile, generatedProblems } from './lib/shape.js'
 
 const APP = resolve(import.meta.dirname, '..')
 const out = mkdtempSync(join(tmpdir(), 'docs-data-'))
-const run = spawnSync(join(APP, 'node_modules', '.bin', 'tsx'), ['scripts/docs-data.ts', '--out', out], { cwd: APP, encoding: 'utf8' })
+// node runs tsx's own entry: the .bin shim is a shell script that Windows cannot start without a shell.
+const run = spawnSync(process.execPath, [join(APP, 'node_modules', 'tsx', 'dist', 'cli.mjs'), 'scripts/docs-data.ts', '--out', out], { cwd: APP, encoding: 'utf8' })
 const log = `${run.stdout}${run.stderr}`
 const read = (file: string) => readFileSync(join(out, file), 'utf8')
 const components = JSON.parse(read('components.json')) as ComponentsFile

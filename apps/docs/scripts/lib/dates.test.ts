@@ -28,11 +28,11 @@ describe('lastCommitDate', () => {
   const dir = repoWithTwoCommits()
 
   it('returns the commit date of the newest commit that touched the path', () => {
-    expect(lastCommitDate([join(dir, 'a.mdx')], dir)).toBe('2026-01-02T03:04:05+00:00')
+    expect(lastCommitDate([join(dir, 'a.mdx')], dir)).toBe('2026-01-02T03:04:05.000Z')
   })
 
   it('takes the newest over several paths', () => {
-    expect(lastCommitDate([join(dir, 'a.mdx'), join(dir, 'b.mdx')], dir)).toBe('2026-02-03T04:05:06+00:00')
+    expect(lastCommitDate([join(dir, 'a.mdx'), join(dir, 'b.mdx')], dir)).toBe('2026-02-03T04:05:06.000Z')
   })
 
   it('returns null for a path that does not exist or was never committed', () => {
