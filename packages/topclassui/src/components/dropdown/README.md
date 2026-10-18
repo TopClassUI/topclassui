@@ -15,7 +15,7 @@ Anything that is not a row (a field, a paragraph) goes in a Popover.
 import {
   DropdownGroup, DropdownGroupLabel, DropdownItem, DropdownLinkItem, DropdownMenu, DropdownPopup, DropdownRoot,
   DropdownSeparator, DropdownTrigger,
-} from 'topclassui'
+} from 'topclassui/dropdown'
 ```
 
 ```tsx
@@ -157,7 +157,7 @@ import {
   DropdownPopup,
   DropdownSeparator,
   DropdownTrigger,
-} from 'topclassui'
+} from 'topclassui/dropdown'
 ```
 
 ## Props

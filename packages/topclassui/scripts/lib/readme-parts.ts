@@ -25,9 +25,9 @@ const ATTRIBUTES = 'standard attributes (`onClick`, `aria-*`, `data-*`, `id`) wo
 const MERGE = '`className` is merged last, so yours wins a conflict, and `ref` is a normal prop.'
 const code = (name: string) => `\`${name}\``
 
-/** Every flat name on a line of its own, so a long family still reads as a list. */
-export function familyImport(family: PartFamily): string {
-  return ['import {', ...family.parts.map((part) => `  ${part.name},`), "} from 'topclassui'"].join('\n')
+/** Every flat name on a line of its own, so a long family still reads as a list, from the component's subpath. */
+export function familyImport(family: PartFamily, slug: string): string {
+  return ['import {', ...family.parts.map((part) => `  ${part.name},`), `} from 'topclassui/${slug}'`].join('\n')
 }
 
 /** `a`, `b` and `c`: the names a sentence is about. */

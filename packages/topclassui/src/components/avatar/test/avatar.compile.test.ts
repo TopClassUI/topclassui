@@ -4,6 +4,8 @@ import { join } from 'node:path'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 
+import { importsFromRepo } from '#test/samples.js'
+
 const ROOT = process.cwd()
 const FOLDER = join(ROOT, 'src', 'components', 'avatar')
 
@@ -14,7 +16,7 @@ const probePath = (name: string) => slash(join(FOLDER, 'test', `avatar-probe-${n
 const PARTS = 'AvatarFallback, AvatarImage, AvatarRoot, AvatarSkeleton'
 
 /** The import block compiles as written; it carries a sample, so it is a module of its own. */
-const wrap = (code: string) => `${code.replace("'topclassui'", "'../index.js'")}\nexport const used = [${PARTS}]\n`
+const wrap = (code: string) => `${importsFromRepo(code)}\nexport const used = [${PARTS}]\n`
 
 /** The compiler's verdict per probe, read at runtime so a mutation can reach it. */
 function compile(snippets: Record<string, string>): Record<string, string[]> {
@@ -58,15 +60,15 @@ function asModule(code: string): string {
 
 const verdict = compile({
   sample: wrap(asModule(SAMPLES[0] ?? '')),
-  named: wrap(`import { ${PARTS} } from 'topclassui'\nexport const named = (\n${SAMPLES[2] ?? ''})\n`),
-  imageNoAlt: wrap(`import { ${PARTS} } from 'topclassui'\nexport const bad = <AvatarImage src="/a.jpg" />\n`),
-  imageHandler: wrap(`import { ${PARTS} } from 'topclassui'\nexport const ok = <AvatarImage src="/a.jpg" alt="A" onError={(event) => { void event.currentTarget.src }} />\n`),
+  named: wrap(`import { ${PARTS} } from 'topclassui/avatar'\nexport const named = (\n${SAMPLES[2] ?? ''})\n`),
+  imageNoAlt: wrap(`import { ${PARTS} } from 'topclassui/avatar'\nexport const bad = <AvatarImage src="/a.jpg" />\n`),
+  imageHandler: wrap(`import { ${PARTS} } from 'topclassui/avatar'\nexport const ok = <AvatarImage src="/a.jpg" alt="A" onError={(event) => { void event.currentTarget.src }} />\n`),
 })
 
 describe('the samples in the README compile as written', () => {
   it('finds the three samples; the next/image one is not compiled, since next is not a dependency', () => {
     expect(SAMPLES).toHaveLength(3)
-    expect(SAMPLES[0]).toContain(`import { ${PARTS} } from 'topclassui'`)
+    expect(SAMPLES[0]).toContain(`import { ${PARTS} } from 'topclassui/avatar'`)
     expect(SAMPLES[1]).toContain("import Image from 'next/image'")
     expect(SAMPLES[2]).toContain('<AvatarRoot aria-label="Lina Haddad">')
   })
