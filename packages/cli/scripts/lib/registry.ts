@@ -41,7 +41,7 @@ const ICON_RUNTIME = new Set([
 ])
 
 /** Shipped strings that may name the package; the copy rewrites the first, the second is a command name. */
-export const PACKAGE_STRING_ALLOWED = new Set(['components/icon-registry/index.tsx'])
+export const PACKAGE_STRING_ALLOWED = new Set(['components/icon-registry/index.tsx', 'components/icon-registry/lib.ts'])
 
 const SOURCE = /\.tsx?$/
 
