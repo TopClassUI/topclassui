@@ -105,7 +105,9 @@ describe('BannerDismissible is the client export, re-exported by index.tsx', () 
 
 describe('every demo is a Server Component (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'dismissible', 'long-action', 'long-text', 'minimal', 'rtl', 'tones', 'with-action'])
+    expect(names).toEqual([
+      'basic', 'dismissible', 'long-action', 'long-text', 'minimal', 'playground', 'rtl', 'states', 'tones', 'with-action',
+    ])
   })
 
   for (const name of names) {
@@ -115,12 +117,12 @@ describe('every demo is a Server Component (R-5.1-3)', () => {
     })
   }
 
-  it('only the dismissible demo reaches the shell: the other seven render no client code of Banner', async () => {
+  it('only the dismissible demos reach the shell: the other eight render no client code of Banner', async () => {
     const reached: string[] = []
     for (const name of names) {
       const shells = crossings((await load(name))()).filter((crossing) => crossing.part === 'BannerShell')
       if (shells.length > 0) reached.push(`${name} ${String(shells.length)}`)
     }
-    expect(reached).toEqual(['dismissible 2'])
+    expect(reached).toEqual(['dismissible 2', 'states 1'])
   })
 })

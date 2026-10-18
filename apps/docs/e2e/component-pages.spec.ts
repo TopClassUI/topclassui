@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 
 import { card, collectErrors, openIn } from './pages'
 
-const SLUGS = ['button', 'tag', 'kbd', 'segmented-control'] as const
+const SLUGS = ['button', 'tag', 'kbd', 'segmented-control', 'alert', 'toast', 'banner', 'progress', 'spinner', 'empty-state'] as const
 const LOCALES = [{ locale: 'en', dir: 'ltr' }, { locale: 'ar', dir: 'rtl' }] as const
 const MODES = ['light', 'dark', 'ocean'] as const
 

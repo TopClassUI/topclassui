@@ -117,8 +117,10 @@ Anything else on `ToastViewport` is passed to the element it draws, so standard 
 - `dummy/long-content.tsx`
 - `dummy/many.tsx`
 - `dummy/over-dialog.tsx`
+- `dummy/playground.tsx`
 - `dummy/promise.tsx`
 - `dummy/rtl.tsx`
+- `dummy/states.tsx`
 - `dummy/sticky.tsx`
 - `dummy/tall-page.tsx`
 - `dummy/tones.tsx`
