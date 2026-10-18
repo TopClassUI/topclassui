@@ -84,6 +84,7 @@ Anything else is passed to the element each part draws, so standard attributes (
 - `dummy/report.tsx`
 - `dummy/rtl.tsx`
 - `dummy/skeleton.tsx`
+- `dummy/states.tsx`
 - `dummy/with-actions.tsx`
 
 ## Verified against

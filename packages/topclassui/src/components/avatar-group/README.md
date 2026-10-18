@@ -95,8 +95,10 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/max.tsx`
 - `dummy/on-card.tsx`
 - `dummy/overflow.tsx`
+- `dummy/playground.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`
+- `dummy/states.tsx`
 - `dummy/two.tsx`
 
 ## Verified against

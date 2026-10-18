@@ -8,7 +8,7 @@ import { urlFor } from './pages.js'
 // a team in a table cell stood one face per line as soon as the table scrolled.
 
 /** Every demo, written out, so a deleted one fails here. */
-const DEMOS = ['counts', 'custom-size', 'four', 'in-table', 'linked', 'many', 'max', 'on-card', 'overflow', 'rtl', 'sizes', 'two']
+const DEMOS = ['counts', 'custom-size', 'four', 'in-table', 'linked', 'many', 'max', 'on-card', 'overflow', 'playground', 'rtl', 'sizes', 'states', 'two']
 
 /** The control scale in CSS px, which an avatar and the counter beside it both measure. */
 const SCALE = [28, 32, 40, 48, 56]

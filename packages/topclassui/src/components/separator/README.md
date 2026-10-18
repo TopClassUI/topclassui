@@ -50,8 +50,10 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 ## Examples
 
 - `dummy/horizontal.tsx`
+- `dummy/playground.tsx`
 - `dummy/rtl.tsx`
 - `dummy/semantic.tsx`
+- `dummy/states.tsx`
 - `dummy/vertical.tsx`
 
 ## Verified against

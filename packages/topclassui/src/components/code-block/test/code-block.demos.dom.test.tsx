@@ -9,6 +9,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const names = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
+/** Every demo has one copy button, or none where it writes null; states has one per block that shows it. */
+const BUTTONS: Record<string, number> = { states: 2 }
+
 /** What a press of each demo's button writes to the clipboard: its first line, or null where there is no button. */
 const WRITES: Record<string, string | null> = {
   'basic': 'export default async function Page() {',
@@ -16,7 +19,9 @@ const WRITES: Record<string, string | null> = {
   'long-line': "const token = 'a1b2c3d4e5",
   'no-copy': null,
   'no-header': null,
+  'playground': 'export default async function Page() {',
   'rtl': 'export default async function Page() {',
+  'states': 'export default async function Page() {',
   'wrap': "export const columns = ['number'",
 }
 
@@ -36,7 +41,7 @@ describe('every demo, in the browser, copies what it shows', () => {
       const Demo = await load(name)
       render(<Demo />)
       const buttons = screen.queryAllByRole('button')
-      expect(buttons.length, name).toBe(WRITES[name] === null ? 0 : 1)
+      expect(buttons.length, name).toBe(WRITES[name] === null ? 0 : BUTTONS[name] ?? 1)
       if (buttons[0] === undefined) return
       await act(async () => { fireEvent.click(buttons[0] as HTMLElement); await Promise.resolve() })
       const written = writeText.mock.calls[0] as unknown as [string] | undefined

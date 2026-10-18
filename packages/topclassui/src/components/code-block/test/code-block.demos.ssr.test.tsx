@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['basic', 'highlighted', 'long-line', 'no-copy', 'no-header', 'rtl', 'wrap']
+const EXPECTED = ['basic', 'highlighted', 'long-line', 'no-copy', 'no-header', 'playground', 'rtl', 'states', 'wrap']
 
 /** Each demo as the server writes it: the title, the button's own name, whether the pre is a tab stop and a region. */
 const SHAPE: Record<string, { title: string | null, button: string | null, tabStop: boolean, region: boolean }> = {
@@ -20,7 +20,10 @@ const SHAPE: Record<string, { title: string | null, button: string | null, tabSt
   'long-line': { title: 'token.ts', button: 'Copy', tabStop: true, region: true },
   'no-copy': { title: 'globals.css', button: null, tabStop: true, region: true },
   'no-header': { title: null, button: null, tabStop: true, region: true },
+  'playground': { title: 'app/invoices/page.tsx', button: 'Copy', tabStop: true, region: true },
   'rtl': { title: 'الفواتير.tsx', button: 'نسخ', tabStop: true, region: true },
+  // The first of its three blocks.
+  'states': { title: 'app/page.tsx', button: 'Copy', tabStop: true, region: true },
   'wrap': { title: 'invoice-row.tsx', button: 'Copy', tabStop: false, region: true },
 }
 
@@ -44,7 +47,7 @@ const codeText = (html: string) => (/<code>([\s\S]*)<\/code>/.exec(html)?.[1] ??
   .replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#x27;/g, "'").replace(/&amp;/g, '&')
 
 describe('every demo renders on the server', () => {
-  it('holds exactly the seven demos asked for, so none can be deleted silently', () => {
+  it('holds exactly the nine demos asked for, so none can be deleted silently', () => {
     expect(files).toEqual(EXPECTED)
   })
 
