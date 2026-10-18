@@ -58,6 +58,18 @@ for (const direction of DIRECTIONS) {
       await expectRing(page, 'the star after Shift+Tab', 'label')
     })
 
+    test('with nothing checked, Shift+Tab enters on the last star, as a native radio group does, and Space checks that unchecked star', async ({ page }) => {
+      await openLive(page, 'rating--controlled', { direction })
+      await page.getByRole('button', { name: 'Clear' }).click()
+      await expect(page.locator('#demo [data-chosen]')).toHaveAttribute('data-chosen', '0')
+      await page.keyboard.press('Shift+Tab')
+      expect(await where(page)).toEqual({ focus: 5, checked: 0 })
+      await expectRing(page, 'the unchecked last star', 'label')
+      await page.keyboard.press('Space')
+      expect(await where(page)).toEqual({ focus: 5, checked: 5 })
+      await expect(page.locator('#demo [data-chosen]')).toHaveAttribute('data-chosen', '5')
+    })
+
     test('read-only and disabled ratings take no tab stop', async ({ page }) => {
       for (const demo of ['rating--read-only', 'rating--disabled']) {
         await openLive(page, demo, { direction })

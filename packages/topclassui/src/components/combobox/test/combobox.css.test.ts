@@ -69,7 +69,7 @@ describe('the popup', () => {
 
   it('is as wide as the input, and never wider or taller than the room Base UI measured', () => {
     expect(ruleOf(selectorOf('w-(--anchor-width)'))).toBe('width: var(--anchor-width);')
-    expect(ruleOf(selectorOf('max-w-(--available-width)'))).toBe('max-width: var(--available-width);')
+    expect(ruleOf(selectorOf('max-w-[round(down,var(--available-width),1px)]'))).toBe('max-width: round(down, var(--available-width), 1px);')
     expect(ruleOf(selectorOf('max-h-(--available-height)'))).toBe('max-height: var(--available-height);')
   })
 })

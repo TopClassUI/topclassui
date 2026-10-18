@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 
+import { useProviderPresence } from '#shared/provider/context.js'
 import { useFormValue } from '#shared/use-form-value.js'
 import { serveTabStopOn, useServerTabStop } from '#shared/use-server-tab-stop.js'
 import { SEGMENTED_CONTROL_DEFAULTS } from './constants.js'
@@ -10,7 +11,7 @@ import type { SegmentedControlChangeDetails, SegmentedControlLook, SegmentedCont
 const fallback: SegmentedControlLook = { size: SEGMENTED_CONTROL_DEFAULTS.size, opensOn: null }
 
 /** The look of the nearest SegmentedControlRoot. Base UI tells its radios nothing of ours. */
-export const SegmentedControlLookContext = createContext(fallback)
+const SegmentedControlLookContext = createContext(fallback)
 
 /** A reset puts each radio input back to its first default, and React writes `checked` only when its state changes. */
 function syncRadios(value: string | null, _input: HTMLInputElement | null, root: HTMLDivElement | null): void {
@@ -22,6 +23,7 @@ function syncRadios(value: string | null, _input: HTMLInputElement | null, root:
 /** The value of a segmented control, held here so a form reset brings it back to its latest default (unit-4.md, "A
  * form reset"), and the look its segments read. Base UI always gets the controlled pair. */
 export function useSegmentedControlRoot(size: SegmentedControlLook['size'], { value, defaultValue, onValueChange, ref, children, disabled }: SegmentedControlValueProps) {
+  useProviderPresence()
   // Base UI puts its tab stop on the checked radio only on mount, so a value set from outside remounts it, focus allowing.
   const [resetKey, setResetKey] = useState(0)
   const picked = useRef(value)
@@ -56,7 +58,7 @@ export function useSegmentedControlRoot(size: SegmentedControlLook['size'], { va
     state.setValue(next)
   }
 
-  return { value: state.value, onValueChange: onChange, rootRef: state.rootRef, look, resetKey }
+  return { value: state.value, onValueChange: onChange, rootRef: state.rootRef, look, resetKey, Context: SegmentedControlLookContext }
 }
 
 /** What a segment reads: the size of its track, and a tab stop for the server HTML alone on the segment the page

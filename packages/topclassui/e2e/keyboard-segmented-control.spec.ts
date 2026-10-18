@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
 import { DIRECTIONS } from '../scripts/lib/harness.js'
-import { expectNoRing, expectRing, focusedName, tabIndexes, walk } from './ring.js'
+import { expectNoRing, expectRing, focusedName, tabIndexes, walk } from './keyboard.js'
 import { liveErrors, openLive } from './live.js'
 
 // R-5.6-1, a segmented control is the Authoring Practices radio group, in Chromium: one tab stop that roves, every
@@ -63,6 +63,20 @@ for (const direction of DIRECTIONS) {
       const others = ['Invalid, selected', 'Disabled, selected']
       expect(await press(page, forward)).toEqual({ focus: 'Live', checked: [...others, 'Live', 'Read-only, selected'] })
       expect(await press(page, back)).toEqual({ focus: 'Live, selected', checked: [...others, 'Live, selected', 'Read-only, selected'] })
+    })
+
+    // The track is Base UI's RadioGroup, whose RadioRoot.js:138 keeps a focus in a read-only group from selecting.
+    test('in a read-only track the arrows move the focus, wrapping, and select nothing; Space selects nothing either', async ({ page }) => {
+      await openLive(page, 'segmented-control--states', { direction })
+      await walk(page, 3)
+      const others = ['Invalid, selected', 'Disabled, selected', 'Live, selected']
+      expect(await press(page, forward)).toEqual({ focus: 'Read-only', checked: [...others, 'Read-only, selected'] })
+      expect(await press(page, 'Space')).toEqual({ focus: 'Read-only', checked: [...others, 'Read-only, selected'] })
+      expect(await press(page, forward)).toEqual({ focus: 'Read-only, selected', checked: [...others, 'Read-only, selected'] })
+      expect(await press(page, back)).toEqual({ focus: 'Read-only', checked: [...others, 'Read-only, selected'] })
+      expect(await press(page, 'ArrowDown')).toEqual({ focus: 'Read-only, selected', checked: [...others, 'Read-only, selected'] })
+      expect(await press(page, 'ArrowUp')).toEqual({ focus: 'Read-only', checked: [...others, 'Read-only, selected'] })
+      await expectRing(segmentOf(page, 'Read-only'), 'the read-only segment the arrows landed on')
     })
 
     test('Space selects the focused segment; Enter, Home and End change nothing', async ({ page }) => {

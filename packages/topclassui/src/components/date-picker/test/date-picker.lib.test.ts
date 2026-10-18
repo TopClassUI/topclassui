@@ -134,10 +134,12 @@ describe('moveByKey: the keys of the Authoring Practices grid', () => {
     expect([move('2026-09-22', 'ArrowDown', { rtl: true }), move('2026-09-30', 'ArrowDown')]).toEqual(['2026-09-29', '2026-10-07'])
   })
 
-  it('Home and End: the first and the last day of the row, by the week\'s first day, kept inside the month', () => {
+  it('Home and End: the first and the last day of the week, by the week\'s first day, into the next or previous month', () => {
     expect([move('2026-09-23', 'Home'), move('2026-09-23', 'End')]).toEqual(['2026-09-21', '2026-09-27'])
     expect([move('2026-09-23', 'Home', { start: 7 }), move('2026-09-23', 'End', { start: 7 })]).toEqual(['2026-09-20', '2026-09-26'])
-    expect([move('2026-09-03', 'Home'), move('2026-09-29', 'End')]).toEqual(['2026-09-01', '2026-09-30'])
+    expect([move('2026-09-03', 'Home'), move('2026-09-29', 'End')]).toEqual(['2026-08-31', '2026-10-04'])
+    expect([move('2026-12-31', 'End'), move('2027-01-01', 'Home', { start: 7 })]).toEqual(['2027-01-03', '2026-12-27'])
+    expect([move('2026-09-03', 'Home', { range: { min: '2026-09-02', max: '2026-09-30' } }), move('2026-09-29', 'End', { range: { min: '2026-09-01', max: '2026-10-02' } })]).toEqual(['2026-09-02', '2026-10-02'])
     expect([move('2026-09-23', 'Home', { rtl: true }), move('2026-09-23', 'End', { start: 6 })]).toEqual(['2026-09-21', '2026-09-25'])
   })
 

@@ -7,6 +7,7 @@ import { atRest, expectClosed, openOverlay } from './overlay.js'
 
 // R-5.6-1, the modal dialog pattern: Enter or Space on the trigger opens it with the focus on its first
 // control, Tab and Shift+Tab wrap inside it, Escape and every close button shut it and give the focus back.
+// A non-modal one closes when Tab leaves it, and stays closed when Shift+Tab comes back to its trigger.
 
 /** The built-in x, as each direction's labels name it. */
 const CLOSE = { ltr: 'Close this dialog', rtl: 'إغلاق هذا الحوار' } as const
@@ -74,7 +75,44 @@ for (const direction of DIRECTIONS) {
       await openOverlay(page, trigger, { by: 'keyboard' })
       await pressTo(page, 'Tab', 'Done')
       await pressTo(page, 'Tab', 'Behind the panel')
+      await expectClosed(page)
       await expectRing(page, 'the button behind the panel')
+      await pressTo(page, 'Shift+Tab', 'Find and replace')
+      await expectClosed(page)
+    })
+
+    test('confirm: it opens on the x, Tab wraps through its two answers, and Escape answers neither and gives the focus back', async ({ page }) => {
+      await openLive(page, 'dialog--confirm', { direction })
+      await pressTo(page, 'Tab', 'Delete project')
+      const popup = await openOverlay(page, page.getByRole('button', { name: 'Delete project' }), { by: 'keyboard' })
+      expect(await focused(page)).toBe(close)
+      for (const name of ['Cancel', 'Delete', close]) {
+        await pressTo(page, 'Tab', name)
+        await expectRing(page, name)
+      }
+      await pressTo(page, 'Shift+Tab', 'Delete')
+      await expect(popup).toBeVisible()
+      await page.keyboard.press('Escape')
+      await expectClosed(page)
+      await expect.poll(() => focused(page)).toBe('Delete project')
+      await expectRing(page, 'the trigger after Escape')
+    })
+
+    test('trap-focus: Tab and Shift+Tab stay inside it and never reach the page behind, and Escape gives the focus back', async ({ page }) => {
+      await openLive(page, 'dialog--trap-focus', { direction })
+      await pressTo(page, 'Tab', 'Inspect')
+      const popup = await openOverlay(page, page.getByRole('button', { name: 'Inspect' }), { by: 'keyboard' })
+      expect(await focused(page)).toBe(close)
+      for (const name of ['Done', close, 'Done']) {
+        await pressTo(page, 'Tab', name)
+        await expectRing(page, name)
+      }
+      await pressTo(page, 'Shift+Tab', close)
+      await pressTo(page, 'Shift+Tab', 'Done')
+      await expect(popup).toBeVisible()
+      await page.keyboard.press('Escape')
+      await expectClosed(page)
+      await expect.poll(() => focused(page)).toBe('Inspect')
     })
   })
 }

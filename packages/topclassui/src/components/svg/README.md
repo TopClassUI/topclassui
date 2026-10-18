@@ -41,6 +41,10 @@ Required: `icon`. Every other prop below is optional.
 
 Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
+## Examples
+
+- `dummy/directional.tsx`
+
 ## Verified against
 
 Base UI: not used by this component.

@@ -9,12 +9,12 @@ import { toPopupSelector } from './lib.js'
 import type { PopoverPopupProps } from './types.js'
 
 /** The scope of the nearest PopoverRoot, which its popup writes on itself as data-popover. */
-export const PopoverScopeContext = createContext('')
+const PopoverScopeContext = createContext('')
 
 /** One id per root, and the selector that finds this root's popup and no other popover's. */
 export function usePopoverRoot() {
   const scope = useId()
-  return { scope, popups: toPopupSelector(scope) }
+  return { scope, popups: toPopupSelector(scope), Context: PopoverScopeContext }
 }
 
 /** What the positioner reads from the provider: the dir and the lang a portal cannot inherit.

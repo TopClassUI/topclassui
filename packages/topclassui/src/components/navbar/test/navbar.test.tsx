@@ -73,6 +73,12 @@ describe('NavbarLinks', () => {
     expect(html.endsWith('</a></li></ul></nav>')).toBe(true)
   })
 
+  it('gives each child a list item of its own, and none to a child that renders nothing', () => {
+    const html = markup(<NavbarLinks><NavbarLink href="/a">A</NavbarLink>{null}{false}<NavbarLink href="/b">B</NavbarLink></NavbarLinks>)
+    expect(html.match(/<li class="[^"]+"><a /g)).toHaveLength(2)
+    expect(html.match(/<li/g)).toHaveLength(2)
+  })
+
   it('renders its list with no link in it', () => {
     expect(markup(<NavbarLinks />)).toMatch(/^<nav aria-label="Main" class="[^"]+"><ul role="list" class="[^"]+"><\/ul><\/nav>$/)
   })
@@ -86,9 +92,9 @@ describe('NavbarLinks', () => {
 })
 
 describe('NavbarLink', () => {
-  it('is a list item holding one anchor, with its text in a span of its own', () => {
+  it('is one anchor, with its text in a span of its own', () => {
     const html = markup(<NavbarLink href="/docs">Docs</NavbarLink>)
-    expect(html).toMatch(/^<li class="[^"]+"><a class="[^"]+" href="\/docs"><span dir="auto" class="truncate min-w-0">Docs<\/span><\/a><\/li>$/)
+    expect(html).toMatch(/^<a class="[^"]+" href="\/docs"><span dir="auto" class="truncate min-w-0">Docs<\/span><\/a>$/)
   })
 
   it('is not the current page unless told so', () => {
@@ -98,7 +104,7 @@ describe('NavbarLink', () => {
   })
 
   it('with current it says aria-current="page" on the link, not on the list item', () => {
-    const html = markup(<NavbarLink href="/docs" current>Docs</NavbarLink>)
+    const html = markup(<NavbarLinks><NavbarLink href="/docs" current>Docs</NavbarLink></NavbarLinks>)
     expect(tag(html, 'a')).toContain(' aria-current="page"')
     expect(tag(html, 'li')).not.toContain('aria-current')
   })
@@ -108,7 +114,7 @@ describe('NavbarLink', () => {
   })
 
   it('passes id, target, rel and data attributes to the link', () => {
-    const html = markup(<NavbarLink href="https://example.com" id="out" target="_blank" rel="noreferrer" data-track="nav">Out</NavbarLink>)
+    const html = markup(<NavbarLinks><NavbarLink href="https://example.com" id="out" target="_blank" rel="noreferrer" data-track="nav">Out</NavbarLink></NavbarLinks>)
     for (const attribute of [' href="https://example.com"', ' id="out"', ' target="_blank"', ' rel="noreferrer"', ' data-track="nav"']) {
       expect(tag(html, 'a')).toContain(attribute)
     }

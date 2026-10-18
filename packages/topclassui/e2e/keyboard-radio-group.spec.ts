@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
 import { DIRECTIONS } from '../scripts/lib/harness.js'
-import { expectNoRing, expectRing, focusedName, tabIndexes, walk } from './ring.js'
+import { expectNoRing, expectRing, focusedName, tabIndexes, walk } from './keyboard.js'
 import { liveErrors, openLive } from './live.js'
 
 // R-5.6-1, the Authoring Practices radio group in Chromium: one tab stop that roves, the arrows move, select and wrap,
@@ -64,6 +64,20 @@ for (const direction of DIRECTIONS) {
       await walk(page, 2)
       expect(await press(page, forward)).toEqual({ focus: 'Live', checked: ['Invalid, checked', 'Disabled, checked', 'Live', 'Read-only, checked'] })
       expect(await press(page, back)).toEqual({ focus: 'Live, checked', checked: ['Invalid, checked', 'Disabled, checked', 'Live, checked', 'Read-only, checked'] })
+    })
+
+    // Base UI's composite moves the focus in a read-only group, and RadioRoot.js:138 keeps the focus from checking.
+    test('in a read-only group the arrows move the focus, wrapping, and check nothing; Space checks nothing either', async ({ page }) => {
+      await openLive(page, 'radio-group--states', { direction })
+      await walk(page, 3)
+      const others = ['Invalid, checked', 'Disabled, checked', 'Live, checked']
+      expect(await press(page, forward)).toEqual({ focus: 'Read-only', checked: [...others, 'Read-only, checked'] })
+      expect(await press(page, 'Space')).toEqual({ focus: 'Read-only', checked: [...others, 'Read-only, checked'] })
+      expect(await press(page, forward)).toEqual({ focus: 'Read-only, checked', checked: [...others, 'Read-only, checked'] })
+      expect(await press(page, back)).toEqual({ focus: 'Read-only', checked: [...others, 'Read-only, checked'] })
+      expect(await press(page, 'ArrowDown')).toEqual({ focus: 'Read-only, checked', checked: [...others, 'Read-only, checked'] })
+      expect(await press(page, 'ArrowUp')).toEqual({ focus: 'Read-only', checked: [...others, 'Read-only, checked'] })
+      await expectRing(radioOf(page, 'Read-only').locator(':scope > span'), 'the read-only circle the arrows landed on')
     })
 
     test('Space selects the focused radio; Enter, Home and End change nothing', async ({ page }) => {

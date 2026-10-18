@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { ICON_SIZE } from '#shared/contracts/size.js'
+import { compileEntry } from '#test/stylesheet.js'
 import { attr, classList, markup } from '#test/markup.js'
 import { Svg } from '../index.js'
 
@@ -72,16 +73,21 @@ describe('the accessible name', () => {
 
 describe('direction', () => {
   it('mirrors an icon the set marks directional', () => {
-    expect(classList(markup(<Svg icon={arrow} />))).toContain('rtl:-scale-x-100')
+    expect(classList(markup(<Svg icon={arrow} />))).toContain('scale-x-(--tc-dir)')
   })
 
   it('leaves a non-directional icon alone', () => {
-    expect(classList(markup(<Svg icon={icon} />))).not.toContain('rtl:-scale-x-100')
+    expect(classList(markup(<Svg icon={icon} />))).not.toContain('scale-x-(--tc-dir)')
   })
 
   it('lets the caller override the set either way', () => {
-    expect(classList(markup(<Svg icon={arrow} flipRtl={false} />))).not.toContain('rtl:-scale-x-100')
-    expect(classList(markup(<Svg icon={icon} flipRtl />))).toContain('rtl:-scale-x-100')
+    expect(classList(markup(<Svg icon={arrow} flipRtl={false} />))).not.toContain('scale-x-(--tc-dir)')
+    expect(classList(markup(<Svg icon={icon} flipRtl />))).toContain('scale-x-(--tc-dir)')
+  })
+
+  it('compiles the mirror to the --tc-dir knob, on no direction selector', async () => {
+    const css = (await compileEntry()).build(['scale-x-(--tc-dir)'])
+    expect(css).toContain('.scale-x-\\(--tc-dir\\) {\n    --tw-scale-x: var(--tc-dir);\n    scale: var(--tw-scale-x) var(--tw-scale-y);\n  }')
   })
 })
 

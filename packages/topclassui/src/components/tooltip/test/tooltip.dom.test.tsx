@@ -19,7 +19,7 @@ function Copy(props: TooltipRootProps) {
 }
 
 const trigger = () => screen.getByRole('button', { name: 'Copy link' })
-/** The popup is found by its text: Base UI 1.8.0 gives it no role to query. */
+/** The popup is found by its text; its role and its link are tooltip.aria.dom.test's. */
 const popup = () => screen.queryByText('Copy link', { selector: '[data-placement]' })
 const isOpen = () => trigger().hasAttribute('data-popup-open')
 
@@ -122,13 +122,6 @@ describe('what assistive technology gets', () => {
     await userEvent.tab()
     expect(trigger().getAttribute('aria-label')).toBe('Copy link')
     expect(popup()?.textContent).toBe('Copy link')
-  })
-
-  it('adds no role and no description link by hand, so nothing claims a pairing Base UI never made', async () => {
-    render(<Copy />)
-    await userEvent.tab()
-    expect(popup()?.getAttribute('role')).toBeNull()
-    expect(trigger().getAttribute('aria-describedby')).toBeNull()
   })
 
   it('hides the arrow, which carries no meaning', () => {

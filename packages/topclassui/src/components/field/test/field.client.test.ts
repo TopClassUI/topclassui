@@ -38,10 +38,11 @@ function hooksByPart(source: string): Record<string, string[]> {
 }
 
 describe('the folder holds what Field needs and nothing else (R-8.1-1)', () => {
-  it('the files the plan lists: lib.tsx and no lib.ts, no boundaries, no variants, no skeleton', () => {
+  it('the files the plan lists: lib.ts, one part, no boundaries, no variants, no skeleton', () => {
     expect(readdirSync(FOLDER).sort()).toEqual([
-      'README.md', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'lib.tsx', 'meta.ts', 'schema.ts', 'test', 'types.ts',
+      'README.md', 'classes.ts', 'client.tsx', 'constants.ts', 'dummy', 'hook.ts', 'index.tsx', 'lib.ts', 'meta.ts', 'parts', 'schema.ts', 'test', 'types.ts',
     ])
+    expect(readdirSync(join(FOLDER, 'parts'))).toEqual(['field-frame.tsx'])
   })
 })
 
@@ -56,7 +57,7 @@ describe('index.tsx is the server half (R-5.1-1)', () => {
   it('calls useId and no other hook, and never imports hook.ts', () => {
     expect(hooksByPart(source)).toEqual({ Field: ['useId'] })
     expect(importedModules(source)).not.toContain('./hook.js')
-    expect(importedModules(source)).toContain('./lib.js')
+    expect(importedModules(source)).toContain('./parts/field-frame.js')
   })
 })
 
@@ -70,15 +71,19 @@ describe('client.tsx is markup plus one hook call (R-5.12-1)', () => {
   })
 })
 
-describe('lib.tsx is shared by both halves', () => {
-  const source = read('lib.tsx')
+describe('the frame part is shared by both halves, and lib.ts is pure', () => {
+  const source = read('parts/field-frame.tsx')
 
-  it('has no use client and calls no hook, so the server half may call renderField', () => {
+  it('has no use client and calls no hook, so the server half may render FieldFrame', () => {
     expect(hasUseClient(source)).toBe(false)
     expect(Object.values(hooksByPart(source)).flat()).toEqual([])
   })
 
   it('imports no React hook and nothing of the client half', () => {
-    expect(importedModules(source).filter((name) => name === './hook.js' || name === './client.js' || name.startsWith('react'))).toEqual([])
+    expect(importedModules(source).filter((name) => name === '../hook.js' || name === '../client.js' || name.startsWith('react'))).toEqual([])
+  })
+
+  it('lib.ts imports nothing from React and draws nothing', () => {
+    expect(importedModules(read('lib.ts')).filter((name) => name.startsWith('react') || name.startsWith('#components/'))).toEqual([])
   })
 })

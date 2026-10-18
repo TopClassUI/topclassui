@@ -1,14 +1,12 @@
 // R-8.1-1, R-5.1-2, R-5.12-1, R-5.12-2, R-5.12-4, R-9.2-4, R-8.5-1, R-10.5-1, R-10.5-3: the folder contract, file size, naming, the client boundary, the collection contract and overlay parts.
-import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, posix, relative, sep } from 'node:path'
 
 import { collectionErrors } from './lib/collections.js'
 import { FAIL_LINES, WARN_LINES, countLines, sizeVerdict, sourceFilesUnder } from './lib/file-sizes.js'
-import { INDEX_MARKUP_EXEMPT, indexMarkupViolations, isClientRendering } from './lib/index-markup.js'
+import { indexMarkupViolations, isCoveredFolder } from './lib/index-markup.js'
 import { categoryOf, exportedValueNames, missingBody, unpublishedStickyEdges } from './lib/overlay-parts.js'
-import {
-  NAMING_EXEMPTIONS, SCROLLING_OVERLAYS, hookFileProblems, libFileProblems, overlayPartProblems, partFileProblems,
-} from './lib/part-names.js'
+import { SCROLLING_OVERLAYS, hookFileProblems, libFileProblems, overlayPartProblems, partFileProblems } from './lib/part-names.js'
 import { missingFixture } from './lib/root-props-fixture.js'
 import { inlinePropInterfaces, screamingConstants, strayHookImport } from './lib/source-checks.js'
 
@@ -22,7 +20,6 @@ const ALLOWED_FILES = new Set([
   'client.tsx',
   'hook.ts',
   'lib.ts',
-  'lib.tsx',
   'variants.ts',
   'classes.ts',
   'constants.ts',
@@ -110,7 +107,7 @@ function checkComponentFolder(dir: string, slug: string) {
   }
 
   if (files.includes('hook.ts') && !files.includes('client.tsx')) {
-    errors.push(`${rel(dir)}: hook.ts exists with no client.tsx. Only client.tsx may import it (R-8.1-1).`)
+    errors.push(`${rel(dir)}: hook.ts exists with no client.tsx. Only client.tsx and its 'use client' parts may import it (R-8.1-1).`)
   }
 
   // R-5.12-1: the logic in hook.ts reaches markup only through a client file; the lint checks that file's shape.
@@ -148,10 +145,10 @@ function checkComponentFolder(dir: string, slug: string) {
   }
 
   // R-5.1-2: a C component or a connector keeps its markup out of index.tsx.
-  const isClient = dir.startsWith(CONNECTORS)
-    || (files.includes('meta.ts') && isClientRendering(readFileSync(join(dir, 'meta.ts'), 'utf8')))
-  if (isClient && files.includes('index.tsx') && !INDEX_MARKUP_EXEMPT.has(slug)) {
-    for (const v of indexMarkupViolations(readFileSync(join(dir, 'index.tsx'), 'utf8'))) {
+  const metaSource = files.includes('meta.ts') ? readFileSync(join(dir, 'meta.ts'), 'utf8') : undefined
+  if (isCoveredFolder(rel(dir), metaSource) && files.includes('index.tsx')) {
+    const readSibling = (p: string) => (existsSync(join(dir, p)) ? readFileSync(join(dir, p), 'utf8') : undefined)
+    for (const v of indexMarkupViolations(readFileSync(join(dir, 'index.tsx'), 'utf8'), readSibling)) {
       errors.push(
         `${rel(join(dir, 'index.tsx'))}: ${v}.`
         + ' A C component or a connector re-exports its client parts, types, variants and skeleton (R-5.1-2).',
@@ -161,7 +158,8 @@ function checkComponentFolder(dir: string, slug: string) {
 
   // R-8.5-1: a component that renders items windows them through useCollection in its hook, or is exempt by decision.
   const source = (f: string) => (files.includes(f) ? readFileSync(join(dir, f), 'utf8') : null)
-  for (const error of collectionErrors({ slug, types: source('types.ts'), hook: source('hook.ts') })) {
+  const rest = ['schema.ts', 'classes.ts', 'client.tsx'].map((f) => source(f) ?? '').join('\n')
+  for (const error of collectionErrors({ slug, types: source('types.ts'), hook: source('hook.ts'), rest })) {
     errors.push(`${rel(dir)}: ${error} (R-8.5-1).`)
   }
 
@@ -184,17 +182,16 @@ function checkComponentFolder(dir: string, slug: string) {
   for (const e of partEntries) {
     const path = join(dir, 'parts', e.name)
     if (!e.isFile()) { errors.push(`${rel(path)}: parts/ holds files, not folders (R-8.1-1).`); continue }
+    if (/\.test\.tsx?$/.test(e.name)) { errors.push(`${rel(path)}: tests live in test/, not parts/ (R-8.1-1).`); continue }
     if (!isKebab(e.name.replace(/\.tsx?$/, ''))) errors.push(`${rel(path)}: part files are kebab-case (R-5.12-4).`)
-    if (/\.test\.tsx?$/.test(e.name)) continue
     for (const p of partFileProblems(e.name, readFileSync(path, 'utf8'))) errors.push(`${rel(path)}: ${p} (R-5.12-4)`)
   }
 
   // The parts-folder naming contract: hook.ts holds hooks, lib.ts holds functions (R-5.12-4).
   for (const f of files) {
-    const exempt = NAMING_EXEMPTIONS[`${slug}/${f}`] ?? []
     const source = () => readFileSync(join(dir, f), 'utf8')
-    const problems = f === 'hook.ts' ? hookFileProblems(source(), exempt)
-      : f === 'lib.ts' || f === 'lib.tsx' ? libFileProblems(f, source(), exempt)
+    const problems = f === 'hook.ts' ? hookFileProblems(source())
+      : f === 'lib.ts' || f === 'lib.tsx' ? libFileProblems(f, source())
         : []
     for (const p of problems) errors.push(`${rel(join(dir, f))}: ${p} (R-5.12-4)`)
   }
@@ -236,11 +233,6 @@ walk(COMPONENTS)
 walk(CONNECTORS)
 for (const slug of SCROLLING_OVERLAYS) {
   if (!listDir(join(COMPONENTS, slug)).length) errors.push(`src/components/${slug}: listed as a scrolling overlay but missing (R-9.2-4).`)
-}
-for (const key of Object.keys(NAMING_EXEMPTIONS)) {
-  if (!listDir(join(COMPONENTS, key, '..')).some((e) => e.name === key.split('/')[1])) {
-    errors.push(`src/components/${key}: a naming exemption for a file that no longer exists (R-5.12-4).`)
-  }
 }
 for (const file of sourceFilesUnder(join(ROOT, 'src'))) checkFileSize(file)
 

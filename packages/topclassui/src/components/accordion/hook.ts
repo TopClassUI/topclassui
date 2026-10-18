@@ -2,6 +2,7 @@
 
 import { type MouseEvent, useId, useRef } from 'react'
 
+import { useProviderPresence } from '#shared/provider/context.js'
 import { useScrollTabStop } from '#shared/use-scroll-tab-stop.js'
 import { ACCORDION_HOLD_MS } from './constants.js'
 
@@ -42,6 +43,7 @@ function holdTrigger(event: MouseEvent) {
 /** What one item needs: an id for its trigger, which names the region inside the panel; the ref and tabIndex
  * of that region, a tab stop only while what it holds scrolls sideways; and the onClick that holds the trigger. */
 export function useAccordionItem() {
+  useProviderPresence()
   const ref = useRef(null as HTMLDivElement | null)
   return { triggerId: useId(), ref, tabIndex: useScrollTabStop(ref), onClick: holdTrigger }
 }

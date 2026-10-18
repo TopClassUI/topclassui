@@ -106,7 +106,7 @@ Required: `children`, `label`, `name`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `children` | **yes** | `(control: FieldControl) => ReactNode` | - | Called with the control object, which the control spreads: `(control) => <Input {...control} />`. |
+| `children` | **yes** | `(control: FieldControl) => ReactNode` | - | Called with the control object, which the control spreads: `(control) => <Input {...control} />`. Client-only for FieldLive. |
 | `label` | **yes** | `ReactNode` | - | The visible name of the control. |
 | `name` | **yes** | `string` | - | The control's name, and the key of its errors in a FormAction's answer. |
 | `error` | no | `FieldError` | - | One message or several, read after the hint; with one, the control is invalid unless `invalid` says otherwise. |

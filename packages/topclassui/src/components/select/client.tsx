@@ -6,7 +6,7 @@ import { caretDown } from '#icons/data/caret-down.js'
 import { check } from '#icons/data/check.js'
 import { FIELD_HOLDER_FULL, FIELD_SIZE, FIELD_TEXT } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
-import { POPUP_BOUNDS, toSideAlign } from '#shared/floating.js'
+import { FLOATING, toSideAlign } from '#shared/floating.js'
 import { Svg } from '#components/svg/index.js'
 import {
   SELECT_ICON, SELECT_ITEM, SELECT_ITEM_TEXT, SELECT_ITEM_TICK, SELECT_LIST, SELECT_POPUP, SELECT_POSITIONER, SELECT_ROOT,
@@ -25,6 +25,9 @@ export function Select({
   fullWidth = SELECT_DEFAULTS.fullWidth,
   placement = SELECT_DEFAULTS.placement,
   visibleRows,
+  hasMore,
+  loadMore,
+  loadMoreThreshold,
   placeholder,
   container,
   value,
@@ -40,6 +43,7 @@ export function Select({
   ...rest
 }: SelectProps) {
   const select = useSelect({
+    items, hasMore, loadMore, loadMoreThreshold,
     value, defaultValue, onValueChange, onOpenChange, inputRef, visibleRows, placeholder, ref,
     'aria-label': rest['aria-label'], 'aria-labelledby': rest['aria-labelledby'],
   })
@@ -75,21 +79,22 @@ export function Select({
           lang={select.lang}
           side={side}
           align={align}
-          sideOffset={POPUP_BOUNDS.sideOffset}
-          collisionPadding={POPUP_BOUNDS.collisionPadding}
+          sideOffset={FLOATING.sideOffset}
+          collisionPadding={FLOATING.collisionPadding}
           collisionAvoidance={side === 'top' || side === 'bottom' ? undefined : SELECT_SIDE_COLLISION_AVOIDANCE}
           alignItemWithTrigger={false}
           className={SELECT_POSITIONER}
         >
           <Base.Popup data-select={select.scope} data-placement={placement} className={SELECT_POPUP}>
             <Base.List
+              ref={select.listRef}
               aria-label={select.listLabel}
               aria-labelledby={select.listLabelledBy}
               className={SELECT_LIST}
               style={{ '--tc-list-rows': select.rows }}
             >
-              {items.map((item) => (
-                <Base.Item key={item.value} value={item.value} label={item.label} disabled={item.disabled} className={SELECT_ITEM}>
+              {select.options.map(({ item, key }) => (
+                <Base.Item key={key} value={item.value} label={item.label} disabled={item.disabled} className={SELECT_ITEM}>
                   <Base.ItemText className={SELECT_ITEM_TEXT}>{item.label}</Base.ItemText>
                   <Base.ItemIndicator className={SELECT_ITEM_TICK}><Svg icon={check} size="0.875rem" /></Base.ItemIndicator>
                 </Base.Item>

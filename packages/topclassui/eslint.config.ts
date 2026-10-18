@@ -17,7 +17,8 @@ export default defineConfig(
   },
 
   // The library itself. Every rule in docs/RULES.md that a linter can enforce
-  // applies here and nowhere else: demos and scripts are deliberately exempt.
+  // applies here; outside src/ only the rules without an "inside src/" clause do, and
+  // tooltip-content-is-text also covers demos, e2e and scripts (below).
   {
     files: ['src/**/*.{ts,tsx}'],
     plugins: { topclass },
@@ -53,26 +54,40 @@ export default defineConfig(
     },
   },
 
+  // R-5.2-6 has no "inside src/" clause, so the e2e fixtures and the harness page
+  // follow it too. scripts/mutations is left out: it injects broken source on purpose.
+  {
+    files: ['e2e/**/*.{ts,tsx}', 'scripts/build-harness.tsx'],
+    plugins: { topclass },
+    rules: { 'topclass/bare-data-variants': 'error' },
+  },
+
   // A test has to write the banned string to prove the rule or the merge works,
   // and a demo exists to show real usage. Neither is published. R-5.11-1 exempts
-  // demos by name, and a test needs a real scroll box with a height and an overflow.
+  // demos by name, a test needs a real scroll box with a height and an overflow,
+  // and a type test compares ours against Base UI's raw props on purpose (R-5.7-5).
   {
     files: ['src/**/*.test.{ts,tsx}', 'src/**/test/**/*.{ts,tsx}', 'src/**/dummy/**/*.tsx'],
     rules: {
       'topclass/semantic-classes-only': 'off',
       'topclass/shared-class-constants': 'off',
       'topclass/logical-properties-only': 'off',
-      'topclass/dir-aware-transforms': 'off',
       'topclass/style-sets-tokens-only': 'off',
       'topclass/text-comes-from-labels': 'off',
-      'topclass/no-fetch-in-components': 'off',
+      'topclass/props-derived-at-the-seam': 'off',
     },
+  },
+
+  // R-8.5-2: a test seeds storage to prove the Banner remembers; a demo ships, so it plays the app in memory.
+  {
+    files: ['src/**/*.test.{ts,tsx}', 'src/**/test/**/*.{ts,tsx}'],
+    rules: { 'topclass/no-fetch-in-components': 'off' },
   },
 
   // R-8.5-2: a dismissed Banner is remembered across pages, which is UI state rather
   // than data; that file may read and write localStorage and nothing else (DECISIONS).
   {
-    files: ['src/components/banner/lib.ts'],
+    files: ['src/components/banner/hook.ts'],
     rules: { 'topclass/no-fetch-in-components': ['error', { allow: ['localStorage'] }] },
   },
 
@@ -83,9 +98,9 @@ export default defineConfig(
     rules: { 'topclass/tooltip-content-is-text': 'error' },
   },
 
-  // R-5.3-4 binds demos, which show real usage; a schema test passes "left" to prove it is refused.
+  // R-5.3-4 binds every other file; a schema or contract test passes "left" to prove it is refused.
   {
-    files: ['src/**/*.test.{ts,tsx}', 'src/**/test/**/*.{ts,tsx}'],
+    files: ['src/**/*.schema.test.ts', 'src/shared/contracts/toast.test.ts'],
     rules: { 'topclass/no-physical-placement': 'off' },
   },
 

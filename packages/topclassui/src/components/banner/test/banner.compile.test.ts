@@ -11,13 +11,13 @@ const FOLDER = join(ROOT, 'src', 'components', 'banner')
 const slash = (path: string) => path.replace(/\\/g, '/')
 const probePath = (name: string) => slash(join(FOLDER, 'test', `banner-probe-${name}.tsx`))
 
-/** What a page that pastes a sample has in scope: the banner, a Button, the Svg and one icon. */
+/** What a page that pastes a sample has in scope: both banners, a Button, the Svg and one icon. */
 const PRELUDE = [
-  "import { Banner } from '../index.js'",
+  "import { Banner, BannerDismissible } from '../index.js'",
   "import { Button } from '#components/button/index.js'",
   "import { Svg } from '#components/svg/index.js'",
   "import { bell } from '#icons/data/bell.js'",
-  'export const used = [Banner, Button, Svg, bell]',
+  'export const used = [Banner, BannerDismissible, Button, Svg, bell]',
   'declare const flag: boolean',
   'export const decided = flag',
 ].join('\n')
@@ -62,12 +62,15 @@ const SAMPLES = readmeSamples()
 const verdict = compile({
   readmeFirst: SAMPLES[0] ?? '<Missing />',
   readmeDismissal: SAMPLES[1] ?? '<Missing />',
-  withHandler: '<Banner aria-label="N" dismissible id="a" onDismiss={() => undefined}>Out.</Banner>',
+  withHandler: '<BannerDismissible aria-label="N" id="a" onDismiss={() => undefined}>Out.</BannerDismissible>',
+  handlerNoId: '<BannerDismissible aria-label="N" onDismiss={() => undefined}>Out.</BannerDismissible>',
+  handlerOnBanner: '<Banner aria-label="N" dismissible id="a" onDismiss={() => undefined}>Out.</Banner>',
+  dismissibleWithId: '<Banner aria-label="N" dismissible id="a">Out.</Banner>',
   noId: '<Banner aria-label="N" dismissible>Out.</Banner>',
   handlerAlone: '<Banner aria-label="N" onDismiss={() => undefined}>Out.</Banner>',
   plainWithId: '<Banner aria-label="N" id="a">Out.</Banner>',
   numberId: '<Banner aria-label="N" dismissible id={2}>Out.</Banner>',
-  flagWithId: '<Banner aria-label="N" dismissible={flag} id="a" onDismiss={() => undefined}>Out.</Banner>',
+  flagWithId: '<Banner aria-label="N" dismissible={flag} id="a">Out.</Banner>',
   flagNoId: '<Banner aria-label="N" dismissible={flag}>Out.</Banner>',
   handlerWithIdAlone: '<Banner aria-label="N" id="a" onDismiss={() => undefined}>Out.</Banner>',
 })
@@ -88,8 +91,14 @@ describe('the samples in the README compile as written', () => {
 })
 
 describe('the id rule is a type', () => {
-  it('takes dismissible with an id and a handler', () => {
+  it('takes dismissible with an id on a Banner, and a handler with an id on BannerDismissible', () => {
+    expect(verdict['dismissibleWithId']).toEqual([])
     expect(verdict['withHandler']).toEqual([])
+    expect(verdict['handlerNoId']).toHaveLength(1)
+  })
+
+  it('refuses onDismiss on a Banner, which takes no function (R-5.1-3)', () => {
+    expect(verdict['handlerOnBanner']).toHaveLength(1)
   })
 
   it('refuses dismissible with no id, which nothing could remember', () => {
@@ -98,7 +107,7 @@ describe('the id rule is a type', () => {
     expect(verdict['noId']?.[0]).toContain("dismissible: true; }' is not assignable to type 'IntrinsicAttributes & BannerProps'")
   })
 
-  it('refuses onDismiss on a banner that has no x', () => {
+  it('refuses onDismiss on a plain banner too', () => {
     expect(verdict['handlerAlone']).toHaveLength(1)
     expect(verdict['handlerWithIdAlone']).toHaveLength(1)
   })

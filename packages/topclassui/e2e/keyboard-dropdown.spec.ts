@@ -1,13 +1,14 @@
 import { expect, test, type Page } from '@playwright/test'
 
 import { DIRECTIONS } from '../scripts/lib/harness.js'
-import { expectRing, expectRowRing, focused, pressTo } from './keyboard.js'
+import { SENTINEL, addSentinel, expectRing, expectRowRing, focused, pressTo } from './keyboard.js'
 import { openLive } from './live.js'
-import { atRest, expectClosed } from './overlay.js'
+import { atRest, expectClosed, openOverlay } from './overlay.js'
 
 // R-5.6-1, the menu button pattern: Enter, Space and ArrowDown open the menu on its first item and ArrowUp on
 // its last, the vertical arrows move and wrap through every item, a disabled one too, Home and End go to the
 // ends, typing goes to the item that starts with it, Enter and Space pick an item, Escape and Tab close it.
+// APG: Tab moves the focus out of the menu and closes it; that it lands after the trigger is Base UI's choice.
 
 const MENU = '[role="menu"]'
 const row = (page: Page, name: string) => page.locator(`${MENU} [role="menuitem"]`, { hasText: name })
@@ -75,8 +76,9 @@ for (const direction of DIRECTIONS) {
       expect(await focused(page)).toBe('Rename')
     })
 
-    test('Escape closes it and gives the focus and the ring back to the trigger; Tab closes it too', async ({ page }) => {
+    test('Escape closes it and gives the focus and the ring back to the trigger; Tab closes it and goes on past the trigger', async ({ page }) => {
       await openLive(page, 'dropdown--basic', { direction })
+      await addSentinel(page)
       await pressTo(page, 'Tab', 'Actions')
       await openWith(page, 'Enter', 'ProfileCtrl P')
       await pressTo(page, 'ArrowDown', 'Settings')
@@ -86,7 +88,9 @@ for (const direction of DIRECTIONS) {
       await expectRing(page, 'the trigger after Escape')
 
       await openWith(page, 'Enter', 'ProfileCtrl P')
-      await page.keyboard.press('Tab')
+      await pressTo(page, 'Tab', SENTINEL)
+      await expectClosed(page, MENU)
+      await pressTo(page, 'Shift+Tab', 'Actions')
       await expectClosed(page, MENU)
     })
 
@@ -101,6 +105,40 @@ for (const direction of DIRECTIONS) {
         await expect.poll(() => focused(page)).toBe('Actions')
       })
     }
+
+    test('in a dialog: the menu opens over it, the first Escape closes the menu onto its trigger, the second the dialog onto its own', async ({ page }) => {
+      await openLive(page, 'dropdown--in-dialog', { direction })
+      await pressTo(page, 'Tab', 'Invite people')
+      await openOverlay(page, page.getByRole('button', { name: 'Invite people' }), { by: 'keyboard' })
+      await pressTo(page, 'Tab', 'Role')
+      await openWith(page, 'Enter', 'Viewer')
+      await pressTo(page, 'ArrowDown', 'Editor')
+      await pressTo(page, 'ArrowDown', 'Owner')
+      await pressTo(page, 'ArrowDown', 'Viewer')
+      await page.keyboard.press('Escape')
+      await expectClosed(page, MENU)
+      await expect.poll(() => focused(page)).toBe('Role')
+      await expect(page.getByRole('dialog')).toBeVisible()
+      await page.keyboard.press('Escape')
+      await expectClosed(page)
+      await expect.poll(() => focused(page)).toBe('Invite people')
+    })
+
+    test('with links: the arrows walk the link rows with a ring, and Enter follows the focused one and closes the menu', async ({ page }) => {
+      await openLive(page, 'dropdown--with-links', { direction })
+      await pressTo(page, 'Tab', 'Help')
+      await openWith(page, 'Enter', 'Documentation')
+      await pressTo(page, 'ArrowDown', 'Changelog')
+      await expectRowRing(row(page, 'Changelog'), 'Changelog')
+      await pressTo(page, 'ArrowDown', 'Contact support')
+      await pressTo(page, 'ArrowDown', 'Status page')
+      await pressTo(page, 'ArrowDown', 'Documentation')
+      await pressTo(page, 'End', 'Status page')
+      await pressTo(page, 'ArrowUp', 'Contact support')
+      await page.keyboard.press('Enter')
+      await expect.poll(() => page.evaluate(() => location.hash)).toBe('#support')
+      await expectClosed(page, MENU)
+    })
 
     test('groups: the arrows pass over the group labels and go from the last row of one group to the first of the next', async ({ page }) => {
       await openLive(page, 'dropdown--groups', { direction })

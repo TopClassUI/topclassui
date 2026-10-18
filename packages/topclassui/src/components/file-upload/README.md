@@ -50,13 +50,15 @@ on screen: a refused file is shown with its reason and never sent.
 action.** `maxFiles` (1 to 100, default 1) keeps the first files and says how many are allowed;
 with 1 a new file replaces the old one. `maxSize` is in bytes (1 to 10 GiB, the default) and
 refuses a larger file as too large; `accept` refuses a file it does not take, as the picker
-reads it (`.pdf`, `image/*`, `application/pdf`). Each refusal is read out in a hidden status line.
+reads it (`.pdf`, `image/*`, `application/pdf`). Each refusal is read out in a hidden status line:
+the first five by name, then "and 995 more files refused".
 
 **The list** adds up across picks and drops, shows each file's name and size in the reader's
 digits, and has a remove button per file that reads "Remove brief.pdf". After a remove the
 focus goes to the next file's button, else the previous one, else the input. It shows
 `visibleRows` rows (1 to 20; left out, the `--tc-list-rows` knob) and then scrolls inside
-itself. `onValueChange(files)` hears the kept files after each change.
+itself. Refused files are rows too and are not capped by `maxFiles`, so above 200 rows the list
+windows: only the rows in view are mounted. `onValueChange(files)` hears the kept files after each change.
 
 ```tsx
 'use client'
@@ -94,7 +96,7 @@ No Base UI part: none takes a file.
 ### Not built
 
 Upload progress and a done or failed state per file (choice 23), a separate Browse button
-(choice 22), image previews, `capture`, folders, a controlled list, windowing (choice 25),
+(choice 22), image previews, `capture`, folders, a controlled list,
 `size`, the drawn "Drop to upload" while dragging, a `showList` toggle, paste into the zone, a
 check for the same file twice, an `error` status (choice 3), a skeleton.
 
@@ -120,7 +122,7 @@ Required: `aria-label` or `aria-labelledby` or `id`. Every other prop below is o
 | `invalid` | no | `boolean` | `false` | Marks the files as wrong: sets aria-invalid on the input, and the line of the zone turns to danger and thickens. |
 | `maxFiles` | no | `integer`, min 1, max 100 | `1` | How many files the list keeps, clamped to 1 to 100; above 1 the input takes several at once. |
 | `maxSize` | no | `integer`, min 1, max 10737418240 | `10737418240` | The largest file accepted, in bytes, clamped to 1 to 10 GiB; checked in the browser only. |
-| `onValueChange` | no | `((files: readonly File[]) => void)` | - | The accepted files after each pick, drop or remove. |
+| `onValueChange` | no | `((files: readonly File[]) => void)` | - | The accepted files after each pick, drop or remove. Client-only. |
 | `ref` | no | `Ref<HTMLDivElement>` | - | The root element, a `<div>`. |
 | `style` | no | `CSSProperties` | - | On the root. |
 | `visibleRows` | no | `number`, min 1, max 20 | `7` | Rows the list shows before it scrolls, clamped; left out, the --tc-list-rows knob applies. |
@@ -135,6 +137,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/multiple.tsx`
 - `dummy/rtl.tsx`
 - `dummy/states.tsx`
+- `dummy/ten-thousand.tsx`
 
 ## Verified against
 

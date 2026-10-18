@@ -6,14 +6,14 @@ import { x } from '#icons/data/x.js'
 import { POPUP_PASSIVE, VIEWPORT_PASSIVE } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
 import { OverlayScopeContext } from '#shared/overlay-scope.js'
-import { hasContent, renderTrigger } from '#shared/render-trigger.js'
+import { hasContent, renderPart, renderTrigger } from '#shared/render-trigger.js'
 import { Svg } from '#components/svg/index.js'
 import {
   DRAWER_BACKDROP, DRAWER_BODY, DRAWER_CLOSE, DRAWER_DESCRIPTION, DRAWER_EDGE, DRAWER_FOOTER, DRAWER_GRABBER,
   DRAWER_HEADER, DRAWER_POPUP, DRAWER_TITLE, DRAWER_VIEWPORT, DRAWER_VIEWPORT_EDGE, DRAWER_WIDTH, DRAWER_X,
 } from './classes.js'
 import { DRAWER_DEFAULTS } from './constants.js'
-import { DrawerContext, useDrawerBody, useDrawerClose, useDrawerPopup, useDrawerRoot } from './hook.js'
+import { useDrawerBody, useDrawerClose, useDrawerPopup, useDrawerRoot } from './hook.js'
 import { isSideSheet } from './lib.js'
 import type {
   DrawerBodyProps, DrawerCloseProps, DrawerDescriptionProps, DrawerFooterProps, DrawerHeaderProps, DrawerPopupProps,
@@ -33,9 +33,9 @@ export function DrawerRoot({
   const root = useDrawerRoot(placement, size, modal, onOpenChange)
   return (
     <OverlayScopeContext value={root.scope}>
-      <DrawerContext value={root.settings}>
+      <root.Context value={root.settings}>
         <Base.Root {...props} modal={modal} swipeDirection={root.swipeDirection} onOpenChange={root.onOpenChange} />
-      </DrawerContext>
+      </root.Context>
     </OverlayScopeContext>
   )
 }
@@ -49,8 +49,8 @@ export function DrawerTrigger({ className, render, ...rest }: DrawerTriggerProps
 /** The portal, the scrim, the viewport and the sheet in one part. Rest props reach the sheet; the
  * viewport carries the dir and the lang of the provider, which a portal cannot inherit. A bottom
  * sheet starts with its grabber, and every sheet ends with the x: a swipe is a drag (WCAG 2.5.7). */
-export function DrawerPopup({ container, keepMounted, className, children, ...rest }: DrawerPopupProps) {
-  const { dir, lang, placement, size, modal, scope } = useDrawerPopup()
+export function DrawerPopup({ container, keepMounted, ref, initialFocus, className, children, ...rest }: DrawerPopupProps) {
+  const { dir, lang, placement, size, modal, scope, ...focus } = useDrawerPopup(ref, initialFocus)
   const blocks = modal === true
   // Around every placement: a wrapper that came and went with it would remount an open sheet moved across a breakpoint.
   return (
@@ -65,6 +65,8 @@ export function DrawerPopup({ container, keepMounted, className, children, ...re
           <Base.Popup
             data-placement={placement}
             data-size={size}
+            ref={focus.ref}
+            initialFocus={focus.initialFocus}
             {...rest}
             data-overlay={scope}
             className={cn(
@@ -87,20 +89,23 @@ export function DrawerHeader({ className, ...rest }: DrawerHeaderProps) {
 }
 
 /** Base UI's title, an h2 that names the sheet. */
-export function DrawerTitle({ className, ...rest }: DrawerTitleProps) {
-  return <Base.Title {...rest} className={cn(DRAWER_TITLE, className)} />
+export function DrawerTitle({ className, render, ...rest }: DrawerTitleProps) {
+  const part = renderPart(render, cn(DRAWER_TITLE, className))
+  return <Base.Title {...rest} render={part.render} className={part.className} />
 }
 
 /** Base UI's description, a paragraph the sheet is described by. */
-export function DrawerDescription({ className, ...rest }: DrawerDescriptionProps) {
-  return <Base.Description {...rest} className={cn(DRAWER_DESCRIPTION, className)} />
+export function DrawerDescription({ className, render, ...rest }: DrawerDescriptionProps) {
+  const part = renderPart(render, cn(DRAWER_DESCRIPTION, className))
+  return <Base.Description {...rest} render={part.render} className={part.className} />
 }
 
 /** R-10.5-1: the scroll container, and Base UI's Content: a mouse drag in it selects text and
  * never moves the sheet. While it scrolls it is a tab stop, so the keyboard reaches a long text. */
-export function DrawerBody({ ref, className, ...rest }: DrawerBodyProps) {
+export function DrawerBody({ ref, className, render, ...rest }: DrawerBodyProps) {
   const body = useDrawerBody(ref)
-  return <Base.Content tabIndex={body.tabIndex} {...rest} ref={body.ref} className={cn(DRAWER_BODY, className)} />
+  const part = renderPart(render, cn(DRAWER_BODY, className))
+  return <Base.Content tabIndex={body.tabIndex} {...rest} ref={body.ref} render={part.render} className={part.className} />
 }
 
 /** The bar that stays put below the body, for the actions. */

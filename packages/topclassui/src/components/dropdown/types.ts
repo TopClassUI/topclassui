@@ -29,6 +29,11 @@ interface OwnRow {
 }
 
 /** R-5.6-1: a row is named by its text. A row with no text, an icon alone, takes aria-label. */
+/** What one row draws: the icon, the label and the shortcut. */
+export interface DropdownRowProps extends OwnRow {
+  label: ReactNode
+}
+
 type Named =
   | { children: ReactNode }
   | { 'children'?: undefined, 'aria-label': string }
@@ -48,7 +53,7 @@ export type DropdownTriggerProps =
 /** The popup's own props, and the two of the portal around it: where it mounts, and whether
  * it stays mounted while closed. The positioner takes none, so the placement stays ours. */
 export type DropdownPopupProps = Omit<Base.Popup.Props, 'className'>
-  & Pick<Base.Portal.Props, 'container' | 'keepMounted'>
+  & Omit<Base.Portal.Props, 'className' | keyof Base.Popup.Props>
   & Pick<DropdownDesignProps, 'placement'>
   & OwnClassName
 

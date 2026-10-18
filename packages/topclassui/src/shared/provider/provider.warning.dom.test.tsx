@@ -20,7 +20,7 @@ async function load() {
 
 let warn: MockInstance<typeof console.warn>
 beforeEach(() => { warn = vi.spyOn(console, 'warn').mockImplementation(() => {}) })
-afterEach(() => { warn.mockRestore(); vi.unstubAllEnvs() })
+afterEach(() => { warn.mockRestore(); vi.unstubAllEnvs(); document.documentElement.removeAttribute('dir') })
 
 describe('R-13-1: a provider the layout gave no direction or locale', () => {
   it('stays quiet when the layout passes both', async () => {
@@ -33,8 +33,10 @@ describe('R-13-1: a provider the layout gave no direction or locale', () => {
     const { Provider, Probe } = await load()
     const { getByTestId } = render(<Provider locale="ar"><Probe /></Provider>)
     expect(warn).toHaveBeenCalledTimes(1)
-    expect(warn.mock.calls[0]?.[0]).toContain('<TopClassProvider> has no valid direction, so it falls back to direction="ltr" locale="en"')
-    expect(warn.mock.calls[0]?.[0]).toContain('Pass both from the root layout (R-13-1)')
+    expect(warn.mock.calls[0]?.[0]).toBe(
+      '[topclassui] <TopClassProvider> has no valid direction, so it falls back to direction="ltr".\n'
+      + '  Pass both from the root layout (R-13-1): <TopClassProvider direction={dir} locale={locale}>',
+    )
     expect(getByTestId('probe').textContent).toBe('ltr ar')
   })
 
@@ -42,7 +44,10 @@ describe('R-13-1: a provider the layout gave no direction or locale', () => {
     const { Provider, Probe } = await load()
     const { getByTestId } = render(<Provider direction="rtl"><Probe /></Provider>)
     expect(warn).toHaveBeenCalledTimes(1)
-    expect(warn.mock.calls[0]?.[0]).toContain('has no valid locale,')
+    expect(warn.mock.calls[0]?.[0]).toBe(
+      '[topclassui] <TopClassProvider> has no valid locale, so it falls back to locale="en".\n'
+      + '  Pass both from the root layout (R-13-1): <TopClassProvider direction={dir} locale={locale}>',
+    )
     expect(getByTestId('probe').textContent).toBe('rtl en')
   })
 
@@ -50,7 +55,7 @@ describe('R-13-1: a provider the layout gave no direction or locale', () => {
     const { Provider, Probe } = await load()
     const { getByTestId } = render(<Provider direction="auto" locale=""><Probe /></Provider>)
     expect(warn).toHaveBeenCalledTimes(1)
-    expect(warn.mock.calls[0]?.[0]).toContain('has no valid direction or locale,')
+    expect(warn.mock.calls[0]?.[0]).toContain('has no valid direction or locale, so it falls back to direction="ltr" locale="en".')
     expect(getByTestId('probe').textContent).toBe('ltr en')
   })
 
@@ -76,5 +81,35 @@ describe('R-13-1: a provider the layout gave no direction or locale', () => {
     const { getByTestId } = render(<Provider><Probe /></Provider>)
     expect(warn).not.toHaveBeenCalled()
     expect(getByTestId('probe').textContent).toBe('ltr en')
+  })
+})
+
+describe('R-13-1: a provider whose direction disagrees with <html dir>', () => {
+  it('warns once, naming both, when the outermost provider disagrees with the page', async () => {
+    document.documentElement.dir = 'rtl'
+    const { Provider } = await load()
+    render(<Provider direction="ltr" locale="en"><p>x</p></Provider>)
+    render(<Provider direction="ltr" locale="en"><p>y</p></Provider>)
+    expect(warn).toHaveBeenCalledTimes(1)
+    expect(warn.mock.calls[0]?.[0]).toBe(
+      '[topclassui] <TopClassProvider direction="ltr"> disagrees with <html dir="rtl">.\n'
+      + '  Pass the same direction to both from the root layout (R-13-1).',
+    )
+  })
+
+  it('stays quiet when they agree, when the page sets no dir, and for a nested island', async () => {
+    const { Provider } = await load()
+    render(<Provider direction="ltr" locale="en"><p>x</p></Provider>)
+    document.documentElement.dir = 'ltr'
+    render(<Provider direction="ltr" locale="en"><Provider direction="rtl" locale="ar"><p>y</p></Provider></Provider>)
+    expect(warn).not.toHaveBeenCalled()
+  })
+
+  it('never warns in production', async () => {
+    vi.stubEnv('NODE_ENV', 'production')
+    document.documentElement.dir = 'rtl'
+    const { Provider } = await load()
+    render(<Provider direction="ltr" locale="en"><p>x</p></Provider>)
+    expect(warn).not.toHaveBeenCalled()
   })
 })

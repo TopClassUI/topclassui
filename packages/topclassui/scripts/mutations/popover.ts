@@ -13,14 +13,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the popover popup loses max-h-(--available-height), so sixty lines run off the bottom of the screen',
     file: CLASSES,
-    from: ' max-h-(--available-height)',
-    to: '',
+    from: '  POPUP_BOUNDS,\n',
+    to: "  'max-w-[round(down,var(--available-width),1px)]',\n",
   },
   {
     label: 'the popover popup loses max-w-(--available-width), so at a doubled text size it is wider than a phone',
     file: CLASSES,
-    from: ' max-w-(--available-width)',
-    to: '',
+    from: '  POPUP_BOUNDS,\n',
+    to: "  'max-h-(--available-height)',\n",
   },
   {
     label: 'the popover popup loses SCROLL_AREA, so a text taller than its box is painted over the page instead of scrolling',
@@ -109,13 +109,13 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the popover forgets the shared side offset, so the popup touches its trigger',
     file: CLIENT,
-    from: "        sideOffset={POPUP_BOUNDS.sideOffset}\n",
+    from: "        sideOffset={FLOATING.sideOffset}\n",
     to: '',
   },
   {
     label: "the popover falls back to Base UI's 5 px collision padding instead of the shared 8",
     file: CLIENT,
-    from: "        collisionPadding={POPUP_BOUNDS.collisionPadding}\n",
+    from: "        collisionPadding={FLOATING.collisionPadding}\n",
     to: '',
   },
   {
@@ -139,8 +139,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the popover root never shares its scope with its popup, so the guard finds no popup of its own and never waits for a tooltip',
     file: CLIENT,
-    from: '<PopoverScopeContext value={scope}>',
-    to: '<PopoverScopeContext value="">',
+    from: '<Context value={scope}>',
+    to: '<Context value="">',
   },
   {
     label: 'the popover popup writes its scope under another attribute than the one its guard looks for',

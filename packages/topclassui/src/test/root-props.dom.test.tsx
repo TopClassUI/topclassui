@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
 
 import { findRepoRoot } from '../../scripts/lib/repo-root.js'
-import { rootPropsFailures } from './root-props.js'
+import { bulletRecords, rootPropsFailures } from './root-props.js'
 import type { RootPropsCase } from './root-props.js'
 
 // The one async Icon imports server-only, which throws outside the react-server condition.
@@ -11,7 +11,9 @@ vi.mock('server-only', () => ({}))
 
 type Module = Record<string, unknown>
 
-type Fixture = Record<string, RootPropsCase<unknown> | undefined>
+type Fixture = Record<string, RootPropsCase<unknown> | RootPropsCase<unknown>[] | undefined>
+
+const casesOf = (entry: Fixture[string]): RootPropsCase<unknown>[] => (entry === undefined ? [] : Array.isArray(entry) ? entry : [entry])
 
 const ROOTS = ['components', 'connectors'] as const
 const folders = ROOTS.flatMap((root) =>
@@ -31,22 +33,21 @@ const load = async (folder: Folder, file: 'index.tsx' | 'skeleton.tsx' | 'test/f
     : await import(`../connectors/${folder.slug}/${file}`) as Module
 }
 
-// pnpm test:mutation runs a copy of the package outside the repo and names the repo in TC_REPO_ROOT.
-const repoRoot = process.env['TC_REPO_ROOT'] ?? findRepoRoot(process.cwd(), existsSync) ?? process.cwd()
+const repoRoot = findRepoRoot(process.cwd(), existsSync) ?? process.cwd()
 /** Each entry of docs/DECISIONS.md by its heading, so a recorded departure must point at a real one. */
 const decisions = new Map(
   readFileSync(join(repoRoot, 'docs', 'DECISIONS.md'), 'utf8').split(/^## /m).slice(1)
     .map((entry) => [entry.slice(0, entry.indexOf('\n')).trim(), entry] as const),
 )
-const decisionOf = (entry: RootPropsCase<unknown> | undefined) =>
-  entry === undefined ? undefined : 'headless' in entry ? entry.headless.decision : entry.target?.decision
+const decisionsOf = (entry: RootPropsCase<unknown>) =>
+  'headless' in entry ? [entry.headless.decision] : [entry.target?.decision, entry.portal?.decision].filter((d) => d !== undefined)
 
 const isComponent = ([name, value]: [string, unknown]) =>
   /^[A-Z]/.test(name) && (typeof value === 'function' || (typeof value === 'object' && value !== null && '$$typeof' in value))
 
 const exportsOf = (module: Module) => Object.entries(module).filter(isComponent)
 
-describe('R-5.7-3: className, ref and data-* reach the root of every export', () => {
+describe('R-5.7-3: className, style, ref and data-* reach the root of every export', () => {
   it('finds the component folders', () => {
     expect(folders.length).toBeGreaterThanOrEqual(46)
   })
@@ -59,16 +60,14 @@ describe('R-5.7-3: className, ref and data-* reach the root of every export', ()
       expect(Object.keys(fixture).filter((n) => !names.has(n))).toEqual([])
     })
 
-    it('every departure points at a docs/DECISIONS.md entry that names the export', async () => {
+    it('every departure points at a bullet of a docs/DECISIONS.md entry that names the export and R-5.7-3', async () => {
       const fixture = ((await load(folder, 'test/fixture.ts')).fixture ?? {}) as Fixture
-      const unrecorded = Object.entries(fixture).filter(([name, entry]) => {
-        const decision = decisionOf(entry)
-        return decision !== undefined && !(decisions.get(decision)?.includes(name) ?? false)
-      })
+      const unrecorded = Object.entries(fixture)
+        .filter(([name, entry]) => casesOf(entry).some((c) => decisionsOf(c).some((decision) => !bulletRecords(decisions.get(decision) ?? '', name))))
       expect(unrecorded.map(([name]) => name)).toEqual([])
     })
 
-    it('every export renders className, ref and data-* onto its root', async () => {
+    it('every export renders className, style, ref and data-* onto its root', async () => {
       const fixture = ((await load(folder, 'test/fixture.ts')).fixture ?? {}) as Fixture
       const skeleton = exportsOf(await load(folder, 'skeleton.tsx'))
       const fromSkeleton = new Set(skeleton.map(([n]) => n))
@@ -77,10 +76,9 @@ describe('R-5.7-3: className, ref and data-* reach the root of every export', ()
       const report: Record<string, string[]> = {}
       for (const [name, component] of all) {
         // A skeleton takes no required prop, so one merged from another branch is covered before its fixture line.
-        const entry = fixture[name] ?? (fromSkeleton.has(name) ? { props: {} } : undefined)
-        report[name] = entry
-          ? await rootPropsFailures(component, entry)
-          : [`no case in ${folder.name}/test/fixture.ts`]
+        const cases = casesOf(fixture[name] ?? (fromSkeleton.has(name) ? { props: {} } : undefined))
+        if (cases.length === 0) report[name] = [`no case in ${folder.name}/test/fixture.ts`]
+        for (const [i, entry] of cases.entries()) report[cases.length > 1 ? `${name}#${String(i)}` : name] = await rootPropsFailures(component, entry)
       }
       const failing = Object.fromEntries(Object.entries(report).filter(([, f]) => f.length > 0))
       expect(failing).toEqual({})

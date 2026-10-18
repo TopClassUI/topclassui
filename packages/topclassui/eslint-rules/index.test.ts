@@ -572,6 +572,13 @@ describe('R-5.2-6: data and aria variants are bare', () => {
     ['a named group', '<div className="group-data-[open]/item:block" />', '"group-data-open/item:"'],
     ['a stacked variant', 'const BOX_CLASSES = "p-2 rtl:data-[disabled]:opacity-50"', '"data-disabled:"'],
     ['a class list outside a class context', 'const x = { root: "flex data-[highlighted]:bg-hover" }', '"data-highlighted:"'],
+    ['an arbitrary selector', '<div className="[&[data-open]]:block" />', '"data-open:"'],
+    ['an arbitrary :has()', '<div className="[&:has([data-open])]:block" />', '"has-data-open:"'],
+    ['an arbitrary :not()', '<div className="[&:not([data-disabled])]:block" />', '"not-data-disabled:"'],
+    ['has-[[data-x]]', '<div className="has-[[data-open]]:block" />', '"has-data-open:"'],
+    ['not-[[data-x]] under a group', '<div className="group-not-[[data-open]]:block" />', '"group-not-data-open:"'],
+    ['an arbitrary selector outside a class context', 'const x = "flex [&[data-open]]:block"', '"data-open:"'],
+    ['a trailing underscore', '<div className="data-[open_]:block" />', '"data-open:"'],
   ]
   for (const [label, code, hint] of bad) {
     it(`fails on ${label} and names the bare form`, () => {
@@ -586,14 +593,58 @@ describe('R-5.2-6: data and aria variants are bare', () => {
     '<div className="data-[state=open]:block" />',
     '<div className="data-[size=custom]:h-auto aria-[current=page]:font-medium" />',
     '<div className="group-data-[side=top]/item:block" />',
-    '<div className="[&[data-open]]:block" />',
     '<div className="data-open:[--tc-x:1]" />',
+    '<div className="[&:is(button,a)]:block [&_[data-open]]:block has-[input:disabled]:opacity-50" />',
+    '<div className="[&[data-side=top]]:block aria-[sort=ascending]:font-medium" />',
+    '<div className="data-[_]:block" />',
   ]
   for (const code of good) {
     it(`allows ${code}`, () => {
       expect(ids(code).filter((r) => r === 'topclass/bare-data-variants'), code).toEqual([])
     })
   }
+})
+
+describe('R-5.2-6: what the bare form means', () => {
+  const only = (code: string) => lint(code).filter((m) => m.ruleId === 'topclass/bare-data-variants')
+
+  const ariaCases: [string, string][] = [
+    ['<div className="aria-[busy]:cursor-progress" />', '"aria-busy:"'],
+    ['<div className="aria-[busy=true]:cursor-progress" />', '"aria-busy:"'],
+    ['<div className="aria-[busy=\'true\']:cursor-progress" />', '"aria-busy:"'],
+    ['const c = cn(\'aria-[busy="true"]:cursor-progress\')', '"aria-busy:"'],
+    ['<div className="[&[aria-busy]]:cursor-progress" />', '"aria-busy:"'],
+    ['<div className="[&[aria-busy=true]]:cursor-progress" />', '"aria-busy:"'],
+  ]
+  for (const [code, hint] of ariaCases) {
+    it(`says the bare aria form matches only "true": ${code}`, () => {
+      const messages = only(code)
+      expect(messages, code).toHaveLength(1)
+      expect(messages[0]?.message, code).toContain(hint)
+      expect(messages[0]?.message, code).toContain('which matches aria-busy="true"; set the attribute only as "true" or absent')
+    })
+  }
+
+  it('warns that in- drops the specificity of [[data-x]_&]', () => {
+    const messages = only('<div className="[[data-open]_&]:block" />')
+    expect(messages).toHaveLength(1)
+    expect(messages[0]?.message).toContain('"in-data-open:"')
+    expect(messages[0]?.message).toContain('loses its 0,1,0 specificity')
+  })
+
+  it('does not call a data- rewrite anything but equivalent', () => {
+    const messages = only('<div className="data-[open]:block" />')
+    expect(messages[0]?.message).toBe('R-5.2-6: "data-[open]:" brackets a bare name. Write "data-open:"; brackets only hold name=value.')
+  })
+
+  it('reports every bracketed name in a string, not only the first', () => {
+    const messages = only('<div className="data-[open]:block aria-[busy]:opacity-50 group-data-[active]:flex" />')
+    expect(messages.map((m) => m.message.split('"')[3])).toEqual(['data-open:', 'aria-busy:', 'group-data-active:'])
+  })
+
+  it('leaves aria-[x=false] and data-[x=true], whose bare forms mean something else', () => {
+    expect(only('<div className="aria-[busy=false]:block data-[open=true]:block [&[data-open=true]]:block" />')).toEqual([])
+  })
 })
 
 describe('R-9.2-3: parts are exported flat', () => {
@@ -675,6 +726,17 @@ describe('R-10.5-2: a tooltip is plain text', () => {
     ['an element passed as the children prop', '<TooltipPopup children={<a href="/">Home</a>} />'],
     ['an element spread in as children', '<TooltipPopup {...{ children: <a href="/">Home</a> }} />'],
     ['an import renamed on the way in', 'import { TooltipPopup as Tip } from "x"\nconst t = <Tip><a href="/">Home</a></Tip>'],
+    ['Base UI\'s own popup', 'import { Tooltip } from "@base-ui/react/tooltip"\nconst t = <Tooltip.Popup><a href="/">Home</a></Tooltip.Popup>'],
+    ['Base UI\'s popup renamed, from the package root', 'import { Tooltip as Base } from "@base-ui/react"\nconst t = <Base.Popup><a href="/">Home</a></Base.Popup>'],
+    ['Base UI\'s viewport under a namespace import', 'import * as B from "@base-ui/react"\nconst t = <B.Tooltip.Viewport><a href="/">Home</a></B.Tooltip.Viewport>'],
+    ['an element as Base UI\'s render', 'import { Tooltip as Base } from "@base-ui/react/tooltip"\nconst t = <Base.Popup render={<a href="/">Home</a>} />'],
+    ['an element as the render prop', '<TooltipPopup render={<a href="/">Home</a>} />'],
+    ['an element thirty levels into an expression', `<TooltipPopup>{<a href="/">Home</a> + ${Array.from({ length: 30 }, () => "'a'").join(' + ')}}</TooltipPopup>`],
+    ['a cast', '<TooltipPopup>{link as unknown as string}</TooltipPopup>'],
+    ['a cast in a wrapper', '<TooltipPopup {...rest}>{children as TooltipText}</TooltipPopup>'],
+    ['a satisfies in the children prop', '<TooltipPopup children={label satisfies string} />'],
+    ['dangerouslySetInnerHTML', '<TooltipPopup dangerouslySetInnerHTML={{ __html: html }} />'],
+    ['dangerouslySetInnerHTML on Base UI\'s popup', 'import { Tooltip as Base } from "@base-ui/react/tooltip"\nconst t = <Base.Popup dangerouslySetInnerHTML={{ __html: html }} />'],
   ]
   for (const [label, code] of bad) {
     it(`fails on ${label}`, () => {
@@ -689,8 +751,21 @@ describe('R-10.5-2: a tooltip is plain text', () => {
       'R-10.5-2: <a> inside TooltipPopup makes it more than text. A link, a control or rich content belongs in a Popover.')
   })
 
+  it('names a cast and dangerouslySetInnerHTML for what they are', () => {
+    const messages = (code: string) => lint(code)
+      .filter((m) => m.ruleId === 'topclass/tooltip-content-is-text').map((m) => m.message)
+    expect(messages('<TooltipPopup>{link as unknown as string}</TooltipPopup>')).toEqual([
+      'R-10.5-2: a cast hides what the tooltip renders. Give TooltipPopup text, or use a Popover.',
+    ])
+    expect(messages('<TooltipPopup dangerouslySetInnerHTML={{ __html: html }} />')).toEqual([
+      'R-10.5-2: dangerouslySetInnerHTML puts markup in TooltipPopup. Rich content belongs in a Popover.',
+    ])
+  })
+
   const good = [
     '<TooltipPopup>Copy link</TooltipPopup>',
+    '<TooltipPopup>{"Copy" as const}</TooltipPopup>',
+    'import { Popover as Base } from "@base-ui/react/popover"\nconst p = <Base.Popup><a href="/docs">Docs</a></Base.Popup>',
     '<TooltipPopup>Delete {count} rows</TooltipPopup>',
     '<TooltipPopup placement="bottom-start">{FILE}</TooltipPopup>',
     '<TooltipPopup>{labels.copy}</TooltipPopup>',
@@ -722,6 +797,12 @@ describe('R-5.7-5: public types are derived from Base UI at the seam', () => {
     ['a pinned alias omitted without className', `${IMPORT}type BaseRoot = Base.Root.Props<string>\nexport type P = Omit<BaseRoot, 'children'>`, 'omit'],
     ['a pinned alias that is exported', `${IMPORT}export type BaseRoot = Base.Root.Props<string>`, 'bare'],
     ['a Pick that takes className', `${IMPORT}export type P = Pick<Base.Root.Props, 'open' | 'className'>`, 'pick'],
+    ['a Pick of named props', `${IMPORT}export type P = Pick<Base.Root.Props, 'open'>`, 'pick'],
+    ['a Pick of the Portal props', `${IMPORT}export type P = Pick<Base.Portal.Props, 'container' | 'keepMounted'>`, 'pick'],
+    ['a Pick of a pinned alias', `${IMPORT}type BaseRoot = Base.Root.Props<string>\nexport type P = Pick<BaseRoot, 'open'>`, 'pick'],
+    ['an alias of a pinned alias, exported', `${IMPORT}type A = Base.Root.Props\ntype B = A\nexport type P = B`, 'bare'],
+    ['an alias of a pinned alias, omitted without className', `${IMPORT}type A = Base.Root.Props\ntype B = A\nexport type P = Omit<B, 'handle'>`, 'omit'],
+    ['an alias of a pinned alias declared first', `${IMPORT}type B = A\ntype A = Base.Root.Props\nexport type P = B & {}`, 'bare'],
     ['a namespace with Props directly on it', "import type { RadioGroup } from '@base-ui/react/radio-group'\nexport type P = RadioGroup.Props & {}", 'bare'],
   ]
   for (const [label, code, messageId] of bad) {
@@ -736,7 +817,9 @@ describe('R-5.7-5: public types are derived from Base UI at the seam', () => {
     ['className through a local alias of keys', `${IMPORT}type Removed = 'handle'\ntype Owned = 'className' | Removed\nexport type P = Omit<Base.Root.Props, Owned>`],
     ['a key alias declared after its use', `${IMPORT}export type P = Omit<Base.Root.Props, Owned>\ntype Owned = 'className' | 'ref'`],
     ['a private alias that pins the generics', `${IMPORT}type BaseRoot = Base.Root.Props<string>\nexport type P = Omit<BaseRoot, 'className'>`],
-    ['a Pick of named props', `${IMPORT}export type P = Pick<Base.Portal.Props, 'container' | 'keepMounted'>`],
+    ['the Portal props a Popup part folds in', `${IMPORT}export type P = Omit<Base.Portal.Props, 'className' | keyof Base.Popup.Props>`],
+    ['a Pick of our own derived props', `${IMPORT}type Own = Omit<Base.Root.Props, 'className'>\nexport type P = Pick<Own, 'open'>`],
+    ['an alias of a pinned alias used by index', `${IMPORT}type A = Base.Root.Props\ntype B = A\nexport type Open = B['open']`],
     ['one prop read by index', `${IMPORT}export type DialogModal = NonNullable<Base.Root.Props['modal']>`],
     ['the keys of the props', `${IMPORT}type Owned = keyof Base.Root.Props`],
     ['an interface that extends the Omit', `${IMPORT}export interface P extends Omit<Base.Root.Props, 'className'> {}`],
@@ -749,9 +832,10 @@ describe('R-5.7-5: public types are derived from Base UI at the seam', () => {
     })
   }
 
-  it('reads only types.ts for the derivation, where R-8.3-4 puts every prop type', () => {
+  it('reads every file for the derivation, not only types.ts', () => {
     const code = `${IMPORT}export type P = Base.Root.Props`
-    expect(own(code, 'src/shared/overlay.ts')).toEqual([])
+    expect(own(code, 'src/shared/overlay.ts')).toEqual(['bare'])
+    expect(own(`${IMPORT}type P = Pick<Base.Root.Props, 'open'>`, 'src/components/x/hook.ts')).toEqual(['pick'])
   })
 
   it('refuses a Base UI re-export in any file, not only types.ts', () => {
@@ -775,6 +859,8 @@ describe('the new rules leave real component code alone', () => {
     ['a class lookup that happens to use PascalCase keys', 'const Tone = { Primary: "tone-primary", Danger: "tone-danger" }'],
     ['a numeric data attribute that is not a state', '<div data-index="2" />'],
     ['an entity rather than prose', '<span>&times;</span>'],
+    ['the tooltip popup with its arrow, as the component writes it',
+      'import { Tooltip as Base } from "@base-ui/react/tooltip"\nconst t = <Base.Popup data-placement={placement} {...rest} className={cn(POPUP, className)}>{children}<Base.Arrow className={ARROW} /></Base.Popup>'],
   ]
   for (const [label, code] of allowed) {
     it(`allows ${label}`, () => {
@@ -830,10 +916,47 @@ describe('R-5.3-2: directional motion follows --tc-dir', () => {
     ['ltr: on anything', '<div className="ltr:rotate-180" />'],
     ['an arbitrary dir variant', '<div className="[[dir=rtl]_&]:ms-2" />'],
     ['a :dir() variant', '<div className="[&:dir(rtl)]:scale-x-[-1]" />'],
-    ['a mirror other than the icon flip', '<div className="rtl:-scale-x-50" />'],
+    ['a mirror on rtl:', '<div className="rtl:-scale-x-50" />'],
+    ['the icon mirror on rtl: rather than --tc-dir', '<svg className="inline-block shrink-0 rtl:-scale-x-100" />'],
     ['object-left with no rtl mirror', '<img className="object-left" />'],
     ['bg-right with no rtl mirror', '<div className="bg-right" />'],
     ['a class list in a const', 'const SLIDE = "transition-transform translate-x-full"'],
+    ['a swipe-named variable with a tail', '<div className="transform-[translateX(var(--foo-swipe-movement-x)+100px)]" />'],
+    ['a swipe offset of a component Base UI does not measure', '<div className="transform-[translateX(var(--sheet-swipe-movement-x))]" />'],
+    ['an origin variable Base UI does not set', '<div className="origin-(--my-origin)" />'],
+    ['an origin at the physical zero', '<div className="origin-[0_0]" />'],
+    ['an origin at a physical percentage', '<div className="origin-[25%_50%]" />'],
+    ['an origin at a physical length', '<div className="origin-[10px]" />'],
+    ['a translate-x with --tc-dir added rather than multiplied', '<div className="translate-x-[calc(100%+var(--tc-dir))]" />'],
+    ['a translate with --tc-dir added', '<div className="transform-[translateX(calc(100%+var(--tc-dir)))]" />'],
+    ['a translate with a term beside the --tc-dir product', '<div className="translate-x-[calc(100%*var(--tc-dir)+4px)]" />'],
+    ['a position whose mirror is another family', '<div className="object-left bg-right rtl:object-right" />'],
+    ['a position whose rtl twin is itself', '<img className="object-left rtl:object-left" />'],
+    ['a position whose rtl twin is the centre', '<img className="object-left rtl:object-center" />'],
+    ['a position whose mirror drops its width variant', '<img className="md:object-left rtl:object-right" />'],
+    ['an arbitrary object position on a side', '<img className="object-[left_top]" />'],
+    ['an arbitrary bg position on a side', '<div className="bg-position-[left_top]" />'],
+    ['a bg position property on a side', '<div className="bg-[position:right_top]" />'],
+    ['a physical percentage position', '<img className="object-[25%_75%]" />'],
+    ['a gradient side with a colour space', '<div className="bg-linear-to-r/oklch" />'],
+    ['a gradient angle with a colour space', '<div className="bg-linear-90/srgb" />'],
+    ['an important gradient side', '<div className="bg-linear-to-r!" />'],
+    ['a gradient angle in a variable', '<div className="bg-linear-(--angle)" />'],
+    ['a conic angle', '<div className="bg-conic-90" />'],
+    ['a conic-gradient from an inline angle', '<div className="bg-[conic-gradient(from_90deg,var(--a),var(--b))]" />'],
+    ['a radial centre on a side', '<div className="bg-radial-[at_left]" />'],
+    ['a radial-gradient centred on a side', '<div className="bg-[radial-gradient(at_left,var(--a),var(--b))]" />'],
+    ['a mask angle', '<div className="mask-linear-90" />'],
+    ['a mask side', '<div className="mask-linear-to-r" />'],
+    ['a mask from one physical side', '<div className="mask-r-from-50%" />'],
+    ['a radial mask centred on a side', '<div className="mask-radial-at-top-left" />'],
+    ['a translate outside a class context with a capital in brackets', 'const slide = "transform-[translateX(100%)]"'],
+    ['a --tc-* style value that translates', '<div style={{ "--tc-x": "translateX(10px)" }} />'],
+    ['a --tc-* style value with a gradient to a side', '<div style={{ "--tc-fill": `linear-gradient(to right, red, blue)` }} />'],
+    ['the icon mirror on not-ltr:', '<svg className="not-ltr:-scale-x-100" />'],
+    ['a rotation on not-rtl:', '<svg className="not-rtl:rotate-180" />'],
+    ['a rotation on group-rtl:', '<svg className="group-rtl:rotate-180" />'],
+    ['a rotation on peer-rtl:', '<svg className="peer-rtl:rotate-180" />'],
   ]
   for (const [label, code] of fails) {
     it(`fails on ${label}`, () => {
@@ -853,12 +976,25 @@ describe('R-5.3-2: directional motion follows --tc-dir', () => {
     ['a centre or block-edge origin', '<div className="origin-center origin-top origin-bottom" />'],
     ['a vertical gradient', '<div className="bg-linear-to-b bg-gradient-to-t bg-linear-180" />'],
     ['a gradient angle times --tc-dir', '<div className="bg-linear-[calc(90deg*var(--tc-dir)),var(--a),var(--b)]" />'],
-    ['the icon mirror of PLAN section 7', '<svg className="inline-block shrink-0 rtl:-scale-x-100" />'],
+    ['the icon mirror times --tc-dir', '<svg className="inline-block shrink-0 scale-x-(--tc-dir)" />'],
     ['an object position with its rtl mirror', '<img className="object-left rtl:object-right" />'],
     ['a bg position with its rtl mirror', '<div className="bg-left-top rtl:bg-right-top" />'],
     ['a direction-neutral position', '<img className="object-center bg-top" />'],
     ['the data-ltr attribute variant, which is not ltr:', '<input className="data-ltr:text-match-parent" />'],
     ['a block-axis rotation', '<div className="group-data-panel-open:rotate-180" />'],
+    ['the swipe offset as a variable shorthand', '<div className="translate-x-(--drawer-swipe-movement-x)" />'],
+    ['the swipe offset in brackets', '<div className="translate-x-[var(--toast-swipe-movement-x)]" />'],
+    ['a zero translate in brackets', '<div className="translate-x-[0]" />'],
+    ['a translate with --tc-dir first', '<div className="-translate-x-[calc(var(--tc-dir)*4px)]" />'],
+    ['the measured origin in brackets and as a property', '<div className="origin-[var(--transform-origin)] [transform-origin:var(--transform-origin)]" />'],
+    ['an origin on the top edge', '<div className="origin-[top] origin-[top_center]" />'],
+    ['an origin x that follows --tc-dir', '<div className="origin-[calc(50%-50%*var(--tc-dir))_50%]" />'],
+    ['a position mirrored under the same width variant', '<img className="md:object-left md:rtl:object-right rtl:md:object-left" />'],
+    ['an arbitrary position with its mirror', '<img className="object-[25%_75%] rtl:object-[75%_75%]" />'],
+    ['a block-axis gradient with a colour space', '<div className="bg-linear-to-b/oklch bg-conic-180 bg-radial-[at_top] mask-radial-at-top" />'],
+    ['a --tc-* style value with no direction', '<div style={{ "--tc-y": "translateY(10px)", "--tc-x": "translateX(calc(4px*var(--tc-dir)))" }} />'],
+    ['a CSS declaration in a test, which is no class list', 'const css = "transform: translateX(var(--x)); translate: 0"'],
+    ['a bare utility prefix', 'const PREFIX = "rtl: translate-x-"'],
   ]
   for (const [label, code] of passes) {
     it(`allows ${label}`, () => {
@@ -875,8 +1011,8 @@ describe('R-5.3-2 rejects the real sources once their direction is taken out', (
     it(`${file} passes as written`, () => {
       expect(ids(code, file)).not.toContain(RULE)
     })
-    it(`${file} fails with --tc-dir removed or the mirror widened`, () => {
-      const broken = code.replaceAll('*var(--tc-dir)', '').replaceAll('rtl:-scale-x-100', 'rtl:-scale-x-100 rtl:rotate-180')
+    it(`${file} fails with --tc-dir removed or the mirror put back on rtl:`, () => {
+      const broken = code.replaceAll('*var(--tc-dir)', '').replaceAll('scale-x-(--tc-dir)', 'rtl:-scale-x-100')
       expect(ids(broken, file)).toContain(RULE)
     })
   }
@@ -903,6 +1039,24 @@ describe('R-8.5-2: components never fetch, cache or paginate', () => {
     ['React.cache()', "import * as React from 'react'\nexport const get = React.cache(() => 1)"],
     ['an import from next/cache', "import { revalidateTag } from 'next/cache'\nexport const r = revalidateTag"],
     ['unstable_cache used', 'export const get = unstable_cache(async () => 1)'],
+    ['localStorage destructured off window', 'export const { localStorage: ls } = window'],
+    ['localStorage destructured shorthand', 'export const { localStorage } = globalThis'],
+    ['a nested host', "export const v = globalThis.window.localStorage.getItem('k')"],
+    ['a computed host member', "export const v = window['localStorage'].getItem('k')"],
+    ['a bare fetch reference', "export const all = ['/a'].map(fetch)"],
+    ["React's cache through a renamed namespace", "import * as R from 'react'\nexport const get = R.cache(() => 1)"],
+    ['new WebSocket()', "export const s = new WebSocket('wss://x')"],
+    ['new EventSource()', "export const s = new EventSource('/events')"],
+    ['navigator.sendBeacon()', "export const b = () => navigator.sendBeacon('/log')"],
+    ['document.cookie', 'export const c = () => document.cookie'],
+    ['cookie destructured off document', 'export const { cookie } = document'],
+    ['an import from axios', "import axios from 'axios'\nexport const a = axios"],
+    ['an import from swr', "import useSWR from 'swr'\nexport const a = useSWR"],
+    ['an import from @tanstack/react-query', "import { useQuery } from '@tanstack/react-query'\nexport const a = useQuery"],
+    ['an import from @apollo/client', "import { useQuery } from '@apollo/client'\nexport const a = useQuery"],
+    ['an import from ky', "import ky from 'ky'\nexport const a = ky"],
+    ['a subpath import from swr', "import useSWRInfinite from 'swr/infinite'\nexport const a = useSWRInfinite"],
+    ['a dynamic import of axios', "export const a = () => import('axios')"],
   ]
   for (const [label, code] of bad) {
     it(`fails on ${label}`, () => {
@@ -911,11 +1065,13 @@ describe('R-8.5-2: components never fetch, cache or paginate', () => {
     })
   }
 
-  it('covers components, connectors and shared, and nothing else', () => {
+  it('covers everything under src, and nothing else', () => {
     const code = "export const load = () => fetch('/api/items')"
     expect(only(code, 'src/components/combobox/hook.ts')).toHaveLength(1)
     expect(only(code, 'src/connectors/adaptive-menu/client.tsx')).toHaveLength(1)
     expect(only(code, 'src/shared/collection/use-collection.ts')).toHaveLength(1)
+    expect(only(code, 'src/icons/x.ts')).toHaveLength(1)
+    expect(only(code, 'src/index.ts')).toHaveLength(1)
     expect(only(code, 'scripts/check-icons.ts')).toEqual([])
     expect(only(code, 'e2e/select.spec.ts')).toEqual([])
   })
@@ -942,6 +1098,10 @@ describe('R-8.5-2: components never fetch, cache or paginate', () => {
     ['the word in a string', "export const NOTE = 'never touches localStorage'"],
     ['other React imports', "import { use, useId } from 'react'\nexport const a = [use, useId]"],
     ['a Response built from data, not a request', "export const r = new Response('ok')"],
+    ['a key destructured off a plain object', 'export const { localStorage: ls } = { localStorage: 1 }'],
+    ['other members of document and navigator', 'export const t = () => [document.title, navigator.language]'],
+    ['a WebSocket in a type, which opens nothing', 'export type Socket = { ws: WebSocket; f: typeof fetch }'],
+    ['a member of React other than cache', "import * as R from 'react'\nexport const a = R.useId"],
   ]
   for (const [label, code] of good) {
     it(`allows ${label}`, () => {
@@ -1038,6 +1198,8 @@ describe("R-5.2-2: the consumer's className is the last argument to cn()", () =>
     ['a computed props["className"]', 'cn(props["className"], own)'],
     ['className under a type assertion', 'cn(className as string, "flex")'],
     ['className inside JSX', '<div className={cn(className, CARD)} />'],
+    ['props.className before another object\'s className', 'cn(props.className, own.className)'],
+    ['className before a className read off a style table', 'cn(className, STYLES.className)'],
   ]
   for (const [label, code] of rejected) {
     it(`rejects ${label}`, () => {
@@ -1061,7 +1223,7 @@ describe("R-5.2-2: the consumer's className is the last argument to cn()", () =>
     ['no consumer class at all', 'cn(SWITCH_TRACK, SWITCH_TRACK_SIZE[size])'],
     ['another object that happens to hold a className', 'cn(own.className, "flex")'],
     ['a function other than cn', 'clsx(className, "flex")'],
-    ['the render= element class after the props class, as renderElement does', 'cn(props["className"] as never, own["className"] as never)'],
+    ['the render= element class after the component\'s finished class, as renderElement does', 'cn(base["className"] as never, own["className"] as never)'],
   ]
   for (const [label, code] of allowed) {
     it(`allows ${label}`, () => {
@@ -1085,6 +1247,9 @@ describe('R-5.3-4: never left or right as a side', () => {
     ['a cast that hides the type error', '<PopoverRoot placement={"left" as Placement} />'],
     ['an object property', 'const settings = { placement: "bottom-left" }'],
     ['a side in a settings object', 'const positioner = { side: "right", align: "start" }'],
+    ['a computed key written as a string', 'const positioner = { ["side"]: "left" }'],
+    ['a local const it names', 'const s = "left"; <Popover.Positioner side={s} />'],
+    ['a local const holding a conditional', 'const p = rtl ? "start" : "right"; <PopoverRoot placement={p} />'],
   ]
   for (const [label, code] of bad) {
     it(`fails on ${label}`, () => {
@@ -1098,6 +1263,7 @@ describe('R-5.3-4: never left or right as a side', () => {
     '<DrawerRoot placement="start" />',
     '<Popover.Positioner side="inline-end" align="center" />',
     '<Popover.Positioner side={side} align={align} />',
+    'const s = pick(); <Popover.Positioner side={s} />',
     '<DrawerRoot swipeDirection="left" />',
     'const inlineEnd = direction === "rtl" ? "left" : "right"',
     'const copy = { title: "Bright lights" }',

@@ -9,7 +9,8 @@ import { cn } from '#shared/cn.js'
 import {
   FILE_UPLOAD_ANNOUNCE, FILE_UPLOAD_BROWSE, FILE_UPLOAD_HINT, FILE_UPLOAD_ICON, FILE_UPLOAD_INPUT, FILE_UPLOAD_LIST,
   FILE_UPLOAD_MESSAGE, FILE_UPLOAD_NAME, FILE_UPLOAD_PROMPT, FILE_UPLOAD_REASON, FILE_UPLOAD_REJECTED_ICON,
-  FILE_UPLOAD_REMOVE, FILE_UPLOAD_ROOT, FILE_UPLOAD_ROW, FILE_UPLOAD_ROW_ICON, FILE_UPLOAD_SIZE, FILE_UPLOAD_ZONE,
+  FILE_UPLOAD_REMOVE, FILE_UPLOAD_ROOT, FILE_UPLOAD_ROW, FILE_UPLOAD_ROW_ICON, FILE_UPLOAD_SIZE, FILE_UPLOAD_SPACER_END,
+  FILE_UPLOAD_SPACER_START, FILE_UPLOAD_ZONE,
 } from './classes.js'
 import { FILE_UPLOAD_DEFAULTS } from './constants.js'
 import { useFileUpload } from './hook.js'
@@ -65,9 +66,13 @@ export function FileUpload({
           className={FILE_UPLOAD_INPUT}
         />
       </div>
-      <ul role="list" ref={upload.listRef} tabIndex={upload.tabIndex} style={{ '--tc-list-rows': upload.listRows }} className={FILE_UPLOAD_LIST}>
+      <ul role="list" ref={upload.listRef} tabIndex={upload.tabIndex}
+        style={{ '--tc-list-rows': upload.listRows, '--tc-list-pad-start': upload.padStart, '--tc-list-pad-end': upload.padEnd }}
+        className={FILE_UPLOAD_LIST}
+      >
+        {upload.padStart === undefined ? null : <li aria-hidden="true" className={FILE_UPLOAD_SPACER_START} />}
         {upload.rows.map((row) => (
-          <li key={row.key} className={FILE_UPLOAD_ROW}>
+          <li key={row.key} data-index={row.index} className={FILE_UPLOAD_ROW}>
             <span aria-hidden="true" className={row.rejected ? FILE_UPLOAD_REJECTED_ICON : FILE_UPLOAD_ROW_ICON}>
               <Svg icon={row.rejected ? warningCircle : fileIcon} />
             </span>
@@ -86,6 +91,7 @@ export function FileUpload({
             </button>
           </li>
         ))}
+        {upload.padEnd === undefined ? null : <li aria-hidden="true" className={FILE_UPLOAD_SPACER_END} />}
       </ul>
       {/* A new node per cut: the same words written again into the same node change nothing, and are not heard. */}
       <div role="status" className={FILE_UPLOAD_MESSAGE}>{upload.message === '' ? null : <span key={upload.messageKey}>{upload.message}</span>}</div>
@@ -93,6 +99,7 @@ export function FileUpload({
         {upload.refused.map((row) => (
           <div key={row.key}><span dir="auto">{row.name}</span> <span>{row.note}</span></div>
         ))}
+        {upload.refusedMore === '' ? null : <div>{upload.refusedMore}</div>}
       </div>
     </div>
   )

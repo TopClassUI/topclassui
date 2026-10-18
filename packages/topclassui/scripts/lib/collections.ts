@@ -2,12 +2,10 @@
 
 /** The folders that render items without useCollection, each by a decision in docs/DECISIONS.md. Keep it short. */
 export const COLLECTION_EXEMPT: Readonly<Record<string, string>> = {
-  breadcrumb: '2026-10-17: a trail of links, short by nature, rendered on the server',
-  dropdown: "2026-10-14: Base UI's Menu reaches mounted items only, so the row cap alone applies",
-  select: "2026-10-15: not windowed and takes no CollectionProps; the ten thousand options are Combobox's",
-  stepper: '2026-10-17: a handful of steps, rendered on the server',
-  table: '2026-10-10: renders the items it is given; windowing waits for the first table that needs it',
-  timeline: '2026-10-10: renders the items it is given; windowing waits for the first timeline that needs it',
+  breadcrumb: 'not a collection in PLAN 8.5 (1371) or 18 (2062); every crumb must be HTML (1800, 1809)',
+  dropdown: "a deviation from PLAN 8.5 (1399): Base UI's Menu moves real focus over mounted items only (MenuRoot.js:368-382)",
+  stepper: 'not a collection in PLAN 8.5 (1371) or 18 (2061), which lists a handful of steps',
+  timeline: 'PLAN 18 (1986): "Collection (8.5) when it grows"; it renders the items it is given until then',
 }
 
 /** The source with its comments blanked, so a word in a comment never counts as code. */
@@ -37,6 +35,12 @@ export function takesLoadMore(types: string): boolean {
     || /\bPick<\s*CollectionProps<[^>]*>[^>]*['"]loadMore['"]/.test(code)
 }
 
+/** A list by its knob: the props take visibleRows, or the code reads --tc-list-rows, whatever the items are called. */
+export function takesListRows(code: string): boolean {
+  const live = stripComments(code)
+  return /^\s*(readonly\s+)?visibleRows\??\s*:/m.test(live) || /--tc-list-rows\b/.test(live)
+}
+
 /** The hook imports useCollection from the shared module and calls it. */
 export function callsUseCollection(hook: string): boolean {
   const code = stripComments(hook)
@@ -50,12 +54,14 @@ export interface CollectionFolder {
   types: string | null
   /** hook.ts, or null when the folder has none. */
   hook: string | null
+  /** schema.ts, classes.ts and client.tsx together, where a list names its knob; empty when there are none. */
+  rest?: string | undefined
 }
 
 /** Every way a folder breaks R-8.5-1, or an exemption that no longer holds. */
-export function collectionErrors({ slug, types, hook }: CollectionFolder, exempt = COLLECTION_EXEMPT): string[] {
+export function collectionErrors({ slug, types, hook, rest = '' }: CollectionFolder, exempt = COLLECTION_EXEMPT): string[] {
   const uses = hook !== null && callsUseCollection(hook)
-  const renders = types !== null && rendersItems(types)
+  const renders = (types !== null && rendersItems(types)) || takesListRows(`${types ?? ''}\n${rest}`)
   const reason = exempt[slug]
   if (reason !== undefined) {
     if (types !== null && takesCollectionProps(types)) return ['its props take CollectionProps, which no exemption covers']

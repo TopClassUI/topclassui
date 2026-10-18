@@ -44,6 +44,19 @@ for (const direction of DIRECTIONS) {
       })
     }
 
+    test('groups: Tab goes from the last link of one group to the first of the next, the labels are no stop, and Shift+Tab back', async ({ page }) => {
+      await openLive(page, 'sidebar--groups', { direction })
+      await pressTo(page, 'Tab', collapse)
+      for (const name of ['Home', 'Projects', 'Team', 'Notifications', 'Settings', 'Sign out']) {
+        await pressTo(page, 'Tab', name)
+        await expectRing(page, name)
+      }
+      for (const name of ['Settings', 'Notifications', 'Team']) await pressTo(page, 'Shift+Tab', name)
+      expect(await page.evaluate(() => document.activeElement?.getAttribute('aria-current'))).toBeNull()
+      await pressTo(page, 'Shift+Tab', 'Projects')
+      expect(await page.evaluate(() => document.activeElement?.getAttribute('aria-current'))).toBe('page')
+    })
+
     test('collapsed, Tab still reaches every link by its name, and Enter follows one', async ({ page }) => {
       await openLive(page, 'sidebar--basic', { direction })
       await pressTo(page, 'Tab', collapse)

@@ -14,3 +14,6 @@ export const FILE_UPLOAD_DEFAULTS = {
   invalid: false,
   visibleRows: COLLECTION_DEFAULTS.visibleRows,
 } as const
+
+/** How many refused names the hidden status line reads before it gives the count of the rest. */
+export const FILE_UPLOAD_ANNOUNCED = 5

@@ -51,17 +51,17 @@ They arrive with the phases that need them.
 ### R-5.1-1 index.tsx is server or shared
 **Rule:** `index.tsx` never contains `'use client'`, never imports a React client hook (only `useId` and `use` are allowed) and never imports `./hook.js`.
 **Why:** it is what keeps atoms at 0 KB of client JavaScript.
-**Enforced by:** `scripts/check-boundaries.ts`
+**Enforced by:** `scripts/check-boundaries.ts`, which holds every `parts/*.tsx` without `'use client'` to the same hook rules, since `index.tsx` may render it
 
 ### R-5.1-2 Client components re-export through index
 **Rule:** for a C component or a connector, `index.tsx` holds no markup: it re-exports the client parts, the prop types, the variants and the skeleton.
 **Why:** `exports` resolves `*/index.js`, and a directive-less re-export of a client module is safe.
-**Enforced by:** `scripts/check-structure.ts`, for every folder whose `meta.ts` says `rendering: 'client'` and every folder under `src/connectors/`: each statement of `index.tsx` is an `export ... from './...'` or an `import type`
+**Enforced by:** `scripts/check-structure.ts`, for every folder whose `meta.ts` says `rendering: 'client'` and every folder under `src/connectors/`: each statement of `index.tsx` is an `import type` or a re-export from its own folder, values only from `client`, `variants`, `skeleton`, `lib.ts` or a `'use client'` file; `src/shared/meta.test` ties `rendering` to PLAN 18
 
 ### R-5.1-3 Only serializable props cross the boundary
 **Rule:** only serializable props cross the boundary: strings, numbers, booleans, plain objects, arrays and `ReactNode` children; functions never, except Server Actions.
 **Why:** React throws at render otherwise.
-**Enforced by:** `src/test/serializable.ts`, through `test/<slug>.serializable.test.ts` in every component that renders in `index.tsx` (a type test, run by `pnpm typecheck`)
+**Enforced by:** `src/test/serializable.ts`, through `test/<slug>.serializable.test.ts` in every component that renders in `index.tsx` or re-exports a server part or skeleton, and `src/shared/provider/provider.serializable.test.ts` (type tests, run by `pnpm typecheck`); `src/test/client-callbacks.test.ts` for the client-only note on each callback of a client export
 
 ### R-5.1-4 No React context in Server Components
 **Rule:** no React context in Server Components: direction and theme come from `dir` and `data-theme` on the HTML, and labels come from props.
@@ -93,7 +93,7 @@ They arrive with the phases that need them.
 ### R-5.2-2 Merge with the configured cn()
 **Rule:** merge classes with `cn()` from `shared/cn.ts`, which uses `extendTailwindMerge`; the consumer's `className` is passed last.
 **Why:** tailwind-merge does not know the custom spacing and radius keys, so the default `twMerge` would keep both conflicting classes.
-**Enforced by:** unit test (`shared/cn.test.ts`) for the merge; eslint (`topclass/cn-class-name-last`) for the argument order
+**Enforced by:** unit test (`shared/cn.test.ts`) for the merge; eslint (`topclass/cn-class-name-last`) for the argument order; `shared/render-part.test.tsx` and a `render-class` test per part family for a `render` element's class
 
 ### R-5.2-3 Never build class names dynamically
 **Rule:** no `` `bg-${tone}` ``; use a lookup object or cva variants.
@@ -113,7 +113,7 @@ They arrive with the phases that need them.
 ### R-5.2-6 Bare data and aria variants
 **Rule:** write `data-open:`, `group-data-panel-open:`, `aria-busy:`; brackets only for values.
 **Why:** it is the v4 idiom and the upgrade tool rewrites the bracket form.
-**Enforced by:** `eslint`
+**Enforced by:** `eslint` over `src/`, `e2e/` and `scripts/build-harness.tsx`, arbitrary selectors such as `[&[data-open]]:` and `has-[[data-open]]:` included
 
 ### R-4-1 Every authored rule sits in a cascade layer
 **Rule:** only custom-property declarations and `@keyframes` may be unlayered; other rules go in `@layer base` (tokens) or `@layer components` (react). `@utility` and `@custom-variant` count as layered, because Tailwind emits them into its own layers.
@@ -146,7 +146,7 @@ They arrive with the phases that need them.
 ### R-5.3-2 Directional motion uses --tc-dir
 **Rule:** translate, transform origin and gradient direction multiply by `--tc-dir`; `object-*` and `bg-*` positions use an `rtl:` variant, since no logical form exists.
 **Why:** these properties have no logical equivalent.
-**Enforced by:** `eslint` (`topclass/dir-aware-transforms`; the icon mirror, Base UI's measured origin and swipe offset are allowed, DECISIONS 2026-10-17)
+**Enforced by:** `eslint` (`topclass/dir-aware-transforms`, tests and demos included; Base UI's measured origin and Drawer and Toast swipe offset are allowed, DECISIONS 2026-10-17) and `scripts/check-css.ts` for stylesheets
 
 ### R-5.3-3 No letter-spacing
 **Rule:** no `tracking-*` anywhere inside `src/`.
@@ -156,12 +156,12 @@ They arrive with the phases that need them.
 ### R-5.3-4 Logical overlay placement
 **Rule:** use the `placement` prop, which maps to Base UI's `side` and `align`; never `left` or `right` as a side.
 **Why:** `align` and the `inline-*` sides flip in RTL automatically.
-**Enforced by:** type + `eslint` (`no-physical-placement`, which bans `left` and `right` in `side`, `align` and `placement` across `src/`, demos included)
+**Enforced by:** type + `eslint` (`no-physical-placement`, which bans `left` and `right` in `side`, `align` and `placement` across `src/`, demos and dom tests included, through local consts; off only for the schema and toast contract tests that prove the value is refused)
 
 ### R-13-1 TopClassProvider is required
 **Rule:** the app mounts `TopClassProvider` at the root layout with `direction` and `locale` as props from the layout, never read from `document.dir` in an effect.
 **Why:** Base UI learns the direction only from `DirectionProvider`, and reading it in an effect disagrees with the server render.
-**Enforced by:** `src/shared/provider/provider.warning.dom.test` and `.ssr.test`, which prove the provider warns once in development when the layout leaves out `direction` or `locale`, never in production and never on the server; an app with no provider at all is review
+**Enforced by:** `src/shared/provider/provider.warning.dom.test`, `provider.presence.dom.test` and `provider.warning.ssr.test`, which prove a warning once in development when the layout leaves out `direction` or `locale`, when no provider is mounted, or when `direction` disagrees with `<html dir>`, never in production and never on the server; `src/shared/no-document-dir.test`, which fails on any read of the page's dir in `src` but that one comparison; "at the root layout" is review
 
 ## 4. API conventions
 
@@ -178,17 +178,17 @@ They arrive with the phases that need them.
 ### R-5.7-3 Pass through className, style, ref and rest
 **Rule:** every component accepts them and spreads the rest onto its root element; `ref` is a normal prop, never `forwardRef`. A skeleton is a component too.
 **Why:** consumers must be able to extend any component.
-**Enforced by:** `src/test/root-props.dom.test.tsx`, which renders every export and skeleton of every folder from its `test/fixture.ts` (which `check-structure` requires) and proves `className`, `ref` and an unknown `data-*` reach the root, or the element a DECISIONS entry names; `style` is manual
+**Enforced by:** `src/test/root-props.dom.test.tsx`, which renders every export and skeleton of every folder from its `test/fixture.ts` (which `check-structure` requires), one case per branch a prop opens, and proves `className`, `style` (a `--tc-*` variable), `ref` and an unknown `data-*` reach the root at the place a slot of the same parents holds, or the element a DECISIONS bullet names, or the role a portal records; a headless Root must render no element
 
 ### R-5.7-4 Polymorphism through render
 **Rule:** server components accept the element form only, implemented with `renderElement`; client components may also accept the function form through `useRender`.
 **Why:** `useRender` calls hooks, so it can never appear in `index.tsx`.
-**Enforced by:** `scripts/check-boundaries.ts`, which rejects a runtime `useRender` in any file without `'use client'` and a server file that takes `render` without `renderElement`; `tsc` keeps that `render` to the element form, since `renderElement` accepts only a `ReactElement`
+**Enforced by:** `scripts/check-boundaries.ts`, which rejects a runtime `useRender` (or the `useRenderElement` it wraps, or a re-export of either) in any file without `'use client'`, demos included, and a server file that takes `render` or a `link` element without calling `renderElement` (directly, through `renderLink`, or by handing `render={render}` on); `tsc` rejects a function passed to `renderElement`, and each server component's `types.ts` declares `render: ReactElement`, pinned by its type tests
 
 ### R-5.7-5 Public types are aliases derived at the seam
 **Rule:** `export type DialogRootProps = Omit<Base.Root.Props, 'className'> & OwnProps`; never re-export a Base UI type name and never hand-copy a primitive's prop list.
 **Why:** a hand-copied list hides new props and drifts; the alias is the one line that changes if the primitive changes.
-**Enforced by:** `eslint` (no Base UI re-export anywhere; in `types.ts` a Base UI `.Props` is only omitted with `'className'`, picked without it, indexed or keyed); a hand-copied prop list is review
+**Enforced by:** `eslint` (no Base UI re-export anywhere; in every file under `src/` but tests and demos, a Base UI `.Props`, or a private alias of it, is only omitted with `'className'`, indexed or keyed, never picked); a hand-copied list of single props is review
 
 ### R-5.7-6 Base UI state attribute grammar
 **Rule:** boolean presence attributes (`data-open`, `data-loading`, `data-disabled`), never `data-state="..."`; enumerated design props are value attributes (`data-variant`, `data-size`, `data-tone`).
@@ -253,34 +253,34 @@ They arrive with the phases that need them.
 ### R-8.5-1 Lists use the collection contract
 **Rule:** any component that renders items uses `CollectionProps` and `useCollection`: the `--tc-list-rows` knob, windowing above the threshold, and optional page-by-page loading.
 **Why:** a component must never create ten thousand DOM nodes, and the app must not be forced to hand over every item at once.
-**Enforced by:** `check-structure`, which requires `useCollection` in the `hook.ts` of every folder whose props take `items`, `CollectionProps` or `MenuContract`, less the exemptions `docs/DECISIONS.md` records; `e2e/collections.spec.ts`, which keeps fewer than a hundred of ten thousand rows mounted and sees `loadMore` called at the end
+**Enforced by:** `check-structure`, which requires `useCollection` in the `hook.ts` of every folder whose props take `items`, `CollectionProps`, `MenuContract` or `visibleRows`, or whose code reads `--tc-list-rows`, less the exemptions `docs/DECISIONS.md` records; `e2e/collections.spec.ts`, which keeps fewer than a hundred of ten thousand rows mounted in every windowed list and sees `loadMore` called at the end of every list whose props take it
 
 ### R-8.5-2 The app owns the data
 **Rule:** components never fetch, cache or paginate; they call `loadMore()` and render what they are given.
 **Why:** data belongs to the application, not to the design system.
-**Enforced by:** `eslint` (`topclass/no-fetch-in-components`, under `src/components`, `src/connectors` and `src/shared`)
+**Enforced by:** `eslint` for fetch, storage and cache (`topclass/no-fetch-in-components`, under `src/`); paginate is manual
 
 ### R-10.5-1 Overlays scroll inside themselves
 **Rule:** popups use `POPUP_BOUNDS` and the row cap, dialogs and drawers scroll their body with sticky header and footer, and every scroll container inside an overlay sets `overscroll-behavior: contain`.
 **Why:** the page must never scroll behind an open overlay.
-**Enforced by:** `e2e/overlay-scroll.spec`, which proves in a browser that the Body of Dialog and Drawer is the scroll container between a header and a footer that keep their boxes, that Popover, Dropdown, Select, Combobox and DatePicker sit at the offset and the collision padding of `POPUP_BOUNDS` inside the room Base UI measured, with their lists inside the row cap, that Command caps its list under its input, and that every scroll container in an open overlay, the Toast viewport included, sets `overscroll-behavior: contain`; `check-structure` requires the Body
+**Enforced by:** `e2e/overlay-scroll.spec`, which proves in a browser that the Body of Dialog and Drawer is the scroll container between a header and a footer that keep their boxes, and that on a 320 x 256 screen the popup scrolls as one instead, that Popover, Dropdown, Select, Combobox and DatePicker sit at the offset and the collision padding of `FLOATING` inside the room Base UI measured, with their lists inside the row cap and the DatePicker's grid scrolling under its month, that Command caps its list under its input, and that every scroll container in an open overlay, the Toast viewport included, sets `overscroll-behavior: contain`; `src/shared/classes.overlay.test`, which fails any `classes.ts` under `src/components` that writes the room as its own bound instead of `POPUP_BOUNDS`; `check-structure` requires the Body
 
 ### R-10.5-2 Tooltips never scroll
 **Rule:** a tooltip is one or two lines of plain text; anything larger, or anything with a link or control, is a Popover.
 **Why:** a scrolling tooltip cannot be reached by pointer or keyboard.
-**Enforced by:** type (`TooltipPopupProps['children']` is `TooltipText`) + `eslint` (`tooltip-content-is-text`, on src, demos and the harness)
+**Enforced by:** type (`TooltipPopupProps['children']` is `TooltipText`) + `eslint` (`tooltip-content-is-text`, on src, demos and the harness, including Base UI's own popup) + e2e/tooltip.spec, which proves two lines for every demo; a caller's text is held by `max-w-xs` and wrapping, a guard rail rather than a validator
 
 ### R-10.5-3 Sticky bars set the scroll padding
 **Rule:** a sticky or fixed bar sets `--tc-sticky-top` or `--tc-sticky-bottom`, and the scroll container reads them into `scroll-padding-block`.
 **Why:** WCAG 2.4.11: a focused element must not be hidden behind a bar.
-**Enforced by:** `e2e/overlay-scroll.spec`, which proves that the sticky Navbar writes its height to `--tc-sticky-top` and the page reads both variables into `scroll-padding-block`; `check-structure`, which fails a folder that wears `STICKY_TOP` or `STICKY_BOTTOM` and never writes the matching variable
+**Enforced by:** `e2e/overlay-scroll.spec`, which proves that the sticky Navbar writes its height to `--tc-sticky-top`, that a Toast stack at the bottom writes its height to `--tc-sticky-bottom` and Tab leaves the last link of the page clear of it, and that the page reads both variables into `scroll-padding-block`; `check-structure`, which fails a folder that wears `STICKY_TOP` or `STICKY_BOTTOM` and never writes the matching variable
 
 ## 8. Code structure
 
 ### R-5.12-1 Logic is separate from markup
-**Rule:** `client.tsx` is JSX plus at most one call to `useXxx()` from `hook.ts`; it holds no `useState`, `useEffect`, `useReducer`, `useRef`, `useMemo` or `useCallback`. Pure helpers live in `lib.ts`.
+**Rule:** `client.tsx` and every `'use client'` part are JSX plus at most one call to `useXxx()` from `hook.ts` per component; they hold no `useState`, `useEffect`, `useReducer`, `useRef`, `useMemo` or `useCallback`. Pure helpers live in `lib.ts`.
 **Why:** markup and behaviour change for different reasons and are tested differently.
-**Enforced by:** `eslint` (`client-shape`, per component and in every `'use client'` part) + `check-structure` (only a client file imports `hook.ts`)
+**Enforced by:** `eslint` (`client-shape`, per component and in every `'use client'` part) + `check-structure` (only `client.tsx` or a `'use client'` part imports `hook.ts`; there is no `lib.tsx`) + `check-boundaries` (`lib.ts` imports no React)
 
 ### R-5.12-2 Files stay small
 **Rule:** `check-structure` warns at 200 lines and fails at 300; a component that needs more files gets a `parts/` folder with one component per file.
@@ -295,7 +295,7 @@ They arrive with the phases that need them.
 ### R-5.12-4 Naming
 **Rule:** kebab-case files and folders, PascalCase components, `useThing` hooks, verb-first pure functions, `SCREAMING_CASE` constants in `constants.ts` or `classes.ts` inside a component folder; a shared contract under `shared/` may declare its own. A file in `parts/` exports one component named after the file.
 **Why:** a predictable name is the cheapest documentation.
-**Enforced by:** `scripts/check-structure.ts` for the kebab-case names, for a SCREAMING_CASE table declared outside `constants.ts` or `classes.ts`, and for the parts-folder naming contract in `scripts/lib/part-names.ts`, where a `parts/` file exports one component named after it, `hook.ts` only `use*` hooks and the contexts they read, `lib.ts` only functions; verb-first and PascalCase names elsewhere are manual
+**Enforced by:** `scripts/check-structure.ts` for the kebab-case names, for a SCREAMING_CASE table declared outside `constants.ts` or `classes.ts`, and for the parts-folder naming contract in `scripts/lib/part-names.ts`, where a `parts/` file exports one component named after it, `hook.ts` only `use*` hooks (a context stays module-private and the root's hook returns it), `lib.ts` and `lib.tsx` only functions, and a test never sits in `parts/`; verb-first and PascalCase names elsewhere are manual
 
 ### R-17-1 A test expectation is named, never derived
 **Rule:** an expectation is written out, never computed from the thing under test; deleting half the implementation must not also delete half the assertion.
@@ -339,7 +339,7 @@ They arrive with the phases that need them.
 ### R-5.6-1 WCAG 2.2 AA
 **Rule:** keyboard behaviour follows the ARIA Authoring Practices; a visible `focus-visible` ring on every interactive element; types enforce labels.
 **Why:** it is a promise of the library, not an extra.
-**Enforced by:** `e2e/keyboard-<slug>.spec.ts`, one per interactive component of Units 3 and 4 (helpers in `e2e/keyboard.ts` and `e2e/ring.ts`), which presses every key of its Authoring Practices pattern in both directions, the roving tab stop, Escape and the focus return, and reads the computed 2 px `focus-visible` ring on the element that takes the focus; Unit 5 still manual; `axe` covers the ARIA attributes in `test:e2e`; the labels are type tests
+**Enforced by:** `e2e/keyboard-<slug>.spec.ts`, one per interactive component of Units 3 to 5 (helpers in `e2e/keyboard.ts`), which presses every key of its Authoring Practices pattern in both directions, the roving tab stop, Escape and the focus return, and reads the computed `focus-visible` ring on each stop with a probe that refuses a ring that is thinner than 2 px, transparent, cut by an ancestor or there without the focus; `e2e/keyboard-coverage.spec.ts` fails when a component folder has neither a keyboard spec nor a recorded reason, and `scripts/lib/keyboard-proof.test` when an interactive component of Unit 5 has none; `e2e/input.spec.ts` and `e2e/table.spec.ts` for Input and Table; `e2e/focus-ring.spec.ts` for Button; `axe` covers the ARIA attributes in `test:e2e`; the labels are type tests; the rest of Units 1 and 2 is manual
 
 ### R-5.6-2 Target size
 **Rule:** every interactive element is at least 24x24 CSS px on every pointer type and 44px under `pointer-coarse`. The floor is a px token with a px fallback, never a rem step, because the success criterion is written in CSS px.

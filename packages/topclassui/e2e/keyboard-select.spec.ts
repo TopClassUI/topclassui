@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
 import { DIRECTIONS } from '../scripts/lib/harness.js'
-import { expectNoRing, expectRing, focusedName, walk } from './ring.js'
+import { expectNoRing, expectRing, focusedName, walk } from './keyboard.js'
 import { liveErrors, openLive } from './live.js'
 import { OPENED, atRest, expectClosed } from './overlay.js'
 
@@ -51,7 +51,8 @@ for (const direction of DIRECTIONS) {
       await expectNoRing(popup.getByRole('option', { name: 'Egypt', exact: true }), 'an option the keyboard is not on')
     })
 
-    for (const key of ['ArrowDown', 'ArrowUp', 'Enter', 'Space'] as const) {
+    // Base UI opens on a vertical arrow whatever the modifier, so Alt with one opens as the arrow does (useListNavigation.js:563-569).
+    for (const key of ['ArrowDown', 'ArrowUp', 'Enter', 'Space', 'Alt+ArrowDown', 'Alt+ArrowUp'] as const) {
       test(`${key} on the closed trigger opens the list on the chosen option`, async ({ page }) => {
         await openLive(page, 'select--basic', { direction })
         await page.keyboard.press('Tab')
@@ -60,6 +61,20 @@ for (const direction of DIRECTIONS) {
         await expect.poll(() => focusedName(page)).toBe('Jordan')
       })
     }
+
+    // Base UI's trigger acts on the main-axis arrows, Enter and Space only (useListNavigation.js:536, :563).
+    test('Home, End, PageUp and PageDown on the closed trigger leave it closed, focused and on the chosen option', async ({ page }) => {
+      await openLive(page, 'select--basic', { direction })
+      await page.keyboard.press('Tab')
+      for (const key of ['Home', 'End', 'PageUp', 'PageDown']) {
+        await page.keyboard.press(key)
+        await page.evaluate(() => new Promise((done) => { requestAnimationFrame(() => { requestAnimationFrame(done) }) }))
+        await expectClosed(page, POPUP)
+        await expect(trigger(page), key).toBeFocused()
+        await expect(trigger(page), key).toHaveText('Jordan')
+      }
+      expect(await hidden(page)).toBe('jo')
+    })
 
     test('in the list the arrows move and stop at both ends, Home and End go to the ends, and a letter to the option it starts', async ({ page }) => {
       await openLive(page, 'select--basic', { direction })

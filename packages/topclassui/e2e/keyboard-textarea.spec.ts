@@ -2,7 +2,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
 
 import { DIRECTIONS } from '../scripts/lib/harness.js'
 import { serverEntries } from './form.js'
-import { expectNoRing, expectRing, walk } from './ring.js'
+import { expectNoRing, expectRing, walk } from './keyboard.js'
 import { liveErrors, openLive } from './live.js'
 
 // R-5.6-1 for a textarea, which the Authoring Practices give no pattern of its own: the native keys, in Chromium, in

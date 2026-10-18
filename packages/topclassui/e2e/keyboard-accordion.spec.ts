@@ -51,6 +51,20 @@ for (const direction of DIRECTIONS) {
       await expect.poll(() => expanded(page)).toEqual(['true', 'false', 'true'])
     })
 
+    test('first open: the open item is a stop like the others, Enter closes it, and Tab goes on through the headers', async ({ page }) => {
+      await openLive(page, 'accordion--first-open', { direction })
+      expect(await expanded(page)).toEqual(['true', 'false', 'false'])
+      await pressTo(page, 'Tab', 'How do I install a component?')
+      await expectRing(page, 'the open header')
+      await page.keyboard.press('Enter')
+      await expect.poll(() => expanded(page)).toEqual(['false', 'false', 'false'])
+      await pressTo(page, 'Tab', 'Does it work in Arabic?')
+      await pressTo(page, 'Tab', 'How big is the bundle?')
+      await pressTo(page, 'Shift+Tab', 'Does it work in Arabic?')
+      await page.keyboard.press('Space')
+      await expect.poll(() => expanded(page)).toEqual(['false', 'true', 'false'])
+    })
+
     test('a disabled header keeps its tab stop and its ring, and neither key opens it', async ({ page }) => {
       await openLive(page, 'accordion--disabled', { direction })
       await pressTo(page, 'Tab', 'Profile')
