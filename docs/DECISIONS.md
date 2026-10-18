@@ -88,6 +88,14 @@ The format is: date, decision, why, and what it affects.
 
 **Affects.** R-9.2-4 and R-5.12-4 in `docs/RULES.md`, which now name `check-structure`. Verb-first function names and PascalCase component names outside `parts/` stay manual.
 
+## 2026-10-17 - What counts as derived at the seam (R-5.7-5)
+
+**Decision.** In `types.ts` a Base UI `.Props` may be omitted from with `'className'` among the keys, picked from without `'className'`, read by index (`Props['modal']`), taken with `keyof`, or pinned to its generics in a private alias that is then used in one of those ways. Used whole, in an intersection, in an `extends` or in an exported alias, it is refused. A headless root with no `className` (Select, Combobox, Menu) still names it in its `Omit`, so a later Base UI release cannot add one unmerged.
+
+**Why.** A `Pick` of named props and an indexed prop type are derivations too; neither copies a list nor carries Base UI's `className`. A hand-copied list cannot be told from a list of our own props by syntax, so it stays review.
+
+**Affects.** R-5.7-5, `eslint-rules/index.ts` (`props-derived-at-the-seam`).
+
 ## 2026-10-17 - One thin themed scrollbar for every scroll area
 
 **Decision.** `SCROLLBAR` in `src/shared/classes.ts` is `scrollbar-width: thin` and `scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track)`. `SCROLL_AREA` and `SCROLL_X` carry it, so every dialog and drawer body, popover, dropdown, command, select and combobox list, date picker, tree view, file upload list, toast viewport, sidebar body, accordion region, tabs list, navbar links, segmented control and code block wears it; the table box and the textarea, which scroll without those two, add it by hand. The thumb is neutral-500 in light and ocean and neutral-400 in dark, on a transparent track, so it stands on the surface beneath it: 4.53 to 4.73:1 in light, 5.83 to 7.63 in dark, and 3.93 / 6.27 on a read-only field. `check:contrast` measures it on every surface and on its track whenever the track is not transparent. The code block sets the two tokens to its own fill and halfway thumb, as before. The collapsed Sidebar still hides its bar. Two widths follow from the thinner bar, measured under a mouse: an expanded Sidebar's bar is 10 px (15 before), and a Textarea that takes the browser's own width, in a `w-fit` parent or beside a label, is 173 px (178 before; unit-4.md says 178), since Chromium reserves the vertical bar in it.

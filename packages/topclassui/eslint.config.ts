@@ -40,6 +40,7 @@ export default defineConfig(
       'topclass/no-fetch-in-components': 'error',
       'topclass/tooltip-content-is-text': 'error',
       'topclass/client-shape': 'error',
+      'topclass/props-derived-at-the-seam': 'error',
 
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/ban-ts-comment': 'error',

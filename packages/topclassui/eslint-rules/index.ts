@@ -300,6 +300,39 @@ function findPhysicalMotion(value: string): { cls: string; hint: string } | unde
 
 const NOT_A_PART = /^(Skeleton|EmptyState|ErrorState|Client|Provider|Context|Variants|Props)$/
 
+const isBaseUiSource = (source: unknown) => typeof source === 'string' && source.startsWith('@base-ui/')
+
+/** The binding a qualified name starts from: `Base` in `Base.Root.Props`. */
+function rootName(name: Node): string | null {
+  let n = name
+  while (n?.type === 'TSQualifiedName') n = n.left
+  while (n?.type === 'MemberExpression') n = n.object
+  return n?.type === 'Identifier' ? String(n.name) : null
+}
+
+/** `Base.Root.Props`, `Base.Props`, or a named import that ends in Props. */
+function isBasePropsName(name: Node, base: Set<string>): boolean {
+  const root = rootName(name)
+  if (root === null || !base.has(root)) return false
+  if (name.type === 'Identifier') return /Props$/.test(String(name.name))
+  const last = name.type === 'TSQualifiedName' ? name.right : name.property
+  return last?.name === 'Props'
+}
+
+/** The string keys a type spells out, through local aliases; `keyof X` and the like add none. */
+function keysOf(node: Node, aliases: Map<string, Node>, seen = new Set<string>()): string[] {
+  if (node?.type === 'TSLiteralType' && typeof node.literal?.value === 'string') return [node.literal.value]
+  if (node?.type === 'TSUnionType') return node.types.flatMap((t: Node) => keysOf(t, aliases, seen))
+  if (node?.type === 'TSTypeReference' && node.typeName?.type === 'Identifier') {
+    const name = String(node.typeName.name)
+    const alias = aliases.get(name)
+    if (!alias || seen.has(name)) return []
+    seen.add(name)
+    return keysOf(alias, aliases, seen)
+  }
+  return []
+}
+
 const rules = {
   'logical-properties-only': {
     meta: {
@@ -892,6 +925,83 @@ const rules = {
           for (const attribute of opening.attributes ?? []) {
             if (attribute.type === 'JSXAttribute' && attribute.name?.name === 'children') flag(attribute.value, name)
             if (attribute.type === 'JSXSpreadAttribute') flag(attribute.argument, name)
+          }
+        },
+      }
+    },
+  },
+
+  'props-derived-at-the-seam': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-5.7-5: public types are aliases derived from Base UI at the seam, never its names re-exported.' },
+      schema: [],
+      messages: {
+        reexport: 'R-5.7-5: never re-export a Base UI type. Name it here: export type DialogRootProps = Omit<Base.Root.Props, \'className\'> & OwnProps.',
+        bare: 'R-5.7-5: {{name}} is used whole, so its className reaches the consumer unmerged. Derive it: Omit<{{name}}, \'className\'> & OwnProps.',
+        omit: 'R-5.7-5: Omit<{{name}}, ...> keeps className. Name \'className\' among the omitted keys, so ours is the only one.',
+        pick: 'R-5.7-5: Pick<{{name}}, ...> takes className from Base UI. Omit it there and declare our own.',
+      },
+    },
+    create(ctx: Context) {
+      const file = String(ctx.filename ?? ctx.getFilename?.() ?? '').replace(/\\/g, '/')
+      const typesFile = /(^|\/)types\.ts$/.test(file)
+      const base = new Set<string>()
+      const aliases = new Map<string, Node>()
+      const pinned = new Set<string>()
+      const uses: Node[] = []
+      const text = (node: Node) => String(ctx.sourceCode.getText(node))
+      const isBaseProps = (name: Node) =>
+        isBasePropsName(name, base) || (name?.type === 'Identifier' && pinned.has(String(name.name)))
+      const check = (node: Node) => {
+        const label = text(node)
+        const parent = node.parent
+        if (parent?.type === 'TSIndexedAccessType' && parent.objectType === node) return
+        if (parent?.type === 'TSTypeOperator' && parent.operator === 'keyof') return
+        if (parent?.type === 'TSTypeAliasDeclaration' && parent.parent?.type !== 'ExportNamedDeclaration') return
+        const holder = parent?.type === 'TSTypeParameterInstantiation' ? parent.parent : null
+        const generic = holder?.typeName?.type === 'Identifier' ? String(holder.typeName.name)
+          : holder?.expression?.type === 'Identifier' ? String(holder.expression.name) : null
+        if (holder && parent.params[0] === node && (generic === 'Omit' || generic === 'Pick')) {
+          const keys = keysOf(parent.params[1], aliases)
+          if (generic === 'Omit' && !keys.includes('className')) ctx.report({ node, messageId: 'omit', data: { name: label } })
+          if (generic === 'Pick' && keys.includes('className')) ctx.report({ node, messageId: 'pick', data: { name: label } })
+          return
+        }
+        ctx.report({ node, messageId: 'bare', data: { name: label } })
+      }
+      return {
+        ImportDeclaration(node: Node) {
+          if (!isBaseUiSource(node.source?.value)) return
+          for (const s of node.specifiers ?? []) base.add(String(s.local?.name))
+        },
+        ExportAllDeclaration(node: Node) {
+          if (isBaseUiSource(node.source?.value)) ctx.report({ node, messageId: 'reexport' })
+        },
+        ExportNamedDeclaration(node: Node) {
+          if (isBaseUiSource(node.source?.value)) return ctx.report({ node, messageId: 'reexport' })
+          if (node.source) return
+          for (const s of node.specifiers ?? []) {
+            if (base.has(String(s.local?.name))) ctx.report({ node: s, messageId: 'reexport' })
+          }
+        },
+        TSTypeAliasDeclaration(node: Node) {
+          aliases.set(String(node.id.name), node.typeAnnotation)
+          const body = node.typeAnnotation
+          // A private alias that pins Base UI's generics is Base UI's props by another name.
+          if (body?.type === 'TSTypeReference' && isBasePropsName(body.typeName, base)
+            && node.parent?.type !== 'ExportNamedDeclaration') pinned.add(String(node.id.name))
+        },
+        TSTypeReference(node: Node) {
+          if (typesFile) uses.push(node)
+        },
+        TSInterfaceHeritage(node: Node) {
+          if (typesFile) uses.push(node)
+        },
+        'Program:exit'() {
+          for (const node of uses) {
+            const name = node.type === 'TSInterfaceHeritage' ? node.expression : node.typeName
+            if (isBaseProps(name)) check(node)
           }
         },
       }
