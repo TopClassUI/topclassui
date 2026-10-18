@@ -3,8 +3,8 @@
 /** The files npm always packs beside dist. */
 export const ROOT_FILES = new Set(['package.json', 'README.md', 'LICENSE', 'CHANGELOG.md'])
 
-/** The first build packed 1,176,561 bytes unpacked; the budget is that plus 10 %, rounded up. */
-export const SIZE_BUDGET_BYTES = 1_300_000
+/** With the CLI and its registry inside (plan cli.md K1) the build packs 2,769,859 bytes unpacked; the budget is that plus 10 %, rounded up. */
+export const SIZE_BUDGET_BYTES = 3_050_000
 
 export const REQUIRED_FILES = ['dist/styles.css', 'dist/tokens.css']
 
