@@ -17,7 +17,7 @@ for (const direction of DIRECTIONS) {
   test.describe(direction, () => {
     test('Tab goes from the action to each x and Shift+Tab back, with a ring on each', async ({ page }) => {
       await openLive(page, 'banner--dismissible', { direction })
-      await pressTo(page, 'Tab', 'Read more')
+      await pressTo(page, 'Tab', 'Read the changelog')
       await expectRing(page, 'the action')
       await pressTo(page, 'Tab', dismiss)
       expect(await whose(page)).toBe('Release announcement')
@@ -32,7 +32,7 @@ for (const direction of DIRECTIONS) {
     for (const key of ['Enter', 'Space'] as const) {
       test(`${key} on an x dismisses its banner, and the focus and the ring go on to the next banner's x`, async ({ page }) => {
         await openLive(page, 'banner--dismissible', { direction })
-        await pressTo(page, 'Tab', 'Read more')
+        await pressTo(page, 'Tab', 'Read the changelog')
         await pressTo(page, 'Tab', dismiss)
         await page.keyboard.press(key)
         await expect.poll(() => banners(page)).toEqual(['Maintenance notice'])
