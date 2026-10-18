@@ -13,10 +13,10 @@ const FOLDER = join(ROOT, 'src', 'components', 'tag')
 const slash = (path: string) => path.replace(/\\/g, '/')
 const probePath = (name: string) => slash(join(FOLDER, 'test', `tag-probe-${name}.tsx`))
 
-/** A whole module is compiled as written; a line of JSX inside a module that imports Tag. */
+/** A whole module is compiled as written; a line of JSX inside a module that imports both exports. */
 function wrap(code: string): string {
   if (code.startsWith("'use client'")) return importsFromRepo(code)
-  return `import { Tag } from '../index.js'\nexport const sample = (\n<>\n${code}\n</>\n)\n`
+  return `import { Tag, TagRemovable } from '../index.js'\nexport const both = [Tag, TagRemovable]\nexport const sample = (\n<>\n${code}\n</>\n)\n`
 }
 
 /** The compiler's verdict, read at runtime: a type assertion erases before Vitest runs, so no mutation could reach it. */
@@ -54,26 +54,25 @@ const SAMPLE = readmeSample()
 
 const verdict = compile({
   readme: SAMPLE,
-  handler: '<Tag onRemove={() => undefined}>React</Tag>',
-  asyncHandler: '<Tag onRemove={async () => { await Promise.resolve() }}>React</Tag>',
-  withLook: '<Tag tone="danger" size="xs" onRemove={() => undefined}>React</Tag>',
-  notAFunction: '<Tag onRemove="remove">React</Tag>',
+  handler: '<TagRemovable onRemove={() => undefined}>React</TagRemovable>',
+  asyncHandler: '<TagRemovable onRemove={async () => { await Promise.resolve() }}>React</TagRemovable>',
+  withLook: '<TagRemovable tone="danger" size="xs" onRemove={() => undefined}>React</TagRemovable>',
+  notAFunction: '<TagRemovable onRemove="remove">React</TagRemovable>',
+  noHandler: '<TagRemovable>React</TagRemovable>',
+  onTag: '<Tag onRemove={() => undefined}>React</Tag>',
   removable: '<Tag removable>React</Tag>',
-  disabled: '<Tag disabled onRemove={() => undefined}>React</Tag>',
+  disabled: '<TagRemovable disabled onRemove={() => undefined}>React</TagRemovable>',
 })
 
 describe('the README sample compiles as written', () => {
   it('finds the client module, so an empty extraction cannot pass', () => {
-    expect(SAMPLE).toContain("import { Tag } from 'topclassui/tag'")
-    expect(SAMPLE).toContain('<Tag onRemove={() => { remove(topic, index) }}>{topic}</Tag>')
+    expect(SAMPLE).toContain("import { TagRemovable } from 'topclassui/tag'")
+    expect(SAMPLE).toContain('<TagRemovable onRemove={() => { setTopics(topics.filter((other) => other !== topic)) }}>{topic}</TagRemovable>')
   })
 
-  it('moves the focus to the next x, or the one before, before the tag leaves the list', () => {
-    expect(SAMPLE.replace(/\r\n/g, '\n')).toContain([
-      '    const next = buttons?.[index + 1] ?? buttons?.[index - 1]',
-      '    next?.focus()',
-      '    setTopics(topics.filter((other) => other !== topic))',
-    ].join('\n'))
+  it('moves no focus of its own: the x hands it to the next x, or the one before', () => {
+    expect(SAMPLE).not.toContain('.focus(')
+    expect(SAMPLE).not.toContain('useRef')
   })
 
   it('compiles: a client component that owns the list', () => {
@@ -88,6 +87,11 @@ describe('what onRemove takes', () => {
 
   it('refuses a string', () => {
     expect((verdict['notAFunction'] ?? []).join(' ')).toContain("Type 'string' is not assignable")
+  })
+
+  it('is required by TagRemovable and refused by Tag, which takes no function (R-5.1-3)', () => {
+    expect((verdict['noHandler'] ?? []).join(' ')).toContain("Property 'onRemove' is missing")
+    expect((verdict['onTag'] ?? []).join(' ')).toContain("Property 'onRemove' does not exist")
   })
 
   it('refuses removable and disabled, which are not built', () => {

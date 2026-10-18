@@ -66,7 +66,7 @@ describe('a server-rendered Select hydrates cleanly', () => {
 
 describe('every demo renders and hydrates', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'form', 'four-rows', 'long-content', 'phase-4-form', 'playground', 'rtl', 'sixty-items', 'sizes', 'states'])
+    expect(names).toEqual(['basic', 'form', 'four-rows', 'load-more', 'long-content', 'phase-4-form', 'playground', 'rtl', 'sixty-items', 'sizes', 'states'])
   })
 
   for (const [name, Demo] of DEMOS) {

@@ -1,6 +1,8 @@
 // The rules of docs/RULES.md that a linter can enforce. Rule ids are in the messages.
 import type { ESLint } from 'eslint'
 
+import { findPhysicalMotion, findPhysicalValue, splitAtColons } from './dir-aware.ts'
+
 type Node = any
 type Context = any
 
@@ -29,6 +31,8 @@ function inClassContext(node: Node): boolean {
 }
 
 const CLASSY_TOKEN = /^-?[a-z0-9][a-z0-9:_\-./[\]()%&>*]*$/
+/** `[&[data-open]]:block` or `aria-[busy="true"]:x`: a variant token, which may open on `[` and quote a value. */
+const VARIANT_TOKEN = /^(-?[a-z0-9]|\[)[a-z0-9:_\-./[\]()%&>*='"]*$/
 
 /**
  * A class list is recognisable on its own, so a plain const, an object value or a
@@ -40,7 +44,9 @@ function looksLikeClassList(value: string): boolean {
   // A path or a URL is never a class list, and both can carry a hyphen.
   if (trimmed.includes('://') || trimmed.startsWith('/') || trimmed.startsWith('.')) return false
   const tokens = trimmed.split(/\s+/)
-  if (!tokens.every((t) => CLASSY_TOKEN.test(t))) return false
+  // Brackets hold CSS, which may name translateX() or separate its arguments with commas.
+  const classy = (t: string) => CLASSY_TOKEN.test(t.replace(/\[\S*\]/g, (b) => b.toLowerCase().replaceAll(',', '_')))
+  if (!tokens.every((t) => classy(t) || (t.includes(']:') && VARIANT_TOKEN.test(t)))) return false
   // Half or more must be utility-shaped, or prose that merely names a class is flagged.
   const utilities = tokens.filter((t) => t.includes('-') || t.includes(':')).length
   return utilities > 0 && utilities * 2 >= tokens.length
@@ -107,24 +113,6 @@ const SYSTEM_COLORS = new Set([
 
 const COLOR_FUNCTION = /^(rgba?|hsla?|hwb|lab|lch|oklab|oklch|color|color-mix|light-dark|contrast-color)\(/
 
-/** Splits a class at the colons between its variants, never at one inside brackets or parentheses. */
-function splitAtColons(token: string): string[] {
-  const parts: string[] = []
-  let depth = 0
-  let start = 0
-  for (let i = 0; i < token.length; i++) {
-    const ch = token[i]
-    if (ch === '[' || ch === '(') depth++
-    else if (ch === ']' || ch === ')') depth = Math.max(0, depth - 1)
-    else if (ch === ':' && depth === 0) {
-      parts.push(token.slice(start, i))
-      start = i + 1
-    }
-  }
-  parts.push(token.slice(start))
-  return parts
-}
-
 /** What sits between a bracket and its match; to the end when a template cut the class short. */
 function bracketContent(text: string, open: number): string {
   let depth = 0
@@ -168,6 +156,54 @@ function findArbitraryColor(value: string): { cls: string; kind: 'arbitrary' | '
   return undefined
 }
 
+/** `data-[open]:` or `group-aria-[busy]/item:`: a bracket around a bare name, which v4 writes bare. */
+const BRACKETED_VARIANT = /^((?:[a-z][a-z0-9-]*-)?(data|aria))-\[([^\]]*)\](\/[\w-]+)?$/
+const ATTR = String.raw`\[(data|aria)-([a-z0-9_-]+)(?:=(true|"true"|'true'))?\]`
+/** `[&[data-open]]:`, `[&:has([data-open])]:`, `[[data-open]_&]:`: an arbitrary selector over a bare name. */
+const ARBITRARY_VARIANT = [
+  [new RegExp(`^\\[&${ATTR}\\]$`), ''],
+  [new RegExp(`^\\[&:has\\(${ATTR}\\)\\]$`), 'has-'],
+  [new RegExp(`^\\[&:not\\(${ATTR}\\)\\]$`), 'not-'],
+  [new RegExp(`^\\[${ATTR}_&\\]$`), 'in-'],
+] as const
+/** `has-[[data-open]]:` or `group-not-[[aria-busy]]:`: a compound variant over a bracketed bare name. */
+const COMPOUND_VARIANT = new RegExp(`^((?:[a-z][a-z0-9-]*-)?(?:has|not|in)-)\\[${ATTR}\\]$`)
+
+type BracketedName = { cls: string; bare: string; attr: string; kind: 'bracketed' | 'aria' | 'in' }
+
+function bareForm(variant: string): Omit<BracketedName, 'cls'> | undefined {
+  const kindOf = (stem: string) => (stem === 'aria' ? 'aria' : 'bracketed')
+  const m = BRACKETED_VARIANT.exec(variant)
+  if (m) {
+    const [, head = '', stem = '', inner = '', group = ''] = m
+    const isTrue = /^[^=]*=(true|"true"|'true')$/.test(inner)
+    if (inner.includes('=') && !(stem === 'aria' && isTrue)) return undefined
+    const name = inner.split('=')[0]?.replace(/^_+|_+$/g, '') ?? ''
+    if (!name) return undefined
+    return { bare: `${head}-${name}${group}:`, attr: `${stem}-${name}`, kind: kindOf(stem) }
+  }
+  const arbitrary = ARBITRARY_VARIANT.map(([re, prefix]) => [re.exec(variant), prefix] as const).find(([a]) => a)
+  const c = arbitrary?.[0] ?? COMPOUND_VARIANT.exec(variant)
+  const prefix = arbitrary ? arbitrary[1] : (c?.[1] ?? '')
+  const [stem = '', name = '', value] = (arbitrary ? c?.slice(1) : c?.slice(2)) ?? []
+  if (!c || (value && stem !== 'aria')) return undefined
+  const kind = arbitrary?.[1] === 'in-' ? 'in' : kindOf(stem)
+  return { bare: `${prefix}${stem}-${name}:`, attr: `${stem}-${name}`, kind }
+}
+
+function findBracketedNames(value: string): BracketedName[] {
+  const hits: BracketedName[] = []
+  for (const cls of value.split(/\s+/)) {
+    const variants = splitAtColons(cls)
+    variants.pop()
+    for (const variant of variants) {
+      const b = bareForm(variant)
+      if (b) hits.push({ cls: `${variant}:`, ...b })
+    }
+  }
+  return hits
+}
+
 const BANNED_SCALE = [
   [/(^|[\s:])rounded-(none|xs|sm|md|lg|xl|2xl|3xl|4xl|full)(\s|$)/, 'use rounded-control, rounded-box or rounded-chip'],
   [/(^|[\s:])h-\d+(\s|$)/, 'use h-control-xs .. h-control-xl from the size scale'],
@@ -188,11 +224,87 @@ function isConsumerStyle(node: Node): boolean {
   return false
 }
 
+/** The text of a `--tc-*` style value, read as one CSS value rather than a class list. */
+function tokenValueOf(node: Node): string | undefined {
+  const key = node?.parent?.type === 'Property' && node.parent.value === node ? node.parent.key : undefined
+  if (!String(key?.value ?? key?.name ?? '').startsWith('--tc-')) return undefined
+  if (node.type === 'Literal' && typeof node.value === 'string') return node.value
+  if (node.type === 'TemplateLiteral' && node.expressions.length === 0) return node.quasis[0]?.value?.cooked
+  return undefined
+}
+
 /**
  * A sibling export that is not a part: a skeleton or a state stands beside the component
  * rather than inside it, so `Card` next to `CardSkeleton` needs no `Root`.
  */
 const NOT_A_PART = /^(Skeleton|EmptyState|ErrorState|Client|Provider|Context|Variants|Props)$/
+
+const isBaseUiSource = (source: unknown) => typeof source === 'string' && source.startsWith('@base-ui/')
+
+/** The binding a qualified name starts from: `Base` in `Base.Root.Props`. */
+function rootName(name: Node): string | null {
+  let n = name
+  while (n?.type === 'TSQualifiedName') n = n.left
+  while (n?.type === 'MemberExpression') n = n.object
+  return n?.type === 'Identifier' ? String(n.name) : null
+}
+
+/** `Base.Root.Props`, `Base.Props`, or a named import that ends in Props. */
+function isBasePropsName(name: Node, base: Set<string>): boolean {
+  const root = rootName(name)
+  if (root === null || !base.has(root)) return false
+  if (name.type === 'Identifier') return /Props$/.test(String(name.name))
+  const last = name.type === 'TSQualifiedName' ? name.right : name.property
+  return last?.name === 'Props'
+}
+
+/** The string keys a type spells out, through local aliases; `keyof X` and the like add none. */
+function keysOf(node: Node, aliases: Map<string, Node>, seen = new Set<string>()): string[] {
+  if (node?.type === 'TSLiteralType' && typeof node.literal?.value === 'string') return [node.literal.value]
+  if (node?.type === 'TSUnionType') return node.types.flatMap((t: Node) => keysOf(t, aliases, seen))
+  if (node?.type === 'TSTypeReference' && node.typeName?.type === 'Identifier') {
+    const name = String(node.typeName.name)
+    const alias = aliases.get(name)
+    if (!alias || seen.has(name)) return []
+    seen.add(name)
+    return keysOf(alias, aliases, seen)
+  }
+  return []
+}
+
+const PLACEMENT_PROPS = new Set(['side', 'align', 'placement'])
+const PHYSICAL_SIDE = /(^|-)(left|right)(-|$)/
+
+/** The initialiser of a same-file `const` the identifier names, or nothing. */
+function constInit(ctx: Context, node: Node): Node {
+  let scope = ctx.sourceCode.getScope(node)
+  while (scope) {
+    const variable = scope.set.get(node.name)
+    if (variable) {
+      const def = variable.defs[0]
+      return def?.type === 'Variable' && def.parent?.kind === 'const' ? def.node.init : null
+    }
+    scope = scope.upper
+  }
+  return null
+}
+
+/** Every string an expression can evaluate to without running it: each branch, each cast, each local const. */
+function possibleStrings(node: Node, ctx: Context, seen = new Set<Node>()): { node: Node; value: string }[] {
+  if (!node || seen.has(node)) return []
+  seen.add(node)
+  const recur = (n: Node) => possibleStrings(n, ctx, seen)
+  if (node.type === 'Identifier') return recur(constInit(ctx, node))
+  if (node.type === 'Literal') return typeof node.value === 'string' ? [{ node, value: node.value }] : []
+  if (node.type === 'TemplateLiteral') {
+    return node.quasis.map((q: Node) => ({ node: q, value: String(q.value?.cooked ?? '') }))
+  }
+  if (node.type === 'JSXExpressionContainer') return recur(node.expression)
+  if (node.type === 'ConditionalExpression') return [...recur(node.consequent), ...recur(node.alternate)]
+  if (node.type === 'LogicalExpression') return [...recur(node.left), ...recur(node.right)]
+  if (node.type === 'TSAsExpression' || node.type === 'TSSatisfiesExpression') return recur(node.expression)
+  return []
+}
 
 const rules = {
   'logical-properties-only': {
@@ -212,6 +324,29 @@ const rules = {
           }
         }
       })
+    },
+  },
+
+  'dir-aware-transforms': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-5.3-2: translate, transform origin and gradient direction follow --tc-dir; rtl: is for object-* and bg-* positions.' },
+      schema: [],
+      messages: { physical: 'R-5.3-2: "{{cls}}" {{hint}}.' },
+    },
+    create(ctx: Context) {
+      return {
+        ...eachClassString((node, value) => {
+          if (tokenValueOf(node.parent?.type === 'TemplateLiteral' ? node.parent : node) !== undefined) return
+          const found = findPhysicalMotion(value)
+          if (found) ctx.report({ node, messageId: 'physical', data: found })
+        }),
+        Property(node: Node) {
+          const value = tokenValueOf(node.value)
+          const hint = value === undefined ? undefined : findPhysicalValue(value)
+          if (hint) ctx.report({ node: node.value, messageId: 'physical', data: { cls: value, hint } })
+        },
+      }
     },
   },
 
@@ -295,6 +430,24 @@ const rules = {
             data: { cls: s[0].trim(), hint: 'use HOVER, FOCUS_RING or the shared state constants' },
           })
         }
+      })
+    },
+  },
+
+  'bare-data-variants': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-5.2-6: data and aria variants are written bare; brackets only hold name=value.' },
+      schema: [],
+      messages: {
+        bracketed: 'R-5.2-6: "{{cls}}" brackets a bare name. Write "{{bare}}"; brackets only hold name=value.',
+        aria: 'R-5.2-6: "{{cls}}" brackets a bare name. Write "{{bare}}", which matches {{attr}}="true"; set the attribute only as "true" or absent.',
+        in: 'R-5.2-6: "{{cls}}" brackets a bare name. Write "{{bare}}"; it emits :where(), so the selector loses its 0,1,0 specificity.',
+      },
+    },
+    create(ctx: Context) {
+      return eachClassString((node, value) => {
+        for (const b of findBracketedNames(value)) ctx.report({ node, messageId: b.kind, data: b })
       })
     },
   },
@@ -632,6 +785,434 @@ const rules = {
           if (isProse(value.value)) {
             ctx.report({ node, messageId: 'hardcoded', data: { text: value.value.slice(0, 40) } })
           }
+        },
+      }
+    },
+  },
+  'no-fetch-in-components': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-8.5-2: components never fetch, cache or paginate; the app owns the data.' },
+      schema: [
+        {
+          type: 'object',
+          properties: { allow: { type: 'array', items: { type: 'string' } } },
+          additionalProperties: false,
+        },
+      ],
+      messages: {
+        data:
+          'R-8.5-2: {{what}} makes the component own data. The app fetches, caches and pages; '
+          + 'take the data as props and call loadMore().',
+      },
+    },
+    create(ctx: Context) {
+      const file = String(ctx.filename ?? ctx.getFilename()).replace(/\\/g, '/')
+      if (!/(^|\/)src\//.test(file)) return {}
+      const allow = new Set((ctx.options?.[0]?.allow ?? []) as string[])
+      const GLOBALS = new Set([
+        'fetch', 'XMLHttpRequest', 'WebSocket', 'EventSource',
+        'localStorage', 'sessionStorage', 'indexedDB', 'caches', 'unstable_cache',
+      ])
+      const HOSTS = new Set(['window', 'globalThis', 'self'])
+      const MEMBERS: Record<string, string[]> = { navigator: ['sendBeacon'], document: ['cookie'] }
+      const BANNED_SOURCES = ['next/cache', 'axios', 'swr', '@tanstack/react-query', '@apollo/client', 'ky']
+      const reactNames = new Set([] as string[])
+
+      const report = (node: Node, name: string, what = name) => {
+        if (!allow.has(name)) ctx.report({ node, messageId: 'data', data: { what } })
+      }
+      /** A property key, a non-computed member name or a type is not a reference to the global. */
+      const isReference = (node: Node) => {
+        const p = node.parent
+        if (p?.type === 'MemberExpression' && p.property === node && !p.computed) return false
+        if ((p?.type === 'Property' || p?.type === 'MethodDefinition' || p?.type === 'PropertyDefinition') && p.key === node && !p.computed) return false
+        if (p?.type === 'TSPropertySignature' && p.key === node) return false
+        if (p?.type === 'TSTypeReference' || p?.type === 'TSQualifiedName' || p?.type === 'TSTypeQuery') return false
+        return !/^Import|^Export/.test(String(p?.type))
+      }
+      /** `a.b`, `a['b']` and `a[`b`]` all name `b`. */
+      const keyName = (key: Node, computed: boolean): string | undefined => {
+        if (!computed && key?.type === 'Identifier') return key.name
+        if (key?.type === 'Literal' && typeof key.value === 'string') return key.value
+        if (key?.type === 'TemplateLiteral' && key.expressions.length === 0) return key.quasis[0]?.value?.cooked
+        return undefined
+      }
+      /** `window`, `self.window` or `globalThis['document']`, read as the global it names. */
+      const globalName = (node: Node): string | undefined => {
+        if (node?.type === 'Identifier') return node.name
+        if (node?.type === 'MemberExpression' && HOSTS.has(globalName(node.object) ?? '')) return keyName(node.property, node.computed)
+        return undefined
+      }
+      const checkMember = (node: Node, owner: string | undefined, name: string | undefined) => {
+        if (owner === undefined || name === undefined) return
+        if (HOSTS.has(owner) && GLOBALS.has(name)) report(node, name, `${owner}.${name}`)
+        if (MEMBERS[owner]?.includes(name)) report(node, name, `${owner}.${name}`)
+        if (reactNames.has(owner) && name === 'cache') report(node, 'cache', "React's cache()")
+      }
+      const checkSource = (node: Node) => {
+        const source = node.source?.value
+        if (typeof source !== 'string') return
+        const banned = BANNED_SOURCES.find((s) => source === s || source.startsWith(`${s}/`))
+        if (banned !== undefined) report(node, banned, `"${source}"`)
+      }
+
+      return {
+        ImportDeclaration(node: Node) {
+          checkSource(node)
+          if (node.source?.value !== 'react') return
+          for (const s of node.specifiers ?? []) {
+            if (s.type === 'ImportSpecifier' && (s.imported?.name ?? s.imported?.value) === 'cache') {
+              report(s, 'cache', "React's cache()")
+            }
+            if (s.type === 'ImportNamespaceSpecifier' || s.type === 'ImportDefaultSpecifier') reactNames.add(s.local.name)
+          }
+        },
+        ImportExpression: checkSource,
+        ExportNamedDeclaration: checkSource,
+        ExportAllDeclaration: checkSource,
+        Identifier(node: Node) {
+          if (GLOBALS.has(node.name) && isReference(node)) report(node, node.name)
+        },
+        MemberExpression(node: Node) {
+          checkMember(node.property, globalName(node.object), keyName(node.property, node.computed))
+        },
+        ObjectPattern(node: Node) {
+          const p = node.parent
+          const source = p?.type === 'VariableDeclarator' ? p.init : p?.type === 'AssignmentExpression' ? p.right : undefined
+          const owner = globalName(source)
+          for (const prop of node.properties ?? []) {
+            const name = keyName(prop.key, prop.computed)
+            // A shorthand global's value is a local of that name, which the Identifier visitor reports.
+            if (prop.type === 'Property' && !(prop.shorthand && GLOBALS.has(name ?? ''))) checkMember(prop.key, owner, name)
+          }
+        },
+        NewExpression(node: Node) {
+          const c = node.callee
+          const name = c?.type === 'Identifier' ? c.name : HOSTS.has(globalName(c?.object) ?? '') ? keyName(c.property, c.computed) : undefined
+          if (name === 'Request') report(node, 'Request', 'new Request()')
+        },
+      }
+    },
+  },
+
+  'tooltip-content-is-text': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-10.5-2: a tooltip is one or two lines of plain text; anything else is a Popover.' },
+      schema: [],
+      messages: {
+        element: 'R-10.5-2: <{{child}}> inside {{name}} makes it more than text. A link, a control or rich content belongs in a Popover.',
+        cast: 'R-10.5-2: a cast hides what the tooltip renders. Give {{name}} text, or use a Popover.',
+        markup: 'R-10.5-2: dangerouslySetInnerHTML puts markup in {{name}}. Rich content belongs in a Popover.',
+      },
+    },
+    create(ctx: Context) {
+      const names = new Set(['TooltipPopup'])
+      /** Local names of Base UI's Tooltip namespace, and of a namespace import that holds it as `.Tooltip`. */
+      const bases = new Set<string>()
+      const roots = new Set<string>()
+      const SOURCES = new Set(['@base-ui/react', '@base-ui/react/tooltip'])
+      const CASTS = new Set(['TSAsExpression', 'TSTypeAssertion', 'TSSatisfiesExpression'])
+      const isConst = (node: Node) => node.typeAnnotation?.type === 'TSTypeReference' && node.typeAnnotation.typeName?.name === 'const'
+      const isCast = (node: Node) => CASTS.has(String(node.type)) && !isConst(node)
+      /** The first JSX node or cast in an expression, so `{ok && <a />}` and `{rows.map(...)}` are seen. */
+      const findHidden = (node: Node): Node => {
+        if (!node || typeof node.type !== 'string') return null
+        if (node.type === 'JSXElement' || node.type === 'JSXFragment') return node
+        if (isCast(node)) return node
+        for (const key of ctx.sourceCode.visitorKeys[node.type] ?? []) {
+          const value = node[key]
+          for (const child of Array.isArray(value) ? value : [value]) {
+            const hit = findHidden(child)
+            if (hit) return hit
+          }
+        }
+        return null
+      }
+      /** The Base UI part a JSX name points at, such as `Popup` for `<Base.Popup>` or `<B.Tooltip.Popup>`. */
+      const basePart = (name: Node): string => {
+        if (name?.type !== 'JSXMemberExpression') return ''
+        const object = name.object
+        const fromBase = object?.type === 'JSXIdentifier'
+          ? bases.has(String(object.name))
+          : object?.type === 'JSXMemberExpression' && roots.has(String(object.object?.name)) && object.property?.name === 'Tooltip'
+        return fromBase ? String(name.property?.name ?? '') : ''
+      }
+      const isPopup = (name: Node) => {
+        const part = basePart(name)
+        return part === 'Popup' || part === 'Viewport' || names.has(String(name?.name ?? name?.property?.name ?? ''))
+      }
+      const label = (jsx: Node) => {
+        if (jsx.type === 'JSXFragment') return 'fragment'
+        const name = jsx.openingElement?.name
+        return String(name?.name ?? name?.property?.name ?? 'element')
+      }
+      const flag = (node: Node, name: string) => {
+        const hit = findHidden(node)
+        if (!hit) return
+        if (CASTS.has(String(hit.type))) ctx.report({ node: hit, messageId: 'cast', data: { name } })
+        else ctx.report({ node: hit, messageId: 'element', data: { name, child: label(hit) } })
+      }
+      return {
+        ImportDeclaration(node: Node) {
+          const fromBase = SOURCES.has(String(node.source?.value))
+          for (const specifier of node.specifiers ?? []) {
+            const imported = String(specifier.imported?.name ?? '')
+            const local = String(specifier.local?.name ?? '')
+            if (names.has(imported)) names.add(local)
+            if (fromBase && imported === 'Tooltip') bases.add(local)
+            if (fromBase && specifier.type === 'ImportNamespaceSpecifier') roots.add(local)
+          }
+        },
+        JSXElement(node: Node) {
+          const opening = node.openingElement
+          if (!isPopup(opening?.name)) return
+          const name = ctx.sourceCode.getText(opening.name)
+          for (const child of node.children ?? []) {
+            // The arrow is decoration Base UI draws against the anchor, and it carries no children.
+            if (child.type === 'JSXElement' && basePart(child.openingElement?.name) === 'Arrow') continue
+            flag(child, name)
+          }
+          for (const attribute of opening.attributes ?? []) {
+            if (attribute.type === 'JSXSpreadAttribute') flag(attribute.argument, name)
+            if (attribute.type !== 'JSXAttribute') continue
+            const prop = String(attribute.name?.name ?? '')
+            if (prop === 'dangerouslySetInnerHTML') ctx.report({ node: attribute, messageId: 'markup', data: { name } })
+            if (prop === 'children' || prop === 'render') flag(attribute.value, name)
+          }
+        },
+      }
+    },
+  },
+
+  'props-derived-at-the-seam': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-5.7-5: public types are aliases derived from Base UI at the seam, never its names re-exported.' },
+      schema: [],
+      messages: {
+        reexport: 'R-5.7-5: never re-export a Base UI type. Name it here: export type DialogRootProps = Omit<Base.Root.Props, \'className\'> & OwnProps.',
+        bare: 'R-5.7-5: {{name}} is used whole, so its className reaches the consumer unmerged. Derive it: Omit<{{name}}, \'className\'> & OwnProps.',
+        omit: 'R-5.7-5: Omit<{{name}}, ...> keeps className. Name \'className\' among the omitted keys, so ours is the only one.',
+        pick: 'R-5.7-5: Pick<{{name}}, ...> hand-copies a list of Base UI props and hides every new one. Omit what is ours, with \'className\', instead.',
+      },
+    },
+    create(ctx: Context) {
+      const base = new Set<string>()
+      const aliases = new Map<string, Node>()
+      const pinned = new Set<string>()
+      const privateRefs = new Map<string, Node>()
+      const uses: Node[] = []
+      const text = (node: Node) => String(ctx.sourceCode.getText(node))
+      const isBaseProps = (name: Node) =>
+        isBasePropsName(name, base) || (name?.type === 'Identifier' && pinned.has(String(name.name)))
+      const check = (node: Node) => {
+        const label = text(node)
+        const parent = node.parent
+        if (parent?.type === 'TSIndexedAccessType' && parent.objectType === node) return
+        if (parent?.type === 'TSTypeOperator' && parent.operator === 'keyof') return
+        if (parent?.type === 'TSTypeAliasDeclaration' && parent.parent?.type !== 'ExportNamedDeclaration') return
+        const holder = parent?.type === 'TSTypeParameterInstantiation' ? parent.parent : null
+        const generic = holder?.typeName?.type === 'Identifier' ? String(holder.typeName.name)
+          : holder?.expression?.type === 'Identifier' ? String(holder.expression.name) : null
+        if (holder && parent.params[0] === node && (generic === 'Omit' || generic === 'Pick')) {
+          const keys = keysOf(parent.params[1], aliases)
+          if (generic === 'Omit' && !keys.includes('className')) ctx.report({ node, messageId: 'omit', data: { name: label } })
+          if (generic === 'Pick') ctx.report({ node, messageId: 'pick', data: { name: label } })
+          return
+        }
+        ctx.report({ node, messageId: 'bare', data: { name: label } })
+      }
+      return {
+        ImportDeclaration(node: Node) {
+          if (!isBaseUiSource(node.source?.value)) return
+          for (const s of node.specifiers ?? []) base.add(String(s.local?.name))
+        },
+        ExportAllDeclaration(node: Node) {
+          if (isBaseUiSource(node.source?.value)) ctx.report({ node, messageId: 'reexport' })
+        },
+        ExportNamedDeclaration(node: Node) {
+          if (isBaseUiSource(node.source?.value)) return ctx.report({ node, messageId: 'reexport' })
+          if (node.source) return
+          for (const s of node.specifiers ?? []) {
+            if (base.has(String(s.local?.name))) ctx.report({ node: s, messageId: 'reexport' })
+          }
+        },
+        TSTypeAliasDeclaration(node: Node) {
+          aliases.set(String(node.id.name), node.typeAnnotation)
+          const body = node.typeAnnotation
+          if (body?.type === 'TSTypeReference' && node.parent?.type !== 'ExportNamedDeclaration') privateRefs.set(String(node.id.name), body.typeName)
+        },
+        TSTypeReference(node: Node) {
+          uses.push(node)
+        },
+        TSInterfaceHeritage(node: Node) {
+          uses.push(node)
+        },
+        'Program:exit'() {
+          // A private alias of Base UI's props, or of such an alias, is Base UI's props by another name.
+          for (let grew = true; grew;) {
+            grew = false
+            for (const [name, ref] of privateRefs) {
+              if (pinned.has(name) || !isBaseProps(ref)) continue
+              pinned.add(name)
+              grew = true
+            }
+          }
+          for (const node of uses) {
+            const name = node.type === 'TSInterfaceHeritage' ? node.expression : node.typeName
+            if (isBaseProps(name)) check(node)
+          }
+        },
+      }
+    },
+  },
+
+  'client-shape': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-5.12-1: client.tsx is markup plus at most one hook from hook.ts per component.' },
+      schema: [],
+      messages: {
+        state: 'R-5.12-1: {{name}} is state or an effect, which lives in hook.ts; client.tsx only calls the hook that returns it.',
+        foreign: 'R-5.12-1: {{name}} does not come from hook.ts. The component hook there calls it and returns what the markup needs.',
+        second: 'R-5.12-1: {{name}} is a second hook call in {{component}}. Its one hook from hook.ts returns everything.',
+        helper: 'R-5.12-1: {{name}} is not a component. A pure helper lives in lib.ts and a hook in hook.ts.',
+      },
+    },
+    create(ctx: Context) {
+      const file = String(ctx.filename ?? ctx.getFilename?.() ?? '').replace(/\\/g, '/')
+      const body = ctx.sourceCode?.ast?.body ?? ctx.getSourceCode?.().ast?.body ?? []
+      const first = body[0]
+      const directive = first?.type === 'ExpressionStatement' && first.directive === 'use client'
+      // A 'use client' part is client.tsx split up by R-5.12-2, so it keeps the same shape.
+      if (!file.endsWith('/client.tsx') && !(file.includes('/parts/') && directive)) return {}
+      const STATE = new Set(['useState', 'useEffect', 'useLayoutEffect', 'useInsertionEffect', 'useReducer', 'useRef', 'useMemo', 'useCallback'])
+      const isHook = (name: string) => /^use[A-Z]/.test(name)
+      const isComponent = (name: string) => /^[A-Z][A-Za-z0-9]*$/.test(name)
+      const fromHook = new Set<string>()
+      const reactHolders = new Set<string>()
+      const calls = new Map<Node, number>()
+      /** The top-level function a call sits in: the component it belongs to. */
+      const componentOf = (node: Node) => {
+        let outer: Node = null
+        for (let n = node.parent; n; n = n.parent) {
+          if (/Function/.test(String(n.type))) outer = n
+        }
+        return outer
+      }
+      const nameOf = (fn: Node) => String(fn?.id?.name ?? (fn?.parent?.type === 'VariableDeclarator' ? fn.parent.id?.name : '') ?? '')
+      const count = (node: Node, name: string) => {
+        const component = componentOf(node)
+        if (!component) return
+        const seen = (calls.get(component) ?? 0) + 1
+        calls.set(component, seen)
+        if (seen > 1) ctx.report({ node, messageId: 'second', data: { name, component: nameOf(component) || 'this component' } })
+      }
+      const helper = (node: Node, name: string) => {
+        if (name && !isComponent(name)) ctx.report({ node, messageId: 'helper', data: { name } })
+      }
+      return {
+        ImportDeclaration(node: Node) {
+          const source = String(node.source?.value ?? '')
+          for (const spec of node.specifiers ?? []) {
+            const local = String(spec.local?.name ?? '')
+            if (/^\.\.?\/hook\.js$/.test(source)) fromHook.add(local)
+            if (source === 'react' && spec.type !== 'ImportSpecifier') reactHolders.add(local)
+          }
+        },
+        CallExpression(node: Node) {
+          const callee = node.callee
+          if (callee?.type === 'Identifier' && isHook(String(callee.name))) {
+            const name = String(callee.name)
+            if (STATE.has(name)) ctx.report({ node, messageId: 'state', data: { name } })
+            else if (!fromHook.has(name)) ctx.report({ node, messageId: 'foreign', data: { name } })
+            count(node, name)
+            return
+          }
+          if (callee?.type === 'MemberExpression' && isHook(String(callee.property?.name ?? ''))) {
+            const name = String(callee.property.name)
+            const holder = String(callee.object?.name ?? '')
+            const messageId = reactHolders.has(holder) && STATE.has(name) ? 'state' : 'foreign'
+            ctx.report({ node, messageId, data: { name: `${holder}.${name}` } })
+            count(node, name)
+          }
+        },
+        'Program > FunctionDeclaration, Program > ExportNamedDeclaration > FunctionDeclaration'(node: Node) {
+          helper(node, String(node.id?.name ?? ''))
+        },
+        'Program > VariableDeclaration > VariableDeclarator, Program > ExportNamedDeclaration > VariableDeclaration > VariableDeclarator'(node: Node) {
+          if (!/^(Arrow)?Function/.test(String(node.init?.type ?? ''))) return
+          helper(node, String(node.id?.name ?? ''))
+        },
+      }
+    },
+  },
+
+  'cn-class-name-last': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: "R-5.2-2: the consumer's className is the last argument to cn()." },
+      schema: [],
+      messages: {
+        notLast: "R-5.2-2: {{name}} is the consumer's class, so it is the last argument to cn() and wins every conflict.",
+      },
+    },
+    create(ctx: Context) {
+      const unwrap = (arg: Node): Node => {
+        let n = arg
+        while (n.type === 'TSAsExpression' || n.type === 'TSNonNullExpression' || n.type === 'TSSatisfiesExpression') {
+          n = n.expression
+        }
+        return n
+      }
+      const consumerClass = (arg: Node): string | null => {
+        const n = unwrap(arg)
+        if (n.type === 'Identifier' && n.name === 'className') return 'className'
+        const key = n.type === 'MemberExpression' && (n.computed ? n.property?.value : n.property?.name)
+        return key === 'className' && n.object?.type === 'Identifier' && n.object.name === 'props' ? 'props.className' : null
+      }
+      return {
+        CallExpression(node: Node) {
+          if (node.callee?.type !== 'Identifier' || node.callee.name !== 'cn') return
+          const args: Node[] = node.arguments
+          args.forEach((arg, i) => {
+            const name = consumerClass(arg)
+            if (name !== null && i < args.length - 1) {
+              ctx.report({ node: arg, messageId: 'notLast', data: { name } })
+            }
+          })
+        },
+      }
+    },
+  },
+
+  'no-physical-placement': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-5.3-4: never left or right as a side, an align or a placement.' },
+      schema: [],
+      messages: {
+        physical: 'R-5.3-4: {{prop}}="{{value}}" is physical and does not mirror in RTL. Use placement with start or end.',
+      },
+    },
+    create(ctx: Context) {
+      const check = (prop: string, value: Node) => {
+        if (!PLACEMENT_PROPS.has(prop)) return
+        for (const found of possibleStrings(value, ctx)) {
+          if (PHYSICAL_SIDE.test(found.value)) {
+            ctx.report({ node: found.node, messageId: 'physical', data: { prop, value: found.value } })
+          }
+        }
+      }
+      return {
+        JSXAttribute(node: Node) {
+          check(String(node.name?.name ?? ''), node.value)
+        },
+        Property(node: Node) {
+          if (node.computed && node.key?.type !== 'Literal') return
+          check(String(node.computed ? node.key.value : node.key?.name ?? node.key?.value ?? ''), node.value)
         },
       }
     },

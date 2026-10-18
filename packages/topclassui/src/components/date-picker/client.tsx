@@ -23,7 +23,7 @@ export function DatePicker({
   fullWidth = DATE_PICKER_DEFAULTS.fullWidth,
   placement = DATE_PICKER_DEFAULTS.placement,
   value, defaultValue, onValueChange, placeholder, minDate, maxDate, firstDayOfWeek,
-  open, defaultOpen, onOpenChange, container,
+  open, defaultOpen, onOpenChange, onOpenChangeComplete, container,
   name, form, required, disabled,
   className,
   'aria-invalid': ariaInvalid,
@@ -35,7 +35,7 @@ export function DatePicker({
     'aria-describedby': describedBy,
   })
   return (
-    <Base.Root modal="trap-focus" open={picker.open} onOpenChange={picker.onOpenChange} actionsRef={picker.actionsRef}>
+    <Base.Root modal="trap-focus" open={picker.open} onOpenChange={picker.onOpenChange} onOpenChangeComplete={onOpenChangeComplete} actionsRef={picker.actionsRef}>
       <span className={cn(DATE_PICKER_ROOT, FIELD_TEXT[size], fullWidth && FIELD_HOLDER_FULL)}>
         <Base.Trigger
           {...rest}

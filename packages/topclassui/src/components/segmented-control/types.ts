@@ -64,7 +64,9 @@ export interface SegmentedControlLook {
 }
 
 /** What the hook reads: the state, its default, the handler and the track, and the segments that take the server tab stop. */
-export type SegmentedControlValueProps = Pick<BaseRoot, 'value' | 'defaultValue' | 'onValueChange' | 'children' | 'disabled'> & {
+export type SegmentedControlValueProps = Pick<SegmentedControlRootProps, 'onValueChange' | 'children' | 'disabled'> & {
+  value?: BaseRoot['value']
+  defaultValue?: BaseRoot['defaultValue']
   ref?: Ref<HTMLDivElement> | undefined
 }
 

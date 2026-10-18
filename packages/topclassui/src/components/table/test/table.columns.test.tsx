@@ -45,7 +45,7 @@ describe('a column can be the header of its row (WCAG 1.3.1)', () => {
   })
 
   it('leaves the column header a column header', () => {
-    const head = /<thead>(.*)<\/thead>/.exec(html({ columns: withRowHeader }))?.[1] ?? ''
+    const head = /<thead[^>]*>(.*)<\/thead>/.exec(html({ columns: withRowHeader }))?.[1] ?? ''
     expect(opening(head, 'th').map((tag) => attr(tag, 'scope'))).toEqual(['col', 'col'])
   })
 })

@@ -43,13 +43,14 @@ const stuckCells = () => [...classesOf(html({ stickyFirstColumn: true }), 'th'),
 const FIRST_COLUMN = [true, false, false, true, false, false, true, false, false, true, false, false, true, false, false]
 
 describe('stickyFirstColumn', () => {
-  it('sticks nothing, draws no edge and keeps no room for a stuck column by default', () => {
-    expect(html()).not.toContain('sticky')
+  it('sticks no column, draws no edge and keeps no room for a stuck column by default; the header row always sticks', () => {
+    expect([...classesOf(html(), 'th'), ...classesOf(html(), 'td')].flat().filter((c) => c.includes('sticky'))).toEqual([])
+    expect(html()).toContain('<thead class="sticky top-0 z-[calc(var(--tc-z-sticky)+1)]">')
     expect(html()).not.toContain('inset-s-0')
     expect(html()).not.toContain('--tc-table-sticky-width')
     expect(html()).not.toContain('after:')
     expect(html()).not.toContain('scroll-mx-')
-    expect(classList(html()).filter((c) => c.startsWith('scroll-p'))).toEqual(['scroll-ps-8', 'scroll-pe-8'])
+    expect(classList(html()).filter((c) => c.startsWith('scroll-p'))).toEqual(['scroll-ps-8', 'scroll-pe-8', 'scroll-pt-[calc(var(--spacing)*9)]'])
   })
 
   it('sticks the first header cell to the inline start, on the fill every header has', () => {
@@ -89,7 +90,7 @@ describe('stickyFirstColumn', () => {
     const html_ = html({ stickyFirstColumn: true })
     // The cap and 2rem more: a focused control shows that much clear of the column, or is scrolled to.
     expect(classList(html_).filter((c) => c.startsWith('scroll-p')))
-      .toEqual(['scroll-pe-8', 'scroll-ps-[calc(var(--tc-table-sticky-width,8rem)+2rem)]'])
+      .toEqual(['scroll-pe-8', 'scroll-pt-[calc(var(--spacing)*9)]', 'scroll-ps-[calc(var(--tc-table-sticky-width,8rem)+2rem)]'])
     const [header] = classesOf(html_, 'th')
     const [cell] = classesOf(body(html_), 'td')
     expect(header).toEqual(expect.arrayContaining(STUCK))

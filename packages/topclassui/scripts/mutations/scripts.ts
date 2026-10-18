@@ -3,6 +3,90 @@ import type { Mutation } from '../lib/mutate.js'
 
 export const MUTATIONS: Mutation[] = [
   {
+    label: 'check-boundaries stops looking for useRender in a server file',
+    file: 'scripts/check-boundaries.ts',
+    from: '    if (runtimeUseRender(source)) {',
+    to: '    if (false && runtimeUseRender(source)) {',
+  },
+  {
+    label: 'check-boundaries accepts a server render prop without renderElement',
+    file: 'scripts/check-boundaries.ts',
+    from: '      if (!implementsRenderProp(source, r, prop)) {',
+    to: '      if (implementsRenderProp(source, r, prop)) {',
+  },
+  {
+    label: 'check-boundaries stops looking at link props',
+    file: 'scripts/check-boundaries.ts',
+    from: "    for (const prop of isDemo ? [] : (['render', 'link'] as const)) {",
+    to: "    for (const prop of isDemo ? [] : (['render'] as const)) {",
+  },
+  {
+    label: 'check-boundaries skips demos for useRender too',
+    file: 'scripts/check-boundaries.ts',
+    from: '  if (!isTest && !hasUseClient(source)) {',
+    to: '  if (!isTest && !isDemo && !hasUseClient(source)) {',
+  },
+  {
+    label: 'check-boundaries lets a server file handle the function form of render',
+    file: 'scripts/check-boundaries.ts',
+    from: "      if (prop === 'render' && handlesRenderFunction(source)) {",
+    to: "      if (prop === 'link' && handlesRenderFunction(source)) {",
+  },
+  {
+    label: 'the named-import scan no longer recognises useRender',
+    file: 'scripts/lib/source-checks.ts',
+    from: "    if (names.some((name) => /^useRender(?:Element)?\\b/.test(name))) return true",
+    to: "    if (names.some((name) => /^type useRender(?:Element)?\\b/.test(name))) return true",
+  },
+  {
+    label: 'the useRender scan no longer sees export *',
+    file: 'scripts/lib/source-checks.ts',
+    from: "  if (new RegExp(String.raw`\\bexport\\s*\\*\\s*(?:as\\s+[\\w$]+\\s*)?from\\s*(?:${homes}|${barrel})`).test(source)) return true",
+    to: '',
+  },
+  {
+    label: 'importing renderElement counts as calling it',
+    file: 'scripts/lib/source-checks.ts',
+    from: "  if (locals.some((local) => new RegExp(String.raw`(?<![\\w$.])${local.replace(/\\$/g, '\\\\$')}\\s*\\(`).test(code))) return true",
+    to: '  if (locals.length > 0) return true',
+  },
+  {
+    label: 'a local render.js counts as shared/render',
+    file: 'scripts/lib/source-checks.ts',
+    from: "    if (resolved.replace(/\\.js$/, '') !== target) continue",
+    to: "    if (!resolved.replace(/\\.js$/, '').endsWith(target.split('/').pop() ?? '')) continue",
+  },
+  {
+    label: 'R-5.1-2: a ./ specifier may step out of the folder with ..',
+    file: 'scripts/lib/index-markup.ts',
+    from: "const OWN_FILE = /^\\.\\/((?:parts\\/)?[\\w-]+)\\.js$/",
+    to: "const OWN_FILE = /^\\.\\/([\\w./-]+)\\.js$/",
+  },
+  {
+    label: 'R-5.1-2: a value re-export from any file of the folder is allowed',
+    file: 'scripts/lib/index-markup.ts',
+    from: '  if (isTypeOnlyExport(statement) || VALUE_SOURCES.has(file)) return undefined',
+    to: '  return undefined',
+  },
+  {
+    label: 'R-5.1-2: a comment that names client marks a folder C',
+    file: 'scripts/lib/index-markup.ts',
+    from: '  return visit(parse(\'meta.ts\', metaSource))',
+    to: '  return visit(parse(\'meta.ts\', metaSource)) || /rendering\\s*:\\s*\'client\'/.test(metaSource)',
+  },
+  {
+    label: 'R-5.1-2: connectors leave the check',
+    file: 'scripts/lib/index-markup.ts',
+    from: "  if (relDir.startsWith('src/connectors/')) return true",
+    to: '',
+  },
+  {
+    label: 'R-5.1-2: the icon registry forgets what was registered',
+    file: 'src/components/icon-registry/lib.ts',
+    from: '    if (data) registry.set(name, data)',
+    to: '',
+  },
+  {
     label: 'the contrast margin that absorbs browser differences is removed',
     file: 'scripts/lib/contrast-checks.ts',
     from: 'export const MARGIN = 0.15',
@@ -187,6 +271,62 @@ export const MUTATIONS: Mutation[] = [
     file: 'scripts/lib/mutate.ts',
     from: '  if (/^\\s*Test(?: Files|s)\\s+\\d+ failed/m.test(output)) return true',
     to: '  return true',
+  },
+  {
+    label: 'R-8.5-1: an exemption covers props that take CollectionProps',
+    file: 'scripts/lib/collections.ts',
+    from: "    if (types !== null && takesCollectionProps(types)) return ['its props take CollectionProps, which no exemption covers']\n",
+    to: '',
+  },
+  {
+    label: 'R-8.5-1: importing useCollection counts as calling it',
+    file: 'scripts/lib/collections.ts',
+    from: "    && /\\buseCollection\\s*(<[^>]*>)?\\s*\\(/.test(code)",
+    to: '    && true',
+  },
+  {
+    label: 'R-8.5-1: a menu of items stops counting as a list',
+    file: 'scripts/lib/collections.ts',
+    from: ' || /\\bMenuContract\\b/.test(code)',
+    to: '',
+  },
+  {
+    label: 'R-8.5-1: a list with no hook passes',
+    file: 'scripts/lib/collections.ts',
+    from: "  if (hook === null) return ['renders items and has no hook.ts to call useCollection in']",
+    to: '  if (hook === null) return []',
+  },
+  {
+    label: 'R-8.5-1: a list found by its knob alone, as the file list, stops counting',
+    file: 'scripts/lib/collections.ts',
+    from: ' || takesListRows(`${types ?? \'\'}\\n${rest}`)',
+    to: '',
+  },
+  {
+    label: 'check-structure reads lib.ts only, so a table exported from lib.tsx passes',
+    file: 'scripts/check-structure.ts',
+    from: ": f === 'lib.ts' || f === 'lib.tsx' ? libFileProblems(f, source())",
+    to: ": f === 'lib.ts' ? libFileProblems(f, source())",
+  },
+  {
+    label: 'check-structure never asks a scrolling overlay for its Header, Body and Footer',
+    file: 'scripts/check-structure.ts',
+    from: "for (const p of overlayPartProblems(slug, readFileSync(join(dir, 'index.tsx'), 'utf8'), names)) {",
+    to: 'for (const p of [] as string[]) {',
+  },
+  {
+    label: 'hook.ts may export a context again beside its hooks',
+    file: 'scripts/lib/part-names.ts',
+    from: '    .filter((n) => !(n.kind === \'function\' && /^use[A-Z]/.test(n.name)))',
+    to: '    .filter((n) => n.kind !== \'context\' && !(n.kind === \'function\' && /^use[A-Z]/.test(n.name)))',
+  },
+  {
+    label: 'check-structure skips a test inside parts/ without a word',
+    file: 'scripts/check-structure.ts',
+    from: "{ errors.push(`${rel(path)}: tests live in test/, not parts/ (R-8.1-1).`); continue }",
+    to: '{ continue }',
+  },
+  {
   },
   {
     label: 'the tarball check accepts a relative specifier without .js, which a node16 consumer cannot resolve',

@@ -1054,7 +1054,8 @@ and 5.
   w-max items-center gap-5`. `labels?: Labels`. The `<nav>` carries `-m-1 min-w-0 p-1` and
   `SCROLL_X`: on a narrow screen the links scroll sideways inside the bar and the page
   never grows wider. The padding is the room a focus ring needs inside a box that clips.
-- **`NavbarLink`.** An `<li>` and a link through `renderElement`. `current`: default
+- **`NavbarLink`.** A link through `renderElement`; `NavbarLinks` gives each direct child
+  its `<li>` (DECISIONS 2026-10-17, "A list gives each of its links a list item"). `current`: default
   `false`, sets `aria-current="page"`. `inline-flex items-center rounded-control text-sm
   text-muted aria-[current=page]:font-semibold aria-[current=page]:text-body`,
   `HOVER.link`, `FOCUS_RING`, `TOUCH_TARGET`.
@@ -1120,7 +1121,8 @@ UI part (`baseUi: null`). Needs shared pull requests 4 and 5.
 - **`SidebarGroup`.** `label?: ReactNode` in a `<p>` (`px-3 py-1 text-xs font-medium
   text-muted group-data-closed/sidebar:sr-only`) that names the `<ul>` under it (`flex
   flex-col gap-1`) through `useId`.
-- **`SidebarLink`.** An `<li>` and a link through `renderElement`. `icon?: ReactNode`,
+- **`SidebarLink`.** A link through `renderElement`; `SidebarGroup` gives each direct
+  child its `<li>` (DECISIONS 2026-10-17, "A list gives each of its links a list item"). `icon?: ReactNode`,
   the label as children, `current` (default `false`, sets `aria-current="page"`). `ROW`,
   `HOVER.ghost`, `FOCUS_RING`, `TRANSITION`, `group-data-closed/sidebar:justify-center
   group-data-closed/sidebar:px-0`, and by `current`, from a lookup: `tone-primary
@@ -1173,7 +1175,7 @@ Surprising:
   scale, default `md`, passed to `Svg`. `readOnly`: default `true`. `labels?: Labels`,
   `locale?: string`. When `readOnly` is `false`: `defaultValue`, `onValueChange`, `name`,
   `disabled`, and a type that requires `aria-label` or `aria-labelledby`.
-- **One star**, from `lib.tsx`, used by both halves: a `<span>` with `relative inline-flex
+- **One star**, `RatingStar` in `parts/rating-star.tsx` (no directive), used by both halves: a `<span>` with `relative inline-flex
   shrink-0 text-line-strong` holding `<Svg icon={star} />`, and over it, for a full or a
   half star, a `<span aria-hidden>` with `absolute inset-y-0 inset-s-0 flex overflow-hidden
   text-warning-solid` and `w-full` or `w-1/2`, holding `<Svg icon={starFill} />` with

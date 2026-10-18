@@ -1,8 +1,11 @@
+import { readdirSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
 import { describe, expect, it } from 'vitest'
 
 import {
-  FADE_MOTION, FOCUS_RING_INSET, FOCUS_RING_WITHIN, ICON_BUTTON, LIST_CAP, OVERLAY_SURFACE, POPUP_MOTION,
-  POPUP_PASSIVE, ROW, ROW_HIGHLIGHT, SCRIM, SCROLL_X, SLIDE_MOTION, STICKY_TOP, VIEWPORT_PASSIVE,
+  FADE_MOTION, FOCUS_RING_INSET, FOCUS_RING_WITHIN, ICON_BUTTON, LIST_CAP, OVERLAY_SURFACE, POPUP_BOUNDS, POPUP_MAX_H,
+  POPUP_MAX_W, POPUP_MOTION, POPUP_PASSIVE, ROW, ROW_HIGHLIGHT, SCRIM, SCROLL_X, SLIDE_MOTION, STICKY_TOP, VIEWPORT_PASSIVE,
 } from './classes.js'
 
 // Every list is written out in full and compared whole: an extra class fails as surely as a missing one.
@@ -96,6 +99,16 @@ describe('a row of a menu and its highlight', () => {
 })
 
 describe('lists, bars and sideways scrolling', () => {
+  it('POPUP_BOUNDS is the room Base UI measured, the width rounded down to the pixel floating-ui places the popup on', () => {
+    expect(list(POPUP_MAX_H)).toEqual(['max-h-(--available-height)'])
+    expect(list(POPUP_MAX_W)).toEqual(['max-w-[round(down,var(--available-width),1px)]'])
+    expect(list(POPUP_BOUNDS)).toEqual(['max-h-(--available-height)', 'max-w-[round(down,var(--available-width),1px)]'])
+  })
+
+  it('POPUP_BOUNDS adds no scroller and no origin: the list inside scrolls, and POPUP_MOTION carries the origin', () => {
+    expect(list(POPUP_BOUNDS).filter((cls) => cls.startsWith('overflow') || cls.startsWith('origin'))).toEqual([])
+  })
+
   it('LIST_CAP is the row count times the row height, and never more than the room Base UI measured', () => {
     expect(list(LIST_CAP)).toEqual([
       'max-h-[min(var(--available-height,100dvh),calc(var(--tc-list-rows)*var(--tc-row-height)))]',
@@ -143,5 +156,30 @@ describe('the icon button and the two other rings', () => {
     for (const ring of [ROW, ICON_BUTTON, FOCUS_RING_INSET, FOCUS_RING_WITHIN]) {
       expect(list(ring).filter((cls) => cls === 'outline-none' || cls === 'outline-hidden')).toEqual(['outline-none'])
     }
+  })
+})
+
+/** The bounds a classes.ts writes for itself instead of taking POPUP_BOUNDS, POPUP_MAX_H or POPUP_MAX_W (PLAN 10.5). */
+const ownBounds = (source: string) => source.match(/max-h-\(--available-height\)|max-w-\(--available-width\)|max-w-\[round\(down,var\(--available-width\),1px\)\]/g) ?? []
+
+describe('R-10.5-1: every anchored popup takes its bounds from src/shared, and none writes its own', () => {
+  const components = join(import.meta.dirname, '..', 'components')
+  const sources = readdirSync(components).flatMap((slug) => {
+    try { return [{ slug, source: readFileSync(join(components, slug, 'classes.ts'), 'utf8') }] } catch { return [] }
+  })
+
+  it('finds a written-out bound in a broken sample', () => {
+    expect(ownBounds("export const X_POPUP = 'flex max-w-(--available-width) max-h-(--available-height)'")).toHaveLength(2)
+    expect(ownBounds("export const X_POPUP = `flex ${POPUP_BOUNDS}`")).toEqual([])
+  })
+
+  it('no classes.ts under src/components writes the room as its own bound', () => {
+    expect(sources.length).toBeGreaterThan(40)
+    expect(sources.filter(({ source }) => ownBounds(source).length > 0).map(({ slug }) => slug)).toEqual([])
+  })
+
+  it('Popover, Select, Combobox and DatePicker wear POPUP_BOUNDS', () => {
+    const wearers = sources.filter(({ source }) => /\$\{POPUP_BOUNDS\}|^\s*POPUP_BOUNDS,$/m.test(source)).map(({ slug }) => slug)
+    expect(wearers).toEqual(['combobox', 'date-picker', 'popover', 'select'])
   })
 })

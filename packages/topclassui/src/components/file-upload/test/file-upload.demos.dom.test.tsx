@@ -18,6 +18,8 @@ const AFTER: Record<string, number[]> = {
   playground: [1],
   rtl: [2],
   states: [1, 0],
+  // Images only: both PDFs are refused, and a refused file is a row too.
+  'ten-thousand': [2],
 }
 
 const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { default: ComponentType }).default

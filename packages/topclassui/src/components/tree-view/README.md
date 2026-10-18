@@ -73,10 +73,10 @@ Required: `items`, `aria-label` or `aria-labelledby`. Every other prop below is 
 | `expanded` | no | `readonly string[]` | - | The ids of the open branches. Use with onExpandedChange when controlled. |
 | `hasMore` | no | `boolean` | - | More root nodes exist, so loadMore is called when the tree nears its end. |
 | `loadingFallback` | no | `ReactNode` | - | What status loading says, in place of labels.common.loading. |
-| `loadMore` | no | `(() => void \| Promise<void>)` | - | Called with no argument for the next page of root nodes, once per page. It never fetches a branch. |
+| `loadMore` | no | `(() => void \| Promise<void>)` | - | Called with no argument for the next page of root nodes, once per page; never for a branch. Client-only, or a Server Action. |
 | `loadMoreThreshold` | no | `integer`, min 0, max 200 | `10` | How many rows from the end loadMore is called, clamped. |
-| `onExpandedChange` | no | `((ids: readonly string[]) => void)` | - | Called with every open id after a branch opens or closes: load a branch's children here. |
-| `onValueChange` | no | `((id: string) => void)` | - | Called with the id of the node Enter, Space or a press selects. |
+| `onExpandedChange` | no | `((ids: readonly string[]) => void)` | - | Called with every open id after a branch opens or closes: load a branch's children here. Client-only. |
+| `onValueChange` | no | `((id: string) => void)` | - | Called with the id of the node Enter, Space or a press selects. Client-only. |
 | `status` | no | `idle` \| `loading` \| `loading-more` \| `empty` | `"idle"` | loading and loading-more mark the tree busy and say so under it; empty says there is nothing. |
 | `value` | no | `string \| null` | - | The selected node's id, or null for none. Use with onValueChange when controlled. |
 | `virtualize` | no | `unknown` | `"auto"` | auto windows the tree above 200 visible rows; true always, false never. |

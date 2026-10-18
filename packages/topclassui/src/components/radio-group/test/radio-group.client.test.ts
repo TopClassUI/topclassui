@@ -83,7 +83,7 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
 
   it('each part calls one hook from hook.ts', () => {
     expect(hooksByPart(source)).toEqual({ RadioGroupRoot: ['useRadioGroupRoot'], RadioGroupItem: ['useRadioGroupItem'] })
-    expect(importedNames(source, './hook.js')).toEqual(['RadioGroupLookContext', 'useRadioGroupItem', 'useRadioGroupRoot'])
+    expect(importedNames(source, './hook.js')).toEqual(['useRadioGroupItem', 'useRadioGroupRoot'])
   })
 
   it('takes Base UI from its radio and radio-group entries, the svg and the dot by explicit import (R-7-1), and no schema', () => {
@@ -111,12 +111,12 @@ describe('hook.ts holds the value and the look of the group (R-5.12-1)', () => {
     expect(source.startsWith("'use client'\n")).toBe(true)
   })
 
-  it('builds on the shared form value and the shared server tab stop', () => {
-    expect(importedModules(source)).toEqual(['react', '#shared/use-form-value.js', '#shared/use-server-tab-stop.js', './constants.js', './types.js'])
+  it('builds on the provider check, the shared form value and the shared server tab stop', () => {
+    expect(importedModules(source)).toEqual(['react', '#shared/provider/context.js', '#shared/use-form-value.js', '#shared/use-server-tab-stop.js', './constants.js', './types.js'])
     expect(importedNames(source, 'react')).toEqual(['createContext', 'useContext', 'useEffect', 'useImperativeHandle', 'useMemo', 'useRef', 'useState'])
     expect(hooksByPart(source)).toEqual({
       syncRadios: [],
-      useRadioGroupRoot: ['useState', 'useRef', 'useFormValue', 'useImperativeHandle', 'useEffect', 'useState', 'useMemo'],
+      useRadioGroupRoot: ['useProviderPresence', 'useState', 'useRef', 'useFormValue', 'useImperativeHandle', 'useEffect', 'useState', 'useMemo'],
       useRadioGroupItem: ['useContext', 'useServerTabStop'],
     })
   })

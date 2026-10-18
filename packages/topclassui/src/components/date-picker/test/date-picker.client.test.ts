@@ -91,8 +91,8 @@ describe('client.tsx, the part and hook.ts (R-5.12-1)', () => {
     const part = read('parts/date-picker-calendar.tsx')
     expect(read('client.tsx')).toContain('modal="trap-focus"')
     expect(part).toContain('initialFocus={false}')
-    expect(part).toContain('sideOffset={POPUP_BOUNDS.sideOffset}')
-    expect(part).toContain('collisionPadding={POPUP_BOUNDS.collisionPadding}')
+    expect(part).toContain('sideOffset={FLOATING.sideOffset}')
+    expect(part).toContain('collisionPadding={FLOATING.collisionPadding}')
     expect(part).toMatch(/<Base\.Close aria-label=\{calendar\.labels\.close\}/)
   })
 
@@ -120,7 +120,7 @@ describe('classes.ts builds every string from the shared constants (R-5.2-4)', (
   it('takes the field box, the holder, the ring, the popup and the target floor from src/shared, and names no physical side', () => {
     expect(importedNames(read('classes.ts'), '#shared/classes.js')).toEqual(expect.arrayContaining([
       'FIELD_BOX', 'FIELD_HOLDER', 'FOCUS_RING', 'FOCUS_RING_INSET', 'HOVER', 'ICON_BUTTON', 'LABEL', 'OVERLAY_SURFACE',
-      'POPUP_MOTION', 'SCROLL_AREA', 'TARGET_HEIGHT', 'TRANSITION',
+      'POPUP_BOUNDS', 'POPUP_MOTION', 'SCROLL_AREA', 'TARGET_HEIGHT', 'TRANSITION',
     ]))
     expect(read('classes.ts')).not.toMatch(/\b(left|right)-|\b[mp][lr]-/)
   })

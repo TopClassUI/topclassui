@@ -1,0 +1,40 @@
+{
+  "name": "@topclassui/cli",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The source of the topclassui bin: npx topclassui init, add, diff and list.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20.9"
+  },
+  "scripts": {
+    "build": "tsx scripts/build.ts",
+    "registry:build": "tsx scripts/registry-build.ts",
+    "check:registry": "tsx scripts/registry-build.ts --check",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:consumers": "tsx scripts/consumers.ts",
+    "check": "pnpm lint && pnpm typecheck && pnpm check:registry && pnpm build && pnpm test"
+  },
+  "devDependencies": {
+    "@base-ui/react": "1.8.0",
+    "@eslint/js": "10.0.1",
+    "@types/node": "22.14.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "eslint": "10.12.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "server-only": "0.0.1",
+    "tailwind-merge": "3.7.0",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.0",
+    "vitest": "5.0.3",
+    "zod": "4.6.5"
+  }
+}
