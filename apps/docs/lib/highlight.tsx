@@ -1,40 +1,46 @@
-// The one highlighter (docs-site S3): Shiki at build time, in a server component, never in a client bundle.
+// One highlighter for MDX fences and demo sources, run at build time on the server (docs-site S3). Never in a client bundle.
 import type { ReactNode } from 'react'
-import { type BundledLanguage, type Highlighter, createHighlighter } from 'shiki'
+import { createHighlighter, type Highlighter } from 'shiki'
 
-/** CodeBlock is dark on a light page and light on a dark one; measured over every demo: 8.45:1 and 4.62:1 (choice 14). */
-export const CODE_THEMES = { onLight: 'github-dark-high-contrast', onDark: 'github-light-high-contrast' } as const
+import { LANGS, ON_DARK, ON_LIGHT } from './shiki-themes'
 
-const LANGS = ['tsx', 'bash'] as const satisfies readonly BundledLanguage[]
 export type CodeLang = (typeof LANGS)[number]
 
 let highlighter: Promise<Highlighter> | null = null
 
-function load(): Promise<Highlighter> {
-  highlighter ??= createHighlighter({ themes: Object.values(CODE_THEMES), langs: [...LANGS] })
+function getHighlighter(): Promise<Highlighter> {
+  highlighter ??= createHighlighter({ themes: [ON_DARK, ON_LIGHT], langs: [...LANGS] })
   return highlighter
 }
 
-/** Each token carries both colours as --tc-code-* variables; the site's CSS picks one with light-dark(). */
-export async function highlight(code: string, lang: CodeLang = 'tsx'): Promise<ReactNode> {
-  const { tokens } = (await load()).codeToTokens(code, {
-    lang,
-    themes: { light: CODE_THEMES.onLight, dark: CODE_THEMES.onDark },
+const ALIASES: Record<string, (typeof LANGS)[number]> = { sh: 'bash', shell: 'bash', typescript: 'ts', javascript: 'js', mjs: 'js' }
+
+function langOf(lang: string | undefined): (typeof LANGS)[number] | null {
+  if (lang === undefined) return null
+  const known = (LANGS as readonly string[]).includes(lang) ? (lang as (typeof LANGS)[number]) : ALIASES[lang]
+  return known ?? null
+}
+
+/** The code as coloured spans for CodeBlock's `highlighted`; plain text when the language is not loaded. */
+export async function highlight(code: string, lang?: string): Promise<ReactNode> {
+  const known = langOf(lang)
+  if (known === null) return null
+  const { tokens } = (await getHighlighter()).codeToTokens(code, {
+    lang: known,
+    themes: { 'on-dark': ON_DARK.name ?? 'on-dark', 'on-light': ON_LIGHT.name ?? 'on-light' },
     defaultColor: false,
     cssVariablePrefix: '--tc-code-',
   })
-  return tokens.map((line, index) => (
-    <span key={index}>
-      {index > 0 ? '\n' : null}
-      {line.map((token) => (
-        <span
-          key={token.offset}
-          data-code-token=""
-          style={{ '--tc-code-on-light': token.htmlStyle?.['--tc-code-light'], '--tc-code-on-dark': token.htmlStyle?.['--tc-code-dark'] }}
-        >
-          {token.content}
+  return (
+    <span className="shiki">
+      {tokens.map((line, row) => (
+        <span key={row}>
+          {line.map((token, column) => (
+            <span key={column} style={{ '--tc-code-on-dark': token.htmlStyle?.['--tc-code-on-dark'], '--tc-code-on-light': token.htmlStyle?.['--tc-code-on-light'] }}>{token.content}</span>
+          ))}
+          {row < tokens.length - 1 ? '\n' : null}
         </span>
       ))}
     </span>
-  ))
+  )
 }

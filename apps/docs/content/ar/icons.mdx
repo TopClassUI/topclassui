@@ -1,0 +1,93 @@
+---
+title: الأيقونات
+description: 84 أيقونة مضمّنة في الصفحة بصيغة SVG. لا يُحمَّل منها إلا ما تعرضه فعلًا.
+---
+
+## المجموعة
+
+أيقونات <span dir="ltr">Phosphor</span> بالوزن العادي، وثلاث نسخ مصمتة حيث يحمل الشكل المُعبّأ معنى.
+
+<IconGroups>
+
+| المجموعة | العدد | ما تغطيه |
+|---|---|---|
+| الأسهم وعلامات الإقحام | 13 | كل الاتجاهات، إضافةً إلى علامتي الإقحام المزدوجتين اللتين يحتاجهما ترقيم الصفحات |
+| الإجراءات | 19 | النسخ، التحرير، الحذف، التنزيل، البحث، التصفية |
+| الحالة والتنبيه | 13 | أيقونة لكل نبرة من النبرات الست، إضافةً إلى مؤشر تحميل |
+| الأشياء والأماكن | 36 | الملفات، المجلدات، المستخدمون، الأجهزة، العلامات التجارية |
+| النسخ المصمتة | 3 | أشكال مُعبّأة، حيث تحمل التعبئة معنى |
+
+</IconGroups>
+
+## المجموعة كاملة
+
+الأيقونات الـ84 كلها، مجمّعة. اللون الكهرماني يميّز الأيقونة الاتجاهية: فهي تنعكس من تلقاء نفسها في العربية.
+
+<IconGrid />
+
+## طريقتان للعرض
+
+يأخذ <span dir="ltr">`Icon`</span> اسمًا ويحلّه على الخادم. ويأخذ <span dir="ltr">`Svg`</span> كائن أيقونة مستوردًا ويعمل في أي مكان.
+
+هذا ما يُبقي الأيقونات غير المستخدمة خارج حزمتك. خريطة واحدة كبيرة كانت ستجلبها كلها.
+
+<WrongRight>
+
+```tsx
+'use client'
+import { Icon } from 'topclassui/icon'
+
+// server-only, so this fails at build time
+<Icon name="spinner" />
+```
+
+```tsx check
+'use client'
+import { Svg } from 'topclassui/svg'
+import { spinner } from 'topclassui/icons/spinner'
+
+<Svg icon={spinner} />
+```
+
+</WrongRight>
+
+## الأحجام
+
+القيمة الافتراضية لـ<span dir="ltr">`Icon`</span> هي <span dir="ltr">`1em`</span>، كي يطابق النص الذي بجانبه. استخدم اسم حجم عندما تقف الأيقونة وحدها.
+
+| الاسم | بالبكسل | أين يناسب |
+|---|---|---|
+| (الافتراضي) | <span dir="ltr">`1em`</span> | داخل النص: مفتاح لوحة مفاتيح، رابط، تسمية زر |
+| <span dir="ltr">`xs`</span> | 16 | صف جدول كثيف |
+| <span dir="ltr">`sm`</span> | 20 | عنصر تحكم بحجم <span dir="ltr">`sm`</span> |
+| <span dir="ltr">`md`</span> | 24 | عنصر تحكم بحجم <span dir="ltr">`md`</span> |
+| <span dir="ltr">`lg`</span> | 32 | حالة فارغة |
+| <span dir="ltr">`xl`</span> | 40 | قسم يعرض ميزة |
+
+## ما ينعكس من اليمين إلى اليسار
+
+تنعكس 16 أيقونة من 84 في الاتجاه من اليمين إلى اليسار. فللاتجاه معنى في السهم، لا في العدسة المكبّرة.
+
+<Cards>
+  <Card title="تنعكس">كل الأسهم وعلامات الإقحام، إضافةً إلى <span dir="ltr">`sign-out`</span> و<span dir="ltr">`paper-plane-tilt`</span> و<span dir="ltr">`sidebar-simple`</span>.</Card>
+  <Card title="لا تنعكس"><span dir="ltr">`magnifying-glass`</span> و<span dir="ltr">`check-circle`</span> و<span dir="ltr">`gear`</span> و<span dir="ltr">`clock`</span>. فالساعة المعكوسة ساعة معطّلة.</Card>
+  <Card title="لماذا قائمة">الاسم ليس دليلًا موثوقًا: <span dir="ltr">`arrow-square-out`</span> تنعكس، و<span dir="ltr">`arrows-clockwise`</span> لا تنعكس.</Card>
+</Cards>
+
+## إضافة أيقونات
+
+أي ملف <span dir="ltr">SVG</span> بمسار واحد يعمل مع <span dir="ltr">`Svg`</span>: أعطه <span dir="ltr">`viewBox`</span> والمسار.
+
+```tsx check title="my-logo.tsx"
+import { Svg } from 'topclassui/svg'
+import type { IconData } from 'topclassui/icons'
+
+// one of your own, no CLI needed
+const myLogo: IconData = {
+  viewBox: '0 0 24 24',
+  path: 'M12 2 22 12 12 22 2 12Z',
+  directional: false,
+}
+
+export const Logo = () => <Svg icon={myLogo} size="md" />
+```
