@@ -1,6 +1,7 @@
 // R-8.3-1: zod lives here only, and components import this file with `import type`.
 import { z } from 'zod'
 
+import { COLLECTION_BOUNDARIES } from '#shared/contracts/collection.js'
 import { TABLE_BOUNDARIES } from './boundaries.js'
 import { TABLE_DEFAULTS, TABLE_SKELETON_DEFAULTS } from './constants.js'
 
@@ -12,6 +13,14 @@ export const tableSchema = z.object({
     .meta({ description: 'Tints every second row, so the eye can follow a wide row across.' }),
   stickyFirstColumn: z.boolean().default(TABLE_DEFAULTS.stickyFirstColumn)
     .meta({ description: 'Keeps the first column in view while the others scroll sideways under it. It is cut with an ellipsis past `--tc-table-sticky-width`.' }),
+  visibleRows: z.number().int().min(COLLECTION_BOUNDARIES.visibleRowsMin).max(COLLECTION_BOUNDARIES.visibleRowsMax)
+    .default(TABLE_DEFAULTS.visibleRows)
+    .meta({ description: 'Body rows the box shows before it scrolls under its sticky header, clamped to 1 to 20; left out, the --tc-list-rows knob.' }),
+  virtualize: z.union([z.literal('auto'), z.boolean()]).default(TABLE_DEFAULTS.virtualize)
+    .meta({ description: 'Windowing: auto mounts only the rows in view above the provider threshold (200); false keeps every row in the HTML.' }),
+  loadMoreThreshold: z.number().int().min(COLLECTION_BOUNDARIES.loadMoreThresholdMin)
+    .max(COLLECTION_BOUNDARIES.loadMoreThresholdMax).default(TABLE_DEFAULTS.loadMoreThreshold)
+    .meta({ description: 'Rows from the end at which loadMore is called, clamped to 0 to 200.' }),
 })
 
 export type TableSchemaInput = z.input<typeof tableSchema>

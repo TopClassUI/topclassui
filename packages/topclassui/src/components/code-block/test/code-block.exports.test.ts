@@ -19,7 +19,7 @@ function exportedNames(source: string): string[] {
 }
 
 describe('index.tsx exports one flat name (R-9.2-3)', () => {
-  it('exports exactly CodeBlock, a function component; the copy button stays inside, as TagRemove does', () => {
+  it('exports exactly CodeBlock, a function component; the copy button stays inside, as the x of a removable Tag does', () => {
     expect(Object.keys(codeBlock)).toEqual(['CodeBlock'])
     expect(typeof codeBlock.CodeBlock).toBe('function')
   })

@@ -28,8 +28,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the file upload leaves a refused file out of the hidden status line, so a screen reader never hears it',
     file: HOOK,
-    from: 'refused: state.value.fresh ? rows.filter((row) => row.rejected) : [],',
-    to: 'refused: [],',
+    from: '    refused: refused.slice(0, FILE_UPLOAD_ANNOUNCED).map((row) => describe(row, -1)),',
+    to: '    refused: [],',
   },
   {
     label: 'the file upload remove dispatches no input event, so FieldLive never hears the list change',
@@ -82,8 +82,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the file upload moves the focus to the previous remove first, skipping the next row',
     file: HOOK,
-    from: 'buttons[index] ?? buttons[index - 1] ?? state.inputRef.current',
-    to: 'buttons[index - 1] ?? buttons[index] ?? state.inputRef.current',
+    from: 'Math.min(focusAt.current, state.value.rows.length - 1)',
+    to: 'Math.min(focusAt.current - 1, state.value.rows.length - 1)',
   },
   {
     label: 'the file upload forgets the drag count, so moving over the input clears the drag look',
@@ -234,5 +234,23 @@ export const MUTATIONS: Mutation[] = [
     file: CLIENT,
     from: '          title=""\n',
     to: '',
+  },
+  {
+    label: 'the file upload reads every refused name aloud again, so ten thousand refusals are ten thousand lines',
+    file: HOOK,
+    from: 'refused.slice(0, FILE_UPLOAD_ANNOUNCED)',
+    to: 'refused',
+  },
+  {
+    label: 'the file upload list stops windowing, so ten thousand refused rows are all mounted',
+    file: HOOK,
+    from: '  const rows = collection.rows.map(({ item, index }) => describe(item, index))',
+    to: '  const rows = state.value.rows.map((item, index) => describe(item, index))',
+  },
+  {
+    label: 'the file upload spacer forgets the gap after it, so the list is taller than its rows by one gap per window',
+    file: LIB,
+    from: 'Math.max(0, padding - gap)',
+    to: 'padding',
   },
 ]

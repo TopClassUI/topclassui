@@ -4,19 +4,19 @@ import type { Mutation } from '../lib/mutate.js'
 export const MUTATIONS: Mutation[] = [
   {
     label: 'rating: the fill rule ignores the value, so every star is drawn full',
-    file: 'src/components/rating/lib.tsx',
+    file: 'src/components/rating/lib.ts',
     from: "  if (value >= step) return 'full'\n  return value >= step - 0.5 ? 'half' : 'none'",
     to: "  return step > 0 ? 'full' : 'none'",
   },
   {
     label: 'rating: a read-only value is no longer rounded to the nearest half',
-    file: 'src/components/rating/lib.tsx',
+    file: 'src/components/rating/lib.ts',
     from: 'return Math.round(clamp(value, 0, max) * 2) / 2',
     to: 'return clamp(value, 0, max)',
   },
   {
     label: 'rating: max is no longer clamped, so a thousand stars render',
-    file: 'src/components/rating/lib.tsx',
+    file: 'src/components/rating/lib.ts',
     from: 'return Math.round(clamp(max, RATING_BOUNDARIES.maxMin, RATING_BOUNDARIES.maxMax))',
     to: 'return Math.round(max)',
   },
@@ -103,5 +103,17 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/rating/index.tsx',
     from: "return props.readOnly === false ? <Editable {...props} /> : <ReadOnly {...props} />",
     to: "return props.readOnly === true ? <ReadOnly {...props} /> : <Editable {...(props as RatingEditableProps)} aria-label=\"x\" readOnly={false} />",
+  },
+  {
+    label: 'rating: RatingInput drops its handler on the way to the radio group, so onValueChange never runs',
+    file: 'src/components/rating/client.tsx',
+    from: 'return <RatingField {...toField(props)} />',
+    to: 'return <RatingField {...toField({ ...props, onValueChange: undefined })} />',
+  },
+  {
+    label: 'rating: an editing rating names a step for every star of an unclamped max, so max={1000} renders a thousand radios',
+    file: 'src/components/rating/lib.ts',
+    from: 'names: stepsOf(max).map((step) => labels.rating.stars(step, fmt)),',
+    to: 'names: stepsOf(rawMax).map((step) => labels.rating.stars(step, fmt)),',
   },
 ]

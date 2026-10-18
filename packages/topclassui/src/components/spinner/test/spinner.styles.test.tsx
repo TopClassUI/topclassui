@@ -76,12 +76,12 @@ describe('forced colors', () => {
 
 describe('direction', () => {
   it('never mirrors in RTL, because the ring is not directional', () => {
-    expect(classes()).not.toContain('rtl:-scale-x-100')
+    expect(classes()).not.toContain('scale-x-(--tc-dir)')
   })
 
   it('stays unmirrored when a caller smuggles flipRtl in', () => {
     const forced = { flipRtl: true } as SpinnerProps
-    expect(classes(forced)).not.toContain('rtl:-scale-x-100')
+    expect(classes(forced)).not.toContain('scale-x-(--tc-dir)')
   })
 })
 

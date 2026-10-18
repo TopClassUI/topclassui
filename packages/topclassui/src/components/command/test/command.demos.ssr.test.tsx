@@ -15,6 +15,7 @@ const TRIGGERS: Record<string, string[]> = {
   'basic': ['Search'],
   'empty-state': ['Find a command'],
   'groups': ['Commands by group'],
+  'load-more': ['Search results'],
   'loading': ['Commands that are loading'],
   'long-content': ['Every hostile case'],
   'long-page': ['Jump to a section'],

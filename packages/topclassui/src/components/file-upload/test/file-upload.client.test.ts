@@ -114,15 +114,17 @@ describe('hook.ts holds the list (R-5.12-1)', () => {
 
   it('builds on the shared form value, the scroll tab stop and the provider', () => {
     expect(importedModules(source)).toEqual([
-      'react', '#shared/clamp.js', '#shared/contracts/collection.js', '#shared/provider/context.js', '#shared/render-trigger.js',
-      '#shared/use-form-value.js', '#shared/use-scroll-tab-stop.js', './boundaries.js', './constants.js', './lib.js', './types.js',
+      'react', '#shared/clamp.js', '#shared/collection/use-collection.js', '#shared/contracts/collection.js',
+      '#shared/provider/context.js', '#shared/render-trigger.js', '#shared/use-form-value.js', '#shared/use-scroll-tab-stop.js',
+      './boundaries.js', './constants.js', './lib.js', './types.js',
     ])
     expect(hooksByPart(source)).toEqual({
       writeFiles: [],
       syncFiles: [],
       announceWrite: [],
       useFileUpload: [
-        'useFormValue', 'useImperativeHandle', 'useRef', 'useScrollTabStop', 'useLabels', 'useNumberFormat', 'useLocale', 'useId',
+        'useFormValue', 'useImperativeHandle', 'useRef', 'useScrollTabStop', 'useState', 'useCollectionDefaults', 'useCollection',
+        'useCallback', 'useLabels', 'useNumberFormat', 'useLocale', 'useId',
         'useRef', 'useRef', 'useRef', 'useState', 'useRef', 'useEffect', 'useLayoutEffect',
       ],
     })

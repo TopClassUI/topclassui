@@ -1,5 +1,5 @@
 // Pure helpers: the filter, the order of the rows and the shortcut, with no React in them.
-import type { CommandEntry, CommandGroup, CommandKeyPress, CommandRun } from './types.js'
+import type { CommandEntry, CommandGroup, CommandKeyPress, CommandRun, CommandRunView } from './types.js'
 
 /** The items whose label holds every word of the query, in any case and anywhere, in their own order. */
 export function filterCommands<T>(items: readonly T[], query: string, getLabel: (item: T) => string): readonly T[] {
@@ -68,6 +68,19 @@ export function runsOf(entries: readonly CommandEntry[]): CommandRun[] {
     if (entry.kind === 'item') run.items.push(entry)
   }
   return runs
+}
+
+/** Each run with its key and the rows windowing left out before it, and the rows left out after the last. */
+export function toRunViews(runs: readonly CommandRun[], total: number): { views: CommandRunView[], tail: number } {
+  const seen = new Map<string | undefined, number>()
+  const views = runs.map((run, at) => {
+    // The active row kept apart from the window makes a second run of its group.
+    const nth = seen.get(run.group) ?? 0
+    seen.set(run.group, nth + 1)
+    const key = `${run.group === undefined ? 'ungrouped' : `group:${run.group}`}:${String(nth)}`
+    return { run, key, gap: run.start - (runs[at - 1]?.end ?? 0) }
+  })
+  return { views, tail: total - (runs.at(-1)?.end ?? 0) }
 }
 
 /** The rows windowing mounts, and the active row as well wherever it is: a finger or the scrollbar

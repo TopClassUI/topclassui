@@ -695,8 +695,23 @@ test.describe('a sheet whose placement changes while it is open', () => {
 })
 
 test.describe('focus', () => {
-  test('opened from the keyboard, focus moves to the sheet itself, which shows its ring inside its box, and Escape hands it back', async ({ page }) => {
+  test('opened from the keyboard, focus moves to the first control with its ring, and Escape hands it back', async ({ page }) => {
     const popup = await open(page, 'drawer--end', { by: 'keyboard' })
+    const reset = popup.locator('button').filter({ hasText: 'Reset' })
+    await expect(reset).toBeFocused()
+    await expect(reset).toHaveCSS('outline-style', 'solid')
+    await expect(popup).not.toBeFocused()
+
+    await page.keyboard.press('Escape')
+    await expectClosed(page)
+    await expect(triggerOf(page, 'Filters')).toBeFocused()
+    expect(await liveErrors(page)).toEqual([])
+  })
+
+  // A caller's initialFocus, a touch, or a sheet that itself scrolls puts the first focus on the sheet.
+  test('focused itself, the sheet shows its ring inside its box', async ({ page }) => {
+    const popup = await open(page, 'drawer--end', { by: 'keyboard' })
+    await popup.focus()
     await expect(popup).toBeFocused()
     await expect(popup).toHaveCSS('outline-style', 'solid')
     await expect(popup).toHaveCSS('outline-width', '2px')
@@ -715,8 +730,8 @@ test.describe('focus', () => {
     for (const key of ['Tab', 'Tab', 'Tab', 'Tab', 'Shift+Tab', 'Shift+Tab', 'Shift+Tab'] as const) {
       seen.push(await pressInside(page, popup, key))
     }
-    expect(seen).toEqual(['Reset', 'Apply', 'Close this panel', 'Reset', 'Close this panel', 'Apply', 'Reset'])
-    await expect(popup.locator('button').filter({ hasText: 'Reset' })).toHaveCSS('outline-style', 'solid')
+    expect(seen).toEqual(['Apply', 'Close this panel', 'Reset', 'Apply', 'Reset', 'Close this panel', 'Apply'])
+    await expect(popup.locator('button').filter({ hasText: 'Apply' })).toHaveCSS('outline-style', 'solid')
   })
 
   test('the x shows its ring, closes the sheet, and focus returns to the trigger', async ({ page }) => {
@@ -745,6 +760,7 @@ test.describe('focus', () => {
   for (const mode of MODES) {
     test(`${mode}: the ring of the sheet is drawn inside it, on its own surface: its other three edges are the edges of the screen`, async ({ page }) => {
       const popup = await open(page, 'drawer--end', { mode, by: 'keyboard' })
+      await popup.focus()
       await expect(popup).toBeFocused()
       // Along its inner edge, below the header: the two pixels past its 1 px line are ring against the surface, at 3:1.
       const frame = await boxOf(popup)
@@ -763,7 +779,7 @@ test.describe('focus', () => {
 // and cancelled the sheet's own close, so the key closed nothing. Each root now looks inside its own popup only.
 test.describe('a sheet inside a dialog', () => {
   const titles = (page: Page) => page.locator('[role="dialog"][data-open] h2').allTextContents()
-  const tooltip = (page: Page) => page.locator('[data-placement][data-open]:not([role])')
+  const tooltip = (page: Page) => page.locator('[role="tooltip"][data-open]')
   const escape = async (page: Page, left: string[]) => {
     await page.keyboard.press('Escape')
     await expect.poll(() => titles(page)).toEqual(left)
@@ -799,7 +815,6 @@ test.describe('a sheet inside a dialog', () => {
 
   test('a tooltip open inside the sheet closes first, then the sheet, then the dialog', async ({ page }) => {
     const sheet = await nested(page)
-    await page.keyboard.press('Tab')
     await expect(sheet.locator('button[aria-label="Copy link"]')).toBeFocused()
     await expect(tooltip(page)).toHaveText('Copy link')
 
@@ -962,11 +977,10 @@ test.describe('the long body', () => {
     expect(await popup.evaluate((el) => `${String(el.scrollTop)} ${String(el.scrollHeight - el.clientHeight)}`)).toBe('0 0')
   })
 
-  test('is the first stop after the sheet: it takes tabindex 0 while it scrolls, shows its ring inside its box, and the keys scroll it', async ({ page }) => {
+  test('is the first focus of the sheet: it takes tabindex 0 while it scrolls, shows its ring inside its box, and the keys scroll it', async ({ page }) => {
     const popup = await open(page, 'drawer--long-body', { by: 'keyboard' })
     const body = bodyOf(popup)
     await expect(body).toHaveAttribute('tabindex', '0')
-    await page.keyboard.press('Tab')
     await expect(body).toBeFocused()
     await expect(body).toHaveCSS('outline-style', 'solid')
     await expect(body).toHaveCSS('outline-offset', '-2px')
@@ -981,11 +995,11 @@ test.describe('the long body', () => {
     expect(await pressInside(page, popup, 'Tab')).toBe('Mark all as read')
   })
 
-  test('a body that holds all it has takes no tabindex, so Tab goes from the sheet straight to the actions', async ({ page }) => {
+  test('a body that holds all it has takes no tabindex, so the first focus goes straight to the actions', async ({ page }) => {
     const popup = await open(page, 'drawer--end', { by: 'keyboard' })
     expect((await partsOf(popup)).scrollable, 'px the body scrolls').toBe(0)
     await expect(bodyOf(popup)).not.toHaveAttribute('tabindex')
-    expect(await pressInside(page, popup, 'Tab')).toBe('Reset')
+    await expect(popup.locator('button').filter({ hasText: 'Reset' })).toBeFocused()
   })
 })
 
@@ -1328,8 +1342,9 @@ test.describe('each value of modal', () => {
     expect(await takesPresses(popup), 'a press on the sheet lands on it').toBe(true)
 
     // The keyboard and the screen reader: held, as in a modal sheet.
+    await expect(popup.locator('button').filter({ hasText: 'Done' })).toBeFocused()
     const seen = [await pressInside(page, popup, 'Tab'), await pressInside(page, popup, 'Tab'), await pressInside(page, popup, 'Tab')]
-    expect(seen).toEqual(['Done', 'Close this panel', 'Done'])
+    expect(seen).toEqual(['Close this panel', 'Done', 'Close this panel'])
     const lock = await pageLock(page)
     // The first portal is the toast region TopClassProvider mounts on every page, which a modal leaves readable.
     expect(lock.reachable).toEqual(['portal', 'portal'])
@@ -1360,8 +1375,9 @@ test.describe('each value of modal', () => {
     expect(await scrollY(page)).toBe(300)
     await page.evaluate(() => { window.scrollTo(0, 0) })
 
-    // Focus is not held: from the sheet, Tab reaches Done and the x, and the next leaves the sheet and closes it.
-    expect([await pressInside(page, popup, 'Tab'), await pressInside(page, popup, 'Tab')]).toEqual(['Done', 'Close this panel'])
+    // Focus is not held: it starts on Done, Tab reaches the x, and the next leaves the sheet and closes it.
+    await expect(popup.locator('button').filter({ hasText: 'Done' })).toBeFocused()
+    expect(await pressInside(page, popup, 'Tab')).toBe('Close this panel')
     await page.keyboard.press('Tab')
     await expectClosed(page)
 

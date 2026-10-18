@@ -2,6 +2,7 @@
 
 import { useImperativeHandle } from 'react'
 
+import { useProviderPresence } from '#shared/provider/context.js'
 import { useFormValue } from '#shared/use-form-value.js'
 import { CHECKBOX_DEFAULTS } from './constants.js'
 import type { CheckboxChangeDetails, CheckboxValueProps } from './types.js'
@@ -22,6 +23,7 @@ export function useCheckbox({
   indeterminate = false,
   uncheckedValue,
 }: CheckboxValueProps) {
+  useProviderPresence()
   const sync = (value: boolean, input: HTMLInputElement | null) => { syncChecked(value && !indeterminate, input) }
   const state = useFormValue({ value: checked, defaultValue: defaultChecked, sync })
   useImperativeHandle(inputRef, () => state.inputRef.current as HTMLInputElement, [state.inputRef])

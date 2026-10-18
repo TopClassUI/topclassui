@@ -10,25 +10,25 @@ const CLASSES = 'src/components/banner/classes.ts'
 export const MUTATIONS: Mutation[] = [
   {
     label: 'the banner dismiss hook stops reading the stored value, so a dismissed banner comes back on every page',
-    file: LIB,
+    file: HOOK,
     from: '    return localStorage.getItem(keyOf(id)) !== null',
     to: '    return false',
   },
   {
     label: 'the banner dismiss store writes without a guard, so blocked storage throws from the x',
-    file: LIB,
+    file: HOOK,
     from: "  try {\n    localStorage.setItem(keyOf(id), '1')\n  } catch {",
     to: "  localStorage.setItem(keyOf(id), '1')\n  try {\n    void 0\n  } catch {",
   },
   {
     label: 'the banner dismiss store keeps no memory, so with blocked storage the x hides nothing',
-    file: LIB,
+    file: HOOK,
     from: '  memory.add(id)\n',
     to: '',
   },
   {
     label: 'the banner dismiss store ignores the storage event, so a dismissal in another tab never reaches this one',
-    file: LIB,
+    file: HOOK,
     from: "  addEventListener('storage', listener)\n",
     to: '',
   },
@@ -59,14 +59,32 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the banner dismiss shell writes its role before the rest props, so a caller can turn the landmark into something else',
     file: INDEX,
-    from: '{...rest} id={rest.id} role="region" onDismiss',
-    to: 'role="region" {...rest} id={rest.id} onDismiss',
+    from: '{...rest} id={rest.id} role="region">',
+    to: 'role="region" {...rest} id={rest.id}>',
   },
   {
     label: 'the banner dismiss shell passes className first, so the consumer loses every conflict',
     file: INDEX,
     from: 'const look = cn(bannerVariants({ tone }), className)',
     to: 'const look = cn(className, bannerVariants({ tone }))',
+  },
+  {
+    label: 'the banner dismiss client export stops handing onDismiss to the shell, so the callback never runs',
+    file: CLIENT,
+    from: 'role="region" onDismiss={onDismiss}>',
+    to: 'role="region">',
+  },
+  {
+    label: 'the banner dismiss client export passes className first, so the consumer loses every conflict',
+    file: CLIENT,
+    from: 'className={cn(bannerVariants({ tone }), className)} {...rest}',
+    to: 'className={cn(className, bannerVariants({ tone }))} {...rest}',
+  },
+  {
+    label: 'the banner dismiss client export drops the message wrapper test, so an empty message opens a gap',
+    file: CLIENT,
+    from: '{isEmpty(children) ? null : <div className={MESSAGE}>{children}</div>}',
+    to: '<div className={MESSAGE}>{children}</div>',
   },
   {
     label: 'the banner dismiss x has no name',
@@ -115,5 +133,41 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/banner/types.ts',
     from: '    dismissible: boolean\n',
     to: '    dismissible: true\n',
+  },
+  {
+    label: 'the banner dismiss hook never moves the focus, so a dismissed banner drops it on the body',
+    file: HOOK,
+    from: '    restoreFocus(next.current.to, next.current.visible)\n',
+    to: '',
+  },
+  {
+    label: 'the banner dismiss hook records no neighbour, so the focus of its x falls to the body',
+    file: HOOK,
+    from: 'if (x === x.ownerDocument.activeElement) next.current =',
+    to: 'if (x === x.ownerDocument.body) next.current =',
+  },
+  {
+    label: 'the banner neighbour is the next stop after the x, which is inside the banner that leaves',
+    file: LIB,
+    from: "return findNeighbour(x.closest('[role=\"region\"]') ?? x)",
+    to: 'return findNeighbour(x)',
+  },
+  {
+    label: 'the shared neighbour of a banner or a tag takes a stop inside the element that leaves',
+    file: 'src/shared/focus-neighbour.ts',
+    from: 'const outside = candidates.filter((candidate) => !gone.contains(candidate))',
+    to: 'const outside = [...candidates]',
+  },
+  {
+    label: 'the shared neighbour of a banner or a tag never looks back, so the last one leaves the focus on the body',
+    file: 'src/shared/focus-neighbour.ts',
+    from: 'return after ?? outside.reverse()',
+    to: 'return after ?? [].reverse()',
+  },
+  {
+    label: 'the shared focus return of a banner or a tag overrides the focus its caller moved',
+    file: 'src/shared/focus-neighbour.ts',
+    from: '  if (!next?.isConnected || (active !== null && active !== undefined && active !== next.ownerDocument.body)) return\n',
+    to: '  if (!next?.isConnected) return\n',
   },
 ]

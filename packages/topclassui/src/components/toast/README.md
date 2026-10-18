@@ -108,7 +108,7 @@ Every prop below is optional and falls back to the default shown.
 | `priority` | no | `low` \| `high` | `"low"` | toast.add: high is announced at once, as an alert; low waits for the reader to finish. |
 | `tone` | no | `primary` \| `neutral` \| `success` \| `warning` \| `danger` \| `info` | `"neutral"` | toast.add: what the toast means. success, warning, danger and info draw an icon; neutral and primary none. |
 
-`ToastViewport` takes no attribute but `className`, which is merged last, and no `ref`.
+Anything else on `ToastViewport` is passed to the element it draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
 
@@ -122,6 +122,7 @@ Every prop below is optional and falls back to the default shown.
 - `dummy/rtl.tsx`
 - `dummy/states.tsx`
 - `dummy/sticky.tsx`
+- `dummy/tall-page.tsx`
 - `dummy/tones.tsx`
 - `dummy/with-action.tsx`
 - `dummy/with-description.tsx`
