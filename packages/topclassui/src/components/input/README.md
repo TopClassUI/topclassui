@@ -66,7 +66,7 @@ compile: it merges the three ways to name an input into one where none is requir
 ## Import
 
 ```tsx
-import { Input } from 'topclassui'
+import { Input } from 'topclassui/input'
 ```
 
 ## Props

@@ -12,7 +12,7 @@ To pick files for a form, by a click, a key or a drop. It is one element: a drop
 a real `<input type="file">`, so it works and posts before any script runs.
 
 ```tsx
-import { FileUpload } from 'topclassui'
+import { FileUpload } from 'topclassui/file-upload'
 ```
 
 ```tsx
@@ -103,7 +103,7 @@ check for the same file twice, an `error` status (choice 3), a skeleton.
 ## Import
 
 ```tsx
-import { FileUpload } from 'topclassui'
+import { FileUpload } from 'topclassui/file-upload'
 ```
 
 ## Props
