@@ -9,11 +9,54 @@ export type IslandWhen = 'near' | 'idle'
 
 const EAGER = ['pointerover', 'focusin', 'touchstart'] as const
 
+type Input = { kind: 'press' | 'wake'; target: Element } | { kind: 'key'; target: Element; init: KeyboardEventInit }
+
+/** What each mounted island does with an input that lands on it before it has taken over. */
+const claims = new Map<Element, (input: Input) => void>()
+/** Inputs on an island that has not mounted yet, as under a provider still waiting for its idle moment. */
+const early: Input[] = []
+/** The element under the pointer, so a hover that began on the server's HTML is given again. */
+let hovered: Element | null = null
+
+function waitingBoxOf(target: Element): Element | null {
+  return target.closest('[data-island]:not([data-island-live])')
+}
+
+/** Hands the input to its island, or queues it and wakes the nearest mounted island around it. */
+function route(input: Input): void {
+  const box = waitingBoxOf(input.target)
+  const claim = box === null ? undefined : claims.get(box)
+  if (claim !== undefined) { claim(input); return }
+  early.push(input)
+  for (let at = box?.parentElement?.closest('[data-island]:not([data-island-live])') ?? null; at !== null; at = at.parentElement?.closest('[data-island]:not([data-island-live])') ?? null) {
+    const outer = claims.get(at)
+    if (outer !== undefined) { outer({ kind: 'wake', target: at }); return }
+  }
+}
+
+// Installed when this module loads, before React hydrates: a press, key or hover on HTML that no island has taken over yet is held, never lost.
+if (typeof document !== 'undefined') {
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element) || !event.isTrusted || waitingBoxOf(event.target) === null || event.target.closest('a[href]') !== null) return
+    event.preventDefault()
+    event.stopImmediatePropagation()
+    route({ kind: 'press', target: event.target })
+  }, true)
+  document.addEventListener('keydown', (event) => {
+    if (!(event.target instanceof Element) || !event.isTrusted || waitingBoxOf(event.target) === null || event.key === 'Tab') return
+    event.preventDefault()
+    event.stopImmediatePropagation()
+    route({ kind: 'key', target: event.target, init: { key: event.key, code: event.code, shiftKey: event.shiftKey, ctrlKey: event.ctrlKey, metaKey: event.metaKey, altKey: event.altKey, bubbles: true, cancelable: true } })
+  }, true)
+  document.addEventListener('pointerover', (event) => { hovered = event.target instanceof Element ? event.target : null }, true)
+  document.addEventListener('pointerleave', () => { hovered = null }, true)
+}
+
 /** True while the server's HTML for this island is in the page and nothing has taken it over: a client navigation mounts with no HTML to keep, so it loads at once. */
 function hasServerHtml(id: string): boolean {
   if (typeof document === 'undefined') return false
   const box = document.querySelector(`[data-island="${id}"]`)
-  return box !== null && !box.hasAttribute('data-island-live')
+  return box !== null && !box.hasAttribute('data-island-mounted')
 }
 
 /** Where a node sits under the box, as child indexes, so the same place can be found in a fresh render. */
@@ -46,15 +89,14 @@ export interface LazyIslandProps<P> {
 }
 
 interface Held {
-  pressed: number[] | null
-  hovered: number[] | null
+  inputs: { kind: Input['kind']; path: number[] | null; init?: KeyboardEventInit }[]
   focused: number[] | null
 }
 
 export function LazyIsland<P extends object>({ load, props, when = 'near', hydrate = false }: LazyIslandProps<P>): ReactNode {
   const id = useId()
   const box = useRef<HTMLDivElement>(null)
-  const held = useRef<Held>({ pressed: null, hovered: null, focused: null })
+  const held = useRef<Held>({ inputs: [], focused: null })
   const [fresh, setFresh] = useState<{ Component: ComponentType<P> } | null>(null)
   // Created once: an island never renders again while it waits, or React would drop the server HTML it is keeping.
   const [island] = useState(() => {
@@ -83,31 +125,39 @@ export function LazyIsland<P extends object>({ load, props, when = 'near', hydra
     const element = box.current
     if (element === null) return
     const { state } = island
-    element.setAttribute('data-island-live', '')
+    element.setAttribute('data-island-mounted', '')
+    if (state.live) element.setAttribute('data-island-live', '')
     const open = () => { state.open() }
     for (const type of EAGER) element.addEventListener(type, open, { once: true, passive: true })
-    // A press or a hover that lands before the chunk does is held, then given again once the island has taken over; a link still navigates at once.
-    const hold = (event: MouseEvent) => {
-      if (state.live || !(event.target instanceof HTMLElement) || event.target.closest('a[href]') !== null) return
-      event.preventDefault()
-      event.stopPropagation()
-      held.current.pressed = pathOf(element, event.target)
+    // An input meant for this island (the innermost one waiting around it) is kept by place; one for an island inside it only wakes this one.
+    const claim = (input: Input) => {
+      if (input.kind !== 'wake' && waitingBoxOf(input.target) === element) {
+        held.current.inputs.push({ kind: input.kind, path: pathOf(element, input.target), ...(input.kind === 'key' ? { init: input.init } : {}) })
+      }
       open()
     }
-    const over = (event: PointerEvent) => { if (!state.live && event.target instanceof Element) held.current.hovered = pathOf(element, event.target) }
-    const out = () => { held.current.hovered = null }
-    element.addEventListener('click', hold, true)
-    element.addEventListener('pointerover', over, true)
-    element.addEventListener('pointerout', out, true)
+    claims.set(element, claim)
+    for (const input of early.splice(0).filter((queued) => { if (element.contains(queued.target)) { claim(queued); return waitingBoxOf(queued.target) !== element } return true })) early.push(input)
     state.onLive = () => {
-      const hovered = nodeAt(element, held.current.hovered)
-      if (hovered !== null) {
-        hovered.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }))
-        hovered.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
-        hovered.dispatchEvent(new MouseEvent('mousemove', { bubbles: true }))
+      element.setAttribute('data-island-live', '')
+      claims.delete(element)
+      const under = hovered !== null && element.contains(hovered) ? hovered : null
+      if (under !== null) {
+        under.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }))
+        under.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+        under.dispatchEvent(new MouseEvent('mousemove', { bubbles: true }))
       }
-      nodeAt(element, held.current.pressed)?.click()
-      held.current = { pressed: null, hovered: null, focused: null }
+      for (const input of held.current.inputs) {
+        const node = nodeAt(element, input.path)
+        if (node === null) continue
+        if (input.kind === 'press') node.click()
+        else {
+          node.focus({ preventScroll: true })
+          node.dispatchEvent(new KeyboardEvent('keydown', input.init))
+        }
+      }
+      held.current = { inputs: [], focused: null }
+      // Inputs for islands inside this one wait for them to mount: they find them in the queue.
     }
     if (state.waits && !hydrate) {
       void state.gate.then(load).then((Component) => {
@@ -137,10 +187,8 @@ export function LazyIsland<P extends object>({ load, props, when = 'near', hydra
     }
     return () => {
       cancel()
+      claims.delete(element)
       for (const type of EAGER) element.removeEventListener(type, open)
-      element.removeEventListener('click', hold, true)
-      element.removeEventListener('pointerover', over, true)
-      element.removeEventListener('pointerout', out, true)
     }
   }, [island, when, hydrate, load])
 
