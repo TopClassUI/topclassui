@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test'
 
 import { DIRECTIONS } from '../scripts/lib/harness.js'
 import { serverEntries } from './form.js'
-import { expectNoRing, expectRing, focusedName } from './ring.js'
+import { expectNoRing, expectRing, focusedName } from './keyboard.js'
 import { liveErrors, openLive } from './live.js'
 
 // R-5.6-1, Base UI's OTP field in Chromium: one tab stop on the first empty cell, a character fills and moves on, the

@@ -20,22 +20,22 @@ for (const direction of DIRECTIONS) {
       await expectRing(page, 'Save')
     })
 
-    for (const [what, style] of [
-      ['no ring at all', 'button { outline: none }'],
-      ['a 1 px ring', 'button:focus-visible { outline: 1px solid blue }'],
-      ['a dashed ring', 'button:focus-visible { outline: 2px dashed blue }'],
+    for (const [what, style, message] of [
+      ['no ring at all', 'button { outline: none }', 'Save: no outline on'],
+      ['a 1 px ring', 'button:focus-visible { outline: 1px solid blue }', 'Save: outline width on button'],
+      ['a dashed ring', 'button:focus-visible { outline: 2px dashed blue }', 'Save: no outline on button'],
     ] as const) {
       test(`expectRing fails on ${what}`, async ({ page }) => {
         await load(page, direction, style, '<button>Save</button>')
         await page.keyboard.press('Tab')
-        await expect(expectRing(page, 'Save')).rejects.toThrow('Save: no focus-visible ring')
+        await expect(expectRing(page, 'Save')).rejects.toThrow(message)
       })
     }
 
     test('expectRing fails on a ring a pointer put there, which :focus-visible does not match', async ({ page }) => {
       await load(page, direction, 'button:focus { outline: 2px solid blue }', '<button>Save</button>')
       await page.getByRole('button', { name: 'Save' }).click()
-      await expect(expectRing(page, 'Save')).rejects.toThrow('Save: no focus-visible ring')
+      await expect(expectRing(page, 'Save')).rejects.toThrow('not :focus-visible')
     })
 
     test('expectRing throws when nothing has the focus', async ({ page }) => {

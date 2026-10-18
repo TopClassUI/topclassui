@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
 import { DIRECTIONS } from '../scripts/lib/harness.js'
-import { expectRing, focusName } from './keys.js'
+import { expectRing, focusName } from './keyboard.js'
 import { liveErrors, openLive } from './live.js'
 import { expectClosed, focusIsInside } from './overlay.js'
 
@@ -103,6 +103,26 @@ test.describe('live: the date picker dialog by keyboard', () => {
       await expectClosed(page, POPUP)
       await expect(trigger(page)).toBeFocused()
       expect(await hiddenValue(page)).toBe('2026-09-22')
+    })
+
+    test(`${direction}: with nothing chosen, Enter opens on today with the ring, the keys start there, and Space chooses`, async ({ page }) => {
+      await page.clock.setFixedTime(new Date(2026, 9, 15, 12))
+      await openLive(page, 'date-picker--states', { direction })
+      const empty = trigger(page)
+      const popup = await openWith(page, 'Enter')
+      const [today, next, home] = direction === 'ltr'
+        ? ['Thursday, October 15, 2026', 'Friday, October 16, 2026', 'Sunday, October 11, 2026']
+        : ['الخميس، 15 أكتوبر 2026', 'الجمعة، 16 أكتوبر 2026', 'السبت، 10 أكتوبر 2026']
+      await expect.poll(() => focusName(page)).toBe(today)
+      expect(await stops(popup)).toEqual([`${today} (focused)`])
+      await expectRing(page, 'today')
+      await press(page, direction === 'ltr' ? 'ArrowRight' : 'ArrowLeft', next)
+      await press(page, 'Home', home)
+      await expectRing(page, 'Home from today')
+      await page.keyboard.press('Space')
+      await expectClosed(page, POPUP)
+      await expect(empty).toBeFocused()
+      expect(await hiddenValue(page)).toBe(direction === 'ltr' ? '2026-10-11' : '2026-10-10')
     })
 
     test(`${direction}: Escape after moving keeps the value, returns the focus to the trigger, and the ring with it`, async ({ page }) => {

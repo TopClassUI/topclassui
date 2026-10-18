@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
 import { DIRECTIONS } from '../scripts/lib/harness.js'
-import { expectNoRing, expectRing, walk } from './ring.js'
+import { expectNoRing, expectRing, walk } from './keyboard.js'
 import { liveErrors, openLive } from './live.js'
 
 // R-5.6-1, the Authoring Practices switch in Chromium: Tab reaches each live one, Space and Enter toggle it, no

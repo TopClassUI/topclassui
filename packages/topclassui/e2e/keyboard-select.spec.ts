@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
 import { DIRECTIONS } from '../scripts/lib/harness.js'
-import { expectNoRing, expectRing, focusedName, walk } from './ring.js'
+import { expectNoRing, expectRing, focusedName, walk } from './keyboard.js'
 import { liveErrors, openLive } from './live.js'
 import { OPENED, atRest, expectClosed } from './overlay.js'
 

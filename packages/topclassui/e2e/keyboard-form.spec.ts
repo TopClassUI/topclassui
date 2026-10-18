@@ -1,7 +1,7 @@
 import { expect, test, type Page, type Request } from '@playwright/test'
 
 import { DIRECTIONS } from '../scripts/lib/harness.js'
-import { expectRing } from './keys.js'
+import { expectRing } from './keyboard.js'
 import { liveErrors, openLive } from './live.js'
 
 // R-5.6-1 for Form, which has no keys of its own beyond the browser's: Enter in a field and Enter or Space on the
