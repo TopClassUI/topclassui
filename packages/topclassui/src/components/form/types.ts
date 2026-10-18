@@ -23,10 +23,11 @@ export type FormActionProps<S extends FormActionState = FormActionState> =
   Omit<ComponentPropsWithRef<'form'>, Owned>
   & Initial<S>
   & {
+    /** A Server Action, `(state, formData)`, as useActionState takes it; or a function from a client file. */
     action: FormActionFunction<S>
     /** The page the form posts to before hydration, passed to useActionState: its response renders this state. */
     permalink?: string | undefined
-    /** The fields; or a function of the action's last state and `pending`, so the fields read what it answered. */
+    /** The fields; or a function of the action's last state and `pending`, so the fields read what it answered: client-only. */
     children?: ReactNode | ((state: S, pending: boolean) => ReactNode)
   }
 

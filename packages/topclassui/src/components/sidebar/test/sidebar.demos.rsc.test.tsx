@@ -15,6 +15,8 @@ const reference = (name: string): Part => Object.assign(() => { throw new Error(
 // Both modules start with 'use client', so a Server Component only ever holds references to their exports.
 vi.mock('../client.js', () => Object.fromEntries(['SidebarRoot', 'SidebarTrigger'].map((name) => [name, reference(name)])))
 vi.mock('#shared/provider/provider.js', () => ({ TopClassProvider: reference('TopClassProvider') }))
+// The body of the Table in-a-layout shows is a client part as well: it is handed rows already rendered, and plain data.
+vi.mock('#components/table/client.js', () => ({ TableRows: reference('TableRows') }))
 // The scan calls a Server Component as a plain function, outside a render, where the real useId has no dispatcher.
 vi.mock('react', async (original) => ({ ...await original<typeof ReactExports>(), useId: () => 'an-id' }))
 
@@ -90,9 +92,11 @@ describe('every demo is a Server Component that only hands the client parts what
 describe('the parts a demo is built from', () => {
   const parts = async (name: string) => crossings((await load(name))()).map((crossing) => crossing.part)
 
-  it('two client parts a rail and no more: the rail, and the toggle its header draws. Every link is server markup', async () => {
-    for (const name of names.filter((demo) => demo !== 'rtl' && demo !== 'states')) expect(await parts(name), name).toEqual(['SidebarRoot', 'SidebarTrigger'])
+  it('two client parts and no more: the rail, and the toggle its header draws. Every link is server markup', async () => {
+    for (const name of names.filter((demo) => demo !== 'rtl' && demo !== 'states' && demo !== 'in-a-layout')) expect(await parts(name), name).toEqual(['SidebarRoot', 'SidebarTrigger'])
     expect(await parts('states')).toEqual(['SidebarRoot', 'SidebarTrigger', 'SidebarRoot', 'SidebarTrigger'])
+    // The page beside the rail holds a Table, whose body is its own client part.
+    expect(await parts('in-a-layout')).toEqual(['SidebarRoot', 'SidebarTrigger', 'TableRows'])
   })
 
   it('rtl: the same two inside the provider an island mounts', async () => {

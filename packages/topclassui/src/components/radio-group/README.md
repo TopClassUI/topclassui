@@ -12,7 +12,7 @@ For one choice out of a few, all shown at once. For many options, a Select reads
 to five short ones in a bar, a SegmentedControl. It is two parts: a group and its radios.
 
 ```tsx
-import { RadioGroupItem, RadioGroupRoot } from 'topclassui'
+import { RadioGroupItem, RadioGroupRoot } from 'topclassui/radio-group'
 ```
 
 ```tsx
@@ -105,7 +105,7 @@ that is always on, a skeleton (use `Skeleton`).
 import {
   RadioGroupRoot,
   RadioGroupItem,
-} from 'topclassui'
+} from 'topclassui/radio-group'
 ```
 
 ## Props

@@ -4,6 +4,8 @@ import { join } from 'node:path'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 
+import { importsFromRepo } from '#test/samples.js'
+
 const ROOT = process.cwd()
 const FOLDER = join(ROOT, 'src', 'components', 'dropdown')
 
@@ -26,7 +28,7 @@ const PRELUDE = [
 
 /** The import line compiles as one that uses what it imports, and any other sample as JSX, the way a page would paste it. */
 function wrap(code: string): string {
-  if (code.startsWith('import ')) return `${code.replace("'topclassui'", "'../index.js'")}\nexport const imported = [${PARTS}]\n`
+  if (code.startsWith('import ')) return `${importsFromRepo(code)}\nexport const imported = [${PARTS}]\n`
   return `${PRELUDE}\nexport const sample = (\n<>\n${code}\n</>\n)\n`
 }
 
@@ -121,7 +123,7 @@ const said = (name: string) => (verdict[name] ?? ['the probe did not compile at 
 describe('the samples in the README compile as written', () => {
   it('finds the import line and the three samples, so an empty extraction cannot pass', () => {
     expect(SAMPLES).toHaveLength(4)
-    expect(SAMPLES[0]).toContain("} from 'topclassui'")
+    expect(SAMPLES[0]).toContain("} from 'topclassui/dropdown'")
     expect(SAMPLES[1]).toContain('<DropdownItem tone="danger">Delete</DropdownItem>')
     expect(SAMPLES[2]).toContain('link={<Link href="" />}')
     expect(SAMPLES[3]).toContain('<DropdownLinkItem render={<Link href="/support" />}>')

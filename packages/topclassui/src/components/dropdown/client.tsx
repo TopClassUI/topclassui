@@ -5,17 +5,19 @@ import { Fragment } from 'react'
 
 import { clamp } from '#shared/clamp.js'
 import { cn } from '#shared/cn.js'
-import { POPUP_BOUNDS, toSideAlign } from '#shared/floating.js'
+import { FLOATING, toSideAlign } from '#shared/floating.js'
+import { toLinkElement } from '#shared/link.js'
 import { guardEscape } from '#shared/overlay.js'
-import { renderTrigger } from '#shared/render-trigger.js'
+import { renderPart, renderTrigger } from '#shared/render-trigger.js'
 import { DROPDOWN_BOUNDARIES } from './boundaries.js'
 import {
   DROPDOWN_GROUP, DROPDOWN_ITEM, DROPDOWN_ITEM_TONE, DROPDOWN_POPUP, DROPDOWN_POSITIONER, DROPDOWN_SEPARATOR,
 } from './classes.js'
 import { DROPDOWN_DEFAULTS } from './constants.js'
-import { DropdownScopeContext, useDropdownMenu, useDropdownPopup, useDropdownPositioner, useDropdownRoot } from './hook.js'
-import { renderRow, toLinkElement, toRowProps } from './lib.js'
+import { useDropdownMenu, useDropdownPopup, useDropdownPositioner, useDropdownRoot } from './hook.js'
+import { toRowProps } from './lib.js'
 import { DropdownGroupLabel } from './parts/dropdown-group-label.js'
+import { DropdownRow } from './parts/dropdown-row.js'
 import type {
   DropdownGroupProps, DropdownItemProps, DropdownLinkItemProps, DropdownMenuProps, DropdownPopupProps,
   DropdownRootProps, DropdownSeparatorProps, DropdownTriggerProps,
@@ -30,11 +32,11 @@ export { DropdownGroupLabel }
  * ref, and Base UI holds the open state. An Escape meant for a popup opened inside its own menu
  * does not close it: the guard looks at this root's popup and at no dialog around its trigger. */
 export function DropdownRoot({ onOpenChange, ...props }: DropdownRootProps) {
-  const { scope, popups } = useDropdownRoot()
+  const { scope, popups, Context } = useDropdownRoot()
   return (
-    <DropdownScopeContext value={scope}>
+    <Context value={scope}>
       <Base.Root {...props} onOpenChange={guardEscape(onOpenChange, popups)} />
-    </DropdownScopeContext>
+    </Context>
   )
 }
 
@@ -70,8 +72,8 @@ export function DropdownPopup({
         lang={lang}
         side={side}
         align={align}
-        sideOffset={POPUP_BOUNDS.sideOffset}
-        collisionPadding={POPUP_BOUNDS.collisionPadding}
+        sideOffset={FLOATING.sideOffset}
+        collisionPadding={FLOATING.collisionPadding}
         className={DROPDOWN_POSITIONER}
       >
         <DropdownSurface data-placement={placement} {...rest} />
@@ -97,50 +99,54 @@ function DropdownSurface({ ref, className, ...rest }: DropdownPopupProps) {
 }
 
 /** One row: the icon, the label in the span that truncates it, then the shortcut. */
-export function DropdownItem({ icon, shortcut, tone = DROPDOWN_DEFAULTS.tone, className, children, ...rest }: DropdownItemProps) {
+export function DropdownItem({ icon, shortcut, tone = DROPDOWN_DEFAULTS.tone, className, render, children, ...rest }: DropdownItemProps) {
+  const part = renderPart(render, cn(DROPDOWN_ITEM, DROPDOWN_ITEM_TONE[tone], className))
   return (
-    <Base.Item {...rest} data-tone={tone} className={cn(DROPDOWN_ITEM, DROPDOWN_ITEM_TONE[tone], className)}>
-      {renderRow(icon, children, shortcut)}
+    <Base.Item {...rest} data-tone={tone} render={part.render} className={part.className}>
+      <DropdownRow icon={icon} label={children} shortcut={shortcut} />
     </Base.Item>
   )
 }
 
 /** The same row as a real anchor, so open-in-new-tab and middle-click work. It closes the
  * menu on a press, which Base UI leaves open: a client-side navigation keeps the page. */
-export function DropdownLinkItem({ icon, shortcut, tone = DROPDOWN_DEFAULTS.tone, className, children, ...rest }: DropdownLinkItemProps) {
+export function DropdownLinkItem({ icon, shortcut, tone = DROPDOWN_DEFAULTS.tone, className, render, children, ...rest }: DropdownLinkItemProps) {
+  const part = renderPart(render, cn(DROPDOWN_ITEM, DROPDOWN_ITEM_TONE[tone], className))
   return (
-    <Base.LinkItem closeOnClick {...rest} data-tone={tone} className={cn(DROPDOWN_ITEM, DROPDOWN_ITEM_TONE[tone], className)}>
-      {renderRow(icon, children, shortcut)}
+    <Base.LinkItem closeOnClick {...rest} data-tone={tone} render={part.render} className={part.className}>
+      <DropdownRow icon={icon} label={children} shortcut={shortcut} />
     </Base.LinkItem>
   )
 }
 
 /** Base UI's group, named by the DropdownGroupLabel inside it. */
-export function DropdownGroup({ className, ...rest }: DropdownGroupProps) {
-  return <Base.Group {...rest} className={cn(DROPDOWN_GROUP, className)} />
+export function DropdownGroup({ className, render, ...rest }: DropdownGroupProps) {
+  const part = renderPart(render, cn(DROPDOWN_GROUP, className))
+  return <Base.Group {...rest} render={part.render} className={part.className} />
 }
 
 /** A line between two sets of rows, which a screen reader announces as a separator. */
-export function DropdownSeparator({ className, ...rest }: DropdownSeparatorProps) {
-  return <Base.Separator {...rest} className={cn(DROPDOWN_SEPARATOR, className)} />
+export function DropdownSeparator({ className, render, ...rest }: DropdownSeparatorProps) {
+  const part = renderPart(render, cn(DROPDOWN_SEPARATOR, className))
+  return <Base.Separator {...rest} render={part.render} className={part.className} />
 }
 
 /** The same menu from data: one group named by title. An href row is a link, cloned from link
  * when one is passed; any other row runs its onSelect or its Server Action on a press. A
  * disabled href row is a plain row, since Base UI gives a link item no disabled. */
-export function DropdownMenu({ trigger, title, items, link, placement, className, open, defaultOpen, onOpenChange }: DropdownMenuProps) {
+export function DropdownMenu({ trigger, title, items, link, open, defaultOpen, onOpenChange, ...rest }: DropdownMenuProps) {
   const menu = useDropdownMenu()
   return (
     <DropdownRoot open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
       <DropdownTrigger render={trigger} />
-      <DropdownPopup placement={placement} className={className}>
+      <DropdownPopup {...rest}>
         <DropdownGroup>
           <DropdownGroupLabel>{title}</DropdownGroupLabel>
           {items.map((item) => (
             <Fragment key={item.id}>
               {item.separatorBefore === true ? <DropdownSeparator /> : null}
               {item.href !== undefined && item.disabled !== true ? (
-                <DropdownLinkItem {...toRowProps(item)} render={toLinkElement(link, item.href)}>{item.label}</DropdownLinkItem>
+                <DropdownLinkItem {...toRowProps(item)} render={toLinkElement('DropdownMenu', link, item.href)}>{item.label}</DropdownLinkItem>
               ) : (
                 <DropdownItem {...toRowProps(item)} disabled={item.disabled} onClick={() => { menu.run(item) }}>{item.label}</DropdownItem>
               )}

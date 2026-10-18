@@ -9,8 +9,8 @@ import { SIDEBAR_DEFAULTS } from '../constants.js'
 import { boundLabel, resolveDir } from '../lib.js'
 import type { SidebarLinkProps } from '../types.js'
 
-/** One row: a list item around a real link. The label has an element of its own, which a
- * collapsed rail hides and a screen reader still reads, so the link keeps its name. */
+/** One row: a real link, which SidebarGroup puts in a list item. The label has an element of its own,
+ * which a collapsed rail hides and a screen reader still reads, so the link keeps its name. */
 export function SidebarLink({
   render,
   icon,
@@ -30,15 +30,11 @@ export function SidebarLink({
     </>
   )
 
-  return (
-    <li>
-      {renderElement(render ?? <a />, {
-        className: cn(SIDEBAR_LINK, SIDEBAR_LINK_STATE[state], className),
-        children,
-        ...rest,
-        // After the rest: JSX lets a hyphenated attribute past the type, and the row must look the way it is announced.
-        'aria-current': current ? 'page' : undefined,
-      }, row)}
-    </li>
-  )
+  return renderElement(render ?? <a />, {
+    className: cn(SIDEBAR_LINK, SIDEBAR_LINK_STATE[state], className),
+    children,
+    ...rest,
+    // After the rest: JSX lets a hyphenated attribute past the type, and the row must look the way it is announced.
+    'aria-current': current ? 'page' : undefined,
+  }, row)
 }

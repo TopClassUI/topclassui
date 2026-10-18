@@ -6,10 +6,13 @@ import { TopClassProvider } from '#shared/provider/provider.js'
 import { DrawerBody, DrawerHeader, DrawerPopup, DrawerRoot, DrawerTitle } from '../index.js'
 import type { DrawerRootProps } from '../types.js'
 
-/** An open sheet with one field in its body. */
+/** The sheet itself, where a touch-opened sheet puts its first focus. */
+const onSheet = () => document.querySelector<HTMLElement>('[role="dialog"]')
+
+/** An open sheet with one field in its body, focused on the sheet as a tap opens it, so the tap meets an unfocused field. */
 const sheet = (root: DrawerRootProps = {}) => (
   <DrawerRoot defaultOpen {...root}>
-    <DrawerPopup>
+    <DrawerPopup initialFocus={onSheet}>
       <DrawerHeader><DrawerTitle>Invite</DrawerTitle></DrawerHeader>
       <DrawerBody><input aria-label="Name" name="name" /></DrawerBody>
     </DrawerPopup>

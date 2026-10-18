@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 
+import { useProviderPresence } from '#shared/provider/context.js'
 import { useFormValue } from '#shared/use-form-value.js'
 import { serveTabStopOn, useServerTabStop } from '#shared/use-server-tab-stop.js'
 import { RADIO_GROUP_DEFAULTS } from './constants.js'
@@ -10,7 +11,7 @@ import type { RadioGroupChangeDetails, RadioGroupLook, RadioGroupValueProps } fr
 const fallback: RadioGroupLook = { size: RADIO_GROUP_DEFAULTS.size, opensOn: null }
 
 /** The look of the nearest RadioGroupRoot. Base UI tells its radios nothing of ours. */
-export const RadioGroupLookContext = createContext(fallback)
+const RadioGroupLookContext = createContext(fallback)
 
 /** A reset puts each radio input back to its first default, and React writes `checked` only when its state changes. */
 function syncRadios(value: string | null, _input: HTMLInputElement | null, root: HTMLDivElement | null): void {
@@ -22,6 +23,7 @@ function syncRadios(value: string | null, _input: HTMLInputElement | null, root:
 /** The value of a radio group, held here so a form reset brings it back to its latest default (unit-4.md, "A form
  * reset"), and the look its radios read. Base UI always gets the controlled pair, with null for no radio checked. */
 export function useRadioGroupRoot(size: RadioGroupLook['size'], { value, defaultValue, onValueChange, ref, children, disabled }: RadioGroupValueProps) {
+  useProviderPresence()
   // Base UI puts its tab stop on the checked radio only on mount, so a value set from outside remounts it, focus allowing.
   const [resetKey, setResetKey] = useState(0)
   const picked = useRef(value)
@@ -56,7 +58,7 @@ export function useRadioGroupRoot(size: RadioGroupLook['size'], { value, default
     state.setValue(next)
   }
 
-  return { value: state.value, onValueChange: onChange, rootRef: state.rootRef, look, resetKey }
+  return { value: state.value, onValueChange: onChange, rootRef: state.rootRef, look, resetKey, Context: RadioGroupLookContext }
 }
 
 /** What a radio reads: the size of its group, and a tab stop for the server HTML alone on the radio the page opens

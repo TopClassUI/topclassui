@@ -3,7 +3,7 @@ import { describe, expect, expectTypeOf, it } from 'vitest'
 import type { Size } from '#shared/contracts/size.js'
 import { TAG_DEFAULTS, TAG_SIZES, TAG_TONES } from '../constants.js'
 import { tagSchema } from '../schema.js'
-import type { TagDesignProps, TagProps, TagTone } from '../types.js'
+import type { TagDesignProps, TagProps, TagRemovableProps, TagTone } from '../types.js'
 
 /** Assignability as a value, so a rejected prop is a passing assertion. */
 type Accepts<Union, Candidate> = Candidate extends Union ? true : false
@@ -50,8 +50,14 @@ describe('the props follow the vocabulary', () => {
     expectTypeOf<Accepts<keyof TagProps, 'disabled'>>().toEqualTypeOf<false>()
   })
 
-  it('takes onRemove, a handler that is given nothing: the handler is the switch, not a removable boolean', () => {
-    expectTypeOf<TagProps['onRemove']>().toEqualTypeOf<(() => void) | undefined>()
+  it('takes no onRemove: a function cannot cross from a Server Component, so the x is TagRemovable', () => {
+    expectTypeOf<Accepts<keyof TagProps, 'onRemove'>>().toEqualTypeOf<false>()
+  })
+
+  it('TagRemovable takes every Tag prop and requires onRemove, a handler that is given nothing', () => {
+    expectTypeOf<TagRemovableProps['onRemove']>().toEqualTypeOf<() => void>()
+    expectTypeOf<Accepts<keyof TagRemovableProps, keyof TagProps>>().toEqualTypeOf<true>()
+    expectTypeOf<Accepts<keyof TagRemovableProps, 'removable'>>().toEqualTypeOf<false>()
   })
 })
 

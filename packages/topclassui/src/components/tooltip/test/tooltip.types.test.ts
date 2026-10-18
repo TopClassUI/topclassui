@@ -44,6 +44,10 @@ describe('the popup takes text and nothing else (R-10.5-2)', () => {
   it('takes no render prop, which would be a way round the text-only rule', () => {
     expectTypeOf<Accepts<keyof TooltipPopupProps, 'render'>>().toEqualTypeOf<false>()
   })
+
+  it('takes no dangerouslySetInnerHTML, which would put markup in the chip', () => {
+    expectTypeOf<Accepts<keyof TooltipPopupProps, 'dangerouslySetInnerHTML'>>().toEqualTypeOf<false>()
+  })
 })
 
 describe('placement', () => {

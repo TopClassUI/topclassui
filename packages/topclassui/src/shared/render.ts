@@ -33,7 +33,7 @@ function composeRefs(a: AnyRef, b: AnyRef): AnyRef {
  * component. `decorate` wraps whichever children survive, so a spinner is not lost. */
 export function renderElement(
   element: ReactElement,
-  props: Props,
+  base: Props,
   decorate?: (children: ReactNode) => ReactNode,
 ): ReactElement {
   if (!isValidElement(element)) {
@@ -47,17 +47,17 @@ export function renderElement(
   const own = (element.props ?? {}) as Props
 
   // Base UI merges className right to left, which would invert tailwind-merge.
-  const merged = mergeProps<'div'>(props as never, own as never) as unknown as Props
+  const merged = mergeProps<'div'>(base as never, own as never) as unknown as Props
   // undefined, not delete: deleting lets the element's own empty className survive cloneElement.
-  const className = cn(props['className'] as never, own['className'] as never)
+  const className = cn(base['className'] as never, own['className'] as never)
   merged['className'] = className === '' ? undefined : className
 
   // mergeProps leaves ref alone, so both are composed rather than one winning.
-  const composed = composeRefs(own['ref'] as AnyRef, props['ref'] as AnyRef)
+  const composed = composeRefs(own['ref'] as AnyRef, base['ref'] as AnyRef)
   if (composed) merged['ref'] = composed
 
   // An element written with children keeps them; otherwise the component supplies them.
-  const children = own['children'] === undefined ? props['children'] : own['children']
+  const children = own['children'] === undefined ? base['children'] : own['children']
   merged['children'] = decorate ? decorate(children as ReactNode) : children
 
   return cloneElement(element, merged)

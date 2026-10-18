@@ -12,7 +12,7 @@ For a number picked by feel inside known limits: a volume, a share, a price rang
 number, a NumberField. A number gives one thumb; a pair gives a range of two.
 
 ```tsx
-import { Slider } from 'topclassui'
+import { Slider } from 'topclassui/slider'
 ```
 
 ```tsx
@@ -116,7 +116,7 @@ thumb, a hover look, a read-only state, the invalid ring that is always on, a sk
 ## Import
 
 ```tsx
-import { Slider } from 'topclassui'
+import { Slider } from 'topclassui/slider'
 ```
 
 ## Props

@@ -2,11 +2,11 @@ import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 
 import { attr, classList } from '#test/markup.js'
-import { Tag } from '../index.js'
+import { Tag, TagRemovable } from '../index.js'
 import type { TagProps } from '../types.js'
 
-/** The HTML a server sends, as a client wrapper around a Tag would have it rendered. */
-const html = (props: TagProps = {}) => renderToString(<Tag onRemove={() => undefined} {...props}>React</Tag>)
+/** The HTML a server sends for a TagRemovable, the client export, as the server render of its client tree writes it. */
+const html = (props: TagProps = {}) => renderToString(<TagRemovable onRemove={() => undefined} {...props}>React</TagRemovable>)
 const button = (source: string) => /<button[^>]*>/.exec(source)?.[0] ?? ''
 const label = (source: string) => /<span id="[^"]*"[^>]*>/.exec(source)?.[0] ?? ''
 
@@ -19,7 +19,7 @@ const SIZE = {
   xl: ['pe-pad-y-xl', '-my-[calc(var(--spacing-pad-y-xl)+var(--tc-line-width))]'],
 } as const
 
-describe('a tag with no onRemove is the server half alone', () => {
+describe('a Tag is the server half alone', () => {
   const plain = renderToString(<Tag>React</Tag>)
 
   it('sends no button, no id and no aria attribute', () => {
@@ -34,7 +34,7 @@ describe('a tag with no onRemove is the server half alone', () => {
   })
 })
 
-describe('a tag with onRemove sends its label and its x in the server HTML', () => {
+describe('a TagRemovable sends its label and its x in the server HTML', () => {
   it('holds the label in one span with an id and the truncating classes, then the x', () => {
     const sent = html()
     expect(label(sent)).toMatch(/^<span id="[^"]+" class="truncate min-w-0 flex items-center gap-\[inherit\]">/)
@@ -66,7 +66,7 @@ describe('a tag with onRemove sends its label and its x in the server HTML', () 
     const sent = html({ tone: 'danger' })
     expect(attr(sent, 'data-tone')).toBe('danger')
     expect(classList(sent)).toContain('bg-danger-soft')
-    expect(renderToString(<Tag onRemove={() => undefined}>{'x'.repeat(500)}</Tag>)).not.toContain('x'.repeat(101))
+    expect(renderToString(<TagRemovable onRemove={() => undefined}>{'x'.repeat(500)}</TagRemovable>)).not.toContain('x'.repeat(101))
   })
 
   it('gives the x the shared icon button, the soft hover of the tag tone, and the forced-colours hover', () => {

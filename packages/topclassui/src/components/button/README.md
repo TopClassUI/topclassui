@@ -27,7 +27,7 @@ loses its `href`, so it cannot be followed.
 ## Import
 
 ```tsx
-import { Button } from 'topclassui'
+import { Button } from 'topclassui/button'
 ```
 
 ## Props

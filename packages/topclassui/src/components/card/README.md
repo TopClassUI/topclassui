@@ -39,7 +39,7 @@ import {
   CardBody,
   CardFooter,
   CardSkeleton,
-} from 'topclassui'
+} from 'topclassui/card'
 ```
 
 ## Props

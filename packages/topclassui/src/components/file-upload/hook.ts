@@ -1,16 +1,17 @@
 'use client'
 
-import { type DragEvent, useEffect, useId, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react'
+import { type DragEvent, useCallback, useEffect, useId, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react'
 
 import { clamp } from '#shared/clamp.js'
+import { useCollection } from '#shared/collection/use-collection.js'
 import { COLLECTION_BOUNDARIES } from '#shared/contracts/collection.js'
-import { useLabels, useLocale, useNumberFormat } from '#shared/provider/context.js'
+import { useCollectionDefaults, useLabels, useLocale, useNumberFormat } from '#shared/provider/context.js'
 import { hasContent } from '#shared/render-trigger.js'
 import { useFormValue } from '#shared/use-form-value.js'
 import { useScrollTabStop } from '#shared/use-scroll-tab-stop.js'
 import { FILE_UPLOAD_BOUNDARIES } from './boundaries.js'
-import { FILE_UPLOAD_DEFAULTS } from './constants.js'
-import { formatBytes, sortFiles } from './lib.js'
+import { FILE_UPLOAD_ANNOUNCED, FILE_UPLOAD_DEFAULTS } from './constants.js'
+import { formatBytes, keyOfRow, sortFiles, spacerOf } from './lib.js'
 import type { FileUploadRow, FileUploadState, FileUploadStateProps } from './types.js'
 
 const { maxFilesMin, maxFilesMax, maxSizeMin, maxSizeMax } = FILE_UPLOAD_BOUNDARIES
@@ -55,6 +56,15 @@ export function useFileUpload(props: FileUploadStateProps) {
   useImperativeHandle(ref, () => state.rootRef.current as HTMLDivElement, [state.rootRef])
   const listRef = useRef(null as HTMLUListElement | null)
   const tabIndex = useScrollTabStop(listRef)
+  const listRows = props.visibleRows === undefined ? undefined : clamp(props.visibleRows, visibleRowsMin, visibleRowsMax)
+  // Every row is one line, so one measured row and the grid's gap are the unit the window counts in.
+  const [unit, setUnit] = useState({ row: useCollectionDefaults().estimateRowHeight, gap: 0 })
+  const collection = useCollection({ items: state.value.rows, getKey: keyOfRow, visibleRows: listRows, estimateRowHeight: unit.row + unit.gap })
+  const { scrollRef, scrollToIndex } = collection
+  const setList = useCallback((node: HTMLUListElement | null) => {
+    listRef.current = node
+    scrollRef(node)
+  }, [scrollRef])
   const labels = useLabels().file
   const format = useNumberFormat()
   const locale = useLocale()
@@ -98,15 +108,23 @@ export function useFileUpload(props: FileUploadStateProps) {
     onValueChange?.(files)
   }
 
-  // The removed row's button is gone: the next row's takes the focus, else the previous one's, else the input.
+  // Each render: the unit the window counts in; then, after a remove, the next row's button, else the previous, else the input.
   useLayoutEffect(() => {
-    const index = focusAt.current
-    if (index === null) return
+    const node = listRef.current
+    const row = node?.querySelector('li[data-index]')
+    const gap = node ? Number.parseFloat(getComputedStyle(node).rowGap) || 0 : 0
+    const height = row ? row.getBoundingClientRect().height : 0
+    if (height > 0 && (Math.abs(height - unit.row) > 0.01 || Math.abs(gap - unit.gap) > 0.01)) setUnit({ row: height, gap })
+    if (focusAt.current === null) return
+    const target = Math.min(focusAt.current, state.value.rows.length - 1)
+    const button = target < 0 ? state.inputRef.current : node?.querySelector(`li[data-index="${String(target)}"] button`)
+    if (!(button instanceof HTMLElement)) {
+      scrollToIndex(target)
+      return
+    }
     focusAt.current = null
-    const buttons = [...(listRef.current?.querySelectorAll('button') ?? [])]
-    const target = buttons[index] ?? buttons[index - 1] ?? state.inputRef.current
-    target?.focus()
-  }, [state.value, state.inputRef])
+    button.focus()
+  })
 
   const onDragEnter = (event: DragEvent) => {
     if (!carriesFiles(event)) return
@@ -138,23 +156,29 @@ export function useFileUpload(props: FileUploadStateProps) {
   }
 
   const numbering = format.resolvedOptions().numberingSystem
-  const rows = state.value.rows.map((row) => ({
+  const describe = (row: FileUploadRow, index: number) => ({
     key: row.key,
+    index,
     name: row.file.name,
     rejected: row.reason !== null,
     nameId: `${id}-${row.key}-name`,
     removeId: `${id}-${row.key}-remove`,
     note: row.reason === null ? formatBytes(row.file.size, locale, numbering) : labels[row.reason],
-  }))
+  })
+  const rows = collection.rows.map(({ item, index }) => describe(item, index))
+  const [padStart, padEnd] = [spacerOf(collection.paddingStart, unit.gap), spacerOf(collection.paddingEnd, unit.gap)]
+  const refused = state.value.fresh ? state.value.rows.filter((row) => row.reason !== null) : []
   const hintId = hasContent(hint) ? `${id}-hint` : undefined
 
   return {
     rootRef: state.rootRef,
     inputRef: state.inputRef,
-    listRef,
+    listRef: setList,
     tabIndex,
-    // Passed, it is set inline on the list; left out, React writes no style and the --tc-list-rows knob applies.
-    listRows: props.visibleRows === undefined ? undefined : clamp(props.visibleRows, visibleRowsMin, visibleRowsMax),
+    // Left out, React writes no style and the --tc-list-rows knob applies; a spacer only while the window leaves rows out.
+    listRows,
+    padStart,
+    padEnd,
     multiple: limits.maxFiles > 1,
     dragging,
     hintId,
@@ -162,7 +186,9 @@ export function useFileUpload(props: FileUploadStateProps) {
     describedBy: [hintId, describedBy].filter(Boolean).join(' ') || undefined,
     labels,
     rows,
-    refused: state.value.fresh ? rows.filter((row) => row.rejected) : [],
+    // The first few names and the count of the rest: ten thousand refusals are not read out one by one.
+    refused: refused.slice(0, FILE_UPLOAD_ANNOUNCED).map((row) => describe(row, -1)),
+    refusedMore: refused.length > FILE_UPLOAD_ANNOUNCED ? labels.refusedMore(refused.length - FILE_UPLOAD_ANNOUNCED, format) : '',
     message: state.value.cut ? labels.tooMany(limits.maxFiles, format) : '',
     messageKey: state.value.cuts,
     onChange: () => { add([...(state.inputRef.current?.files ?? [])]) },

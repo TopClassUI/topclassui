@@ -15,3 +15,11 @@ export function toSwipeDirection(placement: DrawerPlacement, direction: Directio
 export function isSideSheet(placement: DrawerPlacement): boolean {
   return placement === 'start' || placement === 'end'
 }
+
+/** The sheet's first focus (APG Dialog): the sheet itself after a touch, so no virtual keyboard rises, or while
+ * the sheet itself scrolls, so its top stays in view; otherwise true, Base UI's first control, as a Dialog does. */
+export function firstFocusOf(sheet: HTMLElement | null, type: string): HTMLElement | null | true {
+  // One pixel of slack: rounding at a fractional zoom reports overflow on a box that does not scroll.
+  if (type === 'touch' || (sheet !== null && sheet.scrollHeight - sheet.clientHeight > 1)) return sheet
+  return true
+}

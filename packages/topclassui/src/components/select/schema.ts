@@ -5,7 +5,7 @@ import { COLLECTION_BOUNDARIES } from '#shared/contracts/collection.js'
 import { sizeSchema } from '#shared/contracts/size.schema.js'
 import { SELECT_DEFAULTS, SELECT_PLACEMENTS } from './constants.js'
 
-const { visibleRowsMin, visibleRowsMax } = COLLECTION_BOUNDARIES
+const { visibleRowsMin, visibleRowsMax, loadMoreThresholdMin, loadMoreThresholdMax } = COLLECTION_BOUNDARIES
 
 // R-8.3-3: .meta() is last in each chain, or zod drops it from the JSON Schema output.
 export const selectSchema = z.object({
@@ -19,6 +19,9 @@ export const selectSchema = z.object({
     .meta({ description: 'Select: the side and alignment the list opens at; start and end mirror in Arabic.' }),
   visibleRows: z.number().min(visibleRowsMin).max(visibleRowsMax).default(SELECT_DEFAULTS.visibleRows)
     .meta({ description: 'Select: rows the list shows before it scrolls, clamped; left out, the --tc-list-rows knob applies.' }),
+  loadMoreThreshold: z.number().int().min(loadMoreThresholdMin).max(loadMoreThresholdMax)
+    .default(SELECT_DEFAULTS.loadMoreThreshold)
+    .meta({ description: 'Select: rows from the end of the open list at which loadMore is called, clamped to 0 to 200.' }),
 })
 
 export type SelectSchemaInput = z.input<typeof selectSchema>

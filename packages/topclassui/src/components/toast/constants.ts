@@ -30,3 +30,9 @@ export const TOAST_ICONS = {
   info,
   loading: spinner,
 } as const
+
+/** R-10.5-3: where a viewport at the bottom writes its height, and what src/tokens.css reads into scroll-padding. */
+export const TOAST_OFFSET_VARIABLE = '--tc-sticky-bottom'
+
+/** The most of the screen's height a stack may claim as padding, as a sticky Navbar may: a taller one claims none. */
+export const TOAST_STICKY_SHARE = 1 / 3

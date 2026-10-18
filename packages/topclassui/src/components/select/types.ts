@@ -1,6 +1,7 @@
 import type { Select as Base } from '@base-ui/react/select'
 import type { Ref } from 'react'
 
+import type { CollectionProps } from '#shared/contracts/collection.js'
 import type { ControlName } from '#shared/contracts/name.js'
 import type { ListOption } from '#shared/contracts/option.js'
 import type { SELECT_PLACEMENTS } from './constants.js'
@@ -19,8 +20,11 @@ export type SelectName = ControlName
 /** Base UI's root, pinned to one string: a form only ever receives one, and left alone the value is `any`. */
 type BaseRoot = Base.Root.Props<string>
 
+/** R-8.5-1: the part of the shared contract a Select takes. No getKey: an option's key is its value. */
+type SelectCollection = Pick<CollectionProps<ListOption>, 'hasMore' | 'loadMore'>
+
 /** A value is a string, so none of the object helpers; one value, so no `multiple`; the options are data, not children. */
-type RootRemoved = 'multiple' | 'itemToStringLabel' | 'itemToStringValue' | 'isItemEqualToValue' | 'children' | 'items'
+type RootRemoved = 'className' | 'multiple' | 'itemToStringLabel' | 'itemToStringValue' | 'isItemEqualToValue' | 'children' | 'items'
 
 /** The trigger's own props, less every name the root owns and what is fixed here. Its `value` would refuse `value={null}`. */
 type TriggerRest = Omit<
@@ -32,6 +36,7 @@ type TriggerRest = Omit<
 export type SelectProps = Omit<BaseRoot, RootRemoved>
   & TriggerRest
   & SelectDesignProps
+  & SelectCollection
   & {
     /** Plain data, so a Server Component can render a Select: one option per row, in order. */
     items: readonly ListOption[]
@@ -53,4 +58,5 @@ export type SelectChangeDetails = Base.Root.ChangeEventDetails
 export type SelectStateProps = Pick<
   SelectProps,
   'value' | 'defaultValue' | 'onValueChange' | 'onOpenChange' | 'inputRef' | 'visibleRows' | 'placeholder' | 'ref' | 'aria-label' | 'aria-labelledby'
+  | 'items' | 'hasMore' | 'loadMore' | 'loadMoreThreshold'
 >

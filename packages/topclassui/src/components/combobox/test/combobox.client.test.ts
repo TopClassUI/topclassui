@@ -115,8 +115,8 @@ describe('client.tsx and the list part are the browser half (R-5.12-1)', () => {
   })
 
   it('keeps the shared bounds of a popup', () => {
-    expect(client).toContain('sideOffset={POPUP_BOUNDS.sideOffset}')
-    expect(client).toContain('collisionPadding={POPUP_BOUNDS.collisionPadding}')
+    expect(client).toContain('sideOffset={FLOATING.sideOffset}')
+    expect(client).toContain('collisionPadding={FLOATING.collisionPadding}')
   })
 })
 
@@ -155,7 +155,7 @@ describe('hook.ts holds the value, the collection, the window and the locale of 
 describe('classes.ts builds every string from the shared constants (R-5.2-4)', () => {
   it('takes the field box, the width, the rows and the popup from src/shared', () => {
     expect(importedNames(read('classes.ts'), '#shared/classes.js')).toEqual([
-      'DISABLED', 'FIELD_BOX', 'FIELD_OWN_WIDTH', 'LABEL', 'LIST_CAP', 'OVERLAY_SURFACE', 'POPUP_MOTION', 'ROW', 'ROW_HIGHLIGHT',
+      'DISABLED', 'FIELD_BOX', 'FIELD_OWN_WIDTH', 'LABEL', 'LIST_CAP', 'OVERLAY_SURFACE', 'POPUP_BOUNDS', 'POPUP_MOTION', 'ROW', 'ROW_HIGHLIGHT',
       'ROW_SELECTED', 'ROW_TOUCH', 'SCROLL_AREA',
     ])
   })

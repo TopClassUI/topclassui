@@ -6,9 +6,15 @@ import { meta } from '../meta.js'
 import { commandSchema } from '../schema.js'
 
 describe('the schema', () => {
-  it('fills every default the plan gives: the k shortcut, closed, windowing on above the threshold, seven rows', () => {
-    expect(commandSchema.parse({})).toEqual({ visibleRows: 7, virtualize: 'auto', shortcut: 'k', defaultOpen: false })
-    expect(COMMAND_DEFAULTS).toEqual({ shortcut: 'k', defaultOpen: false, virtualize: 'auto', visibleRows: 7 })
+  it('fills every default the plan gives: the k shortcut, closed, windowing on above the threshold, seven rows, ten from the end', () => {
+    expect(commandSchema.parse({})).toEqual({ visibleRows: 7, loadMoreThreshold: 10, virtualize: 'auto', shortcut: 'k', defaultOpen: false })
+    expect(COMMAND_DEFAULTS).toEqual({ shortcut: 'k', defaultOpen: false, virtualize: 'auto', visibleRows: 7, loadMoreThreshold: 10 })
+  })
+
+  it('bounds loadMoreThreshold to 0 to 200 rows, the shared collection bound (R-5.7-7)', () => {
+    expect(commandSchema.safeParse({ loadMoreThreshold: 0 }).success).toBe(true)
+    expect(commandSchema.safeParse({ loadMoreThreshold: 201 }).success).toBe(false)
+    expect(commandSchema.safeParse({ loadMoreThreshold: -1 }).success).toBe(false)
   })
 
   it('bounds visibleRows to 1 to 100 rows, a whole number, the same bound the hook clamps to', () => {

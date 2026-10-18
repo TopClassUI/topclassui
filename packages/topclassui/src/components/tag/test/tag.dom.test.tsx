@@ -16,7 +16,7 @@ describe('in a real tree', () => {
     expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Next' }))
   })
 
-  it('holds no button without onRemove, because the x is the client half', () => {
+  it('holds no button, because the x is TagRemovable, the client export', () => {
     render(<Tag>React</Tag>)
     expect(screen.queryAllByRole('button')).toEqual([])
   })
