@@ -258,7 +258,7 @@ They arrive with the phases that need them.
 ### R-8.5-2 The app owns the data
 **Rule:** components never fetch, cache or paginate; they call `loadMore()` and render what they are given.
 **Why:** data belongs to the application, not to the design system.
-**Enforced by:** `eslint` (`topclass/no-fetch-in-components`, under `src/components`, `src/connectors` and `src/shared`)
+**Enforced by:** `eslint` for fetch, storage and cache (`topclass/no-fetch-in-components`, under `src/`); paginate is manual
 
 ### R-10.5-1 Overlays scroll inside themselves
 **Rule:** popups use `POPUP_BOUNDS` and the row cap, dialogs and drawers scroll their body with sticky header and footer, and every scroll container inside an overlay sets `overscroll-behavior: contain`.

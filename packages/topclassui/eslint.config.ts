@@ -71,8 +71,13 @@ export default defineConfig(
       'topclass/logical-properties-only': 'off',
       'topclass/style-sets-tokens-only': 'off',
       'topclass/text-comes-from-labels': 'off',
-      'topclass/no-fetch-in-components': 'off',
     },
+  },
+
+  // R-8.5-2: a test seeds storage to prove the Banner remembers; a demo ships, so it plays the app in memory.
+  {
+    files: ['src/**/*.test.{ts,tsx}', 'src/**/test/**/*.{ts,tsx}'],
+    rules: { 'topclass/no-fetch-in-components': 'off' },
   },
 
   // R-8.5-2: a dismissed Banner is remembered across pages, which is UI state rather
