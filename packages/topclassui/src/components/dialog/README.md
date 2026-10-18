@@ -250,8 +250,10 @@ This part takes no design props of its own.
 - `dummy/long-content.tsx`
 - `dummy/no-close-button.tsx`
 - `dummy/non-modal.tsx`
+- `dummy/playground.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`
+- `dummy/states.tsx`
 - `dummy/trap-focus.tsx`
 - `dummy/with-form.tsx`
 - `dummy/with-tooltip.tsx`

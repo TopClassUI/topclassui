@@ -211,9 +211,11 @@ This part takes no design props of its own.
 - `dummy/long-body.tsx`
 - `dummy/long-content.tsx`
 - `dummy/non-modal.tsx`
+- `dummy/playground.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`
 - `dummy/start.tsx`
+- `dummy/states.tsx`
 - `dummy/top.tsx`
 - `dummy/trap-focus.tsx`
 - `dummy/with-form.tsx`

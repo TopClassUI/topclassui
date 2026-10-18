@@ -12,7 +12,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['basic', 'delays', 'disabled', 'long-label', 'placements', 'rtl', 'with-count']
+const EXPECTED = ['basic', 'delays', 'disabled', 'long-label', 'placements', 'playground', 'rtl', 'states', 'with-count']
 
 /** How many triggers each demo holds, every one of them a Button. */
 const TRIGGERS: Record<string, number> = {
@@ -21,7 +21,9 @@ const TRIGGERS: Record<string, number> = {
   'disabled': 1,
   'long-label': 2,
   'placements': 12,
+  'playground': 1,
   'rtl': 2,
+  'states': 4,
   'with-count': 1,
 }
 
@@ -32,7 +34,9 @@ const ICONS: Record<string, string[]> = {
   'disabled': ['M227.31,73'],
   'long-label': [],
   'placements': [],
+  'playground': ['M165.66,90'],
   'rtl': ['M165.66,90', 'M216,48H17'],
+  'states': ['M205.66,11', 'M205.66,14', 'M128,24A10', 'M128,24A10'],
   'with-count': ['M216,48H17'],
 }
 

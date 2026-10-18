@@ -10,20 +10,22 @@ import { markup } from '#test/markup.js'
 const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
-/** The label of each demo's one trigger, a Button. Named, so a deleted demo fails here. */
-const TRIGGERS: Record<string, string> = {
-  'basic': 'Search',
-  'empty-state': 'Find a command',
-  'groups': 'Commands by group',
-  'loading': 'Commands that are loading',
-  'long-content': 'Every hostile case',
-  'load-more': 'Search results',
-  'long-page': 'Jump to a section',
-  'rtl': 'بحث',
-  'ten-thousand': 'Ten thousand commands',
-  'thousand': 'A thousand commands',
-  'with-shortcuts': 'Commands with shortcuts',
-  'with-tooltip': 'Find or ask',
+/** The label of each trigger a demo holds, every one a Button: one, but for states. Named, so a deleted demo fails here. */
+const TRIGGERS: Record<string, string[]> = {
+  'basic': ['Search'],
+  'empty-state': ['Find a command'],
+  'groups': ['Commands by group'],
+  'load-more': ['Search results'],
+  'loading': ['Commands that are loading'],
+  'long-content': ['Every hostile case'],
+  'long-page': ['Jump to a section'],
+  'playground': ['Search'],
+  'rtl': ['بحث'],
+  'states': ['Open', 'Empty', 'Loading'],
+  'ten-thousand': ['Ten thousand commands'],
+  'thousand': ['A thousand commands'],
+  'with-shortcuts': ['Commands with shortcuts'],
+  'with-tooltip': ['Find or ask'],
 }
 
 const DEMOS = await Promise.all(files.map(async (name) => {
@@ -37,10 +39,11 @@ describe('every demo renders on the server as its trigger alone', () => {
   })
 
   for (const [name, Demo] of DEMOS) {
-    it(`${name}: one button, ${TRIGGERS[name] ?? '?'}, and no dialog, listbox or input before the first open`, () => {
+    it(`${name}: its buttons, ${TRIGGERS[name]?.join(', ') ?? '?'}, and no dialog, listbox or input before the first open`, () => {
       const html = markup(createElement(Demo))
-      expect(html.match(/<button/g)).toHaveLength(1)
-      expect(html).toContain(TRIGGERS[name])
+      const labels = TRIGGERS[name] ?? []
+      expect(html.match(/<button/g)).toHaveLength(labels.length)
+      for (const label of labels) expect(html).toContain(label)
       expect(html).not.toMatch(/role="(dialog|listbox|combobox)"|<input/)
     })
   }

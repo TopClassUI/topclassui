@@ -197,7 +197,9 @@ This part takes no design props of its own.
 - `dummy/long-content.tsx`
 - `dummy/modal.tsx`
 - `dummy/placements.tsx`
+- `dummy/playground.tsx`
 - `dummy/rtl.tsx`
+- `dummy/states.tsx`
 - `dummy/with-close.tsx`
 - `dummy/with-form.tsx`
 

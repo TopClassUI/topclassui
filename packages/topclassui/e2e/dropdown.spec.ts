@@ -26,8 +26,10 @@ const MENUS: Record<string, readonly string[]> = {
     'top-start', 'top', 'top-end', 'start-top', 'start', 'start-bottom',
     'end-top', 'end', 'end-bottom', 'bottom-start', 'bottom', 'bottom-end',
   ],
+  'dropdown--playground': ['Actions'],
   'dropdown--rtl': ['الإجراءات', 'المزيد'],
   'dropdown--sixty-items': ['Time zone'],
+  'dropdown--states': ['Open', 'Disabled row', 'Danger row', 'Grouped'],
   'dropdown--with-links': ['Help'],
 }
 
@@ -110,7 +112,7 @@ const roomOf = (page: Page) => page.evaluate(() => {
 
 test('the table names every dropdown demo', () => {
   expect(Object.keys(MENUS).sort()).toEqual(DEMOS.filter((demo) => demo.startsWith('dropdown--')).sort())
-  expect(Object.keys(MENUS)).toHaveLength(9)
+  expect(Object.keys(MENUS)).toHaveLength(11)
 })
 
 // The menu-button pattern of the ARIA Authoring Practices, key by key, in a real browser and in both directions.
