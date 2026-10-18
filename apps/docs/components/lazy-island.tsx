@@ -69,11 +69,11 @@ function pathOf(box: Element, node: Element): number[] | null {
   return path
 }
 
-function nodeAt(box: Element, path: number[] | null): HTMLElement | null {
+function nodeAt(box: Element, path: number[] | null): Element | null {
   if (path === null) return null
   let at: Element | undefined = box
   for (const index of path) at = at?.children[index]
-  return at instanceof HTMLElement ? at : null
+  return at ?? null
 }
 
 export interface LazyIslandProps<P> {
@@ -88,12 +88,13 @@ export interface LazyIslandProps<P> {
 interface Held {
   inputs: { kind: Input['kind']; path: number[] | null; init?: KeyboardEventInit }[]
   focused: number[] | null
+  hovered: number[] | null
 }
 
 export function LazyIsland<P extends object>({ load, props, when = 'near', hydrate = false }: LazyIslandProps<P>): ReactNode {
   const id = useId()
   const box = useRef<HTMLDivElement>(null)
-  const held = useRef<Held>({ inputs: [], focused: null })
+  const held = useRef<Held>({ inputs: [], focused: null, hovered: null })
   const [fresh, setFresh] = useState<{ Component: ComponentType<P> } | null>(null)
   // Created once: an island never renders again while it waits, or React would drop the server HTML it is keeping.
   const [island] = useState(() => {
@@ -142,7 +143,7 @@ export function LazyIsland<P extends object>({ load, props, when = 'near', hydra
     state.onLive = () => {
       element.setAttribute('data-island-live', '')
       claims.delete(element)
-      const under = hovered !== null && element.contains(hovered) ? hovered : null
+      const under = held.current.hovered === null ? (hovered !== null && element.contains(hovered) ? hovered : null) : nodeAt(element, held.current.hovered)
       if (under !== null) {
         under.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }))
         under.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
@@ -151,18 +152,20 @@ export function LazyIsland<P extends object>({ load, props, when = 'near', hydra
       for (const input of held.current.inputs) {
         const node = nodeAt(element, input.path)
         if (node === null) continue
-        if (input.kind === 'press') node.click()
+        // dispatchEvent, not click(): the press may have landed on an SVG inside the control.
+        if (input.kind === 'press') node.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }))
         else {
-          node.focus({ preventScroll: true })
+          if (node instanceof HTMLElement) node.focus({ preventScroll: true })
           node.dispatchEvent(new KeyboardEvent('keydown', input.init))
         }
       }
-      held.current = { inputs: [], focused: null }
+      held.current = { inputs: [], focused: null, hovered: null }
     }
     if (state.waits && !hydrate) {
       void state.gate.then(load).then((Component) => {
         const focused = document.activeElement
         held.current.focused = focused !== null && element.contains(focused) ? pathOf(element, focused) : null
+        held.current.hovered = hovered !== null && element.contains(hovered) ? pathOf(element, hovered) : null
         // A transition keeps the server's HTML on screen until the whole fresh render, nested islands included, is ready.
         startTransition(() => { setFresh({ Component }) })
       })
@@ -196,7 +199,8 @@ export function LazyIsland<P extends object>({ load, props, when = 'near', hydra
   useLayoutEffect(() => {
     const element = box.current
     if (fresh === null || element === null) return
-    nodeAt(element, held.current.focused)?.focus({ preventScroll: true })
+    const focused = nodeAt(element, held.current.focused)
+    if (focused instanceof HTMLElement) focused.focus({ preventScroll: true })
     island.state.live = true
     island.state.onLive()
   }, [fresh, island])

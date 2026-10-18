@@ -59,8 +59,10 @@ test('every live example on a Forms page is hydrated by React', async ({ page })
     await page.waitForLoadState('networkidle')
     const controls = examplesOf(page).locator('input, textarea, button, [role="slider"], [role="combobox"]')
     expect(await controls.count(), slug).toBeGreaterThan(0)
-    const unhydrated = await controls.evaluateAll((nodes) => nodes.filter((node) => !Object.keys(node).some((key) => key.startsWith('__reactFiber'))).length)
-    expect(unhydrated, slug).toBe(0)
+    // An example takes over when it nears the viewport (lazy-island.tsx), so each is brought on screen first.
+    for (const control of await controls.all()) await control.evaluate((node) => { node.scrollIntoView({ block: 'center', behavior: 'instant' }) })
+    await page.waitForLoadState('networkidle')
+    await expect.poll(() => controls.evaluateAll((nodes) => nodes.filter((node) => !Object.keys(node).some((key) => key.startsWith('__reactFiber'))).length), { message: slug }).toBe(0)
     expect(errors, slug).toEqual([])
   }
 })
