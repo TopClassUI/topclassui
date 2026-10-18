@@ -1,6 +1,6 @@
 // S13 step 3: the fences marked `check` in a guide page's MDX, compiled against the package as a reader would paste them.
 import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, sep } from 'node:path'
 
 import ts from 'typescript'
 
@@ -34,8 +34,9 @@ export function checkedSamples(file: string, mdx: string): Sample[] {
   return samples
 }
 
+// TypeScript hands the host forward-slash paths on every platform, so the virtual keys use them too.
 const pathOf = (app: string, sample: Sample) =>
-  join(app, '.samples', sample.file.replace(/\.mdx$/, ''), sample.title ?? `sample-${String(sample.index)}.${sample.lang}`)
+  join(app, '.samples', sample.file.replace(/\.mdx$/, ''), sample.title ?? `sample-${String(sample.index)}.${sample.lang}`).split(sep).join('/')
 
 /**
  * The sets of files to compile together. A title shown twice on one page (step 4 rewrites `page.tsx`) is the later file
