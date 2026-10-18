@@ -5,6 +5,7 @@ import { join } from 'node:path'
 import { expect, test, type Page } from '@playwright/test'
 
 import { DIRECTIONS } from '../scripts/lib/harness.js'
+import { expectNoRing, expectRing, walk } from './ring.js'
 import { expectInsideViewport, expectNoSidewaysScroll, openLive, viewportBox } from './live.js'
 import { demoListProblem, newerSource } from './pages.js'
 import { paintedRgb, pixelsOf, rgbOf } from './pixels.js'
@@ -90,6 +91,27 @@ test.describe('expectNoSidewaysScroll', () => {
       await expectNoSidewaysScroll(page)
     })
   }
+})
+
+test.describe('the keyboard helpers', () => {
+  test('expectRing fails on a focused control whose ring was reset away, or drawn thinner or dotted', async ({ page }) => {
+    await openLive(page, 'switch--basic')
+    await page.keyboard.press('Tab')
+    const track = page.locator('#switch-basic-digest > span')
+    await expectRing(track, 'the track')
+    await track.evaluate((el) => { el.style.setProperty('outline-style', 'none', 'important') })
+    await expect(expectRing(track, 'the track')).rejects.toThrow(/the track paints the ring/)
+    await expectNoRing(track, 'the track')
+    await track.evaluate((el) => { el.style.setProperty('outline', '1px dotted red', 'important') })
+    await expect(expectRing(track, 'the track')).rejects.toThrow(/the track paints the ring/)
+    await expect(expectNoRing(track, 'the track')).rejects.toThrow(/paints no ring/)
+  })
+
+  test('walk names every stop, so a radio group that lost its tab stop shows the page instead of the checked radio', async ({ page }) => {
+    await openLive(page, 'radio-group--basic')
+    await page.locator('#demo [role="radio"]').evaluateAll((all) => { for (const radio of all) radio.setAttribute('tabindex', '-1') })
+    expect(await walk(page, 1)).toEqual(['body'])
+  })
 })
 
 test.describe('the static page list', () => {

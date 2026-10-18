@@ -339,7 +339,7 @@ They arrive with the phases that need them.
 ### R-5.6-1 WCAG 2.2 AA
 **Rule:** keyboard behaviour follows the ARIA Authoring Practices; a visible `focus-visible` ring on every interactive element; types enforce labels.
 **Why:** it is a promise of the library, not an extra.
-**Enforced by:** `e2e/keyboard-<slug>.spec.ts` for every interactive component of Unit 3: each key the pattern lists, in both directions, the roving tab stop, Escape and the focus return, and the 2 px `focus-visible` ring; Units 4 and 5 still manual; `axe` covers the ARIA attributes in `test:e2e`
+**Enforced by:** `e2e/keyboard-<slug>.spec.ts`, one per interactive component of Units 3 and 4 (helpers in `e2e/keyboard.ts` and `e2e/ring.ts`), which presses every key of its Authoring Practices pattern in both directions, the roving tab stop, Escape and the focus return, and reads the computed 2 px `focus-visible` ring on the element that takes the focus; Unit 5 still manual; `axe` covers the ARIA attributes in `test:e2e`; the labels are type tests
 
 ### R-5.6-2 Target size
 **Rule:** every interactive element is at least 24x24 CSS px on every pointer type and 44px under `pointer-coarse`. The floor is a px token with a px fallback, never a rem step, because the success criterion is written in CSS px.
@@ -349,7 +349,7 @@ They arrive with the phases that need them.
 ### R-5.6-3 Every drag has an alternative
 **Rule:** Slider, Drawer and Toast swipe, Carousel, Resizable, sortable lists and the editor kit each provide a keyboard or button path to the same result.
 **Why:** WCAG 2.5.7.
-**Enforced by:** `e2e/keyboard-drawer.spec.ts` and `e2e/keyboard-toast.spec.ts` (Escape, and the x by Enter and by Space); the Slider still manual; Carousel, Resizable, sortable lists and the editor kit do not exist yet
+**Enforced by:** `e2e/keyboard-slider.spec.ts`, where the keys reach every value a drag reaches, and `e2e/keyboard-drawer.spec.ts` and `e2e/keyboard-toast.spec.ts` (Escape, and the x by Enter and by Space); Carousel, Resizable, sortable lists and the editor kit do not exist yet
 
 ### R-5.6-4 Contrast
 **Rule:** 4.5:1 for text, including a tone's text colour on its own soft tint; 3:1 for `--tc-line-strong`, `--tc-ring` and icons. `--tc-line` is decorative and exempt.
