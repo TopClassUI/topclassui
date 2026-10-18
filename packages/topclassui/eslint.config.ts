@@ -42,6 +42,7 @@ export default defineConfig(
       'topclass/client-shape': 'error',
       'topclass/props-derived-at-the-seam': 'error',
       'topclass/cn-class-name-last': 'error',
+      'topclass/no-physical-placement': 'error',
 
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/ban-ts-comment': 'error',
@@ -80,6 +81,12 @@ export default defineConfig(
     files: ['e2e/**/*.tsx', 'scripts/**/*.tsx'],
     plugins: { topclass },
     rules: { 'topclass/tooltip-content-is-text': 'error' },
+  },
+
+  // R-5.3-4 binds demos, which show real usage; a schema test passes "left" to prove it is refused.
+  {
+    files: ['src/**/*.test.{ts,tsx}', 'src/**/test/**/*.{ts,tsx}'],
+    rules: { 'topclass/no-physical-placement': 'off' },
   },
 
   // Tooling runs in Node, never ships, and walks untyped ESLint AST nodes.

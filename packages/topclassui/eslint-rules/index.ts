@@ -333,6 +333,23 @@ function keysOf(node: Node, aliases: Map<string, Node>, seen = new Set<string>()
   return []
 }
 
+const PLACEMENT_PROPS = new Set(['side', 'align', 'placement'])
+const PHYSICAL_SIDE = /(^|-)(left|right)(-|$)/
+
+/** Every string an expression can evaluate to without running it: each branch, each cast. */
+function possibleStrings(node: Node): { node: Node; value: string }[] {
+  if (!node) return []
+  if (node.type === 'Literal') return typeof node.value === 'string' ? [{ node, value: node.value }] : []
+  if (node.type === 'TemplateLiteral') {
+    return node.quasis.map((q: Node) => ({ node: q, value: String(q.value?.cooked ?? '') }))
+  }
+  if (node.type === 'JSXExpressionContainer') return possibleStrings(node.expression)
+  if (node.type === 'ConditionalExpression') return [...possibleStrings(node.consequent), ...possibleStrings(node.alternate)]
+  if (node.type === 'LogicalExpression') return [...possibleStrings(node.left), ...possibleStrings(node.right)]
+  if (node.type === 'TSAsExpression' || node.type === 'TSSatisfiesExpression') return possibleStrings(node.expression)
+  return []
+}
+
 const rules = {
   'logical-properties-only': {
     meta: {
@@ -1129,6 +1146,36 @@ const rules = {
               ctx.report({ node: arg, messageId: 'notLast', data: { name } })
             }
           })
+        },
+      }
+    },
+  },
+
+  'no-physical-placement': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-5.3-4: never left or right as a side, an align or a placement.' },
+      schema: [],
+      messages: {
+        physical: 'R-5.3-4: {{prop}}="{{value}}" is physical and does not mirror in RTL. Use placement with start or end.',
+      },
+    },
+    create(ctx: Context) {
+      const check = (prop: string, value: Node) => {
+        if (!PLACEMENT_PROPS.has(prop)) return
+        for (const found of possibleStrings(value)) {
+          if (PHYSICAL_SIDE.test(found.value)) {
+            ctx.report({ node: found.node, messageId: 'physical', data: { prop, value: found.value } })
+          }
+        }
+      }
+      return {
+        JSXAttribute(node: Node) {
+          check(String(node.name?.name ?? ''), node.value)
+        },
+        Property(node: Node) {
+          if (node.computed) return
+          check(String(node.key?.name ?? node.key?.value ?? ''), node.value)
         },
       }
     },
