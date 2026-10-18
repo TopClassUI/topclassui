@@ -1,0 +1,54 @@
+@import "tailwindcss";
+@import "topclassui/tokens.css";
+@import "topclassui/styles.css";
+
+/* After the three imports: tokens.css declares both on :root, so only order makes these win (docs-site S10). */
+:root {
+  --tc-font-latin: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --tc-font-arabic: var(--font-noto-arabic), ui-sans-serif, system-ui, sans-serif;
+  --docs-sidebar: 13.75rem;
+  --docs-toc: 11.875rem;
+  --docs-column: 59rem;
+  --docs-home: 75rem;
+}
+
+@layer base {
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+
+  /* Shiki writes both themes as variables; CodeBlock is dark in light and ocean, light in dark (docs-site S3). */
+  .shiki span { color: var(--tc-code-on-dark); }
+  [data-theme='dark'] .shiki span { color: var(--tc-code-on-light); }
+  [data-theme='light'] .shiki span,
+  [data-theme='ocean'] .shiki span { color: var(--tc-code-on-dark); }
+}
+
+@layer components {
+  /* Home's glows: a token mixed toward transparent, so they turn with the theme (docs-site page 1). */
+  .docs-glow {
+    position: absolute;
+    inset: -10rem 0 auto;
+    block-size: 56rem;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(closest-side, color-mix(in oklch, var(--tc-primary-solid) 35%, transparent), transparent);
+  }
+
+  .docs-number {
+    background: radial-gradient(circle at 50% 0%, color-mix(in oklch, var(--docs-number-tone) 14%, transparent), transparent 70%);
+  }
+
+  .docs-number-primary { --docs-number-tone: var(--tc-primary-solid); }
+  .docs-number-info { --docs-number-tone: var(--tc-info-solid); }
+  .docs-number-success { --docs-number-tone: var(--tc-success-solid); }
+  .docs-number-warning { --docs-number-tone: var(--tc-warning-solid); }
+}
+
+@layer components {
+  /* Home's sections below the fold skip style and layout until they near the viewport (docs-site rule 9). */
+  .docs-deferred {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 48rem;
+  }
+}

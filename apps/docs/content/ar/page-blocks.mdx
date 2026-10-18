@@ -1,0 +1,53 @@
+## الشيفرة
+
+كتلة شيفرة باسم ملف. زر النسخ ينسخ ما يظهر بالضبط.
+
+```css title="app/globals.css"
+@import "tailwindcss";
+@import "topclassui/tokens.css";
+@import "topclassui/styles.css";
+```
+
+## مديرو الحزم
+
+أسطر التثبيت الأربعة، مكتوبة من ثابت واحد.
+
+<PackageManagers />
+
+## الجدول
+
+جدول GFM يرسمه مكوّن `Table` من المكتبة.
+
+| الكتلة | مبنية بـ | تُكتب هكذا |
+|---|---|---|
+| الشيفرة | `CodeBlock` | كتلة محاطة بعلامات |
+| مديرو الحزم | `Tabs` | `<PackageManagers />` |
+| التنبيه | `Alert` | `<Callout tone="info">` |
+
+## التنبيه
+
+<Callout tone="info">تبقى الشيفرة من اليسار إلى اليمين داخل الصفحة العربية.</Callout>
+
+<Callout tone="warning">المثال الموسوم بـ check يُترجم مقابل الحزمة.</Callout>
+
+## الخطأ والصواب
+
+<WrongRight>
+
+```tsx
+<div className="ml-4 text-left" />
+```
+
+```tsx
+<div className="ms-4 text-start" />
+```
+
+</WrongRight>
+
+## البطاقات
+
+<Cards>
+  <Card title="الخادم أولًا">أغلب المكوّنات لا تضيف أي JavaScript إلى الصفحة.</Card>
+  <Card title="من اليمين إلى اليسار">كل صفحة تُعرض بشكل صحيح بالعربية.</Card>
+  <Card title="ملكك بالكامل">كل مكوّن شيفرة عادية يمكنك قراءتها.</Card>
+</Cards>
