@@ -2,7 +2,10 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
-import { ComponentPage } from '../../../../../../components/component-page/component-page'
+import { ComponentPage, componentToc } from '../../../../../../components/component-page/component-page'
+import { DocsColumns } from '../../../../../../components/shell/docs-shell'
+import { SitePage } from '../../../../../../components/shell/site-page'
+import { labelsFor } from '../../../../../../labels/index'
 import { pagedComponentOf, pagedComponents } from '../../../../../../lib/components'
 import { LOCALES, isLocale } from '../../../../../../lib/locales'
 
@@ -37,5 +40,11 @@ export default async function Page({ params }: { params: Params }) {
   const { locale, slug } = await params
   const entry = pagedComponentOf(slug)
   if (entry === null || !isLocale(locale)) notFound()
-  return <ComponentPage entry={entry} locale={locale} />
+  return (
+    <SitePage locale={locale} current="components" path={`/docs/components/${slug}`}>
+      <DocsColumns locale={locale} current="components" labels={labelsFor(locale)} toc={componentToc(entry, locale)}>
+        <ComponentPage entry={entry} locale={locale} />
+      </DocsColumns>
+    </SitePage>
+  )
 }

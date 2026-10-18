@@ -1,0 +1,72 @@
+---
+slug: css
+title: مدخل CSS
+description: ثلاثة أسطر استيراد بترتيب ثابت، ولا ملف إعدادات. هذا كل ما يحتاجه إعداد Tailwind.
+---
+
+## الأسطر الثلاثة
+
+```css title="app/globals.css"
+@import "tailwindcss";
+@import "topclassui/tokens.css";
+@import "topclassui/styles.css";
+```
+
+## ما يضيفه كل سطر
+
+| السطر | ما يضيفه |
+|---|---|
+| <span dir="ltr">`tailwindcss`</span> | Tailwind نفسه: الطبقة الأساسية والأصناف المساعدة |
+| <span dir="ltr">`topclassui/tokens.css`</span> | كل متغيّرات <span dir="ltr">`--tc-*`</span>، وكتل الأوضاع الثلاثة، ومقابض الضبط، وقاعدة الخط العربي |
+| <span dir="ltr">`topclassui/styles.css`</span> | سطر <span dir="ltr">`@source`</span> الذي يفحص المكوّنات، وربط <span dir="ltr">`@theme inline`</span>، والمتغيّرات الشرطية (variants) للحالات المفروضة |
+
+## لماذا لا يوجد ملف tailwind.config.js
+
+يُضبط Tailwind v4 داخل CSS. الاستيراد الثالث يحمل الربط وسطر <span dir="ltr">`@source`</span>، فلا يمكن أن يخرج عن تطابقه مع المكوّنات.
+
+## أسماء الأصناف المساعدة التي تحصل عليها
+
+كل متغيّر تصميم يصبح صنفًا مساعدًا، بالأسماء نفسها التي تستخدمها المكوّنات.
+
+<ThemeUtilities />
+
+## تغيير قيمة متغيّر
+
+عرّف المتغيّر بعد الاستيرادات الثلاثة. لا شيء يفحص التباين لقيمة تضعها بنفسك.
+
+```css title="app/globals.css"
+@import "topclassui/styles.css";
+
+:root {
+  --tc-primary-solid: var(--color-emerald-700);
+  --tc-primary-on-solid: var(--color-white);
+  --tc-primary-on-soft: var(--color-emerald-700);
+  --tc-radius: 0.75rem;
+}
+```
+
+## إذا كان الترتيب خاطئًا
+
+ترتيب طبقات Tailwind يحدّده الاستيراد الأول. إذا فتحت طبقة قبله، تخسر المكوّنات أمام إعادة الضبط الأساسية.
+
+<WrongRight>
+
+```css
+@import "topclassui/styles.css";
+@import "tailwindcss";
+
+/* the components layer is opened before Tailwind's layer
+   order statement, so it sinks below base and the resets win */
+```
+
+```css
+@import "tailwindcss";
+@import "topclassui/tokens.css";
+@import "topclassui/styles.css";
+```
+
+</WrongRight>
+
+## مع Vite
+
+مع Vite تنطبق الأسطر الثلاثة نفسها، مع <span dir="ltr">`@tailwindcss/vite`</span> في قائمة الإضافات بدلًا من PostCSS. الإعداد موجود في صفحة [تثبيت الحزمة](/ar/docs/installation#react-من-دون-next-js).

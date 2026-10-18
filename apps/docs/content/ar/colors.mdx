@@ -1,0 +1,140 @@
+---
+title: الألوان
+description: "للألوان ثلاث طبقات: لوحة ألوان لا تستخدمها مباشرة أبدًا، ورموز دلالية تستخدمها دائمًا، والأصناف المساعدة التي يولّدها Tailwind من تلك الرموز."
+---
+
+<PageControls />
+
+## الطبقات الثلاث
+
+لا يسمّي المكوّن لونًا أبدًا، بل يسمّي دورًا، ويُحَلّ هذا الدور بشكل مختلف في كل وضع.
+
+لوحة الألوان هي تدرّج <span dir="ltr">oklch</span> في <span dir="ltr">Tailwind v4</span>. تربط الطبقة الدلالية كل دور بدرجة لونية، ثم يحوّل <span dir="ltr">`@theme inline`</span> كل دور إلى صنف مساعد.
+
+```css
+/* palette - never referenced by a component */
+--color-blue-600: oklch(54.6% 0.245 262.881);
+
+/* semantic - what a component means */
+--tc-primary-solid: var(--color-blue-600);
+--tc-primary-on-solid: var(--color-white);
+
+/* utility - what Tailwind generates */
+@theme inline {
+  --color-primary-solid: var(--tc-primary-solid);
+}
+
+/* what you write */
+className="bg-primary-solid text-primary-on-solid"
+```
+
+لا يستخدم أي مكوّن إلا الطبقة الدلالية، لذا لا يحتاج أي وضع جديد إلى تغيير في المكوّنات.
+
+## كل الأصناف
+
+صنف واحد لكل دور. هذه هي الأسماء التي تستخدمها المكوّنات، وهي نفسها التي تستخدمها أنت بجانبها.
+
+<TokenTable>
+
+| الصنف | المتغيّر | الغرض منه |
+|---|---|---|
+| <span dir="ltr">`bg-page`</span> | <span dir="ltr">`--tc-page`</span> | الصفحة خلف كل شيء |
+| <span dir="ltr">`bg-surface`</span> | <span dir="ltr">`--tc-surface`</span> | سطح غائر أو مخطّط |
+| <span dir="ltr">`bg-surface-raised`</span> | <span dir="ltr">`--tc-surface-raised`</span> | بطاقة، نافذة منبثقة، حقل إدخال |
+| <span dir="ltr">`text-body`</span> | <span dir="ltr">`--tc-body`</span> | نص المحتوى |
+| <span dir="ltr">`text-muted`</span> | <span dir="ltr">`--tc-muted`</span> | النص الثانوي |
+| <span dir="ltr">`border-line`</span> | <span dir="ltr">`--tc-line`</span> | خط رفيع للزينة |
+| <span dir="ltr">`border-line-strong`</span> | <span dir="ltr">`--tc-line-strong`</span> | حدّ عنصر التحكم، ويجب أن يبلغ 3:1 |
+| <span dir="ltr">`outline-ring`</span> | <span dir="ltr">`--tc-ring`</span> | حلقة التركيز |
+| <span dir="ltr">`bg-primary-solid`</span> | <span dir="ltr">`--tc-primary-solid`</span> | عنصر تحكم مُعبّأ |
+| <span dir="ltr">`text-primary-on-solid`</span> | <span dir="ltr">`--tc-primary-on-solid`</span> | النص فوق تلك التعبئة |
+| <span dir="ltr">`bg-primary-soft`</span> | <span dir="ltr">`--tc-primary-soft`</span> | صبغة خفيفة، لشريحة أو لصف يمرّ عليه المؤشر |
+| <span dir="ltr">`text-primary-on-soft`</span> | <span dir="ltr">`--tc-primary-on-soft`</span> | النص والأيقونات فوق تلك الصبغة |
+
+</TokenTable>
+
+## النبرات الست
+
+لكل نبرة المجموعة نفسها من الأدوار، لذا يستخدم كلٌّ من <span dir="ltr">Badge</span> و<span dir="ltr">Alert</span> و<span dir="ltr">Button</span> النبرة بالطريقة نفسها.
+
+<ToneSwatches>
+
+| الدور | الغرض منه |
+|---|---|
+| <span dir="ltr">`primary/solid`</span> | عنصر تحكم مُعبّأ بتسمية بيضاء |
+| <span dir="ltr">`primary/soft`</span> | صبغة خفيفة، لشريحة أو لصف يمرّ عليه المؤشر |
+| <span dir="ltr">`primary/on-soft`</span> | النص والأيقونات فوق تلك الصبغة |
+| <span dir="ltr">`success/solid`</span> | عنصر تحكم مُعبّأ بتسمية بيضاء |
+| <span dir="ltr">`warning/solid`</span> | تسميته شبه سوداء، لا بيضاء |
+| <span dir="ltr">`danger/solid`</span> | الإجراءات المدمِّرة |
+| <span dir="ltr">`info/solid`</span> | معلومات محايدة |
+| <span dir="ltr">`neutral/solid`</span> | يتبدّل مع الوضع |
+
+</ToneSwatches>
+
+معروضة في وضع الصفحة. كل صف متغيّر حيّ، لا صورة له.
+
+## أين يُستخدم كل لون
+
+شاشة واحدة، وعلى كل دور فيها اسمه.
+
+<RoleBoard>
+
+- <span dir="ltr">`bg-surface`</span>: الشريط العلوي، صندوق يستقر فوق الصفحة.
+- <span dir="ltr">`border-line`</span>: الخط الرفيع تحت الشريط وحول البطاقة.
+- <span dir="ltr">`text-body`</span>: العناوين والنص العادي.
+- <span dir="ltr">`text-muted`</span>: سطر الوصف الرمادي.
+- <span dir="ltr">`bg-primary-solid`</span> + <span dir="ltr">`text-primary-on-solid`</span>: زر «حفظ».
+- <span dir="ltr">`bg-primary-soft`</span> + <span dir="ltr">`text-primary-on-soft`</span>: الصف المحدد في القائمة المنسدلة.
+- <span dir="ltr">`bg-surface-raised`</span>: القائمة المنسدلة، طافيةً فوق البطاقة، أفتح منها بدرجة واحدة ومعها ظل.
+- <span dir="ltr">`bg-page`</span>: الشاشة كلها، خلف كل شيء.
+
+</RoleBoard>
+
+## الأوضاع الثلاثة
+
+الفاتح والداكن والمحيط ثلاث كتل <span dir="ltr">CSS</span> تضبط أسماء المتغيّرات نفسها. يتبع هذا الموقع وضع نظامك إلى أن تختار وضعًا.
+
+وضع المحيط هو الوضع الفاتح بلون أساسي سماوي وزوايا على شكل كبسولة. لا يحتاج الوضع المخصّص إلى أكثر من كتلة <span dir="ltr">CSS</span> واحدة.
+
+<TokensSample mode="dark" />
+
+## ما يفرضه فحص التباين
+
+يُفحص التباين عند كل تغيير في المكتبة، وأي إخفاق يوقف ذلك التغيير. ويعتمد الفحص على ربط النطاق اللوني (<span dir="ltr">gamut mapping</span>) وفق <span dir="ltr">CSS Color 4</span>، لأن بعض الدرجات تقع خارج <span dir="ltr">sRGB</span>.
+
+| ما يُقاس | الحدّ | يُقاس مقابل |
+|---|---|---|
+| النص، بما فيه نص النبرة فوق صبغتها | 4.5:1 | السطح الذي يقع عليه |
+| <span dir="ltr">`line-strong`</span> و<span dir="ltr">`ring`</span> والأيقونات | 3:1 | الأسطح الثلاثة كلها، لا الصفحة وحدها |
+| الصبغة الخفيفة | خطوة 1.06 | الأسطح الثلاثة كلها |
+| <span dir="ltr">`line`</span> | مُستثنى | خط رفيع للزينة، <span dir="ltr">WCAG 1.4.11</span> |
+
+## أضف سمتك الخاصة
+
+أضف كتلة <span dir="ltr">CSS</span> واحدة، وضع <span dir="ltr">`data-theme="brand"`</span> على العنصر الذي تغطيه. يمكن للوضع أن يغيّر مفاتيح الضبط كما يغيّر الألوان.
+
+<Callout tone="warning">الوضع الذي يضبط <span dir="ltr">`--tc-primary-solid`</span> يجب أن يضبط <span dir="ltr">`--tc-primary-on-solid`</span> أيضًا، وإلا فقد ينزل تباين تسميته عن 4.5:1 فوق التعبئة الجديدة.</Callout>
+
+```css title="app/globals.css"
+/* after the three imports */
+[data-theme="brand"] {
+  color-scheme: dark;
+
+  --tc-page: var(--color-slate-950);
+  --tc-surface: var(--color-slate-900);
+  --tc-surface-raised: var(--color-slate-800);
+  --tc-body: var(--color-slate-50);
+  --tc-muted: var(--color-slate-400);
+  --tc-line: var(--color-slate-800);
+  --tc-line-strong: var(--color-slate-600);
+
+  --tc-primary-solid: var(--color-teal-500);
+  --tc-primary-on-solid: var(--color-slate-950);
+  --tc-primary-on-soft: var(--color-teal-300);
+
+  --tc-radius: 1rem;
+}
+```
+
+<Callout tone="info">لا يحفظ <span dir="ltr">`ThemeScript`</span> إلا <span dir="ltr">`light`</span> و<span dir="ltr">`dark`</span> و<span dir="ltr">`ocean`</span>، لذا ضع الوضع المخصّص على قسم من الصفحة، أو على <span dir="ltr">`html`</span> في تخطيط لا يعرض <span dir="ltr">`ThemeScript`</span>.</Callout>

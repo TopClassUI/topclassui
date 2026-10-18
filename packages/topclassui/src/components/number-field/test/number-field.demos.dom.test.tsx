@@ -16,6 +16,7 @@ const AFTER: Record<string, string[]> = {
   basic: ['3'],
   form: ['3'],
   limits: ['8', '2'],
+  playground: ['3'],
   row: ['3', '1'],
   rtl: ['‎-4', '١٬٢٣٥٫٥'],
   sizes: ['13', '13', '13', '13', '13'],
