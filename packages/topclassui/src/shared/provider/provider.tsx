@@ -50,11 +50,11 @@ export function TopClassProvider(props: TopClassProviderProps) {
     collection,
     toast,
   } = props
-  const { direction, locale } = useProviderLocale(props.direction, props.locale)
-
-  const query = adaptive?.query ?? DEFAULT_ADAPTIVE_QUERY
   // A nested provider, such as an RTL island, joins the outer root, delay group and toasts.
   const nested = useContext(TopClassContext) !== null
+  const { direction, locale } = useProviderLocale(props.direction, props.locale, nested)
+
+  const query = adaptive?.query ?? DEFAULT_ADAPTIVE_QUERY
 
   const value = useMemo<TopClassContextValue>(() => {
     const { labels } = getLabels(locale, overrides)

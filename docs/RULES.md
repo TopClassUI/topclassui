@@ -161,7 +161,7 @@ They arrive with the phases that need them.
 ### R-13-1 TopClassProvider is required
 **Rule:** the app mounts `TopClassProvider` at the root layout with `direction` and `locale` as props from the layout, never read from `document.dir` in an effect.
 **Why:** Base UI learns the direction only from `DirectionProvider`, and reading it in an effect disagrees with the server render.
-**Enforced by:** `src/shared/provider/provider.warning.dom.test` and `.ssr.test`, which prove the provider warns once in development when the layout leaves out `direction` or `locale`, never in production and never on the server; an app with no provider at all is review
+**Enforced by:** `src/shared/provider/provider.warning.dom.test`, `provider.presence.dom.test` and `provider.warning.ssr.test`, which prove a warning once in development when the layout leaves out `direction` or `locale`, when no provider is mounted, or when `direction` disagrees with `<html dir>`, never in production and never on the server; `src/shared/no-document-dir.test`, which fails on any read of the page's dir in `src` but that one comparison; "at the root layout" is review
 
 ## 4. API conventions
 

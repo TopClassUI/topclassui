@@ -114,12 +114,12 @@ describe('hook.ts holds the value and the look of the track (R-5.12-1)', () => {
     expect(source.startsWith("'use client'\n")).toBe(true)
   })
 
-  it('builds on the shared form value and the shared server tab stop', () => {
-    expect(importedModules(source)).toEqual(['react', '#shared/use-form-value.js', '#shared/use-server-tab-stop.js', './constants.js', './types.js'])
+  it('builds on the provider check, the shared form value and the shared server tab stop', () => {
+    expect(importedModules(source)).toEqual(['react', '#shared/provider/context.js', '#shared/use-form-value.js', '#shared/use-server-tab-stop.js', './constants.js', './types.js'])
     expect(importedNames(source, 'react')).toEqual(['createContext', 'useContext', 'useEffect', 'useImperativeHandle', 'useMemo', 'useRef', 'useState'])
     expect(hooksByPart(source)).toEqual({
       syncRadios: [],
-      useSegmentedControlRoot: ['useState', 'useRef', 'useFormValue', 'useImperativeHandle', 'useEffect', 'useState', 'useMemo'],
+      useSegmentedControlRoot: ['useProviderPresence', 'useState', 'useRef', 'useFormValue', 'useImperativeHandle', 'useEffect', 'useState', 'useMemo'],
       useSegmentedControlItem: ['useContext', 'useServerTabStop'],
     })
   })
