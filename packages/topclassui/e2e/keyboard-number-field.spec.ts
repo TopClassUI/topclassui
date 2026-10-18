@@ -4,7 +4,7 @@ import { DIRECTIONS } from '../scripts/lib/harness.js'
 import { expectNoRing, expectRing, walk } from './ring.js'
 import { liveErrors, openLive } from './live.js'
 
-// R-5.6-1, the Authoring Practices spin button in Chromium, the same in both directions: ArrowUp increases, ArrowDown
+// R-5.6-1, the Authoring Practices spin button keys in Chromium, the same in both directions: ArrowUp increases, ArrowDown
 // decreases, Home and End go to the limits, the steppers take no stop. number-field.keyboard.dom.test.tsx in happy-dom.
 
 const inputOf = (page: Page, name: string) => page.getByRole('textbox', { name, exact: true })

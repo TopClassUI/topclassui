@@ -1,6 +1,9 @@
 // The steps every keyboard spec repeats (R-5.6-1): the keys a direction gives the next and the previous
 // item, where the focus is, which element of a composite holds the one tab stop, and the ring.
 // The ring is read as its computed outline, not as pixels: forced colours and the pixel reads are focus-ring.spec's.
+import { existsSync, readdirSync } from 'node:fs'
+import { join } from 'node:path'
+
 import { expect, type Locator, type Page } from '@playwright/test'
 
 import type { Direction } from '../scripts/lib/harness.js'
@@ -85,3 +88,11 @@ export async function addSentinel(page: Page): Promise<void> {
     document.getElementById('demo')?.after(button)
   }, SENTINEL)
 }
+
+/** The component folders under `root` with neither their own `e2e/keyboard-<slug>.spec.ts` nor a reason for having none. */
+export const foldersWithoutKeyboardSpec = (root: string, reasons: Readonly<Record<string, string>>): string[] =>
+  readdirSync(join(root, 'src', 'components'), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .filter((slug) => !existsSync(join(root, 'e2e', `keyboard-${slug}.spec.ts`)) && !(slug in reasons))
+    .sort()

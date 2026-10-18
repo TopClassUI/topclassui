@@ -92,15 +92,19 @@ for (const direction of DIRECTIONS) {
 
     test('a read-only field takes the focus and the ring, and no character or Backspace changes it; a disabled one is no stop', async ({ page }) => {
       await openLive(page, 'otp-field--states', { direction })
-      await page.keyboard.press('Tab')
-      await page.keyboard.press('Tab')
+      const invalid = `${GROUP}:has(#otp-states-invalid)`
+      const disabled = `${GROUP}:has(#otp-states-disabled)`
       const readOnly = `${GROUP}:has(#otp-states-read-only)`
-      expect(await state(page, readOnly)).toMatchObject({ code: '482913' })
-      expect((await state(page, readOnly)).at).toBeGreaterThanOrEqual(0)
+      await page.keyboard.press('Tab')
+      expect(await state(page, invalid)).toEqual({ code: '482913', at: 5 })
+      await page.keyboard.press('Tab')
+      expect(await state(page, invalid)).toEqual({ code: '482913', at: -1 })
+      expect(await state(page, disabled)).toEqual({ code: '482___', at: -1 })
+      expect(await state(page, readOnly)).toEqual({ code: '482913', at: 5 })
       await expectRing(page.locator(':focus'), 'the read-only cell')
       await page.keyboard.press('Backspace')
       await page.keyboard.press('7')
-      expect((await state(page, readOnly)).code).toBe('482913')
+      expect(await state(page, readOnly)).toEqual({ code: '482913', at: 5 })
     })
   })
 }
