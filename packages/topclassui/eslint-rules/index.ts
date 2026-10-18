@@ -168,6 +168,22 @@ function findArbitraryColor(value: string): { cls: string; kind: 'arbitrary' | '
   return undefined
 }
 
+/** `data-[open]:` or `group-aria-[busy]/item:`: a bracket around a bare name, which v4 writes bare. */
+const BRACKETED_VARIANT = /^((?:[a-z][a-z0-9-]*-)?(?:data|aria))-\[([^\]]*)\](\/[\w-]+)?$/
+
+function findBracketedName(value: string): { cls: string; bare: string } | undefined {
+  for (const cls of value.split(/\s+/)) {
+    const variants = splitAtColons(cls)
+    variants.pop()
+    for (const variant of variants) {
+      const m = BRACKETED_VARIANT.exec(variant)
+      if (!m || m[2]?.includes('=')) continue
+      return { cls: `${variant}:`, bare: `${m[1] ?? ''}-${m[2] ?? ''}${m[3] ?? ''}:` }
+    }
+  }
+  return undefined
+}
+
 const BANNED_SCALE = [
   [/(^|[\s:])rounded-(none|xs|sm|md|lg|xl|2xl|3xl|4xl|full)(\s|$)/, 'use rounded-control, rounded-box or rounded-chip'],
   [/(^|[\s:])h-\d+(\s|$)/, 'use h-control-xs .. h-control-xl from the size scale'],
@@ -295,6 +311,21 @@ const rules = {
             data: { cls: s[0].trim(), hint: 'use HOVER, FOCUS_RING or the shared state constants' },
           })
         }
+      })
+    },
+  },
+
+  'bare-data-variants': {
+    meta: {
+      type: 'problem' as const,
+      docs: { description: 'R-5.2-6: data and aria variants are written bare; brackets only hold name=value.' },
+      schema: [],
+      messages: { bracketed: 'R-5.2-6: "{{cls}}" brackets a bare name. Write "{{bare}}"; brackets only hold name=value.' },
+    },
+    create(ctx: Context) {
+      return eachClassString((node, value) => {
+        const b = findBracketedName(value)
+        if (b) ctx.report({ node, messageId: 'bracketed', data: b })
       })
     },
   },
