@@ -24,7 +24,7 @@ Client Component use `<Svg icon={check} />` instead, which takes the same props.
 ## Import
 
 ```tsx
-import { Icon } from 'topclassui'
+import { Icon } from 'topclassui/icon'
 ```
 
 ## Props

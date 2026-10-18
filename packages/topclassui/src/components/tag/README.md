@@ -33,7 +33,7 @@ component, and move the focus before the x goes:
 'use client'
 
 import { useRef, useState } from 'react'
-import { Tag } from 'topclassui'
+import { Tag } from 'topclassui/tag'
 
 export function Topics({ initial }: { initial: string[] }) {
   const [topics, setTopics] = useState(initial)
@@ -96,7 +96,7 @@ a link inside a Tag: its focus ring is cut off at size `xs` and at the end of a 
 ## Import
 
 ```tsx
-import { Tag } from 'topclassui'
+import { Tag } from 'topclassui/tag'
 ```
 
 ## Props

@@ -12,7 +12,7 @@ A searchable list of actions, opened from anywhere with Ctrl+K or Cmd+K. Type to
 it, the arrows to move, Enter to run. It loads on its first open, never with the page.
 
 ```ts
-import { Command } from 'topclassui'
+import { Command } from 'topclassui/command'
 ```
 
 `getKey`, `getLabel` and `onSelect` are functions, so the palette lives in a client file:
@@ -87,7 +87,7 @@ over a listbox, with `aria-activedescendant` on the active row.
 ## Import
 
 ```tsx
-import { Command } from 'topclassui'
+import { Command } from 'topclassui/command'
 ```
 
 ## Props
