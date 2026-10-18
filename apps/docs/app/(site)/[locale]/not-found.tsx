@@ -12,7 +12,7 @@ export const metadata: Metadata = { robots: { index: false } }
 /** A notFound() inside a locale, such as /en/docs/nope (docs-site page 20); not-found gets no params, so the root param says which. */
 export default async function NotFound() {
   const raw = await localeParam()
-  const locale = isLocale(raw) ? raw : 'en'
+  const locale = raw !== undefined && isLocale(raw) ? raw : 'en'
   const labels = labelsFor(locale)
   const catalog = pageBySlug('components')
   return (
