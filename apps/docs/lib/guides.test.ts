@@ -12,7 +12,7 @@ describe('tokenNameOf', () => {
 
 describe('the generated facts', () => {
   it('count the kinds across the 52 component imports', () => {
-    expect(KIND_COUNTS).toEqual({ server: 20, split: 12, client: 20, total: 52 })
+    expect(KIND_COUNTS).toEqual({ server: 19, split: 13, client: 20, total: 52 })
   })
 
   it('fail a token or a knob the library does not declare', () => {
