@@ -19,7 +19,7 @@ components/button/skeleton.tsx  acb869d6cc10
 components/button/types.ts  4d790d19e519
 components/button/variants.ts  ec77eabeee0b
 components/dialog/classes.ts  e0e06db161fc
-components/dialog/client.tsx  7d6daa5e3d67
+components/dialog/client.tsx  cbae7390e22b
 components/dialog/constants.ts  31f59af76a25
 components/dialog/dummy/basic.tsx  6c1d3739f8b1
 components/dialog/dummy/confirm.tsx  9642dedef3b5
@@ -30,32 +30,34 @@ components/dialog/dummy/non-modal.tsx  d492ef948279
 components/dialog/dummy/rtl.tsx  e72cae528c9a
 components/dialog/dummy/sizes.tsx  94813dbb37c3
 components/dialog/dummy/trap-focus.tsx  b6694b11f20a
-components/dialog/hook.ts  5091fce14f3e
+components/dialog/hook.ts  b7c7286a3d7f
 components/dialog/index.tsx  b8a7a05b303c
 components/dialog/schema.ts  1c80e945de0a
-components/dialog/types.ts  deb92234388c
-components/select/classes.ts  11e76755da1d
-components/select/client.tsx  291aa7f54226
-components/select/constants.ts  39c27146b041
+components/dialog/types.ts  0f5bb119f9e7
+components/select/classes.ts  6529e2d8c458
+components/select/client.tsx  c93f5400fba7
+components/select/constants.ts  be16be40cc0d
 components/select/dummy/basic.tsx  9dd3a3d4158b
 components/select/dummy/form.tsx  9b8024353d8d
 components/select/dummy/four-rows.tsx  31eea2abee3c
+components/select/dummy/load-more.tsx  2d20af829ede
 components/select/dummy/long-content.tsx  f0008342f0b2
 components/select/dummy/rtl.tsx  8fbe331778e7
 components/select/dummy/sixty-items.tsx  77e331d56e4b
 components/select/dummy/sizes.tsx  3fdf04a1a943
 components/select/dummy/states.tsx  9ea233ed5335
-components/select/hook.ts  c65f5976d2dc
+components/select/hook.ts  8a033badacfb
 components/select/index.tsx  868fe09ae951
-components/select/lib.ts  0b340b3c1dfd
-components/select/schema.ts  5875ca7c4258
-components/select/types.ts  fbc10b83e616
-components/svg/index.tsx  3514a90657b9
+components/select/lib.ts  43cc1219ea1a
+components/select/schema.ts  f5cb2d34ac0f
+components/select/types.ts  7736bc197dba
+components/svg/dummy/directional.tsx  2e5ee73d6845
+components/svg/index.tsx  5f74dbeb8ec4
 components/svg/types.ts  421e3ef8a60e
 components/toast/boundaries.ts  b37fcce899bc
 components/toast/classes.ts  b205f9d71c76
-components/toast/client.tsx  a81dcb3dbaea
-components/toast/constants.ts  0472a018a44a
+components/toast/client.tsx  ca4e82e5ff12
+components/toast/constants.ts  336503243aa6
 components/toast/dummy/basic.tsx  d3bcba59fd60
 components/toast/dummy/high-priority.tsx  79626f2c411d
 components/toast/dummy/long-content.tsx  3eaddef38357
@@ -64,14 +66,15 @@ components/toast/dummy/over-dialog.tsx  ac368a555cf2
 components/toast/dummy/promise.tsx  35c1dae896cc
 components/toast/dummy/rtl.tsx  a9df681ca47b
 components/toast/dummy/sticky.tsx  9898da815d1f
+components/toast/dummy/tall-page.tsx  7829debb204f
 components/toast/dummy/tones.tsx  a7d143e1c315
 components/toast/dummy/with-action.tsx  7c697a89ebb7
 components/toast/dummy/with-description.tsx  c71f56faf7ef
-components/toast/hook.ts  19b3e6493906
-components/toast/index.tsx  a5919d63b8b9
-components/toast/lib.ts  a575a93db718
+components/toast/hook.ts  fc8b3acfbbe5
+components/toast/index.tsx  076c3109c443
+components/toast/lib.ts  0103eb8db0f7
 components/toast/schema.ts  869e99757f9b
-components/toast/types.ts  2ae76450ab31
+components/toast/types.ts  5875556d8909
 icons/data/arrow-right.ts  d67ac346403c
 icons/data/caret-down.ts  f3bef6ce0c56
 icons/data/check-circle.ts  f92cd7a67d51
@@ -90,12 +93,12 @@ process-env.d.ts  4b0230413e57
 shared/adaptive/create-adaptive.tsx  e455c0cb68a2
 shared/adaptive/use-adaptive-mode.ts  4bd74bccdf93
 shared/clamp.ts  8b3357d9b629
-shared/classes.ts  2e36759fcf77
+shared/classes.ts  e6f60fcb13c0
 shared/cn.ts  4a507659c948
 shared/collection/use-collection.ts  df4bd84890df
 shared/collection/window.ts  9413500304ac
 shared/contracts/boundaries.ts  994e1c4698ae
-shared/contracts/collection.ts  6de20d98af91
+shared/contracts/collection.ts  77647568aafd
 shared/contracts/menu.ts  a6eae4b439c6
 shared/contracts/name.ts  8fe01c9d5d4c
 shared/contracts/option.ts  57dd97bed5dd
@@ -105,24 +108,28 @@ shared/contracts/state.ts  8f39e25fa2ff
 shared/contracts/toast.schema.ts  d97a33f73a3f
 shared/contracts/toast.ts  993c3b9b6432
 shared/contracts/tone.ts  1f5cec0766d3
-shared/floating.ts  962b169a7b0b
+shared/floating.ts  061641dd71cb
+shared/focus-neighbour.ts  42858fa16e6c
 shared/form-errors.ts  a3e305a4005a
-shared/labels/ar.ts  ac3552b5142a
-shared/labels/en.ts  f1746707c6c2
+shared/labels/ar.ts  8779f9e48d6c
+shared/labels/en.ts  04392d9407b9
 shared/labels/get-labels.ts  4507cefd9c4f
-shared/labels/types.ts  f8900290dfbb
-shared/link.tsx  533ea6fb7b33
+shared/labels/types.ts  625f7170531e
+shared/link.tsx  2886640b3278
 shared/overlay-scope.ts  75ee3c4dd51e
 shared/overlay.ts  5fbd5963f4ca
-shared/provider/context.ts  d0de6c6703c0
-shared/provider/provider.tsx  122e11278696
-shared/provider/use-portal-locale.ts  1990d40f8a56
-shared/render-trigger.ts  4752ce629ec1
-shared/render.ts  25b333500f9a
+shared/provider/context.ts  44a35002b4f7
+shared/provider/provider.tsx  46d02adb6a02
+shared/provider/use-portal-locale.ts  4637c4061bb3
+shared/provider/use-provider-locale.ts  68801ba9cb19
+shared/render-trigger.ts  5830b328c9bb
+shared/render.ts  efbc9019872e
 shared/style-tokens.ts  c01e8d1ce97d
 shared/theme/script.ts  e0a8a401b2df
 shared/theme/theme-script.tsx  4fbb364a0a0e
 shared/toast/manager.ts  91fe953395d8
+shared/toast/toast.ts  feee16fe2858
+shared/toast/viewports.ts  362f4cfd27e7
 shared/truncate-label.tsx  c6f1bd58465f
 shared/use-controllable-state.ts  f19d62c2be16
 shared/use-form-value.ts  62e15e8b3cff
@@ -356,6 +363,11 @@ body {
         "version": "<library version>",
         "sha256": "<sha256>"
       },
+      "components/select/dummy/load-more.tsx": {
+        "from": "select",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
       "components/select/dummy/long-content.tsx": {
         "from": "select",
         "version": "<library version>",
@@ -403,6 +415,11 @@ body {
       },
       "components/select/types.ts": {
         "from": "select",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "components/svg/dummy/directional.tsx": {
+        "from": "svg",
         "version": "<library version>",
         "sha256": "<sha256>"
       },
@@ -476,6 +493,11 @@ body {
         "version": "<library version>",
         "sha256": "<sha256>"
       },
+      "components/toast/dummy/tall-page.tsx": {
+        "from": "toast",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
       "components/toast/dummy/tones.tsx": {
         "from": "toast",
         "version": "<library version>",
@@ -517,7 +539,7 @@ body {
         "sha256": "<sha256>"
       },
       "icons/data/arrow-right.ts": {
-        "from": "button",
+        "from": "svg",
         "version": "<library version>",
         "sha256": "<sha256>"
       },
@@ -532,7 +554,7 @@ body {
         "sha256": "<sha256>"
       },
       "icons/data/check.ts": {
-        "from": "button",
+        "from": "svg",
         "version": "<library version>",
         "sha256": "<sha256>"
       },
@@ -686,6 +708,11 @@ body {
         "version": "<library version>",
         "sha256": "<sha256>"
       },
+      "shared/focus-neighbour.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
       "shared/form-errors.ts": {
         "from": "base",
         "version": "<library version>",
@@ -741,6 +768,11 @@ body {
         "version": "<library version>",
         "sha256": "<sha256>"
       },
+      "shared/provider/use-provider-locale.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
       "shared/render-trigger.ts": {
         "from": "base",
         "version": "<library version>",
@@ -767,6 +799,16 @@ body {
         "sha256": "<sha256>"
       },
       "shared/toast/manager.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/toast/toast.ts": {
+        "from": "base",
+        "version": "<library version>",
+        "sha256": "<sha256>"
+      },
+      "shared/toast/viewports.ts": {
         "from": "base",
         "version": "<library version>",
         "sha256": "<sha256>"
