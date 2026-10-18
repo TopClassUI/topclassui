@@ -9,6 +9,7 @@ export const ar: SiteLabels = {
   },
   shell: {
     skip: 'انتقل إلى المحتوى',
+    sectionsNav: 'أقسام الموقع',
     siteNav: 'الموقع',
     sidebarTitle: 'التوثيق',
     onThisPage: 'في هذه الصفحة',
@@ -30,7 +31,7 @@ export const ar: SiteLabels = {
     version: (version, beta) => (beta ? `v${version} تجريبي` : `v${version}`),
     columns: { start: 'ابدأ', foundations: 'الأساسيات', reference: 'المكوّنات', more: 'مصادر' },
     bottom: 'برخصة MIT. مبني في العلن.',
-    install: 'التثبيت',
+    install: 'ثبّت TopClass UI',
   },
   blocks: {
     wrong: 'خطأ',

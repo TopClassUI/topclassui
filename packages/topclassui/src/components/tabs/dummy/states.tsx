@@ -1,0 +1,30 @@
+import { TabsList, TabsPanel, TabsRoot, TabsTab } from '../index.js'
+
+/** The states a server can render, in both looks: the active tab, a tab at rest and a disabled
+ * one. Each list has a name of its own, so the two are told apart. */
+export default function Demo() {
+  return (
+    <div className="grid gap-8">
+      <TabsRoot defaultValue="active">
+        <TabsList aria-label="Line">
+          <TabsTab value="active">Active</TabsTab>
+          <TabsTab value="rest">At rest</TabsTab>
+          <TabsTab value="disabled" disabled>Disabled</TabsTab>
+        </TabsList>
+        <TabsPanel value="active">The active tab is semibold over a bar of the primary colour.</TabsPanel>
+        <TabsPanel value="rest">A tab at rest is muted.</TabsPanel>
+        <TabsPanel value="disabled">A disabled tab cannot be made active.</TabsPanel>
+      </TabsRoot>
+      <TabsRoot variant="enclosed" defaultValue="active">
+        <TabsList aria-label="Enclosed">
+          <TabsTab value="active">Active</TabsTab>
+          <TabsTab value="rest">At rest</TabsTab>
+          <TabsTab value="disabled" disabled>Disabled</TabsTab>
+        </TabsList>
+        <TabsPanel value="active">The active tab sits on a raised surface.</TabsPanel>
+        <TabsPanel value="rest">A tab at rest sits on the tinted box.</TabsPanel>
+        <TabsPanel value="disabled">A disabled tab cannot be made active.</TabsPanel>
+      </TabsRoot>
+    </div>
+  )
+}

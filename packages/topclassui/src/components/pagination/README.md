@@ -74,8 +74,10 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/last-page.tsx`
 - `dummy/many-pages.tsx`
 - `dummy/middle.tsx`
+- `dummy/playground.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`
+- `dummy/states.tsx`
 - `dummy/two-navs.tsx`
 - `dummy/wide-numbers.tsx`
 

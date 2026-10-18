@@ -40,7 +40,7 @@ export function SiteNavbar({ locale, current, path, labels }: SiteNavbarProps) {
         <Icon name="palette" />
         <span>{labels.meta.siteName}</span>
       </NavbarBrand>
-      <NavbarLinks labels={library.labels} className="max-md:hidden">
+      <NavbarLinks labels={library.labels} aria-label={labels.shell.sectionsNav} className="max-md:hidden">
         {navLinks(locale, labels).map((link) => (
           <NavbarLink key={link.key} render={<Link href={link.href} />} current={link.slugs.includes(current)}>
             {link.text}

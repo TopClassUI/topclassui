@@ -46,13 +46,19 @@ export function changedProps(values: Readonly<Record<string, PropValue>>, defaul
   return Object.entries(values).filter(([name, value]) => defaults[name] !== value)
 }
 
-/** The usage with the given props written where the spread or their pass-through was; with none, those are only removed. */
+const attributeNamed = (name: string) => new RegExp(`(\\s)${name}=(?:\\{[^{}]*\\}|"[^"]*")`, 'g')
+
+/** The usage with the given props written in: over an attribute of the same name wherever the tree has one
+ * (a pass-through or a literal), else where the spread was; a pass-through left unset is dropped. */
 export function snippetOf(usage: Usage, props: readonly [string, PropValue][]): string {
-  const values = new Map(props)
-  const spread = props.filter(([name]) => !usage.passed.includes(name)).map(([name, value]) => ` ${attributeOf(name, value)}`).join('')
-  const jsx = usage.passed.reduce((tree, name) => {
-    const value = values.get(name)
-    return tree.replace(passThrough(name), value === undefined ? '' : ` ${attributeOf(name, value)}`)
-  }, usage.jsx.replace(SPREAD, spread))
+  let jsx = usage.jsx
+  const spread: string[] = []
+  for (const [name, value] of props) {
+    const pattern = attributeNamed(name)
+    if (pattern.test(jsx)) jsx = jsx.replace(pattern, (_, space: string) => `${space}${attributeOf(name, value)}`)
+    else spread.push(` ${attributeOf(name, value)}`)
+  }
+  jsx = usage.passed.reduce((tree, name) => tree.replace(passThrough(name), ''), jsx)
+  jsx = jsx.replace(/[ \t]+(\w+)=\{\1\}/g, '').replace(SPREAD, spread.join(''))
   return usage.imports.length > 0 ? `${usage.imports.join('\n')}\n\n${jsx}` : jsx
 }

@@ -106,9 +106,16 @@ describe('a server-rendered rail hydrates cleanly', () => {
   })
 })
 
+/** The state of each rail of each demo, in document order, as the server sends it. */
+const RAILS: Record<string, string[]> = {
+  'basic': ['open'], 'collapsed': ['closed'], 'controlled': ['open'], 'groups': ['open'], 'in-a-layout': ['open'],
+  'long-list': ['open'], 'playground': ['open'], 'rtl': ['open'], 'states': ['open', 'closed'],
+}
+
 describe('every demo renders and hydrates', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(DEMOS.map(([name]) => name)).toEqual(['basic', 'collapsed', 'controlled', 'groups', 'in-a-layout', 'long-list', 'rtl'])
+    expect(DEMOS.map(([name]) => name)).toEqual(['basic', 'collapsed', 'controlled', 'groups', 'in-a-layout', 'long-list', 'playground', 'rtl', 'states'])
+    expect(Object.keys(RAILS)).toEqual(DEMOS.map(([name]) => name))
   })
 
   for (const [name, Demo] of DEMOS) {
@@ -119,8 +126,8 @@ describe('every demo renders and hydrates', () => {
     it(`${name} hydrates with no recoverable error, in the state the server sent`, async () => {
       const { errors, html, container } = await hydrate(createElement(Demo))
       expect(errors).toEqual([])
-      expect(states(container)).toEqual([name === 'collapsed' ? 'closed' : 'open'])
-      expect(html.includes(' data-closed=""')).toBe(name === 'collapsed')
+      expect(states(container)).toEqual(RAILS[name])
+      expect(html.includes(' data-closed=""')).toBe(RAILS[name]?.includes('closed'))
     })
   }
 })

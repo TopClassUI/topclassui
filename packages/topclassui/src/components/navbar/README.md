@@ -151,7 +151,9 @@ Anything else is passed to the element each part draws, so standard attributes (
 - `dummy/basic.tsx`
 - `dummy/many-links.tsx`
 - `dummy/not-sticky.tsx`
+- `dummy/playground.tsx`
 - `dummy/rtl.tsx`
+- `dummy/states.tsx`
 - `dummy/tall-page.tsx`
 - `dummy/with-search.tsx`
 

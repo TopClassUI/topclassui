@@ -11,7 +11,10 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['all-links', 'basic', 'deep-trail', 'long-label', 'long-trail', 'mixed-label', 'rtl']
+const EXPECTED = ['all-links', 'basic', 'deep-trail', 'long-label', 'long-trail', 'mixed-label', 'rtl', 'states']
+
+/** How many trails a demo holds, and how many of them emit JSON-LD: a trail with no link emits none. */
+const TRAILS: Record<string, { navs: number, jsonLd: number }> = { states: { navs: 3, jsonLd: 2 } }
 
 const load = async (file: string) => {
   const loaded = await import(`../dummy/${file}.tsx`) as { default: ComponentType }
@@ -26,15 +29,15 @@ describe('every demo renders on the server', () => {
   })
 
   for (const file of files) {
-    it(`${file}.tsx exports one default demo that renders one breadcrumb`, async () => {
+    it(`${file}.tsx exports one default demo that renders ${String(TRAILS[file]?.navs ?? 1)} breadcrumb(s)`, async () => {
       const loaded = await import(`../dummy/${file}.tsx`) as { default?: ComponentType }
       const Demo = loaded.default
       expect(typeof Demo, file).toBe('function')
       if (!Demo) return
-      // Not toContain('<'): an empty div passes that. One nav, or two trails share one name.
+      // Not toContain('<'): an empty div passes that. One nav, unless the demo names each of its trails.
       const out = markup(<Demo />)
-      expect(count(out, '<nav '), file).toBe(1)
-      expect(count(out, 'application/ld+json'), file).toBe(1)
+      expect(count(out, '<nav '), file).toBe(TRAILS[file]?.navs ?? 1)
+      expect(count(out, 'application/ld+json'), file).toBe(TRAILS[file]?.jsonLd ?? 1)
     })
   }
 })
@@ -82,6 +85,13 @@ describe('each demo shows what its name says', () => {
     expect(out).toMatch(/^<div class="[^"]*w-60[^"]*">/)
     expect(out).toContain('"><span class="truncate min-w-0">Release notes ملاحظات الإصدار لكل مكوّن في المكتبة</span></a>')
     expect(out).toContain('<span aria-current="page" class="truncate min-w-0 text-body font-semibold">Logical properties')
+  })
+
+  it('states names each of its three trails, and only the lone current page has no link', async () => {
+    const out = await load('states')
+    expect([...out.matchAll(/<nav aria-label="([^"]*)"/g)].map((m) => m[1])).toEqual(['Ending on the current page', 'Every crumb a link', 'Only the current page'])
+    expect(count(out, '<a href=')).toBe(4)
+    expect(count(out, 'aria-current="page"')).toBe(2)
   })
 
   it('rtl sets the direction, names the nav in Arabic and keeps the flipping caret', async () => {
