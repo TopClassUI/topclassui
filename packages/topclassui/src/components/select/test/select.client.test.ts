@@ -114,12 +114,13 @@ describe('hook.ts holds the value, the labels and the locale of the portal (R-5.
 
   it('builds on the shared form value, the Escape guard, the labels and the portal locale', () => {
     expect(importedModules(source)).toEqual([
-      'react', '#shared/clamp.js', '#shared/contracts/collection.js', '#shared/overlay.js', '#shared/provider/context.js',
-      '#shared/provider/use-portal-locale.js', '#shared/use-form-value.js', './lib.js', './types.js',
+      'react', '#shared/clamp.js', '#shared/collection/use-collection.js', '#shared/contracts/collection.js', '#shared/overlay.js',
+      '#shared/provider/context.js', '#shared/provider/use-portal-locale.js', '#shared/use-form-value.js', './constants.js',
+      './lib.js', './types.js',
     ])
     expect(hooksByPart(source)).toEqual({
       toPopupSelector: [],
-      useSelect: ['useFormValue', 'useImperativeHandle', 'useRef', 'useImperativeHandle', 'useId', 'useLabels', 'usePortalLocale', 'useState', 'useEffect'],
+      useSelect: ['useFormValue', 'useImperativeHandle', 'useRef', 'useImperativeHandle', 'useId', 'useLabels', 'usePortalLocale', 'useState', 'useEffect', 'useCollection', 'useCollectionDefaults', 'useEffect'],
     })
   })
 

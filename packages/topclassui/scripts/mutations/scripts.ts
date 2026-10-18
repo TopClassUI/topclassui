@@ -290,4 +290,10 @@ export const MUTATIONS: Mutation[] = [
     from: "  if (hook === null) return ['renders items and has no hook.ts to call useCollection in']",
     to: '  if (hook === null) return []',
   },
+  {
+    label: 'R-8.5-1: a list found by its knob alone, as the file list, stops counting',
+    file: 'scripts/lib/collections.ts',
+    from: ' || takesListRows(`${types ?? \'\'}\\n${rest}`)',
+    to: '',
+  },
 ]

@@ -40,7 +40,7 @@ Every component is `status: 'beta'`. None is `stable`: PLAN 20 asks for the visu
 - The page-scroll check in `e2e/pagination.spec.ts` compares with `documentElement.clientWidth`, which is 15 px lenient under `scrollbar-gutter: stable` (`e2e/table.spec.ts` reads `document.body.clientWidth` since 79f7a6e).
 - `--tc-line` is faint in dark.
 
-**Not built on purpose, and waiting for a reason:** Table's sticky header, loading and error states and row class hook; Pagination's page-size selector (it needs Select); AvatarGroup's `total` and a ring that follows the surface of a Card; `useCollection` in Table and Timeline.
+**Not built on purpose, and waiting for a reason:** Table's loading and error states and row class hook; Pagination's page-size selector (it needs Select); AvatarGroup's `total` and a ring that follows the surface of a Card; `useCollection` in Timeline (PLAN 18 defers it until it grows; Table windows since 17 October).
 
 **GitHub Actions is off** (the billing budget). The gate is `pnpm check` and `pnpm test:mutation` on Omar's machine, run on `main` after every merge.
 

@@ -10,10 +10,13 @@ export type CommandDesignProps = {
   [K in keyof CommandSchemaInput]?: CommandSchemaInput[K] | undefined
 }
 
-/** The part of the shared collection contract the palette takes: no loadMore, no errorFallback. */
-type CommandCollection<T> = Pick<CollectionProps<T>, 'items' | 'getKey' | 'emptyFallback' | 'loadingFallback'> & {
-  /** 'idle', 'loading' or 'empty'. Never 'error': with no errorFallback, a failed fetch would read as No results. */
-  status?: Exclude<Status, 'error' | 'loading-more'> | undefined
+/** The part of the shared collection contract the palette takes: paging on scroll and on search, no errorFallback. */
+type CommandCollection<T> = Pick<CollectionProps<T>,
+  'items' | 'getKey' | 'emptyFallback' | 'loadingFallback' | 'hasMore' | 'loadMore'> & {
+  /** Never 'error': with no errorFallback, a failed fetch would read as No results. */
+  status?: Exclude<Status, 'error'> | undefined
+  /** Called with each new query, so the caller can fetch its first page from the server. */
+  onQueryChange?: ((query: string) => void) | undefined
 }
 
 // R-5.7-5: the popup's own props reach Base UI's popup, with the two of the portal around it.

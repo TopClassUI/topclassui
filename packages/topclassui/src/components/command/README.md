@@ -53,6 +53,9 @@ export function Search({ commands }: { commands: { id: string, label: string }[]
   long label in `min-w-0 flex-1 truncate`.
 - **Long lists.** `virtualize` is `'auto'` (windowing above 200 rows), `true` or `false`.
   Ten thousand rows mount about fifteen at a time. `visibleRows` sets how many rows show.
+- **Paging.** With `hasMore`, `loadMore` is called once as the list nears its end
+  (`loadMoreThreshold` rows away), on scroll and after a new query; `onQueryChange` hands
+  you the query to fetch its first page. `status="loading-more"` sets `aria-busy` on the list.
 - **Nothing found.** The list hides and `labels.collection.noResults` shows, or your
   `emptyFallback`. With `status="loading"` and no items it says `labels.common.loading`,
   or your `loadingFallback`.
@@ -77,7 +80,7 @@ over a listbox, with `aria-activedescendant` on the active row.
 
 - The parts as public exports.
 - The "Esc" and "Enter" key hints: a key name is English text and needs two more labels.
-- `loadMore`, `hasMore` and `errorFallback`.
+- `errorFallback` and a retry row: a failed page is asked again on the next scroll.
 - Icons by name: draw one in `renderItem`.
 - `placement`: it always sits near the top.
 - Home and End: the input keeps them for its caret.
@@ -104,12 +107,16 @@ Required: `getKey`, `getLabel`, `items`, `onSelect`. Every other prop below is o
 | `defaultOpen` | no | `boolean` | `false` | Whether it starts open, when open is not controlled. |
 | `emptyFallback` | no | `ReactNode` | - |  |
 | `getGroup` | no | `((item: T) => string \| undefined)` | - | The heading a row sits under; rows with none come first, in a group with no heading. |
+| `hasMore` | no | `boolean` | - |  |
 | `loadingFallback` | no | `ReactNode` | - |  |
+| `loadMore` | no | `(() => void \| Promise<void>)` | - | Client-only, or a Server Action. Called once when the window nears the end. |
+| `loadMoreThreshold` | no | `integer`, min 0, max 200 | `10` | Rows from the end at which loadMore is called, clamped to 0 to 200. |
 | `onOpenChange` | no | `((open: boolean) => void)` | - |  |
+| `onQueryChange` | no | `((query: string) => void)` | - | Called with each new query, so the caller can fetch its first page from the server. |
 | `open` | no | `boolean` | - | Whether it is open. Use with onOpenChange when controlled. |
 | `renderItem` | no | `((item: T) => ReactNode)` | - | What a row holds in place of its label. It stays one row tall. |
 | `shortcut` | no | `unknown` | `"k"` | The key that opens it with Ctrl or Cmd, wherever focus is; null for none. |
-| `status` | no | `Exclude<Status, 'error' \| 'loading-more'>` | - | 'idle', 'loading' or 'empty'. Never 'error': with no errorFallback, a failed fetch would read as No results. |
+| `status` | no | `Exclude<Status, 'error'>` | - | Never 'error': with no errorFallback, a failed fetch would read as No results. |
 | `virtualize` | no | `unknown` | `"auto"` | Windowing: auto mounts only the rows in view above the provider threshold (200). |
 | `visibleRows` | no | `integer`, min 1, max 100 | `7` | Rows the list shows before it scrolls, clamped to 1 to 100; left out, the --tc-list-rows knob. |
 
@@ -120,6 +127,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/basic.tsx`
 - `dummy/empty-state.tsx`
 - `dummy/groups.tsx`
+- `dummy/load-more.tsx`
 - `dummy/loading.tsx`
 - `dummy/long-content.tsx`
 - `dummy/long-page.tsx`

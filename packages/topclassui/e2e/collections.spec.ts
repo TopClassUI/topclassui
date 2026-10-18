@@ -24,6 +24,13 @@ interface Driver {
 }
 
 const comboboxNames: Record<string, string> = { 'combobox--ten-thousand': 'Ten thousand options', 'combobox--load-more': 'Search results' }
+const commandNames: Record<string, string> = { 'command--ten-thousand': 'Ten thousand commands', 'command--load-more': 'Search results' }
+
+/** The lists that follow R-8.5-1 without windowing, each by the external constraint that stops it: the load-more loop
+ * still runs for them, the ten-thousand loop does not. */
+const UNWINDOWED: Record<string, string> = {
+  select: 'Base UI SelectRoot.js:292-306 moves real focus over the mounted items, with no virtual option',
+}
 
 const DRIVERS: Record<string, Driver> = {
   combobox: {
@@ -39,11 +46,40 @@ const DRIVERS: Record<string, Driver> = {
   command: {
     open: async (page, demo) => {
       await openLive(page, demo)
-      await openOverlay(page, page.locator('#demo button').filter({ hasText: 'Ten thousand commands' }))
+      await openOverlay(page, page.locator('#demo button').filter({ hasText: commandNames[demo] ?? '' }))
       return page.locator('[role="dialog"] [role="listbox"]')
     },
     row: '[role="option"]',
     last: 'Pin page 10000',
+  },
+  'file-upload': {
+    open: async (page, demo) => {
+      await openLive(page, demo)
+      // Ten thousand text files into an images-only upload: every one is refused, and each is a row of the list.
+      const files = Array.from({ length: 10_000 }, (_, index) => ({ name: `File ${String(index + 1)}.txt`, mimeType: 'text/plain', buffer: Buffer.from('') }))
+      await page.locator('#demo input[type="file"]').setInputFiles(files)
+      return page.locator('#demo ul[role="list"]')
+    },
+    row: 'li[data-index]',
+    last: 'File 10000.txt',
+  },
+  select: {
+    open: async (page, demo) => {
+      await openLive(page, demo)
+      await page.getByRole('combobox', { name: 'Search results', exact: true }).click()
+      await atRest(page.locator('[data-placement]'))
+      return page.getByRole('listbox')
+    },
+    row: '[role="option"]',
+    last: '',
+  },
+  table: {
+    open: async (page, demo) => {
+      await openLive(page, demo)
+      return page.locator('#demo [role="region"]').first()
+    },
+    row: 'tbody tr:not([aria-hidden])',
+    last: 'Entry 10000',
   },
   'tree-view': {
     open: async (page, demo) => {
@@ -66,24 +102,28 @@ const COLLECTIONS = readdirSync(COMPONENTS, { withFileTypes: true })
 
 const mounted = (list: Locator, row: string) => list.locator(row).count()
 
+const WINDOWED = COLLECTIONS.filter((slug) => !(slug in UNWINDOWED))
+const PAGED = COLLECTIONS.filter((slug) => takesLoadMore(read(slug, 'types.ts')))
+
 test('a driver for every component whose hook calls useCollection, and nothing else', () => {
-  expect(COLLECTIONS).toEqual(['combobox', 'command', 'tree-view'])
+  expect(COLLECTIONS).toEqual(['combobox', 'command', 'file-upload', 'select', 'table', 'tree-view'])
   expect(Object.keys(DRIVERS).sort()).toEqual(COLLECTIONS)
+  expect(Object.keys(UNWINDOWED).filter((slug) => !COLLECTIONS.includes(slug))).toEqual([])
 })
 
-test('each has a ten-thousand demo, and a load-more demo when its props take loadMore', () => {
+test('each windowed one has a ten-thousand demo, and each has a load-more demo when its props take loadMore', () => {
   const missing = COLLECTIONS.flatMap((slug) => [
-    ...(DEMOS.includes(`${slug}--ten-thousand`) ? [] : [`${slug}--ten-thousand`]),
-    ...(takesLoadMore(read(slug, 'types.ts')) && !DEMOS.includes(`${slug}--load-more`) ? [`${slug}--load-more`] : []),
+    ...(slug in UNWINDOWED || DEMOS.includes(`${slug}--ten-thousand`) ? [] : [`${slug}--ten-thousand`]),
+    ...(PAGED.includes(slug) && !DEMOS.includes(`${slug}--load-more`) ? [`${slug}--load-more`] : []),
   ])
   expect(missing).toEqual([])
-  expect(COLLECTIONS.filter((slug) => takesLoadMore(read(slug, 'types.ts')))).toEqual(['combobox', 'tree-view'])
+  expect(PAGED).toEqual(['combobox', 'command', 'select', 'table', 'tree-view'])
 })
 
 test.describe('live', () => {
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 
-  for (const slug of Object.keys(DRIVERS)) {
+  for (const slug of WINDOWED) {
     const driver = DRIVERS[slug] as Driver
 
     test(`${slug}: ten thousand items keep fewer than a hundred rows mounted at the top, the middle and the end`, async ({ page }) => {
@@ -101,7 +141,8 @@ test.describe('live', () => {
     })
   }
 
-  for (const slug of ['combobox', 'tree-view']) {
+  // Derived, so a list that starts taking loadMore gets this test without an edit here.
+  for (const slug of PAGED) {
     const driver = DRIVERS[slug] as Driver
 
     test(`${slug}: nothing is asked at the top, and scrolling to the end calls loadMore once`, async ({ page }) => {

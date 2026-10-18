@@ -37,7 +37,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'command: status takes error again, and a failed fetch is announced as No results',
     file: TYPES,
-    from: "  status?: Exclude<Status, 'error' | 'loading-more'> | undefined",
+    from: "  status?: Exclude<Status, 'error'> | undefined",
     to: '  status?: Status | undefined',
   },
   {
@@ -195,5 +195,29 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: 'max-w-105 flex-col wrap-anywhere',
     to: 'max-w-105 flex-col overflow-hidden wrap-anywhere',
+  },
+  {
+    label: 'command: the window ignores visibleRows, so a two-row box mounts the rows of seven',
+    file: HOOK,
+    from: '    visibleRows: rows,\n',
+    to: '',
+  },
+  {
+    label: 'command: loadMore is asked while the palette is closed',
+    file: HOOK,
+    from: '(props.hasMore ?? false) && props.open',
+    to: '(props.hasMore ?? false)',
+  },
+  {
+    label: 'command: a new query never reaches onQueryChange, so the caller cannot fetch its first page',
+    file: HOOK,
+    from: '    onQueryChange?.(next)\n',
+    to: '',
+  },
+  {
+    label: 'command: loading-more leaves the list without aria-busy',
+    file: PANEL,
+    from: 'aria-busy={panel.busy || undefined}',
+    to: 'aria-busy={undefined}',
   },
 ]

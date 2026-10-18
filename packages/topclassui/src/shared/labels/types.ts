@@ -59,6 +59,8 @@ export interface Labels {
     readonly browse: string
     readonly remove: string
     readonly tooMany: CountLabel
+    /** After the first refused names, the count of the rest, so ten thousand refusals are not all read out. */
+    readonly refusedMore: CountLabel
     /** The reasons on a rejected file's row, beside its name. */
     readonly tooLarge: string
     readonly wrongType: string

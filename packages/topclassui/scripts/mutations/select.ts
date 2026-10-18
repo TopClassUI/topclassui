@@ -151,4 +151,16 @@ export const MUTATIONS: Mutation[] = [
     from: "collisionAvoidance={side === 'top' || side === 'bottom' ? undefined : SELECT_SIDE_COLLISION_AVOIDANCE}",
     to: 'collisionAvoidance={SELECT_SIDE_COLLISION_AVOIDANCE}',
   },
+  {
+    label: 'the select draws its options from the props again, so a duplicate value is drawn twice',
+    file: CLIENT,
+    from: '{select.options.map(({ item, key }) => (',
+    to: '{items.map((item) => ({ item, key: item.value })).map(({ item, key }) => (',
+  },
+  {
+    label: 'the select stops warning above the windowing threshold, so ten thousand mounted options go unnoticed',
+    file: HOOK,
+    from: 'items.length > virtualizeAbove',
+    to: 'false',
+  },
 ]
