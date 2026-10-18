@@ -1,5 +1,5 @@
 import { readdirSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, sep } from 'node:path'
 
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
@@ -48,7 +48,9 @@ function undocumented(files: readonly string[], host?: ts.CompilerHost): string[
 }
 
 /** A host that also serves the given files from memory, so a fixture needs nothing on disk. */
-function withFiles(files: Record<string, string>): ts.CompilerHost {
+function withFiles(given: Record<string, string>): ts.CompilerHost {
+  // TypeScript asks the host with forward-slash paths on every platform, so the keys use them too.
+  const files = Object.fromEntries(Object.entries(given).map(([name, code]) => [name.split(sep).join('/'), code]))
   const host = ts.createCompilerHost(options)
   const fileExists = host.fileExists.bind(host)
   const readFile = host.readFile.bind(host)
