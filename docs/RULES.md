@@ -178,7 +178,7 @@ They arrive with the phases that need them.
 ### R-5.7-3 Pass through className, style, ref and rest
 **Rule:** every component accepts them and spreads the rest onto its root element; `ref` is a normal prop, never `forwardRef`. A skeleton is a component too.
 **Why:** consumers must be able to extend any component.
-**Enforced by:** `src/test/root-props.dom.test.tsx`, which renders every export and skeleton of every folder from its `test/fixture.ts` (which `check-structure` requires) and proves `className`, `ref` and an unknown `data-*` reach the root, or the element a DECISIONS entry names; `style` is manual
+**Enforced by:** `src/test/root-props.dom.test.tsx`, which renders every export and skeleton of every folder from its `test/fixture.ts` (which `check-structure` requires), one case per branch a prop opens, and proves `className`, `style` (a `--tc-*` variable), `ref` and an unknown `data-*` reach the root at the place a slot of the same parents holds, or the element a DECISIONS bullet names, or the role a portal records; a headless Root must render no element
 
 ### R-5.7-4 Polymorphism through render
 **Rule:** server components accept the element form only, implemented with `renderElement`; client components may also accept the function form through `useRender`.

@@ -1,16 +1,15 @@
 // pnpm test:mutation - the gate on the gates. See scripts/mutations/index.ts.
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join, sep } from 'node:path'
+import { join, relative, sep } from 'node:path'
 import { spawnSync } from 'node:child_process'
 
 import { type Mutation, type Outcome, caughtBy, readAnchors, summarise } from './lib/mutate.js'
-import { findRepoRoot } from './lib/repo-root.js'
+import { WORKSPACE_FILE, findRepoRoot } from './lib/repo-root.js'
 import { MUTATIONS } from './mutations/index.js'
 
 const ROOT = process.cwd()
-// The copy holds the package only, so a test that reads the repo's docs finds them through this.
-const REPO_ROOT = findRepoRoot(ROOT, existsSync) ?? ROOT
+const REPO = findRepoRoot(ROOT, existsSync)
 const only = process.argv.slice(2).find((a) => !a.startsWith('-'))
 // Flags go to vitest, so a crowded machine can ask for fewer workers: pnpm test:mutation tag --maxWorkers=2.
 const flags = process.argv.slice(2).filter((a) => a.startsWith('-'))
@@ -31,12 +30,15 @@ if (missing.length > 0) {
 
 /** Copies the repository, applies the mutation if there is one, and judges a vitest run of the copy. */
 function caughtIn(mutation: Mutation | null): boolean {
-  // The copy keeps the repo layout, so a test that reads docs/ (meta.test reads PLAN 18) finds it.
-  const base = mkdtempSync(join(tmpdir(), 'tc-mutate-'))
-  const dir = join(base, 'packages', 'topclassui')
+  const repo = mkdtempSync(join(tmpdir(), 'tc-mutate-'))
+  // The copy keeps the repository's shape, so a test finds docs/ (PLAN 18, DECISIONS) above the package by findRepoRoot.
+  const dir = REPO ? join(repo, relative(REPO, ROOT)) : repo
   try {
     mkdirSync(dir, { recursive: true })
-    symlinkSync(join(ROOT, '..', '..', 'docs'), join(base, 'docs'), 'junction')
+    if (REPO) {
+      cpSync(join(REPO, WORKSPACE_FILE), join(repo, WORKSPACE_FILE))
+      symlinkSync(join(REPO, 'docs'), join(repo, 'docs'), 'junction')
+    }
     // join, not a literal slash: on Windows the separator is \ and the filter never matched,
     // so cpSync walked into pnpm's symlink store and failed with EPERM.
     const skip = ['node_modules', '.git', '.harness', 'dist', '.pack'].map((name) => join(ROOT, name))
@@ -56,11 +58,11 @@ function caughtIn(mutation: Mutation | null): boolean {
     return caughtBy(spawnSync('node', [join(ROOT, 'node_modules/vitest/vitest.mjs'), 'run', ...flags], {
       cwd: dir,
       encoding: 'utf8',
-      env: { ...process.env, NO_COLOR: '1', TC_REPO_ROOT: REPO_ROOT },
+      env: { ...process.env, NO_COLOR: '1' },
       maxBuffer: 1 << 28,
     }))
   } finally {
-    rmSync(base, { recursive: true, force: true })
+    rmSync(repo, { recursive: true, force: true })
   }
 }
 

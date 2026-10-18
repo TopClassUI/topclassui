@@ -10,6 +10,6 @@ export const fixture: RootPropsFixture<typeof Index> = {
   RadioGroupItem: {
     props: { value: 'a' },
     wrap: (el) => createElement(RadioGroupRoot, { 'aria-label': 'Probe' }, el),
-    target: { ref: 'button[role="radio"]', data: 'button[role="radio"]', decision: '2026-10-15 - Unit 4: where it departs from its plan' },
+    target: { ref: ':scope > button[role="radio"]', data: ':scope > button[role="radio"]', decision: '2026-10-15 - Unit 4: where it departs from its plan' },
   },
 }

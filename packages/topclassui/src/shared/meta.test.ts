@@ -1,8 +1,9 @@
-import { readFileSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import { findRepoRoot } from '../../scripts/lib/repo-root.js'
 import { CATEGORIES, RENDERINGS, STATUSES, TIERS, type ComponentMeta } from './meta.js'
 
 // R-8.3-4 for the catalog: the contract is a type, so this proves every file wears it.
@@ -102,7 +103,7 @@ function planRenderings(plan: string): Map<string, string> {
 }
 
 describe('meta.rendering follows PLAN 18', () => {
-  const plan = planRenderings(readFileSync(join(process.cwd(), '..', '..', 'docs', 'PLAN.md'), 'utf8'))
+  const plan = planRenderings(readFileSync(join(findRepoRoot(process.cwd(), existsSync) ?? process.cwd(), 'docs', 'PLAN.md'), 'utf8'))
 
   it('reads the catalog, so an empty parse cannot pass', () => {
     expect(plan.get('dialog')).toBe('client')

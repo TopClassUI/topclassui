@@ -194,8 +194,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a sidebar link keeps an aria-current written by hand, so a row is announced as current and drawn as any other',
     file: LINK,
-    from: "        ...rest,\n        // After the rest: JSX lets a hyphenated attribute past the type, and the row must look the way it is announced.\n        'aria-current': current ? 'page' : undefined,\n",
-    to: "        'aria-current': current ? 'page' : undefined,\n        ...rest,\n",
+    from: "    ...rest,\n    // After the rest: JSX lets a hyphenated attribute past the type, and the row must look the way it is announced.\n    'aria-current': current ? 'page' : undefined,\n",
+    to: "    'aria-current': current ? 'page' : undefined,\n    ...rest,\n",
   },
   {
     label: 'the label of a sidebar link loses its own element, so a collapsed rail has nothing to hide',
@@ -216,10 +216,16 @@ export const MUTATIONS: Mutation[] = [
     to: '{label}',
   },
   {
+    label: 'a sidebar group puts its links straight in the ul, so the list holds no list item',
+    file: GROUP,
+    from: '{Children.toArray(children).map((child, index) => <li key={isValidElement(child) ? child.key : index}>{child}</li>)}',
+    to: '{children}',
+  },
+  {
     label: 'a sidebar link whose render element holds the text loses its icon and the label that can hide',
     file: LINK,
-    from: '      }, row)}',
-    to: '      })}',
+    from: '  }, row)',
+    to: '  })',
   },
   {
     label: 'the icon of a sidebar link loses its wrapper, so its colour would have to sit on the svg',
