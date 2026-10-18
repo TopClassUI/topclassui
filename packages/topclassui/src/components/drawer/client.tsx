@@ -6,7 +6,7 @@ import { x } from '#icons/data/x.js'
 import { POPUP_PASSIVE, VIEWPORT_PASSIVE } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
 import { OverlayScopeContext } from '#shared/overlay-scope.js'
-import { hasContent, renderTrigger } from '#shared/render-trigger.js'
+import { hasContent, renderPart, renderTrigger } from '#shared/render-trigger.js'
 import { Svg } from '#components/svg/index.js'
 import {
   DRAWER_BACKDROP, DRAWER_BODY, DRAWER_CLOSE, DRAWER_DESCRIPTION, DRAWER_EDGE, DRAWER_FOOTER, DRAWER_GRABBER,
@@ -87,20 +87,23 @@ export function DrawerHeader({ className, ...rest }: DrawerHeaderProps) {
 }
 
 /** Base UI's title, an h2 that names the sheet. */
-export function DrawerTitle({ className, ...rest }: DrawerTitleProps) {
-  return <Base.Title {...rest} className={cn(DRAWER_TITLE, className)} />
+export function DrawerTitle({ className, render, ...rest }: DrawerTitleProps) {
+  const part = renderPart(render, cn(DRAWER_TITLE, className))
+  return <Base.Title {...rest} render={part.render} className={part.className} />
 }
 
 /** Base UI's description, a paragraph the sheet is described by. */
-export function DrawerDescription({ className, ...rest }: DrawerDescriptionProps) {
-  return <Base.Description {...rest} className={cn(DRAWER_DESCRIPTION, className)} />
+export function DrawerDescription({ className, render, ...rest }: DrawerDescriptionProps) {
+  const part = renderPart(render, cn(DRAWER_DESCRIPTION, className))
+  return <Base.Description {...rest} render={part.render} className={part.className} />
 }
 
 /** R-10.5-1: the scroll container, and Base UI's Content: a mouse drag in it selects text and
  * never moves the sheet. While it scrolls it is a tab stop, so the keyboard reaches a long text. */
-export function DrawerBody({ ref, className, ...rest }: DrawerBodyProps) {
+export function DrawerBody({ ref, className, render, ...rest }: DrawerBodyProps) {
   const body = useDrawerBody(ref)
-  return <Base.Content tabIndex={body.tabIndex} {...rest} ref={body.ref} className={cn(DRAWER_BODY, className)} />
+  const part = renderPart(render, cn(DRAWER_BODY, className))
+  return <Base.Content tabIndex={body.tabIndex} {...rest} ref={body.ref} render={part.render} className={part.className} />
 }
 
 /** The bar that stays put below the body, for the actions. */

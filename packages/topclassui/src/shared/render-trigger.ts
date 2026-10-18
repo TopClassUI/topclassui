@@ -12,6 +12,18 @@ function withoutChildren(element: ReactElement<Own>, merged: Own): ReactElement 
   return createElement(element.type, props)
 }
 
+/** The element a render prop holds, or undefined for a function form or nothing. */
+function elementOf(render: unknown): ReactElement<Own> | undefined {
+  // Flight hands an element built in a Server Component over as a lazy wrapper; toArray unwraps it.
+  const element = isValidElement(render) || typeof render === 'function' ? render : Children.toArray(render as ReactNode)[0]
+  return isValidElement<Own>(element) ? element : undefined
+}
+
+/** In Base UI the element's own props win, so a children key with no value would erase the part's label. */
+function isBare(own: ReactElement<Own>): boolean {
+  return 'children' in own.props && own.props.children === undefined
+}
+
 /** The `render` and `className` an overlay trigger hands its Base UI part. An element takes the
  * className through cn(), so the caller's class wins, and loses a children key that holds nothing,
  * so the part's label is not erased; a function form, or nothing to change, comes back as given. */
@@ -19,15 +31,24 @@ export function renderTrigger<Render>(
   render: Render,
   className: string | undefined,
 ): { render: Render | ReactElement, className: string | undefined } {
-  // Flight hands an element built in a Server Component over as a lazy wrapper; toArray unwraps it.
-  const element = isValidElement(render) || typeof render === 'function' ? render : Children.toArray(render as ReactNode)[0]
-  const own = isValidElement<Own>(element) ? element : undefined
-  // In Base UI the element's own props win, so a children key with no value would erase the part's label.
-  const bare = own !== undefined && 'children' in own.props && own.props.children === undefined
+  const own = elementOf(render)
+  const bare = own !== undefined && isBare(own)
   if (!own || (className === undefined && !bare)) return { render, className }
   // Base UI only joins the two class strings, and a server-built Button has already run its cn().
   const merged = className === undefined ? {} : { className: cn(own.props.className, className) }
   return { render: bare ? withoutChildren(own, merged) : cloneElement(own, merged), className: undefined }
+}
+
+/** The `render` and `className` a styled part hands its Base UI part: `base` is the part's finished
+ * class, and an element's own class follows it through cn(), as renderElement orders them. */
+export function renderPart<Render>(
+  render: Render,
+  base: string,
+): { render: Render | ReactElement, className: string | undefined } {
+  const own = elementOf(render)
+  if (!own) return { render, className: base }
+  const merged = { className: cn(base, own.props.className) }
+  return { render: isBare(own) ? withoutChildren(own, merged) : cloneElement(own, merged), className: undefined }
 }
 
 /** Whether children put anything on the page, which decides between a part's built-in control and

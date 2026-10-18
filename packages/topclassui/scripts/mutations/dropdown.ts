@@ -168,8 +168,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a dropdown link item drops the colour of its tone, so a destructive link looks like any other',
     file: CLIENT,
-    from: '<Base.LinkItem closeOnClick {...rest} data-tone={tone} className={cn(DROPDOWN_ITEM, DROPDOWN_ITEM_TONE[tone], className)}>',
-    to: '<Base.LinkItem closeOnClick {...rest} data-tone={tone} className={cn(DROPDOWN_ITEM, className)}>',
+    from: 'cn(DROPDOWN_ITEM, DROPDOWN_ITEM_TONE[tone], className))\n  return (\n    <Base.LinkItem',
+    to: 'cn(DROPDOWN_ITEM, className))\n  return (\n    <Base.LinkItem',
   },
   {
     label: 'a dropdown shortcut keeps its width beside a label it cuts, so at a doubled text size a row loses its name',

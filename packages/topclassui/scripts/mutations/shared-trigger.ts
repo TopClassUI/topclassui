@@ -5,8 +5,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'renderTrigger hands the className back after merging it into the element, so Base UI writes the class a second time',
     file: 'src/shared/render-trigger.ts',
-    from: 'className: undefined }',
-    to: 'className }',
+    from: 'bare ? withoutChildren(own, merged) : cloneElement(own, merged), className: undefined }',
+    to: 'bare ? withoutChildren(own, merged) : cloneElement(own, merged), className }',
   },
   {
     label: 'renderTrigger copies a render element it has nothing to change on, so a lazy wrapper is unwrapped and rebuilt on every render',
@@ -17,7 +17,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'renderTrigger stops looking for a children key that holds nothing, so a label left on a trigger is erased by its render element',
     file: 'src/shared/render-trigger.ts',
-    from: "const bare = own !== undefined && 'children' in own.props && own.props.children === undefined",
+    from: 'const bare = own !== undefined && isBare(own)',
     to: 'const bare = false',
   },
   {
@@ -25,6 +25,24 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/shared/render-trigger.ts',
     from: ' && own.props.children === undefined',
     to: '',
+  },
+  {
+    label: "renderPart puts the part's class after the render element's, so the part's own class beats the caller's",
+    file: 'src/shared/render-trigger.ts',
+    from: 'cn(base, own.props.className)',
+    to: 'cn(own.props.className, base)',
+  },
+  {
+    label: "renderPart hands the part's class back beside the element too, so Base UI appends it after the element's and it wins again",
+    file: 'src/shared/render-trigger.ts',
+    from: 'isBare(own) ? withoutChildren(own, merged) : cloneElement(own, merged), className: undefined }',
+    to: 'isBare(own) ? withoutChildren(own, merged) : cloneElement(own, merged), className: base }',
+  },
+  {
+    label: 'renderPart drops the part\'s class when it is given no element, so a title or a row loses its look',
+    file: 'src/shared/render-trigger.ts',
+    from: 'if (!own) return { render, className: base }',
+    to: 'if (!own) return { render, className: undefined }',
   },
   {
     label: 'useScrollTabStop measures one axis only, so a box that scrolls sideways is never a tab stop',

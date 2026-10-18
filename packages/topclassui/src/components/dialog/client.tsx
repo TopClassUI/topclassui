@@ -6,7 +6,7 @@ import { x } from '#icons/data/x.js'
 import { POPUP_PASSIVE, VIEWPORT_PASSIVE } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
 import { OverlayScopeContext } from '#shared/overlay-scope.js'
-import { hasContent, renderTrigger } from '#shared/render-trigger.js'
+import { hasContent, renderPart, renderTrigger } from '#shared/render-trigger.js'
 import { Svg } from '#components/svg/index.js'
 import {
   DIALOG_BACKDROP, DIALOG_BODY, DIALOG_CLOSE, DIALOG_DESCRIPTION, DIALOG_FOOTER, DIALOG_HEADER, DIALOG_HEADING,
@@ -82,13 +82,15 @@ export function DialogHeader({
 }
 
 /** Base UI's title, an h2 that names the popup. */
-export function DialogTitle({ className, ...rest }: DialogTitleProps) {
-  return <Base.Title {...rest} className={cn(DIALOG_TITLE, className)} />
+export function DialogTitle({ className, render, ...rest }: DialogTitleProps) {
+  const part = renderPart(render, cn(DIALOG_TITLE, className))
+  return <Base.Title {...rest} render={part.render} className={part.className} />
 }
 
 /** Base UI's description, a paragraph the popup is described by. */
-export function DialogDescription({ className, ...rest }: DialogDescriptionProps) {
-  return <Base.Description {...rest} className={cn(DIALOG_DESCRIPTION, className)} />
+export function DialogDescription({ className, render, ...rest }: DialogDescriptionProps) {
+  const part = renderPart(render, cn(DIALOG_DESCRIPTION, className))
+  return <Base.Description {...rest} render={part.render} className={part.className} />
 }
 
 /** R-10.5-1: the scroll container. The header and the footer keep their boxes around it.

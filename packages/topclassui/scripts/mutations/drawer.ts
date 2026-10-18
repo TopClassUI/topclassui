@@ -287,8 +287,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the drawer body never hands its element to its hook, so nothing is measured and it is never a tab stop',
     file: CLIENT,
-    from: '{...rest} ref={body.ref} className={cn(DRAWER_BODY, className)}',
-    to: '{...rest} className={cn(DRAWER_BODY, className)}',
+    from: '{...rest} ref={body.ref} render={part.render}',
+    to: '{...rest} render={part.render}',
   },
   {
     label: 'the drawer x loses its name, so a screen reader announces a button and nothing else',

@@ -125,13 +125,9 @@ The format is: date, decision, why, and what it affects.
 
 **Affects.** R-5.7-5, `eslint-rules/index.ts` (`props-derived-at-the-seam`), `eslint.config.ts` (the test and demo override).
 
-## 2026-10-17 - R-5.2-2's lint lets a caller's class follow the consumer's className
+## 2026-10-17 - R-5.2-2: which caller class wins when a part takes a render element
 
-**Decision.** `topclass/cn-class-name-last` reports a `cn()` call where `className`, `props.className` or `props['className']` is followed by any argument that is not itself a `className` read (`className`, or the `className` key of any object). So `cn(BUTTON, className)` passes, `cn(className, BUTTON)` fails, and `cn(props['className'], own['className'])` in `renderElement` (`src/shared/render.ts`) passes with no lint disable.
-
-**Why.** The rule exists so a component's own classes never beat the consumer's. In `renderElement`, `props` is the component's finished prop set, already holding the consumer's `className` merged after the component's classes, and `own` is the element the same caller wrote in `render={<a className="..." />}`, which is the more specific of the two and has to win; swapping the arguments would invert that. Two classes the caller wrote are ordered by specificity, not by this rule. The narrowing is shape-only and keeps the package's zero-disable policy; an own class after the pair (`cn(props.className, own.className, 'flex')`) is still reported.
-
-**Affects.** R-5.2-2, `eslint-rules/index.ts`, `src/shared/render.ts`.
+**Decision.** `renderElement(element, base)` (`src/shared/render.ts`) and `renderPart(render, base)` (`src/shared/render-trigger.ts`) put the `render` element's own class after the component's finished class `cn(OWN, className)`, as Base UI does (`useRenderElement.js:133`), with no lint narrowing; `renderTrigger` puts a trigger's or a close's `className` after its `render` element's class, since that part has no class of its own.
 
 ## 2026-10-17 - R-5.3-4 is linted everywhere in src but the tests
 
