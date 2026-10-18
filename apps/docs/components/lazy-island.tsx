@@ -36,19 +36,53 @@ export function LazyIsland<P extends object>({ load, props, when = 'near' }: Laz
   const [island] = useState(() => {
     const { promise, open } = gate()
     const waits = hasServerHtml(id)
+    const state: { open: () => void; waits: boolean; live: boolean; onLive: () => void } = { open, waits, live: !waits, onLive: () => undefined }
     const Island = lazy(async () => {
       if (waits) await promise
-      return { default: await load() }
+      const Loaded = await load()
+      return {
+        default: function Hydrated(loadedProps: P) {
+          useEffect(() => {
+            state.live = true
+            state.onLive()
+          }, [])
+          return <Loaded {...loadedProps} />
+        },
+      }
     })
-    return { Island, open, waits }
+    return { Island, state }
   })
 
   useEffect(() => {
     const element = box.current
     if (element === null) return
     element.setAttribute('data-island-live', '')
-    const open = () => { island.open() }
+    const open = () => { island.state.open() }
     for (const type of EAGER) element.addEventListener(type, open, { once: true, passive: true })
+    // A press or a hover that lands before the chunk does is held, then given again once the island has hydrated; a link still navigates at once.
+    let pressed: HTMLElement | null = null
+    let hovered: Element | null = null
+    const hold = (event: MouseEvent) => {
+      if (island.state.live || !(event.target instanceof HTMLElement) || event.target.closest('a[href]') !== null) return
+      event.preventDefault()
+      event.stopPropagation()
+      pressed = event.target
+      open()
+    }
+    const over = (event: PointerEvent) => { if (!island.state.live && event.target instanceof Element) hovered = event.target }
+    const out = () => { hovered = null }
+    element.addEventListener('click', hold, true)
+    element.addEventListener('pointerover', over, true)
+    element.addEventListener('pointerout', out, true)
+    island.state.onLive = () => {
+      if (hovered?.isConnected === true) {
+        hovered.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }))
+        hovered.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+        hovered.dispatchEvent(new MouseEvent('mousemove', { bubbles: true }))
+      }
+      if (pressed?.isConnected === true) pressed.click()
+      pressed = null
+    }
     let cancel: () => void = () => undefined
     if (when === 'idle') {
       // Safari has no requestIdleCallback; a timer still runs after the first paint.
@@ -70,6 +104,9 @@ export function LazyIsland<P extends object>({ load, props, when = 'near' }: Laz
     return () => {
       cancel()
       for (const type of EAGER) element.removeEventListener(type, open)
+      element.removeEventListener('click', hold, true)
+      element.removeEventListener('pointerover', over, true)
+      element.removeEventListener('pointerout', out, true)
     }
   }, [island, when])
 
@@ -77,7 +114,7 @@ export function LazyIsland<P extends object>({ load, props, when = 'near' }: Laz
   return (
     <div ref={box} data-island={id} className="contents">
       <Activity mode="visible">
-        {island.waits || typeof window === 'undefined'
+        {island.state.waits || typeof window === 'undefined'
           ? <island.Island {...props} />
           : <Suspense fallback={null}><island.Island {...props} /></Suspense>}
       </Activity>
