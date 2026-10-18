@@ -60,7 +60,9 @@ export function ringOf(page: Page, holder?: string): Promise<OutlineRing> {
 export function rowRingOf(row: Locator): Promise<OutlineRing> {
   return row.evaluate((element) => {
     const style = getComputedStyle(element)
-    return { visible: element.hasAttribute('data-highlighted'), style: style.outlineStyle, width: style.outlineWidth }
+    // Some Chromium builds resolve outline-width to the medium 3px even with outline-style none; an absent ring is 0.
+    const width = style.outlineStyle === 'none' ? '0px' : style.outlineWidth
+    return { visible: element.hasAttribute('data-highlighted'), style: style.outlineStyle, width }
   })
 }
 
