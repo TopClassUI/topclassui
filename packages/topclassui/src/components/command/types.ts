@@ -21,7 +21,7 @@ type CommandCollection<T> = Pick<CollectionProps<T>,
 
 // R-5.7-5: the popup's own props reach Base UI's popup, with the two of the portal around it.
 type CommandPopupProps = Omit<Base.Popup.Props, 'className' | 'children' | 'render' | 'onSelect'>
-  & Pick<Base.Portal.Props, 'container' | 'keepMounted'>
+  & Omit<Base.Portal.Props, 'className' | keyof Base.Popup.Props>
 
 export type CommandProps<T> = CommandCollection<T> & CommandDesignProps & CommandPopupProps & {
   /** The text a row shows and the query is matched against, word by word. */

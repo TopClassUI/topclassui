@@ -46,11 +46,13 @@ describe('eslint.config.ts arms the custom rules', () => {
     const off = exempt.flatMap((b) =>
       Object.entries(b.rules ?? {}).filter(([r, l]) => r.startsWith('topclass/') && l === 'off').map(([r]) => r))
     // Each of these rules is written "inside src/", and a test or a demo is inside src/:
-    // one has to write the banned string to prove the rule, the other to show real usage.
+    // one has to write the banned string to prove the rule, the other to show real usage;
+    // a type test compares against Base UI's raw props.
     expect([...new Set(off)].sort()).toEqual([
       'topclass/logical-properties-only',
       'topclass/no-fetch-in-components',
       'topclass/no-physical-placement',
+      'topclass/props-derived-at-the-seam',
       'topclass/semantic-classes-only',
       'topclass/shared-class-constants',
       'topclass/style-sets-tokens-only',

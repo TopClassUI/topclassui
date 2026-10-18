@@ -978,15 +978,14 @@ const rules = {
         reexport: 'R-5.7-5: never re-export a Base UI type. Name it here: export type DialogRootProps = Omit<Base.Root.Props, \'className\'> & OwnProps.',
         bare: 'R-5.7-5: {{name}} is used whole, so its className reaches the consumer unmerged. Derive it: Omit<{{name}}, \'className\'> & OwnProps.',
         omit: 'R-5.7-5: Omit<{{name}}, ...> keeps className. Name \'className\' among the omitted keys, so ours is the only one.',
-        pick: 'R-5.7-5: Pick<{{name}}, ...> takes className from Base UI. Omit it there and declare our own.',
+        pick: 'R-5.7-5: Pick<{{name}}, ...> hand-copies a list of Base UI props and hides every new one. Omit what is ours, with \'className\', instead.',
       },
     },
     create(ctx: Context) {
-      const file = String(ctx.filename ?? ctx.getFilename?.() ?? '').replace(/\\/g, '/')
-      const typesFile = /(^|\/)types\.ts$/.test(file)
       const base = new Set<string>()
       const aliases = new Map<string, Node>()
       const pinned = new Set<string>()
+      const privateRefs = new Map<string, Node>()
       const uses: Node[] = []
       const text = (node: Node) => String(ctx.sourceCode.getText(node))
       const isBaseProps = (name: Node) =>
@@ -1003,7 +1002,7 @@ const rules = {
         if (holder && parent.params[0] === node && (generic === 'Omit' || generic === 'Pick')) {
           const keys = keysOf(parent.params[1], aliases)
           if (generic === 'Omit' && !keys.includes('className')) ctx.report({ node, messageId: 'omit', data: { name: label } })
-          if (generic === 'Pick' && keys.includes('className')) ctx.report({ node, messageId: 'pick', data: { name: label } })
+          if (generic === 'Pick') ctx.report({ node, messageId: 'pick', data: { name: label } })
           return
         }
         ctx.report({ node, messageId: 'bare', data: { name: label } })
@@ -1026,17 +1025,24 @@ const rules = {
         TSTypeAliasDeclaration(node: Node) {
           aliases.set(String(node.id.name), node.typeAnnotation)
           const body = node.typeAnnotation
-          // A private alias that pins Base UI's generics is Base UI's props by another name.
-          if (body?.type === 'TSTypeReference' && isBasePropsName(body.typeName, base)
-            && node.parent?.type !== 'ExportNamedDeclaration') pinned.add(String(node.id.name))
+          if (body?.type === 'TSTypeReference' && node.parent?.type !== 'ExportNamedDeclaration') privateRefs.set(String(node.id.name), body.typeName)
         },
         TSTypeReference(node: Node) {
-          if (typesFile) uses.push(node)
+          uses.push(node)
         },
         TSInterfaceHeritage(node: Node) {
-          if (typesFile) uses.push(node)
+          uses.push(node)
         },
         'Program:exit'() {
+          // A private alias of Base UI's props, or of such an alias, is Base UI's props by another name.
+          for (let grew = true; grew;) {
+            grew = false
+            for (const [name, ref] of privateRefs) {
+              if (pinned.has(name) || !isBaseProps(ref)) continue
+              pinned.add(name)
+              grew = true
+            }
+          }
           for (const node of uses) {
             const name = node.type === 'TSInterfaceHeritage' ? node.expression : node.typeName
             if (isBaseProps(name)) check(node)

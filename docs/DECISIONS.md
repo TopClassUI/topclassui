@@ -119,11 +119,11 @@ The format is: date, decision, why, and what it affects.
 
 ## 2026-10-17 - What counts as derived at the seam (R-5.7-5)
 
-**Decision.** In `types.ts` a Base UI `.Props` may be omitted from with `'className'` among the keys, picked from without `'className'`, read by index (`Props['modal']`), taken with `keyof`, or pinned to its generics in a private alias that is then used in one of those ways. Used whole, in an intersection, in an `extends` or in an exported alias, it is refused. A headless root with no `className` (Select, Combobox, Menu) still names it in its `Omit`, so a later Base UI release cannot add one unmerged.
+**Decision.** In any file under `src/` a Base UI `.Props` may be omitted from with `'className'` among the keys, read by index (`Props['modal']`), taken with `keyof`, or pinned to its generics in a private alias (or an alias of one) that is then used in one of those ways. Used whole, in an intersection, in an `extends`, in an exported alias or in a `Pick`, it is refused. A Popup part takes the Portal's own props as `Omit<Base.Portal.Props, 'className' | keyof Base.Popup.Props>`; a hook input picks from our own derived type, never from Base UI's. A headless root with no `className` (Select, Combobox, Menu) still names it in its `Omit`, so a later Base UI release cannot add one unmerged. Tests and demos are outside the rule: a type test compares ours against Base UI's raw props on purpose.
 
-**Why.** A `Pick` of named props and an indexed prop type are derivations too; neither copies a list nor carries Base UI's `className`. A hand-copied list cannot be told from a list of our own props by syntax, so it stays review.
+**Why.** An indexed prop type is a derivation; a `Pick` is a hand-copied list that hides every prop it does not name (PLAN.md 5.7), as DatePicker's open state hid `onOpenChangeComplete`. A hand-copied list of own props cannot be told from a list of our own props by syntax, so it stays review.
 
-**Affects.** R-5.7-5, `eslint-rules/index.ts` (`props-derived-at-the-seam`).
+**Affects.** R-5.7-5, `eslint-rules/index.ts` (`props-derived-at-the-seam`), `eslint.config.ts` (the test and demo override).
 
 ## 2026-10-17 - R-5.2-2's lint lets a caller's class follow the consumer's className
 

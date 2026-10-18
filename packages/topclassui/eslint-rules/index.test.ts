@@ -797,6 +797,12 @@ describe('R-5.7-5: public types are derived from Base UI at the seam', () => {
     ['a pinned alias omitted without className', `${IMPORT}type BaseRoot = Base.Root.Props<string>\nexport type P = Omit<BaseRoot, 'children'>`, 'omit'],
     ['a pinned alias that is exported', `${IMPORT}export type BaseRoot = Base.Root.Props<string>`, 'bare'],
     ['a Pick that takes className', `${IMPORT}export type P = Pick<Base.Root.Props, 'open' | 'className'>`, 'pick'],
+    ['a Pick of named props', `${IMPORT}export type P = Pick<Base.Root.Props, 'open'>`, 'pick'],
+    ['a Pick of the Portal props', `${IMPORT}export type P = Pick<Base.Portal.Props, 'container' | 'keepMounted'>`, 'pick'],
+    ['a Pick of a pinned alias', `${IMPORT}type BaseRoot = Base.Root.Props<string>\nexport type P = Pick<BaseRoot, 'open'>`, 'pick'],
+    ['an alias of a pinned alias, exported', `${IMPORT}type A = Base.Root.Props\ntype B = A\nexport type P = B`, 'bare'],
+    ['an alias of a pinned alias, omitted without className', `${IMPORT}type A = Base.Root.Props\ntype B = A\nexport type P = Omit<B, 'handle'>`, 'omit'],
+    ['an alias of a pinned alias declared first', `${IMPORT}type B = A\ntype A = Base.Root.Props\nexport type P = B & {}`, 'bare'],
     ['a namespace with Props directly on it', "import type { RadioGroup } from '@base-ui/react/radio-group'\nexport type P = RadioGroup.Props & {}", 'bare'],
   ]
   for (const [label, code, messageId] of bad) {
@@ -811,7 +817,9 @@ describe('R-5.7-5: public types are derived from Base UI at the seam', () => {
     ['className through a local alias of keys', `${IMPORT}type Removed = 'handle'\ntype Owned = 'className' | Removed\nexport type P = Omit<Base.Root.Props, Owned>`],
     ['a key alias declared after its use', `${IMPORT}export type P = Omit<Base.Root.Props, Owned>\ntype Owned = 'className' | 'ref'`],
     ['a private alias that pins the generics', `${IMPORT}type BaseRoot = Base.Root.Props<string>\nexport type P = Omit<BaseRoot, 'className'>`],
-    ['a Pick of named props', `${IMPORT}export type P = Pick<Base.Portal.Props, 'container' | 'keepMounted'>`],
+    ['the Portal props a Popup part folds in', `${IMPORT}export type P = Omit<Base.Portal.Props, 'className' | keyof Base.Popup.Props>`],
+    ['a Pick of our own derived props', `${IMPORT}type Own = Omit<Base.Root.Props, 'className'>\nexport type P = Pick<Own, 'open'>`],
+    ['an alias of a pinned alias used by index', `${IMPORT}type A = Base.Root.Props\ntype B = A\nexport type Open = B['open']`],
     ['one prop read by index', `${IMPORT}export type DialogModal = NonNullable<Base.Root.Props['modal']>`],
     ['the keys of the props', `${IMPORT}type Owned = keyof Base.Root.Props`],
     ['an interface that extends the Omit', `${IMPORT}export interface P extends Omit<Base.Root.Props, 'className'> {}`],
@@ -824,9 +832,10 @@ describe('R-5.7-5: public types are derived from Base UI at the seam', () => {
     })
   }
 
-  it('reads only types.ts for the derivation, where R-8.3-4 puts every prop type', () => {
+  it('reads every file for the derivation, not only types.ts', () => {
     const code = `${IMPORT}export type P = Base.Root.Props`
-    expect(own(code, 'src/shared/overlay.ts')).toEqual([])
+    expect(own(code, 'src/shared/overlay.ts')).toEqual(['bare'])
+    expect(own(`${IMPORT}type P = Pick<Base.Root.Props, 'open'>`, 'src/components/x/hook.ts')).toEqual(['pick'])
   })
 
   it('refuses a Base UI re-export in any file, not only types.ts', () => {
