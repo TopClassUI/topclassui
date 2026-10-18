@@ -13,7 +13,7 @@ import { FORCED_CANVAS, contrast, rgbOf } from './pixels.js'
 // What happy-dom cannot lay out or open: the windowed list in a real popup, the highlight on rows that are not mounted,
 // where the popup lands, what a finger and a zoomed page get, the server HTML a form sends, and a form reset.
 
-const DEMOS = ['basic', 'form', 'load-more', 'long-content', 'rtl', 'sizes', 'states', 'status', 'ten-thousand'].map((demo) => `combobox--${demo}`)
+const DEMOS = ['basic', 'form', 'load-more', 'long-content', 'playground', 'rtl', 'sizes', 'states', 'status', 'ten-thousand'].map((demo) => `combobox--${demo}`)
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 const POPUP = '[data-placement]'

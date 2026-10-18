@@ -64,7 +64,7 @@ describe('a server-rendered DatePicker hydrates cleanly', () => {
 
 describe('every demo renders and hydrates', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'form', 'in-field', 'limits', 'rtl', 'sizes', 'states', 'week-start'])
+    expect(names).toEqual(['basic', 'form', 'in-field', 'limits', 'playground', 'rtl', 'sizes', 'states', 'week-start'])
   })
 
   for (const [name, Demo] of DEMOS) {

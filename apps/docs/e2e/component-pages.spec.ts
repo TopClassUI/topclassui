@@ -1,28 +1,11 @@
 import AxeBuilder from '@axe-core/playwright'
-import { type Page, expect, test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
+
+import { card, collectErrors, openIn } from './pages'
 
 const SLUGS = ['button', 'tag', 'kbd', 'segmented-control', 'alert', 'toast', 'banner', 'progress', 'spinner', 'empty-state'] as const
 const LOCALES = [{ locale: 'en', dir: 'ltr' }, { locale: 'ar', dir: 'rtl' }] as const
 const MODES = ['light', 'dark', 'ocean'] as const
-
-/** Every console error and uncaught exception: a hydration mismatch is one of them. */
-function collectErrors(page: Page): string[] {
-  const errors: string[] = []
-  page.on('pageerror', (error) => errors.push(error.message))
-  // The site's icon is the shell's (S6 manifest.ts); until it lands the browser's own /favicon.ico request 404s.
-  page.on('console', (message) => {
-    if (message.type() === 'error' && !message.location().url.endsWith('/favicon.ico')) errors.push(`${message.text()} ${message.location().url}`)
-  })
-  return errors
-}
-
-async function openIn(page: Page, path: string, mode: string) {
-  await page.addInitScript((stored) => { localStorage.setItem('tc-theme', stored) }, mode)
-  const response = await page.goto(path)
-  expect(response?.status()).toBe(200)
-}
-
-const card = (page: Page, slug: string) => page.locator(`[data-component="${slug}"]`)
 
 for (const slug of SLUGS) {
   for (const { locale, dir } of LOCALES) {
@@ -115,6 +98,19 @@ test('a live example hydrates: a segmented control in the examples answers a cli
   const radios = page.locator('section[aria-labelledby="examples"] [role="radiogroup"]').nth(2).getByRole('radio')
   await radios.nth(1).click()
   await expect(radios.nth(1)).toHaveAttribute('aria-checked', 'true')
+})
+
+test('Kbd: the keys of an English sentence keep its order on the Arabic page', async ({ page }) => {
+  await page.goto('/ar/docs/components/kbd')
+  const sentences = page.locator('section[aria-labelledby="examples"] p', { hasText: 'Press' })
+  await expect(sentences).toHaveCount(4)
+  for (const sentence of await sentences.all()) {
+    const keys = sentence.locator('kbd kbd, kbd:not(:has(kbd))')
+    const lefts = await keys.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().left))
+    const text = await sentence.textContent() ?? ''
+    expect(lefts, text).toHaveLength(2)
+    expect(lefts[0], text).toBeLessThan(lefts[1] ?? 0)
+  }
 })
 
 test('the density knob writes --tc-density on the examples only', async ({ page }) => {

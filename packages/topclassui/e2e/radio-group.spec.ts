@@ -14,7 +14,7 @@ import { FORCED_CANVAS, contrast, inkOn, pixelsOf, rgbOf } from './pixels.js'
 
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['basic', 'form', 'horizontal', 'long-content', 'rtl', 'sizes', 'states'].map((demo) => `radio-group--${demo}`)
+const DEMOS = ['basic', 'form', 'horizontal', 'long-content', 'playground', 'rtl', 'sizes', 'states'].map((demo) => `radio-group--${demo}`)
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 const NAMES = { xs: 'Extra small', sm: 'Small', md: 'Medium', lg: 'Large', xl: 'Extra large' } as const
 

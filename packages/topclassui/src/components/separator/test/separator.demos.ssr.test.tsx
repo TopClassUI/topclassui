@@ -11,13 +11,15 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['horizontal', 'rtl', 'semantic', 'vertical']
+const EXPECTED = ['horizontal', 'playground', 'rtl', 'semantic', 'states', 'vertical']
 
 /** What each demo must hold: its separators, by orientation and role, in document order. */
 const SEPARATORS: Record<string, string[]> = {
   horizontal: ['horizontal none'],
+  playground: ['horizontal none'],
   rtl: ['horizontal none', 'vertical none'],
   semantic: ['horizontal separator', 'vertical separator'],
+  states: ['horizontal none', 'vertical none'],
   vertical: ['vertical none'],
 }
 

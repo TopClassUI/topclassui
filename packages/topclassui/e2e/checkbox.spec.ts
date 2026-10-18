@@ -14,7 +14,7 @@ import { FORCED_CANVAS, contrast, inkOn, paintedIn, pixelsOf, rgbOf, ringRow } f
 
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['checkbox--basic', 'checkbox--form', 'checkbox--labelled', 'checkbox--rtl', 'checkbox--sizes', 'checkbox--states'] as const
+const DEMOS = ['checkbox--basic', 'checkbox--form', 'checkbox--labelled', 'checkbox--playground', 'checkbox--rtl', 'checkbox--sizes', 'checkbox--states'] as const
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 const NAMES = { xs: 'Extra small', sm: 'Small', md: 'Medium', lg: 'Large', xl: 'Extra large' } as const
 

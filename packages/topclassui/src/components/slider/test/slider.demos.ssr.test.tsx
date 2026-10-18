@@ -11,12 +11,13 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'range', 'rtl', 'show-value', 'sizes', 'states']
+const EXPECTED = ['basic', 'form', 'playground', 'range', 'rtl', 'show-value', 'sizes', 'states']
 
 /** Each range input of each demo as the server writes it: the name a screen reader gets with no script, and the value. */
 const THUMBS: Record<string, string[]> = {
   'basic': ['Volume 60'],
   'form': ['Volume 60'],
+  'playground': ['Volume 60'],
   'range': ['Minimum 20', 'Maximum 80'],
   'rtl': ['مستوى الصوت 30', 'الحد الأدنى 20', 'الحد الأقصى 80'],
   'show-value': ['Brightness 40', 'Minimum 200', 'Maximum 800'],
@@ -40,7 +41,7 @@ function thumbsIn(html: string): string[] {
 }
 
 describe('every demo renders on the server', () => {
-  it('holds exactly the seven demos asked for, so none can be deleted silently', () => {
+  it('holds exactly the eight demos asked for, so none can be deleted silently', () => {
     expect(files).toEqual(EXPECTED)
   })
 
@@ -68,6 +69,13 @@ describe('the demos the plan names', () => {
     const html = await render('form')
     expect(html).toMatch(/^<form class="[^"]*">/)
     expect(html).toMatch(/<input [^>]*type="range" name="volume" value="60"\/>/)
+  })
+
+  it('playground: the schema props a Try it control sets reach the slider', async () => {
+    const loaded = await import('../dummy/playground.js') as { default: ComponentType<{ size?: string, showValue?: boolean }> }
+    const html = markup(<loaded.default size="lg" showValue />)
+    expect(html).toContain('data-size="lg"')
+    expect(html).toContain('>60</output>')
   })
 
   it('rtl: an island that carries the direction and the language, with the value in the provider\'s format', async () => {

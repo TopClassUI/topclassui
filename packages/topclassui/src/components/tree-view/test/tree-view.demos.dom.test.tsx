@@ -16,8 +16,10 @@ const AFTER: Record<string, (string | null)[]> = {
   'basic': ['README.md'],
   'load-more': ['Folder 20'],
   'long-content': ['Item 60'],
+  'playground': ['README.md'],
   'rtl': ['ملاحظات.txt'],
   'selected': ['next.config.ts'],
+  'states': ['next.config.ts', 'next.config.ts'],
   'status': [],
   'ten-thousand': ['File 10000.ts'],
 }

@@ -1,0 +1,93 @@
+---
+slug: server-first
+title: الخادم أولًا
+description: لا يشحن المكوّن شيفرة JavaScript إلا حين يحتاج إلى الاستماع إلى حدث ما. أما البقية فلا تضيف شيئًا.
+---
+
+## الأنواع الثلاثة
+
+كل مكوّن ينتمي إلى نوع من ثلاثة أنواع، ويظهر نوعه على الشارة بجانب اسمه.
+
+| النوع | الشارة | المعنى |
+|---|---|---|
+| <span dir="ltr">S</span> - خادم | <span dir="ltr">server - 0 KB</span> | يُعرض على الخادم. بلا خطّافات، ولا معالجات أحداث، ولا <span dir="ltr">JavaScript</span> في المتصفح |
+| <span dir="ltr">C</span> - عميل | <span dir="ltr">client - size not measured yet</span> | يحتاج إلى المتصفح: نافذة منبثقة، أو سحب، أو مستمع للوحة المفاتيح |
+| <span dir="ltr">Sp</span> - مقسوم | <span dir="ltr">split - 0 KB server + size not measured yet</span> | تُعرض البنية على الخادم، ويُرطَّب جزء صغير واحد فقط. يبقى <span dir="ltr">`Tag`</span> مكوّن خادم حتى تمرّر له <span dir="ltr">`onRemove`</span> |
+
+<KindCounts />
+
+## ما الذي يمكن أن يعبر الحد
+
+فقط ما يستطيع <span dir="ltr">React</span> تسلسله: النصوص والأرقام والقيم المنطقية والكائنات البسيطة والمصفوفات والعناصر الأبناء. لا تعبر الدالة الحد أبدًا، إلا إذا كانت إجراء خادم (<span dir="ltr">Server Action</span>).
+
+<WrongRight>
+
+```tsx
+// app/page.tsx - a Server Component
+<Command items={commands} getKey={(c) => c.id} getLabel={(c) => c.label} onSelect={run} />
+// getKey, getLabel and onSelect are functions: they cannot cross
+```
+
+```tsx check
+'use client'
+// the file that configures a palette is a client file
+import { Command } from 'topclassui/command'
+
+export function Search({ commands }: { commands: { id: string, label: string }[] }) {
+  return (
+    <Command
+      items={commands}
+      getKey={(command) => command.id}
+      getLabel={(command) => command.label}
+      onSelect={(command) => { window.location.assign(`/docs/${command.id}`) }}
+    />
+  )
+}
+```
+
+</WrongRight>
+
+## لماذا لا يحتوي index.tsx على خطّافات
+
+البنية في <span dir="ltr">`index.tsx`</span>، والسلوك في <span dir="ltr">`hook.ts`</span>. لا يحتوي <span dir="ltr">`index.tsx`</span> أبدًا على <span dir="ltr">`'use client'`</span>، ولا يستورد <span dir="ltr">`hook.ts`</span>. ويفرض ذلك فحصٌ أثناء البناء.
+
+```tsx title="index.tsx"
+// index.tsx - server
+import { useId } from 'react'   // allowed
+import { use } from 'react'     // allowed
+
+// anything else fails check-boundaries:
+// useState, useEffect, useRef, useMemo, useCallback
+```
+
+الخطّافان الوحيدان اللذان يُسمح لمكوّن الخادم باستدعائهما.
+
+## كيف يعمل المكوّن المقسوم
+
+يعرض نصف الخادم البنية، ويتولّى كل ما يحتاج إلى الخادم، مثل أسماء الأيقونات. ويضيف نصف العميل السلوك الوحيد المطلوب.
+
+```tsx title="tag/index.tsx"
+// tag/index.tsx - server
+export function Tag({ onRemove, children, ...rest }: TagProps) {
+  if (onRemove) {
+    return <Removable onRemove={onRemove} {...rest}>{children}</Removable> // the x is a client part
+  }
+  return <span {...rest}>{children}</span> // still server
+}
+```
+
+## كيف تُفحص الأحجام
+
+لكل مكوّن ميزانية حجم. أما الفحص الذي يُفشل البناء عند تجاوز الميزانية فلم يُبنَ بعد.
+
+<Callout tone="info">تُظهر الشارات نوع كل مكوّن. وإلى أن يصدر أول بناء مقيس، تكتب شارة المكوّن العميل أو المقسوم <span dir="ltr">"size not measured yet"</span> بدل الرقم.</Callout>
+
+## ما الذي يكلّفك
+
+يأتي مبدأ الخادم أولًا ببعض القيود، وهذه هي القيود التي ستلاحظها.
+
+<Cards>
+  <Card title="لا يوجد onClick في مكوّن الخادم">الزر الذي يُعرض على الخادم يرسل نموذجًا أو يتبع رابطًا. وإن كان لا بد أن ينفّذ شيفرة في المتصفح، فمكانه ملف عميل.</Card>
+  <Card title="لوحة الأوامر تحتاج إلى ملف عميل"><span dir="ltr">`getKey`</span> و<span dir="ltr">`getLabel`</span> و<span dir="ltr">`onSelect`</span> دوال، لذا يجب إعداد <span dir="ltr">`Command`</span> في ملف يبدأ بـ <span dir="ltr">`'use client'`</span>. أما <span dir="ltr">`Select`</span> و<span dir="ltr">`Combobox`</span> فيأخذان بيانات بسيطة ويُعرضان من ملف خادم.</Card>
+  <Card title="بعض عناصر التحكم تنتظر الترطيب">ترسل <span dir="ltr">`Checkbox`</span> و<span dir="ltr">`Switch`</span> و<span dir="ltr">`Select`</span> قيمتها الافتراضية إلى أن يُحمَّل <span dir="ltr">JavaScript</span>. أما <span dir="ltr">`Input`</span> و<span dir="ltr">`Textarea`</span> فلا يحتاجان إلى <span dir="ltr">JavaScript</span> إطلاقًا.</Card>
+</Cards>

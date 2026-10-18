@@ -1,0 +1,113 @@
+---
+title: من اليمين إلى اليسار
+description: كل مكوّن ينعكس في العربية دون أي تغيير في الشيفرة، لأنه لا يُسمح لأي مكوّن بأن يقول يسار أو يمين.
+---
+
+## القاعدة
+
+يُضبط الاتجاه مرة واحدة، على العنصر <span dir="ltr">`html`</span>. وتقرؤه المكوّنات عبر <span dir="ltr">CSS</span> المنطقي، لا عبر <span dir="ltr">JavaScript</span> أبدًا.
+
+```tsx check title="app/layout.tsx"
+import { TopClassProvider } from 'topclassui/provider'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="ar" dir="rtl">
+      <body>
+        {/* the provider forwards direction to Base UI and to gestures */}
+        <TopClassProvider direction="rtl" locale="ar">{children}</TopClassProvider>
+      </body>
+    </html>
+  )
+}
+```
+
+<DirectionPair ltr="pagination/middle" rtl="pagination/rtl" />
+
+## الأصناف المنطقية فقط
+
+ما زال <span dir="ltr">Tailwind</span> يوفّر الأصناف الفيزيائية. هذه المكتبة لا تستخدمها أبدًا، فالصيغة المنطقية تؤدي العمل بدلًا منها.
+
+| ممنوع | استخدم بدلًا منه |
+|---|---|
+| <span dir="ltr">`ml-*`</span> <span dir="ltr">`mr-*`</span> | <span dir="ltr">`ms-*`</span> <span dir="ltr">`me-*`</span> |
+| <span dir="ltr">`pl-*`</span> <span dir="ltr">`pr-*`</span> | <span dir="ltr">`ps-*`</span> <span dir="ltr">`pe-*`</span> |
+| <span dir="ltr">`left-*`</span> <span dir="ltr">`right-*`</span> | <span dir="ltr">`inset-s-*`</span> <span dir="ltr">`inset-e-*`</span> |
+| <span dir="ltr">`start-*`</span> <span dir="ltr">`end-*`</span> | <span dir="ltr">`inset-s-*`</span> <span dir="ltr">`inset-e-*`</span> |
+| <span dir="ltr">`text-left`</span> <span dir="ltr">`text-right`</span> | <span dir="ltr">`text-start`</span> <span dir="ltr">`text-end`</span> |
+| <span dir="ltr">`border-l`</span> <span dir="ltr">`border-r`</span> | <span dir="ltr">`border-s`</span> <span dir="ltr">`border-e`</span> |
+| <span dir="ltr">`rounded-l-*`</span> <span dir="ltr">`rounded-r-*`</span> | <span dir="ltr">`rounded-s-*`</span> <span dir="ltr">`rounded-e-*`</span> |
+| <span dir="ltr">`space-x-*`</span> <span dir="ltr">`divide-x-*`</span> | <span dir="ltr">`gap-*`</span>، و<span dir="ltr">`border-s`</span> على العنصر |
+| <span dir="ltr">`tracking-*`</span> | لا شيء، فالخط العربي لا يستخدم تباعد الأحرف |
+
+## التحويلات والإيماءات
+
+الإزاحة ونقطة أصل التحويل والتدرّج اللوني والسحب لا صيغة منطقية لها في <span dir="ltr">CSS</span>. لذا تُضرب في <span dir="ltr">`--tc-dir`</span>، وقيمته <span dir="ltr">`1`</span> من اليسار إلى اليمين و<span dir="ltr">`-1`</span> من اليمين إلى اليسار.
+
+```css title="styles.css"
+[dir="rtl"] { --tc-dir: -1; }
+
+/* the switch thumb */
+--tc-slide: calc(1rem * var(--tc-dir));
+className="translate-x-(--tc-slide)"
+
+/* object and background positions have no logical form */
+className="object-left rtl:object-right"
+```
+
+## الموضع لا الجهة
+
+كل طبقة عائمة تأخذ <span dir="ltr">`placement`</span> بدلًا من <span dir="ltr">`side`</span>. تُحَلّ <span dir="ltr">`start`</span> و<span dir="ltr">`end`</span> إلى بداية السطر ونهايته، لذا تُفتح القائمة في مكانها الصحيح في الاتجاهين.
+
+<WrongRight>
+
+```tsx
+<PopoverPopup side="left" align="start" />
+```
+
+```tsx check
+import { PopoverPopup } from 'topclassui/popover'
+
+<PopoverPopup placement="start-top" />
+
+// start   -> inline-start, mirrors
+// bottom  -> bottom, does not
+```
+
+</WrongRight>
+
+## الخط والجمع والأرقام
+
+يأخذ النص العربي <span dir="ltr">`--tc-font-arabic`</span> عبر قاعدة <span dir="ltr">`[lang|='ar']`</span>، فلا تبدّل متغيّر خط أبدًا. والتسمية التي تحوي عددًا دالةٌ في ذلك العدد.
+
+```tsx title="labels/ar.ts"
+// labels/ar.ts
+const plural = new Intl.PluralRules('ar')
+
+selected: (n, fmt) => {
+  const rule = plural.select(n)
+  const value = fmt.format(n)
+  if (rule === 'zero') return 'لم يتم تحديد شيء'
+  if (rule === 'one') return 'عنصر واحد محدد'
+  if (rule === 'two') return 'عنصران محددان'
+  if (rule === 'few') return `${value} عناصر محددة`
+  if (rule === 'many') return `${value} عنصرًا محددًا`
+  return `${value} عنصر محدد`
+}
+
+<TopClassProvider direction="rtl" locale="ar" numberingSystem="arab">
+```
+
+## ما تلتقطه قاعدة التدقيق
+
+تعمل القاعدة على كل سلسلة أصناف في المكتبة، وتُفشل التدقيق عند أي صنف فيزيائي. وتلتقط الأسماء البديلة المهجورة أيضًا.
+
+```tsx title="lint-probe.tsx"
+// wrong: one error per class string
+className="pl-4 text-left"
+// R-5.3-1: "pl-" is physical. use ps- or pe-.
+// fix it, and the next run names text-left
+
+// right
+className="ps-4 text-start"
+```
