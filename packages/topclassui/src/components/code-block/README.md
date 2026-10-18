@@ -12,7 +12,7 @@ For code a reader copies or studies: a file, a command, a snippet. It is a `<pre
 server; the only script is the copy button, and `showCopy={false}` drops that too.
 
 ```tsx
-import { CodeBlock } from 'topclassui'
+import { CodeBlock } from 'topclassui/code-block'
 ```
 
 ```tsx
@@ -71,7 +71,7 @@ shared CopyButton component (choice 14), a download button, `size`.
 ## Import
 
 ```tsx
-import { CodeBlock } from 'topclassui'
+import { CodeBlock } from 'topclassui/code-block'
 ```
 
 ## Props

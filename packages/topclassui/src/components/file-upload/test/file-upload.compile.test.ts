@@ -4,6 +4,8 @@ import { join } from 'node:path'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 
+import { importsFromRepo } from '#test/samples.js'
+
 const ROOT = process.cwd()
 const FOLDER = join(ROOT, 'src', 'components', 'file-upload')
 
@@ -15,7 +17,7 @@ const PRELUDE = "import { FileUpload, type FileUploadProps } from '../index.js'\
 
 /** The import line compiles as one that uses what it imports, a client module as a module, and any other sample as JSX. */
 function wrap(code: string): string {
-  if (code.startsWith('import ')) return `${code.replace("'topclassui'", "'../index.js'")}\nexport const imported = [FileUpload]\n`
+  if (code.startsWith('import ')) return `${importsFromRepo(code)}\nexport const imported = [FileUpload]\n`
   if (code.startsWith("'use client'")) return `${code.split('\n')[0] ?? ''}\n${PRELUDE}\n${code.split('\n').slice(1).join('\n')}\n`
   if (code.startsWith('type ') || code.startsWith('export ')) return `${PRELUDE}\n${code}\n`
   return `${PRELUDE}\nexport const sample = (\n<>\n${code}\n</>\n)\n`
@@ -81,7 +83,7 @@ const verdict = compile({
 describe('the samples in the README compile as written', () => {
   it('finds the import line and the two samples, so an empty extraction cannot pass', () => {
     expect(SAMPLES).toHaveLength(3)
-    expect(SAMPLES[0]).toContain("import { FileUpload } from 'topclassui'")
+    expect(SAMPLES[0]).toContain("import { FileUpload } from 'topclassui/file-upload'")
     expect(SAMPLES[1]).toContain('encType="multipart/form-data"')
     expect(SAMPLES[2]).toContain('onValueChange')
   })

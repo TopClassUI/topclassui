@@ -13,14 +13,14 @@ radio group drawn as one track, so one segment is always selected. For longer ch
 RadioGroup reads better. It is two parts: the track and its segments.
 
 ```tsx
-import { SegmentedControlItem, SegmentedControlRoot } from 'topclassui'
+import { SegmentedControlItem, SegmentedControlRoot } from 'topclassui/segmented-control'
 ```
 
 ```tsx
 'use client'
 
 import { useState } from 'react'
-import { SegmentedControlItem, SegmentedControlRoot } from 'topclassui'
+import { SegmentedControlItem, SegmentedControlRoot } from 'topclassui/segmented-control'
 
 export function ViewSwitch() {
   const [view, setView] = useState('board')
@@ -112,7 +112,7 @@ read-only look, a line around the selected segment, a skeleton (use `Skeleton`).
 import {
   SegmentedControlRoot,
   SegmentedControlItem,
-} from 'topclassui'
+} from 'topclassui/segmented-control'
 ```
 
 ## Props

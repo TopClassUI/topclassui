@@ -13,7 +13,7 @@ setting that takes effect at once, a Switch reads better. It is one element: Bas
 as a native button.
 
 ```tsx
-import { Checkbox } from 'topclassui'
+import { Checkbox } from 'topclassui/checkbox'
 ```
 
 ```tsx
@@ -100,7 +100,7 @@ the invalid ring that is always on, a skeleton (use `Skeleton`).
 ## Import
 
 ```tsx
-import { Checkbox } from 'topclassui'
+import { Checkbox } from 'topclassui/checkbox'
 ```
 
 ## Props
