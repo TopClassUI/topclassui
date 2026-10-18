@@ -1,5 +1,5 @@
 // pnpm docs:data: the one door from the library into the site (docs-site S7). --strict fails on any issue; --out writes elsewhere.
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 
 import { LIVE_PAGES, hrefOf } from '../content/pages.js'
@@ -8,7 +8,8 @@ import type { ExportsMap } from '../lib/rewrite-imports.js'
 import { changelogFacts, releaseToc } from './lib/changelog.js'
 import { collect } from './lib/collect.js'
 import { lastCommitDate, newestOf } from './lib/dates.js'
-import { demoMapSource, playgroundMapSource } from './lib/demo-map.js'
+import { type DemoKind, demoKindOf } from './lib/demo-kind.js'
+import { actionDemoMapSource, clientDemoGroupSource, clientDemoMapSource, demoMapSource, playgroundMapSource, serverDemoMapSource } from './lib/demo-map.js'
 import { libraryFacts } from './lib/facts.js'
 import { guideFacts as startFacts, guidesFileSchema } from './lib/guide-facts.js'
 import { guideFacts } from './lib/guides.js'
@@ -42,7 +43,11 @@ const pageDates = Object.fromEntries(pageNames.map((page) => [
   page,
   newestOf([lastCommitDate(LOCALES.map((locale) => join(CONTENT, locale, `${page}.mdx`)), REPO)]),
 ]))
-const demos = demoMapSource(file.components.flatMap((entry) => entry.demos.map((demo) => ({ slug: entry.slug, name: demo.name }))))
+const demoKeys = file.components.flatMap((entry) => entry.demos.map((demo) => ({ slug: entry.slug, name: demo.name })))
+const demos = demoMapSource(demoKeys)
+const kinds = demoKeys.map((demo) => demoKindOf(join(COMPONENTS, demo.slug, 'dummy', `${demo.name}.tsx`)))
+const demosOf = (kind: DemoKind) => demoKeys.filter((_, index) => kinds[index] === kind)
+const clientDemos = demosOf('client')
 const generated = { components: file, toc, dates: { components: dates, pages: pageDates }, demos }
 
 const problems = generatedProblems(generated, (key) => {
@@ -65,6 +70,14 @@ writeFileSync(join(OUT, 'components.json'), `${JSON.stringify(generated.componen
 writeFileSync(join(OUT, 'toc.json'), `${JSON.stringify(generated.toc, null, 2)}\n`)
 writeFileSync(join(OUT, 'dates.json'), `${JSON.stringify(generated.dates, null, 2)}\n`)
 writeFileSync(join(OUT, 'demos.ts'), demos)
+writeFileSync(join(OUT, 'server-demos.ts'), serverDemoMapSource(demosOf('server'), clientDemos, demosOf('action')))
+writeFileSync(join(OUT, 'client-demos.ts'), clientDemoMapSource(clientDemos))
+rmSync(join(OUT, 'client-demos'), { recursive: true, force: true })
+mkdirSync(join(OUT, 'client-demos'))
+for (const slug of new Set(clientDemos.map((demo) => demo.slug))) {
+  writeFileSync(join(OUT, 'client-demos', `${slug}.ts`), clientDemoGroupSource(clientDemos.filter((demo) => demo.slug === slug)))
+}
+writeFileSync(join(OUT, 'action-demos.ts'), actionDemoMapSource(demosOf('action')))
 // The catalog's headings are not in an MDX file, so it brings its own; every other live page reads toc.json.
 const catalogOf = (locale: (typeof LOCALES)[number]): SearchPage => ({
   title: labelsFor(locale).catalog.title,

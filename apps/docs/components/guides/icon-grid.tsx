@@ -3,7 +3,7 @@ import type { IconName } from 'topclassui/icons'
 
 import type { Locale } from '../../content/pages'
 import { GUIDES } from '../../lib/guides'
-import { IconFinder } from './icon-finder'
+import { IconFinder } from './guide-islands'
 
 /** All 84, each drawn on the server with `<Icon name>`; the search and the filter are a small client island over them. */
 export function IconGrid({ locale }: { locale: Locale }) {

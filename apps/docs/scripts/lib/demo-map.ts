@@ -31,6 +31,56 @@ export function demoMapSource(demos: DemoKey[]): string {
   ].join('\n')
 }
 
+const loaders = (demos: DemoKey[]) => demos.map((demo) => `  '${keyOf(demo)}': () => import('${TO_ROOT}/${distFileOf(demo)}'),`)
+const keyList = (demos: DemoKey[]) => demos.map((demo) => `  '${keyOf(demo)}',`)
+
+/** server-demos.ts: the demos that reach no 'use client' file, and only the keys of the others, so a page's server graph holds no client demo. */
+export function serverDemoMapSource(server: DemoKey[], client: DemoKey[], action: DemoKey[]): string {
+  return [
+    '// Written by pnpm docs:data. Do not edit.',
+    'export const SERVER_DEMOS = {',
+    ...loaders(server),
+    '} as const',
+    '',
+    'export const CLIENT_DEMO_KEYS: readonly string[] = [',
+    ...keyList(client),
+    ']',
+    '',
+    'export const ACTION_DEMO_KEYS: readonly string[] = [',
+    ...keyList(action),
+    ']',
+    '',
+  ].join('\n')
+}
+
+/** client-demos.ts: one loader per component, so a page's bundle carries 46 entries rather than one per demo. */
+export function clientDemoMapSource(client: DemoKey[]): string {
+  const slugs = [...new Set(client.map((demo) => demo.slug))]
+  return [
+    '// Written by pnpm docs:data. Do not edit.',
+    'export const CLIENT_DEMO_GROUPS = {',
+    ...slugs.map((slug) => `  '${slug}': () => import('./client-demos/${slug}'),`),
+    '} as const',
+    '',
+  ].join('\n')
+}
+
+/** client-demos/<slug>.ts: that component's demos with a client part, each its own chunk, imported by the client island alone. */
+export function clientDemoGroupSource(client: DemoKey[]): string {
+  return [
+    '// Written by pnpm docs:data. Do not edit.',
+    'export const DEMOS = {',
+    ...client.map((demo) => `  '${demo.name}': () => import('../${TO_ROOT}/${distFileOf(demo)}'),`),
+    '} as const',
+    '',
+  ].join('\n')
+}
+
+/** action-demos.ts: the demos that define an inline Server Action beside a client part, imported by the component page alone, so no other route carries their client code. */
+export function actionDemoMapSource(action: DemoKey[]): string {
+  return ['// Written by pnpm docs:data. Do not edit.', 'export const ACTION_DEMOS = {', ...loaders(action), '} as const', ''].join('\n')
+}
+
 /** The keys and files a demos.ts lists, read back for the shape check. */
 export function parseDemoMap(source: string): { key: string; file: string }[] {
   return [...source.matchAll(/^ {2}'([^']+)': \(\) => import\('([^']+)'\),$/gm)]

@@ -1,8 +1,9 @@
 // One demo alone at a stable address (S9), plus the reserved blank/empty baseline for the size test.
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import type { ComponentType } from 'react'
 
-import { Demo, isDemoKey } from '../../../../../../../components/demo'
+import { DEMOS } from '../../../../../../../.generated/demos'
 import { BLANK, previewDemos } from '../../../../../../../lib/preview'
 
 export const dynamicParams = false
@@ -24,6 +25,8 @@ export default async function PreviewPage({ params }: { params: Params }) {
   // Named for axe and for a screenshot's reader; hidden, so the picture is the demo alone.
   const heading = <h1 className="sr-only">{key}</h1>
   if (component === BLANK.component && demo === BLANK.demo) return heading
-  if (!isDemoKey(key)) notFound()
-  return <>{heading}<Demo demoKey={key} /></>
+  // Every demo hydrates at once here, as a browser test expects; the docs pages load theirs near the viewport instead.
+  if (!(key in DEMOS)) notFound()
+  const { default: Component } = (await DEMOS[key as keyof typeof DEMOS]()) as { default: ComponentType }
+  return <>{heading}<Component /></>
 }

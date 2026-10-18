@@ -37,7 +37,8 @@ export function componentToc(entry: PagedComponent, locale: Locale): { id: strin
   return SECTION_IDS.map((id) => ({ id, text: headingOf(id, entry, locale, COMPONENT_PAGE_LABELS[locale]) }))
 }
 
-export function ComponentPage({ entry, locale }: { entry: PagedComponent; locale: Locale }) {
+/** `actions` holds the page's action demos, rendered by the one route that imports them (component-route.tsx). */
+export function ComponentPage({ entry, locale, actions = {} }: { entry: PagedComponent; locale: Locale; actions?: Readonly<Record<string, ReactNode>> }) {
   const t = COMPONENT_PAGE_LABELS[locale]
   const { content } = entry
   const title = content.title[locale]
@@ -66,7 +67,7 @@ export function ComponentPage({ entry, locale }: { entry: PagedComponent; locale
         <div><Badge tone="neutral" variant="outline" size="sm"><bdi>{chip}</bdi></Badge></div>
       </header>
       <Previewer entry={entry} locale={locale} headingId="preview" />
-      {section('examples', <Examples entry={entry} locale={locale} />)}
+      {section('examples', <Examples entry={entry} locale={locale} actions={actions} />)}
       {section('props', <PropsTables entry={entry} locale={locale} />)}
       {section('keyboard', <KeyboardTable entry={entry} locale={locale} />)}
       {section('rtl', <p className={PROSE}><InlineText text={content.rtl[locale]} /></p>)}

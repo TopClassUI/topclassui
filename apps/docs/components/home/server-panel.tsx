@@ -7,7 +7,7 @@ import { Separator } from 'topclassui/separator'
 
 import type { SiteLabels } from '../../labels'
 import { cardBySlug } from '../../lib/data'
-import { VoidIsland } from './void-island'
+import { VoidIsland } from './home-islands'
 import { ZERO_KB } from '../../lib/site'
 
 /** The components the invoice card is built from; their kinds come from meta.ts, never typed. */

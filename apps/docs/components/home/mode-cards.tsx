@@ -3,9 +3,9 @@ import { Button } from 'topclassui/button'
 import { BORDER } from 'topclassui/classes'
 import { Field } from 'topclassui/field'
 import { Input } from 'topclassui/input'
-import { Switch } from 'topclassui/switch'
 
 import type { Mode, SiteLabels } from '../../labels'
+import { Switch } from './home-islands'
 
 const MODES = ['light', 'dark', 'ocean'] as const satisfies readonly Mode[]
 
