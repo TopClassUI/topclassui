@@ -28,30 +28,22 @@ that imports Tag may still load that one small file (about 3 KB gzipped).
 only calls `onRemove`: you take the tag out of your list. It is the client export, because
 `Tag` takes no function: a Server Component page renders `Tag` as it is, and passes a
 `TagRemovable` its `onRemove` only as a Server Action (`onRemove={removeTopic.bind(null, id)}`).
-To keep the list in state, put it in a client component, and move the focus before the x goes:
+To keep the list in state, put it in a client component:
 
 ```tsx
 'use client'
 
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { TagRemovable } from 'topclassui'
 
 export function Topics({ initial }: { initial: string[] }) {
   const [topics, setTopics] = useState(initial)
-  const list = useRef<HTMLUListElement>(null)
-
-  const remove = (topic: string, index: number) => {
-    const buttons = list.current?.querySelectorAll('button')
-    const next = buttons?.[index + 1] ?? buttons?.[index - 1]
-    next?.focus()
-    setTopics(topics.filter((other) => other !== topic))
-  }
 
   return (
-    <ul ref={list} aria-label="Topics" className="flex flex-wrap gap-2">
-      {topics.map((topic, index) => (
+    <ul aria-label="Topics" className="flex flex-wrap gap-2">
+      {topics.map((topic) => (
         <li key={topic}>
-          <TagRemovable onRemove={() => { remove(topic, index) }}>{topic}</TagRemovable>
+          <TagRemovable onRemove={() => { setTopics(topics.filter((other) => other !== topic)) }}>{topic}</TagRemovable>
         </li>
       ))}
     </ul>
@@ -62,7 +54,7 @@ export function Topics({ initial }: { initial: string[] }) {
 Your server page renders `<Topics initial={['React', 'Tailwind']} />`: strings cross, and a function crosses only as a Server Action.
 
 - **Name.** The x reads "Remove React": the word comes from `labels.tag.remove` of the provider ("إزالة" in Arabic), then the label.
-- **Focus.** A removed x would take the focus with it, to the page body. The sample sends it to the next x, or the one before; when the list empties, focus a control after it, as `dummy/removable.tsx` does.
+- **Focus.** When the x that holds the focus leaves with its tag, the focus goes to the next x of the same list, else the one before, else the next control on the page; never to the body. It moves in the x's effect cleanup, before the caller's own effects run, so a caller that moves the focus itself, in `onRemove` or in an effect, keeps its choice, as `dummy/removable.tsx` does for the button that brings the list back.
 - **Size.** The x is 24 px, 44 under a touch pointer. An `xs` tag grows from 22 to 24 px, and every tag is 44 px tall under a touch pointer (`xl` stays 50).
 - **Long labels.** The label is cut with an ellipsis and the x always stays whole.
 

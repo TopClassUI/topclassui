@@ -48,16 +48,17 @@ describe('client.tsx is markup and one hook call (R-5.12-1)', () => {
 })
 
 describe('hook.ts and lib.ts', () => {
-  it("hook.ts starts with 'use client' and holds the store, taking only the key from lib.ts", () => {
+  it("hook.ts starts with 'use client' and holds the store, taking the key and the neighbour from lib.ts", () => {
     const source = read('hook.ts')
     expect(source.startsWith("'use client'\n")).toBe(true)
-    expect(importedNames(source, 'react')).toEqual(['useSyncExternalStore'])
-    expect(importedNames(source, './lib.js')).toEqual(['keyOf'])
+    expect(importedNames(source, 'react')).toEqual(['useEffect', 'useRef', 'useSyncExternalStore'])
+    expect(importedNames(source, './lib.js')).toEqual(['keyOf', 'neighbourOf'])
+    expect(importedNames(source, '#shared/focus-neighbour.js')).toEqual(['restoreFocus'])
   })
 
   it('lib.ts is pure: no React, no storage, no listener, no state', () => {
     const source = read('lib.ts')
-    expect(importedModules(source)).toEqual(['./constants.js'])
+    expect(importedModules(source)).toEqual(['#shared/focus-neighbour.js', './constants.js'])
     expect(source).not.toMatch(/localStorage\.|addEventListener\(|new Set|new Map/)
   })
 })

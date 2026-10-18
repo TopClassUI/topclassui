@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef, ReactNode } from 'react'
+import type { ComponentPropsWithRef, MouseEvent, ReactNode } from 'react'
 
 import type { Tone } from '#shared/contracts/tone.js'
 import type { BannerSchemaInput } from './schema.js'
@@ -75,3 +75,6 @@ export type BannerShellProps = Omit<ComponentPropsWithRef<'div'>, 'id'> & {
   'data-tone': BannerTone
   'onDismiss'?: (() => void) | undefined
 }
+
+/** The press on the x, which the hook reads to know whether the x held the focus. Internal. */
+export type BannerDismissEvent = MouseEvent<HTMLButtonElement>

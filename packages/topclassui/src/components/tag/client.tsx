@@ -13,7 +13,7 @@ import type { TagRemovableProps } from './types.js'
 import { tagVariants } from './variants.js'
 
 /** A Tag with an x, the label in one span and then the button, named "Remove React". The x
- * calls onRemove with nothing; the caller takes the tag out of its list. */
+ * calls onRemove with nothing; the caller takes the tag out of its list, and the hook moves the focus. */
 export function TagRemovable({
   tone = TAG_DEFAULTS.tone,
   size = TAG_DEFAULTS.size,
@@ -22,7 +22,7 @@ export function TagRemovable({
   onRemove,
   ...rest
 }: TagRemovableProps) {
-  const tag = useTagRemovable()
+  const tag = useTagRemovable(onRemove)
   return (
     <span
       data-tone={tone}
@@ -36,8 +36,9 @@ export function TagRemovable({
         id={tag.id}
         aria-label={tag.label}
         aria-labelledby={`${tag.id} ${tag.labelId}`}
+        data-tag-remove=""
         className={cn(TAG_REMOVE, TONE_CLASS[tone], REMOVE_SIZE[size])}
-        onClick={() => { onRemove() }}
+        onClick={tag.remove}
       >
         <Svg icon={x} />
       </button>

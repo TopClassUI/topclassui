@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef, ReactNode } from 'react'
+import type { ComponentPropsWithRef, MouseEvent, ReactNode } from 'react'
 
 import type { Tone } from '#shared/contracts/tone.js'
 import type { TagSchemaInput } from './schema.js'
@@ -22,3 +22,6 @@ export interface TagRemovableProps extends TagProps {
   /** Client-only, or a Server Action: called with nothing when the x is pressed; taking the tag out of the list is the caller's. */
   onRemove: () => void
 }
+
+/** The press on the x, which the hook reads to know whether the x held the focus. Internal. */
+export type TagRemoveEvent = MouseEvent<HTMLButtonElement>

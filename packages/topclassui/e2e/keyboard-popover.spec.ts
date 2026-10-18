@@ -1,14 +1,14 @@
 import { expect, test } from '@playwright/test'
 
 import { DIRECTIONS } from '../scripts/lib/harness.js'
-import { expectRing, focused, pressTo } from './keyboard.js'
+import { SENTINEL, addSentinel, expectRing, focused, pressTo } from './keyboard.js'
 import { openLive } from './live.js'
 import { expectClosed, openOverlay } from './overlay.js'
 
 // R-5.6-1: a popover is a dialog that does not hold the page. Enter or Space on the trigger opens it with the
-// focus on its first control, Escape closes it and gives the focus back, Tab past its end closes it on its
-// trigger, where the page order goes on, and Shift+Tab past its start goes back to the trigger and leaves it
-// open. A modal one holds Tab and wraps, as a dialog does.
+// focus on its first control, Escape closes it and gives the focus back, Tab past its end closes it and goes on
+// to the control after the trigger, and Shift+Tab past its start goes back to the trigger and leaves it open.
+// A modal one holds Tab and wraps, as a dialog does.
 
 /** The x a PopoverClose draws, as each direction's labels name it. */
 const CLOSE = { ltr: 'Close', rtl: 'إغلاق' } as const
@@ -27,12 +27,13 @@ for (const direction of DIRECTIONS) {
       await expectRing(page, 'the trigger after Escape')
     })
 
-    test('Space opens it too, and Tab past its last control closes it on the trigger', async ({ page }) => {
+    test('Space opens it too, and Tab past its last control closes it and goes on to the control after the trigger', async ({ page }) => {
       await openLive(page, 'popover--basic', { direction })
+      await addSentinel(page)
       await pressTo(page, 'Tab', 'Share')
       await page.keyboard.press('Space')
       await expect.poll(() => focused(page)).toBe('Copy link')
-      await pressTo(page, 'Tab', 'Share')
+      await pressTo(page, 'Tab', SENTINEL)
       await expectClosed(page)
     })
 

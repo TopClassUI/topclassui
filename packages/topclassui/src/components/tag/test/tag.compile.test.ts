@@ -65,15 +65,12 @@ const verdict = compile({
 describe('the README sample compiles as written', () => {
   it('finds the client module, so an empty extraction cannot pass', () => {
     expect(SAMPLE).toContain("import { TagRemovable } from 'topclassui'")
-    expect(SAMPLE).toContain('<TagRemovable onRemove={() => { remove(topic, index) }}>{topic}</TagRemovable>')
+    expect(SAMPLE).toContain('<TagRemovable onRemove={() => { setTopics(topics.filter((other) => other !== topic)) }}>{topic}</TagRemovable>')
   })
 
-  it('moves the focus to the next x, or the one before, before the tag leaves the list', () => {
-    expect(SAMPLE.replace(/\r\n/g, '\n')).toContain([
-      '    const next = buttons?.[index + 1] ?? buttons?.[index - 1]',
-      '    next?.focus()',
-      '    setTopics(topics.filter((other) => other !== topic))',
-    ].join('\n'))
+  it('moves no focus of its own: the x hands it to the next x, or the one before', () => {
+    expect(SAMPLE).not.toContain('.focus(')
+    expect(SAMPLE).not.toContain('useRef')
   })
 
   it('compiles: a client component that owns the list', () => {
