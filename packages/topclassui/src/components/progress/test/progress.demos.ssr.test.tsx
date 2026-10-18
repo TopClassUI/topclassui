@@ -12,7 +12,8 @@ const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
 const EXPECTED = [
-  'custom-size', 'file-row', 'indeterminate', 'labelled', 'rtl', 'sizes', 'tones', 'values',
+  'custom-size', 'file-row', 'indeterminate', 'labelled', 'playground', 'rtl', 'sizes', 'states', 'tones',
+  'values',
 ]
 
 const render = async (file: string) => {

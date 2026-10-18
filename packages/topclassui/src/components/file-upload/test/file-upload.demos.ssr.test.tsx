@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'in-field', 'multiple', 'rtl', 'states']
+const EXPECTED = ['basic', 'form', 'in-field', 'multiple', 'playground', 'rtl', 'states']
 
 /** Each file input of each demo, as the server writes it: its name by the label that points at its id, its form name,
  * and the attributes a form reads. */
@@ -20,6 +20,7 @@ const INPUTS: Record<string, string[]> = {
   form: ['Attachments: attachments, multiple, required'],
   'in-field': ['Attachments: attachments, multiple, accept application/pdf,image/png'],
   multiple: ['Attachments: attachments, multiple, accept application/pdf,image/png'],
+  playground: ['Attachment: attachment, one, accept .png,.jpg,.jpeg,.pdf'],
   rtl: ['المرفقات: attachments, multiple, accept application/pdf,image/png'],
   states: ['Invalid: invalid, one, invalid', 'Disabled: disabled, one, disabled'],
 }
@@ -75,6 +76,11 @@ describe('the demos the plan names', () => {
     const html = await render('form')
     expect(html).toMatch(/^<form class="[^"]*" encType="multipart\/form-data" method="post">/)
     expect(html).toContain('type="submit"')
+  })
+
+  it('playground: the schema props a Try it control sets reach the upload', async () => {
+    const loaded = await import('../dummy/playground.js') as { default: ComponentType<{ maxFiles?: number, invalid?: boolean }> }
+    expect(inputsIn(markup(<loaded.default maxFiles={3} invalid />))).toEqual(['Attachment: attachment, multiple, accept .png,.jpg,.jpeg,.pdf, invalid'])
   })
 
   it('rtl: an island that carries the direction and the language, and the Arabic words', async () => {

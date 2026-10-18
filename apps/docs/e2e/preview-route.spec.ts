@@ -1,7 +1,8 @@
 import { readFileSync } from 'node:fs'
 
-import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
+
+import { axeViolations } from './pages'
 
 interface Entry { slug: string; page: boolean; content: unknown; demos: { name: string }[] }
 
@@ -11,14 +12,14 @@ const DEMOS = components.filter((entry) => entry.page && entry.content !== null)
 const THEMES = ['light', 'dark', 'ocean'] as const
 const DIRS = [{ dir: 'ltr', lang: 'en' }, { dir: 'rtl', lang: 'ar' }] as const
 
-test('the route has every demo of the Actions and Overlays components', () => {
-  expect(DEMOS.length).toBe(110)
+test('the route has every demo of the Actions, Forms, Display, Data, Feedback and Overlays components', () => {
+  expect(DEMOS.length).toBe(388)
 })
 
 for (const theme of THEMES) {
   for (const { dir, lang } of DIRS) {
     test(`every demo renders alone in ${theme} ${dir}, noindex, and passes axe`, async ({ page }) => {
-      test.setTimeout(240_000)
+      test.setTimeout(900_000)
       for (const key of DEMOS) {
         const response = await page.goto(`/preview/${theme}/${dir}/${key}`)
         expect(response?.status(), key).toBe(200)
@@ -29,8 +30,7 @@ for (const theme of THEMES) {
         await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow')
         await expect(page.locator('nav, header, footer, aside')).toHaveCount(0)
         expect(await page.locator('main > *').count(), key).toBeGreaterThan(1)
-        const results = await new AxeBuilder({ page }).analyze()
-        expect(results.violations.map((v) => `${key} ${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([])
+        expect((await axeViolations(page)).map((violation) => `${key} ${violation}`)).toEqual([])
       }
     })
   }

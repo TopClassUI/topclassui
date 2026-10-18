@@ -15,6 +15,7 @@ const AFTER: Record<string, number[]> = {
   form: [2],
   'in-field': [2],
   multiple: [2],
+  playground: [1],
   rtl: [2],
   states: [1, 0],
 }

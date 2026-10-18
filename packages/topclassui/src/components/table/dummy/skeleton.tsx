@@ -15,7 +15,7 @@ export default function Demo() {
     <div className="grid gap-6">
       <TableSkeleton rows={4} columns={4} />
       <Table
-        caption="Recent deploys"
+        caption="Latest deploys"
         items={deploys}
         getKey={(deploy) => deploy.id}
         columns={[

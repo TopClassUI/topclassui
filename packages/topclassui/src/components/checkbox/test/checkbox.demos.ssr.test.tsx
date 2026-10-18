@@ -11,13 +11,14 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'labelled', 'rtl', 'sizes', 'states']
+const EXPECTED = ['basic', 'form', 'labelled', 'playground', 'rtl', 'sizes', 'states']
 
 /** Each box of each demo, as the server writes it: its name, by aria-label, by a label[for] or by a wrapping label, and its state. */
 const BOXES: Record<string, string[]> = {
   'basic': ['I accept the terms: true', 'Send me product news: false'],
   'form': ['I accept the terms: true', 'Send me product news: false'],
   'labelled': ['Named by a label that points at it: false', 'Named by a label that wraps it: false'],
+  'playground': ['I accept the terms: true'],
   'rtl': ['أوافق على الشروط: true', 'أرسل لي أخبار المنتج: false'],
   'sizes': ['Extra small: true', 'Small: true', 'Medium: true', 'Large: true', 'Extra large: true'],
   'states': [
@@ -43,7 +44,7 @@ function boxesIn(html: string): string[] {
 }
 
 describe('every demo renders on the server', () => {
-  it('holds exactly the six demos asked for, so none can be deleted silently', () => {
+  it('holds exactly the seven demos asked for, so none can be deleted silently', () => {
     expect(files).toEqual(EXPECTED)
   })
 
@@ -78,6 +79,13 @@ describe('the demos the plan names', () => {
     const html = await render('labelled')
     expect(html).toContain('<label for="checkbox-labelled-for"')
     expect(html).toMatch(/<label class="[^"]*"><button [^>]*id="checkbox-labelled-wrap"/)
+  })
+
+  it('playground: the schema props a Try it control sets reach the checkbox', async () => {
+    const loaded = await import('../dummy/playground.js') as { default: ComponentType<{ size?: string, invalid?: boolean }> }
+    const html = markup(<loaded.default size="lg" invalid />)
+    expect(html).toContain('data-size="lg"')
+    expect(html).toContain('aria-invalid="true"')
   })
 
   it('rtl: an island that carries the direction and the language', async () => {

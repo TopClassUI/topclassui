@@ -60,7 +60,7 @@ describe('a server-rendered Stepper hydrates cleanly', () => {
 
 describe('every demo renders and hydrates', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['arabic-digits', 'basic', 'custom-size', 'long-content', 'rtl', 'sizes', 'statuses'])
+    expect(names).toEqual(['arabic-digits', 'basic', 'custom-size', 'long-content', 'playground', 'rtl', 'sizes', 'states', 'statuses'])
   })
 
   for (const [name, Demo] of DEMOS) {

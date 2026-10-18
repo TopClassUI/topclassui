@@ -15,5 +15,5 @@ export interface CodeProps {
 
 export async function Code({ code, title, copyLabel, locale, lang = 'tsx' }: CodeProps) {
   const { labels } = getLabels(locale, { common: { copy: copyLabel } })
-  return <CodeBlock lang={lang} title={title} labels={labels} highlighted={await highlight(code, lang)}>{code}</CodeBlock>
+  return <CodeBlock lang={lang} title={title} labels={labels} highlighted={(await highlight(code, lang)) ?? undefined}>{code}</CodeBlock>
 }

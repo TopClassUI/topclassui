@@ -14,6 +14,7 @@ const names = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
  * Written out, so the demo and the expectation cannot drift together. */
 const AFTER: Record<string, string[]> = {
   'basic': ['Sep 30, 2026'],
+  'playground': ['Sep 30, 2026'],
   'form': ['Oct 31, 2026'],
   'in-field': ['Oct 31, 2026'],
   'limits': ['Oct 31, 2026'],

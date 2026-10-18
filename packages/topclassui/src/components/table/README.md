@@ -106,10 +106,12 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/column-classes.tsx`
 - `dummy/empty.tsx`
 - `dummy/in-a-layout.tsx`
+- `dummy/playground.tsx`
 - `dummy/row-actions.tsx`
 - `dummy/rtl.tsx`
 - `dummy/skeleton.tsx`
 - `dummy/sorted.tsx`
+- `dummy/states.tsx`
 - `dummy/sticky-first-column.tsx`
 - `dummy/striped.tsx`
 

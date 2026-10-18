@@ -1,0 +1,60 @@
+---
+slug: installation
+title: تثبيت الحزمة
+description: خطوتان فقط. ثبّت الحزمة، ثم أضف المكوّنات التي تحتاج إليها.
+---
+
+## اختر إطار العمل
+
+الخطوات نفسها في كل إطار عمل.
+
+<FrameworkTabs frameworks={['Next.js App Router', 'Vite', 'React Router v7']} />
+
+## التثبيت
+
+استخدم مدير الحزم الذي تعمل به أصلًا.
+
+<PackageManagers />
+
+## الاعتماديات النظيرة
+
+ثلاث اعتماديات، وهي موجودة في مشروعك من قبل.
+
+| الحزمة | النطاق | سبب الحاجة إليها |
+|---|---|---|
+| <span dir="ltr">`react`</span> | <PeerRange name="react" /> | المكوّنات مكتوبة لـ React 19، حيث <span dir="ltr">`ref`</span> خاصية عادية |
+| <span dir="ltr">`react-dom`</span> | <PeerRange name="react-dom" /> | السبب نفسه |
+| <span dir="ltr">`tailwindcss`</span> | <PeerRange name="tailwindcss" /> | الأصناف المساعدة <span dir="ltr">`inset-s-*`</span> تحتاج إلى Tailwind 4.2 أو أحدث |
+
+## دعم أطر العمل
+
+المستوى يعني مدى تغطية الميزات، لا مستوى الجودة.
+
+| إطار العمل | المستوى | ما الذي يتغيّر |
+|---|---|---|
+| Next.js 15 أو 16 مع App Router | 1 | لا شيء. هذا هو الإعداد المرجعي: مكوّنات الخادم لا تضيف أي JavaScript، و<span dir="ltr">`Icon`</span> يعمل بالاسم، وإجراءات الخادم (Server Actions) متاحة |
+| تطبيق صفحة واحدة مع Vite | 2 | لا عرض على الخادم. كل مكوّن تستخدمه يدخل في حزمة المتصفح، و<span dir="ltr">`Icon`</span> يُستورد من <span dir="ltr">`icon-registry`</span> |
+
+## React من دون Next.js
+
+كل شيء يعمل كما هو. ثلاثة أشياء فقط تتغيّر.
+
+لا عرض على الخادم، لذلك يُشحن كل مكوّن تستخدمه داخل حزمة تطبيقك. استورد <span dir="ltr">`Icon`</span> من <span dir="ltr">`topclassui/icon-registry`</span> وسجّل الأيقونات التي تستخدمها مرة واحدة. والصق سكربت السمة في <span dir="ltr">`index.html`</span> يدويًا، كما تشرح صفحة [المزوّد](/ar/docs/provider#في-تطبيق-صفحة-واحدة).
+
+```ts title="vite.config.ts"
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+})
+```
+
+```ts title="src/icons.ts" check
+// once per app
+import { registerIcons } from 'topclassui/icon-registry'
+import { caretDown } from 'topclassui/icons/caret-down'
+
+registerIcons({ 'caret-down': caretDown })
+```

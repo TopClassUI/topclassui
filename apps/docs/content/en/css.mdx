@@ -1,0 +1,72 @@
+---
+slug: css
+title: CSS entry
+description: Three import lines, in order, and no configuration file. That is the whole Tailwind setup.
+---
+
+## The three lines
+
+```css title="app/globals.css"
+@import "tailwindcss";
+@import "topclassui/tokens.css";
+@import "topclassui/styles.css";
+```
+
+## What each line brings
+
+| Line | Brings |
+|---|---|
+| `tailwindcss` | Tailwind itself: the base layer and the utility classes |
+| `topclassui/tokens.css` | Every `--tc-*` variable, the three mode blocks, the knobs and the Arabic font rule |
+| `topclassui/styles.css` | The `@source` line that scans the components, the `@theme inline` mapping and the variants for forced states |
+
+## Why there is no tailwind.config.js
+
+Tailwind v4 is configured in CSS. The third import carries the mapping and the `@source` line, so it can never fall out of step with the components.
+
+## The utility names you get
+
+Every token becomes a utility class, with the same names the components use.
+
+<ThemeUtilities />
+
+## Overriding a token
+
+Set the variable after the three imports. Nothing checks the contrast of a value you set yourself.
+
+```css title="app/globals.css"
+@import "topclassui/styles.css";
+
+:root {
+  --tc-primary-solid: var(--color-emerald-700);
+  --tc-primary-on-solid: var(--color-white);
+  --tc-primary-on-soft: var(--color-emerald-700);
+  --tc-radius: 0.75rem;
+}
+```
+
+## If the order is wrong
+
+Tailwind’s layer order is set by the first import. Open a layer before it and the components lose to the base resets.
+
+<WrongRight>
+
+```css
+@import "topclassui/styles.css";
+@import "tailwindcss";
+
+/* the components layer is opened before Tailwind's layer
+   order statement, so it sinks below base and the resets win */
+```
+
+```css
+@import "tailwindcss";
+@import "topclassui/tokens.css";
+@import "topclassui/styles.css";
+```
+
+</WrongRight>
+
+## On Vite
+
+On Vite, the same three lines apply, with `@tailwindcss/vite` in the plugin list instead of PostCSS. The config is on [Install the package](/en/docs/installation#react-without-next-js).
