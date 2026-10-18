@@ -51,6 +51,8 @@ export function ToastViewport({ className, ...rest }: ToastViewportProps) {
         dir={viewport.dir}
         lang={viewport.lang}
         aria-label={viewport.labels.region}
+        onFocus={viewport.onFocus}
+        onBlur={viewport.onBlur}
         className={cn(TOAST_VIEWPORT, TOAST_PLACEMENT[viewport.placement], className)}
       >
         {viewport.toasts.map((entry) => (
