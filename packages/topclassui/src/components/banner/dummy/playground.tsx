@@ -2,11 +2,12 @@ import { Button } from '#components/button/index.js'
 import { Banner } from '../index.js'
 import type { BannerDesignProps } from '../index.js'
 
-/** The docs stage, as the frame draws it: the Try it controls set the tone and the x; the action is a link in the banner's colour. */
+/** The docs stage, as the frame draws it: dismissible, with the action as a link in the banner's colour; Try it sets the tone and the x. */
 // BannerDismissal takes a boolean beside the id, never an optional one.
-export default function Demo(props: Omit<BannerDesignProps, 'dismissible'> & { dismissible: boolean } = { dismissible: false }) {
+export default function Demo({ dismissible = true, ...props }: Omit<BannerDesignProps, 'dismissible'> & { dismissible?: boolean } = {}) {
   return (
     <Banner {...props}
+      dismissible={dismissible}
       id="banner-playground"
       aria-label="Release announcement"
       action={<Button size="sm" variant="link" className="px-0 font-semibold text-current" render={<a href="/changelog" />}>Read more</Button>}
