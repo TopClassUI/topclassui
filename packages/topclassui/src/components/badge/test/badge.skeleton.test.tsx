@@ -11,10 +11,10 @@ const classes = (props: BadgeSkeletonProps = {}) => classList(html(props))
 /** Every class that decides the height, written out per size. */
 const HEIGHT = {
   xs: ['py-pad-y-xs', 'text-xs'],
-  sm: ['py-pad-y-sm', 'text-sm'],
-  md: ['py-pad-y-md', 'text-sm'],
-  lg: ['py-pad-y-lg', 'text-base'],
-  xl: ['py-pad-y-xl', 'text-lg'],
+  sm: ['py-pad-y-sm', 'text-sm/4'],
+  md: ['py-pad-y-md', 'text-sm/4'],
+  lg: ['py-pad-y-lg', 'text-base/5'],
+  xl: ['py-pad-y-xl', 'text-lg/6'],
 } as const
 
 /** Written out, so one width repeated across the scale is a failure. */
@@ -73,7 +73,7 @@ describe('BadgeSkeleton', () => {
     expect(classes({ className: 'ms-2' }).sort()).toEqual([
       'animate-pulse', 'bg-neutral-soft', 'border-(length:--tc-line-width)', 'border-transparent',
       'gap-2', 'inline-flex', 'motion-reduce:animate-none', 'ms-2', 'px-3', 'py-pad-y-md',
-      'rounded-chip', 'text-sm', 'w-16',
+      'rounded-chip', 'text-sm/4', 'w-16',
     ])
   })
 

@@ -11,10 +11,10 @@ const classes = (props: BadgeProps = {}) => classList(html(props))
 /** The Build this table, written out: a derived expectation would shrink with BADGE_SIZE. */
 const SIZE = {
   xs: ['px-1', 'py-pad-y-xs', 'gap-1', 'text-xs'],
-  sm: ['px-2', 'py-pad-y-sm', 'gap-1.5', 'text-sm'],
-  md: ['px-3', 'py-pad-y-md', 'gap-2', 'text-sm'],
-  lg: ['px-4', 'py-pad-y-lg', 'gap-2', 'text-base'],
-  xl: ['px-5', 'py-pad-y-xl', 'gap-3', 'text-lg'],
+  sm: ['px-2', 'py-pad-y-sm', 'gap-1.5', 'text-sm/4'],
+  md: ['px-3', 'py-pad-y-md', 'gap-2', 'text-sm/4'],
+  lg: ['px-4', 'py-pad-y-lg', 'gap-2', 'text-base/5'],
+  xl: ['px-5', 'py-pad-y-xl', 'gap-3', 'text-lg/6'],
 } as const
 
 const BORDER_WIDTH = 'border-(length:--tc-line-width)'
@@ -45,12 +45,12 @@ describe('size', () => {
   })
 
   it('takes xl to text-lg, the Size collection step, not Button\'s text-base', () => {
-    expect(classes({ size: 'xl' })).toContain('text-lg')
+    expect(classes({ size: 'xl' })).toContain('text-lg/6')
   })
 
   it('custom opts out of the scale entirely, which is what it is for', () => {
     const list = classes({ size: 'custom' })
-    expect(list.filter((c) => /^(px-|py-|gap-|text-(xs|sm|base|lg)$)/.test(c))).toEqual([])
+    expect(list.filter((c) => /^(px-|py-|gap-|text-(xs|sm|base|lg)(\/\d)?$)/.test(c))).toEqual([])
   })
 })
 
@@ -82,7 +82,7 @@ describe('className', () => {
     expect(classes({ className: 'ms-2' }).sort()).toEqual([
       'bg-primary-soft', 'border-(length:--tc-line-width)', 'border-transparent', 'font-medium',
       'gap-2', 'inline-flex', 'items-center', 'max-w-full', 'ms-2', 'px-3', 'py-pad-y-md',
-      'rounded-chip', 'text-primary-on-soft', 'text-sm',
+      'rounded-chip', 'text-primary-on-soft', 'text-sm/4',
     ])
   })
 
@@ -95,6 +95,6 @@ describe('className', () => {
   it('lets the consumer override the type step', () => {
     const list = classes({ size: 'md', className: 'text-xs' })
     expect(list).toContain('text-xs')
-    expect(list).not.toContain('text-sm')
+    expect(list).not.toContain('text-sm/4')
   })
 })
