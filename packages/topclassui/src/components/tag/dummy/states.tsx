@@ -1,7 +1,7 @@
 import { tagVariants } from '../index.js'
 
-/** The ring a linked tag wears on focus-visible, drawn at rest so the strip can show it. */
-const RING = 'outline-solid outline-(length:--tc-ring-width) outline-offset-(length:--tc-ring-offset) outline-ring'
+/** The ring a linked tag wears on focus-visible, drawn at rest so the strip can show it; not under forced colours, where a ring at rest would read as focus. */
+const RING = 'not-forced-colors:outline-solid not-forced-colors:outline-(length:--tc-ring-width) not-forced-colors:outline-offset-(length:--tc-ring-offset) not-forced-colors:outline-ring'
 const chip = tagVariants({ tone: 'primary', interactive: true })
 
 /** One cell per state of a linked tag, named by its aria-label, as Figma 135:285 draws them. */
