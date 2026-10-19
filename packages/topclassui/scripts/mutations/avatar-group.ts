@@ -125,8 +125,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the AvatarGroup in-table demo gives every team its own max, so no row shows the default of four and a counter',
     file: 'src/components/avatar-group/dummy/in-table.tsx',
-    from: '<AvatarGroup className="*:ring-surface-raised"',
-    to: '<AvatarGroup max={20} className="*:ring-surface-raised"',
+    from: '<AvatarGroup aria-label={`${project.name}: ${placed}`}>',
+    to: '<AvatarGroup max={20} aria-label={`${project.name}: ${placed}`}>',
   },
   {
     label: 'the AvatarGroup linked demo drops the focus ring of the library, so its links show the ring the browser draws',

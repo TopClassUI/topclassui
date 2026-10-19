@@ -43,6 +43,22 @@ The format is: date, decision, why, and what it affects.
 
 **Affects.** PLAN 14 and 16 (the chip), R-0-2 (`pnpm check` has a new gate), `docs/RULES.md` commands, `docs/figma/docs-site.md` choice 15. Left for Omar: whether the class runtime should count in the budget, the fifteen raised budgets (slimming them, or moving the classes), and DatePicker's eager hook.
 
+## 2026-10-19 - Actions and display components read from their Figma Previewer frames
+
+**Decision.** Job 116 (round 8) compared Button, Tag, Kbd, SegmentedControl, Badge, Avatar, AvatarGroup, Card, Separator, Skeleton and CodeBlock against their `Previewer: <Name>` frames and changed the build where the frame differs. Composites are in `docs/figma/parity/<slug>.png`; each states demo is one cell per drawn state, captioned by its aria-label.
+
+- **Button.** Outline and ghost labels are `text-body` in every tone, as the component set 64:340 draws them; link keeps the tone's text. Pointer cursor on the root.
+- **Card.** Previewer spacing (18 around, 10 between), title on a 20 px line, body at `text-sm/tight`. `CardRoot render={<a href />}` renders the card as one link with the drawn hover (`HOVER.surface`, new in `shared/classes.ts`) and the focus ring; a plain card stays non-interactive. New part `CardMedia`, the full-bleed band of the Components-page drawing. This reverses the Unit 1 note that Card is built without states and the media part.
+- **Tag and Badge.** The chip sits on a 16 px line (`text-sm/4` at md), 30 px tall as drawn instead of 34. `tagVariants({ interactive: true })` is the linked tag with the drawn hover, active, focus and disabled.
+- **Kbd.** The cap is `bg-surface-raised`; `pressed` and `disabled` emit `data-pressed` and `data-disabled` as the frame's strip draws them. `muted` is named by the playground and never drawn, so it is not built.
+- **Separator.** Children make the labelled form: a line, the label, a line, 10 apart; an announced one is named by its label.
+- **Skeleton.** Rows step down (full, 5/6, 2/3) and are 0.75em thick.
+- **SegmentedControl.** A new knob, `--tc-segmented-height` (36 px times density), is the md track Figma draws, between the sm and md control steps; md and sm labels are 12 px; segments are regular, the selected one medium. The focus ring stays on the focused segment (R-5.6-1 and the keyboard spec): the frame draws it around the track. The tracks the keyboard and layout specs drive moved to `dummy/track-states.tsx`.
+- **Avatar and AvatarGroup.** Discs are `bg-neutral-soft text-neutral-on-soft`; only the group's +N counter wears the primary tint. The group's ring is `*:ring-neutral-soft`, the avatar's own fill, so fallback discs read as one shape and photos keep an edge on any surface; the `*:ring-surface-raised` override on a Card or in a Table is no longer needed. Initials step with the circle (sm xs, md base, lg lg, xl xl).
+- **CodeBlock.** Header 12 in and 32 tall, body 12 in, code at `text-xs` on an 18 px line.
+
+**Not built, for Omar.** The playground props with no drawing behind them: Card `variant` and `padding`, Badge `dot`, `uppercase` and `truncate`, Avatar `shape`, `bordered`, `status` and `clickable`, AvatarGroup `spacing`, `showCount` and `bordered`, Separator `spacing`, Kbd `variant`, `size` and `muted`, CodeBlock `theme`, `maxLines` and `lineNumbers`. CodeBlock's copy hover and copied states are live only; the copied tick is not in the success tone.
+
 ---
 
 ## 2026-10-18 - The site hydrates in islands, and the shell's code waits for the first paint

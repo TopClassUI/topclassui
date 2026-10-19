@@ -111,7 +111,7 @@ describe('a Card rendered as a link, as Previewer: Card draws its hover and focu
 
   it('steps down to the surface on hover, shows the ring on focus and wears a pointer', () => {
     const list = classList(link())
-    expect(list).toContain('hover:bg-surface')
+    expect(list).toContain('hover:bg-(--tc-surface)')
     expect(list).toContain('focus-visible:outline-ring')
     expect(list).toContain('cursor-pointer')
     expect(list).toContain('bg-surface-raised')

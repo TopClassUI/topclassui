@@ -25,7 +25,7 @@ const TRACKS: Record<string, string[]> = {
   'rtl': ['طريقة العرض: لوحة | جدول *^ | تقويم'],
   'sizes': ['Extra small: Extra small *^ | Off', 'Small: Small *^ | Off', 'Medium: Medium *^ | Off', 'Large: Large *^ | Off', 'Extra large: Extra large *^ | Off'],
   'states': [
-    'idle: A *^ | B', 'hover: A^ | B', 'focus-visible: A^ | B', 'checked: A *^ | B', 'disabled: A | B',
+    'idle: A *^ | B', 'hover: A *^ | B', 'focus-visible: A *^ | B', 'checked: A *^ | B', 'disabled: A *^ | B',
     'invalid: A *^ | B', 'one disabled: A *^ | B | C', 'read-only: A *^ | B',
   ],
   'track-states': [
