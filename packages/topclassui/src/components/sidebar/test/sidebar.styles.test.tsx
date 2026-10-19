@@ -69,6 +69,7 @@ describe('the header', () => {
   it('the toggle is the shared icon button with its 24 and 44 px floors, its ring and the ghost hover of the neutral ramp', () => {
     expect(toggle).toEqual([
       'inline-flex', 'shrink-0', 'items-center', 'justify-center', 'rounded-control',
+      'cursor-pointer', 'disabled:cursor-default', 'aria-disabled:cursor-default', 'data-disabled:cursor-default', 'data-readonly:cursor-default', 'data-loading:cursor-default',
       'min-h-[var(--tc-target-min,24px)]', 'min-w-[var(--tc-target-min,24px)]', ...COARSE, ...RING, ...MOTION,
       'text-muted', 'tone-neutral', 'hover:bg-(--tc-soft)', 'active:bg-(--tc-soft-hover)',
     ])
@@ -121,6 +122,7 @@ describe('a row', () => {
   const ROW = [
     'relative', 'overflow-hidden', 'min-w-[var(--tc-target-min,24px)]', ...COARSE,
     'flex', 'min-h-(--tc-row-height)', 'w-full', 'items-center', 'gap-2', 'rounded-control', 'px-3', 'text-start', 'text-sm',
+    'cursor-pointer', 'disabled:cursor-default', 'aria-disabled:cursor-default', 'data-disabled:cursor-default', 'data-readonly:cursor-default', 'data-loading:cursor-default',
     ...RING, ...MOTION, 'group-data-closed/sidebar:justify-center',
   ]
 

@@ -3,8 +3,7 @@ import { cva } from 'class-variance-authority'
 import { memoizeVariants } from '#shared/variants.js'
 
 import {
-  BORDER_WIDTH, CONTAIN, CONTROL_SIZE, DISABLED, FOCUS_RING, HOVER, LOADING, TOUCH_TARGET,
-  TRANSITION,
+  BORDER_WIDTH, CONTAIN, CONTROL_SIZE, DISABLED, FOCUS_RING, HOVER, LOADING, POINTER, TOUCH_TARGET, TRANSITION,
 } from '#shared/classes.js'
 import { TONE_CLASS } from '#shared/contracts/tone.js'
 import { ON_SOFT, ON_SOLID, TONE_TEXT } from './classes.js'
@@ -20,6 +19,7 @@ const resolve = cva(
     CONTAIN,
     DISABLED,
     LOADING,
+    POINTER,
     FOCUS_RING,
     TOUCH_TARGET,
     TRANSITION,
