@@ -23,6 +23,13 @@ The format is: date, decision, why, and what it affects.
 **Affects.** PLAN 14 and 16 (the chip), R-0-2 (`pnpm check` has a new gate), `docs/RULES.md` commands, `docs/figma/docs-site.md` choice 15. Left for Omar: whether the class runtime should count in the budget, the fifteen raised budgets (slimming them, or moving the classes), and DatePicker's eager hook.
 
 ---
+## 2026-10-19 - Breadcrumb writes JSON-LD only when given siteUrl
+
+**Decision.** Job 122. `Breadcrumb`'s `baseUrl` is replaced by `siteUrl`, an absolute http or https origin with no trailing slash (`https://example.com`), declared in `schema.ts` (with `BREADCRUMB_SITE_URL_PATTERN` in `constants.ts`) and derived into `types.ts` (R-8.3-4). With it, the trail is written as `BreadcrumbList` JSON-LD: every crumb with an `href` is a `ListItem` whose `item` is absolute against the origin of `siteUrl`, and the current page is the last `ListItem`, with its name and no `item`, as Google documents for the last crumb. Without it no script is written. A `siteUrl` that does not parse as an http or https URL writes no script either and never throws; a path or a trailing slash on it is ignored, since only its origin is used. A trail with no link writes no script, because a list holding only the current page points nowhere.
+
+**Why.** Every demo on the site, in the harness and in a consumer's own gallery wrote a `BreadcrumbList` of relative URLs into the page that showed it, which Google reads as that page's own trail, and relative `item` URLs are dropped anyway. Opt-in by the absolute origin fixes both.
+
+**What it affects.** `src/components/breadcrumb/{index.tsx,lib.ts,types.ts,schema.ts,constants.ts,README.md}`, its tests and mutation rows, and the site's two `Breadcrumb`s (`component-page.tsx`, `docs-shell.tsx`), which now pass `siteUrl={SITE_URL}` and so gain the current page as the last `ListItem`. A caller still passing `baseUrl` fails to compile. The 10 October entry's Breadcrumb bullet is superseded on this point.
 
 ## 2026-10-18 - The site hydrates in islands, and the shell's code waits for the first paint
 

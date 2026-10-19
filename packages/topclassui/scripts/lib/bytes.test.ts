@@ -1,23 +1,17 @@
 // A heredoc once wrote a literal backspace into a regex, which silently disabled a whole
 // check. Control bytes are invisible in a diff, so they are asserted against here.
-import { readFileSync, readdirSync } from 'node:fs'
-import { join, sep } from 'node:path'
+import { readFileSync } from 'node:fs'
+import { sep } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import { trackedFiles } from './tracked-files.js'
+
 const ROOT = process.cwd()
-const SKIP = new Set(['node_modules', '.git', 'dist', 'coverage'])
 const TEXT = /\.(ts|tsx|css|md|json|ya?ml|mjs|cjs)$/
 
-function sources(dir: string, out: string[] = []): string[] {
-  for (const e of readdirSync(dir, { withFileTypes: true })) {
-    if (SKIP.has(e.name)) continue
-    const p = join(dir, e.name)
-    if (e.isDirectory()) sources(p, out)
-    else if (TEXT.test(e.name)) out.push(p)
-  }
-  return out
-}
+/** The tracked text files only, so a build folder left on disk cannot fail the check. */
+const sources = (dir: string): string[] => trackedFiles(dir).filter((file) => TEXT.test(file))
 
 /** Tab, newline and carriage return are the only control bytes a source file may hold. */
 const allowed = new Set([9, 10, 13])

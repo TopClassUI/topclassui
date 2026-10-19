@@ -20,7 +20,7 @@ export const breadcrumb = {
     en: [
       '`items` is the trail as `{ href?, label }`, root first. With an `href` on the last item too, it is one more link and no page is marked current.',
       'In Next.js a plain link reloads the page. Pass `link={<Link href="" />}` and each crumb is a client navigation; its href is replaced with the item\'s.',
-      'Pass `baseUrl="https://example.com"` and the JSON-LD lists absolute URLs. The links stay as written.',
+      'Pass `siteUrl="https://example.com"`, the origin with no trailing slash, and the trail is also written as BreadcrumbList JSON-LD with absolute URLs, the current page last. Without it no JSON-LD is written. The links stay as written.',
       'A crumb with an empty label, or one that is not a string, is left out of the trail and of the JSON-LD.',
       'A crumb without an `href` that is not the last one is plain text: no link, and no entry in the JSON-LD.',
       'A long label ends in an ellipsis at the width of its box and is cut at 200 characters. The JSON-LD keeps the whole label.',
@@ -28,7 +28,7 @@ export const breadcrumb = {
     ar: [
       '`items` هو المسار بصيغة `{ href?, label }`، يبدأ من الجذر. إن كان على العنصر الأخير `href` أيضًا فهو رابط آخر، ولا تُعلَّم أي صفحة بأنها الحالية.',
       'في Next.js يعيد الرابط العادي تحميل الصفحة. مرّر `link={<Link href="" />}` فيصبح كل عنصر تنقّلًا من جهة المتصفح، ويُستبدل href فيه بعنوان العنصر.',
-      'مرّر `baseUrl="https://example.com"` فتصبح عناوين JSON-LD مطلقة. الروابط نفسها تبقى كما كُتبت.',
+      'مرّر `siteUrl="https://example.com"`، أصل الموقع بلا شرطة مائلة في آخره، فيُكتب المسار أيضًا بصيغة BreadcrumbList في JSON-LD بعناوين مطلقة، والصفحة الحالية آخره. ومن دونه لا يُكتب JSON-LD. الروابط نفسها تبقى كما كُتبت.',
       'العنصر الذي تسميته فارغة، أو ليست نصًّا، يُستبعد من المسار ومن JSON-LD.',
       'العنصر الذي لا `href` له وليس الأخير نص عادي: لا رابط، ولا مدخل في JSON-LD.',
       'التسمية الطويلة تنتهي بعلامة حذف عند عرض صندوقه ويُقصّ عند 200 حرف. أما JSON-LD فيحتفظ بالتسمية كاملة.',

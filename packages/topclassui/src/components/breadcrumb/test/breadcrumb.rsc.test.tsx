@@ -21,7 +21,7 @@ function Link({ prefetch, ...rest }: { href: string; prefetch?: boolean; classNa
 }
 
 /** The element Breadcrumb returns, read before React renders it. */
-const element = (items: BreadcrumbItem[]) => Breadcrumb({ items }) as ReactElement<NavProps> | null
+const element = (items: BreadcrumbItem[], siteUrl?: string) => Breadcrumb({ items, siteUrl }) as ReactElement<NavProps> | null
 
 describe('<Breadcrumb> in a Server Component tree', () => {
   it('runs with no client hook and returns the nav itself as the root', () => {
@@ -45,14 +45,18 @@ describe('<Breadcrumb> in a Server Component tree', () => {
   })
 
   it('hands the JSON-LD over as a string, which is all that crosses to the document', () => {
-    const script = element(TRAIL)?.props.children[1] as ReactElement<{
+    const script = element(TRAIL, 'https://example.com')?.props.children[1] as ReactElement<{
       type: string
       dangerouslySetInnerHTML: { __html: string }
     }>
     expect(script.type).toBe('script')
     expect(script.props.type).toBe('application/ld+json')
     expect(script.props.dangerouslySetInnerHTML.__html).toBe(
-      '{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"/"}]}',
+      '{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://example.com/"},{"@type":"ListItem","position":2,"name":"Breadcrumb"}]}',
     )
+  })
+
+  it('hands over no script without siteUrl, only the list', () => {
+    expect(element(TRAIL)?.props.children[1]).toBeNull()
   })
 })
