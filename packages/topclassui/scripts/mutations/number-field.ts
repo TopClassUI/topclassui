@@ -34,8 +34,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the number field root loses FIELD_HOLDER, so its box is a floor again and two in a row scroll the page',
     file: CLASSES,
-    from: 'export const NUMBER_FIELD_ROOT = `inline-grid align-middle ${FIELD_HOLDER}`',
-    to: 'export const NUMBER_FIELD_ROOT = \'inline-grid align-middle\'',
+    from: 'export const NUMBER_FIELD_ROOT = `inline-grid align-middle ${FIELD_HOLDER} ',
+    to: 'export const NUMBER_FIELD_ROOT = `inline-grid align-middle ',
   },
   {
     label: 'the number field bounds are not clamped, so min, max and step past the limits reach Base UI',
@@ -136,8 +136,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the number field stepper is shrink-0 again, so at a 32 px root the increase stepper of a large field is cut',
     file: CLASSES,
-    from: 'aspect-square shrink items-center',
-    to: 'aspect-square shrink-0 items-center',
+    from: 'aspect-4/5 shrink cursor-pointer',
+    to: 'aspect-4/5 shrink-0 cursor-pointer',
   },
   {
     label: 'the number field reads a typed Latin 1,234 only on blur, so Enter under Arabic-Indic digits submits 1',

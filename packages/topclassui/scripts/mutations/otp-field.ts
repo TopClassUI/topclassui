@@ -184,8 +184,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the otp field cell loses its 24 px floor, so a narrow parent squeezes it under the target size',
     file: CLASSES,
-    from: '`min-w-[var(--tc-target-min,24px)] shrink',
-    to: '`min-w-0 shrink',
+    from: '`min-w-[var(--tc-target-min,24px)] pointer-coarse:',
+    to: '`min-w-0 pointer-coarse:',
   },
   {
     label: 'the otp field cell loses its height floor, so under a finger it is 40 px tall',
