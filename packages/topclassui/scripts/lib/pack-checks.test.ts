@@ -7,8 +7,8 @@ import {
 const CLEAN = ['package.json', 'README.md', 'LICENSE', 'dist/styles.css', 'dist/tokens.css', 'dist/components/button/index.js']
 
 describe('pathProblems', () => {
-  it('accepts dist and the four root files', () => {
-    expect(pathProblems([...CLEAN, 'CHANGELOG.md'])).toEqual([])
+  it('accepts dist and the five root files', () => {
+    expect(pathProblems([...CLEAN, 'CHANGELOG.md', 'size.json'])).toEqual([])
   })
 
   it('names a path outside dist', () => {

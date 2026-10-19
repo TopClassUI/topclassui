@@ -11,7 +11,7 @@ export function componentOgImage(locale: string, slug: string) {
   if (entry === null) notFound()
   return ogImage({
     name: entry.content.title.en,
-    chip: chipOf(entry.rendering, entry.slug, COMPONENT_PAGE_LABELS.en.chip),
+    chip: chipOf(entry, COMPONENT_PAGE_LABELS.en.chip),
     line: ogLineOf(locale, `/${locale}/docs/components/${slug}`, entry.content.description.en),
   })
 }
