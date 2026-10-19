@@ -16,8 +16,8 @@ const classes = (props: ButtonProps = {}) => classList(html(props))
 const MARKS: Record<string, string[]> = {
   solid: ['border-transparent', 'bg-primary-solid', 'text-primary-on-solid', 'hover:bg-(--tc-hover)', 'active:bg-(--tc-active)'],
   soft: ['border-transparent', 'bg-primary-soft', 'text-primary-on-soft', 'hover:bg-(--tc-soft-hover)', 'active:bg-(--tc-soft-active)'],
-  outline: ['border-line-strong', 'text-primary-on-soft', 'hover:bg-(--tc-soft)', 'active:bg-(--tc-soft-hover)'],
-  ghost: ['border-transparent', 'text-primary-on-soft', 'hover:bg-(--tc-soft)', 'active:bg-(--tc-soft-hover)'],
+  outline: ['border-line-strong', 'text-body', 'hover:bg-(--tc-soft)', 'active:bg-(--tc-soft-hover)'],
+  ghost: ['border-transparent', 'text-body', 'hover:bg-(--tc-soft)', 'active:bg-(--tc-soft-hover)'],
   link: ['border-transparent', 'text-primary-on-soft', 'underline-offset-4', 'hover:underline'],
 }
 

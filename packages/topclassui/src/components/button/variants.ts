@@ -9,12 +9,12 @@ import {
 import { TONE_CLASS } from '#shared/contracts/tone.js'
 import { ON_SOFT, ON_SOLID, TONE_TEXT } from './classes.js'
 import {
-  BUTTON_DEFAULTS, BUTTON_SIZES, BUTTON_TONES, BUTTON_UNFILLED, BUTTON_VARIANTS,
+  BUTTON_DEFAULTS, BUTTON_SIZES, BUTTON_TONES, BUTTON_BODY_TEXT, BUTTON_VARIANTS,
 } from './constants.js'
 
 const resolve = cva(
   [
-    'inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium rounded-control',
+    'inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap font-medium rounded-control',
     // The width is always present, so switching to outline shifts no layout.
     BORDER_WIDTH,
     CONTAIN,
@@ -41,12 +41,9 @@ const resolve = cva(
     compoundVariants: [
       ...BUTTON_TONES.map((tone) => ({ variant: 'solid' as const, tone, class: ON_SOLID[tone] })),
       ...BUTTON_TONES.map((tone) => ({ variant: 'soft' as const, tone, class: ON_SOFT[tone] })),
-      ...BUTTON_TONES.map((tone) => ({
-        // Spread: cva wants a mutable list, and R-8.3-5 wants the source as const.
-        variant: [...BUTTON_UNFILLED],
-        tone,
-        class: TONE_TEXT[tone],
-      })),
+      // Spread: cva wants a mutable list, and R-8.3-5 wants the source as const.
+      { variant: [...BUTTON_BODY_TEXT], class: 'text-body' },
+      ...BUTTON_TONES.map((tone) => ({ variant: 'link' as const, tone, class: TONE_TEXT[tone] })),
     ],
     defaultVariants: {
       variant: BUTTON_DEFAULTS.variant,
