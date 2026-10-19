@@ -1,5 +1,6 @@
 // The Previewer card (S8): head, stage and Try it, the code, every state, install. Used by a component's page and the catalog.
 import { Badge } from 'topclassui/badge'
+import { Button } from 'topclassui/button'
 import { Svg } from 'topclassui/svg'
 import { downloadSimple } from 'topclassui/icons/download-simple'
 import { info } from 'topclassui/icons/info'
@@ -10,13 +11,16 @@ import { type PagedComponent, demoSourceOf } from '../../lib/components'
 import type { Locale } from '../../lib/locales'
 import { countStates } from '../../lib/states'
 import { snippetOf, usageOf } from '../../lib/usage'
-import { CARD, CARD_HEAD, CARD_PART, CARD_TITLE, H3, LINK, SMALL, STAGE, STATE_SCOPE } from '../classes'
+import { CAPTION, CARD_TITLE, CODE_PART, CARD_PART, FLAT_CODE, H3, LINK, NOTE, PART_ROW, PREVIEWER, PREVIEWER_HEAD, SMALL, STAGE, STATE_SCOPE } from '../classes'
 import { Code } from '../code'
 import { Demo } from '../demo'
 import { InlineText } from '../inline-text'
 import { InstallRow } from './install-row'
-import { CardModeSwitch, PlaygroundIsland } from './previewer-islands'
+import { CardModeSwitch, CopyButton, PlaygroundIsland } from './previewer-islands'
 import { ModeScope, PreviewerModeProvider } from './previewer-mode'
+
+/** The chip's colour by where the component renders, as the frames tint it. */
+const CHIP_TONE = { server: 'success', split: 'info', client: 'primary' } as const
 
 export interface PreviewerProps {
   entry: PagedComponent
@@ -36,12 +40,11 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
   const stageDemo = content.stageDemo ?? (playground ? 'playground' : (content.demos[0] ?? 'playground'))
   const stageSource = demoSourceOf(entry, stageDemo) ?? ''
   const usage = playground ? usageOf(stageSource) : null
-  const restCode = (
-    <Code locale={locale} title={`${entry.slug}.tsx`} copyLabel={t.copyCode} code={usage === null ? stageSource : snippetOf(usage, [])} />
-  )
+  const restSource = usage === null ? stageSource : snippetOf(usage, [])
+  const restCode = <Code locale={locale} title={`${entry.slug}.tsx`} copyLabel={t.copyCode} code={restSource} className={FLAT_CODE} />
   const note = (
-    <p className={`flex items-start gap-2 ${SMALL}`}>
-      <Svg icon={info} size="1rem" className="mt-0.5 shrink-0" aria-hidden="true" />
+    <p className={`flex items-start gap-2 ${NOTE}`}>
+      <Svg icon={info} size="0.75rem" className="mt-0.5 shrink-0" aria-hidden="true" />
       <span><InlineText text={content.note[locale]} /></span>
     </p>
   )
@@ -51,21 +54,23 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
 
   return (
     <PreviewerModeProvider>
-      <article aria-labelledby={headingId} data-component={entry.slug} className={deferred ? `${CARD} docs-card-deferred` : CARD}>
-        <header className={CARD_HEAD}>
-          <div className="flex flex-wrap items-center gap-3">
-            <h2 id={headingId} className={CARD_TITLE}>
-              {href === undefined ? title : <a href={href} className={LINK}>{title}</a>}
-            </h2>
-            <Badge tone="neutral" variant="outline" size="sm"><bdi>{chipOf(entry.rendering, entry.slug, t.chip)}</bdi></Badge>
+      <article aria-labelledby={headingId} data-component={entry.slug} className={deferred ? `${PREVIEWER} docs-card-deferred` : PREVIEWER}>
+        <header className={PREVIEWER_HEAD}>
+          <div className="grid min-w-0 flex-1 basis-80 gap-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 id={headingId} className={CARD_TITLE}>
+                {href === undefined ? title : <a href={href} className={LINK}>{title}</a>}
+              </h2>
+              <Badge tone={CHIP_TONE[entry.rendering]} variant="soft" size="sm" className="font-mono"><bdi>{chipOf(entry.rendering, entry.slug, t.chip)}</bdi></Badge>
+            </div>
+            <p className={SMALL}><InlineText text={content.description[locale]} /></p>
           </div>
-          <p className={SMALL}><InlineText text={content.description[locale]} /></p>
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
             <CardModeSwitch label={t.cardMode(title)} names={t.modes} />
-            <a href={`#${installId}`} className={`gap-1.5 text-sm ${LINK}`}>
-              <Svg icon={downloadSimple} size="1rem" aria-hidden="true" />
+            <Button size="sm" render={<a href={`#${installId}`} />}>
+              <Svg icon={downloadSimple} size="0.875rem" aria-hidden="true" />
               {t.install}
-            </a>
+            </Button>
           </div>
         </header>
 
@@ -79,9 +84,10 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
               stageHeight={content.stageHeight}
               serverStage={entry.rendering === 'client' ? null : <Demo demoKey={`${entry.slug}/playground`} />}
               restCode={restCode}
+              restSource={restSource}
               usage={usage}
               note={note}
-              labels={{ tryIt: t.tryIt, theCode: t.theCode, copyCode: t.copyCode }}
+              labels={{ tryIt: t.tryIt, theCode: t.theCode, copyCode: t.copyCode, copy: t.copy, copied: t.copied, copyFailed: t.copyFailed }}
             />
           </div>
         ) : (
@@ -91,8 +97,11 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
                 <Demo demoKey={`${entry.slug}/${stageDemo}`} />
               </div>
             </ModeScope>
-            <div className={CARD_PART}>
-              <h3 className={H3}>{t.theCode}</h3>
+            <div className={CODE_PART}>
+              <div className={PART_ROW}>
+                <h3 className={H3}>{t.theCode}</h3>
+                <CopyButton text={restSource} label={t.copyCode} word={t.copy} copied={t.copied} failed={t.copyFailed} />
+              </div>
               {restCode}
               {note}
             </div>
@@ -101,9 +110,9 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
 
         {statesSource === null ? null : (
           <div className={CARD_PART}>
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <h3 className={H3}>{t.everyState}</h3>
-              <span className={SMALL}>{t.stateCount(countStates(statesSource))}</span>
+            <div className={PART_ROW}>
+              <h3 className={CAPTION}>{t.everyState}</h3>
+              <span className="font-mono text-xs text-muted">{t.stateCount(countStates(statesSource))}</span>
             </div>
             <ModeScope className={STATE_SCOPE}>
               <Demo demoKey={`${entry.slug}/states`} />

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { importLineOf, installLineOf, versionLabelOf } from './install'
+import { addLineOf, importLineOf, installLineOf, sourceImportLineOf, versionLabelOf } from './install'
 
 describe('installLineOf', () => {
   it('installs the beta tag while the version is a prerelease', () => {
@@ -20,5 +20,13 @@ describe('importLineOf', () => {
   it('imports every part from the component subpath', () => {
     expect(importLineOf(['SegmentedControlRoot', 'SegmentedControlItem'], 'segmented-control'))
       .toBe("import { SegmentedControlRoot, SegmentedControlItem } from 'topclassui/segmented-control'")
+  })
+})
+
+describe('the copy-the-source pair', () => {
+  it('adds one component with the CLI and imports it through the @/topclassui alias', () => {
+    expect(addLineOf('date-picker')).toBe('npx topclassui add date-picker')
+    expect(sourceImportLineOf(['DialogRoot', 'DialogBody'], 'dialog'))
+      .toBe("import { DialogRoot, DialogBody } from '@/topclassui/components/dialog'")
   })
 })

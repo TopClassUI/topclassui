@@ -170,7 +170,7 @@ test('Dialog: size from Try it reaches the open popup and the code', async ({ pa
   await card(page, 'dialog').getByRole('button', { name: 'Publish', exact: true }).click()
   await expect(page.getByRole('dialog')).toHaveAttribute('data-size', 'lg')
   await close(page, 'dialog')
-  await card(page, 'dialog').getByRole('switch', { name: 'closeButton' }).click()
+  await card(page, 'dialog').getByRole('checkbox', { name: 'closeButton' }).click()
   await card(page, 'dialog').getByRole('button', { name: 'Publish', exact: true }).click()
   await expect(page.getByRole('dialog').getByRole('button')).toHaveText(['Cancel', 'Publish now'])
   expect(errors).toEqual([])
@@ -232,7 +232,7 @@ test('Command: defaultOpen from Try it opens the palette with its list', async (
   await card(page, 'command').scrollIntoViewIfNeeded()
   // Pressed once the demo has mounted, so Try it must remount it for defaultOpen to take effect.
   await page.waitForLoadState('networkidle')
-  await card(page, 'command').getByRole('switch', { name: 'defaultOpen' }).click()
+  await card(page, 'command').getByRole('checkbox', { name: 'defaultOpen' }).click()
   const palette = page.getByRole('dialog')
   await expect(palette).toBeVisible()
   await expect(palette.getByRole('option', { name: 'Dialog' })).toBeVisible()

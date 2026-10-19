@@ -9,7 +9,8 @@ import { Skeleton } from 'topclassui/skeleton'
 import { PLAYGROUNDS } from '../../.generated/playgrounds'
 import type { Control } from '../../lib/components'
 import { type PropValue, type Usage, changedProps, snippetOf } from '../../lib/usage'
-import { CARD_PART, CONTROL, CONTROL_LABEL, CONTROL_RESERVE, H3, PLAY_ROW, STAGE, STAGE_RESERVE, TRY_IT } from '../classes'
+import { CHECK_LABEL, CHECK_ROW, CODE_PART, CONTROL, CONTROL_LABEL, CONTROL_RESERVE, FLAT_CODE, H3, PART_ROW, PLAY_ROW, STAGE, STAGE_RESERVE, TRY_IT } from '../classes'
+import { CopyButton } from './copy-button'
 import { ModeScope } from './previewer-mode'
 import { TryItControl } from './try-it-control'
 import { useNearViewport } from './use-near-viewport'
@@ -27,9 +28,11 @@ export interface PlaygroundIslandProps {
   serverStage: ReactNode
   /** The highlighted usage at the defaults, rendered on the server. */
   restCode: ReactNode
+  /** The same usage as text, for the copy button. */
+  restSource: string
   usage: Usage | null
   note: ReactNode
-  labels: { tryIt: string; theCode: string; copyCode: string }
+  labels: { tryIt: string; theCode: string; copyCode: string; copy: string; copied: string; copyFailed: string }
 }
 
 /** What each control shows first: the schema's default, else the first option or the minimum. */
@@ -41,7 +44,7 @@ const startOf = (controls: Control[]) => Object.fromEntries(controls.flatMap((co
 })) as Record<string, PropValue>
 
 export function PlaygroundIsland(props: PlaygroundIslandProps) {
-  const { slug, locale, controls, descriptions, stageHeight, serverStage, restCode, usage, note, labels } = props
+  const { slug, locale, controls, descriptions, stageHeight, serverStage, restCode, restSource, usage, note, labels } = props
   const idBase = useId()
   const row = useRef<HTMLDivElement>(null)
   const near = useNearViewport(row)
@@ -54,6 +57,7 @@ export function PlaygroundIsland(props: PlaygroundIslandProps) {
   const remountKey = changed.filter(([name]) => /^default[A-Z]/.test(name)).map(([name, value]) => `${name}=${String(value)}`).join(' ')
   const live = Demo !== null && (serverStage === null ? near : changed.length > 0)
   const copy = getLabels(locale, { common: { copy: labels.copyCode } }).labels
+  const shown = changed.length === 0 || usage === null ? null : snippetOf(usage, changed)
 
   return (
     <>
@@ -74,17 +78,27 @@ export function PlaygroundIsland(props: PlaygroundIslandProps) {
                   onChange={(value) => { setValues((current) => ({ ...current, [control.prop]: value })) }}
                 />
               ))
-            : controls.map((control) => (
-                <div key={control.prop} className={CONTROL}>
-                  <span dir="ltr" className={CONTROL_LABEL}>{control.prop}</span>
-                  <Skeleton variant="rect" className={CONTROL_RESERVE[control.kind]} />
-                </div>
-              ))}
+            : controls.map((control) => (control.kind === 'switch'
+                ? (
+                    <div key={control.prop} className={CHECK_ROW}>
+                      <Skeleton variant="rect" className={CONTROL_RESERVE.switch} />
+                      <span dir="ltr" className={CHECK_LABEL}>{control.prop}</span>
+                    </div>
+                  )
+                : (
+                    <div key={control.prop} className={CONTROL}>
+                      <span dir="ltr" className={CONTROL_LABEL}>{control.prop}</span>
+                      <Skeleton variant="rect" className={CONTROL_RESERVE[control.kind]} />
+                    </div>
+                  )))}
         </div>
       </ModeScope>
-      <div className={CARD_PART}>
-        <h3 className={H3}>{labels.theCode}</h3>
-        {changed.length === 0 || usage === null ? restCode : <CodeBlock lang="tsx" title={`${slug}.tsx`} labels={copy}>{snippetOf(usage, changed)}</CodeBlock>}
+      <div className={CODE_PART}>
+        <div className={PART_ROW}>
+          <h3 className={H3}>{labels.theCode}</h3>
+          <CopyButton text={shown ?? restSource} label={labels.copyCode} word={labels.copy} copied={labels.copied} failed={labels.copyFailed} />
+        </div>
+        {shown === null ? restCode : <CodeBlock lang="tsx" title={`${slug}.tsx`} labels={copy} showCopy={false} className={FLAT_CODE}>{shown}</CodeBlock>}
         {note}
       </div>
     </>
