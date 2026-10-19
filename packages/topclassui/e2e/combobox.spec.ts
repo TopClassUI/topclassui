@@ -445,7 +445,7 @@ test.describe('live: paging, through load-more', () => {
     expect(Math.max(...await page.evaluate(() => (window as unknown as { ahead: number[] }).ahead))).toBe(0)
   })
 
-  test('status: loading turns the caret into a spinner, says Loading in the list, and marks the input busy', async ({ page }) => {
+  test('status: loading draws a spinner at the inline end, says Loading in the list, and marks the input busy', async ({ page }) => {
     await open(page, 'combobox--status', 'City, loading')
     expect(await inputOf(page, 'City, loading').getAttribute('aria-busy')).toBe('true')
     await expect(page.getByRole('status').last()).toHaveText('Loading')
@@ -483,12 +483,12 @@ test.describe('live: where the popup lands', () => {
     }
   }
 
-  test('rtl: the popup lines up with the right edge of the input, the caret sits at its left, and the tick ends a row at its left', async ({ page }) => {
+  test('rtl: the popup lines up with the right edge of the input, the glass sits at its right, and the tick ends a row at its left', async ({ page }) => {
     const popup = await open(page, 'combobox--rtl', 'المدينة', { direction: 'rtl' })
     const [box, input] = [await boxOf(popup), await boxOf(inputOf(page, 'المدينة'))]
     expect(Math.abs(box.right - input.right)).toBeLessThanOrEqual(1)
-    const caret = await boxOf(page.locator('#demo [aria-hidden] svg'))
-    expect(caret.left - input.left).toBeLessThan(input.right - caret.right)
+    const glass = await boxOf(page.locator('#demo [aria-hidden] svg'))
+    expect(input.right - glass.right).toBeLessThan(glass.left - input.left)
     const chosen = page.getByRole('option', { name: 'عمّان' })
     const [tick, row] = [await boxOf(chosen.locator('svg')), await boxOf(chosen)]
     expect(tick.left - row.left).toBeLessThan(row.right - tick.right)
