@@ -14,16 +14,16 @@ const partClasses = (source: string, opening: string) =>
   classList(source.slice(source.indexOf(opening)).replace(/>[\s\S]*$/, '>'))
 
 describe('each part wears exactly the classes the spec names', () => {
-  it('the root is a top-aligned row on the box radius, 16 px inline and 12 px block', () => {
+  it('the root is a top-aligned row on the box radius, the frame\'s 14 px inline and 12 px block counting its edge', () => {
     expect(classes().sort()).toEqual([
-      'bg-info-soft', 'border-(length:--tc-line-width)', 'border-transparent', 'flex', 'gap-2',
-      'items-start', 'px-pad-x-md', 'py-3', 'rounded-box', 'text-info-on-soft',
+      'bg-info-soft', 'border-(length:--tc-line-width)', 'border-transparent', 'flex', 'gap-2.5',
+      'items-start', 'px-3.25', 'py-2.75', 'rounded-box', 'text-info-on-soft',
     ])
   })
 
   it('the body fills the row, may shrink, and breaks a word that has no space', () => {
     expect(partClasses(html(), '<div class="flex min-w').sort())
-      .toEqual(['flex', 'flex-1', 'flex-col', 'gap-1', 'min-w-0', 'wrap-anywhere'])
+      .toEqual(['flex', 'flex-1', 'flex-col', 'gap-0.75', 'min-w-0', 'wrap-anywhere'])
   })
 
   it('the title is a paragraph at the small step in semibold', () => {
@@ -70,7 +70,7 @@ describe('className is merged last, so the consumer wins every conflict', () => 
   it('replaces the padding and the gap', () => {
     const list = classes({ className: 'px-0 py-1 gap-4' })
     expect(list).toEqual(expect.arrayContaining(['px-0', 'py-1', 'gap-4']))
-    expect(list.filter((c) => ['px-pad-x-md', 'py-3', 'gap-2'].includes(c))).toEqual([])
+    expect(list.filter((c) => ['px-3.25', 'py-2.75', 'gap-2.5'].includes(c))).toEqual([])
   })
 
   it('replaces the fill and the border colour of the tone', () => {

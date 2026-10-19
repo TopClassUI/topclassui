@@ -41,8 +41,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the alert body loses wrap-anywhere, so a long URL runs out of the box',
     file: 'src/components/alert/index.tsx',
-    from: 'flex-col gap-1 wrap-anywhere"',
-    to: 'flex-col gap-1"',
+    from: 'flex-col gap-0.75 wrap-anywhere"',
+    to: 'flex-col gap-0.75"',
   },
   {
     label: 'the alert passes className first, so the consumer loses every conflict',
@@ -72,13 +72,13 @@ export const MUTATIONS: Mutation[] = [
     label: "a caller's alert icon moves after the text, so it sits at the wrong end in either direction",
     file: 'src/components/alert/index.tsx',
     from: ' : icon}\n' +
-      '      <div className="flex min-w-0 flex-1 flex-col gap-1 wrap-anywhere">\n' +
+      '      <div className="flex min-w-0 flex-1 flex-col gap-0.75 wrap-anywhere">\n' +
       '        {isEmpty(title) ? null : <p className="text-sm font-semibold">{title}</p>}\n' +
       '        {isEmpty(children) ? null : <div className="text-sm">{children}</div>}\n' +
       '        {isEmpty(actions) ? null : <div className="flex flex-wrap gap-2 pt-1">{actions}</div>}\n' +
       '      </div>\n',
     to: ' : null}\n' +
-      '      <div className="flex min-w-0 flex-1 flex-col gap-1 wrap-anywhere">\n' +
+      '      <div className="flex min-w-0 flex-1 flex-col gap-0.75 wrap-anywhere">\n' +
       '        {isEmpty(title) ? null : <p className="text-sm font-semibold">{title}</p>}\n' +
       '        {isEmpty(children) ? null : <div className="text-sm">{children}</div>}\n' +
       '        {isEmpty(actions) ? null : <div className="flex flex-wrap gap-2 pt-1">{actions}</div>}\n' +

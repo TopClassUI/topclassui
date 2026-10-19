@@ -36,7 +36,7 @@ export function Alert({
     >
       {/* mt-0.5 centres the 16 px icon on the 20 px first line of text-sm. */}
       {icon === undefined ? <Svg icon={pickIcon(tone)} size="xs" className="mt-0.5" /> : icon}
-      <div className="flex min-w-0 flex-1 flex-col gap-1 wrap-anywhere">
+      <div className="flex min-w-0 flex-1 flex-col gap-0.75 wrap-anywhere">
         {isEmpty(title) ? null : <p className="text-sm font-semibold">{title}</p>}
         {isEmpty(children) ? null : <div className="text-sm">{children}</div>}
         {isEmpty(actions) ? null : <div className="flex flex-wrap gap-2 pt-1">{actions}</div>}
