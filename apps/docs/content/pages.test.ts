@@ -42,9 +42,9 @@ describe('the page registry', () => {
   it('derives previous from the live order, skipping a later page, and has none before Home', () => {
     expect(previousPage('home')).toBeUndefined()
     expect(previousPage('installation')?.slug).toBe('home')
-    expect(previousPage('css')?.slug).toBe('installation')
+    expect(previousPage('cli')?.slug).toBe('installation')
+    expect(previousPage('css')?.slug).toBe('cli')
     expect(previousPage('colors')?.slug).toBe('first-component')
     expect(previousPage('changelog')?.slug).toBe('components')
-    expect(previousPage('cli')).toBeUndefined()
   })
 })
