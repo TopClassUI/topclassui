@@ -423,7 +423,8 @@ test.describe('ten thousand rows, windowed', () => {
       const before = await scrollY(page)
       await openOverlay(page, triggerOf(page, 'Jump to a section'), { by: 'tap' })
       const list = await boxOf(listOf(page))
-      for (let drag = 0; drag < 12; drag++) await touchDrag(page, list.left + 60, list.bottom - 20, list.top + 20)
+      // Seven 32 px rows make a 224 px list, so a drag moves 184 px of the 2640 the sixty 44 px rows take.
+      for (let drag = 0; drag < 16; drag++) await touchDrag(page, list.left + 60, list.bottom - 20, list.top + 20)
       const last = await boxOf(page.getByRole('option', { name: 'Go to section 60' }))
       expect(last.bottom).toBeLessThanOrEqual(list.bottom + 0.5)
       expect(await scrollY(page)).toBe(before)
@@ -559,7 +560,7 @@ for (const scheme of ['light', 'dark'] as const) {
   test.describe(`forced colours, ${scheme} palette`, () => {
     test.use({ forcedColors: 'active', colorScheme: scheme })
 
-    test('the popup keeps a line against the page, and the active row is a frame as well as a fill', async ({ page }) => {
+    test('the popup keeps a line against the page, and the active row is a bar as well as a fill', async ({ page }) => {
       const popup = await open(page, 'command--basic')
       await page.keyboard.type('but')
       const canvas = FORCED_CANVAS[scheme]
@@ -569,9 +570,13 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(inkOn(edge, canvas), 'pixels of line at 3:1 along the start edge').toBeGreaterThanOrEqual(along)
 
       const active = page.locator('[role="option"][data-highlighted]')
+      // DECISIONS 2026-10-19: the bar at the inline start of the row, no longer a ring around it.
       const look = await active.evaluate((row) => {
-        const style = getComputedStyle(row)
-        return { outline: style.outlineStyle, width: style.outlineWidth, fill: style.backgroundColor, line: style.outlineColor }
+        const bar = getComputedStyle(row, '::before')
+        return {
+          outline: bar.borderInlineStartStyle, width: bar.borderInlineStartWidth, fill: getComputedStyle(row).backgroundColor,
+          line: bar.borderInlineStartColor,
+        }
       })
       expect(look.outline).toBe('solid')
       expect(look.width).toBe('2px')
@@ -586,7 +591,7 @@ for (const scheme of ['light', 'dark'] as const) {
         return colour
       })
       expect(look.line).toBe(highlightText)
-      const rest = await page.locator('[role="option"]:not([data-highlighted])').first().evaluate((row) => getComputedStyle(row).outlineStyle)
+      const rest = await page.locator('[role="option"]:not([data-highlighted])').first().evaluate((row) => getComputedStyle(row, '::before').display)
       expect(rest).toBe('none')
       // The line is drawn: the frame inside the active row, in HighlightText on Highlight.
       const box = await boxOf(active)

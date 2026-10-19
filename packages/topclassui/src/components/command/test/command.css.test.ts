@@ -55,6 +55,23 @@ const DECLARATION: Record<string, string> = {
   'font-medium': 'font-weight: var(--font-weight-medium);',
   'cursor-default': 'cursor: default;',
   'select-none': 'user-select: none;',
+  // The focus mark: a ring-thick --tc-ring line over the search row's hairline while the input has the focus.
+  'relative': 'position: relative;',
+  'after:absolute': 'position: absolute;',
+  'after:inset-x-0': 'inset-inline: 0px;',
+  'after:-bottom-(--tc-line-width)': 'bottom: calc(var(--tc-line-width) * -1);',
+  'after:border-b-(length:--tc-ring-width)': 'border-bottom-width: var(--tc-ring-width);',
+  'after:border-ring': 'border-color: var(--tc-ring);',
+  'has-focus-visible:after:block': 'display: block;',
+  // The active row's bar, a ring thick at its inline start, in HighlightText under forced colours.
+  'before:absolute': 'position: absolute;',
+  'before:inset-y-1.5': 'inset-block: calc(var(--spacing) * 1.5);',
+  'before:inset-s-0': 'inset-inline-start: 0px;',
+  'before:hidden': 'display: none;',
+  'before:border-s-(length:--tc-ring-width)': 'border-inline-start-width: var(--tc-ring-width);',
+  'before:border-ring': 'border-color: var(--tc-ring);',
+  'data-highlighted:before:block': 'display: block;',
+  'forced-colors:data-highlighted:before:border-[HighlightText]': 'border-color: HighlightText;',
   // The Enter hint, drawn after the active row only and never under a finger.
   'after:content-(--tc-command-enter)': '--tw-content: var(--tc-command-enter);',
   'after:font-mono': 'font-family: var(--tc-font-mono);',
@@ -85,6 +102,7 @@ const SCOPE: Record<string, string> = {
 const WRAPPED: Record<string, string> = {
   'pointer-coarse:h-control-lg': '@media (pointer: coarse) { ',
   'pointer-coarse:hidden': '@media (pointer: coarse) { ',
+  'forced-colors:data-highlighted:before:border-[HighlightText]': '@media (forced-colors: active) { ',
   'pointer-coarse:data-highlighted:after:hidden': '@media (pointer: coarse) { ',
   'pointer-coarse:h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]': '@media (pointer: coarse) { ',
   'pointer-coarse:h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-coarse,44px)))]': '@media (pointer: coarse) { ',
@@ -119,7 +137,7 @@ describe('every class an open Command wears compiles with the installed Tailwind
       COMMAND_SPACER, COMMAND_GROUP_LABEL, COMMAND_ITEM, COMMAND_ESCAPE_HINT, COMMAND_STATUS, COMMAND_TITLE,
     ]).filter((cls) => !shared.has(cls))
     expect(own).toEqual(Object.keys(DECLARATION).sort())
-    expect(own).toHaveLength(51)
+    expect(own).toHaveLength(66)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {
@@ -150,13 +168,20 @@ describe('the guarantees a class carries', () => {
     expect(COMMAND_VIEWPORT).toBe('fixed inset-0 z-(--tc-z-dialog) flex items-start justify-center p-(--tc-overlay-inset) pt-[15dvh]')
   })
 
-  it('the popup clips nothing, so the ring of the input is never cut', () => {
+  it('the popup clips nothing, so the line under the search row is never cut', () => {
     expect(COMMAND_POPUP).not.toContain('overflow-hidden')
     expect(COMMAND_POPUP).toContain(FOCUS_RING_INSET)
   })
 
   it('the input is 40 px tall, 48 under a finger, with 16 px text, so a phone neither misses it nor zooms the page', () => {
-    expect(COMMAND_INPUT.split(' ').slice(0, 8)).toEqual(['h-control-md', 'pointer-coarse:h-control-lg', 'min-w-0', 'flex-1', 'rounded-control', 'bg-transparent', 'px-2', 'text-base'])
+    expect(COMMAND_INPUT.split(' ').slice(0, 7)).toEqual(['h-control-md', 'pointer-coarse:h-control-lg', 'min-w-0', 'flex-1', 'bg-transparent', 'px-2', 'text-base'])
+  })
+
+  it('the input draws no box and no ring: its focus is the ring-thick line its row draws while it has the focus', () => {
+    expect(COMMAND_INPUT).toContain('outline-none')
+    expect(COMMAND_INPUT.split(' ').filter((cls) => cls.startsWith('focus-visible:') || cls.startsWith('border'))).toEqual([])
+    expect(COMMAND_SEARCH).toContain('has-focus-visible:after:block')
+    expect(COMMAND_SEARCH).toContain('after:border-b-(length:--tc-ring-width) after:border-ring')
   })
 
   it('the list has no gap, so a row is where windowing reckons it, and is gone when nothing matches', () => {
@@ -169,9 +194,10 @@ describe('the guarantees a class carries', () => {
     expect(COMMAND_SPACER).toContain('shrink-0 h-[calc(var(--tc-list-rows)*var(--tc-row-height))]')
   })
 
-  it('the active row wears the shared highlight, the fill and the ring inside its edge, and no line of its own', () => {
-    expect(COMMAND_ITEM).toContain(ROW_HIGHLIGHT)
-    expect(COMMAND_ITEM.split(' ').filter((cls) => cls.includes('outline-') && !ROW_HIGHLIGHT.includes(cls) && !ROW.includes(cls))).toEqual([])
+  it('the active row is the soft fill and a ring-thick bar at its inline start, with no ring around it', () => {
+    expect(COMMAND_ITEM).toContain('data-highlighted:bg-primary-soft data-highlighted:text-primary-on-soft')
+    expect(COMMAND_ITEM).toContain('before:inset-s-0 before:hidden before:border-s-(length:--tc-ring-width) before:border-ring data-highlighted:before:block')
+    expect(COMMAND_ITEM.split(' ').filter((cls) => cls.includes('outline-') && !ROW.includes(cls))).toEqual([])
   })
 
   it('the empty text takes no room while Base UI keeps its live region mounted and empty', () => {

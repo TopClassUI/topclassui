@@ -6,6 +6,14 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-19 - The command palette's focus appearance is an underline and a bar, not a ring
+
+**Decision.** Omar's review of the Command composite asked for the frame's look: a borderless search row with no ring, and an active row that is a fill with no ring. In the palette the DOM focus never leaves the input (the rows are reached through `aria-activedescendant`), and a text input matches `:focus-visible` on every focus, so the pointer and keyboard split of `ROW_FOCUSED` cannot apply. The palette keeps a keyboard mark in another shape, a lead call recorded for Omar on `cloud/reports-8`: the input is borderless and `outline-none`; while it has the focus, the hairline under the search row is overdrawn by a `--tc-ring` line as thick as a ring (`COMMAND_SEARCH_FOCUS`, a border on `::after`, so forced colours keep it and the row keeps its height). The active row is the soft fill plus a `--tc-ring` bar as thick as a ring at its inline start (`COMMAND_ACTIVE`, a border on `::before`, so it flips in RTL); forced colours keep the Highlight fill and HighlightText label, with the bar in HighlightText. The frame's Enter hint is drawn on the active row only as `::after` content from `labels.command.enter`, with CSS alternative text `"Enter" / ""`, so it is never part of the option's accessible name or its text.
+
+**Why.** R-5.6-1 and WCAG 2.4.7 ask for a visible focus indicator; a 2 px `--tc-ring` line holds 3:1 on the raised surface in every mode (`check:contrast` measures `--tc-ring`), which the soft fill alone does not. This supersedes, for Command only, the ring of `FOCUS_RING_INSET` on the input and of `ROW_HIGHLIGHT` on its rows.
+
+**What it affects.** `command/classes.ts` (`COMMAND_SEARCH_FOCUS`, `COMMAND_INPUT`, `COMMAND_ACTIVE`, `COMMAND_ENTER_HINT`), the `--tc-command-enter` token, `e2e/keyboard-command.spec.ts` (it reads the line and the bar), the forced-colours case of `e2e/command.spec.ts`, and the Command rows of `review-notes/figma-audit/diffs/command.md`.
+
 ## 2026-10-19 - The overlays follow their Previewer frames
 
 **Decision.** Job 110 compared Dialog, Drawer, Command, Dropdown, Popover and Tooltip with their `Previewer: <Name>` frames (138:1814, 138:1976, 138:1653, 138:1464, 138:2132, 138:2273) in dark, then light and ocean, in both directions, and changed the build where it differed. The composites are `docs/figma/parity/<slug>.png`, frame left and build right.
@@ -18,7 +26,7 @@ The format is: date, decision, why, and what it affects.
 - **Dropdown.** 220 px at least (`calc(var(--spacing)*55)`), and the separator has no margin of its own: the 2 px gap of the popup is all the frame leaves around the line. A row holds the real focus, so it wears job 114's `ROW_FOCUSED` (the same text as on `figma/forms-1`): the frame's hover row is the tint alone, and a key brings the focus ring back. The basic demo's trigger is `sm`.
 - **Popover.** The basic demo carries the x beside the title and the two icons the frame draws.
 
-**Not followed, and why.** A highlighted Command row keeps its 2 px inner ring (the focus stays in the input, so the row has no focus ring of its own), and the Command input keeps its ring: the frames draw the fill alone, but the fill is under 3:1 against the popup and R-5.6-1 asks for a visible ring on what holds the focus (the keyboard specs read both). The frame's "Enter" hint on the active Command row is not built: it would join the option's accessible name. The neutral look of an outline Button (the frames' Cancel and triggers) is Button's own frame, job 116.
+**Not followed, and why.** The Command input and its active row keep a keyboard mark in another shape than the ring (the entry above). Dialog's bars draw their line only while the body scrolls, as the frame's scrolled state does. The Dialog demos' Cancel is the neutral soft Button, as drawn. The neutral look of an outline Button (the frames' Cancel and triggers) is Button's own frame, job 116.
 
 **What it affects.** `src/tokens.css`, `src/shared/classes.ts`, the six `classes.ts`, `command/parts/command-panel.tsx`, the labels (`command.escape` in English and Arabic), the Popover basic demo, the tests that pin those class strings, and their mutation rows.
 

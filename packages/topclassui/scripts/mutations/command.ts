@@ -167,10 +167,16 @@ export const MUTATIONS: Mutation[] = [
     to: "'",
   },
   {
-    label: 'command: the active row drops the shared highlight, so neither a fill nor a ring tells it apart',
+    label: 'command: the active row drops its mark, so neither a fill nor a bar tells it apart',
     file: CLASSES,
-    from: '${ROW} ${ROW_HIGHLIGHT} ${DISABLED}',
+    from: '${ROW} ${COMMAND_ACTIVE} ${DISABLED}',
     to: '${ROW} ${DISABLED}',
+  },
+  {
+    label: 'command: the input has the focus and its row draws no line, so a keyboard user cannot see where the focus is',
+    file: CLASSES,
+    from: ' has-focus-visible:after:block',
+    to: '',
   },
   {
     label: 'command: the input text drops to 14 px, and iOS zooms the page into it',
