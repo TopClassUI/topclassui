@@ -84,7 +84,7 @@ export const ar = {
     close: 'إغلاق هذا الحوار',
   },
   file: {
-    drop: 'أفلت الملفات هنا',
+    drop: 'اسحب الملفات إلى هنا أو',
     browse: 'تصفّح',
     remove: 'إزالة',
     tooMany: byCount({

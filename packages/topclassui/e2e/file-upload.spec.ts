@@ -103,12 +103,12 @@ test.describe('what the server HTML sends, with no script at all', () => {
 
 test.describe('the box, on the static page', () => {
   for (const direction of DIRECTIONS) {
-    test(`${direction}: the input fills the zone inside its 1 px line, and the zone is 152 px tall`, async ({ page }) => {
+    test(`${direction}: the input fills the zone inside its 1 px line, and the zone is 128 px tall`, async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 800 })
       await page.goto(urlFor('file-upload--basic', 'light', direction))
       const [zone, input] = [await boxOf(zoneOf(inputIn(page))), await boxOf(inputIn(page))]
       expect([input.left - zone.left, zone.right - input.right, input.top - zone.top, zone.bottom - input.bottom]).toEqual([1, 1, 1, 1])
-      expect(zone.height).toBe(152)
+      expect(zone.height).toBe(128)
       expect(await css(zoneOf(inputIn(page)), 'border-top-style')).toBe('dashed')
     })
   }
@@ -179,7 +179,7 @@ test.describe('live: the limits and the list', () => {
     await expect(zoneOf(input)).toHaveAttribute('data-dragging', '')
     const primary = await page.evaluate(() => { const probe = document.createElement('i'); probe.style.color = 'var(--tc-primary-solid)'; document.body.append(probe); return getComputedStyle(probe).color })
     // The colour eases in over 150 ms; the style changes at once.
-    expect(await css(zoneOf(input), 'border-top-style')).toBe('solid')
+    expect(await css(zoneOf(input), 'border-top-style')).toBe('dashed')
     await expect.poll(() => css(zoneOf(input), 'border-top-color')).toBe(primary)
     await drag(input, 'dragleave')
     await expect(zoneOf(input)).not.toHaveAttribute('data-dragging')

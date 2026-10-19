@@ -87,6 +87,6 @@ describe('the demos the plan names', () => {
   it('rtl: an island that carries the direction and the language, and the Arabic words', async () => {
     const html = await render('rtl')
     expect(html).toMatch(/^<div class="isolate"><div dir="rtl" lang="ar" class="[^"]*">/)
-    expect(html).toContain('<span>أفلت الملفات هنا</span>')
+    expect(html).toContain('<span>اسحب الملفات إلى هنا أو</span>')
   })
 })
