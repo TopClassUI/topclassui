@@ -338,15 +338,15 @@ test.describe('ten thousand rows, windowed', () => {
     await page.mouse.move(list.left + 60, list.top + 60)
     const steps: string[] = []
     for (let turn = 0; turn < 10; turn++) {
-      await page.mouse.wheel(0, 40)
-      await expect.poll(() => listOf(page).evaluate((el) => Math.round(el.scrollTop))).toBe(40 * (turn + 1))
+      await page.mouse.wheel(0, 32)
+      await expect.poll(() => listOf(page).evaluate((el) => Math.round(el.scrollTop))).toBe(32 * (turn + 1))
       steps.push(await listOf(page).evaluate((el) => {
         const top = el.getBoundingClientRect().top
         const row = [...el.querySelectorAll('[role="option"]')].find((option) => option.getBoundingClientRect().bottom > top + 6)
         return `${String(el.scrollHeight)} ${String((row?.getBoundingClientRect().top ?? 0) - top)}`
       }))
     }
-    expect(new Set(steps)).toEqual(new Set(['400012 6']))
+    expect(new Set(steps)).toEqual(new Set(['320012 6']))
   })
 
   test('the frame time while the wheel runs through the list, and the time a key takes to filter ten thousand', async ({ page }) => {
@@ -611,7 +611,7 @@ test.describe('motion', () => {
 })
 
 test.describe('text zoom and text spacing', () => {
-  test('at a 32 px root on a phone: rows of 80 px, the palette fits, and the last of ten thousand still lands whole', async ({ page }) => {
+  test('at a 32 px root on a phone: rows of 64 px, the palette fits, and the last of ten thousand still lands whole', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     await openLive(page, 'command--ten-thousand')
     await page.addStyleTag({ content: 'html { font-size: 32px !important; }' })
@@ -619,7 +619,7 @@ test.describe('text zoom and text spacing', () => {
     await expectInsideViewport(popup, 'the popup', 15.5)
     await nothingSideways(popup)
     await expectNoSidewaysScroll(page)
-    expect((await boxOf(page.getByRole('option').first())).height).toBe(80)
+    expect((await boxOf(page.getByRole('option').first())).height).toBe(64)
     await page.keyboard.press('ArrowDown')
     await page.keyboard.press('ArrowUp')
     await expect.poll(() => activeOf(page)).toMatchObject({ text: 'Pin page 10000', whole: true })
