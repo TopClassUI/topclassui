@@ -16,15 +16,15 @@ const SHARED = [
 /** The box and the type step of the avatar each one stands in for. */
 const BOX = {
   xs: ['size-control-xs', 'text-xs'],
-  sm: ['size-control-sm', 'text-sm'],
-  md: ['size-control-md', 'text-sm'],
-  lg: ['size-control-lg', 'text-base'],
-  xl: ['size-control-xl', 'text-base'],
+  sm: ['size-control-sm', 'text-xs'],
+  md: ['size-control-md', 'text-base'],
+  lg: ['size-control-lg', 'text-lg'],
+  xl: ['size-control-xl', 'text-xl'],
 } as const
 
 describe('AvatarSkeleton', () => {
   it('is the md circle by default, in the placeholder fill, pulsing', () => {
-    expect(classes()).toEqual([...SHARED, 'size-control-md', 'text-sm'].sort())
+    expect(classes()).toEqual([...SHARED, 'size-control-md', 'text-base'].sort())
   })
 
   for (const size of ['xs', 'sm', 'md', 'lg', 'xl'] as const) {
@@ -58,7 +58,7 @@ describe('AvatarSkeleton', () => {
     expect(classes({ className: 'rounded-box size-control-xl bg-surface' })).toEqual([
       'animate-pulse', 'bg-surface', 'forced-colors:outline-(length:--tc-line-width)', 'inline-flex',
       'items-center', 'justify-center', 'motion-reduce:animate-none', 'rounded-box', 'shrink-0',
-      'size-control-xl', 'text-sm',
+      'size-control-xl', 'text-base',
     ])
   })
 

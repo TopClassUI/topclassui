@@ -51,9 +51,9 @@ describe('the server HTML of an avatar with no image is what it always was', () 
       </>,
     )
     expect(html).toBe(
-      '<span data-size="md" class="relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary-soft text-primary-on-soft font-medium forced-colors:outline-(length:--tc-line-width) size-control-md text-sm" role="img" aria-label="Lina Haddad">'
+      '<span data-size="md" class="relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-neutral-soft text-neutral-on-soft font-medium forced-colors:outline-(length:--tc-line-width) size-control-md text-base" role="img" aria-label="Lina Haddad">'
       + '<span aria-hidden="true" class="inline-flex items-center justify-center">LH</span></span>'
-      + '<span class="inline-flex shrink-0 items-center justify-center rounded-full animate-pulse bg-neutral-soft motion-reduce:animate-none forced-colors:outline-(length:--tc-line-width) size-control-md text-sm" aria-hidden="true">\u00a0</span>',
+      + '<span class="inline-flex shrink-0 items-center justify-center rounded-full animate-pulse bg-neutral-soft motion-reduce:animate-none forced-colors:outline-(length:--tc-line-width) size-control-md text-base" aria-hidden="true">\u00a0</span>',
     )
   })
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { attr, markup } from '#test/markup.js'
+import { attr, classList, markup } from '#test/markup.js'
 import { Separator } from '../index.js'
 import type { SeparatorProps } from '../types.js'
 
@@ -89,5 +89,27 @@ describe('the design attributes', () => {
 
   it('carries no state attribute, because a separator has no states', () => {
     expect(html()).not.toMatch(/data-(state|disabled|loading|open|decorative)/)
+  })
+})
+
+describe('the labelled form, as Figma 137:815 draws it', () => {
+  it('puts the label between two lines that carry the hairline', () => {
+    const html = markup(<Separator>or</Separator>)
+    expect(html).toMatch(/<span aria-hidden="true" class="flex-1 border-t-\(length:--tc-line-width\) border-line"><\/span><span id="[^"]+">or<\/span><span aria-hidden="true" class="flex-1 border-t-/)
+  })
+
+  it('moves the line off the root, which becomes the row', () => {
+    const list = classList(markup(<Separator>or</Separator>))
+    expect(list).toEqual(expect.arrayContaining(['flex', 'items-center', 'gap-2.5', 'text-xs', 'text-muted']))
+    expect(list).not.toContain('border-line')
+  })
+
+  it('names an announced separator by its label', () => {
+    const html = markup(<Separator decorative={false}>or</Separator>)
+    expect(attr(html, 'aria-labelledby')).toBe(/id="([^"]+)">or</.exec(html)?.[1])
+  })
+
+  it('names a decorative one by nothing, since the label is read as text', () => {
+    expect(markup(<Separator>or</Separator>)).not.toContain('aria-labelledby')
   })
 })

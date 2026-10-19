@@ -22,7 +22,7 @@ export const ON_SOFT = {
   info: 'bg-info-soft text-info-on-soft',
 } as const satisfies Record<Tone, string>
 
-/** outline, ghost and link have no fill, so only the tone's text colour applies. */
+/** link has no fill, so only the tone's text colour applies. */
 export const TONE_TEXT = {
   primary: 'text-primary-on-soft',
   neutral: 'text-neutral-on-soft',

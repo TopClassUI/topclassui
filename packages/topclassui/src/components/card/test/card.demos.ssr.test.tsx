@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['basic', 'grid', 'paragraphs', 'report', 'rtl', 'skeleton', 'states', 'with-actions']
+const EXPECTED = ['basic', 'grid', 'interactive', 'media', 'paragraphs', 'report', 'rtl', 'skeleton', 'states', 'with-actions']
 
 const render = async (file: string) => {
   const loaded = await import(`../dummy/${file}.tsx`) as { default?: ComponentType }

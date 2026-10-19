@@ -88,7 +88,7 @@ describe('a server-rendered SegmentedControl hydrates cleanly', () => {
 
 describe('every demo renders and hydrates', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'form', 'full-width', 'long-content', 'many', 'playground', 'rtl', 'sizes', 'states', 'with-icons'])
+    expect(names).toEqual(['basic', 'form', 'full-width', 'long-content', 'many', 'playground', 'rtl', 'sizes', 'states', 'track-states', 'with-icons'])
   })
 
   for (const [name, Demo] of DEMOS) {

@@ -44,6 +44,8 @@ export const HOVER = {
   outline: 'hover:bg-(--tc-soft) active:bg-(--tc-soft-hover)',
   ghost: 'hover:bg-(--tc-soft) active:bg-(--tc-soft-hover)',
   link: 'hover:underline',
+  // A raised surface steps down to the page's surface, as the interactive Card is drawn.
+  surface: 'hover:bg-surface',
 } as const
 
 /** The height alone, so a skeleton stands in for a control without copying the value. */

@@ -15,8 +15,11 @@ export const SKELETON_SHAPE = {
   card: 'block w-full aspect-5/2 rounded-box',
 } as const satisfies Record<SkeletonVariant, string>
 
-/** As tall as the font size, with margins making up the line height, so N rows are N lines. */
-export const SKELETON_ROW = 'block h-[1em] my-[calc((1lh-1em)/2)] rounded-chip'
+/** Three quarters of the font size, as Figma 137:916 draws the bar, with margins making up the line height, so N rows are N lines. */
+export const SKELETON_ROW = 'block h-[0.75em] my-[calc((1lh-0.75em)/2)] rounded-chip'
 
 /** The last of several rows, so the block ends like a paragraph does. */
 export const SKELETON_LAST_ROW = 'w-2/3'
+
+/** The row before the last of three or more: Figma 137:916 steps the rows down 100, 82, 64. */
+export const SKELETON_NEXT_TO_LAST_ROW = 'w-5/6'

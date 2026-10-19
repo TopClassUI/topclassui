@@ -92,4 +92,10 @@ export const MUTATIONS: Mutation[] = [
     from: 'renderElement(render ?? <img />, ',
     to: 'renderElement(<img />, ',
   },
+  {
+    label: 'the md avatar keeps the 14 px initials, smaller than the 0.4 of the circle Figma draws',
+    file: 'src/components/avatar/classes.ts',
+    from: "  md: 'size-control-md text-base',",
+    to: "  md: 'size-control-md text-sm',",
+  },
 ]

@@ -22,8 +22,8 @@ const EXPECTED = [
   'states', 'tones', 'topics', 'with-icon',
 ]
 
-/** The link demo holds no Tag: its chips are anchors wearing tagVariants(). */
-const WITHOUT_A_TAG = ['link']
+/** The link and states demos hold no Tag: their chips are anchors wearing tagVariants(). */
+const WITHOUT_A_TAG = ['link', 'states']
 
 describe('every demo renders on the server', () => {
   it('holds exactly the demos PLAN 20 asks for, so none can be deleted silently', () => {

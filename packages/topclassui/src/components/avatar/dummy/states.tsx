@@ -8,39 +8,34 @@ const PORTRAIT = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' v
 /** Not a picture, so it fails the way a 404 does. */
 const FAILED = 'data:image/svg+xml,failed'
 
-/** Each state with its name under it: a picture, initials, an icon, a picture that failed, and loading. */
+/** One cell per state, named by its aria-label: the four Figma 137:461 draws, then a picture that failed. */
 export default function Demo() {
   return (
-    <div className="flex flex-wrap items-start gap-6 text-sm text-muted">
-      <div className="grid justify-items-center gap-2">
+    <div className="flex flex-wrap items-center gap-6">
+      <div role="group" aria-label="image">
         <AvatarRoot size="lg">
           <AvatarImage src={PORTRAIT} alt="Omar Abed" />
           <AvatarFallback>OA</AvatarFallback>
         </AvatarRoot>
-        <span>Image</span>
       </div>
-      <div className="grid justify-items-center gap-2">
+      <div role="group" aria-label="initials">
         <AvatarRoot size="lg" aria-label="Lina Haddad">
           <AvatarFallback>LH</AvatarFallback>
         </AvatarRoot>
-        <span>Initials</span>
       </div>
-      <div className="grid justify-items-center gap-2">
+      <div role="group" aria-label="icon">
         <AvatarRoot size="lg" aria-label="Guest">
-          <AvatarFallback><Svg icon={user} /></AvatarFallback>
+          <AvatarFallback><Svg icon={user} size="1.35em" /></AvatarFallback>
         </AvatarRoot>
-        <span>Icon</span>
       </div>
-      <div className="grid justify-items-center gap-2">
+      <div role="group" aria-label="loading">
+        <AvatarSkeleton size="lg" />
+      </div>
+      <div role="group" aria-label="failed">
         <AvatarRoot size="lg">
           <AvatarImage src={FAILED} alt="Sara Khalil" />
           <AvatarFallback>SK</AvatarFallback>
         </AvatarRoot>
-        <span>Failed</span>
-      </div>
-      <div className="grid justify-items-center gap-2">
-        <AvatarSkeleton size="lg" />
-        <span>Loading</span>
       </div>
     </div>
   )

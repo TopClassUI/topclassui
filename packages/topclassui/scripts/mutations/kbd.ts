@@ -5,13 +5,13 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the key renders a span instead of a kbd, so it stops meaning keyboard input',
     file: 'src/components/kbd/index.tsx',
-    from: '<kbd className={classes} {...rest}>{children}</kbd>',
-    to: '<span className={classes} {...rest}>{children}</span>',
+    from: '<kbd data-pressed={pressed ? \'\' : undefined} data-disabled={disabled ? \'\' : undefined} className={classes} {...rest}>\n      {children}\n    </kbd>',
+    to: '<span className={classes} {...rest}>\n      {children}\n    </span>',
   },
   {
     label: 'the key passes className first, so the consumer loses every conflict',
     file: 'src/components/kbd/index.tsx',
-    from: "  const classes = cn(\n    'inline-flex items-center justify-center rounded-chip bg-surface px-1.5 py-0.5 font-mono text-xs text-body',\n    BORDER_STRONG,\n    className,\n  )",
+    from: "  const classes = cn(\n    'inline-flex items-center justify-center rounded-chip bg-surface-raised px-1.5 py-0.5 font-mono text-xs text-body',\n    // R-5.7-6: presence attributes; Figma 135:411 draws the pressed cap on the surface and the disabled one at half strength.\n    'data-pressed:bg-surface data-disabled:opacity-50',\n    BORDER_STRONG,\n    className,\n  )",
     to: "  const classes = cn(\n    className,\n    'inline-flex items-center justify-center rounded-chip bg-surface px-1.5 py-0.5 font-mono text-xs text-body',\n    BORDER_STRONG,\n  )",
   },
   {
@@ -31,5 +31,17 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/kbd/index.tsx',
     from: '    BORDER_STRONG,\n    className,\n',
     to: '    className,\n    BORDER_STRONG,\n',
+  },
+  {
+    label: 'a pressed key writes no attribute, so it never drops to the surface',
+    file: 'src/components/kbd/index.tsx',
+    from: "data-pressed={pressed ? '' : undefined}",
+    to: 'data-pressed={undefined}',
+  },
+  {
+    label: 'the key sits on the surface instead of the raised surface Figma draws',
+    file: 'src/components/kbd/index.tsx',
+    from: "rounded-chip bg-surface-raised px-1.5",
+    to: "rounded-chip bg-surface px-1.5",
   },
 ]

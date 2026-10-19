@@ -1,9 +1,8 @@
-import { cn } from '#shared/cn.js'
-import { FOCUS_RING, LABEL, TOUCH_TARGET } from '#shared/classes.js'
+import { LABEL } from '#shared/classes.js'
 import { tagVariants } from '../index.js'
 
 const LONG = 'Infrastructure, platform reliability and developer experience working group'
-const chip = cn(tagVariants({ tone: 'info' }), FOCUS_RING, TOUCH_TARGET)
+const chip = tagVariants({ tone: 'info', interactive: true })
 
 /** A linked tag: the link is the chip, so its focus ring is never clipped. */
 export default function Demo() {
