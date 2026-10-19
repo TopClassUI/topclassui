@@ -70,7 +70,7 @@ const X = [
   'items-center', 'justify-center', 'min-h-[var(--tc-target-min,24px)]', 'min-w-[var(--tc-target-min,24px)]',
   'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]', 'pointer-coarse:min-w-[var(--tc-target-coarse,44px)]',
   'rounded-control', 'shrink-0', 'text-muted', 'tone-neutral',
-  'transition-[color,background-color,border-color,outline-color,opacity,translate]',
+  'transition-[color,background-color,border-color,outline-color,opacity,translate]',  'cursor-pointer', 'disabled:cursor-default', 'aria-disabled:cursor-default', 'data-disabled:cursor-default', 'data-readonly:cursor-default', 'data-loading:cursor-default',
 ]
 
 describe('every element carries exactly the classes the spec names', () => {
@@ -87,7 +87,7 @@ describe('every element carries exactly the classes the spec names', () => {
 
   it('the header: a bar that never shrinks, with a line under it, 4rem short of the edge the x is on', async () => {
     expect(classes((await opened()).header)).toEqual([
-      'border-b-(length:--tc-line-width)', 'border-line', 'pe-16', 'ps-4', 'py-4', 'shrink-0',
+      'border-b-(length:--tc-line-width)', 'border-line', 'pe-16', 'ps-4', 'py-3.5', 'shrink-0',
     ])
   })
 

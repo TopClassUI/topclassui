@@ -9,7 +9,7 @@ import { en } from '#shared/labels/en.js'
 import { createNumberFormat } from '#shared/labels/get-labels.js'
 import { renderLink } from '#shared/link.js'
 import { Svg } from '#components/svg/index.js'
-import { CELL_GAP, CELL_SIZE, LIST } from './classes.js'
+import { CELL_GAP, CELL_SIZE, COMPACT, FULL, LIST, STATUS, STATUS_SIZE } from './classes.js'
 import { PAGINATION_DEFAULTS } from './constants.js'
 import { clampPage, clampPageCount, listPages } from './lib.js'
 import type { PaginationLinkParts, PaginationProps } from './types.js'
@@ -69,11 +69,12 @@ export function Pagination({
         {control(page - 1, text.previous, caretLeft, page === 1, 'prev')}
         {listPages({ value: page, pageCount: count, siblingCount, boundaryCount }).map((item) => {
           if (typeof item !== 'number') {
-            return <li key={item} aria-hidden="true" className={cn(CELL_GAP, CELL_SIZE[size])}>...</li>
+            return <li key={item} aria-hidden="true" className={cn(CELL_GAP, CELL_SIZE[size], FULL)}>...</li>
           }
           const current = item === page
           return (
-            <li key={item}>
+            // Hidden, not dropped, in the compact row: the links stay in the HTML a crawler reads.
+            <li key={item} className={FULL}>
               {anchor(item, {
                 // The count is said once, on the page the reader is on: "Page 3 of 12".
                 'aria-label': current ? text.pageOf(item, count, numbers) : text.page(item, numbers),
@@ -84,6 +85,10 @@ export function Pagination({
             </li>
           )
         })}
+        {/* dir="auto": English digits on an RTL page would otherwise read "of 12 3". */}
+        <li dir="auto" className={cn(COMPACT, STATUS, STATUS_SIZE[size])}>
+          {numbers.format(page)} {text.ofPages(count, numbers)}
+        </li>
         {control(page + 1, text.next, caretRight, page === count, 'next')}
         {control(count, text.last, caretDoubleRight, page === count)}
       </ul>

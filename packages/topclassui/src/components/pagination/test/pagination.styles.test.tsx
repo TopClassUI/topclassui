@@ -154,8 +154,8 @@ describe('a gap is text, not a control', () => {
 })
 
 describe('the list', () => {
-  it('is a wrapping row with the 4 px gap of the frame, so it never scrolls a phone sideways', () => {
-    expect(attr(/<ul [^>]*>/.exec(html())?.[0] ?? '', 'class')).toBe('flex flex-wrap items-center gap-1')
+  it('is a wrapping row with the 4 px gap of the frame and the container the compact row measures', () => {
+    expect(attr(/<ul [^>]*>/.exec(html())?.[0] ?? '', 'class')).toBe('flex flex-wrap items-center gap-1 @container/pagination')
   })
 
   it('adds no class of its own to the nav, so className arrives alone', () => {

@@ -1,3 +1,5 @@
+import { SCROLL_AREA } from 'topclassui/classes'
+
 import { QUIET_LINK } from '../classes'
 
 export interface TocEntry {
@@ -9,7 +11,7 @@ export interface TocEntry {
 export function OnThisPage({ entries, label }: { entries: readonly TocEntry[]; label: string }) {
   if (entries.length === 0) return null
   return (
-    <nav aria-label={label} className="sticky top-(--tc-sticky-top) hidden self-start max-h-[calc(100dvh-var(--tc-sticky-top))] overflow-y-auto overscroll-contain px-4 pt-9 pb-4 xl:block">
+    <nav aria-label={label} className={`sticky top-(--tc-sticky-top) hidden self-start max-h-[calc(100dvh-var(--tc-sticky-top))] px-4 pt-9 pb-4 xl:block ${SCROLL_AREA}`}>
       <p className="mb-2 text-xs font-semibold text-muted">{label}</p>
       <ul className="flex flex-col gap-1 text-sm">
         {entries.map((entry) => (

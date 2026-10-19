@@ -94,7 +94,7 @@ describe('the crumbs are the caller\'s own text', () => {
   })
 
   it('keeps the JSON-LD keys and types in English under Arabic labels, because they are a vocabulary', () => {
-    const out = html({ labels: ar })
+    const out = html({ labels: ar, siteUrl: 'https://example.com' })
     expect(out).toContain('"@type":"BreadcrumbList"')
     expect(out).toContain('"@type":"ListItem"')
     expect(out).toContain('"name":"Start"')

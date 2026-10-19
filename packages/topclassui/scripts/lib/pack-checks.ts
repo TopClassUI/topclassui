@@ -1,7 +1,7 @@
 // The tarball rules of the release plan (R5), as pure functions over the packed paths and contents.
 
-/** The files npm always packs beside dist. */
-export const ROOT_FILES = new Set(['package.json', 'README.md', 'LICENSE', 'CHANGELOG.md'])
+/** The files npm always packs beside dist, and size.json, which pnpm size writes for the site's chips. */
+export const ROOT_FILES = new Set(['package.json', 'README.md', 'LICENSE', 'CHANGELOG.md', 'size.json'])
 
 /** With the CLI and its registry inside (plan cli.md K1) the build packs 2,769,859 bytes unpacked; the budget is that plus 10 %, rounded up. */
 export const SIZE_BUDGET_BYTES = 3_050_000

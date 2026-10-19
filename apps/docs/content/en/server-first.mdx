@@ -11,8 +11,8 @@ Every component is one of three kinds. The kind is shown on the chip beside its 
 | Kind | Chip | What it means |
 |---|---|---|
 | S - server | server - 0 KB | Renders on the server. No hooks, no event handlers, no client JavaScript |
-| C - client | client - size not measured yet | Needs the browser: a popup, a drag, a keyboard listener |
-| Sp - split | split - 0 KB server + size not measured yet | The markup renders on the server and one small part hydrates. Tag is a server component until you pass `onRemove` |
+| C - client | client - n KB | Needs the browser: a popup, a drag, a keyboard listener |
+| Sp - split | split - 0 KB server + n KB client | The markup renders on the server and one small part hydrates. Tag is a server component until you pass `onRemove` |
 
 <KindCounts />
 
@@ -78,9 +78,9 @@ export function Tag({ onRemove, children, ...rest }: TagProps) {
 
 ## How sizes are checked
 
-Every component has a size budget. The check that fails the build when a budget is crossed is not built yet.
+Every client component has a size budget in `size-budget.json`: 6 KB gzipped for a simple control, 14 KB for an overlay, and Command and DatePicker load their heavy part on demand. `pnpm size` bundles each component's client entry with esbuild, minified, and gzips it. React and Base UI are left out of the number, because a page loads them once; the total with Base UI is recorded beside it. `pnpm size --check` runs in `pnpm check` and fails the build when a component goes over its budget.
 
-<Callout tone="info">The chips show each component's kind. Until the first measured build, a client or split chip says "size not measured yet" instead of a number.</Callout>
+<Callout tone="info">The chips print the number `pnpm size` measured, so a chip cannot drift from the build.</Callout>
 
 ## What it costs you
 

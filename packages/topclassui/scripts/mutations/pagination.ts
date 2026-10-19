@@ -35,8 +35,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a pagination gap is no longer hidden, so a screen reader announces three dots as a list item',
     file: 'src/components/pagination/index.tsx',
-    from: '<li key={item} aria-hidden="true" className={cn(CELL_GAP, CELL_SIZE[size])}>',
-    to: '<li key={item} className={cn(CELL_GAP, CELL_SIZE[size])}>',
+    from: '<li key={item} aria-hidden="true" className={cn(CELL_GAP, CELL_SIZE[size], FULL)}>',
+    to: '<li key={item} className={cn(CELL_GAP, CELL_SIZE[size], FULL)}>',
   },
   {
     label: 'a pagination cell goes back to a fixed square, so page 12,345 runs out of its box and reads 2,345',
@@ -84,6 +84,18 @@ export const MUTATIONS: Mutation[] = [
     label: 'the pagination current page takes the hover fill of its theme under a pointer in forced colours',
     file: 'src/components/pagination/classes.ts',
     from: "  'forced-colors:hover:bg-[Highlight]',\n",
+    to: '',
+  },
+  {
+    label: 'the pagination page links lose pagination-full, so a phone gets the bulky wrapped row back',
+    file: 'src/components/pagination/index.tsx',
+    from: '<li key={item} className={FULL}>',
+    to: '<li key={item}>',
+  },
+  {
+    label: 'the pagination compact row ignores a coarse pointer, so a tablet finger meets eleven cells',
+    file: 'src/styles.css',
+    from: '  @media (pointer: coarse) { display: none !important; }\n',
     to: '',
   },
 ]

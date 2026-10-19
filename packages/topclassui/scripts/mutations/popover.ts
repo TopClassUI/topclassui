@@ -301,8 +301,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the popover basic demo puts its label back on the trigger, where a server-built Button loses its truncating span',
     file: `${DUMMY}/basic.tsx`,
-    from: '<PopoverTrigger render={<Button variant="outline">Share</Button>} />',
-    to: '<PopoverTrigger render={<Button variant="outline" />}>Share</PopoverTrigger>',
+    from: '<PopoverTrigger render={<Button variant="outline" size="sm"><Svg icon={arrowSquareOut} />Share</Button>} />',
+    to: '<PopoverTrigger render={<Button variant="outline" size="sm" />}><Svg icon={arrowSquareOut} />Share</PopoverTrigger>',
   },
   {
     label: 'the popover modal demo loses modal, so the panel that asks before deleting leaves the page behind it in use',
@@ -345,5 +345,11 @@ export const MUTATIONS: Mutation[] = [
     file: `${DUMMY}/rtl.tsx`,
     from: '          <PopoverPopup placement="start">\n',
     to: '          <PopoverPopup placement="start" lang="ar">\n',
+  },
+  {
+    label: 'the popover playground drops defaultOpen from its stage branch, so the docs stage draws the trigger with no popup at it',
+    file: `${DUMMY}/playground.tsx`,
+    from: 'defaultOpen={stage}',
+    to: 'defaultOpen={false}',
   },
 ]

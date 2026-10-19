@@ -9,6 +9,13 @@ import {
 
 // The static harness never opens a popup, so none of these classes reaches Tailwind there.
 const DECLARATION: Record<string, string> = {
+  // POINTER: the hand, and the arrow back on a control that cannot be pressed.
+  'cursor-pointer': 'cursor: pointer;',
+  'disabled:cursor-default': 'cursor: default;',
+  'aria-disabled:cursor-default': 'cursor: default;',
+  'data-disabled:cursor-default': 'cursor: default;',
+  'data-readonly:cursor-default': 'cursor: default;',
+  'data-loading:cursor-default': 'cursor: default;',
   // The scrim and the viewport.
   'fixed': 'position: fixed;',
   'inset-0': 'inset: 0px;',
@@ -28,7 +35,7 @@ const DECLARATION: Record<string, string> = {
   'flex-col': 'flex-direction: column;',
   'bg-surface-raised': 'background-color: var(--tc-surface-raised);',
   'text-body': 'color: var(--tc-body);',
-  'shadow-lg': 'box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);',
+  'shadow-(--tc-shadow-overlay)': 'box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);',
   'wrap-anywhere': 'overflow-wrap: anywhere;',
   'transform-[translate(var(--drawer-swipe-movement-x,0px),var(--drawer-swipe-movement-y,0px))]':
     'transform: translate(var(--drawer-swipe-movement-x,0px),var(--drawer-swipe-movement-y,0px));',
@@ -53,6 +60,7 @@ const DECLARATION: Record<string, string> = {
   'border-b-(length:--tc-line-width)': 'border-bottom-width: var(--tc-line-width);',
   'border-t-(length:--tc-line-width)': 'border-top-width: var(--tc-line-width);',
   'border-line': 'border-color: var(--tc-line);',
+  'py-3.5': 'padding-block: calc(var(--spacing) * 3.5);',
   'py-4': 'padding-block: calc(var(--spacing) * 4);',
   'px-4': 'padding-inline: calc(var(--spacing) * 4);',
   'ps-4': 'padding-inline-start: calc(var(--spacing) * 4);',
@@ -130,7 +138,7 @@ describe('every class a sheet wears at any edge compiles with the installed Tail
       DRAWER_HEADER, DRAWER_TITLE, DRAWER_DESCRIPTION, DRAWER_BODY_SHORT, DRAWER_BODY, DRAWER_FOOTER, DRAWER_CLOSE,
     ]).filter((cls) => cls !== '' && !elsewhere.has(cls))
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(65)
+    expect(all).toHaveLength(72)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {
@@ -191,9 +199,9 @@ describe('the tokens the sheet reads are the ones the plan names', () => {
     expect(at('[@media(height<17rem)]:overflow-y-visible')).toBeGreaterThan(at('overflow-y-auto'))
   })
 
-  it('the header ends 4rem short of the edge after ps-4 and py-4 gave it its own padding: neither sets the inline end', async () => {
+  it('the header ends 4rem short of the edge after ps-4 and py-3.5 gave it its own padding: neither sets the inline end', async () => {
     const sheet = await css
     expect(ruleFor(sheet, 'ps-4')).not.toContain('padding-inline-end')
-    expect(ruleFor(sheet, 'py-4')).not.toContain('padding-inline')
+    expect(ruleFor(sheet, 'py-3.5')).not.toContain('padding-inline')
   })
 })

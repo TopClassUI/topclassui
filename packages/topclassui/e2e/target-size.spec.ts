@@ -26,6 +26,8 @@ for (const demo of DEMOS) {
     const boxes = await page.locator(INTERACTIVE).all()
 
     for (const box of boxes) {
+      // A box with display: none is no target: Pagination keeps its page links in the HTML of the compact row.
+      if (!await box.isVisible()) continue
       const size = await box.boundingBox()
       const label = (await box.textContent())?.trim() ?? '(no text)'
       expect(size, label).not.toBeNull()
@@ -42,6 +44,7 @@ test.describe('under a coarse pointer', () => {
     test(`${demo}: every interactive box clears 44 CSS px`, async ({ page }) => {
       await page.goto(urlFor(demo, 'light', 'ltr'))
       for (const box of await page.locator(INTERACTIVE).all()) {
+        if (!await box.isVisible()) continue
         const size = await box.boundingBox()
         const label = (await box.textContent())?.trim() ?? '(no text)'
         expect(size?.width ?? 0, `${label} width`).toBeGreaterThanOrEqual(44)
