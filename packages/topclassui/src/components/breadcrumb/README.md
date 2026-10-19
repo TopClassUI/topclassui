@@ -57,6 +57,8 @@ Required: `items`. Every other prop below is optional.
 | `labels` | no | `Labels` | - | The built-in strings; the nav is named by `labels.breadcrumb.label`. Defaults to English. |
 | `link` | no | `ReactElement` | - | The element every crumb link is cloned from, such as `link={<Link href="" />}`; its href is replaced with the item's. |
 | `locale` | no | `string` | - | Accepted so `{...getLabels(locale)}` spreads cleanly. Nothing here formats a number, so it is not used and never reaches the element. |
+| `maxItems` | no | `number` | - | Fold a longer trail to the first crumb, three dots and the last `maxItems - 1`; clamped to 2..100. The JSON-LD keeps every crumb. |
+| `showHome` | no | `boolean` | - | Draw the first crumb as a house icon; its label is still read by a screen reader. |
 
 Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 

@@ -1,13 +1,15 @@
 // No 'use client': a client bundle gets it only when a client file imports it.
 import { caretRight } from '#icons/data/caret-right.js'
+import { dotsThree } from '#icons/data/dots-three.js'
+import { house } from '#icons/data/house.js'
 import { cn } from '#shared/cn.js'
 import { en } from '#shared/labels/en.js'
 import { renderLink } from '#shared/link.js'
 import { cutLabel, resolveLabelDir, truncateLabel } from '#shared/truncate-label.js'
 import { Svg } from '#components/svg/index.js'
 import { BREADCRUMB_BOUNDARIES } from './boundaries.js'
-import { CURRENT, ITEM, LINK, LIST, ROOT, TEXT } from './classes.js'
-import { buildBreadcrumbList, serializeJsonLd } from './lib.js'
+import { CURRENT, GAP, HIDDEN_LABEL, ITEM, LINK, LIST, ROOT, TEXT } from './classes.js'
+import { buildBreadcrumbList, collapseTrail, serializeJsonLd } from './lib.js'
 import type { BreadcrumbProps } from './types.js'
 
 /** Where the page sits in the site: real links, the page being read last, and the same
@@ -16,6 +18,8 @@ export function Breadcrumb({
   items,
   link,
   baseUrl,
+  showHome = false,
+  maxItems,
   labels = en,
   locale: _locale,
   className,
@@ -36,10 +40,15 @@ export function Breadcrumb({
     <nav aria-label={name} className={cn(ROOT, className)} {...rest}>
       {/* Preflight removes the list style, and Safari with VoiceOver then drops the list role. */}
       <ol role="list" className={LIST}>
-        {trail.map((item, index) => {
+        {collapseTrail(trail.length, maxItems).map((index) => {
+          // The folded crumbs are one mark, hidden from a screen reader as Pagination's gap is.
+          if (index === 'gap') return <li key="gap" aria-hidden="true" className={ITEM}><Svg icon={caretRight} /><span className={GAP}><Svg icon={dotsThree} /></span></li>
+          const item = trail[index] as (typeof trail)[number]
           // R-5.2-7: the box cuts the rendering; the JSON-LD below keeps the whole label.
           const max = BREADCRUMB_BOUNDARIES.labelMaxLength
           const current = index === lastIndex
+          const home = showHome && index === 0
+          const text = home ? <span className={HIDDEN_LABEL}>{cutLabel(item.label, max)}</span> : null
 
           return (
             // The index is the key: two crumbs may share a label, and the trail is never reordered.
@@ -48,9 +57,9 @@ export function Breadcrumb({
               {index === 0 ? null : <Svg icon={caretRight} />}
               {item.href === undefined ? (
                 <span dir={resolveLabelDir(item.label)} aria-current={current ? 'page' : undefined} className={current ? CURRENT : TEXT}>
-                  {cutLabel(item.label, max)}
+                  {home ? <><Svg icon={house} />{text}</> : cutLabel(item.label, max)}
                 </span>
-              ) : renderLink('Breadcrumb', link, item.href, { className: LINK, children: truncateLabel(item.label, max) })}
+              ) : renderLink('Breadcrumb', link, item.href, { className: LINK, children: home ? <><Svg icon={house} />{text}</> : truncateLabel(item.label, max) })}
             </li>
           )
         })}

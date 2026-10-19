@@ -122,4 +122,28 @@ export const MUTATIONS: Mutation[] = [
     from: '<span dir={resolveLabelDir(item.label)} aria-current',
     to: '<span dir="auto" aria-current',
   },
+  {
+    label: 'the breadcrumb maxItems loses its clamp, so maxItems 0 folds away the page being read',
+    file: 'src/components/breadcrumb/lib.ts',
+    from: 'const keep = clamp(Math.floor(maxItems), min, max)',
+    to: 'const keep = Math.floor(maxItems)',
+  },
+  {
+    label: 'the folded breadcrumb gap is no longer hidden, so a screen reader reads a list item with nothing in it',
+    file: 'src/components/breadcrumb/index.tsx',
+    from: '<li key="gap" aria-hidden="true" className={ITEM}>',
+    to: '<li key="gap" className={ITEM}>',
+  },
+  {
+    label: 'the breadcrumb home crumb hides its label from a screen reader too, so the first link has no name',
+    file: 'src/components/breadcrumb/classes.ts',
+    from: "export const HIDDEN_LABEL = 'sr-only'",
+    to: "export const HIDDEN_LABEL = 'hidden'",
+  },
+  {
+    label: 'a breadcrumb link only underlines under the pointer, and stays muted where the frame lifts it to the body colour',
+    file: 'src/components/breadcrumb/classes.ts',
+    from: '  HOVER.mutedLink,',
+    to: '  HOVER.link,',
+  },
 ]

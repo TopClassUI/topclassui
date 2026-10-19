@@ -44,6 +44,8 @@ export const HOVER = {
   outline: 'hover:bg-(--tc-soft) active:bg-(--tc-soft-hover)',
   ghost: 'hover:bg-(--tc-soft) active:bg-(--tc-soft-hover)',
   link: 'hover:underline',
+  // A muted link, such as a crumb, also lifts to the body colour under the pointer.
+  mutedLink: 'hover:underline hover:text-body',
 } as const
 
 /** The height alone, so a skeleton stands in for a control without copying the value. */

@@ -1,3 +1,5 @@
+import { clamp } from '#shared/clamp.js'
+import { BREADCRUMB_BOUNDARIES } from './boundaries.js'
 import type { BreadcrumbItem } from './types.js'
 
 /** A crumb's address for a crawler: absolute against `baseUrl`, and as written when no
@@ -32,4 +34,15 @@ export function buildBreadcrumbList(items: readonly BreadcrumbItem[], baseUrl?: 
  * a JSON parser reads `<` back as the same character, so no label is changed. */
 export function serializeJsonLd(data: unknown): string {
   return JSON.stringify(data).replace(/</g, '\\u003c')
+}
+
+/** The crumbs to draw, by their index in the trail, with 'gap' where maxItems folds the middle away:
+ * the first crumb, then the last maxItems - 1. A trail that fits, or no maxItems, is drawn whole. */
+export function collapseTrail(length: number, maxItems: number | undefined): (number | 'gap')[] {
+  const all = Array.from({ length }, (_, index) => index)
+  if (maxItems === undefined) return all
+  const { min, max } = BREADCRUMB_BOUNDARIES.maxItems
+  const keep = clamp(Math.floor(maxItems), min, max)
+  if (length <= keep) return all
+  return [0, 'gap', ...all.slice(length - (keep - 1))]
 }
