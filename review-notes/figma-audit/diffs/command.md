@@ -1,0 +1,18 @@
+# command: Figma frame vs live build
+
+Verdict: **major**. Blockers 0, major 5, minor 3.
+
+| Area | Figma frame | Built | Fix | Severity |
+|---|---|---|---|---|
+| Search row (input) | Borderless search line flush in the palette header: 16px magnifier at ~16px inset, body text 16px inline, row ~44px tall, no input box, no border, no focus ring in any state | Input is a separate boxed field (~358x46px, radius ~8px) with a 2px primary focus ring, placed 2px under the palette's top edge; the magnifier sits outside the box | Make the input transparent and borderless inside the palette (no bg, no border), suppress the ring for the auto-focus on open (keep focus-visible only for keyboard tabbing or put it on the palette), icon and text inline on one ~44px row with ~16px padding | major |
+| Esc kbd chip | "Esc" kbd chip at the end of the search row (~26x16px, muted raised surface, ~10px muted mono text) | No Esc hint anywhere | Render a kbd chip from labels (escape) at the end of the search row, vertically centred | major |
+| Item leading icon | 16px document icon before every item label, muted on rest rows and primary-coloured on the highlighted row, ~8px gap to the label | Items are text only, no icon slot | Add a per-item icon slot (ReactNode) rendered at 16px that inherits the row text colour, with a default glyph when the demo item has none | major |
+| Highlighted / selected row | First match is highlighted on open: primary tint background, primary text, radius ~6px, box inset ~6px from the palette edges, row ~32px | No row is highlighted on open in either capture; every row is plain body text on the raised surface | Highlight the first item on open and after each filter change (data-highlighted / aria-selected) with the primary-tint surface, primary text and the inset rounded box | major |
+| Group heading | "Components" group label above the rows: ~11px muted text, ~24px below the search row, ~8px above the first item | No group heading; the list starts ~14px under the input with no section label | Support group headings (muted 11-12px label, 8px gap under it) and show a grouped list in the demo; if groups already exist, this is demo data only | major |
+| Enter hint on highlighted row | Muted ~10px "Enter" text at the end of the highlighted row | No Enter hint | Render labels.enter as a muted hint at the end of the highlighted row only | minor |
+| Row geometry and type | Item rows ~32px tall, label ~15px regular body text, rows inset ~8px from the palette edge | Rows on a 40px pitch, label ~14px with a heavier (medium) weight, no visible horizontal inset | Use the 32px row height, regular-weight body label, 8px horizontal inset for the row box | minor |
+| Palette width | Palette ~400px wide | Palette ~420px wide | Set the palette max-width to 400px | minor |
+
+Missing states: closed (Ctrl K shortcut hint), typing (filtered list with the match highlighted), empty (centred magnifier icon above 'no results'), loading (centred spinner), selected (primary-tint highlighted row)
+
+Notes: Sample content differs and is not counted: the frame has \"but\" typed with grouped results (Components: Button, Button group), while the live captures show the empty placeholder with unfiltered lists of 7 items (basic) and 3 items (states). The states capture only shows the open palette; the demo offers Empty and Loading buttons, so those two states may exist in the build but were not captured, whereas typing/selected depend on the missing row highlight. Font-family differences ignored. The ring on the input may be the mandated focus-visible ring, but the frame never draws a ring on the palette input, so the input should be flush and the auto-focus ring suppressed or moved to the palette.

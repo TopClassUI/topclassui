@@ -1,0 +1,19 @@
+# sidebar: Figma frame vs live build
+
+Verdict: **major**. Blockers 0, major 4, minor 5.
+
+| Area | Figma frame | Built | Fix | Severity |
+|---|---|---|---|---|
+| Container surface and border | Self-contained card: surface is the page colour (#0A0A0A, no raised fill), 1px line (#262626) on all four sides, ~12px corner radius. Same treatment in every state of the strip. | Raised surface (#171717) panel with square corners and a 1px line (#262626) on the trailing edge only; no top, bottom or leading line, no radius. | With `bordered`, draw the line on all four sides and apply the panel radius knob; use the page/base surface role instead of the raised surface. | major |
+| Row height and pitch (links and header) | Header row and every link row are 32px tall at a 33px pitch (1px between rows); header + 4 links = 165px. | Rows are 40px tall at a 44px pitch (4px gap); header + 4 links = 220px. | Row min-height to the 32px (sm) control knob and a 1px row gap; apply the same height to the header row. | major |
+| Active indicator bar | Active row is tint only: #101E3B fill with primary text and icon (#51A2FF); no bar, in both expanded and collapsed. | A 3px x 24px primary bar (#50A2FF) inset 4px on the leading edge of the active row, vertically centred, in both the expanded row and the collapsed cell. | Remove the leading-edge bar on `data-active`; keep tint + primary foreground. | major |
+| Collapsed rail | Rail is ~51px wide with the same bordered rounded card; the active cell is a 34 x 28 pill (wider than tall, ~6-8px radius) with no bar; icon rows sit at ~30px pitch. | Rail is 60px wide, flat with a trailing line only; the active cell is a 38 x 38 square (8px radius) with the 3px bar; rows at 44px pitch. | Rail width ~52px (8px padding + 34-36px cell), cell 34 x 28 with the row radius, no bar, 32px row height. | major |
+| Container size | 190px wide and hugs content height (171px for header + 4 links). | 220px wide and stretches to the full demo height (384px in the capture). | Let the demo sample hug content; align the default width to one value (the Try-it panel in the frame says 220 while the drawn card is 190). | minor |
+| Active row radius | ~6px. | ~8px. | Use the smaller radius knob for rows. | minor |
+| Row inset and inner spacing | Rows inset 8px from the card's inner edge; icon box starts 6px inside the row; icon-to-label gap 10px. | Rows inset 10px from the panel edge; icon box starts 11px inside the row; icon-to-label gap 8px. | Panel padding 8px, row padding-inline 6px, gap 10px (gap-2.5). | minor |
+| Hover state | Hovered row gets a neutral raised tint (#171717) with the same 32px geometry and radius as the active row; no bar, no line; text stays body colour. | Not captured in the states demo. | Add a hover sample to the states demo; hover = raised-surface tint only. | minor |
+| Focus-visible state | 2px primary ring (#51A2FF) at 2px offset outside the row, ring radius ~8px (row radius + offset); the row fill is unchanged. | Not captured in the states demo. | Add a focus-visible sample to the states demo; ring from the shared focus classes with 2px offset. | minor |
+
+Missing states: hover, focus-visible
+
+Notes: Sample content differs and is not counted: the built states demo lists three links (Home, Projects, Settings; no Team) and its collapsed rail marks Projects active where the frame marks Home; the basic demo carries the frame's four links. Font family ignored per instructions. Type matches: link and header cap heights are 10px on both sides (~14px), header semibold, links regular; colour roles match (body #FAFAFA, muted icons ~#757575, primary #51A2FF, primary tint #101E3B, line #262626). The frame's own Try-it panel reads width 220 and bordered true while the drawn card is 190px, so the width row is minor; the bordered treatment (four-sided line + radius) is taken from the drawing.
