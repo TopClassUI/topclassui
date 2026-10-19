@@ -1,0 +1,101 @@
+---
+slug: cli
+title: الإضافة عبر الطرفية
+description: انسخ مكوّنًا واحدًا إلى مشروعك بأمر واحد، ثم عدّله كأنه ملفك.
+---
+
+## ابدأ المشروع
+
+أمر واحد يجهّز المشروع: يتعرّف على إطار العمل، وينسخ الشيفرة المشتركة، ويضيف سطرين إلى ملف CSS.
+
+```bash
+npx topclassui init
+```
+
+يتعرّف على Next.js مع App Router أو على React مع Vite، وعلى مدير الحزم الذي تستخدمه. ينسخ المزوّد وسكربت السمة والنصوص و<span dir="ltr">`tokens.css`</span> و<span dir="ltr">`styles.css`</span> إلى مجلد واحد اسمه <span dir="ltr">`topclassui/`</span>. ثم يثبّت <span dir="ltr">`@base-ui/react`</span> و<span dir="ltr">`class-variance-authority`</span> و<span dir="ltr">`clsx`</span> و<span dir="ltr">`tailwind-merge`</span> و<span dir="ltr">`zod`</span>، ويكتب <span dir="ltr">`topclassui.json`</span>، ويطبع أسطر المزوّد التي تضعها في التخطيط.
+
+```css title="app/globals.css"
+@import "tailwindcss";
+@import "../topclassui/tokens.css";
+@import "../topclassui/styles.css";
+```
+
+## أضف مكوّنًا
+
+اذكر مكوّنًا واحدًا أو أكثر، ويصل كل مكوّن مع كل ملف يستورده.
+
+```bash
+npx topclassui add button
+npx topclassui add dialog select
+```
+
+الخيار <span dir="ltr">`--all`</span> ينسخ المكوّنات كلها. ولا يكتب الأمر فوق ملف عدّلته أبدًا: يتركه <span dir="ltr">`add`</span> كما هو ويذكر اسمه.
+
+## مجلد topclassui
+
+كل شيء يصل إلى مجلد واحد، وهو ملكك تعدّله كما تشاء.
+
+```text title="topclassui/"
+topclassui/
+  components/button/   index.tsx, classes.ts, variants.ts, ... and dummy/ with the examples
+  shared/              cn, classes, contracts, labels, provider, theme
+  icons/data/          one file for each icon a copy uses
+  tokens.css
+  styles.css
+topclassui.json        what was copied, from which version, with a hash of each file
+```
+
+استورد من المجلد لا من الحزمة. النسخ تستورد بعضها بمسارات نسبية، فلا حاجة إلى اسم مستعار.
+
+```tsx title="app/page.tsx"
+import { Button } from '@/topclassui/components/button'
+```
+
+## تابع الإصدارات الجديدة
+
+حدّث الحزمة، ثم قارن.
+
+```bash
+npx topclassui diff
+npx topclassui add --update
+```
+
+يعرض <span dir="ltr">`diff`</span> حالة كل ملف منسوخ: محدّث، أو تغيّر في المصدر، أو عدّلته أنت، ويطبع رقعة لكل تغيير في المصدر، وينتهي بالرمز 1 إذا اختلف أي شيء. ويكتب <span dir="ltr">`add --update`</span> الإصدار الجديد من الملفات التي لم تلمسها. أما <span dir="ltr">`--overwrite`</span> فيستبدل الملفات التي عدّلتها أيضًا، بعد أن يطبع الفرق.
+
+## اعرف ما لديك
+
+```bash
+npx topclassui list
+```
+
+كل المكوّنات، وما أضفته منها إلى مشروعك. والخيار <span dir="ltr">`--json`</span> يطبع القائمة نفسها بصيغة JSON.
+
+## الخيارات
+
+كل أمر يقبل أيضًا <span dir="ltr">`--cwd <dir>`</span> لمشروع خارج المجلد الحالي.
+
+| الخيار | ما يفعله |
+|---|---|
+| <span dir="ltr">`-y`</span>، <span dir="ltr">`--yes`</span> | يقبل كل القيم الافتراضية دون سؤال |
+| <span dir="ltr">`--dry-run`</span> | يطبع ما سيكتبه، ولا يكتب ولا يثبّت شيئًا |
+| <span dir="ltr">`--no-install`</span> | يطبع أمر التثبيت بدل تشغيله |
+| <span dir="ltr">`--css <file>`</span> | مع <span dir="ltr">`init`</span>: ملف CSS الذي يستورد <span dir="ltr">`tailwindcss`</span> |
+| <span dir="ltr">`--dir <path>`</span> | مع <span dir="ltr">`init`</span>: مجلد النسخ |
+| <span dir="ltr">`--pm <name>`</span> | <span dir="ltr">`npm`</span> أو <span dir="ltr">`pnpm`</span> أو <span dir="ltr">`yarn`</span> أو <span dir="ltr">`bun`</span> |
+| <span dir="ltr">`--examples`</span>، <span dir="ltr">`--no-examples`</span> | مع <span dir="ltr">`add`</span>: يضيف ما تحتاج إليه الأمثلة، أو لا ينسخ أي مثال |
+
+## Next.js و Vite
+
+الأوامر نفسها في الاثنين، وثلاثة أشياء فقط تختلف.
+
+| الموضع | Next.js مع App Router | Vite |
+|---|---|---|
+| المجلد | <span dir="ltr">`topclassui/`</span>، أو <span dir="ltr">`src/topclassui/`</span> إن كان في المشروع مجلد <span dir="ltr">`src`</span> | <span dir="ltr">`src/topclassui/`</span> |
+| ملف CSS | <span dir="ltr">`app/globals.css`</span> | <span dir="ltr">`src/index.css`</span> |
+| المزوّد | <span dir="ltr">`app/layout.tsx`</span>، مع <span dir="ltr">`ThemeScript`</span> في الرأس | <span dir="ltr">`src/main.tsx`</span>، حول <span dir="ltr">`<App />`</span> |
+
+## النسخ أو الحزمة
+
+اختر واحدًا منهما. النسخ تقرأ المزوّد المنسوخ، فإذا ركّب التخطيط المزوّد من الحزمة بقيت النسخ بالإنجليزية ومن اليسار إلى اليمين. يتوقف <span dir="ltr">`init`</span> عندما يجد ذلك، والخيار <span dir="ltr">`--force`</span> يمضي على أي حال.
+
+<Callout tone="info">رموز الخروج: 0 تمّ، 1 ثمة اختلاف، 2 خطأ في الأمر، 3 فشل التثبيت.</Callout>
