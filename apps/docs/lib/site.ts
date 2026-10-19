@@ -37,6 +37,9 @@ export const PRERELEASE = VERSION.includes('-')
 /** The one install line every page prints (docs-site S8). */
 export const INSTALL_LINE = PRERELEASE ? 'npm i topclassui@beta zod' : 'npm i topclassui zod'
 
+/** The CLI's first copy, printed under the install line where a page shows both steps. */
+export const ADD_LINE = 'npx topclassui add button'
+
 /** "^19.0.0" reads "19+", "^4.2.0" reads "4.2+": the floor of a caret range. */
 export function floorOf(range: string): string {
   const [major = '0', minor = '0'] = range.replace(/^[\^~>=\s]+/, '').split('.')

@@ -7,7 +7,7 @@ const { components } = JSON.parse(readFileSync(new URL('../.generated/components
 const SLUGS = components.filter((entry) => entry.page && entry.content !== null).map((entry) => entry.slug)
 const LOCALES = ['en', 'ar'] as const
 // The registry's live pages other than Home, the catalog among them.
-const GUIDE_PATHS = ['/docs/installation', '/docs/css', '/docs/provider', '/docs/first-component', '/docs/colors', '/docs/icons', '/docs/theming', '/docs/rtl', '/docs/server-first', '/docs/accessibility', '/docs/components', '/changelog']
+const GUIDE_PATHS = ['/docs/installation', '/docs/cli', '/docs/css', '/docs/provider', '/docs/first-component', '/docs/colors', '/docs/icons', '/docs/theming', '/docs/rtl', '/docs/server-first', '/docs/accessibility', '/docs/components', '/changelog']
 
 test('49 component pages and the catalog, in both locales: 100 pages', () => {
   expect(SLUGS).toHaveLength(49)
@@ -41,7 +41,7 @@ test('llms.txt is plain text and links every live page in both locales', async (
   const text = await response.text()
   expect(text.startsWith('# TopClass UI\n')).toBe(true)
   const links = [...text.matchAll(/^- \[[^\]]+\]\(https:\/\/topclassui\.com([^)]+)\): .{50,}$/gm)].map((match) => match[1])
-  expect(links).toHaveLength(122)
+  expect(links).toHaveLength(124)
   for (const locale of LOCALES) {
     for (const path of GUIDE_PATHS) expect(links).toContain(`/${locale}${path}`)
     for (const slug of SLUGS) expect(links).toContain(`/${locale}/docs/components/${slug}`)

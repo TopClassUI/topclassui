@@ -48,7 +48,7 @@ export const PAGES = [
     },
   },
   {
-    slug: 'cli', path: '/docs/cli', kind: 'guide', group: 'start', icon: 'terminal-window', status: 'later',
+    slug: 'cli', path: '/docs/cli', kind: 'guide', group: 'start', icon: 'terminal-window', status: 'live',
     title: { en: 'Add with the CLI', ar: 'الإضافة عبر الطرفية' },
     description: {
       en: 'Copy one component into your project with one command, then edit it as your own file.',
@@ -147,7 +147,10 @@ export const PAGES = [
 
 export type PageSlug = (typeof PAGES)[number]['slug']
 
-export const LIVE_PAGES: readonly PageEntry[] = PAGES.filter((page) => page.status === 'live')
+/** Read as PageEntry, so the filter still means something when no entry waits for later. */
+const ENTRIES: readonly PageEntry[] = PAGES
+
+export const LIVE_PAGES: readonly PageEntry[] = ENTRIES.filter((page) => page.status === 'live')
 
 /** The guide pages `docs/[page]` renders, in sidebar order. */
 export const LIVE_GUIDES: readonly PageEntry[] = LIVE_PAGES.filter((page) => page.kind === 'guide')

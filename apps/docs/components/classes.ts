@@ -39,8 +39,11 @@ export const TILE = {
   success: 'bg-success-solid text-success-on-solid',
 } as const
 
-/** Inline code in prose and table cells: Latin, left to right, inside an Arabic sentence too. */
-export const INLINE_CODE = 'rounded-chip bg-neutral-soft px-1 font-mono text-sm text-body'
+/** Inline code in prose and table cells: Latin, left to right, inside an Arabic sentence too. Mono on the text's own ground, as the docs frames draw it. */
+export const INLINE_CODE = 'font-mono text-sm text-body'
+
+/** A guide page's code block: on the page, edged, its header on the surface (globals.css). */
+export const DOCS_CODE = 'docs-code'
 
 export const LINK = `inline-flex items-center rounded-control text-primary-on-soft underline-offset-4 ${HOVER.link} ${FOCUS_RING} ${TOUCH_TARGET}`
 /** Visible on focus, as S11 asks, and on hover of its heading. */
