@@ -13,7 +13,7 @@ export default function Demo() {
         tone="info"
         aria-label="Release announcement"
         icon={<Svg icon={bell} size="xs" />}
-        action={<Button size="sm" variant="outline" tone="info" render={<a href="/changelog" />}>Read the changelog</Button>}
+        action={<Button size="sm" variant="link" tone="info" className="px-0 font-semibold" render={<a href="/changelog" />}>Read the changelog</Button>}
       >
         Version 2 is out, with faster builds and a new theme editor.
       </Banner>

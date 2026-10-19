@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
+import { getLabels } from '#shared/labels/get-labels.js'
 import { attr, markup } from '#test/markup.js'
 import * as entry from '../index.js'
 import { Timeline } from '../index.js'
@@ -53,8 +54,8 @@ describe('the element it renders', () => {
     expect(markup(<Timeline items={EVENTS} getKey={key} style={{ opacity: 0.5 }} />)).toMatch(/^<ol [^>]*style="opacity:0.5"/)
   })
 
-  it('exports one component and no variants function, because the root has no design prop', () => {
-    expect(Object.keys(entry)).toEqual(['Timeline'])
+  it('exports the component and its skeleton, and no variants function, because the root has no design prop', () => {
+    expect(Object.keys(entry).sort()).toEqual(['Timeline', 'TimelineSkeleton'])
   })
 
   it('asks getKey once for each item, so the key is the identity the caller gives', () => {
@@ -146,8 +147,16 @@ describe('the connector', () => {
 })
 
 describe('no items', () => {
-  it('renders nothing at all, not an empty list', () => {
-    expect(html([])).toBe('')
+  it('renders the tray and the empty label, muted, not an empty list', () => {
+    expect(html([])).toMatch(/^<p class="flex items-center gap-2 text-sm text-muted"><svg [^>]*>.*<\/svg>Nothing here yet<\/p>$/)
+  })
+
+  it('takes the labels for the empty line', () => {
+    expect(markup(<Timeline items={[]} getKey={key} labels={getLabels('ar').labels} />)).toContain(getLabels('ar').labels.state.empty)
+  })
+
+  it('renders nothing at all for emptyFallback={null}', () => {
+    expect(markup(<Timeline items={[]} getKey={key} emptyFallback={null} />)).toBe('')
   })
 
   it('renders the fallback in place of the list', () => {

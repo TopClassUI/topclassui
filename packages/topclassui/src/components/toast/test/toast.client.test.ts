@@ -34,9 +34,9 @@ describe('client.tsx (R-5.12-1)', () => {
     expect(importedNames(source, 'react')).toEqual([])
   })
 
-  it('calls one hook, the viewport\'s, from hook.ts', () => {
-    expect(importedNames(source, './hook.js')).toEqual(['useToastViewport'])
-    expect(source.match(/\buse[A-Z]\w*\(/g)).toEqual(['useToastViewport('])
+  it('calls one hook a component from hook.ts: the viewport\'s, the stage\'s and its column\'s', () => {
+    expect(importedNames(source, './hook.js')).toEqual(['useToastStage', 'useToastStageList', 'useToastViewport'])
+    expect(source.match(/\buse[A-Z]\w*\(/g)).toEqual(['useToastViewport(', 'useToastStageList(', 'useToastStage('])
   })
 
   it('imports no other Unit 3 component: Svg draws the icons, and Button lends its look to the action', () => {

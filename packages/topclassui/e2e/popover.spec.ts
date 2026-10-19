@@ -14,7 +14,8 @@ import { FORCED_CANVAS, inkOn, pixelsOf } from './pixels.js'
 // What happy-dom cannot lay out and the static page cannot open: where the popup lands beside its trigger,
 // what it does at an edge and on a small screen, where focus goes, and what the page behind still does.
 
-/** Every trigger of every demo, by its label, in tab order. Written out, so a renamed demo fails here. */
+/** Every trigger of every demo, by its label, in tab order. Written out, so a renamed demo fails here. The
+ * states strip is not here: it draws two popovers open before any press, and has a describe of its own. */
 const POPOVERS: Record<string, readonly string[]> = {
   'popover--basic': ['Share'],
   'popover--hover': ['Billing details'],
@@ -26,7 +27,6 @@ const POPOVERS: Record<string, readonly string[]> = {
   ],
   'popover--playground': ['Share'],
   'popover--rtl': ['مشاركة', 'التفاصيل', 'الإعدادات'],
-  'popover--states': ['Open', 'Above', 'With close', 'Modal', 'On hover'],
   'popover--with-close': ['Notifications'],
   'popover--with-form': ['Rename'],
 }
@@ -81,9 +81,47 @@ const scrollOf = (popup: Locator) => popup.evaluate((element) => ({
   sideways: element.scrollWidth - element.clientWidth,
 }))
 
-test('the table names every popover demo', () => {
-  expect(Object.keys(POPOVERS).sort()).toEqual(DEMOS.filter((demo) => demo.startsWith('popover--')).sort())
-  expect(Object.keys(POPOVERS)).toHaveLength(10)
+test('the table names every popover demo but the states strip', () => {
+  expect([...Object.keys(POPOVERS), 'popover--states'].sort()).toEqual(DEMOS.filter((demo) => demo.startsWith('popover--')).sort())
+  expect(Object.keys(POPOVERS)).toHaveLength(9)
+})
+
+test.describe('the states strip', () => {
+  /** The cell a state is drawn in, by the title that captions it. */
+  const cellOf = (page: Page, title: string) => page.locator(`#demo [title="${title}"]`)
+
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: open sits below its trigger and flipped above it, 6 px off it, whole inside its own cell, and neither holds the focus`, async ({ page }) => {
+      await openLive(page, 'popover--states', { direction })
+      expect(await cellOf(page, 'closed').locator('xpath=..').locator(':scope > *').evaluateAll((cells) => cells.map((cell) => cell.getAttribute('title'))))
+        .toEqual(['closed', 'open', 'flipped'])
+      await expect(cellOf(page, 'closed').locator('[role="dialog"]')).toHaveCount(0)
+      for (const [title, where, name] of [['open', 'below', 'Details'], ['flipped', 'above', 'Settings']] as const) {
+        const cell = cellOf(page, title)
+        const popup = cell.locator(`[role="dialog"]${OPENED}`)
+        await expect(popup).toBeVisible()
+        await atRest(popup)
+        await expect(popup.locator('h2')).toHaveText(name)
+        const side = sideOf(await boxOf(popup), await boxOf(triggerOf(page, name)))
+        expect(side?.where, `${title} lies on the wrong side of its trigger`).toBe(where)
+        expect(Math.abs((side?.gap ?? 0) - 6), `${title} is not 6 px from its trigger`).toBeLessThanOrEqual(1)
+        const [inner, outer] = [await boxOf(popup), await boxOf(cell)]
+        expect(inner.top >= outer.top && inner.bottom <= outer.bottom && inner.left >= outer.left && inner.right <= outer.right, `${title} leaves its cell`).toBe(true)
+        expect(await popup.evaluate((element) => element.contains(document.activeElement)), `${title} took the focus`).toBe(false)
+      }
+      expect((await axe(page)).violations).toEqual([])
+    })
+  }
+
+  test('closed: its trigger opens a whole popover like any other, which Escape closes', async ({ page }) => {
+    await openLive(page, 'popover--states')
+    const popup = await openOverlay(page, triggerOf(page, 'Share'))
+    await expect(popup.locator('h2')).toHaveText('Share this page')
+    await expectInsideViewport(popup, 'the popover of "Share"', 8)
+    expect((await axe(page)).violations).toEqual([])
+    await page.keyboard.press('Escape')
+    await expect(popup).toBeHidden()
+  })
 })
 
 /** Where a popup must land, written out: on its own side while there is room, on the opposite one at that edge. */
@@ -368,9 +406,9 @@ test('320 x 160: where the popup has to scroll, its action keeps its 32 px and i
   await page.setViewportSize({ width: 320, height: 160 })
   const popup = await open(page, 'popover--basic', { edge: 'top' })
   await expectInsideViewport(popup, 'the popup', 8)
-  expect((await boxOf(popup.locator('button'))).height).toBe(32)
-  // The whole content, 148 px, in a box that shows 104 of it.
-  expect(await popup.evaluate((el) => `${String(el.scrollHeight)} in ${String(el.clientHeight)}`)).toBe('148 in 104')
+  expect((await boxOf(popup.getByRole('button', { name: 'Copy link' }))).height).toBe(32)
+  // The whole content, 152 px, in a box that shows 112 of it.
+  expect(await popup.evaluate((el) => `${String(el.scrollHeight)} in ${String(el.clientHeight)}`)).toBe('152 in 112')
 })
 
 test.describe('focus', () => {
@@ -393,8 +431,8 @@ test.describe('focus', () => {
 
   test('opened from the keyboard, focus moves to the first control, and Escape hands it back to the trigger', async ({ page }) => {
     const popup = await open(page, 'popover--basic', { by: 'keyboard' })
-    await expect(popup.locator('button')).toBeFocused()
-    await expect(popup.locator('button')).toHaveCSS('outline-style', 'solid')
+    await expect(popup.locator('button').first()).toBeFocused()
+    await expect(popup.locator('button').first()).toHaveCSS('outline-style', 'solid')
 
     await page.keyboard.press('Escape')
     await expectClosed(page)
@@ -412,7 +450,7 @@ test.describe('focus', () => {
       const popup = page.locator(`[role="dialog"]${OPENED}`)
       await expect(popup).toBeVisible()
       await atRest(popup)
-      await expect(popup.locator('button')).toBeFocused()
+      await expect(popup.locator('button').first()).toBeFocused()
       await page.keyboard.press('Escape')
       await expectClosed(page)
       await expect(trigger).toBeFocused()

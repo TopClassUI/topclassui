@@ -113,7 +113,7 @@ describe('the parts a demo is built from', () => {
       'basic': [{}], 'collapsed': [{ defaultOpen: false }], 'groups': [{}], 'in-a-layout': [{}], 'long-list': [{}],
       // The Try it rail hands on what the controls pass, which is nothing until one is set.
       'playground': [{ defaultOpen: undefined, open: undefined }], 'rtl': [{}],
-      'states': [{ 'aria-label': 'Expanded' }, { 'aria-label': 'Collapsed', 'defaultOpen': false }],
+      'states': [{ 'aria-label': 'expanded' }, { 'aria-label': 'collapsed', 'defaultOpen': false }],
     })
     const collapsed = crossings((await load('collapsed'))()).find((crossing) => crossing.part === 'SidebarRoot')
     expect(collapsed?.props['defaultOpen']).toBe(false)

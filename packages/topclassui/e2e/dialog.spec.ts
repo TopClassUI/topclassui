@@ -4,7 +4,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
 import { DIRECTIONS, MODES } from '../scripts/lib/harness.js'
 import { type LiveOptions, expectInsideViewport, expectNoSidewaysScroll, liveErrors, openLive } from './live.js'
 import {
-  type Box, type OpenOptions, boxOf, expectClosed, expectNothingSideways, focusedName, inkOf, openOverlay,
+  type Box, type OpenOptions, OPENED, atRest, boxOf, expectClosed, expectNothingSideways, focusedName, inkOf, openOverlay,
   pageLock, pressInside, scrollPageTo, touchDrag, wheelAt, withScrollbar,
 } from './overlay.js'
 import { DEMOS } from './pages.js'
@@ -28,6 +28,7 @@ const DIALOGS: Record<string, { trigger: string, title: string }> = {
   'dialog--playground': { trigger: 'Publish', title: 'Publish changes' },
   'dialog--rtl': { trigger: 'نشر', title: 'نشر التغييرات' },
   'dialog--sizes': { trigger: 'xs', title: 'Size xs' },
+  // The closed cell's trigger; its three other cells draw their dialogs open (tests of their own below).
   'dialog--states': { trigger: 'Open', title: 'Open' },
   'dialog--trap-focus': { trigger: 'Inspect', title: 'Inspector' },
   'dialog--with-form': { trigger: 'Rename', title: 'Rename this project' },
@@ -113,10 +114,10 @@ test.describe('the helper that opens every overlay', () => {
     }
   })
 
-  // On the first frame a popup is open and past its starting style it is at opacity 0, scale 0.95, 380 px wide.
+  // On the first frame a popup is open and past its starting style it is at opacity 0, scale 0.95, 361 px wide.
   test('returns a dialog at rest: opaque, at full size, with no transition left running', async ({ page }) => {
     const popup = await open(page, 'dialog--basic')
-    expect(await motion(popup)).toEqual({ opacity: '1', scale: 'none', translate: 'none', width: 400, left: 432.5, running: 0 })
+    expect(await motion(popup)).toEqual({ opacity: '1', scale: 'none', translate: 'none', width: 380, left: 442.5, running: 0 })
   })
 
   // A Drawer slides and never fades, so a wait on its opacity would return on the first frame of the slide.
@@ -127,13 +128,13 @@ test.describe('the helper that opens every overlay', () => {
       '[role="dialog"][data-starting-style] { translate: 100% 0 !important }',
     ].join('\n') })
     const popup = await openOverlay(page, triggerOf(page, 'Publish'))
-    expect(await motion(popup)).toEqual({ opacity: '1', scale: 'none', translate: 'none', width: 400, left: 432.5, running: 0 })
+    expect(await motion(popup)).toEqual({ opacity: '1', scale: 'none', translate: 'none', width: 380, left: 442.5, running: 0 })
   })
 
   test('returns at once where nothing moves, under reduced motion', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' })
     const popup = await open(page, 'dialog--basic')
-    expect(await motion(popup)).toEqual({ opacity: '1', scale: 'none', translate: 'none', width: 400, left: 432.5, running: 0 })
+    expect(await motion(popup)).toEqual({ opacity: '1', scale: 'none', translate: 'none', width: 380, left: 442.5, running: 0 })
   })
 })
 
@@ -206,7 +207,7 @@ test.describe('focus', () => {
   })
 
   test('with more in the form than the window holds, its body is still what scrolls: the form makes no box of its own', async ({ page }) => {
-    // 268 px of popup, 266 inside its line, for a header of 57, a footer of 73 and a body grown to 304.
+    // 268 px of popup, 266 inside its line, for a header of 53, a footer of 69 and a body grown to 304.
     await page.setViewportSize({ width: 400, height: 300 })
     const popup = await open(page, 'dialog--with-form')
     await bodyOf(popup).evaluate((body) => {
@@ -216,8 +217,8 @@ test.describe('focus', () => {
     })
     const parts = await partsOf(popup)
     expect(parts.popup.height).toBe(268)
-    expect(parts.body.height).toBe(136)
-    expect(parts.scrollable, 'px the body scrolls').toBe(172)
+    expect(parts.body.height).toBe(144)
+    expect(parts.scrollable, 'px the body scrolls').toBe(160)
     expect(parts.footer.bottom).toBe(parts.popup.bottom - 1)
     expect(await popup.evaluate((el) => el.scrollHeight - el.clientHeight), 'px the popup scrolls').toBe(0)
   })
@@ -263,11 +264,11 @@ test.describe('focus', () => {
       const frame = await boxOf(popup)
       const [left, top] = [Math.floor(frame.left), Math.floor(frame.top)]
       const surface = await pixelsOf(page, { x: left + 40, y: top + 8, width: 1, height: 1 })
-      const band = await pixelsOf(page, { x: left + 24, y: top + 1, width: 352, height: 1 })
-      expect(inkOn(band, surface[0] ?? [0, 0, 0]), 'pixels of ring at 3:1 on the surface, along the top edge').toBe(352)
+      const band = await pixelsOf(page, { x: left + 24, y: top + 1, width: 332, height: 1 })
+      expect(inkOn(band, surface[0] ?? [0, 0, 0]), 'pixels of ring at 3:1 on the surface, along the top edge').toBe(332)
       // And nothing of it outside the box, where it lay on the scrim at 1.8:1.
       const ring = (band[0] ?? [0, 0, 0]).join(',')
-      const outside = await pixelsOf(page, { x: left + 24, y: top - 4, width: 352, height: 3 })
+      const outside = await pixelsOf(page, { x: left + 24, y: top - 4, width: 332, height: 3 })
       expect(outside.filter((pixel) => pixel.join(',') === ring), 'pixels of ring in the three rows above the popup').toEqual([])
     })
   }
@@ -553,8 +554,8 @@ test.describe('inside the viewport', () => {
 
         // The word is broken into lines no wider than the body, and the body still shows at least one of them.
         const [word, body] = [await inkOf(bodyOf(popup)), await boxOf(bodyOf(popup))]
-        expect(word.left).toBeGreaterThanOrEqual(body.left + 20)
-        expect(word.right).toBeLessThanOrEqual(body.right - 20)
+        expect(word.left).toBeGreaterThanOrEqual(body.left + 18)
+        expect(word.right).toBeLessThanOrEqual(body.right - 18)
         expect(word.height, 'px of word: several lines').toBeGreaterThan(100)
         expect(body.height).toBeGreaterThanOrEqual(60)
 
@@ -583,7 +584,7 @@ test.describe('inside the viewport', () => {
     }
   }
 
-  test('the five sizes are 320, 360, 400, 512 and 640 px wide, and custom takes the width of its className', async ({ page }) => {
+  test('the five sizes are 320, 360, 380, 512 and 640 px wide, and custom takes the width of its className', async ({ page }) => {
     await openLive(page, 'dialog--sizes')
     const seen: string[] = []
     for (const size of ['xs', 'sm', 'md', 'lg', 'xl', 'custom']) {
@@ -592,7 +593,7 @@ test.describe('inside the viewport', () => {
       await page.keyboard.press('Escape')
       await expectClosed(page)
     }
-    expect(seen).toEqual(['xs 320', 'sm 360', 'md 400', 'lg 512', 'xl 640', 'custom 768'])
+    expect(seen).toEqual(['xs 320', 'sm 360', 'md 380', 'lg 512', 'xl 640', 'custom 768'])
   })
 
   test('the stylesheet already holds the classes of a popup nothing has rendered yet', async ({ page }) => {
@@ -607,9 +608,9 @@ test.describe('inside the viewport', () => {
         inset: viewport.paddingTop, scrim: scrim.backgroundColor !== 'rgba(0, 0, 0, 0)', fixed: `${viewport.position} ${scrim.position}`,
       }
     })
-    // max-w-100, the screen less two insets, rounded-box, the line, shadow-lg, wrap-anywhere, --tc-z-dialog, --tc-overlay-inset.
+    // max-w-95, the screen less two insets, rounded-box, the line, shadow-(--tc-shadow-overlay), wrap-anywhere, --tc-z-dialog, --tc-overlay-inset.
     expect(styles).toEqual({
-      maxWidth: '400px', maxHeight: '688px', radius: '12px', line: '1px', raised: true, wrap: 'anywhere', layer: '60 60',
+      maxWidth: '380px', maxHeight: '688px', radius: '12px', line: '1px', raised: true, wrap: 'anywhere', layer: '60 60',
       inset: '16px', scrim: true, fixed: 'fixed fixed',
     })
   })
@@ -656,7 +657,7 @@ test.describe('a screen under 272 px tall', () => {
     await expect(bodyOf(popup)).toHaveCSS('overflow-y', 'auto')
     expect(await scrollersOf(popup), 'boxes that scroll').toBe(1)
     const parts = await partsOf(popup)
-    expect(parts.body.height).toBe(136)
+    expect(parts.body.height).toBe(144)
     expect(parts.footer.bottom).toBe(parts.popup.bottom - 1)
     expect(await popup.evaluate((el) => el.scrollHeight - el.clientHeight)).toBe(0)
   })
@@ -860,7 +861,7 @@ test.describe('a popup inside the dialog', () => {
 })
 
 test.describe('direction', () => {
-  /** Where the x, the title and the two actions lie between the inner edges of a popup, 21 px in from its box. */
+  /** Where the x, the title and the two actions lie: 19 px in from the box, the x's box 14, so its glyph ends on that line. */
   async function layoutOf(popup: Locator) {
     const [frame, x, title] = [await boxOf(popup), await boxOf(xOf(popup)), await inkOf(popup.locator('h2'))]
     const [first, second] = await Promise.all((await popup.locator('button:not([aria-label])').all()).map((b) => boxOf(b)))
@@ -875,12 +876,12 @@ test.describe('direction', () => {
 
   test('ltr: the x is at the right, the title starts at the left and the actions end at the right', async ({ page }) => {
     const layout = await layoutOf(await open(page, 'dialog--basic'))
-    expect(layout).toMatchObject({ xFromRight: 21, titleFromLeft: 21, secondFromRight: 21, firstIsRightOfSecond: false })
+    expect(layout).toMatchObject({ xFromRight: 14, titleFromLeft: 19, secondFromRight: 19, firstIsRightOfSecond: false })
   })
 
   test('rtl: the x is at the left, the title starts at the right and the actions end at the left', async ({ page }) => {
     const layout = await layoutOf(await open(page, 'dialog--basic', { direction: 'rtl' }))
-    expect(layout).toMatchObject({ xFromLeft: 21, titleFromRight: 21, secondFromLeft: 21, firstIsRightOfSecond: true })
+    expect(layout).toMatchObject({ xFromLeft: 14, titleFromRight: 19, secondFromLeft: 19, firstIsRightOfSecond: true })
   })
 
   // The demo mounts its own RTL provider, so on an LTR page its portal sits in a <body> of the other direction.
@@ -893,7 +894,7 @@ test.describe('direction', () => {
       footer: getComputedStyle(element.lastElementChild ?? element).direction,
     }))
     expect(directions).toEqual({ body: 'ltr', viewport: 'rtl', popup: 'rtl', footer: 'rtl' })
-    expect(await layoutOf(popup)).toMatchObject({ xFromLeft: 21, titleFromRight: 21, secondFromLeft: 21, firstIsRightOfSecond: true })
+    expect(await layoutOf(popup)).toMatchObject({ xFromLeft: 14, titleFromRight: 19, secondFromLeft: 19, firstIsRightOfSecond: true })
     // Named by the island's own labels, not the page's.
     await expect(xOf(popup)).toHaveAttribute('aria-label', CLOSE.ar)
 
@@ -910,13 +911,13 @@ test.describe('direction', () => {
 
   test('the same demo on the RTL page is laid out the same way', async ({ page }) => {
     const popup = await open(page, 'dialog--rtl', { direction: 'rtl' })
-    expect(await layoutOf(popup)).toMatchObject({ xFromLeft: 21, titleFromRight: 21, secondFromLeft: 21, firstIsRightOfSecond: true })
+    expect(await layoutOf(popup)).toMatchObject({ xFromLeft: 14, titleFromRight: 19, secondFromLeft: 19, firstIsRightOfSecond: true })
   })
 
   /** What a dialog must inherit from each page when no provider tells it, written out. */
   const INHERITED = {
-    ltr: { direction: 'ltr', arabic: false, english: true, layout: { xFromRight: 21, titleFromLeft: 21, secondFromRight: 21, firstIsRightOfSecond: false } },
-    rtl: { direction: 'rtl', arabic: true, english: false, layout: { xFromLeft: 21, titleFromRight: 21, secondFromLeft: 21, firstIsRightOfSecond: true } },
+    ltr: { direction: 'ltr', arabic: false, english: true, layout: { xFromRight: 14, titleFromLeft: 19, secondFromRight: 19, firstIsRightOfSecond: false } },
+    rtl: { direction: 'rtl', arabic: true, english: false, layout: { xFromLeft: 14, titleFromRight: 19, secondFromLeft: 19, firstIsRightOfSecond: true } },
   } as const
 
   // R-13-1 asks for the provider and the harness always mounts one, so this dialog comes from a fixture module.
@@ -1003,14 +1004,14 @@ test.describe('under a coarse pointer', () => {
     const parts = await partsOf(popup)
     // The body keeps one whole line, and what no longer fits is reached by scrolling the popup.
     expect(parts.body.height).toBe(60)
-    expect(await popup.evaluate((el) => el.scrollHeight - el.clientHeight), 'px of popup below its own box').toBe(58)
+    expect(await popup.evaluate((el) => el.scrollHeight - el.clientHeight), 'px of popup below its own box').toBe(50)
     const last = popup.locator('button').last()
     const frame = await boxOf(popup)
-    expect((await boxOf(last)).bottom, 'the last action, before any scroll').toBe(frame.bottom + 41)
+    expect((await boxOf(last)).bottom, 'the last action, before any scroll').toBe(frame.bottom + 35)
 
     // A finger on the header drags the popup up: a real drag, since a script scrolls a box that clips and a finger cannot.
     await touchDrag(page, parts.header.left + 40, parts.header.top + 200, parts.header.top + 80)
-    expect(await popup.evaluate((el) => el.scrollTop), 'px the drag scrolled the popup').toBe(58)
+    expect(await popup.evaluate((el) => el.scrollTop), 'px the drag scrolled the popup').toBe(50)
     const box = await boxOf(last)
     expect(box.height).toBe(44)
     expect(box.bottom, 'the last action ends below the popup').toBeLessThanOrEqual(frame.bottom)
@@ -1126,6 +1127,30 @@ test.describe('what a footer holds besides its actions', () => {
         for (const kind of ['badge', 'tag', 'spinner', 'progress']) expect(inside[kind], kind).toBe(alone[kind])
         await expect(footer.locator('[data-kind="button"]')).toHaveCSS('min-height', coarse ? '44px' : '40px')
       })
+    })
+  }
+})
+
+test.describe('the states demo, as the Every state strip draws it', () => {
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: closed, open, alert and scrolled; the three open dialogs whole inside their cells, taking no focus, and only the long body scrolls`, async ({ page }) => {
+      await openLive(page, 'dialog--states', { direction })
+      const cells = page.locator('#demo [title="closed"]').locator('xpath=..').locator(':scope > *')
+      expect(await cells.evaluateAll((all) => all.map((cell) => cell.getAttribute('title')))).toEqual(['closed', 'open', 'alert', 'scrolled'])
+      await expect(page.locator('#demo [title="closed"] [role="dialog"]')).toHaveCount(0)
+      for (const [title, scrolls] of [['open', false], ['alert', false], ['scrolled', true]] as const) {
+        const cell = page.locator(`#demo [title="${title}"]`)
+        const popup = cell.locator(`[role="dialog"]${OPENED}`)
+        await atRest(popup)
+        const [inner, outer] = [await boxOf(popup), await boxOf(cell)]
+        expect(inner.left >= outer.left && inner.right <= outer.right && inner.top >= outer.top && inner.bottom <= outer.bottom, `the dialog of "${title}" leaves its cell`).toBe(true)
+        await expect(popup.locator('[data-scrolls]'), title).toHaveCount(scrolls ? 1 : 0)
+      }
+      await expect(xOf(page.locator('#demo [title="alert"] [role="dialog"]'))).toHaveCount(0)
+      await expect(page.locator('[data-base-ui-portal] > [data-base-ui-inert]')).toHaveCount(0)
+      expect(await page.evaluate(() => document.activeElement === document.body)).toBe(true)
+      expect((await axe(page)).violations).toEqual([])
+      expect(await liveErrors(page)).toEqual([])
     })
   }
 })

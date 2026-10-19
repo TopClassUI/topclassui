@@ -9,9 +9,9 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
-    label: 'the breadcrumb JSON-LD lists the current page too, as a ListItem with no URL',
+    label: 'the breadcrumb JSON-LD lists a middle crumb with no href too, as a ListItem with no URL',
     file: 'src/components/breadcrumb/lib.ts',
-    from: 'items.filter((item) => item.href !== undefined)',
+    from: 'items.filter((item, index) => item.href !== undefined || index === lastIndex)',
     to: 'items',
   },
   {
@@ -29,8 +29,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the breadcrumb caret stops flipping, so it points against the trail under dir="rtl"',
     file: 'src/components/breadcrumb/index.tsx',
-    from: '<Svg icon={caretRight} />',
-    to: '<Svg icon={caretRight} flipRtl={false} />',
+    from: '{index === 0 ? null : <Svg icon={caretRight} />}',
+    to: '{index === 0 ? null : <Svg icon={caretRight} flipRtl={false} />}',
   },
   {
     label: 'the breadcrumb nav is named in English whatever labels the caller passes',
@@ -75,22 +75,52 @@ export const MUTATIONS: Mutation[] = [
     to: "item.label !== ''",
   },
   {
-    label: 'the breadcrumb baseUrl is ignored, so the JSON-LD lists relative URLs whatever the caller passes',
+    label: 'a breadcrumb with no siteUrl writes BreadcrumbList JSON-LD again, so every demo leaks a trail into the page showing it',
     file: 'src/components/breadcrumb/lib.ts',
-    from: 'return new URL(href, baseUrl).href',
+    from: "const origin = siteUrl === undefined ? undefined : resolveOrigin(siteUrl)\n  if (origin === undefined) return null",
+    to: "const origin = siteUrl === undefined ? '' : resolveOrigin(siteUrl) ?? ''",
+  },
+  {
+    label: 'the breadcrumb siteUrl is ignored, so the JSON-LD lists relative URLs a crawler drops',
+    file: 'src/components/breadcrumb/lib.ts',
+    from: 'return new URL(href, origin).href',
     to: 'return href',
   },
   {
-    label: 'a breadcrumb baseUrl that is not a URL throws, and the page holding the trail fails to render',
+    label: 'a breadcrumb siteUrl that is not an http URL is used anyway, so a typo writes JSON-LD with relative URLs',
     file: 'src/components/breadcrumb/lib.ts',
-    from: '  } catch {\n    return href\n  }',
-    to: '  } finally {\n    void href\n  }',
+    from: "url.protocol === 'https:' || url.protocol === 'http:' ? url.origin : undefined",
+    to: 'url.origin',
+  },
+  {
+    label: 'a breadcrumb siteUrl that is not a URL throws, and the page holding the trail fails to render',
+    file: 'src/components/breadcrumb/lib.ts',
+    from: '  } catch {\n    return undefined\n  }',
+    to: '  } finally {\n    void siteUrl\n  }',
+  },
+  {
+    label: 'the breadcrumb JSON-LD leaves the current page out again, so the trail a crawler reads stops one step short',
+    file: 'src/components/breadcrumb/lib.ts',
+    from: 'item.href !== undefined || index === lastIndex',
+    to: 'item.href !== undefined',
+  },
+  {
+    label: 'the breadcrumb JSON-LD gives the current page an item with no URL',
+    file: 'src/components/breadcrumb/lib.ts',
+    from: "...(item.href === undefined ? {} : { item: resolveHref(item.href, origin) }),",
+    to: "item: item.href === undefined ? '' : resolveHref(item.href, origin),",
+  },
+  {
+    label: 'a breadcrumb trail with no link writes JSON-LD holding only a current page, which points nowhere',
+    file: 'src/components/breadcrumb/lib.ts',
+    from: '  if (!listed.some((item) => item.href !== undefined)) return null\n',
+    to: '',
   },
   {
     label: 'the breadcrumb caret sets its own colour again, which forced colours keep as a grey on black',
     file: 'src/components/breadcrumb/index.tsx',
-    from: '<Svg icon={caretRight} />',
-    to: '<Svg icon={caretRight} className="text-muted" />',
+    from: '{index === 0 ? null : <Svg icon={caretRight} />}',
+    to: '{index === 0 ? null : <Svg icon={caretRight} className="text-muted" />}',
   },
   {
     label: 'the breadcrumb current page loses its weight, so only colour tells it from a link',
@@ -121,5 +151,29 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/breadcrumb/index.tsx',
     from: '<span dir={resolveLabelDir(item.label)} aria-current',
     to: '<span dir="auto" aria-current',
+  },
+  {
+    label: 'the breadcrumb maxItems loses its clamp, so maxItems 0 folds away the page being read',
+    file: 'src/components/breadcrumb/lib.ts',
+    from: 'const keep = clamp(Math.floor(maxItems), min, max)',
+    to: 'const keep = Math.floor(maxItems)',
+  },
+  {
+    label: 'the folded breadcrumb gap is no longer hidden, so a screen reader reads a list item with nothing in it',
+    file: 'src/components/breadcrumb/index.tsx',
+    from: '<li key="gap" aria-hidden="true" className={ITEM}>',
+    to: '<li key="gap" className={ITEM}>',
+  },
+  {
+    label: 'the breadcrumb home crumb hides its label from a screen reader too, so the first link has no name',
+    file: 'src/components/breadcrumb/classes.ts',
+    from: "export const HIDDEN_LABEL = 'sr-only'",
+    to: "export const HIDDEN_LABEL = 'hidden'",
+  },
+  {
+    label: 'a breadcrumb link only underlines under the pointer, and stays muted where the frame lifts it to the body colour',
+    file: 'src/components/breadcrumb/classes.ts',
+    from: '  HOVER.mutedLink,',
+    to: '  HOVER.link,',
   },
 ]

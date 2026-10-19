@@ -19,12 +19,12 @@ describe('the schema is the documentation', () => {
   const keys = Object.keys(paginationSchema.shape)
 
   it('covers every design prop', () => {
-    expect(keys.sort()).toEqual(['boundaryCount', 'pageCount', 'siblingCount', 'size', 'value'])
+    expect(keys.sort()).toEqual(['boundaryCount', 'disabled', 'pageCount', 'siblingCount', 'size', 'value'])
   })
 
   it('converts to JSON Schema at all', () => {
     expect(Object.keys(json.properties ?? {}).sort())
-      .toEqual(['boundaryCount', 'pageCount', 'siblingCount', 'size', 'value'])
+      .toEqual(['boundaryCount', 'disabled', 'pageCount', 'siblingCount', 'size', 'value'])
   })
 
   for (const key of keys) {
@@ -40,11 +40,12 @@ describe('the schema is the documentation', () => {
     expect([...(json.required ?? [])].sort()).toEqual(['pageCount', 'value'])
   })
 
-  it('carries the three defaults', () => {
+  it('carries the four defaults', () => {
     expect(json.properties?.['siblingCount']?.default).toBe(1)
     expect(json.properties?.['boundaryCount']?.default).toBe(1)
     expect(json.properties?.['size']?.default).toBe('md')
-    expect(paginationSchema.parse(page)).toEqual({ value: 3, pageCount: 12, siblingCount: 1, boundaryCount: 1, size: 'md' })
+    expect(json.properties?.['disabled']?.default).toBe(false)
+    expect(paginationSchema.parse(page)).toEqual({ value: 3, pageCount: 12, siblingCount: 1, boundaryCount: 1, size: 'md', disabled: false })
   })
 
   // PLAN 20: a value test passes a hand-written copy with the same value, so read the source.
@@ -54,6 +55,7 @@ describe('the schema is the documentation', () => {
       '.default(PAGINATION_DEFAULTS.siblingCount)',
       '.default(PAGINATION_DEFAULTS.boundaryCount)',
       '.default(PAGINATION_DEFAULTS.size)',
+      '.default(PAGINATION_DEFAULTS.disabled)',
     ])
   })
 

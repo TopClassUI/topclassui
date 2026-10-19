@@ -1,15 +1,22 @@
 // R-5.12-4: one class string per element Navbar styles, built from the shared constants.
 import { CONTAIN, FOCUS_RING, HOVER, SCROLL_X, STICKY_TOP, TOUCH_TARGET } from '#shared/classes.js'
-import type { NavbarTop } from './types.js'
+import type { NavbarTop, NavbarVariant } from './types.js'
 
-/** The bar. One row while its parts fit; when they do not, a part drops to a row of its own
- * before the page grows wider. Its side padding is the drawn 20 px plus the safe area: the
- * safe utility alone would replace the 20 px and leave none. */
+/** The bar, 52 px at rest as Figma 138:2393 draws it. One row while its parts fit; when they do not, a part drops
+ * to a row of its own before the page grows wider. Its side padding is the drawn 16 px plus the safe area: the
+ * safe utility alone would replace the 16 px and leave none. */
 export const NAVBAR_ROOT = [
-  'flex min-h-15 w-full flex-wrap items-center gap-x-6 gap-y-2 pb-1.5',
-  'ps-[calc(1.25rem+var(--tc-safe-start))] pe-[calc(1.25rem+var(--tc-safe-end))]',
-  'bg-surface-raised border-b-(length:--tc-line-width) border-line',
+  'flex min-h-13 w-full flex-wrap items-center gap-x-4 gap-y-2 pb-1',
+  'ps-[calc(1rem+var(--tc-safe-start))] pe-[calc(1rem+var(--tc-safe-end))]',
+  'border-b-(length:--tc-line-width)',
 ].join(' ')
+
+/** R-5.2-3: the raised bar, which a sticky one lifts with a shadow once the page has scrolled under it; or no
+ * surface at all, its line kept transparent so both looks are one box. */
+export const NAVBAR_SURFACE = {
+  solid: 'bg-surface-raised border-line data-scrolled:shadow-md',
+  transparent: 'border-transparent',
+} as const satisfies Record<NavbarVariant, string>
 
 /** R-5.2-3: a bar that sticks clears the top safe area too; one that scrolls away starts under it.
  * The hook marks a sticky bar too tall for the screen, which then scrolls away with the page. */
@@ -41,7 +48,7 @@ export const NAVBAR_LIST_ROOM = '-m-[calc(var(--tc-ring-width)+var(--tc-ring-off
 /** Tab does not scroll a link that is half in view: Chromium leaves it cut, by 31 px measured.
  * The list therefore snaps, to the one link that has the keyboard focus: with none, it scrolls freely.
  * Under the pointer it never snaps, or a wheel would spring back to a link that keeps the focus. */
-export const NAVBAR_LIST = `flex items-center gap-5 snap-x snap-mandatory hover:snap-none ${NAVBAR_LIST_ROOM} ${SCROLL_X}`
+export const NAVBAR_LIST = `flex items-center gap-4 snap-x snap-mandatory hover:snap-none ${NAVBAR_LIST_ROOM} ${SCROLL_X}`
 
 /** Never squeezed by its neighbours, and never wider than the room the list shows. */
 export const NAVBAR_ITEM = `flex shrink-0 ${CONTAIN}`

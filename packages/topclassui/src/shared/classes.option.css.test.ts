@@ -54,7 +54,8 @@ describe('a row under a finger', () => {
 })
 
 describe('the chosen row', () => {
-  it('is set in the medium weight of the theme, on the attribute Base UI sets', () => {
-    expect(ruleOf(`${selectorOf('data-selected:font-medium')}[data-selected]`)).toContain('font-weight: var(--font-weight-medium);')
+  it('is tinted with the primary pair, on the attribute Base UI sets', () => {
+    expect(ruleOf(`${selectorOf('data-selected:bg-primary-soft')}[data-selected]`)).toBe('background-color: var(--tc-primary-soft);')
+    expect(ruleOf(`${selectorOf('data-selected:text-primary-on-soft')}[data-selected]`)).toBe('color: var(--tc-primary-on-soft);')
   })
 })

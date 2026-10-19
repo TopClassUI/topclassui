@@ -3,8 +3,12 @@
 /** Every prop's starting value. A caller overrides any of them by passing the prop. */
 export const NAVBAR_DEFAULTS = {
   sticky: true,
+  variant: 'solid',
   current: false,
 } as const
+
+/** R-8.3-5: the two looks Figma 138:2393 draws: the raised bar, and one on the page with no surface. */
+export const NAVBAR_VARIANTS = ['solid', 'transparent'] as const
 
 /** R-10.5-3: where a sticky bar writes its height, and what src/tokens.css reads into scroll-padding. */
 export const NAVBAR_OFFSET_VARIABLE = '--tc-sticky-top'

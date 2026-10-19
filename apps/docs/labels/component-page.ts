@@ -24,7 +24,7 @@ export interface ComponentPageLabels {
   importFromPackage: string
   copyImport: (component: string) => string
   installOnce: string
-  chip: { notMeasured: string; lazy: string }
+  chip: { lazy: string }
   demoTabs: (component: string) => string
   preview: string
   code: string
@@ -83,7 +83,7 @@ const en: ComponentPageLabels = {
   importFromPackage: 'Import from the package',
   copyImport: (component) => `Copy the import for ${component}`,
   installOnce: 'Install once:',
-  chip: { notMeasured: 'size not measured yet', lazy: 'lazy' },
+  chip: { lazy: 'lazy' },
   demoTabs: (component) => `${component} demo`,
   preview: 'Preview',
   code: 'Code',
@@ -143,7 +143,7 @@ const ar: ComponentPageLabels = {
   importFromPackage: 'أو استورده من الحزمة',
   copyImport: (component) => `انسخ الاستيراد لـ ${component}`,
   installOnce: 'ثبّت مرة واحدة:',
-  chip: { notMeasured: 'الحجم لم يُقَس بعد', lazy: 'عند الطلب' },
+  chip: { lazy: 'عند الطلب' },
   demoTabs: (component) => `مثال ${component}`,
   preview: 'العرض',
   code: 'الشيفرة',

@@ -55,8 +55,8 @@ describe('the box and the input', () => {
     expect(ruleOf(selectorOf('pe-9'))).toBe('padding-inline-end: calc(var(--spacing) * 9);')
   })
 
-  it('a read-only input takes the soft fill, and the spinner stands still under reduced motion', () => {
-    expect(ruleOf(`${selectorOf('data-readonly:bg-neutral-soft')}[data-readonly]`)).toBe('background-color: var(--tc-neutral-soft);')
+  it('the icons dim with a disabled input, and the spinner stands still under reduced motion', () => {
+    expect(ruleOf(`${selectorOf('peer-disabled:opacity-50')}:is(:where(.peer):disabled ~ *)`)).toBe('opacity: 50%;')
     expect(mediaOf(selectorOf('motion-reduce:animate-none'))).toBe('@media (prefers-reduced-motion: reduce)')
   })
 })
@@ -107,8 +107,9 @@ describe('a row', () => {
     expect(ruleOf(`${selectorOf('forced-colors:data-highlighted:bg-[Highlight]')}[data-highlighted]`)).toBe('background-color: Highlight;')
   })
 
-  it('the chosen row is heavier as well as ticked, and a disabled one dims to half', () => {
-    expect(ruleOf(`${selectorOf('data-selected:font-medium')}[data-selected]`)).toBe('--tw-font-weight: var(--font-weight-medium); font-weight: var(--font-weight-medium);')
+  it('the chosen row is tinted as well as ticked, and a disabled one dims to half', () => {
+    expect(ruleOf(`${selectorOf('data-selected:bg-primary-soft')}[data-selected]`)).toBe('background-color: var(--tc-primary-soft);')
+    expect(ruleOf(`${selectorOf('data-selected:text-primary-on-soft')}[data-selected]`)).toBe('color: var(--tc-primary-on-soft);')
     expect(ruleOf(`${selectorOf('data-disabled:opacity-50')}[data-disabled]`)).toBe('opacity: 50%;')
   })
 

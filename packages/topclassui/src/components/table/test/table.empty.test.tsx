@@ -23,12 +23,12 @@ const html = (props: Partial<TableProps<Member>> = {}) =>
 
 const body = (source: string) => /<tbody>(.*)<\/tbody>/.exec(source)?.[1] ?? ''
 
-/** What the one cell holds, without the element that keeps it in view. */
-const words = (source: string) => /<td [^>]*><div [^>]*>(.*)<\/div><\/td>/.exec(body(source))?.[1]
+/** What the one cell says, without the element that keeps it in view and the tray over it. */
+const words = (source: string) => /<td [^>]*><div [^>]*><svg [^>]*>.*?<\/svg><span>(.*)<\/span><\/div><\/td>/.exec(body(source))?.[1]
 
 describe('no items', () => {
-  it('renders one row holding one cell, and the words in an element of their own', () => {
-    expect(body(html())).toMatch(/^<tr><td [^>]*><div [^>]*>[^<]*<\/div><\/td><\/tr>$/)
+  it('renders one row holding one cell, the tray and the words in an element of their own', () => {
+    expect(body(html())).toMatch(/^<tr><td [^>]*><div [^>]*><svg [^>]*>.*?<\/svg><span>[^<]*<\/span><\/div><\/td><\/tr>$/)
   })
 
   it('spans every column, so the words sit under the whole header', () => {
@@ -47,15 +47,22 @@ describe('no items', () => {
     expect([...html_.matchAll(/<th [^>]*>(.*?)<\/th>/g)].map((m) => m[1])).toEqual(['Name', 'Role', 'Number'])
   })
 
-  it('centres the words in the muted colour, under the same line every row has, and lets them wrap', () => {
+  it('centres the words in the small muted step, under the same line every row has, and lets them wrap', () => {
     expect(classList(body(html()))).toEqual([
-      'border-t-(length:--tc-line-width)', 'border-line', 'px-4', 'py-3', 'text-center', 'text-sm', 'text-muted',
+      'border-t-(length:--tc-line-width)', 'border-line', 'px-3.5', 'py-6', 'text-center', 'text-xs', 'text-muted',
     ])
   })
 
   it('keeps the words in the part of the box in view, however wide the table is', () => {
     const inner = /<td [^>]*>(<div [^>]*>)/.exec(body(html()))?.[1] ?? ''
-    expect(classList(inner)).toEqual(['sticky', 'inset-s-4', 'inset-e-4', 'mx-auto', 'w-fit'])
+    expect(classList(inner)).toEqual(['sticky', 'inset-s-4', 'inset-e-4', 'mx-auto', 'flex', 'w-fit', 'flex-col', 'items-center', 'gap-1.25'])
+  })
+
+  it('draws the tray of the frame over the words, 22 px, muted and hidden from a reader', () => {
+    const tray = /<svg [^>]*>/.exec(body(html()))?.[0] ?? ''
+    expect(attr(tray, 'width')).toBe('22')
+    expect(attr(tray, 'aria-hidden')).toBe('true')
+    expect(classList(tray)).toContain('text-muted')
   })
 
   it('reports data-empty on the root, and only when there is nothing', () => {
@@ -75,7 +82,8 @@ describe('no items', () => {
 describe('no columns', () => {
   it('is as empty as no items: one row of words, not a row per item with no cell in it', () => {
     const html_ = html({ items: [layla, { ...layla, id: 8 }], columns: [] })
-    expect(body(html_)).toMatch(/^<tr><td [^>]*><div [^>]*>Nothing here yet<\/div><\/td><\/tr>$/)
+    expect(words(html_)).toBe('Nothing here yet')
+    expect([...body(html_).matchAll(/<tr>/g)]).toHaveLength(1)
     expect(attr(html_, 'data-empty')).toBe('')
   })
 

@@ -130,9 +130,9 @@ describe('what the demos show', () => {
     expect(html).toContain('</nav><div class="grid min-w-0 grow basis-40 content-start gap-3">')
   })
 
-  it('in-a-layout puts a column that can shrink beside the rail, holding a table', async () => {
+  it('in-a-layout puts a column that can shrink beside the rail, scrolling under the thin bar, holding a table', async () => {
     const html = await render('in-a-layout')
-    expect(html).toContain('</nav><div class="min-w-0 flex-1 overflow-y-auto p-4">')
+    expect(html).toContain('</nav><div class="min-w-0 flex-1 p-4 overflow-y-auto overscroll-contain scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))] [scrollbar-width:thin] [scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]">')
     expect(tags(html, 'table')).toHaveLength(1)
     // One main a page: the harness owns it, so the column is a div.
     expect(tags(html, 'main')).toHaveLength(0)
@@ -154,7 +154,7 @@ describe('what the demos show', () => {
 
   it('states names each of its two rails, so a page can hold both, and each toggle in English', async () => {
     const html = await render('states')
-    expect(tags(html, 'nav').map((nav) => attr(nav, 'aria-label'))).toEqual(['Expanded', 'Collapsed'])
+    expect(tags(html, 'nav').map((nav) => attr(nav, 'aria-label'))).toEqual(['expanded', 'collapsed'])
     expect(tags(html, 'button').map((button) => attr(button, 'aria-label'))).toEqual(['Collapse the sidebar', 'Expand the sidebar'])
   })
 

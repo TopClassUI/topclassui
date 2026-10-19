@@ -9,6 +9,7 @@ import { Table } from 'topclassui/table'
 
 import type { Locale } from '../../content/pages'
 import type { Rendering, SiteLabels } from '../../labels'
+import { kbOf } from '../../lib/chip'
 import { CARDS, cardBySlug, componentDate, type CardEntry } from '../../lib/data'
 import { ZERO_KB } from '../../lib/site'
 
@@ -53,7 +54,7 @@ export function ProductFrame({ locale, labels }: { locale: Locale; labels: SiteL
             columns={[
               { key: 'component', header: frame.columns.component, rowHeader: true, cell: (row) => <code dir="ltr" className="font-mono text-sm">{row.name}</code> },
               { key: 'kind', header: frame.columns.kind, cell: (row) => <Badge tone={KIND_TONE[row.rendering]} size="sm">{frame.kinds[row.rendering]}</Badge> },
-              { key: 'js', header: frame.columns.js, className: 'max-md:hidden', cell: (row) => (row.rendering === 'server' ? ZERO_KB : frame.notMeasured) },
+              { key: 'js', header: frame.columns.js, className: 'max-md:hidden', cell: (row) => (row.clientBytes === null ? ZERO_KB : kbOf(row.clientBytes)) },
               { key: 'status', header: frame.columns.status, className: 'max-md:hidden', cell: () => frame.beta },
               { key: 'updated', header: frame.columns.updated, className: 'max-md:hidden', cell: (row) => monthOf(componentDate(row.slug), locale) },
             ]}

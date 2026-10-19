@@ -46,7 +46,9 @@ describe('ten thousand rows', () => {
 
   it('striped tints by the row\'s place in the whole table, not in the window', () => {
     render(<Table items={lines(10)} getKey={(line) => line.id} columns={columns} caption="Lines" striped />)
-    expect(mounted().map((row) => row.className)).toEqual(['', 'bg-surface', '', 'bg-surface', '', 'bg-surface', '', 'bg-surface', '', 'bg-surface'])
+    const row = 'group/row hover:bg-surface data-selected:bg-primary-soft'
+    const tint = 'group/row data-selected:bg-primary-soft bg-surface hover:bg-neutral-soft group-hover/row:bg-neutral-soft group-data-selected/row:bg-primary-soft'
+    expect(mounted().map((line) => line.className)).toEqual([row, tint, row, tint, row, tint, row, tint, row, tint])
   })
 })
 

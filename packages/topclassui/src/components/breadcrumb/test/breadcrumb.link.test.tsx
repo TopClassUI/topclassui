@@ -32,7 +32,7 @@ describe('with no link element', () => {
   })
 
   it('writes the anchor as it did before link existed: the href, then the class, then the label', () => {
-    expect(html()).toContain('<a href="/" class="inline-flex items-center justify-center rounded-chip text-muted ')
+    expect(html()).toContain('<a href="/" class="inline-flex items-center justify-center gap-1.5 rounded-chip text-muted ')
     expect(html()).toContain('"><span dir="auto" class="truncate min-w-0">Home</span></a></li>')
     expect(html()).not.toMatch(/<a class=/)
   })
@@ -107,12 +107,13 @@ describe('with link={<Link href="" />} (PLAN 5.8)', () => {
   })
 
   it('reads the JSON-LD from the items, so it is the same list whichever element renders', () => {
-    expect(script(linked)).toBe(
+    expect(script(html({ link: <Link href="" />, siteUrl: 'https://example.com' }))).toBe(
       '<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":['
-      + '{"@type":"ListItem","position":1,"name":"Home","item":"/"},'
-      + '{"@type":"ListItem","position":2,"name":"Profile","item":"/settings/profile"}]}</script>',
+      + '{"@type":"ListItem","position":1,"name":"Home","item":"https://example.com/"},'
+      + '{"@type":"ListItem","position":2,"name":"Profile","item":"https://example.com/settings/profile"},'
+      + '{"@type":"ListItem","position":3,"name":"Avatar"}]}</script>',
     )
-    expect(script(html({ link: <Link href="/placeholder" /> }))).not.toContain('placeholder')
+    expect(script(html({ link: <Link href="/placeholder" />, siteUrl: 'https://example.com' }))).not.toContain('placeholder')
   })
 })
 

@@ -22,7 +22,7 @@ describe('the layer behind an overlay and the box it sits in', () => {
 
   it('OVERLAY_SURFACE is the raised surface with the box radius, a hairline and a shadow', () => {
     expect(list(OVERLAY_SURFACE)).toEqual([
-      'rounded-box', 'bg-surface-raised', 'text-body', 'border-(length:--tc-line-width)', 'border-line', 'shadow-lg',
+      'rounded-box', 'bg-surface-raised', 'text-body', 'border-(length:--tc-line-width)', 'border-line', 'shadow-(--tc-shadow-overlay)',
     ])
   })
 })
@@ -66,7 +66,7 @@ describe('motion reads the knob and the two attributes Base UI sets', () => {
 describe('a row of a menu and its highlight', () => {
   it('ROW is a full-width flex row as tall as the row token, with no outline of its own', () => {
     expect(list(ROW)).toEqual([
-      'flex', 'min-h-(--tc-row-height)', 'w-full', 'items-center', 'gap-2', 'rounded-control', 'px-3',
+      'flex', 'min-h-(--tc-row-height)', 'w-full', 'items-center', 'gap-2', 'rounded-control', 'px-2.5',
       'text-start', 'text-sm', 'outline-none', 'cursor-pointer', 'disabled:cursor-default', 'aria-disabled:cursor-default',
       'data-disabled:cursor-default', 'data-readonly:cursor-default', 'data-loading:cursor-default',
     ])

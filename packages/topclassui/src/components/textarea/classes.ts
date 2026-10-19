@@ -16,8 +16,8 @@ export const TEXTAREA_SIZE = {
   custom: '',
 } as const satisfies Record<Size, string>
 
-/** A field that grows by itself takes no handle: a hand-set height would fight the next keystroke. */
-export const TEXTAREA_RESIZE = { plain: 'resize-y', autosize: 'resize-none' } as const
+/** A field that grows by itself takes no handle: a hand-set height would fight the next keystroke. Nor does a disabled one. */
+export const TEXTAREA_RESIZE = { plain: 'resize-y disabled:resize-none', autosize: 'resize-none' } as const
 
 /** The client half: the textarea above, its counter under it at the inline end. */
 export const TEXTAREA_HOLDER = 'grid max-w-full gap-1.5'

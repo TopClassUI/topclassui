@@ -29,7 +29,7 @@ describe('the popup', () => {
     expect(popup.getAttribute('data-testid')).toBe('palette')
     expect(popup.id).toBe('palette')
     expect(popup.className).toContain('max-w-80')
-    expect(popup.className).not.toContain('max-w-105')
+    expect(popup.className).not.toContain('max-w-100')
   })
 
   it('visibleRows sets the row knob on the list, clamped to 1 to 100, and nothing when left out', async () => {
@@ -43,7 +43,13 @@ describe('the popup', () => {
     second.unmount()
     render(<Palette />)
     await opened()
-    expect(list().getAttribute('style')).toBeNull()
+    expect(list().style.getPropertyValue('--tc-list-rows')).toBe('')
+  })
+
+  it('hands the rows the Enter hint of the labels with an empty alternative, so it is drawn and never read', async () => {
+    render(<Palette />)
+    await opened()
+    expect(list().style.getPropertyValue('--tc-command-enter')).toBe('"Enter" / ""')
   })
 
   it('caps what can be typed at the search field cap of 256 characters', async () => {

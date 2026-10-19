@@ -42,13 +42,8 @@ const SHOWN: Record<string, Shown[]> = {
     { trigger: 'xl', title: 'Size xl', controls: ['Close this dialog', 'Done'] },
     { trigger: 'custom', title: 'Size custom', controls: ['Close this dialog', 'Done'] },
   ],
-  'states': [
-    { trigger: 'Open', title: 'Open', controls: ['Close this dialog', 'Done'] },
-    { trigger: 'Alert', title: 'Alert', controls: ['Close this dialog', 'Cancel', 'Delete'] },
-    { trigger: 'Scrolled', title: 'Scrolled', controls: ['Close this dialog', 'Done'] },
-    { trigger: 'Focus trapped', title: 'Focus trapped', controls: ['Close this dialog', 'Done'] },
-    { trigger: 'Non-modal', title: 'Non-modal', controls: ['Close this dialog', 'Done'] },
-  ],
+  // The one trigger is the closed cell's: the other cells draw their dialogs open, with no trigger (dialog.states.dom.test).
+  'states': [{ trigger: 'Open', title: 'Open', controls: ['Close this dialog', 'Done'] }],
   'trap-focus': [{ trigger: 'Inspect', title: 'Inspector', controls: ['Close this dialog', 'Done'] }],
   'with-form': [{ trigger: 'Rename', title: 'Rename this project', controls: ['Close this dialog', 'Name', 'Cancel', 'Save'] }],
   'with-tooltip': [{ trigger: 'Share', title: 'Share this project', controls: ['Close this dialog', 'Link', 'Copy link', 'Done'] }],
@@ -77,7 +72,8 @@ async function shown(Demo: ComponentType): Promise<Shown[]> {
       controls: [...popup.querySelectorAll('button, input')].map(nameOf),
     })
     await userEvent.keyboard('{Escape}')
-    await waitFor(() => { expect(screen.queryByRole('dialog')).toBeNull() })
+    // That dialog, not every one: the states demo draws three more open beside its trigger.
+    await waitFor(() => { expect(popup.isConnected).toBe(false) })
   }
   return out
 }

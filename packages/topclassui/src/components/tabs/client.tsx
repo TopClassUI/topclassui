@@ -2,12 +2,11 @@
 
 import { Tabs as Base } from '@base-ui/react/tabs'
 
-import { CONTROL_SIZE } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
 import { renderPart } from '#shared/render-trigger.js'
 import { truncateLabel } from '#shared/truncate-label.js'
 import { TABS_BOUNDARIES } from './boundaries.js'
-import { TABS_LIST, TABS_PANEL, TABS_ROOT, TABS_TAB } from './classes.js'
+import { TABS_LIST, TABS_PANEL, TABS_ROOT, TABS_SIZE, TABS_TAB } from './classes.js'
 import { TABS_DEFAULTS } from './constants.js'
 import { useTabsLook, useTabsRoot, useTabsTab } from './hook.js'
 import type { TabsListProps, TabsPanelProps, TabsRootProps, TabsTabProps } from './types.js'
@@ -41,7 +40,7 @@ export function TabsList({ className, render, ...rest }: TabsListProps) {
  * ellipsis. In the server HTML the tab the page opens on is the one tab stop of its list. */
 export function TabsTab({ className, render, children, ...rest }: TabsTabProps) {
   const { variant, size, stop } = useTabsTab(rest.value)
-  const part = renderPart(render, cn(TABS_TAB[variant], CONTROL_SIZE[size], className))
+  const part = renderPart(render, cn(TABS_TAB[variant], TABS_SIZE[variant][size], className))
   return (
     <Base.Tab {...stop} {...rest} render={part.render} className={part.className}>
       {truncateLabel(children, TABS_BOUNDARIES.labelMaxLength)}

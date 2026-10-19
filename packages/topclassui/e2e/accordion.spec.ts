@@ -20,7 +20,7 @@ const TITLES: Record<string, readonly string[]> = {
   'accordion--multiple': ['Plan', 'Seats', 'Invoices'],
   'accordion--playground': ['What is a server component?', 'Does it work in Arabic?', 'How big is the bundle?'],
   'accordion--rtl': ['ما هو مكوّن الخادم؟', 'هل يعمل بالعربية؟', 'ما حجم الحزمة؟'],
-  'accordion--states': ['Every item disabled', 'Open', 'Disabled', 'Closed'],
+  'accordion--states': ['Question', 'Question', 'Question'],
 }
 
 /** A small phone, a phone, a desktop and a phone on its side. */
@@ -29,6 +29,9 @@ const SCREENS = [
 ] as const
 
 const triggers = (page: Page, scope = '#demo') => page.locator(`${scope} button[aria-expanded]`)
+
+/** The triggers a press can toggle: the states demo ends on a disabled one. */
+const pressable = (page: Page) => triggers(page).and(page.locator(':not([data-disabled])'))
 /** The panel of a trigger: the element after its heading. Its region is the one child it has. */
 const panelOf = (trigger: Locator) => trigger.locator('xpath=../following-sibling::*[1]')
 const regionOf = (trigger: Locator) => panelOf(trigger).locator('xpath=./*[@role="region"]')
@@ -166,8 +169,8 @@ test.describe('a closed panel', () => {
     }
     expect(await regionOf(triggers(page).nth(2)).evaluate((region) => region.textContent))
       .toBe('About one kilobyte in the browser. The answers cost nothing: they are plain HTML.')
-    // The box is three triggers and two lines tall, and nothing more: 3 x 48, 2 x 1 and its own border.
-    expect((await boxOf(page.locator('#demo [data-orientation]').first())).height).toBe(148)
+    // The box is three triggers and two lines tall, and nothing more: 3 x 44, 2 x 1 and its own border.
+    expect((await boxOf(page.locator('#demo [data-orientation]').first())).height).toBe(136)
   })
 
   test('an open one is shown at its own height, and closes back to 0 px', async ({ page }) => {
@@ -510,19 +513,19 @@ test.describe('the caret', () => {
   const titleOf = (trigger: Locator) => trigger.locator('xpath=./span[1]')
 
   for (const direction of DIRECTIONS) {
-    test(`${direction}: it sits at the inline end, 16 px in, with the title at the other side`, async ({ page }) => {
+    test(`${direction}: it sits at the inline end, 14 px in, with the title at the other side`, async ({ page }) => {
       await openLive(page, 'accordion--basic', { direction })
       const trigger = triggers(page).first()
       const [box, title, caret] = await Promise.all([boxOf(trigger), boxOf(titleOf(trigger)), boxOf(caretOf(trigger))])
       expect({ width: caret.width, height: caret.height }).toEqual({ width: 14, height: 14 })
       if (direction === 'ltr') {
-        expect(box.right - caret.right).toBe(16)
-        expect(title.left - box.left).toBe(16)
-        expect(caret.left - title.right).toBe(12)
+        expect(box.right - caret.right).toBe(14)
+        expect(title.left - box.left).toBe(14)
+        expect(caret.left - title.right).toBe(10)
       } else {
-        expect(caret.left - box.left).toBe(16)
-        expect(box.right - title.right).toBe(16)
-        expect(title.left - caret.right).toBe(12)
+        expect(caret.left - box.left).toBe(14)
+        expect(box.right - title.right).toBe(14)
+        expect(title.left - caret.right).toBe(10)
       }
       await expect(trigger).toHaveCSS('text-align', 'start')
     })
@@ -572,7 +575,7 @@ for (const scheme of ['light', 'dark'] as const) {
       // A column 1 px wide down the box, 100 px in: the top line, the two between the items and the bottom one.
       const column = await pixelsOf(page, { x: left + 100, y: top, width: 1, height: bottom - top })
       const lines = column.flatMap((pixel, y) => (inkOn([pixel], canvas) === 1 ? [y] : []))
-      expect(lines).toEqual([0, 49, 98, 147])
+      expect(lines).toEqual([0, 45, 90, 135])
     })
 
     test('each caret is drawn in the text colour of its trigger, and the disabled one in the grey of the system', async ({ page }) => {
@@ -685,7 +688,7 @@ test.describe('motion', () => {
     // No height animation: the panel is one height from its first frame, and so is the box, three triggers taller than it.
     expect(runsOf(shown.map((frame) => frame.height))).toHaveLength(1)
     expect(shown[0]?.height).toBeGreaterThanOrEqual(40)
-    expect(runsOf(shown.map((frame) => frame.box - frame.height))).toEqual([148])
+    expect(runsOf(shown.map((frame) => frame.box - frame.height))).toEqual([136])
     const opacities = shown.map((frame) => frame.opacity)
     expect(opacities[0]).toBeLessThan(0.2)
     expect(opacities.at(-1)).toBe(1)
@@ -709,7 +712,7 @@ test.describe('motion', () => {
     expect(shown.filter((frame) => frame.ending && frame.opacity > 0.05 && frame.opacity < 0.95).length, 'frames in the middle of the fade').toBeGreaterThanOrEqual(2)
     // Then it is hidden for good, and the box is three triggers tall again.
     expect(hidden.length).toBeGreaterThanOrEqual(1)
-    expect(hidden.every((frame) => !frame.shown && frame.height === 0 && frame.box === 148)).toBe(true)
+    expect(hidden.every((frame) => !frame.shown && frame.height === 0 && frame.box === 136)).toBe(true)
   })
 
   test('one at a time: the box is taller while the old panel fades out beside the new one, then settles', async ({ page }) => {
@@ -910,7 +913,7 @@ test.describe('on every screen, in both directions', () => {
           await expectNoSidewaysScroll(page)
           expect(await faultsOf(page), `${demo} as it loads`).toEqual([])
           // And with its last item toggled: opened where it was closed, closed where it was open. The table too.
-          await triggers(page).last().click()
+          await pressable(page).last().click()
           if (demo === 'accordion--long-content') await triggers(page).nth(2).click()
           await atRest(page)
           await expectNoSidewaysScroll(page)
@@ -998,10 +1001,10 @@ test.describe('hostile content', () => {
     })
   }
 
-  test('sixty items: each trigger is 48 px tall, the page scrolls to the last by wheel, and Tab reaches it from the one before', async ({ page }) => {
+  test('sixty items: each trigger is 44 px tall, the page scrolls to the last by wheel, and Tab reaches it from the one before', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 480 })
     await openLive(page, 'accordion--many-items')
-    expect(await triggers(page).evaluateAll((all) => [...new Set(all.map((one) => one.getBoundingClientRect().height))])).toEqual([48])
+    expect(await triggers(page).evaluateAll((all) => [...new Set(all.map((one) => one.getBoundingClientRect().height))])).toEqual([44])
     const last = triggers(page).nth(59)
     await expect(last).not.toBeInViewport()
     await page.mouse.move(160, 240)
@@ -1093,8 +1096,8 @@ test.describe('what a caller must not write, and what happens when they do', () 
   test('an empty title: the trigger is a button with no name, which axe reports', async ({ page }) => {
     await openFixture(page)
     expect((await axe(page, '#empty-title')).violations.map((found) => found.split(':')[0])).toEqual(['button-name', 'empty-heading'])
-    // No line of text: it is the 14 px of its caret and the 14 px above and below, still over the 24 px floor.
-    expect((await boxOf(triggers(page, '#empty-title'))).height).toBe(42)
+    // No line of text: it is the 14 px of its caret and the 12 px above and below, still over the 24 px floor.
+    expect((await boxOf(triggers(page, '#empty-title'))).height).toBe(38)
     // Its value is the empty string, which names an item as well as any other: a press opens it.
     await triggers(page, '#empty-title').click()
     await expect(triggers(page, '#empty-title')).toHaveAttribute('aria-expanded', 'true')
@@ -1149,7 +1152,7 @@ test.describe('under a coarse pointer', () => {
         }
       }
       await measure()
-      await triggers(page).last().tap()
+      await pressable(page).last().tap()
       await atRest(page)
       await measure()
     })
@@ -1202,7 +1205,7 @@ test.describe('axe', () => {
           // Not an empty run: axe did read the headings and the triggers.
           expect(loaded.passes).toEqual(expect.arrayContaining(['heading-order', 'button-name', 'aria-allowed-attr']))
 
-          await triggers(page).last().click()
+          await pressable(page).last().click()
           await atRest(page)
           expect((await axe(page)).violations).toEqual([])
         })
@@ -1240,18 +1243,18 @@ test.describe('larger text', () => {
         await page.addStyleTag({ content: 'html { font-size: 32px }' })
         await expectNoSidewaysScroll(page)
         expect(await faultsOf(page), demo).toEqual([])
-        // One line of 28 px text is 40 px tall, in 28 px of padding above and below: twice the 48 px, or more lines.
+        // One line of 28 px text is 40 px tall, in 24 px of padding above and below: twice the 44 px, or more lines.
         const heights = await triggers(page).evaluateAll((all) => all.map((one) => one.getBoundingClientRect().height))
-        expect(Math.min(...heights), demo).toBeGreaterThanOrEqual(96)
-        if (screen.width === 1280 && demo === 'accordion--basic') expect(heights).toEqual([96, 96, 96])
+        expect(Math.min(...heights), demo).toBeGreaterThanOrEqual(88)
+        if (screen.width === 1280 && demo === 'accordion--basic') expect(heights).toEqual([88, 88, 88])
         const caret = await boxOf(triggers(page).first().locator('xpath=./span[last()]'))
         expect({ width: caret.width, height: caret.height }).toEqual({ width: 28, height: 28 })
-        // Beside its title or wrapped below it, each caret keeps 32 px (px-4) from the inline end of its trigger.
+        // Beside its title or wrapped below it, each caret keeps 28 px (px-3.5) from the inline end of its trigger.
         const ends = await triggers(page).evaluateAll((all) => all.map((one) => {
           const [row, mark] = [one.getBoundingClientRect(), one.lastElementChild?.getBoundingClientRect()]
           return mark ? Math.round(getComputedStyle(one).direction === 'rtl' ? mark.left - row.left : row.right - mark.right) : -1
         }))
-        expect([...new Set(ends)], demo).toEqual([32])
+        expect([...new Set(ends)], demo).toEqual([28])
       }
     })
   }

@@ -16,7 +16,7 @@ export type PaginationDesignProps = PaginationSchemaInput
 /** The four numbers the page list is worked out from, before any clamp. Spelled per key:
  * Required<> keeps zod's written `| undefined` under exactOptionalPropertyTypes. */
 export type PaginationRange = {
-  [K in keyof Omit<PaginationSchemaInput, 'size'>]-?: NonNullable<PaginationSchemaInput[K]>
+  [K in keyof Omit<PaginationSchemaInput, 'size' | 'disabled'>]-?: NonNullable<PaginationSchemaInput[K]>
 }
 
 /** What Pagination writes on each link, whichever element renders it. */

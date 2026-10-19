@@ -64,7 +64,7 @@ describe('className is passed last', () => {
     expect(list).toContain('bg-surface')
     expect(list).toContain('shadow-none')
     expect(list).toContain('border-s-0')
-    for (const own of ['max-w-80', 'bg-surface-raised', 'shadow-lg', 'border-s-(length:--tc-line-width)']) expect(list, own).not.toContain(own)
+    for (const own of ['max-w-80', 'bg-surface-raised', 'shadow-(--tc-shadow-overlay)', 'border-s-(length:--tc-line-width)']) expect(list, own).not.toContain(own)
     expect(list).toContain('flex-col')
     expect(list).toContain('h-dvh')
   })
@@ -81,7 +81,7 @@ describe('className is passed last', () => {
       body: { className: 'px-8 py-2' }, footer: { className: 'justify-start' },
     })
     expect(classes(parts.header)).toEqual([
-      'border-b-(length:--tc-line-width)', 'border-line', 'pe-16', 'ps-8', 'py-4', 'shrink-0',
+      'border-b-(length:--tc-line-width)', 'border-line', 'pe-16', 'ps-8', 'py-3.5', 'shrink-0',
     ])
     expect(classes(parts.title)).toEqual(['font-semibold', 'text-body', 'text-lg'])
     expect(classes(parts.description)).toEqual(['text-muted', 'text-xs'])

@@ -26,6 +26,8 @@ const load = (file: string) => HTML.get(file) ?? ''
 /** One chunk per banner in a demo, each starting at its tone. */
 const banners = (source: string) => source.split('<div data-tone="').slice(1)
 
+const STATES = ['primary', 'info', 'warning', 'dismissed']
+
 describe('every demo renders on the server', () => {
   it('holds exactly the demos PLAN 20 asks for, so none can be deleted silently', () => {
     expect(files).toEqual(EXPECTED)
@@ -68,5 +70,14 @@ describe('every demo renders on the server', () => {
       'long-text: warning/warning', 'rtl: info/info',
       'with-action: warning/warning', 'with-action: danger/danger', 'with-action: primary/primary',
     ])
+  })
+})
+
+describe('the states demo', () => {
+  it('is the frame\'s strip: one captioned cell a state', async () => {
+    const { default: Demo } = await import('../dummy/states.js') as { default: ComponentType }
+    const html = markup(<Demo />)
+    const captions = [...html.matchAll(/<div (?:role="(?:group|region)" )?(?:data-tone="\w+" )?[^>]*aria-label="([^"]+)"/g)].map((m) => m[1])
+    expect(captions).toEqual(STATES)
   })
 })

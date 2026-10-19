@@ -1,57 +1,61 @@
+'use client'
+
+import { useState } from 'react'
+
 import { arrowDown } from '#icons/data/arrow-down.js'
 import { arrowUp } from '#icons/data/arrow-up.js'
-import { clock } from '#icons/data/clock.js'
-import { prohibit } from '#icons/data/prohibit.js'
+import { linkSimple } from '#icons/data/link-simple.js'
 import { Button } from '#components/button/index.js'
 import { Svg } from '#components/svg/index.js'
 import { TooltipPopup, TooltipRoot, TooltipTrigger } from '../index.js'
 
-/** One trigger per state, each named after it: a popup only mounts in the browser, so a server
- * page shows each hidden. Above, below, delayed by a second, and disabled. */
+const CELL = 'relative flex h-36 w-48 items-center justify-center overflow-hidden rounded-box border-(length:--tc-line-width) border-line [contain:paint]'
+
+/** Every state the frame draws, one cell each, captioned by its title: the hidden tooltip of a trigger
+ * at rest, then one held open above its trigger and one below, each inside its own cell. Held by open,
+ * since the provider's delay group closes an open tooltip as soon as another one opens. */
 export default function Demo() {
+  // Elements, not refs: a popup open on the first render resolves its container before a ref is attached.
+  const [top, setTop] = useState<HTMLDivElement | null>(null)
+  const [bottom, setBottom] = useState<HTMLDivElement | null>(null)
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <TooltipRoot>
-        <TooltipTrigger
-          render={
-            <Button variant="ghost" aria-label="Top">
-              <Svg icon={arrowUp} />
-            </Button>
-          }
-        />
-        <TooltipPopup>Top</TooltipPopup>
-      </TooltipRoot>
-      <TooltipRoot>
-        <TooltipTrigger
-          render={
-            <Button variant="ghost" aria-label="Bottom">
-              <Svg icon={arrowDown} />
-            </Button>
-          }
-        />
-        <TooltipPopup placement="bottom">Bottom</TooltipPopup>
-      </TooltipRoot>
-      <TooltipRoot>
-        <TooltipTrigger
-          delay={1000}
-          render={
-            <Button variant="ghost" aria-label="Delayed">
-              <Svg icon={clock} />
-            </Button>
-          }
-        />
-        <TooltipPopup>Delayed</TooltipPopup>
-      </TooltipRoot>
-      <TooltipRoot disabled>
-        <TooltipTrigger
-          render={
-            <Button variant="ghost" aria-label="Disabled">
-              <Svg icon={prohibit} />
-            </Button>
-          }
-        />
-        <TooltipPopup>Disabled</TooltipPopup>
-      </TooltipRoot>
+    <div className="flex flex-wrap items-start gap-4">
+      <div title="hidden" className="flex h-36 w-48 items-center justify-center">
+        <TooltipRoot>
+          <TooltipTrigger
+            render={
+              <Button variant="ghost" aria-label="Copy link">
+                <Svg icon={linkSimple} />
+              </Button>
+            }
+          />
+          <TooltipPopup>Copy link</TooltipPopup>
+        </TooltipRoot>
+      </div>
+      <div ref={setTop} title="top" className={CELL}>
+        <TooltipRoot open>
+          <TooltipTrigger
+            render={
+              <Button variant="ghost" aria-label="Top">
+                <Svg icon={arrowUp} />
+              </Button>
+            }
+          />
+          <TooltipPopup container={top}>Top</TooltipPopup>
+        </TooltipRoot>
+      </div>
+      <div ref={setBottom} title="bottom" className={CELL}>
+        <TooltipRoot open>
+          <TooltipTrigger
+            render={
+              <Button variant="ghost" aria-label="Bottom">
+                <Svg icon={arrowDown} />
+              </Button>
+            }
+          />
+          <TooltipPopup placement="bottom" container={bottom}>Bottom</TooltipPopup>
+        </TooltipRoot>
+      </div>
     </div>
   )
 }
