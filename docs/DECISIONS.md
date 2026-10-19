@@ -6,6 +6,22 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-19 - Pagination turns compact on a narrow list or under a finger
+
+**Decision.** Job 119 (round 8, "bulky pagination on phones"). The `<ul>` of Pagination is a container named `pagination` (`@container/pagination`), and two utilities in `src/styles.css` read it: `pagination-full` (the pages and the gaps) is `display: none` below 36rem of the list's width or under `pointer: coarse`, and `pagination-compact` (a new item between Previous and Next, "3 of 12" from `labels.pagination.ofPages`) is shown in exactly those two cases. The compact row is First, Previous, "current of total", Next, Last on one line; the status takes the room the four controls leave (`flex-1`) and wraps its own text, so "12,345 of 123,456" at `xl` still keeps one row at 390 px. The page links stay in the HTML, hidden, so a crawler follows every one; the current page link is hidden too, and the status says the page in words.
+
+- **36rem.** The full row at `lg` is 11 x 48 px plus ten 4 px gaps, 568 px; `xl` past that still wraps as before. A query cannot read a custom property, so the number is written in the utility, once.
+- **Coarse pointer at any width.** As the job asks: 44 px cells make the full row 524 px, which wraps on most phones and some tablets.
+- **`!important`.** A gap's own `inline-flex` is emitted after `pagination-full` in the same layer, so the hide carries `!important`.
+- **`dir="auto"` on the status.** English labels on an RTL page read "of 12 3" otherwise; Arabic labels resolve to RTL themselves.
+- **Figma 138:1269 stays the desktop truth.** Nothing above 36rem with a fine pointer changed: the status is `display: none` there.
+- **A container takes no width from its content.** A Pagination placed in a flex row needs a width of its own (`flex-1`, `w-full`); the README says so.
+- **`e2e/target-size.spec.ts` skips a box with `display: none`**, which is no target; Pagination keeps its hidden links in the HTML.
+
+**What it affects.** `src/components/pagination/{index.tsx,classes.ts,README.md}` and its tests, `src/styles.css`, `e2e/pagination-compact.spec.ts` (390 px under a fine and a coarse pointer, both directions, every demo: one line, 44 px targets, Previous and Next lead to the neighbours, links kept), `e2e/target-size.spec.ts`, two rows of `scripts/mutations/pagination.ts`.
+
+---
+
 ## 2026-10-19 - No default scrollbar anywhere: the page wears the shared bar, and an e2e reads every scroller
 
 **Decision.** Job 123. `html` in `src/tokens.css` sets `scrollbar-width: thin` and `scrollbar-color` from the two scrollbar tokens, so the page's own bar is drawn like every SCROLLBAR, SCROLL_AREA and SCROLL_X container. The Sidebar's in-a-layout demo wears SCROLL_AREA; on the site, STAGE and STATE_SCOPE wear SCROLL_X and On this page wears SCROLL_AREA. `e2e/scrollbar-everywhere.spec.ts` (every harness page and every overlay opened live) and `apps/docs/e2e/scrollbars.spec.ts` (every sitemap page at 1440 and 390, and the open search palette) fail on any rendered element whose overflow is auto or scroll and whose computed `scrollbar-width` is not `thin`. `none` passes: it draws no bar, and the closed Sidebar rail hides its own on purpose.
