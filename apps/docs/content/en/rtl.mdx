@@ -102,12 +102,17 @@ selected: (n, fmt) => {
 
 The rule runs on every class string in the library and fails the lint on a physical class. It catches the deprecated aliases too.
 
-```tsx title="lint-probe.tsx"
-// wrong: one error per class string
+<WrongRight>
+
+```tsx
 className="pl-4 text-left"
 // R-5.3-1: "pl-" is physical. use ps- or pe-.
+// one error per class string;
 // fix it, and the next run names text-left
+```
 
-// right
+```tsx
 className="ps-4 text-start"
 ```
+
+</WrongRight>
