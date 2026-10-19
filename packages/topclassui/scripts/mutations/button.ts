@@ -23,8 +23,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the button stops being a centred flex row',
     file: 'src/components/button/variants.ts',
-    from: "    'inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium rounded-control',",
-    to: "    'whitespace-nowrap font-medium rounded-control',",
+    from: "    'inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap font-medium rounded-control',",
+    to: "    'cursor-pointer whitespace-nowrap font-medium rounded-control',",
   },
   {
     label: 'the link variant emits nothing at all',
@@ -37,6 +37,18 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/button/variants.ts',
     from: '    BORDER_WIDTH,\n',
     to: '',
+  },
+  {
+    label: 'the button loses its pointer cursor',
+    file: 'src/components/button/variants.ts',
+    from: "    'inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap font-medium rounded-control',",
+    to: "    'inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium rounded-control',",
+  },
+  {
+    label: 'outline and ghost wear the tone text again instead of the body text Figma draws',
+    file: 'src/components/button/variants.ts',
+    from: "      { variant: [...BUTTON_BODY_TEXT], class: 'text-body' },",
+    to: "      ...BUTTON_TONES.map((tone) => ({ variant: [...BUTTON_BODY_TEXT], tone, class: TONE_TEXT[tone] })),",
   },
   {
     label: 'two tones share one fill',
