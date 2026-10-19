@@ -139,8 +139,9 @@ describe('the touch floor for the text', () => {
   })
 })
 
-describe('the read-only surface', () => {
-  it('is the neutral tint, whose step from every surface check:contrast measures', () => {
-    expect(blockOf('bg-neutral-soft')).toContain('background-color: var(--tc-neutral-soft)')
+describe('the disabled surface', () => {
+  it('is the surface under the raised fill, on the disabled field only', () => {
+    expect(blockOf('disabled:bg-surface')).toContain(':disabled')
+    expect(blockOf('disabled:bg-surface')).toContain('background-color: var(--tc-surface)')
   })
 })

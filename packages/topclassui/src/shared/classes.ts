@@ -239,11 +239,11 @@ export const FIELD_INVALID_WITHIN = 'has-aria-invalid:border-danger-solid has-ar
 /** A value forced left-to-right keeps the form's side. */
 export const FIELD_LTR = 'data-ltr:text-match-parent data-ltr:placeholder:[unicode-bidi:plaintext]'
 
-/** Kept but not typed in. Set from the prop, never from read-only:. */
-export const FIELD_READ_ONLY = 'bg-neutral-soft'
+/** The line steps up from its 3:1 rest under the pointer, as the frames step it from line to line-strong. Not on an invalid field, whose red stays. */
+export const FIELD_HOVER = 'hover:not-aria-invalid:not-has-aria-invalid:border-body'
 
 /** The box of a field: its fill, its 3:1 line and its radius. */
-export const FIELD_SURFACE = `rounded-control bg-surface-raised text-body ${BORDER_STRONG} ${CONTAIN} ${TRANSITION}`
+export const FIELD_SURFACE = `rounded-control bg-surface-raised text-body ${BORDER_STRONG} ${FIELD_HOVER} ${CONTAIN} ${TRANSITION}`
 
 /** Disabled sits on the surface below the raised fill, then dims with every control. */
 export const FIELD_DISABLED = 'disabled:bg-surface data-disabled:bg-surface'

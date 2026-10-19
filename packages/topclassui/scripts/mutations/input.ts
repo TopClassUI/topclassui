@@ -99,12 +99,6 @@ export const MUTATIONS: Mutation[] = [
     to: 'const ltr = INPUT_LTR_TYPES',
   },
   {
-    label: 'a read-only input looks exactly like an editable one again',
-    file: 'src/components/input/index.tsx',
-    from: '        readOnly && INPUT_READ_ONLY,\n',
-    to: '',
-  },
-  {
     label: 'an input stops importing the style augmentation, so --tc-input-width in style does not compile in a program without Progress',
     file: 'src/components/input/index.tsx',
     from: "import type {} from '#shared/style-tokens.js'\n",
