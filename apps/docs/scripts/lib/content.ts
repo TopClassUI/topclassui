@@ -21,6 +21,8 @@ export const contentSchema = z.strictObject({
   demos: z.array(z.string().min(1)).min(1),
   stageHeight: z.number().positive(),
   stageDemo: z.string().min(1).optional(),
+  /** The frame draws the overlay open in the stage: the playground demo gets `stage` and renders open inside its own root. */
+  stageOpen: z.boolean().optional(),
   note: both,
   notes: bothLists,
   keyboard: z.array(z.strictObject({ keys: z.array(z.string().min(1)).min(1), action: both })),

@@ -65,6 +65,8 @@ export const NOTE = 'text-xs text-muted'
 export const LIST = 'grid list-disc gap-1 ps-5 text-base text-body'
 /** The stage holds the component on the page background, and a wide one scrolls inside it. */
 export const STAGE = `grid min-w-0 grid-cols-1 place-items-center bg-page p-5 text-body ${SCROLL_X}`
+/** An overlay open in the stage: paint containment makes the stage the box its fixed parts are placed in and cut to. */
+export const STAGE_OPEN = 'relative contain-paint'
 /** Try it beside the stage at 48rem and up, under it below. */
 export const PLAY_ROW = 'grid min-w-0 md:grid-cols-[minmax(0,1fr)_15.5rem]'
 export const TRY_IT = 'grid content-start gap-3.5 border-t-(length:--tc-line-width) border-line bg-surface p-4.5 text-body md:border-t-0 md:border-s-(length:--tc-line-width)'

@@ -9,7 +9,7 @@ import { Skeleton } from 'topclassui/skeleton'
 import { PLAYGROUNDS } from '../../.generated/playgrounds'
 import type { Control } from '../../lib/components'
 import { type PropValue, type Usage, changedProps, snippetOf } from '../../lib/usage'
-import { CHECK_LABEL, CHECK_ROW, CODE_PART, CONTROL, CONTROL_LABEL, CONTROL_RESERVE, FLAT_CODE, H3, PART_ROW, PLAY_ROW, STAGE, STAGE_RESERVE, TRY_IT } from '../classes'
+import { CHECK_LABEL, CHECK_ROW, CODE_PART, CONTROL, CONTROL_LABEL, CONTROL_RESERVE, FLAT_CODE, H3, PART_ROW, PLAY_ROW, STAGE, STAGE_OPEN, STAGE_RESERVE, TRY_IT } from '../classes'
 import { CopyButton } from './copy-button'
 import { ModeScope } from './previewer-mode'
 import { TryItControl } from './try-it-control'
@@ -24,6 +24,8 @@ export interface PlaygroundIslandProps {
   descriptions: Record<string, string>
   /** The stage's reserved height in rem, from the content file, so nothing shifts when it mounts. */
   stageHeight: number
+  /** An overlay drawn open in the stage: the demo gets `stage` and the stage contains its fixed parts. */
+  stageOpen: boolean
   /** The server's render of the stage at the defaults; null for a client component, which mounts near the viewport. */
   serverStage: ReactNode
   /** The highlighted usage at the defaults, rendered on the server. */
@@ -44,7 +46,7 @@ const startOf = (controls: Control[]) => Object.fromEntries(controls.flatMap((co
 })) as Record<string, PropValue>
 
 export function PlaygroundIsland(props: PlaygroundIslandProps) {
-  const { slug, locale, controls, descriptions, stageHeight, serverStage, restCode, restSource, usage, note, labels } = props
+  const { slug, locale, controls, descriptions, stageHeight, stageOpen, serverStage, restCode, restSource, usage, note, labels } = props
   const idBase = useId()
   const row = useRef<HTMLDivElement>(null)
   const near = useNearViewport(row)
@@ -55,15 +57,15 @@ export function PlaygroundIsland(props: PlaygroundIslandProps) {
   const reserve = <Skeleton variant="rect" className={STAGE_RESERVE} />
   // A demo reads a default* prop on mount only, so changing one in Try it remounts it.
   const remountKey = changed.filter(([name]) => /^default[A-Z]/.test(name)).map(([name, value]) => `${name}=${String(value)}`).join(' ')
-  const live = Demo !== null && (serverStage === null ? near : changed.length > 0)
+  const live = Demo !== null && (serverStage === null || stageOpen ? near : changed.length > 0)
   const copy = getLabels(locale, { common: { copy: labels.copyCode } }).labels
   const shown = changed.length === 0 || usage === null ? null : snippetOf(usage, changed)
 
   return (
     <>
       <ModeScope className={PLAY_ROW}>
-        <div ref={row} style={{ '--tc-stage-height': `${String(stageHeight)}rem` }} className={`${STAGE} min-h-(--tc-stage-height)`}>
-          {live ? <Suspense fallback={serverStage ?? reserve}><Demo key={remountKey} {...Object.fromEntries(changed)} /></Suspense> : (serverStage ?? reserve)}
+        <div ref={row} style={{ '--tc-stage-height': `${String(stageHeight)}rem` }} className={stageOpen ? `${STAGE} ${STAGE_OPEN} min-h-(--tc-stage-height)` : `${STAGE} min-h-(--tc-stage-height)`}>
+          {live ? <Suspense fallback={serverStage ?? reserve}><Demo key={remountKey} {...(stageOpen ? { stage: true } : {})} {...Object.fromEntries(changed)} /></Suspense> : (serverStage ?? reserve)}
         </div>
         <div className={TRY_IT}>
           <h3 className={H3}>{labels.tryIt}</h3>

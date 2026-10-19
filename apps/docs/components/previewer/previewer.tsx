@@ -95,6 +95,7 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
               controls={entry.controls}
               descriptions={descriptions}
               stageHeight={content.stageHeight}
+              stageOpen={content.stageOpen === true}
               serverStage={entry.rendering === 'client' ? null : <Demo demoKey={`${entry.slug}/playground`} />}
               restCode={restCode}
               restSource={restSource}

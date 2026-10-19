@@ -20,6 +20,7 @@ export const command = {
     'rtl',
   ],
   stageHeight: 12,
+  stageOpen: true,
   note: {
     en: '`getKey`, `getLabel` and `onSelect` are functions, so the palette is configured inside a client file.',
     ar: '`getKey` و`getLabel` و`onSelect` دوال، لذا تُضبط اللوحة داخل ملف عميل.',

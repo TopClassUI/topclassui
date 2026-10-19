@@ -8,6 +8,7 @@ export const tooltip = {
   },
   demos: ['basic', 'delays', 'long-label', 'with-count', 'placements', 'disabled', 'rtl'],
   stageHeight: 12,
+  stageOpen: true,
   note: {
     en: 'Touch never shows a tooltip, so the trigger\'s own name must repeat the text: give an icon-only Button an `aria-label`.',
     ar: 'شاشات اللمس لا تعرض التلميح أبدًا، فيجب أن يكرّر اسم المشغّل النص نفسه: أعطِ الزر ذا الأيقونة فقط `aria-label`.',
