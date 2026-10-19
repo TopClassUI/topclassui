@@ -55,3 +55,13 @@ describe('the states demo', () => {
     expect(html).not.toMatch(/role="(region|status|alert|dialog)"/)
   })
 })
+
+describe('the playground demo', () => {
+  it('is the button alone by default, and inside a stage with stage, its toast added only once mounted', async () => {
+    const Demo = (await import('../dummy/playground.js')).default as ComponentType<{ stage?: boolean }>
+    expect(markup(<Demo />)).toMatch(/^<button /)
+    const staged = markup(<Demo stage />)
+    expect(staged).toMatch(/^<div class="relative isolate min-h-60 w-full"><button /)
+    expect(staged).not.toContain('Project created')
+  })
+})

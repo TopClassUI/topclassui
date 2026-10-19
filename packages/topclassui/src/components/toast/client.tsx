@@ -8,12 +8,12 @@ import { buttonVariants } from '#components/button/index.js'
 import { Svg } from '#components/svg/index.js'
 import {
   TOAST_ACTION, TOAST_CLOSE, TOAST_CONTENT, TOAST_DESCRIPTION, TOAST_ICON, TOAST_ICON_SVG, TOAST_ICON_TONE,
-  TOAST_PLACEMENT, TOAST_ROOT, TOAST_TITLE, TOAST_VIEWPORT,
+  TOAST_PLACEMENT, TOAST_ROOT, TOAST_STAGE, TOAST_STAGE_VIEWPORT, TOAST_TITLE, TOAST_VIEWPORT,
 } from './classes.js'
 import { TOAST_ICONS } from './constants.js'
-import { useToastViewport } from './hook.js'
+import { useToastStage, useToastStageList, useToastViewport } from './hook.js'
 import { iconTypeOf } from './lib.js'
-import type { ToastItemProps, ToastViewportProps } from './types.js'
+import type { ToastItemProps, ToastStageProps, ToastViewportProps } from './types.js'
 
 /** One toast. A Root for every entry, an ending one too: Base UI drops an entry only when its Root has faded out. */
 function ToastItem({ entry, swipeDirection, closeLabel }: ToastItemProps) {
@@ -61,5 +61,31 @@ export function ToastViewport({ className, ref, ...rest }: ToastViewportProps) {
         ))}
       </Base.Viewport>
     </Base.Portal>
+  )
+}
+
+/** The column of a stage: its own toasts, drawn in the box with no portal. */
+function ToastStageViewport() {
+  const stage = useToastStageList()
+  return (
+    <Base.Viewport aria-label={stage.labels.region} className={TOAST_STAGE_VIEWPORT}>
+      {stage.toasts.map((entry) => (
+        <ToastItem key={entry.id} entry={entry} swipeDirection={stage.swipeDirection} closeLabel={stage.labels.close} />
+      ))}
+    </Base.Viewport>
+  )
+}
+
+/** A box that shows a toast at rest in its bottom-end corner, for a docs stage or a screenshot: a list of its own,
+ * so `toast.add` still reaches the page's corner. The children are what the box holds. */
+export function ToastStage({ toast: shown, className, children, ...rest }: ToastStageProps) {
+  const manager = useToastStage(shown)
+  return (
+    <Base.Provider toastManager={manager}>
+      <div {...rest} className={cn(TOAST_STAGE, className)}>
+        {children}
+        <ToastStageViewport />
+      </div>
+    </Base.Provider>
   )
 }
