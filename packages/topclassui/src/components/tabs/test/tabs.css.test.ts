@@ -3,8 +3,6 @@ import { describe, expect, it } from 'vitest'
 import { compileEntry } from '#test/stylesheet.js'
 import { TABS_LIST, TABS_PANEL, TABS_ROOT, TABS_SIZE, TABS_TAB } from '../classes.js'
 
-const SHADOW = 'box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);'
-
 /** What each class Tabs writes must emit, written out: a class Tailwind does not know emits nothing at all. */
 const DECLARATION: Record<string, string> = {
   // The root, and the two lists.
