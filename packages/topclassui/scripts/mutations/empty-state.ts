@@ -17,7 +17,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the empty state frame loses its border width and colour, so no line is drawn',
     file: 'src/components/empty-state/classes.ts',
-    from: '  BORDER,\n',
+    from: '  BORDER_STRONG,\n',
     to: '',
   },
   {
@@ -85,5 +85,11 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/empty-state/index.tsx',
     from: '  locale: _locale,\n',
     to: '',
+  },
+  {
+    label: 'the empty state frame draws its dash in the faint decorative line, which the previewer does not',
+    file: 'src/components/empty-state/classes.ts',
+    from: '  BORDER_STRONG,\n',
+    to: "  'border-(length:--tc-line-width) border-line',\n",
   },
 ]

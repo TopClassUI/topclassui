@@ -15,8 +15,8 @@ const classesOf = (out: string, tag: string) =>
 
 /** The Build this block, written out: a derived expectation would shrink with ROOT. */
 const ROOT = [
-  'bg-surface', 'border-(length:--tc-line-width)', 'border-dashed', 'border-line', 'flex', 'flex-col',
-  'gap-3', 'items-center', 'p-8', 'rounded-box', 'text-center', 'wrap-anywhere',
+  'bg-surface', 'border-(length:--tc-line-width)', 'border-dashed', 'border-line-strong', 'flex', 'flex-col',
+  'gap-2.5', 'items-center', 'p-7', 'rounded-box', 'text-center', 'wrap-anywhere',
 ]
 
 describe('every part carries exactly its own classes', () => {
@@ -70,9 +70,9 @@ describe('the frame', () => {
     expect(rootClasses().filter((c) => interactive.test(c))).toEqual([])
   })
 
-  it('uses the decorative line, not the strong control boundary', () => {
-    expect(rootClasses()).toContain('border-line')
-    expect(rootClasses()).not.toContain('border-line-strong')
+  it('draws its dash in the strong line, as the previewer does, not the faint decorative one', () => {
+    expect(rootClasses()).toContain('border-line-strong')
+    expect(rootClasses()).not.toContain('border-line')
   })
 
   it('names no palette colour on any part', () => {
@@ -87,11 +87,11 @@ describe('className is passed last, so the consumer wins every conflict', () => 
   /** Each pair is the consumer class and the root class it must replace. */
   const CONFLICTS = [
     ['rounded-control', 'rounded-box'],
-    ['p-4', 'p-8'],
-    ['gap-6', 'gap-3'],
+    ['p-4', 'p-7'],
+    ['gap-6', 'gap-2.5'],
     ['bg-page', 'bg-surface'],
     ['border-solid', 'border-dashed'],
-    ['border-line-strong', 'border-line'],
+    ['border-line', 'border-line-strong'],
     ['items-start', 'items-center'],
     ['text-start', 'text-center'],
     ['wrap-normal', 'wrap-anywhere'],
