@@ -107,12 +107,13 @@ describe('with link={<Link href="" />} (PLAN 5.8)', () => {
   })
 
   it('reads the JSON-LD from the items, so it is the same list whichever element renders', () => {
-    expect(script(linked)).toBe(
+    expect(script(html({ link: <Link href="" />, siteUrl: 'https://example.com' }))).toBe(
       '<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":['
-      + '{"@type":"ListItem","position":1,"name":"Home","item":"/"},'
-      + '{"@type":"ListItem","position":2,"name":"Profile","item":"/settings/profile"}]}</script>',
+      + '{"@type":"ListItem","position":1,"name":"Home","item":"https://example.com/"},'
+      + '{"@type":"ListItem","position":2,"name":"Profile","item":"https://example.com/settings/profile"},'
+      + '{"@type":"ListItem","position":3,"name":"Avatar"}]}</script>',
     )
-    expect(script(html({ link: <Link href="/placeholder" /> }))).not.toContain('placeholder')
+    expect(script(html({ link: <Link href="/placeholder" />, siteUrl: 'https://example.com' }))).not.toContain('placeholder')
   })
 })
 

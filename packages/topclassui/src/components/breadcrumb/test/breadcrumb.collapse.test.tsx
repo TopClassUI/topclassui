@@ -53,9 +53,9 @@ describe('maxItems', () => {
     expect(gap).not.toContain('<a ')
   })
 
-  it('leaves the JSON-LD whole, every linked crumb in it', () => {
-    const json = /<script type="application\/ld\+json">(.*?)<\/script>/.exec(html({ maxItems: 3 }))?.[1] ?? ''
-    expect((JSON.parse(json) as { itemListElement: unknown[] }).itemListElement).toHaveLength(4)
+  it('leaves the JSON-LD whole, every crumb in it', () => {
+    const json = /<script type="application\/ld\+json">(.*?)<\/script>/.exec(html({ maxItems: 3, siteUrl: 'https://example.com' }))?.[1] ?? ''
+    expect((JSON.parse(json) as { itemListElement: unknown[] }).itemListElement).toHaveLength(5)
   })
 })
 

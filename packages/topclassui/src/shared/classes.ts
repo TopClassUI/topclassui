@@ -124,10 +124,10 @@ export const POPUP_MOTION = 'origin-(--transform-origin) transition-[opacity,sca
 export const SLIDE_MOTION = 'transition-transform duration-(--tc-duration-slow) ease-out'
 
 /** The box of a dialog, a popup and a toast. Forced colours drop the shadow and keep the line. */
-export const OVERLAY_SURFACE = `rounded-box bg-surface-raised text-body ${BORDER} shadow-lg`
+export const OVERLAY_SURFACE = `rounded-box bg-surface-raised text-body ${BORDER} shadow-(--tc-shadow-overlay)`
 
 /** One row of a menu or a list, at least --tc-row-height tall. Its highlight is its focus mark. */
-export const ROW = `flex min-h-(--tc-row-height) w-full items-center gap-2 rounded-control px-3 text-start text-sm outline-none ${POINTER}`
+export const ROW = `flex min-h-(--tc-row-height) w-full items-center gap-2 rounded-control px-2.5 text-start text-sm outline-none ${POINTER}`
 
 /** The row the keyboard or the pointer is on: a fill, and the ring inside its edge, since the fill alone
  * is under 3:1 against the popup. Forced colours erase a fill, so there it paints the system pair itself,
@@ -164,6 +164,15 @@ export const ICON_BUTTON = `inline-flex shrink-0 items-center justify-center rou
 
 /** The ring drawn inside the box, for a control flush against an edge that clips it. */
 export const FOCUS_RING_INSET = 'outline-none focus-visible:outline-solid focus-visible:outline-(length:--tc-ring-width) focus-visible:-outline-offset-(length:--tc-ring-width) focus-visible:outline-ring'
+
+/** The same fill for a row that holds the real focus, as a Select's does: its ring is the focus ring, so a row
+ * a pointer opened on or passes over is tinted without one, and a key brings the ring back. */
+export const ROW_FOCUSED = [
+  'data-highlighted:bg-primary-soft data-highlighted:text-primary-on-soft',
+  `${FOCUS_RING_INSET} forced-colors:focus-visible:outline-[HighlightText]`,
+  'forced-colors:data-highlighted:forced-color-adjust-none forced-colors:data-highlighted:bg-[Highlight]',
+  'forced-colors:data-highlighted:text-[HighlightText]',
+].join(' ')
 
 /** The ring on a wrapper whose focused element is hidden: a label around a native radio. */
 export const FOCUS_RING_WITHIN = 'outline-none has-focus-visible:outline-solid has-focus-visible:outline-(length:--tc-ring-width) has-focus-visible:outline-offset-(length:--tc-ring-offset) has-focus-visible:outline-ring'

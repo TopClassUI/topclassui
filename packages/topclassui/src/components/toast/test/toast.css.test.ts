@@ -129,7 +129,7 @@ describe('inside a toast', () => {
   it('a toast is a grid that the viewport measures: under 16rem the icon and the action take rows of their own (TOAST-4)', async () => {
     expect(words(TOAST_VIEWPORT)).toContain('@container')
     expect(words(TOAST_ROOT)).toEqual(expect.arrayContaining(['grid', 'grid-cols-[auto_minmax(0,1fr)_auto]']))
-    expect(words(TOAST_ICON)).toEqual(expect.arrayContaining(['col-start-1', 'row-start-1', 'me-3']))
+    expect(words(TOAST_ICON)).toEqual(expect.arrayContaining(['col-start-1', 'row-start-1', 'me-2.5']))
     expect(words(TOAST_CONTENT)).toEqual(expect.arrayContaining(['col-start-2', 'row-start-1', '@max-3xs:col-start-1', '@max-3xs:col-span-2', '@max-3xs:row-start-2']))
     expect(words(TOAST_ACTION)).toEqual(expect.arrayContaining(['col-start-2', 'row-start-2', 'justify-self-start', '@max-3xs:col-start-1', '@max-3xs:col-span-3', '@max-3xs:row-start-3']))
     const css = await compiled

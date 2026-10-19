@@ -94,15 +94,17 @@ for (const { theme, palette, canvas } of FORCED) {
 }
 
 for (const mode of MODES) {
-  test(`${mode}: the current marker differs from a done one by shape, inside the same 12 px box`, async ({ page }) => {
+  test(`${mode}: done and current are filled to the stroke as the previewer draws them, inside the same 12 px box`, async ({ page }) => {
     await page.goto(urlFor('timeline--basic', mode, 'ltr'))
     const canvas = await pixel(page, 1, 1)
     const [done, , current, todo] = await markers(page)
     if (!done || !current || !todo) throw new Error('the basic demo lost a status')
     expect(contrast(done.gap, canvas), 'done is filled to its stroke').toBeGreaterThanOrEqual(3)
-    expect(contrast(current.gap, canvas), 'current has a gap under its stroke').toBeLessThan(1.2)
-    expect(contrast(current.centre, canvas), 'current has a dot in the middle').toBeGreaterThanOrEqual(3)
-    expect(contrast(todo.centre, canvas), 'todo is hollow').toBeLessThan(1.2)
+    expect(contrast(current.gap, canvas), 'current is filled to its stroke').toBeGreaterThanOrEqual(3)
+    expect(contrast(current.centre, canvas), 'current is filled in the middle').toBeGreaterThanOrEqual(3)
+    // The raised surface: white on a light page, one step up on a dark one, never a tone.
+    expect(contrast(todo.centre, canvas), 'todo is a ring on the raised surface').toBeLessThan(1.5)
+    expect(contrast(todo.edge, canvas), 'todo keeps its stroke').toBeGreaterThanOrEqual(3)
     expect([current.box.width, current.box.height]).toEqual([12, 12])
     expect([done.box.width, done.box.height]).toEqual([12, 12])
     // Nothing is drawn outside the box, where a scrolling or clipping parent would cut it.
@@ -146,9 +148,9 @@ for (const direction of DIRECTIONS) {
     expect(wrapped?.height).toBeGreaterThan(100)
     expect(url?.height).toBeGreaterThan(80)
     for (const row of [wrapped, url]) {
-      // The marker box is 20 px, and the connector takes every pixel under it.
-      expect(row?.connector?.height).toBe((row?.height ?? 0) - 20)
-      expect(row?.connector?.bottom).toBe(row?.bottom)
+      // The marker box is 20 px around a 12 px dot: the connector starts under the dot and ends at the next one, 4 px into it.
+      expect(row?.connector?.height).toBe((row?.height ?? 0) - 20 + 8)
+      expect(row?.connector?.bottom).toBe((row?.bottom ?? 0) + 4)
       expect(row?.connector?.axis).toBe(row?.dotAxis)
     }
     expect(last?.connector).toBeNull()

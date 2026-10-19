@@ -28,7 +28,7 @@ describe('Pagination on the server', () => {
 
   // Preflight sets list-style: none, and Safari with VoiceOver then stops announcing a list.
   it('says role="list" on the ul, so the list survives the reset in Safari', () => {
-    expect(tags(html(), 'ul')).toEqual(['<ul role="list" class="flex flex-wrap items-center gap-1.5">'])
+    expect(tags(html(), 'ul')).toEqual(['<ul role="list" class="flex flex-wrap items-center @container/pagination gap-1.5">'])
   })
 
   it('is named by the labels, and reports its size', () => {

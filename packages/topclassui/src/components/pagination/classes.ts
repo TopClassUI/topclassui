@@ -3,8 +3,14 @@ import { BORDER, HOVER, POINTER } from '#shared/classes.js'
 import type { Size } from '#shared/contracts/size.js'
 import { TONE_CLASS } from '#shared/contracts/tone.js'
 
-/** The row wraps, so eleven cells at 44 px still fit a phone instead of scrolling it. */
-export const LIST = 'flex flex-wrap items-center'
+/** A page or a gap: only in the full row. */
+export const FULL = 'pagination-full'
+
+/** "3 of 12": only in the compact row, between previous and next. */
+export const COMPACT = 'pagination-compact'
+
+/** The row wraps, so eleven cells at 44 px still fit a phone; the list is the container the compact row measures. */
+export const LIST = 'flex flex-wrap items-center @container/pagination'
 
 /** The room between two cells grows with them: 3 to 6 px as Figma 138:1269 draws xs and sm. */
 export const LIST_GAP = {
@@ -49,6 +55,20 @@ export const CELL_CURRENT = `bg-primary-solid text-primary-on-solid ${TONE_CLASS
 /** Every other cell: the hairline the frame draws, body text, and the neutral tint under a pointer.
  * The digit names the link, so the box is decorative; a dead edge drops it, as Figma 138:1269 does. */
 export const CELL_OTHER = `${BORDER} text-body ${TONE_CLASS.neutral} ${HOVER.outline} ${POINTER} data-disabled:border-transparent`
+
+/** The page in words, filling what the four controls leave; pagination-compact makes it a flex box.
+ * flex-1 lets "12,345 of 123,456" wrap inside its box, so the row itself never breaks on a phone. */
+export const STATUS = 'flex-1 items-center justify-center rounded-control px-1 text-center font-medium tabular-nums text-body'
+
+/** The cell height as a floor, so a wrapped status grows instead of spilling. */
+export const STATUS_SIZE = {
+  xs: 'min-h-control-xs text-xs',
+  sm: 'min-h-control-sm text-sm',
+  md: 'min-h-control-md text-sm',
+  lg: 'min-h-control-lg text-base',
+  xl: 'min-h-control-xl text-base',
+  custom: '',
+} as const satisfies Record<Size, string>
 
 /** A gap is a mark, not a control: muted, with no boundary, no ring, no hover and no pointer. */
 export const CELL_GAP = 'inline-flex items-center justify-center text-muted'

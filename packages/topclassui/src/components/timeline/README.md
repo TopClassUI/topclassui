@@ -48,7 +48,7 @@ Required: `getKey`, `items`. Every other prop below is optional.
 |---|---|---|---|---|
 | `getKey` | **yes** | `(item: T) => string` | - | A stable identity for each item, which becomes its React key. |
 | `items` | **yes** | `readonly T[]` | - | The events, first to last. The connector runs from each marker to the next. |
-| `emptyFallback` | no | `ReactNode` | - | Rendered in place of the list while `items` is empty. Without it, nothing renders. |
+| `emptyFallback` | no | `ReactNode` | - | Rendered in place of the list while `items` is empty. Defaults to the tray and `labels.state.empty`, muted; `null` renders nothing. |
 | `labels` | no | `Labels` | - | The built-in strings, which name each status. Defaults to English; pass `getLabels(locale).labels` for another. |
 | `locale` | no | `string` | - | Accepted so `{...getLabels(locale)}` spreads cleanly. Nothing here formats a number, so it is not used and never reaches the element. |
 
@@ -59,6 +59,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/basic.tsx`
 - `dummy/empty.tsx`
 - `dummy/icons.tsx`
+- `dummy/loading.tsx`
 - `dummy/long-text.tsx`
 - `dummy/rtl.tsx`
 - `dummy/states.tsx`

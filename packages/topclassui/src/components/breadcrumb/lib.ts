@@ -2,30 +2,43 @@ import { clamp } from '#shared/clamp.js'
 import { BREADCRUMB_BOUNDARIES } from './boundaries.js'
 import type { BreadcrumbItem } from './types.js'
 
-/** A crumb's address for a crawler: absolute against `baseUrl`, and as written when no
- * base is given or the pair does not parse, so a bad base never fails a render. */
-export function resolveHref(href: string | undefined, baseUrl: string | undefined): string | undefined {
-  if (href === undefined || baseUrl === undefined) return href
+/** The origin a crumb resolves against, or undefined when `siteUrl` is not an http or https
+ * URL, so a typo in an environment variable writes no JSON-LD instead of failing a render. */
+export function resolveOrigin(siteUrl: string): string | undefined {
   try {
-    return new URL(href, baseUrl).href
+    const url = new URL(siteUrl)
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.origin : undefined
+  } catch {
+    return undefined
+  }
+}
+
+/** A crumb's absolute address, and the href as written when the pair does not parse. */
+export function resolveHref(href: string, origin: string): string {
+  try {
+    return new URL(href, origin).href
   } catch {
     return href
   }
 }
 
-/** The trail as schema.org reads it: only the crumbs that link somewhere, numbered from 1
- * with no gap, because a position names a place in this list and not in `items`. */
-export function buildBreadcrumbList(items: readonly BreadcrumbItem[], baseUrl?: string) {
-  const linked = items.filter((item) => item.href !== undefined)
+/** The trail as schema.org reads it, or null without a usable `siteUrl` or a single link: the
+ * linked crumbs with absolute URLs, then the current page with no `item`, numbered from 1. */
+export function buildBreadcrumbList(items: readonly BreadcrumbItem[], siteUrl: string | undefined) {
+  const origin = siteUrl === undefined ? undefined : resolveOrigin(siteUrl)
+  if (origin === undefined) return null
+  const lastIndex = items.length - 1
+  const listed = items.filter((item, index) => item.href !== undefined || index === lastIndex)
+  if (!listed.some((item) => item.href !== undefined)) return null
 
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
-    itemListElement: linked.map((item, index) => ({
+    itemListElement: listed.map((item, index) => ({
       '@type': 'ListItem',
       position: index + 1,
       name: item.label,
-      item: resolveHref(item.href, baseUrl),
+      ...(item.href === undefined ? {} : { item: resolveHref(item.href, origin) }),
     })),
   }
 }

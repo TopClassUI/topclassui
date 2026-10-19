@@ -179,8 +179,8 @@ describe('a gap is a mark, not a control', () => {
 })
 
 describe('the list', () => {
-  it('is a wrapping row with the 6 px gap the frame draws at md, so it never scrolls a phone sideways', () => {
-    expect(attr(/<ul [^>]*>/.exec(html())?.[0] ?? '', 'class')).toBe('flex flex-wrap items-center gap-1.5')
+  it('is a wrapping row with the 6 px gap the frame draws at md and the container the compact row measures, so it never scrolls a phone sideways', () => {
+    expect(attr(/<ul [^>]*>/.exec(html())?.[0] ?? '', 'class')).toBe('flex flex-wrap items-center @container/pagination gap-1.5')
   })
 
   it('spaces its cells by size: 4 px at xs and custom, 6 at sm and md, 8 at lg and xl', () => {

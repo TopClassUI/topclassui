@@ -16,6 +16,8 @@ const EXPECTED = [
   'states', 'tones', 'variants', 'with-actions',
 ]
 
+const STATES = ['info', 'success', 'warning', 'danger']
+
 describe('every demo renders on the server', () => {
   it('holds exactly the demos PLAN 20 asks for, so none can be deleted silently', () => {
     expect(files).toEqual(EXPECTED)
@@ -50,5 +52,14 @@ describe('every demo renders on the server', () => {
       expect(withActions.length, file).toBeGreaterThan(0)
       expect(withActions.filter((a) => !a.startsWith('"soft"')), file).toEqual([])
     }
+  })
+})
+
+describe('the states demo', () => {
+  it('is the frame\'s strip: one captioned cell a state', async () => {
+    const { default: Demo } = await import('../dummy/states.js') as { default: ComponentType }
+    const html = markup(<Demo />)
+    const captions = [...html.matchAll(/<div (?:role="(?:group|region)" )?(?:data-tone="\w+" )?[^>]*aria-label="([^"]+)"/g)].map((m) => m[1])
+    expect(captions).toEqual(STATES)
   })
 })

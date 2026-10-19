@@ -98,13 +98,14 @@ for (const mode of MODES) {
     await scratch(page, MENU, mode)
     const [plain, lit] = [await boxOf(page, '#rename'), await boxOf(page, '#duplicate')]
     // --tc-row-height at the default density.
-    expect([plain.height, lit.height]).toEqual([40, 40])
+    expect([plain.height, lit.height]).toEqual([32, 32])
 
     // A soft tint on the raised surface: measured 1.19 in light, 1.11 in dark and 1.18 in ocean.
     const surface = await pixelAt(page, plain.x + 2, plain.y + 2)
     const fill = await pixelAt(page, lit.x + lit.width - 12, lit.y + lit.height / 2)
     expect(contrast(fill, surface), 'the fill against the surface of the menu').toBeGreaterThan(1.05)
-    expect(paintedIn(await pixelsOf(page, lit), fill), 'pixels of fill in the highlighted row').toBeGreaterThan(lit.width * lit.height * 0.8)
+    // Three quarters: ocean's pill corners, the 2 px ring and the label take 22% of a 32 px row (measured 78.3%).
+    expect(paintedIn(await pixelsOf(page, lit), fill), 'pixels of fill in the highlighted row').toBeGreaterThan(lit.width * lit.height * 0.75)
     expect(paintedIn(await pixelsOf(page, plain), fill), 'pixels of fill in another row').toBe(0)
 
     // The fill is not the only cue: the label changes colour with it, and is read on it.
@@ -263,10 +264,10 @@ const LIST = `<div id="list" class="${LIST_CAP} ${SCROLL_AREA} flex w-64 flex-co
 test('the list cap is seven rows tall, cuts the last row it shows, and gives way to the room Base UI measured', async ({ page }) => {
   await scratch(page, LIST)
   const list = page.locator('#list')
-  // --tc-list-rows times --tc-row-height: 7 x 40. No row shrinks to fit: each keeps its 40.
-  expect((await boxOf(page, '#list')).height).toBe(280)
+  // --tc-list-rows times --tc-row-height: 7 x 32. No row shrinks to fit: each keeps its 32.
+  expect((await boxOf(page, '#list')).height).toBe(224)
   expect(await list.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true)
-  expect(await list.locator('> div').evaluateAll((rows) => [...new Set(rows.map((el) => el.getBoundingClientRect().height))])).toEqual([40])
+  expect(await list.locator('> div').evaluateAll((rows) => [...new Set(rows.map((el) => el.getBoundingClientRect().height))])).toEqual([32])
 
   // Rows only, not the padding or the gaps: a row cut short says there is more.
   const cut = await list.evaluate((el) => {
@@ -285,7 +286,7 @@ test('the list cap is seven rows tall, cuts the last row it shows, and gives way
     el.style.removeProperty('--available-height')
     el.style.setProperty('--tc-list-rows', '3')
   })
-  expect((await boxOf(page, '#list')).height).toBe(120)
+  expect((await boxOf(page, '#list')).height).toBe(96)
 })
 
 const WITHIN = `<label id="wrap" class="${FOCUS_RING_WITHIN} inline-flex h-control-md items-center rounded-control px-3 text-sm">

@@ -1,0 +1,26 @@
+import { render, screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+
+import Demo from '../dummy/states.js'
+
+/** Each direct child of the demo's root is one state, captioned by its title. */
+const cellsOf = (root: Element | null) => [...(root?.children ?? [])] as HTMLElement[]
+
+describe('the states demo, one cell per state of the Every state strip', () => {
+  it('draws closed, open and a disabled row, in that order, each captioned by its title', () => {
+    const { container } = render(<Demo />)
+    expect(cellsOf(container.firstElementChild).map((cell) => cell.getAttribute('title'))).toEqual(['closed', 'open', 'disabled item'])
+  })
+
+  it('draws the two open menus open inside their own cells, not modal, and the closed one with none', async () => {
+    const { container } = render(<Demo />)
+    const [closed, open, disabled] = cellsOf(container.firstElementChild)
+    expect(await screen.findAllByRole('menu')).toHaveLength(2)
+    expect(closed?.querySelector('[role="menu"]')).toBeNull()
+    expect(closed?.querySelector('button')?.getAttribute('aria-expanded')).toBe('false')
+    const rows = (cell: HTMLElement | undefined) => [...(cell?.querySelectorAll('[role="menu"][data-open] [role="menuitem"]') ?? [])]
+    expect(rows(open).map((row) => row.textContent)).toEqual(['ProfileCtrl P', 'Settings', 'Duplicate', 'Delete'])
+    expect(rows(disabled).map((row) => [row.textContent, row.getAttribute('aria-disabled')])).toEqual([['Duplicate', null], ['Rename', 'true']])
+    expect(document.querySelectorAll('[data-base-ui-portal] > [data-base-ui-inert]')).toHaveLength(0)
+  })
+})

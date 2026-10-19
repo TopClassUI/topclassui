@@ -10,7 +10,7 @@ const TRAIL: BreadcrumbItem[] = [
   { label: 'Breadcrumb' },
 ]
 
-const of = (items: BreadcrumbItem[]) => markup(<Breadcrumb items={items} />)
+const of = (items: BreadcrumbItem[]) => markup(<Breadcrumb items={items} siteUrl="https://example.com" />)
 const count = (haystack: string, needle: string) => haystack.split(needle).length - 1
 
 /** The raw text between the script tags, exactly as a crawler or an HTML parser receives it. */
@@ -20,7 +20,7 @@ const raw = (out: string) => /<script type="application\/ld\+json">(.*?)<\/scrip
 const parsed = (out: string) => JSON.parse(raw(out)) as {
   '@context': string
   '@type': string
-  itemListElement: { '@type': string; position: number; name: string; item: string }[]
+  itemListElement: { '@type': string; position: number; name: string; item?: string }[]
 }
 
 describe('the structured data', () => {
@@ -36,27 +36,28 @@ describe('the structured data', () => {
     expect(data['@type']).toBe('BreadcrumbList')
   })
 
-  it('lists the crumbs that have an href, written out value by value', () => {
+  it('lists the crumbs that have an href, then the current page, written out value by value', () => {
     expect(parsed(of(TRAIL))).toEqual({
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: '/' },
-        { '@type': 'ListItem', position: 2, name: 'Docs', item: '/docs' },
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://example.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Docs', item: 'https://example.com/docs' },
+        { '@type': 'ListItem', position: 3, name: 'Breadcrumb' },
       ],
     })
   })
 
-  it('leaves the current page out, because it has no href to point at', () => {
-    expect(raw(of(TRAIL))).not.toContain('Breadcrumb"')
-    expect(parsed(of(TRAIL)).itemListElement).toHaveLength(2)
+  it('gives the current page a name and no item, because it has no href to point at', () => {
+    expect(raw(of(TRAIL))).toContain('{"@type":"ListItem","position":3,"name":"Breadcrumb"}]}')
+    expect(parsed(of(TRAIL)).itemListElement[2]).not.toHaveProperty('item')
   })
 
   it('includes the last crumb when the caller gives it an href', () => {
     const data = parsed(of([{ href: '/', label: 'Home' }, { href: '/shop', label: 'Shop' }]))
     expect(data.itemListElement).toEqual([
-      { '@type': 'ListItem', position: 1, name: 'Home', item: '/' },
-      { '@type': 'ListItem', position: 2, name: 'Shop', item: '/shop' },
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://example.com/' },
+      { '@type': 'ListItem', position: 2, name: 'Shop', item: 'https://example.com/shop' },
     ])
   })
 
@@ -68,8 +69,9 @@ describe('the structured data', () => {
       { label: 'Avatar' },
     ]))
     expect(data.itemListElement).toEqual([
-      { '@type': 'ListItem', position: 1, name: 'Home', item: '/' },
-      { '@type': 'ListItem', position: 2, name: 'Profile', item: '/settings/profile' },
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://example.com/' },
+      { '@type': 'ListItem', position: 2, name: 'Profile', item: 'https://example.com/settings/profile' },
+      { '@type': 'ListItem', position: 3, name: 'Avatar' },
     ])
   })
 
@@ -112,10 +114,10 @@ describe('a label cannot break out of the script', () => {
     expect(parsed(out).itemListElement[0]?.name).toBe('</script><script>alert(1)</script>')
   })
 
-  it('escapes a < in the href too', () => {
+  it('cannot be broken by a < in the href, which the URL parser writes as %3C', () => {
     const data = of([{ href: '/search?q=</script>', label: 'Search' }, { label: 'Now' }])
     expect(count(data, '</script>')).toBe(1)
-    expect(parsed(data).itemListElement[0]?.item).toBe('/search?q=</script>')
+    expect(parsed(data).itemListElement[0]?.item).toBe('https://example.com/search?q=%3C/script%3E')
   })
 
   it('cannot open an HTML comment, which would hide the closing tag from the parser', () => {

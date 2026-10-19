@@ -10,4 +10,6 @@ export interface LibraryFacts {
   dark: { body: string; muted: string; primary: string }
   /** What the library's gates check today: harness pages (demos x modes x directions) and token pairs. */
   checks: { demos: number; modes: number; directions: number; pages: number; contrastPairs: number }
+  /** Dialog's lines of the library's size-budget.json, which Home prints as the check behind the chip. */
+  sizeBudget: string
 }

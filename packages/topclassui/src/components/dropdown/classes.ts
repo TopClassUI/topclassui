@@ -1,15 +1,15 @@
 // R-5.12-4: one class string per element Dropdown styles, built from the shared overlay constants.
 import {
-  CONTAIN, FOCUS_RING_INSET, LIST_CAP, OVERLAY_SURFACE, POPUP_MOTION, ROW, ROW_HIGHLIGHT, ROW_TOUCH, SCROLL_AREA,
+  CONTAIN, FOCUS_RING_INSET, LIST_CAP, OVERLAY_SURFACE, POPUP_MOTION, ROW, ROW_FOCUSED, ROW_TOUCH, SCROLL_AREA,
 } from '#shared/classes.js'
 import type { DropdownItemTone } from './types.js'
 
 /** Above the page, and hidden once its trigger scrolls out of view (PLAN 10.5). */
 export const DROPDOWN_POSITIONER = 'z-(--tc-z-popup) data-anchor-hidden:invisible'
 
-/** As wide as its longest row: 12rem at least and 20rem at most, and neither past the room POPUP_MAX_W rounds down
+/** As wide as its longest row: 13.75rem at least and 20rem at most, and neither past the room POPUP_MAX_W rounds down
  * to, so a doubled text size cannot push it off a phone. A wider label ends in an ellipsis. */
-export const DROPDOWN_WIDTH = 'min-w-[min(calc(var(--spacing)*48),round(down,var(--available-width),1px))] max-w-[min(calc(var(--spacing)*80),round(down,var(--available-width),1px))]'
+export const DROPDOWN_WIDTH = 'min-w-[min(calc(var(--spacing)*55),round(down,var(--available-width),1px))] max-w-[min(calc(var(--spacing)*80),round(down,var(--available-width),1px))]'
 
 /** R-10.5-1: a column that shows about --tc-list-rows rows and scrolls inside itself. A group label
  * too long for its width breaks, and the ring of a menu that holds the focus itself is drawn inside its box. */
@@ -31,11 +31,11 @@ export const DROPDOWN_ITEM_DISABLED = [
   'forced-colors:data-disabled:*:opacity-100 forced-colors:data-disabled:not-data-highlighted:text-[GrayText]',
 ].join(' ')
 
-/** R-5.6-2: a row is --tc-row-height tall, 40 px, and at least 44 under a finger. It never shrinks:
+/** R-5.6-2: a row is --tc-row-height tall, 32 px, and at least 44 under a finger. It never shrinks:
  * a flex item gives up its height before its container scrolls. */
 export const DROPDOWN_ITEM = [
   ROW,
-  ROW_HIGHLIGHT,
+  ROW_FOCUSED,
   DROPDOWN_ITEM_DISABLED,
   CONTAIN,
   'group shrink-0 select-none',
@@ -61,4 +61,4 @@ export const DROPDOWN_GROUP = 'flex shrink-0 flex-col gap-0.5'
 
 export const DROPDOWN_GROUP_LABEL = 'px-3 py-1.5 text-xs font-medium text-muted'
 
-export const DROPDOWN_SEPARATOR = 'my-1 shrink-0 border-t-(length:--tc-line-width) border-line'
+export const DROPDOWN_SEPARATOR = 'shrink-0 border-t-(length:--tc-line-width) border-line'

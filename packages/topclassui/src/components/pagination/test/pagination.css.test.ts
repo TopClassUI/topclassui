@@ -146,3 +146,24 @@ describe('the current page under forced colours', () => {
     expect(forcedPressed, 'the forced pressed fill is not emitted after the forced hover one').toBeGreaterThan(forcedHover)
   })
 })
+
+/** The stylesheet on one line, so a nested block reads as the browser parses it. */
+const flat = () => css.replace(/\s+/g, ' ')
+
+describe('the compact row on a narrow list or under a finger', () => {
+  it('makes the list the container the row measures', () => {
+    expect(ruleOf('.\\@container\\/pagination')).toBe('container-type: inline-size;\n    container-name: pagination;')
+  })
+
+  it('hides the pages and the gaps below 36rem and under a coarse pointer, over their own inline-flex', () => {
+    expect(flat()).toContain('@container pagination (width < 36rem) { .pagination-full { display: none !important; } }')
+    expect(flat()).toContain('@media (pointer: coarse) { .pagination-full { display: none !important; } }')
+  })
+
+  it('shows "current of total" in exactly those two cases and nowhere else', () => {
+    expect(flat()).toContain(
+      '.pagination-compact { display: none; @container pagination (width < 36rem) { display: flex; } '
+      + '@media (pointer: coarse) { display: flex; } }',
+    )
+  })
+})

@@ -17,25 +17,35 @@ const columns: TableColumn<Deploy>[] = [
   { key: 'duration', header: 'Duration', align: 'end', sortHref: '?sort=duration', cell: (deploy) => deploy.duration },
 ]
 
-/** Every look a table has: plain, its caption drawn, striped, sorted, the first column stuck in a narrow box, empty and loading. */
+/** The frame's strip, one cell a state: idle, a row under the pointer, sorted, a row selected, empty and loading. The
+ * caption, the stripes and the stuck column have demos of their own. */
 export default function Demo() {
   return (
     <div className="grid gap-6">
-      <Table caption="Deploys" items={deploys} getKey={(deploy) => deploy.id} columns={columns} />
-      <Table captionVisible caption="Deploys, caption drawn" items={deploys} getKey={(deploy) => deploy.id} columns={columns} />
-      <Table striped caption="Deploys, striped" items={deploys} getKey={(deploy) => deploy.id} columns={columns} />
-      <Table
-        sort={{ key: 'duration', direction: 'descending' }}
-        caption="Deploys, slowest first"
-        items={deploys}
-        getKey={(deploy) => deploy.id}
-        columns={columns}
-      />
-      <div className="max-w-xs">
-        <Table stickyFirstColumn caption="Deploys, first column stuck" items={deploys} getKey={(deploy) => deploy.id} columns={columns} />
+      <div role="group" aria-label="idle">
+        <Table caption="Deploys" items={deploys} getKey={(deploy) => deploy.id} columns={columns} />
       </div>
-      <Table caption="Deploys, none yet" items={nothing} getKey={(deploy) => deploy.id} columns={columns} />
-      <TableSkeleton rows={3} columns={4} />
+      <div role="group" aria-label="hover row">
+        <Table caption="Deploys, point at a row" items={deploys} getKey={(deploy) => deploy.id} columns={columns} />
+      </div>
+      <div role="group" aria-label="sorted">
+        <Table
+          sort={{ key: 'duration', direction: 'descending' }}
+          caption="Deploys, slowest first"
+          items={deploys}
+          getKey={(deploy) => deploy.id}
+          columns={columns}
+        />
+      </div>
+      <div role="group" aria-label="selected">
+        <Table selectedKeys={['dpl_7f39']} caption="Deploys, one selected" items={deploys} getKey={(deploy) => deploy.id} columns={columns} />
+      </div>
+      <div role="group" aria-label="empty">
+        <Table caption="Deploys, none yet" items={nothing} getKey={(deploy) => deploy.id} columns={columns} />
+      </div>
+      <div role="group" aria-label="loading">
+        <TableSkeleton rows={3} columns={4} />
+      </div>
     </div>
   )
 }

@@ -12,7 +12,7 @@ import { DropdownItem, DropdownPopup, DropdownRoot, DropdownSeparator, DropdownT
 export default function Demo() {
   return (
     <DropdownRoot>
-      <DropdownTrigger render={<Button variant="outline">Actions</Button>} />
+      <DropdownTrigger render={<Button variant="outline" size="sm">Actions</Button>} />
       <DropdownPopup>
         <DropdownItem icon={<Svg icon={user} />} shortcut="Ctrl P">Profile</DropdownItem>
         <DropdownItem icon={<Svg icon={gear} />}>Settings</DropdownItem>

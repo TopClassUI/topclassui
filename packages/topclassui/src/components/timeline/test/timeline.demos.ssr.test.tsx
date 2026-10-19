@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['basic', 'empty', 'icons', 'long-text', 'rtl', 'states', 'tones']
+const EXPECTED = ['basic', 'empty', 'icons', 'loading', 'long-text', 'rtl', 'states', 'tones']
 
 const load = async (file: string) => (await import(`../dummy/${file}.tsx`) as { default: ComponentType }).default
 
@@ -20,14 +20,22 @@ describe('every demo renders on the server', () => {
     expect(files).toEqual(EXPECTED)
   })
 
-  for (const file of files.filter((f) => f !== 'empty')) {
+  for (const file of files.filter((f) => f !== 'empty' && f !== 'loading')) {
     it(`${file}.tsx exports one default demo that renders a timeline`, async () => {
       const Demo = await load(file)
       expect(typeof Demo, file).toBe('function')
       // Not toContain('<'): an empty div passes that, and every timeline is an ol of items.
-      expect(markup(<Demo />), file).toMatch(/<ol class="flex flex-col" role="list"><li /)
+      expect(markup(<Demo />), file).toMatch(/<ol class="flex flex-col"[^>]* role="list"><li /)
     })
   }
+
+  it('the loading demo renders the skeleton, hidden, and no list', async () => {
+    const Demo = await load('loading')
+    const out = markup(<Demo />)
+    expect(out).toContain('aria-hidden="true"')
+    expect(out.match(/rounded-full/g)).toHaveLength(3)
+    expect(out).not.toContain('<ol')
+  })
 
   it('the empty demo renders its fallback and no list', async () => {
     const Demo = await load('empty')

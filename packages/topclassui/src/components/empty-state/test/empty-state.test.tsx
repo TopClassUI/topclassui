@@ -12,8 +12,8 @@ const TITLE = 'Nothing here yet'
 const DESCRIPTION = 'When there is something to show, it will appear here.'
 
 /** The opening tags of the two text parts, written out from the Build this block. */
-const TITLE_TAG = '<p class="text-base font-semibold text-body">'
-const DESCRIPTION_TAG = '<div class="text-sm text-muted">'
+const TITLE_TAG = '<p class="text-base leading-tight font-semibold text-body">'
+const DESCRIPTION_TAG = '<div class="text-sm leading-tight text-muted">'
 
 const count = (haystack: string, needle: string) => haystack.split(needle).length - 1
 
