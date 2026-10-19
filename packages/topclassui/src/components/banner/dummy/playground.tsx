@@ -9,7 +9,7 @@ export default function Demo({ dismissible = true, ...props }: Omit<BannerDesign
     <Banner {...props}
       dismissible={dismissible}
       id="banner-playground"
-      aria-label="Release announcement"
+      aria-label="Version 0.2 announcement"
       action={<Button size="sm" variant="link" className="px-0 font-semibold text-current" render={<a href="/changelog" />}>Read more</Button>}
     >
       Version 0.2 is out, with a Drawer and full RTL support.
