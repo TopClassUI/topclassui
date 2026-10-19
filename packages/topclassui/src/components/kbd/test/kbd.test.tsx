@@ -7,7 +7,7 @@ import { Kbd } from '../index.js'
 
 /** The class attribute the spec gives, written out in the order cn() emits it. */
 const CLASS = 'inline-flex items-center justify-center rounded-chip bg-surface-raised px-1.5 py-0.5'
-  + ' font-mono text-xs text-body data-pressed:bg-surface data-disabled:opacity-50 border-(length:--tc-line-width) border-line-strong'
+  + ' font-mono text-xs text-body data-pressed:bg-surface data-disabled:bg-surface data-disabled:border-line data-disabled:text-muted border-(length:--tc-line-width) border-line-strong'
 
 /** The text of every keycap in the markup, in document order. */
 const keysIn = (html: string) =>

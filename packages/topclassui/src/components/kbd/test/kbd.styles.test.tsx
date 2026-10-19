@@ -9,7 +9,7 @@ const classes = (props: KbdProps = {}) => classList(markup(<Kbd {...props}>K</Kb
 /** The Build this list, written out; the last two are BORDER_STRONG. */
 const KEYCAP = [
   'inline-flex', 'items-center', 'justify-center', 'rounded-chip', 'bg-surface-raised',
-  'px-1.5', 'py-0.5', 'font-mono', 'text-xs', 'text-body', 'data-pressed:bg-surface', 'data-disabled:opacity-50',
+  'px-1.5', 'py-0.5', 'font-mono', 'text-xs', 'text-body', 'data-pressed:bg-surface', 'data-disabled:bg-surface', 'data-disabled:border-line', 'data-disabled:text-muted',
   'border-(length:--tc-line-width)', 'border-line-strong',
 ]
 

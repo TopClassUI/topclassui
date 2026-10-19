@@ -11,7 +11,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the key passes className first, so the consumer loses every conflict',
     file: 'src/components/kbd/index.tsx',
-    from: "  const classes = cn(\n    'inline-flex items-center justify-center rounded-chip bg-surface-raised px-1.5 py-0.5 font-mono text-xs text-body',\n    // R-5.7-6: presence attributes; Figma 135:411 draws the pressed cap on the surface and the disabled one at half strength.\n    'data-pressed:bg-surface data-disabled:opacity-50',\n    BORDER_STRONG,\n    className,\n  )",
+    from: "  const classes = cn(\n    'inline-flex items-center justify-center rounded-chip bg-surface-raised px-1.5 py-0.5 font-mono text-xs text-body',\n    // R-5.7-6: presence attributes. A key is not a control, so a disabled one keeps 4.5:1 text and fades its fill and line instead.\n    'data-pressed:bg-surface data-disabled:bg-surface data-disabled:border-line data-disabled:text-muted',\n    BORDER_STRONG,\n    className,\n  )",
     to: "  const classes = cn(\n    className,\n    'inline-flex items-center justify-center rounded-chip bg-surface px-1.5 py-0.5 font-mono text-xs text-body',\n    BORDER_STRONG,\n  )",
   },
   {
