@@ -6,9 +6,10 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from '
 import { useDirection, useLabels, useToastSettings } from '#shared/provider/context.js'
 import { usePortalLocale } from '#shared/provider/use-portal-locale.js'
 import { claimViewport, drawingViewport, subscribeViewports } from '#shared/toast/viewports.js'
-import { TOAST_OFFSET_VARIABLE, TOAST_STICKY_SHARE } from './constants.js'
+import { toBaseOptions } from '#shared/toast/toast.js'
+import { TOAST_DEFAULTS, TOAST_OFFSET_VARIABLE, TOAST_STICKY_SHARE } from './constants.js'
 import { toSwipeDirections } from './lib.js'
-import type { ToastViewportFocus, ToastViewportProps } from './types.js'
+import type { ToastStageToast, ToastViewportFocus, ToastViewportProps } from './types.js'
 
 /** R-10.5-3: while a stack shows at the bottom, its height in whole px is --tc-sticky-bottom on the root element. */
 function useStickyBottom(viewport: HTMLDivElement | null, publishes: boolean) {
@@ -95,4 +96,25 @@ function useFocusReturn(toasts: readonly unknown[]) {
       queueMicrotask(() => { if (went !== null || left.isConnected) holds.current = false })
     },
   }
+}
+
+/** A stage's own manager, holding its one toast: added at mount, and added again in place of the last when an option
+ * changes. It stays until closed unless the options give a duration. */
+export function useToastStage({ title, description, tone, priority, duration }: ToastStageToast) {
+  const [manager] = useState(() => Toast.createToastManager())
+  useEffect(() => {
+    const id = manager.add({
+      ...toBaseOptions({ title, description, priority, duration }),
+      type: tone ?? TOAST_DEFAULTS.tone,
+      timeout: duration === undefined ? 0 : toBaseOptions({ duration }).timeout,
+    })
+    return () => { manager.close(id) }
+  }, [manager, title, description, tone, priority, duration])
+  return manager
+}
+
+/** What a stage's column reads: its own list, the labels, and the swipes of a bottom-end corner. */
+export function useToastStageList() {
+  const { toasts } = Toast.useToastManager()
+  return { toasts, labels: useLabels().toast, swipeDirection: toSwipeDirections('bottom-end', useDirection()) }
 }

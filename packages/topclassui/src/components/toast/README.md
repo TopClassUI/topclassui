@@ -95,7 +95,7 @@ provider mounts.
 ## Import
 
 ```tsx
-import { ToastViewport, toast } from 'topclassui/toast'
+import { ToastStage, ToastViewport, toast } from 'topclassui/toast'
 ```
 
 ## Props
@@ -108,7 +108,7 @@ Every prop below is optional and falls back to the default shown.
 | `priority` | no | `low` \| `high` | `"low"` | toast.add: high is announced at once, as an alert; low waits for the reader to finish. |
 | `tone` | no | `primary` \| `neutral` \| `success` \| `warning` \| `danger` \| `info` | `"neutral"` | toast.add: what the toast means. success, warning, danger and info draw an icon; neutral and primary none. |
 
-Anything else on `ToastViewport` is passed to the element it draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
+Anything else on `ToastStage` and `ToastViewport` is passed to the element it draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
 ## Examples
 

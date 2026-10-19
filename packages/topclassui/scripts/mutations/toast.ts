@@ -84,8 +84,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the toast viewport catches every press in its box, so a button of the page under it can no longer be pressed',
     file: 'src/components/toast/classes.ts',
-    from: ' ${FOCUS_RING_INSET} ${VIEWPORT_PASSIVE}`',
-    to: ' ${FOCUS_RING_INSET}`',
+    from: 'p-(--tc-overlay-inset) ${SCROLL_AREA} ${FOCUS_RING_INSET} ${VIEWPORT_PASSIVE}`',
+    to: 'p-(--tc-overlay-inset) ${SCROLL_AREA} ${FOCUS_RING_INSET}`',
   },
   {
     label: 'a toast inside the passive viewport takes no press back, so its x cannot be pressed',
@@ -230,5 +230,23 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/toast/classes.ts',
     from: ' shadow-(--tc-shadow-toast) ',
     to: ' ',
+  },
+  {
+    label: 'a toast stage shows no toast at rest, so the docs stage is empty until a press',
+    file: 'src/components/toast/hook.ts',
+    from: '    const id = manager.add({',
+    to: '    const id = false && manager.add({',
+  },
+  {
+    label: 'a toast stage leaves its column fixed to the screen, so its toast escapes the stage to the page corner',
+    file: 'src/components/toast/classes.ts',
+    from: '`absolute bottom-0 inset-e-0 z-1',
+    to: '`fixed bottom-0 inset-e-0 z-1',
+  },
+  {
+    label: 'a toast stage sends its toast to the page list, so it lands in the page corner and not in the stage',
+    file: 'src/components/toast/client.tsx',
+    from: '    <Base.Provider toastManager={manager}>\n',
+    to: '    <Base.Provider>\n',
   },
 ]

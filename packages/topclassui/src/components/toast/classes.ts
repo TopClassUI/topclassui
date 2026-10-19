@@ -74,3 +74,9 @@ export const TOAST_ACTION = 'col-start-2 row-start-2 mt-2.5 self-start justify-s
 /** The x: an icon button on the neutral ramp, so its hover is the ghost tint, its 14 px glyph on the padding's corner.
  * Beside the text and sticky, so it stays on screen while any of a toast taller than the screen shows (WCAG 2.5.7). */
 export const TOAST_CLOSE = `${ICON_BUTTON} cursor-pointer text-muted tone-neutral ${HOVER.ghost} col-start-3 row-span-2 row-start-1 -me-1.25 -mt-1.25 ms-1.25 self-start sticky top-0`
+
+/** A stage: the box its toasts are placed in, and the layer that keeps them over what the box holds. */
+export const TOAST_STAGE = 'relative isolate'
+
+/** The stage's column at its bottom-end corner, inside the box rather than fixed to the screen, as wide as the corner's. */
+export const TOAST_STAGE_VIEWPORT = `absolute bottom-0 inset-e-0 z-1 flex w-88 max-w-full flex-col-reverse gap-2 p-(--tc-overlay-inset) ${FOCUS_RING_INSET} ${VIEWPORT_PASSIVE}`
