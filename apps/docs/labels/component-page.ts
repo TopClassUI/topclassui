@@ -31,7 +31,7 @@ export interface ComponentPageLabels {
   thenImport: string
   thenImportNote: string
   copyImport: (component: string) => string
-  chip: { notMeasured: string; lazy: string }
+  chip: { lazy: string }
   demoTabs: (component: string) => string
   preview: string
   code: string
@@ -96,7 +96,7 @@ const en: ComponentPageLabels = {
   thenImport: 'Then import it',
   thenImportNote: 'It is your file now. Edit it freely; topclassui diff shows what changed upstream.',
   copyImport: (component) => `Copy the import for ${component}`,
-  chip: { notMeasured: 'size not measured yet', lazy: 'lazy' },
+  chip: { lazy: 'lazy' },
   demoTabs: (component) => `${component} demo`,
   preview: 'Preview',
   code: 'Code',
@@ -162,7 +162,7 @@ const ar: ComponentPageLabels = {
   thenImport: 'ثم استورده',
   thenImportNote: 'الملف ملفك الآن. عدّله بحرية؛ يُظهر topclassui diff ما تغيّر في المصدر.',
   copyImport: (component) => `انسخ الاستيراد لـ ${component}`,
-  chip: { notMeasured: 'الحجم لم يُقَس بعد', lazy: 'عند الطلب' },
+  chip: { lazy: 'عند الطلب' },
   demoTabs: (component) => `مثال ${component}`,
   preview: 'العرض',
   code: 'الشيفرة',

@@ -61,7 +61,7 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
               <h2 id={headingId} className={CARD_TITLE}>
                 {href === undefined ? title : <a href={href} className={LINK}>{title}</a>}
               </h2>
-              <Badge tone={CHIP_TONE[entry.rendering]} variant="soft" size="sm" className="font-mono"><bdi>{chipOf(entry.rendering, entry.slug, t.chip)}</bdi></Badge>
+              <Badge tone={CHIP_TONE[entry.rendering]} variant="soft" size="sm" className="font-mono"><bdi>{chipOf(entry, t.chip)}</bdi></Badge>
             </div>
             <p className={SMALL}><InlineText text={content.description[locale]} /></p>
           </div>
