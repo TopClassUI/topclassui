@@ -107,8 +107,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the box of a table keeps no room at its ends, so a focused control that shows one pixel past the edge is left there',
     file: 'src/components/table/index.tsx',
-    from: "BOX_CAP[captionVisible ? 'visible' : 'hidden'], FOCUS_ROOM, BORDER,",
-    to: "BOX_CAP[captionVisible ? 'visible' : 'hidden'], BORDER,",
+    from: "BOX_CAP[density][captionVisible ? 'visible' : 'hidden'], FOCUS_ROOM, BOX_VARIANT[variant],",
+    to: "BOX_CAP[density][captionVisible ? 'visible' : 'hidden'], BOX_VARIANT[variant],",
   },
   {
     label: 'the room a table keeps past its stuck column shrinks to the column itself, so a focused control can show one pixel beside it',
@@ -167,7 +167,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the table box loses its row cap, so it never scrolls and loadMore is asked page after page',
     file: 'src/components/table/index.tsx',
-    from: "BOX_CAP[captionVisible ? 'visible' : 'hidden'], ",
+    from: "BOX_CAP[density][captionVisible ? 'visible' : 'hidden'], ",
     to: '',
   },
   {

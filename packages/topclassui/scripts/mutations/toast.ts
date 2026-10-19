@@ -132,14 +132,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a long toast action label stays on one line and runs out of its button',
     file: 'src/components/toast/classes.ts',
-    from: 'h-auto min-h-control-sm whitespace-normal py-1',
-    to: 'h-auto min-h-control-sm py-1',
+    from: 'h-auto min-h-control-sm cursor-pointer whitespace-normal py-1',
+    to: 'h-auto min-h-control-sm cursor-pointer py-1',
   },
   {
     label: 'the toast x scrolls away with its toast, so under a finger a toast taller than the screen closes by a drag alone (TOAST-3)',
     file: 'src/components/toast/classes.ts',
-    from: ' ms-3 self-start sticky top-0`',
-    to: ' ms-3 self-start`',
+    from: ' ms-1.25 self-start sticky top-0`',
+    to: ' ms-1.25 self-start`',
   },
   {
     label: 'the toast x keeps to the first row, so in a narrow toast it cannot follow the text and leaves the screen (TOAST-3)',
