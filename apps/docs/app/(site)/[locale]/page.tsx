@@ -64,7 +64,7 @@ export default async function Home({ params }: { params: Params }) {
         </div>
         <HomeSection id="proof" eyebrow={home.proof.eyebrow} title={home.proof.title} lead={home.proof.lead}>
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <ServerPanel labels={labels} />
+            <ServerPanel locale={locale} labels={labels} />
             <RtlPanel labels={labels} />
             <TestedPanel labels={labels} />
           </div>
