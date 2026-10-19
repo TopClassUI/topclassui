@@ -13,7 +13,7 @@
   --tc-density: 1;
   --tc-motion: 1;
   --tc-list-rows: 7;
-  --tc-row-height: calc(2.5rem * var(--tc-density));
+  --tc-row-height: calc(2rem * var(--tc-density));
   --tc-overlay-inset: 1rem;
   --tc-sticky-top: 0px;
   --tc-sticky-bottom: 0px;

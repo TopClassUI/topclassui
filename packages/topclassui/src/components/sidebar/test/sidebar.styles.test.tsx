@@ -35,7 +35,7 @@ describe('the parts are where the scan expects them', () => {
 
 describe('the rail', () => {
   it('is the group its server parts read, a column as tall as its parent that a flex row cannot squeeze', () => {
-    expect(nav?.slice(0, 10)).toEqual(['group/sidebar', 'relative', 'flex', 'h-full', 'shrink-0', 'flex-col', 'gap-1', 'bg-page', 'p-2.5', 'text-body'])
+    expect(nav?.slice(0, 10)).toEqual(['group/sidebar', 'relative', 'flex', 'h-full', 'shrink-0', 'flex-col', 'gap-1', 'bg-page', 'p-2', 'text-body'])
   })
 
   // A rail with no SidebarBody, inside a box of the page that scrolls: its hidden labels need a box of their own to stay in.
@@ -48,12 +48,12 @@ describe('the rail', () => {
     expect(nav?.filter((cls) => /^border-[lrse]-/.test(cls))).toEqual(['border-e-(length:--tc-line-width)'])
   })
 
-  it('is 220 px expanded and 60 collapsed, by the attribute it sets itself', () => {
-    expect(nav?.slice(12, 14)).toEqual(['data-open:w-55', 'data-closed:w-15'])
+  it('is 220 px expanded and 52 collapsed, by the attribute it sets itself', () => {
+    expect(nav?.slice(12, 14)).toEqual(['data-open:w-55', 'data-closed:w-13'])
   })
 
   it('under a finger a collapsed rail is as wide as a 44 px target, its padding and its line; and never wider than its parent', () => {
-    expect(nav?.slice(14)).toEqual(['pointer-coarse:data-closed:min-w-[calc(var(--tc-target-coarse,44px)+1.25rem+var(--tc-line-width))]', 'max-w-full'])
+    expect(nav?.slice(14)).toEqual(['pointer-coarse:data-closed:min-w-[calc(var(--tc-target-coarse,44px)+1rem+var(--tc-line-width))]', 'max-w-full'])
   })
 
   it('animates nothing: no transition class on the rail, so no width animation exists', () => {
@@ -81,7 +81,7 @@ describe('the header', () => {
 
 describe('the body', () => {
   it('is the scroll container: it takes the room that is left, scrolls down, and keeps the scroll to itself', () => {
-    expect(body?.slice(0, 7)).toEqual(['relative', 'flex', 'flex-1', 'flex-col', 'gap-1', 'overflow-y-auto', 'overscroll-contain'])
+    expect(body?.slice(0, 7)).toEqual(['relative', 'flex', 'flex-1', 'flex-col', 'gap-0.5', 'overflow-y-auto', 'overscroll-contain'])
   })
 
   // Measured: with and without it the body is 370 px in a 416 px rail and scrolls 2302. A box that scrolls has no minimum height.
@@ -108,8 +108,8 @@ describe('the body', () => {
 
 describe('a group', () => {
   it('is a column, and so is its list', () => {
-    expect(group).toEqual(['flex', 'flex-col', 'gap-1'])
-    expect(list).toEqual(['flex', 'flex-col', 'gap-1'])
+    expect(group).toEqual(['flex', 'flex-col', 'gap-0.5'])
+    expect(list).toEqual(['flex', 'flex-col', 'gap-0.5'])
   })
 
   it('its label is one muted line as wide as its text at the start of the rail, that ends in an ellipsis, hidden with sr-only in a collapsed rail', () => {
@@ -120,8 +120,8 @@ describe('a group', () => {
 describe('a row', () => {
   const ROW = [
     'relative', 'overflow-hidden', 'min-w-[var(--tc-target-min,24px)]', ...COARSE,
-    'flex', 'min-h-(--tc-row-height)', 'w-full', 'items-center', 'gap-2', 'rounded-control', 'px-3', 'text-start', 'text-sm',
-    ...RING, ...MOTION, 'group-data-closed/sidebar:justify-center',
+    'flex', 'min-h-(--tc-row-height)', 'w-full', 'items-center', 'gap-2', 'rounded-control', 'text-start', 'text-sm',
+    ...RING, ...MOTION, 'px-2', 'group-data-closed/sidebar:justify-center',
   ]
 
   it('is the shared row with a ring outside it, clipped to its own box, and centred in a collapsed rail', () => {
@@ -129,8 +129,8 @@ describe('a row', () => {
     expect(current?.slice(0, ROW.length)).toEqual(ROW)
   })
 
-  // cn() keeps the last min-height it is given: after the 24 px floor that is the 40 px of a row, and 44 under a finger.
-  it('is 40 px tall at least, not the 24 px of the floor, and 44 under a coarse pointer', () => {
+  // cn() keeps the last min-height it is given: after the 24 px floor that is the 32 px of a row, and 44 under a finger.
+  it('is 32 px tall at least, not the 24 px of the floor, and 44 under a coarse pointer', () => {
     for (const row of [rest, current]) {
       expect(row).toContain('min-h-(--tc-row-height)')
       expect(row).not.toContain('min-h-[var(--tc-target-min,24px)]')
@@ -142,12 +142,9 @@ describe('a row', () => {
     expect(rest?.slice(ROW.length)).toEqual(['tone-neutral', 'text-body', 'hover:bg-(--tc-soft)', 'active:bg-(--tc-soft-hover)'])
   })
 
-  it('the current one is filled with the soft primary, semibold, and marked with a bar in the colour of its text', () => {
-    expect(current?.slice(ROW.length, ROW.length + 8)).toEqual([
-      'bg-primary-soft', 'font-semibold', 'text-primary-on-soft',
-      'before:absolute', 'before:inset-y-2', 'before:inset-s-1', 'before:w-0.75', 'before:rounded-full',
-    ])
-    expect(current).toContain('before:bg-current')
+  it('the current one is filled with the soft primary and semibold, with no bar, as Figma 138:2539 draws it', () => {
+    expect(current?.slice(ROW.length, ROW.length + 3)).toEqual(['bg-primary-soft', 'font-semibold', 'text-primary-on-soft'])
+    expect((current ?? []).filter((cls) => cls.startsWith('before:'))).toEqual([])
     // Semibold, not medium: a font with a regular and a bold face alone paints 500 as regular.
     expect(current).not.toContain('font-medium')
   })

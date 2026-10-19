@@ -1,19 +1,19 @@
 // R-5.12-4: one class string per element Sidebar styles, built from the shared constants.
 import { CONTAIN, FOCUS_RING, HOVER, ICON_BUTTON, LABEL, ROW, SCROLL_AREA, TOUCH_TARGET, TRANSITION } from '#shared/classes.js'
 
-/** 220 px expanded and 60 collapsed. A server part cannot read context (R-5.1-4): every part
+/** 220 px expanded and 52 collapsed, as Figma 138:2539 draws the rail. A server part cannot read context (R-5.1-4): every part
  * under the rail learns its state from this group and the attribute the root sets on it. */
-export const SIDEBAR_WIDTH = 'data-open:w-55 data-closed:w-15'
+export const SIDEBAR_WIDTH = 'data-open:w-55 data-closed:w-13'
 
 /** Under a finger a collapsed rail is as wide as a 44 px target, its padding and its line:
- * at 60 px it leaves a row 39, which a 44 px row would overflow. */
-export const SIDEBAR_COARSE = 'pointer-coarse:data-closed:min-w-[calc(var(--tc-target-coarse,44px)+1.25rem+var(--tc-line-width))]'
+ * at 52 px it leaves a row 35, which a 44 px row would overflow. */
+export const SIDEBAR_COARSE = 'pointer-coarse:data-closed:min-w-[calc(var(--tc-target-coarse,44px)+1rem+var(--tc-line-width))]'
 
 /** A column as tall as its parent that a flex row never squeezes, and never wider than that
  * parent. It sits on the page colour behind its line, as Figma 138:2539 draws the bordered rail. The line is on the inline end, so it faces the page in either direction.
  * relative: it holds the hidden labels of a rail that has no body, inside whatever scrolls it. */
 export const SIDEBAR_ROOT = [
-  'group/sidebar relative flex h-full shrink-0 flex-col gap-1 bg-page p-2.5 text-body',
+  'group/sidebar relative flex h-full shrink-0 flex-col gap-1 bg-page p-2 text-body',
   'border-e-(length:--tc-line-width) border-line',
   SIDEBAR_WIDTH,
   SIDEBAR_COARSE,
@@ -41,17 +41,17 @@ export const SIDEBAR_BAR = 'group-data-closed/sidebar:[scrollbar-width:none]'
 /** The scroll container. relative: it holds every sr-only label of a collapsed rail, or each
  * would be laid out against the page and make it as tall as the whole list. No min-h-0:
  * a box that scrolls has no minimum height of its own, so the class would change nothing. */
-export const SIDEBAR_BODY = `relative flex flex-1 flex-col gap-1 ${SCROLL_AREA} ${SIDEBAR_RING_ROOM} ${SIDEBAR_BAR}`
+export const SIDEBAR_BODY = `relative flex flex-1 flex-col gap-0.5 ${SCROLL_AREA} ${SIDEBAR_RING_ROOM} ${SIDEBAR_BAR}`
 
-export const SIDEBAR_GROUP = 'flex flex-col gap-1'
+export const SIDEBAR_GROUP = 'flex flex-col gap-0.5'
 
 /** One line that ends in an ellipsis. Collapsed, it is hidden and still names its list. As wide as its text and
  * at the start of the rail, so a label in its own direction, an English one in an Arabic rail, sits where the rows do. */
 export const SIDEBAR_GROUP_LABEL = `self-start ${CONTAIN} truncate px-3 py-1 text-xs font-medium text-muted group-data-closed/sidebar:sr-only`
 
-export const SIDEBAR_LIST = 'flex flex-col gap-1'
+export const SIDEBAR_LIST = 'flex flex-col gap-0.5'
 
-/** A row at least 40 px tall, 44 under a finger, that clips what it holds. Collapsed, its icon is
+/** A row at least --tc-row-height tall (32 px), 44 under a finger, padded 8 px as drawn, that clips what it holds. Collapsed, its icon is
  * centred, and needs no px-0: what is centred stays centred when it is wider than its room.
  * The floors come first: cn() keeps the last min-height, and after ROW that would be 24 px. */
 export const SIDEBAR_LINK = [
@@ -60,27 +60,22 @@ export const SIDEBAR_LINK = [
   ROW,
   FOCUS_RING,
   TRANSITION,
-  'group-data-closed/sidebar:justify-center',
+  'px-2 group-data-closed/sidebar:justify-center',
 ].join(' ')
 
-/** A bar inside the inline start of the current row: a shape, where the fill and the text are
- * colours and the weight is hidden with the label of a collapsed rail. It takes the colour of
- * the label, so it keeps the label's contrast in every mode, and sits clear of a pill's round end. */
-export const SIDEBAR_MARK = 'before:absolute before:inset-y-2 before:inset-s-1 before:w-0.75 before:rounded-full before:bg-current'
-
 /** Forced colours erase the fill, so there the current row takes the system pair and paints
- * it itself, as a highlighted row of a menu does. The bar follows: it is the colour of the text.
+ * it itself, as a highlighted row of a menu does.
  * A row that paints itself keeps the ring of its theme, so it takes the text colour of the canvas. */
 export const SIDEBAR_CURRENT_FORCED = [
   'forced-colors:forced-color-adjust-none forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]',
   'forced-colors:[--tc-ring:CanvasText]',
 ].join(' ')
 
-/** R-5.2-3: the row by whether it is the page being read. Semibold, not medium: a font with
- * a regular and a bold face alone paints 500 as regular. Only another row answers the pointer:
+/** R-5.2-3: the row by whether it is the page being read: the tint and the weight, with no bar, as
+ * Figma 138:2539 draws it. Semibold, not medium: a font with a regular and a bold face paints 500 as regular. Only another row answers the pointer:
  * under forced colours a hover fill on the current one would lie under the text of the highlight. */
 export const SIDEBAR_LINK_STATE = {
-  current: `bg-primary-soft font-semibold text-primary-on-soft ${SIDEBAR_MARK} ${SIDEBAR_CURRENT_FORCED}`,
+  current: `bg-primary-soft font-semibold text-primary-on-soft ${SIDEBAR_CURRENT_FORCED}`,
   rest: `tone-neutral text-body ${HOVER.ghost}`,
 } as const
 
