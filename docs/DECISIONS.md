@@ -6,6 +6,13 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-19 - No default scrollbar anywhere: the page wears the shared bar, and an e2e reads every scroller
+
+**Decision.** Job 123. `html` in `src/tokens.css` sets `scrollbar-width: thin` and `scrollbar-color` from the two scrollbar tokens, so the page's own bar is drawn like every SCROLLBAR, SCROLL_AREA and SCROLL_X container. The Sidebar's in-a-layout demo wears SCROLL_AREA; on the site, STAGE and STATE_SCOPE wear SCROLL_X and On this page wears SCROLL_AREA. `e2e/scrollbar-everywhere.spec.ts` (every harness page and every overlay opened live) and `apps/docs/e2e/scrollbars.spec.ts` (every sitemap page at 1440 and 390, and the open search palette) fail on any rendered element whose overflow is auto or scroll and whose computed `scrollbar-width` is not `thin`. `none` passes: it draws no bar, and the closed Sidebar rail hides its own on purpose.
+
+**Why.** Omar's round-8 review: no default browser scrollbar anywhere; the classic bar beside the search palette was the page's.
+
+**What it affects.** `src/tokens.css`, `src/scrollbar.test.ts` (the page rule, and a raw overflow in a demo), the mutation rows in `scripts/mutations/shared-scrollbar.ts`, the sidebar demo and its test, `apps/docs/components/classes.ts`, `apps/docs/components/shell/on-this-page.tsx`, the two specs.
 ## 2026-10-19 - The hand on every pressable control: `POINTER`
 
 **Decision.** Round 8, job 120. `shared/classes.ts` gains `POINTER`: `cursor-pointer`, then `cursor-default` under `disabled:`, `aria-disabled:`, `data-disabled:`, `data-readonly:` and `data-loading:`, so a control that cannot be pressed shows the arrow whichever mark it carries. `ICON_BUTTON`, `ROW` and `TOGGLE_TARGET` wear it, which reaches every x and icon button (Dialog, Drawer, Popover, Toast, Sidebar, Tag, Banner, CodeBlock, FileUpload, DatePicker's month buttons), every row of a menu or a list (Dropdown, Command, Select, Combobox, Sidebar) and every Checkbox, Radio and Switch. Button, Tabs, SegmentedControl, Accordion, the Select and DatePicker triggers, NumberField's steppers, DatePicker's days, TreeView's rows and Pagination's cells add it to their own strings; the `cursor-default` the option rows, Dropdown and TreeView set by hand is gone. Rating's stars and FileUpload's input already had the hand.
