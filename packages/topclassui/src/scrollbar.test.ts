@@ -111,7 +111,7 @@ describe('every scroll container wears the shared scrollbar', () => {
   it('a raw overflow in a demo wears a shared scroll constant on the same line', () => {
     const bare: string[] = []
     for (const dir of readdirSync(COMPONENTS)) {
-      let demos: string[] = []
+      let demos: string[]
       try { demos = readdirSync(join(COMPONENTS, dir, 'dummy')) } catch { continue }
       for (const demo of demos) {
         for (const line of readFileSync(join(COMPONENTS, dir, 'dummy', demo), 'utf8').split('\n')) {
