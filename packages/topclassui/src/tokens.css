@@ -60,6 +60,8 @@
   --tc-tree-level: 0;
   /* One level of a tree's indent: 18 px at density 1, as the Components page and the playground draw it. */
   --tc-tree-indent: calc(1.125rem * var(--tc-density));
+  /* The md SegmentedControl track: 36 px at density 1, as Figma 138:668 draws it, between the sm and md control steps. */
+  --tc-segmented-height: calc(2.25rem * var(--tc-density));
 }
 
 /* Both selectors, so a light island inside a dark page resets every colour. */

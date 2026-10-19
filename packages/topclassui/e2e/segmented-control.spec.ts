@@ -15,7 +15,7 @@ import { FORCED_CANVAS, contrast, rgbOf } from './pixels.js'
 
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['basic', 'form', 'full-width', 'long-content', 'many', 'rtl', 'sizes', 'states', 'with-icons'].map((demo) => `segmented-control--${demo}`)
+const DEMOS = ['basic', 'form', 'full-width', 'long-content', 'many', 'rtl', 'sizes', 'states', 'track-states', 'with-icons'].map((demo) => `segmented-control--${demo}`)
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 const NAMES = { xs: 'Extra small', sm: 'Small', md: 'Medium', lg: 'Large', xl: 'Extra large' } as const
 
@@ -69,8 +69,8 @@ const srgb = (page: Page, computed: string) => page.evaluate((colour): [number, 
 
 test.describe('the five sizes, on the static page', () => {
   const FINE = {
-    xs: { track: 32, segment: [74.9, 24] }, sm: { track: 32, segment: [54.7, 24] }, md: { track: 40, segment: [77, 32] },
-    lg: { track: 48, segment: [72.1, 40] }, xl: { track: 56, segment: [117.2, 48] },
+    xs: { track: 32, segment: [78.8, 24] }, sm: { track: 32, segment: [51.3, 24] }, md: { track: 36, segment: [68.3, 28] },
+    lg: { track: 48, segment: [75.3, 40] }, xl: { track: 56, segment: [122.1, 48] },
   }
   const shapes = async (page: Page) => {
     const out: Record<string, Awaited<ReturnType<typeof shape>>> = {}
@@ -93,8 +93,8 @@ test.describe('the five sizes, on the static page', () => {
     test('every segment is 44 px tall and wide at least, and the track grows to hold it', async ({ page }) => {
       await page.goto(urlFor('segmented-control--sizes', 'light', 'ltr'))
       expect(await shapes(page)).toEqual({
-        xs: { track: 52, segment: [74.9, 44] }, sm: { track: 52, segment: [54.7, 44] }, md: { track: 52, segment: [77, 44] },
-        lg: { track: 52, segment: [72.1, 44] }, xl: { track: 56, segment: [117.2, 48] },
+        xs: { track: 52, segment: [78.8, 44] }, sm: { track: 52, segment: [51.3, 44] }, md: { track: 52, segment: [68.3, 44] },
+        lg: { track: 52, segment: [75.3, 44] }, xl: { track: 56, segment: [122.1, 48] },
       })
       const widths = await page.locator('#demo [role="radio"]').evaluateAll((all) => all.map((el) => el.getBoundingClientRect().width))
       expect(Math.min(...widths)).toBeGreaterThanOrEqual(44)
@@ -108,7 +108,7 @@ test.describe('the five sizes, on the static page', () => {
       const segment = segmentIn(page, NAMES[size])
       steps.push(`${size} ${await css(segment, 'font-size')} ${await css(segment, 'padding-inline-start')}`)
     }
-    expect(steps).toEqual(['xs 12px 8px', 'sm 14px 10px', 'md 14px 12px', 'lg 16px 16px', 'xl 16px 20px'])
+    expect(steps).toEqual(['xs 12px 8px', 'sm 12px 10px', 'md 12px 11px', 'lg 16px 16px', 'xl 16px 20px'])
   })
 })
 
@@ -133,7 +133,7 @@ test.describe('the server HTML, before any script runs', () => {
   }
 
   test('states: the disabled track has no tab stop, and every other track has one, on its selected segment', async ({ page }) => {
-    await page.goto(urlFor('segmented-control--states', 'light', 'ltr'))
+    await page.goto(urlFor('segmented-control--track-states', 'light', 'ltr'))
     const stops: string[] = []
     for (let press = 0; press < 4; press += 1) {
       await page.keyboard.press('Tab')
@@ -147,7 +147,7 @@ test.describe('the states, on the static page', () => {
   test('selected is raised and shadowed, and also heavier and darker, so a fill is not the only cue', async ({ page }) => {
     await page.goto(urlFor('segmented-control--basic', 'light', 'ltr'))
     const [on, off] = [segmentIn(page, 'Board'), segmentIn(page, 'Table')]
-    expect([await css(on, 'font-weight'), await css(off, 'font-weight')]).toEqual(['600', '500'])
+    expect([await css(on, 'font-weight'), await css(off, 'font-weight')]).toEqual(['500', '400'])
     expect(await css(on, 'background-color')).toBe(await resolve(page, 'var(--tc-surface-raised)'))
     expect(await css(off, 'background-color')).toBe('rgba(0, 0, 0, 0)')
     expect(await css(on, 'color')).toBe(await resolve(page, 'var(--tc-body)'))
@@ -168,7 +168,7 @@ test.describe('the states, on the static page', () => {
   }
 
   test('invalid: the line of the track turns to danger and is 2 px thick; a live track keeps its hairline', async ({ page }) => {
-    await page.goto(urlFor('segmented-control--states', 'light', 'ltr'))
+    await page.goto(urlFor('segmented-control--track-states', 'light', 'ltr'))
     const danger = await resolve(page, 'var(--tc-danger-solid)')
     const invalid = page.getByRole('radiogroup', { name: 'Invalid' })
     expect(await css(invalid, 'border-top-color')).toBe(danger)
@@ -177,7 +177,7 @@ test.describe('the states, on the static page', () => {
   })
 
   test('disabled: a segment dims to half, every one of a disabled track too, and a live one beside it does not', async ({ page }) => {
-    await page.goto(urlFor('segmented-control--states', 'light', 'ltr'))
+    await page.goto(urlFor('segmented-control--track-states', 'light', 'ltr'))
     for (const name of ['Disabled', 'Disabled, selected', 'One disabled']) expect(await css(segmentIn(page, name), 'opacity'), name).toBe('0.5')
     expect(await css(segmentIn(page, 'Live'), 'opacity')).toBe('1')
   })
@@ -188,7 +188,7 @@ for (const scheme of ['light', 'dark'] as const) {
     test.use({ forcedColors: 'active', colorScheme: scheme, reducedMotion: 'reduce' })
 
     test('the selected segment takes the system highlight, the others the page, and the track keeps its line', async ({ page }) => {
-      await page.goto(urlFor('segmented-control--states', 'light', 'ltr'))
+      await page.goto(urlFor('segmented-control--track-states', 'light', 'ltr'))
       expect(await page.evaluate(() => matchMedia('(forced-colors: active)').matches)).toBe(true)
       const canvas = FORCED_CANVAS[scheme]
       const highlight = rgbOf(await resolve(page, 'Highlight'))
@@ -204,7 +204,7 @@ for (const scheme of ['light', 'dark'] as const) {
 
     // SEGMENTED-1: painted on a canvas and read back, so the test measures the colour and not its spelling.
     test('a disabled selected segment takes GrayText and Canvas, apart from a live selected one', async ({ page }) => {
-      await page.goto(urlFor('segmented-control--states', 'light', 'ltr'))
+      await page.goto(urlFor('segmented-control--track-states', 'light', 'ltr'))
       const painted = (colour: string) => page.evaluate((value) => {
         const pen = document.createElement('canvas').getContext('2d')
         if (!pen) throw new Error('no canvas')
@@ -219,7 +219,7 @@ for (const scheme of ['light', 'dark'] as const) {
     })
 
     test('invalid thickens the line to 2 px; disabled dims; no segment has an outline at rest', async ({ page }) => {
-      await page.goto(urlFor('segmented-control--states', 'light', 'ltr'))
+      await page.goto(urlFor('segmented-control--track-states', 'light', 'ltr'))
       expect(await css(page.getByRole('radiogroup', { name: 'Invalid' }), 'border-top-width')).toBe('2px')
       expect(await css(page.getByRole('radiogroup', { name: 'Read-only' }), 'border-top-width')).toBe('1px')
       for (const name of ['Disabled', 'Disabled, selected', 'One disabled']) expect(await css(segmentIn(page, name), 'opacity'), name).toBe('0.5')
@@ -286,7 +286,7 @@ test.describe('text', () => {
       await page.goto(urlFor('segmented-control--basic', 'light', direction))
       await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
       const track = page.getByRole('radiogroup')
-      expect(await shape(track)).toEqual({ track: 80, segment: [122.9, 66] })
+      expect(await shape(track)).toEqual({ track: 72, segment: [111.8, 58] })
       expect(await track.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true)
       await expectNoSidewaysScroll(page)
     })
@@ -300,7 +300,7 @@ test.describe('text', () => {
     let before = Number.NEGATIVE_INFINITY
     for (const segment of segments) {
       const box = await boxOf(segment)
-      expect(box.height).toBe(32)
+      expect(box.height).toBe(28)
       expect(box.left, 'a segment overlaps the one before').toBeGreaterThanOrEqual(before)
       before = box.right
     }
@@ -353,7 +353,7 @@ test.describe('live: the keyboard', () => {
   })
 
   test('a disabled segment is skipped by the arrows, and a disabled track is skipped by Tab', async ({ page }) => {
-    await openLive(page, 'segmented-control--states')
+    await openLive(page, 'segmented-control--track-states')
     const track = page.getByRole('radiogroup', { name: 'One disabled' })
     await page.keyboard.press('Tab')
     await page.keyboard.press('Tab')
@@ -496,13 +496,13 @@ test.describe('live: where a page puts a segmented control', () => {
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 
   for (const direction of DIRECTIONS) {
-    test(`1280 px, ${direction}: three segments are 210.9 px in every parent; seven fit except in a half-width track column`, async ({ page }) => {
+    test(`1280 px, ${direction}: three segments are 193.9 px in every parent; seven fit except in a half-width track column`, async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 800 })
       await fixture(page, { direction })
       expect(await cases(page)).toEqual([
-        ['block', 210.9, false, false], ['grid', 210.9, false, false], ['track', 210.9, true, false],
-        ['flex-col', 210.9, false, false], ['label-row', 210.9, false, false], ['flex-1', 210.9, false, false],
-        ['w-fit', 210.9, false, false], ['cell', 210.9, false, false], ['full', 1233, false, false],
+        ['block', 193.9, false, false], ['grid', 193.9, false, false], ['track', 193.9, true, false],
+        ['flex-col', 193.9, false, false], ['label-row', 193.9, false, false], ['flex-1', 193.9, false, false],
+        ['w-fit', 193.9, false, false], ['cell', 193.9, false, false], ['full', 1233, false, false],
       ])
       await expectNoSidewaysScroll(page)
     })
@@ -515,9 +515,9 @@ test.describe('live: where a page puts a segmented control', () => {
       test(`${direction}: seven segments scroll inside the track in every parent, and the page does not scroll sideways`, async ({ page }) => {
         await fixture(page, { direction })
         expect(await cases(page)).toEqual([
-          ['block', 210.9, true, false], ['grid', 210.9, true, false], ['track', 140, true, false],
-          ['flex-col', 210.9, true, false], ['label-row', 210.9, true, false], ['flex-1', 200, true, false],
-          ['w-fit', 210.9, true, false], ['cell', 210.9, true, false], ['full', 288, true, false],
+          ['block', 193.9, true, false], ['grid', 193.9, true, false], ['track', 140, true, false],
+          ['flex-col', 193.9, true, false], ['label-row', 193.9, true, false], ['flex-1', 193.9, true, false],
+          ['w-fit', 193.9, true, false], ['cell', 193.9, true, false], ['full', 288, true, false],
         ])
         const full = await page.locator('[data-case="full"] [data-track="three"] [role="radio"]').evaluateAll((all) => all.map((el) => Math.round(el.getBoundingClientRect().width * 10) / 10))
         expect(full).toEqual([92, 92, 92])
