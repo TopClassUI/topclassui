@@ -15,7 +15,7 @@ import type { ComponentEntry, ComponentsFile } from './shape.js'
 
 export interface Issue {
   slug: string
-  kind: 'content-missing' | 'content-invalid' | 'bare-root' | 'unresolved-import'
+  kind: 'content-missing' | 'content-invalid' | 'bare-root' | 'unresolved-import' | 'size-missing'
   detail: string
 }
 
@@ -23,6 +23,14 @@ export interface Collected {
   file: ComponentsFile
   dates: Record<string, string | null>
   issues: Issue[]
+}
+
+/** The own client bytes pnpm size wrote for each folder with a client.js; a server folder has none. */
+export function clientBytesOf(libraryRoot: string): Record<string, number> {
+  const file = join(libraryRoot, 'size.json')
+  if (!existsSync(file)) return {}
+  const { components } = JSON.parse(readFileSync(file, 'utf8')) as { components: Record<string, { clientBytes: number }> }
+  return Object.fromEntries(Object.entries(components).map(([slug, size]) => [slug, size.clientBytes]))
 }
 
 const placeOf = (slug: string) => {
@@ -43,6 +51,7 @@ export async function collect(contentDir: string, exportsMap: ExportsMap, repoRo
   const issues: Issue[] = []
   const components: ComponentEntry[] = []
   const dates: Record<string, string | null> = {}
+  const sizes = clientBytesOf(LIBRARY)
 
   for (const slug of folders) {
     const dir = join(COMPONENTS, slug)
@@ -50,6 +59,8 @@ export async function collect(contentDir: string, exportsMap: ExportsMap, repoRo
     const json = await jsonSchemaOf(dir)
     const demoNames = demoNamesOf(dir)
     const place = placeOf(slug)
+    const clientBytes = meta.rendering === 'server' ? null : (sizes[slug] ?? null)
+    if (meta.rendering !== 'server' && clientBytes === null) issues.push({ slug, kind: 'size-missing', detail: 'size.json has no number for it: run pnpm build && pnpm size' })
 
     let content: ComponentContent | null = null
     if (place.page) {
@@ -78,6 +89,7 @@ export async function collect(contentDir: string, exportsMap: ExportsMap, repoRo
       tier: meta.tier,
       category: meta.category,
       baseUi: meta.baseUi,
+      clientBytes,
       ...place,
       files: {
         client: existsSync(join(dir, 'client.tsx')),
