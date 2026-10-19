@@ -5,6 +5,6 @@ import type { ComponentPropsWithRef } from 'react'
 export interface KbdProps extends ComponentPropsWithRef<'kbd'> {
   /** The key is held down: the cap drops from the raised surface to the surface below it. */
   pressed?: boolean | undefined
-  /** The key does nothing here: the whole cap at half strength. */
+  /** The key does nothing here: muted text on the surface with the decorative line, still 4.5:1. */
   disabled?: boolean | undefined
 }

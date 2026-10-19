@@ -1,3 +1,4 @@
+import { en } from '#shared/labels/en.js'
 import { CodeBlock } from '../index.js'
 
 const CODE = `export default async function Page() {
@@ -18,7 +19,7 @@ export default function Demo() {
         <CodeBlock lang="tsx" title="columns.ts" wrap>{LONG}</CodeBlock>
       </div>
       <div role="group" aria-label="no header">
-        <CodeBlock lang="sh" showCopy={false}>{'pnpm add topclassui zod'}</CodeBlock>
+        <CodeBlock lang="sh" showCopy={false} labels={{ ...en, common: { ...en.common, code: 'Install command' } }}>{'pnpm add topclassui zod'}</CodeBlock>
       </div>
       <div role="group" aria-label="no copy button">
         <CodeBlock lang="tsx" title="app/reports/page.tsx" showCopy={false}>{CODE}</CodeBlock>
