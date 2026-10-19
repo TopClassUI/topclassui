@@ -58,7 +58,7 @@ export default async function Home({ params }: { params: Params }) {
           ...(GITHUB_URL === null ? {} : { codeRepository: GITHUB_URL }),
         }}
       />
-      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-(--docs-home) overflow-x-clip px-4 pb-16 outline-none md:px-6 xl:px-0">
+      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-(--docs-home) px-4 pb-16 outline-none md:px-6 xl:px-0">
         <Hero locale={locale} labels={labels} />
         <div className="pt-16 pb-24">
           <ProductFrame locale={locale} labels={labels} />

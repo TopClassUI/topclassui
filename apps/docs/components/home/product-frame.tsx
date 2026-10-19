@@ -84,9 +84,9 @@ export function ProductFrame({ locale, labels }: { locale: Locale; labels: SiteL
             sort={{ key: 'component', direction: 'ascending' }}
             columns={[
               { key: 'component', header: frame.columns.component, rowHeader: true, cell: (row) => <code dir="ltr" className="font-mono text-xs">{row.slug}</code> },
-              { key: 'kind', header: <Sortable label={frame.columns.kind} />, cell: (row) => <Badge tone={KIND_TONE[row.rendering]} size="xs">{frame.kinds[row.rendering]}</Badge> },
+              { key: 'name', header: <Sortable label={frame.columns.name} />, className: 'font-medium', cell: (row) => row.name },
               { key: 'js', header: <Sortable label={frame.columns.js} />, className: 'max-md:hidden', cell: (row) => <bdi>{row.clientBytes === null ? ZERO_KB : kbOf(row.clientBytes)}</bdi> },
-              { key: 'status', header: <Sortable label={frame.columns.status} />, className: 'max-md:hidden', cell: () => frame.beta },
+              { key: 'status', header: <Sortable label={frame.columns.status} />, cell: (row) => <Badge tone={KIND_TONE[row.rendering]} size="xs">{frame.kinds[row.rendering]}</Badge> },
               { key: 'updated', header: <Sortable label={frame.columns.updated} />, className: 'text-muted max-md:hidden', cell: (row) => monthOf(componentDate(row.slug), locale) },
               { key: 'actions', header: <span className="sr-only">{frame.columns.actions}</span>, align: 'end', className: 'text-muted', cell: () => <Icon name="dots-three" /> },
             ]}
