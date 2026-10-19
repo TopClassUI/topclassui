@@ -28,21 +28,58 @@
   /* Home's glows: a token mixed toward transparent, so they turn with the theme (docs-site page 1). */
   .docs-glow {
     position: absolute;
-    inset: -10rem 0 auto;
+    inset: -7.5rem -6rem auto;
     block-size: 56rem;
     z-index: -1;
     pointer-events: none;
-    background: radial-gradient(closest-side, color-mix(in oklch, var(--tc-primary-solid) 35%, transparent), transparent);
+    background: radial-gradient(50% 50% at 50% 50%, color-mix(in oklch, var(--tc-primary-solid) 30%, transparent), transparent);
   }
 
-  .docs-number {
-    background: radial-gradient(circle at 50% 0%, color-mix(in oklch, var(--docs-number-tone) 14%, transparent), transparent 70%);
+  /* The product frame: a primary line and the drawn blue halo under a deep drop. */
+  .docs-frame {
+    border: var(--tc-line-width) solid var(--tc-primary-on-soft);
+    box-shadow: 0 30px 60px -10px color-mix(in oklch, var(--tc-overlay) 60%, transparent), 0 0 90px 6px color-mix(in oklch, var(--tc-primary-solid) 35%, transparent);
   }
 
-  .docs-number-primary { --docs-number-tone: var(--tc-primary-solid); }
-  .docs-number-info { --docs-number-tone: var(--tc-info-solid); }
-  .docs-number-success { --docs-number-tone: var(--tc-success-solid); }
-  .docs-number-warning { --docs-number-tone: var(--tc-warning-solid); }
+  /* Numbers, Follow us and What you need: a card that darkens toward its foot, lifted by a soft drop. */
+  .docs-lift {
+    background-image: linear-gradient(to bottom, transparent, color-mix(in oklch, var(--tc-page) 40%, transparent));
+    box-shadow: 0 20px 40px -14px color-mix(in oklch, var(--tc-overlay) 60%, transparent), inset 0 -3px 8px color-mix(in oklch, var(--tc-overlay) 60%, transparent);
+  }
+
+  .docs-tile {
+    background-image: linear-gradient(to bottom, transparent, color-mix(in oklch, var(--tc-page) 28%, transparent));
+    box-shadow: 0 12px 24px -8px color-mix(in oklch, var(--tc-overlay) 70%, transparent), inset 0 -3px 5px color-mix(in oklch, var(--tc-overlay) 70%, transparent);
+  }
+
+  .docs-number { background-color: var(--tc-surface); }
+
+  .docs-number-glow {
+    position: absolute;
+    inset-inline-start: -5rem;
+    inset-block-start: -5.75rem;
+    inline-size: 13.75rem;
+    block-size: 13.75rem;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, color-mix(in oklch, var(--docs-number-tone) 80%, transparent), transparent);
+  }
+
+  .docs-number-value {
+    background: linear-gradient(to bottom, var(--tc-body), var(--docs-number-text));
+    background-clip: text;
+    color: transparent;
+  }
+
+  @media (forced-colors: active) {
+    .docs-number-value { color: CanvasText; background: none; }
+  }
+
+  .docs-number-primary { --docs-number-tone: var(--tc-primary-solid); --docs-number-text: var(--tc-primary-on-soft); }
+  .docs-number-info { --docs-number-tone: var(--tc-info-solid); --docs-number-text: var(--tc-info-on-soft); }
+  .docs-number-success { --docs-number-tone: var(--tc-success-solid); --docs-number-text: var(--tc-success-on-soft); }
+  .docs-number-warning { --docs-number-tone: var(--tc-warning-solid); --docs-number-text: var(--tc-warning-on-soft); }
 }
 
 @layer components {
@@ -59,9 +96,158 @@
   }
 }
 
+/* Utilities, not components: these restyle CodeBlock's own utility classes, so they must sit in the same layer and win on specificity. */
+@layer utilities {
+  /* A guide page's fence sits on the page, as the docs frames draw it: CodeBlock's solid pair becomes the page's own. */
+  .docs-code {
+    --tc-neutral-solid: var(--tc-page);
+    --tc-neutral-on-solid: var(--tc-body);
+    border: var(--tc-line-width) solid var(--tc-line);
+    overflow: hidden;
+  }
+
+  .docs-code > div {
+    background: var(--tc-surface);
+    border-block-end: var(--tc-line-width) solid var(--tc-line);
+  }
+
+  .docs-code > pre {
+    padding-block-start: 0.875rem;
+    font-size: var(--text-xs);
+    line-height: var(--text-sm--line-height);
+  }
+
+  /* On the page the colours follow the page, not the opposite theme. */
+  [data-theme='dark'] .docs-code .shiki span { color: var(--tc-code-on-dark); }
+  [data-theme='light'] .docs-code .shiki span,
+  [data-theme='ocean'] .docs-code .shiki span { color: var(--tc-code-on-light); }
+
+  /* Inside the tab card the tab names the code: the header keeps only its copy button, at the inline end. */
+  .docs-tabbed .docs-code {
+    border: 0;
+    border-radius: 0;
+  }
+
+  .docs-tabbed .docs-code > div {
+    position: absolute;
+    inset-block-start: 0.375rem;
+    inset-inline-end: 0.5rem;
+    padding: 0;
+    background: none;
+    border: 0;
+  }
+
+  .docs-tabbed .docs-code > div > span {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .docs-tabbed .docs-code > pre {
+    padding-inline-end: 3rem;
+  }
+
+  /* Wrong and Right carry their name above the box and a tone edge instead of a header. */
+  .docs-bare > div { display: none; }
+  .docs-bare.docs-code { border-color: var(--docs-edge); }
+  .docs-wrong { --docs-edge: var(--tc-danger-on-soft); }
+  .docs-right { --docs-edge: var(--tc-success-on-soft); }
+}
+
 @layer components {
   /* CodeBlock is dark on a light page and light on a dark one, so each token takes the colour of the opposite theme (S3). */
   [data-code-token] {
     color: light-dark(var(--tc-code-on-light), var(--tc-code-on-dark));
+  }
+}
+
+/* Site motion: every time multiplies by --tc-motion and every distance by it too, so reduced motion is static; nothing runs past 300 ms. */
+@property --docs-count {
+  syntax: '<integer>';
+  inherits: false;
+  initial-value: 0;
+}
+
+@keyframes docs-reveal {
+  from { opacity: calc(1 - var(--tc-motion)); translate: 0 calc(1.5rem * var(--tc-motion)); }
+}
+
+@keyframes docs-glow-in {
+  from { opacity: 0; scale: 0.96; }
+}
+
+@keyframes docs-glow-drift {
+  to { translate: calc(3rem * var(--tc-dir) * var(--tc-motion)) calc(5rem * var(--tc-motion)); }
+}
+
+@keyframes docs-count-run {
+  from { --docs-count: 0; opacity: 1; }
+  99% { opacity: 1; }
+  to { --docs-count: var(--docs-count-to); opacity: 0; }
+}
+
+@keyframes docs-count-final {
+  from, to { opacity: 0; }
+}
+
+@keyframes docs-tick {
+  from { opacity: 0; scale: 0.5; }
+}
+
+@layer components {
+  .docs-glow { animation: docs-glow-in var(--tc-duration-slow) ease-out both; }
+
+  /* A card or chip rises a little under a mouse; touch never hovers, so it never sticks. */
+  .docs-hover-lift { transition: translate var(--tc-duration-base) ease-out; }
+
+  @media (hover: hover) {
+    .docs-hover-lift:hover { translate: 0 calc(-0.25rem * var(--tc-motion)); }
+  }
+
+  /* Without view() the watcher holds a block below the fold here until it scrolls in. */
+  [data-motion='reveal'] { transition: opacity var(--tc-duration-slow) ease-out, translate var(--tc-duration-slow) ease-out; }
+  [data-motion='reveal'][data-motion-wait] { opacity: 0; translate: 0 calc(1.5rem * var(--tc-motion)); }
+
+  /* Children step in one after another, at most 120 ms apart from the first, so the last ends by 300 ms. */
+  [data-motion='stagger'] { --docs-step: 3ms; --docs-rise: 0.5rem; }
+  [data-motion='stagger'].docs-cross-fade { --docs-step: 60ms; --docs-rise: 0rem; }
+  [data-motion='stagger'] > * {
+    transition: opacity calc(180ms * var(--tc-motion)) ease-out, translate calc(180ms * var(--tc-motion)) ease-out;
+    transition-delay: 0s;
+    transition-delay: calc(min((sibling-index() - 1) * var(--docs-step), 120ms) * var(--tc-motion));
+  }
+  [data-motion='stagger'][data-motion-wait] > * { opacity: 0; translate: 0 calc(var(--docs-rise) * var(--tc-motion)); }
+
+  /* Numbers: the real value stays in the page for screen readers and paints again when the run ends. */
+  .docs-count-run { counter-reset: docs-count var(--docs-count); }
+  [data-motion-play] .docs-count-run[data-count] { animation: docs-count-run var(--tc-duration-slow) ease-out both; }
+  [data-motion-play] .docs-count-run[data-count]::after {
+    content: counter(docs-count) / '';
+    background: inherit;
+    background-clip: text;
+  }
+  [data-motion-play] .docs-count-run[data-count] + .docs-count-final { animation: docs-count-final var(--tc-duration-slow) backwards; }
+
+  .docs-tick { animation: docs-tick var(--tc-duration-base) ease-out; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      [data-motion='reveal'] {
+        animation: docs-reveal linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 60%;
+      }
+    }
+
+    @supports (animation-timeline: scroll()) {
+      .docs-glow {
+        animation: docs-glow-in var(--tc-duration-slow) ease-out both, docs-glow-drift linear both;
+        animation-timeline: auto, scroll(root);
+        animation-range: normal, 0 100vh;
+      }
+    }
   }
 }

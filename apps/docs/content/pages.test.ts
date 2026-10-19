@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { LIVE_GUIDES, LIVE_PAGES, PAGES, hrefOf, nextPage } from './pages.js'
+import { LIVE_GUIDES, LIVE_PAGES, PAGES, hrefOf, nextPage, previousPage } from './pages.js'
 
 describe('the page registry', () => {
   it('holds each slug and each path once', () => {
@@ -17,14 +17,15 @@ describe('the page registry', () => {
     }
   })
 
-  it('routes Home, the four getting-started pages, the foundation pages, the catalog and the changelog today', () => {
-    expect(LIVE_PAGES.map((page) => page.slug)).toEqual(['home', 'installation', 'css', 'provider', 'first-component', 'colors', 'icons', 'theming', 'rtl', 'server-first', 'accessibility', 'components', 'changelog'])
-    expect(LIVE_GUIDES.map((page) => page.slug)).toEqual(['installation', 'css', 'provider', 'first-component', 'colors', 'icons', 'theming', 'rtl', 'server-first', 'accessibility'])
+  it('routes Home, the five getting-started pages, the foundation pages, the catalog and the changelog today', () => {
+    expect(LIVE_PAGES.map((page) => page.slug)).toEqual(['home', 'installation', 'cli', 'css', 'provider', 'first-component', 'colors', 'icons', 'theming', 'rtl', 'server-first', 'accessibility', 'components', 'changelog'])
+    expect(LIVE_GUIDES.map((page) => page.slug)).toEqual(['installation', 'cli', 'css', 'provider', 'first-component', 'colors', 'icons', 'theming', 'rtl', 'server-first', 'accessibility'])
   })
 
-  it('derives next from the live order, skipping a later page, and stops after the last', () => {
+  it('derives next from the live order and stops after the last', () => {
     expect(nextPage('home')?.slug).toBe('installation')
-    expect(nextPage('installation')?.slug).toBe('css')
+    expect(nextPage('installation')?.slug).toBe('cli')
+    expect(nextPage('cli')?.slug).toBe('css')
     expect(nextPage('css')?.slug).toBe('provider')
     expect(nextPage('provider')?.slug).toBe('first-component')
     expect(nextPage('first-component')?.slug).toBe('colors')
@@ -36,5 +37,14 @@ describe('the page registry', () => {
   it('builds the route under the locale', () => {
     expect(hrefOf({ path: '/' }, 'ar')).toBe('/ar')
     expect(hrefOf({ path: '/docs/css' }, 'en')).toBe('/en/docs/css')
+  })
+
+  it('derives previous from the live order, skipping a later page, and has none before Home', () => {
+    expect(previousPage('home')).toBeUndefined()
+    expect(previousPage('installation')?.slug).toBe('home')
+    expect(previousPage('css')?.slug).toBe('installation')
+    expect(previousPage('colors')?.slug).toBe('first-component')
+    expect(previousPage('changelog')?.slug).toBe('components')
+    expect(previousPage('cli')).toBeUndefined()
   })
 })

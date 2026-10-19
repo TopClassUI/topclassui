@@ -42,7 +42,8 @@ export function MdxTable({ children, locale }: { children?: ReactNode; locale: L
         key: String(column),
         header: cell,
         rowHeader: column === 0,
-        className: 'whitespace-normal',
+        // A floor per column, so a phone scrolls the table inside itself instead of stacking one word per line.
+        className: column === header.length - 1 ? 'whitespace-normal min-w-60' : 'whitespace-normal min-w-32',
         cell: (item: Row) => item.cells[column],
       }))}
     />

@@ -5,3 +5,4 @@ import { island } from '../lazy-island'
 
 export const VoidIsland = island(() => import('./void-island').then((m) => m.VoidIsland))
 export const Switch = island(() => import('topclassui/switch').then((m) => m.Switch))
+export const CopyButton = island(() => import('../copy-button').then((m) => m.CopyButton))

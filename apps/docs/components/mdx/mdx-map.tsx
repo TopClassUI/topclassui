@@ -3,6 +3,7 @@ import type { MDXComponents } from 'mdx/types'
 import type { ComponentProps } from 'react'
 
 import type { Locale } from '../../content/pages'
+import { EXTERNAL_REL, isExternal } from '../../lib/external'
 import { labelsFor } from '../../labels/index'
 import { INLINE_CODE, TEXT_LINK } from '../classes'
 import { Callout } from './callout'
@@ -14,6 +15,7 @@ import { MdxTable } from './mdx-table'
 import { PackageManagers } from './package-managers'
 import { PeerRange } from './peer-range'
 import { PropsTable } from './props-table'
+import { Steps } from './steps'
 import { ThemeScriptCsp } from './theme-script-csp'
 import { ThemeScriptHtml } from './theme-script-html'
 import { ThemeUtilities } from './theme-utilities'
@@ -26,14 +28,14 @@ export function mdxComponents(locale: Locale): MDXComponents {
   return {
     h2: ({ children }) => <Heading anchorLabel={labels.shell.anchor}>{children}</Heading>,
     h3: ({ children }) => <h3 className="text-lg font-semibold text-body">{children}</h3>,
-    p: ({ children }) => <p className="text-base text-body">{children}</p>,
+    p: ({ children }) => <p className="text-base text-muted">{children}</p>,
     ul: ({ children }) => <ul className="flex list-disc flex-col gap-1 ps-6 text-base text-body">{children}</ul>,
-    ol: ({ children }) => <ol className="flex list-decimal flex-col gap-1 ps-6 text-base text-body">{children}</ol>,
+    ol: ({ children }) => <Steps>{children}</Steps>,
     code: ({ children }) => <code dir="ltr" className={INLINE_CODE}>{children}</code>,
     pre: ({ children }) => <CodeFence locale={locale} terminal={terminal} repeat={labels.blocks.repeat}>{children}</CodeFence>,
     table: ({ children }) => <MdxTable locale={locale}>{children}</MdxTable>,
     a: ({ href = '', children }: ComponentProps<'a'>) =>
-      href.startsWith('/') ? <Link href={href} className={TEXT_LINK}>{children}</Link> : <a href={href} className={TEXT_LINK}>{children}</a>,
+      href.startsWith('/') ? <Link href={href} className={TEXT_LINK}>{children}</Link> : <a href={href} rel={isExternal(href) ? EXTERNAL_REL : undefined} className={TEXT_LINK}>{children}</a>,
     Callout,
     Cards,
     Card,

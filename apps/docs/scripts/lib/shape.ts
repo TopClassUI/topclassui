@@ -44,6 +44,7 @@ export const componentSchema = z.strictObject({
   tier: z.number().int().min(1).max(4),
   category: z.string().min(1),
   baseUi: z.string().nullable(),
+  clientBytes: z.number().int().min(0).nullable(),
   section: z.enum(sectionIds).nullable(),
   order: z.number().int().min(0).nullable(),
   card: z.boolean(),

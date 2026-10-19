@@ -9,6 +9,13 @@ import {
 
 // The static harness never opens a popup, so none of these classes reaches Tailwind there.
 const DECLARATION: Record<string, string> = {
+  // POINTER: the hand, and the arrow back on a control that cannot be pressed.
+  'cursor-pointer': 'cursor: pointer;',
+  'disabled:cursor-default': 'cursor: default;',
+  'aria-disabled:cursor-default': 'cursor: default;',
+  'data-disabled:cursor-default': 'cursor: default;',
+  'data-readonly:cursor-default': 'cursor: default;',
+  'data-loading:cursor-default': 'cursor: default;',
   // The scrim and the viewport.
   'fixed': 'position: fixed;',
   'inset-0': 'inset: 0px;',
@@ -130,7 +137,7 @@ describe('every class a sheet wears at any edge compiles with the installed Tail
       DRAWER_HEADER, DRAWER_TITLE, DRAWER_DESCRIPTION, DRAWER_BODY_SHORT, DRAWER_BODY, DRAWER_FOOTER, DRAWER_CLOSE,
     ]).filter((cls) => cls !== '' && !elsewhere.has(cls))
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(65)
+    expect(all).toHaveLength(71)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

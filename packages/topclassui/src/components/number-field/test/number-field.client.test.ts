@@ -133,7 +133,7 @@ describe('classes.ts builds every string from the shared field constants (R-5.2-
   it('takes the holder, the surface, the rings, the floors, the hover and the invalid line from src/shared', () => {
     expect(importedNames(read('classes.ts'), '#shared/classes.js')).toEqual([
       'DISABLED', 'FIELD_HOLDER', 'FIELD_INVALID_WITHIN', 'FIELD_SURFACE', 'FOCUS_RING_INSET', 'FOCUS_RING_WITHIN', 'HOVER',
-      'TARGET_HEIGHT', 'TOUCH_TARGET', 'TRANSITION',
+      'POINTER', 'TARGET_HEIGHT', 'TOUCH_TARGET', 'TRANSITION',
     ])
   })
 

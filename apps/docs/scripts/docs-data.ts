@@ -39,10 +39,18 @@ for (const locale of LOCALES) {
   if (own !== undefined) toc[locale]['changelog'] = uniqueIds([...releaseToc(changelog), ...own])
 }
 const pageNames = [...new Set(LOCALES.flatMap((locale) => Object.keys(toc[locale])))].sort()
-const pageDates = Object.fromEntries(pageNames.map((page) => [
+const pageDates: Record<string, string | null> = Object.fromEntries(pageNames.map((page) => [
   page,
   newestOf([lastCommitDate(LOCALES.map((locale) => join(CONTENT, locale, `${page}.mdx`)), REPO)]),
 ]))
+// Home and the catalog have no MDX: Home dates from its route, sections and copy, the catalog also from every card it previews.
+const SITE = join(APP, 'app', '(site)', '[locale]')
+const copy = [join(APP, 'labels', 'en.ts'), join(APP, 'labels', 'ar.ts')]
+pageDates['home'] = lastCommitDate([join(SITE, 'page.tsx'), join(APP, 'components', 'home'), ...copy], REPO)
+pageDates['components'] = newestOf([
+  lastCommitDate([join(SITE, 'docs', 'components', 'page.tsx'), join(APP, 'components', 'catalog'), join(CONTENT, 'sections.ts'), ...copy], REPO),
+  ...Object.values(dates),
+])
 const demoKeys = file.components.flatMap((entry) => entry.demos.map((demo) => ({ slug: entry.slug, name: demo.name })))
 const demos = demoMapSource(demoKeys)
 const kinds = demoKeys.map((demo) => demoKindOf(join(COMPONENTS, demo.slug, 'dummy', `${demo.name}.tsx`)))

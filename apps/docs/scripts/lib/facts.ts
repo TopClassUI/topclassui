@@ -43,6 +43,7 @@ export function libraryFacts(root = LIBRARY): LibraryFacts {
   }
   const byMode = (token: string) => Object.fromEntries(MODES.map((mode) => [mode, read(token, mode)])) as LibraryFacts['page']
   const demos = findDemos(root).length
+  const budget = JSON.parse(readFileSync(join(root, 'size-budget.json'), 'utf8')) as { kb: { overlay: number }; components: Record<string, unknown> }
   return {
     page: byMode('--tc-page'),
     codeSurface: byMode('--tc-neutral-solid'),
@@ -54,5 +55,6 @@ export function libraryFacts(root = LIBRARY): LibraryFacts {
       pages: demos * MODES.length * DIRECTIONS.length,
       contrastPairs: checkTokens(css, palette).pairs,
     },
+    sizeBudget: JSON.stringify({ kb: { overlay: budget.kb.overlay }, components: { dialog: budget.components['dialog'] } }, null, 2),
   }
 }

@@ -5,6 +5,7 @@ import type { Locale } from '../../content/pages'
 import { highlight } from '../../lib/highlight'
 import { INSTALL_LINE } from '../../lib/site'
 import { CodeTabs } from './mdx-islands'
+import { DOCS_CODE } from '../classes'
 
 /** The four install lines, each written from the one install constant (docs-site S3, S8). */
 export function installLines(line = INSTALL_LINE) {
@@ -23,7 +24,7 @@ export async function PackageManagers({ locale, label }: { locale: Locale; label
   const tabs = lines.map((entry, index) => ({
     name: entry.manager,
     value: entry.manager,
-    panel: <CodeBlock {...getLabels(locale)} lang="bash" title={entry.manager} highlighted={highlighted[index] ?? undefined}>{entry.line}</CodeBlock>,
+    panel: <CodeBlock className={DOCS_CODE} {...getLabels(locale)} lang="bash" title={entry.manager} highlighted={highlighted[index] ?? undefined}>{entry.line}</CodeBlock>,
   }))
   return <CodeTabs label={label} tabs={tabs} />
 }

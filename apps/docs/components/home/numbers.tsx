@@ -5,9 +5,12 @@ import type { SiteLabels } from '../../labels'
 import { CARDS, FACTS } from '../../lib/data'
 import { ZERO_KB } from '../../lib/site'
 
+/** A whole number counts up from 0 as the card scrolls in; 0 KB stays as it is. */
+const COUNTABLE = /^[1-9]\d*$/
+
 const GLOWS = ['docs-number-primary', 'docs-number-info', 'docs-number-success', 'docs-number-warning'] as const
 
-/** Four numbers, each read from the package or the generated data, never typed. */
+/** Four numbers, each read from the package or the generated data, never typed; each card glows in its own tone. */
 export function Numbers({ labels }: { labels: SiteLabels }) {
   const text = labels.home.numbers
   const items = [
@@ -17,10 +20,14 @@ export function Numbers({ labels }: { labels: SiteLabels }) {
     { value: ZERO_KB, label: text.zero },
   ]
   return (
-    <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <ul data-motion="count" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {items.map((item, index) => (
-        <li key={item.label} className={`docs-number ${GLOWS[index] ?? ''} flex flex-col gap-2 rounded-box bg-surface p-6 ${BORDER}`}>
-          <span className="text-5xl font-semibold text-body"><bdi>{item.value}</bdi></span>
+        <li key={item.label} className={`docs-number docs-lift docs-hover-lift ${GLOWS[index] ?? ''} relative isolate flex min-h-48 flex-col gap-2.5 overflow-hidden rounded-box px-6.5 py-7 text-start ${BORDER}`}>
+          <span aria-hidden="true" className="docs-number-glow" />
+          <span className="grid text-6xl font-semibold">
+            <span aria-hidden="true" data-count={COUNTABLE.test(item.value) ? item.value : undefined} className="docs-number-value docs-count-run col-start-1 row-start-1" />
+            <bdi className="docs-number-value docs-count-final col-start-1 row-start-1">{item.value}</bdi>
+          </span>
           <span className="text-sm text-muted">{item.label}</span>
         </li>
       ))}

@@ -16,6 +16,10 @@ export interface SiteLabels {
     siteName: string
     homeTitle: string
     guideTitle: (title: string) => string
+    /** Tails a component's lead may take to reach 120 to 160 characters, shortest first; the longest that fits is used. */
+    componentTails: readonly string[]
+    /** The og:image:alt of a page's card. */
+    ogAlt: (title: string) => string
     notFoundTitle: string
   }
   shell: {
@@ -26,10 +30,16 @@ export interface SiteLabels {
     sidebarTitle: string
     onThisPage: string
     next: string
+    previous: string
+    /** The nav holding the Previous and Next cards. */
+    pager: string
     home: string
     breadcrumb: string
     menu: string
+    /** The navbar's first link, short: "Docs". */
+    docs: string
     github: string
+    youtube: string
     groups: Record<PageGroup, string>
     anchor: (heading: string) => string
   }
@@ -44,6 +54,10 @@ export interface SiteLabels {
     columns: Record<PageGroup, string>
     bottom: string
     install: string
+    llms: string
+    social: string
+    cli: string
+    all: (components: number) => string
   }
   blocks: {
     wrong: string
@@ -82,11 +96,12 @@ export interface SiteLabels {
       search: string
       filter: string
       add: string
-      columns: { component: string; kind: string; js: string; status: string; updated: string }
+      columns: { component: string; kind: string; js: string; status: string; updated: string; actions: string }
       kinds: Record<Rendering, string>
-      notMeasured: string
       beta: string
       showing: (from: number, to: number, total: number) => string
+      perPage: (rows: number) => string
+      toast: { title: string; body: string; close: string }
     }
     proof: Titled & {
       server: {
@@ -105,17 +120,21 @@ export interface SiteLabels {
         border: string
         onServer: string
         inBrowser: string
-        notMeasured: string
+        inBrowserSize: (size: string) => string
+        checkTitle: string
+        checkNote: string
         tree: string
-        treeSummary: (server: number, client: number) => string
+        treeServer: (server: number) => string
+        treeClient: (client: number) => string
       }
       rtl: {
         title: string
         lead: string
-        grid: string
+        grid: (pages: number) => string
         gridNote: (modes: number, directions: number) => string
         note: string
         sample: string
+        checked: string
       }
       tested: {
         title: string
@@ -147,10 +166,14 @@ export interface SiteLabels {
       open: string
       badges: Record<Rendering, string>
     }
+    follow: Titled & {
+      github: Social
+      youtube: Social
+      x: Social
+    }
     install: Titled & {
-      card: string
-      note: string
-      once: string
+      copy: { title: string; note: string }
+      import: { title: string; note: string }
     }
     need: Titled & {
       next: { name: string; line: string }
@@ -169,7 +192,6 @@ export interface SiteLabels {
 export interface CatalogLabels {
   title: string
   lead: (count: number) => string
-  metaTitle: string
   description: string
   beforeTitle: string
   beforeOnce: string
@@ -185,6 +207,8 @@ export interface CatalogLabels {
   installHeading: string
 }
 
+interface Social { name: string; line: string; action: string }
+
 interface StepLabels { title: string; note: string }
 
 export interface SearchLabels {
@@ -196,4 +220,4 @@ export interface SearchLabels {
   shortcut: { pc: string; mac: string }
 }
 
-export interface LlmsLabels { summary: string; docs: string; components: string }
+export interface LlmsLabels { summary: string; docs: string; components: string; keyboard: string; accessibility: string; rtl: string }
