@@ -12,7 +12,7 @@ import { Demo } from '../demo'
 import { InlineText } from '../inline-text'
 import { TopClassProvider } from '../shell/provider-island'
 import { DENSITY, KNOB_DEFAULTS, RADIUS } from './knob-values'
-import { ExampleKnobs } from './page-islands'
+import { ExampleKnobs, ExampleStage } from './page-islands'
 
 const EXAMPLES_ID = 'examples-grid'
 
@@ -50,9 +50,11 @@ function Example({ entry, name, locale, action }: { entry: PagedComponent; name:
         {rtl ? <p data-example-name={name} className={CAPTION}>{t.rtlDemo}</p> : <p data-example-name={name} dir="ltr" className={`${CAPTION} text-start font-mono`}>{name}</p>}
       </div>
       <div data-example-stage="" className={`${STAGE} min-h-40 border-t-(length:--tc-line-width) border-line`}>
-        {rtl
-          ? <div dir="rtl" lang="ar" className="min-w-0"><TopClassProvider direction="rtl" locale="ar">{demo}</TopClassProvider></div>
-          : demo}
+        <ExampleStage
+          stage={rtl
+            ? <div dir="rtl" lang="ar" className="min-w-0"><TopClassProvider direction="rtl" locale="ar">{demo}</TopClassProvider></div>
+            : demo}
+        />
       </div>
       <div className={CODE_PART}>
         <div className={PART_ROW}>

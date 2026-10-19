@@ -65,7 +65,7 @@ test('every live example on a Forms page is hydrated by React', async ({ page })
       const end = section.getBoundingClientRect().bottom + window.scrollY
       for (let y = section.getBoundingClientRect().top + window.scrollY; y < end; y += window.innerHeight) {
         window.scrollTo({ top: y, behavior: 'instant' })
-        await new Promise((resolve) => setTimeout(resolve, 50))
+        await new Promise((resolve) => setTimeout(resolve, 150))
       }
     })
     await page.waitForLoadState('networkidle')

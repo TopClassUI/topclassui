@@ -96,8 +96,8 @@ test('Toast: the playground sets the options of the toast the press adds', async
   await toast.getByRole('textbox', { name: 'duration' }).fill('0')
   await toast.getByRole('textbox', { name: 'duration' }).blur()
   await toast.getByRole('button', { name: 'Show a toast' }).click()
-  // The stage holds a toast of its own at rest, so the one the press added is the last.
-  const shown = page.getByRole('alertdialog', { name: 'Project created' }).last()
+  // The stage holds a toast of its own at rest; the one the press added is in the page's viewport, outside the card.
+  const shown = page.locator('[role="alertdialog"]:not([data-component="toast"] *)', { hasText: 'Project created' })
   await expect(shown).toBeVisible()
   await expect(shown).toHaveAttribute('data-type', 'danger')
   // toast is a function, not a tag, so the code is the stage's source rather than a usage the values are written into.
@@ -114,7 +114,7 @@ test('a live example hydrates: a toast from the examples shows and closes', asyn
   const examples = page.locator('section[aria-labelledby="examples"]')
   await examples.getByRole('button').first().scrollIntoViewIfNeeded()
   await examples.getByRole('button').first().click()
-  const shown = page.locator('[data-type][aria-modal]')
+  const shown = page.locator('[data-type][aria-modal]:not([data-component="toast"] *)')
   await expect(shown).toHaveCount(1)
   await shown.getByRole('button', { name: 'إغلاق هذا الإشعار' }).click()
   await expect(shown).toHaveCount(0)
