@@ -1,6 +1,6 @@
 // R-5.12-4: one class string per element Tabs styles, built from the shared constants.
 import {
-  CONTAIN, FOCUS_RING, FOCUS_RING_INSET, FORCED_EDGE, SCROLL_X, TOUCH_TARGET, TRANSITION,
+  CONTAIN, FOCUS_RING, FOCUS_RING_INSET, FORCED_EDGE, POINTER, SCROLL_X, TOUCH_TARGET, TRANSITION,
 } from '#shared/classes.js'
 import type { TabsVariant } from './types.js'
 
@@ -42,6 +42,7 @@ const TAB = [
   'data-active:font-semibold data-active:text-body',
   CONTAIN,
   FOCUS_RING_INSET,
+  POINTER,
   TOUCH_TARGET,
   TRANSITION,
   TABS_TAB_DISABLED,

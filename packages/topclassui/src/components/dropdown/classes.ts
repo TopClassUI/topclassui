@@ -38,7 +38,7 @@ export const DROPDOWN_ITEM = [
   ROW_HIGHLIGHT,
   DROPDOWN_ITEM_DISABLED,
   CONTAIN,
-  'group shrink-0 cursor-default select-none',
+  'group shrink-0 select-none',
   ROW_TOUCH,
 ].join(' ')
 

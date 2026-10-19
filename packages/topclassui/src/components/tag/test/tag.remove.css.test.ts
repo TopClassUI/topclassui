@@ -5,6 +5,13 @@ import { REMOVABLE, REMOVABLE_END, REMOVE_SIZE, TAG_LABEL, TAG_REMOVE } from '..
 
 /** What each class of the removable tag must emit, written out: a class Tailwind does not know emits nothing at all. */
 const DECLARATION: Record<string, string> = {
+  // POINTER: the hand, and the arrow back on a control that cannot be pressed.
+  'cursor-pointer': 'cursor: pointer;',
+  'disabled:cursor-default': 'cursor: default;',
+  'aria-disabled:cursor-default': 'cursor: default;',
+  'data-disabled:cursor-default': 'cursor: default;',
+  'data-readonly:cursor-default': 'cursor: default;',
+  'data-loading:cursor-default': 'cursor: default;',
   // The chip.
   'inline-grid': 'display: inline-grid;',
   'grid-cols-[minmax(0,auto)_auto]': 'grid-template-columns: minmax(0,auto) auto;',
@@ -82,7 +89,7 @@ describe('every class of the removable tag compiles with the installed Tailwind'
   it('the table names exactly the classes of the chip, the label, the x and the two size tables', () => {
     const all = written([REMOVABLE, ...Object.values(REMOVABLE_END), TAG_LABEL, TAG_REMOVE, ...Object.values(REMOVE_SIZE)])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(39)
+    expect(all).toHaveLength(45)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {
