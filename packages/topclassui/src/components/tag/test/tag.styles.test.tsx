@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { attr, classList, markup } from '#test/markup.js'
-import { Tag } from '../index.js'
+import { Tag, tagVariants } from '../index.js'
 import { TAG_SIZES } from '../constants.js'
 import type { TagProps } from '../types.js'
 
@@ -11,10 +11,10 @@ const classes = (props: TagProps = {}) => classList(html(props))
 /** The Build this table, written out: a derived expectation would shrink with TAG_SIZE. */
 const SIZE = {
   xs: ['px-1', 'py-pad-y-xs', 'gap-1', 'text-xs'],
-  sm: ['px-2', 'py-pad-y-sm', 'gap-1.5', 'text-sm'],
-  md: ['px-3', 'py-pad-y-md', 'gap-2', 'text-sm'],
-  lg: ['px-4', 'py-pad-y-lg', 'gap-2', 'text-base'],
-  xl: ['px-5', 'py-pad-y-xl', 'gap-3', 'text-lg'],
+  sm: ['px-2', 'py-pad-y-sm', 'gap-1.5', 'text-sm/4'],
+  md: ['px-3', 'py-pad-y-md', 'gap-2', 'text-sm/4'],
+  lg: ['px-4', 'py-pad-y-lg', 'gap-2', 'text-base/5'],
+  xl: ['px-5', 'py-pad-y-xl', 'gap-3', 'text-lg/6'],
 } as const
 
 describe('size', () => {
@@ -97,7 +97,7 @@ describe('className', () => {
     expect(classes({ className: 'ms-2' }).sort()).toEqual([
       'bg-neutral-soft', 'border-(length:--tc-line-width)', 'border-transparent', 'font-medium',
       'gap-2', 'inline-flex', 'items-center', 'max-w-full', 'ms-2', 'overflow-hidden', 'px-3',
-      'py-pad-y-md', 'rounded-chip', 'shrink-0', 'text-neutral-on-soft', 'text-sm', 'whitespace-nowrap',
+      'py-pad-y-md', 'rounded-chip', 'shrink-0', 'text-neutral-on-soft', 'text-sm/4', 'whitespace-nowrap',
     ])
   })
 
@@ -116,12 +116,25 @@ describe('className', () => {
   it('lets the consumer override the type step', () => {
     const list = classes({ size: 'md', className: 'text-xs' })
     expect(list).toContain('text-xs')
-    expect(list).not.toContain('text-sm')
+    expect(list).not.toContain('text-sm/4')
   })
 
   it('lets a consumer override the fill, which is what cn() is for', () => {
     const list = classes({ className: 'bg-surface' })
     expect(list).toContain('bg-surface')
     expect(list).not.toContain('bg-neutral-soft')
+  })
+})
+
+describe('a linked tag, as Figma 135:285 draws its states', () => {
+  it('wears the tone utility, the soft hover and press tints, the ring and a pointer', () => {
+    const list = tagVariants({ tone: 'primary', interactive: true }).split(' ')
+    expect(list).toEqual(expect.arrayContaining([
+      'tone-primary', 'hover:bg-(--tc-soft-hover)', 'active:bg-(--tc-soft-active)', 'focus-visible:outline-ring', 'cursor-pointer', 'data-disabled:opacity-50',
+    ]))
+  })
+
+  it('leaves a plain tag without them', () => {
+    expect(tagVariants({ tone: 'primary' }).split(' ').filter((c) => c.startsWith('hover:') || c === 'cursor-pointer' || c.startsWith('tone-'))).toEqual([])
   })
 })
