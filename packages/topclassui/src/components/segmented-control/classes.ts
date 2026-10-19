@@ -30,7 +30,7 @@ export const SEGMENTED_ITEM = [
   'forced-colors:data-checked:data-disabled:bg-[GrayText] forced-colors:data-checked:data-disabled:text-[Canvas]',
   // R-5.2-7: an element given as the label is a flex item of its own, so it truncates as a run of text does.
   '*:min-w-0 *:truncate',
-  CONTAIN, FOCUS_RING_INSET, POINTER, TOUCH_TARGET, TRANSITION, DISABLED,
+  CONTAIN, FOCUS_RING_INSET, TOUCH_TARGET, TRANSITION, DISABLED, POINTER,
 ].join(' ')
 
 /** The inline padding and the type step of a segment; custom emits none. */

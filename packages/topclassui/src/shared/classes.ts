@@ -158,7 +158,7 @@ export const SCROLL_X = `overflow-x-auto overscroll-x-contain ${SCROLLBAR}`
 export const STICKY_TOP = 'sticky top-0 z-(--tc-z-sticky)'
 
 /** A control that holds one icon and no text: the x of an overlay, the toggle of a sidebar. */
-export const ICON_BUTTON = `inline-flex shrink-0 items-center justify-center rounded-control ${POINTER} ${TOUCH_TARGET} ${FOCUS_RING} ${TRANSITION}`
+export const ICON_BUTTON = `inline-flex shrink-0 items-center justify-center rounded-control ${TOUCH_TARGET} ${FOCUS_RING} ${TRANSITION} ${POINTER}`
 
 /** The ring drawn inside the box, for a control flush against an edge that clips it. */
 export const FOCUS_RING_INSET = 'outline-none focus-visible:outline-solid focus-visible:outline-(length:--tc-ring-width) focus-visible:-outline-offset-(length:--tc-ring-width) focus-visible:outline-ring'
@@ -190,7 +190,7 @@ export const POPUP_PASSIVE = 'pointer-events-auto'
 // Unit 4: the toggles. The element that takes the press is a group; the drawn box inside it reads the group's state.
 
 /** What takes the press: 24 px, 44 under a coarse pointer, whatever size the drawn box is. w-fit: laid straight into a grid it would fill the track. */
-export const TOGGLE_TARGET = `group/toggle relative inline-flex w-fit shrink-0 items-center justify-center outline-none ${POINTER} ${TOUCH_TARGET} ${DISABLED}`
+export const TOGGLE_TARGET = `group/toggle relative inline-flex w-fit shrink-0 ${POINTER} items-center justify-center outline-none ${TOUCH_TARGET} ${DISABLED}`
 
 /** The ring of a focused target, drawn on the box inside it. The group is named: a bare one would match an accordion trigger around it.
  * A filled box opts out of forced colours, which would keep --tc-ring at 2.4:1 on Canvas: CanvasText follows the user's palette. */

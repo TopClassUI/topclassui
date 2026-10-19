@@ -32,13 +32,13 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the shared pointer leaves the icon button',
     file: CLASSES,
-    from: 'rounded-control ${POINTER} ${TOUCH_TARGET}',
-    to: 'rounded-control ${TOUCH_TARGET}',
+    from: '${FOCUS_RING} ${TRANSITION} ${POINTER}`',
+    to: '${FOCUS_RING} ${TRANSITION}`',
   },
   {
     label: 'the shared pointer leaves the target of a toggle',
     file: CLASSES,
-    from: 'outline-none ${POINTER} ${TOUCH_TARGET} ${DISABLED}`',
-    to: 'outline-none ${TOUCH_TARGET} ${DISABLED}`',
+    from: 'w-fit shrink-0 ${POINTER} items-center',
+    to: 'w-fit shrink-0 items-center',
   },
 ]
