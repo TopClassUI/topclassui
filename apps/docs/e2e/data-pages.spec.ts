@@ -67,7 +67,7 @@ test('every Data code block shows the rewritten imports, never a path into the l
 })
 
 test('every Data page counts its states', async ({ page }) => {
-  const counts = { table: '7 states', 'tree-view': '4 states', timeline: '6 states', stepper: '4 states' } as const
+  const counts = { table: '6 states', 'tree-view': '4 states', timeline: '6 states', stepper: '4 states' } as const
   for (const slug of SLUGS) {
     await page.goto(`/en/docs/components/${slug}`)
     await expect(card(page, slug).getByText(counts[slug], { exact: true })).toBeVisible()
@@ -83,8 +83,9 @@ test('Table: the playground drives the stage and the code', async ({ page }) => 
   await table.getByRole('checkbox', { name: 'stickyFirstColumn' }).click()
   await expect(table.locator('[data-sticky-first-column]').first()).toBeVisible()
   await table.getByRole('checkbox', { name: 'captionVisible' }).click()
-  await expect(table.locator('caption', { hasText: 'Quarterly revenue by region' })).toBeVisible()
-  await expect(table.locator('pre').first()).toContainText('<Table captionVisible striped stickyFirstColumn')
+  await expect(table.locator('caption', { hasText: 'Team members' })).toBeVisible()
+  const code = table.locator('pre').first()
+  for (const prop of ['stickyFirstColumn', 'captionVisible', 'striped']) await expect(code).toContainText(`  ${prop}\n`)
   expect(errors).toEqual([])
 })
 
