@@ -9,10 +9,10 @@ const html = (className?: string) =>
 const classes = (className?: string) => classList(html(className))
 
 describe('each part wears exactly the classes the spec names', () => {
-  it('the root is a full-width centred row that wraps, 20 px inline and 12 px block, in medium at the small step', () => {
+  it('the root is a full-width centred row that wraps, 18 px inline and 11 px block as the frame draws it, in medium at the small step', () => {
     expect(classes().sort()).toEqual([
       'bg-primary-soft', 'flex', 'flex-wrap', 'font-medium', 'forced-colors:border-b-(length:--tc-line-width)',
-      'gap-3', 'items-center', 'min-w-0', 'px-5', 'py-3', 'text-primary-on-soft', 'text-sm', 'w-full', 'wrap-anywhere',
+      'gap-3', 'items-center', 'min-w-0', 'px-4.5', 'py-2.75', 'text-primary-on-soft', 'text-sm/tight', 'w-full', 'wrap-anywhere',
     ])
   })
 
@@ -60,7 +60,7 @@ describe('className is merged last, so the consumer wins every conflict', () => 
   it('replaces the padding and the gap', () => {
     const list = classes('px-0 py-1 gap-4')
     expect(list).toEqual(expect.arrayContaining(['px-0', 'py-1', 'gap-4']))
-    expect(list.filter((c) => ['px-5', 'py-3', 'gap-3'].includes(c))).toEqual([])
+    expect(list.filter((c) => ['px-4.5', 'py-2.75', 'gap-3'].includes(c))).toEqual([])
   })
 
   it('replaces the wrap, for a caller who wants one line whatever it costs', () => {
@@ -78,6 +78,6 @@ describe('className is merged last, so the consumer wins every conflict', () => 
   it('wins in bannerVariants too, the string for an element that cannot be a Banner', () => {
     const list = bannerVariants({ className: 'px-0' }).split(' ')
     expect(list).toContain('px-0')
-    expect(list).not.toContain('px-5')
+    expect(list).not.toContain('px-4.5')
   })
 })

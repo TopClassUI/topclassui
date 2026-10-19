@@ -72,7 +72,7 @@ describe('each demo shows the state its name promises', () => {
     const html = await render('middle')
     expect(pages(html)).toEqual(['1', '5', '6', '7', '12'])
     expect(html.match(/<li aria-hidden="true"/g)).toHaveLength(2)
-    expect(html).not.toContain('aria-disabled')
+    expect(html).not.toContain('aria-disabled=')
   })
 
   it('last-page: page 12 is current, and next and last are the two spans', async () => {
@@ -96,10 +96,10 @@ describe('each demo shows the state its name promises', () => {
     ])
   })
 
-  it('many-pages: 500 pages in eleven cells, between the four controls', async () => {
+  it('many-pages: 500 pages in eleven cells and the compact status, between the four controls', async () => {
     const html = await render('many-pages')
     expect(pages(html)).toEqual(['1', '2', '248', '249', '250', '251', '252', '499', '500'])
-    expect(html.match(/<li/g)).toHaveLength(15)
+    expect(html.match(/<li/g)).toHaveLength(16)
   })
 
   it('two-navs: the pager above and the one below each carry a name of their own', async () => {

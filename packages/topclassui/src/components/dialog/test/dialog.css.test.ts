@@ -9,6 +9,13 @@ import {
 
 // The static harness never opens a popup, so none of these classes reaches Tailwind there.
 const DECLARATION: Record<string, string> = {
+  // POINTER: the hand, and the arrow back on a control that cannot be pressed.
+  'cursor-pointer': 'cursor: pointer;',
+  'disabled:cursor-default': 'cursor: default;',
+  'aria-disabled:cursor-default': 'cursor: default;',
+  'data-disabled:cursor-default': 'cursor: default;',
+  'data-readonly:cursor-default': 'cursor: default;',
+  'data-loading:cursor-default': 'cursor: default;',
   // The scrim and the viewport.
   'fixed': 'position: fixed;',
   'inset-0': 'inset: 0px;',
@@ -44,10 +51,10 @@ const DECLARATION: Record<string, string> = {
   'text-body': 'color: var(--tc-body);',
   'border-(length:--tc-line-width)': 'border-width: var(--tc-line-width);',
   'border-line': 'border-color: var(--tc-line);',
-  'shadow-lg': 'box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);',
+  'shadow-(--tc-shadow-overlay)': 'box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);',
   'max-w-80': 'max-width: calc(var(--spacing) * 80);',
   'max-w-90': 'max-width: calc(var(--spacing) * 90);',
-  'max-w-100': 'max-width: calc(var(--spacing) * 100);',
+  'max-w-95': 'max-width: calc(var(--spacing) * 95);',
   'max-w-128': 'max-width: calc(var(--spacing) * 128);',
   'max-w-160': 'max-width: calc(var(--spacing) * 160);',
   // The ring, outside the x and inside the popup and the body.
@@ -63,9 +70,9 @@ const DECLARATION: Record<string, string> = {
   'gap-3': 'gap: calc(var(--spacing) * 3);',
   'border-b-(length:--tc-line-width)': 'border-bottom-width: var(--tc-line-width);',
   'border-t-(length:--tc-line-width)': 'border-top-width: var(--tc-line-width);',
-  'px-5': 'padding-inline: calc(var(--spacing) * 5);',
-  'py-4': 'padding-block: calc(var(--spacing) * 4);',
-  'py-5': 'padding-block: calc(var(--spacing) * 5);',
+  'px-4.5': 'padding-inline: calc(var(--spacing) * 4.5);',
+  'py-3.5': 'padding-block: calc(var(--spacing) * 3.5);',
+  'py-4.5': 'padding-block: calc(var(--spacing) * 4.5);',
   'min-w-0': 'min-width: 0px;',
   'flex-1': 'flex: 1;',
   'min-h-15': 'min-height: calc(var(--spacing) * 15);',
@@ -73,6 +80,10 @@ const DECLARATION: Record<string, string> = {
   'text-sm': 'font-size: var(--text-sm);',
   'font-semibold': 'font-weight: var(--font-weight-semibold);',
   'text-muted': 'color: var(--tc-muted);',
+  '-me-1.25': 'margin-inline-end: calc(var(--spacing) * -1.25);',
+  // The bars draw their line only while the body scrolls, which marks itself with data-scrolls.
+  'border-transparent': 'border-color: transparent;',
+  'group-has-data-scrolls/dialog:border-line': 'border-color: var(--tc-line);',
   'flex-wrap': 'flex-wrap: wrap;',
   'items-center': 'align-items: center;',
   'justify-end': 'justify-content: flex-end;',
@@ -128,7 +139,7 @@ function ruleFor(css: string, cls: string): string {
 const written = (strings: readonly string[]) => [...new Set(strings.join(' ').split(' '))].sort()
 
 describe('every class an open Dialog wears compiles with the installed Tailwind', () => {
-  const css = compileEntry().then((compiled) => compiled.build(Object.keys(DECLARATION)))
+  const css = compileEntry().then((compiled) => compiled.build([...Object.keys(DECLARATION), 'group/dialog']))
 
   // The classes that only act on a short screen, in a footer action or in a dialog that is not modal have a file of their own.
   it('the table names exactly the classes of the eleven strings in classes.ts, less those dialog.css.layout.test.ts holds', () => {
@@ -137,8 +148,8 @@ describe('every class an open Dialog wears compiles with the installed Tailwind'
       DIALOG_BACKDROP, DIALOG_VIEWPORT, DIALOG_POPUP, ...Object.values(DIALOG_WIDTH), DIALOG_HEADER, DIALOG_HEADING,
       DIALOG_TITLE, DIALOG_DESCRIPTION, DIALOG_BODY, DIALOG_FOOTER, DIALOG_CLOSE,
     ]).filter((cls) => cls !== '' && !elsewhere.has(cls))
-    expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(74)
+    expect(all).toEqual([...Object.keys(DECLARATION), 'group/dialog'].sort())
+    expect(all).toHaveLength(84)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

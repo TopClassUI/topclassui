@@ -70,6 +70,7 @@ describe('the header', () => {
     expect(toggle).toEqual([
       'inline-flex', 'shrink-0', 'items-center', 'justify-center', 'rounded-control',
       'min-h-[var(--tc-target-min,24px)]', 'min-w-[var(--tc-target-min,24px)]', ...COARSE, ...RING, ...MOTION,
+      'cursor-pointer', 'disabled:cursor-default', 'aria-disabled:cursor-default', 'data-disabled:cursor-default', 'data-readonly:cursor-default', 'data-loading:cursor-default',
       'text-muted', 'tone-neutral', 'hover:bg-(--tc-soft)', 'active:bg-(--tc-soft-hover)',
     ])
   })
@@ -120,7 +121,8 @@ describe('a group', () => {
 describe('a row', () => {
   const ROW = [
     'relative', 'overflow-hidden', 'min-w-[var(--tc-target-min,24px)]', ...COARSE,
-    'flex', 'min-h-(--tc-row-height)', 'w-full', 'items-center', 'gap-2', 'rounded-control', 'px-3', 'text-start', 'text-sm',
+    'flex', 'min-h-(--tc-row-height)', 'w-full', 'items-center', 'gap-2', 'rounded-control', 'px-2.5', 'text-start', 'text-sm',
+    'cursor-pointer', 'disabled:cursor-default', 'aria-disabled:cursor-default', 'data-disabled:cursor-default', 'data-readonly:cursor-default', 'data-loading:cursor-default',
     ...RING, ...MOTION, 'group-data-closed/sidebar:justify-center',
   ]
 
@@ -129,8 +131,8 @@ describe('a row', () => {
     expect(current?.slice(0, ROW.length)).toEqual(ROW)
   })
 
-  // cn() keeps the last min-height it is given: after the 24 px floor that is the 40 px of a row, and 44 under a finger.
-  it('is 40 px tall at least, not the 24 px of the floor, and 44 under a coarse pointer', () => {
+  // cn() keeps the last min-height it is given: after the 24 px floor that is the 32 px of a row, and 44 under a finger.
+  it('is 32 px tall at least, not the 24 px of the floor, and 44 under a coarse pointer', () => {
     for (const row of [rest, current]) {
       expect(row).toContain('min-h-(--tc-row-height)')
       expect(row).not.toContain('min-h-[var(--tc-target-min,24px)]')

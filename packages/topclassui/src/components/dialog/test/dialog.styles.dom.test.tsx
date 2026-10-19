@@ -95,21 +95,22 @@ describe('every element carries exactly the classes the spec names', () => {
     ])
   })
 
-  it('the popup: a column no taller than the screen, on the raised surface, 400 px at most', async () => {
+  it('the popup: a column no taller than the screen, on the raised surface, 380 px at most', async () => {
     expect(classes((await opened()).popup)).toEqual([
       ...RING_INSET,
-      'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line', 'data-ending-style:opacity-0',
+      'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line', 'group/dialog', 'data-ending-style:opacity-0',
       'data-ending-style:scale-95', 'data-starting-style:opacity-0', 'data-starting-style:scale-95',
       'duration-(--tc-duration)', 'ease-out', 'flex', 'flex-col', 'max-h-[calc(100dvh-2*var(--tc-overlay-inset))]',
-      'max-w-100', 'origin-(--transform-origin)', 'overflow-y-auto', 'overscroll-contain', 'rounded-box',
-      'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]', 'shadow-lg', 'text-body', 'transition-[opacity,scale]',
+      'max-w-95', 'origin-(--transform-origin)', 'overflow-y-auto', 'overscroll-contain', 'rounded-box',
+      'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]', 'shadow-(--tc-shadow-overlay)', 'text-body', 'transition-[opacity,scale]',
       'w-full', 'wrap-anywhere', '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]', '[scrollbar-width:thin]',
     ].sort())
   })
 
-  it('the header: a row that never shrinks, with a line under it', async () => {
+  it('the header: a row that never shrinks, with a line under it while the body scrolls', async () => {
     expect(classes((await opened()).header)).toEqual([
-      'border-b-(length:--tc-line-width)', 'border-line', 'flex', 'gap-3', 'items-start', 'px-5', 'py-4', 'shrink-0',
+      'border-b-(length:--tc-line-width)', 'border-transparent', 'flex', 'gap-3', 'group-has-data-scrolls/dialog:border-line',
+      'items-start', 'px-4.5', 'py-3.5', 'shrink-0',
     ])
   })
 
@@ -127,27 +128,28 @@ describe('every element carries exactly the classes the spec names', () => {
     expect(classes((await opened()).body)).toEqual([
       ...RING_INSET,
       '[@container(height<15rem)]:overflow-y-visible', '[@container(height<15rem)]:shrink-0', 'flex-1', 'min-h-15',
-      'overflow-y-auto', 'overscroll-contain', 'px-5', 'py-5', 'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]',
+      'overflow-y-auto', 'overscroll-contain', 'px-4.5', 'py-4.5', 'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]',
       'text-muted', 'text-sm', '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]', '[scrollbar-width:thin]',
     ].sort())
   })
 
-  it('the footer: a row that never shrinks, its actions at the end, with a line over it', async () => {
+  it('the footer: a row that never shrinks, its actions at the end, with a line over it while the body scrolls', async () => {
     expect(classes((await opened()).footer)).toEqual([
       ...ACTION_WRAP,
-      'border-line', 'border-t-(length:--tc-line-width)', 'flex', 'flex-wrap', 'gap-2', 'items-center', 'justify-end',
-      'px-5', 'py-4', 'shrink-0',
+      'border-t-(length:--tc-line-width)', 'border-transparent', 'group-has-data-scrolls/dialog:border-line', 'flex', 'flex-wrap', 'gap-2', 'items-center', 'justify-end',
+      'px-4.5', 'py-3.5', 'shrink-0',
     ].sort())
   })
 
   it('the x: an icon button of at least 24 px, 44 under a coarse pointer, muted, with the ghost hover', async () => {
     const expected = [
       ...RING,
-      'active:bg-(--tc-soft-hover)', 'duration-(--tc-duration)', 'ease-out', 'hover:bg-(--tc-soft)', 'inline-flex',
+      '-me-1.25', 'active:bg-(--tc-soft-hover)', 'duration-(--tc-duration)', 'ease-out', 'hover:bg-(--tc-soft)', 'inline-flex',
       'items-center', 'justify-center', 'min-h-[var(--tc-target-min,24px)]', 'min-w-[var(--tc-target-min,24px)]',
       'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]', 'pointer-coarse:min-w-[var(--tc-target-coarse,44px)]',
       'rounded-control', 'shrink-0', 'text-muted', 'tone-neutral',
       'transition-[color,background-color,border-color,outline-color,opacity,translate]',
+      'cursor-pointer', 'disabled:cursor-default', 'aria-disabled:cursor-default', 'data-disabled:cursor-default', 'data-readonly:cursor-default', 'data-loading:cursor-default',
     ].sort()
     const { x, close } = await opened()
     expect(classes(x)).toEqual(expected)
@@ -166,7 +168,7 @@ describe('every element carries exactly the classes the spec names', () => {
 })
 
 describe('the width follows the size', () => {
-  const WIDTH = { xs: 'max-w-80', sm: 'max-w-90', md: 'max-w-100', lg: 'max-w-128', xl: 'max-w-160' } as const
+  const WIDTH = { xs: 'max-w-80', sm: 'max-w-90', md: 'max-w-95', lg: 'max-w-128', xl: 'max-w-160' } as const
 
   for (const [size, width] of Object.entries(WIDTH) as [keyof typeof WIDTH, string][]) {
     it(`${size} is ${width}`, async () => {

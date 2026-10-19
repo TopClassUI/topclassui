@@ -1,8 +1,9 @@
-import { readdirSync } from 'node:fs'
-import { join, sep } from 'node:path'
+import { join, relative, sep } from 'node:path'
 
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
+
+import { trackedFiles } from '../../scripts/lib/tracked-files.js'
 
 const ROOT = process.cwd()
 const COMPONENTS = join(ROOT, 'src', 'components')
@@ -10,7 +11,8 @@ const CLIENT_ONLY = /client|server action/i
 
 const read = ts.readConfigFile(join(ROOT, 'tsconfig.json'), ts.sys.readFile.bind(ts.sys))
 const options = { ...ts.parseJsonConfigFileContent(read.config ?? {}, ts.sys, ROOT).options, noEmit: true }
-const indexes = readdirSync(COMPONENTS).map((slug) => join(COMPONENTS, slug, 'index.tsx')).filter((path) => ts.sys.fileExists(path))
+// Tracked files only: a folder a build or a branch switch left behind is not a component.
+const indexes = trackedFiles(COMPONENTS).filter((path) => /^[^/]+\/index\.tsx$/.test(relative(COMPONENTS, path).split(sep).join('/')))
 
 /** A key we declare in src/ whose type takes a call; ref is R-5.7-3's, and React's and Base UI's keys are theirs to document. */
 function isOwnCallback(checker: ts.TypeChecker, key: ts.Symbol, at: ts.Node): boolean {

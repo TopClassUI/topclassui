@@ -151,6 +151,8 @@ export const ar = {
   command: {
     label: 'لوحة الأوامر',
     placeholder: 'اكتب أمرًا أو ابحث',
+    escape: 'Esc',
+    enter: 'Enter',
   },
   navbar: {
     label: 'التنقل الرئيسي',

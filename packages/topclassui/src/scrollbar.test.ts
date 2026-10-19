@@ -3,6 +3,7 @@ import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import { parseCss } from '../scripts/lib/css-parse.js'
 import { readBlocks } from '../scripts/lib/tokens.js'
 import { ACCORDION_CONTENT } from './components/accordion/classes.js'
 import { CODE_BLOCK_PRE } from './components/code-block/classes.js'
@@ -105,5 +106,27 @@ describe('every scroll container wears the shared scrollbar', () => {
       }
     }
     expect(bare).toEqual([])
+  })
+
+  it('a raw overflow in a demo wears a shared scroll constant on the same line', () => {
+    const bare: string[] = []
+    for (const dir of readdirSync(COMPONENTS)) {
+      let demos: string[] = []
+      try { demos = readdirSync(join(COMPONENTS, dir, 'dummy')) } catch { continue }
+      for (const demo of demos) {
+        for (const line of readFileSync(join(COMPONENTS, dir, 'dummy', demo), 'utf8').split('\n')) {
+          if (/\boverflow(-[xy])?-(auto|scroll)\b/.test(line) && !/\$\{(SCROLL_AREA|SCROLL_X|SCROLLBAR)\}/.test(line)) bare.push(`${dir}/${demo}: ${line.trim().slice(0, 60)}`)
+        }
+      }
+    }
+    expect(bare).toEqual([])
+  })
+})
+
+describe('the page itself', () => {
+  it('draws its own bar thin and in the two tokens, so no page keeps the classic one', () => {
+    const html = parseCss(css).rules.filter((rule) => rule.prelude.trim() === 'html')
+      .flatMap((rule) => rule.declarations.filter((d) => d.property.startsWith('scrollbar-')).map((d) => `${d.property}: ${d.value}`))
+    expect(html).toEqual(['scrollbar-gutter: stable', 'scrollbar-width: thin', 'scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track)'])
   })
 })

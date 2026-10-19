@@ -28,6 +28,7 @@
     "readme:build": "pnpm --filter topclassui readme:build",
     "check:readme": "pnpm --filter topclassui check:readme",
     "check:package": "pnpm --filter topclassui check:package",
+    "size": "pnpm --filter topclassui size",
     "test:consumers": "pnpm --filter topclassui test:consumers",
     "docs:dev": "pnpm --filter @topclassui/docs dev",
     "docs:build": "pnpm --filter @topclassui/docs docs:build",

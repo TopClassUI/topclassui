@@ -84,7 +84,6 @@ export interface SiteLabels {
       add: string
       columns: { component: string; kind: string; js: string; status: string; updated: string }
       kinds: Record<Rendering, string>
-      notMeasured: string
       beta: string
       showing: (from: number, to: number, total: number) => string
     }
@@ -105,7 +104,9 @@ export interface SiteLabels {
         border: string
         onServer: string
         inBrowser: string
-        notMeasured: string
+        inBrowserSize: (size: string) => string
+        checkTitle: string
+        checkNote: string
         tree: string
         treeSummary: (server: number, client: number) => string
       }

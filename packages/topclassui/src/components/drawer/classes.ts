@@ -28,7 +28,7 @@ export const DRAWER_FOLLOW = 'transform-[translate(var(--drawer-swipe-movement-x
  * breaks a word too long for its width, and draws its ring inside its box: three of its edges are
  * the edges of the screen. */
 export const DRAWER_POPUP = [
-  'relative flex flex-col bg-surface-raised text-body shadow-lg wrap-anywhere',
+  'relative flex flex-col bg-surface-raised text-body shadow-(--tc-shadow-overlay) wrap-anywhere',
   DRAWER_FOLLOW,
   SLIDE_MOTION,
   SCROLL_AREA,
@@ -74,7 +74,7 @@ export const DRAWER_GRABBER = `mx-auto mt-2.5 mb-1 h-1 w-9 shrink-0 rounded-full
 
 /** It never shrinks, so it keeps its box while the body scrolls. Its end padding keeps a title clear
  * of the x, which is 44 px wide under a coarse pointer. */
-export const DRAWER_HEADER = 'shrink-0 border-b-(length:--tc-line-width) border-line py-4 ps-4 pe-16'
+export const DRAWER_HEADER = 'shrink-0 border-b-(length:--tc-line-width) border-line py-3.5 ps-4 pe-16'
 
 export const DRAWER_TITLE = 'text-base font-semibold text-body'
 

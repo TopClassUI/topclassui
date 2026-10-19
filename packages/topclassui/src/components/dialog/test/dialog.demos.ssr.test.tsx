@@ -29,7 +29,8 @@ const TRIGGERS: Record<string, string[]> = {
   'playground': ['Publish'],
   'rtl': ['نشر'],
   'sizes': ['xs', 'sm', 'md', 'lg', 'xl', 'custom'],
-  'states': ['Open', 'Alert', 'Scrolled', 'Focus trapped', 'Non-modal'],
+  // The closed cell's trigger: the three open cells mount their dialogs in the browser only, with no trigger.
+  'states': ['Open'],
   'trap-focus': ['Inspect'],
   'with-form': ['Rename'],
   'with-tooltip': ['Share'],
@@ -88,7 +89,8 @@ describe('every demo renders on the server', () => {
     it(`${file}.tsx renders no popup on the server, because the portal mounts in the browser`, async () => {
       const html = await render(file)
       expect(html, file).not.toContain('role="dialog"')
-      expect(html, file).not.toContain('bg-overlay')
+      // No backdrop: the only scrims served are the ones the states demo draws in its three open cells, under their portals.
+      expect(html.match(/bg-overlay/g)?.length ?? 0, file).toBe(file === 'states' ? 3 : 0)
       expect(html, file).not.toContain('<h2')
     })
 

@@ -1,48 +1,56 @@
+'use client'
+
+import { useRef, type ReactNode } from 'react'
+
+import { copy } from '#icons/data/copy.js'
+import { gear } from '#icons/data/gear.js'
 import { pencilSimple } from '#icons/data/pencil-simple.js'
 import { trash } from '#icons/data/trash.js'
+import { user } from '#icons/data/user.js'
 import { Button } from '#components/button/index.js'
 import { Svg } from '#components/svg/index.js'
-import {
-  DropdownGroup, DropdownGroupLabel, DropdownItem, DropdownPopup, DropdownRoot, DropdownSeparator, DropdownTrigger,
-} from '../index.js'
+import { DropdownItem, DropdownPopup, DropdownRoot, DropdownSeparator, DropdownTrigger } from '../index.js'
 
-/** One trigger per state, named after it: a menu only mounts in the browser, so a server page
- * shows each closed. Open, a disabled row, a danger row, and rows in a named group. */
+const cell = 'relative h-64 w-64 overflow-hidden rounded-box border-(length:--tc-line-width) border-line p-3 [contain:paint]'
+
+/** One cell, captioned by its title: the menu under its trigger, drawn open inside the cell, not modal. */
+function Open({ title, children }: { title: string, children: ReactNode }) {
+  const box = useRef<HTMLDivElement>(null)
+  return (
+    <div ref={box} title={title} className={cell}>
+      <DropdownRoot defaultOpen modal={false}>
+        <DropdownTrigger render={<Button variant="outline">Actions</Button>} />
+        <DropdownPopup container={box}>{children}</DropdownPopup>
+      </DropdownRoot>
+    </div>
+  )
+}
+
+/** Every state, one cell each, captioned by its title: closed, open and a disabled row. The hover of a row needs a live
+ * pointer, and a submenu and a checked row are not in the API, so none is drawn. */
 export default function Demo() {
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      <DropdownRoot>
-        <DropdownTrigger render={<Button variant="outline">Open</Button>} />
-        <DropdownPopup>
-          <DropdownItem>Profile</DropdownItem>
-          <DropdownItem>Settings</DropdownItem>
-        </DropdownPopup>
-      </DropdownRoot>
-      <DropdownRoot>
-        <DropdownTrigger render={<Button variant="outline">Disabled row</Button>} />
-        <DropdownPopup>
-          <DropdownItem>Duplicate</DropdownItem>
-          <DropdownItem icon={<Svg icon={pencilSimple} />} disabled>Rename</DropdownItem>
-        </DropdownPopup>
-      </DropdownRoot>
-      <DropdownRoot>
-        <DropdownTrigger render={<Button variant="outline">Danger row</Button>} />
-        <DropdownPopup>
-          <DropdownItem>Move to archive</DropdownItem>
-          <DropdownSeparator />
-          <DropdownItem icon={<Svg icon={trash} />} tone="danger">Delete project</DropdownItem>
-        </DropdownPopup>
-      </DropdownRoot>
-      <DropdownRoot>
-        <DropdownTrigger render={<Button variant="outline">Grouped</Button>} />
-        <DropdownPopup>
-          <DropdownGroup>
-            <DropdownGroupLabel>Sort by</DropdownGroupLabel>
-            <DropdownItem>Name</DropdownItem>
-            <DropdownItem>Last edited</DropdownItem>
-          </DropdownGroup>
-        </DropdownPopup>
-      </DropdownRoot>
+    <div className="flex flex-wrap items-start gap-3">
+      <div title="closed" className={cell}>
+        <DropdownRoot>
+          <DropdownTrigger render={<Button variant="outline">Actions</Button>} />
+          <DropdownPopup>
+            <DropdownItem icon={<Svg icon={user} />}>Profile</DropdownItem>
+            <DropdownItem icon={<Svg icon={gear} />}>Settings</DropdownItem>
+          </DropdownPopup>
+        </DropdownRoot>
+      </div>
+      <Open title="open">
+        <DropdownItem icon={<Svg icon={user} />} shortcut="Ctrl P">Profile</DropdownItem>
+        <DropdownItem icon={<Svg icon={gear} />}>Settings</DropdownItem>
+        <DropdownItem icon={<Svg icon={copy} />}>Duplicate</DropdownItem>
+        <DropdownSeparator />
+        <DropdownItem icon={<Svg icon={trash} />} tone="danger">Delete</DropdownItem>
+      </Open>
+      <Open title="disabled item">
+        <DropdownItem icon={<Svg icon={copy} />}>Duplicate</DropdownItem>
+        <DropdownItem icon={<Svg icon={pencilSimple} />} disabled>Rename</DropdownItem>
+      </Open>
     </div>
   )
 }

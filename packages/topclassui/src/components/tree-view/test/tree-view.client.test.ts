@@ -128,8 +128,8 @@ describe('lib.ts and classes.ts', () => {
     expect(importedModules(read('lib.ts'))).toEqual(['./types.js'])
   })
 
-  it('classes.ts takes the line, the forced edge, the hover, the label, the scroll area and the transition from src/shared', () => {
-    expect(importedNames(read('classes.ts'), '#shared/classes.js')).toEqual(['BORDER', 'FORCED_EDGE', 'HOVER', 'LABEL', 'SCROLL_AREA', 'TRANSITION'])
+  it('classes.ts takes the line, the forced edge, the hover, the label, the pointer, the scroll area and the transition from src/shared', () => {
+    expect(importedNames(read('classes.ts'), '#shared/classes.js')).toEqual(['BORDER', 'FORCED_EDGE', 'HOVER', 'LABEL', 'POINTER', 'SCROLL_AREA', 'TRANSITION'])
   })
 
   it('classes.ts names no physical side', () => {

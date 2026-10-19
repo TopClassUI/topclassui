@@ -1,5 +1,5 @@
 import type { Toast as Base } from '@base-ui/react/toast'
-import type { FocusEvent, ReactNode } from 'react'
+import type { ComponentPropsWithRef, FocusEvent, ReactNode } from 'react'
 
 import type { ToastPlacement } from '#shared/contracts/toast.js'
 import type { Tone } from '#shared/contracts/tone.js'
@@ -68,3 +68,12 @@ export type ToastViewportProps = Omit<Base.Viewport.Props, 'className' | 'childr
 
 /** A focus event on the viewport, where the hook reads where the keyboard came from. */
 export type ToastViewportFocus = FocusEvent<HTMLElement>
+
+/** The toast a stage shows at rest: the options of `toast.add` but the action, which would pass a function. */
+export type ToastStageToast = Omit<ToastOptions, 'action'>
+
+/** A box that shows toasts in place, at its own bottom-end corner, from a list of its own: the page's corner is left alone. */
+export type ToastStageProps = ComponentPropsWithRef<'div'> & {
+  /** Added once the stage mounts, and again whenever one of its options changes. Left out, it stays until closed. */
+  toast: ToastStageToast
+}

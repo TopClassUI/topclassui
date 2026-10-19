@@ -133,7 +133,8 @@ describe('hook.ts holds the value and the look of the track (R-5.12-1)', () => {
 describe('classes.ts builds every string from the shared constants (R-5.2-4)', () => {
   it('takes the line, the box, the ring, the target, the motion and the scroll from src/shared', () => {
     expect(importedNames(read('classes.ts'), '#shared/classes.js')).toEqual([
-      'BORDER', 'CONTAIN', 'DISABLED', 'FIELD_INVALID', 'FOCUS_RING_INSET', 'SCROLL_X', 'TOUCH_TARGET', 'TRANSITION',
+      'BORDER', 'CONTAIN', 'DISABLED', 'FIELD_INVALID', 'FOCUS_RING_INSET', 'POINTER', 'SCROLL_X', 'TOUCH_TARGET',
+      'TRANSITION',
     ])
   })
 

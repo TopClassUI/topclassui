@@ -38,10 +38,12 @@ describe('a column can be the header of its row (WCAG 1.3.1)', () => {
     expect(texts(body, 'td')).toEqual(['120', '80', '310'])
   })
 
-  it('keeps the weight of a cell: a th is bold until told otherwise', () => {
+  it('draws a row header as the frame does: medium, not the bold a th starts with, in the body colour', () => {
     const body = /<tbody>(.*)<\/tbody>/.exec(html({ columns: withRowHeader }))?.[1] ?? ''
-    for (const tag of opening(body, 'th')) expect(classList(tag)).toContain('font-normal')
-    for (const tag of opening(body, 'td')) expect(classList(tag)).not.toContain('font-normal')
+    for (const tag of opening(body, 'th')) expect(classList(tag)).toEqual(expect.arrayContaining(['font-medium', 'text-body']))
+    for (const tag of opening(body, 'th')) expect(classList(tag)).not.toContain('text-muted')
+    for (const tag of opening(body, 'td')) expect(classList(tag)).not.toContain('font-medium')
+    for (const tag of opening(body, 'td')) expect(classList(tag)).toContain('text-muted')
   })
 
   it('leaves the column header a column header', () => {

@@ -25,12 +25,13 @@ export function useDialogPopup() {
   return { ...usePortalLocale(), modal: useContext(DialogModalContext), scope: useOverlayScope() }
 }
 
-/** The body's own ref, which the caller's ref follows, and the tabIndex it needs: 0 only while
- * its content overflows it, so a long text can be scrolled from the keyboard. */
+/** The body's own ref, which the caller's ref follows, the tabIndex it needs: 0 only while its
+ * content overflows it, so a long text can be scrolled from the keyboard, and data-scrolls then. */
 export function useDialogBody(forwarded: DialogBodyProps['ref']) {
   const ref = useRef(null as HTMLDivElement | null)
   useImperativeHandle(forwarded, () => ref.current as HTMLDivElement, [])
-  return { ref, tabIndex: useScrollTabStop(ref) }
+  const tabIndex = useScrollTabStop(ref)
+  return { ref, tabIndex, scrolls: tabIndex === 0 ? '' : undefined }
 }
 
 /** The name of the x, in the language of the provider: English when none is mounted. */
