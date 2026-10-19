@@ -68,7 +68,7 @@ export function ToastViewport({ className, ref, ...rest }: ToastViewportProps) {
 function ToastStageViewport() {
   const stage = useToastStageList()
   return (
-    <Base.Viewport aria-label={stage.labels.region} className={TOAST_STAGE_VIEWPORT}>
+    <Base.Viewport aria-label={stage.labels.stage} className={TOAST_STAGE_VIEWPORT}>
       {stage.toasts.map((entry) => (
         <ToastItem key={entry.id} entry={entry} swipeDirection={stage.swipeDirection} closeLabel={stage.labels.close} />
       ))}
