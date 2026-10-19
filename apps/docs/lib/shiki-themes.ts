@@ -32,6 +32,7 @@ function themeOf(name: string, palette: Palette): ThemeRegistrationRaw {
       },
       { scope: ['string', 'punctuation.definition.string', 'string.template'], settings: { foreground: palette.string } },
       { scope: ['entity.other.attribute-name', 'constant.numeric', 'constant.language'], settings: { foreground: palette.attribute } },
+      { scope: ['string.unquoted.argument'], settings: { foreground: palette.text } },
     ],
   }
 }
