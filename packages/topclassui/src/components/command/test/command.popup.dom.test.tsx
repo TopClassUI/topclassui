@@ -29,7 +29,7 @@ describe('the popup', () => {
     expect(popup.getAttribute('data-testid')).toBe('palette')
     expect(popup.id).toBe('palette')
     expect(popup.className).toContain('max-w-80')
-    expect(popup.className).not.toContain('max-w-105')
+    expect(popup.className).not.toContain('max-w-100')
   })
 
   it('visibleRows sets the row knob on the list, clamped to 1 to 100, and nothing when left out', async () => {

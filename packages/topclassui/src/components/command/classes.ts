@@ -13,18 +13,18 @@ export const COMMAND_VIEWPORT = 'fixed inset-0 z-(--tc-z-dialog) flex items-star
 /** A column that ends the inset above the bottom, so the list is what gives way. No overflow-hidden:
  * it would cut the ring of the input. The popup's own ring is drawn inside it, never on the scrim. */
 export const COMMAND_POPUP = [
-  'flex max-h-[calc(85dvh-var(--tc-overlay-inset))] w-full max-w-105 flex-col wrap-anywhere',
+  'flex max-h-[calc(85dvh-var(--tc-overlay-inset))] w-full max-w-100 flex-col wrap-anywhere',
   OVERLAY_SURFACE,
   POPUP_MOTION,
   FOCUS_RING_INSET,
 ].join(' ')
 
 /** The search row: the magnifying glass, then the input. It never shrinks. */
-export const COMMAND_SEARCH = 'flex shrink-0 items-center gap-2.5 border-b-(length:--tc-line-width) border-line px-4 text-muted'
+export const COMMAND_SEARCH = 'flex shrink-0 items-center gap-2.5 border-b-(length:--tc-line-width) border-line ps-3.5 pe-3 text-muted'
 
-/** 48 px tall and 16 px text, so a phone neither misses it nor zooms the page into it. The ring is
- * drawn inside, with room before the caret, since the row sits flush against the popup. */
-export const COMMAND_INPUT = `h-control-lg min-w-0 flex-1 rounded-control bg-transparent px-2 text-base text-body placeholder:text-muted ${FOCUS_RING_INSET}`
+/** 40 px tall, 48 under a finger, and 16 px text, so a phone neither misses it nor zooms the page into it.
+ * The ring is drawn inside, with room before the caret, since the row sits flush against the popup. */
+export const COMMAND_INPUT = `h-control-md pointer-coarse:h-control-lg min-w-0 flex-1 rounded-control bg-transparent px-2 text-base text-body placeholder:text-muted ${FOCUS_RING_INSET}`
 
 /** R-10.5-1: the scroll container, at most --tc-list-rows rows, gone when nothing matches. No gap: the
  * spacers count whole rows, so with one the list grew and slid 2 px for each row the window passed. */
@@ -41,11 +41,14 @@ export const COMMAND_SPACER = [
 ].join(' ')
 
 /** A heading, at the foot of its unit so it sits on the rows it names. */
-export const COMMAND_GROUP_LABEL = `flex items-end px-3 pb-1 text-xs font-medium text-muted ${COMMAND_UNIT}`
+export const COMMAND_GROUP_LABEL = `flex items-end px-2.5 pb-0.5 text-xs font-medium text-muted ${COMMAND_UNIT}`
 
 /** One command. Its label truncates, so a long one never widens the popup. The active row is the
  * highlighted one, filled and ringed by ROW_HIGHLIGHT: the focus stays in the input. */
 export const COMMAND_ITEM = `${ROW} ${ROW_HIGHLIGHT} ${DISABLED} ${COMMAND_UNIT} ${CONTAIN} cursor-default select-none`
+
+/** The Esc keycap at the end of the search row: a hint for a keyboard, so a finger never sees it. */
+export const COMMAND_ESCAPE_HINT = 'shrink-0 border-line text-muted pointer-coarse:hidden'
 
 /** The empty and the loading text. Base UI keeps the element mounted to announce it, so it takes no room while empty. */
 export const COMMAND_STATUS = 'px-4 py-6 text-center text-sm text-muted empty:p-0'

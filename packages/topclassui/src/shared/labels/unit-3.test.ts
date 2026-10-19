@@ -15,7 +15,7 @@ describe('the labels of Unit 3, in English', () => {
   })
 
   it('names the command palette and writes its placeholder', () => {
-    expect(en.command).toEqual({ label: 'Command palette', placeholder: 'Type a command or search' })
+    expect(en.command).toEqual({ label: 'Command palette', placeholder: 'Type a command or search', escape: 'Esc' })
   })
 
   it('names the two navigation landmarks and both states of the sidebar button', () => {
@@ -45,7 +45,7 @@ describe('the labels of Unit 3, in Arabic', () => {
   })
 
   it('names the command palette and writes its placeholder', () => {
-    expect(ar.command).toEqual({ label: 'لوحة الأوامر', placeholder: 'اكتب أمرًا أو ابحث' })
+    expect(ar.command).toEqual({ label: 'لوحة الأوامر', placeholder: 'اكتب أمرًا أو ابحث', escape: 'Esc' })
   })
 
   it('names the two navigation landmarks and both states of the sidebar button', () => {
@@ -119,7 +119,7 @@ describe('the labels of Unit 3 through getLabels', () => {
 
   it('lets a caller reword the placeholder of the command palette and keeps its name', () => {
     const { labels } = getLabels('en', { command: { placeholder: 'Search the docs' } })
-    expect(labels.command).toEqual({ label: 'Command palette', placeholder: 'Search the docs' })
+    expect(labels.command).toEqual({ label: 'Command palette', placeholder: 'Search the docs', escape: 'Esc' })
   })
 
   it('lets a caller rename the navbar, which a page with two of them has to', () => {

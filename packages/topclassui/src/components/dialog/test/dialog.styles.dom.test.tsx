@@ -101,15 +101,15 @@ describe('every element carries exactly the classes the spec names', () => {
       'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line', 'data-ending-style:opacity-0',
       'data-ending-style:scale-95', 'data-starting-style:opacity-0', 'data-starting-style:scale-95',
       'duration-(--tc-duration)', 'ease-out', 'flex', 'flex-col', 'max-h-[calc(100dvh-2*var(--tc-overlay-inset))]',
-      'max-w-100', 'origin-(--transform-origin)', 'overflow-y-auto', 'overscroll-contain', 'rounded-box',
-      'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]', 'shadow-lg', 'text-body', 'transition-[opacity,scale]',
+      'max-w-95', 'origin-(--transform-origin)', 'overflow-y-auto', 'overscroll-contain', 'rounded-box',
+      'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]', 'shadow-(--tc-shadow-overlay)', 'text-body', 'transition-[opacity,scale]',
       'w-full', 'wrap-anywhere', '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]', '[scrollbar-width:thin]',
     ].sort())
   })
 
   it('the header: a row that never shrinks, with a line under it', async () => {
     expect(classes((await opened()).header)).toEqual([
-      'border-b-(length:--tc-line-width)', 'border-line', 'flex', 'gap-3', 'items-start', 'px-5', 'py-4', 'shrink-0',
+      'border-b-(length:--tc-line-width)', 'border-line', 'flex', 'gap-3', 'items-start', 'px-4.5', 'py-3.5', 'shrink-0',
     ])
   })
 
@@ -127,7 +127,7 @@ describe('every element carries exactly the classes the spec names', () => {
     expect(classes((await opened()).body)).toEqual([
       ...RING_INSET,
       '[@container(height<15rem)]:overflow-y-visible', '[@container(height<15rem)]:shrink-0', 'flex-1', 'min-h-15',
-      'overflow-y-auto', 'overscroll-contain', 'px-5', 'py-5', 'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]',
+      'overflow-y-auto', 'overscroll-contain', 'px-4.5', 'py-4.5', 'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]',
       'text-muted', 'text-sm', '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]', '[scrollbar-width:thin]',
     ].sort())
   })
@@ -136,7 +136,7 @@ describe('every element carries exactly the classes the spec names', () => {
     expect(classes((await opened()).footer)).toEqual([
       ...ACTION_WRAP,
       'border-line', 'border-t-(length:--tc-line-width)', 'flex', 'flex-wrap', 'gap-2', 'items-center', 'justify-end',
-      'px-5', 'py-4', 'shrink-0',
+      'px-4.5', 'py-3.5', 'shrink-0',
     ].sort())
   })
 
@@ -166,7 +166,7 @@ describe('every element carries exactly the classes the spec names', () => {
 })
 
 describe('the width follows the size', () => {
-  const WIDTH = { xs: 'max-w-80', sm: 'max-w-90', md: 'max-w-100', lg: 'max-w-128', xl: 'max-w-160' } as const
+  const WIDTH = { xs: 'max-w-80', sm: 'max-w-90', md: 'max-w-95', lg: 'max-w-128', xl: 'max-w-160' } as const
 
   for (const [size, width] of Object.entries(WIDTH) as [keyof typeof WIDTH, string][]) {
     it(`${size} is ${width}`, async () => {

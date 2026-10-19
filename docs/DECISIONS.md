@@ -6,6 +6,21 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-19 - The overlays follow their Previewer frames
+
+**Decision.** Job 110 compared Dialog, Drawer, Command, Dropdown, Popover and Tooltip with their `Previewer: <Name>` frames (138:1814, 138:1976, 138:1653, 138:1464, 138:2132, 138:2273) in dark, then light and ocean, in both directions, and changed the build where it differed. The composites are `docs/figma/parity/<slug>.png`, frame left and build right.
+
+- **Two new values in `tokens.css`.** `--tc-shadow-overlay` is the frames' drop shadow, `0 8px 10px` at 45% black in dark and 15% on a light page (light and ocean), and `OVERLAY_SURFACE` and the Drawer's sheet wear it instead of `shadow-lg`. `--tc-row-height` is now `2rem` times the density, 32 px: every menu and list row in the frames is 31 px (14 px text, 7 px of padding above and below), against 40 before. A coarse pointer still gets 44 px from `ROW_TOUCH` and `COMMAND_UNIT`, and the 24 px floor of R-5.6-2 is untouched. `ROW` pads 10 px a side instead of 12 (the frames draw 9). Every component that wears `ROW` or the knob moves with it: Select, Combobox, Sidebar, TreeView, FileUpload and DatePicker as well as the six here.
+- **Dialog.** Header and footer pad 18 by 14 px and the body 18, as drawn; `md` is 380 px wide (`max-w-95`), the drawn panel.
+- **Drawer.** The header pads 14 px above and below.
+- **Command.** 400 px wide, the search row pads 14 px at its start, the input is 40 px tall and 48 under a finger, and an Esc keycap (`labels.command.escape`, aria-hidden, gone under a coarse pointer) ends the search row. The group heading sits 2 px over its rows.
+- **Dropdown.** 220 px at least (`calc(var(--spacing)*55)`), and the separator has no margin of its own: the 2 px gap of the popup is all the frame leaves around the line.
+- **Popover.** The basic demo carries the x beside the title and the two icons the frame draws.
+
+**Not followed, and why.** The highlighted row keeps its 2 px inner ring, and the Command input keeps its ring: the frames draw the fill alone, but the fill is under 3:1 against the popup and R-5.6-1 asks for a visible ring on what holds the focus (the keyboard specs read both). The frame's "Enter" hint on the active Command row is not built: it would join the option's accessible name. The neutral look of an outline Button (the frames' Cancel and triggers) is Button's own frame, job 116.
+
+**What it affects.** `src/tokens.css`, `src/shared/classes.ts`, the six `classes.ts`, `command/parts/command-panel.tsx`, the labels (`command.escape` in English and Arabic), the Popover basic demo, the tests that pin those class strings, and their mutation rows.
+
 ## 2026-10-18 - The site hydrates in islands, and the shell's code waits for the first paint
 
 **Decision.** Job 83 (Lighthouse on the docs site, mobile preset). Every client part of the site goes through `apps/docs/components/lazy-island.tsx`: the server's HTML is rendered as before, and the part's own chunk loads only when it comes within one viewport (`near`) or, for what is on screen from the start, after the first paint and an idle moment (`idle`). A pointer, touch or focus on it loads it at once, and a press or hover that lands before the chunk is given again afterwards. While it waits, the island's box keeps the server's HTML untouched (an empty `dangerouslySetInnerHTML` during hydration, which React leaves alone); once the chunk is in, the part renders afresh in its place in one transition, and focus goes back where it was. Parts are not hydrated late because a Base UI part hydrated inside a deferred boundary could be left with sync updates React never committed (the Dialog, Popover, Tooltip and Switch states stopped answering). The one island that hydrates is the root provider, in an `<Activity>`: React streams a Suspense boundary over 500 bytes out of order once the page passes 12.8 KB, hidden until a script reveals it, which held the first paint; an Activity stays inline. A client navigation mounts an island with no HTML to keep, so it loads at once.

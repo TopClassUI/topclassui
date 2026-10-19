@@ -98,6 +98,7 @@ export interface Labels {
   readonly command: {
     readonly label: string
     readonly placeholder: string
+    readonly escape: string
   }
   readonly navbar: {
     readonly label: string

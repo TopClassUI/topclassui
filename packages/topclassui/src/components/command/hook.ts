@@ -145,6 +145,7 @@ export function useCommandPanel(props: CommandPanelProps) {
     labels: {
       title: labels.command.label,
       placeholder: labels.command.placeholder,
+      escape: labels.command.escape,
       empty: labels.collection.noResults,
       loading: labels.common.loading,
     },

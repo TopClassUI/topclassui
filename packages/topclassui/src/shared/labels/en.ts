@@ -86,6 +86,7 @@ export const en = {
   command: {
     label: 'Command palette',
     placeholder: 'Type a command or search',
+    escape: 'Esc',
   },
   navbar: {
     label: 'Main',

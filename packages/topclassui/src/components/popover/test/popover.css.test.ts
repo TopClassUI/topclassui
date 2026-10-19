@@ -29,7 +29,7 @@ const DECLARATION: Record<string, string> = {
   'text-body': 'color: var(--tc-body);',
   'border-(length:--tc-line-width)': 'border-width: var(--tc-line-width);',
   'border-line': 'border-color: var(--tc-line);',
-  'shadow-lg': 'box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);',
+  'shadow-(--tc-shadow-overlay)': 'box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);',
   // The motion, which reads the duration that --tc-motion scales, and grows from the side of the trigger.
   'origin-(--transform-origin)': 'transform-origin: var(--transform-origin);',
   'transition-[opacity,scale]': 'transition-property: opacity,scale;',

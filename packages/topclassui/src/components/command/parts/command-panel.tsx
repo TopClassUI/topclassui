@@ -7,9 +7,10 @@ import { magnifyingGlass } from '#icons/data/magnifying-glass.js'
 import { cn } from '#shared/cn.js'
 import { TEXT_MAX_LENGTH } from '#shared/contracts/boundaries.js'
 import { guardEscape } from '#shared/overlay.js'
+import { Kbd } from '#components/kbd/index.js'
 import { Svg } from '#components/svg/index.js'
 import {
-  COMMAND_BACKDROP, COMMAND_INPUT, COMMAND_LIST, COMMAND_POPUP, COMMAND_SEARCH, COMMAND_STATUS, COMMAND_TITLE,
+  COMMAND_BACKDROP, COMMAND_ESCAPE_HINT, COMMAND_INPUT, COMMAND_LIST, COMMAND_POPUP, COMMAND_SEARCH, COMMAND_STATUS, COMMAND_TITLE,
   COMMAND_VIEWPORT,
 } from '../classes.js'
 import { COMMAND_ESCAPE_GUARD } from '../constants.js'
@@ -58,6 +59,7 @@ export function CommandPanel(props: CommandPanelProps) {
                   maxLength={TEXT_MAX_LENGTH.search}
                   className={COMMAND_INPUT}
                 />
+                <Kbd aria-hidden className={COMMAND_ESCAPE_HINT}>{panel.labels.escape}</Kbd>
               </div>
               <Autocomplete.List
                 ref={panel.listRef}
