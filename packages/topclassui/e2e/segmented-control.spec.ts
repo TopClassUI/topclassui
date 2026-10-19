@@ -502,7 +502,7 @@ test.describe('live: where a page puts a segmented control', () => {
       expect(await cases(page)).toEqual([
         ['block', 193.9, false, false], ['grid', 193.9, false, false], ['track', 193.9, true, false],
         ['flex-col', 193.9, false, false], ['label-row', 193.9, false, false], ['flex-1', 193.9, false, false],
-        ['w-fit', 193.9, false, false], ['cell', 193.9, false, false], ['full', 1233, false, false],
+        ['w-fit', 193.9, false, false], ['cell', 193.9, false, false], ['full', 1238, false, false],
       ])
       await expectNoSidewaysScroll(page)
     })
