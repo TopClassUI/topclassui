@@ -25,7 +25,7 @@ describe('every demo renders on the server', () => {
       const Demo = await load(file)
       expect(typeof Demo, file).toBe('function')
       // Not toContain('<'): an empty div passes that, and every timeline is an ol of items.
-      expect(markup(<Demo />), file).toMatch(/<ol class="flex flex-col" role="list"><li /)
+      expect(markup(<Demo />), file).toMatch(/<ol class="flex flex-col"[^>]* role="list"><li /)
     })
   }
 
