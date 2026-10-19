@@ -48,11 +48,11 @@ test('every code block shows the rewritten imports, never a path into the librar
   }
 })
 
-test('the Code tab of an example opens its source', async ({ page }) => {
+test('every example shows its stage and its source under it, with a Copy', async ({ page }) => {
   await page.goto('/en/docs/components/button')
-  const example = page.locator('section[aria-labelledby="examples"] [role="tablist"]').first()
-  await example.getByRole('tab', { name: 'Code' }).click()
-  await expect(page.getByRole('tabpanel').filter({ hasText: "from 'topclassui/button'" }).first()).toBeVisible()
+  const example = page.locator('section[aria-labelledby="examples"] article').first()
+  await expect(example.locator('pre')).toContainText("from 'topclassui/button'")
+  await expect(example.getByRole('button', { name: /Copy the .* code for Button/ })).toBeVisible()
 })
 
 test('Button: the stage draws the five variants, then the playground drives it and the code', async ({ page }) => {

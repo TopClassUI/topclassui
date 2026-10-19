@@ -9,7 +9,7 @@ import { chipOf } from '../../lib/chip'
 import type { PagedComponent } from '../../lib/components'
 import type { Locale } from '../../lib/locales'
 import { SITE_URL } from '../../lib/site'
-import { H1, LEAD, PROSE, SECTION } from '../classes'
+import { H1, LEAD, PROSE, SECTION, SECTION_H2 } from '../classes'
 import { InlineText } from '../inline-text'
 import { Previewer } from '../previewer/previewer'
 import { SectionHeading } from '../section-heading'
@@ -46,7 +46,7 @@ export function ComponentPage({ entry, locale, actions = {} }: { entry: PagedCom
   const files = ['index.tsx', ...(entry.files.client ? ['client.tsx'] : [])]
   const section = (id: Exclude<SectionId, 'preview'>, body: ReactNode) => (
     <section key={id} aria-labelledby={id} className={SECTION}>
-      <SectionHeading id={id} anchorLabel={t.anchor(headingOf(id, entry, locale, t))}>{headingOf(id, entry, locale, t)}</SectionHeading>
+      <SectionHeading id={id} className={SECTION_H2} anchorLabel={t.anchor(headingOf(id, entry, locale, t))}>{headingOf(id, entry, locale, t)}</SectionHeading>
       {body}
     </section>
   )

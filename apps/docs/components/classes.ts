@@ -86,10 +86,11 @@ export const CONTROL_RESERVE = {
 /** A placeholder that fills the stage's content box, inside its padding, rather than its own min-height on top of it. */
 export const STAGE_RESERVE = 'self-stretch justify-self-stretch'
 export const STATE_SCOPE = 'grid min-w-0 gap-4 text-body'
-/** Two demos per row at 64rem and up, one below (page 14). */
-export const DEMO_GRID = 'grid min-w-0 gap-4 lg:grid-cols-2'
-export const KNOBS = 'flex flex-wrap items-center gap-4'
-export const KNOB = 'flex items-center gap-2 text-sm text-muted'
+/** One example card a row, each as wide as the Previewer above it (page 14). */
+export const DEMO_GRID = 'grid min-w-0 gap-6'
+/** The example knobs in Try it's dress: a surface panel, each label above its segmented control. */
+export const KNOBS = `flex min-w-0 flex-wrap items-end gap-6 rounded-box bg-surface p-4.5 ${BORDER}`
+export const KNOB = 'grid gap-1.5 text-xs font-medium text-muted'
 /** A heading inside a catalog card (Before you start, How to read a card): 16 px in the frames. */
 export const IN_CARD_TITLE = 'text-base'
 /** A numbered step or legend part's own title, 14 px semibold in the frames. */

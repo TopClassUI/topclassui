@@ -1,16 +1,18 @@
-// Examples (page 14, section 3): each demo a Preview and a Code tab, both in the HTML; the rtl one in Arabic.
+// Examples (page 14, section 3): each demo a card in the Previewer's parts, its stage and its code; the rtl one in Arabic.
 import type { ReactNode } from 'react'
 
 import { COMPONENT_PAGE_LABELS } from '../../labels/component-page'
 import { type PagedComponent, demoSourceOf } from '../../lib/components'
+import { cleanSourceOf } from '../../lib/usage'
+import { CopyButton } from '../previewer/previewer-islands'
 import type { Locale } from '../../lib/locales'
-import { DEMO_GRID, LIST, STAGE } from '../classes'
+import { CAPTION, CODE_PART, DEMO_GRID, FLAT_CODE, H3, LIST, PART_ROW, PREVIEWER, STAGE } from '../classes'
 import { Code } from '../code'
 import { Demo } from '../demo'
 import { InlineText } from '../inline-text'
 import { TopClassProvider } from '../shell/provider-island'
 import { DENSITY, KNOB_DEFAULTS, RADIUS } from './knob-values'
-import { ExampleKnobs, ExampleTabs } from './page-islands'
+import { ExampleKnobs } from './page-islands'
 
 const EXAMPLES_ID = 'examples-grid'
 
@@ -34,24 +36,30 @@ export function Examples({ entry, locale, actions }: { entry: PagedComponent; lo
   )
 }
 
+/** One example as the Previewer card draws its parts: the name, the stage on the page background, then the code with its Copy. */
 function Example({ entry, name, locale, action }: { entry: PagedComponent; name: string; locale: Locale; action: ReactNode }) {
   const t = COMPONENT_PAGE_LABELS[locale]
   const key = `${entry.slug}/${name}`
   const rtl = name === 'rtl'
   const demo = action ?? <Demo demoKey={key} />
+  const source = cleanSourceOf(demoSourceOf(entry, name) ?? '')
   return (
-    <ExampleTabs
-      caption={rtl ? <span className="text-sm text-muted">{t.rtlDemo}</span> : <span dir="ltr" className="font-mono text-sm text-muted">{name}</span>}
-      label={t.demoTabs(entry.name)}
-      names={{ preview: t.preview, code: t.code }}
-      preview={
-        <div className={`${STAGE} rounded-box`}>
-          {rtl
-            ? <div dir="rtl" lang="ar" className="min-w-0"><TopClassProvider direction="rtl" locale="ar">{demo}</TopClassProvider></div>
-            : demo}
+    <article aria-label={`${entry.name}: ${name}`} className={PREVIEWER}>
+      <div className="p-4.5">
+        {rtl ? <h3 className={CAPTION}>{t.rtlDemo}</h3> : <h3 dir="ltr" className={`${CAPTION} text-start font-mono`}>{name}</h3>}
+      </div>
+      <div className={`${STAGE} min-h-40 border-t-(length:--tc-line-width) border-line`}>
+        {rtl
+          ? <div dir="rtl" lang="ar" className="min-w-0"><TopClassProvider direction="rtl" locale="ar">{demo}</TopClassProvider></div>
+          : demo}
+      </div>
+      <div className={CODE_PART}>
+        <div className={PART_ROW}>
+          <h4 className={H3}>{t.theCode}</h4>
+          <CopyButton text={source} label={t.copyDemo(name, entry.name)} word={t.copy} copied={t.copied} failed={t.copyFailed} />
         </div>
-      }
-      code={<Code locale={locale} title={`${name}.tsx`} copyLabel={t.copyDemo(name, entry.name)} code={demoSourceOf(entry, name) ?? ''} />}
-    />
+        <Code locale={locale} title={`${name}.tsx`} copyLabel={t.copyDemo(name, entry.name)} code={source} className={FLAT_CODE} />
+      </div>
+    </article>
   )
 }
