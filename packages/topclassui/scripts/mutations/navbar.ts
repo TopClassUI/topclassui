@@ -172,8 +172,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the navbar root passes className first, so the consumer loses every conflict',
     file: ROOT,
-    from: "cn(NAVBAR_ROOT, NAVBAR_TOP[sticky ? 'sticky' : 'flow'], className)",
-    to: "cn(className, NAVBAR_ROOT, NAVBAR_TOP[sticky ? 'sticky' : 'flow'])",
+    from: "cn(NAVBAR_ROOT, NAVBAR_SURFACE[variant], NAVBAR_TOP[sticky ? 'sticky' : 'flow'], className)",
+    to: "cn(className, NAVBAR_ROOT, NAVBAR_SURFACE[variant], NAVBAR_TOP[sticky ? 'sticky' : 'flow'])",
   },
   {
     label: 'a navbar root that is not sticky still wears the sticky classes',
@@ -202,8 +202,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the navbar bar loses the line along its foot, its one edge under forced colours',
     file: CLASSES,
-    from: "'bg-surface-raised border-b-(length:--tc-line-width) border-line'",
-    to: "'bg-surface-raised'",
+    from: "  'border-b-(length:--tc-line-width)',\n].join(' ')",
+    to: "].join(' ')",
   },
   {
     label: 'the navbar bar is no longer on the sticky layer, so page content can paint over it',

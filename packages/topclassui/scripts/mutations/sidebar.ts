@@ -351,8 +351,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a collapsed sidebar row is not centred, so its icon starts 12 px in and sits off the middle',
     file: CLASSES,
-    from: "  'group-data-closed/sidebar:justify-center',\n",
-    to: '',
+    from: "  'px-2 group-data-closed/sidebar:justify-center',\n",
+    to: "  'px-2',\n",
   },
   {
     label: 'the toggle of a collapsed sidebar stays at the start, 7.5 px off the icons under it',

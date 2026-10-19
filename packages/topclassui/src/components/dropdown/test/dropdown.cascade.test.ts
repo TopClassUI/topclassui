@@ -82,9 +82,9 @@ describe('the tokens the menu reads are the ones the plan names', () => {
     expect(sheet).toContain('--tc-z-toast: 70;')
   })
 
-  it('a row is 2.5rem times the density, 40 px, and the menu shows seven of them', async () => {
+  it('a row is 2rem times the density, 32 px, and the menu shows seven of them', async () => {
     const sheet = await css
-    expect(sheet).toContain('--tc-row-height: calc(2.5rem * var(--tc-density));')
+    expect(sheet).toContain('--tc-row-height: calc(2rem * var(--tc-density));')
     expect(sheet).toContain('--tc-list-rows: 7;')
   })
 

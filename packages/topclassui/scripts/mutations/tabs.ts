@@ -122,8 +122,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a tabs tab may shrink, so eight of them squeeze into a phone instead of scrolling',
     file: CLASSES,
-    from: "'inline-flex shrink-0 items-center",
-    to: "'inline-flex items-center",
+    from: "'inline-flex shrink-0 cursor-pointer items-center",
+    to: "'inline-flex cursor-pointer items-center",
   },
   {
     label: 'a tabs tab may be wider than its list, so a long label never ends in an ellipsis',

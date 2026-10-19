@@ -114,8 +114,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the region of an accordion panel no longer scrolls sideways, so the box cuts a wide table off',
     file: CLASSES,
-    from: 'pb-4 ${SCROLL_X} ${FOCUS_RING_INSET}',
-    to: 'pb-4 ${FOCUS_RING_INSET}',
+    from: 'pb-3.5 ${SCROLL_X} ${FOCUS_RING_INSET}',
+    to: 'pb-3.5 ${FOCUS_RING_INSET}',
   },
   {
     label: 'the accordion trigger loses its inset focus ring, so the keyboard shows no focus on it',
@@ -162,8 +162,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'an accordion trigger never wraps, so where its title and caret do not fit side by side the title is squeezed to 0 px',
     file: CLASSES,
-    from: "'group flex w-full flex-wrap items-center",
-    to: "'group flex w-full items-center",
+    from: "'group flex w-full cursor-pointer flex-wrap items-center",
+    to: "'group flex w-full cursor-pointer items-center",
   },
   {
     label: 'an accordion caret that wraps below its title sits at the inline start, under the first letter',
