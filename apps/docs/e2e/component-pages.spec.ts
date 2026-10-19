@@ -55,11 +55,13 @@ test('the Code tab of an example opens its source', async ({ page }) => {
   await expect(page.getByRole('tabpanel').filter({ hasText: "from 'topclassui/button'" }).first()).toBeVisible()
 })
 
-test('Button: the playground drives the stage and the code', async ({ page }) => {
+test('Button: the stage draws the five variants, then the playground drives it and the code', async ({ page }) => {
   const errors = collectErrors(page)
   await page.goto('/en/docs/components/button')
   const button = card(page, 'button')
-  const stage = button.locator('button', { hasText: 'Save' })
+  const stageBox = button.locator('[style*="--tc-stage-height"]').first()
+  await expect(stageBox.getByRole('button')).toHaveCount(5)
+  const stage = stageBox.locator('button', { hasText: 'Save' })
   await expect(stage).toHaveAttribute('data-variant', 'solid')
   await button.getByRole('combobox', { name: 'variant' }).click()
   await page.getByRole('option', { name: 'soft', exact: true }).click()
