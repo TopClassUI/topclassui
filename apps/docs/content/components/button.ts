@@ -8,6 +8,8 @@ export const button = {
   },
   demos: ['variants', 'tones', 'sizes', 'with-icon', 'as-link', 'full-width', 'long-label', 'custom-size', 'skeleton', 'rtl'],
   stageHeight: 20,
+  stageDemo: 'variants',
+  extraSwitches: ['disabled'],
   note: {
     en: '`loading` blocks clicks and announces itself with `aria-busy`, but keeps full colour, so it never reads as disabled.',
     ar: '`loading` يمنع النقر ويعلن عن نفسه عبر `aria-busy`، لكنه يحتفظ بلونه كاملًا فلا يبدو معطّلًا.',

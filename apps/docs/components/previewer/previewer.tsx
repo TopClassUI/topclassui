@@ -48,11 +48,13 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
   const t = COMPONENT_PAGE_LABELS[locale]
   const { content } = entry
   const title = content.title[locale]
-  const playground = entry.files.playground && entry.controls.length > 0
+  const controls = [...entry.controls, ...(content.extraSwitches ?? []).map((prop) => ({ prop, kind: 'switch' as const, default: false }))]
+  const playground = entry.files.playground && controls.length > 0
+  // The stage at rest is the demo the frame draws (stageDemo); Try it swaps in the playground on the first change.
   const stageDemo = content.stageDemo ?? (playground ? 'playground' : (content.demos[0] ?? 'playground'))
   const stageSource = demoSourceOf(entry, stageDemo) ?? ''
-  const usage = playground ? usageOf(stageSource) : null
-  const restSource = usage === null ? cleanSourceOf(stageSource) : snippetOf(usage, [])
+  const usage = playground ? usageOf(demoSourceOf(entry, 'playground') ?? '') : null
+  const restSource = usage === null || stageDemo !== 'playground' ? cleanSourceOf(stageSource) : snippetOf(usage, [])
   const restCode = <Code locale={locale} title={`${entry.slug}.tsx`} copyLabel={t.copyCode} code={restSource} className={FLAT_CODE} />
   const note = (
     <p className={`flex items-start gap-2 ${NOTE}`}>
@@ -92,11 +94,11 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
             <PlaygroundIsland
               slug={entry.slug}
               locale={locale}
-              controls={entry.controls}
+              controls={controls}
               descriptions={descriptions}
               stageHeight={content.stageHeight}
               stageOpen={content.stageOpen === true}
-              serverStage={entry.rendering === 'client' ? null : <Demo demoKey={`${entry.slug}/playground`} />}
+              serverStage={stageDemo !== 'playground' ? <Demo demoKey={`${entry.slug}/${stageDemo}`} /> : entry.rendering === 'client' ? null : <Demo demoKey={`${entry.slug}/playground`} />}
               restCode={restCode}
               restSource={restSource}
               usage={usage}
