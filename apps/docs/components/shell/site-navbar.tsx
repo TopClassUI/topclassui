@@ -6,6 +6,7 @@ import { HOVER, ICON_BUTTON } from 'topclassui/classes'
 
 import { LIVE_GUIDES, hrefOf, pageBySlug, type Locale } from '../../content/pages'
 import type { SiteLabels } from '../../labels/index'
+import { EXTERNAL_REL } from '../../lib/external'
 import { GITHUB_URL } from '../../lib/site'
 import { LanguageSwitch } from './language-switch'
 import { MobileMenu, ModeSwitch, SearchButton } from './shell-islands'
@@ -52,7 +53,7 @@ export function SiteNavbar({ locale, current, path, labels }: SiteNavbarProps) {
         <ModeSwitch label={labels.mode.label} names={{ light: labels.mode.light, dark: labels.mode.dark, ocean: labels.mode.ocean }} />
         <LanguageSwitch locale={locale} path={path} label={labels.language.label} />
         {GITHUB_URL === null ? null : (
-          <a href={GITHUB_URL} rel="noopener noreferrer" className={`${ICON_BUTTON} ${HOVER.ghost} text-muted`} aria-label={labels.shell.github}>
+          <a href={GITHUB_URL} rel={EXTERNAL_REL} className={`${ICON_BUTTON} ${HOVER.ghost} text-muted`} aria-label={labels.shell.github}>
             <Icon name="github-logo" />
           </a>
         )}

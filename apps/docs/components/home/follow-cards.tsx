@@ -3,6 +3,7 @@ import { Button } from 'topclassui/button'
 import { Icon } from 'topclassui/icon'
 
 import type { SiteLabels } from '../../labels'
+import { EXTERNAL_REL } from '../../lib/external'
 import { GITHUB_URL, HANDLE, X_URL, YOUTUBE_URL } from '../../lib/site'
 import { TILE, TINT } from '../classes'
 import { GithubMark, XMark, YoutubeMark } from './brand-logos'
@@ -45,7 +46,7 @@ export function FollowCards({ labels }: { labels: SiteLabels }) {
               </div>
             </div>
             <p className="text-sm">{card.line}</p>
-            <Button tone={tone} variant="solid" render={<a href={url} rel="noopener noreferrer" />}>
+            <Button tone={tone} variant="solid" render={<a href={url} rel={EXTERNAL_REL} />}>
               {card.action}
               <Icon name="arrow-square-out" />
             </Button>

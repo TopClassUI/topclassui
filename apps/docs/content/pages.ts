@@ -162,6 +162,12 @@ export function nextPage(slug: string): PageEntry | undefined {
   return index === -1 ? undefined : LIVE_PAGES[index + 1]
 }
 
+/** The live entry before it in sidebar order, or none before the first. */
+export function previousPage(slug: string): PageEntry | undefined {
+  const index = LIVE_PAGES.findIndex((page) => page.slug === slug)
+  return index < 1 ? undefined : LIVE_PAGES[index - 1]
+}
+
 /** The route of a page in a locale: `/en`, `/ar/docs/css`. */
 export function hrefOf(page: Pick<PageEntry, 'path'>, locale: Locale): string {
   return page.path === '/' ? `/${locale}` : `/${locale}${page.path}`

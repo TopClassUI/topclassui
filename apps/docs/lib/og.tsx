@@ -6,9 +6,10 @@ import { ImageResponse } from 'next/og'
 
 import { BrandMark } from '../components/shell/brand-mark'
 import { FACTS } from './data'
+import { OG_SIZE } from './metadata'
 import { SITE_URL } from './site'
 
-export const OG_SIZE = { width: 1200, height: 630 }
+export { OG_SIZE }
 export const OG_TYPE = 'image/png'
 
 async function font(file: string) {

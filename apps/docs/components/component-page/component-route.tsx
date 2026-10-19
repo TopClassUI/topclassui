@@ -5,14 +5,17 @@ import type { ReactNode } from 'react'
 
 import { ACTION_DEMO_KEYS } from '../../.generated/server-demos'
 import { labelsFor } from '../../labels/index'
-import { pagedComponentOf, pagedComponents } from '../../lib/components'
-import { LOCALES, isLocale } from '../../lib/locales'
+import { componentDate } from '../../lib/data'
+import { ACTION_ROUTES, pagedComponentOf, pagedComponents } from '../../lib/components'
+import { isLocale } from '../../lib/locales'
+import { createMetadata } from '../../lib/metadata'
+import { componentArticleData } from '../../lib/structured-data'
+import { JsonLd } from '../json-ld'
 import { DocsColumns } from '../shell/docs-shell'
 import { SitePage } from '../shell/site-page'
 import { ComponentPage, componentToc } from './component-page'
 
-/** The pages whose demos define a Server Action: each has a route of its own, so the client code of those demos stays on that page. */
-export const ACTION_ROUTES = ['dropdown'] as const
+export { ACTION_ROUTES }
 
 const hasActionDemos = (slug: string) => ACTION_DEMO_KEYS.some((key) => key.startsWith(`${slug}/`))
 
@@ -25,22 +28,10 @@ export function sharedRouteSlugs(): string[] {
   })
 }
 
-const pathOf = (locale: string, slug: string) => `/${locale}/docs/components/${slug}`
-
 export function componentMetadata(locale: string, slug: string): Metadata {
   const entry = pagedComponentOf(slug)
   if (entry === null || !isLocale(locale)) return {}
-  const title = locale === 'en'
-    ? `React ${entry.content.title.en} - Tailwind CSS, RTL, accessible | TopClass UI`
-    : `${entry.name} لـ React - Tailwind CSS، من اليمين إلى اليسار، سهل الوصول | TopClass UI`
-  return {
-    title,
-    description: entry.content.description[locale],
-    alternates: {
-      canonical: pathOf(locale, slug),
-      languages: { ...Object.fromEntries(LOCALES.map((other) => [other, pathOf(other, slug)])), 'x-default': pathOf('en', slug) },
-    },
-  }
+  return createMetadata(entry, locale)
 }
 
 export function ComponentRoute({ locale, slug, actions = {} }: { locale: string; slug: string; actions?: Readonly<Record<string, ReactNode>> }) {
@@ -48,6 +39,7 @@ export function ComponentRoute({ locale, slug, actions = {} }: { locale: string;
   if (entry === null || !isLocale(locale)) notFound()
   return (
     <SitePage locale={locale} current="components" path={`/docs/components/${slug}`}>
+      <JsonLd data={componentArticleData(entry, locale, componentDate(slug))} />
       <DocsColumns locale={locale} current="components" labels={labelsFor(locale)} toc={componentToc(entry, locale)}>
         <ComponentPage entry={entry} locale={locale} actions={actions} />
       </DocsColumns>

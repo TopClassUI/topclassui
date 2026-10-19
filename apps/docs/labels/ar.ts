@@ -5,6 +5,13 @@ export const ar: SiteLabels = {
     siteName: 'TopClass UI',
     homeTitle: 'TopClass UI - مكوّنات React لـ Next.js، من اليمين إلى اليسار والخادم أولًا',
     guideTitle: (title) => `${title} - TopClass UI`,
+    componentTails: [
+      ' مكوّن React لـ Next.js.',
+      ' مكوّن React لـ Next.js، بالعربية والإنجليزية.',
+      ' مكوّن React لـ Next.js وTailwind CSS، سهل الوصول وجاهز للعربية.',
+      ' مكوّن React لـ Next.js وTailwind CSS، سهل الوصول، ويعمل من اليمين إلى اليسار دون أي تعديل.',
+    ],
+    ogAlt: (title) => `${title}، على بطاقة TopClass UI`,
     notFoundTitle: 'الصفحة غير موجودة - TopClass UI',
   },
   shell: {
@@ -14,6 +21,8 @@ export const ar: SiteLabels = {
     sidebarTitle: 'التوثيق',
     onThisPage: 'في هذه الصفحة',
     next: 'التالي',
+    previous: 'السابق',
+    pager: 'الصفحتان السابقة والتالية',
     home: 'الرئيسية',
     breadcrumb: 'مسار التنقل',
     menu: 'القائمة',
@@ -188,7 +197,6 @@ export const ar: SiteLabels = {
   catalog: {
     title: 'المكوّنات',
     lead: (count) => `${String(count)} مكوّنًا، لكل واحد عرض حيّ: كل الحالات معًا، ومساحة تجربة موصولة بالخصائص الحقيقية، وسطر الاستيراد.`,
-    metaTitle: 'المكوّنات - TopClass UI',
     description: 'كل مكوّنات TopClass UI في صفحة واحدة، مع عرض حيّ ومساحة تجربة على الخصائص الحقيقية وكل الحالات وسطر الاستيراد.',
     beforeTitle: 'قبل أن تبدأ',
     beforeOnce: 'مرة واحدة لكل تطبيق',
@@ -237,5 +245,8 @@ export const ar: SiteLabels = {
     summary: 'مكوّنات React لـ Next.js، من اليمين إلى اليسار أولًا ومن الخادم أولًا، مبنية على Tailwind CSS v4 وBase UI.',
     docs: 'التوثيق بالعربية',
     components: 'المكوّنات بالعربية',
+    keyboard: 'لوحة المفاتيح',
+    accessibility: 'إمكانية الوصول',
+    rtl: 'من اليمين إلى اليسار',
   },
 }
