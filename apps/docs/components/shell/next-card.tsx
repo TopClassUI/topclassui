@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { BORDER, FOCUS_RING, HOVER, TRANSITION } from 'topclassui/classes'
 import { Icon } from 'topclassui/icon'
 
-const CARD = `flex items-center gap-3 rounded-box bg-surface px-4 py-4 tone-neutral ${BORDER} ${HOVER.outline} ${FOCUS_RING} ${TRANSITION}`
+const CARD = `docs-hover-lift flex items-center gap-2.5 rounded-box bg-surface px-4.5 py-4 tone-neutral ${BORDER} ${HOVER.outline} ${FOCUS_RING} ${TRANSITION}`
 
 export interface PageLink {
   href: string
@@ -16,10 +16,10 @@ export function NextCard({ href, title, label, direction = 'next' }: PageLink & 
     <Link href={href} rel={previous ? 'prev' : 'next'} className={CARD}>
       {previous ? <Icon name="arrow-left" /> : null}
       <span className="flex min-w-0 flex-1 flex-col">
-        <span className="text-xs font-semibold text-muted">{label}</span>
-        <span className="truncate text-base font-medium text-body">{title}</span>
+        <span className="text-xs font-medium text-muted uppercase">{label}</span>
+        <span className="truncate text-base font-semibold text-body">{title}</span>
       </span>
-      {previous ? null : <Icon name="arrow-right" />}
+      {previous ? null : <span className="inline-flex text-primary-on-soft"><Icon name="arrow-right" /></span>}
     </Link>
   )
 }

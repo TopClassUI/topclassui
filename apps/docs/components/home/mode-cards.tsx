@@ -14,7 +14,7 @@ export function ModeCards({ labels }: { labels: SiteLabels }) {
   const text = labels.home.modes
   return (
     <figure className="flex flex-col gap-7">
-      <div inert className="grid grid-cols-1 gap-5 md:grid-cols-3">
+      <div inert data-motion="stagger" className="docs-cross-fade grid grid-cols-1 gap-5 md:grid-cols-3">
         {MODES.map((mode) => (
           <div key={mode} data-theme={mode} className={`flex flex-col gap-3.5 rounded-box bg-page p-5.5 text-start text-body ${BORDER}`}>
             <div className="flex items-center justify-between gap-2">

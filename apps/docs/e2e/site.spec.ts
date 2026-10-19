@@ -4,7 +4,7 @@ import { expect, test, type Page } from '@playwright/test'
 import { TARGETS } from '../../../packages/topclassui/scripts/lib/targets.js'
 
 const MODES = ['light', 'dark', 'ocean'] as const
-const GUIDES = ['installation', 'css', 'provider', 'first-component'] as const
+const GUIDES = ['installation', 'cli', 'css', 'provider', 'first-component'] as const
 const PAGES = ['/en', '/ar', ...GUIDES.flatMap((slug) => [`/en/docs/${slug}`, `/ar/docs/${slug}`])] as const
 
 async function openIn(page: Page, path: string, mode: (typeof MODES)[number]) {
@@ -105,14 +105,15 @@ for (const path of PAGES) {
 
 // Written out: the following live page's title in each language; Colors follows the four getting-started pages.
 const NEXT = {
-  installation: { en: 'CSS entry', ar: 'مدخل CSS', href: 'css' },
+  installation: { en: 'Add with the CLI', ar: 'الإضافة عبر الطرفية', href: 'cli' },
+  cli: { en: 'CSS entry', ar: 'مدخل CSS', href: 'css' },
   css: { en: 'Provider', ar: 'المزوّد', href: 'provider' },
   provider: { en: 'Your first component', ar: 'مكوّنك الأول', href: 'first-component' },
   'first-component': { en: 'Colors', ar: 'الألوان', href: 'colors' },
 } as const
 
 // Written out: how many `##` sections each page has, so a heading lost from the MDX fails here.
-const SECTIONS = { installation: 5, css: 7, provider: 6, 'first-component': 6 } as const
+const SECTIONS = { installation: 5, cli: 8, css: 7, provider: 6, 'first-component': 6 } as const
 
 for (const slug of GUIDES) {
   for (const locale of ['en', 'ar'] as const) {

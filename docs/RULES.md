@@ -19,6 +19,7 @@ pnpm check:css        cascade layers, token references, one-line comments in CSS
 pnpm check:icons      the generated icon modules still match raw/
 pnpm check:readme     every component README still matches its schema and types
 pnpm check:contrast   AA contrast in every mode
+pnpm size             gzip of every client.js, own and with Base UI, into size.json; --check holds it to size-budget.json
 pnpm test:e2e         playwright: target size, the focus ring and axe, in a real browser
 pnpm rules:sync       regenerate CLAUDE.md, AGENTS.md and .cursor/rules from this file
 pnpm icons:build      regenerate the icon modules from raw/
@@ -34,8 +35,10 @@ Every command runs from the repo root and forwards to `packages/topclassui`, whe
 Once per machine: `pnpm --filter topclassui exec playwright install chromium`. `pnpm test:mutation` is not in
 `pnpm check`, because it runs the whole suite once per mutant; CI runs it as its own job.
 
-Not built yet, so do not run them: `pnpm test:visual`, `pnpm size`.
-They arrive with the phases that need them.
+`pnpm size` reads `dist/`, so it runs after `pnpm build`; in `pnpm check` it follows `check:package`, which builds.
+
+Not built yet, so do not run it: `pnpm test:visual`.
+It arrives with the phase that needs it.
 
 ## How to work
 

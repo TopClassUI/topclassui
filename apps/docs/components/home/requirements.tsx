@@ -14,7 +14,7 @@ export function Requirements({ labels }: { labels: SiteLabels }) {
   return (
     <ul className="grid grid-cols-1 gap-5 md:grid-cols-3">
       {items.map(({ Mark, ...item }) => (
-        <li key={item.name} className={`docs-lift flex flex-col items-center gap-4.5 rounded-box p-8 text-center ${TINT[item.tone]}`}>
+        <li key={item.name} className={`docs-lift docs-hover-lift flex flex-col items-center gap-4.5 rounded-box p-8 text-center ${TINT[item.tone]}`}>
           <span aria-hidden="true" className={`docs-tile inline-flex size-22 items-center justify-center rounded-box ${TILE[item.tone]}`}><Mark className="size-12" /></span>
           <span className="text-5xl font-semibold"><bdi>{item.range}</bdi></span>
           <h3 className="text-xl font-semibold">{item.name}</h3>

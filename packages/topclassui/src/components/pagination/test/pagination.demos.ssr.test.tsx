@@ -72,7 +72,7 @@ describe('each demo shows the state its name promises', () => {
     const html = await render('middle')
     expect(pages(html)).toEqual(['1', '5', '6', '7', '12'])
     expect(html.match(/<li aria-hidden="true"/g)).toHaveLength(2)
-    expect(html).not.toContain('aria-disabled')
+    expect(html).not.toContain('aria-disabled=')
   })
 
   it('last-page: page 12 is current, and next and last are the two spans', async () => {

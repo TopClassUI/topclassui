@@ -9,7 +9,7 @@ import { TEXT_LINK, TINT } from '../classes'
 import { KIND_TONE } from './product-frame'
 
 const CHIP = `inline-flex items-center gap-2 rounded-control bg-surface py-2 ps-2.5 pe-3 text-sm font-medium text-body ${BORDER}`
-const CHIP_LINK = `${CHIP} ${HOVER.outline} ${FOCUS_RING} ${TOUCH_TARGET} ${TRANSITION}`
+const CHIP_LINK = `docs-hover-lift ${CHIP} ${HOVER.outline} ${FOCUS_RING} ${TOUCH_TARGET} ${TRANSITION}`
 const KIND_BADGE = 'inline-flex h-4.5 min-w-5.5 items-center justify-center rounded-chip px-1 font-mono text-xs'
 
 function badgeOf(rendering: Rendering): string {
@@ -22,7 +22,7 @@ export function CatalogChips({ locale, labels }: { locale: Locale; labels: SiteL
   const catalog = pageBySlug('components')
   return (
     <div className="flex flex-col gap-7">
-      <ul dir="ltr" className="flex flex-wrap gap-2">
+      <ul dir="ltr" data-motion="stagger" className="flex flex-wrap gap-2">
         {CARDS.map((card) => {
           const inner = (
             <>

@@ -2,6 +2,7 @@ import { folder } from '#icons/data/folder.js'
 import { gear } from '#icons/data/gear.js'
 import { house } from '#icons/data/house.js'
 import { users } from '#icons/data/users.js'
+import { SCROLL_AREA } from '#shared/classes.js'
 import { Svg } from '#components/svg/index.js'
 import { Table, type TableColumn } from '#components/table/index.js'
 import { SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoot } from '../index.js'
@@ -38,7 +39,7 @@ export default function Demo() {
           </SidebarGroup>
         </SidebarBody>
       </SidebarRoot>
-      <div className="min-w-0 flex-1 overflow-y-auto p-4">
+      <div className={`min-w-0 flex-1 p-4 ${SCROLL_AREA}`}>
         <h2 className="pb-3 text-base font-semibold">Orders</h2>
         <Table caption="Orders" items={orders} getKey={(order) => order.id} columns={columns} />
       </div>

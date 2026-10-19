@@ -47,7 +47,7 @@ export function ComponentPage({ entry, locale, actions = {} }: { entry: PagedCom
   const t = COMPONENT_PAGE_LABELS[locale]
   const { content } = entry
   const title = content.title[locale]
-  const chip = chipOf(entry.rendering, entry.slug, t.chip)
+  const chip = chipOf(entry, t.chip)
   const neighbours = componentNeighbours(entry.slug)
   const files = ['index.tsx', ...(entry.files.client ? ['client.tsx'] : [])]
   const section = (id: Exclude<SectionId, 'preview'>, body: ReactNode) => (

@@ -37,7 +37,7 @@ export function FollowCards({ labels }: { labels: SiteLabels }) {
         if (url === null) return null
         const card = text[key]
         return (
-          <li key={key} className={`docs-lift flex w-full flex-col items-start gap-4 rounded-box px-7 pt-7 pb-8 text-start md:w-96 ${TINT[tone]}`}>
+          <li key={key} className={`docs-lift docs-hover-lift flex w-full flex-col items-start gap-4 rounded-box px-7 pt-7 pb-8 text-start md:w-96 ${TINT[tone]}`}>
             <div className="flex items-center gap-3.5">
               <span aria-hidden="true" className={`docs-tile inline-flex size-14 items-center justify-center rounded-box ${TILE[tone]}`}><Mark className="size-7" /></span>
               <div className="flex flex-col gap-0.5">
