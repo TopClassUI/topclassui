@@ -47,3 +47,25 @@ export function controlsOf(json: JsonSchemaObject): Control[] {
     .map(([prop, schema]) => controlOf(prop, schema))
     .filter((control) => control !== null)
 }
+
+/** The starting values a playground demo gives its own props in its signature, `{ dismissible = true, size = 'lg' }`:
+ * the stage opens as the demo draws it, so Try it starts there too, and the schema default only where the demo sets nothing. */
+export function demoStartsOf(source: string): Record<string, ControlValue> {
+  const params = /export default function \w+\(\s*\{([^}]*)\}/.exec(source)?.[1] ?? ''
+  const starts: Record<string, ControlValue> = {}
+  for (const [, name = '', raw = ''] of params.matchAll(/(\w+)\s*=\s*(true|false|-?\d+(?:\.\d+)?|'[^']*'|"[^"]*")/g)) {
+    starts[name] = raw === 'true' ? true : raw === 'false' ? false : /^-?\d/.test(raw) ? Number(raw) : raw.slice(1, -1)
+  }
+  return starts
+}
+
+/** The controls with each start the demo sets written in as the default. */
+export function withStarts(controls: readonly Control[], starts: Readonly<Record<string, ControlValue>>): Control[] {
+  return controls.map((control) => {
+    const start = starts[control.prop]
+    if (start === undefined) return control
+    if (control.kind === 'switch') return typeof start === 'boolean' ? { ...control, default: start } : control
+    if (control.kind === 'slider' || control.kind === 'number') return typeof start === 'number' ? { ...control, default: start } : control
+    return control.options.includes(start) ? { ...control, default: start } : control
+  })
+}

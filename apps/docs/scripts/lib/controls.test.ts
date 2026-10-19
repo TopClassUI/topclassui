@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { controlOf, controlsOf } from './controls.js'
+import { type Control, controlOf, controlsOf, demoStartsOf, withStarts } from './controls.js'
 
 describe('controlOf', () => {
   it('makes every enum a select, as the Previewer frames draw Try it', () => {
@@ -71,5 +71,26 @@ describe('controlsOf', () => {
 
   it('returns nothing for a schema with no properties', () => {
     expect(controlsOf({})).toEqual([])
+  })
+})
+
+describe('demoStartsOf and withStarts', () => {
+  it('reads the starts a playground demo writes in its signature', () => {
+    const source = "export default function Demo({ dismissible = true, size = 'lg', max = 3, ...props }: Props = {}) {"
+    expect(demoStartsOf(source)).toEqual({ dismissible: true, size: 'lg', max: 3 })
+    expect(demoStartsOf('export default function Demo(props: Props) {')).toEqual({})
+  })
+
+  it('starts each control at the demo start, and keeps the schema default where the demo sets none or an unknown value', () => {
+    const controls: Control[] = [
+      { prop: 'dismissible', kind: 'switch', default: false },
+      { prop: 'size', kind: 'select', options: ['sm', 'md', 'lg'], default: 'md' },
+      { prop: 'tone', kind: 'select', options: ['neutral'], default: 'neutral' },
+    ]
+    expect(withStarts(controls, { dismissible: true, size: 'lg', tone: 'violet' })).toEqual([
+      { prop: 'dismissible', kind: 'switch', default: true },
+      { prop: 'size', kind: 'select', options: ['sm', 'md', 'lg'], default: 'lg' },
+      { prop: 'tone', kind: 'select', options: ['neutral'], default: 'neutral' },
+    ])
   })
 })
