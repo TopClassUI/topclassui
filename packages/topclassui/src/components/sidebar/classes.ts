@@ -21,7 +21,7 @@ export const SIDEBAR_ROOT = [
 ].join(' ')
 
 /** The toggle: an icon button on the neutral ramp, so its hover is the ghost tint. */
-export const SIDEBAR_TRIGGER = `${ICON_BUTTON} text-muted tone-neutral ${HOVER.ghost} cursor-pointer`
+export const SIDEBAR_TRIGGER = `${ICON_BUTTON} text-muted tone-neutral ${HOVER.ghost}`
 
 /** It never shrinks, so it keeps its box while the body scrolls. Collapsed, the trigger
  * stands alone and is centred over the icons below it. */

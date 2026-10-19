@@ -1,6 +1,6 @@
 // R-5.12-4: the class strings of the segmented control, built from the shared constants (unit-4.md, SegmentedControl).
 import {
-  BORDER, CONTAIN, DISABLED, FIELD_INVALID, FOCUS_RING_INSET, SCROLL_X, TOUCH_TARGET, TRANSITION,
+  BORDER, CONTAIN, DISABLED, FIELD_INVALID, FOCUS_RING_INSET, POINTER, SCROLL_X, TOUCH_TARGET, TRANSITION,
 } from '#shared/classes.js'
 
 /** A grid of one column that may shrink to nothing, as TABS_ROOT is: a track that scrolls would otherwise widen a
@@ -30,7 +30,7 @@ export const SEGMENTED_ITEM = [
   'forced-colors:data-checked:data-disabled:bg-[GrayText] forced-colors:data-checked:data-disabled:text-[Canvas]',
   // R-5.2-7: an element given as the label is a flex item of its own, so it truncates as a run of text does.
   '*:min-w-0 *:truncate',
-  CONTAIN, FOCUS_RING_INSET, TOUCH_TARGET, TRANSITION, DISABLED,
+  CONTAIN, FOCUS_RING_INSET, POINTER, TOUCH_TARGET, TRANSITION, DISABLED,
 ].join(' ')
 
 /** The inline padding and the type step of a segment; custom emits none. */

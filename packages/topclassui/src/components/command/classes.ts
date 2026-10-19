@@ -45,7 +45,7 @@ export const COMMAND_GROUP_LABEL = `flex items-end px-3 pb-1 text-xs font-medium
 
 /** One command. Its label truncates, so a long one never widens the popup. The active row is the
  * highlighted one, filled and ringed by ROW_HIGHLIGHT: the focus stays in the input. */
-export const COMMAND_ITEM = `${ROW} ${ROW_HIGHLIGHT} ${DISABLED} ${COMMAND_UNIT} ${CONTAIN} cursor-default select-none`
+export const COMMAND_ITEM = `${ROW} ${ROW_HIGHLIGHT} ${DISABLED} ${COMMAND_UNIT} ${CONTAIN} select-none`
 
 /** The empty and the loading text. Base UI keeps the element mounted to announce it, so it takes no room while empty. */
 export const COMMAND_STATUS = 'px-4 py-6 text-center text-sm text-muted empty:p-0'

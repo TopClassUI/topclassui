@@ -1,5 +1,5 @@
 // R-5.12-4: Pagination's own class tables, read by variants.ts and index.tsx.
-import { BORDER, HOVER } from '#shared/classes.js'
+import { BORDER, HOVER, POINTER } from '#shared/classes.js'
 import type { Size } from '#shared/contracts/size.js'
 import { TONE_CLASS } from '#shared/contracts/tone.js'
 
@@ -18,7 +18,7 @@ export const LIST_GAP = {
 
 /** What a link, an edge control and a gap share: a centred box with the control radius.
  * tabular-nums gives every digit one width, so Next stays put from page 111 to 112. */
-export const CELL = 'inline-flex cursor-pointer items-center justify-center rounded-control font-medium tabular-nums data-disabled:cursor-default'
+export const CELL = 'inline-flex items-center justify-center rounded-control font-medium tabular-nums'
 
 /** A cell wider than it is tall, as Figma 138:1269 draws it: the width of the control step, the height a step
  * or two under it and never under the 24 px floor of TOUCH_TARGET. It grows with a long number instead of spilling it. */
@@ -44,11 +44,11 @@ export const CELL_CURRENT_FORCED = [
 ].join(' ')
 
 /** The page the reader is on: filled, so it is found without reading a number. */
-export const CELL_CURRENT = `bg-primary-solid text-primary-on-solid ${TONE_CLASS.primary} ${HOVER.solid} ${CELL_CURRENT_FORCED}`
+export const CELL_CURRENT = `bg-primary-solid text-primary-on-solid ${TONE_CLASS.primary} ${HOVER.solid} ${POINTER} ${CELL_CURRENT_FORCED}`
 
 /** Every other cell: the hairline the frame draws, body text, and the neutral tint under a pointer.
  * The digit names the link, so the box is decorative; a dead edge drops it, as Figma 138:1269 does. */
-export const CELL_OTHER = `${BORDER} text-body ${TONE_CLASS.neutral} ${HOVER.outline} data-disabled:border-transparent`
+export const CELL_OTHER = `${BORDER} text-body ${TONE_CLASS.neutral} ${HOVER.outline} ${POINTER} data-disabled:border-transparent`
 
 /** A gap is a mark, not a control: muted, with no boundary, no ring, no hover and no pointer. */
 export const CELL_GAP = 'inline-flex items-center justify-center text-muted'

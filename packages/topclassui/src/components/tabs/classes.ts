@@ -1,6 +1,6 @@
 // R-5.12-4: one class string per element Tabs styles, built from the shared constants.
 import {
-  CONTAIN, CONTROL_HEIGHT, FOCUS_RING, FOCUS_RING_INSET, FORCED_EDGE, SCROLL_X, TOUCH_TARGET, TRANSITION,
+  CONTAIN, CONTROL_HEIGHT, FOCUS_RING, FOCUS_RING_INSET, FORCED_EDGE, POINTER, SCROLL_X, TOUCH_TARGET, TRANSITION,
 } from '#shared/classes.js'
 import type { Size } from '#shared/contracts/size.js'
 import type { TabsVariant } from './types.js'
@@ -39,10 +39,11 @@ export const TABS_TAB_DISABLED = [
  * box, because the list clips too. Content that fits is centred; content that does not starts
  * at the start edge, so the beginning of a label is never the part that is cut. */
 const TAB = [
-  'inline-flex shrink-0 cursor-pointer items-center justify-center-safe gap-2 overflow-hidden whitespace-nowrap font-normal text-muted',
+  'inline-flex shrink-0 items-center justify-center-safe gap-2 overflow-hidden whitespace-nowrap font-normal text-muted',
   'data-active:font-semibold data-active:text-body',
   CONTAIN,
   FOCUS_RING_INSET,
+  POINTER,
   TOUCH_TARGET,
   TRANSITION,
   TABS_TAB_DISABLED,

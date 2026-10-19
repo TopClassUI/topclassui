@@ -8,6 +8,12 @@ import {
 
 // A class list proves nothing about the rule behind it: each class is compiled with the installed Tailwind.
 const DECLARATION: Record<string, string> = {
+  // POINTER: the hand, and the arrow back on a control that cannot be pressed.
+  'disabled:cursor-default': 'cursor: default;',
+  'aria-disabled:cursor-default': 'cursor: default;',
+  'data-disabled:cursor-default': 'cursor: default;',
+  'data-readonly:cursor-default': 'cursor: default;',
+  'data-loading:cursor-default': 'cursor: default;',
   // The box.
   'grid': 'display: grid;',
   'grid-cols-1': 'grid-template-columns: repeat(1, minmax(0, 1fr));',
@@ -105,7 +111,7 @@ describe('every class an Accordion wears compiles with the installed Tailwind', 
       ACCORDION_ROOT, ACCORDION_ITEM, ACCORDION_TRIGGER, ACCORDION_TITLE, ACCORDION_CARET, ACCORDION_PANEL, ACCORDION_CONTENT,
     ])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(65)
+    expect(all).toHaveLength(70)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

@@ -162,8 +162,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'an accordion trigger never wraps, so where its title and caret do not fit side by side the title is squeezed to 0 px',
     file: CLASSES,
-    from: "'group flex w-full cursor-pointer flex-wrap items-center",
-    to: "'group flex w-full cursor-pointer items-center",
+    from: "'group flex w-full flex-wrap items-center",
+    to: "'group flex w-full items-center",
   },
   {
     label: 'an accordion caret that wraps below its title sits at the inline start, under the first letter',

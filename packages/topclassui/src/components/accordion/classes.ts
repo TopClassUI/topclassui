@@ -1,6 +1,6 @@
 // R-5.12-4: one class string per element Accordion styles, built from the shared constants.
 import {
-  BORDER, DISABLED, FADE_MOTION, FOCUS_RING_INSET, HOVER, SCROLL_X, TOUCH_TARGET, TRANSITION,
+  BORDER, DISABLED, FADE_MOTION, FOCUS_RING_INSET, HOVER, POINTER, SCROLL_X, TOUCH_TARGET, TRANSITION,
 } from '#shared/classes.js'
 
 /** The box. It clips, so a hover fill ends at its rounded corners, and it breaks a word too long
@@ -19,9 +19,10 @@ export const ACCORDION_TRIGGER_FORCED = 'forced-colors:data-disabled:text-[GrayT
 /** A row as wide as the box, 41 px at rest as Figma 138:994 draws it. Its ring is drawn inside it, because the box clips.
  * Where six letters of the title and the caret do not fit side by side (text at 200%), the caret wraps below. */
 export const ACCORDION_TRIGGER = [
-  'group flex w-full cursor-pointer flex-wrap items-center gap-2.5 px-3.5 py-3 text-start text-sm font-medium text-body tone-neutral',
+  'group flex w-full flex-wrap items-center gap-2.5 px-3.5 py-3 text-start text-sm font-medium text-body tone-neutral',
   HOVER.ghost,
   FOCUS_RING_INSET,
+  POINTER,
   TOUCH_TARGET,
   TRANSITION,
   DISABLED,

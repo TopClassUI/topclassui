@@ -204,14 +204,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a dropdown row stays 40 px under a finger',
     file: CLASSES,
-    from: "  'group shrink-0 cursor-default select-none',\n  ROW_TOUCH,\n",
-    to: "  'group shrink-0 cursor-default select-none',\n",
+    from: "  'group shrink-0 select-none',\n  ROW_TOUCH,\n",
+    to: "  'group shrink-0 select-none',\n",
   },
   {
     label: 'a dropdown row under a finger replaces its row height instead of raising it, so at a 32 px root it shrinks to 44 px',
     file: CLASSES,
-    from: "  'group shrink-0 cursor-default select-none',\n  ROW_TOUCH,\n",
-    to: "  'group shrink-0 cursor-default select-none pointer-coarse:min-h-[var(--tc-target-coarse,44px)]',\n",
+    from: "  'group shrink-0 select-none',\n  ROW_TOUCH,\n",
+    to: "  'group shrink-0 select-none pointer-coarse:min-h-[var(--tc-target-coarse,44px)]',\n",
   },
   {
     label: 'a highlighted danger dropdown row keeps the primary fill',

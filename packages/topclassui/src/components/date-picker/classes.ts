@@ -1,12 +1,12 @@
 // R-5.12-4: the class strings of the DatePicker, built from the shared field and overlay constants (unit-5.md, DatePicker).
 import {
-  FIELD_BOX, FIELD_HOLDER, FOCUS_RING, FOCUS_RING_INSET, HOVER, ICON_BUTTON, LABEL, OVERLAY_SURFACE, POPUP_BOUNDS, POPUP_MOTION,
-  SCROLL_AREA, TARGET_HEIGHT, TRANSITION,
+  FIELD_BOX, FIELD_HOLDER, FOCUS_RING, FOCUS_RING_INSET, HOVER, ICON_BUTTON, LABEL, OVERLAY_SURFACE, POINTER,
+  POPUP_BOUNDS, POPUP_MOTION, SCROLL_AREA, TARGET_HEIGHT, TRANSITION,
 } from '#shared/classes.js'
 
 /** The box that owns the width, as Select's. relative: it holds the form input. */
 export const DATE_PICKER_ROOT = `relative inline-grid align-middle ${FIELD_HOLDER}`
-export const DATE_PICKER_TRIGGER = `inline-flex w-full items-center gap-2 text-start ${FIELD_BOX}`
+export const DATE_PICKER_TRIGGER = `inline-flex w-full items-center gap-2 text-start ${FIELD_BOX} ${POINTER}`
 export const DATE_PICKER_ICON = 'flex shrink-0 text-muted'
 export const DATE_PICKER_VALUE = `${LABEL} flex-1 data-placeholder:text-muted`
 /** The form's copy of the value: out of sight and out of the tab order, still checked by required. */
@@ -52,6 +52,7 @@ export const DATE_PICKER_DAY = [
   'inline-flex h-control-sm w-full items-center justify-center rounded-control text-sm tabular-nums text-body',
   TARGET_HEIGHT,
   FOCUS_RING,
+  POINTER,
   TRANSITION,
   HOVER.ghost,
   'data-selected:bg-primary-solid data-selected:font-medium data-selected:text-primary-on-solid',
