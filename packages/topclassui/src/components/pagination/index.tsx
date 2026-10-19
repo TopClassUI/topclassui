@@ -80,7 +80,7 @@ export function Pagination({
           }
           const current = item === page
           // Disabled, the current page loses its fill as well: nothing in the nav answers.
-          if (disabled) return <li key={item}>{dead(current ? text.pageOf(item, count, numbers) : text.page(item, numbers), numbers.format(item), current)}</li>
+          if (disabled) return <li key={item} className={FULL}>{dead(current ? text.pageOf(item, count, numbers) : text.page(item, numbers), numbers.format(item), current)}</li>
           return (
             // Hidden, not dropped, in the compact row: the links stay in the HTML a crawler reads.
             <li key={item} className={FULL}>

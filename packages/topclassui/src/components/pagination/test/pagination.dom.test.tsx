@@ -37,6 +37,12 @@ describe('in a real tree', () => {
     expect(items.filter((item) => item.className.includes('pagination-full'))).toHaveLength(5)
   })
 
+  it('hides the dead pages of a disabled pagination in the compact row too', () => {
+    render(<Pagination value={6} pageCount={12} getHref={blog} disabled />)
+    const items = screen.getAllByRole('listitem')
+    expect(items.filter((item) => item.className.includes('pagination-full')).map((item) => item.textContent)).toEqual(['1', '5', '6', '7', '12'])
+  })
+
   it('names the four controls and each page, in reading order', () => {
     render(<Pagination value={6} pageCount={12} getHref={blog} />)
     expect(linkNames()).toEqual([
