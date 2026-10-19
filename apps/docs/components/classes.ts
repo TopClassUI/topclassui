@@ -98,3 +98,9 @@ export const STEP = 'grid min-w-0 content-start gap-2.5 border-t-(length:--tc-li
 export const CHIP = `inline-flex items-center rounded-chip px-2 py-0.5 font-mono text-xs text-muted ${BORDER}`
 /** The legend's step number in its soft round badge. */
 export const LEGEND_NUMBER = 'inline-flex size-4.5 shrink-0 items-center justify-center rounded-full bg-primary-soft text-xs font-semibold text-primary-on-soft'
+/** Every state: the cells wrap, each at least the frames' 151 px, spread across the row. */
+export const STATE_GRID = 'flex min-w-0 flex-wrap items-start justify-around gap-x-2 gap-y-4'
+export const STATE_CELL = 'grid min-w-37.75 max-w-full content-start justify-items-center gap-2.5'
+/** The frames' 56 px box each state sits centred in. */
+export const STATE_BOX = 'flex min-h-14 max-w-full items-center justify-center'
+export const STATE_CAPTION = 'max-w-full text-center font-mono text-xs text-muted'

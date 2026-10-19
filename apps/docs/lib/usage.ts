@@ -87,3 +87,22 @@ export function snippetOf(usage: Usage, props: readonly [string, PropValue][]): 
   jsx = jsx.replace(/[ \t]+(\w+)=\{\1\}/g, '').replace(SPREAD, spread.join(''))
   return usage.imports.length > 0 ? `${usage.imports.join('\n')}\n\n${jsx}` : jsx
 }
+
+const DOC_COMMENT = /^\/\*\*[\s\S]*?\*\/\n(?=export default function)/m
+const TYPE_IMPORT = /^import\s+type\b[^\n]*\n/gm
+
+/** A demo shown whole, as a reader would write it: no type imports, no docs comment, and the props the docs
+ * stage passes in taken out of the signature, the pass-throughs and the `name ?? fallback` reads. */
+export function cleanSourceOf(source: string): string {
+  const signature = SIGNATURE.exec(source)
+  const names = (signature?.[1] ?? '').split(',').map((name) => name.trim()).filter((name) => /^\w+$/.test(name))
+  let code = source.replace(TYPE_IMPORT, '').replace(DOC_COMMENT, '')
+  if (signature !== null && names.length > 0) {
+    code = code.replace(/(export default function \w+\()\s*\{[^}]*\}[^)]*\)/, '$1)')
+    for (const name of names) {
+      code = code.replace(new RegExp(`\\n[ \\t]*${name}=\\{${name}\\}(?=\\n)`, 'g'), '').replace(passThrough(name), '')
+      code = code.replace(new RegExp(`\\b${name} \\?\\? `, 'g'), '')
+    }
+  }
+  return code.replace(/\n{3,}/g, '\n\n')
+}

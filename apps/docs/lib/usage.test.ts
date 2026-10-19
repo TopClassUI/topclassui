@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { attributeOf, changedProps, snippetOf, usageOf } from './usage'
+import { attributeOf, changedProps, cleanSourceOf, snippetOf, usageOf } from './usage'
 
 const BUTTON = `import { Button } from 'topclassui/button'
 import type { ButtonDesignProps } from 'topclassui/button'
@@ -160,5 +160,45 @@ describe('snippetOf', () => {
   it('writes a changed value over the literal the tree already passes', () => {
     expect(snippetOf({ imports: [], jsx: '<Pagination value={6} pageCount={12} {...props} />', passed: [] }, [['value', 8], ['size', 'lg']]))
       .toBe('<Pagination value={8} pageCount={12} size="lg" />')
+  })
+})
+
+describe('cleanSourceOf', () => {
+  it('takes the docs plumbing out of a demo shown whole', () => {
+    const source = [
+      "import { useState } from 'react'",
+      "import { Command } from 'topclassui/command'",
+      "import type { CommandDesignProps } from 'topclassui/command'",
+      '',
+      '/** The docs stage. */',
+      'export default function Demo({ visibleRows, defaultOpen }: CommandDesignProps = {}) {',
+      '  const [open, setOpen] = useState(defaultOpen ?? false)',
+      '  return (',
+      '    <Command',
+      '      items={COMMANDS}',
+      '      visibleRows={visibleRows}',
+      '      open={open}',
+      '    />',
+      '  )',
+      '}',
+    ].join('\n')
+    expect(cleanSourceOf(source)).toBe([
+      "import { useState } from 'react'",
+      "import { Command } from 'topclassui/command'",
+      '',
+      'export default function Demo() {',
+      '  const [open, setOpen] = useState(false)',
+      '  return (',
+      '    <Command',
+      '      items={COMMANDS}',
+      '      open={open}',
+      '    />',
+      '  )',
+      '}',
+    ].join('\n'))
+  })
+
+  it('leaves a demo with no props as it is', () => {
+    expect(cleanSourceOf('export default function Demo() {\n  return <Kbd>K</Kbd>\n}')).toBe('export default function Demo() {\n  return <Kbd>K</Kbd>\n}')
   })
 })
