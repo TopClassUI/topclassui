@@ -146,6 +146,7 @@ export const ar = {
   },
   toast: {
     region: 'الإشعارات',
+    stage: 'إشعارات المثال',
     close: 'إغلاق هذا الإشعار',
   },
   command: {
