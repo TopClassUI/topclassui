@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
@@ -111,9 +111,9 @@ describe('every scroll container wears the shared scrollbar', () => {
   it('a raw overflow in a demo wears a shared scroll constant on the same line', () => {
     const bare: string[] = []
     for (const dir of readdirSync(COMPONENTS)) {
-      let demos: string[] = []
-      try { demos = readdirSync(join(COMPONENTS, dir, 'dummy')) } catch { continue }
-      for (const demo of demos) {
+      const dummy = join(COMPONENTS, dir, 'dummy')
+      if (!existsSync(dummy)) continue
+      for (const demo of readdirSync(dummy)) {
         for (const line of readFileSync(join(COMPONENTS, dir, 'dummy', demo), 'utf8').split('\n')) {
           if (/\boverflow(-[xy])?-(auto|scroll)\b/.test(line) && !/\$\{(SCROLL_AREA|SCROLL_X|SCROLLBAR)\}/.test(line)) bare.push(`${dir}/${demo}: ${line.trim().slice(0, 60)}`)
         }
