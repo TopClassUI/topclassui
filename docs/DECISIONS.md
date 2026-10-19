@@ -18,6 +18,8 @@ The format is: date, decision, why, and what it affects.
 
 **The site.** `docs:data` reads `size.json` into `clientBytes` on every entry of `components.json` (null for a server component; a client or split folder with no number is an issue). The chip prints `client - 4.8 KB`, `split - 0 KB server + 2.1 KB client` and `, lazy` from it, so "size not measured yet" is gone from the chip, the product frame, the server panel, the Open Graph image and both `server-first.mdx`. Home's server panel shows the Dialog's lines of `size-budget.json` as the check behind the number.
 
+**For Omar, two numbers.** (1) The budgets as written cannot be met while the runtime chunk counts: to budget the full own number he would raise them to about 23 KB for a simple control (FileUpload is 20.9 KB own), 22 KB for an overlay (Combobox, 20.0 KB) and 21.4 KB for the eager part of a lazy one (DatePicker, 19.4 KB), each the largest measured plus 10 %. (2) The runtime chunk is 9,196 bytes gzipped (9.0 KB of 1,024), most of it `tailwind-merge`; slimming or replacing it is a saving of its own, paid back on every page with a client component.
+
 **Affects.** PLAN 14 and 16 (the chip), R-0-2 (`pnpm check` has a new gate), `docs/RULES.md` commands, `docs/figma/docs-site.md` choice 15. Left for Omar: whether the class runtime should count in the budget, the fifteen raised budgets (slimming them, or moving the classes), and DatePicker's eager hook.
 
 ---
