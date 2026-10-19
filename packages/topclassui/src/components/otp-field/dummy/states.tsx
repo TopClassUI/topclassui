@@ -1,6 +1,6 @@
 import { OTPField } from '../index.js'
 
-/** The states a server can render. A read-only field looks like a live one: it says so to a screen reader only. */
+/** The states a server can render, then partly filled and complete. A read-only field looks like a live one: it says so to a screen reader only. */
 export default function Demo() {
   return (
     <div className="grid justify-items-start gap-2">
@@ -10,6 +10,10 @@ export default function Demo() {
       <OTPField id="otp-states-disabled" disabled defaultValue="482" />
       <label htmlFor="otp-states-read-only" className="text-sm text-body">Read-only</label>
       <OTPField id="otp-states-read-only" readOnly defaultValue="482913" />
+      <label htmlFor="otp-states-partly" className="text-sm text-body">Partly filled</label>
+      <OTPField id="otp-states-partly" defaultValue="48" />
+      <label htmlFor="otp-states-complete" className="text-sm text-body">Complete</label>
+      <OTPField id="otp-states-complete" defaultValue="482913" />
     </div>
   )
 }
