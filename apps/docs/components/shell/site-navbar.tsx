@@ -32,6 +32,21 @@ function navLinks(locale: Locale, labels: SiteLabels) {
   return links.filter((link) => link !== null)
 }
 
+/** The mode, the language and GitHub: in the bar from 40rem, and in the menu's footer below it, so a phone's bar keeps one row. */
+function ShellSettings({ locale, path, labels }: Omit<SiteNavbarProps, 'current'>) {
+  return (
+    <>
+        <ModeSwitch label={labels.mode.label} names={{ light: labels.mode.light, dark: labels.mode.dark, ocean: labels.mode.ocean }} />
+        <LanguageSwitch locale={locale} path={path} label={labels.language.label} />
+        {GITHUB_URL === null ? null : (
+          <a href={GITHUB_URL} rel="noopener noreferrer" className={`${ICON_BUTTON} ${HOVER.ghost} text-muted`} aria-label={labels.shell.github}>
+            <Icon name="github-logo" />
+          </a>
+        )}
+    </>
+  )
+}
+
 export function SiteNavbar({ locale, current, path, labels }: SiteNavbarProps) {
   const library = getLabels(locale)
   return (
@@ -49,14 +64,15 @@ export function SiteNavbar({ locale, current, path, labels }: SiteNavbarProps) {
       </NavbarLinks>
       <NavbarActions>
         <SearchButton locale={locale} labels={labels.search} />
-        <ModeSwitch label={labels.mode.label} names={{ light: labels.mode.light, dark: labels.mode.dark, ocean: labels.mode.ocean }} />
-        <LanguageSwitch locale={locale} path={path} label={labels.language.label} />
-        {GITHUB_URL === null ? null : (
-          <a href={GITHUB_URL} rel="noopener noreferrer" className={`${ICON_BUTTON} ${HOVER.ghost} text-muted`} aria-label={labels.shell.github}>
-            <Icon name="github-logo" />
-          </a>
-        )}
-        <MobileMenu label={labels.shell.menu} title={labels.shell.sidebarTitle} navLabel={labels.shell.siteNav}>
+        <div className="contents max-sm:hidden">
+          <ShellSettings locale={locale} path={path} labels={labels} />
+        </div>
+        <MobileMenu
+          label={labels.shell.menu}
+          title={labels.shell.sidebarTitle}
+          navLabel={labels.shell.siteNav}
+          footer={<ShellSettings locale={locale} path={path} labels={labels} />}
+        >
           <SidebarGroups locale={locale} current={current} labels={labels} />
         </MobileMenu>
       </NavbarActions>

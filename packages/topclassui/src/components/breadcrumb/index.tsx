@@ -10,12 +10,12 @@ import { CURRENT, ITEM, LINK, LIST, ROOT, TEXT } from './classes.js'
 import { buildBreadcrumbList, serializeJsonLd } from './lib.js'
 import type { BreadcrumbProps } from './types.js'
 
-/** Where the page sits in the site: real links, the page being read last, and the same
- * trail as BreadcrumbList JSON-LD for a crawler. An empty trail renders nothing. */
+/** Where the page sits in the site: real links, the page being read last and, given `siteUrl`,
+ * the same trail as BreadcrumbList JSON-LD for a crawler. An empty trail renders nothing. */
 export function Breadcrumb({
   items,
   link,
-  baseUrl,
+  siteUrl,
   labels = en,
   locale: _locale,
   className,
@@ -28,7 +28,7 @@ export function Breadcrumb({
   if (trail.length === 0) return null
 
   const lastIndex = trail.length - 1
-  const jsonLd = buildBreadcrumbList(trail, baseUrl)
+  const jsonLd = buildBreadcrumbList(trail, siteUrl)
   // An empty aria-label names nothing, so the label stands in for it, as in Pagination.
   const name = ariaLabel === undefined || ariaLabel === '' ? labels.breadcrumb.label : ariaLabel
 
@@ -55,8 +55,8 @@ export function Breadcrumb({
           )
         })}
       </ol>
-      {/* An empty itemListElement is invalid structured data, so no link means no script. */}
-      {jsonLd.itemListElement.length === 0 ? null : (
+      {/* Without siteUrl a demo or a preview would claim a trail for the page that holds it. */}
+      {jsonLd === null ? null : (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
       )}
     </nav>

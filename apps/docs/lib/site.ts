@@ -17,9 +17,6 @@ export const X_URL: string | null = null
 /** The one handle Home's Follow us cards print, the same on every network. */
 export const HANDLE = '@topclassui'
 
-/** The CLI's line on Home: one component copied into the project. */
-export const ADD_LINE = 'npx topclassui add button'
-
 /** PLAN 2: Next.js 14 and older are not supported; the package declares no peer on next. */
 export const NEXT_RANGE = '15+'
 
@@ -33,6 +30,9 @@ export const PRERELEASE = VERSION.includes('-')
 
 /** The one install line every page prints (docs-site S8). */
 export const INSTALL_LINE = PRERELEASE ? 'npm i topclassui@beta zod' : 'npm i topclassui zod'
+
+/** The CLI's first copy, printed under the install line where a page shows both steps. */
+export const ADD_LINE = 'npx topclassui add button'
 
 /** "^19.0.0" reads "19+", "^4.2.0" reads "4.2+": the floor of a caret range. */
 export function floorOf(range: string): string {

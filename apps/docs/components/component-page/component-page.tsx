@@ -42,7 +42,7 @@ export function ComponentPage({ entry, locale, actions = {} }: { entry: PagedCom
   const t = COMPONENT_PAGE_LABELS[locale]
   const { content } = entry
   const title = content.title[locale]
-  const chip = chipOf(entry.rendering, entry.slug, t.chip)
+  const chip = chipOf(entry, t.chip)
   const files = ['index.tsx', ...(entry.files.client ? ['client.tsx'] : [])]
   const section = (id: Exclude<SectionId, 'preview'>, body: ReactNode) => (
     <section key={id} aria-labelledby={id} className={SECTION}>
@@ -54,7 +54,7 @@ export function ComponentPage({ entry, locale, actions = {} }: { entry: PagedCom
     <article className="mx-auto grid w-full max-w-(--docs-column) min-w-0 gap-8">
       <header className="grid min-w-0 gap-2.5">
         <Breadcrumb
-          baseUrl={SITE_URL}
+          siteUrl={SITE_URL}
           labels={getLabels(locale).labels}
           items={[
             { href: `/${locale}`, label: t.home },

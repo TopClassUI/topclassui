@@ -49,6 +49,8 @@ export interface SiteLabels {
     install: string
     llms: string
     social: string
+    cli: string
+    all: (components: number) => string
   }
   blocks: {
     wrong: string
@@ -87,9 +89,9 @@ export interface SiteLabels {
       search: string
       filter: string
       add: string
-      columns: { component: string; name: string; js: string; kind: string; updated: string }
+      columns: { component: string; kind: string; js: string; status: string; updated: string; actions: string }
       kinds: Record<Rendering, string>
-      notMeasured: string
+      beta: string
       showing: (from: number, to: number, total: number) => string
       perPage: (rows: number) => string
       toast: { title: string; body: string; close: string }
@@ -111,7 +113,9 @@ export interface SiteLabels {
         border: string
         onServer: string
         inBrowser: string
-        notMeasured: string
+        inBrowserSize: (size: string) => string
+        checkTitle: string
+        checkNote: string
         tree: string
         treeServer: (server: number) => string
         treeClient: (client: number) => string

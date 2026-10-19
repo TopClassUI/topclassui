@@ -27,6 +27,9 @@ export const FOCUS_RING = [
 /** Every transition multiplies by --tc-motion, so one knob can stop all of them. */
 export const TRANSITION = 'transition-[color,background-color,border-color,outline-color,opacity,translate] duration-(--tc-duration) ease-out'
 
+/** The hand on whatever a pointer can press. Disabled, read-only and loading go back to the arrow, whichever mark the control carries. */
+export const POINTER = 'cursor-pointer disabled:cursor-default aria-disabled:cursor-default data-disabled:cursor-default data-readonly:cursor-default data-loading:cursor-default'
+
 /** R-5.6-2: SC 2.5.8 is written in CSS px, so the floor is a px token, never a rem step. */
 export const TOUCH_TARGET = [
   // The fallback matters: a consumer token file missing these would leave no floor at all.
@@ -122,7 +125,7 @@ export const SLIDE_MOTION = 'transition-transform duration-(--tc-duration-slow) 
 export const OVERLAY_SURFACE = `rounded-box bg-surface-raised text-body ${BORDER} shadow-lg`
 
 /** One row of a menu or a list, at least --tc-row-height tall. Its highlight is its focus mark. */
-export const ROW = 'flex min-h-(--tc-row-height) w-full items-center gap-2 rounded-control px-3 text-start text-sm outline-none'
+export const ROW = `flex min-h-(--tc-row-height) w-full items-center gap-2 rounded-control px-3 text-start text-sm outline-none ${POINTER}`
 
 /** The row the keyboard or the pointer is on: a fill, and the ring inside its edge, since the fill alone
  * is under 3:1 against the popup. Forced colours erase a fill, so there it paints the system pair itself,
@@ -155,7 +158,7 @@ export const SCROLL_X = `overflow-x-auto overscroll-x-contain ${SCROLLBAR}`
 export const STICKY_TOP = 'sticky top-0 z-(--tc-z-sticky)'
 
 /** A control that holds one icon and no text: the x of an overlay, the toggle of a sidebar. */
-export const ICON_BUTTON = `inline-flex shrink-0 items-center justify-center rounded-control ${TOUCH_TARGET} ${FOCUS_RING} ${TRANSITION}`
+export const ICON_BUTTON = `inline-flex shrink-0 items-center justify-center rounded-control ${TOUCH_TARGET} ${FOCUS_RING} ${TRANSITION} ${POINTER}`
 
 /** The ring drawn inside the box, for a control flush against an edge that clips it. */
 export const FOCUS_RING_INSET = 'outline-none focus-visible:outline-solid focus-visible:outline-(length:--tc-ring-width) focus-visible:-outline-offset-(length:--tc-ring-width) focus-visible:outline-ring'
@@ -187,7 +190,7 @@ export const POPUP_PASSIVE = 'pointer-events-auto'
 // Unit 4: the toggles. The element that takes the press is a group; the drawn box inside it reads the group's state.
 
 /** What takes the press: 24 px, 44 under a coarse pointer, whatever size the drawn box is. w-fit: laid straight into a grid it would fill the track. */
-export const TOGGLE_TARGET = `group/toggle relative inline-flex w-fit shrink-0 items-center justify-center outline-none ${TOUCH_TARGET} ${DISABLED}`
+export const TOGGLE_TARGET = `group/toggle relative inline-flex w-fit shrink-0 ${POINTER} items-center justify-center outline-none ${TOUCH_TARGET} ${DISABLED}`
 
 /** The ring of a focused target, drawn on the box inside it. The group is named: a bare one would match an accordion trigger around it.
  * A filled box opts out of forced colours, which would keep --tc-ring at 2.4:1 on Canvas: CanvasText follows the user's palette. */
