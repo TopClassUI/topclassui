@@ -512,4 +512,10 @@ export const MUTATIONS: Mutation[] = [
     from: '<DrawerRoot placement="bottom">\n  <DrawerTrigger render={<Button>Invite</Button>} />',
     to: '<DrawerRoot placement="down">\n  <DrawerTrigger render={<Button>Invite</Button>} />',
   },
+  {
+    label: 'the drawer playground drops defaultOpen from its stage branch, so the docs stage draws an empty box with no sheet in it',
+    file: `${DUMMY}/playground.tsx`,
+    from: 'defaultOpen={stage}',
+    to: 'defaultOpen={false}',
+  },
 ]

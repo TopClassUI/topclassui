@@ -346,4 +346,10 @@ export const MUTATIONS: Mutation[] = [
     from: '          <PopoverPopup placement="start">\n',
     to: '          <PopoverPopup placement="start" lang="ar">\n',
   },
+  {
+    label: 'the popover playground drops defaultOpen from its stage branch, so the docs stage draws the trigger with no popup at it',
+    file: `${DUMMY}/playground.tsx`,
+    from: 'defaultOpen={stage}',
+    to: 'defaultOpen={false}',
+  },
 ]

@@ -39,8 +39,11 @@ export interface TooltipTriggerElementProps {
   state: Base.Trigger.State
 }
 
+/** The popup's own props, and the two of the portal around it: where it mounts, and whether
+ * it stays mounted while closed. The positioner takes none, so the placement stays ours. */
 export type TooltipPopupProps =
   Omit<Base.Popup.Props, 'className' | 'children' | 'render' | 'dangerouslySetInnerHTML'>
+  & Omit<Base.Portal.Props, 'className' | keyof Base.Popup.Props>
   & Pick<TooltipDesignProps, 'placement'>
   & {
     /** Merged last, so a consumer class wins a conflict with the popup's own. */

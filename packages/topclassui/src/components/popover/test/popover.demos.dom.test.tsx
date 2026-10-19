@@ -38,11 +38,9 @@ const SHOWN: Record<string, Shown[]> = {
     { trigger: 'الإعدادات', title: 'إعدادات الإشعارات', controls: [] },
   ],
   'states': [
-    { trigger: 'Open', title: 'Open', controls: [] },
-    { trigger: 'Above', title: 'Above', controls: [] },
-    { trigger: 'With close', title: 'With close', controls: ['Close'] },
-    { trigger: 'Modal', title: 'Modal', controls: ['Close'] },
-    { trigger: 'On hover', title: 'On hover', controls: [] },
+    { trigger: 'Share', title: 'Share this page', controls: [] },
+    { trigger: 'Details', title: 'Details', controls: [] },
+    { trigger: 'Settings', title: 'Settings', controls: [] },
   ],
   'with-close': [{ trigger: 'Notifications', title: 'Notifications are paused', controls: ['Close'] }],
   'with-form': [{ trigger: 'Rename', title: 'Rename this project', controls: ['Name', 'Cancel', 'Save'] }],
@@ -57,21 +55,29 @@ function nameOf(control: Element): string {
 }
 
 /** Opens each popover of a demo in turn from its trigger, reads it, and closes it with Escape. A button
- * of the page that opens nothing, as the modal demo holds beside its trigger, is not one. */
+ * of the page that opens nothing, as the modal demo holds beside its trigger, is not one. A popover the
+ * states strip draws open is closed by its own trigger's press, so it is opened by the next. */
 async function shown(Demo: ComponentType): Promise<Shown[]> {
   render(<Demo />)
   const out: Shown[] = []
   const triggers = screen.getAllByRole('button').filter((button) => button.getAttribute('aria-haspopup') === 'dialog')
   for (const trigger of triggers) {
+    if (trigger.getAttribute('aria-expanded') === 'true') await userEvent.click(trigger)
+    await waitFor(() => { expect(trigger.getAttribute('aria-expanded')).toBe('false') })
     await userEvent.click(trigger)
-    const popup = await screen.findByRole('dialog')
+    // The popup this trigger controls, by the id Base UI writes on it: never one already open beside it.
+    const popup = await waitFor(() => {
+      const found = document.getElementById(trigger.getAttribute('aria-controls') ?? '')
+      expect(found?.getAttribute('role')).toBe('dialog')
+      return found as HTMLElement
+    })
     out.push({
       trigger: trigger.textContent,
       title: popup.querySelector('h2')?.textContent ?? '',
       controls: [...popup.querySelectorAll('button, input, a')].map(nameOf),
     })
     await userEvent.keyboard('{Escape}')
-    await waitFor(() => { expect(screen.queryByRole('dialog')).toBeNull() })
+    await waitFor(() => { expect(popup.isConnected).toBe(false) })
   }
   return out
 }
@@ -164,5 +170,21 @@ describe('what the demos show of the props', () => {
     expect([popup.parentElement?.getAttribute('dir'), popup.parentElement?.getAttribute('lang')]).toEqual(['rtl', 'ar'])
     expect([popup.hasAttribute('dir'), popup.hasAttribute('lang')]).toEqual([false, false])
     expect(popup.getAttribute('data-placement')).toBe('start')
+  })
+})
+
+describe('the states strip, one cell per state the frame draws', () => {
+  it('captions each cell by its title, and draws two popovers open at their trigger inside their own cell', async () => {
+    const loaded = await import('../dummy/states.js') as { default: ComponentType }
+    const { container } = render(<loaded.default />)
+    const cells = [...(container.firstElementChild?.children ?? [])]
+    expect(cells.map((cell) => cell.getAttribute('title'))).toEqual(['closed', 'open', 'flipped'])
+    const dialogs = await screen.findAllByRole('dialog')
+    expect(dialogs.map((dialog) => dialog.querySelector('h2')?.textContent)).toEqual(['Details', 'Settings'])
+    expect(cells[1]?.contains(dialogs[0] ?? null)).toBe(true)
+    expect(cells[2]?.contains(dialogs[1] ?? null)).toBe(true)
+    expect(cells.map((cell) => cell.querySelector('button')?.getAttribute('aria-expanded'))).toEqual(['false', 'true', 'true'])
+    expect(document.querySelectorAll('[data-base-ui-portal] > [data-base-ui-inert]')).toHaveLength(0)
+    expect(dialogs.some((dialog) => dialog.contains(document.activeElement))).toBe(false)
   })
 })
