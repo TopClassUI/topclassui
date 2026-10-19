@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode, Ref } from 'react'
+import type { CSSProperties, ReactElement, ReactNode, Ref } from 'react'
 import { describe, expectTypeOf, it } from 'vitest'
 
 // From the index, so a type it stops re-exporting fails here.
@@ -45,8 +45,8 @@ describe('every part takes what a div takes', () => {
 })
 
 describe('none of the props the spec leaves unbuilt', () => {
-  it('has no render prop, because a card rendered as a link would have no drawn states', () => {
-    expectTypeOf<Accepts<keyof CardRootProps, 'render'>>().toEqualTypeOf<false>()
+  it('takes render on the root alone, as an element, because Previewer: Card draws its hover and focus', () => {
+    expectTypeOf<CardRootProps['render']>().toEqualTypeOf<ReactElement | undefined>()
     expectTypeOf<Accepts<keyof CardHeaderProps, 'render'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof CardBodyProps, 'render'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof CardFooterProps, 'render'>>().toEqualTypeOf<false>()

@@ -2,7 +2,7 @@ import type { ComponentType } from 'react'
 import { describe, expect, it } from 'vitest'
 
 import { classList, markup } from '#test/markup.js'
-import { CardBody, CardFooter, CardHeader, CardRoot } from '../index.js'
+import { CardBody, CardFooter, CardHeader, CardMedia, CardRoot } from '../index.js'
 import type { CardRootProps } from '../types.js'
 
 const classes = (Part: ComponentType<CardRootProps>, className?: string) =>
@@ -12,11 +12,11 @@ const classes = (Part: ComponentType<CardRootProps>, className?: string) =>
 const EXACT = {
   CardRoot: [
     'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line',
-    'flex', 'flex-col', 'gap-2', 'p-5', 'rounded-box',
+    'flex', 'flex-col', 'gap-2.5', 'p-4.5', 'rounded-box',
   ],
   CardHeader: ['font-semibold', 'text-base', 'text-body'],
   CardBody: ['text-muted', 'text-sm'],
-  CardFooter: ['flex', 'flex-wrap', 'gap-2', 'items-center', 'pt-1'],
+  CardFooter: ['flex', 'flex-wrap', 'gap-2', 'items-center'],
 }
 
 /** Each consumer class conflicts with one of the part's own, so only a className passed last wins. */
@@ -54,8 +54,8 @@ describe('every part carries exactly the classes the spec names', () => {
   }
 
   it('puts the padding and the gap on the root, so a card needs no inner wrapper', () => {
-    expect(classes(CardRoot)).toContain('p-5')
-    expect(classes(CardRoot)).toContain('gap-2')
+    expect(classes(CardRoot)).toContain('p-4.5')
+    expect(classes(CardRoot)).toContain('gap-2.5')
   })
 
   it('draws the hairline border at the knob width, with the decorative line colour', () => {
@@ -84,7 +84,7 @@ describe('className is passed last on every part', () => {
   }
 })
 
-describe('Card is not interactive, and leaves its children alone', () => {
+describe('a Card without render is not interactive, and leaves its children alone', () => {
   for (const [name, Part] of PARTS) {
     it(`${name} carries no ring, hover, transition, touch target or disabled state`, () => {
       const interactive = /^(hover:|active:|focus|outline-|transition|duration-|min-[hw]-|disabled:|data-disabled:|cursor-)/
@@ -100,4 +100,36 @@ describe('Card is not interactive, and leaves its children alone', () => {
       expect(classes(Part).filter((c) => palette.test(c)), name).toEqual([])
     })
   }
+})
+
+describe('a Card rendered as a link, as Previewer: Card draws its hover and focus-visible', () => {
+  const link = () => markup(<CardRoot render={<a href="/report" />}>Inside</CardRoot>)
+
+  it('renders the given element, so the whole card is one link', () => {
+    expect(link()).toMatch(/^<a href="\/report"/)
+  })
+
+  it('steps down to the surface on hover, shows the ring on focus and wears a pointer', () => {
+    const list = classList(link())
+    expect(list).toContain('hover:bg-surface')
+    expect(list).toContain('focus-visible:outline-ring')
+    expect(list).toContain('cursor-pointer')
+    expect(list).toContain('bg-surface-raised')
+  })
+
+  it('keeps the plain card free of them', () => {
+    expect(classes(CardRoot).filter((c) => c.startsWith('hover:') || c === 'cursor-pointer')).toEqual([])
+  })
+})
+
+describe('CardMedia, the band drawn above the title', () => {
+  const media = () => classList(markup(<CardMedia>Picture</CardMedia>)).sort()
+
+  it('bleeds over the root padding at the top and both sides', () => {
+    expect(media()).toEqual(expect.arrayContaining(['-mx-4.5', '-mt-4.5', 'rounded-t-box']))
+  })
+
+  it('is 120 tall with the neutral tint, as drawn', () => {
+    expect(media()).toEqual(expect.arrayContaining(['min-h-30', 'bg-neutral-soft']))
+  })
 })

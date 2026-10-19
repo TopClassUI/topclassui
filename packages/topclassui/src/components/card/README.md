@@ -35,6 +35,7 @@ heading level to you. `CardBody` is a block, so space several paragraphs yoursel
 ```tsx
 import {
   CardRoot,
+  CardMedia,
   CardHeader,
   CardBody,
   CardFooter,
@@ -50,7 +51,15 @@ Every prop below is optional and falls back to the default shown.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `children` | no | `ReactNode` | - | The parts, in order: CardHeader, CardBody and CardFooter. Each one is optional. |
+| `children` | no | `ReactNode` | - | The parts, in order: CardMedia, CardHeader, CardBody and CardFooter. Each one is optional. |
+| `render` | no | `ReactElement` | - | A link or a button to render the whole card as, with the drawn hover and focus ring:
+render={<Link href="/report" />}. The element form only, so it works on the server. |
+
+### CardMedia
+
+| Prop | Required | Type | Default | What it does |
+|---|---|---|---|---|
+| `children` | no | `ReactNode` | - | The image or illustration, edge to edge above the title. |
 
 ### CardHeader
 
@@ -80,6 +89,8 @@ Anything else is passed to the element each part draws, so standard attributes (
 
 - `dummy/basic.tsx`
 - `dummy/grid.tsx`
+- `dummy/interactive.tsx`
+- `dummy/media.tsx`
 - `dummy/paragraphs.tsx`
 - `dummy/report.tsx`
 - `dummy/rtl.tsx`
