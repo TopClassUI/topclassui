@@ -30,6 +30,8 @@ const captionOf = (table: string) => /<caption id="([^"]*)"[^>]*>(.*?)<\/caption
 /** What a stuck body cell ends its class list with, before its fill. */
 const STUCK = 'sticky inset-s-0 z-(--tc-z-sticky) max-w-[var(--tc-table-sticky-width,8rem)] truncate after:absolute after:inset-y-0 after:inset-e-0 after:border-e-(length:--tc-line-width) after:border-line-strong **:scroll-mx-[100vw]'
 
+const STATES = ['idle', 'hover row', 'sorted', 'selected', 'empty', 'loading']
+
 describe('every demo renders on the server', () => {
   it('holds exactly these demos, so none can be deleted silently', () => {
     expect(files).toEqual(EXPECTED)
@@ -187,5 +189,14 @@ describe('each demo shows what its name says', () => {
       expect(table.split('<th scope="col"').length - 1).toBe(6)
       expect(table).toMatch(/^<div [^>]*class="relative isolate grid grid-cols-1 overflow-x-auto /)
     }
+  })
+})
+
+describe('the states demo', () => {
+  it('is the frame\'s strip: one captioned cell a state', async () => {
+    const { default: Demo } = await import('../dummy/states.js') as { default: ComponentType }
+    const html = markup(<Demo />)
+    const captions = [...html.matchAll(/<div (?:role="(?:group|region)" )?(?:data-tone="\w+" )?[^>]*aria-label="([^"]+)"/g)].map((m) => m[1])
+    expect(captions).toEqual(STATES)
   })
 })
