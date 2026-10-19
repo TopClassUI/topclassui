@@ -81,6 +81,7 @@ export const en = {
   },
   toast: {
     region: 'Notifications',
+    stage: 'Example notifications',
     close: 'Dismiss this notification',
   },
   command: {

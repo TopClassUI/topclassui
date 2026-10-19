@@ -21,8 +21,8 @@ function Panel({ icon, title, className }: { icon?: ReactNode; title: string; cl
   )
 }
 
-/** The frame's strip, one cell a state: the three icons, a stack, a toast fading in, and one past the limit, which
- * the viewport keeps mounted and does not draw. */
+/** The frame's strip, one cell a state: the three icons, a stack, a toast fading in (a dashed edge, since a faded
+ * text would fail 4.5:1), and one past the limit, which the viewport keeps mounted and does not draw. */
 export default function Demo() {
   return (
     <div className="flex flex-wrap items-start gap-6">
@@ -41,7 +41,7 @@ export default function Demo() {
         <Panel title="Draft saved" />
       </div>
       <div role="group" aria-label="entering">
-        <Panel icon={<Svg icon={checkCircle} className="text-success-on-soft" />} title="Invitation sent" className="opacity-55" />
+        <Panel icon={<Svg icon={checkCircle} className="text-success-on-soft" />} title="Invitation sent" className="border-dashed border-line-strong" />
       </div>
       <div role="group" aria-label="limited">
         <p className="text-xs text-muted">Past the limit: mounted, not drawn.</p>
