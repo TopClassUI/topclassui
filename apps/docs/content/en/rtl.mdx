@@ -61,11 +61,11 @@ Every overlay takes a `placement` instead of a `side`. `start` and `end` resolve
 
 <WrongRight>
 
-```tsx
+```tsx title="wrong"
 <PopoverPopup side="left" align="start" />
 ```
 
-```tsx check
+```tsx check title="right"
 import { PopoverPopup } from 'topclassui/popover'
 
 <PopoverPopup placement="start-top" />
@@ -104,14 +104,14 @@ The rule runs on every class string in the library and fails the lint on a physi
 
 <WrongRight>
 
-```tsx
+```tsx title="wrong"
 className="pl-4 text-left"
 // R-5.3-1: "pl-" is physical. use ps- or pe-.
 // one error per class string;
 // fix it, and the next run names text-left
 ```
 
-```tsx
+```tsx title="right"
 className="ps-4 text-start"
 ```
 

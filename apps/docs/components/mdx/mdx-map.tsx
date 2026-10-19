@@ -38,7 +38,7 @@ export function mdxComponents(locale: Locale): MDXComponents {
     Callout,
     Cards,
     Card,
-    WrongRight: ({ children }) => <WrongRight locale={locale} wrong={wrong} right={right} terminal={terminal}>{children}</WrongRight>,
+    WrongRight: ({ children }) => <WrongRight locale={locale} wrong={wrong} right={right} terminal={terminal} repeat={labels.blocks.repeat}>{children}</WrongRight>,
     PackageManagers: () => <PackageManagers locale={locale} label={packageManagers} />,
     FrameworkTabs: ({ frameworks }: { frameworks: readonly string[] }) => <FrameworkTabs locale={locale} label={framework} frameworks={frameworks} terminal={terminal} />,
     PeerRange,

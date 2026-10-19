@@ -10,6 +10,8 @@ export interface WrongRightProps {
   wrong: string
   right: string
   terminal: string
+  /** The words read after a pair shown again on the page, so its regions are told apart: ", version 2". */
+  repeat: (count: number) => string
 }
 
 // The name sits above each box in its tone, and the box takes that tone as its edge (docs frames, CSS entry and Provider).
@@ -18,7 +20,7 @@ const NAME_TONE = { wrong: 'text-danger-on-soft', right: 'text-success-on-soft' 
 const EDGE = { wrong: 'docs-bare docs-wrong', right: 'docs-bare docs-right' } as const
 
 /** Two fences side by side, stacked under 48rem: the first titled Wrong, the second Right. */
-export function WrongRight({ children, locale, wrong, right, terminal }: WrongRightProps) {
+export function WrongRight({ children, locale, wrong, right, terminal, repeat }: WrongRightProps) {
   const fences = Children.toArray(children).filter((child) => isValidElement<{ children?: ReactNode }>(child))
   const [bad, good] = fences.map((fence) => (fence as { props: { children?: ReactNode } }).props.children)
   const sides = [
@@ -30,7 +32,7 @@ export function WrongRight({ children, locale, wrong, right, terminal }: WrongRi
       {sides.map((side) => (
         <div key={side.key} className="grid min-w-0 gap-2">
           <span aria-hidden="true" className={`${NAME} ${NAME_TONE[side.key]}`}><Icon name={side.icon} />{side.name}</span>
-          <CodeFence locale={locale} terminal={terminal} title={side.name} className={EDGE[side.key]}>{side.code}</CodeFence>
+          <CodeFence locale={locale} terminal={terminal} title={side.name} repeat={repeat} className={EDGE[side.key]}>{side.code}</CodeFence>
         </div>
       ))}
     </div>
