@@ -134,4 +134,10 @@ export const MUTATIONS: Mutation[] = [
     from: '{index === 0\n',
     to: '{index === -1\n',
   },
+  {
+    label: 'a stepper column is no longer capped at 2.75 circles, so a short stepper spreads over the page',
+    file: 'src/components/stepper/classes.ts',
+    from: ' max-w-[calc(var(--tc-stepper-mark)*2.75)] flex-1',
+    to: ' flex-1',
+  },
 ]

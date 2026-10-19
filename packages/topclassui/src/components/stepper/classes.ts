@@ -5,8 +5,9 @@ import { BORDER_STRONG } from '#shared/classes.js'
 export const STEPPER_ROOT = 'flex w-full min-w-0 flex-wrap items-start gap-y-4'
 
 /** relative: the hidden status word sits inside it (an sr-only span outside one grew the Sidebar page).
- * Never narrower than its circle; the title wraps to the column instead. */
-export const STEPPER_STEP = 'relative flex min-w-(--tc-stepper-mark) flex-1 flex-col items-center gap-2 text-center'
+ * Never narrower than its circle; the title wraps to the column instead. At most 2.75 circles wide, 88 px at md,
+ * the previewer's pitch, so a short stepper keeps its steps together instead of spreading over the page. */
+export const STEPPER_STEP = 'relative flex min-w-(--tc-stepper-mark) max-w-[calc(var(--tc-stepper-mark)*2.75)] flex-1 flex-col items-center gap-2 text-center'
 
 /** The mark and the line behind it share one row, so the line is level with the centre at every size. */
 export const STEPPER_MARK_ROW = 'relative flex w-full justify-center'

@@ -11,6 +11,7 @@ The format is: date, decision, why, and what it affects.
 **Decision.** The `Previewer: <Name>` frames on the Docs pages (137:2477, 137:1409, 137:1223, 137:2349, 137:2113, 137:2234) are the truth for the look of these six; the composites are under `docs/figma/parity/`.
 
 - **TreeView rows are 30 px, from a new token `--tc-tree-row-height`** (`calc(1.875rem * var(--tc-density))`), not the menus' 40 px `--tc-row-height`: the previewer's rows sit 31 px apart. The tree's cap adds its own padding and border, so seven rows fit whole. The caret is 12 px, rows take `cursor-pointer`, and a label no longer stretches (`flex-1`), so in an RTL row a Latin label sits beside its caret.
+- **A Stepper column is at most 2.75 circles wide** (`max-w-[calc(var(--tc-stepper-mark)*2.75)]`, 88 px at md): the previewer draws its steps about 90 px apart, not spread over the page. The equal columns, the wrap and the half lines are unchanged, so a narrow list lays out as before.
 - **The Timeline rail runs dot to dot.** The connector takes `-my-1`, the 4 px between a 12 px dot and its 20 px marker box, at both ends, so no gap opens beside a dot.
 - **EmptyState draws its dash in `line-strong`, with gap 10 and padding 28** (`gap-2.5`, `p-7`), as the previewer does; the Components page's `line`, 12 and 32 were the older drawing.
 

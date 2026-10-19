@@ -28,7 +28,7 @@ describe('each part wears exactly the classes the spec names', () => {
   })
 
   it('a step is a centred column that shrinks to its circle and no further, with 8 px between the circle and the title', () => {
-    expect(all(html(), /^<li /)[0]).toEqual(['flex', 'flex-1', 'flex-col', 'gap-2', 'items-center', 'min-w-(--tc-stepper-mark)', 'relative', 'text-center'])
+    expect(all(html(), /^<li /)[0]).toEqual(['flex', 'flex-1', 'flex-col', 'gap-2', 'items-center', 'max-w-[calc(var(--tc-stepper-mark)*2.75)]', 'min-w-(--tc-stepper-mark)', 'relative', 'text-center'])
   })
 
   it('the row holding the circle and the line is as wide as its step', () => {
