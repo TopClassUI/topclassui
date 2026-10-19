@@ -3,6 +3,7 @@ import { Table } from 'topclassui/table'
 import { getLabels } from 'topclassui/labels/get-labels'
 
 import type { Locale } from '../../content/pages'
+import { TABLE_ROWS_ALL } from '../../lib/table-of'
 import { textOf } from '../../lib/text-of'
 
 type Row = { key: string; cells: ReactNode[] }
@@ -37,7 +38,7 @@ export function MdxTable({ children, locale }: { children?: ReactNode; locale: L
       {...getLabels(locale)}
       items={items}
       getKey={(item) => item.key}
-      visibleRows={items.length}
+      visibleRows={TABLE_ROWS_ALL}
       caption={caption === '' ? '-' : caption}
       columns={header.map((cell, column) => ({
         key: String(column),

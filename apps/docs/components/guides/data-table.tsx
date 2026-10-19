@@ -3,7 +3,7 @@ import { Table } from 'topclassui/table'
 import { getLabels } from 'topclassui/labels/get-labels'
 
 import type { Locale } from '../../content/pages'
-import { captionOf } from '../../lib/table-of'
+import { TABLE_ROWS_ALL, captionOf } from '../../lib/table-of'
 
 interface Row {
   key: string
@@ -18,7 +18,7 @@ export function DataTable({ header, rows, locale }: { header: ReactNode[]; rows:
       {...getLabels(locale)}
       items={items}
       getKey={(item) => item.key}
-      visibleRows={items.length}
+      visibleRows={TABLE_ROWS_ALL}
       caption={captionOf(header)}
       columns={header.map((cell, column) => ({
         key: String(column),
