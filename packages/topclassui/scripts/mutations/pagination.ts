@@ -89,8 +89,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the pagination page links lose pagination-full, so a phone gets the bulky wrapped row back',
     file: 'src/components/pagination/index.tsx',
-    from: '<li key={item} className={FULL}>',
-    to: '<li key={item}>',
+    from: '<li key={item} className={FULL}>\n',
+    to: '<li key={item}>\n',
+  },
+  {
+    label: 'a disabled pagination shows its dead pages in the compact row, so a phone gets the wrapped row back',
+    file: 'src/components/pagination/index.tsx',
+    from: 'if (disabled) return <li key={item} className={FULL}>',
+    to: 'if (disabled) return <li key={item}>',
   },
   {
     label: 'the pagination compact row ignores a coarse pointer, so a tablet finger meets eleven cells',
