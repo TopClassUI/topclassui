@@ -9,6 +9,18 @@ const CLASSES = 'src/components/date-picker/classes.ts'
 
 export const MUTATIONS: Mutation[] = [
   {
+    label: 'the date picker trigger loses its ring while the calendar is open',
+    file: CLASSES,
+    from: 'text-start ${FIELD_BOX} ${OPEN_RING} ${POINTER}`',
+    to: 'text-start ${FIELD_BOX} ${POINTER}`',
+  },
+  {
+    label: 'the date picker day loses its pill and goes back to the control radius',
+    file: CLASSES,
+    from: 'justify-center rounded-full align-middle text-xs',
+    to: 'justify-center rounded-control align-middle text-xs',
+  },
+  {
     label: 'the date picker addMonths stops keeping the day inside the month, so 31 March back a month is 3 March',
     file: LIB,
     from: '  return withinYears({ year, month, day: Math.min(parts.day, daysInMonth(year, month)) })',

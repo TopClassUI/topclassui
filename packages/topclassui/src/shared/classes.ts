@@ -24,6 +24,9 @@ export const FOCUS_RING = [
   'focus-visible:outline-ring',
 ].join(' ')
 
+/** The ring a trigger keeps while its popup is open, as the frames draw it; the focus is in the popup meanwhile. */
+export const OPEN_RING = 'data-popup-open:outline-solid data-popup-open:outline-(length:--tc-ring-width) data-popup-open:outline-offset-(length:--tc-ring-offset) data-popup-open:outline-ring'
+
 /** Every transition multiplies by --tc-motion, so one knob can stop all of them. */
 export const TRANSITION = 'transition-[color,background-color,border-color,outline-color,opacity,translate] duration-(--tc-duration) ease-out'
 
