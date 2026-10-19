@@ -45,7 +45,7 @@ function Fixture() {
         {SIZES.map((size) => <Toggle key={size} id={`size-${size}`} size={size} />)}
       </div>
       <div id="grid" style={{ display: 'grid' }}>
-        <Toggle id="in-grid" width={35} />
+        <Toggle id="in-grid" width={42} />
       </div>
       <div id="states" style={ROW}>
         <Toggle id="checked" checked />
