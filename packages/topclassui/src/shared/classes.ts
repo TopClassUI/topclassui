@@ -165,8 +165,8 @@ export const FOCUS_RING_INSET = 'outline-none focus-visible:outline-solid focus-
 export const ROW_FOCUSED = [
   'data-highlighted:bg-primary-soft data-highlighted:text-primary-on-soft',
   `${FOCUS_RING_INSET} forced-colors:focus-visible:outline-[HighlightText]`,
-  'forced-colors:data-highlighted:forced-color-adjust-none forced-colors:data-highlighted:bg-[Highlight]',
-  'forced-colors:data-highlighted:text-[HighlightText]',
+  'forced-colors:data-highlighted:bg-[Highlight] forced-colors:data-highlighted:text-[HighlightText]',
+  'forced-colors:data-highlighted:forced-color-adjust-none',
 ].join(' ')
 
 /** The ring on a wrapper whose focused element is hidden: a label around a native radio. */
@@ -276,5 +276,5 @@ export const FIELD_SIZE = {
 /** A row under a finger: raised to the coarse target, never below the row height a 32 px root or a density sets. */
 export const ROW_TOUCH = 'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]'
 
-/** The chosen row wears the tint and the tick; under forced colours the fill goes and the tick stays. */
-export const ROW_SELECTED = 'data-selected:bg-primary-soft data-selected:text-primary-on-soft'
+/** The chosen row wears the tint and the tick. Forced colours would repaint the tint as Canvas, so there it is cleared and the tick tells it. */
+export const ROW_SELECTED = 'data-selected:bg-primary-soft data-selected:text-primary-on-soft forced-colors:data-selected:not-data-highlighted:bg-transparent'

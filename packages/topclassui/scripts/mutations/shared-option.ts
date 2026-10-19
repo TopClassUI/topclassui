@@ -28,7 +28,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the shared option selected row is emptied, so the chosen row is told by its tick alone',
     file: CLASSES,
-    from: "export const ROW_SELECTED = 'data-selected:bg-primary-soft data-selected:text-primary-on-soft'",
+    from: "export const ROW_SELECTED = 'data-selected:bg-primary-soft data-selected:text-primary-on-soft forced-colors:data-selected:not-data-highlighted:bg-transparent'",
     to: "export const ROW_SELECTED = ''",
   },
   {
