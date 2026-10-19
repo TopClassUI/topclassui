@@ -101,8 +101,9 @@ describe('a row', () => {
     expect(SELECT_ITEM.split(' ')).toContain(cls)
   })
 
-  it('the chosen row is heavier as well as ticked, and the highlighted one takes the Highlight pair under forced colours', () => {
-    expect(ruleOf(`${selectorOf('data-selected:font-medium')}[data-selected]`)).toBe('--tw-font-weight: var(--font-weight-medium); font-weight: var(--font-weight-medium);')
+  it('the chosen row is tinted as well as ticked, and the highlighted one takes the Highlight pair under forced colours', () => {
+    expect(ruleOf(`${selectorOf('data-selected:bg-primary-soft')}[data-selected]`)).toBe('background-color: var(--tc-primary-soft);')
+    expect(ruleOf(`${selectorOf('data-selected:text-primary-on-soft')}[data-selected]`)).toBe('color: var(--tc-primary-on-soft);')
     expect(ruleOf(`${selectorOf('forced-colors:data-highlighted:bg-[Highlight]')}[data-highlighted]`)).toBe('background-color: Highlight;')
   })
 
