@@ -18,7 +18,7 @@ export function VoidIsland({ label, title, body, keep }: VoidIslandProps) {
   const [wanted, setWanted] = useState(false)
   return (
     <>
-      <Button size="sm" tone="danger" variant="soft" aria-haspopup="dialog" aria-expanded={open} onClick={() => { setWanted(true); setOpen(true) }}>
+      <Button size="sm" tone="danger" aria-haspopup="dialog" aria-expanded={open} onClick={() => { setWanted(true); setOpen(true) }}>
         {label}
       </Button>
       {wanted ? (

@@ -1,23 +1,24 @@
-import { BORDER } from 'topclassui/classes'
-
 import type { SiteLabels } from '../../labels'
 import { NEXT_RANGE, PEERS } from '../../lib/site'
+import { TILE, TINT } from '../classes'
+import { NextMark, ReactMark, TailwindMark } from './brand-logos'
 
-/** Next.js, React and Tailwind CSS with the floor of each range the package declares; no brand logos. */
+/** Next.js, React and Tailwind CSS with the floor of each range the package declares, each under its brand mark. */
 export function Requirements({ labels }: { labels: SiteLabels }) {
   const text = labels.home.need
   const items = [
-    { range: NEXT_RANGE, ...text.next },
-    { range: PEERS.react, ...text.react },
-    { range: PEERS.tailwindcss, ...text.tailwind },
-  ]
+    { range: NEXT_RANGE, tone: 'neutral', Mark: NextMark, ...text.next },
+    { range: PEERS.react, tone: 'info', Mark: ReactMark, ...text.react },
+    { range: PEERS.tailwindcss, tone: 'primary', Mark: TailwindMark, ...text.tailwind },
+  ] as const
   return (
-    <ul className="grid grid-cols-1 gap-4 md:grid-cols-3">
-      {items.map((item) => (
-        <li key={item.name} className={`flex flex-col gap-2 rounded-box bg-surface p-6 ${BORDER}`}>
-          <span className="text-4xl font-semibold text-body"><bdi>{item.range}</bdi></span>
-          <span className="text-xl font-semibold text-body">{item.name}</span>
-          <span className="text-sm text-muted">{item.line}</span>
+    <ul className="grid grid-cols-1 gap-5 md:grid-cols-3">
+      {items.map(({ Mark, ...item }) => (
+        <li key={item.name} className={`docs-lift flex flex-col items-center gap-4.5 rounded-box p-8 text-center ${TINT[item.tone]}`}>
+          <span aria-hidden="true" className={`docs-tile inline-flex size-22 items-center justify-center rounded-box ${TILE[item.tone]}`}><Mark className="size-12" /></span>
+          <span className="text-5xl font-semibold"><bdi>{item.range}</bdi></span>
+          <h3 className="text-xl font-semibold">{item.name}</h3>
+          <p className="text-sm">{item.line}</p>
         </li>
       ))}
     </ul>
