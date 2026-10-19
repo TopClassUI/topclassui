@@ -6,6 +6,17 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-19 - Stepper, Timeline, TreeView, EmptyState, Progress and Spinner follow their Previewer frames
+
+**Decision.** The `Previewer: <Name>` frames on the Docs pages (137:2477, 137:1409, 137:1223, 137:2349, 137:2113, 137:2234) are the truth for the look of these six; the composites are under `docs/figma/parity/`.
+
+- **TreeView rows are 30 px, from a new token `--tc-tree-row-height`** (`calc(1.875rem * var(--tc-density))`), not the menus' 40 px `--tc-row-height`: the previewer's rows sit 31 px apart. The tree's cap adds its own padding and border, so seven rows fit whole. The caret is 12 px, rows take `cursor-pointer`, and a label no longer stretches (`flex-1`), so in an RTL row a Latin label sits beside its caret.
+- **EmptyState draws its dash in `line-strong`, with gap 10 and padding 28** (`gap-2.5`, `p-7`), as the previewer does; the Components page's `line`, 12 and 32 were the older drawing.
+
+**Kept against the frame, by rule.** Progress fills the bar with `<tone>-on-soft` and outlines its track: the drawn `<tone>-solid` bars measure under 3:1 on the track (warning 1.78 in light, success 2.97 and info 2.74 in dark), so R-5.6-4 holds. TreeView keeps the medium weight on a selected row (a cue beside colour) and draws its focus ring inside the row, since the tree clips its rows.
+
+**Affects** `src/tokens.css`, the six component folders, their tests, e2e specs and mutation rows.
+
 ## 2026-10-18 - The site hydrates in islands, and the shell's code waits for the first paint
 
 **Decision.** Job 83 (Lighthouse on the docs site, mobile preset). Every client part of the site goes through `apps/docs/components/lazy-island.tsx`: the server's HTML is rendered as before, and the part's own chunk loads only when it comes within one viewport (`near`) or, for what is on screen from the start, after the first paint and an idle moment (`idle`). A pointer, touch or focus on it loads it at once, and a press or hover that lands before the chunk is given again afterwards. While it waits, the island's box keeps the server's HTML untouched (an empty `dangerouslySetInnerHTML` during hydration, which React leaves alone); once the chunk is in, the part renders afresh in its place in one transition, and focus goes back where it was. Parts are not hydrated late because a Base UI part hydrated inside a deferred boundary could be left with sync updates React never committed (the Dialog, Popover, Tooltip and Switch states stopped answering). The one island that hydrates is the root provider, in an `<Activity>`: React streams a Suspense boundary over 500 bytes out of order once the page passes 12.8 KB, hidden until a script reveals it, which held the first paint; an Activity stays inline. A client navigation mounts an island with no HTML to keep, so it loads at once.

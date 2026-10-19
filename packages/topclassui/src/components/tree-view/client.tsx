@@ -60,7 +60,7 @@ export function TreeView({
             className={cn(TREE_VIEW_ROW, TREE_VIEW_ROW_SELECTED, TREE_VIEW_ROW_ACTIVE, TREE_VIEW_ROW_DISABLED)}
           >
             <span aria-hidden="true" className={TREE_VIEW_CARET}>
-              {row.branch ? <Svg icon={row.open ? caretDown : caretRight} size="0.875rem" /> : null}
+              {row.branch ? <Svg icon={row.open ? caretDown : caretRight} size="0.75rem" /> : null}
             </span>
             {row.node.icon === undefined ? null : <span aria-hidden="true" className={TREE_VIEW_ICON}>{row.node.icon}</span>}
             <span dir="auto" className={TREE_VIEW_LABEL}>{row.node.label}</span>

@@ -53,8 +53,9 @@ describe('the tree', () => {
   })
 
   it('is capped at the row count, 44 px rows under a finger, and scrolls inside itself without moving the page', () => {
-    expect(ruleOf(selectorOf('max-h-[calc(var(--tc-list-rows)*var(--tc-row-height))]'))).toBe('max-height: calc(var(--tc-list-rows) * var(--tc-row-height));')
-    const coarse = 'pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-coarse,44px)))]'
+    expect(ruleOf(selectorOf('max-h-[calc(var(--tc-list-rows)*var(--tc-tree-row-height)+1rem+2*var(--tc-line-width))]')))
+      .toBe('max-height: calc(var(--tc-list-rows) * var(--tc-tree-row-height) + 1rem + 2 * var(--tc-line-width));')
+    const coarse = 'pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-tree-row-height),var(--tc-target-coarse,44px))+1rem+2*var(--tc-line-width))]'
     expect(mediaOf(selectorOf(coarse))).toBe('@media (pointer: coarse)')
     expect(ruleOf(selectorOf('overscroll-contain'))).toBe('overscroll-behavior: contain;')
   })
@@ -81,10 +82,10 @@ describe('the tree', () => {
 
 describe('a row', () => {
   it('is exactly one unit tall, and 44 px under a finger, so the spacers stand for whole rows', () => {
-    expect(ruleOf(selectorOf('h-(--tc-row-height)'))).toBe('height: var(--tc-row-height);')
-    const coarse = 'pointer-coarse:h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]'
+    expect(ruleOf(selectorOf('h-(--tc-tree-row-height)'))).toBe('height: var(--tc-tree-row-height);')
+    const coarse = 'pointer-coarse:h-[max(var(--tc-tree-row-height),var(--tc-target-coarse,44px))]'
     expect(mediaOf(selectorOf(coarse))).toBe('@media (pointer: coarse)')
-    expect(ruleOf(selectorOf(coarse))).toBe('height: max(var(--tc-row-height), var(--tc-target-coarse,44px));')
+    expect(ruleOf(selectorOf(coarse))).toBe('height: max(var(--tc-tree-row-height), var(--tc-target-coarse,44px));')
   })
 
   it('starts one indent further in per level, on the inline start', () => {
@@ -113,9 +114,9 @@ describe('a row', () => {
     expect(ruleOf(`${selectorOf('aria-disabled:pointer-events-none')}[aria-disabled="true"]`)).toBe('pointer-events: none;')
   })
 
-  it('the caret slot is 14 px wide on every row, and the label ends in an ellipsis', () => {
-    expect(ruleOf(selectorOf('size-3.5'))).toBe('width: calc(var(--spacing) * 3.5); height: calc(var(--spacing) * 3.5);')
-    expect(TREE_VIEW_LABEL.split(' ')).toEqual(['truncate', 'min-w-0', 'flex-1'])
+  it('the caret slot is 12 px wide on every row, and the label ends in an ellipsis', () => {
+    expect(ruleOf(selectorOf('size-3'))).toBe('width: calc(var(--spacing) * 3); height: calc(var(--spacing) * 3);')
+    expect(TREE_VIEW_LABEL.split(' ')).toEqual(['truncate', 'min-w-0'])
   })
 })
 

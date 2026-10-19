@@ -18,5 +18,5 @@ export const TREE_VIEW_DEFAULTS = {
 /** Letters typed within this many ms of each other are one query for the type-ahead. */
 export const TYPEAHEAD_MS = 500
 
-/** A row before it is measured: --tc-row-height is 40 px at a density of 1. The tree then measures its first row. */
-export const TREE_VIEW_ROW_ESTIMATE = 40
+/** A row before it is measured: --tc-tree-row-height is 30 px at a density of 1. The tree then measures its first row. */
+export const TREE_VIEW_ROW_ESTIMATE = 30

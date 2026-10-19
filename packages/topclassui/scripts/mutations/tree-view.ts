@@ -142,8 +142,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a tree view row is no longer exactly one unit tall, so the spacers drift from the rows they stand for',
     file: CLASSES,
-    from: "'group/row flex h-(--tc-row-height) shrink-0",
-    to: "'group/row flex min-h-(--tc-row-height) shrink-0",
+    from: "'group/row flex h-(--tc-tree-row-height) shrink-0",
+    to: "'group/row flex min-h-(--tc-tree-row-height) shrink-0",
   },
   {
     label: 'a tree view row no longer starts one indent further in per level',
@@ -252,5 +252,11 @@ export const MUTATIONS: Mutation[] = [
     file: HOOK,
     from: '    visibleRows: rowsCap,\n',
     to: '',
+  },
+  {
+    label: 'a tree view label stretches across its row again, so a Latin label in an RTL row leaves its caret',
+    file: CLASSES,
+    from: 'export const TREE_VIEW_LABEL = LABEL',
+    to: 'export const TREE_VIEW_LABEL = `${LABEL} flex-1`',
   },
 ]

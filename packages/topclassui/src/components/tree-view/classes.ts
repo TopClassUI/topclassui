@@ -10,18 +10,18 @@ export const TREE_VIEW_TREE = [
   'group/tree relative flex flex-col rounded-box bg-surface-raised p-2 outline-none tone-neutral empty:hidden',
   'focus-visible:not-has-data-highlighted:outline-solid focus-visible:not-has-data-highlighted:outline-(length:--tc-ring-width) focus-visible:not-has-data-highlighted:-outline-offset-(length:--tc-ring-width) focus-visible:not-has-data-highlighted:outline-ring',
   'focus-visible:data-highlight-hidden:outline-solid focus-visible:data-highlight-hidden:outline-(length:--tc-ring-width) focus-visible:data-highlight-hidden:-outline-offset-(length:--tc-ring-width) focus-visible:data-highlight-hidden:outline-ring',
-  'max-h-[calc(var(--tc-list-rows)*var(--tc-row-height))]',
-  'pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-coarse,44px)))]',
+  'max-h-[calc(var(--tc-list-rows)*var(--tc-tree-row-height)+1rem+2*var(--tc-line-width))]',
+  'pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-tree-row-height),var(--tc-target-coarse,44px))+1rem+2*var(--tc-line-width))]',
   'before:h-(--tc-list-pad-start) before:shrink-0 after:h-(--tc-list-pad-end) after:shrink-0',
   BORDER,
   SCROLL_AREA,
 ].join(' ')
 
-/** Exactly one unit tall, 44 px under a finger. The start padding grows by one indent per level. */
+/** Exactly one tree row tall, 30 px as the previewer draws it, 44 px under a finger. The start padding grows by one indent per level. */
 export const TREE_VIEW_ROW = [
-  'group/row flex h-(--tc-row-height) shrink-0 cursor-default select-none items-center gap-1.5 rounded-control text-start text-sm text-body',
+  'group/row flex h-(--tc-tree-row-height) shrink-0 cursor-pointer select-none items-center gap-1.5 rounded-control text-start text-sm text-body',
   'pe-2 ps-[calc(0.5rem+var(--tc-tree-level)*var(--tc-tree-indent))]',
-  'pointer-coarse:h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]',
+  'pointer-coarse:h-[max(var(--tc-tree-row-height),var(--tc-target-coarse,44px))]',
   HOVER.ghost,
   TRANSITION,
 ].join(' ')
@@ -37,11 +37,12 @@ export const TREE_VIEW_ROW_DISABLED = 'aria-disabled:pointer-events-none aria-di
 
 /** The caret, or an empty slot as wide on a leaf. Colour on the wrapper, never on the svg; on a selected row under
  * forced colours it inherits the row's adjust-none, so it is set to HighlightText by hand. */
-export const TREE_VIEW_CARET = 'flex size-3.5 shrink-0 items-center justify-center text-muted group-aria-selected/row:text-primary-on-soft forced-colors:group-aria-selected/row:text-[HighlightText]'
+export const TREE_VIEW_CARET = 'flex size-3 shrink-0 items-center justify-center text-muted group-aria-selected/row:text-primary-on-soft forced-colors:group-aria-selected/row:text-[HighlightText]'
 
 export const TREE_VIEW_ICON = 'flex shrink-0 text-muted group-aria-selected/row:text-primary-on-soft forced-colors:group-aria-selected/row:text-[HighlightText]'
 
-export const TREE_VIEW_LABEL = `${LABEL} flex-1`
+/** Not flex-1: in an RTL row a dir=auto Latin label would sit at the far edge, away from its caret. */
+export const TREE_VIEW_LABEL = LABEL
 
 /** The loading and the empty text, outside the tree. A live region stays in the page so its first words are read; empty, it takes no room. */
 export const TREE_VIEW_NOTE = 'px-3 py-2 text-sm text-muted empty:p-0'

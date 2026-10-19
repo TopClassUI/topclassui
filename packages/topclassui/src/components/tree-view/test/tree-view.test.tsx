@@ -60,14 +60,14 @@ describe('on the server', () => {
 
   it('a closed branch carries the right caret, an open one the down caret, a leaf an empty slot of the same width', () => {
     const out = html({ defaultExpanded: ['app'] })
-    const slots = [...out.matchAll(/<span aria-hidden="true" class="flex size-3\.5[^"]*">(.*?)<\/span>/g)].map(([, inner]) => inner ?? '')
+    const slots = [...out.matchAll(/<span aria-hidden="true" class="flex size-3 [^"]*">(.*?)<\/span>/g)].map(([, inner]) => inner ?? '')
     expect(slots.map((inner) => (inner.includes('M181.66,133.66') ? 'right' : inner.includes('<svg') ? 'down' : 'none'))).toEqual(['down', 'none', 'none', 'right', 'none'])
     expect(out).toContain('scale-x-(--tc-dir)')
   })
 
   it('the icon sits in a hidden wrapper, and the label in a span of its own direction that truncates', () => {
     const out = html({ defaultExpanded: ['app'] })
-    expect(out).toMatch(/<span aria-hidden="true" class="flex shrink-0 text-muted [^"]*"><b>i<\/b><\/span><span dir="auto" class="truncate min-w-0 flex-1">layout\.tsx<\/span>/)
+    expect(out).toMatch(/<span aria-hidden="true" class="flex shrink-0 text-muted [^"]*"><b>i<\/b><\/span><span dir="auto" class="truncate min-w-0">layout\.tsx<\/span>/)
     expect([...out.matchAll(/<span dir="auto"/g)]).toHaveLength(5)
   })
 
@@ -112,6 +112,6 @@ describe('on the server', () => {
     expect(rows(out).length).toBeGreaterThan(0)
     expect(rows(out).length).toBeLessThan(30)
     expect(attr(rows(out)[0] ?? '', 'aria-setsize')).toBe('10')
-    expect(Number(/--tc-list-pad-end:(\d+)px/.exec(out)?.[1])).toBeGreaterThan(390_000)
+    expect(Number(/--tc-list-pad-end:(\d+)px/.exec(out)?.[1])).toBeGreaterThan(290_000)
   })
 })

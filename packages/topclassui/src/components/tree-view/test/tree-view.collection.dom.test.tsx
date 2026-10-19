@@ -21,13 +21,13 @@ const ITEMS: TreeNode[] = [{ id: 'a', label: 'A', children: [{ id: 'a1', label: 
 const last = () => seen.at(-1)
 
 describe('the rows are the shared collection', () => {
-  it('the visible rows, keyed by id, with virtualize auto and a row of 40 px until one is measured', () => {
+  it('the visible rows, keyed by id, with virtualize auto and a row of 30 px until one is measured', () => {
     render(<TreeView aria-label="T" items={ITEMS} defaultExpanded={['a']} />)
     const props = last()
     expect((props?.items as { node: TreeNode }[]).map((row) => row.node.id)).toEqual(['a', 'a1', 'b'])
     expect(props?.getKey(props.items[1])).toBe('a1')
     expect(props?.virtualize).toBe('auto')
-    expect(seen[0]?.estimateRowHeight).toBe(40)
+    expect(seen[0]?.estimateRowHeight).toBe(30)
   })
 
   it('loadMoreThreshold is clamped to 0 and 200 before it reaches useCollection (R-5.7-7)', () => {
