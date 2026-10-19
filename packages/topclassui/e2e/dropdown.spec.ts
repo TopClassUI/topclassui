@@ -1201,7 +1201,7 @@ test('the stylesheet already holds the classes of a menu nothing has rendered ye
   expect(styles).toEqual({
     minWidth: '220px', maxWidth: '320px', maxHeight: '224px', padding: '6px', gap: '2px', radius: '12px', edge: '1px',
     raised: true, wrap: 'anywhere', scrolls: 'auto contain', layer: '60',
-    row: '32px 14px 10px 8px 8px default none 0', shortcut: '12px 160px 16px 10000 ellipsis', line: '0px 1px 0',
+    row: '32px 14px 10px 8px 8px pointer none 0', shortcut: '12px 160px 16px 10000 ellipsis', line: '0px 1px 0',
   })
 })
 

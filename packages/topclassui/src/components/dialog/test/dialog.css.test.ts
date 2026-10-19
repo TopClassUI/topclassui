@@ -9,6 +9,13 @@ import {
 
 // The static harness never opens a popup, so none of these classes reaches Tailwind there.
 const DECLARATION: Record<string, string> = {
+  // POINTER: the hand, and the arrow back on a control that cannot be pressed.
+  'cursor-pointer': 'cursor: pointer;',
+  'disabled:cursor-default': 'cursor: default;',
+  'aria-disabled:cursor-default': 'cursor: default;',
+  'data-disabled:cursor-default': 'cursor: default;',
+  'data-readonly:cursor-default': 'cursor: default;',
+  'data-loading:cursor-default': 'cursor: default;',
   // The scrim and the viewport.
   'fixed': 'position: fixed;',
   'inset-0': 'inset: 0px;',
@@ -142,7 +149,7 @@ describe('every class an open Dialog wears compiles with the installed Tailwind'
       DIALOG_TITLE, DIALOG_DESCRIPTION, DIALOG_BODY, DIALOG_FOOTER, DIALOG_CLOSE,
     ]).filter((cls) => cls !== '' && !elsewhere.has(cls))
     expect(all).toEqual([...Object.keys(DECLARATION), 'group/dialog'].sort())
-    expect(all).toHaveLength(78)
+    expect(all).toHaveLength(84)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

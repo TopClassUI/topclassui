@@ -53,7 +53,6 @@ const DECLARATION: Record<string, string> = {
   'pb-0.5': 'padding-bottom: calc(var(--spacing) * 0.5);',
   'text-xs': 'font-size: var(--text-xs);',
   'font-medium': 'font-weight: var(--font-weight-medium);',
-  'cursor-default': 'cursor: default;',
   'select-none': 'user-select: none;',
   // The focus mark: a ring-thick --tc-ring line over the search row's hairline while the input has the focus.
   'relative': 'position: relative;',
@@ -137,7 +136,7 @@ describe('every class an open Command wears compiles with the installed Tailwind
       COMMAND_SPACER, COMMAND_GROUP_LABEL, COMMAND_ITEM, COMMAND_ESCAPE_HINT, COMMAND_STATUS, COMMAND_TITLE,
     ]).filter((cls) => !shared.has(cls))
     expect(own).toEqual(Object.keys(DECLARATION).sort())
-    expect(own).toHaveLength(66)
+    expect(own).toHaveLength(65)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

@@ -293,14 +293,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the overlay row loses its height token, so a menu row is as short as its text',
     file: 'src/shared/classes.ts',
-    from: "'flex min-h-(--tc-row-height) w-full",
-    to: "'flex w-full",
+    from: '`flex min-h-(--tc-row-height) w-full',
+    to: '`flex w-full',
   },
   {
     label: 'the overlay row resets with outline-hidden, a 2 px ring on every row of a menu at rest',
     file: 'src/shared/classes.ts',
-    from: "text-start text-sm outline-none'",
-    to: "text-start text-sm outline-hidden'",
+    from: 'text-start text-sm outline-none ${POINTER}`',
+    to: 'text-start text-sm outline-hidden ${POINTER}`',
   },
   {
     label: 'the overlay row highlight loses the system pair, so no row is told from the others once a fill is erased',

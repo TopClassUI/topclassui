@@ -61,7 +61,7 @@ export const COMMAND_ENTER_HINT = 'after:ms-auto after:hidden after:shrink-0 aft
 
 /** One command. Its label truncates, so a long one never widens the popup. The active row is the
  * highlighted one, filled and marked by COMMAND_ACTIVE: the focus stays in the input. */
-export const COMMAND_ITEM = `relative ${ROW} ${COMMAND_ACTIVE} ${DISABLED} ${COMMAND_UNIT} ${CONTAIN} ${COMMAND_ENTER_HINT} cursor-default select-none`
+export const COMMAND_ITEM = `relative ${ROW} ${COMMAND_ACTIVE} ${DISABLED} ${COMMAND_UNIT} ${CONTAIN} ${COMMAND_ENTER_HINT} select-none`
 
 /** The Esc keycap at the end of the search row: a hint for a keyboard, so a finger never sees it. */
 export const COMMAND_ESCAPE_HINT = 'shrink-0 border-line text-muted pointer-coarse:hidden'

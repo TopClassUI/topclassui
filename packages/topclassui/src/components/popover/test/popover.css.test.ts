@@ -5,6 +5,13 @@ import { POPOVER_CLOSE, POPOVER_DESCRIPTION, POPOVER_POPUP, POPOVER_POSITIONER, 
 
 // The static harness never opens a popup, so none of these classes reaches Tailwind there.
 const DECLARATION: Record<string, string> = {
+  // POINTER: the hand, and the arrow back on a control that cannot be pressed.
+  'cursor-pointer': 'cursor: pointer;',
+  'disabled:cursor-default': 'cursor: default;',
+  'aria-disabled:cursor-default': 'cursor: default;',
+  'data-disabled:cursor-default': 'cursor: default;',
+  'data-readonly:cursor-default': 'cursor: default;',
+  'data-loading:cursor-default': 'cursor: default;',
   // The positioner: the popup layer, and hidden with its trigger.
   'z-(--tc-z-popup)': 'z-index: var(--tc-z-popup);',
   'data-anchor-hidden:invisible': 'visibility: hidden;',
@@ -108,7 +115,7 @@ describe('every class an open Popover wears compiles with the installed Tailwind
   it('the table names exactly the classes of the five strings in classes.ts', () => {
     const all = written([POPOVER_POSITIONER, POPOVER_POPUP, POPOVER_TITLE, POPOVER_DESCRIPTION, POPOVER_CLOSE])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(52)
+    expect(all).toHaveLength(58)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

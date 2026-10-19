@@ -265,6 +265,9 @@
 
   html {
     scrollbar-gutter: stable;
+    /* The page's own bar, as SCROLLBAR draws every other: thin and in the theme's two colours. */
+    scrollbar-width: thin;
+    scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track);
     /* R-10.5-3: a sticky bar sets these to its own height, so a target or a focused control never lands under it. */
     scroll-padding-block: var(--tc-sticky-top) var(--tc-sticky-bottom);
   }

@@ -8,6 +8,13 @@ const CLOSED = ':is(:where(.group\\/sidebar)[data-closed] *) {'
 
 /** What each class Sidebar writes must emit, written out: a class Tailwind does not know emits nothing at all. */
 const DECLARATION: Record<string, string> = {
+  // POINTER: the hand, and the arrow back on a control that cannot be pressed.
+  'cursor-pointer': 'cursor: pointer;',
+  'disabled:cursor-default': 'cursor: default;',
+  'aria-disabled:cursor-default': 'cursor: default;',
+  'data-disabled:cursor-default': 'cursor: default;',
+  'data-readonly:cursor-default': 'cursor: default;',
+  'data-loading:cursor-default': 'cursor: default;',
   // The rail.
   'flex': 'display: flex;',
   'h-full': 'height: 100%;',
@@ -134,7 +141,7 @@ describe('every class Sidebar writes compiles with the installed Tailwind', () =
 
   it('the table names exactly the classes of classes.ts, and the one that only marks the group', () => {
     expect(written).toEqual([...Object.keys(DECLARATION), 'group/sidebar'].sort())
-    expect(written).toHaveLength(75)
+    expect(written).toHaveLength(81)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

@@ -57,7 +57,7 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
             <h2 id={headingId} className={CARD_TITLE}>
               {href === undefined ? title : <a href={href} className={LINK}>{title}</a>}
             </h2>
-            <Badge tone="neutral" variant="outline" size="sm"><bdi>{chipOf(entry.rendering, entry.slug, t.chip)}</bdi></Badge>
+            <Badge tone="neutral" variant="outline" size="sm"><bdi>{chipOf(entry, t.chip)}</bdi></Badge>
           </div>
           <p className={SMALL}><InlineText text={content.description[locale]} /></p>
           <div className="flex flex-wrap items-center gap-3">

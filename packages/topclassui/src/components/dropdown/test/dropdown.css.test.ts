@@ -8,6 +8,13 @@ import {
 
 // The static harness never opens a menu, so none of these classes reaches Tailwind there.
 const DECLARATION: Record<string, string> = {
+  // POINTER: the hand, and the arrow back on a control that cannot be pressed.
+  'cursor-pointer': 'cursor: pointer;',
+  'disabled:cursor-default': 'cursor: default;',
+  'aria-disabled:cursor-default': 'cursor: default;',
+  'data-disabled:cursor-default': 'cursor: default;',
+  'data-readonly:cursor-default': 'cursor: default;',
+  'data-loading:cursor-default': 'cursor: default;',
   // The positioner: the popup layer, and hidden with its trigger.
   'z-(--tc-z-popup)': 'z-index: var(--tc-z-popup);',
   'data-anchor-hidden:invisible': 'visibility: hidden;',
@@ -59,7 +66,6 @@ const DECLARATION: Record<string, string> = {
   'text-start': 'text-align: start;',
   'text-sm': 'font-size: var(--text-sm);',
   'shrink-0': 'flex-shrink: 0;',
-  'cursor-default': 'cursor: default;',
   'select-none': 'user-select: none;',
   'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]': 'min-height: max(var(--tc-row-height), var(--tc-target-coarse,44px));',
   'data-highlighted:bg-primary-soft': 'background-color: var(--tc-primary-soft);',
@@ -155,7 +161,7 @@ describe('every class an open Dropdown wears compiles with the installed Tailwin
       DROPDOWN_SHORTCUT, DROPDOWN_GROUP, DROPDOWN_GROUP_LABEL, DROPDOWN_SEPARATOR,
     ])
     expect(all).toEqual([...Object.keys(DECLARATION), 'group'].sort())
-    expect(all).toHaveLength(75)
+    expect(all).toHaveLength(80)
   })
 
   it('group emits nothing of its own: it only marks the row for the shortcut inside it', async () => {

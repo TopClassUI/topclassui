@@ -13,6 +13,8 @@ export interface CardEntry {
   name: string
   status: string
   rendering: Rendering
+  /** pnpm size's own gzip bytes, null for a server component. */
+  clientBytes: number | null
   section: string | null
   order: number | null
 }
@@ -29,7 +31,7 @@ export const CARDS: readonly CardEntry[] = components.sections.flatMap((section)
   section.slugs.map((slug) => {
     const entry = entries.find((candidate) => candidate.slug === slug)
     if (entry === undefined) throw new Error(`components.json has no ${slug}`)
-    return { slug: entry.slug, name: entry.name, status: entry.status, rendering: entry.rendering, section: entry.section, order: entry.order }
+    return { slug: entry.slug, name: entry.name, status: entry.status, rendering: entry.rendering, clientBytes: entry.clientBytes, section: entry.section, order: entry.order }
   }),
 )
 
