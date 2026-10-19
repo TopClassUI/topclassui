@@ -123,11 +123,11 @@ test.describe('the look of each state, on the static page', () => {
     expect([await css(group, 'opacity'), ...await group.locator('button').evaluateAll((all) => all.map((el) => getComputedStyle(el).opacity))]).toEqual(['1', '1', '0.5'])
   })
 
-  test('read-only: both steppers at 0.5, the box tinted, and the pointer paints no hover on a stepper', async ({ page }) => {
+  test('read-only: both steppers at 0.5, the box untinted as the frame draws it, and the pointer paints no hover on a stepper', async ({ page }) => {
     await page.goto(urlFor('number-field--states', 'light', 'ltr'))
     const group = groupOf(input(page, 'Read-only'))
     expect(await group.locator('button').evaluateAll((all) => all.map((el) => getComputedStyle(el).opacity))).toEqual(['0.5', '0.5'])
-    expect(await css(group, 'background-color')).not.toBe(await css(groupOf(input(page, 'Invalid')), 'background-color'))
+    expect(await css(group, 'background-color')).toBe(await css(groupOf(input(page, 'Invalid')), 'background-color'))
     const plus = group.getByRole('button', { name: 'Increase' })
     const before = await css(plus, 'background-color')
     await page.mouse.move(0, 0)

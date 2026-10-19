@@ -51,7 +51,6 @@ describe('the box', () => {
   it('rings while the input inside it has the focus, and dims as a whole when disabled', () => {
     expect(selectorLine('has-focus-visible:outline-solid')).toBe('.has-focus-visible\\:outline-solid:has(:focus-visible)')
     expect(ruleOf(`${selectorOf('data-disabled:opacity-50')}[data-disabled]`)).toBe('opacity: 50%;')
-    expect(ruleOf(`${selectorOf('data-readonly:bg-neutral-soft')}[data-readonly]`)).toBe('background-color: var(--tc-neutral-soft);')
   })
 
   it('dims as a whole when a disabled fieldset disables its input, and not when only a stepper at its limit is disabled', () => {
