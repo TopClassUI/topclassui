@@ -227,14 +227,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the date picker popup keeps its full side padding on a narrow screen, so at a 32 px root two digits overflow their day',
     file: CLASSES,
-    from: 'px-[clamp(4px,calc(1rem-(17.5rem*var(--tc-density)-var(--available-width,100vw))/2),min(1rem,16px))]',
-    to: 'px-[min(1rem,16px)]',
+    from: 'px-[clamp(4px,calc(0.875rem-(16.75rem*var(--tc-density)-var(--available-width,100vw))/2),min(0.875rem,14px))]',
+    to: 'px-[min(0.875rem,14px)]',
   },
   {
-    label: 'the date picker popup block padding grows with the root again, 32 px above and below the month at a 32 px root',
+    label: 'the date picker popup block padding grows with the root again, 28 px above and below the month at a 32 px root',
     file: CLASSES,
-    from: "'py-[min(1rem,16px)] px-[clamp(",
-    to: "'p-4 px-[clamp(",
+    from: "'py-[min(0.875rem,14px)] px-[clamp(",
+    to: "'p-3.5 px-[clamp(",
   },
   {
     label: 'the date picker cell keeps a side padding, so a day is narrower than its column and two digits overflow at a 32 px root',
