@@ -29,7 +29,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the AvatarGroup ring loses the page colour, so it paints in the text colour of each avatar',
     file: 'src/components/avatar-group/classes.ts',
-    from: "'*:ring-2 *:ring-page'",
+    from: "'*:ring-2 *:ring-neutral-soft'",
     to: "'*:ring-2'",
   },
   {
@@ -83,8 +83,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the AvatarGroup counter keeps the fixed width of the avatar at md, so its floor and its padding widen nothing',
     file: 'src/components/avatar-group/classes.ts',
-    from: "md: 'w-auto min-w-control-md px-1',",
-    to: "md: 'min-w-control-md px-1',",
+    from: "md: 'w-auto min-w-control-md px-1 bg-primary-soft",
+    to: "md: 'min-w-control-md px-1 bg-primary-soft",
   },
   {
     label: 'the AvatarGroup custom size widens the counter too, so one class on the group can no longer size it',
@@ -133,5 +133,11 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/avatar-group/dummy/linked.tsx',
     from: "cn('inline-flex', FOCUS_RING)",
     to: "cn('inline-flex')",
+  },
+  {
+    label: 'the AvatarGroup counter loses its primary tint, so +N reads as one more neutral face',
+    file: 'src/components/avatar-group/classes.ts',
+    from: "md: 'w-auto min-w-control-md px-1 bg-primary-soft text-primary-on-soft ring-primary-soft',",
+    to: "md: 'w-auto min-w-control-md px-1',",
   },
 ]

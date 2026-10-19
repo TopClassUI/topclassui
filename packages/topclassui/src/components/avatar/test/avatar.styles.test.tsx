@@ -13,18 +13,18 @@ const image = (className?: string) =>
 
 /** The Build this block for the root and its forced-colours edge, less the size, sorted and written out. */
 const ROOT = [
-  'bg-primary-soft', 'font-medium', 'forced-colors:outline-(length:--tc-line-width)', 'inline-flex',
+  'bg-neutral-soft', 'font-medium', 'forced-colors:outline-(length:--tc-line-width)', 'inline-flex',
   'items-center', 'justify-center', 'overflow-hidden', 'relative', 'rounded-full', 'shrink-0',
-  'text-primary-on-soft',
+  'text-neutral-on-soft',
 ]
 
 /** The control size on both axes, and the type step CONTROL_SIZE gives that size. */
 const SIZE = {
   xs: ['size-control-xs', 'text-xs'],
-  sm: ['size-control-sm', 'text-sm'],
-  md: ['size-control-md', 'text-sm'],
-  lg: ['size-control-lg', 'text-base'],
-  xl: ['size-control-xl', 'text-base'],
+  sm: ['size-control-sm', 'text-xs'],
+  md: ['size-control-md', 'text-base'],
+  lg: ['size-control-lg', 'text-lg'],
+  xl: ['size-control-xl', 'text-xl'],
   custom: [],
 } as const
 
@@ -36,7 +36,7 @@ describe('AvatarRoot carries exactly the classes the spec names', () => {
   }
 
   it('is md when no size is given', () => {
-    expect(root()).toEqual([...ROOT, 'size-control-md', 'text-sm'].sort())
+    expect(root()).toEqual([...ROOT, 'size-control-md', 'text-base'].sort())
   })
 
   it('is square: one size class sets both axes, and no height or width class sits beside it', () => {

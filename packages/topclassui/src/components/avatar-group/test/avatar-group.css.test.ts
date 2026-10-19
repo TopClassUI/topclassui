@@ -33,7 +33,7 @@ const ruleOf = (selector: string) => {
 describe('every class the group renders paints something', () => {
   it('rendered the classes at all, the counter among them, so an empty list cannot pass', () => {
     expect(RENDERED.length).toBeGreaterThan(20)
-    expect(RENDERED).toContain('*:ring-page')
+    expect(RENDERED).toContain('*:ring-neutral-soft')
     expect(RENDERED).toContain('rounded-full')
     expect(RENDERED).toContain('min-w-control-xs')
   })
@@ -70,7 +70,7 @@ describe('the containment', () => {
 describe('the ring', () => {
   it('reaches every direct child, so the counter is ringed like an avatar', () => {
     expect(css).toContain(':is(.\\*\\:ring-2 > *) {')
-    expect(css).toContain(':is(.\\*\\:ring-page > *) {')
+    expect(css).toContain(':is(.\\*\\:ring-neutral-soft > *) {')
   })
 
   it('is two pixels of box shadow, which follows the circle and takes no space', () => {
@@ -79,12 +79,12 @@ describe('the ring', () => {
     expect(rule).toContain('box-shadow:')
   })
 
-  it('takes the page colour from the token, so it changes with the mode and is never a fixed white', () => {
-    expect(ruleOf(':is(.\\*\\:ring-page > *)')).toBe('--tw-ring-color: var(--tc-page);')
+  it('takes the avatar fill from the token, so it changes with the mode and never shows on a fallback disc', () => {
+    expect(ruleOf(':is(.\\*\\:ring-neutral-soft > *)')).toBe('--tw-ring-color: var(--tc-neutral-soft);')
   })
 
-  it('finds that token declared for light and for dark, so the ring is never an unset colour', () => {
-    expect(css).toMatch(/\[data-theme='light'\] \{[^}]*--tc-page:/)
+  it('finds that token mixed from the page of each mode, so the ring is never an unset colour', () => {
+    expect(css).toMatch(/--tc-neutral-soft: color-mix\(in oklch, var\(--tc-neutral-solid\) var\(--tc-neutral-mix\), var\(--tc-page\)\)/)
     expect(css).toMatch(/\[data-theme='dark'\] \{[^}]*--tc-page:/)
   })
 

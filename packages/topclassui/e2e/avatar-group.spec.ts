@@ -160,7 +160,7 @@ for (const direction of DIRECTIONS) {
       return { box: [box.width, box.height], avatar: [avatar?.width, avatar?.height], round: Number.parseFloat(getComputedStyle(link).borderTopLeftRadius) >= 24 }
     }))
     expect(links).toEqual([1, 2, 3].map(() => ({ box: [48, 48], avatar: [48, 48], round: true })))
-    expect(await ringBetween(page, direction), 'the first avatar paints over the ring of the second').toEqual([255, 255, 255])
+    expect(await ringBetween(page, direction), 'the first avatar paints over the ring of the second').toEqual([234, 234, 234])
 
     // Tab to the second link: its focus ring must also show on the side the third avatar covers.
     const second = page.locator('#demo [role="group"] > a').nth(1)
@@ -222,13 +222,13 @@ test('custom-size: one class on the group sizes every avatar and the counter ali
 
 /** The page and a Card in each mode, written out: only in dark do the two differ. */
 const SURFACES = [
-  { mode: 'light', page: [255, 255, 255], card: [255, 255, 255] },
-  { mode: 'dark', page: [10, 10, 10], card: [38, 38, 38] },
-  { mode: 'ocean', page: [255, 255, 255], card: [255, 255, 255] },
+  { mode: 'light', page: [234, 234, 234], card: [234, 234, 234] },
+  { mode: 'dark', page: [32, 32, 32], card: [32, 32, 32] },
+  { mode: 'ocean', page: [234, 234, 234], card: [234, 234, 234] },
 ] as const
 
 for (const surface of SURFACES) {
-  test(`${surface.mode}: the ring is the page colour, and on a Card the colour the caller gives it`, async ({ page }) => {
+  test(`${surface.mode}: the ring is the avatar fill, on the page, on a Card and in a Table alike`, async ({ page }) => {
     await page.goto(urlFor('avatar-group--overflow', surface.mode, 'ltr'))
     expect(await ringBetween(page, 'ltr')).toEqual(surface.page)
     await page.goto(urlFor('avatar-group--on-card', surface.mode, 'ltr'))
