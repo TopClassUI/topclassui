@@ -16,8 +16,8 @@ const BLOCKS = DEMOS.filter((demo) => demo.startsWith('code-block--'))
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 1280, height: 800 }, { width: 844, height: 390 }] as const
 const LAYOUTS = ['cb-alone', 'cb-track', 'cb-flex', 'cb-fit', 'cb-cell'] as const
 const BASIC = 'export default async function Page() {\n  const invoices = await getInvoices()\n  return <InvoiceTable items={invoices} />\n}'
-/** px-3.5 at the default spacing: the code and the header both start 14 px in from the block's edge. */
-const PAD = 14
+/** px-3 at the default spacing: the code and the header both start 12 px in from the block's edge, as Figma 137:1585 draws. */
+const PAD = 12
 /** Inside the demo: a live page also holds the harness's own hidden pre for errors. */
 const [PRE, CODE, BUTTON] = ['#demo pre', '#demo pre code', '#demo button']
 
@@ -227,7 +227,7 @@ for (const pointer of ['fine', 'coarse'] as const) {
         const size = pointer === 'coarse' ? 44 : 24
         const [header, button] = [await boxOf(page.locator(PRE).locator('xpath=preceding-sibling::div')), await boxOf(page.locator(BUTTON))]
         expect([button.width, button.height]).toEqual([size, size])
-        expect([Math.round(button.top - header.top), Math.round(header.bottom - button.bottom)], 'py-1.5 above and below').toEqual([6, 6])
+        expect([Math.round(button.top - header.top), Math.round(header.bottom - button.bottom)], 'py-1 above and below').toEqual([4, 4])
       })
     }
   })

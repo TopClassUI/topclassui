@@ -166,7 +166,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the code block pre alone keeps the header shape: no top padding, square top corners',
     file: CLASSES,
-    from: "export const CODE_BLOCK_PRE_ALONE = 'rounded-box pt-3.5'",
+    from: "export const CODE_BLOCK_PRE_ALONE = 'rounded-box pt-3'",
     to: "export const CODE_BLOCK_PRE_ALONE = ''",
   },
   {
