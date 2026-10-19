@@ -24,7 +24,7 @@ export function BannerShell({ id, onDismiss, children, ...rest }: BannerShellPro
         onClick={banner.dismiss}
         className={cn(DISMISS, DISMISS_TONE[rest['data-tone']])}
       >
-        <Svg icon={x} size={14} />
+        <Svg icon={x} />
       </button>
     </div>
   )
