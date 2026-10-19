@@ -2,12 +2,16 @@ import type { ComponentPropsWithRef, ReactElement, ReactNode } from 'react'
 
 import type { CollectionProps } from '#shared/contracts/collection.js'
 import type { Labels } from '#shared/labels/types.js'
-import type { TABLE_ALIGNS, TABLE_SORT_DIRECTIONS } from './constants.js'
+import type { TABLE_ALIGNS, TABLE_DENSITIES, TABLE_SORT_DIRECTIONS, TABLE_VARIANTS } from './constants.js'
 import type { TableSchemaInput, TableSkeletonSchemaInput } from './schema.js'
 
 export type TableAlign = (typeof TABLE_ALIGNS)[number]
 
 export type TableSortDirection = (typeof TABLE_SORT_DIRECTIONS)[number]
+
+export type TableDensity = (typeof TABLE_DENSITIES)[number]
+
+export type TableVariant = (typeof TABLE_VARIANTS)[number]
 
 // R-8.3-4: derived from the schema, so the props and the validation cannot drift apart.
 export type TableDesignProps = {
@@ -108,4 +112,4 @@ export type TableSkeletonDesignProps = {
 export type TableSkeletonProps =
   Omit<ComponentPropsWithRef<'div'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
   & TableSkeletonDesignProps
-  & Pick<TableDesignProps, 'captionVisible'>
+  & Pick<TableDesignProps, 'captionVisible' | 'density' | 'variant'>

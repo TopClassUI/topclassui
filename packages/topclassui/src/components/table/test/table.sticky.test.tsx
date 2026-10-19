@@ -94,7 +94,7 @@ describe('stickyFirstColumn', () => {
     const [header] = classesOf(html_, 'th')
     const [cell] = classesOf(body(html_), 'td')
     expect(header).toEqual(expect.arrayContaining(STUCK))
-    expect(cell?.slice(-12)).toEqual([...STUCK, 'bg-surface-raised'])
+    expect(cell?.slice(-13)).toEqual([...STUCK, 'bg-surface-raised', 'group-hover/row:bg-surface'])
   })
 
   it('pads the scrolling by the stuck column only when a column is stuck: with none, nothing can cover a control', () => {
@@ -142,9 +142,9 @@ describe('a class per column', () => {
   it('is merged last, so whitespace-normal replaces the one line a cell keeps by default', () => {
     const [, status] = classesOf(html({ columns: wrapping }), 'th')
     const [, cell] = classesOf(body(html({ columns: wrapping })), 'td')
-    expect(status).toEqual(['px-4', 'py-2.5', 'text-xs', 'font-medium', 'text-muted', 'bg-surface', 'text-start', 'min-w-40', 'whitespace-normal'])
+    expect(status).toEqual(['px-3.5', 'text-xs', 'font-medium', 'text-muted', 'bg-surface', 'py-2', 'text-start', 'min-w-40', 'whitespace-normal'])
     expect(cell).toEqual([
-      'border-t-(length:--tc-line-width)', 'border-line', 'px-4', 'py-3', 'text-sm', 'text-body', 'text-start', 'min-w-40', 'whitespace-normal',
+      'border-t-(length:--tc-line-width)', 'border-line', 'px-3.5', 'text-sm', 'text-muted', 'py-3', 'text-start', 'min-w-40', 'whitespace-normal',
     ])
   })
 

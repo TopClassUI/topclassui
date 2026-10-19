@@ -1,7 +1,7 @@
 /** R-5.12-4: Table's own class tables. A cell reads its alignment from one and a sticky
  * cell its fill from another, so the columns scrolling under it never show through. */
-import { CONTAIN, FOCUS_RING, FORCED_EDGE, HOVER, SCROLLBAR, TOUCH_TARGET } from '#shared/classes.js'
-import type { TableAlign } from './types.js'
+import { BORDER, CONTAIN, FOCUS_RING, FORCED_EDGE, HOVER, SCROLLBAR, TOUCH_TARGET } from '#shared/classes.js'
+import type { TableAlign, TableDensity, TableVariant } from './types.js'
 
 /** relative: the box contains every sr-only span, or one in a far column widens the page.
  * isolate: the z-index of a stuck cell stays inside, under any sticky bar of the page.
@@ -11,9 +11,21 @@ export const BOX = `relative isolate grid grid-cols-1 overflow-x-auto rounded-bo
 /** R-8.5-1: overflow-x auto scrolls the block axis too. The header row and --tc-list-rows body rows, each its padding, one line of text and its line, then the
  * body scrolls under the header. A visible caption scrolls away with the rows, so it adds a row's height. */
 export const BOX_CAP = {
-  hidden: 'max-h-[calc(var(--spacing)*9+var(--tc-list-rows)*(var(--spacing)*11+var(--tc-line-width)))]',
-  visible: 'max-h-[calc(var(--spacing)*20+var(--tc-line-width)+var(--tc-list-rows)*(var(--spacing)*11+var(--tc-line-width)))]',
-} as const
+  comfortable: {
+    hidden: 'max-h-[calc(var(--spacing)*8+var(--tc-list-rows)*(var(--spacing)*11+var(--tc-line-width)))]',
+    visible: 'max-h-[calc(var(--spacing)*19+var(--tc-line-width)+var(--tc-list-rows)*(var(--spacing)*11+var(--tc-line-width)))]',
+  },
+  compact: {
+    hidden: 'max-h-[calc(var(--spacing)*7+var(--tc-list-rows)*(var(--spacing)*8+var(--tc-line-width)))]',
+    visible: 'max-h-[calc(var(--spacing)*18+var(--tc-line-width)+var(--tc-list-rows)*(var(--spacing)*8+var(--tc-line-width)))]',
+  },
+} as const satisfies Record<TableDensity, Record<'hidden' | 'visible', string>>
+
+/** The frame's outline variant draws the hairline round the box; plain leaves it out. */
+export const BOX_VARIANT = {
+  outline: BORDER,
+  plain: '',
+} as const satisfies Record<TableVariant, string>
 
 /** The header stays at the top of the box while the body scrolls, over every body cell, the stuck one too. */
 export const HEAD = 'sticky top-0 z-[calc(var(--tc-z-sticky)+1)]'
@@ -58,11 +70,15 @@ export const LINK_ALIGN = {
   end: 'justify-end',
 } as const satisfies Record<TableAlign, string>
 
-/** The fill of a row: the frame's own, or the tint `striped` gives every second one. */
+/** The fill of a row: the frame's own, or the tint `striped` gives every second one. A stuck cell carries the row's
+ * hover tint itself, or the raised fill it needs to cover the columns under it would hide the tint. */
 export const ROW_FILL = {
-  plain: 'bg-surface-raised',
+  plain: 'bg-surface-raised group-hover/row:bg-surface',
   striped: 'bg-surface',
 } as const
+
+/** The frame's hover row: the page's surface under the pointer, so the eye can follow it across. */
+export const ROW = 'group/row hover:bg-surface'
 
 /** Drawn above the header row, or read out without being drawn. */
 export const CAPTION = {
@@ -71,18 +87,32 @@ export const CAPTION = {
 } as const
 
 /** One line each: a narrow screen scrolls the box instead of stacking a date word by word. */
-export const HEADER_CELL = 'px-4 py-2.5 text-xs font-medium whitespace-nowrap text-muted bg-surface'
+export const HEADER_CELL = 'px-3.5 text-xs font-medium whitespace-nowrap text-muted bg-surface'
 
-/** The line is on the cell, not the row: a sticky cell carries its own border with it. */
-export const BODY_CELL = 'border-t-(length:--tc-line-width) border-line px-4 py-3 text-sm whitespace-nowrap text-body'
+/** The line is on the cell, not the row: a sticky cell carries its own border with it. The frame reads a row from
+ * its header cell, so the other cells are muted. */
+export const BODY_CELL = 'border-t-(length:--tc-line-width) border-line px-3.5 text-sm whitespace-nowrap text-muted'
 
-/** A row header is a th, which a browser draws bold and centred. */
-export const ROW_HEADER = 'font-normal'
+/** The block padding of each density: comfortable is the frame's row, compact the same row with a quarter of it. */
+export const CELL_DENSITY = {
+  comfortable: { header: 'py-2', body: 'py-3' },
+  compact: { header: 'py-1.5', body: 'py-1.5' },
+} as const satisfies Record<TableDensity, Record<'header' | 'body', string>>
 
-export const EMPTY_CELL = 'border-t-(length:--tc-line-width) border-line px-4 py-3 text-center text-sm text-muted'
+/** A row header is a th, which a browser draws bold and centred; the frame draws it medium, in the body colour. */
+export const ROW_HEADER = 'font-medium text-body'
 
-/** The cell is as wide as the table, so its words stick to the part of the box in view. */
-export const EMPTY_WORDS = 'sticky inset-s-4 inset-e-4 mx-auto w-fit'
+export const EMPTY_CELL = 'border-t-(length:--tc-line-width) border-line px-3.5 py-6 text-center text-xs text-muted'
+
+/** The cell is as wide as the table, so its words stick to the part of the box in view; the tray sits over them. */
+export const EMPTY_WORDS = 'sticky inset-s-4 inset-e-4 mx-auto flex w-fit flex-col items-center gap-1.25'
+
+/** The frame's empty tray, a step over the text. */
+export const EMPTY_ICON = 'text-muted'
+
+/** The caret after a header: a muted pair while the column can be sorted, the direction once it is. */
+export const SORT_ICON = 'ms-1.25 shrink-0'
+export const SORT_IDLE = `${SORT_ICON} text-muted`
 
 /** inline-flex: as wide as its label, so the ring is the header's and not the column's. align-top:
  * on the baseline a header that wraps makes its row 4 px taller. -my-1 gives back the 8 px the

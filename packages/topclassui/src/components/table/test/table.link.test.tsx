@@ -46,7 +46,7 @@ describe('a sortable header is a real link', () => {
   })
 
   it('says what the link does before the header, in text only a screen reader gets', () => {
-    expect(headers(html())[0]).toMatch(/<a [^>]*><span class="sr-only">Sort by <\/span><span id="[^"]+" class="[^"]*">Invoice<\/span><\/a><\/th>$/)
+    expect(headers(html())[0]).toMatch(/<a [^>]*><span class="sr-only">Sort by <\/span><span id="[^"]+" class="[^"]*">Invoice<\/span><svg [^>]*aria-hidden="true"[^>]*>.*<\/svg><\/a><\/th>$/)
   })
 
   it('keeps the caret inside the link, so the whole header is one target', () => {
@@ -94,7 +94,9 @@ describe('the link prop: one element every sort link is cloned from (R-5.7-4)', 
     expect(classList(first ?? '')).toEqual(expect.arrayContaining(['inline-flex', '-my-1', 'max-w-full', 'outline-none', 'no-underline', 'justify-center']))
     expect(classList(first ?? '')).not.toContain('justify-start')
     expect(html_).toContain('<span class="sr-only">Sort by </span>')
-    expect(html_.split('<svg').length - 1).toBe(1)
+    // The sorted column's mark and the idle pair of the other sortable one.
+    expect(html_.split('<svg').length - 1).toBe(2)
+    expect(html_.split('role="img"').length - 1).toBe(1)
   })
 
   it('takes an intrinsic element as well, such as an anchor with a rel', () => {
@@ -157,10 +159,11 @@ describe('the sort link is the only interactive part', () => {
     expect(amount).not.toContain('justify-start')
   })
 
-  it('puts no ring, hover or target on a cell or a row: none of them can be activated', () => {
+  it('puts no ring or target on a cell or a row, none of which can be activated, and on a row only the frame\'s hover tint', () => {
     const interactive = /(^|:)(hover|active|focus-visible):|^(min-h-|cursor-|transition)/
-    for (const tag of ['table', 'thead', 'tbody', 'tr', 'th', 'td', 'caption']) {
+    for (const tag of ['table', 'thead', 'tbody', 'th', 'td', 'caption']) {
       expect(classesOf(html({ striped: true }), tag).flat().filter((c) => interactive.test(c)), tag).toEqual([])
     }
+    expect([...new Set(classesOf(html({ striped: true }), 'tr').flat().filter((c) => interactive.test(c)))]).toEqual(['hover:bg-surface'])
   })
 })

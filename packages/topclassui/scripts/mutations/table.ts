@@ -176,4 +176,28 @@ export const MUTATIONS: Mutation[] = [
     from: 'clamp(visibleRows, visibleRowsMin, visibleRowsMax)',
     to: 'visibleRows',
   },
+  {
+    label: 'a compact table keeps the comfortable rows, so the density prop changes nothing',
+    file: 'src/components/table/index.tsx',
+    from: 'cn(BODY_CELL, CELL_DENSITY[density].body,',
+    to: 'cn(BODY_CELL, CELL_DENSITY.comfortable.body,',
+  },
+  {
+    label: 'a plain table keeps the hairline round its box, so the variant prop changes nothing',
+    file: 'src/components/table/index.tsx',
+    from: 'BOX_VARIANT[variant]',
+    to: 'BOX_VARIANT.outline',
+  },
+  {
+    label: 'a sortable table header loses its idle mark, so nothing tells the eye the column can be sorted',
+    file: 'src/components/table/index.tsx',
+    from: 'column.sortHref === undefined ? null : (',
+    to: 'true ? null : (',
+  },
+  {
+    label: 'a table row loses the hover tint of the frame',
+    file: 'src/components/table/client.tsx',
+    from: 'className={cn(ROW, tinted && fill)}',
+    to: 'className={cn(tinted && fill)}',
+  },
 ]

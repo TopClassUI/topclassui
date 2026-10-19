@@ -89,6 +89,7 @@ Required: `caption`, `columns`, `getKey`, `items`. Every other prop below is opt
 | `getKey` | **yes** | `(item: T) => string` | - | A stable identity for a row, as the shared collection contract has it. It becomes the React key. |
 | `items` | **yes** | `readonly T[]` | - | The rows, already sorted and paged: Table renders what it is given. |
 | `captionVisible` | no | `boolean` | `false` | Draws the caption above the header row; when false it is still read out, only not drawn. |
+| `density` | no | `comfortable` \| `compact` | `"comfortable"` | How tall a row is: comfortable, or compact for a long list read at a glance. |
 | `emptyFallback` | no | `ReactNode` | - | Shown in one row across every column when there are no items. `null` also gives `labels.state.empty`. |
 | `hasMore` | no | `boolean` | - |  |
 | `labels` | no | `Labels` | - | The built-in strings: the empty row and the words of the sort links. Defaults to English. |
@@ -99,6 +100,7 @@ Required: `caption`, `columns`, `getKey`, `items`. Every other prop below is opt
 | `sort` | no | `TableSort` | - | The column the rows are sorted by, which gets `aria-sort` and a caret. |
 | `stickyFirstColumn` | no | `boolean` | `false` | Keeps the first column in view while the others scroll sideways under it. It is cut with an ellipsis past `--tc-table-sticky-width`. |
 | `striped` | no | `boolean` | `false` | Tints every second row, so the eye can follow a wide row across. |
+| `variant` | no | `outline` \| `plain` | `"outline"` | outline draws a hairline round the box; plain leaves it out, for a table already inside a card. |
 | `virtualize` | no | `unknown` | `"auto"` | Windowing: auto mounts only the rows in view above the provider threshold (200); false keeps every row in the HTML. |
 | `visibleRows` | no | `integer`, min 1, max 20 | `7` | Body rows the box shows before it scrolls under its sticky header, clamped to 1 to 20; left out, the --tc-list-rows knob. |
 
@@ -109,6 +111,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/basic.tsx`
 - `dummy/caption.tsx`
 - `dummy/column-classes.tsx`
+- `dummy/density.tsx`
 - `dummy/empty.tsx`
 - `dummy/in-a-layout.tsx`
 - `dummy/load-more.tsx`

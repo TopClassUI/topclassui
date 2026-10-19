@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '#shared/cn.js'
-import { ROW_FILL, SPACER } from './classes.js'
+import { ROW, ROW_FILL, SPACER } from './classes.js'
 import { useTableRows } from './hook.js'
 import type { TableRowsProps } from './types.js'
 
@@ -21,7 +21,7 @@ export function TableRows(props: TableRowsProps) {
         const tinted = props.striped && index % 2 === 1
         const fill = tinted ? ROW_FILL.striped : ROW_FILL.plain
         return (
-          <tr key={row.key} ref={body.rowRef?.(index)} aria-rowindex={index + 2} className={tinted ? fill : undefined}>
+          <tr key={row.key} ref={body.rowRef?.(index)} aria-rowindex={index + 2} className={cn(ROW, tinted && fill)}>
             {props.columns.map((column, at) => {
               const Cell = column.rowHeader ? 'th' : 'td'
               // Its own fill: a sticky cell with none lets the columns scrolling under it show through.

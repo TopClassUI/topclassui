@@ -42,7 +42,10 @@ describe('the unions come from the constants', () => {
   })
 
   it('names the defaults and the bounds, each written out', () => {
-    expect(TABLE_DEFAULTS).toEqual({ captionVisible: false, striped: false, stickyFirstColumn: false, visibleRows: 7, virtualize: 'auto', loadMoreThreshold: 10 })
+    expect(TABLE_DEFAULTS).toEqual({
+      captionVisible: false, density: 'comfortable', variant: 'outline', striped: false, stickyFirstColumn: false, visibleRows: 7,
+      virtualize: 'auto', loadMoreThreshold: 10,
+    })
     expect(TABLE_COLUMN_DEFAULTS).toEqual({ align: 'start' })
     expect(TABLE_SKELETON_DEFAULTS).toEqual({ rows: 5, columns: 4 })
     expect(TABLE_BOUNDARIES).toEqual({ skeletonRowsMin: 1, skeletonRowsMax: 500, skeletonColumnsMin: 1, skeletonColumnsMax: 50 })
@@ -151,8 +154,6 @@ describe('the props follow the vocabulary', () => {
 
   it('has none of the props the spec leaves unbuilt', () => {
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'pageSize'>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<keyof TableProps<Invoice>, 'density'>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<keyof TableProps<Invoice>, 'variant'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'size'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'selectedKeys'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'stickyHeader'>>().toEqualTypeOf<false>()
@@ -161,9 +162,11 @@ describe('the props follow the vocabulary', () => {
 })
 
 describe('the design props and the schema cannot drift', () => {
-  it('is derived from the schema input: three optional booleans and the collection knobs', () => {
+  it('is derived from the schema input: the density, the variant, three optional booleans and the collection knobs', () => {
     expectTypeOf<TableDesignProps>().toEqualTypeOf<{
       captionVisible?: boolean | undefined
+      density?: 'comfortable' | 'compact' | undefined
+      variant?: 'outline' | 'plain' | undefined
       striped?: boolean | undefined
       stickyFirstColumn?: boolean | undefined
       visibleRows?: number | undefined
