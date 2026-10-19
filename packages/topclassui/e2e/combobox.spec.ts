@@ -259,15 +259,15 @@ test.describe('live: ten thousand options, windowed', () => {
     await page.mouse.move(list.left + 60, list.top + 60)
     const steps: string[] = []
     for (let turn = 0; turn < 10; turn++) {
-      await page.mouse.wheel(0, 40)
-      await expect.poll(() => listOf(page).evaluate((el) => Math.round(el.scrollTop))).toBe(40 * (turn + 1))
+      await page.mouse.wheel(0, 32)
+      await expect.poll(() => listOf(page).evaluate((el) => Math.round(el.scrollTop))).toBe(32 * (turn + 1))
       steps.push(await listOf(page).evaluate((el) => {
         const top = el.getBoundingClientRect().top
         const row = [...el.querySelectorAll('[role="option"]')].find((option) => option.getBoundingClientRect().bottom > top + 6)
         return `${String(el.scrollHeight)} ${String((row?.getBoundingClientRect().top ?? 0) - top)}`
       }))
     }
-    expect(new Set(steps)).toEqual(new Set(['400012 6']))
+    expect(new Set(steps)).toEqual(new Set(['320012 6']))
   })
 
   test('typing 999 leaves the nineteen that contain it, unwindowed, and zzz says No results and hides the list', async ({ page }) => {
@@ -373,13 +373,13 @@ test.describe('live: ten thousand options, windowed', () => {
     expect(await reopenOnChosen(page)).toEqual({ text: 'Option 9997', whole: true })
   })
 
-  test('at a 32 px root on a phone: rows of 80 px, the popup fits, and the last of ten thousand still lands whole', async ({ page }) => {
+  test('at a 32 px root on a phone: rows of 64 px, the popup fits, and the last of ten thousand still lands whole', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 480 })
     await openLive(page, 'combobox--ten-thousand')
     await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
     await inputOf(page, 'Ten thousand options').click()
     await atRest(popupOf(page))
-    expect((await boxOf(page.getByRole('option').first())).height).toBe(80)
+    expect((await boxOf(page.getByRole('option').first())).height).toBe(64)
     await expectInsideViewport(popupOf(page), 'the popup')
     await page.keyboard.press('ArrowUp')
     await expect.poll(() => activeOf(page)).toMatchObject({ text: 'Option 10000', whole: true })
