@@ -4,14 +4,15 @@ import {
   TOUCH_TARGET, TRANSITION,
 } from '#shared/classes.js'
 
-/** The box that owns the width. As an inline block with a width of its own it could not shrink: the input inside keeps the browser's width as a floor. */
-export const NUMBER_FIELD_ROOT = `inline-grid align-middle ${FIELD_HOLDER}`
+/** The box that owns the width. As an inline block with a width of its own it could not shrink: the input inside keeps the browser's width as a floor.
+ * Under a finger it is never narrower than three 44 px targets, the input's and the two steppers'. */
+export const NUMBER_FIELD_ROOT = `inline-grid align-middle ${FIELD_HOLDER} pointer-coarse:min-w-[calc(3*var(--tc-target-coarse,44px)+2*var(--tc-line-width))]`
 
 /** The box of the field. Its ring shows while the input inside it has the focus. It dims the whole field when disabled, by the prop or by a disabled fieldset, which Base UI never hears of; a stepper at its limit is disabled too, so the test is on the input. */
 export const NUMBER_FIELD_GROUP = `group/number flex w-full items-stretch overflow-hidden ${FIELD_SURFACE} ${FOCUS_RING_WITHIN} ${TARGET_HEIGHT} ${FIELD_INVALID_WITHIN} data-disabled:bg-surface data-disabled:opacity-50 has-[input:disabled]:bg-surface has-[input:disabled]:opacity-50`
 
 /** It reaches over the line of the box, or it is 42 px tall on touch and the shared spec refuses it. */
-export const NUMBER_FIELD_INPUT = `-my-(--tc-line-width) min-w-0 flex-1 bg-transparent px-1 text-center font-medium tabular-nums outline-none placeholder:text-muted ${TARGET_HEIGHT}`
+export const NUMBER_FIELD_INPUT = `-my-(--tc-line-width) min-w-0 pointer-coarse:min-w-[var(--tc-target-coarse,44px)] flex-1 bg-transparent px-1 text-center font-medium tabular-nums outline-none placeholder:text-muted ${TARGET_HEIGHT}`
 
 /** The input comes first in the markup, so a label that wraps the field names and focuses it, not the decrease button; flex order puts decrease back at the inline start. */
 export const NUMBER_FIELD_DECREASE = 'order-first'
