@@ -28,7 +28,7 @@ test.describe('at 390 px', () => {
         await page.goto(urlFor(demo, 'light', direction))
         const measured = await page.evaluate(() => ({
           scrollWidth: document.documentElement.scrollWidth,
-          // The body, not the root: the root still counts the scrollbar gutter the harness keeps, 15 px of slack.
+          // The body, not the root: the root still counts the scrollbar gutter the harness keeps, 10 px of slack.
           clientWidth: document.body.clientWidth,
           boxes: [...document.querySelectorAll('[role="region"]')].map((box) => {
             const { left, right } = box.getBoundingClientRect()

@@ -108,9 +108,9 @@ test.describe('left to right, in an Arabic form', () => {
       await page.goto(urlFor('otp-field--rtl', 'light', direction))
       const group = page.locator('#demo [role="group"]')
       const [box, parent] = [await boxOf(group), await boxOf(group.locator('xpath=..'))]
-      expect([box.left, box.right, parent.right]).toEqual([953, 1233, 1233])
+      expect([box.left, box.right, parent.right]).toEqual([958, 1238, 1238])
       const lefts = await group.locator('input').evaluateAll((all) => all.map((cell) => cell.getBoundingClientRect().left))
-      expect(lefts).toEqual([953, 1001, 1049, 1097, 1145, 1193])
+      expect(lefts).toEqual([958, 1006, 1054, 1102, 1150, 1198])
     })
   }
 })
@@ -236,13 +236,13 @@ test.describe('text', () => {
   test.use({ reducedMotion: 'reduce' })
 
   for (const direction of DIRECTIONS) {
-    // At 320 px the demo's parent is 177 px, under the 224 px floor of six cells and 16 px gaps: the row breaks, never overflows.
+    // At 320 px the demo's parent is 182 px, under the 224 px floor of six cells and 16 px gaps: the row breaks, never overflows.
     test(`${direction}: at a root of 32 px a cell doubles; at 320 px the row breaks inside its parent and the page does not scroll`, async ({ page }) => {
       await page.goto(urlFor('otp-field--basic', 'light', direction))
       await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
       expect(await fields(page)).toEqual([{ cells: '80x80', font: '36px', rows: '6' }])
       await page.setViewportSize({ width: 320, height: 480 })
-      expect(await fields(page)).toEqual([{ cells: '32.3x80 80x80', font: '36px', rows: '4+2' }])
+      expect(await fields(page)).toEqual([{ cells: '33.5x80 80x80', font: '36px', rows: '4+2' }])
       const outside = await page.locator('#demo [role="group"]').evaluate((group) => {
         const parent = (group.parentElement as HTMLElement).getBoundingClientRect()
         return [...group.querySelectorAll('input')].filter((cell) => {
@@ -259,7 +259,7 @@ test.describe('text', () => {
     await page.setViewportSize({ width: 320, height: 640 })
     await page.goto(urlFor('otp-field--sizes', 'light', 'ltr'))
     await page.addStyleTag({ content: '* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-block-end: 2em !important; }' })
-    expect((await fields(page)).map((field) => field.cells)).toEqual(['28x28', '32x32', '33.5x40', '33.5x48', '33.5x56'])
+    expect((await fields(page)).map((field) => field.cells)).toEqual(['28x28', '32x32', '34.3x40', '34.3x48', '34.3x56'])
     let above = 0
     for (const label of await page.locator('#demo span[id]').all()) {
       const [text, group] = [await boxOf(label), await boxOf(label.locator('xpath=following-sibling::div[1]'))]

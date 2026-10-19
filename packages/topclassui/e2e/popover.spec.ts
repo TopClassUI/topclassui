@@ -1150,7 +1150,7 @@ test.describe('a larger text', () => {
     await expectInsideViewport(popup, 'the popup', 8)
     await expectNoSidewaysScroll(page)
     // The screen less its gutter and 8 px on each side.
-    expect((await boxOf(popup)).width).toBe(359)
+    expect((await boxOf(popup)).width).toBe(364)
     expect((await scrollOf(popup)).sideways).toBe(0)
     await expect(popup.locator('p')).toHaveCSS('font-size', '28px')
     const cut = await popup.evaluate((el) => [...el.querySelectorAll('h2, p, span')].filter((text) => text.scrollWidth > text.clientWidth + 1).length)
@@ -1218,7 +1218,7 @@ test('the stylesheet already holds the classes of a popup nothing has rendered y
   })
   // w-70, the room Base UI measured on both axes, p-4, gap-3, rounded-box, the line, shadow-lg, wrap-anywhere, SCROLL_AREA, --tc-z-popup.
   expect(styles).toEqual({
-    width: '280px', maxWidth: '1249px', maxHeight: '666px', padding: '16px', gap: '12px', radius: '12px', line: '1px',
+    width: '280px', maxWidth: '1254px', maxHeight: '666px', padding: '16px', gap: '12px', radius: '12px', line: '1px',
     raised: true, wrap: 'anywhere', scrolls: 'auto contain', layer: '60', title: '14px 600', text: '14px', shrink: '1',
   })
 })
