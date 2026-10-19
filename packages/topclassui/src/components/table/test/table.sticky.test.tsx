@@ -94,7 +94,7 @@ describe('stickyFirstColumn', () => {
     const [header] = classesOf(html_, 'th')
     const [cell] = classesOf(body(html_), 'td')
     expect(header).toEqual(expect.arrayContaining(STUCK))
-    expect(cell?.slice(-13)).toEqual([...STUCK, 'bg-surface-raised', 'group-hover/row:bg-surface'])
+    expect(cell?.slice(-14)).toEqual([...STUCK, 'bg-surface-raised', 'group-hover/row:bg-surface', 'group-data-selected/row:bg-primary-soft'])
   })
 
   it('pads the scrolling by the stuck column only when a column is stuck: with none, nothing can cover a control', () => {
@@ -144,7 +144,8 @@ describe('a class per column', () => {
     const [, cell] = classesOf(body(html({ columns: wrapping })), 'td')
     expect(status).toEqual(['px-3.5', 'text-xs', 'font-medium', 'text-muted', 'bg-surface', 'py-2', 'text-start', 'min-w-40', 'whitespace-normal'])
     expect(cell).toEqual([
-      'border-t-(length:--tc-line-width)', 'border-line', 'px-3.5', 'text-sm', 'text-muted', 'py-3', 'text-start', 'min-w-40', 'whitespace-normal',
+      'border-t-(length:--tc-line-width)', 'border-line', 'px-3.5', 'text-sm', 'text-muted', 'group-data-selected/row:text-primary-on-soft', 'py-3', 'text-start',
+      'min-w-40', 'whitespace-normal',
     ])
   })
 

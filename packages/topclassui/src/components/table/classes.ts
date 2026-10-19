@@ -73,12 +73,13 @@ export const LINK_ALIGN = {
 /** The fill of a row: the frame's own, or the tint `striped` gives every second one. A stuck cell carries the row's
  * hover tint itself, or the raised fill it needs to cover the columns under it would hide the tint. */
 export const ROW_FILL = {
-  plain: 'bg-surface-raised group-hover/row:bg-surface',
-  striped: 'bg-surface',
+  plain: 'bg-surface-raised group-hover/row:bg-surface group-data-selected/row:bg-primary-soft',
+  striped: 'bg-surface hover:bg-neutral-soft group-hover/row:bg-neutral-soft group-data-selected/row:bg-primary-soft',
 } as const
 
-/** The frame's hover row: the page's surface under the pointer, so the eye can follow it across. */
-export const ROW = 'group/row hover:bg-surface'
+/** The frame's hover row, the page's surface under the pointer, and its selected row, the primary tint. A striped
+ * row is already the surface, so it hovers a step further. */
+export const ROW = 'group/row hover:bg-surface data-selected:bg-primary-soft'
 
 /** Drawn above the header row, or read out without being drawn. */
 export const CAPTION = {
@@ -91,7 +92,7 @@ export const HEADER_CELL = 'px-3.5 text-xs font-medium whitespace-nowrap text-mu
 
 /** The line is on the cell, not the row: a sticky cell carries its own border with it. The frame reads a row from
  * its header cell, so the other cells are muted. */
-export const BODY_CELL = 'border-t-(length:--tc-line-width) border-line px-3.5 text-sm whitespace-nowrap text-muted'
+export const BODY_CELL = 'border-t-(length:--tc-line-width) border-line px-3.5 text-sm whitespace-nowrap text-muted group-data-selected/row:text-primary-on-soft'
 
 /** The block padding of each density: comfortable is the frame's row, compact the same row with a quarter of it. */
 export const CELL_DENSITY = {
@@ -100,7 +101,7 @@ export const CELL_DENSITY = {
 } as const satisfies Record<TableDensity, Record<'header' | 'body', string>>
 
 /** A row header is a th, which a browser draws bold and centred; the frame draws it medium, in the body colour. */
-export const ROW_HEADER = 'font-medium text-body'
+export const ROW_HEADER = 'font-medium text-body group-data-selected/row:text-primary-on-soft'
 
 export const EMPTY_CELL = 'border-t-(length:--tc-line-width) border-line px-3.5 py-6 text-center text-xs text-muted'
 
@@ -122,9 +123,10 @@ export const SORT_LINK = `inline-flex items-center -my-1 align-top rounded-chip 
 /** R-5.2-7: LABEL without its nowrap, so the cell still decides whether its header wraps. */
 export const HEADER_LABEL = 'min-w-0 overflow-hidden text-ellipsis'
 
-/** The placeholder never scrolls: it has no tab stop, so nothing in it may need one.
+/** The placeholder never scrolls: it has no tab stop, so nothing in it may need one. On the page's surface, as the
+ * frame draws its bars, because in dark the neutral tint of a bar lands below the raised fill.
  * grid grid-cols-1 as on BOX: it stands where the table will, in the same grid or flex parent. */
-export const SKELETON_BOX = 'grid grid-cols-1 overflow-hidden rounded-box bg-surface-raised'
+export const SKELETON_BOX = 'grid grid-cols-1 overflow-hidden rounded-box bg-surface'
 
 /** One line of nothing: as tall as the type, with margins making up the line height. */
 export const SKELETON_BAR = `block h-[1em] my-[calc((1lh-1em)/2)] w-full rounded-chip bg-neutral-soft animate-pulse motion-reduce:animate-none ${FORCED_EDGE}`

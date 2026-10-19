@@ -155,7 +155,6 @@ describe('the props follow the vocabulary', () => {
   it('has none of the props the spec leaves unbuilt', () => {
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'pageSize'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'size'>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<keyof TableProps<Invoice>, 'selectedKeys'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'stickyHeader'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof TableProps<Invoice>, 'loading'>>().toEqualTypeOf<false>()
   })

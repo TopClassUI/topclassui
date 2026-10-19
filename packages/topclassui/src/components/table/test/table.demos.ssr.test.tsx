@@ -99,8 +99,8 @@ describe('each demo shows what its name says', () => {
   it('striped: six rows, the second, fourth and sixth tinted', async () => {
     const html = await render('striped')
     const rows = [...html.slice(html.indexOf('<tbody>')).matchAll(/<tr( [^>]*)?>/g)].map((m) => / class="([^"]*)"/.exec(m[1] ?? '')?.[1])
-    const row = 'group/row hover:bg-surface'
-    const tint = `${row} bg-surface`
+    const row = 'group/row hover:bg-surface data-selected:bg-primary-soft'
+    const tint = 'group/row data-selected:bg-primary-soft bg-surface hover:bg-neutral-soft group-hover/row:bg-neutral-soft group-data-selected/row:bg-primary-soft'
     expect(rows).toEqual([row, tint, row, tint, row, tint])
   })
 
@@ -115,8 +115,8 @@ describe('each demo shows what its name says', () => {
       expect(table).toContain('scroll-ps-[calc(var(--tc-table-sticky-width,8rem)+2rem)]')
     }
     expect(plain).not.toContain('data-striped')
-    expect((striped ?? '').split(`${STUCK} bg-surface"`).length - 1).toBe(2)
-    expect((striped ?? '').split(`${STUCK} bg-surface-raised group-hover/row:bg-surface"`).length - 1).toBe(2)
+    expect((striped ?? '').split(`${STUCK} bg-surface hover:bg-neutral-soft group-hover/row:bg-neutral-soft group-data-selected/row:bg-primary-soft"`).length - 1).toBe(2)
+    expect((striped ?? '').split(`${STUCK} bg-surface-raised group-hover/row:bg-surface group-data-selected/row:bg-primary-soft"`).length - 1).toBe(2)
   })
 
   it('sticky-first-column: holds what e2e/table.spec scrolls under the stuck column, a dimmed Button and focusable controls', async () => {

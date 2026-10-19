@@ -21,7 +21,14 @@ export function TableRows(props: TableRowsProps) {
         const tinted = props.striped && index % 2 === 1
         const fill = tinted ? ROW_FILL.striped : ROW_FILL.plain
         return (
-          <tr key={row.key} ref={body.rowRef?.(index)} aria-rowindex={index + 2} className={cn(ROW, tinted && fill)}>
+          <tr
+            key={row.key}
+            ref={body.rowRef?.(index)}
+            aria-rowindex={index + 2}
+            aria-selected={row.selected ? true : undefined}
+            data-selected={row.selected ? '' : undefined}
+            className={cn(ROW, tinted && fill)}
+          >
             {props.columns.map((column, at) => {
               const Cell = column.rowHeader ? 'th' : 'td'
               // Its own fill: a sticky cell with none lets the columns scrolling under it show through.

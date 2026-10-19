@@ -74,7 +74,7 @@ describe('rows and columns', () => {
 describe('it has the dimensions of the table it stands in for', () => {
   it('wears the box without its scrolling: a placeholder with no tab stop must not need one', () => {
     expect(classList(html()).sort()).toEqual([
-      'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line', 'grid', 'grid-cols-1', 'overflow-hidden', 'rounded-box',
+      'bg-surface', 'border-(length:--tc-line-width)', 'border-line', 'grid', 'grid-cols-1', 'overflow-hidden', 'rounded-box',
     ])
   })
 
@@ -87,7 +87,8 @@ describe('it has the dimensions of the table it stands in for', () => {
       'px-3.5', 'text-xs', 'font-medium', 'whitespace-nowrap', 'text-muted', 'bg-surface', 'py-2',
     ])
     expect(classList(opening(html(), 'td')[0] ?? '')).toEqual([
-      'border-t-(length:--tc-line-width)', 'border-line', 'px-3.5', 'text-sm', 'whitespace-nowrap', 'text-muted', 'py-3',
+      'border-t-(length:--tc-line-width)', 'border-line', 'px-3.5', 'text-sm', 'whitespace-nowrap', 'text-muted',
+      'group-data-selected/row:text-primary-on-soft', 'py-3',
     ])
   })
 

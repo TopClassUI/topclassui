@@ -17,7 +17,8 @@ const columns: TableColumn<Deploy>[] = [
   { key: 'duration', header: 'Duration', align: 'end', sortHref: '?sort=duration', cell: (deploy) => deploy.duration },
 ]
 
-/** Every look a table has: plain, its caption drawn, striped, sorted, the first column stuck in a narrow box, empty and loading. */
+/** Every look a table has: plain, its caption drawn, striped, sorted, a row selected, the first column stuck in a narrow box,
+ * empty and loading. The frame's hover row is the pointer over any of them. */
 export default function Demo() {
   return (
     <div className="grid gap-6">
@@ -31,6 +32,7 @@ export default function Demo() {
         getKey={(deploy) => deploy.id}
         columns={columns}
       />
+      <Table selectedKeys={['dpl_7f39']} caption="Deploys, one selected" items={deploys} getKey={(deploy) => deploy.id} columns={columns} />
       <div className="max-w-xs">
         <Table stickyFirstColumn caption="Deploys, first column stuck" items={deploys} getKey={(deploy) => deploy.id} columns={columns} />
       </div>

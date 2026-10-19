@@ -200,4 +200,10 @@ export const MUTATIONS: Mutation[] = [
     from: 'className={cn(ROW, tinted && fill)}',
     to: 'className={cn(tinted && fill)}',
   },
+  {
+    label: 'a table row named in selectedKeys is not marked, so the selection shows nowhere',
+    file: 'src/components/table/index.tsx',
+    from: 'selected: selectedKeys?.includes(key) === true',
+    to: 'selected: false',
+  },
 ]

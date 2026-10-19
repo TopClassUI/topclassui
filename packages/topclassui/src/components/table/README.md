@@ -97,6 +97,7 @@ Required: `caption`, `columns`, `getKey`, `items`. Every other prop below is opt
 | `loadMore` | no | `(() => void \| Promise<void>)` | - | Client-only, or a Server Action. Called once when the window nears the end. |
 | `loadMoreThreshold` | no | `integer`, min 0, max 200 | `10` | Rows from the end at which loadMore is called, clamped to 0 to 200. |
 | `locale` | no | `string` | - | Accepted so `{...getLabels(locale)}` spreads cleanly. Nothing here formats a number, so it is not used and never reaches the element. |
+| `selectedKeys` | no | `readonly string[]` | - | The keys of the selected rows, tinted in primary and marked `aria-selected`. Selecting is the caller's: a checkbox in a column, say. |
 | `sort` | no | `TableSort` | - | The column the rows are sorted by, which gets `aria-sort` and a caret. |
 | `stickyFirstColumn` | no | `boolean` | `false` | Keeps the first column in view while the others scroll sideways under it. It is cut with an ellipsis past `--tc-table-sticky-width`. |
 | `striped` | no | `boolean` | `false` | Tints every second row, so the eye can follow a wide row across. |

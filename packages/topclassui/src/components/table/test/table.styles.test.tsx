@@ -89,11 +89,12 @@ describe('each part wears exactly the classes it needs', () => {
   it('a body cell is the frame\'s 14 by 12 px of padding at the body step, muted, on one line, with the line above it', () => {
     const [number, , amount] = classesOf(body(html()), 'td')
     expect(number).toEqual([
-      'border-t-(length:--tc-line-width)', 'border-line', 'px-3.5', 'text-sm', 'whitespace-nowrap', 'text-muted', 'py-3', 'text-start',
+      'border-t-(length:--tc-line-width)', 'border-line', 'px-3.5', 'text-sm', 'whitespace-nowrap', 'text-muted',
+      'group-data-selected/row:text-primary-on-soft', 'py-3', 'text-start',
     ])
     expect(amount).toEqual([
-      'border-t-(length:--tc-line-width)', 'border-line', 'px-3.5', 'text-sm', 'whitespace-nowrap', 'text-muted', 'py-3',
-      'text-end', 'tabular-nums',
+      'border-t-(length:--tc-line-width)', 'border-line', 'px-3.5', 'text-sm', 'whitespace-nowrap', 'text-muted',
+      'group-data-selected/row:text-primary-on-soft', 'py-3', 'text-end', 'tabular-nums',
     ])
   })
 
@@ -162,14 +163,18 @@ describe('alignment is logical (R-5.3-1)', () => {
 })
 
 describe('striped', () => {
-  it('leaves every row unfilled by default, so the frame shows through, and tints the one under the pointer', () => {
-    const row = ['group/row', 'hover:bg-surface']
+  it('leaves every row unfilled by default, so the frame shows through, and tints the one under the pointer or selected', () => {
+    const row = ['group/row', 'hover:bg-surface', 'data-selected:bg-primary-soft']
     expect(classesOf(body(html()), 'tr')).toEqual([row, row, row, row])
   })
 
-  it('tints every second row, counting from the first', () => {
-    const row = ['group/row', 'hover:bg-surface']
-    expect(classesOf(body(html({ striped: true })), 'tr')).toEqual([row, [...row, 'bg-surface'], row, [...row, 'bg-surface']])
+  it('tints every second row, counting from the first, and hovers a tinted row a step further', () => {
+    const row = ['group/row', 'hover:bg-surface', 'data-selected:bg-primary-soft']
+    const tint = [
+      'group/row', 'data-selected:bg-primary-soft', 'bg-surface', 'hover:bg-neutral-soft', 'group-hover/row:bg-neutral-soft',
+      'group-data-selected/row:bg-primary-soft',
+    ]
+    expect(classesOf(body(html({ striped: true })), 'tr')).toEqual([row, tint, row, tint])
   })
 
   it('fills the row and not its cells, which have no background to paint over it', () => {

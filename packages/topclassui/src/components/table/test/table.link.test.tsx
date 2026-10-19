@@ -159,11 +159,11 @@ describe('the sort link is the only interactive part', () => {
     expect(amount).not.toContain('justify-start')
   })
 
-  it('puts no ring or target on a cell or a row, none of which can be activated, and on a row only the frame\'s hover tint', () => {
+  it('puts no ring or target on a cell or a row, none of which can be activated, and on a row only the frame\'s hover tints', () => {
     const interactive = /(^|:)(hover|active|focus-visible):|^(min-h-|cursor-|transition)/
     for (const tag of ['table', 'thead', 'tbody', 'th', 'td', 'caption']) {
       expect(classesOf(html({ striped: true }), tag).flat().filter((c) => interactive.test(c)), tag).toEqual([])
     }
-    expect([...new Set(classesOf(html({ striped: true }), 'tr').flat().filter((c) => interactive.test(c)))]).toEqual(['hover:bg-surface'])
+    expect([...new Set(classesOf(html({ striped: true }), 'tr').flat().filter((c) => interactive.test(c)))]).toEqual(['hover:bg-surface', 'hover:bg-neutral-soft'])
   })
 })
