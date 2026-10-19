@@ -15,6 +15,8 @@
   --tc-list-rows: 7;
   --tc-row-height: calc(2.5rem * var(--tc-density));
   --tc-overlay-inset: 1rem;
+  /* The Toast frame's drop shadow, one value in every mode as Figma draws it. */
+  --tc-shadow-toast: 0 6px 16px -4px rgb(0 0 0 / 0.4);
   --tc-sticky-top: 0px;
   --tc-sticky-bottom: 0px;
   /* The widest a Table's stuck first column gets, and the scroll padding that keeps focus clear of it. */

@@ -48,8 +48,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the x of a toast renders only beside an action, so a bare toast can be closed by a swipe alone',
     file: 'src/components/toast/client.tsx',
-    from: '      <Base.Close aria-label={closeLabel} aria-hidden={false} className={TOAST_CLOSE}>\n        <Svg icon={x} />\n      </Base.Close>\n',
-    to: '      {entry.actionProps === undefined ? null : (\n        <Base.Close aria-label={closeLabel} aria-hidden={false} className={TOAST_CLOSE}>\n          <Svg icon={x} />\n        </Base.Close>\n      )}\n',
+    from: '      <Base.Close aria-label={closeLabel} aria-hidden={false} className={TOAST_CLOSE}>\n        <Svg icon={x} size={14} />\n      </Base.Close>\n',
+    to: '      {entry.actionProps === undefined ? null : (\n        <Base.Close aria-label={closeLabel} aria-hidden={false} className={TOAST_CLOSE}>\n          <Svg icon={x} size={14} />\n        </Base.Close>\n      )}\n',
   },
   {
     label: 'the x of a toast is hidden from a reader again, as Base UI hides it until the stack expands',
@@ -224,5 +224,11 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/toast/hook.ts',
     from: 'height > root.clientHeight * TOAST_STICKY_SHARE ? 0 : height',
     to: 'height',
+  },
+  {
+    label: 'a toast drops the shadow of its frame, so it sits flat on the page it floats over',
+    file: 'src/components/toast/classes.ts',
+    from: ' shadow-(--tc-shadow-toast) ',
+    to: ' ',
   },
 ]
