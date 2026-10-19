@@ -93,6 +93,7 @@ export interface Labels {
   }
   readonly toast: {
     readonly region: string
+    readonly stage: string
     readonly close: string
   }
   readonly command: {
