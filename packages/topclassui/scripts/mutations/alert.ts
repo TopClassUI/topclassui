@@ -17,8 +17,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the default alert icon loses size xs, so it follows the surrounding font size instead of a fixed 16 px',
     file: 'src/components/alert/index.tsx',
-    from: ' size="xs" className="mt-0.5" />',
-    to: ' className="mt-0.5" />',
+    from: '<Svg icon={pickIcon(tone)} size="xs" />',
+    to: '<Svg icon={pickIcon(tone)} />',
   },
   {
     label: 'a tone no list holds crashes the alert render instead of taking the default icon',
@@ -35,8 +35,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the alert description takes the drawn 0.9 opacity, so white on the danger solid drops under 4.5:1',
     file: 'src/components/alert/index.tsx',
-    from: '<div className="text-sm">{children}</div>',
-    to: '<div className="text-sm opacity-90">{children}</div>',
+    from: '<div className="text-sm/tight">{children}</div>',
+    to: '<div className="text-sm/tight opacity-90">{children}</div>',
   },
   {
     label: 'the alert body loses wrap-anywhere, so a long URL runs out of the box',
@@ -73,14 +73,14 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/alert/index.tsx',
     from: ' : icon}\n' +
       '      <div className="flex min-w-0 flex-1 flex-col gap-0.75 wrap-anywhere">\n' +
-      '        {isEmpty(title) ? null : <p className="text-sm font-semibold">{title}</p>}\n' +
-      '        {isEmpty(children) ? null : <div className="text-sm">{children}</div>}\n' +
+      '        {isEmpty(title) ? null : <p className="text-sm/tight font-semibold">{title}</p>}\n' +
+      '        {isEmpty(children) ? null : <div className="text-sm/tight">{children}</div>}\n' +
       '        {isEmpty(actions) ? null : <div className="flex flex-wrap gap-2 pt-1">{actions}</div>}\n' +
       '      </div>\n',
     to: ' : null}\n' +
       '      <div className="flex min-w-0 flex-1 flex-col gap-0.75 wrap-anywhere">\n' +
-      '        {isEmpty(title) ? null : <p className="text-sm font-semibold">{title}</p>}\n' +
-      '        {isEmpty(children) ? null : <div className="text-sm">{children}</div>}\n' +
+      '        {isEmpty(title) ? null : <p className="text-sm/tight font-semibold">{title}</p>}\n' +
+      '        {isEmpty(children) ? null : <div className="text-sm/tight">{children}</div>}\n' +
       '        {isEmpty(actions) ? null : <div className="flex flex-wrap gap-2 pt-1">{actions}</div>}\n' +
       '      </div>\n' +
       '      {icon === undefined ? null : icon}\n',

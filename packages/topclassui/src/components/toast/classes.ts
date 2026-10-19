@@ -62,9 +62,10 @@ export const TOAST_ICON_SVG = {
 
 export const TOAST_CONTENT = 'col-start-2 row-start-1 flex min-w-0 flex-col gap-0.75 @max-3xs:col-span-2 @max-3xs:col-start-1 @max-3xs:row-start-2'
 
-export const TOAST_TITLE = 'text-sm font-semibold text-body'
+/** The frame sets both on tight lines, 3 px apart. */
+export const TOAST_TITLE = 'text-sm/tight font-semibold text-body'
 
-export const TOAST_DESCRIPTION = 'text-sm text-muted wrap-anywhere'
+export const TOAST_DESCRIPTION = 'text-sm/tight text-muted wrap-anywhere'
 
 /** A small outline button under the text, or across the whole toast when it is narrow. A long label wraps onto
  * more lines instead of leaving the toast. */

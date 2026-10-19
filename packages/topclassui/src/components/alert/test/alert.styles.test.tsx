@@ -27,11 +27,11 @@ describe('each part wears exactly the classes the spec names', () => {
   })
 
   it('the title is a paragraph at the small step in semibold', () => {
-    expect(partClasses(html(), '<p ')).toEqual(['text-sm', 'font-semibold'])
+    expect(partClasses(html(), '<p ')).toEqual(['text-sm/tight', 'font-semibold'])
   })
 
   it('the description is the small step and nothing else: no opacity, which would fail 4.5:1', () => {
-    expect(partClasses(html(), '<div class="text-sm"')).toEqual(['text-sm'])
+    expect(partClasses(html(), '<div class="text-sm/tight"')).toEqual(['text-sm/tight'])
   })
 
   it('the actions are a wrapping row with the spacing Card draws for its own', () => {

@@ -12,7 +12,7 @@ describe('each part wears exactly the classes the spec names', () => {
   it('the root is a full-width centred row that wraps, 18 px inline and 11 px block as the frame draws it, in medium at the small step', () => {
     expect(classes().sort()).toEqual([
       'bg-primary-soft', 'flex', 'flex-wrap', 'font-medium', 'forced-colors:border-b-(length:--tc-line-width)',
-      'gap-3', 'items-center', 'min-w-0', 'px-4.5', 'py-2.75', 'text-primary-on-soft', 'text-sm', 'w-full', 'wrap-anywhere',
+      'gap-3', 'items-center', 'min-w-0', 'px-4.5', 'py-2.75', 'text-primary-on-soft', 'text-sm/tight', 'w-full', 'wrap-anywhere',
     ])
   })
 

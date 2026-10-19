@@ -4,8 +4,8 @@ import { attr, markup } from '#test/markup.js'
 import { Alert } from '../index.js'
 
 const BODY = '<div class="flex min-w-0 flex-1 flex-col gap-0.75 wrap-anywhere">'
-const TITLE = '<p class="text-sm font-semibold">'
-const DESCRIPTION = '<div class="text-sm">'
+const TITLE = '<p class="text-sm/tight font-semibold">'
+const DESCRIPTION = '<div class="text-sm/tight">'
 const ACTIONS = '<div class="flex flex-wrap gap-2 pt-1">'
 
 /** Everything after the icon: the body column, exactly as rendered. */
