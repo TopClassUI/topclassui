@@ -25,13 +25,13 @@ describe('every part carries exactly its own classes', () => {
   })
 
   it('the title is a paragraph at the base step, semibold, in the body colour', () => {
-    expect(classesOf(html(), 'p')).toEqual(['font-semibold', 'text-base', 'text-body'])
+    expect(classesOf(html(), 'p')).toEqual(['font-semibold', 'leading-tight', 'text-base', 'text-body'])
   })
 
   it('the description is a div at the small step in the muted colour', () => {
     const out = html()
     const description = /<div class="([^"]*)">When there/.exec(out)?.[1] ?? ''
-    expect(description.split(' ').sort()).toEqual(['text-muted', 'text-sm'])
+    expect(description.split(' ').sort()).toEqual(['leading-tight', 'text-muted', 'text-sm'])
   })
 
   it('the default icon is Svg\'s own two classes plus the muted colour', () => {
@@ -41,8 +41,8 @@ describe('every part carries exactly its own classes', () => {
   it('keeps the same classes on each part when the caller passes every text', () => {
     const out = html({ title: 'No projects yet', description: 'Create one.' })
     expect([...classList(out)].sort()).toEqual(ROOT)
-    expect(classesOf(out, 'p')).toEqual(['font-semibold', 'text-base', 'text-body'])
-    expect(/<div class="([^"]*)">Create one/.exec(out)?.[1]).toBe('text-sm text-muted')
+    expect(classesOf(out, 'p')).toEqual(['font-semibold', 'leading-tight', 'text-base', 'text-body'])
+    expect(/<div class="([^"]*)">Create one/.exec(out)?.[1]).toBe('text-sm leading-tight text-muted')
   })
 })
 
@@ -113,7 +113,29 @@ describe('className is passed last, so the consumer wins every conflict', () => 
     const out = html({ className: 'text-lg' })
     expect(classList(out)).toContain('text-lg')
     expect(classesOf(out, 'svg')).toEqual(['inline-block', 'shrink-0', 'text-muted'])
-    expect(classesOf(out, 'p')).toEqual(['font-semibold', 'text-base', 'text-body'])
-    expect(/<div class="([^"]*)">When there/.exec(out)?.[1]).toBe('text-sm text-muted')
+    expect(classesOf(out, 'p')).toEqual(['font-semibold', 'leading-tight', 'text-base', 'text-body'])
+    expect(/<div class="([^"]*)">When there/.exec(out)?.[1]).toBe('text-sm leading-tight text-muted')
+  })
+})
+
+describe('compact', () => {
+  const out = () => html({ compact: true, title: 'No files', description: 'Upload one.' })
+
+  it('marks the root and lays half the padding and a tighter gap over the frame', () => {
+    expect(attr(out(), 'data-compact')).toBe('')
+    expect(classList(out())).toContain('p-4')
+    expect(classList(out())).toContain('gap-1.5')
+    expect(classList(out())).not.toContain('p-7')
+    expect(classList(out())).not.toContain('gap-2.5')
+  })
+
+  it('takes the next type step down for the title and the description, and the 24 px icon', () => {
+    expect(classesOf(out(), 'p')).toEqual(['font-semibold', 'leading-tight', 'text-body', 'text-sm'])
+    expect(/<div class="([^"]*)">Upload one/.exec(out())?.[1]).toBe('text-muted text-xs leading-tight')
+    expect(attr(/<svg[^>]*>/.exec(out())?.[0] ?? '', 'width')).toBe('24')
+  })
+
+  it('is off by default and writes no attribute', () => {
+    expect(html()).not.toContain('data-compact')
   })
 })

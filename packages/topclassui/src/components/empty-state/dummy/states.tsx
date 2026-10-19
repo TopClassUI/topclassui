@@ -4,7 +4,7 @@ import { Svg } from '#components/svg/index.js'
 import { Button } from '#components/button/index.js'
 import { EmptyState } from '../index.js'
 
-/** Every state EmptyState draws: the defaults, a title alone, an action, the error and the filtered cell. */
+/** Every state EmptyState draws: the defaults, a title alone, an action, the error and the filtered cell, and the compact form. */
 export default function Demo() {
   return (
     <div className="grid gap-6 sm:grid-cols-2">
@@ -27,6 +27,7 @@ export default function Demo() {
       >
         <Button size="sm" variant="outline">Clear filters</Button>
       </EmptyState>
+      <EmptyState compact title="Compact" description="The tight form, for a panel or a list cell." />
     </div>
   )
 }

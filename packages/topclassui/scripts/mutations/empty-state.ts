@@ -23,8 +23,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the empty state passes className first, so the consumer loses every conflict',
     file: 'src/components/empty-state/index.tsx',
-    from: 'cn(ROOT, className)',
-    to: 'cn(className, ROOT)',
+    from: 'cn(ROOT, compact && COMPACT.root, className)',
+    to: 'cn(className, ROOT, compact && COMPACT.root)',
   },
   {
     label: 'the empty state shows its default icon when the caller passes icon={null}',
@@ -47,20 +47,20 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the empty state becomes a status live region, so a screen reader announces page content',
     file: 'src/components/empty-state/index.tsx',
-    from: '<div className={cn(ROOT, className)} {...rest}>',
-    to: '<div role="status" className={cn(ROOT, className)} {...rest}>',
+    from: "<div data-compact={compact ? '' : undefined} className=",
+    to: "<div role=\"status\" data-compact={compact ? '' : undefined} className=",
   },
   {
     label: 'the empty state default icon drops to 1em, so it shrinks to the text size',
     file: 'src/components/empty-state/index.tsx',
-    from: '<Svg icon={tray} size="xl" className={ICON} />',
+    from: "<Svg icon={tray} size={compact ? 'md' : 'xl'} className={ICON} />",
     to: '<Svg icon={tray} className={ICON} />',
   },
   {
     label: 'the empty state passes className to the description too, so a consumer class restyles the text',
     file: 'src/components/empty-state/index.tsx',
-    from: '<div className={DESCRIPTION}>',
-    to: '<div className={cn(DESCRIPTION, className)}>',
+    from: '<div className={cn(DESCRIPTION, compact && COMPACT.description)}>',
+    to: '<div className={cn(DESCRIPTION, compact && COMPACT.description, className)}>',
   },
   {
     label: 'the empty state passes className to the default icon too, so a consumer class restyles it',
@@ -71,8 +71,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the empty state spreads the rest onto the title too, so an id is duplicated',
     file: 'src/components/empty-state/index.tsx',
-    from: '<p className={TITLE}>',
-    to: '<p className={TITLE} {...rest}>',
+    from: '<p className={cn(TITLE, compact && COMPACT.title)}>',
+    to: '<p className={cn(TITLE, compact && COMPACT.title)} {...rest}>',
   },
   {
     label: 'the empty state wraps true, so a boolean slot opens a gap',
@@ -91,5 +91,17 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/empty-state/classes.ts',
     from: '  BORDER_STRONG,\n',
     to: "  'border-(length:--tc-line-width) border-line',\n",
+  },
+  {
+    label: 'a compact empty state keeps the full padding and gap, so it is no tighter than the regular one',
+    file: 'src/components/empty-state/index.tsx',
+    from: 'cn(ROOT, compact && COMPACT.root, className)',
+    to: 'cn(ROOT, className)',
+  },
+  {
+    label: 'a compact empty state keeps the 40 px icon',
+    file: 'src/components/empty-state/index.tsx',
+    from: "size={compact ? 'md' : 'xl'}",
+    to: "size=\"xl\"",
   },
 ]
