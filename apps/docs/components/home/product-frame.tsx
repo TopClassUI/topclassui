@@ -44,6 +44,7 @@ export function ProductFrame({ locale, labels }: { locale: Locale; labels: SiteL
   const frame = labels.home.frame
   const library = getLabels(locale)
   const rows = ROWS.map((slug) => cardBySlug(slug)).filter((entry): entry is CardEntry => entry !== undefined)
+  const pages = Math.ceil(CARDS.length / rows.length)
   return (
     <figure className="relative isolate flex flex-col gap-4.5">
       <div aria-hidden="true" className="docs-glow" />
@@ -59,7 +60,7 @@ export function ProductFrame({ locale, labels }: { locale: Locale; labels: SiteL
         </ul>
         <div className="flex min-w-0 flex-1 flex-col gap-4.5 p-4 md:p-7">
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <div className="flex min-w-0 flex-1 basis-full flex-col gap-0.5 sm:basis-0">
               <p className="text-xl font-semibold text-body">{frame.title}</p>
               <p className="text-xs text-muted">{frame.count(CARDS.length)}</p>
             </div>
@@ -84,7 +85,9 @@ export function ProductFrame({ locale, labels }: { locale: Locale; labels: SiteL
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
             <p>{frame.showing(1, rows.length, CARDS.length)}</p>
             <Button size="xs" variant="outline" tone="neutral">{frame.perPage(rows.length)}<Icon name="caret-down" /></Button>
-            <Pagination {...library} className="ms-auto" value={1} pageCount={Math.ceil(CARDS.length / rows.length)} siblingCount={1} boundaryCount={1} getHref={(page) => `#page-${String(page)}`} size="sm" />
+            <Pagination {...library} className="ms-auto max-sm:hidden" value={1} pageCount={pages} siblingCount={1} boundaryCount={1} getHref={(page) => `#page-${String(page)}`} size="sm" />
+            {/* A phone has room for one row of cells, so it draws the short run. */}
+            <Pagination {...library} className="ms-auto sm:hidden" value={1} pageCount={pages} siblingCount={0} boundaryCount={0} getHref={(page) => `#page-${String(page)}`} size="sm" />
           </div>
         </div>
         <FrameToast title={frame.toast.title} body={frame.toast.body} />
