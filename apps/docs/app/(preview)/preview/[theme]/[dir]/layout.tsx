@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { TopClassProvider } from 'topclassui/provider'
 
+import { fontClassOf } from '../../../../../lib/fonts'
 import { PREVIEW_DIRS, PREVIEW_LANG, PREVIEW_THEMES, isPreviewDir, isPreviewTheme } from '../../../../../lib/preview'
 
 export const dynamicParams = false
@@ -20,8 +21,8 @@ export default async function PreviewLayout({ children, params }: { children: Re
   const { theme, dir } = await params
   if (!isPreviewTheme(theme) || !isPreviewDir(dir)) notFound()
   return (
-    <html lang={PREVIEW_LANG[dir]} dir={dir} data-theme={theme}>
-      <body className="bg-page text-body">
+    <html lang={PREVIEW_LANG[dir]} dir={dir} data-theme={theme} className={fontClassOf(PREVIEW_LANG[dir])}>
+      <body className="bg-page font-sans text-body antialiased">
         <TopClassProvider direction={dir} locale={PREVIEW_LANG[dir]}>
           <main className="p-8">{children}</main>
         </TopClassProvider>
