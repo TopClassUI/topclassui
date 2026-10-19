@@ -77,8 +77,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the stepper step loses its floor of one circle, so past a few steps the circles overlap and hide their numbers',
     file: 'src/components/stepper/classes.ts',
-    from: "'relative flex min-w-(--tc-stepper-mark) flex-1 flex-col",
-    to: "'relative flex min-w-0 flex-1 flex-col",
+    from: "'relative flex min-w-(--tc-stepper-mark) max-w-",
+    to: "'relative flex min-w-0 max-w-",
   },
   {
     label: 'the stepper filled circle keeps its theme fill under forced colours, which can match the canvas',

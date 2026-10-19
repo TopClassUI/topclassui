@@ -112,6 +112,6 @@ describe('on the server', () => {
     expect(rows(out).length).toBeGreaterThan(0)
     expect(rows(out).length).toBeLessThan(30)
     expect(attr(rows(out)[0] ?? '', 'aria-setsize')).toBe('10')
-    expect(Number(/--tc-list-pad-end:(\d+)px/.exec(out)?.[1])).toBeGreaterThan(290_000)
+    expect(Number(/--tc-list-pad-end:(\d+)px/.exec(out)?.[1])).toBeGreaterThan(310_000)
   })
 })

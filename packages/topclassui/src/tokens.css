@@ -13,7 +13,7 @@
   --tc-density: 1;
   --tc-motion: 1;
   --tc-list-rows: 7;
-  --tc-row-height: calc(2.5rem * var(--tc-density));
+  --tc-row-height: calc(2rem * var(--tc-density));
   --tc-overlay-inset: 1rem;
   --tc-sticky-top: 0px;
   --tc-sticky-bottom: 0px;
@@ -60,8 +60,6 @@
   --tc-tree-level: 0;
   /* One level of a tree's indent: 18 px at density 1, as the Components page and the playground draw it. */
   --tc-tree-indent: calc(1.125rem * var(--tc-density));
-  /* A tree row: 30 px at density 1, the previewer's pitch, tighter than a menu's --tc-row-height. */
-  --tc-tree-row-height: calc(1.875rem * var(--tc-density));
 }
 
 /* Both selectors, so a light island inside a dark page resets every colour. */

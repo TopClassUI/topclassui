@@ -142,8 +142,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a tree view row is no longer exactly one unit tall, so the spacers drift from the rows they stand for',
     file: CLASSES,
-    from: "'group/row flex h-(--tc-tree-row-height) shrink-0",
-    to: "'group/row flex min-h-(--tc-tree-row-height) shrink-0",
+    from: "'group/row flex h-(--tc-row-height) shrink-0",
+    to: "'group/row flex min-h-(--tc-row-height) shrink-0",
   },
   {
     label: 'a tree view row no longer starts one indent further in per level',

@@ -24,19 +24,15 @@ describe('the unit 5 tokens on the root', () => {
     expect(root?.decls.get('--tc-tree-indent')).toBe('calc(1.125rem * var(--tc-density))')
   })
 
-  it('--tc-tree-row-height is 1.875rem a row, the previewer\'s 30 px, scaled by the density knob', () => {
-    expect(root?.decls.get('--tc-tree-row-height')).toBe('calc(1.875rem * var(--tc-density))')
-  })
-
   it('sit under the list spacers, in this order, each under a comment of one line', () => {
-    expect([...(root?.decls.keys() ?? [])].slice(-5)).toEqual([
-      '--tc-list-pad-end', '--tc-meter-value', '--tc-tree-level', '--tc-tree-indent', '--tc-tree-row-height',
+    expect([...(root?.decls.keys() ?? [])].slice(-4)).toEqual([
+      '--tc-list-pad-end', '--tc-meter-value', '--tc-tree-level', '--tc-tree-indent',
     ])
-    expect(css).toMatch(/\n {2}\/\*[^\n]*\*\/\n {2}--tc-meter-value: 0%;\n {2}\/\*[^\n]*\*\/\n {2}--tc-tree-level: 0;\n {2}\/\*[^\n]*\*\/\n {2}--tc-tree-indent: calc\(1\.125rem \* var\(--tc-density\)\);\n {2}\/\*[^\n]*\*\/\n {2}--tc-tree-row-height: calc\(1\.875rem \* var\(--tc-density\)\);\n\}/)
+    expect(css).toMatch(/\n {2}\/\*[^\n]*\*\/\n {2}--tc-meter-value: 0%;\n {2}\/\*[^\n]*\*\/\n {2}--tc-tree-level: 0;\n {2}\/\*[^\n]*\*\/\n {2}--tc-tree-indent: calc\(1\.125rem \* var\(--tc-density\)\);\n\}/)
   })
 
   it('are declared nowhere else, so no theme or mode moves them', () => {
-    const names = ['--tc-meter-value', '--tc-tree-level', '--tc-tree-indent', '--tc-tree-row-height']
+    const names = ['--tc-meter-value', '--tc-tree-level', '--tc-tree-indent']
     const elsewhere = blocks.filter((block) => block !== root && names.some((name) => block.decls.has(name)))
     expect(elsewhere.map((block) => block.selector)).toEqual([])
   })

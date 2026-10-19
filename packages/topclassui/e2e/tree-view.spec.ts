@@ -219,7 +219,7 @@ test.describe('live: a small wheel never leaves the focused tree with no ring in
   for (const { demo, direction, mode } of cases) {
     test(`${demo} ${mode} ${direction}: a 160 px wheel puts the highlighted row out of sight, and the tree draws its ring until a key brings the row back`, async ({ page }) => {
       await openLive(page, demo, { direction, mode, tall: true })
-      // Four rows, so the eight of the basic tree overflow by more than the first row at 30 px a row.
+      // Four rows, so the eight of the basic tree overflow by more than the first row at 32 px a row.
       await treeOf(page).evaluate((tree) => { tree.style.setProperty('--tc-list-rows', '4') })
       await page.keyboard.press('Tab')
       const box = await boxOf(treeOf(page))
@@ -479,9 +479,9 @@ const indents = (page: Page) => page.locator('#demo [role="treeitem"]').evaluate
 
 test.describe('the indent and the rows, measured', () => {
   const CASES = [
-    { name: 'density 1', css: '', row: 30, steps: ['1 8', '2 26', '3 44'] },
-    { name: 'density 1.25', css: ':root { --tc-density: 1.25 !important; }', row: 37.5, steps: ['1 8', '2 30.5', '3 53'] },
-    { name: 'a 32 px root', css: 'html { font-size: 32px !important; }', row: 60, steps: ['1 16', '2 52', '3 88'] },
+    { name: 'density 1', css: '', row: 32, steps: ['1 8', '2 26', '3 44'] },
+    { name: 'density 1.25', css: ':root { --tc-density: 1.25 !important; }', row: 40, steps: ['1 8', '2 30.5', '3 53'] },
+    { name: 'a 32 px root', css: 'html { font-size: 32px !important; }', row: 64, steps: ['1 16', '2 52', '3 88'] },
   ]
   for (const direction of DIRECTIONS) {
     for (const one of CASES) {
@@ -635,11 +635,11 @@ test.describe('motion, zoom and spacing', () => {
     })
   })
 
-  test('at a 32 px root on a phone: rows of 60 px, the last of ten thousand still lands whole, nothing sideways', async ({ page }) => {
+  test('at a 32 px root on a phone: rows of 64 px, the last of ten thousand still lands whole, nothing sideways', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     await openLive(page, 'tree-view--ten-thousand')
     await page.addStyleTag({ content: 'html { font-size: 32px !important; }' })
-    expect((await boxOf(page.getByRole('treeitem').first())).height).toBe(60)
+    expect((await boxOf(page.getByRole('treeitem').first())).height).toBe(64)
     await page.keyboard.press('Tab')
     await page.keyboard.press('End')
     await expect.poll(() => stateOf(page)).toMatchObject({ text: 'File 10000.ts', whole: true })
