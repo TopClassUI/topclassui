@@ -1,5 +1,5 @@
 // The mutations of the shared scrollbar: the constant, the two scroll constants that wear it, the two containers
-// that wear it by hand, and the two tokens it reads. Found by scripts/mutations/index.ts; every label says "shared scrollbar".
+// that wear it by hand, a demo, the page, and the two tokens it reads. Found by scripts/mutations/index.ts; every label says "shared scrollbar".
 import type { Mutation } from '../lib/mutate.js'
 
 const CLASSES = 'src/shared/classes.ts'
@@ -41,6 +41,18 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/textarea/classes.ts',
     from: 'export const TEXTAREA_BOX = `block ${FIELD_BOX} ${SCROLLBAR}`',
     to: 'export const TEXTAREA_BOX = `block ${FIELD_BOX}`',
+  },
+  {
+    label: 'the page loses the shared scrollbar, so the page itself draws the classic 15 px bar beside every overlay',
+    file: TOKENS,
+    from: '    scrollbar-width: thin;\n    scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track);\n',
+    to: '',
+  },
+  {
+    label: 'the shared scrollbar is dropped from the sidebar layout demo, so its column draws the default bar',
+    file: 'src/components/sidebar/dummy/in-a-layout.tsx',
+    from: '<div className={`min-w-0 flex-1 p-4 ${SCROLL_AREA}`}>',
+    to: '<div className="min-w-0 flex-1 overflow-y-auto p-4">',
   },
   {
     label: 'the shared scrollbar thumb in light is neutral-300, 1.5:1 on the page, under the 3:1 of R-5.6-4',

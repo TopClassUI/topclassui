@@ -84,28 +84,29 @@ describe('keyboard', () => {
 describe('the structured data in the document', () => {
   const script = (container: HTMLElement) => container.querySelector('script[type="application/ld+json"]')
 
-  it('is one data block a JSON parser reads back as the linked crumbs', () => {
-    const { container } = render(<Breadcrumb items={TRAIL} />)
+  it('is one data block a JSON parser reads back as the trail', () => {
+    const { container } = render(<Breadcrumb items={TRAIL} siteUrl="https://example.com" />)
     expect(container.querySelectorAll('script')).toHaveLength(1)
     expect(JSON.parse(script(container)?.textContent ?? '{}')).toEqual({
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: '/' },
-        { '@type': 'ListItem', position: 2, name: 'Docs', item: '/docs' },
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://example.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Docs', item: 'https://example.com/docs' },
+        { '@type': 'ListItem', position: 3, name: 'Breadcrumb' },
       ],
     })
   })
 
   it('sits inside the nav, so the root stays a single element', () => {
-    const { container } = render(<Breadcrumb items={TRAIL} />)
+    const { container } = render(<Breadcrumb items={TRAIL} siteUrl="https://example.com" />)
     expect(container.children).toHaveLength(1)
     expect(script(container)?.parentElement?.tagName).toBe('NAV')
   })
 
   it('parses a server-rendered hostile label as data: one script, no injected element', () => {
     const hostile = '</script><img src=x onerror=alert(1)><script>'
-    const { container } = render(<Breadcrumb items={[{ href: '/x', label: hostile }, { label: 'Now' }]} />)
+    const { container } = render(<Breadcrumb items={[{ href: '/x', label: hostile }, { label: 'Now' }]} siteUrl="https://example.com" />)
     // Parsed again from the serialised HTML, which is what a browser does with a server response.
     const reparsed = document.createElement('div')
     reparsed.innerHTML = container.innerHTML

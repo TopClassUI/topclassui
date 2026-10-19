@@ -67,7 +67,8 @@ describe('a row of a menu and its highlight', () => {
   it('ROW is a full-width flex row as tall as the row token, with no outline of its own', () => {
     expect(list(ROW)).toEqual([
       'flex', 'min-h-(--tc-row-height)', 'w-full', 'items-center', 'gap-2', 'rounded-control', 'px-3',
-      'text-start', 'text-sm', 'outline-none',
+      'text-start', 'text-sm', 'outline-none', 'cursor-pointer', 'disabled:cursor-default', 'aria-disabled:cursor-default',
+      'data-disabled:cursor-default', 'data-readonly:cursor-default', 'data-loading:cursor-default',
     ])
   })
 
@@ -127,13 +128,13 @@ describe('lists, bars and sideways scrolling', () => {
 describe('the icon button and the two other rings', () => {
   it('ICON_BUTTON is a centred box with the touch target, the focus ring and the transition', () => {
     expect(list(ICON_BUTTON)).toEqual([
-      'inline-flex', 'shrink-0', 'items-center', 'justify-center', 'rounded-control',
-      'min-h-[var(--tc-target-min,24px)]', 'min-w-[var(--tc-target-min,24px)]',
+      'inline-flex', 'shrink-0', 'items-center', 'justify-center', 'rounded-control', 'min-h-[var(--tc-target-min,24px)]', 'min-w-[var(--tc-target-min,24px)]',
       'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]', 'pointer-coarse:min-w-[var(--tc-target-coarse,44px)]',
       'outline-none', 'focus-visible:outline-solid', 'focus-visible:outline-(length:--tc-ring-width)',
       'focus-visible:outline-offset-(length:--tc-ring-offset)', 'focus-visible:outline-ring',
       'transition-[color,background-color,border-color,outline-color,opacity,translate]',
-      'duration-(--tc-duration)', 'ease-out',
+      'duration-(--tc-duration)', 'ease-out', 'cursor-pointer', 'disabled:cursor-default', 'aria-disabled:cursor-default',
+      'data-disabled:cursor-default', 'data-readonly:cursor-default', 'data-loading:cursor-default',
     ])
   })
 
