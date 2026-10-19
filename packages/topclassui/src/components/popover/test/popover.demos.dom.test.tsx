@@ -26,7 +26,7 @@ const PLACES = [
 
 /** What each trigger of each demo opens, written out. */
 const SHOWN: Record<string, Shown[]> = {
-  'basic': [{ trigger: 'Share', title: 'Share this page', controls: ['Copy link'] }],
+  'basic': [{ trigger: 'Share', title: 'Share this page', controls: ['Close', 'Copy link'] }],
   'hover': [{ trigger: 'Billing details', title: 'How billing works', controls: ['Read the guide'] }],
   'long-content': [{ trigger: 'Change log', title: 'Change log', controls: [] }],
   'modal': [{ trigger: 'Delete draft', title: 'Delete this draft?', controls: ['Close', 'Keep it', 'Delete'] }],

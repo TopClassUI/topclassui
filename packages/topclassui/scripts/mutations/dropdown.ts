@@ -154,10 +154,10 @@ export const MUTATIONS: Mutation[] = [
     to: 'max-w-[round(down,var(--available-width),1px)]',
   },
   {
-    label: 'the dropdown menu keeps 12rem at a doubled text size, wider than a phone',
+    label: 'the dropdown menu keeps 13.75rem at a doubled text size, wider than a phone',
     file: CLASSES,
-    from: 'min-w-[min(calc(var(--spacing)*48),round(down,var(--available-width),1px))]',
-    to: 'min-w-48',
+    from: 'min-w-[min(calc(var(--spacing)*55),round(down,var(--available-width),1px))]',
+    to: 'min-w-55',
   },
   {
     label: 'a dropdown shortcut is capped at half its row, so a short row cuts a real shortcut',

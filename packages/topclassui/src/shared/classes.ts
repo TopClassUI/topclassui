@@ -119,10 +119,10 @@ export const POPUP_MOTION = 'origin-(--transform-origin) transition-[opacity,sca
 export const SLIDE_MOTION = 'transition-transform duration-(--tc-duration-slow) ease-out'
 
 /** The box of a dialog, a popup and a toast. Forced colours drop the shadow and keep the line. */
-export const OVERLAY_SURFACE = `rounded-box bg-surface-raised text-body ${BORDER} shadow-lg`
+export const OVERLAY_SURFACE = `rounded-box bg-surface-raised text-body ${BORDER} shadow-(--tc-shadow-overlay)`
 
 /** One row of a menu or a list, at least --tc-row-height tall. Its highlight is its focus mark. */
-export const ROW = 'flex min-h-(--tc-row-height) w-full items-center gap-2 rounded-control px-3 text-start text-sm outline-none'
+export const ROW = 'flex min-h-(--tc-row-height) w-full items-center gap-2 rounded-control px-2.5 text-start text-sm outline-none'
 
 /** The row the keyboard or the pointer is on: a fill, and the ring inside its edge, since the fill alone
  * is under 3:1 against the popup. Forced colours erase a fill, so there it paints the system pair itself,

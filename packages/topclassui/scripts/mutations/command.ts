@@ -193,8 +193,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'command: the popup clips its children, and the ring of the input with them',
     file: CLASSES,
-    from: 'max-w-105 flex-col wrap-anywhere',
-    to: 'max-w-105 flex-col overflow-hidden wrap-anywhere',
+    from: 'max-w-100 flex-col wrap-anywhere',
+    to: 'max-w-100 flex-col overflow-hidden wrap-anywhere',
   },
   {
     label: 'command: the window ignores visibleRows, so a two-row box mounts the rows of seven',

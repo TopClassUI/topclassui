@@ -68,6 +68,7 @@ const DECLARATION: Record<string, string> = {
   'p-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]': `padding: ${RING_REACH};`,
   'group-data-closed/sidebar:[scrollbar-width:none]': 'scrollbar-width: none;',
   // The label of a group.
+  'px-2.5': 'padding-inline: calc(var(--spacing) * 2.5);',
   'px-3': 'padding-inline: calc(var(--spacing) * 3);',
   'py-1': 'padding-block: var(--spacing);',
   'text-xs': 'font-size: var(--text-xs);',
@@ -133,7 +134,7 @@ describe('every class Sidebar writes compiles with the installed Tailwind', () =
 
   it('the table names exactly the classes of classes.ts, and the one that only marks the group', () => {
     expect(written).toEqual([...Object.keys(DECLARATION), 'group/sidebar'].sort())
-    expect(written).toHaveLength(74)
+    expect(written).toHaveLength(75)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

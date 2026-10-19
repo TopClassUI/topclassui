@@ -287,8 +287,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the overlay surface loses its hairline, so forced colours leave a popup with no edge at all',
     file: 'src/shared/classes.ts',
-    from: 'text-body ${BORDER} shadow-lg',
-    to: 'text-body shadow-lg',
+    from: 'text-body ${BORDER} shadow-(--tc-shadow-overlay)',
+    to: 'text-body shadow-(--tc-shadow-overlay)',
   },
   {
     label: 'the overlay row loses its height token, so a menu row is as short as its text',

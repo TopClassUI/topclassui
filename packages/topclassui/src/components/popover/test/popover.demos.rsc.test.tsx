@@ -83,8 +83,8 @@ describe('every demo is a Server Component that only hands the parts what can cr
 describe('the parts a demo is built from', () => {
   const parts = async (name: string) => crossings((await load(name))()).map((crossing) => crossing.part)
 
-  it('basic: five of the six flat parts, each a reference', async () => {
-    expect(await parts('basic')).toEqual(['PopoverRoot', 'PopoverTrigger', 'PopoverPopup', 'PopoverTitle', 'PopoverDescription'])
+  it('basic: all six flat parts, each a reference', async () => {
+    expect(await parts('basic')).toEqual(['PopoverRoot', 'PopoverTrigger', 'PopoverPopup', 'PopoverTitle', 'PopoverClose', 'PopoverDescription'])
   })
 
   it('modal: the sixth, used three times: the x and the two actions', async () => {

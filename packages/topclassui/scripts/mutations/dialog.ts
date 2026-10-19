@@ -25,8 +25,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog body loses its one-line floor, so a tall header and footer squeeze it to nothing on a small phone',
     file: CLASSES,
-    from: '`min-h-15 flex-1 px-5 py-5',
-    to: '`min-h-0 flex-1 px-5 py-5',
+    from: '`min-h-15 flex-1 px-4.5 py-4.5',
+    to: '`min-h-0 flex-1 px-4.5 py-4.5',
   },
   {
     label: 'the dialog body keeps scrolling on a screen under 272 px tall, so a wheel that starts on it never reaches the actions',
@@ -91,7 +91,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog md width becomes 512 px, the width of lg',
     file: CLASSES,
-    from: "md: 'max-w-100',",
+    from: "md: 'max-w-95',",
     to: "md: 'max-w-128',",
   },
   {
@@ -109,8 +109,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog footer no longer wears the shared action wrap, so a long action ends in an ellipsis on a phone',
     file: CLASSES,
-    from: 'border-line px-5 py-4 ${ACTIONS_WRAP}`',
-    to: 'border-line px-5 py-4`',
+    from: 'border-line px-4.5 py-3.5 ${ACTIONS_WRAP}`',
+    to: 'border-line px-4.5 py-3.5`',
   },
   {
     label: 'the dialog viewport loses the direction of its provider, so the dialog of an RTL island has its x on the right and its text left-aligned',

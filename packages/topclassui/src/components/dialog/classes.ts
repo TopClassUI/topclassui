@@ -26,14 +26,14 @@ export const DIALOG_POPUP = [
 export const DIALOG_WIDTH = {
   xs: 'max-w-80',
   sm: 'max-w-90',
-  md: 'max-w-100',
+  md: 'max-w-95',
   lg: 'max-w-128',
   xl: 'max-w-160',
   custom: '',
 } as const satisfies Record<Size, string>
 
 /** It never shrinks, so it keeps its box while the body scrolls. */
-export const DIALOG_HEADER = 'flex shrink-0 items-start gap-3 border-b-(length:--tc-line-width) border-line px-5 py-4'
+export const DIALOG_HEADER = 'flex shrink-0 items-start gap-3 border-b-(length:--tc-line-width) border-line px-4.5 py-3.5'
 
 /** The title and the description: the column that gives way, so the x keeps its place. */
 export const DIALOG_HEADING = 'min-w-0 flex-1'
@@ -49,11 +49,11 @@ export const DIALOG_BODY_SHORT = '[@container(height<15rem)]:shrink-0 [@containe
 
 /** R-10.5-1: the scroll container. Never shorter than one line of text and its padding, and
  * its ring is drawn inside its box, because the popup clips whatever is outside it. */
-export const DIALOG_BODY = `min-h-15 flex-1 px-5 py-5 text-sm text-muted ${SCROLL_AREA} ${FOCUS_RING_INSET} ${DIALOG_BODY_SHORT}`
+export const DIALOG_BODY = `min-h-15 flex-1 px-4.5 py-4.5 text-sm text-muted ${SCROLL_AREA} ${FOCUS_RING_INSET} ${DIALOG_BODY_SHORT}`
 
 /** It never shrinks either. The actions sit at the end and wrap onto rows on a narrow screen,
  * and a label too long for its row wraps inside its action. */
-export const DIALOG_FOOTER = `flex shrink-0 flex-wrap items-center justify-end gap-2 border-t-(length:--tc-line-width) border-line px-5 py-4 ${ACTIONS_WRAP}`
+export const DIALOG_FOOTER = `flex shrink-0 flex-wrap items-center justify-end gap-2 border-t-(length:--tc-line-width) border-line px-4.5 py-3.5 ${ACTIONS_WRAP}`
 
 /** The x: an icon button on the neutral ramp, so its hover is the ghost tint. */
 export const DIALOG_CLOSE = `${ICON_BUTTON} text-muted tone-neutral ${HOVER.ghost}`
