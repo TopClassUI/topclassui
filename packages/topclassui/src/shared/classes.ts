@@ -160,6 +160,15 @@ export const ICON_BUTTON = `inline-flex shrink-0 items-center justify-center rou
 /** The ring drawn inside the box, for a control flush against an edge that clips it. */
 export const FOCUS_RING_INSET = 'outline-none focus-visible:outline-solid focus-visible:outline-(length:--tc-ring-width) focus-visible:-outline-offset-(length:--tc-ring-width) focus-visible:outline-ring'
 
+/** The same fill for a row that holds the real focus, as a Select's does: its ring is the focus ring, so a row
+ * a pointer opened on or passes over is tinted without one, and a key brings the ring back. */
+export const ROW_FOCUSED = [
+  'data-highlighted:bg-primary-soft data-highlighted:text-primary-on-soft',
+  `${FOCUS_RING_INSET} forced-colors:focus-visible:outline-[HighlightText]`,
+  'forced-colors:data-highlighted:forced-color-adjust-none forced-colors:data-highlighted:bg-[Highlight]',
+  'forced-colors:data-highlighted:text-[HighlightText]',
+].join(' ')
+
 /** The ring on a wrapper whose focused element is hidden: a label around a native radio. */
 export const FOCUS_RING_WITHIN = 'outline-none has-focus-visible:outline-solid has-focus-visible:outline-(length:--tc-ring-width) has-focus-visible:outline-offset-(length:--tc-ring-offset) has-focus-visible:outline-ring'
 
@@ -236,8 +245,11 @@ export const FIELD_READ_ONLY = 'bg-neutral-soft'
 /** The box of a field: its fill, its 3:1 line and its radius. */
 export const FIELD_SURFACE = `rounded-control bg-surface-raised text-body ${BORDER_STRONG} ${CONTAIN} ${TRANSITION}`
 
+/** Disabled sits on the surface below the raised fill, then dims with every control. */
+export const FIELD_DISABLED = 'disabled:bg-surface data-disabled:bg-surface'
+
 /** A field that is one element: the box, the ring, the floor and the invalid mark. */
-export const FIELD_BOX = `${FIELD_SURFACE} placeholder:text-muted ${DISABLED} ${FOCUS_RING} ${TOUCH_TARGET} ${FIELD_INVALID}`
+export const FIELD_BOX = `${FIELD_SURFACE} placeholder:text-muted ${DISABLED} ${FIELD_DISABLED} ${FOCUS_RING} ${TOUCH_TARGET} ${FIELD_INVALID}`
 
 /** The type step of a field, for a wrapper that owns the width: --tc-input-width is in em. */
 export const FIELD_TEXT = {
@@ -264,5 +276,5 @@ export const FIELD_SIZE = {
 /** A row under a finger: raised to the coarse target, never below the row height a 32 px root or a density sets. */
 export const ROW_TOUCH = 'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]'
 
-/** The chosen row differs by weight as well as by its tick. */
-export const ROW_SELECTED = 'data-selected:font-medium'
+/** The chosen row wears the tint and the tick; under forced colours the fill goes and the tick stays. */
+export const ROW_SELECTED = 'data-selected:bg-primary-soft data-selected:text-primary-on-soft'
