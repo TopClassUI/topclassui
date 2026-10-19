@@ -2,7 +2,7 @@
 import { cn } from '#shared/cn.js'
 import { clamp } from '#shared/clamp.js'
 import { SKELETON_BOUNDARIES } from './boundaries.js'
-import { SKELETON_FILL, SKELETON_LAST_ROW, SKELETON_ROW, SKELETON_SHAPE } from './classes.js'
+import { SKELETON_FILL, SKELETON_LAST_ROW, SKELETON_NEXT_TO_LAST_ROW, SKELETON_ROW, SKELETON_SHAPE } from './classes.js'
 import { SKELETON_DEFAULTS } from './constants.js'
 import type { SkeletonProps } from './types.js'
 
@@ -33,7 +33,12 @@ export function Skeleton({
       {Array.from({ length: count }, (_, row) => (
         <span
           key={row}
-          className={cn(SKELETON_ROW, SKELETON_FILL, count > 1 && row === count - 1 && SKELETON_LAST_ROW)}
+          className={cn(
+            SKELETON_ROW,
+            SKELETON_FILL,
+            count > 1 && row === count - 1 && SKELETON_LAST_ROW,
+            count > 2 && row === count - 2 && SKELETON_NEXT_TO_LAST_ROW,
+          )}
         />
       ))}
     </span>

@@ -8,7 +8,7 @@ import { compileEntry, declarationIndex } from '#test/stylesheet.js'
 import { Skeleton } from '../index.js'
 
 const HTML = [
-  markup(createElement(Skeleton, { rows: 2 })),
+  markup(createElement(Skeleton, { rows: 3 })),
   markup(createElement(Skeleton, { variant: 'circle' })),
   markup(createElement(Skeleton, { variant: 'rect' })),
   markup(createElement(Skeleton, { variant: 'card' })),
@@ -44,12 +44,16 @@ describe('every class the component renders paints something', () => {
 })
 
 describe('a row is exactly one line of the text it replaces', () => {
-  it('is as tall as the font size', () => {
-    expect(ruleOf('.h-\\[1em\\]')).toBe('height: 1em;')
+  it('is three quarters of the font size, as Figma draws the bar', () => {
+    expect(ruleOf('.h-\\[0\\.75em\\]')).toBe('height: 0.75em;')
   })
 
   it('splits the rest of the line height between its two margins', () => {
-    expect(ruleOf('.my-\\[calc\\(\\(1lh-1em\\)\\/2\\)\\]')).toBe('margin-block: calc((1lh - 1em) / 2);')
+    expect(ruleOf('.my-\\[calc\\(\\(1lh-0\\.75em\\)\\/2\\)\\]')).toBe('margin-block: calc((1lh - 0.75em) / 2);')
+  })
+
+  it('narrows the row before it to five sixths', () => {
+    expect(ruleOf('.w-5\\/6')).toBe('width: calc(5 / 6 * 100%);')
   })
 
   it('narrows the last row to two thirds of the column', () => {

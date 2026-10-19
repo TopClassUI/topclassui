@@ -129,8 +129,8 @@ describe('the whole markup, written out', () => {
   it('is a column of two rows, the last one two thirds wide', () => {
     expect(html({ rows: 2 })).toBe(
       '<span data-variant="text" class="flex flex-col w-full" aria-hidden="true">'
-      + '<span class="block h-[1em] my-[calc((1lh-1em)/2)] rounded-chip bg-neutral-soft animate-pulse motion-reduce:animate-none forced-colors:outline-(length:--tc-line-width)"></span>'
-      + '<span class="block h-[1em] my-[calc((1lh-1em)/2)] rounded-chip bg-neutral-soft animate-pulse motion-reduce:animate-none forced-colors:outline-(length:--tc-line-width) w-2/3"></span>'
+      + '<span class="block h-[0.75em] my-[calc((1lh-0.75em)/2)] rounded-chip bg-neutral-soft animate-pulse motion-reduce:animate-none forced-colors:outline-(length:--tc-line-width)"></span>'
+      + '<span class="block h-[0.75em] my-[calc((1lh-0.75em)/2)] rounded-chip bg-neutral-soft animate-pulse motion-reduce:animate-none forced-colors:outline-(length:--tc-line-width) w-2/3"></span>'
       + '</span>',
     )
   })
