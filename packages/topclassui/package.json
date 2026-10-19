@@ -34,7 +34,9 @@
   },
   "files": [
     "dist",
-    "!dist/**/dummy"
+    "!dist/**/dummy",
+    "CHANGELOG.md",
+    "size.json"
   ],
   "exports": {
     "./package.json": "./package.json",
@@ -89,11 +91,6 @@
       "#components/*": "./dist/components/*"
     }
   },
-  "files": [
-    "dist",
-    "!dist/**/dummy",
-    "CHANGELOG.md"
-  ],
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
@@ -106,7 +103,7 @@
     "check:package": "tsx scripts/check-package.ts",
     "check:pack": "tsx scripts/check-pack.ts",
     "rules:sync": "tsx scripts/rules-sync.ts",
-    "check": "pnpm lint && pnpm typecheck && pnpm check:package && pnpm test && pnpm check:structure && pnpm check:boundaries && pnpm check:css && pnpm check:icons && pnpm check:readme && pnpm check:contrast && pnpm test:e2e && pnpm rules:sync --check",
+    "check": "pnpm lint && pnpm typecheck && pnpm check:package && pnpm size --check && pnpm test && pnpm check:structure && pnpm check:boundaries && pnpm check:css && pnpm check:icons && pnpm check:readme && pnpm check:contrast && pnpm test:e2e && pnpm rules:sync --check",
     "check:css": "tsx scripts/check-css.ts",
     "icons:build": "tsx scripts/icons-build.ts",
     "check:icons": "tsx scripts/icons-build.ts --check",
@@ -118,6 +115,7 @@
     "test:e2e": "pnpm harness:build && playwright test",
     "readme:build": "tsx scripts/readme-build.ts",
     "check:readme": "tsx scripts/readme-build.ts --check",
+    "size": "tsx scripts/size.ts",
     "test:consumers": "tsx scripts/consumer-smoke.ts",
     "prepublishOnly": "pnpm check:package"
   },
@@ -133,6 +131,7 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "axe-core": "4.14.0",
+    "esbuild": "0.28.2",
     "eslint": "10.12.0",
     "happy-dom": "20.14.5",
     "jiti": "2.7.0",

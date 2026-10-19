@@ -1,0 +1,87 @@
+{
+  "kb": {
+    "simple": 6,
+    "overlay": 14,
+    "lazy": 6
+  },
+  "components": {
+    "accordion": {
+      "class": "simple",
+      "kb": 7.5
+    },
+    "avatar": "simple",
+    "banner": {
+      "class": "simple",
+      "kb": 7.7
+    },
+    "checkbox": {
+      "class": "simple",
+      "kb": 6.9
+    },
+    "code-block": "simple",
+    "combobox": "overlay",
+    "command": {
+      "class": "lazy",
+      "kb": 7.1
+    },
+    "date-picker": {
+      "class": "lazy",
+      "kb": 11.5
+    },
+    "dialog": "overlay",
+    "drawer": "overlay",
+    "dropdown": "overlay",
+    "field": "simple",
+    "file-upload": {
+      "class": "simple",
+      "kb": 13.1
+    },
+    "form": "simple",
+    "icon-registry": "simple",
+    "navbar": "simple",
+    "number-field": {
+      "class": "simple",
+      "kb": 8.2
+    },
+    "otp-field": {
+      "class": "simple",
+      "kb": 6.9
+    },
+    "popover": "overlay",
+    "radio-group": {
+      "class": "simple",
+      "kb": 7.6
+    },
+    "rating": "simple",
+    "segmented-control": {
+      "class": "simple",
+      "kb": 8.3
+    },
+    "select": "overlay",
+    "sidebar": "simple",
+    "slider": {
+      "class": "simple",
+      "kb": 7.3
+    },
+    "switch": "simple",
+    "table": {
+      "class": "simple",
+      "kb": 7.3
+    },
+    "tabs": {
+      "class": "simple",
+      "kb": 7.2
+    },
+    "tag": {
+      "class": "simple",
+      "kb": 8.3
+    },
+    "textarea": "simple",
+    "toast": "overlay",
+    "tooltip": "overlay",
+    "tree-view": {
+      "class": "simple",
+      "kb": 11.4
+    }
+  }
+}

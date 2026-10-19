@@ -172,7 +172,7 @@ Deliberate departures from PLAN.md sections 4, 6 and 7 are recorded in `docs/DEC
 
 - **26 components are not on `main` yet.** Unit 3 (ten, plus Rating and three client halves), Unit 4 (the form controls) and Unit 5 are built and reviewed, waiting to merge.
 - **The docs site** is not built, only designed. The harness pages under `.harness/` stand in for it in the browser tests.
-- **`pnpm test:visual` and `pnpm size`** do not exist, so no component can be `stable`.
+- **`pnpm test:visual`** does not exist, so no component can be `stable`. `pnpm size` exists since 19 October (DECISIONS); fifteen client halves are over their PLAN 14 class and carry a raised budget until they are slimmed.
 - **The components page** (`Docs site - LTR`, 46 cards) has not been reviewed. It is the largest frame in the file and the most important one left.
 - **The home page** has not been reviewed.
 - **The Connectors page needs a visual pass.** The 16 cards were built without being able to see them, and Omar's verdict on the result was "so bad". The structure is sound and the audit is clean - no raw colours, no fixed rows, no overflow - but it needs eyes.
