@@ -1,5 +1,5 @@
 // R-5.12-4: Pagination's own class tables, read by variants.ts and index.tsx.
-import { BORDER_STRONG, HOVER } from '#shared/classes.js'
+import { BORDER, HOVER } from '#shared/classes.js'
 import type { Size } from '#shared/contracts/size.js'
 import { TONE_CLASS } from '#shared/contracts/tone.js'
 
@@ -8,7 +8,7 @@ export const LIST = 'flex flex-wrap items-center gap-1'
 
 /** What a link, an edge control and a gap share: a centred box with the control radius.
  * tabular-nums gives every digit one width, so Next stays put from page 111 to 112. */
-export const CELL = 'inline-flex items-center justify-center rounded-control font-medium tabular-nums'
+export const CELL = 'inline-flex cursor-pointer items-center justify-center rounded-control font-medium tabular-nums data-disabled:cursor-default'
 
 /** A square at the control height that grows with a long number instead of spilling it.
  * min-w-auto replaces the px floors of TOUCH_TARGET: the ratio carries min-height across. */
@@ -36,8 +36,9 @@ export const CELL_CURRENT_FORCED = [
 /** The page the reader is on: filled, so it is found without reading a number. */
 export const CELL_CURRENT = `bg-primary-solid text-primary-on-solid ${TONE_CLASS.primary} ${HOVER.solid} ${CELL_CURRENT_FORCED}`
 
-/** Every other cell: a control boundary at 3:1, body text, and the neutral tint under a pointer. */
-export const CELL_OTHER = `${BORDER_STRONG} text-body ${TONE_CLASS.neutral} ${HOVER.outline}`
+/** Every other cell: the hairline the frame draws, body text, and the neutral tint under a pointer.
+ * The digit names the link, so the box is decorative; a dead edge drops it, as Figma 138:1269 does. */
+export const CELL_OTHER = `${BORDER} text-body ${TONE_CLASS.neutral} ${HOVER.outline} data-disabled:border-transparent`
 
-/** A gap is text, not a control: no boundary, no ring and no hover. */
-export const CELL_GAP = `${CELL} text-body`
+/** A gap is a mark, not a control: no boundary, no ring, no hover and no pointer. */
+export const CELL_GAP = 'inline-flex items-center justify-center text-body'

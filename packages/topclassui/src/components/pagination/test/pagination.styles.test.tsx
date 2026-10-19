@@ -4,6 +4,7 @@ import { caretDoubleLeft } from '#icons/data/caret-double-left.js'
 import { caretDoubleRight } from '#icons/data/caret-double-right.js'
 import { caretLeft } from '#icons/data/caret-left.js'
 import { caretRight } from '#icons/data/caret-right.js'
+import { dotsThree } from '#icons/data/dots-three.js'
 import { attr, markup } from '#test/markup.js'
 import { Pagination } from '../index.js'
 import type { PaginationProps } from '../types.js'
@@ -116,14 +117,15 @@ describe('the current page and the others', () => {
     expect(current).toContain('bg-primary-solid')
     expect(current).toContain('text-primary-on-solid')
     expect(current).not.toContain('text-body')
-    expect(current).not.toContain('border-line-strong')
+    expect(current).not.toContain('border-line')
   })
 
-  it('strokes every other link and both edge spans with the strong line, in body text', () => {
+  it('strokes every other link and both edge spans with the hairline of Figma 138:1269, in body text', () => {
     const others = cells({ value: 1 }).filter((list) => !list.includes('bg-primary-solid'))
     expect(others).toHaveLength(9)
     for (const list of others) {
-      expect(missing(['border-(length:--tc-line-width)', 'border-line-strong', 'text-body'], list)).toEqual([])
+      expect(missing(['border-(length:--tc-line-width)', 'border-line', 'text-body'], list)).toEqual([])
+      expect(list).not.toContain('border-line-strong')
     }
   })
 
@@ -142,13 +144,28 @@ describe('an edge span is dimmed and takes no pointer', () => {
     }
     expect(html({ value: 1 }).match(/<span [^>]*data-disabled=""/g)).toHaveLength(2)
   })
+
+  it('drops its stroke and the pointer, as the dead edges of Figma 138:1269 do', () => {
+    for (const list of classesOf(html({ value: 1 }), EDGE)) {
+      expect(list).toContain('data-disabled:border-transparent')
+      expect(list).toContain('data-disabled:cursor-default')
+    }
+  })
 })
 
-describe('a gap is text, not a control', () => {
-  it('carries no floor, no ring, no stroke and no hover', () => {
+describe('a link shows the pointer', () => {
+  it('on every page link, the current one included', () => {
+    const links = classesOf(html({ value: 6 }), LINK)
+    expect(links).toHaveLength(9)
+    for (const list of links) expect(list).toContain('cursor-pointer')
+  })
+})
+
+describe('a gap is a mark, not a control', () => {
+  it('carries no floor, no ring, no stroke, no hover and no pointer', () => {
     const [gap] = classesOf(html(), GAP)
     expect(gap).toContain('text-body')
-    const control = /^(min-h-|pointer-coarse:min-h-|min-w-\[|outline-|focus-visible:|border-|hover:|active:|tone-|transition)/
+    const control = /^(min-h-|pointer-coarse:min-h-|min-w-\[|outline-|focus-visible:|border-|hover:|active:|tone-|transition|cursor-)/
     expect((gap ?? []).filter((cls) => control.test(cls))).toEqual([])
   })
 })
@@ -167,14 +184,23 @@ describe('the list', () => {
 describe('direction', () => {
   it('draws first, previous, next and last with the four carets, in that order', () => {
     const paths = [...html({ value: 6 }).matchAll(/<path d="([^"]*)"/g)].map((match) => match[1])
-    expect(paths).toEqual([caretDoubleLeft.path, caretLeft.path, caretRight.path, caretDoubleRight.path])
+    expect(paths).toEqual([caretDoubleLeft.path, caretLeft.path, dotsThree.path, dotsThree.path, caretRight.path, caretDoubleRight.path])
   })
 
   it('lets Svg mirror all four in RTL, on a link and on an edge span alike', () => {
     for (const value of [1, 6, 12]) {
-      const icons = classesOf(html({ value }), /<svg [^>]*>/g)
+      const icons = classesOf(html({ value }).replace(/<li aria-hidden="true"[^>]*><svg [^>]*>/g, ''), /<svg [^>]*>/g)
       expect(icons, String(value)).toHaveLength(4)
       for (const list of icons) expect(list, String(value)).toContain('scale-x-(--tc-dir)')
+    }
+  })
+
+  it('never mirrors the dots of a gap, which have no direction', () => {
+    const gaps = classesOf(html({ value: 6 }), /(?<=<li aria-hidden="true"[^>]*>)<svg [^>]*>/g)
+    expect(gaps).toHaveLength(2)
+    for (const list of gaps) {
+      expect(list).toContain('inline-block')
+      expect(list).not.toContain('scale-x-(--tc-dir)')
     }
   })
 })

@@ -3,6 +3,7 @@ import { caretDoubleLeft } from '#icons/data/caret-double-left.js'
 import { caretDoubleRight } from '#icons/data/caret-double-right.js'
 import { caretLeft } from '#icons/data/caret-left.js'
 import { caretRight } from '#icons/data/caret-right.js'
+import { dotsThree } from '#icons/data/dots-three.js'
 import type { IconData } from '#icons/types.js'
 import { cn } from '#shared/cn.js'
 import { en } from '#shared/labels/en.js'
@@ -69,7 +70,7 @@ export function Pagination({
         {control(page - 1, text.previous, caretLeft, page === 1, 'prev')}
         {listPages({ value: page, pageCount: count, siblingCount, boundaryCount }).map((item) => {
           if (typeof item !== 'number') {
-            return <li key={item} aria-hidden="true" className={cn(CELL_GAP, CELL_SIZE[size])}>...</li>
+            return <li key={item} aria-hidden="true" className={cn(CELL_GAP, CELL_SIZE[size])}><Svg icon={dotsThree} /></li>
           }
           const current = item === page
           return (
