@@ -18,12 +18,12 @@ export const ON_SOFT = {
   info: 'bg-info-soft text-info-on-soft',
 } as const satisfies Record<Tone, string>
 
-/** The x. `ms-auto` keeps it at the inline end of whatever line it wraps to. Forced colours erase
- * the hover fill, so there a hovered x draws an outline instead. */
+/** The x. `ms-auto` keeps it at the inline end of whatever line it wraps to, and the negative margin puts its 14 px
+ * glyph on the padding's edge as the frame draws it. Forced colours erase the hover fill, so there a hovered x draws an outline. */
 export const DISMISS = [
   ICON_BUTTON,
   HOVER.soft,
-  'ms-auto',
+  'ms-auto -me-1.25 cursor-pointer',
   'forced-colors:hover:outline-solid forced-colors:hover:outline-(length:--tc-line-width)',
 ].join(' ')
 
