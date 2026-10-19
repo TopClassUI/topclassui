@@ -75,9 +75,9 @@ for (const path of PATHS) {
     for (const href of hrefs) await expect(page.locator(`h2[id="${href.slice(1)}"]`)).toHaveCount(1)
     const locale = path.slice(0, 3)
     const next = NEXT[path.slice(3) as (typeof ROUTES)[number]]
-    const card = page.locator('main a[href]').last()
+    const card = page.locator('main a[rel="next"]')
     if (next === null) {
-      await expect(page.locator(`main a[href="${locale}/changelog"]`)).toHaveCount(0)
+      await expect(card).toHaveCount(0)
     } else {
       await expect(card).toHaveAttribute('href', `${locale}${next}`)
       await card.click()
