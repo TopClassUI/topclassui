@@ -86,4 +86,16 @@ export const MUTATIONS: Mutation[] = [
     from: "  'forced-colors:hover:bg-[Highlight]',\n",
     to: '',
   },
+  {
+    label: 'the pagination page links lose pagination-full, so a phone gets the bulky wrapped row back',
+    file: 'src/components/pagination/index.tsx',
+    from: '<li key={item} className={FULL}>',
+    to: '<li key={item}>',
+  },
+  {
+    label: 'the pagination compact row ignores a coarse pointer, so a tablet finger meets eleven cells',
+    file: 'src/styles.css',
+    from: '  @media (pointer: coarse) { display: none !important; }\n',
+    to: '',
+  },
 ]

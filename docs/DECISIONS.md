@@ -6,6 +6,20 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-19 - Pagination turns compact on a narrow list or under a finger
+
+**Decision.** Job 119 (round 8, "bulky pagination on phones"). The `<ul>` of Pagination is a container named `pagination` (`@container/pagination`), and two utilities in `src/styles.css` read it: `pagination-full` (the pages and the gaps) is `display: none` below 36rem of the list's width or under `pointer: coarse`, and `pagination-compact` (a new item between Previous and Next, "3 of 12" from `labels.pagination.ofPages`) is shown in exactly those two cases. The compact row is First, Previous, "current of total", Next, Last on one line; the status takes the room the four controls leave (`flex-1`) and wraps its own text, so "12,345 of 123,456" at `xl` still keeps one row at 390 px. The page links stay in the HTML, hidden, so a crawler follows every one; the current page link is hidden too, and the status says the page in words.
+
+- **36rem.** The full row at `lg` is 11 x 48 px plus ten 4 px gaps, 568 px; `xl` past that still wraps as before. A query cannot read a custom property, so the number is written in the utility, once.
+- **Coarse pointer at any width.** As the job asks: 44 px cells make the full row 524 px, which wraps on most phones and some tablets.
+- **`!important`.** A gap's own `inline-flex` is emitted after `pagination-full` in the same layer, so the hide carries `!important`.
+- **`dir="auto"` on the status.** English labels on an RTL page read "of 12 3" otherwise; Arabic labels resolve to RTL themselves.
+- **Figma 138:1269 stays the desktop truth.** Nothing above 36rem with a fine pointer changed: the status is `display: none` there.
+- **A container takes no width from its content.** A Pagination placed in a flex row needs a width of its own (`flex-1`, `w-full`); the README says so.
+- **`e2e/target-size.spec.ts` skips a box with `display: none`**, which is no target; Pagination keeps its hidden links in the HTML.
+
+**What it affects.** `src/components/pagination/{index.tsx,classes.ts,README.md}` and its tests, `src/styles.css`, `e2e/pagination-compact.spec.ts` (390 px under a fine and a coarse pointer, both directions, every demo: one line, 44 px targets, Previous and Next lead to the neighbours, links kept), `e2e/target-size.spec.ts`, two rows of `scripts/mutations/pagination.ts`.
+
 ## 2026-10-18 - The site hydrates in islands, and the shell's code waits for the first paint
 
 **Decision.** Job 83 (Lighthouse on the docs site, mobile preset). Every client part of the site goes through `apps/docs/components/lazy-island.tsx`: the server's HTML is rendered as before, and the part's own chunk loads only when it comes within one viewport (`near`) or, for what is on screen from the start, after the first paint and an idle moment (`idle`). A pointer, touch or focus on it loads it at once, and a press or hover that lands before the chunk is given again afterwards. While it waits, the island's box keeps the server's HTML untouched (an empty `dangerouslySetInnerHTML` during hydration, which React leaves alone); once the chunk is in, the part renders afresh in its place in one transition, and focus goes back where it was. Parts are not hydrated late because a Base UI part hydrated inside a deferred boundary could be left with sync updates React never committed (the Dialog, Popover, Tooltip and Switch states stopped answering). The one island that hydrates is the root provider, in an `<Activity>`: React streams a Suspense boundary over 500 bytes out of order once the page passes 12.8 KB, hidden until a script reveals it, which held the first paint; an Activity stays inline. A client navigation mounts an island with no HTML to keep, so it loads at once.

@@ -96,10 +96,10 @@ describe('each demo shows the state its name promises', () => {
     ])
   })
 
-  it('many-pages: 500 pages in eleven cells, between the four controls', async () => {
+  it('many-pages: 500 pages in eleven cells and the compact status, between the four controls', async () => {
     const html = await render('many-pages')
     expect(pages(html)).toEqual(['1', '2', '248', '249', '250', '251', '252', '499', '500'])
-    expect(html.match(/<li/g)).toHaveLength(15)
+    expect(html.match(/<li/g)).toHaveLength(16)
   })
 
   it('two-navs: the pager above and the one below each carry a name of their own', async () => {
