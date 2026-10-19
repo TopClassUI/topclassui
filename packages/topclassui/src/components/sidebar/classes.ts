@@ -10,10 +10,10 @@ export const SIDEBAR_WIDTH = 'data-open:w-55 data-closed:w-15'
 export const SIDEBAR_COARSE = 'pointer-coarse:data-closed:min-w-[calc(var(--tc-target-coarse,44px)+1.25rem+var(--tc-line-width))]'
 
 /** A column as tall as its parent that a flex row never squeezes, and never wider than that
- * parent. The line is on the inline end, so it faces the page in either direction.
+ * parent. It sits on the page colour behind its line, as Figma 138:2539 draws the bordered rail. The line is on the inline end, so it faces the page in either direction.
  * relative: it holds the hidden labels of a rail that has no body, inside whatever scrolls it. */
 export const SIDEBAR_ROOT = [
-  'group/sidebar relative flex h-full shrink-0 flex-col gap-1 bg-surface p-2.5 text-body',
+  'group/sidebar relative flex h-full shrink-0 flex-col gap-1 bg-page p-2.5 text-body',
   'border-e-(length:--tc-line-width) border-line',
   SIDEBAR_WIDTH,
   SIDEBAR_COARSE,
@@ -21,7 +21,7 @@ export const SIDEBAR_ROOT = [
 ].join(' ')
 
 /** The toggle: an icon button on the neutral ramp, so its hover is the ghost tint. */
-export const SIDEBAR_TRIGGER = `${ICON_BUTTON} text-muted tone-neutral ${HOVER.ghost}`
+export const SIDEBAR_TRIGGER = `${ICON_BUTTON} text-muted tone-neutral ${HOVER.ghost} cursor-pointer`
 
 /** It never shrinks, so it keeps its box while the body scrolls. Collapsed, the trigger
  * stands alone and is centred over the icons below it. */

@@ -35,7 +35,7 @@ describe('the parts are where the scan expects them', () => {
 
 describe('the rail', () => {
   it('is the group its server parts read, a column as tall as its parent that a flex row cannot squeeze', () => {
-    expect(nav?.slice(0, 10)).toEqual(['group/sidebar', 'relative', 'flex', 'h-full', 'shrink-0', 'flex-col', 'gap-1', 'bg-surface', 'p-2.5', 'text-body'])
+    expect(nav?.slice(0, 10)).toEqual(['group/sidebar', 'relative', 'flex', 'h-full', 'shrink-0', 'flex-col', 'gap-1', 'bg-page', 'p-2.5', 'text-body'])
   })
 
   // A rail with no SidebarBody, inside a box of the page that scrolls: its hidden labels need a box of their own to stay in.
@@ -66,11 +66,11 @@ describe('the header', () => {
     expect(header).toEqual(['flex', 'shrink-0', 'items-center', 'gap-2', 'pb-1.5', 'group-data-closed/sidebar:justify-center'])
   })
 
-  it('the toggle is the shared icon button with its 24 and 44 px floors, its ring and the ghost hover of the neutral ramp', () => {
+  it('the toggle is the shared icon button with its 24 and 44 px floors, its ring and the ghost hover of the neutral ramp, under the pointer cursor', () => {
     expect(toggle).toEqual([
       'inline-flex', 'shrink-0', 'items-center', 'justify-center', 'rounded-control',
       'min-h-[var(--tc-target-min,24px)]', 'min-w-[var(--tc-target-min,24px)]', ...COARSE, ...RING, ...MOTION,
-      'text-muted', 'tone-neutral', 'hover:bg-(--tc-soft)', 'active:bg-(--tc-soft-hover)',
+      'text-muted', 'tone-neutral', 'hover:bg-(--tc-soft)', 'active:bg-(--tc-soft-hover)', 'cursor-pointer',
     ])
   })
 
