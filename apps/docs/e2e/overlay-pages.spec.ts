@@ -114,11 +114,11 @@ for (const slug of SLUGS) {
       const errors = collectErrors(page)
       await page.goto(`/${locale}/docs/components/${slug}`)
       await page.waitForLoadState('networkidle')
-      const previews = page.locator('section[aria-labelledby="examples"] [role="tabpanel"]:not([hidden])')
+      const previews = page.locator('section[aria-labelledby="examples"] [data-example-stage]')
       const count = await previews.count()
       expect(count).toBeGreaterThan(0)
       for (let index = 0; index < count; index += 1) {
-        const name = await previews.nth(index).locator('xpath=..').locator('span').first().textContent()
+        const name = await previews.nth(index).locator('xpath=..').locator('[data-example-name]').getAttribute('data-example-name')
         await drive(slug, previews.nth(index).locator('button').first())
         if (slug === 'tooltip' && name === 'disabled') {
           // The demo's own default delay passes before the check, so a tooltip that was going to open would have.

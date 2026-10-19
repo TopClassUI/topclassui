@@ -36,7 +36,8 @@ export function Examples({ entry, locale, actions }: { entry: PagedComponent; lo
   )
 }
 
-/** One example as the Previewer card draws its parts: the name, the stage on the page background, then the code with its Copy. */
+/** One example as the Previewer card draws its parts: the name, the stage on the page background, then the code with its Copy.
+ * No headings of its own: a demo may hold headings, and the section's h2 names them all. */
 function Example({ entry, name, locale, action }: { entry: PagedComponent; name: string; locale: Locale; action: ReactNode }) {
   const t = COMPONENT_PAGE_LABELS[locale]
   const key = `${entry.slug}/${name}`
@@ -46,16 +47,16 @@ function Example({ entry, name, locale, action }: { entry: PagedComponent; name:
   return (
     <article aria-label={`${entry.name}: ${name}`} className={PREVIEWER}>
       <div className="p-4.5">
-        {rtl ? <h3 className={CAPTION}>{t.rtlDemo}</h3> : <h3 dir="ltr" className={`${CAPTION} text-start font-mono`}>{name}</h3>}
+        {rtl ? <p data-example-name={name} className={CAPTION}>{t.rtlDemo}</p> : <p data-example-name={name} dir="ltr" className={`${CAPTION} text-start font-mono`}>{name}</p>}
       </div>
-      <div className={`${STAGE} min-h-40 border-t-(length:--tc-line-width) border-line`}>
+      <div data-example-stage="" className={`${STAGE} min-h-40 border-t-(length:--tc-line-width) border-line`}>
         {rtl
           ? <div dir="rtl" lang="ar" className="min-w-0"><TopClassProvider direction="rtl" locale="ar">{demo}</TopClassProvider></div>
           : demo}
       </div>
       <div className={CODE_PART}>
         <div className={PART_ROW}>
-          <h4 className={H3}>{t.theCode}</h4>
+          <p className={H3}>{t.theCode}</p>
           <CopyButton text={source} label={t.copyDemo(name, entry.name)} word={t.copy} copied={t.copied} failed={t.copyFailed} />
         </div>
         <Code locale={locale} title={`${name}.tsx`} copyLabel={t.copyDemo(name, entry.name)} code={source} className={FLAT_CODE} />

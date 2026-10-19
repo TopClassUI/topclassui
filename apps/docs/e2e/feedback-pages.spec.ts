@@ -96,7 +96,8 @@ test('Toast: the playground sets the options of the toast the press adds', async
   await toast.getByRole('textbox', { name: 'duration' }).fill('0')
   await toast.getByRole('textbox', { name: 'duration' }).blur()
   await toast.getByRole('button', { name: 'Show a toast' }).click()
-  const shown = page.getByRole('alertdialog', { name: 'Project created' })
+  // The stage holds a toast of its own at rest, so the one the press added is the last.
+  const shown = page.getByRole('alertdialog', { name: 'Project created' }).last()
   await expect(shown).toBeVisible()
   await expect(shown).toHaveAttribute('data-type', 'danger')
   // toast is a function, not a tag, so the code is the stage's source rather than a usage the values are written into.
