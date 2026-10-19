@@ -6,8 +6,19 @@ export const SITE_URL = 'https://topclassui.com'
 /** The product's name, the same in both languages. */
 export const SITE_NAME = 'TopClass UI'
 
-/** Choice 12: shown only once the repository is public; until then nothing links to it. */
-export const GITHUB_URL: string | null = null
+/** Choice 12: the repository is public, so the navbar, Home and the footer link to it. */
+export const GITHUB_URL: string | null = 'https://github.com/TopClassUI/topclassui'
+
+export const YOUTUBE_URL: string | null = 'https://www.youtube.com/@topclassui'
+
+/** Left out until there is a handle: a link to nothing is never drawn (choice 12). */
+export const X_URL: string | null = null
+
+/** The one handle Home's Follow us cards print, the same on every network. */
+export const HANDLE = '@topclassui'
+
+/** The CLI's line on Home: one component copied into the project. */
+export const ADD_LINE = 'npx topclassui add button'
 
 /** PLAN 2: Next.js 14 and older are not supported; the package declares no peer on next. */
 export const NEXT_RANGE = '15+'
