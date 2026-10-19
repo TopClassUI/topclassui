@@ -58,7 +58,10 @@
       "kb": 8.3
     },
     "select": "overlay",
-    "sidebar": "simple",
+    "sidebar": {
+      "class": "simple",
+      "kb": 6.2
+    },
     "slider": {
       "class": "simple",
       "kb": 7.3

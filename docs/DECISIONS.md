@@ -6,6 +6,18 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-19 - The round-8 library raises the tarball budget to 3,150,000 bytes and Sidebar's to 6.2 KB
+
+**Decision.** The thirteen round-8 branches stacked together (the library integrator, job 131) pack 3,114,237 bytes unpacked, over the 3,050,000 the 2026-10-18 entry set; the base cf1ec12 packs 2,986,683, so round 8 adds 127,555 bytes. `SIZE_BUDGET_BYTES` in `scripts/lib/pack-checks.ts` rises to 3,150,000, the measured size plus about 1 %, so it stays a guard rail. In the same stack Sidebar's own client half measures 6,246 bytes against the 6 KB simple-control budget of `pnpm size`, and its entry in `size-budget.json` becomes 6.2 KB, as job 118 raised fifteen others to what was measured.
+
+**What round 8 added to the tarball.** `dist/components` +51,849 bytes (the new parts ToastStage and CardMedia, the states demos and their classes, POINTER and the scroll classes in every family, the regenerated READMEs); the CLI registry +70 KB, since every component's source rides in `dist/registry/*.json` (table +7,954, command +6,345, breadcrumb +5,278, base +4,369, toast +4,235, card +3,794, timeline +3,480, tree-view +3,440, segmented-control +3,378); `size.json`, shipped by 118, +4,567. Sidebar's half grew with 113's frame rework, 120's POINTER and 123's scroll classes.
+
+**Why.** Each job alone fit both budgets; only the stack crosses them, and nothing in it is dead weight to cut. Omar confirms the two numbers.
+
+**Affects.** `pack-checks.ts` and its test, `size-budget.json`, `check:package`, `pnpm size --check` and `test:consumers`. A tarball over 3.15 MB again needs a new entry here.
+
+---
+
 ## 2026-10-19 - Pagination turns compact on a narrow list or under a finger
 
 **Decision.** Job 119 (round 8, "bulky pagination on phones"). The `<ul>` of Pagination is a container named `pagination` (`@container/pagination`), and two utilities in `src/styles.css` read it: `pagination-full` (the pages and the gaps) is `display: none` below 36rem of the list's width or under `pointer: coarse`, and `pagination-compact` (a new item between Previous and Next, "3 of 12" from `labels.pagination.ofPages`) is shown in exactly those two cases. The compact row is First, Previous, "current of total", Next, Last on one line; the status takes the room the four controls leave (`flex-1`) and wraps its own text, so "12,345 of 123,456" at `xl` still keeps one row at 390 px. The page links stay in the HTML, hidden, so a crawler follows every one; the current page link is hidden too, and the status says the page in words.
