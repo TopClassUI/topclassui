@@ -54,7 +54,7 @@ export function ComponentPage({ entry, locale, actions = {} }: { entry: PagedCom
     <article className="mx-auto grid w-full max-w-(--docs-column) min-w-0 gap-8">
       <header className="grid min-w-0 gap-2.5">
         <Breadcrumb
-          baseUrl={SITE_URL}
+          siteUrl={SITE_URL}
           labels={getLabels(locale).labels}
           items={[
             { href: `/${locale}`, label: t.home },

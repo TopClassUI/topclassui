@@ -18,6 +18,20 @@ The format is: date, decision, why, and what it affects.
 
 **What it affects.** `apps/docs` only (Home, the navbar, the footer, the icon and Open Graph routes, the labels), the root README's wordmark and `docs/brand/`. The library is untouched.
 
+## 2026-10-19 - No default scrollbar anywhere: the page wears the shared bar, and an e2e reads every scroller
+
+**Decision.** Job 123. `html` in `src/tokens.css` sets `scrollbar-width: thin` and `scrollbar-color` from the two scrollbar tokens, so the page's own bar is drawn like every SCROLLBAR, SCROLL_AREA and SCROLL_X container. The Sidebar's in-a-layout demo wears SCROLL_AREA; on the site, STAGE and STATE_SCOPE wear SCROLL_X and On this page wears SCROLL_AREA. `e2e/scrollbar-everywhere.spec.ts` (every harness page and every overlay opened live) and `apps/docs/e2e/scrollbars.spec.ts` (every sitemap page at 1440 and 390, and the open search palette) fail on any rendered element whose overflow is auto or scroll and whose computed `scrollbar-width` is not `thin`. `none` passes: it draws no bar, and the closed Sidebar rail hides its own on purpose.
+
+**Why.** Omar's round-8 review: no default browser scrollbar anywhere; the classic bar beside the search palette was the page's.
+
+**What it affects.** `src/tokens.css`, `src/scrollbar.test.ts` (the page rule, and a raw overflow in a demo), the mutation rows in `scripts/mutations/shared-scrollbar.ts`, the sidebar demo and its test, `apps/docs/components/classes.ts`, `apps/docs/components/shell/on-this-page.tsx`, the two specs.
+## 2026-10-19 - The hand on every pressable control: `POINTER`
+
+**Decision.** Round 8, job 120. `shared/classes.ts` gains `POINTER`: `cursor-pointer`, then `cursor-default` under `disabled:`, `aria-disabled:`, `data-disabled:`, `data-readonly:` and `data-loading:`, so a control that cannot be pressed shows the arrow whichever mark it carries. `ICON_BUTTON`, `ROW` and `TOGGLE_TARGET` wear it, which reaches every x and icon button (Dialog, Drawer, Popover, Toast, Sidebar, Tag, Banner, CodeBlock, FileUpload, DatePicker's month buttons), every row of a menu or a list (Dropdown, Command, Select, Combobox, Sidebar) and every Checkbox, Radio and Switch. Button, Tabs, SegmentedControl, Accordion, the Select and DatePicker triggers, NumberField's steppers, DatePicker's days, TreeView's rows and Pagination's cells add it to their own strings; the `cursor-default` the option rows, Dropdown and TreeView set by hand is gone. Rating's stars and FileUpload's input already had the hand.
+
+**Why.** Tailwind 4 dropped the pointer on buttons from its preflight, so every control showed the arrow, which Omar's review read as unfinished. A rule in the base layer would have reached the consumer's own buttons too; a class reaches only ours. `LOADING` keeps no cursor of its own (the 2026-10-06 entry): `data-loading:cursor-default` only stops the hand, and `cursor: progress` still never ships.
+
+**Affects.** R-5.2-4 (the cursor comes from `shared/classes.ts`). Proved by `e2e/cursor.spec.ts`, which reads the computed cursor of every `button, [role=button], [role=tab], [role=option], [role=menuitem], [role=treeitem], [role=gridcell][tabindex]` with a box on every harness page and in the open Select, Combobox, Dropdown, Command and DatePicker: the hand when enabled, never the hand when disabled, read-only or loading. `src/shared/classes.pointer.css.test.ts` and the "shared pointer" rows of `pnpm test:mutation`.
 ## 2026-10-19 - pnpm size measures every client half with esbuild, and fifteen budgets are raised to what was measured
 
 **Decision.** Job 118. `pnpm size` (`packages/topclassui/scripts/size.ts`, its logic in `scripts/lib/size.ts`) bundles the 33 `dist/components/<slug>/client.js` entries in one esbuild run, ESM, minified, with splitting, `process.env.NODE_ENV` set to production, and gzips each output chunk with `node:zlib` at level 9. A component's number is the sum of the chunks its entry loads at once; the chunks it loads through `import()` are its lazy bytes. Two runs give two numbers: **own** (`react`, `react-dom`, `react/jsx-runtime` and `@base-ui/react/*` external), which is the chip on the site, and **with Base UI** (React external only), which is recorded and never budgeted. Both go into `packages/topclassui/size.json`, committed and shipped in `files` so the site and a consumer read the same numbers; `check-pack` allows it beside the four root files. `pnpm size --check` runs in `pnpm check` right after `check:package` (which builds `dist/`), fails a component over its budget, a lazy one that loads nothing on demand, a component with no budget or a budget with no component, and a `size.json` more than 64 bytes away from a fresh run (a different zlib may move a gzip by a few bytes).
@@ -30,9 +44,18 @@ The format is: date, decision, why, and what it affects.
 
 **The site.** `docs:data` reads `size.json` into `clientBytes` on every entry of `components.json` (null for a server component; a client or split folder with no number is an issue). The chip prints `client - 4.8 KB`, `split - 0 KB server + 2.1 KB client` and `, lazy` from it, so "size not measured yet" is gone from the chip, the product frame, the server panel, the Open Graph image and both `server-first.mdx`. Home's server panel shows the Dialog's lines of `size-budget.json` as the check behind the number.
 
+**For Omar, two numbers.** (1) The budgets as written cannot be met while the runtime chunk counts: to budget the full own number he would raise them to about 23 KB for a simple control (FileUpload is 20.9 KB own), 22 KB for an overlay (Combobox, 20.0 KB) and 21.4 KB for the eager part of a lazy one (DatePicker, 19.4 KB), each the largest measured plus 10 %. (2) The runtime chunk is 9,196 bytes gzipped (9.0 KB of 1,024), most of it `tailwind-merge`; slimming or replacing it is a saving of its own, paid back on every page with a client component.
+
 **Affects.** PLAN 14 and 16 (the chip), R-0-2 (`pnpm check` has a new gate), `docs/RULES.md` commands, `docs/figma/docs-site.md` choice 15. Left for Omar: whether the class runtime should count in the budget, the fifteen raised budgets (slimming them, or moving the classes), and DatePicker's eager hook.
 
 ---
+## 2026-10-19 - Breadcrumb writes JSON-LD only when given siteUrl
+
+**Decision.** Job 122. `Breadcrumb`'s `baseUrl` is replaced by `siteUrl`, an absolute http or https origin with no trailing slash (`https://example.com`), declared in `schema.ts` (with `BREADCRUMB_SITE_URL_PATTERN` in `constants.ts`) and derived into `types.ts` (R-8.3-4). With it, the trail is written as `BreadcrumbList` JSON-LD: every crumb with an `href` is a `ListItem` whose `item` is absolute against the origin of `siteUrl`, and the current page is the last `ListItem`, with its name and no `item`, as Google documents for the last crumb. Without it no script is written. A `siteUrl` that does not parse as an http or https URL writes no script either and never throws; a path or a trailing slash on it is ignored, since only its origin is used. A trail with no link writes no script, because a list holding only the current page points nowhere.
+
+**Why.** Every demo on the site, in the harness and in a consumer's own gallery wrote a `BreadcrumbList` of relative URLs into the page that showed it, which Google reads as that page's own trail, and relative `item` URLs are dropped anyway. Opt-in by the absolute origin fixes both.
+
+**What it affects.** `src/components/breadcrumb/{index.tsx,lib.ts,types.ts,schema.ts,constants.ts,README.md}`, its tests and mutation rows, and the site's two `Breadcrumb`s (`component-page.tsx`, `docs-shell.tsx`), which now pass `siteUrl={SITE_URL}` and so gain the current page as the last `ListItem`. A caller still passing `baseUrl` fails to compile. The 10 October entry's Breadcrumb bullet is superseded on this point.
 
 ## 2026-10-19 - The guide pages' code sits on the page, in the frames' colours
 

@@ -80,7 +80,7 @@ const X = [
   'items-center', 'justify-center', 'min-h-[var(--tc-target-min,24px)]', 'min-w-[var(--tc-target-min,24px)]',
   'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]', 'pointer-coarse:min-w-[var(--tc-target-coarse,44px)]',
   'rounded-control', 'shrink-0', 'text-muted', 'tone-neutral',
-  'transition-[color,background-color,border-color,outline-color,opacity,translate]',
+  'transition-[color,background-color,border-color,outline-color,opacity,translate]',  'cursor-pointer', 'disabled:cursor-default', 'aria-disabled:cursor-default', 'data-disabled:cursor-default', 'data-readonly:cursor-default', 'data-loading:cursor-default',
 ]
 
 describe('the sheet at each edge', () => {

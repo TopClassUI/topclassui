@@ -444,7 +444,7 @@ Footer 1440x321  V g0
   the same groups in a `Drawer` from the inline start. The current row carries
   `aria-current="page"`.
 - **Main.** `hd` (the breadcrumb: Home > Components > {Title} on a component page, Home >
-  {Title} on a guide page, the library's `Breadcrumb` with `baseUrl` from `SITE_URL`, so every
+  {Title} on a guide page, the library's `Breadcrumb` with `siteUrl` from `SITE_URL`, so every
   docs page gets the BreadcrumbList PLAN 15.3 asks for; the route text Figma draws is dropped,
   a URL is not content), the `h1`, the lead, then one `section` per MDX `##` heading, then the
   "next" card (a link: "Next" and the title, the arrow icon flipping in RTL because it is a
@@ -594,7 +594,7 @@ PLAN 15.3: generateMetadata per page; title pattern for a component
   Search Console and Bing after launch.
 PLAN 1: 100 in Lighthouse SEO; within 90 days every en and ar component page indexed, zero
   hreflang errors, zero URLs rated poor.
-Repo: Breadcrumb already emits BreadcrumbList JSON-LD with baseUrl. No JsonLd component and
+Repo: Breadcrumb emits BreadcrumbList JSON-LD only when given siteUrl. No JsonLd component and
   no createMetadata exist.
 ```
 
@@ -605,7 +605,7 @@ Repo: Breadcrumb already emits BreadcrumbList JSON-LD with baseUrl. No JsonLd co
   `alternates.languages` with `en`, `ar` and `x-default` (the English URL), Open Graph and
   Twitter card. `metadataBase` once, in the locale layout, from `SITE_URL` in `lib/site.ts`
   (`https://topclassui.com`): the one constant the sitemap, `robots.ts`, `llms.txt` and every
-  `Breadcrumb`'s `baseUrl` also read (rule 5), so no absolute URL is typed twice.
+  `Breadcrumb`'s `siteUrl` also read (rule 5), so no absolute URL is typed twice.
 - **Titles.** Home: "TopClass UI - React components for Next.js, RTL-first and server-first".
   A guide page: "{Title} - TopClass UI". A component page: PLAN's pattern, with the human
   title ("React Dropdown menu - Tailwind CSS, RTL, accessible | TopClass UI"). The Arabic
@@ -614,8 +614,8 @@ Repo: Breadcrumb already emits BreadcrumbList JSON-LD with baseUrl. No JsonLd co
 - **Structured data.** A site `JsonLd` server component that serialises with `<` escaped,
   typed with `schema-dts`. `TechArticle` on every docs page (headline, description,
   `inLanguage`, `dateModified`), `BreadcrumbList` from the library's `Breadcrumb` on every
-  docs page, guide pages included (it already emits it, and only for crumbs with an `href`,
-  absolute when given `baseUrl`; do not emit a second), `SoftwareSourceCode` and
+  docs page, guide pages included (it emits it when given `siteUrl`: the crumbs with an `href`,
+  absolute, then the current page with no `item`; do not emit a second), `SoftwareSourceCode` and
   `Organization` on Home (`codeRepository` only once the repository is public). No FAQPage in
   the first release.
 - **Dates.** `dateModified` and the sitemap's `lastModified` never come from the build clock,

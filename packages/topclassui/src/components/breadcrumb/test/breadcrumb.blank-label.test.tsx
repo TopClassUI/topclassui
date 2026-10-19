@@ -4,13 +4,13 @@ import { attr, markup } from '#test/markup.js'
 import { Breadcrumb } from '../index.js'
 import type { BreadcrumbItem } from '../types.js'
 
-const of = (items: BreadcrumbItem[]) => markup(<Breadcrumb items={items} />)
+const of = (items: BreadcrumbItem[]) => markup(<Breadcrumb items={items} siteUrl="https://example.com" />)
 const count = (haystack: string, needle: string) => haystack.split(needle).length - 1
 const anchors = (out: string) => out.match(/<a [^>]*>/g) ?? []
 
 /** What a JSON-LD reader ends up with. */
 const listed = (out: string) => (JSON.parse(/<script[^>]*>(.*?)<\/script>/.exec(out)?.[1] ?? '{}') as {
-  itemListElement?: { position: number; name: string; item: string }[]
+  itemListElement?: { position: number; name: string; item?: string }[]
 }).itemListElement
 
 // A CMS page with no title: the type cannot refuse an empty string, so the render does.
@@ -33,8 +33,11 @@ describe('a crumb whose label is empty or only whitespace', () => {
     expect(count(out, '<svg')).toBe(1)
   })
 
-  it('keeps it out of the JSON-LD, which lists exactly the links that are rendered', () => {
-    expect(listed(out)).toEqual([{ '@type': 'ListItem', position: 1, name: 'Home', item: '/' }])
+  it('keeps it out of the JSON-LD, which lists exactly the crumbs that are rendered', () => {
+    expect(listed(out)).toEqual([
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://example.com/' },
+      { '@type': 'ListItem', position: 2, name: 'Page' },
+    ])
     expect(out).not.toContain('/untitled')
     expect(out).not.toContain('/spaces')
   })
@@ -42,8 +45,9 @@ describe('a crumb whose label is empty or only whitespace', () => {
   it('numbers what is left from 1 with no gap', () => {
     const gap = of([{ href: '/a', label: 'A' }, { href: '/x', label: ' ' }, { href: '/b', label: 'B' }, { label: 'C' }])
     expect(listed(gap)).toEqual([
-      { '@type': 'ListItem', position: 1, name: 'A', item: '/a' },
-      { '@type': 'ListItem', position: 2, name: 'B', item: '/b' },
+      { '@type': 'ListItem', position: 1, name: 'A', item: 'https://example.com/a' },
+      { '@type': 'ListItem', position: 2, name: 'B', item: 'https://example.com/b' },
+      { '@type': 'ListItem', position: 3, name: 'C' },
     ])
   })
 
@@ -87,7 +91,10 @@ describe('a crumb whose label is not a string', () => {
 
   it('leaves it out of the JSON-LD too, so the list agrees with what is rendered', () => {
     for (const label of STRAY) {
-      expect(listed(stray(label)), String(label)).toEqual([{ '@type': 'ListItem', position: 1, name: 'Home', item: '/' }])
+      expect(listed(stray(label)), String(label)).toEqual([
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://example.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Page' },
+      ])
       expect(stray(label), String(label)).not.toContain('/stray')
     }
   })
@@ -107,7 +114,10 @@ describe('a label that has text', () => {
   it('is written exactly as given, spaces around it included: only the blank ones are dropped', () => {
     const out = of([{ href: '/', label: ' Home ' }, { label: 'Page' }])
     expect(out).toContain('<span dir="auto" class="truncate min-w-0"> Home </span></a>')
-    expect(listed(out)).toEqual([{ '@type': 'ListItem', position: 1, name: ' Home ', item: '/' }])
+    expect(listed(out)).toEqual([
+      { '@type': 'ListItem', position: 1, name: ' Home ', item: 'https://example.com/' },
+      { '@type': 'ListItem', position: 2, name: 'Page' },
+    ])
   })
 
   it('keeps a one-character label, which is short but not blank', () => {
