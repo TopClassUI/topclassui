@@ -89,9 +89,8 @@ export interface SiteLabels {
       search: string
       filter: string
       add: string
-      columns: { component: string; kind: string; js: string; status: string; updated: string; actions: string }
+      columns: { component: string; name: string; js: string; status: string; updated: string; actions: string }
       kinds: Record<Rendering, string>
-      beta: string
       showing: (from: number, to: number, total: number) => string
       perPage: (rows: number) => string
       toast: { title: string; body: string; close: string }

@@ -17,6 +17,9 @@
     html { scroll-behavior: smooth; }
   }
 
+  /* Home's glow reaches past the content column, so the page clips it at the viewport, never with a scrollbar. */
+  body { overflow-x: clip; }
+
   /* Shiki writes both themes as variables; CodeBlock is dark in light and ocean, light in dark (docs-site S3). */
   .shiki span { color: var(--tc-code-on-dark); }
   [data-theme='dark'] .shiki span { color: var(--tc-code-on-light); }
@@ -28,11 +31,12 @@
   /* Home's glows: a token mixed toward transparent, so they turn with the theme (docs-site page 1). */
   .docs-glow {
     position: absolute;
-    inset: -7.5rem -6rem auto;
-    block-size: 56rem;
+    inset: -7.5rem -9.5rem auto;
+    block-size: 56.25rem;
     z-index: -1;
     pointer-events: none;
-    background: radial-gradient(50% 50% at 50% 50%, color-mix(in oklch, var(--tc-primary-solid) 30%, transparent), transparent);
+    background: radial-gradient(closest-side, color-mix(in oklch, var(--tc-primary-solid) 75%, transparent), color-mix(in oklch, var(--tc-primary-solid) 40%, transparent) 55%, transparent);
+    filter: blur(40px);
   }
 
   /* The product frame: a primary line and the drawn blue halo under a deep drop. */
