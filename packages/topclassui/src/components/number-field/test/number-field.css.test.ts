@@ -74,8 +74,8 @@ describe('the input and the steppers', () => {
     expect(ruleOf(selectorOf('tabular-nums'))).toContain('--tw-numeric-spacing: tabular-nums;')
   })
 
-  it('a stepper is square but gives way to its floor before it is cut, and keeps full opacity inside a disabled box', () => {
-    expect(ruleOf(selectorOf('aspect-square'))).toBe('aspect-ratio: 1 / 1;')
+  it('a stepper is four fifths as wide as tall but gives way to its floor before it is cut, and keeps full opacity inside a disabled box', () => {
+    expect(ruleOf(selectorOf('aspect-4/5'))).toBe('aspect-ratio: 4/5;')
     expect(ruleOf(selectorOf('shrink'))).toBe('flex-shrink: 1;')
     expect(NUMBER_FIELD_STEP.split(' ')).not.toContain('shrink-0')
     expect(selectorLine('group-data-disabled/number:disabled:opacity-100')).toMatch(/:is\(:where\(\.group\\\/number\)\[data-disabled\] \*\):disabled$/)
