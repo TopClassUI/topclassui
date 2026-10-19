@@ -1,8 +1,8 @@
 import { Button } from '#components/button/index.js'
 import { NavbarActions, NavbarBrand, NavbarLink, NavbarLinks, NavbarRoot } from '../index.js'
 
-/** The states a server can render. Only the first bar sticks, since two would write the same
- * --tc-sticky-top; each nav has a name of its own, so the two are told apart. */
+/** The states a server can render: the solid bar at the top of the page, one in the flow and the transparent look.
+ * Only the first bar sticks, since two would write the same --tc-sticky-top; each nav has a name of its own. */
 export default function Demo() {
   return (
     <div className="grid gap-6">
@@ -23,6 +23,12 @@ export default function Demo() {
         <NavbarLinks aria-label="In the flow, nothing being read">
           <NavbarLink href="/blog">Blog</NavbarLink>
           <NavbarLink href="/changelog">Changelog</NavbarLink>
+        </NavbarLinks>
+      </NavbarRoot>
+      <NavbarRoot sticky={false} variant="transparent">
+        <NavbarBrand href="/">TopClass UI</NavbarBrand>
+        <NavbarLinks aria-label="Transparent, on the page">
+          <NavbarLink href="/about">About</NavbarLink>
         </NavbarLinks>
       </NavbarRoot>
     </div>

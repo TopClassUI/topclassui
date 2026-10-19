@@ -184,14 +184,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the navbar bar no longer wraps, so a brand and two actions push a 320 px page wide',
     file: CLASSES,
-    from: "'flex min-h-15 w-full flex-wrap items-center gap-x-6 gap-y-2 pb-1.5'",
-    to: "'flex min-h-15 w-full items-center gap-x-6 gap-y-2 pb-1.5'",
+    from: "'flex min-h-13 w-full flex-wrap items-center gap-x-4 gap-y-2 pb-1'",
+    to: "'flex min-h-13 w-full items-center gap-x-4 gap-y-2 pb-1'",
   },
   {
-    label: 'the navbar side padding is px-5 beside the safe utilities again, which leave the bar no side padding at all',
+    label: 'the navbar side padding is px-4 beside the safe utilities again, which leave the bar no side padding at all',
     file: CLASSES,
-    from: "'ps-[calc(1.25rem+var(--tc-safe-start))] pe-[calc(1.25rem+var(--tc-safe-end))]'",
-    to: "'px-5 ps-safe pe-safe'",
+    from: "'ps-[calc(1rem+var(--tc-safe-start))] pe-[calc(1rem+var(--tc-safe-end))]'",
+    to: "'px-4 ps-safe pe-safe'",
   },
   {
     label: 'a sticky navbar ignores the safe area at the top, so a notch covers its first row',
@@ -270,8 +270,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the navbar list no longer snaps, so Tab leaves a link that was half in view cut in half',
     file: CLASSES,
-    from: 'flex items-center gap-5 snap-x snap-mandatory hover:snap-none ',
-    to: 'flex items-center gap-5 ',
+    from: 'flex items-center gap-4 snap-x snap-mandatory hover:snap-none ',
+    to: 'flex items-center gap-4 ',
   },
   {
     label: 'the navbar list snaps under the pointer too, so a wheel springs back to a link that keeps the focus',
@@ -460,5 +460,23 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/navbar/schema.ts',
     from: "    .meta({ description: 'NavbarRoot: the bar stays at the top while the page scrolls, and publishes its height as --tc-sticky-top.' }),",
     to: "    .meta({ description: '' }),",
+  },
+  {
+    label: 'the transparent navbar keeps the raised surface, so the look Figma 138:2393 draws on the page is a solid bar',
+    file: 'src/components/navbar/classes.ts',
+    from: "  transparent: 'border-transparent',",
+    to: "  transparent: 'bg-surface-raised border-line',",
+  },
+  {
+    label: 'the navbar never marks the page scrolled under it, so the solid bar never takes its shadow',
+    file: 'src/components/navbar/hook.ts',
+    from: "bar.toggleAttribute('data-scrolled', view.scrollY > 0)",
+    to: "bar.toggleAttribute('data-scrolled', false)",
+  },
+  {
+    label: 'the navbar keeps its scrolled mark after it unmounts',
+    file: 'src/components/navbar/hook.ts',
+    from: "      bar.removeAttribute('data-scrolled')\n",
+    to: '',
   },
 ]

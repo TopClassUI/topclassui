@@ -13,9 +13,9 @@ const json = z.toJSONSchema(navbarSchema, { io: 'input' }) as {
 describe('the schema is the documentation', () => {
   const keys = Object.keys(navbarSchema.shape)
 
-  it('covers the two design props and no other: size, bordered and a variant are not built', () => {
-    expect(keys.sort()).toEqual(['current', 'sticky'])
-    expect(Object.keys(json.properties ?? {}).sort()).toEqual(['current', 'sticky'])
+  it('covers the three design props and no other: size and bordered are not built', () => {
+    expect(keys.sort()).toEqual(['current', 'sticky', 'variant'])
+    expect(Object.keys(json.properties ?? {}).sort()).toEqual(['current', 'sticky', 'variant'])
   })
 
   for (const key of keys) {
@@ -39,15 +39,15 @@ describe('the schema is the documentation', () => {
 
 describe('the schema and the constants agree', () => {
   it('fills every default from constants.ts', () => {
-    expect(navbarSchema.parse({})).toEqual({ sticky: true, current: false })
+    expect(navbarSchema.parse({})).toEqual({ sticky: true, variant: 'solid', current: false })
   })
 
   it('names the defaults the spec gives, so a changed constant is a failure here', () => {
-    expect(NAVBAR_DEFAULTS).toEqual({ sticky: true, current: false })
+    expect(NAVBAR_DEFAULTS).toEqual({ sticky: true, variant: 'solid', current: false })
   })
 
   it('keeps what a caller passes', () => {
-    expect(navbarSchema.parse({ sticky: false, current: true })).toEqual({ sticky: false, current: true })
+    expect(navbarSchema.parse({ sticky: false, variant: 'transparent', current: true })).toEqual({ sticky: false, variant: 'transparent', current: true })
   })
 
   it('refuses anything that is not a boolean', () => {
