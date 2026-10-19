@@ -59,6 +59,67 @@
   }
 }
 
+/* Utilities, not components: these restyle CodeBlock's own utility classes, so they must sit in the same layer and win on specificity. */
+@layer utilities {
+  /* A guide page's fence sits on the page, as the docs frames draw it: CodeBlock's solid pair becomes the page's own. */
+  .docs-code {
+    --tc-neutral-solid: var(--tc-page);
+    --tc-neutral-on-solid: var(--tc-body);
+    border: var(--tc-line-width) solid var(--tc-line);
+    overflow: hidden;
+  }
+
+  .docs-code > div {
+    background: var(--tc-surface);
+    border-block-end: var(--tc-line-width) solid var(--tc-line);
+  }
+
+  .docs-code > pre {
+    padding-block-start: 0.875rem;
+    font-size: var(--text-xs);
+    line-height: var(--text-sm--line-height);
+  }
+
+  /* On the page the colours follow the page, not the opposite theme. */
+  [data-theme='dark'] .docs-code .shiki span { color: var(--tc-code-on-dark); }
+  [data-theme='light'] .docs-code .shiki span,
+  [data-theme='ocean'] .docs-code .shiki span { color: var(--tc-code-on-light); }
+
+  /* Inside the tab card the tab names the code: the header keeps only its copy button, at the inline end. */
+  .docs-tabbed .docs-code {
+    border: 0;
+    border-radius: 0;
+  }
+
+  .docs-tabbed .docs-code > div {
+    position: absolute;
+    inset-block-start: 0.375rem;
+    inset-inline-end: 0.5rem;
+    padding: 0;
+    background: none;
+    border: 0;
+  }
+
+  .docs-tabbed .docs-code > div > span {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .docs-tabbed .docs-code > pre {
+    padding-inline-end: 3rem;
+  }
+
+  /* Wrong and Right carry their name above the box and a tone edge instead of a header. */
+  .docs-bare > div { display: none; }
+  .docs-bare.docs-code { border-color: var(--docs-edge); }
+  .docs-wrong { --docs-edge: var(--tc-danger-on-soft); }
+  .docs-right { --docs-edge: var(--tc-success-on-soft); }
+}
+
 @layer components {
   /* CodeBlock is dark on a light page and light on a dark one, so each token takes the colour of the opposite theme (S3). */
   [data-code-token] {

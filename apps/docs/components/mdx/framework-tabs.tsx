@@ -6,6 +6,7 @@ import { highlight } from '../../lib/highlight'
 import { INSTALL_LINE } from '../../lib/site'
 import { slugify } from '../../lib/slug'
 import { CodeTabs } from './mdx-islands'
+import { DOCS_CODE } from '../classes'
 
 export interface FrameworkTabsProps {
   locale: Locale
@@ -21,7 +22,7 @@ export async function FrameworkTabs({ locale, label, terminal, frameworks }: Fra
   const tabs = frameworks.map((name) => ({
     name,
     value: slugify(name),
-    panel: <CodeBlock {...getLabels(locale)} lang="bash" title={terminal} highlighted={highlighted ?? undefined}>{INSTALL_LINE}</CodeBlock>,
+    panel: <CodeBlock className={DOCS_CODE} {...getLabels(locale)} lang="bash" title={terminal} highlighted={highlighted ?? undefined}>{INSTALL_LINE}</CodeBlock>,
   }))
   return <CodeTabs label={label} tabs={tabs} />
 }
