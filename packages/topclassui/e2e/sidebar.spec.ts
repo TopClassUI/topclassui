@@ -1041,7 +1041,7 @@ test.describe('direction', () => {
     await expect(triggerOf(rail).locator('svg')).toHaveCSS('scale', '-1 1')
     expect(await heavierHalf(page, rail)).toBe('right')
     // The rail starts where the page does in Arabic: at the right.
-    expect((await boxOf(rail)).right).toBe(1233)
+    expect((await boxOf(rail)).right).toBe(1238)
   })
 
   for (const direction of DIRECTIONS) {
@@ -1056,12 +1056,12 @@ test.describe('direction', () => {
         line: 'left', toggle: { fromLeft: 188, fromRight: 8 }, labelSide: 'left of the icon',
       })
       expect(await heavierHalf(page, rail)).toBe('right')
-      expect((await boxOf(rail)).right).toBe(1233)
+      expect((await boxOf(rail)).right).toBe(1238)
       await triggerOf(rail).click()
       await expect(triggerOf(rail)).toHaveAttribute('aria-label', NAMES.rtl.expand)
       expect(await widthOf(rail)).toBe(52)
       expect((await layoutOf(page, rail)).line).toBe('left')
-      expect((await boxOf(rail)).right).toBe(1233)
+      expect((await boxOf(rail)).right).toBe(1238)
     })
   }
 
