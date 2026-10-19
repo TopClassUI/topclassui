@@ -41,32 +41,33 @@ describe('every class the component renders paints something', () => {
   })
 })
 
-/** The control heights of styles.css, written out: md is the height of a default Button. */
-const CONTROL = { xs: '1.75rem', sm: '2rem', md: '2.5rem', lg: '3rem', xl: '3.5rem' } as const
+/** The control steps of styles.css, written out. Figma 138:1269 draws a cell as wide as a step and
+ * shorter than it: 32 x 18 at sm, which the 24 px floor raises to 32 x 24. */
+const STEP = { xs: '1.75rem', sm: '2rem', md: '2.5rem', lg: '3rem', xl: '3.5rem' } as const
+const HEIGHT = { md: 'xs', lg: 'sm', xl: 'md' } as const
+const WIDTH = { sm: 'sm', md: 'md', lg: 'lg', xl: 'xl' } as const
 
-describe('a cell is a square at the control height that a long number can widen', () => {
-  for (const size of ['xs', 'sm', 'md', 'lg', 'xl'] as const) {
-    it(`${size} is ${CONTROL[size]} tall, scaled by the density knob, and sets no width`, () => {
-      expect(ruleOf(`.h-control-${size}`), size).toBe(`height: calc(${CONTROL[size]} * var(--tc-density));`)
-      expect(css, size).not.toContain(`.size-control-${size}`)
-      expect(css, size).not.toContain(`.w-control-${size}`)
+describe('a cell is wider than it is tall, and a long number can widen it', () => {
+  for (const [size, step] of Object.entries(HEIGHT)) {
+    it(`${size} is ${STEP[step]} tall, a step or two under its width, scaled by the density knob`, () => {
+      expect(ruleOf(`.h-control-${step}`), size).toBe(`height: calc(${STEP[step]} * var(--tc-density));`)
     })
   }
 
-  it('gets its width from the ratio, which a fixed width would not let the text stretch', () => {
-    expect(ruleOf('.aspect-square')).toBe('aspect-ratio: 1 / 1;')
+  for (const [size, step] of Object.entries(WIDTH)) {
+    it(`${size} is at least ${STEP[step]} wide, a minimum and not a width, so a long number widens it`, () => {
+      expect(ruleOf(selectorOf(`min-w-control-${step}`)), size).toBe(`min-width: calc(${STEP[step]} * var(--tc-density));`)
+    })
+  }
+
+  it('sets no fixed width and no ratio, which would cut a long number', () => {
+    expect(css).not.toMatch(/\.(w|size)-control-/)
+    expect(css).not.toContain('.aspect-square')
   })
 
-  // min-width: auto is what lets the content widen a box that has a preferred ratio.
-  it('leaves the minimum width to the content, at a fine pointer and at a coarse one', () => {
-    expect(ruleOf('.min-w-auto')).toBe('min-width: auto;')
-    const coarse = css.slice(css.indexOf('@media (pointer: coarse)'))
-    expect(coarse).toContain(`${selectorOf('pointer-coarse:min-w-auto')} {\n      min-width: auto;`)
-  })
-
-  it('keeps a number off the border with a little inline padding', () => {
-    expect(ruleOf(selectorOf('px-0.5'))).toBe('padding-inline: calc(var(--spacing) * 0.5);')
-    expect(ruleOf('.px-1')).toBe('padding-inline: var(--spacing);')
+  it('keeps a number off its edges with the inline padding of the control knobs', () => {
+    expect(ruleOf('.px-pad-x-xs')).toBe('padding-inline: calc(0.5rem * var(--tc-density));')
+    expect(ruleOf('.px-pad-x-sm')).toBe('padding-inline: calc(0.75rem * var(--tc-density));')
   })
 
   it('gives every digit one width, so Next does not move from page 111 to 112', () => {
@@ -75,7 +76,7 @@ describe('a cell is a square at the control height that a long number can widen'
 })
 
 describe('the floors and the dimming reach the browser', () => {
-  it('holds 24 px on the height with a px fallback, which the square carries to the width', () => {
+  it('holds 24 px on the height with a px fallback, which xs and sm take as their height', () => {
     expect(ruleOf(selectorOf('min-h-[var(--tc-target-min,24px)]'))).toBe('min-height: var(--tc-target-min,24px);')
   })
 
@@ -84,7 +85,7 @@ describe('the floors and the dimming reach the browser', () => {
     expect(coarse).toContain('min-height: var(--tc-target-coarse,44px);')
   })
 
-  it('still holds both px floors on the width for size custom, which has no ratio', () => {
+  it('still holds both px floors on the width for xs and custom, which set no width of their own', () => {
     expect(ruleOf(selectorOf('min-w-[var(--tc-target-min,24px)]'))).toBe('min-width: var(--tc-target-min,24px);')
     expect(css).toContain('min-width: var(--tc-target-coarse,44px);')
   })

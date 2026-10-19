@@ -59,6 +59,7 @@ Required: `getHref`, `pageCount`, `value`. Every other prop below is optional.
 | `pageCount` | **yes** | `integer`, min 1, max 9007199254740991 | - | How many pages there are; a fraction is rounded up and anything below 1 is one page. |
 | `value` | **yes** | `integer`, min 1, max 9007199254740991 | - | The current page, counted from 1; anything outside 1 to pageCount is clamped. |
 | `boundaryCount` | no | `integer`, min 0, max 3 | `1` | How many pages always show at each end of the list; clamped to 0-3. |
+| `disabled` | no | `boolean` | `false` | Every cell is dimmed and none is a link, the current page included. |
 | `labels` | no | `Labels` | - | The built-in strings: the name of the nav, of each page and of the four icon links. Defaults to English. |
 | `link` | no | `ReactElement` | - | The element every link is cloned from, such as `link={<Link href="" />}`; its href is replaced. |
 | `locale` | no | `string` | - | The locale the page numbers are formatted in. Defaults to `en`. |

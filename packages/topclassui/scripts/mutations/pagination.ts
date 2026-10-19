@@ -41,7 +41,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a pagination cell goes back to a fixed square, so page 12,345 runs out of its box and reads 2,345',
     file: 'src/components/pagination/classes.ts',
-    from: "  md: 'h-control-md aspect-square min-w-auto pointer-coarse:min-w-auto px-1 text-sm',",
+    from: "  md: 'h-control-xs min-w-control-md px-pad-x-xs text-sm',",
     to: "  md: 'size-control-md text-sm',",
   },
   {
@@ -85,5 +85,23 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/pagination/classes.ts',
     from: "  'forced-colors:hover:bg-[Highlight]',\n",
     to: '',
+  },
+  {
+    label: 'a disabled pagination still renders its pages as links, so a reader follows a nav that is switched off',
+    file: 'src/components/pagination/index.tsx',
+    from: '          if (disabled) return',
+    to: '          if (false) return',
+  },
+  {
+    label: 'a disabled pagination keeps first, previous, next and last as links',
+    file: 'src/components/pagination/index.tsx',
+    from: '{atEdge || disabled',
+    to: '{atEdge',
+  },
+  {
+    label: 'a pagination cell is a square again, so the cell the frame draws 32 x 18 renders 40 x 40 at md',
+    file: 'src/components/pagination/classes.ts',
+    from: "  md: 'h-control-xs min-w-control-md px-pad-x-xs text-sm',",
+    to: "  md: 'h-control-md aspect-square px-pad-x-xs text-sm',",
   },
 ]

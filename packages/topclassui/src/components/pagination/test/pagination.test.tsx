@@ -28,7 +28,7 @@ describe('Pagination on the server', () => {
 
   // Preflight sets list-style: none, and Safari with VoiceOver then stops announcing a list.
   it('says role="list" on the ul, so the list survives the reset in Safari', () => {
-    expect(tags(html(), 'ul')).toEqual(['<ul role="list" class="flex flex-wrap items-center gap-1">'])
+    expect(tags(html(), 'ul')).toEqual(['<ul role="list" class="flex flex-wrap items-center gap-1.5">'])
   })
 
   it('is named by the labels, and reports its size', () => {
@@ -91,7 +91,7 @@ describe('the current page', () => {
 
 describe('the defaults', () => {
   it('are one sibling, one boundary, the md cell of R-5.7-2 and the en locale', () => {
-    expect(PAGINATION_DEFAULTS).toEqual({ siblingCount: 1, boundaryCount: 1, size: 'md', locale: 'en' })
+    expect(PAGINATION_DEFAULTS).toEqual({ siblingCount: 1, boundaryCount: 1, size: 'md', disabled: false, locale: 'en' })
   })
 
   it('apply to an explicit undefined too', () => {

@@ -1,4 +1,6 @@
 // No 'use client': a client bundle gets it only when a client file imports it.
+import type { ReactNode } from 'react'
+
 import { caretDoubleLeft } from '#icons/data/caret-double-left.js'
 import { caretDoubleRight } from '#icons/data/caret-double-right.js'
 import { caretLeft } from '#icons/data/caret-left.js'
@@ -10,7 +12,7 @@ import { en } from '#shared/labels/en.js'
 import { createNumberFormat } from '#shared/labels/get-labels.js'
 import { renderLink } from '#shared/link.js'
 import { Svg } from '#components/svg/index.js'
-import { CELL_GAP, CELL_SIZE, LIST } from './classes.js'
+import { CELL_GAP, CELL_SIZE, LIST, LIST_GAP } from './classes.js'
 import { PAGINATION_DEFAULTS } from './constants.js'
 import { clampPage, clampPageCount, listPages } from './lib.js'
 import type { PaginationLinkParts, PaginationProps } from './types.js'
@@ -26,6 +28,7 @@ export function Pagination({
   siblingCount = PAGINATION_DEFAULTS.siblingCount,
   boundaryCount = PAGINATION_DEFAULTS.boundaryCount,
   size = PAGINATION_DEFAULTS.size,
+  disabled = PAGINATION_DEFAULTS.disabled,
   labels = en,
   locale = PAGINATION_DEFAULTS.locale,
   'aria-label': ariaLabel,
@@ -44,27 +47,30 @@ export function Pagination({
   const anchor = (target: number, parts: PaginationLinkParts) =>
     renderLink('Pagination', link, getHref(target), { ...parts })
 
-  /** At an edge there is no page to go to, so it is a span and not a link to nowhere.
-   * role="link" is what lets aria-disabled reach a screen reader, as Button's dead link does. */
+  /** A cell that leads nowhere: a span, not a link. role="link" is what lets aria-disabled
+   * reach a screen reader, as Button's dead link does. */
+  const dead = (label: string, children: ReactNode, current = false) => (
+    <span role="link" aria-disabled="true" aria-label={label} aria-current={current ? 'page' : undefined} data-disabled="" className={cell}>
+      {children}
+    </span>
+  )
+
+  /** At an edge, or with the whole nav disabled, there is no page to go to. */
   const control = (target: number, label: string, icon: IconData, atEdge: boolean, rel?: 'prev' | 'next') => (
     <li>
-      {atEdge
-        ? (
-          <span role="link" aria-disabled="true" aria-label={label} data-disabled="" className={cell}>
-            <Svg icon={icon} />
-          </span>
-        )
+      {atEdge || disabled
+        ? dead(label, <Svg icon={icon} />)
         : anchor(target, { 'aria-label': label, rel, className: cell, children: <Svg icon={icon} /> })}
     </li>
   )
 
   // The rest goes first, so data-size and the name are the ones Pagination worked out.
   return (
-    <nav {...rest} aria-label={name} data-size={size}>
+    <nav {...rest} aria-label={name} data-size={size} data-disabled={disabled ? '' : undefined}>
       <ul
         // Preflight removes the list style, and Safari with VoiceOver then drops the list semantics.
         role="list"
-        className={LIST}
+        className={cn(LIST, LIST_GAP[size])}
       >
         {control(1, text.first, caretDoubleLeft, page === 1)}
         {control(page - 1, text.previous, caretLeft, page === 1, 'prev')}
@@ -73,6 +79,8 @@ export function Pagination({
             return <li key={item} aria-hidden="true" className={cn(CELL_GAP, CELL_SIZE[size])}><Svg icon={dotsThree} /></li>
           }
           const current = item === page
+          // Disabled, the current page loses its fill as well: nothing in the nav answers.
+          if (disabled) return <li key={item}>{dead(current ? text.pageOf(item, count, numbers) : text.page(item, numbers), numbers.format(item), current)}</li>
           return (
             <li key={item}>
               {anchor(item, {

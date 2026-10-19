@@ -54,11 +54,12 @@ describe('each demo shows the state its name promises', () => {
     expect(html).toContain('aria-label="Page 6 of 12" aria-current="page"')
   })
 
-  it('states: four navs, each named, with the spans each one leaves where there is nowhere to go', async () => {
+  it('states: five navs, each named, with the spans each one leaves where there is nowhere to go', async () => {
     const html = await render('states')
-    expect([...html.matchAll(/<nav aria-label="([^"]*)"/g)].map((m) => m[1])).toEqual(['On the first page', 'In the middle', 'On the last page', 'A single page'])
+    expect([...html.matchAll(/<nav aria-label="([^"]*)"/g)].map((m) => m[1])).toEqual(['On the first page', 'In the middle', 'On the last page', 'A single page', 'Switched off'])
     expect([...html.matchAll(/<span [^>]*aria-label="([^"]*)"/g)].map((m) => m[1])).toEqual([
       'First page', 'Previous', 'Next', 'Last page', 'First page', 'Previous', 'Next', 'Last page',
+      'First page', 'Previous', 'Page 1 of 12', 'Page 2', 'Page 3', 'Page 4', 'Page 5', 'Page 12', 'Next', 'Last page',
     ])
   })
 
