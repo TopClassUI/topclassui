@@ -26,10 +26,11 @@ const DECLARATION: Record<string, string> = {
   '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]': 'scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track);',
   'w-fit': 'width: fit-content;',
   'max-w-full': 'max-width: 100%;',
-  'gap-1': 'gap: var(--spacing);',
+  'gap-0.5': 'gap: calc(var(--spacing) * 0.5);',
+  'p-0.5': 'padding: calc(var(--spacing) * 0.5);',
+  'pb-px': 'padding-bottom: 1px;',
   'rounded-control': 'border-radius: var(--tc-radius);',
   'bg-surface': 'background-color: var(--tc-surface);',
-  'p-1': 'padding: var(--spacing);',
   'forced-colors:outline-(length:--tc-line-width)': 'outline-width: var(--tc-line-width);',
   // A tab of either look.
   'inline-flex': 'display: inline-flex;',
@@ -66,13 +67,9 @@ const DECLARATION: Record<string, string> = {
   'forced-colors:border-[Canvas]': 'border-color: Canvas;',
   'forced-colors:data-active:border-[Highlight]': 'border-color: Highlight;',
   'data-active:bg-surface-raised': 'background-color: var(--tc-surface-raised);',
-  'data-active:shadow-sm': SHADOW,
-  'not-forced-colors:data-active:inset-ring-(length:--tc-line-width)': '--tw-inset-ring-shadow: inset 0 0 0 var(--tc-line-width) var(--tw-inset-ring-color, currentcolor);',
-  'not-forced-colors:data-active:inset-ring-line-strong': '--tw-inset-ring-color: var(--tc-line-strong);',
   'forced-colors:data-active:forced-color-adjust-none': 'forced-color-adjust: none;',
   'forced-colors:data-active:bg-[Highlight]': 'background-color: Highlight;',
   'forced-colors:data-active:text-[HighlightText]': 'color: HighlightText;',
-  'forced-colors:data-active:shadow-none': '--tw-shadow: 0 0 #0000;',
   'forced-colors:data-active:[--tc-ring:HighlightText]': '--tc-ring: HighlightText;',
   // The sizes of the shared scale.
   'h-control-xs': 'height: calc(1.75rem * var(--tc-density));',
@@ -99,9 +96,6 @@ const SCOPE: Record<string, string> = {
   'data-active:text-body': '[data-active] {',
   'data-active:border-primary-solid': '[data-active] {',
   'data-active:bg-surface-raised': '[data-active] {',
-  'data-active:shadow-sm': '[data-active] {',
-  'not-forced-colors:data-active:inset-ring-(length:--tc-line-width)': '[data-active] {',
-  'not-forced-colors:data-active:inset-ring-line-strong': '[data-active] {',
   'data-disabled:pointer-events-none': '[data-disabled] {',
   'data-disabled:*:opacity-50': '[data-disabled] > *) {',
   'forced-colors:data-disabled:*:opacity-100': '[data-disabled] > *) {',
@@ -110,7 +104,6 @@ const SCOPE: Record<string, string> = {
   'forced-colors:data-active:forced-color-adjust-none': '[data-active] {',
   'forced-colors:data-active:bg-[Highlight]': '[data-active] {',
   'forced-colors:data-active:text-[HighlightText]': '[data-active] {',
-  'forced-colors:data-active:shadow-none': '[data-active] {',
   'forced-colors:data-active:[--tc-ring:HighlightText]': '[data-active] {',
   'focus-visible:outline-solid': ':focus-visible {',
   'focus-visible:outline-(length:--tc-ring-width)': ':focus-visible {',
@@ -136,9 +129,9 @@ describe('every class Tabs writes compiles with the installed Tailwind', () => {
   const css = compileEntry().then((compiled) => compiled.build(Object.keys(DECLARATION)))
 
   it('the table names exactly the classes of the root, the lists, the tabs, the panel and the size scale', () => {
-    const all = written([TABS_ROOT, ...Object.values(TABS_LIST), ...Object.values(TABS_TAB), TABS_PANEL, ...Object.values(TABS_SIZE)])
+    const all = written([TABS_ROOT, ...Object.values(TABS_LIST), ...Object.values(TABS_TAB), TABS_PANEL, ...Object.values(TABS_SIZE).flatMap((sizes) => Object.values(sizes))])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(77)
+    expect(all).toHaveLength(74)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

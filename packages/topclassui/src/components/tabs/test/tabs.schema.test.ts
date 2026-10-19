@@ -77,9 +77,12 @@ describe('every look and every size has its classes', () => {
   })
 
   it('a height, a padding and a type step for each size of the shared scale, and none for custom', () => {
-    expect(Object.keys(TABS_SIZE)).toEqual(['xs', 'sm', 'md', 'lg', 'xl', 'custom'])
-    expect(TABS_SIZE.md).toBe('h-control-md px-pad-x-sm text-sm')
-    expect(TABS_SIZE.custom).toBe('')
+    expect(Object.keys(TABS_SIZE)).toEqual(['line', 'enclosed'])
+    for (const sizes of Object.values(TABS_SIZE)) expect(Object.keys(sizes)).toEqual(['xs', 'sm', 'md', 'lg', 'xl', 'custom'])
+    expect(TABS_SIZE.line.md).toBe('h-control-md px-pad-x-sm text-sm')
+    expect(TABS_SIZE.enclosed.md).toBe('h-control-sm px-pad-x-sm text-sm')
+    expect(TABS_SIZE.line.custom).toBe('')
+    expect(TABS_SIZE.enclosed.custom).toBe('')
   })
 })
 

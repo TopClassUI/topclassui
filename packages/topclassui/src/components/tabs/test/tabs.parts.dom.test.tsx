@@ -34,7 +34,7 @@ describe('the look comes from the nearest root', () => {
         </TabsPanel>
       </TabsRoot>,
     )
-    expect(classes('outer-tab')).toEqual(expect.arrayContaining(['h-control-lg', 'data-active:bg-surface-raised']))
+    expect(classes('outer-tab')).toEqual(expect.arrayContaining(['h-control-md', 'data-active:bg-surface-raised']))
     expect(classes('inner-tab')).toEqual(expect.arrayContaining(['h-control-xs', 'border-b-2']))
     expect(classes('inner-tab')).not.toContain('data-active:bg-surface-raised')
     expect(classes('inner-list')).toContain('gap-5')
@@ -46,7 +46,7 @@ describe('the look follows the root when it changes', () => {
     const view = render(tabs({ variant: 'line', size: 'sm' }))
     expect(classes('tab')).toEqual(expect.arrayContaining(['h-control-sm', 'border-b-2']))
     view.rerender(tabs({ variant: 'enclosed', size: 'lg' }))
-    expect(classes('tab')).toEqual(expect.arrayContaining(['h-control-lg', 'data-active:bg-surface-raised']))
+    expect(classes('tab')).toEqual(expect.arrayContaining(['h-control-md', 'data-active:bg-surface-raised']))
     expect(classes('tab')).not.toContain('h-control-sm')
     expect(classes('list')).toContain('bg-surface')
     expect(screen.getByTestId('root').getAttribute('data-variant')).toBe('enclosed')

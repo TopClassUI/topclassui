@@ -56,14 +56,26 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the line tabs list ends flush with its last tab, which an RTL list then stops short of',
     file: CLASSES,
-    from: 'gap-5 px-px ${TABS_LIST_LINE}',
-    to: 'gap-5 ps-px ${TABS_LIST_LINE}',
+    from: 'gap-5 px-px pb-px ${TABS_LIST_LINE}',
+    to: 'gap-5 ps-px pb-px ${TABS_LIST_LINE}',
   },
   {
     label: 'the line tabs list starts flush with its first tab, so hydration scrolls an RTL list by a pixel and every tab jumps',
     file: CLASSES,
-    from: 'gap-5 px-px ${TABS_LIST_LINE}',
-    to: 'gap-5 pe-px ${TABS_LIST_LINE}',
+    from: 'gap-5 px-px pb-px ${TABS_LIST_LINE}',
+    to: 'gap-5 pe-px pb-px ${TABS_LIST_LINE}',
+  },
+  {
+    label: 'the line tabs list is as wide as its parent, so its hairline runs far past the last tab',
+    file: CLASSES,
+    from: 'line: `flex w-fit max-w-full',
+    to: 'line: `flex max-w-full',
+  },
+  {
+    label: 'the line tabs list draws its hairline under the bar of the active tab, which then paints over it',
+    file: CLASSES,
+    from: 'gap-5 px-px pb-px',
+    to: 'gap-5 px-px',
   },
   {
     label: 'the enclosed tabs list is inline-flex, so inside the grid of its root it stretches to the full width',
@@ -80,8 +92,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the enclosed tabs list has no edge under forced colours, where its tint is erased',
     file: CLASSES,
-    from: 'p-1 ${FORCED_EDGE} ${TABS_LIST_SCROLL}',
-    to: 'p-1 ${TABS_LIST_SCROLL}',
+    from: 'p-0.5 ${FORCED_EDGE} ${TABS_LIST_SCROLL}',
+    to: 'p-0.5 ${TABS_LIST_SCROLL}',
   },
   {
     label: 'a disabled tabs tab is dimmed whole, so the ring it shows when the arrow keys land on it drops to 2.5:1',
@@ -152,7 +164,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the active enclosed tabs tab is not raised, so only its colour tells it from the others',
     file: CLASSES,
-    from: "'rounded-control data-active:bg-surface-raised data-active:shadow-sm',",
+    from: "'rounded-control data-active:bg-surface-raised',",
     to: "'rounded-control',",
   },
   {
@@ -160,18 +172,6 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: 'whitespace-nowrap font-normal text-muted',
     to: 'whitespace-nowrap font-medium text-muted',
-  },
-  {
-    label: 'the active enclosed tabs tab has no edge, so a fill of 1.04:1 against the list is all that tells it from the others',
-    file: CLASSES,
-    from: "  'not-forced-colors:data-active:inset-ring-(length:--tc-line-width) not-forced-colors:data-active:inset-ring-line-strong',\n",
-    to: '',
-  },
-  {
-    label: 'the edge of the active enclosed tabs tab is painted under forced colours too, over the highlight that already tells it',
-    file: CLASSES,
-    from: "'not-forced-colors:data-active:inset-ring-(length:--tc-line-width) not-forced-colors:data-active:inset-ring-line-strong'",
-    to: "'data-active:inset-ring-(length:--tc-line-width) data-active:inset-ring-line-strong'",
   },
   {
     label: 'the active enclosed tabs tab takes no highlight under forced colours, where its fill is erased',
@@ -266,7 +266,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a tabs tab ignores the size of its root',
     file: CLIENT,
-    from: 'cn(TABS_TAB[variant], TABS_SIZE[size], className)',
+    from: 'cn(TABS_TAB[variant], TABS_SIZE[variant][size], className)',
     to: 'cn(TABS_TAB[variant], className)',
   },
   {
@@ -290,8 +290,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: "a tabs tab's own classes beat a consumer className",
     file: CLIENT,
-    from: 'cn(TABS_TAB[variant], TABS_SIZE[size], className)',
-    to: 'cn(className, TABS_TAB[variant], TABS_SIZE[size])',
+    from: 'cn(TABS_TAB[variant], TABS_SIZE[variant][size], className)',
+    to: 'cn(className, TABS_TAB[variant], TABS_SIZE[variant][size])',
   },
   {
     label: "a tabs panel's own classes beat a consumer className",

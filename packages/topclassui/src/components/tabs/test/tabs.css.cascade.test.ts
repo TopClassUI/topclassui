@@ -5,7 +5,7 @@ import { TABS_LIST, TABS_PANEL, TABS_ROOT, TABS_SIZE, TABS_TAB } from '../classe
 
 /** Every class Tabs writes, once: the same set tabs.css.test.ts checks one by one. */
 const WRITTEN = [...new Set(
-  [TABS_ROOT, ...Object.values(TABS_LIST), ...Object.values(TABS_TAB), TABS_PANEL, ...Object.values(TABS_SIZE)].join(' ').split(' '),
+  [TABS_ROOT, ...Object.values(TABS_LIST), ...Object.values(TABS_TAB), TABS_PANEL, ...Object.values(TABS_SIZE).flatMap((sizes) => Object.values(sizes))].join(' ').split(' '),
 )].filter(Boolean)
 
 const escape = (cls: string) => cls.replace(/[^a-zA-Z0-9_-]/g, '\\$&')
@@ -31,7 +31,7 @@ describe('a class that only applies under a query sits inside it', () => {
       'forced-colors:border-[Canvas]', 'forced-colors:border-b-(length:--tc-line-width)',
       'forced-colors:data-active:[--tc-ring:HighlightText]', 'forced-colors:data-active:bg-[Highlight]',
       'forced-colors:data-active:border-[Highlight]', 'forced-colors:data-active:forced-color-adjust-none',
-      'forced-colors:data-active:shadow-none', 'forced-colors:data-active:text-[HighlightText]',
+      'forced-colors:data-active:text-[HighlightText]',
       'forced-colors:data-disabled:*:opacity-100', 'forced-colors:data-disabled:not-data-active:text-[GrayText]',
       'forced-colors:outline-(length:--tc-line-width)',
     ])
@@ -67,7 +67,6 @@ describe('the order the cascade needs', () => {
   it('under forced colours the active enclosed tab takes the system pair after its raised surface and its body colour', async () => {
     await follows('forced-colors:data-active:bg-[Highlight]', 'data-active:bg-surface-raised')
     await follows('forced-colors:data-active:text-[HighlightText]', 'data-active:text-body')
-    await follows('forced-colors:data-active:shadow-none', 'data-active:shadow-sm')
   })
 
   it('under forced colours what a disabled tab holds is opaque again, after it was dimmed', async () => {

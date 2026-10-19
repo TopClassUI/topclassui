@@ -40,7 +40,7 @@ export function TabsList({ className, render, ...rest }: TabsListProps) {
  * ellipsis. In the server HTML the tab the page opens on is the one tab stop of its list. */
 export function TabsTab({ className, render, children, ...rest }: TabsTabProps) {
   const { variant, size, stop } = useTabsTab(rest.value)
-  const part = renderPart(render, cn(TABS_TAB[variant], TABS_SIZE[size], className))
+  const part = renderPart(render, cn(TABS_TAB[variant], TABS_SIZE[variant][size], className))
   return (
     <Base.Tab {...stop} {...rest} render={part.render} className={part.className}>
       {truncateLabel(children, TABS_BOUNDARIES.labelMaxLength)}
