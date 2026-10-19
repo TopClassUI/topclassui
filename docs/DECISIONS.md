@@ -6,6 +6,18 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-19 - Home is built from the Figma frame 191:1495
+
+**Decision.** Job 124 rebuilt every Home section against the frame (composites in `docs/figma/parity/site-home-*.png`, frame left, build right) and took B1 to B3 of the approved plan: the mark from `docs/brand/` in the navbar, footer, product frame, favicon, apple icon, manifest and Open Graph card; `GITHUB_URL`, `YOUTUBE_URL` and `X_URL = null` in `apps/docs/lib/site.ts`; the Follow us section; the five-column footer with llms.txt, Changelog and the social icons; centred section heads with capital eyebrows; `SECTION_TITLE` up to 40 px; "Docs" in the navbar; the tick grid in the Arabic panel; the Open Graph chip from the labels.
+
+- **Where the build departs from the frame.** No letter-spacing on the eyebrows: the site's lint holds R-5.3-3, so the capitals are drawn without the frame's 0.8 px tracking. The chip keeps the 0.1 beta wording and the hero's "Available with v0.1" note is left out (change 11); the frame's table header slips (Kind over the names, Status over the kinds) are read as Name and Kind. The frame's Client JavaScript sizes wait for `pnpm size` (job 118); the table says "not measured yet". The Proof panel 3 stays "Tested, not promised", in the drawn card's shape. The size-limit snippet of panel 1 arrives with job 118. The X card and icon wait for a handle. The footer's Components column lists live pages only, so the group names of the frame are left out (choice 12).
+- **Glows and lifts** are site classes in `apps/docs/app/globals.css` (`docs-glow`, `docs-frame`, `docs-lift`, `docs-tile`, `docs-number-*`), every colour a `color-mix()` of a `--tc-*` token; no token was added.
+- **The brand marks** of Next.js, React, Tailwind CSS, GitHub, YouTube and X are inline single-colour SVG in `apps/docs/components/home/brand-logos.tsx`, each taking its tile's text colour.
+
+**Why.** Omar named the landing page first among the pages that looked unfinished; the frame is the truth for the look.
+
+**What it affects.** `apps/docs` only (Home, the navbar, the footer, the icon and Open Graph routes, the labels), the root README's wordmark and `docs/brand/`. The library is untouched.
+
 ## 2026-10-18 - The site hydrates in islands, and the shell's code waits for the first paint
 
 **Decision.** Job 83 (Lighthouse on the docs site, mobile preset). Every client part of the site goes through `apps/docs/components/lazy-island.tsx`: the server's HTML is rendered as before, and the part's own chunk loads only when it comes within one viewport (`near`) or, for what is on screen from the start, after the first paint and an idle moment (`idle`). A pointer, touch or focus on it loads it at once, and a press or hover that lands before the chunk is given again afterwards. While it waits, the island's box keeps the server's HTML untouched (an empty `dangerouslySetInnerHTML` during hydration, which React leaves alone); once the chunk is in, the part renders afresh in its place in one transition, and focus goes back where it was. Parts are not hydrated late because a Base UI part hydrated inside a deferred boundary could be left with sync updates React never committed (the Dialog, Popover, Tooltip and Switch states stopped answering). The one island that hydrates is the root provider, in an `<Activity>`: React streams a Suspense boundary over 500 bytes out of order once the page passes 12.8 KB, hidden until a script reveals it, which held the first paint; an Activity stays inline. A client navigation mounts an island with no HTML to keep, so it loads at once.

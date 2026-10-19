@@ -59,7 +59,7 @@ export function ProductFrame({ locale, labels }: { locale: Locale; labels: SiteL
         </ul>
         <div className="flex min-w-0 flex-1 flex-col gap-4.5 p-4 md:p-7">
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <div className="flex min-w-0 flex-1 basis-full flex-col gap-0.5 sm:basis-auto">
               <p className="text-xl font-semibold text-body">{frame.title}</p>
               <p className="text-xs text-muted">{frame.count(CARDS.length)}</p>
             </div>
@@ -76,7 +76,7 @@ export function ProductFrame({ locale, labels }: { locale: Locale; labels: SiteL
             columns={[
               { key: 'component', header: frame.columns.component, rowHeader: true, cell: (row) => <code dir="ltr" className="font-mono text-xs">{row.slug}</code> },
               { key: 'name', header: frame.columns.name, className: 'font-medium', cell: (row) => row.name },
-              { key: 'js', header: frame.columns.js, className: 'max-md:hidden', cell: (row) => (row.rendering === 'server' ? ZERO_KB : frame.notMeasured) },
+              { key: 'js', header: frame.columns.js, className: 'max-md:hidden', cell: (row) => (row.rendering === 'server' ? <bdi>{ZERO_KB}</bdi> : frame.notMeasured) },
               { key: 'kind', header: frame.columns.kind, cell: (row) => <Badge tone={KIND_TONE[row.rendering]} size="xs">{frame.kinds[row.rendering]}</Badge> },
               { key: 'updated', header: frame.columns.updated, className: 'text-muted max-md:hidden', cell: (row) => monthOf(componentDate(row.slug), locale) },
             ]}

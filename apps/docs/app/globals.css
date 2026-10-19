@@ -38,18 +38,18 @@
   /* The product frame: a primary line and the drawn blue halo under a deep drop. */
   .docs-frame {
     border: var(--tc-line-width) solid var(--tc-primary-on-soft);
-    box-shadow: 0 30px 60px -10px var(--tc-overlay), 0 0 90px 6px color-mix(in oklch, var(--tc-primary-solid) 35%, transparent);
+    box-shadow: 0 30px 60px -10px color-mix(in oklch, var(--tc-overlay) 60%, transparent), 0 0 90px 6px color-mix(in oklch, var(--tc-primary-solid) 35%, transparent);
   }
 
   /* Numbers, Follow us and What you need: a card that darkens toward its foot, lifted by a soft drop. */
   .docs-lift {
     background-image: linear-gradient(to bottom, transparent, color-mix(in oklch, var(--tc-page) 40%, transparent));
-    box-shadow: 0 20px 40px -14px var(--tc-overlay), inset 0 -3px 8px color-mix(in oklch, var(--tc-overlay) 60%, transparent);
+    box-shadow: 0 20px 40px -14px color-mix(in oklch, var(--tc-overlay) 60%, transparent), inset 0 -3px 8px color-mix(in oklch, var(--tc-overlay) 60%, transparent);
   }
 
   .docs-tile {
     background-image: linear-gradient(to bottom, transparent, color-mix(in oklch, var(--tc-page) 28%, transparent));
-    box-shadow: 0 12px 24px -8px var(--tc-overlay), inset 0 -3px 5px color-mix(in oklch, var(--tc-overlay) 70%, transparent);
+    box-shadow: 0 12px 24px -8px color-mix(in oklch, var(--tc-overlay) 70%, transparent), inset 0 -3px 5px color-mix(in oklch, var(--tc-overlay) 70%, transparent);
   }
 
   .docs-number { background-color: var(--tc-surface); }
