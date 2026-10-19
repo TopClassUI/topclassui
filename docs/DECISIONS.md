@@ -6,6 +6,22 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-19 - Navigation components read from their Figma Previewer frames
+
+**Decision.** Pagination, Tabs, Navbar, Sidebar, Breadcrumb and Accordion were compared with their `Previewer: <Name>` frames (138:1269, 138:809, 138:2393, 138:2539, 138:1140, 138:994) in dark, light and ocean, both directions; the composites are in `docs/figma/parity/`. What changed:
+
+- **Pagination.** A page cell is stroked with the decorative `--tc-line`, not `--tc-line-strong`: the frame draws the hairline, and the digit, not the box, names the link (R-5.6-4 exempts `--tc-line`). A dead first, previous, next or last cell drops its stroke. The gap is the `dots-three` icon, not three typed periods. Every cell link shows the pointer; a dead one keeps the default cursor.
+- **Tabs.** The line list is 20 px apart (`gap-5`, was 24) and a tab's inline padding is one step under a button's (`TABS_SIZE`, md pads 12 px against the drawn 11). Tabs show the pointer.
+- **Sidebar.** The rail sits on `--tc-page` behind its line, as the bordered rail is drawn, instead of `--tc-surface`. Its toggle shows the pointer.
+- **Accordion.** A trigger is 41 px at rest as drawn (`px-3.5 py-3`, gap 10 px), and a panel's padding follows (`px-3.5 pb-3.5`). Triggers show the pointer.
+- **Navbar and Breadcrumb** already match: the Navbar stage is the build drawn at about 0.87 scale, and the Breadcrumb's spacing and type measure the same.
+
+**Why.** Round 8 makes the frames the truth for the look. The `cursor-pointer` classes are local, pending the shared ones of `feat/cursor-pointer`.
+
+**Kept, and left for Omar.** The active enclosed tab keeps its `line-strong` edge (2026-10-16) and the current Sidebar row keeps its bar and its semibold weight, both cues the frame does not draw. A Sidebar row stays at the shared `--tc-row-height` (40 px) where the frame draws 31. Not built, since each is new API: Pagination's `disabled`, `shape`, `showFirstLast`, `showPrevNext` and the frame's `compact` (job 119); Navbar's scrolled shadow, transparent look, collapsible menu and `bordered` toggle; Sidebar's `variant` and `overlayOnMobile`.
+
+---
+
 ## 2026-10-18 - The site hydrates in islands, and the shell's code waits for the first paint
 
 **Decision.** Job 83 (Lighthouse on the docs site, mobile preset). Every client part of the site goes through `apps/docs/components/lazy-island.tsx`: the server's HTML is rendered as before, and the part's own chunk loads only when it comes within one viewport (`near`) or, for what is on screen from the start, after the first paint and an idle moment (`idle`). A pointer, touch or focus on it loads it at once, and a press or hover that lands before the chunk is given again afterwards. While it waits, the island's box keeps the server's HTML untouched (an empty `dangerouslySetInnerHTML` during hydration, which React leaves alone); once the chunk is in, the part renders afresh in its place in one transition, and focus goes back where it was. Parts are not hydrated late because a Base UI part hydrated inside a deferred boundary could be left with sync updates React never committed (the Dialog, Popover, Tooltip and Switch states stopped answering). The one island that hydrates is the root provider, in an `<Activity>`: React streams a Suspense boundary over 500 bytes out of order once the page passes 12.8 KB, hidden until a script reveals it, which held the first paint; an Activity stays inline. A client navigation mounts an island with no HTML to keep, so it loads at once.
