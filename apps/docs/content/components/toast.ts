@@ -13,6 +13,7 @@ export const toast = {
   demos: ['with-description', 'basic', 'tones', 'with-action', 'promise', 'sticky', 'high-priority', 'many', 'over-dialog', 'long-content', 'rtl'],
   stageHeight: 6,
   stageOpen: true,
+  starts: { tone: 'success' },
   notes: {
     en: [
       '`toast` is four plain functions: `add`, `update`, `close` and `promise`. The table lists the options of `toast.add`, not props; it also takes a required title, a description and one action.',

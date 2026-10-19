@@ -13,6 +13,7 @@ import { type PagedComponent, demoSourceOf } from '../../lib/components'
 import type { Locale } from '../../lib/locales'
 import { countStates } from '../../lib/states'
 import { cleanSourceOf, snippetOf, usageOf } from '../../lib/usage'
+import { withStarts } from '../../scripts/lib/controls'
 import { CARD_PART, CARD_TITLE, CODE_PART, FLAT_CODE, H3, LINK, NOTE, PART_ROW, PREVIEWER, PREVIEWER_HEAD, SMALL, STAGE } from '../classes'
 import { Code } from '../code'
 import { Demo } from '../demo'
@@ -50,7 +51,7 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
   const title = content.title[locale]
   const order = content.controlOrder ?? []
   const rank = (prop: string) => (order.includes(prop) ? order.indexOf(prop) : order.length)
-  const controls = [...entry.controls, ...(content.extraSwitches ?? []).map((prop) => ({ prop, kind: 'switch' as const, default: false }))]
+  const controls = withStarts([...entry.controls, ...(content.extraSwitches ?? []).map((prop) => ({ prop, kind: 'switch' as const, default: false }))], content.starts ?? {})
     .map((control, index) => ({ control, index }))
     .sort((a, b) => rank(a.control.prop) - rank(b.control.prop) || a.index - b.index)
     .map(({ control }) => control)
