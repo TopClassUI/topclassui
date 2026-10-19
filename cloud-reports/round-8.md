@@ -20,7 +20,7 @@ Rule call made by the lead (for Omar): a frame that draws a control boundary wit
 | 118 pnpm size | feat/size | main cf1ec12 | running | - | - | - |
 | 119 Pagination compact | feat/pagination-compact | main cf1ec12 | running | - | - | - |
 | 120 Cursor pointer | feat/cursor-pointer | main cf1ec12 | running | - | - | - |
-| 121 Tree-walk tests | fix/tree-walk-tests | main cf1ec12 | running | - | - | - |
+| 121 Tree-walk tests | fix/tree-walk-tests | main cf1ec12 | 2d95639 (done 16:36 UTC, verified by the lead 16:38 UTC) | 1 over cf1ec12, one line, OmarAbed16, no trailer, no merge | pnpm test 0 (935 files, 17,267 tests, four projects); lint, typecheck, structure, boundaries, css, readme 0; rules:sync not needed; not run: e2e, contrast, mutation | New scripts/lib/tracked-files.ts (trackedFiles runs git ls-files --cached and keeps what is on disk; walkFiles fallback with one warning when git cannot answer) used by bytes.test and client-callbacks.test; tracked-files.test (4 tests on a real temp repo). Flake reproduced on main with an untracked stray-build folder (2 of 6 failed), green after. For Omar: whether trackedFiles should also list untracked-but-not-ignored files (--others --exclude-standard), since as built a new component is checked only once git-added; file-sizes sourceFilesUnder (check-structure, harness) still walks the disk and could take the helper. |
 | 122 Breadcrumb JSON-LD | fix/breadcrumb-json-ld | main cf1ec12 | running | - | - | - |
 | 123 Scrollbars everywhere | fix/scrollbars-everywhere | main cf1ec12 | running | - | - | - |
 | 124 Site Home | figma/site-home | main cf1ec12, then the library top | running | - | - | - |
