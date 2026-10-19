@@ -140,4 +140,16 @@ export const MUTATIONS: Mutation[] = [
     from: ' max-w-[calc(var(--tc-stepper-mark)*2.75)] flex-1',
     to: ' flex-1',
   },
+  {
+    label: 'a disabled stepper step no longer says so, so it draws at full strength',
+    file: 'src/components/stepper/index.tsx',
+    from: "            data-disabled={item.disabled === true ? '' : undefined}\n",
+    to: '',
+  },
+  {
+    label: 'the stepper half line moves half a pixel up again, so the 1 px line smears over two rows',
+    file: 'src/components/stepper/classes.ts',
+    from: "'absolute top-1/2 w-1/2 border-t",
+    to: "'absolute top-1/2 w-1/2 -translate-y-1/2 border-t",
+  },
 ]

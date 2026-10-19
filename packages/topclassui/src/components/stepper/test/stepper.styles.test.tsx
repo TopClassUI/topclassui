@@ -28,7 +28,7 @@ describe('each part wears exactly the classes the spec names', () => {
   })
 
   it('a step is a centred column that shrinks to its circle and no further, with 8 px between the circle and the title', () => {
-    expect(all(html(), /^<li /)[0]).toEqual(['flex', 'flex-1', 'flex-col', 'gap-2', 'items-center', 'max-w-[calc(var(--tc-stepper-mark)*2.75)]', 'min-w-(--tc-stepper-mark)', 'relative', 'text-center'])
+    expect(all(html(), /^<li /)[0]).toEqual(['data-disabled:opacity-50', 'flex', 'flex-1', 'flex-col', 'gap-2', 'items-center', 'max-w-[calc(var(--tc-stepper-mark)*2.75)]', 'min-w-(--tc-stepper-mark)', 'relative', 'text-center'])
   })
 
   it('the row holding the circle and the line is as wide as its step', () => {
@@ -36,7 +36,7 @@ describe('each part wears exactly the classes the spec names', () => {
   })
 
   it('the line is two halves, centre to column end and column start to centre, a 1 px border level with the circle', () => {
-    const half = ['-translate-y-1/2', 'absolute', 'border-line', 'border-t-(length:--tc-line-width)', 'data-done:border-primary-solid', 'top-1/2', 'w-1/2']
+    const half = ['absolute', 'border-line', 'border-t-(length:--tc-line-width)', 'data-done:border-primary-solid', 'top-1/2', 'w-1/2']
     const [after, before] = all(html(), /class="absolute/)
     expect(after).toEqual([...half, 'inset-s-1/2'].sort())
     expect(before).toEqual([...half, 'inset-s-0'].sort())
@@ -113,8 +113,8 @@ describe('right to left', () => {
 })
 
 describe('a stepper is not interactive', () => {
-  it('carries no ring, hover, transition, cursor or disabled style', () => {
-    const interactive = /(^|:)(hover|active|focus-visible|disabled|data-disabled):|^(outline-|transition|duration-|cursor-)/
+  it('carries no ring, hover, transition, cursor or control disabled style; a disabled step only dims', () => {
+    const interactive = /(^|:)(hover|active|focus-visible|disabled):|^(outline-|transition|duration-|cursor-)/
     expect(html().match(/class="[^"]*"/g)?.join(' ').split(/[\s"=]+/).filter((c) => interactive.test(c))).toEqual([])
   })
 
