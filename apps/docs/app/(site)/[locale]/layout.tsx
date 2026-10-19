@@ -49,7 +49,8 @@ export default async function LocaleLayout({ children, params }: { children: Rea
         <TopClassProvider direction={DIRECTION[locale]} locale={locale}>
           {children}
         </TopClassProvider>
-        <SpeedInsights />
+        {/* Vercel serves this script on its own deployments only; on next start it would answer 404. */}
+        {process.env['VERCEL'] === '1' ? <SpeedInsights /> : null}
       </body>
     </html>
   )
