@@ -1,92 +1,104 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildBreadcrumbList, resolveHref, serializeJsonLd } from '../lib.js'
+import { buildBreadcrumbList, resolveHref, resolveOrigin, serializeJsonLd } from '../lib.js'
+
+const SITE = 'https://example.com'
 
 describe('buildBreadcrumbList', () => {
-  it('turns each linked crumb into a ListItem with its position, name and item', () => {
-    expect(buildBreadcrumbList([{ href: '/', label: 'Home' }, { href: '/docs', label: 'Docs' }])).toEqual({
+  it('turns each linked crumb into a ListItem with its position, name and absolute item', () => {
+    expect(buildBreadcrumbList([{ href: '/', label: 'Home' }, { href: '/docs', label: 'Docs' }], SITE)).toEqual({
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: '/' },
-        { '@type': 'ListItem', position: 2, name: 'Docs', item: '/docs' },
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://example.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Docs', item: 'https://example.com/docs' },
       ],
     })
   })
 
-  it('skips a crumb without an href and closes the gap in the positions', () => {
-    const list = buildBreadcrumbList([{ label: 'Start' }, { href: '/a', label: 'A' }, { label: 'Gap' }, { href: '/b', label: 'B' }])
-    expect(list.itemListElement.map((entry) => entry.position)).toEqual([1, 2])
-    expect(list.itemListElement.map((entry) => entry.name)).toEqual(['A', 'B'])
-    expect(list.itemListElement.map((entry) => entry.item)).toEqual(['/a', '/b'])
-  })
-
-  it('counts an empty href as a link, since only a missing one means the current page', () => {
-    expect(buildBreadcrumbList([{ href: '', label: 'Here' }]).itemListElement).toEqual([
-      { '@type': 'ListItem', position: 1, name: 'Here', item: '' },
+  it('lists the current page last, with a name and no item', () => {
+    expect(buildBreadcrumbList([{ href: '/', label: 'Home' }, { label: 'Now' }], SITE)?.itemListElement).toEqual([
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://example.com/' },
+      { '@type': 'ListItem', position: 2, name: 'Now' },
     ])
   })
 
-  it('returns an empty list for no items and for no links, which the component then omits', () => {
-    expect(buildBreadcrumbList([]).itemListElement).toEqual([])
-    expect(buildBreadcrumbList([{ label: 'Only' }]).itemListElement).toEqual([])
+  it('skips a crumb without an href that is not the last, and closes the gap in the positions', () => {
+    const list = buildBreadcrumbList([{ label: 'Start' }, { href: '/a', label: 'A' }, { label: 'Gap' }, { href: '/b', label: 'B' }, { label: 'Now' }], SITE)
+    expect(list?.itemListElement).toEqual([
+      { '@type': 'ListItem', position: 1, name: 'A', item: 'https://example.com/a' },
+      { '@type': 'ListItem', position: 2, name: 'B', item: 'https://example.com/b' },
+      { '@type': 'ListItem', position: 3, name: 'Now' },
+    ])
+  })
+
+  it('counts an empty href as a link, since only a missing one means the current page', () => {
+    expect(buildBreadcrumbList([{ href: '', label: 'Here' }], SITE)?.itemListElement).toEqual([
+      { '@type': 'ListItem', position: 1, name: 'Here', item: 'https://example.com/' },
+    ])
+  })
+
+  it('is null without a siteUrl, whatever the trail', () => {
+    expect(buildBreadcrumbList([{ href: '/', label: 'Home' }, { label: 'Now' }], undefined)).toBeNull()
+    expect(buildBreadcrumbList([{ href: 'https://example.com/', label: 'Home' }], undefined)).toBeNull()
+  })
+
+  it('is null for no items and for no links, since a list with no URL in it points nowhere', () => {
+    expect(buildBreadcrumbList([], SITE)).toBeNull()
+    expect(buildBreadcrumbList([{ label: 'Only' }], SITE)).toBeNull()
+    expect(buildBreadcrumbList([{ label: 'Home' }, { label: 'Now' }], SITE)).toBeNull()
+  })
+
+  it('is null when the siteUrl is not an http or https URL, even if every href is absolute', () => {
+    for (const bad of ['', 'example.com', '/docs', 'not a url', 'https://', 'ftp://example.com', 'javascript:alert(1)']) {
+      expect(buildBreadcrumbList([{ href: 'https://example.com/a', label: 'A' }], bad), bad).toBeNull()
+    }
+  })
+
+  it('resolves against the origin alone, so a trailing slash or a path changes nothing', () => {
+    const items = [{ href: 'shoes', label: 'Shoes' }, { href: '/cart', label: 'Cart' }]
+    for (const site of ['https://example.com/', 'https://example.com/shop/', 'https://example.com/shop']) {
+      expect(buildBreadcrumbList(items, site)?.itemListElement.map((entry) => entry.item), site)
+        .toEqual(['https://example.com/shoes', 'https://example.com/cart'])
+    }
   })
 
   it('does not change the array it was given', () => {
     const items = [{ href: '/', label: 'Home' }, { label: 'Now' }]
-    buildBreadcrumbList(items)
+    buildBreadcrumbList(items, SITE)
     expect(items).toEqual([{ href: '/', label: 'Home' }, { label: 'Now' }])
   })
 })
 
-describe('resolveHref', () => {
-  it('returns the href untouched when there is no base', () => {
-    expect(resolveHref('/docs', undefined)).toBe('/docs')
-    expect(resolveHref('', undefined)).toBe('')
-    expect(resolveHref('docs/../a b', undefined)).toBe('docs/../a b')
+describe('resolveOrigin', () => {
+  it('is the origin of an http or https URL', () => {
+    expect(resolveOrigin('https://example.com')).toBe('https://example.com')
+    expect(resolveOrigin('http://localhost:3000/')).toBe('http://localhost:3000')
+    expect(resolveOrigin('https://example.com/shop/?a=1#top')).toBe('https://example.com')
   })
 
-  it('makes a root-relative href absolute against the origin of the base', () => {
-    expect(resolveHref('/docs', 'https://example.com')).toBe('https://example.com/docs')
-    expect(resolveHref('/', 'https://example.com')).toBe('https://example.com/')
-    expect(resolveHref('/docs?page=2#top', 'https://example.com/shop/')).toBe('https://example.com/docs?page=2#top')
-  })
-
-  it('resolves a path-relative href against the path of the base', () => {
-    expect(resolveHref('shoes', 'https://example.com/shop/')).toBe('https://example.com/shop/shoes')
-    expect(resolveHref('', 'https://example.com/shop/')).toBe('https://example.com/shop/')
-  })
-
-  it('leaves an absolute href on its own origin', () => {
-    expect(resolveHref('https://other.example/a', 'https://example.com')).toBe('https://other.example/a')
-  })
-
-  it('falls back to the href as written when the base does not parse, and never throws', () => {
-    expect(resolveHref('/docs', '')).toBe('/docs')
-    expect(resolveHref('/docs', 'example.com')).toBe('/docs')
-    expect(resolveHref('/docs', '/relative')).toBe('/docs')
-    expect(resolveHref('/docs', 'https://')).toBe('/docs')
-  })
-
-  it('passes a missing href through, base or no base', () => {
-    expect(resolveHref(undefined, 'https://example.com')).toBeUndefined()
-    expect(resolveHref(undefined, undefined)).toBeUndefined()
+  it('is undefined for anything else, and never throws', () => {
+    expect(resolveOrigin('')).toBeUndefined()
+    expect(resolveOrigin('example.com')).toBeUndefined()
+    expect(resolveOrigin('https://')).toBeUndefined()
+    expect(resolveOrigin('mailto:a@example.com')).toBeUndefined()
   })
 })
 
-describe('buildBreadcrumbList with a base', () => {
-  it('writes every item absolute, and changes neither the names nor the positions', () => {
-    const list = buildBreadcrumbList([{ href: '/', label: 'Home' }, { label: 'Gap' }, { href: '/docs', label: 'Docs' }], 'https://example.com')
-    expect(list.itemListElement).toEqual([
-      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://example.com/' },
-      { '@type': 'ListItem', position: 2, name: 'Docs', item: 'https://example.com/docs' },
-    ])
+describe('resolveHref', () => {
+  it('makes a root-relative or path-relative href absolute against the origin', () => {
+    expect(resolveHref('/docs', SITE)).toBe('https://example.com/docs')
+    expect(resolveHref('/', SITE)).toBe('https://example.com/')
+    expect(resolveHref('docs?page=2#top', SITE)).toBe('https://example.com/docs?page=2#top')
   })
 
-  it('is the list it was without one when the base is not a URL', () => {
-    expect(buildBreadcrumbList([{ href: '/docs', label: 'Docs' }], 'nonsense').itemListElement).toEqual([
-      { '@type': 'ListItem', position: 1, name: 'Docs', item: '/docs' },
-    ])
+  it('leaves an absolute href on its own origin', () => {
+    expect(resolveHref('https://other.example/a', SITE)).toBe('https://other.example/a')
+  })
+
+  it('falls back to the href as written when it does not parse, and never throws', () => {
+    expect(resolveHref('https://', SITE)).toBe('https://')
+    expect(resolveHref('http://[', SITE)).toBe('http://[')
   })
 })
 
