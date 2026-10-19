@@ -17,13 +17,14 @@ export function SidebarGroups({ locale, current, labels }: SidebarGroupsProps) {
     const pages = LIVE_PAGES.filter((page) => page.group === group)
     if (pages.length === 0) return null
     return (
-      <SidebarGroup key={group} label={labels.shell.groups[group]}>
+      <SidebarGroup key={group} label={<span className="uppercase">{labels.shell.groups[group]}</span>} className="pt-2">
         {pages.map((page) => (
           <SidebarLink
             key={page.slug}
             render={<Link href={hrefOf(page, locale)} />}
             icon={<Icon name={page.icon} />}
             current={page.slug === current}
+            className="px-2"
           >
             {page.title[locale]}
           </SidebarLink>
