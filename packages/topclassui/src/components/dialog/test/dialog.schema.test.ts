@@ -70,10 +70,10 @@ describe('the schema and the constants agree', () => {
 })
 
 describe('the width table has one entry per size', () => {
-  it('maps the five names to 320, 360, 400, 512 and 640 px, and custom to nothing', () => {
+  it('maps the five names to 320, 360, 380, 512 and 640 px, and custom to nothing', () => {
     // Tailwind's spacing step is 4 px, so max-w-80 is 320.
     expect(DIALOG_WIDTH).toEqual({
-      xs: 'max-w-80', sm: 'max-w-90', md: 'max-w-100', lg: 'max-w-128', xl: 'max-w-160', custom: '',
+      xs: 'max-w-80', sm: 'max-w-90', md: 'max-w-95', lg: 'max-w-128', xl: 'max-w-160', custom: '',
     })
   })
 })

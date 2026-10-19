@@ -14,8 +14,9 @@ const html = (props: Partial<PaginationProps> = {}) =>
 /** The opening tag of every element of one name, in document order. */
 const tags = (html_: string, name: string) => html_.match(new RegExp(`<${name}(?: [^>]*)?>`, 'g')) ?? []
 
-/** What each cell shows: a page number, or the three dots of a gap. */
-const shown = (html_: string) => [...html_.matchAll(/>([\d.,]+)<\/(?:a|li)>/g)].map((match) => match[1])
+/** What each cell shows: a page number, or '...' for a gap, which draws the dots icon. */
+const shown = (html_: string) =>
+  [...html_.matchAll(/>([\d,]+)<\/a>|<li aria-hidden="true"[^>]*><svg/g)].map((match) => match[1] ?? '...')
 
 describe('Pagination on the server', () => {
   it('is a nav holding one list', () => {
@@ -27,7 +28,7 @@ describe('Pagination on the server', () => {
 
   // Preflight sets list-style: none, and Safari with VoiceOver then stops announcing a list.
   it('says role="list" on the ul, so the list survives the reset in Safari', () => {
-    expect(tags(html(), 'ul')).toEqual(['<ul role="list" class="flex flex-wrap items-center gap-1">'])
+    expect(tags(html(), 'ul')).toEqual(['<ul role="list" class="flex flex-wrap items-center @container/pagination gap-1.5">'])
   })
 
   it('is named by the labels, and reports its size', () => {
@@ -56,8 +57,12 @@ describe('a gap', () => {
   })
 
   it('is not a link, so it is no tab stop and no touch target', () => {
-    expect(html({ value: 6 })).toContain('>...</li>')
-    expect(html({ value: 6 })).not.toContain('>...</a>')
+    expect(html({ value: 6 }).match(/<li aria-hidden="true"[^>]*><svg/g)).toHaveLength(2)
+    expect(html({ value: 6 }).match(/<li aria-hidden="true"[^>]*><a /g)).toBeNull()
+  })
+
+  it('draws the dots icon the frame draws, not three typed periods', () => {
+    expect(html({ value: 6 })).not.toContain('...')
   })
 
   it('does not exist when every page fits', () => {
@@ -86,7 +91,7 @@ describe('the current page', () => {
 
 describe('the defaults', () => {
   it('are one sibling, one boundary, the md cell of R-5.7-2 and the en locale', () => {
-    expect(PAGINATION_DEFAULTS).toEqual({ siblingCount: 1, boundaryCount: 1, size: 'md', locale: 'en' })
+    expect(PAGINATION_DEFAULTS).toEqual({ siblingCount: 1, boundaryCount: 1, size: 'md', disabled: false, locale: 'en' })
   })
 
   it('apply to an explicit undefined too', () => {

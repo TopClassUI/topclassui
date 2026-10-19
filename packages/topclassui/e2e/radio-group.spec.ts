@@ -57,10 +57,10 @@ test.describe('the five sizes, on the static page', () => {
   test.use({ reducedMotion: 'reduce' })
 
   const FINE = {
-    xs: { target: [24, 24], box: [14, 14], dot: [6.7, 6.7], centred: true }, sm: { target: [24, 24], box: [16, 16], dot: [7.8, 7.8], centred: true },
-    md: { target: [24, 24], box: [20, 20], dot: [10.1, 10.1], centred: true }, lg: { target: [24, 24], box: [24, 24], dot: [12.3, 12.3], centred: true },
-    // 56% of the 26 px inside the xl line is 14.56 px; Chromium lays it out on a 1/64 px grid, at 14.546875.
-    xl: { target: [28, 28], box: [28, 28], dot: [14.5, 14.5], centred: true },
+    xs: { target: [24, 24], box: [16, 16], dot: [7.8, 7.8], centred: true }, sm: { target: [24, 24], box: [20, 20], dot: [10.1, 10.1], centred: true },
+    // 56% of the 26 px inside the lg line is 14.56 px; Chromium lays it out on a 1/64 px grid, at 14.546875.
+    md: { target: [24, 24], box: [24, 24], dot: [12.3, 12.3], centred: true }, lg: { target: [28, 28], box: [28, 28], dot: [14.5, 14.5], centred: true },
+    xl: { target: [32, 32], box: [32, 32], dot: [16.8, 16.8], centred: true },
   }
   const shapes = async (page: Page) => {
     const out: Record<string, Awaited<ReturnType<typeof shape>>> = {}
@@ -248,7 +248,7 @@ test.describe('text', () => {
       await page.goto(urlFor('radio-group--basic', 'light', direction))
       await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
       const control = radioIn(page, 'Yearly')
-      expect(await shape(control)).toEqual({ target: [40, 40], box: [40, 40], dot: [21.3, 21.3], centred: true })
+      expect(await shape(control)).toEqual({ target: [48, 48], box: [48, 48], dot: [25.8, 25.8], centred: true })
       const [box, text] = [await boxOf(control), await boxOf(control.locator('xpath=following-sibling::span'))]
       expect(direction === 'ltr' ? text.left >= box.right : text.right <= box.left).toBe(true)
       await expectNoSidewaysScroll(page)
@@ -264,7 +264,7 @@ test.describe('text', () => {
     let above = 0
     for (const row of rows) {
       const control = row.getByRole('radio')
-      expect((await shape(control)).box).toEqual([20, 20])
+      expect((await shape(control)).box).toEqual([24, 24])
       const [circle, text, label] = [await boxOf(control), await boxOf(row.locator(':scope > span')), await boxOf(row)]
       expect(text.left, 'the text overlaps its circle').toBeGreaterThanOrEqual(circle.right)
       expect(label.top, 'a row overlaps the one above').toBeGreaterThanOrEqual(above)
@@ -385,7 +385,7 @@ test.describe('live: pressing it', () => {
           }
           return { width: edge.right - edge.left, cut }
         })
-        expect(ring).toEqual({ width: 28, cut: [] })
+        expect(ring).toEqual({ width: 32, cut: [] })
       })
     })
   }
@@ -456,7 +456,7 @@ test.describe('live: where a page puts a radio group', () => {
   }))
   const ALL = ['grid', 'track', 'flex-1', 'w-fit', 'cell', 'label-row', 'long', 'horizontal', 'element'] as const
   const expected = (target: number) => ALL.map((name) => {
-    const box = name === 'long' ? 16 : 20
+    const box = name === 'long' ? 20 : 24
     return [name, [target, target], [box, box]]
   })
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })

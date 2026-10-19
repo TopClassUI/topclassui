@@ -13,8 +13,8 @@ const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
 const EXPECTED = ['all-links', 'basic', 'deep-trail', 'long-label', 'long-trail', 'mixed-label', 'rtl', 'states']
 
-/** How many trails a demo holds, and how many of them emit JSON-LD: a trail with no link emits none. */
-const TRAILS: Record<string, { navs: number, jsonLd: number }> = { states: { navs: 3, jsonLd: 2 } }
+/** How many trails a demo holds. */
+const TRAILS: Record<string, { navs: number }> = { states: { navs: 5 } }
 
 const load = async (file: string) => {
   const loaded = await import(`../dummy/${file}.tsx`) as { default: ComponentType }
@@ -37,7 +37,8 @@ describe('every demo renders on the server', () => {
       // Not toContain('<'): an empty div passes that. One nav, unless the demo names each of its trails.
       const out = markup(<Demo />)
       expect(count(out, '<nav '), file).toBe(TRAILS[file]?.navs ?? 1)
-      expect(count(out, 'application/ld+json'), file).toBe(TRAILS[file]?.jsonLd ?? 1)
+      // No demo passes siteUrl, so none leaks a BreadcrumbList into the page that shows it.
+      expect(count(out, '<script'), file).toBe(0)
     })
   }
 })
@@ -87,11 +88,14 @@ describe('each demo shows what its name says', () => {
     expect(out).toContain('<span aria-current="page" class="truncate min-w-0 text-body font-semibold">Logical properties')
   })
 
-  it('states names each of its three trails, and only the lone current page has no link', async () => {
+  it('states names each of its five trails, and only the lone current page has no link', async () => {
     const out = await load('states')
-    expect([...out.matchAll(/<nav aria-label="([^"]*)"/g)].map((m) => m[1])).toEqual(['Ending on the current page', 'Every crumb a link', 'Only the current page'])
-    expect(count(out, '<a href=')).toBe(4)
-    expect(count(out, 'aria-current="page"')).toBe(2)
+    expect([...out.matchAll(/<nav aria-label="([^"]*)"/g)].map((m) => m[1])).toEqual([
+      'current', 'idle', 'current page only', 'collapsed', 'home icon',
+    ])
+    // 4 in the first two, 2 of the folded five (Docs, then Button) and 2 under the house.
+    expect(count(out, '<a href=')).toBe(8)
+    expect(count(out, 'aria-current="page"')).toBe(4)
   })
 
   it('rtl sets the direction, names the nav in Arabic and keeps the flipping caret', async () => {

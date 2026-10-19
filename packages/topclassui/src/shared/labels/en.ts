@@ -47,8 +47,8 @@ export const en = {
     close: 'Close this dialog',
   },
   file: {
-    drop: 'Drop files here',
-    browse: 'Browse',
+    drop: 'Drag files here or',
+    browse: 'browse',
     remove: 'Remove',
     tooMany: (n, fmt) => (n === 1 ? 'Only 1 file allowed' : `Only ${fmt.format(n)} files allowed`),
     refusedMore: (n, fmt) => (n === 1 ? 'and 1 more file refused' : `and ${fmt.format(n)} more files refused`),
@@ -86,6 +86,8 @@ export const en = {
   command: {
     label: 'Command palette',
     placeholder: 'Type a command or search',
+    escape: 'Esc',
+    enter: 'Enter',
   },
   navbar: {
     label: 'Main',

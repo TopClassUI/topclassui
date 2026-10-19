@@ -1,7 +1,8 @@
 // R-5.12-4: one class string per element Tabs styles, built from the shared constants.
 import {
-  CONTAIN, FOCUS_RING, FOCUS_RING_INSET, FORCED_EDGE, SCROLL_X, TOUCH_TARGET, TRANSITION,
+  CONTAIN, CONTROL_HEIGHT, FOCUS_RING, FOCUS_RING_INSET, FORCED_EDGE, POINTER, SCROLL_X, TOUCH_TARGET, TRANSITION,
 } from '#shared/classes.js'
+import type { Size } from '#shared/contracts/size.js'
 import type { TabsVariant } from './types.js'
 
 /** A grid of one column that may shrink to nothing: a list that scrolls would otherwise widen a
@@ -18,12 +19,12 @@ export const TABS_LIST_LINE = 'shadow-[inset_0_calc(var(--tc-line-width)*-1)_var
  * padding, so no tab the keyboard reaches is cut (0.72 px was). */
 export const TABS_LIST_SCROLL = `relative scroll-px-px ${SCROLL_X}`
 
-/** R-5.2-3: the list of each look. Both scroll sideways inside themselves when the tabs do not fit, and
- * both keep at least a pixel before the first tab and after the last: the scroll padding is then met where the
+/** R-5.2-3: the list of each look, as wide as its tabs (Figma 138:809), the line one with its hairline under the bar.
+ * Both scroll sideways inside themselves when the tabs do not fit, and both keep at least a pixel before the first tab and after the last: the scroll padding is then met where the
  * server drew them, so hydration scrolls no RTL list (it moved by 1 px), and an RTL list reaches its end. */
 export const TABS_LIST = {
-  line: `flex items-center gap-6 px-px ${TABS_LIST_LINE} ${TABS_LIST_SCROLL}`,
-  enclosed: `flex w-fit max-w-full items-center gap-1 rounded-control bg-surface p-1 ${FORCED_EDGE} ${TABS_LIST_SCROLL}`,
+  line: `flex w-fit max-w-full items-center gap-5 px-px pb-px ${TABS_LIST_LINE} ${TABS_LIST_SCROLL}`,
+  enclosed: `flex w-fit max-w-full items-center gap-0.5 rounded-control bg-surface p-0.5 ${FORCED_EDGE} ${TABS_LIST_SCROLL}`,
 } as const satisfies Record<TabsVariant, string>
 
 /** A disabled tab still takes the focus from the arrow keys, so what it holds is dimmed and
@@ -42,6 +43,7 @@ const TAB = [
   'data-active:font-semibold data-active:text-body',
   CONTAIN,
   FOCUS_RING_INSET,
+  POINTER,
   TOUCH_TARGET,
   TRANSITION,
   TABS_TAB_DISABLED,
@@ -51,13 +53,12 @@ const TAB = [
  * not active takes the colour of the page, and the active one the system's highlight. */
 export const TABS_BAR = 'border-b-2 border-transparent data-active:border-primary-solid forced-colors:border-[Canvas] forced-colors:data-active:border-[Highlight]'
 
-/** The raised fill is 1.04:1 against the list, so an edge of 3:1 is what tells the active tab (WCAG 1.4.11).
- * Forced colours erase a fill and a shadow: there it takes the system pair, with a ring that shows on it. */
+/** A flat raised fill, with no edge and no shadow, as Figma 138:809 draws it: the semibold body label tells the
+ * active tab too. Forced colours erase a fill: there it takes the system pair, with a ring that shows on it. */
 export const TABS_RAISED = [
-  'rounded-control data-active:bg-surface-raised data-active:shadow-sm',
-  'not-forced-colors:data-active:inset-ring-(length:--tc-line-width) not-forced-colors:data-active:inset-ring-line-strong',
+  'rounded-control data-active:bg-surface-raised',
   'forced-colors:data-active:forced-color-adjust-none forced-colors:data-active:bg-[Highlight]',
-  'forced-colors:data-active:text-[HighlightText] forced-colors:data-active:shadow-none',
+  'forced-colors:data-active:text-[HighlightText]',
   'forced-colors:data-active:[--tc-ring:HighlightText]',
 ].join(' ')
 
@@ -67,6 +68,27 @@ export const TABS_TAB = {
   line: `${TAB} ${TABS_BAR}`,
   enclosed: `${TAB} ${TABS_RAISED}`,
 } as const satisfies Record<TabsVariant, string>
+
+/** The type step, with the inline padding one step under a button's: Figma 138:809 pads a md tab 11 px.
+ * A line tab is the control height; an enclosed one a step lower, so its box is the drawn 36 px at md. */
+export const TABS_SIZE = {
+  line: {
+    xs: `${CONTROL_HEIGHT.xs} px-pad-x-xs text-xs`,
+    sm: `${CONTROL_HEIGHT.sm} px-pad-x-xs text-sm`,
+    md: `${CONTROL_HEIGHT.md} px-pad-x-sm text-sm`,
+    lg: `${CONTROL_HEIGHT.lg} px-pad-x-md text-base`,
+    xl: `${CONTROL_HEIGHT.xl} px-pad-x-lg text-base`,
+    custom: '',
+  },
+  enclosed: {
+    xs: 'px-pad-x-xs text-xs',
+    sm: `${CONTROL_HEIGHT.xs} px-pad-x-xs text-sm`,
+    md: `${CONTROL_HEIGHT.sm} px-pad-x-sm text-sm`,
+    lg: `${CONTROL_HEIGHT.md} px-pad-x-md text-base`,
+    xl: `${CONTROL_HEIGHT.lg} px-pad-x-lg text-base`,
+    custom: '',
+  },
+} as const satisfies Record<TabsVariant, Record<Size, string>>
 
 /** A margin and not a padding: the ring of a focused panel reaches 4 px outside its box,
  * and the list above would paint over a ring that lay on it. A long word breaks. */

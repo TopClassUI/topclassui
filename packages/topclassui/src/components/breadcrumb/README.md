@@ -29,8 +29,15 @@ With an `href` it is one more link, and no page is marked current.
 <Breadcrumb link={<Link href="" />} items={items} />
 ```
 
-**JSON-LD.** The items with an `href` are also written as `BreadcrumbList` JSON-LD for search engines.
-Pass `baseUrl="https://example.com"` and those URLs are absolute; the links stay as written.
+**JSON-LD.** Pass `siteUrl`, the origin of the site with no trailing slash, and the trail is also written as `BreadcrumbList` JSON-LD for search engines:
+
+```tsx
+<Breadcrumb siteUrl="https://example.com" items={items} />
+```
+
+Each crumb with an `href` is a `ListItem` whose `item` is absolute against `siteUrl`, and the current page is the last `ListItem`, with its name and no `item`.
+The links themselves stay as written. Without `siteUrl` no script is written at all, so a demo, a preview or a component gallery never claims a trail for the page that shows it.
+A `siteUrl` that is not an `http` or `https` URL writes no script either, and never fails the render.
 
 - **Arabic.** `labels={getLabels('ar').labels}` names the `<nav>`; the crumbs are your own text.
 - **A blank label.** A crumb with an empty label, or one that is not a string (a CMS page with no title), is left out, of the trail and of the JSON-LD.
@@ -52,11 +59,13 @@ Required: `items`. Every other prop below is optional.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `items` | **yes** | `readonly BreadcrumbItem[]` | - | The trail as `{ href?, label }`, root first. An item with an `href` is a link and joins the JSON-LD; the last one without is the current page. |
-| `baseUrl` | no | `string` | - | The address of the site, such as `https://example.com`: the JSON-LD then lists absolute URLs. The links stay as written. |
+| `items` | **yes** | `readonly BreadcrumbItem[]` | - | The trail as `{ href?, label }`, root first. An item with an `href` is a link; the last one without is the current page. |
 | `labels` | no | `Labels` | - | The built-in strings; the nav is named by `labels.breadcrumb.label`. Defaults to English. |
 | `link` | no | `ReactElement` | - | The element every crumb link is cloned from, such as `link={<Link href="" />}`; its href is replaced with the item's. |
 | `locale` | no | `string` | - | Accepted so `{...getLabels(locale)}` spreads cleanly. Nothing here formats a number, so it is not used and never reaches the element. |
+| `maxItems` | no | `number` | - | Fold a longer trail to the first crumb, three dots and the last `maxItems - 1`; clamped to 2..100. The JSON-LD keeps every crumb. |
+| `showHome` | no | `boolean` | - | Draw the first crumb as a house icon; its label is still read by a screen reader. |
+| `siteUrl` | no | `string` | - | The origin of the site, such as `https://example.com` with no trailing slash. Given, the trail is also written as BreadcrumbList JSON-LD with absolute URLs; left out, no JSON-LD is written. |
 
 Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 

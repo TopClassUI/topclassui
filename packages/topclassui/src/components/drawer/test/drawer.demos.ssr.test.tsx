@@ -28,7 +28,7 @@ const TRIGGERS: Record<string, string[]> = {
   'rtl': ['القائمة', 'التصفية'],
   'sizes': ['xs', 'sm', 'md', 'lg', 'xl', 'custom'],
   'start': ['Menu'],
-  'states': ['Side sheet', 'Bottom sheet', 'Scrolled', 'Focus trapped', 'Non-modal'],
+  'states': ['Open'],
   'top': ['What is new'],
   'trap-focus': ['Inspect'],
   'with-form': ['Invite'],
@@ -87,7 +87,8 @@ describe('every demo renders on the server', () => {
     it(`${file}.tsx renders no popup on the server, because the portal mounts in the browser`, async () => {
       const html = await render(file)
       expect(html, file).not.toContain('role="dialog"')
-      expect(html, file).not.toContain('bg-overlay')
+      // The states strip draws the dimmed page of the frame itself, as a plain div; Base UI's scrim is never there.
+      expect(html.replaceAll('<div aria-hidden="true" class="absolute inset-0 bg-overlay"></div>', ''), file).not.toContain('bg-overlay')
       expect(html, file).not.toContain('<h2')
     })
 

@@ -50,9 +50,9 @@ describe('the box and the trigger', () => {
     expect(ruleOf(selectorOf('inline-grid'))).toBe('display: inline-grid;')
   })
 
-  it('the placeholder is muted, a read-only trigger takes the soft fill', () => {
+  it('the placeholder is muted, a read-only trigger takes no fill of its own', () => {
     expect(ruleOf(`${selectorOf('data-placeholder:text-muted')}[data-placeholder]`)).toBe('color: var(--tc-muted);')
-    expect(ruleOf(`${selectorOf('data-readonly:bg-neutral-soft')}[data-readonly]`)).toBe('background-color: var(--tc-neutral-soft);')
+    expect(SELECT_TRIGGER.split(' ')).not.toContain('data-readonly:bg-neutral-soft')
   })
 
   it('in forced colours, which drop the fill, a read-only trigger has a dashed line instead', () => {
@@ -101,8 +101,9 @@ describe('a row', () => {
     expect(SELECT_ITEM.split(' ')).toContain(cls)
   })
 
-  it('the chosen row is heavier as well as ticked, and the highlighted one takes the Highlight pair under forced colours', () => {
-    expect(ruleOf(`${selectorOf('data-selected:font-medium')}[data-selected]`)).toBe('--tw-font-weight: var(--font-weight-medium); font-weight: var(--font-weight-medium);')
+  it('the chosen row is tinted as well as ticked, and the highlighted one takes the Highlight pair under forced colours', () => {
+    expect(ruleOf(`${selectorOf('data-selected:bg-primary-soft')}[data-selected]`)).toBe('background-color: var(--tc-primary-soft);')
+    expect(ruleOf(`${selectorOf('data-selected:text-primary-on-soft')}[data-selected]`)).toBe('color: var(--tc-primary-on-soft);')
     expect(ruleOf(`${selectorOf('forced-colors:data-highlighted:bg-[Highlight]')}[data-highlighted]`)).toBe('background-color: Highlight;')
   })
 

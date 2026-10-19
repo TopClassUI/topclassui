@@ -95,7 +95,7 @@ describe('client.tsx and the list part are the browser half (R-5.12-1)', () => {
 
   it('takes Base UI from its combobox entry, the svg and the icons by explicit import (R-7-1), and no schema', () => {
     expect(importedModules(client).filter((m) => m.startsWith('@base-ui/'))).toEqual(['@base-ui/react/combobox'])
-    expect(importedModules(client).filter((m) => m.startsWith('#icons/'))).toEqual(['#icons/data/caret-down.js', '#icons/data/spinner.js'])
+    expect(importedModules(client).filter((m) => m.startsWith('#icons/'))).toEqual(['#icons/data/magnifying-glass.js', '#icons/data/spinner.js'])
     expect(importedModules(part).filter((m) => m.startsWith('#icons/'))).toEqual(['#icons/data/check.js'])
     for (const source of [client, part]) {
       expect(importedModules(source).filter((m) => m.startsWith('#components/'))).toEqual(['#components/svg/index.js'])

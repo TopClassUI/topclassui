@@ -52,7 +52,7 @@ describe('the box', () => {
     const sizes = Object.fromEntries(Object.entries(CHECKBOX_SIZE).filter(([size]) => size !== 'custom')
       .map(([size, cls]) => [size, ruleOf(selectorOf(cls))]))
     const square = (rem: string) => `width: calc(${rem}rem * var(--tc-density)); height: calc(${rem}rem * var(--tc-density));`
-    expect(sizes).toEqual({ xs: square('0.875'), sm: square('1'), md: square('1.25'), lg: square('1.5'), xl: square('1.75') })
+    expect(sizes).toEqual({ xs: square('1'), sm: square('1.25'), md: square('1.5'), lg: square('1.75'), xl: square('2') })
     expect(CHECKBOX_SIZE.custom).toBe('')
   })
 })

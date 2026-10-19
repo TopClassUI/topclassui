@@ -11,8 +11,8 @@ description: لا يشحن المكوّن شيفرة JavaScript إلا حين ي
 | النوع | الشارة | المعنى |
 |---|---|---|
 | <span dir="ltr">S</span> - خادم | <span dir="ltr">server - 0 KB</span> | يُعرض على الخادم. بلا خطّافات، ولا معالجات أحداث، ولا <span dir="ltr">JavaScript</span> في المتصفح |
-| <span dir="ltr">C</span> - عميل | <span dir="ltr">client - size not measured yet</span> | يحتاج إلى المتصفح: نافذة منبثقة، أو سحب، أو مستمع للوحة المفاتيح |
-| <span dir="ltr">Sp</span> - مقسوم | <span dir="ltr">split - 0 KB server + size not measured yet</span> | تُعرض البنية على الخادم، ويُرطَّب جزء صغير واحد فقط. يبقى <span dir="ltr">`Tag`</span> مكوّن خادم حتى تمرّر له <span dir="ltr">`onRemove`</span> |
+| <span dir="ltr">C</span> - عميل | <span dir="ltr">client - n KB</span> | يحتاج إلى المتصفح: نافذة منبثقة، أو سحب، أو مستمع للوحة المفاتيح |
+| <span dir="ltr">Sp</span> - مقسوم | <span dir="ltr">split - 0 KB server + n KB client</span> | تُعرض البنية على الخادم، ويُرطَّب جزء صغير واحد فقط. يبقى <span dir="ltr">`Tag`</span> مكوّن خادم حتى تمرّر له <span dir="ltr">`onRemove`</span> |
 
 <KindCounts />
 
@@ -78,9 +78,9 @@ export function Tag({ onRemove, children, ...rest }: TagProps) {
 
 ## كيف تُفحص الأحجام
 
-لكل مكوّن ميزانية حجم. أما الفحص الذي يُفشل البناء عند تجاوز الميزانية فلم يُبنَ بعد.
+لكل مكوّن يعمل في المتصفح ميزانية حجم في <span dir="ltr">`size-budget.json`</span>: <span dir="ltr">6 KB</span> مضغوطة لعنصر التحكم البسيط، و<span dir="ltr">14 KB</span> للطبقة المنبثقة، ويحمّل <span dir="ltr">`Command`</span> و<span dir="ltr">`DatePicker`</span> جزأهما الثقيل عند الطلب. يجمع الأمر <span dir="ltr">`pnpm size`</span> مدخل المتصفح لكل مكوّن بأداة <span dir="ltr">esbuild</span> مصغّرًا ثم يضغطه. لا يدخل <span dir="ltr">React</span> ولا <span dir="ltr">Base UI</span> في الرقم، لأن الصفحة تحمّلهما مرة واحدة؛ ويُسجَّل المجموع مع <span dir="ltr">Base UI</span> بجانبه. يعمل <span dir="ltr">`pnpm size --check`</span> ضمن <span dir="ltr">`pnpm check`</span> ويُفشل البناء حين يتجاوز مكوّن ميزانيته.
 
-<Callout tone="info">تُظهر الشارات نوع كل مكوّن. وإلى أن يصدر أول بناء مقيس، تكتب شارة المكوّن العميل أو المقسوم <span dir="ltr">"size not measured yet"</span> بدل الرقم.</Callout>
+<Callout tone="info">تطبع الشارات الرقم الذي قاسه <span dir="ltr">`pnpm size`</span>، فلا تنحرف الشارة عن البناء.</Callout>
 
 ## ما الذي يكلّفك
 

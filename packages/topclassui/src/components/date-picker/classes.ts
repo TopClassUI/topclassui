@@ -1,24 +1,24 @@
 // R-5.12-4: the class strings of the DatePicker, built from the shared field and overlay constants (unit-5.md, DatePicker).
 import {
-  FIELD_BOX, FIELD_HOLDER, FOCUS_RING, FOCUS_RING_INSET, HOVER, ICON_BUTTON, LABEL, OVERLAY_SURFACE, POPUP_BOUNDS, POPUP_MOTION,
-  SCROLL_AREA, TARGET_HEIGHT, TRANSITION,
+  FIELD_BOX, FIELD_HOLDER, FOCUS_RING, FOCUS_RING_INSET, HOVER, ICON_BUTTON, LABEL, OPEN_RING, OVERLAY_SURFACE, POINTER,
+  POPUP_BOUNDS, POPUP_MOTION, SCROLL_AREA, TARGET_HEIGHT, TRANSITION,
 } from '#shared/classes.js'
 
 /** The box that owns the width, as Select's. relative: it holds the form input. */
 export const DATE_PICKER_ROOT = `relative inline-grid align-middle ${FIELD_HOLDER}`
-export const DATE_PICKER_TRIGGER = `inline-flex w-full items-center gap-2 text-start ${FIELD_BOX}`
+export const DATE_PICKER_TRIGGER = `inline-flex w-full items-center gap-2 text-start ${FIELD_BOX} ${OPEN_RING} ${POINTER}`
 export const DATE_PICKER_ICON = 'flex shrink-0 text-muted'
 export const DATE_PICKER_VALUE = `${LABEL} flex-1 data-placeholder:text-muted`
 /** The form's copy of the value: out of sight and out of the tab order, still checked by required. */
 export const DATE_PICKER_INPUT = 'sr-only'
 export const DATE_PICKER_POSITIONER = 'z-(--tc-z-popup) data-anchor-hidden:invisible'
-/** 280 px as drawn, never wider or taller than the room Base UI measured: the grid scrolls under the month,
+/** 268 px as drawn, never wider or taller than the room Base UI measured: the grid scrolls under the month,
  * and on a short screen the popup scrolls as one. */
 export const DATE_PICKER_POPUP = [
   // The side padding gives up what a narrow screen takes from the drawn width: at a 32 px root the days need it.
-  'flex w-[calc(17.5rem*var(--tc-density))] flex-col gap-3 tone-neutral',
+  'flex w-[calc(16.75rem*var(--tc-density))] flex-col gap-2.5 tone-neutral',
   POPUP_BOUNDS,
-  'py-[min(1rem,16px)] px-[clamp(4px,calc(1rem-(17.5rem*var(--tc-density)-var(--available-width,100vw))/2),min(1rem,16px))]',
+  'py-[min(0.875rem,14px)] px-[clamp(4px,calc(0.875rem-(16.75rem*var(--tc-density)-var(--available-width,100vw))/2),min(0.875rem,14px))]',
   SCROLL_AREA,
   OVERLAY_SURFACE,
   POPUP_MOTION,
@@ -46,12 +46,13 @@ export const DATE_PICKER_SCROLL = [
 export const DATE_PICKER_GRID = 'w-full table-fixed border-collapse'
 export const DATE_PICKER_WEEKDAY = 'pb-1 text-center text-xs font-medium text-muted'
 export const DATE_PICKER_CELL = 'px-0 py-[min(0.125rem,2px)] text-center'
-/** A day: 32 px tall and 44 under a finger, as wide as its column. Selected is a fill, a weight and an inset line at 3:1
+/** A day: a pill at the 24 px floor, 44 under a finger, as wide as its column. Selected is a fill, a weight and an inset line at 3:1
  * on the surface in every mode, where the dark fill alone is 2.88:1; today an underline. */
 export const DATE_PICKER_DAY = [
-  'inline-flex h-control-sm w-full items-center justify-center rounded-control text-sm tabular-nums text-body',
+  'inline-flex w-full items-center justify-center rounded-full align-middle text-xs tabular-nums text-body',
   TARGET_HEIGHT,
   FOCUS_RING,
+  POINTER,
   TRANSITION,
   HOVER.ghost,
   'data-selected:bg-primary-solid data-selected:font-medium data-selected:text-primary-on-solid',

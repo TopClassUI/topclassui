@@ -8,22 +8,30 @@ const CLOSED = ':is(:where(.group\\/sidebar)[data-closed] *) {'
 
 /** What each class Sidebar writes must emit, written out: a class Tailwind does not know emits nothing at all. */
 const DECLARATION: Record<string, string> = {
+  // POINTER: the hand, and the arrow back on a control that cannot be pressed.
+  'disabled:cursor-default': 'cursor: default;',
+  'aria-disabled:cursor-default': 'cursor: default;',
+  'data-disabled:cursor-default': 'cursor: default;',
+  'data-readonly:cursor-default': 'cursor: default;',
+  'data-loading:cursor-default': 'cursor: default;',
   // The rail.
   'flex': 'display: flex;',
   'h-full': 'height: 100%;',
   'shrink-0': 'flex-shrink: 0;',
   'self-start': 'align-self: flex-start;',
   'flex-col': 'flex-direction: column;',
+  'gap-0.5': 'gap: calc(var(--spacing) * 0.5);',
   'gap-1': 'gap: var(--spacing);',
-  'bg-surface': 'background-color: var(--tc-surface);',
-  'p-2.5': 'padding: calc(var(--spacing) * 2.5);',
+  'bg-page': 'background-color: var(--tc-page);',
+  'cursor-pointer': 'cursor: pointer;',
+  'p-2': 'padding: calc(var(--spacing) * 2);',
   'text-body': 'color: var(--tc-body);',
   'border-e-(length:--tc-line-width)': 'border-inline-end-width: var(--tc-line-width);',
   'border-line': 'border-color: var(--tc-line);',
   'data-open:w-55': 'width: calc(var(--spacing) * 55);',
-  'data-closed:w-15': 'width: calc(var(--spacing) * 15);',
-  'pointer-coarse:data-closed:min-w-[calc(var(--tc-target-coarse,44px)+1.25rem+var(--tc-line-width))]':
-    'min-width: calc(var(--tc-target-coarse,44px) + 1.25rem + var(--tc-line-width));',
+  'data-closed:w-13': 'width: calc(var(--spacing) * 13);',
+  'pointer-coarse:data-closed:min-w-[calc(var(--tc-target-coarse,44px)+1rem+var(--tc-line-width))]':
+    'min-width: calc(var(--tc-target-coarse,44px) + 1rem + var(--tc-line-width));',
   'max-w-full': 'max-width: 100%;',
   // The toggle.
   'inline-flex': 'display: inline-flex;',
@@ -68,6 +76,8 @@ const DECLARATION: Record<string, string> = {
   'p-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]': `padding: ${RING_REACH};`,
   'group-data-closed/sidebar:[scrollbar-width:none]': 'scrollbar-width: none;',
   // The label of a group.
+  'px-2': 'padding-inline: calc(var(--spacing) * 2);',
+  'px-2.5': 'padding-inline: calc(var(--spacing) * 2.5);',
   'px-3': 'padding-inline: calc(var(--spacing) * 3);',
   'py-1': 'padding-block: var(--spacing);',
   'text-xs': 'font-size: var(--text-xs);',
@@ -79,12 +89,6 @@ const DECLARATION: Record<string, string> = {
   'text-start': 'text-align: start;',
   'bg-primary-soft': 'background-color: var(--tc-primary-soft);',
   'text-primary-on-soft': 'color: var(--tc-primary-on-soft);',
-  'before:absolute': 'position: absolute;',
-  'before:inset-y-2': 'inset-block: calc(var(--spacing) * 2);',
-  'before:inset-s-1': 'inset-inline-start: var(--spacing);',
-  'before:w-0.75': 'width: calc(var(--spacing) * 0.75);',
-  'before:rounded-full': 'border-radius: calc(infinity * 1px);',
-  'before:bg-current': 'background-color: currentcolor;',
   'forced-colors:forced-color-adjust-none': 'forced-color-adjust: none;',
   'forced-colors:bg-[Highlight]': 'background-color: Highlight;',
   'forced-colors:text-[HighlightText]': 'color: HighlightText;',
@@ -94,8 +98,8 @@ const DECLARATION: Record<string, string> = {
 /** The attribute, the state or the pseudo-element each variant class must be scoped to, or it would paint everywhere. */
 const SCOPE: Record<string, string> = {
   'data-open:w-55': '[data-open] {',
-  'data-closed:w-15': '[data-closed] {',
-  'pointer-coarse:data-closed:min-w-[calc(var(--tc-target-coarse,44px)+1.25rem+var(--tc-line-width))]': '[data-closed] {',
+  'data-closed:w-13': '[data-closed] {',
+  'pointer-coarse:data-closed:min-w-[calc(var(--tc-target-coarse,44px)+1rem+var(--tc-line-width))]': '[data-closed] {',
   'group-data-closed/sidebar:justify-center': CLOSED,
   'group-data-closed/sidebar:sr-only': CLOSED,
   'group-data-closed/sidebar:[scrollbar-width:none]': CLOSED,
@@ -105,12 +109,6 @@ const SCOPE: Record<string, string> = {
   'focus-visible:outline-ring': ':focus-visible {',
   'hover:bg-(--tc-soft)': ':hover {',
   'active:bg-(--tc-soft-hover)': ':active {',
-  'before:absolute': '::before {',
-  'before:inset-y-2': '::before {',
-  'before:inset-s-1': '::before {',
-  'before:w-0.75': '::before {',
-  'before:rounded-full': '::before {',
-  'before:bg-current': '::before {',
 }
 
 const escape = (cls: string) => cls.replace(/[^a-zA-Z0-9_-]/g, '\\$&')
@@ -133,7 +131,7 @@ describe('every class Sidebar writes compiles with the installed Tailwind', () =
 
   it('the table names exactly the classes of classes.ts, and the one that only marks the group', () => {
     expect(written).toEqual([...Object.keys(DECLARATION), 'group/sidebar'].sort())
-    expect(written).toHaveLength(74)
+    expect(written).toHaveLength(77)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

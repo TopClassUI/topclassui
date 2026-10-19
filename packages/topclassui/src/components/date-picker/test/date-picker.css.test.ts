@@ -58,6 +58,12 @@ describe('the box, the trigger and the form input', () => {
     expect(ruleOf(`${selectorOf('data-placeholder:text-muted')}[data-placeholder]`)).toBe('color: var(--tc-muted);')
     expect(ruleOf(selectorOf('sr-only'))).toContain('position: absolute; width: 1px; height: 1px;')
   })
+
+  it('the trigger keeps the ring while the calendar is open, as the frame draws it', () => {
+    expect(ruleOf(`${selectorOf('data-popup-open:outline-ring')}[data-popup-open]`)).toBe('outline-color: var(--tc-ring);')
+    expect(ruleOf(`${selectorOf('data-popup-open:outline-(length:--tc-ring-width)')}[data-popup-open]`)).toBe('outline-style: var(--tw-outline-style); outline-width: var(--tc-ring-width);')
+    expect(DATE_PICKER_TRIGGER.split(' ')).toEqual(expect.arrayContaining(['data-popup-open:outline-solid', 'data-popup-open:outline-offset-(length:--tc-ring-offset)']))
+  })
 })
 
 describe('the popup', () => {
@@ -66,8 +72,8 @@ describe('the popup', () => {
     expect(ruleOf(`${selectorOf('data-anchor-hidden:invisible')}[data-anchor-hidden]`)).toBe('visibility: hidden;')
   })
 
-  it('is 280 px at density 1, never wider or taller than the room Base UI measured, and scrolls as one on a short screen', () => {
-    expect(ruleOf(selectorOf('w-[calc(17.5rem*var(--tc-density))]'))).toBe('width: calc(17.5rem * var(--tc-density));')
+  it('is 268 px at density 1, never wider or taller than the room Base UI measured, and scrolls as one on a short screen', () => {
+    expect(ruleOf(selectorOf('w-[calc(16.75rem*var(--tc-density))]'))).toBe('width: calc(16.75rem * var(--tc-density));')
     expect(ruleOf(selectorOf('max-w-[round(down,var(--available-width),1px)]'))).toBe('max-width: round(down, var(--available-width), 1px);')
     expect(ruleOf(selectorOf('max-h-(--available-height)'))).toBe('max-height: var(--available-height);')
     expect(ruleOf(selectorOf('overscroll-contain'))).toBe('overscroll-behavior: contain;')
@@ -96,8 +102,12 @@ describe('the popup', () => {
 })
 
 describe('a day', () => {
-  it('is 32 px tall, 44 under a finger, and as wide as its column', () => {
-    expect(ruleOf(selectorOf('h-control-sm'))).toBe('height: calc(2rem * var(--tc-density));')
+  it('is a pill at the 24 px floor, 44 under a finger, and as wide as its column', () => {
+    const fine = 'min-h-[var(--tc-target-min,24px)]'
+    expect(ruleOf(selectorOf(fine))).toBe('min-height: var(--tc-target-min,24px);')
+    expect(ruleOf(selectorOf('rounded-full'))).toBe('border-radius: calc(infinity * 1px);')
+    expect(DATE_PICKER_DAY.split(' ')).toEqual(expect.arrayContaining([fine, 'rounded-full', 'text-xs']))
+    expect(DATE_PICKER_DAY.split(' ')).not.toContain('h-control-sm')
     const coarse = 'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]'
     expect(ruleOf(selectorOf(coarse))).toBe('min-height: var(--tc-target-coarse,44px);')
     expect(mediaOf(selectorOf(coarse))).toBe('@media (pointer: coarse)')
@@ -125,11 +135,11 @@ describe('a day', () => {
   })
 
   it('a day is as wide as its column, and the popup gives up side padding to a narrow screen, so a 32 px root leaves two digits room', () => {
-    const side = 'px-[clamp(4px,calc(1rem-(17.5rem*var(--tc-density)-var(--available-width,100vw))/2),min(1rem,16px))]'
-    expect(ruleOf(selectorOf(side))).toBe('padding-inline: clamp(4px, calc(1rem - (17.5rem * var(--tc-density) - var(--available-width,100vw)) / 2), min(1rem, 16px));')
-    expect(ruleOf(selectorOf('py-[min(1rem,16px)]'))).toBe('padding-block: min(1rem, 16px);')
+    const side = 'px-[clamp(4px,calc(0.875rem-(16.75rem*var(--tc-density)-var(--available-width,100vw))/2),min(0.875rem,14px))]'
+    expect(ruleOf(selectorOf(side))).toBe('padding-inline: clamp(4px, calc(0.875rem - (16.75rem * var(--tc-density) - var(--available-width,100vw)) / 2), min(0.875rem, 14px));')
+    expect(ruleOf(selectorOf('py-[min(0.875rem,14px)]'))).toBe('padding-block: min(0.875rem, 14px);')
     expect(ruleOf(selectorOf('py-[min(0.125rem,2px)]'))).toBe('padding-block: min(0.125rem, 2px);')
-    expect(DATE_PICKER_POPUP.split(' ').filter((cls) => /^p[xy]?-/.test(cls))).toEqual(['py-[min(1rem,16px)]', side])
+    expect(DATE_PICKER_POPUP.split(' ').filter((cls) => /^p[xy]?-/.test(cls))).toEqual(['py-[min(0.875rem,14px)]', side])
     expect(DATE_PICKER_CELL.split(' ')).toEqual(['px-0', 'py-[min(0.125rem,2px)]', 'text-center'])
   })
 
@@ -152,6 +162,6 @@ describe('the three buttons of the header', () => {
 
   it('a month button at the range\'s end dims by aria-disabled, never by disabled, which would drop the focus', () => {
     expect(DATE_PICKER_NAV.split(' ')).toEqual(expect.arrayContaining(['aria-disabled:opacity-50', 'aria-disabled:pointer-events-none']))
-    expect(DATE_PICKER_NAV.split(' ').filter((cls) => cls.startsWith('disabled:'))).toEqual([])
+    expect(DATE_PICKER_NAV.split(' ').filter((cls) => /^disabled:(opacity|pointer-events)/.test(cls))).toEqual([])
   })
 })

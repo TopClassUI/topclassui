@@ -19,7 +19,7 @@ export default function Demo() {
           <DialogDescription>This removes the project and every file in it. This cannot be undone.</DialogDescription>
         </DialogBody>
         <DialogFooter>
-          <DialogClose render={<Button variant="outline" size="sm">Cancel</Button>} />
+          <DialogClose render={<Button variant="soft" tone="neutral" size="sm">Cancel</Button>} />
           <DialogClose render={<Button tone="danger" size="sm">Delete</Button>} />
         </DialogFooter>
       </DialogPopup>

@@ -11,6 +11,8 @@ export interface EmptyStateProps
   title?: ReactNode | undefined
   /** Defaults to `labels.state.emptyDescription` only while `title` is unset too; `null` hides it. */
   description?: ReactNode | undefined
+  /** The tight form the previewer's states strip draws: a 24 px icon, half the padding and the next type step down. */
+  compact?: boolean | undefined
   /** The action, which the caller passes as a Button. The component draws none of its own. */
   children?: ReactNode | undefined
   /** The built-in strings. Defaults to English; pass `getLabels(locale).labels` for another. */

@@ -20,7 +20,8 @@ const TRIGGERS: Record<string, string> = {
   'command--long-page': 'Jump to a section',
   'command--playground': 'Search',
   'command--rtl': 'بحث',
-  'command--states': 'Open',
+  // No trigger: its palette opens by Ctrl K alone, which its closed cell draws (tests of its own below).
+  'command--states': '',
   'command--ten-thousand': 'Ten thousand commands',
   'command--thousand': 'A thousand commands',
   'command--with-shortcuts': 'Commands with shortcuts',
@@ -338,15 +339,15 @@ test.describe('ten thousand rows, windowed', () => {
     await page.mouse.move(list.left + 60, list.top + 60)
     const steps: string[] = []
     for (let turn = 0; turn < 10; turn++) {
-      await page.mouse.wheel(0, 40)
-      await expect.poll(() => listOf(page).evaluate((el) => Math.round(el.scrollTop))).toBe(40 * (turn + 1))
+      await page.mouse.wheel(0, 32)
+      await expect.poll(() => listOf(page).evaluate((el) => Math.round(el.scrollTop))).toBe(32 * (turn + 1))
       steps.push(await listOf(page).evaluate((el) => {
         const top = el.getBoundingClientRect().top
         const row = [...el.querySelectorAll('[role="option"]')].find((option) => option.getBoundingClientRect().bottom > top + 6)
         return `${String(el.scrollHeight)} ${String((row?.getBoundingClientRect().top ?? 0) - top)}`
       }))
     }
-    expect(new Set(steps)).toEqual(new Set(['400012 6']))
+    expect(new Set(steps)).toEqual(new Set(['320012 6']))
   })
 
   test('the frame time while the wheel runs through the list, and the time a key takes to filter ten thousand', async ({ page }) => {
@@ -423,7 +424,7 @@ test.describe('ten thousand rows, windowed', () => {
       const before = await scrollY(page)
       await openOverlay(page, triggerOf(page, 'Jump to a section'), { by: 'tap' })
       const list = await boxOf(listOf(page))
-      for (let drag = 0; drag < 12; drag++) await touchDrag(page, list.left + 60, list.bottom - 20, list.top + 20)
+      for (let drag = 0; drag < 16; drag++) await touchDrag(page, list.left + 60, list.bottom - 20, list.top + 20)
       const last = await boxOf(page.getByRole('option', { name: 'Go to section 60' }))
       expect(last.bottom).toBeLessThanOrEqual(list.bottom + 0.5)
       expect(await scrollY(page)).toBe(before)
@@ -559,7 +560,7 @@ for (const scheme of ['light', 'dark'] as const) {
   test.describe(`forced colours, ${scheme} palette`, () => {
     test.use({ forcedColors: 'active', colorScheme: scheme })
 
-    test('the popup keeps a line against the page, and the active row is a frame as well as a fill', async ({ page }) => {
+    test('the popup keeps a line against the page, and the active row is a bar as well as a fill', async ({ page }) => {
       const popup = await open(page, 'command--basic')
       await page.keyboard.type('but')
       const canvas = FORCED_CANVAS[scheme]
@@ -569,9 +570,13 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(inkOn(edge, canvas), 'pixels of line at 3:1 along the start edge').toBeGreaterThanOrEqual(along)
 
       const active = page.locator('[role="option"][data-highlighted]')
+      // DECISIONS 2026-10-19: the bar at the inline start of the row, no longer a ring around it.
       const look = await active.evaluate((row) => {
-        const style = getComputedStyle(row)
-        return { outline: style.outlineStyle, width: style.outlineWidth, fill: style.backgroundColor, line: style.outlineColor }
+        const bar = getComputedStyle(row, '::before')
+        return {
+          outline: bar.borderInlineStartStyle, width: bar.borderInlineStartWidth, fill: getComputedStyle(row).backgroundColor,
+          line: bar.borderInlineStartColor,
+        }
       })
       expect(look.outline).toBe('solid')
       expect(look.width).toBe('2px')
@@ -586,7 +591,7 @@ for (const scheme of ['light', 'dark'] as const) {
         return colour
       })
       expect(look.line).toBe(highlightText)
-      const rest = await page.locator('[role="option"]:not([data-highlighted])').first().evaluate((row) => getComputedStyle(row).outlineStyle)
+      const rest = await page.locator('[role="option"]:not([data-highlighted])').first().evaluate((row) => getComputedStyle(row, '::before').display)
       expect(rest).toBe('none')
       // The line is drawn: the frame inside the active row, in HighlightText on Highlight.
       const box = await boxOf(active)
@@ -611,7 +616,7 @@ test.describe('motion', () => {
 })
 
 test.describe('text zoom and text spacing', () => {
-  test('at a 32 px root on a phone: rows of 80 px, the palette fits, and the last of ten thousand still lands whole', async ({ page }) => {
+  test('at a 32 px root on a phone: rows of 64 px, the palette fits, and the last of ten thousand still lands whole', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     await openLive(page, 'command--ten-thousand')
     await page.addStyleTag({ content: 'html { font-size: 32px !important; }' })
@@ -619,7 +624,7 @@ test.describe('text zoom and text spacing', () => {
     await expectInsideViewport(popup, 'the popup', 15.5)
     await nothingSideways(popup)
     await expectNoSidewaysScroll(page)
-    expect((await boxOf(page.getByRole('option').first())).height).toBe(80)
+    expect((await boxOf(page.getByRole('option').first())).height).toBe(64)
     await page.keyboard.press('ArrowDown')
     await page.keyboard.press('ArrowUp')
     await expect.poll(() => activeOf(page)).toMatchObject({ text: 'Pin page 10000', whole: true })
@@ -686,5 +691,29 @@ test.describe('axe on the open palette, on a 320 x 480 phone', () => {
       if (query !== '') await page.keyboard.type(query)
       expect((await axe(page)).violations).toEqual([])
     })
+  }
+})
+
+test.describe('the states demo, as the Every state strip draws it', () => {
+  for (const mode of MODES) {
+    for (const direction of DIRECTIONS) {
+      test(`${mode} ${direction}: six cells, each captioned, five of them pictures a reader never meets; Ctrl K opens the real palette with no violation`, async ({ page }) => {
+        await openLive(page, 'command--states', { mode, direction })
+        const cells = page.locator('#demo [title="closed"]').locator('xpath=..').locator(':scope > *')
+        expect(await cells.evaluateAll((all) => all.map((cell) => cell.getAttribute('title')))).toEqual([
+          'closed', 'open', 'typing', 'empty', 'loading', 'selected',
+        ])
+        await expect(page.locator('#demo [aria-hidden="true"]:not(svg)')).toHaveCount(5)
+        await expect(page.locator('#demo [data-highlighted]')).toHaveCount(2)
+        expect((await axe(page)).violations).toEqual([])
+        await page.keyboard.press('ControlOrMeta+k')
+        const popup = page.locator('[role="dialog"][data-open]')
+        await expect(popup).toBeVisible()
+        await expect(inputOf(page)).toBeFocused()
+        expect((await axe(page)).violations).toEqual([])
+        await page.keyboard.press('Escape')
+        await expectClosed(page)
+      })
+    }
   }
 })

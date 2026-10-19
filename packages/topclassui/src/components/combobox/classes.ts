@@ -10,12 +10,17 @@ export const COMBOBOX_ROOT = 'relative inline-block max-w-full align-middle'
 /** The width of the box: an Input's, or its parent's with fullWidth. */
 export const COMBOBOX_WIDTH = { own: FIELD_OWN_WIDTH, full: 'w-full' } as const
 
-export const COMBOBOX_INPUT = `w-full ${FIELD_BOX} data-readonly:bg-neutral-soft`
+export const COMBOBOX_INPUT = `peer w-full ${FIELD_BOX}`
 
-/** Merged after the size: it replaces the end padding of the size, to keep the text clear of the caret. */
+/** Merged after the size: they replace its inline padding, to keep the text clear of the glass and the spinner. */
+export const COMBOBOX_INPUT_START = 'ps-9'
 export const COMBOBOX_INPUT_END = 'pe-9'
 
-export const COMBOBOX_ICON = 'pointer-events-none absolute inset-y-0 inset-e-3 flex items-center text-muted'
+/** The magnifying glass at the inline start, as the frame draws a search field. It dims with a disabled input. */
+export const COMBOBOX_SEARCH = 'pointer-events-none absolute inset-y-0 inset-s-3 flex items-center text-muted peer-disabled:opacity-50'
+
+/** The spinner at the inline end while a page loads. */
+export const COMBOBOX_ICON = 'pointer-events-none absolute inset-y-0 inset-e-3 flex items-center text-muted peer-disabled:opacity-50'
 
 export const COMBOBOX_SPIN = 'flex animate-spin motion-reduce:animate-none'
 
@@ -33,7 +38,7 @@ export const COMBOBOX_UNIT = 'h-(--tc-row-height)'
 /** The active row: a fill, and a line inside its edge, since the fill alone is under 3:1 against the popup. */
 export const COMBOBOX_ACTIVE = 'data-highlighted:outline-solid data-highlighted:outline-(length:--tc-ring-width) data-highlighted:-outline-offset-(length:--tc-ring-width) data-highlighted:outline-primary-on-soft forced-colors:data-highlighted:outline-[HighlightText]'
 
-export const COMBOBOX_ITEM = `shrink-0 cursor-default select-none ${ROW} ${ROW_HIGHLIGHT} ${ROW_TOUCH} ${ROW_SELECTED} ${COMBOBOX_UNIT} ${COMBOBOX_ACTIVE} ${DISABLED}`
+export const COMBOBOX_ITEM = `shrink-0 select-none ${ROW} ${ROW_HIGHLIGHT} ${ROW_TOUCH} ${ROW_SELECTED} ${COMBOBOX_UNIT} ${COMBOBOX_ACTIVE} ${DISABLED}`
 
 export const COMBOBOX_ITEM_TEXT = `${LABEL} flex-1`
 

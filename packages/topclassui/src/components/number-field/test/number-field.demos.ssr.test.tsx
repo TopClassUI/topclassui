@@ -22,7 +22,7 @@ const FIELDS: Record<string, string[]> = {
   row: ['Adults: 2', 'Children: 0'],
   rtl: ['الفرق: ‎-5', 'عدد الضيوف: ١٬٢٣٤٫٥'],
   sizes: ['Extra small: 12', 'Small: 12', 'Medium: 12', 'Large: 12', 'Extra large: 12'],
-  states: ['Empty: ', 'Invalid: 12', 'Disabled: 12', 'Read-only: 12'],
+  states: ['Empty: ', 'Invalid: 12', 'Disabled: 12', 'Read-only: 12', 'At the limit: 99'],
 }
 
 const render = async (file: string) => {
@@ -85,8 +85,8 @@ describe('the demos the plan names', () => {
     expect(html).toMatch(/<input type="number"[^>]* step="0.5"/)
   })
 
-  it('row: two fields side by side, in tracks of 6.5rem at least, so at 200% text the second goes under the first', async () => {
-    expect(await render('row')).toMatch(/^<div class="grid grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,6\.5rem\),max-content\)\)\] gap-2">/)
+  it('row: two fields side by side, in tracks of 8.5rem at least, so at 200% text or under a finger the second goes under the first', async () => {
+    expect(await render('row')).toMatch(/^<div class="grid grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,8\.5rem\),max-content\)\)\] gap-2">/)
   })
 
   it('rtl: an island that carries the direction and the language', async () => {

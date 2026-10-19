@@ -1,6 +1,7 @@
 import type { ComponentPropsWithRef, ReactElement } from 'react'
 
 import type { Labels } from '#shared/labels/types.js'
+import type { BreadcrumbSchemaInput } from './schema.js'
 
 /** One step of the trail. */
 export interface BreadcrumbItem {
@@ -10,15 +11,22 @@ export interface BreadcrumbItem {
   label: string
 }
 
+// R-8.3-4: derived from the schema, so the props and the validation cannot drift apart.
+export type BreadcrumbDesignProps = {
+  [K in keyof BreadcrumbSchemaInput]?: BreadcrumbSchemaInput[K] | undefined
+}
+
 /** The trail is `items`, so the nav takes no children of its own. */
 export interface BreadcrumbProps
-  extends Omit<ComponentPropsWithRef<'nav'>, 'children' | 'dangerouslySetInnerHTML'> {
-  /** The trail as `{ href?, label }`, root first. An item with an `href` is a link and joins the JSON-LD; the last one without is the current page. */
+  extends Omit<ComponentPropsWithRef<'nav'>, 'children' | 'dangerouslySetInnerHTML'>, BreadcrumbDesignProps {
+  /** The trail as `{ href?, label }`, root first. An item with an `href` is a link; the last one without is the current page. */
   items: readonly BreadcrumbItem[]
   /** The element every crumb link is cloned from, such as `link={<Link href="" />}`; its href is replaced with the item's. */
   link?: ReactElement | undefined
-  /** The address of the site, such as `https://example.com`: the JSON-LD then lists absolute URLs. The links stay as written. */
-  baseUrl?: string | undefined
+  /** Draw the first crumb as a house icon; its label is still read by a screen reader. */
+  showHome?: boolean | undefined
+  /** Fold a longer trail to the first crumb, three dots and the last `maxItems - 1`; clamped to 2..100. The JSON-LD keeps every crumb. */
+  maxItems?: number | undefined
   /** The built-in strings; the nav is named by `labels.breadcrumb.label`. Defaults to English. */
   labels?: Labels | undefined
   /** Accepted so `{...getLabels(locale)}` spreads cleanly. Nothing here formats a number, so it is not used and never reaches the element. */

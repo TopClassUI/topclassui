@@ -14,6 +14,8 @@ export interface StepperItem {
   title: ReactNode
   /** Wins over the status worked out from `value`. `error` draws an x and is read as needing attention. */
   status?: StepperStatus | undefined
+  /** Drawn at half strength, as a step the user cannot reach yet. It changes the look only: nothing here takes focus. */
+  disabled?: boolean | undefined
 }
 
 // R-8.3-4: derived from the schema, so the props and the validation cannot drift apart.

@@ -46,11 +46,11 @@ describe('the track', () => {
     const widths = Object.fromEntries(Object.entries(SWITCH_TRACK_SIZE).filter(([size]) => size !== 'custom')
       .map(([size, classes]) => [size, classes.split(' ').map((cls) => ruleOf(selectorOf(cls)))]))
     expect(widths).toEqual({
-      xs: ['height: calc(0.875rem * var(--tc-density));', 'width: calc(1.53125rem * var(--tc-density));'],
-      sm: ['height: calc(1rem * var(--tc-density));', 'width: calc(1.75rem * var(--tc-density));'],
-      md: ['height: calc(1.25rem * var(--tc-density));', 'width: calc(2.1875rem * var(--tc-density));'],
-      lg: ['height: calc(1.5rem * var(--tc-density));', 'width: calc(2.625rem * var(--tc-density));'],
-      xl: ['height: calc(1.75rem * var(--tc-density));', 'width: calc(3.0625rem * var(--tc-density));'],
+      xs: ['height: calc(1rem * var(--tc-density));', 'width: calc(1.75rem * var(--tc-density));'],
+      sm: ['height: calc(1.25rem * var(--tc-density));', 'width: calc(2.1875rem * var(--tc-density));'],
+      md: ['height: calc(1.5rem * var(--tc-density));', 'width: calc(2.625rem * var(--tc-density));'],
+      lg: ['height: calc(1.75rem * var(--tc-density));', 'width: calc(3.0625rem * var(--tc-density));'],
+      xl: ['height: calc(2rem * var(--tc-density));', 'width: calc(3.5rem * var(--tc-density));'],
     })
     expect(SWITCH_TRACK_SIZE.custom).toBe('@container')
     expect(ruleOf(selectorOf('@container'))).toBe('container-type: inline-size;')
@@ -73,7 +73,7 @@ describe('the thumb', () => {
     const slides = Object.fromEntries(Object.entries(SWITCH_SLIDE).filter(([size]) => size !== 'custom')
       .map(([size, cls]) => [size, ruleOf(`${selectorOf(cls)}${CHECKED}`)]))
     const step = (rem: string) => `--tw-translate-x: calc(${rem}rem * var(--tc-density) * var(--tc-dir)); translate: var(--tw-translate-x) var(--tw-translate-y);`
-    expect(slides).toEqual({ xs: step('0.65625'), sm: step('0.75'), md: step('0.9375'), lg: step('1.125'), xl: step('1.3125') })
+    expect(slides).toEqual({ xs: step('0.75'), sm: step('0.9375'), md: step('1.125'), lg: step('1.3125'), xl: step('1.5') })
     // Custom has no size to subtract: the track's inside (100cqw) less the thumb's own width (100%).
     expect(ruleOf(`${selectorOf(SWITCH_SLIDE.custom)}${CHECKED}`))
       .toBe('--tw-translate-x: calc((100cqw - 100%) * var(--tc-dir)); translate: var(--tw-translate-x) var(--tw-translate-y);')

@@ -4,7 +4,7 @@ import { TOGGLE_BOX, TOGGLE_INVALID, TOGGLE_ON, TOGGLE_SIZE, TOGGLE_TARGET } fro
 /** The button that takes the press: 24 px, 44 under a coarse pointer, whatever size the box is. */
 export const CHECKBOX_ROOT = TOGGLE_TARGET
 
-/** The square sizes of the toggle scale: 14, 16, 20, 24 and 28 px. */
+/** The square sizes of the toggle scale: 16, 20, 24, 28 and 32 px. */
 export const CHECKBOX_SIZE = TOGGLE_SIZE
 
 /** Indeterminate is filled as checked is, forced colours too: Base UI then sets neither data-checked nor data-unchecked. */

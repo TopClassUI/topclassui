@@ -18,7 +18,7 @@ export default function Demo() {
         <NavbarLink href="/changelog">Changelog</NavbarLink>
       </NavbarLinks>
       <NavbarActions>
-        <Button variant="ghost" aria-label="GitHub" render={<a href="https://github.com/TopClassUI/topclassui" />}>
+        <Button variant="ghost" aria-label="GitHub" render={<a href="https://github.com/TopClassUI/topclassui" rel="noopener noreferrer" />}>
           <Svg icon={githubLogo} />
         </Button>
         <Button render={<a href="/login" />}>Sign in</Button>

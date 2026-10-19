@@ -12,5 +12,6 @@ export const PAGINATION_DEFAULTS = {
   siblingCount: 1,
   boundaryCount: 1,
   size: DEFAULT_SIZE,
+  disabled: false,
   locale: 'en',
 } as const

@@ -2,8 +2,9 @@
 import { useId } from 'react'
 
 import { Svg } from '#components/svg/index.js'
+import { tray } from '#icons/data/tray.js'
 import { clamp } from '#shared/clamp.js'
-import { BORDER, FOCUS_RING } from '#shared/classes.js'
+import { FOCUS_RING } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
 import { COLLECTION_BOUNDARIES } from '#shared/contracts/collection.js'
 import { en } from '#shared/labels/en.js'
@@ -11,11 +12,11 @@ import { renderLink } from '#shared/link.js'
 // Named here as well, so a consumer program that never compiles shared/ gets the --tc-* keys.
 import type {} from '#shared/style-tokens.js'
 import {
-  BODY_CELL, BOX, BOX_CAP, CAPTION, CELL_ALIGN, EMPTY_CELL, EMPTY_WORDS, FOCUS_ROOM, HEAD, HEADER_CELL, HEADER_LABEL,
-  LINK_ALIGN, ROW_HEADER, SORT_LINK, STICKY_BOX, STICKY_CELL,
+  BODY_CELL, BOX, BOX_CAP, BOX_VARIANT, CAPTION, CELL_ALIGN, CELL_DENSITY, EMPTY_CELL, EMPTY_ICON, EMPTY_WORDS, FOCUS_ROOM,
+  HEAD, HEADER_CELL, HEADER_LABEL, LINK_ALIGN, ROW_HEADER, SORT_ICON, SORT_IDLE, SORT_LINK, STICKY_BOX, STICKY_CELL,
 } from './classes.js'
 import { TableRows } from './client.js'
-import { SORT_ICONS, SORT_LABELS, TABLE_COLUMN_DEFAULTS, TABLE_DEFAULTS } from './constants.js'
+import { SORT_ICONS, SORT_ICON_SIZE, SORT_IDLE_ICON, SORT_LABELS, TABLE_COLUMN_DEFAULTS, TABLE_DEFAULTS } from './constants.js'
 import { columnsOf, directionOf } from './lib.js'
 import type { TableCaption, TableCellMeta, TableProps } from './types.js'
 
@@ -30,6 +31,9 @@ export function Table<T, Caption extends TableCaption = TableCaption>({
   caption,
   captionVisible = TABLE_DEFAULTS.captionVisible,
   sort,
+  selectedKeys,
+  density = TABLE_DEFAULTS.density,
+  variant = TABLE_DEFAULTS.variant,
   striped = TABLE_DEFAULTS.striped,
   stickyFirstColumn = TABLE_DEFAULTS.stickyFirstColumn,
   emptyFallback,
@@ -53,7 +57,7 @@ export function Table<T, Caption extends TableCaption = TableCaption>({
   const cells = shown.map((column, index): TableCellMeta => ({
     key: column.key,
     rowHeader: column.rowHeader === true,
-    className: cn(BODY_CELL, column.rowHeader && ROW_HEADER, CELL_ALIGN[column.align ?? TABLE_COLUMN_DEFAULTS.align], sticks(index) && STICKY_CELL),
+    className: cn(BODY_CELL, CELL_DENSITY[density].body, column.rowHeader && ROW_HEADER, CELL_ALIGN[column.align ?? TABLE_COLUMN_DEFAULTS.align], sticks(index) && STICKY_CELL),
     sticky: sticks(index),
     own: column.className,
   }))
@@ -68,11 +72,13 @@ export function Table<T, Caption extends TableCaption = TableCaption>({
       aria-labelledby={captionId}
       aria-label={undefined}
       tabIndex={shown.length === 0 ? undefined : 0}
+      data-density={density}
+      data-variant={variant}
       data-striped={striped ? '' : undefined}
       data-sticky-first-column={stickyFirstColumn ? '' : undefined}
       data-empty={empty ? '' : undefined}
       style={{ ...rest.style, '--tc-list-rows': rows }}
-      className={cn(BOX, BOX_CAP[captionVisible ? 'visible' : 'hidden'], FOCUS_ROOM, BORDER, FOCUS_RING, stickyFirstColumn && STICKY_BOX, className)}
+      className={cn(BOX, BOX_CAP[density][captionVisible ? 'visible' : 'hidden'], FOCUS_ROOM, BOX_VARIANT[variant], FOCUS_RING, stickyFirstColumn && STICKY_BOX, className)}
     >
       {/* border-separate: under border-collapse the table paints the lines, and a sticky cell leaves its own behind. */}
       {/* ARIA: -1 while more pages may come, as the count of rows is not known yet. */}
@@ -84,9 +90,11 @@ export function Table<T, Caption extends TableCaption = TableCaption>({
               const align = column.align ?? TABLE_COLUMN_DEFAULTS.align
               const direction = directionOf(sort, column.key)
               const headerId = `${captionId}-h${String(index)}`
-              // aria-sort is not read out everywhere, so the caret carries the same words.
-              const caret = direction === undefined ? null : (
-                <Svg icon={SORT_ICONS[direction]} label={labels.table[SORT_LABELS[direction]]} flipRtl={false} className="ms-1" />
+              // aria-sort is not read out everywhere, so the mark carries the same words; the idle pair says nothing new.
+              const caret = direction === undefined ? column.sortHref === undefined ? null : (
+                <Svg icon={SORT_IDLE_ICON} size={SORT_ICON_SIZE} flipRtl={false} className={SORT_IDLE} />
+              ) : (
+                <Svg icon={SORT_ICONS[direction]} size={SORT_ICON_SIZE} label={labels.table[SORT_LABELS[direction]]} flipRtl={false} className={SORT_ICON} />
               )
               // A header is read out with every cell under it, so "Sort by" and the caret stay out of its name.
               const plain = column.sortHref === undefined && direction === undefined
@@ -97,7 +105,7 @@ export function Table<T, Caption extends TableCaption = TableCaption>({
                   scope="col"
                   aria-sort={direction}
                   aria-labelledby={plain ? undefined : headerId}
-                  className={cn(HEADER_CELL, CELL_ALIGN[align], sticks(index) && STICKY_CELL, column.className)}
+                  className={cn(HEADER_CELL, CELL_DENSITY[density].header, CELL_ALIGN[align], sticks(index) && STICKY_CELL, column.className)}
                 >
                   {column.sortHref === undefined ? <>{header}{caret}</> : renderLink('Table', link, column.sortHref, {
                     className: cn(SORT_LINK, LINK_ALIGN[align]),
@@ -118,13 +126,19 @@ export function Table<T, Caption extends TableCaption = TableCaption>({
           <tbody>
             <tr>
               <td colSpan={Math.max(shown.length, 1)} className={EMPTY_CELL}>
-                <div className={EMPTY_WORDS}>{emptyFallback ?? labels.state.empty}</div>
+                <div className={EMPTY_WORDS}>
+                  <Svg icon={tray} size={22} className={EMPTY_ICON} />
+                  <span>{emptyFallback ?? labels.state.empty}</span>
+                </div>
               </td>
             </tr>
           </tbody>
         ) : (
           <TableRows
-            rows={items.map((item) => ({ key: getKey(item), cells: shown.map((column) => column.cell(item)) }))}
+            rows={items.map((item) => {
+              const key = getKey(item)
+              return { key, cells: shown.map((column) => column.cell(item)), selected: selectedKeys?.includes(key) === true }
+            })}
             columns={cells}
             striped={striped}
             visibleRows={rows}

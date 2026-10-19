@@ -31,6 +31,18 @@
 /* Chromium only knows the prefixed value; the parent's side, whatever the element's own dir. */
 @utility text-match-parent { text-align: -webkit-match-parent; text-align: match-parent; }
 
+/* Pagination's compact row: a narrow nav or a finger keeps first, previous, "3 of 12", next and last. */
+/* Important, or a gap's own inline-flex, emitted later in the same layer, keeps it on screen. */
+@utility pagination-full {
+  @container pagination (width < 36rem) { display: none !important; }
+  @media (pointer: coarse) { display: none !important; }
+}
+@utility pagination-compact {
+  display: none;
+  @container pagination (width < 36rem) { display: flex; }
+  @media (pointer: coarse) { display: flex; }
+}
+
 /* A tone swaps the five interaction variables, so the hover classes never change. */
 @utility tone-primary {
   --tc-soft: var(--tc-primary-soft);
@@ -118,11 +130,17 @@
   --spacing-control-lg: calc(3rem * var(--tc-density));
   --spacing-control-xl: calc(3.5rem * var(--tc-density));
 
-  --spacing-toggle-xs: calc(0.875rem * var(--tc-density));
-  --spacing-toggle-sm: calc(1rem * var(--tc-density));
-  --spacing-toggle-md: calc(1.25rem * var(--tc-density));
-  --spacing-toggle-lg: calc(1.5rem * var(--tc-density));
-  --spacing-toggle-xl: calc(1.75rem * var(--tc-density));
+  --spacing-toggle-xs: calc(1rem * var(--tc-density));
+  --spacing-toggle-sm: calc(1.25rem * var(--tc-density));
+  --spacing-toggle-md: calc(1.5rem * var(--tc-density));
+  --spacing-toggle-lg: calc(1.75rem * var(--tc-density));
+  --spacing-toggle-xl: calc(2rem * var(--tc-density));
+
+  --spacing-knob-xs: calc(0.875rem * var(--tc-density));
+  --spacing-knob-sm: calc(1rem * var(--tc-density));
+  --spacing-knob-md: calc(1.25rem * var(--tc-density));
+  --spacing-knob-lg: calc(1.5rem * var(--tc-density));
+  --spacing-knob-xl: calc(1.75rem * var(--tc-density));
 
   --spacing-icon-xs: 1rem;
   --spacing-icon-sm: 1.25rem;

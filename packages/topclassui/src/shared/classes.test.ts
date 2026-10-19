@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { SIZES } from './contracts/size.js'
 import {
   BORDER, BORDER_STRONG, BORDER_WIDTH, CONTROL_HEIGHT, CONTROL_SIZE, DISABLED, FOCUS_RING,
-  FORCED_EDGE, HOVER, LOADING, TOGGLE_BOX, TOGGLE_INVALID, TOGGLE_ON, TOGGLE_RING, TOGGLE_SIZE, TOGGLE_TARGET,
+  FORCED_EDGE, HOVER, KNOB_SIZE, LOADING, TOGGLE_BOX, TOGGLE_INVALID, TOGGLE_ON, TOGGLE_RING, TOGGLE_SIZE, TOGGLE_TARGET,
   TOUCH_TARGET, TRANSITION,
 } from './classes.js'
 
@@ -78,7 +78,7 @@ describe('the size maps cover the scale and read the knobs', () => {
   const real = SIZES.filter((s) => s !== 'custom')
 
   it('names every size, and only custom emits nothing', () => {
-    for (const map of [CONTROL_SIZE, CONTROL_HEIGHT, TOGGLE_SIZE]) {
+    for (const map of [CONTROL_SIZE, CONTROL_HEIGHT, TOGGLE_SIZE, KNOB_SIZE]) {
       expect(Object.keys(map).sort()).toEqual([...SIZES].sort())
       expect(map.custom).toBe('')
     }
@@ -94,6 +94,10 @@ describe('the size maps cover the scale and read the knobs', () => {
   for (const size of real) {
     it(`${size} is the square toggle box of its own name`, () => {
       expect(TOGGLE_SIZE[size]).toBe(`size-toggle-${size}`)
+    })
+
+    it(`${size} is the slider knob of its own name`, () => {
+      expect(KNOB_SIZE[size]).toBe(`size-knob-${size}`)
     })
 
     it(`${size} carries the type step the scale names for it`, () => {

@@ -38,10 +38,10 @@ describe('a class that only applies under a query sits inside it', () => {
     ])
   })
 
-  it('the 44 px floors and the 65 px of a collapsed rail sit inside the coarse-pointer query, so a mouse keeps 24 and 60 px', async () => {
+  it('the 44 px floors and the 61 px of a collapsed rail sit inside the coarse-pointer query, so a mouse keeps 24 and 52 px', async () => {
     const sheet = await css
     expect(WRITTEN.filter((cls) => queryOf(sheet, cls) === '@media (pointer: coarse)').sort()).toEqual([
-      'pointer-coarse:data-closed:min-w-[calc(var(--tc-target-coarse,44px)+1.25rem+var(--tc-line-width))]',
+      'pointer-coarse:data-closed:min-w-[calc(var(--tc-target-coarse,44px)+1rem+var(--tc-line-width))]',
       'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]', 'pointer-coarse:min-w-[var(--tc-target-coarse,44px)]',
     ])
   })
@@ -66,7 +66,7 @@ describe('the order the cascade needs', () => {
     expect(at(sheet, later), `${later} must come after ${earlier}`).toBeGreaterThan(at(sheet, earlier))
   }
 
-  it('under a finger the 44 px floor of a row comes after the 40 px of its height, and after the 24 px floor', async () => {
+  it('under a finger the 44 px floor of a row comes after the 32 px of its height, and after the 24 px floor', async () => {
     await follows('pointer-coarse:min-h-[var(--tc-target-coarse,44px)]', 'min-h-(--tc-row-height)')
     await follows('pointer-coarse:min-h-[var(--tc-target-coarse,44px)]', 'min-h-[var(--tc-target-min,24px)]')
     await follows('pointer-coarse:min-w-[var(--tc-target-coarse,44px)]', 'min-w-[var(--tc-target-min,24px)]')
@@ -108,14 +108,14 @@ describe('what a collapsed rail overrides, it overrides by weight and not by ord
 
   it('the two widths are one class and one attribute each, so a width the caller writes for one state leaves the other', async () => {
     expect(await selectorOf('data-open:w-55')).toBe('.data-open\\:w-55[data-open]')
-    expect(await selectorOf('data-closed:w-15')).toBe('.data-closed\\:w-15[data-closed]')
+    expect(await selectorOf('data-closed:w-13')).toBe('.data-closed\\:w-13[data-closed]')
   })
 })
 
 describe('the tokens Sidebar reads are declared, with the values the measurements were taken at', () => {
-  it('a row is 2.5rem tall times the density, a target 24 px and 44 under a finger', async () => {
+  it('a row is 2rem tall times the density, a target 24 px and 44 under a finger', async () => {
     const sheet = await css
-    expect(sheet).toContain('--tc-row-height: calc(2.5rem * var(--tc-density));')
+    expect(sheet).toContain('--tc-row-height: calc(2rem * var(--tc-density));')
     expect(sheet).toContain('--tc-target-min: 24px;')
     expect(sheet).toContain('--tc-target-coarse: 44px;')
   })

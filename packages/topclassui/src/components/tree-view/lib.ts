@@ -1,5 +1,12 @@
 // R-5.12-1: the pure helpers of the hook, with no React in them.
-import type { TreeKeyAction, TreeNode, TreeRow } from './types.js'
+import type { TreeKeyAction, TreeNode, TreeNoteKind, TreeRow, TreeViewStatus } from './types.js'
+
+/** The built-in look only when the caller passed no fallback of their own for that status. */
+export function noteKindOf(status: TreeViewStatus, loadingFallback: unknown, emptyFallback: unknown): TreeNoteKind {
+  if (status === 'loading') return loadingFallback === undefined ? 'loading' : 'own'
+  if (status === 'empty') return emptyFallback === undefined ? 'empty' : 'own'
+  return status
+}
 
 /** The visible rows in order: a node, then its children when it is an open branch. Iterative, so depth costs no stack. */
 export function flattenTree(items: readonly TreeNode[], expanded: readonly string[]): TreeRow[] {

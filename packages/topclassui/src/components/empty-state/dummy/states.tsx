@@ -4,29 +4,31 @@ import { Svg } from '#components/svg/index.js'
 import { Button } from '#components/button/index.js'
 import { EmptyState } from '../index.js'
 
-/** Every state EmptyState draws: the defaults, a title alone, an action, the error and the filtered cell. */
+/** Every state the strip draws, one cell each, captioned by its name: default, filtered, error and compact. A group
+ * role, so the caption is a name the element may carry. */
 export default function Demo() {
   return (
-    <div className="grid gap-6 sm:grid-cols-2">
-      <EmptyState />
-      <EmptyState icon={null} title="Title only" />
-      <EmptyState title="With action" description="The action is the caller's own Button.">
-        <Button size="sm">New project</Button>
+    <div className="grid items-start gap-6 sm:grid-cols-2">
+      <EmptyState role="group" aria-label="default" />
+      <EmptyState
+        role="group"
+        aria-label="filtered"
+        icon={<Svg icon={magnifyingGlass} size="xl" className="text-muted" />}
+        title="No matches"
+        description="Nothing matches that search."
+      >
+        <Button size="sm" variant="outline">Clear filters</Button>
       </EmptyState>
       <EmptyState
+        role="group"
+        aria-label="error"
         icon={<Svg icon={warningCircle} size="xl" className="text-danger-on-soft" />}
         title="Failed"
         description="Check your connection, then try again."
       >
         <Button size="sm" variant="outline">Try again</Button>
       </EmptyState>
-      <EmptyState
-        icon={<Svg icon={magnifyingGlass} size="xl" className="text-muted" />}
-        title="Filtered"
-        description="Nothing matches that search."
-      >
-        <Button size="sm" variant="outline">Clear filters</Button>
-      </EmptyState>
+      <EmptyState role="group" aria-label="compact" compact />
     </div>
   )
 }

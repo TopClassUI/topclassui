@@ -11,14 +11,16 @@ describe('a row of a list of options', () => {
     expect(list(ROW_TOUCH)).toEqual(['pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]'])
   })
 
-  it('marks the chosen row by weight, on the attribute Base UI sets on a selected item', () => {
-    expect(list(ROW_SELECTED)).toEqual(['data-selected:font-medium'])
+  it('marks the chosen row by its tint, on the attribute Base UI sets on a selected item', () => {
+    expect(list(ROW_SELECTED)).toEqual([
+      'data-selected:bg-primary-soft', 'data-selected:text-primary-on-soft', 'forced-colors:data-selected:not-data-highlighted:bg-transparent',
+    ])
   })
 
   it('keeps the row height and the coarse floor side by side when cn() merges them, since one is behind a pointer query', () => {
     expect(list(cn(ROW, ROW_HIGHLIGHT, ROW_SELECTED, ROW_TOUCH))).toEqual(expect.arrayContaining([
       'min-h-(--tc-row-height)', 'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]',
-      'data-highlighted:bg-primary-soft', 'data-selected:font-medium', 'text-sm',
+      'data-highlighted:bg-primary-soft', 'data-selected:bg-primary-soft', 'text-sm',
     ]))
   })
 })

@@ -1,6 +1,6 @@
 import { Textarea } from '../index.js'
 
-/** The states a server can render; hover and focus-visible are live in the browser. */
+/** The states a server can render, one per child, then at its limit; hover and focus-visible are live in the browser. */
 export default function Demo() {
   return (
     <div className="grid max-w-sm gap-3">
@@ -10,6 +10,7 @@ export default function Demo() {
       <Textarea fullWidth disabled defaultValue="Sent on Monday" aria-label="Disabled" />
       <Textarea fullWidth readOnly defaultValue="Kept as it was sent" aria-label="Read-only" />
       <Textarea fullWidth required placeholder="Required" aria-label="Required" />
+      <Textarea fullWidth showCount maxLength={12} defaultValue="Twelve chars" aria-label="At limit" />
     </div>
   )
 }

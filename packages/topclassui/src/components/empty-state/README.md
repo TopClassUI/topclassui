@@ -36,6 +36,7 @@ Every prop below is optional and falls back to the default shown.
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
 | `children` | no | `ReactNode` | - | The action, which the caller passes as a Button. The component draws none of its own. |
+| `compact` | no | `boolean` | - | The tight form the previewer's states strip draws: a 24 px icon, half the padding and the next type step down. |
 | `description` | no | `ReactNode` | - | Defaults to `labels.state.emptyDescription` only while `title` is unset too; `null` hides it. |
 | `icon` | no | `ReactNode` | - | Above the title. Defaults to the tray icon in the muted colour; `null` hides it. |
 | `labels` | no | `Labels` | - | The built-in strings. Defaults to English; pass `getLabels(locale).labels` for another. |

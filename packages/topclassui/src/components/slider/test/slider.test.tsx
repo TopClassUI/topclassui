@@ -155,8 +155,8 @@ describe('what reaches the root', () => {
   it('the control takes the padding of its size over half a target; custom keeps half a target', () => {
     const padding = (html: string) => attr(tag(html, 'div').find((div) => div.includes('data-base-ui-swipe-ignore')) ?? '', 'class')?.split(' ').filter((cls) => /^(pointer-coarse:)?px-/.test(cls))
     expect(padding(volume({ size: 'xl' }))).toEqual([
-      'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-toggle-xl)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
-      'pointer-coarse:px-[max(calc(var(--tc-target-coarse,44px)/2),calc(var(--spacing-toggle-xl)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
+      'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-knob-xl)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
+      'pointer-coarse:px-[max(calc(var(--tc-target-coarse,44px)/2),calc(var(--spacing-knob-xl)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
     ])
     expect(padding(volume({ size: 'custom' }))).toEqual(['px-[calc(var(--tc-target-min,24px)/2)]', 'pointer-coarse:px-[calc(var(--tc-target-coarse,44px)/2)]'])
   })
@@ -177,12 +177,12 @@ describe('what reaches the root', () => {
 
   it('size: the type step of an Input, the track and the knob; custom emits none of them', () => {
     expect(attr(root(volume({ size: 'xl' })), 'data-size')).toBe('xl')
-    expect(volume({ size: 'xl' })).toContain('size-toggle-xl')
+    expect(volume({ size: 'xl' })).toContain('size-knob-xl')
     expect(volume({ size: 'xl' })).toMatch(/<div data-orientation="horizontal" style="position:relative" class="w-full [^"]* h-2">/)
     expect(attr(root(volume({ size: 'xs' })), 'class')).toContain(' text-xs ')
     expect(attr(root(volume({ size: 'lg' })), 'class')?.endsWith(' text-base pointer-coarse:text-[max(1rem,16px)]')).toBe(true)
     const custom = volume({ size: 'custom' })
-    expect(custom).not.toMatch(/size-toggle-|text-(xs|sm|base)|h-1\b|h-1\.5|h-2\b/)
+    expect(custom).not.toMatch(/size-knob-|text-(xs|sm|base)|h-1\b|h-1\.5|h-2\b/)
   })
 
   it('fullWidth puts w-full and one full column after the width of an Input', () => {

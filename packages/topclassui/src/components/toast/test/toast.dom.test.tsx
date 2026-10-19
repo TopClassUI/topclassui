@@ -41,7 +41,7 @@ describe('toast.add, with nothing but TopClassProvider mounted', () => {
     await shown('Invitation sent')
     const box = roots()[0]?.firstElementChild
     expect(box?.tagName).toBe('SPAN')
-    expect(box?.className).toBe('col-start-1 row-start-1 me-3 flex h-5 shrink-0 items-center @max-3xs:mb-2 text-success-on-soft')
+    expect(box?.className).toBe('col-start-1 row-start-1 me-2.5 flex h-5 shrink-0 items-center @max-3xs:mb-2 text-success-on-soft')
     expect(box?.querySelector('svg')?.getAttribute('class')).toBe('inline-block shrink-0')
   })
 })

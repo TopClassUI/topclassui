@@ -14,10 +14,10 @@ const json = z.toJSONSchema(tableSchema, { io: 'input' }) as {
 describe('the schema is the documentation', () => {
   const keys = Object.keys(tableSchema.shape)
 
-  const ALL = ['captionVisible', 'loadMoreThreshold', 'stickyFirstColumn', 'striped', 'virtualize', 'visibleRows']
+  const ALL = ['captionVisible', 'density', 'loadMoreThreshold', 'stickyFirstColumn', 'striped', 'variant', 'virtualize', 'visibleRows']
   const TOGGLES = ['captionVisible', 'stickyFirstColumn', 'striped']
 
-  it('covers the three toggles and the three collection knobs, and none of the data: items and columns are not design props', () => {
+  it('covers the density, the variant, the three toggles and the three collection knobs, and none of the data', () => {
     // Named, or a key dropped from TABLE_DEFAULTS drops from the expectation too.
     expect([...keys].sort()).toEqual(ALL)
   })
@@ -51,10 +51,18 @@ describe('the schema is the documentation', () => {
     })
   }
 
-  it('starts with every toggle off, which is the table the frame draws', () => {
+  it('starts comfortable and outlined with every toggle off, which is the table the frame draws', () => {
     expect(tableSchema.parse({})).toEqual({
-      captionVisible: false, striped: false, stickyFirstColumn: false, visibleRows: 7, virtualize: 'auto', loadMoreThreshold: 10,
+      captionVisible: false, density: 'comfortable', variant: 'outline', striped: false, stickyFirstColumn: false, visibleRows: 7,
+      virtualize: 'auto', loadMoreThreshold: 10,
     })
+  })
+
+  it('takes the frame\'s two densities and two variants and nothing else', () => {
+    expect(json.properties?.['density']).toMatchObject({ enum: ['comfortable', 'compact'], default: 'comfortable' })
+    expect(json.properties?.['variant']).toMatchObject({ enum: ['outline', 'plain'], default: 'outline' })
+    expect(tableSchema.safeParse({ density: 'cozy' }).success).toBe(false)
+    expect(tableSchema.safeParse({ variant: 'ghost' }).success).toBe(false)
   })
 
   it('refuses anything that is not a boolean', () => {
@@ -64,7 +72,7 @@ describe('the schema is the documentation', () => {
   })
 
   it('has none of the props the spec leaves unbuilt', () => {
-    for (const key of ['pageSize', 'density', 'variant', 'sortable', 'selectable', 'size', 'tone']) {
+    for (const key of ['pageSize', 'sortable', 'selectable', 'size', 'tone']) {
       expect(keys, key).not.toContain(key)
     }
   })

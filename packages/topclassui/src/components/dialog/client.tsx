@@ -94,10 +94,11 @@ export function DialogDescription({ className, render, ...rest }: DialogDescript
 }
 
 /** R-10.5-1: the scroll container. The header and the footer keep their boxes around it.
- * While it scrolls it is a tab stop, so the keyboard reaches a text that holds no control. */
+ * While it scrolls it is a tab stop, so the keyboard reaches a text that holds no control, and it
+ * carries data-scrolls, which draws the lines of the two bars. */
 export function DialogBody({ ref, className, ...rest }: DialogBodyProps) {
   const body = useDialogBody(ref)
-  return <div tabIndex={body.tabIndex} {...rest} ref={body.ref} className={cn(DIALOG_BODY, className)} />
+  return <div tabIndex={body.tabIndex} data-scrolls={body.scrolls} {...rest} ref={body.ref} className={cn(DIALOG_BODY, className)} />
 }
 
 /** The bar that stays put below the body, for the actions. */

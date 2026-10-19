@@ -43,9 +43,9 @@ test.describe('the five sizes, on the static page', () => {
   test.use({ reducedMotion: 'reduce' })
 
   const FINE = {
-    xs: { target: [24.5, 24], track: [24.5, 14], thumb: [10, 10] }, sm: { target: [28, 24], track: [28, 16], thumb: [12, 12] },
-    md: { target: [35, 24], track: [35, 20], thumb: [16, 16] }, lg: { target: [42, 24], track: [42, 24], thumb: [20, 20] },
-    xl: { target: [49, 28], track: [49, 28], thumb: [24, 24] },
+    xs: { target: [28, 24], track: [28, 16], thumb: [12, 12] }, sm: { target: [35, 24], track: [35, 20], thumb: [16, 16] },
+    md: { target: [42, 24], track: [42, 24], thumb: [20, 20] }, lg: { target: [49, 28], track: [49, 28], thumb: [24, 24] },
+    xl: { target: [56, 32], track: [56, 32], thumb: [28, 28] },
   }
   const shapes = async (page: Page) => {
     const out: Record<string, { target: number[], track: number[], thumb: number[] }> = {}
@@ -66,19 +66,19 @@ test.describe('the five sizes, on the static page', () => {
       await page.goto(urlFor('switch--sizes', 'light', direction))
       for (const size of SIZES) expect(await gaps(switchOf(page, NAMES[size]), direction), size).toMatchObject({ end: 2 })
       await page.goto(urlFor('switch--states', 'light', direction))
-      expect(await gaps(switchOf(page, 'Off'), direction)).toEqual({ start: 2, end: 17 })
-      expect(await gaps(switchOf(page, 'On'), direction)).toEqual({ start: 17, end: 2 })
+      expect(await gaps(switchOf(page, 'Off'), direction)).toEqual({ start: 2, end: 20 })
+      expect(await gaps(switchOf(page, 'On'), direction)).toEqual({ start: 20, end: 2 })
     })
   }
 
   test.describe('under a coarse pointer', () => {
     test.use(COARSE)
 
-    test('the target is 44 x 44 px at every size, 49 wide at xl, and the track keeps its own size inside it', async ({ page }) => {
+    test('the target is 44 x 44 px at every size, 49 wide at lg and 56 at xl, and the track keeps its own size inside it', async ({ page }) => {
       await page.goto(urlFor('switch--sizes', 'light', 'ltr'))
       expect(await shapes(page)).toEqual({
         xs: { ...FINE.xs, target: [44, 44] }, sm: { ...FINE.sm, target: [44, 44] }, md: { ...FINE.md, target: [44, 44] },
-        lg: { ...FINE.lg, target: [44, 44] }, xl: { ...FINE.xl, target: [49, 44] },
+        lg: { ...FINE.lg, target: [49, 44] }, xl: { ...FINE.xl, target: [56, 44] },
       })
     })
   })
@@ -254,7 +254,7 @@ test.describe('motion', () => {
       const control = switchOf(page, 'Email me when I am mentioned')
       expect(await css(control.locator('span span'), 'transition-duration')).toBe('0s')
       await control.click()
-      expect(await gaps(control, 'ltr')).toEqual({ start: 17, end: 2 })
+      expect(await gaps(control, 'ltr')).toEqual({ start: 20, end: 2 })
     })
   })
 })
@@ -282,8 +282,8 @@ test.describe('text', () => {
       await page.goto(urlFor('switch--basic', 'light', direction))
       await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
       const control = page.locator('#demo [role="switch"]').first()
-      expect(await shape(control)).toMatchObject({ target: [70, 40], track: [70, 40], thumb: [36, 36] })
-      expect(await gaps(control, direction)).toEqual({ start: 32, end: 2 })
+      expect(await shape(control)).toMatchObject({ target: [84, 48], track: [84, 48], thumb: [44, 44] })
+      expect(await gaps(control, direction)).toEqual({ start: 38, end: 2 })
       await expectNoSidewaysScroll(page)
     })
   }
@@ -293,7 +293,7 @@ test.describe('text', () => {
     await page.goto(urlFor('switch--basic', 'light', 'ltr'))
     await page.addStyleTag({ content: '* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-block-end: 2em !important; }' })
     for (const row of await page.locator('#demo [role="switch"]').all()) {
-      expect((await shape(row)).track).toEqual([35, 20])
+      expect((await shape(row)).track).toEqual([42, 24])
       const [control, label] = [await boxOf(row), await boxOf(page.locator(`label[for="${String(await row.getAttribute('id'))}"]`))]
       expect(label.left, 'the label overlaps its switch').toBeGreaterThanOrEqual(control.right)
     }
@@ -310,15 +310,15 @@ test.describe('live: pressing it', () => {
       const control = page.locator('#switch-basic-mentions')
       await page.locator('label[for="switch-basic-mentions"]').click()
       await expect(control).toHaveAttribute('aria-checked', 'true')
-      await expect.poll(() => gaps(control, direction)).toEqual({ start: 17, end: 2 })
+      await expect.poll(() => gaps(control, direction)).toEqual({ start: 20, end: 2 })
     })
   }
 
   test('an rtl island on an ltr page: the thumb of a switch that is on sits at the left', async ({ page }) => {
     await openLive(page, 'switch--rtl', { direction: 'ltr' })
-    await expect.poll(() => gaps(page.locator('#switch-rtl-digest'), 'rtl')).toEqual({ start: 17, end: 2 })
+    await expect.poll(() => gaps(page.locator('#switch-rtl-digest'), 'rtl')).toEqual({ start: 20, end: 2 })
     await page.locator('#switch-rtl-mentions').click()
-    await expect.poll(() => gaps(page.locator('#switch-rtl-mentions'), 'rtl')).toEqual({ start: 17, end: 2 })
+    await expect.poll(() => gaps(page.locator('#switch-rtl-mentions'), 'rtl')).toEqual({ start: 20, end: 2 })
   })
 
   test('Tab reaches it, Space and Enter toggle it, and the form sends what it shows', async ({ page }) => {
@@ -360,7 +360,7 @@ test.describe('live: pressing it', () => {
           }
           return { width: box.right - box.left, cut }
         })
-        expect(ring).toEqual({ width: 43, cut: [] })
+        expect(ring).toEqual({ width: 50, cut: [] })
       })
     })
   }
@@ -427,15 +427,15 @@ test.describe('live: where a page puts a switch', () => {
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 
   for (const direction of DIRECTIONS) {
-    test(`1280 px, ${direction}: laid straight into a grid the target is 35 x 24 px at the start, and every case keeps its size`, async ({ page }) => {
+    test(`1280 px, ${direction}: laid straight into a grid the target is 42 x 24 px at the start, and every case keeps its size`, async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 800 })
       await fixture(page, { direction })
       const [grid, target] = [await boxOf(page.locator('#grid')), await boxOf(switchOf(page, 'In a grid'))]
-      expect([target.width, target.height]).toEqual([35, 24])
+      expect([target.width, target.height]).toEqual([42, 24])
       expect(direction === 'ltr' ? target.left - grid.left : grid.right - target.right).toBe(0)
       expect(await cases(page)).toEqual([
-        ['grid', [35, 24], [35, 20]], ['track', [35, 24], [35, 20]], ['flex-1', [35, 24], [35, 20]], ['w-fit', [35, 24], [35, 20]],
-        ['cell', [35, 24], [35, 20]], ['label-row', [35, 24], [35, 20]], ['long', [28, 24], [28, 16]], ['no-label', [42, 24], [42, 24]],
+        ['grid', [42, 24], [42, 24]], ['track', [42, 24], [42, 24]], ['flex-1', [42, 24], [42, 24]], ['w-fit', [42, 24], [42, 24]],
+        ['cell', [42, 24], [42, 24]], ['label-row', [42, 24], [42, 24]], ['long', [35, 24], [35, 20]], ['no-label', [49, 28], [49, 28]],
         ['custom', [48, 24], [48, 24]],
       ])
       await expectNoSidewaysScroll(page)
@@ -464,8 +464,8 @@ test.describe('live: where a page puts a switch', () => {
       test(`${direction}: every case is a 44 px target around its own track, and the page does not scroll sideways`, async ({ page }) => {
         await fixture(page, { direction })
         expect(await cases(page)).toEqual([
-          ['grid', [44, 44], [35, 20]], ['track', [44, 44], [35, 20]], ['flex-1', [44, 44], [35, 20]], ['w-fit', [44, 44], [35, 20]],
-          ['cell', [44, 44], [35, 20]], ['label-row', [44, 44], [35, 20]], ['long', [44, 44], [28, 16]], ['no-label', [44, 44], [42, 24]],
+          ['grid', [44, 44], [42, 24]], ['track', [44, 44], [42, 24]], ['flex-1', [44, 44], [42, 24]], ['w-fit', [44, 44], [42, 24]],
+          ['cell', [44, 44], [42, 24]], ['label-row', [44, 44], [42, 24]], ['long', [44, 44], [35, 20]], ['no-label', [49, 44], [49, 28]],
           ['custom', [48, 44], [48, 24]],
         ])
         await expectNoSidewaysScroll(page)

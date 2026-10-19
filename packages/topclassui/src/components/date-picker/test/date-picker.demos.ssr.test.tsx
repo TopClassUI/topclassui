@@ -23,7 +23,7 @@ const PICKERS: Record<string, string[]> = {
   'playground': ['Check-in: Sep 22, 2026'],
   'rtl': ['تاريخ الوصول: 22/09/2026'.replaceAll('/', `${String.fromCodePoint(0x200f)}/`)],
   'sizes': ['Extra small: Sep 22, 2026', 'Small: Sep 22, 2026', 'Medium: Sep 22, 2026', 'Large: Sep 22, 2026', 'Extra large: Sep 22, 2026'],
-  'states': ['Nothing chosen: Pick a date', 'Invalid: Sep 22, 2026', 'Disabled: Sep 22, 2026'],
+  'states': ['Nothing chosen: Pick a date', 'Selected: Sep 22, 2026', 'Invalid: Sep 22, 2026', 'Disabled: Sep 22, 2026'],
   'week-start': ['Monday first: Sep 22, 2026', 'Saturday first: Sep 22, 2026', 'The locale\'s first day: 22 Sept 2026'],
 }
 

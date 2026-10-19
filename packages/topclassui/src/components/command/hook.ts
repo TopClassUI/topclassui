@@ -142,9 +142,13 @@ export function useCommandPanel(props: CommandPanelProps) {
     // Left out, the --tc-list-rows knob applies: React writes no style for an undefined value.
     rows,
     busy: status === 'loading' || status === 'loading-more',
+    // CSS alt text after the slash: the hint is drawn and never read, so a row is named by its label alone.
+    enterHint: `${JSON.stringify(labels.command.enter)} / ""`,
     labels: {
       title: labels.command.label,
       placeholder: labels.command.placeholder,
+      escape: labels.command.escape,
+      enter: labels.command.enter,
       empty: labels.collection.noResults,
       loading: labels.common.loading,
     },

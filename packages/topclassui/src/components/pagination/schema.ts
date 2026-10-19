@@ -23,6 +23,8 @@ export const paginationSchema = z.object({
     .meta({ description: 'How many pages always show at each end of the list; clamped to 0-3.' }),
   size: sizeSchema.default(PAGINATION_DEFAULTS.size)
     .meta({ description: 'The control scale each cell takes its height from; custom emits no size classes.' }),
+  disabled: z.boolean().default(PAGINATION_DEFAULTS.disabled)
+    .meta({ description: 'Every cell is dimmed and none is a link, the current page included.' }),
 })
 
 export type PaginationSchemaInput = z.input<typeof paginationSchema>
