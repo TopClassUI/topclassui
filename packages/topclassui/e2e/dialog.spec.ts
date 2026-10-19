@@ -4,7 +4,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
 import { DIRECTIONS, MODES } from '../scripts/lib/harness.js'
 import { type LiveOptions, expectInsideViewport, expectNoSidewaysScroll, liveErrors, openLive } from './live.js'
 import {
-  type Box, type OpenOptions, boxOf, expectClosed, expectNothingSideways, focusedName, inkOf, openOverlay,
+  type Box, type OpenOptions, OPENED, atRest, boxOf, expectClosed, expectNothingSideways, focusedName, inkOf, openOverlay,
   pageLock, pressInside, scrollPageTo, touchDrag, wheelAt, withScrollbar,
 } from './overlay.js'
 import { DEMOS } from './pages.js'
@@ -28,6 +28,7 @@ const DIALOGS: Record<string, { trigger: string, title: string }> = {
   'dialog--playground': { trigger: 'Publish', title: 'Publish changes' },
   'dialog--rtl': { trigger: 'نشر', title: 'نشر التغييرات' },
   'dialog--sizes': { trigger: 'xs', title: 'Size xs' },
+  // The closed cell's trigger; its three other cells draw their dialogs open (tests of their own below).
   'dialog--states': { trigger: 'Open', title: 'Open' },
   'dialog--trap-focus': { trigger: 'Inspect', title: 'Inspector' },
   'dialog--with-form': { trigger: 'Rename', title: 'Rename this project' },
@@ -1126,6 +1127,30 @@ test.describe('what a footer holds besides its actions', () => {
         for (const kind of ['badge', 'tag', 'spinner', 'progress']) expect(inside[kind], kind).toBe(alone[kind])
         await expect(footer.locator('[data-kind="button"]')).toHaveCSS('min-height', coarse ? '44px' : '40px')
       })
+    })
+  }
+})
+
+test.describe('the states demo, as the Every state strip draws it', () => {
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: closed, open, alert and scrolled; the three open dialogs whole inside their cells, taking no focus, and only the long body scrolls`, async ({ page }) => {
+      await openLive(page, 'dialog--states', { direction })
+      const cells = page.locator('#demo [title="closed"]').locator('xpath=..').locator(':scope > *')
+      expect(await cells.evaluateAll((all) => all.map((cell) => cell.getAttribute('title')))).toEqual(['closed', 'open', 'alert', 'scrolled'])
+      await expect(page.locator('#demo [title="closed"] [role="dialog"]')).toHaveCount(0)
+      for (const [title, scrolls] of [['open', false], ['alert', false], ['scrolled', true]] as const) {
+        const cell = page.locator(`#demo [title="${title}"]`)
+        const popup = cell.locator(`[role="dialog"]${OPENED}`)
+        await atRest(popup)
+        const [inner, outer] = [await boxOf(popup), await boxOf(cell)]
+        expect(inner.left >= outer.left && inner.right <= outer.right && inner.top >= outer.top && inner.bottom <= outer.bottom, `the dialog of "${title}" leaves its cell`).toBe(true)
+        await expect(popup.locator('[data-scrolls]'), title).toHaveCount(scrolls ? 1 : 0)
+      }
+      await expect(xOf(page.locator('#demo [title="alert"] [role="dialog"]'))).toHaveCount(0)
+      await expect(page.locator('[data-base-ui-portal] > [data-base-ui-inert]')).toHaveCount(0)
+      expect(await page.evaluate(() => document.activeElement === document.body)).toBe(true)
+      expect((await axe(page)).violations).toEqual([])
+      expect(await liveErrors(page)).toEqual([])
     })
   }
 })

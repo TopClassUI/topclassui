@@ -20,7 +20,8 @@ const TRIGGERS: Record<string, string> = {
   'command--long-page': 'Jump to a section',
   'command--playground': 'Search',
   'command--rtl': 'بحث',
-  'command--states': 'Open',
+  // No trigger: its palette opens by Ctrl K alone, which its closed cell draws (tests of its own below).
+  'command--states': '',
   'command--ten-thousand': 'Ten thousand commands',
   'command--thousand': 'A thousand commands',
   'command--with-shortcuts': 'Commands with shortcuts',
@@ -691,5 +692,29 @@ test.describe('axe on the open palette, on a 320 x 480 phone', () => {
       if (query !== '') await page.keyboard.type(query)
       expect((await axe(page)).violations).toEqual([])
     })
+  }
+})
+
+test.describe('the states demo, as the Every state strip draws it', () => {
+  for (const mode of MODES) {
+    for (const direction of DIRECTIONS) {
+      test(`${mode} ${direction}: six cells, each captioned, five of them pictures a reader never meets; Ctrl K opens the real palette with no violation`, async ({ page }) => {
+        await openLive(page, 'command--states', { mode, direction })
+        const cells = page.locator('#demo [title="closed"]').locator('xpath=..').locator(':scope > *')
+        expect(await cells.evaluateAll((all) => all.map((cell) => cell.getAttribute('title')))).toEqual([
+          'closed', 'open', 'typing', 'empty', 'loading', 'selected',
+        ])
+        await expect(page.locator('#demo [aria-hidden="true"]:not(svg)')).toHaveCount(5)
+        await expect(page.locator('#demo [data-highlighted]')).toHaveCount(2)
+        expect((await axe(page)).violations).toEqual([])
+        await page.keyboard.press('ControlOrMeta+k')
+        const popup = page.locator('[role="dialog"][data-open]')
+        await expect(popup).toBeVisible()
+        await expect(inputOf(page)).toBeFocused()
+        expect((await axe(page)).violations).toEqual([])
+        await page.keyboard.press('Escape')
+        await expectClosed(page)
+      })
+    }
   }
 })

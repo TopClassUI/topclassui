@@ -29,7 +29,8 @@ const MENUS: Record<string, readonly string[]> = {
   'dropdown--playground': ['Actions'],
   'dropdown--rtl': ['الإجراءات', 'المزيد'],
   'dropdown--sixty-items': ['Time zone'],
-  'dropdown--states': ['Open', 'Disabled row', 'Danger row', 'Grouped'],
+  // Two of its three menus are drawn open in their own cells, and the three triggers share one label: tests of its own below.
+  'dropdown--states': [],
   'dropdown--with-links': ['Help'],
 }
 
@@ -1246,6 +1247,13 @@ async function axe(page: Page): Promise<{ violations: string[], passes: string[]
 
 /** Opens the first menu of a demo from the keyboard, so its first row is highlighted: through its dialog where it has one. */
 async function openForAxe(page: Page, demo: string, options: LiveOptions & OpenOptions): Promise<Locator> {
+  if (demo === 'dropdown--states') {
+    await openLive(page, demo, options)
+    const menu = page.locator(`#demo [title="open"] ${MENU}${OPENED}`)
+    await atRest(menu)
+    await menu.scrollIntoViewIfNeeded()
+    return menu
+  }
   if (demo !== 'dropdown--in-dialog') return open(page, demo, options)
   await openLive(page, demo, options)
   await openOverlay(page, triggerOf(page, 'Invite people'), options)
@@ -1282,4 +1290,38 @@ test.describe('axe on the open menu, on a 320 x 480 phone', () => {
       expect((await axe(page)).violations).toEqual([])
     })
   }
+})
+
+test.describe('the states demo, as the Every state strip draws it', () => {
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: closed, open and a disabled row, the two open menus whole inside their own cells, and the page not locked`, async ({ page }) => {
+      await openLive(page, 'dropdown--states', { direction })
+      const cells = page.locator('#demo [title="closed"]').locator('xpath=..').locator(':scope > *')
+      expect(await cells.evaluateAll((all) => all.map((cell) => cell.getAttribute('title')))).toEqual(['closed', 'open', 'disabled item'])
+      await expect(page.locator(`#demo [title="closed"] ${MENU}`)).toHaveCount(0)
+      for (const [title, rows] of [['open', ['Profile', 'Settings', 'Duplicate', 'Delete']], ['disabled item', ['Duplicate', 'Rename']]] as const) {
+        const cell = page.locator(`#demo [title="${title}"]`)
+        const menu = cell.locator(`${MENU}${OPENED}`)
+        await atRest(menu)
+        expect(await rowsOf(menu).evaluateAll((all) => all.map((row) => row.querySelector('span.min-w-0')?.textContent))).toEqual(rows)
+        const [inner, outer, trigger] = [await boxOf(menu), await boxOf(cell), await boxOf(cell.locator('button'))]
+        expect(inner.left >= outer.left && inner.right <= outer.right && inner.top >= outer.top && inner.bottom <= outer.bottom, `the menu of "${title}" leaves its cell`).toBe(true)
+        expect(sideOf(inner, trigger)?.where, `the menu of "${title}"`).toBe('below')
+      }
+      await expect(rowOf(page.locator(`#demo [title="disabled item"] ${MENU}`), 'Rename')).toHaveAttribute('aria-disabled', 'true')
+      // Not modal: no scroll lock on the page, and nothing of it hidden or made inert behind the menus.
+      const lock = await pageLock(page)
+      expect([lock.html ?? '', lock.body ?? '', lock.overflow]).toEqual(['', '', 'visible'])
+      expect(lock.reachable).toContain('main')
+      await expect(page.locator('[data-base-ui-portal] > [data-base-ui-inert]')).toHaveCount(0)
+      expect(await liveErrors(page)).toEqual([])
+    })
+  }
+
+  test('the closed trigger opens its menu, which closes the two drawn open as any press outside them does', async ({ page }) => {
+    await openLive(page, 'dropdown--states')
+    const menu = await openOverlay(page, page.locator('#demo [title="closed"] button'), asMenu())
+    expect(await rowsOf(menu).evaluateAll((all) => all.map((row) => row.querySelector('span.min-w-0')?.textContent))).toEqual(['Profile', 'Settings'])
+    await expect(openMenus(page)).toHaveCount(1)
+  })
 })

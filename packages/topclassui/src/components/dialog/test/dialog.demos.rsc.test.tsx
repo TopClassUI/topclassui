@@ -66,12 +66,12 @@ describe('every demo is a Server Component that only hands the parts what can cr
   it('found the demo folder, so an empty list cannot pass', () => {
     expect(names).toEqual([
       'basic', 'confirm', 'long-body', 'long-content', 'no-close-button', 'non-modal', 'rtl', 'sizes',
-      'states', 'trap-focus', 'with-form', 'with-tooltip',
+      'trap-focus', 'with-form', 'with-tooltip',
     ])
   })
 
-  it('leaves out the two demos that are client files, which cannot run here: they call useState and useRef', async () => {
-    expect(every.filter(isClient)).toEqual(['close-on-success', 'playground'])
+  it('leaves out the three demos that are client files, which cannot run here: they call useState and useRef', async () => {
+    expect(every.filter(isClient)).toEqual(['close-on-success', 'playground', 'states'])
     const Demo = await load('close-on-success')
     expect(() => Demo()).toThrow(/useState/)
   })

@@ -249,4 +249,10 @@ export const MUTATIONS: Mutation[] = [
     from: 'delay={delay === undefined ? undefined : clamp(delay, delayMin, delayMax)}',
     to: 'delay={delay}',
   },
+  {
+    label: 'the dropdown playground drops defaultOpen from its stage branch, so the docs stage draws the trigger with no menu under it',
+    file: 'src/components/dropdown/dummy/playground.tsx',
+    from: '<DropdownRoot defaultOpen modal={false}>',
+    to: '<DropdownRoot modal={false}>',
+  },
 ]
