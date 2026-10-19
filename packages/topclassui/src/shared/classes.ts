@@ -185,8 +185,7 @@ export const FOCUS_RING_INSET = 'outline-none focus-visible:outline-solid focus-
 export const ROW_FOCUSED = [
   'data-highlighted:bg-primary-soft data-highlighted:text-primary-on-soft',
   `${FOCUS_RING_INSET} forced-colors:focus-visible:outline-[HighlightText]`,
-  'forced-colors:data-highlighted:bg-[Highlight] forced-colors:data-highlighted:text-[HighlightText]',
-  'forced-colors:data-highlighted:forced-color-adjust-none',
+  'forced-colors:data-highlighted:bg-[Highlight] forced-colors:data-highlighted:text-[HighlightText] forced-colors:data-highlighted:forced-color-adjust-none',
 ].join(' ')
 
 /** The ring on a wrapper whose focused element is hidden: a label around a native radio. */
