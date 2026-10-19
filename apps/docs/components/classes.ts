@@ -85,7 +85,7 @@ export const CONTROL_RESERVE = {
 } as const
 /** A placeholder that fills the stage's content box, inside its padding, rather than its own min-height on top of it. */
 export const STAGE_RESERVE = 'self-stretch justify-self-stretch'
-export const STATE_SCOPE = `min-w-0 text-body ${SCROLL_X}`
+export const STATE_SCOPE = 'grid min-w-0 gap-4 text-body'
 /** Two demos per row at 64rem and up, one below (page 14). */
 export const DEMO_GRID = 'grid min-w-0 gap-4 lg:grid-cols-2'
 export const KNOBS = 'flex flex-wrap items-center gap-4'
