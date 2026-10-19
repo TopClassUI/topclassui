@@ -295,7 +295,7 @@ for (const pointer of ['fine', 'coarse'] as const) {
       const row = await boxOf(page.locator('#demo li').first())
       const size = pointer === 'fine' ? 24 : 44
       expect([remove.width, remove.height]).toEqual([size, size])
-      expect(row.height).toBe(pointer === 'fine' ? 40 : 54)
+      expect(row.height).toBe(pointer === 'fine' ? 34 : 54)
       expect(await css(page.locator('#demo li [dir="auto"]').first(), 'font-size')).toBe('14px')
       expect(await liveErrors(page)).toEqual([])
     })
@@ -335,14 +335,14 @@ test.describe('live: hostile content', () => {
     const list = page.locator('#grid ul')
     expect(await list.locator('li').count()).toBe(60)
     await expect(list).toHaveAttribute('tabindex', '0')
-    expect(await shownIn(list)).toEqual({ whole: 7, rowHeights: [40], scrolls: true })
+    expect(await shownIn(list)).toEqual({ whole: 7, rowHeights: [34], scrolls: true })
     await expectNoSidewaysScroll(page)
   })
 
   test('visibleRows 2: two whole rows', async ({ page }) => {
     await fixture(page)
     await page.getByLabel('Two rows', { exact: true }).setInputFiles(['a', 'b', 'c', 'd', 'e'].map((name) => pdf(`${name}.pdf`)))
-    expect(await shownIn(page.locator('#two-rows ul'))).toEqual({ whole: 2, rowHeights: [40], scrolls: true })
+    expect(await shownIn(page.locator('#two-rows ul'))).toEqual({ whole: 2, rowHeights: [34], scrolls: true })
   })
 
   test('a link in the hint takes the pointer from the input over the zone; the hint\'s words leave it to the input', async ({ page }) => {
@@ -413,7 +413,7 @@ test.describe('live: a long list under a coarse pointer', () => {
       expect(ring).toEqual({ visible: true, inside: true })
       // At a 32 px root the coarse row is --tc-row-height, the floor ROW_TOUCH keeps, and seven of them still fit.
       await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
-      expect(await shownIn(list)).toEqual({ whole: 7, rowHeights: [80], scrolls: true })
+      expect(await shownIn(list)).toEqual({ whole: 7, rowHeights: [64], scrolls: true })
     })
   }
 })

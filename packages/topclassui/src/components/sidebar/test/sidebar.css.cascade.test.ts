@@ -113,9 +113,9 @@ describe('what a collapsed rail overrides, it overrides by weight and not by ord
 })
 
 describe('the tokens Sidebar reads are declared, with the values the measurements were taken at', () => {
-  it('a row is 2.5rem tall times the density, a target 24 px and 44 under a finger', async () => {
+  it('a row is 2rem tall times the density, a target 24 px and 44 under a finger', async () => {
     const sheet = await css
-    expect(sheet).toContain('--tc-row-height: calc(2.5rem * var(--tc-density));')
+    expect(sheet).toContain('--tc-row-height: calc(2rem * var(--tc-density));')
     expect(sheet).toContain('--tc-target-min: 24px;')
     expect(sheet).toContain('--tc-target-coarse: 44px;')
   })
