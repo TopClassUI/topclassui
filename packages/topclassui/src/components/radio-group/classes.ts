@@ -12,7 +12,7 @@ export const RADIO_ITEM = 'inline-flex min-w-0 max-w-full items-center gap-2 tex
 
 export const RADIO_ITEM_TEXT = { xs: 'text-xs', sm: 'text-sm', md: 'text-sm', lg: 'text-base', xl: 'text-base', custom: '' } as const
 
-/** The circle sizes of the toggle scale: 14, 16, 20, 24 and 28 px. */
+/** The circle sizes of the toggle scale: 16, 20, 24, 28 and 32 px. */
 export const RADIO_SIZE = TOGGLE_SIZE
 
 /** The peer of its label text, so the text of a disabled radio dims with it. */

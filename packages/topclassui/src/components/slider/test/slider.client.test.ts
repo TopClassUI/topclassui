@@ -128,7 +128,7 @@ describe('hook.ts holds the value, the limits and the name (R-5.12-1)', () => {
 describe('classes.ts builds every string from the shared constants (R-5.2-4)', () => {
   it('takes the holder, the type step, the target and the knob sizes from src/shared; its own line-strong edge needs no FORCED_EDGE', () => {
     expect(importedNames(read('classes.ts'), '#shared/classes.js')).toEqual([
-      'DISABLED', 'FIELD_HOLDER', 'FIELD_HOLDER_FULL', 'FIELD_TEXT', 'TARGET_HEIGHT', 'TOGGLE_SIZE', 'TOUCH_TARGET',
+      'DISABLED', 'FIELD_HOLDER', 'FIELD_HOLDER_FULL', 'FIELD_TEXT', 'KNOB_SIZE', 'TARGET_HEIGHT', 'TOUCH_TARGET',
     ])
   })
 

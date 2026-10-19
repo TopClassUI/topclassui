@@ -118,11 +118,17 @@
   --spacing-control-lg: calc(3rem * var(--tc-density));
   --spacing-control-xl: calc(3.5rem * var(--tc-density));
 
-  --spacing-toggle-xs: calc(0.875rem * var(--tc-density));
-  --spacing-toggle-sm: calc(1rem * var(--tc-density));
-  --spacing-toggle-md: calc(1.25rem * var(--tc-density));
-  --spacing-toggle-lg: calc(1.5rem * var(--tc-density));
-  --spacing-toggle-xl: calc(1.75rem * var(--tc-density));
+  --spacing-toggle-xs: calc(1rem * var(--tc-density));
+  --spacing-toggle-sm: calc(1.25rem * var(--tc-density));
+  --spacing-toggle-md: calc(1.5rem * var(--tc-density));
+  --spacing-toggle-lg: calc(1.75rem * var(--tc-density));
+  --spacing-toggle-xl: calc(2rem * var(--tc-density));
+
+  --spacing-knob-xs: calc(0.875rem * var(--tc-density));
+  --spacing-knob-sm: calc(1rem * var(--tc-density));
+  --spacing-knob-md: calc(1.25rem * var(--tc-density));
+  --spacing-knob-lg: calc(1.5rem * var(--tc-density));
+  --spacing-knob-xl: calc(1.75rem * var(--tc-density));
 
   --spacing-icon-xs: 1rem;
   --spacing-icon-sm: 1.25rem;

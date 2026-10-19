@@ -75,7 +75,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the slider control pads by half a target only, so the knob and its ring at either end leave the box',
     file: CLASSES,
-    from: "  md: 'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-toggle-md)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]",
+    from: "  md: 'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-knob-md)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]",
     to: "  md: 'px-[calc(var(--tc-target-min,24px)/2)]",
   },
   {

@@ -39,6 +39,12 @@ export const MUTATIONS: Mutation[] = [
     to: "  xs: 'size-toggle-md',",
   },
   {
+    label: 'the slider knobs all become one size',
+    file: 'src/shared/classes.ts',
+    from: "  xs: 'size-knob-xs',",
+    to: "  xs: 'size-knob-md',",
+  },
+  {
     label: 'disabled styling stops reaching an element with no disabled attribute',
     file: 'src/shared/classes.ts',
     from: "  'data-disabled:pointer-events-none data-disabled:opacity-50',\n",

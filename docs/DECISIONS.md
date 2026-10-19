@@ -6,6 +6,19 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-19 - The form controls follow their Figma frames (Checkbox, RadioGroup, Switch, Slider, Rating, DatePicker, FileUpload)
+
+**Decision.** Round 8, job 115: each control was screenshotted beside its `Previewer:` frame and changed until the two matched inside the rules; the composites are `docs/figma/parity/<slug>.png`.
+
+- **The toggle scale moves up a step.** Every frame draws the `md` checkbox, radio and switch at 24 px (the switch 42 x 24 with a 20 px thumb), so `--spacing-toggle-*` is now 16, 20, 24, 28 and 32 px. A switch track stays 1.75 times its height. The `md` box now fills the 24 px target, as drawn. The Figma Size collection's `toggle/<size>` (14 to 28) is the frame's to follow.
+- **The slider knob keeps the old steps** (14, 16, 20, 24, 28 px) under its own `--spacing-knob-*` and `KNOB_SIZE`: the frame's knob is 18 px, under its 24 px boxes, so it did not move with them.
+
+**Why.** The Previewer frame is the truth for a component's look (round 8). The frames bind no size variable on these boxes; the numbers are the frames'.
+
+**What it affects.** `src/styles.css` (the toggle values, the knob scale), `shared/classes.ts` (`KNOB_SIZE`), `shared/cn.ts`, Switch's widths and slides, Slider's knob and padding, and the tests and e2e specs that pinned the old pixels.
+
+---
+
 ## 2026-10-18 - The site hydrates in islands, and the shell's code waits for the first paint
 
 **Decision.** Job 83 (Lighthouse on the docs site, mobile preset). Every client part of the site goes through `apps/docs/components/lazy-island.tsx`: the server's HTML is rendered as before, and the part's own chunk loads only when it comes within one viewport (`near`) or, for what is on screen from the start, after the first paint and an idle moment (`idle`). A pointer, touch or focus on it loads it at once, and a press or hover that lands before the chunk is given again afterwards. While it waits, the island's box keeps the server's HTML untouched (an empty `dangerouslySetInnerHTML` during hydration, which React leaves alone); once the chunk is in, the part renders afresh in its place in one transition, and focus goes back where it was. Parts are not hydrated late because a Base UI part hydrated inside a deferred boundary could be left with sync updates React never committed (the Dialog, Popover, Tooltip and Switch states stopped answering). The one island that hydrates is the root provider, in an `<Activity>`: React streams a Suspense boundary over 500 bytes out of order once the page passes 12.8 KB, hidden until a script reveals it, which held the first paint; an Activity stays inline. A client navigation mounts an island with no HTML to keep, so it loads at once.

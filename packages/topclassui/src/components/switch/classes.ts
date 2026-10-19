@@ -10,11 +10,11 @@ export const SWITCH_TRACK = `rounded-full bg-neutral-soft p-px ${TOGGLE_BOX} ${T
 /** The heights of the toggle scale, and 1.75 times that as the width. Custom sizes nothing (R-5.7-2): the caller's CSS does,
  * and the track is a container so the thumb can measure it. */
 export const SWITCH_TRACK_SIZE = {
-  xs: 'h-toggle-xs w-[calc(1.53125rem*var(--tc-density))]',
-  sm: 'h-toggle-sm w-[calc(1.75rem*var(--tc-density))]',
-  md: 'h-toggle-md w-[calc(2.1875rem*var(--tc-density))]',
-  lg: 'h-toggle-lg w-[calc(2.625rem*var(--tc-density))]',
-  xl: 'h-toggle-xl w-[calc(3.0625rem*var(--tc-density))]',
+  xs: 'h-toggle-xs w-[calc(1.75rem*var(--tc-density))]',
+  sm: 'h-toggle-sm w-[calc(2.1875rem*var(--tc-density))]',
+  md: 'h-toggle-md w-[calc(2.625rem*var(--tc-density))]',
+  lg: 'h-toggle-lg w-[calc(3.0625rem*var(--tc-density))]',
+  xl: 'h-toggle-xl w-[calc(3.5rem*var(--tc-density))]',
   custom: '@container',
 } as const
 
@@ -24,10 +24,10 @@ export const SWITCH_THUMB = `block aspect-square h-full rounded-full bg-line-str
 
 /** R-5.3-2: the width minus the height, toward the inline end. Custom measures it: the track's inside less the thumb. */
 export const SWITCH_SLIDE = {
-  xs: 'group-data-checked/toggle:translate-x-[calc(0.65625rem*var(--tc-density)*var(--tc-dir))]',
-  sm: 'group-data-checked/toggle:translate-x-[calc(0.75rem*var(--tc-density)*var(--tc-dir))]',
-  md: 'group-data-checked/toggle:translate-x-[calc(0.9375rem*var(--tc-density)*var(--tc-dir))]',
-  lg: 'group-data-checked/toggle:translate-x-[calc(1.125rem*var(--tc-density)*var(--tc-dir))]',
-  xl: 'group-data-checked/toggle:translate-x-[calc(1.3125rem*var(--tc-density)*var(--tc-dir))]',
+  xs: 'group-data-checked/toggle:translate-x-[calc(0.75rem*var(--tc-density)*var(--tc-dir))]',
+  sm: 'group-data-checked/toggle:translate-x-[calc(0.9375rem*var(--tc-density)*var(--tc-dir))]',
+  md: 'group-data-checked/toggle:translate-x-[calc(1.125rem*var(--tc-density)*var(--tc-dir))]',
+  lg: 'group-data-checked/toggle:translate-x-[calc(1.3125rem*var(--tc-density)*var(--tc-dir))]',
+  xl: 'group-data-checked/toggle:translate-x-[calc(1.5rem*var(--tc-density)*var(--tc-dir))]',
   custom: 'group-data-checked/toggle:translate-x-[calc((100cqw-100%)*var(--tc-dir))]',
 } as const

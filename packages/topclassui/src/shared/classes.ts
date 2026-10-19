@@ -76,6 +76,16 @@ export const TOGGLE_SIZE = {
   custom: '',
 } as const
 
+/** The slider's knob, a step under the toggle box at each size: the toggle scale moved up to the frame, the knob did not. */
+export const KNOB_SIZE = {
+  xs: 'size-knob-xs',
+  sm: 'size-knob-sm',
+  md: 'size-knob-md',
+  lg: 'size-knob-lg',
+  xl: 'size-knob-xl',
+  custom: '',
+} as const
+
 /** The native scrollbar, thin and in the theme's two colours. Forced colours compute scrollbar-color to auto,
  * so there the browser draws its system colours; a component sets the two tokens, never the property. */
 export const SCROLLBAR = '[scrollbar-width:thin] [scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]'

@@ -10,6 +10,7 @@ const twMerge = extendTailwindMerge<'tone'>({
       spacing: [
         'control-xs', 'control-sm', 'control-md', 'control-lg', 'control-xl',
         'toggle-xs', 'toggle-sm', 'toggle-md', 'toggle-lg', 'toggle-xl',
+        'knob-xs', 'knob-sm', 'knob-md', 'knob-lg', 'knob-xl',
         'icon-xs', 'icon-sm', 'icon-md', 'icon-lg', 'icon-xl',
         'pad-x-xs', 'pad-x-sm', 'pad-x-md', 'pad-x-lg', 'pad-x-xl',
         'pad-y-xs', 'pad-y-sm', 'pad-y-md', 'pad-y-lg', 'pad-y-xl',
