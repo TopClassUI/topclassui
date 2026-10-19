@@ -8,6 +8,12 @@ import {
 
 // A class list proves nothing about the rule behind it: each class is compiled with the installed Tailwind.
 const DECLARATION: Record<string, string> = {
+  // POINTER: the hand, and the arrow back on a control that cannot be pressed.
+  'disabled:cursor-default': 'cursor: default;',
+  'aria-disabled:cursor-default': 'cursor: default;',
+  'data-disabled:cursor-default': 'cursor: default;',
+  'data-readonly:cursor-default': 'cursor: default;',
+  'data-loading:cursor-default': 'cursor: default;',
   // The box.
   'grid': 'display: grid;',
   'grid-cols-1': 'grid-template-columns: repeat(1, minmax(0, 1fr));',
@@ -27,9 +33,10 @@ const DECLARATION: Record<string, string> = {
   'flex-wrap': 'flex-wrap: wrap;',
   'w-full': 'width: 100%;',
   'items-center': 'align-items: center;',
-  'gap-3': 'gap: calc(var(--spacing) * 3);',
-  'px-4': 'padding-inline: calc(var(--spacing) * 4);',
-  'py-3.5': 'padding-block: calc(var(--spacing) * 3.5);',
+  'cursor-pointer': 'cursor: pointer;',
+  'gap-2.5': 'gap: calc(var(--spacing) * 2.5);',
+  'px-3.5': 'padding-inline: calc(var(--spacing) * 3.5);',
+  'py-3': 'padding-block: calc(var(--spacing) * 3);',
   'text-start': 'text-align: start;',
   'text-sm': 'font-size: var(--text-sm);',
   'font-medium': 'font-weight: var(--font-weight-medium);',
@@ -72,7 +79,7 @@ const DECLARATION: Record<string, string> = {
   'data-starting-style:opacity-0': 'opacity: 0%;',
   'data-ending-style:opacity-0': 'opacity: 0%;',
   'pt-1': 'padding-top: var(--spacing);',
-  'pb-4': 'padding-bottom: calc(var(--spacing) * 4);',
+  'pb-3.5': 'padding-bottom: calc(var(--spacing) * 3.5);',
   'overflow-x-auto': 'overflow-x: auto;',
   'overscroll-x-contain': 'overscroll-behavior-x: contain;',
   '[scrollbar-width:thin]': 'scrollbar-width: thin;',
@@ -104,7 +111,7 @@ describe('every class an Accordion wears compiles with the installed Tailwind', 
       ACCORDION_ROOT, ACCORDION_ITEM, ACCORDION_TRIGGER, ACCORDION_TITLE, ACCORDION_CARET, ACCORDION_PANEL, ACCORDION_CONTENT,
     ])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(64)
+    expect(all).toHaveLength(70)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

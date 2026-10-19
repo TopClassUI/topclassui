@@ -38,7 +38,7 @@ export const COMBOBOX_UNIT = 'h-(--tc-row-height)'
 /** The active row: a fill, and a line inside its edge, since the fill alone is under 3:1 against the popup. */
 export const COMBOBOX_ACTIVE = 'data-highlighted:outline-solid data-highlighted:outline-(length:--tc-ring-width) data-highlighted:-outline-offset-(length:--tc-ring-width) data-highlighted:outline-primary-on-soft forced-colors:data-highlighted:outline-[HighlightText]'
 
-export const COMBOBOX_ITEM = `shrink-0 cursor-pointer select-none ${ROW} ${ROW_HIGHLIGHT} ${ROW_TOUCH} ${ROW_SELECTED} ${COMBOBOX_UNIT} ${COMBOBOX_ACTIVE} ${DISABLED}`
+export const COMBOBOX_ITEM = `shrink-0 select-none ${ROW} ${ROW_HIGHLIGHT} ${ROW_TOUCH} ${ROW_SELECTED} ${COMBOBOX_UNIT} ${COMBOBOX_ACTIVE} ${DISABLED}`
 
 export const COMBOBOX_ITEM_TEXT = `${LABEL} flex-1`
 

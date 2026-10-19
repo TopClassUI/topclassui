@@ -25,8 +25,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog body loses its one-line floor, so a tall header and footer squeeze it to nothing on a small phone',
     file: CLASSES,
-    from: '`min-h-15 flex-1 px-5 py-5',
-    to: '`min-h-0 flex-1 px-5 py-5',
+    from: '`min-h-15 flex-1 px-4.5 py-4.5',
+    to: '`min-h-0 flex-1 px-4.5 py-4.5',
   },
   {
     label: 'the dialog body keeps scrolling on a screen under 272 px tall, so a wheel that starts on it never reaches the actions',
@@ -67,8 +67,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog popup loses its maximum height, so a long body runs off the bottom of the screen',
     file: CLASSES,
-    from: "'flex max-h-[calc(100dvh-2*var(--tc-overlay-inset))] w-full",
-    to: "'flex w-full",
+    from: "'group/dialog flex max-h-[calc(100dvh-2*var(--tc-overlay-inset))] w-full",
+    to: "'group/dialog flex w-full",
   },
   {
     label: 'the dialog popup draws its ring outside its box again, on the scrim, where it reads at 1.8:1',
@@ -91,7 +91,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog md width becomes 512 px, the width of lg',
     file: CLASSES,
-    from: "md: 'max-w-100',",
+    from: "md: 'max-w-95',",
     to: "md: 'max-w-128',",
   },
   {
@@ -103,14 +103,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog x loses the icon button classes, so it is 16 px wide under a finger and has no ring',
     file: CLASSES,
-    from: '`${ICON_BUTTON} text-muted tone-neutral ${HOVER.ghost}`',
-    to: '`text-muted tone-neutral ${HOVER.ghost}`',
+    from: '`-me-1.25 ${ICON_BUTTON} text-muted tone-neutral ${HOVER.ghost}`',
+    to: '`-me-1.25 text-muted tone-neutral ${HOVER.ghost}`',
   },
   {
     label: 'the dialog footer no longer wears the shared action wrap, so a long action ends in an ellipsis on a phone',
     file: CLASSES,
-    from: 'border-line px-5 py-4 ${ACTIONS_WRAP}`',
-    to: 'border-line px-5 py-4`',
+    from: '${DIALOG_BAR_LINE} px-4.5 py-3.5 ${ACTIONS_WRAP}`',
+    to: '${DIALOG_BAR_LINE} px-4.5 py-3.5`',
   },
   {
     label: 'the dialog viewport loses the direction of its provider, so the dialog of an RTL island has its x on the right and its text left-aligned',
@@ -139,14 +139,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog body takes no tabIndex from its hook, so a long text with no control in it is out of reach of the keyboard',
     file: CLIENT,
-    from: 'return <div tabIndex={body.tabIndex} {...rest} ref={body.ref}',
-    to: 'return <div {...rest} ref={body.ref}',
+    from: 'return <div tabIndex={body.tabIndex} data-scrolls={body.scrolls} {...rest} ref={body.ref}',
+    to: 'return <div data-scrolls={body.scrolls} {...rest} ref={body.ref}',
   },
   {
     label: 'the tabIndex of the dialog body is written after the rest props, so tabIndex={-1} from a caller no longer opts out',
     file: CLIENT,
-    from: 'return <div tabIndex={body.tabIndex} {...rest} ref={body.ref}',
-    to: 'return <div {...rest} tabIndex={body.tabIndex} ref={body.ref}',
+    from: 'return <div tabIndex={body.tabIndex} data-scrolls={body.scrolls} {...rest} ref={body.ref}',
+    to: 'return <div data-scrolls={body.scrolls} {...rest} tabIndex={body.tabIndex} ref={body.ref}',
   },
   {
     label: 'the dialog body never hands its element to its hook, so nothing is measured and it is never a tab stop',
@@ -163,8 +163,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog body is a tab stop whether or not it scrolls, so Tab stops on every one-line body',
     file: HOOK,
-    from: 'return { ref, tabIndex: useScrollTabStop(ref) }',
-    to: 'return { ref, tabIndex: 0 as const }',
+    from: '  const tabIndex = useScrollTabStop(ref)\n',
+    to: '  const tabIndex = 0 as const\n',
   },
   {
     label: 'a dialog that is not modal still draws its scrim, so the page it leaves usable is dimmed',
@@ -277,8 +277,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog body drops the rest props, so an id, a role and a tabIndex of the caller never reach it',
     file: CLIENT,
-    from: 'return <div tabIndex={body.tabIndex} {...rest} ref={body.ref} className={cn(DIALOG_BODY, className)} />',
-    to: 'return <div tabIndex={body.tabIndex} ref={body.ref} className={cn(DIALOG_BODY, className)}>{rest.children}</div>',
+    from: 'return <div tabIndex={body.tabIndex} data-scrolls={body.scrolls} {...rest} ref={body.ref} className={cn(DIALOG_BODY, className)} />',
+    to: 'return <div tabIndex={body.tabIndex} data-scrolls={body.scrolls} ref={body.ref} className={cn(DIALOG_BODY, className)}>{rest.children}</div>',
   },
   {
     label: 'the dialog x loses its name, so a screen reader announces a button and nothing else',
@@ -411,5 +411,17 @@ export const MUTATIONS: Mutation[] = [
     file: `${DUMMY}/trap-focus.tsx`,
     from: '<DialogRoot modal="trap-focus">',
     to: '<DialogRoot>',
+  },
+  {
+    label: 'the dialog bars draw their line on a short dialog too, where the frame draws none',
+    file: CLASSES,
+    from: "export const DIALOG_BAR_LINE = 'border-transparent group-has-data-scrolls/dialog:border-line'",
+    to: "export const DIALOG_BAR_LINE = 'border-line'",
+  },
+  {
+    label: 'the dialog body never marks that it scrolls, so a long dialog loses the lines of its bars',
+    file: CLIENT,
+    from: 'data-scrolls={body.scrolls} ',
+    to: '',
   },
 ]

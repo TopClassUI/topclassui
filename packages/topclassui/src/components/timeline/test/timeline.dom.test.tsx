@@ -31,9 +31,15 @@ describe('in a real tree', () => {
     expect(screen.getByRole('list').getAttribute('role')).toBe('list')
   })
 
-  it('renders no list when there are no items', () => {
+  it('renders no list when there are no items, but the empty label beside a hidden tray', () => {
     const { container } = render(<Timeline items={[]} getKey={key} />)
     expect(screen.queryByRole('list')).toBeNull()
+    expect(container.textContent).toBe('Nothing here yet')
+    expect(container.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true')
+  })
+
+  it('renders nothing for emptyFallback={null}', () => {
+    const { container } = render(<Timeline items={[]} getKey={key} emptyFallback={null} />)
     expect(container.innerHTML).toBe('')
   })
 

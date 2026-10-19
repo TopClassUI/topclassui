@@ -88,7 +88,7 @@ describe('the tokens the menu reads are the ones the plan names', () => {
     expect(sheet).toContain('--tc-list-rows: 7;')
   })
 
-  it('the spacing step is 4 px, so the menu is 192 px at least and 320 px at most, and a shortcut 160 px', async () => {
+  it('the spacing step is 4 px, so the menu is 220 px at least and 320 px at most, and a shortcut 160 px', async () => {
     expect(await css).toContain('--spacing: 0.25rem;')
   })
 

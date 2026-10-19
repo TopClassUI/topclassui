@@ -38,7 +38,7 @@ describe('each part wears exactly the classes it needs', () => {
     expect(classList(html()).sort()).toEqual([
       'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line', ...RING,
       'grid', 'grid-cols-1', 'isolate', 'overflow-x-auto', 'relative', 'rounded-box', 'scroll-pe-8', 'scroll-ps-8',
-      'scroll-pt-[calc(var(--spacing)*9)]', 'max-h-[calc(var(--spacing)*9+var(--tc-list-rows)*(var(--spacing)*11+var(--tc-line-width)))]',
+      'scroll-pt-[calc(var(--spacing)*9)]', 'max-h-[calc(var(--spacing)*8+var(--tc-list-rows)*(var(--spacing)*11+var(--tc-line-width)))]',
       '[scrollbar-width:thin]', '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]',
     ].sort())
   })
@@ -78,23 +78,42 @@ describe('each part wears exactly the classes it needs', () => {
     expect(classesOf(html(), 'table')).toEqual([['w-full', 'border-separate', 'border-spacing-0']])
   })
 
-  it('a header cell is 16 by 10 px of padding, the small muted step, on the surface, on one line', () => {
+  it('a header cell is the frame\'s 14 by 8 px of padding, the small muted step, on the surface, on one line', () => {
     const [, status, amount] = classesOf(html(), 'th')
-    expect(status).toEqual(['px-4', 'py-2.5', 'text-xs', 'font-medium', 'whitespace-nowrap', 'text-muted', 'bg-surface', 'text-start'])
+    expect(status).toEqual(['px-3.5', 'text-xs', 'font-medium', 'whitespace-nowrap', 'text-muted', 'bg-surface', 'py-2', 'text-start'])
     expect(amount).toEqual([
-      'px-4', 'py-2.5', 'text-xs', 'font-medium', 'whitespace-nowrap', 'text-muted', 'bg-surface', 'text-end', 'tabular-nums',
+      'px-3.5', 'text-xs', 'font-medium', 'whitespace-nowrap', 'text-muted', 'bg-surface', 'py-2', 'text-end', 'tabular-nums',
     ])
   })
 
-  it('a body cell is 16 by 12 px of padding at the body step, on one line, with the line above it', () => {
+  it('a body cell is the frame\'s 14 by 12 px of padding at the body step, muted, on one line, with the line above it', () => {
     const [number, , amount] = classesOf(body(html()), 'td')
     expect(number).toEqual([
-      'border-t-(length:--tc-line-width)', 'border-line', 'px-4', 'py-3', 'text-sm', 'whitespace-nowrap', 'text-body', 'text-start',
+      'border-t-(length:--tc-line-width)', 'border-line', 'px-3.5', 'text-sm', 'whitespace-nowrap', 'text-muted',
+      'group-data-selected/row:text-primary-on-soft', 'py-3', 'text-start',
     ])
     expect(amount).toEqual([
-      'border-t-(length:--tc-line-width)', 'border-line', 'px-4', 'py-3', 'text-sm', 'whitespace-nowrap', 'text-body',
-      'text-end', 'tabular-nums',
+      'border-t-(length:--tc-line-width)', 'border-line', 'px-3.5', 'text-sm', 'whitespace-nowrap', 'text-muted',
+      'group-data-selected/row:text-primary-on-soft', 'py-3', 'text-end', 'tabular-nums',
     ])
+  })
+
+  it('compact takes a quarter off the frame\'s row and the header, and caps the box by the shorter rows', () => {
+    const compact = html({ density: 'compact' })
+    expect(classesOf(compact, 'th').map((list) => list.filter((c) => c.startsWith('py-')))).toEqual([['py-1.5'], ['py-1.5'], ['py-1.5']])
+    expect(classesOf(body(compact), 'td')[0]).toContain('py-1.5')
+    expect(classList(compact)).toContain('max-h-[calc(var(--spacing)*7+var(--tc-list-rows)*(var(--spacing)*8+var(--tc-line-width)))]')
+    expect(classList(html({ density: 'compact', captionVisible: true })))
+      .toContain('max-h-[calc(var(--spacing)*18+var(--tc-line-width)+var(--tc-list-rows)*(var(--spacing)*8+var(--tc-line-width)))]')
+    expect(classList(html({ captionVisible: true })))
+      .toContain('max-h-[calc(var(--spacing)*19+var(--tc-line-width)+var(--tc-list-rows)*(var(--spacing)*11+var(--tc-line-width)))]')
+  })
+
+  it('plain drops the hairline round the box and keeps everything else', () => {
+    const plain = classList(html({ variant: 'plain' }))
+    expect(plain).not.toContain('border-line')
+    expect(plain).not.toContain('border-(length:--tc-line-width)')
+    expect(plain).toEqual(expect.arrayContaining(['rounded-box', 'bg-surface-raised', 'overflow-x-auto']))
   })
 
   it('keeps every header and every cell on one line, so a narrow box scrolls instead of stacking words', () => {
@@ -144,12 +163,18 @@ describe('alignment is logical (R-5.3-1)', () => {
 })
 
 describe('striped', () => {
-  it('leaves every row unfilled by default, so the frame shows through', () => {
-    expect(classesOf(body(html()), 'tr')).toEqual([[], [], [], []])
+  it('leaves every row unfilled by default, so the frame shows through, and tints the one under the pointer or selected', () => {
+    const row = ['group/row', 'hover:bg-surface', 'data-selected:bg-primary-soft']
+    expect(classesOf(body(html()), 'tr')).toEqual([row, row, row, row])
   })
 
-  it('tints every second row, counting from the first', () => {
-    expect(classesOf(body(html({ striped: true })), 'tr')).toEqual([[], ['bg-surface'], [], ['bg-surface']])
+  it('tints every second row, counting from the first, and hovers a tinted row a step further', () => {
+    const row = ['group/row', 'hover:bg-surface', 'data-selected:bg-primary-soft']
+    const tint = [
+      'group/row', 'data-selected:bg-primary-soft', 'bg-surface', 'hover:bg-neutral-soft', 'group-hover/row:bg-neutral-soft',
+      'group-data-selected/row:bg-primary-soft',
+    ]
+    expect(classesOf(body(html({ striped: true })), 'tr')).toEqual([row, tint, row, tint])
   })
 
   it('fills the row and not its cells, which have no background to paint over it', () => {

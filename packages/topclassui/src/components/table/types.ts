@@ -2,12 +2,16 @@ import type { ComponentPropsWithRef, ReactElement, ReactNode } from 'react'
 
 import type { CollectionProps } from '#shared/contracts/collection.js'
 import type { Labels } from '#shared/labels/types.js'
-import type { TABLE_ALIGNS, TABLE_SORT_DIRECTIONS } from './constants.js'
+import type { TABLE_ALIGNS, TABLE_DENSITIES, TABLE_SORT_DIRECTIONS, TABLE_VARIANTS } from './constants.js'
 import type { TableSchemaInput, TableSkeletonSchemaInput } from './schema.js'
 
 export type TableAlign = (typeof TABLE_ALIGNS)[number]
 
 export type TableSortDirection = (typeof TABLE_SORT_DIRECTIONS)[number]
+
+export type TableDensity = (typeof TABLE_DENSITIES)[number]
+
+export type TableVariant = (typeof TABLE_VARIANTS)[number]
 
 // R-8.3-4: derived from the schema, so the props and the validation cannot drift apart.
 export type TableDesignProps = {
@@ -66,6 +70,8 @@ export interface TableProps<T, Caption extends TableCaption = TableCaption>
   caption: NonEmpty<Caption>
   /** The column the rows are sorted by, which gets `aria-sort` and a caret. */
   sort?: TableSort | undefined
+  /** The keys of the selected rows, tinted in primary and marked `aria-selected`. Selecting is the caller's: a checkbox in a column, say. */
+  selectedKeys?: readonly string[] | undefined
   /** Shown in one row across every column when there are no items. `null` also gives `labels.state.empty`. */
   emptyFallback?: ReactNode | undefined
   /** The element every sort link is cloned from, such as `link={<Link href="" />}`; its `href` is replaced with the column's `sortHref`. */
@@ -80,6 +86,7 @@ export interface TableProps<T, Caption extends TableCaption = TableCaption>
 export interface TableRow {
   key: string
   cells: readonly ReactNode[]
+  selected: boolean
 }
 
 /** What a body cell is, worked out on the server: a row header or a data cell, its classes, whether it sticks, and the
@@ -108,4 +115,4 @@ export type TableSkeletonDesignProps = {
 export type TableSkeletonProps =
   Omit<ComponentPropsWithRef<'div'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>
   & TableSkeletonDesignProps
-  & Pick<TableDesignProps, 'captionVisible'>
+  & Pick<TableDesignProps, 'captionVisible' | 'density' | 'variant'>

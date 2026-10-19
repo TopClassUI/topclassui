@@ -35,7 +35,7 @@ describe('every tone paints its bar and nothing else', () => {
       ])
     })
 
-    it(`${tone} keeps its fill at 100, so complete never turns a bar success`, () => {
+    it(`${tone}, chosen, keeps its fill at 100, so complete never turns a chosen tone success`, () => {
       expect(bar({ tone, value: 100 }).filter((c) => c.startsWith('bg-')), tone).toEqual([FILL[tone]])
     })
 
@@ -43,6 +43,18 @@ describe('every tone paints its bar and nothing else', () => {
       expect(attr(html({ tone }), 'data-tone')).toBe(tone)
     })
   }
+})
+
+describe('a bar with no tone asked for', () => {
+  it('fills in success once complete, as the previewer draws it, and keeps primary below 100 and while indeterminate', () => {
+    expect(bar({ value: 100 }).filter((c) => c.startsWith('bg-'))).toEqual(['bg-success-on-soft'])
+    expect(bar({ value: 99 }).filter((c) => c.startsWith('bg-'))).toEqual(['bg-primary-on-soft'])
+    expect(bar({ value: 100, indeterminate: true }).filter((c) => c.startsWith('bg-'))).toEqual(['bg-primary-on-soft'])
+  })
+
+  it('still reports primary on data-tone, the tone it was given by default', () => {
+    expect(attr(html({ value: 100 }), 'data-tone')).toBe('primary')
+  })
 })
 
 describe('the tone mechanism', () => {

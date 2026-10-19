@@ -5,6 +5,13 @@ import { POPOVER_CLOSE, POPOVER_DESCRIPTION, POPOVER_POPUP, POPOVER_POSITIONER, 
 
 // The static harness never opens a popup, so none of these classes reaches Tailwind there.
 const DECLARATION: Record<string, string> = {
+  // POINTER: the hand, and the arrow back on a control that cannot be pressed.
+  'cursor-pointer': 'cursor: pointer;',
+  'disabled:cursor-default': 'cursor: default;',
+  'aria-disabled:cursor-default': 'cursor: default;',
+  'data-disabled:cursor-default': 'cursor: default;',
+  'data-readonly:cursor-default': 'cursor: default;',
+  'data-loading:cursor-default': 'cursor: default;',
   // The positioner: the popup layer, and hidden with its trigger.
   'z-(--tc-z-popup)': 'z-index: var(--tc-z-popup);',
   'data-anchor-hidden:invisible': 'visibility: hidden;',
@@ -29,7 +36,7 @@ const DECLARATION: Record<string, string> = {
   'text-body': 'color: var(--tc-body);',
   'border-(length:--tc-line-width)': 'border-width: var(--tc-line-width);',
   'border-line': 'border-color: var(--tc-line);',
-  'shadow-lg': 'box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);',
+  'shadow-(--tc-shadow-overlay)': 'box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);',
   // The motion, which reads the duration that --tc-motion scales, and grows from the side of the trigger.
   'origin-(--transform-origin)': 'transform-origin: var(--transform-origin);',
   'transition-[opacity,scale]': 'transition-property: opacity,scale;',
@@ -108,7 +115,7 @@ describe('every class an open Popover wears compiles with the installed Tailwind
   it('the table names exactly the classes of the five strings in classes.ts', () => {
     const all = written([POPOVER_POSITIONER, POPOVER_POPUP, POPOVER_TITLE, POPOVER_DESCRIPTION, POPOVER_CLOSE])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(52)
+    expect(all).toHaveLength(58)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

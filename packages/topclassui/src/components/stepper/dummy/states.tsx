@@ -1,31 +1,14 @@
 import { Stepper } from '../index.js'
 
-const STEPS = [
-  { id: 'cart', title: 'Cart' },
-  { id: 'address', title: 'Address' },
-  { id: 'payment', title: 'Payment' },
-] as const
-
-const FAILED = [
-  { id: 'cart', title: 'Cart' },
-  { id: 'address', title: 'Address', status: 'error' },
-  { id: 'payment', title: 'Payment' },
-] as const
-
-const FINISHED = [
-  { id: 'cart', title: 'Cart' },
-  { id: 'address', title: 'Address' },
-  { id: 'payment', title: 'Payment', status: 'done' },
-] as const
-
-/** A task at its start, in its middle, stopped by an error and finished: every status a circle can draw. */
+/** Every state the strip draws, one cell each, captioned by its name: a single circle in each status, and a disabled one. */
 export default function Demo() {
   return (
-    <div className="grid gap-8">
-      <Stepper items={STEPS} value="cart" aria-label="Not started" />
-      <Stepper items={STEPS} value="address" aria-label="In progress" />
-      <Stepper items={FAILED} value="address" aria-label="Needs attention" />
-      <Stepper items={FINISHED} value="payment" aria-label="Finished" />
+    <div className="flex flex-wrap items-start gap-6">
+      <Stepper aria-label="todo" items={[{ id: 'team', title: 'Team', status: 'todo' }]} />
+      <Stepper aria-label="current" items={[{ id: 'profile', title: 'Profile', status: 'current' }]} />
+      <Stepper aria-label="done" items={[{ id: 'account', title: 'Account', status: 'done' }]} />
+      <Stepper aria-label="error" items={[{ id: 'payment', title: 'Payment', status: 'error' }]} />
+      <Stepper aria-label="disabled" items={[{ id: 'review', title: 'Review', status: 'todo', disabled: true }]} />
     </div>
   )
 }

@@ -1,8 +1,7 @@
-import { BORDER } from '#shared/classes.js'
 import { clamp } from '#shared/clamp.js'
 import { cn } from '#shared/cn.js'
 import { TABLE_BOUNDARIES } from './boundaries.js'
-import { BODY_CELL, CAPTION, HEADER_CELL, SKELETON_BAR, SKELETON_BOX, SKELETON_WIDTH } from './classes.js'
+import { BODY_CELL, BOX_VARIANT, CAPTION, CELL_DENSITY, HEADER_CELL, SKELETON_BAR, SKELETON_BOX, SKELETON_WIDTH } from './classes.js'
 import { TABLE_DEFAULTS, TABLE_SKELETON_DEFAULTS } from './constants.js'
 import type { TableSkeletonProps } from './types.js'
 
@@ -12,6 +11,8 @@ export function TableSkeleton({
   rows = TABLE_SKELETON_DEFAULTS.rows,
   columns = TABLE_SKELETON_DEFAULTS.columns,
   captionVisible = TABLE_DEFAULTS.captionVisible,
+  density = TABLE_DEFAULTS.density,
+  variant = TABLE_DEFAULTS.variant,
   className,
   ...rest
 }: TableSkeletonProps) {
@@ -21,7 +22,7 @@ export function TableSkeleton({
   const cells = Array.from({ length: columnCount }, (_, column) => column)
 
   return (
-    <div className={cn(SKELETON_BOX, BORDER, className)} {...rest} aria-hidden>
+    <div className={cn(SKELETON_BOX, BOX_VARIANT[variant], className)} {...rest} aria-hidden>
       <table className="w-full border-separate border-spacing-0">
         {captionVisible ? (
           <caption className={CAPTION.visible}>
@@ -31,7 +32,7 @@ export function TableSkeleton({
         <thead>
           <tr>
             {cells.map((column) => (
-              <th key={column} className={HEADER_CELL}>
+              <th key={column} className={cn(HEADER_CELL, CELL_DENSITY[density].header)}>
                 <span className={cn(SKELETON_BAR, SKELETON_WIDTH.header)} />
               </th>
             ))}
@@ -41,7 +42,7 @@ export function TableSkeleton({
           {Array.from({ length: rowCount }, (_, row) => (
             <tr key={row}>
               {cells.map((column) => (
-                <td key={column} className={BODY_CELL}>
+                <td key={column} className={cn(BODY_CELL, CELL_DENSITY[density].body)}>
                   <span className={cn(SKELETON_BAR, SKELETON_WIDTH.cell)} />
                 </td>
               ))}

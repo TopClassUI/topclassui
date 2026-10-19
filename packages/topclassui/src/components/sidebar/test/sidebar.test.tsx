@@ -63,7 +63,7 @@ describe('SidebarRoot on the server', () => {
     const classes = classList(tag(rail({ className: 'data-open:w-72' }), 'nav'))
     expect(classes).toContain('data-open:w-72')
     expect(classes).not.toContain('data-open:w-55')
-    expect(classes).toContain('data-closed:w-15')
+    expect(classes).toContain('data-closed:w-13')
     expect(classes.at(-1)).toBe('data-open:w-72')
   })
 
@@ -160,6 +160,6 @@ describe('SidebarBody on the server', () => {
     const html = rail({}, <SidebarBody id="rows" className="gap-2">Rows</SidebarBody>)
     expect(attr(body(html), 'id')).toBe('rows')
     expect(classList(body(html)).at(-1)).toBe('gap-2')
-    expect(classList(body(html))).not.toContain('gap-1')
+    expect(classList(body(html))).not.toContain('gap-0.5')
   })
 })

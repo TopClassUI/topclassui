@@ -6,7 +6,8 @@ import { NAVBAR_OFFSET_VARIABLE, NAVBAR_STICKY_SHARE } from './constants.js'
 import { findHashTarget } from './lib.js'
 
 /** What NavbarOffset reads: the ref of its span. The bar around that span is watched, and its height
- * is written in whole px to --tc-sticky-top on the root element, then removed when the bar unmounts. */
+ * is written in whole px to --tc-sticky-top on the root element, then removed when the bar unmounts.
+ * The bar is marked data-scrolled while the page is scrolled under it. */
 export function useNavbarOffset() {
   const ref = useRef(null as HTMLSpanElement | null)
 
@@ -30,6 +31,10 @@ export function useNavbarOffset() {
     const landed = target?.getBoundingClientRect().top
     const padding = Number.parseFloat(view.getComputedStyle(root).scrollPaddingTop) || 0
 
+    const scrolled = () => bar.toggleAttribute('data-scrolled', view.scrollY > 0)
+    view.addEventListener('scroll', scrolled, { passive: true })
+    scrolled()
+
     // The border box: a safe area that grows changes the padding, and the bar with it.
     const sizes = new ResizeObserver(publish)
     sizes.observe(bar, { box: 'border-box' })
@@ -43,7 +48,9 @@ export function useNavbarOffset() {
     return () => {
       sizes.disconnect()
       view.removeEventListener('resize', publish)
+      view.removeEventListener('scroll', scrolled)
       bar.removeAttribute('data-unstuck')
+      bar.removeAttribute('data-scrolled')
       root.style.removeProperty(NAVBAR_OFFSET_VARIABLE)
     }
   }, [])

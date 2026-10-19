@@ -194,3 +194,35 @@ describe('a page opened at an #anchor', () => {
     expect(scrolled).not.toHaveBeenCalled()
   })
 })
+
+describe('the scrolled mark, which lifts a solid bar with a shadow (Figma 138:2393)', () => {
+  const scrollTo = (y: number) => { act(() => {
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: y })
+    window.dispatchEvent(new Event('scroll'))
+  }); }
+
+  afterEach(() => {
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 0 })
+  })
+
+  it('is off at the top of the page, on once the page scrolls under the bar, and off again at the top', () => {
+    const { container } = render(<NavbarRoot><NavbarBrand href="/">Home</NavbarBrand></NavbarRoot>)
+    const bar = container.querySelector('header')
+    expect(bar?.hasAttribute('data-scrolled')).toBe(false)
+    scrollTo(120)
+    expect(bar?.hasAttribute('data-scrolled')).toBe(true)
+    scrollTo(0)
+    expect(bar?.hasAttribute('data-scrolled')).toBe(false)
+  })
+
+  it('is taken off when the bar unmounts, and a bar in the flow never gets it', () => {
+    const { container, unmount } = render(<NavbarRoot><NavbarBrand href="/">Home</NavbarBrand></NavbarRoot>)
+    const bar = container.querySelector('header')
+    scrollTo(120)
+    unmount()
+    expect(bar?.hasAttribute('data-scrolled')).toBe(false)
+    const flow = render(<NavbarRoot sticky={false}><NavbarBrand href="/">Home</NavbarBrand></NavbarRoot>)
+    scrollTo(240)
+    expect(flow.container.querySelector('header')?.hasAttribute('data-scrolled')).toBe(false)
+  })
+})

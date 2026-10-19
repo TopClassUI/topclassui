@@ -10,7 +10,7 @@ import { markup } from '#test/markup.js'
 const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
-/** The label of each trigger a demo holds, every one a Button: one, but for states. Named, so a deleted demo fails here. */
+/** The label of each trigger a demo holds, every one a Button: one, but for states, which has none. Named, so a deleted demo fails here. */
 const TRIGGERS: Record<string, string[]> = {
   'basic': ['Search'],
   'empty-state': ['Find a command'],
@@ -21,7 +21,8 @@ const TRIGGERS: Record<string, string[]> = {
   'long-page': ['Jump to a section'],
   'playground': ['Search'],
   'rtl': ['بحث'],
-  'states': ['Open', 'Empty', 'Loading'],
+  // Its palette opens by Ctrl K alone, which its closed cell draws; the other cells are pictures with no control.
+  'states': [],
   'ten-thousand': ['Ten thousand commands'],
   'thousand': ['A thousand commands'],
   'with-shortcuts': ['Commands with shortcuts'],
@@ -42,7 +43,7 @@ describe('every demo renders on the server as its trigger alone', () => {
     it(`${name}: its buttons, ${TRIGGERS[name]?.join(', ') ?? '?'}, and no dialog, listbox or input before the first open`, () => {
       const html = markup(createElement(Demo))
       const labels = TRIGGERS[name] ?? []
-      expect(html.match(/<button/g)).toHaveLength(labels.length)
+      expect(html.match(/<button/g) ?? []).toHaveLength(labels.length)
       for (const label of labels) expect(html).toContain(label)
       expect(html).not.toMatch(/role="(dialog|listbox|combobox)"|<input/)
     })

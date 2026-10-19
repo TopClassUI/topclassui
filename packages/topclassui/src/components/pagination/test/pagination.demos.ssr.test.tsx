@@ -54,11 +54,12 @@ describe('each demo shows the state its name promises', () => {
     expect(html).toContain('aria-label="Page 6 of 12" aria-current="page"')
   })
 
-  it('states: four navs, each named, with the spans each one leaves where there is nowhere to go', async () => {
+  it('states: five navs, each named, with the spans each one leaves where there is nowhere to go', async () => {
     const html = await render('states')
-    expect([...html.matchAll(/<nav aria-label="([^"]*)"/g)].map((m) => m[1])).toEqual(['On the first page', 'In the middle', 'On the last page', 'A single page'])
+    expect([...html.matchAll(/<nav aria-label="([^"]*)"/g)].map((m) => m[1])).toEqual(['first page', 'middle', 'last page', 'single page', 'disabled'])
     expect([...html.matchAll(/<span [^>]*aria-label="([^"]*)"/g)].map((m) => m[1])).toEqual([
       'First page', 'Previous', 'Next', 'Last page', 'First page', 'Previous', 'Next', 'Last page',
+      'First page', 'Previous', 'Page 1 of 12', 'Page 2', 'Page 3', 'Page 4', 'Page 5', 'Page 12', 'Next', 'Last page',
     ])
   })
 
@@ -72,7 +73,7 @@ describe('each demo shows the state its name promises', () => {
     const html = await render('middle')
     expect(pages(html)).toEqual(['1', '5', '6', '7', '12'])
     expect(html.match(/<li aria-hidden="true"/g)).toHaveLength(2)
-    expect(html).not.toContain('aria-disabled')
+    expect(html).not.toContain('aria-disabled=')
   })
 
   it('last-page: page 12 is current, and next and last are the two spans', async () => {
@@ -96,10 +97,10 @@ describe('each demo shows the state its name promises', () => {
     ])
   })
 
-  it('many-pages: 500 pages in eleven cells, between the four controls', async () => {
+  it('many-pages: 500 pages in eleven cells and the compact status, between the four controls', async () => {
     const html = await render('many-pages')
     expect(pages(html)).toEqual(['1', '2', '248', '249', '250', '251', '252', '499', '500'])
-    expect(html.match(/<li/g)).toHaveLength(15)
+    expect(html.match(/<li/g)).toHaveLength(16)
   })
 
   it('two-navs: the pager above and the one below each carry a name of their own', async () => {

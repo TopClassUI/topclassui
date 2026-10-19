@@ -136,8 +136,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the number field stepper is shrink-0 again, so at a 32 px root the increase stepper of a large field is cut',
     file: CLASSES,
-    from: 'aspect-4/5 shrink cursor-pointer',
-    to: 'aspect-4/5 shrink-0 cursor-pointer',
+    from: 'aspect-4/5 shrink items-center',
+    to: 'aspect-4/5 shrink-0 items-center',
   },
   {
     label: 'the number field reads a typed Latin 1,234 only on blur, so Enter under Arabic-Indic digits submits 1',

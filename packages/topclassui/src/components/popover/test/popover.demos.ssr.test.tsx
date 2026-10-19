@@ -28,7 +28,7 @@ const TRIGGERS: Record<string, string[]> = {
   ],
   'playground': ['Share'],
   'rtl': ['مشاركة', 'التفاصيل', 'الإعدادات'],
-  'states': ['Open', 'Above', 'With close', 'Modal', 'On hover'],
+  'states': ['Share', 'Details', 'Settings'],
   'with-close': ['Notifications'],
   'with-form': ['Rename'],
 }

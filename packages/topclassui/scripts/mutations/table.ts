@@ -107,8 +107,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the box of a table keeps no room at its ends, so a focused control that shows one pixel past the edge is left there',
     file: 'src/components/table/index.tsx',
-    from: "BOX_CAP[captionVisible ? 'visible' : 'hidden'], FOCUS_ROOM, BORDER,",
-    to: "BOX_CAP[captionVisible ? 'visible' : 'hidden'], BORDER,",
+    from: "BOX_CAP[density][captionVisible ? 'visible' : 'hidden'], FOCUS_ROOM, BOX_VARIANT[variant],",
+    to: "BOX_CAP[density][captionVisible ? 'visible' : 'hidden'], BOX_VARIANT[variant],",
   },
   {
     label: 'the room a table keeps past its stuck column shrinks to the column itself, so a focused control can show one pixel beside it',
@@ -167,7 +167,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the table box loses its row cap, so it never scrolls and loadMore is asked page after page',
     file: 'src/components/table/index.tsx',
-    from: "BOX_CAP[captionVisible ? 'visible' : 'hidden'], ",
+    from: "BOX_CAP[density][captionVisible ? 'visible' : 'hidden'], ",
     to: '',
   },
   {
@@ -175,5 +175,35 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/table/index.tsx',
     from: 'clamp(visibleRows, visibleRowsMin, visibleRowsMax)',
     to: 'visibleRows',
+  },
+  {
+    label: 'a compact table keeps the comfortable rows, so the density prop changes nothing',
+    file: 'src/components/table/index.tsx',
+    from: 'cn(BODY_CELL, CELL_DENSITY[density].body,',
+    to: 'cn(BODY_CELL, CELL_DENSITY.comfortable.body,',
+  },
+  {
+    label: 'a plain table keeps the hairline round its box, so the variant prop changes nothing',
+    file: 'src/components/table/index.tsx',
+    from: 'BOX_VARIANT[variant]',
+    to: 'BOX_VARIANT.outline',
+  },
+  {
+    label: 'a sortable table header loses its idle mark, so nothing tells the eye the column can be sorted',
+    file: 'src/components/table/index.tsx',
+    from: 'column.sortHref === undefined ? null : (',
+    to: 'true ? null : (',
+  },
+  {
+    label: 'a table row loses the hover tint of the frame',
+    file: 'src/components/table/client.tsx',
+    from: 'className={cn(ROW, tinted && fill)}',
+    to: 'className={cn(tinted && fill)}',
+  },
+  {
+    label: 'a table row named in selectedKeys is not marked, so the selection shows nowhere',
+    file: 'src/components/table/index.tsx',
+    from: 'selected: selectedKeys?.includes(key) === true',
+    to: 'selected: false',
   },
 ]

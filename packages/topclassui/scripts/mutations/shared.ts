@@ -287,20 +287,20 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the overlay surface loses its hairline, so forced colours leave a popup with no edge at all',
     file: 'src/shared/classes.ts',
-    from: 'text-body ${BORDER} shadow-lg',
-    to: 'text-body shadow-lg',
+    from: 'text-body ${BORDER} shadow-(--tc-shadow-overlay)',
+    to: 'text-body shadow-(--tc-shadow-overlay)',
   },
   {
     label: 'the overlay row loses its height token, so a menu row is as short as its text',
     file: 'src/shared/classes.ts',
-    from: "'flex min-h-(--tc-row-height) w-full",
-    to: "'flex w-full",
+    from: '`flex min-h-(--tc-row-height) w-full',
+    to: '`flex w-full',
   },
   {
     label: 'the overlay row resets with outline-hidden, a 2 px ring on every row of a menu at rest',
     file: 'src/shared/classes.ts',
-    from: "text-start text-sm outline-none'",
-    to: "text-start text-sm outline-hidden'",
+    from: 'text-start text-sm outline-none ${POINTER}`',
+    to: 'text-start text-sm outline-hidden ${POINTER}`',
   },
   {
     label: 'the overlay row highlight loses the system pair, so no row is told from the others once a fill is erased',
@@ -311,8 +311,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the overlay row highlight stays adjusted, so a backplate hides the label of the highlighted row',
     file: 'src/shared/classes.ts',
-    from: "'forced-colors:data-highlighted:forced-color-adjust-none ",
-    to: "'",
+    from: "'forced-colors:data-highlighted:forced-color-adjust-none forced-colors:data-highlighted:bg-[Highlight]',\n  'forced-colors:data-highlighted:text-[HighlightText] forced-colors",
+    to: "'forced-colors:data-highlighted:bg-[Highlight]',\n  'forced-colors:data-highlighted:text-[HighlightText] forced-colors",
   },
   {
     label: 'the overlay row highlight loses its ring, so the row the keyboard is on is told by a fill at 1.1:1',

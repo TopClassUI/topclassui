@@ -159,8 +159,10 @@ describe('what reaches the root', () => {
 })
 
 describe('the design attributes', () => {
-  it('carries none at rest: a boolean is present or absent, never "false"', () => {
-    expect(opening(html(), 'div')[0]).not.toMatch(/data-/)
+  it('carries only the density and the variant at rest: a boolean is present or absent, never "false"', () => {
+    const root = opening(html(), 'div')[0] ?? ''
+    expect([...root.matchAll(/ (data-[\w-]+)="([^"]*)"/g)].map((m) => `${m[1] ?? ''}=${m[2] ?? ''}`))
+      .toEqual(['data-density=comfortable', 'data-variant=outline'])
   })
 
   it('reports striped and the sticky column as presence attributes (R-5.7-6)', () => {
@@ -170,7 +172,10 @@ describe('the design attributes', () => {
     expect(root).not.toContain('data-empty')
   })
 
-  it('has no variant, tone or size to report', () => {
-    expect(html()).not.toMatch(/data-(variant|tone|size|state)/)
+  it('reports the density and the variant as value attributes (R-5.7-6), and no tone, size or state', () => {
+    const root = opening(html({ density: 'compact', variant: 'plain' }), 'div')[0] ?? ''
+    expect(attr(root, 'data-density')).toBe('compact')
+    expect(attr(root, 'data-variant')).toBe('plain')
+    expect(html()).not.toMatch(/data-(tone|size|state)/)
   })
 })

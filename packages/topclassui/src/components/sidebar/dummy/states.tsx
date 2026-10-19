@@ -9,7 +9,7 @@ import { SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoot } fr
 export default function Demo() {
   return (
     <div className="flex h-96 flex-wrap gap-6">
-      <SidebarRoot aria-label="Expanded">
+      <SidebarRoot aria-label="expanded">
         <SidebarHeader>Workspace</SidebarHeader>
         <SidebarBody>
           <SidebarGroup>
@@ -19,7 +19,7 @@ export default function Demo() {
           </SidebarGroup>
         </SidebarBody>
       </SidebarRoot>
-      <SidebarRoot aria-label="Collapsed" defaultOpen={false}>
+      <SidebarRoot aria-label="collapsed" defaultOpen={false}>
         <SidebarHeader>Workspace</SidebarHeader>
         <SidebarBody>
           <SidebarGroup>

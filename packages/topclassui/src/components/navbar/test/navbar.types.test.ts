@@ -10,9 +10,10 @@ import type {
 /** Assignability as a value, so a rejected prop is a passing assertion. */
 type Accepts<Union, Candidate> = Candidate extends Union ? true : false
 
-describe('the two design props', () => {
-  it('are optional booleans, each on the part that takes it', () => {
-    expectTypeOf<NavbarDesignProps>().toEqualTypeOf<{ sticky?: boolean | undefined, current?: boolean | undefined }>()
+describe('the three design props', () => {
+  it('are optional, each on the part that takes it', () => {
+    expectTypeOf<NavbarDesignProps>().toEqualTypeOf<{ sticky?: boolean | undefined, variant?: 'solid' | 'transparent' | undefined, current?: boolean | undefined }>()
+    expectTypeOf<NavbarRootProps['variant']>().toEqualTypeOf<'solid' | 'transparent' | undefined>()
     expectTypeOf<NavbarRootProps['sticky']>().toEqualTypeOf<boolean | undefined>()
     expectTypeOf<NavbarLinkProps['current']>().toEqualTypeOf<boolean | undefined>()
   })
@@ -22,8 +23,8 @@ describe('the two design props', () => {
     expectTypeOf<Accepts<keyof NavbarRootProps, 'current'>>().toEqualTypeOf<false>()
   })
 
-  it('what is not built is not in the types: size, bordered, variant and a collapsible bar', () => {
-    type Unbuilt = 'size' | 'bordered' | 'variant' | 'collapsible' | 'transparent'
+  it('what is not built is not in the types: size, bordered and a collapsible bar', () => {
+    type Unbuilt = 'size' | 'bordered' | 'collapsible' | 'transparent'
     expectTypeOf<Extract<keyof NavbarRootProps, Unbuilt>>().toEqualTypeOf<never>()
   })
 })

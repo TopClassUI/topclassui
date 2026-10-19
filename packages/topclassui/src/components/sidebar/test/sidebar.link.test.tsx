@@ -57,7 +57,7 @@ describe('SidebarGroup on the server', () => {
     expect(attr(div, 'id')).toBe('group')
     expect(attr(div, 'data-testid')).toBe('group')
     expect(classList(div).at(-1)).toBe('gap-3')
-    expect(classList(div)).not.toContain('gap-1')
+    expect(classList(div)).not.toContain('gap-0.5')
   })
 })
 

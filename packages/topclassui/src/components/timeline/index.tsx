@@ -1,10 +1,12 @@
 // No 'use client': a client bundle gets it only when a client file imports it.
 import type { ReactNode } from 'react'
 
+import { tray } from '#icons/data/tray.js'
 import { cn } from '#shared/cn.js'
 import { en } from '#shared/labels/en.js'
+import { Svg } from '#components/svg/index.js'
 import {
-  TIMELINE_CONNECTOR, TIMELINE_DOT, TIMELINE_DOT_CURRENT, TIMELINE_DOT_HOLLOW, TIMELINE_ICON,
+  TIMELINE_CONNECTOR, TIMELINE_DOT, TIMELINE_DOT_CURRENT, TIMELINE_DOT_HOLLOW, TIMELINE_EMPTY, TIMELINE_ICON,
   TIMELINE_ICON_HOLLOW, TIMELINE_MARKER, TIMELINE_TIME, TIMELINE_TITLE,
 } from './classes.js'
 import { TIMELINE_DEFAULTS, TIMELINE_STATUS_TONES } from './constants.js'
@@ -31,7 +33,10 @@ export function Timeline<T extends TimelineItem = TimelineItem>({
   className,
   ...rest
 }: TimelineProps<T>) {
-  if (items.length === 0) return emptyFallback ?? null
+  if (items.length === 0) {
+    if (emptyFallback !== undefined) return emptyFallback
+    return <p className={TIMELINE_EMPTY}><Svg icon={tray} size="sm" />{labels.state.empty}</p>
+  }
   const last = items.length - 1
 
   return (
@@ -65,7 +70,7 @@ export function Timeline<T extends TimelineItem = TimelineItem>({
               </span>
               {index === last ? null : <span className={TIMELINE_CONNECTOR} />}
             </div>
-            <div className={cn('flex min-w-0 flex-1 flex-col gap-0.5 wrap-anywhere', index === last ? null : 'pb-4')}>
+            <div className={cn('flex min-w-0 flex-1 flex-col wrap-anywhere', index === last ? null : 'pb-4')}>
               {spoken === null ? null : <span className="sr-only">{spoken}</span>}
               <div className={TIMELINE_TITLE}>{item.title}</div>
               {isBlank(item.time) ? null : <div className={TIMELINE_TIME}>{item.time}</div>}
@@ -77,4 +82,5 @@ export function Timeline<T extends TimelineItem = TimelineItem>({
   )
 }
 
-export type { TimelineItem, TimelineProps, TimelineStatus, TimelineTone } from './types.js'
+export { TimelineSkeleton } from './skeleton.js'
+export type { TimelineItem, TimelineProps, TimelineSkeletonProps, TimelineStatus, TimelineTone } from './types.js'

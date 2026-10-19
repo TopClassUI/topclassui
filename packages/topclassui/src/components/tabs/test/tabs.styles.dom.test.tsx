@@ -48,11 +48,16 @@ describe('the root', () => {
 })
 
 describe('the line look, the default', () => {
-  it('the list is a row that scrolls sideways inside itself and is the offset parent of its tabs', () => {
+  it('the list is a row as wide as its tabs that scrolls sideways inside itself and is the offset parent of its tabs', () => {
     render(tabs())
     expect(classes('list')).toEqual(expect.arrayContaining([
-      'relative', 'scroll-px-px', 'flex', 'items-center', 'gap-6', 'px-px', 'overflow-x-auto', 'overscroll-x-contain',
+      'relative', 'scroll-px-px', 'flex', 'w-fit', 'max-w-full', 'items-center', 'gap-5', 'px-px', 'overflow-x-auto', 'overscroll-x-contain',
     ]))
+  })
+
+  it('the list keeps a pixel under its tabs, so its hairline runs under the bar of the active one', () => {
+    render(tabs())
+    expect(classes('list')).toContain('pb-px')
   })
 
   it('the line under the list is a shadow inside it, and a border only under forced colours', () => {
@@ -79,18 +84,16 @@ describe('the enclosed look', () => {
   it('the list is a tinted box as wide as its tabs and no wider than its parent, with an edge under forced colours', () => {
     render(tabs({ variant: 'enclosed' }))
     expect(classes('list')).toEqual(expect.arrayContaining([
-      'relative', 'scroll-px-px', 'flex', 'w-fit', 'max-w-full', 'items-center', 'gap-1', 'rounded-control', 'bg-surface', 'p-1',
+      'relative', 'scroll-px-px', 'flex', 'w-fit', 'max-w-full', 'items-center', 'gap-0.5', 'rounded-control', 'bg-surface', 'p-0.5',
       'forced-colors:outline-(length:--tc-line-width)', 'overflow-x-auto', 'overscroll-x-contain',
     ]))
-    expect(classes('list')).not.toContain('gap-6')
+    expect(classes('list')).not.toContain('gap-5')
   })
 
-  it('the active tab is lifted onto the raised surface inside an edge of 3:1, and carries no bar', () => {
+  it('the active tab is lifted onto the flat raised surface, with no edge, no shadow and no bar', () => {
     render(tabs({ variant: 'enclosed' }))
-    expect(classes('tab')).toEqual(expect.arrayContaining([
-      'rounded-control', 'data-active:bg-surface-raised', 'data-active:shadow-sm',
-      'not-forced-colors:data-active:inset-ring-(length:--tc-line-width)', 'not-forced-colors:data-active:inset-ring-line-strong',
-    ]))
+    expect(classes('tab')).toEqual(expect.arrayContaining(['rounded-control', 'data-active:bg-surface-raised']))
+    expect(classes('tab').filter((cls) => /inset-ring|shadow/.test(cls))).toEqual([])
     expect(classes('tab')).not.toContain('border-b-2')
   })
 
@@ -98,7 +101,7 @@ describe('the enclosed look', () => {
     render(tabs({ variant: 'enclosed' }))
     expect(classes('tab')).toEqual(expect.arrayContaining([
       'forced-colors:data-active:forced-color-adjust-none', 'forced-colors:data-active:bg-[Highlight]',
-      'forced-colors:data-active:text-[HighlightText]', 'forced-colors:data-active:shadow-none',
+      'forced-colors:data-active:text-[HighlightText]',
       'forced-colors:data-active:[--tc-ring:HighlightText]',
     ]))
   })
@@ -149,10 +152,10 @@ describe('a tab of either look', () => {
 describe('size', () => {
   const SIZE = {
     xs: ['h-control-xs', 'px-pad-x-xs', 'text-xs'],
-    sm: ['h-control-sm', 'px-pad-x-sm', 'text-sm'],
-    md: ['h-control-md', 'px-pad-x-md', 'text-sm'],
-    lg: ['h-control-lg', 'px-pad-x-lg', 'text-base'],
-    xl: ['h-control-xl', 'px-pad-x-xl', 'text-base'],
+    sm: ['h-control-sm', 'px-pad-x-xs', 'text-sm'],
+    md: ['h-control-md', 'px-pad-x-sm', 'text-sm'],
+    lg: ['h-control-lg', 'px-pad-x-md', 'text-base'],
+    xl: ['h-control-xl', 'px-pad-x-lg', 'text-base'],
   } as const
 
   for (const [size, expected] of Object.entries(SIZE)) {

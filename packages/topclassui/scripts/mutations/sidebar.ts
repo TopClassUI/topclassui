@@ -253,13 +253,13 @@ export const MUTATIONS: Mutation[] = [
     to: '  ROW,\n  TOUCH_TARGET,\n',
   },
   {
-    label: 'a sidebar row loses the 44 px floor, so it is 40 px under a finger',
+    label: 'a sidebar row loses the 44 px floor, so it is 32 px under a finger',
     file: CLASSES,
     from: '  TOUCH_TARGET,\n  ROW,\n',
     to: '  ROW,\n',
   },
   {
-    label: 'a collapsed sidebar stays 60 px under a finger, 5 px narrower than the 44 px row it holds',
+    label: 'a collapsed sidebar stays 52 px under a finger, 9 px narrower than the 44 px row it holds',
     file: CLASSES,
     from: '  SIDEBAR_COARSE,\n',
     to: '',
@@ -285,7 +285,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a collapsed sidebar is as wide as an expanded one',
     file: CLASSES,
-    from: "'data-open:w-55 data-closed:w-15'",
+    from: "'data-open:w-55 data-closed:w-13'",
     to: "'data-open:w-55 data-closed:w-55'",
   },
   {
@@ -297,8 +297,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the sidebar body does not hold its hidden labels, so ten collapsed groups make the page 1732 px taller',
     file: CLASSES,
-    from: '`relative flex flex-1 flex-col gap-1',
-    to: '`flex flex-1 flex-col gap-1',
+    from: '`relative flex flex-1 flex-col gap-0.5',
+    to: '`flex flex-1 flex-col gap-0.5',
   },
   {
     label: 'the sidebar itself is not positioned, so a rail with no body lets its hidden labels out of the box that scrolls it',
@@ -309,14 +309,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the sidebar body takes a min-h-0 again, a class that changes nothing on a box that scrolls',
     file: CLASSES,
-    from: '`relative flex flex-1 flex-col gap-1',
-    to: '`relative flex min-h-0 flex-1 flex-col gap-1',
+    from: '`relative flex flex-1 flex-col gap-0.5',
+    to: '`relative flex min-h-0 flex-1 flex-col gap-0.5',
   },
   {
     label: 'the sidebar body no longer scrolls, so a list longer than the rail is cut off',
     file: CLASSES,
-    from: 'gap-1 ${SCROLL_AREA} ${SIDEBAR_RING_ROOM}',
-    to: 'gap-1 ${SIDEBAR_RING_ROOM}',
+    from: 'gap-0.5 ${SCROLL_AREA} ${SIDEBAR_RING_ROOM}',
+    to: 'gap-0.5 ${SIDEBAR_RING_ROOM}',
   },
   {
     label: 'a collapsed sidebar draws its scrollbar, which leaves a row 29 px and pushes every icon off the middle',
@@ -351,8 +351,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a collapsed sidebar row is not centred, so its icon starts 12 px in and sits off the middle',
     file: CLASSES,
-    from: "  'group-data-closed/sidebar:justify-center',\n",
-    to: '',
+    from: "  'px-2 group-data-closed/sidebar:justify-center',\n",
+    to: "  'px-2',\n",
   },
   {
     label: 'the toggle of a collapsed sidebar stays at the start, 7.5 px off the icons under it',
@@ -367,22 +367,10 @@ export const MUTATIONS: Mutation[] = [
     to: 'bg-primary-soft font-medium text-primary-on-soft',
   },
   {
-    label: 'the current sidebar row has no bar, so in a collapsed rail only a colour tells it from the others',
-    file: CLASSES,
-    from: 'text-primary-on-soft ${SIDEBAR_MARK} ${SIDEBAR_CURRENT_FORCED}',
-    to: 'text-primary-on-soft ${SIDEBAR_CURRENT_FORCED}',
-  },
-  {
-    label: 'the bar of the current sidebar row is the solid primary, 2.84:1 on its fill in dark',
-    file: CLASSES,
-    from: "before:rounded-full before:bg-current'",
-    to: "before:rounded-full before:bg-primary-solid'",
-  },
-  {
     label: 'the current sidebar row takes no highlight under forced colours, where its fill is erased',
     file: CLASSES,
-    from: '${SIDEBAR_MARK} ${SIDEBAR_CURRENT_FORCED}`',
-    to: '${SIDEBAR_MARK}`',
+    from: 'text-primary-on-soft ${SIDEBAR_CURRENT_FORCED}`',
+    to: 'text-primary-on-soft`',
   },
   {
     label: 'the current sidebar row keeps the ring of its theme under forced colours',

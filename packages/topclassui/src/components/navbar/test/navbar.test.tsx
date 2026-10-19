@@ -36,7 +36,7 @@ describe('NavbarRoot', () => {
   })
 
   it('renders with nothing in it', () => {
-    expect(markup(<NavbarRoot sticky={false} />)).toMatch(/^<header class="[^"]+"><\/header>$/)
+    expect(markup(<NavbarRoot sticky={false} />)).toMatch(/^<header class="[^"]+" data-variant="solid"><\/header>$/)
   })
 
   it('names the variable the tokens file reads, and no other', () => {
