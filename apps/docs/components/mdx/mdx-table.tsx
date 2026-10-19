@@ -21,7 +21,7 @@ function rowsOf(section: ReactNode): ReactNode[][] {
   return rows
 }
 
-/** A GFM table drawn by the library's Table; the header row names the columns and the caption. */
+/** A GFM table drawn by the library's Table; the header row names the columns and the caption, and every row shows. */
 export function MdxTable({ children, locale }: { children?: ReactNode; locale: Locale }) {
   let header: ReactNode[] = []
   let body: ReactNode[][] = []
@@ -37,6 +37,7 @@ export function MdxTable({ children, locale }: { children?: ReactNode; locale: L
       {...getLabels(locale)}
       items={items}
       getKey={(item) => item.key}
+      visibleRows={items.length}
       caption={caption === '' ? '-' : caption}
       columns={header.map((cell, column) => ({
         key: String(column),
