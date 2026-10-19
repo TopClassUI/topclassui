@@ -30,6 +30,6 @@ describe('BannerDismissible, the client export', () => {
     render(<BannerDismissible ref={ref} aria-label="Notice" id={fresh()} data-testid="b" className="px-2">Out.</BannerDismissible>)
     expect(ref.current?.getAttribute('data-testid')).toBe('b')
     expect(ref.current?.className.split(' ')).toContain('px-2')
-    expect(ref.current?.className.split(' ')).not.toContain('px-5')
+    expect(ref.current?.className.split(' ')).not.toContain('px-4.5')
   })
 })

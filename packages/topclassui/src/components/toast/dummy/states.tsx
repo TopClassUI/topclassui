@@ -1,42 +1,48 @@
-'use client'
+import { x } from '#icons/data/x.js'
+import { Svg } from '#components/svg/index.js'
+import { cn } from '#shared/cn.js'
+import {
+  TOAST_CONTENT, TOAST_ICON, TOAST_ICON_SVG, TOAST_ICON_TONE, TOAST_ROOT, TOAST_TITLE,
+} from '../classes.js'
+import { TOAST_ICONS } from '../constants.js'
+import type { ToastIconType } from '../types.js'
 
-import { Button } from '#components/button/index.js'
-import { toast } from '../index.js'
-
-/** Stands in for a request that settles after three seconds. */
-const wait = () => new Promise<void>((resolve) => { setTimeout(resolve, 3000) })
-
-/** A toast exists only once something adds it, so each state is one press away. */
-export default function Demo() {
-  const undo = () => {
-    const id = toast.add({ title: 'Project archived', action: { label: 'Undo', onClick: () => { toast.close(id) } } })
-  }
-  const load = () => {
-    toast.promise(wait(), { loading: 'Uploading', success: 'Uploaded', error: 'Upload failed' }).catch(() => undefined)
-  }
+/** A toast drawn in place, with the classes the viewport gives one: a picture of a state, not a live region. */
+function Panel({ type, title, className }: { type?: ToastIconType; title: string; className?: string }) {
   return (
-    <div className="flex flex-wrap gap-2">
-      <Button variant="outline" onClick={() => { toast.add({ title: 'Draft saved' }) }}>Neutral</Button>
-      <Button variant="outline" onClick={() => { toast.add({ tone: 'primary', title: 'New version available' }) }}>Primary</Button>
-      <Button variant="outline" onClick={() => { toast.add({ tone: 'success', title: 'Invitation sent' }) }}>Success</Button>
-      <Button variant="outline" onClick={() => { toast.add({ tone: 'warning', title: 'Storage almost full' }) }}>Warning</Button>
-      <Button variant="outline" onClick={() => { toast.add({ tone: 'danger', title: 'Could not save' }) }}>Danger</Button>
-      <Button variant="outline" onClick={() => { toast.add({ tone: 'info', title: 'Maintenance tonight' }) }}>Info</Button>
-      <Button
-        variant="outline"
-        onClick={() => { toast.add({ title: 'Invitation sent', description: 'Sara will get an email in a minute.' }) }}
-      >
-        With description
-      </Button>
-      <Button variant="outline" onClick={undo}>With action</Button>
-      <Button variant="outline" onClick={() => { toast.add({ tone: 'warning', title: 'You are offline', duration: 0 }) }}>Sticky</Button>
-      <Button
-        variant="outline"
-        onClick={() => { toast.add({ tone: 'danger', priority: 'high', title: 'Payment failed' }) }}
-      >
-        High priority
-      </Button>
-      <Button variant="outline" onClick={load}>Loading</Button>
+    <div className={cn(TOAST_ROOT, 'w-72', className)}>
+      {type === undefined ? null : (
+        <span className={cn(TOAST_ICON, TOAST_ICON_TONE[type])}>
+          <Svg icon={TOAST_ICONS[type]} className={TOAST_ICON_SVG[type]} />
+        </span>
+      )}
+      <div className={TOAST_CONTENT}>
+        <p className={TOAST_TITLE}>{title}</p>
+      </div>
+      <span className="col-start-3 row-start-1 ms-2.5 text-muted">
+        <Svg icon={x} size="0.875em" />
+      </span>
+    </div>
+  )
+}
+
+/** The frame's strip, one cell a state: the three icons, a stack, a toast fading in, and one past the limit, which
+ * the viewport keeps mounted and does not draw. */
+export default function Demo() {
+  return (
+    <div className="flex flex-wrap items-start gap-6">
+      <div role="group" aria-label="success"><Panel type="success" title="Invitation sent" /></div>
+      <div role="group" aria-label="error"><Panel type="error" title="Could not save" /></div>
+      <div role="group" aria-label="loading"><Panel type="loading" title="Uploading" /></div>
+      <div role="group" aria-label="stacked" className="flex flex-col gap-2">
+        <Panel title="Draft saved" />
+        <Panel title="Draft saved" />
+        <Panel title="Draft saved" />
+      </div>
+      <div role="group" aria-label="entering"><Panel type="success" title="Invitation sent" className="opacity-55" /></div>
+      <div role="group" aria-label="limited">
+        <p className="text-xs text-muted">Past the limit: mounted, not drawn.</p>
+      </div>
     </div>
   )
 }

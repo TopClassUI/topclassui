@@ -55,8 +55,8 @@ describe('the default icon is the alert\'s own choice, not the Svg default', () 
     expect(attr(svg, 'height')).toBe('16')
   })
 
-  it('sits 2 px down, which centres it on the 20 px first line of the title', () => {
-    expect(classList(svgTag(html())).sort()).toEqual(['inline-block', 'mt-0.5', 'shrink-0'])
+  it('sits with its top on the top of the first line, as the frame draws it', () => {
+    expect(classList(svgTag(html())).sort()).toEqual(['inline-block', 'shrink-0'])
   })
 
   it('has no label, because the title carries the meaning', () => {

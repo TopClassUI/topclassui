@@ -117,12 +117,12 @@ describe('every demo is a Server Component (R-5.1-3)', () => {
     })
   }
 
-  it('only the dismissible demos reach the shell: the other eight render no client code of Banner', async () => {
+  it('only the dismissible demo and the playground, dismissible as the frame draws it, reach the shell: the other eight render no client code of Banner', async () => {
     const reached: string[] = []
     for (const name of names) {
       const shells = crossings((await load(name))()).filter((crossing) => crossing.part === 'BannerShell')
       if (shells.length > 0) reached.push(`${name} ${String(shells.length)}`)
     }
-    expect(reached).toEqual(['dismissible 2', 'states 1'])
+    expect(reached).toEqual(['dismissible 2', 'playground 1'])
   })
 })

@@ -9,7 +9,7 @@ export default function Demo(props: ToastDesignProps = {}) {
   return (
     <Button
       variant="outline"
-      onClick={() => { toast.add({ ...props, title: 'Project created', description: 'It is ready for its first deploy.' }) }}
+      onClick={() => { toast.add({ ...props, title: 'Project created', description: 'You can invite your team now.' }) }}
     >
       Show a toast
     </Button>

@@ -11,7 +11,7 @@ const classes = (props: Cell) => classList(markup(<Alert {...props} title="Saved
 
 /** The box every cell shares: layout, radius, padding and the border width. */
 const BOX = [
-  'flex', 'items-start', 'gap-2', 'rounded-box', 'px-pad-x-md', 'py-3',
+  'flex', 'items-start', 'gap-2.5', 'rounded-box', 'px-3.25', 'py-2.75',
   'border-(length:--tc-line-width)',
 ]
 

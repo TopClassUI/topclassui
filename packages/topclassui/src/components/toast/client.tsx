@@ -33,7 +33,7 @@ function ToastItem({ entry, swipeDirection, closeLabel }: ToastItemProps) {
       <Base.Action className={cn(buttonVariants({ variant: 'outline', tone: 'neutral', size: 'sm' }), TOAST_ACTION)} />
       {/* WCAG 2.5.7: a swipe is a drag, so the x is always there. Base UI hides it from a reader until the stack expands. */}
       <Base.Close aria-label={closeLabel} aria-hidden={false} className={TOAST_CLOSE}>
-        <Svg icon={x} />
+        <Svg icon={x} size="0.875em" />
       </Base.Close>
     </Base.Root>
   )

@@ -12,7 +12,7 @@ const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
 const EXPECTED = [
-  'basic', 'caption', 'column-classes', 'empty', 'in-a-layout', 'load-more', 'playground', 'row-actions', 'rtl', 'skeleton',
+  'basic', 'caption', 'column-classes', 'density', 'empty', 'in-a-layout', 'load-more', 'playground', 'row-actions', 'rtl', 'skeleton',
   'sorted', 'states', 'sticky-first-column', 'striped', 'ten-thousand',
 ]
 
@@ -29,6 +29,8 @@ const captionOf = (table: string) => /<caption id="([^"]*)"[^>]*>(.*?)<\/caption
 
 /** What a stuck body cell ends its class list with, before its fill. */
 const STUCK = 'sticky inset-s-0 z-(--tc-z-sticky) max-w-[var(--tc-table-sticky-width,8rem)] truncate after:absolute after:inset-y-0 after:inset-e-0 after:border-e-(length:--tc-line-width) after:border-line-strong **:scroll-mx-[100vw]'
+
+const STATES = ['idle', 'hover row', 'sorted', 'selected', 'empty', 'loading']
 
 describe('every demo renders on the server', () => {
   it('holds exactly these demos, so none can be deleted silently', () => {
@@ -87,10 +89,21 @@ describe('each demo shows what its name says', () => {
     expect([...(bySeats ?? '').matchAll(/<a [^>]*href="\?sort=(\w+)&amp;dir=(\w+)"/g)].map((m) => `${m[1] ?? ''} ${m[2] ?? ''}`)).toEqual(['name asc', 'seats asc'])
   })
 
+  it('density: comfortable and outlined, compact, and plain', async () => {
+    const [comfortable, compact, plain] = tables(await render('density'))
+    expect(attr(comfortable ?? '', 'data-density')).toBe('comfortable')
+    expect(attr(comfortable ?? '', 'data-variant')).toBe('outline')
+    expect(attr(compact ?? '', 'data-density')).toBe('compact')
+    expect(attr(plain ?? '', 'data-variant')).toBe('plain')
+    expect(plain).not.toMatch(/^<div [^>]*class="[^"]*border-line/)
+  })
+
   it('striped: six rows, the second, fourth and sixth tinted', async () => {
     const html = await render('striped')
     const rows = [...html.slice(html.indexOf('<tbody>')).matchAll(/<tr( [^>]*)?>/g)].map((m) => / class="([^"]*)"/.exec(m[1] ?? '')?.[1])
-    expect(rows).toEqual([undefined, 'bg-surface', undefined, 'bg-surface', undefined, 'bg-surface'])
+    const row = 'group/row hover:bg-surface data-selected:bg-primary-soft'
+    const tint = 'group/row data-selected:bg-primary-soft bg-surface hover:bg-neutral-soft group-hover/row:bg-neutral-soft group-data-selected/row:bg-primary-soft'
+    expect(rows).toEqual([row, tint, row, tint, row, tint])
   })
 
   it('sticky-first-column: a box narrower than its table, plain and striped, every first cell stuck with its fill', async () => {
@@ -104,8 +117,8 @@ describe('each demo shows what its name says', () => {
       expect(table).toContain('scroll-ps-[calc(var(--tc-table-sticky-width,8rem)+2rem)]')
     }
     expect(plain).not.toContain('data-striped')
-    expect((striped ?? '').split(`${STUCK} bg-surface"`).length - 1).toBe(2)
-    expect((striped ?? '').split(`${STUCK} bg-surface-raised"`).length - 1).toBe(2)
+    expect((striped ?? '').split(`${STUCK} bg-surface hover:bg-neutral-soft group-hover/row:bg-neutral-soft group-data-selected/row:bg-primary-soft"`).length - 1).toBe(2)
+    expect((striped ?? '').split(`${STUCK} bg-surface-raised group-hover/row:bg-surface group-data-selected/row:bg-primary-soft"`).length - 1).toBe(2)
   })
 
   it('sticky-first-column: holds what e2e/table.spec scrolls under the stuck column, a dimmed Button and focusable controls', async () => {
@@ -121,7 +134,7 @@ describe('each demo shows what its name says', () => {
   it('empty: the built-in words in one table and the caller own fallback in the other', async () => {
     const [builtIn, custom] = tables(await render('empty'))
     expect(builtIn).toContain('colSpan="3"')
-    expect(builtIn).toContain('>Nothing here yet</div></td>')
+    expect(builtIn).toContain('<span>Nothing here yet</span></div></td>')
     expect(custom).toContain('Nobody has joined this team yet.')
     expect(custom).not.toContain('Nothing here yet')
   })
@@ -153,7 +166,7 @@ describe('each demo shows what its name says', () => {
     expect(html).toContain('<span class="sr-only">ترتيب حسب </span>')
     expect(html).toContain('aria-label="مرتب تنازليًا"')
     expect(html).toContain('aria-label="مرتب تصاعديًا"')
-    expect(html).toContain('>لا يوجد شيء بعد</div></td>')
+    expect(html).toContain('<span>لا يوجد شيء بعد</span></div></td>')
     expect(html).not.toMatch(/Sort by|sorted (a|de)scending|Nothing here yet/)
     expect(html).toContain(STUCK)
   })
@@ -176,5 +189,14 @@ describe('each demo shows what its name says', () => {
       expect(table.split('<th scope="col"').length - 1).toBe(6)
       expect(table).toMatch(/^<div [^>]*class="relative isolate grid grid-cols-1 overflow-x-auto /)
     }
+  })
+})
+
+describe('the states demo', () => {
+  it('is the frame\'s strip: one captioned cell a state', async () => {
+    const { default: Demo } = await import('../dummy/states.js') as { default: ComponentType }
+    const html = markup(<Demo />)
+    const captions = [...html.matchAll(/<div (?:role="(?:group|region)" )?(?:data-tone="\w+" )?[^>]*aria-label="([^"]+)"/g)].map((m) => m[1])
+    expect(captions).toEqual(STATES)
   })
 })

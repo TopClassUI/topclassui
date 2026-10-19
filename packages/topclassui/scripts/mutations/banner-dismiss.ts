@@ -107,8 +107,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the banner dismiss x loses ms-auto, so on a line of its own it sits at the inline start',
     file: CLASSES,
-    from: "  'ms-auto',\n",
-    to: '',
+    from: "  'ms-auto -me-1.25 cursor-pointer',\n",
+    to: "  '-me-1.25 cursor-pointer',\n",
   },
   {
     label: 'the banner dismiss x draws no outline on hover under forced colours, where its fill is erased',

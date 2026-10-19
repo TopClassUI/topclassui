@@ -48,8 +48,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the x of a toast renders only beside an action, so a bare toast can be closed by a swipe alone',
     file: 'src/components/toast/client.tsx',
-    from: '      <Base.Close aria-label={closeLabel} aria-hidden={false} className={TOAST_CLOSE}>\n        <Svg icon={x} />\n      </Base.Close>\n',
-    to: '      {entry.actionProps === undefined ? null : (\n        <Base.Close aria-label={closeLabel} aria-hidden={false} className={TOAST_CLOSE}>\n          <Svg icon={x} />\n        </Base.Close>\n      )}\n',
+    from: '      <Base.Close aria-label={closeLabel} aria-hidden={false} className={TOAST_CLOSE}>\n        <Svg icon={x} size="0.875em" />\n      </Base.Close>\n',
+    to: '      {entry.actionProps === undefined ? null : (\n        <Base.Close aria-label={closeLabel} aria-hidden={false} className={TOAST_CLOSE}>\n          <Svg icon={x} size="0.875em" />\n        </Base.Close>\n      )}\n',
   },
   {
     label: 'the x of a toast is hidden from a reader again, as Base UI hides it until the stack expands',
@@ -132,14 +132,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a long toast action label stays on one line and runs out of its button',
     file: 'src/components/toast/classes.ts',
-    from: 'h-auto min-h-control-sm whitespace-normal py-1',
-    to: 'h-auto min-h-control-sm py-1',
+    from: 'h-auto min-h-control-sm cursor-pointer whitespace-normal py-1',
+    to: 'h-auto min-h-control-sm cursor-pointer py-1',
   },
   {
     label: 'the toast x scrolls away with its toast, so under a finger a toast taller than the screen closes by a drag alone (TOAST-3)',
     file: 'src/components/toast/classes.ts',
-    from: ' ms-3 self-start sticky top-0`',
-    to: ' ms-3 self-start`',
+    from: ' ms-1.25 self-start sticky top-0`',
+    to: ' ms-1.25 self-start`',
   },
   {
     label: 'the toast x keeps to the first row, so in a narrow toast it cannot follow the text and leaves the screen (TOAST-3)',
@@ -224,5 +224,11 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/toast/hook.ts',
     from: 'height > root.clientHeight * TOAST_STICKY_SHARE ? 0 : height',
     to: 'height',
+  },
+  {
+    label: 'a toast drops the shadow of its frame, so it sits flat on the page it floats over',
+    file: 'src/components/toast/classes.ts',
+    from: ' shadow-(--tc-shadow-toast) ',
+    to: ' ',
   },
 ]
