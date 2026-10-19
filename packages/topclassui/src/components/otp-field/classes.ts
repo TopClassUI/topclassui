@@ -13,8 +13,9 @@ export const OTP_CELL_FIT = 'basis-[var(--tc-target-min,24px)] grow'
 /** Past eight items a row cannot shrink enough (nine cells of 24 px and their gaps are 280 px), so it breaks at whole cells and each keeps its max-w. */
 export const OTP_CELL_WHOLE = 'w-full grow-0'
 
-/** A cell may give up width where the row does not fit, never under the 24 px floor, and never height. */
-export const OTP_CELL = `min-w-[var(--tc-target-min,24px)] shrink p-0 text-center font-semibold tabular-nums rounded-control bg-surface-raised text-body ${BORDER_STRONG} ${TRANSITION} ${DISABLED} ${FOCUS_RING} ${TARGET_HEIGHT} ${FIELD_INVALID}`
+/** A cell may give up width where the row does not fit, never under the 24 px floor, nor under 44 px beneath a finger
+ * (R-5.6-2): there the row wraps instead. It never gives up height. */
+export const OTP_CELL = `min-w-[var(--tc-target-min,24px)] pointer-coarse:min-w-[var(--tc-target-coarse,44px)] shrink p-0 text-center font-semibold tabular-nums rounded-control bg-surface-raised text-body ${BORDER_STRONG} ${TRANSITION} ${DISABLED} ${FOCUS_RING} ${TARGET_HEIGHT} ${FIELD_INVALID}`
 
 /** One step of the control scale taller than it is wide, as the frame draws a cell (38 by 46 at md). Under a coarse
  * pointer the three small sizes may be 44 px wide, and typed text is never under 16 px. */
