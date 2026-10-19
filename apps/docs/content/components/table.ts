@@ -11,6 +11,7 @@ export const table = {
     'skeleton', 'in-a-layout', 'rtl',
   ],
   stageHeight: 22,
+  controlOrder: ['density', 'variant', 'stickyFirstColumn'],
   note: {
     en: 'Sorting is a link the server answers with the rows in their new order, so a sorted table costs no JavaScript.',
     ar: 'الترتيب رابط يجيب عنه الخادم بالصفوف في ترتيبها الجديد، فلا يكلّف الجدول المرتّب أي JavaScript.',

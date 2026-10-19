@@ -25,6 +25,8 @@ export const contentSchema = z.strictObject({
   stageOpen: z.boolean().optional(),
   /** Boolean props the schema leaves to the element (a native `disabled`) that Try it still offers, as the frame draws them. */
   extraSwitches: z.array(z.string().regex(/^[a-z][A-Za-z]*$/)).optional(),
+  /** Props Try it lists first, in the frame's order; the rest follow in the schema's. */
+  controlOrder: z.array(z.string().regex(/^[a-z][A-Za-z]*$/)).optional(),
   note: both,
   notes: bothLists,
   keyboard: z.array(z.strictObject({ keys: z.array(z.string().min(1)).min(1), action: both })),

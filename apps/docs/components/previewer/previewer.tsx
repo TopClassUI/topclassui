@@ -48,7 +48,12 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
   const t = COMPONENT_PAGE_LABELS[locale]
   const { content } = entry
   const title = content.title[locale]
+  const order = content.controlOrder ?? []
+  const rank = (prop: string) => (order.includes(prop) ? order.indexOf(prop) : order.length)
   const controls = [...entry.controls, ...(content.extraSwitches ?? []).map((prop) => ({ prop, kind: 'switch' as const, default: false }))]
+    .map((control, index) => ({ control, index }))
+    .sort((a, b) => rank(a.control.prop) - rank(b.control.prop) || a.index - b.index)
+    .map(({ control }) => control)
   const playground = entry.files.playground && controls.length > 0
   // The stage at rest is the demo the frame draws (stageDemo); Try it swaps in the playground on the first change.
   const stageDemo = content.stageDemo ?? (playground ? 'playground' : (content.demos[0] ?? 'playground'))
