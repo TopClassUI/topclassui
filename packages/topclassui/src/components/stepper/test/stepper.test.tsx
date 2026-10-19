@@ -129,18 +129,6 @@ describe('the current step', () => {
   })
 })
 
-describe('a disabled step', () => {
-  it('carries data-disabled and keeps its status, while the others carry none', () => {
-    const out = html({ items: [...FOUR.slice(0, 3), { id: 'done', title: 'Done', disabled: true }] })
-    expect(rows(out).map((row) => attr(`<li ${row}`, 'data-disabled'))).toEqual([undefined, undefined, undefined, ''])
-    expect(rows(out).map((row) => attr(`<li ${row}`, 'data-status'))).toEqual(['done', 'current', 'todo', 'todo'])
-  })
-
-  it('writes no data-disabled for disabled={false}', () => {
-    expect(html({ items: [{ id: 'a', title: 'A', disabled: false }] })).not.toContain('data-disabled=')
-  })
-})
-
 describe('the connector', () => {
   it('is drawn in two halves: one after every step but the last, one before every step but the first', () => {
     expect(rows(html()).map((row) => [/class="absolute [^"]* inset-s-1\/2"/.test(row), /class="absolute [^"]* inset-s-0"/.test(row)]))

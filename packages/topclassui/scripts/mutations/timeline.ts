@@ -23,8 +23,26 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the timeline renders an empty list for no items, and never its emptyFallback',
     file: 'src/components/timeline/index.tsx',
-    from: '  if (items.length === 0) return emptyFallback ?? null\n',
-    to: '',
+    from: '  if (items.length === 0) {\n',
+    to: '  if (items.length < 0) {\n',
+  },
+  {
+    label: 'the timeline takes emptyFallback={null} for no fallback, so a caller cannot render nothing',
+    file: 'src/components/timeline/index.tsx',
+    from: 'if (emptyFallback !== undefined) return emptyFallback',
+    to: 'if (emptyFallback != null) return emptyFallback',
+  },
+  {
+    label: 'the timeline empty line ignores the labels prop, so an Arabic page says it in English',
+    file: 'src/components/timeline/index.tsx',
+    from: '{labels.state.empty}</p>',
+    to: '{en.state.empty}</p>',
+  },
+  {
+    label: 'the timeline skeleton can be un-hidden by a caller, so a screen reader walks three empty rows',
+    file: 'src/components/timeline/skeleton.tsx',
+    from: '{...rest} aria-hidden>',
+    to: 'aria-hidden {...rest}>',
   },
   {
     label: 'the timeline fills the marker of a todo item, so todo and done read the same',
@@ -51,16 +69,16 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
-    label: 'the timeline draws its current marker as a done one, so the two differ by hue alone',
+    label: 'the timeline draws its current marker as a done one, so under forced colours the two read the same',
     file: 'src/components/timeline/index.tsx',
     from: "const dot = item.status === 'current' ? TIMELINE_DOT_CURRENT[tone] : TIMELINE_DOT[tone]",
     to: 'const dot = TIMELINE_DOT[tone]',
   },
   {
-    label: 'a filled timeline dot loses its stroke, so the amber one is 2.13:1 against a white page',
+    label: 'the amber timeline dot is stroked in its own fill, so it is 2.15:1 against a white page',
     file: 'src/components/timeline/classes.ts',
-    from: 'const FILLED = `${DOT} ${BORDER_STRONG} forced-color-adjust-none`',
-    to: 'const FILLED = `${DOT} forced-color-adjust-none`',
+    from: '`${FILLED} ${FORCED} border-warning-on-soft bg-warning-solid`',
+    to: '`${FILLED} ${FORCED} border-warning-solid bg-warning-solid`',
   },
   {
     label: 'a filled timeline dot keeps its theme colour under forced colours, so a neutral one matches an opposite canvas',
