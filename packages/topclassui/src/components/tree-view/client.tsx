@@ -2,11 +2,13 @@
 
 import { caretDown } from '#icons/data/caret-down.js'
 import { caretRight } from '#icons/data/caret-right.js'
+import { tray } from '#icons/data/tray.js'
 import { cn } from '#shared/cn.js'
 import { Svg } from '#components/svg/index.js'
 import {
-  TREE_VIEW_CARET, TREE_VIEW_ICON, TREE_VIEW_LABEL, TREE_VIEW_NOTE, TREE_VIEW_ROOT, TREE_VIEW_ROW, TREE_VIEW_ROW_ACTIVE,
-  TREE_VIEW_ROW_DISABLED, TREE_VIEW_ROW_SELECTED, TREE_VIEW_TREE,
+  TREE_VIEW_CARET, TREE_VIEW_ICON, TREE_VIEW_LABEL, TREE_VIEW_NOTE, TREE_VIEW_NOTE_KIND, TREE_VIEW_NOTE_TEXT, TREE_VIEW_ROOT,
+  TREE_VIEW_ROW, TREE_VIEW_ROW_ACTIVE, TREE_VIEW_ROW_DISABLED, TREE_VIEW_ROW_SELECTED, TREE_VIEW_SKELETON_BAR,
+  TREE_VIEW_SKELETON_WIDTHS, TREE_VIEW_TREE,
 } from './classes.js'
 import { useTreeView } from './hook.js'
 import type { TreeViewProps } from './types.js'
@@ -67,7 +69,13 @@ export function TreeView({
           </div>
         ))}
       </div>
-      <div role="status" className={TREE_VIEW_NOTE}>{tree.note}</div>
+      <div role="status" className={cn(TREE_VIEW_NOTE, TREE_VIEW_NOTE_KIND[tree.noteKind])}>
+        {tree.noteKind === 'empty' ? <Svg icon={tray} size="md" /> : null}
+        {tree.noteKind === 'loading' || tree.noteKind === 'loading-more'
+          ? TREE_VIEW_SKELETON_WIDTHS.map((width) => <span key={width} aria-hidden="true" className={cn(TREE_VIEW_SKELETON_BAR, width)} />)
+          : null}
+        {tree.note === null ? null : <span className={TREE_VIEW_NOTE_TEXT[tree.noteKind]}>{tree.note}</span>}
+      </div>
     </div>
   )
 }

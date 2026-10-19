@@ -83,9 +83,9 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
     expect(importedNames(client, './hook.js')).toEqual(['useTreeView'])
   })
 
-  it('takes no Base UI part, the svg and the two carets by explicit import (R-7-1), and no schema', () => {
+  it('takes no Base UI part, the svg, the two carets and the tray by explicit import (R-7-1), and no schema', () => {
     expect(importedModules(client).filter((m) => m.startsWith('@base-ui/'))).toEqual([])
-    expect(importedModules(client).filter((m) => m.startsWith('#icons/'))).toEqual(['#icons/data/caret-down.js', '#icons/data/caret-right.js'])
+    expect(importedModules(client).filter((m) => m.startsWith('#icons/'))).toEqual(['#icons/data/caret-down.js', '#icons/data/caret-right.js', '#icons/data/tray.js'])
     expect(importedModules(client).filter((m) => m.startsWith('#components/'))).toEqual(['#components/svg/index.js'])
     expect(importedModules(client).filter((m) => m.includes('schema') || m.startsWith('zod'))).toEqual([])
   })
@@ -128,8 +128,8 @@ describe('lib.ts and classes.ts', () => {
     expect(importedModules(read('lib.ts'))).toEqual(['./types.js'])
   })
 
-  it('classes.ts takes the line, the hover, the label, the scroll area and the transition from src/shared', () => {
-    expect(importedNames(read('classes.ts'), '#shared/classes.js')).toEqual(['BORDER', 'HOVER', 'LABEL', 'SCROLL_AREA', 'TRANSITION'])
+  it('classes.ts takes the line, the forced edge, the hover, the label, the scroll area and the transition from src/shared', () => {
+    expect(importedNames(read('classes.ts'), '#shared/classes.js')).toEqual(['BORDER', 'FORCED_EDGE', 'HOVER', 'LABEL', 'SCROLL_AREA', 'TRANSITION'])
   })
 
   it('classes.ts names no physical side', () => {

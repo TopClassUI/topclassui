@@ -92,6 +92,6 @@ describe('the demos the plan names', () => {
   it('status: the loading tree is busy and says Loading; the empty one says Nothing here yet', async () => {
     const html = await render('status')
     expect([...html.matchAll(/aria-busy="true"/g)]).toHaveLength(1)
-    expect([...html.matchAll(/<div role="status"[^>]*>([^<]*)<\/div>/g)].map(([, text]) => text)).toEqual(['Loading', 'Nothing here yet'])
+    expect([...html.matchAll(/<div role="status"[^>]*>(.*?)<\/div>/g)].map(([, inner]) => inner?.replace(/<[^>]*>/g, ''))).toEqual(['Loading', 'Nothing here yet'])
   })
 })

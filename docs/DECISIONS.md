@@ -16,9 +16,10 @@ The format is: date, decision, why, and what it affects.
 - **Timeline renders its own empty line and ships `TimelineSkeleton`.** With no items and no `emptyFallback`, it renders the tray icon and `labels.state.empty`, muted; `emptyFallback={null}` still renders nothing. The skeleton is three rows of a dot and a bar in Skeleton's fill and pulse, hidden from the accessibility tree.
 - **A Stepper step takes `disabled`**, drawn at half strength (`data-disabled:opacity-50`), as the states strip draws it; it changes the look only. The half lines lose their `-translate-y-1/2`, so the 1 px connector is crisp instead of smeared over two rows.
 - **The Timeline rail runs dot to dot.** The connector takes `-my-1`, the 4 px between a 12 px dot and its 20 px marker box, at both ends, so no gap opens beside a dot.
+- **TreeView draws its states as the previewer does.** A selected row keeps the regular weight; the caret and the item icon take the body colour; the keyboard ring sits 2 px outside the row, inside the tree's 8 px padding and scroll padding. While loading, two bars in Skeleton's fill stand for the words, which stay in the live region as `sr-only`; empty draws the tray over `labels.state.empty` in a raised box. A caller's `loadingFallback` or `emptyFallback` replaces the built-in look.
 - **EmptyState draws its dash in `line-strong`, with gap 10 and padding 28** (`gap-2.5`, `p-7`), as the previewer does; the Components page's `line`, 12 and 32 were the older drawing.
 
-**Kept against the frame, by rule.** Progress fills the bar with `<tone>-on-soft` and outlines its track: the drawn `<tone>-solid` bars measure under 3:1 on the track (warning 1.78 in light, success 2.97 and info 2.74 in dark), so R-5.6-4 holds. TreeView keeps the medium weight on a selected row (a cue beside colour) and draws its focus ring inside the row, since the tree clips its rows.
+**Kept against the frame, by rule.** Progress fills the bar with `<tone>-on-soft` and outlines its track: the drawn `<tone>-solid` bars measure under 3:1 on the track (warning 1.78 in light, success 2.97 and info 2.74 in dark), so R-5.6-4 holds. 
 
 **Affects** `src/tokens.css` (the row knob only), the six component folders, their tests, e2e specs and mutation rows.
 

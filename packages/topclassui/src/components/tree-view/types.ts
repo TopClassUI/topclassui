@@ -94,6 +94,9 @@ export type TreeViewHookProps = Pick<
 >
 
 /** What the hook hands the markup: the windowed rows, the tree's own attributes and the listeners it wraps. */
+/** How the status line under the tree draws: nothing, the caller's own node, bars while loading, or the tray when empty. */
+export type TreeNoteKind = 'idle' | 'own' | 'loading' | 'loading-more' | 'empty'
+
 export interface TreeViewHookResult {
   treeRef: (node: HTMLDivElement | null) => void
   rows: UseCollectionResult<TreeRow>['rows']
@@ -106,6 +109,7 @@ export interface TreeViewHookResult {
   busy: boolean | undefined
   /** Null while idle, never undefined: the status element always has something to say or an explicit nothing. */
   note: Exclude<ReactNode, undefined>
+  noteKind: TreeNoteKind
   style: CSSProperties & { '--tc-list-pad-start': string, '--tc-list-pad-end': string, '--tc-list-rows': number | undefined }
   onKeyDown: (event: TreeKeyEvent) => void
   onFocus: (event: TreeFocusEvent) => void

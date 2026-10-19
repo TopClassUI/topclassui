@@ -98,8 +98,8 @@ describe('a row', () => {
     expect(ruleOf(`${active}:is(:where(.group\\/tree):focus-visible *)[data-highlighted]`)).toContain('outline-style: solid;')
   })
 
-  it('selected: a tint and a heavier weight; under forced colours the system pair, the ring and the marks in HighlightText', () => {
-    expect(ruleOf(`${selectorOf('aria-selected:font-medium')}[aria-selected="true"]`)).toContain('font-weight: var(--font-weight-medium);')
+  it('selected: a tint at the regular weight; under forced colours the system pair, the ring and the marks in HighlightText', () => {
+    expect(TREE_VIEW_ROW_SELECTED.split(' ').filter((cls) => cls.includes('font-'))).toEqual([])
     expect(ruleOf(`${selectorOf('forced-colors:aria-selected:bg-[Highlight]')}[aria-selected="true"]`)).toBe('background-color: Highlight;')
     // Written with the ring's own condition, or the ring's colour wins on specificity (measured: the token's primary on Highlight).
     expect(ruleOf(`${selectorOf('forced-colors:aria-selected:group-focus-visible/tree:data-highlighted:outline-[HighlightText]')}[aria-selected="true"]:is(:where(.group\\/tree):focus-visible *)[data-highlighted]`))

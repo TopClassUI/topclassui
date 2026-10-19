@@ -259,4 +259,22 @@ export const MUTATIONS: Mutation[] = [
     from: 'export const TREE_VIEW_LABEL = LABEL',
     to: 'export const TREE_VIEW_LABEL = `${LABEL} flex-1`',
   },
+  {
+    label: 'the tree view loading line shows its words again instead of the bars, so the line reads twice',
+    file: CLASSES,
+    from: "loading: 'sr-only', 'loading-more': 'sr-only'",
+    to: "loading: '', 'loading-more': ''",
+  },
+  {
+    label: 'the tree view takes the built-in loading look over a caller loadingFallback',
+    file: 'src/components/tree-view/lib.ts',
+    from: "return loadingFallback === undefined ? 'loading' : 'own'",
+    to: "return 'loading'",
+  },
+  {
+    label: 'the tree view row ring moves back inside the row, where the previewer does not draw it',
+    file: CLASSES,
+    from: 'group-focus-visible/tree:data-highlighted:outline-offset-(length:--tc-ring-offset)',
+    to: 'group-focus-visible/tree:data-highlighted:-outline-offset-(length:--tc-ring-width)',
+  },
 ]

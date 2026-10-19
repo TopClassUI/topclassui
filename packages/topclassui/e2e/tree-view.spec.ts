@@ -184,11 +184,11 @@ test.describe('live: the keys of the Authoring Practices', () => {
     await page.keyboard.press('ArrowDown')
     await expect(lit).toHaveText('components')
     // Chromium's :focus-visible turns on at the first key after a press, so the keyboard user sees where the keys are.
-    expect(await ringOf(lit)).toBe('solid 2px -2px')
+    expect(await ringOf(lit)).toBe('solid 2px 2px')
     await page.locator('body').click({ position: { x: 2, y: 2 } })
     await page.keyboard.press('Tab')
     await page.keyboard.press('ArrowDown')
-    expect(await ringOf(page.locator('#demo [data-highlighted]'))).toBe('solid 2px -2px')
+    expect(await ringOf(page.locator('#demo [data-highlighted]'))).toBe('solid 2px 2px')
     expect(await ringOf(tree)).toBe('none')
   })
 
@@ -239,7 +239,7 @@ test.describe('live: a small wheel never leaves the focused tree with no ring in
       await page.keyboard.press('ArrowDown')
       await expect.poll(() => stateOf(page)).toMatchObject({ whole: true, focused: true })
       expect(await ringOf(treeOf(page))).toBe('none')
-      expect(await ringOf(page.locator('#demo [data-highlighted]'))).toBe('solid 2px -2px')
+      expect(await ringOf(page.locator('#demo [data-highlighted]'))).toBe('solid 2px 2px')
     })
   }
 
@@ -315,7 +315,7 @@ test.describe('live: ten thousand rows, windowed', () => {
     await page.keyboard.press('End')
     await expect.poll(() => stateOf(page)).toMatchObject({ text: 'File 10000.ts', named: true, highlighted: 'File 10000.ts', whole: true })
     expect((await stateOf(page)).mounted).toBeLessThan(100)
-    expect(await ringOf(page.locator('#demo [data-highlighted]'))).toBe('solid 2px -2px')
+    expect(await ringOf(page.locator('#demo [data-highlighted]'))).toBe('solid 2px 2px')
     // The spacers stood for exactly the rows they replaced: below the last row, only the tree's own 8 px padding.
     const below = await treeOf(page).evaluate((tree) => {
       const last = [...tree.querySelectorAll('[role="treeitem"]')].at(-1)
@@ -565,24 +565,26 @@ test.describe('inside the viewport', () => {
 })
 
 test.describe('focus ring whole, never cut', () => {
-  test('the row ring is drawn inside the row, and the tree ring inside the tree, so no clipping parent cuts either', async ({ page }) => {
+  test('the row ring is drawn just outside the row, inside the tree\'s padding, so no clipping parent cuts it', async ({ page }) => {
     await openLive(page, 'tree-view--basic')
     const first = page.getByRole('treeitem').first()
     const [row, tree] = [await boxOf(first), await boxOf(treeOf(page))]
-    // The four edges of the row, two pixels deep: every one of them must change when the ring is drawn.
+    // The ring is 2 px wide, 2 px off the row: the four bands from 4 to 2 px outside each edge must change when it is drawn.
     const bands = [
-      { x: Math.floor(row.left) + 8, y: Math.ceil(row.top), width: Math.floor(row.width) - 16, height: 2 },
-      { x: Math.floor(row.left) + 8, y: Math.floor(row.bottom) - 2, width: Math.floor(row.width) - 16, height: 2 },
-      { x: Math.ceil(row.left), y: Math.floor(row.top) + 8, width: 2, height: Math.floor(row.height) - 16 },
-      { x: Math.floor(row.right) - 2, y: Math.floor(row.top) + 8, width: 2, height: Math.floor(row.height) - 16 },
+      { x: Math.floor(row.left) + 8, y: Math.round(row.top) - 4, width: Math.floor(row.width) - 16, height: 2 },
+      { x: Math.floor(row.left) + 8, y: Math.round(row.bottom) + 2, width: Math.floor(row.width) - 16, height: 2 },
+      { x: Math.round(row.left) - 4, y: Math.floor(row.top) + 8, width: 2, height: Math.floor(row.height) - 16 },
+      { x: Math.round(row.right) + 2, y: Math.floor(row.top) + 8, width: 2, height: Math.floor(row.height) - 16 },
     ]
     const before = await Promise.all(bands.map((clip) => page.screenshot({ clip })))
     await page.keyboard.press('Tab')
-    expect(await ringOf(page.locator('#demo [data-highlighted]'))).toBe('solid 2px -2px')
+    expect(await ringOf(page.locator('#demo [data-highlighted]'))).toBe('solid 2px 2px')
     const after = await Promise.all(bands.map((clip) => page.screenshot({ clip })))
     expect(before.map((shot, index) => Buffer.compare(shot, after[index] ?? shot) !== 0)).toEqual([true, true, true, true])
-    expect(row.left).toBeGreaterThanOrEqual(tree.left)
-    expect(row.right).toBeLessThanOrEqual(tree.right)
+    // The ring's outer edge, 4 px out, stays inside the tree's border, where its overflow would cut it.
+    expect(row.left - 4).toBeGreaterThan(tree.left)
+    expect(row.right + 4).toBeLessThan(tree.right)
+    expect(row.top - 4).toBeGreaterThan(tree.top)
   })
 })
 
@@ -621,7 +623,7 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(line[1]).toBe(line[2])
       await page.keyboard.press('ArrowUp')
       await expect(lit).toHaveText('layout.tsx')
-      expect(await ringOf(lit)).toBe('solid 2px -2px')
+      expect(await ringOf(lit)).toBe('solid 2px 2px')
     })
   })
 }

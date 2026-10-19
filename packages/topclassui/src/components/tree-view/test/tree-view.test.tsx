@@ -67,7 +67,7 @@ describe('on the server', () => {
 
   it('the icon sits in a hidden wrapper, and the label in a span of its own direction that truncates', () => {
     const out = html({ defaultExpanded: ['app'] })
-    expect(out).toMatch(/<span aria-hidden="true" class="flex shrink-0 text-muted [^"]*"><b>i<\/b><\/span><span dir="auto" class="truncate min-w-0">layout\.tsx<\/span>/)
+    expect(out).toMatch(/<span aria-hidden="true" class="flex shrink-0 text-body [^"]*"><b>i<\/b><\/span><span dir="auto" class="truncate min-w-0">layout\.tsx<\/span>/)
     expect([...out.matchAll(/<span dir="auto"/g)]).toHaveLength(5)
   })
 
@@ -93,7 +93,7 @@ describe('on the server', () => {
   })
 
   it('status: busy while loading, the note says so outside the tree, and idle writes nothing', () => {
-    const note = (out: string) => /<div role="status" class="[^"]*">(.*?)<\/div>/.exec(out)?.[1]
+    const note = (out: string) => /<div role="status" class="[^"]*">(.*?)<\/div>/.exec(out)?.[1]?.replace(/<[^>]*>/g, '')
     expect(attr(tree(html({ status: 'loading' })), 'aria-busy')).toBe('true')
     expect(attr(tree(html({ status: 'loading-more' })), 'aria-busy')).toBe('true')
     expect(attr(tree(html()), 'aria-busy')).toBeUndefined()
@@ -101,6 +101,19 @@ describe('on the server', () => {
       .toEqual(['Loading', 'Loading more', 'Nothing here yet', ''])
     expect(note(html({ status: 'loading', loadingFallback: 'Fetching' }))).toBe('Fetching')
     expect(note(html({ status: 'empty', emptyFallback: 'No files', items: [] }))).toBe('No files')
+  })
+
+  it('status: two hidden bars stand for the loading words, which stay in the live region; empty draws the tray over its words', () => {
+    const inner = (out: string) => /<div role="status" class="[^"]*">(.*?)<\/div>/.exec(out)?.[1] ?? ''
+    for (const status of ['loading', 'loading-more'] as const) {
+      const out = inner(html({ status }))
+      expect(out.match(/<span aria-hidden="true" class="block h-2 rounded-chip bg-neutral-soft animate-pulse/g), status).toHaveLength(2)
+      expect(out, status).toMatch(/<span class="sr-only">Loading/)
+    }
+    expect(inner(html({ status: 'loading', loadingFallback: 'Fetching' }))).toBe('<span class="">Fetching</span>')
+    const empty = inner(html({ status: 'empty', items: [] }))
+    expect(empty).toMatch(/^<svg [^>]*aria-hidden="true"[^>]*>.*<\/svg><span class="">Nothing here yet<\/span>$/)
+    expect(inner(html({ status: 'empty', emptyFallback: 'No files', items: [] }))).toBe('<span class="">No files</span>')
   })
 
   it('with no rows the tree is no tab stop', () => {
