@@ -22,7 +22,7 @@ const INPUTS: Record<string, string[]> = {
   multiple: ['Attachments: attachments, multiple, accept application/pdf,image/png'],
   playground: ['Attachment: attachment, one, accept .png,.jpg,.jpeg,.pdf'],
   rtl: ['المرفقات: attachments, multiple, accept application/pdf,image/png'],
-  states: ['Invalid: invalid, one, invalid', 'Disabled: disabled, one, disabled'],
+  states: ['Idle: idle, one', 'Invalid: invalid, one, invalid', 'Disabled: disabled, one, disabled'],
   'ten-thousand': ['Ten thousand files: photos, multiple, accept image/*'],
 }
 
