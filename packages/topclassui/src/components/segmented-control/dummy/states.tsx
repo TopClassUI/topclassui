@@ -4,7 +4,7 @@ import { SegmentedControlItem, SegmentedControlRoot } from '../index.js'
 const RING = 'outline-solid outline-(length:--tc-ring-width) -outline-offset-(length:--tc-ring-width) outline-ring'
 
 /** One track per state, named by its aria-label: the five Figma 138:668 draws, then invalid, one disabled segment and
- * read-only. Hover is drawn identical to a track with nothing selected. A read-only track looks like a live one. */
+ * read-only. A track always has a selected segment, so hover is drawn identical to idle. A read-only track looks like a live one. */
 export default function Demo() {
   return (
     <div className="flex flex-wrap items-center gap-6">
@@ -12,11 +12,11 @@ export default function Demo() {
         <SegmentedControlItem value="a">A</SegmentedControlItem>
         <SegmentedControlItem value="b">B</SegmentedControlItem>
       </SegmentedControlRoot>
-      <SegmentedControlRoot aria-label="hover">
+      <SegmentedControlRoot aria-label="hover" defaultValue="a">
         <SegmentedControlItem value="a">A</SegmentedControlItem>
         <SegmentedControlItem value="b">B</SegmentedControlItem>
       </SegmentedControlRoot>
-      <SegmentedControlRoot aria-label="focus-visible">
+      <SegmentedControlRoot aria-label="focus-visible" defaultValue="a">
         <SegmentedControlItem value="a" className={RING}>A</SegmentedControlItem>
         <SegmentedControlItem value="b">B</SegmentedControlItem>
       </SegmentedControlRoot>
@@ -24,7 +24,7 @@ export default function Demo() {
         <SegmentedControlItem value="a">A</SegmentedControlItem>
         <SegmentedControlItem value="b">B</SegmentedControlItem>
       </SegmentedControlRoot>
-      <SegmentedControlRoot aria-label="disabled" disabled>
+      <SegmentedControlRoot aria-label="disabled" disabled defaultValue="a">
         <SegmentedControlItem value="a">A</SegmentedControlItem>
         <SegmentedControlItem value="b">B</SegmentedControlItem>
       </SegmentedControlRoot>
