@@ -423,7 +423,7 @@ test.describe('ten thousand rows, windowed', () => {
       const before = await scrollY(page)
       await openOverlay(page, triggerOf(page, 'Jump to a section'), { by: 'tap' })
       const list = await boxOf(listOf(page))
-      for (let drag = 0; drag < 12; drag++) await touchDrag(page, list.left + 60, list.bottom - 20, list.top + 20)
+      for (let drag = 0; drag < 16; drag++) await touchDrag(page, list.left + 60, list.bottom - 20, list.top + 20)
       const last = await boxOf(page.getByRole('option', { name: 'Go to section 60' }))
       expect(last.bottom).toBeLessThanOrEqual(list.bottom + 0.5)
       expect(await scrollY(page)).toBe(before)
