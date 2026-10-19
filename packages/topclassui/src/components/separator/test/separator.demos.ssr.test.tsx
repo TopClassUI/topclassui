@@ -19,7 +19,7 @@ const SEPARATORS: Record<string, string[]> = {
   playground: ['horizontal none'],
   rtl: ['horizontal none', 'vertical none'],
   semantic: ['horizontal separator', 'vertical separator'],
-  states: ['horizontal none', 'vertical none'],
+  states: ['horizontal none', 'vertical none', 'horizontal none'],
   vertical: ['vertical none'],
 }
 

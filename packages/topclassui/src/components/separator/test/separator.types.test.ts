@@ -1,4 +1,5 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
+import type { ReactNode } from 'react'
 
 import { SEPARATOR_DEFAULTS, SEPARATOR_ORIENTATIONS } from '../constants.js'
 import { separatorSchema } from '../schema.js'
@@ -40,8 +41,8 @@ describe('the props follow the vocabulary', () => {
     expectTypeOf<Accepts<keyof SeparatorProps, 'aria-orientation'>>().toEqualTypeOf<false>()
   })
 
-  it('takes no content, because the labelled form is not built', () => {
-    expectTypeOf<Accepts<keyof SeparatorProps, 'children'>>().toEqualTypeOf<false>()
+  it('takes a label as its children, as Figma 137:815 draws it, and no raw HTML', () => {
+    expectTypeOf<SeparatorProps['children']>().toEqualTypeOf<ReactNode | undefined>()
     expectTypeOf<Accepts<keyof SeparatorProps, 'dangerouslySetInnerHTML'>>().toEqualTypeOf<false>()
   })
 

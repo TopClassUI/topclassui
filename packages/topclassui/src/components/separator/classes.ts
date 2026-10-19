@@ -8,3 +8,15 @@ export const SEPARATOR_ORIENTATION = {
   horizontal: 'w-full border-t-(length:--tc-line-width) border-line',
   vertical: 'self-stretch border-s-(length:--tc-line-width) border-line',
 } as const satisfies Record<SeparatorOrientation, string>
+
+/** The labelled form Figma 137:815 draws: a line, the label, a line, 10 apart. */
+export const SEPARATOR_LABELLED = {
+  horizontal: 'flex w-full items-center gap-2.5 text-xs text-muted',
+  vertical: 'flex flex-col self-stretch items-center gap-2.5 text-xs text-muted',
+} as const satisfies Record<SeparatorOrientation, string>
+
+/** One of the two lines either side of the label; each takes half of what the label leaves. */
+export const SEPARATOR_SIDE = {
+  horizontal: 'flex-1 border-t-(length:--tc-line-width) border-line',
+  vertical: 'flex-1 border-s-(length:--tc-line-width) border-line',
+} as const satisfies Record<SeparatorOrientation, string>
