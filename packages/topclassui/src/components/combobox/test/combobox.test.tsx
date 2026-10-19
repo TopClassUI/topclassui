@@ -116,7 +116,7 @@ describe('on the server', () => {
   })
 
   it('the magnifying glass is drawn at the inline start, in a wrapper hidden from assistive technology, and no caret', () => {
-    expect(html()).toMatch(/<span aria-hidden="true" class="pointer-events-none absolute inset-y-0 inset-s-3 flex items-center text-muted"><svg/)
+    expect(html()).toMatch(/<span aria-hidden="true" class="pointer-events-none absolute inset-y-0 inset-s-3 flex items-center text-muted peer-disabled:opacity-50"><svg/)
     expect(html()).not.toContain('inset-e-3')
   })
 })

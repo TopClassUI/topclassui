@@ -55,8 +55,8 @@ describe('the box and the input', () => {
     expect(ruleOf(selectorOf('pe-9'))).toBe('padding-inline-end: calc(var(--spacing) * 9);')
   })
 
-  it('a read-only input takes the soft fill, and the spinner stands still under reduced motion', () => {
-    expect(ruleOf(`${selectorOf('data-readonly:bg-neutral-soft')}[data-readonly]`)).toBe('background-color: var(--tc-neutral-soft);')
+  it('the icons dim with a disabled input, and the spinner stands still under reduced motion', () => {
+    expect(ruleOf(`${selectorOf('peer-disabled:opacity-50')}:is(:where(.peer):disabled ~ *)`)).toBe('opacity: 50%;')
     expect(mediaOf(selectorOf('motion-reduce:animate-none'))).toBe('@media (prefers-reduced-motion: reduce)')
   })
 })

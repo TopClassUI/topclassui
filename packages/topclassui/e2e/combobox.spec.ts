@@ -99,7 +99,7 @@ test.describe('the server HTML, before any script runs', () => {
     })
   })
 
-  test('invalid: the line turns to danger and thickens; disabled dims to half; read-only takes the read-only fill', async ({ page }) => {
+  test('invalid: the line turns to danger and thickens; disabled dims to half on the surface; read-only looks like idle', async ({ page }) => {
     await page.goto(urlFor('combobox--states', 'light', 'ltr'))
     const [invalid, disabled, readOnly, live] = ['Invalid', 'Disabled', 'Read-only', 'One option disabled'].map((name) => inputOf(page, name))
     if (!invalid || !disabled || !readOnly || !live) throw new Error('a state is missing')
@@ -107,7 +107,8 @@ test.describe('the server HTML, before any script runs', () => {
     expect(await css(invalid, 'box-shadow')).toContain('0px 0px 0px 1px inset')
     expect(await css(live, 'box-shadow')).not.toContain('inset')
     expect(await css(disabled, 'opacity')).toBe('0.5')
-    expect(await css(readOnly, 'background-color')).not.toBe(await css(live, 'background-color'))
+    expect(await css(disabled, 'background-color')).not.toBe(await css(live, 'background-color'))
+    expect(await css(readOnly, 'background-color')).toBe(await css(live, 'background-color'))
   })
 })
 
