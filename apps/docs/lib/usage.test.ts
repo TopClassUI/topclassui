@@ -202,3 +202,18 @@ describe('cleanSourceOf', () => {
     expect(cleanSourceOf('export default function Demo() {\n  return <Kbd>K</Kbd>\n}')).toBe('export default function Demo() {\n  return <Kbd>K</Kbd>\n}')
   })
 })
+
+describe('usageOf imports', () => {
+  it('keeps an import whose brace list runs over several lines whole', () => {
+    const source = [
+      'import {',
+      '  DialogBody, DialogRoot,',
+      "} from 'topclassui/dialog'",
+      '',
+      'export default function Demo(props: Props) {',
+      '  return <DialogRoot {...props} />',
+      '}',
+    ].join('\n')
+    expect(usageOf(source)?.imports).toEqual(["import {\n  DialogBody, DialogRoot,\n} from 'topclassui/dialog'"])
+  })
+})

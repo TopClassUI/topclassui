@@ -11,7 +11,8 @@ export interface Usage {
 }
 
 const SPREAD = /[ \t]*\{\.\.\.props\}/
-const IMPORT = /^import\s+(?!type\b)[^\n]*$/gm
+// A brace list may run over several lines, as a long import of a part family does.
+const IMPORT = /^import\s+(?!type\b)(?:[^\n{]*\{[^}]*\}[^\n]*|[^\n]*)$/gm
 const SIGNATURE = /export default function \w+\(\s*(?:\{([^}]*)\})?[^)]*\)[^{]*\{/
 const passThrough = (name: string) => new RegExp(`\\s+${name}=\\{${name}\\}`, 'g')
 
