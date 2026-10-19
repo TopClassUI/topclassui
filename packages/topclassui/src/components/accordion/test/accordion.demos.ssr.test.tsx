@@ -24,8 +24,8 @@ const TRIGGERS: Record<string, { count: number, open: number[] }> = {
   'multiple': { count: 3, open: [0, 1] },
   'playground': { count: 3, open: [0] },
   'rtl': { count: 3, open: [0] },
-  // The one item of the accordion disabled as a whole, then three items with the first of them open.
-  'states': { count: 4, open: [1] },
+  // One accordion per drawn state: closed, open and disabled.
+  'states': { count: 3, open: [1] },
 }
 
 const render = async (file: string) => {

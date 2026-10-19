@@ -7,11 +7,11 @@ const blog = (page: number) => `/blog?page=${String(page)}`
 export default function Demo() {
   return (
     <div className="flex flex-col gap-4">
-      <Pagination value={1} pageCount={12} getHref={blog} aria-label="On the first page" />
-      <Pagination value={6} pageCount={12} getHref={blog} aria-label="In the middle" />
-      <Pagination value={12} pageCount={12} getHref={blog} aria-label="On the last page" />
-      <Pagination value={1} pageCount={1} getHref={blog} aria-label="A single page" />
-      <Pagination value={1} pageCount={12} getHref={blog} disabled aria-label="Switched off" />
+      <Pagination value={1} pageCount={12} getHref={blog} aria-label="first page" />
+      <Pagination value={6} pageCount={12} getHref={blog} aria-label="middle" />
+      <Pagination value={12} pageCount={12} getHref={blog} aria-label="last page" />
+      <Pagination value={1} pageCount={1} getHref={blog} aria-label="single page" />
+      <Pagination value={1} pageCount={12} getHref={blog} disabled aria-label="disabled" />
     </div>
   )
 }

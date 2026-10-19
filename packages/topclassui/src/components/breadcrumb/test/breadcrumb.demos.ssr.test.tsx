@@ -90,7 +90,7 @@ describe('each demo shows what its name says', () => {
   it('states names each of its five trails, and only the lone current page has no link', async () => {
     const out = await load('states')
     expect([...out.matchAll(/<nav aria-label="([^"]*)"/g)].map((m) => m[1])).toEqual([
-      'Ending on the current page', 'Every crumb a link', 'Only the current page', 'Folded to three crumbs', 'Home as an icon',
+      'current', 'idle', 'current page only', 'collapsed', 'home icon',
     ])
     // 4 in the first two, 2 of the folded five (Docs, then Button) and 2 under the house.
     expect(count(out, '<a href=')).toBe(8)

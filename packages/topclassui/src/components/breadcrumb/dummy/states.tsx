@@ -7,7 +7,7 @@ export default function Demo() {
   return (
     <div className="grid justify-items-start gap-4">
       <Breadcrumb
-        aria-label="Ending on the current page"
+        aria-label="current"
         items={[
           { href: '/', label: 'Home' },
           { href: '/docs', label: 'Docs' },
@@ -15,15 +15,15 @@ export default function Demo() {
         ]}
       />
       <Breadcrumb
-        aria-label="Every crumb a link"
+        aria-label="idle"
         items={[
           { href: '/', label: 'Home' },
           { href: '/shop', label: 'Shop' },
         ]}
       />
-      <Breadcrumb aria-label="Only the current page" items={[{ label: 'Home' }]} />
+      <Breadcrumb aria-label="current page only" items={[{ label: 'Home' }]} />
       <Breadcrumb
-        aria-label="Folded to three crumbs"
+        aria-label="collapsed"
         maxItems={3}
         items={[
           { href: '/docs', label: 'Docs' },
@@ -34,7 +34,7 @@ export default function Demo() {
         ]}
       />
       <Breadcrumb
-        aria-label="Home as an icon"
+        aria-label="home icon"
         showHome
         items={[
           { href: '/', label: 'Home' },
