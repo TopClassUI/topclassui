@@ -15,7 +15,7 @@ export default function Demo(props: TableDesignProps) {
   return (
     <Table
       {...props}
-      caption="Team members"
+      caption="Team members, by name"
       items={members}
       getKey={(member) => member.id}
       sort={{ key: 'name', direction: 'ascending' }}

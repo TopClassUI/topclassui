@@ -60,6 +60,12 @@ describe('ToastStage', () => {
     expect(inStage().map((root) => root.querySelector('h2')?.textContent)).toEqual(['Project created'])
   })
 
+  it('names its column apart from the page\'s, so the two landmarks differ', async () => {
+    render(stage())
+    await screen.findByRole('heading', { name: 'Project created' })
+    expect(screen.getByRole('region', { name: 'Example notifications' }).contains(inStage()[0] ?? null)).toBe(true)
+  })
+
   it('draws its column at the bottom-end of the box, never fixed to the screen', async () => {
     render(stage())
     await screen.findByRole('heading', { name: 'Project created' })
