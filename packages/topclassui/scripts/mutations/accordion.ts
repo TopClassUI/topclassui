@@ -90,8 +90,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the region of an accordion panel loses its 4 px above, so the ring of a control on its first line is cut',
     file: CLASSES,
-    from: 'px-4 pt-1 pb-4',
-    to: 'px-4 pb-4',
+    from: 'px-3.5 pt-1 pb-3.5',
+    to: 'px-3.5 pb-3.5',
   },
   {
     label: 'the accordion box is no longer one grid column, so a wide table in a panel widens a parent that fits its content',
