@@ -36,6 +36,9 @@ for (const [w, h] of WIDTHS) {
       try {
         await page.goto(`${ORIGIN}${path}`, { waitUntil: 'networkidle', timeout: 60_000 })
         await page.evaluate((m) => document.documentElement.setAttribute('data-theme', m), mode)
+        // content-visibility: auto leaves off-screen sections unpainted in a full-page shot; paint everything for the audit.
+        await page.addStyleTag({ content: '* { content-visibility: visible !important; }' })
+        await page.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 800) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, 60)) } window.scrollTo(0, 0) })
         await page.waitForTimeout(400)
         await page.screenshot({ path: join(OUT, `${name}-${w}-${mode}.png`), fullPage: true })
         console.log('ok', name, w, mode)
