@@ -32,7 +32,9 @@ export function usageOf(source: string): Usage | null {
   // A multi-line tree's closing tag sits at the root's own indent, which the first line lost to the trim.
   const cut = indents.length > 0 ? Math.min(...indents) : 0
   const jsx = lines.map((line, index) => (index === 0 ? line : line.slice(Math.min(cut, line.length - line.trimStart().length)))).join('\n')
-  return { imports: source.match(IMPORT) ?? [], jsx, passed }
+  // A type the demo needs for its own props is not one the reader's usage needs.
+  const imports = (source.match(IMPORT) ?? []).map((line) => line.replace(/,\s*type \w+/g, '').replace(/\{\s*type \w+,\s*/, '{ '))
+  return { imports, jsx, passed }
 }
 
 /** One JSX attribute as a reader would type it: `size="lg"`, `loading`, `fullWidth={false}`, `max={5}`. */
@@ -85,6 +87,9 @@ export function snippetOf(usage: Usage, props: readonly [string, PropValue][]): 
     }
   }
   jsx = usage.passed.reduce((tree, name) => tree.replace(passThrough(name), ''), jsx)
+  // A spread on a line of its own goes with its line when nothing takes its place.
+  if (spread.length === 0) jsx = jsx.replace(/\n[ \t]*\{\.\.\.props\}(?=\n)/, '')
+  else jsx = jsx.replace(/^([ \t]*)\{\.\.\.props\}$/m, (_, indent: string) => spread.map((attribute) => `${indent}${attribute.trim()}`).join('\n'))
   jsx = jsx.replace(/[ \t]+(\w+)=\{\1\}/g, '').replace(SPREAD, spread.join(''))
   return usage.imports.length > 0 ? `${usage.imports.join('\n')}\n\n${jsx}` : jsx
 }

@@ -217,3 +217,23 @@ describe('usageOf imports', () => {
     expect(usageOf(source)?.imports).toEqual(["import {\n  DialogBody, DialogRoot,\n} from 'topclassui/dialog'"])
   })
 })
+
+describe('snippetOf on a multi-line root', () => {
+  it('drops the spread line and the props type when no value takes their place', () => {
+    const source = [
+      "import { Table, type TableDesignProps } from 'topclassui/table'",
+      '',
+      'export default function Demo(props: TableDesignProps) {',
+      '  return (',
+      '    <Table',
+      '      {...props}',
+      '      caption="Team"',
+      '    />',
+      '  )',
+      '}',
+    ].join('\n')
+    const usage = usageOf(source)
+    expect(usage === null ? null : snippetOf(usage, [])).toBe("import { Table } from 'topclassui/table'\n\n<Table\n  caption=\"Team\"\n/>")
+    expect(usage === null ? null : snippetOf(usage, [['striped', true]])).toBe("import { Table } from 'topclassui/table'\n\n<Table\n  striped\n  caption=\"Team\"\n/>")
+  })
+})
