@@ -4,6 +4,7 @@ import { getLabels } from 'topclassui/labels/get-labels'
 import type { Locale } from '../../content/pages'
 import { GUIDES } from '../../lib/data'
 import { highlight } from '../../lib/highlight'
+import { DOCS_CODE } from '../classes'
 
 // A file name, the same in every language, as a fence's title is.
 const FILE_NAME = 'index.html'
@@ -29,5 +30,5 @@ export function themeScriptHtml(locale: Locale): string {
 export async function ThemeScriptHtml({ locale }: { locale: Locale }) {
   const code = themeScriptHtml(locale)
   const highlighted = await highlight(code, 'html')
-  return <CodeBlock {...getLabels(locale)} lang="html" title={FILE_NAME} highlighted={highlighted ?? undefined}>{code}</CodeBlock>
+  return <CodeBlock className={DOCS_CODE} {...getLabels(locale)} lang="html" title={FILE_NAME} highlighted={highlighted ?? undefined}>{code}</CodeBlock>
 }

@@ -1,6 +1,6 @@
 // R-5.12-4: one class string per element Accordion styles, built from the shared constants.
 import {
-  BORDER, DISABLED, FADE_MOTION, FOCUS_RING_INSET, HOVER, SCROLL_X, TOUCH_TARGET, TRANSITION,
+  BORDER, DISABLED, FADE_MOTION, FOCUS_RING_INSET, HOVER, POINTER, SCROLL_X, TOUCH_TARGET, TRANSITION,
 } from '#shared/classes.js'
 
 /** The box. It clips, so a hover fill ends at its rounded corners, and it breaks a word too long
@@ -22,6 +22,7 @@ export const ACCORDION_TRIGGER = [
   'group flex w-full flex-wrap items-center gap-3 px-4 py-3.5 text-start text-sm font-medium text-body tone-neutral',
   HOVER.ghost,
   FOCUS_RING_INSET,
+  POINTER,
   TOUCH_TARGET,
   TRANSITION,
   DISABLED,

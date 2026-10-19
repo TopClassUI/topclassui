@@ -1,5 +1,5 @@
 // R-5.12-4: Pagination's own class tables, read by variants.ts and index.tsx.
-import { BORDER_STRONG, HOVER } from '#shared/classes.js'
+import { BORDER_STRONG, HOVER, POINTER } from '#shared/classes.js'
 import type { Size } from '#shared/contracts/size.js'
 import { TONE_CLASS } from '#shared/contracts/tone.js'
 
@@ -34,10 +34,10 @@ export const CELL_CURRENT_FORCED = [
 ].join(' ')
 
 /** The page the reader is on: filled, so it is found without reading a number. */
-export const CELL_CURRENT = `bg-primary-solid text-primary-on-solid ${TONE_CLASS.primary} ${HOVER.solid} ${CELL_CURRENT_FORCED}`
+export const CELL_CURRENT = `bg-primary-solid text-primary-on-solid ${TONE_CLASS.primary} ${HOVER.solid} ${POINTER} ${CELL_CURRENT_FORCED}`
 
 /** Every other cell: a control boundary at 3:1, body text, and the neutral tint under a pointer. */
-export const CELL_OTHER = `${BORDER_STRONG} text-body ${TONE_CLASS.neutral} ${HOVER.outline}`
+export const CELL_OTHER = `${BORDER_STRONG} text-body ${TONE_CLASS.neutral} ${HOVER.outline} ${POINTER}`
 
 /** A gap is text, not a control: no boundary, no ring and no hover. */
 export const CELL_GAP = `${CELL} text-body`

@@ -1,5 +1,5 @@
 // R-5.12-4: one class string per element TreeView styles, built from the shared constants.
-import { BORDER, HOVER, LABEL, SCROLL_AREA, TRANSITION } from '#shared/classes.js'
+import { BORDER, HOVER, LABEL, POINTER, SCROLL_AREA, TRANSITION } from '#shared/classes.js'
 
 /** The box: one column, so the tree scrolls inside it and never widens its parent. No gap: the note brings its own room. */
 export const TREE_VIEW_ROOT = 'grid min-w-0 grid-cols-1'
@@ -19,10 +19,11 @@ export const TREE_VIEW_TREE = [
 
 /** Exactly one unit tall, 44 px under a finger. The start padding grows by one indent per level. */
 export const TREE_VIEW_ROW = [
-  'group/row flex h-(--tc-row-height) shrink-0 cursor-default select-none items-center gap-1.5 rounded-control text-start text-sm text-body',
+  'group/row flex h-(--tc-row-height) shrink-0 select-none items-center gap-1.5 rounded-control text-start text-sm text-body',
   'pe-2 ps-[calc(0.5rem+var(--tc-tree-level)*var(--tc-tree-indent))]',
   'pointer-coarse:h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]',
   HOVER.ghost,
+  POINTER,
   TRANSITION,
 ].join(' ')
 

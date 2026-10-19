@@ -1,4 +1,4 @@
-// Docs-site S3: every token colour of both Shiki themes reaches 4.5:1 plus the repo's margin on CodeBlock's surface.
+// Docs-site S3: every token colour of both Shiki themes reaches 4.5:1 plus the repo's margin on CodeBlock's surface and on a guide page's.
 import { codeToTokensBase } from 'shiki'
 import { describe, expect, it } from 'vitest'
 
@@ -14,7 +14,7 @@ const CORPUS: [string, string][] = [
   ['json', '{ "a": 1, "b": [true, null, "s"] }'],
 ]
 
-const { codeSurface } = libraryFacts()
+const { codeSurface, page } = libraryFacts()
 
 async function colorsOf(theme: typeof ON_DARK): Promise<Set<string>> {
   const colors = new Set<string>()
@@ -25,16 +25,20 @@ async function colorsOf(theme: typeof ON_DARK): Promise<Set<string>> {
   return colors
 }
 
-describe('the Shiki pair on CodeBlock', () => {
+describe('the Shiki pair on CodeBlock and on the page', () => {
   const cases = [
-    { theme: ON_DARK, modes: ['light', 'ocean'] as const },
-    { theme: ON_LIGHT, modes: ['dark'] as const },
+    { theme: ON_DARK, ground: 'CodeBlock', surfaces: codeSurface, modes: ['light', 'ocean'] as const },
+    { theme: ON_LIGHT, ground: 'CodeBlock', surfaces: codeSurface, modes: ['dark'] as const },
+    { theme: ON_DARK, ground: 'the page', surfaces: page, modes: ['dark'] as const },
+    { theme: ON_LIGHT, ground: 'the page', surfaces: page, modes: ['light', 'ocean'] as const },
   ]
-  for (const { theme, modes } of cases) {
+  for (const { theme, ground, surfaces, modes } of cases) {
     for (const mode of modes) {
-      it(`${String(theme.name)} passes 4.5:1 plus the margin in ${mode}`, async () => {
-        for (const color of await colorsOf(theme)) {
-          expect(contrastOfHex(color, codeSurface[mode]), `${color} on ${codeSurface[mode]}`).toBeGreaterThanOrEqual(4.5 + MARGIN)
+      it(`${String(theme.name)} passes 4.5:1 plus the margin on ${ground} in ${mode}`, async () => {
+        const colors = await colorsOf(theme)
+        expect(colors.size).toBeGreaterThanOrEqual(4)
+        for (const color of colors) {
+          expect(contrastOfHex(color, surfaces[mode]), `${color} on ${surfaces[mode]}`).toBeGreaterThanOrEqual(4.5 + MARGIN)
         }
       })
     }

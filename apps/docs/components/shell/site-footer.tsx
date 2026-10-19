@@ -6,6 +6,7 @@ import { Separator } from 'topclassui/separator'
 
 import { LIVE_PAGES, PAGE_GROUPS, hrefOf, pageBySlug, type Locale } from '../../content/pages'
 import type { SiteLabels } from '../../labels/index'
+import { SECTIONS } from '../../content/sections'
 import { CARDS } from '../../lib/data'
 import { GITHUB_URL, INSTALL_LINE, PRERELEASE, VERSION, X_URL, YOUTUBE_URL } from '../../lib/site'
 import { QUIET_LINK } from '../classes'
@@ -13,14 +14,24 @@ import { CommandBox } from '../command-box'
 import { GithubMark, XMark, YoutubeMark } from '../home/brand-logos'
 import { BrandTile } from './brand-mark'
 
+/** The catalog sections the footer's Components column lists, as drawn. */
+const FOOTER_SECTIONS = ['actions', 'forms', 'overlays', 'navigation', 'data'] as const
+
 const FACT = `rounded-chip bg-page px-2 py-0.5 font-mono text-xs text-muted ${BORDER}`
 
-/** Five columns as drawn: the brand, then one per page group; a column whose pages are not live yet is left out (choice 12). */
+/** Five columns as drawn: the brand, then one per page group, the catalog's sections under Components; a page not live yet is left out (choice 12). */
 export function SiteFooter({ locale, labels }: { locale: Locale; labels: SiteLabels }) {
+  const catalog = pageBySlug('components')
+  const catalogHref = catalog === undefined ? '' : hrefOf(catalog, locale)
   const columns = PAGE_GROUPS.map((group) => ({
     group,
     links: [
-      ...LIVE_PAGES.filter((page) => page.group === group && page.kind !== 'home').map((page) => ({ key: page.slug, href: hrefOf(page, locale), text: page.title[locale] })),
+      ...LIVE_PAGES.filter((page) => page.group === group && page.kind !== 'home').map((page) => ({
+        key: page.slug,
+        href: hrefOf(page, locale),
+        text: page.slug === 'components' ? labels.footer.all(CARDS.length) : page.slug === 'cli' ? labels.footer.cli : page.title[locale],
+      })),
+      ...(group === 'reference' ? FOOTER_SECTIONS.map((id) => SECTIONS.find((section) => section.id === id)).filter((section) => section !== undefined).map((section) => ({ key: section.id, href: `${catalogHref}#${section.id}`, text: section.title[locale] })) : []),
       ...(group === 'more' ? [{ key: 'llms', href: '/llms.txt', text: labels.footer.llms }] : []),
     ],
   })).filter((column) => column.links.length > 0)
@@ -79,6 +90,7 @@ export function SiteFooter({ locale, labels }: { locale: Locale; labels: SiteLab
           )))}
         </ul>
         {changelog === undefined ? null : <Link href={hrefOf(changelog, locale)} className={QUIET_LINK}>{changelog.title[locale]}</Link>}
+        {GITHUB_URL === null ? null : <a href={GITHUB_URL} rel="noopener noreferrer" className={QUIET_LINK}>{labels.shell.github}</a>}
       </div>
     </footer>
   )
