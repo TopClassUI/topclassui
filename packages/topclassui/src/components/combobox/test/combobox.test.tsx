@@ -115,7 +115,8 @@ describe('on the server', () => {
     expect(hidden(out)).toContain('required=""')
   })
 
-  it('the caret is drawn at the inline end, in a wrapper hidden from assistive technology', () => {
-    expect(html()).toMatch(/<span aria-hidden="true" class="pointer-events-none absolute inset-y-0 inset-e-3 flex items-center text-muted"><svg/)
+  it('the magnifying glass is drawn at the inline start, in a wrapper hidden from assistive technology, and no caret', () => {
+    expect(html()).toMatch(/<span aria-hidden="true" class="pointer-events-none absolute inset-y-0 inset-s-3 flex items-center text-muted"><svg/)
+    expect(html()).not.toContain('inset-e-3')
   })
 })

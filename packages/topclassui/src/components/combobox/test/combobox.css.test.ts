@@ -107,8 +107,9 @@ describe('a row', () => {
     expect(ruleOf(`${selectorOf('forced-colors:data-highlighted:bg-[Highlight]')}[data-highlighted]`)).toBe('background-color: Highlight;')
   })
 
-  it('the chosen row is heavier as well as ticked, and a disabled one dims to half', () => {
-    expect(ruleOf(`${selectorOf('data-selected:font-medium')}[data-selected]`)).toBe('--tw-font-weight: var(--font-weight-medium); font-weight: var(--font-weight-medium);')
+  it('the chosen row is tinted as well as ticked, and a disabled one dims to half', () => {
+    expect(ruleOf(`${selectorOf('data-selected:bg-primary-soft')}[data-selected]`)).toBe('background-color: var(--tc-primary-soft);')
+    expect(ruleOf(`${selectorOf('data-selected:text-primary-on-soft')}[data-selected]`)).toBe('color: var(--tc-primary-on-soft);')
     expect(ruleOf(`${selectorOf('data-disabled:opacity-50')}[data-disabled]`)).toBe('opacity: 50%;')
   })
 
