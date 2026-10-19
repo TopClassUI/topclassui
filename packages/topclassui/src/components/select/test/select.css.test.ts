@@ -50,9 +50,9 @@ describe('the box and the trigger', () => {
     expect(ruleOf(selectorOf('inline-grid'))).toBe('display: inline-grid;')
   })
 
-  it('the placeholder is muted, a read-only trigger takes the soft fill', () => {
+  it('the placeholder is muted, a read-only trigger takes no fill of its own', () => {
     expect(ruleOf(`${selectorOf('data-placeholder:text-muted')}[data-placeholder]`)).toBe('color: var(--tc-muted);')
-    expect(ruleOf(`${selectorOf('data-readonly:bg-neutral-soft')}[data-readonly]`)).toBe('background-color: var(--tc-neutral-soft);')
+    expect(SELECT_TRIGGER.split(' ')).not.toContain('data-readonly:bg-neutral-soft')
   })
 
   it('in forced colours, which drop the fill, a read-only trigger has a dashed line instead', () => {

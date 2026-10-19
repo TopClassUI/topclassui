@@ -9,8 +9,8 @@ export const SELECT_ROOT = `inline-grid align-middle ${FIELD_HOLDER}`
 /** The ring of FOCUS_RING, held on the trigger of an open list. */
 const SELECT_OPEN_RING = 'data-popup-open:outline-solid data-popup-open:outline-(length:--tc-ring-width) data-popup-open:outline-offset-(length:--tc-ring-offset) data-popup-open:outline-ring'
 
-/** Read-only takes the soft fill; forced colours drop a fill, so there its line is dashed. Open, it keeps the ring the frame draws while the focus is in the list. */
-export const SELECT_TRIGGER = `inline-flex w-full cursor-pointer items-center justify-between gap-2 text-start ${FIELD_BOX} data-readonly:bg-neutral-soft forced-colors:data-readonly:border-dashed ${SELECT_OPEN_RING}`
+/** Read-only looks like idle, as the frames draw it; under forced colours its line is dashed. Open, it keeps the ring the frame draws while the focus is in the list. */
+export const SELECT_TRIGGER = `inline-flex w-full cursor-pointer items-center justify-between gap-2 text-start ${FIELD_BOX} forced-colors:data-readonly:border-dashed ${SELECT_OPEN_RING}`
 export const SELECT_VALUE = `${LABEL} flex-1 data-placeholder:text-muted`
 export const SELECT_ICON = 'flex shrink-0 text-muted'
 export const SELECT_POSITIONER = 'z-(--tc-z-popup) data-anchor-hidden:invisible'

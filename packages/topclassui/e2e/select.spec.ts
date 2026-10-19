@@ -97,14 +97,15 @@ test.describe('the static page: the server HTML, before any script runs', () => 
     })
   }
 
-  test('the states: the placeholder is muted, invalid is red and 2 px, disabled is dimmed, read-only takes the soft fill', async ({ page }) => {
+  test('the states: the placeholder is muted, invalid is red and 2 px, disabled sits on the surface and is dimmed, read-only looks like idle', async ({ page }) => {
     await page.goto(urlFor('select--states', 'light', 'ltr'))
     const danger = await resolve(page, 'var(--tc-danger-solid)')
     expect(await css(combo(page, 'Nothing chosen').locator('span').first(), 'color')).toBe(await resolve(page, 'var(--tc-muted)'))
     expect(await css(combo(page, 'Invalid'), 'border-top-color')).toBe(danger)
     expect(await css(combo(page, 'Invalid'), 'box-shadow')).toContain(`${danger} 0px 0px 0px 1px inset`)
     expect(await css(combo(page, 'Disabled'), 'opacity')).toBe('0.5')
-    expect(await css(combo(page, 'Read-only'), 'background-color')).toBe(await resolve(page, 'var(--tc-neutral-soft)'))
+    expect(await css(combo(page, 'Disabled'), 'background-color')).toBe(await resolve(page, 'var(--tc-surface)'))
+    expect(await css(combo(page, 'Read-only'), 'background-color')).toBe(await resolve(page, 'var(--tc-surface-raised)'))
     expect(await css(combo(page, 'Nothing chosen'), 'background-color')).toBe(await resolve(page, 'var(--tc-surface-raised)'))
   })
 
@@ -158,7 +159,7 @@ test.describe('the static page: the server HTML, before any script runs', () => 
     expect(await liveErrors(page)).toEqual([])
   })
 
-  test('outside forced colours the read-only line stays solid: the soft fill tells it there', async ({ page }) => {
+  test('outside forced colours the read-only line stays solid, as the frame draws it', async ({ page }) => {
     await page.goto(urlFor('select--states', 'light', 'ltr'))
     expect(await css(combo(page, 'Read-only'), 'border-top-style')).toBe('solid')
   })
