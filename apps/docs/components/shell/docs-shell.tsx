@@ -49,7 +49,7 @@ export function DocsShell({ locale, entry, labels, children }: DocsShellProps) {
         <div className="flex flex-col gap-2.5">
           <Breadcrumb
             items={[{ label: labels.shell.home, href: `/${locale}` }, { label: entry.title[locale] }]}
-            baseUrl={SITE_URL}
+            siteUrl={SITE_URL}
             {...library}
           />
           <h1 className="text-4xl font-semibold text-body">{entry.title[locale]}</h1>
