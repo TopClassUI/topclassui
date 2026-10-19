@@ -15,7 +15,7 @@ export const DIALOG_VIEWPORT = 'fixed inset-0 z-(--tc-z-dialog) grid place-items
  * itself only where the three bars cannot fit, and it breaks a word too long for its width.
  * Its ring is drawn inside its box: outside it would lie on the scrim, at 1.8:1. */
 export const DIALOG_POPUP = [
-  'flex max-h-[calc(100dvh-2*var(--tc-overlay-inset))] w-full flex-col wrap-anywhere',
+  'group/dialog flex max-h-[calc(100dvh-2*var(--tc-overlay-inset))] w-full flex-col wrap-anywhere',
   SCROLL_AREA,
   OVERLAY_SURFACE,
   POPUP_MOTION,
@@ -32,8 +32,11 @@ export const DIALOG_WIDTH = {
   custom: '',
 } as const satisfies Record<Size, string>
 
+/** The line a bar draws against the body only while the body scrolls: a short dialog is drawn with none. */
+export const DIALOG_BAR_LINE = 'border-transparent group-has-data-scrolls/dialog:border-line'
+
 /** It never shrinks, so it keeps its box while the body scrolls. */
-export const DIALOG_HEADER = 'flex shrink-0 items-start gap-3 border-b-(length:--tc-line-width) border-line px-4.5 py-3.5'
+export const DIALOG_HEADER = `flex shrink-0 items-start gap-3 border-b-(length:--tc-line-width) ${DIALOG_BAR_LINE} px-4.5 py-3.5`
 
 /** The title and the description: the column that gives way, so the x keeps its place. */
 export const DIALOG_HEADING = 'min-w-0 flex-1'
@@ -53,7 +56,7 @@ export const DIALOG_BODY = `min-h-15 flex-1 px-4.5 py-4.5 text-sm text-muted ${S
 
 /** It never shrinks either. The actions sit at the end and wrap onto rows on a narrow screen,
  * and a label too long for its row wraps inside its action. */
-export const DIALOG_FOOTER = `flex shrink-0 flex-wrap items-center justify-end gap-2 border-t-(length:--tc-line-width) border-line px-4.5 py-3.5 ${ACTIONS_WRAP}`
+export const DIALOG_FOOTER = `flex shrink-0 flex-wrap items-center justify-end gap-2 border-t-(length:--tc-line-width) ${DIALOG_BAR_LINE} px-4.5 py-3.5 ${ACTIONS_WRAP}`
 
 /** The x: an icon button on the neutral ramp, so its hover is the ghost tint. It reaches 5 px into the
  * padding, so its 14 px glyph ends on the padding line, as drawn, while its box keeps 24 px. */

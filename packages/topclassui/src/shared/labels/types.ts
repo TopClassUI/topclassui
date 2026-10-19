@@ -99,6 +99,7 @@ export interface Labels {
     readonly label: string
     readonly placeholder: string
     readonly escape: string
+    readonly enter: string
   }
   readonly navbar: {
     readonly label: string

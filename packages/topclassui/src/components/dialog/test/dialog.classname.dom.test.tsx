@@ -75,7 +75,8 @@ describe('className is passed last', () => {
       body: { className: 'px-8 py-2' }, footer: { className: 'justify-start' },
     })
     expect(classes(parts.header)).toEqual([
-      'border-b-(length:--tc-line-width)', 'border-line', 'flex', 'gap-3', 'items-start', 'px-8', 'py-3.5', 'shrink-0',
+      'border-b-(length:--tc-line-width)', 'border-transparent', 'flex', 'gap-3', 'group-has-data-scrolls/dialog:border-line',
+      'items-start', 'px-8', 'py-3.5', 'shrink-0',
     ])
     expect(classes(parts.title)).toEqual(['font-semibold', 'text-body', 'text-lg'])
     expect(classes(parts.description)).toEqual(['text-muted', 'text-xs'])

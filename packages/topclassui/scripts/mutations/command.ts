@@ -219,5 +219,16 @@ export const MUTATIONS: Mutation[] = [
     file: PANEL,
     from: 'aria-busy={panel.busy || undefined}',
     to: 'aria-busy={undefined}',
+  },  {
+    label: 'command: the Enter hint loses its empty alternative, so a screen reader names the active row "ButtonEnter"',
+    file: HOOK,
+    from: 'enterHint: `${JSON.stringify(labels.command.enter)} / ""`,',
+    to: 'enterHint: JSON.stringify(labels.command.enter),',
+  },
+  {
+    label: 'command: the Esc keycap stays under a finger, where no key can press it',
+    file: CLASSES,
+    from: "'shrink-0 border-line text-muted pointer-coarse:hidden'",
+    to: "'shrink-0 border-line text-muted'",
   },
 ]

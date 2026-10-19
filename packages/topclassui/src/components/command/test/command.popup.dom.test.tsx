@@ -43,7 +43,13 @@ describe('the popup', () => {
     second.unmount()
     render(<Palette />)
     await opened()
-    expect(list().getAttribute('style')).toBeNull()
+    expect(list().style.getPropertyValue('--tc-list-rows')).toBe('')
+  })
+
+  it('hands the rows the Enter hint of the labels with an empty alternative, so it is drawn and never read', async () => {
+    render(<Palette />)
+    await opened()
+    expect(list().style.getPropertyValue('--tc-command-enter')).toBe('"Enter" / ""')
   })
 
   it('caps what can be typed at the search field cap of 256 characters', async () => {

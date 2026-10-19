@@ -43,9 +43,12 @@ export const COMMAND_SPACER = [
 /** A heading, at the foot of its unit so it sits on the rows it names. */
 export const COMMAND_GROUP_LABEL = `flex items-end px-2.5 pb-0.5 text-xs font-medium text-muted ${COMMAND_UNIT}`
 
+/** The Enter hint at the end of the active row only, as muted mono text from the labels, and never under a finger. */
+export const COMMAND_ENTER_HINT = 'after:ms-auto after:hidden after:shrink-0 after:font-mono after:text-xs after:text-muted after:content-(--tc-command-enter) data-highlighted:after:inline pointer-coarse:data-highlighted:after:hidden'
+
 /** One command. Its label truncates, so a long one never widens the popup. The active row is the
  * highlighted one, filled and ringed by ROW_HIGHLIGHT: the focus stays in the input. */
-export const COMMAND_ITEM = `${ROW} ${ROW_HIGHLIGHT} ${DISABLED} ${COMMAND_UNIT} ${CONTAIN} cursor-default select-none`
+export const COMMAND_ITEM = `${ROW} ${ROW_HIGHLIGHT} ${DISABLED} ${COMMAND_UNIT} ${CONTAIN} ${COMMAND_ENTER_HINT} cursor-default select-none`
 
 /** The Esc keycap at the end of the search row: a hint for a keyboard, so a finger never sees it. */
 export const COMMAND_ESCAPE_HINT = 'shrink-0 border-line text-muted pointer-coarse:hidden'

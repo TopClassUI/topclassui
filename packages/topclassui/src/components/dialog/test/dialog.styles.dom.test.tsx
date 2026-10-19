@@ -95,10 +95,10 @@ describe('every element carries exactly the classes the spec names', () => {
     ])
   })
 
-  it('the popup: a column no taller than the screen, on the raised surface, 400 px at most', async () => {
+  it('the popup: a column no taller than the screen, on the raised surface, 380 px at most', async () => {
     expect(classes((await opened()).popup)).toEqual([
       ...RING_INSET,
-      'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line', 'data-ending-style:opacity-0',
+      'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line', 'group/dialog', 'data-ending-style:opacity-0',
       'data-ending-style:scale-95', 'data-starting-style:opacity-0', 'data-starting-style:scale-95',
       'duration-(--tc-duration)', 'ease-out', 'flex', 'flex-col', 'max-h-[calc(100dvh-2*var(--tc-overlay-inset))]',
       'max-w-95', 'origin-(--transform-origin)', 'overflow-y-auto', 'overscroll-contain', 'rounded-box',
@@ -107,9 +107,10 @@ describe('every element carries exactly the classes the spec names', () => {
     ].sort())
   })
 
-  it('the header: a row that never shrinks, with a line under it', async () => {
+  it('the header: a row that never shrinks, with a line under it while the body scrolls', async () => {
     expect(classes((await opened()).header)).toEqual([
-      'border-b-(length:--tc-line-width)', 'border-line', 'flex', 'gap-3', 'items-start', 'px-4.5', 'py-3.5', 'shrink-0',
+      'border-b-(length:--tc-line-width)', 'border-transparent', 'flex', 'gap-3', 'group-has-data-scrolls/dialog:border-line',
+      'items-start', 'px-4.5', 'py-3.5', 'shrink-0',
     ])
   })
 
@@ -132,10 +133,10 @@ describe('every element carries exactly the classes the spec names', () => {
     ].sort())
   })
 
-  it('the footer: a row that never shrinks, its actions at the end, with a line over it', async () => {
+  it('the footer: a row that never shrinks, its actions at the end, with a line over it while the body scrolls', async () => {
     expect(classes((await opened()).footer)).toEqual([
       ...ACTION_WRAP,
-      'border-line', 'border-t-(length:--tc-line-width)', 'flex', 'flex-wrap', 'gap-2', 'items-center', 'justify-end',
+      'border-t-(length:--tc-line-width)', 'border-transparent', 'group-has-data-scrolls/dialog:border-line', 'flex', 'flex-wrap', 'gap-2', 'items-center', 'justify-end',
       'px-4.5', 'py-3.5', 'shrink-0',
     ].sort())
   })

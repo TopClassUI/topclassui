@@ -55,6 +55,16 @@ const DECLARATION: Record<string, string> = {
   'font-medium': 'font-weight: var(--font-weight-medium);',
   'cursor-default': 'cursor: default;',
   'select-none': 'user-select: none;',
+  // The Enter hint, drawn after the active row only and never under a finger.
+  'after:content-(--tc-command-enter)': '--tw-content: var(--tc-command-enter);',
+  'after:font-mono': 'font-family: var(--tc-font-mono);',
+  'after:hidden': 'display: none;',
+  'after:ms-auto': 'margin-inline-start: auto;',
+  'after:shrink-0': 'flex-shrink: 0;',
+  'after:text-muted': 'color: var(--tc-muted);',
+  'after:text-xs': 'font-size: var(--text-xs);',
+  'data-highlighted:after:inline': 'display: inline;',
+  'pointer-coarse:data-highlighted:after:hidden': 'display: none;',
   // The Esc keycap, gone under a finger.
   'pointer-coarse:hidden': 'display: none;',
   // The empty and the loading text, and the title only a reader reads.
@@ -75,6 +85,7 @@ const SCOPE: Record<string, string> = {
 const WRAPPED: Record<string, string> = {
   'pointer-coarse:h-control-lg': '@media (pointer: coarse) { ',
   'pointer-coarse:hidden': '@media (pointer: coarse) { ',
+  'pointer-coarse:data-highlighted:after:hidden': '@media (pointer: coarse) { ',
   'pointer-coarse:h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]': '@media (pointer: coarse) { ',
   'pointer-coarse:h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-coarse,44px)))]': '@media (pointer: coarse) { ',
 }
@@ -108,7 +119,7 @@ describe('every class an open Command wears compiles with the installed Tailwind
       COMMAND_SPACER, COMMAND_GROUP_LABEL, COMMAND_ITEM, COMMAND_ESCAPE_HINT, COMMAND_STATUS, COMMAND_TITLE,
     ]).filter((cls) => !shared.has(cls))
     expect(own).toEqual(Object.keys(DECLARATION).sort())
-    expect(own).toHaveLength(42)
+    expect(own).toHaveLength(51)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

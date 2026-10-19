@@ -64,7 +64,7 @@ export function CommandPanel(props: CommandPanelProps) {
               <Autocomplete.List
                 ref={panel.listRef}
                 aria-busy={panel.busy || undefined}
-                style={{ '--tc-list-rows': panel.rows }}
+                style={{ '--tc-list-rows': panel.rows, '--tc-command-enter': panel.enterHint }}
                 className={COMMAND_LIST}
               >
                 <CommandRows

@@ -74,6 +74,9 @@ const DECLARATION: Record<string, string> = {
   'font-semibold': 'font-weight: var(--font-weight-semibold);',
   'text-muted': 'color: var(--tc-muted);',
   '-me-1.25': 'margin-inline-end: calc(var(--spacing) * -1.25);',
+  // The bars draw their line only while the body scrolls, which marks itself with data-scrolls.
+  'border-transparent': 'border-color: transparent;',
+  'group-has-data-scrolls/dialog:border-line': 'border-color: var(--tc-line);',
   'flex-wrap': 'flex-wrap: wrap;',
   'items-center': 'align-items: center;',
   'justify-end': 'justify-content: flex-end;',
@@ -129,7 +132,7 @@ function ruleFor(css: string, cls: string): string {
 const written = (strings: readonly string[]) => [...new Set(strings.join(' ').split(' '))].sort()
 
 describe('every class an open Dialog wears compiles with the installed Tailwind', () => {
-  const css = compileEntry().then((compiled) => compiled.build(Object.keys(DECLARATION)))
+  const css = compileEntry().then((compiled) => compiled.build([...Object.keys(DECLARATION), 'group/dialog']))
 
   // The classes that only act on a short screen, in a footer action or in a dialog that is not modal have a file of their own.
   it('the table names exactly the classes of the eleven strings in classes.ts, less those dialog.css.layout.test.ts holds', () => {
@@ -138,8 +141,8 @@ describe('every class an open Dialog wears compiles with the installed Tailwind'
       DIALOG_BACKDROP, DIALOG_VIEWPORT, DIALOG_POPUP, ...Object.values(DIALOG_WIDTH), DIALOG_HEADER, DIALOG_HEADING,
       DIALOG_TITLE, DIALOG_DESCRIPTION, DIALOG_BODY, DIALOG_FOOTER, DIALOG_CLOSE,
     ]).filter((cls) => cls !== '' && !elsewhere.has(cls))
-    expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(75)
+    expect(all).toEqual([...Object.keys(DECLARATION), 'group/dialog'].sort())
+    expect(all).toHaveLength(78)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

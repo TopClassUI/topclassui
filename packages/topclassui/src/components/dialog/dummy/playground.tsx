@@ -22,7 +22,7 @@ export default function Demo({ size, closeButton, stage = false }: DialogDesignP
       </DialogHeader>
       <DialogBody>11 files changed since the last publish.</DialogBody>
       <DialogFooter>
-        <DialogClose render={<Button variant="outline" size="sm">Cancel</Button>} />
+        <DialogClose render={<Button variant="soft" tone="neutral" size="sm">Cancel</Button>} />
         <DialogClose render={<Button size="sm">Publish now</Button>} />
       </DialogFooter>
     </>
