@@ -16,13 +16,14 @@ export const OTP_CELL_WHOLE = 'w-full grow-0'
 /** A cell may give up width where the row does not fit, never under the 24 px floor, and never height. */
 export const OTP_CELL = `min-w-[var(--tc-target-min,24px)] shrink p-0 text-center font-semibold tabular-nums rounded-control bg-surface-raised text-body ${BORDER_STRONG} ${TRANSITION} ${DISABLED} ${FOCUS_RING} ${TARGET_HEIGHT} ${FIELD_INVALID}`
 
-/** A square of the control scale, as the most a cell may be. Under a coarse pointer the three small sizes may be 44 px wide, and typed text is never under 16 px. */
+/** One step of the control scale taller than it is wide, as the frame draws a cell (38 by 46 at md). Under a coarse
+ * pointer the three small sizes may be 44 px wide, and typed text is never under 16 px. */
 export const OTP_CELL_SIZE = {
-  xs: `h-control-xs max-w-control-xs text-sm pointer-coarse:max-w-[var(--tc-target-coarse,44px)] ${FIELD_TEXT_COARSE}`,
-  sm: `h-control-sm max-w-control-sm text-base pointer-coarse:max-w-[var(--tc-target-coarse,44px)] ${FIELD_TEXT_COARSE}`,
-  md: 'h-control-md max-w-control-md text-lg pointer-coarse:max-w-[var(--tc-target-coarse,44px)] pointer-coarse:text-[max(1.125rem,16px)]',
-  lg: 'h-control-lg max-w-control-lg text-xl pointer-coarse:text-[max(1.25rem,16px)]',
-  xl: 'h-control-xl max-w-control-xl text-2xl pointer-coarse:text-[max(1.5rem,16px)]',
+  xs: `h-control-sm max-w-control-xs text-sm pointer-coarse:max-w-[var(--tc-target-coarse,44px)] ${FIELD_TEXT_COARSE}`,
+  sm: `h-control-md max-w-control-sm text-base pointer-coarse:max-w-[var(--tc-target-coarse,44px)] ${FIELD_TEXT_COARSE}`,
+  md: 'h-control-lg max-w-control-md text-lg pointer-coarse:max-w-[var(--tc-target-coarse,44px)] pointer-coarse:text-[max(1.125rem,16px)]',
+  lg: 'h-control-xl max-w-control-lg text-xl pointer-coarse:text-[max(1.25rem,16px)]',
+  xl: 'h-[calc(var(--spacing-control-xl)+var(--spacing-control-xl)-var(--spacing-control-lg))] max-w-control-xl text-2xl pointer-coarse:text-[max(1.5rem,16px)]',
   custom: '',
 } as const
 

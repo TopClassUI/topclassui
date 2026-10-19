@@ -119,9 +119,9 @@ describe('on the server', () => {
     expect(attr(hidden(html({ name: 'code', defaultValue: '٤٨٢' })), 'value')).toBe('482')
   })
 
-  it('size reaches the root as data-size and each cell as its square; custom draws no size', () => {
+  it('size reaches the root as data-size and each cell as its box; custom draws no size', () => {
     expect(attr(root(html({ size: 'xl' })), 'data-size')).toBe('xl')
-    expect(cells(html({ size: 'xl' }))[0]).toContain('h-control-xl max-w-control-xl text-2xl')
+    expect(cells(html({ size: 'xl' }))[0]).toContain('h-[calc(var(--spacing-control-xl)+var(--spacing-control-xl)-var(--spacing-control-lg))] max-w-control-xl text-2xl')
     expect(cells(html({ size: 'custom' }))[0]).not.toMatch(/h-control-|max-w-control-|text-(sm|base|lg|xl|2xl)/)
   })
 

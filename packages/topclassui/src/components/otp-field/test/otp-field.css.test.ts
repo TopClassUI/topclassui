@@ -71,11 +71,14 @@ describe('a cell', () => {
     expect(css.match(/flex-basis: [^;]+;/g)).toEqual(['flex-basis: var(--tc-target-min,24px);'])
   })
 
-  it('is a square of the control scale at each size, with its type step; custom draws none', () => {
+  it('is one step of the control scale taller than it is wide at each size, with its type step; custom draws none', () => {
     const sizes = Object.fromEntries(Object.entries(OTP_CELL_SIZE).filter(([size]) => size !== 'custom')
       .map(([size, classes]) => [size, classes.split(' ').slice(0, 2).map((cls) => ruleOf(selectorOf(cls)))]))
-    const square = (rem: string) => [`height: calc(${rem}rem * var(--tc-density));`, `max-width: calc(${rem}rem * var(--tc-density));`]
-    expect(sizes).toEqual({ xs: square('1.75'), sm: square('2'), md: square('2.5'), lg: square('3'), xl: square('3.5') })
+    const cell = (tall: string, wide: string) => [`height: calc(${tall}rem * var(--tc-density));`, `max-width: calc(${wide}rem * var(--tc-density));`]
+    expect(sizes).toEqual({
+      xs: cell('2', '1.75'), sm: cell('2.5', '2'), md: cell('3', '2.5'), lg: cell('3.5', '3'),
+      xl: ['height: calc(var(--spacing-control-xl) + var(--spacing-control-xl) - var(--spacing-control-lg));', 'max-width: calc(3.5rem * var(--tc-density));'],
+    })
     expect(OTP_CELL_SIZE.custom).toBe('')
   })
 
