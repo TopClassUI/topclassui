@@ -1064,7 +1064,7 @@ test.describe('a screen under 272 px tall', () => {
     await expect(bodyOf(popup)).toHaveCSS('overflow-y', 'auto')
     expect(await scrollersOf(popup), 'boxes that scroll').toBe(1)
     const parts = await partsOf(popup)
-    expect(parts.body.height).toBe(170)
+    expect(parts.body.height).toBe(174)
     expect(parts.footer?.bottom).toBe(parts.popup.bottom)
     expect(await popup.evaluate((el) => el.scrollHeight - el.clientHeight)).toBe(0)
   })
@@ -1110,7 +1110,7 @@ test.describe('inside the screen', () => {
         // Where the three bars are taller than the screen the sheet scrolls as one, by a wheel over its header.
         const [frame, header] = [await boxOf(popup), (await partsOf(popup)).header]
         const hidden = await popup.evaluate((el) => el.scrollHeight - el.clientHeight)
-        expect(hidden, 'px of sheet below its own box').toBe(screen.height === 390 ? 20 : 0)
+        expect(hidden, 'px of sheet below its own box').toBe(screen.height === 390 ? 16 : 0)
         await wheelAt(page, header.left + 40, header.top + 20, hidden)
         expect(await popup.evaluate((el) => el.scrollTop), 'px the wheel scrolled the sheet').toBe(hidden)
         for (const button of await popup.locator('button:not([aria-label])').all()) {

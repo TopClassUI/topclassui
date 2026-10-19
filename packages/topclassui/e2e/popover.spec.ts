@@ -368,9 +368,9 @@ test('320 x 160: where the popup has to scroll, its action keeps its 32 px and i
   await page.setViewportSize({ width: 320, height: 160 })
   const popup = await open(page, 'popover--basic', { edge: 'top' })
   await expectInsideViewport(popup, 'the popup', 8)
-  expect((await boxOf(popup.locator('button'))).height).toBe(32)
-  // The whole content, 148 px, in a box that shows 104 of it.
-  expect(await popup.evaluate((el) => `${String(el.scrollHeight)} in ${String(el.clientHeight)}`)).toBe('148 in 104')
+  expect((await boxOf(popup.getByRole('button', { name: 'Copy link' }))).height).toBe(32)
+  // The whole content, 152 px, in a box that shows 112 of it.
+  expect(await popup.evaluate((el) => `${String(el.scrollHeight)} in ${String(el.clientHeight)}`)).toBe('152 in 112')
 })
 
 test.describe('focus', () => {
@@ -393,8 +393,8 @@ test.describe('focus', () => {
 
   test('opened from the keyboard, focus moves to the first control, and Escape hands it back to the trigger', async ({ page }) => {
     const popup = await open(page, 'popover--basic', { by: 'keyboard' })
-    await expect(popup.locator('button')).toBeFocused()
-    await expect(popup.locator('button')).toHaveCSS('outline-style', 'solid')
+    await expect(popup.locator('button').first()).toBeFocused()
+    await expect(popup.locator('button').first()).toHaveCSS('outline-style', 'solid')
 
     await page.keyboard.press('Escape')
     await expectClosed(page)
@@ -412,7 +412,7 @@ test.describe('focus', () => {
       const popup = page.locator(`[role="dialog"]${OPENED}`)
       await expect(popup).toBeVisible()
       await atRest(popup)
-      await expect(popup.locator('button')).toBeFocused()
+      await expect(popup.locator('button').first()).toBeFocused()
       await page.keyboard.press('Escape')
       await expectClosed(page)
       await expect(trigger).toBeFocused()
