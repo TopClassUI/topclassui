@@ -34,7 +34,7 @@ The shared class every control carries, and your own controls can carry it too. 
 
 ## Every drag has a keyboard path
 
-WCAG 2.5.7. A Slider takes arrow keys. A Drawer and a Toast always render a close button.
+[WCAG 2.5.7](https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html). A Slider takes arrow keys. A Drawer and a Toast always render a close button.
 
 ## Focus is always visible
 
@@ -81,9 +81,9 @@ export function Email() {
 | Check | How | When |
 |---|---|---|
 | Contrast | `check-contrast.ts` | Every `pnpm check` |
-| ARIA and roles | axe-core in every demo | Every `pnpm check` |
+| ARIA and roles | [axe-core](https://github.com/dequelabs/axe-core) in every demo | Every `pnpm check` |
 | Target size | A browser test measures every focusable element | Every `pnpm check` |
-| Keyboard behaviour | A test per interactive component, following the ARIA Authoring Practices | Every `pnpm check` |
+| Keyboard behaviour | A test per interactive component, following the [ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/) | Every `pnpm check` |
 | Screen reader | NVDA and VoiceOver, by hand | Before each release |
 | Forced colors | Windows high contrast, by hand | Before each release |
 
