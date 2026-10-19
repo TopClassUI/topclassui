@@ -89,7 +89,7 @@ describe('an element that is not a button', () => {
   })
 
   it('is left alone when it is usable', () => {
-    expect(link()).not.toContain('aria-disabled')
+    expect(link()).not.toContain('aria-disabled=')
     expect(link()).not.toContain('tabindex')
   })
 

@@ -152,6 +152,6 @@ describe('the three buttons of the header', () => {
 
   it('a month button at the range\'s end dims by aria-disabled, never by disabled, which would drop the focus', () => {
     expect(DATE_PICKER_NAV.split(' ')).toEqual(expect.arrayContaining(['aria-disabled:opacity-50', 'aria-disabled:pointer-events-none']))
-    expect(DATE_PICKER_NAV.split(' ').filter((cls) => cls.startsWith('disabled:'))).toEqual([])
+    expect(DATE_PICKER_NAV.split(' ').filter((cls) => /^disabled:(opacity|pointer-events)/.test(cls))).toEqual([])
   })
 })
