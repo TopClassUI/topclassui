@@ -17,8 +17,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the timeline connector loses its border, so forced colours repaint the rail to nothing',
     file: 'src/components/timeline/classes.ts',
-    from: "'block w-0.5 flex-1 bg-line border-s-(length:--tc-line-width) border-transparent'",
-    to: "'block w-0.5 flex-1 bg-line'",
+    from: "'block w-0.5 flex-1 -my-1 bg-line border-s-(length:--tc-line-width) border-transparent'",
+    to: "'block w-0.5 flex-1 -my-1 bg-line'",
   },
   {
     label: 'the timeline renders an empty list for no items, and never its emptyFallback',
@@ -91,5 +91,11 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/timeline/index.tsx',
     from: '{isBlank(item.icon)',
     to: '{item.icon == null',
+  },
+  {
+    label: 'the timeline connector stops 4 px short of each dot, so the rail is drawn in pieces',
+    file: 'src/components/timeline/classes.ts',
+    from: "'block w-0.5 flex-1 -my-1 bg-line",
+    to: "'block w-0.5 flex-1 bg-line",
   },
 ]

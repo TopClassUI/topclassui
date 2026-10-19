@@ -146,9 +146,9 @@ for (const direction of DIRECTIONS) {
     expect(wrapped?.height).toBeGreaterThan(100)
     expect(url?.height).toBeGreaterThan(80)
     for (const row of [wrapped, url]) {
-      // The marker box is 20 px, and the connector takes every pixel under it.
-      expect(row?.connector?.height).toBe((row?.height ?? 0) - 20)
-      expect(row?.connector?.bottom).toBe(row?.bottom)
+      // The marker box is 20 px around a 12 px dot: the connector starts under the dot and ends at the next one, 4 px into it.
+      expect(row?.connector?.height).toBe((row?.height ?? 0) - 20 + 8)
+      expect(row?.connector?.bottom).toBe((row?.bottom ?? 0) + 4)
       expect(row?.connector?.axis).toBe(row?.dotAxis)
     }
     expect(last?.connector).toBeNull()

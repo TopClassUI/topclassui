@@ -55,9 +55,10 @@ export const TIMELINE_ICON = {
 
 export const TIMELINE_ICON_HOLLOW = 'flex text-muted'
 
-/** The drawn 2 px fill, plus a transparent inline-start border inside the same box:
- * forced colours drop the fill and paint the border, so the rail never vanishes. */
-export const TIMELINE_CONNECTOR = 'block w-0.5 flex-1 bg-line border-s-(length:--tc-line-width) border-transparent'
+/** The drawn 2 px fill, plus a transparent inline-start border inside the same box: forced colours drop the
+ * fill and paint the border, so the rail never vanishes. -my-1 crosses the 4 px of the marker box above and
+ * below a 12 px dot, so the rail runs dot to dot without a gap, as the previewer draws it. */
+export const TIMELINE_CONNECTOR = 'block w-0.5 flex-1 -my-1 bg-line border-s-(length:--tc-line-width) border-transparent'
 
 /** One line tall even when empty, or an item with no title is as short as its marker
  * and its connector has no height left to draw. */

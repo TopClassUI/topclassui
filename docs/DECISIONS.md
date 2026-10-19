@@ -11,9 +11,10 @@ The format is: date, decision, why, and what it affects.
 **Decision.** The `Previewer: <Name>` frames on the Docs pages (137:2477, 137:1409, 137:1223, 137:2349, 137:2113, 137:2234) are the truth for the look of these six; the composites are under `docs/figma/parity/`.
 
 - **TreeView rows are 30 px, from a new token `--tc-tree-row-height`** (`calc(1.875rem * var(--tc-density))`), not the menus' 40 px `--tc-row-height`: the previewer's rows sit 31 px apart. The tree's cap adds its own padding and border, so seven rows fit whole. The caret is 12 px, rows take `cursor-pointer`, and a label no longer stretches (`flex-1`), so in an RTL row a Latin label sits beside its caret.
+- **The Timeline rail runs dot to dot.** The connector takes `-my-1`, the 4 px between a 12 px dot and its 20 px marker box, at both ends, so no gap opens beside a dot.
 - **EmptyState draws its dash in `line-strong`, with gap 10 and padding 28** (`gap-2.5`, `p-7`), as the previewer does; the Components page's `line`, 12 and 32 were the older drawing.
 
-**Kept against the frame, by rule.** Progress fills the bar with `<tone>-on-soft` and outlines its track: the drawn `<tone>-solid` bars measure under 3:1 on the track (warning 1.78 in light, success 2.97 and info 2.74 in dark), so R-5.6-4 holds. TreeView keeps the medium weight on a selected row (a cue beside colour) and draws its focus ring inside the row, since the tree clips its rows.
+**Kept against the frame, by rule.** Progress fills the bar with `<tone>-on-soft` and outlines its track: the drawn `<tone>-solid` bars measure under 3:1 on the track (warning 1.78 in light, success 2.97 and info 2.74 in dark), so R-5.6-4 holds. Timeline keeps its current step as a dot in a ring and the line-strong stroke round each filled dot, where the frame draws a plain fill: shape, not hue alone, tells current from done (SC 1.4.1), and the stroke holds 3:1 for amber on white. TreeView keeps the medium weight on a selected row (a cue beside colour) and draws its focus ring inside the row, since the tree clips its rows.
 
 **Affects** `src/tokens.css`, the six component folders, their tests, e2e specs and mutation rows.
 

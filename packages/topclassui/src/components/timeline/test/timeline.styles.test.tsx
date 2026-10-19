@@ -57,9 +57,9 @@ describe('each part wears exactly the classes the spec names', () => {
     expect(list).not.toContain('p-0.5')
   })
 
-  it('the connector is the 2 px line that fills the rest of the rail', () => {
+  it('the connector is the 2 px line that fills the rest of the rail, from dot to dot', () => {
     expect(nth(html(TWO), CONNECTOR)).toEqual([
-      'bg-line', 'block', 'border-s-(length:--tc-line-width)', 'border-transparent', 'flex-1', 'w-0.5',
+      '-my-1', 'bg-line', 'block', 'border-s-(length:--tc-line-width)', 'border-transparent', 'flex-1', 'w-0.5',
     ])
   })
 
