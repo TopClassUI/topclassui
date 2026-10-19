@@ -8,7 +8,7 @@ import { LIVE_PAGES, PAGE_GROUPS, hrefOf, pageBySlug, type Locale } from '../../
 import type { SiteLabels } from '../../labels/index'
 import { SECTIONS } from '../../content/sections'
 import { CARDS } from '../../lib/data'
-import { CLI_URL, GITHUB_URL, INSTALL_LINE, PRERELEASE, VERSION, X_URL, YOUTUBE_URL } from '../../lib/site'
+import { GITHUB_URL, INSTALL_LINE, PRERELEASE, VERSION, X_URL, YOUTUBE_URL } from '../../lib/site'
 import { QUIET_LINK } from '../classes'
 import { CommandBox } from '../command-box'
 import { GithubMark, XMark, YoutubeMark } from '../home/brand-logos'
@@ -29,9 +29,8 @@ export function SiteFooter({ locale, labels }: { locale: Locale; labels: SiteLab
       ...LIVE_PAGES.filter((page) => page.group === group && page.kind !== 'home').map((page) => ({
         key: page.slug,
         href: hrefOf(page, locale),
-        text: page.slug === 'components' ? labels.footer.all(CARDS.length) : page.title[locale],
+        text: page.slug === 'components' ? labels.footer.all(CARDS.length) : page.slug === 'cli' ? labels.footer.cli : page.title[locale],
       })),
-      ...(group === 'start' && pageBySlug('cli') === undefined ? [{ key: 'cli', href: CLI_URL, text: labels.footer.cli }] : []),
       ...(group === 'reference' ? FOOTER_SECTIONS.map((id) => SECTIONS.find((section) => section.id === id)).filter((section) => section !== undefined).map((section) => ({ key: section.id, href: `${catalogHref}#${section.id}`, text: section.title[locale] })) : []),
       ...(group === 'more' ? [{ key: 'llms', href: '/llms.txt', text: labels.footer.llms }] : []),
     ],

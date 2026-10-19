@@ -17,12 +17,6 @@ export const X_URL: string | null = null
 /** The one handle Home's Follow us cards print, the same on every network. */
 export const HANDLE = '@topclassui'
 
-/** Where the CLI's commands are listed until its own page goes live (docs-site page 3). */
-export const CLI_URL = 'https://github.com/TopClassUI/topclassui/tree/main/packages/cli#readme'
-
-/** The CLI's line on Home: one component copied into the project. */
-export const ADD_LINE = 'npx topclassui add button'
-
 /** PLAN 2: Next.js 14 and older are not supported; the package declares no peer on next. */
 export const NEXT_RANGE = '15+'
 
