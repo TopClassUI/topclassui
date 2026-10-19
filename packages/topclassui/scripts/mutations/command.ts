@@ -237,4 +237,10 @@ export const MUTATIONS: Mutation[] = [
     from: "'shrink-0 border-line text-muted pointer-coarse:hidden'",
     to: "'shrink-0 border-line text-muted'",
   },
+  {
+    label: 'command: the playground ignores stage, so the docs stage shows a closed palette behind its button',
+    file: 'src/components/command/dummy/playground.tsx',
+    from: '  if (stage) return <Stage />\n',
+    to: '',
+  },
 ]
