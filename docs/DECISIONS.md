@@ -6,6 +6,23 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-19 - The form fields follow their Figma frames (Input, Textarea, Select, Combobox, NumberField, OTPField)
+
+**Decision.** Each field was compared with its `Previewer` frame (135:531, 135:660, 135:789, 135:939, 135:1594, 135:1768) in dark, light and ocean, both directions; the composites are in `docs/figma/parity/`. What changed:
+
+- **`--tc-row-height` is 2rem**, 32 px at a density of 1 (40 before). Every list frame draws a 31 px row of 14 px text; the row a finger gets is still 44 px (`ROW_TOUCH`). It is a knob, so Dropdown, Command, Sidebar, TreeView and FileUpload rows follow it too; their tests pin the new value.
+- **The chosen option is tinted**: `ROW_SELECTED` is the `primary-soft` fill and `primary-on-soft` text, as the frames draw it, instead of the medium weight. The tick stays, so forced colours, which erase the fill, still mark it.
+- **A Select row draws its ring from the focus** (`ROW_FOCUSED`): Base UI gives the row real focus, so a list opened or crossed by a pointer is tinted with no ring, as the frame draws it, and a key brings the 2 px ring back. Combobox keeps `ROW_HIGHLIGHT`: its focus stays in the input. An open Select keeps the ring on its trigger (`data-popup-open`), as the frame's "open" state shows.
+- **Combobox is a search field**: a magnifying glass at the inline start, no caret; the spinner still takes the inline end while a page loads.
+- **A disabled field sits on `surface`** before it dims (`FIELD_DISABLED`), as every frame draws it.
+- **NumberField**: the steppers are four fifths as wide as the field is tall (32 px at md), and the number is medium weight.
+- **OTPField**: a cell is one step of the control scale taller than it is wide (40 by 48 at md; the frame draws 38 by 46).
+- `cursor-pointer` on the Select trigger and on every Select, Combobox and NumberField option or stepper.
+
+**Kept, though the frames differ.** A field's line at rest is `line-strong`, not the frame's `line` (1.3:1 in dark, 1.26:1 in light): a control boundary must reach 3:1 (WCAG 1.4.11, `BORDER_STRONG`). Read-only keeps its soft fill (the frame draws it as idle; the 10 October review found read-only looked exactly like a filled input). Invalid stays a 2 px line rather than the frame's outer ring: an outline at rest would be a ring the focus probe refuses, and a box-shadow gap cannot show the backdrop. The frame's mail icon inside an Input needs an adornment API that Input does not have. The popup shadow is `OVERLAY_SURFACE`'s, shared with every overlay.
+
+**Affects** `src/tokens.css`, `src/shared/classes.ts`, the classes of the six fields, Combobox's client, and the tests that pinned the old values.
+
 ## 2026-10-18 - The site hydrates in islands, and the shell's code waits for the first paint
 
 **Decision.** Job 83 (Lighthouse on the docs site, mobile preset). Every client part of the site goes through `apps/docs/components/lazy-island.tsx`: the server's HTML is rendered as before, and the part's own chunk loads only when it comes within one viewport (`near`) or, for what is on screen from the start, after the first paint and an idle moment (`idle`). A pointer, touch or focus on it loads it at once, and a press or hover that lands before the chunk is given again afterwards. While it waits, the island's box keeps the server's HTML untouched (an empty `dangerouslySetInnerHTML` during hydration, which React leaves alone); once the chunk is in, the part renders afresh in its place in one transition, and focus goes back where it was. Parts are not hydrated late because a Base UI part hydrated inside a deferred boundary could be left with sync updates React never committed (the Dialog, Popover, Tooltip and Switch states stopped answering). The one island that hydrates is the root provider, in an `<Activity>`: React streams a Suspense boundary over 500 bytes out of order once the page passes 12.8 KB, hidden until a script reveals it, which held the first paint; an Activity stays inline. A client navigation mounts an island with no HTML to keep, so it loads at once.
