@@ -106,7 +106,7 @@ export function RoleBoard({ children, locale }: { children?: ReactNode; locale: 
                 style={{ '--tc-board-x': percent(x, BOARD.width), '--tc-board-y': percent(y, BOARD.height), '--tc-board-w': percent(width, BOARD.width) }}
                 className="absolute inset-s-(--tc-board-x) top-(--tc-board-y) flex w-(--tc-board-w) flex-col gap-0.5 text-xs text-muted"
               >
-                <code dir="ltr" className="text-start font-sans font-semibold">{name}</code>
+                <code dir="ltr" className="w-fit font-sans font-semibold">{name}</code>
                 <span>{text}</span>
               </li>
             )
