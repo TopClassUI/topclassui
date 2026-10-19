@@ -143,7 +143,7 @@ describe('every element carries exactly the classes the spec names', () => {
   it('the x: an icon button of at least 24 px, 44 under a coarse pointer, muted, with the ghost hover', async () => {
     const expected = [
       ...RING,
-      'active:bg-(--tc-soft-hover)', 'duration-(--tc-duration)', 'ease-out', 'hover:bg-(--tc-soft)', 'inline-flex',
+      '-me-1.25', 'active:bg-(--tc-soft-hover)', 'duration-(--tc-duration)', 'ease-out', 'hover:bg-(--tc-soft)', 'inline-flex',
       'items-center', 'justify-center', 'min-h-[var(--tc-target-min,24px)]', 'min-w-[var(--tc-target-min,24px)]',
       'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]', 'pointer-coarse:min-w-[var(--tc-target-coarse,44px)]',
       'rounded-control', 'shrink-0', 'text-muted', 'tone-neutral',

@@ -11,7 +11,7 @@ import {
 export default function Demo() {
   return (
     <PopoverRoot>
-      <PopoverTrigger render={<Button variant="outline"><Svg icon={arrowSquareOut} />Share</Button>} />
+      <PopoverTrigger render={<Button variant="outline" size="sm"><Svg icon={arrowSquareOut} />Share</Button>} />
       <PopoverPopup>
         <div className="flex items-center justify-between gap-2">
           <PopoverTitle>Share this page</PopoverTitle>

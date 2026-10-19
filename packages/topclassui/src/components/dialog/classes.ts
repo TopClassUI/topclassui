@@ -55,5 +55,6 @@ export const DIALOG_BODY = `min-h-15 flex-1 px-4.5 py-4.5 text-sm text-muted ${S
  * and a label too long for its row wraps inside its action. */
 export const DIALOG_FOOTER = `flex shrink-0 flex-wrap items-center justify-end gap-2 border-t-(length:--tc-line-width) border-line px-4.5 py-3.5 ${ACTIONS_WRAP}`
 
-/** The x: an icon button on the neutral ramp, so its hover is the ghost tint. */
-export const DIALOG_CLOSE = `${ICON_BUTTON} text-muted tone-neutral ${HOVER.ghost}`
+/** The x: an icon button on the neutral ramp, so its hover is the ghost tint. It reaches 5 px into the
+ * padding, so its 14 px glyph ends on the padding line, as drawn, while its box keeps 24 px. */
+export const DIALOG_CLOSE = `-me-1.25 ${ICON_BUTTON} text-muted tone-neutral ${HOVER.ghost}`

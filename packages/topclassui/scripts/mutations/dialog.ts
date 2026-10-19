@@ -103,8 +103,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the dialog x loses the icon button classes, so it is 16 px wide under a finger and has no ring',
     file: CLASSES,
-    from: '`${ICON_BUTTON} text-muted tone-neutral ${HOVER.ghost}`',
-    to: '`text-muted tone-neutral ${HOVER.ghost}`',
+    from: '`-me-1.25 ${ICON_BUTTON} text-muted tone-neutral ${HOVER.ghost}`',
+    to: '`-me-1.25 text-muted tone-neutral ${HOVER.ghost}`',
   },
   {
     label: 'the dialog footer no longer wears the shared action wrap, so a long action ends in an ellipsis on a phone',

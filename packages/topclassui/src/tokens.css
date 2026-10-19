@@ -13,7 +13,6 @@
   --tc-density: 1;
   --tc-motion: 1;
   --tc-list-rows: 7;
-  /* 32 px: the Figma menus draw a row as 14 px text in 9 px of padding a side. */
   --tc-row-height: calc(2rem * var(--tc-density));
   --tc-overlay-inset: 1rem;
   --tc-sticky-top: 0px;
@@ -73,7 +72,8 @@
   --tc-muted: var(--color-neutral-600);
   --tc-line: var(--color-neutral-200);
   --tc-line-strong: var(--color-neutral-500);
-  --tc-overlay: oklch(0 0 0 / 0.5);
+  /* The frames dim the page to about a third in light and two fifths in dark, so what is behind stays readable. */
+  --tc-overlay: oklch(0 0 0 / 0.3);
   /* The lift of a dialog, a popup or a sheet: Figma's 0 8 10 drop shadow, lighter on a light page. */
   --tc-shadow-overlay: 0 8px 10px oklch(0 0 0 / 0.15);
 
@@ -139,7 +139,7 @@
   --tc-line: var(--color-neutral-800);
   /* neutral-400 not neutral-500: on a raised card neutral-500 measured only 3.19:1. */
   --tc-line-strong: var(--color-neutral-400);
-  --tc-overlay: oklch(0 0 0 / 0.7);
+  --tc-overlay: oklch(0 0 0 / 0.4);
   --tc-shadow-overlay: 0 8px 10px oklch(0 0 0 / 0.45);
 
   --tc-neutral-solid: var(--color-neutral-100);

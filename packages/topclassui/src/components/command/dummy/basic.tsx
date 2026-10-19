@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 
+import { fileText } from '#icons/data/file-text.js'
 import { magnifyingGlass } from '#icons/data/magnifying-glass.js'
 import { Button } from '#components/button/index.js'
 import { Svg } from '#components/svg/index.js'
@@ -36,6 +37,12 @@ export default function Demo() {
         items={COMMANDS}
         getKey={(command) => command.id}
         getLabel={(command) => command.label}
+        renderItem={(command) => (
+          <>
+            <Svg icon={fileText} />
+            <span className="min-w-0 flex-1 truncate">{command.label}</span>
+          </>
+        )}
         onSelect={(command) => { setRan((before) => ({ label: command.label, times: before.times + 1 })) }}
         open={open}
         onOpenChange={setOpen}

@@ -17,8 +17,8 @@ export default function Demo() {
         </DialogHeader>
         <DialogBody>11 files changed since the last publish.</DialogBody>
         <DialogFooter>
-          <DialogClose render={<Button variant="outline">Cancel</Button>} />
-          <DialogClose render={<Button>Publish now</Button>} />
+          <DialogClose render={<Button variant="outline" size="sm">Cancel</Button>} />
+          <DialogClose render={<Button size="sm">Publish now</Button>} />
         </DialogFooter>
       </DialogPopup>
     </DialogRoot>

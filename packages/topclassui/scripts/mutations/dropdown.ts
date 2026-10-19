@@ -228,7 +228,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a dropdown row drops the shared highlight, so the row the keyboard is on has neither fill nor ring',
     file: CLASSES,
-    from: '  ROW,\n  ROW_HIGHLIGHT,\n',
+    from: '  ROW,\n  ROW_FOCUSED,\n',
     to: '  ROW,\n',
   },
   {

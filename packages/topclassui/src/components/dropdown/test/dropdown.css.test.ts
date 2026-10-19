@@ -64,15 +64,11 @@ const DECLARATION: Record<string, string> = {
   'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]': 'min-height: max(var(--tc-row-height), var(--tc-target-coarse,44px));',
   'data-highlighted:bg-primary-soft': 'background-color: var(--tc-primary-soft);',
   'data-highlighted:text-primary-on-soft': 'color: var(--tc-primary-on-soft);',
-  // The ring of the highlighted row, inside its edge: the fill alone is under 3:1 against the menu.
-  'data-highlighted:outline-solid': 'outline-style: solid;',
-  'data-highlighted:outline-(length:--tc-ring-width)': 'outline-width: var(--tc-ring-width);',
-  'data-highlighted:-outline-offset-(length:--tc-ring-width)': 'outline-offset: calc(var(--tc-ring-width) * -1);',
-  'data-highlighted:outline-ring': 'outline-color: var(--tc-ring);',
   'forced-colors:data-highlighted:forced-color-adjust-none': 'forced-color-adjust: none;',
   'forced-colors:data-highlighted:bg-[Highlight]': 'background-color: Highlight;',
   'forced-colors:data-highlighted:text-[HighlightText]': 'color: HighlightText;',
-  'forced-colors:data-highlighted:outline-[HighlightText]': 'outline-color: HighlightText;',
+  // The row holds the focus, so its ring is the focus ring, in the system's colour under forced colours.
+  'forced-colors:focus-visible:outline-[HighlightText]': 'outline-color: HighlightText;',
   // A disabled row: what it holds is dimmed, and forced colours take the grey of the system.
   'data-disabled:pointer-events-none': 'pointer-events: none;',
   'data-disabled:*:opacity-50': 'opacity: 50%;',
@@ -111,9 +107,7 @@ const SCOPE: Record<string, string> = {
   'data-highlighted:text-danger-on-soft': '[data-highlighted] {',
   'data-disabled:pointer-events-none': '[data-disabled] {',
   'forced-colors:data-highlighted:bg-[Highlight]': '[data-highlighted] {',
-  'data-highlighted:outline-solid': '[data-highlighted] {',
-  'data-highlighted:outline-ring': '[data-highlighted] {',
-  'forced-colors:data-highlighted:outline-[HighlightText]': '[data-highlighted] {',
+  'forced-colors:focus-visible:outline-[HighlightText]': ':focus-visible {',
   'forced-colors:data-disabled:not-data-highlighted:text-[GrayText]': '[data-disabled]:not([data-highlighted]) {',
 }
 
@@ -123,7 +117,7 @@ const WRAPPED: Record<string, string> = {
   'forced-colors:data-highlighted:forced-color-adjust-none': '@media (forced-colors: active) { ',
   'forced-colors:data-highlighted:bg-[Highlight]': '@media (forced-colors: active) { ',
   'forced-colors:data-highlighted:text-[HighlightText]': '@media (forced-colors: active) { ',
-  'forced-colors:data-highlighted:outline-[HighlightText]': '@media (forced-colors: active) { ',
+  'forced-colors:focus-visible:outline-[HighlightText]': '@media (forced-colors: active) { ',
   'forced-colors:data-disabled:not-data-highlighted:text-[GrayText]': '@media (forced-colors: active) { ',
 }
 
@@ -161,7 +155,7 @@ describe('every class an open Dropdown wears compiles with the installed Tailwin
       DROPDOWN_SHORTCUT, DROPDOWN_GROUP, DROPDOWN_GROUP_LABEL, DROPDOWN_SEPARATOR,
     ])
     expect(all).toEqual([...Object.keys(DECLARATION), 'group'].sort())
-    expect(all).toHaveLength(79)
+    expect(all).toHaveLength(75)
   })
 
   it('group emits nothing of its own: it only marks the row for the shortcut inside it', async () => {

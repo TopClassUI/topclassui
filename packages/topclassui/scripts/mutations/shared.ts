@@ -311,8 +311,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the overlay row highlight stays adjusted, so a backplate hides the label of the highlighted row',
     file: 'src/shared/classes.ts',
-    from: "'forced-colors:data-highlighted:forced-color-adjust-none ",
-    to: "'",
+    from: "'forced-colors:data-highlighted:forced-color-adjust-none forced-colors:data-highlighted:bg-[Highlight]',\n  'forced-colors:data-highlighted:text-[HighlightText] forced-colors",
+    to: "'forced-colors:data-highlighted:bg-[Highlight]',\n  'forced-colors:data-highlighted:text-[HighlightText] forced-colors",
   },
   {
     label: 'the overlay row highlight loses its ring, so the row the keyboard is on is told by a fill at 1.1:1',

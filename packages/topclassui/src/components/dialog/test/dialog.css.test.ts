@@ -73,6 +73,7 @@ const DECLARATION: Record<string, string> = {
   'text-sm': 'font-size: var(--text-sm);',
   'font-semibold': 'font-weight: var(--font-weight-semibold);',
   'text-muted': 'color: var(--tc-muted);',
+  '-me-1.25': 'margin-inline-end: calc(var(--spacing) * -1.25);',
   'flex-wrap': 'flex-wrap: wrap;',
   'items-center': 'align-items: center;',
   'justify-end': 'justify-content: flex-end;',
@@ -138,7 +139,7 @@ describe('every class an open Dialog wears compiles with the installed Tailwind'
       DIALOG_TITLE, DIALOG_DESCRIPTION, DIALOG_BODY, DIALOG_FOOTER, DIALOG_CLOSE,
     ]).filter((cls) => cls !== '' && !elsewhere.has(cls))
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(74)
+    expect(all).toHaveLength(75)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

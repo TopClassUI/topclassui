@@ -160,6 +160,15 @@ export const ICON_BUTTON = `inline-flex shrink-0 items-center justify-center rou
 /** The ring drawn inside the box, for a control flush against an edge that clips it. */
 export const FOCUS_RING_INSET = 'outline-none focus-visible:outline-solid focus-visible:outline-(length:--tc-ring-width) focus-visible:-outline-offset-(length:--tc-ring-width) focus-visible:outline-ring'
 
+/** The same fill for a row that holds the real focus, as a Select's does: its ring is the focus ring, so a row
+ * a pointer opened on or passes over is tinted without one, and a key brings the ring back. */
+export const ROW_FOCUSED = [
+  'data-highlighted:bg-primary-soft data-highlighted:text-primary-on-soft',
+  `${FOCUS_RING_INSET} forced-colors:focus-visible:outline-[HighlightText]`,
+  'forced-colors:data-highlighted:forced-color-adjust-none forced-colors:data-highlighted:bg-[Highlight]',
+  'forced-colors:data-highlighted:text-[HighlightText]',
+].join(' ')
+
 /** The ring on a wrapper whose focused element is hidden: a label around a native radio. */
 export const FOCUS_RING_WITHIN = 'outline-none has-focus-visible:outline-solid has-focus-visible:outline-(length:--tc-ring-width) has-focus-visible:outline-offset-(length:--tc-ring-offset) has-focus-visible:outline-ring'
 
