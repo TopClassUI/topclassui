@@ -23,7 +23,9 @@ return (
   >
     <head><ThemeScript /></head>
     <body>
-      <TopClassProvider direction={dir} locale={locale}>
+      <TopClassProvider
+        direction={dir} locale={locale}
+      >
         {children}
       </TopClassProvider>
     </body>
