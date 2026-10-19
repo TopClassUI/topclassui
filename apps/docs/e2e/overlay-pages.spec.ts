@@ -220,7 +220,8 @@ test('Tooltip: placement bottom opens below its trigger', async ({ page }) => {
 test('Dropdown: tone danger colours the last row', async ({ page }) => {
   await page.goto('/en/docs/components/dropdown')
   await card(page, 'dropdown').scrollIntoViewIfNeeded()
-  await card(page, 'dropdown').getByRole('radiogroup', { name: 'tone' }).getByRole('radio', { name: 'danger' }).click()
+  await card(page, 'dropdown').getByRole('combobox', { name: 'tone' }).click()
+  await page.getByRole('option', { name: 'danger', exact: true }).click()
   await expect(card(page, 'dropdown').locator('pre').first()).toContainText('tone="danger"')
   await card(page, 'dropdown').getByRole('button', { name: 'Actions', exact: true }).click()
   await expect(page.getByRole('menuitem', { name: 'Delete' })).toHaveAttribute('data-tone', 'danger')

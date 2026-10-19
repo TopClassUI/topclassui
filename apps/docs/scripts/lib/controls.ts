@@ -9,8 +9,8 @@ export type Control =
   | { prop: string; kind: 'slider'; min: number; max: number; step: number | null; default: number | null }
   | { prop: string; kind: 'number'; min: number | null; max: number | null; step: number | null; default: number | null }
 
-/** A segmented control up to this many values; a select above it. */
-export const SEGMENTED_MAX = 3
+/** An integer range up to this many steps is a fixed option set, a select as the Previewer frames draw visibleRows; a wider one is a slider. */
+export const SELECT_SPAN = 100
 /** A wider range is a guard rail (R-5.7-8), such as pageCount up to 2^53, which no slider can step through. */
 export const SLIDER_SPAN = 10_000
 
@@ -23,13 +23,16 @@ export function controlOf(prop: string, schema: JsonSchemaProp): Control | null 
     const options = schema.enum.filter((value) => !(prop === 'size' && value === 'custom'))
     const value = schema.default
     const fallback = typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' ? value : null
-    return { prop, kind: options.length <= SEGMENTED_MAX ? 'segmented' : 'select', options, default: fallback }
+    return { prop, kind: 'select', options, default: fallback }
   }
   if (schema.type === 'boolean') return { prop, kind: 'switch', default: schema.default === true }
   if (schema.type === 'number' || schema.type === 'integer') {
     const step = schema.type === 'integer' ? 1 : null
     const value = numberOrNull(schema.default)
     const { minimum: min, maximum: max } = schema
+    if (schema.type === 'integer' && min !== undefined && max !== undefined && max - min <= SELECT_SPAN) {
+      return { prop, kind: 'select', options: Array.from({ length: max - min + 1 }, (_, index) => min + index), default: value }
+    }
     if (min !== undefined && max !== undefined && max - min <= SLIDER_SPAN) {
       return { prop, kind: 'slider', min, max, step, default: value }
     }
