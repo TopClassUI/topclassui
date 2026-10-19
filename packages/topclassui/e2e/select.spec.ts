@@ -213,7 +213,7 @@ test.describe('live: the keyboard, the Authoring Practices select-only combobox'
       const option = (name: string) => popup.getByRole('option', { name, exact: true })
       await expect(option('Option 30')).toBeInViewport()
       expect(await option('Option 30').evaluate((el) => [el.hasAttribute('data-highlighted'), el.getAttribute('aria-selected'), getComputedStyle(el).fontWeight, el.querySelector('svg') !== null]))
-        .toEqual([true, 'true', '500', true])
+        .toEqual([true, 'true', '400', true])
       for (let press = 0; press < 12; press += 1) await page.keyboard.press('ArrowDown')
       await expect.poll(() => focusedText(page)).toBe('Option 42')
       await expect(option('Option 42')).toBeInViewport()
@@ -271,7 +271,7 @@ test.describe('live: the keyboard, the Authoring Practices select-only combobox'
 test.describe('live: where the list opens', () => {
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 
-  test('ltr: 6 px under the trigger, its left edge on the trigger\'s, at least as wide, seven rows of 40 px, scrolling inside itself', async ({ page }) => {
+  test('ltr: 6 px under the trigger, its left edge on the trigger\'s, at least as wide, seven rows of 32 px, scrolling inside itself', async ({ page }) => {
     await openLive(page, 'select--sixty-items')
     const trigger = combo(page)
     const popup = await openList(page, trigger)
@@ -280,8 +280,8 @@ test.describe('live: where the list opens', () => {
     expect(Math.abs(p.left - t.left)).toBeLessThanOrEqual(1)
     expect(p.width).toBeGreaterThanOrEqual(t.width - 1)
     const list = popup.getByRole('listbox')
-    expect(await list.evaluate((el) => [el.clientHeight, el.scrollHeight, getComputedStyle(el).overscrollBehaviorY])).toEqual([280, 2530, 'contain'])
-    expect((await boxOf(popup.getByRole('option').first())).height).toBe(40)
+    expect(await list.evaluate((el) => [el.clientHeight, el.scrollHeight, getComputedStyle(el).overscrollBehaviorY])).toEqual([224, 2050, 'contain'])
+    expect((await boxOf(popup.getByRole('option').first())).height).toBe(32)
   })
 
   test('rtl: the list ends at the right edge of the trigger, and the caret and the tick sit at the left', async ({ page }) => {
@@ -318,10 +318,10 @@ test.describe('live: where the list opens', () => {
     })
   }
 
-  test('visibleRows={4}: the list is 160 px tall', async ({ page }) => {
+  test('visibleRows={4}: the list is 128 px tall', async ({ page }) => {
     await openLive(page, 'select--four-rows')
     const popup = await openList(page, combo(page))
-    expect(await popup.getByRole('listbox').evaluate((el) => el.clientHeight)).toBe(160)
+    expect(await popup.getByRole('listbox').evaluate((el) => el.clientHeight)).toBe(128)
   })
 
   test.describe('under a coarse pointer', () => {
@@ -340,12 +340,12 @@ test.describe('live: where the list opens', () => {
       await openLive(page, 'select--sixty-items')
       await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
       let popup = await openList(page, combo(page), 'tap')
-      expect((await boxOf(popup.getByRole('option').first())).height).toBe(80)
+      expect((await boxOf(popup.getByRole('option').first())).height).toBe(64)
       await page.keyboard.press('Escape')
       await expect(popup).toBeHidden()
-      await page.evaluate(() => { document.documentElement.style.fontSize = ''; document.documentElement.style.setProperty('--tc-density', '1.25') })
+      await page.evaluate(() => { document.documentElement.style.fontSize = ''; document.documentElement.style.setProperty('--tc-density', '1.5') })
       popup = await openList(page, combo(page), 'tap')
-      expect((await boxOf(popup.getByRole('option').first())).height).toBe(50)
+      expect((await boxOf(popup.getByRole('option').first())).height).toBe(48)
     })
   })
 
