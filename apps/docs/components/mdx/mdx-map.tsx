@@ -14,6 +14,7 @@ import { MdxTable } from './mdx-table'
 import { PackageManagers } from './package-managers'
 import { PeerRange } from './peer-range'
 import { PropsTable } from './props-table'
+import { Steps } from './steps'
 import { ThemeScriptCsp } from './theme-script-csp'
 import { ThemeScriptHtml } from './theme-script-html'
 import { ThemeUtilities } from './theme-utilities'
@@ -26,9 +27,9 @@ export function mdxComponents(locale: Locale): MDXComponents {
   return {
     h2: ({ children }) => <Heading anchorLabel={labels.shell.anchor}>{children}</Heading>,
     h3: ({ children }) => <h3 className="text-lg font-semibold text-body">{children}</h3>,
-    p: ({ children }) => <p className="text-base text-body">{children}</p>,
+    p: ({ children }) => <p className="text-base text-muted">{children}</p>,
     ul: ({ children }) => <ul className="flex list-disc flex-col gap-1 ps-6 text-base text-body">{children}</ul>,
-    ol: ({ children }) => <ol className="flex list-decimal flex-col gap-1 ps-6 text-base text-body">{children}</ol>,
+    ol: ({ children }) => <Steps>{children}</Steps>,
     code: ({ children }) => <code dir="ltr" className={INLINE_CODE}>{children}</code>,
     pre: ({ children }) => <CodeFence locale={locale} terminal={terminal} repeat={labels.blocks.repeat}>{children}</CodeFence>,
     table: ({ children }) => <MdxTable locale={locale}>{children}</MdxTable>,
@@ -37,7 +38,7 @@ export function mdxComponents(locale: Locale): MDXComponents {
     Callout,
     Cards,
     Card,
-    WrongRight: ({ children }) => <WrongRight locale={locale} wrong={wrong} right={right}>{children}</WrongRight>,
+    WrongRight: ({ children }) => <WrongRight locale={locale} wrong={wrong} right={right} terminal={terminal}>{children}</WrongRight>,
     PackageManagers: () => <PackageManagers locale={locale} label={packageManagers} />,
     FrameworkTabs: ({ frameworks }: { frameworks: readonly string[] }) => <FrameworkTabs locale={locale} label={framework} frameworks={frameworks} terminal={terminal} />,
     PeerRange,
