@@ -5,6 +5,7 @@ import type { Locale } from '../../content/pages'
 import { guideLabelsFor } from '../../labels/guides'
 import { GUIDES } from '../../lib/guides'
 import { highlight } from '../../lib/highlight'
+import { DOCS_CODE } from '../classes'
 
 /** The lines of a mode's block that declare one of `names`, each with the comment above it, groups kept apart as the source keeps them. */
 export function excerptOf(block: string, names: readonly string[]): string {
@@ -30,7 +31,7 @@ export async function TokensSample({ mode, names, locale }: { mode: 'dark' | 'oc
   const code = names === undefined ? GUIDES.modeBlocks[mode] : excerptOf(GUIDES.modeBlocks[mode], names)
   const highlighted = await highlight(code, 'css')
   return (
-    <CodeBlock {...getLabels(locale)} lang="css" title={guideLabelsFor(locale).sample.title} highlighted={highlighted ?? undefined}>
+    <CodeBlock {...getLabels(locale)} lang="css" title={guideLabelsFor(locale).sample.title} highlighted={highlighted ?? undefined} className={DOCS_CODE}>
       {code}
     </CodeBlock>
   )
