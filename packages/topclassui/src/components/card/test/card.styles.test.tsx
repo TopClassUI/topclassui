@@ -14,8 +14,8 @@ const EXACT = {
     'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line',
     'flex', 'flex-col', 'gap-2.5', 'p-4.5', 'rounded-box',
   ],
-  CardHeader: ['font-semibold', 'text-base', 'text-body'],
-  CardBody: ['text-muted', 'text-sm'],
+  CardHeader: ['font-semibold', 'text-base/5', 'text-body'],
+  CardBody: ['text-muted', 'text-sm/tight'],
   CardFooter: ['flex', 'flex-wrap', 'gap-2', 'items-center'],
 }
 

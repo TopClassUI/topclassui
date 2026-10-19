@@ -13,10 +13,10 @@ export const CARD_MEDIA = [
 ].join(' ')
 
 /** The drawn title. The heading level is the caller's; this sets only the type. */
-export const CARD_HEADER = 'text-base font-semibold text-body'
+export const CARD_HEADER = 'text-base/5 font-semibold text-body'
 
 /** A block, not a flex column, so a link inside a sentence stays on its line. */
-export const CARD_BODY = 'text-sm text-muted'
+export const CARD_BODY = 'text-sm/tight text-muted'
 
 /** The drawn action row: 8 between the buttons, 10 from the text through the root's gap. */
 export const CARD_FOOTER = 'flex flex-wrap items-center gap-2'

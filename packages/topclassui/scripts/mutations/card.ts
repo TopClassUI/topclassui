@@ -35,8 +35,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the card body becomes a flex column, so a sentence with a link stacks as rows',
     file: 'src/components/card/classes.ts',
-    from: "export const CARD_BODY = 'text-sm text-muted'",
-    to: "export const CARD_BODY = 'flex flex-col text-sm text-muted'",
+    from: "export const CARD_BODY = 'text-sm/tight text-muted'",
+    to: "export const CARD_BODY = 'flex flex-col text-sm/tight text-muted'",
   },
   {
     label: 'the card footer drops the rest props, so id, aria-*, style and ref never reach it',
