@@ -4,6 +4,7 @@ import { join } from 'node:path'
 
 import { ImageResponse } from 'next/og'
 
+import { BrandMark } from '../components/shell/brand-mark'
 import { FACTS } from './data'
 import { SITE_URL } from './site'
 
@@ -37,7 +38,12 @@ export async function ogImage({ name, chip, line }: OgCard): Promise<ImageRespon
     (
       <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 32, padding: 80, background: FACTS.page.dark, color: FACTS.dark.body, fontFamily: 'Inter' }}>
         <div style={{ display: 'flex', alignSelf: 'flex-start', padding: '8px 20px', borderRadius: 999, background: FACTS.dark.primary, color: FACTS.dark.body, fontSize: 28, fontWeight: 600 }}>{chip}</div>
-        <div style={{ display: 'flex', fontSize: 88, fontWeight: 600 }}>{name}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 112, height: 112, borderRadius: 24, background: FACTS.dark.primary }}>
+            <BrandMark color={FACTS.dark.body} size={112} />
+          </div>
+          <div style={{ display: 'flex', fontSize: 88, fontWeight: 600 }}>{name}</div>
+        </div>
         <div style={{ display: 'flex', fontSize: 40, color: FACTS.dark.muted, maxWidth: 1040 }}>{line}</div>
       </div>
     ),
