@@ -1,7 +1,8 @@
 // R-5.12-4: one class string per element Tabs styles, built from the shared constants.
 import {
-  CONTAIN, FOCUS_RING, FOCUS_RING_INSET, FORCED_EDGE, SCROLL_X, TOUCH_TARGET, TRANSITION,
+  CONTAIN, CONTROL_HEIGHT, FOCUS_RING, FOCUS_RING_INSET, FORCED_EDGE, SCROLL_X, TOUCH_TARGET, TRANSITION,
 } from '#shared/classes.js'
+import type { Size } from '#shared/contracts/size.js'
 import type { TabsVariant } from './types.js'
 
 /** A grid of one column that may shrink to nothing: a list that scrolls would otherwise widen a
@@ -22,7 +23,7 @@ export const TABS_LIST_SCROLL = `relative scroll-px-px ${SCROLL_X}`
  * both keep at least a pixel before the first tab and after the last: the scroll padding is then met where the
  * server drew them, so hydration scrolls no RTL list (it moved by 1 px), and an RTL list reaches its end. */
 export const TABS_LIST = {
-  line: `flex items-center gap-6 px-px ${TABS_LIST_LINE} ${TABS_LIST_SCROLL}`,
+  line: `flex items-center gap-5 px-px ${TABS_LIST_LINE} ${TABS_LIST_SCROLL}`,
   enclosed: `flex w-fit max-w-full items-center gap-1 rounded-control bg-surface p-1 ${FORCED_EDGE} ${TABS_LIST_SCROLL}`,
 } as const satisfies Record<TabsVariant, string>
 
@@ -38,7 +39,7 @@ export const TABS_TAB_DISABLED = [
  * box, because the list clips too. Content that fits is centred; content that does not starts
  * at the start edge, so the beginning of a label is never the part that is cut. */
 const TAB = [
-  'inline-flex shrink-0 items-center justify-center-safe gap-2 overflow-hidden whitespace-nowrap font-normal text-muted',
+  'inline-flex shrink-0 cursor-pointer items-center justify-center-safe gap-2 overflow-hidden whitespace-nowrap font-normal text-muted',
   'data-active:font-semibold data-active:text-body',
   CONTAIN,
   FOCUS_RING_INSET,
@@ -67,6 +68,17 @@ export const TABS_TAB = {
   line: `${TAB} ${TABS_BAR}`,
   enclosed: `${TAB} ${TABS_RAISED}`,
 } as const satisfies Record<TabsVariant, string>
+
+/** The control height and type step, with the inline padding one step under a button's:
+ * Figma 138:809 pads a md tab 11 px, so a row of labels does not read as a row of buttons. */
+export const TABS_SIZE = {
+  xs: `${CONTROL_HEIGHT.xs} px-pad-x-xs text-xs`,
+  sm: `${CONTROL_HEIGHT.sm} px-pad-x-xs text-sm`,
+  md: `${CONTROL_HEIGHT.md} px-pad-x-sm text-sm`,
+  lg: `${CONTROL_HEIGHT.lg} px-pad-x-md text-base`,
+  xl: `${CONTROL_HEIGHT.xl} px-pad-x-lg text-base`,
+  custom: '',
+} as const satisfies Record<Size, string>
 
 /** A margin and not a padding: the ring of a focused panel reaches 4 px outside its box,
  * and the list above would paint over a ring that lay on it. A long word breaks. */

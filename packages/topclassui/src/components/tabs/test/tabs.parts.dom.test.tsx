@@ -37,7 +37,7 @@ describe('the look comes from the nearest root', () => {
     expect(classes('outer-tab')).toEqual(expect.arrayContaining(['h-control-lg', 'data-active:bg-surface-raised']))
     expect(classes('inner-tab')).toEqual(expect.arrayContaining(['h-control-xs', 'border-b-2']))
     expect(classes('inner-tab')).not.toContain('data-active:bg-surface-raised')
-    expect(classes('inner-list')).toContain('gap-6')
+    expect(classes('inner-list')).toContain('gap-5')
   })
 })
 
@@ -73,7 +73,7 @@ describe('className, style, ref and the rest reach the element each part renders
     expect(classes('root')).toContain('flex')
     expect(classes('root')).not.toContain('grid')
     expect(classes('list')).toContain('gap-2')
-    expect(classes('list')).not.toContain('gap-6')
+    expect(classes('list')).not.toContain('gap-5')
     expect(classes('tab')).toEqual(expect.arrayContaining(['font-bold', 'text-body']))
     expect(classes('tab')).not.toContain('font-normal')
     expect(classes('tab')).not.toContain('text-muted')

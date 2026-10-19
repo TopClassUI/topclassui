@@ -51,7 +51,7 @@ describe('the line look, the default', () => {
   it('the list is a row that scrolls sideways inside itself and is the offset parent of its tabs', () => {
     render(tabs())
     expect(classes('list')).toEqual(expect.arrayContaining([
-      'relative', 'scroll-px-px', 'flex', 'items-center', 'gap-6', 'px-px', 'overflow-x-auto', 'overscroll-x-contain',
+      'relative', 'scroll-px-px', 'flex', 'items-center', 'gap-5', 'px-px', 'overflow-x-auto', 'overscroll-x-contain',
     ]))
   })
 
@@ -82,7 +82,7 @@ describe('the enclosed look', () => {
       'relative', 'scroll-px-px', 'flex', 'w-fit', 'max-w-full', 'items-center', 'gap-1', 'rounded-control', 'bg-surface', 'p-1',
       'forced-colors:outline-(length:--tc-line-width)', 'overflow-x-auto', 'overscroll-x-contain',
     ]))
-    expect(classes('list')).not.toContain('gap-6')
+    expect(classes('list')).not.toContain('gap-5')
   })
 
   it('the active tab is lifted onto the raised surface inside an edge of 3:1, and carries no bar', () => {
@@ -149,10 +149,10 @@ describe('a tab of either look', () => {
 describe('size', () => {
   const SIZE = {
     xs: ['h-control-xs', 'px-pad-x-xs', 'text-xs'],
-    sm: ['h-control-sm', 'px-pad-x-sm', 'text-sm'],
-    md: ['h-control-md', 'px-pad-x-md', 'text-sm'],
-    lg: ['h-control-lg', 'px-pad-x-lg', 'text-base'],
-    xl: ['h-control-xl', 'px-pad-x-xl', 'text-base'],
+    sm: ['h-control-sm', 'px-pad-x-xs', 'text-sm'],
+    md: ['h-control-md', 'px-pad-x-sm', 'text-sm'],
+    lg: ['h-control-lg', 'px-pad-x-md', 'text-base'],
+    xl: ['h-control-xl', 'px-pad-x-lg', 'text-base'],
   } as const
 
   for (const [size, expected] of Object.entries(SIZE)) {

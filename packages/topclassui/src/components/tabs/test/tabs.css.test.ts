@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { CONTROL_SIZE } from '#shared/classes.js'
 import { compileEntry } from '#test/stylesheet.js'
-import { TABS_LIST, TABS_PANEL, TABS_ROOT, TABS_TAB } from '../classes.js'
+import { TABS_LIST, TABS_PANEL, TABS_ROOT, TABS_SIZE, TABS_TAB } from '../classes.js'
 
 const SHADOW = 'box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);'
 
@@ -14,7 +13,8 @@ const DECLARATION: Record<string, string> = {
   'relative': 'position: relative;',
   'flex': 'display: flex;',
   'items-center': 'align-items: center;',
-  'gap-6': 'gap: calc(var(--spacing) * 6);',
+  'gap-5': 'gap: calc(var(--spacing) * 5);',
+  'cursor-pointer': 'cursor: pointer;',
   'px-px': 'padding-inline: 1px;',
   'scroll-px-px': 'scroll-padding-inline: 1px;',
   'shadow-[inset_0_calc(var(--tc-line-width)*-1)_var(--tc-line)]':
@@ -84,7 +84,6 @@ const DECLARATION: Record<string, string> = {
   'px-pad-x-sm': 'padding-inline: calc(0.75rem * var(--tc-density));',
   'px-pad-x-md': 'padding-inline: calc(1rem * var(--tc-density));',
   'px-pad-x-lg': 'padding-inline: calc(1.25rem * var(--tc-density));',
-  'px-pad-x-xl': 'padding-inline: calc(1.5rem * var(--tc-density));',
   'text-xs': 'font-size: var(--text-xs);',
   'text-sm': 'font-size: var(--text-sm);',
   'text-base': 'font-size: var(--text-base);',
@@ -137,7 +136,7 @@ describe('every class Tabs writes compiles with the installed Tailwind', () => {
   const css = compileEntry().then((compiled) => compiled.build(Object.keys(DECLARATION)))
 
   it('the table names exactly the classes of the root, the lists, the tabs, the panel and the size scale', () => {
-    const all = written([TABS_ROOT, ...Object.values(TABS_LIST), ...Object.values(TABS_TAB), TABS_PANEL, ...Object.values(CONTROL_SIZE)])
+    const all = written([TABS_ROOT, ...Object.values(TABS_LIST), ...Object.values(TABS_TAB), TABS_PANEL, ...Object.values(TABS_SIZE)])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
     expect(all).toHaveLength(77)
   })

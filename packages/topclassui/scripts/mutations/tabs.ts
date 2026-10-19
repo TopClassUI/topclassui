@@ -56,14 +56,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the line tabs list ends flush with its last tab, which an RTL list then stops short of',
     file: CLASSES,
-    from: 'gap-6 px-px ${TABS_LIST_LINE}',
-    to: 'gap-6 ps-px ${TABS_LIST_LINE}',
+    from: 'gap-5 px-px ${TABS_LIST_LINE}',
+    to: 'gap-5 ps-px ${TABS_LIST_LINE}',
   },
   {
     label: 'the line tabs list starts flush with its first tab, so hydration scrolls an RTL list by a pixel and every tab jumps',
     file: CLASSES,
-    from: 'gap-6 px-px ${TABS_LIST_LINE}',
-    to: 'gap-6 pe-px ${TABS_LIST_LINE}',
+    from: 'gap-5 px-px ${TABS_LIST_LINE}',
+    to: 'gap-5 pe-px ${TABS_LIST_LINE}',
   },
   {
     label: 'the enclosed tabs list is inline-flex, so inside the grid of its root it stretches to the full width',
@@ -266,7 +266,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a tabs tab ignores the size of its root',
     file: CLIENT,
-    from: 'cn(TABS_TAB[variant], CONTROL_SIZE[size], className)',
+    from: 'cn(TABS_TAB[variant], TABS_SIZE[size], className)',
     to: 'cn(TABS_TAB[variant], className)',
   },
   {
@@ -290,8 +290,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: "a tabs tab's own classes beat a consumer className",
     file: CLIENT,
-    from: 'cn(TABS_TAB[variant], CONTROL_SIZE[size], className)',
-    to: 'cn(className, TABS_TAB[variant], CONTROL_SIZE[size])',
+    from: 'cn(TABS_TAB[variant], TABS_SIZE[size], className)',
+    to: 'cn(className, TABS_TAB[variant], TABS_SIZE[size])',
   },
   {
     label: "a tabs panel's own classes beat a consumer className",

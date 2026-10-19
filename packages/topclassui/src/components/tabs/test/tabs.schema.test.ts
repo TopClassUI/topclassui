@@ -1,9 +1,8 @@
 import { z } from 'zod'
 import { describe, expect, it } from 'vitest'
 
-import { CONTROL_SIZE } from '#shared/classes.js'
 import { TABS_BOUNDARIES } from '../boundaries.js'
-import { TABS_LIST, TABS_TAB } from '../classes.js'
+import { TABS_LIST, TABS_SIZE, TABS_TAB } from '../classes.js'
 import { TABS_DEFAULTS, TABS_SIZES, TABS_VARIANTS } from '../constants.js'
 import { tabsSchema } from '../schema.js'
 
@@ -78,9 +77,9 @@ describe('every look and every size has its classes', () => {
   })
 
   it('a height, a padding and a type step for each size of the shared scale, and none for custom', () => {
-    expect(Object.keys(CONTROL_SIZE)).toEqual(['xs', 'sm', 'md', 'lg', 'xl', 'custom'])
-    expect(CONTROL_SIZE.md).toBe('h-control-md px-pad-x-md text-sm')
-    expect(CONTROL_SIZE.custom).toBe('')
+    expect(Object.keys(TABS_SIZE)).toEqual(['xs', 'sm', 'md', 'lg', 'xl', 'custom'])
+    expect(TABS_SIZE.md).toBe('h-control-md px-pad-x-sm text-sm')
+    expect(TABS_SIZE.custom).toBe('')
   })
 })
 

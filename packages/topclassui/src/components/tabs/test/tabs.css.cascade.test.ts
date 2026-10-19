@@ -1,12 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { CONTROL_SIZE } from '#shared/classes.js'
 import { compileEntry } from '#test/stylesheet.js'
-import { TABS_LIST, TABS_PANEL, TABS_ROOT, TABS_TAB } from '../classes.js'
+import { TABS_LIST, TABS_PANEL, TABS_ROOT, TABS_SIZE, TABS_TAB } from '../classes.js'
 
 /** Every class Tabs writes, once: the same set tabs.css.test.ts checks one by one. */
 const WRITTEN = [...new Set(
-  [TABS_ROOT, ...Object.values(TABS_LIST), ...Object.values(TABS_TAB), TABS_PANEL, ...Object.values(CONTROL_SIZE)].join(' ').split(' '),
+  [TABS_ROOT, ...Object.values(TABS_LIST), ...Object.values(TABS_TAB), TABS_PANEL, ...Object.values(TABS_SIZE)].join(' ').split(' '),
 )].filter(Boolean)
 
 const escape = (cls: string) => cls.replace(/[^a-zA-Z0-9_-]/g, '\\$&')
