@@ -17,7 +17,10 @@ const ROOT_LAYOUT = `// app/[locale]/layout.tsx
 const dir = locale === 'ar' ? 'rtl' : 'ltr'
 
 return (
-  <html lang={locale} dir={dir} data-theme="dark" suppressHydrationWarning>
+  <html
+    lang={locale} dir={dir} data-theme="dark"
+    suppressHydrationWarning
+  >
     <head><ThemeScript /></head>
     <body>
       <TopClassProvider direction={dir} locale={locale}>
