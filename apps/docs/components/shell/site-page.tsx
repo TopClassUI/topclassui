@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 
 import type { Locale } from '../../content/pages'
 import { labelsFor } from '../../labels/index'
+import { MotionWatch } from './motion-watch'
 import { SiteFooter } from './site-footer'
 import { SiteNavbar } from './site-navbar'
 
@@ -22,6 +23,7 @@ export function SitePage({ locale, current, path, children }: SitePageProps) {
       <SiteNavbar locale={locale} current={current} path={path} labels={labels} />
       <div className="flex flex-1 flex-col">{children}</div>
       <SiteFooter locale={locale} labels={labels} />
+      <MotionWatch />
     </div>
   )
 }

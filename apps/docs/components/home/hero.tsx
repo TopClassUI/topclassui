@@ -25,7 +25,7 @@ export function Hero({ locale, labels }: { locale: Locale; labels: SiteLabels })
   return (
     <div className="flex flex-col items-center pt-16 text-center md:pt-28">
       {changelog === undefined ? <p className={CHIP}>{chip}</p> : (
-        <Link href={hrefOf(changelog, locale)} className={`${CHIP} ${HOVER.outline} ${FOCUS_RING} ${TOUCH_TARGET} ${TRANSITION}`}>{chip}</Link>
+        <Link href={hrefOf(changelog, locale)} className={`docs-hover-lift ${CHIP} ${HOVER.outline} ${FOCUS_RING} ${TOUCH_TARGET} ${TRANSITION}`}>{chip}</Link>
       )}
       <h1 className="mt-7.5 flex flex-col text-5xl font-semibold text-body lg:text-[clamp(3rem,6.4vw,5.75rem)] lg:leading-[1.04]">
         <span>{hero.titleTop}</span>
