@@ -19,6 +19,8 @@ The format is: date, decision, why, and what it affects.
 - **TreeView draws its states as the previewer does.** A selected row keeps the regular weight; the caret and the item icon take the body colour; the keyboard ring sits 2 px outside the row, inside the tree's 8 px padding and scroll padding. While loading, two bars in Skeleton's fill stand for the words, which stay in the live region as `sr-only`; empty draws the tray over `labels.state.empty` in a raised box. A caller's `loadingFallback` or `emptyFallback` replaces the built-in look.
 - **EmptyState draws its dash in `line-strong`, with gap 10 and padding 28** (`gap-2.5`, `p-7`), as the previewer does; the Components page's `line`, 12 and 32 were the older drawing. Its title and description take `leading-tight`, the previewer's normal line height. A new `compact` prop (`data-compact`) draws the strip's compact cell: a 24 px icon, `p-4` and `gap-1.5`, and the title and description one type step down.
 
+- **A complete Progress bar with no tone asked for fills in success**, as the stage and the strip draw it; a tone the caller chose, primary included, keeps its meaning at 100. `data-tone` still reports the tone.
+
 **Kept against the frame, by rule.** Progress fills the bar with `<tone>-on-soft` and outlines its track: the drawn `<tone>-solid` bars measure under 3:1 on the track (warning 1.78 in light, success 2.97 and info 2.74 in dark), so R-5.6-4 holds. 
 
 **Affects** `src/tokens.css` (the row knob only), the six component folders, their tests, e2e specs and mutation rows.

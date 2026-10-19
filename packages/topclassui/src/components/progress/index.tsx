@@ -12,16 +12,19 @@ import type { ProgressProps } from './types.js'
  * name, and the value is clamped before it reaches ARIA or the width of the bar. */
 export function Progress({
   value = PROGRESS_DEFAULTS.value,
-  tone = PROGRESS_DEFAULTS.tone,
+  tone: chosenTone,
   size = PROGRESS_DEFAULTS.size,
   indeterminate = PROGRESS_DEFAULTS.indeterminate,
   className,
   style,
   ...rest
 }: ProgressProps) {
+  const tone = chosenTone ?? PROGRESS_DEFAULTS.tone
   const percent = clamp(value, PROGRESS_BOUNDARIES.valueMin, PROGRESS_BOUNDARIES.valueMax)
   // An unknown wait is never complete, whatever value it was also given.
   const complete = !indeterminate && percent === PROGRESS_BOUNDARIES.valueMax
+  // The previewer draws a finished bar in success when no tone was asked for; a chosen tone keeps its meaning at 100.
+  const fill = complete && chosenTone === undefined ? 'success' : tone
 
   // The rest goes first: JSX accepts any hyphenated attribute, so aria-valuenow={150} type-checks.
   return (
@@ -46,7 +49,7 @@ export function Progress({
         className={cn(
           'h-full rounded-control forced-colors:bg-[CanvasText]',
           indeterminate ? 'w-1/3 animate-pulse motion-reduce:animate-none' : 'w-(--tc-progress-value)',
-          BAR_FILL[tone],
+          BAR_FILL[fill],
         )}
       />
     </div>

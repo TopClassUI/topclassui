@@ -104,4 +104,16 @@ export const MUTATIONS: Mutation[] = [
     from: 'z.enum(PROGRESS_TONES).default(PROGRESS_DEFAULTS.tone)',
     to: "z.enum(PROGRESS_TONES).default('primary')",
   },
+  {
+    label: 'a complete progress bar with no tone asked for stays primary, where the previewer draws it in success',
+    file: 'src/components/progress/index.tsx',
+    from: "const fill = complete && chosenTone === undefined ? 'success' : tone",
+    to: 'const fill = tone',
+  },
+  {
+    label: 'a complete progress bar turns success even when the caller chose its tone',
+    file: 'src/components/progress/index.tsx',
+    from: "const fill = complete && chosenTone === undefined ? 'success' : tone",
+    to: "const fill = complete ? 'success' : tone",
+  },
 ]

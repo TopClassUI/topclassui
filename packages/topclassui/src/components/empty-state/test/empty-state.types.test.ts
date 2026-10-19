@@ -55,11 +55,14 @@ describe('the props follow the vocabulary', () => {
     expectTypeOf<Accepts<keyof EmptyStateProps, 'render'>>().toEqualTypeOf<false>()
   })
 
+  it('takes compact, the form the states strip draws, as an optional boolean', () => {
+    expectTypeOf<EmptyStateProps['compact']>().toEqualTypeOf<boolean | undefined>()
+  })
+
   it('has none of the props the spec leaves unbuilt', () => {
     expectTypeOf<Accepts<keyof EmptyStateProps, 'size'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof EmptyStateProps, 'variant'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof EmptyStateProps, 'tone'>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<keyof EmptyStateProps, 'compact'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof EmptyStateProps, 'bordered'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof EmptyStateProps, 'withAction'>>().toEqualTypeOf<false>()
   })
