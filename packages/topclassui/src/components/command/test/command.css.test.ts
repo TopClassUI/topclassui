@@ -50,7 +50,6 @@ const DECLARATION: Record<string, string> = {
   'pb-1': 'padding-bottom: var(--spacing);',
   'text-xs': 'font-size: var(--text-xs);',
   'font-medium': 'font-weight: var(--font-weight-medium);',
-  'cursor-default': 'cursor: default;',
   'select-none': 'user-select: none;',
   // The empty and the loading text, and the title only a reader reads.
   'py-6': 'padding-block: calc(var(--spacing) * 6);',
@@ -101,7 +100,7 @@ describe('every class an open Command wears compiles with the installed Tailwind
       COMMAND_SPACER, COMMAND_GROUP_LABEL, COMMAND_ITEM, COMMAND_STATUS, COMMAND_TITLE,
     ]).filter((cls) => !shared.has(cls))
     expect(own).toEqual(Object.keys(DECLARATION).sort())
-    expect(own).toHaveLength(38)
+    expect(own).toHaveLength(37)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {
