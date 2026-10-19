@@ -14,13 +14,22 @@ function textOf(node: ReactNode): string {
   return ''
 }
 
-/** A state's caption: its aria-label, else a string title, else its text; empty for a part with nothing to show inline (a portal). */
-export function captionOf(node: ReactNode): string {
+/** Longer text is the state's content, not its name, so the cell goes uncaptioned. */
+const CAPTION_MAX = 40
+
+/** What names a state: its aria-label, else a string title, else its text; empty for a part with nothing to show inline (a portal). */
+export function nameOf(node: ReactNode): string {
   if (!isValidElement<Props>(node)) return ''
   const { 'aria-label': label, title } = node.props
   if (typeof label === 'string') return label
   if (typeof title === 'string') return title
   return textOf(node.props.children).trim()
+}
+
+/** The caption under a cell: its name when short enough to read as one. */
+export const captionOf = (node: ReactNode): string => {
+  const name = nameOf(node)
+  return name.length <= CAPTION_MAX ? name : ''
 }
 
 export interface StateStripProps {
@@ -36,8 +45,8 @@ export interface StateStripProps {
 export function StateStrip({ tree, heading, counts, sourceCount }: StateStripProps) {
   const root = isValidElement<Props>(tree) && typeof tree.type === 'string' ? tree : null
   const parts = root === null ? [] : Children.toArray(root.props.children)
-  const cells = parts.filter((part) => captionOf(part) !== '')
-  const rest = parts.filter((part) => captionOf(part) === '')
+  const cells = parts.filter((part) => nameOf(part) !== '')
+  const rest = parts.filter((part) => nameOf(part) === '')
   const count = cells.length === 0 ? sourceCount : cells.length
   return (
     <>
@@ -52,7 +61,7 @@ export function StateStrip({ tree, heading, counts, sourceCount }: StateStripPro
               {cells.map((part, index) => (
                 <li key={index} className={STATE_CELL}>
                   <div className={STATE_BOX}>{part}</div>
-                  <span aria-hidden="true" className={STATE_CAPTION}>{captionOf(part)}</span>
+                  {captionOf(part) === '' ? null : <span aria-hidden="true" className={STATE_CAPTION}>{captionOf(part)}</span>}
                 </li>
               ))}
             </ul>
