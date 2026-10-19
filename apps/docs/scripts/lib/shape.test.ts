@@ -16,6 +16,7 @@ const entry = (slug: string, demos: { name: string; key: string; source: string 
   tier: 1,
   category: 'actions',
   baseUi: null,
+  clientBytes: null,
   section: 'actions',
   order: 0,
   card: true,
