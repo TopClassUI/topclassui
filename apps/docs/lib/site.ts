@@ -9,6 +9,8 @@ export const SITE_NAME = 'TopClass UI'
 /** Choice 12: the repository is public, so the navbar, Home and the footer link to it. */
 export const GITHUB_URL: string | null = 'https://github.com/TopClassUI/topclassui'
 
+export const NPM_URL = 'https://www.npmjs.com/package/topclassui'
+
 export const YOUTUBE_URL: string | null = 'https://www.youtube.com/@topclassui'
 
 /** Left out until there is a handle: a link to nothing is never drawn (choice 12). */

@@ -41,6 +41,13 @@ describe('sitemap', () => {
     ])
   })
 
+  it('dates Home and the catalog like every other page, from git, never the build clock', () => {
+    for (const index of [0, 1, 22, 23]) {
+      expect(entries[index]?.lastModified, entries[index]?.url).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.000Z$/)
+    }
+    expect(entries.filter((entry) => entry.lastModified === undefined).map((entry) => entry.url)).toEqual([])
+  })
+
   it('pairs every URL with its other language and x-default', () => {
     expect(entries[3]?.alternates?.languages).toEqual({
       en: 'https://topclassui.com/en/docs/installation',

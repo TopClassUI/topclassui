@@ -5,6 +5,7 @@ import { Icon } from 'topclassui/icon'
 
 import { LIVE_GUIDES, hrefOf, pageBySlug, type Locale } from '../../content/pages'
 import type { SiteLabels } from '../../labels'
+import { EXTERNAL_REL } from '../../lib/external'
 import { GITHUB_URL, INSTALL_LINE, PRERELEASE, VERSION } from '../../lib/site'
 import { CommandBox } from '../command-box'
 
@@ -43,7 +44,7 @@ export function Hero({ locale, labels }: { locale: Locale; labels: SiteLabels })
           </Button>
         )}
         {GITHUB_URL === null ? null : (
-          <Button size="lg" variant="outline" tone="neutral" render={<a href={GITHUB_URL} rel="noopener noreferrer" />}>
+          <Button size="lg" variant="outline" tone="neutral" render={<a href={GITHUB_URL} rel={EXTERNAL_REL} />}>
             <Icon name="github-logo" />
             {hero.star}
           </Button>

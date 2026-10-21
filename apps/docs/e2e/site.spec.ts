@@ -122,7 +122,7 @@ for (const slug of GUIDES) {
     test(`${path}: the Next card goes to the following page`, async ({ page }) => {
       await page.goto(path)
       const next = NEXT[slug]
-      const card = page.locator('main article > a[href]').last()
+      const card = page.locator('main article > nav a[rel="next"]')
       await expect(card).toHaveAttribute('href', `/${locale}/docs/${next.href}`)
       await expect(card).toContainText(next[locale])
       await card.click()

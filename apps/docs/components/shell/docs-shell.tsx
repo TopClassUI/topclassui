@@ -2,11 +2,11 @@ import type { ReactNode } from 'react'
 import { Breadcrumb } from 'topclassui/breadcrumb'
 import { getLabels } from 'topclassui/labels/get-labels'
 
-import { hrefOf, nextPage, type Locale, type PageEntry } from '../../content/pages'
+import { hrefOf, nextPage, previousPage, type Locale, type PageEntry } from '../../content/pages'
 import type { SiteLabels } from '../../labels/index'
 import { tocOf } from '../../lib/data'
 import { SITE_URL } from '../../lib/site'
-import { NextCard } from './next-card'
+import { Pager, type PageLink } from './next-card'
 import { OnThisPage, type TocEntry } from './on-this-page'
 import { SiteSidebar } from './site-sidebar'
 
@@ -39,9 +39,11 @@ export function DocsColumns({ locale, current, labels, toc, children }: DocsColu
   )
 }
 
-/** A registry page in the columns: breadcrumb, h1, lead, sections and next. */
+const linkOf = (page: PageEntry | undefined, locale: Locale): PageLink | undefined =>
+  page === undefined ? undefined : { href: hrefOf(page, locale), title: page.title[locale] }
+
+/** A registry page in the columns: breadcrumb, h1, lead, sections, previous and next. */
 export function DocsShell({ locale, entry, labels, children }: DocsShellProps) {
-  const next = nextPage(entry.slug)
   const library = getLabels(locale)
   return (
     <DocsColumns locale={locale} current={entry.slug} labels={labels} toc={tocOf(locale, entry.slug)}>
@@ -56,7 +58,7 @@ export function DocsShell({ locale, entry, labels, children }: DocsShellProps) {
           <p className="text-base text-muted">{entry.description[locale]}</p>
         </div>
         {children}
-        {next === undefined ? null : <NextCard href={hrefOf(next, locale)} title={next.title[locale]} label={labels.shell.next} />}
+        <Pager previous={linkOf(previousPage(entry.slug), locale)} next={linkOf(nextPage(entry.slug), locale)} labels={labels.shell} />
       </article>
     </DocsColumns>
   )

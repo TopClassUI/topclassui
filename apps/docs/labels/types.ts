@@ -16,6 +16,10 @@ export interface SiteLabels {
     siteName: string
     homeTitle: string
     guideTitle: (title: string) => string
+    /** Tails a component's lead may take to reach 120 to 160 characters, shortest first; the longest that fits is used. */
+    componentTails: readonly string[]
+    /** The og:image:alt of a page's card. */
+    ogAlt: (title: string) => string
     notFoundTitle: string
   }
   shell: {
@@ -26,6 +30,9 @@ export interface SiteLabels {
     sidebarTitle: string
     onThisPage: string
     next: string
+    previous: string
+    /** The nav holding the Previous and Next cards. */
+    pager: string
     home: string
     breadcrumb: string
     menu: string
@@ -184,7 +191,6 @@ export interface SiteLabels {
 export interface CatalogLabels {
   title: string
   lead: (count: number) => string
-  metaTitle: string
   description: string
   beforeTitle: string
   beforeOnce: string
@@ -213,4 +219,4 @@ export interface SearchLabels {
   shortcut: { pc: string; mac: string }
 }
 
-export interface LlmsLabels { summary: string; docs: string; components: string }
+export interface LlmsLabels { summary: string; docs: string; components: string; keyboard: string; accessibility: string; rtl: string }

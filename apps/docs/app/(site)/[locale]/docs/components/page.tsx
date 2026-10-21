@@ -2,33 +2,33 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
-import { CatalogPage, catalogToc } from '../../../../../components/catalog/catalog-page'
+import { CatalogPage, catalogCards, catalogToc } from '../../../../../components/catalog/catalog-page'
+import { JsonLd } from '../../../../../components/json-ld'
 import { DocsColumns } from '../../../../../components/shell/docs-shell'
 import { SitePage } from '../../../../../components/shell/site-page'
+import { isLocale, pageBySlug, type Locale, type PageEntry } from '../../../../../content/pages'
 import { labelsFor } from '../../../../../labels/index'
-import { LOCALES, isLocale } from '../../../../../lib/locales'
+import { createMetadata } from '../../../../../lib/metadata'
+import { catalogData } from '../../../../../lib/structured-data'
 
-const pathOf = (locale: string) => `/${locale}/docs/components`
+type Params = Promise<{ locale: string }>
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
-  const { locale } = await params
-  if (!isLocale(locale)) return {}
-  const t = labelsFor(locale).catalog
-  return {
-    title: t.metaTitle,
-    description: t.description,
-    alternates: {
-      canonical: pathOf(locale),
-      languages: { ...Object.fromEntries(LOCALES.map((other) => [other, pathOf(other)])), 'x-default': pathOf('en') },
-    },
-  }
+function catalogOf(locale: string): { locale: Locale; entry: PageEntry } {
+  const entry = pageBySlug('components')
+  if (!isLocale(locale) || entry?.kind !== 'catalog') notFound()
+  return { locale, entry }
 }
 
-export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params
-  if (!isLocale(locale)) notFound()
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const { locale, entry } = catalogOf((await params).locale)
+  return createMetadata(entry, locale)
+}
+
+export default async function Page({ params }: { params: Params }) {
+  const { locale, entry } = catalogOf((await params).locale)
   return (
     <SitePage locale={locale} current="components" path="/docs/components">
+      <JsonLd data={catalogData(entry, locale, catalogCards())} />
       <DocsColumns locale={locale} current="components" labels={labelsFor(locale)} toc={catalogToc(locale).flatMap((group) => group.items)}>
         <CatalogPage locale={locale} />
       </DocsColumns>

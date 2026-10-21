@@ -5,6 +5,12 @@ export const en: SiteLabels = {
     siteName: 'TopClass UI',
     homeTitle: 'TopClass UI - React components for Next.js, RTL-first and server-first',
     guideTitle: (title) => `${title} - TopClass UI`,
+    componentTails: [
+      ' A React component for Next.js.',
+      ' A React component for Next.js, in English and Arabic.',
+      ' A React component for Next.js and Tailwind CSS, accessible and ready for Arabic.',
+    ],
+    ogAlt: (title) => `${title}, on the TopClass UI card`,
     notFoundTitle: 'Page not found - TopClass UI',
   },
   shell: {
@@ -14,6 +20,8 @@ export const en: SiteLabels = {
     sidebarTitle: 'Documentation',
     onThisPage: 'On this page',
     next: 'Next',
+    previous: 'Previous',
+    pager: 'Previous and next pages',
     home: 'Home',
     breadcrumb: 'Breadcrumb',
     menu: 'Menu',
@@ -191,7 +199,6 @@ export const en: SiteLabels = {
   catalog: {
     title: 'Components',
     lead: (count) => `${String(count)} components, each with a live preview: every state at once, a playground wired to the real props, and the import line.`,
-    metaTitle: 'Components - TopClass UI',
     description: 'Every TopClass UI component on one page, with a live preview, a playground on the real props, every state and its import line.',
     beforeTitle: 'Before you start',
     beforeOnce: 'once per app',
@@ -235,5 +242,8 @@ export const en: SiteLabels = {
     summary: 'React components for Next.js, RTL-first and server-first, built on Tailwind CSS v4 and Base UI.',
     docs: 'Docs',
     components: 'Components',
+    keyboard: 'Keyboard',
+    accessibility: 'Accessibility',
+    rtl: 'Right to left',
   },
 }

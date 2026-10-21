@@ -7,6 +7,7 @@ import { Separator } from 'topclassui/separator'
 import { LIVE_PAGES, PAGE_GROUPS, hrefOf, pageBySlug, type Locale } from '../../content/pages'
 import type { SiteLabels } from '../../labels/index'
 import { SECTIONS } from '../../content/sections'
+import { EXTERNAL_REL } from '../../lib/external'
 import { CARDS } from '../../lib/data'
 import { GITHUB_URL, INSTALL_LINE, PRERELEASE, VERSION, X_URL, YOUTUBE_URL } from '../../lib/site'
 import { QUIET_LINK } from '../classes'
@@ -59,7 +60,7 @@ export function SiteFooter({ locale, labels }: { locale: Locale; labels: SiteLab
           <div className="flex flex-wrap items-center gap-2 pt-1">
             <CommandBox code={INSTALL_LINE} locale={locale} size="sm" className="w-fit" />
             {GITHUB_URL === null ? null : (
-              <Button size="sm" render={<a href={GITHUB_URL} rel="noopener noreferrer" />}>
+              <Button size="sm" render={<a href={GITHUB_URL} rel={EXTERNAL_REL} />}>
                 <Icon name="github-logo" />
                 {labels.home.hero.star}
               </Button>
@@ -85,7 +86,7 @@ export function SiteFooter({ locale, labels }: { locale: Locale; labels: SiteLab
         <ul aria-label={labels.footer.social} className="flex items-center gap-1">
           {social.map(({ key, url, name, Mark }) => (url === null ? null : (
             <li key={key}>
-              <a href={url} rel="noopener noreferrer" aria-label={name} className={`${ICON_BUTTON} ${HOVER.ghost} text-muted`}><Mark /></a>
+              <a href={url} rel={EXTERNAL_REL} aria-label={name} className={`${ICON_BUTTON} ${HOVER.ghost} text-muted`}><Mark /></a>
             </li>
           )))}
         </ul>

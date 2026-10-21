@@ -3,6 +3,7 @@ import type { MDXComponents } from 'mdx/types'
 import type { ComponentProps } from 'react'
 
 import type { Locale } from '../../content/pages'
+import { EXTERNAL_REL, isExternal } from '../../lib/external'
 import { labelsFor } from '../../labels/index'
 import { INLINE_CODE, TEXT_LINK } from '../classes'
 import { Callout } from './callout'
@@ -34,7 +35,7 @@ export function mdxComponents(locale: Locale): MDXComponents {
     pre: ({ children }) => <CodeFence locale={locale} terminal={terminal} repeat={labels.blocks.repeat}>{children}</CodeFence>,
     table: ({ children }) => <MdxTable locale={locale}>{children}</MdxTable>,
     a: ({ href = '', children }: ComponentProps<'a'>) =>
-      href.startsWith('/') ? <Link href={href} className={TEXT_LINK}>{children}</Link> : <a href={href} className={TEXT_LINK}>{children}</a>,
+      href.startsWith('/') ? <Link href={href} className={TEXT_LINK}>{children}</Link> : <a href={href} rel={isExternal(href) ? EXTERNAL_REL : undefined} className={TEXT_LINK}>{children}</a>,
     Callout,
     Cards,
     Card,

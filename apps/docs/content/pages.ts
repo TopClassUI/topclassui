@@ -51,8 +51,8 @@ export const PAGES = [
     slug: 'cli', path: '/docs/cli', kind: 'guide', group: 'start', icon: 'terminal-window', status: 'live',
     title: { en: 'Add with the CLI', ar: 'الإضافة عبر الطرفية' },
     description: {
-      en: 'Copy one component into your project with one command, then edit it as your own file.',
-      ar: 'انسخ مكوّنًا واحدًا إلى مشروعك بأمر واحد، ثم عدّله كأنه ملفك.',
+      en: 'Copy one component into your project with one command. The CLI brings its source, constants, schema, types and variants, and you edit them as your own files.',
+      ar: 'انسخ مكوّنًا واحدًا إلى مشروعك بأمر واحد. تجلب الطرفية مصدره مع ثوابته ومخططه وأنواعه ومتغيراته، ثم تعدّلها كأنها ملفاتك، ويظهر كل تحديث لاحق بأمر diff.',
     },
   },
   {
@@ -163,6 +163,12 @@ export function pageBySlug(slug: string): PageEntry | undefined {
 export function nextPage(slug: string): PageEntry | undefined {
   const index = LIVE_PAGES.findIndex((page) => page.slug === slug)
   return index === -1 ? undefined : LIVE_PAGES[index + 1]
+}
+
+/** The live entry before it in sidebar order, or none before the first. */
+export function previousPage(slug: string): PageEntry | undefined {
+  const index = LIVE_PAGES.findIndex((page) => page.slug === slug)
+  return index < 1 ? undefined : LIVE_PAGES[index - 1]
 }
 
 /** The route of a page in a locale: `/en`, `/ar/docs/css`. */

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { LIVE_GUIDES, LIVE_PAGES, PAGES, hrefOf, nextPage } from './pages.js'
+import { LIVE_GUIDES, LIVE_PAGES, PAGES, hrefOf, nextPage, previousPage } from './pages.js'
 
 describe('the page registry', () => {
   it('holds each slug and each path once', () => {
@@ -37,5 +37,14 @@ describe('the page registry', () => {
   it('builds the route under the locale', () => {
     expect(hrefOf({ path: '/' }, 'ar')).toBe('/ar')
     expect(hrefOf({ path: '/docs/css' }, 'en')).toBe('/en/docs/css')
+  })
+
+  it('derives previous from the live order, skipping a later page, and has none before Home', () => {
+    expect(previousPage('home')).toBeUndefined()
+    expect(previousPage('installation')?.slug).toBe('home')
+    expect(previousPage('cli')?.slug).toBe('installation')
+    expect(previousPage('css')?.slug).toBe('cli')
+    expect(previousPage('colors')?.slug).toBe('first-component')
+    expect(previousPage('changelog')?.slug).toBe('components')
   })
 })
