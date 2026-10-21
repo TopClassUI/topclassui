@@ -16,6 +16,10 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-22 - The round-10 states demos raise the tarball budget to 3,250,000 bytes
+
+**Decision.** The six round-10 branches redraw every Every state strip from the Figma frames (one captioned cell a state, the combined matrices moved to their own demos), and the stack packs 3,158,858 bytes unpacked, 8,858 over the 3,150,000 of 2026-10-19. The budget becomes 3,250,000: the growth is demo source the CLI copies, not runtime code, and the per-component client budgets in size-budget.json are unchanged. For Omar to confirm, as the 2026-10-19 raise was.
+
 ## 2026-10-19 - The round-8 library raises the tarball budget to 3,150,000 bytes and Sidebar's to 6.2 KB
 
 **Decision.** The thirteen round-8 branches stacked together (the library integrator, job 131) pack 3,114,237 bytes unpacked, over the 3,050,000 the 2026-10-18 entry set; the base cf1ec12 packs 2,986,683, so round 8 adds 127,555 bytes. `SIZE_BUDGET_BYTES` in `scripts/lib/pack-checks.ts` rises to 3,150,000, the measured size plus about 1 %, so it stays a guard rail. In the same stack Sidebar's own client half measures 6,246 bytes against the 6 KB simple-control budget of `pnpm size`, and its entry in `size-budget.json` becomes 6.2 KB, as job 118 raised fifteen others to what was measured.
