@@ -24,7 +24,7 @@ const SHOWS: Record<string, { rails: number, links: number, named: number, curre
   // The Try it rail, with nothing passed: no row is current until the reader turns current on.
   'playground': { rails: 1, links: 3, named: 0, current: [], title: 'Workspace' },
   'rtl': { rails: 1, links: 4, named: 1, current: ['الرئيسية'], title: 'مساحة العمل' },
-  'states': { rails: 2, links: 6, named: 0, current: ['Home', 'Projects'], title: 'Workspace' },
+  'states': { rails: 5, links: 15, named: 0, current: ['Home', 'Projects', 'Home', 'Home', 'Home'], title: 'Workspace' },
 }
 
 const render = async (file: string) => {
@@ -99,7 +99,7 @@ describe('what the demos show', () => {
     }
     expect(found).toEqual({
       'basic': ['open'], 'collapsed': ['closed'], 'controlled': ['open'], 'groups': ['open'], 'in-a-layout': ['open'],
-      'long-list': ['open'], 'playground': ['open'], 'rtl': ['open'], 'states': ['open', 'closed'],
+      'long-list': ['open'], 'playground': ['open'], 'rtl': ['open'], 'states': ['open', 'closed', 'open', 'open', 'open'],
     })
   })
 
@@ -152,10 +152,10 @@ describe('what the demos show', () => {
     expect(rows(html).map((row) => row.label)).toEqual(['الرئيسية', 'المشاريع', 'الفريق', 'الإعدادات'])
   })
 
-  it('states names each of its two rails, so a page can hold both, and each toggle in English', async () => {
+  it('states names each of its five rails, so a page can hold both, and each toggle in English', async () => {
     const html = await render('states')
-    expect(tags(html, 'nav').map((nav) => attr(nav, 'aria-label'))).toEqual(['expanded', 'collapsed'])
-    expect(tags(html, 'button').map((button) => attr(button, 'aria-label'))).toEqual(['Collapse the sidebar', 'Expand the sidebar'])
+    expect(tags(html, 'nav').map((nav) => attr(nav, 'aria-label'))).toEqual(['expanded', 'collapsed', 'active item', 'hover', 'focus-visible'])
+    expect(tags(html, 'button').map((button) => attr(button, 'aria-label'))).toEqual(['Collapse the sidebar', 'Expand the sidebar', 'Collapse the sidebar', 'Collapse the sidebar', 'Collapse the sidebar'])
   })
 
   it('every other demo names its rail and its toggle in English', async () => {

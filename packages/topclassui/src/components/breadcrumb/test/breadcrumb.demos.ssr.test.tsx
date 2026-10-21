@@ -14,7 +14,7 @@ const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 const EXPECTED = ['all-links', 'basic', 'deep-trail', 'long-label', 'long-trail', 'mixed-label', 'rtl', 'states']
 
 /** How many trails a demo holds. */
-const TRAILS: Record<string, { navs: number }> = { states: { navs: 5 } }
+const TRAILS: Record<string, { navs: number }> = { states: { navs: 3 } }
 
 const load = async (file: string) => {
   const loaded = await import(`../dummy/${file}.tsx`) as { default: ComponentType }
@@ -88,14 +88,12 @@ describe('each demo shows what its name says', () => {
     expect(out).toContain('<span aria-current="page" class="truncate min-w-0 text-body font-semibold">Logical properties')
   })
 
-  it('states names each of its five trails, and only the lone current page has no link', async () => {
+  it('states names each of its three trails, and the idle one ends on a link', async () => {
     const out = await load('states')
-    expect([...out.matchAll(/<nav aria-label="([^"]*)"/g)].map((m) => m[1])).toEqual([
-      'current', 'idle', 'current page only', 'collapsed', 'home icon',
-    ])
-    // 4 in the first two, 2 of the folded five (Docs, then Button) and 2 under the house.
-    expect(count(out, '<a href=')).toBe(8)
-    expect(count(out, 'aria-current="page"')).toBe(4)
+    expect([...out.matchAll(/<nav aria-label="([^"]*)"/g)].map((m) => m[1])).toEqual(['idle', 'collapsed', 'current'])
+    // 2 in the idle trail, 2 of the folded four (Docs, then Actions) and 1 before the current page.
+    expect(count(out, '<a href=')).toBe(5)
+    expect(count(out, 'aria-current="page"')).toBe(2)
   })
 
   it('rtl sets the direction, names the nav in Arabic and keeps the flipping caret', async () => {

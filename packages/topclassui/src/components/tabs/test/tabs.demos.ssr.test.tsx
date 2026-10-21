@@ -25,7 +25,7 @@ const COUNTS: Record<string, { roots: number, tabs: number, panels: number }> = 
   'rtl': { roots: 1, tabs: 3, panels: 3 },
   'server-content': { roots: 1, tabs: 2, panels: 2 },
   'sizes': { roots: 12, tabs: 24, panels: 24 },
-  'states': { roots: 3, tabs: 9, panels: 9 },
+  'states': { roots: 4, tabs: 12, panels: 12 },
 }
 
 /** A sentence each demo keeps in a panel that is not the one it opens on. */

@@ -1,27 +1,18 @@
 import { Breadcrumb } from '../index.js'
 
-/** The states a server can render: a trail ending on the page being read, one of ancestors only,
- * a lone current page, a long trail folded by maxItems and one that opens on the house icon.
- * Five navs on one page need a name each, so every one passes its own. */
+/** One trail per state the Previewer frame draws that a server trail can show, in its order: ancestors only, a long trail folded
+ * by maxItems, and one ending on the page being read. The frame's hover underlines one crumb, which no prop of the data reaches.
+ * Three navs on one page need a name each, so every one passes its own. */
 export default function Demo() {
   return (
-    <div className="grid justify-items-start gap-4">
-      <Breadcrumb
-        aria-label="current"
-        items={[
-          { href: '/', label: 'Home' },
-          { href: '/docs', label: 'Docs' },
-          { label: 'Breadcrumb' },
-        ]}
-      />
+    <div className="flex flex-wrap items-center gap-6">
       <Breadcrumb
         aria-label="idle"
         items={[
-          { href: '/', label: 'Home' },
-          { href: '/shop', label: 'Shop' },
+          { href: '/docs', label: 'Docs' },
+          { href: '/docs/button', label: 'Button' },
         ]}
       />
-      <Breadcrumb aria-label="current page only" items={[{ label: 'Home' }]} />
       <Breadcrumb
         aria-label="collapsed"
         maxItems={3}
@@ -29,15 +20,12 @@ export default function Demo() {
           { href: '/docs', label: 'Docs' },
           { href: '/docs/components', label: 'Components' },
           { href: '/docs/components/actions', label: 'Actions' },
-          { href: '/docs/components/actions/button', label: 'Button' },
-          { label: 'Props' },
+          { label: 'Button' },
         ]}
       />
       <Breadcrumb
-        aria-label="home icon"
-        showHome
+        aria-label="current"
         items={[
-          { href: '/', label: 'Home' },
           { href: '/docs', label: 'Docs' },
           { label: 'Button' },
         ]}

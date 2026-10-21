@@ -21,7 +21,7 @@ const TABS: Record<string, number> = {
   'tabs--rtl': 1,
   'tabs--server-content': 1,
   'tabs--sizes': 12,
-  'tabs--states': 3,
+  'tabs--states': 4,
 }
 
 /** The three screens Unit 3 measures at, and a phone on its side. */

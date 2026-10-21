@@ -25,7 +25,7 @@ const LISTS: Record<string, string[]> = {
     'line xs', 'line sm', 'line md', 'line lg', 'line xl', 'line custom',
     'enclosed xs', 'enclosed sm', 'enclosed md', 'enclosed lg', 'enclosed xl', 'enclosed custom',
   ],
-  'states': ['Line', 'Enclosed', 'Every tab disabled'],
+  'states': ['Line', 'Enclosed', 'Focused', 'Every tab disabled'],
 }
 
 const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { default: ComponentType }).default

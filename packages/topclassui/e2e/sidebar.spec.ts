@@ -20,8 +20,8 @@ const SIDEBARS: Record<string, { open: boolean, links: number }> = {
   'sidebar--long-list': { open: true, links: 60 },
   'sidebar--playground': { open: true, links: 3 },
   'sidebar--rtl': { open: true, links: 4 },
-  // Two rails, the expanded one first: what a test reads of the first rail is that one.
-  'sidebar--states': { open: true, links: 6 },
+  // Five rails, the expanded one first: what a test reads of the first rail is that one.
+  'sidebar--states': { open: true, links: 15 },
 }
 
 /** The three screens Unit 3 measures at, and a phone on its side. */

@@ -5,10 +5,7 @@ import { AvatarFallback, AvatarImage, AvatarRoot, AvatarSkeleton } from '../inde
 /** Inline, so the demo never reaches the network. */
 const PORTRAIT = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23475569'/%3E%3Ccircle cx='20' cy='15' r='7' fill='%23e2e8f0'/%3E%3Cpath d='M6 40a14 14 0 0 1 28 0z' fill='%23e2e8f0'/%3E%3C/svg%3E"
 
-/** Not a picture, so it fails the way a 404 does. */
-const FAILED = 'data:image/svg+xml,failed'
-
-/** One cell per state, named by its aria-label: the four Figma 137:461 draws, then a picture that failed. */
+/** One cell per state, named by its aria-label: the four Figma 137:461 draws. A picture that fails is the failed demo. */
 export default function Demo() {
   return (
     <div className="flex flex-wrap items-center gap-6">
@@ -30,12 +27,6 @@ export default function Demo() {
       </div>
       <div role="group" aria-label="loading">
         <AvatarSkeleton size="lg" />
-      </div>
-      <div role="group" aria-label="failed">
-        <AvatarRoot size="lg">
-          <AvatarImage src={FAILED} alt="Sara Khalil" />
-          <AvatarFallback>SK</AvatarFallback>
-        </AvatarRoot>
       </div>
     </div>
   )

@@ -20,7 +20,7 @@ const TITLES: Record<string, readonly string[]> = {
   'accordion--multiple': ['Plan', 'Seats', 'Invoices'],
   'accordion--playground': ['What is a server component?', 'Does it work in Arabic?', 'How big is the bundle?'],
   'accordion--rtl': ['ما هو مكوّن الخادم؟', 'هل يعمل بالعربية؟', 'ما حجم الحزمة؟'],
-  'accordion--states': ['Question', 'Question', 'Question'],
+  'accordion--states': ['Question', 'Question', 'Hovered question', 'Focused question', 'Question'],
 }
 
 /** A small phone, a phone, a desktop and a phone on its side. */
