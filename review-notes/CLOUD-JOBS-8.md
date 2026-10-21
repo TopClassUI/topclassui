@@ -1,3 +1,5 @@
+Final checks (the cloud, 2026-10-20): PR 180 fix/thin-page-bar-e2e 3f5ca359 is green (merge 180); PRs 175-179 on 4f8692f2 are red on docs:check e2e (853 / 11: three CLI-page pins, six phone-width overflows, motion ar, popover top), repaired in round 9 by job 133 on preview/r8-all.
+
 # Cloud jobs, round 8: Figma-first (2026-10-19 night)
 
 Omar reviewed the live site and the components against Figma and said the UI looks "like Bootstrap": the landing page, Toast, Table, Dialog, the search palette (default scrollbar, bare rows), no cursor pointer, bulky pagination on phones. The cause: every component and page was built from the text notes in `docs/figma/*.md`, never from the frames. This round rebuilds the look **from the frames**. Every job below runs the same loop and does not stop until the screenshot matches the frame:
