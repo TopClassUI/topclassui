@@ -387,8 +387,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a sidebar row that is not current no longer answers the pointer',
     file: CLASSES,
-    from: 'rest: `tone-neutral text-body ${HOVER.ghost}`,',
-    to: "rest: 'tone-neutral text-body',",
+    from: 'rest: `tone-neutral text-body ${HOVER.ghost} ${SIDEBAR_REST_FORCED}`,',
+    to: 'rest: `tone-neutral text-body ${SIDEBAR_REST_FORCED}`,',
   },
   {
     label: 'a focused sidebar row shows no ring',
@@ -486,5 +486,11 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/sidebar/schema.ts',
     from: 'z.boolean().default(SIDEBAR_DEFAULTS.defaultOpen)',
     to: 'z.boolean().optional()',
+  },
+  {
+    label: 'a sidebar row keeps its ring outside under forced colours, where the highlight of the current row above can hide its top',
+    file: 'src/components/sidebar/classes.ts',
+    from: 'rest: `tone-neutral text-body ${HOVER.ghost} ${SIDEBAR_REST_FORCED}`,',
+    to: 'rest: `tone-neutral text-body ${HOVER.ghost}`,',
   },
 ]

@@ -155,15 +155,23 @@ describe('the compact row on a narrow list or under a finger', () => {
     expect(ruleOf('.\\@container\\/pagination')).toBe('container-type: inline-size;\n    container-name: pagination;')
   })
 
-  it('hides the pages and the gaps below 36rem and under a coarse pointer, over their own inline-flex', () => {
-    expect(flat()).toContain('@container pagination (width < 36rem) { .pagination-full { display: none !important; } }')
+  it('hides the pages and the gaps on a phone and under a coarse pointer, over their own inline-flex', () => {
+    expect(flat()).toContain('@media (width < 36rem) { .pagination-full { display: none !important; } }')
     expect(flat()).toContain('@media (pointer: coarse) { .pagination-full { display: none !important; } }')
   })
 
-  it('shows "current of total" in exactly those two cases and nowhere else', () => {
+  it('shows "current of total" in exactly those two cases, and in a list narrower than its row', () => {
     expect(flat()).toContain(
-      '.pagination-compact { display: none; @container pagination (width < 36rem) { display: flex; } '
-      + '@media (pointer: coarse) { display: flex; } }',
+      '.pagination-compact { display: none; @media (width < 36rem) { display: flex; } @media (pointer: coarse) { display: flex; } }',
+    )
+  })
+
+  it('lets the list claim its row and turn compact below it, so a cell sized to its content shows the full row', () => {
+    const steps = RENDERED.filter((cls) => cls.startsWith('pagination-at-')).sort()
+    expect(steps).toEqual(['pagination-at-22', 'pagination-at-28', 'pagination-at-32', 'pagination-at-36', 'pagination-at-38', 'pagination-at-44'])
+    expect(flat()).toContain(
+      '.pagination-at-28 { contain-intrinsic-inline-size: 28rem; @container pagination (width < 28rem) { '
+      + '& .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }',
     )
   })
 })

@@ -14,7 +14,7 @@ const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 const EXPECTED = ['all-links', 'basic', 'deep-trail', 'long-label', 'long-trail', 'mixed-label', 'rtl', 'states']
 
 /** How many trails a demo holds. */
-const TRAILS: Record<string, { navs: number }> = { states: { navs: 5 } }
+const TRAILS: Record<string, { navs: number }> = { states: { navs: 4 } }
 
 const load = async (file: string) => {
   const loaded = await import(`../dummy/${file}.tsx`) as { default: ComponentType }
@@ -44,12 +44,14 @@ describe('every demo renders on the server', () => {
 })
 
 describe('each demo shows what its name says', () => {
-  it('basic is the sample of the spec: two links, then the current page', async () => {
+  it('basic is the stage of the frame: the house for Home, two links, then the current page', async () => {
     const out = await load('basic')
-    expect(count(out, '<a href=')).toBe(2)
+    expect(count(out, '<a href=')).toBe(3)
     expect(out).toContain('<a href="/" ')
+    expect(out).toContain('<span class="sr-only">Home</span>')
     expect(out).toContain('<a href="/docs" ')
-    expect(out).toMatch(/<span dir="auto" aria-current="page" class="[^"]*">Breadcrumb<\/span>/)
+    expect(out).toContain('<a href="/docs/components" ')
+    expect(out).toMatch(/<span dir="auto" aria-current="page" class="[^"]*">Button<\/span>/)
   })
 
   it('all-links marks no current page, because every crumb is an ancestor', async () => {
@@ -88,14 +90,15 @@ describe('each demo shows what its name says', () => {
     expect(out).toContain('<span aria-current="page" class="truncate min-w-0 text-body font-semibold">Logical properties')
   })
 
-  it('states names each of its five trails, and only the lone current page has no link', async () => {
+  it('states names the four trails of the frame, and hovers the one crumb of the hover trail', async () => {
     const out = await load('states')
     expect([...out.matchAll(/<nav aria-label="([^"]*)"/g)].map((m) => m[1])).toEqual([
-      'current', 'idle', 'current page only', 'collapsed', 'home icon',
+      'idle', 'hover', 'collapsed', 'current',
     ])
-    // 4 in the first two, 2 of the folded five (Docs, then Button) and 2 under the house.
-    expect(count(out, '<a href=')).toBe(8)
-    expect(count(out, 'aria-current="page"')).toBe(4)
+    // 2 ancestors in idle, then Docs in each of the other three.
+    expect(count(out, '<a href=')).toBe(5)
+    expect(count(out, 'data-hover=""')).toBe(1)
+    expect(count(out, 'aria-current="page"')).toBe(3)
   })
 
   it('rtl sets the direction, names the nav in Arabic and keeps the flipping caret', async () => {

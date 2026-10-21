@@ -92,7 +92,7 @@ describe('with link={<Link href="" />} (PLAN 5.8)', () => {
   })
 
   it('never writes the element onto the nav', () => {
-    expect(linked.startsWith('<nav aria-label="Pagination" data-size="md">')).toBe(true)
+    expect(linked.startsWith('<nav aria-label="Pagination" data-size="md" class="max-w-full">')).toBe(true)
   })
 })
 

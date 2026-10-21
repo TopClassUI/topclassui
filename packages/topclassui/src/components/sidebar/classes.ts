@@ -71,12 +71,16 @@ export const SIDEBAR_CURRENT_FORCED = [
   'forced-colors:[--tc-ring:CanvasText]',
 ].join(' ')
 
+/** Rows sit 2 px apart and a ring reaches 4 px out, over the row above: forced colours may draw it in the colour that
+ * row is filled with, so there another row draws its ring inside its own box, on the canvas. */
+export const SIDEBAR_REST_FORCED = 'forced-colors:focus-visible:-outline-offset-(length:--tc-ring-width)'
+
 /** R-5.2-3: the row by whether it is the page being read: the tint and the weight, with no bar, as
  * Figma 138:2539 draws it. Semibold, not medium: a font with a regular and a bold face paints 500 as regular. Only another row answers the pointer:
  * under forced colours a hover fill on the current one would lie under the text of the highlight. */
 export const SIDEBAR_LINK_STATE = {
   current: `bg-primary-soft font-semibold text-primary-on-soft ${SIDEBAR_CURRENT_FORCED}`,
-  rest: `tone-neutral text-body ${HOVER.ghost}`,
+  rest: `tone-neutral text-body ${HOVER.ghost} ${SIDEBAR_REST_FORCED}`,
 } as const
 
 /** The colour sits on a wrapper, never on the svg: one set on an svg survives forced colours.

@@ -140,8 +140,8 @@ describe('a row', () => {
     }
   })
 
-  it('one that is not current is on the neutral ramp in the body colour, and answers the pointer with the ghost tint', () => {
-    expect(rest?.slice(ROW.length)).toEqual(['tone-neutral', 'text-body', 'hover:bg-(--tc-soft)', 'active:bg-(--tc-soft-hover)'])
+  it('one that is not current is on the neutral ramp in the body colour, answers the pointer with the ghost tint, and rings inside under forced colours', () => {
+    expect(rest?.slice(ROW.length)).toEqual(['tone-neutral', 'text-body', 'hover:bg-(--tc-soft)', 'active:bg-(--tc-soft-hover)', 'forced-colors:focus-visible:-outline-offset-(length:--tc-ring-width)'])
   })
 
   it('the current one is filled with the soft primary and semibold, with no bar, as Figma 138:2539 draws it', () => {

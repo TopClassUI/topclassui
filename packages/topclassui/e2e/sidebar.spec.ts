@@ -10,18 +10,19 @@ import { type Clip, type Rgb, contrast, pixelsOf, rgbOf } from './pixels.js'
 // What happy-dom cannot lay out: two widths, a list that scrolls inside the rail, a ring a scrolling box could
 // cut, the keys in a real browser, what forced colours leave of a fill, and a page that must not grow.
 
-/** Every demo: whether its first rail starts expanded, and how many links it holds. Written out, so a renamed demo fails here. */
-const SIDEBARS: Record<string, { open: boolean, links: number }> = {
+/** Every demo: whether its first rail starts expanded, how many links it holds, and its open width where it is not the
+ * drawn 220. Written out, so a renamed demo fails here. */
+const SIDEBARS: Record<string, { open: boolean, links: number, width?: number }> = {
   'sidebar--basic': { open: true, links: 4 },
   'sidebar--collapsed': { open: false, links: 4 },
   'sidebar--controlled': { open: true, links: 2 },
   'sidebar--groups': { open: true, links: 6 },
   'sidebar--in-a-layout': { open: true, links: 4 },
   'sidebar--long-list': { open: true, links: 60 },
-  'sidebar--playground': { open: true, links: 3 },
+  'sidebar--playground': { open: true, links: 4 },
   'sidebar--rtl': { open: true, links: 4 },
-  // Two rails, the expanded one first: what a test reads of the first rail is that one.
-  'sidebar--states': { open: true, links: 6 },
+  // Five rails, the expanded one first: what a test reads of the first rail is that one. 160 px open, so five fit the strip.
+  'sidebar--states': { open: true, links: 20, width: 160 },
 }
 
 /** The three screens Unit 3 measures at, and a phone on its side. */
@@ -284,10 +285,10 @@ test.describe('the server HTML', () => {
 
   // axe never returns in a context with scripts turned off, so this reads the static pages: the same markup, and no script on them.
   test('on a page with no script axe finds nothing in either state, and every target is 24 px at least', async ({ page }) => {
-    for (const [demo, { open }] of Object.entries(SIDEBARS)) {
+    for (const [demo, { open, width = 220 }] of Object.entries(SIDEBARS)) {
       await page.goto(urlFor(demo, 'light', 'ltr'))
       expect(await page.locator('script').count(), demo).toBe(0)
-      expect(await widthOf(railOf(page)), demo).toBe(open ? 220 : 52)
+      expect(await widthOf(railOf(page)), demo).toBe(open ? width : 52)
       const found = await axe(page)
       expect(found.violations, demo).toEqual([])
       expect(found.passes, demo).toEqual(expect.arrayContaining(['aria-allowed-attr', 'link-name', 'button-name', 'listitem', 'landmark-unique']))
@@ -1177,7 +1178,7 @@ for (const scheme of ['light', 'dark'] as const) {
         await openLive(page, 'sidebar--basic')
         expect(await page.evaluate(() => matchMedia('(forced-colors: active)').matches)).toBe(true)
         const system = await systemColours(page)
-        const [canvas, highlight, highlightText, text] = [system.canvas, system.highlight, system.highlightText, system.text].map((colour) => rgbOf(colour).join())
+        const [canvas, highlight, text] = [system.canvas, system.highlight, system.text].map((colour) => rgbOf(colour).join())
         const rail = railOf(page)
         if (state === 'collapsed') await triggerOf(rail).click()
         await page.mouse.move(700, 700)
@@ -1193,8 +1194,8 @@ for (const scheme of ['light', 'dark'] as const) {
         await expect(current).toHaveCSS('color', system.highlightText)
         expect((await pixelAt(page, lit.right - 4, lit.top + 20)).join(), 'the current row, painted').toBe(highlight)
         expect((await pixelAt(page, plain.right - 4, plain.top + 20)).join(), 'another row, painted').toBe(canvas)
-        // The bar is the colour of the text of the highlight, on the highlight.
-        expect((await pixelAt(page, lit.left + 5, lit.top + 20)).join(), 'the bar').toBe(highlightText)
+        // No bar (DECISIONS: the tint and the weight, with no bar): the highlight runs to the start edge.
+        expect((await pixelAt(page, lit.left + 5, lit.top + 20)).join(), 'no bar').toBe(highlight)
         expect(contrast(await inkOf(page, current.locator('svg'), rgbOf(system.highlight)), rgbOf(system.highlight)), 'the icon on the highlight').toBeGreaterThanOrEqual(4.5)
         expect(contrast(await inkOf(page, other.locator('svg'), rgbOf(system.canvas)), rgbOf(system.canvas)), 'the icon of another row').toBeGreaterThanOrEqual(4.5)
         expect(contrast(await inkOf(page, triggerOf(rail), rgbOf(system.canvas)), rgbOf(system.canvas)), 'the icon of the toggle').toBeGreaterThanOrEqual(4.5)
@@ -1234,7 +1235,8 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(await ringOf(page), 'the current row').toEqual(WHOLE)
       await linksOf(rail).first().focus()
       await page.keyboard.press('Tab')
-      expect(await ringOf(page), 'another row').toEqual(WHOLE)
+      // Inside its own box, so the current row above it, filled with the highlight, cannot hide its top.
+      expect(await ringOf(page), 'another row').toEqual({ ...WHOLE, outside: 0 })
     })
   })
 }
@@ -1242,7 +1244,7 @@ for (const scheme of ['light', 'dark'] as const) {
 test.describe('under a coarse pointer', () => {
   test.use({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } })
 
-  for (const demo of Object.keys(SIDEBARS)) {
+  for (const [demo, { width = 220 }] of Object.entries(SIDEBARS)) {
     test(`${demo}: the toggle and every link are at least 44 px both ways, expanded and collapsed, and a collapsed rail is 61 px wide`, async ({ page }) => {
       await openLive(page, demo)
       expect(await page.evaluate(() => matchMedia('(pointer: coarse)').matches)).toBe(true)
@@ -1255,7 +1257,7 @@ test.describe('under a coarse pointer', () => {
         const open = (await rail.getAttribute('data-open')) === ''
         expect(await small(), open ? 'expanded' : 'collapsed').toEqual([])
         // 44 px of target, 8 px of padding on each side and the 1 px line: the rail is never narrower than what it holds.
-        expect(await widthOf(rail)).toBe(open ? 220 : 61)
+        expect(await widthOf(rail)).toBe(open ? width : 61)
         expect((await scrollOf(bodyOf(rail))).sideways, 'px the body scrolls sideways').toBe(0)
         await expectNoSidewaysScroll(page)
         await triggerOf(rail).tap()
