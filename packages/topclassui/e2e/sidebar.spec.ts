@@ -1178,7 +1178,7 @@ for (const scheme of ['light', 'dark'] as const) {
         await openLive(page, 'sidebar--basic')
         expect(await page.evaluate(() => matchMedia('(forced-colors: active)').matches)).toBe(true)
         const system = await systemColours(page)
-        const [canvas, highlight, highlightText, text] = [system.canvas, system.highlight, system.highlightText, system.text].map((colour) => rgbOf(colour).join())
+        const [canvas, highlight, text] = [system.canvas, system.highlight, system.text].map((colour) => rgbOf(colour).join())
         const rail = railOf(page)
         if (state === 'collapsed') await triggerOf(rail).click()
         await page.mouse.move(700, 700)
@@ -1194,8 +1194,8 @@ for (const scheme of ['light', 'dark'] as const) {
         await expect(current).toHaveCSS('color', system.highlightText)
         expect((await pixelAt(page, lit.right - 4, lit.top + 20)).join(), 'the current row, painted').toBe(highlight)
         expect((await pixelAt(page, plain.right - 4, plain.top + 20)).join(), 'another row, painted').toBe(canvas)
-        // The bar is the colour of the text of the highlight, on the highlight.
-        expect((await pixelAt(page, lit.left + 5, lit.top + 20)).join(), 'the bar').toBe(highlightText)
+        // No bar (DECISIONS: the tint and the weight, with no bar): the highlight runs to the start edge.
+        expect((await pixelAt(page, lit.left + 5, lit.top + 20)).join(), 'no bar').toBe(highlight)
         expect(contrast(await inkOf(page, current.locator('svg'), rgbOf(system.highlight)), rgbOf(system.highlight)), 'the icon on the highlight').toBeGreaterThanOrEqual(4.5)
         expect(contrast(await inkOf(page, other.locator('svg'), rgbOf(system.canvas)), rgbOf(system.canvas)), 'the icon of another row').toBeGreaterThanOrEqual(4.5)
         expect(contrast(await inkOf(page, triggerOf(rail), rgbOf(system.canvas)), rgbOf(system.canvas)), 'the icon of the toggle').toBeGreaterThanOrEqual(4.5)
@@ -1235,7 +1235,8 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(await ringOf(page), 'the current row').toEqual(WHOLE)
       await linksOf(rail).first().focus()
       await page.keyboard.press('Tab')
-      expect(await ringOf(page), 'another row').toEqual(WHOLE)
+      // Inside its own box, so the current row above it, filled with the highlight, cannot hide its top.
+      expect(await ringOf(page), 'another row').toEqual({ ...WHOLE, outside: 0 })
     })
   })
 }
