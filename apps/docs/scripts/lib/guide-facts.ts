@@ -79,15 +79,27 @@ function utilityOf(name: string): string {
   return `bg-${key}`
 }
 
+/** The colours the CSS entry frame draws in one row with another: the page with the surfaces, muted with body. */
+const JOINS: Partial<Record<string, string>> = { page: 'surface', muted: 'body' }
+
+/** The CSS entry frame's families, in its order; every other group follows them in the file's order. */
+const FRAME_ORDER = ['surface', 'body', 'line', 'primary', 'ring', 'control', 'radius']
+
 /** The row a theme variable joins: its first name segment for a colour (a tone, `surface`, `line`), its scale for spacing. */
 function groupOf(name: string): string {
   const [space = '', first = '', second = ''] = name.split('-')
-  if (space === 'color') return first
+  if (space === 'color') return JOINS[first] ?? first
   if (space === 'spacing') return first === 'pad' ? `pad-${second}` : first
   return space
 }
 
-/** The `@theme inline` block of the library's styles.css, one row per group, in the file's order. */
+/** Where a group stands: the frame's families first, in its order, then the rest. */
+function rankOf(group: string): number {
+  const at = FRAME_ORDER.indexOf(group)
+  return at === -1 ? FRAME_ORDER.length : at
+}
+
+/** The `@theme inline` block of the library's styles.css, one row per group: the frame's families first, then the file's order. */
 export function themeUtilities(css = readFileSync(join(LIBRARY, 'src', 'styles.css'), 'utf8')): GuidesFile['utilities'] {
   const block = /@theme inline\s*\{([\s\S]*?)\n\}/.exec(css)?.[1] ?? ''
   const rows = new Map<string, { tokens: string[]; utilities: string[] }>()
@@ -97,7 +109,7 @@ export function themeUtilities(css = readFileSync(join(LIBRARY, 'src', 'styles.c
     row.utilities.push(utilityOf(name))
     rows.set(groupOf(name), row)
   }
-  return [...rows.values()]
+  return [...rows.entries()].sort(([a], [b]) => rankOf(a) - rankOf(b)).map(([, row]) => row)
 }
 
 /** The CSP source of the inline theme script: the SHA-256 of the exact string, base64. */

@@ -70,3 +70,13 @@ description: ثلاثة أسطر استيراد بترتيب ثابت، ولا �
 ## مع Vite
 
 مع Vite تنطبق الأسطر الثلاثة نفسها، مع <span dir="ltr">`@tailwindcss/vite`</span> في قائمة الإضافات بدلًا من PostCSS. الإعداد موجود في صفحة [تثبيت الحزمة](/ar/docs/installation#react-من-دون-next-js).
+
+```ts title="vite.config.ts"
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+})
+```

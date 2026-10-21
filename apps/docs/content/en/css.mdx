@@ -70,3 +70,13 @@ Tailwind’s layer order is set by the first import. Open a layer before it and 
 ## On Vite
 
 On Vite, the same three lines apply, with `@tailwindcss/vite` in the plugin list instead of PostCSS. The config is on [Install the package](/en/docs/installation#react-without-next-js).
+
+```ts title="vite.config.ts"
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+})
+```
