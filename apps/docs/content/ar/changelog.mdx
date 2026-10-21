@@ -6,19 +6,6 @@ description: كل إصدار من TopClass UI، الأحدث أولًا، مع �
 
 <Releases />
 
-## كيف يُكتب المُدخل
-
-يأتي كل تغيير مع ملاحظة قصيرة. وعند الإصدار تُجمع هذه الملاحظات، ويُرفع رقم الإصدار، وتُكتب هذه الصفحة منها.
-
-```md title=".changeset/dialog-body.md"
----
-"topclassui": minor
----
-
-Add `DialogBody` as the scroll container. `DialogTitle` and `DialogFooter`
-now stay fixed while the body scrolls, per the scroll policy.
-```
-
 ## سياسة الإصدارات
 
 يتبع <span dir="ltr">TopClass UI</span> الترقيم الدلالي للإصدارات (<span dir="ltr">semantic versioning</span>). حزمة واحدة، ورقم إصدار واحد. ولا يتّسع نطاق الاعتماديات النظيرة (<span dir="ltr">peer dependencies</span>) إلا في إصدار ثانوي، ولا يضيق أبدًا.
@@ -26,13 +13,3 @@ now stay fixed while the body scrolls, per the scroll policy.
 ## التغييرات الكاسرة
 
 التغيير الكاسر يعني رفع رقم الإصدار الرئيسي، ويُوسَم في المُدخل مع خطوات الانتقال. وقبل الإصدار <span dir="ltr">1.0</span> قد يحتوي الإصدار الثانوي على تغيير كاسر.
-
-هكذا يبدو مُدخل فيه تغيير كاسر:
-
-```md title="CHANGELOG.md"
-## 0.4.0
-
-### Breaking
-
-- `Card` is now `CardRoot`. Find and replace; nothing else changed.
-```
