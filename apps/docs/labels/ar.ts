@@ -56,7 +56,7 @@ export const ar: SiteLabels = {
     copy: 'نسخ',
     packageManagers: 'مدير الحزم',
     framework: 'إطار العمل',
-    utilities: { token: 'المتغيّر', utilities: 'الأصناف المساعدة' },
+    utilities: { token: 'المتغيّر', utilities: 'الأصناف المساعدة', through: 'إلى' },
     props: { prop: 'الخاصية', type: 'النوع', default: 'القيمة الافتراضية', description: 'ما الذي تفعله', required: 'مطلوبة' },
     repeat: (count) => `، النسخة ${String(count)}`,
     csp: 'سياسة أمان المحتوى',
