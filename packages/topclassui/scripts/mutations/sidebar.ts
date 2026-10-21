@@ -387,8 +387,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a sidebar row that is not current no longer answers the pointer',
     file: CLASSES,
-    from: 'rest: `tone-neutral text-body ${HOVER.ghost}`,',
-    to: "rest: 'tone-neutral text-body',",
+    from: 'rest: `tone-neutral text-body ${HOVER.ghost} ${SIDEBAR_REST_FORCED}`,',
+    to: 'rest: `tone-neutral text-body ${SIDEBAR_REST_FORCED}`,',
   },
   {
     label: 'a focused sidebar row shows no ring',
