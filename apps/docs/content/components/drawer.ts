@@ -19,7 +19,7 @@ export const drawer = {
     'trap-focus',
     'rtl',
   ],
-  stageHeight: 12,
+  stageHeight: 24.25,
   stageOpen: true,
   note: {
     en: '`placement` is logical: `start` opens from the left in English and from the right in Arabic. Never `left` or `right`.',

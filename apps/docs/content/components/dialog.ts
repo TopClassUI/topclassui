@@ -20,7 +20,7 @@ export const dialog = {
     'with-tooltip',
     'rtl',
   ],
-  stageHeight: 12,
+  stageHeight: 24.25,
   stageOpen: true,
   note: {
     en: 'Wrap the parts in a form with the class `contents`, and a Server Action submits from the footer with no client handler.',

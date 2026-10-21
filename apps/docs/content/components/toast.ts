@@ -11,7 +11,7 @@ export const toast = {
     ar: 'TopClassProvider يركّب منطقة العرض الوحيدة، فلا شيء عليك تركيبه؛ وtoast.add يعمل من أي وحدة في المتصفح، داخل React أو خارجه.',
   },
   demos: ['with-description', 'basic', 'tones', 'with-action', 'promise', 'sticky', 'high-priority', 'many', 'over-dialog', 'long-content', 'rtl'],
-  stageHeight: 6,
+  stageHeight: 17.5,
   stageOpen: true,
   starts: { tone: 'success' },
   notes: {

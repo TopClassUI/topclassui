@@ -19,7 +19,7 @@ export const command = {
     'with-tooltip',
     'rtl',
   ],
-  stageHeight: 12,
+  stageHeight: 24.25,
   stageOpen: true,
   note: {
     en: '`getKey`, `getLabel` and `onSelect` are functions, so the palette is configured inside a client file.',
