@@ -6,6 +6,7 @@ import { hrefOf, nextPage, previousPage, type Locale, type PageEntry } from '../
 import type { SiteLabels } from '../../labels/index'
 import { tocOf } from '../../lib/data'
 import { SITE_URL } from '../../lib/site'
+import { GUIDE_LEAD, GUIDE_TITLE } from '../classes'
 import { Pager, type PageLink } from './next-card'
 import { OnThisPage, type TocEntry } from './on-this-page'
 import { SiteSidebar } from './site-sidebar'
@@ -54,8 +55,8 @@ export function DocsShell({ locale, entry, labels, children }: DocsShellProps) {
             siteUrl={SITE_URL}
             {...library}
           />
-          <h1 className="text-4xl font-semibold text-body">{entry.title[locale]}</h1>
-          <p className="text-base text-muted">{entry.description[locale]}</p>
+          <h1 className={GUIDE_TITLE}>{entry.title[locale]}</h1>
+          <p className={GUIDE_LEAD}>{entry.description[locale]}</p>
         </div>
         {children}
         <Pager previous={linkOf(previousPage(entry.slug), locale)} next={linkOf(nextPage(entry.slug), locale)} labels={labels.shell} />

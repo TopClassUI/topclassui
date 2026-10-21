@@ -3,14 +3,14 @@ import { getLabels } from 'topclassui/labels/get-labels'
 
 import type { Locale } from '../../content/pages'
 import { GUIDES } from '../../lib/data'
-import { INLINE_CODE } from '../classes'
+import { PROSE_COLUMN, PROSE_TABLE, TABLE_CODE } from '../classes'
 
 type Row = (typeof GUIDES.utilities)[number]
 
 function Codes({ values }: { values: readonly string[] }) {
   return (
     <span className="flex flex-wrap gap-1">
-      {values.map((value) => <code key={value} dir="ltr" className={INLINE_CODE}>{value}</code>)}
+      {values.map((value) => <code key={value} dir="ltr" className={TABLE_CODE}>{value}</code>)}
     </span>
   )
 }
@@ -23,9 +23,11 @@ export function ThemeUtilities({ locale, labels }: { locale: Locale; labels: { t
       items={GUIDES.utilities}
       getKey={(row: Row) => row.tokens.join(' ')}
       caption={`${labels.token}, ${labels.utilities}`}
+      className={PROSE_TABLE}
       columns={[
-        { key: 'token', header: labels.token, rowHeader: true, className: 'whitespace-normal', cell: (row: Row) => <Codes values={row.tokens} /> },
-        { key: 'utilities', header: labels.utilities, className: 'whitespace-normal', cell: (row: Row) => <Codes values={row.utilities} /> },
+        // The frame gives Token 348 of its 944 px.
+        { key: 'token', header: labels.token, rowHeader: true, className: `${PROSE_COLUMN.wrap} w-[37%]`, cell: (row: Row) => <Codes values={row.tokens} /> },
+        { key: 'utilities', header: labels.utilities, className: PROSE_COLUMN.prose, cell: (row: Row) => <Codes values={row.utilities} /> },
       ]}
     />
   )

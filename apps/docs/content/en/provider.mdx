@@ -37,7 +37,7 @@ export default async function RootLayout({ children, params }: {
 
 ## Why direction is a prop
 
-Reading `document.dir` in an effect would give the server one answer and the browser another for one frame, which shows as a flash in the wrong direction. A prop from the layout has the same value in both places.
+Reading `document.dir` in an effect would give the server one answer and the browser another for one frame, which shows as a flash in the wrong direction. A prop from the layout has the same value in both places. In development, a warning fires if the prop and the `html` `dir` attribute disagree.
 
 <WrongRight>
 

@@ -4,6 +4,7 @@ import { SidebarGroup, SidebarLink } from 'topclassui/sidebar'
 
 import { LIVE_PAGES, PAGE_GROUPS, hrefOf, type Locale } from '../../content/pages'
 import type { SiteLabels } from '../../labels/index'
+import { SIDE_LINK, TYPE } from '../classes'
 
 export interface SidebarGroupsProps {
   locale: Locale
@@ -17,14 +18,14 @@ export function SidebarGroups({ locale, current, labels }: SidebarGroupsProps) {
     const pages = LIVE_PAGES.filter((page) => page.group === group)
     if (pages.length === 0) return null
     return (
-      <SidebarGroup key={group} label={<span className="uppercase">{labels.shell.groups[group]}</span>} className="pt-2">
+      <SidebarGroup key={group} label={<span className={`uppercase ${TYPE.eyebrow}`}>{labels.shell.groups[group]}</span>} className="pt-2 *:gap-0.5">
         {pages.map((page) => (
           <SidebarLink
             key={page.slug}
             render={<Link href={hrefOf(page, locale)} />}
             icon={<Icon name={page.icon} />}
             current={page.slug === current}
-            className="px-2"
+            className={SIDE_LINK[page.slug === current ? 'current' : 'rest']}
           >
             {page.title[locale]}
           </SidebarLink>

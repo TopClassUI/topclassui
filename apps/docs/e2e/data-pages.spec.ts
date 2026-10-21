@@ -1,5 +1,6 @@
-import AxeBuilder from '@axe-core/playwright'
 import { type Page, expect, test } from '@playwright/test'
+
+import { axeViolations } from './pages'
 
 const SLUGS = ['table', 'tree-view', 'timeline', 'stepper'] as const
 const LOCALES = [{ locale: 'en', dir: 'ltr' }, { locale: 'ar', dir: 'rtl' }] as const
@@ -38,8 +39,7 @@ for (const slug of SLUGS) {
         await expect(page.locator('h1')).toHaveCount(1)
         await card(page, slug).scrollIntoViewIfNeeded()
         await page.waitForLoadState('networkidle')
-        const results = await new AxeBuilder({ page }).analyze()
-        expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([])
+        expect(await axeViolations(page)).toEqual([])
         expect(errors).toEqual([])
       })
     }
@@ -67,7 +67,7 @@ test('every Data code block shows the rewritten imports, never a path into the l
 })
 
 test('every Data page counts its states', async ({ page }) => {
-  const counts = { table: '6 states', 'tree-view': '4 states', timeline: '6 states', stepper: '4 states' } as const
+  const counts = { table: '6 states', 'tree-view': '6 states', timeline: '6 states', stepper: '5 states' } as const
   for (const slug of SLUGS) {
     await page.goto(`/en/docs/components/${slug}`)
     await expect(card(page, slug).getByText(counts[slug], { exact: true })).toBeVisible()

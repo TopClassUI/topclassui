@@ -12,9 +12,9 @@ export interface SiteSidebarProps {
   labels: SiteLabels
 }
 
-// The docs frames: the rail on the page colour, its line the full height of the column, rows 28 px apart from 32 (the row knob, 24 px floor kept).
+// The docs frames: the rail on the page colour, its line the full height of the column, rows 26 px tall and 28 apart (the row knob, 24 px floor kept).
 const COLUMN = 'hidden border-e-(length:--tc-line-width) border-line lg:block'
-const RAIL = 'h-full border-e-0 bg-page px-2.5 pt-5 pb-6 [--tc-row-height:1.75rem]'
+const RAIL = 'h-full border-e-0 bg-page px-2.5 pt-5 pb-6 [--tc-row-height:1.625rem]'
 const TITLE = 'flex shrink-0 items-center gap-2 ps-2 pb-2.5 text-sm font-semibold text-body'
 
 /** Sticky under the navbar, its own scroll container; hidden under 64rem, where the menu's drawer carries the groups. */
@@ -23,7 +23,7 @@ export function SiteSidebar({ locale, current, labels }: SiteSidebarProps) {
     <div className={COLUMN}>
       <div className="sticky top-(--tc-sticky-top) flex h-[calc(100dvh-var(--tc-sticky-top))]">
         <SidebarRoot aria-label={labels.shell.siteNav} className={RAIL}>
-          <p className={TITLE}><Icon name="book-open" />{labels.shell.sidebarTitle}</p>
+          <p className={TITLE}><span className="inline-flex text-primary-on-soft"><Icon name="book-open" /></span>{labels.shell.sidebarTitle}</p>
           <SidebarBody className="gap-0.5 overscroll-contain">
             <SidebarGroups locale={locale} current={current} labels={labels} />
           </SidebarBody>

@@ -10,7 +10,7 @@ export const otpField = {
     ar: 'رمز يُستخدم مرة واحدة، حرف في كل خانة. اللصق يملأ كل الخانات، وحقل مخفي واحد يحمل الرمز إلى النموذج.',
   },
   demos: ['basic', 'grouped', 'form', 'sizes', 'long', 'rtl'],
-  stageHeight: 7,
+  stageHeight: 7.25,
   controlOrder: ['length', 'size', 'mask', 'autoSubmit', 'disabled', 'invalid'],
   controlsHidden: ['groupSize'],
   extraSwitches: ['mask', 'autoSubmit', 'disabled'],

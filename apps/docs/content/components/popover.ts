@@ -7,7 +7,7 @@ export const popover = {
     ar: 'لوحة مثبّتة بجانب مشغّلها لرابط أو حقل أو إجراء. تنقلب وتتقلّص إلى المساحة المتاحة بدلًا من أن تفيض.',
   },
   demos: ['basic', 'with-close', 'hover', 'with-form', 'modal', 'placements', 'long-content', 'rtl'],
-  stageHeight: 12,
+  stageHeight: 24.25,
   controlOrder: ['placement'],
   controlsHidden: ['delay', 'closeDelay'],
   stageOpen: true,

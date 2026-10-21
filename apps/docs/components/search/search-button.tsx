@@ -8,6 +8,7 @@ import { magnifyingGlass } from 'topclassui/icons/magnifying-glass'
 
 import type { SearchLabels } from '../../labels/types'
 import type { Locale } from '../../lib/locales'
+import { SEARCH_TRIGGER } from '../classes'
 
 const SearchPalette = lazy(() => import('./search-palette'))
 
@@ -40,7 +41,7 @@ export function SearchButton({ locale, labels: t }: { locale: Locale; labels: Se
 
   return (
     <>
-      <Button variant="outline" tone="neutral" size="sm" className="bg-page font-normal text-muted" aria-keyshortcuts={mac ? 'Meta+K' : 'Control+K'} data-search-button="" onClick={() => { setOpened(true); setOpen(true) }}>
+      <Button variant="outline" tone="neutral" size="sm" className={SEARCH_TRIGGER} aria-keyshortcuts={mac ? 'Meta+K' : 'Control+K'} data-search-button="" onClick={() => { setOpened(true); setOpen(true) }}>
         <Svg icon={magnifyingGlass} size="1rem" aria-hidden="true" />
         <span className="max-md:sr-only">{t.button}</span>
         <kbd aria-hidden="true" dir="ltr" className="font-mono text-xs text-muted max-md:hidden">{mac ? t.shortcut.mac : t.shortcut.pc}</kbd>

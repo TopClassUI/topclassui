@@ -7,7 +7,7 @@ export const dropdown = {
     ar: 'قائمة إجراءات وروابط خلف زر واحد. صفوف الروابط روابط حقيقية، فيعمل الفتح في علامة تبويب جديدة والنقر بالزر الأوسط.',
   },
   demos: ['basic', 'groups', 'danger-item', 'with-links', 'data-driven', 'placements', 'sixty-items', 'in-dialog', 'rtl'],
-  stageHeight: 12,
+  stageHeight: 24.25,
   controlOrder: ['placement'],
   controlsHidden: ['delay', 'closeDelay'],
   stageOpen: true,

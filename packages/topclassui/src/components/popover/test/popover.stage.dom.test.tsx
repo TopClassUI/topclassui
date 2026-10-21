@@ -22,6 +22,14 @@ describe('the playground with stage, as the docs stage draws it', () => {
     expect((await screen.findByRole('dialog')).getAttribute('data-placement')).toBe('end-top')
   })
 
+  it('puts the trigger at the foot of the box for a top placement, and at its head otherwise', () => {
+    const { unmount } = render(<Demo stage placement="top-start" />)
+    expect(screen.getByRole('button', { name: 'Share' }).parentElement?.className).toBe('absolute inset-0 flex items-end justify-center pb-12')
+    unmount()
+    render(<Demo stage placement="bottom" />)
+    expect(screen.getByRole('button', { name: 'Share' }).parentElement?.className).toBe('flex justify-center pt-12')
+  })
+
   it('without stage it is the closed popover behind its trigger', () => {
     render(<Demo />)
     expect(screen.getByRole('button', { name: 'Share' }).getAttribute('aria-expanded')).toBe('false')

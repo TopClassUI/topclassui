@@ -20,7 +20,7 @@ export const dialog = {
     'with-tooltip',
     'rtl',
   ],
-  stageHeight: 12,
+  stageHeight: 24.25,
   controlOrder: ['size'],
   stageOpen: true,
   note: {

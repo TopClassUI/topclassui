@@ -173,8 +173,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the tooltip playground stops holding its stage open, so the docs stage draws the trigger with no tooltip at it',
     file: 'src/components/tooltip/dummy/playground.tsx',
-    from: 'open={stage ? true : undefined}',
-    to: 'open={undefined}',
+    from: '<TooltipRoot open>',
+    to: '<TooltipRoot>',
   },
   {
     label: 'the tooltip popup stops handing its container to the portal, so a tooltip drawn open in a box of its own lands in the body',

@@ -35,18 +35,35 @@ describe('themeUtilities', () => {
     const css = '@theme inline {\n  --color-body: var(--tc-body);\n  --color-primary-solid: var(--tc-primary-solid);\n  --color-primary-on-soft: var(--tc-primary-on-soft);\n  --color-line-strong: var(--tc-line-strong);\n  --color-ring: var(--tc-ring);\n  --spacing-control-xs: calc(1.75rem * var(--tc-density));\n  --spacing-pad-x-md: 1rem;\n  --radius-box: 1rem;\n}\n'
     expect(themeUtilities(css)).toEqual([
       { tokens: ['--tc-body'], utilities: ['text-body'] },
-      { tokens: ['--tc-primary-solid', '--tc-primary-on-soft'], utilities: ['bg-primary-solid', 'text-primary-on-soft'] },
       { tokens: ['--tc-line-strong'], utilities: ['border-line-strong'] },
+      { tokens: ['--tc-primary-solid', '--tc-primary-on-soft'], utilities: ['bg-primary-solid', 'text-primary-on-soft'] },
       { tokens: ['--tc-ring'], utilities: ['outline-ring'] },
       { tokens: ['--spacing-control-xs'], utilities: ['h-control-xs'] },
-      { tokens: ['--spacing-pad-x-md'], utilities: ['px-pad-x-md'] },
       { tokens: ['--radius-box'], utilities: ['rounded-box'] },
+      { tokens: ['--spacing-pad-x-md'], utilities: ['px-pad-x-md'] },
+    ])
+  })
+
+  it('joins the page to the surfaces and muted to body, in the CSS entry frame’s order, before every other group', () => {
+    const css = '@theme inline {\n  --color-page: var(--tc-page);\n  --color-overlay: var(--tc-overlay);\n  --color-muted: var(--tc-muted);\n  --color-surface: var(--tc-surface);\n  --color-body: var(--tc-body);\n}\n'
+    expect(themeUtilities(css)).toEqual([
+      { tokens: ['--tc-page', '--tc-surface'], utilities: ['bg-page', 'bg-surface'] },
+      { tokens: ['--tc-muted', '--tc-body'], utilities: ['text-muted', 'text-body'] },
+      { tokens: ['--tc-overlay'], utilities: ['bg-overlay'] },
     ])
   })
 
   it('reads the library’s styles.css, controls and radius knobs included', () => {
     const rows = themeUtilities()
-    expect(rows.find((row) => row.tokens.includes('--tc-page'))?.utilities).toEqual(['bg-page'])
+    expect(rows.slice(0, 7).map((row) => row.utilities)).toEqual([
+      ['bg-page', 'bg-surface', 'bg-surface-raised'],
+      ['text-body', 'text-muted'],
+      ['border-line', 'border-line-strong'],
+      ['bg-primary-solid', 'text-primary-on-solid', 'bg-primary-soft', 'text-primary-on-soft'],
+      ['outline-ring'],
+      ['h-control-xs', 'h-control-sm', 'h-control-md', 'h-control-lg', 'h-control-xl'],
+      ['rounded-control', 'rounded-box', 'rounded-chip'],
+    ])
     expect(rows.find((row) => row.tokens.includes('--spacing-control-md'))?.utilities).toEqual(['h-control-xs', 'h-control-sm', 'h-control-md', 'h-control-lg', 'h-control-xl'])
     expect(rows.find((row) => row.tokens.includes('--tc-radius'))?.utilities).toEqual(['rounded-control', 'rounded-box', 'rounded-chip'])
   })

@@ -5,7 +5,7 @@ import type { ComponentProps } from 'react'
 import type { Locale } from '../../content/pages'
 import { EXTERNAL_REL, isExternal } from '../../lib/external'
 import { labelsFor } from '../../labels/index'
-import { INLINE_CODE, TEXT_LINK } from '../classes'
+import { PROSE_CODE, TEXT_LINK } from '../classes'
 import { Callout } from './callout'
 import { FrameworkTabs } from './framework-tabs'
 import { Card, Cards } from './cards'
@@ -31,7 +31,7 @@ export function mdxComponents(locale: Locale): MDXComponents {
     p: ({ children }) => <p className="text-base text-muted">{children}</p>,
     ul: ({ children }) => <ul className="flex list-disc flex-col gap-1 ps-6 text-base text-body">{children}</ul>,
     ol: ({ children }) => <Steps>{children}</Steps>,
-    code: ({ children }) => <code dir="ltr" className={INLINE_CODE}>{children}</code>,
+    code: ({ children }) => <code dir="ltr" className={PROSE_CODE}>{children}</code>,
     pre: ({ children }) => <CodeFence locale={locale} terminal={terminal} repeat={labels.blocks.repeat}>{children}</CodeFence>,
     table: ({ children }) => <MdxTable locale={locale}>{children}</MdxTable>,
     a: ({ href = '', children }: ComponentProps<'a'>) =>

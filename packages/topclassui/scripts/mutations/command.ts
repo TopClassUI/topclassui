@@ -240,7 +240,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'command: the playground ignores stage, so the docs stage shows a closed palette behind its button',
     file: 'src/components/command/dummy/playground.tsx',
-    from: '  if (stage) return <Stage />\n',
+    from: '  if (stage && [visibleRows, virtualize, shortcut, defaultOpen].every((prop) => prop === undefined)) return <Stage />\n',
     to: '',
   },
 ]

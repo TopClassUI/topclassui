@@ -78,8 +78,9 @@ describe('every demo is a Server Component that only hands the parts what can cr
 
   it('leaves out the two demos that are client files, which cannot run here: they draw a menu open in a box of their own, held by useRef', async () => {
     expect(every.filter(isClient)).toEqual(['playground', 'states'])
-    const Demo = await load('playground')
-    expect(() => Demo()).toThrow(/useRef/)
+    const Demo = (await import('../dummy/playground.js') as { default: (props: Props) => ReactElement<Props> }).default
+    const staged = Demo({ stage: true })
+    expect(() => (staged.type as Part)(staged.props)).toThrow(/useRef/)
   })
 
   for (const name of names) {

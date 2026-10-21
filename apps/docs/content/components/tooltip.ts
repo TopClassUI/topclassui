@@ -7,7 +7,7 @@ export const tooltip = {
     ar: 'سطر أو سطران من النص عند التمرير أو التركيز: اسم عنصر تحكم بأيقونة فقط، أو تسمية مقطوعة.',
   },
   demos: ['basic', 'delays', 'long-label', 'with-count', 'placements', 'disabled', 'rtl'],
-  stageHeight: 12,
+  stageHeight: 24.25,
   stageOpen: true,
   note: {
     en: 'Touch never shows a tooltip, so the trigger\'s own name must repeat the text: give an icon-only Button an `aria-label`.',

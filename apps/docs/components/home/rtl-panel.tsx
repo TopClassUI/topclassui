@@ -4,6 +4,7 @@ import { Button } from 'topclassui/button'
 import { BORDER } from 'topclassui/classes'
 import { Icon } from 'topclassui/icon'
 import { Input } from 'topclassui/input'
+import { Kbd } from 'topclassui/kbd'
 import { getLabels } from 'topclassui/labels/get-labels'
 import { Pagination } from 'topclassui/pagination'
 
@@ -11,6 +12,7 @@ import type { Mode, SiteLabels } from '../../labels'
 import { FACTS } from '../../lib/data'
 import { RTL_SAMPLES } from '../../labels/samples'
 import { PANEL } from '../classes'
+import { AdornedInput, ROOM } from './adorned-input'
 
 const MODES = ['light', 'dark', 'ocean'] as const satisfies readonly Mode[]
 const DIRECTIONS = ['ltr', 'rtl'] as const
@@ -19,10 +21,16 @@ const DIRECTIONS = ['ltr', 'rtl'] as const
 function SampleForm({ sample }: { sample: (typeof RTL_SAMPLES)[keyof typeof RTL_SAMPLES] }) {
   const library = getLabels(sample.lang)
   return (
-    <div lang={sample.lang} dir={sample.dir} className={`flex flex-col gap-2.5 rounded-box bg-surface-raised p-3 ${BORDER}`}>
+    <div lang={sample.lang} dir={sample.dir} className={`flex flex-col gap-2 rounded-box bg-surface-raised p-3 ${BORDER}`}>
       <Badge tone="neutral" size="xs" className="self-end font-mono"><span dir="ltr">{`dir="${sample.dir}"`}</span></Badge>
-      <Breadcrumb {...library} items={sample.crumbs.map((label) => ({ label }))} />
-      <Input type="search" size="sm" aria-label={sample.search} placeholder={sample.search} fullWidth />
+      <div className="flex min-w-0 items-center gap-2 text-sm text-muted">
+        <Icon name="house" />
+        <Icon name="caret-right" />
+        <Breadcrumb {...library} items={sample.crumbs.map((label) => ({ label }))} className="min-w-0" />
+      </div>
+      <AdornedInput icon="magnifying-glass" end={<Kbd>/</Kbd>}>
+        <Input type="search" size="sm" aria-label={sample.search} placeholder={sample.search} fullWidth className={`bg-page ${ROOM.start} ${ROOM.end}`} />
+      </AdornedInput>
       <div className="flex flex-wrap gap-2">
         <Button size="xs">{sample.send}<Icon name="paper-plane-tilt" /></Button>
         <Button size="xs" variant="outline" tone="neutral">{sample.open}<Icon name="arrow-square-out" /></Button>

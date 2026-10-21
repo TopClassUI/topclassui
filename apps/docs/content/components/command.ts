@@ -19,7 +19,7 @@ export const command = {
     'with-tooltip',
     'rtl',
   ],
-  stageHeight: 12,
+  stageHeight: 24.25,
   controlOrder: ['visibleRows'],
   controlsHidden: ['loadMoreThreshold'],
   stageOpen: true,

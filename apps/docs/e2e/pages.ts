@@ -22,17 +22,21 @@ export async function openIn(page: Page, path: string, mode: string) {
 export const card = (page: Page, slug: string) => page.locator(`[data-component="${slug}"]`)
 
 /** A landmark-unique made only of navs, at most one of them outside the demos: a component shown many times under its default
- * name, beside the page's own copy as the component page's breadcrumb is (open for Omar). */
+ * name, beside the page's own copy as the component page's breadcrumb is (open for Omar). Accordion panels inside the demos
+ * count too: the stage, the examples and the states strip each draw the same question (open for Omar). */
 const demoNavs = (page: Page, targets: string[]) => page.evaluate((all) => {
   const placed = all.map((target) => document.querySelector(target))
   const inDemo = (element: Element | null) => element !== null && element.closest('[data-component], section[aria-labelledby="examples"]') !== null
-  return placed.every((element) => element?.tagName === 'NAV') && placed.filter((element) => !inDemo(element)).length <= 1
+  const panels = placed.every((element) => inDemo(element) && element?.getAttribute('role') === 'region'
+    && document.getElementById(element.getAttribute('aria-labelledby') ?? '')?.hasAttribute('aria-expanded') === true)
+  return panels || (placed.every((element) => element?.tagName === 'NAV') && placed.filter((element) => !inDemo(element)).length <= 1)
 }, targets)
 
 /** axe's violations on the page, less contrast inside a disabled control: WCAG 1.4.3 exempts an inactive component.
+ * Base UI's focus guards are left out, as the library's e2e leaves them: each hands focus on and never holds it.
  * With `demoCopies`, also less landmark-unique between copies of a demo's own nav, as the Navigation pages allow. */
 export async function axeViolations(page: Page, { demoCopies = false } = {}): Promise<string[]> {
-  const results = await new AxeBuilder({ page }).analyze()
+  const results = await new AxeBuilder({ page }).exclude('[data-base-ui-focus-guard]').analyze()
   const found: string[] = []
   for (const violation of results.violations) {
     for (const node of violation.nodes) {

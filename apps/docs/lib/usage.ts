@@ -15,6 +15,10 @@ const SPREAD = /[ \t]*\{\.\.\.props\}/
 const IMPORT = /^import\s+(?!type\b)(?:[^\n{]*\{[^}]*\}[^\n]*|[^\n]*)$/gm
 const SIGNATURE = /export default function \w+\(\s*(?:\{([^}]*)\})?[^)]*\)[^{]*\{/
 const passThrough = (name: string) => new RegExp(`\\s+${name}=\\{${name}\\}`, 'g')
+// The docs stage's own branch: a Stage the demo draws open, which the reader's usage never takes.
+const STAGE_BRANCH = /^if \(stage\) return <\w+[^\n]*\/>$/
+/** The names an import line binds, `as` left out: a side-effect import binds none and is always kept. */
+const bindingsOf = (line: string) => [...line.replace(/^import\s+/, '').replace(/\s+from\s+['"][^'"]+['"];?\s*$/, '').matchAll(/\w+/g)].map(([name]) => name).filter((name) => name !== 'as')
 
 /** Reads a dummy/playground.tsx whose default export only returns one JSX tree that spreads `props` or passes its props on by name. */
 export function usageOf(source: string): Usage | null {
@@ -23,7 +27,8 @@ export function usageOf(source: string): Usage | null {
   const end = source.lastIndexOf('}')
   if (signature === null || start === -1 || end < start) return null
   // A hook or a constant before the return is state the snippet would lose, so such a demo shows its whole source.
-  if (source.slice(signature.index + signature[0].length, start).trim() !== '') return null
+  const before = source.slice(signature.index + signature[0].length, start).trim()
+  if (before !== '' && !STAGE_BRANCH.test(before)) return null
   const body = source.slice(start + 'return '.length, end).trim().replace(/^\(\s*\n?/, '').replace(/\n?\s*\)$/, '')
   const passed = (signature[1] ?? '').split(',').map((name) => name.trim()).filter((name) => /^\w+$/.test(name) && passThrough(name).test(body))
   if (!SPREAD.test(body) && passed.length === 0) return null
@@ -32,8 +37,9 @@ export function usageOf(source: string): Usage | null {
   // A multi-line tree's closing tag sits at the root's own indent, which the first line lost to the trim.
   const cut = indents.length > 0 ? Math.min(...indents) : 0
   const jsx = lines.map((line, index) => (index === 0 ? line : line.slice(Math.min(cut, line.length - line.trimStart().length)))).join('\n')
-  // A type the demo needs for its own props is not one the reader's usage needs.
+  // A type the demo needs for its own props, or a name only its Stage uses, is not one the reader's usage needs.
   const imports = (source.match(IMPORT) ?? []).map((line) => line.replace(/,\s*type \w+/g, '').replace(/\{\s*type \w+,\s*/, '{ '))
+    .filter((line) => bindingsOf(line).length === 0 || bindingsOf(line).some((name) => new RegExp(`\\b${name}\\b`).test(jsx)))
   return { imports, jsx, passed }
 }
 

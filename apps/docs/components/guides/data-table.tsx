@@ -3,7 +3,8 @@ import { Table } from 'topclassui/table'
 import { getLabels } from 'topclassui/labels/get-labels'
 
 import type { Locale } from '../../content/pages'
-import { TABLE_ROWS_ALL, captionOf } from '../../lib/table-of'
+import { TABLE_ROWS_ALL, captionOf, columnFit } from '../../lib/table-of'
+import { AUTHORED_CELL, PROSE_COLUMN, PROSE_TABLE } from '../classes'
 
 interface Row {
   key: string
@@ -20,11 +21,12 @@ export function DataTable({ header, rows, locale }: { header: ReactNode[]; rows:
       getKey={(item) => item.key}
       visibleRows={TABLE_ROWS_ALL}
       caption={captionOf(header)}
+      className={PROSE_TABLE}
       columns={header.map((cell, column) => ({
         key: String(column),
         header: cell,
         rowHeader: column === 0,
-        className: 'whitespace-normal',
+        className: `${PROSE_COLUMN[columnFit(cell, rows.map((cells) => cells[column]), column === header.length - 1)]} ${AUTHORED_CELL}`,
         cell: (item: Row) => item.cells[column],
       }))}
     />
