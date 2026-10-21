@@ -1,5 +1,5 @@
 // The site's own class strings, built from the library's shared constants (docs-site rule 1, choice 20).
-import { BORDER, FOCUS_RING, HOVER, SCROLL_X, TOUCH_TARGET, TRANSITION } from 'topclassui/classes'
+import { BORDER, FOCUS_RING, HOVER, POINTER, SCROLL_X, TOUCH_TARGET, TRANSITION } from 'topclassui/classes'
 
 /** A text link inside prose or a list: the library's ring and target, underlined on hover. */
 export const TEXT_LINK = `inline-flex items-center text-primary-on-soft underline-offset-4 ${HOVER.link} ${FOCUS_RING} ${TOUCH_TARGET} rounded-chip`
@@ -42,8 +42,18 @@ export const TILE = {
 /** Inline code in prose and table cells: Latin, left to right, inside an Arabic sentence too. Mono on the text's own ground, as the docs frames draw it. */
 export const INLINE_CODE = 'font-mono text-sm text-body'
 
+/** Inline code in a prose paragraph or list: mono in the paragraph's own muted colour, so it never outshines the sentence. */
+export const PROSE_CODE = 'font-mono text-sm text-muted'
+
 /** A guide page's code block: on the page, edged, its header on the surface (globals.css). */
 export const DOCS_CODE = 'docs-code'
+
+/** The box that lays a code block's Copy button over its header (globals.css keeps the header clear of it). */
+export const CODE_FRAME = 'docs-fence relative isolate grid min-w-0 grid-cols-1'
+
+/** The header's Copy button: 28 px and edged, as drawn, at the header's inline end; 44 px under a finger. */
+export const CODE_COPY = `absolute top-2 inset-e-2 z-1 inline-flex h-control-xs items-center gap-1.5 rounded-control bg-surface px-2.5 text-xs font-medium text-body tone-neutral ${BORDER} ${HOVER.outline} ${TOUCH_TARGET} ${FOCUS_RING} ${TRANSITION} ${POINTER}`
+export const CODE_COPY_ICON = 'flex text-muted'
 
 export const LINK = `inline-flex items-center rounded-control text-primary-on-soft underline-offset-4 ${HOVER.link} ${FOCUS_RING} ${TOUCH_TARGET}`
 /** Visible on focus, as S11 asks, and on hover of its heading. */

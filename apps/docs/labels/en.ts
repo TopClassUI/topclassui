@@ -51,6 +51,8 @@ export const en: SiteLabels = {
     wrong: 'Wrong',
     right: 'Right',
     terminal: 'terminal',
+    code: 'code',
+    copy: 'Copy',
     packageManagers: 'Package manager',
     framework: 'Framework',
     utilities: { token: 'Token', utilities: 'Utilities' },

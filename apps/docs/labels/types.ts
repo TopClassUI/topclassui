@@ -63,6 +63,10 @@ export interface SiteLabels {
     wrong: string
     right: string
     terminal: string
+    /** The header of a fence with no file name and no language. */
+    code: string
+    /** The word on a code block's copy button. */
+    copy: string
     packageManagers: string
     framework: string
     utilities: { token: string; utilities: string }
