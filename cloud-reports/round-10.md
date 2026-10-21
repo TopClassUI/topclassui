@@ -4,6 +4,8 @@ Started 2026-10-21 19:20 UTC from the laptop's handover (Omar's word): the CLOUD
 
 Caption call made by the lead (19:25 UTC, on job 144's question, sent to all six): the frames draw a small caption under each state cell, but the library states demos keep the recorded contract (DECISIONS "The states demos are the frames' strips": one captioned direct child per state, the caption as the cell's aria-label/title, no visible caption text in the demo); the site's component page renders those captions visibly under each cell in its Every state section (job 127). The jobs match the frame's cell layout only (equal cells, small panels, spacing) and keep the caption wording the frame uses; no visible caption spans in the library. Omar confirms or overrides.
 
+Main note (19:45 UTC, the laptop, Omar's word): main is fc034293 with the landing page merged (PR 180, 175-179, 181). Nothing changes for the six library jobs: they keep building on fix/r9-library d2849631; the laptop merges main in when it integrates them. The laptop runs a clean full Windows library e2e on d2849631 (about 45 min) and sends each job its Windows-only failures through the lead.
+
 Figma tools: file key BxRSdAVOhk9Hj3Tkq4tjcy; the Previewer frame ids are in review-notes/figma-audit/previewer-frames.json on review/round-8; the cloud proxy blocks www.figma.com itself; get_screenshot, get_metadata and get_design_context work; use_figma is never called. get_screenshot returns a figma.com URL the proxy blocks: the jobs call it with enableBase64Response true (maxDimension 2048) and decode the inline PNG (the lead, 19:40 UTC, after job 142 fell back to round-8 crops).
 
 | Job | Branch | Base | Tip | Commits | Gates | Composites and what is left for Omar |
