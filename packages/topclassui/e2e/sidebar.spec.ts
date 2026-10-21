@@ -10,18 +10,19 @@ import { type Clip, type Rgb, contrast, pixelsOf, rgbOf } from './pixels.js'
 // What happy-dom cannot lay out: two widths, a list that scrolls inside the rail, a ring a scrolling box could
 // cut, the keys in a real browser, what forced colours leave of a fill, and a page that must not grow.
 
-/** Every demo: whether its first rail starts expanded, and how many links it holds. Written out, so a renamed demo fails here. */
-const SIDEBARS: Record<string, { open: boolean, links: number }> = {
+/** Every demo: whether its first rail starts expanded, how many links it holds, and its open width where it is not the
+ * drawn 220. Written out, so a renamed demo fails here. */
+const SIDEBARS: Record<string, { open: boolean, links: number, width?: number }> = {
   'sidebar--basic': { open: true, links: 4 },
   'sidebar--collapsed': { open: false, links: 4 },
   'sidebar--controlled': { open: true, links: 2 },
   'sidebar--groups': { open: true, links: 6 },
   'sidebar--in-a-layout': { open: true, links: 4 },
   'sidebar--long-list': { open: true, links: 60 },
-  'sidebar--playground': { open: true, links: 3 },
+  'sidebar--playground': { open: true, links: 4 },
   'sidebar--rtl': { open: true, links: 4 },
-  // Two rails, the expanded one first: what a test reads of the first rail is that one.
-  'sidebar--states': { open: true, links: 6 },
+  // Five rails, the expanded one first: what a test reads of the first rail is that one. 160 px open, so five fit the strip.
+  'sidebar--states': { open: true, links: 20, width: 160 },
 }
 
 /** The three screens Unit 3 measures at, and a phone on its side. */
@@ -284,10 +285,10 @@ test.describe('the server HTML', () => {
 
   // axe never returns in a context with scripts turned off, so this reads the static pages: the same markup, and no script on them.
   test('on a page with no script axe finds nothing in either state, and every target is 24 px at least', async ({ page }) => {
-    for (const [demo, { open }] of Object.entries(SIDEBARS)) {
+    for (const [demo, { open, width = 220 }] of Object.entries(SIDEBARS)) {
       await page.goto(urlFor(demo, 'light', 'ltr'))
       expect(await page.locator('script').count(), demo).toBe(0)
-      expect(await widthOf(railOf(page)), demo).toBe(open ? 220 : 52)
+      expect(await widthOf(railOf(page)), demo).toBe(open ? width : 52)
       const found = await axe(page)
       expect(found.violations, demo).toEqual([])
       expect(found.passes, demo).toEqual(expect.arrayContaining(['aria-allowed-attr', 'link-name', 'button-name', 'listitem', 'landmark-unique']))
@@ -1242,7 +1243,7 @@ for (const scheme of ['light', 'dark'] as const) {
 test.describe('under a coarse pointer', () => {
   test.use({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } })
 
-  for (const demo of Object.keys(SIDEBARS)) {
+  for (const [demo, { width = 220 }] of Object.entries(SIDEBARS)) {
     test(`${demo}: the toggle and every link are at least 44 px both ways, expanded and collapsed, and a collapsed rail is 61 px wide`, async ({ page }) => {
       await openLive(page, demo)
       expect(await page.evaluate(() => matchMedia('(pointer: coarse)').matches)).toBe(true)
@@ -1255,7 +1256,7 @@ test.describe('under a coarse pointer', () => {
         const open = (await rail.getAttribute('data-open')) === ''
         expect(await small(), open ? 'expanded' : 'collapsed').toEqual([])
         // 44 px of target, 8 px of padding on each side and the 1 px line: the rail is never narrower than what it holds.
-        expect(await widthOf(rail)).toBe(open ? 220 : 61)
+        expect(await widthOf(rail)).toBe(open ? width : 61)
         expect((await scrollOf(bodyOf(rail))).sideways, 'px the body scrolls sideways').toBe(0)
         await expectNoSidewaysScroll(page)
         await triggerOf(rail).tap()

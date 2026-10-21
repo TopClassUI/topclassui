@@ -21,10 +21,10 @@ const SHOWS: Record<string, { rails: number, links: number, named: number, curre
   'groups': { rails: 1, links: 6, named: 2, current: ['Projects'], title: 'Acme' },
   'in-a-layout': { rails: 1, links: 4, named: 0, current: ['Orders'], title: 'Workspace' },
   'long-list': { rails: 1, links: 60, named: 1, current: ['Page 1'], title: 'Handbook' },
-  // The Try it rail, with nothing passed: no row is current until the reader turns current on.
-  'playground': { rails: 1, links: 3, named: 0, current: [], title: 'Workspace' },
+  // The Try it rail, with nothing passed: Home is current, as the frame's stage draws it, until the reader turns it off.
+  'playground': { rails: 1, links: 4, named: 0, current: ['Home'], title: 'Workspace' },
   'rtl': { rails: 1, links: 4, named: 1, current: ['الرئيسية'], title: 'مساحة العمل' },
-  'states': { rails: 2, links: 6, named: 0, current: ['Home', 'Projects'], title: 'Workspace' },
+  'states': { rails: 5, links: 20, named: 0, current: ['Home', 'Home', 'Home', 'Home', 'Home'], title: 'Workspace' },
 }
 
 const render = async (file: string) => {
@@ -99,7 +99,7 @@ describe('what the demos show', () => {
     }
     expect(found).toEqual({
       'basic': ['open'], 'collapsed': ['closed'], 'controlled': ['open'], 'groups': ['open'], 'in-a-layout': ['open'],
-      'long-list': ['open'], 'playground': ['open'], 'rtl': ['open'], 'states': ['open', 'closed'],
+      'long-list': ['open'], 'playground': ['open'], 'rtl': ['open'], 'states': ['open', 'closed', 'open', 'open', 'open'],
     })
   })
 
@@ -108,8 +108,11 @@ describe('what the demos show', () => {
     for (const file of files) parents[file] = /class="([^"]*)"[^>]*><nav /.exec(await render(file))?.[1] ?? ''
     expect(parents).toEqual({
       'basic': 'h-96', 'collapsed': 'h-96', 'controlled': 'flex h-96 flex-wrap gap-4', 'groups': 'h-112',
-      'in-a-layout': 'flex h-[calc(100dvh-4rem)]', 'long-list': 'h-[calc(100dvh-4rem)]', 'playground': 'h-96', 'rtl': 'h-96',
-      'states': 'flex h-96 flex-wrap gap-6',
+      'in-a-layout': 'flex h-[calc(100dvh-4rem)]', 'long-list': 'h-[calc(100dvh-4rem)]',
+      // The Try it rail is as tall as its four links, as the frame's stage draws it: no parent of its own.
+      'playground': '', 'rtl': 'h-96',
+      // The states strip: each rail as tall as its four links, as the frame draws it, so its body has nothing to scroll.
+      'states': 'flex flex-wrap items-start gap-6',
     })
   })
 
@@ -152,10 +155,12 @@ describe('what the demos show', () => {
     expect(rows(html).map((row) => row.label)).toEqual(['الرئيسية', 'المشاريع', 'الفريق', 'الإعدادات'])
   })
 
-  it('states names each of its two rails, so a page can hold both, and each toggle in English', async () => {
+  it('states names each of its five rails, so a page can hold them all, and each toggle in English', async () => {
     const html = await render('states')
-    expect(tags(html, 'nav').map((nav) => attr(nav, 'aria-label'))).toEqual(['expanded', 'collapsed'])
-    expect(tags(html, 'button').map((button) => attr(button, 'aria-label'))).toEqual(['Collapse the sidebar', 'Expand the sidebar'])
+    expect(tags(html, 'nav').map((nav) => attr(nav, 'aria-label'))).toEqual(['expanded', 'collapsed', 'active item', 'hover', 'focus-visible'])
+    expect(tags(html, 'button').map((button) => attr(button, 'aria-label'))).toEqual([
+      'Collapse the sidebar', 'Expand the sidebar', 'Collapse the sidebar', 'Collapse the sidebar', 'Collapse the sidebar',
+    ])
   })
 
   it('every other demo names its rail and its toggle in English', async () => {
