@@ -12,7 +12,7 @@ const HOVER = 'border-body'
  * the frame draws, its list left shut so it covers no cell. Read-only, which the frame leaves out, looks like idle. */
 export default function Demo() {
   return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] items-start gap-6">
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(min(8rem,100%),1fr))] items-start gap-6">
       <Select fullWidth aria-label="idle" placeholder="Country" items={COUNTRIES} />
       <Select fullWidth aria-label="hover" placeholder="Country" items={COUNTRIES} className={HOVER} />
       <Select fullWidth aria-label="focus-visible" items={COUNTRIES} defaultValue="jo" className={RING} />
