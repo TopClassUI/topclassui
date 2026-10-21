@@ -69,10 +69,11 @@ function Stage() {
 }
 
 /** The docs stage: the basic palette, with the schema's props passed through, so the Try it
- * controls drive it. defaultOpen is where the open state starts; the Button opens it too. With stage it is the picture. */
+ * controls drive it. defaultOpen is where the open state starts; the Button opens it too. With stage and
+ * no prop set it is the picture; a prop from Try it brings the live palette, which the picture cannot show. */
 export default function Demo({ visibleRows, virtualize, shortcut, defaultOpen, stage = false }: CommandDesignProps & { stage?: boolean } = {}) {
   const [open, setOpen] = useState(defaultOpen ?? false)
-  if (stage) return <Stage />
+  if (stage && [visibleRows, virtualize, shortcut, defaultOpen].every((prop) => prop === undefined)) return <Stage />
   return (
     <div className="grid justify-items-start gap-3">
       <Button variant="outline" onClick={() => { setOpen(true) }}><Svg icon={magnifyingGlass} />Search</Button>

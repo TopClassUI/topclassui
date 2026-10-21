@@ -15,6 +15,12 @@ describe('the playground with stage, as the docs stage draws it', () => {
     expect(screen.queryByRole('button')).toBeNull()
   })
 
+  it('with stage and defaultOpen from Try it it is the live palette, open with its list', async () => {
+    render(<Demo stage defaultOpen />)
+    const palette = await screen.findByRole('dialog', {}, { timeout: 15_000 })
+    expect(palette.querySelector('[role="option"]')?.textContent).toBe('Button')
+  })
+
   it('without stage it is the closed palette behind its Search button', () => {
     render(<Demo />)
     expect(screen.getByRole('button', { name: 'Search' })).not.toBeNull()
