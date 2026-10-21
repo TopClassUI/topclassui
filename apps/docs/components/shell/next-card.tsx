@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { BORDER, FOCUS_RING, HOVER, TRANSITION } from 'topclassui/classes'
 import { Icon } from 'topclassui/icon'
 
-const CARD = `flex items-center gap-2.5 rounded-box bg-surface px-4.5 py-4 tone-neutral ${BORDER} ${HOVER.outline} ${FOCUS_RING} ${TRANSITION}`
+const CARD = `docs-hover-lift flex items-center gap-2.5 rounded-box bg-surface px-4.5 py-4 tone-neutral ${BORDER} ${HOVER.outline} ${FOCUS_RING} ${TRANSITION}`
 
 /** "Next" and the following live page; the arrow is directional, so it flips in RTL. */
 export function NextCard({ href, title, label }: { href: string; title: string; label: string }) {

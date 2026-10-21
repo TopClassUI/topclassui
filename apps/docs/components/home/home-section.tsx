@@ -13,7 +13,7 @@ export interface HomeSectionProps {
 /** One Home section as drawn: 6rem above, 2rem below, the heading centred, 1.75rem between it and the body. */
 export function HomeSection({ id, eyebrow, title, lead, children }: HomeSectionProps) {
   return (
-    <section aria-labelledby={id} className="docs-deferred flex flex-col gap-7 pt-24 pb-8">
+    <section aria-labelledby={id} data-motion="reveal" className="docs-deferred flex flex-col gap-7 pt-24 pb-8">
       <div className="flex flex-col items-center gap-2.5 text-center">
         <p className={EYEBROW}>{eyebrow}</p>
         <h2 id={id} className={SECTION_TITLE}>{title}</h2>

@@ -22,7 +22,7 @@ export function CopyButton({ code, label, copied, failed }: CopyButtonProps) {
   return (
     <>
       <button type="button" aria-label={label} onClick={press} className={`${ICON_BUTTON} ${HOVER.ghost} text-muted`}>
-        <Svg icon={status === copied ? check : copy} size="1rem" aria-hidden="true" />
+        {status === copied ? <Svg icon={check} size="1rem" aria-hidden="true" className="docs-tick" /> : <Svg icon={copy} size="1rem" aria-hidden="true" />}
       </button>
       <span role="status" className="sr-only">{status}</span>
     </>
