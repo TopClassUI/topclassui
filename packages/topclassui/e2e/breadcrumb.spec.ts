@@ -31,7 +31,7 @@ function probe() {
     ellipsis: labels.filter((label) => getComputedStyle(label).textOverflow === 'ellipsis').length,
     rows: new Set(items.map((item) => Math.round(item.getBoundingClientRect().top))).size,
     // The body, not the root: headless Chromium hides scrollbars, so the root's clientWidth
-    // still counts the stable gutter and 15 px of overflow would pass unseen.
+    // still counts the stable gutter and 10 px of overflow would pass unseen.
     scrollWidth: document.documentElement.scrollWidth,
     pageWidth: document.body.clientWidth,
   }

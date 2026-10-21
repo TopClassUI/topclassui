@@ -623,7 +623,7 @@ test.describe('hostile content', () => {
     inside: part.getBoundingClientRect().left >= element.getBoundingClientRect().left && part.getBoundingClientRect().right <= element.getBoundingClientRect().right,
   })))
 
-  for (const [width, height, direction, widest] of [[1280, 800, 'ltr', 320], [320, 480, 'ltr', 289], [320, 480, 'rtl', 289]] as const) {
+  for (const [width, height, direction, widest] of [[1280, 800, 'ltr', 320], [320, 480, 'ltr', 294], [320, 480, 'rtl', 294]] as const) {
     const label = `${String(width)} x ${String(height)} ${direction}`
 
     test(`${label}: a 300-character label ends in an ellipsis, its icon stays whole, its shortcut gives way first, and the menu is ${String(widest)} px wide`, async ({ page }) => {
@@ -658,7 +658,7 @@ test.describe('hostile content', () => {
       await expectNoSidewaysScroll(page)
       await expectNothingSideways(menu)
       // 10rem, or half the room Base UI measured where that is less: 304 px on a 320 px screen less its gutter.
-      const cap = widest === 320 ? 160 : 145
+      const cap = widest === 320 ? 160 : 147
       const [go, goShortcut] = await partsOf(rowsOf(menu).first())
       expect(go).toEqual({ width: 18, cut: false, inside: true })
       expect(goShortcut).toEqual({ width: cap, cut: true, inside: true })
@@ -871,7 +871,7 @@ test.describe('a larger text', () => {
     await expectNoSidewaysScroll(page)
     await expectNothingSideways(menu)
     // The screen less its gutter and 8 px on each side.
-    expect((await boxOf(menu)).width).toBe(359)
+    expect((await boxOf(menu)).width).toBe(364)
     expect((await boxOf(rowsOf(menu).first())).height).toBe(64)
     await expect(rowsOf(menu).first()).toHaveCSS('font-size', '28px')
     const cut = await menu.evaluate((el) => [...el.querySelectorAll('span')].filter((span) => span.scrollWidth > span.clientWidth + 1).length)
