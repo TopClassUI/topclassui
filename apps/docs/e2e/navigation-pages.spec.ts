@@ -150,7 +150,7 @@ test('Accordion: the playground drives hiddenUntilFound on the root and the code
   await page.goto('/en/docs/components/accordion')
   const accordion = card(page, 'accordion')
   await accordion.getByRole('checkbox', { name: 'hiddenUntilFound' }).click()
-  await expect(accordion.locator('pre').first()).toContainText('<AccordionRoot hiddenUntilFound={false} className="max-w-105">')
+  await expect(accordion.locator('pre').first()).toContainText("<AccordionRoot defaultValue={['server']} hiddenUntilFound={false} className=\"max-w-105\">")
   const trigger = accordion.getByRole('button', { name: 'Does it work in Arabic?' })
   await trigger.click()
   await expect(trigger).toHaveAttribute('aria-expanded', 'true')
