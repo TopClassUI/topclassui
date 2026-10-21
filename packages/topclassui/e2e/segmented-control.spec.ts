@@ -21,6 +21,14 @@ const NAMES = { xs: 'Extra small', sm: 'Small', md: 'Medium', lg: 'Large', xl: '
 
 const segmentIn = (page: Page, name: string) => page.getByRole('radio', { name, exact: true })
 const css = (element: Locator, property: string) => element.evaluate((el, name) => getComputedStyle(el).getPropertyValue(name), property)
+/** The width of each label inside these segments: the platform's font, which a width written out in px cannot know (Windows reads 1 to 5 px under Linux). */
+const labelWidths = (segments: Locator) => segments.evaluateAll((all) => all.map((el) => {
+  const range = document.createRange()
+  range.selectNodeContents(el)
+  return range.getBoundingClientRect().width
+}))
+const tenth = (px: number) => Math.round(px * 10) / 10
+
 const focusedText = (page: Page) => page.evaluate(() => (document.activeElement?.getAttribute('role') === 'radio' ? document.activeElement.textContent : document.activeElement?.tagName ?? ''))
 const selectedIn = (track: Locator) => track.locator('[role="radio"][aria-checked="true"]').evaluateAll((all) => all.map((el) => el.textContent))
 
@@ -68,20 +76,29 @@ const srgb = (page: Page, computed: string) => page.evaluate((colour): [number, 
 }, computed)
 
 test.describe('the five sizes, on the static page', () => {
-  const FINE = {
-    xs: { track: 32, segment: [78.8, 24] }, sm: { track: 32, segment: [51.3, 24] }, md: { track: 36, segment: [68.3, 28] },
-    lg: { track: 48, segment: [75.3, 40] }, xl: { track: 56, segment: [122.1, 48] },
-  }
+  /** The inline padding of a segment at each size, on each side; its width is its label's and twice this (78.8 for xs on Linux). */
+  const PAD = { xs: 8, sm: 10, md: 11, lg: 16, xl: 20 } as const
   const shapes = async (page: Page) => {
     const out: Record<string, Awaited<ReturnType<typeof shape>>> = {}
     for (const size of SIZES) out[size] = await shape(page.getByRole('radiogroup', { name: NAMES[size], exact: true }))
     return out
   }
+  /** The shape each size must have: the track and segment heights written out, the width from the label and the padding. */
+  const expected = async (page: Page, floor: number, heights: Record<(typeof SIZES)[number], [number, number]>) => {
+    const out: Record<string, { track: number, segment: number[] }> = {}
+    for (const size of SIZES) {
+      const [label = 0] = await labelWidths(page.getByRole('radiogroup', { name: NAMES[size], exact: true }).getByRole('radio').first())
+      const [track, segment] = heights[size]
+      out[size] = { track, segment: [tenth(Math.max(floor, label + 2 * PAD[size])), segment] }
+    }
+    return out
+  }
+  const FINE = { xs: [32, 24], sm: [32, 24], md: [36, 28], lg: [48, 40], xl: [56, 48] } as const satisfies Record<string, [number, number]>
 
   for (const direction of DIRECTIONS) {
     test(`fine pointer, ${direction}: a track of the control scale, a segment never under 24 px (the xs track is 32)`, async ({ page }) => {
       await page.goto(urlFor('segmented-control--sizes', 'light', direction))
-      expect(await shapes(page)).toEqual(FINE)
+      expect(await shapes(page)).toEqual(await expected(page, 24, FINE))
       const off = page.getByRole('radiogroup', { name: 'Extra small' }).getByRole('radio', { name: 'Off' })
       expect((await boxOf(off)).width).toBeGreaterThanOrEqual(24)
     })
@@ -92,10 +109,7 @@ test.describe('the five sizes, on the static page', () => {
 
     test('every segment is 44 px tall and wide at least, and the track grows to hold it', async ({ page }) => {
       await page.goto(urlFor('segmented-control--sizes', 'light', 'ltr'))
-      expect(await shapes(page)).toEqual({
-        xs: { track: 52, segment: [78.8, 44] }, sm: { track: 52, segment: [51.3, 44] }, md: { track: 52, segment: [68.3, 44] },
-        lg: { track: 52, segment: [75.3, 44] }, xl: { track: 56, segment: [122.1, 48] },
-      })
+      expect(await shapes(page)).toEqual(await expected(page, 44, { xs: [52, 44], sm: [52, 44], md: [52, 44], lg: [52, 44], xl: [56, 48] }))
       const widths = await page.locator('#demo [role="radio"]').evaluateAll((all) => all.map((el) => el.getBoundingClientRect().width))
       expect(Math.min(...widths)).toBeGreaterThanOrEqual(44)
     })
@@ -286,7 +300,9 @@ test.describe('text', () => {
       await page.goto(urlFor('segmented-control--basic', 'light', direction))
       await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
       const track = page.getByRole('radiogroup')
-      expect(await shape(track)).toEqual({ track: 72, segment: [111.8, 58] })
+      // md pads 0.6875rem a side, 22 px at this root; 111.8 on Linux.
+      const [label = 0] = await labelWidths(track.getByRole('radio').first())
+      expect(await shape(track)).toEqual({ track: 72, segment: [tenth(label + 44), 58] })
       expect(await track.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true)
       await expectNoSidewaysScroll(page)
     })
@@ -493,16 +509,20 @@ test.describe('live: where a page puts a segmented control', () => {
     })
     return [holder.getAttribute('data-case'), Math.round((three?.getBoundingClientRect().width ?? 0) * 10) / 10, (seven?.scrollWidth ?? 0) > (seven?.clientWidth ?? 0), outside]
   }))
+  /** The three-segment track: its labels, 11 px of padding a side on each segment, two 2 px gaps, 3 px of padding and
+   * a 1 px line a side, 78 px in all; 193.9 on Linux, whose font makes the labels 115.9. */
+  const three = async (page: Page) => tenth((await labelWidths(page.locator('[data-case="block"] [data-track="three"] [role="radio"]'))).reduce((sum, one) => sum + one, 0) + 78)
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 
   for (const direction of DIRECTIONS) {
-    test(`1280 px, ${direction}: three segments are 193.9 px in every parent; seven fit except in a half-width track column`, async ({ page }) => {
+    test(`1280 px, ${direction}: three segments are as wide as their labels in every parent; seven fit except in a half-width track column`, async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 800 })
       await fixture(page, { direction })
+      const w = await three(page)
       expect(await cases(page)).toEqual([
-        ['block', 193.9, false, false], ['grid', 193.9, false, false], ['track', 193.9, true, false],
-        ['flex-col', 193.9, false, false], ['label-row', 193.9, false, false], ['flex-1', 193.9, false, false],
-        ['w-fit', 193.9, false, false], ['cell', 193.9, false, false], ['full', 1238, false, false],
+        ['block', w, false, false], ['grid', w, false, false], ['track', w, true, false],
+        ['flex-col', w, false, false], ['label-row', w, false, false], ['flex-1', w, false, false],
+        ['w-fit', w, false, false], ['cell', w, false, false], ['full', 1238, false, false],
       ])
       await expectNoSidewaysScroll(page)
     })
@@ -514,10 +534,11 @@ test.describe('live: where a page puts a segmented control', () => {
     for (const direction of DIRECTIONS) {
       test(`${direction}: seven segments scroll inside the track in every parent, and the page does not scroll sideways`, async ({ page }) => {
         await fixture(page, { direction })
+        const w = await three(page)
         expect(await cases(page)).toEqual([
-          ['block', 193.9, true, false], ['grid', 193.9, true, false], ['track', 140, true, false],
-          ['flex-col', 193.9, true, false], ['label-row', 193.9, true, false], ['flex-1', 193.9, true, false],
-          ['w-fit', 193.9, true, false], ['cell', 193.9, true, false], ['full', 288, true, false],
+          ['block', w, true, false], ['grid', w, true, false], ['track', 140, true, false],
+          ['flex-col', w, true, false], ['label-row', w, true, false], ['flex-1', w, true, false],
+          ['w-fit', w, true, false], ['cell', w, true, false], ['full', 288, true, false],
         ])
         const full = await page.locator('[data-case="full"] [data-track="three"] [role="radio"]').evaluateAll((all) => all.map((el) => Math.round(el.getBoundingClientRect().width * 10) / 10))
         expect(full).toEqual([92, 92, 92])

@@ -515,7 +515,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the drawer playground drops defaultOpen from its stage branch, so the docs stage draws an empty box with no sheet in it',
     file: `${DUMMY}/playground.tsx`,
-    from: 'defaultOpen={stage}',
-    to: 'defaultOpen={false}',
+    from: '<DrawerRoot placement={placement} size={size} defaultOpen modal={false}>',
+    to: '<DrawerRoot placement={placement} size={size} modal={false}>',
   },
 ]

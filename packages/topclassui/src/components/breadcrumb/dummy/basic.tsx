@@ -1,13 +1,16 @@
 import { Breadcrumb } from '../index.js'
 
-/** The last item has no href: it is the page being read. No siteUrl, so no JSON-LD. */
+/** The stage the frame draws: the house icon for Home, then Docs and Components, and the page being read last, with no
+ * href. No siteUrl, so no JSON-LD. */
 export default function Demo() {
   return (
     <Breadcrumb
+      showHome
       items={[
         { href: '/', label: 'Home' },
         { href: '/docs', label: 'Docs' },
-        { label: 'Breadcrumb' },
+        { href: '/docs/components', label: 'Components' },
+        { label: 'Button' },
       ]}
     />
   )

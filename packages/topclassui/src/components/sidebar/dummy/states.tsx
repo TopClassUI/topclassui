@@ -1,34 +1,42 @@
 import { folder } from '#icons/data/folder.js'
 import { gear } from '#icons/data/gear.js'
 import { house } from '#icons/data/house.js'
+import { users } from '#icons/data/users.js'
 import { Svg } from '#components/svg/index.js'
 import { SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoot } from '../index.js'
 
-/** The states a server can render: expanded and collapsed, each with the page being read
- * marked. Two rails on one page need a name each, so both pass their own aria-label. */
+/** The ring a focused link wears, drawn at rest so the strip can show it; not under forced colours, where a ring at
+ * rest would read as focus. */
+const RING = 'not-forced-colors:outline-solid not-forced-colors:outline-(length:--tc-ring-width) not-forced-colors:outline-offset-(length:--tc-ring-offset) not-forced-colors:outline-ring'
+
+/** One rail of the frame, Home the page being read; `hover` and `ring` draw a pointer on Projects and the focus on Home. */
+function Rail({ label, open = true, hover = false, ring = false }: { label: string, open?: boolean, hover?: boolean, ring?: boolean }) {
+  return (
+    // 160 px open, narrower than the drawn 220, so five rails fit five cells of the strip.
+    <SidebarRoot aria-label={label} defaultOpen={open} className="data-open:w-40">
+      <SidebarHeader>Workspace</SidebarHeader>
+      <SidebarBody>
+        <SidebarGroup>
+          <SidebarLink href="#home" icon={<Svg icon={house} />} current className={ring ? RING : undefined}>Home</SidebarLink>
+          <SidebarLink href="#projects" icon={<Svg icon={folder} />} className={hover ? 'bg-(--tc-soft)' : undefined}>Projects</SidebarLink>
+          <SidebarLink href="#team" icon={<Svg icon={users} />}>Team</SidebarLink>
+          <SidebarLink href="#settings" icon={<Svg icon={gear} />}>Settings</SidebarLink>
+        </SidebarGroup>
+      </SidebarBody>
+    </SidebarRoot>
+  )
+}
+
+/** The five states the frame draws, one rail each as tall as its links, named by its state: expanded, collapsed, the
+ * page being read, a link under the pointer and a link with the focus ring. Each rail passes its own aria-label. */
 export default function Demo() {
   return (
-    <div className="flex h-96 flex-wrap gap-6">
-      <SidebarRoot aria-label="expanded">
-        <SidebarHeader>Workspace</SidebarHeader>
-        <SidebarBody>
-          <SidebarGroup>
-            <SidebarLink href="#home" icon={<Svg icon={house} />} current>Home</SidebarLink>
-            <SidebarLink href="#projects" icon={<Svg icon={folder} />}>Projects</SidebarLink>
-            <SidebarLink href="#settings" icon={<Svg icon={gear} />}>Settings</SidebarLink>
-          </SidebarGroup>
-        </SidebarBody>
-      </SidebarRoot>
-      <SidebarRoot aria-label="collapsed" defaultOpen={false}>
-        <SidebarHeader>Workspace</SidebarHeader>
-        <SidebarBody>
-          <SidebarGroup>
-            <SidebarLink href="#home" icon={<Svg icon={house} />}>Home</SidebarLink>
-            <SidebarLink href="#projects" icon={<Svg icon={folder} />} current>Projects</SidebarLink>
-            <SidebarLink href="#settings" icon={<Svg icon={gear} />}>Settings</SidebarLink>
-          </SidebarGroup>
-        </SidebarBody>
-      </SidebarRoot>
+    <div className="flex flex-wrap items-start gap-6">
+      <Rail label="expanded" />
+      <Rail label="collapsed" open={false} />
+      <Rail label="active item" />
+      <Rail label="hover" hover />
+      <Rail label="focus-visible" ring />
     </div>
   )
 }

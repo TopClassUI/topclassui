@@ -121,11 +121,11 @@ test.describe('the static page: the server HTML, before any script runs', () => 
   test('the states: the placeholder is muted, invalid is red and 2 px, disabled is dimmed; the icon sits at the inline start', async ({ page }) => {
     await page.goto(urlFor('date-picker--states', 'light', 'ltr'))
     const danger = await resolve(page, 'var(--tc-danger-solid)')
-    expect(await css(trigger(page, 'Nothing chosen').locator('span[id]'), 'color')).toBe(await resolve(page, 'var(--tc-muted)'))
-    expect(await css(trigger(page, 'Invalid'), 'border-top-color')).toBe(danger)
-    expect(await css(trigger(page, 'Invalid'), 'box-shadow')).toContain(`${danger} 0px 0px 0px 1px inset`)
-    expect(await css(trigger(page, 'Disabled'), 'opacity')).toBe('0.5')
-    const [icon, value] = [await boxOf(trigger(page, 'Invalid').locator('span').first()), await boxOf(trigger(page, 'Invalid').locator('span[id]'))]
+    expect(await css(trigger(page, 'idle').locator('span[id]'), 'color')).toBe(await resolve(page, 'var(--tc-muted)'))
+    expect(await css(trigger(page, 'invalid'), 'border-top-color')).toBe(danger)
+    expect(await css(trigger(page, 'invalid'), 'box-shadow')).toContain(`${danger} 0px 0px 0px 1px inset`)
+    expect(await css(trigger(page, 'disabled'), 'opacity')).toBe('0.5')
+    const [icon, value] = [await boxOf(trigger(page, 'invalid').locator('span').first()), await boxOf(trigger(page, 'invalid').locator('span[id]'))]
     expect(icon.right).toBeLessThanOrEqual(value.left)
   })
 
@@ -134,11 +134,11 @@ test.describe('the static page: the server HTML, before any script runs', () => 
       await page.emulateMedia({ forcedColors: 'active', colorScheme: scheme })
       await page.goto(urlFor('date-picker--states', 'light', 'ltr'))
       const canvas = FORCED_CANVAS[scheme]
-      const box = await boxOf(trigger(page, 'Nothing chosen'))
+      const box = await boxOf(trigger(page, 'idle'))
       const left = await pixelsOf(page, { x: Math.floor(box.left), y: Math.round(box.top + box.height / 2), width: 3, height: 1 })
       expect(inkOn(left, canvas), 'line pixels at 3:1 on the inline-start edge').toBeGreaterThan(0)
-      expect(contrast(rgbOf(await css(trigger(page, 'Nothing chosen'), 'border-top-color')), canvas)).toBeGreaterThanOrEqual(3)
-      expect(await css(trigger(page, 'Invalid'), 'border-top-width')).toBe('2px')
+      expect(contrast(rgbOf(await css(trigger(page, 'idle'), 'border-top-color')), canvas)).toBeGreaterThanOrEqual(3)
+      expect(await css(trigger(page, 'invalid'), 'border-top-width')).toBe('2px')
     })
   }
 
@@ -412,7 +412,7 @@ test.describe('live: today in the browser\'s own time zone', () => {
   test('at 2026-10-14T22:30:00Z it is already 15 October in Riyadh: that day is aria-current, underlined, and the calendar opens on it', async ({ page }) => {
     await page.clock.setFixedTime(new Date('2026-10-14T22:30:00Z'))
     await openLive(page, 'date-picker--states')
-    const popup = await openCalendar(page, trigger(page, 'Nothing chosen'))
+    const popup = await openCalendar(page, trigger(page, 'idle'))
     const today = day(popup, 'Thursday, October 15, 2026')
     await expect(today).toHaveAttribute('aria-current', 'date')
     await expect(popup.locator('[aria-current]')).toHaveCount(1)

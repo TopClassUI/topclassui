@@ -6,6 +6,47 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-21 - Ocean is a light mode on a section too, and the mono token names each platform's font
+
+**Decision.** `[data-theme='ocean']` joins `:root` and `[data-theme='light']` on the block of light colours in `src/tokens.css`, so an ocean section inside a dark page gets the light neutrals, tints and scrollbar under its own cyan primary and pill radius, as Theming's "Scoping a theme to a section" shows; before, it kept the dark page's neutrals under `color-scheme: light`. The dark block now sets the four primary tokens ocean changes (solid, on-solid, hover, active, to light's values), so a dark section inside an ocean page loses the cyan. `--tc-font-mono` is `ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace`: `ui-monospace` resolves only in Safari, and Chromium on Windows fell back to Courier New.
+
+**Why.** A mode block only redeclares what it names, and a nested element never matches `:root`, so a section inherits every token its mode leaves out from the page around it. The contrast sweep models ocean only as a whole page, so it could not see this; `scripts/lib/tokens.test.ts` now checks an ocean section in a dark page, a light one in dark and a dark one in ocean against the whole-page modes.
+
+**Affects.** `src/tokens.css`, `src/scrollbar.test.ts` (the light block's selector) and `scripts/lib/tokens.test.ts`. The site's `blockSource` (`apps/docs/scripts/lib/guides.ts`) skips a selector list that ends in the same selector, so the ocean sample on Theming is still the ocean block. Contrast at the page level is unchanged (390 pairs, 230 distinct readings). Theming's "It changes one tone and one knob" stays true of the ocean block. A consumer's own mode written as one block still inherits the neutrals around a scoped section, unless its selector joins the light or dark block the same way.
+
+---
+
+## 2026-10-22 - The round-10 states demos raise the tarball budget to 3,250,000 bytes
+
+**Decision.** The six round-10 branches redraw every Every state strip from the Figma frames (one captioned cell a state, the combined matrices moved to their own demos), and the stack packs 3,158,858 bytes unpacked, 8,858 over the 3,150,000 of 2026-10-19. The budget becomes 3,250,000: the growth is demo source the CLI copies, not runtime code, and the per-component client budgets in size-budget.json are unchanged. For Omar to confirm, as the 2026-10-19 raise was.
+
+## 2026-10-19 - The round-8 library raises the tarball budget to 3,150,000 bytes and Sidebar's to 6.2 KB
+
+**Decision.** The thirteen round-8 branches stacked together (the library integrator, job 131) pack 3,114,237 bytes unpacked, over the 3,050,000 the 2026-10-18 entry set; the base cf1ec12 packs 2,986,683, so round 8 adds 127,555 bytes. `SIZE_BUDGET_BYTES` in `scripts/lib/pack-checks.ts` rises to 3,150,000, the measured size plus about 1 %, so it stays a guard rail. In the same stack Sidebar's own client half measures 6,246 bytes against the 6 KB simple-control budget of `pnpm size`, and its entry in `size-budget.json` becomes 6.2 KB, as job 118 raised fifteen others to what was measured.
+
+**What round 8 added to the tarball.** `dist/components` +51,849 bytes (the new parts ToastStage and CardMedia, the states demos and their classes, POINTER and the scroll classes in every family, the regenerated READMEs); the CLI registry +70 KB, since every component's source rides in `dist/registry/*.json` (table +7,954, command +6,345, breadcrumb +5,278, base +4,369, toast +4,235, card +3,794, timeline +3,480, tree-view +3,440, segmented-control +3,378); `size.json`, shipped by 118, +4,567. Sidebar's half grew with 113's frame rework, 120's POINTER and 123's scroll classes.
+
+**Why.** Each job alone fit both budgets; only the stack crosses them, and nothing in it is dead weight to cut. Omar confirms the two numbers.
+
+**Affects.** `pack-checks.ts` and its test, `size-budget.json`, `check:package`, `pnpm size --check` and `test:consumers`. A tarball over 3.15 MB again needs a new entry here.
+
+---
+
+## 2026-10-19 - Pagination turns compact on a narrow list or under a finger
+
+**Decision.** Job 119 (round 8, "bulky pagination on phones"). The `<ul>` of Pagination is a container named `pagination` (`@container/pagination`), and two utilities in `src/styles.css` read it: `pagination-full` (the pages and the gaps) is `display: none` below 36rem of the list's width or under `pointer: coarse`, and `pagination-compact` (a new item between Previous and Next, "3 of 12" from `labels.pagination.ofPages`) is shown in exactly those two cases. The compact row is First, Previous, "current of total", Next, Last on one line; the status takes the room the four controls leave (`flex-1`) and wraps its own text, so "12,345 of 123,456" at `xl` still keeps one row at 390 px. The page links stay in the HTML, hidden, so a crawler follows every one; the current page link is hidden too, and the status says the page in words.
+
+- **36rem.** The full row at `lg` is 11 x 48 px plus ten 4 px gaps, 568 px; `xl` past that still wraps as before. A query cannot read a custom property, so the number is written in the utility, once.
+- **Coarse pointer at any width.** As the job asks: 44 px cells make the full row 524 px, which wraps on most phones and some tablets.
+- **`!important`.** A gap's own `inline-flex` is emitted after `pagination-full` in the same layer, so the hide carries `!important`.
+- **`dir="auto"` on the status.** English labels on an RTL page read "of 12 3" otherwise; Arabic labels resolve to RTL themselves.
+- **Figma 138:1269 stays the desktop truth.** Nothing above 36rem with a fine pointer changed: the status is `display: none` there.
+- **A container takes no width from its content.** A Pagination placed in a flex row needs a width of its own (`flex-1`, `w-full`); the README says so.
+- **`e2e/target-size.spec.ts` skips a box with `display: none`**, which is no target; Pagination keeps its hidden links in the HTML.
+
+**What it affects.** `src/components/pagination/{index.tsx,classes.ts,README.md}` and its tests, `src/styles.css`, `e2e/pagination-compact.spec.ts` (390 px under a fine and a coarse pointer, both directions, every demo: one line, 44 px targets, Previous and Next lead to the neighbours, links kept), `e2e/target-size.spec.ts`, two rows of `scripts/mutations/pagination.ts`.
+
+---
 ## 2026-10-19 - The site's SEO kit: titles, meta descriptions, JSON-LD, cards, llms-full.txt, headers
 
 **Decision.** Job 130, in `apps/docs` only.
@@ -44,33 +85,6 @@ The format is: date, decision, why, and what it affects.
 **Why.** Omar named the landing page first among the pages that looked unfinished; the frame is the truth for the look.
 
 **What it affects.** `apps/docs` only (Home, the navbar, the footer, the icon and Open Graph routes, the labels), the root README's wordmark and `docs/brand/`. The library is untouched.
-## 2026-10-19 - The round-8 library raises the tarball budget to 3,150,000 bytes and Sidebar's to 6.2 KB
-
-**Decision.** The thirteen round-8 branches stacked together (the library integrator, job 131) pack 3,114,237 bytes unpacked, over the 3,050,000 the 2026-10-18 entry set; the base cf1ec12 packs 2,986,683, so round 8 adds 127,555 bytes. `SIZE_BUDGET_BYTES` in `scripts/lib/pack-checks.ts` rises to 3,150,000, the measured size plus about 1 %, so it stays a guard rail. In the same stack Sidebar's own client half measures 6,246 bytes against the 6 KB simple-control budget of `pnpm size`, and its entry in `size-budget.json` becomes 6.2 KB, as job 118 raised fifteen others to what was measured.
-
-**What round 8 added to the tarball.** `dist/components` +51,849 bytes (the new parts ToastStage and CardMedia, the states demos and their classes, POINTER and the scroll classes in every family, the regenerated READMEs); the CLI registry +70 KB, since every component's source rides in `dist/registry/*.json` (table +7,954, command +6,345, breadcrumb +5,278, base +4,369, toast +4,235, card +3,794, timeline +3,480, tree-view +3,440, segmented-control +3,378); `size.json`, shipped by 118, +4,567. Sidebar's half grew with 113's frame rework, 120's POINTER and 123's scroll classes.
-
-**Why.** Each job alone fit both budgets; only the stack crosses them, and nothing in it is dead weight to cut. Omar confirms the two numbers.
-
-**Affects.** `pack-checks.ts` and its test, `size-budget.json`, `check:package`, `pnpm size --check` and `test:consumers`. A tarball over 3.15 MB again needs a new entry here.
-
----
-
-## 2026-10-19 - Pagination turns compact on a narrow list or under a finger
-
-**Decision.** Job 119 (round 8, "bulky pagination on phones"). The `<ul>` of Pagination is a container named `pagination` (`@container/pagination`), and two utilities in `src/styles.css` read it: `pagination-full` (the pages and the gaps) is `display: none` below 36rem of the list's width or under `pointer: coarse`, and `pagination-compact` (a new item between Previous and Next, "3 of 12" from `labels.pagination.ofPages`) is shown in exactly those two cases. The compact row is First, Previous, "current of total", Next, Last on one line; the status takes the room the four controls leave (`flex-1`) and wraps its own text, so "12,345 of 123,456" at `xl` still keeps one row at 390 px. The page links stay in the HTML, hidden, so a crawler follows every one; the current page link is hidden too, and the status says the page in words.
-
-- **36rem.** The full row at `lg` is 11 x 48 px plus ten 4 px gaps, 568 px; `xl` past that still wraps as before. A query cannot read a custom property, so the number is written in the utility, once.
-- **Coarse pointer at any width.** As the job asks: 44 px cells make the full row 524 px, which wraps on most phones and some tablets.
-- **`!important`.** A gap's own `inline-flex` is emitted after `pagination-full` in the same layer, so the hide carries `!important`.
-- **`dir="auto"` on the status.** English labels on an RTL page read "of 12 3" otherwise; Arabic labels resolve to RTL themselves.
-- **Figma 138:1269 stays the desktop truth.** Nothing above 36rem with a fine pointer changed: the status is `display: none` there.
-- **A container takes no width from its content.** A Pagination placed in a flex row needs a width of its own (`flex-1`, `w-full`); the README says so.
-- **`e2e/target-size.spec.ts` skips a box with `display: none`**, which is no target; Pagination keeps its hidden links in the HTML.
-
-**What it affects.** `src/components/pagination/{index.tsx,classes.ts,README.md}` and its tests, `src/styles.css`, `e2e/pagination-compact.spec.ts` (390 px under a fine and a coarse pointer, both directions, every demo: one line, 44 px targets, Previous and Next lead to the neighbours, links kept), `e2e/target-size.spec.ts`, two rows of `scripts/mutations/pagination.ts`.
-
----
 
 ## 2026-10-19 - No default scrollbar anywhere: the page wears the shared bar, and an e2e reads every scroller
 
@@ -89,29 +103,6 @@ The format is: date, decision, why, and what it affects.
 **Why.** Tailwind 4 dropped the pointer on buttons from its preflight, so every control showed the arrow, which Omar's review read as unfinished. A rule in the base layer would have reached the consumer's own buttons too; a class reaches only ours. `LOADING` keeps no cursor of its own (the 2026-10-06 entry): `data-loading:cursor-default` only stops the hand, and `cursor: progress` still never ships.
 
 **Affects.** R-5.2-4 (the cursor comes from `shared/classes.ts`). Proved by `e2e/cursor.spec.ts`, which reads the computed cursor of every `button, [role=button], [role=tab], [role=option], [role=menuitem], [role=treeitem], [role=gridcell][tabindex]` with a box on every harness page and in the open Select, Combobox, Dropdown, Command and DatePicker: the hand when enabled, never the hand when disabled, read-only or loading. `src/shared/classes.pointer.css.test.ts` and the "shared pointer" rows of `pnpm test:mutation`.
-## 2026-10-19 - The guide pages' code sits on the page, in the frames' colours
-
-**Decision.** Job 125 (the getting-started pages against Figma 193:1588, 193:2328, 193:2659 and 193:3001). On a guide page a fence, the install tabs and the ThemeScript blocks carry `docs-code` (`apps/docs/app/globals.css`): CodeBlock's solid pair is set to the page's own (`--tc-neutral-solid: var(--tc-page)`, `--tc-neutral-on-solid: var(--tc-body)`), with a line around it and its header on the surface, as the four frames draw it. The install tabs are one card (tabs on the surface over a line, the code flush beneath, the copy button at the inline end); Wrong and Right drop the header for a name above the box and a danger or success edge. The Shiki pair is no longer github-dark-default and github-light-high-contrast but the frames' colours from the Tailwind palette (`lib/shiki-themes.ts`): keywords and tags blue, strings emerald, attributes and constants amber, comments neutral, at 400 on a dark ground and 700/800/600 on a light one. The component pages keep CodeBlock's own solid block, which the CodeBlock Previewer frame draws.
-
-**Why.** docs-site S3 put every fence on `neutral/solid` (unit-5 choice 13), read from the text notes; the page frames, read for the first time, draw the code on `base/page` with a `base/surface` header and a `base/line` edge.
-
-**What it affects.** `lib/shiki-contrast.test.ts` now also measures `on-dark` on the dark page and `on-light` on the light and ocean pages, every token colour at 4.5:1 plus the 0.15 margin. Code on a guide page is `text-xs` on the `text-sm` line height (the frames draw 11 px). Nothing in the library changed.
-
-## 2026-10-19 - The overlays follow their Previewer frames
-
-**Decision.** Job 110 compared Dialog, Drawer, Command, Dropdown, Popover and Tooltip with their `Previewer: <Name>` frames (138:1814, 138:1976, 138:1653, 138:1464, 138:2132, 138:2273) in dark, then light and ocean, in both directions, and changed the build where it differed. The composites are `docs/figma/parity/<slug>.png`, frame left and build right.
-
-- **Two new values in `tokens.css`.** `--tc-shadow-overlay` is the frames' drop shadow, `0 8px 10px` at 45% black in dark and 15% on a light page (light and ocean), and `OVERLAY_SURFACE` and the Drawer's sheet wear it instead of `shadow-lg`. `--tc-row-height` is now `2rem` times the density, 32 px: every menu and list row in the frames is 31 px (14 px text, 7 px of padding above and below), against 40 before. A coarse pointer still gets 44 px from `ROW_TOUCH` and `COMMAND_UNIT`, and the 24 px floor of R-5.6-2 is untouched. `ROW` pads 10 px a side instead of 12 (the frames draw 9). Every component that wears `ROW` or the knob moves with it: Select, Combobox, Sidebar, TreeView, FileUpload and DatePicker as well as the six here.
-- **Dialog.** Header and footer pad 18 by 14 px and the body 18, as drawn; `md` is 380 px wide (`max-w-95`), the drawn panel.
-- **Drawer.** The header pads 14 px above and below.
-- **Command.** 400 px wide, the search row pads 14 px at its start, the input is 40 px tall and 48 under a finger, and an Esc keycap (`labels.command.escape`, aria-hidden, gone under a coarse pointer) ends the search row. The group heading sits 2 px over its rows.
-- **Dropdown.** 220 px at least (`calc(var(--spacing)*55)`), and the separator has no margin of its own: the 2 px gap of the popup is all the frame leaves around the line.
-- **Popover.** The basic demo carries the x beside the title and the two icons the frame draws.
-
-**Not followed, and why.** The highlighted row keeps its 2 px inner ring, and the Command input keeps its ring: the frames draw the fill alone, but the fill is under 3:1 against the popup and R-5.6-1 asks for a visible ring on what holds the focus (the keyboard specs read both). The frame's "Enter" hint on the active Command row is not built: it would join the option's accessible name. The neutral look of an outline Button (the frames' Cancel and triggers) is Button's own frame, job 116.
-
-**What it affects.** `src/tokens.css`, `src/shared/classes.ts`, the six `classes.ts`, `command/parts/command-panel.tsx`, the labels (`command.escape` in English and Arabic), the Popover basic demo, the tests that pin those class strings, and their mutation rows.
-
 ## 2026-10-19 - pnpm size measures every client half with esbuild, and fifteen budgets are raised to what was measured
 
 **Decision.** Job 118. `pnpm size` (`packages/topclassui/scripts/size.ts`, its logic in `scripts/lib/size.ts`) bundles the 33 `dist/components/<slug>/client.js` entries in one esbuild run, ESM, minified, with splitting, `process.env.NODE_ENV` set to production, and gzips each output chunk with `node:zlib` at level 9. A component's number is the sum of the chunks its entry loads at once; the chunks it loads through `import()` are its lazy bytes. Two runs give two numbers: **own** (`react`, `react-dom`, `react/jsx-runtime` and `@base-ui/react/*` external), which is the chip on the site, and **with Base UI** (React external only), which is recorded and never budgeted. Both go into `packages/topclassui/size.json`, committed and shipped in `files` so the site and a consumer read the same numbers; `check-pack` allows it beside the four root files. `pnpm size --check` runs in `pnpm check` right after `check:package` (which builds `dist/`), fails a component over its budget, a lazy one that loads nothing on demand, a component with no budget or a budget with no component, and a `size.json` more than 64 bytes away from a fresh run (a different zlib may move a gzip by a few bytes).
@@ -138,13 +129,6 @@ The format is: date, decision, why, and what it affects.
 
 **What it affects.** `src/components/breadcrumb/{index.tsx,lib.ts,types.ts,schema.ts,constants.ts,README.md}`, its tests and mutation rows, and the site's two `Breadcrumb`s (`component-page.tsx`, `docs-shell.tsx`), which now pass `siteUrl={SITE_URL}` and so gain the current page as the last `ListItem`. A caller still passing `baseUrl` fails to compile. The 10 October entry's Breadcrumb bullet is superseded on this point.
 
-## 2026-10-19 - The guide pages' code sits on the page, in the frames' colours
-
-**Decision.** Job 125 (the getting-started pages against Figma 193:1588, 193:2328, 193:2659 and 193:3001). On a guide page a fence, the install tabs and the ThemeScript blocks carry `docs-code` (`apps/docs/app/globals.css`): CodeBlock's solid pair is set to the page's own (`--tc-neutral-solid: var(--tc-page)`, `--tc-neutral-on-solid: var(--tc-body)`), with a line around it and its header on the surface, as the four frames draw it. The install tabs are one card (tabs on the surface over a line, the code flush beneath, the copy button at the inline end); Wrong and Right drop the header for a name above the box and a danger or success edge. The Shiki pair is no longer github-dark-default and github-light-high-contrast but the frames' colours from the Tailwind palette (`lib/shiki-themes.ts`): keywords and tags blue, strings emerald, attributes and constants amber, comments neutral, at 400 on a dark ground and 700/800/600 on a light one. The component pages keep CodeBlock's own solid block, which the CodeBlock Previewer frame draws.
-
-**Why.** docs-site S3 put every fence on `neutral/solid` (unit-5 choice 13), read from the text notes; the page frames, read for the first time, draw the code on `base/page` with a `base/surface` header and a `base/line` edge.
-
-**What it affects.** `lib/shiki-contrast.test.ts` now also measures `on-dark` on the dark page and `on-light` on the light and ocean pages, every token colour at 4.5:1 plus the 0.15 margin. Code on a guide page is `text-xs` on the `text-sm` line height (the frames draw 11 px). Nothing in the library changed.
 ---
 
 ## 2026-10-19 - The command palette's focus appearance is an underline and a bar, not a ring
@@ -290,23 +274,13 @@ The format is: date, decision, why, and what it affects.
 **Not built, for Omar.** The playground props with no drawing behind them: Card `variant` and `padding`, Badge `dot`, `uppercase` and `truncate`, Avatar `shape`, `bordered`, `status` and `clickable`, AvatarGroup `spacing`, `showCount` and `bordered`, Separator `spacing`, Kbd `variant`, `size` and `muted`, CodeBlock `theme`, `maxLines` and `lineNumbers`. CodeBlock's copy hover and copied states are live only; the copied tick is not in the success tone.
 
 ---
+## 2026-10-19 - The guide pages' code sits on the page, in the frames' colours
 
-## 2026-10-19 - Toast and Table follow their Previewer frames
+**Decision.** Job 125 (the getting-started pages against Figma 193:1588, 193:2328, 193:2659 and 193:3001). On a guide page a fence, the install tabs and the ThemeScript blocks carry `docs-code` (`apps/docs/app/globals.css`): CodeBlock's solid pair is set to the page's own (`--tc-neutral-solid: var(--tc-page)`, `--tc-neutral-on-solid: var(--tc-body)`), with a line around it and its header on the surface, as the four frames draw it. The install tabs are one card (tabs on the surface over a line, the code flush beneath, the copy button at the inline end); Wrong and Right drop the header for a name above the box and a danger or success edge. The Shiki pair is no longer github-dark-default and github-light-high-contrast but the frames' colours from the Tailwind palette (`lib/shiki-themes.ts`): keywords and tags blue, strings emerald, attributes and constants amber, comments neutral, at 400 on a dark ground and 700/800/600 on a light one. The component pages keep CodeBlock's own solid block, which the CodeBlock Previewer frame draws.
 
-**Decision.** Job 111 of round 8 rebuilt the look of Toast (frame 137:1841) and Table (frame 137:1022) from the frames, read with the Figma tools, instead of the unit notes. The composites are `docs/figma/parity/toast.png` and `docs/figma/parity/table.png`.
+**Why.** docs-site S3 put every fence on `neutral/solid` (unit-5 choice 13), read from the text notes; the page frames, read for the first time, draw the code on `base/page` with a `base/surface` header and a `base/line` edge.
 
-- **Toast.** The toast is the frame's 320 px (the viewport is `w-88`, 352 px less its 16 px insets), padded 14 px on every side, its icon 10 px from the text, title and description 3 px apart, and its x a 14 px glyph (0.875em, so it grows with the text) whose corner sits on the padding's corner; the 24 px and 44 px targets of the x stay, pulled into the padding by negative margins. The shadow is the frame's own drop shadow, `0 6px 16px -4px` black at 40%, which Figma draws in one value for every mode: it is the new token `--tc-shadow-toast` in `tokens.css`, and the toast no longer wears `OVERLAY_SURFACE`'s `shadow-lg`. The x and the action carry `cursor-pointer` until job 120's shared classes land. The playground's description is the frame's.
-- **Table.** Cells are padded 14 px inline as the frame draws them; the header row is 32 px (8 px block padding), so the cap of the box counts 8 spacing steps for it. A body cell is muted and a row header is medium in the body colour, as the frame reads a row from its first cell. A row takes the frame's hover tint (`bg-surface`; a stuck cell follows it through `group-hover/row`). Every sortable header shows the frame's idle up-down pair, muted and hidden from a reader; the sorted one shows `sort-ascending` or `sort-descending` at the frame's 13 px instead of a caret, still named by its direction. The empty row draws the frame's 22 px tray over its words, in the small step. The playground is the frame's team table (avatar and name, role, a soft badge for the status), sorted by name.
-- **Alert and Banner.** Alert is the frame's 14 by 12 px (the 1 px edge every variant keeps counts in it), its icon 10 px from the text and its top on the first line's top. Banner is 18 by 11 px, its x a 14 px glyph on the padding's edge; its playground is dismissible by default, as the frame draws it, and its demos pass the action as a link in the banner's colour, as the frame draws "Read more", and its states demo gives each tone the frame's mark (primary none). The Alert description keeps its full colour: the frame's 85% would drop white on a solid tone under 4.5:1, which an existing test guards.
-- **Tight lines.** The frame sets the text of Toast, Alert and Banner on tight lines (17 px for 14 px text) with 3 px between title and description, so they take `text-sm/tight` and `gap-0.75`. The type step is unchanged.
-- **Table selection and the states strip.** The frame's states strip draws a selected row, so Table takes `selectedKeys` (strings, so it crosses to the client): a named row gets `data-selected` and `aria-selected`, the primary tint, and primary text in every cell, a stuck one too. Selecting stays the caller's (a checkbox column, say). A striped row, already the surface, hovers to the neutral tint. The empty table keeps its header row, so a reader knows what is empty, and the skeleton keeps the table's shape on the page's surface, where its bars show in dark as the frame's do.
-- **Two new design props on Table**, from the frame's Try it: `density` (`comfortable`, the default and the frame's row, or `compact`, 6 px of block padding) and `variant` (`outline`, the default with the hairline round the box, or `plain` without it). Both are value attributes on the root (`data-density`, `data-variant`, R-5.7-6), both reach `TableSkeleton`, and the `density` demo shows them. The type and schema tests that listed them as unbuilt now pin them.
-
-**The states demos are the frames' strips.** Each `dummy/states.tsx` holds one direct child a state, captioned by its `aria-label` (a `role="group"` around a component that takes none): Table idle, hover row, sorted, selected, empty, loading; Toast success, error, loading, stacked, entering, limited, drawn in place with the viewport's classes rather than through the live region; Alert info, success, warning, danger; Banner primary, info, warning, dismissed. The states each strip leaves out (variants, slots, the caption, stripes, the stuck column, the x) have demos of their own.
-
-**Not built, and left for Omar.** The frame's Try it also offers Table's `pageSize` (it needs Select), Alert's `size` and `dismissible`, and Banner's `variant`, `placement` and `sticky`; none is built. The toast past the limit stays undrawn (`data-limited:hidden`), not the frame's 40% ghost, which would keep its row in the column. Dark `--tc-info-on-soft` reads a little lighter than the frame's info text: a token for the integrator. The frame's "stacked" toast cell overlaps three toasts by 6 px; the build keeps its column with an 8 px gap, because an overlap would hide the edge of the toast behind and the frame's prototype gives no expand behaviour to follow. The frame's avatar is a neutral circle; the library's Avatar fallback is the primary tint (Avatar is job 116's). The frame draws the toast at rest in the docs stage; on the site it is still a button that adds one (job 127's stage).
-
-**Affects** `src/tokens.css`, `src/components/toast/{classes.ts,client.tsx,dummy/playground.tsx}`, `src/components/table/*` and its README, both components' tests and mutation rows.
+**What it affects.** `lib/shiki-contrast.test.ts` now also measures `on-dark` on the dark page and `on-light` on the light and ocean pages, every token colour at 4.5:1 plus the 0.15 margin. Code on a guide page is `text-xs` on the `text-sm` line height (the frames draw 11 px). Nothing in the library changed.
 
 ## 2026-10-18 - The site hydrates in islands, and the shell's code waits for the first paint
 
@@ -1609,5 +1583,3 @@ The second audit proposed about ninety more. They were declined and listed at th
 **Why.** The CLI plan (K1) ships the component sources once, as the registry JSON in `dist/registry/`, so `npx topclassui add` reads its own installed version with no network; the registry is 1.48 MB unpacked (one item per component with its demos, one base item for `shared/` and `icons/`). The 1.3 MB budget was written for the components-only tarball of release R5.
 
 **Affects.** `pack-checks.ts`, its test, and every later release: a tarball over 3.05 MB needs a new entry here, not a bigger number.
-
-- **2026-10-22, the Home hero title keeps the frame's tight letter-spacing in English.** Home 191:1495 draws the h1 at 92 px with -2.3 px tracking; without it the frame's line width and its letter height cannot both hold. R-5.3-3 bans tracking because letter-spacing breaks joined Arabic letters, so the site applies -0.025em to the hero title under :lang(en) only (apps/docs/app/globals.css, .docs-hero-title) and the Arabic title keeps none. The library is untouched: R-5.3-3 still holds inside packages/topclassui/src.

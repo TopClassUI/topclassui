@@ -59,7 +59,7 @@ describe('the holder and the track', () => {
     expect(ruleOf(selectorOf('max-w-full'))).toBe('max-width: 100%;')
     expect(ruleOf(selectorOf('overflow-x-auto'))).toBe('overflow-x: auto;')
     expect(ruleOf(selectorOf('overscroll-x-contain'))).toBe('overscroll-behavior-x: contain;')
-    expect(ruleOf(selectorOf('scroll-px-px'))).toBe('scroll-padding-inline: 1px;')
+    expect(ruleOf(selectorOf('scroll-px-0.5'))).toBe('scroll-padding-inline: calc(var(--spacing) * 0.5);')
     expect(ruleOf(selectorOf('relative'))).toBe('position: relative;')
   })
 

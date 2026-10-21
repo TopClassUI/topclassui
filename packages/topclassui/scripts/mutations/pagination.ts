@@ -122,4 +122,22 @@ export const MUTATIONS: Mutation[] = [
     from: "  md: 'h-control-xs min-w-control-md px-pad-x-xs text-sm',",
     to: "  md: 'h-control-md aspect-square px-pad-x-xs text-sm',",
   },
+  {
+    label: 'a pagination list loses its measured row, so a cell sized to its content draws "6 / of / 12" in a column',
+    file: 'src/components/pagination/index.tsx',
+    from: 'className={cn(LIST, LIST_GAP[size], ROW_AT[step])}',
+    to: 'className={cn(LIST, LIST_GAP[size])}',
+  },
+  {
+    label: 'a pagination nav loses max-w-full, so a narrow cell sized to its content spills the row the list claims',
+    file: 'src/components/pagination/classes.ts',
+    from: "export const ROOT = 'max-w-full'",
+    to: "export const ROOT = ''",
+  },
+  {
+    label: 'a pagination row claims one step too few, so its last cell wraps under the first in a cell sized to it',
+    file: 'src/components/pagination/lib.ts',
+    from: 'step * 16 >= px',
+    to: 'step * 16 + 32 >= px',
+  },
 ]

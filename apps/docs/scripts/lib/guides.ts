@@ -71,7 +71,8 @@ export function tokenFacts(css: string, palette: Map<string, Color> = readPalett
 /** One top-level block of tokens.css, copied as written, comments included. */
 export function blockSource(css: string, selector: string): string {
   const lines = css.split('\n')
-  const start = lines.indexOf(`${selector} {`)
+  // The block whose whole selector this is, not a list that ends in it, as the light block's list ends in ocean.
+  const start = lines.findIndex((line, at) => line === `${selector} {` && !(lines[at - 1] ?? '').trimEnd().endsWith(','))
   const end = lines.indexOf('}', start)
   if (start === -1 || end === -1) throw new Error(`tokens.css has no top-level ${selector} block`)
   return lines.slice(start, end + 1).join('\n')

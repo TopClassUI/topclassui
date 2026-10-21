@@ -14,7 +14,7 @@ import { FORCED_CANVAS, contrast, inkOn, paintedIn, pixelsOf, rgbOf, ringRow } f
 
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['checkbox--basic', 'checkbox--form', 'checkbox--labelled', 'checkbox--playground', 'checkbox--rtl', 'checkbox--sizes', 'checkbox--states'] as const
+const DEMOS = ['checkbox--basic', 'checkbox--form', 'checkbox--labelled', 'checkbox--playground', 'checkbox--rtl', 'checkbox--sizes', 'checkbox--states', 'checkbox--combined'] as const
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 const NAMES = { xs: 'Extra small', sm: 'Small', md: 'Medium', lg: 'Large', xl: 'Extra large' } as const
 
@@ -94,7 +94,7 @@ test.describe('the states, on the static page', () => {
   test.use({ reducedMotion: 'reduce' })
 
   test('indeterminate is filled as checked is, says mixed and draws the dash', async ({ page }) => {
-    await page.goto(urlFor('checkbox--states', 'light', 'ltr'))
+    await page.goto(urlFor('checkbox--combined', 'light', 'ltr'))
     const [checked, mixed] = [boxIn(page, 'Checked'), boxIn(page, 'Indeterminate')]
     expect(await mixed.getAttribute('aria-checked')).toBe('mixed')
     expect([await markOf(checked), await markOf(mixed)]).toEqual(['tick', 'dash'])
@@ -105,7 +105,7 @@ test.describe('the states, on the static page', () => {
   })
 
   test('invalid: the line turns to danger and is 2 px thick, unticked, ticked and mixed', async ({ page }) => {
-    await page.goto(urlFor('checkbox--states', 'light', 'ltr'))
+    await page.goto(urlFor('checkbox--combined', 'light', 'ltr'))
     const danger = await resolve(page, 'var(--tc-danger-solid)')
     for (const name of ['Invalid', 'Invalid, checked', 'Invalid, indeterminate']) {
       expect(await css(drawn(boxIn(page, name)), 'border-top-color'), name).toBe(danger)
@@ -129,7 +129,7 @@ for (const scheme of ['light', 'dark'] as const) {
     }
 
     test('unticked, ticked and mixed differ by more than a fill: an empty box, a tick and a dash', async ({ page }) => {
-      await page.goto(urlFor('checkbox--states', 'light', 'ltr'))
+      await page.goto(urlFor('checkbox--combined', 'light', 'ltr'))
       expect(await page.evaluate(() => matchMedia('(forced-colors: active)').matches)).toBe(true)
       const highlight = rgbOf(await resolve(page, 'Highlight'))
       for (const name of ['Checked', 'Indeterminate']) {
@@ -152,7 +152,7 @@ for (const scheme of ['light', 'dark'] as const) {
     })
 
     test('invalid and ticked or mixed: a CanvasText line and no author red; disabled and ticked or mixed, prop or fieldset: GrayText', async ({ page }) => {
-      await page.goto(urlFor('checkbox--states', 'light', 'ltr'))
+      await page.goto(urlFor('checkbox--combined', 'light', 'ltr'))
       const [canvasText, grayText] = [await resolve(page, 'CanvasText'), await resolve(page, 'GrayText')]
       for (const name of ['Invalid, checked', 'Invalid, indeterminate']) {
         expect(await css(drawn(boxIn(page, name)), 'border-top-color'), name).toBe(canvasText)
@@ -176,7 +176,7 @@ for (const scheme of ['light', 'dark'] as const) {
     // The page in the other theme, where --tc-ring falls to 2.4:1 on Canvas: only a system colour holds in both.
     for (const mode of scheme === 'light' ? ['dark'] as const : ['light', 'ocean'] as const) {
       test(`${mode} page: the ring of a focused box is the user's CanvasText, 3:1 on Canvas, ticked, mixed and invalid too`, async ({ page }) => {
-        await page.goto(urlFor('checkbox--states', mode, 'ltr'))
+        await page.goto(urlFor('checkbox--combined', mode, 'ltr'))
         const canvasText = await resolve(page, 'CanvasText')
         for (const name of ['Unchecked', 'Checked', 'Indeterminate', 'Invalid, checked', 'Invalid, indeterminate', 'Read-only']) {
           await boxIn(page, name).focus()
@@ -188,7 +188,7 @@ for (const scheme of ['light', 'dark'] as const) {
     }
 
     test('invalid thickens the line to 2 px; disabled dims the whole box; no target has an outline at rest', async ({ page }) => {
-      await page.goto(urlFor('checkbox--states', 'light', 'ltr'))
+      await page.goto(urlFor('checkbox--combined', 'light', 'ltr'))
       for (const name of ['Invalid', 'Invalid, checked', 'Invalid, indeterminate']) {
         expect(await css(drawn(boxIn(page, name)), 'border-top-width'), name).toBe('2px')
       }

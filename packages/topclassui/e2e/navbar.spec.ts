@@ -15,6 +15,10 @@ const NAVBARS = [
   'navbar--with-search',
 ]
 
+/** The states strip draws brand-only bars, as the frame does: no list to scroll, no link to read but the brand. */
+const BRAND_ONLY = ['navbar--states']
+const WITH_LINKS = NAVBARS.filter((demo) => !BRAND_ONLY.includes(demo))
+
 /** The three screens Unit 3 measures at, and a phone on its side. */
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 1280, height: 800 }, { width: 844, height: 390 }] as const
 
@@ -670,7 +674,18 @@ test.describe('under a finger', () => {
     })
   }
 
-  for (const demo of NAVBARS) {
+  test('navbar--states: every brand is at least 44 px wide and 44 px tall', async ({ page }) => {
+    await openLive(page, 'navbar--states')
+    const sizes = await page.locator('header a[href]').evaluateAll((all) => all.map((element) => {
+      const { width, height } = element.getBoundingClientRect()
+      return { width, height }
+    }))
+    expect(sizes).toHaveLength(4)
+    expect(sizes.filter((size) => size.width < 44 || size.height < 44)).toEqual([])
+    await expectNoSidewaysScroll(page)
+  })
+
+  for (const demo of WITH_LINKS) {
     test(`${demo}: every link, button and field of the bar is at least 44 px wide and 44 px tall, and a field is typed in at 16 px`, async ({ page }) => {
       await openLive(page, demo)
       expect(await page.evaluate(() => matchMedia('(pointer: coarse)').matches)).toBe(true)
@@ -1100,7 +1115,18 @@ test.describe('motion', () => {
 })
 
 test.describe('axe on the hydrated bar', () => {
-  for (const demo of NAVBARS) {
+  for (const mode of MODES) {
+    for (const direction of DIRECTIONS) {
+      test(`navbar--states ${mode} ${direction}: no violation, at rest and with a brand focused`, async ({ page }) => {
+        await openLive(page, 'navbar--states', { mode, direction })
+        expect((await axe(page)).violations).toEqual([])
+        await page.locator('header a[href]').last().focus()
+        expect((await axe(page)).violations).toEqual([])
+      })
+    }
+  }
+
+  for (const demo of WITH_LINKS) {
     for (const mode of MODES) {
       for (const direction of DIRECTIONS) {
         test(`${demo} ${mode} ${direction}: no violation, at rest and with a link focused`, async ({ page }) => {
@@ -1127,7 +1153,7 @@ test.describe('axe on the hydrated bar', () => {
 test.describe('axe on a 320 x 480 phone', () => {
   test.use({ hasTouch: true, isMobile: true, viewport: { width: 320, height: 480 } })
 
-  for (const demo of NAVBARS) {
+  for (const demo of WITH_LINKS) {
     test(`${demo}: no violation where the list scrolls and the bar wraps`, async ({ page }) => {
       await openLive(page, demo)
       const found = await axe(page)

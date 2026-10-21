@@ -9,13 +9,12 @@ const ITEMS = [
     id: 'src', label: 'src', children: [
       { id: 'file1', label: 'file1', icon: FILE },
       { id: 'file2', label: 'file2', icon: FILE },
-      { id: 'file3', label: 'file3', icon: FILE, disabled: true },
     ],
   },
 ]
 
 /** Every state the strip draws, one cell each, captioned by its name: collapsed, expanded, selected, focus-visible
- * (the ring shows once Tab reaches the tree), loading and empty. The expanded cell adds a disabled row. */
+ * (the ring shows once Tab reaches the tree), loading and empty. */
 export default function Demo() {
   return (
     <div className="grid gap-3 sm:grid-cols-2">

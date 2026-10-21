@@ -94,7 +94,10 @@ describe('the parts a demo is built from', () => {
 
   it('two client parts and no more: the rail, and the toggle its header draws. Every link is server markup', async () => {
     for (const name of names.filter((demo) => demo !== 'rtl' && demo !== 'states' && demo !== 'in-a-layout')) expect(await parts(name), name).toEqual(['SidebarRoot', 'SidebarTrigger'])
-    expect(await parts('states')).toEqual(['SidebarRoot', 'SidebarTrigger', 'SidebarRoot', 'SidebarTrigger'])
+    expect(await parts('states')).toEqual([
+      'SidebarRoot', 'SidebarTrigger', 'SidebarRoot', 'SidebarTrigger', 'SidebarRoot', 'SidebarTrigger',
+      'SidebarRoot', 'SidebarTrigger', 'SidebarRoot', 'SidebarTrigger',
+    ])
     // The page beside the rail holds a Table, whose body is its own client part.
     expect(await parts('in-a-layout')).toEqual(['SidebarRoot', 'SidebarTrigger', 'TableRows'])
   })
@@ -113,7 +116,13 @@ describe('the parts a demo is built from', () => {
       'basic': [{}], 'collapsed': [{ defaultOpen: false }], 'groups': [{}], 'in-a-layout': [{}], 'long-list': [{}],
       // The Try it rail hands on what the controls pass, which is nothing until one is set.
       'playground': [{ defaultOpen: undefined, open: undefined }], 'rtl': [{}],
-      'states': [{ 'aria-label': 'expanded' }, { 'aria-label': 'collapsed', 'defaultOpen': false }],
+      'states': [
+        { 'aria-label': 'expanded', 'defaultOpen': true, 'className': 'data-open:w-40' },
+        { 'aria-label': 'collapsed', 'defaultOpen': false, 'className': 'data-open:w-40' },
+        { 'aria-label': 'active item', 'defaultOpen': true, 'className': 'data-open:w-40' },
+        { 'aria-label': 'hover', 'defaultOpen': true, 'className': 'data-open:w-40' },
+        { 'aria-label': 'focus-visible', 'defaultOpen': true, 'className': 'data-open:w-40' },
+      ],
     })
     const collapsed = crossings((await load('collapsed'))()).find((crossing) => crossing.part === 'SidebarRoot')
     expect(collapsed?.props['defaultOpen']).toBe(false)

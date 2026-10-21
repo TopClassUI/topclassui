@@ -2,12 +2,40 @@
 import { BORDER, HOVER, POINTER } from '#shared/classes.js'
 import type { Size } from '#shared/contracts/size.js'
 import { TONE_CLASS } from '#shared/contracts/tone.js'
+import type { PAGINATION_ROW_STEPS } from './constants.js'
 
 /** A page or a gap: only in the full row. */
 export const FULL = 'pagination-full'
 
 /** "3 of 12": only in the compact row, between previous and next. */
 export const COMPACT = 'pagination-compact'
+
+/** The width the list claims and below which it turns compact, one class per step of PAGINATION_ROW_STEPS. */
+export const ROW_AT = {
+  10: 'pagination-at-10',
+  12: 'pagination-at-12',
+  14: 'pagination-at-14',
+  16: 'pagination-at-16',
+  18: 'pagination-at-18',
+  20: 'pagination-at-20',
+  22: 'pagination-at-22',
+  24: 'pagination-at-24',
+  26: 'pagination-at-26',
+  28: 'pagination-at-28',
+  30: 'pagination-at-30',
+  32: 'pagination-at-32',
+  34: 'pagination-at-34',
+  36: 'pagination-at-36',
+  38: 'pagination-at-38',
+  40: 'pagination-at-40',
+  42: 'pagination-at-42',
+  44: 'pagination-at-44',
+  46: 'pagination-at-46',
+  48: 'pagination-at-48',
+} as const satisfies Record<(typeof PAGINATION_ROW_STEPS)[number], string>
+
+/** In a cell sized to its content the root takes no more than the cell, so a narrow cell turns compact instead of spilling. */
+export const ROOT = 'max-w-full'
 
 /** The row wraps, so eleven cells at 44 px still fit a phone; the list is the container the compact row measures. */
 export const LIST = 'flex flex-wrap items-center @container/pagination'
@@ -57,8 +85,8 @@ export const CELL_CURRENT = `bg-primary-solid text-primary-on-solid ${TONE_CLASS
 export const CELL_OTHER = `${BORDER} text-body ${TONE_CLASS.neutral} ${HOVER.outline} ${POINTER} data-disabled:border-transparent`
 
 /** The page in words, filling what the four controls leave; pagination-compact makes it a flex box.
- * flex-1 lets "12,345 of 123,456" wrap inside its box, so the row itself never breaks on a phone. */
-export const STATUS = 'flex-1 items-center justify-center rounded-control px-1 text-center font-medium tabular-nums text-body'
+ * min-w-0 and flex-1 let "12,345 of 123,456" wrap inside its box, so the row itself never breaks on a phone. */
+export const STATUS = 'min-w-0 flex-1 items-center justify-center rounded-control px-1 text-center font-medium tabular-nums text-body'
 
 /** The cell height as a floor, so a wrapped status grows instead of spilling. */
 export const STATUS_SIZE = {

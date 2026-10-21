@@ -1,18 +1,19 @@
 import { Checkbox } from '../index.js'
 
-/** The states a server can render. A read-only checkbox looks like a live one: it says so to a screen reader only. */
+/** The ring a focused box wears on focus-visible, drawn at rest so the strip can show it; not under forced colours, where a ring at rest would read as focus. */
+const RING = 'rounded-chip not-forced-colors:outline-solid not-forced-colors:outline-(length:--tc-ring-width) not-forced-colors:outline-offset-(length:--tc-ring-offset) not-forced-colors:outline-ring'
+
+/** One cell per state the strip draws, named by its aria-label. A box has no hover look, so hover is drawn identical to
+ * unchecked; invalid, read-only and the combined states are in the combined demo. */
 export default function Demo() {
   return (
-    <div className="flex flex-wrap items-center gap-4">
-      <Checkbox aria-label="Unchecked" />
-      <Checkbox defaultChecked aria-label="Checked" />
-      <Checkbox indeterminate aria-label="Indeterminate" />
-      <Checkbox invalid aria-label="Invalid" />
-      <Checkbox invalid defaultChecked aria-label="Invalid, checked" />
-      <Checkbox invalid indeterminate aria-label="Invalid, indeterminate" />
-      <Checkbox disabled aria-label="Disabled" />
-      <Checkbox disabled defaultChecked aria-label="Disabled, checked" />
-      <Checkbox readOnly defaultChecked aria-label="Read-only" />
+    <div className="flex flex-wrap items-center gap-6">
+      <Checkbox aria-label="unchecked" />
+      <Checkbox defaultChecked aria-label="checked" />
+      <Checkbox indeterminate aria-label="indeterminate" />
+      <Checkbox aria-label="hover" />
+      <Checkbox className={RING} aria-label="focus-visible" />
+      <Checkbox disabled aria-label="disabled" />
     </div>
   )
 }

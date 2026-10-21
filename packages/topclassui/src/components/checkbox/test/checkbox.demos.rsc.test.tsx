@@ -52,7 +52,7 @@ const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { 
 
 describe('every demo is a Server Component that only hands Checkbox what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'form', 'labelled', 'playground', 'rtl', 'sizes', 'states'])
+    expect(names).toEqual(['basic', 'combined', 'form', 'labelled', 'playground', 'rtl', 'sizes', 'states'])
   })
 
   for (const name of names) {
@@ -63,8 +63,13 @@ describe('every demo is a Server Component that only hands Checkbox what can cro
     })
   }
 
-  it('states: each state is a plain boolean prop', async () => {
+  it('states: each state is a plain prop, the drawn ring a class', async () => {
     const props = crossings((await load('states'))()).map(({ props: given }) => Object.keys(given).filter((key) => key !== 'aria-label'))
+    expect(props).toEqual([[], ['defaultChecked'], ['indeterminate'], [], ['className'], ['disabled']])
+  })
+
+  it('combined: each state is a plain boolean prop', async () => {
+    const props = crossings((await load('combined'))()).map(({ props: given }) => Object.keys(given).filter((key) => key !== 'aria-label'))
     expect(props).toEqual([
       [], ['defaultChecked'], ['indeterminate'], ['invalid'], ['invalid', 'defaultChecked'], ['invalid', 'indeterminate'],
       ['disabled'], ['disabled', 'defaultChecked'], ['readOnly', 'defaultChecked'],

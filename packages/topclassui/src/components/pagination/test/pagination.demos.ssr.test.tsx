@@ -48,18 +48,19 @@ describe('each demo shows the state its name promises', () => {
     return Demo ? markup(<Demo />) : ''
   }
 
-  it('playground: with nothing passed, page 6 of 12 between two gaps, like middle', async () => {
+  it('playground: with nothing passed, page 1 of 24 at sm, one gap before the last page, as the frame draws it', async () => {
     const html = await render('playground')
-    expect(pages(html)).toEqual(['1', '5', '6', '7', '12'])
-    expect(html).toContain('aria-label="Page 6 of 12" aria-current="page"')
+    expect(pages(html)).toEqual(['1', '2', '3', '4', '5', '24'])
+    expect(html).toContain('aria-label="Page 1 of 24" aria-current="page"')
+    expect(html).toContain('data-size="sm"')
   })
 
-  it('states: five navs, each named, with the spans each one leaves where there is nowhere to go', async () => {
+  it('states: the four navs of the frame, each named, with the spans each one leaves where there is nowhere to go', async () => {
     const html = await render('states')
-    expect([...html.matchAll(/<nav aria-label="([^"]*)"/g)].map((m) => m[1])).toEqual(['first page', 'middle', 'last page', 'single page', 'disabled'])
+    expect([...html.matchAll(/<nav [^>]*aria-label="([^"]*)"/g)].map((m) => m[1])).toEqual(['first page', 'middle', 'last page', 'disabled'])
     expect([...html.matchAll(/<span [^>]*aria-label="([^"]*)"/g)].map((m) => m[1])).toEqual([
-      'First page', 'Previous', 'Next', 'Last page', 'First page', 'Previous', 'Next', 'Last page',
-      'First page', 'Previous', 'Page 1 of 12', 'Page 2', 'Page 3', 'Page 4', 'Page 5', 'Page 12', 'Next', 'Last page',
+      'First page', 'Previous', 'Next', 'Last page',
+      'First page', 'Previous', 'Page 1 of 3', 'Page 2', 'Page 3', 'Next', 'Last page',
     ])
   })
 
@@ -122,8 +123,8 @@ describe('each demo shows the state its name promises', () => {
   it('custom-size: the second nav opts out of the scale and still names itself', async () => {
     const html = await render('custom-size')
     expect([...html.matchAll(/<nav ([^>]*)>/g)].map((m) => m[1])).toEqual([
-      'aria-label="The scale" data-size="md"',
-      'class="text-xs" aria-label="Your own cells" data-size="custom"',
+      'aria-label="The scale" data-size="md" class="max-w-full"',
+      'aria-label="Your own cells" data-size="custom" class="max-w-full text-xs"',
     ])
   })
 })

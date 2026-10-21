@@ -1,25 +1,30 @@
 import { RadioGroupItem, RadioGroupRoot } from '../index.js'
 
-/** The states a server can render. A read-only group looks like a live one, and its aria-readonly is not announced. */
+/** The ring a focused radio wears on focus-visible, drawn at rest so the strip can show it; not under forced colours, where a ring at rest would read as focus. */
+const RING = 'rounded-full not-forced-colors:outline-solid not-forced-colors:outline-(length:--tc-ring-width) not-forced-colors:outline-offset-(length:--tc-ring-offset) not-forced-colors:outline-ring'
+
+/** One cell per state the strip draws, a group of one bare radio named by the group's aria-label. A radio has no hover
+ * look, so hover is drawn identical to unselected; read-only and the combined states are in the combined demo. */
 export default function Demo() {
   return (
-    <div className="grid justify-items-start gap-4">
-      <RadioGroupRoot aria-label="Invalid" invalid defaultValue="yes" orientation="horizontal">
-        <RadioGroupItem value="yes">Invalid, checked</RadioGroupItem>
-        <RadioGroupItem value="no">Invalid</RadioGroupItem>
+    <div className="flex flex-wrap items-center gap-6">
+      <RadioGroupRoot aria-label="unselected">
+        <RadioGroupItem value="monthly" aria-label="Monthly" className="gap-0" />
       </RadioGroupRoot>
-      <RadioGroupRoot aria-label="Disabled" disabled defaultValue="yes" orientation="horizontal">
-        <RadioGroupItem value="yes">Disabled, checked</RadioGroupItem>
-        <RadioGroupItem value="no">Disabled</RadioGroupItem>
+      <RadioGroupRoot aria-label="selected" defaultValue="monthly">
+        <RadioGroupItem value="monthly" aria-label="Monthly" className="gap-0" />
       </RadioGroupRoot>
-      <RadioGroupRoot aria-label="One disabled" defaultValue="yes" orientation="horizontal">
-        <RadioGroupItem value="yes">Live, checked</RadioGroupItem>
-        <RadioGroupItem value="no" disabled>One disabled</RadioGroupItem>
-        <RadioGroupItem value="maybe">Live</RadioGroupItem>
+      <RadioGroupRoot aria-label="hover">
+        <RadioGroupItem value="monthly" aria-label="Monthly" className="gap-0" />
       </RadioGroupRoot>
-      <RadioGroupRoot aria-label="Read-only" readOnly defaultValue="yes" orientation="horizontal">
-        <RadioGroupItem value="yes">Read-only, checked</RadioGroupItem>
-        <RadioGroupItem value="no">Read-only</RadioGroupItem>
+      <RadioGroupRoot aria-label="focus-visible">
+        <RadioGroupItem value="monthly" aria-label="Monthly" className={`gap-0 ${RING}`} />
+      </RadioGroupRoot>
+      <RadioGroupRoot aria-label="disabled" disabled>
+        <RadioGroupItem value="monthly" aria-label="Monthly" className="gap-0" />
+      </RadioGroupRoot>
+      <RadioGroupRoot aria-label="invalid" invalid>
+        <RadioGroupItem value="monthly" aria-label="Monthly" className="gap-0" />
       </RadioGroupRoot>
     </div>
   )

@@ -36,11 +36,11 @@ describe('the states demo, one cell per state of the Every state strip', () => {
     const [, open, typing, empty, loading, selected] = cellsOf(container.firstElementChild)
     const rows = (cell: HTMLElement | undefined) => [...(cell?.querySelectorAll('[data-command-row]') ?? [])].map((row) => row.textContent)
     const active = (cell: HTMLElement | undefined) => [...(cell?.querySelectorAll('[data-highlighted]') ?? [])].map((row) => row.textContent)
-    expect([rows(open), active(open)]).toEqual([['Button', 'Dialog', 'Drawer', 'Table', 'Tabs'], []])
-    expect([typing?.textContent.includes('ta'), rows(typing), active(typing)]).toEqual([true, ['Tabs', 'Table'], ['Tabs']])
-    expect([rows(empty), empty?.textContent.includes('zebra'), empty?.textContent.endsWith('No results')]).toEqual([[], true, true])
-    expect([rows(loading), loading?.textContent.endsWith('Loading')]).toEqual([[], true])
-    expect(active(selected)).toEqual(['Drawer'])
+    expect([open?.textContent, rows(open), active(open)]).toEqual(['searchButton', ['Button'], []])
+    expect([typing?.textContent, rows(typing), active(typing)]).toEqual(['butButton', ['Button'], ['Button']])
+    expect([rows(empty), empty?.textContent]).toEqual([[], 'no results'])
+    expect([rows(loading), loading?.textContent, loading?.querySelectorAll('svg').length]).toEqual([[], '', 1])
+    expect([selected?.textContent, active(selected)]).toEqual(['searchButton', ['Button']])
   })
 
   it('opens the real palette with Ctrl K, after the cells and uncaptioned', async () => {

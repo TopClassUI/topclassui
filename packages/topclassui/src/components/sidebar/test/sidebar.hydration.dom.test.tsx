@@ -109,7 +109,7 @@ describe('a server-rendered rail hydrates cleanly', () => {
 /** The state of each rail of each demo, in document order, as the server sends it. */
 const RAILS: Record<string, string[]> = {
   'basic': ['open'], 'collapsed': ['closed'], 'controlled': ['open'], 'groups': ['open'], 'in-a-layout': ['open'],
-  'long-list': ['open'], 'playground': ['open'], 'rtl': ['open'], 'states': ['open', 'closed'],
+  'long-list': ['open'], 'playground': ['open'], 'rtl': ['open'], 'states': ['open', 'closed', 'open', 'open', 'open'],
 }
 
 describe('every demo renders and hydrates', () => {

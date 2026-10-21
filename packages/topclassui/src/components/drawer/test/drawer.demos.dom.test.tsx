@@ -116,7 +116,7 @@ describe('the states strip, one cell per state the frame draws', () => {
     expect(cells.map((cell) => cell.getAttribute('title'))).toEqual(['closed', 'side sheet', 'bottom sheet'])
     const dialogs = await screen.findAllByRole('dialog')
     expect(dialogs.map((dialog) => [dialog.querySelector('h2')?.textContent, dialog.getAttribute('data-placement')]))
-      .toEqual([['Side sheet', 'end'], ['Bottom sheet', 'bottom']])
+      .toEqual([['sheet', 'end'], ['sheet', 'bottom']])
     expect(cells[1]?.contains(dialogs[0] ?? null)).toBe(true)
     expect(cells[2]?.contains(dialogs[1] ?? null)).toBe(true)
     expect(cells.map((cell) => cell.querySelectorAll(':scope > .bg-overlay').length)).toEqual([0, 1, 1])

@@ -16,6 +16,7 @@ const readNavs = () => [...document.querySelectorAll('nav')].map((nav) => {
   const status = nav.querySelector('li.pagination-compact')
   return {
     name: nav.getAttribute('aria-label'),
+    disabled: nav.hasAttribute('data-disabled'),
     // The row centres its items, so a line is one centre whatever the height of each box.
     lines: [...new Set(shown.map((item) => {
       const box = item.getBoundingClientRect()
@@ -56,6 +57,11 @@ for (const pointer of ['fine', 'coarse'] as const) {
           for (const nav of navs) {
             expect(nav.lines, `${String(nav.name)} wraps`).toHaveLength(1)
             expect(nav.status, `${String(nav.name)} shows no "current of total"`).not.toBeNull()
+            // Disabled, every cell is a dead span by design, so there is no link to reach.
+            if (nav.disabled) {
+              expect(nav.linksInHtml, `${String(nav.name)} kept a link`).toBe(0)
+              continue
+            }
             // Next leads to current + 1 and previous to current - 1, so walking either way reaches every page.
             expect([...new Set(nav.reached)], String(nav.name)).toEqual(neighbours(nav.current, nav.count))
             expect(nav.linksInHtml, `${String(nav.name)} dropped its page links`).toBeGreaterThan(nav.reached.length)
@@ -88,5 +94,39 @@ test.describe('at 1280 px under a fine pointer', () => {
     const [nav] = await page.evaluate(readNavs)
     expect(nav?.status).toBeNull()
     expect(nav?.reached).toEqual([1, 1, 5, 5, 6, 7, 7, 12, 12])
+  })
+})
+
+test.describe('at 1280 px in a cell sized to its content', () => {
+  /** Each nav moved into a centred flex cell of the given width, as the docs' states strip lays it out. */
+  const intoCells = (width: number) => {
+    for (const nav of document.querySelectorAll('nav')) {
+      const cell = document.createElement('div')
+      cell.style.cssText = `display: flex; justify-content: center; width: ${String(width)}px`
+      nav.replaceWith(cell)
+      cell.append(nav)
+    }
+  }
+
+  test('a row that fits its 227 px cell stays full, on one line and inside the cell', async ({ page }) => {
+    await page.goto(urlFor('pagination--states', 'dark', 'ltr'))
+    await page.evaluate(intoCells, 227)
+    const widths = await page.evaluate(() => [...document.querySelectorAll('nav')].map((nav) => nav.getBoundingClientRect().width))
+    for (const nav of await page.evaluate(readNavs)) {
+      expect(nav.status, String(nav.name)).toBeNull()
+      expect(nav.lines, `${String(nav.name)} wraps`).toHaveLength(1)
+    }
+    for (const width of widths) expect(width).toBeLessThanOrEqual(227)
+  })
+
+  test('a row that does not fit its 160 px cell turns compact, on one line and inside the cell', async ({ page }) => {
+    await page.goto(urlFor('pagination--states', 'dark', 'ltr'))
+    await page.evaluate(intoCells, 160)
+    const widths = await page.evaluate(() => [...document.querySelectorAll('nav')].map((nav) => nav.getBoundingClientRect().width))
+    for (const nav of await page.evaluate(readNavs)) {
+      expect(nav.status, String(nav.name)).toMatch(/^[123] of 3$/)
+      expect(nav.lines, `${String(nav.name)} wraps`).toHaveLength(1)
+    }
+    for (const width of widths) expect(width).toBeLessThanOrEqual(160)
   })
 })

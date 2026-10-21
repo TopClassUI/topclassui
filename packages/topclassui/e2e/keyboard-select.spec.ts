@@ -33,8 +33,8 @@ for (const direction of DIRECTIONS) {
   test.describe(direction, () => {
     test('Tab reaches each live trigger, one stop each, and skips a disabled one', async ({ page }) => {
       await openLive(page, 'select--states', { direction })
-      expect(await walk(page, 3)).toEqual(['Nothing chosen', 'Invalid', 'Read-only'])
-      expect(await walk(page, 1, 'Shift+Tab')).toEqual(['Invalid'])
+      expect(await walk(page, 6)).toEqual(['idle', 'hover', 'focus-visible', 'open', 'invalid', 'read-only'])
+      expect(await walk(page, 1, 'Shift+Tab')).toEqual(['invalid'])
     })
 
     test('the focused trigger paints the ring, and the highlighted option paints it inside its edge', async ({ page }) => {
@@ -136,8 +136,8 @@ for (const direction of DIRECTIONS) {
 
     test('a read-only trigger takes the focus and the ring; it opens, as Base UI\'s does (DECISIONS, 15 October), and no key changes it', async ({ page }) => {
       await openLive(page, 'select--states', { direction })
-      await walk(page, 3)
-      const readOnly = trigger(page, 'Read-only')
+      await walk(page, 6)
+      const readOnly = trigger(page, 'read-only')
       await expect(readOnly).toBeFocused()
       await expectRing(readOnly, 'the read-only trigger')
       await page.keyboard.press('ArrowDown')
@@ -147,7 +147,7 @@ for (const direction of DIRECTIONS) {
       await page.keyboard.press('Escape')
       await expectClosed(page, POPUP)
       await expect(readOnly).toBeFocused()
-      await expect(readOnly).toHaveText('Team')
+      await expect(readOnly).toHaveText('Jordan')
     })
   })
 }

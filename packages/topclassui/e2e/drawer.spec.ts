@@ -169,7 +169,7 @@ test.describe('the states strip', () => {
       expect(await cellOf(page, 'closed').locator('xpath=..').locator(':scope > *').evaluateAll((cells) => cells.map((cell) => cell.getAttribute('title'))))
         .toEqual(['closed', 'side sheet', 'bottom sheet'])
       await expect(cellOf(page, 'closed').locator('[role="dialog"]')).toHaveCount(0)
-      for (const [title, name] of [['side sheet', 'Side sheet'], ['bottom sheet', 'Bottom sheet']] as const) {
+      for (const [title, name] of [['side sheet', 'sheet'], ['bottom sheet', 'sheet']] as const) {
         const cell = cellOf(page, title)
         const popup = cell.locator(`[role="dialog"]${OPENED}`)
         await expect(popup).toBeVisible()

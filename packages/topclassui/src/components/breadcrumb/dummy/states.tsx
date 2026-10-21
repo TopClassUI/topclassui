@@ -1,43 +1,38 @@
 import { Breadcrumb } from '../index.js'
 
-/** The states a server can render: a trail ending on the page being read, one of ancestors only,
- * a lone current page, a long trail folded by maxItems and one that opens on the house icon.
- * Five navs on one page need a name each, so every one passes its own. */
+/** The four states the frame draws, one nav each, named by its aria-label: a trail of ancestors only, a crumb under
+ * the pointer (drawn with the data-hover a pointer would set), a long trail folded by maxItems, and the page being read. */
 export default function Demo() {
   return (
     <div className="grid justify-items-start gap-4">
       <Breadcrumb
-        aria-label="current"
-        items={[
-          { href: '/', label: 'Home' },
-          { href: '/docs', label: 'Docs' },
-          { label: 'Breadcrumb' },
-        ]}
-      />
-      <Breadcrumb
         aria-label="idle"
         items={[
-          { href: '/', label: 'Home' },
-          { href: '/shop', label: 'Shop' },
+          { href: '/docs', label: 'Docs' },
+          { href: '/docs/button', label: 'Button' },
         ]}
       />
-      <Breadcrumb aria-label="current page only" items={[{ label: 'Home' }]} />
+      <Breadcrumb
+        aria-label="hover"
+        link={<a href="/" data-hover="" />}
+        items={[
+          { href: '/docs', label: 'Docs' },
+          { label: 'Button' },
+        ]}
+      />
       <Breadcrumb
         aria-label="collapsed"
-        maxItems={3}
+        maxItems={2}
         items={[
           { href: '/docs', label: 'Docs' },
           { href: '/docs/components', label: 'Components' },
           { href: '/docs/components/actions', label: 'Actions' },
-          { href: '/docs/components/actions/button', label: 'Button' },
-          { label: 'Props' },
+          { label: 'Button' },
         ]}
       />
       <Breadcrumb
-        aria-label="home icon"
-        showHome
+        aria-label="current"
         items={[
-          { href: '/', label: 'Home' },
           { href: '/docs', label: 'Docs' },
           { label: 'Button' },
         ]}

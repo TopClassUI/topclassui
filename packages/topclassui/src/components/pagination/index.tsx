@@ -12,9 +12,9 @@ import { en } from '#shared/labels/en.js'
 import { createNumberFormat } from '#shared/labels/get-labels.js'
 import { renderLink } from '#shared/link.js'
 import { Svg } from '#components/svg/index.js'
-import { CELL_GAP, CELL_SIZE, COMPACT, FULL, LIST, LIST_GAP, STATUS, STATUS_SIZE } from './classes.js'
+import { CELL_GAP, CELL_SIZE, COMPACT, FULL, LIST, LIST_GAP, ROOT, ROW_AT, STATUS, STATUS_SIZE } from './classes.js'
 import { PAGINATION_DEFAULTS } from './constants.js'
-import { clampPage, clampPageCount, listPages } from './lib.js'
+import { clampPage, clampPageCount, listPages, measureRow, pickRowStep } from './lib.js'
 import type { PaginationLinkParts, PaginationProps } from './types.js'
 import { paginationVariants } from './variants.js'
 
@@ -32,6 +32,7 @@ export function Pagination({
   labels = en,
   locale = PAGINATION_DEFAULTS.locale,
   'aria-label': ariaLabel,
+  className,
   ...rest
 }: PaginationProps) {
   const count = clampPageCount(pageCount)
@@ -39,6 +40,9 @@ export function Pagination({
   const numbers = createNumberFormat(locale)
   const text = labels.pagination
   const cell = paginationVariants({ size })
+  const items = listPages({ value: page, pageCount: count, siblingCount, boundaryCount })
+  // custom draws cells this file cannot measure, so it keeps the 36rem the row had before it was measured.
+  const step = size === 'custom' ? 36 : pickRowStep(measureRow(items.map((item) => typeof item === 'number' ? numbers.format(item) : ''), size))
 
   // An empty aria-label names nothing; a caller with two navs on a page names each.
   const name = ariaLabel === undefined || ariaLabel === '' ? text.label : ariaLabel
@@ -66,15 +70,15 @@ export function Pagination({
 
   // The rest goes first, so data-size and the name are the ones Pagination worked out.
   return (
-    <nav {...rest} aria-label={name} data-size={size} data-disabled={disabled ? '' : undefined}>
+    <nav {...rest} aria-label={name} data-size={size} data-disabled={disabled ? '' : undefined} className={cn(ROOT, className)}>
       <ul
         // Preflight removes the list style, and Safari with VoiceOver then drops the list semantics.
         role="list"
-        className={cn(LIST, LIST_GAP[size])}
+        className={cn(LIST, LIST_GAP[size], ROW_AT[step])}
       >
         {control(1, text.first, caretDoubleLeft, page === 1)}
         {control(page - 1, text.previous, caretLeft, page === 1, 'prev')}
-        {listPages({ value: page, pageCount: count, siblingCount, boundaryCount }).map((item) => {
+        {items.map((item) => {
           if (typeof item !== 'number') {
             return <li key={item} aria-hidden="true" className={cn(CELL_GAP, CELL_SIZE[size], FULL)}><Svg icon={dotsThree} /></li>
           }

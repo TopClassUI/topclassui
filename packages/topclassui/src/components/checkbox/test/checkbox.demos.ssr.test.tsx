@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'labelled', 'playground', 'rtl', 'sizes', 'states']
+const EXPECTED = ['basic', 'combined', 'form', 'labelled', 'playground', 'rtl', 'sizes', 'states']
 
 /** Each box of each demo, as the server writes it: its name, by aria-label, by a label[for] or by a wrapping label, and its state. */
 const BOXES: Record<string, string[]> = {
@@ -21,10 +21,11 @@ const BOXES: Record<string, string[]> = {
   'playground': ['I accept the terms: true'],
   'rtl': ['أوافق على الشروط: true', 'أرسل لي أخبار المنتج: false'],
   'sizes': ['Extra small: true', 'Small: true', 'Medium: true', 'Large: true', 'Extra large: true'],
-  'states': [
+  'combined': [
     'Unchecked: false', 'Checked: true', 'Indeterminate: mixed', 'Invalid: false', 'Invalid, checked: true',
     'Invalid, indeterminate: mixed', 'Disabled: false', 'Disabled, checked: true', 'Read-only: true',
   ],
+  'states': ['unchecked: false', 'checked: true', 'indeterminate: mixed', 'hover: false', 'focus-visible: false', 'disabled: false'],
 }
 
 const render = async (file: string) => {
@@ -44,7 +45,7 @@ function boxesIn(html: string): string[] {
 }
 
 describe('every demo renders on the server', () => {
-  it('holds exactly the seven demos asked for, so none can be deleted silently', () => {
+  it('holds exactly the eight demos asked for, so none can be deleted silently', () => {
     expect(files).toEqual(EXPECTED)
   })
 

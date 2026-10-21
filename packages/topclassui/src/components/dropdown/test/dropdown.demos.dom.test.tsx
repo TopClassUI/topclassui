@@ -31,7 +31,7 @@ const SHOWN: Record<string, Shown[]> = {
   'groups': [{ trigger: 'View', rows: ['Name', 'Last edited', 'Grid', 'Table'] }],
   'in-dialog': [{ trigger: 'Role', rows: ['Viewer', 'Editor', 'Owner'] }],
   'placements': PLACES.map((place) => ({ trigger: place, rows: TWO })),
-  'playground': [{ trigger: 'Actions', rows: ['Profile Ctrl P', 'Settings', 'Duplicate', 'Delete'] }],
+  'playground': [{ trigger: 'Actions', rows: ['Profile Ctrl P', 'Settings', 'Duplicate', 'Delete Del'] }],
   'rtl': [
     { trigger: 'الإجراءات', rows: ['الملف الشخصي Ctrl P', 'الإعدادات', 'حذف'] },
     { trigger: 'المزيد', rows: ['نسخ الرابط', 'إعادة التسمية'] },
@@ -40,8 +40,8 @@ const SHOWN: Record<string, Shown[]> = {
   // The first press closes the two menus drawn open, as a press outside any menu does; then each opens from its trigger.
   'states': [
     { trigger: 'Actions', rows: ['Profile', 'Settings'] },
-    { trigger: 'Actions', rows: ['Profile Ctrl P', 'Settings', 'Duplicate', 'Delete'] },
-    { trigger: 'Actions', rows: ['Duplicate', 'Rename'] },
+    { trigger: 'Actions', rows: ['Edit', 'Delete'] },
+    { trigger: 'Actions', rows: ['Edit', 'Delete'] },
   ],
   'with-links': [{ trigger: 'Help', rows: ['Documentation', 'Changelog', 'Contact support', 'Status page'] }],
 }

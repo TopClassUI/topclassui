@@ -9,11 +9,26 @@ import {
 } from '../index.js'
 import type { DialogDesignProps } from '../types.js'
 
-/** The dialog drawn open inside its own box over a scrim, as the frame draws it: not modal, and it takes no focus. */
+const BAR = 'min-h-2 rounded-chip bg-surface-raised'
+
+/** The page behind the scrim, as the frame draws it: four bars of text, hidden from a reader. */
+function PageBehind() {
+  return (
+    <div aria-hidden className="absolute inset-0 flex flex-col gap-2 p-6">
+      <div className={`${BAR} w-1/2`} />
+      <div className={`${BAR} w-4/5`} />
+      <div className={`${BAR} w-2/3`} />
+      <div className={`${BAR} w-2/5`} />
+    </div>
+  )
+}
+
+/** The dialog drawn open inside its own box over the page and a scrim, as the frame draws it: not modal, and it takes no focus. */
 function Stage({ size, closeButton }: DialogDesignProps) {
   const root = useRef<HTMLDivElement>(null)
   return (
     <div ref={root} data-stage="" className="relative min-h-87 w-full [contain:paint]">
+      <PageBehind />
       <div aria-hidden className="absolute inset-0 bg-overlay" />
       <DialogRoot defaultOpen modal={false}>
         <DialogPopup size={size} container={root} initialFocus={false}>

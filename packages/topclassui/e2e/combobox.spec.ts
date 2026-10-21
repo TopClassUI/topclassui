@@ -101,7 +101,7 @@ test.describe('the server HTML, before any script runs', () => {
 
   test('invalid: the line turns to danger and thickens; disabled dims to half on the surface; read-only looks like idle', async ({ page }) => {
     await page.goto(urlFor('combobox--states', 'light', 'ltr'))
-    const [invalid, disabled, readOnly, live] = ['Invalid', 'Disabled', 'Read-only', 'One option disabled'].map((name) => inputOf(page, name))
+    const [invalid, disabled, readOnly, live] = ['invalid', 'disabled', 'read-only', 'one option disabled'].map((name) => inputOf(page, name))
     if (!invalid || !disabled || !readOnly || !live) throw new Error('a state is missing')
     expect(await invalid.getAttribute('aria-invalid')).toBe('true')
     expect(await css(invalid, 'box-shadow')).toContain('0px 0px 0px 1px inset')
@@ -170,14 +170,14 @@ test.describe('live: the keyboard, as the editable combobox of the Authoring Pra
   })
 
   test('a disabled option takes the highlight, is dimmed, and neither Enter nor a click chooses it', async ({ page }) => {
-    await open(page, 'combobox--states', 'One option disabled')
+    await open(page, 'combobox--states', 'one option disabled')
     for (let press = 0; press < 3; press++) await page.keyboard.press('ArrowDown')
     expect((await activeOf(page)).text).toBe('Morocco')
     const morocco = page.getByRole('option', { name: 'Morocco' })
     expect(await css(morocco, 'opacity')).toBe('0.5')
     await page.keyboard.press('Enter')
     await morocco.click({ force: true })
-    expect(await inputOf(page, 'One option disabled').inputValue()).toBe('')
+    expect(await inputOf(page, 'one option disabled').inputValue()).toBe('')
   })
 })
 

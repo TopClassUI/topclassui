@@ -1,6 +1,7 @@
 // Pure: the page list is worked out here, so it is tested without rendering anything.
 import { clamp } from '#shared/clamp.js'
 import { PAGINATION_BOUNDARIES } from './boundaries.js'
+import { PAGINATION_CELL_PX, PAGINATION_ROW_STEPS, PAGINATION_ROW_WIDEST } from './constants.js'
 import type { PaginationItem, PaginationRange } from './types.js'
 
 /** Number() first: clamp only catches a real NaN, so a string from a JavaScript
@@ -49,4 +50,16 @@ export function listPages({ value, pageCount, siblingCount, boundaryCount }: Pag
     after,
     ...range(count - boundary + 1, count),
   ]
+}
+
+/** The full row's width in px: four arrows, then each page by its digits and each gap ('') at a page's floor. */
+export function measureRow(cells: readonly string[], size: keyof typeof PAGINATION_CELL_PX): number {
+  const px = PAGINATION_CELL_PX[size]
+  const pages = cells.map((cell) => Math.max(px.page, cell.length * px.digit + px.padding))
+  return px.arrow * 4 + pages.reduce((sum, width) => sum + width, 0) + px.gap * (cells.length + 3)
+}
+
+/** The narrowest step, in rem at 16 px, that holds the row; a row past the widest takes the widest. */
+export function pickRowStep(px: number): (typeof PAGINATION_ROW_STEPS)[number] {
+  return PAGINATION_ROW_STEPS.find((step) => step * 16 >= px) ?? PAGINATION_ROW_WIDEST
 }

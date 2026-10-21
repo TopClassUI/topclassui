@@ -93,6 +93,8 @@ const DECLARATION: Record<string, string> = {
   'forced-colors:bg-[Highlight]': 'background-color: Highlight;',
   'forced-colors:text-[HighlightText]': 'color: HighlightText;',
   'forced-colors:[--tc-ring:CanvasText]': '--tc-ring: CanvasText;',
+  // Another row: its ring inside its box under forced colours.
+  'forced-colors:focus-visible:-outline-offset-(length:--tc-ring-width)': 'outline-offset: calc(var(--tc-ring-width) * -1);',
 }
 
 /** The attribute, the state or the pseudo-element each variant class must be scoped to, or it would paint everywhere. */
@@ -131,7 +133,7 @@ describe('every class Sidebar writes compiles with the installed Tailwind', () =
 
   it('the table names exactly the classes of classes.ts, and the one that only marks the group', () => {
     expect(written).toEqual([...Object.keys(DECLARATION), 'group/sidebar'].sort())
-    expect(written).toHaveLength(77)
+    expect(written).toHaveLength(78)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {
