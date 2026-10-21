@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs'
 import { expect, test, type Page } from '@playwright/test'
 
 import { TARGETS } from '../../../packages/topclassui/scripts/lib/targets.js'
+import { STAGE, STATE_GRID, TRY_IT } from '../components/classes'
 import { LIVE_PAGES, LOCALES, hrefOf } from '../content/pages'
 import { axeViolations } from './pages'
 
@@ -18,6 +19,10 @@ const SITEMAP = LOCALES.flatMap((locale) => [
 // Home, the catalog, a guide and a component page, at the narrowest phone, the widest one and a tablet.
 const SAMPLES = LOCALES.flatMap((locale) => ['', '/docs/components', '/docs/installation', '/docs/components/table'].map((path) => `/${locale}${path}`))
 const WIDTHS = [360, 418, 768] as const
+/** The two phones every page is read at in the dark: the common one and the narrowest. */
+const PHONES = [{ width: 390, height: 844 }, { width: 360, height: 800 }] as const
+/** A state cell's floor, 9rem, unless the strip itself is narrower. */
+const CELL_MIN = 144
 
 /** The library's own boxes under 44 px on a phone, each left to the component job named (packages/topclassui, not the site). */
 const LIBRARY_SHORTFALLS: Record<string, string> = {
@@ -88,6 +93,73 @@ async function smallTargets(page: Page, path = ''): Promise<string[]> {
   }), [shortfalls, pageSlug] as const)
 }
 
+/** Every stage, of the Previewer or of an example, whose demo is wider than the phone and scrolls it sideways. */
+async function stageScrolls(page: Page): Promise<string[]> {
+  return page.evaluate((stage) => [...document.querySelectorAll('main *')].filter((element) => {
+    const name = element.getAttribute('class') ?? ''
+    return (name === stage || name.startsWith(`${stage} `)) && element.scrollWidth > element.clientWidth + 1
+  }).map((element) => {
+    const owner = element.closest('[data-example-name]')?.getAttribute('data-example-name') ?? element.closest('[data-component]')?.getAttribute('data-component') ?? ''
+    return `${owner} ${String(element.scrollWidth)} > ${String(element.clientWidth)}`
+  }), STAGE)
+}
+
+/** Every state strip whose cells are crushed under 9rem, leave the strip, or let their state stick out of the cell. */
+async function stripFaults(page: Page): Promise<string[]> {
+  return page.evaluate(([grid, floor]) => [...document.querySelectorAll('ul')].filter((list) => list.getAttribute('class') === grid).flatMap((list) => {
+    const owner = list.closest('[data-component]')?.getAttribute('data-component') ?? list.closest('main')?.querySelector('h1')?.textContent ?? ''
+    const strip = list.getBoundingClientRect()
+    return [...list.children].flatMap((cell) => {
+      const box = cell.getBoundingClientRect()
+      const label = `${owner} "${cell.textContent.trim().slice(0, 24)}"`
+      if (box.width < Math.min(floor, strip.width) - 0.5) return [`${label} ${String(Math.round(box.width))} px wide`]
+      if (box.left < strip.left - 0.5 || box.right > strip.right + 0.5) return [`${label} leaves the strip`]
+      const out = [...cell.querySelectorAll('*')].some((element) => {
+        const inner = element.getBoundingClientRect()
+        if (inner.width <= 1 || element.closest('.sr-only') !== null) return false
+        // A part that scrolls or clips its own content inside the cell answers for what it holds.
+        for (let parent = element.parentElement; parent !== null && parent !== cell; parent = parent.parentElement) {
+          if (getComputedStyle(parent).overflowX !== 'visible') return false
+        }
+        return inner.left < box.left - 0.5 || inner.right > box.right + 0.5
+      })
+      return out ? [`${label} sticks out of its cell`] : []
+    })
+  }), [STATE_GRID, CELL_MIN] as const)
+}
+
+/** Inside every card and page: a box cut by an ancestor that hides overflow, text cut without an ellipsis, code or a Try it control under 12 px. */
+async function clipFaults(page: Page): Promise<string[]> {
+  return page.locator('main').evaluate((main, tryIt) => {
+    const shown = (element: Element) => {
+      const box = element.getBoundingClientRect()
+      return box.width > 1 && box.height > 1 && getComputedStyle(element).visibility !== 'hidden' && element.closest('.sr-only, [aria-hidden="true"], [inert]') === null
+    }
+    const name = (element: Element) => `${element.closest('[data-component]')?.getAttribute('data-component') ?? ''} ${element.tagName.toLowerCase()} "${element.textContent.trim().slice(0, 30)}"`
+    const faults: string[] = []
+    for (const element of main.querySelectorAll('*')) {
+      if (!shown(element)) continue
+      const box = element.getBoundingClientRect()
+      for (let parent = element.parentElement; parent !== null && parent !== main; parent = parent.parentElement) {
+        const overflow = getComputedStyle(parent).overflowX
+        if (overflow === 'visible') continue
+        if (overflow === 'hidden' || overflow === 'clip') {
+          const frame = parent.getBoundingClientRect()
+          if (box.left < frame.left - 1 || box.right > frame.right + 1) faults.push(`${name(element)} cut by ${parent.tagName.toLowerCase()}`)
+        }
+        break
+      }
+      const style = getComputedStyle(element)
+      const text = [...element.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && (node.textContent ?? '').trim() !== '')
+      if (!text) continue
+      if (['hidden', 'clip'].includes(style.overflowX) && style.textOverflow !== 'ellipsis' && element.scrollWidth > element.clientWidth + 1) faults.push(`${name(element)} text cut`)
+      const read = element.closest('pre') !== null || element.closest(`[class="${tryIt}"]`) !== null
+      if (read && Number.parseFloat(style.fontSize) < 12) faults.push(`${name(element)} ${style.fontSize}`)
+    }
+    return faults
+  }, TRY_IT)
+}
+
 async function measure(page: Page, path: string) {
   const response = await page.goto(path)
   expect(response?.status(), path).toBe(200)
@@ -141,6 +213,42 @@ test.describe('on a phone', () => {
         expect(overflow, 'horizontal overflow').toEqual([])
         expect(rows, 'navbar rows').toBeLessThanOrEqual(2)
         expect(small, 'targets under 44 px').toEqual([])
+      })
+    }
+  }
+})
+
+test.describe('on a phone in the dark', () => {
+  test.use({ hasTouch: true, isMobile: true, colorScheme: 'dark' })
+
+  for (const phone of PHONES) {
+    for (const path of SITEMAP) {
+      test(`${path} at ${String(phone.width)}: no sideways scroll, stages inside the phone, strips wrapping, nothing clipped, targets of 44 px`, async ({ page }) => {
+        test.setTimeout(90_000)
+        await page.setViewportSize(phone)
+        const { overflow, rows, small } = await measure(page, path)
+        expect(overflow, 'horizontal overflow').toEqual([])
+        expect(rows, 'navbar rows').toBeLessThanOrEqual(2)
+        expect(small, 'targets under 44 px').toEqual([])
+        expect(await stageScrolls(page), 'stages scrolling sideways').toEqual([])
+        expect(await stripFaults(page), 'state strips').toEqual([])
+        expect(await clipFaults(page), 'clipped or small text').toEqual([])
+      })
+    }
+
+    for (const locale of LOCALES) {
+      test(`/${locale}/docs/components at ${String(phone.width)}: the open search palette sits inside the phone with options of 44 px`, async ({ page }) => {
+        await page.setViewportSize(phone)
+        await page.goto(`/${locale}/docs/components`)
+        await page.locator('[data-search-button]').first().click()
+        const dialog = page.getByRole('dialog')
+        await expect(dialog.getByRole('option').first()).toBeVisible()
+        await dialog.evaluate((element) => Promise.all(element.getAnimations({ subtree: true }).map((animation) => animation.finished)))
+        const box = await dialog.boundingBox()
+        expect(box?.x ?? -1).toBeGreaterThanOrEqual(0)
+        expect((box?.x ?? 0) + (box?.width ?? phone.width + 1)).toBeLessThanOrEqual(phone.width)
+        expect(await overflowOf(page), 'horizontal overflow').toEqual([])
+        expect(await smallTargets(page), 'targets under 44 px').toEqual([])
       })
     }
   }
