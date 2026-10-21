@@ -76,7 +76,7 @@ export function destage(source: string): string {
     const end = closeOf(body, body.indexOf('{', at))
     body = body.slice(0, lineStart) + body.slice(end).replace(/^\n/, '')
   }
-  body = body.replace(/^[ \t]*if \(stage\) return [^\n]*\n/m, '')
+  body = body.replace(/^[ \t]*if \(stage(?: &&[^\n]*)?\) return [^\n]*\n/m, '')
   // A demo that returns its tree unless it is the stage: that tree is the demo, and the box after it goes.
   const plain = /^([ \t]*)if \(!stage\) return (\w+)\n/m.exec(body)
   if (plain !== null) body = `${body.slice(0, plain.index)}${plain[1] ?? ''}return ${plain[2] ?? ''}\n`
