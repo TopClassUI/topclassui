@@ -182,8 +182,9 @@
   from { opacity: 0; scale: 0.96; }
 }
 
+/* Down only: a sideways drift widens the page in RTL, where the start side scrolls. */
 @keyframes docs-glow-drift {
-  to { translate: calc(3rem * var(--tc-dir) * var(--tc-motion)) calc(5rem * var(--tc-motion)); }
+  to { translate: 0 calc(5rem * var(--tc-motion)); }
 }
 
 @keyframes docs-count-run {
