@@ -192,6 +192,47 @@ describe('the shipped tokens', () => {
   })
 })
 
+describe('a theme scoped to a section inside another mode', () => {
+  const real = readBlocks(readFileSync(join(process.cwd(), 'src', 'tokens.css'), 'utf8'))
+  // A nested element matches no :root, only the blocks that name its own theme or every theme; the rest it inherits.
+  const reaches = (selector: string, section: string) => selector.split(',').map((part) => part.trim())
+    .some((part) => part === '[data-theme]' || part === `[data-theme='${section}']`)
+  const scoped = (page: string, section: string) => {
+    const out = tokensFor(real, page)
+    for (const block of real) if (reaches(block.selector, section)) for (const [k, v] of block.decls) out.set(k, v)
+    return out
+  }
+  const NEUTRALS = ['--tc-page', '--tc-surface', '--tc-surface-raised', '--tc-body', '--tc-muted', '--tc-line', '--tc-line-strong']
+  const COLOURS = [
+    ...NEUTRALS, '--tc-overlay', '--tc-ring', '--tc-scrollbar-thumb', '--tc-neutral-solid-thumb',
+    ...['primary', 'neutral', 'success', 'warning', 'danger', 'info'].flatMap((t) => [
+      `--tc-${t}-solid`, `--tc-${t}-on-solid`, `--tc-${t}-soft`, `--tc-${t}-on-soft`,
+      `--tc-${t}-hover`, `--tc-${t}-active`, `--tc-${t}-soft-hover`, `--tc-${t}-soft-active`,
+    ]),
+  ]
+  const reading = (tokens: Map<string, string>, name: string) => JSON.stringify(resolve(name, tokens, palette))
+  const differ = (section: Map<string, string>, page: Map<string, string>) =>
+    COLOURS.filter((name) => reading(section, name) !== reading(page, name))
+
+  it('gives an ocean section in a dark page the light neutrals and ocean\'s own primary', () => {
+    const ocean = scoped('dark', 'ocean')
+    expect([...NEUTRALS, '--tc-primary-solid', '--tc-primary-mix', '--tc-radius'].map((name) => ocean.get(name))).toEqual([
+      'var(--color-white)', 'var(--color-neutral-50)', 'var(--color-white)', 'var(--color-neutral-950)',
+      'var(--color-neutral-600)', 'var(--color-neutral-200)', 'var(--color-neutral-500)',
+      'var(--color-cyan-700)', '12%', '9999px',
+    ])
+  })
+
+  it('reads every colour of an ocean section in a dark page as an ocean page does', () => {
+    expect(differ(scoped('dark', 'ocean'), tokensFor(real, 'ocean'))).toEqual([])
+  })
+
+  it('reads a light section in a dark page as light, and a dark section in an ocean page as dark', () => {
+    expect(differ(scoped('dark', 'light'), tokensFor(real, 'light'))).toEqual([])
+    expect(differ(scoped('ocean', 'dark'), tokensFor(real, 'dark'))).toEqual([])
+  })
+})
+
 describe('a token has to exist in every mode, not only the one it was added for', () => {
   const css = (body: string) => readBlocks(body)
 

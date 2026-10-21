@@ -6,6 +6,16 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-21 - Ocean is a light mode on a section too, and the mono token names each platform's font
+
+**Decision.** `[data-theme='ocean']` joins `:root` and `[data-theme='light']` on the block of light colours in `src/tokens.css`, so an ocean section inside a dark page gets the light neutrals, tints and scrollbar under its own cyan primary and pill radius, as Theming's "Scoping a theme to a section" shows; before, it kept the dark page's neutrals under `color-scheme: light`. The dark block now sets the four primary tokens ocean changes (solid, on-solid, hover, active, to light's values), so a dark section inside an ocean page loses the cyan. `--tc-font-mono` is `ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace`: `ui-monospace` resolves only in Safari, and Chromium on Windows fell back to Courier New.
+
+**Why.** A mode block only redeclares what it names, and a nested element never matches `:root`, so a section inherits every token its mode leaves out from the page around it. The contrast sweep models ocean only as a whole page, so it could not see this; `scripts/lib/tokens.test.ts` now checks an ocean section in a dark page, a light one in dark and a dark one in ocean against the whole-page modes.
+
+**Affects.** `src/tokens.css`, `src/scrollbar.test.ts` (the light block's selector) and `scripts/lib/tokens.test.ts`. The site's `blockSource` (`apps/docs/scripts/lib/guides.ts`) skips a selector list that ends in the same selector, so the ocean sample on Theming is still the ocean block. Contrast at the page level is unchanged (390 pairs, 230 distinct readings). Theming's "It changes one tone and one knob" stays true of the ocean block. A consumer's own mode written as one block still inherits the neutrals around a scoped section, unless its selector joins the light or dark block the same way.
+
+---
+
 ## 2026-10-19 - The round-8 library raises the tarball budget to 3,150,000 bytes and Sidebar's to 6.2 KB
 
 **Decision.** The thirteen round-8 branches stacked together (the library integrator, job 131) pack 3,114,237 bytes unpacked, over the 3,050,000 the 2026-10-18 entry set; the base cf1ec12 packs 2,986,683, so round 8 adds 127,555 bytes. `SIZE_BUDGET_BYTES` in `scripts/lib/pack-checks.ts` rises to 3,150,000, the measured size plus about 1 %, so it stays a guard rail. In the same stack Sidebar's own client half measures 6,246 bytes against the 6 KB simple-control budget of `pnpm size`, and its entry in `size-budget.json` becomes 6.2 KB, as job 118 raised fifteen others to what was measured.
