@@ -109,17 +109,16 @@ describe('every demo opens the sheet its trigger names', () => {
 })
 
 describe('the states strip, one cell per state the frame draws', () => {
-  it('captions each cell by its title, and draws the side and the bottom sheet open inside their own cell', async () => {
+  it('captions each cell by its title, and draws the side, bottom, dragging and trapped sheets open inside their own cell', async () => {
     const loaded = await import('../dummy/states.js') as { default: ComponentType }
     const { container } = render(<loaded.default />)
     const cells = [...(container.firstElementChild?.children ?? [])]
-    expect(cells.map((cell) => cell.getAttribute('title'))).toEqual(['closed', 'side sheet', 'bottom sheet'])
+    expect(cells.map((cell) => cell.getAttribute('title'))).toEqual(['closed', 'side sheet', 'bottom sheet', 'dragging', 'focus trapped'])
     const dialogs = await screen.findAllByRole('dialog')
     expect(dialogs.map((dialog) => [dialog.querySelector('h2')?.textContent, dialog.getAttribute('data-placement')]))
-      .toEqual([['sheet', 'end'], ['sheet', 'bottom']])
-    expect(cells[1]?.contains(dialogs[0] ?? null)).toBe(true)
-    expect(cells[2]?.contains(dialogs[1] ?? null)).toBe(true)
-    expect(cells.map((cell) => cell.querySelectorAll(':scope > .bg-overlay').length)).toEqual([0, 1, 1])
+      .toEqual([['sheet', 'end'], ['sheet', 'bottom'], ['sheet', 'end'], ['sheet', 'end']])
+    expect(dialogs.map((dialog) => cells.findIndex((cell) => cell.contains(dialog)))).toEqual([1, 2, 3, 4])
+    expect(cells.map((cell) => cell.querySelectorAll(':scope > .bg-overlay').length)).toEqual([0, 1, 1, 1, 1])
     expect(document.querySelectorAll('[data-base-ui-portal] > [data-base-ui-inert]')).toHaveLength(0)
     expect(dialogs.some((dialog) => dialog.contains(document.activeElement))).toBe(false)
     expect(within(cells[0] as HTMLElement).getByRole('button', { name: 'Open' }).getAttribute('aria-expanded')).toBe('false')

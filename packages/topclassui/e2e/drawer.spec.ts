@@ -167,7 +167,7 @@ test.describe('the states strip', () => {
     test(`${direction}: the side and the bottom sheet stand open at their edge of their own cell, whole inside it, and neither holds the focus`, async ({ page }) => {
       await openLive(page, 'drawer--states', { direction })
       expect(await cellOf(page, 'closed').locator('xpath=..').locator(':scope > *').evaluateAll((cells) => cells.map((cell) => cell.getAttribute('title'))))
-        .toEqual(['closed', 'side sheet', 'bottom sheet'])
+        .toEqual(['closed', 'side sheet', 'bottom sheet', 'dragging', 'focus trapped'])
       await expect(cellOf(page, 'closed').locator('[role="dialog"]')).toHaveCount(0)
       for (const [title, name] of [['side sheet', 'sheet'], ['bottom sheet', 'sheet']] as const) {
         const cell = cellOf(page, title)
