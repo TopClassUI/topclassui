@@ -44,7 +44,7 @@ test('Banner: the playground drives the tone and the x, in Arabic', async ({ pag
   await page.goto('/ar/docs/components/banner')
   const banner = card(page, 'banner')
   // The playground demo starts dismissible, as the frame draws it, so Try it starts with the box checked.
-  const stage = banner.getByRole('region', { name: 'Release announcement' }).first()
+  const stage = banner.getByRole('region', { name: 'Version 0.2 announcement' }).first()
   await expect(banner.getByRole('checkbox', { name: 'dismissible' })).toBeChecked()
   await choose(page, 'banner', 'tone', 'warning')
   await expect(stage).toHaveAttribute('data-tone', 'warning')
