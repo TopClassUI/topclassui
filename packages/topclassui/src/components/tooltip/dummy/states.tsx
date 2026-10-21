@@ -9,9 +9,9 @@ import { Button } from '#components/button/index.js'
 import { Svg } from '#components/svg/index.js'
 import { TooltipPopup, TooltipRoot, TooltipTrigger } from '../index.js'
 
-const CELL = 'relative flex h-36 w-48 items-center justify-center overflow-hidden rounded-box border-(length:--tc-line-width) border-line [contain:paint]'
+const CELL = 'relative flex h-28 items-center justify-center overflow-hidden [contain:paint]'
 
-/** Every state the frame draws, one cell each, captioned by its title: the hidden tooltip of a trigger
+/** Every state the frame draws, one equal cell each, captioned by its title: the hidden tooltip of a trigger
  * at rest, then one held open above its trigger and one below, each inside its own cell. Held by open,
  * since the provider's delay group closes an open tooltip as soon as another one opens. */
 export default function Demo() {
@@ -19,8 +19,8 @@ export default function Demo() {
   const [top, setTop] = useState<HTMLDivElement | null>(null)
   const [bottom, setBottom] = useState<HTMLDivElement | null>(null)
   return (
-    <div className="flex flex-wrap items-start gap-4">
-      <div title="hidden" className="flex h-36 w-48 items-center justify-center">
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] gap-4">
+      <div title="hidden" className="flex h-28 items-center justify-center">
         <TooltipRoot>
           <TooltipTrigger
             render={
