@@ -140,8 +140,10 @@ export const FLAT_CODE = 'docs-flat-code bg-transparent text-body [--tc-ring:var
 /** The same code in a bordered box on the page background, as Before you start draws it. */
 export const BOXED_CODE = `${FLAT_CODE} rounded-control bg-page p-3 ${BORDER}`
 /** A one-line copy field of the install row: the text, then its copy button. */
-export const COPY_FIELD = `flex min-w-0 items-center gap-2 rounded-control bg-page ps-3 pe-1 ${BORDER}`
-export const COPY_FIELD_TEXT = 'min-w-0 flex-1 py-2 font-mono text-xs text-body wrap-anywhere'
+export const COPY_FIELD = `flex min-w-0 items-center gap-0.5 rounded-control bg-page ps-2.5 pe-0 ${BORDER}`
+/** The frames' 11 px mono: a 59-character import line fits a 932 px card's half beside a 24 px copy target. */
+export const COPY_FIELD_TEXT = 'min-w-0 flex-1 py-2 font-mono text-[0.6875rem] leading-4 text-body wrap-anywhere'
+export const COPY_FIELD_BUTTON = 'size-6 px-0'
 /** The two install columns side by side at 40rem and up, stacked below. */
 export const INSTALL_ROW = 'grid min-w-0 border-t-(length:--tc-line-width) border-line sm:grid-cols-2'
 export const INSTALL_COL = 'grid min-w-0 content-start gap-2 p-4.5'
