@@ -8,5 +8,5 @@ Figma tools: the cloud proxy blocks www.figma.com itself; the Figma MCP get_scre
 
 | Job | Branch | Base | Tip | Commits | Gates | Composites and what is left for Omar |
 | --- | --- | --- | --- | --- | --- | --- |
-| 133 Site integration repair | preview/r8-all (and fix/r9-library from c0ee519a if a library demo is the cause) | preview/r8-all 81239358 | started 18:05 UTC | - | - | - |
+| 133 Site integration repair | preview/r8-all (and fix/r9-library from c0ee519a if a library demo is the cause) | preview/r8-all 81239358 | 81239358 (repair in progress) | 0 so far | first docs:check on 81239358: exit 1; docs:data 0 (52 folders, 46 cards, 477 demos, 0 issues), typecheck 0, lint 0, vitest 0 (38 files, 262 passed), docs:build 0, check:static 0 (24 routes, 133 required paths, 126 OG images), test:e2e 1 (779 passed, 85 failed: overlay-pages 53, mobile 12, preview-route 7, data-pages 7, motion 3, seo 2, navigation, forms, feedback 1 each), list:todo not reached | repairing; fix/r9-library 1800bd83 (stepper disabled step dims its mark row only, title keeps 4.5:1) committed locally, not pushed yet |
 | 134 Figma parity of the 45 component cards | fix/r9-parity from c0ee519a (library), preview/r8-all after 133 is green (site) | c0ee519a / preview/r8-all 81239358 | started 18:05 UTC | - | - | - |
