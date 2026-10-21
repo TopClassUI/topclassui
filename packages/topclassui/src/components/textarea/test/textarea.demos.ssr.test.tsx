@@ -25,7 +25,7 @@ const TEXTAREAS: Record<string, string[]> = {
   'show-count': ['Always counted: 3', 'Counted near the cap: 3', 'At the cap: 3', 'No cap: 3'],
   'sizes': ['Extra small: 3', 'Small: 3', 'Medium: 3', 'Large: 3', 'Extra large: 3'],
   'skeleton': ['Message, xs: 3', 'Message, sm: 3', 'Message, md: 3', 'Message, lg: 3', 'Message, xl: 3', 'One row: 1', 'Full width: 5'],
-  'states': ['Idle: 3', 'Filled: 3', 'Invalid: 3', 'Disabled: 3', 'Read-only: 3', 'Required: 3', 'At limit: 3'],
+  'states': ['idle: 2', 'hover: 2', 'focus-visible: 2', 'disabled: 2', 'invalid: 2', 'Message at its limit: 2'],
 }
 
 const render = async (file: string) => {

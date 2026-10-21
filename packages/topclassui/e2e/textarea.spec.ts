@@ -89,9 +89,9 @@ test.describe('invalid is told by more than colour', () => {
   test('the line turns to danger and an inset ring makes it 2 px thick; a valid field has neither', async ({ page }) => {
     await page.goto(urlFor('textarea--states', 'light', 'ltr'))
     const danger = await resolved(page, 'var(--tc-danger-solid)')
-    expect(await css(field(page, 'Invalid'), 'border-top-color')).toBe(danger)
-    expect(await css(field(page, 'Invalid'), 'box-shadow')).toContain(`${danger} 0px 0px 0px 1px inset`)
-    expect(await css(field(page, 'Filled'), 'box-shadow')).not.toContain('inset')
+    expect(await css(field(page, 'invalid'), 'border-top-color')).toBe(danger)
+    expect(await css(field(page, 'invalid'), 'box-shadow')).toContain(`${danger} 0px 0px 0px 1px inset`)
+    expect(await css(field(page, 'hover'), 'box-shadow')).not.toContain('inset')
   })
 
   for (const scheme of ['light', 'dark'] as const) {
@@ -101,8 +101,8 @@ test.describe('invalid is told by more than colour', () => {
       test('the line of an invalid field grows to 2 px, since the inset ring is not painted; the others keep 1 px', async ({ page }) => {
         await page.goto(urlFor('textarea--states', 'light', 'ltr'))
         expect(await page.evaluate(() => matchMedia('(forced-colors: active)').matches)).toBe(true)
-        expect(await css(field(page, 'Invalid'), 'border-top-width')).toBe('2px')
-        for (const name of ['Idle', 'Filled', 'Read-only']) expect(await css(field(page, name), 'border-top-width'), name).toBe('1px')
+        expect(await css(field(page, 'invalid'), 'border-top-width')).toBe('2px')
+        for (const name of ['idle', 'hover', 'disabled']) expect(await css(field(page, name), 'border-top-width'), name).toBe('1px')
       })
     })
   }
