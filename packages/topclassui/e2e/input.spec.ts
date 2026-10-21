@@ -140,7 +140,7 @@ for (const direction of ['ltr', 'rtl'] as const) {
 for (const mode of ['light', 'dark'] as const) {
   for (const direction of ['ltr', 'rtl'] as const) {
     test(`${mode} ${direction}: turning invalid thickens the line and moves nothing`, async ({ page }) => {
-      await page.goto(urlFor('input--states', mode, direction))
+      await page.goto(urlFor('input--state-matrix', mode, direction))
       const field = page.getByRole('textbox', { name: 'Filled' })
 
       const box = await boxOf(field)
@@ -162,7 +162,7 @@ test.describe('under forced colours', () => {
 
   for (const direction of ['ltr', 'rtl'] as const) {
     test(`${direction}: an invalid input still differs from a valid one, and is the same box`, async ({ page }) => {
-      await page.goto(urlFor('input--states', 'light', direction))
+      await page.goto(urlFor('input--state-matrix', 'light', direction))
       const field = page.getByRole('textbox', { name: 'Filled' })
       expect(await page.evaluate(() => matchMedia('(forced-colors: active)').matches)).toBe(true)
 
@@ -234,7 +234,7 @@ test('rtl: an email and a number read left-to-right, on the side the form starts
 // e2e/focus-ring.spec measures a button; this is the same ring on the first form control.
 for (const [mode, direction] of MODES.flatMap((one) => DIRECTIONS.map((side) => [one, side] as const))) {
   test(`${mode} ${direction}: tabbing to an input paints a ring outside its box`, async ({ page }) => {
-    await page.goto(urlFor('input--states', mode, direction))
+    await page.goto(urlFor('input--state-matrix', mode, direction))
     const first = page.locator('input').first()
     const box = await boxOf(first)
 

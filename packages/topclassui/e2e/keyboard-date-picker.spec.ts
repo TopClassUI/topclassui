@@ -107,7 +107,7 @@ test.describe('live: the date picker dialog by keyboard', () => {
 
     test(`${direction}: with nothing chosen, Enter opens on today with the ring, the keys start there, and Space chooses`, async ({ page }) => {
       await page.clock.setFixedTime(new Date(2026, 9, 15, 12))
-      await openLive(page, 'date-picker--states', { direction })
+      await openLive(page, 'date-picker--state-matrix', { direction })
       const empty = trigger(page)
       const popup = await openWith(page, 'Enter')
       const [today, next, home] = direction === 'ltr'

@@ -1,15 +1,24 @@
+import type { CSSProperties } from 'react'
+
 import { Input } from '../index.js'
 
-/** The states a server can render; hover and focus-visible are live in the browser. */
+/** The field as wide as the frame's cells draw it. */
+const CELL = { '--tc-input-width': '8rem' } as CSSProperties
+
+/** The line under the pointer and the ring of focus-visible, drawn at rest as the live states draw them; not under forced colours, where a ring at rest would read as focus. */
+const HOVER = 'border-body'
+const RING = 'not-forced-colors:outline-solid not-forced-colors:outline-(length:--tc-ring-width) not-forced-colors:outline-offset-(length:--tc-ring-offset) not-forced-colors:outline-ring'
+
+/** One cell per state the Previewer frame draws, in its order, named by its aria-label. */
 export default function Demo() {
   return (
-    <div className="grid max-w-sm gap-3">
-      <Input fullWidth placeholder="Enter your email" aria-label="Idle" />
-      <Input fullWidth defaultValue="omar@example.com" aria-label="Filled" />
-      <Input fullWidth disabled defaultValue="omar@example.com" aria-label="Disabled" />
-      <Input fullWidth readOnly defaultValue="omar@example.com" aria-label="Read-only" />
-      <Input fullWidth invalid defaultValue="omar@example" aria-label="Invalid" />
-      <Input fullWidth required placeholder="Required" aria-label="Required" />
+    <div className="flex flex-wrap items-center gap-6">
+      <Input placeholder="Email" aria-label="idle" style={CELL} />
+      <Input placeholder="Email" aria-label="hover" className={HOVER} style={CELL} />
+      <Input defaultValue="you@mail.com" aria-label="focus-visible" className={RING} style={CELL} />
+      <Input disabled placeholder="Email" aria-label="disabled" style={CELL} />
+      <Input readOnly defaultValue="you@mail.com" aria-label="read-only" style={CELL} />
+      <Input invalid defaultValue="you@mail.com" aria-label="invalid" style={CELL} />
     </div>
   )
 }

@@ -25,7 +25,7 @@ test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) 
 for (const direction of DIRECTIONS) {
   test.describe(direction, () => {
     test('Tab walks the live boxes in order and skips the disabled ones; Shift+Tab walks back', async ({ page }) => {
-      await openLive(page, 'checkbox--states', { direction })
+      await openLive(page, 'checkbox--state-matrix', { direction })
       expect(await walk(page, 7)).toEqual(['Unchecked', 'Checked', 'Indeterminate', 'Invalid', 'Invalid, checked', 'Invalid, indeterminate', 'Read-only'])
       expect(await walk(page, 2, 'Shift+Tab')).toEqual(['Invalid, indeterminate', 'Invalid, checked'])
     })
@@ -65,7 +65,7 @@ for (const direction of DIRECTIONS) {
     })
 
     test('Space on an indeterminate box leaves it mixed, its owner\'s to clear; on a read-only one changes nothing', async ({ page }) => {
-      await openLive(page, 'checkbox--states', { direction })
+      await openLive(page, 'checkbox--state-matrix', { direction })
       await walk(page, 3)
       await expect(boxOf(page, 'Indeterminate')).toBeFocused()
       await page.keyboard.press('Space')

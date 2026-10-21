@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'horizontal', 'long-content', 'playground', 'rtl', 'sizes', 'states']
+const EXPECTED = ['basic', 'form', 'horizontal', 'long-content', 'playground', 'rtl', 'sizes', 'state-matrix', 'states']
 
 /** Each group of each demo as the server writes it: its name, then each radio's text, a star on the checked one and a
  * caret on the one tab stop. */
@@ -23,10 +23,11 @@ const GROUPS: Record<string, string[]> = {
   'playground': ['Billing: Monthly | Yearly *^ | Lifetime'],
   'rtl': ['الفوترة: شهريًا | سنويًا *^ | مدى الحياة'],
   'sizes': ['Extra small: Extra small *^ | Off', 'Small: Small *^ | Off', 'Medium: Medium *^ | Off', 'Large: Large *^ | Off', 'Extra large: Extra large *^ | Off'],
-  'states': [
+  'state-matrix': [
     'Invalid: Invalid, checked *^ | Invalid', 'Disabled: Disabled, checked *^ | Disabled',
     'One disabled: Live, checked *^ | One disabled | Live', 'Read-only: Read-only, checked *^ | Read-only',
   ],
+  'states': ['unselected: ^', 'selected:  *^', 'hover: ^', 'focus-visible: ^', 'disabled: ', 'invalid: ^'],
 }
 
 const render = async (file: string) => {
@@ -97,8 +98,8 @@ describe('the demos the plan names', () => {
     expect(await render('rtl')).toMatch(/^<div class="isolate"><div dir="rtl" lang="ar" class="[^"]*">/)
   })
 
-  it('states: the invalid group says so, the disabled group disables every radio, the read-only one says so', async () => {
-    const html = await render('states')
+  it('state-matrix: the invalid group says so, the disabled group disables every radio, the read-only one says so', async () => {
+    const html = await render('state-matrix')
     expect(html).toMatch(/<div role="radiogroup" aria-label="Invalid" aria-invalid="true"/)
     expect(html).toMatch(/<div data-disabled="" role="radiogroup" [^>]*aria-label="Disabled"/)
     expect(html).toMatch(/<div data-disabled="" role="radiogroup" aria-disabled="true"/)

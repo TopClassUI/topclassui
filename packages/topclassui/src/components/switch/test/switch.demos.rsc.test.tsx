@@ -52,7 +52,7 @@ const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { 
 
 describe('every demo is a Server Component that only hands Switch what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'form', 'playground', 'rtl', 'sizes', 'states', 'unchecked-value'])
+    expect(names).toEqual(['basic', 'form', 'playground', 'rtl', 'sizes', 'state-matrix', 'states', 'unchecked-value'])
   })
 
   for (const name of names) {
@@ -63,8 +63,8 @@ describe('every demo is a Server Component that only hands Switch what can cross
     })
   }
 
-  it('states: each state is a plain boolean prop', async () => {
-    const props = crossings((await load('states'))()).map(({ props: given }) => Object.keys(given).filter((key) => key !== 'aria-label'))
+  it('state-matrix: each state is a plain boolean prop', async () => {
+    const props = crossings((await load('state-matrix'))()).map(({ props: given }) => Object.keys(given).filter((key) => key !== 'aria-label'))
     expect(props).toEqual([[], ['defaultChecked'], ['invalid'], ['invalid', 'defaultChecked'], ['disabled'], ['disabled', 'defaultChecked'], ['readOnly', 'defaultChecked']])
   })
 

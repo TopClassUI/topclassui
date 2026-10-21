@@ -13,7 +13,7 @@ import { FORCED_CANVAS, contrast, rgbOf } from './pixels.js'
 // What happy-dom cannot lay out or open: the windowed list in a real popup, the highlight on rows that are not mounted,
 // where the popup lands, what a finger and a zoomed page get, the server HTML a form sends, and a form reset.
 
-const DEMOS = ['basic', 'form', 'load-more', 'long-content', 'playground', 'rtl', 'sizes', 'states', 'status', 'ten-thousand'].map((demo) => `combobox--${demo}`)
+const DEMOS = ['basic', 'form', 'load-more', 'long-content', 'playground', 'rtl', 'sizes', 'state-matrix', 'states', 'status', 'ten-thousand'].map((demo) => `combobox--${demo}`)
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 const POPUP = '[data-placement]'
@@ -100,7 +100,7 @@ test.describe('the server HTML, before any script runs', () => {
   })
 
   test('invalid: the line turns to danger and thickens; disabled dims to half on the surface; read-only looks like idle', async ({ page }) => {
-    await page.goto(urlFor('combobox--states', 'light', 'ltr'))
+    await page.goto(urlFor('combobox--state-matrix', 'light', 'ltr'))
     const [invalid, disabled, readOnly, live] = ['Invalid', 'Disabled', 'Read-only', 'One option disabled'].map((name) => inputOf(page, name))
     if (!invalid || !disabled || !readOnly || !live) throw new Error('a state is missing')
     expect(await invalid.getAttribute('aria-invalid')).toBe('true')
@@ -170,7 +170,7 @@ test.describe('live: the keyboard, as the editable combobox of the Authoring Pra
   })
 
   test('a disabled option takes the highlight, is dimmed, and neither Enter nor a click chooses it', async ({ page }) => {
-    await open(page, 'combobox--states', 'One option disabled')
+    await open(page, 'combobox--state-matrix', 'One option disabled')
     for (let press = 0; press < 3; press++) await page.keyboard.press('ArrowDown')
     expect((await activeOf(page)).text).toBe('Morocco')
     const morocco = page.getByRole('option', { name: 'Morocco' })

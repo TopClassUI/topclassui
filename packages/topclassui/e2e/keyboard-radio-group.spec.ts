@@ -23,7 +23,7 @@ for (const direction of DIRECTIONS) {
 
   test.describe(direction, () => {
     test('Tab enters on the checked radio, the only stop; the next Tab leaves and Shift+Tab comes back to it', async ({ page }) => {
-      await openLive(page, 'radio-group--states', { direction })
+      await openLive(page, 'radio-group--state-matrix', { direction })
       expect(await walk(page, 3)).toEqual(['Invalid, checked', 'Live, checked', 'Read-only, checked'])
       expect(await walk(page, 1, 'Shift+Tab')).toEqual(['Live, checked'])
       expect(await tabIndexes(page.getByRole('radiogroup', { name: 'One disabled' }).getByRole('radio'))).toEqual(['0', '-1', '-1'])
@@ -60,7 +60,7 @@ for (const direction of DIRECTIONS) {
     })
 
     test('the arrows pass over a disabled radio', async ({ page }) => {
-      await openLive(page, 'radio-group--states', { direction })
+      await openLive(page, 'radio-group--state-matrix', { direction })
       await walk(page, 2)
       expect(await press(page, forward)).toEqual({ focus: 'Live', checked: ['Invalid, checked', 'Disabled, checked', 'Live', 'Read-only, checked'] })
       expect(await press(page, back)).toEqual({ focus: 'Live, checked', checked: ['Invalid, checked', 'Disabled, checked', 'Live, checked', 'Read-only, checked'] })
@@ -68,7 +68,7 @@ for (const direction of DIRECTIONS) {
 
     // Base UI's composite moves the focus in a read-only group, and RadioRoot.js:138 keeps the focus from checking.
     test('in a read-only group the arrows move the focus, wrapping, and check nothing; Space checks nothing either', async ({ page }) => {
-      await openLive(page, 'radio-group--states', { direction })
+      await openLive(page, 'radio-group--state-matrix', { direction })
       await walk(page, 3)
       const others = ['Invalid, checked', 'Disabled, checked', 'Live, checked']
       expect(await press(page, forward)).toEqual({ focus: 'Read-only', checked: [...others, 'Read-only, checked'] })

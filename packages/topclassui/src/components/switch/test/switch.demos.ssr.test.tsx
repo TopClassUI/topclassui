@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'playground', 'rtl', 'sizes', 'states', 'unchecked-value']
+const EXPECTED = ['basic', 'form', 'playground', 'rtl', 'sizes', 'state-matrix', 'states', 'unchecked-value']
 
 /** Each switch of each demo, as the server writes it: its name, by aria-label or by the label that points at its id, and its state. */
 const SWITCHES: Record<string, string[]> = {
@@ -20,7 +20,8 @@ const SWITCHES: Record<string, string[]> = {
   'playground': ['Weekly digest: true'],
   'rtl': ['الملخص الأسبوعي: true', 'راسلني عند الإشارة إليّ: false'],
   'sizes': ['Extra small: true', 'Small: true', 'Medium: true', 'Large: true', 'Extra large: true'],
-  'states': ['Off: false', 'On: true', 'Invalid: false', 'Invalid, on: true', 'Disabled: false', 'Disabled, on: true', 'Read-only: true'],
+  'state-matrix': ['Off: false', 'On: true', 'Invalid: false', 'Invalid, on: true', 'Disabled: false', 'Disabled, on: true', 'Read-only: true'],
+  'states': ['off: false', 'on: true', 'hover: false', 'focus-visible: false', 'disabled: false', 'invalid: false'],
   'unchecked-value': ['Product news: false'],
 }
 
@@ -40,7 +41,7 @@ function switchesIn(html: string): string[] {
 }
 
 describe('every demo renders on the server', () => {
-  it('holds exactly the seven demos asked for, so none can be deleted silently', () => {
+  it('holds exactly the eight demos asked for, so none can be deleted silently', () => {
     expect(files).toEqual(EXPECTED)
   })
 

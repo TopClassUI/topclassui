@@ -12,7 +12,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['basic', 'form', 'in-field', 'limits', 'playground', 'rtl', 'sizes', 'states', 'week-start']
+const EXPECTED = ['basic', 'form', 'in-field', 'limits', 'playground', 'rtl', 'sizes', 'state-matrix', 'states', 'week-start']
 
 /** Each DatePicker of each demo as the server writes it: its name, then what its trigger shows. */
 const PICKERS: Record<string, string[]> = {
@@ -23,7 +23,8 @@ const PICKERS: Record<string, string[]> = {
   'playground': ['Check-in: Sep 22, 2026'],
   'rtl': ['تاريخ الوصول: 22/09/2026'.replaceAll('/', `${String.fromCodePoint(0x200f)}/`)],
   'sizes': ['Extra small: Sep 22, 2026', 'Small: Sep 22, 2026', 'Medium: Sep 22, 2026', 'Large: Sep 22, 2026', 'Extra large: Sep 22, 2026'],
-  'states': ['Nothing chosen: Pick a date', 'Selected: Sep 22, 2026', 'Invalid: Sep 22, 2026', 'Disabled: Sep 22, 2026'],
+  'state-matrix': ['Nothing chosen: Pick a date', 'Selected: Sep 22, 2026', 'Invalid: Sep 22, 2026', 'Disabled: Sep 22, 2026'],
+  'states': ['idle: Pick a date', 'selected: Sep 22, 2026', 'disabled: Pick a date', 'invalid: Pick a date'],
   'week-start': ['Monday first: Sep 22, 2026', 'Saturday first: Sep 22, 2026', 'The locale\'s first day: 22 Sept 2026'],
 }
 
@@ -93,8 +94,8 @@ describe('the demos the plan names', () => {
     expect(html).toMatch(/<input [^>]*name="checkIn" value="2026-10-02"/)
   })
 
-  it('states: invalid points at its message, disabled says so', async () => {
-    const html = await render('states')
+  it('state-matrix: invalid points at its message, disabled says so', async () => {
+    const html = await render('state-matrix')
     expect(html).toMatch(/aria-invalid="true"/)
     expect(html).toMatch(/aria-describedby="[^"]* date-picker-states-error"/)
     expect(html).toMatch(/<button [^>]*disabled=""[^>]*aria-label="Disabled"/)

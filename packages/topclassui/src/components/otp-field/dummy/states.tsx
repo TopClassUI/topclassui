@@ -1,28 +1,29 @@
 import { OTPField } from '../index.js'
 
-/** The states a server can render, one per child with its label, then partly filled and complete. A read-only field looks like a live one: it says so to a screen reader only. */
+/** One cell per state the Previewer frame draws, in its order, captioned by its title, each a four-cell code at the small size the frame draws.
+ * Its focus-visible cell rings one input inside the group, which no class from outside reaches. */
 export default function Demo() {
   return (
-    <div className="grid justify-items-start gap-3">
-      <div title="Invalid" className="grid justify-items-start gap-2">
-        <label htmlFor="otp-states-invalid" className="text-sm text-body">Invalid</label>
-        <OTPField id="otp-states-invalid" invalid defaultValue="482913" />
+    <div className="flex flex-wrap items-center gap-6">
+      <div title="idle">
+        <label htmlFor="otp-states-idle" className="sr-only">Code</label>
+        <OTPField id="otp-states-idle" length={4} size="xs" />
       </div>
-      <div title="Disabled" className="grid justify-items-start gap-2">
-        <label htmlFor="otp-states-disabled" className="text-sm text-body">Disabled</label>
-        <OTPField id="otp-states-disabled" disabled defaultValue="482" />
+      <div title="partly filled">
+        <label htmlFor="otp-states-partly-filled" className="sr-only">Code</label>
+        <OTPField id="otp-states-partly-filled" length={4} size="xs" defaultValue="48" />
       </div>
-      <div title="Read-only" className="grid justify-items-start gap-2">
-        <label htmlFor="otp-states-read-only" className="text-sm text-body">Read-only</label>
-        <OTPField id="otp-states-read-only" readOnly defaultValue="482913" />
+      <div title="complete">
+        <label htmlFor="otp-states-complete" className="sr-only">Code</label>
+        <OTPField id="otp-states-complete" length={4} size="xs" defaultValue="4829" />
       </div>
-      <div title="Partly filled" className="grid justify-items-start gap-2">
-        <label htmlFor="otp-states-partly" className="text-sm text-body">Partly filled</label>
-        <OTPField id="otp-states-partly" defaultValue="48" />
+      <div title="invalid">
+        <label htmlFor="otp-states-invalid" className="sr-only">Code</label>
+        <OTPField id="otp-states-invalid" length={4} size="xs" invalid defaultValue="48" />
       </div>
-      <div title="Complete" className="grid justify-items-start gap-2">
-        <label htmlFor="otp-states-complete" className="text-sm text-body">Complete</label>
-        <OTPField id="otp-states-complete" defaultValue="482913" />
+      <div title="disabled">
+        <label htmlFor="otp-states-disabled" className="sr-only">Code</label>
+        <OTPField id="otp-states-disabled" length={4} size="xs" disabled defaultValue="48" />
       </div>
     </div>
   )

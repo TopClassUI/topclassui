@@ -25,7 +25,7 @@ test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) 
 for (const direction of DIRECTIONS) {
   test.describe(direction, () => {
     test('Tab goes from input to input: no stepper is a stop, and a disabled field is skipped', async ({ page }) => {
-      await openLive(page, 'number-field--states', { direction })
+      await openLive(page, 'number-field--state-matrix', { direction })
       expect(await walk(page, 3)).toEqual(['Empty', 'Invalid', 'Read-only'])
       expect(await walk(page, 2, 'Shift+Tab')).toEqual(['Invalid', 'Empty'])
     })
@@ -55,7 +55,7 @@ for (const direction of DIRECTIONS) {
     })
 
     test('a read-only field takes the focus and the ring, and no key changes it', async ({ page }) => {
-      await openLive(page, 'number-field--states', { direction })
+      await openLive(page, 'number-field--state-matrix', { direction })
       await walk(page, 3)
       const input = inputOf(page, 'Read-only')
       await expect(input).toBeFocused()

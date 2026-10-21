@@ -12,7 +12,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'load-more', 'long-content', 'playground', 'rtl', 'sizes', 'states', 'status', 'ten-thousand']
+const EXPECTED = ['basic', 'form', 'load-more', 'long-content', 'playground', 'rtl', 'sizes', 'state-matrix', 'states', 'status', 'ten-thousand']
 
 /** Each Combobox of each demo as the server writes it: its name, then the first twenty letters its input shows. */
 const COMBOBOXES: Record<string, string[]> = {
@@ -23,7 +23,8 @@ const COMBOBOXES: Record<string, string[]> = {
   'playground': ['Framework: '],
   'rtl': ['المدينة: عمّان'],
   'sizes': ['Fruit, extra small: Apple', 'Fruit, small: Banana', 'Fruit, medium: Cherry', 'Fruit, large: Date', 'Fruit, extra large: '],
-  'states': ['Invalid: Jordan', 'Disabled: Egypt', 'Read-only: Saudi Arabia', 'One option disabled: ', 'Loading: jor'],
+  'state-matrix': ['Invalid: Jordan', 'Disabled: Egypt', 'Read-only: Saudi Arabia', 'One option disabled: ', 'Loading: jor'],
+  'states': ['idle: ', 'loading: jor', 'disabled: '],
   'status': ['City, loading: ', 'City, loading more: '],
   'ten-thousand': ['Ten thousand options: '],
 }

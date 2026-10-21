@@ -57,7 +57,7 @@ const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { 
 
 describe('every demo is a Server Component that only hands the DatePicker what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'form', 'in-field', 'limits', 'playground', 'rtl', 'sizes', 'states', 'week-start'])
+    expect(names).toEqual(['basic', 'form', 'in-field', 'limits', 'playground', 'rtl', 'sizes', 'state-matrix', 'states', 'week-start'])
   })
 
   for (const name of names) {

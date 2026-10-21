@@ -52,7 +52,7 @@ const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { 
 
 describe('every demo is a Server Component that only hands the field what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'form', 'grouped', 'long', 'playground', 'rtl', 'sizes', 'states'])
+    expect(names).toEqual(['basic', 'form', 'grouped', 'long', 'playground', 'rtl', 'sizes', 'state-matrix', 'states'])
   })
 
   for (const name of names) {
@@ -63,8 +63,8 @@ describe('every demo is a Server Component that only hands the field what can cr
     })
   }
 
-  it('states: each state is a plain prop of the field', async () => {
-    const props = crossings((await load('states'))()).map(({ props: given }) => Object.keys(given).join(' '))
+  it('state-matrix: each state is a plain prop of the field', async () => {
+    const props = crossings((await load('state-matrix'))()).map(({ props: given }) => Object.keys(given).join(' '))
     expect(props).toEqual(['id invalid defaultValue', 'id disabled defaultValue', 'id readOnly defaultValue', 'id defaultValue', 'id defaultValue'])
   })
 

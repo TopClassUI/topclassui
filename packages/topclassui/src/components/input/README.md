@@ -96,6 +96,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/sizes.tsx`
 - `dummy/skeleton.tsx`
 - `dummy/skeleton-match.tsx`
+- `dummy/state-matrix.tsx`
 - `dummy/states.tsx`
 - `dummy/types.tsx`
 

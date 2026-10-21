@@ -66,7 +66,7 @@ describe('a server-rendered Textarea hydrates cleanly', () => {
 
 describe('every demo renders and hydrates', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(DEMOS.length).toBe(11)
+    expect(DEMOS.length).toBe(12)
   })
 
   for (const [name, Demo] of DEMOS) {

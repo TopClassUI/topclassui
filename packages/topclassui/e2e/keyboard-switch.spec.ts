@@ -14,7 +14,7 @@ test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) 
 for (const direction of DIRECTIONS) {
   test.describe(direction, () => {
     test('Tab walks the live switches in order and skips the disabled ones; Shift+Tab walks back', async ({ page }) => {
-      await openLive(page, 'switch--states', { direction })
+      await openLive(page, 'switch--state-matrix', { direction })
       expect(await walk(page, 5)).toEqual(['Off', 'On', 'Invalid', 'Invalid, on', 'Read-only'])
       expect(await walk(page, 4, 'Shift+Tab')).toEqual(['Invalid, on', 'Invalid', 'On', 'Off'])
     })
@@ -54,7 +54,7 @@ for (const direction of DIRECTIONS) {
     })
 
     test('a read-only switch takes the focus and the ring, and neither Space nor Enter changes it', async ({ page }) => {
-      await openLive(page, 'switch--states', { direction })
+      await openLive(page, 'switch--state-matrix', { direction })
       const control = switchOf(page, 'Read-only')
       await walk(page, 5)
       await expect(control).toBeFocused()

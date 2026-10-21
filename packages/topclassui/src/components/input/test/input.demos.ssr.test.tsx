@@ -12,7 +12,7 @@ const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
 const EXPECTED = [
-  'custom-size', 'full-width', 'labelled', 'playground', 'row', 'rtl', 'sizes', 'skeleton', 'skeleton-match', 'states',
+  'custom-size', 'full-width', 'labelled', 'playground', 'row', 'rtl', 'sizes', 'skeleton', 'skeleton-match', 'state-matrix', 'states',
   'types',
 ]
 
@@ -83,7 +83,7 @@ describe('the demos cover what PLAN 20 asks for', () => {
   })
 
   it('shows the disabled, read-only, invalid, required and filled states', async () => {
-    const html = await render('states')
+    const html = await render('state-matrix')
     expect(html).toContain('disabled=""')
     expect(html).toContain('readOnly=""')
     expect(html).toContain('data-invalid=""')
@@ -107,9 +107,9 @@ describe('the demos cover what PLAN 20 asks for', () => {
     expect(tags.map((tag) => / w-full[ "]/.test(tag))).toEqual([true, false])
   })
 
-  it('fills the column in the states and types demos, so a date and a text field line up', async () => {
+  it('fills the column in the state-matrix and types demos, so a date and a text field line up', async () => {
     // A grid stretches a date, whose width is auto, but not a text field at its own width.
-    for (const file of ['states', 'types']) {
+    for (const file of ['state-matrix', 'types']) {
       const tags = inputs(await render(file))
       expect(tags.length, file).toBeGreaterThan(5)
       expect(tags.filter((tag) => !/ w-full[ "]/.test(tag)).map((tag) => attr(tag, 'aria-label')), file).toEqual([])

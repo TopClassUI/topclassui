@@ -16,7 +16,7 @@ import { FORCED_CANVAS, contrast, inkOn, pixelsOf, rgbOf } from './pixels.js'
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const NAMES = { xs: 'Extra small', sm: 'Small', md: 'Medium', lg: 'Large', xl: 'Extra large' } as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['basic', 'form', 'in-field', 'limits', 'playground', 'rtl', 'sizes', 'states', 'week-start'].map((demo) => `date-picker--${demo}`)
+const DEMOS = ['basic', 'form', 'in-field', 'limits', 'playground', 'rtl', 'sizes', 'state-matrix', 'states', 'week-start'].map((demo) => `date-picker--${demo}`)
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 const POPUP = '[role="dialog"][data-placement]'
 const RLM = String.fromCodePoint(0x200f)
@@ -119,7 +119,7 @@ test.describe('the static page: the server HTML, before any script runs', () => 
   }
 
   test('the states: the placeholder is muted, invalid is red and 2 px, disabled is dimmed; the icon sits at the inline start', async ({ page }) => {
-    await page.goto(urlFor('date-picker--states', 'light', 'ltr'))
+    await page.goto(urlFor('date-picker--state-matrix', 'light', 'ltr'))
     const danger = await resolve(page, 'var(--tc-danger-solid)')
     expect(await css(trigger(page, 'Nothing chosen').locator('span[id]'), 'color')).toBe(await resolve(page, 'var(--tc-muted)'))
     expect(await css(trigger(page, 'Invalid'), 'border-top-color')).toBe(danger)
@@ -132,7 +132,7 @@ test.describe('the static page: the server HTML, before any script runs', () => 
   for (const scheme of ['light', 'dark'] as const) {
     test(`forced colours, ${scheme}: the trigger keeps a line at 3:1, and invalid thickens it to 2 px`, async ({ page }) => {
       await page.emulateMedia({ forcedColors: 'active', colorScheme: scheme })
-      await page.goto(urlFor('date-picker--states', 'light', 'ltr'))
+      await page.goto(urlFor('date-picker--state-matrix', 'light', 'ltr'))
       const canvas = FORCED_CANVAS[scheme]
       const box = await boxOf(trigger(page, 'Nothing chosen'))
       const left = await pixelsOf(page, { x: Math.floor(box.left), y: Math.round(box.top + box.height / 2), width: 3, height: 1 })
@@ -411,7 +411,7 @@ test.describe('live: today in the browser\'s own time zone', () => {
 
   test('at 2026-10-14T22:30:00Z it is already 15 October in Riyadh: that day is aria-current, underlined, and the calendar opens on it', async ({ page }) => {
     await page.clock.setFixedTime(new Date('2026-10-14T22:30:00Z'))
-    await openLive(page, 'date-picker--states')
+    await openLive(page, 'date-picker--state-matrix')
     const popup = await openCalendar(page, trigger(page, 'Nothing chosen'))
     const today = day(popup, 'Thursday, October 15, 2026')
     await expect(today).toHaveAttribute('aria-current', 'date')

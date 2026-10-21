@@ -34,7 +34,7 @@ for (const direction of DIRECTIONS) {
 
   test.describe(direction, () => {
     test('Tab reaches each live thumb and skips a disabled slider; Shift+Tab walks back', async ({ page }) => {
-      await openLive(page, 'slider--states', { direction })
+      await openLive(page, 'slider--state-matrix', { direction })
       expect(await walk(page, 4)).toEqual(['Live', 'Invalid', low, high])
       expect(await walk(page, 3, 'Shift+Tab')).toEqual([low, 'Invalid', 'Live'])
     })

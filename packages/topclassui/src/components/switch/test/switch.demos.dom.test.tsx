@@ -17,7 +17,8 @@ const AFTER: Record<string, string[]> = {
   'playground': ['false'],
   'rtl': ['false', 'true'],
   'sizes': ['false', 'false', 'false', 'false', 'false'],
-  'states': ['true', 'false', 'true', 'false', 'false', 'true', 'true'],
+  'state-matrix': ['true', 'false', 'true', 'false', 'false', 'true', 'true'],
+  'states': ['true', 'false', 'true', 'true', 'false', 'true'],
   'unchecked-value': ['true'],
 }
 

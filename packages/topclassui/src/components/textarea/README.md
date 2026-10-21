@@ -99,6 +99,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/show-count.tsx`
 - `dummy/sizes.tsx`
 - `dummy/skeleton.tsx`
+- `dummy/state-matrix.tsx`
 - `dummy/states.tsx`
 
 ## Verified against

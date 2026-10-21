@@ -14,7 +14,7 @@ import { FORCED_CANVAS, contrast, inkOn, pixelsOf, rgbOf, ringRow } from './pixe
 
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['switch--basic', 'switch--form', 'switch--playground', 'switch--rtl', 'switch--sizes', 'switch--states', 'switch--unchecked-value'] as const
+const DEMOS = ['switch--basic', 'switch--form', 'switch--playground', 'switch--rtl', 'switch--sizes', 'switch--state-matrix', 'switch--states', 'switch--unchecked-value'] as const
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 
 const switchOf = (page: Page, name: string) => page.getByRole('switch', { name, exact: true })
@@ -65,7 +65,7 @@ test.describe('the five sizes, on the static page', () => {
     test(`${direction}: on, the thumb is 2 px from the inline end; off, 2 px from the inline start`, async ({ page }) => {
       await page.goto(urlFor('switch--sizes', 'light', direction))
       for (const size of SIZES) expect(await gaps(switchOf(page, NAMES[size]), direction), size).toMatchObject({ end: 2 })
-      await page.goto(urlFor('switch--states', 'light', direction))
+      await page.goto(urlFor('switch--state-matrix', 'light', direction))
       expect(await gaps(switchOf(page, 'Off'), direction)).toEqual({ start: 2, end: 20 })
       expect(await gaps(switchOf(page, 'On'), direction)).toEqual({ start: 20, end: 2 })
     })
@@ -101,7 +101,7 @@ test.describe('invalid, on the static page', () => {
   test.use({ reducedMotion: 'reduce' })
 
   test('the line of the track turns to danger and is 2 px thick, on and off', async ({ page }) => {
-    await page.goto(urlFor('switch--states', 'light', 'ltr'))
+    await page.goto(urlFor('switch--state-matrix', 'light', 'ltr'))
     const danger = await page.evaluate(() => {
       const probe = document.createElement('span')
       probe.style.color = 'var(--tc-danger-solid)'
@@ -132,7 +132,7 @@ test.describe('the off thumb against its track, on the static page', () => {
 
   for (const mode of ['light', 'dark', 'ocean'] as const) {
     test(`${mode}: the thumb that shows the state stands 3:1 off the track around it (WCAG 1.4.11), at every size`, async ({ page }) => {
-      await page.goto(urlFor('switch--states', mode, 'ltr'))
+      await page.goto(urlFor('switch--state-matrix', mode, 'ltr'))
       expect(await thumbOnTrack(page, switchOf(page, 'Off'), 'ltr')).toBeGreaterThanOrEqual(3)
       expect(await thumbOnTrack(page, switchOf(page, 'Invalid'), 'ltr')).toBeGreaterThanOrEqual(3)
       // The sizes demo is on: turned off by hand on the static page, where no script puts it back.
@@ -157,7 +157,7 @@ for (const scheme of ['light', 'dark'] as const) {
     }
 
     test('on is filled Highlight with a HighlightText thumb at the end; off has a ButtonText thumb at the start: more than a fill', async ({ page }) => {
-      await page.goto(urlFor('switch--states', 'light', 'ltr'))
+      await page.goto(urlFor('switch--state-matrix', 'light', 'ltr'))
       expect(await page.evaluate(() => matchMedia('(forced-colors: active)').matches)).toBe(true)
       const [on, off] = [switchOf(page, 'On'), switchOf(page, 'Off')]
       const system = (colour: string) => page.evaluate((value) => {
@@ -178,7 +178,7 @@ for (const scheme of ['light', 'dark'] as const) {
     })
 
     test('invalid and on: a CanvasText line and no author red; disabled and on, prop or fieldset: GrayText under its thumb', async ({ page }) => {
-      await page.goto(urlFor('switch--states', 'light', 'ltr'))
+      await page.goto(urlFor('switch--state-matrix', 'light', 'ltr'))
       const system = (colour: string) => page.evaluate((value) => {
         const probe = document.createElement('span')
         probe.style.setProperty('forced-color-adjust', 'none')
@@ -207,7 +207,7 @@ for (const scheme of ['light', 'dark'] as const) {
     // The page in the other theme, where --tc-ring falls to 2.4:1 on Canvas: only a system colour holds in both.
     for (const mode of scheme === 'light' ? ['dark'] as const : ['light', 'ocean'] as const) {
       test(`${mode} page: the ring of a focused switch is the user's CanvasText, 3:1 on Canvas, on and invalid too`, async ({ page }) => {
-        await page.goto(urlFor('switch--states', mode, 'ltr'))
+        await page.goto(urlFor('switch--state-matrix', mode, 'ltr'))
         const canvasText = await page.evaluate(() => {
           const probe = document.createElement('span')
           probe.style.setProperty('forced-color-adjust', 'none')
@@ -227,7 +227,7 @@ for (const scheme of ['light', 'dark'] as const) {
     }
 
     test('invalid thickens the line to 2 px; disabled dims the whole switch; no target has an outline at rest', async ({ page }) => {
-      await page.goto(urlFor('switch--states', 'light', 'ltr'))
+      await page.goto(urlFor('switch--state-matrix', 'light', 'ltr'))
       expect(await css(trackOf(switchOf(page, 'Invalid')), 'border-top-width')).toBe('2px')
       expect(await css(trackOf(switchOf(page, 'Off')), 'border-top-width')).toBe('1px')
       expect(await css(switchOf(page, 'Disabled'), 'opacity')).toBe('0.5')

@@ -116,6 +116,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/playground.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`
+- `dummy/state-matrix.tsx`
 - `dummy/states.tsx`
 - `dummy/unchecked-value.tsx`
 

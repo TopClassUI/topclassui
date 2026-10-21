@@ -136,6 +136,7 @@ Anything else on `OTPField` is passed to the element it draws, so standard attri
 - `dummy/playground.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`
+- `dummy/state-matrix.tsx`
 - `dummy/states.tsx`
 
 ## Verified against

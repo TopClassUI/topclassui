@@ -15,7 +15,7 @@ import { FORCED_CANVAS, contrast, inkOn, pixelsOf } from './pixels.js'
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const NAMES = { xs: 'Extra small', sm: 'Small', md: 'Medium', lg: 'Large', xl: 'Extra large' } as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['basic', 'form', 'limits', 'playground', 'row', 'rtl', 'sizes', 'states'].map((demo) => `number-field--${demo}`)
+const DEMOS = ['basic', 'form', 'limits', 'playground', 'row', 'rtl', 'sizes', 'state-matrix', 'states'].map((demo) => `number-field--${demo}`)
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 
 const input = (page: Page, name: string) => page.getByRole('textbox', { name, exact: true })
@@ -99,13 +99,13 @@ test.describe('what the server HTML sends, before any script runs', () => {
 
 test.describe('the look of each state, on the static page', () => {
   test('disabled: the box is at 0.5 and a stepper inside it at 1, so each is painted once at half', async ({ page }) => {
-    await page.goto(urlFor('number-field--states', 'light', 'ltr'))
+    await page.goto(urlFor('number-field--state-matrix', 'light', 'ltr'))
     const group = groupOf(input(page, 'Disabled'))
     expect([await css(group, 'opacity'), ...await group.locator('button').evaluateAll((all) => all.map((el) => getComputedStyle(el).opacity))]).toEqual(['0.5', '1', '1'])
   })
 
   test('in a disabled fieldset, before any script runs, the field dims as one exactly as the disabled prop dims it', async ({ page }) => {
-    await page.goto(urlFor('number-field--states', 'light', 'ltr'))
+    await page.goto(urlFor('number-field--state-matrix', 'light', 'ltr'))
     await groupOf(input(page, 'Empty')).evaluate((group) => {
       const fieldset = document.createElement('fieldset')
       fieldset.disabled = true
@@ -124,7 +124,7 @@ test.describe('the look of each state, on the static page', () => {
   })
 
   test('read-only: both steppers at 0.5, the box untinted as the frame draws it, and the pointer paints no hover on a stepper', async ({ page }) => {
-    await page.goto(urlFor('number-field--states', 'light', 'ltr'))
+    await page.goto(urlFor('number-field--state-matrix', 'light', 'ltr'))
     const group = groupOf(input(page, 'Read-only'))
     expect(await group.locator('button').evaluateAll((all) => all.map((el) => getComputedStyle(el).opacity))).toEqual(['0.5', '0.5'])
     expect(await css(group, 'background-color')).toBe(await css(groupOf(input(page, 'Invalid')), 'background-color'))
@@ -137,7 +137,7 @@ test.describe('the look of each state, on the static page', () => {
   })
 
   test('invalid: the line of the box turns to danger and is 2 px thick', async ({ page }) => {
-    await page.goto(urlFor('number-field--states', 'light', 'ltr'))
+    await page.goto(urlFor('number-field--state-matrix', 'light', 'ltr'))
     const danger = await page.evaluate(() => {
       const probe = document.createElement('span')
       probe.style.color = 'var(--tc-danger-solid)'
@@ -169,7 +169,7 @@ for (const scheme of ['light', 'dark'] as const) {
       const [minus, plus] = [group.getByRole('button', { name: 'Decrease' }), group.getByRole('button', { name: 'Increase' })]
       expect(await ink(page, minus)).toBeGreaterThan(10)
       expect(await ink(page, plus)).toBeLessThan(await ink(page, minus))
-      await page.goto(urlFor('number-field--states', 'light', 'ltr'))
+      await page.goto(urlFor('number-field--state-matrix', 'light', 'ltr'))
       expect(await css(groupOf(input(page, 'Invalid')), 'border-top-width')).toBe('2px')
       expect(await css(groupOf(input(page, 'Empty')), 'border-top-width')).toBe('1px')
     })

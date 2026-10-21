@@ -15,7 +15,7 @@ import { FORCED_CANVAS, contrast, inkOn, pixelsOf, rgbOf } from './pixels.js'
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const NAMES = { xs: 'Extra small', sm: 'Small', md: 'Medium', lg: 'Large', xl: 'Extra large' } as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['basic', 'form', 'playground', 'range', 'rtl', 'show-value', 'sizes', 'states'].map((demo) => `slider--${demo}`)
+const DEMOS = ['basic', 'form', 'playground', 'range', 'rtl', 'show-value', 'sizes', 'state-matrix', 'states'].map((demo) => `slider--${demo}`)
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 
 /** The range input of a thumb, named as a screen reader names it. */
@@ -109,7 +109,7 @@ test.describe('the server HTML, before any script runs', () => {
 
 test.describe('the states, on the static page', () => {
   test('primary: the fill, the knob\'s 2 px line on the raised surface, and a 1 px line-strong edge around the track', async ({ page }) => {
-    await page.goto(urlFor('slider--states', 'light', 'ltr'))
+    await page.goto(urlFor('slider--state-matrix', 'light', 'ltr'))
     const primary = await resolve(page, 'var(--tc-primary-solid)')
     const live = thumbIn(page, 'Live')
     expect(await css(fillOf(live), 'background-color')).toBe(primary)
@@ -120,7 +120,7 @@ test.describe('the states, on the static page', () => {
   })
 
   test('invalid: the fill and the knob turn to danger, and a danger line is drawn around the track, not hue alone', async ({ page }) => {
-    await page.goto(urlFor('slider--states', 'light', 'ltr'))
+    await page.goto(urlFor('slider--state-matrix', 'light', 'ltr'))
     const danger = await resolve(page, 'var(--tc-danger-solid)')
     for (const name of ['Invalid', 'Minimum', 'Maximum']) {
       const input = thumbIn(page, name)
@@ -132,7 +132,7 @@ test.describe('the states, on the static page', () => {
   })
 
   test('disabled: the whole slider dims to half; the others do not', async ({ page }) => {
-    await page.goto(urlFor('slider--states', 'light', 'ltr'))
+    await page.goto(urlFor('slider--state-matrix', 'light', 'ltr'))
     const opacity = (name: string) => thumbIn(page, name).evaluate((el) => getComputedStyle(el.closest('[role="group"]') as Element).opacity)
     expect([await opacity('Disabled'), await opacity('Live'), await opacity('Invalid')]).toEqual(['0.5', '1', '1'])
   })
@@ -141,7 +141,7 @@ test.describe('the states, on the static page', () => {
 test.describe('the edge of the empty track, read from the pixels a page painted', () => {
   for (const mode of ['light', 'dark', 'ocean'] as const) {
     test(`${mode}: a line at 3:1 against the page runs along the empty track, so the end of the range can be seen`, async ({ page }) => {
-      await page.goto(urlFor('slider--states', mode, 'ltr'))
+      await page.goto(urlFor('slider--state-matrix', mode, 'ltr'))
       const input = thumbIn(page, 'Live')
       const [thumb, track] = [await boxOf(thumbOf(input)), await boxOf(trackOf(input))]
       const [x, width] = [Math.round(thumb.right + 4), Math.round(track.right - thumb.right - 12)]
@@ -164,7 +164,7 @@ for (const scheme of ['light', 'dark'] as const) {
     }
 
     test('the empty track keeps a line, the fill is Highlight, and the knob a line at 3:1: the value is told by more than a fill', async ({ page }) => {
-      await page.goto(urlFor('slider--states', 'light', 'ltr'))
+      await page.goto(urlFor('slider--state-matrix', 'light', 'ltr'))
       expect(await page.evaluate(() => matchMedia('(forced-colors: active)').matches)).toBe(true)
       const canvas = FORCED_CANVAS[scheme]
       const live = thumbIn(page, 'Live')
@@ -174,7 +174,7 @@ for (const scheme of ['light', 'dark'] as const) {
     })
 
     test('invalid draws the line around the track 2 px thick; no range input has an outline at rest', async ({ page }) => {
-      await page.goto(urlFor('slider--states', 'light', 'ltr'))
+      await page.goto(urlFor('slider--state-matrix', 'light', 'ltr'))
       expect(await css(trackOf(thumbIn(page, 'Invalid')), 'outline-width')).toBe('2px')
       expect(await css(trackOf(thumbIn(page, 'Live')), 'outline-width')).toBe('1px')
       // The user's palette, not the author's red: the 2 px line already tells invalid apart.
@@ -301,7 +301,7 @@ test.describe('live: what a screen reader is handed', () => {
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 
   test('the focused range input of an invalid slider is invalid, one thumb and both of a range; a valid one is not', async ({ page }) => {
-    await openLive(page, 'slider--states')
+    await openLive(page, 'slider--state-matrix')
     const cdp = await page.context().newCDPSession(page)
     const { nodes } = await cdp.send('Accessibility.getFullAXTree') as { nodes: { ignored: boolean; role?: { value: string }; name?: { value: string }; properties?: { name: string; value: { value?: string | boolean } }[] }[] }
     const sliders = nodes.filter((node) => !node.ignored && node.role?.value === 'slider')

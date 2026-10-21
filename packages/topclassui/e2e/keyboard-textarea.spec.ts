@@ -16,7 +16,7 @@ test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) 
 for (const direction of DIRECTIONS) {
   test.describe(direction, () => {
     test('Tab reaches each live textarea, a read-only one too, and skips a disabled one; Shift+Tab walks back', async ({ page }) => {
-      await openLive(page, 'textarea--states', { direction })
+      await openLive(page, 'textarea--state-matrix', { direction })
       expect(await walk(page, 5)).toEqual(['Idle', 'Filled', 'Invalid', 'Read-only', 'Required'])
       expect(await walk(page, 2, 'Shift+Tab')).toEqual(['Read-only', 'Invalid'])
     })
@@ -62,7 +62,7 @@ for (const direction of DIRECTIONS) {
     })
 
     test('a read-only textarea takes the focus and the ring, and a key types nothing into it', async ({ page }) => {
-      await openLive(page, 'textarea--states', { direction })
+      await openLive(page, 'textarea--state-matrix', { direction })
       await walk(page, 4)
       const area = areaOf(page, 'Read-only')
       await expect(area).toBeFocused()

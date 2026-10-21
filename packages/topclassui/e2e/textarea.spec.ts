@@ -13,7 +13,7 @@ import { urlFor } from './pages.js'
 
 const SIZES = ['Extra small', 'Small', 'Medium', 'Large', 'Extra large'] as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['autosize', 'basic', 'form', 'long-content', 'playground', 'row', 'rtl', 'show-count', 'sizes', 'skeleton', 'states'].map((name) => `textarea--${name}`)
+const DEMOS = ['autosize', 'basic', 'form', 'long-content', 'playground', 'row', 'rtl', 'show-count', 'sizes', 'skeleton', 'state-matrix', 'states'].map((name) => `textarea--${name}`)
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 
 const field = (page: Page, name: string) => page.getByRole('textbox', { name, exact: true })
@@ -87,7 +87,7 @@ test.describe('what the server HTML sends, with no script at all', () => {
 
 test.describe('invalid is told by more than colour', () => {
   test('the line turns to danger and an inset ring makes it 2 px thick; a valid field has neither', async ({ page }) => {
-    await page.goto(urlFor('textarea--states', 'light', 'ltr'))
+    await page.goto(urlFor('textarea--state-matrix', 'light', 'ltr'))
     const danger = await resolved(page, 'var(--tc-danger-solid)')
     expect(await css(field(page, 'Invalid'), 'border-top-color')).toBe(danger)
     expect(await css(field(page, 'Invalid'), 'box-shadow')).toContain(`${danger} 0px 0px 0px 1px inset`)
@@ -99,7 +99,7 @@ test.describe('invalid is told by more than colour', () => {
       test.use({ forcedColors: 'active', colorScheme: scheme })
 
       test('the line of an invalid field grows to 2 px, since the inset ring is not painted; the others keep 1 px', async ({ page }) => {
-        await page.goto(urlFor('textarea--states', 'light', 'ltr'))
+        await page.goto(urlFor('textarea--state-matrix', 'light', 'ltr'))
         expect(await page.evaluate(() => matchMedia('(forced-colors: active)').matches)).toBe(true)
         expect(await css(field(page, 'Invalid'), 'border-top-width')).toBe('2px')
         for (const name of ['Idle', 'Filled', 'Read-only']) expect(await css(field(page, name), 'border-top-width'), name).toBe('1px')

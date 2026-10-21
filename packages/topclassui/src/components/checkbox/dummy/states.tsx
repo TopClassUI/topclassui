@@ -1,18 +1,18 @@
 import { Checkbox } from '../index.js'
 
-/** The states a server can render. A read-only checkbox looks like a live one: it says so to a screen reader only. */
+/** The ring the box wears on focus-visible, drawn at rest on the 24 px target the md box fills; not under forced colours, where a ring at rest would read as focus. */
+const RING = 'not-forced-colors:outline-solid not-forced-colors:outline-(length:--tc-ring-width) not-forced-colors:outline-offset-(length:--tc-ring-offset) not-forced-colors:outline-ring'
+
+/** One cell per state the Previewer frame draws, named by its aria-label. Hover is drawn as the frame draws it, the same as unchecked. */
 export default function Demo() {
   return (
-    <div className="flex flex-wrap items-center gap-4">
-      <Checkbox aria-label="Unchecked" />
-      <Checkbox defaultChecked aria-label="Checked" />
-      <Checkbox indeterminate aria-label="Indeterminate" />
-      <Checkbox invalid aria-label="Invalid" />
-      <Checkbox invalid defaultChecked aria-label="Invalid, checked" />
-      <Checkbox invalid indeterminate aria-label="Invalid, indeterminate" />
-      <Checkbox disabled aria-label="Disabled" />
-      <Checkbox disabled defaultChecked aria-label="Disabled, checked" />
-      <Checkbox readOnly defaultChecked aria-label="Read-only" />
+    <div className="flex flex-wrap items-center gap-6">
+      <Checkbox aria-label="unchecked" />
+      <Checkbox defaultChecked aria-label="checked" />
+      <Checkbox indeterminate aria-label="indeterminate" />
+      <Checkbox aria-label="hover" />
+      <Checkbox aria-label="focus-visible" className={RING} />
+      <Checkbox disabled aria-label="disabled" />
     </div>
   )
 }

@@ -14,7 +14,7 @@ import { FORCED_CANVAS, contrast, inkOn, pixelsOf, rgbOf } from './pixels.js'
 
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['basic', 'form', 'horizontal', 'long-content', 'playground', 'rtl', 'sizes', 'states'].map((demo) => `radio-group--${demo}`)
+const DEMOS = ['basic', 'form', 'horizontal', 'long-content', 'playground', 'rtl', 'sizes', 'state-matrix', 'states'].map((demo) => `radio-group--${demo}`)
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 const NAMES = { xs: 'Extra small', sm: 'Small', md: 'Medium', lg: 'Large', xl: 'Extra large' } as const
 
@@ -113,7 +113,7 @@ test.describe('the server HTML, before any script runs', () => {
   }
 
   test('states: the disabled group has no tab stop, and every other group has one, on its checked radio', async ({ page }) => {
-    await page.goto(urlFor('radio-group--states', 'light', 'ltr'))
+    await page.goto(urlFor('radio-group--state-matrix', 'light', 'ltr'))
     const stops: string[] = []
     for (let press = 0; press < 4; press += 1) {
       await page.keyboard.press('Tab')
@@ -152,7 +152,7 @@ test.describe('the states, on the static page', () => {
   }
 
   test('invalid: every circle of the group turns to danger and is 2 px thick, checked or not', async ({ page }) => {
-    await page.goto(urlFor('radio-group--states', 'light', 'ltr'))
+    await page.goto(urlFor('radio-group--state-matrix', 'light', 'ltr'))
     const danger = await resolve(page, 'var(--tc-danger-solid)')
     for (const name of ['Invalid', 'Invalid, checked']) {
       expect(await css(drawn(radioIn(page, name)), 'border-top-color'), name).toBe(danger)
@@ -162,7 +162,7 @@ test.describe('the states, on the static page', () => {
   })
 
   test('disabled: the radio and its text dim to half, a disabled radio alone too, and a live one beside it does not', async ({ page }) => {
-    await page.goto(urlFor('radio-group--states', 'light', 'ltr'))
+    await page.goto(urlFor('radio-group--state-matrix', 'light', 'ltr'))
     for (const name of ['Disabled', 'Disabled, checked', 'One disabled']) {
       const control = radioIn(page, name)
       expect([await css(control, 'opacity'), await css(control.locator('xpath=following-sibling::span'), 'opacity')], name).toEqual(['0.5', '0.5'])
@@ -185,7 +185,7 @@ for (const scheme of ['light', 'dark'] as const) {
     }
 
     test('checked differs from unchecked by a dot, not a fill: ink in the middle of a checked circle, none in an empty one', async ({ page }) => {
-      await page.goto(urlFor('radio-group--states', 'light', 'ltr'))
+      await page.goto(urlFor('radio-group--state-matrix', 'light', 'ltr'))
       expect(await page.evaluate(() => matchMedia('(forced-colors: active)').matches)).toBe(true)
       const canvas = FORCED_CANVAS[scheme]
       for (const name of ['Invalid, checked', 'Live, checked', 'Read-only, checked']) expect(inkOn(await middle(page, radioIn(page, name)), canvas), name).toBeGreaterThan(20)
@@ -194,7 +194,7 @@ for (const scheme of ['light', 'dark'] as const) {
     })
 
     test('invalid thickens the line to 2 px; disabled dims the radio and its text; no target has an outline at rest', async ({ page }) => {
-      await page.goto(urlFor('radio-group--states', 'light', 'ltr'))
+      await page.goto(urlFor('radio-group--state-matrix', 'light', 'ltr'))
       for (const name of ['Invalid', 'Invalid, checked']) expect(await css(drawn(radioIn(page, name)), 'border-top-width'), name).toBe('2px')
       expect(await css(drawn(radioIn(page, 'Live')), 'border-top-width')).toBe('1px')
       for (const name of ['Disabled', 'Disabled, checked', 'One disabled']) expect(await css(radioIn(page, name), 'opacity'), name).toBe('0.5')
@@ -315,7 +315,7 @@ test.describe('live: the keyboard', () => {
   })
 
   test('a disabled radio is skipped by the arrows, and a disabled group is skipped by Tab', async ({ page }) => {
-    await openLive(page, 'radio-group--states')
+    await openLive(page, 'radio-group--state-matrix')
     const group = page.getByRole('radiogroup', { name: 'One disabled' })
     await page.keyboard.press('Tab')
     await page.keyboard.press('Tab')

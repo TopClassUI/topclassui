@@ -16,7 +16,7 @@ import { FORCED_CANVAS, contrast, inkOn, pixelsOf, rgbOf } from './pixels.js'
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const NAMES = { xs: 'Extra small', sm: 'Small', md: 'Medium', lg: 'Large', xl: 'Extra large' } as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['basic', 'form', 'four-rows', 'load-more', 'long-content', 'phase-4-form', 'playground', 'rtl', 'sixty-items', 'sizes', 'states'].map((demo) => `select--${demo}`)
+const DEMOS = ['basic', 'form', 'four-rows', 'load-more', 'long-content', 'phase-4-form', 'playground', 'rtl', 'sixty-items', 'sizes', 'state-matrix', 'states'].map((demo) => `select--${demo}`)
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 /** The listbox has no data-open of its own: the popup around it carries the placement and the state. */
 const POPUP = '[data-placement]'
@@ -98,7 +98,7 @@ test.describe('the static page: the server HTML, before any script runs', () => 
   }
 
   test('the states: the placeholder is muted, invalid is red and 2 px, disabled sits on the surface and is dimmed, read-only looks like idle', async ({ page }) => {
-    await page.goto(urlFor('select--states', 'light', 'ltr'))
+    await page.goto(urlFor('select--state-matrix', 'light', 'ltr'))
     const danger = await resolve(page, 'var(--tc-danger-solid)')
     expect(await css(combo(page, 'Nothing chosen').locator('span').first(), 'color')).toBe(await resolve(page, 'var(--tc-muted)'))
     expect(await css(combo(page, 'Invalid'), 'border-top-color')).toBe(danger)
@@ -112,7 +112,7 @@ test.describe('the static page: the server HTML, before any script runs', () => 
   for (const scheme of ['light', 'dark'] as const) {
     test(`forced colours, ${scheme}: the trigger keeps a line at 3:1 on every side, and invalid thickens it to 2 px`, async ({ page }) => {
       await page.emulateMedia({ forcedColors: 'active', colorScheme: scheme })
-      await page.goto(urlFor('select--states', 'light', 'ltr'))
+      await page.goto(urlFor('select--state-matrix', 'light', 'ltr'))
       const canvas = FORCED_CANVAS[scheme]
       const box = await boxOf(combo(page, 'Nothing chosen'))
       const middle = Math.round(box.top + box.height / 2)
@@ -128,7 +128,7 @@ test.describe('the static page: the server HTML, before any script runs', () => 
     for (const direction of DIRECTIONS) {
       test(`forced colours, ${scheme} ${direction}: a read-only trigger is told by a dashed line, which every other state keeps solid`, async ({ page }) => {
         await page.emulateMedia({ forcedColors: 'active', colorScheme: scheme })
-        await page.goto(urlFor('select--states', 'light', direction))
+        await page.goto(urlFor('select--state-matrix', 'light', direction))
         const line = (name: string) => combo(page, name).evaluate((el) => {
           const style = getComputedStyle(el)
           return [style.borderTopStyle, style.borderInlineStartStyle, style.borderBottomStyle, style.borderInlineEndStyle, style.borderTopWidth].join(' ')
@@ -152,7 +152,7 @@ test.describe('the static page: the server HTML, before any script runs', () => 
 
   test('forced colours, after hydration: the read-only line is still dashed, and the list still opens', async ({ page }) => {
     await page.emulateMedia({ forcedColors: 'active' })
-    await openLive(page, 'select--states')
+    await openLive(page, 'select--state-matrix')
     expect(await css(combo(page, 'Read-only'), 'border-top-style')).toBe('dashed')
     await openList(page, combo(page, 'Read-only'))
     expect(await css(combo(page, 'Read-only'), 'border-top-style')).toBe('dashed')
@@ -160,7 +160,7 @@ test.describe('the static page: the server HTML, before any script runs', () => 
   })
 
   test('outside forced colours the read-only line stays solid, as the frame draws it', async ({ page }) => {
-    await page.goto(urlFor('select--states', 'light', 'ltr'))
+    await page.goto(urlFor('select--state-matrix', 'light', 'ltr'))
     expect(await css(combo(page, 'Read-only'), 'border-top-style')).toBe('solid')
   })
 
@@ -780,7 +780,7 @@ async function axe(page: Page): Promise<string[]> {
 }
 
 test.describe('axe on the open list', () => {
-  for (const demo of ['select--basic', 'select--sixty-items', 'select--rtl', 'select--states']) {
+  for (const demo of ['select--basic', 'select--sixty-items', 'select--rtl', 'select--state-matrix']) {
     for (const mode of MODES) {
       for (const direction of DIRECTIONS) {
         test(`${demo} ${mode} ${direction}: no violation, in the list or in the demo behind it`, async ({ page }) => {

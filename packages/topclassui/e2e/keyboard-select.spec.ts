@@ -32,7 +32,7 @@ test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) 
 for (const direction of DIRECTIONS) {
   test.describe(direction, () => {
     test('Tab reaches each live trigger, one stop each, and skips a disabled one', async ({ page }) => {
-      await openLive(page, 'select--states', { direction })
+      await openLive(page, 'select--state-matrix', { direction })
       expect(await walk(page, 3)).toEqual(['Nothing chosen', 'Invalid', 'Read-only'])
       expect(await walk(page, 1, 'Shift+Tab')).toEqual(['Invalid'])
     })
@@ -135,7 +135,7 @@ for (const direction of DIRECTIONS) {
     })
 
     test('a read-only trigger takes the focus and the ring; it opens, as Base UI\'s does (DECISIONS, 15 October), and no key changes it', async ({ page }) => {
-      await openLive(page, 'select--states', { direction })
+      await openLive(page, 'select--state-matrix', { direction })
       await walk(page, 3)
       const readOnly = trigger(page, 'Read-only')
       await expect(readOnly).toBeFocused()

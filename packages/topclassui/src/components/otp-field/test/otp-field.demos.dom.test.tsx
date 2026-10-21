@@ -20,7 +20,8 @@ const AFTER: Record<string, string[]> = {
   'long': ['4821930ab'],
   'rtl': ['482193'],
   'sizes': ['482482', '482482', '482482', '482482', '482482'],
-  'states': ['482914', '482', '482913', '484821', '482914'],
+  'state-matrix': ['482914', '482', '482913', '484821', '482914'],
+  'states': ['4821', '4848', '4824', '4844', '48'],
 }
 
 const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { default: ComponentType }).default

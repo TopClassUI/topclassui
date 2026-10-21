@@ -22,7 +22,8 @@ const AFTER: Record<string, string[]> = {
   'show-count': ['taken', 'taken', 'refused', 'taken'],
   'sizes': ['taken', 'taken', 'taken', 'taken', 'taken'],
   'skeleton': ['taken', 'taken', 'taken', 'taken', 'taken', 'taken', 'taken'],
-  'states': ['taken', 'taken', 'taken', 'refused', 'refused', 'taken', 'refused'],
+  'state-matrix': ['taken', 'taken', 'taken', 'refused', 'refused', 'taken', 'refused'],
+  'states': ['taken', 'taken', 'taken', 'refused', 'taken', 'refused'],
 }
 
 const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { default: ComponentType }).default
