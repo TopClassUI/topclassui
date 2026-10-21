@@ -55,7 +55,7 @@ test('Home writes Organization with its logo and profiles, WebSite in its langua
     expect(typesOf(data)).toEqual(['Organization', 'SoftwareSourceCode', 'WebSite'])
     const organization = data.find((item) => item['@type'] === 'Organization')
     expect(organization?.['logo']).toEqual({ '@type': 'ImageObject', url: `${ORIGIN}/icon-512.png`, width: '512', height: '512' })
-    expect(organization?.['sameAs']).toEqual(['https://github.com/TopClassUI/topclassui', 'https://www.npmjs.com/package/topclassui', 'https://www.youtube.com/@topclassui'])
+    expect(organization?.['sameAs']).toEqual(['https://github.com/TopClassUI/topclassui', 'https://www.npmjs.com/package/topclassui', 'https://www.youtube.com/@topclassui', 'https://x.com/topclassui'])
     expect(data.find((item) => item['@type'] === 'WebSite')?.['inLanguage']).toBe(locale)
   }
 })

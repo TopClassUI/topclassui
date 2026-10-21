@@ -7,6 +7,7 @@ import { META_DESCRIPTIONS } from '../content/descriptions'
 import { LOCALES, hrefOf, type Locale, type PageEntry } from '../content/pages'
 import { labelsFor } from '../labels/index'
 import { ACTION_ROUTES, type PagedComponent } from './components'
+import { HANDLE, X_URL } from './site'
 
 export const OG_SIZE = { width: 1200, height: 630 }
 
@@ -96,6 +97,6 @@ export function createMetadata(subject: MetaSubject, locale: Locale): Metadata {
       alternateLocale: locale === 'ar' ? ['en_US'] : ['ar_SA'],
       images: [image],
     },
-    twitter: { card: 'summary_large_image', title, description, images: [image] },
+    twitter: { card: 'summary_large_image', title, description, images: [image], ...(X_URL === null ? {} : { site: HANDLE, creator: HANDLE }) },
   }
 }
