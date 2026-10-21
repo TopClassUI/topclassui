@@ -112,7 +112,7 @@ const CROSSES: Record<string, string[]> = {
   'rtl': ['AvatarImage'],
   'sizes': [],
   'skeleton': [],
-  'states': ['AvatarImage', 'AvatarImage'],
+  'states': ['AvatarImage'],
   'with-name': ['AvatarImage'],
 }
 
