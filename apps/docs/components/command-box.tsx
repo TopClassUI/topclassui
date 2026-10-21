@@ -9,13 +9,14 @@ import { CopyButton } from './home/home-islands'
 const BOX = {
   lg: `h-control-xl gap-3 bg-surface-raised py-3.25 ps-4.5 pe-2.5 text-sm ${BORDER_STRONG}`,
   md: `h-[2.75rem] gap-2.5 bg-page py-2.75 ps-3.5 pe-2.5 text-xs/[1.7] ${BORDER}`,
-  sm: `h-control-sm gap-2 bg-page ps-2.5 pe-1 text-xs ${BORDER}`,
+  /** The footer's chip as drawn: 29 px, 10 px mono; the 24 px copy target leaves 5.5 px around its 13 px icon, so 2.5 px more puts it the drawn 8 px from the text and the end. */
+  sm: `min-h-[1.8125rem] gap-[0.15625rem] bg-page ps-2.5 pe-[0.15625rem] text-[0.625rem] ${BORDER}`,
 } as const
 
 /** The hero's copy button is the drawn 32 by 28 px filled chip; Install's 14 px icon keeps its 24 px target and ends where the icon is drawn. */
 const COPY = { lg: 'bg-surface px-2 py-1.5', md: '-me-1.25', sm: '' } as const satisfies Record<keyof typeof BOX, string>
 
-const COPY_ICON = { lg: '1rem', md: '0.875rem', sm: '1rem' } as const satisfies Record<keyof typeof BOX, string>
+const COPY_ICON = { lg: '1rem', md: '0.875rem', sm: '0.8125rem' } as const satisfies Record<keyof typeof BOX, string>
 
 export interface CommandBoxProps {
   code: string

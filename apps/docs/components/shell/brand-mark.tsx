@@ -20,11 +20,11 @@ export function BrandMark({ className, color = 'currentColor', size = '1em' }: B
   )
 }
 
-/** The mark on the primary tile, as the navbar, the footer and the product frame draw it. */
-export function BrandTile({ className = 'size-6' }: { className?: string }) {
+/** The mark on the primary tile, as the navbar, the footer and the product frame draw it; `mark` sizes the glyph where a frame draws its own. */
+export function BrandTile({ className = 'size-6', mark = '70%' }: { className?: string; mark?: string }) {
   return (
     <span aria-hidden="true" className={`inline-flex shrink-0 items-center justify-center rounded-chip bg-primary-solid text-primary-on-solid ${className}`}>
-      <BrandMark size="70%" />
+      <BrandMark size={mark} />
     </span>
   )
 }

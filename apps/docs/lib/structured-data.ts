@@ -5,7 +5,7 @@ import { hrefOf, type Locale, type PageEntry } from '../content/pages'
 import { labelsFor } from '../labels/index'
 import type { PagedComponent } from './components'
 import { type MetaSubject, descriptionOf, nameOf, ogImagePathOf, pathOf } from './metadata'
-import { GITHUB_URL, NEXT_RANGE, NPM_URL, PEERS, SITE_NAME, SITE_URL, VERSION, YOUTUBE_URL, absolute } from './site'
+import { GITHUB_URL, NEXT_RANGE, NPM_URL, PEERS, SITE_NAME, SITE_URL, VERSION, X_URL, YOUTUBE_URL, absolute } from './site'
 
 const CONTEXT = 'https://schema.org'
 export const ORGANIZATION_ID = `${SITE_URL}/#organization`
@@ -17,7 +17,7 @@ const urlOf = (subject: MetaSubject, locale: Locale) => absolute(hrefOf({ path: 
 const publisher = { '@type': 'Organization', '@id': ORGANIZATION_ID, name: SITE_NAME, logo: absolute(LOGO_PATH) } as const
 
 export function organizationData(): WithContext<Organization> {
-  const sameAs = [GITHUB_URL, NPM_URL, YOUTUBE_URL].filter((url): url is string => url !== null)
+  const sameAs = [GITHUB_URL, NPM_URL, YOUTUBE_URL, X_URL].filter((url): url is string => url !== null)
   return {
     '@context': CONTEXT,
     '@type': 'Organization',
