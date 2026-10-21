@@ -259,7 +259,7 @@ test.describe('the rings, on the block', () => {
   }
 })
 
-/** Under a classic scrollbar, at 390 px: the colour the pre's bottom ring row is painted in when focused, and the colour of the
+/** Under a classic scrollbar, at 320 px: the colour the pre's bottom ring row is painted in when focused, and the colour of the
  * bar just inside it, over the thumb and over the track, with the block's own fill to tell the two apart. */
 async function ringOnBar(page: Page, block: Rgb) {
   const pre = page.locator(PRE)
@@ -285,7 +285,8 @@ async function ringOnBar(page: Page, block: Rgb) {
 test.describe('the pre ring over a classic scrollbar', () => {
   for (const mode of MODES) {
     withScrollbar(`${mode}: the bar takes the block's colours, so the ring's bottom side stands 3:1 off its track and its thumb`, async ({ barPage: page }) => {
-      await page.setViewportSize({ width: 390, height: 844 })
+      // At 390 px basic's 43-character line fits in Consolas, so Windows draws no bar; at 320 px it overflows in every mono.
+      await page.setViewportSize({ width: 320, height: 844 })
       for (const demo of ['code-block--long-line', 'code-block--basic']) {
         for (const direction of DIRECTIONS) {
           await page.goto(urlFor(demo, mode, direction))

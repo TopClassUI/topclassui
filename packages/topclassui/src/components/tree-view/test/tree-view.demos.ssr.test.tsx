@@ -23,9 +23,9 @@ const TREES: Record<string, string[]> = {
   'selected': ['Project 0: app, layout.tsx, page.tsx, docs, next.config.ts'],
   'states': [
     'Source, collapsed 0: src',
-    'Source, expanded 0: src, file1, file2, file3',
-    'Source, selected 0: src, file1, file2, file3',
-    'Source, focus-visible 0: src, file1, file2, file3',
+    'Source, expanded 0: src, file1, file2',
+    'Source, selected 0: src, file1, file2',
+    'Source, focus-visible 0: src, file1, file2',
     'Source, loading -: ',
     'Source, empty -: ',
   ],

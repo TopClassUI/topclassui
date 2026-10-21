@@ -21,7 +21,7 @@ const WRITES: Record<string, string | null> = {
   'no-header': null,
   'playground': 'export default async function Page() {',
   'rtl': 'export default async function Page() {',
-  'states': 'export default async function Page() {',
+  'states': '<Button/>',
   'wrap': "export const columns = ['number'",
 }
 
