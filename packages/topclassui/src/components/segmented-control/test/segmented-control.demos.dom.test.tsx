@@ -21,7 +21,7 @@ const AFTER: Record<string, string[]> = {
   'playground': ['Calendar'],
   'rtl': ['تقويم'],
   'sizes': ['Off', 'Off', 'Off', 'Off', 'Off'],
-  'states': ['B', 'B', 'B', 'B', 'B', 'C', 'A'],
+  'states': ['B', 'B', 'B', 'B', 'A', 'B', 'C', 'A'],
   'track-states': ['Invalid', 'Disabled, selected', 'Live', 'Read-only, selected'],
   'with-icons': ['System'],
 }
