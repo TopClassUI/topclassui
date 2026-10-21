@@ -65,7 +65,7 @@ const NAMING: Record<string, { fallbacks: number; namedRoots: number; namedImage
   'sizes': { fallbacks: 5, namedRoots: 5, namedImages: 0 },
   'skeleton': { fallbacks: 5, namedRoots: 5, namedImages: 0 },
   // A picture, initials, an icon, a picture that failed, and a skeleton, which has no fallback.
-  'states': { fallbacks: 4, namedRoots: 2, namedImages: 2 },
+  'states': { fallbacks: 3, namedRoots: 2, namedImages: 1 },
   'with-name': { fallbacks: 1, namedRoots: 0, namedImages: 0 },
 }
 

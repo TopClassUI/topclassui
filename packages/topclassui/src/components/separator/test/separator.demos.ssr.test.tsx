@@ -16,7 +16,7 @@ const EXPECTED = ['horizontal', 'playground', 'rtl', 'semantic', 'states', 'vert
 /** What each demo must hold: its separators, by orientation and role, in document order. */
 const SEPARATORS: Record<string, string[]> = {
   horizontal: ['horizontal none'],
-  playground: ['horizontal none'],
+  playground: ['horizontal none', 'horizontal none'],
   rtl: ['horizontal none', 'vertical none'],
   semantic: ['horizontal separator', 'vertical separator'],
   states: ['horizontal none', 'vertical none', 'horizontal none'],
