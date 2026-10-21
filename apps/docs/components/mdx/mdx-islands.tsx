@@ -4,3 +4,4 @@
 import { island } from '../lazy-island'
 
 export const CodeTabs = island(() => import('./code-tabs').then((m) => m.CodeTabs))
+export const CopyButton = island(() => import('../copy-button').then((m) => m.CopyButton))

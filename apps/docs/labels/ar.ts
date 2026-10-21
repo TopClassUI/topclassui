@@ -52,6 +52,8 @@ export const ar: SiteLabels = {
     wrong: 'خطأ',
     right: 'صواب',
     terminal: 'الطرفية',
+    code: 'شيفرة',
+    copy: 'نسخ',
     packageManagers: 'مدير الحزم',
     framework: 'إطار العمل',
     utilities: { token: 'المتغيّر', utilities: 'الأصناف المساعدة' },
