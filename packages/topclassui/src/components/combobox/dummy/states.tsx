@@ -14,7 +14,7 @@ const RING = 'not-forced-colors:outline-solid not-forced-colors:outline-(length:
  * the inputs the frame draws, their lists left shut so they cover no cell. Then invalid, read-only and one disabled option. */
 export default function Demo() {
   return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] items-start gap-6">
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(min(8rem,100%),1fr))] items-start gap-6">
       <Combobox fullWidth aria-label="idle" placeholder="Search" items={COUNTRIES} />
       <Combobox fullWidth aria-label="focus-visible" items={COUNTRIES} defaultValue="jo" className={RING} />
       <Combobox fullWidth aria-label="open" items={COUNTRIES} defaultInputValue="jor" className={RING} />
