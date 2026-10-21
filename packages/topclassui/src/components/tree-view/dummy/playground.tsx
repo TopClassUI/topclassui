@@ -23,7 +23,7 @@ const ITEMS = [
   { id: 'readme', label: 'README.md', icon: FILE },
 ]
 
-/** The docs card's stage: the Try it controls pass the schema's props, the nodes stay as drawn. */
+/** The docs card's stage: the Try it controls pass the schema's props, the nodes stay as drawn, page.tsx selected. */
 export default function Demo(props: TreeViewDesignProps) {
-  return <TreeView {...props} aria-label="Files" items={ITEMS} defaultExpanded={['src', 'app']} />
+  return <TreeView {...props} aria-label="Files" items={ITEMS} defaultExpanded={['src', 'app']} defaultValue="page" />
 }
