@@ -4,7 +4,7 @@ import { Skeleton } from '../index.js'
  * the card below has no side to mirror. */
 export default function Demo() {
   return (
-    <div dir="rtl" lang="ar" className="flex max-w-sm flex-col gap-6">
+    <div dir="rtl" lang="ar" className="flex w-sm max-w-full flex-col gap-6">
       <div className="flex items-center gap-4">
         <Skeleton variant="circle" />
         <Skeleton />
