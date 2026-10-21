@@ -64,7 +64,7 @@ function probe() {
   })
 
   // The body, not the root: headless Chromium hides scrollbars, so the root's clientWidth
-  // still counts the stable gutter and 15 px of overflow would pass unseen.
+  // still counts the stable gutter and 10 px of overflow would pass unseen.
   return { banners, scrollWidth: document.documentElement.scrollWidth, pageWidth: document.body.clientWidth }
 }
 

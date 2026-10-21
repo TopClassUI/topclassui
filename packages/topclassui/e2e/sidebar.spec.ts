@@ -764,7 +764,7 @@ test.describe('inside a real layout', () => {
     const scroller = page.locator('#demo table').locator('xpath=..')
     const column = page.locator('#demo nav + div')
     // Beside the open rail the column is its own padding and the box its two 1 px lines: nothing of the table shows.
-    for (const [state, width, box] of [['expanded', 32, 2], ['collapsed', 189, 157]] as const) {
+    for (const [state, width, box] of [['expanded', 32, 2], ['collapsed', 194, 162]] as const) {
       const sizes = await scroller.evaluate((element) => ({ room: element.scrollWidth - element.clientWidth, width: element.getBoundingClientRect().width }))
       expect(await widthOf(column), state).toBe(width)
       expect(sizes.width, state).toBe(box)
@@ -1307,9 +1307,9 @@ test.describe('text that is made larger or spaced out', () => {
       await page.addStyleTag({ content: 'html { font-size: 32px !important }' })
       const rail = railOf(page)
       const parent = await boxOf(rail.locator('xpath=..'))
-      // 440 px of rail in 177 px of page: it gives way, where the page would have scrolled sideways.
-      expect(parent.width).toBe(177)
-      expect(await widthOf(rail)).toBe(177)
+      // 440 px of rail in 182 px of page: it gives way, where the page would have scrolled sideways.
+      expect(parent.width).toBe(182)
+      expect(await widthOf(rail)).toBe(182)
       expect(await pageRoom(page)).toEqual({ down: 0, sideways: 0 })
       expect(await faultsOf(rail)).toEqual([])
       const label = linksOf(rail).first().locator('> span').last()
@@ -1340,7 +1340,7 @@ test.describe('text that is made larger or spaced out', () => {
   }
 
   // The rail gives way to its parent at a 32 px root; a column beside it must give way too, by going under it.
-  for (const { width, page: room, rail: railWidth } of [{ width: 320, page: 305, rail: 177 }, { width: 390, page: 375, rail: 247 }]) {
+  for (const { width, page: room, rail: railWidth } of [{ width: 320, page: 310, rail: 182 }, { width: 390, page: 380, rail: 252 }]) {
     for (const direction of DIRECTIONS) {
       test(`${String(width)} px ${direction} with the root at 32 px: the controlled demo's button goes under the rail, whole on the page, expanded and collapsed`, async ({ page }) => {
         await page.setViewportSize({ width, height: 480 })
@@ -1372,7 +1372,7 @@ test.describe('text that is made larger or spaced out', () => {
   }
 })
 
-// A mouse keeps the page's scrollbar gutter, 15 px that isMobile has not: 320 px is the reflow width of WCAG 1.4.10.
+// A mouse keeps the page's scrollbar gutter, 10 px that isMobile has not: 320 px is the reflow width of WCAG 1.4.10.
 test.describe('a mouse at 320 x 480, with the scrollbar gutter', () => {
   test.use({ viewport: { width: 320, height: 480 } })
 
@@ -1381,7 +1381,7 @@ test.describe('a mouse at 320 x 480, with the scrollbar gutter', () => {
       test(`${demo} ${direction}: the page does not scroll sideways, expanded or collapsed`, async ({ page }) => {
         await openLive(page, demo, { direction })
         const rail = railOf(page)
-        expect(await page.evaluate(() => document.body.clientWidth), 'px of page beside the gutter').toBe(305)
+        expect(await page.evaluate(() => document.body.clientWidth), 'px of page beside the gutter').toBe(310)
         for (let press = 0; press < 2; press++) {
           await expectNoSidewaysScroll(page)
           expect(await faultsOf(rail)).toEqual([])
