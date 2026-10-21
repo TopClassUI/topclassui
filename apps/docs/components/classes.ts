@@ -1,11 +1,43 @@
 // The site's own class strings, built from the library's shared constants (docs-site rule 1, choice 20).
-import { BORDER, FOCUS_RING, HOVER, SCROLL_X, TOUCH_TARGET, TRANSITION } from 'topclassui/classes'
+import { BORDER, FOCUS_RING, HOVER, POINTER, SCROLL_X, TOUCH_TARGET, TRANSITION } from 'topclassui/classes'
 
 /** A text link inside prose or a list: the library's ring and target, underlined on hover. */
 export const TEXT_LINK = `inline-flex items-center text-primary-on-soft underline-offset-4 ${HOVER.link} ${FOCUS_RING} ${TOUCH_TARGET} rounded-chip`
 
+/** The shell's type steps between the library's 12, 14 and 16 px, as the docs frames draw them: 11, 13, 15 (a lead, or a name on one line) and 32 px. */
+export const TYPE = {
+  eyebrow: 'text-[0.6875rem] leading-4',
+  nav: 'text-[0.8125rem] leading-5',
+  lead: 'text-[0.9375rem] leading-6',
+  name: 'text-[0.9375rem] leading-5',
+  title: 'text-[2rem] leading-10',
+} as const
+
+const QUIET = `inline-flex items-center ${HOVER.link} ${FOCUS_RING} ${TOUCH_TARGET} ${TRANSITION} rounded-chip`
+
 /** A quiet link in the footer or On this page. */
-export const QUIET_LINK = `inline-flex items-center text-muted ${HOVER.link} ${FOCUS_RING} ${TOUCH_TARGET} ${TRANSITION} rounded-chip`
+export const QUIET_LINK = `${QUIET} text-muted`
+
+/** An On this page entry: the section being read in the primary text and heavier, so colour is not the only cue. */
+export const TOC_LINK = {
+  current: `${QUIET} font-medium text-primary-on-soft`,
+  rest: QUIET_LINK,
+} as const
+
+/** The small capitals over a list: a sidebar group, On this page, a pager card. Arabic has no case. */
+export const SHELL_EYEBROW = `${TYPE.eyebrow} font-medium text-muted uppercase`
+
+/** The navbar's search trigger, sunk into the page with a quiet label; merged after the Button's own classes. */
+export const SEARCH_TRIGGER = `bg-page font-normal text-muted ${TYPE.nav}`
+
+/** A segment of the mode switch, regular and the chosen one medium; merged after the segment's own classes. */
+export const MODE_SEGMENT = `font-normal data-checked:font-medium ${TYPE.nav}`
+
+/** A sidebar row merged after the library's: muted until hovered; the page being read keeps its pill and primary text, without the edge bar. */
+export const SIDE_LINK = {
+  current: `px-2 font-medium before:hidden ${TYPE.nav}`,
+  rest: `px-2 text-muted hover:text-body ${TYPE.nav}`,
+} as const
 
 /** The skip link: hidden until it takes the focus, then drawn above the navbar. */
 export const SKIP_LINK = `sr-only focus:not-sr-only focus:fixed focus:top-2 focus:inset-s-2 focus:z-(--tc-z-toast) focus:p-3 bg-surface-raised text-body rounded-control ${FOCUS_RING}`
@@ -19,7 +51,7 @@ export const SECTION_TITLE = 'text-[clamp(1.875rem,1.25rem+2vw,2.5rem)] leading-
 export const LEAD = 'max-w-3xl text-lg text-muted'
 
 /** A Home panel: the surface, the line and the drawn 14 px corner. */
-export const PANEL = `flex min-w-0 flex-col gap-3.5 rounded-box bg-surface p-4.5 ${BORDER}`
+export const PANEL = `flex min-w-0 flex-col gap-3 rounded-box bg-surface p-4.5 ${BORDER}`
 
 /** The soft fill of a tone and its text, for Home's tinted cards (Follow us, What you need). */
 export const TINT = {
@@ -42,8 +74,46 @@ export const TILE = {
 /** Inline code in prose and table cells: Latin, left to right, inside an Arabic sentence too. Mono on the text's own ground, as the docs frames draw it. */
 export const INLINE_CODE = 'font-mono text-sm text-body'
 
+/** Inline code in a prose paragraph or list: mono in the paragraph's own muted colour, so it never outshines the sentence. */
+export const PROSE_CODE = 'font-mono text-sm text-muted'
+
+/** A guide table as the docs frames draw it: the body rows on the surface, and every row shown, with no scroll inside. */
+export const PROSE_TABLE = 'bg-surface max-h-none'
+
+/** A cell of a guide table: muted, regular, 13 px and top-aligned. The header row is the one at aria-rowindex 1: on the page, body-coloured, semibold, 14 px. */
+const PROSE_CELL = 'px-3.5 py-3 align-top text-[0.8125rem]/5 font-normal text-muted in-aria-[rowindex=1]:bg-page in-aria-[rowindex=1]:text-sm in-aria-[rowindex=1]:font-semibold in-aria-[rowindex=1]:text-body'
+
+/** How a column of a guide table lays out: sized to its content on one line, or wrapping above a floor, so a phone scrolls the table instead of stacking one word per line. */
+export const PROSE_COLUMN = {
+  fit: `${PROSE_CELL} whitespace-nowrap`,
+  wrap: `${PROSE_CELL} whitespace-normal min-w-32`,
+  prose: `${PROSE_CELL} whitespace-normal min-w-60`,
+} as const
+
+/** Code an author wrote in a cell arrives at prose size (INLINE_CODE); in a guide table it takes the cell's. */
+export const AUTHORED_CELL = '**:text-[length:inherit]'
+
+/** Code a guide table prints itself: mono and body-coloured, at the cell's size. */
+export const TABLE_CODE = 'font-mono text-body'
+
+/** A printed default as one box, so in Arabic it sits at the start of its cell like every other value while its lines read left to right. */
+export const DEFAULT_CODE = `${TABLE_CODE} inline-block`
+
+/** A printed object default, one entry per line; the lines after the first indented past its opening brace. */
+export const DEFAULT_LINE = {
+  first: 'block',
+  rest: 'block ps-[2ch]',
+} as const
+
 /** A guide page's code block: on the page, edged, its header on the surface (globals.css). */
 export const DOCS_CODE = 'docs-code'
+
+/** The box that lays a code block's Copy button over its header (globals.css keeps the header clear of it). */
+export const CODE_FRAME = 'docs-fence relative isolate grid min-w-0 grid-cols-1'
+
+/** The header's Copy button: 28 px and edged, as drawn, at the header's inline end; 44 px under a finger. */
+export const CODE_COPY = `absolute top-2 inset-e-2 z-1 inline-flex h-control-xs items-center gap-1.5 rounded-control bg-surface px-2.5 text-xs font-medium text-body tone-neutral ${BORDER} ${HOVER.outline} ${TOUCH_TARGET} ${FOCUS_RING} ${TRANSITION} ${POINTER}`
+export const CODE_COPY_ICON = 'flex text-muted'
 
 export const LINK = `inline-flex items-center rounded-control text-primary-on-soft underline-offset-4 ${HOVER.link} ${FOCUS_RING} ${TOUCH_TARGET}`
 /** Visible on focus, as S11 asks, and on hover of its heading. */
@@ -76,6 +146,9 @@ export const H2_BASE = 'group/heading flex items-center gap-2 font-semibold text
 export const H2 = `${H2_BASE} text-xl`
 /** A catalog section's title, 26 px in the frame, read as the scale's 2xl. */
 export const SECTION_H2 = 'text-2xl'
+/** A guide page's title and lead, a step under H1 and LEAD, as the guide frames draw them. */
+export const GUIDE_TITLE = `${TYPE.title} font-semibold text-body`
+export const GUIDE_LEAD = `${TYPE.lead} text-muted`
 export const CARD_TITLE = 'text-lg font-semibold text-body'
 export const H3 = 'text-xs font-medium text-muted uppercase'
 /** A part caption the frames write in sentence case: Every state, Copy the source, Then import it. */

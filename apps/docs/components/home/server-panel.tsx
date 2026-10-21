@@ -12,13 +12,27 @@ import { kbOf } from '../../lib/chip'
 import { FACTS, cardBySlug } from '../../lib/data'
 import { highlight } from '../../lib/highlight'
 import { ZERO_KB } from '../../lib/site'
-import { PANEL } from '../classes'
+import { DOCS_CODE, PANEL } from '../classes'
 import { VoidIsland } from './home-islands'
 
 /** The components the invoice card is built from; their kinds come from meta.ts, never typed. */
 const TREE = ['card', 'badge', 'separator', 'button', 'dialog'] as const
 
 const BUDGET_FILE = 'size-budget.json'
+
+/** A value on one line, `{ "overlay": 14 }`, as a person would write a short object. */
+function inlineOf(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map((item: unknown) => inlineOf(item)).join(', ')}]`
+  if (value === null || typeof value !== 'object') return JSON.stringify(value)
+  const pairs = Object.entries(value as Record<string, unknown>).map(([key, item]) => `${JSON.stringify(key)}: ${inlineOf(item)}`)
+  return `{ ${pairs.join(', ')} }`
+}
+
+/** The budget with each top-level key on one line: the same check in half the lines, so the panel keeps its neighbours' height. */
+function compactOf(json: string): string {
+  const pairs = Object.entries(JSON.parse(json) as Record<string, unknown>).map(([key, value]) => `  ${JSON.stringify(key)}: ${inlineOf(value)}`)
+  return ['{', pairs.join(',\n'), '}'].join('\n')
+}
 
 /** Server first, measured: a real invoice Card whose one client island is the Void dialog, and the budget that holds it. */
 export async function ServerPanel({ locale, labels }: { locale: Locale; labels: SiteLabels }) {
@@ -29,13 +43,14 @@ export async function ServerPanel({ locale, labels }: { locale: Locale; labels: 
   const parts = [{ name: 'Icon', client: false }, ...tree.map((entry) => ({ name: entry.name, client: entry.rendering === 'client' }))]
   const client = parts.filter((part) => part.client).length
   const server = parts.length - client
+  const budget = compactOf(FACTS.sizeBudget)
   return (
     <div className={PANEL}>
       <div className="flex flex-col gap-1.5">
         <h3 className="text-base font-semibold text-body">{text.title}</h3>
         <p className="text-xs text-muted">{text.lead(server, parts.length)}</p>
       </div>
-      <CardRoot className="border-line-strong bg-surface-raised">
+      <CardRoot className="border-line-strong bg-surface-raised p-4">
         <CardHeader>
           <div className="flex items-center justify-between gap-2">
             <p className="text-sm font-semibold text-body"><bdi>{text.invoice}</bdi></p>
@@ -58,9 +73,9 @@ export async function ServerPanel({ locale, labels }: { locale: Locale; labels: 
         </CardFooter>
       </CardRoot>
       <p className="font-mono text-xs text-muted">{text.border}</p>
-      <dl className="flex flex-col gap-3.5 text-xs">
-        <div className="flex items-center justify-between gap-2"><dt className="text-body">{text.onServer}</dt><dd><Badge tone="success" size="xs"><bdi>{ZERO_KB}</bdi></Badge></dd></div>
-        <div className="flex items-center justify-between gap-2"><dt className="text-body">{text.inBrowser}</dt><dd><Badge tone="info" size="xs">{text.inBrowserSize(kbOf(browserBytes))}</Badge></dd></div>
+      <dl className="flex flex-col gap-2.5 text-xs">
+        <div className="flex items-center justify-between gap-2"><dt className="whitespace-nowrap text-body">{text.onServer}</dt><dd><Badge tone="success" size="xs"><bdi>{ZERO_KB}</bdi></Badge></dd></div>
+        <div className="flex items-center justify-between gap-2"><dt className="whitespace-nowrap text-body">{text.inBrowser}</dt><dd><Badge tone="info" size="xs">{text.inBrowserSize(kbOf(browserBytes))}</Badge></dd></div>
       </dl>
       <div className="flex flex-col gap-2">
         <p className="text-xs font-medium text-muted">{text.tree}</p>
@@ -74,7 +89,7 @@ export async function ServerPanel({ locale, labels }: { locale: Locale; labels: 
       </div>
       <div className="flex flex-col gap-2">
         <p className="text-xs font-medium text-muted">{text.checkTitle}</p>
-        <CodeBlock {...getLabels(locale)} lang="json" title={BUDGET_FILE} highlighted={(await highlight(FACTS.sizeBudget, 'json')) ?? undefined}>{FACTS.sizeBudget}</CodeBlock>
+        <CodeBlock {...getLabels(locale)} lang="json" title={BUDGET_FILE} className={DOCS_CODE} wrap highlighted={(await highlight(budget, 'json')) ?? undefined}>{budget}</CodeBlock>
         <p className="text-xs text-muted">{text.checkNote}</p>
       </div>
     </div>
