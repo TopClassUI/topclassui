@@ -1,0 +1,53 @@
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { describe, expect, it } from 'vitest'
+
+import Demo from '../dummy/states.js'
+
+/** Each direct child of the demo's root is one state, captioned by its title; the closed palette renders nothing. */
+const cellsOf = (root: Element | null) => [...(root?.children ?? [])] as HTMLElement[]
+
+describe('the states demo, one cell per state of the Every state strip', () => {
+  it('draws closed, open, typing, empty, loading and selected, in that order, each captioned by its title', () => {
+    const { container } = render(<Demo />)
+    expect(cellsOf(container.firstElementChild).map((cell) => cell.getAttribute('title'))).toEqual([
+      'closed', 'open', 'typing', 'empty', 'loading', 'selected',
+    ])
+  })
+
+  it('draws the closed palette as its Ctrl K hint, a pair of keys', () => {
+    const { container } = render(<Demo />)
+    const [closed] = cellsOf(container.firstElementChild)
+    expect([...(closed?.querySelectorAll('kbd') ?? [])].map((key) => key.textContent)).toEqual(['Ctrl', 'K'])
+  })
+
+  it('draws every other cell as one picture hidden from a reader, with no role and no control in it', () => {
+    const { container } = render(<Demo />)
+    const pictures = cellsOf(container.firstElementChild).slice(1)
+    expect(pictures.map((cell) => [cell.children.length, cell.firstElementChild?.getAttribute('aria-hidden')])).toEqual([
+      [1, 'true'], [1, 'true'], [1, 'true'], [1, 'true'], [1, 'true'],
+    ])
+    expect(container.querySelectorAll('[role], button, input, [tabindex]')).toHaveLength(0)
+    expect(screen.queryByRole('dialog')).toBeNull()
+  })
+
+  it('draws the query, the rows and the highlighted row of each state', () => {
+    const { container } = render(<Demo />)
+    const [, open, typing, empty, loading, selected] = cellsOf(container.firstElementChild)
+    const rows = (cell: HTMLElement | undefined) => [...(cell?.querySelectorAll('[data-command-row]') ?? [])].map((row) => row.textContent)
+    const active = (cell: HTMLElement | undefined) => [...(cell?.querySelectorAll('[data-highlighted]') ?? [])].map((row) => row.textContent)
+    expect([rows(open), active(open)]).toEqual([['Button', 'Dialog', 'Drawer', 'Table', 'Tabs'], []])
+    expect([typing?.textContent.includes('ta'), rows(typing), active(typing)]).toEqual([true, ['Tabs', 'Table'], ['Tabs']])
+    expect([rows(empty), empty?.textContent.includes('zebra'), empty?.textContent.endsWith('No results')]).toEqual([[], true, true])
+    expect([rows(loading), loading?.textContent.endsWith('Loading')]).toEqual([[], true])
+    expect(active(selected)).toEqual(['Drawer'])
+  })
+
+  it('opens the real palette with Ctrl K, after the cells and uncaptioned', async () => {
+    const { container } = render(<Demo />)
+    await userEvent.keyboard('{Control>}k{/Control}')
+    const dialog = await screen.findByRole('dialog')
+    expect(container.contains(dialog)).toBe(false)
+    expect(cellsOf(container.firstElementChild)).toHaveLength(6)
+  })
+})

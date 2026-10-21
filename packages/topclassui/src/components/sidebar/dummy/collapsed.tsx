@@ -5,7 +5,7 @@ import { users } from '#icons/data/users.js'
 import { Svg } from '#components/svg/index.js'
 import { SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoot } from '../index.js'
 
-/** Collapsed from the start: the server sends the 60 px column of icons, so nothing moves
+/** Collapsed from the start: the server sends the 52 px column of icons, so nothing moves
  * when the page hydrates. Each label is hidden and still names its link. */
 export default function Demo() {
   return (

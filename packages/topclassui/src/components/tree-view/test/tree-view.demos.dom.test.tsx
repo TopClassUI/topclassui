@@ -19,7 +19,8 @@ const AFTER: Record<string, (string | null)[]> = {
   'playground': ['README.md'],
   'rtl': ['ملاحظات.txt'],
   'selected': ['next.config.ts'],
-  'states': ['next.config.ts', 'next.config.ts'],
+  // The last row of the open trees is disabled, so Enter on it selects nothing: the collapsed src, and the selected cell's file1.
+  'states': ['src', 'file1'],
   'status': [],
   'ten-thousand': ['File 10000.ts'],
 }

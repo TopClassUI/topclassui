@@ -65,7 +65,7 @@ describe('every demo is a Server Component that only hands the field what can cr
 
   it('states: each state is a plain prop of the field', async () => {
     const props = crossings((await load('states'))()).map(({ props: given }) => Object.keys(given).join(' '))
-    expect(props).toEqual(['id invalid defaultValue', 'id disabled defaultValue', 'id readOnly defaultValue'])
+    expect(props).toEqual(['id invalid defaultValue', 'id disabled defaultValue', 'id readOnly defaultValue', 'id defaultValue', 'id defaultValue'])
   })
 
   it('rtl: the field sits inside the provider an island mounts', async () => {

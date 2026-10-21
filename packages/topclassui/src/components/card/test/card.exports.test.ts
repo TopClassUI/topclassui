@@ -27,14 +27,15 @@ const PART_FILES = {
   'card-body': ['CardBody'],
   'card-footer': ['CardFooter'],
   'card-header': ['CardHeader'],
+  'card-media': ['CardMedia'],
   'card-root': ['CardRoot'],
 }
 
 // The root-part lint reads declarations, and index.tsx declares nothing, so this is the guard.
 describe('index.tsx exports flat names, and no bare Card', () => {
-  it('exports exactly the four parts and the skeleton', () => {
+  it('exports exactly the five parts and the skeleton', () => {
     expect(Object.keys(card).sort()).toEqual([
-      'CardBody', 'CardFooter', 'CardHeader', 'CardRoot', 'CardSkeleton',
+      'CardBody', 'CardFooter', 'CardHeader', 'CardMedia', 'CardRoot', 'CardSkeleton',
     ])
   })
 
@@ -47,7 +48,7 @@ describe('index.tsx exports flat names, and no bare Card', () => {
     const source = readFileSync(join(import.meta.dirname, '..', 'index.tsx'), 'utf8')
     expect(exportedNames(source).sort()).toEqual([
       'CardBody', 'CardBodyProps', 'CardFooter', 'CardFooterProps', 'CardHeader', 'CardHeaderProps',
-      'CardRoot', 'CardRootProps', 'CardSkeleton', 'CardSkeletonProps',
+      'CardMedia', 'CardMediaProps', 'CardRoot', 'CardRootProps', 'CardSkeleton', 'CardSkeletonProps',
     ])
   })
 
@@ -58,9 +59,9 @@ describe('index.tsx exports flat names, and no bare Card', () => {
 })
 
 describe('parts/ holds one component per file', () => {
-  it('holds exactly the four part files', () => {
+  it('holds exactly the five part files', () => {
     expect(readdirSync(join(import.meta.dirname, '..', 'parts')).sort()).toEqual([
-      'card-body.tsx', 'card-footer.tsx', 'card-header.tsx', 'card-root.tsx',
+      'card-body.tsx', 'card-footer.tsx', 'card-header.tsx', 'card-media.tsx', 'card-root.tsx',
     ])
   })
 

@@ -56,11 +56,11 @@ test.describe('the five sizes, on the static page', () => {
   test.use({ reducedMotion: 'reduce' })
 
   for (const direction of DIRECTIONS) {
-    test(`fine pointer, ${direction}: a square of the control scale at each size, with its type step`, async ({ page }) => {
+    test(`fine pointer, ${direction}: one control step taller than wide at each size, with its type step`, async ({ page }) => {
       await page.goto(urlFor('otp-field--sizes', 'light', direction))
       expect(await fields(page)).toEqual([
-        { cells: '28x28', font: '14px', rows: '6' }, { cells: '32x32', font: '16px', rows: '6' }, { cells: '40x40', font: '18px', rows: '6' },
-        { cells: '48x48', font: '20px', rows: '6' }, { cells: '56x56', font: '24px', rows: '6' },
+        { cells: '28x32', font: '14px', rows: '6' }, { cells: '32x40', font: '16px', rows: '6' }, { cells: '40x48', font: '18px', rows: '6' },
+        { cells: '48x56', font: '20px', rows: '6' }, { cells: '56x64', font: '24px', rows: '6' },
       ])
     })
   }
@@ -71,9 +71,9 @@ test.describe('the five sizes, on the static page', () => {
     test('every cell is at least 44 x 44 px, the small three 44 wide, and typed text is never under 16 px', async ({ page }) => {
       await page.goto(urlFor('otp-field--sizes', 'light', 'ltr'))
       expect(await fields(page)).toEqual([
-        { cells: '44x44', font: '16px', rows: '6' }, { cells: '44x44', font: '16px', rows: '6' }, { cells: '44x44', font: '18px', rows: '6' },
-        // Six cells of 48 or 56 px do not fit 326 px: the cells give up width, never height.
-        { cells: '47.7x48', font: '20px', rows: '6' }, { cells: '47.7x56', font: '24px', rows: '6' },
+        { cells: '44x44', font: '16px', rows: '6' }, { cells: '44x44', font: '16px', rows: '6' }, { cells: '44x48', font: '18px', rows: '6' },
+        // Six cells of 48 or 56 px do not fit 326 px: the cells give up width down to 44, never height.
+        { cells: '47.7x56', font: '20px', rows: '6' }, { cells: '47.7x64', font: '24px', rows: '6' },
       ])
     })
   })
@@ -83,17 +83,17 @@ test.describe('phones, on the static page', () => {
   test.use({ ...COARSE, reducedMotion: 'reduce' })
 
   for (const direction of DIRECTIONS) {
-    test(`${direction}, 390 px: six cells are 44 x 44 px, with a separator too, and twelve wrap 6 + 6 at 44 px`, async ({ page }) => {
+    test(`${direction}, 390 px: six cells are 44 x 48 px, with a separator too, and twelve wrap 6 + 6`, async ({ page }) => {
       for (const [demo, rows] of [['basic', '6'], ['grouped', '6'], ['long', '6+6']] as const) {
         await page.goto(urlFor(`otp-field--${demo}`, 'light', direction))
-        expect(await fields(page), demo).toEqual([{ cells: '44x44', font: '18px', rows }])
+        expect(await fields(page), demo).toEqual([{ cells: '44x48', font: '18px', rows }])
         await expectNoSidewaysScroll(page)
       }
     })
 
-    test(`${direction}, 320 px: six cells give up width and keep 44 px of height (choice 38); twelve wrap 5 + 5 + 2 at 44 px`, async ({ page }) => {
+    test(`${direction}, 320 px: cells keep 44 px of width under a finger (R-5.6-2), so six wrap 5 + 1, 4 + 2 with a separator, and twelve 5 + 5 + 2`, async ({ page }) => {
       await page.setViewportSize({ width: 320, height: 640 })
-      for (const [demo, cells, rows] of [['basic', '36x44', '6'], ['grouped', '33x44', '6'], ['long', '44x44', '5+5+2']] as const) {
+      for (const [demo, cells, rows] of [['basic', '44x48', '5+1'], ['grouped', '44x48', '4+2'], ['long', '44x48', '5+5+2']] as const) {
         await page.goto(urlFor(`otp-field--${demo}`, 'light', direction))
         expect(await fields(page), demo).toEqual([{ cells, font: '18px', rows }])
         await expectNoSidewaysScroll(page)
@@ -108,9 +108,9 @@ test.describe('left to right, in an Arabic form', () => {
       await page.goto(urlFor('otp-field--rtl', 'light', direction))
       const group = page.locator('#demo [role="group"]')
       const [box, parent] = [await boxOf(group), await boxOf(group.locator('xpath=..'))]
-      expect([box.left, box.right, parent.right]).toEqual([953, 1233, 1233])
+      expect([box.left, box.right, parent.right]).toEqual([958, 1238, 1238])
       const lefts = await group.locator('input').evaluateAll((all) => all.map((cell) => cell.getBoundingClientRect().left))
-      expect(lefts).toEqual([953, 1001, 1049, 1097, 1145, 1193])
+      expect(lefts).toEqual([958, 1006, 1054, 1102, 1150, 1198])
     })
   }
 })
@@ -236,13 +236,13 @@ test.describe('text', () => {
   test.use({ reducedMotion: 'reduce' })
 
   for (const direction of DIRECTIONS) {
-    // At 320 px the demo's parent is 177 px, under the 224 px floor of six cells and 16 px gaps: the row breaks, never overflows.
+    // At 320 px the demo's parent is 182 px, under the 224 px floor of six cells and 16 px gaps: the row breaks, never overflows.
     test(`${direction}: at a root of 32 px a cell doubles; at 320 px the row breaks inside its parent and the page does not scroll`, async ({ page }) => {
       await page.goto(urlFor('otp-field--basic', 'light', direction))
       await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
-      expect(await fields(page)).toEqual([{ cells: '80x80', font: '36px', rows: '6' }])
+      expect(await fields(page)).toEqual([{ cells: '80x96', font: '36px', rows: '6' }])
       await page.setViewportSize({ width: 320, height: 480 })
-      expect(await fields(page)).toEqual([{ cells: '32.3x80 80x80', font: '36px', rows: '4+2' }])
+      expect(await fields(page)).toEqual([{ cells: '33.5x96 80x96', font: '36px', rows: '4+2' }])
       const outside = await page.locator('#demo [role="group"]').evaluate((group) => {
         const parent = (group.parentElement as HTMLElement).getBoundingClientRect()
         return [...group.querySelectorAll('input')].filter((cell) => {
@@ -259,7 +259,7 @@ test.describe('text', () => {
     await page.setViewportSize({ width: 320, height: 640 })
     await page.goto(urlFor('otp-field--sizes', 'light', 'ltr'))
     await page.addStyleTag({ content: '* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-block-end: 2em !important; }' })
-    expect((await fields(page)).map((field) => field.cells)).toEqual(['28x28', '32x32', '33.5x40', '33.5x48', '33.5x56'])
+    expect((await fields(page)).map((field) => field.cells)).toEqual(['28x32', '32x40', '34.3x48', '34.3x56', '34.3x64'])
     let above = 0
     for (const label of await page.locator('#demo span[id]').all()) {
       const [text, group] = [await boxOf(label), await boxOf(label.locator('xpath=following-sibling::div[1]'))]
@@ -439,10 +439,10 @@ test.describe('live: where a page puts a code field', () => {
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 
   for (const direction of DIRECTIONS) {
-    test(`1280 px, ${direction}: every case holds six cells of 40 x 40 px`, async ({ page }) => {
+    test(`1280 px, ${direction}: every case holds six cells of 40 x 48 px`, async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 800 })
       await fixture(page, { direction })
-      expect(await cases(page)).toEqual(['block', 'grid', 'track', 'flex-column', 'label-row', 'flex-1', 'w-fit', 'cell', 'auto-1fr', 'pair', 'halves', 'halves-direct'].map((name) => `${name}: 40x40`))
+      expect(await cases(page)).toEqual(['block', 'grid', 'track', 'flex-column', 'label-row', 'flex-1', 'w-fit', 'cell', 'auto-1fr', 'pair', 'halves', 'halves-direct'].map((name) => `${name}: 40x48`))
       expect(await strays(page)).toEqual([])
       await expectNoSidewaysScroll(page)
     })
@@ -452,13 +452,12 @@ test.describe('live: where a page puts a code field', () => {
     test.use({ ...COARSE, viewport: { width: 320, height: 480 } })
 
     for (const direction of DIRECTIONS) {
-      // 288 px inside the fixture's padding: a parent that sizes to its content counts a cell as 24 px, so the field shrinks.
-      // A column of 140 px is under the 184 px floor of six cells, so the field breaks there: 4 + 2, the last two at their cap.
-      test(`${direction}: every cell keeps 44 px of height and at least 24 of width, inside its group, and the page does not scroll sideways`, async ({ page }) => {
+      // 288 px inside the fixture's padding: six cells of 44 px and their gaps are 304 px, so every case wraps, never under 44 px a cell.
+      test(`${direction}: every cell keeps 44 px of width and its height, inside its group, and the page does not scroll sideways`, async ({ page }) => {
         await fixture(page, { direction })
         expect(await cases(page)).toEqual([
-          'block: 41.3x44', 'grid: 41.3x44', 'track: 29x44 44x44 in 4+2', 'flex-column: 41.3x44', 'label-row: 33.8x44', 'flex-1: 26.7x44',
-          'w-fit: 41.3x44', 'cell: 29.3x44', 'auto-1fr: 30.3x44 44x44 in 5+1', 'pair: 41.3x44', 'halves: 29x44 44x44 in 4+2', 'halves-direct: 29x44 44x44 in 4+2',
+          'block: 44x48 in 5+1', 'grid: 44x48 in 5+1', 'track: 44x48 in 2+2+2', 'flex-column: 44x48 in 5+1', 'label-row: 44x48 in 4+2', 'flex-1: 44x48 in 4+2',
+          'w-fit: 44x48 in 5+1', 'cell: 44x48 in 4+2', 'auto-1fr: 44x48 in 3+3', 'pair: 44x48 in 5+1', 'halves: 44x48 in 2+2+2', 'halves-direct: 44x48 in 2+2+2',
         ])
         expect(await strays(page)).toEqual([])
         await expectNoSidewaysScroll(page)
@@ -495,7 +494,7 @@ test.describe('live: hostile content', () => {
         const many = page.locator('#hostile [role="group"]').last()
         expect([await many.locator('input').count(), await many.locator('span').count()]).toEqual([12, 0])
         const sizes = await page.locator('#hostile [role="group"] input').evaluateAll((all) => [...new Set(all.map((el) => el.getBoundingClientRect().height))])
-        expect(sizes).toEqual([44])
+        expect(sizes).toEqual([48])
       })
     }
   })

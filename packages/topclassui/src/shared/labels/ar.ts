@@ -84,7 +84,7 @@ export const ar = {
     close: 'إغلاق هذا الحوار',
   },
   file: {
-    drop: 'أفلت الملفات هنا',
+    drop: 'اسحب الملفات إلى هنا أو',
     browse: 'تصفّح',
     remove: 'إزالة',
     tooMany: byCount({
@@ -146,11 +146,14 @@ export const ar = {
   },
   toast: {
     region: 'الإشعارات',
+    stage: 'إشعارات المثال',
     close: 'إغلاق هذا الإشعار',
   },
   command: {
     label: 'لوحة الأوامر',
     placeholder: 'اكتب أمرًا أو ابحث',
+    escape: 'Esc',
+    enter: 'Enter',
   },
   navbar: {
     label: 'التنقل الرئيسي',

@@ -9,8 +9,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the switch slide loses var(--tc-dir), so in Arabic the thumb leaves its track',
     file: CLASSES,
-    from: "md: 'group-data-checked/toggle:translate-x-[calc(0.9375rem*var(--tc-density)*var(--tc-dir))]'",
-    to: "md: 'group-data-checked/toggle:translate-x-[calc(0.9375rem*var(--tc-density))]'",
+    from: "md: 'group-data-checked/toggle:translate-x-[calc(1.125rem*var(--tc-density)*var(--tc-dir))]'",
+    to: "md: 'group-data-checked/toggle:translate-x-[calc(1.125rem*var(--tc-density))]'",
   },
   {
     label: 'the switch hands Base UI defaultChecked again, so a form reset leaves it as it was while the form sends the default',

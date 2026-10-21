@@ -42,6 +42,7 @@ Every prop below is optional and falls back to the default shown.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
+| `children` | no | `ReactNode` | - | A short label between two lines, such as "or". It names the separator when it is announced. |
 | `decorative` | no | `boolean` | `true` | Keeps the line out of the accessibility tree; false announces it as a separator. |
 | `orientation` | no | `horizontal` \| `vertical` | `"horizontal"` | Which way the line runs: across its container, or down the height of a flex row. |
 

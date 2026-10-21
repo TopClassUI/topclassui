@@ -6,8 +6,8 @@ import { attr, classList, markup } from '#test/markup.js'
 import { Kbd } from '../index.js'
 
 /** The class attribute the spec gives, written out in the order cn() emits it. */
-const CLASS = 'inline-flex items-center justify-center rounded-chip bg-surface px-1.5 py-0.5'
-  + ' font-mono text-xs text-body border-(length:--tc-line-width) border-line-strong'
+const CLASS = 'inline-flex items-center justify-center rounded-chip bg-surface-raised px-1.5 py-0.5'
+  + ' font-mono text-xs text-body data-pressed:bg-surface data-disabled:bg-surface data-disabled:border-line data-disabled:text-muted border-(length:--tc-line-width) border-line-strong'
 
 /** The text of every keycap in the markup, in document order. */
 const keysIn = (html: string) =>
@@ -44,8 +44,8 @@ describe('the element it renders', () => {
 })
 
 describe('no design prop and no state', () => {
-  it('carries no design or state attribute, because the spec builds neither', () => {
-    expect(markup(<Kbd>K</Kbd>)).not.toMatch(/data-(variant|tone|size|state|pressed|muted|disabled|open|loading)/)
+  it('carries no design or state attribute at rest', () => {
+    expect(markup(<Kbd>K</Kbd>)).not.toMatch(/data-(variant|tone|size|state|pressed|muted|disabled|open|loading)=/)
   })
 
   it('is not a control, so it carries no disabled, pressed or tab-stop attribute', () => {

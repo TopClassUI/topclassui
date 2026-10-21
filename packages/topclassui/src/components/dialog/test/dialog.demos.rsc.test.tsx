@@ -65,13 +65,13 @@ const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { 
 describe('every demo is a Server Component that only hands the parts what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
     expect(names).toEqual([
-      'basic', 'confirm', 'long-body', 'long-content', 'no-close-button', 'non-modal', 'playground', 'rtl', 'sizes',
-      'states', 'trap-focus', 'with-form', 'with-tooltip',
+      'basic', 'confirm', 'long-body', 'long-content', 'no-close-button', 'non-modal', 'rtl', 'sizes',
+      'trap-focus', 'with-form', 'with-tooltip',
     ])
   })
 
-  it('leaves out the one demo that is a client file, which cannot run here: it calls useState', async () => {
-    expect(every.filter(isClient)).toEqual(['close-on-success'])
+  it('leaves out the three demos that are client files, which cannot run here: they call useState and useRef', async () => {
+    expect(every.filter(isClient)).toEqual(['close-on-success', 'playground', 'states'])
     const Demo = await load('close-on-success')
     expect(() => Demo()).toThrow(/useState/)
   })

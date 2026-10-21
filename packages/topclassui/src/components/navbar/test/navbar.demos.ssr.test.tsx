@@ -42,8 +42,8 @@ const DEMOS: Record<string, Shape> = {
     current: [], navs: ['On this page'], sticky: 1,
   },
   'states': {
-    hrefs: ['/', '/docs', '/components', '/icons', '/theming', '/login', '/', '/blog', '/changelog'],
-    current: ['/docs'], navs: ['Sticky, Docs being read', 'In the flow, nothing being read'], sticky: 1,
+    hrefs: ['/', '/docs', '/components', '/icons', '/theming', '/login', '/', '/blog', '/changelog', '/', '/about'],
+    current: ['/docs'], navs: ['Sticky, Docs being read', 'In the flow, nothing being read', 'Transparent, on the page'], sticky: 1,
   },
   'with-search': { hrefs: ['/', '/docs', '/components', '/icons'], current: ['/docs'], navs: ['Main'], sticky: 1 },
 }

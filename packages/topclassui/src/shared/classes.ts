@@ -24,6 +24,9 @@ export const FOCUS_RING = [
   'focus-visible:outline-ring',
 ].join(' ')
 
+/** The ring a trigger keeps while its popup is open, as the frames draw it; the focus is in the popup meanwhile. */
+export const OPEN_RING = 'data-popup-open:outline-solid data-popup-open:outline-(length:--tc-ring-width) data-popup-open:outline-offset-(length:--tc-ring-offset) data-popup-open:outline-ring'
+
 /** Every transition multiplies by --tc-motion, so one knob can stop all of them. */
 export const TRANSITION = 'transition-[color,background-color,border-color,outline-color,opacity,translate] duration-(--tc-duration) ease-out'
 
@@ -47,6 +50,10 @@ export const HOVER = {
   outline: 'hover:bg-(--tc-soft) active:bg-(--tc-soft-hover)',
   ghost: 'hover:bg-(--tc-soft) active:bg-(--tc-soft-hover)',
   link: 'hover:underline',
+  // A raised surface steps down to the page's surface, as the interactive Card is drawn.
+  surface: 'hover:bg-(--tc-surface)',
+  // A muted link, such as a crumb, also lifts to the body colour under the pointer.
+  mutedLink: 'hover:underline hover:text-body',
 } as const
 
 /** The height alone, so a skeleton stands in for a control without copying the value. */
@@ -76,6 +83,16 @@ export const TOGGLE_SIZE = {
   md: 'size-toggle-md',
   lg: 'size-toggle-lg',
   xl: 'size-toggle-xl',
+  custom: '',
+} as const
+
+/** The slider's knob, a step under the toggle box at each size: the toggle scale moved up to the frame, the knob did not. */
+export const KNOB_SIZE = {
+  xs: 'size-knob-xs',
+  sm: 'size-knob-sm',
+  md: 'size-knob-md',
+  lg: 'size-knob-lg',
+  xl: 'size-knob-xl',
   custom: '',
 } as const
 
@@ -122,10 +139,10 @@ export const POPUP_MOTION = 'origin-(--transform-origin) transition-[opacity,sca
 export const SLIDE_MOTION = 'transition-transform duration-(--tc-duration-slow) ease-out'
 
 /** The box of a dialog, a popup and a toast. Forced colours drop the shadow and keep the line. */
-export const OVERLAY_SURFACE = `rounded-box bg-surface-raised text-body ${BORDER} shadow-lg`
+export const OVERLAY_SURFACE = `rounded-box bg-surface-raised text-body ${BORDER} shadow-(--tc-shadow-overlay)`
 
 /** One row of a menu or a list, at least --tc-row-height tall. Its highlight is its focus mark. */
-export const ROW = `flex min-h-(--tc-row-height) w-full items-center gap-2 rounded-control px-3 text-start text-sm outline-none ${POINTER}`
+export const ROW = `flex min-h-(--tc-row-height) w-full items-center gap-2 rounded-control px-2.5 text-start text-sm outline-none ${POINTER}`
 
 /** The row the keyboard or the pointer is on: a fill, and the ring inside its edge, since the fill alone
  * is under 3:1 against the popup. Forced colours erase a fill, so there it paints the system pair itself,
@@ -162,6 +179,14 @@ export const ICON_BUTTON = `inline-flex shrink-0 items-center justify-center rou
 
 /** The ring drawn inside the box, for a control flush against an edge that clips it. */
 export const FOCUS_RING_INSET = 'outline-none focus-visible:outline-solid focus-visible:outline-(length:--tc-ring-width) focus-visible:-outline-offset-(length:--tc-ring-width) focus-visible:outline-ring'
+
+/** The same fill for a row that holds the real focus, as a Select's does: its ring is the focus ring, so a row
+ * a pointer opened on or passes over is tinted without one, and a key brings the ring back. */
+export const ROW_FOCUSED = [
+  'data-highlighted:bg-primary-soft data-highlighted:text-primary-on-soft',
+  `${FOCUS_RING_INSET} forced-colors:focus-visible:outline-[HighlightText]`,
+  'forced-colors:data-highlighted:bg-[Highlight] forced-colors:data-highlighted:text-[HighlightText] forced-colors:data-highlighted:forced-color-adjust-none',
+].join(' ')
 
 /** The ring on a wrapper whose focused element is hidden: a label around a native radio. */
 export const FOCUS_RING_WITHIN = 'outline-none has-focus-visible:outline-solid has-focus-visible:outline-(length:--tc-ring-width) has-focus-visible:outline-offset-(length:--tc-ring-offset) has-focus-visible:outline-ring'
@@ -233,14 +258,17 @@ export const FIELD_INVALID_WITHIN = 'has-aria-invalid:border-danger-solid has-ar
 /** A value forced left-to-right keeps the form's side. */
 export const FIELD_LTR = 'data-ltr:text-match-parent data-ltr:placeholder:[unicode-bidi:plaintext]'
 
-/** Kept but not typed in. Set from the prop, never from read-only:. */
-export const FIELD_READ_ONLY = 'bg-neutral-soft'
+/** The line steps up from its 3:1 rest under the pointer, as the frames step it from line to line-strong. Not on an invalid field, whose red stays. */
+export const FIELD_HOVER = 'hover:not-aria-invalid:not-has-aria-invalid:border-body'
 
 /** The box of a field: its fill, its 3:1 line and its radius. */
-export const FIELD_SURFACE = `rounded-control bg-surface-raised text-body ${BORDER_STRONG} ${CONTAIN} ${TRANSITION}`
+export const FIELD_SURFACE = `rounded-control bg-surface-raised text-body ${BORDER_STRONG} ${FIELD_HOVER} ${CONTAIN} ${TRANSITION}`
+
+/** Disabled sits on the surface below the raised fill, then dims with every control. */
+export const FIELD_DISABLED = 'disabled:bg-surface data-disabled:bg-surface'
 
 /** A field that is one element: the box, the ring, the floor and the invalid mark. */
-export const FIELD_BOX = `${FIELD_SURFACE} placeholder:text-muted ${DISABLED} ${FOCUS_RING} ${TOUCH_TARGET} ${FIELD_INVALID}`
+export const FIELD_BOX = `${FIELD_SURFACE} placeholder:text-muted ${DISABLED} ${FIELD_DISABLED} ${FOCUS_RING} ${TOUCH_TARGET} ${FIELD_INVALID}`
 
 /** The type step of a field, for a wrapper that owns the width: --tc-input-width is in em. */
 export const FIELD_TEXT = {
@@ -267,5 +295,5 @@ export const FIELD_SIZE = {
 /** A row under a finger: raised to the coarse target, never below the row height a 32 px root or a density sets. */
 export const ROW_TOUCH = 'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]'
 
-/** The chosen row differs by weight as well as by its tick. */
-export const ROW_SELECTED = 'data-selected:font-medium'
+/** The chosen row wears the tint and the tick. Forced colours would repaint the tint as Canvas, so there it is cleared and the tick tells it. */
+export const ROW_SELECTED = 'data-selected:bg-primary-soft data-selected:text-primary-on-soft forced-colors:data-selected:not-data-highlighted:bg-transparent'

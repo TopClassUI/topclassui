@@ -3,8 +3,8 @@
 /** The files npm always packs beside dist, and size.json, which pnpm size writes for the site's chips. */
 export const ROOT_FILES = new Set(['package.json', 'README.md', 'LICENSE', 'CHANGELOG.md', 'size.json'])
 
-/** With the CLI and its registry inside (plan cli.md K1) the build packs 2,769,859 bytes unpacked; the budget is that plus 10 %, rounded up. */
-export const SIZE_BUDGET_BYTES = 3_050_000
+/** The round-8 library packs 3,114,237 bytes unpacked; the budget is that plus about 1 % (DECISIONS 2026-10-19). */
+export const SIZE_BUDGET_BYTES = 3_150_000
 
 export const REQUIRED_FILES = ['dist/styles.css', 'dist/tokens.css']
 

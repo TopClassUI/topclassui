@@ -44,7 +44,7 @@ export function FileUpload({
         data-disabled={disabled ? '' : undefined}
         className={FILE_UPLOAD_ZONE}
       >
-        <span aria-hidden="true" className={FILE_UPLOAD_ICON}><Svg icon={uploadSimple} size="1.75rem" /></span>
+        <span aria-hidden="true" className={FILE_UPLOAD_ICON}><Svg icon={uploadSimple} size="1.625rem" /></span>
         <span className={FILE_UPLOAD_PROMPT}>
           <span>{upload.labels.drop}</span>
           <span className={FILE_UPLOAD_BROWSE}>{upload.labels.browse}</span>

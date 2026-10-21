@@ -8,7 +8,7 @@ import { COLLECTION_BOUNDARIES } from '#shared/contracts/collection.js'
 import { useDirection, useLabels } from '#shared/provider/context.js'
 import { useControllableState } from '#shared/use-controllable-state.js'
 import { TREE_VIEW_DEFAULTS, TREE_VIEW_ROW_ESTIMATE, TYPEAHEAD_MS } from './constants.js'
-import { findRow, flattenTree, isScrolledOut, keyAction, keyOfRow, rowIndexOf, toggled, typeahead } from './lib.js'
+import { findRow, flattenTree, isScrolledOut, keyAction, keyOfRow, noteKindOf, rowIndexOf, toggled, typeahead } from './lib.js'
 import type {
   TreeFocusEvent, TreeKeyAction, TreeKeyEvent, TreeMouseEvent, TreePointerEvent, TreeViewHookProps, TreeViewHookResult,
 } from './types.js'
@@ -204,6 +204,7 @@ export function useTreeView(props: TreeViewHookProps): TreeViewHookResult {
       idle: null, loading: props.loadingFallback ?? labels.common.loading, 'loading-more': labels.state.loadingMore,
       empty: props.emptyFallback ?? labels.state.empty,
     }[status],
+    noteKind: noteKindOf(status, props.loadingFallback, props.emptyFallback),
     style: {
       ...props.style,
       '--tc-list-pad-start': `${String(collection.paddingStart)}px`,

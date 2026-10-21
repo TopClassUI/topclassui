@@ -53,7 +53,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a skeleton row loses its margins, so three rows are shorter than three lines',
     file: 'src/components/skeleton/classes.ts',
-    from: ' my-[calc((1lh-1em)/2)]',
+    from: ' my-[calc((1lh-0.75em)/2)]',
     to: '',
   },
   {
@@ -85,5 +85,11 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/skeleton/classes.ts',
     from: "['bg-neutral-soft animate-pulse motion-reduce:animate-none', FORCED_EDGE].join(' ')",
     to: "'bg-neutral-soft animate-pulse motion-reduce:animate-none'",
+  },
+  {
+    label: 'the row before the last stays full width, so three rows stop stepping down as drawn',
+    file: 'src/components/skeleton/index.tsx',
+    from: '            count > 2 && row === count - 2 && SKELETON_NEXT_TO_LAST_ROW,\n',
+    to: '',
   },
 ]

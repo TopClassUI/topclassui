@@ -1,6 +1,6 @@
 // R-5.12-4: the class strings of the slider (unit-4.md, Slider), built from the shared field and target constants.
 import {
-  DISABLED, FIELD_HOLDER, FIELD_HOLDER_FULL, FIELD_TEXT, TARGET_HEIGHT, TOGGLE_SIZE, TOUCH_TARGET,
+  DISABLED, FIELD_HOLDER, FIELD_HOLDER_FULL, FIELD_TEXT, KNOB_SIZE, TARGET_HEIGHT, TOUCH_TARGET,
 } from '#shared/classes.js'
 
 /** The box that owns the width. No type step here: FIELD_TEXT[size] gives it, so the em of the width is an Input's.
@@ -13,8 +13,8 @@ export const SLIDER_TEXT = FIELD_TEXT
 /** fullWidth, merged after the root: w-full replaces w-fit and the column fills the box. */
 export const SLIDER_FULL = FIELD_HOLDER_FULL
 
-/** The knob, of the toggle scale: 14, 16, 20, 24 and 28 px. */
-export const SLIDER_KNOB_SIZE = TOGGLE_SIZE
+/** The knob, of the knob scale: 14, 16, 20, 24 and 28 px. */
+export const SLIDER_KNOB_SIZE = KNOB_SIZE
 
 /** The one item of that grid: the control, and the value after it, or below it when the value would eat the track. */
 export const SLIDER_ROW = 'flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1'
@@ -25,11 +25,11 @@ export const SLIDER_CONTROL = `relative flex min-w-2/3 flex-1 touch-none select-
 /** Merged after the control: half the knob plus its focus ring when that is more than half a target, as at xl or a
  * 32 px root, so the ring of a thumb at either end stays inside the box too. custom keeps the control's own. */
 export const SLIDER_CONTROL_SIZE = {
-  xs: 'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-toggle-xs)/2+var(--tc-ring-offset)+var(--tc-ring-width)))] pointer-coarse:px-[max(calc(var(--tc-target-coarse,44px)/2),calc(var(--spacing-toggle-xs)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
-  sm: 'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-toggle-sm)/2+var(--tc-ring-offset)+var(--tc-ring-width)))] pointer-coarse:px-[max(calc(var(--tc-target-coarse,44px)/2),calc(var(--spacing-toggle-sm)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
-  md: 'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-toggle-md)/2+var(--tc-ring-offset)+var(--tc-ring-width)))] pointer-coarse:px-[max(calc(var(--tc-target-coarse,44px)/2),calc(var(--spacing-toggle-md)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
-  lg: 'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-toggle-lg)/2+var(--tc-ring-offset)+var(--tc-ring-width)))] pointer-coarse:px-[max(calc(var(--tc-target-coarse,44px)/2),calc(var(--spacing-toggle-lg)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
-  xl: 'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-toggle-xl)/2+var(--tc-ring-offset)+var(--tc-ring-width)))] pointer-coarse:px-[max(calc(var(--tc-target-coarse,44px)/2),calc(var(--spacing-toggle-xl)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
+  xs: 'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-knob-xs)/2+var(--tc-ring-offset)+var(--tc-ring-width)))] pointer-coarse:px-[max(calc(var(--tc-target-coarse,44px)/2),calc(var(--spacing-knob-xs)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
+  sm: 'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-knob-sm)/2+var(--tc-ring-offset)+var(--tc-ring-width)))] pointer-coarse:px-[max(calc(var(--tc-target-coarse,44px)/2),calc(var(--spacing-knob-sm)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
+  md: 'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-knob-md)/2+var(--tc-ring-offset)+var(--tc-ring-width)))] pointer-coarse:px-[max(calc(var(--tc-target-coarse,44px)/2),calc(var(--spacing-knob-md)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
+  lg: 'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-knob-lg)/2+var(--tc-ring-offset)+var(--tc-ring-width)))] pointer-coarse:px-[max(calc(var(--tc-target-coarse,44px)/2),calc(var(--spacing-knob-lg)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
+  xl: 'px-[max(calc(var(--tc-target-min,24px)/2),calc(var(--spacing-knob-xl)/2+var(--tc-ring-offset)+var(--tc-ring-width)))] pointer-coarse:px-[max(calc(var(--tc-target-coarse,44px)/2),calc(var(--spacing-knob-xl)/2+var(--tc-ring-offset)+var(--tc-ring-width)))]',
   custom: '',
 } as const
 

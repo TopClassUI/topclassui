@@ -8,7 +8,7 @@ const COLLECTION = 'src/shared/contracts/collection.ts'
 
 export const MUTATIONS: Mutation[] = [
   {
-    label: 'the shared option row touch floor is emptied, so a row under a finger is 40 px tall, under the 44 px target',
+    label: 'the shared option row touch floor is emptied, so a row under a finger is 32 px tall, under the 44 px target',
     file: CLASSES,
     from: "export const ROW_TOUCH = 'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]'",
     to: "export const ROW_TOUCH = ''",
@@ -28,7 +28,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the shared option selected row is emptied, so the chosen row is told by its tick alone',
     file: CLASSES,
-    from: "export const ROW_SELECTED = 'data-selected:font-medium'",
+    from: "export const ROW_SELECTED = 'data-selected:bg-primary-soft data-selected:text-primary-on-soft forced-colors:data-selected:not-data-highlighted:bg-transparent'",
     to: "export const ROW_SELECTED = ''",
   },
   {

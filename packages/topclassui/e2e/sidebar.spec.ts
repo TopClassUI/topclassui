@@ -263,10 +263,10 @@ test.describe('the server HTML', () => {
     expect(arabic).toContain(`<button aria-label="${NAMES.rtl.collapse}"`)
   })
 
-  test('with no script at all the rails are 220 and 60 px wide, every link is named, and one is the current page', async ({ browser }) => {
+  test('with no script at all the rails are 220 and 52 px wide, every link is named, and one is the current page', async ({ browser }) => {
     const context = await browser.newContext({ javaScriptEnabled: false })
     const page = await context.newPage()
-    for (const [demo, width] of [['sidebar--basic', 220], ['sidebar--collapsed', 60]] as const) {
+    for (const [demo, width] of [['sidebar--basic', 220], ['sidebar--collapsed', 52]] as const) {
       await page.goto(liveUrl(demo))
       const rail = railOf(page)
       expect(await widthOf(rail), demo).toBe(width)
@@ -287,7 +287,7 @@ test.describe('the server HTML', () => {
     for (const [demo, { open }] of Object.entries(SIDEBARS)) {
       await page.goto(urlFor(demo, 'light', 'ltr'))
       expect(await page.locator('script').count(), demo).toBe(0)
-      expect(await widthOf(railOf(page)), demo).toBe(open ? 220 : 60)
+      expect(await widthOf(railOf(page)), demo).toBe(open ? 220 : 52)
       const found = await axe(page)
       expect(found.violations, demo).toEqual([])
       expect(found.passes, demo).toEqual(expect.arrayContaining(['aria-allowed-attr', 'link-name', 'button-name', 'listitem', 'landmark-unique']))
@@ -299,7 +299,7 @@ test.describe('the server HTML', () => {
   test('with no script and a finger every target is 44 px, in the expanded rail and in the collapsed one', async ({ browser }) => {
     const context = await browser.newContext({ javaScriptEnabled: false, hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } })
     const page = await context.newPage()
-    for (const [demo, width] of [['sidebar--basic', 220], ['sidebar--collapsed', 65]] as const) {
+    for (const [demo, width] of [['sidebar--basic', 220], ['sidebar--collapsed', 61]] as const) {
       await page.goto(liveUrl(demo))
       expect(await widthOf(railOf(page)), demo).toBe(width)
       const sizes = await page.locator('#demo button, #demo a').evaluateAll((all) => all.map((element) => {
@@ -311,7 +311,7 @@ test.describe('the server HTML', () => {
     await context.close()
   })
 
-  for (const [demo, width, other] of [['sidebar--collapsed', 60, 220], ['sidebar--basic', 220, 60]] as const) {
+  for (const [demo, width, other] of [['sidebar--collapsed', 52, 220], ['sidebar--basic', 220, 52]] as const) {
     test(`${demo}: ${String(width)} px while its script is held back and ${String(width)} px once it has hydrated, with no width in between`, async ({ page }) => {
       let release = (): void => undefined
       const held = new Promise<void>((resolve) => { release = resolve })
@@ -344,7 +344,7 @@ test.describe('the server HTML', () => {
 
 test.describe('the toggle', () => {
   for (const direction of DIRECTIONS) {
-    test(`${direction}: a press takes the rail from 220 to 60 px and back, and the toggle says so each time`, async ({ page }) => {
+    test(`${direction}: a press takes the rail from 220 to 52 px and back, and the toggle says so each time`, async ({ page }) => {
       await openLive(page, 'sidebar--basic', { direction })
       const rail = railOf(page)
       const trigger = triggerOf(rail)
@@ -356,7 +356,7 @@ test.describe('the toggle', () => {
       })
       expect(await state()).toEqual({ width: 220, expanded: 'true', name: names.collapse, open: '', closed: null })
       await trigger.click()
-      expect(await state()).toEqual({ width: 60, expanded: 'false', name: names.expand, open: null, closed: '' })
+      expect(await state()).toEqual({ width: 52, expanded: 'false', name: names.expand, open: null, closed: '' })
       await trigger.click()
       expect(await state()).toEqual({ width: 220, expanded: 'true', name: names.collapse, open: '', closed: null })
     })
@@ -366,13 +366,13 @@ test.describe('the toggle', () => {
     await openLive(page, 'sidebar--collapsed')
     const rail = railOf(page)
     const frame = await boxOf(rail)
-    // 60 px less the line on the inline end: the middle of what is left.
-    const middle = frame.left + (60 - 1) / 2
+    // 52 px less the line on the inline end: the middle of what is left.
+    const middle = frame.left + (52 - 1) / 2
     const toggle = await boxOf(triggerOf(rail))
     expect((toggle.left + toggle.right) / 2).toBe(middle)
     for (const link of await linksOf(rail).all()) {
       const [row, icon, label] = [await boxOf(link), await boxOf(link.locator('svg')), await boxOf(link.locator('> span').last())]
-      expect([row.width, row.height]).toEqual([39, 40])
+      expect([row.width, row.height]).toEqual([35, 32])
       expect((icon.left + icon.right) / 2).toBe(middle)
       expect([label.width, label.height]).toEqual([1, 1])
     }
@@ -387,7 +387,7 @@ test.describe('the toggle', () => {
     await expect(log).toHaveText('')
     await triggerOf(rail).click()
     await expect(log).toHaveText('false')
-    expect(await widthOf(rail)).toBe(60)
+    expect(await widthOf(rail)).toBe(52)
     await triggerOf(rail).click()
     await expect(log).toHaveText('false,true')
     await triggerOf(rail).focus()
@@ -417,7 +417,7 @@ test.describe('the toggle', () => {
     const rail = page.locator('#followed')
     await triggerOf(rail).click()
     await expect(page.locator('#followed-log')).toHaveText('false')
-    expect(await widthOf(rail)).toBe(60)
+    expect(await widthOf(rail)).toBe(52)
     await triggerOf(rail).click()
     await expect(page.locator('#followed-log')).toHaveText('false,true')
     expect(await widthOf(rail)).toBe(220)
@@ -429,7 +429,7 @@ test.describe('the toggle', () => {
     const count = page.locator('#demo p')
     await expect(count).toHaveText('The rail asked to change 0 times.')
     await page.getByRole('button', { name: 'Hide the labels' }).click()
-    expect(await widthOf(rail)).toBe(60)
+    expect(await widthOf(rail)).toBe(52)
     await expect(triggerOf(rail)).toHaveAttribute('aria-expanded', 'false')
     await expect(count).toHaveText('The rail asked to change 0 times.')
     await triggerOf(rail).click()
@@ -445,7 +445,7 @@ test.describe('the toggle', () => {
     const before = await boxOf(trigger)
     await page.keyboard.press('Enter')
     await expect(trigger).toBeFocused()
-    expect((await boxOf(trigger)).left).toBe(before.left + 7.5)
+    expect((await boxOf(trigger)).left).toBe(before.left + 5.5)
     await page.keyboard.press('Enter')
     await expect(trigger).toBeFocused()
     expect(await boxOf(trigger)).toEqual(before)
@@ -472,7 +472,7 @@ for (const direction of DIRECTIONS) {
       const rail = railOf(page)
       await triggerOf(rail).focus()
       await page.keyboard.press('Enter')
-      expect(await widthOf(rail)).toBe(60)
+      expect(await widthOf(rail)).toBe(52)
       await expect(triggerOf(rail)).toHaveAttribute('aria-expanded', 'false')
       await page.keyboard.press('Space')
       expect(await widthOf(rail)).toBe(220)
@@ -571,7 +571,7 @@ test.describe('sixty links', () => {
         const rail = railOf(page)
         const body = bodyOf(rail)
         for (const state of ['expanded', 'collapsed']) {
-          expect((await scrollOf(body)).room, `${state}: px the body scrolls`).toBeGreaterThan(1800)
+          expect((await scrollOf(body)).room, `${state}: px the body scrolls`).toBeGreaterThan(1200)
           expect((await scrollOf(body)).sideways, `${state}: px the body scrolls sideways`).toBe(0)
           expect(await pageRoom(page), state).toEqual({ down: 0, sideways: 0 })
           expect(await faultsOf(rail), state).toEqual([])
@@ -622,7 +622,7 @@ test.describe('sixty links', () => {
           if (Math.min(room.top, room.bottom, room.left, room.right) < 4) cut.push(`${name} after ${key}: ${JSON.stringify(room)}`)
         }
         for (let index = 1; index <= 60; index++) await visit('Tab', `Page ${String(index)}`)
-        expect((await scrollOf(body)).top, 'px the body scrolled to show the last').toBeGreaterThan(1500)
+        expect((await scrollOf(body)).top, 'px the body scrolled to show the last').toBeGreaterThan(1200)
         for (let index = 59; index >= 1; index--) await visit('Shift+Tab', `Page ${String(index)}`)
         expect(cut).toEqual([])
         expect(await page.evaluate(() => [window.scrollX, window.scrollY])).toEqual([0, 0])
@@ -641,8 +641,8 @@ test.describe('sixty links', () => {
         await expect(linksOf(rail).first()).toBeFocused()
         await expect(linksOf(rail).first()).toHaveCSS('outline-offset', '2px')
         const first = await roomOf(bodyOf(rail))
-        // Expanded, the label of the group is above the first link: 24 px of label and a 4 px gap more.
-        expect([first.top, first.left, first.right], 'px above and beside the first link').toEqual([state === 'collapsed' ? 4 : 32, 4, 4])
+        // Expanded, the label of the group is above the first link: 24 px of label and a 2 px gap more.
+        expect([first.top, first.left, first.right], 'px above and beside the first link').toEqual([state === 'collapsed' ? 4 : 30, 4, 4])
         expect(await ringOf(page), 'the first link').toEqual(WHOLE)
 
         await linksOf(rail).nth(58).focus()
@@ -720,12 +720,12 @@ test.describe('sixty links', () => {
         const body = bodyOf(rail)
         const bar = () => body.evaluate((element) => element.getBoundingClientRect().width - element.clientWidth)
         expect(await bar()).toBe(10)
-        expect(await widthOf(linksOf(rail).first())).toBe(189)
+        expect(await widthOf(linksOf(rail).first())).toBe(193)
 
         await triggerOf(rail).click()
         expect(await bar()).toBe(0)
         const [row, icon, toggle] = [await boxOf(linksOf(rail).first()), await boxOf(linksOf(rail).first().locator('svg')), await boxOf(triggerOf(rail))]
-        expect(row.width).toBe(39)
+        expect(row.width).toBe(35)
         expect((icon.left + icon.right) / 2).toBe((toggle.left + toggle.right) / 2)
         await wheelAt(page, row.left + 20, row.top + 100, 500)
         await expect.poll(async () => (await scrollOf(body)).top).toBe(500)
@@ -738,13 +738,13 @@ test.describe('sixty links', () => {
 test.describe('inside a real layout', () => {
   for (const screen of SCREENS) {
     for (const direction of DIRECTIONS) {
-      test(`${String(screen.width)} x ${String(screen.height)} ${direction}: beside a column the rail keeps its 220 and 60 px, the column takes the rest, and the page does not scroll`, async ({ page }) => {
+      test(`${String(screen.width)} x ${String(screen.height)} ${direction}: beside a column the rail keeps its 220 and 52 px, the column takes the rest, and the page does not scroll`, async ({ page }) => {
         await page.setViewportSize(screen)
         await openLive(page, 'sidebar--in-a-layout', { direction })
         const rail = railOf(page)
         const column = page.locator('#demo nav + div')
         const shell = await boxOf(page.locator('#demo nav').locator('xpath=..'))
-        for (const width of [220, 60]) {
+        for (const width of [220, 52]) {
           expect(await widthOf(rail)).toBe(width)
           // The column has 16 px of padding on each side, which is the least it can be.
           expect(await widthOf(column), `the column beside a ${String(width)} px rail`).toBe(Math.max(32, shell.width - width))
@@ -764,7 +764,7 @@ test.describe('inside a real layout', () => {
     const scroller = page.locator('#demo table').locator('xpath=..')
     const column = page.locator('#demo nav + div')
     // Beside the open rail the column is its own padding and the box its two 1 px lines: nothing of the table shows.
-    for (const [state, width, box] of [['expanded', 32, 2], ['collapsed', 181, 149]] as const) {
+    for (const [state, width, box] of [['expanded', 32, 2], ['collapsed', 194, 162]] as const) {
       const sizes = await scroller.evaluate((element) => ({ room: element.scrollWidth - element.clientWidth, width: element.getBoundingClientRect().width }))
       expect(await widthOf(column), state).toBe(width)
       expect(sizes.width, state).toBe(box)
@@ -775,7 +775,7 @@ test.describe('inside a real layout', () => {
 
   for (const screen of [{ width: 320, height: 480 }, { width: 1280, height: 800 }]) {
     for (const direction of DIRECTIONS) {
-      test(`${String(screen.width)} px ${direction}: in a flex row, a grid track, a parent that fits its content and a table cell the rail is 220 px, and 60 collapsed`, async ({ page }) => {
+      test(`${String(screen.width)} px ${direction}: in a flex row, a grid track, a parent that fits its content and a table cell the rail is 220 px, and 52 collapsed`, async ({ page }) => {
         await page.setViewportSize(screen)
         await openFixture(page, { direction })
         await expectNoSidewaysScroll(page)
@@ -793,10 +793,10 @@ test.describe('inside a real layout', () => {
         expect(await widthOf(page.locator('#in-fit'))).toBe(220)
         for (const layout of ['flex', 'grid', 'fit', 'cell']) {
           await triggerOf(page.locator(`#${layout}-rail`)).click()
-          expect(await widthOf(page.locator(`#${layout}-rail`)), `${layout}, collapsed`).toBe(60)
+          expect(await widthOf(page.locator(`#${layout}-rail`)), `${layout}, collapsed`).toBe(52)
         }
-        expect(await widthOf(page.locator('#in-fit'))).toBe(60)
-        expect(await widthOf(page.locator('#flex-column'))).toBe(section.width - 60)
+        expect(await widthOf(page.locator('#in-fit'))).toBe(52)
+        expect(await widthOf(page.locator('#flex-column'))).toBe(section.width - 52)
         await expectNoSidewaysScroll(page)
       })
     }
@@ -826,12 +826,12 @@ test.describe('content no demo should show', () => {
     expect((await word.textContent())?.length).toBe(100)
     const label = word.locator('> span').last()
     await expect(label).toHaveCSS('text-overflow', 'ellipsis')
-    expect(await widthOf(label)).toBe(153)
+    expect(await widthOf(label)).toBe(165)
     expect(await label.evaluate((element) => element.scrollWidth - element.clientWidth), 'px of the word the label cuts').toBeGreaterThan(500)
 
     const element = page.locator('#element')
     expect((await element.textContent())?.length).toBe(309)
-    expect(await widthOf(element.locator('> span').last())).toBe(153)
+    expect(await widthOf(element.locator('> span').last())).toBe(165)
     // Its beginning is what shows: the bold word starts where a plain label would.
     expect((await boxOf(element.locator('strong'))).left).toBe((await boxOf(label)).left)
 
@@ -839,17 +839,17 @@ test.describe('content no demo should show', () => {
     const title = headerOf(page.locator('#hostile-rail')).locator('span')
     expect((await title.textContent())?.length).toBe(100)
     await expect(title).toHaveCSS('text-overflow', 'ellipsis')
-    expect(await widthOf(title)).toBe(167)
+    expect(await widthOf(title)).toBe(171)
     const group = page.locator('#hostile-rail p').first()
     expect((await group.textContent())?.length).toBe(100)
     await expect(group).toHaveCSS('text-overflow', 'ellipsis')
-    expect(await widthOf(group)).toBe(199)
+    expect(await widthOf(group)).toBe(203)
   })
 
-  test('a link with no label is still a 40 px row named by its aria-label, and one whose render element holds the text keeps its icon', async ({ page }) => {
+  test('a link with no label is still a 32 px row named by its aria-label, and one whose render element holds the text keeps its icon', async ({ page }) => {
     await openFixture(page)
     const empty = page.locator('#empty')
-    expect([await widthOf(empty), (await boxOf(empty)).height]).toEqual([199, 40])
+    expect([await widthOf(empty), (await boxOf(empty)).height]).toEqual([203, 32])
     await expect(page.getByRole('link', { name: 'Empty', exact: true })).toHaveAttribute('href', '#empty')
     // No empty span is left behind for a label that is not there.
     expect(await empty.locator('> span').count()).toBe(1)
@@ -863,13 +863,13 @@ test.describe('content no demo should show', () => {
   })
 
   // Not built: a letter or a tooltip for a link with no icon. The README says an icon is needed where a rail can collapse.
-  test('a link with no icon is an empty 39 x 40 px row in a collapsed rail: still a stop, still named, with a ring', async ({ page }) => {
+  test('a link with no icon is an empty 35 x 32 px row in a collapsed rail: still a stop, still named, with a ring', async ({ page }) => {
     await openFixture(page)
     const rail = page.locator('#hostile-rail')
     const bare = page.locator('#bare-row')
     await triggerOf(rail).click()
     const row = await boxOf(bare)
-    expect([row.width, row.height]).toEqual([39, 40])
+    expect([row.width, row.height]).toEqual([35, 32])
     const [surface, inside] = [await pixelAt(page, row.left + 2, row.top + 20), await pixelsOf(page, clipOf(row))]
     expect(inside.filter((pixel) => contrast(pixel, surface) >= 3).length, 'pixels of anything drawn in the row').toBe(0)
     await expect(page.getByRole('link', { name: 'No icon', exact: true })).toBeVisible()
@@ -887,7 +887,7 @@ test.describe('content no demo should show', () => {
     const before = await height()
     // The comparison can fail: let the labels out of the body, and each is laid out against the page.
     await bodyOf(rail).evaluate((element) => { element.style.position = 'static' })
-    expect(await height()).toBeGreaterThan(before + 1000)
+    expect(await height()).toBeGreaterThan(before + 500)
     await bodyOf(rail).evaluate((element) => { element.style.position = '' })
     expect(await height()).toBe(before)
     await expect(bodyOf(rail)).toHaveCSS('position', 'relative')
@@ -905,21 +905,21 @@ test.describe('content no demo should show', () => {
     const before = await height()
     // The comparison can fail: let the labels out of the rail, and each is laid out against the page.
     await rail.evaluate((nav) => { nav.style.position = 'static' })
-    expect(await height()).toBeGreaterThan(before + 1000)
+    expect(await height()).toBeGreaterThan(before + 500)
     await rail.evaluate((nav) => { nav.style.position = '' })
     expect(await height()).toBe(before)
     await expect(rail).toHaveCSS('position', 'relative')
     await expect(rail.getByRole('list', { name: 'Group 10' }).getByRole('link')).toHaveCount(6)
   })
 
-  // The row keeps its 12 px of padding, which leaves 15: what is centred and does not fit spills evenly, so it stays in the middle.
-  test('collapsed, an icon of 24 px is still in the middle of its 39 px row, 7.5 px from either edge', async ({ page }) => {
+  // The row keeps its 8 px of padding, which leaves 19: what is centred and does not fit spills evenly, so it stays in the middle.
+  test('collapsed, an icon of 24 px is still in the middle of its 35 px row, 5.5 px from either edge', async ({ page }) => {
     await openFixture(page)
     await triggerOf(page.locator('#hostile-rail')).click()
     const [row, icon] = [await boxOf(page.locator('#big-icon')), await boxOf(page.locator('#big-icon svg'))]
-    expect([row.width, icon.width]).toEqual([39, 24])
+    expect([row.width, icon.width]).toEqual([35, 24])
     expect((icon.left + icon.right) / 2).toBe((row.left + row.right) / 2)
-    expect([icon.left - row.left, row.right - icon.right]).toEqual([7.5, 7.5])
+    expect([icon.left - row.left, row.right - icon.right]).toEqual([5.5, 5.5])
   })
 
   test('a rail with no header and no icons is a plain list of links under the name its caller gave it', async ({ page }) => {
@@ -1017,11 +1017,11 @@ test.describe('direction', () => {
     return left > right ? 'left' : 'right'
   }
 
-  test('ltr: the line is on the right of the rail, the toggle 10 px from its left, and each icon before its label', async ({ page }) => {
+  test('ltr: the line is on the right of the rail, the toggle 8 px from its left, and each icon before its label', async ({ page }) => {
     await openLive(page, 'sidebar--basic')
     const rail = railOf(page)
     expect(await layoutOf(page, rail)).toEqual({
-      line: 'right', toggle: { fromLeft: 10, fromRight: 186 }, icon: { fromLeft: 22, fromRight: 184 }, labelSide: 'right of the icon',
+      line: 'right', toggle: { fromLeft: 8, fromRight: 188 }, icon: { fromLeft: 16, fromRight: 190 }, labelSide: 'right of the icon',
     })
     await expect(rail).toHaveCSS('border-right-width', '1px')
     await expect(rail).toHaveCSS('border-left-width', '0px')
@@ -1030,18 +1030,18 @@ test.describe('direction', () => {
     expect((await boxOf(rail)).left).toBe(32)
   })
 
-  test('rtl: the line is on the left of the rail, the toggle 10 px from its right with its icon mirrored, and each icon after its label', async ({ page }) => {
+  test('rtl: the line is on the left of the rail, the toggle 8 px from its right with its icon mirrored, and each icon after its label', async ({ page }) => {
     await openLive(page, 'sidebar--basic', { direction: 'rtl' })
     const rail = railOf(page)
     expect(await layoutOf(page, rail)).toEqual({
-      line: 'left', toggle: { fromLeft: 186, fromRight: 10 }, icon: { fromLeft: 184, fromRight: 22 }, labelSide: 'left of the icon',
+      line: 'left', toggle: { fromLeft: 188, fromRight: 8 }, icon: { fromLeft: 190, fromRight: 16 }, labelSide: 'left of the icon',
     })
     await expect(rail).toHaveCSS('border-left-width', '1px')
     await expect(rail).toHaveCSS('border-right-width', '0px')
     await expect(triggerOf(rail).locator('svg')).toHaveCSS('scale', '-1 1')
     expect(await heavierHalf(page, rail)).toBe('right')
     // The rail starts where the page does in Arabic: at the right.
-    expect((await boxOf(rail)).right).toBe(1233)
+    expect((await boxOf(rail)).right).toBe(1238)
   })
 
   for (const direction of DIRECTIONS) {
@@ -1053,15 +1053,15 @@ test.describe('direction', () => {
       const layout = await layoutOf(page, rail)
       // One row lower than the basic demo: this one has a group label. The sides are what matter.
       expect({ line: layout.line, toggle: layout.toggle, labelSide: layout.labelSide }).toEqual({
-        line: 'left', toggle: { fromLeft: 186, fromRight: 10 }, labelSide: 'left of the icon',
+        line: 'left', toggle: { fromLeft: 188, fromRight: 8 }, labelSide: 'left of the icon',
       })
       expect(await heavierHalf(page, rail)).toBe('right')
-      expect((await boxOf(rail)).right).toBe(1233)
+      expect((await boxOf(rail)).right).toBe(1238)
       await triggerOf(rail).click()
       await expect(triggerOf(rail)).toHaveAttribute('aria-label', NAMES.rtl.expand)
-      expect(await widthOf(rail)).toBe(60)
+      expect(await widthOf(rail)).toBe(52)
       expect((await layoutOf(page, rail)).line).toBe('left')
-      expect((await boxOf(rail)).right).toBe(1233)
+      expect((await boxOf(rail)).right).toBe(1238)
     })
   }
 
@@ -1071,7 +1071,7 @@ test.describe('direction', () => {
     await expect(rail).toHaveAttribute('aria-label', 'Sidebar')
     await expect(triggerOf(rail)).toHaveAttribute('aria-label', 'Collapse the sidebar')
     const layout = await layoutOf(page, rail)
-    expect([layout.line, layout.toggle.fromRight, layout.labelSide]).toEqual(['left', 10, 'left of the icon'])
+    expect([layout.line, layout.toggle.fromRight, layout.labelSide]).toEqual(['left', 8, 'left of the icon'])
     await expect(triggerOf(rail).locator('svg')).toHaveCSS('scale', '-1 1')
   })
 })
@@ -1082,7 +1082,7 @@ for (const mode of MODES) {
     test.use({ reducedMotion: 'reduce' })
 
     for (const state of ['expanded', 'collapsed'] as const) {
-      test(`${state}: the current row is told by a fill, by a bar at its start and by a heavier label; no other row has any of them`, async ({ page }) => {
+      test(`${state}: the current row is told by a fill and by a heavier label; no other row has either`, async ({ page }) => {
         await openLive(page, 'sidebar--basic', { mode })
         const rail = railOf(page)
         if (state === 'collapsed') await triggerOf(rail).click()
@@ -1096,18 +1096,8 @@ for (const mode of MODES) {
         // A fill of this weight is a colour and no more: it could not carry the state alone.
         expect(contrast(fill, surface), 'the fill against the rail').toBeLessThan(1.5)
 
-        // The bar: 3 px wide, 4 px inside the start of the row, 24 px tall, at 3:1 against the fill and the rail.
-        const bar = await pixelAt(page, lit.left + 5, lit.top + 20)
-        expect(contrast(bar, fill), `the bar ${bar.join()} against the fill ${fill.join()}`).toBeGreaterThanOrEqual(3)
-        expect(contrast(bar, surface), 'the bar against the rail').toBeGreaterThanOrEqual(3)
-        const row = (await pixelsOf(page, { x: Math.round(lit.left), y: Math.round(lit.top + 20), width: 12, height: 1 })).map((pixel) => (pixel.join() === bar.join() ? 'bar' : pixel.join() === fill.join() ? 'fill' : 'edge'))
-        // From the second pixel: the first is the smoothed edge of a row whose end is round.
-        expect(row.slice(1, 8)).toEqual(['fill', 'fill', 'fill', 'bar', 'bar', 'bar', 'fill'])
-        const column = await pixelsOf(page, { x: Math.round(lit.left + 5), y: Math.round(lit.top), width: 1, height: 40 })
-        const tall = column.filter((pixel) => pixel.join() === bar.join()).length
-        expect(tall, 'px of bar from top to bottom').toBeGreaterThanOrEqual(22)
-        expect(tall).toBeLessThanOrEqual(24)
-        expect((await pixelAt(page, plain.left + 5, plain.top + 20)).join(), 'no bar on another row').toBe(surface.join())
+        // No bar, as Figma 138:2539 draws it: the start of the current row is its fill like the rest of it.
+        expect((await pixelAt(page, lit.left + 5, lit.top + 16)).join(), 'no bar at the start of the current row').toBe(fill.join())
 
         // The icon of the current row takes the colour of its label; the others are muted. Both reach 3:1.
         expect(contrast(await inkOf(page, current.locator('svg'), fill), fill), 'the icon of the current row').toBeGreaterThanOrEqual(3)
@@ -1253,7 +1243,7 @@ test.describe('under a coarse pointer', () => {
   test.use({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } })
 
   for (const demo of Object.keys(SIDEBARS)) {
-    test(`${demo}: the toggle and every link are at least 44 px both ways, expanded and collapsed, and a collapsed rail is 65 px wide`, async ({ page }) => {
+    test(`${demo}: the toggle and every link are at least 44 px both ways, expanded and collapsed, and a collapsed rail is 61 px wide`, async ({ page }) => {
       await openLive(page, demo)
       expect(await page.evaluate(() => matchMedia('(pointer: coarse)').matches)).toBe(true)
       const rail = railOf(page)
@@ -1264,8 +1254,8 @@ test.describe('under a coarse pointer', () => {
       for (let press = 0; press < 2; press++) {
         const open = (await rail.getAttribute('data-open')) === ''
         expect(await small(), open ? 'expanded' : 'collapsed').toEqual([])
-        // 44 px of target, 10 px of padding on each side and the 1 px line: the rail is never narrower than what it holds.
-        expect(await widthOf(rail)).toBe(open ? 220 : 65)
+        // 44 px of target, 8 px of padding on each side and the 1 px line: the rail is never narrower than what it holds.
+        expect(await widthOf(rail)).toBe(open ? 220 : 61)
         expect((await scrollOf(bodyOf(rail))).sideways, 'px the body scrolls sideways').toBe(0)
         await expectNoSidewaysScroll(page)
         await triggerOf(rail).tap()
@@ -1278,7 +1268,7 @@ test.describe('under a coarse pointer', () => {
     const rail = railOf(page)
     const [frame, toggle, row, icon] = [await boxOf(rail), await boxOf(triggerOf(rail)), await boxOf(linksOf(rail).first()), await boxOf(linksOf(rail).first().locator('svg'))]
     expect([row.width, row.height, toggle.width, toggle.height]).toEqual([44, 44, 44, 44])
-    expect([row.left - frame.left, frame.right - row.right]).toEqual([10, 11])
+    expect([row.left - frame.left, frame.right - row.right]).toEqual([8, 9])
     expect((icon.left + icon.right) / 2).toBe((toggle.left + toggle.right) / 2)
   })
 
@@ -1286,14 +1276,14 @@ test.describe('under a coarse pointer', () => {
     await openLive(page, 'sidebar--basic')
     const rail = railOf(page)
     await triggerOf(rail).tap()
-    expect(await widthOf(rail)).toBe(65)
+    expect(await widthOf(rail)).toBe(61)
     await linksOf(rail).nth(2).tap()
     await expect(page).toHaveURL(/#team$/)
   })
 })
 
 test.describe('text that is made larger or spaced out', () => {
-  test('1280 px with the root at 32 px: the rail is 440 px and 120 collapsed, a row 80 px tall, and every label is whole', async ({ page }) => {
+  test('1280 px with the root at 32 px: the rail is 440 px and 104 collapsed, a row 64 px tall, and every label is whole', async ({ page }) => {
     await openLive(page, 'sidebar--groups')
     await page.addStyleTag({ content: 'html { font-size: 32px !important }' })
     const rail = railOf(page)
@@ -1302,11 +1292,11 @@ test.describe('text that is made larger or spaced out', () => {
       const label = row.querySelector(':scope > span:last-child') as HTMLElement
       return { height: row.getBoundingClientRect().height, font: getComputedStyle(row).fontSize, cut: label.scrollWidth > label.clientWidth }
     }))
-    expect(new Set(rows.map((row) => `${String(row.height)} ${row.font} ${String(row.cut)}`))).toEqual(new Set(['80 28px false']))
+    expect(new Set(rows.map((row) => `${String(row.height)} ${row.font} ${String(row.cut)}`))).toEqual(new Set(['64 28px false']))
     expect(await faultsOf(rail)).toEqual([])
     await expectNoSidewaysScroll(page)
     await triggerOf(rail).click()
-    expect(await widthOf(rail)).toBe(120)
+    expect(await widthOf(rail)).toBe(104)
     expect(await faultsOf(rail)).toEqual([])
   })
 
@@ -1317,16 +1307,16 @@ test.describe('text that is made larger or spaced out', () => {
       await page.addStyleTag({ content: 'html { font-size: 32px !important }' })
       const rail = railOf(page)
       const parent = await boxOf(rail.locator('xpath=..'))
-      // 440 px of rail in 177 px of page: it gives way, where the page would have scrolled sideways.
-      expect(parent.width).toBe(177)
-      expect(await widthOf(rail)).toBe(177)
+      // 440 px of rail in 182 px of page: it gives way, where the page would have scrolled sideways.
+      expect(parent.width).toBe(182)
+      expect(await widthOf(rail)).toBe(182)
       expect(await pageRoom(page)).toEqual({ down: 0, sideways: 0 })
       expect(await faultsOf(rail)).toEqual([])
       const label = linksOf(rail).first().locator('> span').last()
       await expect(label).toHaveCSS('text-overflow', 'ellipsis')
       expect(await label.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true)
       await triggerOf(rail).click()
-      expect(await widthOf(rail)).toBe(120)
+      expect(await widthOf(rail)).toBe(104)
       expect(await pageRoom(page)).toEqual({ down: 0, sideways: 0 })
       expect(await faultsOf(rail)).toEqual([])
     })
@@ -1350,7 +1340,7 @@ test.describe('text that is made larger or spaced out', () => {
   }
 
   // The rail gives way to its parent at a 32 px root; a column beside it must give way too, by going under it.
-  for (const { width, page: room, rail: railWidth } of [{ width: 320, page: 305, rail: 177 }, { width: 390, page: 375, rail: 247 }]) {
+  for (const { width, page: room, rail: railWidth } of [{ width: 320, page: 310, rail: 182 }, { width: 390, page: 380, rail: 252 }]) {
     for (const direction of DIRECTIONS) {
       test(`${String(width)} px ${direction} with the root at 32 px: the controlled demo's button goes under the rail, whole on the page, expanded and collapsed`, async ({ page }) => {
         await page.setViewportSize({ width, height: 480 })
@@ -1358,7 +1348,7 @@ test.describe('text that is made larger or spaced out', () => {
         await page.addStyleTag({ content: 'html { font-size: 32px !important }' })
         const rail = railOf(page)
         expect(await page.evaluate(() => document.body.clientWidth)).toBe(room)
-        for (const [name, expected] of [['Hide the labels', railWidth], ['Show the labels', 120]] as const) {
+        for (const [name, expected] of [['Hide the labels', railWidth], ['Show the labels', 104]] as const) {
           const button = page.getByRole('button', { name })
           expect(await widthOf(rail)).toBe(expected)
           const [frame, box] = [await boxOf(rail), await boxOf(button)]
@@ -1382,7 +1372,7 @@ test.describe('text that is made larger or spaced out', () => {
   }
 })
 
-// A mouse keeps the page's scrollbar gutter, 15 px that isMobile has not: 320 px is the reflow width of WCAG 1.4.10.
+// A mouse keeps the page's scrollbar gutter, 10 px that isMobile has not: 320 px is the reflow width of WCAG 1.4.10.
 test.describe('a mouse at 320 x 480, with the scrollbar gutter', () => {
   test.use({ viewport: { width: 320, height: 480 } })
 
@@ -1391,7 +1381,7 @@ test.describe('a mouse at 320 x 480, with the scrollbar gutter', () => {
       test(`${demo} ${direction}: the page does not scroll sideways, expanded or collapsed`, async ({ page }) => {
         await openLive(page, demo, { direction })
         const rail = railOf(page)
-        expect(await page.evaluate(() => document.body.clientWidth), 'px of page beside the gutter').toBe(305)
+        expect(await page.evaluate(() => document.body.clientWidth), 'px of page beside the gutter').toBe(310)
         for (let press = 0; press < 2; press++) {
           await expectNoSidewaysScroll(page)
           expect(await faultsOf(rail)).toEqual([])
@@ -1414,11 +1404,11 @@ test.describe('motion', () => {
     return { widths: [...new Set(seen)], animations: nav.getAnimations().length }
   })
 
-  test('no width animation exists: the rail is 60 px on the first frame after a press, and nothing animates on it', async ({ page }) => {
+  test('no width animation exists: the rail is 52 px on the first frame after a press, and nothing animates on it', async ({ page }) => {
     await openLive(page, 'sidebar--basic')
     const rail = railOf(page)
     await expect(rail).toHaveCSS('transition-duration', '0s')
-    expect(await framesAfterPress(rail)).toEqual({ widths: [60], animations: 0 })
+    expect(await framesAfterPress(rail)).toEqual({ widths: [52], animations: 0 })
     expect(await framesAfterPress(rail)).toEqual({ widths: [220], animations: 0 })
   })
 
@@ -1436,7 +1426,7 @@ test.describe('motion', () => {
       await openLive(page, 'sidebar--basic')
       const rail = railOf(page)
       await expect(linksOf(rail).nth(1)).toHaveCSS('transition-duration', '0s')
-      expect(await framesAfterPress(rail)).toEqual({ widths: [60], animations: 0 })
+      expect(await framesAfterPress(rail)).toEqual({ widths: [52], animations: 0 })
     })
   })
 })

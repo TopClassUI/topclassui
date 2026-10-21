@@ -7,8 +7,7 @@ const TEAM = [
   ['RT', 'Rami Tahan'], ['YB', 'Yara Bakri'],
 ] as const
 
-/** The ring is the page colour, and a Card is a raised surface: in dark mode the two differ,
- * so on a Card the ring is given the Card's own colour. */
+/** The ring is the avatar's own fill, so a Card needs nothing more than the page does. */
 export default function Demo() {
   return (
     <div className="max-w-xs">
@@ -17,7 +16,7 @@ export default function Demo() {
           <h2>Design team</h2>
         </CardHeader>
         <CardBody>
-          <AvatarGroup className="*:ring-surface-raised" aria-label="Design team">
+          <AvatarGroup aria-label="Design team">
             {TEAM.map(([initials, name]) => (
               <AvatarRoot key={initials} aria-label={name}>
                 <AvatarFallback>{initials}</AvatarFallback>

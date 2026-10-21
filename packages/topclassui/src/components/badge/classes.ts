@@ -32,13 +32,14 @@ export const ON_OUTLINE = {
   info: 'text-info-on-soft border-current',
 } as const satisfies Record<Tone, string>
 
-/** The drawn inline padding is twice padding-y at every size, so it is not pad-x. */
+/** The drawn inline padding is twice padding-y at every size, so it is not pad-x. The line is
+ * tight, as Figma draws the chip (29 px at md): 16 on a 14 px label, not text-sm's 20. */
 export const BADGE_SIZE = {
   xs: 'px-1 py-pad-y-xs gap-1 text-xs',
-  sm: 'px-2 py-pad-y-sm gap-1.5 text-sm',
-  md: 'px-3 py-pad-y-md gap-2 text-sm',
-  lg: 'px-4 py-pad-y-lg gap-2 text-base',
-  xl: 'px-5 py-pad-y-xl gap-3 text-lg',
+  sm: 'px-2 py-pad-y-sm gap-1.5 text-sm/4',
+  md: 'px-3 py-pad-y-md gap-2 text-sm/4',
+  lg: 'px-4 py-pad-y-lg gap-2 text-base/5',
+  xl: 'px-5 py-pad-y-xl gap-3 text-lg/6',
   custom: '',
 } as const satisfies Record<Size, string>
 

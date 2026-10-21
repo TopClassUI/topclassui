@@ -22,10 +22,12 @@ const TREES: Record<string, string[]> = {
   'rtl': ['الملفات 0: المستندات, التقرير السنوي.pdf, الميزانية.xlsx, الصور, ملاحظات.txt'],
   'selected': ['Project 0: app, layout.tsx, page.tsx, docs, next.config.ts'],
   'states': [
-    'Project 0: app, layout.tsx, page.tsx, docs, guide.md, faq.md, next.config.ts',
-    'Project, loading more 0: app, docs, next.config.ts',
-    'Project, loading -: ',
-    'Project, empty -: ',
+    'Source, collapsed 0: src',
+    'Source, expanded 0: src, file1, file2, file3',
+    'Source, selected 0: src, file1, file2, file3',
+    'Source, focus-visible 0: src, file1, file2, file3',
+    'Source, loading -: ',
+    'Source, empty -: ',
   ],
   'status': ['Files, loading -: ', 'Files, empty -: '],
   'ten-thousand': ['Ten thousand files 0: Folder 1, File 1.ts, File 2.ts, File 3.ts, File 4.ts, File 5.ts, File 6.ts, File 7.ts'],
@@ -92,6 +94,6 @@ describe('the demos the plan names', () => {
   it('status: the loading tree is busy and says Loading; the empty one says Nothing here yet', async () => {
     const html = await render('status')
     expect([...html.matchAll(/aria-busy="true"/g)]).toHaveLength(1)
-    expect([...html.matchAll(/<div role="status"[^>]*>([^<]*)<\/div>/g)].map(([, text]) => text)).toEqual(['Loading', 'Nothing here yet'])
+    expect([...html.matchAll(/<div role="status"[^>]*>(.*?)<\/div>/g)].map(([, inner]) => inner?.replace(/<[^>]*>/g, ''))).toEqual(['Loading', 'Nothing here yet'])
   })
 })

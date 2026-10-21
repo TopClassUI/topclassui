@@ -32,7 +32,7 @@ describe('with no link element', () => {
   })
 
   it('writes the anchor as it did before link existed: the href, then the class, then the label', () => {
-    expect(html()).toContain('<a href="/" class="inline-flex items-center justify-center rounded-chip text-muted ')
+    expect(html()).toContain('<a href="/" class="inline-flex items-center justify-center gap-1.5 rounded-chip text-muted ')
     expect(html()).toContain('"><span dir="auto" class="truncate min-w-0">Home</span></a></li>')
     expect(html()).not.toMatch(/<a class=/)
   })

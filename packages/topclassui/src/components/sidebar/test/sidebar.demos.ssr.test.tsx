@@ -154,7 +154,7 @@ describe('what the demos show', () => {
 
   it('states names each of its two rails, so a page can hold both, and each toggle in English', async () => {
     const html = await render('states')
-    expect(tags(html, 'nav').map((nav) => attr(nav, 'aria-label'))).toEqual(['Expanded', 'Collapsed'])
+    expect(tags(html, 'nav').map((nav) => attr(nav, 'aria-label'))).toEqual(['expanded', 'collapsed'])
     expect(tags(html, 'button').map((button) => attr(button, 'aria-label'))).toEqual(['Collapse the sidebar', 'Expand the sidebar'])
   })
 

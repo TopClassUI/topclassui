@@ -24,7 +24,7 @@ const DECLARATION: Record<string, string> = {
   'gap-0.5': 'gap: calc(var(--spacing) * 0.5);',
   'p-1.5': 'padding: calc(var(--spacing) * 1.5);',
   'wrap-anywhere': 'overflow-wrap: anywhere;',
-  'min-w-[min(calc(var(--spacing)*48),round(down,var(--available-width),1px))]': 'min-width: min(calc(var(--spacing) * 48), round(down, var(--available-width), 1px));',
+  'min-w-[min(calc(var(--spacing)*55),round(down,var(--available-width),1px))]': 'min-width: min(calc(var(--spacing) * 55), round(down, var(--available-width), 1px));',
   'max-w-[min(calc(var(--spacing)*80),round(down,var(--available-width),1px))]': 'max-width: min(calc(var(--spacing) * 80), round(down, var(--available-width), 1px));',
   'max-h-[min(var(--available-height,100dvh),calc(var(--tc-list-rows)*var(--tc-row-height)))]':
     'max-height: min(var(--available-height,100dvh), calc(var(--tc-list-rows) * var(--tc-row-height)));',
@@ -38,7 +38,7 @@ const DECLARATION: Record<string, string> = {
   'text-body': 'color: var(--tc-body);',
   'border-(length:--tc-line-width)': 'border-width: var(--tc-line-width);',
   'border-line': 'border-color: var(--tc-line);',
-  'shadow-lg': 'box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);',
+  'shadow-(--tc-shadow-overlay)': 'box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);',
   // The motion, which reads the duration that --tc-motion scales, and grows from the side of the trigger.
   'origin-(--transform-origin)': 'transform-origin: var(--transform-origin);',
   'transition-[opacity,scale]': 'transition-property: opacity,scale;',
@@ -62,6 +62,7 @@ const DECLARATION: Record<string, string> = {
   'gap-2': 'gap: calc(var(--spacing) * 2);',
   'rounded-control': 'border-radius: var(--tc-radius);',
   'px-3': 'padding-inline: calc(var(--spacing) * 3);',
+  'px-2.5': 'padding-inline: calc(var(--spacing) * 2.5);',
   'text-start': 'text-align: start;',
   'text-sm': 'font-size: var(--text-sm);',
   'shrink-0': 'flex-shrink: 0;',
@@ -69,15 +70,11 @@ const DECLARATION: Record<string, string> = {
   'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]': 'min-height: max(var(--tc-row-height), var(--tc-target-coarse,44px));',
   'data-highlighted:bg-primary-soft': 'background-color: var(--tc-primary-soft);',
   'data-highlighted:text-primary-on-soft': 'color: var(--tc-primary-on-soft);',
-  // The ring of the highlighted row, inside its edge: the fill alone is under 3:1 against the menu.
-  'data-highlighted:outline-solid': 'outline-style: solid;',
-  'data-highlighted:outline-(length:--tc-ring-width)': 'outline-width: var(--tc-ring-width);',
-  'data-highlighted:-outline-offset-(length:--tc-ring-width)': 'outline-offset: calc(var(--tc-ring-width) * -1);',
-  'data-highlighted:outline-ring': 'outline-color: var(--tc-ring);',
   'forced-colors:data-highlighted:forced-color-adjust-none': 'forced-color-adjust: none;',
   'forced-colors:data-highlighted:bg-[Highlight]': 'background-color: Highlight;',
   'forced-colors:data-highlighted:text-[HighlightText]': 'color: HighlightText;',
-  'forced-colors:data-highlighted:outline-[HighlightText]': 'outline-color: HighlightText;',
+  // The row holds the focus, so its ring is the focus ring, in the system's colour under forced colours.
+  'forced-colors:focus-visible:outline-[HighlightText]': 'outline-color: HighlightText;',
   // A disabled row: what it holds is dimmed, and forced colours take the grey of the system.
   'data-disabled:pointer-events-none': 'pointer-events: none;',
   'data-disabled:*:opacity-50': 'opacity: 50%;',
@@ -101,7 +98,6 @@ const DECLARATION: Record<string, string> = {
   // The group label and the separator.
   'py-1.5': 'padding-block: calc(var(--spacing) * 1.5);',
   'font-medium': 'font-weight: var(--font-weight-medium);',
-  'my-1': 'margin-block: var(--spacing);',
   'border-t-(length:--tc-line-width)': 'border-top-width: var(--tc-line-width);',
 }
 
@@ -117,9 +113,7 @@ const SCOPE: Record<string, string> = {
   'data-highlighted:text-danger-on-soft': '[data-highlighted] {',
   'data-disabled:pointer-events-none': '[data-disabled] {',
   'forced-colors:data-highlighted:bg-[Highlight]': '[data-highlighted] {',
-  'data-highlighted:outline-solid': '[data-highlighted] {',
-  'data-highlighted:outline-ring': '[data-highlighted] {',
-  'forced-colors:data-highlighted:outline-[HighlightText]': '[data-highlighted] {',
+  'forced-colors:focus-visible:outline-[HighlightText]': ':focus-visible {',
   'forced-colors:data-disabled:not-data-highlighted:text-[GrayText]': '[data-disabled]:not([data-highlighted]) {',
 }
 
@@ -129,7 +123,7 @@ const WRAPPED: Record<string, string> = {
   'forced-colors:data-highlighted:forced-color-adjust-none': '@media (forced-colors: active) { ',
   'forced-colors:data-highlighted:bg-[Highlight]': '@media (forced-colors: active) { ',
   'forced-colors:data-highlighted:text-[HighlightText]': '@media (forced-colors: active) { ',
-  'forced-colors:data-highlighted:outline-[HighlightText]': '@media (forced-colors: active) { ',
+  'forced-colors:focus-visible:outline-[HighlightText]': '@media (forced-colors: active) { ',
   'forced-colors:data-disabled:not-data-highlighted:text-[GrayText]': '@media (forced-colors: active) { ',
 }
 
@@ -167,7 +161,7 @@ describe('every class an open Dropdown wears compiles with the installed Tailwin
       DROPDOWN_SHORTCUT, DROPDOWN_GROUP, DROPDOWN_GROUP_LABEL, DROPDOWN_SEPARATOR,
     ])
     expect(all).toEqual([...Object.keys(DECLARATION), 'group'].sort())
-    expect(all).toHaveLength(84)
+    expect(all).toHaveLength(80)
   })
 
   it('group emits nothing of its own: it only marks the row for the shortcut inside it', async () => {

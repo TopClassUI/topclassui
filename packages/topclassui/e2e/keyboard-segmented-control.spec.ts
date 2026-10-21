@@ -22,7 +22,7 @@ for (const direction of DIRECTIONS) {
 
   test.describe(direction, () => {
     test('Tab enters on the selected segment, the only stop of each track, and skips a disabled track', async ({ page }) => {
-      await openLive(page, 'segmented-control--states', { direction })
+      await openLive(page, 'segmented-control--track-states', { direction })
       expect(await walk(page, 3)).toEqual(['Invalid, selected', 'Live, selected', 'Read-only, selected'])
       expect(await walk(page, 1, 'Shift+Tab')).toEqual(['Live, selected'])
       expect(await tabIndexes(page.getByRole('radiogroup', { name: 'One disabled' }).getByRole('radio'))).toEqual(['0', '-1', '-1'])
@@ -58,7 +58,7 @@ for (const direction of DIRECTIONS) {
     })
 
     test('the arrows pass over a disabled segment', async ({ page }) => {
-      await openLive(page, 'segmented-control--states', { direction })
+      await openLive(page, 'segmented-control--track-states', { direction })
       await walk(page, 2)
       const others = ['Invalid, selected', 'Disabled, selected']
       expect(await press(page, forward)).toEqual({ focus: 'Live', checked: [...others, 'Live', 'Read-only, selected'] })
@@ -67,7 +67,7 @@ for (const direction of DIRECTIONS) {
 
     // The track is Base UI's RadioGroup, whose RadioRoot.js:138 keeps a focus in a read-only group from selecting.
     test('in a read-only track the arrows move the focus, wrapping, and select nothing; Space selects nothing either', async ({ page }) => {
-      await openLive(page, 'segmented-control--states', { direction })
+      await openLive(page, 'segmented-control--track-states', { direction })
       await walk(page, 3)
       const others = ['Invalid, selected', 'Disabled, selected', 'Live, selected']
       expect(await press(page, forward)).toEqual({ focus: 'Read-only', checked: [...others, 'Read-only, selected'] })

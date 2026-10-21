@@ -35,11 +35,12 @@ describe('in a real tree', () => {
     expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Next' }))
   })
 
-  it('draws the rows as direct children, in order, with only the last one narrowed', () => {
+  it('draws the rows as direct children, in order, with the last two narrowed', () => {
     const { container } = render(<Skeleton rows={4} />)
     const rows = [...(container.firstElementChild?.children ?? [])]
     expect(rows.map((row) => row.tagName)).toEqual(['SPAN', 'SPAN', 'SPAN', 'SPAN'])
     expect(rows.map((row) => row.classList.contains('w-2/3'))).toEqual([false, false, false, true])
+    expect(rows.map((row) => row.classList.contains('w-5/6'))).toEqual([false, false, true, false])
   })
 })
 

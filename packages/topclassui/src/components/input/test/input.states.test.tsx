@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { attr, classList, markup } from '#test/markup.js'
 import { INPUT_SIZES } from '../constants.js'
-import { Input, inputVariants } from '../index.js'
+import { Input } from '../index.js'
 import type { InputProps } from '../types.js'
 
 const html = (props: Partial<InputProps> = {}) => markup(<Input aria-label="Email" {...props} />)
@@ -58,31 +58,14 @@ describe('text is at least 16px on a touch screen, or iOS zooms the page on focu
   })
 })
 
-describe('read-only does not look editable', () => {
-  it('sits on the soft surface instead of the raised one', () => {
+describe('read-only looks like idle, as the frame draws it', () => {
+  it('keeps the raised surface and takes no tint', () => {
     const list = classes({ readOnly: true })
-    expect(list).toContain('bg-neutral-soft')
-    expect(list).not.toContain('bg-surface-raised')
+    expect(list).toContain('bg-surface-raised')
+    expect(list).not.toContain('bg-neutral-soft')
   })
 
   it('still reaches the input as the native attribute', () => {
     expect(attr(html({ readOnly: true }), 'readOnly')).toBe('')
-  })
-
-  it('changes nothing for an editable or a disabled input', () => {
-    expect(classes()).not.toContain('bg-neutral-soft')
-    expect(classes({ readOnly: false })).not.toContain('bg-neutral-soft')
-    expect(classes({ disabled: true })).toContain('bg-surface-raised')
-    expect(classes({ disabled: true })).not.toContain('bg-neutral-soft')
-  })
-
-  it('is not in inputVariants: every element that is not a field matches :read-only', () => {
-    expect(inputVariants().split(' ').filter((c) => c.includes('read-only') || c === 'bg-neutral-soft')).toEqual([])
-  })
-
-  it("lets the caller's background win", () => {
-    const list = classes({ readOnly: true, className: 'bg-surface' })
-    expect(list).toContain('bg-surface')
-    expect(list).not.toContain('bg-neutral-soft')
   })
 })

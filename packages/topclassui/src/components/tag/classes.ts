@@ -1,6 +1,6 @@
 /** R-5.12-4: Tag's own class tables. A chip is tighter than a control, so its size
  * table is its own, and a tag is only ever drawn on the soft pair of its tone. */
-import { HOVER, ICON_BUTTON, LABEL } from '#shared/classes.js'
+import { DISABLED, FOCUS_RING, HOVER, ICON_BUTTON, LABEL, TOUCH_TARGET, TRANSITION } from '#shared/classes.js'
 import type { Size } from '#shared/contracts/size.js'
 import type { Tone } from '#shared/contracts/tone.js'
 
@@ -14,18 +14,22 @@ export const ON_SOFT = {
   info: 'bg-info-soft text-info-on-soft border-transparent',
 } as const satisfies Record<Tone, string>
 
+/** A tag that is a link: Figma 135:285 draws its hover and active tints, the ring and the dimmed disabled chip. */
+export const TAG_INTERACTIVE = `cursor-pointer ${HOVER.soft} ${FOCUS_RING} ${TOUCH_TARGET} ${TRANSITION} ${DISABLED}`
+
 /** An element label, or bare text on a tagVariants() anchor, is cut at the chip on one line
  * instead of widening the page. shrink-0, or the clip leaves a flex item no minimum size:
  * a row crushed a 55 px tag to 36 beside wrapping text, and a column squashed it to 14 tall. */
 export const CLIP = 'overflow-hidden whitespace-nowrap shrink-0'
 
-/** The drawn inline padding is twice padding-y at every size, so it is not pad-x. */
+/** The drawn inline padding is twice padding-y at every size, so it is not pad-x. The line is
+ * tight, as Figma draws the chip (29 px at md): 16 on a 14 px label, not text-sm's 20. */
 export const TAG_SIZE = {
   xs: 'px-1 py-pad-y-xs gap-1 text-xs',
-  sm: 'px-2 py-pad-y-sm gap-1.5 text-sm',
-  md: 'px-3 py-pad-y-md gap-2 text-sm',
-  lg: 'px-4 py-pad-y-lg gap-2 text-base',
-  xl: 'px-5 py-pad-y-xl gap-3 text-lg',
+  sm: 'px-2 py-pad-y-sm gap-1.5 text-sm/4',
+  md: 'px-3 py-pad-y-md gap-2 text-sm/4',
+  lg: 'px-4 py-pad-y-lg gap-2 text-base/5',
+  xl: 'px-5 py-pad-y-xl gap-3 text-lg/6',
   custom: '',
 } as const satisfies Record<Size, string>
 

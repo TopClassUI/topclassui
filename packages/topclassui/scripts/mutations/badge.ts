@@ -44,4 +44,10 @@ export const MUTATIONS: Mutation[] = [
     from: "      className={cn(\n        'inline-flex",
     to: "      className={className ?? cn(\n        'inline-flex",
   },
+  {
+    label: 'the md badge goes back to the 20 px line the frame does not draw',
+    file: 'src/components/badge/classes.ts',
+    from: "  md: 'px-3 py-pad-y-md gap-2 text-sm/4',",
+    to: "  md: 'px-3 py-pad-y-md gap-2 text-sm',",
+  },
 ]

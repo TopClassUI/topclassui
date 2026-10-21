@@ -32,7 +32,8 @@ const TRIGGERS: Record<string, string[]> = {
   'playground': ['Actions'],
   'rtl': ['الإجراءات', 'المزيد'],
   'sixty-items': ['Time zone'],
-  'states': ['Open', 'Disabled row', 'Danger row', 'Grouped'],
+  // One trigger per cell: closed, open and a disabled row. The two open menus mount in the browser only.
+  'states': ['Actions', 'Actions', 'Actions'],
   'with-links': ['Help'],
 }
 

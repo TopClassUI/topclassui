@@ -11,17 +11,19 @@ export const AVATAR_FORCED_EDGE = 'forced-colors:outline-(length:--tc-line-width
 export const AVATAR_ROOT = [
   'relative inline-flex shrink-0 items-center justify-center overflow-hidden',
   AVATAR_CIRCLE,
-  'bg-primary-soft text-primary-on-soft font-medium',
+  // Figma 137:461 and 137:572: a neutral disc; only AvatarGroup's counter wears the primary tint.
+  'bg-neutral-soft text-neutral-on-soft font-medium',
   AVATAR_FORCED_EDGE,
 ].join(' ')
 
-/** R-5.2-3: the control height on both axes, with the type step CONTROL_SIZE pairs it with. */
+/** R-5.2-3: the control height on both axes, with a type step near 0.4 of it, as Figma draws the
+ * initials (12 in 32, 17 in 44); an icon fallback is 1em, so it grows with the circle too. */
 export const AVATAR_SIZE = {
   xs: 'size-control-xs text-xs',
-  sm: 'size-control-sm text-sm',
-  md: 'size-control-md text-sm',
-  lg: 'size-control-lg text-base',
-  xl: 'size-control-xl text-base',
+  sm: 'size-control-sm text-xs',
+  md: 'size-control-md text-base',
+  lg: 'size-control-lg text-lg',
+  xl: 'size-control-xl text-xl',
   custom: '',
 } as const satisfies Record<Size, string>
 

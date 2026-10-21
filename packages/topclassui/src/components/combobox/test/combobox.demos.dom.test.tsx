@@ -20,7 +20,7 @@ const AFTER: Record<string, string[]> = {
   'playground': ['Next.js'],
   'rtl': ['عمّان'],
   'sizes': ['Apple', 'Apple', 'Apple', 'Apple', 'Apple'],
-  'states': ['Jordan', 'Egypt', 'Saudi Arabia', 'Jordan'],
+  'states': ['Jordan', 'Egypt', 'Saudi Arabia', 'Jordan', ''],
   'status': ['', 'Aleppo'],
   'ten-thousand': ['Option 1'],
 }

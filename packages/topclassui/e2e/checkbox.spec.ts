@@ -46,9 +46,9 @@ test.describe('the five sizes, on the static page', () => {
   test.use({ reducedMotion: 'reduce' })
 
   const FINE = {
-    xs: { target: [24, 24], box: [14, 14], mark: [9.6, 9.6], centred: true }, sm: { target: [24, 24], box: [16, 16], mark: [11.2, 11.2], centred: true },
-    md: { target: [24, 24], box: [20, 20], mark: [14.4, 14.4], centred: true }, lg: { target: [24, 24], box: [24, 24], mark: [17.6, 17.6], centred: true },
-    xl: { target: [28, 28], box: [28, 28], mark: [20.8, 20.8], centred: true },
+    xs: { target: [24, 24], box: [16, 16], mark: [11.2, 11.2], centred: true }, sm: { target: [24, 24], box: [20, 20], mark: [14.4, 14.4], centred: true },
+    md: { target: [24, 24], box: [24, 24], mark: [17.6, 17.6], centred: true }, lg: { target: [28, 28], box: [28, 28], mark: [20.8, 20.8], centred: true },
+    xl: { target: [32, 32], box: [32, 32], mark: [24, 24], centred: true },
   }
   const shapes = async (page: Page) => {
     const out: Record<string, Awaited<ReturnType<typeof shape>>> = {}
@@ -245,7 +245,7 @@ test.describe('text', () => {
       await page.goto(urlFor('checkbox--basic', 'light', direction))
       await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
       const control = page.locator('#demo [role="checkbox"]').first()
-      expect(await shape(control)).toEqual({ target: [40, 40], box: [40, 40], mark: [30.4, 30.4], centred: true })
+      expect(await shape(control)).toEqual({ target: [48, 48], box: [48, 48], mark: [36.8, 36.8], centred: true })
       const [box, label] = [await boxOf(control), await boxOf(page.locator('label[for="checkbox-basic-terms"]'))]
       expect(direction === 'ltr' ? label.left >= box.right : label.right <= box.left).toBe(true)
       await expectNoSidewaysScroll(page)
@@ -257,7 +257,7 @@ test.describe('text', () => {
     await page.goto(urlFor('checkbox--basic', 'light', 'ltr'))
     await page.addStyleTag({ content: '* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-block-end: 2em !important; }' })
     for (const row of await page.locator('#demo [role="checkbox"]').all()) {
-      expect((await shape(row)).box).toEqual([20, 20])
+      expect((await shape(row)).box).toEqual([24, 24])
       const [control, label] = [await boxOf(row), await boxOf(page.locator(`label[for="${String(await row.getAttribute('id'))}"]`))]
       expect(label.left, 'the label overlaps its box').toBeGreaterThanOrEqual(control.right)
     }
@@ -331,7 +331,7 @@ test.describe('live: pressing it', () => {
           }
           return { width: edge.right - edge.left, cut }
         })
-        expect(ring).toEqual({ width: 28, cut: [] })
+        expect(ring).toEqual({ width: 32, cut: [] })
       })
     })
   }
@@ -405,9 +405,9 @@ test.describe('live: where a page puts a checkbox', () => {
     return [holder.getAttribute('data-case'), size(button), size(button?.querySelector(':scope > span'))]
   }))
   const ALL = ['grid', 'track', 'flex-1', 'w-fit', 'cell', 'label-row', 'long', 'no-label', 'wrapped'] as const
-  const expected = (target: number) => ALL.map((name) => {
-    const box = name === 'long' ? 16 : name === 'no-label' ? 24 : 20
-    return [name, [target, target], [box, box]]
+  const expected = (target: number, large: number) => ALL.map((name) => {
+    const box = name === 'long' ? 20 : name === 'no-label' ? 28 : 24
+    return [name, name === 'no-label' ? [large, large] : [target, target], [box, box]]
   })
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 
@@ -418,7 +418,7 @@ test.describe('live: where a page puts a checkbox', () => {
       const [grid, target] = [await boxOf(page.locator('#grid')), await boxOf(boxIn(page, 'In a grid'))]
       expect([target.width, target.height]).toEqual([24, 24])
       expect(direction === 'ltr' ? target.left - grid.left : grid.right - target.right).toBe(0)
-      expect(await cases(page)).toEqual(expected(24))
+      expect(await cases(page)).toEqual(expected(24, 28))
       await expectNoSidewaysScroll(page)
     })
   }
@@ -429,7 +429,7 @@ test.describe('live: where a page puts a checkbox', () => {
     for (const direction of DIRECTIONS) {
       test(`${direction}: every case is a 44 px target around its own box, and the page does not scroll sideways`, async ({ page }) => {
         await fixture(page, { direction })
-        expect(await cases(page)).toEqual(expected(44))
+        expect(await cases(page)).toEqual(expected(44, 44))
         await expectNoSidewaysScroll(page)
       })
     }

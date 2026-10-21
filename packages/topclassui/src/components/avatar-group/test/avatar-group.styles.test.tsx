@@ -56,7 +56,7 @@ describe('the root', () => {
 
   it('rings every child in the page colour, the counter included', () => {
     expect(classList(group())).toContain('*:ring-2')
-    expect(classList(group())).toContain('*:ring-page')
+    expect(classList(group())).toContain('*:ring-neutral-soft')
   })
 
   it('makes every child a circle that paints whole, so a link around an avatar is ringed like one', () => {
@@ -75,10 +75,11 @@ describe('the root', () => {
 
 describe('the counter is an Avatar of the same size that may widen', () => {
   for (const size of ['xs', 'sm', 'md', 'lg', 'xl'] as const) {
-    it(`${size} carries every class an AvatarRoot at ${size} carries, then the three that let it widen`, () => {
+    it(`${size} carries every class an AvatarRoot at ${size} carries, then the three that let it widen and its primary tint`, () => {
       const classes = classList(counter(group({ size })))
       const [box, floor] = BOX[size]
-      expect(classes, size).toEqual([...classList(markup(<AvatarRoot size={size} />)), 'w-auto', floor, 'px-1'])
+      const root = classList(markup(<AvatarRoot size={size} />)).filter((c) => c !== 'bg-neutral-soft' && c !== 'text-neutral-on-soft')
+      expect(classes, size).toEqual([...root, 'w-auto', floor, 'px-1', 'bg-primary-soft', 'text-primary-on-soft', 'ring-primary-soft'])
       expect(classes, size).toContain(box)
     })
 
@@ -87,7 +88,7 @@ describe('the counter is an Avatar of the same size that may widen', () => {
     })
   }
 
-  it('is a circle with the soft fill an Avatar has, so +N reads as one more face', () => {
+  it('is a circle in the primary tint, the one disc of the row that is not neutral, as Figma 137:572 draws it', () => {
     const classes = classList(counter(group()))
     expect(classes).toContain('rounded-full')
     expect(classes).toContain('bg-primary-soft')

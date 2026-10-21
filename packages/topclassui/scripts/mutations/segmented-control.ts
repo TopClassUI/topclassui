@@ -10,7 +10,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the segmented control selected segment loses its heavier weight, so only a fill tells it from the others',
     file: CLASSES,
-    from: ' data-checked:font-semibold',
+    from: ' data-checked:font-medium',
     to: '',
   },
   {
@@ -228,5 +228,11 @@ export const MUTATIONS: Mutation[] = [
     file: HOOK,
     from: 'useState(() => serveTabStopOn(children, value ?? defaultValue ?? null, disabled))',
     to: 'useState(() => value ?? defaultValue ?? null)',
+  },
+  {
+    label: 'the md track goes back to the 40 px control step instead of the 36 px Figma draws',
+    file: CLASSES,
+    from: "md: 'min-h-(--tc-segmented-height)',",
+    to: "md: 'min-h-control-md',",
   },
 ]

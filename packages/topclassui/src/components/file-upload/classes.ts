@@ -7,9 +7,9 @@ import {
 /** One column, so the list scrolls instead of widening its parent. relative: it holds the hidden status line. */
 export const FILE_UPLOAD_ROOT = 'relative grid min-w-0 grid-cols-1 gap-2.5 text-body'
 
-/** The ring shows when the input over the zone has the keyboard; the dashed 3:1 line, danger when invalid. While a
- * drag is over it the line turns solid as well as primary, so the state is more than a fill and a hue. */
-export const FILE_UPLOAD_ZONE = `group/zone relative flex flex-col items-center justify-center gap-2 rounded-box border-dashed bg-surface p-6 text-center ${BORDER_STRONG} ${TRANSITION} ${FOCUS_RING_WITHIN} ${FIELD_INVALID_WITHIN} data-disabled:opacity-50 data-dragging:border-solid data-dragging:border-primary-solid data-dragging:bg-primary-soft data-dragging:text-primary-on-soft forced-colors:data-dragging:border-[Highlight]`
+/** The ring shows when the input over the zone has the keyboard; the dashed 3:1 line, danger when invalid. A drag turns
+ * the dashed line, the fill and the words primary, as drawn; forced colours erase those, so there the line turns solid. */
+export const FILE_UPLOAD_ZONE = `group/zone relative flex flex-col items-center justify-center gap-2 rounded-box border-dashed bg-surface p-6 text-center ${BORDER_STRONG} ${TRANSITION} ${FOCUS_RING_WITHIN} ${FIELD_INVALID_WITHIN} data-disabled:opacity-50 data-dragging:border-primary-solid forced-colors:data-dragging:border-solid data-dragging:bg-primary-soft data-dragging:text-primary-on-soft forced-colors:data-dragging:border-[Highlight]`
 
 /** The native input over the whole zone, unseen: a click, a key and a drop reach it before any script. */
 export const FILE_UPLOAD_INPUT = 'absolute inset-0 size-full cursor-pointer opacity-0 disabled:cursor-default'
@@ -17,9 +17,10 @@ export const FILE_UPLOAD_INPUT = 'absolute inset-0 size-full cursor-pointer opac
 export const FILE_UPLOAD_ICON = 'flex text-muted group-data-dragging/zone:text-primary-on-soft'
 
 /** CONTAIN and wrap-anywhere: a word with no space to break at wraps inside the zone instead of widening the page. */
-export const FILE_UPLOAD_PROMPT = `flex flex-col items-center gap-0.5 text-sm font-medium wrap-anywhere ${CONTAIN}`
+export const FILE_UPLOAD_PROMPT = `flex flex-wrap justify-center gap-x-1 text-sm font-medium wrap-anywhere ${CONTAIN}`
 
-export const FILE_UPLOAD_BROWSE = 'text-primary-on-soft underline underline-offset-2'
+/** One line with the drop words, as drawn: the whole zone is the control, so the word needs no link styling. */
+export const FILE_UPLOAD_BROWSE = 'text-body group-data-dragging/zone:text-primary-on-soft'
 
 /** As the prompt; a link or a button in it is lifted over the input, which takes every other pointer on the zone. */
 export const FILE_UPLOAD_HINT = `text-xs text-muted group-data-dragging/zone:text-primary-on-soft wrap-anywhere ${CONTAIN} [&_a,&_button]:relative [&_a,&_button]:z-1`
@@ -43,7 +44,8 @@ export const FILE_UPLOAD_NAME = `${LABEL} flex-1 font-medium`
 
 export const FILE_UPLOAD_SIZE = 'shrink-0 text-xs text-muted tabular-nums'
 
-export const FILE_UPLOAD_REASON = 'shrink-0 text-xs text-danger-on-soft'
+/** Muted: the icon before it carries the danger hue, as the frame draws it. */
+export const FILE_UPLOAD_REASON = 'shrink-0 text-xs text-muted'
 
 /** The x: an icon button on the neutral ramp, as Popover's close, dimmed with the upload when it is disabled. */
 export const FILE_UPLOAD_REMOVE = `${ICON_BUTTON} text-muted tone-neutral ${HOVER.ghost} ${DISABLED}`

@@ -1,25 +1,12 @@
 import { Separator } from '../index.js'
 
-/** Each state with its name under it. The labelled form is not built, so there is no "with label". */
+/** One cell per state Figma 137:815 draws, named by its aria-label. */
 export default function Demo() {
   return (
-    <div className="grid max-w-xs gap-6 text-sm">
-      <div className="grid gap-2">
-        <div className="flex flex-col gap-3 text-body">
-          <span>Account</span>
-          <Separator />
-          <span>Security</span>
-        </div>
-        <span className="text-muted">Horizontal</span>
-      </div>
-      <div className="grid gap-2">
-        <div className="flex h-5 items-center gap-3 text-body">
-          <span>Draft</span>
-          <Separator orientation="vertical" />
-          <span>Edited 2 hours ago</span>
-        </div>
-        <span className="text-muted">Vertical</span>
-      </div>
+    <div className="flex flex-wrap items-center gap-10">
+      <div role="group" aria-label="horizontal" className="w-28"><Separator /></div>
+      <div role="group" aria-label="vertical" className="flex h-10"><Separator orientation="vertical" /></div>
+      <div role="group" aria-label="with label" className="w-28"><Separator>or</Separator></div>
     </div>
   )
 }

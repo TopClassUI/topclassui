@@ -1,6 +1,7 @@
 import type { ComponentPropsWithRef, ReactElement, ReactNode } from 'react'
 
 import type { Labels } from '#shared/labels/types.js'
+import type { NAVBAR_VARIANTS } from './constants.js'
 import type { NavbarSchemaInput } from './schema.js'
 
 // R-8.3-4: derived from the schema, so the props and the validation cannot drift apart.
@@ -8,11 +9,14 @@ export type NavbarDesignProps = {
   [K in keyof NavbarSchemaInput]?: NavbarSchemaInput[K] | undefined
 }
 
+/** The look of the bar, from the list in constants.ts. */
+export type NavbarVariant = (typeof NAVBAR_VARIANTS)[number]
+
 /** How the top of the bar is padded: one that sticks clears the safe area, one in the flow does not. */
 export type NavbarTop = 'sticky' | 'flow'
 
 export interface NavbarRootProps
-  extends Omit<ComponentPropsWithRef<'header'>, 'children'>, Pick<NavbarDesignProps, 'sticky'> {
+  extends Omit<ComponentPropsWithRef<'header'>, 'children'>, Pick<NavbarDesignProps, 'sticky' | 'variant'> {
   /** The parts, in order: NavbarBrand, NavbarLinks and NavbarActions. Each one is optional. */
   children?: ReactNode | undefined
 }

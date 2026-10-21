@@ -24,7 +24,7 @@ const FIELDS: Record<string, string[]> = {
   'playground': ['Verification code: ^______'],
   'rtl': ['رمز التحقق: ^______'],
   'sizes': ['Extra small: 482^___', 'Small: 482^___', 'Medium: 482^___', 'Large: 482^___', 'Extra large: 482^___'],
-  'states': ['Invalid: 48291^3 invalid', 'Disabled: 482^___ disabled', 'Read-only: 48291^3 read-only'],
+  'states': ['Invalid: 48291^3 invalid', 'Disabled: 482^___ disabled', 'Read-only: 48291^3 read-only', 'Partly filled: 48^____', 'Complete: 48291^3'],
 }
 
 const render = async (file: string) => {

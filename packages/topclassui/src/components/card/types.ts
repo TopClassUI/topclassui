@@ -1,10 +1,18 @@
-import type { ComponentPropsWithRef, ReactNode } from 'react'
+import type { ComponentPropsWithRef, ReactElement, ReactNode } from 'react'
 
 /** Every part is a plain div, so each takes what a div takes, ref included. */
 type DivProps = Omit<ComponentPropsWithRef<'div'>, 'children'>
 
 export interface CardRootProps extends DivProps {
-  /** The parts, in order: CardHeader, CardBody and CardFooter. Each one is optional. */
+  /** The parts, in order: CardMedia, CardHeader, CardBody and CardFooter. Each one is optional. */
+  children?: ReactNode | undefined
+  /** A link or a button to render the whole card as, with the drawn hover and focus ring:
+   * render={<Link href="/report" />}. The element form only, so it works on the server. */
+  render?: ReactElement | undefined
+}
+
+export interface CardMediaProps extends DivProps {
+  /** The image or illustration, edge to edge above the title. */
   children?: ReactNode | undefined
 }
 

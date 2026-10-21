@@ -1,20 +1,18 @@
-import { bell } from '#icons/data/bell.js'
 import { Button } from '#components/button/index.js'
-import { Svg } from '#components/svg/index.js'
 import { Banner } from '../index.js'
 import type { BannerDesignProps } from '../index.js'
 
-/** The docs stage: the Try it controls set the tone and the x; the neutral action reads on every tone. */
+/** The docs stage, as the frame draws it: dismissible, with the action as a link in the banner's colour; Try it sets the tone and the x. */
 // BannerDismissal takes a boolean beside the id, never an optional one.
-export default function Demo(props: Omit<BannerDesignProps, 'dismissible'> & { dismissible: boolean } = { dismissible: false }) {
+export default function Demo({ dismissible = true, ...props }: Omit<BannerDesignProps, 'dismissible'> & { dismissible?: boolean } = {}) {
   return (
     <Banner {...props}
+      dismissible={dismissible}
       id="banner-playground"
-      aria-label="Version 2 announcement"
-      icon={<Svg icon={bell} size="xs" />}
-      action={<Button size="sm" variant="outline" tone="neutral" render={<a href="/changelog" />}>Read the changelog</Button>}
+      aria-label="Version 0.2 announcement"
+      action={<Button size="sm" variant="link" className="px-0 font-semibold text-current" render={<a href="/changelog" />}>Read more</Button>}
     >
-      Version 2 is out, with faster builds and a new theme editor.
+      Version 0.2 is out, with a Drawer and full RTL support.
     </Banner>
   )
 }

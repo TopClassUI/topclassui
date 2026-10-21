@@ -123,11 +123,11 @@ describe('the name of the nav', () => {
   })
 })
 
-describe('the four icons', () => {
+describe('the four icons and the two gaps', () => {
   it('are decorative: the link carries the name, so nothing is announced twice', () => {
     const html_ = html({ value: 6 })
-    expect(html_.match(/<svg /g)).toHaveLength(4)
-    expect(html_.match(/<svg [^>]*aria-hidden="true"/g)).toHaveLength(4)
+    expect(html_.match(/<svg /g)).toHaveLength(6)
+    expect(html_.match(/<svg [^>]*aria-hidden="true"/g)).toHaveLength(6)
     expect(html_).not.toContain('role="img"')
   })
 })

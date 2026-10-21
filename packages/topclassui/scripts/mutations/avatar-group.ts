@@ -29,7 +29,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the AvatarGroup ring loses the page colour, so it paints in the text colour of each avatar',
     file: 'src/components/avatar-group/classes.ts',
-    from: "'*:ring-2 *:ring-page'",
+    from: "'*:ring-2 *:ring-neutral-soft'",
     to: "'*:ring-2'",
   },
   {
@@ -83,8 +83,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the AvatarGroup counter keeps the fixed width of the avatar at md, so its floor and its padding widen nothing',
     file: 'src/components/avatar-group/classes.ts',
-    from: "md: 'w-auto min-w-control-md px-1',",
-    to: "md: 'min-w-control-md px-1',",
+    from: "md: 'w-auto min-w-control-md px-1 bg-primary-soft",
+    to: "md: 'min-w-control-md px-1 bg-primary-soft",
   },
   {
     label: 'the AvatarGroup custom size widens the counter too, so one class on the group can no longer size it',
@@ -125,13 +125,19 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the AvatarGroup in-table demo gives every team its own max, so no row shows the default of four and a counter',
     file: 'src/components/avatar-group/dummy/in-table.tsx',
-    from: '<AvatarGroup className="*:ring-surface-raised"',
-    to: '<AvatarGroup max={20} className="*:ring-surface-raised"',
+    from: '<AvatarGroup aria-label={`${project.name}: ${placed}`}>',
+    to: '<AvatarGroup max={20} aria-label={`${project.name}: ${placed}`}>',
   },
   {
     label: 'the AvatarGroup linked demo drops the focus ring of the library, so its links show the ring the browser draws',
     file: 'src/components/avatar-group/dummy/linked.tsx',
     from: "cn('inline-flex', FOCUS_RING)",
     to: "cn('inline-flex')",
+  },
+  {
+    label: 'the AvatarGroup counter loses its primary tint, so +N reads as one more neutral face',
+    file: 'src/components/avatar-group/classes.ts',
+    from: "md: 'w-auto min-w-control-md px-1 bg-primary-soft text-primary-on-soft ring-primary-soft',",
+    to: "md: 'w-auto min-w-control-md px-1',",
   },
 ]

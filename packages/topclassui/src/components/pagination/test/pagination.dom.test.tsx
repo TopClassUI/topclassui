@@ -20,12 +20,27 @@ describe('in a real tree', () => {
     const list = within(screen.getByRole('navigation')).getByRole('list')
     expect(list.tagName).toBe('UL')
     expect([...list.children].map((child) => child.tagName))
-      .toEqual(['LI', 'LI', 'LI', 'LI', 'LI', 'LI', 'LI', 'LI', 'LI', 'LI', 'LI'])
+      .toEqual(['LI', 'LI', 'LI', 'LI', 'LI', 'LI', 'LI', 'LI', 'LI', 'LI', 'LI', 'LI'])
   })
 
-  it('announces nine items for page 6 of 12, because the two gaps are hidden', () => {
+  // jsdom applies no container query, so the compact status counts here; a browser shows one row or the other.
+  it('announces ten items for page 6 of 12, because the two gaps are hidden', () => {
     render(<Pagination value={6} pageCount={12} getHref={blog} />)
-    expect(screen.getAllByRole('listitem')).toHaveLength(9)
+    expect(screen.getAllByRole('listitem')).toHaveLength(10)
+  })
+
+  it('writes the compact status between Previous and Next, and keeps every page link beside it', () => {
+    render(<Pagination value={6} pageCount={12} getHref={blog} />)
+    const items = screen.getAllByRole('listitem')
+    expect(items.map((item) => item.textContent)).toEqual(['', '', '1', '5', '6', '7', '12', '6 of 12', '', ''])
+    expect(items[7]?.className).toContain('pagination-compact')
+    expect(items.filter((item) => item.className.includes('pagination-full'))).toHaveLength(5)
+  })
+
+  it('hides the dead pages of a disabled pagination in the compact row too', () => {
+    render(<Pagination value={6} pageCount={12} getHref={blog} disabled />)
+    const items = screen.getAllByRole('listitem')
+    expect(items.filter((item) => item.className.includes('pagination-full')).map((item) => item.textContent)).toEqual(['1', '5', '6', '7', '12'])
   })
 
   it('names the four controls and each page, in reading order', () => {

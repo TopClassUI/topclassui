@@ -1,84 +1,84 @@
 {
   "tool": "esbuild 0.28.2, ESM, minified, split, gzip level 9 per chunk",
-  "runtimeBytes": 9196,
+  "runtimeBytes": 9213,
   "components": {
     "accordion": {
-      "clientBytes": 16211,
+      "clientBytes": 16426,
       "lazyBytes": 0,
-      "withBaseUiBytes": 29264,
-      "budgetedBytes": 7015
+      "withBaseUiBytes": 29476,
+      "budgetedBytes": 7213
     },
     "avatar": {
-      "clientBytes": 10700,
+      "clientBytes": 10704,
       "lazyBytes": 0,
-      "withBaseUiBytes": 11874,
-      "budgetedBytes": 1504
+      "withBaseUiBytes": 11885,
+      "budgetedBytes": 1491
     },
     "banner": {
-      "clientBytes": 16330,
+      "clientBytes": 16570,
       "lazyBytes": 0,
-      "withBaseUiBytes": 16848,
-      "budgetedBytes": 7134
+      "withBaseUiBytes": 17087,
+      "budgetedBytes": 7357
     },
     "checkbox": {
-      "clientBytes": 15608,
+      "clientBytes": 15825,
       "lazyBytes": 0,
-      "withBaseUiBytes": 27713,
-      "budgetedBytes": 6412
+      "withBaseUiBytes": 27936,
+      "budgetedBytes": 6612
     },
     "code-block": {
-      "clientBytes": 12944,
+      "clientBytes": 13154,
       "lazyBytes": 0,
-      "withBaseUiBytes": 13461,
-      "budgetedBytes": 3748
+      "withBaseUiBytes": 13669,
+      "budgetedBytes": 3941
     },
     "combobox": {
-      "clientBytes": 20570,
+      "clientBytes": 20810,
       "lazyBytes": 0,
-      "withBaseUiBytes": 90126,
-      "budgetedBytes": 11374
+      "withBaseUiBytes": 90357,
+      "budgetedBytes": 11597
     },
     "command": {
-      "clientBytes": 6537,
-      "lazyBytes": 14097,
-      "withBaseUiBytes": 7052,
-      "budgetedBytes": 6537
+      "clientBytes": 6602,
+      "lazyBytes": 14793,
+      "withBaseUiBytes": 7121,
+      "budgetedBytes": 6602
     },
     "date-picker": {
-      "clientBytes": 19965,
-      "lazyBytes": 1379,
-      "withBaseUiBytes": 77725,
-      "budgetedBytes": 10769
+      "clientBytes": 20176,
+      "lazyBytes": 1377,
+      "withBaseUiBytes": 77955,
+      "budgetedBytes": 10963
     },
     "dialog": {
-      "clientBytes": 16840,
+      "clientBytes": 17130,
       "lazyBytes": 0,
-      "withBaseUiBytes": 66672,
-      "budgetedBytes": 7644
+      "withBaseUiBytes": 66974,
+      "budgetedBytes": 7917
     },
     "drawer": {
-      "clientBytes": 17609,
+      "clientBytes": 17830,
       "lazyBytes": 0,
-      "withBaseUiBytes": 83072,
-      "budgetedBytes": 8413
+      "withBaseUiBytes": 83298,
+      "budgetedBytes": 8617
     },
     "dropdown": {
-      "clientBytes": 17842,
+      "clientBytes": 18049,
       "lazyBytes": 0,
-      "withBaseUiBytes": 83811,
-      "budgetedBytes": 8646
+      "withBaseUiBytes": 84031,
+      "budgetedBytes": 8836
     },
     "field": {
-      "clientBytes": 12407,
+      "clientBytes": 12423,
       "lazyBytes": 0,
-      "withBaseUiBytes": 12924,
-      "budgetedBytes": 3211
+      "withBaseUiBytes": 12940,
+      "budgetedBytes": 3210
     },
     "file-upload": {
-      "clientBytes": 21436,
+      "clientBytes": 21638,
       "lazyBytes": 0,
-      "withBaseUiBytes": 21950,
-      "budgetedBytes": 12240
+      "withBaseUiBytes": 22153,
+      "budgetedBytes": 12425
     },
     "form": {
       "clientBytes": 795,
@@ -87,118 +87,118 @@
       "budgetedBytes": 795
     },
     "icon-registry": {
-      "clientBytes": 9982,
+      "clientBytes": 9996,
       "lazyBytes": 0,
-      "withBaseUiBytes": 10496,
-      "budgetedBytes": 786
+      "withBaseUiBytes": 10513,
+      "budgetedBytes": 783
     },
     "navbar": {
-      "clientBytes": 640,
+      "clientBytes": 687,
       "lazyBytes": 0,
-      "withBaseUiBytes": 1166,
-      "budgetedBytes": 640
+      "withBaseUiBytes": 1215,
+      "budgetedBytes": 687
     },
     "number-field": {
-      "clientBytes": 16847,
+      "clientBytes": 17118,
       "lazyBytes": 0,
-      "withBaseUiBytes": 35375,
-      "budgetedBytes": 7651
+      "withBaseUiBytes": 35643,
+      "budgetedBytes": 7905
     },
     "otp-field": {
-      "clientBytes": 15673,
+      "clientBytes": 15917,
       "lazyBytes": 0,
-      "withBaseUiBytes": 30104,
-      "budgetedBytes": 6477
+      "withBaseUiBytes": 30355,
+      "budgetedBytes": 6704
     },
     "popover": {
-      "clientBytes": 16589,
+      "clientBytes": 16802,
       "lazyBytes": 0,
-      "withBaseUiBytes": 74376,
-      "budgetedBytes": 7393
+      "withBaseUiBytes": 74604,
+      "budgetedBytes": 7589
     },
     "radio-group": {
-      "clientBytes": 16259,
+      "clientBytes": 16474,
       "lazyBytes": 0,
-      "withBaseUiBytes": 38366,
-      "budgetedBytes": 7063
+      "withBaseUiBytes": 38586,
+      "budgetedBytes": 7261
     },
     "rating": {
-      "clientBytes": 15107,
+      "clientBytes": 15314,
       "lazyBytes": 0,
-      "withBaseUiBytes": 15625,
-      "budgetedBytes": 5911
+      "withBaseUiBytes": 15831,
+      "budgetedBytes": 6101
     },
     "segmented-control": {
-      "clientBytes": 16906,
+      "clientBytes": 17140,
       "lazyBytes": 0,
-      "withBaseUiBytes": 39005,
-      "budgetedBytes": 7710
+      "withBaseUiBytes": 39241,
+      "budgetedBytes": 7927
     },
     "select": {
-      "clientBytes": 19196,
+      "clientBytes": 19448,
       "lazyBytes": 0,
-      "withBaseUiBytes": 82975,
-      "budgetedBytes": 10000
+      "withBaseUiBytes": 83224,
+      "budgetedBytes": 10235
     },
     "sidebar": {
-      "clientBytes": 15304,
+      "clientBytes": 15463,
       "lazyBytes": 0,
-      "withBaseUiBytes": 15823,
-      "budgetedBytes": 6108
+      "withBaseUiBytes": 15981,
+      "budgetedBytes": 6250
     },
     "slider": {
-      "clientBytes": 15980,
+      "clientBytes": 16190,
       "lazyBytes": 0,
-      "withBaseUiBytes": 39295,
-      "budgetedBytes": 6784
+      "withBaseUiBytes": 39515,
+      "budgetedBytes": 6977
     },
     "switch": {
-      "clientBytes": 14962,
+      "clientBytes": 15167,
       "lazyBytes": 0,
-      "withBaseUiBytes": 24105,
-      "budgetedBytes": 5766
+      "withBaseUiBytes": 24320,
+      "budgetedBytes": 5954
     },
     "table": {
-      "clientBytes": 15970,
+      "clientBytes": 16294,
       "lazyBytes": 0,
-      "withBaseUiBytes": 16488,
-      "budgetedBytes": 6774
+      "withBaseUiBytes": 16811,
+      "budgetedBytes": 7081
     },
     "tabs": {
-      "clientBytes": 15935,
+      "clientBytes": 16225,
       "lazyBytes": 0,
-      "withBaseUiBytes": 38359,
-      "budgetedBytes": 6739
+      "withBaseUiBytes": 38654,
+      "budgetedBytes": 7012
     },
     "tag": {
-      "clientBytes": 16944,
+      "clientBytes": 17271,
       "lazyBytes": 0,
-      "withBaseUiBytes": 17462,
-      "budgetedBytes": 7748
+      "withBaseUiBytes": 17789,
+      "budgetedBytes": 8058
     },
     "textarea": {
-      "clientBytes": 14709,
+      "clientBytes": 14923,
       "lazyBytes": 0,
-      "withBaseUiBytes": 15228,
-      "budgetedBytes": 5513
+      "withBaseUiBytes": 15443,
+      "budgetedBytes": 5710
     },
     "toast": {
-      "clientBytes": 19665,
+      "clientBytes": 20382,
       "lazyBytes": 0,
-      "withBaseUiBytes": 74470,
-      "budgetedBytes": 10469
+      "withBaseUiBytes": 75172,
+      "budgetedBytes": 11169
     },
     "tooltip": {
-      "clientBytes": 13075,
+      "clientBytes": 13136,
       "lazyBytes": 0,
-      "withBaseUiBytes": 65203,
-      "budgetedBytes": 3879
+      "withBaseUiBytes": 65264,
+      "budgetedBytes": 3923
     },
     "tree-view": {
-      "clientBytes": 19806,
+      "clientBytes": 20470,
       "lazyBytes": 0,
-      "withBaseUiBytes": 20323,
-      "budgetedBytes": 10610
+      "withBaseUiBytes": 20987,
+      "budgetedBytes": 11257
     }
   }
 }

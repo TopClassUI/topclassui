@@ -80,4 +80,16 @@ export const MUTATIONS: Mutation[] = [
     from: 'Tag renders on the server, with no client part.',
     to: 'Tag renders on the server and ships no JavaScript.',
   },
+  {
+    label: 'a linked tag loses the tone utility, so its hover tint reads no variable',
+    file: 'src/components/tag/variants.ts',
+    from: "    compoundVariants: TAG_TONES.map((tone) => ({ interactive: true, tone, class: TONE_CLASS[tone] })),",
+    to: '    compoundVariants: [],',
+  },
+  {
+    label: 'the md tag goes back to the 20 px line the frame does not draw',
+    file: 'src/components/tag/classes.ts',
+    from: "  md: 'px-3 py-pad-y-md gap-2 text-sm/4',",
+    to: "  md: 'px-3 py-pad-y-md gap-2 text-sm',",
+  },
 ]

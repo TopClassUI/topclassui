@@ -9,7 +9,7 @@ const html = (tone: BannerTone) => markup(<Banner aria-label="Notice" tone={tone
 
 /** The row every tone shares: layout, padding, the type step, both wraps and the forced-colours edge. */
 const ROW = [
-  'flex', 'w-full', 'min-w-0', 'flex-wrap', 'items-center', 'gap-3', 'px-5', 'py-3', 'text-sm', 'font-medium', 'wrap-anywhere',
+  'flex', 'w-full', 'min-w-0', 'flex-wrap', 'items-center', 'gap-3', 'px-4.5', 'py-2.75', 'text-sm/tight', 'font-medium', 'wrap-anywhere',
   'forced-colors:border-b-(length:--tc-line-width)',
 ]
 

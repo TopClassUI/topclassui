@@ -52,7 +52,7 @@ const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { 
 
 describe('every demo is a Server Component that only hands the segmented control what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'form', 'full-width', 'long-content', 'many', 'playground', 'rtl', 'sizes', 'states', 'with-icons'])
+    expect(names).toEqual(['basic', 'form', 'full-width', 'long-content', 'many', 'playground', 'rtl', 'sizes', 'states', 'track-states', 'with-icons'])
   })
 
   for (const name of names) {
@@ -68,8 +68,12 @@ describe('every demo is a Server Component that only hands the segmented control
     const props = crossings((await load('states'))())
       .map(({ part, props: given }) => `${part}: ${Object.keys(given).filter((key) => !['aria-label', 'children'].includes(key)).join(' ')}`)
     expect(props).toEqual([
-      'SegmentedControlRoot: invalid defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value',
+      'SegmentedControlRoot: defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value',
+      'SegmentedControlRoot: defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value',
+      'SegmentedControlRoot: defaultValue', 'SegmentedControlItem: value className', 'SegmentedControlItem: value',
+      'SegmentedControlRoot: defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value',
       'SegmentedControlRoot: disabled defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value',
+      'SegmentedControlRoot: invalid defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value',
       'SegmentedControlRoot: defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value disabled', 'SegmentedControlItem: value',
       'SegmentedControlRoot: readOnly defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value',
     ])

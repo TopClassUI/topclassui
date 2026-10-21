@@ -47,13 +47,25 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the separator passes className first, so the consumer loses every conflict',
     file: 'src/components/separator/index.tsx',
-    from: 'cn(SEPARATOR_ORIENTATION[orientation], className)',
-    to: 'cn(className, SEPARATOR_ORIENTATION[orientation])',
+    from: 'cn(labelled ? SEPARATOR_LABELLED[orientation] : SEPARATOR_ORIENTATION[orientation], className)',
+    to: 'cn(className, labelled ? SEPARATOR_LABELLED[orientation] : SEPARATOR_ORIENTATION[orientation])',
   },
   {
     label: 'a consumer className replaces the separator classes, so the line disappears',
     file: 'src/components/separator/index.tsx',
-    from: 'cn(SEPARATOR_ORIENTATION[orientation], className)',
-    to: 'cn(className ?? SEPARATOR_ORIENTATION[orientation])',
+    from: 'cn(labelled ? SEPARATOR_LABELLED[orientation] : SEPARATOR_ORIENTATION[orientation], className)',
+    to: 'cn(className ?? (labelled ? SEPARATOR_LABELLED[orientation] : SEPARATOR_ORIENTATION[orientation]))',
+  },
+  {
+    label: 'an announced labelled separator loses the name its label gives it',
+    file: 'src/components/separator/index.tsx',
+    from: 'aria-labelledby={labelled && !decorative ? labelId : undefined}',
+    to: 'aria-labelledby={undefined}',
+  },
+  {
+    label: 'the labelled separator drops the line after its label',
+    file: 'src/components/separator/index.tsx',
+    from: '          <span id={labelId}>{children}</span>\n          <span aria-hidden className={SEPARATOR_SIDE[orientation]} />\n',
+    to: '          <span id={labelId}>{children}</span>\n',
   },
 ]

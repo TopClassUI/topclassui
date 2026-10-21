@@ -55,16 +55,16 @@ describe('the header', () => {
 describe('the pre', () => {
   it('scrolls sideways in its own box, keeps the spacing of code, and rings inside its edge', () => {
     expect(missing(classesOf(html(), 'pre'), [
-      'overflow-x-auto', 'overscroll-x-contain', 'whitespace-pre', 'font-mono', 'text-start', 'rounded-b-box', 'pb-3.5', 'px-3.5',
+      'overflow-x-auto', 'overscroll-x-contain', 'whitespace-pre', 'font-mono', 'text-start', 'rounded-b-box', 'pb-3', 'px-3',
       'focus-visible:-outline-offset-(length:--tc-ring-width)', 'focus-visible:outline-ring',
     ])).toEqual([])
   })
 
   it('alone, with no header, takes the top padding back and rounds every corner', () => {
     const list = classesOf(html({ title: undefined, showCopy: false }), 'pre')
-    expect(missing(list, ['rounded-box', 'pt-3.5'])).toEqual([])
+    expect(missing(list, ['rounded-box', 'pt-3'])).toEqual([])
     expect(list).not.toContain('rounded-b-box')
-    expect(classesOf(html(), 'pre')).not.toContain('pt-3.5')
+    expect(classesOf(html(), 'pre')).not.toContain('pt-3')
   })
 
   it('wrap breaks the long line instead, and cn drops the whitespace-pre it replaces', () => {

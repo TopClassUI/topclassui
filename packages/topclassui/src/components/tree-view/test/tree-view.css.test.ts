@@ -53,8 +53,9 @@ describe('the tree', () => {
   })
 
   it('is capped at the row count, 44 px rows under a finger, and scrolls inside itself without moving the page', () => {
-    expect(ruleOf(selectorOf('max-h-[calc(var(--tc-list-rows)*var(--tc-row-height))]'))).toBe('max-height: calc(var(--tc-list-rows) * var(--tc-row-height));')
-    const coarse = 'pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-coarse,44px)))]'
+    expect(ruleOf(selectorOf('max-h-[calc(var(--tc-list-rows)*var(--tc-row-height)+1rem+2*var(--tc-line-width))]')))
+      .toBe('max-height: calc(var(--tc-list-rows) * var(--tc-row-height) + 1rem + 2 * var(--tc-line-width));')
+    const coarse = 'pointer-coarse:max-h-[calc(var(--tc-list-rows)*max(var(--tc-row-height),var(--tc-target-coarse,44px))+1rem+2*var(--tc-line-width))]'
     expect(mediaOf(selectorOf(coarse))).toBe('@media (pointer: coarse)')
     expect(ruleOf(selectorOf('overscroll-contain'))).toBe('overscroll-behavior: contain;')
   })
@@ -97,8 +98,8 @@ describe('a row', () => {
     expect(ruleOf(`${active}:is(:where(.group\\/tree):focus-visible *)[data-highlighted]`)).toContain('outline-style: solid;')
   })
 
-  it('selected: a tint and a heavier weight; under forced colours the system pair, the ring and the marks in HighlightText', () => {
-    expect(ruleOf(`${selectorOf('aria-selected:font-medium')}[aria-selected="true"]`)).toContain('font-weight: var(--font-weight-medium);')
+  it('selected: a tint at the regular weight; under forced colours the system pair, the ring and the marks in HighlightText', () => {
+    expect(TREE_VIEW_ROW_SELECTED.split(' ').filter((cls) => cls.includes('font-'))).toEqual([])
     expect(ruleOf(`${selectorOf('forced-colors:aria-selected:bg-[Highlight]')}[aria-selected="true"]`)).toBe('background-color: Highlight;')
     // Written with the ring's own condition, or the ring's colour wins on specificity (measured: the token's primary on Highlight).
     expect(ruleOf(`${selectorOf('forced-colors:aria-selected:group-focus-visible/tree:data-highlighted:outline-[HighlightText]')}[aria-selected="true"]:is(:where(.group\\/tree):focus-visible *)[data-highlighted]`))
@@ -113,9 +114,9 @@ describe('a row', () => {
     expect(ruleOf(`${selectorOf('aria-disabled:pointer-events-none')}[aria-disabled="true"]`)).toBe('pointer-events: none;')
   })
 
-  it('the caret slot is 14 px wide on every row, and the label ends in an ellipsis', () => {
-    expect(ruleOf(selectorOf('size-3.5'))).toBe('width: calc(var(--spacing) * 3.5); height: calc(var(--spacing) * 3.5);')
-    expect(TREE_VIEW_LABEL.split(' ')).toEqual(['truncate', 'min-w-0', 'flex-1'])
+  it('the caret slot is 12 px wide on every row, and the label ends in an ellipsis', () => {
+    expect(ruleOf(selectorOf('size-3'))).toBe('width: calc(var(--spacing) * 3); height: calc(var(--spacing) * 3);')
+    expect(TREE_VIEW_LABEL.split(' ')).toEqual(['truncate', 'min-w-0'])
   })
 })
 

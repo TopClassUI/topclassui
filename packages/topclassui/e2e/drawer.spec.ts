@@ -4,7 +4,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
 import { DIRECTIONS, MODES } from '../scripts/lib/harness.js'
 import { type LiveOptions, expectInsideViewport, expectNoSidewaysScroll, liveErrors, openLive } from './live.js'
 import {
-  type Box, type OpenOptions, atRest, boxOf, expectClosed, expectNothingSideways, inkOf, openOverlay,
+  type Box, type OpenOptions, OPENED, atRest, boxOf, expectClosed, expectNothingSideways, inkOf, openOverlay,
   pageLock, pressInside, scrollPageTo, touchDrag, wheelAt, withScrollbar,
 } from './overlay.js'
 import { DEMOS } from './pages.js'
@@ -27,7 +27,7 @@ const DRAWERS: Record<string, { trigger: string, title: string }> = {
   'drawer--rtl': { trigger: 'القائمة', title: 'تصفّح' },
   'drawer--sizes': { trigger: 'xs', title: 'Size xs' },
   'drawer--start': { trigger: 'Menu', title: 'Browse' },
-  'drawer--states': { trigger: 'Side sheet', title: 'Side sheet' },
+  'drawer--states': { trigger: 'Open', title: 'Opened' },
   'drawer--top': { trigger: 'What is new', title: 'Version 2.4' },
   'drawer--trap-focus': { trigger: 'Inspect', title: 'Inspector' },
   'drawer--with-form': { trigger: 'Invite', title: 'Invite a teammate' },
@@ -89,7 +89,7 @@ const partsOf = (popup: Locator) => popup.evaluate((element): Parts => {
 
 /**
  * Where a sheet stands on the screen and where its x stands on the sheet, in whole pixels from each edge. The screen
- * is the body's width: html keeps a gutter for the scrollbar, 15 px that no fixed box, scrim or sheet, is laid out in.
+ * is the body's width: html keeps a gutter for the scrollbar, 10 px that no fixed box, scrim or sheet, is laid out in.
  */
 const seatOf = (popup: Locator) => popup.evaluate((element) => {
   const frame = element.getBoundingClientRect()
@@ -159,6 +159,35 @@ test('the table names every drawer demo', () => {
   expect(Object.keys(DRAWERS)).toHaveLength(13)
 })
 
+test.describe('the states strip', () => {
+  /** The cell a state is drawn in, by the title that captions it. */
+  const cellOf = (page: Page, title: string) => page.locator(`#demo [title="${title}"]`)
+
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: the side and the bottom sheet stand open at their edge of their own cell, whole inside it, and neither holds the focus`, async ({ page }) => {
+      await openLive(page, 'drawer--states', { direction })
+      expect(await cellOf(page, 'closed').locator('xpath=..').locator(':scope > *').evaluateAll((cells) => cells.map((cell) => cell.getAttribute('title'))))
+        .toEqual(['closed', 'side sheet', 'bottom sheet'])
+      await expect(cellOf(page, 'closed').locator('[role="dialog"]')).toHaveCount(0)
+      for (const [title, name] of [['side sheet', 'Side sheet'], ['bottom sheet', 'Bottom sheet']] as const) {
+        const cell = cellOf(page, title)
+        const popup = cell.locator(`[role="dialog"]${OPENED}`)
+        await expect(popup).toBeVisible()
+        await atRest(popup)
+        await expect(popup.locator('h2')).toHaveText(name)
+        const [inner, outer] = [await boxOf(popup), await boxOf(cell)]
+        expect(inner.top >= outer.top && inner.bottom <= outer.bottom && inner.left >= outer.left && inner.right <= outer.right, `${title} leaves its cell`).toBe(true)
+        // The edge it stands on: the inline end, which is the left in Arabic, or the bottom.
+        const edge = title === 'bottom sheet' ? outer.bottom - inner.bottom : direction === 'rtl' ? inner.left - outer.left : outer.right - inner.right
+        expect(Math.abs(edge - 1), `${title} is off its edge`).toBeLessThanOrEqual(1)
+        await expect(popup.locator(':scope > :last-child')).toHaveAttribute('aria-label', direction === 'rtl' ? CLOSE.ar : CLOSE.en)
+        expect(await popup.evaluate((element) => element.contains(document.activeElement)), `${title} took the focus`).toBe(false)
+      }
+      expect((await axe(page)).violations).toEqual([])
+    })
+  }
+})
+
 // A Drawer slides and never fades: a wait on its opacity would return on the first frame of the slide.
 test.describe('the helper that opens every overlay holds for a sheet that slides', () => {
   /** What moves on the sheet and beside it, read in the same tick openOverlay returned in. */
@@ -172,23 +201,23 @@ test.describe('the helper that opens every overlay holds for a sheet that slides
     }
   })
 
-  // 1265 px of screen beside the gutter, less the 320 px of the sheet: its left edge rests at 945.
+  // 1270 px of screen beside the gutter, less the 320 px of the sheet: its left edge rests at 950.
   test('returns a sheet at rest: at its edge, with no slide left running, after 300 ms of one', async ({ page }) => {
     const popup = await open(page, 'drawer--end')
-    expect(await motion(popup)).toEqual({ opacity: '1', transform: 'matrix(1, 0, 0, 1, 0, 0)', width: 320, left: 945, duration: '0.3s', running: 0 })
+    expect(await motion(popup)).toEqual({ opacity: '1', transform: 'matrix(1, 0, 0, 1, 0, 0)', width: 320, left: 950, duration: '0.3s', running: 0 })
   })
 
   test('returns at once where nothing moves, under reduced motion', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' })
     const popup = await open(page, 'drawer--end')
-    expect(await motion(popup)).toEqual({ opacity: '1', transform: 'matrix(1, 0, 0, 1, 0, 0)', width: 320, left: 945, duration: '0s', running: 0 })
+    expect(await motion(popup)).toEqual({ opacity: '1', transform: 'matrix(1, 0, 0, 1, 0, 0)', width: 320, left: 950, duration: '0s', running: 0 })
   })
 })
 
 test.describe('placement is logical', () => {
   /** The sheet is 320 px of a screen 1265 px wide, and its x is 12 px in from its inline end, past the line of a start sheet. */
-  const AT_THE_RIGHT = { left: 945, right: 0, top: 0, bottom: 0 }
-  const AT_THE_LEFT = { left: 0, right: 945, top: 0, bottom: 0 }
+  const AT_THE_RIGHT = { left: 950, right: 0, top: 0, bottom: 0 }
+  const AT_THE_LEFT = { left: 0, right: 950, top: 0, bottom: 0 }
 
   test('ltr: end stands at the right, full height, with its x at the right', async ({ page }) => {
     expect(await seatOf(await open(page, 'drawer--end'))).toEqual({ ...AT_THE_RIGHT, xFromLeft: 284, xFromRight: 12 })
@@ -928,8 +957,8 @@ test.describe('the page behind', () => {
       for (const edge of ['start', 'end'] as const) {
         withScrollbar(`${direction}, trigger at the ${edge}: opening and closing the sheet does not move the trigger`, async ({ barPage: page }) => {
           await openLive(page, 'drawer--end', { direction, edge, tall: true })
-          // A real bar 15 px wide: the root's client box is narrower than the window.
-          expect(await page.evaluate(() => window.innerWidth - document.documentElement.clientWidth)).toBe(15)
+          // A real bar, 10 px as the page draws it thin: the root's client box is narrower than the window.
+          expect(await page.evaluate(() => window.innerWidth - document.documentElement.clientWidth)).toBe(10)
           const trigger = triggerOf(page, 'Filters')
           const before = await boxOf(trigger)
 
@@ -946,13 +975,13 @@ test.describe('the page behind', () => {
       }
     }
 
-    withScrollbar('the comparison can fail: with the gutter forced off, the trigger at the end moves by the 15 px of the bar', async ({ barPage: page }) => {
+    withScrollbar('the comparison can fail: with the gutter forced off, the trigger at the end moves by the 10 px of the bar', async ({ barPage: page }) => {
       await openLive(page, 'drawer--end', { edge: 'end', tall: true })
       await page.addStyleTag({ content: 'html { scrollbar-gutter: auto !important }' })
       const trigger = triggerOf(page, 'Filters')
       const before = await boxOf(trigger)
       await openOverlay(page, trigger)
-      expect((await boxOf(trigger)).left).toBe(before.left - 15)
+      expect((await boxOf(trigger)).left).toBe(before.left - 10)
     })
   })
 })
@@ -1064,7 +1093,7 @@ test.describe('a screen under 272 px tall', () => {
     await expect(bodyOf(popup)).toHaveCSS('overflow-y', 'auto')
     expect(await scrollersOf(popup), 'boxes that scroll').toBe(1)
     const parts = await partsOf(popup)
-    expect(parts.body.height).toBe(170)
+    expect(parts.body.height).toBe(174)
     expect(parts.footer?.bottom).toBe(parts.popup.bottom)
     expect(await popup.evaluate((el) => el.scrollHeight - el.clientHeight)).toBe(0)
   })
@@ -1110,7 +1139,7 @@ test.describe('inside the screen', () => {
         // Where the three bars are taller than the screen the sheet scrolls as one, by a wheel over its header.
         const [frame, header] = [await boxOf(popup), (await partsOf(popup)).header]
         const hidden = await popup.evaluate((el) => el.scrollHeight - el.clientHeight)
-        expect(hidden, 'px of sheet below its own box').toBe(screen.height === 390 ? 20 : 0)
+        expect(hidden, 'px of sheet below its own box').toBe(screen.height === 390 ? 16 : 0)
         await wheelAt(page, header.left + 40, header.top + 20, hidden)
         expect(await popup.evaluate((el) => el.scrollTop), 'px the wheel scrolled the sheet').toBe(hidden)
         for (const button of await popup.locator('button:not([aria-label])').all()) {
@@ -1413,7 +1442,7 @@ test.describe('each value of modal', () => {
   // With no scrim the sheet has its line and its shadow to stand out from the page beside it.
   test('a sheet that is not modal keeps its place and its width: 256 px at the inline end, over a page that is still there', async ({ page }) => {
     const popup = await open(page, 'drawer--non-modal')
-    expect(await seatOf(popup)).toMatchObject({ left: 1009, right: 0, top: 0, bottom: 0 })
+    expect(await seatOf(popup)).toMatchObject({ left: 1014, right: 0, top: 0, bottom: 0 })
     await expect(popup).toHaveCSS('border-left-width', '1px')
     expect(await popup.evaluate((el) => getComputedStyle(el).boxShadow !== 'none')).toBe(true)
   })

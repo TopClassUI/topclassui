@@ -14,10 +14,10 @@ const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { wid
 const LAYOUTS = ['word-tag', 'element-tag', 'grid-tag', 'flex-tag', 'fit-tag', 'cell-tag'] as const
 
 /** The tag's height and the button's box at each size, written out. Fine: 24 px x, and xs grows from 22 to 24. */
-const FINE = { xs: 24, sm: 30, md: 34, lg: 42, xl: 50 } as const
-const COARSE = { xs: 44, sm: 44, md: 44, lg: 44, xl: 50 } as const
+const FINE = { xs: 24, sm: 26, md: 30, lg: 38, xl: 46 } as const
+const COARSE = { xs: 44, sm: 44, md: 44, lg: 44, xl: 46 } as const
 /** A plain tag of each size, which the x must not change. */
-const PLAIN = { xs: 22, sm: 30, md: 34, lg: 42, xl: 50 } as const
+const PLAIN = { xs: 22, sm: 26, md: 30, lg: 38, xl: 46 } as const
 /** From the x to the end edge of the chip: the block padding, then the 1 px border. */
 const END = { xs: 3, sm: 5, md: 7, lg: 9, xl: 11 } as const
 

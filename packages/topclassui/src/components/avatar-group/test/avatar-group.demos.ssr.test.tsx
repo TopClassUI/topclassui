@@ -138,19 +138,19 @@ describe('the demos cover what a real dashboard does to a group', () => {
     expect(html.match(/<td [^>]*><div class="w-fit [^"]*"><span [^>]*role="group"/g)).toHaveLength(3)
   })
 
-  it('in-table: every group takes the colour of the table for its ring, as on a Card', async () => {
+  it('in-table: every group keeps the ring in the avatar fill, with no class for the table', async () => {
     const tags = groups(await render('in-table'))
     expect(tags).toHaveLength(9)
     for (const tag of tags) {
-      expect(attr(tag, 'class'), tag).toContain('*:ring-surface-raised')
-      expect(attr(tag, 'class'), tag).not.toContain('*:ring-page')
+      expect(attr(tag, 'class'), tag).toContain('*:ring-neutral-soft')
+      expect(attr(tag, 'class'), tag).not.toContain('*:ring-surface-raised')
     }
   })
 
-  it('on-card: the group inside a Card is given the colour of the Card for its ring', async () => {
+  it('on-card: the group inside a Card keeps the ring in the avatar fill, with no class for the Card', async () => {
     const tag = groups(await render('on-card'))[0] ?? ''
-    expect(attr(tag, 'class')).toContain('*:ring-surface-raised')
-    expect(attr(tag, 'class')).not.toContain('*:ring-page')
+    expect(attr(tag, 'class')).toContain('*:ring-neutral-soft')
+    expect(attr(tag, 'class')).not.toContain('*:ring-surface-raised')
   })
 })
 

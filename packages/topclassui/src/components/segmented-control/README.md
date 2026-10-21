@@ -154,6 +154,7 @@ Anything else is passed to the element each part draws, so standard attributes (
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`
 - `dummy/states.tsx`
+- `dummy/track-states.tsx`
 - `dummy/with-icons.tsx`
 
 ## Verified against

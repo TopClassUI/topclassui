@@ -27,21 +27,23 @@ const SHOWN: Record<string, (string | null)[]> = {
   ],
   'playground': ['Copy link'],
   'rtl': ['نسخ الرابط', 'حذف هذا الصف'],
-  'states': ['Top', 'Bottom', 'Delayed', null],
+  'states': ['Copy link', 'Top', 'Bottom'],
   'with-count': ['Delete 3 rows'],
 }
 
 /** What a screen reader announces for the trigger: its aria-label, or else its text. */
 const nameOf = (button: HTMLElement) => button.getAttribute('aria-label') ?? button.textContent
 
-/** Tabs to each trigger in turn and reads the popup that focus opened, if any. */
+/** Tabs to each trigger in turn and reads the open popup it is described by, if any: never one the
+ * states strip draws open beside it. */
 async function shown(Demo: ComponentType) {
   render(<Demo />)
   const out: { name: string | null; text: string | null }[] = []
   for (const button of screen.getAllByRole('button')) {
     await userEvent.tab()
     expect(document.activeElement).toBe(button)
-    const open = document.querySelector('[data-placement][data-open]')
+    const described = document.getElementById(button.getAttribute('aria-describedby') ?? '')
+    const open = described?.matches('[data-placement][data-open]') === true ? described : null
     out.push({ name: nameOf(button), text: open?.textContent ?? null })
   }
   return out
@@ -67,4 +69,18 @@ describe('every trigger in every demo names itself with the text its tooltip sho
       }
     })
   }
+})
+
+describe('the states strip, one cell per state the frame draws', () => {
+  it('captions each cell by its title, and draws the top and the bottom tooltip open at their trigger inside their own cell', async () => {
+    const loaded = await import('../dummy/states.js') as { default: ComponentType }
+    const { container } = render(<loaded.default />)
+    const cells = [...(container.firstElementChild?.children ?? [])]
+    expect(cells.map((cell) => cell.getAttribute('title'))).toEqual(['hidden', 'top', 'bottom'])
+    const tips = await screen.findAllByRole('tooltip')
+    expect(tips.map((tip) => [tip.textContent, tip.getAttribute('data-placement')])).toEqual([['Top', 'top'], ['Bottom', 'bottom']])
+    expect(cells[1]?.contains(tips[0] ?? null)).toBe(true)
+    expect(cells[2]?.contains(tips[1] ?? null)).toBe(true)
+    expect(screen.getByRole('button', { name: 'Copy link' }).hasAttribute('aria-describedby')).toBe(false)
+  })
 })

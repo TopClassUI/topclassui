@@ -45,9 +45,11 @@ describe('the zone', () => {
     expect(ruleOf(selectorOf('rounded-box'))).toBe('border-radius: min(calc(var(--tc-radius) * 1.5), 1.5rem);')
   })
 
-  it('a drag over it turns the line solid and primary and the fill to the primary tint: more than a fill', () => {
+  it('a drag over it keeps the dashed line and turns it, the fill and the words primary, as the frame draws it', () => {
     const dragging = (cls: string) => ruleOf(`${selectorOf(cls)}[data-dragging]`)
-    expect(dragging('data-dragging:border-solid')).toBe('--tw-border-style: solid; border-style: solid;')
+    expect(CLASSES_OF.FILE_UPLOAD_ZONE.split(' ')).not.toContain('data-dragging:border-solid')
+    expect(CLASSES_OF.FILE_UPLOAD_ZONE.split(' ')).toContain('border-dashed')
+    expect(ruleOf(`${selectorOf('forced-colors:data-dragging:border-solid')}[data-dragging]`)).toBe('--tw-border-style: solid; border-style: solid;')
     expect(dragging('data-dragging:border-primary-solid')).toBe('border-color: var(--tc-primary-solid);')
     expect(dragging('data-dragging:bg-primary-soft')).toBe('background-color: var(--tc-primary-soft);')
   })

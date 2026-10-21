@@ -61,12 +61,13 @@ describe('every demo is a Server Component that only hands the parts what can cr
     ])
   })
 
-  // A popover needs no state of the page to open. Closing it when its form is saved does: open and onOpenChange.
-  it('none of them is a client file but with-form, whose Save closes the popover', () => {
-    expect(names.filter((name) => readFileSync(join(DUMMY, `${name}.tsx`), 'utf8').startsWith("'use client'"))).toEqual(['with-form'])
+  // A popover needs no state of the page to open. Closing it on a save does, and so does drawing it open in a box of its own.
+  it('none of them is a client file but with-form, whose Save closes the popover, and the two that draw one open in a box', () => {
+    expect(names.filter((name) => readFileSync(join(DUMMY, `${name}.tsx`), 'utf8').startsWith("'use client'")))
+      .toEqual(['playground', 'states', 'with-form'])
   })
 
-  for (const name of names.filter((demo) => demo !== 'with-form')) {
+  for (const name of names.filter((demo) => !['playground', 'states', 'with-form'].includes(demo))) {
     it(`${name}: runs with no hook and no context, and returns an element`, async () => {
       const Demo = await load(name)
       expect(isValidElement(Demo())).toBe(true)
@@ -83,8 +84,8 @@ describe('every demo is a Server Component that only hands the parts what can cr
 describe('the parts a demo is built from', () => {
   const parts = async (name: string) => crossings((await load(name))()).map((crossing) => crossing.part)
 
-  it('basic: five of the six flat parts, each a reference', async () => {
-    expect(await parts('basic')).toEqual(['PopoverRoot', 'PopoverTrigger', 'PopoverPopup', 'PopoverTitle', 'PopoverDescription'])
+  it('basic: all six flat parts, each a reference', async () => {
+    expect(await parts('basic')).toEqual(['PopoverRoot', 'PopoverTrigger', 'PopoverPopup', 'PopoverTitle', 'PopoverClose', 'PopoverDescription'])
   })
 
   it('modal: the sixth, used three times: the x and the two actions', async () => {

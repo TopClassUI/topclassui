@@ -11,11 +11,11 @@ const arab = createNumberFormat('ar', 'arab')
 describe('the labels of Unit 3, in English', () => {
   it('names the close button of a drawer and of a toast, each after its own surface', () => {
     expect(en.drawer).toEqual({ close: 'Close this panel' })
-    expect(en.toast).toEqual({ region: 'Notifications', close: 'Dismiss this notification' })
+    expect(en.toast).toEqual({ region: 'Notifications', stage: 'Example notifications', close: 'Dismiss this notification' })
   })
 
   it('names the command palette and writes its placeholder', () => {
-    expect(en.command).toEqual({ label: 'Command palette', placeholder: 'Type a command or search' })
+    expect(en.command).toEqual({ label: 'Command palette', placeholder: 'Type a command or search', escape: 'Esc', enter: 'Enter' })
   })
 
   it('names the two navigation landmarks and both states of the sidebar button', () => {
@@ -41,11 +41,11 @@ describe('the labels of Unit 3, in English', () => {
 describe('the labels of Unit 3, in Arabic', () => {
   it('names the close button of a drawer and of a toast, each after its own surface', () => {
     expect(ar.drawer).toEqual({ close: 'إغلاق هذه اللوحة' })
-    expect(ar.toast).toEqual({ region: 'الإشعارات', close: 'إغلاق هذا الإشعار' })
+    expect(ar.toast).toEqual({ region: 'الإشعارات', stage: 'إشعارات المثال', close: 'إغلاق هذا الإشعار' })
   })
 
   it('names the command palette and writes its placeholder', () => {
-    expect(ar.command).toEqual({ label: 'لوحة الأوامر', placeholder: 'اكتب أمرًا أو ابحث' })
+    expect(ar.command).toEqual({ label: 'لوحة الأوامر', placeholder: 'اكتب أمرًا أو ابحث', escape: 'Esc', enter: 'Enter' })
   })
 
   it('names the two navigation landmarks and both states of the sidebar button', () => {
@@ -114,12 +114,12 @@ describe('the labels of Unit 3 through getLabels', () => {
 
   it('lets a caller reword the close button of a toast and keeps the name of the region', () => {
     const { labels } = getLabels('en', { toast: { close: 'Hide' } })
-    expect(labels.toast).toEqual({ region: 'Notifications', close: 'Hide' })
+    expect(labels.toast).toEqual({ region: 'Notifications', stage: 'Example notifications', close: 'Hide' })
   })
 
   it('lets a caller reword the placeholder of the command palette and keeps its name', () => {
     const { labels } = getLabels('en', { command: { placeholder: 'Search the docs' } })
-    expect(labels.command).toEqual({ label: 'Command palette', placeholder: 'Search the docs' })
+    expect(labels.command).toEqual({ label: 'Command palette', placeholder: 'Search the docs', escape: 'Esc', enter: 'Enter' })
   })
 
   it('lets a caller rename the navbar, which a page with two of them has to', () => {

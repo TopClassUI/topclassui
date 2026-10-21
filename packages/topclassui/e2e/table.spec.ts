@@ -28,7 +28,7 @@ test.describe('at 390 px', () => {
         await page.goto(urlFor(demo, 'light', direction))
         const measured = await page.evaluate(() => ({
           scrollWidth: document.documentElement.scrollWidth,
-          // The body, not the root: the root still counts the scrollbar gutter the harness keeps, 15 px of slack.
+          // The body, not the root: the root still counts the scrollbar gutter the harness keeps, 10 px of slack.
           clientWidth: document.body.clientWidth,
           boxes: [...document.querySelectorAll('[role="region"]')].map((box) => {
             const { left, right } = box.getBoundingClientRect()
@@ -311,8 +311,8 @@ test('a sort header that wraps is no taller than its lines: the link sits on the
   const wrapped = await measure()
 
   expect(wrapped.link, 'the header did not wrap, so this measured nothing').toBeGreaterThan(oneLine.link + 12)
-  // 20 px of cell padding less the 8 px the link gives back: on the baseline the wrapped row was 16 px more, not 12.
-  expect([oneLine.row - oneLine.link, wrapped.row - wrapped.link]).toEqual([12, 12])
+  // 16 px of cell padding less the 8 px the link gives back: on the baseline the wrapped row was 12 px more, not 8.
+  expect([oneLine.row - oneLine.link, wrapped.row - wrapped.link]).toEqual([8, 8])
 })
 
 type Sides = Record<'top' | 'bottom' | 'left' | 'right', number>

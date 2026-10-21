@@ -70,7 +70,7 @@ describe('every element carries exactly the classes the spec names', () => {
       'font-medium',
       'forced-colors:data-disabled:opacity-100',
       'forced-colors:data-disabled:text-[GrayText]',
-      'gap-3',
+      'gap-2.5',
       'group',
       'hover:bg-(--tc-soft)',
       'items-center',
@@ -79,8 +79,8 @@ describe('every element carries exactly the classes the spec names', () => {
       'outline-none',
       'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]',
       'pointer-coarse:min-w-[var(--tc-target-coarse,44px)]',
-      'px-4',
-      'py-3.5',
+      'px-3.5',
+      'py-3',
       'text-body',
       'text-sm',
       'text-start',
@@ -127,9 +127,9 @@ describe('every element carries exactly the classes the spec names', () => {
       'outline-none',
       'overflow-x-auto',
       'overscroll-x-contain',
-      'pb-4',
+      'pb-3.5',
       'pt-1',
-      'px-4',
+      'px-3.5',
     ])
   })
 })

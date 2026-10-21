@@ -17,7 +17,7 @@ describe("R-5.2-2: a render element's class follows the part's own and the consu
     )
     expect(classes(container.querySelector('section'))).toEqual(['grid', 'grid-cols-3'])
     expect(classes(screen.getByRole('tablist'))).toContain('gap-2')
-    expect(classes(screen.getByRole('tablist'))).not.toContain('gap-6')
+    expect(classes(screen.getByRole('tablist'))).not.toContain('gap-5')
     expect(classes(screen.getByRole('tab'))).toContain('font-bold')
     expect(classes(screen.getByRole('tab'))).not.toContain('font-medium')
     expect(classes(screen.getByRole('tabpanel'))).toContain('mt-8')

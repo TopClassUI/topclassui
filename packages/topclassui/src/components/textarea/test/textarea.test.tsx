@@ -126,13 +126,14 @@ describe('invalid and the design props', () => {
 
   it('takes a handle that resizes it in the block direction, and none with autosize', () => {
     expect(classesOf()).toContain('resize-y')
+    expect(classesOf()).toContain('disabled:resize-none')
     expect(classesOf({ autosize: true })).toContain('resize-none')
     expect(classesOf({ autosize: true })).not.toContain('resize-y')
   })
 
-  it('a read-only field takes the read-only fill, from the prop', () => {
-    expect(classesOf({ readOnly: true })).toContain('bg-neutral-soft')
-    expect(classesOf({ readOnly: true })).not.toContain('bg-surface-raised')
+  it('a read-only field keeps the raised fill, as the frame draws it', () => {
+    expect(classesOf({ readOnly: true })).not.toContain('bg-neutral-soft')
+    expect(classesOf({ readOnly: true })).toContain('bg-surface-raised')
     expect(on({ readOnly: true }, 'readOnly')).toBe('')
   })
 

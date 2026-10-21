@@ -3,12 +3,16 @@ import { z } from 'zod'
 
 import { COLLECTION_BOUNDARIES } from '#shared/contracts/collection.js'
 import { TABLE_BOUNDARIES } from './boundaries.js'
-import { TABLE_DEFAULTS, TABLE_SKELETON_DEFAULTS } from './constants.js'
+import { TABLE_DEFAULTS, TABLE_DENSITIES, TABLE_SKELETON_DEFAULTS, TABLE_VARIANTS } from './constants.js'
 
 // R-8.3-3: .meta() is last in each chain, or zod drops it from the JSON Schema output.
 export const tableSchema = z.object({
   captionVisible: z.boolean().default(TABLE_DEFAULTS.captionVisible)
     .meta({ description: 'Draws the caption above the header row; when false it is still read out, only not drawn.' }),
+  density: z.enum(TABLE_DENSITIES).default(TABLE_DEFAULTS.density)
+    .meta({ description: 'How tall a row is: comfortable, or compact for a long list read at a glance.' }),
+  variant: z.enum(TABLE_VARIANTS).default(TABLE_DEFAULTS.variant)
+    .meta({ description: 'outline draws a hairline round the box; plain leaves it out, for a table already inside a card.' }),
   striped: z.boolean().default(TABLE_DEFAULTS.striped)
     .meta({ description: 'Tints every second row, so the eye can follow a wide row across.' }),
   stickyFirstColumn: z.boolean().default(TABLE_DEFAULTS.stickyFirstColumn)

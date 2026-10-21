@@ -13,14 +13,15 @@ const rowsOf = (out: string) =>
 
 /** Every class a row wears, written out, so a row that loses its fill or its margins fails. */
 const ROW = [
-  'animate-pulse', 'bg-neutral-soft', 'block', 'forced-colors:outline-(length:--tc-line-width)', 'h-[1em]',
-  'motion-reduce:animate-none', 'my-[calc((1lh-1em)/2)]', 'rounded-chip',
+  'animate-pulse', 'bg-neutral-soft', 'block', 'forced-colors:outline-(length:--tc-line-width)', 'h-[0.75em]',
+  'motion-reduce:animate-none', 'my-[calc((1lh-0.75em)/2)]', 'rounded-chip',
 ]
 const LAST = [...ROW, 'w-2/3'].sort()
+const NEXT = [...ROW, 'w-5/6'].sort()
 
 describe('rows', () => {
-  it('draws three by default, the playground default', () => {
-    expect(rowsOf(html())).toEqual([ROW, ROW, LAST])
+  it('draws three by default, stepping down as Figma 137:916 draws them', () => {
+    expect(rowsOf(html())).toEqual([ROW, NEXT, LAST])
   })
 
   it('keeps a single row at full width, because one line has no ragged end', () => {
@@ -32,7 +33,7 @@ describe('rows', () => {
   })
 
   it('draws five for the Suspense sample of the docs', () => {
-    expect(rowsOf(html({ rows: 5 }))).toEqual([ROW, ROW, ROW, ROW, LAST])
+    expect(rowsOf(html({ rows: 5 }))).toEqual([ROW, ROW, ROW, NEXT, LAST])
   })
 
   it('carries the fill on every row and never on the column around them', () => {
@@ -43,7 +44,7 @@ describe('rows', () => {
 
   it('leaves the rows bare when the caller passes rest props, which belong to the root alone', () => {
     const out = markup(<Skeleton id="notes-loading" style={{ width: '12rem' }} />)
-    expect(rowsOf(out)).toEqual([ROW, ROW, LAST])
+    expect(rowsOf(out)).toEqual([ROW, NEXT, LAST])
     expect(out.match(/ id="/g)).toHaveLength(1)
   })
 
@@ -51,7 +52,7 @@ describe('rows', () => {
     for (const variant of ['circle', 'rect', 'card'] as const) {
       const out = html({ variant, rows: 5 })
       expect((out.match(/<span/g) ?? []).length, variant).toBe(1)
-      expect(out, variant).not.toContain('h-[1em]')
+      expect(out, variant).not.toContain('h-[0.75em]')
     }
   })
 })

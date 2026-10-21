@@ -36,7 +36,7 @@ describe('a long crumb truncates instead of pushing the page apart', () => {
 
 describe('the label bound stops a megabyte reaching the visible trail', () => {
   it('is 200 characters, written out here so a change to it is a decision', () => {
-    expect(BREADCRUMB_BOUNDARIES).toEqual({ labelMaxLength: 200 })
+    expect(BREADCRUMB_BOUNDARIES).toEqual({ labelMaxLength: 200, maxItems: { min: 2, max: 100 } })
   })
 
   it('cuts a linked label at the boundary, not at the width', () => {

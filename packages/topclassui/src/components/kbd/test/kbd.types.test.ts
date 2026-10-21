@@ -7,8 +7,10 @@ import type { KbdProps } from '../types.js'
 type Accepts<Union, Candidate> = Candidate extends Union ? true : false
 
 describe('the props are the native kbd props and nothing else', () => {
-  it('is exactly the props of a kbd element, because Kbd has none of its own', () => {
-    expectTypeOf<KbdProps>().toEqualTypeOf<ComponentPropsWithRef<'kbd'>>()
+  it('is the props of a kbd element plus pressed and disabled', () => {
+    expectTypeOf<Omit<KbdProps, 'pressed' | 'disabled'>>().toEqualTypeOf<Omit<ComponentPropsWithRef<'kbd'>, 'pressed' | 'disabled'>>()
+    expectTypeOf<KbdProps['pressed']>().toEqualTypeOf<boolean | undefined>()
+    expectTypeOf<KbdProps['disabled']>().toEqualTypeOf<boolean | undefined>()
   })
 
   it('accepts children, className, style and ref, and ref is a normal prop', () => {
@@ -32,10 +34,8 @@ describe('the props the spec leaves unbuilt', () => {
     expectTypeOf<Accepts<keyof KbdProps, 'tone'>>().toEqualTypeOf<false>()
   })
 
-  it('has no state prop, because a key is not interactive', () => {
-    expectTypeOf<Accepts<keyof KbdProps, 'pressed'>>().toEqualTypeOf<false>()
+  it('has no muted prop: the playground names it, the frame never draws it', () => {
     expectTypeOf<Accepts<keyof KbdProps, 'muted'>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<keyof KbdProps, 'disabled'>>().toEqualTypeOf<false>()
   })
 
   it('has no render prop, which none of the Unit 1 server components takes', () => {

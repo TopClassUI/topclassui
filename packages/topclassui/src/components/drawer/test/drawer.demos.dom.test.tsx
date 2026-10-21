@@ -1,7 +1,7 @@
 import { readdirSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ComponentType } from 'react'
 import { describe, expect, it } from 'vitest'
@@ -55,13 +55,7 @@ const SHOWN: Record<string, Shown[]> = {
   ],
   'start': [{ trigger: 'Menu', title: 'Browse', placement: 'start', controls: ['Documentation', 'Components', 'Changelog', X] }],
   'top': [{ trigger: 'What is new', title: 'Version 2.4', placement: 'top', controls: ['Got it', X] }],
-  'states': [
-    { trigger: 'Side sheet', title: 'Side sheet', placement: 'end', controls: ['Done', X] },
-    { trigger: 'Bottom sheet', title: 'Bottom sheet', placement: 'bottom', controls: ['Done', X] },
-    { trigger: 'Scrolled', title: 'Scrolled', placement: 'end', controls: ['Done', X] },
-    { trigger: 'Focus trapped', title: 'Focus trapped', placement: 'end', controls: ['Done', X] },
-    { trigger: 'Non-modal', title: 'Non-modal', placement: 'end', controls: ['Done', X] },
-  ],
+  'states': [{ trigger: 'Open', title: 'Opened', placement: 'end', controls: ['Done', X] }],
   'trap-focus': [{ trigger: 'Inspect', title: 'Inspector', placement: 'end', controls: ['Done', X] }],
   'with-form': [{ trigger: 'Invite', title: 'Invite a teammate', placement: 'bottom', controls: ['Name', 'Email', 'Cancel', 'Send', X] }],
 }
@@ -75,14 +69,20 @@ function nameOf(control: Element): string {
 }
 
 /** Opens each sheet of a demo in turn from its trigger, reads it, and closes it with Escape. A button
- * of the page that opens nothing, as two demos hold beside their trigger, is not one. */
+ * of the page that opens nothing, as two demos hold beside their trigger, is not one; nor is a sheet
+ * the states strip draws open in a cell, which is there before any press. */
 async function shown(Demo: ComponentType): Promise<Shown[]> {
   render(<Demo />)
   const out: Shown[] = []
   const triggers = screen.getAllByRole('button').filter((button) => button.getAttribute('aria-haspopup') === 'dialog')
   for (const trigger of triggers) {
     await userEvent.click(trigger)
-    const popup = await screen.findByRole('dialog')
+    // The sheet this trigger controls, by the id Base UI writes on it: never one already open beside it.
+    const popup = await waitFor(() => {
+      const found = document.getElementById(trigger.getAttribute('aria-controls') ?? '')
+      expect(found?.getAttribute('role')).toBe('dialog')
+      return found as HTMLElement
+    })
     out.push({
       trigger: trigger.textContent,
       title: popup.querySelector('h2')?.textContent ?? '',
@@ -90,7 +90,7 @@ async function shown(Demo: ComponentType): Promise<Shown[]> {
       controls: [...popup.querySelectorAll('button, input, a')].map(nameOf),
     })
     await userEvent.keyboard('{Escape}')
-    await waitFor(() => { expect(screen.queryByRole('dialog')).toBeNull() })
+    await waitFor(() => { expect(popup.isConnected).toBe(false) })
   }
   return out
 }
@@ -106,4 +106,22 @@ describe('every demo opens the sheet its trigger names', () => {
       expect(await shown(loaded.default), name).toEqual(SHOWN[name])
     })
   }
+})
+
+describe('the states strip, one cell per state the frame draws', () => {
+  it('captions each cell by its title, and draws the side and the bottom sheet open inside their own cell', async () => {
+    const loaded = await import('../dummy/states.js') as { default: ComponentType }
+    const { container } = render(<loaded.default />)
+    const cells = [...(container.firstElementChild?.children ?? [])]
+    expect(cells.map((cell) => cell.getAttribute('title'))).toEqual(['closed', 'side sheet', 'bottom sheet'])
+    const dialogs = await screen.findAllByRole('dialog')
+    expect(dialogs.map((dialog) => [dialog.querySelector('h2')?.textContent, dialog.getAttribute('data-placement')]))
+      .toEqual([['Side sheet', 'end'], ['Bottom sheet', 'bottom']])
+    expect(cells[1]?.contains(dialogs[0] ?? null)).toBe(true)
+    expect(cells[2]?.contains(dialogs[1] ?? null)).toBe(true)
+    expect(cells.map((cell) => cell.querySelectorAll(':scope > .bg-overlay').length)).toEqual([0, 1, 1])
+    expect(document.querySelectorAll('[data-base-ui-portal] > [data-base-ui-inert]')).toHaveLength(0)
+    expect(dialogs.some((dialog) => dialog.contains(document.activeElement))).toBe(false)
+    expect(within(cells[0] as HTMLElement).getByRole('button', { name: 'Open' }).getAttribute('aria-expanded')).toBe('false')
+  })
 })

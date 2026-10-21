@@ -29,7 +29,8 @@ const MENUS: Record<string, readonly string[]> = {
   'dropdown--playground': ['Actions'],
   'dropdown--rtl': ['الإجراءات', 'المزيد'],
   'dropdown--sixty-items': ['Time zone'],
-  'dropdown--states': ['Open', 'Disabled row', 'Danger row', 'Grouped'],
+  // Two of its three menus are drawn open in their own cells, and the three triggers share one label: tests of its own below.
+  'dropdown--states': [],
   'dropdown--with-links': ['Help'],
 }
 
@@ -257,15 +258,24 @@ test.describe('what a key does to the menu', () => {
 })
 
 test.describe('where the focus is drawn', () => {
-  test('a menu a press opened holds the focus itself and draws no ring; a row the pointer is on takes it', async ({ page }) => {
+  test('a menu a press opened holds the focus itself and draws no ring; a row the pointer is on is tinted, and a key rings it', async ({ page }) => {
     const menu = await open(page, 'dropdown--basic')
     await expect(menu).toBeFocused()
     await expect(menu).toHaveCSS('outline-style', 'none')
     await rowOf(menu, 'Settings').hover()
     await expect.poll(() => focusedRow(page)).toBe('Settings')
     await expect(rowOf(menu, 'Settings')).toHaveAttribute('data-highlighted', '')
-    // The row the pointer is on is the highlighted one, and the ring goes with the highlight.
-    await expect(rowOf(menu, 'Settings')).toHaveCSS('outline-style', 'solid')
+    // ROW_FOCUSED: a focus the pointer moved is not focus-visible, so the row is tinted and draws no ring.
+    await expect(rowOf(menu, 'Settings')).toHaveCSS('background-color', 'oklch(0.945515 0.0294438 262.881)')
+    await expect(rowOf(menu, 'Settings')).toHaveCSS('color', 'oklch(0.424 0.199 265.638)')
+    await expect(rowOf(menu, 'Settings')).toHaveCSS('outline-style', 'none')
+    await expect(menu).toHaveCSS('outline-style', 'none')
+    // A key makes the focus visible, and the row it lands on takes the ring in --tc-ring.
+    await press(page, 'ArrowDown', 'Duplicate')
+    await expect(rowOf(menu, 'Duplicate')).toHaveCSS('outline-style', 'solid')
+    await expect(rowOf(menu, 'Duplicate')).toHaveCSS('outline-width', '2px')
+    await expect(rowOf(menu, 'Duplicate')).toHaveCSS('outline-color', 'oklch(0.424 0.199 265.638)')
+    await expect(rowOf(menu, 'Settings')).toHaveCSS('outline-style', 'none')
     await expect(menu).toHaveCSS('outline-style', 'none')
   })
 
@@ -478,12 +488,12 @@ test.describe('sixty rows', () => {
         const menu = await open(page, 'dropdown--sixty-items', { direction, by: 'keyboard', tall: true })
         await expectInsideViewport(menu, 'the menu', 8)
         await expectNoSidewaysScroll(page)
-        // LIST_CAP: seven rows of 40 px. Sixty rows, their gaps and the padding are 2530 px, in a box that shows 278.
-        expect((await boxOf(menu)).height).toBe(280)
-        expect(await scrollOf(menu)).toEqual({ top: 0, left: 2252, far: 2252, sideways: 0 })
+        // LIST_CAP: seven rows of 32 px. Sixty rows, their gaps and the padding are 2050 px, in a box that shows 222.
+        expect((await boxOf(menu)).height).toBe(224)
+        expect(await scrollOf(menu)).toEqual({ top: 0, left: 1828, far: 1828, sideways: 0 })
         // The seventh row starts inside the menu and ends below it: a cut row says there is more.
-        expect(await rowIn(menu, 5)).toEqual({ top: 216, bottom: 256, height: 278 })
-        expect(await rowIn(menu, 6)).toEqual({ top: 258, bottom: 298, height: 278 })
+        expect(await rowIn(menu, 5)).toEqual({ top: 176, bottom: 208, height: 222 })
+        expect(await rowIn(menu, 6)).toEqual({ top: 210, bottom: 242, height: 222 })
 
         const cut: string[] = []
         for (let stop = 2; stop <= 14; stop++) {
@@ -530,8 +540,8 @@ test.describe('sixty rows', () => {
 
   test.describe('under a finger', () => {
     test.use({ hasTouch: true, isMobile: true, viewport: { width: 320, height: 480 } })
-    // Up to seventeen drags of twelve steps, each waiting for the fling to stop.
-    test.describe.configure({ timeout: 90_000 })
+    // Up to twenty-five drags of twelve steps, each waiting for the fling to stop: a 224 px menu moves about 130 a drag.
+    test.describe.configure({ timeout: 120_000 })
 
     // A modal menu does not lock the page under a finger, so overscroll-contain alone keeps the drag in the menu.
     test('rows are 44 px, a drag scrolls the menu to its last row, and a drag past its end never moves the page', async ({ page }) => {
@@ -542,10 +552,10 @@ test.describe('sixty rows', () => {
       expect((await axe(page)).violations).toEqual([])
       await expectInsideViewport(menu, 'the menu', 8)
       expect(await rowsOf(menu).evaluateAll((rows) => [...new Set(rows.map((row) => row.getBoundingClientRect().height))])).toEqual([44])
-      // The cap still counts seven rows of 40 px, so under a finger it shows six and cuts the seventh.
+      // The cap still counts seven rows of 32 px, so under a finger it shows four and cuts the fifth.
       const frame = await boxOf(menu)
-      expect(frame.height).toBe(280)
-      for (let drag = 0; drag < 16 && (await scrollOf(menu)).left > 0; drag++) {
+      expect(frame.height).toBe(224)
+      for (let drag = 0; drag < 24 && (await scrollOf(menu)).left > 0; drag++) {
         await touchDrag(page, frame.left + 60, frame.bottom - 40, frame.top + 40)
       }
       expect((await scrollOf(menu)).left, 'px of menu still below').toBe(0)
@@ -613,7 +623,7 @@ test.describe('hostile content', () => {
     inside: part.getBoundingClientRect().left >= element.getBoundingClientRect().left && part.getBoundingClientRect().right <= element.getBoundingClientRect().right,
   })))
 
-  for (const [width, height, direction, widest] of [[1280, 800, 'ltr', 320], [320, 480, 'ltr', 289], [320, 480, 'rtl', 289]] as const) {
+  for (const [width, height, direction, widest] of [[1280, 800, 'ltr', 320], [320, 480, 'ltr', 294], [320, 480, 'rtl', 294]] as const) {
     const label = `${String(width)} x ${String(height)} ${direction}`
 
     test(`${label}: a 300-character label ends in an ellipsis, its icon stays whole, its shortcut gives way first, and the menu is ${String(widest)} px wide`, async ({ page }) => {
@@ -626,7 +636,7 @@ test.describe('hostile content', () => {
       expect((await boxOf(menu)).width).toBe(widest)
       for (const index of [0, 1]) {
         const row = rowsOf(menu).nth(index)
-        expect((await boxOf(row)).height).toBe(40)
+        expect((await boxOf(row)).height).toBe(32)
         const [icon, text, shortcut] = await partsOf(row)
         expect(icon).toEqual({ width: 14, cut: false, inside: true })
         expect(text?.cut, 'the label is cut').toBe(true)
@@ -648,7 +658,7 @@ test.describe('hostile content', () => {
       await expectNoSidewaysScroll(page)
       await expectNothingSideways(menu)
       // 10rem, or half the room Base UI measured where that is less: 304 px on a 320 px screen less its gutter.
-      const cap = widest === 320 ? 160 : 145
+      const cap = widest === 320 ? 160 : 147
       const [go, goShortcut] = await partsOf(rowsOf(menu).first())
       expect(go).toEqual({ width: 18, cut: false, inside: true })
       expect(goShortcut).toEqual({ width: cap, cut: true, inside: true })
@@ -665,7 +675,7 @@ test.describe('hostile content', () => {
     const menu = await openOverlay(page, triggerOf(page, 'In a grid track', '#layouts'), asMenu())
     const [text, shortcut] = await partsOf(rowOf(menu, 'Rename F2'))
     expect([text?.cut, shortcut?.cut]).toEqual([false, false])
-    expect((await boxOf(menu)).width).toBe(192)
+    expect((await boxOf(menu)).width).toBe(220)
   })
 
   test('a row with an icon alone is named by its aria-label, and is a row like any other', async ({ page }) => {
@@ -673,7 +683,7 @@ test.describe('hostile content', () => {
     const menu = await openOverlay(page, triggerOf(page, 'Icon only', SCOPE), asMenu({ by: 'keyboard' }))
     await expect(menu.getByRole('menuitem', { name: 'Settings', exact: true })).toHaveCount(1)
     await expect(menu.getByRole('menuitem', { name: 'Delete', exact: true })).toHaveCount(1)
-    expect(await rowsOf(menu).evaluateAll((rows) => rows.map((row) => row.getBoundingClientRect().height))).toEqual([40, 40])
+    expect(await rowsOf(menu).evaluateAll((rows) => rows.map((row) => row.getBoundingClientRect().height))).toEqual([32, 32])
     await press(page, 'ArrowDown', 'Delete')
     const results = await new AxeBuilder({ page }).include('[data-base-ui-portal]').analyze()
     expect(results.violations.map((violation) => violation.id)).toEqual([])
@@ -693,7 +703,8 @@ test.describe('hostile content', () => {
     const groups = await openOverlay(page, triggerOf(page, 'Sixty groups', SCOPE), asMenu({ by: 'keyboard' }))
     await expectInsideViewport(groups, 'the menu of sixty groups', 8)
     await expectNoSidewaysScroll(page)
-    expect((await scrollOf(groups)).far).toBeGreaterThan(4000)
+    // Sixty groups of a 28 px label and a 32 px row, their gaps and the padding: 3850 px in a box that shows 222.
+    expect((await scrollOf(groups)).far).toBeGreaterThan(3600)
     await press(page, 'End', 'Row 60')
     expect((await roomOf(page)).below).toBeGreaterThanOrEqual(4)
     expect(await liveErrors(page)).toEqual([])
@@ -833,9 +844,10 @@ test.describe('under a coarse pointer', () => {
       return Math.min(...heights)
     }
     await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
-    expect(await shortest()).toBeGreaterThanOrEqual(80)
-    await page.evaluate(() => { document.documentElement.style.fontSize = ''; document.documentElement.style.setProperty('--tc-density', '1.25') })
-    expect(await shortest()).toBeGreaterThanOrEqual(50)
+    expect(await shortest()).toBeGreaterThanOrEqual(64)
+    // At 1.25 a row is 40 px, under the floor, so 1.5 is the density that makes it taller than 44: 48 px.
+    await page.evaluate(() => { document.documentElement.style.fontSize = ''; document.documentElement.style.setProperty('--tc-density', '1.5') })
+    expect(await shortest()).toBeGreaterThanOrEqual(48)
   })
 
   test('a tap puts the focus on the menu itself, and a tap on a row runs it', async ({ page }) => {
@@ -849,7 +861,7 @@ test.describe('under a coarse pointer', () => {
 })
 
 test.describe('a larger text', () => {
-  // Text-only zoom: the root at 32 px doubles every rem, and the 12rem floor of the menu would be 384 px on a 390 px phone.
+  // Text-only zoom: the root at 32 px doubles every rem, and the 13.75rem floor of the menu would be 440 px on a 390 px phone.
   test('390 x 844 with the root at 32 px: the menu narrows to the screen, its rows double, and nothing is cut or scrolls sideways', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     await openLive(page, 'dropdown--basic')
@@ -859,8 +871,8 @@ test.describe('a larger text', () => {
     await expectNoSidewaysScroll(page)
     await expectNothingSideways(menu)
     // The screen less its gutter and 8 px on each side.
-    expect((await boxOf(menu)).width).toBe(359)
-    expect((await boxOf(rowsOf(menu).first())).height).toBe(80)
+    expect((await boxOf(menu)).width).toBe(364)
+    expect((await boxOf(rowsOf(menu).first())).height).toBe(64)
     await expect(rowsOf(menu).first()).toHaveCSS('font-size', '28px')
     const cut = await menu.evaluate((el) => [...el.querySelectorAll('span')].filter((span) => span.scrollWidth > span.clientWidth + 1).length)
     expect(cut, 'labels and shortcuts wider than their box').toBe(0)
@@ -1142,11 +1154,11 @@ test.describe('direction', () => {
   }
 
   test('ltr: the icon is at the left of its row and the shortcut at the right', async ({ page }) => {
-    expect(await layoutOf(await open(page, 'dropdown--basic'))).toMatchObject({ iconFromLeft: 12, shortcutFromRight: 12 })
+    expect(await layoutOf(await open(page, 'dropdown--basic'))).toMatchObject({ iconFromLeft: 10, shortcutFromRight: 10 })
   })
 
   test('rtl: the icon is at the right of its row and the shortcut at the left', async ({ page }) => {
-    expect(await layoutOf(await open(page, 'dropdown--basic', { direction: 'rtl' }))).toMatchObject({ iconFromRight: 12, shortcutFromLeft: 12 })
+    expect(await layoutOf(await open(page, 'dropdown--basic', { direction: 'rtl' }))).toMatchObject({ iconFromRight: 10, shortcutFromLeft: 10 })
   })
 
   // The demo mounts its own RTL provider, so on an LTR page its portal sits in a <body> of the other direction.
@@ -1155,7 +1167,7 @@ test.describe('direction', () => {
     const trigger = triggerOf(page, 'الإجراءات')
     const menu = await openOverlay(page, trigger, asMenu())
     expect(Math.abs((await boxOf(menu)).right - (await boxOf(trigger)).right), 'bottom-start is not aligned to the right edge').toBeLessThanOrEqual(1)
-    expect(await layoutOf(menu)).toMatchObject({ iconFromRight: 12, shortcutFromLeft: 12 })
+    expect(await layoutOf(menu)).toMatchObject({ iconFromRight: 10, shortcutFromLeft: 10 })
     const read = await menu.evaluate((element) => ({
       body: getComputedStyle(document.body).direction,
       positioner: getComputedStyle(element.parentElement ?? element).direction,
@@ -1185,11 +1197,11 @@ test('the stylesheet already holds the classes of a menu nothing has rendered ye
       line: `${line.marginTop} ${line.borderTopWidth} ${line.flexShrink}`,
     }
   })
-  // 12rem and 20rem, seven rows, p-1.5, gap-0.5, rounded-box, the line, shadow-lg, wrap-anywhere, SCROLL_AREA, --tc-z-popup.
+  // 13.75rem and 20rem, seven rows, p-1.5, gap-0.5, rounded-box, the line, the overlay shadow, wrap-anywhere, SCROLL_AREA, --tc-z-popup.
   expect(styles).toEqual({
-    minWidth: '192px', maxWidth: '320px', maxHeight: '280px', padding: '6px', gap: '2px', radius: '12px', edge: '1px',
+    minWidth: '220px', maxWidth: '320px', maxHeight: '224px', padding: '6px', gap: '2px', radius: '12px', edge: '1px',
     raised: true, wrap: 'anywhere', scrolls: 'auto contain', layer: '60',
-    row: '40px 14px 12px 8px 8px pointer none 0', shortcut: '12px 160px 16px 10000 ellipsis', line: '4px 1px 0',
+    row: '32px 14px 10px 8px 8px pointer none 0', shortcut: '12px 160px 16px 10000 ellipsis', line: '0px 1px 0',
   })
 })
 
@@ -1235,6 +1247,13 @@ async function axe(page: Page): Promise<{ violations: string[], passes: string[]
 
 /** Opens the first menu of a demo from the keyboard, so its first row is highlighted: through its dialog where it has one. */
 async function openForAxe(page: Page, demo: string, options: LiveOptions & OpenOptions): Promise<Locator> {
+  if (demo === 'dropdown--states') {
+    await openLive(page, demo, options)
+    const menu = page.locator(`#demo [title="open"] ${MENU}${OPENED}`)
+    await atRest(menu)
+    await menu.scrollIntoViewIfNeeded()
+    return menu
+  }
   if (demo !== 'dropdown--in-dialog') return open(page, demo, options)
   await openLive(page, demo, options)
   await openOverlay(page, triggerOf(page, 'Invite people'), options)
@@ -1271,4 +1290,38 @@ test.describe('axe on the open menu, on a 320 x 480 phone', () => {
       expect((await axe(page)).violations).toEqual([])
     })
   }
+})
+
+test.describe('the states demo, as the Every state strip draws it', () => {
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: closed, open and a disabled row, the two open menus whole inside their own cells, and the page not locked`, async ({ page }) => {
+      await openLive(page, 'dropdown--states', { direction })
+      const cells = page.locator('#demo [title="closed"]').locator('xpath=..').locator(':scope > *')
+      expect(await cells.evaluateAll((all) => all.map((cell) => cell.getAttribute('title')))).toEqual(['closed', 'open', 'disabled item'])
+      await expect(page.locator(`#demo [title="closed"] ${MENU}`)).toHaveCount(0)
+      for (const [title, rows] of [['open', ['Profile', 'Settings', 'Duplicate', 'Delete']], ['disabled item', ['Duplicate', 'Rename']]] as const) {
+        const cell = page.locator(`#demo [title="${title}"]`)
+        const menu = cell.locator(`${MENU}${OPENED}`)
+        await atRest(menu)
+        expect(await rowsOf(menu).evaluateAll((all) => all.map((row) => row.querySelector('span.min-w-0')?.textContent))).toEqual(rows)
+        const [inner, outer, trigger] = [await boxOf(menu), await boxOf(cell), await boxOf(cell.locator('button'))]
+        expect(inner.left >= outer.left && inner.right <= outer.right && inner.top >= outer.top && inner.bottom <= outer.bottom, `the menu of "${title}" leaves its cell`).toBe(true)
+        expect(sideOf(inner, trigger)?.where, `the menu of "${title}"`).toBe('below')
+      }
+      await expect(rowOf(page.locator(`#demo [title="disabled item"] ${MENU}`), 'Rename')).toHaveAttribute('aria-disabled', 'true')
+      // Not modal: no scroll lock on the page, and nothing of it hidden or made inert behind the menus.
+      const lock = await pageLock(page)
+      expect([lock.html ?? '', lock.body ?? '', lock.overflow]).toEqual(['', '', 'visible'])
+      expect(lock.reachable).toContain('main')
+      await expect(page.locator('[data-base-ui-portal] > [data-base-ui-inert]')).toHaveCount(0)
+      expect(await liveErrors(page)).toEqual([])
+    })
+  }
+
+  test('the closed trigger opens its menu, which closes the two drawn open as any press outside them does', async ({ page }) => {
+    await openLive(page, 'dropdown--states')
+    const menu = await openOverlay(page, page.locator('#demo [title="closed"] button'), asMenu())
+    expect(await rowsOf(menu).evaluateAll((all) => all.map((row) => row.querySelector('span.min-w-0')?.textContent))).toEqual(['Profile', 'Settings'])
+    await expect(openMenus(page)).toHaveCount(1)
+  })
 })

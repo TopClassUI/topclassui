@@ -9,7 +9,8 @@ import { DEMOS } from './pages.js'
 // What happy-dom cannot lay out and the static page cannot open: where the popup really lands
 // when its trigger is flush against an edge, and which edge of it the arrow is drawn on.
 
-/** Every trigger of every demo, by its accessible name, in tab order. Written out, so a renamed demo fails here. */
+/** Every trigger of every demo, by its accessible name, in tab order. Written out, so a renamed demo fails here. The
+ * states strip is not here: it draws two tooltips open before any focus, and has tests of its own. */
 const TOOLTIPS: Record<string, readonly string[]> = {
   'tooltip--basic': ['Copy link'],
   'tooltip--delays': ['Copy', 'Delete this row', 'Settings'],
@@ -23,7 +24,6 @@ const TOOLTIPS: Record<string, readonly string[]> = {
   ],
   'tooltip--playground': ['Copy link'],
   'tooltip--rtl': ['نسخ الرابط', 'حذف هذا الصف'],
-  'tooltip--states': ['Top', 'Bottom', 'Delayed'],
   'tooltip--with-count': ['Delete 3 rows'],
 }
 
@@ -129,13 +129,13 @@ function expectArrowTowardTrigger({ popup, arrow, trigger, where }: Placed, labe
   expect(along, `${label}: the arrow is past the trigger`).toBeLessThanOrEqual(to)
 }
 
-test('the tables name every tooltip demo but the one that never opens, and only triggers that exist', () => {
+test('the tables name every tooltip demo but the one that never opens and the states strip, and only triggers that exist', () => {
   const found = DEMOS.filter((demo) => demo.startsWith('tooltip--')).sort()
   expect(found).toEqual([
     'tooltip--basic', 'tooltip--delays', 'tooltip--disabled', 'tooltip--long-label',
     'tooltip--placements', 'tooltip--playground', 'tooltip--rtl', 'tooltip--states', 'tooltip--with-count',
   ])
-  expect(Object.keys(TOOLTIPS).sort()).toEqual(found.filter((demo) => demo !== 'tooltip--disabled'))
+  expect(Object.keys(TOOLTIPS).sort()).toEqual(found.filter((demo) => demo !== 'tooltip--disabled' && demo !== 'tooltip--states'))
   // A row for a trigger the loop below never opens would be an expectation nobody checks.
   for (const row of SIDES) expect(TOOLTIPS[row.demo] ?? [], `${row.demo} has no "${row.name}"`).toContain(row.name)
 })
@@ -173,6 +173,48 @@ test('axe finds nothing on the page while a tooltip is open, the trigger describ
   const results = await new AxeBuilder({ page }).disableRules(['region']).analyze()
   expect(results.violations.map((v) => `${v.id}: ${String(v.nodes.length)} node(s)`)).toEqual([])
   expect(results.passes.map((rule) => rule.id)).toEqual(expect.arrayContaining(['aria-allowed-role', 'aria-valid-attr-value']))
+})
+
+test.describe('the states strip', () => {
+  /** The cell a state is drawn in, by the title that captions it. */
+  const cellOf = (page: Page, title: string) => page.locator(`#demo [title="${title}"]`)
+
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: top sits above its trigger and bottom below it, 11 px off it, whole inside its own cell, its arrow toward it`, async ({ page }) => {
+      await openLive(page, 'tooltip--states', { direction })
+      expect(await cellOf(page, 'hidden').locator('xpath=..').locator(':scope > *').evaluateAll((cells) => cells.map((cell) => cell.getAttribute('title'))))
+        .toEqual(['hidden', 'top', 'bottom'])
+      await expect(cellOf(page, 'hidden').locator('[role="tooltip"]')).toHaveCount(0)
+      for (const [title, where, name] of [['top', 'above', 'Top'], ['bottom', 'below', 'Bottom']] as const) {
+        const cell = cellOf(page, title)
+        const popup = cell.locator('[role="tooltip"][data-open]')
+        await expect(popup).toHaveText(name)
+        const box = async (target: Locator): Promise<Box> => target.evaluate((element) => {
+          const { left, top, right, bottom } = element.getBoundingClientRect()
+          return { left, top, right, bottom }
+        })
+        const placed = { popup: await box(popup), arrow: await box(popup.locator('[aria-hidden="true"]')), trigger: await box(page.getByRole('button', { name, exact: true })) }
+        const side = sideOf(placed)
+        expect(side?.where, `${title} lies on the wrong side of its trigger`).toBe(where)
+        expect(Math.abs((side?.gap ?? 0) - 11), `${title} is not 11 px from its trigger`).toBeLessThanOrEqual(1)
+        expectArrowTowardTrigger({ ...placed, where }, title)
+        const outer = await box(cell)
+        expect(placed.popup.top >= outer.top && placed.popup.bottom <= outer.bottom && placed.popup.left >= outer.left && placed.popup.right <= outer.right, `${title} leaves its cell`).toBe(true)
+        await expectTwoLinesAtMost(popup, name)
+      }
+      const results = await new AxeBuilder({ page }).disableRules(['region']).analyze()
+      expect(results.violations.map((v) => `${v.id}: ${String(v.nodes.length)} node(s)`)).toEqual([])
+    })
+  }
+
+  test('hidden: focus on its trigger opens its own tooltip, which describes it', async ({ page }) => {
+    await openLive(page, 'tooltip--states')
+    await page.keyboard.press('Tab')
+    const trigger = page.getByRole('button', { name: 'Copy link' })
+    await expect(trigger).toBeFocused()
+    await expect(trigger).toHaveAccessibleDescription('Copy link')
+    await expect(page.getByRole('tooltip', { name: 'Copy link' })).toBeVisible()
+  })
 })
 
 test('hover opens it, and the pointer leaving closes it', async ({ page }) => {

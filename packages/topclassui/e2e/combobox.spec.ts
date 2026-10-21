@@ -99,7 +99,7 @@ test.describe('the server HTML, before any script runs', () => {
     })
   })
 
-  test('invalid: the line turns to danger and thickens; disabled dims to half; read-only takes the read-only fill', async ({ page }) => {
+  test('invalid: the line turns to danger and thickens; disabled dims to half on the surface; read-only looks like idle', async ({ page }) => {
     await page.goto(urlFor('combobox--states', 'light', 'ltr'))
     const [invalid, disabled, readOnly, live] = ['Invalid', 'Disabled', 'Read-only', 'One option disabled'].map((name) => inputOf(page, name))
     if (!invalid || !disabled || !readOnly || !live) throw new Error('a state is missing')
@@ -107,7 +107,8 @@ test.describe('the server HTML, before any script runs', () => {
     expect(await css(invalid, 'box-shadow')).toContain('0px 0px 0px 1px inset')
     expect(await css(live, 'box-shadow')).not.toContain('inset')
     expect(await css(disabled, 'opacity')).toBe('0.5')
-    expect(await css(readOnly, 'background-color')).not.toBe(await css(live, 'background-color'))
+    expect(await css(disabled, 'background-color')).not.toBe(await css(live, 'background-color'))
+    expect(await css(readOnly, 'background-color')).toBe(await css(live, 'background-color'))
   })
 })
 
@@ -259,15 +260,15 @@ test.describe('live: ten thousand options, windowed', () => {
     await page.mouse.move(list.left + 60, list.top + 60)
     const steps: string[] = []
     for (let turn = 0; turn < 10; turn++) {
-      await page.mouse.wheel(0, 40)
-      await expect.poll(() => listOf(page).evaluate((el) => Math.round(el.scrollTop))).toBe(40 * (turn + 1))
+      await page.mouse.wheel(0, 32)
+      await expect.poll(() => listOf(page).evaluate((el) => Math.round(el.scrollTop))).toBe(32 * (turn + 1))
       steps.push(await listOf(page).evaluate((el) => {
         const top = el.getBoundingClientRect().top
         const row = [...el.querySelectorAll('[role="option"]')].find((option) => option.getBoundingClientRect().bottom > top + 6)
         return `${String(el.scrollHeight)} ${String((row?.getBoundingClientRect().top ?? 0) - top)}`
       }))
     }
-    expect(new Set(steps)).toEqual(new Set(['400012 6']))
+    expect(new Set(steps)).toEqual(new Set(['320012 6']))
   })
 
   test('typing 999 leaves the nineteen that contain it, unwindowed, and zzz says No results and hides the list', async ({ page }) => {
@@ -373,13 +374,13 @@ test.describe('live: ten thousand options, windowed', () => {
     expect(await reopenOnChosen(page)).toEqual({ text: 'Option 9997', whole: true })
   })
 
-  test('at a 32 px root on a phone: rows of 80 px, the popup fits, and the last of ten thousand still lands whole', async ({ page }) => {
+  test('at a 32 px root on a phone: rows of 64 px, the popup fits, and the last of ten thousand still lands whole', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 480 })
     await openLive(page, 'combobox--ten-thousand')
     await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
     await inputOf(page, 'Ten thousand options').click()
     await atRest(popupOf(page))
-    expect((await boxOf(page.getByRole('option').first())).height).toBe(80)
+    expect((await boxOf(page.getByRole('option').first())).height).toBe(64)
     await expectInsideViewport(popupOf(page), 'the popup')
     await page.keyboard.press('ArrowUp')
     await expect.poll(() => activeOf(page)).toMatchObject({ text: 'Option 10000', whole: true })
@@ -445,7 +446,7 @@ test.describe('live: paging, through load-more', () => {
     expect(Math.max(...await page.evaluate(() => (window as unknown as { ahead: number[] }).ahead))).toBe(0)
   })
 
-  test('status: loading turns the caret into a spinner, says Loading in the list, and marks the input busy', async ({ page }) => {
+  test('status: loading draws a spinner at the inline end, says Loading in the list, and marks the input busy', async ({ page }) => {
     await open(page, 'combobox--status', 'City, loading')
     expect(await inputOf(page, 'City, loading').getAttribute('aria-busy')).toBe('true')
     await expect(page.getByRole('status').last()).toHaveText('Loading')
@@ -483,12 +484,12 @@ test.describe('live: where the popup lands', () => {
     }
   }
 
-  test('rtl: the popup lines up with the right edge of the input, the caret sits at its left, and the tick ends a row at its left', async ({ page }) => {
+  test('rtl: the popup lines up with the right edge of the input, the glass sits at its right, and the tick ends a row at its left', async ({ page }) => {
     const popup = await open(page, 'combobox--rtl', 'المدينة', { direction: 'rtl' })
     const [box, input] = [await boxOf(popup), await boxOf(inputOf(page, 'المدينة'))]
     expect(Math.abs(box.right - input.right)).toBeLessThanOrEqual(1)
-    const caret = await boxOf(page.locator('#demo [aria-hidden] svg'))
-    expect(caret.left - input.left).toBeLessThan(input.right - caret.right)
+    const glass = await boxOf(page.locator('#demo [aria-hidden] svg'))
+    expect(input.right - glass.right).toBeLessThan(glass.left - input.left)
     const chosen = page.getByRole('option', { name: 'عمّان' })
     const [tick, row] = [await boxOf(chosen.locator('svg')), await boxOf(chosen)]
     expect(tick.left - row.left).toBeLessThan(row.right - tick.right)

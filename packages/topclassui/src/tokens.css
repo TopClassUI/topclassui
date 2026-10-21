@@ -13,8 +13,10 @@
   --tc-density: 1;
   --tc-motion: 1;
   --tc-list-rows: 7;
-  --tc-row-height: calc(2.5rem * var(--tc-density));
+  --tc-row-height: calc(2rem * var(--tc-density));
   --tc-overlay-inset: 1rem;
+  /* The Toast frame's drop shadow, one value in every mode as Figma draws it. */
+  --tc-shadow-toast: 0 6px 16px -4px rgb(0 0 0 / 0.4);
   --tc-sticky-top: 0px;
   --tc-sticky-bottom: 0px;
   /* The widest a Table's stuck first column gets, and the scroll padding that keeps focus clear of it. */
@@ -49,8 +51,12 @@
 
   /* A Stepper circle: each size sets it on the list; a custom Stepper reads the caller's, or this md 32 px. */
   --tc-stepper-mark: calc(2rem * var(--tc-density));
+  /* The md SegmentedControl track: 36 px at density 1, as Figma 138:668 draws it, between the sm and md control steps. */
+  --tc-segmented-height: calc(2.25rem * var(--tc-density));
   /* Set inline by Progress from its clamped value; declared here so R-4-2 can see it. */
   --tc-progress-value: 0%;
+  /* Set inline by Command to the Enter hint of its labels, with an empty alternative, so it is drawn and never read. */
+  --tc-command-enter: "";
   /* Set inline by a windowed list to the spacers of useCollection, read by two spacers and never by its padding. */
   --tc-list-pad-start: 0px;
   --tc-list-pad-end: 0px;
@@ -72,7 +78,10 @@
   --tc-muted: var(--color-neutral-600);
   --tc-line: var(--color-neutral-200);
   --tc-line-strong: var(--color-neutral-500);
-  --tc-overlay: oklch(0 0 0 / 0.5);
+  /* The frames dim the page to about a third in light and two fifths in dark, so what is behind stays readable. */
+  --tc-overlay: oklch(0 0 0 / 0.3);
+  /* The lift of a dialog, a popup or a sheet: Figma's 0 8 10 drop shadow, lighter on a light page. */
+  --tc-shadow-overlay: 0 8px 10px oklch(0 0 0 / 0.15);
 
   --tc-primary-solid: var(--color-blue-600);
   --tc-primary-on-solid: var(--color-white);
@@ -136,7 +145,8 @@
   --tc-line: var(--color-neutral-800);
   /* neutral-400 not neutral-500: on a raised card neutral-500 measured only 3.19:1. */
   --tc-line-strong: var(--color-neutral-400);
-  --tc-overlay: oklch(0 0 0 / 0.7);
+  --tc-overlay: oklch(0 0 0 / 0.4);
+  --tc-shadow-overlay: 0 8px 10px oklch(0 0 0 / 0.45);
 
   --tc-neutral-solid: var(--color-neutral-100);
   --tc-neutral-on-solid: var(--color-neutral-950);

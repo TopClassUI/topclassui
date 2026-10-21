@@ -41,8 +41,8 @@ way first; pass `className="shrink"` to let the faces wrap sooner.
 and the table scrolls, so keep `max` small. A box as wide as its content (`inline-flex`,
 `w-fit`) does the same; there `className="w-auto"` lets a long group wrap again.
 
-**On a Card.** The ring between avatars is the page colour. On a Card, in a Table, or on any
-surface that is not the page, give it that surface: `className="*:ring-surface-raised"`.
+**On a Card.** The ring between avatars is the avatar's own fill, so the discs read as one
+shape and photos keep an edge; it needs no class on a Card, in a Table or on any other surface.
 
 **Links.** Wrap an avatar in a link and make the link `inline-flex`. The link is then the
 child the group rings and overlaps. Give it a focus ring of your own, as `dummy/linked.tsx`

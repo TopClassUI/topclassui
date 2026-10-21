@@ -64,7 +64,7 @@ describe('the text column', () => {
     expect(classes().filter((c) => /^text-(xs|sm|base|lg|xl)$/.test(c))).toEqual([])
   })
 
-  it('aims no class at its rows, so a row keeps its own height of 1em', () => {
+  it('aims no class at its rows, so a row keeps its own height of 0.75em', () => {
     for (const variant of SKELETON_VARIANTS) {
       expect(classes({ variant }).filter((c) => /^(\*|\[&)/.test(c) || c.includes(':*')), variant)
         .toEqual([])
@@ -73,7 +73,7 @@ describe('the text column', () => {
 
   it('sizes each row from the type, not from the control scale', () => {
     for (const row of rowClasses(html())) {
-      expect(row.split(' ').filter((c) => c.startsWith('h-'))).toEqual(['h-[1em]'])
+      expect(row.split(' ').filter((c) => c.startsWith('h-'))).toEqual(['h-[0.75em]'])
     }
   })
 })

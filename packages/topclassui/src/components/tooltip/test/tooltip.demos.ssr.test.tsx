@@ -23,7 +23,7 @@ const TRIGGERS: Record<string, number> = {
   'placements': 12,
   'playground': 1,
   'rtl': 2,
-  'states': 4,
+  'states': 3,
   'with-count': 1,
 }
 
@@ -36,7 +36,7 @@ const ICONS: Record<string, string[]> = {
   'placements': [],
   'playground': ['M165.66,90'],
   'rtl': ['M165.66,90', 'M216,48H17'],
-  'states': ['M205.66,11', 'M205.66,14', 'M128,24A10', 'M128,24A10'],
+  'states': ['M165.66,90', 'M205.66,11', 'M205.66,14'],
   'with-count': ['M216,48H17'],
 }
 

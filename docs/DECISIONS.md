@@ -44,6 +44,33 @@ The format is: date, decision, why, and what it affects.
 **Why.** Omar named the landing page first among the pages that looked unfinished; the frame is the truth for the look.
 
 **What it affects.** `apps/docs` only (Home, the navbar, the footer, the icon and Open Graph routes, the labels), the root README's wordmark and `docs/brand/`. The library is untouched.
+## 2026-10-19 - The round-8 library raises the tarball budget to 3,150,000 bytes and Sidebar's to 6.2 KB
+
+**Decision.** The thirteen round-8 branches stacked together (the library integrator, job 131) pack 3,114,237 bytes unpacked, over the 3,050,000 the 2026-10-18 entry set; the base cf1ec12 packs 2,986,683, so round 8 adds 127,555 bytes. `SIZE_BUDGET_BYTES` in `scripts/lib/pack-checks.ts` rises to 3,150,000, the measured size plus about 1 %, so it stays a guard rail. In the same stack Sidebar's own client half measures 6,246 bytes against the 6 KB simple-control budget of `pnpm size`, and its entry in `size-budget.json` becomes 6.2 KB, as job 118 raised fifteen others to what was measured.
+
+**What round 8 added to the tarball.** `dist/components` +51,849 bytes (the new parts ToastStage and CardMedia, the states demos and their classes, POINTER and the scroll classes in every family, the regenerated READMEs); the CLI registry +70 KB, since every component's source rides in `dist/registry/*.json` (table +7,954, command +6,345, breadcrumb +5,278, base +4,369, toast +4,235, card +3,794, timeline +3,480, tree-view +3,440, segmented-control +3,378); `size.json`, shipped by 118, +4,567. Sidebar's half grew with 113's frame rework, 120's POINTER and 123's scroll classes.
+
+**Why.** Each job alone fit both budgets; only the stack crosses them, and nothing in it is dead weight to cut. Omar confirms the two numbers.
+
+**Affects.** `pack-checks.ts` and its test, `size-budget.json`, `check:package`, `pnpm size --check` and `test:consumers`. A tarball over 3.15 MB again needs a new entry here.
+
+---
+
+## 2026-10-19 - Pagination turns compact on a narrow list or under a finger
+
+**Decision.** Job 119 (round 8, "bulky pagination on phones"). The `<ul>` of Pagination is a container named `pagination` (`@container/pagination`), and two utilities in `src/styles.css` read it: `pagination-full` (the pages and the gaps) is `display: none` below 36rem of the list's width or under `pointer: coarse`, and `pagination-compact` (a new item between Previous and Next, "3 of 12" from `labels.pagination.ofPages`) is shown in exactly those two cases. The compact row is First, Previous, "current of total", Next, Last on one line; the status takes the room the four controls leave (`flex-1`) and wraps its own text, so "12,345 of 123,456" at `xl` still keeps one row at 390 px. The page links stay in the HTML, hidden, so a crawler follows every one; the current page link is hidden too, and the status says the page in words.
+
+- **36rem.** The full row at `lg` is 11 x 48 px plus ten 4 px gaps, 568 px; `xl` past that still wraps as before. A query cannot read a custom property, so the number is written in the utility, once.
+- **Coarse pointer at any width.** As the job asks: 44 px cells make the full row 524 px, which wraps on most phones and some tablets.
+- **`!important`.** A gap's own `inline-flex` is emitted after `pagination-full` in the same layer, so the hide carries `!important`.
+- **`dir="auto"` on the status.** English labels on an RTL page read "of 12 3" otherwise; Arabic labels resolve to RTL themselves.
+- **Figma 138:1269 stays the desktop truth.** Nothing above 36rem with a fine pointer changed: the status is `display: none` there.
+- **A container takes no width from its content.** A Pagination placed in a flex row needs a width of its own (`flex-1`, `w-full`); the README says so.
+- **`e2e/target-size.spec.ts` skips a box with `display: none`**, which is no target; Pagination keeps its hidden links in the HTML.
+
+**What it affects.** `src/components/pagination/{index.tsx,classes.ts,README.md}` and its tests, `src/styles.css`, `e2e/pagination-compact.spec.ts` (390 px under a fine and a coarse pointer, both directions, every demo: one line, 44 px targets, Previous and Next lead to the neighbours, links kept), `e2e/target-size.spec.ts`, two rows of `scripts/mutations/pagination.ts`.
+
+---
 
 ## 2026-10-19 - No default scrollbar anywhere: the page wears the shared bar, and an e2e reads every scroller
 
@@ -52,6 +79,9 @@ The format is: date, decision, why, and what it affects.
 **Why.** Omar's round-8 review: no default browser scrollbar anywhere; the classic bar beside the search palette was the page's.
 
 **What it affects.** `src/tokens.css`, `src/scrollbar.test.ts` (the page rule, and a raw overflow in a demo), the mutation rows in `scripts/mutations/shared-scrollbar.ts`, the sidebar demo and its test, `apps/docs/components/classes.ts`, `apps/docs/components/shell/on-this-page.tsx`, the two specs.
+
+---
+
 ## 2026-10-19 - The hand on every pressable control: `POINTER`
 
 **Decision.** Round 8, job 120. `shared/classes.ts` gains `POINTER`: `cursor-pointer`, then `cursor-default` under `disabled:`, `aria-disabled:`, `data-disabled:`, `data-readonly:` and `data-loading:`, so a control that cannot be pressed shows the arrow whichever mark it carries. `ICON_BUTTON`, `ROW` and `TOGGLE_TARGET` wear it, which reaches every x and icon button (Dialog, Drawer, Popover, Toast, Sidebar, Tag, Banner, CodeBlock, FileUpload, DatePicker's month buttons), every row of a menu or a list (Dropdown, Command, Select, Combobox, Sidebar) and every Checkbox, Radio and Switch. Button, Tabs, SegmentedControl, Accordion, the Select and DatePicker triggers, NumberField's steppers, DatePicker's days, TreeView's rows and Pagination's cells add it to their own strings; the `cursor-default` the option rows, Dropdown and TreeView set by hand is gone. Rating's stars and FileUpload's input already had the hand.
@@ -76,6 +106,7 @@ The format is: date, decision, why, and what it affects.
 **Affects.** PLAN 14 and 16 (the chip), R-0-2 (`pnpm check` has a new gate), `docs/RULES.md` commands, `docs/figma/docs-site.md` choice 15. Left for Omar: whether the class runtime should count in the budget, the fifteen raised budgets (slimming them, or moving the classes), and DatePicker's eager hook.
 
 ---
+
 ## 2026-10-19 - Breadcrumb writes JSON-LD only when given siteUrl
 
 **Decision.** Job 122. `Breadcrumb`'s `baseUrl` is replaced by `siteUrl`, an absolute http or https origin with no trailing slash (`https://example.com`), declared in `schema.ts` (with `BREADCRUMB_SITE_URL_PATTERN` in `constants.ts`) and derived into `types.ts` (R-8.3-4). With it, the trail is written as `BreadcrumbList` JSON-LD: every crumb with an `href` is a `ListItem` whose `item` is absolute against the origin of `siteUrl`, and the current page is the last `ListItem`, with its name and no `item`, as Google documents for the last crumb. Without it no script is written. A `siteUrl` that does not parse as an http or https URL writes no script either and never throws; a path or a trailing slash on it is ignored, since only its origin is used. A trail with no link writes no script, because a list holding only the current page points nowhere.
@@ -91,6 +122,151 @@ The format is: date, decision, why, and what it affects.
 **Why.** docs-site S3 put every fence on `neutral/solid` (unit-5 choice 13), read from the text notes; the page frames, read for the first time, draw the code on `base/page` with a `base/surface` header and a `base/line` edge.
 
 **What it affects.** `lib/shiki-contrast.test.ts` now also measures `on-dark` on the dark page and `on-light` on the light and ocean pages, every token colour at 4.5:1 plus the 0.15 margin. Code on a guide page is `text-xs` on the `text-sm` line height (the frames draw 11 px). Nothing in the library changed.
+---
+
+## 2026-10-19 - The command palette's focus appearance is an underline and a bar, not a ring
+
+**Decision.** Omar's review of the Command composite asked for the frame's look: a borderless search row with no ring, and an active row that is a fill with no ring. In the palette the DOM focus never leaves the input (the rows are reached through `aria-activedescendant`), and a text input matches `:focus-visible` on every focus, so the pointer and keyboard split of `ROW_FOCUSED` cannot apply. The palette keeps a keyboard mark in another shape, a lead call recorded for Omar on `cloud/reports-8`: the input is borderless and `outline-none`; while it has the focus, the hairline under the search row is overdrawn by a `--tc-ring` line as thick as a ring (`COMMAND_SEARCH_FOCUS`, a border on `::after`, so forced colours keep it and the row keeps its height). The active row is the soft fill plus a `--tc-ring` bar as thick as a ring at its inline start (`COMMAND_ACTIVE`, a border on `::before`, so it flips in RTL); forced colours keep the Highlight fill and HighlightText label, with the bar in HighlightText. The frame's Enter hint is drawn on the active row only as `::after` content from `labels.command.enter`, with CSS alternative text `"Enter" / ""`, so it is never part of the option's accessible name or its text.
+
+**Why.** R-5.6-1 and WCAG 2.4.7 ask for a visible focus indicator; a 2 px `--tc-ring` line holds 3:1 on the raised surface in every mode (`check:contrast` measures `--tc-ring`), which the soft fill alone does not. This supersedes, for Command only, the ring of `FOCUS_RING_INSET` on the input and of `ROW_HIGHLIGHT` on its rows.
+
+**What it affects.** `command/classes.ts` (`COMMAND_SEARCH_FOCUS`, `COMMAND_INPUT`, `COMMAND_ACTIVE`, `COMMAND_ENTER_HINT`), the `--tc-command-enter` token, `e2e/keyboard-command.spec.ts` (it reads the line and the bar), the forced-colours case of `e2e/command.spec.ts`, and the Command rows of `review-notes/figma-audit/diffs/command.md`.
+
+## 2026-10-19 - The overlays follow their Previewer frames
+
+**Decision.** Job 110 compared Dialog, Drawer, Command, Dropdown, Popover and Tooltip with their `Previewer: <Name>` frames (138:1814, 138:1976, 138:1653, 138:1464, 138:2132, 138:2273) in dark, then light and ocean, in both directions, and changed the build where it differed. The composites are `docs/figma/parity/<slug>.png`, frame left and build right.
+
+- **Two new values in `tokens.css`.** `--tc-shadow-overlay` is the frames' drop shadow, `0 8px 10px` at 45% black in dark and 15% on a light page (light and ocean), and `OVERLAY_SURFACE` and the Drawer's sheet wear it instead of `shadow-lg`. `--tc-row-height` is now `2rem` times the density, 32 px: every menu and list row in the frames is 31 px (14 px text, 7 px of padding above and below), against 40 before. A coarse pointer still gets 44 px from `ROW_TOUCH` and `COMMAND_UNIT`, and the 24 px floor of R-5.6-2 is untouched. `ROW` pads 10 px a side instead of 12 (the frames draw 9). Every component that wears `ROW` or the knob moves with it: Select, Combobox, Sidebar, TreeView, FileUpload and DatePicker as well as the six here.
+- **The scrim.** `--tc-overlay` is 30% black on a light page and 40% in dark (was 50% and 70%): the frames dim the page behind a dialog or a sheet so that it stays readable.
+- **Dialog.** Header and footer pad 18 by 14 px and the body 18, as drawn; `md` is 380 px wide (`max-w-95`), the drawn panel. The x reaches 5 px into the padding (`-me-1.25`), so its glyph ends on the padding line while its box keeps 24 px. The basic demo's actions are `sm`, as drawn.
+- **Drawer.** The header pads 14 px above and below.
+- **Command.** 400 px wide, the search row pads 14 px at its start, the input is 40 px tall and 48 under a finger, and an Esc keycap (`labels.command.escape`, aria-hidden, gone under a coarse pointer) ends the search row. The group heading sits 2 px over its rows.
+- **Dropdown.** 220 px at least (`calc(var(--spacing)*55)`), and the separator has no margin of its own: the 2 px gap of the popup is all the frame leaves around the line. A row holds the real focus, so it wears job 114's `ROW_FOCUSED` (the same text as on `figma/forms-1`): the frame's hover row is the tint alone, and a key brings the focus ring back. The basic demo's trigger is `sm`.
+- **Popover.** The basic demo carries the x beside the title and the two icons the frame draws.
+
+**Not followed, and why.** The Command input and its active row keep a keyboard mark in another shape than the ring (the entry above). Dialog's bars draw their line only while the body scrolls, as the frame's scrolled state does. The Dialog demos' Cancel is the neutral soft Button, as drawn. The neutral look of an outline Button (the frames' Cancel and triggers) is Button's own frame, job 116.
+
+- **The stage and the states strip (a lead call for the docs site).** Each of the six `dummy/playground.tsx` takes an optional `stage`: the overlay is drawn open inside the demo's own box (`data-stage`, `contain: paint`, the portal's container), not modal, taking no focus, over a scrim where the frame draws one (Dialog, Drawer). Command is always modal, so its stage is a picture built from its own class constants and hidden from a reader; Tooltip is held `open`, because the provider's delay group keeps one tooltip open at a time. Each `dummy/states.tsx` is one captioned cell per drawn state (the `title` of each direct child), real components drawn open in their cells (Command's as pictures). Left out, because they need a live focus, pointer or gesture, or look the same as another cell: Dialog and Drawer "focus trapped", Drawer "dragging", Popover "focus-visible" and "dismissed", Tooltip "delayed", Dropdown "hover item". Dropdown's "submenu" and "checked" need a submenu and a checkbox item, which Dropdown does not have: new API, for Omar. A Dropdown menu drawn open takes the focus (Base UI 1.8.0's `MenuPopup` hardcodes its initial focus), so the last open menu of the strip shows its focus ring.
+- **TooltipPopup takes `container` and `keepMounted`,** the two props of its portal, as PopoverPopup does, so a stage can draw it inside its own box.
+
+**What it affects.** `src/tokens.css`, `src/shared/classes.ts`, the six `classes.ts`, `command/parts/command-panel.tsx`, the labels (`command.escape` in English and Arabic), the Popover basic demo, the tests that pin those class strings, and their mutation rows.
+
+---
+
+## 2026-10-19 - Toast and Table follow their Previewer frames
+
+**Decision.** Job 111 of round 8 rebuilt the look of Toast (frame 137:1841) and Table (frame 137:1022) from the frames, read with the Figma tools, instead of the unit notes. The composites are `docs/figma/parity/toast.png` and `docs/figma/parity/table.png`.
+
+- **Toast.** The toast is the frame's 320 px (the viewport is `w-88`, 352 px less its 16 px insets), padded 14 px on every side, its icon 10 px from the text, title and description 3 px apart, and its x a 14 px glyph (0.875em, so it grows with the text) whose corner sits on the padding's corner; the 24 px and 44 px targets of the x stay, pulled into the padding by negative margins. The shadow is the frame's own drop shadow, `0 6px 16px -4px` black at 40%, which Figma draws in one value for every mode: it is the new token `--tc-shadow-toast` in `tokens.css`, and the toast no longer wears `OVERLAY_SURFACE`'s `shadow-lg`. The x and the action carry `cursor-pointer` until job 120's shared classes land. The playground's description is the frame's.
+- **Table.** Cells are padded 14 px inline as the frame draws them; the header row is 32 px (8 px block padding), so the cap of the box counts 8 spacing steps for it. A body cell is muted and a row header is medium in the body colour, as the frame reads a row from its first cell. A row takes the frame's hover tint (`bg-surface`; a stuck cell follows it through `group-hover/row`). Every sortable header shows the frame's idle up-down pair, muted and hidden from a reader; the sorted one shows `sort-ascending` or `sort-descending` at the frame's 13 px instead of a caret, still named by its direction. The empty row draws the frame's 22 px tray over its words, in the small step. The playground is the frame's team table (avatar and name, role, a soft badge for the status), sorted by name.
+- **Alert and Banner.** Alert is the frame's 14 by 12 px (the 1 px edge every variant keeps counts in it), its icon 10 px from the text and its top on the first line's top. Banner is 18 by 11 px, its x a 14 px glyph on the padding's edge; its playground is dismissible by default, as the frame draws it, and its demos pass the action as a link in the banner's colour, as the frame draws "Read more", and its states demo gives each tone the frame's mark (primary none). The Alert description keeps its full colour: the frame's 85% would drop white on a solid tone under 4.5:1, which an existing test guards.
+- **Tight lines.** The frame sets the text of Toast, Alert and Banner on tight lines (17 px for 14 px text) with 3 px between title and description, so they take `text-sm/tight` and `gap-0.75`. The type step is unchanged.
+- **Table selection and the states strip.** The frame's states strip draws a selected row, so Table takes `selectedKeys` (strings, so it crosses to the client): a named row gets `data-selected` and `aria-selected`, the primary tint, and primary text in every cell, a stuck one too. Selecting stays the caller's (a checkbox column, say). A striped row, already the surface, hovers to the neutral tint. The empty table keeps its header row, so a reader knows what is empty, and the skeleton keeps the table's shape on the page's surface, where its bars show in dark as the frame's do.
+- **Two new design props on Table**, from the frame's Try it: `density` (`comfortable`, the default and the frame's row, or `compact`, 6 px of block padding) and `variant` (`outline`, the default with the hairline round the box, or `plain` without it). Both are value attributes on the root (`data-density`, `data-variant`, R-5.7-6), both reach `TableSkeleton`, and the `density` demo shows them. The type and schema tests that listed them as unbuilt now pin them.
+
+**The states demos are the frames' strips.** Each `dummy/states.tsx` holds one direct child a state, captioned by its `aria-label` (a `role="group"` around a component that takes none): Table idle, hover row, sorted, selected, empty, loading; Toast success, error, loading, stacked, entering, limited, drawn in place with the viewport's classes rather than through the live region; Alert info, success, warning, danger; Banner primary, info, warning, dismissed. The states each strip leaves out (variants, slots, the caption, stripes, the stuck column, the x) have demos of their own.
+
+**Not built, and left for Omar.** The frame's Try it also offers Table's `pageSize` (it needs Select), Alert's `size` and `dismissible`, and Banner's `variant`, `placement` and `sticky`; none is built. The toast past the limit stays undrawn (`data-limited:hidden`), not the frame's 40% ghost, which would keep its row in the column. Dark `--tc-info-on-soft` reads a little lighter than the frame's info text: a token for the integrator. The frame's "stacked" toast cell overlaps three toasts by 6 px; the build keeps its column with an 8 px gap, because an overlap would hide the edge of the toast behind and the frame's prototype gives no expand behaviour to follow. The frame's avatar is a neutral circle; the library's Avatar fallback is the primary tint (Avatar is job 116's). The frame draws the toast at rest in the docs stage; on the site it is still a button that adds one (job 127's stage).
+
+**Affects** `src/tokens.css`, `src/components/toast/{classes.ts,client.tsx,dummy/playground.tsx}`, `src/components/table/*` and its README, both components' tests and mutation rows.
+
+---
+
+## 2026-10-19 - Stepper, Timeline, TreeView, EmptyState, Progress and Spinner follow their Previewer frames
+
+**Decision.** The `Previewer: <Name>` frames on the Docs pages (137:2477, 137:1409, 137:1223, 137:2349, 137:2113, 137:2234) are the truth for the look of these six; the composites are under `docs/figma/parity/`.
+
+- **TreeView rows follow the shared row knob**, `--tc-row-height`, now 32 px (`calc(2rem * var(--tc-density))`, set with the list frames' 31 px rows in figma/forms-1); no tree token. The tree's cap adds its own padding and border, so seven rows fit whole. The caret is 12 px, rows take `cursor-pointer`, and a label no longer stretches (`flex-1`), so in an RTL row a Latin label sits beside its caret.
+- **A Stepper column is at most 2.75 circles wide** (`max-w-[calc(var(--tc-stepper-mark)*2.75)]`, 88 px at md): the previewer draws its steps about 90 px apart, not spread over the page. The equal columns, the wrap and the half lines are unchanged, so a narrow list lays out as before.
+- **Timeline markers are drawn as the previewer draws them.** A done or current dot is filled and stroked in its tone's solid (warning's stroke is `warning-on-soft`, since amber is 2.15:1 on white); the current one keeps its dot-in-a-ring only under forced colours, where every fill is one system colour, so there the shape still tells it from done; elsewhere the order and the hidden status word do. A todo dot is a 2 px `line-strong` ring on `surface-raised`. The text column has no gap, so an item is 52 px as drawn.
+- **Timeline renders its own empty line and ships `TimelineSkeleton`.** With no items and no `emptyFallback`, it renders the tray icon and `labels.state.empty`, muted; `emptyFallback={null}` still renders nothing. The skeleton is three rows of a dot and a bar in Skeleton's fill and pulse, hidden from the accessibility tree.
+- **A Stepper step takes `disabled`**, drawn at half strength (`data-disabled:opacity-50`), as the states strip draws it; it changes the look only. The half lines lose their `-translate-y-1/2`, so the 1 px connector is crisp instead of smeared over two rows.
+- **The Timeline rail runs dot to dot.** The connector takes `-my-1`, the 4 px between a 12 px dot and its 20 px marker box, at both ends, so no gap opens beside a dot.
+- **TreeView draws its states as the previewer does.** A selected row keeps the regular weight; the caret and the item icon take the body colour; the keyboard ring sits 2 px outside the row, inside the tree's 8 px padding and scroll padding. While loading, two bars in Skeleton's fill stand for the words, which stay in the live region as `sr-only`; empty draws the tray over `labels.state.empty` in a raised box. A caller's `loadingFallback` or `emptyFallback` replaces the built-in look.
+- **EmptyState draws its dash in `line-strong`, with gap 10 and padding 28** (`gap-2.5`, `p-7`), as the previewer does; the Components page's `line`, 12 and 32 were the older drawing. Its title and description take `leading-tight`, the previewer's normal line height. A new `compact` prop (`data-compact`) draws the strip's compact cell: a 24 px icon, `p-4` and `gap-1.5`, and the title and description one type step down.
+
+- **A complete Progress bar with no tone asked for fills in success**, as the stage and the strip draw it; a tone the caller chose, primary included, keeps its meaning at 100. `data-tone` still reports the tone.
+
+**Kept against the frame, by rule.** Progress fills the bar with `<tone>-on-soft` and outlines its track: the drawn `<tone>-solid` bars measure under 3:1 on the track (warning 1.78 in light, success 2.97 and info 2.74 in dark), so R-5.6-4 holds. 
+
+**Affects** `src/tokens.css` (the row knob only), the six component folders, their tests, e2e specs and mutation rows.
+
+---
+
+## 2026-10-19 - Navigation components read from their Figma Previewer frames
+
+**Decision.** Pagination, Tabs, Navbar, Sidebar, Breadcrumb and Accordion were rebuilt against their `Previewer: <Name>` frames (138:1269, 138:809, 138:2393, 138:2539, 138:1140, 138:994) and the laptop's reviewed diff lists (`review-notes/figma-audit/diffs/<slug>.md`), in dark, light and ocean, both directions; the composites are in `docs/figma/parity/`, with hover, focus-visible and scrolled captured from the live harness. What changed:
+
+- **Pagination.** A cell is wider than it is tall, as drawn: the width of its control step (`min-w-control-*`) and a step or two shorter, never under the 24 px floor; sm is 32 x 24 where the frame draws 32 x 18, which R-5.6-2 does not allow. The radius stays the control knob, the 8 px the frame writes. Cells are stroked with the decorative `--tc-line`, not `--tc-line-strong`: the digit names the link (R-5.6-4 exempts `--tc-line`). A dead edge drops its stroke; the gap is the `dots-three` icon, muted; the room between cells grows with the size (`LIST_GAP`). New prop `disabled`: every cell a span, the current page without its fill.
+- **Tabs.** The line list hugs its tabs, 20 px apart, its hairline running under the bar (`pb-px`). The enclosed list is 36 px at md: tabs one control step lower (`TABS_SIZE.enclosed`), 2 px of padding and gap. The active enclosed tab is a flat raised fill with no edge and no shadow; its semibold body label tells it, which replaces the `line-strong` edge of 2026-10-16. Inline padding is one step under a button's. The states demo gains a list whose every tab is disabled.
+- **Navbar.** The bar is 52 px with 16 px side padding and gaps (`pb-1` under a 40 px action). New prop `variant`: `solid`, the raised bar, or `transparent`, no surface. A sticky solid bar takes `shadow-md` while the page is scrolled under it, through `data-scrolled`, which the existing client part sets. The playground's brand opens on the drawn logo tile.
+- **Sidebar.** Rows follow `--tc-row-height`, now 2rem as job 114 set it (the identical line). The rail sits on `--tc-page`, 52 px collapsed, padded 8 px, rows 2 px apart and padded 8 px. The current row is the tint and the weight with no bar, which replaces the bar of the Unit 3 review; the fill is not the only cue, since the weight is kept.
+- **Breadcrumb.** New props `showHome` (the first crumb drawn as the house icon, its label kept for a screen reader) and `maxItems` (the first crumb, a muted dots mark hidden from a screen reader, and the last `maxItems - 1`; clamped to 2..100 through `BREADCRUMB_BOUNDARIES`, as Breadcrumb has no schema to carry the bound, the one place R-5.7-7 is met by the boundaries file alone). The JSON-LD keeps every crumb. A link lifts to the body colour under the pointer through the new shared `HOVER.mutedLink`, underlined 3 px down.
+- **Accordion.** A trigger is 41 px at rest (`px-3.5 py-3`, gap 10 px), a panel padded to match; the playground opens on its first item.
+
+**Why.** Round 8 makes the frames the truth for the look. Every pressable part takes the hand through the shared `POINTER` of job 120 (entry below).
+
+**Rows not built, and why.** Pagination's `shape`, `showFirstLast` and `showPrevNext` (Try it only; job 119 owns `compact`). Navbar's rounded corners (a sticky bar spans the page, where round corners leave gaps at the top of the screen), and its mobile menu toggle and open-menu state (new client behaviour and a keyboard pattern of its own; the bar wraps and its links scroll instead). Sidebar's four-sided border and radius: the Previewer draws the rail as a rounded card, but a side rail fills a layout column from the top of the page to its foot, beside the main column, so it keeps the one line on its inline end that faces the page, and its square corners meet the bar above it and the edge of the screen; a rail drawn as a card is the caller's className (`rounded-box border-(length:--tc-line-width)`). The accordion's 16 px type (the frame's own text is 14 px medium, as built). Navbar type stays text-base and text-sm, the reviewed list's own fix line. Each is left for Omar.
+
+---
+
+## 2026-10-19 - The form fields follow their Figma frames (Input, Textarea, Select, Combobox, NumberField, OTPField)
+
+**Decision.** Each field was compared with its `Previewer` frame (135:531, 135:660, 135:789, 135:939, 135:1594, 135:1768) in dark, light and ocean, both directions; the composites are in `docs/figma/parity/`. What changed:
+
+- **`--tc-row-height` is 2rem**, 32 px at a density of 1 (40 before). Every list frame draws a 31 px row of 14 px text; the row a finger gets is still 44 px (`ROW_TOUCH`). It is a knob, so Dropdown, Command, Sidebar, TreeView and FileUpload rows follow it too; their tests pin the new value.
+- **The chosen option is tinted**: `ROW_SELECTED` is the `primary-soft` fill and `primary-on-soft` text, as the frames draw it, instead of the medium weight. The tick stays, so forced colours, which erase the fill, still mark it.
+- **A Select row draws its ring from the focus** (`ROW_FOCUSED`): Base UI gives the row real focus, so a list opened or crossed by a pointer is tinted with no ring, as the frame draws it, and a key brings the 2 px ring back. Combobox keeps `ROW_HIGHLIGHT`: its focus stays in the input. An open Select keeps the ring on its trigger (`data-popup-open`), as the frame's "open" state shows.
+- **Combobox is a search field**: a magnifying glass at the inline start, no caret; the spinner still takes the inline end while a page loads.
+- **A disabled field sits on `surface`** before it dims (`FIELD_DISABLED`), as every frame draws it.
+- **NumberField**: the steppers are four fifths as wide as the field is tall (32 px at md), and the number is medium weight.
+- **OTPField**: a cell is one step of the control scale taller than it is wide (40 by 48 at md; the frame draws 38 by 46).
+- `cursor-pointer` on the Select trigger and on every Select, Combobox and NumberField option or stepper.
+- **Hover steps the line up** (`FIELD_HOVER`): from `line-strong` to `body` under the pointer, as the frames step it from `line` to `line-strong`; an invalid field keeps its red.
+- **Read-only looks like idle**, as the frames draw it: the soft fill of 10 October is gone from Input, Textarea, Select, Combobox and NumberField. It is still told apart by its attribute, by a screen reader, by the dimmed steppers of a NumberField and, under forced colours, by a Select's dashed line.
+- **Under a finger an OTP cell is 44 px wide** (`R-5.6-2`): it no longer gives up width below 44, so a six-cell row wraps where it does not fit (5 + 1 at 320 px), the way unit-4.md named as the other side of choice 38. A **NumberField is three 44 px targets wide** under a finger, with a 44 px input between its steppers; the row demo's tracks are 8.5rem, so two fields stack at 320 px. A chosen option drops its tint under forced colours, where the tick tells it.
+- Combobox's icons dim with a disabled input; a disabled Textarea has no resize grip; the states demos add NumberField at its limit, OTPField partly filled and complete, and Combobox loading.
+
+**Kept, though the frames differ.** A field's line at rest is `line-strong`, not the frame's `line` (1.3:1 in dark, 1.26:1 in light): a control boundary must reach 3:1 (WCAG 1.4.11, `BORDER_STRONG`). Invalid stays a 2 px line rather than the frame's outer ring: an outline at rest would be a ring the focus probe refuses, and a box-shadow gap cannot show the backdrop. The frame's mail icon inside an Input needs an adornment API that Input does not have. A Textarea or NumberField at its limit is not an error, so it is not red (the frames draw it red); the count turns bold and the stepper dims. The control widths are the `--tc-input-width` knob (193 px), not the frames' 170 to 230 px samples. The popup shadow is `OVERLAY_SURFACE`'s, shared with every overlay.
+
+**Affects** `src/tokens.css`, `src/shared/classes.ts`, the classes of the six fields, Combobox's client, and the tests that pinned the old values.
+
+---
+
+## 2026-10-19 - The form controls follow their Figma frames (Checkbox, RadioGroup, Switch, Slider, Rating, DatePicker, FileUpload)
+
+**Decision.** Round 8, job 115: each control was screenshotted beside its `Previewer:` frame and changed until the two matched inside the rules; the composites are `docs/figma/parity/<slug>.png`.
+
+- **The toggle scale moves up a step.** Every frame draws the `md` checkbox, radio and switch at 24 px (the switch 42 x 24 with a 20 px thumb), so `--spacing-toggle-*` is now 16, 20, 24, 28 and 32 px. A switch track stays 1.75 times its height. The `md` box now fills the 24 px target, as drawn. The Figma Size collection's `toggle/<size>` (14 to 28) is the frame's to follow.
+- **The slider knob keeps the old steps** (14, 16, 20, 24, 28 px) under its own `--spacing-knob-*` and `KNOB_SIZE`: the frame's knob is 18 px, under its 24 px boxes, so it did not move with them.
+- **DatePicker's calendar is the frame's compact one.** 268 px wide with 14 px of padding and 10 px between the month and the grid; a day is a pill at the 24 px floor in the small type step, 44 px under a finger, so the rows are 28 px apart where the frame's 19 px rows would be under R-5.6-2's floor. The trigger keeps the ring while its calendar is open (`OPEN_RING` in `shared/classes.ts`, on `data-popup-open`), and the Try it demo starts its week on Monday as the frame's panel does. The Close button in the header stays, where the frame has none: Base UI's `modal="trap-focus"` traps nothing without a `Close` part (`PopoverPopup.js`), and a touch screen-reader user, with no Escape key and no outside to press while the focus is held in the calendar, has no other way out (`docs/figma/unit-5.md`, the calendar part).
+- **FileUpload's zone says it in one line.** "Drag files here or browse", in the body colour with no underline: the whole zone is the control, so the word needs no link styling; the labels change to match (`file.drop`, `file.browse`, English and Arabic). A drag keeps the dashed line and turns it, the fill and the words primary, as drawn; under forced colours, which erase the hue and the fill, the line still turns solid. A refused file's reason is muted and its icon alone carries the danger hue; the zone's icon is 26 px. The frame's upload progress bar and its done row are not built: the component never uploads (R-8.5-2), so they need a per-file status prop, a public API for Omar to decide.
+
+- **What stays as built, against the frames, for Omar to settle.** Each one keeps a rule or an earlier decision: an invalid radio or switch keeps its 2 px inset line, where the frames draw a danger ring outside it (a resting outline is a focus ring without the focus, which R-5.6-1's probe refuses); the off switch thumb stays line-strong at 3:1, where the frame's surface-raised thumb is 1.1:1 on its track; the slider track keeps its line-strong edge (R-5.6-4); the checked radio stays primary-on-soft (the 2026-10-16 entry); Rating keeps its ring on the focused star (the Authoring Practices radio group), its warning-on-soft fill and its full-strength read-only stars; DatePicker keeps its Close button (above); FileUpload builds no progress or done row.
+
+**Why.** The Previewer frame is the truth for a component's look (round 8). The frames bind no size variable on these boxes; the numbers are the frames'.
+
+**What it affects.** `src/styles.css` (the toggle values, the knob scale), `shared/classes.ts` (`KNOB_SIZE`), `shared/cn.ts`, Switch's widths and slides, Slider's knob and padding, and the tests and e2e specs that pinned the old pixels.
+
+---
+
+## 2026-10-19 - Actions and display components read from their Figma Previewer frames
+
+**Decision.** Job 116 (round 8) compared Button, Tag, Kbd, SegmentedControl, Badge, Avatar, AvatarGroup, Card, Separator, Skeleton and CodeBlock against their `Previewer: <Name>` frames and changed the build where the frame differs. Composites are in `docs/figma/parity/<slug>.png`; each states demo is one cell per drawn state, captioned by its aria-label.
+
+- **Button.** Outline and ghost labels are `text-body` in every tone, as the component set 64:340 draws them; link keeps the tone's text. Pointer cursor on the root.
+- **Card.** Previewer spacing (18 around, 10 between), title on a 20 px line, body at `text-sm/tight`. `CardRoot render={<a href />}` renders the card as one link with the drawn hover (`HOVER.surface`, new in `shared/classes.ts`) and the focus ring; a plain card stays non-interactive. New part `CardMedia`, the full-bleed band of the Components-page drawing. This reverses the Unit 1 note that Card is built without states and the media part.
+- **Tag and Badge.** The chip sits on a 16 px line (`text-sm/4` at md), 30 px tall as drawn instead of 34. `tagVariants({ interactive: true })` is the linked tag with the drawn hover, active, focus and disabled.
+- **Kbd.** The cap is `bg-surface-raised`; `pressed` and `disabled` emit `data-pressed` and `data-disabled` as the frame's strip draws them. `muted` is named by the playground and never drawn, so it is not built.
+- **Separator.** Children make the labelled form: a line, the label, a line, 10 apart; an announced one is named by its label.
+- **Skeleton.** Rows step down (full, 5/6, 2/3) and are 0.75em thick.
+- **SegmentedControl.** A new knob, `--tc-segmented-height` (36 px times density), is the md track Figma draws, between the sm and md control steps; md and sm labels are 12 px; segments are regular, the selected one medium. The focus ring stays on the focused segment (R-5.6-1 and the keyboard spec): the frame draws it around the track. The tracks the keyboard and layout specs drive moved to `dummy/track-states.tsx`.
+- **Avatar and AvatarGroup.** Discs are `bg-neutral-soft text-neutral-on-soft`; only the group's +N counter wears the primary tint. The group's ring is `*:ring-neutral-soft`, the avatar's own fill, so fallback discs read as one shape and photos keep an edge on any surface; the `*:ring-surface-raised` override on a Card or in a Table is no longer needed. Initials step with the circle (sm xs, md base, lg lg, xl xl).
+- **CodeBlock.** Header 12 in and 32 tall, body 12 in, code at `text-xs` on an 18 px line.
+
+**Not built, for Omar.** The playground props with no drawing behind them: Card `variant` and `padding`, Badge `dot`, `uppercase` and `truncate`, Avatar `shape`, `bordered`, `status` and `clickable`, AvatarGroup `spacing`, `showCount` and `bordered`, Separator `spacing`, Kbd `variant`, `size` and `muted`, CodeBlock `theme`, `maxLines` and `lineNumbers`. CodeBlock's copy hover and copied states are live only; the copied tick is not in the success tone.
+
+---
 
 ## 2026-10-18 - The site hydrates in islands, and the shell's code waits for the first paint
 

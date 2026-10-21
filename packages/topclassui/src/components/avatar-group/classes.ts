@@ -6,9 +6,9 @@ import type { Size } from '#shared/contracts/size.js'
  * for a wrapping row is one face. shrink-0: a sibling in a flex row gives way first. */
 export const GROUP_ROOT = 'inline-flex w-max max-w-full shrink-0 flex-wrap items-center gap-y-1'
 
-/** A ring in the page colour on every child, the counter included, so an overlap reads.
- * On the root, so a Server Component never clones the avatars it was handed. */
-export const GROUP_RING = '*:ring-2 *:ring-page'
+/** A ring in the avatar's own fill on every child, so photos overlap with an edge and the discs
+ * Figma 137:572 draws stay one continuous shape. On the root, so a Server Component never clones the avatars it was handed. */
+export const GROUP_RING = '*:ring-2 *:ring-neutral-soft'
 
 /** A link or a button around an avatar is ringed as a circle too, and each child paints
  * whole before the next: without isolate the avatar before it hides the ring of a link.
@@ -28,12 +28,12 @@ export const GROUP_OVERLAP = {
 } as const satisfies Record<Size, string>
 
 /** The counter is a circle until its count is too long for one, then a pill: no digit is
- * ever cut. custom emits nothing, like every size table. */
+ * ever cut. It is the one primary disc in the row, as drawn. custom emits nothing, like every size table. */
 export const GROUP_COUNTER = {
-  xs: 'w-auto min-w-control-xs px-1',
-  sm: 'w-auto min-w-control-sm px-1',
-  md: 'w-auto min-w-control-md px-1',
-  lg: 'w-auto min-w-control-lg px-1',
-  xl: 'w-auto min-w-control-xl px-1',
+  xs: 'w-auto min-w-control-xs px-1 bg-primary-soft text-primary-on-soft ring-primary-soft',
+  sm: 'w-auto min-w-control-sm px-1 bg-primary-soft text-primary-on-soft ring-primary-soft',
+  md: 'w-auto min-w-control-md px-1 bg-primary-soft text-primary-on-soft ring-primary-soft',
+  lg: 'w-auto min-w-control-lg px-1 bg-primary-soft text-primary-on-soft ring-primary-soft',
+  xl: 'w-auto min-w-control-xl px-1 bg-primary-soft text-primary-on-soft ring-primary-soft',
   custom: '',
 } as const satisfies Record<Size, string>
