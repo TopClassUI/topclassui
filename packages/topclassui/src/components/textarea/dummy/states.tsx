@@ -6,10 +6,10 @@ const RING = 'not-forced-colors:outline-solid not-forced-colors:outline-(length:
 /** The line a hovered field draws, at rest. */
 const HOVER = 'border-body'
 
-/** The frame's strip, one cell a state named by its aria-label (the counted field wears a wrapper, so a group names its cell), each field filling a track so none spills into the next. */
+/** The frame's strip, one cell a state named by its aria-label (the counted field wears a wrapper, so a group names its cell), each field filling a track so none spills into the next; then read-only, which the frame leaves out. */
 export default function Demo() {
   return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] items-start gap-6">
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(min(8rem,100%),1fr))] items-start gap-6">
       <Textarea fullWidth rows={2} placeholder="Message" aria-label="idle" />
       <Textarea fullWidth rows={2} defaultValue="Message" aria-label="hover" className={HOVER} />
       <Textarea fullWidth rows={2} defaultValue="Message" aria-label="focus-visible" className={RING} />
@@ -18,6 +18,7 @@ export default function Demo() {
       <div role="group" aria-label="at limit">
         <Textarea fullWidth rows={2} showCount maxLength={7} defaultValue="Message" aria-label="Message at its limit" />
       </div>
+      <Textarea fullWidth rows={2} readOnly defaultValue="Message" aria-label="read-only" />
     </div>
   )
 }
