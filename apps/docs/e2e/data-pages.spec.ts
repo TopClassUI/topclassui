@@ -109,7 +109,8 @@ test('TreeView: the keyboard moves through the stage, and in Arabic ArrowLeft op
   await tree.focus()
   const components = tree.getByRole('treeitem', { name: 'components' })
   await expect(components).toHaveAttribute('aria-expanded', 'false')
-  for (let i = 0; i < 4; i++) await page.keyboard.press('ArrowDown')
+  // The stage selects page.tsx, so the focus starts there, one row above components.
+  await page.keyboard.press('ArrowDown')
   await expect(tree).toHaveAttribute('aria-activedescendant', (await components.getAttribute('id')) ?? '')
   await page.keyboard.press('ArrowLeft')
   await expect(components).toHaveAttribute('aria-expanded', 'true')
