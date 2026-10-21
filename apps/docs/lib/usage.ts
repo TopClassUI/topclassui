@@ -57,6 +57,19 @@ export function changedProps(values: Readonly<Record<string, PropValue>>, defaul
 
 const attributeNamed = (name: string) => new RegExp(`(\\s)${name}=(?:\\{[^{}]*\\}|"[^"]*")`, 'g')
 
+/** The tag that holds the spread without its own value of a prop the spread now writes, bare or literal. */
+function withoutSpreadOwn(jsx: string, name: string): string {
+  const at = jsx.search(SPREAD)
+  if (at < 0) return jsx
+  const start = jsx.lastIndexOf('<', at)
+  // Quotes and braces blanked to the same length, so a class word or an expression never matches.
+  const blank = jsx.slice(start, at).replace(/"[^"]*"|\{[^{}]*\}/g, (part) => `${part[0] ?? ''}${' '.repeat(part.length - 2)}${part.at(-1) ?? ''}`)
+  const match = new RegExp(`\\s+${name}(?:=(?:\\{\\s*\\}|"\\s*"))?(?=[\\s/>]|$)`).exec(blank)
+  if (match === null) return jsx
+  const from = start + match.index
+  return `${jsx.slice(0, from)}${jsx.slice(from + match[0].length)}`
+}
+
 /** The root element's opening tag with every brace's contents blanked, so only its own attributes can match. */
 function rootTagOf(jsx: string): string {
   let depth = 0
@@ -84,7 +97,10 @@ export function snippetOf(usage: Usage, props: readonly [string, PropValue][]): 
     const root = rootTagOf(jsx)
     const literal = [...root.matchAll(attributeNamed(name))][0]
     if (passThrough(name).test(jsx)) jsx = jsx.replace(passThrough(name), attribute)
-    else if (literal === undefined) spread.push(attribute)
+    else if (literal === undefined) {
+      jsx = withoutSpreadOwn(jsx, name)
+      spread.push(attribute)
+    }
     else {
       // The blanked tag keeps every offset, so the match's place in it is its place in the tree.
       const start = literal.index + (literal[1]?.length ?? 0)

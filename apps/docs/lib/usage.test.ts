@@ -171,6 +171,11 @@ describe('snippetOf', () => {
       .toBe('<Button variant="soft" loading>Save</Button>')
   })
 
+  it('replaces the value the spread\'s own tag writes before it, bare or literal, rather than writing the prop twice', () => {
+    const usage = { imports: [], jsx: '<div>\n  <Checkbox id="terms" className="disabled" defaultChecked size="sm" {...props} />\n</div>', passed: [] }
+    expect(snippetOf(usage, [['defaultChecked', false], ['size', 'lg'], ['disabled', true]])).toBe('<div>\n  <Checkbox id="terms" className="disabled" defaultChecked={false} size="lg" disabled />\n</div>')
+  })
+
   it('removes each pass-through at rest', () => {
     const usage = { imports: [], jsx: '<Root>\n  <Popup size={size}>\n    <Header closeButton={closeButton} />\n  </Popup>\n</Root>', passed: ['size', 'closeButton'] }
     expect(snippetOf(usage, [])).toBe('<Root>\n  <Popup>\n    <Header />\n  </Popup>\n</Root>')
