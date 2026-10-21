@@ -576,8 +576,9 @@ test.describe('six links on a 320 px screen', () => {
         await brandOf(root).focus()
         await press(page, 'Tab', 'Docs')
         expect((await scrollOf(list)).at).toBe(0)
-        const frame = await boxOf(list)
-        await page.mouse.move(frame.left + frame.width / 2, frame.top + frame.height / 2)
+        // Over the focused link: in RTL a wheel over the gap between two links leaves a list with a focused link where it is.
+        const link = await boxOf(page.locator('#demo nav a').filter({ hasText: 'Docs' }))
+        await page.mouse.move(link.left + link.width / 2, link.top + link.height / 2)
         await page.mouse.wheel(towardsEnd, 0)
         await settle()
         return Math.abs((await scrollOf(list)).at)
