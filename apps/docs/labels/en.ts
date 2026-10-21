@@ -58,7 +58,6 @@ export const en: SiteLabels = {
     utilities: { token: 'Token', utilities: 'Utilities', through: 'to' },
     props: { prop: 'Prop', type: 'Type', default: 'Default', description: 'What it does', required: 'required' },
     repeat: (count) => `, version ${String(count)}`,
-    csp: 'Content Security Policy',
   },
   providerProps: {
     children: 'Your app.',

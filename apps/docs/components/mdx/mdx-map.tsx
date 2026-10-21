@@ -45,7 +45,7 @@ export function mdxComponents(locale: Locale): MDXComponents {
     PeerRange,
     ThemeUtilities: () => <ThemeUtilities locale={locale} labels={labels.blocks.utilities} />,
     PropsTable: ({ of }: { of: 'TopClassProvider' }) => <PropsTable of={of} locale={locale} labels={labels} />,
-    ThemeScriptCsp: () => <ThemeScriptCsp locale={locale} title={labels.blocks.csp} />,
+    ThemeScriptCsp: () => <ThemeScriptCsp locale={locale} />,
     ThemeScriptHtml: () => <ThemeScriptHtml locale={locale} />,
   }
 }
