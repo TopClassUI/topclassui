@@ -106,7 +106,8 @@ test('AvatarGroup: the max select changes how many avatars show', async ({ page 
 test('Separator: the playground turns the line vertical and semantic', async ({ page }) => {
   await page.goto('/en/docs/components/separator')
   const separator = card(page, 'separator')
-  const stage = stageOf(page, 'separator').locator('[data-orientation]')
+  // The stage draws the frame's line and its labelled "or" divider, and both take Try it's props.
+  const stage = stageOf(page, 'separator').locator('[data-orientation]').first()
   await expect(stage).toHaveAttribute('role', 'none')
   await separator.getByRole('combobox', { name: 'orientation' }).click()
   await page.getByRole('option', { name: 'vertical', exact: true }).click()
@@ -119,7 +120,8 @@ test('Separator: the playground turns the line vertical and semantic', async ({ 
 test('Skeleton: the playground drives the variant and the rows', async ({ page }) => {
   await page.goto('/en/docs/components/skeleton')
   const skeleton = card(page, 'skeleton')
-  const stage = stageOf(page, 'skeleton').locator('[data-variant]').first()
+  // The playground draws an avatar circle beside the text skeleton, so the rows are the text one's.
+  const stage = stageOf(page, 'skeleton').locator('[data-variant="text"]')
   await expect(stage.locator('> span')).toHaveCount(3)
   await skeleton.getByRole('combobox', { name: 'rows' }).click()
   await page.getByRole('option', { name: '5', exact: true }).click()
