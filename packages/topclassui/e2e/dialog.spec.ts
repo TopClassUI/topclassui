@@ -1167,12 +1167,12 @@ test.describe('what a footer holds besides its actions', () => {
 
 test.describe('the states demo, as the Every state strip draws it', () => {
   for (const direction of DIRECTIONS) {
-    test(`${direction}: closed, open, alert and scrolled; the three open dialogs whole inside their cells, taking no focus, and only the long body scrolls`, async ({ page }) => {
+    test(`${direction}: closed, open, alert, scrolled and focus trapped; the four open dialogs whole inside their cells, taking no focus, and only the long body scrolls`, async ({ page }) => {
       await openLive(page, 'dialog--states', { direction })
       const cells = page.locator('#demo [title="closed"]').locator('xpath=..').locator(':scope > *')
-      expect(await cells.evaluateAll((all) => all.map((cell) => cell.getAttribute('title')))).toEqual(['closed', 'open', 'alert', 'scrolled'])
+      expect(await cells.evaluateAll((all) => all.map((cell) => cell.getAttribute('title')))).toEqual(['closed', 'open', 'alert', 'scrolled', 'focus trapped'])
       await expect(page.locator('#demo [title="closed"] [role="dialog"]')).toHaveCount(0)
-      for (const [title, scrolls] of [['open', false], ['alert', false], ['scrolled', true]] as const) {
+      for (const [title, scrolls] of [['open', false], ['alert', false], ['scrolled', true], ['focus trapped', false]] as const) {
         const cell = page.locator(`#demo [title="${title}"]`)
         const popup = cell.locator(`[role="dialog"]${OPENED}`)
         await atRest(popup)
