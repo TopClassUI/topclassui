@@ -1,6 +1,5 @@
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import type { Metadata, Viewport } from 'next'
-import { Inter, Noto_Sans_Arabic } from 'next/font/google'
 import { notFound } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { ThemeScript } from 'topclassui/theme'
@@ -10,12 +9,9 @@ import { TopClassProvider } from '../../../components/shell/provider-island'
 import { SkipLink } from '../../../components/shell/skip-link'
 import { DIRECTION, labelsFor } from '../../../labels/index'
 import { FACTS } from '../../../lib/data'
+import { fontClassOf } from '../../../lib/fonts'
 import { SITE_URL } from '../../../lib/site'
 import '../../globals.css'
-
-const inter = Inter({ subsets: ['latin'], weight: ['400', '500', '600'], variable: '--font-inter', display: 'swap' })
-// PLAN 14: only Inter is preloaded. On /en the Arabic sample of Home falls back to the system font, so its 160 KB never loads there.
-const notoArabic = Noto_Sans_Arabic({ subsets: ['arabic'], weight: ['400', '500', '600'], variable: '--font-noto-arabic', display: 'swap', preload: false })
 
 export const dynamicParams = false
 
@@ -40,7 +36,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   if (!isLocale(locale)) notFound()
   const labels = labelsFor(locale)
   return (
-    <html lang={locale} dir={DIRECTION[locale]} data-theme="dark" suppressHydrationWarning className={locale === 'ar' ? `${inter.variable} ${notoArabic.variable}` : inter.variable}>
+    <html lang={locale} dir={DIRECTION[locale]} data-theme="dark" suppressHydrationWarning className={fontClassOf(locale)}>
       <head>
         <ThemeScript />
       </head>

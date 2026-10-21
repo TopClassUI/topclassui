@@ -1,14 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { controlOf, controlsOf } from './controls.js'
+import { type Control, controlOf, controlsOf, demoStartsOf, withStarts } from './controls.js'
 
 describe('controlOf', () => {
-  it('makes an enum of three values or fewer a segmented control', () => {
+  it('makes every enum a select, as the Previewer frames draw Try it', () => {
     expect(controlOf('orientation', { type: 'string', enum: ['horizontal', 'vertical'], default: 'horizontal' }))
-      .toEqual({ prop: 'orientation', kind: 'segmented', options: ['horizontal', 'vertical'], default: 'horizontal' })
-  })
+      .toEqual({ prop: 'orientation', kind: 'select', options: ['horizontal', 'vertical'], default: 'horizontal' })
 
-  it('makes a longer enum a select', () => {
     expect(controlOf('tone', { type: 'string', enum: ['neutral', 'primary', 'success', 'warning'], default: 'neutral' }))
       .toEqual({ prop: 'tone', kind: 'select', options: ['neutral', 'primary', 'success', 'warning'], default: 'neutral' })
   })
@@ -17,7 +15,7 @@ describe('controlOf', () => {
     expect(controlOf('size', { type: 'string', enum: ['xs', 'sm', 'md', 'lg', 'xl', 'custom'], default: 'md' }))
       .toEqual({ prop: 'size', kind: 'select', options: ['xs', 'sm', 'md', 'lg', 'xl'], default: 'md' })
     expect(controlOf('width', { type: 'string', enum: ['auto', 'custom'], default: 'auto' }))
-      .toEqual({ prop: 'width', kind: 'segmented', options: ['auto', 'custom'], default: 'auto' })
+      .toEqual({ prop: 'width', kind: 'select', options: ['auto', 'custom'], default: 'auto' })
   })
 
   it('makes a boolean a switch, off when the schema has no default', () => {
@@ -25,9 +23,15 @@ describe('controlOf', () => {
     expect(controlOf('open', { type: 'boolean' })).toEqual({ prop: 'open', kind: 'switch', default: false })
   })
 
-  it('makes a bounded integer a slider with a step of one', () => {
-    expect(controlOf('visibleRows', { type: 'integer', minimum: 1, maximum: 50, default: 7 }))
-      .toEqual({ prop: 'visibleRows', kind: 'slider', min: 1, max: 50, step: 1, default: 7 })
+  it('makes a short integer range a select of every value, as frame 138:1653 draws visibleRows', () => {
+    expect(controlOf('maxLines', { type: 'integer', minimum: 1, maximum: 4, default: 2 }))
+      .toEqual({ prop: 'maxLines', kind: 'select', options: [1, 2, 3, 4], default: 2 })
+    expect(controlOf('visibleRows', { type: 'integer', minimum: 1, maximum: 100, default: 7 })).toMatchObject({ kind: 'select', default: 7 })
+  })
+
+  it('makes a wider integer range a slider with a step of one', () => {
+    expect(controlOf('loadMoreThreshold', { type: 'integer', minimum: 0, maximum: 200, default: 10 }))
+      .toEqual({ prop: 'loadMoreThreshold', kind: 'slider', min: 0, max: 200, step: 1, default: 10 })
   })
 
   it('makes a bounded number a continuous slider, and keeps a missing default as null', () => {
@@ -62,10 +66,31 @@ describe('controlsOf', () => {
         disabled: { type: 'boolean', default: false },
       },
     }
-    expect(controlsOf(json).map((control) => `${control.prop}:${control.kind}`)).toEqual(['variant:segmented', 'disabled:switch'])
+    expect(controlsOf(json).map((control) => `${control.prop}:${control.kind}`)).toEqual(['variant:select', 'disabled:switch'])
   })
 
   it('returns nothing for a schema with no properties', () => {
     expect(controlsOf({})).toEqual([])
+  })
+})
+
+describe('demoStartsOf and withStarts', () => {
+  it('reads the starts a playground demo writes in its signature', () => {
+    const source = "export default function Demo({ dismissible = true, size = 'lg', max = 3, ...props }: Props = {}) {"
+    expect(demoStartsOf(source)).toEqual({ dismissible: true, size: 'lg', max: 3 })
+    expect(demoStartsOf('export default function Demo(props: Props) {')).toEqual({})
+  })
+
+  it('starts each control at the demo start, and keeps the schema default where the demo sets none or an unknown value', () => {
+    const controls: Control[] = [
+      { prop: 'dismissible', kind: 'switch', default: false },
+      { prop: 'size', kind: 'select', options: ['sm', 'md', 'lg'], default: 'md' },
+      { prop: 'tone', kind: 'select', options: ['neutral'], default: 'neutral' },
+    ]
+    expect(withStarts(controls, { dismissible: true, size: 'lg', tone: 'violet' })).toEqual([
+      { prop: 'dismissible', kind: 'switch', default: true },
+      { prop: 'size', kind: 'select', options: ['sm', 'md', 'lg'], default: 'lg' },
+      { prop: 'tone', kind: 'select', options: ['neutral'], default: 'neutral' },
+    ])
   })
 })

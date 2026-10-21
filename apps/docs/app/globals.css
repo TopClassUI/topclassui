@@ -261,3 +261,16 @@
   [data-theme='dark'] [data-shade='dark'],
   [data-theme='ocean'] [data-shade='ocean'] { display: flex; }
 }
+
+@layer utilities {
+  /* The Previewer frames draw code flat on the page colour, not in CodeBlock's inverted box: the name stays for the region, the header goes. */
+  .docs-flat-code > div:first-child { display: none; }
+  .docs-flat-code pre {
+    padding: 0;
+    font-size: 0.75rem;
+    line-height: 1.7;
+    --tc-scrollbar-thumb: var(--tc-line-strong);
+    --tc-scrollbar-track: transparent;
+  }
+  .docs-flat-code .shiki span { color: light-dark(var(--tc-code-on-light), var(--tc-code-on-dark)); }
+}

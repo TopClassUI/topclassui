@@ -20,6 +20,7 @@ export const drawer = {
     'rtl',
   ],
   stageHeight: 12,
+  stageOpen: true,
   note: {
     en: '`placement` is logical: `start` opens from the left in English and from the right in Arabic. Never `left` or `right`.',
     ar: '`placement` منطقي: `start` يفتح من اليسار في الإنجليزية ومن اليمين في العربية. لا `left` ولا `right` أبدًا.',

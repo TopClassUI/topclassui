@@ -48,23 +48,25 @@ test('every code block shows the rewritten imports, never a path into the librar
   }
 })
 
-test('the Code tab of an example opens its source', async ({ page }) => {
+test('every example shows its stage and its source under it, with a Copy', async ({ page }) => {
   await page.goto('/en/docs/components/button')
-  const example = page.locator('section[aria-labelledby="examples"] [role="tablist"]').first()
-  await example.getByRole('tab', { name: 'Code' }).click()
-  await expect(page.getByRole('tabpanel').filter({ hasText: "from 'topclassui/button'" }).first()).toBeVisible()
+  const example = page.locator('section[aria-labelledby="examples"] article').first()
+  await expect(example.locator('pre')).toContainText("from 'topclassui/button'")
+  await expect(example.getByRole('button', { name: /Copy the .* code for Button/ })).toBeVisible()
 })
 
-test('Button: the playground drives the stage and the code', async ({ page }) => {
+test('Button: the stage draws the five variants, then the playground drives it and the code', async ({ page }) => {
   const errors = collectErrors(page)
   await page.goto('/en/docs/components/button')
   const button = card(page, 'button')
-  const stage = button.locator('button', { hasText: 'Save' })
+  const stageBox = button.locator('[style*="--tc-stage-height"]').first()
+  await expect(stageBox.getByRole('button')).toHaveCount(5)
+  const stage = stageBox.locator('button', { hasText: 'Save' })
   await expect(stage).toHaveAttribute('data-variant', 'solid')
   await button.getByRole('combobox', { name: 'variant' }).click()
   await page.getByRole('option', { name: 'soft', exact: true }).click()
   await expect(stage).toHaveAttribute('data-variant', 'soft')
-  await button.getByRole('switch', { name: 'loading' }).click()
+  await button.getByRole('checkbox', { name: 'loading' }).click()
   await expect(stage).toHaveAttribute('aria-busy', 'true')
   await expect(button.locator('pre').first()).toContainText('<Button variant="soft" loading>Save</Button>')
   expect(errors).toEqual([])
@@ -85,7 +87,7 @@ test('SegmentedControl: the client stage mounts near the viewport and takes the 
   const segmented = card(page, 'segmented-control')
   const track = segmented.getByRole('radiogroup', { name: 'View' })
   await expect(track).toBeVisible()
-  await segmented.getByRole('switch', { name: 'invalid' }).click()
+  await segmented.getByRole('checkbox', { name: 'invalid' }).click()
   await expect(track).toHaveAttribute('aria-invalid', 'true')
   await track.getByRole('radio', { name: 'Table' }).click()
   await expect(track.getByRole('radio', { name: 'Table' })).toHaveAttribute('aria-checked', 'true')

@@ -11,7 +11,8 @@ export interface Usage {
 }
 
 const SPREAD = /[ \t]*\{\.\.\.props\}/
-const IMPORT = /^import\s+(?!type\b)[^\n]*$/gm
+// A brace list may run over several lines, as a long import of a part family does.
+const IMPORT = /^import\s+(?!type\b)(?:[^\n{]*\{[^}]*\}[^\n]*|[^\n]*)$/gm
 const SIGNATURE = /export default function \w+\(\s*(?:\{([^}]*)\})?[^)]*\)[^{]*\{/
 const passThrough = (name: string) => new RegExp(`\\s+${name}=\\{${name}\\}`, 'g')
 
@@ -31,7 +32,9 @@ export function usageOf(source: string): Usage | null {
   // A multi-line tree's closing tag sits at the root's own indent, which the first line lost to the trim.
   const cut = indents.length > 0 ? Math.min(...indents) : 0
   const jsx = lines.map((line, index) => (index === 0 ? line : line.slice(Math.min(cut, line.length - line.trimStart().length)))).join('\n')
-  return { imports: source.match(IMPORT) ?? [], jsx, passed }
+  // A type the demo needs for its own props is not one the reader's usage needs.
+  const imports = (source.match(IMPORT) ?? []).map((line) => line.replace(/,\s*type \w+/g, '').replace(/\{\s*type \w+,\s*/, '{ '))
+  return { imports, jsx, passed }
 }
 
 /** One JSX attribute as a reader would type it: `size="lg"`, `loading`, `fullWidth={false}`, `max={5}`. */
@@ -84,6 +87,28 @@ export function snippetOf(usage: Usage, props: readonly [string, PropValue][]): 
     }
   }
   jsx = usage.passed.reduce((tree, name) => tree.replace(passThrough(name), ''), jsx)
+  // A spread on a line of its own goes with its line when nothing takes its place.
+  if (spread.length === 0) jsx = jsx.replace(/\n[ \t]*\{\.\.\.props\}(?=\n)/, '')
+  else jsx = jsx.replace(/^([ \t]*)\{\.\.\.props\}$/m, (_, indent: string) => spread.map((attribute) => `${indent}${attribute.trim()}`).join('\n'))
   jsx = jsx.replace(/[ \t]+(\w+)=\{\1\}/g, '').replace(SPREAD, spread.join(''))
   return usage.imports.length > 0 ? `${usage.imports.join('\n')}\n\n${jsx}` : jsx
+}
+
+const DOC_COMMENT = /^\/\*\*[\s\S]*?\*\/\n(?=export default function)/m
+const TYPE_IMPORT = /^import\s+type\b[^\n]*\n/gm
+
+/** A demo shown whole, as a reader would write it: no type imports, no docs comment, and the props the docs
+ * stage passes in taken out of the signature, the pass-throughs and the `name ?? fallback` reads. */
+export function cleanSourceOf(source: string): string {
+  const signature = SIGNATURE.exec(source)
+  const names = (signature?.[1] ?? '').split(',').map((name) => name.trim()).filter((name) => /^\w+$/.test(name))
+  let code = source.replace(TYPE_IMPORT, '').replace(DOC_COMMENT, '')
+  if (signature !== null && names.length > 0) {
+    code = code.replace(/(export default function \w+\()\s*\{[^}]*\}[^)]*\)/, '$1)')
+    for (const name of names) {
+      code = code.replace(new RegExp(`\\n[ \\t]*${name}=\\{${name}\\}(?=\\n)`, 'g'), '').replace(passThrough(name), '')
+      code = code.replace(new RegExp(`\\b${name} \\?\\? `, 'g'), '')
+    }
+  }
+  return code.replace(/\n{3,}/g, '\n\n')
 }

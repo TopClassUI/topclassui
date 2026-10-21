@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { attributeOf, changedProps, snippetOf, usageOf } from './usage'
+import { attributeOf, changedProps, cleanSourceOf, snippetOf, usageOf } from './usage'
 
 const BUTTON = `import { Button } from 'topclassui/button'
 import type { ButtonDesignProps } from 'topclassui/button'
@@ -160,5 +160,80 @@ describe('snippetOf', () => {
   it('writes a changed value over the literal the tree already passes', () => {
     expect(snippetOf({ imports: [], jsx: '<Pagination value={6} pageCount={12} {...props} />', passed: [] }, [['value', 8], ['size', 'lg']]))
       .toBe('<Pagination value={8} pageCount={12} size="lg" />')
+  })
+})
+
+describe('cleanSourceOf', () => {
+  it('takes the docs plumbing out of a demo shown whole', () => {
+    const source = [
+      "import { useState } from 'react'",
+      "import { Command } from 'topclassui/command'",
+      "import type { CommandDesignProps } from 'topclassui/command'",
+      '',
+      '/** The docs stage. */',
+      'export default function Demo({ visibleRows, defaultOpen }: CommandDesignProps = {}) {',
+      '  const [open, setOpen] = useState(defaultOpen ?? false)',
+      '  return (',
+      '    <Command',
+      '      items={COMMANDS}',
+      '      visibleRows={visibleRows}',
+      '      open={open}',
+      '    />',
+      '  )',
+      '}',
+    ].join('\n')
+    expect(cleanSourceOf(source)).toBe([
+      "import { useState } from 'react'",
+      "import { Command } from 'topclassui/command'",
+      '',
+      'export default function Demo() {',
+      '  const [open, setOpen] = useState(false)',
+      '  return (',
+      '    <Command',
+      '      items={COMMANDS}',
+      '      open={open}',
+      '    />',
+      '  )',
+      '}',
+    ].join('\n'))
+  })
+
+  it('leaves a demo with no props as it is', () => {
+    expect(cleanSourceOf('export default function Demo() {\n  return <Kbd>K</Kbd>\n}')).toBe('export default function Demo() {\n  return <Kbd>K</Kbd>\n}')
+  })
+})
+
+describe('usageOf imports', () => {
+  it('keeps an import whose brace list runs over several lines whole', () => {
+    const source = [
+      'import {',
+      '  DialogBody, DialogRoot,',
+      "} from 'topclassui/dialog'",
+      '',
+      'export default function Demo(props: Props) {',
+      '  return <DialogRoot {...props} />',
+      '}',
+    ].join('\n')
+    expect(usageOf(source)?.imports).toEqual(["import {\n  DialogBody, DialogRoot,\n} from 'topclassui/dialog'"])
+  })
+})
+
+describe('snippetOf on a multi-line root', () => {
+  it('drops the spread line and the props type when no value takes their place', () => {
+    const source = [
+      "import { Table, type TableDesignProps } from 'topclassui/table'",
+      '',
+      'export default function Demo(props: TableDesignProps) {',
+      '  return (',
+      '    <Table',
+      '      {...props}',
+      '      caption="Team"',
+      '    />',
+      '  )',
+      '}',
+    ].join('\n')
+    const usage = usageOf(source)
+    expect(usage === null ? null : snippetOf(usage, [])).toBe("import { Table } from 'topclassui/table'\n\n<Table\n  caption=\"Team\"\n/>")
+    expect(usage === null ? null : snippetOf(usage, [['striped', true]])).toBe("import { Table } from 'topclassui/table'\n\n<Table\n  striped\n  caption=\"Team\"\n/>")
   })
 })

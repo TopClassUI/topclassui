@@ -11,7 +11,7 @@ type Props = Record<string, unknown>
 const loaders = new Map<string, () => Promise<ComponentType<Props>>>()
 
 /** One loader per key, kept, so the island's effect sees the same function on every render. */
-function loaderOf(demoKey: string): () => Promise<ComponentType<Props>> {
+export function loaderOf(demoKey: string): () => Promise<ComponentType<Props>> {
   const known = loaders.get(demoKey)
   if (known !== undefined) return known
   const load = async (): Promise<ComponentType<Props>> => {

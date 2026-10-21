@@ -114,11 +114,11 @@ for (const slug of SLUGS) {
       const errors = collectErrors(page)
       await page.goto(`/${locale}/docs/components/${slug}`)
       await page.waitForLoadState('networkidle')
-      const previews = page.locator('section[aria-labelledby="examples"] [role="tabpanel"]:not([hidden])')
+      const previews = page.locator('section[aria-labelledby="examples"] [data-example-stage]')
       const count = await previews.count()
       expect(count).toBeGreaterThan(0)
       for (let index = 0; index < count; index += 1) {
-        const name = await previews.nth(index).locator('xpath=..').locator('span').first().textContent()
+        const name = await previews.nth(index).locator('xpath=..').locator('[data-example-name]').getAttribute('data-example-name')
         await drive(slug, previews.nth(index).locator('button').first())
         if (slug === 'tooltip' && name === 'disabled') {
           // The demo's own default delay passes before the check, so a tooltip that was going to open would have.
@@ -170,7 +170,7 @@ test('Dialog: size from Try it reaches the open popup and the code', async ({ pa
   await card(page, 'dialog').getByRole('button', { name: 'Publish', exact: true }).click()
   await expect(page.getByRole('dialog')).toHaveAttribute('data-size', 'lg')
   await close(page, 'dialog')
-  await card(page, 'dialog').getByRole('switch', { name: 'closeButton' }).click()
+  await card(page, 'dialog').getByRole('checkbox', { name: 'closeButton' }).click()
   await card(page, 'dialog').getByRole('button', { name: 'Publish', exact: true }).click()
   await expect(page.getByRole('dialog').getByRole('button')).toHaveText(['Cancel', 'Publish now'])
   expect(errors).toEqual([])
@@ -220,7 +220,8 @@ test('Tooltip: placement bottom opens below its trigger', async ({ page }) => {
 test('Dropdown: tone danger colours the last row', async ({ page }) => {
   await page.goto('/en/docs/components/dropdown')
   await card(page, 'dropdown').scrollIntoViewIfNeeded()
-  await card(page, 'dropdown').getByRole('radiogroup', { name: 'tone' }).getByRole('radio', { name: 'danger' }).click()
+  await card(page, 'dropdown').getByRole('combobox', { name: 'tone' }).click()
+  await page.getByRole('option', { name: 'danger', exact: true }).click()
   await expect(card(page, 'dropdown').locator('pre').first()).toContainText('tone="danger"')
   await card(page, 'dropdown').getByRole('button', { name: 'Actions', exact: true }).click()
   await expect(page.getByRole('menuitem', { name: 'Delete' })).toHaveAttribute('data-tone', 'danger')
@@ -232,7 +233,7 @@ test('Command: defaultOpen from Try it opens the palette with its list', async (
   await card(page, 'command').scrollIntoViewIfNeeded()
   // Pressed once the demo has mounted, so Try it must remount it for defaultOpen to take effect.
   await page.waitForLoadState('networkidle')
-  await card(page, 'command').getByRole('switch', { name: 'defaultOpen' }).click()
+  await card(page, 'command').getByRole('checkbox', { name: 'defaultOpen' }).click()
   const palette = page.getByRole('dialog')
   await expect(palette).toBeVisible()
   await expect(palette.getByRole('option', { name: 'Dialog' })).toBeVisible()

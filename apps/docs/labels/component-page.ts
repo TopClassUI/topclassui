@@ -21,9 +21,16 @@ export interface ComponentPageLabels {
   copyCode: string
   everyState: string
   stateCount: (n: number) => string
-  importFromPackage: string
+  /** The visible word on the code's copy button, and what its status says. */
+  copy: string
+  copied: string
+  copyFailed: string
+  copySource: string
+  copySourceNote: string
+  copyAdd: (component: string) => string
+  thenImport: string
+  thenImportNote: string
   copyImport: (component: string) => string
-  installOnce: string
   chip: { lazy: string }
   demoTabs: (component: string) => string
   preview: string
@@ -80,9 +87,15 @@ const en: ComponentPageLabels = {
   copyCode: 'Copy the code',
   everyState: 'Every state',
   stateCount: (n) => (n === 1 ? '1 state' : `${String(n)} states`),
-  importFromPackage: 'Import from the package',
+  copy: 'Copy',
+  copied: 'Copied',
+  copyFailed: 'Could not copy',
+  copySource: 'Copy the source',
+  copySourceNote: 'Source lands in your repo. You own it.',
+  copyAdd: (component) => `Copy the add command for ${component}`,
+  thenImport: 'Then import it',
+  thenImportNote: 'It is your file now. Edit it freely; topclassui diff shows what changed upstream.',
   copyImport: (component) => `Copy the import for ${component}`,
-  installOnce: 'Install once:',
   chip: { lazy: 'lazy' },
   demoTabs: (component) => `${component} demo`,
   preview: 'Preview',
@@ -140,9 +153,15 @@ const ar: ComponentPageLabels = {
     const word = { zero: 'حالة', one: 'حالة واحدة', two: 'حالتان', few: 'حالات', many: 'حالة', other: 'حالة' }[rule]
     return rule === 'one' || rule === 'two' ? word : `${String(n)} ${word}`
   },
-  importFromPackage: 'أو استورده من الحزمة',
+  copy: 'نسخ',
+  copied: 'نُسخ',
+  copyFailed: 'تعذّر النسخ',
+  copySource: 'انسخ الشيفرة المصدرية',
+  copySourceNote: 'تصل الشيفرة إلى مستودعك. أنت تملكها.',
+  copyAdd: (component) => `انسخ أمر الإضافة لـ ${component}`,
+  thenImport: 'ثم استورده',
+  thenImportNote: 'الملف ملفك الآن. عدّله بحرية؛ يُظهر topclassui diff ما تغيّر في المصدر.',
   copyImport: (component) => `انسخ الاستيراد لـ ${component}`,
-  installOnce: 'ثبّت مرة واحدة:',
   chip: { lazy: 'عند الطلب' },
   demoTabs: (component) => `مثال ${component}`,
   preview: 'العرض',

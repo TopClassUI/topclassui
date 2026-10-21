@@ -8,6 +8,7 @@ export const dropdown = {
   },
   demos: ['basic', 'groups', 'danger-item', 'with-links', 'data-driven', 'placements', 'sixty-items', 'in-dialog', 'rtl'],
   stageHeight: 12,
+  stageOpen: true,
   note: {
     en: '`href` and Server Action items work from a server page; `onSelect` is a plain function and needs a client file.',
     ar: 'عناصر `href` وإجراء الخادم تعمل من صفحة خادم؛ أما `onSelect` فدالة عادية تحتاج ملف عميل.',

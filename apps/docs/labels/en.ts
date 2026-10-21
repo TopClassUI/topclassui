@@ -198,14 +198,15 @@ export const en: SiteLabels = {
   },
   catalog: {
     title: 'Components',
-    lead: (count) => `${String(count)} components, each with a live preview: every state at once, a playground wired to the real props, and the import line.`,
+    lead: (count) => `${String(count)} components, each with a live preview. Every state at once, a playground wired to the real props, and two ways to use each one: copy the source into your project, or install the package.`,
+    metaTitle: 'Components - TopClass UI',
     description: 'Every TopClass UI component on one page, with a live preview, a playground on the real props, every state and its import line.',
     beforeTitle: 'Before you start',
     beforeOnce: 'once per app',
-    beforeLead: 'Every card below shows an import line. These three steps make it work.',
+    beforeLead: 'Every card below shows a copy command and an import line. These four steps make either of them work.',
     steps: {
       install: {
-        title: '1. Install the package',
+        title: '1. Install the package and its peers',
         note: 'Three peer dependencies: react, react-dom and Tailwind CSS 4.2 or later. Your project already has them, and zod installs with the package.',
       },
       css: {
@@ -216,6 +217,11 @@ export const en: SiteLabels = {
         title: '3. The root layout',
         note: 'Pass direction and locale to TopClassProvider as props from your layout; never read them from document.dir in an effect. ThemeScript goes first in <head>: it sets data-theme before the first paint.',
       },
+      source: {
+        title: '4. Or copy the source into your repo',
+        note: 'The CLI copies the source into your project with its constants, schema, types and variants. Steps 2 and 3 still apply.',
+      },
+      addComment: '# then add the components you want:',
     },
     legendTitle: 'How to read a card',
     legendLead: 'Every component below is laid out the same way, so you learn it once. Five parts, top to bottom.',
@@ -224,7 +230,7 @@ export const en: SiteLabels = {
       { title: 'Try it', text: 'Every prop you can change, with its allowed values.' },
       { title: 'The code', text: 'The JSX that produces the preview above it. Copy it, paste it and it runs.' },
       { title: 'Every state', text: 'Hover, focus, disabled, loading, error - all at once. You never hover to review a state.' },
-      { title: 'Import it', text: 'The one import line from the package, and the install command.' },
+      { title: 'Two ways in', text: 'Copy the source into your repo, or import it from the package. Same component.' },
     ],
     sectionCount: (n) => (n === 1 ? '1 component' : `${String(n)} components`),
     startHere: 'Start here',
@@ -237,6 +243,9 @@ export const en: SiteLabels = {
     placeholder: 'Search pages and components',
     groups: { pages: 'Pages', components: 'Components', icons: 'Icons' },
     shortcut: { pc: 'Ctrl K', mac: '⌘ K' },
+    enter: 'Enter',
+    empty: 'No results',
+    loading: 'Loading the index',
   },
   llms: {
     summary: 'React components for Next.js, RTL-first and server-first, built on Tailwind CSS v4 and Base UI.',

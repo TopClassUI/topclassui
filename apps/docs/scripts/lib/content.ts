@@ -21,6 +21,14 @@ export const contentSchema = z.strictObject({
   demos: z.array(z.string().min(1)).min(1),
   stageHeight: z.number().positive(),
   stageDemo: z.string().min(1).optional(),
+  /** The frame draws the overlay open in the stage: the playground demo gets `stage` and renders open inside its own root. */
+  stageOpen: z.boolean().optional(),
+  /** Boolean props the schema leaves to the element (a native `disabled`) that Try it still offers, as the frame draws them. */
+  extraSwitches: z.array(z.string().regex(/^[a-z][A-Za-z]*$/)).optional(),
+  /** Props Try it lists first, in the frame's order; the rest follow in the schema's. */
+  /** Where Try it starts a prop the playground sets in its body rather than its signature, so the control shows what the stage draws. */
+  starts: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional(),
+  controlOrder: z.array(z.string().regex(/^[a-z][A-Za-z]*$/)).optional(),
   note: both,
   notes: bothLists,
   keyboard: z.array(z.strictObject({ keys: z.array(z.string().min(1)).min(1), action: both })),

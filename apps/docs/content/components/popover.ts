@@ -8,6 +8,7 @@ export const popover = {
   },
   demos: ['basic', 'with-close', 'hover', 'with-form', 'modal', 'placements', 'long-content', 'rtl'],
   stageHeight: 12,
+  stageOpen: true,
   note: {
     en: 'A tooltip is plain text only: its children are typed as text. Anything with a link or a control is a Popover.',
     ar: 'التلميح نص فقط: أبناؤه مكتوبون كنص. كل ما فيه رابط أو عنصر تحكم هو نافذة منبثقة.',

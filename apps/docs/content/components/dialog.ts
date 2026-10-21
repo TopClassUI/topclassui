@@ -21,6 +21,7 @@ export const dialog = {
     'rtl',
   ],
   stageHeight: 12,
+  stageOpen: true,
   note: {
     en: 'Wrap the parts in a form with the class `contents`, and a Server Action submits from the footer with no client handler.',
     ar: 'غلّف الأجزاء بنموذج يحمل الصنف `contents`، فيُرسَل إجراء الخادم من التذييل دون أي معالج في المتصفح.',
