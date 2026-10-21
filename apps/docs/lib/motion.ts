@@ -22,10 +22,12 @@ export function armMotion(doc: Document): () => void {
       observer.unobserve(entry.target)
     }
   }, { rootMargin: '0px 0px -10% 0px' })
+  const candidates = [...doc.querySelectorAll<HTMLElement>('[data-motion]')]
+    .filter((element) => !(skipReveal && element.dataset['motion'] === 'reveal') && !element.hasAttribute('data-motion-play'))
+  // Every read before any write: a write between two reads lays the page out again (a forced reflow).
+  const below = candidates.filter((element) => element.getBoundingClientRect().top >= view.innerHeight)
   const held: Element[] = []
-  for (const element of doc.querySelectorAll<HTMLElement>('[data-motion]')) {
-    if (skipReveal && element.dataset['motion'] === 'reveal') continue
-    if (element.hasAttribute('data-motion-play') || element.getBoundingClientRect().top < view.innerHeight) continue
+  for (const element of below) {
     for (const run of element.querySelectorAll<HTMLElement>('[data-count]')) run.style.setProperty('--docs-count-to', run.dataset['count'] ?? '0')
     element.setAttribute('data-motion-wait', '')
     held.push(element)
