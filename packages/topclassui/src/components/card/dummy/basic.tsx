@@ -1,14 +1,19 @@
-import { CardBody, CardHeader, CardRoot } from '../index.js'
+import { Button } from '#components/button/index.js'
+import { CardBody, CardFooter, CardHeader, CardRoot } from '../index.js'
 
-/** The first drawing: a title and a line of text, with nothing to press. */
+/** The stage drawing: a title, a line of text and two small buttons in the footer. */
 export default function Demo() {
   return (
-    <div className="max-w-xs">
+    <div className="w-75 max-w-full">
       <CardRoot>
         <CardHeader>
-          <h2>Storage</h2>
+          <h2>Ship it everywhere</h2>
         </CardHeader>
-        <CardBody>You have used 18 GB of the 50 GB in your plan.</CardBody>
+        <CardBody>One design system for a browser, a phone and an Arabic page.</CardBody>
+        <CardFooter>
+          <Button size="sm">Read more</Button>
+          <Button size="sm" variant="outline" tone="neutral">Later</Button>
+        </CardFooter>
       </CardRoot>
     </div>
   )
