@@ -21,9 +21,13 @@ export async function openIn(page: Page, path: string, mode: string) {
 
 export const card = (page: Page, slug: string) => page.locator(`[data-component="${slug}"]`)
 
-/** A landmark-unique node that is a nav inside a card or an example: a component shown many times under its default name (open for Omar). */
-const demoNav = (page: Page, selector: string) => page.locator(selector).first()
-  .evaluate((element) => element.tagName === 'NAV' && element.closest('[data-component], section[aria-labelledby="examples"]') !== null)
+/** A landmark-unique made only of navs, at most one of them outside the demos: a component shown many times under its default
+ * name, beside the page's own copy as the component page's breadcrumb is (open for Omar). */
+const demoNavs = (page: Page, targets: string[]) => page.evaluate((all) => {
+  const placed = all.map((target) => document.querySelector(target))
+  const inDemo = (element: Element | null) => element !== null && element.closest('[data-component], section[aria-labelledby="examples"]') !== null
+  return placed.every((element) => element?.tagName === 'NAV') && placed.filter((element) => !inDemo(element)).length <= 1
+}, targets)
 
 /** axe's violations on the page, less contrast inside a disabled control: WCAG 1.4.3 exempts an inactive component.
  * With `demoCopies`, also less landmark-unique between copies of a demo's own nav, as the Navigation pages allow. */
@@ -35,7 +39,8 @@ export async function axeViolations(page: Page, { demoCopies = false } = {}): Pr
       const selector = node.target.join(' ')
       const inactive = violation.id === 'color-contrast'
         && await page.locator(selector).first().evaluate((element) => element.closest('[data-disabled]') !== null)
-      const copy = demoCopies && violation.id === 'landmark-unique' && await demoNav(page, selector)
+      const related = node.any.flatMap((check) => check.relatedNodes ?? []).map((other) => other.target.join(' '))
+      const copy = demoCopies && violation.id === 'landmark-unique' && await demoNavs(page, [selector, ...related])
       if (!inactive && !copy) found.push(`${violation.id}: ${selector}`)
     }
   }
