@@ -7,6 +7,7 @@ import { palette } from 'topclassui/icons/palette'
 import { sun } from 'topclassui/icons/sun'
 
 import type { Mode } from '../../labels/index'
+import { MODE_SEGMENT } from '../classes'
 import { useModeSwitch } from './use-mode-switch'
 
 export interface ModeSwitchProps {
@@ -23,7 +24,7 @@ export function ModeSwitch({ label, names }: ModeSwitchProps) {
   return (
     <SegmentedControlRoot aria-label={label} value={mode} onValueChange={select} size="sm">
       {ORDER.map((value) => (
-        <SegmentedControlItem key={value} value={value} icon={<Svg icon={ICONS[value]} />}>
+        <SegmentedControlItem key={value} value={value} icon={<Svg icon={ICONS[value]} />} className={MODE_SEGMENT}>
           <span className="max-md:sr-only">{names[value]}</span>
         </SegmentedControlItem>
       ))}
