@@ -23,7 +23,9 @@ const COMBOBOXES: Record<string, string[]> = {
   'playground': ['Framework: '],
   'rtl': ['المدينة: عمّان'],
   'sizes': ['Fruit, extra small: Apple', 'Fruit, small: Banana', 'Fruit, medium: Cherry', 'Fruit, large: Date', 'Fruit, extra large: '],
-  'states': ['Invalid: Jordan', 'Disabled: Egypt', 'Read-only: Saudi Arabia', 'One option disabled: ', 'Loading: jor'],
+  'states': [
+    'idle: ', 'focus-visible: Jordan', 'open: jor', 'loading: jor', 'empty: zzz', 'disabled: ', 'invalid: Jordan', 'read-only: Saudi Arabia', 'one option disabled: ',
+  ],
   'status': ['City, loading: ', 'City, loading more: '],
   'ten-thousand': ['Ten thousand options: '],
 }
