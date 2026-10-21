@@ -7,3 +7,5 @@ export const SearchButton = island(() => import('../search/search-button').then(
 export const ModeSwitch = island(() => import('./mode-switch').then((m) => m.ModeSwitch), 'idle')
 export const MobileMenu = island(() => import('./mobile-menu').then((m) => m.MobileMenu), 'idle')
 export const SidebarRoot = island(() => import('topclassui/sidebar').then((m) => m.SidebarRoot))
+// Near the viewport, not idle: under 80rem On this page is hidden, so its spy never loads there.
+export const TocList = island(() => import('./toc-list').then((m) => m.TocList))

@@ -10,7 +10,7 @@ import { SECTIONS } from '../../content/sections'
 import { EXTERNAL_REL } from '../../lib/external'
 import { CARDS } from '../../lib/data'
 import { GITHUB_URL, INSTALL_LINE, PRERELEASE, VERSION, X_URL, YOUTUBE_URL } from '../../lib/site'
-import { QUIET_LINK } from '../classes'
+import { QUIET_LINK, TYPE } from '../classes'
 import { CommandBox } from '../command-box'
 import { GithubMark, XMark, YoutubeMark } from '../home/brand-logos'
 import { BrandTile } from './brand-mark'
@@ -44,10 +44,10 @@ export function SiteFooter({ locale, labels }: { locale: Locale; labels: SiteLab
   ]
   return (
     <footer className="border-t border-line bg-surface">
-      <div className="grid grid-cols-2 gap-x-6 gap-y-10 px-4 py-10 md:grid-cols-4 md:px-10 lg:grid-cols-[25rem_repeat(4,minmax(0,1fr))] lg:gap-12">
+      <div className="grid grid-cols-2 gap-x-6 gap-y-10 px-4 py-10 md:grid-cols-4 md:px-10 lg:grid-cols-[22.5rem_repeat(4,minmax(0,1fr))] lg:gap-12">
         <div className="col-span-full flex max-w-md flex-col gap-3 lg:col-span-1">
-          <p className="flex items-center gap-2 text-base font-semibold text-body">
-            <BrandTile />
+          <p className={`flex items-center gap-2 font-semibold text-body ${TYPE.name}`}>
+            <BrandTile className="size-5" />
             {labels.meta.siteName}
           </p>
           <p className="text-sm font-medium text-body">{labels.footer.tagline}</p>
@@ -60,7 +60,7 @@ export function SiteFooter({ locale, labels }: { locale: Locale; labels: SiteLab
           <div className="flex flex-wrap items-center gap-2 pt-1">
             <CommandBox code={INSTALL_LINE} locale={locale} size="sm" className="w-fit" />
             {GITHUB_URL === null ? null : (
-              <Button size="sm" render={<a href={GITHUB_URL} rel={EXTERNAL_REL} />}>
+              <Button size="sm" className="text-xs" render={<a href={GITHUB_URL} rel={EXTERNAL_REL} />}>
                 <Icon name="github-logo" />
                 {labels.home.hero.star}
               </Button>

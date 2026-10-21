@@ -4,8 +4,40 @@ import { BORDER, FOCUS_RING, HOVER, POINTER, SCROLL_X, TOUCH_TARGET, TRANSITION 
 /** A text link inside prose or a list: the library's ring and target, underlined on hover. */
 export const TEXT_LINK = `inline-flex items-center text-primary-on-soft underline-offset-4 ${HOVER.link} ${FOCUS_RING} ${TOUCH_TARGET} rounded-chip`
 
+/** The shell's type steps between the library's 12, 14 and 16 px, as the docs frames draw them: 11, 13, 15 (a lead, or a name on one line) and 32 px. */
+export const TYPE = {
+  eyebrow: 'text-[0.6875rem] leading-4',
+  nav: 'text-[0.8125rem] leading-5',
+  lead: 'text-[0.9375rem] leading-6',
+  name: 'text-[0.9375rem] leading-5',
+  title: 'text-[2rem] leading-10',
+} as const
+
+const QUIET = `inline-flex items-center ${HOVER.link} ${FOCUS_RING} ${TOUCH_TARGET} ${TRANSITION} rounded-chip`
+
 /** A quiet link in the footer or On this page. */
-export const QUIET_LINK = `inline-flex items-center text-muted ${HOVER.link} ${FOCUS_RING} ${TOUCH_TARGET} ${TRANSITION} rounded-chip`
+export const QUIET_LINK = `${QUIET} text-muted`
+
+/** An On this page entry: the section being read in the primary text and heavier, so colour is not the only cue. */
+export const TOC_LINK = {
+  current: `${QUIET} font-medium text-primary-on-soft`,
+  rest: QUIET_LINK,
+} as const
+
+/** The small capitals over a list: a sidebar group, On this page, a pager card. Arabic has no case. */
+export const SHELL_EYEBROW = `${TYPE.eyebrow} font-medium text-muted uppercase`
+
+/** The navbar's search trigger, sunk into the page with a quiet label; merged after the Button's own classes. */
+export const SEARCH_TRIGGER = `bg-page font-normal text-muted ${TYPE.nav}`
+
+/** A segment of the mode switch, regular and the chosen one medium; merged after the segment's own classes. */
+export const MODE_SEGMENT = `font-normal data-checked:font-medium ${TYPE.nav}`
+
+/** A sidebar row merged after the library's: muted until hovered; the page being read keeps its pill and primary text, without the edge bar. */
+export const SIDE_LINK = {
+  current: `px-2 font-medium before:hidden ${TYPE.nav}`,
+  rest: `px-2 text-muted hover:text-body ${TYPE.nav}`,
+} as const
 
 /** The skip link: hidden until it takes the focus, then drawn above the navbar. */
 export const SKIP_LINK = `sr-only focus:not-sr-only focus:fixed focus:top-2 focus:inset-s-2 focus:z-(--tc-z-toast) focus:p-3 bg-surface-raised text-body rounded-control ${FOCUS_RING}`
@@ -63,6 +95,9 @@ export const CARD_PART = 'grid min-w-0 gap-3 border-t-(length:--tc-line-width) b
 export const CARD_HEAD = 'grid min-w-0 gap-3 p-4.5'
 export const SECTION = 'grid min-w-0 scroll-mt-(--tc-sticky-top,0px) gap-3'
 export const H1 = 'text-4xl font-semibold text-body'
+/** A guide page's title and lead, a step under H1 and LEAD, as the guide frames draw them. */
+export const GUIDE_TITLE = `${TYPE.title} font-semibold text-body`
+export const GUIDE_LEAD = `${TYPE.lead} text-muted`
 export const H2 = 'group/heading flex items-center gap-2 text-xl font-semibold text-body'
 export const CARD_TITLE = 'text-lg font-semibold text-body'
 export const H3 = 'text-xs font-semibold text-muted uppercase'
