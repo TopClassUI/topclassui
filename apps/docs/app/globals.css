@@ -6,6 +6,8 @@
 :root {
   --tc-font-latin: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --tc-font-arabic: var(--font-noto-arabic), ui-sans-serif, system-ui, sans-serif;
+  /* Arabic in a code comment falls back to Noto Sans Arabic, not a system monospace that spaces its letters apart. */
+  --tc-font-mono: ui-monospace, monospace, var(--font-noto-arabic, monospace);
   --docs-sidebar: 13.75rem;
   --docs-toc: 11.875rem;
   --docs-column: 59rem;
@@ -83,6 +85,17 @@
   .docs-number-info { --docs-number-tone: var(--tc-info-solid); --docs-number-text: var(--tc-info-on-soft); }
   .docs-number-success { --docs-number-tone: var(--tc-success-solid); --docs-number-text: var(--tc-success-on-soft); }
   .docs-number-warning { --docs-number-tone: var(--tc-warning-solid); --docs-number-text: var(--tc-warning-on-soft); }
+
+  /* The first number: the drawn saturated primary over its inline-start half, solid under the text so on-solid stays AA. */
+  .docs-number-lead {
+    background-image:
+      linear-gradient(calc(90deg * var(--tc-dir)), var(--tc-primary-solid) 7rem, color-mix(in oklch, var(--tc-primary-solid) 80%, transparent) 46%, color-mix(in oklch, var(--tc-primary-solid) 35%, transparent) 62%, transparent 80%),
+      linear-gradient(to bottom, transparent, color-mix(in oklch, var(--tc-page) 40%, transparent));
+  }
+
+  .docs-number-lead .docs-number-glow { display: none; }
+
+  .docs-number-lead .docs-number-value { background: none; color: var(--tc-primary-on-solid); }
 }
 
 @layer components {
