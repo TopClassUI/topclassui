@@ -25,11 +25,12 @@ const COUNTS: Record<string, { roots: number, tabs: number, panels: number }> = 
   'rtl': { roots: 1, tabs: 3, panels: 3 },
   'server-content': { roots: 1, tabs: 2, panels: 2 },
   'sizes': { roots: 12, tabs: 24, panels: 24 },
-  'states': { roots: 3, tabs: 9, panels: 9 },
+  // The strip draws lists only, as the frame does: how a tab looks, with no panel under it.
+  'states': { roots: 4, tabs: 12, panels: 0 },
 }
 
-/** A sentence each demo keeps in a panel that is not the one it opens on. */
-const HIDDEN_TEXT: Record<string, string> = {
+/** A sentence each demo keeps in a panel that is not the one it opens on; null where the demo has no panel. */
+const HIDDEN_TEXT: Record<string, string | null> = {
   'basic': 'Only an owner can rename or delete this project.',
   'controlled': 'Everyone can read a published post.',
   'disabled': 'Two props changed their default.',
@@ -40,7 +41,7 @@ const HIDDEN_TEXT: Record<string, string> = {
   'rtl': 'لا يعيد تسمية المشروع أو يحذفه إلا مالكه.',
   'server-content': '<li>Yousef Nasser</li>',
   'sizes': 'Props of your own size.',
-  'states': 'A tab at rest sits on the tinted box.',
+  'states': null,
 }
 
 const render = async (file: string) => {
@@ -79,12 +80,14 @@ describe('every demo renders on the server', () => {
     it(`${file}.tsx opens each root on one tab, so the server HTML shows one panel a root and hides the rest`, async () => {
       const html = await render(file)
       const shown = tags(html, 'tabpanel').filter((tag) => attr(tag, 'hidden') === undefined)
-      expect(shown.length, file).toBe(COUNTS[file]?.roots)
+      expect(shown.length, file).toBe(COUNTS[file]?.panels === 0 ? 0 : COUNTS[file]?.roots)
       expect(tags(html, 'tab').filter((tag) => attr(tag, 'aria-selected') === 'true').length, file).toBe(COUNTS[file]?.roots)
     })
 
     it(`${file}.tsx has the text of a panel that is not open in its HTML`, async () => {
-      expect(await render(file), file).toContain(HIDDEN_TEXT[file])
+      const text = HIDDEN_TEXT[file]
+      if (text === null) expect(tags(await render(file), 'tabpanel'), file).toEqual([])
+      else expect(await render(file), file).toContain(text)
     })
 
     it(`${file}.tsx names every list of tabs`, async () => {
