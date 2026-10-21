@@ -136,7 +136,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the segmented control track is no offset parent and keeps no scroll padding, so an arrow in RTL leaves a segment cut',
     file: CLASSES,
-    from: '`relative flex w-fit max-w-full items-stretch gap-0.5 rounded-control bg-surface p-0.75 scroll-px-px ',
+    from: '`relative flex w-fit max-w-full items-stretch gap-0.5 rounded-control bg-surface p-0.75 scroll-px-0.5 ',
     to: '`flex w-fit max-w-full items-stretch gap-0.5 rounded-control bg-surface p-0.75 ',
   },
   {
