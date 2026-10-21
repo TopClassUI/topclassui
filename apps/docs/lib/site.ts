@@ -13,8 +13,8 @@ export const NPM_URL = 'https://www.npmjs.com/package/topclassui'
 
 export const YOUTUBE_URL: string | null = 'https://www.youtube.com/@topclassui'
 
-/** Left out until there is a handle: a link to nothing is never drawn (choice 12). */
-export const X_URL: string | null = null
+/** The X account Omar opened on 2026-10-21, the same handle as the others. */
+export const X_URL: string | null = 'https://x.com/topclassui'
 
 /** The one handle Home's Follow us cards print, the same on every network. */
 export const HANDLE = '@topclassui'
