@@ -14,7 +14,7 @@ import { FORCED_CANVAS, contrast, inkOn, pixelsOf } from './pixels.js'
 // and the form, before hydration and after a reset.
 
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['basic', 'form', 'grouped', 'long', 'playground', 'rtl', 'sizes', 'states'].map((demo) => `otp-field--${demo}`)
+const DEMOS = ['basic', 'form', 'grouped', 'long', 'playground', 'rtl', 'sizes', 'states', 'combined'].map((demo) => `otp-field--${demo}`)
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 
 const css = (element: Locator, property: string) => element.evaluate((el, name) => getComputedStyle(el).getPropertyValue(name), property)
@@ -144,7 +144,7 @@ test.describe('the states, on the static page', () => {
   test.use({ reducedMotion: 'reduce' })
 
   test('invalid: every cell turns to danger and is 2 px thick; read-only looks like a live field; disabled dims to half', async ({ page }) => {
-    await page.goto(urlFor('otp-field--states', 'light', 'ltr'))
+    await page.goto(urlFor('otp-field--combined', 'light', 'ltr'))
     const danger = await resolve(page, 'var(--tc-danger-solid)')
     const line = await resolve(page, 'var(--tc-line-strong)')
     const [invalid, disabled, readOnly] = await page.locator('#demo [role="group"]').all()
@@ -187,7 +187,7 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(inkOn(await inside(page, cells.nth(4)), canvas)).toBe(0)
       expect(contrast(await toRgb(page, await css(cells.nth(4), 'border-top-color')), canvas)).toBeGreaterThanOrEqual(3)
 
-      await page.goto(urlFor('otp-field--states', 'light', 'ltr'))
+      await page.goto(urlFor('otp-field--combined', 'light', 'ltr'))
       const [invalid, , readOnly] = await page.locator('#demo [role="group"]').all()
       expect(await css((invalid as Locator).locator('input').first(), 'border-top-width')).toBe('2px')
       expect(await css((readOnly as Locator).locator('input').first(), 'border-top-width')).toBe('1px')
