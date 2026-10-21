@@ -4,7 +4,7 @@ import { FileUpload } from '../index.js'
  * danger and thicker. Drag over, uploading, done and error need a held file or a drag, which a server cannot draw. */
 export default function Demo() {
   return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] items-start gap-6">
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(min(12rem,100%),1fr))] items-start gap-6">
       <div role="group" aria-label="idle">
         <label htmlFor="file-upload-idle" className="sr-only">idle</label>
         <FileUpload id="file-upload-idle" name="idle" />

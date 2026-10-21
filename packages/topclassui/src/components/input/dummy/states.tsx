@@ -9,7 +9,7 @@ const HOVER = 'border-body'
 /** The frame's strip, one cell a state named by its aria-label, each field filling a track so none spills into the next. */
 export default function Demo() {
   return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] items-start gap-6">
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(min(8rem,100%),1fr))] items-start gap-6">
       <Input fullWidth placeholder="Email" aria-label="idle" />
       <Input fullWidth placeholder="Email" aria-label="hover" className={HOVER} />
       <Input fullWidth defaultValue="you@mail.com" aria-label="focus-visible" className={RING} />

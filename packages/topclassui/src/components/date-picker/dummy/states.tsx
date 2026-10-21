@@ -7,7 +7,7 @@ const RING = 'not-forced-colors:outline-solid not-forced-colors:outline-(length:
  * the frame draws, its calendar left shut so it covers no cell, and today is the trigger holding the day the calendar marks. */
 export default function Demo() {
   return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] items-start gap-6">
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(min(10rem,100%),1fr))] items-start gap-6">
       <DatePicker fullWidth aria-label="idle" />
       <DatePicker fullWidth aria-label="open" defaultValue="2026-09-22" className={RING} />
       <DatePicker fullWidth aria-label="selected" defaultValue="2026-09-22" />
