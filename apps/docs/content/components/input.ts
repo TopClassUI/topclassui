@@ -11,6 +11,7 @@ export const input = {
   },
   demos: ['labelled', 'types', 'sizes', 'full-width', 'row', 'custom-size', 'skeleton', 'rtl'],
   stageHeight: 7,
+  extraSwitches: ['disabled', 'required'],
   note: {
     en: 'Outside a Field, Input needs `id`, `aria-label` or `aria-labelledby`: the types reject an unlabelled one.',
     ar: 'خارج Field يحتاج Input إلى `id` أو `aria-label` أو `aria-labelledby`: الأنواع ترفض حقلًا بلا تسمية.',

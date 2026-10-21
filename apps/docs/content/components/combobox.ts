@@ -11,6 +11,7 @@ export const combobox = {
   },
   demos: ['basic', 'form', 'sizes', 'load-more', 'status', 'ten-thousand', 'long-content', 'rtl'],
   stageHeight: 7,
+  extraSwitches: ['disabled'],
   note: {
     en: 'Filtering runs over the options loaded so far; the next page arrives through `hasMore` and `loadMore`.',
     ar: 'تجري التصفية على الخيارات المحمّلة حتى الآن؛ وتصل الصفحة التالية عبر `hasMore` و`loadMore`.',

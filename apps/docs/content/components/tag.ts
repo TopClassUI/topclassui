@@ -8,6 +8,7 @@ export const tag = {
   },
   demos: ['topics', 'tones', 'sizes', 'with-icon', 'removable', 'removable-sizes', 'link', 'long-label', 'element-label', 'custom-size', 'rtl'],
   stageHeight: 20,
+  stageDemo: 'tones',
   note: {
     en: 'A plain Tag stays on the server; `onRemove` is the switch that adds the x, and taking the tag out of the list is yours.',
     ar: 'الوسم العادي يبقى على الخادم، و`onRemove` هو ما يضيف زر الإزالة، وإخراج الوسم من القائمة مسؤوليتك.',

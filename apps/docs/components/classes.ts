@@ -124,7 +124,7 @@ export const CHIP = `inline-flex items-center rounded-chip px-2 py-0.5 font-mono
 /** The legend's step number in its soft round badge. */
 export const LEGEND_NUMBER = 'inline-flex size-4.5 shrink-0 items-center justify-center rounded-full bg-primary-soft text-xs font-semibold text-primary-on-soft'
 /** Every state: the cells share the row, each at least 144 px (six fit the frames' 906), and wrap below that; a wide state grows. */
-export const STATE_GRID = 'flex min-w-0 flex-wrap items-start gap-y-4'
+export const STATE_GRID = 'flex min-w-0 flex-wrap items-start gap-x-6 gap-y-4'
 export const STATE_CELL = 'grid min-w-[max(9rem,min-content)] max-w-full grow basis-36 content-start justify-items-center gap-2.5'
 /** The frames' 56 px box each state sits centred in. */
 export const STATE_BOX = 'flex min-h-14 max-w-full items-center justify-center'

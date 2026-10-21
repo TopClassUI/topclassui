@@ -7,7 +7,7 @@ export const kbd = {
     ar: 'غطاء مفتاح لمفتاح يضغطه القارئ، يُعرض على الخادم. والتركيبة مفاتيح متجاورة، بلا جزء تجميع وبلا علامة زائد.',
   },
   demos: ['keys', 'combination', 'with-icon', 'nested', 'rtl'],
-  stageDemo: 'keys',
+  stageDemo: 'combination',
   stageHeight: 8,
   note: {
     en: 'An icon inside a key is an `<Svg>` with no size: at its 1em default it follows the key\'s own text.',

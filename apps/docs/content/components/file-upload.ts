@@ -11,6 +11,7 @@ export const fileUpload = {
   },
   demos: ['basic', 'multiple', 'in-field', 'form', 'rtl'],
   stageHeight: 14,
+  extraSwitches: ['disabled'],
   note: {
     en: '`maxSize` is in bytes and checked in the browser only: check it again in the action.',
     ar: '`maxSize` بالبايت، ويُتحقق منه في المتصفح فقط: تحقّق منه مجددًا في الإجراء.',

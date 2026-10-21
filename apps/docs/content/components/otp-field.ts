@@ -11,6 +11,7 @@ export const otpField = {
   },
   demos: ['basic', 'grouped', 'form', 'sizes', 'long', 'rtl'],
   stageHeight: 7,
+  extraSwitches: ['mask', 'autoSubmit', 'disabled'],
   note: {
     en: 'The export is `OTPField`. In a form the hidden input sends what is typed so far, a partial code too.',
     ar: 'اسم التصدير هو `OTPField`. داخل نموذج يرسل الحقل المخفي ما كُتب حتى الآن، حتى لو كان الرمز ناقصًا.',

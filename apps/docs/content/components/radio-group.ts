@@ -11,6 +11,7 @@ export const radioGroup = {
   },
   demos: ['basic', 'horizontal', 'form', 'sizes', 'long-content', 'rtl'],
   stageHeight: 13.75,
+  extraSwitches: ['disabled', 'required'],
   note: {
     en: 'The group carries the state and the form; each `RadioGroupItem` carries only its `value` and its text.',
     ar: 'المجموعة تحمل الحالة والنموذج؛ وكل `RadioGroupItem` يحمل `value` الخاص به ونصه فقط.',

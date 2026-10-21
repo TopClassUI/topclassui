@@ -11,6 +11,7 @@ export const select = {
   },
   demos: ['basic', 'form', 'sizes', 'four-rows', 'sixty-items', 'long-content', 'rtl'],
   stageHeight: 7,
+  extraSwitches: ['disabled', 'required'],
   note: {
     en: '`items` is plain data, so a server page can render a Select: no function crosses to the browser.',
     ar: '`items` بيانات بسيطة، فتستطيع صفحة خادم أن تعرض Select: لا تعبر أي دالة إلى المتصفح.',
