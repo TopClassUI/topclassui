@@ -11,16 +11,17 @@ import { CommandBox } from '../command-box'
 
 const CHIP = `inline-flex items-center gap-2 rounded-chip bg-surface ps-3 pe-3.5 py-1.5 text-sm font-medium text-muted ${BORDER}`
 
-/** The version chip, the h1, the lead, and one row: the install line and the two calls to action (docs-site page 1). */
+/** The version chip, the h1, the lead, one row (the install line and the two calls to action) and the caption under it (docs-site page 1). */
 export function Hero({ locale, labels }: { locale: Locale; labels: SiteLabels }) {
   const hero = labels.home.hero
   const changelog = pageBySlug('changelog')
   const docs = LIVE_GUIDES[0]
   const [major = '0', minor = '0'] = VERSION.split('.')
+  const release = `${major}.${minor}`
   const chip = (
     <>
       <span aria-hidden="true" className="size-2 rounded-chip bg-warning-solid" />
-      <bdi>{hero.chip(`${major}.${minor}`, PRERELEASE)}</bdi>
+      <bdi>{hero.chip(release, PRERELEASE)}</bdi>
     </>
   )
   return (
@@ -28,7 +29,7 @@ export function Hero({ locale, labels }: { locale: Locale; labels: SiteLabels })
       {changelog === undefined ? <p className={CHIP}>{chip}</p> : (
         <Link href={hrefOf(changelog, locale)} className={`docs-hover-lift ${CHIP} ${HOVER.outline} ${FOCUS_RING} ${TOUCH_TARGET} ${TRANSITION}`}>{chip}</Link>
       )}
-      <h1 className="mt-7.5 flex flex-col text-[clamp(2.25rem,1rem+7vw,3rem)] font-semibold text-body lg:text-[clamp(3rem,6.4vw,5.75rem)] lg:leading-[1.04]">
+      <h1 className="mt-7.5 flex flex-col text-[clamp(2.25rem,1rem+7vw,3rem)] font-semibold text-body lg:text-[clamp(3rem,5.55vw,5rem)] lg:leading-[1.04]">
         <span>{hero.titleTop}</span>
         <span>{hero.titleBottom}</span>
       </h1>
@@ -50,6 +51,7 @@ export function Hero({ locale, labels }: { locale: Locale; labels: SiteLabels })
           </Button>
         )}
       </div>
+      <p className="mt-4 text-xs text-muted">{hero.caption(release, PRERELEASE)}</p>
     </div>
   )
 }

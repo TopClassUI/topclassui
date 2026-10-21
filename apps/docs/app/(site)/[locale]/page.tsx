@@ -53,7 +53,7 @@ export default async function Home({ params }: { params: Params }) {
           <div className="grid grid-cols-1 gap-5.5 lg:grid-cols-3">
             <ServerPanel locale={locale} labels={labels} />
             <RtlPanel labels={labels} />
-            <TestedPanel labels={labels} />
+            <TestedPanel locale={locale} labels={labels} />
           </div>
         </HomeSection>
         <HomeSection id="modes" eyebrow={home.modes.eyebrow} title={home.modes.title} lead={home.modes.lead}>
