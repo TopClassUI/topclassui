@@ -99,8 +99,8 @@ test.describe('on a phone', () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })
 
   test('the sitemap lists every live page and every component page in both locales', () => {
-    // Written out: 13 live pages and 49 component pages, twice.
-    expect(SITEMAP).toHaveLength(124)
+    // Written out: 14 live pages and 49 component pages, twice.
+    expect(SITEMAP).toHaveLength(126)
   })
 
   for (const path of SITEMAP) {
