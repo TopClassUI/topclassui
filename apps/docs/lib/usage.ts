@@ -20,10 +20,22 @@ const STAGE_BRANCH = /^if \(stage\) return <\w+[^\n]*\/>$/
 /** The names an import line binds, `as` left out: a side-effect import binds none and is always kept. */
 const bindingsOf = (line: string) => [...line.replace(/^import\s+/, '').replace(/\s+from\s+['"][^'"]+['"];?\s*$/, '').matchAll(/\w+/g)].map(([name]) => name).filter((name) => name !== 'as')
 
+/** Where the last `return ` outside a template literal starts, so a code sample passed as a child never reads as the demo's return. */
+function lastReturnOf(source: string): number {
+  let found = -1
+  let literal = false
+  for (let i = 0; i < source.length; i++) {
+    if (source[i] === '\\') i++
+    else if (source[i] === '`') literal = !literal
+    else if (!literal && source.startsWith('return ', i)) found = i
+  }
+  return found
+}
+
 /** Reads a dummy/playground.tsx whose default export only returns one JSX tree that spreads `props` or passes its props on by name. */
 export function usageOf(source: string): Usage | null {
   const signature = SIGNATURE.exec(source)
-  const start = source.lastIndexOf('return ')
+  const start = lastReturnOf(source)
   const end = source.lastIndexOf('}')
   if (signature === null || start === -1 || end < start) return null
   // A hook or a constant before the return is state the snippet would lose, so such a demo shows its whole source.
@@ -33,10 +45,12 @@ export function usageOf(source: string): Usage | null {
   const passed = (signature[1] ?? '').split(',').map((name) => name.trim()).filter((name) => /^\w+$/.test(name) && passThrough(name).test(body))
   if (!SPREAD.test(body) && passed.length === 0) return null
   const lines = body.split('\n')
-  const indents = lines.slice(1).filter((line) => line.trim() !== '').map((line) => /^ */.exec(line)?.[0].length ?? 0)
+  // A line that opens inside a template literal is the sample's own text: its indent is not the tree's.
+  const opensInLiteral = lines.map((_, index) => (lines.slice(0, index).join('\n').match(/`/g) ?? []).length % 2 === 1)
+  const indents = lines.slice(1).filter((line, index) => line.trim() !== '' && !opensInLiteral[index + 1]).map((line) => /^ */.exec(line)?.[0].length ?? 0)
   // A multi-line tree's closing tag sits at the root's own indent, which the first line lost to the trim.
   const cut = indents.length > 0 ? Math.min(...indents) : 0
-  const jsx = lines.map((line, index) => (index === 0 ? line : line.slice(Math.min(cut, line.length - line.trimStart().length)))).join('\n')
+  const jsx = lines.map((line, index) => (index === 0 || opensInLiteral[index] ? line : line.slice(Math.min(cut, line.length - line.trimStart().length)))).join('\n')
   // A type the demo needs for its own props, or a name only its Stage uses, is not one the reader's usage needs.
   const imports = (source.match(IMPORT) ?? []).map((line) => line.replace(/,\s*type \w+/g, '').replace(/\{\s*type \w+,\s*/, '{ '))
     .filter((line) => bindingsOf(line).length === 0 || bindingsOf(line).some((name) => new RegExp(`\\b${name}\\b`).test(jsx)))
