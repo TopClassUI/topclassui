@@ -1609,3 +1609,5 @@ The second audit proposed about ninety more. They were declined and listed at th
 **Why.** The CLI plan (K1) ships the component sources once, as the registry JSON in `dist/registry/`, so `npx topclassui add` reads its own installed version with no network; the registry is 1.48 MB unpacked (one item per component with its demos, one base item for `shared/` and `icons/`). The 1.3 MB budget was written for the components-only tarball of release R5.
 
 **Affects.** `pack-checks.ts`, its test, and every later release: a tarball over 3.05 MB needs a new entry here, not a bigger number.
+
+- **2026-10-22, the Home hero title keeps the frame's tight letter-spacing in English.** Home 191:1495 draws the h1 at 92 px with -2.3 px tracking; without it the frame's line width and its letter height cannot both hold. R-5.3-3 bans tracking because letter-spacing breaks joined Arabic letters, so the site applies -0.025em to the hero title under :lang(en) only (apps/docs/app/globals.css, .docs-hero-title) and the Arabic title keeps none. The library is untouched: R-5.3-3 still holds inside packages/topclassui/src.

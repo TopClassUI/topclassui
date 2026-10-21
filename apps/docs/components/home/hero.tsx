@@ -11,6 +11,12 @@ import { CommandBox } from '../command-box'
 
 const CHIP = `inline-flex items-center gap-2 rounded-chip bg-surface ps-3 pe-3.5 py-1.5 text-sm font-medium text-muted ${BORDER}`
 
+/** The drawn calls to action: 16 px on a 19 px line, 22 px from the edge; the Button's own 1 px line (transparent on the solid one) is part of that. */
+const CTA = {
+  docs: 'px-5.25 py-3 text-base/[1.1875rem]',
+  star: 'bg-surface-raised px-5.5 py-3.25 text-base/[1.1875rem] text-body',
+} as const
+
 /** The version chip, the h1, the lead, one row (the install line and the two calls to action) and the caption under it (docs-site page 1). */
 export function Hero({ locale, labels }: { locale: Locale; labels: SiteLabels }) {
   const hero = labels.home.hero
@@ -29,7 +35,7 @@ export function Hero({ locale, labels }: { locale: Locale; labels: SiteLabels })
       {changelog === undefined ? <p className={CHIP}>{chip}</p> : (
         <Link href={hrefOf(changelog, locale)} className={`docs-hover-lift ${CHIP} ${HOVER.outline} ${FOCUS_RING} ${TOUCH_TARGET} ${TRANSITION}`}>{chip}</Link>
       )}
-      <h1 className="mt-7.5 flex flex-col text-[clamp(2.25rem,1rem+7vw,3rem)] font-semibold text-body lg:text-[clamp(3rem,5.55vw,5rem)] lg:leading-[1.04]">
+      <h1 className="docs-hero-title mt-7.5 flex flex-col text-[clamp(2.25rem,1rem+7vw,3rem)] font-semibold text-body lg:text-[clamp(3rem,6.39vw,5.75rem)] lg:leading-[1.04]">
         <span>{hero.titleTop}</span>
         <span>{hero.titleBottom}</span>
       </h1>
@@ -39,14 +45,14 @@ export function Hero({ locale, labels }: { locale: Locale; labels: SiteLabels })
           <CommandBox code={INSTALL_LINE} locale={locale} size="lg" prompt />
         </div>
         {docs === undefined ? null : (
-          <Button size="lg" render={<Link href={hrefOf(docs, locale)} />}>
-            <Icon name="book-open" />
+          <Button size="custom" className={CTA.docs} render={<Link href={hrefOf(docs, locale)} />}>
+            <Icon name="book-open" size="1.125rem" />
             {hero.readDocs}
           </Button>
         )}
         {GITHUB_URL === null ? null : (
-          <Button size="lg" variant="outline" tone="neutral" render={<a href={GITHUB_URL} rel={EXTERNAL_REL} />}>
-            <Icon name="github-logo" />
+          <Button size="custom" variant="outline" tone="neutral" className={CTA.star} render={<a href={GITHUB_URL} rel={EXTERNAL_REL} />}>
+            <Icon name="github-logo" size="1.125rem" />
             {hero.star}
           </Button>
         )}

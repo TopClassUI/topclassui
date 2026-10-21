@@ -17,15 +17,17 @@ export interface CopyButtonProps {
   text?: string
   /** Extra classes for the icon-only button, such as the filled chip the hero's install line draws. */
   className?: string
+  /** The icon-only button's icon, 1rem unless its box draws it smaller. */
+  iconSize?: string
 }
 
 /** One button that copies a command and says so in a live region; the tick stays until the next press. */
-export function CopyButton({ code, label, copied, failed, text, className = '' }: CopyButtonProps) {
+export function CopyButton({ code, label, copied, failed, text, className = '', iconSize = '1rem' }: CopyButtonProps) {
   const [status, setStatus] = useState('')
   const press = () => {
     navigator.clipboard.writeText(code).then(() => { setStatus(copied) }, () => { setStatus(failed) })
   }
-  const size = text === undefined ? '1rem' : '0.875rem'
+  const size = text === undefined ? iconSize : '0.875rem'
   const icon = status === copied ? <Svg icon={check} size={size} aria-hidden="true" className="docs-tick" /> : <Svg icon={copy} size={size} aria-hidden="true" />
   return (
     <>

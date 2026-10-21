@@ -186,7 +186,7 @@ export const en: SiteLabels = {
     follow: {
       eyebrow: 'Follow us',
       title: 'One handle, everywhere',
-      lead: 'Star the repository or subscribe, and you will hear the moment a new version ships.',
+      lead: '@topclassui on GitHub, YouTube and X. Star, subscribe or follow, and you will hear the moment a new version ships.',
       github: { name: 'GitHub', line: 'Star the repository, read the source and open issues.', action: 'Star on GitHub' },
       youtube: { name: 'YouTube', line: 'Short videos on how each component is built.', action: 'Subscribe' },
       x: { name: 'X', line: 'Release notes, previews and answers.', action: 'Follow' },

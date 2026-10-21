@@ -42,13 +42,19 @@ export const SIDE_LINK = {
 /** The skip link: hidden until it takes the focus, then drawn above the navbar. */
 export const SKIP_LINK = `sr-only focus:not-sr-only focus:fixed focus:top-2 focus:inset-s-2 focus:z-(--tc-z-toast) focus:p-3 bg-surface-raised text-body rounded-control ${FOCUS_RING}`
 
-/** The eyebrow over a Home section heading, in capitals as drawn; Arabic has no case. */
-export const EYEBROW = 'text-xs font-medium text-primary-on-soft uppercase'
+/** The eyebrow over a Home section heading: the drawn 11 px in capitals, without the frame's letter-spacing (R-5.3-3); Arabic has no case. */
+export const EYEBROW = 'text-[0.6875rem]/[1.2] font-medium text-primary-on-soft uppercase'
 
-/** 30 px on a phone up to the drawn 40 px at 1440. */
-export const SECTION_TITLE = 'text-[clamp(1.875rem,1.25rem+2vw,2.5rem)] leading-tight font-semibold text-body'
+/** 30 px on a phone up to the drawn 40 px at 1440, on the drawn 1.12 line. */
+export const SECTION_TITLE = 'text-[clamp(1.875rem,1.25rem+2vw,2.5rem)] leading-[1.12] font-semibold text-body'
+
+/** A Home section's lead: the drawn 17 px on a 1.52 line, 720 px at most. */
+export const SECTION_LEAD = 'max-w-180 text-[1.0625rem]/[1.52] text-muted'
 
 export const LEAD = 'max-w-3xl text-lg text-muted'
+
+/** The drawn 16 px corner of Home's larger cards: twice the radius knob, capped as rounded-box is, so a pill mode never rounds a card into a lozenge. */
+export const ROUNDED_CARD = 'rounded-[min(calc(var(--tc-radius)*2),1.5rem)]'
 
 /** A Home panel: the surface, the line and the drawn 14 px corner. */
 export const PANEL = `flex min-w-0 flex-col gap-3 rounded-box bg-surface p-4.5 ${BORDER}`

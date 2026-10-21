@@ -12,7 +12,7 @@ function required<T>(value: T | null | undefined): T {
 }
 
 describe('the JSON-LD of each page type', () => {
-  it('names the organization with its logo and its GitHub, npm and YouTube profiles', () => {
+  it('names the organization with its logo and its GitHub, npm, YouTube and X profiles', () => {
     expect(organizationData()).toEqual({
       '@context': 'https://schema.org',
       '@type': 'Organization',
@@ -20,7 +20,7 @@ describe('the JSON-LD of each page type', () => {
       name: 'TopClass UI',
       url: 'https://topclassui.com',
       logo: { '@type': 'ImageObject', url: 'https://topclassui.com/icon-512.png', width: '512', height: '512' },
-      sameAs: ['https://github.com/TopClassUI/topclassui', 'https://www.npmjs.com/package/topclassui', 'https://www.youtube.com/@topclassui'],
+      sameAs: ['https://github.com/TopClassUI/topclassui', 'https://www.npmjs.com/package/topclassui', 'https://www.youtube.com/@topclassui', 'https://x.com/topclassui'],
     })
   })
 
