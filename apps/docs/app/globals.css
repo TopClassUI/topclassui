@@ -14,6 +14,17 @@
   --docs-home: 75rem;
 }
 
+/* The first number's bloom: the frame's full strength left the muted label at 3.7:1, so each mode keeps the most that measured AA. */
+:root,
+[data-theme='light'],
+[data-theme='ocean'] {
+  --docs-bloom-lead: 50%;
+}
+
+[data-theme='dark'] {
+  --docs-bloom-lead: 65%;
+}
+
 @layer base {
   @media (prefers-reduced-motion: no-preference) {
     html { scroll-behavior: smooth; }
@@ -28,6 +39,9 @@
 }
 
 @layer components {
+  /* The hero title's drawn -2.3 px at 92 px, in Latin only: letter-spacing breaks joined Arabic letters, so Arabic keeps none. */
+  .docs-hero-title:lang(en) { letter-spacing: -0.025em; }
+
   /* Home's glows: a token mixed toward transparent, so they turn with the theme (docs-site page 1). */
   .docs-glow {
     position: absolute;
@@ -46,29 +60,40 @@
     box-shadow: 0 30px 60px -10px color-mix(in oklch, var(--tc-overlay) 60%, transparent), 0 0 90px 6px color-mix(in oklch, var(--tc-primary-solid) 35%, transparent);
   }
 
-  /* Numbers, Follow us and What you need: a card that darkens toward its foot, lifted by a soft drop. */
+  /* Numbers, Follow us and What you need as drawn: edges and drops in the overlay's black at the frame's own alpha, in every mode. */
+  /* The foot fades toward the page: the frame's black in dark, where the page is near black, and no grey that dims the text in light. */
   .docs-lift {
-    background-image: linear-gradient(to bottom, transparent, color-mix(in oklch, var(--tc-page) 40%, transparent));
-    box-shadow: 0 20px 40px -14px color-mix(in oklch, var(--tc-overlay) 60%, transparent), inset 0 -3px 8px color-mix(in oklch, var(--tc-overlay) 60%, transparent);
+    border: var(--tc-line-width) solid oklch(from var(--tc-overlay) l c h / var(--docs-lift-edge, 0.25));
+    background-image: linear-gradient(to bottom, transparent, color-mix(in oklch, var(--tc-page) var(--docs-lift-foot, 22%), transparent));
+    box-shadow: var(--docs-lift-drop, 0 20px 40px -14px oklch(from var(--tc-overlay) l c h / 0.5)), inset 0 -3px 8px oklch(from var(--tc-overlay) l c h / 0.3);
   }
+
+  .docs-follow { --docs-lift-drop: 0 20px 20px oklch(from var(--tc-overlay) l c h / 0.5); }
 
   .docs-tile {
-    background-image: linear-gradient(to bottom, transparent, color-mix(in oklch, var(--tc-page) 28%, transparent));
-    box-shadow: 0 12px 24px -8px color-mix(in oklch, var(--tc-overlay) 70%, transparent), inset 0 -3px 5px color-mix(in oklch, var(--tc-overlay) 70%, transparent);
+    border: var(--tc-line-width) solid oklch(from var(--tc-overlay) l c h / 0.3);
+    background-image: linear-gradient(to bottom, transparent, oklch(from var(--tc-overlay) l c h / 0.28));
+    box-shadow: 0 12px 12px oklch(from var(--tc-overlay) l c h / 0.55), inset 0 -3px 5px oklch(from var(--tc-overlay) l c h / 0.35);
   }
 
-  .docs-number { background-color: var(--tc-surface); }
+  .docs-number {
+    --docs-lift-edge: 0.3;
+    --docs-lift-foot: 25%;
+    background-color: var(--tc-surface);
+  }
 
+  /* The frame's glow: a 220 px disc of the tone, blurred by 35 px, from just past the card's top-start corner. */
   .docs-number-glow {
     position: absolute;
-    inset-inline-start: -5rem;
-    inset-block-start: -5.75rem;
+    inset-inline-start: -5.0625rem;
+    inset-block-start: -5.6875rem;
     inline-size: 13.75rem;
     block-size: 13.75rem;
     z-index: -1;
     pointer-events: none;
     border-radius: 50%;
-    background: radial-gradient(closest-side, color-mix(in oklch, var(--docs-number-tone) 80%, transparent), transparent);
+    background: color-mix(in oklch, var(--docs-number-tone) var(--docs-bloom, 14%), transparent);
+    filter: blur(35px);
   }
 
   .docs-number-value {
@@ -86,16 +111,8 @@
   .docs-number-success { --docs-number-tone: var(--tc-success-solid); --docs-number-text: var(--tc-success-on-soft); }
   .docs-number-warning { --docs-number-tone: var(--tc-warning-solid); --docs-number-text: var(--tc-warning-on-soft); }
 
-  /* The first number: the drawn saturated primary over its inline-start half, solid under the text so on-solid stays AA. */
-  .docs-number-lead {
-    background-image:
-      linear-gradient(calc(90deg * var(--tc-dir)), var(--tc-primary-solid) 7rem, color-mix(in oklch, var(--tc-primary-solid) 80%, transparent) 46%, color-mix(in oklch, var(--tc-primary-solid) 35%, transparent) 62%, transparent 80%),
-      linear-gradient(to bottom, transparent, color-mix(in oklch, var(--tc-page) 40%, transparent));
-  }
-
-  .docs-number-lead .docs-number-glow { display: none; }
-
-  .docs-number-lead .docs-number-value { background: none; color: var(--tc-primary-on-solid); }
+  /* The first number blooms stronger than the frame's 14 % on the other three. */
+  .docs-number-lead { --docs-bloom: var(--docs-bloom-lead); }
 }
 
 @layer components {
@@ -183,6 +200,13 @@
 
   .docs-tabbed .docs-code > pre {
     padding-inline-end: 3rem;
+  }
+
+  /* Follow us buttons as drawn: Button's border-transparent is a utility, so this sits in the same layer after it. */
+  .docs-press {
+    border-color: oklch(from var(--tc-overlay) l c h / 0.25);
+    background-image: linear-gradient(to bottom, transparent, oklch(from var(--tc-overlay) l c h / 0.2));
+    box-shadow: 0 6px 7px oklch(from var(--tc-overlay) l c h / 0.4);
   }
 
   /* Wrong and Right carry their name above the box and a tone edge instead of a header. */

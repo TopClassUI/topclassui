@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { EYEBROW, LEAD, SECTION_TITLE } from '../classes'
+import { EYEBROW, SECTION_LEAD, SECTION_TITLE } from '../classes'
 
 export interface HomeSectionProps {
   id: string
@@ -17,7 +17,7 @@ export function HomeSection({ id, eyebrow, title, lead, children }: HomeSectionP
       <div className="flex flex-col items-center gap-2.5 text-center">
         <p className={EYEBROW}>{eyebrow}</p>
         <h2 id={id} className={SECTION_TITLE}>{title}</h2>
-        <p className={LEAD}>{lead}</p>
+        <p className={SECTION_LEAD}>{lead}</p>
       </div>
       {children}
     </section>

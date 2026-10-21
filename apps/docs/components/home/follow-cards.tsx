@@ -28,29 +28,29 @@ function shortOf(url: string): string {
   return url.replace(/^https:\/\/(www\.)?/, '')
 }
 
-/** Follow us: one tinted card per network that has an address; X waits for its handle (choice 12). */
+/** Follow us: one tinted card per network that has an address, three across as drawn. */
 export function FollowCards({ labels }: { labels: SiteLabels }) {
   const text = labels.home.follow
   return (
-    <ul className="flex flex-wrap justify-center gap-5">
+    <ul className="grid grid-cols-1 gap-5 md:grid-cols-3">
       {NETWORKS.map(({ key, url, tone, Mark }) => {
         if (url === null) return null
         const card = text[key]
         return (
-          <li key={key} className={`docs-lift docs-hover-lift flex w-full flex-col items-start gap-4 rounded-box px-7 pt-7 pb-8 text-start md:w-96 ${TINT[tone]}`}>
+          <li key={key} className={`docs-lift docs-follow docs-hover-lift flex flex-col items-start gap-4 rounded-[1.25rem] px-7 pt-7 pb-8 text-start ${TINT[tone]}`}>
             <div className="flex items-center gap-3.5">
-              <span aria-hidden="true" className={`docs-tile inline-flex size-14 items-center justify-center rounded-box ${TILE[tone]}`}><Mark className="size-7" /></span>
-              <div className="flex flex-col gap-0.5">
-                <h3 className="text-xl font-semibold">{card.name}</h3>
+              <span aria-hidden="true" className={`docs-tile inline-flex size-14 shrink-0 items-center justify-center rounded-[1rem] ${TILE[tone]}`}><Mark className="size-7" /></span>
+              <div className="flex flex-col gap-0.75">
+                <h3 className="text-xl leading-[normal] font-semibold">{card.name}</h3>
                 <p dir="ltr" className="text-start font-mono text-xs rtl:text-end">{HANDLE}</p>
               </div>
             </div>
-            <p className="text-sm">{card.line}</p>
-            <Button tone={tone} variant="solid" render={<a href={url} rel={EXTERNAL_REL} />}>
+            <p className="text-sm leading-[1.55] opacity-90">{card.line}</p>
+            <Button tone={tone} variant="solid" size="custom" className="docs-press px-4 py-2.5 text-sm leading-[normal]" render={<a href={url} rel={EXTERNAL_REL} />}>
               {card.action}
               <Icon name="arrow-square-out" />
             </Button>
-            <p dir="ltr" className="font-mono text-xs">{shortOf(url)}</p>
+            <p dir="ltr" className="font-mono text-[0.6875rem] leading-[normal]">{shortOf(url)}</p>
           </li>
         )
       })}

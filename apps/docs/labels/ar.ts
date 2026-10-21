@@ -187,7 +187,7 @@ export const ar: SiteLabels = {
     follow: {
       eyebrow: 'تابعنا',
       title: 'اسم واحد، في كل مكان',
-      lead: 'ضع نجمة على المستودع أو اشترك، وستعرف لحظة صدور كل إصدار جديد.',
+      lead: '‎@topclassui على GitHub وYouTube وX. ضع نجمة أو اشترك أو تابع، وستعرف لحظة صدور إصدار جديد.',
       github: { name: 'GitHub', line: 'ضع نجمة على المستودع، واقرأ الشيفرة، وافتح البلاغات.', action: 'ضع نجمة على GitHub' },
       youtube: { name: 'YouTube', line: 'مقاطع قصيرة عن طريقة بناء كل مكوّن.', action: 'اشترك' },
       x: { name: 'X', line: 'ملاحظات الإصدارات، ولمحات مسبقة، وإجابات.', action: 'تابِع' },

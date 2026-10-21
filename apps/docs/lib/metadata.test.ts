@@ -40,6 +40,15 @@ describe('createMetadata', () => {
     expect(wrong).toEqual([])
   })
 
+  it('names the X account as the Twitter card\'s site and creator on every page', () => {
+    if (button === null) throw new Error('Button has a page')
+    for (const subject of [PAGES[0], PAGES[1], button]) {
+      for (const locale of LOCALES) {
+        expect(createMetadata(subject, locale).twitter).toMatchObject({ card: 'summary_large_image', site: '@topclassui', creator: '@topclassui' })
+      }
+    }
+  })
+
   it('points the canonical at the page itself and pairs both languages with x-default', () => {
     const install = PAGES[1]
     const meta = createMetadata(install, 'ar')

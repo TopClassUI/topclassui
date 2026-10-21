@@ -5,16 +5,18 @@ import { BORDER, BORDER_STRONG } from 'topclassui/classes'
 import type { Locale } from '../content/pages'
 import { CopyButton } from './home/home-islands'
 
+/** The hero's drawn 56 px box on the raised surface, Install's 44 px well on the page, and the footer's small one. */
 const BOX = {
-  lg: 'h-control-lg gap-3 bg-surface-raised ps-4.5 pe-2.5 text-sm',
-  md: 'h-control-md gap-2.5 bg-page ps-3.5 pe-1.5 text-xs',
-  sm: 'h-control-sm gap-2 bg-page ps-2.5 pe-1 text-xs',
+  lg: `h-control-xl gap-3 bg-surface-raised py-3.25 ps-4.5 pe-2.5 text-sm ${BORDER_STRONG}`,
+  md: `h-[2.75rem] gap-2.5 bg-page py-2.75 ps-3.5 pe-2.5 text-xs/[1.7] ${BORDER}`,
+  /** The footer's chip as drawn: 29 px, 10 px mono; the 24 px copy target leaves 5.5 px around its 13 px icon, so 2.5 px more puts it the drawn 8 px from the text and the end. */
+  sm: `min-h-[1.8125rem] gap-[0.15625rem] bg-page ps-2.5 pe-[0.15625rem] text-[0.625rem] ${BORDER}`,
 } as const
 
-const EDGE = { lg: BORDER_STRONG, md: BORDER, sm: BORDER } as const satisfies Record<keyof typeof BOX, string>
+/** The hero's copy button is the drawn 32 by 28 px filled chip; Install's 14 px icon keeps its 24 px target and ends where the icon is drawn. */
+const COPY = { lg: 'bg-surface px-2 py-1.5', md: '-me-1.25', sm: '' } as const satisfies Record<keyof typeof BOX, string>
 
-/** The hero's copy button is the drawn 28 px filled chip; the smaller boxes keep the bare icon. */
-const COPY = { lg: 'size-7 bg-surface', md: '', sm: '' } as const satisfies Record<keyof typeof BOX, string>
+const COPY_ICON = { lg: '1rem', md: '0.875rem', sm: '0.8125rem' } as const satisfies Record<keyof typeof BOX, string>
 
 export interface CommandBoxProps {
   code: string
@@ -22,18 +24,16 @@ export interface CommandBoxProps {
   size?: keyof typeof BOX
   /** Draws a muted $ before a shell command. */
   prompt?: boolean
-  /** No line around the box: a well sunk into its card, as Home's Install cards draw it. */
-  bare?: boolean
   className?: string
 }
 
-export function CommandBox({ code, locale, size = 'md', prompt = false, bare = false, className = '' }: CommandBoxProps) {
+export function CommandBox({ code, locale, size = 'md', prompt = false, className = '' }: CommandBoxProps) {
   const common = getLabels(locale).labels.common
   return (
-    <div dir="ltr" className={`flex min-w-0 items-center rounded-control font-mono ${BOX[size]} ${bare ? '' : EDGE[size]} ${className}`}>
+    <div dir="ltr" className={`flex min-w-0 items-center rounded-control font-mono ${BOX[size]} ${className}`}>
       {prompt ? <span aria-hidden="true" className="text-muted">$</span> : null}
       <code translate="no" className="min-w-0 flex-1 truncate text-start text-body">{code}</code>
-      <CopyButton code={code} label={`${common.copy} ${code}`} copied={common.copied} failed={common.copyFailed} className={COPY[size]} />
+      <CopyButton code={code} label={`${common.copy} ${code}`} copied={common.copied} failed={common.copyFailed} iconSize={COPY_ICON[size]} className={COPY[size]} />
     </div>
   )
 }
