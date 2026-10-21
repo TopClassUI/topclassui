@@ -8,7 +8,7 @@ Job 134's site work: told at 21:55 UTC to push what passes the static gates on p
 
 | Job | Branch | Base | Tip | Commits | Gates | Composites and what is left for Omar |
 | --- | --- | --- | --- | --- | --- | --- |
-| 133 Site integration: main 62368dc8 + stack/r11-components 7fc2f424 into preview/r8-all | preview/r8-all | preview/r8-all bb001a58 | started 21:55 UTC | - | - | - |
+| 133 Site integration: main 62368dc8 + stack/r11-components 7fc2f424 into preview/r8-all | preview/r8-all | preview/r8-all bb001a58 | local 168a96b9 (not pushed yet) | 3: 91c9e585 take main 62368dc8 (clean), 81c8b259 take stack/r11-components 7fc2f424 (DECISIONS conflict: the stack's file is the union, ours had no entry it lacks), 168a96b9 docs:data 483 demos and the preview route 482 (six combined Forms demos) | install 0, build 0; docs:check running | packages/ identical to the stack, apps/docs shell and Home identical to main |
 | 140 pages fields-1: checkbox, radio-group, switch, slider, number-field, otp-field | fix/r11-pages-140 | preview/r8-all after 133's push | waiting for 133 | - | - | - |
 | 141 pages fields-2: input, textarea, select, combobox, segmented-control, rating, date-picker, file-upload | fix/r11-pages-141 | preview/r8-all after 133's push | waiting for 133 | - | - | - |
 | 142 pages display: tag, kbd, badge, avatar, card, separator, skeleton | fix/r11-pages-142 | preview/r8-all after 133's push | waiting for 133 | - | - | - |
