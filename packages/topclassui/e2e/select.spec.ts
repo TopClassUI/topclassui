@@ -100,13 +100,13 @@ test.describe('the static page: the server HTML, before any script runs', () => 
   test('the states: the placeholder is muted, invalid is red and 2 px, disabled sits on the surface and is dimmed, read-only looks like idle', async ({ page }) => {
     await page.goto(urlFor('select--states', 'light', 'ltr'))
     const danger = await resolve(page, 'var(--tc-danger-solid)')
-    expect(await css(combo(page, 'Nothing chosen').locator('span').first(), 'color')).toBe(await resolve(page, 'var(--tc-muted)'))
-    expect(await css(combo(page, 'Invalid'), 'border-top-color')).toBe(danger)
-    expect(await css(combo(page, 'Invalid'), 'box-shadow')).toContain(`${danger} 0px 0px 0px 1px inset`)
-    expect(await css(combo(page, 'Disabled'), 'opacity')).toBe('0.5')
-    expect(await css(combo(page, 'Disabled'), 'background-color')).toBe(await resolve(page, 'var(--tc-surface)'))
-    expect(await css(combo(page, 'Read-only'), 'background-color')).toBe(await resolve(page, 'var(--tc-surface-raised)'))
-    expect(await css(combo(page, 'Nothing chosen'), 'background-color')).toBe(await resolve(page, 'var(--tc-surface-raised)'))
+    expect(await css(combo(page, 'idle').locator('span').first(), 'color')).toBe(await resolve(page, 'var(--tc-muted)'))
+    expect(await css(combo(page, 'invalid'), 'border-top-color')).toBe(danger)
+    expect(await css(combo(page, 'invalid'), 'box-shadow')).toContain(`${danger} 0px 0px 0px 1px inset`)
+    expect(await css(combo(page, 'disabled'), 'opacity')).toBe('0.5')
+    expect(await css(combo(page, 'disabled'), 'background-color')).toBe(await resolve(page, 'var(--tc-surface)'))
+    expect(await css(combo(page, 'read-only'), 'background-color')).toBe(await resolve(page, 'var(--tc-surface-raised)'))
+    expect(await css(combo(page, 'idle'), 'background-color')).toBe(await resolve(page, 'var(--tc-surface-raised)'))
   })
 
   for (const scheme of ['light', 'dark'] as const) {
@@ -114,13 +114,13 @@ test.describe('the static page: the server HTML, before any script runs', () => 
       await page.emulateMedia({ forcedColors: 'active', colorScheme: scheme })
       await page.goto(urlFor('select--states', 'light', 'ltr'))
       const canvas = FORCED_CANVAS[scheme]
-      const box = await boxOf(combo(page, 'Nothing chosen'))
+      const box = await boxOf(combo(page, 'idle'))
       const middle = Math.round(box.top + box.height / 2)
       const left = await pixelsOf(page, { x: Math.floor(box.left), y: middle, width: 3, height: 1 })
       expect(inkOn(left, canvas), 'line pixels at 3:1 on the inline-start edge').toBeGreaterThan(0)
-      expect(contrast(rgbOf(await css(combo(page, 'Nothing chosen'), 'border-top-color')), canvas)).toBeGreaterThanOrEqual(3)
-      expect(await css(combo(page, 'Invalid'), 'border-top-width')).toBe('2px')
-      expect(await css(combo(page, 'Nothing chosen'), 'border-top-width')).toBe('1px')
+      expect(contrast(rgbOf(await css(combo(page, 'idle'), 'border-top-color')), canvas)).toBeGreaterThanOrEqual(3)
+      expect(await css(combo(page, 'invalid'), 'border-top-width')).toBe('2px')
+      expect(await css(combo(page, 'idle'), 'border-top-width')).toBe('1px')
     })
   }
 
@@ -133,17 +133,17 @@ test.describe('the static page: the server HTML, before any script runs', () => 
           const style = getComputedStyle(el)
           return [style.borderTopStyle, style.borderInlineStartStyle, style.borderBottomStyle, style.borderInlineEndStyle, style.borderTopWidth].join(' ')
         })
-        expect(await line('Read-only')).toBe('dashed dashed dashed dashed 1px')
-        for (const name of ['Nothing chosen', 'Disabled']) expect(await line(name), name).toBe('solid solid solid solid 1px')
-        expect(await line('Invalid')).toBe('solid solid solid solid 2px')
+        expect(await line('read-only')).toBe('dashed dashed dashed dashed 1px')
+        for (const name of ['idle', 'disabled']) expect(await line(name), name).toBe('solid solid solid solid 1px')
+        expect(await line('invalid')).toBe('solid solid solid solid 2px')
         const topEdge = async (name: string) => {
           const box = await boxOf(combo(page, name))
           const row = await pixelsOf(page, { x: Math.round(box.left + 8), y: Math.floor(box.top), width: Math.round(box.width - 16), height: 1 })
           return [inkOn(row, FORCED_CANVAS[scheme]), row.length]
         }
-        const [plain, length] = await topEdge('Nothing chosen')
+        const [plain, length] = await topEdge('idle')
         expect(plain, 'the plain line is whole').toBe(length)
-        const [dashed] = await topEdge('Read-only')
+        const [dashed] = await topEdge('read-only')
         expect(dashed, 'the dashes are drawn').toBeGreaterThan(0)
         expect(dashed, 'the dashes leave gaps').toBeLessThan((length ?? 0) * 0.8)
       })
@@ -153,15 +153,15 @@ test.describe('the static page: the server HTML, before any script runs', () => 
   test('forced colours, after hydration: the read-only line is still dashed, and the list still opens', async ({ page }) => {
     await page.emulateMedia({ forcedColors: 'active' })
     await openLive(page, 'select--states')
-    expect(await css(combo(page, 'Read-only'), 'border-top-style')).toBe('dashed')
-    await openList(page, combo(page, 'Read-only'))
-    expect(await css(combo(page, 'Read-only'), 'border-top-style')).toBe('dashed')
+    expect(await css(combo(page, 'read-only'), 'border-top-style')).toBe('dashed')
+    await openList(page, combo(page, 'read-only'))
+    expect(await css(combo(page, 'read-only'), 'border-top-style')).toBe('dashed')
     expect(await liveErrors(page)).toEqual([])
   })
 
   test('outside forced colours the read-only line stays solid, as the frame draws it', async ({ page }) => {
     await page.goto(urlFor('select--states', 'light', 'ltr'))
-    expect(await css(combo(page, 'Read-only'), 'border-top-style')).toBe('solid')
+    expect(await css(combo(page, 'read-only'), 'border-top-style')).toBe('solid')
   })
 
   for (const direction of DIRECTIONS) {
