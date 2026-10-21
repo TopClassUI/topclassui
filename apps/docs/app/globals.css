@@ -253,4 +253,11 @@
       }
     }
   }
+
+  /* Colors' tone rows name the shade of the page's own mode: one of three spans shows. */
+  [data-shade] { display: none; }
+  :root:not([data-theme]) [data-shade='light'],
+  [data-theme='light'] [data-shade='light'],
+  [data-theme='dark'] [data-shade='dark'],
+  [data-theme='ocean'] [data-shade='ocean'] { display: flex; }
 }

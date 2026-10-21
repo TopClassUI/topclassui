@@ -12,7 +12,7 @@ import { ModeIsland } from './mode-island'
 import { PageControls } from './guide-islands'
 import { Releases } from './releases'
 import { RoleBoard } from './role-board'
-import { TokenTable } from './token-table'
+import { TokenTable, ToneTable } from './token-table'
 import { TokensSample } from './tokens-sample'
 
 type Mode = 'light' | 'dark' | 'ocean'
@@ -22,9 +22,9 @@ export function guideComponents(locale: Locale): MDXComponents {
   return {
     PageControls: () => <PageControls labels={guideLabelsFor(locale).controls} />,
     TokenTable: ({ children }: { children?: ReactNode }) => <TokenTable locale={locale}>{children}</TokenTable>,
-    ToneSwatches: ({ children }: { children?: ReactNode }) => <TokenTable locale={locale}>{children}</TokenTable>,
+    ToneSwatches: ({ children }: { children?: ReactNode }) => <ToneTable locale={locale}>{children}</ToneTable>,
     RoleBoard: ({ children }: { children?: ReactNode }) => <RoleBoard locale={locale}>{children}</RoleBoard>,
-    TokensSample: ({ mode }: { mode: 'dark' | 'ocean' }) => <TokensSample mode={mode} locale={locale} />,
+    TokensSample: ({ mode, names }: { mode: 'dark' | 'ocean'; names?: string }) => <TokensSample mode={mode} names={names?.split(' ')} locale={locale} />,
     IconGroups: ({ children }: { children?: ReactNode }) => <IconGroups locale={locale}>{children}</IconGroups>,
     IconGrid: () => <IconGrid locale={locale} />,
     KnobsTable: ({ children }: { children?: ReactNode }) => <KnobsTable locale={locale}>{children}</KnobsTable>,

@@ -97,7 +97,7 @@ Light, dark and ocean are three CSS blocks that set the same variable names. Thi
 
 Ocean is light mode with a cyan primary and a pill radius. A custom mode needs nothing more than one CSS block.
 
-<TokensSample mode="dark" />
+<TokensSample mode="dark" names="--tc-page --tc-surface --tc-surface-raised --tc-line-strong --tc-primary-mix" />
 
 ## What the contrast check enforces
 
@@ -108,7 +108,7 @@ Contrast is checked on every change to the library, and a failure blocks the cha
 | Text, including a tone text on its own tint | 4.5:1 | The surface it sits on |
 | `line-strong`, `ring` and icons | 3:1 | All three surfaces, not only the page |
 | A soft tint | 1.06 step | All three surfaces |
-| `line` | exempt | Decorative hairline, WCAG 1.4.11 |
+| `line` | exempt | Decorative hairline, [WCAG 1.4.11](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html) |
 
 ## Add your own theme
 

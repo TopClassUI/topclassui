@@ -8,6 +8,9 @@ export interface TableOf {
   rows: ReactNode[][]
 }
 
+/** Table's highest row cap: a docs table is short and shows whole, as the frames draw every table, even when its cells wrap. */
+export const TABLE_ROWS_ALL = 20
+
 type WithChildren = { children?: ReactNode }
 
 function cellsOf(row: ReactNode): ReactNode[] {
