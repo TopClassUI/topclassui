@@ -866,8 +866,8 @@ for (const scheme of ['light', 'dark'] as const) {
       const [active, other] = [tabsIn(list).nth(0), tabsIn(list).nth(2)]
       await expect(active).toHaveCSS('background-color', system.highlight)
       await expect(active).toHaveCSS('color', system.highlightText)
-      // shadow-none leaves a list of shadows with no colour and no size: nothing of it is painted.
-      expect((await active.evaluate((element) => getComputedStyle(element).boxShadow)).replaceAll('rgba(0, 0, 0, 0) 0px 0px 0px 0px', '').replace(/[, ]/g, '')).toBe('')
+      // shadow-none leaves a list of shadows with no colour and no size, or none at all (Windows): nothing of it is painted.
+      expect((await active.evaluate((element) => getComputedStyle(element).boxShadow)).replace(/^none$/, '').replaceAll('rgba(0, 0, 0, 0) 0px 0px 0px 0px', '').replace(/[, ]/g, '')).toBe('')
       await expect(other).toHaveCSS('color', system.text)
 
       const [fill, canvas] = [rgbOf(system.highlight).join(','), rgbOf(system.canvas).join(',')]
