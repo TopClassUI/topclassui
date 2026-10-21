@@ -12,7 +12,8 @@ import { chipOf } from '../../lib/chip'
 import { type PagedComponent, demoSourceOf } from '../../lib/components'
 import type { Locale } from '../../lib/locales'
 import { countStates } from '../../lib/states'
-import { cleanSourceOf, snippetOf, usageOf } from '../../lib/usage'
+import { sampleOf, stagelessOf } from '../../lib/sample'
+import { snippetOf, usageOf } from '../../lib/usage'
 import { withStarts } from '../../scripts/lib/controls'
 import { CARD_PART, CARD_TITLE, CODE_PART, FLAT_CODE, H3, LINK, NOTE, PART_ROW, PREVIEWER, PREVIEWER_HEAD, SMALL, STAGE } from '../classes'
 import { Code } from '../code'
@@ -59,8 +60,10 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
   // The stage at rest is the demo the frame draws (stageDemo); Try it swaps in the playground on the first change.
   const stageDemo = content.stageDemo ?? (playground ? 'playground' : (content.demos[0] ?? 'playground'))
   const stageSource = demoSourceOf(entry, stageDemo) ?? ''
-  const usage = playground ? usageOf(demoSourceOf(entry, 'playground') ?? '') : null
-  const restSource = usage === null || stageDemo !== 'playground' ? cleanSourceOf(stageSource) : snippetOf(usage, [])
+  const playgroundSource = demoSourceOf(entry, 'playground') ?? ''
+  // An overlay's playground draws the docs stage too: the usage is read from it once the stage is gone.
+  const usage = playground ? (usageOf(playgroundSource) ?? usageOf(stagelessOf(playgroundSource))) : null
+  const restSource = usage === null || stageDemo !== 'playground' ? sampleOf(stageSource) : snippetOf(usage, [])
   const restCode = <Code locale={locale} title={`${entry.slug}.tsx`} copyLabel={t.copyCode} code={restSource} className={FLAT_CODE} />
   const note = (
     <p className={`flex items-start gap-2 ${NOTE}`}>
