@@ -141,7 +141,7 @@ for (const mode of ['light', 'dark'] as const) {
   for (const direction of ['ltr', 'rtl'] as const) {
     test(`${mode} ${direction}: turning invalid thickens the line and moves nothing`, async ({ page }) => {
       await page.goto(urlFor('input--states', mode, direction))
-      const field = page.getByRole('textbox', { name: 'Filled' })
+      const field = page.getByRole('textbox', { name: 'read-only' })
 
       const box = await boxOf(field)
       const text = await shot(page, textBand(box))
@@ -163,7 +163,7 @@ test.describe('under forced colours', () => {
   for (const direction of ['ltr', 'rtl'] as const) {
     test(`${direction}: an invalid input still differs from a valid one, and is the same box`, async ({ page }) => {
       await page.goto(urlFor('input--states', 'light', direction))
-      const field = page.getByRole('textbox', { name: 'Filled' })
+      const field = page.getByRole('textbox', { name: 'read-only' })
       expect(await page.evaluate(() => matchMedia('(forced-colors: active)').matches)).toBe(true)
 
       const box = await boxOf(field)

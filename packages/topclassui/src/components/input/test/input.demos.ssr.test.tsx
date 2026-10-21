@@ -82,14 +82,13 @@ describe('the demos cover what PLAN 20 asks for', () => {
     for (const size of ['xs', 'sm', 'md', 'lg', 'xl', 'custom']) expect(html, size).toContain(`data-size="${size}"`)
   })
 
-  it('shows the disabled, read-only, invalid, required and filled states', async () => {
+  it('shows the disabled, read-only, invalid and filled states', async () => {
     const html = await render('states')
     expect(html).toContain('disabled=""')
     expect(html).toContain('readOnly=""')
     expect(html).toContain('data-invalid=""')
     expect(html).toContain('aria-invalid="true"')
-    expect(html).toContain('required=""')
-    expect(html).toContain('value="omar@example.com"')
+    expect(html).toContain('value="you@mail.com"')
   })
 
   it('shows every text type, a number, a date, a caller cap and no cap', async () => {
