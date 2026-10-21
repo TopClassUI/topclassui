@@ -1,3 +1,4 @@
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import type { Metadata, Viewport } from 'next'
 import { Inter, Noto_Sans_Arabic } from 'next/font/google'
 import { notFound } from 'next/navigation'
@@ -48,6 +49,8 @@ export default async function LocaleLayout({ children, params }: { children: Rea
         <TopClassProvider direction={DIRECTION[locale]} locale={locale}>
           {children}
         </TopClassProvider>
+        {/* Vercel serves this script on its own deployments only; on next start it would answer 404. */}
+        {process.env['VERCEL'] === '1' ? <SpeedInsights /> : null}
       </body>
     </html>
   )
