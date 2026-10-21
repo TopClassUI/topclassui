@@ -55,8 +55,8 @@ export function PlaygroundIsland(props: PlaygroundIslandProps) {
   const changed = changedProps(values, start)
   const Demo = useMemo(() => (slug in PLAYGROUNDS ? lazy(PLAYGROUNDS[slug as keyof typeof PLAYGROUNDS] as Loader) : null), [slug])
   const reserve = <Skeleton variant="rect" className={STAGE_RESERVE} />
-  // A demo reads a default* prop on mount only, so changing one in Try it remounts it.
-  const remountKey = changed.filter(([name]) => /^default[A-Z]/.test(name)).map(([name, value]) => `${name}=${String(value)}`).join(' ')
+  // A demo reads a default* prop on mount only; a press on Try it dismisses a stage's open popup, so any change there remounts.
+  const remountKey = changed.filter(([name]) => stageOpen || /^default[A-Z]/.test(name)).map(([name, value]) => `${name}=${String(value)}`).join(' ')
   const live = Demo !== null && (serverStage === null || stageOpen ? near : changed.length > 0)
   const copy = getLabels(locale, { common: { copy: labels.copyCode } }).labels
   const shown = changed.length === 0 || usage === null ? null : snippetOf(usage, changed)
