@@ -6,6 +6,19 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-21 - The Every state strips hold the frames' cells, and the server matrices move to state-matrix
+
+**Decision.** Job 134 (round 9) put each built card beside its `Previewer:` frame. Where the strip on the card did not hold the frame's cells, `dummy/states.tsx` now holds one cell per state the frame draws, in the frame's order and captioned as the frame captions it: Checkbox, RadioGroup, Switch, Slider, NumberField, OTPField, Input, Textarea, Select, Combobox, Rating, DatePicker, Avatar, Tabs, Sidebar, Breadcrumb, Accordion and Pagination. The matrix of every state a server can render, which the e2e and unit specs drive, keeps its content under `dummy/state-matrix.tsx` (the same move job 116 made for SegmentedControl's `track-states.tsx`), and every spec that read the old demo reads the matrix.
+
+- **Hover and focus-visible are drawn at rest** where a class on the part that takes `className` reaches the drawn box: the ring as the live `focus-visible` draws it (Button's own states demo), under `not-forced-colors:` so a ring at rest never reads as focus there; a field's hover as the line it steps up to (`border-body`); a Sidebar row's as its tint. Where the frame draws the state as the rest state (Checkbox, RadioGroup and Switch hover, Slider hover and active, Accordion hover), the cell is the rest state.
+- **Left out, for Omar.** A cell whose look sits on a part inside the root that no class from outside reaches: the focus-visible knob of a Slider, the line and ring of a NumberField, Select, Combobox or DatePicker trigger (hover, focus-visible and open), the focused OTP cell, Breadcrumb's hovered crumb, Combobox's empty list, DatePicker's today. Drawing them needs a demo hook on the inner part (a data attribute the classes read), which is a public API.
+- **The cells are as wide as the frame draws them.** A field takes `--tc-input-width` of 7 or 8rem through `style` (R-5.2-5); a bar or a placeholder that fills its box (Progress, Skeleton) sits in a 7rem cell, and their playgrounds are `w-full max-w-xs`, so neither collapses to nothing in a centred stage or cell. Pagination's list measures itself (2026-10-19), so the playground fills the stage and each state cell is `w-xl max-w-full`, the full row the frame draws, compact again where the page is narrower.
+- **Gone from the strips:** Avatar's failed picture (its own `failed` demo keeps it) and Pagination's single page; neither is a frame cell.
+
+**Affects.** The `dummy/` and `test/` folders of the eighteen components, their e2e specs, and their READMEs (regenerated).
+
+---
+
 ## 2026-10-19 - The round-8 library raises the tarball budget to 3,150,000 bytes and Sidebar's to 6.2 KB
 
 **Decision.** The thirteen round-8 branches stacked together (the library integrator, job 131) pack 3,114,237 bytes unpacked, over the 3,050,000 the 2026-10-18 entry set; the base cf1ec12 packs 2,986,683, so round 8 adds 127,555 bytes. `SIZE_BUDGET_BYTES` in `scripts/lib/pack-checks.ts` rises to 3,150,000, the measured size plus about 1 %, so it stays a guard rail. In the same stack Sidebar's own client half measures 6,246 bytes against the 6 KB simple-control budget of `pnpm size`, and its entry in `size-budget.json` becomes 6.2 KB, as job 118 raised fifteen others to what was measured.
