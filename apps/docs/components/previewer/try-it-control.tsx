@@ -63,6 +63,7 @@ export function TryItControl({ control, value, onChange, description, idBase }: 
           {...named}
           size="sm"
           fullWidth
+          className="font-mono"
           items={control.options.map((option) => ({ value: String(option), label: String(option) }))}
           value={value === undefined ? null : String(value)}
           onValueChange={(next) => {
