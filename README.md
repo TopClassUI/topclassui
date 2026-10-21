@@ -1,3 +1,8 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./docs/brand/wordmark-dark.svg">
+  <img alt="TopClass UI" src="./docs/brand/wordmark-light.svg" width="380" height="64">
+</picture>
+
 # topclassui
 
 RTL-first, server-first React design system for Next.js App Router and Tailwind CSS v4.

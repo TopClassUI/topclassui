@@ -1,3 +1,4 @@
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import type { Metadata, Viewport } from 'next'
 import { Inter, Noto_Sans_Arabic } from 'next/font/google'
 import { notFound } from 'next/navigation'
@@ -9,6 +10,7 @@ import { TopClassProvider } from '../../../components/shell/provider-island'
 import { SkipLink } from '../../../components/shell/skip-link'
 import { DIRECTION, labelsFor } from '../../../labels/index'
 import { FACTS } from '../../../lib/data'
+import { geistMono } from '../../../lib/fonts'
 import { SITE_URL } from '../../../lib/site'
 import '../../globals.css'
 
@@ -39,7 +41,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   if (!isLocale(locale)) notFound()
   const labels = labelsFor(locale)
   return (
-    <html lang={locale} dir={DIRECTION[locale]} data-theme="dark" suppressHydrationWarning className={locale === 'ar' ? `${inter.variable} ${notoArabic.variable}` : inter.variable}>
+    <html lang={locale} dir={DIRECTION[locale]} data-theme="dark" suppressHydrationWarning className={locale === 'ar' ? `${inter.variable} ${geistMono.variable} ${notoArabic.variable}` : `${inter.variable} ${geistMono.variable}`}>
       <head>
         <ThemeScript />
       </head>
@@ -48,6 +50,8 @@ export default async function LocaleLayout({ children, params }: { children: Rea
         <TopClassProvider direction={DIRECTION[locale]} locale={locale}>
           {children}
         </TopClassProvider>
+        {/* Vercel serves this script on its own deployments only; on next start it would answer 404. */}
+        {process.env['VERCEL'] === '1' ? <SpeedInsights /> : null}
       </body>
     </html>
   )

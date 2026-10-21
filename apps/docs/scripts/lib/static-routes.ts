@@ -19,3 +19,11 @@ export function dynamicRoutes({ appRoutes, prerender }: Manifests): string[] {
 export function missingRoutes({ prerender }: Manifests, required: readonly string[]): string[] {
   return required.filter((path) => !(path in prerender.routes))
 }
+
+/** The URLs among `urls` that the sitemap lists with no <lastmod>, or does not list at all. */
+export function undatedUrls(sitemapXml: string, urls: readonly string[]): string[] {
+  const dated = new Set([...sitemapXml.matchAll(/<url>\s*<loc>([^<]+)<\/loc>[\s\S]*?<\/url>/g)]
+    .filter((match) => match[0].includes('<lastmod>'))
+    .map((match) => match[1]))
+  return urls.filter((url) => !dated.has(url))
+}

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import { CatalogChips } from '../../../components/home/catalog-chips'
+import { FollowCards } from '../../../components/home/follow-cards'
 import { Hero } from '../../../components/home/hero'
 import { HomeSection } from '../../../components/home/home-section'
 import { InstallCard } from '../../../components/home/install-card'
@@ -14,11 +15,11 @@ import { ServerPanel } from '../../../components/home/server-panel'
 import { TestedPanel } from '../../../components/home/tested-panel'
 import { JsonLd } from '../../../components/json-ld'
 import { SitePage } from '../../../components/shell/site-page'
-import { hrefOf, isLocale, pageBySlug, type Locale, type PageEntry } from '../../../content/pages'
+import { isLocale, pageBySlug, type Locale, type PageEntry } from '../../../content/pages'
 import { labelsFor } from '../../../labels'
 import { CARDS } from '../../../lib/data'
 import { createMetadata } from '../../../lib/metadata'
-import { GITHUB_URL, SITE_URL, VERSION, absolute } from '../../../lib/site'
+import { organizationData, sourceCodeData, websiteData } from '../../../lib/structured-data'
 
 type Params = Promise<{ locale: string }>
 
@@ -38,35 +39,21 @@ export default async function Home({ params }: { params: Params }) {
   const { locale, entry } = homeOf((await params).locale)
   const labels = labelsFor(locale)
   const home = labels.home
-  const organization = { '@type': 'Organization', name: labels.meta.siteName, url: SITE_URL } as const
   return (
     <SitePage locale={locale} current="home" path="">
-      <JsonLd data={{ '@context': 'https://schema.org', ...organization }} />
-      <JsonLd
-        data={{
-          '@context': 'https://schema.org',
-          '@type': 'SoftwareSourceCode',
-          name: labels.meta.siteName,
-          description: entry.description[locale],
-          url: absolute(hrefOf(entry, locale)),
-          programmingLanguage: 'TypeScript',
-          runtimePlatform: 'React',
-          license: 'https://opensource.org/licenses/MIT',
-          version: VERSION,
-          author: organization,
-          ...(GITHUB_URL === null ? {} : { codeRepository: GITHUB_URL }),
-        }}
-      />
-      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-(--docs-home) px-4 pb-16 outline-none md:px-6">
+      <JsonLd data={organizationData()} />
+      <JsonLd data={websiteData(locale)} />
+      <JsonLd data={sourceCodeData(entry, locale)} />
+      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-(--docs-home) px-4 pb-16 outline-none md:px-6 xl:px-0">
         <Hero locale={locale} labels={labels} />
-        <div className="pt-16">
+        <div className="pt-16 pb-24">
           <ProductFrame locale={locale} labels={labels} />
         </div>
         <HomeSection id="proof" eyebrow={home.proof.eyebrow} title={home.proof.title} lead={home.proof.lead}>
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5.5 lg:grid-cols-3">
             <ServerPanel locale={locale} labels={labels} />
             <RtlPanel labels={labels} />
-            <TestedPanel labels={labels} />
+            <TestedPanel locale={locale} labels={labels} />
           </div>
         </HomeSection>
         <HomeSection id="modes" eyebrow={home.modes.eyebrow} title={home.modes.title} lead={home.modes.lead}>
@@ -77,6 +64,9 @@ export default async function Home({ params }: { params: Params }) {
         </HomeSection>
         <HomeSection id="catalog" eyebrow={home.catalog.eyebrow} title={home.catalog.title(CARDS.length)} lead={home.catalog.lead}>
           <CatalogChips locale={locale} labels={labels} />
+        </HomeSection>
+        <HomeSection id="follow" eyebrow={home.follow.eyebrow} title={home.follow.title} lead={home.follow.lead}>
+          <FollowCards labels={labels} />
         </HomeSection>
         <HomeSection id="install" eyebrow={home.install.eyebrow} title={home.install.title} lead={home.install.lead}>
           <InstallCard locale={locale} labels={labels} />

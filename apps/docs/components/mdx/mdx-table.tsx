@@ -3,7 +3,9 @@ import { Table } from 'topclassui/table'
 import { getLabels } from 'topclassui/labels/get-labels'
 
 import type { Locale } from '../../content/pages'
+import { columnFit } from '../../lib/table-of'
 import { textOf } from '../../lib/text-of'
+import { AUTHORED_CELL, PROSE_COLUMN, PROSE_TABLE } from '../classes'
 
 type Row = { key: string; cells: ReactNode[] }
 
@@ -38,11 +40,12 @@ export function MdxTable({ children, locale }: { children?: ReactNode; locale: L
       items={items}
       getKey={(item) => item.key}
       caption={caption === '' ? '-' : caption}
+      className={PROSE_TABLE}
       columns={header.map((cell, column) => ({
         key: String(column),
         header: cell,
         rowHeader: column === 0,
-        className: 'whitespace-normal',
+        className: `${PROSE_COLUMN[columnFit(cell, body.map((cells) => cells[column]), column === header.length - 1)]} ${AUTHORED_CELL}`,
         cell: (item: Row) => item.cells[column],
       }))}
     />

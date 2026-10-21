@@ -1,10 +1,10 @@
 import { isValidElement, type ReactNode } from 'react'
-import { CodeBlock } from 'topclassui/code-block'
-import { getLabels } from 'topclassui/labels/get-labels'
 
 import type { Locale } from '../../content/pages'
+import { labelsFor } from '../../labels/index'
 import { highlight } from '../../lib/highlight'
 import { parseMeta } from '../../lib/text-of'
+import { CodeFrame } from './code-frame'
 
 interface CodeProps {
   className?: string
@@ -19,9 +19,15 @@ export interface CodeFenceProps {
   /** "terminal" for a shell fence with no title of its own. */
   terminal: string
   /** Overrides the info string's title, as WrongRight does. */
-  title?: ReactNode
+  title?: string
   /** Read after a title the page shows again, so the regions and copy buttons are told apart: ", version 2". */
   repeat?: (count: number) => string
+  /** false leaves out the Copy button, as WrongRight's bare panes do. */
+  copy?: boolean
+  /** Long lines break instead of scrolling. */
+  wrap?: boolean
+  /** Added to DOCS_CODE, as WrongRight's tone edge is. */
+  className?: string
 }
 
 const SHELL = new Set(['bash', 'sh', 'shell'])
@@ -38,16 +44,22 @@ export function fenceOf(children: ReactNode): { code: string; lang: string | und
   }
 }
 
-/** A fenced block: CodeBlock with Shiki's colours from build time and its own copy button (docs-site S3). */
-export async function CodeFence({ children, locale, terminal, title, repeat }: CodeFenceProps) {
+/** A fenced block: CodeBlock with Shiki's colours from build time, named by its file, its language or "code" (docs-site S3). */
+export async function CodeFence({ children, locale, terminal, title, repeat, copy = true, wrap = false, className }: CodeFenceProps) {
   const { code, lang, meta, repeat: count } = fenceOf(children)
-  const parsed = parseMeta(meta)
-  const named = title ?? parsed.title ?? (lang !== undefined && SHELL.has(lang) ? terminal : undefined)
-  const shown = count === null || repeat === undefined ? named : <>{named}<span className="sr-only">{repeat(count)}</span></>
+  const named = title ?? parseMeta(meta).title ?? (lang === undefined ? labelsFor(locale).blocks.code : SHELL.has(lang) ? terminal : lang)
   const highlighted = await highlight(code, lang)
   return (
-    <CodeBlock {...getLabels(locale)} lang={lang} title={shown} highlighted={highlighted ?? undefined}>
-      {code}
-    </CodeBlock>
+    <CodeFrame
+      code={code}
+      locale={locale}
+      title={named}
+      repeat={count === null || repeat === undefined ? undefined : repeat(count)}
+      lang={lang}
+      highlighted={highlighted}
+      copy={copy ? code : false}
+      wrap={wrap}
+      className={className}
+    />
   )
 }

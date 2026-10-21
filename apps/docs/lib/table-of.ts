@@ -1,4 +1,4 @@
-// The wrappers on the foundation pages read the GFM table an author wrote inside them, then add the generated columns.
+// The wrappers on the foundation pages read the GFM table an author wrote inside them, then add the generated columns; and how every guide table lays out.
 import { Children, isValidElement, type ReactNode } from 'react'
 
 import { textOf } from './text-of'
@@ -38,4 +38,36 @@ export function tableOf(children: ReactNode): TableOf {
 /** The table's caption: its column names, as MdxTable gives every table. */
 export function captionOf(header: readonly ReactNode[]): string {
   return header.map(textOf).join(', ')
+}
+
+/** Longer than this, a cell reads as prose and its column wraps; "Next.js 15 or 16, App Router" stays on one line. */
+const ONE_LINE = 32
+
+/** How a column of a guide table lays out: on one line when its header and every cell are short, wrapping otherwise; the last column always wraps. */
+export function columnFit(header: ReactNode, cells: readonly ReactNode[], last: boolean): 'fit' | 'wrap' | 'prose' {
+  if (last) return 'prose'
+  return [header, ...cells].every((cell) => textOf(cell).length <= ONE_LINE) ? 'fit' : 'wrap'
+}
+
+/** A default as docs:data prints it, one object entry per line so a narrow column never wraps inside one: `{ a: 1,` `b: 2 }`. */
+export function defaultLines(text: string): string[] {
+  if (!text.startsWith('{ ') || !text.endsWith(' }')) return [text]
+  const inner = text.slice(2, -2)
+  const entries: string[] = []
+  let depth = 0
+  let quote = ''
+  let start = 0
+  for (let at = 0; at < inner.length; at += 1) {
+    const char = inner.charAt(at)
+    if (quote !== '') quote = char === quote ? '' : quote
+    else if (char === "'" || char === '"') quote = char
+    else if ('{[('.includes(char)) depth += 1
+    else if ('}])'.includes(char)) depth -= 1
+    else if (char === ',' && depth === 0) {
+      entries.push(inner.slice(start, at).trim())
+      start = at + 1
+    }
+  }
+  entries.push(inner.slice(start).trim())
+  return entries.map((entry, at) => `${at === 0 ? '{ ' : ''}${entry}${at === entries.length - 1 ? ' }' : ','}`)
 }

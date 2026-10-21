@@ -8,8 +8,9 @@ import { guideLabelsFor } from '../../labels/guides'
 import type { Shade } from '../../lib/guide-facts'
 import { tokenFact, tokenNameOf } from '../../lib/guides'
 import type { FactMode } from '../../lib/library-facts'
-import { captionOf, tableOf } from '../../lib/table-of'
+import { captionOf, columnFit, tableOf } from '../../lib/table-of'
 import { textOf } from '../../lib/text-of'
+import { AUTHORED_CELL, PROSE_COLUMN, PROSE_TABLE, TABLE_CODE } from '../classes'
 
 const MODES = ['light', 'dark', 'ocean'] as const satisfies readonly FactMode[]
 
@@ -40,10 +41,12 @@ export function TokenTable({ children, locale }: { children?: ReactNode; locale:
       items={items}
       getKey={(item) => item.key}
       caption={captionOf([...header, ...modeHeaders])}
+      className={PROSE_TABLE}
       columns={[
         {
           key: 'swatch',
           header: labels.swatch,
+          className: PROSE_COLUMN.fit,
           cell: (item: Row) => (
             <span aria-hidden="true" style={{ '--tc-swatch': `var(${item.token})` }} className={`inline-block size-6 rounded-chip bg-(--tc-swatch) align-middle ${BORDER_STRONG}`} />
           ),
@@ -52,19 +55,19 @@ export function TokenTable({ children, locale }: { children?: ReactNode; locale:
           key: `own-${String(column)}`,
           header: cell,
           rowHeader: column === 0,
-          className: 'whitespace-normal',
+          className: `${PROSE_COLUMN[columnFit(cell, rows.map((cells) => cells[column]), false)]} ${AUTHORED_CELL}`,
           cell: (item: Row) => item.cells[column],
         })),
         ...MODES.map((mode) => ({
           key: mode,
           header: labels.modes[mode],
-          className: 'whitespace-normal min-w-32',
+          className: PROSE_COLUMN.wrap,
           cell: (item: Row) => {
             const fact = tokenFact(item.token)
             const measured = fact.contrast?.[mode]
             return (
               <span className="flex flex-col gap-0.5">
-                <code dir="ltr" className="font-mono text-sm text-body">{shade(fact.shade[mode])}</code>
+                <code dir="ltr" className={TABLE_CODE}>{shade(fact.shade[mode])}</code>
                 <span className="text-xs text-muted">{measured === undefined ? labels.notMeasured : labels.contrast(measured.ratio, measured.min)}</span>
               </span>
             )

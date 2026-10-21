@@ -42,7 +42,7 @@ export default defineConfig(
 
   // Satori draws the Open Graph images and the icon from inline styles alone; no stylesheet reaches them.
   {
-    files: ['app/**/opengraph-image.tsx', 'app/icon.tsx', 'lib/og.tsx'],
+    files: ['app/**/opengraph-image.tsx', 'app/icon.tsx', 'app/apple-icon.tsx', 'lib/og.tsx', 'lib/icon-tile.tsx'],
     rules: { 'topclass/style-sets-tokens-only': 'off' },
   },
 

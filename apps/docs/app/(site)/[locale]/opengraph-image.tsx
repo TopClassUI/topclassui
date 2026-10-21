@@ -18,9 +18,10 @@ export default async function Image({ params }: { params: Promise<{ locale: stri
   const locale = isLocale(raw) ? raw : 'en'
   const labels = labelsFor(locale)
   const [major = '0', minor = '0'] = VERSION.split('.')
+  // The English chip on both: Satori cannot shape Arabic (lib/og.tsx).
   return ogImage({
     name: labels.meta.siteName,
-    chip: `v${major}.${minor}${PRERELEASE ? ' beta' : ''}`,
+    chip: labelsFor('en').home.hero.chip(`${major}.${minor}`, PRERELEASE),
     line: locale === 'ar' ? `${SITE_URL.replace('https://', '')}/ar` : pageBySlug('home')?.description.en ?? '',
   })
 }

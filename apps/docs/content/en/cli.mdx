@@ -1,0 +1,101 @@
+---
+slug: cli
+title: Add with the CLI
+description: Copy one component into your project with one command. The CLI brings its source, constants, schema, types and variants, and you edit them as your own files.
+---
+
+## Start a project
+
+One command sets the project up. It reads your framework, copies the shared code and adds two lines to your CSS.
+
+```bash title="terminal"
+npx topclassui init
+```
+
+It finds Next.js with the App Router or React with Vite, and your package manager. It copies the provider, the theme script, the labels, `tokens.css` and `styles.css` into one `topclassui/` folder. It installs `@base-ui/react`, `class-variance-authority`, `clsx`, `tailwind-merge` and `zod`, writes `topclassui.json`, and prints the provider lines for your layout.
+
+```css title="app/globals.css"
+@import "tailwindcss";
+@import "../topclassui/tokens.css";
+@import "../topclassui/styles.css";
+```
+
+## Add a component
+
+Name one or several. Each comes with every file it imports.
+
+```bash title="terminal"
+npx topclassui add button
+npx topclassui add dialog select
+```
+
+`--all` copies every component. A file you have edited is never written over: `add` leaves it as it is and names it.
+
+## The topclassui folder
+
+Everything lands in one folder, and it is yours to edit.
+
+```text title="topclassui/"
+topclassui/
+  components/button/   index.tsx, classes.ts, variants.ts, ... and dummy/ with the examples
+  shared/              cn, classes, contracts, labels, provider, theme
+  icons/data/          one file for each icon a copy uses
+  tokens.css
+  styles.css
+topclassui.json        what was copied, from which version, with a hash of each file
+```
+
+Import from the folder, not from the package. The copies import each other with relative paths, so no alias is needed.
+
+```tsx title="app/page.tsx"
+import { Button } from '@/topclassui/components/button'
+```
+
+## Keep up with new versions
+
+Update the package, then compare.
+
+```bash title="terminal"
+npx topclassui diff
+npx topclassui add --update
+```
+
+`diff` lists every copied file as up to date, changed upstream or changed by you, prints a patch for each upstream change, and exits with 1 when anything differs. `add --update` writes the new version of the files you have not touched. `--overwrite` replaces the ones you edited too, after printing the diff.
+
+## See what is there
+
+```bash title="terminal"
+npx topclassui list
+```
+
+Every component, and which ones are in your project. `--json` prints the same list as JSON.
+
+## Flags
+
+Every command also takes `--cwd <dir>` for a project outside the current folder.
+
+| Flag | What it does |
+|---|---|
+| `-y`, `--yes` | Accept every default without asking |
+| `--dry-run` | Print what would be written; write and install nothing |
+| `--no-install` | Print the install command instead of running it |
+| `--css <file>` | `init`: the CSS file that imports `tailwindcss` |
+| `--dir <path>` | `init`: the folder for the copies |
+| `--pm <name>` | `npm`, `pnpm`, `yarn` or `bun` |
+| `--examples`, `--no-examples` | `add`: also add what the examples need, or copy no examples |
+
+## Next.js and Vite
+
+The same commands on both. Three things differ.
+
+| Where | Next.js App Router | Vite |
+|---|---|---|
+| Folder | `topclassui/`, or `src/topclassui/` with a `src` folder | `src/topclassui/` |
+| CSS entry | `app/globals.css` | `src/index.css` |
+| Provider | `app/layout.tsx`, with `ThemeScript` in the head | `src/main.tsx`, around `<App />` |
+
+## Copy or package
+
+Pick one. The copies read the copied provider, so a layout that mounts the provider from the package leaves them in English and left to right. `init` stops when it finds one; `--force` goes ahead anyway.
+
+<Callout tone="info">Exit codes: 0 done, 1 something differs, 2 a mistake in the command, 3 the install failed.</Callout>
