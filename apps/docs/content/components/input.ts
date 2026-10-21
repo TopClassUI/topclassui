@@ -10,7 +10,7 @@ export const input = {
     ar: 'حقل إدخال أصلي يُعرض على الخادم ولا يشحن أي JavaScript. الأنواع ترفض حقلًا بلا اسم.',
   },
   demos: ['labelled', 'types', 'sizes', 'full-width', 'row', 'custom-size', 'skeleton', 'rtl'],
-  stageHeight: 7,
+  stageHeight: 7.5,
   controlOrder: ['size', 'disabled', 'invalid', 'required', 'fullWidth'],
   extraSwitches: ['disabled', 'required'],
   note: {

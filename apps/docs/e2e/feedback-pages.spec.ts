@@ -63,9 +63,11 @@ test('Progress: the playground drives the value, the tone, the size and indeterm
   const progress = card(page, 'progress')
   const stage = progress.getByRole('progressbar', { name: 'Upload' })
   const slider = progress.getByRole('slider')
+  // Try it starts at the frame's 60, which the stage draws before any press.
+  await expect(stage).toHaveAttribute('aria-valuenow', '60')
   await slider.focus()
   for (let press = 0; press < 5; press++) await page.keyboard.press('ArrowRight')
-  await expect(stage).toHaveAttribute('aria-valuenow', '5')
+  await expect(stage).toHaveAttribute('aria-valuenow', '65')
   await choose(page, 'progress', 'tone', 'success')
   await expect(stage).toHaveAttribute('data-tone', 'success')
   await choose(page, 'progress', 'size', 'lg')
