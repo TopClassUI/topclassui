@@ -24,8 +24,7 @@ const config: NextConfig = {
   turbopack: { root: REPO },
   outputFileTracingRoot: REPO,
   // Still experimental in 16.3.8: without it app/global-not-found.tsx is ignored (docs-site page 20).
-  // inlineCss: the stylesheet travels in the HTML, so a phone paints without waiting on a CSS request (PageSpeed's render-blocking item).
-  experimental: { globalNotFound: true, inlineCss: true },
+  experimental: { globalNotFound: true },
   poweredByHeader: false,
   headers() {
     // Next sets the same value on /_next/static itself and warns that a custom one can break next dev, so it is written for builds only.
