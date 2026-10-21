@@ -19,7 +19,7 @@ export const SECTION_TITLE = 'text-[clamp(1.875rem,1.25rem+2vw,2.5rem)] leading-
 export const LEAD = 'max-w-3xl text-lg text-muted'
 
 /** A Home panel: the surface, the line and the drawn 14 px corner. */
-export const PANEL = `flex min-w-0 flex-col gap-3.5 rounded-box bg-surface p-4.5 ${BORDER}`
+export const PANEL = `flex min-w-0 flex-col gap-3 rounded-box bg-surface p-4.5 ${BORDER}`
 
 /** The soft fill of a tone and its text, for Home's tinted cards (Follow us, What you need). */
 export const TINT = {

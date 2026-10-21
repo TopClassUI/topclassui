@@ -87,6 +87,8 @@ export interface SiteLabels {
       lead: string
       readDocs: string
       star: string
+      /** The line under the calls to action: where the release is and what to read first. */
+      caption: (version: string, beta: boolean) => string
     }
     frame: {
       caption: string
@@ -142,6 +144,11 @@ export interface SiteLabels {
         target: (pages: number) => string
         focus: (pages: number) => string
         contrast: (pairs: number) => string
+        /** The heading over the commands that run the checks above. */
+        run: string
+        /** The comment above each command in the code well, without its #. */
+        commands: { setup: string; e2e: string; contrast: (pairs: number) => string; all: string }
+        runNote: string
       }
     }
     modes: Titled & {
