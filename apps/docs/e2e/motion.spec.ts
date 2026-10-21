@@ -10,25 +10,30 @@ interface Seen {
   inDemo: boolean
 }
 
-/** Adds up every layout shift from the first paint, input or not: the shifts that move an element's box apart from those that move only text. */
+/** Adds up every layout shift from the first paint, input or not: the shifts that move an element's box apart from those that
+ * move only text, and from those inside a demo's floating popup, as a tooltip's arrow Base UI places a frame after its popup. */
 async function watchShifts(page: Page) {
   await page.addInitScript(() => {
-    const record = window as unknown as { shift: { boxes: number; glyphs: number } }
-    record.shift = { boxes: 0, glyphs: 0 }
+    const record = window as unknown as { shift: { boxes: number; glyphs: number; floating: number } }
+    record.shift = { boxes: 0, glyphs: 0, floating: 0 }
+    const floating = (node: Node | null) => node instanceof Element
+      && node.closest('[data-side]')?.closest('[data-component], section[aria-labelledby="examples"]') != null
     new PerformanceObserver((list) => {
       for (const entry of list.getEntries() as (PerformanceEntry & { value: number; sources: { node: Node | null }[] })[]) {
         const glyphsOnly = entry.sources.every((source) => source.node?.nodeType === Node.TEXT_NODE)
-        record.shift[glyphsOnly ? 'glyphs' : 'boxes'] += entry.value
+        const inPopup = entry.sources.every((source) => floating(source.node))
+        record.shift[glyphsOnly ? 'glyphs' : inPopup ? 'floating' : 'boxes'] += entry.value
       }
     }).observe({ type: 'layout-shift', buffered: true })
   })
 }
 
-/** No box moves; a web font swapping in under a fallback with other metrics may move text by less than Lighthouse prints (0.000). */
+/** No box moves; a web font swapping in under a fallback with other metrics, or a demo popup's arrow, may move by less than Lighthouse prints (0.000). */
 async function expectNoShift(page: Page) {
-  const shift = await page.evaluate(() => (window as unknown as { shift: { boxes: number; glyphs: number } }).shift)
+  const shift = await page.evaluate(() => (window as unknown as { shift: { boxes: number; glyphs: number; floating: number } }).shift)
   expect(shift.boxes).toBe(0)
   expect(shift.glyphs).toBeLessThan(0.0005)
+  expect(shift.floating).toBeLessThan(0.0005)
 }
 
 /** Every animation alive right now, with its time from start to end; a library demo's own motion is told apart. */
