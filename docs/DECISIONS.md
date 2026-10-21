@@ -6,6 +6,18 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-19 - Home is built from the Figma frame 191:1495
+
+**Decision.** Job 124 rebuilt every Home section against the frame (composites in `docs/figma/parity/site-home-*.png`, frame left, build right) and took B1 to B3 of the approved plan: the mark from `docs/brand/` in the navbar, footer, product frame, favicon, apple icon, manifest and Open Graph card; `GITHUB_URL`, `YOUTUBE_URL` and `X_URL = null` in `apps/docs/lib/site.ts`; the Follow us section; the five-column footer with llms.txt, Changelog and the social icons; centred section heads with capital eyebrows; `SECTION_TITLE` up to 40 px; "Docs" in the navbar; the tick grid in the Arabic panel; the Open Graph chip from the labels.
+
+- **Where the build departs from the frame.** No letter-spacing on the eyebrows: the site's lint holds R-5.3-3, so the capitals are drawn without the frame's 0.8 px tracking. The chip keeps the 0.1 beta wording and the hero's "Available with v0.1" note is left out (change 11); the frame's table header slips (Kind over the names, Status over the kinds) are read as Name and Kind. The Client JavaScript sizes are the ones `pnpm size` measured (job 118, taken at 927a307). The Proof panel 3 stays "Tested, not promised", in the drawn card's shape. Panel 1 prints Dialog's lines of `size-budget.json`, the real check, in place of the drawn `.size-limit.json`. The X card and icon wait for a handle. The footer's Components column lists live pages only, so the group names of the frame are left out (choice 12).
+- **Glows and lifts** are site classes in `apps/docs/app/globals.css` (`docs-glow`, `docs-frame`, `docs-lift`, `docs-tile`, `docs-number-*`), every colour a `color-mix()` of a `--tc-*` token; no token was added.
+- **The brand marks** of Next.js, React, Tailwind CSS, GitHub, YouTube and X are inline single-colour SVG in `apps/docs/components/home/brand-logos.tsx`, each taking its tile's text colour.
+
+**Why.** Omar named the landing page first among the pages that looked unfinished; the frame is the truth for the look.
+
+**What it affects.** `apps/docs` only (Home, the navbar, the footer, the icon and Open Graph routes, the labels), the root README's wordmark and `docs/brand/`. The library is untouched.
+
 ## 2026-10-19 - No default scrollbar anywhere: the page wears the shared bar, and an e2e reads every scroller
 
 **Decision.** Job 123. `html` in `src/tokens.css` sets `scrollbar-width: thin` and `scrollbar-color` from the two scrollbar tokens, so the page's own bar is drawn like every SCROLLBAR, SCROLL_AREA and SCROLL_X container. The Sidebar's in-a-layout demo wears SCROLL_AREA; on the site, STAGE and STATE_SCOPE wear SCROLL_X and On this page wears SCROLL_AREA. `e2e/scrollbar-everywhere.spec.ts` (every harness page and every overlay opened live) and `apps/docs/e2e/scrollbars.spec.ts` (every sitemap page at 1440 and 390, and the open search palette) fail on any rendered element whose overflow is auto or scroll and whose computed `scrollbar-width` is not `thin`. `none` passes: it draws no bar, and the closed Sidebar rail hides its own on purpose.
@@ -44,6 +56,14 @@ The format is: date, decision, why, and what it affects.
 **Why.** Every demo on the site, in the harness and in a consumer's own gallery wrote a `BreadcrumbList` of relative URLs into the page that showed it, which Google reads as that page's own trail, and relative `item` URLs are dropped anyway. Opt-in by the absolute origin fixes both.
 
 **What it affects.** `src/components/breadcrumb/{index.tsx,lib.ts,types.ts,schema.ts,constants.ts,README.md}`, its tests and mutation rows, and the site's two `Breadcrumb`s (`component-page.tsx`, `docs-shell.tsx`), which now pass `siteUrl={SITE_URL}` and so gain the current page as the last `ListItem`. A caller still passing `baseUrl` fails to compile. The 10 October entry's Breadcrumb bullet is superseded on this point.
+
+## 2026-10-19 - The guide pages' code sits on the page, in the frames' colours
+
+**Decision.** Job 125 (the getting-started pages against Figma 193:1588, 193:2328, 193:2659 and 193:3001). On a guide page a fence, the install tabs and the ThemeScript blocks carry `docs-code` (`apps/docs/app/globals.css`): CodeBlock's solid pair is set to the page's own (`--tc-neutral-solid: var(--tc-page)`, `--tc-neutral-on-solid: var(--tc-body)`), with a line around it and its header on the surface, as the four frames draw it. The install tabs are one card (tabs on the surface over a line, the code flush beneath, the copy button at the inline end); Wrong and Right drop the header for a name above the box and a danger or success edge. The Shiki pair is no longer github-dark-default and github-light-high-contrast but the frames' colours from the Tailwind palette (`lib/shiki-themes.ts`): keywords and tags blue, strings emerald, attributes and constants amber, comments neutral, at 400 on a dark ground and 700/800/600 on a light one. The component pages keep CodeBlock's own solid block, which the CodeBlock Previewer frame draws.
+
+**Why.** docs-site S3 put every fence on `neutral/solid` (unit-5 choice 13), read from the text notes; the page frames, read for the first time, draw the code on `base/page` with a `base/surface` header and a `base/line` edge.
+
+**What it affects.** `lib/shiki-contrast.test.ts` now also measures `on-dark` on the dark page and `on-light` on the light and ocean pages, every token colour at 4.5:1 plus the 0.15 margin. Code on a guide page is `text-xs` on the `text-sm` line height (the frames draw 11 px). Nothing in the library changed.
 
 ## 2026-10-18 - The site hydrates in islands, and the shell's code waits for the first paint
 

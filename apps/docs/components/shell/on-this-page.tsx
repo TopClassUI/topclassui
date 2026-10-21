@@ -12,8 +12,8 @@ export function OnThisPage({ entries, label }: { entries: readonly TocEntry[]; l
   if (entries.length === 0) return null
   return (
     <nav aria-label={label} className={`sticky top-(--tc-sticky-top) hidden self-start max-h-[calc(100dvh-var(--tc-sticky-top))] px-4 pt-9 pb-4 xl:block ${SCROLL_AREA}`}>
-      <p className="mb-2 text-xs font-semibold text-muted">{label}</p>
-      <ul className="flex flex-col gap-1 text-sm">
+      <p className="mb-2.5 text-xs font-medium text-muted uppercase">{label}</p>
+      <ul className="flex flex-col gap-px text-xs">
         {entries.map((entry) => (
           <li key={entry.id}>
             <a href={`#${entry.id}`} className={QUIET_LINK}>{entry.text}</a>

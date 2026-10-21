@@ -10,15 +10,40 @@ export const QUIET_LINK = `inline-flex items-center text-muted ${HOVER.link} ${F
 /** The skip link: hidden until it takes the focus, then drawn above the navbar. */
 export const SKIP_LINK = `sr-only focus:not-sr-only focus:fixed focus:top-2 focus:inset-s-2 focus:z-(--tc-z-toast) focus:p-3 bg-surface-raised text-body rounded-control ${FOCUS_RING}`
 
-/** Small caps-free eyebrow over a Home section heading. */
-export const EYEBROW = 'text-xs font-semibold text-primary-on-soft'
+/** The eyebrow over a Home section heading, in capitals as drawn; Arabic has no case. */
+export const EYEBROW = 'text-xs font-medium text-primary-on-soft uppercase'
 
-export const SECTION_TITLE = 'text-3xl font-semibold text-body lg:text-4xl'
+/** 30 px on a phone up to the drawn 40 px at 1440. */
+export const SECTION_TITLE = 'text-[clamp(1.875rem,1.25rem+2vw,2.5rem)] leading-tight font-semibold text-body'
 
-export const LEAD = 'text-base text-muted'
+export const LEAD = 'max-w-3xl text-lg text-muted'
 
-/** Inline code in prose and table cells: Latin, left to right, inside an Arabic sentence too. */
-export const INLINE_CODE = 'rounded-chip bg-neutral-soft px-1 font-mono text-sm text-body'
+/** A Home panel: the surface, the line and the drawn 14 px corner. */
+export const PANEL = `flex min-w-0 flex-col gap-3.5 rounded-box bg-surface p-4.5 ${BORDER}`
+
+/** The soft fill of a tone and its text, for Home's tinted cards (Follow us, What you need). */
+export const TINT = {
+  primary: 'bg-primary-soft text-primary-on-soft',
+  info: 'bg-info-soft text-info-on-soft',
+  danger: 'bg-danger-soft text-danger-on-soft',
+  neutral: 'bg-neutral-soft text-neutral-on-soft',
+  success: 'bg-success-soft text-success-on-soft',
+} as const
+
+/** The solid fill of a tone, for the icon tiles on the tinted cards. */
+export const TILE = {
+  primary: 'bg-primary-solid text-primary-on-solid',
+  info: 'bg-info-solid text-info-on-solid',
+  danger: 'bg-danger-solid text-danger-on-solid',
+  neutral: 'bg-neutral-solid text-neutral-on-solid',
+  success: 'bg-success-solid text-success-on-solid',
+} as const
+
+/** Inline code in prose and table cells: Latin, left to right, inside an Arabic sentence too. Mono on the text's own ground, as the docs frames draw it. */
+export const INLINE_CODE = 'font-mono text-sm text-body'
+
+/** A guide page's code block: on the page, edged, its header on the surface (globals.css). */
+export const DOCS_CODE = 'docs-code'
 
 export const LINK = `inline-flex items-center rounded-control text-primary-on-soft underline-offset-4 ${HOVER.link} ${FOCUS_RING} ${TOUCH_TARGET}`
 /** Visible on focus, as S11 asks, and on hover of its heading. */

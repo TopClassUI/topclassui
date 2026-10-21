@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import { CatalogChips } from '../../../components/home/catalog-chips'
+import { FollowCards } from '../../../components/home/follow-cards'
 import { Hero } from '../../../components/home/hero'
 import { HomeSection } from '../../../components/home/home-section'
 import { InstallCard } from '../../../components/home/install-card'
@@ -57,13 +58,13 @@ export default async function Home({ params }: { params: Params }) {
           ...(GITHUB_URL === null ? {} : { codeRepository: GITHUB_URL }),
         }}
       />
-      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-(--docs-home) px-4 pb-16 outline-none md:px-6">
+      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-(--docs-home) px-4 pb-16 outline-none md:px-6 xl:px-0">
         <Hero locale={locale} labels={labels} />
-        <div className="pt-16">
+        <div className="pt-16 pb-24">
           <ProductFrame locale={locale} labels={labels} />
         </div>
         <HomeSection id="proof" eyebrow={home.proof.eyebrow} title={home.proof.title} lead={home.proof.lead}>
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5.5 lg:grid-cols-3">
             <ServerPanel locale={locale} labels={labels} />
             <RtlPanel labels={labels} />
             <TestedPanel labels={labels} />
@@ -77,6 +78,9 @@ export default async function Home({ params }: { params: Params }) {
         </HomeSection>
         <HomeSection id="catalog" eyebrow={home.catalog.eyebrow} title={home.catalog.title(CARDS.length)} lead={home.catalog.lead}>
           <CatalogChips locale={locale} labels={labels} />
+        </HomeSection>
+        <HomeSection id="follow" eyebrow={home.follow.eyebrow} title={home.follow.title} lead={home.follow.lead}>
+          <FollowCards labels={labels} />
         </HomeSection>
         <HomeSection id="install" eyebrow={home.install.eyebrow} title={home.install.title} lead={home.install.lead}>
           <InstallCard locale={locale} labels={labels} />
