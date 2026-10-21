@@ -35,7 +35,7 @@ export function Hero({ locale, labels }: { locale: Locale; labels: SiteLabels })
       {changelog === undefined ? <p className={CHIP}>{chip}</p> : (
         <Link href={hrefOf(changelog, locale)} className={`docs-hover-lift ${CHIP} ${HOVER.outline} ${FOCUS_RING} ${TOUCH_TARGET} ${TRANSITION}`}>{chip}</Link>
       )}
-      <h1 className="mt-7.5 flex flex-col text-[clamp(2.25rem,1rem+7vw,3rem)] font-semibold text-body lg:text-[clamp(3rem,5.55vw,5rem)] lg:leading-[1.04]">
+      <h1 className="docs-hero-title mt-7.5 flex flex-col text-[clamp(2.25rem,1rem+7vw,3rem)] font-semibold text-body lg:text-[clamp(3rem,6.39vw,5.75rem)] lg:leading-[1.04]">
         <span>{hero.titleTop}</span>
         <span>{hero.titleBottom}</span>
       </h1>

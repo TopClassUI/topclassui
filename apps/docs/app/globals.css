@@ -39,6 +39,9 @@
 }
 
 @layer components {
+  /* The hero title's drawn -2.3 px at 92 px, in Latin only: letter-spacing breaks joined Arabic letters, so Arabic keeps none. */
+  .docs-hero-title:lang(en) { letter-spacing: -0.025em; }
+
   /* Home's glows: a token mixed toward transparent, so they turn with the theme (docs-site page 1). */
   .docs-glow {
     position: absolute;
