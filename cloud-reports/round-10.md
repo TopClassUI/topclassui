@@ -6,6 +6,8 @@ Caption call made by the lead (19:25 UTC, on job 144's question, sent to all six
 
 Main note (19:45 UTC, the laptop, Omar's word): main is fc034293 with the landing page merged (PR 180, 175-179, 181). Nothing changes for the six library jobs: they keep building on fix/r9-library d2849631; the laptop merges main in when it integrates them. The laptop runs a clean full Windows library e2e on d2849631 (about 45 min) and sends each job its Windows-only failures through the lead.
 
+fix/r9-parity call made by the lead (20:05 UTC): job 134 pushed fix/r9-parity 1e81ea9c (its earlier library commits on c0ee519a) after jobs 140, 142 and 143 had finished the same components from fresh frames; it overlaps their branches (48 files with fix/r10-fields-1) and the in-progress 141 and 145. The round-10 branches are the library side that counts; 141 and 145 use fix/r9-parity as reference only, never merge it; the laptop decides whether anything of it (the DECISIONS entry) is merged or it is dropped. Omar confirms or overrides.
+
 Figma tools: file key BxRSdAVOhk9Hj3Tkq4tjcy; the Previewer frame ids are in review-notes/figma-audit/previewer-frames.json on review/round-8; the cloud proxy blocks www.figma.com itself; get_screenshot, get_metadata and get_design_context work; use_figma is never called. get_screenshot returns a figma.com URL the proxy blocks: the jobs call it with enableBase64Response true (maxDimension 2048) and decode the inline PNG (the lead, 19:40 UTC, after job 142 fell back to round-8 crops).
 
 | Job | Branch | Base | Tip | Commits | Gates | Composites and what is left for Omar |
