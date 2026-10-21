@@ -91,4 +91,11 @@ describe('the knobs and the mode blocks', () => {
     expect(facts.modeBlocks.ocean.split('\n')[0]).toBe("[data-theme='ocean'] {")
     expect(facts.modeBlocks.dark).toContain('--tc-primary-mix: 24%;')
   })
+
+  it('skip a selector list that ends in the same selector, so the ocean sample is never the light block', () => {
+    const css = ":root,\n[data-theme='ocean'] {\n  --tc-page: white;\n}\n\n[data-theme='ocean'] {\n  --tc-radius: 9999px;\n}\n"
+    expect(blockSource(css, "[data-theme='ocean']")).toBe("[data-theme='ocean'] {\n  --tc-radius: 9999px;\n}")
+    expect(facts.modeBlocks.ocean).toContain('--tc-primary-solid: var(--color-cyan-700);')
+    expect(facts.modeBlocks.ocean).not.toContain('--tc-page')
+  })
 })
