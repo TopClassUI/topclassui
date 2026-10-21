@@ -12,7 +12,7 @@ export const rating = {
   demos: ['read-only', 'editable', 'in-form', 'controlled', 'disabled', 'sizes', 'max-ten', 'rtl'],
   stageHeight: 4,
   controlOrder: ['max', 'size', 'readOnly'],
-  controlsHidden: ['value', 'defaultValue', 'disabled'],
+  controlsHidden: ['value', 'defaultValue'],
   note: {
     en: '`value` alone renders stars on the server; only `readOnly={false}` ships the client half.',
     ar: '`value` وحده يعرض النجوم على الخادم؛ ووحده `readOnly={false}` يشحن نصف العميل.',

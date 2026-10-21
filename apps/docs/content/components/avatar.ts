@@ -8,7 +8,6 @@ export const avatar = {
   },
   demos: ['basic', 'with-name', 'sizes', 'icon', 'failed', 'skeleton', 'custom-size', 'rtl'],
   stageHeight: 8,
-  stageDemo: 'basic',
   note: {
     en: 'The fallback shows while the picture loads and after it fails; initials are its children.',
     ar: 'يظهر البديل أثناء تحميل الصورة وبعد فشلها؛ والأحرف الأولى هي محتواه.',

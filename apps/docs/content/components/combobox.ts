@@ -12,7 +12,7 @@ export const combobox = {
   demos: ['basic', 'form', 'sizes', 'load-more', 'status', 'ten-thousand', 'long-content', 'rtl'],
   stageHeight: 7,
   controlOrder: ['size', 'visibleRows', 'disabled', 'invalid', 'fullWidth', 'hasMore'],
-  controlsHidden: ['placement', 'loadMoreThreshold', 'status'],
+  controlsHidden: ['loadMoreThreshold'],
   extraSwitches: ['disabled'],
   note: {
     en: 'Filtering runs over the options loaded so far; the next page arrives through `hasMore` and `loadMore`.',

@@ -9,7 +9,7 @@ export const dropdown = {
   demos: ['basic', 'groups', 'danger-item', 'with-links', 'data-driven', 'placements', 'sixty-items', 'in-dialog', 'rtl'],
   stageHeight: 12,
   controlOrder: ['placement'],
-  controlsHidden: ['tone', 'delay', 'closeDelay'],
+  controlsHidden: ['delay', 'closeDelay'],
   stageOpen: true,
   note: {
     en: '`href` and Server Action items work from a server page; `onSelect` is a plain function and needs a client file.',
