@@ -5,6 +5,7 @@ import { Field } from 'topclassui/field'
 import { Input } from 'topclassui/input'
 
 import type { Mode, SiteLabels } from '../../labels'
+import { AdornedInput, ROOM } from './adorned-input'
 import { Switch } from './home-islands'
 
 const MODES = ['light', 'dark', 'ocean'] as const satisfies readonly Mode[]
@@ -22,7 +23,11 @@ export function ModeCards({ labels }: { labels: SiteLabels }) {
               <code dir="ltr" className="font-mono text-xs text-muted">{`data-theme="${mode}"`}</code>
             </div>
             <Field name={`email-${mode}`} label={text.email} id={`email-${mode}`}>
-              {(control) => <Input {...control} type="email" size="sm" fullWidth defaultValue="omar@example.com" />}
+              {(control) => (
+                <AdornedInput icon="envelope-simple" dir="ltr">
+                  <Input {...control} type="email" size="sm" fullWidth defaultValue="omar@example.com" className={ROOM.start} />
+                </AdornedInput>
+              )}
             </Field>
             <div className="flex flex-wrap gap-2">
               <Button size="sm">{text.save}</Button>
