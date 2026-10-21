@@ -20,7 +20,7 @@ const AFTER: Record<string, string[]> = {
   'limits': ['Oct 31, 2026'],
   'rtl': ['30/09/2026'.replaceAll('/', `${String.fromCodePoint(0x200f)}/`)],
   'sizes': ['Sep 30, 2026', 'Sep 30, 2026', 'Sep 30, 2026', 'Sep 30, 2026', 'Sep 30, 2026'],
-  'states': ['Oct 31, 2026', 'Sep 30, 2026', 'Sep 30, 2026', 'Sep 22, 2026'],
+  'states': ['Oct 31, 2026', 'Sep 30, 2026', 'Sep 30, 2026', 'Sep 30, 2026', 'Pick a date', 'Oct 31, 2026'],
   'week-start': ['Sep 30, 2026', 'Sep 30, 2026', '30 Sept 2026'],
 }
 

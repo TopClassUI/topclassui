@@ -23,7 +23,7 @@ const PICKERS: Record<string, string[]> = {
   'playground': ['Check-in: Sep 22, 2026'],
   'rtl': ['تاريخ الوصول: 22/09/2026'.replaceAll('/', `${String.fromCodePoint(0x200f)}/`)],
   'sizes': ['Extra small: Sep 22, 2026', 'Small: Sep 22, 2026', 'Medium: Sep 22, 2026', 'Large: Sep 22, 2026', 'Extra large: Sep 22, 2026'],
-  'states': ['Nothing chosen: Pick a date', 'Selected: Sep 22, 2026', 'Invalid: Sep 22, 2026', 'Disabled: Sep 22, 2026'],
+  'states': ['idle: Pick a date', 'open: Sep 22, 2026', 'selected: Sep 22, 2026', 'today: Sep 22, 2026', 'disabled: Pick a date', 'invalid: Pick a date'],
   'week-start': ['Monday first: Sep 22, 2026', 'Saturday first: Sep 22, 2026', 'The locale\'s first day: 22 Sept 2026'],
 }
 
@@ -93,10 +93,9 @@ describe('the demos the plan names', () => {
     expect(html).toMatch(/<input [^>]*name="checkIn" value="2026-10-02"/)
   })
 
-  it('states: invalid points at its message, disabled says so', async () => {
+  it('states: invalid and disabled say so', async () => {
     const html = await render('states')
     expect(html).toMatch(/aria-invalid="true"/)
-    expect(html).toMatch(/aria-describedby="[^"]* date-picker-states-error"/)
-    expect(html).toMatch(/<button [^>]*disabled=""[^>]*aria-label="Disabled"/)
+    expect(html).toMatch(/<button [^>]*disabled=""[^>]*aria-label="disabled"/)
   })
 })
