@@ -55,6 +55,28 @@ export default function Demo({ visibleRows, defaultOpen }: CommandDesignProps = 
 }
 `
 
+const STAGED = `import { useRef } from 'react'
+
+import { Button } from 'topclassui/button'
+import { DialogPopup, DialogRoot, DialogTrigger } from 'topclassui/dialog'
+import type { DialogDesignProps } from 'topclassui/dialog'
+
+function Stage({ size }: DialogDesignProps) {
+  const root = useRef<HTMLDivElement>(null)
+  return <div ref={root}><DialogRoot defaultOpen><DialogPopup size={size} container={root}>Hi</DialogPopup></DialogRoot></div>
+}
+
+export default function Demo({ size, stage = false }: DialogDesignProps & { stage?: boolean } = {}) {
+  if (stage) return <Stage size={size} />
+  return (
+    <DialogRoot>
+      <DialogTrigger render={<Button>Publish</Button>} />
+      <DialogPopup size={size}>Hi</DialogPopup>
+    </DialogRoot>
+  )
+}
+`
+
 describe('usageOf', () => {
   it('keeps the value imports and the one-line tree, and drops the type import', () => {
     expect(usageOf(BUTTON)).toEqual({
@@ -91,6 +113,26 @@ describe('usageOf', () => {
       ].join('\n'),
       passed: ['size', 'closeButton'],
     })
+  })
+
+  it('reads the live tree past the docs stage branch, and drops the imports only its Stage uses', () => {
+    expect(usageOf(STAGED)).toEqual({
+      imports: [
+        "import { Button } from 'topclassui/button'",
+        "import { DialogPopup, DialogRoot, DialogTrigger } from 'topclassui/dialog'",
+      ],
+      jsx: [
+        '<DialogRoot>',
+        '  <DialogTrigger render={<Button>Publish</Button>} />',
+        '  <DialogPopup size={size}>Hi</DialogPopup>',
+        '</DialogRoot>',
+      ].join('\n'),
+      passed: ['size'],
+    })
+  })
+
+  it('reads nothing from a demo whose branch before the return is not the docs stage', () => {
+    expect(usageOf(STAGED.replace('if (stage) return <Stage size={size} />', 'if (stage) console.log(size)'))).toBeNull()
   })
 
   it('reads nothing from a demo that holds state before its return, since the snippet would lose it', () => {
