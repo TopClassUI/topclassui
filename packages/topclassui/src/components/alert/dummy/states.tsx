@@ -1,14 +1,16 @@
 import { Alert } from '../index.js'
 
-/** The frame's strip, one cell a tone, each with its own icon so the message reads without colour. The variants and the
- * slots left out have demos of their own. */
+const CELL = 'grid min-h-14 place-items-center'
+
+/** The frame's strip, one equal cell a tone, each alert the same width and with its own icon so the message reads
+ * without colour. The variants and the slots left out have demos of their own. */
 export default function Demo() {
   return (
-    <div className="flex flex-wrap items-start gap-6">
-      <div role="group" aria-label="info"><Alert tone="info" title="Saved" /></div>
-      <div role="group" aria-label="success"><Alert tone="success" title="Saved" /></div>
-      <div role="group" aria-label="warning"><Alert tone="warning" title="Saved" /></div>
-      <div role="group" aria-label="danger"><Alert tone="danger" title="Saved" /></div>
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] gap-4">
+      <div role="group" aria-label="info" className={CELL}><Alert tone="info" title="Saved" className="w-36" /></div>
+      <div role="group" aria-label="success" className={CELL}><Alert tone="success" title="Saved" className="w-36" /></div>
+      <div role="group" aria-label="warning" className={CELL}><Alert tone="warning" title="Saved" className="w-36" /></div>
+      <div role="group" aria-label="danger" className={CELL}><Alert tone="danger" title="Saved" className="w-36" /></div>
     </div>
   )
 }
