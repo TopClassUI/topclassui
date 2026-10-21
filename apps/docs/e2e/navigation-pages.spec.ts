@@ -34,9 +34,11 @@ async function isDemoCopies(page: Page, violation: Result): Promise<boolean> {
   if (violation.id !== 'landmark-unique') return false
   const placed = await page.evaluate((targets) => targets.map((target) => {
     const element = document.querySelector(target)
-    return element === null ? null : { nav: element.tagName === 'NAV', inDemo: element.closest('[data-component], section[aria-labelledby="examples"]') !== null }
+    return element === null ? null : { landmark: element.matches('nav, aside, [role="navigation"], [role="complementary"]'), inDemo: element.closest('[data-component], section[aria-labelledby="examples"]') !== null }
   }), targetsOf(violation))
-  return placed.every((place) => place?.nav === true) && placed.filter((place) => place?.inDemo !== true).length <= 1
+  // A target an island re-rendered after axe read it is gone: it can no longer duplicate anything.
+  const live = placed.filter((place) => place !== null)
+  return live.length > 0 && live.every((place) => place.landmark) && live.filter((place) => !place.inDemo).length <= 1
 }
 
 const card = (page: Page, slug: string) => page.locator(`[data-component="${slug}"]`)

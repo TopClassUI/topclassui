@@ -13,6 +13,7 @@ import { kbOf } from '../../lib/chip'
 import { CARDS, cardBySlug, componentDate, type CardEntry } from '../../lib/data'
 import { ZERO_KB } from '../../lib/site'
 import { BrandTile } from '../shell/brand-mark'
+import { AdornedInput, ROOM } from './adorned-input'
 
 const ROWS = ['button', 'select', 'date-picker', 'input', 'tag', 'table', 'dialog'] as const
 /** As drawn: server green, client blue, split the info tone. */
@@ -35,7 +36,7 @@ function Sortable({ label }: { label: string }) {
 function FrameToast({ title, body }: { title: string; body: string }) {
   // TODO(tc): a static Toast part, so a page can draw one without the toast manager.
   return (
-    <div className={`absolute inset-e-6 bottom-6 flex items-center gap-2.5 rounded-box bg-surface-raised py-3 ps-3.5 pe-3 shadow-lg max-md:hidden ${BORDER_STRONG}`}>
+    <div className={`absolute inset-e-15 bottom-6 flex items-center gap-2.5 rounded-box bg-surface-raised py-3 ps-3.5 pe-3 shadow-lg max-md:hidden ${BORDER_STRONG}`}>
       <span className="text-success-on-soft"><Icon name="check-circle" size="1.125rem" /></span>
       <div className="flex flex-col gap-px text-start">
         <p className="text-sm font-medium text-body">{title}</p>
@@ -71,7 +72,9 @@ export function ProductFrame({ locale, labels }: { locale: Locale; labels: SiteL
               <p className="text-xl font-semibold text-body">{frame.title}</p>
               <p className="text-xs text-muted">{frame.count(CARDS.length)}</p>
             </div>
-            <Input type="search" size="sm" aria-label={frame.search} placeholder={frame.search} className="max-md:hidden" />
+            <AdornedInput icon="magnifying-glass" className="max-md:hidden">
+              <Input type="search" size="sm" aria-label={frame.search} placeholder={frame.search} className={ROOM.start} />
+            </AdornedInput>
             <Button size="sm" variant="outline" tone="neutral"><Icon name="funnel" />{frame.filter}</Button>
             <Button size="sm"><Icon name="plus" />{frame.add}</Button>
           </div>

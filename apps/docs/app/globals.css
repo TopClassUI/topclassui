@@ -2,10 +2,12 @@
 @import "topclassui/tokens.css";
 @import "topclassui/styles.css";
 
-/* After the three imports: tokens.css declares both on :root, so only order makes these win (docs-site S10). */
+/* After the three imports: tokens.css declares all three on :root, so only order makes these win (docs-site S10). */
 :root {
   --tc-font-latin: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --tc-font-arabic: var(--font-noto-arabic), ui-sans-serif, system-ui, sans-serif;
+  /* Geist Mono first; Arabic in a code comment falls back to Noto Sans Arabic, not a system monospace that spaces its letters apart. */
+  --tc-font-mono: var(--font-geist-mono), ui-monospace, monospace, var(--font-noto-arabic, monospace);
   --docs-sidebar: 13.75rem;
   --docs-toc: 11.875rem;
   --docs-column: 59rem;
@@ -83,6 +85,17 @@
   .docs-number-info { --docs-number-tone: var(--tc-info-solid); --docs-number-text: var(--tc-info-on-soft); }
   .docs-number-success { --docs-number-tone: var(--tc-success-solid); --docs-number-text: var(--tc-success-on-soft); }
   .docs-number-warning { --docs-number-tone: var(--tc-warning-solid); --docs-number-text: var(--tc-warning-on-soft); }
+
+  /* The first number: the drawn saturated primary over its inline-start half, solid under the text so on-solid stays AA. */
+  .docs-number-lead {
+    background-image:
+      linear-gradient(calc(90deg * var(--tc-dir)), var(--tc-primary-solid) 7rem, color-mix(in oklch, var(--tc-primary-solid) 80%, transparent) 46%, color-mix(in oklch, var(--tc-primary-solid) 35%, transparent) 62%, transparent 80%),
+      linear-gradient(to bottom, transparent, color-mix(in oklch, var(--tc-page) 40%, transparent));
+  }
+
+  .docs-number-lead .docs-number-glow { display: none; }
+
+  .docs-number-lead .docs-number-value { background: none; color: var(--tc-primary-on-solid); }
 }
 
 @layer components {
@@ -109,13 +122,31 @@
     overflow: hidden;
   }
 
+  /* The header as drawn: 44 px on the surface, no line beneath, its icon and name muted, the name in 11 px mono. */
   .docs-code > div {
+    min-block-size: 2.75rem;
     background: var(--tc-surface);
-    border-block-end: var(--tc-line-width) solid var(--tc-line);
   }
 
+  /* match-parent: the name is dir=auto, so on an Arabic page a Latin file name would otherwise sit at the far end, away from its icon. */
+  .docs-code > div > span {
+    color: var(--tc-muted);
+    font-size: 0.6875rem;
+    text-align: -webkit-match-parent;
+    text-align: match-parent;
+  }
+
+  /* The frame lays its Copy button over the header's inline end, so the name stops short of it; a finger's 44 px button needs a taller header. */
+  .docs-fence > .docs-code > div { padding-inline-end: 6.5rem; }
+
+  @media (pointer: coarse) {
+    .docs-fence > .docs-code > div { min-block-size: 3.75rem; }
+  }
+
+  /* Code with no grammar takes the muted grey, as the highlighted code's own text does. */
   .docs-code > pre {
     padding-block-start: 0.875rem;
+    color: var(--tc-muted);
     font-size: var(--text-xs);
     line-height: var(--text-sm--line-height);
   }
@@ -135,6 +166,7 @@
     position: absolute;
     inset-block-start: 0.375rem;
     inset-inline-end: 0.5rem;
+    min-block-size: 0;
     padding: 0;
     background: none;
     border: 0;
@@ -182,8 +214,9 @@
   from { opacity: 0; scale: 0.96; }
 }
 
+/* Down only: a sideways drift widens the page in RTL, where the start side scrolls. */
 @keyframes docs-glow-drift {
-  to { translate: calc(3rem * var(--tc-dir) * var(--tc-motion)) calc(5rem * var(--tc-motion)); }
+  to { translate: 0 calc(5rem * var(--tc-motion)); }
 }
 
 @keyframes docs-count-run {

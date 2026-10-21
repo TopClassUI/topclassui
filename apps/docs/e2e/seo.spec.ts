@@ -130,7 +130,7 @@ test('llms-full.txt is plain text holding every guide and every component page i
   const text = await response.text()
   expect(text.startsWith('# TopClass UI\n')).toBe(true)
   const urls = [...text.matchAll(/^URL: https:\/\/topclassui\.com(\S+)$/gm)].map((match) => match[1])
-  expect(urls).toHaveLength(11 + 49)
+  expect(urls).toHaveLength(12 + 49)
   for (const path of PAGES.filter((page) => page !== '' && page !== '/docs/components')) expect(urls).toContain(`/en${path}`)
   for (const slug of SLUGS) expect(urls).toContain(`/en/docs/components/${slug}`)
   expect(text).toContain('### Peer dependencies')
@@ -158,7 +158,7 @@ test('the manifest lists the 192 and 512 px icons, and each is a square PNG of t
 test('a guide has Previous and Next; a component page has its neighbours in catalog order', async ({ page }) => {
   await page.goto('/en/docs/css')
   const pager = page.getByRole('navigation', { name: 'Previous and next pages' })
-  await expect(pager.locator('a[rel="prev"]')).toHaveAttribute('href', '/en/docs/installation')
+  await expect(pager.locator('a[rel="prev"]')).toHaveAttribute('href', '/en/docs/cli')
   await expect(pager.locator('a[rel="next"]')).toHaveAttribute('href', '/en/docs/provider')
   await page.goto('/ar/docs/components/tag')
   const arabic = page.getByRole('navigation', { name: 'الصفحتان السابقة والتالية' })
