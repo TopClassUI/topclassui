@@ -2,10 +2,11 @@
 @import "topclassui/tokens.css";
 @import "topclassui/styles.css";
 
-/* After the three imports: tokens.css declares both on :root, so only order makes these win (docs-site S10). */
+/* After the three imports: tokens.css declares all three on :root, so only order makes these win (docs-site S10). */
 :root {
   --tc-font-latin: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --tc-font-arabic: var(--font-noto-arabic), ui-sans-serif, system-ui, sans-serif;
+  --tc-font-mono: var(--font-geist-mono), ui-monospace, monospace;
   --docs-sidebar: 13.75rem;
   --docs-toc: 11.875rem;
   --docs-column: 59rem;
