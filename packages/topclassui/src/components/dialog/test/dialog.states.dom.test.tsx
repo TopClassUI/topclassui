@@ -19,18 +19,17 @@ describe('the states demo, one cell per state of the Every state strip', () => {
     expect(closed?.querySelector('[role="dialog"]')).toBeNull()
     expect(closed?.querySelector('button')?.textContent).toBe('Open')
     const titles = open.map((cell) => cell.querySelector('[role="dialog"][data-open] h2')?.textContent)
-    expect(titles).toEqual(['Publish changes', 'Delete this project?', 'Scrolled'])
+    expect(titles).toEqual(['dialog', 'alert', 'dialog'])
     expect(open.map((cell) => cell.querySelectorAll('.bg-overlay').length)).toEqual([1, 1, 1])
     expect(document.querySelectorAll('[data-base-ui-portal] > [data-base-ui-inert]')).toHaveLength(0)
     expect(document.activeElement).toBe(document.body)
   })
 
-  it('draws the alert with no x and its two answers, and the open dialog with its x', async () => {
+  it('draws each open dialog as the frame does, a small panel with no x and no action', async () => {
     const { container } = render(<Demo />)
-    const [, open, alert] = cellsOf(container.firstElementChild)
+    const [, open, alert, scrolled] = cellsOf(container.firstElementChild)
     await screen.findAllByRole('dialog')
     const names = (cell: HTMLElement | undefined) => [...(cell?.querySelectorAll('[role="dialog"] button') ?? [])].map((button) => button.getAttribute('aria-label') ?? button.textContent)
-    expect(names(alert)).toEqual(['Cancel', 'Delete'])
-    expect(names(open)).toEqual(['Close this dialog', 'Cancel', 'Publish now'])
+    expect([names(open), names(alert), names(scrolled)]).toEqual([[], [], []])
   })
 })

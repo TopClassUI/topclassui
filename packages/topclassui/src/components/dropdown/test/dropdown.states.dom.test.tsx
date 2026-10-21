@@ -19,8 +19,8 @@ describe('the states demo, one cell per state of the Every state strip', () => {
     expect(closed?.querySelector('[role="menu"]')).toBeNull()
     expect(closed?.querySelector('button')?.getAttribute('aria-expanded')).toBe('false')
     const rows = (cell: HTMLElement | undefined) => [...(cell?.querySelectorAll('[role="menu"][data-open] [role="menuitem"]') ?? [])]
-    expect(rows(open).map((row) => row.textContent)).toEqual(['ProfileCtrl P', 'Settings', 'Duplicate', 'Delete'])
-    expect(rows(disabled).map((row) => [row.textContent, row.getAttribute('aria-disabled')])).toEqual([['Duplicate', null], ['Rename', 'true']])
+    expect(rows(open).map((row) => row.textContent)).toEqual(['Edit', 'Delete'])
+    expect(rows(disabled).map((row) => [row.textContent, row.getAttribute('aria-disabled')])).toEqual([['Edit', null], ['Delete', 'true']])
     expect(document.querySelectorAll('[data-base-ui-portal] > [data-base-ui-inert]')).toHaveLength(0)
   })
 })

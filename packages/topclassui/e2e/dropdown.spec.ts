@@ -1299,7 +1299,7 @@ test.describe('the states demo, as the Every state strip draws it', () => {
       const cells = page.locator('#demo [title="closed"]').locator('xpath=..').locator(':scope > *')
       expect(await cells.evaluateAll((all) => all.map((cell) => cell.getAttribute('title')))).toEqual(['closed', 'open', 'disabled item'])
       await expect(page.locator(`#demo [title="closed"] ${MENU}`)).toHaveCount(0)
-      for (const [title, rows] of [['open', ['Profile', 'Settings', 'Duplicate', 'Delete']], ['disabled item', ['Duplicate', 'Rename']]] as const) {
+      for (const [title, rows] of [['open', ['Edit', 'Delete']], ['disabled item', ['Edit', 'Delete']]] as const) {
         const cell = page.locator(`#demo [title="${title}"]`)
         const menu = cell.locator(`${MENU}${OPENED}`)
         await atRest(menu)
@@ -1308,7 +1308,7 @@ test.describe('the states demo, as the Every state strip draws it', () => {
         expect(inner.left >= outer.left && inner.right <= outer.right && inner.top >= outer.top && inner.bottom <= outer.bottom, `the menu of "${title}" leaves its cell`).toBe(true)
         expect(sideOf(inner, trigger)?.where, `the menu of "${title}"`).toBe('below')
       }
-      await expect(rowOf(page.locator(`#demo [title="disabled item"] ${MENU}`), 'Rename')).toHaveAttribute('aria-disabled', 'true')
+      await expect(rowOf(page.locator(`#demo [title="disabled item"] ${MENU}`), 'Delete')).toHaveAttribute('aria-disabled', 'true')
       // Not modal: no scroll lock on the page, and nothing of it hidden or made inert behind the menus.
       const lock = await pageLock(page)
       expect([lock.html ?? '', lock.body ?? '', lock.overflow]).toEqual(['', '', 'visible'])

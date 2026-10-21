@@ -124,7 +124,7 @@ describe('what the demos show of the props', () => {
       const source = readFileSync(join(DUMMY, file), 'utf8')
       const popups = source.split('<DrawerPopup').length - 1
       expect(popups, file).toBeGreaterThan(0)
-      expect(source.split('<DrawerHeader>').length - 1, file).toBe(popups)
+      expect(source.split(/<DrawerHeader[\s>]/).length - 1, file).toBe(popups)
     }
     const popup = await openFirst('top')
     expect(popup.firstElementChild?.querySelector('h2')?.textContent).toBe('Version 2.4')

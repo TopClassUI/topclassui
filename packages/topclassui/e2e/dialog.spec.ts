@@ -91,6 +91,33 @@ const actionsOf = (popup: Locator) => popup.evaluate((element) => {
   })
 })
 
+/** The room the hostile dialog's text takes, in the platform's font: what a pin written out in px cannot know (Windows
+ * wraps dialog--long-content at 320 px to other heights than Linux): the lines of the body's word, and the header and footer
+ * that stand above and below the 60 px body floor in a popup 446 px inside. */
+const textRoomOf = (popup: Locator) => popup.evaluate((element) => {
+  const header = element.querySelector('h2')?.parentElement?.parentElement
+  const body = header?.nextElementSibling
+  const footer = body?.nextElementSibling
+  if (!header || !body || !footer) throw new Error('the popup has no header, body and footer')
+  const range = document.createRange()
+  range.selectNodeContents(body)
+  return {
+    // Its lines at the 20 px line of text-sm: a range's box stops at the last glyph, short of its line.
+    word: new Set([...range.getClientRects()].map((rect) => Math.round(rect.top))).size * 20,
+    body: body.clientHeight,
+    bars: Math.round(header.getBoundingClientRect().height + footer.getBoundingClientRect().height),
+  }
+})
+
+/** An action's height follows its lines: 40 px for one, and one 10 px step more for a label that wraps to two. */
+const expectActionsWhole = (actions: string[]) => {
+  for (const action of actions) {
+    const [, height = '', lines = ''] = /^(\d+) px, (\d+) lines?, whole$/.exec(action) ?? []
+    expect(action, 'an action is cut').toMatch(/, whole$/)
+    expect(Number(height), action).toBe(40 + 10 * (Number(lines) - 1))
+  }
+}
+
 /** How many boxes of a popup really scroll up and down: the popup itself and its body are the two that can. */
 const scrollersOf = (popup: Locator) => popup.evaluate((element) => {
   const body = element.querySelector('h2')?.parentElement?.parentElement?.nextElementSibling
@@ -457,7 +484,9 @@ test.describe('the body is a tab stop only while it scrolls', () => {
 
     await page.setViewportSize({ width: 320, height: 480 })
     await expect(bodyOf(popup)).toHaveAttribute('tabindex', '0')
-    expect((await partsOf(popup)).scrollable, 'px the body scrolls at 320 x 480').toBe(180)
+    // 180 on Linux, 174 on Windows: the word and its 36 px of padding, less the body's box.
+    const room = await textRoomOf(popup)
+    expect((await partsOf(popup)).scrollable, 'px the body scrolls at 320 x 480').toBe(room.word + 36 - room.body)
 
     await page.setViewportSize({ width: 1280, height: 720 })
     await expect(bodyOf(popup)).not.toHaveAttribute('tabindex')
@@ -563,7 +592,9 @@ test.describe('inside the viewport', () => {
         // action. A wheel, not scrollIntoView: a script scrolls a box that clips, and a reader cannot.
         const [frame, header] = [await boxOf(popup), (await partsOf(popup)).header]
         const hidden = await popup.evaluate((el) => el.scrollHeight - el.clientHeight)
-        expect(hidden, 'px of popup below its own box').toBe(screen.height === 480 ? 26 : 0)
+        // At 480 px tall, what the header, the 60 px body floor and the footer need past the 446 px inside the popup: 28 on Linux, 0 on Windows.
+        const { bars } = await textRoomOf(popup)
+        expect(hidden, 'px of popup below its own box').toBe(screen.height === 480 ? Math.max(0, bars + 60 - 446) : 0)
         await wheelAt(page, header.left + 40, header.top + 20, hidden)
         expect(await popup.evaluate((el) => el.scrollTop), 'px the wheel scrolled the popup').toBe(hidden)
         for (const button of await popup.locator('button:not([aria-label])').all()) {
@@ -577,9 +608,8 @@ test.describe('inside the viewport', () => {
 
         // No action ends in an ellipsis. At 320 px the two long ones wrap onto a second line and grow by one
         // line of text; where a label fits its row, the button keeps the 40 px of its size.
-        expect(await actionsOf(popup)).toEqual(screen.width === 320
-          ? ['40 px, 1 line, whole', '50 px, 2 lines, whole', '50 px, 2 lines, whole']
-          : ['40 px, 1 line, whole', '40 px, 1 line, whole', '40 px, 1 line, whole'])
+        if (screen.width === 320) expectActionsWhole(await actionsOf(popup))
+        else expect(await actionsOf(popup)).toEqual(['40 px, 1 line, whole', '40 px, 1 line, whole', '40 px, 1 line, whole'])
       })
     }
   }
@@ -1004,14 +1034,18 @@ test.describe('under a coarse pointer', () => {
     const parts = await partsOf(popup)
     // The body keeps one whole line, and what no longer fits is reached by scrolling the popup.
     expect(parts.body.height).toBe(60)
-    expect(await popup.evaluate((el) => el.scrollHeight - el.clientHeight), 'px of popup below its own box').toBe(50)
+    // The header, the body floor and the 44 px actions past the 446 px inside the popup: 50 on Linux, 26 on Windows.
+    const below = (await textRoomOf(popup)).bars + 60 - 446
+    expect(below, 'px of popup below its own box').toBeGreaterThan(0)
+    expect(await popup.evaluate((el) => el.scrollHeight - el.clientHeight), 'px of popup below its own box').toBe(below)
     const last = popup.locator('button').last()
     const frame = await boxOf(popup)
-    expect((await boxOf(last)).bottom, 'the last action, before any scroll').toBe(frame.bottom + 35)
+    // The footer's 14 px of padding and its 1 px line stand under the last action.
+    expect((await boxOf(last)).bottom, 'the last action, before any scroll').toBe(frame.bottom + below - 15)
 
     // A finger on the header drags the popup up: a real drag, since a script scrolls a box that clips and a finger cannot.
     await touchDrag(page, parts.header.left + 40, parts.header.top + 200, parts.header.top + 80)
-    expect(await popup.evaluate((el) => el.scrollTop), 'px the drag scrolled the popup').toBe(50)
+    expect(await popup.evaluate((el) => el.scrollTop), 'px the drag scrolled the popup').toBe(below)
     const box = await boxOf(last)
     expect(box.height).toBe(44)
     expect(box.bottom, 'the last action ends below the popup').toBeLessThanOrEqual(frame.bottom)

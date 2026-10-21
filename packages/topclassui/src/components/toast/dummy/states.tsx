@@ -3,48 +3,46 @@ import type { ReactNode } from 'react'
 import { checkCircle } from '#icons/data/check-circle.js'
 import { spinner } from '#icons/data/spinner.js'
 import { warningCircle } from '#icons/data/warning-circle.js'
-import { x } from '#icons/data/x.js'
 import { Svg } from '#components/svg/index.js'
 import { BORDER } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
 
-/** A toast drawn in place with the look the viewport gives one: a picture of a state, not a live region. */
-function Panel({ icon, title, className }: { icon?: ReactNode; title: string; className?: string }) {
+const CELL = 'grid min-h-14 place-items-center'
+
+/** A toast drawn in place, small, with the look the viewport gives one: a picture of a state, not a live region. */
+function Panel({ icon, label, className }: { icon?: ReactNode; label: string; className?: string }) {
   return (
-    <div className={cn('grid w-72 grid-cols-[auto_minmax(0,1fr)_auto] items-start rounded-box bg-surface-raised p-3.5 text-body shadow-(--tc-shadow-toast)', BORDER, className)}>
-      {icon === undefined ? null : <span className="me-2.5 flex h-5 items-center">{icon}</span>}
-      <p className="col-start-2 text-sm/tight font-semibold">{title}</p>
-      <span className="col-start-3 ms-2.5 text-muted">
-        <Svg icon={x} size="0.875em" />
-      </span>
+    <div className={cn('flex w-34 items-center gap-2 rounded-box bg-surface-raised px-3 py-2.5 font-mono text-xs/tight text-body shadow-(--tc-shadow-toast)', BORDER, className)}>
+      {icon}
+      {label}
     </div>
   )
 }
 
-/** The frame's strip, one cell a state: the three icons, a stack, a toast fading in (a dashed edge, since a faded
+/** The frame's strip, one equal cell a state: the three icons, a stack, a toast fading in (a dashed edge, since a faded
  * text would fail 4.5:1), and one past the limit, which the viewport keeps mounted and does not draw. */
 export default function Demo() {
   return (
-    <div className="flex flex-wrap items-start gap-6">
-      <div role="group" aria-label="success">
-        <Panel icon={<Svg icon={checkCircle} className="text-success-on-soft" />} title="Invitation sent" />
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] gap-4">
+      <div role="group" aria-label="success" className={CELL}>
+        <Panel icon={<Svg icon={checkCircle} size="0.875rem" className="text-success-on-soft" />} label="success" />
       </div>
-      <div role="group" aria-label="error">
-        <Panel icon={<Svg icon={warningCircle} className="text-danger-on-soft" />} title="Could not save" />
+      <div role="group" aria-label="error" className={CELL}>
+        <Panel icon={<Svg icon={warningCircle} size="0.875rem" className="text-danger-on-soft" />} label="error" />
       </div>
-      <div role="group" aria-label="loading">
-        <Panel icon={<Svg icon={spinner} className="animate-spin text-muted motion-reduce:animate-none" />} title="Uploading" />
+      <div role="group" aria-label="loading" className={CELL}>
+        <Panel icon={<Svg icon={spinner} size="0.875rem" className="animate-spin text-muted motion-reduce:animate-none" />} label="loading" />
       </div>
-      <div role="group" aria-label="stacked" className="flex flex-col gap-2">
-        <Panel title="Draft saved" />
-        <Panel title="Draft saved" />
-        <Panel title="Draft saved" />
+      <div role="group" aria-label="stacked" className={cn(CELL, 'place-items-start justify-center')}>
+        <Panel label="toast" className="w-30" />
+        <Panel label="toast" className="-mt-1.5 w-28" />
+        <Panel label="toast" className="-mt-1.5 w-26" />
       </div>
-      <div role="group" aria-label="entering">
-        <Panel icon={<Svg icon={checkCircle} className="text-success-on-soft" />} title="Invitation sent" className="border-dashed border-line-strong" />
+      <div role="group" aria-label="entering" className={CELL}>
+        <Panel icon={<Svg icon={checkCircle} size="0.875rem" className="text-success-on-soft" />} label="entering" className="border-dashed border-line-strong" />
       </div>
-      <div role="group" aria-label="limited">
-        <p className="text-xs text-muted">Past the limit: mounted, not drawn.</p>
+      <div role="group" aria-label="limited" className={CELL}>
+        <p className="w-34 text-center text-xs text-muted">Past the limit: mounted, not drawn.</p>
       </div>
     </div>
   )

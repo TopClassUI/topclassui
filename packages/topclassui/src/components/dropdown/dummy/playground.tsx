@@ -25,7 +25,7 @@ function Stage({ placement, tone, delay, closeDelay }: DropdownDesignProps) {
             <DropdownItem icon={<Svg icon={gear} />}>Settings</DropdownItem>
             <DropdownItem icon={<Svg icon={copy} />}>Duplicate</DropdownItem>
             <DropdownSeparator />
-            <DropdownItem icon={<Svg icon={trash} />} tone={tone}>Delete</DropdownItem>
+            <DropdownItem icon={<Svg icon={trash} />} shortcut="Del" tone={tone}>Delete</DropdownItem>
           </DropdownPopup>
         </DropdownRoot>
       </div>
@@ -46,7 +46,7 @@ export default function Demo({ placement, tone, delay, closeDelay, stage = false
         <DropdownItem icon={<Svg icon={gear} />}>Settings</DropdownItem>
         <DropdownItem icon={<Svg icon={copy} />}>Duplicate</DropdownItem>
         <DropdownSeparator />
-        <DropdownItem icon={<Svg icon={trash} />} tone={tone}>Delete</DropdownItem>
+        <DropdownItem icon={<Svg icon={trash} />} shortcut="Del" tone={tone}>Delete</DropdownItem>
       </DropdownPopup>
     </DropdownRoot>
   )

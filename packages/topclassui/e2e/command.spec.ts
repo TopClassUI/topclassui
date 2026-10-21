@@ -593,10 +593,11 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(look.line).toBe(highlightText)
       const rest = await page.locator('[role="option"]:not([data-highlighted])').first().evaluate((row) => getComputedStyle(row, '::before').display)
       expect(rest).toBe('none')
-      // The line is drawn: the frame inside the active row, in HighlightText on Highlight.
+      // The line is drawn: the bar down the inline start of the active row, 6 px short of each end, in HighlightText on Highlight.
       const box = await boxOf(active)
-      const strip = await pixelsOf(page, { x: Math.floor(box.left) + 4, y: Math.floor(box.top), width: 40, height: 3 })
-      expect(inkOn(strip, rgbOf(look.fill)), 'pixels of the frame at 3:1 on the fill').toBeGreaterThanOrEqual(40)
+      const length = Math.floor(box.bottom - box.top) - 16
+      const strip = await pixelsOf(page, { x: Math.floor(box.left), y: Math.floor(box.top) + 8, width: 4, height: length })
+      expect(inkOn(strip, rgbOf(look.fill)), 'pixels of the bar at 3:1 on the fill').toBeGreaterThanOrEqual(length)
     })
   })
 }
