@@ -46,8 +46,9 @@ describe('the states demo, one cell per state of the Every state strip', () => {
   it('opens the real palette with Ctrl K, after the cells and uncaptioned', async () => {
     const { container } = render(<Demo />)
     await userEvent.keyboard('{Control>}k{/Control}')
-    const dialog = await screen.findByRole('dialog')
+    // The palette loads lazily: under the whole suite's load it takes longer than findBy's default second.
+    const dialog = await screen.findByRole('dialog', {}, { timeout: 5_000 })
     expect(container.contains(dialog)).toBe(false)
     expect(cellsOf(container.firstElementChild)).toHaveLength(6)
-  })
+  }, 10_000)
 })

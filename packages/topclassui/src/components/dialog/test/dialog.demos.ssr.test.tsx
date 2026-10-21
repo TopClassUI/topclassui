@@ -89,8 +89,8 @@ describe('every demo renders on the server', () => {
     it(`${file}.tsx renders no popup on the server, because the portal mounts in the browser`, async () => {
       const html = await render(file)
       expect(html, file).not.toContain('role="dialog"')
-      // No backdrop: the only scrims served are the ones the states demo draws in its three open cells, under their portals.
-      expect(html.match(/bg-overlay/g)?.length ?? 0, file).toBe(file === 'states' ? 3 : 0)
+      // No backdrop: the only scrims served are the ones the states demo draws in its four open cells, under their portals.
+      expect(html.match(/bg-overlay/g)?.length ?? 0, file).toBe(file === 'states' ? 4 : 0)
       expect(html, file).not.toContain('<h2')
     })
 

@@ -3,6 +3,7 @@
 import { useRef, type ReactNode } from 'react'
 
 import { SCROLLBAR } from '#shared/classes.js'
+import { cn } from '#shared/cn.js'
 import { Button } from '#components/button/index.js'
 import {
   DialogBody, DialogClose, DialogFooter, DialogHeader, DialogPopup, DialogRoot, DialogTitle, DialogTrigger,
@@ -13,6 +14,8 @@ const LINES = Array.from({ length: 12 }, (_, index) => index + 1)
 const CELL = 'relative h-28 w-36 justify-self-center overflow-hidden rounded-box [contain:paint]'
 const BAR = 'min-h-2 rounded-chip bg-surface-raised'
 const LABEL = 'font-mono text-xs/tight font-normal text-muted'
+// The ring the focus draws, as a picture: the focus stays where it was.
+const TRAPPED = 'outline-solid outline-(length:--tc-ring-width) outline-offset-(length:--tc-ring-offset) outline-ring'
 // The cell is under 15rem tall, where a real body stops scrolling and the popup scrolls as one; this body still scrolls.
 const SCROLLED = `grid gap-1 p-2.5 font-mono text-xs [@container(height<15rem)]:shrink [@container(height<15rem)]:overflow-y-auto ${SCROLLBAR}`
 
@@ -30,21 +33,21 @@ function PageBehind() {
 
 /** One cell, captioned by its title: a small dialog drawn open over the page and its scrim inside the cell, not modal,
  * and taking no focus. The cell is its screen, so the popup is held to the cell's height as a page holds it to the viewport's. */
-function Open({ title, alert = false, children }: { title: string, alert?: boolean, children: ReactNode }) {
+function Open({ title, alert = false, className, children }: { title: string, alert?: boolean, className?: string, children: ReactNode }) {
   const box = useRef<HTMLDivElement>(null)
   return (
     <div ref={box} title={title} className={CELL}>
       <PageBehind />
       <div aria-hidden className="absolute inset-0 bg-overlay" />
       <DialogRoot defaultOpen modal={false} disablePointerDismissal={alert}>
-        <DialogPopup size="custom" container={box} initialFocus={false} className="max-h-[100cqh] w-28">{children}</DialogPopup>
+        <DialogPopup size="custom" container={box} initialFocus={false} className={cn('max-h-[100cqh] w-28', className)}>{children}</DialogPopup>
       </DialogRoot>
     </div>
   )
 }
 
 /** Every state, one equal cell each, captioned by its title: closed, open, an alert that a press outside cannot close,
- * and a body long enough to scroll, whose bars then draw their lines. Focus trapped needs a live focus: not drawn. */
+ * a body long enough to scroll, whose bars then draw their lines, and focus trapped, drawn as its ring. */
 export default function Demo() {
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] gap-4">
@@ -79,6 +82,11 @@ export default function Demo() {
         <DialogBody className={SCROLLED}>
           {LINES.map((line) => <p key={line}>line {line}</p>)}
         </DialogBody>
+      </Open>
+      <Open title="focus trapped" className={TRAPPED}>
+        <DialogHeader closeButton={false} className="border-b-0 p-2.5">
+          <DialogTitle className={LABEL}>dialog</DialogTitle>
+        </DialogHeader>
       </Open>
     </div>
   )
