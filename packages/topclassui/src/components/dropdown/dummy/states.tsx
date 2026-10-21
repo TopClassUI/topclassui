@@ -2,16 +2,16 @@
 
 import { useRef, type ReactNode } from 'react'
 
-import { copy } from '#icons/data/copy.js'
 import { gear } from '#icons/data/gear.js'
 import { pencilSimple } from '#icons/data/pencil-simple.js'
 import { trash } from '#icons/data/trash.js'
 import { user } from '#icons/data/user.js'
 import { Button } from '#components/button/index.js'
 import { Svg } from '#components/svg/index.js'
-import { DropdownItem, DropdownPopup, DropdownRoot, DropdownSeparator, DropdownTrigger } from '../index.js'
+import { DropdownItem, DropdownPopup, DropdownRoot, DropdownTrigger } from '../index.js'
 
-const cell = 'relative h-64 w-64 overflow-hidden rounded-box border-(length:--tc-line-width) border-line p-3 [contain:paint]'
+const cell = 'relative flex h-36 justify-center overflow-hidden pt-2 [contain:paint]'
+const trigger = <Button variant="outline" size="sm">Actions</Button>
 
 /** One cell, captioned by its title: the menu under its trigger, drawn open inside the cell, not modal. */
 function Open({ title, children }: { title: string, children: ReactNode }) {
@@ -19,21 +19,21 @@ function Open({ title, children }: { title: string, children: ReactNode }) {
   return (
     <div ref={box} title={title} className={cell}>
       <DropdownRoot defaultOpen modal={false}>
-        <DropdownTrigger render={<Button variant="outline">Actions</Button>} />
+        <DropdownTrigger render={trigger} />
         <DropdownPopup container={box}>{children}</DropdownPopup>
       </DropdownRoot>
     </div>
   )
 }
 
-/** Every state, one cell each, captioned by its title: closed, open and a disabled row. The hover of a row needs a live
- * pointer, and a submenu and a checked row are not in the API, so none is drawn. */
+/** Every state, one equal cell each, captioned by its title: closed, the frame's two rows open, and Delete disabled.
+ * The hover of a row needs a live pointer, and a submenu and a checked row are not in the API, so none is drawn. */
 export default function Demo() {
   return (
-    <div className="flex flex-wrap items-start gap-3">
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] gap-4">
       <div title="closed" className={cell}>
         <DropdownRoot>
-          <DropdownTrigger render={<Button variant="outline">Actions</Button>} />
+          <DropdownTrigger render={trigger} />
           <DropdownPopup>
             <DropdownItem icon={<Svg icon={user} />}>Profile</DropdownItem>
             <DropdownItem icon={<Svg icon={gear} />}>Settings</DropdownItem>
@@ -41,15 +41,12 @@ export default function Demo() {
         </DropdownRoot>
       </div>
       <Open title="open">
-        <DropdownItem icon={<Svg icon={user} />} shortcut="Ctrl P">Profile</DropdownItem>
-        <DropdownItem icon={<Svg icon={gear} />}>Settings</DropdownItem>
-        <DropdownItem icon={<Svg icon={copy} />}>Duplicate</DropdownItem>
-        <DropdownSeparator />
-        <DropdownItem icon={<Svg icon={trash} />} tone="danger">Delete</DropdownItem>
+        <DropdownItem icon={<Svg icon={pencilSimple} />}>Edit</DropdownItem>
+        <DropdownItem icon={<Svg icon={trash} />}>Delete</DropdownItem>
       </Open>
       <Open title="disabled item">
-        <DropdownItem icon={<Svg icon={copy} />}>Duplicate</DropdownItem>
-        <DropdownItem icon={<Svg icon={pencilSimple} />} disabled>Rename</DropdownItem>
+        <DropdownItem icon={<Svg icon={pencilSimple} />}>Edit</DropdownItem>
+        <DropdownItem icon={<Svg icon={trash} />} disabled>Delete</DropdownItem>
       </Open>
     </div>
   )

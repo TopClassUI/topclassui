@@ -12,7 +12,7 @@ describe('the playground with stage, as the docs stage draws it', () => {
     expect(box?.contains(screen.getByRole('button', { name: 'Actions' }))).toBe(true)
     expect(menu.hasAttribute('data-open')).toBe(true)
     expect(document.querySelectorAll('[data-base-ui-portal] > [data-base-ui-inert]')).toHaveLength(0)
-    expect([...menu.querySelectorAll('[role="menuitem"]')].map((row) => row.textContent)).toEqual(['ProfileCtrl P', 'Settings', 'Duplicate', 'Delete'])
+    expect([...menu.querySelectorAll('[role="menuitem"]')].map((row) => row.textContent)).toEqual(['ProfileCtrl P', 'Settings', 'Duplicate', 'DeleteDel'])
   })
 
   it('without stage it is the closed menu behind its trigger', () => {
