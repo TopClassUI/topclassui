@@ -6,10 +6,10 @@ export default function Demo() {
   return (
     <div className="grid gap-6">
       <div role="group" aria-label="idle">
-        <CodeBlock lang="tsx" title="code" className="w-32">{'<Button/>'}</CodeBlock>
+        <CodeBlock lang="tsx" title="button.tsx" className="w-32">{'<Button/>'}</CodeBlock>
       </div>
       <div role="group" aria-label="wrapped">
-        <CodeBlock lang="tsx" title="code" className="w-32" wrap>{'<Button size="sm"/>'}</CodeBlock>
+        <CodeBlock lang="tsx" title="wrapped" className="w-32" wrap>{'<Button size="sm"/>'}</CodeBlock>
       </div>
       <div role="group" aria-label="no header">
         <CodeBlock lang="tsx" showCopy={false} className="w-32">{'<Button/>'}</CodeBlock>
