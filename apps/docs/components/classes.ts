@@ -42,6 +42,34 @@ export const TILE = {
 /** Inline code in prose and table cells: Latin, left to right, inside an Arabic sentence too. Mono on the text's own ground, as the docs frames draw it. */
 export const INLINE_CODE = 'font-mono text-sm text-body'
 
+/** A guide table as the docs frames draw it: the body rows on the surface, and every row shown, with no scroll inside. */
+export const PROSE_TABLE = 'bg-surface max-h-none'
+
+/** A cell of a guide table: muted, regular, 13 px and top-aligned. The header row is the one at aria-rowindex 1: on the page, body-coloured, semibold, 14 px. */
+const PROSE_CELL = 'px-3.5 py-3 align-top text-[0.8125rem]/5 font-normal text-muted in-aria-[rowindex=1]:bg-page in-aria-[rowindex=1]:text-sm in-aria-[rowindex=1]:font-semibold in-aria-[rowindex=1]:text-body'
+
+/** How a column of a guide table lays out: sized to its content on one line, or wrapping above a floor, so a phone scrolls the table instead of stacking one word per line. */
+export const PROSE_COLUMN = {
+  fit: `${PROSE_CELL} whitespace-nowrap`,
+  wrap: `${PROSE_CELL} whitespace-normal min-w-32`,
+  prose: `${PROSE_CELL} whitespace-normal min-w-60`,
+} as const
+
+/** Code an author wrote in a cell arrives at prose size (INLINE_CODE); in a guide table it takes the cell's. */
+export const AUTHORED_CELL = '**:text-[length:inherit]'
+
+/** Code a guide table prints itself: mono and body-coloured, at the cell's size. */
+export const TABLE_CODE = 'font-mono text-body'
+
+/** A printed default as one box, so in Arabic it sits at the start of its cell like every other value while its lines read left to right. */
+export const DEFAULT_CODE = `${TABLE_CODE} inline-block`
+
+/** A printed object default, one entry per line; the lines after the first indented past its opening brace. */
+export const DEFAULT_LINE = {
+  first: 'block',
+  rest: 'block ps-[2ch]',
+} as const
+
 /** A guide page's code block: on the page, edged, its header on the surface (globals.css). */
 export const DOCS_CODE = 'docs-code'
 
