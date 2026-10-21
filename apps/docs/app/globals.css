@@ -183,7 +183,8 @@
 }
 
 @keyframes docs-glow-drift {
-  to { translate: calc(3rem * var(--tc-dir) * var(--tc-motion)) calc(5rem * var(--tc-motion)); }
+  /* Toward the inline start: a box past the start edge never scrolls the page, one past the end does. */
+  to { translate: calc(-3rem * var(--tc-dir) * var(--tc-motion)) calc(5rem * var(--tc-motion)); }
 }
 
 @keyframes docs-count-run {
