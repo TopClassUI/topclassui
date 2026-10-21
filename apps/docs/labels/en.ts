@@ -199,7 +199,6 @@ export const en: SiteLabels = {
   catalog: {
     title: 'Components',
     lead: (count) => `${String(count)} components, each with a live preview. Every state at once, a playground wired to the real props, and two ways to use each one: copy the source into your project, or install the package.`,
-    metaTitle: 'Components - TopClass UI',
     description: 'Every TopClass UI component on one page, with a live preview, a playground on the real props, every state and its import line.',
     beforeTitle: 'Before you start',
     beforeOnce: 'once per app',
