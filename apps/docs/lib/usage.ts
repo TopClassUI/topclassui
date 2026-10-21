@@ -42,7 +42,8 @@ export function usageOf(source: string): Usage | null {
   const before = source.slice(signature.index + signature[0].length, start).trim()
   if (before !== '' && !STAGE_BRANCH.test(before)) return null
   const body = source.slice(start + 'return '.length, end).trim().replace(/^\(\s*\n?/, '').replace(/\n?\s*\)$/, '')
-  const passed = (signature[1] ?? '').split(',').map((name) => name.trim()).filter((name) => /^\w+$/.test(name) && passThrough(name).test(body))
+  // A name with a default (`dismissible = true`) is passed on all the same.
+  const passed = (signature[1] ?? '').split(',').map((name) => name.split('=')[0]?.trim() ?? '').filter((name) => /^\w+$/.test(name) && passThrough(name).test(body))
   if (!SPREAD.test(body) && passed.length === 0) return null
   const lines = body.split('\n')
   // A line that opens inside a template literal is the sample's own text: its indent is not the tree's.
@@ -110,7 +111,8 @@ export function snippetOf(usage: Usage, props: readonly [string, PropValue][]): 
   // A spread on a line of its own goes with its line when nothing takes its place.
   if (spread.length === 0) jsx = jsx.replace(/\n[ \t]*\{\.\.\.props\}(?=\n)/, '')
   else jsx = jsx.replace(/^([ \t]*)\{\.\.\.props\}$/m, (_, indent: string) => spread.map((attribute) => `${indent}${attribute.trim()}`).join('\n'))
-  jsx = jsx.replace(/[ \t]+(\w+)=\{\1\}/g, '').replace(SPREAD, spread.join(''))
+  // A pass-through on a line of its own goes with its line.
+  jsx = jsx.replace(/\n[ \t]*(\w+)=\{\1\}(?=\n)/g, '').replace(/[ \t]+(\w+)=\{\1\}/g, '').replace(SPREAD, spread.join(''))
   return usage.imports.length > 0 ? `${usage.imports.join('\n')}\n\n${jsx}` : jsx
 }
 
