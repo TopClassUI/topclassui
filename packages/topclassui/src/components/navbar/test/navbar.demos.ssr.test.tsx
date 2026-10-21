@@ -23,6 +23,8 @@ interface Shape {
   current: string[]
   /** The name of each nav, one a bar. */
   navs: string[]
+  /** The bars, where one holds no nav: the states strip draws brand-only bars, as the frame does. */
+  bars?: number
   /** How many of the bars hold their client part. */
   sticky: number
 }
@@ -41,10 +43,7 @@ const DEMOS: Record<string, Shape> = {
     hrefs: ['#install', '#install', '#usage', '#theming', '#questions', '/handbook/edit', '#usage', '#theming', '#questions', '#install'],
     current: [], navs: ['On this page'], sticky: 1,
   },
-  'states': {
-    hrefs: ['/', '/docs', '/components', '/icons', '/theming', '/login', '/', '/blog', '/changelog', '/', '/about'],
-    current: ['/docs'], navs: ['Sticky, Docs being read', 'In the flow, nothing being read', 'Transparent, on the page'], sticky: 1,
-  },
+  'states': { hrefs: ['/', '/', '/', '/'], current: [], navs: [], bars: 4, sticky: 1 },
   'with-search': { hrefs: ['/', '/docs', '/components', '/icons'], current: ['/docs'], navs: ['Main'], sticky: 1 },
 }
 
@@ -55,9 +54,9 @@ describe('every demo renders on the server', () => {
   })
 
   for (const [file, shape] of Object.entries(DEMOS)) {
-    it(`${file}.tsx: one header and one nav a bar, named ${shape.navs.join(', ')}`, async () => {
+    it(`${file}.tsx: ${String(shape.bars ?? shape.navs.length)} header(s), and one nav a bar, named ${shape.navs.join(', ')}`, async () => {
       const html = await render(file)
-      expect(html.match(/<header /g), file).toHaveLength(shape.navs.length)
+      expect(html.match(/<header /g), file).toHaveLength(shape.bars ?? shape.navs.length)
       expect([...html.matchAll(/<nav aria-label="([^"]*)"/g)].map((match) => match[1]), file).toEqual(shape.navs)
     })
 
