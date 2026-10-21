@@ -11,8 +11,9 @@ export const SEGMENTED_HOLDER = 'grid grid-cols-1'
 export const SEGMENTED_HOLDER_FULL = 'w-full'
 
 /** The track scrolls sideways inside itself when its segments do not fit, as a list of tabs does. w-fit: a grid item
- * would fill its holder. It is the offset parent of its segments and keeps a pixel of scroll padding (tabs/classes.ts). */
-export const SEGMENTED_ROOT = `relative flex w-fit max-w-full items-stretch gap-0.5 rounded-control bg-surface p-0.75 scroll-px-px ${BORDER} ${SCROLL_X} ${FIELD_INVALID}`
+ * would fill its holder. It is the offset parent of its segments and keeps 2 px of scroll padding: Base UI scrolls by
+ * whole-pixel offsets, so a segment of fractional width can land up to a pixel past 1 px of it. */
+export const SEGMENTED_ROOT = `relative flex w-fit max-w-full items-stretch gap-0.5 rounded-control bg-surface p-0.75 scroll-px-0.5 ${BORDER} ${SCROLL_X} ${FIELD_INVALID}`
 
 /** The height of the track. A segment stretches to it and never goes under its own 24 px, 44 under a finger.
  * md is the 36 px track Figma 138:668 draws, a knob of its own between the sm and md control steps. */

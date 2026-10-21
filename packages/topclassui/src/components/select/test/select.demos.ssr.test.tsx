@@ -26,7 +26,7 @@ const SELECTS: Record<string, string[]> = {
   'rtl': ['الدولة: الأردن'],
   'sixty-items': ['Sixty options: Option 30'],
   'sizes': ['Extra small: Pro', 'Small: Pro', 'Medium: Pro', 'Large: Pro', 'Extra large: Pro'],
-  'states': ['Nothing chosen: Select', 'Invalid: Free', 'Disabled: Pro', 'Read-only: Team'],
+  'states': ['idle: Country', 'hover: Country', 'focus-visible: Jordan', 'open: Jordan', 'disabled: Country', 'invalid: Jordan', 'read-only: Jordan'],
 }
 
 const render = async (file: string) => {
@@ -87,10 +87,10 @@ describe('the demos the plan names', () => {
     expect(await render('rtl')).toMatch(/^<div class="isolate"><div dir="rtl" lang="ar" class="[^"]*">/)
   })
 
-  it('states: invalid points at its message, disabled and read-only say so', async () => {
+  it('states: invalid, disabled and read-only say so', async () => {
     const html = await render('states')
-    expect(html).toMatch(/aria-describedby="select-states-error" aria-invalid="true"|aria-invalid="true"[^>]*aria-describedby="select-states-error"/)
-    expect(html).toMatch(/<button [^>]*disabled=""[^>]*aria-label="Disabled"/)
-    expect(html).toMatch(/<button [^>]*aria-readonly="true"[^>]*aria-label="Read-only"/)
+    expect(html).toMatch(/<button [^>]*aria-invalid="true"[^>]*aria-label="invalid"|<button [^>]*aria-label="invalid"[^>]*aria-invalid="true"/)
+    expect(html).toMatch(/<button [^>]*disabled=""[^>]*aria-label="disabled"/)
+    expect(html).toMatch(/<button [^>]*aria-readonly="true"[^>]*aria-label="read-only"/)
   })
 })

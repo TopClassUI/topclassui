@@ -37,8 +37,8 @@ for (const direction of DIRECTIONS) {
   test.describe(direction, () => {
     test('Tab reaches each live input, one stop each, and skips a disabled one', async ({ page }) => {
       await openLive(page, 'combobox--states', { direction })
-      expect(await walk(page, 3)).toEqual(['Invalid', 'Read-only', 'One option disabled'])
-      expect(await walk(page, 1, 'Shift+Tab')).toEqual(['Read-only'])
+      expect(await walk(page, 8)).toEqual(['idle', 'focus-visible', 'open', 'loading', 'empty', 'invalid', 'read-only', 'one option disabled'])
+      expect(await walk(page, 1, 'Shift+Tab')).toEqual(['read-only'])
     })
 
     test('the focused input paints the ring and keeps the focus while the list is open; the highlighted row paints it too', async ({ page }) => {
@@ -109,8 +109,8 @@ for (const direction of DIRECTIONS) {
     // AriaCombobox.js:1014: read-only locks the value, not the browsing; ComboboxInput.js:294 stops the Enter.
     test('a read-only input opens on the arrows and the highlight moves and wraps, but Enter, a letter and Backspace change nothing', async ({ page }) => {
       await openLive(page, 'combobox--states', { direction })
-      await walk(page, 2)
-      const name = 'Read-only'
+      await walk(page, 7)
+      const name = 'read-only'
       await expect(inputOf(page, name)).toHaveValue('Saudi Arabia')
       expect(await press(page, 'ArrowDown', name)).toBe('Saudi Arabia')
       await opened(page)
@@ -129,8 +129,8 @@ for (const direction of DIRECTIONS) {
 
     test('a disabled option takes the highlight and Enter does not choose it', async ({ page }) => {
       await openLive(page, 'combobox--states', { direction })
-      await walk(page, 3)
-      const name = 'One option disabled'
+      await walk(page, 8)
+      const name = 'one option disabled'
       expect([await press(page, 'ArrowDown', name), await press(page, 'ArrowDown', name), await press(page, 'ArrowDown', name)]).toEqual(['Jordan', 'Egypt', 'Morocco'])
       await page.keyboard.press('Enter')
       await expect(popupOf(page)).toBeVisible()
