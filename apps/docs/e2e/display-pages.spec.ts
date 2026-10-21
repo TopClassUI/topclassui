@@ -70,8 +70,9 @@ test('Badge: the playground drives the variant and the tone', async ({ page }) =
   const errors = collectErrors(page)
   await page.goto('/en/docs/components/badge')
   const badge = card(page, 'badge')
+  // At rest the stage is the frame's matrix of variants and tones; the first change swaps in the playground's badge.
+  await expect(stageOf(page, 'badge').locator('[data-tone="info"][data-variant="outline"]')).toBeVisible()
   const stage = stageOf(page, 'badge').locator('[data-tone]', { hasText: 'Paid' })
-  await expect(stage).toHaveAttribute('data-variant', 'soft')
   await badge.getByRole('combobox', { name: 'variant' }).click()
   await page.getByRole('option', { name: 'solid', exact: true }).click()
   await expect(stage).toHaveAttribute('data-variant', 'solid')

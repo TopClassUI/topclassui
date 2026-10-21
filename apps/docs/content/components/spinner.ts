@@ -12,6 +12,7 @@ export const spinner = {
   },
   demos: ['with-text', 'sizes', 'tones', 'inherit-color', 'custom-size', 'rtl'],
   stageHeight: 4,
+  stageDemo: 'sizes',
   notes: {
     en: [
       'For a route still loading or a preview still building. When the shape of what is coming is known, a list or a table among them, a Skeleton holds its place instead.',

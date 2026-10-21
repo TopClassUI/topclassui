@@ -21,6 +21,7 @@ export const dialog = {
     'rtl',
   ],
   stageHeight: 24.25,
+  controlOrder: ['size'],
   stageOpen: true,
   note: {
     en: 'Wrap the parts in a form with the class `contents`, and a Server Action submits from the footer with no client handler.',

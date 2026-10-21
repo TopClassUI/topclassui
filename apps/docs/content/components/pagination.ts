@@ -11,6 +11,8 @@ export const pagination = {
   },
   demos: ['middle', 'first-page', 'last-page', 'sizes', 'many-pages', 'two-navs', 'custom-size', 'wide-numbers', 'rtl'],
   stageHeight: 6,
+  controlOrder: ['siblingCount', 'size'],
+  controlsHidden: ['value', 'pageCount', 'boundaryCount'],
   note: {
     en: 'getHref keeps every page crawlable; value, siblingCount and boundaryCount are clamped to a safe range.',
     ar: 'getHref يبقي كل صفحة قابلة للزحف، وقيم value وsiblingCount وboundaryCount محصورة في مدى آمن.',

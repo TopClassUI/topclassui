@@ -11,6 +11,8 @@ export const sidebar = {
   },
   demos: ['basic', 'groups', 'collapsed', 'controlled', 'in-a-layout', 'long-list', 'rtl'],
   stageHeight: 25,
+  controlOrder: ['defaultOpen'],
+  controlsHidden: ['open'],
   note: {
     en: '`defaultOpen={false}` sends the rail collapsed in the server HTML, so nothing moves when the page hydrates.',
     ar: 'مع `defaultOpen={false}` يرسل الخادم الشريط مطويًّا، فلا يتحرك شيء عند الترطيب.',

@@ -8,6 +8,8 @@ export const treeView = {
   },
   demos: ['basic', 'selected', 'load-more', 'status', 'ten-thousand', 'long-content', 'rtl'],
   stageHeight: 22,
+  controlOrder: ['visibleRows'],
+  controlsHidden: ['loadMoreThreshold'],
   note: {
     en: '`items` is plain data and a node\'s icon is an element, so a Server Component passes the tree as it is; there is no `getKey`.',
     ar: '`items` بيانات عادية وأيقونة العقدة عنصر، فيمرّر مكوّن الخادم الشجرة كما هي، ولا يوجد `getKey`.',

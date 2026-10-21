@@ -35,7 +35,8 @@ test('Alert: the playground drives the variant and the tone', async ({ page }) =
   await expect(stage).toHaveAttribute('data-variant', 'outline')
   await choose(page, 'alert', 'tone', 'danger')
   await expect(stage).toHaveAttribute('data-tone', 'danger')
-  await expect(alert.locator('pre').first()).toContainText('<Alert variant="outline" tone="danger"')
+  // Try it lists tone before variant, as the frame does, so the code writes them in that order.
+  await expect(alert.locator('pre').first()).toContainText('<Alert tone="danger" variant="outline"')
   expect(errors).toEqual([])
 })
 
@@ -100,8 +101,8 @@ test('Toast: the playground sets the options of the toast the press adds', async
   const shown = page.locator('[role="alertdialog"]:not([data-component="toast"] *)', { hasText: 'Project created' })
   await expect(shown).toBeVisible()
   await expect(shown).toHaveAttribute('data-type', 'danger')
-  // toast is a function, not a tag, so the code is the stage's source rather than a usage the values are written into.
-  await expect(toast.locator('pre').first()).toContainText('toast.add({ ...props')
+  // toast is a function, not a tag, so the code is the button that adds one, as a page writes it, with no stage.
+  await expect(toast.locator('pre').first()).toContainText('toast.add({ title: TITLE, description: DESCRIPTION })')
   await page.waitForTimeout(5500)
   await expect(shown, 'duration 0 stays until it is closed').toBeVisible()
   await shown.getByRole('button', { name: 'Dismiss this notification' }).click()

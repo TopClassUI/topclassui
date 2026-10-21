@@ -11,6 +11,9 @@ export const numberField = {
   },
   demos: ['basic', 'limits', 'form', 'sizes', 'row', 'rtl'],
   stageHeight: 7,
+  controlOrder: ['size', 'disabled', 'invalid', 'required', 'fullWidth'],
+  controlsHidden: ['min', 'max'],
+  extraSwitches: ['disabled', 'required'],
   note: {
     en: '`min`, `max` and `step` are clamped at runtime, so a typed or passed value cannot break the field.',
     ar: '`min` و`max` و`step` تُحصر أثناء التشغيل، فلا تستطيع قيمة مكتوبة أو ممرَّرة أن تكسر الحقل.',

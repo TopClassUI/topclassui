@@ -20,6 +20,8 @@ export const command = {
     'rtl',
   ],
   stageHeight: 24.25,
+  controlOrder: ['visibleRows'],
+  controlsHidden: ['loadMoreThreshold'],
   stageOpen: true,
   note: {
     en: '`getKey`, `getLabel` and `onSelect` are functions, so the palette is configured inside a client file.',

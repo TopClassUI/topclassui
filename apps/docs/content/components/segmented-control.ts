@@ -8,6 +8,7 @@ export const segmentedControl = {
   },
   demos: ['basic', 'with-icons', 'sizes', 'full-width', 'form', 'many', 'long-content', 'rtl'],
   stageHeight: 20,
+  extraSwitches: ['disabled'],
   note: {
     en: 'The arrow keys move and select at once; under an RTL `TopClassProvider`, ArrowRight goes to the segment before.',
     ar: 'الأسهم تنقل وتختار معًا، وتحت `TopClassProvider` باتجاه من اليمين إلى اليسار ينتقل السهم الأيمن إلى المقطع السابق.',

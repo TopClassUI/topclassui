@@ -11,7 +11,7 @@ export const emptyState = {
     ar: 'بلا خصائص يعرض أيقونة الدُّرج ونصّي labels.state؛ وعنوانك الخاص يُسقط الوصف الافتراضي.',
   },
   demos: ['default', 'with-action', 'filtered', 'failed', 'title-only', 'long-text', 'rtl'],
-  stageDemo: 'default',
+  stageDemo: 'with-action',
   stageHeight: 16,
   notes: {
     en: [

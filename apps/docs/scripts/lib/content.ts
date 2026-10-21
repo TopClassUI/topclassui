@@ -29,6 +29,8 @@ export const contentSchema = z.strictObject({
   /** Where Try it starts a prop the playground sets in its body rather than its signature, so the control shows what the stage draws. */
   starts: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional(),
   controlOrder: z.array(z.string().regex(/^[a-z][A-Za-z]*$/)).optional(),
+  /** Props Try it leaves out because the frame draws no control for them. */
+  controlsHidden: z.array(z.string().regex(/^[a-z][A-Za-z]*$/)).optional(),
   note: both,
   notes: bothLists,
   keyboard: z.array(z.strictObject({ keys: z.array(z.string().min(1)).min(1), action: both })),

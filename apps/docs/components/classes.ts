@@ -173,8 +173,8 @@ export const PLAY_ROW = 'grid min-w-0 md:grid-cols-[minmax(0,1fr)_15.5rem]'
 export const TRY_IT = 'grid content-start gap-3.5 border-t-(length:--tc-line-width) border-line bg-surface p-4.5 text-body md:border-t-0 md:border-s-(length:--tc-line-width)'
 export const CONTROL = 'grid gap-1.5'
 export const CONTROL_LABEL = 'text-xs font-medium text-muted'
-/** A boolean prop: the checkbox, then its name beside it. */
-export const CHECK_ROW = 'flex min-w-0 items-center gap-2'
+/** A boolean prop: the checkbox, then its name beside it; the negative margin gives the frames' 25 px pitch down a list of them. */
+export const CHECK_ROW = 'flex min-w-0 items-center gap-2 -my-1.5'
 export const CHECK_LABEL = 'text-xs text-body'
 /** The box each Try it control is reserved before it mounts, as tall as the sm control it stands for, so the column never shifts. */
 export const CONTROL_RESERVE = {
@@ -203,7 +203,7 @@ export const CHIP = `inline-flex items-center rounded-chip px-2 py-0.5 font-mono
 /** The legend's step number in its soft round badge. */
 export const LEGEND_NUMBER = 'inline-flex size-4.5 shrink-0 items-center justify-center rounded-full bg-primary-soft text-xs font-semibold text-primary-on-soft'
 /** Every state: the cells share the row, each at least 144 px (six fit the frames' 906), and wrap below that; a wide state grows. */
-export const STATE_GRID = 'flex min-w-0 flex-wrap items-start gap-y-4'
+export const STATE_GRID = 'flex min-w-0 flex-wrap items-start gap-x-6 gap-y-4'
 export const STATE_CELL = 'grid min-w-[max(9rem,min-content)] max-w-full grow basis-36 content-start justify-items-center gap-2.5'
 /** The frames' 56 px box each state sits centred in. */
 export const STATE_BOX = 'flex min-h-14 max-w-full items-center justify-center'
