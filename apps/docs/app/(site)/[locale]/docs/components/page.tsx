@@ -2,7 +2,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
-import { CatalogPage, catalogCards, catalogToc } from '../../../../../components/catalog/catalog-page'
+import { CatalogPage, catalogCards, catalogTocEntries } from '../../../../../components/catalog/catalog-page'
 import { JsonLd } from '../../../../../components/json-ld'
 import { DocsColumns } from '../../../../../components/shell/docs-shell'
 import { SitePage } from '../../../../../components/shell/site-page'
@@ -29,7 +29,7 @@ export default async function Page({ params }: { params: Params }) {
   return (
     <SitePage locale={locale} current="components" path="/docs/components">
       <JsonLd data={catalogData(entry, locale, catalogCards())} />
-      <DocsColumns locale={locale} current="components" labels={labelsFor(locale)} toc={catalogToc(locale).flatMap((group) => group.items)}>
+      <DocsColumns locale={locale} current="components" labels={labelsFor(locale)} toc={catalogTocEntries(locale)}>
         <CatalogPage locale={locale} />
       </DocsColumns>
     </SitePage>

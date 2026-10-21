@@ -78,7 +78,7 @@ export function Tag({ onRemove, children, ...rest }: TagProps) {
 
 ## How sizes are checked
 
-Every client component has a size budget in `size-budget.json`: 6 KB gzipped for a simple control, 14 KB for an overlay, and Command and DatePicker load their heavy part on demand. `pnpm size` bundles each component's client entry with esbuild, minified, and gzips it. React and Base UI are left out of the number, because a page loads them once; the total with Base UI is recorded beside it. `pnpm size --check` runs in `pnpm check` and fails the build when a component goes over its budget.
+Every client component has a size budget: 6 KB gzipped for a simple control, 14 KB for an overlay. `pnpm size --check` fails the build when one is crossed; React and Base UI are left out, because a page loads them once.
 
 <Callout tone="info">The chips print the number `pnpm size` measured, so a chip cannot drift from the build.</Callout>
 
@@ -86,7 +86,7 @@ Every client component has a size budget in `size-budget.json`: 6 KB gzipped for
 
 Server-first comes with constraints. These are the ones you will notice.
 
-<Cards>
+<Cards columns={3}>
   <Card title="No onClick on a server component">A Button rendered on the server submits a form or follows a link. If it must run code in the browser, it lives in a client file.</Card>
   <Card title="A command palette needs a client file">`getKey`, `getLabel` and `onSelect` are functions, so Command must be configured in a file marked `'use client'`. Select and Combobox take plain data and render from a server file.</Card>
   <Card title="Some controls wait for hydration">Checkbox, Switch and Select submit their default value until JavaScript loads. Input and Textarea need no JavaScript at all.</Card>
