@@ -45,7 +45,6 @@ export default function SearchPalette({ locale, labels: t, open, onOpenChange }:
             <Svg icon={fileText} size="0.875rem" aria-hidden="true" className="shrink-0 text-muted in-data-highlighted:text-primary-on-soft" />
             <span className="min-w-0 flex-1 truncate">{entry.title}</span>
             {entry.hint === null ? null : <bdi dir="ltr" className="shrink-0 font-mono text-xs text-muted in-data-highlighted:hidden">{entry.hint}</bdi>}
-            <kbd aria-hidden="true" dir="ltr" className="hidden shrink-0 font-mono text-xs text-muted in-data-highlighted:inline">{t.enter}</kbd>
           </>
         )}
         emptyFallback={(
