@@ -2,6 +2,7 @@
 
 import { useRef, type ReactNode } from 'react'
 
+import { SCROLLBAR } from '#shared/classes.js'
 import { Button } from '#components/button/index.js'
 import {
   DialogBody, DialogClose, DialogFooter, DialogHeader, DialogPopup, DialogRoot, DialogTitle, DialogTrigger,
@@ -13,7 +14,7 @@ const CELL = 'relative h-28 w-36 justify-self-center overflow-hidden rounded-box
 const BAR = 'min-h-2 rounded-chip bg-surface-raised'
 const LABEL = 'font-mono text-xs/tight font-normal text-muted'
 // The cell is under 15rem tall, where a real body stops scrolling and the popup scrolls as one; this body still scrolls.
-const SCROLLED = 'grid gap-1 p-2.5 font-mono text-xs [@container(height<15rem)]:shrink [@container(height<15rem)]:overflow-y-auto'
+const SCROLLED = `grid gap-1 p-2.5 font-mono text-xs [@container(height<15rem)]:shrink [@container(height<15rem)]:overflow-y-auto ${SCROLLBAR}`
 
 /** The page behind the scrim, as the frame draws it: four bars of text, hidden from a reader. */
 function PageBehind() {
