@@ -193,6 +193,19 @@ describe('snippetOf', () => {
       .toBe('<NavbarRoot sticky={false}>\n  <NavbarLink href="/docs" current>Docs</NavbarLink>\n</NavbarRoot>')
   })
 
+  const BANNER = 'export default function Demo({ dismissible = true, ...props }: P = {}) {\n  return (\n    <Banner {...props}\n      dismissible={dismissible}\n      id="x"\n    >\n      Hi.\n    </Banner>\n  )\n}\n'
+
+  it('drops a pass-through with a default and its line at rest, leaving no empty line in the tag', () => {
+    const usage = usageOf(BANNER)
+    expect(usage?.passed).toEqual(['dismissible'])
+    expect(usage === null ? '' : snippetOf(usage, [])).toBe('<Banner\n  id="x"\n>\n  Hi.\n</Banner>')
+  })
+
+  it('writes a changed pass-through with a default on the tag it stood in', () => {
+    const usage = usageOf(BANNER)
+    expect(usage === null ? '' : snippetOf(usage, [['dismissible', false], ['tone', 'info']])).toBe('<Banner tone="info" dismissible={false}\n  id="x"\n>\n  Hi.\n</Banner>')
+  })
+
   it('writes a root prop where the spread was, never over a nested part\'s attribute of the same name', () => {
     const usage = { imports: [], jsx: '<Banner {...props}\n  action={<Button tone="neutral">Read</Button>}\n>\n  Out now.\n</Banner>', passed: [] }
     expect(snippetOf(usage, [['tone', 'warning'], ['dismissible', true]]))

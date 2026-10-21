@@ -14,7 +14,7 @@ export const toast = {
   stageHeight: 17.5,
   controlOrder: ['tone'],
   stageOpen: true,
-  starts: { tone: 'success' },
+  starts: { tone: 'success', duration: 5000 },
   notes: {
     en: [
       '`toast` is four plain functions: `add`, `update`, `close` and `promise`. The table lists the options of `toast.add`, not props; it also takes a required title, a description and one action.',
