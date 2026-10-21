@@ -11,6 +11,8 @@ export const navbar = {
   },
   demos: ['basic', 'with-search', 'many-links', 'not-sticky', 'tall-page', 'rtl'],
   stageHeight: 6,
+  controlOrder: ['variant', 'sticky'],
+  controlsHidden: ['current'],
   note: {
     en: 'The bar writes its own height to --tc-sticky-top, so an #anchor target stops below it, not under it.',
     ar: 'يكتب الشريط ارتفاعه في --tc-sticky-top، فيتوقف هدف الرابط #anchor تحته لا خلفه.',

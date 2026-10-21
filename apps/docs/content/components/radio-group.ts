@@ -11,6 +11,7 @@ export const radioGroup = {
   },
   demos: ['basic', 'horizontal', 'form', 'sizes', 'long-content', 'rtl'],
   stageHeight: 13.75,
+  controlOrder: ['size', 'orientation', 'disabled', 'required', 'invalid'],
   extraSwitches: ['disabled', 'required'],
   note: {
     en: 'The group carries the state and the form; each `RadioGroupItem` carries only its `value` and its text.',

@@ -12,6 +12,7 @@ export const alert = {
   },
   demos: ['basic', 'tones', 'variants', 'with-actions', 'minimal', 'rich-content', 'custom-icon', 'live-region', 'long-text', 'rtl'],
   stageHeight: 8,
+  controlOrder: ['tone', 'variant'],
   notes: {
     en: [
       'For a message that belongs to the page: a trial about to end, a failed deploy, a saved form. For something that has just happened, use a Toast; for a bar above the whole page, use a Banner.',

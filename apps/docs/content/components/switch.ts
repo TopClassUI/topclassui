@@ -11,6 +11,7 @@ export const switchControl = {
   },
   demos: ['basic', 'form', 'unchecked-value', 'sizes', 'rtl'],
   stageHeight: 5.25,
+  controlOrder: ['size', 'disabled', 'required', 'invalid'],
   extraSwitches: ['disabled', 'required'],
   note: {
     en: 'The `xs` and `sm` switches still grow to a 44px target under a touch pointer, so the thumb stays easy to tap.',

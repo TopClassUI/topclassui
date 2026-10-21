@@ -11,6 +11,8 @@ export const slider = {
   },
   demos: ['basic', 'range', 'show-value', 'form', 'sizes', 'rtl'],
   stageHeight: 7,
+  controlOrder: ['size', 'disabled', 'showValue', 'invalid'],
+  controlsHidden: ['fullWidth', 'min', 'max', 'step', 'largeStep', 'minStepsBetweenValues'],
   extraSwitches: ['disabled'],
   note: {
     en: 'A hidden range input carries the value, so the slider submits with its form; the thumb moves once the page hydrates.',

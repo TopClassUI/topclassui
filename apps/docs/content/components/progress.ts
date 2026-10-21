@@ -12,6 +12,8 @@ export const progress = {
   },
   demos: ['labelled', 'values', 'tones', 'sizes', 'indeterminate', 'file-row', 'custom-size', 'rtl'],
   stageHeight: 3,
+  controlOrder: ['tone', 'size', 'indeterminate'],
+  controlsHidden: ['value'],
   notes: {
     en: [
       'For an upload, a quota or a step in a long job. `value` is a percentage, clamped to 0-100 before it reaches ARIA or the bar; for a custom range, use Meter.',

@@ -11,6 +11,8 @@ export const accordion = {
   },
   demos: ['basic', 'first-open', 'multiple', 'disabled', 'long-content', 'many-items', 'rtl'],
   stageHeight: 14,
+  controlOrder: ['hiddenUntilFound', 'disabled'],
+  controlsHidden: ['headingLevel'],
   extraSwitches: ['disabled'],
   note: {
     en: 'A closed panel is hidden="until-found": the browser\'s search, an #id link or a text fragment opens it.',

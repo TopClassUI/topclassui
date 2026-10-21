@@ -53,6 +53,7 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
   const order = content.controlOrder ?? []
   const rank = (prop: string) => (order.includes(prop) ? order.indexOf(prop) : order.length)
   const controls = withStarts([...entry.controls, ...(content.extraSwitches ?? []).map((prop) => ({ prop, kind: 'switch' as const, default: false }))], content.starts ?? {})
+    .filter((control) => !(content.controlsHidden ?? []).includes(control.prop))
     .map((control, index) => ({ control, index }))
     .sort((a, b) => rank(a.control.prop) - rank(b.control.prop) || a.index - b.index)
     .map(({ control }) => control)

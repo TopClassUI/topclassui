@@ -12,6 +12,8 @@ export const toast = {
   },
   demos: ['with-description', 'basic', 'tones', 'with-action', 'promise', 'sticky', 'high-priority', 'many', 'over-dialog', 'long-content', 'rtl'],
   stageHeight: 6,
+  controlOrder: ['tone'],
+  controlsHidden: ['priority', 'duration'],
   stageOpen: true,
   starts: { tone: 'success' },
   notes: {

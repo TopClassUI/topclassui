@@ -11,6 +11,7 @@ export const checkbox = {
   },
   demos: ['basic', 'labelled', 'form', 'sizes', 'rtl'],
   stageHeight: 5.25,
+  controlOrder: ['size', 'indeterminate', 'disabled', 'invalid'],
   extraSwitches: ['indeterminate', 'disabled'],
   note: {
     en: 'The box is a native `<button role="checkbox">`, and a hidden checkbox beside it is what the form sends.',

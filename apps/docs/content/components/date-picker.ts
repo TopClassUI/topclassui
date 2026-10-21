@@ -11,6 +11,8 @@ export const datePicker = {
   },
   demos: ['basic', 'in-field', 'limits', 'week-start', 'form', 'sizes', 'rtl'],
   stageHeight: 7,
+  controlOrder: ['placement', 'firstDayOfWeek', 'disabled', 'invalid'],
+  controlsHidden: ['size', 'fullWidth'],
   extraSwitches: ['disabled'],
   note: {
     en: 'The value is an ISO date string, YYYY-MM-DD; the shown format comes from the provider\'s locale.',

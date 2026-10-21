@@ -11,6 +11,8 @@ export const textarea = {
   },
   demos: ['basic', 'autosize', 'show-count', 'sizes', 'form', 'row', 'long-content', 'skeleton', 'rtl'],
   stageHeight: 10,
+  controlOrder: ['size', 'maxRows', 'autosize', 'showCount', 'disabled', 'invalid'],
+  controlsHidden: ['fullWidth', 'rows'],
   extraSwitches: ['disabled'],
   note: {
     en: 'On its own it is server HTML; `autosize` or `showCount` is what loads the small client half.',

@@ -11,6 +11,8 @@ export const otpField = {
   },
   demos: ['basic', 'grouped', 'form', 'sizes', 'long', 'rtl'],
   stageHeight: 7,
+  controlOrder: ['length', 'size', 'mask', 'autoSubmit', 'disabled', 'invalid'],
+  controlsHidden: ['groupSize'],
   extraSwitches: ['mask', 'autoSubmit', 'disabled'],
   note: {
     en: 'The export is `OTPField`. In a form the hidden input sends what is typed so far, a partial code too.',
