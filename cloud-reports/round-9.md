@@ -1,0 +1,12 @@
+# Cloud jobs, round 9
+
+Started 2026-10-21 18:00 UTC from the laptop's handover (Omar's word). The laptop verifies the landing page (PRs 175-179 + 180) and the library component stack; the cloud runs two jobs in parallel. Rules: one-line OmarAbed16 commits (author and committer OmarAbed16 <OmarFathiAbed@gmail.com>), no body, no trailer, no AI mention, fast-forward pushes, never main, no PRs (the laptop opens them). Do not push to the seven figma branches or the five landing branches while the laptop verifies them.
+
+State at the start: main 666bf507. Library branches with main and fix/thin-page-bar-e2e merged by the laptop: figma/overlays cf0ccefe → figma/data-feedback-1 0d511bd6 → figma/data-feedback-2 7f5bb71f → figma/navigation d8cba6ca → figma/forms-1 1af0e655 → figma/forms-2 a7b80640 → figma/actions-display c0ee519a (the library top). Combined tree: preview/r8-all 81239358 (landing top feat/site-speed-insights 4f8692f2 + library top c0ee519a + figma/site-guides 0f974ca1 + figma/site-components 3f74c06e; globals.css keeps every block, components/classes.ts and the catalog lead labels take site-components, the unused catalog metaTitle dropped, docs:data counts 477 demos). Job 132's triage of the site e2e on the stack (round 8, 87 failures): overlay-pages 53, mobile 12, preview-route 7, data-pages 7, motion 3, seo 2, navigation, forms and feedback 1 each; some are gone now, since Speed Insights loads only when VERCEL is 1.
+
+Figma tools: the cloud proxy blocks www.figma.com itself; the Figma MCP get_screenshot and get_design_context work (save images locally); use_figma blocks a session on a permission prompt nobody can answer and is never called.
+
+| Job | Branch | Base | Tip | Commits | Gates | Composites and what is left for Omar |
+| --- | --- | --- | --- | --- | --- | --- |
+| 133 Site integration repair | preview/r8-all (and fix/r9-library from c0ee519a if a library demo is the cause) | preview/r8-all 81239358 | started 18:05 UTC | - | - | - |
+| 134 Figma parity of the 45 component cards | fix/r9-parity from c0ee519a (library), preview/r8-all after 133 is green (site) | c0ee519a / preview/r8-all 81239358 | started 18:05 UTC | - | - | - |
