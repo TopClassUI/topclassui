@@ -180,17 +180,17 @@ describe('a gap is a mark, not a control', () => {
 
 describe('the list', () => {
   it('is a wrapping row with the 6 px gap the frame draws at md and the container the compact row measures, so it never scrolls a phone sideways', () => {
-    expect(attr(/<ul [^>]*>/.exec(html())?.[0] ?? '', 'class')).toBe('flex flex-wrap items-center @container/pagination gap-1.5')
+    expect(attr(/<ul [^>]*>/.exec(html())?.[0] ?? '', 'class')).toBe('flex flex-wrap items-center @container/pagination gap-1.5 pagination-at-32')
   })
 
   it('spaces its cells by size: 4 px at xs and custom, 6 at sm and md, 8 at lg and xl', () => {
-    const gap = (size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'custom') => attr(/<ul [^>]*>/.exec(html({ size }))?.[0] ?? '', 'class')?.split(' ').at(-1)
+    const gap = (size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'custom') => attr(/<ul [^>]*>/.exec(html({ size }))?.[0] ?? '', 'class')?.split(' ').at(-2)
     expect((['xs', 'sm', 'md', 'lg', 'xl', 'custom'] as const).map(gap)).toEqual(['gap-1', 'gap-1.5', 'gap-1.5', 'gap-2', 'gap-2', 'gap-1'])
   })
 
-  it('adds no class of its own to the nav, so className arrives alone', () => {
-    expect(html().startsWith('<nav aria-label="Pagination" data-size="md">')).toBe(true)
-    expect(attr(html({ className: 'mt-4 justify-self-end' }), 'class')).toBe('mt-4 justify-self-end')
+  it('holds the nav to its cell with max-w-full alone, and puts className after it', () => {
+    expect(html().startsWith('<nav aria-label="Pagination" data-size="md" class="max-w-full">')).toBe(true)
+    expect(attr(html({ className: 'mt-4 justify-self-end' }), 'class')).toBe('max-w-full mt-4 justify-self-end')
   })
 })
 

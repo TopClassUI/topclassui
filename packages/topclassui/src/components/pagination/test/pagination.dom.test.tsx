@@ -121,7 +121,7 @@ describe('the root element', () => {
     )
     const nav = screen.getByRole('navigation')
     expect(nav.id).toBe('pages')
-    expect(nav.className).toBe('mt-4')
+    expect(nav.className).toBe('max-w-full mt-4')
     expect(nav.getAttribute('data-testid')).toBe('pages')
     expect(nav.style.getPropertyValue('--tc-density')).toBe('1')
   })
