@@ -116,7 +116,7 @@ test.describe('the helper that opens every overlay', () => {
   // On the first frame a popup is open and past its starting style it is at opacity 0, scale 0.95, 380 px wide.
   test('returns a dialog at rest: opaque, at full size, with no transition left running', async ({ page }) => {
     const popup = await open(page, 'dialog--basic')
-    expect(await motion(popup)).toEqual({ opacity: '1', scale: 'none', translate: 'none', width: 400, left: 432.5, running: 0 })
+    expect(await motion(popup)).toEqual({ opacity: '1', scale: 'none', translate: 'none', width: 400, left: 435, running: 0 })
   })
 
   // A Drawer slides and never fades, so a wait on its opacity would return on the first frame of the slide.
@@ -127,13 +127,13 @@ test.describe('the helper that opens every overlay', () => {
       '[role="dialog"][data-starting-style] { translate: 100% 0 !important }',
     ].join('\n') })
     const popup = await openOverlay(page, triggerOf(page, 'Publish'))
-    expect(await motion(popup)).toEqual({ opacity: '1', scale: 'none', translate: 'none', width: 400, left: 432.5, running: 0 })
+    expect(await motion(popup)).toEqual({ opacity: '1', scale: 'none', translate: 'none', width: 400, left: 435, running: 0 })
   })
 
   test('returns at once where nothing moves, under reduced motion', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' })
     const popup = await open(page, 'dialog--basic')
-    expect(await motion(popup)).toEqual({ opacity: '1', scale: 'none', translate: 'none', width: 400, left: 432.5, running: 0 })
+    expect(await motion(popup)).toEqual({ opacity: '1', scale: 'none', translate: 'none', width: 400, left: 435, running: 0 })
   })
 })
 
@@ -361,8 +361,8 @@ test.describe('the page behind', () => {
       for (const edge of ['start', 'end'] as const) {
         withScrollbar(`${direction}, trigger at the ${edge}: opening and closing the dialog does not move the trigger`, async ({ barPage: page }) => {
           await openLive(page, 'dialog--basic', { direction, edge, tall: true })
-          // A real bar 15 px wide: the root's client box is narrower than the window.
-          expect(await page.evaluate(() => window.innerWidth - document.documentElement.clientWidth)).toBe(15)
+          // A real bar, 10 px as the page draws it thin: the root's client box is narrower than the window.
+          expect(await page.evaluate(() => window.innerWidth - document.documentElement.clientWidth)).toBe(10)
           const trigger = triggerOf(page, 'Publish')
           const before = await boxOf(trigger)
 
@@ -377,13 +377,13 @@ test.describe('the page behind', () => {
       }
     }
 
-    withScrollbar('the comparison can fail: with the gutter forced off, the trigger at the end moves by the 15 px of the bar', async ({ barPage: page }) => {
+    withScrollbar('the comparison can fail: with the gutter forced off, the trigger at the end moves by the 10 px of the bar', async ({ barPage: page }) => {
       await openLive(page, 'dialog--basic', { edge: 'end', tall: true })
       await page.addStyleTag({ content: 'html { scrollbar-gutter: auto !important }' })
       const trigger = triggerOf(page, 'Publish')
       const before = await boxOf(trigger)
       await openOverlay(page, trigger)
-      expect((await boxOf(trigger)).left).toBe(before.left - 15)
+      expect((await boxOf(trigger)).left).toBe(before.left - 10)
     })
   })
 })
@@ -562,7 +562,7 @@ test.describe('inside the viewport', () => {
         // action. A wheel, not scrollIntoView: a script scrolls a box that clips, and a reader cannot.
         const [frame, header] = [await boxOf(popup), (await partsOf(popup)).header]
         const hidden = await popup.evaluate((el) => el.scrollHeight - el.clientHeight)
-        expect(hidden, 'px of popup below its own box').toBe(screen.height === 480 ? 36 : 0)
+        expect(hidden, 'px of popup below its own box').toBe(screen.height === 480 ? 26 : 0)
         await wheelAt(page, header.left + 40, header.top + 20, hidden)
         expect(await popup.evaluate((el) => el.scrollTop), 'px the wheel scrolled the popup').toBe(hidden)
         for (const button of await popup.locator('button:not([aria-label])').all()) {
@@ -810,7 +810,7 @@ test('320 x 480: a label beside a part that cannot shrink is one letter a line, 
     return { width: Math.round(label?.width ?? 0), height: Math.round(label?.height ?? 0), sideways: body.scrollWidth - body.clientWidth }
   }, row)
 
-  expect(await labelIn('flex gap-2')).toEqual({ width: 12, height: 180, sideways: 5 })
+  expect(await labelIn('flex gap-2')).toEqual({ width: 12, height: 180, sideways: 0 })
   expect(await labelIn('flex flex-wrap gap-2')).toEqual({ width: 81, height: 20, sideways: 0 })
 })
 
