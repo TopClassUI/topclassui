@@ -25,6 +25,8 @@ export const contentSchema = z.strictObject({
   stageOpen: z.boolean().optional(),
   /** The demo THE CODE shows at rest when the frame's code is another sample than the stage it draws. */
   codeDemo: z.string().min(1).optional(),
+  /** A one-line caption the frame writes over THE CODE in place of its heading (S8). */
+  codeCaption: both.optional(),
   /** Boolean props the schema leaves to the element (a native `disabled`) that Try it still offers, as the frame draws them. */
   extraSwitches: z.array(z.string().regex(/^[a-z][A-Za-z]*$/)).optional(),
   /** Props Try it lists first, in the frame's order; the rest follow in the schema's. */
