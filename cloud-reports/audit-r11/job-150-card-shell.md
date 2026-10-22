@@ -174,3 +174,29 @@ Branch fix/r11-card-shell. The 115 rows of the ten audit files marked (shared) o
 | r12-43 | audit-r12/job-145-navigation.md | /en/docs/components/pagination | 3 [low] Every state, cell and pagination size | page row (job 145: pagination CELL_SIZE.xs, packages) |
 | r12-44 | audit-r12/job-145-navigation.md | /en/docs/components/tabs | 3 [medium] Every state, the focus-visible and disabled lists run together | page row (job 145: tabs states.tsx) |
 | r12-45 | audit-r12/job-145-navigation.md | /en/docs/components/accordion | 3 [low] Every state, open cell | page row (job 145: accordion states.tsx) |
+
+## Second audit, last three groups (audit-r12 job-144-feedback, job-144-overlays, getting-started at 815df5a3)
+
+18 shell rows (2 medium, 16 low) plus the medium plain code colour row: 7 fixed, 8 already fixed by 51e730dc, 3 page rows (job 144), 1 kept on a recorded decision and put to Omar.
+
+| # | Source | Page | Row | Status |
+|---|---|---|---|---|
+| r12b-1 | audit-r12/getting-started.md | /en/docs/installation | 1 [medium] (new) Peer dependencies and Framework support tables, header row (also CSS, Provider and the two CLI tables) | fixed (34981dfc): PROSE_HEAD by page group; getting-started tables 14 px semibold on 17 px (41 px), Foundations keep the 11 px mono header (r11 guides rows) |
+| r12b-2 | audit-r12/getting-started.md | /en/docs/installation | 5 [low] (still open) row 12, navbar mode switch weight | already fixed (51e730dc): MODE_SEGMENT all medium |
+| r12b-3 | audit-r12/getting-started.md | /en/docs/installation | 6 [low] (still open) row 15, sidebar rest-row text colour | already fixed (51e730dc): SIDE_LINK.rest body |
+| r12b-4 | audit-r12/getting-started.md | /en/docs/installation | 11 [low] (still open) row 22, prose inline code on every guide page | fixed (34981dfc): PROSE_CODE is the sentence face in muted |
+| r12b-5 | audit-r12/getting-started.md | /en/docs/cli | 4 [low] (new) On this page, an entry that wraps to two lines (also CSS and First component) | fixed (34981dfc): TOC_LINK py-1 |
+| r12b-6 | audit-r12/getting-started.md | /en/docs/first-component | 1 [low] (new) 3. What you should see, step row heights | fixed (34981dfc): steps on 17 px lines (steps.tsx), STEP_NUMBER without mt-1 |
+| r12b-7 | audit-r12/job-144-feedback.md | /en/docs/components/alert | 1 [low] head, chip beside the name (S2) | already fixed (51e730dc): chip 16 px (10 px on a 12 px line, py-px) |
+| r12b-8 | audit-r12/job-144-feedback.md | /en/docs/components/banner | 1 [low] head, chip beside the name (S2) | already fixed (51e730dc): chip 16 px (10 px on a 12 px line, py-px) |
+| r12b-9 | audit-r12/job-144-feedback.md | /en/docs/components/toast | 2 [low] head, chip beside the name (S2) | already fixed (51e730dc): chip 16 px (10 px on a 12 px line, py-px) |
+| r12b-10 | audit-r12/job-144-feedback.md | /en/docs/components/toast | 3 [low] Try it, duration | fixed (34981dfc): format useGrouping false and font-mono |
+| r12b-11 | audit-r12/job-144-feedback.md | /en/docs/components/tooltip | 1 [medium] head, description (S3) | already fixed (51e730dc): the mode-switch segments at 9 px padding leave a 579 px column; the sentence is one 17.5 px line (measured) |
+| r12b-12 | audit-r12/job-144-feedback.md | /en/docs/components/tooltip | 4 [low] head, chip beside the name (S2) | already fixed (51e730dc): chip 16 px (10 px on a 12 px line, py-px) |
+| r12b-13 | audit-r12/job-144-feedback.md | /en/docs/components/popover | 5 [low] head, chip beside the name (S2) | already fixed (51e730dc): chip 16 px (10 px on a 12 px line, py-px) |
+| r12b-14 | audit-r12/job-144-overlays.md | /en/docs/components/dialog | 2 [low] code part, caption row | fixed (34981dfc): codeCaption {en, ar} in the content schema, rendered at 10 px medium in place of THE CODE; dialog.ts filled |
+| r12b-15 | audit-r12/job-144-overlays.md | /en/docs/components/dialog | 7 [low] Every state, row height and caption gap | page row (job 144: dialog states.tsx) |
+| r12b-16 | audit-r12/job-144-overlays.md | /en/docs/components/drawer | 7 [low] Every state, row height and caption gap | page row (job 144: drawer states.tsx) |
+| r12b-17 | audit-r12/job-144-overlays.md | /en/docs/components/dropdown | 8 [low] Try it, the tone select against the stage | page row (job 144: dropdown playground tone) |
+| r12b-18 | audit-r12/job-144-overlays.md | /en/docs/components/command | 3 [low] code part, caption row | fixed (34981dfc): command.ts filled the same way |
+| r12b-19 | audit-r12/getting-started.md | every guide | 3 [medium] (added by verifier) plain code text colour in every guide code block | kept (DECISIONS 2026-10-22, plain code neutral-300: the landing chose it on purpose and the entry names it a site-wide call for Omar); the Previewer cards already draw plain JSX in body (c7c65f16). For Omar: take the drawn 250 site-wide (lib/shiki-themes.ts DARK_GROUND.text, entry rewritten) or keep |
