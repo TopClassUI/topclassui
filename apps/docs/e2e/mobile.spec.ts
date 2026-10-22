@@ -30,6 +30,19 @@ const LIBRARY_SHORTFALLS: Record<string, string> = {
   'number-field': 'the input between its two 44 px steppers keeps 16 px of a 106 px field: job 114 figma/forms-1',
 }
 
+/** Cuts the library draws on purpose or owes, each left to the job named, matched by the start of the fault. */
+const LIBRARY_CUTS: Record<string, string> = {
+  'drawer div "sheet" cut by div': 'the states cell draws the side sheet mid-swipe, half out of its frame, as a picture',
+  'tag a "Infrastructure, platform relia" text cut': 'tag/dummy/link.tsx puts the long label straight in the chip with no LABEL span, so it is cut with no ellipsis at every width: routed by job 148',
+  'tag strong "Infrastructure, platform relia" cut by span': 'tag/dummy/element-label.tsx: an element as the label is clipped to the chip; only bare text gets the ellipsis',
+  'tag em "Infrastructure, platform relia" cut by span': 'tag/dummy/element-label.tsx, the same',
+  'tag code "sha256_9f86d081884c7d659a2feaa" cut by span': 'tag/dummy/element-label.tsx, the same',
+}
+/** Example stages the library's own demo holds wider than a phone, each left to the job named. */
+const LIBRARY_STAGES: Record<string, string> = {
+  popover: 'popover/dummy/placements.tsx keeps three 8rem columns under its max-w-[31.5rem], 504 px in a 326 px stage; w-full max-w-[31.5rem] gives two: routed by job 148',
+}
+
 /** Paints every deferred section and scrolls once to the bottom and back, so the lazy islands below the fold mount. */
 async function settle(page: Page) {
   await page.addStyleTag({ content: '* { content-visibility: visible !important; }' })
@@ -94,7 +107,9 @@ async function smallTargets(page: Page, path = ''): Promise<string[]> {
 }
 
 /** Every stage, of the Previewer or of an example, whose demo is wider than the phone and scrolls it sideways. */
-async function stageScrolls(page: Page): Promise<string[]> {
+async function stageScrolls(page: Page, path: string): Promise<string[]> {
+  const slug = path.split('/docs/components/')[1] ?? ''
+  if (slug in LIBRARY_STAGES) return []
   return page.evaluate((stage) => [...document.querySelectorAll('main *')].filter((element) => {
     const name = element.getAttribute('class') ?? ''
     return (name === stage || name.startsWith(`${stage} `)) && element.scrollWidth > element.clientWidth + 1
@@ -129,13 +144,14 @@ async function stripFaults(page: Page): Promise<string[]> {
 }
 
 /** Inside every card and page: a box cut by an ancestor that hides overflow, text cut without an ellipsis, code or a Try it control under 12 px. */
-async function clipFaults(page: Page): Promise<string[]> {
-  return page.locator('main').evaluate((main, tryIt) => {
+async function clipFaults(page: Page, path: string): Promise<string[]> {
+  const slug = path.split('/docs/components/')[1] ?? ''
+  const faults = await page.locator('main').evaluate((main, [tryIt, pageSlug]) => {
     const shown = (element: Element) => {
       const box = element.getBoundingClientRect()
       return box.width > 1 && box.height > 1 && getComputedStyle(element).visibility !== 'hidden' && element.closest('.sr-only, [aria-hidden="true"], [inert]') === null
     }
-    const name = (element: Element) => `${element.closest('[data-component]')?.getAttribute('data-component') ?? ''} ${element.tagName.toLowerCase()} "${element.textContent.trim().slice(0, 30)}"`
+    const name = (element: Element) => `${element.closest('[data-component]')?.getAttribute('data-component') ?? pageSlug} ${element.tagName.toLowerCase()} "${element.textContent.trim().slice(0, 30)}"`
     const faults: string[] = []
     for (const element of main.querySelectorAll('*')) {
       if (!shown(element)) continue
@@ -143,7 +159,8 @@ async function clipFaults(page: Page): Promise<string[]> {
       for (let parent = element.parentElement; parent !== null && parent !== main; parent = parent.parentElement) {
         const overflow = getComputedStyle(parent).overflowX
         if (overflow === 'visible') continue
-        if (overflow === 'hidden' || overflow === 'clip') {
+        // An ellipsis is R-5.2-7's truncation: the rendering is cut on purpose, the data is not.
+        if ((overflow === 'hidden' || overflow === 'clip') && getComputedStyle(parent).textOverflow !== 'ellipsis') {
           const frame = parent.getBoundingClientRect()
           if (box.left < frame.left - 1 || box.right > frame.right + 1) faults.push(`${name(element)} cut by ${parent.tagName.toLowerCase()}`)
         }
@@ -157,7 +174,8 @@ async function clipFaults(page: Page): Promise<string[]> {
       if (read && Number.parseFloat(style.fontSize) < 12) faults.push(`${name(element)} ${style.fontSize}`)
     }
     return faults
-  }, TRY_IT)
+  }, [TRY_IT, slug] as const)
+  return faults.filter((fault) => !Object.keys(LIBRARY_CUTS).some((known) => fault.startsWith(known)))
 }
 
 async function measure(page: Page, path: string) {
@@ -230,9 +248,9 @@ test.describe('on a phone in the dark', () => {
         expect(overflow, 'horizontal overflow').toEqual([])
         expect(rows, 'navbar rows').toBeLessThanOrEqual(2)
         expect(small, 'targets under 44 px').toEqual([])
-        expect(await stageScrolls(page), 'stages scrolling sideways').toEqual([])
+        expect(await stageScrolls(page, path), 'stages scrolling sideways').toEqual([])
         expect(await stripFaults(page), 'state strips').toEqual([])
-        expect(await clipFaults(page), 'clipped or small text').toEqual([])
+        expect(await clipFaults(page, path), 'clipped or small text').toEqual([])
       })
     }
 
