@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { MDXComponents } from 'mdx/types'
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
 import type { Locale } from '../../content/pages'
 import { EXTERNAL_REL, isExternal } from '../../lib/external'
@@ -12,7 +12,7 @@ import { FrameworkTabs } from './framework-tabs'
 import { Card, Cards } from './cards'
 import { CodeFence } from './code-fence'
 import { Heading } from './heading'
-import { MdxTable } from './mdx-table'
+import { MdxTable, Widths, type ColumnWidth } from './mdx-table'
 import { PackageManagers } from './package-managers'
 import { PeerRange } from './peer-range'
 import { PropsTable } from './props-table'
@@ -34,7 +34,8 @@ export function mdxComponents(locale: Locale): MDXComponents {
     ol: ({ children }) => <Steps>{children}</Steps>,
     code: ({ children }) => <code dir="ltr" className={PROSE_CODE}>{children}</code>,
     pre: ({ children }) => <CodeFence locale={locale} terminal={terminal} repeat={labels.blocks.repeat}>{children}</CodeFence>,
-    table: ({ children }) => <MdxTable locale={locale}>{children}</MdxTable>,
+    table: ({ children, widths }: { children?: ReactNode; widths?: readonly ColumnWidth[] | undefined }) => <MdxTable locale={locale} widths={widths}>{children}</MdxTable>,
+    Widths,
     a: ({ href = '', children }: ComponentProps<'a'>) =>
       href.startsWith('/') ? <Link href={href} className={TEXT_LINK}>{children}</Link> : <a href={href} rel={isExternal(href) ? EXTERNAL_REL : undefined} className={TEXT_LINK}>{children}</a>,
     Callout,

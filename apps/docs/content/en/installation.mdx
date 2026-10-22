@@ -20,20 +20,28 @@ Use whichever you already have.
 
 Three, and your project already has them.
 
+<Widths of={['15%', '10%']}>
+
 | Package | Range | Why it is required |
 |---|---|---|
-| `react` | <PeerRange name="react" /> | The components are written for React 19, where `ref` is an ordinary prop |
+| `react` | <PeerRange name="react" /> | The components are written for React 19, where ref is an ordinary prop |
 | `react-dom` | <PeerRange name="react-dom" /> | Same |
-| `tailwindcss` | <PeerRange name="tailwindcss" /> | The `inset-s-*` utilities need Tailwind 4.2 or later |
+| `tailwindcss` | <PeerRange name="tailwindcss" /> | The inset-s-* utilities need Tailwind 4.2 or later |
+
+</Widths>
 
 ## Framework support
 
 Tier means feature coverage, not quality.
 
+<Widths of={['25%', '10%']}>
+
 | Framework | Tier | What changes |
 |---|---|---|
-| Next.js 15 or 16, App Router | 1 | Nothing. This is the reference setup: server components add no JavaScript, `Icon` works by name, and Server Actions are available |
-| Vite single-page app | 2 | No server render. Every component you use is in the browser bundle, and `Icon` is imported from `icon-registry` |
+| `Next.js 15 or 16, App Router` | 1 | Nothing. This is the reference setup: server components add no JavaScript, Icon works by name, and Server Actions are available |
+| `Vite single-page app` | 2 | No server render. Every component you use is in the browser bundle, and Icon is imported from icon-registry |
+
+</Widths>
 
 ## React without Next.js
 
