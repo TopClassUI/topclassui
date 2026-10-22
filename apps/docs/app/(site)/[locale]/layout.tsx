@@ -1,3 +1,6 @@
+// First, so globals.css's <link> leads next/font's: over HTTP/1.1 the first stylesheet reuses the connection the HTML warmed (DECISIONS 2026-10-22).
+import '../../globals.css'
+
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import type { Metadata, Viewport } from 'next'
 import { notFound } from 'next/navigation'
@@ -11,7 +14,6 @@ import { DIRECTION, labelsFor } from '../../../labels/index'
 import { FACTS } from '../../../lib/data'
 import { fontClassOf } from '../../../lib/fonts'
 import { SITE_URL } from '../../../lib/site'
-import '../../globals.css'
 
 export const dynamicParams = false
 
