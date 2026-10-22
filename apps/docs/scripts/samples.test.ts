@@ -17,14 +17,13 @@ describe('checkedSamples', () => {
 describe('the live guide pages', () => {
   const samples = samplesOf(resolve(APP, 'content'), LIVE_GUIDES.map((page) => page.slug), LOCALES)
 
-  it('hold thirty samples marked check: six on the getting-started pages and nine on the foundation pages, in each locale', () => {
+  it('hold twenty-eight samples marked check: five on the getting-started pages and nine on the foundation pages, in each locale', () => {
     expect(samples.map((sample) => `${sample.file} ${sample.title ?? ''}`)).toEqual([
       'en/installation.mdx src/icons.ts',
       'en/provider.mdx app/[locale]/layout.tsx',
       'en/first-component.mdx app/subscribe/actions.ts',
       'en/first-component.mdx app/subscribe/page.tsx',
       'en/first-component.mdx app/subscribe/subscribe-form.tsx',
-      'en/first-component.mdx app/subscribe/page.tsx',
       'en/icons.mdx ',
       'en/icons.mdx my-logo.tsx',
       'en/theming.mdx ',
@@ -39,7 +38,6 @@ describe('the live guide pages', () => {
       'ar/first-component.mdx app/subscribe/actions.ts',
       'ar/first-component.mdx app/subscribe/page.tsx',
       'ar/first-component.mdx app/subscribe/subscribe-form.tsx',
-      'ar/first-component.mdx app/subscribe/page.tsx',
       'ar/icons.mdx ',
       'ar/icons.mdx my-logo.tsx',
       'ar/theming.mdx ',
@@ -56,8 +54,8 @@ describe('the live guide pages', () => {
     expect(compileSamples(APP, samples)).toEqual([])
   })
 
-  it('compile the step 2 page.tsx too, which step 4 replaces under the same title', () => {
-    expect(programsOf(APP, samples)).toHaveLength(3)
+  it('compile every sample in one program, since no later sample of the same title hides an earlier one', () => {
+    expect(programsOf(APP, samples)).toHaveLength(1)
   })
 
   it('fail an earlier sample that a later one of the same title would hide', () => {

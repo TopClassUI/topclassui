@@ -210,3 +210,6 @@ export const STATE_CELL = 'grid min-w-[max(9rem,min-content)] max-w-full grow ba
 /** The frames' 56 px box each state sits centred in. */
 export const STATE_BOX = 'flex min-h-14 max-w-full items-center justify-center'
 export const STATE_CAPTION = 'max-w-full text-center font-mono text-xs text-muted'
+
+// A step's number as the docs frames draw it: a 22 x 12 pill, 10 px semibold, on the primary tint.
+export const STEP_NUMBER = 'inline-flex h-3 w-5.5 shrink-0 items-center justify-center rounded-full bg-primary-soft text-[0.625rem] font-semibold text-primary-on-soft mt-1'
