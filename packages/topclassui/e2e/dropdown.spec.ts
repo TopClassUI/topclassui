@@ -1294,12 +1294,12 @@ test.describe('axe on the open menu, on a 320 x 480 phone', () => {
 
 test.describe('the states demo, as the Every state strip draws it', () => {
   for (const direction of DIRECTIONS) {
-    test(`${direction}: closed, open and a disabled row, the two open menus whole inside their own cells, and the page not locked`, async ({ page }) => {
+    test(`${direction}: closed, open, a hovered row and a disabled row, the three open menus whole inside their own cells, and the page not locked`, async ({ page }) => {
       await openLive(page, 'dropdown--states', { direction })
       const cells = page.locator('#demo [title="closed"]').locator('xpath=..').locator(':scope > *')
-      expect(await cells.evaluateAll((all) => all.map((cell) => cell.getAttribute('title')))).toEqual(['closed', 'open', 'disabled item'])
+      expect(await cells.evaluateAll((all) => all.map((cell) => cell.getAttribute('title')))).toEqual(['closed', 'open', 'hover item', 'disabled item'])
       await expect(page.locator(`#demo [title="closed"] ${MENU}`)).toHaveCount(0)
-      for (const [title, rows] of [['open', ['Edit', 'Delete']], ['disabled item', ['Edit', 'Delete']]] as const) {
+      for (const [title, rows] of [['open', ['Edit', 'Delete']], ['hover item', ['Edit', 'Delete']], ['disabled item', ['Edit', 'Delete']]] as const) {
         const cell = page.locator(`#demo [title="${title}"]`)
         const menu = cell.locator(`${MENU}${OPENED}`)
         await atRest(menu)

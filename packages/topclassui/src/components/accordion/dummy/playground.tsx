@@ -5,7 +5,7 @@ import { AccordionItem, AccordionRoot } from '../index.js'
  * goes to the root, headingLevel to every item, which open on h2 under the harness h1 rather than the schema's h3. */
 export default function Demo({ headingLevel = 2, ...props }: AccordionDesignProps = {}) {
   return (
-    <AccordionRoot defaultValue={['server']} {...props} className="max-w-105">
+    <AccordionRoot defaultValue={['server']} {...props} className="max-w-100">
       <AccordionItem value="server" title="What is a server component?" headingLevel={headingLevel}>
         <p>A component that renders on the server and sends HTML, with no JavaScript of its own.</p>
       </AccordionItem>

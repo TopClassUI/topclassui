@@ -432,7 +432,7 @@ test.describe('live: pressing it', () => {
       test('the ring is 2 px inside the focused segment, and no parent cuts it', async ({ page }) => {
         await openLive(page, 'segmented-control--with-icons')
         await page.keyboard.press('Tab')
-        const segment = segmentIn(page, 'Light')
+        const segment = segmentIn(page, 'Dark')
         await expect(segment).toBeFocused()
         expect([await css(segment, 'outline-style'), await css(segment, 'outline-width'), await css(segment, 'outline-offset')]).toEqual(['solid', '2px', '-2px'])
         expect(await cutBy(segment)).toEqual([])

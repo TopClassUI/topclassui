@@ -13,7 +13,7 @@ import { FORCED_CANVAS, contrast, rgbOf } from './pixels.js'
 // What happy-dom cannot lay out or open: the windowed list in a real popup, the highlight on rows that are not mounted,
 // where the popup lands, what a finger and a zoomed page get, the server HTML a form sends, and a form reset.
 
-const DEMOS = ['basic', 'form', 'load-more', 'long-content', 'playground', 'rtl', 'sizes', 'states', 'status', 'ten-thousand'].map((demo) => `combobox--${demo}`)
+const DEMOS = ['basic', 'combined', 'form', 'load-more', 'long-content', 'playground', 'rtl', 'sizes', 'states', 'status', 'ten-thousand'].map((demo) => `combobox--${demo}`)
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 const POPUP = '[data-placement]'
@@ -101,13 +101,16 @@ test.describe('the server HTML, before any script runs', () => {
 
   test('invalid: the line turns to danger and thickens; disabled dims to half on the surface; read-only looks like idle', async ({ page }) => {
     await page.goto(urlFor('combobox--states', 'light', 'ltr'))
-    const [invalid, disabled, readOnly, live] = ['invalid', 'disabled', 'read-only', 'one option disabled'].map((name) => inputOf(page, name))
-    if (!invalid || !disabled || !readOnly || !live) throw new Error('a state is missing')
+    const disabled = inputOf(page, 'disabled')
+    expect(await css(disabled, 'opacity')).toBe('0.5')
+    const dimmed = await css(disabled, 'background-color')
+    await page.goto(urlFor('combobox--combined', 'light', 'ltr'))
+    const [invalid, readOnly, live] = ['Invalid', 'Read-only', 'One option disabled'].map((name) => inputOf(page, name))
+    if (!invalid || !readOnly || !live) throw new Error('a state is missing')
     expect(await invalid.getAttribute('aria-invalid')).toBe('true')
     expect(await css(invalid, 'box-shadow')).toContain('0px 0px 0px 1px inset')
     expect(await css(live, 'box-shadow')).not.toContain('inset')
-    expect(await css(disabled, 'opacity')).toBe('0.5')
-    expect(await css(disabled, 'background-color')).not.toBe(await css(live, 'background-color'))
+    expect(dimmed).not.toBe(await css(live, 'background-color'))
     expect(await css(readOnly, 'background-color')).toBe(await css(live, 'background-color'))
   })
 })
@@ -170,14 +173,14 @@ test.describe('live: the keyboard, as the editable combobox of the Authoring Pra
   })
 
   test('a disabled option takes the highlight, is dimmed, and neither Enter nor a click chooses it', async ({ page }) => {
-    await open(page, 'combobox--states', 'one option disabled')
+    await open(page, 'combobox--combined', 'One option disabled')
     for (let press = 0; press < 3; press++) await page.keyboard.press('ArrowDown')
     expect((await activeOf(page)).text).toBe('Morocco')
     const morocco = page.getByRole('option', { name: 'Morocco' })
     expect(await css(morocco, 'opacity')).toBe('0.5')
     await page.keyboard.press('Enter')
     await morocco.click({ force: true })
-    expect(await inputOf(page, 'one option disabled').inputValue()).toBe('')
+    expect(await inputOf(page, 'One option disabled').inputValue()).toBe('')
   })
 })
 
