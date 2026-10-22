@@ -26,13 +26,12 @@ const TRACKS: Record<string, string[]> = {
   'sizes': ['Extra small: Extra small *^ | Off', 'Small: Small *^ | Off', 'Medium: Medium *^ | Off', 'Large: Large *^ | Off', 'Extra large: Extra large *^ | Off'],
   'states': [
     'idle: A *^ | B', 'hover: A *^ | B', 'focus-visible: A *^ | B', 'checked: A *^ | B', 'disabled: A *^ | B',
-    'invalid: A *^ | B', 'one disabled: A *^ | B | C', 'read-only: A *^ | B',
   ],
   'track-states': [
     'Invalid: Invalid, selected *^ | Invalid', 'Disabled: Disabled, selected *^ | Disabled',
     'One disabled: Live, selected *^ | One disabled | Live', 'Read-only: Read-only, selected *^ | Read-only',
   ],
-  'with-icons': ['Theme: Light *^ | Dark | System'],
+  'with-icons': ['Colour mode: Light | Dark *^ | Ocean'],
 }
 
 const render = async (file: string) => {
@@ -105,10 +104,10 @@ describe('the demos the plan names', () => {
     expect(await render('rtl')).toMatch(/^<div class="isolate"><div dir="rtl" lang="ar" class="[^"]*">/)
   })
 
-  it('states: the invalid track says so, the disabled one disables every segment, the read-only one says so', async () => {
-    const html = await render('states')
-    expect(html).toMatch(/<div role="radiogroup" aria-label="invalid" aria-invalid="true"/)
-    expect(html).toMatch(/<div data-disabled="" role="radiogroup" aria-disabled="true" aria-label="disabled"/)
-    expect(html).toMatch(/<div data-readonly="" role="radiogroup" aria-readonly="true" aria-label="read-only"/)
+  it('states: the disabled track disables every segment; track-states: the invalid track says so, the read-only one says so', async () => {
+    expect(await render('states')).toMatch(/<div data-disabled="" role="radiogroup" aria-disabled="true" aria-label="disabled"/)
+    const tracks = await render('track-states')
+    expect(tracks).toMatch(/<div role="radiogroup" aria-label="Invalid" aria-invalid="true"/)
+    expect(tracks).toMatch(/<div data-readonly="" role="radiogroup" aria-readonly="true" aria-label="Read-only"/)
   })
 })
