@@ -91,7 +91,7 @@ test('SegmentedControl: the client stage mounts near the viewport and takes the 
   await page.goto('/en/docs/components/segmented-control')
   const segmented = card(page, 'segmented-control')
   // At rest the stage is the frame's colour mode track; the first Try it change swaps in the playground.
-  await expect(segmented.getByRole('radiogroup', { name: 'Colour mode' })).toBeVisible()
+  await expect(segmented.getByRole('radiogroup', { name: 'Colour mode', exact: true })).toBeVisible()
   const track = segmented.getByRole('radiogroup', { name: 'View' })
   await segmented.getByRole('checkbox', { name: 'invalid' }).click()
   await expect(track).toHaveAttribute('aria-invalid', 'true')
