@@ -33,7 +33,7 @@ const TRIGGERS: Record<string, string[]> = {
   'rtl': ['الإجراءات', 'المزيد'],
   'sixty-items': ['Time zone'],
   // One trigger per cell: closed, open and a disabled row. The two open menus mount in the browser only.
-  'states': ['Actions', 'Actions', 'Actions', 'Actions'],
+  'states': ['Actions'],
   'with-links': ['Help'],
 }
 
@@ -94,10 +94,11 @@ describe('every demo renders on the server', () => {
       expect(html, file).not.toContain('role="separator"')
     })
 
-    it(`${file}.tsx serves no anchor and no svg: every row, link and icon is inside the closed menu`, async () => {
+    it(`${file}.tsx serves no anchor and no svg: every row, link and icon is inside the closed menu, but for the strip's pictures`, async () => {
       const html = await render(file)
       expect(html.match(/<a[\s>]/g) ?? [], file).toEqual([])
-      expect(html.match(/<svg[\s>]/g) ?? [], file).toEqual([])
+      // The states strip draws three open menus as pictures, two rows each, each row with its icon.
+      expect((html.match(/<svg[\s>]/g) ?? []).length, file).toBe(file === 'states' ? 6 : 0)
     })
   }
 })
