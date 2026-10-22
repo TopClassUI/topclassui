@@ -17,9 +17,8 @@ const search = [
   'relative flex shrink-0 items-center gap-2.5 border-b-(length:--tc-line-width) border-line ps-3.5 pe-3 text-muted',
   'after:absolute after:inset-x-0 after:-bottom-(--tc-line-width) after:block after:border-b-(length:--tc-ring-width) after:border-ring',
 ].join(' ')
-const input = 'flex h-control-md min-w-0 flex-1 items-center px-2 text-base text-body'
+const input = 'flex h-control-md min-w-0 flex-1 items-center pe-2 text-base text-body'
 const list = 'flex min-h-0 flex-col p-1.5'
-// The picture's heading is the frame's 19 px; the live palette keeps the full unit its windowing counts.
 const heading = 'flex shrink-0 items-end px-2.5 pt-1.5 pb-0.5 text-xs font-medium text-muted'
 const row = [
   `group relative h-(--tc-row-height) shrink-0 ${ROW} ${CONTAIN}`,
