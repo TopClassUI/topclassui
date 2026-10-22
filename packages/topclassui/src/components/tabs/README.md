@@ -127,6 +127,7 @@ Anything else is passed to the element each part draws, so standard attributes (
 - `dummy/rtl.tsx`
 - `dummy/server-content.tsx`
 - `dummy/sizes.tsx`
+- `dummy/stage.tsx`
 - `dummy/states.tsx`
 
 ## Verified against
