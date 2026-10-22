@@ -86,13 +86,13 @@ export function RoleBoard({ children, locale }: { children?: ReactNode; locale: 
         <div className="absolute inset-s-[25.86%] top-[21.41%] w-[48.28%]">
           <Screen labels={labels} />
         </div>
-        <svg aria-hidden="true" viewBox={`0 0 ${String(BOARD.width)} ${String(BOARD.height)}`} className="absolute inset-0 size-full scale-x-(--tc-dir) text-muted">
+        <svg aria-hidden="true" viewBox={`0 0 ${String(BOARD.width)} ${String(BOARD.height)}`} className="absolute inset-0 size-full scale-x-(--tc-dir) text-line">
           {items.map(({ role }) => {
             const [x1, y1, x2, y2] = SPOTS[role].line
             return (
               <g key={role}>
                 <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="currentColor" strokeWidth="1" />
-                <circle cx={x2} cy={y2} r="2.85" fill="currentColor" />
+                <circle cx={x2} cy={y2} r="2.85" className="fill-primary-on-soft" />
               </g>
             )
           })}
@@ -104,9 +104,9 @@ export function RoleBoard({ children, locale }: { children?: ReactNode; locale: 
               <li
                 key={role}
                 style={{ '--tc-board-x': percent(x, BOARD.width), '--tc-board-y': percent(y, BOARD.height), '--tc-board-w': percent(width, BOARD.width) }}
-                className="absolute inset-s-(--tc-board-x) top-(--tc-board-y) flex w-(--tc-board-w) flex-col gap-0.5 text-xs text-muted"
+                className="absolute inset-s-(--tc-board-x) top-(--tc-board-y) flex w-(--tc-board-w) flex-col gap-0.5 text-[0.625rem]/[1.2] text-muted"
               >
-                <code dir="ltr" className="w-fit font-sans font-semibold">{name}</code>
+                <code dir="ltr" className="w-fit font-sans font-semibold whitespace-nowrap">{name}</code>
                 <span>{text}</span>
               </li>
             )

@@ -3,11 +3,12 @@ export const skeleton = {
   slug: 'skeleton',
   title: { en: 'Skeleton', ar: 'هيكل التحميل' },
   description: {
-    en: 'A placeholder that holds the shape of content while it loads: lines of text, a circle, a rectangle or a card.',
-    ar: 'عنصر نائب يحجز شكل المحتوى أثناء تحميله: أسطر نص، أو دائرة، أو مستطيل، أو بطاقة.',
+    en: 'The placeholder every component ships with, so a page keeps its shape.',
+    ar: 'العنصر النائب الذي يأتي مع كل مكوّن، فتحتفظ الصفحة بشكلها.',
   },
   demos: ['media-object', 'variants', 'rows', 'beside-text', 'custom-size', 'rtl'],
-  stageHeight: 8,
+  stageHeight: 14.0625,
+  codeDemo: 'media-object',
   note: {
     en: 'Give the skeleton the real dimensions through className; rows is clamped from 1 to 50, and a wrong size is a layout shift.',
     ar: 'أعطِ الهيكل الأبعاد الحقيقية عبر className؛ تُحصر rows بين 1 و50، والحجم الخاطئ يعني إزاحة في التخطيط.',

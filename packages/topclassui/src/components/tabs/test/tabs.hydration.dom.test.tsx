@@ -134,8 +134,8 @@ describe('every demo renders and hydrates', () => {
       const served = document.createElement('div')
       served.innerHTML = html
       expect(shown(container)).toEqual(shown(served))
-      // The states strip draws lists only, as the frame does.
-      expect(shown(container).length).toBeGreaterThanOrEqual(name === 'states' ? 0 : 1)
+      // The stage and the states strip draw lists only, as the frame does.
+      expect(shown(container).length).toBeGreaterThanOrEqual(name === 'stage' || name === 'states' ? 0 : 1)
     })
   }
 })
