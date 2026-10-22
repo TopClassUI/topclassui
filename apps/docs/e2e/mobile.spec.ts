@@ -100,7 +100,8 @@ async function smallTargets(page: Page, path = ''): Promise<string[]> {
     if (element.closest('p, pre') !== null) return []
     const demo = element.closest('[data-component]')?.getAttribute('data-component') ?? (element.closest('main') === null ? '' : slug)
     if (element.tagName === 'INPUT' && owned.includes(demo)) return []
-    if (Math.min(box.width, box.height) >= 44) return []
+    // A scroll-driven translate leaves a float error of 1/8192 px in the rect; a layout unit is 1/64 px, so a real shortfall still fails.
+    if (Math.min(box.width, box.height) >= 44 - 0.01) return []
     const label = element.getAttribute('aria-label') ?? element.textContent.trim().slice(0, 40)
     return [`${element.tagName.toLowerCase()} "${label}" ${Math.round(box.width)}x${Math.round(box.height)}`]
   }), [shortfalls, pageSlug] as const)
