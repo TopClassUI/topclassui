@@ -2,7 +2,7 @@ import { type ReactNode, createElement } from 'react'
 import { prerender } from 'react-dom/static'
 import { describe, expect, it } from 'vitest'
 
-import { clientPartOf, createServerBoxes } from './islands.js'
+import { FIRST, type Turn, clientPartOf, createServerBoxes, createTurns, rankNear } from './islands.js'
 
 /** A server box: its island id, whether it is still in the page, and the attributes the island has set on it. */
 function box(id: string, connected = true, attributes: string[] = []) {
@@ -81,5 +81,100 @@ describe('clientPartOf', () => {
     expect(clientPartOf(load) === failed).toBe(false)
     expect(await html(createElement(clientPartOf(load)))).toBe('<i>back</i>')
     expect(loads).toBe(2)
+  })
+})
+
+/** A clock the test runs by hand: paint() lets every waiting frame paint, expire() runs every timer. */
+function clock() {
+  const paints: (() => void)[] = []
+  const timers: { next: () => void; ms: number }[] = []
+  return {
+    timers,
+    afterPaint: (next: () => void) => { paints.push(next) },
+    later: (next: () => void, ms: number) => { timers.push({ next, ms }) },
+    paint: () => { for (const next of paints.splice(0)) next() },
+    expire: () => { for (const { next } of timers.splice(0)) next() },
+  }
+}
+
+/** A turn that logs its swap and hands its `end` to the test. */
+function turn(name: string, rank: number, log: string[], ends: Map<string, () => void>): Turn {
+  return { rank, swap: (end) => { log.push(name); ends.set(name, end) } }
+}
+
+describe('createTurns', () => {
+  it('lets one island take over at a time, the next after it has ended and the frame has painted', () => {
+    const time = clock()
+    const take = createTurns(time, 1000)
+    const log: string[] = []
+    const ends = new Map<string, () => void>()
+    take(turn('a', 0, log, ends))
+    take(turn('b', 0, log, ends))
+    take(turn('c', 0, log, ends))
+    expect(log).toEqual(['a'])
+    ends.get('a')?.()
+    expect(log).toEqual(['a'])
+    time.paint()
+    expect(log).toEqual(['a', 'b'])
+    ends.get('b')?.()
+    time.paint()
+    expect(log).toEqual(['a', 'b', 'c'])
+  })
+
+  it('chooses the lowest rank when a turn ends, read then, and keeps the order of arrival between equal ranks', () => {
+    const time = clock()
+    const take = createTurns(time, 1000)
+    const log: string[] = []
+    const ends = new Map<string, () => void>()
+    take(turn('running', 0, log, ends))
+    const late = { ...turn('pressed while waiting', 5, log, ends) }
+    take(turn('near', 2, log, ends))
+    take(late)
+    take(turn('near too', 2, log, ends))
+    late.rank = FIRST
+    for (const name of ['running', 'pressed while waiting', 'near', 'near too']) {
+      ends.get(name)?.()
+      time.paint()
+    }
+    expect(log).toEqual(['running', 'pressed while waiting', 'near', 'near too'])
+  })
+
+  it('lets the next island go when a turn outlasts the limit, and a late end starts nothing more', () => {
+    const time = clock()
+    const take = createTurns(time, 1000)
+    const log: string[] = []
+    const ends = new Map<string, () => void>()
+    take(turn('slow', 0, log, ends))
+    take(turn('next', 0, log, ends))
+    take(turn('last', 0, log, ends))
+    expect(time.timers.map(({ ms }) => ms)).toEqual([1000])
+    time.expire()
+    time.paint()
+    expect(log).toEqual(['slow', 'next'])
+    ends.get('slow')?.()
+    ends.get('slow')?.()
+    time.paint()
+    expect(log).toEqual(['slow', 'next'])
+  })
+
+  it('starts the next island at once when the queue had run dry', () => {
+    const time = clock()
+    const take = createTurns(time, 1000)
+    const log: string[] = []
+    const ends = new Map<string, () => void>()
+    take(turn('a', 0, log, ends))
+    ends.get('a')?.()
+    time.paint()
+    take(turn('b', 0, log, ends))
+    expect(log).toEqual(['a', 'b'])
+  })
+})
+
+describe('rankNear', () => {
+  it('puts the latest report first, and in one report the island nearest a 800 px screen first', () => {
+    expect(rankNear(2, 900, 1300, 800)).toBe(-1_999_900)
+    expect(rankNear(2, 100, 400, 800)).toBe(-2_000_000)
+    expect(rankNear(2, -700, -300, 800)).toBe(-1_999_700)
+    expect(rankNear(1, 100, 400, 800)).toBe(-1_000_000)
   })
 })

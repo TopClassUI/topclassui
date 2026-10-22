@@ -1,4 +1,4 @@
-// The lazy islands' bookkeeping (components/lazy-island.tsx): which ones have server HTML to keep, and the part each loads.
+// The lazy islands' bookkeeping (components/lazy-island.tsx): which ones have server HTML to keep, the part each loads, and whose turn it is to take over.
 import { type ComponentType, type LazyExoticComponent, lazy } from 'react'
 
 /** What an island loads: its part's chunk, then the part. */
@@ -47,4 +47,57 @@ export function clientPartOf<P>(load: Load<P>): LazyExoticComponent<ComponentTyp
   }))
   clientParts.set(load, part)
   return part
+}
+
+export interface Turn {
+  /** Lower goes first; read when a turn is chosen, so an input that lands while the island waits moves it up. */
+  readonly rank: number
+  /** Starts the island's fresh render, and calls `end` once it has committed, or at once if the island is gone. */
+  swap: (end: () => void) => void
+}
+
+export interface TurnClock {
+  /** Calls `next` once the browser has painted the frame after the call. */
+  afterPaint: (next: () => void) => void
+  /** Calls `next` after `ms`. */
+  later: (next: () => void, ms: number) => void
+}
+
+/** Islands take over one at a time, each after the frame the last one painted in, so a section that scrolls in is a run of short tasks rather
+ * than one commit of every island in it. A turn that has not ended after `limit` ms (a nested chunk still on the network) lets the next one go. */
+export function createTurns(clock: TurnClock, limit: number): (turn: Turn) => void {
+  const waiting: Turn[] = []
+  let running = false
+  const next = (): void => {
+    let turn: Turn | undefined
+    for (const waiter of waiting) if (turn === undefined || waiter.rank < turn.rank) turn = waiter
+    if (turn === undefined) {
+      running = false
+      return
+    }
+    waiting.splice(waiting.indexOf(turn), 1)
+    running = true
+    let ended = false
+    const end = () => {
+      if (ended) return
+      ended = true
+      clock.afterPaint(next)
+    }
+    clock.later(end, limit)
+    turn.swap(end)
+  }
+  return (turn) => {
+    waiting.push(turn)
+    if (!running) next()
+  }
+}
+
+/** An input on the island, or a part on screen from the start: it goes before every island that only came near. */
+export const FIRST = -Infinity
+
+/** The rank of an island that came near the screen in the `round`-th report: the latest report first, since that is where the reader is now,
+ * and in one report the island nearest the screen first. `top` and `bottom` are its box against a screen `screen` px tall. */
+export function rankNear(round: number, top: number, bottom: number, screen: number): number {
+  const distance = top > screen ? top - screen : bottom < 0 ? -bottom : 0
+  return -round * 1e6 + Math.min(distance, 999_999)
 }

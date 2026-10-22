@@ -3,7 +3,7 @@
 // A client part that keeps the server's HTML until it comes within one viewport, then loads its own chunk and takes over in place (S8).
 import { Activity, type ComponentType, type ReactNode, lazy, startTransition, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 
-import { type Load, clientPartOf, createServerBoxes } from '../lib/islands'
+import { FIRST, type Load, clientPartOf, createServerBoxes, createTurns, rankNear } from '../lib/islands'
 
 export type IslandWhen = 'near' | 'idle'
 
@@ -52,6 +52,50 @@ if (typeof document !== 'undefined') {
 /** True while the server's HTML for this island is in the page and nothing has taken it over: a client navigation mounts with no HTML to keep, so it loads at once. */
 const hasServerHtml = typeof document === 'undefined' ? () => false : createServerBoxes(document)
 
+/** One island takes over at a time, after the frame the last one painted in (lib/islands.ts). */
+const takeTurn = createTurns({
+  afterPaint: (next) => {
+    // A hidden tab paints no frame, and shows nothing until it is back.
+    if (document.visibilityState === 'hidden') setTimeout(next, 0)
+    else requestAnimationFrame(() => { setTimeout(next, 0) })
+  },
+  later: (next, ms) => { setTimeout(next, ms) },
+  // React's expiry for a transition: an island still waiting by then, on a nested chunk, lets the next one go.
+}, 5000)
+
+/** Every island waiting for the viewport shares one observer, and leaves it once it has come near. */
+const nearby = new Map<Element, Set<(rank: number) => void>>()
+let nearObserver: IntersectionObserver | null = null
+let round = 0
+
+function watchNear(target: Element, open: (rank: number) => void): () => void {
+  if (nearObserver === null) {
+    const observer = new IntersectionObserver((entries) => {
+      round += 1
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue
+        // The root is the screen grown by one screen above and one below.
+        const rank = rankNear(round, entry.boundingClientRect.top, entry.boundingClientRect.bottom, (entry.rootBounds?.height ?? 0) / 3)
+        for (const opener of nearby.get(entry.target) ?? []) opener(rank)
+        nearby.delete(entry.target)
+        observer.unobserve(entry.target)
+      }
+    }, { rootMargin: '100% 0px' })
+    nearObserver = observer
+  }
+  const openers = nearby.get(target) ?? new Set()
+  openers.add(open)
+  nearby.set(target, openers)
+  nearObserver.observe(target)
+  const observer = nearObserver
+  return () => {
+    openers.delete(open)
+    if (openers.size > 0 || nearby.get(target) !== openers) return
+    nearby.delete(target)
+    observer.unobserve(target)
+  }
+}
+
 /** Where a node sits under the box, as child indexes, so the same place can be found in a fresh render. */
 function pathOf(box: Element, node: Element): number[] | null {
   const path: number[] = []
@@ -97,7 +141,7 @@ export function LazyIsland<P extends object>({ load, props, when = 'near', hydra
     let open: () => void = () => undefined
     const gate = new Promise<void>((resolve) => { open = resolve })
     const waits = hasServerHtml(id)
-    const state = { open, gate, waits, live: !waits, onLive: () => undefined as unknown }
+    const state = { open, gate, waits, live: !waits, onLive: () => undefined as unknown, rank: Infinity, endTurn: (): void => undefined }
     const Island = !waits && !hydrate ? clientPartOf(load) : lazy(async () => {
       if (waits) await gate
       const Loaded = await load()
@@ -121,14 +165,18 @@ export function LazyIsland<P extends object>({ load, props, when = 'near', hydra
     const { state } = island
     element.setAttribute('data-island-mounted', '')
     if (state.live) element.setAttribute('data-island-live', '')
-    const open = () => { state.open() }
-    for (const type of EAGER) element.addEventListener(type, open, { once: true, passive: true })
+    const open = (rank: number) => {
+      state.rank = Math.min(state.rank, rank)
+      state.open()
+    }
+    const first = () => { open(FIRST) }
+    for (const type of EAGER) element.addEventListener(type, first, { once: true, passive: true })
     // A swapped island replaces the HTML of every island inside it, so it keeps all their inputs; the provider hydrates, so an inner island mounts and takes its own from the queue.
     const claim = (input: Input) => {
       if (!hydrate || waitingBoxOf(input.target) === element) {
         held.current.inputs.push({ kind: input.kind, path: pathOf(element, input.target), ...(input.kind === 'key' ? { init: input.init } : {}) })
       } else early.push(input)
-      open()
+      first()
     }
     claims.set(element, claim)
     const queued = early.splice(0)
@@ -159,39 +207,49 @@ export function LazyIsland<P extends object>({ load, props, when = 'near', hydra
     state.onLive = () => {
       element.setAttribute('data-island-live', '')
       claims.delete(element)
+      state.endTurn()
       setTimeout(replay, 32)
     }
+    let alive = true
     if (state.waits && !hydrate) {
       void state.gate.then(load).then((Component) => {
-        const focused = document.activeElement
-        held.current.focused = focused !== null && element.contains(focused) ? pathOf(element, focused) : null
-        held.current.hovered = hovered !== null && element.contains(hovered) ? pathOf(element, hovered) : null
-        // A transition keeps the server's HTML on screen until the whole fresh render, nested islands included, is ready.
-        startTransition(() => { setFresh({ Component }) })
+        takeTurn({
+          get rank() { return state.rank },
+          swap: (end) => {
+            if (!alive) {
+              end()
+              return
+            }
+            state.endTurn = end
+            const focused = document.activeElement
+            held.current.focused = focused !== null && element.contains(focused) ? pathOf(element, focused) : null
+            held.current.hovered = hovered !== null && element.contains(hovered) ? pathOf(element, hovered) : null
+            // A transition keeps the server's HTML on screen until the whole fresh render, nested islands included, is ready.
+            startTransition(() => { setFresh({ Component }) })
+          },
+        })
       })
     }
     let cancel: () => void = () => undefined
     if (when === 'idle') {
       // Safari has no requestIdleCallback; a timer still runs after the first paint.
       if ('requestIdleCallback' in window) {
-        const handle = window.requestIdleCallback(open, { timeout: 2000 })
+        const handle = window.requestIdleCallback(first, { timeout: 2000 })
         cancel = () => { window.cancelIdleCallback(handle) }
       } else {
-        const handle = setTimeout(open, 200)
+        const handle = setTimeout(first, 200)
         cancel = () => { clearTimeout(handle) }
       }
     } else {
       // display: contents gives the box no geometry, so the observer watches its first child.
-      const observer = new IntersectionObserver((entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) open()
-      }, { rootMargin: '100% 0px' })
-      observer.observe(element.firstElementChild ?? element)
-      cancel = () => { observer.disconnect() }
+      cancel = watchNear(element.firstElementChild ?? element, open)
     }
     return () => {
+      alive = false
       cancel()
       claims.delete(element)
-      for (const type of EAGER) element.removeEventListener(type, open)
+      state.endTurn()
+      for (const type of EAGER) element.removeEventListener(type, first)
     }
   }, [island, when, hydrate, load])
 
