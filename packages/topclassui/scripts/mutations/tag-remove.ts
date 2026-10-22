@@ -58,14 +58,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the tag remove chip keeps the clip, so the ring of the x is cut at xs and sm',
     file: CLASSES,
-    from: " overflow-visible'",
-    to: "'",
+    from: ' overflow-visible ${DISABLED}`',
+    to: ' ${DISABLED}`',
   },
   {
     label: 'the tag remove chip loses its label column that starts at 0, so a long label widens a flex column and a table',
     file: CLASSES,
-    from: "'inline-grid grid-cols-[minmax(0,auto)_auto] overflow-visible'",
-    to: "'overflow-visible'",
+    from: '`inline-grid grid-cols-[minmax(0,auto)_auto] overflow-visible ${DISABLED}`',
+    to: '`overflow-visible ${DISABLED}`',
   },
   {
     label: 'the tag remove label loses LABEL, so an element label is no longer clipped by it',
@@ -131,6 +131,18 @@ export const MUTATIONS: Mutation[] = [
     label: 'the tag remove button loses data-tag-remove, so no other x is found as its neighbour',
     file: CLIENT,
     from: '      data-tag-remove=""\n',
+    to: '',
+  },
+  {
+    label: 'the x of a tag stops pulling over the chip gap, so the glyph sits 13 px from a md label',
+    file: CLASSES,
+    from: "+var(--tc-line-width))] -ms-2',\n  lg",
+    to: "+var(--tc-line-width))]',\n  lg",
+  },
+  {
+    label: 'a disabled removable tag keeps its x pressable',
+    file: 'src/components/tag/client.tsx',
+    from: '        disabled={disabled}\n',
     to: '',
   },
 ]
