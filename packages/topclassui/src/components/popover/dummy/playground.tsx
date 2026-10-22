@@ -17,17 +17,17 @@ function Stage({ placement, delay, closeDelay }: PopoverDesignProps) {
   // An element, not a ref: a popup open on the first render resolves its container before a ref is attached.
   const [root, setRoot] = useState<HTMLDivElement | null>(null)
   return (
-    <div ref={setRoot} data-stage="" className="relative min-h-87 w-full [contain:paint]">
+    <div ref={setRoot} data-stage="" className="relative min-h-67.75 w-full [contain:paint]">
       <div className={placement?.startsWith('top') === true ? 'absolute inset-0 flex items-end justify-center pb-12' : 'flex justify-center pt-12'}>
         <PopoverRoot defaultOpen>
-          <PopoverTrigger openOnHover delay={delay} closeDelay={closeDelay} render={<Button variant="outline" size="sm"><Svg icon={arrowSquareOut} />Share</Button>} />
+          <PopoverTrigger openOnHover delay={delay} closeDelay={closeDelay} render={<Button variant="outline" size="xs" className="gap-1.5"><Svg icon={arrowSquareOut} />Share</Button>} />
           <PopoverPopup placement={placement} container={root} initialFocus={false}>
             <div className="flex items-center justify-between gap-2">
               <PopoverTitle>Share this page</PopoverTitle>
-              <PopoverClose />
+              <PopoverClose className="-my-1" />
             </div>
-            <PopoverDescription>Anyone with the link can read it. Only your team can edit.</PopoverDescription>
-            <Button size="sm" className="self-start"><Svg icon={copy} />Copy link</Button>
+            <PopoverDescription className="text-sm/tight">Anyone with the link can read it. Only your team can edit.</PopoverDescription>
+            <Button size="xs" className="self-start"><Svg icon={copy} />Copy link</Button>
           </PopoverPopup>
         </PopoverRoot>
       </div>
@@ -42,14 +42,14 @@ export default function Demo({ placement, delay, closeDelay, stage = false }: Po
   if (stage) return <Stage placement={placement} delay={delay} closeDelay={closeDelay} />
   return (
     <PopoverRoot>
-      <PopoverTrigger openOnHover delay={delay} closeDelay={closeDelay} render={<Button variant="outline" size="sm"><Svg icon={arrowSquareOut} />Share</Button>} />
+      <PopoverTrigger openOnHover delay={delay} closeDelay={closeDelay} render={<Button variant="outline" size="xs" className="gap-1.5"><Svg icon={arrowSquareOut} />Share</Button>} />
       <PopoverPopup placement={placement}>
         <div className="flex items-center justify-between gap-2">
           <PopoverTitle>Share this page</PopoverTitle>
-          <PopoverClose />
+          <PopoverClose className="-my-1" />
         </div>
-        <PopoverDescription>Anyone with the link can read it. Only your team can edit.</PopoverDescription>
-        <Button size="sm" className="self-start"><Svg icon={copy} />Copy link</Button>
+        <PopoverDescription className="text-sm/tight">Anyone with the link can read it. Only your team can edit.</PopoverDescription>
+        <Button size="xs" className="self-start"><Svg icon={copy} />Copy link</Button>
       </PopoverPopup>
     </PopoverRoot>
   )

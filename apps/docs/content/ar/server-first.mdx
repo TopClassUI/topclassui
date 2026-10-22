@@ -24,8 +24,14 @@ description: لا يشحن المكوّن شيفرة JavaScript إلا حين ي
 
 ```tsx
 // app/page.tsx - a Server Component
-<Command items={commands} getKey={(c) => c.id} getLabel={(c) => c.label} onSelect={run} />
-// getKey, getLabel and onSelect are functions: they cannot cross
+<Command
+  items={commands}
+  getKey={(c) => c.id}
+  getLabel={(c) => c.label}
+  onSelect={run}
+/>
+// getKey, getLabel and onSelect are functions:
+// they cannot cross
 ```
 
 ```tsx check
@@ -60,7 +66,7 @@ import { use } from 'react'     // allowed
 // useState, useEffect, useRef, useMemo, useCallback
 ```
 
-الخطّافان الوحيدان اللذان يُسمح لمكوّن الخادم باستدعائهما.
+<Caption>الخطّافان الوحيدان اللذان يُسمح لمكوّن الخادم باستدعائهما.</Caption>
 
 ## كيف يعمل المكوّن المقسوم
 

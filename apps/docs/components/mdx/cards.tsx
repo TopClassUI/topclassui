@@ -15,8 +15,8 @@ export function Card({ title, children }: { title: string; children?: ReactNode 
         <h3 className="text-sm font-semibold text-body">{title}</h3>
       </CardHeader>
       <CardBody>
-        {/* Inline code keeps the card's 12 px and stays whole: a narrow card would break --no-install at its hyphen. */}
-        <div className="text-xs text-muted **:text-[length:inherit] **:whitespace-nowrap">{children}</div>
+        {/* A narrow card would break a flag such as --no-install at its hyphen, worst inside Arabic text. */}
+        <div className="text-xs text-muted **:whitespace-nowrap **:text-[length:inherit]">{children}</div>
       </CardBody>
     </CardRoot>
   )
