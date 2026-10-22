@@ -6,7 +6,7 @@ interface Both {
   ar: string
 }
 
-export const META_DESCRIPTIONS: Readonly<Record<Exclude<PageSlug, 'cli'>, Both>> = {
+export const META_DESCRIPTIONS: Readonly<Record<PageSlug, Both>> = {
   home: {
     en: 'React components for Next.js, RTL-first and server-first. Most render on the server and add no JavaScript; all of them work in Arabic.',
     ar: 'مكوّنات React لـ Next.js، تبدأ من اليمين إلى اليسار وتُعرض على الخادم أولًا. أغلبها لا يضيف أي JavaScript، وكلها تعمل بالعربية.',
@@ -14,6 +14,10 @@ export const META_DESCRIPTIONS: Readonly<Record<Exclude<PageSlug, 'cli'>, Both>>
   installation: {
     en: 'Install TopClass UI in two steps: add the package with your package manager, then add the components you need. Works with Next.js, Vite and React Router.',
     ar: 'ثبّت TopClass UI بخطوتين: أضف الحزمة بمدير الحزم الذي تستخدمه، ثم أضف المكوّنات التي تحتاج إليها. يعمل مع Next.js وVite وReact Router.',
+  },
+  cli: {
+    en: 'Copy one component into your project with one command. The CLI brings its source, constants, schema, types and variants, and you edit them as your own files.',
+    ar: 'انسخ مكوّنًا واحدًا إلى مشروعك بأمر واحد. تجلب الطرفية مصدره مع ثوابته ومخططه وأنواعه ومتغيراته، ثم تعدّلها كأنها ملفاتك، ويظهر كل تحديث لاحق بأمر diff.',
   },
   css: {
     en: 'The whole Tailwind CSS v4 setup for TopClass UI: three import lines in a fixed order and no configuration file, with the utility names you get from them.',

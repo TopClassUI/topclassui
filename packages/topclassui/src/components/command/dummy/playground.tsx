@@ -19,14 +19,15 @@ const search = [
 ].join(' ')
 const input = 'flex h-control-md min-w-0 flex-1 items-center px-2 text-base text-body'
 const list = 'flex min-h-0 flex-col p-1.5'
-const heading = 'flex h-(--tc-row-height) shrink-0 items-end px-2.5 pb-0.5 text-xs font-medium text-muted'
+// The picture's heading is the frame's 19 px; the live palette keeps the full unit its windowing counts.
+const heading = 'flex shrink-0 items-end px-2.5 pt-1.5 pb-0.5 text-xs font-medium text-muted'
 const row = [
-  `relative h-(--tc-row-height) shrink-0 ${ROW} ${CONTAIN}`,
+  `group relative h-(--tc-row-height) shrink-0 ${ROW} ${CONTAIN}`,
   'data-highlighted:bg-primary-soft data-highlighted:text-primary-on-soft',
   'before:absolute before:inset-y-1.5 before:inset-s-0 before:hidden before:border-s-(length:--tc-ring-width) before:border-ring data-highlighted:before:block',
   'after:ms-auto after:hidden after:shrink-0 after:font-mono after:text-xs after:text-muted after:content-(--tc-command-enter) data-highlighted:after:inline',
 ].join(' ')
-const escape = 'shrink-0 border-line text-muted'
+const escape = 'shrink-0 border-line bg-surface text-muted'
 
 interface Entry { id: string, label: string }
 
@@ -47,7 +48,7 @@ const COMMANDS: Entry[] = [
  * a reader, with "but" typed and the first match active, as drawn. */
 function Stage() {
   return (
-    <div data-stage="" className="relative grid min-h-87 w-full place-items-center p-4">
+    <div data-stage="" className="relative grid min-h-67.75 w-full place-items-center p-4">
       <div aria-hidden className={panel}>
         <div className={search}>
           <Svg icon={magnifyingGlass} />
@@ -58,7 +59,7 @@ function Stage() {
           <div className={heading}>Components</div>
           {['Button', 'Button group'].map((label, index) => (
             <div key={label} data-highlighted={index === 0 ? '' : undefined} className={row}>
-              <Svg icon={fileText} />
+              <Svg icon={fileText} className="text-muted group-data-highlighted:text-inherit" />
               <span className="min-w-0 flex-1 truncate">{label}</span>
             </div>
           ))}
