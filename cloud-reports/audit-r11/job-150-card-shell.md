@@ -200,3 +200,25 @@ Branch fix/r11-card-shell. The 115 rows of the ten audit files marked (shared) o
 | r12b-17 | audit-r12/job-144-overlays.md | /en/docs/components/dropdown | 8 [low] Try it, the tone select against the stage | page row (job 144: dropdown playground tone) |
 | r12b-18 | audit-r12/job-144-overlays.md | /en/docs/components/command | 3 [low] code part, caption row | fixed (34981dfc): command.ts filled the same way |
 | r12b-19 | audit-r12/getting-started.md | every guide | 3 [medium] (added by verifier) plain code text colour in every guide code block | kept (DECISIONS 2026-10-22, plain code neutral-300: the landing chose it on purpose and the entry names it a site-wide call for Omar); the Previewer cards already draw plain JSX in body (c7c65f16). For Omar: take the drawn 250 site-wide (lib/shiki-themes.ts DARK_GROUND.text, entry rewritten) or keep |
+
+## Items 144 and 146 marked shared with job 150 (after audit-r12)
+
+| Item | Status |
+|---|---|
+| 144: head chip, previewer.tsx:91 | already fixed (51e730dc): 16 px chip, 10 px on a 12 px line, py-px |
+| 144: codeCaption | already fixed (34981dfc): optional {en, ar} in the content schema, Dialog and Command filled |
+| 144: multi-line import colour | fixed (85f6b511): highlight.tsx marks every line of an import (data-import), globals.css mutes their plain tokens |
+| 144: Try it duration field | already fixed (34981dfc): mono, format useGrouping false |
+| 144: Command shortcut control | fixed (85f6b511): controlOptions content field, Command offers shortcut k, p, / |
+| 144: sample.ts comment pruning | fixed (85f6b511): a declaration's own leading comment is no use of it (sample.test case) |
+| 144: segmented switch width | already fixed (51e730dc): segments gap-1.25 px-2.25 |
+| 146: Installation 3, plain code colour | kept (DECISIONS 2026-10-22, plain code neutral-300; Omar's site-wide call) |
+| 146: Installation 4 and CSS 2, cell code | fixed (4834d5f8): getting-started table code in 11 px mono, body colour (AUTHORED_CELL by page group) |
+| 146: Installation 5, mode switch weight | already fixed (51e730dc): MODE_SEGMENT medium |
+| 146: Installation 6, sidebar rest colour | already fixed (51e730dc): SIDE_LINK.rest body, as the r12 catalog audit reads the frame |
+| 146: Installation 7, On this page offset | already fixed (5b7ed57d, guides): eyebrow and first entry within 2 px of the drawn 96 and 119 (measured) |
+| 146: Installation 8, footer | fixed (4834d5f8): version chip v0.1.0 beta, CLI last in Get started; the frame's link wording against the page titles is open for Omar |
+| 146: Installation 9, code-block icon | library item: CodeBlock hard-codes terminalWindow (code-block/index.tsx:40); an icon prop is a library change |
+| 146: Installation 10, fence line pitch | fixed (4834d5f8): .docs-code > pre on 19 px lines with 14 px padding |
+| 146: Installation 12, sidebar list position | already fixed (0cae5832, catalog): Home 140, Colors 360, Components 580 against 140, 359, 578 (measured) |
+| 146: Installation 13, navbar current section | kept for Omar: needs his DECISIONS line (the build marks the current page's section) |
