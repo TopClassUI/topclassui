@@ -4,6 +4,7 @@ import type { ComponentProps } from 'react'
 
 import type { Locale } from '../../content/pages'
 import { EXTERNAL_REL, isExternal } from '../../lib/external'
+import { INSTALL_LINE } from '../../lib/site'
 import { labelsFor } from '../../labels/index'
 import { PROSE_CODE, TEXT_LINK } from '../classes'
 import { Callout } from './callout'
@@ -43,9 +44,10 @@ export function mdxComponents(locale: Locale): MDXComponents {
     PackageManagers: () => <PackageManagers locale={locale} label={packageManagers} />,
     FrameworkTabs: ({ frameworks }: { frameworks: readonly string[] }) => <FrameworkTabs locale={locale} label={framework} frameworks={frameworks} terminal={terminal} />,
     PeerRange,
+    InstallLine: () => <code dir="ltr" className={PROSE_CODE}>{INSTALL_LINE}</code>,
     ThemeUtilities: () => <ThemeUtilities locale={locale} labels={labels.blocks.utilities} />,
     PropsTable: ({ of }: { of: 'TopClassProvider' }) => <PropsTable of={of} locale={locale} labels={labels} />,
-    ThemeScriptCsp: () => <ThemeScriptCsp locale={locale} title={labels.blocks.csp} />,
+    ThemeScriptCsp: () => <ThemeScriptCsp locale={locale} />,
     ThemeScriptHtml: () => <ThemeScriptHtml locale={locale} />,
   }
 }

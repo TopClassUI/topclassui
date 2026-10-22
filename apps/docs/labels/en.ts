@@ -55,10 +55,9 @@ export const en: SiteLabels = {
     copy: 'Copy',
     packageManagers: 'Package manager',
     framework: 'Framework',
-    utilities: { token: 'Token', utilities: 'Utilities' },
+    utilities: { token: 'Token', utilities: 'Utilities', through: 'to' },
     props: { prop: 'Prop', type: 'Type', default: 'Default', description: 'What it does', required: 'required' },
     repeat: (count) => `, version ${String(count)}`,
-    csp: 'Content Security Policy',
   },
   providerProps: {
     children: 'Your app.',
