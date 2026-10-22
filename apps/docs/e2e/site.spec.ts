@@ -113,7 +113,7 @@ const NEXT = {
 } as const
 
 // Written out: how many `##` sections each page has, so a heading lost from the MDX fails here.
-const SECTIONS = { installation: 5, cli: 9, css: 7, provider: 6, 'first-component': 6 } as const
+const SECTIONS = { installation: 5, cli: 7, css: 7, provider: 6, 'first-component': 6 } as const
 
 for (const slug of GUIDES) {
   for (const locale of ['en', 'ar'] as const) {
@@ -243,3 +243,19 @@ test('/en/docs/components: the body computes Inter first', async ({ page }) => {
   await page.goto('/en/docs/components')
   expect(await page.evaluate(() => getComputedStyle(document.body).fontFamily)).toMatch(/^Inter, "Inter Fallback", /)
 })
+
+// Ocean's --tc-radius is 9999px: a box of code takes the box radius at most, and flat code's scroller cuts no corner letter.
+for (const path of ['/en/docs/components', '/en/docs/components/accordion'] as const) {
+  test(`${path} in ocean: no code box is rounder than a box, and flat code's scroller has square corners`, async ({ page }) => {
+    await openIn(page, path, 'ocean')
+    const radii = await page.evaluate(() => [...document.querySelectorAll('.docs-flat-code')].map((box) => [
+      getComputedStyle(box).borderStartStartRadius,
+      getComputedStyle(box.querySelector('pre') ?? box).borderEndStartRadius,
+    ]))
+    expect(radii.length).toBeGreaterThan(0)
+    for (const [box, scroller] of radii) {
+      expect(box).toBe('24px')
+      expect(scroller).toBe('0px')
+    }
+  })
+}

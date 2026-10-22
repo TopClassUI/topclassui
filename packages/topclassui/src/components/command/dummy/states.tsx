@@ -4,17 +4,16 @@ import { magnifyingGlass } from '#icons/data/magnifying-glass.js'
 import { spinner } from '#icons/data/spinner.js'
 import { CONTAIN, OVERLAY_SURFACE, ROW } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
-import { Kbd } from '#components/kbd/index.js'
 import { Svg } from '#components/svg/index.js'
 import { Command } from '../index.js'
 
 // The palette's look, written out from the shared classes: a demo the site shows imports public paths only.
 const panel = `flex w-34 flex-col wrap-anywhere ${OVERLAY_SURFACE}`
 const search = [
-  'relative flex shrink-0 items-center gap-1.5 border-b-(length:--tc-line-width) border-line px-2.5 py-1.5 font-mono text-xs/tight text-muted',
+  'relative flex shrink-0 items-center gap-1.5 border-b-(length:--tc-line-width) border-line px-2.5 py-1 font-mono text-xs/tight text-muted',
   'after:absolute after:inset-x-0 after:-bottom-(--tc-line-width) after:block after:border-b-(length:--tc-ring-width) after:border-ring',
 ].join(' ')
-const list = 'flex min-h-0 flex-col p-1.5'
+const list = 'flex min-h-0 flex-col p-1.25'
 const row = [
   `relative h-(--tc-row-height) shrink-0 ${ROW} ${CONTAIN}`,
   'data-highlighted:bg-primary-soft data-highlighted:text-primary-on-soft',
@@ -56,7 +55,7 @@ export default function Demo() {
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] gap-4">
       <div title="closed" className={cn(CELL, 'grid-flow-col justify-center gap-1 font-mono text-xs text-muted')}>
-        <Kbd>Ctrl</Kbd> <Kbd>K</Kbd>
+        Ctrl K
       </div>
       <div title="open" className={CELL}><Panel query="search" /></div>
       <div title="typing" className={CELL}><Panel query="but" active /></div>

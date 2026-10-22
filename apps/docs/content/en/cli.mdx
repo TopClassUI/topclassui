@@ -1,76 +1,131 @@
 ---
 slug: cli
 title: Add with the CLI
-description: Copy one component into your project with one command. The CLI brings its source, constants, schema, types and variants, and you edit them as your own files.
+description: Copy a component into your project and own the file.
 ---
 
-## Start a project
+## Initialise once
 
-One command sets the project up. It reads your framework, copies the shared code and adds two lines to your CSS.
+`init` detects your framework and package manager, copies the shared code into one folder and adds two lines to your CSS entry.
 
-```bash title="terminal"
-npx topclassui init
+```text title="terminal"
+$ npx topclassui init
+
+Detected Next.js 16.4.2, App Router, TypeScript 5.9.3, Tailwind 4.3.3
+Detected npm (default)
+CSS entry  app/globals.css
+Folder     topclassui
+svg → topclassui/components/svg/ (button imports it)
+button → topclassui/components/button/ (toast imports it)
+toast → topclassui/components/toast/ (base imports it)
+base → topclassui/
+Added to app/globals.css:
+  @import "../topclassui/tokens.css";
+  @import "../topclassui/styles.css";
+Wrote 106 files and topclassui.json
 ```
 
-It finds Next.js with the App Router or React with Vite, and your package manager. It copies the provider, the theme script, the labels, `tokens.css` and `styles.css` into one `topclassui/` folder. It installs `@base-ui/react`, `class-variance-authority`, `clsx`, `tailwind-merge` and `zod`, writes `topclassui.json`, and prints the provider lines for your layout.
+It then installs `@base-ui/react`, `class-variance-authority`, `clsx`, `tailwind-merge` and `zod`, and prints the provider lines for your layout; it never edits the layout itself. If the layout already mounts the provider from the package, `init` stops, since the copies read the copied provider; `--force` goes ahead anyway.
 
-```css title="app/globals.css"
-@import "tailwindcss";
-@import "../topclassui/tokens.css";
-@import "../topclassui/styles.css";
-```
+| Where | Next.js App Router | Vite |
+|---|---|---|
+| Folder | `topclassui/`, or `src/topclassui/` with a `src` folder | `src/topclassui/` |
+| CSS entry | `app/globals.css` | `src/index.css` |
+| Provider | `app/layout.tsx`, with `ThemeScript` in the head | `src/main.tsx`, around `<App />` |
 
 ## Add a component
 
-Name one or several. Each comes with every file it imports.
+`add` copies the component and everything it imports. Name one or several, or pass `--all`.
+
+```text title="terminal"
+$ npx topclassui add select
+
+select → topclassui/components/select/
+
+# the same command under each package manager
+$ pnpm dlx topclassui add select
+$ yarn dlx topclassui add select
+$ bunx topclassui add select
+```
+
+`list` prints every component and which ones are in your project; `--json` prints the same list as JSON.
+
+## What lands in your project
+
+One folder for everything we add. Your own code stays untouched.
+
+<FileTree rows={[
+  { depth: 0, kind: 'folder', name: 'your-app/' },
+  { depth: 1, kind: 'folder', name: 'app/' },
+  { depth: 2, kind: 'file', name: 'globals.css', note: 'init adds two import lines' },
+  { depth: 1, kind: 'folder', name: 'topclassui/', note: 'everything of ours, in one folder' },
+  { depth: 2, kind: 'folder', name: 'components/' },
+  { depth: 3, kind: 'folder', name: 'button/', note: 'init brings it, the toast imports it' },
+  { depth: 4, kind: 'code', name: 'index.tsx', note: 'the component, renders on the server' },
+  { depth: 4, kind: 'code', name: 'variants.ts', note: 'how it looks' },
+  { depth: 4, kind: 'code', name: 'classes.ts', note: 'its own class constants' },
+  { depth: 4, kind: 'code', name: 'constants.ts', note: 'its default values' },
+  { depth: 4, kind: 'code', name: 'types.ts', note: 'its props' },
+  { depth: 4, kind: 'code', name: 'schema.ts', note: 'prop rules' },
+  { depth: 4, kind: 'code', name: 'boundaries.ts', note: 'the limits it enforces' },
+  { depth: 4, kind: 'code', name: 'skeleton.tsx', note: 'loading' },
+  { depth: 4, kind: 'folder', name: 'dummy/', note: 'working examples, one per file' },
+  { depth: 3, kind: 'folder', name: 'select/', note: 'npx topclassui add select' },
+  { depth: 4, kind: 'code', name: 'client.tsx', note: 'the interactive part only' },
+  { depth: 4, kind: 'code', name: 'hook.ts', note: 'state, effects, handlers' },
+  { depth: 4, kind: 'code', name: 'lib.ts', note: 'pure helpers, no React' },
+  { depth: 2, kind: 'folder', name: 'shared/', note: 'cn, classes, contracts, labels, provider, theme' },
+  { depth: 2, kind: 'folder', name: 'icons/', note: 'one file for each icon a copy uses' },
+  { depth: 2, kind: 'file', name: 'tokens.css', note: 'every --tc-* variable' },
+  { depth: 2, kind: 'file', name: 'styles.css', note: 'the @theme mapping and the variants' },
+  { depth: 1, kind: 'settings', name: 'topclassui.json', note: 'your settings' },
+]} />
+
+Import from the folder, not from the package: `import { Button } from '@/topclassui/components/button'`. The copies import each other with relative paths.
+
+## The config file
+
+Written by `init` and read by `add` and `diff`. `lock` records each copied file with its version and a hash, so leave it to the CLI.
+
+```json title="topclassui.json"
+{
+  "version": 1,
+  "framework": "next-app",
+  "css": "app/globals.css",
+  "dir": "topclassui",
+  "imports": "relative",
+  "packageManager": "npm",
+  "lock": {
+    "registry": "0.1.0-beta.1",
+    "files": {
+      "components/button/index.tsx": { "from": "button", "version": "0.1.0-beta.1", "sha256": "…" }
+    }
+  }
+}
+```
+
+## When you have edited a copied file
+
+`add` never overwrites your edits. `diff` shows what changed and exits with 1 when anything differs; `--overwrite` replaces the file and prints the diff first.
+
+```text title="terminal"
+$ npx topclassui diff select
+
+select: 1 of 20 files differ
+  components/select/classes.ts: modified locally
+
+$ npx topclassui add select --overwrite
+```
+
+After you update the package, `add --update` writes the new version of every file you have not touched.
+
+## Running without prompts
 
 ```bash title="terminal"
-npx topclassui add button
-npx topclassui add dialog select
+npx topclassui init --yes                # accept every default
+npx topclassui add button --yes
+npx topclassui add button --dry-run      # print what would be written, write nothing
 ```
-
-`--all` copies every component. A file you have edited is never written over: `add` leaves it as it is and names it.
-
-## The topclassui folder
-
-Everything lands in one folder, and it is yours to edit.
-
-```text title="topclassui/"
-topclassui/
-  components/button/   index.tsx, classes.ts, variants.ts, ... and dummy/ with the examples
-  shared/              cn, classes, contracts, labels, provider, theme
-  icons/data/          one file for each icon a copy uses
-  tokens.css
-  styles.css
-topclassui.json        what was copied, from which version, with a hash of each file
-```
-
-Import from the folder, not from the package. The copies import each other with relative paths, so no alias is needed.
-
-```tsx title="app/page.tsx"
-import { Button } from '@/topclassui/components/button'
-```
-
-## Keep up with new versions
-
-Update the package, then compare.
-
-```bash title="terminal"
-npx topclassui diff
-npx topclassui add --update
-```
-
-`diff` lists every copied file as up to date, changed upstream or changed by you, prints a patch for each upstream change, and exits with 1 when anything differs. `add --update` writes the new version of the files you have not touched. `--overwrite` replaces the ones you edited too, after printing the diff.
-
-## See what is there
-
-```bash title="terminal"
-npx topclassui list
-```
-
-Every component, and which ones are in your project. `--json` prints the same list as JSON.
-
-## Flags
 
 Every command also takes `--cwd <dir>` for a project outside the current folder.
 
@@ -83,20 +138,6 @@ Every command also takes `--cwd <dir>` for a project outside the current folder.
 | `--dir <path>` | `init`: the folder for the copies |
 | `--pm <name>` | `npm`, `pnpm`, `yarn` or `bun` |
 | `--examples`, `--no-examples` | `add`: also add what the examples need, or copy no examples |
-
-## Next.js and Vite
-
-The same commands on both. Three things differ.
-
-| Where | Next.js App Router | Vite |
-|---|---|---|
-| Folder | `topclassui/`, or `src/topclassui/` with a `src` folder | `src/topclassui/` |
-| CSS entry | `app/globals.css` | `src/index.css` |
-| Provider | `app/layout.tsx`, with `ThemeScript` in the head | `src/main.tsx`, around `<App />` |
-
-## Copy or package
-
-Pick one. The copies read the copied provider, so a layout that mounts the provider from the package leaves them in English and left to right. `init` stops when it finds one; `--force` goes ahead anyway.
 
 <Callout tone="info">Exit codes: 0 done, 1 something differs, 2 a mistake in the command, 3 the install failed.</Callout>
 
