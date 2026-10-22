@@ -109,10 +109,11 @@ test('TreeView: the keyboard moves through the stage, and in Arabic ArrowLeft op
   await tree.focus()
   const input = tree.getByRole('treeitem', { name: 'input' })
   await expect(input).toHaveAttribute('aria-expanded', 'false')
-  // The stage selects index.tsx, so the focus starts there, two rows above input.
+  // The stage hydrates on focus: the keys count once the tree names its active row, index.tsx, two rows above input.
+  await expect(tree).toHaveAttribute('aria-activedescendant', /.+/)
   await page.keyboard.press('ArrowDown')
   await page.keyboard.press('ArrowDown')
-  await expect(tree).toHaveAttribute('aria-activedescendant', (await input.getAttribute('id')) ?? '')
+  await expect.poll(async () => (await tree.getAttribute('aria-activedescendant')) === (await input.getAttribute('id'))).toBe(true)
   await page.keyboard.press('ArrowLeft')
   await expect(input).toHaveAttribute('aria-expanded', 'true')
 })
