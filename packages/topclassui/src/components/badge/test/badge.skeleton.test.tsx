@@ -10,7 +10,7 @@ const classes = (props: BadgeSkeletonProps = {}) => classList(html(props))
 
 /** Every class that decides the height, written out per size. */
 const HEIGHT = {
-  xs: ['py-pad-y-xs', 'text-xs'],
+  xs: ['py-[calc(var(--spacing-pad-y-xs)-var(--tc-line-width))]', 'text-xs/3.75'],
   sm: ['py-pad-y-sm', 'text-sm/4'],
   md: ['py-pad-y-md', 'text-sm/4'],
   lg: ['py-pad-y-lg', 'text-base/5'],

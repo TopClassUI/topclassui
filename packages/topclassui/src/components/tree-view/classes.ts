@@ -48,13 +48,13 @@ export const TREE_VIEW_LABEL = LABEL
 /** The loading and the empty text, outside the tree. A live region stays in the page so its first words are read; empty, it takes no room. */
 export const TREE_VIEW_NOTE = 'px-3 py-2 text-sm text-muted empty:p-0'
 
-/** R-5.2-3: the status line's own look per kind. Loading draws bars in the tree's box, empty the tray over its words. */
+/** R-5.2-3: the status line's own look per kind. Loading draws two bare bars, empty the tray over its words in a box. */
 export const TREE_VIEW_NOTE_KIND = {
   idle: '',
   own: '',
-  loading: `flex flex-col gap-3 rounded-box bg-surface-raised p-4 ${BORDER}`,
+  loading: 'flex flex-col gap-1.25',
   'loading-more': 'flex flex-col gap-3',
-  empty: `flex flex-col items-center gap-2 rounded-box bg-surface-raised p-6 text-center ${BORDER}`,
+  empty: `flex flex-col items-center gap-2 rounded-box bg-surface-raised px-4 py-6 text-center ${BORDER}`,
 } as const
 
 /** The words of a loading line, while bars stand for them: still read by the live region, never seen. */
