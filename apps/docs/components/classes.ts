@@ -188,8 +188,8 @@ export const PLAY_ROW = 'grid min-w-0 md:grid-cols-[minmax(0,1fr)_15.5rem]'
 export const TRY_IT = 'grid content-start gap-3.5 border-t-(length:--tc-line-width) border-line bg-surface p-4.5 text-body md:border-t-0 md:border-s-(length:--tc-line-width)'
 export const CONTROL = 'grid gap-1.5'
 export const CONTROL_LABEL = 'justify-self-start text-xs font-medium text-muted'
-/** A boolean prop: the checkbox, then its name beside it; the negative margin gives the frames' 25 px pitch down a list of them. */
-export const CHECK_ROW = 'flex min-w-0 items-center gap-1 -my-1.5'
+/** A boolean prop: the frames' 16 px box, then its name 8 px beside it; the 6.5 px pulled from each side of its 24 px target gives the frames' 25 px pitch down a list of them. */
+export const CHECK_ROW = 'flex min-w-0 items-center gap-1 -my-[0.40625rem]'
 export const CHECK_LABEL = 'text-xs text-body'
 /** The box each Try it control is reserved before it mounts, as tall as the xs control it stands for, so the column never shifts. */
 export const CONTROL_RESERVE = {
