@@ -14,7 +14,16 @@ The format is: date, decision, why, and what it affects.
 
 **What an Arabic first visit shows.** On a fast connection, Noto Sans Arabic, as before. On a slow one, the fallback stack for the whole first page view: next/font's size-adjusted "Noto Sans Arabic Fallback", with the Arabic glyphs from the operating system's Arabic face (Segoe UI on Windows, SF Arabic on macOS and iOS, the system Noto on Android). The next page uses Noto from the cache. `/en` loads no Arabic font at all: Inter (48,432 bytes) and Geist Mono (23,108 bytes) only; `/ar` fetches Noto Sans Arabic (166,152 bytes) when its text needs it.
 
-**Not measured here.** Mobile Lighthouse on the branch's Vercel preview against production (performance, LCP, CLS, bytes for `/en` and `/ar`): the cloud container's network policy refuses topclassui.com and vercel.com (proxy CONNECT 403), so the laptop measures it before this merges.
+**Measured.** Lighthouse 12.8.2, mobile, performance only, on a local `next start` of each build (not Vercel, which the cloud container cannot reach), median of 3 runs, measured on the laptop.
+
+| Page | Build | Performance | LCP | CLS | TBT | Bytes | Fonts |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `/en` | swap, the preview (local merge 6963704f) | 93 | 3.12 s | 0.000 | 32 ms | 544 KB | 71 KB |
+| `/en` | optional, this branch | 94 | 3.12 s | 0.000 | - | 543 KB | 71 KB |
+| `/ar` | swap, the preview (local merge 6963704f) | 82 | 4.21 s | 0.038 | 93 ms | 745 KB | 265 KB |
+| `/ar` | optional, this branch | 83 | 4.21 s | 0.000 | 66 ms | 746 KB | 265 KB |
+
+The `/en` branch score is 3 x 94 on an interleaved re-run against 93, 94 and 94 for the preview; a first 88 was machine noise. `/en` is unchanged: it loads no Arabic font bytes either way. `/ar` loses its 0.038 layout shift at the same LCP and bytes. The cost is the first Arabic visit, which may show the fallback face until the font is cached.
 
 **What it affects.** `apps/docs` only: `lib/fonts.ts`, `components/home/product-frame.tsx`. `motion.spec.ts` `/ar` and `/en` pass three times over; `site.spec.ts`'s font checks pass.
 
