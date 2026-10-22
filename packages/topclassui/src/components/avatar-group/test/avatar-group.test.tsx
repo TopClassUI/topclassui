@@ -11,12 +11,12 @@ const two = (props: AvatarGroupProps = {}) =>
 /** Every class of the root but the overlap, written out and in the order it is emitted. */
 const BASE = [
   'inline-flex', 'w-max', 'max-w-full', 'shrink-0', 'flex-wrap', 'items-center', 'gap-y-1',
-  '*:ring-2', '*:ring-neutral-soft', '*:rounded-full', '*:isolate', '*:focus-visible:z-1',
+  '*:ring-2', '*:ring-neutral-soft', '*:data-counter:ring-primary-soft', '*:rounded-full', '*:isolate', '*:focus-visible:z-1',
 ]
 
 /** The whole default render, written out, so an extra attribute or element also fails. */
 const CLASSES = 'inline-flex w-max max-w-full shrink-0 flex-wrap items-center gap-y-1'
-  + ' *:ring-2 *:ring-neutral-soft *:rounded-full *:isolate *:focus-visible:z-1 ps-2 *:-ms-2'
+  + ' *:ring-2 *:ring-neutral-soft *:data-counter:ring-primary-soft *:rounded-full *:isolate *:focus-visible:z-1 ps-2 *:-ms-2'
 const DEFAULT = `<span role="group" data-size="md" class="${CLASSES}"><span>A</span><span>B</span></span>`
 
 describe('the element it renders', () => {
@@ -70,6 +70,7 @@ describe('className', () => {
     const classes = classList(two({ className: '*:ring-surface-raised' }))
     expect(classes).not.toContain('*:ring-neutral-soft')
     expect(classes).toContain('*:ring-2')
+    expect(classes).toContain('*:data-counter:ring-primary-soft')
     expect(classes.at(-1)).toBe('*:ring-surface-raised')
   })
 
@@ -81,7 +82,7 @@ describe('className', () => {
   it('lets a caller take the natural width back off, so a long group wraps inside a fitted box again', () => {
     expect(classList(two({ className: 'w-auto' }))).toEqual([
       'inline-flex', 'max-w-full', 'shrink-0', 'flex-wrap', 'items-center', 'gap-y-1',
-      '*:ring-2', '*:ring-neutral-soft', '*:rounded-full', '*:isolate', '*:focus-visible:z-1', 'ps-2', '*:-ms-2', 'w-auto',
+      '*:ring-2', '*:ring-neutral-soft', '*:data-counter:ring-primary-soft', '*:rounded-full', '*:isolate', '*:focus-visible:z-1', 'ps-2', '*:-ms-2', 'w-auto',
     ])
   })
 })

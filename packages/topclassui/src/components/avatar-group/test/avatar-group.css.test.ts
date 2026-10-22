@@ -79,6 +79,11 @@ describe('the ring', () => {
     expect(rule).toContain('box-shadow:')
   })
 
+  it('gives the counter its primary fill as its ring, from a rule that outweighs the child rule (137:572 draws no grey rim)', () => {
+    expect(HTML).toMatch(/<span[^>]*role="img"[^>]*data-counter=""/)
+    expect(ruleOf(':is(.\\*\\:data-counter\\:ring-primary-soft > *)[data-counter] {')).toBe('--tw-ring-color: var(--tc-primary-soft);')
+  })
+
   it('takes the avatar fill from the token, so it changes with the mode and never shows on a fallback disc', () => {
     expect(ruleOf(':is(.\\*\\:ring-neutral-soft > *)')).toBe('--tw-ring-color: var(--tc-neutral-soft);')
   })
