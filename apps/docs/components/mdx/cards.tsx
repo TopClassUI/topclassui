@@ -12,11 +12,11 @@ export function Card({ title, children }: { title: string; children?: ReactNode 
   return (
     <CardRoot className="gap-1.5 bg-surface p-4">
       <CardHeader>
-        <h3 className="text-sm font-semibold text-body">{title}</h3>
+        <h3 className="text-sm/[1.0625rem] font-semibold text-body">{title}</h3>
       </CardHeader>
       <CardBody>
         {/* A narrow card would break a flag such as --no-install at its hyphen, worst inside Arabic text. */}
-        <div className="text-xs text-muted **:whitespace-nowrap **:text-[length:inherit]">{children}</div>
+        <div className="text-xs leading-[0.9375rem] text-muted **:font-sans **:whitespace-nowrap **:text-[length:inherit] **:leading-[inherit]">{children}</div>
       </CardBody>
     </CardRoot>
   )

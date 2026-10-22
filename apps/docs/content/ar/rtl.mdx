@@ -5,7 +5,7 @@ description: كل مكوّن ينعكس في العربية دون أي تغيي
 
 ## القاعدة
 
-يُضبط الاتجاه مرة واحدة، على العنصر <span dir="ltr">`html`</span>. وتقرؤه المكوّنات عبر <span dir="ltr">CSS</span> المنطقي، لا عبر <span dir="ltr">JavaScript</span> أبدًا.
+يُضبط الاتجاه مرة واحدة، على العنصر <span dir="ltr">html</span>. وتقرؤه المكوّنات عبر <span dir="ltr">CSS</span> المنطقي، لا عبر <span dir="ltr">JavaScript</span> أبدًا.
 
 ```tsx check title="app/layout.tsx" show="5-8"
 import { TopClassProvider } from 'topclassui/provider'
@@ -30,19 +30,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 | ممنوع | استخدم بدلًا منه |
 |---|---|
-| <span dir="ltr">`ml-*`</span> <span dir="ltr">`mr-*`</span> | <span dir="ltr">`ms-*`</span> <span dir="ltr">`me-*`</span> |
-| <span dir="ltr">`pl-*`</span> <span dir="ltr">`pr-*`</span> | <span dir="ltr">`ps-*`</span> <span dir="ltr">`pe-*`</span> |
-| <span dir="ltr">`left-*`</span> <span dir="ltr">`right-*`</span> | <span dir="ltr">`inset-s-*`</span> <span dir="ltr">`inset-e-*`</span> |
-| <span dir="ltr">`start-*`</span> <span dir="ltr">`end-*`</span> | <span dir="ltr">`inset-s-*`</span> <span dir="ltr">`inset-e-*`</span> |
-| <span dir="ltr">`text-left`</span> <span dir="ltr">`text-right`</span> | <span dir="ltr">`text-start`</span> <span dir="ltr">`text-end`</span> |
-| <span dir="ltr">`border-l`</span> <span dir="ltr">`border-r`</span> | <span dir="ltr">`border-s`</span> <span dir="ltr">`border-e`</span> |
-| <span dir="ltr">`rounded-l-*`</span> <span dir="ltr">`rounded-r-*`</span> | <span dir="ltr">`rounded-s-*`</span> <span dir="ltr">`rounded-e-*`</span> |
-| <span dir="ltr">`space-x-*`</span> <span dir="ltr">`divide-x-*`</span> | <span dir="ltr">`gap-*`</span>، و<span dir="ltr">`border-s`</span> على العنصر |
+| <span dir="ltr">ml-\*</span> <span dir="ltr">mr-\*</span> | <span dir="ltr">ms-\*</span> <span dir="ltr">me-\*</span> |
+| <span dir="ltr">pl-\*</span> <span dir="ltr">pr-\*</span> | <span dir="ltr">ps-\*</span> <span dir="ltr">pe-\*</span> |
+| <span dir="ltr">left-\*</span> <span dir="ltr">right-\*</span> | <span dir="ltr">inset-s-\*</span> <span dir="ltr">inset-e-\*</span> |
+| <span dir="ltr">start-\*</span> <span dir="ltr">end-\*</span> | <span dir="ltr">inset-s-\*</span> <span dir="ltr">inset-e-\*</span> |
+| <span dir="ltr">text-left</span> <span dir="ltr">text-right</span> | <span dir="ltr">text-start</span> <span dir="ltr">text-end</span> |
+| <span dir="ltr">border-l</span> <span dir="ltr">border-r</span> | <span dir="ltr">border-s</span> <span dir="ltr">border-e</span> |
+| <span dir="ltr">rounded-l-\*</span> <span dir="ltr">rounded-r-\*</span> | <span dir="ltr">rounded-s-\*</span> <span dir="ltr">rounded-e-\*</span> |
+| <span dir="ltr">space-x-\*</span> <span dir="ltr">divide-x-\*</span> | <span dir="ltr">gap-\*</span>، و<span dir="ltr">border-s</span> على العنصر |
 | <span dir="ltr">`tracking-*`</span> | لا شيء، فالخط العربي لا يستخدم تباعد الأحرف |
 
 ## التحويلات والإيماءات
 
-الإزاحة ونقطة أصل التحويل والتدرّج اللوني والسحب لا صيغة منطقية لها في <span dir="ltr">CSS</span>. لذا تُضرب في <span dir="ltr">`--tc-dir`</span>، وقيمته <span dir="ltr">`1`</span> من اليسار إلى اليمين و<span dir="ltr">`-1`</span> من اليمين إلى اليسار.
+الإزاحة ونقطة أصل التحويل والتدرّج اللوني والسحب لا صيغة منطقية لها في <span dir="ltr">CSS</span>. لذا تُضرب في <span dir="ltr">--tc-dir</span>، وقيمته <span dir="ltr">1</span> من اليسار إلى اليمين و<span dir="ltr">-1</span> من اليمين إلى اليسار.
 
 ```css title="styles.css"
 [dir="rtl"] { --tc-dir: -1; }
@@ -57,7 +57,7 @@ className="object-left rtl:object-right"
 
 ## الموضع لا الجهة
 
-كل طبقة عائمة تأخذ <span dir="ltr">`placement`</span> بدلًا من <span dir="ltr">`side`</span>. تُحَلّ <span dir="ltr">`start`</span> و<span dir="ltr">`end`</span> إلى بداية السطر ونهايته، لذا تُفتح القائمة في مكانها الصحيح في الاتجاهين.
+كل طبقة عائمة تأخذ <span dir="ltr">placement</span> بدلًا من <span dir="ltr">side</span>. تُحَلّ <span dir="ltr">start</span> و<span dir="ltr">end</span> إلى بداية السطر ونهايته، لذا تُفتح القائمة في مكانها الصحيح في الاتجاهين.
 
 <WrongRight>
 

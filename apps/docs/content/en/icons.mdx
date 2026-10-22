@@ -27,7 +27,7 @@ All 84, grouped. Amber marks a directional icon - it mirrors itself in Arabic.
 
 ## Two ways to render
 
-`Icon` takes a name and resolves it on the server. `Svg` takes an imported icon object and works anywhere.
+Icon takes a name and resolves it on the server. Svg takes an imported icon object and works anywhere.
 
 This is what keeps unused icons out of your bundle. One big map would pull them all in.
 
@@ -53,14 +53,14 @@ import { spinner } from 'topclassui/icons/spinner'
 
 ## Sizes
 
-`Icon` defaults to `1em` so it matches the text beside it. Use a size name when it stands alone.
+Icon defaults to 1em so it matches the text beside it. Use a size name when it stands alone.
 
 | Name | Pixels | Where it fits |
 |---|---|---|
 | `(default)` | `1em` | Inline with text - a key cap, a link, a button label |
 | `xs` | `16` | A dense table row |
-| `sm` | `20` | A control at `sm` |
-| `md` | `24` | A control at `md` |
+| `sm` | `20` | A control at sm |
+| `md` | `24` | A control at md |
 | `lg` | `32` | An empty state |
 | `xl` | `40` | A feature block |
 
@@ -76,7 +76,7 @@ import { spinner } from 'topclassui/icons/spinner'
 
 ## Adding icons
 
-Any single-path SVG works with `Svg`: give it the `viewBox` and the path.
+Any single-path SVG works with Svg: give it the viewBox and the path.
 
 ```tsx check title="my-logo.tsx"
 import { Svg } from 'topclassui/svg'

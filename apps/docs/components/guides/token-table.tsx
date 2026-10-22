@@ -24,7 +24,7 @@ function tokenOfRow(cells: readonly ReactNode[]): string {
 export function TokenTable({ children, locale }: { children?: ReactNode; locale: Locale }) {
   const { header, rows } = tableOf(children)
   for (const cells of rows) tokenFact(tokenOfRow(cells))
-  return <DataTable header={header} rows={rows} locale={locale} />
+  return <DataTable header={header} rows={rows} locale={locale} head="code" />
 }
 
 /** The six tones as the frame draws them: a live swatch, the role, its shade and contrast in the page's mode, and what it is for. */
