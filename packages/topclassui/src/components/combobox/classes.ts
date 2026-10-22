@@ -12,12 +12,12 @@ export const COMBOBOX_WIDTH = { own: FIELD_OWN_WIDTH, full: 'w-full' } as const
 
 export const COMBOBOX_INPUT = `peer w-full ${FIELD_BOX}`
 
-/** Merged after the size: they replace its inline padding, to keep the text clear of the glass and the spinner. */
-export const COMBOBOX_INPUT_START = 'ps-9'
+/** Merged after the size: the text 8 px after the 14 px glass, as drawn; the end only while the spinner is there. */
+export const COMBOBOX_INPUT_START = 'ps-9.5'
 export const COMBOBOX_INPUT_END = 'pe-9'
 
-/** The magnifying glass at the inline start, as the frame draws a search field. It dims with a disabled input. */
-export const COMBOBOX_SEARCH = 'pointer-events-none absolute inset-y-0 inset-s-3 flex items-center text-muted peer-disabled:opacity-50'
+/** The magnifying glass 16 px in from the inline start, as the frame draws a search field. It dims with a disabled input. */
+export const COMBOBOX_SEARCH = 'pointer-events-none absolute inset-y-0 inset-s-4 flex items-center text-muted peer-disabled:opacity-50'
 
 /** The spinner at the inline end while a page loads. */
 export const COMBOBOX_ICON = 'pointer-events-none absolute inset-y-0 inset-e-3 flex items-center text-muted peer-disabled:opacity-50'

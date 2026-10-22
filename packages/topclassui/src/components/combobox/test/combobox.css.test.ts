@@ -5,15 +5,15 @@ import { beforeAll, describe, expect, it } from 'vitest'
 
 import { compileEntry } from '#test/stylesheet.js'
 import {
-  COMBOBOX_ACTIVE, COMBOBOX_ICON, COMBOBOX_INPUT, COMBOBOX_INPUT_END, COMBOBOX_ITEM, COMBOBOX_ITEM_TEXT, COMBOBOX_ITEM_TICK,
-  COMBOBOX_LIST, COMBOBOX_NOTE, COMBOBOX_POPUP, COMBOBOX_POSITIONER, COMBOBOX_ROOT, COMBOBOX_SPIN, COMBOBOX_UNIT,
-  COMBOBOX_WIDTH,
+  COMBOBOX_ACTIVE, COMBOBOX_ICON, COMBOBOX_INPUT, COMBOBOX_INPUT_END, COMBOBOX_INPUT_START, COMBOBOX_ITEM, COMBOBOX_ITEM_TEXT,
+  COMBOBOX_ITEM_TICK, COMBOBOX_LIST, COMBOBOX_NOTE, COMBOBOX_POPUP, COMBOBOX_POSITIONER, COMBOBOX_ROOT, COMBOBOX_SEARCH, COMBOBOX_SPIN,
+  COMBOBOX_UNIT, COMBOBOX_WIDTH,
 } from '../classes.js'
 
 const OWN = [
-  COMBOBOX_ACTIVE, COMBOBOX_ICON, COMBOBOX_INPUT, COMBOBOX_INPUT_END, COMBOBOX_ITEM, COMBOBOX_ITEM_TEXT, COMBOBOX_ITEM_TICK,
-  COMBOBOX_LIST, COMBOBOX_NOTE, COMBOBOX_POPUP, COMBOBOX_POSITIONER, COMBOBOX_ROOT, COMBOBOX_SPIN, COMBOBOX_UNIT,
-  COMBOBOX_WIDTH.own, COMBOBOX_WIDTH.full,
+  COMBOBOX_ACTIVE, COMBOBOX_ICON, COMBOBOX_INPUT, COMBOBOX_INPUT_END, COMBOBOX_INPUT_START, COMBOBOX_ITEM, COMBOBOX_ITEM_TEXT,
+  COMBOBOX_ITEM_TICK, COMBOBOX_LIST, COMBOBOX_NOTE, COMBOBOX_POPUP, COMBOBOX_POSITIONER, COMBOBOX_ROOT, COMBOBOX_SEARCH, COMBOBOX_SPIN,
+  COMBOBOX_UNIT, COMBOBOX_WIDTH.own, COMBOBOX_WIDTH.full,
 ]
 const CLASSES = [...new Set(OWN.join(' ').split(' ').filter(Boolean))]
 
@@ -53,6 +53,8 @@ describe('the box and the input', () => {
     expect(ruleOf(selectorOf('w-[min(100%,var(--tc-input-width))]'))).toBe('width: min(100%, var(--tc-input-width));')
     expect(ruleOf(selectorOf('inset-e-3'))).toBe('inset-inline-end: calc(var(--spacing) * 3);')
     expect(ruleOf(selectorOf('pe-9'))).toBe('padding-inline-end: calc(var(--spacing) * 9);')
+    expect(ruleOf(selectorOf('ps-9.5'))).toBe('padding-inline-start: calc(var(--spacing) * 9.5);')
+    expect(ruleOf(selectorOf('inset-s-4'))).toBe('inset-inline-start: calc(var(--spacing) * 4);')
   })
 
   it('the icons dim with a disabled input, and the spinner stands still under reduced motion', () => {
