@@ -14,6 +14,9 @@ Figma Knobs, Light / Dark / Ocean: radius/base 8/8/100, radius/control 8/8/100, 
 |---|---|---|---|
 | catalog | tints, lines and drops hold on white | Before you start code boxes were discs that clipped their letters | **fixed** (57a08f98: .docs-flat-code and .docs-box take min(--radius-control, --radius-box)) |
 | search palette | ok, AA in en and ar | ok, radius capped | ok |
+| install row (every card) | ok | the multi-line Then import it field was a stadium | **fixed** (c72e0ae2) |
+| icons guide tiles | ok | already boxes on the tip | **already fixed** upstream; held by the c72e0ae2 e2e |
+| Arabic body and catalog font (AR 1) | body, h1 and p computed Inter on /ar | the same | **fixed** (ebe24d6f) |
 | accordion | ok | outline items are pills, as Figma's radius/control | ok, Figma |
 | alert | soft tints visible on white, AA | ok | ok |
 | avatar | ok | ok | ok |
@@ -28,8 +31,8 @@ Figma Knobs, Light / Dark / Ocean: radius/base 8/8/100, radius/control 8/8/100, 
 | combobox | ok | pill fields | ok, Figma |
 | command | ok | ok | ok |
 | date-picker | ok | pill trigger | ok, Figma |
-| dialog | the stage was a mid-grey block: the library's 30 % black over white | the same | **fixed** (scrim 12 % black in light and ocean inside a card, 40 % kept in dark) |
-| drawer | the page side of the stage is a solid grey with no bars; with the new scrim it is a light grey | the same | **fixed** the scrim; **named**: the Drawer stage draws no page bars (the dark frame has four), for the Drawer stage owner (144) |
+| dialog | the stage was a mid-grey block: the library's 30 % black over white | the same | **fixed** (08d0a700: scrim 12 % black in light and ocean inside a card, 40 % kept in dark) |
+| drawer | the page side of the stage is a solid grey with no bars; with the new scrim it is a light grey | the same | **fixed** the scrim (08d0a700); **named**: the Drawer stage draws no page bars (the dark frame has four), for the Drawer stage owner (144) |
 | dropdown | the open, hover and disabled state cells render empty (their menus are visibility hidden, 14 px tall) | the same | **named**: the same in dark, a states-strip bug, not a mode one |
 | empty-state | the dashed line holds on white | ok | ok |
 | field | ok | pill input | ok, Figma |
