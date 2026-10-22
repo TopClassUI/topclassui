@@ -18,7 +18,7 @@ export const FILE_UPLOAD_INPUT = 'absolute inset-0 size-full cursor-pointer opac
 export const FILE_UPLOAD_ICON = 'flex text-muted group-data-dragging/zone:text-primary-on-soft'
 
 /** CONTAIN and wrap-anywhere: a word with no space to break at wraps inside the zone instead of widening the page. */
-export const FILE_UPLOAD_PROMPT = `flex flex-wrap justify-center gap-x-1 text-sm font-medium wrap-anywhere group-data-compact/zone:text-xs group-data-compact/zone:font-normal ${CONTAIN}`
+export const FILE_UPLOAD_PROMPT = `flex flex-wrap justify-center gap-x-1 text-sm group-data-compact/zone:text-xs group-data-compact/zone:font-normal font-medium wrap-anywhere ${CONTAIN}`
 
 /** The drop words before browse; a compact zone shows the browse word alone, as the frame's mini zone does. */
 export const FILE_UPLOAD_DROP = 'group-data-compact/zone:hidden'
