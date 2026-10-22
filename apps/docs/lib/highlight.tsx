@@ -34,7 +34,7 @@ export async function highlight(code: string, lang?: string): Promise<ReactNode>
   return (
     <span className="shiki">
       {tokens.map((line, row) => (
-        <span key={row}>
+        <span key={row} data-blank={line.length === 0 ? '' : undefined}>
           {line.map((token, column) => (
             <span key={column} style={{ '--tc-code-on-dark': token.htmlStyle?.['--tc-code-on-dark'], '--tc-code-on-light': token.htmlStyle?.['--tc-code-on-light'] }}>{token.content}</span>
           ))}
