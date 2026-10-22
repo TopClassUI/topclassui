@@ -29,8 +29,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the breadcrumb caret stops flipping, so it points against the trail under dir="rtl"',
     file: 'src/components/breadcrumb/index.tsx',
-    from: '{index === 0 ? null : <Svg icon={caretRight} />}',
-    to: '{index === 0 ? null : <Svg icon={caretRight} flipRtl={false} />}',
+    from: '? null : <Svg icon={caretRight} />}',
+    to: '? null : <Svg icon={caretRight} flipRtl={false} />}',
   },
   {
     label: 'the breadcrumb nav is named in English whatever labels the caller passes',
@@ -53,8 +53,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a breadcrumb crumb ignores the link element, so every click in a Next.js app reloads the document',
     file: 'src/components/breadcrumb/index.tsx',
-    from: "renderLink('Breadcrumb', link, item.href,",
-    to: "renderLink('Breadcrumb', undefined, item.href,",
+    from: "renderLink('Breadcrumb', item.link ?? link, item.href,",
+    to: "renderLink('Breadcrumb', item.link, item.href,",
   },
   {
     label: 'a breadcrumb crumb with an empty label is rendered again, as a link with no name',
@@ -119,8 +119,20 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the breadcrumb caret sets its own colour again, which forced colours keep as a grey on black',
     file: 'src/components/breadcrumb/index.tsx',
-    from: '{index === 0 ? null : <Svg icon={caretRight} />}',
-    to: '{index === 0 ? null : <Svg icon={caretRight} className="text-muted" />}',
+    from: '? null : <Svg icon={caretRight} />}',
+    to: '? null : <Svg icon={caretRight} className="text-muted" />}',
+  },
+  {
+    label: 'a caret follows the house again, where Figma 138:1173 draws Docs straight after it',
+    file: 'src/components/breadcrumb/index.tsx',
+    from: '{index === 0 || (showHome && index === 1) ? null',
+    to: '{index === 0 ? null',
+  },
+  {
+    label: "a crumb's own link element is ignored, so the one crumb that carries an attribute loses it",
+    file: 'src/components/breadcrumb/index.tsx',
+    from: "renderLink('Breadcrumb', item.link ?? link, item.href,",
+    to: "renderLink('Breadcrumb', link, item.href,",
   },
   {
     label: 'the breadcrumb current page loses its weight, so only colour tells it from a link',

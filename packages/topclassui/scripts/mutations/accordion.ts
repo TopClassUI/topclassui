@@ -90,8 +90,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the region of an accordion panel loses its 4 px above, so the ring of a control on its first line is cut',
     file: CLASSES,
-    from: 'px-3.5 pt-1 pb-3.5',
-    to: 'px-3.5 pb-3.5',
+    from: '`pt-1 ${SCROLL_X}',
+    to: '`${SCROLL_X}',
   },
   {
     label: 'the accordion box is no longer one grid column, so a wide table in a panel widens a parent that fits its content',
@@ -114,8 +114,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the region of an accordion panel no longer scrolls sideways, so the box cuts a wide table off',
     file: CLASSES,
-    from: 'pb-3.5 ${SCROLL_X} ${FOCUS_RING_INSET}',
-    to: 'pb-3.5 ${FOCUS_RING_INSET}',
+    from: 'pt-1 ${SCROLL_X} ${FOCUS_RING_INSET}',
+    to: 'pt-1 ${FOCUS_RING_INSET}',
   },
   {
     label: 'the accordion trigger loses its inset focus ring, so the keyboard shows no focus on it',
@@ -126,8 +126,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the accordion panel loses its fade, so it appears and goes in one frame in every mode',
     file: CLASSES,
-    from: '`text-sm text-muted ${FADE_MOTION}`',
-    to: "'text-sm text-muted'",
+    from: '`text-muted ${FADE_MOTION}`',
+    to: "'text-muted'",
   },
   {
     label: 'the accordion caret no longer turns when its panel opens',
