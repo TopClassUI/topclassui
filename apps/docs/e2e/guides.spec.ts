@@ -81,7 +81,8 @@ for (const path of PATHS) {
     } else {
       await expect(card).toHaveAttribute('href', `${locale}${next}`)
       await card.click()
-      await expect(page).toHaveURL(new RegExp(`${locale}${next}$`))
+      // Accessibility's Next is the catalog, about 3.6 MB of HTML: its navigation can outlast the default 5 s under a loaded run.
+      await expect(page).toHaveURL(new RegExp(`${locale}${next}$`), { timeout: 15_000 })
     }
   })
 
