@@ -33,7 +33,7 @@ const TRIGGERS: Record<string, string[]> = {
   'rtl': ['الإجراءات', 'المزيد'],
   'sixty-items': ['Time zone'],
   // One trigger per cell: closed, open and a disabled row. The two open menus mount in the browser only.
-  'states': ['Actions', 'Actions', 'Actions'],
+  'states': ['Actions', 'Actions', 'Actions', 'Actions'],
   'with-links': ['Help'],
 }
 

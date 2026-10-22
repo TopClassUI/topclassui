@@ -8,11 +8,13 @@ import { BORDER } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
 
 const CELL = 'grid min-h-14 place-items-center'
+// The stack overflows its 56 px row as the frame's does, so every caption sits on one line.
+const STACKED = 'p-2 text-muted'
 
 /** A toast drawn in place, small, with the look the viewport gives one: a picture of a state, not a live region. */
 function Panel({ icon, label, className }: { icon?: ReactNode; label: string; className?: string }) {
   return (
-    <div className={cn('flex w-34 items-center gap-2 rounded-box bg-surface-raised px-3 py-2.5 font-mono text-xs/tight text-body shadow-(--tc-shadow-toast)', BORDER, className)}>
+    <div className={cn('flex w-34 items-center gap-1.75 rounded-box bg-surface-raised px-2.25 py-2.25 font-mono text-xs/tight text-body shadow-(--tc-shadow-toast)', BORDER, className)}>
       {icon}
       {label}
     </div>
@@ -33,10 +35,10 @@ export default function Demo() {
       <div role="group" aria-label="loading" className={CELL}>
         <Panel icon={<Svg icon={spinner} size="0.875rem" className="animate-spin text-muted motion-reduce:animate-none" />} label="loading" />
       </div>
-      <div role="group" aria-label="stacked" className={cn(CELL, 'place-items-start justify-center')}>
-        <Panel label="toast" className="w-30" />
-        <Panel label="toast" className="-mt-1.5 w-28" />
-        <Panel label="toast" className="-mt-1.5 w-26" />
+      <div role="group" aria-label="stacked" className="grid h-14 content-center justify-center place-items-start">
+        <Panel label="toast" className={cn(STACKED, 'w-30')} />
+        <Panel label="toast" className={cn(STACKED, '-mt-1.5 w-28')} />
+        <Panel label="toast" className={cn(STACKED, '-mt-1.5 w-26')} />
       </div>
       <div role="group" aria-label="entering" className={CELL}>
         <Panel icon={<Svg icon={checkCircle} size="0.875rem" className="text-success-on-soft" />} label="entering" className="border-dashed border-line-strong" />

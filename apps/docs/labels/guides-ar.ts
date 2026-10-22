@@ -4,7 +4,7 @@ export const guidesAr: GuideLabels = {
   tokens: {
     swatch: 'العيّنة',
     modes: { light: 'فاتح', dark: 'داكن', ocean: 'محيط' },
-    mix: (percent, of) => `${String(percent)}% من ${of} ممزوجة بالصفحة`,
+    mix: (percent) => `${String(percent)}% ممزوجة بالصفحة`,
     contrast: (ratio, min) => `${ratio.toFixed(2)}:1، والحد الأدنى ${String(min)}:1`,
     notMeasured: 'غير مقيس: سطح أو خط زخرفي',
   },
@@ -40,6 +40,7 @@ export const guidesAr: GuideLabels = {
     copy: (name) => `انسخ شيفرة ${name}`,
     copied: (code) => `نُسخ ${code}`,
     failed: 'لم يسمح المتصفح بالنسخ. حدّد الاسم وانسخه يدويًا.',
+    clear: 'امسح البحث',
   },
   island: {
     page: 'في وضع الصفحة',

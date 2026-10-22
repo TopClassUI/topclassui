@@ -3,7 +3,7 @@ import { COMPONENT_PAGE_LABELS } from '../../labels/component-page'
 import type { PagedComponent } from '../../lib/components'
 import { addLineOf, sourceImportLineOf } from '../../lib/install'
 import type { Locale } from '../../lib/locales'
-import { CAPTION, COPY_FIELD, COPY_FIELD_BUTTON, COPY_FIELD_TEXT, INSTALL_COL, INSTALL_COL_END, INSTALL_ROW, NOTE } from '../classes'
+import { CAPTION, COPY_FIELD, COPY_FIELD_BUTTON, COPY_FIELD_TEXT, INSTALL_COL, INSTALL_COL_END, INSTALL_NOTE, INSTALL_ROW } from '../classes'
 import { CopyButton } from './previewer-islands'
 
 interface FieldProps { heading: string; line: string; note: string; copyLabel: string; locale: Locale }
@@ -17,7 +17,7 @@ function CopyColumn({ heading, line, note, copyLabel, locale, className }: Field
         <code dir="ltr" translate="no" className={COPY_FIELD_TEXT}>{line}</code>
         <CopyButton text={line} label={copyLabel} copied={t.copied} failed={t.copyFailed} className={COPY_FIELD_BUTTON} />
       </div>
-      <p className={NOTE}>{note}</p>
+      <p className={INSTALL_NOTE}>{note}</p>
     </div>
   )
 }

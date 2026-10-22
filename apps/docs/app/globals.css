@@ -5,7 +5,8 @@
 /* After the three imports: tokens.css declares all three on :root, so only order makes these win (docs-site S10). */
 :root {
   --tc-font-latin: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --tc-font-arabic: var(--font-noto-arabic), ui-sans-serif, system-ui, sans-serif;
+  /* Inter after Noto Sans Arabic: a Latin word in Arabic text, a prop or the product name, keeps the site's Latin face. */
+  --tc-font-arabic: var(--font-noto-arabic), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   /* Geist Mono first; Arabic in a code comment falls back to Noto Sans Arabic, not a system monospace that spaces its letters apart. */
   --tc-font-mono: var(--font-geist-mono), ui-monospace, monospace, var(--font-noto-arabic, monospace);
   --docs-sidebar: 13.75rem;
@@ -330,4 +331,7 @@
     --tc-scrollbar-track: transparent;
   }
   .docs-flat-code .shiki span { color: light-dark(var(--tc-code-on-light), var(--tc-code-on-dark)); }
+  /* Plain tokens (lib/shiki-themes.ts, text) as the frames draw them: body in the JSX, muted on a line that opens with a keyword, an import. */
+  .docs-flat-code .shiki span[style*='#D4D4D4'] { color: var(--tc-body); }
+  .docs-flat-code .shiki > span:has(> span:first-child[style*='#51A2FF']) > span[style*='#D4D4D4'] { color: var(--tc-muted); }
 }

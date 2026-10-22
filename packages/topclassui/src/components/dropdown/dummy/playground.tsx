@@ -11,21 +11,21 @@ import { Svg } from '#components/svg/index.js'
 import { DropdownItem, DropdownPopup, DropdownRoot, DropdownSeparator, DropdownTrigger } from '../index.js'
 import type { DropdownDesignProps } from '../types.js'
 
-/** The menu drawn open under its trigger inside its own box, as the frame draws it: not modal. Base UI gives a menu
- * no initialFocus, so on open the focus moves to it. */
+/** The menu drawn open under its trigger, the two centred as one 220 px group with Delete in danger, as the frame draws
+ * it: not modal. Base UI gives a menu no initialFocus, so on open the focus moves to it. */
 function Stage({ placement, tone, delay, closeDelay }: DropdownDesignProps) {
   const root = useRef<HTMLDivElement>(null)
   return (
-    <div ref={root} data-stage="" className="relative min-h-87 w-full [contain:paint]">
-      <div className="flex justify-center p-6">
+    <div ref={root} data-stage="" className="relative grid min-h-67.75 w-full place-items-center [contain:paint]">
+      <div className="w-55">
         <DropdownRoot defaultOpen modal={false}>
-          <DropdownTrigger openOnHover delay={delay} closeDelay={closeDelay} render={<Button variant="outline">Actions</Button>} />
+          <DropdownTrigger openOnHover delay={delay} closeDelay={closeDelay} render={<Button variant="outline" size="sm">Actions</Button>} />
           <DropdownPopup placement={placement} container={root}>
             <DropdownItem icon={<Svg icon={user} />} shortcut="Ctrl P">Profile</DropdownItem>
             <DropdownItem icon={<Svg icon={gear} />}>Settings</DropdownItem>
             <DropdownItem icon={<Svg icon={copy} />}>Duplicate</DropdownItem>
             <DropdownSeparator />
-            <DropdownItem icon={<Svg icon={trash} />} shortcut="Del" tone={tone}>Delete</DropdownItem>
+            <DropdownItem icon={<Svg icon={trash} />} shortcut="Del" tone={tone ?? 'danger'}>Delete</DropdownItem>
           </DropdownPopup>
         </DropdownRoot>
       </div>

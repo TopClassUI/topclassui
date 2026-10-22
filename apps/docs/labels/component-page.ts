@@ -21,6 +21,8 @@ export interface ComponentPageLabels {
   copyCode: string
   everyState: string
   stateCount: (n: number) => string
+  /** A state's caption by its id in dummy/states.tsx; an id missing here, a prop value such as sm or solid, stays Latin. */
+  stateNames: Record<string, string>
   /** The visible word on the code's copy button, and what its status says. */
   copy: string
   copied: string
@@ -87,6 +89,7 @@ const en: ComponentPageLabels = {
   copyCode: 'Copy the code',
   everyState: 'Every state',
   stateCount: (n) => (n === 1 ? '1 state' : `${String(n)} states`),
+  stateNames: {},
   copy: 'Copy',
   copied: 'Copied',
   copyFailed: 'Could not copy',
@@ -152,6 +155,14 @@ const ar: ComponentPageLabels = {
     const rule = new Intl.PluralRules('ar').select(n)
     const word = { zero: 'حالة', one: 'حالة واحدة', two: 'حالتان', few: 'حالات', many: 'حالة', other: 'حالة' }[rule]
     return rule === 'one' || rule === 'two' ? word : `${String(n)} ${word}`
+  },
+  stateNames: {
+    idle: 'عادي', hover: 'تمرير', active: 'ضغط', 'focus-visible': 'تركيز', disabled: 'معطّل', loading: 'تحميل',
+    invalid: 'غير صالح', 'read-only': 'للقراءة فقط', empty: 'فارغ', selected: 'محدّد', unselected: 'غير محدّد', open: 'مفتوح',
+    closed: 'مغلق', error: 'خطأ', success: 'نجاح', warning: 'تحذير', info: 'معلومة', danger: 'خطر', current: 'الحالية',
+    todo: 'لاحقة', done: 'منجزة', complete: 'مكتمل', checked: 'محدّد', unchecked: 'غير محدّد', indeterminate: 'جزئي',
+    collapsed: 'مطويّ', expanded: 'موسّع', on: 'مفعّل', off: 'متوقف', today: 'اليوم', scrolled: 'بعد التمرير', sorted: 'مرتّب',
+    filtered: 'مصفّى', dismissed: 'مُغلق', partial: 'جزئي', half: 'نصف', full: 'كامل', default: 'افتراضي',
   },
   copy: 'نسخ',
   copied: 'نُسخ',

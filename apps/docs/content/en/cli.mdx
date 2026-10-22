@@ -99,3 +99,11 @@ The same commands on both. Three things differ.
 Pick one. The copies read the copied provider, so a layout that mounts the provider from the package leaves them in English and left to right. `init` stops when it finds one; `--force` goes ahead anyway.
 
 <Callout tone="info">Exit codes: 0 done, 1 something differs, 2 a mistake in the command, 3 the install failed.</Callout>
+
+## What it never does
+
+<Cards columns={3}>
+  <Card title="No telemetry">It sends nothing. The files come from the package you installed; the only download is the install it runs, and `--no-install` turns that off.</Card>
+  <Card title="Nothing outside its own files">It writes the `topclassui/` folder and `topclassui.json`, and adds two lines to the CSS entry you name. Your layout stays yours.</Card>
+  <Card title="No silent overwrite">A file you have edited is left alone unless you pass `--overwrite`, and even then the diff prints first.</Card>
+</Cards>

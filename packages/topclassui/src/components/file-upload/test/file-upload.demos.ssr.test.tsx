@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'in-field', 'multiple', 'playground', 'rtl', 'states', 'ten-thousand']
+const EXPECTED = ['basic', 'form', 'in-field', 'invalid', 'multiple', 'playground', 'rtl', 'states', 'ten-thousand']
 
 /** Each file input of each demo, as the server writes it: its name by the label that points at its id, its form name,
  * and the attributes a form reads. */
@@ -20,9 +20,10 @@ const INPUTS: Record<string, string[]> = {
   form: ['Attachments: attachments, multiple, required'],
   'in-field': ['Attachments: attachments, multiple, accept application/pdf,image/png'],
   multiple: ['Attachments: attachments, multiple, accept application/pdf,image/png'],
-  playground: ['Attachment: attachment, one, accept .png,.jpg,.jpeg,.pdf'],
+  playground: ['Attachment: attachment, multiple, accept .png,.jpg,.jpeg,.pdf'],
   rtl: ['المرفقات: attachments, multiple, accept application/pdf,image/png'],
-  states: ['idle: idle, one', 'disabled: disabled, one, disabled', 'invalid: invalid, one, invalid'],
+  invalid: ['Contract: contract, one, invalid'],
+  states: ['idle: idle, one', 'disabled: disabled, one, disabled'],
   'ten-thousand': ['Ten thousand files: photos, multiple, accept image/*'],
 }
 
@@ -35,7 +36,7 @@ const render = async (file: string) => {
 function inputsIn(html: string): string[] {
   return [...html.matchAll(/<input [^>]*type="file"[^>]*>/g)].map(([input]) => {
     const id = / id="([^"]*)"/.exec(input)?.[1] ?? ''
-    const label = new RegExp(`<label [^>]*for="${id}"[^>]*>([^<]*)</label>`).exec(html)?.[1] ?? '(no name)'
+    const label = new RegExp(`<label [^>]*for="${id}"[^>]*>([^<]*)</label>`).exec(html)?.[1] ?? / aria-label="([^"]*)"/.exec(input)?.[1] ?? '(no name)'
     const parts = [
       / name="([^"]*)"/.exec(input)?.[1] ?? '(no form name)',
       input.includes(' multiple=""') ? 'multiple' : 'one',

@@ -69,6 +69,11 @@
   --tc-tree-indent: calc(1.125rem * var(--tc-density));
 }
 
+/* A font-sans element under Arabic takes the Arabic stack; unlayered, or the :root value above wins over it. */
+[lang|='ar'] {
+  --tc-font-sans: var(--tc-font-arabic);
+}
+
 /* Every light mode, so a light or ocean section inside a dark page resets every colour. */
 :root,
 [data-theme='light'],

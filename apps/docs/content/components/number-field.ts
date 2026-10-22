@@ -6,12 +6,13 @@ export const numberField = {
     ar: 'حقل رقمي',
   },
   description: {
-    en: 'A number between known bounds, typed or stepped. A hidden input carries the plain number, so the form submits before hydration.',
-    ar: 'رقم بين حدود معروفة، يُكتب أو يُزاد خطوة خطوة. حقل مخفي يحمل الرقم المجرد، فيُرسل النموذج قبل الترطيب.',
+    en: 'A bounded number, typed or stepped, that a hidden input sends before hydration.',
+    ar: 'رقم ضمن حدود، يُكتب أو يُزاد خطوة خطوة، يرسله حقل مخفي قبل الترطيب.',
   },
   demos: ['basic', 'limits', 'form', 'sizes', 'row', 'rtl'],
+  stageDemo: 'stage',
   stageHeight: 7,
-  controlOrder: ['size', 'disabled', 'invalid', 'required', 'fullWidth'],
+  controlOrder: ['size', 'step', 'disabled', 'invalid', 'required', 'fullWidth'],
   controlsHidden: ['min', 'max'],
   extraSwitches: ['disabled', 'required'],
   note: {
