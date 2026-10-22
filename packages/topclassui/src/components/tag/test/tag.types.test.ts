@@ -92,6 +92,6 @@ describe('the schema', () => {
   })
 
   it('agrees with the defaults the spec names', () => {
-    expect(TAG_DEFAULTS).toEqual({ tone: 'neutral', size: 'md' })
+    expect(TAG_DEFAULTS).toEqual({ tone: 'neutral', size: 'md', disabled: false })
   })
 })

@@ -57,6 +57,7 @@ Your server page renders `<Topics initial={['React', 'Tailwind']} />`: strings c
 - **Focus.** When the x that holds the focus leaves with its tag, the focus goes to the next x of the same list, else the one before, else the next control on the page; never to the body. It moves in the x's effect cleanup, before the caller's own effects run, so a caller that moves the focus itself, in `onRemove` or in an effect, keeps its choice, as `dummy/removable.tsx` does for the button that brings the list back.
 - **Size.** The x is 24 px, 44 under a touch pointer. An `xs` tag grows from 22 to 24 px, and every tag is 44 px tall under a touch pointer (`xl` stays 50).
 - **Long labels.** The label is cut with an ellipsis and the x always stays whole.
+- **Disabled.** `disabled` turns the x off: the button is disabled and the chip fades to half, as a disabled control does. A plain Tag takes no `disabled`; it is text, so it keeps its colours.
 
 Base UI: not used; the x is a plain `<button type="button">`.
 

@@ -62,6 +62,7 @@ const verdict = compile({
   onTag: '<Tag onRemove={() => undefined}>React</Tag>',
   removable: '<Tag removable>React</Tag>',
   disabled: '<TagRemovable disabled onRemove={() => undefined}>React</TagRemovable>',
+  disabledTag: '<Tag disabled>React</Tag>',
 })
 
 describe('the README sample compiles as written', () => {
@@ -94,8 +95,12 @@ describe('what onRemove takes', () => {
     expect((verdict['onTag'] ?? []).join(' ')).toContain("Property 'onRemove' does not exist")
   })
 
-  it('refuses removable and disabled, which are not built', () => {
+  it('refuses removable, which is not built: passing onRemove is the switch', () => {
     expect((verdict['removable'] ?? []).join(' ')).toContain("Property 'removable' does not exist")
-    expect((verdict['disabled'] ?? []).join(' ')).toContain("Property 'disabled' does not exist")
+  })
+
+  it('takes disabled on TagRemovable, whose x it turns off, and refuses it on Tag, which is text', () => {
+    expect(verdict['disabled']).toEqual([])
+    expect((verdict['disabledTag'] ?? []).join(' ')).toContain("Property 'disabled' does not exist")
   })
 })

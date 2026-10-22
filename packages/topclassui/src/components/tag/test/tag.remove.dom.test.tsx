@@ -53,6 +53,25 @@ describe('the x of a removable tag', () => {
     expect(onRemove).toHaveBeenCalledTimes(2)
   })
 
+  it('disabled turns the x off: not pressed, not reached by Tab, and the chip says so with data-disabled', async () => {
+    const onRemove = vi.fn()
+    render(<><button type="button">Before</button><TagRemovable disabled onRemove={onRemove}>React</TagRemovable><button type="button">After</button></>)
+    const off = screen.getByRole('button', { name: 'Remove React' })
+    expect(off.hasAttribute('disabled')).toBe(true)
+    expect(off.parentElement?.getAttribute('data-disabled')).toBe('')
+    await userEvent.click(off)
+    screen.getByRole('button', { name: 'Before' }).focus()
+    await userEvent.tab()
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'After' }))
+    expect(onRemove).not.toHaveBeenCalled()
+  })
+
+  it('is enabled with no data-disabled when disabled is left out', () => {
+    render(<TagRemovable onRemove={() => undefined}>React</TagRemovable>)
+    expect(x().hasAttribute('disabled')).toBe(false)
+    expect(x().parentElement?.hasAttribute('data-disabled')).toBe(false)
+  })
+
   it('leaves the tag where it is: taking it out of the list is the caller', async () => {
     render(<TagRemovable onRemove={() => undefined}>React</TagRemovable>)
     await userEvent.click(x())

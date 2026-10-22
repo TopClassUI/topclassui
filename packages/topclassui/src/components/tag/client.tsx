@@ -20,6 +20,7 @@ export function TagRemovable({
   className,
   children,
   onRemove,
+  disabled = TAG_DEFAULTS.disabled,
   ...rest
 }: TagRemovableProps) {
   const tag = useTagRemovable(onRemove)
@@ -27,6 +28,7 @@ export function TagRemovable({
     <span
       data-tone={tone}
       data-size={size}
+      data-disabled={disabled ? '' : undefined}
       className={cn(tagVariants({ tone, size }), REMOVABLE, REMOVABLE_END[size], className)}
       {...rest}
     >
@@ -37,6 +39,7 @@ export function TagRemovable({
         aria-label={tag.label}
         aria-labelledby={`${tag.id} ${tag.labelId}`}
         data-tag-remove=""
+        disabled={disabled}
         className={cn(TAG_REMOVE, TONE_CLASS[tone], REMOVE_SIZE[size])}
         onClick={tag.remove}
       >

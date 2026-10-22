@@ -11,4 +11,5 @@ export const TAG_SIZES = SIZES
 export const TAG_DEFAULTS = {
   tone: 'neutral',
   size: DEFAULT_SIZE,
+  disabled: false,
 } as const

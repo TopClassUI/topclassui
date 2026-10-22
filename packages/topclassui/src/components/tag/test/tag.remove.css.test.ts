@@ -16,6 +16,11 @@ const DECLARATION: Record<string, string> = {
   'inline-grid': 'display: inline-grid;',
   'grid-cols-[minmax(0,auto)_auto]': 'grid-template-columns: minmax(0,auto) auto;',
   'overflow-visible': 'overflow: visible;',
+  // DISABLED: a disabled x fades the whole chip and takes no press.
+  'disabled:pointer-events-none': 'pointer-events: none;',
+  'disabled:opacity-50': 'opacity: 50%;',
+  'data-disabled:pointer-events-none': 'pointer-events: none;',
+  'data-disabled:opacity-50': 'opacity: 50%;',
   'pe-pad-y-xs': 'padding-inline-end: calc(0.125rem * var(--tc-density));',
   'pe-pad-y-sm': 'padding-inline-end: calc(0.25rem * var(--tc-density));',
   'pe-pad-y-md': 'padding-inline-end: calc(0.375rem * var(--tc-density));',
@@ -55,6 +60,11 @@ const DECLARATION: Record<string, string> = {
   '-my-[calc(var(--spacing-pad-y-md)+var(--tc-line-width))]': 'margin-block: calc(calc(var(--spacing-pad-y-md) + var(--tc-line-width)) * -1);',
   '-my-[calc(var(--spacing-pad-y-lg)+var(--tc-line-width))]': 'margin-block: calc(calc(var(--spacing-pad-y-lg) + var(--tc-line-width)) * -1);',
   '-my-[calc(var(--spacing-pad-y-xl)+var(--tc-line-width))]': 'margin-block: calc(calc(var(--spacing-pad-y-xl) + var(--tc-line-width)) * -1);',
+  // The pull back over the chip's gap, one per gap of TAG_SIZE: 4, 6, 8 and 12 px.
+  '-ms-1': 'margin-inline-start: calc(var(--spacing) * -1);',
+  '-ms-1.5': 'margin-inline-start: calc(var(--spacing) * -1.5);',
+  '-ms-2': 'margin-inline-start: calc(var(--spacing) * -2);',
+  '-ms-3': 'margin-inline-start: calc(var(--spacing) * -3);',
 }
 
 /** The state or the media each variant class must sit under, or it would paint at rest. */
@@ -65,6 +75,8 @@ const SCOPE: Record<string, string> = {
   'forced-colors:hover:bg-[Highlight]': ':hover',
   'forced-colors:hover:text-[HighlightText]': ':hover',
   'focus-visible:outline-solid': ':focus-visible',
+  'disabled:opacity-50': ':disabled',
+  'data-disabled:opacity-50': '[data-disabled]',
 }
 
 const escape = (cls: string) => cls.replace(/[^a-zA-Z0-9_-]/g, '\\$&')
@@ -89,7 +101,7 @@ describe('every class of the removable tag compiles with the installed Tailwind'
   it('the table names exactly the classes of the chip, the label, the x and the two size tables', () => {
     const all = written([REMOVABLE, ...Object.values(REMOVABLE_END), TAG_LABEL, TAG_REMOVE, ...Object.values(REMOVE_SIZE)])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(45)
+    expect(all).toHaveLength(53)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

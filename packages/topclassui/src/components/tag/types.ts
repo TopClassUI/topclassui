@@ -21,6 +21,8 @@ export interface TagProps
 export interface TagRemovableProps extends TagProps {
   /** Client-only, or a Server Action: called with nothing when the x is pressed; taking the tag out of the list is the caller's. */
   onRemove: () => void
+  /** The x does nothing: its button is disabled and the chip fades to half, as a disabled control does. */
+  disabled?: boolean | undefined
 }
 
 /** The press on the x, which the hook reads to know whether the x held the focus. Internal. */
