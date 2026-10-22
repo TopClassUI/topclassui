@@ -48,6 +48,31 @@ FCP moved the same way in every run: `/en` 1,357 to 1,361 ms on main, 1,207 to 1
 **Affects.** `apps/docs/app/(site)/[locale]/layout.tsx`, `apps/docs/lib/arabic-preload.ts` and its test, and the comment in `lib/fonts.ts`. Every `/ar` page's HTML grows by about 2.4 KB raw (the script, once in the head and once in the RSC payload).
 
 ---
+## 2026-10-22 - Home's HTML can lose 156 KB of repeats, but Lantern's first paint does not move, so it stays as it is
+
+**Decision.** Two `apps/docs` changes were built, checked and measured against main (c577d9de) and are not kept, because neither moved FCP or Speed Index on `/en` or `/ar`:
+
+- **The shell once a payload.** Next 16.3.8 writes `[locale]/not-found.tsx` into every page's RSC payload as the root layout's `notFound` boundary (`create-component-tree.js`), so each page sent a second navbar, phone menu and footer (72 KB raw on Home). Making the footer, the brand, the links, the search button, the settings and each phone-menu group with React's `cache()` lets Flight write the second copy as references (`writtenObjects` in `renderModelDestructive`); 17 KB was left. The rail must keep its own groups: `SidebarGroup`'s `useId` label would repeat in the rail and the open drawer.
+- **One class for what Home repeats.** `.docs-chip`, `.docs-kind`, `.docs-quiet-link` and `.docs-icon-link` in `globals.css`, each an `@apply` of the same utilities from `topclassui/classes`, in place of the 670-character list on each of the 46 chips and the 521-character one on each of the 21 footer links, written once in the markup and again in the payload.
+
+**What they cut.** Home `/en`: 680,374 to 524,635 bytes raw, 63,287 to 54,526 gzip; `/ar` 689,352 to 532,940 raw, 67,679 to 57,949 gzip; every page lost 4 to 8 KB gzip from the shell (`/en/docs/css` 39,103 to 34,470). By section on `/en` (markup plus payload, raw): the not-found copy -54.9 KB, the catalog chips -67.0 KB, the footer -25.1 KB, the navbar and phone menu -5.0 KB. The site CSS grows 4.4 KB raw, 531 bytes gzip. The decoded not-found and page trees were identical to main's, the markup identical but for `useId` numbers, and every computed style of the re-classed links identical at rest, hovered, focused and under a coarse pointer.
+
+**Measured.** `measure.sh`, median of 5 interleaved runs, both changes against main:
+
+```
+/en                          base: perf 94 FCP 1.36s LCP 3.12s SI 1.36s TBT 33 CLS 0.000 | JS 295KB CSS 30KB font 71KB doc 62KB
+/en                          cand: perf 93 FCP 1.36s LCP 3.14s SI 1.94s TBT 40 CLS 0.000 | JS 295KB CSS 30KB font 71KB doc 54KB
+/ar                          base: perf 83 FCP 2.41s LCP 4.21s SI 2.41s TBT 56 CLS 0.000 | JS 295KB CSS 30KB font 265KB doc 67KB
+/ar                          cand: perf 83 FCP 2.41s LCP 4.21s SI 2.41s TBT 45 CLS 0.000 | JS 295KB CSS 30KB font 265KB doc 57KB
+```
+
+On every quiet run Speed Index equals FCP in both builds, 1.36 s on `/en` and 2.41 s on `/ar`; the `/en` 1.94 s is three candidate runs slowed by other builds on the laptop (observed Speed Index 0.7 to 2.2 s against 0.25 s). A review rebuilt both changes and measured them twice more, with an A/A run of the unchanged branch for scale. Where the load left a run alone, FCP was the same on both sides: 1.36 s on `/en`, 2.42 to 2.44 s on `/ar`; the second run's `/en` candidate median of 1.63 s is five loaded runs (observed FCP 0.9 to 2.4 s). The Speed Index medians swung both ways with the laptop's load: `/en` 1.75 to 1.66 s, then 2.35 to 4.37 s; `/ar` 3.42 to 3.18 s, then 3.28 to 2.47 s. The A/A run alone gave `/en` 1.56 against 2.84 s.
+
+**Why the paint does not move.** Lantern downloads the document alone, then the CSS, in TCP round trips of 150 ms that carry 14.6 KB, then 29.2 KB, then 30.7 KB at 1.6 Mbps. A document of 43.8 to 74.5 KB takes two round trips after its first byte, whatever its size inside that range, and Speed Index is never below FCP. The saved runs show the step: `/en/docs/installation` (38 KB) paints at 1.21 s, Home and the Button page (58 to 64 KB) at 1.36 s. Home would need about 11 KB gzip more: making every class string over 60 characters short, nearly all of them the library's, reaches 43.4 KB. On Vercel, which sends brotli, Home `/en` is 44.9 KB today and these changes would bring it to about 42.8 KB, just under the line with its headers; that was not measured.
+
+**Not done.** A `<use>` sprite for the repeated icons: the copies after the first of each repeated SVG on Home are 17 KB raw and 0.7 KB gzip, most of them inside library parts, and the 2026-09-21 entry keeps `<Icon>`. An `@apply` on a selector list (`.docs-chip, .docs-quiet-link, …`) is wrong: the minified CSS kept `outline-style: solid` only for `[data-focus-visible]`, so a focused link lost its ring.
+
+**Affects.** Nothing ships. The not-found page still renders through `SitePage` as docs-site page 20 asks; a client `notFound()` hangs the main thread on main as on the branch, a path the site never takes.
 
 ## 2026-10-22 - Only main creates a Vercel deployment
 
