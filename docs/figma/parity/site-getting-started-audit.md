@@ -6,13 +6,13 @@ Each row of cloud-reports/audit-r11/getting-started.md (on cloud/audit-r11) with
 
 | # | Row | Status |
 |---|---|---|
-| 1 | navbar, search trigger border | fixed, 3260f1d2 (SEARCH_TRIGGER takes border-line; dfc90103 had changed only the size) |
+| 1 | navbar, search trigger border | fixed, 3260f1d2, and the same line landed in c7c65f16 (job 140's card shell); the merge keeps c7c65f16's constant. dfc90103 had changed only the size |
 | 2 | tab cards, header row | fixed, aa83e64c (code-tabs LIST w-full max-w-none) |
 | 3 | tab cards, copy button | fixed, aa83e64c (showCopy={false} in both tab blocks, the 3rem pre padding dropped) |
 | 4 | navbar height | already fixed, dfc90103 (min-h-14.5) |
 | 5 | sidebar rows | already fixed for the 29/31 px pitch, dfc90103 (RAIL 1.8125rem); the 14 px text (SIDE_LINK TYPE.nav) is shared, job 150 |
 | 6 | table column widths | fixed, aa83e64c (`<Widths>` around the two tables: 15.5/10.2 and 24.6/10.2 %) |
-| 7 | icon-registry breaks at its hyphen | fixed, aa83e64c (plain text in the prose cell, as drawn) |
+| 7 | icon-registry breaks at its hyphen | fixed, aa83e64c (plain text in the prose cell, as drawn); c7c65f16 also keeps code in a cell whole (AUTHORED_CELL) |
 | 8 | React without Next.js, one block | kept: src/icons.ts is compiled under `check` (scripts/samples.test.ts); one fence would compile vite.config.ts against vite, @vitejs/plugin-react and @tailwindcss/vite, which the docs app does not install. The file-name headers are recorded (docs-site.md:493) |
 | 9 | tab cards, tab size | fixed, aa83e64c (TabsTab h-9.25 px-3.5) |
 | 10 | navbar inline padding | already fixed, dfc90103 |
@@ -23,7 +23,7 @@ Each row of cloud-reports/audit-r11/getting-started.md (on cloud/audit-r11) with
 | 15 | sidebar rest-row colour | shared, job 150 (SIDE_LINK.rest) |
 | 16 | On this page offset | shared, job 150 (on-this-page.tsx) |
 | 17 | footer, Get started and chips | shared, job 150 (site-footer.tsx, labels) |
-| 18 | tables, row height | shared, job 150 (PROSE_CELL in classes.ts serves every guide table) |
+| 18 | tables, row height | already fixed, c7c65f16 (PROSE_CELL on a 17 px line) |
 | 19 | tables, cell fonts | fixed, aa83e64c (framework names in mono; ref, inset-s-*, Icon, icon-registry plain). Kept: the three package names stay mono, the frame draws react-dom mono and the other two plain; PeerRange keeps the table's code size (shared PROSE_CELL scale) |
 | 20 | code block header icon | shared, job 150 (CodeBlock hard-codes the terminal icon: a library prop) |
 | 21 | code block line pitch | shared, job 150 (globals.css .docs-code) |
