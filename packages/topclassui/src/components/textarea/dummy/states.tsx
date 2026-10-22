@@ -1,13 +1,13 @@
 import { Textarea } from '../index.js'
 
 /** The ring a focused field wears, drawn at rest so the strip can show it; not under forced colours, where a ring at rest would read as focus. */
-const RING = 'w-32 resize-none not-forced-colors:outline-solid not-forced-colors:outline-(length:--tc-ring-width) not-forced-colors:outline-offset-(length:--tc-ring-offset) not-forced-colors:outline-ring'
+const RING = 'w-32 max-w-full resize-none not-forced-colors:outline-solid not-forced-colors:outline-(length:--tc-ring-width) not-forced-colors:outline-offset-(length:--tc-ring-offset) not-forced-colors:outline-ring'
 
 /** The field the frame draws in each cell: 128 px, with no grip. */
-const CELL = 'w-32 resize-none'
+const CELL = 'w-32 max-w-full resize-none'
 
 /** The line a hovered field draws, at rest, on the frame's 128 px field. */
-const HOVER = 'w-32 resize-none border-body'
+const HOVER = 'w-32 max-w-full resize-none border-body'
 
 /** The frame's strip, one cell a state named by its aria-label; the counted field wears a wrapper, so a group names its cell. */
 export default function Demo() {
