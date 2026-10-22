@@ -66,7 +66,7 @@ const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { 
 
 describe('every demo is a Server Component that only hands the client parts what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'collapsed', 'groups', 'in-a-layout', 'long-list', 'playground', 'rtl', 'states'])
+    expect(names).toEqual(['basic', 'collapsed', 'groups', 'in-a-layout', 'long-list', 'playground', 'rtl', 'stage', 'states'])
   })
 
   it('leaves out the one demo that is a client file, which cannot run here: it calls useState', async () => {
@@ -115,7 +115,9 @@ describe('the parts a demo is built from', () => {
     expect(handed).toEqual({
       'basic': [{}], 'collapsed': [{ defaultOpen: false }], 'groups': [{}], 'in-a-layout': [{}], 'long-list': [{}],
       // The Try it rail hands on what the controls pass, which is nothing until one is set.
-      'playground': [{ defaultOpen: undefined, open: undefined, className: 'h-auto rounded-box border-(length:--tc-line-width) data-open:w-47.5' }], 'rtl': [{}],
+      'playground': [{ defaultOpen: undefined, open: undefined }], 'rtl': [{}],
+      // The frame's stage: a 190 px card rail, the caller's className.
+      'stage': [{ className: 'h-auto rounded-box border-(length:--tc-line-width) data-open:w-47.5' }],
       'states': [
         { 'aria-label': 'expanded', 'defaultOpen': true, 'className': 'data-open:w-40 rounded-box border-(length:--tc-line-width)' },
         { 'aria-label': 'collapsed', 'defaultOpen': false, 'className': 'data-open:w-40 rounded-box border-(length:--tc-line-width)' },

@@ -9,7 +9,7 @@ import { Skeleton } from 'topclassui/skeleton'
 import { PLAYGROUNDS } from '../../.generated/playgrounds'
 import type { Control } from '../../lib/components'
 import { type PropValue, type Usage, changedProps, snippetOf } from '../../lib/usage'
-import { CHECK_LABEL, CHECK_ROW, CODE_PART, CONTROL, CONTROL_LABEL, CONTROL_RESERVE, FLAT_CODE, H3, PART_ROW, PLAY_ROW, STAGE, STAGE_OPEN, STAGE_RESERVE, TRY_IT } from '../classes'
+import { CODE_CAPTION, CHECK_LABEL, CHECK_ROW, CODE_PART, CONTROL, CONTROL_LABEL, CONTROL_RESERVE, FLAT_CODE, H3, PART_ROW, PLAY_ROW, STAGE, STAGE_OPEN, STAGE_RESERVE, TRY_IT } from '../classes'
 import { CopyButton } from './copy-button'
 import { ModeScope } from './previewer-mode'
 import { TryItControl } from './try-it-control'
@@ -36,6 +36,8 @@ export interface PlaygroundIslandProps {
   restSource: string
   usage: Usage | null
   note: ReactNode
+  /** The frame's one-line caption over the code, in place of THE CODE. */
+  codeCaption?: string | undefined
   labels: { tryIt: string; theCode: string; copyCode: string; copy: string; copied: string; copyFailed: string }
 }
 
@@ -48,7 +50,7 @@ const startOf = (controls: Control[]) => Object.fromEntries(controls.flatMap((co
 })) as Record<string, PropValue>
 
 export function PlaygroundIsland(props: PlaygroundIslandProps) {
-  const { slug, locale, controls, descriptions, stageHeight, stageOpen, serverStage, stageIsPlayground, restCode, restSource, usage, note, labels } = props
+  const { slug, locale, controls, descriptions, stageHeight, stageOpen, serverStage, stageIsPlayground, restCode, restSource, usage, note, codeCaption, labels } = props
   const idBase = useId()
   const row = useRef<HTMLDivElement>(null)
   const near = useNearViewport(row)
@@ -99,7 +101,7 @@ export function PlaygroundIsland(props: PlaygroundIslandProps) {
       </ModeScope>
       <div className={CODE_PART}>
         <div className={PART_ROW}>
-          <h3 className={H3}>{labels.theCode}</h3>
+          <h3 className={codeCaption === undefined ? H3 : CODE_CAPTION}>{codeCaption ?? labels.theCode}</h3>
           <CopyButton text={shown ?? restSource} label={labels.copyCode} word={labels.copy} copied={labels.copied} failed={labels.copyFailed} />
         </div>
         {shown === null ? restCode : <CodeBlock lang="tsx" title={`${slug}.tsx`} labels={copy} showCopy={false} className={FLAT_CODE}>{shown}</CodeBlock>}

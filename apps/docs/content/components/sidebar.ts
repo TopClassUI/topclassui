@@ -11,6 +11,7 @@ export const sidebar = {
   },
   demos: ['basic', 'groups', 'collapsed', 'controlled', 'in-a-layout', 'long-list', 'rtl'],
   stageHeight: 19.4,
+  stageDemo: 'stage',
   controlOrder: ['defaultOpen'],
   controlsHidden: ['open'],
   note: {
