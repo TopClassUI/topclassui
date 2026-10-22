@@ -13,13 +13,13 @@ const HOVER = 'w-32 max-w-full resize-none border-body'
 export default function Demo() {
   return (
     <div className="flex flex-wrap items-start gap-6">
-      <Textarea className={CELL} rows={2} placeholder="Message" aria-label="idle" />
-      <Textarea className={HOVER} rows={2} defaultValue="Message" aria-label="hover" />
-      <Textarea className={RING} rows={2} defaultValue="Message" aria-label="focus-visible" />
-      <Textarea className={CELL} rows={2} disabled placeholder="Message" aria-label="disabled" />
-      <Textarea className={CELL} rows={2} invalid defaultValue="Message" aria-label="invalid" />
+      <Textarea className={CELL} rows={1} placeholder="Message" aria-label="idle" />
+      <Textarea className={HOVER} rows={1} defaultValue="Message" aria-label="hover" />
+      <Textarea className={RING} rows={1} defaultValue="Message" aria-label="focus-visible" />
+      <Textarea className={CELL} rows={1} disabled defaultValue="Message" aria-label="disabled" />
+      <Textarea className={CELL} rows={1} invalid defaultValue="Message" aria-label="invalid" />
       <div role="group" aria-label="at limit">
-        <Textarea className={CELL} rows={2} showCount maxLength={7} defaultValue="Message" aria-label="Message at its limit" />
+        <Textarea className={CELL} rows={1} showCount maxLength={7} defaultValue="Message" aria-label="Message at its limit" />
       </div>
     </div>
   )

@@ -10,7 +10,7 @@ export const textarea = {
     ar: 'مربع نص أصلي على الخادم؛ التمدد التلقائي والعدّاد الحي هما الجزآن الوحيدان في المتصفح.',
   },
   demos: ['basic', 'autosize', 'show-count', 'sizes', 'form', 'row', 'long-content', 'skeleton', 'rtl'],
-  stageHeight: 10,
+  stageHeight: 21,
   stageDemo: 'stage',
   controlOrder: ['size', 'maxRows', 'autosize', 'showCount', 'disabled', 'invalid'],
   controlsHidden: ['fullWidth', 'rows'],
