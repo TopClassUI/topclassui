@@ -95,6 +95,7 @@ const DECLARATION: Record<string, string> = {
   'text-xs': 'font-size: var(--text-xs);',
   'text-muted': 'color: var(--tc-muted);',
   'group-data-highlighted:text-inherit': 'color: inherit;',
+  'group-data-[tone=danger]:text-inherit': 'color: inherit;',
   // The group label and the separator.
   'py-1.5': 'padding-block: calc(var(--spacing) * 1.5);',
   'font-medium': 'font-weight: var(--font-weight-medium);',
@@ -109,6 +110,7 @@ const SCOPE: Record<string, string> = {
   'focus-visible:outline-solid': ':focus-visible {',
   'focus-visible:-outline-offset-(length:--tc-ring-width)': ':focus-visible {',
   'data-highlighted:bg-primary-soft': '[data-highlighted] {',
+  'group-data-[tone=danger]:text-inherit': ':is(:where(.group)[data-tone="danger"] *) {',
   'data-highlighted:bg-danger-soft': '[data-highlighted] {',
   'data-highlighted:text-danger-on-soft': '[data-highlighted] {',
   'data-disabled:pointer-events-none': '[data-disabled] {',
@@ -161,7 +163,7 @@ describe('every class an open Dropdown wears compiles with the installed Tailwin
       DROPDOWN_SHORTCUT, DROPDOWN_GROUP, DROPDOWN_GROUP_LABEL, DROPDOWN_SEPARATOR,
     ])
     expect(all).toEqual([...Object.keys(DECLARATION), 'group'].sort())
-    expect(all).toHaveLength(80)
+    expect(all).toHaveLength(81)
   })
 
   it('group emits nothing of its own: it only marks the row for the shortcut inside it', async () => {
