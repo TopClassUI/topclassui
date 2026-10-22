@@ -23,10 +23,6 @@ export interface BreadcrumbProps
   items: readonly BreadcrumbItem[]
   /** The element every crumb link is cloned from, such as `link={<Link href="" />}`; its href is replaced with the item's. */
   link?: ReactElement | undefined
-  /** Draw the first crumb as a house icon; its label is still read by a screen reader. */
-  showHome?: boolean | undefined
-  /** Fold a longer trail to the first crumb, three dots and the last `maxItems - 1`; clamped to 2..100. The JSON-LD keeps every crumb. */
-  maxItems?: number | undefined
   /** The built-in strings; the nav is named by `labels.breadcrumb.label`. Defaults to English. */
   labels?: Labels | undefined
   /** Accepted so `{...getLabels(locale)}` spreads cleanly. Nothing here formats a number, so it is not used and never reaches the element. */

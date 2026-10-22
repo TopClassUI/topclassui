@@ -109,6 +109,18 @@ test('a live example hydrates: a segmented control in the examples answers a cli
   await expect(radios.nth(1)).toHaveAttribute('aria-checked', 'true')
 })
 
+test('Kbd: Try it presses and disables the three keys of the frame', async ({ page }) => {
+  await page.goto('/en/docs/components/kbd')
+  const kbd = card(page, 'kbd')
+  const stage = kbd.locator('[style*="--tc-stage-height"]').first()
+  await expect(stage.locator('kbd')).toHaveText(['Ctrl', 'Shift', 'K'])
+  await kbd.getByRole('checkbox', { name: 'pressed' }).click()
+  await expect(stage.locator('kbd[data-pressed]')).toHaveCount(3)
+  await kbd.getByRole('checkbox', { name: 'disabled' }).click()
+  await expect(stage.locator('kbd[data-disabled]')).toHaveCount(3)
+  await expect(kbd.locator('pre').first()).toContainText('<Kbd pressed disabled>')
+})
+
 test('Kbd: the keys of an English sentence keep its order on the Arabic page', async ({ page }) => {
   await page.goto('/ar/docs/components/kbd')
   const sentences = page.locator('section[aria-labelledby="examples"] p', { hasText: 'Press' })

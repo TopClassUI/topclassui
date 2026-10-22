@@ -27,7 +27,7 @@ export const contentSchema = z.strictObject({
   codeDemo: z.string().min(1).optional(),
   /** A one-line caption the frame writes over THE CODE in place of its heading (S8). */
   codeCaption: both.optional(),
-  /** Boolean props the schema leaves to the element (a native `disabled`) that Try it still offers, as the frame draws them. */
+  /** Booleans the schema does not hold that Try it still offers, as the frame draws them: a native `disabled`, or a part the playground adds (Card's footer). */
   extraSwitches: z.array(z.string().regex(/^[a-z][A-Za-z]*$/)).optional(),
   /** Props Try it lists first, in the frame's order; the rest follow in the schema's. */
   /** Where Try it starts a prop the playground sets in its body rather than its signature, so the control shows what the stage draws. */

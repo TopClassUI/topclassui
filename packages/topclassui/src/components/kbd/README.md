@@ -34,8 +34,8 @@ Every prop below is optional and falls back to the default shown.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
-| `disabled` | no | `boolean` | - | The key does nothing here: muted text on the surface with the decorative line, still 4.5:1. |
-| `pressed` | no | `boolean` | - | The key is held down: the cap drops from the raised surface to the surface below it. |
+| `disabled` | no | `boolean` | `false` | The key does nothing here: muted text on the surface with the decorative line, still 4.5:1. |
+| `pressed` | no | `boolean` | `false` | The key is held down: the cap drops from the raised surface to the surface below it. |
 
 Anything else is passed to the root element, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 
@@ -44,6 +44,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/combination.tsx`
 - `dummy/keys.tsx`
 - `dummy/nested.tsx`
+- `dummy/playground.tsx`
 - `dummy/rtl.tsx`
 - `dummy/stage.tsx`
 - `dummy/states.tsx`

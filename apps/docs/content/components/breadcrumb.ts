@@ -12,6 +12,7 @@ export const breadcrumb = {
   demos: ['basic', 'all-links', 'long-trail', 'long-label', 'mixed-label', 'deep-trail', 'rtl'],
   stageHeight: 15.6,
   stageDemo: 'basic',
+  controlOrder: ['maxItems', 'showHome'],
   note: {
     en: 'Leave href off the last item: it becomes the current page, and the linked items also emit the BreadcrumbList JSON-LD.',
     ar: 'اترك href عن العنصر الأخير ليصبح الصفحة الحالية. العناصر ذات الروابط تُكتب أيضًا في BreadcrumbList بصيغة JSON-LD.',

@@ -73,7 +73,8 @@ export function ProductFrame({ locale, labels }: { locale: Locale; labels: SiteL
               <p className="text-xs text-muted">{frame.count(CARDS.length)}</p>
             </div>
             <AdornedInput icon="magnifying-glass" className="max-md:hidden">
-              <Input type="search" size="sm" aria-label={frame.search} placeholder={frame.search} className={ROOM.start} />
+              {/* A fixed width: an input sized by its font's character width moves when Noto Sans Arabic swaps in. */}
+              <Input type="search" size="sm" aria-label={frame.search} placeholder={frame.search} className={`w-56 ${ROOM.start}`} />
             </AdornedInput>
             <Button size="sm" variant="outline" tone="neutral"><Icon name="funnel" />{frame.filter}</Button>
             <Button size="sm"><Icon name="plus" />{frame.add}</Button>
