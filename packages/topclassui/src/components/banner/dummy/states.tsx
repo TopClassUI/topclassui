@@ -17,8 +17,8 @@ export default function Demo() {
       <div className={CELL}><Banner tone="info" aria-label="info" className={CHIP} icon={<Svg icon={info} size="0.8125rem" />}>info</Banner></div>
       <div className={CELL}><Banner tone="warning" aria-label="warning" className={CHIP} icon={<Svg icon={warning} size="0.8125rem" />}>warning</Banner></div>
       <div role="group" aria-label="dismissed" className={cn(CELL, 'grid-flow-col justify-center gap-1.5 font-mono text-xs text-muted')}>
-        <Svg icon={x} size="0.875rem" className="opacity-40" />
-        <span aria-hidden className="opacity-40">hidden</span>
+        <Svg icon={x} size="0.875rem" />
+        hidden
       </div>
     </div>
   )

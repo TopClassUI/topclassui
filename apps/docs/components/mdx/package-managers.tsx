@@ -24,7 +24,7 @@ export async function PackageManagers({ locale, label }: { locale: Locale; label
   const tabs = lines.map((entry, index) => ({
     name: entry.manager,
     value: entry.manager,
-    panel: <CodeBlock className={DOCS_CODE} {...getLabels(locale)} lang="bash" title={entry.manager} highlighted={highlighted[index] ?? undefined}>{entry.line}</CodeBlock>,
+    panel: <CodeBlock className={DOCS_CODE} {...getLabels(locale)} lang="bash" title={entry.manager} showCopy={false} highlighted={highlighted[index] ?? undefined}>{entry.line}</CodeBlock>,
   }))
   return <CodeTabs label={label} tabs={tabs} />
 }
