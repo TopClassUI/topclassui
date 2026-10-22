@@ -18,7 +18,7 @@ export default function Demo() {
       <Textarea className={RING} rows={1} defaultValue="Message" aria-label="focus-visible" />
       <Textarea className={CELL} rows={1} disabled defaultValue="Message" aria-label="disabled" />
       <Textarea className={CELL} rows={1} invalid defaultValue="Message" aria-label="invalid" />
-      <div role="group" aria-label="at limit">
+      <div role="group" aria-label="at limit" className="min-w-0 max-w-full">
         <Textarea className={CELL} rows={1} showCount maxLength={7} defaultValue="Message" aria-label="Message at its limit" />
       </div>
     </div>
