@@ -6,18 +6,6 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
-## 2026-10-22 - The site preloads Noto Sans Arabic on every page, against PLAN 14
-
-**Decision.** `apps/docs/lib/fonts.ts` preloads Noto Sans Arabic (`preload: true`), where PLAN 14 preloaded Inter only. The Home frame's search field takes a fixed `w-56` instead of a width sized by its font.
-
-**Why.** Since the library's `[lang|='ar']` rule (2026-10-22, `--tc-font-sans: var(--tc-font-arabic)`), every `/ar` page sets its text in Noto Sans Arabic. Unpreloaded, it arrives after the first paint, and the swap grew the Arabic hero h1 from 185 to 257 px: a layout shift of 0.004 to 0.0097 on `/ar`, which `e2e/motion.spec.ts` holds at 0 for boxes. With the preload the font is ready before the first paint. The one box still moving was the search input in Home's product frame, sized by its font's character width (223 to 218 px, 0.0000058); a fixed width ends that. next/font keys its preload list by the module that imports the font, not by the route's params, and `/en` and `/ar` render from the same `app/(site)/[locale]/layout.tsx`, so the preload cannot be scoped to `/ar` without splitting the route tree.
-
-**Cost.** One more preloaded file on every page, `/en` included: the Noto Sans Arabic woff2 of 166,152 bytes (162.3 KiB, one variable file for the 400, 500 and 600 weights), beside Inter's 48,432 and Geist Mono's 23,108 bytes, from the build's `next-font-manifest.json`.
-
-**What it affects.** `apps/docs` only: `lib/fonts.ts`, `components/home/product-frame.tsx`. `motion.spec.ts` `/ar` and `/en` pass three times over.
-
----
-
 ## 2026-10-22 - Right to left keeps the full Arabic plural sample, and a checked fence may show only its drawn lines
 
 **Decision.** "Type, plurals and digits" on the Right to left guide keeps the five-branch `Intl.PluralRules` sample (zero, one, two, few, many and the rest) instead of the frame's one-line ternary (183:1245). Elsewhere a guide fence marked `check` may carry `show="a-b"`: the page shows those lines, dedented, and Copy copies them, while the sample check still compiles the whole fence.
