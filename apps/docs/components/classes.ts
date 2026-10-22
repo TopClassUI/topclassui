@@ -18,10 +18,10 @@ const QUIET = `inline-flex items-center ${HOVER.link} ${FOCUS_RING} ${TOUCH_TARG
 /** A quiet link in the footer or On this page. */
 export const QUIET_LINK = `${QUIET} text-muted`
 
-/** An On this page entry: the section being read in the primary text and heavier, so colour is not the only cue. */
+/** An On this page entry: the section being read in the primary text and heavier, so colour is not the only cue; 4 px above and below, so a wrapped entry keeps its distance. */
 export const TOC_LINK = {
-  current: `${QUIET} font-medium text-primary-on-soft`,
-  rest: QUIET_LINK,
+  current: `${QUIET} py-1 font-medium text-primary-on-soft`,
+  rest: `${QUIET_LINK} py-1`,
 } as const
 
 /** The small capitals over a list: a sidebar group, On this page, a pager card. Arabic has no case. */
@@ -80,18 +80,18 @@ export const TILE = {
 /** Inline code in prose and table cells: Latin, left to right, inside an Arabic sentence too. Mono on the text's own ground, as the docs frames draw it. */
 export const INLINE_CODE = 'font-mono text-sm text-body'
 
-/** Inline code in a prose paragraph or list: mono in the paragraph's own muted colour, so it never outshines the sentence. */
-export const PROSE_CODE = 'font-mono text-sm text-muted'
+/** Inline code in a prose paragraph or list: the sentence's own face and size in its muted colour, as the guide frames draw it; left to right inside Arabic. */
+export const PROSE_CODE = 'text-muted'
 
 /** A guide table as the docs frames draw it: the body rows on the surface, and every row shown, with no scroll inside. */
 export const PROSE_TABLE = 'bg-surface max-h-none'
 
 /** A cell of a guide table: muted, regular, 13 px on the drawn 17 px line and top-aligned. The header row is the one at aria-rowindex 1, on the page and body-coloured. */
 const PROSE_CELL = 'px-3.5 py-3 align-top text-[0.8125rem]/[1.0625rem] font-normal text-muted in-aria-[rowindex=1]:bg-page in-aria-[rowindex=1]:text-body'
-/** The header row on the frames' 38 px: over code, 11 px mono and regular; over a prose column, 14 px semibold. */
+/** The header row: 14 px semibold on a 17 px line, as the getting-started frames draw every column; a Foundations guide (data-group, the page's group) draws the header over code in 11 px mono on the frames' 38 px. */
 const PROSE_HEAD = {
-  code: 'in-aria-[rowindex=1]:font-mono in-aria-[rowindex=1]:text-[0.6875rem]/3.5',
-  prose: 'in-aria-[rowindex=1]:text-sm/3.5 in-aria-[rowindex=1]:font-semibold',
+  code: 'in-aria-[rowindex=1]:text-sm/[1.0625rem] in-aria-[rowindex=1]:font-semibold in-data-[group=foundations]:in-aria-[rowindex=1]:font-mono in-data-[group=foundations]:in-aria-[rowindex=1]:text-[0.6875rem]/3.5 in-data-[group=foundations]:in-aria-[rowindex=1]:font-normal',
+  prose: 'in-aria-[rowindex=1]:text-sm/[1.0625rem] in-aria-[rowindex=1]:font-semibold in-data-[group=foundations]:in-aria-[rowindex=1]:text-sm/3.5',
 } as const
 
 /** How a column of a guide table lays out: sized to its content on one line, or wrapping above a floor, so a phone scrolls the table instead of stacking one word per line. */
@@ -168,6 +168,8 @@ export const PREVIEWER_TITLE = 'text-lg/tight font-semibold text-body'
 export const PREVIEWER_TITLE_LINK = `inline-flex items-center rounded-control text-body underline-offset-4 ${HOVER.link} ${FOCUS_RING} ${TOUCH_TARGET}`
 export const PREVIEWER_DESCRIPTION = 'text-sm/tight text-muted'
 export const H3 = 'text-xs/3 font-medium text-muted uppercase'
+/** A card's own one-line caption in place of THE CODE: 10 px medium in sentence case. */
+export const CODE_CAPTION = 'text-[0.625rem]/3 font-medium text-muted'
 /** A part caption the frames write in sentence case: Every state, Copy the source, Then import it. */
 export const CAPTION = 'text-xs/3 font-medium text-muted'
 export const PROSE = 'text-base text-body'
