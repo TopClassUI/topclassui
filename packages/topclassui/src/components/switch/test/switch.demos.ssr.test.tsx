@@ -17,7 +17,7 @@ const EXPECTED = ['basic', 'combined', 'form', 'playground', 'rtl', 'sizes', 'st
 const SWITCHES: Record<string, string[]> = {
   'basic': ['Weekly digest: true', 'Email me when I am mentioned: false'],
   'form': ['Weekly digest: true'],
-  'playground': ['Weekly digest: true'],
+  'playground': ['Weekly digest: false'],
   'rtl': ['الملخص الأسبوعي: true', 'راسلني عند الإشارة إليّ: false'],
   'sizes': ['Extra small: true', 'Small: true', 'Medium: true', 'Large: true', 'Extra large: true'],
   'combined': ['Off: false', 'On: true', 'Invalid: false', 'Invalid, on: true', 'Disabled: false', 'Disabled, on: true', 'Read-only: true'],
