@@ -10,9 +10,10 @@ import { DEFAULT_CODE, DEFAULT_LINE, PROSE_COLUMN, PROSE_TABLE, TABLE_CODE } fro
 /** A props table from the component's own types, through the README generator (docs-site page 5). Every row shows: the page scrolls, not the table. */
 export function PropsTable({ locale, labels }: { of: 'TopClassProvider'; locale: Locale; labels: SiteLabels }) {
   const { prop, type, default: fallback, description, required } = labels.blocks.props
-  const code = (text: string) => <code dir="ltr" className={TABLE_CODE}>{text}</code>
+  // The frame sets types and defaults at 10.5 px, so a default breaks at its spaces inside the drawn 115 px column.
+  const code = (text: string) => <code dir="ltr" className={`${TABLE_CODE} text-[0.6875rem]`}>{text}</code>
   const lines = (text: string) => (
-    <code dir="ltr" className={DEFAULT_CODE}>
+    <code dir="ltr" className={`${DEFAULT_CODE} text-[0.6875rem]`}>
       {defaultLines(text).map((line, at) => <span key={line} className={at === 0 ? DEFAULT_LINE.first : DEFAULT_LINE.rest}>{line}</span>)}
     </code>
   )
@@ -28,8 +29,8 @@ export function PropsTable({ locale, labels }: { of: 'TopClassProvider'; locale:
         // The frame draws the names as plain muted text and the columns at 115 / 322 / 115 of its 944 px.
         { key: 'prop', header: prop, rowHeader: true, className: `${PROSE_COLUMN.fit} w-[12%]`, cell: (row: ProviderPropRow) => <span dir="ltr">{row.name}</span> },
         { key: 'type', header: type, className: `${PROSE_COLUMN.wrap} w-[34%]`, cell: (row: ProviderPropRow) => code(row.type) },
-        { key: 'default', header: fallback, className: `${PROSE_COLUMN.fit} w-[12%]`, cell: (row: ProviderPropRow) => (row.required ? required : lines(row.default)) },
-        { key: 'description', header: description, className: PROSE_COLUMN.prose, cell: (row: ProviderPropRow) => labels.providerProps[row.name] ?? '' },
+        { key: 'default', header: fallback, className: `${PROSE_COLUMN.wrap} w-[12%]`, cell: (row: ProviderPropRow) => (row.required ? required : lines(row.default)) },
+        { key: 'description', header: description, className: `${PROSE_COLUMN.prose} w-[41.5%]`, cell: (row: ProviderPropRow) => labels.providerProps[row.name] ?? '' },
       ]}
     />
   )
