@@ -246,6 +246,25 @@ describe('snippetOf', () => {
   })
 })
 
+describe('snippetOf, a spread on every part', () => {
+  it('writes the values on the one part that spreads them', () => {
+    const usage = { imports: [], jsx: '<div className="flex">\n  <Select items={COUNTRIES} {...props} />\n</div>', passed: [] }
+    expect(snippetOf(usage, [['size', 'sm']])).toBe('<div className="flex">\n  <Select items={COUNTRIES} size="sm" />\n</div>')
+  })
+
+  it('writes the values on every part that spreads them, and drops every spread at rest', () => {
+    const usage = { imports: [], jsx: '<div>\n  <Kbd {...props}>Ctrl</Kbd>\n  <Kbd {...props}>Shift</Kbd>\n  <Kbd size="md" {...props}>K</Kbd>\n</div>', passed: [] }
+    expect(snippetOf(usage, [['size', 'sm'], ['pressed', true]])).toBe('<div>\n  <Kbd size="sm" pressed>Ctrl</Kbd>\n  <Kbd size="sm" pressed>Shift</Kbd>\n  <Kbd size="sm" pressed>K</Kbd>\n</div>')
+    expect(snippetOf(usage, [])).toBe('<div>\n  <Kbd>Ctrl</Kbd>\n  <Kbd>Shift</Kbd>\n  <Kbd size="md">K</Kbd>\n</div>')
+  })
+
+  it('writes the values on a part nested inside another, and resolves a read of a prop to its value or its fallback', () => {
+    const usage = { imports: [], jsx: "<div className={box[props.orientation ?? 'horizontal']}>\n  <Separator {...props} />\n  {withLabel && <Separator {...props} className=\"x\">or</Separator>}\n</div>", passed: [] }
+    expect(snippetOf(usage, [['orientation', 'vertical']])).toBe("<div className={box['vertical']}>\n  <Separator orientation=\"vertical\" />\n  {withLabel && <Separator orientation=\"vertical\" className=\"x\">or</Separator>}\n</div>")
+    expect(snippetOf(usage, [])).toBe("<div className={box['horizontal']}>\n  <Separator />\n  {withLabel && <Separator className=\"x\">or</Separator>}\n</div>")
+  })
+})
+
 describe('cleanSourceOf', () => {
   it('takes the docs plumbing out of a demo shown whole', () => {
     const source = [
