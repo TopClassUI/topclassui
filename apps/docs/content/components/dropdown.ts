@@ -3,13 +3,13 @@ export const dropdown = {
   slug: 'dropdown',
   title: { en: 'Dropdown menu', ar: 'قائمة منسدلة' },
   description: {
-    en: 'Menu whose link items render real anchors, so open-in-new-tab and middle-click work.',
+    en: 'Menu whose links render real anchors, so open-in-new-tab and middle-click work.',
     ar: 'قائمة تُعرض عناصر روابطها روابطَ حقيقية، فيعمل الفتح في علامة تبويب جديدة والنقر بالزر الأوسط.',
   },
   demos: ['basic', 'groups', 'danger-item', 'with-links', 'data-driven', 'placements', 'sixty-items', 'in-dialog', 'rtl'],
   stageHeight: 19.4375,
   controlOrder: ['placement'],
-  controlsHidden: ['delay', 'closeDelay'],
+  controlsHidden: ['delay', 'closeDelay', 'tone'],
   stageOpen: true,
   note: {
     en: '`href` and Server Action items work from a server page; `onSelect` is a plain function and needs a client file.',

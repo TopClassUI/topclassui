@@ -32,8 +32,8 @@ const TRIGGERS: Record<string, string[]> = {
   'playground': ['Actions'],
   'rtl': ['الإجراءات', 'المزيد'],
   'sixty-items': ['Time zone'],
-  // One trigger per cell: closed, open and a disabled row. The two open menus mount in the browser only.
-  'states': ['Actions', 'Actions', 'Actions', 'Actions'],
+  // Only the closed cell holds a trigger: the open, hover and disabled cells are pictures.
+  'states': ['Actions'],
   'with-links': ['Help'],
 }
 
@@ -94,10 +94,11 @@ describe('every demo renders on the server', () => {
       expect(html, file).not.toContain('role="separator"')
     })
 
-    it(`${file}.tsx serves no anchor and no svg: every row, link and icon is inside the closed menu`, async () => {
+    it(`${file}.tsx serves no anchor and no svg: every row, link and icon is inside the closed menu, but for the drawn trigger and pictures`, async () => {
       const html = await render(file)
       expect(html.match(/<a[\s>]/g) ?? [], file).toEqual([])
-      expect(html.match(/<svg[\s>]/g) ?? [], file).toEqual([])
+      // The frame's trigger carries its dots, and the states strip draws three open menus as pictures, two rows each, each row with its icon.
+      expect((html.match(/<svg[\s>]/g) ?? []).length, file).toBe(({ playground: 1, states: 7 } as Record<string, number>)[file] ?? 0)
     })
   }
 })

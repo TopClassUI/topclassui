@@ -27,7 +27,8 @@ const SHOWN: Record<string, (string | null)[]> = {
   ],
   'playground': ['Copy link'],
   'rtl': ['نسخ الرابط', 'حذف هذا الصف'],
-  'states': ['Copy link', 'Top', 'Bottom'],
+  // The top and bottom cells are inert pictures a reader never meets: the hidden cell's is the one trigger.
+  'states': ['Copy link'],
   'with-count': ['Delete 3 rows'],
 }
 
@@ -72,15 +73,17 @@ describe('every trigger in every demo names itself with the text its tooltip sho
 })
 
 describe('the states strip, one cell per state the frame draws', () => {
-  it('captions each cell by its title, and draws the top and the bottom tooltip open at their trigger inside their own cell', async () => {
+  it('captions each cell by its title, and draws top and bottom as inert pictures of a tip, its arrow under it and over it', async () => {
     const loaded = await import('../dummy/states.js') as { default: ComponentType }
     const { container } = render(<loaded.default />)
     const cells = [...(container.firstElementChild?.children ?? [])]
     expect(cells.map((cell) => cell.getAttribute('title'))).toEqual(['hidden', 'top', 'bottom'])
-    const tips = await screen.findAllByRole('tooltip')
-    expect(tips.map((tip) => [tip.textContent, tip.getAttribute('data-placement')])).toEqual([['Top', 'top'], ['Bottom', 'bottom']])
-    expect(cells[1]?.contains(tips[0] ?? null)).toBe(true)
-    expect(cells[2]?.contains(tips[1] ?? null)).toBe(true)
+    expect(screen.queryAllByRole('tooltip')).toHaveLength(0)
+    const picture = (cell: Element | undefined) => {
+      const tip = cell?.firstElementChild
+      return [tip?.getAttribute('aria-hidden'), tip?.hasAttribute('inert'), tip?.textContent, tip?.firstElementChild?.className.includes('-top-1'), cell?.querySelectorAll('button').length]
+    }
+    expect([picture(cells[1]), picture(cells[2])]).toEqual([['true', true, 'Top', false, 0], ['true', true, 'Bottom', true, 0]])
     expect(screen.getByRole('button', { name: 'Copy link' }).hasAttribute('aria-describedby')).toBe(false)
   })
 })

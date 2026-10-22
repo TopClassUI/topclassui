@@ -37,13 +37,8 @@ const SHOWN: Record<string, Shown[]> = {
     { trigger: 'المزيد', rows: ['نسخ الرابط', 'إعادة التسمية'] },
   ],
   'sixty-items': [{ trigger: 'Time zone', rows: Array.from({ length: 60 }, (_, index) => `Zone ${String(index + 1)}`) }],
-  // The first press closes the two menus drawn open, as a press outside any menu does; then each opens from its trigger.
-  'states': [
-    { trigger: 'Actions', rows: ['Profile', 'Settings'] },
-    { trigger: 'Actions', rows: ['Edit', 'Delete'] },
-    { trigger: 'Actions', rows: ['Edit', 'Delete'] },
-    { trigger: 'Actions', rows: ['Edit', 'Delete'] },
-  ],
+  // The open cells are pictures: the closed cell's is the one trigger.
+  'states': [{ trigger: 'Actions', rows: ['Profile', 'Settings'] }],
   'with-links': [{ trigger: 'Help', rows: ['Documentation', 'Changelog', 'Contact support', 'Status page'] }],
 }
 

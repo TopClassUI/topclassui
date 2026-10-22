@@ -3,7 +3,7 @@ export const tooltip = {
   slug: 'tooltip',
   title: { en: 'Tooltip', ar: 'تلميح' },
   description: {
-    en: 'One or two lines of text on hover; a shared delay makes the next tooltip open instantly.',
+    en: 'One or two lines of text on hover; a shared delay opens the next tooltip instantly.',
     ar: 'سطر أو سطران من النص عند التمرير؛ ومهلة مشتركة تجعل التلميح التالي يفتح فورًا.',
   },
   demos: ['basic', 'delays', 'long-label', 'with-count', 'placements', 'disabled', 'rtl'],
