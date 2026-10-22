@@ -17,7 +17,7 @@ export default function Demo() {
           </AccordionItem>
         </AccordionRoot>
       </section>
-      <section aria-label="open">
+      <section aria-label="open" className="-my-3">
         <AccordionRoot defaultValue={['open']}>
           <AccordionItem value="open" title="Open question" headingLevel={2}>
             <p className="text-xs">Answer.</p>

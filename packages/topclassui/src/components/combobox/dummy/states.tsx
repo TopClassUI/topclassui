@@ -22,9 +22,9 @@ export default function Demo() {
       <Combobox className={RING} aria-label="focus-visible" items={COUNTRIES} defaultValue="jo" />
       <Combobox className={RING} aria-label="open" items={COUNTRIES} defaultInputValue="jor" />
       <Combobox className={CELL} aria-label="loading" status="loading" items={[]} defaultInputValue="jor" />
-      <div role="group" aria-label="empty" className="grid justify-items-center gap-1">
+      <div role="group" aria-label="empty" className="grid justify-items-center gap-0.5">
         <Combobox className={CELL} aria-label="Country, nothing matches" items={COUNTRIES} defaultInputValue="zzz" />
-        <span className="text-xs text-muted">no matches</span>
+        <span className="font-mono text-xs/3.5 text-muted">no matches</span>
       </div>
       <Combobox className={CELL} aria-label="disabled" disabled placeholder="Search" items={COUNTRIES} />
     </div>

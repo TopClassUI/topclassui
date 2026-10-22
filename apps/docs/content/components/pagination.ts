@@ -10,7 +10,7 @@ export const pagination = {
     ar: 'أرقام صفحات هي روابط حقيقية لا معالجات نقر، فتعمل دون JavaScript ويتبع الزاحف كل صفحة منها.',
   },
   demos: ['middle', 'first-page', 'last-page', 'sizes', 'many-pages', 'two-navs', 'custom-size', 'wide-numbers', 'rtl'],
-  stageHeight: 6,
+  stageHeight: 19.4,
   controlOrder: ['siblingCount', 'size'],
   starts: { size: 'sm' },
   controlsHidden: ['value', 'pageCount', 'boundaryCount', 'disabled'],
