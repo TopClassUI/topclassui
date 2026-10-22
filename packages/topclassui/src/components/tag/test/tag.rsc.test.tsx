@@ -49,8 +49,8 @@ describe('a Tag is a Server Component that renders no client part', () => {
     expect(crossings(<Tag tone="info" size="xs">React</Tag>)).toEqual([])
   })
 
-  it('every demo a server page renders is such a tree; only the removable demos and the stage are client files', async () => {
-    expect(demos.filter(isClient)).toEqual(['removable', 'removable-sizes', 'stage'])
+  it('every demo a server page renders is such a tree; only the removable demos, the stage and the playground are client files', async () => {
+    expect(demos.filter(isClient)).toEqual(['playground', 'removable', 'removable-sizes', 'stage'])
     for (const name of demos.filter((demo) => !isClient(demo))) {
       const Demo = (await import(`../dummy/${name}.tsx`) as { default: () => ReactNode }).default
       expect(crossings(Demo()), name).toEqual([])

@@ -10,6 +10,7 @@ export const tag = {
   stageHeight: 19.4375,
   stageDemo: 'stage',
   codeDemo: 'topics',
+  extraSwitches: ['removable'],
   note: {
     en: 'A plain Tag stays on the server; `onRemove` is the switch that adds the x, and taking the tag out of the list is yours.',
     ar: 'الوسم العادي يبقى على الخادم، و`onRemove` هو ما يضيف زر الإزالة، وإخراج الوسم من القائمة مسؤوليتك.',
