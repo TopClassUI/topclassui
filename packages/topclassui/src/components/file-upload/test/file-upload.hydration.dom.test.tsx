@@ -60,7 +60,7 @@ describe('a server-rendered FileUpload hydrates cleanly', () => {
 
 describe('every demo renders and hydrates', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'form', 'in-field', 'multiple', 'playground', 'rtl', 'states', 'ten-thousand'])
+    expect(names).toEqual(['basic', 'form', 'in-field', 'invalid', 'multiple', 'playground', 'rtl', 'states', 'ten-thousand'])
   })
 
   for (const [name, Demo] of DEMOS) {
