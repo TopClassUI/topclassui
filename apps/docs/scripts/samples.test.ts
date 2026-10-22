@@ -8,6 +8,11 @@ import { checkedSamples, compileSamples, programsOf, samplesOf } from './lib/sam
 const APP = resolve(import.meta.dirname, '..')
 
 describe('checkedSamples', () => {
+  it('compiles only the checklines range of a fence that holds two files', () => {
+    const mdx = '```ts check checklines="3-4"\n// a.ts\nimport x from "missing"\n// b.ts\nconst b = 2\n```\n'
+    expect(checkedSamples('en/x.mdx', mdx)).toEqual([{ file: 'en/x.mdx', index: 0, lang: 'ts', title: null, code: '// b.ts\nconst b = 2\n' }])
+  })
+
   it('takes only the fences marked check', () => {
     const mdx = '```tsx title="a.tsx" check\nconst a = 1\n```\n\n```tsx title="check.tsx"\nconst b = 2\n```\n'
     expect(checkedSamples('en/x.mdx', mdx)).toEqual([{ file: 'en/x.mdx', index: 0, lang: 'tsx', title: 'a.tsx', code: 'const a = 1\n' }])
@@ -19,7 +24,7 @@ describe('the live guide pages', () => {
 
   it('hold twenty-four samples marked check: five on the getting-started pages and seven on the foundation pages, in each locale', () => {
     expect(samples.map((sample) => `${sample.file} ${sample.title ?? ''}`)).toEqual([
-      'en/installation.mdx src/icons.ts',
+      'en/installation.mdx ',
       'en/provider.mdx app/[locale]/layout.tsx',
       'en/first-component.mdx app/subscribe/actions.ts',
       'en/first-component.mdx app/subscribe/page.tsx',
@@ -31,7 +36,7 @@ describe('the live guide pages', () => {
       'en/rtl.mdx right',
       'en/server-first.mdx ',
       'en/accessibility.mdx ',
-      'ar/installation.mdx src/icons.ts',
+      'ar/installation.mdx ',
       'ar/provider.mdx app/[locale]/layout.tsx',
       'ar/first-component.mdx app/subscribe/actions.ts',
       'ar/first-component.mdx app/subscribe/page.tsx',
