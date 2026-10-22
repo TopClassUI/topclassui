@@ -5,9 +5,10 @@
 /* After the three imports: tokens.css declares all three on :root, so only order makes these win (docs-site S10). */
 :root {
   --tc-font-latin: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --tc-font-arabic: var(--font-noto-arabic), ui-sans-serif, system-ui, sans-serif;
-  /* Geist Mono first; Arabic in a code comment falls back to Noto Sans Arabic, not a system monospace that spaces its letters apart. */
-  --tc-font-mono: var(--font-geist-mono), ui-monospace, monospace, var(--font-noto-arabic, monospace);
+  /* Inter after Noto Sans Arabic: a Latin word in Arabic text, a prop or the product name, keeps the site's Latin face. */
+  --tc-font-arabic: var(--font-noto-arabic), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /* Geist Mono by name before its Arial fallback face, so Arabic glyphs reach Noto Sans Arabic (unset on /en, hence the var() fallback). */
+  --tc-font-mono: "Geist Mono", var(--font-noto-arabic, "Geist Mono"), var(--font-geist-mono), ui-monospace, monospace;
   --docs-sidebar: 13.75rem;
   --docs-toc: 11.875rem;
   --docs-column: 59rem;
@@ -23,6 +24,12 @@
 
 [data-theme='dark'] {
   --docs-bloom-lead: 65%;
+}
+
+/* A card's stage dims its drawn page as the dark frame does; black at 30 % over white read as a solid grey block. */
+[data-component],
+[data-component] [data-theme] {
+  --tc-overlay: light-dark(oklch(0 0 0 / 0.12), oklch(0 0 0 / 0.4));
 }
 
 @layer base {
@@ -173,7 +180,7 @@
   [data-theme='light'] .docs-code .shiki span,
   [data-theme='ocean'] .docs-code .shiki span { color: var(--tc-code-on-light); }
 
-  /* Inside the tab card the tab names the code: the header keeps only its copy button, at the inline end. */
+  /* Inside the tab card the tab names the code: the header stays only as the region's hidden name. */
   .docs-tabbed .docs-code {
     border: 0;
     border-radius: 0;
@@ -196,10 +203,6 @@
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
-  }
-
-  .docs-tabbed .docs-code > pre {
-    padding-inline-end: 3rem;
   }
 
   /* Follow us buttons as drawn: Button's border-transparent is a utility, so this sits in the same layer after it. */
@@ -310,4 +313,35 @@
       }
     }
   }
+
+  /* Colors' tone rows name the shade of the page's own mode: one of three spans shows. */
+  [data-shade] { display: none; }
+  :root:not([data-theme]) [data-shade='light'],
+  [data-theme='light'] [data-shade='light'],
+  [data-theme='dark'] [data-shade='dark'],
+  [data-theme='ocean'] [data-shade='ocean'] { display: flex; }
+}
+
+@layer utilities {
+  /* The Previewer frames draw code flat on the page colour, not in CodeBlock's inverted box: the name stays for the region, the header goes. */
+  .docs-flat-code > div:first-child { display: none; }
+  /* Ocean's pill radius rounds a box of code into a disc that clips its corner letters: a box takes the box radius at most. */
+  .docs-flat-code,
+  .docs-box,
+  div:has(> code[dir='ltr'][translate='no'] + [data-island]) { border-radius: min(var(--radius-control), var(--radius-box)); }
+  /* Flat code has no edge to round, and with no padding the scroller's corner would cut the first letter of the last line. */
+  .docs-flat-code pre {
+    border-radius: 0;
+    padding: 0;
+    font-size: 0.75rem;
+    line-height: 1.7;
+    --tc-scrollbar-thumb: var(--tc-line-strong);
+    --tc-scrollbar-track: transparent;
+  }
+  .docs-flat-code .shiki span { color: light-dark(var(--tc-code-on-light), var(--tc-code-on-dark)); }
+  /* Plain tokens (lib/shiki-themes.ts, text) as the frames draw them: body in the JSX, muted on a line that opens with a keyword, an import. */
+  .docs-flat-code .shiki span[style*='#D4D4D4'] { color: var(--tc-body); }
+  /* The frames part the imports from the JSX by a 10 px gap, not a whole blank line. */
+  .docs-flat-code .shiki > span[data-blank] { display: block; block-size: 0.625rem; overflow: hidden; }
+  .docs-flat-code .shiki > span:has(> span:first-child[style*='#51A2FF']) > span[style*='#D4D4D4'] { color: var(--tc-muted); }
 }

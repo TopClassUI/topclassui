@@ -56,10 +56,9 @@ export const ar: SiteLabels = {
     copy: 'نسخ',
     packageManagers: 'مدير الحزم',
     framework: 'إطار العمل',
-    utilities: { token: 'المتغيّر', utilities: 'الأصناف المساعدة' },
+    utilities: { token: 'المتغيّر', utilities: 'الأصناف المساعدة', through: 'إلى', scale: 'مقاسات الحجم والحشو، و* من xs إلى xl' },
     props: { prop: 'الخاصية', type: 'النوع', default: 'القيمة الافتراضية', description: 'ما الذي تفعله', required: 'مطلوبة' },
     repeat: (count) => `، النسخة ${String(count)}`,
-    csp: 'سياسة أمان المحتوى',
   },
   providerProps: {
     children: 'تطبيقك.',
@@ -210,14 +209,14 @@ export const ar: SiteLabels = {
   },
   catalog: {
     title: 'المكوّنات',
-    lead: (count) => `${String(count)} مكوّنًا، لكل واحد عرض حيّ: كل الحالات معًا، ومساحة تجربة موصولة بالخصائص الحقيقية، وسطر الاستيراد.`,
+    lead: (count) => `${String(count)} مكوّنًا، لكل واحد عرض حيّ. كل الحالات معًا، ومساحة تجربة موصولة بالخصائص الحقيقية، وطريقتان لاستخدام كل واحد: انسخ الشيفرة المصدرية إلى مشروعك، أو ثبّت الحزمة.`,
     description: 'كل مكوّنات TopClass UI في صفحة واحدة، مع عرض حيّ ومساحة تجربة على الخصائص الحقيقية وكل الحالات وسطر الاستيراد.',
     beforeTitle: 'قبل أن تبدأ',
     beforeOnce: 'مرة واحدة لكل تطبيق',
-    beforeLead: 'كل بطاقة أدناه تعرض سطر استيراد. هذه الخطوات الثلاث تجعله يعمل.',
+    beforeLead: 'كل بطاقة أدناه تعرض أمر نسخ وسطر استيراد. هذه الخطوات الأربع تجعل أيًّا منهما يعمل.',
     steps: {
       install: {
-        title: '1. ثبّت الحزمة',
+        title: '1. ثبّت الحزمة واعتمادياتها النظيرة',
         note: 'ثلاث اعتماديات نظيرة: react وreact-dom وTailwind CSS 4.2 أو أحدث. مشروعك فيه هذه بالفعل، وzod يُثبَّت مع الحزمة.',
       },
       css: {
@@ -226,8 +225,13 @@ export const ar: SiteLabels = {
       },
       layout: {
         title: '3. التخطيط الجذري',
-        note: 'مرّر direction وlocale إلى TopClassProvider خاصيتين من التخطيط؛ ولا تقرأهما أبدًا من document.dir داخل effect. يأتي ThemeScript أولًا في <head>: يضبط data-theme قبل أول رسم.',
+        note: 'مرّر direction وlocale إلى TopClassProvider خاصيتين من التخطيط؛ ولا تقرأهما أبدًا من document.dir داخل effect. يأتي ThemeScript أولًا في <head>: يضبط data-theme قبل أول رسم، فأضف suppressHydrationWarning إلى <html>.',
       },
+      source: {
+        title: '4. أو انسخ الشيفرة المصدرية إلى مستودعك',
+        note: 'تنسخ أداة سطر الأوامر الشيفرة المصدرية إلى مشروعك مع ثوابتها ومخططها وأنواعها ومتغيّراتها. الخطوتان 2 و3 تبقيان كما هما.',
+      },
+      addComment: '# then add the components you want:',
     },
     legendTitle: 'كيف تقرأ البطاقة',
     legendLead: 'كل مكوّن أدناه مرتّب بالطريقة نفسها، فتتعلمها مرة واحدة. خمسة أجزاء، من الأعلى إلى الأسفل.',
@@ -236,7 +240,7 @@ export const ar: SiteLabels = {
       { title: 'جرّبه', text: 'كل خاصية يمكنك تغييرها، مع قيمها المسموح بها.' },
       { title: 'الشيفرة', text: 'شيفرة JSX التي تنتج العرض فوقها. انسخها والصقها فتعمل.' },
       { title: 'كل الحالات', text: 'التمرير والتركيز والتعطيل والتحميل والخطأ - كلها معًا. لا تحتاج إلى التمرير لمراجعة حالة.' },
-      { title: 'استورده', text: 'سطر الاستيراد الواحد من الحزمة، وأمر التثبيت.' },
+      { title: 'طريقتان للاستخدام', text: 'انسخ الشيفرة المصدرية إلى مستودعك، أو استوردها من الحزمة. المكوّن نفسه.' },
     ],
     sectionCount: (n) => {
       const rule = new Intl.PluralRules('ar').select(n)
@@ -246,7 +250,7 @@ export const ar: SiteLabels = {
     },
     startHere: 'ابدأ من هنا',
     sectionsHeading: 'الأقسام',
-    installHeading: 'قبل أن تبدأ',
+    installHeading: 'التثبيت: سطر الأوامر أو الحزمة',
   },
   search: {
     button: 'ابحث في التوثيق',
@@ -254,6 +258,8 @@ export const ar: SiteLabels = {
     placeholder: 'ابحث في الصفحات والمكوّنات',
     groups: { pages: 'الصفحات', components: 'المكوّنات', icons: 'الأيقونات' },
     shortcut: { pc: 'Ctrl K', mac: '⌘ K' },
+    empty: 'لا نتائج',
+    loading: 'جارٍ تحميل الفهرس',
   },
   llms: {
     summary: 'مكوّنات React لـ Next.js، من اليمين إلى اليسار أولًا ومن الخادم أولًا، مبنية على Tailwind CSS v4 وBase UI.',

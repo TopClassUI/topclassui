@@ -1,15 +1,15 @@
 'use client'
 
 // One Try it control (S7, S8): a library control per kind, labelled by the prop name and described by its description.
+import { Checkbox } from 'topclassui/checkbox'
 import { NumberField } from 'topclassui/number-field'
 import { SegmentedControlItem, SegmentedControlRoot } from 'topclassui/segmented-control'
 import { Select } from 'topclassui/select'
 import { Slider } from 'topclassui/slider'
-import { Switch } from 'topclassui/switch'
 
 import type { Control } from '../../lib/components'
 import type { PropValue } from '../../lib/usage'
-import { CONTROL, CONTROL_LABEL } from '../classes'
+import { CHECK_LABEL, CHECK_ROW, CONTROL, CONTROL_LABEL } from '../classes'
 
 export interface TryItControlProps {
   control: Control
@@ -27,6 +27,17 @@ export function TryItControl({ control, value, onChange, description, idBase }: 
   const labelId = `${idBase}-${control.prop}`
   const describedBy = `${labelId}-description`
   const named = { 'aria-labelledby': labelId, 'aria-describedby': describedBy }
+  // A boolean prop is a checkbox with its name beside it, as the Previewer frames draw Try it.
+  if (control.kind === 'switch') {
+    const id = `${labelId}-box`
+    return (
+      <div className={CHECK_ROW}>
+        <Checkbox id={id} aria-describedby={describedBy} size="xs" checked={value === true} onCheckedChange={(checked) => { onChange(checked) }} />
+        <label htmlFor={id} dir="ltr" className={CHECK_LABEL}>{control.prop}</label>
+        <span id={describedBy} className="sr-only">{description}</span>
+      </div>
+    )
+  }
   return (
     <div className={CONTROL}>
       <span id={labelId} dir="ltr" className={CONTROL_LABEL}>{control.prop}</span>
@@ -34,7 +45,7 @@ export function TryItControl({ control, value, onChange, description, idBase }: 
       {control.kind === 'segmented' ? (
         <SegmentedControlRoot
           {...named}
-          size="sm"
+          size="xs"
           fullWidth
           value={String(value ?? control.options[0])}
           onValueChange={(next) => {
@@ -50,8 +61,9 @@ export function TryItControl({ control, value, onChange, description, idBase }: 
       {control.kind === 'select' ? (
         <Select
           {...named}
-          size="sm"
+          size="xs"
           fullWidth
+          className="font-mono"
           items={control.options.map((option) => ({ value: String(option), label: String(option) }))}
           value={value === undefined ? null : String(value)}
           onValueChange={(next) => {
@@ -60,13 +72,10 @@ export function TryItControl({ control, value, onChange, description, idBase }: 
           }}
         />
       ) : null}
-      {control.kind === 'switch' ? (
-        <Switch {...named} size="sm" checked={value === true} onCheckedChange={(checked) => { onChange(checked) }} />
-      ) : null}
       {control.kind === 'slider' ? (
         <Slider
           {...named}
-          size="sm"
+          size="xs"
           fullWidth
           showValue
           min={control.min}
@@ -79,11 +88,13 @@ export function TryItControl({ control, value, onChange, description, idBase }: 
       {control.kind === 'number' ? (
         <NumberField
           {...named}
-          size="sm"
+          size="xs"
           fullWidth
           min={control.min ?? undefined}
           max={control.max ?? undefined}
           step={control.step ?? 1}
+          format={{ useGrouping: false }}
+          className="font-mono"
           value={typeof value === 'number' ? value : null}
           onValueChange={(next) => { if (next !== null) onChange(next) }}
         />

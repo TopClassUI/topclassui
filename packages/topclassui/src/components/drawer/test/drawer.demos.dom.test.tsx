@@ -1,7 +1,7 @@
 import { readdirSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ComponentType } from 'react'
 import { describe, expect, it } from 'vitest'
@@ -55,13 +55,7 @@ const SHOWN: Record<string, Shown[]> = {
   ],
   'start': [{ trigger: 'Menu', title: 'Browse', placement: 'start', controls: ['Documentation', 'Components', 'Changelog', X] }],
   'top': [{ trigger: 'What is new', title: 'Version 2.4', placement: 'top', controls: ['Got it', X] }],
-  'states': [
-    { trigger: 'Side sheet', title: 'Side sheet', placement: 'end', controls: ['Done', X] },
-    { trigger: 'Bottom sheet', title: 'Bottom sheet', placement: 'bottom', controls: ['Done', X] },
-    { trigger: 'Scrolled', title: 'Scrolled', placement: 'end', controls: ['Done', X] },
-    { trigger: 'Focus trapped', title: 'Focus trapped', placement: 'end', controls: ['Done', X] },
-    { trigger: 'Non-modal', title: 'Non-modal', placement: 'end', controls: ['Done', X] },
-  ],
+  'states': [{ trigger: 'Open', title: 'Opened', placement: 'end', controls: ['Done', X] }],
   'trap-focus': [{ trigger: 'Inspect', title: 'Inspector', placement: 'end', controls: ['Done', X] }],
   'with-form': [{ trigger: 'Invite', title: 'Invite a teammate', placement: 'bottom', controls: ['Name', 'Email', 'Cancel', 'Send', X] }],
 }
@@ -82,7 +76,12 @@ async function shown(Demo: ComponentType): Promise<Shown[]> {
   const triggers = screen.getAllByRole('button').filter((button) => button.getAttribute('aria-haspopup') === 'dialog')
   for (const trigger of triggers) {
     await userEvent.click(trigger)
-    const popup = await screen.findByRole('dialog')
+    // The sheet this trigger controls, by the id Base UI writes on it: never one already open beside it.
+    const popup = await waitFor(() => {
+      const found = document.getElementById(trigger.getAttribute('aria-controls') ?? '')
+      expect(found?.getAttribute('role')).toBe('dialog')
+      return found as HTMLElement
+    })
     out.push({
       trigger: trigger.textContent,
       title: popup.querySelector('h2')?.textContent ?? '',
@@ -90,7 +89,7 @@ async function shown(Demo: ComponentType): Promise<Shown[]> {
       controls: [...popup.querySelectorAll('button, input, a')].map(nameOf),
     })
     await userEvent.keyboard('{Escape}')
-    await waitFor(() => { expect(screen.queryByRole('dialog')).toBeNull() })
+    await waitFor(() => { expect(popup.isConnected).toBe(false) })
   }
   return out
 }
@@ -106,4 +105,21 @@ describe('every demo opens the sheet its trigger names', () => {
       expect(await shown(loaded.default), name).toEqual(SHOWN[name])
     })
   }
+})
+
+describe('the states strip, one cell per state the frame draws', () => {
+  it('captions each cell by its title, and draws the side, bottom, dragging and trapped sheets as inert pictures inside their own cell', async () => {
+    const loaded = await import('../dummy/states.js') as { default: ComponentType }
+    const { container } = render(<loaded.default />)
+    const cells = [...(container.firstElementChild?.children ?? [])]
+    expect(cells.map((cell) => cell.getAttribute('title'))).toEqual(['closed', 'side sheet', 'bottom sheet', 'dragging', 'focus trapped'])
+    expect(screen.queryAllByRole('dialog')).toHaveLength(0)
+    const sheets = cells.map((cell) => cell.querySelector('[inert]'))
+    expect(sheets.map((sheet) => [sheet?.getAttribute('aria-hidden'), sheet?.textContent])).toEqual([
+      [undefined, undefined], ['true', 'sheet'], ['true', 'sheet'], ['true', 'sheet'], ['true', 'sheet'],
+    ])
+    expect(cells.map((cell) => cell.querySelectorAll(':scope > .bg-overlay').length)).toEqual([0, 1, 1, 1, 1])
+    expect(cells.slice(1).map((cell) => cell.querySelectorAll('button, a, [tabindex]').length)).toEqual([0, 0, 0, 0])
+    expect(within(cells[0] as HTMLElement).getByRole('button', { name: 'Open' }).getAttribute('aria-expanded')).toBe('false')
+  })
 })

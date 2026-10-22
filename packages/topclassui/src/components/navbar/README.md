@@ -114,6 +114,7 @@ Every prop below is optional and falls back to the default shown.
 |---|---|---|---|---|
 | `children` | no | `ReactNode` | - | The parts, in order: NavbarBrand, NavbarLinks and NavbarActions. Each one is optional. |
 | `sticky` | no | `boolean` | `true` | NavbarRoot: the bar stays at the top while the page scrolls, and publishes its height as --tc-sticky-top. |
+| `variant` | no | `solid` \| `transparent` | `"solid"` | NavbarRoot: solid is the raised bar, which takes a shadow once the page scrolls under it; transparent sits on the page. |
 
 ### NavbarBrand
 
@@ -153,6 +154,7 @@ Anything else is passed to the element each part draws, so standard attributes (
 - `dummy/not-sticky.tsx`
 - `dummy/playground.tsx`
 - `dummy/rtl.tsx`
+- `dummy/stage.tsx`
 - `dummy/states.tsx`
 - `dummy/tall-page.tsx`
 - `dummy/with-search.tsx`

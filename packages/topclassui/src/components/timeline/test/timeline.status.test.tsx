@@ -86,21 +86,21 @@ describe('an icon that is blank', () => {
   const row = (item: Omit<TimelineItem, 'title'>) =>
     rows(markup(<Timeline items={[{ id: 'a', title: 'Launch', ...item }]} getKey={key} />))[0] ?? ''
   const MARKER = '<span class="flex min-h-5 shrink-0 items-center">'
-  const STROKE = 'block size-3 rounded-full border-(length:--tc-line-width) border-line-strong'
-  const FILLED = `${STROKE} forced-color-adjust-none forced-colors:border-[CanvasText] forced-colors:bg-[CanvasText]`
+  const FILLED = 'block size-3 rounded-full border-(length:--tc-line-width) forced-color-adjust-none forced-colors:border-[CanvasText] forced-colors:bg-[CanvasText]'
+  const HOLLOW = 'block size-3 rounded-full border-[length:calc(var(--tc-line-width)*2)] border-line-strong bg-surface-raised'
 
   it('draws the dot for false, null, undefined, true or an empty string, never an empty wrapper', () => {
     for (const blank of [false, null, undefined, true, '']) {
-      expect(row({ icon: blank }), String(blank)).toContain(`${MARKER}<span class="${FILLED} bg-primary-solid"></span></span>`)
+      expect(row({ icon: blank }), String(blank)).toContain(`${MARKER}<span class="${FILLED} border-primary-solid bg-primary-solid"></span></span>`)
       expect(row({ icon: blank }), String(blank)).not.toContain('text-primary-on-soft')
     }
   })
 
-  it('draws the marker of the status: done filled, current clipped, todo hollow', () => {
-    expect(row({ icon: false, status: 'done' })).toContain(`${MARKER}<span class="${FILLED} bg-success-solid"></span></span>`)
+  it('draws the marker of the status: done filled, current filled and clipped under forced colours, todo a ring', () => {
+    expect(row({ icon: false, status: 'done' })).toContain(`${MARKER}<span class="${FILLED} border-success-solid bg-success-solid"></span></span>`)
     expect(row({ icon: false, status: 'current' }))
-      .toContain(`${MARKER}<span class="${FILLED} bg-primary-solid bg-clip-content p-0.5"></span></span>`)
-    expect(row({ icon: false, status: 'todo' })).toContain(`${MARKER}<span class="${STROKE}"></span></span>`)
+      .toContain(`${MARKER}<span class="${FILLED} border-primary-solid bg-primary-solid forced-colors:bg-clip-content forced-colors:p-0.5"></span></span>`)
+    expect(row({ icon: false, status: 'todo' })).toContain(`${MARKER}<span class="${HOLLOW}"></span></span>`)
   })
 
   it('still renders a zero, which React prints', () => {

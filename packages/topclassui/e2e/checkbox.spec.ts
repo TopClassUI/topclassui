@@ -14,7 +14,7 @@ import { FORCED_CANVAS, contrast, inkOn, paintedIn, pixelsOf, rgbOf, ringRow } f
 
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['checkbox--basic', 'checkbox--form', 'checkbox--labelled', 'checkbox--playground', 'checkbox--rtl', 'checkbox--sizes', 'checkbox--states'] as const
+const DEMOS = ['checkbox--basic', 'checkbox--form', 'checkbox--labelled', 'checkbox--playground', 'checkbox--rtl', 'checkbox--sizes', 'checkbox--states', 'checkbox--combined'] as const
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 const NAMES = { xs: 'Extra small', sm: 'Small', md: 'Medium', lg: 'Large', xl: 'Extra large' } as const
 
@@ -46,9 +46,9 @@ test.describe('the five sizes, on the static page', () => {
   test.use({ reducedMotion: 'reduce' })
 
   const FINE = {
-    xs: { target: [24, 24], box: [14, 14], mark: [9.6, 9.6], centred: true }, sm: { target: [24, 24], box: [16, 16], mark: [11.2, 11.2], centred: true },
-    md: { target: [24, 24], box: [20, 20], mark: [14.4, 14.4], centred: true }, lg: { target: [24, 24], box: [24, 24], mark: [17.6, 17.6], centred: true },
-    xl: { target: [28, 28], box: [28, 28], mark: [20.8, 20.8], centred: true },
+    xs: { target: [24, 24], box: [16, 16], mark: [11.2, 11.2], centred: true }, sm: { target: [24, 24], box: [20, 20], mark: [14.4, 14.4], centred: true },
+    md: { target: [24, 24], box: [24, 24], mark: [17.6, 17.6], centred: true }, lg: { target: [28, 28], box: [28, 28], mark: [20.8, 20.8], centred: true },
+    xl: { target: [32, 32], box: [32, 32], mark: [24, 24], centred: true },
   }
   const shapes = async (page: Page) => {
     const out: Record<string, Awaited<ReturnType<typeof shape>>> = {}
@@ -94,7 +94,7 @@ test.describe('the states, on the static page', () => {
   test.use({ reducedMotion: 'reduce' })
 
   test('indeterminate is filled as checked is, says mixed and draws the dash', async ({ page }) => {
-    await page.goto(urlFor('checkbox--states', 'light', 'ltr'))
+    await page.goto(urlFor('checkbox--combined', 'light', 'ltr'))
     const [checked, mixed] = [boxIn(page, 'Checked'), boxIn(page, 'Indeterminate')]
     expect(await mixed.getAttribute('aria-checked')).toBe('mixed')
     expect([await markOf(checked), await markOf(mixed)]).toEqual(['tick', 'dash'])
@@ -105,7 +105,7 @@ test.describe('the states, on the static page', () => {
   })
 
   test('invalid: the line turns to danger and is 2 px thick, unticked, ticked and mixed', async ({ page }) => {
-    await page.goto(urlFor('checkbox--states', 'light', 'ltr'))
+    await page.goto(urlFor('checkbox--combined', 'light', 'ltr'))
     const danger = await resolve(page, 'var(--tc-danger-solid)')
     for (const name of ['Invalid', 'Invalid, checked', 'Invalid, indeterminate']) {
       expect(await css(drawn(boxIn(page, name)), 'border-top-color'), name).toBe(danger)
@@ -129,7 +129,7 @@ for (const scheme of ['light', 'dark'] as const) {
     }
 
     test('unticked, ticked and mixed differ by more than a fill: an empty box, a tick and a dash', async ({ page }) => {
-      await page.goto(urlFor('checkbox--states', 'light', 'ltr'))
+      await page.goto(urlFor('checkbox--combined', 'light', 'ltr'))
       expect(await page.evaluate(() => matchMedia('(forced-colors: active)').matches)).toBe(true)
       const highlight = rgbOf(await resolve(page, 'Highlight'))
       for (const name of ['Checked', 'Indeterminate']) {
@@ -152,7 +152,7 @@ for (const scheme of ['light', 'dark'] as const) {
     })
 
     test('invalid and ticked or mixed: a CanvasText line and no author red; disabled and ticked or mixed, prop or fieldset: GrayText', async ({ page }) => {
-      await page.goto(urlFor('checkbox--states', 'light', 'ltr'))
+      await page.goto(urlFor('checkbox--combined', 'light', 'ltr'))
       const [canvasText, grayText] = [await resolve(page, 'CanvasText'), await resolve(page, 'GrayText')]
       for (const name of ['Invalid, checked', 'Invalid, indeterminate']) {
         expect(await css(drawn(boxIn(page, name)), 'border-top-color'), name).toBe(canvasText)
@@ -176,7 +176,7 @@ for (const scheme of ['light', 'dark'] as const) {
     // The page in the other theme, where --tc-ring falls to 2.4:1 on Canvas: only a system colour holds in both.
     for (const mode of scheme === 'light' ? ['dark'] as const : ['light', 'ocean'] as const) {
       test(`${mode} page: the ring of a focused box is the user's CanvasText, 3:1 on Canvas, ticked, mixed and invalid too`, async ({ page }) => {
-        await page.goto(urlFor('checkbox--states', mode, 'ltr'))
+        await page.goto(urlFor('checkbox--combined', mode, 'ltr'))
         const canvasText = await resolve(page, 'CanvasText')
         for (const name of ['Unchecked', 'Checked', 'Indeterminate', 'Invalid, checked', 'Invalid, indeterminate', 'Read-only']) {
           await boxIn(page, name).focus()
@@ -188,7 +188,7 @@ for (const scheme of ['light', 'dark'] as const) {
     }
 
     test('invalid thickens the line to 2 px; disabled dims the whole box; no target has an outline at rest', async ({ page }) => {
-      await page.goto(urlFor('checkbox--states', 'light', 'ltr'))
+      await page.goto(urlFor('checkbox--combined', 'light', 'ltr'))
       for (const name of ['Invalid', 'Invalid, checked', 'Invalid, indeterminate']) {
         expect(await css(drawn(boxIn(page, name)), 'border-top-width'), name).toBe('2px')
       }
@@ -245,7 +245,7 @@ test.describe('text', () => {
       await page.goto(urlFor('checkbox--basic', 'light', direction))
       await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
       const control = page.locator('#demo [role="checkbox"]').first()
-      expect(await shape(control)).toEqual({ target: [40, 40], box: [40, 40], mark: [30.4, 30.4], centred: true })
+      expect(await shape(control)).toEqual({ target: [48, 48], box: [48, 48], mark: [36.8, 36.8], centred: true })
       const [box, label] = [await boxOf(control), await boxOf(page.locator('label[for="checkbox-basic-terms"]'))]
       expect(direction === 'ltr' ? label.left >= box.right : label.right <= box.left).toBe(true)
       await expectNoSidewaysScroll(page)
@@ -257,7 +257,7 @@ test.describe('text', () => {
     await page.goto(urlFor('checkbox--basic', 'light', 'ltr'))
     await page.addStyleTag({ content: '* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-block-end: 2em !important; }' })
     for (const row of await page.locator('#demo [role="checkbox"]').all()) {
-      expect((await shape(row)).box).toEqual([20, 20])
+      expect((await shape(row)).box).toEqual([24, 24])
       const [control, label] = [await boxOf(row), await boxOf(page.locator(`label[for="${String(await row.getAttribute('id'))}"]`))]
       expect(label.left, 'the label overlaps its box').toBeGreaterThanOrEqual(control.right)
     }
@@ -331,7 +331,7 @@ test.describe('live: pressing it', () => {
           }
           return { width: edge.right - edge.left, cut }
         })
-        expect(ring).toEqual({ width: 28, cut: [] })
+        expect(ring).toEqual({ width: 32, cut: [] })
       })
     })
   }
@@ -405,9 +405,9 @@ test.describe('live: where a page puts a checkbox', () => {
     return [holder.getAttribute('data-case'), size(button), size(button?.querySelector(':scope > span'))]
   }))
   const ALL = ['grid', 'track', 'flex-1', 'w-fit', 'cell', 'label-row', 'long', 'no-label', 'wrapped'] as const
-  const expected = (target: number) => ALL.map((name) => {
-    const box = name === 'long' ? 16 : name === 'no-label' ? 24 : 20
-    return [name, [target, target], [box, box]]
+  const expected = (target: number, large: number) => ALL.map((name) => {
+    const box = name === 'long' ? 20 : name === 'no-label' ? 28 : 24
+    return [name, name === 'no-label' ? [large, large] : [target, target], [box, box]]
   })
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 
@@ -418,7 +418,7 @@ test.describe('live: where a page puts a checkbox', () => {
       const [grid, target] = [await boxOf(page.locator('#grid')), await boxOf(boxIn(page, 'In a grid'))]
       expect([target.width, target.height]).toEqual([24, 24])
       expect(direction === 'ltr' ? target.left - grid.left : grid.right - target.right).toBe(0)
-      expect(await cases(page)).toEqual(expected(24))
+      expect(await cases(page)).toEqual(expected(24, 28))
       await expectNoSidewaysScroll(page)
     })
   }
@@ -429,7 +429,7 @@ test.describe('live: where a page puts a checkbox', () => {
     for (const direction of DIRECTIONS) {
       test(`${direction}: every case is a 44 px target around its own box, and the page does not scroll sideways`, async ({ page }) => {
         await fixture(page, { direction })
-        expect(await cases(page)).toEqual(expected(44))
+        expect(await cases(page)).toEqual(expected(44, 44))
         await expectNoSidewaysScroll(page)
       })
     }

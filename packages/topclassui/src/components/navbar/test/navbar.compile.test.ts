@@ -91,6 +91,7 @@ const verdict = compile({
   size: bar(' size="md"', ''),
   bordered: bar(' bordered', ''),
   variant: bar(' variant="transparent"', ''),
+  badVariant: bar(' variant="glass"', ''),
   badSticky: bar(' sticky="top"', ''),
   badCurrent: bar('', '<NavbarLinks><NavbarLink href="/a" current="page">A</NavbarLink></NavbarLinks>'),
   currentOnRoot: bar(' current', ''),
@@ -154,10 +155,14 @@ describe('what Navbar does not take', () => {
     expect((verdict['brandFunction'] ?? []).join(' ')).toContain('ReactElement')
   })
 
-  it('refuses size, bordered and a variant, which are not built', () => {
+  it('refuses size and bordered, which are not built', () => {
     expect((verdict['size'] ?? []).join(' ')).toContain("Property 'size' does not exist")
     expect((verdict['bordered'] ?? []).join(' ')).toContain("Property 'bordered' does not exist")
-    expect((verdict['variant'] ?? []).join(' ')).toContain("Property 'variant' does not exist")
+  })
+
+  it('takes the transparent variant on the root, and refuses one that is not in the list', () => {
+    expect(verdict['variant'] ?? []).toEqual([])
+    expect((verdict['badVariant'] ?? []).join(' ')).toContain('is not assignable to type')
   })
 
   it('refuses a sticky or a current that is not a boolean', () => {

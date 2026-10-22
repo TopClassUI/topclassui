@@ -12,8 +12,8 @@ const toneKeys = Object.fromEntries(ALERT_TONES.map((tone) => [tone, ''])) as Re
 
 const resolve = cva(
   [
-    'flex items-start gap-2 rounded-box px-pad-x-md py-3',
-    // On every variant, so changing the variant never moves the layout.
+    // The frame's 14 by 12 px of padding, counting the 1 px edge every variant keeps so the layout never moves.
+    'flex items-start gap-2.5 rounded-box px-3.25 py-2.75',
     BORDER_WIDTH,
   ],
   {

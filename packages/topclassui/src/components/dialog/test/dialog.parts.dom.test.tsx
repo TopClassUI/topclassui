@@ -104,7 +104,7 @@ describe('render on the popup passes to Base UI', () => {
     expect(form.tagName).toBe('FORM')
     expect(form.getAttribute('role')).toBe('dialog')
     expect(form.getAttribute('data-size')).toBe('md')
-    expect(form.getAttribute('class')).toContain('max-w-100')
+    expect(form.getAttribute('class')).toContain('max-w-95')
   })
 })
 

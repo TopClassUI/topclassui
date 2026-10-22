@@ -6,11 +6,14 @@ export const radioGroup = {
     ar: 'مجموعة اختيار فردي',
   },
   description: {
-    en: 'One choice out of a few, all shown at once. One Tab stop for the group, and the checked radio is the tab stop before hydration.',
-    ar: 'اختيار واحد من خيارات قليلة معروضة كلها معًا. للمجموعة محطة Tab واحدة، والزر المحدد هو تلك المحطة قبل الترطيب.',
+    en: 'One choice out of a few, all shown; one Tab stop, the checked radio before hydration.',
+    ar: 'اختيار واحد من خيارات قليلة معروضة كلها؛ محطة Tab واحدة هي الزر المحدد قبل الترطيب.',
   },
   demos: ['basic', 'horizontal', 'form', 'sizes', 'long-content', 'rtl'],
+  stageDemo: 'stage',
   stageHeight: 13.75,
+  controlOrder: ['size', 'orientation', 'disabled', 'required', 'invalid'],
+  extraSwitches: ['disabled', 'required'],
   note: {
     en: 'The group carries the state and the form; each `RadioGroupItem` carries only its `value` and its text.',
     ar: 'المجموعة تحمل الحالة والنموذج؛ وكل `RadioGroupItem` يحمل `value` الخاص به ونصه فقط.',

@@ -27,6 +27,8 @@ export interface PageEntry {
   title: Both
   description: Both
   status: PageStatus
+  /** A phrase of the lead drawn as a link, the same words in both languages. */
+  leadLink?: { text: string; href: string }
 }
 
 /** Sidebar order. "Next" is the following live entry; a `later` entry is not routed, listed or indexed. */
@@ -51,8 +53,8 @@ export const PAGES = [
     slug: 'cli', path: '/docs/cli', kind: 'guide', group: 'start', icon: 'terminal-window', status: 'live',
     title: { en: 'Add with the CLI', ar: 'الإضافة عبر الطرفية' },
     description: {
-      en: 'Copy one component into your project with one command. The CLI brings its source, constants, schema, types and variants, and you edit them as your own files.',
-      ar: 'انسخ مكوّنًا واحدًا إلى مشروعك بأمر واحد. تجلب الطرفية مصدره مع ثوابته ومخططه وأنواعه ومتغيراته، ثم تعدّلها كأنها ملفاتك، ويظهر كل تحديث لاحق بأمر diff.',
+      en: 'Copy a component into your project and own the file.',
+      ar: 'انسخ مكوّنًا إلى مشروعك وامتلك ملفه، فهو ملفك تعدّله كما تشاء.',
     },
   },
   {
@@ -83,48 +85,49 @@ export const PAGES = [
     slug: 'colors', path: '/docs/colors', kind: 'guide', group: 'foundations', icon: 'palette', status: 'live',
     title: { en: 'Colors', ar: 'الألوان' },
     description: {
-      en: 'Every color token, in each mode, with the contrast it is checked against.',
-      ar: 'كل رمز لوني في كل وضع، مع التباين الذي يُفحص مقابله.',
+      en: 'Color has three layers: a palette you never use directly, semantic tokens you always use, and the utility classes Tailwind generates from those tokens.',
+      ar: 'للألوان ثلاث طبقات: لوحة ألوان لا تستخدمها مباشرة أبدًا، ورموز دلالية تستخدمها دائمًا، والأصناف المساعدة التي يولّدها Tailwind من تلك الرموز.',
     },
   },
   {
     slug: 'icons', path: '/docs/icons', kind: 'guide', group: 'foundations', icon: 'image', status: 'live',
     title: { en: 'Icons', ar: 'الأيقونات' },
     description: {
-      en: 'The built-in icons, by name, and the ones that flip on their own in Arabic.',
-      ar: 'الأيقونات المضمّنة بأسمائها، والتي تنعكس وحدها في العربية.',
+      en: '84 icons, inlined as SVG. Only the ones you render are loaded.',
+      ar: '84 أيقونة مضمّنة في الصفحة بصيغة SVG. لا يُحمَّل منها إلا ما تعرضه فعلًا.',
     },
   },
   {
     slug: 'theming', path: '/docs/theming', kind: 'guide', group: 'foundations', icon: 'moon', status: 'live',
     title: { en: 'Theming', ar: 'السمات' },
     description: {
-      en: 'Light, dark and your own mode from one small CSS block, without touching a component.',
-      ar: 'وضع فاتح وداكن ووضعك الخاص من كتلة CSS صغيرة واحدة، دون لمس أي مكوّن.',
+      en: 'Six knobs change the shape of every component at once. A mode changes the colors. Nothing else is themeable, by design.',
+      ar: 'ستة مفاتيح ضبط تغيّر شكل كل المكوّنات دفعة واحدة، والوضع يغيّر الألوان. ولا شيء غير ذلك قابل للتخصيص، عن قصد.',
     },
   },
   {
     slug: 'rtl', path: '/docs/rtl', kind: 'guide', group: 'foundations', icon: 'translate', status: 'live',
     title: { en: 'Right to left', ar: 'من اليمين إلى اليسار' },
     description: {
-      en: 'Arabic works without a code change: the layout, the icons and the digits follow the page.',
-      ar: 'العربية تعمل دون تغيير في الشيفرة: التخطيط والأيقونات والأرقام تتبع الصفحة.',
+      en: 'Every component mirrors in Arabic without a code change, because no component is allowed to say left or right.',
+      ar: 'كل مكوّن ينعكس في العربية دون أي تغيير في الشيفرة، لأنه لا يُسمح لأي مكوّن بأن يقول يسار أو يمين.',
     },
   },
   {
     slug: 'server-first', path: '/docs/server-first', kind: 'guide', group: 'foundations', icon: 'globe', status: 'live',
     title: { en: 'Server first', ar: 'الخادم أولًا' },
     description: {
-      en: 'Most components render on the server and add no JavaScript. Here is which ones, and why.',
-      ar: 'أغلب المكوّنات تُعرض على الخادم ولا تضيف أي JavaScript. هذه هي، وهذا هو السبب.',
+      en: 'A component ships JavaScript only when it has to listen for something. Most of them never do.',
+      ar: 'لا يشحن المكوّن شيفرة JavaScript إلا حين يحتاج إلى الاستماع إلى حدث ما. أما البقية فلا تضيف شيئًا.',
     },
   },
   {
     slug: 'accessibility', path: '/docs/accessibility', kind: 'guide', group: 'foundations', icon: 'check-circle', status: 'live',
+    leadLink: { text: 'WCAG 2.2 AA', href: 'https://www.w3.org/TR/WCAG22/' },
     title: { en: 'Accessibility', ar: 'إمكانية الوصول' },
     description: {
-      en: 'WCAG 2.2 AA, checked in a real browser: axe, target size, the focus ring and contrast.',
-      ar: 'معيار WCAG 2.2 AA، مفحوص في متصفح حقيقي: axe وحجم الهدف وحلقة التركيز والتباين.',
+      en: 'WCAG 2.2 AA is the target. This page lists what a machine checks, what a person checks, and what is not yet covered.',
+      ar: 'الهدف هو WCAG 2.2 AA. تعرض هذه الصفحة ما تفحصه الآلة، وما يفحصه الإنسان، وما لم يُغطَّ بعد.',
     },
   },
   {
@@ -139,8 +142,8 @@ export const PAGES = [
     slug: 'changelog', path: '/changelog', kind: 'changelog', group: 'more', icon: 'clock', status: 'live',
     title: { en: 'Changelog', ar: 'سجل التغييرات' },
     description: {
-      en: 'What changed in each release of TopClass UI, newest first, with the version it shipped in.',
-      ar: 'ما تغيّر في كل إصدار من TopClass UI، الأحدث أولًا، مع الإصدار الذي صدر فيه.',
+      en: 'Every release of TopClass UI, newest first, with what changed in it and how to move to it.',
+      ar: 'كل إصدار من TopClass UI، الأحدث أولًا، مع ما تغيّر فيه وكيفية الانتقال إليه.',
     },
   },
 ] as const satisfies readonly PageEntry[]

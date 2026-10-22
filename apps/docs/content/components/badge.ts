@@ -3,11 +3,13 @@ export const badge = {
   slug: 'badge',
   title: { en: 'Badge', ar: 'شارة' },
   description: {
-    en: 'A short status label in three variants across six tones. It renders on the server and ships no JavaScript.',
+    en: 'A status label in three variants across six tones, rendered on the server with no script.',
     ar: 'تسمية حالة قصيرة بثلاثة أنماط عبر ست نبرات. تُعرض على الخادم ولا تُرسل أي JavaScript إلى المتصفح.',
   },
   demos: ['with-icon', 'variants', 'tones', 'sizes', 'long-label', 'skeleton', 'custom-size', 'rtl'],
-  stageHeight: 8,
+  stageHeight: 19.4375,
+  stageDemo: 'tones',
+  codeDemo: 'with-icon',
   note: {
     en: 'Badge has no ARIA role: the text carries the meaning, colour never does alone.',
     ar: 'لا تحمل الشارة أي دور ARIA: النص يحمل المعنى، واللون وحده لا يكفي أبدًا.',

@@ -1,25 +1,25 @@
-import { check } from '#icons/data/check.js'
-import { clock } from '#icons/data/clock.js'
-import { Svg } from '#components/svg/index.js'
-import { Timeline } from '../index.js'
+import { Timeline, TimelineSkeleton } from '../index.js'
 
-const DONE = [{ id: 'done', title: 'Done', time: 'A filled dot in success', status: 'done' }] as const
-const CURRENT = [{ id: 'current', title: 'Current', time: 'A dot in a ring, read as the current step', status: 'current' }] as const
-const TODO = [{ id: 'todo', title: 'To do', time: 'A hollow dot', status: 'todo' }] as const
-const TONED = [{ id: 'toned', title: 'A tone of its own', time: 'No status, the danger tone', tone: 'danger' }] as const
-const ICON = [{ id: 'icon', icon: <Svg icon={check} size="xs" />, title: 'An icon', time: 'Takes the tone of its status', status: 'done' }] as const
-const ICON_TODO = [{ id: 'icon-todo', icon: <Svg icon={clock} size="xs" />, title: 'An icon to do', status: 'todo' }] as const
+const key = (event: { id: string }) => event.id
 
-/** Every marker the rail draws, one rail each so each is named: the three statuses, a tone with no status, and an icon filled and hollow. */
+/** The strip's word beside each marker: 8 px from it, small, regular and muted, as drawn. */
+const WORD = '-ms-1 font-mono text-xs font-normal text-muted'
+
+/** Every state the strip draws, one cell each, captioned by its name: a marker and its word for done, current, todo and
+ * error, then loading and empty. */
 export default function Demo() {
   return (
     <div className="grid gap-4">
-      <Timeline items={DONE} getKey={(event) => event.id} />
-      <Timeline items={CURRENT} getKey={(event) => event.id} />
-      <Timeline items={TODO} getKey={(event) => event.id} />
-      <Timeline items={TONED} getKey={(event) => event.id} />
-      <Timeline items={ICON} getKey={(event) => event.id} />
-      <Timeline items={ICON_TODO} getKey={(event) => event.id} />
+      <Timeline aria-label="done" items={[{ id: 'done', title: <span className={WORD}>done</span>, status: 'done' }]} getKey={key} />
+      <Timeline aria-label="current" items={[{ id: 'current', title: <span className={WORD}>current</span>, status: 'current' }]} getKey={key} />
+      <Timeline aria-label="todo" items={[{ id: 'todo', title: <span className={WORD}>todo</span>, status: 'todo' }]} getKey={key} />
+      <Timeline aria-label="error" items={[{ id: 'error', title: <span className={WORD}>error</span>, tone: 'danger' }]} getKey={key} />
+      <div role="group" aria-label="loading" aria-busy="true">
+        <TimelineSkeleton className="w-36" />
+      </div>
+      <div role="group" aria-label="empty">
+        <Timeline items={[]} getKey={key} />
+      </div>
     </div>
   )
 }

@@ -11,7 +11,8 @@ const classes = (props: ButtonProps = {}) => classList(markup(<Button {...props}
 const cell = (variant: string, tone: string) => {
   if (variant === 'solid') return [`bg-${tone}-solid`, `text-${tone}-on-solid`]
   if (variant === 'soft') return [`bg-${tone}-soft`, `text-${tone}-on-soft`]
-  return [`text-${tone}-on-soft`]
+  if (variant === 'link') return [`text-${tone}-on-soft`]
+  return []
 }
 
 describe('every tone against every variant', () => {
@@ -32,6 +33,18 @@ describe('every tone against every variant', () => {
 
         const others = BUTTON_TONES.filter((t) => t !== tone).flatMap((t) => cell(variant, t))
         expect(others.filter((c) => list.includes(c)), `${variant}/${tone}`).toEqual([])
+      })
+    }
+  }
+})
+
+describe('outline and ghost, as Figma 64:340 draws them', () => {
+  for (const tone of BUTTON_TONES) {
+    for (const variant of ['outline', 'ghost'] as const) {
+      it(`${variant} + ${tone} keeps body text and wears no tone text`, () => {
+        const list = classes({ variant, tone })
+        expect(list).toContain('text-body')
+        expect(list.filter((c) => c.endsWith('-on-soft'))).toEqual([])
       })
     }
   }
@@ -73,5 +86,12 @@ describe('the tone mechanism', () => {
     const list = classes({ tone: 'primary', className: 'tone-danger' })
     expect(list).toContain('tone-danger')
     expect(list).not.toContain('tone-primary')
+  })
+})
+
+describe('the pointer', () => {
+  it('is a hand on every variant, and disabled stops pointer events so it never shows', () => {
+    for (const variant of BUTTON_VARIANTS) expect(classes({ variant })).toContain('cursor-pointer')
+    expect(classes({ disabled: true })).toContain('disabled:pointer-events-none')
   })
 })

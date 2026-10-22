@@ -167,10 +167,16 @@ export const MUTATIONS: Mutation[] = [
     to: "'",
   },
   {
-    label: 'command: the active row drops the shared highlight, so neither a fill nor a ring tells it apart',
+    label: 'command: the active row drops its mark, so neither a fill nor a bar tells it apart',
     file: CLASSES,
-    from: '${ROW} ${ROW_HIGHLIGHT} ${DISABLED}',
+    from: '${ROW} ${COMMAND_ACTIVE} ${DISABLED}',
     to: '${ROW} ${DISABLED}',
+  },
+  {
+    label: 'command: the input has the focus and its row draws no line, so a keyboard user cannot see where the focus is',
+    file: CLASSES,
+    from: ' has-focus-visible:after:block',
+    to: '',
   },
   {
     label: 'command: the input text drops to 14 px, and iOS zooms the page into it',
@@ -193,8 +199,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'command: the popup clips its children, and the ring of the input with them',
     file: CLASSES,
-    from: 'max-w-105 flex-col wrap-anywhere',
-    to: 'max-w-105 flex-col overflow-hidden wrap-anywhere',
+    from: 'max-w-100 flex-col wrap-anywhere',
+    to: 'max-w-100 flex-col overflow-hidden wrap-anywhere',
   },
   {
     label: 'command: the window ignores visibleRows, so a two-row box mounts the rows of seven',
@@ -219,5 +225,22 @@ export const MUTATIONS: Mutation[] = [
     file: PANEL,
     from: 'aria-busy={panel.busy || undefined}',
     to: 'aria-busy={undefined}',
+  },  {
+    label: 'command: the Enter hint loses its empty alternative, so a screen reader names the active row "ButtonEnter"',
+    file: HOOK,
+    from: 'enterHint: `${JSON.stringify(labels.command.enter)} / ""`,',
+    to: 'enterHint: JSON.stringify(labels.command.enter),',
+  },
+  {
+    label: 'command: the Esc keycap stays under a finger, where no key can press it',
+    file: CLASSES,
+    from: "'shrink-0 border-line text-muted pointer-coarse:hidden'",
+    to: "'shrink-0 border-line text-muted'",
+  },
+  {
+    label: 'command: the playground ignores stage, so the docs stage shows a closed palette behind its button',
+    file: 'src/components/command/dummy/playground.tsx',
+    from: '  if (stage && [visibleRows, virtualize, shortcut, defaultOpen].every((prop) => prop === undefined)) return <Stage />\n',
+    to: '',
   },
 ]

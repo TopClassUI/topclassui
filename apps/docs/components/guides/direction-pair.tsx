@@ -9,11 +9,11 @@ function demoOf(key: string) {
   return <Demo demoKey={key} />
 }
 
-/** One component's demo left to right beside its rtl demo, both from the library's dummy/ files in dist (docs-site page 10). */
+/** One component's demo left to right above its rtl demo, each the full column so neither wraps, both from the library's dummy/ files in dist (docs-site page 10). */
 export function DirectionPair({ ltr, rtl, locale }: { ltr: string; rtl: string; locale: Locale }) {
   const labels = guideLabelsFor(locale).pair
   return (
-    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-3">
       <figure dir="ltr" lang="en" className={`flex min-w-0 flex-col gap-3 rounded-box bg-page p-4 ${BORDER}`}>
         <figcaption className="font-mono text-sm text-muted">{labels.ltr}</figcaption>
         {demoOf(ltr)}

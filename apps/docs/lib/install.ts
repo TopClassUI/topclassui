@@ -20,3 +20,11 @@ export const INSTALL_LINE = installLineOf(PACKAGE_VERSION)
 export function importLineOf(names: readonly string[], slug: string): string {
   return `import { ${names.join(', ')} } from 'topclassui/${slug}'`
 }
+
+/** The CLI command that copies one component's source into the app (docs-site.md, the Previewer's install row). */
+export const addLineOf = (slug: string): string => `npx topclassui add ${slug}`
+
+/** The import of the copied source, through the `@/topclassui` alias the CLI sets up. */
+export function sourceImportLineOf(names: readonly string[], slug: string): string {
+  return `import { ${names.join(', ')} } from '@/topclassui/components/${slug}'`
+}

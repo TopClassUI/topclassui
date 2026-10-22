@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import { caretDown } from '#icons/data/caret-down.js'
-import { caretUp } from '#icons/data/caret-up.js'
+import { caretUpDown } from '#icons/data/caret-up-down.js'
+import { sortDescending } from '#icons/data/sort-descending.js'
+import { sortAscending } from '#icons/data/sort-ascending.js'
 import { ar } from '#shared/labels/ar.js'
 import { en } from '#shared/labels/en.js'
 import { attr, classList, markup } from '#test/markup.js'
@@ -50,48 +51,59 @@ describe('aria-sort names the sorted column and no other', () => {
     expect(th).toContain('<svg ')
   })
 
-  it('marks nothing when sort.key names no column', () => {
+  it('marks nothing when sort.key names no column: every sortable header keeps its idle pair', () => {
     const html_ = html({ sort: { key: 'customer', direction: 'ascending' } })
     expect(html_).not.toContain('aria-sort')
-    expect(html_).not.toContain('<svg')
+    expect(html_).not.toContain('role="img"')
+    expect(html_.split(caretUpDown.path).length - 1).toBe(2)
   })
 
   it('reads a direction no list holds as unsorted, instead of crashing on a missing icon', () => {
     const sideways = { key: 'amount', direction: 'sideways' } as unknown as TableSort
     const html_ = html({ sort: sideways })
     expect(html_).not.toContain('aria-sort')
-    expect(html_).not.toContain('<svg')
+    expect(html_).not.toContain('role="img"')
+    expect(html_.split(caretUpDown.path).length - 1).toBe(2)
   })
 })
 
 describe('the caret of the sorted column', () => {
   it('points up for ascending and down for descending', () => {
     const up = html({ sort: { key: 'amount', direction: 'ascending' } })
-    expect(up).toContain(caretUp.path)
-    expect(up).not.toContain(caretDown.path)
+    expect(up).toContain(sortAscending.path)
+    expect(up).not.toContain(sortDescending.path)
 
     const down = html({ sort: { key: 'amount', direction: 'descending' } })
-    expect(down).toContain(caretDown.path)
-    expect(down).not.toContain(caretUp.path)
+    expect(down).toContain(sortDescending.path)
+    expect(down).not.toContain(sortAscending.path)
   })
 
-  it('is drawn once, in the sorted header and nowhere else', () => {
+  it('is drawn once, in the sorted header; the other sortable header keeps the idle pair and a plain one has none', () => {
     const cells = headers(html({ sort: { key: 'amount', direction: 'descending' } }))
-    expect(cells.map((th) => th.split('<svg').length - 1)).toEqual([0, 0, 1])
+    expect(cells.map((th) => th.split('role="img"').length - 1)).toEqual([0, 0, 1])
+    expect(cells.map((th) => th.split(caretUpDown.path).length - 1)).toEqual([1, 0, 0])
+  })
+
+  it('draws the idle pair muted, hidden from a reader, as the frame does after every sortable header', () => {
+    const [number] = headers(html())
+    const svg = /<svg [^>]*>/.exec(number ?? '')?.[0] ?? ''
+    expect(attr(svg, 'aria-hidden')).toBe('true')
+    expect(classList(svg)).toEqual(['inline-block', 'ms-1.25', 'shrink-0', 'text-muted'])
+    expect(attr(svg, 'width')).toBe('13')
   })
 
   it('says the direction in words, because aria-sort is not read out everywhere', () => {
-    const svg = /<svg [^>]*>/.exec(html({ sort: { key: 'amount', direction: 'descending' } }))?.[0] ?? ''
+    const svg = /<svg [^>]*role="img"[^>]*>/.exec(html({ sort: { key: 'amount', direction: 'descending' } }))?.[0] ?? ''
     expect(attr(svg, 'role')).toBe('img')
     expect(attr(svg, 'aria-label')).toBe('sorted descending')
-    expect(attr(/<svg [^>]*>/.exec(html({ sort: { key: 'amount', direction: 'ascending' } }))?.[0] ?? '', 'aria-label'))
+    expect(attr(/<svg [^>]*role="img"[^>]*>/.exec(html({ sort: { key: 'amount', direction: 'ascending' } }))?.[0] ?? '', 'aria-label'))
       .toBe('sorted ascending')
   })
 
-  it('sits after the header at one em and never mirrors: up and down mean the same in Arabic', () => {
-    const svg = /<svg [^>]*>/.exec(html({ sort: { key: 'amount', direction: 'descending' } }))?.[0] ?? ''
-    expect(classList(svg)).toEqual(['inline-block', 'shrink-0', 'ms-1'])
-    expect(attr(svg, 'width')).toBe('1em')
+  it('sits after the header at the frame\'s 13 px and never mirrors: up and down mean the same in Arabic', () => {
+    const svg = /<svg [^>]*role="img"[^>]*>/.exec(html({ sort: { key: 'amount', direction: 'descending' } }))?.[0] ?? ''
+    expect(classList(svg)).toEqual(['inline-block', 'ms-1.25', 'shrink-0'])
+    expect(attr(svg, 'width')).toBe('13')
   })
 })
 

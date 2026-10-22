@@ -74,10 +74,10 @@ test.describe('the Arabic font still lands, set apart from the Latin one', () =>
   test('rtl: the page takes it, and the code and the keycap keep the monospace', async ({ page }) => {
     await page.goto(urlFor('code-block--highlighted', 'light', 'rtl'))
     await page.addStyleTag({ content: ARABIC })
-    expect(await fonts(page, '#demo pre code')).toEqual({ body: 'serif', element: 'ui-monospace, monospace', child: 'ui-monospace, monospace' })
+    expect(await fonts(page, '#demo pre code')).toEqual({ body: 'serif', element: 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace', child: 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace' })
     await page.goto(urlFor('kbd--combination', 'light', 'rtl'))
     await page.addStyleTag({ content: ARABIC })
-    expect(await fonts(page, '#demo kbd')).toEqual({ body: 'serif', element: 'ui-monospace, monospace', child: 'ui-monospace, monospace' })
+    expect(await fonts(page, '#demo kbd')).toEqual({ body: 'serif', element: 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace', child: 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace' })
   })
 
   test('ltr: an island marked lang="ar-EG" takes it, and its keycap keeps the monospace; the page keeps the Latin one', async ({ page }) => {
@@ -85,7 +85,33 @@ test.describe('the Arabic font still lands, set apart from the Latin one', () =>
     await page.addStyleTag({ content: ARABIC })
     await page.locator('#demo').evaluate((demo) => { demo.setAttribute('lang', 'ar-EG') })
     expect(await fonts(page, '#demo')).toEqual({ body: 'ui-sans-serif, system-ui, sans-serif', element: 'serif', child: 'serif' })
-    expect(await fonts(page, '#demo kbd')).toEqual({ body: 'ui-sans-serif, system-ui, sans-serif', element: 'ui-monospace, monospace', child: 'ui-monospace, monospace' })
+    expect(await fonts(page, '#demo kbd')).toEqual({ body: 'ui-sans-serif, system-ui, sans-serif', element: 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace', child: 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace' })
+  })
+})
+
+test.describe('a font-sans element takes the font of its language', () => {
+  const ARABIC = ':root { --tc-font-arabic: serif }'
+  /** What font-sans gives an element appended to the target: the same declaration the utility writes. */
+  const sans = (page: Page, target: string) => page.locator(target).evaluate((owner) => {
+    const element = owner.appendChild(document.createElement('div'))
+    element.style.fontFamily = 'var(--tc-font-sans)'
+    const family = getComputedStyle(element).fontFamily
+    element.remove()
+    return family
+  })
+
+  test('rtl: under the Arabic page it is the Arabic stack, not the Latin one', async ({ page }) => {
+    await page.goto(urlFor('kbd--combination', 'light', 'rtl'))
+    await page.addStyleTag({ content: ARABIC })
+    expect(await sans(page, 'body')).toBe('serif')
+  })
+
+  test('ltr: in an island marked lang="ar" it is the Arabic stack; on the page it stays Latin', async ({ page }) => {
+    await page.goto(urlFor('kbd--combination', 'light', 'ltr'))
+    await page.addStyleTag({ content: ARABIC })
+    await page.locator('#demo').evaluate((demo) => { demo.setAttribute('lang', 'ar') })
+    expect(await sans(page, '#demo')).toBe('serif')
+    expect(await sans(page, 'body')).toBe('ui-sans-serif, system-ui, sans-serif')
   })
 })
 

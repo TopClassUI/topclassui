@@ -1,22 +1,13 @@
 import { Skeleton } from '../index.js'
 
-const SHAPES = [
-  ['text', 'Text'],
-  ['circle', 'Circle'],
-  ['rect', 'Rect'],
-  ['card', 'Card'],
-] as const
-
-/** The four shapes at their own default sizes, each with its name under it. */
+/** One cell per shape, named by its aria-label, as Figma 137:916 draws the strip; each cell has a width of its own, since a centred cell gives a full-width shape none. */
 export default function Demo() {
   return (
-    <div className="grid max-w-sm gap-6 text-sm text-muted">
-      {SHAPES.map(([variant, name]) => (
-        <div key={variant} className="grid gap-2">
-          <Skeleton variant={variant} />
-          <span>{name}</span>
-        </div>
-      ))}
+    <div className="flex flex-wrap items-center gap-6">
+      <div role="group" aria-label="text" className="w-27.5 text-[0.6667rem]/[0.875rem]"><Skeleton variant="text" rows={2} /></div>
+      <div role="group" aria-label="circle"><Skeleton variant="circle" className="size-9" /></div>
+      <div role="group" aria-label="rect" className="w-28"><Skeleton variant="rect" /></div>
+      <div role="group" aria-label="card" className="w-28"><Skeleton variant="card" /></div>
     </div>
   )
 }

@@ -3,15 +3,15 @@ export const banner = {
   slug: 'banner',
   title: { en: 'Banner', ar: 'شريط إعلان' },
   description: {
-    en: 'One message for the whole page, full width above the header. It sits in the page flow, so it pushes the page down and covers nothing.',
-    ar: 'رسالة واحدة للصفحة كلها، بعرض كامل فوق الترويسة. يقع في تدفق الصفحة، فيدفعها إلى الأسفل ولا يغطي شيئًا.',
+    en: 'Full width above the header; it pushes the page down rather than covering anything.',
+    ar: 'بعرض كامل فوق الترويسة؛ يدفع الصفحة إلى الأسفل بدل أن يغطي شيئًا.',
   },
   note: {
     en: 'Dismissal is remembered per id in this browser, so change the id when the message changes.',
     ar: 'الإخفاء يُحفظ حسب المعرّف في هذا المتصفح، فغيّر المعرّف عندما تتغير الرسالة.',
   },
   demos: ['basic', 'tones', 'with-action', 'dismissible', 'minimal', 'long-action', 'long-text', 'rtl'],
-  stageHeight: 4,
+  stageHeight: 19.4375,
   notes: {
     en: [
       'For one message the whole page should see: a release, a trial ending, planned maintenance. Put it above the header.',

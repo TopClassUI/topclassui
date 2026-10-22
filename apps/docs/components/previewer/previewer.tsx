@@ -1,22 +1,32 @@
 // The Previewer card (S8): head, stage and Try it, the code, every state, install. Used by a component's page and the catalog.
+import type { ReactNode } from 'react'
 import { Badge } from 'topclassui/badge'
+import { Button } from 'topclassui/button'
 import { Svg } from 'topclassui/svg'
 import { downloadSimple } from 'topclassui/icons/download-simple'
 import { info } from 'topclassui/icons/info'
 
+import { CLIENT_DEMO_KEYS, SERVER_DEMOS } from '../../.generated/server-demos'
 import { COMPONENT_PAGE_LABELS } from '../../labels/component-page'
 import { chipOf } from '../../lib/chip'
 import { type PagedComponent, demoSourceOf } from '../../lib/components'
 import type { Locale } from '../../lib/locales'
 import { countStates } from '../../lib/states'
+import { sampleOf, stagelessOf } from '../../lib/sample'
 import { snippetOf, usageOf } from '../../lib/usage'
-import { CARD, CARD_HEAD, CARD_PART, CARD_TITLE, H3, LINK, SMALL, STAGE, STATE_SCOPE } from '../classes'
+import { withStarts } from '../../scripts/lib/controls'
+import { CARD_PART, CODE_CAPTION, CODE_PART, FLAT_CODE, H3, NOTE, NOTE_CODE, PART_ROW, PREVIEWER, PREVIEWER_DESCRIPTION, PREVIEWER_HEAD, PREVIEWER_TITLE, PREVIEWER_TITLE_LINK, STAGE } from '../classes'
 import { Code } from '../code'
 import { Demo } from '../demo'
 import { InlineText } from '../inline-text'
 import { InstallRow } from './install-row'
-import { CardModeSwitch, PlaygroundIsland } from './previewer-islands'
+import { ClientStates } from './client-states'
+import { CardModeSwitch, CopyButton, PlaygroundIsland } from './previewer-islands'
+import { StateStrip, type StateStripProps } from './state-strip'
 import { ModeScope, PreviewerModeProvider } from './previewer-mode'
+
+/** The chip's colour by where the component renders, as the frames tint it. */
+const CHIP_TONE = { server: 'success', split: 'info', client: 'primary' } as const
 
 export interface PreviewerProps {
   entry: PagedComponent
@@ -28,44 +38,66 @@ export interface PreviewerProps {
   deferred?: boolean
 }
 
+/** A server states demo is called here, so its root's children become the strip's cells; one with a client part goes to its island. */
+async function StatesPart({ demoKey, ...props }: Omit<StateStripProps, 'tree'> & { demoKey: string }) {
+  if (CLIENT_DEMO_KEYS.includes(demoKey)) return <ClientStates demoKey={demoKey} {...props} />
+  if (!(demoKey in SERVER_DEMOS)) return null
+  const { default: Component } = (await SERVER_DEMOS[demoKey as keyof typeof SERVER_DEMOS]()) as { default: (props: Record<string, never>) => ReactNode | Promise<ReactNode> }
+  return <StateStrip tree={await Component({})} {...props} />
+}
+
 export function Previewer({ entry, locale, href, headingId, deferred = false }: PreviewerProps) {
   const t = COMPONENT_PAGE_LABELS[locale]
   const { content } = entry
   const title = content.title[locale]
-  const playground = entry.files.playground && entry.controls.length > 0
+  const order = content.controlOrder ?? []
+  const rank = (prop: string) => (order.includes(prop) ? order.indexOf(prop) : order.length)
+  const controls = withStarts([...entry.controls, ...(content.extraSwitches ?? []).map((prop) => ({ prop, kind: 'switch' as const, default: false }))], content.starts ?? {})
+    .filter((control) => !(content.controlsHidden ?? []).includes(control.prop))
+    .map((control, index) => ({ control, index }))
+    .sort((a, b) => rank(a.control.prop) - rank(b.control.prop) || a.index - b.index)
+    .map(({ control }) => control)
+  const playground = entry.files.playground && controls.length > 0
+  // The stage at rest is the demo the frame draws (stageDemo); Try it swaps in the playground on the first change.
   const stageDemo = content.stageDemo ?? (playground ? 'playground' : (content.demos[0] ?? 'playground'))
   const stageSource = demoSourceOf(entry, stageDemo) ?? ''
-  const usage = playground ? usageOf(stageSource) : null
-  const restCode = (
-    <Code locale={locale} title={`${entry.slug}.tsx`} copyLabel={t.copyCode} code={usage === null ? stageSource : snippetOf(usage, [])} />
-  )
+  const playgroundSource = demoSourceOf(entry, 'playground') ?? ''
+  // An overlay's playground draws the docs stage too: the usage is read from it once the stage is gone.
+  const usage = playground ? (usageOf(playgroundSource) ?? usageOf(stagelessOf(playgroundSource))) : null
+  // THE CODE at rest is the frame's sample: codeDemo when set, else the playground's usage whatever the stage draws, else the stage's own file.
+  const codeSource = content.codeDemo === undefined ? null : demoSourceOf(entry, content.codeDemo)
+  const restSource = codeSource !== null ? sampleOf(codeSource) : usage === null ? sampleOf(stageSource) : snippetOf(usage, [])
+  const restCode = <Code locale={locale} title={`${entry.slug}.tsx`} copyLabel={t.copyCode} code={restSource} className={FLAT_CODE} />
   const note = (
-    <p className={`flex items-start gap-2 ${SMALL}`}>
-      <Svg icon={info} size="1rem" className="mt-0.5 shrink-0" aria-hidden="true" />
-      <span><InlineText text={content.note[locale]} /></span>
+    <p className={`flex items-start gap-2 ${NOTE}`}>
+      <Svg icon={info} size="0.75rem" className="mt-0.5 shrink-0" aria-hidden="true" />
+      <span className={NOTE_CODE}><InlineText text={content.note[locale]} /></span>
     </p>
   )
   const descriptions = Object.fromEntries(entry.props.flatMap((part) => part.rows.map((row) => [row.name, row.description])))
   const statesSource = entry.files.states ? demoSourceOf(entry, 'states') : null
   const installId = `install-${entry.slug}`
+  const counts = Array.from({ length: 25 }, (_, n) => t.stateCount(n))
 
   return (
     <PreviewerModeProvider>
-      <article aria-labelledby={headingId} data-component={entry.slug} className={deferred ? `${CARD} docs-card-deferred` : CARD}>
-        <header className={CARD_HEAD}>
-          <div className="flex flex-wrap items-center gap-3">
-            <h2 id={headingId} className={CARD_TITLE}>
-              {href === undefined ? title : <a href={href} className={LINK}>{title}</a>}
-            </h2>
-            <Badge tone="neutral" variant="outline" size="sm"><bdi>{chipOf(entry, t.chip)}</bdi></Badge>
+      <article aria-labelledby={headingId} data-component={entry.slug} className={deferred ? `${PREVIEWER} docs-card-deferred` : PREVIEWER}>
+        <header className={PREVIEWER_HEAD}>
+          <div className="grid min-w-0 flex-1 basis-80 gap-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 id={headingId} className={PREVIEWER_TITLE}>
+                {href === undefined ? title : <a href={href} className={PREVIEWER_TITLE_LINK}>{title}</a>}
+              </h2>
+              <Badge tone={CHIP_TONE[entry.rendering]} variant="soft" size="xs" className="px-1.75 py-px font-mono font-normal text-[0.625rem]/3"><bdi>{chipOf(entry, t.chip)}</bdi></Badge>
+            </div>
+            <p className={PREVIEWER_DESCRIPTION}><InlineText text={content.description[locale]} /></p>
           </div>
-          <p className={SMALL}><InlineText text={content.description[locale]} /></p>
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
             <CardModeSwitch label={t.cardMode(title)} names={t.modes} />
-            <a href={`#${installId}`} className={`gap-1.5 text-sm ${LINK}`}>
-              <Svg icon={downloadSimple} size="1rem" aria-hidden="true" />
+            <Button size="xs" className="gap-1.5 px-3" render={<a href={`#${installId}`} />}>
+              <Svg icon={downloadSimple} size="0.875rem" aria-hidden="true" />
               {t.install}
-            </a>
+            </Button>
           </div>
         </header>
 
@@ -74,14 +106,18 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
             <PlaygroundIsland
               slug={entry.slug}
               locale={locale}
-              controls={entry.controls}
+              controls={controls}
               descriptions={descriptions}
               stageHeight={content.stageHeight}
-              serverStage={entry.rendering === 'client' ? null : <Demo demoKey={`${entry.slug}/playground`} />}
+              stageOpen={content.stageOpen === true}
+              serverStage={stageDemo !== 'playground' ? <Demo demoKey={`${entry.slug}/${stageDemo}`} /> : entry.rendering === 'client' ? null : <Demo demoKey={`${entry.slug}/playground`} />}
+              stageIsPlayground={stageDemo === 'playground'}
               restCode={restCode}
+              restSource={restSource}
               usage={usage}
               note={note}
-              labels={{ tryIt: t.tryIt, theCode: t.theCode, copyCode: t.copyCode }}
+              codeCaption={content.codeCaption?.[locale]}
+              labels={{ tryIt: t.tryIt, theCode: t.theCode, copyCode: t.copyCode, copy: t.copy, copied: t.copied, copyFailed: t.copyFailed }}
             />
           </div>
         ) : (
@@ -91,8 +127,11 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
                 <Demo demoKey={`${entry.slug}/${stageDemo}`} />
               </div>
             </ModeScope>
-            <div className={CARD_PART}>
-              <h3 className={H3}>{t.theCode}</h3>
+            <div className={CODE_PART}>
+              <div className={PART_ROW}>
+                <h3 className={content.codeCaption === undefined ? H3 : CODE_CAPTION}>{content.codeCaption?.[locale] ?? t.theCode}</h3>
+                <CopyButton text={restSource} label={t.copyCode} word={t.copy} copied={t.copied} failed={t.copyFailed} />
+              </div>
               {restCode}
               {note}
             </div>
@@ -101,13 +140,7 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
 
         {statesSource === null ? null : (
           <div className={CARD_PART}>
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <h3 className={H3}>{t.everyState}</h3>
-              <span className={SMALL}>{t.stateCount(countStates(statesSource))}</span>
-            </div>
-            <ModeScope className={STATE_SCOPE}>
-              <Demo demoKey={`${entry.slug}/states`} />
-            </ModeScope>
+            <StatesPart demoKey={`${entry.slug}/states`} heading={t.everyState} counts={counts} sourceCount={countStates(statesSource)} names={t.stateNames} />
           </div>
         )}
 

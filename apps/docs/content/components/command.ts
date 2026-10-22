@@ -3,8 +3,8 @@ export const command = {
   slug: 'command',
   title: { en: 'Command palette', ar: 'لوحة الأوامر' },
   description: {
-    en: 'A searchable palette of actions, opened with Ctrl+K or Cmd+K. It loads on its first open, never with the page.',
-    ar: 'لوحة أوامر قابلة للبحث تُفتح بـ Ctrl+K أو Cmd+K. تُحمَّل عند أول فتح لها، لا مع الصفحة أبدًا.',
+    en: 'Searchable action palette that loads on first open, never in the initial bundle.',
+    ar: 'لوحة أوامر قابلة للبحث تُحمَّل عند أول فتح، ولا تدخل أبدًا في الحزمة الأولى.',
   },
   demos: [
     'basic',
@@ -19,7 +19,14 @@ export const command = {
     'with-tooltip',
     'rtl',
   ],
-  stageHeight: 12,
+  stageHeight: 19.4375,
+  controlOrder: ['visibleRows'],
+  controlsHidden: ['loadMoreThreshold'],
+  stageOpen: true,
+  codeCaption: {
+    en: 'Loaded with React.lazy and mounted on first open, so it is never in the initial bundle.',
+    ar: 'يُحمَّل عبر React.lazy ويُركَّب عند أول فتح، فلا يدخل الحزمة الأولى أبدًا.',
+  },
   note: {
     en: '`getKey`, `getLabel` and `onSelect` are functions, so the palette is configured inside a client file.',
     ar: '`getKey` و`getLabel` و`onSelect` دوال، لذا تُضبط اللوحة داخل ملف عميل.',

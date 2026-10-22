@@ -66,7 +66,7 @@ const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { 
 
 describe('every demo is a Server Component that only hands the client parts what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'collapsed', 'groups', 'in-a-layout', 'long-list', 'playground', 'rtl', 'states'])
+    expect(names).toEqual(['basic', 'collapsed', 'groups', 'in-a-layout', 'long-list', 'playground', 'rtl', 'stage', 'states'])
   })
 
   it('leaves out the one demo that is a client file, which cannot run here: it calls useState', async () => {
@@ -94,7 +94,10 @@ describe('the parts a demo is built from', () => {
 
   it('two client parts and no more: the rail, and the toggle its header draws. Every link is server markup', async () => {
     for (const name of names.filter((demo) => demo !== 'rtl' && demo !== 'states' && demo !== 'in-a-layout')) expect(await parts(name), name).toEqual(['SidebarRoot', 'SidebarTrigger'])
-    expect(await parts('states')).toEqual(['SidebarRoot', 'SidebarTrigger', 'SidebarRoot', 'SidebarTrigger'])
+    expect(await parts('states')).toEqual([
+      'SidebarRoot', 'SidebarTrigger', 'SidebarRoot', 'SidebarTrigger', 'SidebarRoot', 'SidebarTrigger',
+      'SidebarRoot', 'SidebarTrigger', 'SidebarRoot', 'SidebarTrigger',
+    ])
     // The page beside the rail holds a Table, whose body is its own client part.
     expect(await parts('in-a-layout')).toEqual(['SidebarRoot', 'SidebarTrigger', 'TableRows'])
   })
@@ -113,7 +116,15 @@ describe('the parts a demo is built from', () => {
       'basic': [{}], 'collapsed': [{ defaultOpen: false }], 'groups': [{}], 'in-a-layout': [{}], 'long-list': [{}],
       // The Try it rail hands on what the controls pass, which is nothing until one is set.
       'playground': [{ defaultOpen: undefined, open: undefined }], 'rtl': [{}],
-      'states': [{ 'aria-label': 'Expanded' }, { 'aria-label': 'Collapsed', 'defaultOpen': false }],
+      // The frame's stage: a 190 px card rail, the caller's className.
+      'stage': [{ className: 'h-auto rounded-box border-(length:--tc-line-width) data-open:w-47.5' }],
+      'states': [
+        { 'aria-label': 'expanded', 'defaultOpen': true, 'className': 'data-open:w-40 rounded-box border-(length:--tc-line-width)' },
+        { 'aria-label': 'collapsed', 'defaultOpen': false, 'className': 'data-open:w-40 rounded-box border-(length:--tc-line-width)' },
+        { 'aria-label': 'active item', 'defaultOpen': true, 'className': 'data-open:w-40 rounded-box border-(length:--tc-line-width)' },
+        { 'aria-label': 'hover', 'defaultOpen': true, 'className': 'data-open:w-40 rounded-box border-(length:--tc-line-width)' },
+        { 'aria-label': 'focus-visible', 'defaultOpen': true, 'className': 'data-open:w-40 rounded-box border-(length:--tc-line-width)' },
+      ],
     })
     const collapsed = crossings((await load('collapsed'))()).find((crossing) => crossing.part === 'SidebarRoot')
     expect(collapsed?.props['defaultOpen']).toBe(false)

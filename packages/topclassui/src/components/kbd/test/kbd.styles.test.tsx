@@ -8,8 +8,8 @@ const classes = (props: KbdProps = {}) => classList(markup(<Kbd {...props}>K</Kb
 
 /** The Build this list, written out; the last two are BORDER_STRONG. */
 const KEYCAP = [
-  'inline-flex', 'items-center', 'justify-center', 'rounded-chip', 'bg-surface',
-  'px-1.5', 'py-0.5', 'font-mono', 'text-xs', 'text-body',
+  'inline-flex', 'items-center', 'justify-center', 'rounded-chip', 'bg-surface-raised',
+  'px-1.5', 'py-0.5', 'font-mono', 'text-xs', 'text-body', 'data-pressed:bg-surface', 'data-disabled:bg-surface', 'data-disabled:border-line', 'data-disabled:text-muted',
   'border-(length:--tc-line-width)', 'border-line-strong',
 ]
 
@@ -32,7 +32,7 @@ describe('the keycap', () => {
   })
 
   it('is not interactive, so it carries no ring, hover, transition or touch target', () => {
-    const interactive = /^(hover:|active:|focus-visible:|outline-|transition|duration-|min-[hw]-|disabled:|data-disabled:|cursor-)/
+    const interactive = /^(hover:|active:|focus-visible:|outline-|transition|duration-|min-[hw]-|disabled:|cursor-)/
     expect(classes().filter((c) => interactive.test(c))).toEqual([])
   })
 })
@@ -74,5 +74,23 @@ describe('className', () => {
     const width = classes({ className: 'border-0' })
     expect(width).toContain('border-0')
     expect(width).not.toContain('border-(length:--tc-line-width)')
+  })
+})
+
+describe('the states Figma 135:411 draws', () => {
+  it('marks a pressed key with a presence attribute, and drops it to the surface', () => {
+    const html = markup(<Kbd pressed>K</Kbd>)
+    expect(html).toContain('data-pressed=""')
+    expect(classList(html)).toContain('data-pressed:bg-surface')
+  })
+
+  it('marks a disabled key with a presence attribute, at half strength', () => {
+    expect(markup(<Kbd disabled>K</Kbd>)).toContain('data-disabled=""')
+  })
+
+  it('writes neither attribute at rest', () => {
+    const html = markup(<Kbd>K</Kbd>)
+    expect(html).not.toContain('data-pressed=')
+    expect(html).not.toContain('data-disabled=')
   })
 })

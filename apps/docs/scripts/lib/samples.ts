@@ -21,7 +21,7 @@ export const PREAMBLE = [
   'declare const items: readonly { id: string; label: string }[]',
 ].join('\n')
 
-/** Every ```ts or ```tsx fence whose info string carries `check`. */
+/** Every ```ts or ```tsx fence whose info string carries `check`; `checklines="10-14"` compiles only those lines, where one drawn block holds two files. */
 export function checkedSamples(file: string, mdx: string): Sample[] {
   const samples: Sample[] = []
   const fence = /^```(tsx?)([^\n]*)\n([\s\S]*?)^```/gm
@@ -29,7 +29,9 @@ export function checkedSamples(file: string, mdx: string): Sample[] {
   for (const match of mdx.matchAll(fence)) {
     const [, lang = 'ts', meta = '', code = ''] = match
     if (!/(^|\s)check(\s|$)/.test(meta.replace(/title="[^"]*"/, ''))) continue
-    samples.push({ file, index: index++, lang, title: /title="([^"]+)"/.exec(meta)?.[1] ?? null, code })
+    const range = /checklines="(\d+)-(\d+)"/.exec(meta)
+    const lines = range === null ? code : `${code.split('\n').slice(Number(range[1]) - 1, Number(range[2])).join('\n')}\n`
+    samples.push({ file, index: index++, lang, title: /title="([^"]+)"/.exec(meta)?.[1] ?? null, code: lines })
   }
   return samples
 }

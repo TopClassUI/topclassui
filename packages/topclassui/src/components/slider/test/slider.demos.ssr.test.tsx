@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'playground', 'range', 'rtl', 'show-value', 'sizes', 'states']
+const EXPECTED = ['basic', 'combined', 'form', 'playground', 'range', 'rtl', 'show-value', 'sizes', 'stage', 'states']
 
 /** Each range input of each demo as the server writes it: the name a screen reader gets with no script, and the value. */
 const THUMBS: Record<string, string[]> = {
@@ -22,7 +22,9 @@ const THUMBS: Record<string, string[]> = {
   'rtl': ['مستوى الصوت 30', 'الحد الأدنى 20', 'الحد الأقصى 80'],
   'show-value': ['Brightness 40', 'Minimum 200', 'Maximum 800'],
   'sizes': ['Extra small 20', 'Small 40', 'Medium 50', 'Large 60', 'Extra large 80'],
-  'states': ['Live 40', 'Invalid 40', 'Disabled 40', 'Minimum 20', 'Maximum 70'],
+  'combined': ['Live 40', 'Invalid 40', 'Disabled 40', 'Minimum 20', 'Maximum 70'],
+  'stage': ['Volume 40', 'Balance 70'],
+  'states': ['idle 40', 'hover 40', 'active 60', 'focus-visible 40', 'disabled 40', 'invalid 40'],
 }
 
 const render = async (file: string) => {
@@ -41,7 +43,7 @@ function thumbsIn(html: string): string[] {
 }
 
 describe('every demo renders on the server', () => {
-  it('holds exactly the eight demos asked for, so none can be deleted silently', () => {
+  it('holds exactly the ten demos asked for, so none can be deleted silently', () => {
     expect(files).toEqual(EXPECTED)
   })
 
@@ -89,8 +91,8 @@ describe('the demos the plan names', () => {
     expect([...html.matchAll(/<output [^>]*>([^<]*)<\/output>/g)].map(([, text]) => text)).toEqual(['40', '$200 – $800'])
   })
 
-  it('states: the two invalid sliders say so on the group, and the disabled one disables its input', async () => {
-    const html = await render('states')
+  it('combined: the two invalid sliders say so on the group, and the disabled one disables its input', async () => {
+    const html = await render('combined')
     expect(html.match(/role="group" (aria-label="Invalid range" )?dir="ltr" aria-invalid="true"/g)).toEqual([
       'role="group" dir="ltr" aria-invalid="true"', 'role="group" aria-label="Invalid range" dir="ltr" aria-invalid="true"',
     ])

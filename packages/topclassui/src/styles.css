@@ -31,6 +31,39 @@
 /* Chromium only knows the prefixed value; the parent's side, whatever the element's own dir. */
 @utility text-match-parent { text-align: -webkit-match-parent; text-align: match-parent; }
 
+/* Pagination's compact row: a phone, a finger or a list narrower than its row keeps first, previous, "3 of 12", next and last. */
+/* Important, or a gap's own inline-flex, emitted later in the same layer, keeps it on screen. */
+@utility pagination-full {
+  @media (width < 36rem) { display: none !important; }
+  @media (pointer: coarse) { display: none !important; }
+}
+@utility pagination-compact {
+  display: none;
+  @media (width < 36rem) { display: flex; }
+  @media (pointer: coarse) { display: flex; }
+}
+/* The row's own width, worked out by the server: a list sized to its content claims it, so a shrink-to-fit cell is not compact. */
+@utility pagination-at-10 { contain-intrinsic-inline-size: 10rem; @container pagination (width < 10rem) { & .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }
+@utility pagination-at-12 { contain-intrinsic-inline-size: 12rem; @container pagination (width < 12rem) { & .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }
+@utility pagination-at-14 { contain-intrinsic-inline-size: 14rem; @container pagination (width < 14rem) { & .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }
+@utility pagination-at-16 { contain-intrinsic-inline-size: 16rem; @container pagination (width < 16rem) { & .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }
+@utility pagination-at-18 { contain-intrinsic-inline-size: 18rem; @container pagination (width < 18rem) { & .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }
+@utility pagination-at-20 { contain-intrinsic-inline-size: 20rem; @container pagination (width < 20rem) { & .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }
+@utility pagination-at-22 { contain-intrinsic-inline-size: 22rem; @container pagination (width < 22rem) { & .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }
+@utility pagination-at-24 { contain-intrinsic-inline-size: 24rem; @container pagination (width < 24rem) { & .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }
+@utility pagination-at-26 { contain-intrinsic-inline-size: 26rem; @container pagination (width < 26rem) { & .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }
+@utility pagination-at-28 { contain-intrinsic-inline-size: 28rem; @container pagination (width < 28rem) { & .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }
+@utility pagination-at-30 { contain-intrinsic-inline-size: 30rem; @container pagination (width < 30rem) { & .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }
+@utility pagination-at-32 { contain-intrinsic-inline-size: 32rem; @container pagination (width < 32rem) { & .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }
+@utility pagination-at-34 { contain-intrinsic-inline-size: 34rem; @container pagination (width < 34rem) { & .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }
+@utility pagination-at-36 { contain-intrinsic-inline-size: 36rem; @container pagination (width < 36rem) { & .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }
+@utility pagination-at-38 { contain-intrinsic-inline-size: 38rem; @container pagination (width < 38rem) { & .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }
+@utility pagination-at-40 { contain-intrinsic-inline-size: 40rem; @container pagination (width < 40rem) { & .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }
+@utility pagination-at-42 { contain-intrinsic-inline-size: 42rem; @container pagination (width < 42rem) { & .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }
+@utility pagination-at-44 { contain-intrinsic-inline-size: 44rem; @container pagination (width < 44rem) { & .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }
+@utility pagination-at-46 { contain-intrinsic-inline-size: 46rem; @container pagination (width < 46rem) { & .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }
+@utility pagination-at-48 { contain-intrinsic-inline-size: 48rem; @container pagination (width < 48rem) { & .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }
+
 /* A tone swaps the five interaction variables, so the hover classes never change. */
 @utility tone-primary {
   --tc-soft: var(--tc-primary-soft);
@@ -118,11 +151,17 @@
   --spacing-control-lg: calc(3rem * var(--tc-density));
   --spacing-control-xl: calc(3.5rem * var(--tc-density));
 
-  --spacing-toggle-xs: calc(0.875rem * var(--tc-density));
-  --spacing-toggle-sm: calc(1rem * var(--tc-density));
-  --spacing-toggle-md: calc(1.25rem * var(--tc-density));
-  --spacing-toggle-lg: calc(1.5rem * var(--tc-density));
-  --spacing-toggle-xl: calc(1.75rem * var(--tc-density));
+  --spacing-toggle-xs: calc(1rem * var(--tc-density));
+  --spacing-toggle-sm: calc(1.25rem * var(--tc-density));
+  --spacing-toggle-md: calc(1.5rem * var(--tc-density));
+  --spacing-toggle-lg: calc(1.75rem * var(--tc-density));
+  --spacing-toggle-xl: calc(2rem * var(--tc-density));
+
+  --spacing-knob-xs: calc(0.875rem * var(--tc-density));
+  --spacing-knob-sm: calc(1rem * var(--tc-density));
+  --spacing-knob-md: calc(1.25rem * var(--tc-density));
+  --spacing-knob-lg: calc(1.5rem * var(--tc-density));
+  --spacing-knob-xl: calc(1.75rem * var(--tc-density));
 
   --spacing-icon-xs: 1rem;
   --spacing-icon-sm: 1.25rem;

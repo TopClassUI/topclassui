@@ -8,7 +8,7 @@ description: نموذج يُعرض على الخادم ويُرسل إلى إج�
 
 نموذج اشتراك: حقل نص <span dir="ltr">`Input`</span> داخل <span dir="ltr">`Field`</span>، وزر <span dir="ltr">`Button`</span>.
 
-<Callout tone="info">[ثبّت الحزمة](/ar/docs/installation) أولًا.</Callout>
+<Callout tone="info">[ثبّت الحزمة](/ar/docs/installation) أولًا: <InstallLine /></Callout>
 
 ## 1. الإجراء
 
@@ -60,9 +60,9 @@ export default function Page() {
 
 ## 3. ما الذي يجب أن تراه
 
-1. **حقل نص له تسمية، وزر، بتنسيق الوضع الحالي.** إذا ظهرا بلا تنسيق، فمدخل CSS ينقصه سطر أو ترتيبه خاطئ.
-2. **عطّل JavaScript وأرسل النموذج.** يُرسل النموذج مع ذلك، ويعمل الإجراء، وتُعاد تحميل الصفحة. هذا إجراء الخادم يؤدي عمله؛ أما الأخطاء التي يعيدها فتظهر في الخطوة 4.
-3. **افتح لوحة الشبكة.** لا سكربت للنموذج. <span dir="ltr">`Input`</span> و<span dir="ltr">`Button`</span> و<span dir="ltr">`Field`</span> كلها تُشحن هنا بحجم 0 KB.
+1. **حقل نص له تسمية، وزر، بتنسيق الوضع الحالي** إذا ظهرا بلا تنسيق، فمدخل CSS ينقصه سطر أو ترتيبه خاطئ.
+2. **عطّل JavaScript وأرسل النموذج** يُرسل النموذج مع ذلك، ويعمل الإجراء، وتُعاد تحميل الصفحة. هذا إجراء الخادم يؤدي عمله؛ أما الأخطاء التي يعيدها فتظهر في الخطوة 4.
+3. **افتح لوحة الشبكة** لا سكربت للنموذج. <span dir="ltr">`Input`</span> و<span dir="ltr">`Button`</span> و<span dir="ltr">`Field`</span> كلها تُشحن هنا بحجم 0 KB.
 
 ## 4. اعرض الخطأ بلا إعادة تحميل
 
@@ -88,14 +88,7 @@ export function SubscribeForm({ action }: { action: typeof subscribe }) {
 }
 ```
 
-```tsx title="app/subscribe/page.tsx" check
-import { subscribe } from './actions'
-import { SubscribeForm } from './subscribe-form'
-
-export default function Page() {
-  return <SubscribeForm action={subscribe} />
-}
-```
+<Caption>والصفحة تعرض <span dir="ltr">`<SubscribeForm action={subscribe} />`</span>.</Caption>
 
 ## مع Vite
 

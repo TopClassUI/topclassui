@@ -6,11 +6,15 @@ export const otpField = {
     ar: 'حقل رمز التحقق',
   },
   description: {
-    en: 'A one-time code typed one character per cell. A paste fills every cell, and one hidden input carries the code to the form.',
-    ar: 'رمز يُستخدم مرة واحدة، حرف في كل خانة. اللصق يملأ كل الخانات، وحقل مخفي واحد يحمل الرمز إلى النموذج.',
+    en: 'A one-time code, one character per cell; a paste fills every cell at once.',
+    ar: 'رمز لمرة واحدة، حرف في كل خانة؛ واللصق يملأ كل الخانات دفعة واحدة.',
   },
   demos: ['basic', 'grouped', 'form', 'sizes', 'long', 'rtl'],
-  stageHeight: 7,
+  stageDemo: 'stage',
+  stageHeight: 7.25,
+  controlOrder: ['length', 'size', 'mask', 'autoSubmit', 'disabled', 'invalid'],
+  controlsHidden: ['groupSize'],
+  extraSwitches: ['mask', 'autoSubmit', 'disabled'],
   note: {
     en: 'The export is `OTPField`. In a form the hidden input sends what is typed so far, a partial code too.',
     ar: 'اسم التصدير هو `OTPField`. داخل نموذج يرسل الحقل المخفي ما كُتب حتى الآن، حتى لو كان الرمز ناقصًا.',

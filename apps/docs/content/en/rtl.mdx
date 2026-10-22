@@ -5,9 +5,9 @@ description: Every component mirrors in Arabic without a code change, because no
 
 ## The rule
 
-Direction is set once, on the `html` element. Components read it through logical CSS, never through JavaScript.
+Direction is set once, on the html element. Components read it through logical CSS, never through JavaScript.
 
-```tsx check title="app/layout.tsx"
+```tsx check title="app/layout.tsx" show="5-8"
 import { TopClassProvider } from 'topclassui/provider'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -30,19 +30,19 @@ Tailwind still ships the physical utilities. This library never uses them; the l
 
 | Banned | Use instead |
 |---|---|
-| `ml-*` `mr-*` | `ms-*` `me-*` |
-| `pl-*` `pr-*` | `ps-*` `pe-*` |
-| `left-*` `right-*` | `inset-s-*` `inset-e-*` |
-| `start-*` `end-*` | `inset-s-*` `inset-e-*` |
-| `text-left` `text-right` | `text-start` `text-end` |
-| `border-l` `border-r` | `border-s` `border-e` |
-| `rounded-l-*` `rounded-r-*` | `rounded-s-*` `rounded-e-*` |
-| `space-x-*` `divide-x-*` | `gap-*` and `border-s` on the item |
+| ml-\* mr-\* | ms-\* me-\* |
+| pl-\* pr-\* | ps-\* pe-\* |
+| left-\* right-\* | inset-s-\* inset-e-\* |
+| start-\* end-\* | inset-s-\* inset-e-\* |
+| text-left text-right | text-start text-end |
+| border-l border-r | border-s border-e |
+| rounded-l-\* rounded-r-\* | rounded-s-\* rounded-e-\* |
+| space-x-\* divide-x-\* | gap-\* and border-s on the item |
 | `tracking-*` | nothing - Arabic script does not use letter-spacing |
 
 ## Transforms and gestures
 
-A translate, a transform origin, a gradient or a swipe has no logical form in CSS. These multiply by `--tc-dir`, which is `1` in LTR and `-1` in RTL.
+A translate, a transform origin, a gradient or a swipe has no logical form in CSS. These multiply by --tc-dir, which is 1 in LTR and -1 in RTL.
 
 ```css title="styles.css"
 [dir="rtl"] { --tc-dir: -1; }
@@ -57,15 +57,15 @@ className="object-left rtl:object-right"
 
 ## Placement, not side
 
-Every overlay takes a `placement` instead of a `side`. `start` and `end` resolve to inline-start and inline-end, so a menu opens correctly in both directions.
+Every overlay takes a placement instead of a side. start and end resolve to inline-start and inline-end, so a menu opens correctly in both directions.
 
 <WrongRight>
 
-```tsx
+```tsx title="wrong"
 <PopoverPopup side="left" align="start" />
 ```
 
-```tsx check
+```tsx check title="right" show="3-6"
 import { PopoverPopup } from 'topclassui/popover'
 
 <PopoverPopup placement="start-top" />
@@ -102,12 +102,17 @@ selected: (n, fmt) => {
 
 The rule runs on every class string in the library and fails the lint on a physical class. It catches the deprecated aliases too.
 
-```tsx title="lint-probe.tsx"
-// wrong: one error per class string
+<WrongRight>
+
+```tsx title="wrong"
 className="pl-4 text-left"
 // R-5.3-1: "pl-" is physical. use ps- or pe-.
+// one error per class string;
 // fix it, and the next run names text-left
+```
 
-// right
+```tsx title="right"
 className="ps-4 text-start"
 ```
+
+</WrongRight>

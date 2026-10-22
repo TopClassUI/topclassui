@@ -389,8 +389,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the drawer popup stops breaking a long word, so a 300-character word makes the body scroll sideways',
     file: CLASSES,
-    from: 'text-body shadow-lg wrap-anywhere',
-    to: 'text-body shadow-lg',
+    from: 'text-body shadow-(--tc-shadow-overlay) wrap-anywhere',
+    to: 'text-body shadow-(--tc-shadow-overlay)',
   },
   {
     label: 'the drawer popup clips instead of scrolling, so an action below the screen of a phone on its side can never be reached',
@@ -461,8 +461,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the drawer header no longer ends short of the x, so a long title runs under it',
     file: CLASSES,
-    from: "border-line py-4 ps-4 pe-16'",
-    to: "border-line py-4 px-4'",
+    from: "border-line py-3.5 ps-4 pe-16'",
+    to: "border-line py-3.5 px-4'",
   },
   {
     label: 'the drawer footer no longer wears the shared action wrap, so a long action ends in an ellipsis on a phone',
@@ -511,5 +511,11 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/drawer/README.md',
     from: '<DrawerRoot placement="bottom">\n  <DrawerTrigger render={<Button>Invite</Button>} />',
     to: '<DrawerRoot placement="down">\n  <DrawerTrigger render={<Button>Invite</Button>} />',
+  },
+  {
+    label: 'the drawer playground drops defaultOpen from its stage branch, so the docs stage draws an empty box with no sheet in it',
+    file: `${DUMMY}/playground.tsx`,
+    from: '<DrawerRoot placement={placement} size={size} defaultOpen modal={false}>',
+    to: '<DrawerRoot placement={placement} size={size} modal={false}>',
   },
 ]

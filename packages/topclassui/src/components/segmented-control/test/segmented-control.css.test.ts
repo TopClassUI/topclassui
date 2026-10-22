@@ -59,7 +59,7 @@ describe('the holder and the track', () => {
     expect(ruleOf(selectorOf('max-w-full'))).toBe('max-width: 100%;')
     expect(ruleOf(selectorOf('overflow-x-auto'))).toBe('overflow-x: auto;')
     expect(ruleOf(selectorOf('overscroll-x-contain'))).toBe('overscroll-behavior-x: contain;')
-    expect(ruleOf(selectorOf('scroll-px-px'))).toBe('scroll-padding-inline: 1px;')
+    expect(ruleOf(selectorOf('scroll-px-0.5'))).toBe('scroll-padding-inline: calc(var(--spacing) * 0.5);')
     expect(ruleOf(selectorOf('relative'))).toBe('position: relative;')
   })
 
@@ -71,11 +71,11 @@ describe('the holder and the track', () => {
     expect(ruleOf(selectorOf('p-0.75'))).toBe('padding: calc(var(--spacing) * 0.75);')
   })
 
-  it('the height of the track at each size is the control scale, and custom draws none', () => {
+  it('the height of the track at each size is the control scale, md the drawn 36 px knob, and custom draws none', () => {
     const sizes = Object.fromEntries(Object.entries(SEGMENTED_ROOT_SIZE).filter(([size]) => size !== 'custom')
       .map(([size, cls]) => [size, ruleOf(selectorOf(cls))]))
     const height = (rem: string) => `min-height: calc(${rem}rem * var(--tc-density));`
-    expect(sizes).toEqual({ xs: height('1.75'), sm: height('2'), md: height('2.5'), lg: height('3'), xl: height('3.5') })
+    expect(sizes).toEqual({ xs: height('1.75'), sm: height('2'), md: 'min-height: var(--tc-segmented-height);', lg: height('3'), xl: height('3.5') })
     expect(SEGMENTED_ROOT_SIZE.custom).toBe('')
   })
 
@@ -101,12 +101,12 @@ describe('a segment', () => {
     ]) expect(ruleOf(selectorOf(cls ?? '')), cls).toBe(rule)
   })
 
-  it('selected: raised, shadowed, heavier and darker; not selected it is muted and medium', () => {
+  it('selected: raised, shadowed, heavier and darker; not selected it is muted and regular, as Figma 138:668 draws it', () => {
     expect(ruleOf(`${selectorOf('data-checked:bg-surface-raised')}${CHECKED}`)).toBe('background-color: var(--tc-surface-raised);')
-    expect(ruleOf(`${selectorOf('data-checked:font-semibold')}${CHECKED}`)).toBe('--tw-font-weight: var(--font-weight-semibold); font-weight: var(--font-weight-semibold);')
+    expect(ruleOf(`${selectorOf('data-checked:font-medium')}${CHECKED}`)).toBe('--tw-font-weight: var(--font-weight-medium); font-weight: var(--font-weight-medium);')
     expect(ruleOf(`${selectorOf('data-checked:text-body')}${CHECKED}`)).toBe('color: var(--tc-body);')
     expect(ruleOf(`${selectorOf('data-checked:shadow-sm')}${CHECKED}`)).toContain('--tw-shadow: 0 1px 3px 0')
-    expect(ruleOf(selectorOf('font-medium'))).toBe('--tw-font-weight: var(--font-weight-medium); font-weight: var(--font-weight-medium);')
+    expect(ruleOf(selectorOf('font-normal'))).toBe('--tw-font-weight: var(--font-weight-normal); font-weight: var(--font-weight-normal);')
     expect(ruleOf(selectorOf('text-muted'))).toBe('color: var(--tc-muted);')
   })
 
@@ -150,7 +150,7 @@ describe('a segment', () => {
   })
 
   it('the padding and the type step of each size, and custom draws none', () => {
-    expect(SEGMENTED_ITEM_SIZE).toEqual({ xs: 'px-2 text-xs', sm: 'px-2.5 text-sm', md: 'px-3 text-sm', lg: 'px-4 text-base', xl: 'px-5 text-base', custom: '' })
+    expect(SEGMENTED_ITEM_SIZE).toEqual({ xs: 'px-2 text-xs', sm: 'px-2.5 text-xs', md: 'px-2.75 text-xs', lg: 'px-4 text-base', xl: 'px-5 text-base', custom: '' })
     expect(ruleOf(selectorOf('px-2.5'))).toBe('padding-inline: calc(var(--spacing) * 2.5);')
   })
 

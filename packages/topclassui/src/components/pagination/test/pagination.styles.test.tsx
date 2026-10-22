@@ -4,6 +4,7 @@ import { caretDoubleLeft } from '#icons/data/caret-double-left.js'
 import { caretDoubleRight } from '#icons/data/caret-double-right.js'
 import { caretLeft } from '#icons/data/caret-left.js'
 import { caretRight } from '#icons/data/caret-right.js'
+import { dotsThree } from '#icons/data/dots-three.js'
 import { attr, markup } from '#test/markup.js'
 import { Pagination } from '../index.js'
 import type { PaginationProps } from '../types.js'
@@ -38,8 +39,15 @@ const RING = [
   'focus-visible:outline-ring',
 ]
 const TYPE_STEP = { xs: 'text-xs', sm: 'text-sm', md: 'text-sm', lg: 'text-base', xl: 'text-base' } as const
-const PADDING = { xs: 'px-0.5', sm: 'px-0.5', md: 'px-1', lg: 'px-1', xl: 'px-1' } as const
-const SCALE = /^(size-control-|h-control-|w-control-|aspect-|px-|(pointer-coarse:)?min-w-auto$|text-(xs|sm|base|lg)$)/
+/** Figma 138:1269: a cell as wide as its control step and a step or two shorter, written out per size. */
+const GEOMETRY = {
+  xs: ['px-pad-x-xs'],
+  sm: ['min-w-control-sm', 'px-pad-x-xs'],
+  md: ['h-control-xs', 'min-w-control-md', 'px-pad-x-xs'],
+  lg: ['h-control-sm', 'min-w-control-lg', 'px-pad-x-sm'],
+  xl: ['h-control-md', 'min-w-control-xl', 'px-pad-x-sm'],
+} as const
+const SCALE = /^(size-control-|h-control-|w-control-|min-w-control-|aspect-|px-|text-(xs|sm|base|lg)$)/
 
 describe('every cell is a target a finger can hit (R-5.6-2)', () => {
   it('found the ten cells of page 1 of 12, so an empty list cannot pass', () => {
@@ -52,18 +60,21 @@ describe('every cell is a target a finger can hit (R-5.6-2)', () => {
     }
   })
 
-  // e2e/target-size.spec measures the result: a square cannot be narrower than it is tall.
-  it('takes its width floor through the square, so a long number can still widen the cell', () => {
-    for (const size of ['xs', 'sm', 'md', 'lg', 'xl'] as const) {
+  // e2e/target-size.spec measures the result.
+  it('takes its width from a minimum at the control step, above the 24 px floor, so a long number can still widen the cell', () => {
+    for (const size of ['sm', 'md', 'lg', 'xl'] as const) {
       for (const list of cells({ size })) {
-        expect(missing(['aspect-square', 'min-w-auto', 'pointer-coarse:min-w-auto'], list), size).toEqual([])
-        expect(list.filter((cls) => FLOOR_WIDTH.includes(cls)), size).toEqual([])
+        expect(list, size).toContain(`min-w-control-${size}`)
+        expect(list, size).toContain('pointer-coarse:min-w-[var(--tc-target-coarse,44px)]')
+        expect(list, size).not.toContain('min-w-[var(--tc-target-min,24px)]')
       }
     }
   })
 
-  it('keeps both px floors on its width at size custom, where nothing makes it square', () => {
-    for (const list of cells({ size: 'custom' })) expect(missing(FLOOR_WIDTH, list)).toEqual([])
+  it('keeps both px floors on its width at xs and custom, which set no width of their own', () => {
+    for (const size of ['xs', 'custom'] as const) {
+      for (const list of cells({ size })) expect(missing(FLOOR_WIDTH, list), size).toEqual([])
+    }
   })
 
   it('carries the whole focus ring at every size', () => {
@@ -82,12 +93,10 @@ describe('every cell is a target a finger can hit (R-5.6-2)', () => {
 
 describe('size', () => {
   for (const size of ['xs', 'sm', 'md', 'lg', 'xl'] as const) {
-    it(`${size} gives every cell and the gap that control height, a square ratio and a little padding`, () => {
+    it(`${size} gives every cell and the gap the width, the height, the padding and the type step the frame draws`, () => {
       const html_ = html({ size })
       for (const list of [...cells({ size }), ...classesOf(html_, GAP)]) {
-        expect(list.filter((cls) => SCALE.test(cls)).sort(), size).toEqual([
-          'aspect-square', `h-control-${size}`, 'min-w-auto', 'pointer-coarse:min-w-auto', PADDING[size], TYPE_STEP[size],
-        ].sort())
+        expect(list.filter((cls) => SCALE.test(cls)).sort(), size).toEqual([...GEOMETRY[size], TYPE_STEP[size]].sort())
       }
     })
 
@@ -98,7 +107,7 @@ describe('size', () => {
 
   it('is md when none is passed, like every other control (R-5.7-2)', () => {
     expect(attr(html(), 'data-size')).toBe('md')
-    for (const list of cells()) expect(list).toContain('h-control-md')
+    for (const list of cells()) expect(list).toContain('h-control-xs')
   })
 
   it('custom emits no size class and no type step, on a cell or on the gap (R-5.7-2)', () => {
@@ -116,14 +125,15 @@ describe('the current page and the others', () => {
     expect(current).toContain('bg-primary-solid')
     expect(current).toContain('text-primary-on-solid')
     expect(current).not.toContain('text-body')
-    expect(current).not.toContain('border-line-strong')
+    expect(current).not.toContain('border-line')
   })
 
-  it('strokes every other link and both edge spans with the strong line, in body text', () => {
+  it('strokes every other link and both edge spans with the hairline of Figma 138:1269, in body text', () => {
     const others = cells({ value: 1 }).filter((list) => !list.includes('bg-primary-solid'))
     expect(others).toHaveLength(9)
     for (const list of others) {
-      expect(missing(['border-(length:--tc-line-width)', 'border-line-strong', 'text-body'], list)).toEqual([])
+      expect(missing(['border-(length:--tc-line-width)', 'border-line', 'text-body'], list)).toEqual([])
+      expect(list).not.toContain('border-line-strong')
     }
   })
 
@@ -142,39 +152,68 @@ describe('an edge span is dimmed and takes no pointer', () => {
     }
     expect(html({ value: 1 }).match(/<span [^>]*data-disabled=""/g)).toHaveLength(2)
   })
+
+  it('drops its stroke and the pointer, as the dead edges of Figma 138:1269 do', () => {
+    for (const list of classesOf(html({ value: 1 }), EDGE)) {
+      expect(list).toContain('data-disabled:border-transparent')
+      expect(list).toContain('data-disabled:cursor-default')
+    }
+  })
 })
 
-describe('a gap is text, not a control', () => {
-  it('carries no floor, no ring, no stroke and no hover', () => {
+describe('a link shows the pointer', () => {
+  it('on every page link, the current one included', () => {
+    const links = classesOf(html({ value: 6 }), LINK)
+    expect(links).toHaveLength(9)
+    for (const list of links) expect(list).toContain('cursor-pointer')
+  })
+})
+
+describe('a gap is a mark, not a control', () => {
+  it('carries no floor, no ring, no stroke, no hover and no pointer', () => {
     const [gap] = classesOf(html(), GAP)
-    expect(gap).toContain('text-body')
-    const control = /^(min-h-|pointer-coarse:min-h-|min-w-\[|outline-|focus-visible:|border-|hover:|active:|tone-|transition)/
+    expect(gap).toContain('text-muted')
+    const control = /^(min-h-|pointer-coarse:min-h-|min-w-\[|outline-|focus-visible:|border-|hover:|active:|tone-|transition|cursor-)/
     expect((gap ?? []).filter((cls) => control.test(cls))).toEqual([])
   })
 })
 
 describe('the list', () => {
-  it('is a wrapping row with the 4 px gap of the frame, so it never scrolls a phone sideways', () => {
-    expect(attr(/<ul [^>]*>/.exec(html())?.[0] ?? '', 'class')).toBe('flex flex-wrap items-center gap-1')
+  it('is a wrapping row with the 6 px gap the frame draws at md and the container the compact row measures, so it never scrolls a phone sideways', () => {
+    expect(attr(/<ul [^>]*>/.exec(html())?.[0] ?? '', 'class')).toBe('flex flex-wrap items-center @container/pagination gap-1.5 pagination-at-32')
   })
 
-  it('adds no class of its own to the nav, so className arrives alone', () => {
-    expect(html().startsWith('<nav aria-label="Pagination" data-size="md">')).toBe(true)
-    expect(attr(html({ className: 'mt-4 justify-self-end' }), 'class')).toBe('mt-4 justify-self-end')
+  it('spaces its cells by size: 4 px at xs and custom, 6 at sm and md, 8 at lg and xl', () => {
+    const gap = (size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'custom') => attr(/<ul [^>]*>/.exec(html({ size }))?.[0] ?? '', 'class')?.split(' ').at(-2)
+    expect((['xs', 'sm', 'md', 'lg', 'xl', 'custom'] as const).map(gap)).toEqual(['gap-1', 'gap-1.5', 'gap-1.5', 'gap-2', 'gap-2', 'gap-1'])
+  })
+
+  it('holds the nav to its cell with max-w-full alone, and puts className after it', () => {
+    expect(html().startsWith('<nav aria-label="Pagination" data-size="md" class="max-w-full">')).toBe(true)
+    expect(attr(html({ className: 'mt-4 justify-self-end' }), 'class')).toBe('max-w-full mt-4 justify-self-end')
   })
 })
 
 describe('direction', () => {
   it('draws first, previous, next and last with the four carets, in that order', () => {
     const paths = [...html({ value: 6 }).matchAll(/<path d="([^"]*)"/g)].map((match) => match[1])
-    expect(paths).toEqual([caretDoubleLeft.path, caretLeft.path, caretRight.path, caretDoubleRight.path])
+    expect(paths).toEqual([caretDoubleLeft.path, caretLeft.path, dotsThree.path, dotsThree.path, caretRight.path, caretDoubleRight.path])
   })
 
   it('lets Svg mirror all four in RTL, on a link and on an edge span alike', () => {
     for (const value of [1, 6, 12]) {
-      const icons = classesOf(html({ value }), /<svg [^>]*>/g)
+      const icons = classesOf(html({ value }).replace(/<li aria-hidden="true"[^>]*><svg [^>]*>/g, ''), /<svg [^>]*>/g)
       expect(icons, String(value)).toHaveLength(4)
       for (const list of icons) expect(list, String(value)).toContain('scale-x-(--tc-dir)')
+    }
+  })
+
+  it('never mirrors the dots of a gap, which have no direction', () => {
+    const gaps = classesOf(html({ value: 6 }), /(?<=<li aria-hidden="true"[^>]*>)<svg [^>]*>/g)
+    expect(gaps).toHaveLength(2)
+    for (const list of gaps) {
+      expect(list).toContain('inline-block')
+      expect(list).not.toContain('scale-x-(--tc-dir)')
     }
   })
 })

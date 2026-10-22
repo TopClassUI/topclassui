@@ -3,7 +3,7 @@ export const spinner = {
   slug: 'spinner',
   title: { en: 'Spinner', ar: 'مؤشر التحميل' },
   description: {
-    en: 'For a wait of unknown length. A spinner is an icon, so it takes the icon sizes, 16 to 40 px, and can follow the text it sits in.',
+    en: 'A spinner is an icon: it takes the icon sizes and follows the text it sits in.',
     ar: 'للانتظار مجهول المدة. مؤشر التحميل أيقونة، فيأخذ أحجام الأيقونات من 16 إلى 40 بكسل، ويمكنه أن يتبع النص الذي يجلس فيه.',
   },
   note: {
@@ -11,7 +11,8 @@ export const spinner = {
     ar: 'فضّل Skeleton عندما يكون شكل القادم معروفًا؛ مؤشر التحميل للانتظار المجهول.',
   },
   demos: ['with-text', 'sizes', 'tones', 'inherit-color', 'custom-size', 'rtl'],
-  stageHeight: 4,
+  stageHeight: 15.625,
+  stageDemo: 'stage',
   notes: {
     en: [
       'For a route still loading or a preview still building. When the shape of what is coming is known, a list or a table among them, a Skeleton holds its place instead.',

@@ -8,6 +8,9 @@ export interface TableOf {
   rows: ReactNode[][]
 }
 
+/** Table's highest row cap: a docs table is short and shows whole, as the frames draw every table, even when its cells wrap. */
+export const TABLE_ROWS_ALL = 20
+
 type WithChildren = { children?: ReactNode }
 
 function cellsOf(row: ReactNode): ReactNode[] {
@@ -40,13 +43,14 @@ export function captionOf(header: readonly ReactNode[]): string {
   return header.map(textOf).join(', ')
 }
 
-/** Longer than this, a cell reads as prose and its column wraps; "Next.js 15 or 16, App Router" stays on one line. */
-const ONE_LINE = 32
+/** Longer than this, a cell reads as prose and its column wraps; "Next.js 15 or 16, App Router" and the 33-character split chip stay on one line. */
+const ONE_LINE = 34
 
-/** How a column of a guide table lays out: on one line when its header and every cell are short, wrapping otherwise; the last column always wraps. */
+/** How a column of a guide table lays out: on one line when its header and every cell are short, wrapping otherwise; a long last column reads as prose, so a short one (a ratio, "Every pnpm check") sits at the end as the frames draw it. */
 export function columnFit(header: ReactNode, cells: readonly ReactNode[], last: boolean): 'fit' | 'wrap' | 'prose' {
-  if (last) return 'prose'
-  return [header, ...cells].every((cell) => textOf(cell).length <= ONE_LINE) ? 'fit' : 'wrap'
+  const short = [header, ...cells].every((cell) => textOf(cell).length <= ONE_LINE)
+  if (short) return 'fit'
+  return last ? 'prose' : 'wrap'
 }
 
 /** A default as docs:data prints it, one object entry per line so a narrow column never wraps inside one: `{ a: 1,` `b: 2 }`. */
@@ -70,4 +74,14 @@ export function defaultLines(text: string): string[] {
   }
   entries.push(inner.slice(start).trim())
   return entries.map((entry, at) => `${at === 0 ? '{ ' : ''}${entry}${at === entries.length - 1 ? ' }' : ','}`)
+}
+
+/** Each column's fit; when the last one is short, the first long one takes the slack, so short values sit at the end as the frames draw them. */
+export function columnsOf(header: readonly ReactNode[], rows: readonly (readonly ReactNode[])[], head: 'auto' | 'code' = 'auto'): { fit: 'fit' | 'wrap' | 'prose'; fill: boolean }[] {
+  const fits = header.map((cell, column) => {
+    const fit = columnFit(cell, rows.map((cells) => cells[column]), column === header.length - 1)
+    return head === 'code' && fit === 'prose' ? 'wrap' : fit
+  })
+  const slack = fits.at(-1) === 'fit' ? fits.findIndex((fit) => fit !== 'fit') : -1
+  return fits.map((fit, column) => ({ fit, fill: column === slack }))
 }

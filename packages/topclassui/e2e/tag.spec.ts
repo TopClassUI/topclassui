@@ -18,17 +18,17 @@ const PAGES = {
   // Bare text: three boxes, then two tags sharing a row that does not wrap.
   'tag--long-label': {
     labels: [['ellipsis'], ['ellipsis'], ['ellipsis'], ['ellipsis', 'ellipsis']],
-    heights: [[34], [34], [22], [34, 34]],
+    heights: [[30], [30], [22], [30, 30]],
   },
   // A <strong>, an <em> beside an icon and an unbroken <code>: no span of their own.
   'tag--element-label': {
     labels: [['clipped'], ['clipped'], ['clipped']],
-    heights: [[34], [34], [22]],
+    heights: [[30], [30], [22]],
   },
   // tagVariants() on an anchor: the label in its own span, then bare text.
   'tag--link': {
     labels: [['ellipsis'], ['clipped']],
-    heights: [[34], [34]],
+    heights: [[30], [30]],
   },
 } as const
 

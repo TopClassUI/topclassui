@@ -261,8 +261,8 @@ test.describe('hostile content and real layouts', () => {
           const found = await page.evaluate(geometry, '#banner-fixture')
           expect(found.map((banner) => banner.name)).toEqual(FIXTURE_NAMES)
           for (const banner of found) {
-            // px-5: the x keeps the row's own 20 px from the inline end, on whatever line it wraps to.
-            expect(banner, banner.name).toEqual({ ...banner, tag: 'BUTTON', endGap: 20, inBanner: true, inParent: true, onChild: 0, onText: 0 })
+            // px-4.5 less -me-1.25: the x's box sits 13 px in, so its 14 px glyph lands on the row's 18 px, on whatever line it wraps to.
+            expect(banner, banner.name).toEqual({ ...banner, tag: 'BUTTON', endGap: 13, inBanner: true, inParent: true, onChild: 0, onText: 0 })
           }
         })
       }
@@ -275,7 +275,7 @@ test.describe('hostile content and real layouts', () => {
       await openLive(page, DEMO, { direction })
       await expectNoSidewaysScroll(page)
       for (const banner of await page.evaluate(geometry, '#demo')) {
-        expect(banner, banner.name).toEqual({ ...banner, tag: 'BUTTON', endGap: 20, inBanner: true, inParent: true, onChild: 0, onText: 0 })
+        expect(banner, banner.name).toEqual({ ...banner, tag: 'BUTTON', endGap: 13, inBanner: true, inParent: true, onChild: 0, onText: 0 })
       }
     })
   }
@@ -293,8 +293,8 @@ test.describe('text made larger or spaced out', () => {
       const found = await page.evaluate(geometry, '#banner-fixture')
       expect(found.map((banner) => banner.name)).toEqual(FIXTURE_NAMES)
       for (const banner of found.slice(0, 4)) {
-        // px-5 is 1.25rem, so 40 px at a 32 px root.
-        expect(banner, banner.name).toEqual({ ...banner, endGap: 40, inBanner: true, inParent: true, onChild: 0, onText: 0 })
+        // px-4.5 less -me-1.25 is 0.8125rem, so 26 px at a 32 px root.
+        expect(banner, banner.name).toEqual({ ...banner, endGap: 26, inBanner: true, inParent: true, onChild: 0, onText: 0 })
       }
       // min-w-0 on the root: a 96 px grid track keeps its width, and the banner and its x stay inside it.
       for (const banner of found.slice(4, 7)) {
@@ -309,7 +309,7 @@ test.describe('text made larger or spaced out', () => {
       await page.addStyleTag({ content: '* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important }' })
       await expectNoSidewaysScroll(page)
       for (const banner of await page.evaluate(geometry, '#banner-fixture')) {
-        expect(banner, banner.name).toEqual({ ...banner, endGap: 20, inBanner: true, inParent: true, onChild: 0, onText: 0 })
+        expect(banner, banner.name).toEqual({ ...banner, endGap: 13, inBanner: true, inParent: true, onChild: 0, onText: 0 })
       }
     })
   }

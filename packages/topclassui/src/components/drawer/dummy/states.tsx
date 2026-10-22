@@ -1,77 +1,69 @@
+
+import { cn } from '#shared/cn.js'
 import { Button } from '#components/button/index.js'
 import {
   DrawerBody, DrawerClose, DrawerFooter, DrawerHeader, DrawerPopup, DrawerRoot, DrawerTitle, DrawerTrigger,
 } from '../index.js'
 
-const LINES = Array.from({ length: 30 }, (_, index) => index + 1)
+const CELL = 'relative -my-1.75 h-18 w-33 justify-self-center overflow-hidden rounded-box bg-page [contain:paint]'
+const BAR = 'min-h-2 rounded-chip bg-neutral-soft'
+const SHEET = 'absolute bg-surface-raised p-2 font-mono text-[0.6875rem]/tight text-muted border-line'
+const EDGE = {
+  side: `${SHEET} inset-y-0 inset-e-0 w-14 border-s-(length:--tc-line-width)`,
+  bottom: `${SHEET} inset-x-0 bottom-0 h-6.75 border-t-(length:--tc-line-width)`,
+} as const
 
-/** One trigger per state, named after it: a sheet only mounts in the browser, so a server page
- * shows each closed. A side sheet, a bottom sheet, a scrolled body, focus trapped without a scrim, non-modal. */
+/** The page behind the scrim, as the frame draws it: four bars of text, hidden from a reader. */
+function PageBehind() {
+  return (
+    <div aria-hidden className="absolute inset-0 flex flex-col gap-2 p-3.5">
+      <div className={`${BAR} w-1/2`} />
+      <div className={`${BAR} w-4/5`} />
+      <div className={`${BAR} w-2/3`} />
+      <div className={`${BAR} w-2/5`} />
+    </div>
+  )
+}
+
+// The sheet's fill at the frame's 75 %, so the page shows through it; the label stays whole.
+const DRAGGING = 'bg-surface-raised/75'
+const TRAPPED = 'border-s-(length:--tc-ring-width) border-s-ring'
+
+/** One cell, captioned by its title: a picture of a small sheet open at the inline end or the bottom, over the page and
+ * its scrim, as the frame draws it. `className` draws dragging or the trapped focus on the sheet. Hidden from a reader. */
+function Sheet({ title, edge = 'side', className }: { title: string, edge?: keyof typeof EDGE, className?: string }) {
+  return (
+    <div title={title} className={CELL}>
+      <PageBehind />
+      <div aria-hidden className="absolute inset-0 bg-overlay" />
+      <div aria-hidden inert className={cn(EDGE[edge], className)}>sheet</div>
+    </div>
+  )
+}
+
+/** Every state the frame draws, one equal cell each, captioned by its title: the closed trigger, the one real drawer,
+ * and pictures of a side and a bottom sheet open over the page and a scrim, mid-drag and with its focus trapped. */
 export default function Demo() {
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      <DrawerRoot>
-        <DrawerTrigger render={<Button variant="outline">Side sheet</Button>} />
-        <DrawerPopup>
-          <DrawerHeader>
-            <DrawerTitle>Side sheet</DrawerTitle>
-          </DrawerHeader>
-          <DrawerBody>It slides from the inline end, so it mirrors in Arabic.</DrawerBody>
-          <DrawerFooter>
-            <DrawerClose render={<Button>Done</Button>} />
-          </DrawerFooter>
-        </DrawerPopup>
-      </DrawerRoot>
-      <DrawerRoot placement="bottom">
-        <DrawerTrigger render={<Button variant="outline">Bottom sheet</Button>} />
-        <DrawerPopup>
-          <DrawerHeader>
-            <DrawerTitle>Bottom sheet</DrawerTitle>
-          </DrawerHeader>
-          <DrawerBody>It starts with a grabber; a swipe down closes it.</DrawerBody>
-          <DrawerFooter>
-            <DrawerClose render={<Button>Done</Button>} />
-          </DrawerFooter>
-        </DrawerPopup>
-      </DrawerRoot>
-      <DrawerRoot>
-        <DrawerTrigger render={<Button variant="outline">Scrolled</Button>} />
-        <DrawerPopup>
-          <DrawerHeader>
-            <DrawerTitle>Scrolled</DrawerTitle>
-          </DrawerHeader>
-          <DrawerBody className="grid content-start gap-3">
-            {LINES.map((line) => <p key={line}>Line {line}. The body scrolls; the header and the footer stay put.</p>)}
-          </DrawerBody>
-          <DrawerFooter>
-            <DrawerClose render={<Button>Done</Button>} />
-          </DrawerFooter>
-        </DrawerPopup>
-      </DrawerRoot>
-      <DrawerRoot modal="trap-focus">
-        <DrawerTrigger render={<Button variant="outline">Focus trapped</Button>} />
-        <DrawerPopup>
-          <DrawerHeader>
-            <DrawerTitle>Focus trapped</DrawerTitle>
-          </DrawerHeader>
-          <DrawerBody>No scrim and the page still scrolls, but Tab stays inside the sheet.</DrawerBody>
-          <DrawerFooter>
-            <DrawerClose render={<Button>Done</Button>} />
-          </DrawerFooter>
-        </DrawerPopup>
-      </DrawerRoot>
-      <DrawerRoot modal={false} size="xs">
-        <DrawerTrigger render={<Button variant="outline">Non-modal</Button>} />
-        <DrawerPopup>
-          <DrawerHeader>
-            <DrawerTitle>Non-modal</DrawerTitle>
-          </DrawerHeader>
-          <DrawerBody>The page beside the sheet stays in use, and focus is not held.</DrawerBody>
-          <DrawerFooter>
-            <DrawerClose render={<Button>Done</Button>} />
-          </DrawerFooter>
-        </DrawerPopup>
-      </DrawerRoot>
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] gap-4">
+      <div title="closed" className="grid h-14.5 place-items-center">
+        <DrawerRoot>
+          <DrawerTrigger render={<Button variant="outline" size="xs" className="border-line bg-surface">Open</Button>} />
+          <DrawerPopup>
+            <DrawerHeader>
+              <DrawerTitle>Opened</DrawerTitle>
+            </DrawerHeader>
+            <DrawerBody>Its trigger opened it; Escape, the x or Done closes it.</DrawerBody>
+            <DrawerFooter>
+              <DrawerClose render={<Button>Done</Button>} />
+            </DrawerFooter>
+          </DrawerPopup>
+        </DrawerRoot>
+      </div>
+      <Sheet title="side sheet" />
+      <Sheet title="bottom sheet" edge="bottom" />
+      <Sheet title="dragging" className={DRAGGING} />
+      <Sheet title="focus trapped" className={TRAPPED} />
     </div>
   )
 }

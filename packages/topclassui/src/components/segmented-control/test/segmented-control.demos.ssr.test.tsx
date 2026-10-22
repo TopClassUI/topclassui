@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'full-width', 'long-content', 'many', 'playground', 'rtl', 'sizes', 'states', 'with-icons']
+const EXPECTED = ['basic', 'form', 'full-width', 'long-content', 'many', 'playground', 'rtl', 'sizes', 'states', 'track-states', 'with-icons']
 
 /** Each track of each demo as the server writes it: its name, then each segment's text, a star on the selected one and a
  * caret on the one tab stop. */
@@ -25,10 +25,13 @@ const TRACKS: Record<string, string[]> = {
   'rtl': ['طريقة العرض: لوحة | جدول *^ | تقويم'],
   'sizes': ['Extra small: Extra small *^ | Off', 'Small: Small *^ | Off', 'Medium: Medium *^ | Off', 'Large: Large *^ | Off', 'Extra large: Extra large *^ | Off'],
   'states': [
+    'idle: A *^ | B', 'hover: A *^ | B', 'focus-visible: A *^ | B', 'checked: A *^ | B', 'disabled: A *^ | B',
+  ],
+  'track-states': [
     'Invalid: Invalid, selected *^ | Invalid', 'Disabled: Disabled, selected *^ | Disabled',
     'One disabled: Live, selected *^ | One disabled | Live', 'Read-only: Read-only, selected *^ | Read-only',
   ],
-  'with-icons': ['Theme: Light *^ | Dark | System'],
+  'with-icons': ['Colour mode: Light | Dark *^ | Ocean'],
 }
 
 const render = async (file: string) => {
@@ -101,10 +104,10 @@ describe('the demos the plan names', () => {
     expect(await render('rtl')).toMatch(/^<div class="isolate"><div dir="rtl" lang="ar" class="[^"]*">/)
   })
 
-  it('states: the invalid track says so, the disabled one disables every segment, the read-only one says so', async () => {
-    const html = await render('states')
-    expect(html).toMatch(/<div role="radiogroup" aria-label="Invalid" aria-invalid="true"/)
-    expect(html).toMatch(/<div data-disabled="" role="radiogroup" aria-disabled="true" aria-label="Disabled"/)
-    expect(html).toMatch(/<div data-readonly="" role="radiogroup" aria-readonly="true" aria-label="Read-only"/)
+  it('states: the disabled track disables every segment; track-states: the invalid track says so, the read-only one says so', async () => {
+    expect(await render('states')).toMatch(/<div data-disabled="" role="radiogroup" aria-disabled="true" aria-label="disabled"/)
+    const tracks = await render('track-states')
+    expect(tracks).toMatch(/<div role="radiogroup" aria-label="Invalid" aria-invalid="true"/)
+    expect(tracks).toMatch(/<div data-readonly="" role="radiogroup" aria-readonly="true" aria-label="Read-only"/)
   })
 })

@@ -92,9 +92,9 @@ describe('the optional props follow the vocabulary', () => {
 describe('the design props and the schema cannot drift', () => {
   it('declares the same keys', () => {
     expect(Object.keys(paginationSchema.shape).sort())
-      .toEqual(['boundaryCount', 'pageCount', 'siblingCount', 'size', 'value'])
+      .toEqual(['boundaryCount', 'disabled', 'pageCount', 'siblingCount', 'size', 'value'])
     expectTypeOf<keyof PaginationDesignProps>()
-      .toEqualTypeOf<'boundaryCount' | 'pageCount' | 'siblingCount' | 'size' | 'value'>()
+      .toEqualTypeOf<'boundaryCount' | 'disabled' | 'pageCount' | 'siblingCount' | 'size' | 'value'>()
   })
 
   it('is a subset of the component props, so every design prop is settable', () => {

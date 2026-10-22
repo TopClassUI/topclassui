@@ -15,8 +15,8 @@ const SCOPE = '#toggles'
 
 /** The toggle step of each size, and the target around it: the floor, or the box where the box is larger. */
 const FINE = {
-  xs: { box: 14, target: 24 }, sm: { box: 16, target: 24 }, md: { box: 20, target: 24 },
-  lg: { box: 24, target: 24 }, xl: { box: 28, target: 28 },
+  xs: { box: 16, target: 24 }, sm: { box: 20, target: 24 }, md: { box: 24, target: 24 },
+  lg: { box: 28, target: 28 }, xl: { box: 32, target: 32 },
 } as const
 
 async function fixture(page: Page, options: LiveOptions = {}): Promise<void> {
@@ -53,9 +53,9 @@ async function sizes(page: Page) {
 test('fine pointer: the target is 24 x 24 px around a smaller box, and as large as a larger one', async ({ page }) => {
   await fixture(page)
   expect(await sizes(page)).toEqual({
-    xs: { box: [14, 14], target: [24, 24] }, sm: { box: [16, 16], target: [24, 24] },
-    md: { box: [20, 20], target: [24, 24] }, lg: { box: [24, 24], target: [24, 24] },
-    xl: { box: [28, 28], target: [28, 28] },
+    xs: { box: [16, 16], target: [24, 24] }, sm: { box: [20, 20], target: [24, 24] },
+    md: { box: [24, 24], target: [24, 24] }, lg: { box: [28, 28], target: [28, 28] },
+    xl: { box: [32, 32], target: [32, 32] },
   })
 })
 
@@ -65,13 +65,13 @@ test.describe('under a coarse pointer', () => {
   test('the target is 44 x 44 px at every size, and the box keeps its own step', async ({ page }) => {
     await fixture(page)
     expect(await sizes(page)).toEqual({
-      xs: { box: [14, 14], target: [44, 44] }, sm: { box: [16, 16], target: [44, 44] },
-      md: { box: [20, 20], target: [44, 44] }, lg: { box: [24, 24], target: [44, 44] },
-      xl: { box: [28, 28], target: [44, 44] },
+      xs: { box: [16, 16], target: [44, 44] }, sm: { box: [20, 20], target: [44, 44] },
+      md: { box: [24, 24], target: [44, 44] }, lg: { box: [28, 28], target: [44, 44] },
+      xl: { box: [32, 32], target: [44, 44] },
     })
   })
 
-  test('the ring is drawn on the 20 px box, 28 px across, and not on the 44 px target', async ({ page }) => {
+  test('the ring is drawn on the 24 px box, 32 px across, and not on the 44 px target', async ({ page }) => {
     await fixture(page)
     await target(page, 'size-md').focus()
     expect(await target(page, 'size-md').evaluate((el) => el.matches(':focus-visible'))).toBe(true)
@@ -79,17 +79,17 @@ test.describe('under a coarse pointer', () => {
     expect(await css(box(page, 'size-md'), 'outline-style')).toBe('solid')
     const [ring, offset] = [await css(box(page, 'size-md'), 'outline-width'), await css(box(page, 'size-md'), 'outline-offset')]
     expect([ring, offset]).toEqual(['2px', '2px'])
-    expect((await boxOf(box(page, 'size-md'))).width + 2 * (2 + 2)).toBe(28)
+    expect((await boxOf(box(page, 'size-md'))).width + 2 * (2 + 2)).toBe(32)
   })
 })
 
 for (const direction of DIRECTIONS) {
-  test(`1280 px, ${direction}: laid straight into a grid the target keeps the 35 x 24 px of its track, at the start`, async ({ page }) => {
+  test(`1280 px, ${direction}: laid straight into a grid the target keeps the 42 x 24 px of its track, at the start`, async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 })
     await fixture(page, { direction })
     const [grid, outer, inner] = [await boxOf(page.locator('#grid')), await boxOf(target(page, 'in-grid')), await boxOf(box(page, 'in-grid'))]
-    expect([outer.width, outer.height]).toEqual([35, 24])
-    expect([inner.width, inner.height]).toEqual([35, 20])
+    expect([outer.width, outer.height]).toEqual([42, 24])
+    expect([inner.width, inner.height]).toEqual([42, 24])
     if (direction === 'ltr') expect(outer.left).toBe(grid.left)
     else expect(outer.right).toBe(grid.right)
     await expectNoSidewaysScroll(page)

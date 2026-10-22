@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['basic', 'custom-size', 'failed', 'icon', 'playground', 'rtl', 'sizes', 'skeleton', 'states', 'with-name']
+const EXPECTED = ['basic', 'custom-size', 'failed', 'icon', 'playground', 'rtl', 'sizes', 'skeleton', 'stage', 'states', 'with-name']
 
 const render = async (file: string) => {
   const loaded = await import(`../dummy/${file}.tsx`) as { default?: ComponentType }
@@ -44,7 +44,7 @@ describe('every demo renders on the server', () => {
   it('shows a picture in seven of them, so the check above is not vacuous', async () => {
     const withImage: string[] = []
     for (const file of files) if ((await render(file)).includes('<img')) withImage.push(file)
-    expect(withImage).toEqual(['basic', 'custom-size', 'failed', 'playground', 'rtl', 'states', 'with-name'])
+    expect(withImage).toEqual(['basic', 'custom-size', 'failed', 'playground', 'rtl', 'stage', 'states', 'with-name'])
   })
 
   it('writes no role in any of them: every role="img" counted below is one the root gave itself', () => {
@@ -64,8 +64,9 @@ const NAMING: Record<string, { fallbacks: number; namedRoots: number; namedImage
   'rtl': { fallbacks: 2, namedRoots: 0, namedImages: 0 },
   'sizes': { fallbacks: 5, namedRoots: 5, namedImages: 0 },
   'skeleton': { fallbacks: 5, namedRoots: 5, namedImages: 0 },
+  'stage': { fallbacks: 3, namedRoots: 2, namedImages: 1 },
   // A picture, initials, an icon, a picture that failed, and a skeleton, which has no fallback.
-  'states': { fallbacks: 4, namedRoots: 2, namedImages: 2 },
+  'states': { fallbacks: 3, namedRoots: 2, namedImages: 1 },
   'with-name': { fallbacks: 1, namedRoots: 0, namedImages: 0 },
 }
 

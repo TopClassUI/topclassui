@@ -3,7 +3,7 @@ import type { AvatarGroupDesignProps } from '../index.js'
 import { AvatarGroup } from '../index.js'
 
 const TEAM = [
-  ['OA', 'Omar Abed'], ['LH', 'Lina Haddad'], ['SK', 'Sara Khalil'], ['MN', 'Mona Nasser'],
+  ['OA', 'Omar Abed'], ['LH', 'Lina Haddad'], ['SN', 'Sara Nasser'], ['RK', 'Rami Khoury'],
   ['RT', 'Rami Tahan'], ['YB', 'Yara Bakri'],
 ] as const
 

@@ -87,7 +87,7 @@ describe('every element carries exactly the classes the spec names', () => {
 
   it('the header: a bar that never shrinks, with a line under it, 4rem short of the edge the x is on', async () => {
     expect(classes((await opened()).header)).toEqual([
-      'border-b-(length:--tc-line-width)', 'border-line', 'pe-16', 'ps-4', 'py-4', 'shrink-0',
+      'border-b-(length:--tc-line-width)', 'border-line', 'pe-16', 'ps-4', 'py-3.5', 'shrink-0',
     ])
   })
 

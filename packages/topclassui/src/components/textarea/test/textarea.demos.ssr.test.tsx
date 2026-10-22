@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['autosize', 'basic', 'form', 'long-content', 'playground', 'row', 'rtl', 'show-count', 'sizes', 'skeleton', 'states']
+const EXPECTED = ['autosize', 'basic', 'form', 'long-content', 'playground', 'read-only', 'row', 'rtl', 'show-count', 'sizes', 'skeleton', 'stage', 'states']
 
 /** Each textarea of each demo as the server writes it: its name, by aria-label or by the label that points at its id, and its rows. */
 const TEXTAREAS: Record<string, string[]> = {
@@ -25,7 +25,9 @@ const TEXTAREAS: Record<string, string[]> = {
   'show-count': ['Always counted: 3', 'Counted near the cap: 3', 'At the cap: 3', 'No cap: 3'],
   'sizes': ['Extra small: 3', 'Small: 3', 'Medium: 3', 'Large: 3', 'Extra large: 3'],
   'skeleton': ['Message, xs: 3', 'Message, sm: 3', 'Message, md: 3', 'Message, lg: 3', 'Message, xl: 3', 'One row: 1', 'Full width: 5'],
-  'states': ['Idle: 3', 'Filled: 3', 'Invalid: 3', 'Disabled: 3', 'Read-only: 3', 'Required: 3'],
+  'read-only': ['Read-only: 3'],
+  'stage': ['Feedback: 3'],
+  'states': ['idle: 1', 'hover: 1', 'focus-visible: 1', 'disabled: 1', 'invalid: 1', 'Message at its limit: 1'],
 }
 
 const render = async (file: string) => {
@@ -44,7 +46,7 @@ function textareasIn(html: string): string[] {
 }
 
 describe('every demo renders on the server', () => {
-  it('holds exactly the eleven demos asked for, so none can be deleted silently', () => {
+  it('holds exactly the thirteen demos asked for, so none can be deleted silently', () => {
     expect(files).toEqual(EXPECTED)
   })
 

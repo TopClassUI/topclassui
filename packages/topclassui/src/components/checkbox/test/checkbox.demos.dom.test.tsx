@@ -17,10 +17,12 @@ const AFTER: Record<string, string[] | 'browser'> = {
   'basic': ['false', 'true'],
   'form': ['false', 'true'],
   'labelled': 'browser',
-  'playground': ['false'],
+  'playground': ['true'],
   'rtl': ['false', 'true'],
   'sizes': ['false', 'false', 'false', 'false', 'false'],
-  'states': ['true', 'false', 'mixed', 'true', 'false', 'mixed', 'false', 'true', 'true'],
+  'combined': ['true', 'false', 'mixed', 'true', 'false', 'mixed', 'false', 'true', 'true'],
+  'stage': ['true', 'false', 'mixed'],
+  'states': ['true', 'false', 'mixed', 'true', 'true', 'false'],
 }
 
 const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { default: ComponentType }).default

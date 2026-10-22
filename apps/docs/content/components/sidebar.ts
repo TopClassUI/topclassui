@@ -10,7 +10,10 @@ export const sidebar = {
     ar: 'شريط جانبي روابطه تُعرض على الخادم، وينطوي إلى عمود من الأيقونات. الشريط وزرّه وحدهما يعملان في المتصفح.',
   },
   demos: ['basic', 'groups', 'collapsed', 'controlled', 'in-a-layout', 'long-list', 'rtl'],
-  stageHeight: 25,
+  stageHeight: 19.4,
+  stageDemo: 'stage',
+  controlOrder: ['defaultOpen'],
+  controlsHidden: ['open'],
   note: {
     en: '`defaultOpen={false}` sends the rail collapsed in the server HTML, so nothing moves when the page hydrates.',
     ar: 'مع `defaultOpen={false}` يرسل الخادم الشريط مطويًّا، فلا يتحرك شيء عند الترطيب.',

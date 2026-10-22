@@ -69,7 +69,7 @@ describe('the x', () => {
   it('is an icon button with the soft hover, pushed to the inline end of its line', () => {
     for (const name of ['inline-flex', 'shrink-0', 'rounded-control', 'outline-none', 'focus-visible:outline-solid',
       'min-h-[var(--tc-target-min,24px)]', 'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]',
-      'hover:bg-(--tc-soft-hover)', 'active:bg-(--tc-soft-active)', 'ms-auto']) {
+      'hover:bg-(--tc-soft-hover)', 'active:bg-(--tc-soft-active)', 'ms-auto', '-me-1.25', 'cursor-pointer']) {
       expect(classes, name).toContain(name)
     }
   })

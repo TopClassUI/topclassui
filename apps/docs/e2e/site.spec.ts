@@ -113,7 +113,7 @@ const NEXT = {
 } as const
 
 // Written out: how many `##` sections each page has, so a heading lost from the MDX fails here.
-const SECTIONS = { installation: 5, cli: 8, css: 7, provider: 6, 'first-component': 6 } as const
+const SECTIONS = { installation: 5, cli: 7, css: 7, provider: 6, 'first-component': 6 } as const
 
 for (const slug of GUIDES) {
   for (const locale of ['en', 'ar'] as const) {
@@ -229,3 +229,52 @@ test('the not-found page passes axe', async ({ page }) => {
   const { violations } = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze()
   expect(violations.map((v) => v.id)).toEqual([])
 })
+
+// Inter has no Arabic letters: under lang="ar" the body and its text take Noto Sans Arabic, with Inter after it for Latin words.
+for (const path of ['/ar', '/ar/docs/components', '/ar/docs/colors'] as const) {
+  test(`${path}: the body, the h1 and a paragraph compute Noto Sans Arabic first`, async ({ page }) => {
+    await page.goto(path)
+    const families = await page.evaluate(() => [document.body, document.querySelector('h1'), document.querySelector('main p')].map((element) => element === null ? null : getComputedStyle(element).fontFamily))
+    for (const family of families) expect(family).toMatch(/^"Noto Sans Arabic", "Noto Sans Arabic Fallback", Inter, "Inter Fallback", /)
+  })
+}
+
+test('/en/docs/components: the body computes Inter first', async ({ page }) => {
+  await page.goto('/en/docs/components')
+  expect(await page.evaluate(() => getComputedStyle(document.body).fontFamily)).toMatch(/^Inter, "Inter Fallback", /)
+})
+
+// Ocean's --tc-radius is 9999px: a box of code takes the box radius at most, and flat code's scroller cuts no corner letter.
+for (const path of ['/en/docs/components', '/en/docs/components/accordion'] as const) {
+  test(`${path} in ocean: no code box is rounder than a box, and flat code's scroller has square corners`, async ({ page }) => {
+    await openIn(page, path, 'ocean')
+    const radii = await page.evaluate(() => [...document.querySelectorAll('.docs-flat-code')].map((box) => [
+      getComputedStyle(box).borderStartStartRadius,
+      getComputedStyle(box.querySelector('pre') ?? box).borderEndStartRadius,
+    ]))
+    expect(radii.length).toBeGreaterThan(0)
+    for (const [box, scroller] of radii) {
+      expect(box).toBe('24px')
+      expect(scroller).toBe('0px')
+    }
+  })
+}
+
+test('in ocean the install row\'s copy fields and the icons guide\'s tiles keep a box\'s corners', async ({ page }) => {
+  await openIn(page, '/en/docs/components/dialog', 'ocean')
+  const fields = await page.locator('div:has(> code[dir="ltr"][translate="no"] + [data-island])').evaluateAll((all) => all.map((field) => getComputedStyle(field).borderStartStartRadius))
+  expect(fields).toEqual(['24px', '24px'])
+  await openIn(page, '/en/docs/icons', 'ocean')
+  const tile = await page.locator('main button:has(svg)').nth(10).evaluate((element) => ({ radius: parseFloat(getComputedStyle(element).borderStartStartRadius), height: element.getBoundingClientRect().height }))
+  expect(tile.radius).toBeLessThanOrEqual(24)
+  expect(tile.height).toBeGreaterThan(48)
+})
+
+// The dark frame's stage dims its drawn page and keeps it readable; on white the library's 30 % black read as a solid grey block.
+for (const [mode, alpha] of [['light', '0.12'], ['ocean', '0.12'], ['dark', '0.4']] as const) {
+  test(`/en/docs/components/dialog in ${mode}: the stage's scrim is black at ${alpha}`, async ({ page }) => {
+    await openIn(page, '/en/docs/components/dialog', mode)
+    const scrim = page.locator('[data-component="dialog"] .bg-overlay').first()
+    expect(await scrim.evaluate((element) => getComputedStyle(element).backgroundColor)).toMatch(new RegExp(`^(lab|oklch|rgba)\\(0,? 0,? 0 ?[/,] ?${alpha}\\)$`))
+  })
+}

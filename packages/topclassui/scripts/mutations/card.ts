@@ -29,14 +29,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the card root loses its hairline border',
     file: 'src/components/card/classes.ts',
-    from: "'flex flex-col gap-2 rounded-box bg-surface-raised p-5', BORDER]",
-    to: "'flex flex-col gap-2 rounded-box bg-surface-raised p-5']",
+    from: "'flex flex-col gap-2.5 rounded-box bg-surface-raised p-4.5', BORDER]",
+    to: "'flex flex-col gap-2.5 rounded-box bg-surface-raised p-4.5']",
   },
   {
     label: 'the card body becomes a flex column, so a sentence with a link stacks as rows',
     file: 'src/components/card/classes.ts',
-    from: "export const CARD_BODY = 'text-sm text-muted'",
-    to: "export const CARD_BODY = 'flex flex-col text-sm text-muted'",
+    from: "export const CARD_BODY = 'text-sm/tight text-muted'",
+    to: "export const CARD_BODY = 'flex flex-col text-sm/tight text-muted'",
   },
   {
     label: 'the card footer drops the rest props, so id, aria-*, style and ref never reach it',
@@ -61,5 +61,23 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/card/classes.ts',
     from: "  FORCED_EDGE,\n].join(' ')",
     to: "].join(' ')",
+  },
+  {
+    label: 'a card rendered as a link loses its drawn hover',
+    file: 'src/components/card/classes.ts',
+    from: "['cursor-pointer text-start', HOVER.surface, FOCUS_RING, TRANSITION]",
+    to: "['cursor-pointer text-start', FOCUS_RING, TRANSITION]",
+  },
+  {
+    label: 'a card rendered as a link drops the element it was given',
+    file: 'src/components/card/parts/card-root.tsx',
+    from: '  if (render) {',
+    to: '  if (render && false) {',
+  },
+  {
+    label: 'the card media stops bleeding over the root padding',
+    file: 'src/components/card/classes.ts',
+    from: "'-mx-4.5 -mt-4.5 mb-2 flex",
+    to: "'mb-2 flex",
   },
 ]

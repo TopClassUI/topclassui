@@ -28,13 +28,13 @@ const TRIGGERS: Record<string, string[]> = {
   ],
   'playground': ['Share'],
   'rtl': ['مشاركة', 'التفاصيل', 'الإعدادات'],
-  'states': ['Open', 'Above', 'With close', 'Modal', 'On hover'],
+  'states': ['Share'],
   'with-close': ['Notifications'],
   'with-form': ['Rename'],
 }
 
-/** The one demo that holds a button of the page beside its trigger, to press while the popover is open. */
-const BEHIND: Record<string, string[]> = { modal: ['Behind the panel'] }
+/** The buttons that are no trigger: one of the page beside a trigger, and the two in the states strip's inert pictures. */
+const BEHIND: Record<string, string[]> = { modal: ['Behind the panel'], states: ['Open', 'Open'] }
 
 /** Anything written as a child of a trigger or a close, which a server-built Button never sees. */
 function partChildren(source: string): string[] {

@@ -20,7 +20,13 @@ export const dialog = {
     'with-tooltip',
     'rtl',
   ],
-  stageHeight: 12,
+  stageHeight: 21.75,
+  controlOrder: ['size'],
+  stageOpen: true,
+  codeCaption: {
+    en: 'DialogBody is the scroll container: the header and footer stay put while it scrolls.',
+    ar: 'DialogBody هو حاوية التمرير: يبقى الرأس والتذييل في مكانهما أثناء تمريره.',
+  },
   note: {
     en: 'Wrap the parts in a form with the class `contents`, and a Server Action submits from the footer with no client handler.',
     ar: 'غلّف الأجزاء بنموذج يحمل الصنف `contents`، فيُرسَل إجراء الخادم من التذييل دون أي معالج في المتصفح.',

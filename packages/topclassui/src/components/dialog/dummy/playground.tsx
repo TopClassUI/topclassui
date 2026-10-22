@@ -1,3 +1,7 @@
+'use client'
+
+import { useRef } from 'react'
+
 import { Button } from '#components/button/index.js'
 import {
   DialogBody, DialogClose, DialogDescription, DialogFooter, DialogHeader, DialogPopup, DialogRoot, DialogTitle,
@@ -5,9 +9,48 @@ import {
 } from '../index.js'
 import type { DialogDesignProps } from '../types.js'
 
+const BAR = 'min-h-2 rounded-chip bg-neutral-soft'
+
+/** The page behind the scrim, as the frame draws it: four bars of text, hidden from a reader. */
+function PageBehind() {
+  return (
+    <div aria-hidden className="absolute inset-0 flex flex-col gap-2 p-3.5">
+      <div className={`${BAR} w-67.75 max-w-full`} />
+      <div className={`${BAR} w-104.5 max-w-full`} />
+      <div className={`${BAR} w-86 max-w-full`} />
+      <div className={`${BAR} w-55.25 max-w-full`} />
+    </div>
+  )
+}
+
+/** The frame's confirm drawn open in a 520 by 280 px box over the page and a scrim: not modal, and it takes no focus. */
+function Stage({ size, closeButton }: DialogDesignProps) {
+  const root = useRef<HTMLDivElement>(null)
+  return (
+    <div ref={root} data-stage="" className="relative h-70 w-130 max-w-full overflow-hidden rounded-box [contain:paint]">
+      <PageBehind />
+      <div aria-hidden className="absolute inset-0 bg-overlay" />
+      <DialogRoot defaultOpen modal={false}>
+        <DialogPopup size={size} container={root} initialFocus={false}>
+          <DialogHeader closeButton={closeButton}>
+            <DialogTitle>Delete this project?</DialogTitle>
+          </DialogHeader>
+          <DialogBody>This removes the project and every file in it. This cannot be undone.</DialogBody>
+          <DialogFooter>
+            <DialogClose render={<Button variant="soft" tone="neutral" size="xs">Cancel</Button>} />
+            <DialogClose render={<Button tone="danger" size="xs">Delete</Button>} />
+          </DialogFooter>
+        </DialogPopup>
+      </DialogRoot>
+    </div>
+  )
+}
+
 /** The docs stage: the basic dialog, with the schema's props passed through, so the Try it
- * controls drive it. size goes to the popup and closeButton to the header. */
-export default function Demo({ size, closeButton }: DialogDesignProps = {}) {
+ * controls drive it. size goes to the popup and closeButton to the header. With stage it is
+ * the Stage above; the tree below stays one return, so the docs can write Try it values into it. */
+export default function Demo({ size, closeButton, stage = false }: DialogDesignProps & { stage?: boolean } = {}) {
+  if (stage) return <Stage size={size} closeButton={closeButton} />
   return (
     <DialogRoot>
       <DialogTrigger render={<Button>Publish</Button>} />
@@ -18,8 +61,8 @@ export default function Demo({ size, closeButton }: DialogDesignProps = {}) {
         </DialogHeader>
         <DialogBody>11 files changed since the last publish.</DialogBody>
         <DialogFooter>
-          <DialogClose render={<Button variant="outline">Cancel</Button>} />
-          <DialogClose render={<Button>Publish now</Button>} />
+          <DialogClose render={<Button variant="soft" tone="neutral" size="xs">Cancel</Button>} />
+          <DialogClose render={<Button size="xs">Publish now</Button>} />
         </DialogFooter>
       </DialogPopup>
     </DialogRoot>

@@ -37,8 +37,8 @@ for (const direction of DIRECTIONS) {
   test.describe(direction, () => {
     test('Tab reaches each live input, one stop each, and skips a disabled one', async ({ page }) => {
       await openLive(page, 'combobox--states', { direction })
-      expect(await walk(page, 3)).toEqual(['Invalid', 'Read-only', 'One option disabled'])
-      expect(await walk(page, 1, 'Shift+Tab')).toEqual(['Read-only'])
+      expect(await walk(page, 5)).toEqual(['idle', 'focus-visible', 'open', 'loading', 'Country, nothing matches'])
+      expect(await walk(page, 1, 'Shift+Tab')).toEqual(['loading'])
     })
 
     test('the focused input paints the ring and keeps the focus while the list is open; the highlighted row paints it too', async ({ page }) => {
@@ -108,7 +108,7 @@ for (const direction of DIRECTIONS) {
 
     // AriaCombobox.js:1014: read-only locks the value, not the browsing; ComboboxInput.js:294 stops the Enter.
     test('a read-only input opens on the arrows and the highlight moves and wraps, but Enter, a letter and Backspace change nothing', async ({ page }) => {
-      await openLive(page, 'combobox--states', { direction })
+      await openLive(page, 'combobox--combined', { direction })
       await walk(page, 2)
       const name = 'Read-only'
       await expect(inputOf(page, name)).toHaveValue('Saudi Arabia')
@@ -128,7 +128,7 @@ for (const direction of DIRECTIONS) {
     })
 
     test('a disabled option takes the highlight and Enter does not choose it', async ({ page }) => {
-      await openLive(page, 'combobox--states', { direction })
+      await openLive(page, 'combobox--combined', { direction })
       await walk(page, 3)
       const name = 'One option disabled'
       expect([await press(page, 'ArrowDown', name), await press(page, 'ArrowDown', name), await press(page, 'ArrowDown', name)]).toEqual(['Jordan', 'Egypt', 'Morocco'])

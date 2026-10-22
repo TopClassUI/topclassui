@@ -79,8 +79,8 @@ describe('DropdownPopup', () => {
     const list = classes((await popup(<DropdownItem>Rename</DropdownItem>)).element)
     for (const cls of [
       'flex', 'flex-col', 'gap-0.5', 'p-1.5', 'wrap-anywhere', 'overflow-y-auto', 'overscroll-contain', 'rounded-box', 'bg-surface-raised',
-      'shadow-lg', 'max-h-[min(var(--available-height,100dvh),calc(var(--tc-list-rows)*var(--tc-row-height)))]',
-      'min-w-[min(calc(var(--spacing)*48),round(down,var(--available-width),1px))]', 'max-w-[min(calc(var(--spacing)*80),round(down,var(--available-width),1px))]',
+      'shadow-(--tc-shadow-overlay)', 'max-h-[min(var(--available-height,100dvh),calc(var(--tc-list-rows)*var(--tc-row-height)))]',
+      'min-w-[min(calc(var(--spacing)*55),round(down,var(--available-width),1px))]', 'max-w-[min(calc(var(--spacing)*80),round(down,var(--available-width),1px))]',
       'origin-(--transform-origin)', 'focus-visible:-outline-offset-(length:--tc-ring-width)',
     ]) expect(list, cls).toContain(cls)
   })

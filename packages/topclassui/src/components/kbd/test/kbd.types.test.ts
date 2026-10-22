@@ -1,14 +1,23 @@
 import type { ComponentPropsWithRef, ReactNode, Ref } from 'react'
 import { describe, expectTypeOf, it } from 'vitest'
 
-import type { KbdProps } from '../types.js'
+import type { KbdDesignProps, KbdProps } from '../types.js'
 
 /** Assignability as a value, so a rejected prop is a passing assertion. */
 type Accepts<Union, Candidate> = Candidate extends Union ? true : false
 
 describe('the props are the native kbd props and nothing else', () => {
-  it('is exactly the props of a kbd element, because Kbd has none of its own', () => {
-    expectTypeOf<KbdProps>().toEqualTypeOf<ComponentPropsWithRef<'kbd'>>()
+  it('is the props of a kbd element plus pressed and disabled', () => {
+    expectTypeOf<Omit<KbdProps, 'pressed' | 'disabled'>>().toEqualTypeOf<Omit<ComponentPropsWithRef<'kbd'>, 'pressed' | 'disabled'>>()
+    expectTypeOf<KbdProps['pressed']>().toEqualTypeOf<boolean | undefined>()
+    expectTypeOf<KbdProps['disabled']>().toEqualTypeOf<boolean | undefined>()
+  })
+
+  it('derives pressed and disabled from the schema, so Try it reads them', () => {
+    expectTypeOf<keyof KbdDesignProps>().toEqualTypeOf<'pressed' | 'disabled'>()
+    expectTypeOf<KbdDesignProps['pressed']>().toEqualTypeOf<boolean | undefined>()
+    expectTypeOf<KbdDesignProps['disabled']>().toEqualTypeOf<boolean | undefined>()
+    expectTypeOf<Accepts<KbdProps['pressed'], 'true'>>().toEqualTypeOf<false>()
   })
 
   it('accepts children, className, style and ref, and ref is a normal prop', () => {
@@ -32,10 +41,8 @@ describe('the props the spec leaves unbuilt', () => {
     expectTypeOf<Accepts<keyof KbdProps, 'tone'>>().toEqualTypeOf<false>()
   })
 
-  it('has no state prop, because a key is not interactive', () => {
-    expectTypeOf<Accepts<keyof KbdProps, 'pressed'>>().toEqualTypeOf<false>()
+  it('has no muted prop: the playground names it, the frame never draws it', () => {
     expectTypeOf<Accepts<keyof KbdProps, 'muted'>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<keyof KbdProps, 'disabled'>>().toEqualTypeOf<false>()
   })
 
   it('has no render prop, which none of the Unit 1 server components takes', () => {

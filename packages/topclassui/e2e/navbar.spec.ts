@@ -11,9 +11,13 @@ import { type Clip, type Rgb, contrast, pixelsOf, rgbOf } from './pixels.js'
 
 /** Every demo. Written out, so a renamed demo fails here. */
 const NAVBARS = [
-  'navbar--basic', 'navbar--many-links', 'navbar--not-sticky', 'navbar--playground', 'navbar--rtl', 'navbar--states', 'navbar--tall-page',
+  'navbar--basic', 'navbar--many-links', 'navbar--not-sticky', 'navbar--playground', 'navbar--rtl', 'navbar--stage', 'navbar--states', 'navbar--tall-page',
   'navbar--with-search',
 ]
+
+/** The states strip draws brand-only bars, as the frame does: no list to scroll, no link to read but the brand. */
+const BRAND_ONLY = ['navbar--states']
+const WITH_LINKS = NAVBARS.filter((demo) => !BRAND_ONLY.includes(demo))
 
 /** The three screens Unit 3 measures at, and a phone on its side. */
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 1280, height: 800 }, { width: 844, height: 390 }] as const
@@ -161,7 +165,7 @@ test.afterEach(async ({ page }) => {
 
 test('the table names every navbar demo', () => {
   expect([...NAVBARS].sort()).toEqual(DEMOS.filter((demo) => demo.startsWith('navbar--')).sort())
-  expect(NAVBARS).toHaveLength(8)
+  expect(NAVBARS).toHaveLength(9)
 })
 
 // PLAN 19: a server-first bar is accepted on the HTML the server sends, before any script has run.
@@ -184,15 +188,15 @@ test.describe('the server HTML, with no script', () => {
   }
 
   // The README says so: the variable is 0px until the script runs, and the browser has scrolled by then.
-  test('a page opened at an #anchor lands with its heading under the bar: 60 px under', async ({ page }) => {
+  test('a page opened at an #anchor lands with its heading under the bar: 52 px under', async ({ page }) => {
     await page.goto(`${liveUrl('navbar--tall-page')}#theming`)
-    expect(await below(page.locator('#theming'))).toBe(-60)
+    expect(await below(page.locator('#theming'))).toBe(-52)
   })
 
   test('with the height written in the CSS of the app, the same page lands with its heading at the foot of the bar', async ({ page }) => {
     await page.route('**/navbar--tall-page--light--ltr.html', async (route) => {
       const response = await route.fetch()
-      await route.fulfill({ response, body: (await response.text()).replace('</head>', '<style>:root { --tc-sticky-top: 3.75rem }</style></head>') })
+      await route.fulfill({ response, body: (await response.text()).replace('</head>', '<style>:root { --tc-sticky-top: 3.25rem }</style></head>') })
     })
     await page.goto(`${liveUrl('navbar--tall-page')}#theming`)
     expect(await below(page.locator('#theming'))).toBe(0)
@@ -224,7 +228,7 @@ test.describe('the static pages', () => {
 
 test.describe('a page opened at an #anchor, with script', () => {
   // The browser scrolls before the height arrives; the bar then brings the target to its foot, once.
-  for (const screen of [{ width: 1280, height: 800, bar: 60 }, { width: 390, height: 844, bar: 85 }, { width: 320, height: 480, bar: 85 }]) {
+  for (const screen of [{ width: 1280, height: 800, bar: 52 }, { width: 390, height: 844, bar: 83 }, { width: 320, height: 480, bar: 83 }]) {
     test(`${String(screen.width)} x ${String(screen.height)}: lands at the foot of the bar of ${String(screen.bar)} px once the height arrives, with or without a height in the CSS of the app`, async ({ page }) => {
       await page.setViewportSize(screen)
       await page.goto(`${liveUrl('navbar--tall-page')}#theming`)
@@ -250,7 +254,7 @@ test.describe('a page opened at an #anchor, with script', () => {
     })
     await page.goto(`${liveUrl('navbar--tall-page')}#theming`)
     await expect(page.locator('html')).toHaveAttribute('data-harness', 'hydrated')
-    expect(await sticky(page)).toEqual({ variable: '60px', padding: '60px' })
+    expect(await sticky(page)).toEqual({ variable: '52px', padding: '52px' })
   })
 })
 
@@ -270,17 +274,17 @@ for (const direction of DIRECTIONS) {
       return { before, after: await below(link) }
     }
 
-    test('the bar writes its height, 60 px, and the page keeps that much clear at its top', async ({ page }) => {
+    test('the bar writes its height, 52 px as Figma 138:2393 draws it, and the page keeps that much clear at its top', async ({ page }) => {
       await openLive(page, 'navbar--tall-page', { direction })
-      expect((await boxOf(bar(page))).height).toBe(60)
-      expect(await sticky(page)).toEqual({ variable: '60px', padding: '60px' })
+      expect((await boxOf(bar(page))).height).toBe(52)
+      expect(await sticky(page)).toEqual({ variable: '52px', padding: '52px' })
     })
 
     test('it stays at the top of the screen while the page scrolls under it', async ({ page }) => {
       await openLive(page, 'navbar--tall-page', { direction })
       await page.evaluate(() => { scrollTo(0, 1500) })
       const frame = await boxOf(bar(page))
-      expect([frame.top, frame.bottom]).toEqual([0, 60])
+      expect([frame.top, frame.bottom]).toEqual([0, 52])
       // Painted over the page: the heading that scrolled under it is not what a click at its place reaches.
       await expect(bar(page)).toHaveCSS('z-index', '10')
     })
@@ -298,25 +302,25 @@ for (const direction of DIRECTIONS) {
     test('a link that lies under the bar is scrolled clear of it when Tab reaches it', async ({ page }) => {
       await openLive(page, 'navbar--tall-page', { direction })
       const { before, after } = await tabOntoLinkUnderTheBar(page)
-      expect(before, 'the link starts under the bar').toBe(-40)
+      expect(before, 'the link starts under the bar').toBe(-32)
       expect(after, 'px between the foot of the bar and the focused link').toBeGreaterThanOrEqual(0)
       await expect(firstLink(page)).toBeInViewport({ ratio: 1 })
     })
 
     // The control: the same two measurements with the variable held at the 0px it has without the hook.
-    test('the control: with the variable at 0px the heading lies 60 px under the bar, and the focused link stays under it', async ({ page }) => {
+    test('the control: with the variable at 0px the heading lies 52 px under the bar, and the focused link stays under it', async ({ page }) => {
       await openLive(page, 'navbar--tall-page', { direction })
       await page.addStyleTag({ content: 'html { --tc-sticky-top: 0px !important }' })
       await linksOf(bar(page)).filter({ hasText: 'Theming' }).click()
       await expect(page).toHaveURL(/#theming$/)
-      expect(await below(page.locator('#theming'))).toBe(-60)
-      expect(await tabOntoLinkUnderTheBar(page)).toEqual({ before: -40, after: -40 })
+      expect(await below(page.locator('#theming'))).toBe(-52)
+      expect(await tabOntoLinkUnderTheBar(page)).toEqual({ before: -32, after: -32 })
     })
 
     test('at 320 px the bar takes a second row: the variable follows, and so do the anchor and the focused link', async ({ page }) => {
       await openLive(page, 'navbar--tall-page', { direction })
       await page.setViewportSize({ width: 320, height: 640 })
-      await expect.poll(async () => (await sticky(page)).variable).not.toBe('60px')
+      await expect.poll(async () => (await sticky(page)).variable).not.toBe('52px')
       const frame = await boxOf(bar(page))
       expect((await layoutOf(bar(page))).rows).toBe(2)
       expect(frame.height).toBeGreaterThan(80)
@@ -331,7 +335,7 @@ for (const direction of DIRECTIONS) {
 
       // And back to one row when the screen is wide again.
       await page.setViewportSize({ width: 1280, height: 800 })
-      await expect.poll(async () => (await sticky(page)).variable).toBe('60px')
+      await expect.poll(async () => (await sticky(page)).variable).toBe('52px')
     })
 
     test('a safe area at the top makes the bar taller by as much, and the variable follows', async ({ page }) => {
@@ -343,14 +347,14 @@ for (const direction of DIRECTIONS) {
         root.setProperty('--tc-safe-start', '44px')
         root.setProperty('--tc-safe-end', '30px')
       })
-      await expect.poll(async () => (await sticky(page)).variable).toBe('100px')
+      await expect.poll(async () => (await sticky(page)).variable).toBe('98px')
       const root = bar(page)
       await expect(root).toHaveCSS('padding-top', '53px')
-      await expect(root).toHaveCSS('padding-inline-start', '64px')
-      await expect(root).toHaveCSS('padding-inline-end', '50px')
-      // The brand starts after the start safe area and the drawn 20 px, on the side the page starts at.
+      await expect(root).toHaveCSS('padding-inline-start', '60px')
+      await expect(root).toHaveCSS('padding-inline-end', '46px')
+      // The brand starts after the start safe area and the drawn 16 px, on the side the page starts at.
       const [frame, brand] = [await boxOf(root), await boxOf(brandOf(root))]
-      expect(direction === 'rtl' ? frame.right - brand.right : brand.left - frame.left).toBe(64)
+      expect(direction === 'rtl' ? frame.right - brand.right : brand.left - frame.left).toBe(60)
     })
   })
 }
@@ -375,7 +379,7 @@ test.describe('a bar that mounts and unmounts', () => {
 
     await page.locator('#toggle-bar').click()
     await expect(page.locator('#mounted')).toBeVisible()
-    await expect.poll(() => sticky(page)).toEqual({ variable: '60px', padding: '60px' })
+    await expect.poll(() => sticky(page)).toEqual({ variable: '52px', padding: '52px' })
 
     await page.locator('#add-row').click()
     await expect(page.locator('#mounted [data-row]')).toHaveCount(1)
@@ -392,18 +396,18 @@ test.describe('a bar that mounts and unmounts', () => {
 
 test.describe('one row at 1280 px', () => {
   for (const direction of DIRECTIONS) {
-    test(`${direction}: brand, six links and two actions share one row of 60 px, the brand at the start and the actions at the end`, async ({ page }) => {
+    test(`${direction}: brand, six links and two actions share one row of 52 px, the brand at the start and the actions at the end`, async ({ page }) => {
       await openLive(page, 'navbar--many-links', { direction })
       const root = bar(page)
-      expect(await layoutOf(root)).toMatchObject({ rows: 1, overlapping: [], outside: [], height: 60 })
+      expect(await layoutOf(root)).toMatchObject({ rows: 1, overlapping: [], outside: [], height: 52 })
       const [frame, brand, actions, list] = [await boxOf(root), await boxOf(brandOf(root)), await boxOf(actionsOf(root)), await boxOf(listOf(root))]
       if (direction === 'rtl') {
-        expect(Math.round(frame.right - brand.right), 'px from the right edge to the brand').toBe(20)
-        expect(Math.round(actions.left - frame.left), 'px from the left edge to the actions').toBe(20)
+        expect(Math.round(frame.right - brand.right), 'px from the right edge to the brand').toBe(16)
+        expect(Math.round(actions.left - frame.left), 'px from the left edge to the actions').toBe(16)
         expect(list.right).toBeLessThan(brand.left)
       } else {
-        expect(Math.round(brand.left - frame.left), 'px from the left edge to the brand').toBe(20)
-        expect(Math.round(frame.right - actions.right), 'px from the actions to the right edge').toBe(20)
+        expect(Math.round(brand.left - frame.left), 'px from the left edge to the brand').toBe(16)
+        expect(Math.round(frame.right - actions.right), 'px from the actions to the right edge').toBe(16)
         expect(list.left).toBeGreaterThan(brand.right)
       }
       // Every link fits: the list has nothing to scroll.
@@ -416,8 +420,8 @@ test.describe('one row at 1280 px', () => {
     await openLive(page, 'navbar--rtl', { direction: 'ltr' })
     const root = bar(page)
     const [frame, brand, actions] = [await boxOf(root), await boxOf(brandOf(root)), await boxOf(actionsOf(root))]
-    expect(Math.round(frame.right - brand.right)).toBe(20)
-    expect(Math.round(actions.left - frame.left)).toBe(20)
+    expect(Math.round(frame.right - brand.right)).toBe(16)
+    expect(Math.round(actions.left - frame.left)).toBe(16)
     await expect(root.locator('nav')).toHaveAttribute('aria-label', 'التنقل الرئيسي')
   })
 })
@@ -460,11 +464,11 @@ test.describe('a 320 px bar', () => {
       expect(list.width).toBeGreaterThan(150)
       expect(actions.top).toBeGreaterThan(brand.bottom)
       if (direction === 'rtl') {
-        expect(Math.round(frame.right - brand.right)).toBe(20)
-        expect(Math.round(actions.left - frame.left)).toBe(20)
+        expect(Math.round(frame.right - brand.right)).toBe(16)
+        expect(Math.round(actions.left - frame.left)).toBe(16)
       } else {
-        expect(Math.round(brand.left - frame.left)).toBe(20)
-        expect(Math.round(frame.right - actions.right)).toBe(20)
+        expect(Math.round(brand.left - frame.left)).toBe(16)
+        expect(Math.round(frame.right - actions.right)).toBe(16)
       }
     })
   }
@@ -670,7 +674,18 @@ test.describe('under a finger', () => {
     })
   }
 
-  for (const demo of NAVBARS) {
+  test('navbar--states: every brand is at least 44 px wide and 44 px tall', async ({ page }) => {
+    await openLive(page, 'navbar--states')
+    const sizes = await page.locator('header a[href]').evaluateAll((all) => all.map((element) => {
+      const { width, height } = element.getBoundingClientRect()
+      return { width, height }
+    }))
+    expect(sizes).toHaveLength(4)
+    expect(sizes.filter((size) => size.width < 44 || size.height < 44)).toEqual([])
+    await expectNoSidewaysScroll(page)
+  })
+
+  for (const demo of WITH_LINKS) {
     test(`${demo}: every link, button and field of the bar is at least 44 px wide and 44 px tall, and a field is typed in at 16 px`, async ({ page }) => {
       await openLive(page, demo)
       expect(await page.evaluate(() => matchMedia('(pointer: coarse)').matches)).toBe(true)
@@ -753,8 +768,8 @@ test.describe('inside a real layout, and with content no demo should show', () =
     const [frame, brand] = [await boxOf(root), await boxOf(brandOf(root))]
     const label = brandOf(root).locator('span')
     expect((await brandOf(root).textContent())?.length).toBe(100)
-    expect(brand.left).toBeGreaterThanOrEqual(frame.left + 20)
-    expect(brand.right).toBeLessThanOrEqual(frame.right - 20)
+    expect(brand.left).toBeGreaterThanOrEqual(frame.left + 16)
+    expect(brand.right).toBeLessThanOrEqual(frame.right - 16)
     await expect(label).toHaveCSS('text-overflow', 'ellipsis')
     expect(await label.evaluate((element) => element.scrollWidth > element.clientWidth + 100), 'the label is cut by its box').toBe(true)
   })
@@ -777,8 +792,8 @@ test.describe('inside a real layout, and with content no demo should show', () =
     await openFixture(page)
     const root = page.locator('#word-bar')
     const [frame, action] = [await boxOf(root), await boxOf(actionsOf(root).locator('a'))]
-    expect(action.left).toBeGreaterThanOrEqual(frame.left + 20)
-    expect(action.right).toBeLessThanOrEqual(frame.right - 20)
+    expect(action.left).toBeGreaterThanOrEqual(frame.left + 16)
+    expect(action.right).toBeLessThanOrEqual(frame.right - 16)
   })
 
   test('a brand and a link that hold elements where text is expected clip them at their own edge', async ({ page }) => {
@@ -787,13 +802,13 @@ test.describe('inside a real layout, and with content no demo should show', () =
     const root = page.locator('#element-bar')
     const [frame, brand] = [await boxOf(root), await boxOf(brandOf(root))]
     await expect(brandOf(root)).toHaveCSS('overflow-x', 'hidden')
-    expect(brand.right).toBeLessThanOrEqual(frame.right - 20)
+    expect(brand.right).toBeLessThanOrEqual(frame.right - 16)
     // The italic word is 300 characters long: it is wider than the brand, which shows its beginning and no more.
     expect((await boxOf(brandOf(root).locator('em'))).width).toBeGreaterThan(brand.width)
     expect((await boxOf(brandOf(root).locator('strong'))).left).toBeGreaterThanOrEqual(brand.left)
     await expect(linksOf(root).first()).toHaveCSS('overflow-x', 'hidden')
     // And a block 600 px wide among the actions is held to the width of the bar.
-    expect((await boxOf(actionsOf(root))).width).toBeLessThanOrEqual(frame.width - 40)
+    expect((await boxOf(actionsOf(root))).width).toBeLessThanOrEqual(frame.width - 32)
   })
 
   test('sixty links: Tab from the fifty-ninth brings the sixtieth whole into view, with its whole ring', async ({ page }) => {
@@ -808,9 +823,9 @@ test.describe('inside a real layout, and with content no demo should show', () =
     await expectNoSidewaysScroll(page)
   })
 
-  test('a bar with nothing in it, and parts with nothing in them, keep the 60 px of a bar', async ({ page }) => {
+  test('a bar with nothing in it, and parts with nothing in them, keep the 52 px of a bar', async ({ page }) => {
     await openFixture(page)
-    for (const id of ['bare-bar', 'links-only', 'empty-bar']) expect((await boxOf(page.locator(`#${id}`))).height, id).toBe(60)
+    for (const id of ['bare-bar', 'links-only', 'empty-bar']) expect((await boxOf(page.locator(`#${id}`))).height, id).toBe(52)
     for (const target of [brandOf(page.locator('#empty-bar')), ...await linksOf(page.locator('#empty-bar')).all()]) {
       const box = await boxOf(target)
       expect([box.width, box.height]).toEqual([24, 24])
@@ -998,8 +1013,8 @@ test.describe('text that is made larger or spaced out', () => {
       expect({ overlapping: layout.overlapping, outside: layout.outside }).toEqual({ overlapping: [], outside: [] })
       expect(await spills(page)).toEqual([])
       await expect(linksOf(root).first()).toHaveCSS('font-size', '28px')
-      // Three rows, 321 px, are more than a third of 844: the bar lets go of the top and keeps nothing clear.
-      expect(layout.height).toBe(321)
+      // Three rows, 317 px, are more than a third of 844: the bar lets go of the top and keeps nothing clear.
+      expect(layout.height).toBe(317)
       await expect(root).toHaveAttribute('data-unstuck', '')
       expect(await sticky(page)).toEqual({ variable: '0px', padding: '0px' })
       await brandOf(root).focus()
@@ -1033,12 +1048,12 @@ test.describe('text that is made larger or spaced out', () => {
       expect(await sticky(page)).toEqual({ variable: `${String(height)}px`, padding: `${String(height)}px` })
     })
 
-    test(`${direction}: at 32 px the bar of a page sticks on a 390 x 844 phone at 225 px, and lets go when the phone turns to 844 x 390`, async ({ page }) => {
+    test(`${direction}: at 32 px the bar of a page sticks on a 390 x 844 phone at 221 px, and lets go when the phone turns to 844 x 390`, async ({ page }) => {
       await page.setViewportSize({ width: 390, height: 844 })
       await openLive(page, 'navbar--tall-page', { direction })
       const root = bar(page)
       await page.addStyleTag({ content: 'html { font-size: 32px !important }' })
-      await expect.poll(async () => (await sticky(page)).variable).toBe('225px')
+      await expect.poll(async () => (await sticky(page)).variable).toBe('221px')
       await expect(root).toHaveCSS('position', 'sticky')
       await page.setViewportSize({ width: 844, height: 390 })
       await expect(root).toHaveAttribute('data-unstuck', '')
@@ -1047,11 +1062,11 @@ test.describe('text that is made larger or spaced out', () => {
       await page.setViewportSize({ width: 390, height: 844 })
       await expect(root).not.toHaveAttribute('data-unstuck')
       await expect(root).toHaveCSS('position', 'sticky')
-      expect(await sticky(page)).toEqual({ variable: '225px', padding: '225px' })
-      // A screen that only grows shorter leaves the bar at 225 px, so only the resize of the window can tell.
+      expect(await sticky(page)).toEqual({ variable: '221px', padding: '221px' })
+      // A screen that only grows shorter leaves the bar at 221 px, so only the resize of the window can tell.
       await page.setViewportSize({ width: 390, height: 600 })
       await expect(root).toHaveAttribute('data-unstuck', '')
-      expect((await boxOf(root)).height).toBe(225)
+      expect((await boxOf(root)).height).toBe(221)
       expect(await sticky(page)).toEqual({ variable: '0px', padding: '0px' })
     })
 
@@ -1092,7 +1107,7 @@ test.describe('motion', () => {
           return style.transitionDuration.split(', ').some((duration) => duration !== '0s') || style.animationName !== 'none'
         }).map((element) => element.tagName.toLowerCase()))
         expect(moving).toEqual([])
-        expect((await boxOf(bar(page))).height).toBe(60)
+        expect((await boxOf(bar(page))).height).toBe(52)
         await expect(listOf(bar(page))).toHaveCSS('scroll-behavior', 'auto')
       })
     })
@@ -1100,7 +1115,18 @@ test.describe('motion', () => {
 })
 
 test.describe('axe on the hydrated bar', () => {
-  for (const demo of NAVBARS) {
+  for (const mode of MODES) {
+    for (const direction of DIRECTIONS) {
+      test(`navbar--states ${mode} ${direction}: no violation, at rest and with a brand focused`, async ({ page }) => {
+        await openLive(page, 'navbar--states', { mode, direction })
+        expect((await axe(page)).violations).toEqual([])
+        await page.locator('header a[href]').last().focus()
+        expect((await axe(page)).violations).toEqual([])
+      })
+    }
+  }
+
+  for (const demo of WITH_LINKS) {
     for (const mode of MODES) {
       for (const direction of DIRECTIONS) {
         test(`${demo} ${mode} ${direction}: no violation, at rest and with a link focused`, async ({ page }) => {
@@ -1127,7 +1153,7 @@ test.describe('axe on the hydrated bar', () => {
 test.describe('axe on a 320 x 480 phone', () => {
   test.use({ hasTouch: true, isMobile: true, viewport: { width: 320, height: 480 } })
 
-  for (const demo of NAVBARS) {
+  for (const demo of WITH_LINKS) {
     test(`${demo}: no violation where the list scrolls and the bar wraps`, async ({ page }) => {
       await openLive(page, demo)
       const found = await axe(page)

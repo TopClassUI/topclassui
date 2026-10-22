@@ -31,18 +31,14 @@ const SHOWN: Record<string, Shown[]> = {
   'groups': [{ trigger: 'View', rows: ['Name', 'Last edited', 'Grid', 'Table'] }],
   'in-dialog': [{ trigger: 'Role', rows: ['Viewer', 'Editor', 'Owner'] }],
   'placements': PLACES.map((place) => ({ trigger: place, rows: TWO })),
-  'playground': [{ trigger: 'Actions', rows: ['Profile Ctrl P', 'Settings', 'Duplicate', 'Delete'] }],
+  'playground': [{ trigger: 'Actions', rows: ['Profile Ctrl P', 'Settings', 'Duplicate', 'Delete Del'] }],
   'rtl': [
     { trigger: 'الإجراءات', rows: ['الملف الشخصي Ctrl P', 'الإعدادات', 'حذف'] },
     { trigger: 'المزيد', rows: ['نسخ الرابط', 'إعادة التسمية'] },
   ],
   'sixty-items': [{ trigger: 'Time zone', rows: Array.from({ length: 60 }, (_, index) => `Zone ${String(index + 1)}`) }],
-  'states': [
-    { trigger: 'Open', rows: ['Profile', 'Settings'] },
-    { trigger: 'Disabled row', rows: ['Duplicate', 'Rename'] },
-    { trigger: 'Danger row', rows: ['Move to archive', 'Delete project'] },
-    { trigger: 'Grouped', rows: ['Name', 'Last edited'] },
-  ],
+  // The open cells are pictures: the closed cell's is the one trigger.
+  'states': [{ trigger: 'Actions', rows: ['Profile', 'Settings'] }],
   'with-links': [{ trigger: 'Help', rows: ['Documentation', 'Changelog', 'Contact support', 'Status page'] }],
 }
 

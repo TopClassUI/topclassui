@@ -3,11 +3,13 @@ export const segmentedControl = {
   slug: 'segmented-control',
   title: { en: 'Segmented control', ar: 'تحكم مقسّم' },
   description: {
-    en: 'One choice out of two to five short ones, drawn as one track. It is a radio group: the arrow keys select as they move, and reverse in RTL.',
-    ar: 'اختيار واحد من خيارين إلى خمسة خيارات قصيرة، مرسوم كمسار واحد. هو مجموعة أزرار راديو: الأسهم تختار أثناء التنقل، وتنعكس من اليمين إلى اليسار.',
+    en: 'A radio group drawn as one track; arrows select as they move, and reverse in RTL.',
+    ar: 'مجموعة أزرار راديو مرسومة كمسار واحد؛ الأسهم تختار أثناء التنقل، وتنعكس من اليمين إلى اليسار.',
   },
   demos: ['basic', 'with-icons', 'sizes', 'full-width', 'form', 'many', 'long-content', 'rtl'],
-  stageHeight: 20,
+  stageHeight: 19.4375,
+  stageDemo: 'with-icons',
+  extraSwitches: ['disabled'],
   note: {
     en: 'The arrow keys move and select at once; under an RTL `TopClassProvider`, ArrowRight goes to the segment before.',
     ar: 'الأسهم تنقل وتختار معًا، وتحت `TopClassProvider` باتجاه من اليمين إلى اليسار ينتقل السهم الأيمن إلى المقطع السابق.',

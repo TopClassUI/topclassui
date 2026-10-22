@@ -6,7 +6,7 @@ import { openTypeProgram } from '../../../../packages/topclassui/scripts/lib/rea
 import { SECTIONS } from '../../content/sections.js'
 import { type ExportsMap, namesBareRoot, rewriteImports } from '../../lib/rewrite-imports.js'
 import { type ComponentContent, contentProblems, loadContent } from './content.js'
-import { controlsOf } from './controls.js'
+import { controlsOf, demoStartsOf, withStarts } from './controls.js'
 import { lastCommitDate } from './dates.js'
 import { keyOf } from './demo-map.js'
 import { COMPONENTS, LIBRARY, componentFolders, demoNamesOf, metaOf } from './library.js'
@@ -99,7 +99,7 @@ export async function collect(contentDir: string, exportsMap: ExportsMap, repoRo
       },
       content,
       props: propsOf(program, dir, meta, json),
-      controls: json ? controlsOf(json) : [],
+      controls: json ? withStarts(controlsOf(json), demoStartsOf(demos.find((demo) => demo.name === 'playground')?.source ?? '')) : [],
       demos,
     })
     dates[slug] = lastCommitDate([dir, join(contentDir, `${slug}.ts`)], repoRoot)

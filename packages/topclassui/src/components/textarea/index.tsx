@@ -2,7 +2,7 @@
 import { useId } from 'react'
 
 import { cn } from '#shared/cn.js'
-import { FIELD_OWN_WIDTH, FIELD_READ_ONLY } from '#shared/classes.js'
+import { FIELD_OWN_WIDTH } from '#shared/classes.js'
 import { resolveMaxLength } from '#shared/contracts/boundaries.js'
 // Named here as well, so a consumer program that never compiles shared/ gets the --tc-* keys.
 import type {} from '#shared/style-tokens.js'
@@ -54,7 +54,6 @@ export function Textarea({
         TEXTAREA_RESIZE[autosize ? 'autosize' : 'plain'],
         // In the holder the width is the holder's, so the field fills it.
         held || fullWidth ? 'w-full' : FIELD_OWN_WIDTH,
-        readOnly && FIELD_READ_ONLY,
         className,
       )}
     />

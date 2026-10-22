@@ -3,11 +3,12 @@ export const codeBlock = {
   slug: 'code-block',
   title: { en: 'Code block', ar: 'كتلة شيفرة' },
   description: {
-    en: 'Code in a box of its own, read left to right on any page. The block renders on the server; the copy button is its only script.',
+    en: 'Code in a box of its own, rendered on the server; the copy button is its only script.',
     ar: 'شيفرة في صندوق خاص بها، تُقرأ من اليسار إلى اليمين في أي صفحة. تُعرض على الخادم، وزر النسخ هو الشيفرة الوحيدة في المتصفح.',
   },
   demos: ['basic', 'highlighted', 'long-line', 'wrap', 'no-copy', 'no-header', 'rtl'],
-  stageHeight: 10,
+  stageHeight: 19.4375,
+  controlOrder: ['wrap', 'showCopy'],
   note: {
     en: 'Pass the code as a template-literal child. No highlighter is built in: pass coloured nodes as highlighted.',
     ar: 'مرّر الشيفرة ابنًا بصيغة template literal. لا يوجد ملوّن مدمج: مرّر العقد الملوّنة عبر highlighted.',

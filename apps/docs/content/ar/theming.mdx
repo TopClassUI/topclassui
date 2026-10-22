@@ -13,7 +13,7 @@ description: ستة مفاتيح ضبط تغيّر شكل كل المكوّنا�
 |---|---|---|
 | <span dir="ltr">`--tc-radius`</span> | <span dir="ltr">`0.5rem`</span> | كل استدارات الزوايا: عنصر التحكم والصندوق والشريحة |
 | <span dir="ltr">`--tc-density`</span> | <span dir="ltr">`1`</span> | ارتفاع كل عنصر تحكم وحشوته |
-| <span dir="ltr">`--tc-motion`</span> | <span dir="ltr">`1`</span> | كل انتقال حركي، ويصبح <span dir="ltr">`0`</span> مع <span dir="ltr">`prefers-reduced-motion`</span> |
+| <span dir="ltr">`--tc-motion`</span> | <span dir="ltr">`1`</span> | كل انتقال حركي، ويصبح <span dir="ltr">0</span> مع <span dir="ltr">prefers-reduced-motion</span> |
 | <span dir="ltr">`--tc-list-rows`</span> | <span dir="ltr">`7`</span> | عدد الصفوف التي تعرضها القائمة قبل أن تبدأ بالتمرير |
 | <span dir="ltr">`--tc-ring-width`</span> | <span dir="ltr">`2px`</span> | حلقة التركيز |
 | <span dir="ltr">`--tc-line-width`</span> | <span dir="ltr">`1px`</span> | كل الحدود |
@@ -22,15 +22,15 @@ description: ستة مفاتيح ضبط تغيّر شكل كل المكوّنا�
 
 ## الوضع كتلة واحدة
 
-لا يوجد كائن سمة، ولا خاصية في المزوّد للألوان. الوضع كتلة <span dir="ltr">CSS</span> يختارها <span dir="ltr">`data-theme`</span>.
+لا يوجد كائن سمة، ولا خاصية في المزوّد للألوان. الوضع كتلة <span dir="ltr">CSS</span> يختارها <span dir="ltr">data-theme</span>.
 
 <TokensSample mode="ocean" />
 
-هذا وضع المحيط كاملًا: يغيّر نبرة واحدة ومفتاح ضبط واحدًا.
+<Caption>هذا وضع المحيط كاملًا: يغيّر نبرة واحدة ومفتاح ضبط واحدًا.</Caption>
 
 ## حصر السمة في قسم
 
-يعمل <span dir="ltr">`data-theme`</span> على أي عنصر، لا على الجذر وحده. ضعه على لوحة فيُعاد حساب كل ما بداخلها، بما في ذلك الصبغات الخفيفة وحلقة التركيز.
+يعمل <span dir="ltr">data-theme</span> على أي عنصر، لا على الجذر وحده. ضعه على لوحة فيُعاد حساب كل ما بداخلها، بما في ذلك الصبغات الخفيفة وحلقة التركيز.
 
 ```tsx check
 <section data-theme="dark" className="bg-page text-body">

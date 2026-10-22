@@ -4,55 +4,39 @@ title: Accessibility
 description: WCAG 2.2 AA is the target. This page lists what a machine checks, what a person checks, and what is not yet covered.
 ---
 
-import { FOCUS_RING, TOUCH_TARGET } from 'topclassui/classes'
-
 ## Contrast
 
 Contrast is measured from the real token values in every mode, as part of the build. Anything within 0.15 of a threshold counts as failing.
 
 | What | Minimum |
 |---|---|
-| Body and muted text | 4.5:1 |
-| A tone text on its own soft tint | 4.5:1 |
-| A control boundary, on every surface it can sit on | 3:1 |
-| The focus ring | 3:1 |
-| Icons that carry meaning | 3:1 |
+| Body and muted text | `4.5:1` |
+| A tone text on its own soft tint | `4.5:1` |
+| A control boundary, on every surface it can sit on | `3:1` |
+| The focus ring | `3:1` |
+| Icons that carry meaning | `3:1` |
 
 ## Target size
 
 Every interactive element is at least 24 by 24 CSS pixels, and grows to 44 on touch and other coarse pointers.
 
-```tsx check title="save-button.tsx"
-import { TOUCH_TARGET } from 'topclassui/classes'
+<ClassSample name="TOUCH_TARGET" />
 
-export function SaveButton() {
-  return <button type="button" className={TOUCH_TARGET}>Save</button>
-}
-```
-
-The shared class every control carries, and your own controls can carry it too. Its value: <code>{TOUCH_TARGET}</code>
+<Caption>The shared class every control carries.</Caption>
 
 ## Every drag has a keyboard path
 
-WCAG 2.5.7. A Slider takes arrow keys. A Drawer and a Toast always render a close button.
+[WCAG 2.5.7](https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html). A Slider takes arrow keys. A Drawer and a Toast always render a close button.
 
 ## Focus is always visible
 
-One focus ring on every control: a CSS outline with an offset, so the gap shows the real background on any surface. `--tc-ring` reaches 3:1 on every surface.
+One focus ring on every control: a CSS outline with an offset, so the gap shows the real background on any surface. --tc-ring reaches 3:1 on every surface.
 
-```tsx check title="home-link.tsx"
-import { FOCUS_RING } from 'topclassui/classes'
-
-export function HomeLink() {
-  return <a href="/en" className={FOCUS_RING}>Home</a>
-}
-```
-
-Its value: <code>{FOCUS_RING}</code>
+<ClassSample name="FOCUS_RING" />
 
 ## Labels are enforced by the types
 
-An Input outside a Field needs an `id`, an `aria-label` or an `aria-labelledby`, and TypeScript rejects one without.
+An Input outside a Field needs an id, an aria-label or an aria-labelledby, and TypeScript rejects one without.
 
 <WrongRight>
 
@@ -61,7 +45,7 @@ An Input outside a Field needs an `id`, an `aria-label` or an `aria-labelledby`,
 // Type error: id, aria-label or aria-labelledby is required
 ```
 
-```tsx check
+```tsx check show="6-8"
 import { Field } from 'topclassui/field'
 import { Input } from 'topclassui/input'
 
@@ -81,9 +65,9 @@ export function Email() {
 | Check | How | When |
 |---|---|---|
 | Contrast | `check-contrast.ts` | Every `pnpm check` |
-| ARIA and roles | axe-core in every demo | Every `pnpm check` |
+| ARIA and roles | [axe-core](https://github.com/dequelabs/axe-core) in every demo | Every `pnpm check` |
 | Target size | A browser test measures every focusable element | Every `pnpm check` |
-| Keyboard behaviour | A test per interactive component, following the ARIA Authoring Practices | Every `pnpm check` |
+| Keyboard behaviour | A test per interactive component, following the [ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/) | Every `pnpm check` |
 | Screen reader | NVDA and VoiceOver, by hand | Before each release |
 | Forced colors | Windows high contrast, by hand | Before each release |
 

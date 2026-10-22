@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { clampPage, clampPageCount, listPages } from '../lib.js'
+import { clampPage, clampPageCount, listPages, measureRow, pickRowStep } from '../lib.js'
 
 /** The four numbers in the order a case reads them, with the defaults of the component. */
 const pages = (value: number, pageCount: number, siblingCount = 1, boundaryCount = 1) =>
@@ -172,5 +172,25 @@ describe('pageCount', () => {
   it('leaves a whole count alone', () => {
     expect(clampPageCount(12)).toBe(12)
     expect(clampPageCount(500)).toBe(500)
+  })
+})
+
+describe('the width the full row claims', () => {
+  it('adds four arrows, each page at its floor or by its digits, a gap at the floor, and the room between cells', () => {
+    // 4 x 30 arrows, 3 x 26 pages and 6 x 4 between them at xs.
+    expect(measureRow(['1', '2', '3'], 'xs')).toBe(222)
+    // The middle row at md: 4 x 40 arrows, 7 x 40 pages and gaps, 10 x 6 between them.
+    expect(measureRow(['1', '', '5', '6', '7', '', '12'], 'md')).toBe(500)
+    // "12,345" is 6 x 8 + 21 = 69 wide, past the 40 px floor: 160 + 69 + 4 x 6.
+    expect(measureRow(['12,345'], 'md')).toBe(253)
+  })
+
+  it('picks the narrowest step that holds the row, and the widest for a row past it', () => {
+    expect(pickRowStep(0)).toBe(10)
+    expect(pickRowStep(160)).toBe(10)
+    expect(pickRowStep(161)).toBe(12)
+    expect(pickRowStep(222)).toBe(14)
+    expect(pickRowStep(500)).toBe(32)
+    expect(pickRowStep(5000)).toBe(48)
   })
 })

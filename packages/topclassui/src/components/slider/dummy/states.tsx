@@ -1,14 +1,19 @@
 import { Slider } from '../index.js'
 
-/** The states a server can render. Invalid turns the line around the track red as well as the fill. A slider has no read-only
- * state: Base UI has none. */
+/** The ring a focused thumb wears on focus-visible, drawn on the knob at rest so the strip can show it; not under forced colours, where a ring at rest would read as focus. */
+const RING = 'not-forced-colors:**:data-index:*:outline-solid not-forced-colors:**:data-index:*:outline-(length:--tc-ring-width) not-forced-colors:**:data-index:*:outline-offset-(length:--tc-ring-offset) not-forced-colors:**:data-index:*:outline-ring'
+
+/** One cell per state the strip draws, named by its aria-label, each slider narrow enough for its cell. A thumb has no
+ * hover or pressed look, so hover is drawn identical to idle and active is a step further, as the frame draws it; the invalid range is in the combined demo. */
 export default function Demo() {
   return (
-    <div className="grid justify-items-start gap-4">
-      <Slider aria-label="Live" defaultValue={40} />
-      <Slider aria-label="Invalid" invalid defaultValue={40} />
-      <Slider aria-label="Disabled" disabled defaultValue={40} />
-      <Slider aria-label="Invalid range" invalid defaultValue={[20, 70]} />
+    <div className="flex flex-wrap items-center gap-6">
+      <Slider aria-label="idle" defaultValue={40} className="w-34" />
+      <Slider aria-label="hover" defaultValue={40} className="w-34" />
+      <Slider aria-label="active" defaultValue={60} className="w-34" />
+      <Slider aria-label="focus-visible" defaultValue={40} className={`w-34 ${RING}`} />
+      <Slider aria-label="disabled" disabled defaultValue={40} className="w-34" />
+      <Slider aria-label="invalid" invalid defaultValue={40} className="w-34" />
     </div>
   )
 }

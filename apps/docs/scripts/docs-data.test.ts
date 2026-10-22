@@ -24,11 +24,11 @@ describe('docs:data against the repo', () => {
     expect(run.status, log).toBe(0)
   })
 
-  it('reads all 52 component folders and lists the 46 catalog cards and the 471 demos', () => {
-    expect(log).toMatch(/^docs:data: 52 folders, 46 catalog cards, 471 demos, \d+ issues?$/m)
+  it('reads all 52 component folders and lists the 46 catalog cards and the 509 demos', () => {
+    expect(log).toMatch(/^docs:data: 52 folders, 46 catalog cards, 509 demos, \d+ issues?$/m)
     expect(components.components).toHaveLength(52)
     expect(components.components.filter((entry) => entry.card)).toHaveLength(46)
-    expect(parseDemoMap(demos)).toHaveLength(471)
+    expect(parseDemoMap(demos)).toHaveLength(509)
   })
 
   it('writes four files that pass every shape and cross check', () => {
@@ -53,9 +53,9 @@ describe('docs:data against the repo', () => {
     expect(place('icon')).toEqual([null, null, false, false])
   })
 
-  it('gives every component with a schema its controls, and the five without one none', () => {
+  it('gives every component with a schema its controls, and the four without one none', () => {
     const none = components.components.filter((e) => e.page && e.controls.length === 0).map((e) => e.slug)
-    expect(none).toEqual(['breadcrumb', 'card', 'empty-state', 'form', 'kbd', 'timeline'])
+    expect(none).toEqual(['card', 'empty-state', 'form', 'timeline'])
   })
 
   it('rewrites every demo import to a public subpath', () => {

@@ -9,7 +9,7 @@ description: "Color has three layers: a palette you never use directly, semantic
 
 A component never names a color. It names a role, and the role resolves differently in each mode.
 
-The palette is the Tailwind v4 oklch ramp. The semantic layer maps each role to a shade, and `@theme inline` turns each one into a utility class.
+The palette is the Tailwind v4 oklch ramp. The semantic layer maps each role to a shade, and @theme inline turns each one into a utility class.
 
 ```css
 /* palette - never referenced by a component */
@@ -28,7 +28,7 @@ The palette is the Tailwind v4 oklch ramp. The semantic layer maps each role to 
 className="bg-primary-solid text-primary-on-solid"
 ```
 
-Every component uses the semantic layer only, so a new mode never needs a component change.
+<Caption>Every component uses the semantic layer only, so a new mode never needs a component change.</Caption>
 
 ## Every class
 
@@ -72,7 +72,7 @@ Every tone has the same set of roles, so a Badge, an Alert and a Button all use 
 
 </ToneSwatches>
 
-Shown in the page's mode. Each row is a live variable, not a picture of one.
+<Caption>Shown in the page's mode. Each row is a live variable, not a picture of one.</Caption>
 
 ## Where each color is used
 
@@ -93,11 +93,11 @@ One screen, every role labelled.
 
 ## The three modes
 
-Light, dark and ocean are three CSS blocks that set the same variable names. This site follows your system's mode until you pick one.
+Light, dark and ocean are three CSS blocks that set the same variable names. This site follows your system's mode.
 
 Ocean is light mode with a cyan primary and a pill radius. A custom mode needs nothing more than one CSS block.
 
-<TokensSample mode="dark" />
+<TokensSample mode="dark" names="--tc-page --tc-surface --tc-surface-raised --tc-line-strong --tc-primary-mix" />
 
 ## What the contrast check enforces
 
@@ -105,19 +105,20 @@ Contrast is checked on every change to the library, and a failure blocks the cha
 
 | What | Threshold | Measured against |
 |---|---|---|
-| Text, including a tone text on its own tint | 4.5:1 | The surface it sits on |
-| `line-strong`, `ring` and icons | 3:1 | All three surfaces, not only the page |
+| Text, including a tone text on its own tint | `4.5:1` | The surface it sits on |
+| line-strong, ring and icons | `3:1` | All three surfaces, not only the page |
 | A soft tint | 1.06 step | All three surfaces |
-| `line` | exempt | Decorative hairline, WCAG 1.4.11 |
+| `line` | `exempt` | Decorative hairline, [WCAG 1.4.11](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html) |
 
 ## Add your own theme
 
-Add one CSS block and set `data-theme="brand"` on the element it covers. A mode can change knobs as well as colors.
+Add one CSS block and set data-theme on the section it covers. A mode can change knobs as well as colors.
 
-<Callout tone="warning">A mode that sets `--tc-primary-solid` must also set `--tc-primary-on-solid`, or its label can fall below 4.5:1 on the new fill.</Callout>
+<Callout tone="warning">A mode that sets --tc-primary-solid must also set --tc-primary-on-solid, or its label can fall below 4.5:1 on the new fill.</Callout>
 
 ```css title="app/globals.css"
 /* after the three imports */
+/* ThemeScript keeps light, dark and ocean: set brand on a section */
 [data-theme="brand"] {
   color-scheme: dark;
 
@@ -137,4 +138,3 @@ Add one CSS block and set `data-theme="brand"` on the element it covers. A mode 
 }
 ```
 
-<Callout tone="info">`ThemeScript` stores only `light`, `dark` and `ocean`, so a custom mode goes on a section, or on `html` in a layout that does not render `ThemeScript`.</Callout>

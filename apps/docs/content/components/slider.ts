@@ -6,11 +6,15 @@ export const slider = {
     ar: 'شريط تمرير',
   },
   description: {
-    en: 'A single value or a range of two. Arrow keys and a press on the track give the same result as every drag.',
-    ar: 'قيمة واحدة أو نطاق من قيمتين. مفاتيح الأسهم والضغط على المسار يصلان إلى النتيجة نفسها التي يصل إليها السحب.',
+    en: 'A value or a range; arrow keys and a press on the track reach every drag\'s result.',
+    ar: 'قيمة أو نطاق؛ مفاتيح الأسهم والضغط على المسار تصل إلى ما يصل إليه كل سحب.',
   },
   demos: ['basic', 'range', 'show-value', 'form', 'sizes', 'rtl'],
+  stageDemo: 'stage',
   stageHeight: 7,
+  controlOrder: ['size', 'disabled', 'showValue', 'invalid'],
+  controlsHidden: ['fullWidth', 'min', 'max', 'step', 'largeStep', 'minStepsBetweenValues'],
+  extraSwitches: ['disabled'],
   note: {
     en: 'A hidden range input carries the value, so the slider submits with its form; the thumb moves once the page hydrates.',
     ar: 'حقل نطاق مخفي يحمل القيمة، فيُرسل الشريط مع نموذجه؛ ويتحرك المقبض بعد ترطيب الصفحة.',

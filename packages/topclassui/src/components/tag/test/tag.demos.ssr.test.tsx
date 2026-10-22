@@ -18,12 +18,12 @@ const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
 const EXPECTED = [
-  'custom-size', 'element-label', 'link', 'long-label', 'playground', 'removable', 'removable-sizes', 'rtl', 'sizes',
+  'custom-size', 'element-label', 'link', 'long-label', 'playground', 'removable', 'removable-sizes', 'rtl', 'sizes', 'stage',
   'states', 'tones', 'topics', 'with-icon',
 ]
 
-/** The link demo holds no Tag: its chips are anchors wearing tagVariants(). */
-const WITHOUT_A_TAG = ['link']
+/** The link and states demos hold no Tag: their chips are anchors wearing tagVariants(). */
+const WITHOUT_A_TAG = ['link', 'states']
 
 describe('every demo renders on the server', () => {
   it('holds exactly the demos PLAN 20 asks for, so none can be deleted silently', () => {

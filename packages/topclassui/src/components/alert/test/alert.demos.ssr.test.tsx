@@ -13,8 +13,10 @@ const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
 const EXPECTED = [
   'basic', 'custom-icon', 'live-region', 'long-text', 'minimal', 'playground', 'rich-content', 'rtl',
-  'states', 'tones', 'variants', 'with-actions',
+  'stage', 'states', 'tones', 'variants', 'with-actions',
 ]
+
+const STATES = ['info', 'success', 'warning', 'danger']
 
 describe('every demo renders on the server', () => {
   it('holds exactly the demos PLAN 20 asks for, so none can be deleted silently', () => {
@@ -50,5 +52,14 @@ describe('every demo renders on the server', () => {
       expect(withActions.length, file).toBeGreaterThan(0)
       expect(withActions.filter((a) => !a.startsWith('"soft"')), file).toEqual([])
     }
+  })
+})
+
+describe('the states demo', () => {
+  it('is the frame\'s strip: one captioned cell a state', async () => {
+    const { default: Demo } = await import('../dummy/states.js') as { default: ComponentType }
+    const html = markup(<Demo />)
+    const captions = [...html.matchAll(/<div (?:role="(?:group|region)" )?(?:data-tone="\w+" )?[^>]*aria-label="([^"]+)"/g)].map((m) => m[1])
+    expect(captions).toEqual(STATES)
   })
 })

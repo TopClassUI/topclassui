@@ -5,3 +5,4 @@ import { island } from '../lazy-island'
 
 export const PlaygroundIsland = island(() => import('./playground-island').then((m) => m.PlaygroundIsland))
 export const CardModeSwitch = island(() => import('./card-mode-switch').then((m) => m.CardModeSwitch))
+export const CopyButton = island(() => import('./copy-button').then((m) => m.CopyButton))

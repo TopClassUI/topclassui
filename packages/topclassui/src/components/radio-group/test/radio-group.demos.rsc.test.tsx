@@ -52,7 +52,7 @@ const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { 
 
 describe('every demo is a Server Component that only hands the radio group what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'form', 'horizontal', 'long-content', 'playground', 'rtl', 'sizes', 'states'])
+    expect(names).toEqual(['basic', 'combined', 'form', 'horizontal', 'long-content', 'playground', 'rtl', 'sizes', 'stage', 'states'])
   })
 
   for (const name of names) {
@@ -64,8 +64,18 @@ describe('every demo is a Server Component that only hands the radio group what 
     })
   }
 
-  it('states: each state is a plain prop of the group, or of one item', async () => {
+  it('states: each state is a plain prop of the group, the drawn ring a class of the item', async () => {
     const props = crossings((await load('states'))())
+      .map(({ part, props: given }) => `${part}: ${Object.keys(given).filter((key) => !['aria-label', 'value', 'children'].includes(key)).join(' ')}`)
+    expect(props).toEqual([
+      'RadioGroupRoot: ', 'RadioGroupItem: className', 'RadioGroupRoot: defaultValue', 'RadioGroupItem: className',
+      'RadioGroupRoot: ', 'RadioGroupItem: className', 'RadioGroupRoot: ', 'RadioGroupItem: className',
+      'RadioGroupRoot: disabled', 'RadioGroupItem: className', 'RadioGroupRoot: invalid', 'RadioGroupItem: className',
+    ])
+  })
+
+  it('combined: each state is a plain prop of the group, or of one item', async () => {
+    const props = crossings((await load('combined'))())
       .map(({ part, props: given }) => `${part}: ${Object.keys(given).filter((key) => !['aria-label', 'children', 'orientation'].includes(key)).join(' ')}`)
     expect(props).toEqual([
       'RadioGroupRoot: invalid defaultValue', 'RadioGroupItem: value', 'RadioGroupItem: value',

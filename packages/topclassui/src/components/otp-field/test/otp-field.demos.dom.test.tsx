@@ -14,13 +14,15 @@ const names = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
  * tab stop to its length, a numeric one drops the letters, and a disabled or read-only one keeps its default. */
 const AFTER: Record<string, string[]> = {
   'basic': ['482193'],
-  'playground': ['482193'],
+  'playground': ['482948'],
   'form': ['482193'],
   'grouped': ['482193'],
   'long': ['4821930ab'],
   'rtl': ['482193'],
   'sizes': ['482482', '482482', '482482', '482482', '482482'],
-  'states': ['482914', '482', '482913'],
+  'combined': ['482914', '482', '482913', '484821', '482914'],
+  'stage': ['482948'],
+  'states': ['4821', '4848', '4848', '4824', '4844', '48'],
 }
 
 const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { default: ComponentType }).default

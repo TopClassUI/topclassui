@@ -70,7 +70,7 @@ describe('with link={<Link href="" />} (PLAN 5.8)', () => {
   it('gives every link the look of a cell, the floor and the ring included', () => {
     for (const tag of anchors(linked)) {
       const list = (attr(tag, 'class') ?? '').split(' ')
-      expect(list).toContain('h-control-md')
+      expect(list).toContain('h-control-xs')
       expect(list).toContain('min-h-[var(--tc-target-min,24px)]')
       expect(list).toContain('focus-visible:outline-ring')
     }
@@ -92,7 +92,7 @@ describe('with link={<Link href="" />} (PLAN 5.8)', () => {
   })
 
   it('never writes the element onto the nav', () => {
-    expect(linked.startsWith('<nav aria-label="Pagination" data-size="md">')).toBe(true)
+    expect(linked.startsWith('<nav aria-label="Pagination" data-size="md" class="max-w-full">')).toBe(true)
   })
 })
 

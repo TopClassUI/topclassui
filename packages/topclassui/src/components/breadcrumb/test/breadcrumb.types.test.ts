@@ -2,7 +2,7 @@ import type { ReactElement, Ref } from 'react'
 import { describe, expectTypeOf, it } from 'vitest'
 
 import type { Labels } from '#shared/labels/types.js'
-import type { BreadcrumbItem, BreadcrumbProps } from '../types.js'
+import type { BreadcrumbDesignProps, BreadcrumbItem, BreadcrumbProps } from '../types.js'
 
 /** Assignability as a value, so a rejected prop is a passing assertion. */
 type Accepts<Union, Candidate> = Candidate extends Union ? true : false
@@ -89,11 +89,21 @@ describe('the props', () => {
     expectTypeOf<Accepts<keyof BreadcrumbProps, 'baseUrl'>>().toEqualTypeOf<false>()
   })
 
+  it('takes showHome as a boolean and maxItems as a number, the two the frame draws', () => {
+    expectTypeOf<BreadcrumbProps['showHome']>().toEqualTypeOf<boolean | undefined>()
+    expectTypeOf<BreadcrumbProps['maxItems']>().toEqualTypeOf<number | undefined>()
+  })
+
+  it('derives showHome and maxItems from the schema, beside siteUrl, so Try it reads them', () => {
+    expectTypeOf<keyof BreadcrumbDesignProps>().toEqualTypeOf<'siteUrl' | 'showHome' | 'maxItems'>()
+    expectTypeOf<BreadcrumbDesignProps['showHome']>().toEqualTypeOf<boolean | undefined>()
+    expectTypeOf<BreadcrumbDesignProps['maxItems']>().toEqualTypeOf<number | undefined>()
+    expectTypeOf<Accepts<BreadcrumbProps['maxItems'], string>>().toEqualTypeOf<false>()
+  })
+
   it('has none of the props the spec leaves unbuilt', () => {
-    expectTypeOf<Accepts<keyof BreadcrumbProps, 'maxItems'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof BreadcrumbProps, 'collapse'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof BreadcrumbProps, 'separator'>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<keyof BreadcrumbProps, 'showHome'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof BreadcrumbProps, 'truncate'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof BreadcrumbProps, 'size'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof BreadcrumbProps, 'variant'>>().toEqualTypeOf<false>()

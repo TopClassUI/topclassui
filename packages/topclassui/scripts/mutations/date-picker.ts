@@ -9,6 +9,18 @@ const CLASSES = 'src/components/date-picker/classes.ts'
 
 export const MUTATIONS: Mutation[] = [
   {
+    label: 'the date picker trigger loses its ring while the calendar is open',
+    file: CLASSES,
+    from: 'text-start ${FIELD_BOX} ${OPEN_RING} ${POINTER}`',
+    to: 'text-start ${FIELD_BOX} ${POINTER}`',
+  },
+  {
+    label: 'the date picker day loses its pill and goes back to the control radius',
+    file: CLASSES,
+    from: 'justify-center rounded-full align-middle text-xs',
+    to: 'justify-center rounded-control align-middle text-xs',
+  },
+  {
     label: 'the date picker addMonths stops keeping the day inside the month, so 31 March back a month is 3 March',
     file: LIB,
     from: '  return withinYears({ year, month, day: Math.min(parts.day, daysInMonth(year, month)) })',
@@ -215,14 +227,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the date picker popup keeps its full side padding on a narrow screen, so at a 32 px root two digits overflow their day',
     file: CLASSES,
-    from: 'px-[clamp(4px,calc(1rem-(17.5rem*var(--tc-density)-var(--available-width,100vw))/2),min(1rem,16px))]',
-    to: 'px-[min(1rem,16px)]',
+    from: 'px-[clamp(4px,calc(0.875rem-(16.75rem*var(--tc-density)-var(--available-width,100vw))/2),min(0.875rem,14px))]',
+    to: 'px-[min(0.875rem,14px)]',
   },
   {
-    label: 'the date picker popup block padding grows with the root again, 32 px above and below the month at a 32 px root',
+    label: 'the date picker popup block padding grows with the root again, 28 px above and below the month at a 32 px root',
     file: CLASSES,
-    from: "'py-[min(1rem,16px)] px-[clamp(",
-    to: "'p-4 px-[clamp(",
+    from: "'py-[min(0.875rem,14px)] px-[clamp(",
+    to: "'p-3.5 px-[clamp(",
   },
   {
     label: 'the date picker cell keeps a side padding, so a day is narrower than its column and two digits overflow at a 32 px root',

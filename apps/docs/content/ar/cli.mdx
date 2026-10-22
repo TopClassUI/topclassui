@@ -1,76 +1,131 @@
 ---
 slug: cli
 title: الإضافة عبر الطرفية
-description: انسخ مكوّنًا واحدًا إلى مشروعك بأمر واحد. تجلب الطرفية مصدره مع ثوابته ومخططه وأنواعه ومتغيراته، ثم تعدّلها كأنها ملفاتك، ويظهر كل تحديث لاحق بأمر diff.
+description: انسخ مكوّنًا إلى مشروعك وامتلك ملفه، فهو ملفك تعدّله كما تشاء.
 ---
 
-## ابدأ المشروع
+## التهيئة مرة واحدة
 
-أمر واحد يجهّز المشروع: يتعرّف على إطار العمل، وينسخ الشيفرة المشتركة، ويضيف سطرين إلى ملف CSS.
+يتعرّف <span dir="ltr">`init`</span> على إطار العمل ومدير الحزم، ثم ينسخ الشيفرة المشتركة ويعدّل ملف CSS.
 
-```bash title="الطرفية"
-npx topclassui init
+```text title="الطرفية"
+$ npx topclassui init
+
+Detected Next.js 16.4.2, App Router, TypeScript 5.9.3, Tailwind 4.3.3
+Detected npm (default)
+CSS entry  app/globals.css
+Folder     topclassui
+svg → topclassui/components/svg/ (button imports it)
+button → topclassui/components/button/ (toast imports it)
+toast → topclassui/components/toast/ (base imports it)
+base → topclassui/
+Added to app/globals.css:
+  @import "../topclassui/tokens.css";
+  @import "../topclassui/styles.css";
+Wrote 106 files and topclassui.json
 ```
 
-يتعرّف على Next.js مع App Router أو على React مع Vite، وعلى مدير الحزم الذي تستخدمه. ينسخ المزوّد وسكربت السمة والنصوص و<span dir="ltr">`tokens.css`</span> و<span dir="ltr">`styles.css`</span> إلى مجلد واحد اسمه <span dir="ltr">`topclassui/`</span>. ثم يثبّت <span dir="ltr">`@base-ui/react`</span> و<span dir="ltr">`class-variance-authority`</span> و<span dir="ltr">`clsx`</span> و<span dir="ltr">`tailwind-merge`</span> و<span dir="ltr">`zod`</span>، ويكتب <span dir="ltr">`topclassui.json`</span>، ويطبع أسطر المزوّد التي تضعها في التخطيط.
+ثم يثبّت <span dir="ltr">`@base-ui/react`</span> و<span dir="ltr">`class-variance-authority`</span> و<span dir="ltr">`clsx`</span> و<span dir="ltr">`tailwind-merge`</span> و<span dir="ltr">`zod`</span>، ويطبع أسطر المزوّد التي تضعها في التخطيط؛ ولا يعدّل التخطيط بنفسه أبدًا. وإذا كان التخطيط يركّب المزوّد من الحزمة توقّف <span dir="ltr">`init`</span>، لأن النسخ تقرأ المزوّد المنسوخ؛ والخيار <span dir="ltr">`--force`</span> يمضي على أي حال.
 
-```css title="app/globals.css"
-@import "tailwindcss";
-@import "../topclassui/tokens.css";
-@import "../topclassui/styles.css";
-```
+| الموضع | Next.js مع App Router | Vite |
+|---|---|---|
+| المجلد | <span dir="ltr">`topclassui/`</span>، أو <span dir="ltr">`src/topclassui/`</span> إن كان في المشروع مجلد <span dir="ltr">`src`</span> | <span dir="ltr">`src/topclassui/`</span> |
+| ملف CSS | <span dir="ltr">`app/globals.css`</span> | <span dir="ltr">`src/index.css`</span> |
+| المزوّد | <span dir="ltr">`app/layout.tsx`</span>، مع <span dir="ltr">`ThemeScript`</span> في الرأس | <span dir="ltr">`src/main.tsx`</span>، حول <span dir="ltr">`<App />`</span> |
 
 ## أضف مكوّنًا
 
-اذكر مكوّنًا واحدًا أو أكثر، ويصل كل مكوّن مع كل ملف يستورده.
+ينسخ <span dir="ltr">`add`</span> المكوّن وكل ما يستورده. اذكر مكوّنًا واحدًا أو أكثر، أو مرّر <span dir="ltr">`--all`</span>.
 
-```bash title="الطرفية"
-npx topclassui add button
-npx topclassui add dialog select
+```text title="الطرفية"
+$ npx topclassui add select
+
+select → topclassui/components/select/
+
+# الأمر نفسه مع كل مدير حزم
+$ pnpm dlx topclassui add select
+$ yarn dlx topclassui add select
+$ bunx topclassui add select
 ```
 
-الخيار <span dir="ltr">`--all`</span> ينسخ المكوّنات كلها. ولا يكتب الأمر فوق ملف عدّلته أبدًا: يتركه <span dir="ltr">`add`</span> كما هو ويذكر اسمه.
+يطبع <span dir="ltr">`list`</span> كل المكوّنات وما يوجد منها في مشروعك؛ و<span dir="ltr">`--json`</span> يطبع القائمة نفسها بصيغة JSON.
 
-## مجلد topclassui
+## ما يصل إلى مشروعك
 
-كل شيء يصل إلى مجلد واحد، وهو ملكك تعدّله كما تشاء.
+مجلد واحد لكل ما نضيفه. شيفرتك تبقى كما هي.
 
-```text title="topclassui/"
-topclassui/
-  components/button/   index.tsx, classes.ts, variants.ts, ... and dummy/ with the examples
-  shared/              cn, classes, contracts, labels, provider, theme
-  icons/data/          one file for each icon a copy uses
-  tokens.css
-  styles.css
-topclassui.json        what was copied, from which version, with a hash of each file
+<FileTree rows={[
+  { depth: 0, kind: 'folder', name: 'your-app/' },
+  { depth: 1, kind: 'folder', name: 'app/' },
+  { depth: 2, kind: 'file', name: 'globals.css', note: 'يضيف إليه init سطرَي استيراد' },
+  { depth: 1, kind: 'folder', name: 'topclassui/', note: 'كل ما نضيفه، في مجلد واحد' },
+  { depth: 2, kind: 'folder', name: 'components/' },
+  { depth: 3, kind: 'folder', name: 'button/', note: 'يجلبه init، فالإشعار يستورده' },
+  { depth: 4, kind: 'code', name: 'index.tsx', note: 'المكوّن، يُعرض على الخادم' },
+  { depth: 4, kind: 'code', name: 'variants.ts', note: 'مظهره' },
+  { depth: 4, kind: 'code', name: 'classes.ts', note: 'ثوابت أصنافه' },
+  { depth: 4, kind: 'code', name: 'constants.ts', note: 'قيمه الافتراضية' },
+  { depth: 4, kind: 'code', name: 'types.ts', note: 'خصائصه' },
+  { depth: 4, kind: 'code', name: 'schema.ts', note: 'قواعد الخصائص' },
+  { depth: 4, kind: 'code', name: 'boundaries.ts', note: 'الحدود التي يفرضها' },
+  { depth: 4, kind: 'code', name: 'skeleton.tsx', note: 'حالة التحميل' },
+  { depth: 4, kind: 'folder', name: 'dummy/', note: 'أمثلة عاملة، مثال في كل ملف' },
+  { depth: 3, kind: 'folder', name: 'select/', note: 'npx topclassui add select' },
+  { depth: 4, kind: 'code', name: 'client.tsx', note: 'الجزء التفاعلي وحده' },
+  { depth: 4, kind: 'code', name: 'hook.ts', note: 'الحالة والتأثيرات والمعالجات' },
+  { depth: 4, kind: 'code', name: 'lib.ts', note: 'دوال خالصة، بلا React' },
+  { depth: 2, kind: 'folder', name: 'shared/', note: 'cn وclasses وcontracts وlabels وprovider وtheme' },
+  { depth: 2, kind: 'folder', name: 'icons/', note: 'ملف لكل أيقونة تستخدمها نسخة' },
+  { depth: 2, kind: 'file', name: 'tokens.css', note: 'كل متغيّرات --tc-*' },
+  { depth: 2, kind: 'file', name: 'styles.css', note: 'ربط @theme والمتغيّرات الشرطية' },
+  { depth: 1, kind: 'settings', name: 'topclassui.json', note: 'إعداداتك' },
+]} />
+
+استورد من المجلد لا من الحزمة: <span dir="ltr">`import { Button } from '@/topclassui/components/button'`</span>. النسخ تستورد بعضها بمسارات نسبية.
+
+## ملف الإعدادات
+
+يكتبه <span dir="ltr">`init`</span> ويقرؤه <span dir="ltr">`add`</span> و<span dir="ltr">`diff`</span>. الحقل <span dir="ltr">`lock`</span> يسجّل كل ملف منسوخ مع إصداره وبصمته، فاتركه للطرفية.
+
+```json title="topclassui.json"
+{
+  "version": 1,
+  "framework": "next-app",
+  "css": "app/globals.css",
+  "dir": "topclassui",
+  "imports": "relative",
+  "packageManager": "npm",
+  "lock": {
+    "registry": "0.1.0-beta.1",
+    "files": {
+      "components/button/index.tsx": { "from": "button", "version": "0.1.0-beta.1", "sha256": "…" }
+    }
+  }
+}
 ```
 
-استورد من المجلد لا من الحزمة. النسخ تستورد بعضها بمسارات نسبية، فلا حاجة إلى اسم مستعار.
+## عندما تعدّل ملفًا منسوخًا
 
-```tsx title="app/page.tsx"
-import { Button } from '@/topclassui/components/button'
+لا يكتب <span dir="ltr">`add`</span> فوق تعديلاتك أبدًا. يعرض <span dir="ltr">`diff`</span> ما تغيّر؛ و<span dir="ltr">`--overwrite`</span> يستبدل الملف ويطبع الفرق أولًا.
+
+```text title="الطرفية"
+$ npx topclassui diff select
+
+select: 1 of 20 files differ
+  components/select/classes.ts: modified locally
+
+$ npx topclassui add select --overwrite
 ```
 
-## تابع الإصدارات الجديدة
+يخرج <span dir="ltr">`diff`</span> بالرمز 1 إذا وُجد أي اختلاف. وبعد تحديث الحزمة، يكتب <span dir="ltr">`add --update`</span> الإصدار الجديد من كل ملف لم تلمسه.
 
-حدّث الحزمة، ثم قارن.
+## التشغيل بلا أسئلة
 
-```bash title="الطرفية"
-npx topclassui diff
-npx topclassui add --update
+```bash title="شيفرة"
+npx topclassui init --yes                # يقبل كل القيم الافتراضية
+npx topclassui add button --yes
+npx topclassui add button --dry-run      # يطبع ما سيكتبه ولا يكتب شيئًا
 ```
-
-يعرض <span dir="ltr">`diff`</span> حالة كل ملف منسوخ: محدّث، أو تغيّر في المصدر، أو عدّلته أنت، ويطبع رقعة لكل تغيير في المصدر، وينتهي بالرمز 1 إذا اختلف أي شيء. ويكتب <span dir="ltr">`add --update`</span> الإصدار الجديد من الملفات التي لم تلمسها. أما <span dir="ltr">`--overwrite`</span> فيستبدل الملفات التي عدّلتها أيضًا، بعد أن يطبع الفرق.
-
-## اعرف ما لديك
-
-```bash title="الطرفية"
-npx topclassui list
-```
-
-كل المكوّنات، وما أضفته منها إلى مشروعك. والخيار <span dir="ltr">`--json`</span> يطبع القائمة نفسها بصيغة JSON.
-
-## الخيارات
 
 كل أمر يقبل أيضًا <span dir="ltr">`--cwd <dir>`</span> لمشروع خارج المجلد الحالي.
 
@@ -84,18 +139,12 @@ npx topclassui list
 | <span dir="ltr">`--pm <name>`</span> | <span dir="ltr">`npm`</span> أو <span dir="ltr">`pnpm`</span> أو <span dir="ltr">`yarn`</span> أو <span dir="ltr">`bun`</span> |
 | <span dir="ltr">`--examples`</span>، <span dir="ltr">`--no-examples`</span> | مع <span dir="ltr">`add`</span>: يضيف ما تحتاج إليه الأمثلة، أو لا ينسخ أي مثال |
 
-## Next.js و Vite
-
-الأوامر نفسها في الاثنين، وثلاثة أشياء فقط تختلف.
-
-| الموضع | Next.js مع App Router | Vite |
-|---|---|---|
-| المجلد | <span dir="ltr">`topclassui/`</span>، أو <span dir="ltr">`src/topclassui/`</span> إن كان في المشروع مجلد <span dir="ltr">`src`</span> | <span dir="ltr">`src/topclassui/`</span> |
-| ملف CSS | <span dir="ltr">`app/globals.css`</span> | <span dir="ltr">`src/index.css`</span> |
-| المزوّد | <span dir="ltr">`app/layout.tsx`</span>، مع <span dir="ltr">`ThemeScript`</span> في الرأس | <span dir="ltr">`src/main.tsx`</span>، حول <span dir="ltr">`<App />`</span> |
-
-## النسخ أو الحزمة
-
-اختر واحدًا منهما. النسخ تقرأ المزوّد المنسوخ، فإذا ركّب التخطيط المزوّد من الحزمة بقيت النسخ بالإنجليزية ومن اليسار إلى اليمين. يتوقف <span dir="ltr">`init`</span> عندما يجد ذلك، والخيار <span dir="ltr">`--force`</span> يمضي على أي حال.
-
 <Callout tone="info">رموز الخروج: 0 تمّ، 1 ثمة اختلاف، 2 خطأ في الأمر، 3 فشل التثبيت.</Callout>
+
+## ما لا يفعله أبدًا
+
+<Cards columns={3}>
+  <Card title="لا قياس عن بُعد">لا يرسل شيئًا. التنزيل الوحيد هو التثبيت الذي يشغّله.</Card>
+  <Card title="لا شيء خارج ملفاته">يكتب مجلده و<span dir="ltr">topclassui.json</span>، وسطرين في ملف CSS.</Card>
+  <Card title="لا كتابة فوق ملفاتك بصمت">الملف الذي عدّلته يُترك كما هو ما لم تمرّر <span dir="ltr">--overwrite</span>، وعندها يُطبع الفرق أولًا.</Card>
+</Cards>

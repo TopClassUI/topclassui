@@ -10,7 +10,11 @@ export const select = {
     ar: 'اختيار واحد من قائمة بيانات بسيطة. تبقى القائمة المنبثقة داخل الشاشة وتمرّر نفسها، بارتفاع سبعة صفوف افتراضيًا.',
   },
   demos: ['basic', 'form', 'sizes', 'four-rows', 'sixty-items', 'long-content', 'rtl'],
-  stageHeight: 7,
+  stageHeight: 21,
+  stageOpen: true,
+  controlOrder: ['size', 'placement', 'disabled', 'invalid', 'required', 'fullWidth'],
+  controlsHidden: ['visibleRows', 'loadMoreThreshold'],
+  extraSwitches: ['disabled', 'required'],
   note: {
     en: '`items` is plain data, so a server page can render a Select: no function crosses to the browser.',
     ar: '`items` بيانات بسيطة، فتستطيع صفحة خادم أن تعرض Select: لا تعبر أي دالة إلى المتصفح.',

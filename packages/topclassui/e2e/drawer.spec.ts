@@ -27,7 +27,7 @@ const DRAWERS: Record<string, { trigger: string, title: string }> = {
   'drawer--rtl': { trigger: 'القائمة', title: 'تصفّح' },
   'drawer--sizes': { trigger: 'xs', title: 'Size xs' },
   'drawer--start': { trigger: 'Menu', title: 'Browse' },
-  'drawer--states': { trigger: 'Side sheet', title: 'Side sheet' },
+  'drawer--states': { trigger: 'Open', title: 'Opened' },
   'drawer--top': { trigger: 'What is new', title: 'Version 2.4' },
   'drawer--trap-focus': { trigger: 'Inspect', title: 'Inspector' },
   'drawer--with-form': { trigger: 'Invite', title: 'Invite a teammate' },
@@ -157,6 +157,31 @@ async function strokeOf(popup: Locator, physical: Physical): Promise<{ from: Poi
 test('the table names every drawer demo', () => {
   expect(Object.keys(DRAWERS).sort()).toEqual(DEMOS.filter((demo) => demo.startsWith('drawer--')).sort())
   expect(Object.keys(DRAWERS)).toHaveLength(13)
+})
+
+test.describe('the states strip', () => {
+  /** The cell a state is drawn in, by the title that captions it. */
+  const cellOf = (page: Page, title: string) => page.locator(`#demo [title="${title}"]`)
+
+  for (const direction of DIRECTIONS) {
+    test(`${direction}: the side and the bottom sheet are pictures at their edge of their own cell, whole inside it, and the page holds no open sheet`, async ({ page }) => {
+      await openLive(page, 'drawer--states', { direction })
+      expect(await cellOf(page, 'closed').locator('xpath=..').locator(':scope > *').evaluateAll((cells) => cells.map((cell) => cell.getAttribute('title'))))
+        .toEqual(['closed', 'side sheet', 'bottom sheet', 'dragging', 'focus trapped'])
+      await expect(page.locator('[role="dialog"]')).toHaveCount(0)
+      for (const title of ['side sheet', 'bottom sheet', 'dragging', 'focus trapped']) {
+        const cell = cellOf(page, title)
+        const sheet = cell.locator('[aria-hidden="true"][inert]')
+        await expect(sheet).toHaveText('sheet')
+        const [inner, outer] = [await boxOf(sheet), await boxOf(cell)]
+        expect(inner.top >= outer.top && inner.bottom <= outer.bottom && inner.left >= outer.left && inner.right <= outer.right, `${title} leaves its cell`).toBe(true)
+        // The edge it stands on: the inline end, which is the left in Arabic, or the bottom.
+        const edge = title === 'bottom sheet' ? outer.bottom - inner.bottom : direction === 'rtl' ? inner.left - outer.left : outer.right - inner.right
+        expect(Math.abs(edge), `${title} is off its edge`).toBeLessThanOrEqual(1)
+      }
+      expect((await axe(page)).violations).toEqual([])
+    })
+  }
 })
 
 // A Drawer slides and never fades: a wait on its opacity would return on the first frame of the slide.
@@ -1064,7 +1089,7 @@ test.describe('a screen under 272 px tall', () => {
     await expect(bodyOf(popup)).toHaveCSS('overflow-y', 'auto')
     expect(await scrollersOf(popup), 'boxes that scroll').toBe(1)
     const parts = await partsOf(popup)
-    expect(parts.body.height).toBe(170)
+    expect(parts.body.height).toBe(174)
     expect(parts.footer?.bottom).toBe(parts.popup.bottom)
     expect(await popup.evaluate((el) => el.scrollHeight - el.clientHeight)).toBe(0)
   })
@@ -1110,7 +1135,7 @@ test.describe('inside the screen', () => {
         // Where the three bars are taller than the screen the sheet scrolls as one, by a wheel over its header.
         const [frame, header] = [await boxOf(popup), (await partsOf(popup)).header]
         const hidden = await popup.evaluate((el) => el.scrollHeight - el.clientHeight)
-        expect(hidden, 'px of sheet below its own box').toBe(screen.height === 390 ? 20 : 0)
+        expect(hidden, 'px of sheet below its own box').toBe(screen.height === 390 ? 16 : 0)
         await wheelAt(page, header.left + 40, header.top + 20, hidden)
         expect(await popup.evaluate((el) => el.scrollTop), 'px the wheel scrolled the sheet').toBe(hidden)
         for (const button of await popup.locator('button:not([aria-label])').all()) {

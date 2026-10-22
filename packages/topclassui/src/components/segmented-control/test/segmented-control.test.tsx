@@ -82,7 +82,7 @@ describe('on the server', () => {
     expect(attr(trackOf(html), 'class')?.endsWith(' min-h-control-xl')).toBe(true)
     expect(segments(html).every((button) => attr(button, 'class')?.endsWith(' px-5 text-base'))).toBe(true)
     expect(segments(view({ size: 'xs' })).every((button) => attr(button, 'class')?.endsWith(' px-2 text-xs'))).toBe(true)
-    expect(segments(view()).every((button) => attr(button, 'class')?.endsWith(' px-3 text-sm'))).toBe(true)
+    expect(segments(view()).every((button) => attr(button, 'class')?.endsWith(' px-2.75 text-xs'))).toBe(true)
   })
 
   it('size custom emits no height, no padding and no type step', () => {

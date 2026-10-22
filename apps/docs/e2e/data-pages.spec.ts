@@ -1,5 +1,6 @@
-import AxeBuilder from '@axe-core/playwright'
 import { type Page, expect, test } from '@playwright/test'
+
+import { axeViolations } from './pages'
 
 const SLUGS = ['table', 'tree-view', 'timeline', 'stepper'] as const
 const LOCALES = [{ locale: 'en', dir: 'ltr' }, { locale: 'ar', dir: 'rtl' }] as const
@@ -38,8 +39,7 @@ for (const slug of SLUGS) {
         await expect(page.locator('h1')).toHaveCount(1)
         await card(page, slug).scrollIntoViewIfNeeded()
         await page.waitForLoadState('networkidle')
-        const results = await new AxeBuilder({ page }).analyze()
-        expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([])
+        expect(await axeViolations(page)).toEqual([])
         expect(errors).toEqual([])
       })
     }
@@ -67,7 +67,7 @@ test('every Data code block shows the rewritten imports, never a path into the l
 })
 
 test('every Data page counts its states', async ({ page }) => {
-  const counts = { table: '7 states', 'tree-view': '4 states', timeline: '6 states', stepper: '4 states' } as const
+  const counts = { table: '6 states', 'tree-view': '6 states', timeline: '6 states', stepper: '5 states' } as const
   for (const slug of SLUGS) {
     await page.goto(`/en/docs/components/${slug}`)
     await expect(card(page, slug).getByText(counts[slug], { exact: true })).toBeVisible()
@@ -78,13 +78,14 @@ test('Table: the playground drives the stage and the code', async ({ page }) => 
   const errors = collectErrors(page)
   await page.goto('/en/docs/components/table')
   const table = card(page, 'table')
-  await table.getByRole('switch', { name: 'striped' }).click()
+  await table.getByRole('checkbox', { name: 'striped' }).click()
   await expect(table.locator('[data-striped]').first()).toBeVisible()
-  await table.getByRole('switch', { name: 'stickyFirstColumn' }).click()
+  await table.getByRole('checkbox', { name: 'stickyFirstColumn' }).click()
   await expect(table.locator('[data-sticky-first-column]').first()).toBeVisible()
-  await table.getByRole('switch', { name: 'captionVisible' }).click()
-  await expect(table.locator('caption', { hasText: 'Quarterly revenue by region' })).toBeVisible()
-  await expect(table.locator('pre').first()).toContainText('<Table captionVisible striped stickyFirstColumn')
+  await table.getByRole('checkbox', { name: 'captionVisible' }).click()
+  await expect(table.locator('caption', { hasText: 'Team members' })).toBeVisible()
+  const code = table.locator('pre').first()
+  for (const prop of ['stickyFirstColumn', 'captionVisible', 'striped']) await expect(code).toContainText(`  ${prop}\n`)
   expect(errors).toEqual([])
 })
 
@@ -106,12 +107,15 @@ test('TreeView: the keyboard moves through the stage, and in Arabic ArrowLeft op
   await page.goto('/ar/docs/components/tree-view')
   const tree = card(page, 'tree-view').getByRole('tree', { name: 'Files' })
   await tree.focus()
-  const components = tree.getByRole('treeitem', { name: 'components' })
-  await expect(components).toHaveAttribute('aria-expanded', 'false')
-  for (let i = 0; i < 4; i++) await page.keyboard.press('ArrowDown')
-  await expect(tree).toHaveAttribute('aria-activedescendant', (await components.getAttribute('id')) ?? '')
+  const input = tree.getByRole('treeitem', { name: 'input' })
+  await expect(input).toHaveAttribute('aria-expanded', 'false')
+  // The stage hydrates on focus: the keys count once the tree names its active row, index.tsx, two rows above input.
+  await expect(tree).toHaveAttribute('aria-activedescendant', /.+/)
+  await page.keyboard.press('ArrowDown')
+  await page.keyboard.press('ArrowDown')
+  await expect.poll(async () => (await tree.getAttribute('aria-activedescendant')) === (await input.getAttribute('id'))).toBe(true)
   await page.keyboard.press('ArrowLeft')
-  await expect(components).toHaveAttribute('aria-expanded', 'true')
+  await expect(input).toHaveAttribute('aria-expanded', 'true')
 })
 
 test('Stepper: the playground drives the size, in Arabic', async ({ page }) => {
@@ -126,7 +130,7 @@ test('Stepper: the playground drives the size, in Arabic', async ({ page }) => {
   expect(errors).toEqual([])
 })
 
-test('Timeline: no schema, so the card shows its basic demo and no Try it', async ({ page }) => {
+test('Timeline: no schema, so the card shows its drawn stage and no Try it', async ({ page }) => {
   await page.goto('/en/docs/components/timeline')
   const timeline = card(page, 'timeline')
   await expect(timeline.getByRole('heading', { name: 'Try it' })).toHaveCount(0)

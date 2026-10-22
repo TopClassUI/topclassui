@@ -20,10 +20,10 @@ const SHAPE: Record<string, { title: string | null, button: string | null, tabSt
   'long-line': { title: 'token.ts', button: 'Copy', tabStop: true, region: true },
   'no-copy': { title: 'globals.css', button: null, tabStop: true, region: true },
   'no-header': { title: null, button: null, tabStop: true, region: true },
-  'playground': { title: 'app/invoices/page.tsx', button: 'Copy', tabStop: true, region: true },
+  'playground': { title: 'download.tsx', button: 'Copy', tabStop: true, region: true },
   'rtl': { title: 'الفواتير.tsx', button: 'نسخ', tabStop: true, region: true },
   // The first of its three blocks.
-  'states': { title: 'app/page.tsx', button: 'Copy', tabStop: true, region: true },
+  'states': { title: 'idle', button: 'Copy', tabStop: true, region: true },
   'wrap': { title: 'invoice-row.tsx', button: 'Copy', tabStop: false, region: true },
 }
 

@@ -154,10 +154,10 @@ export const MUTATIONS: Mutation[] = [
     to: 'max-w-[round(down,var(--available-width),1px)]',
   },
   {
-    label: 'the dropdown menu keeps 12rem at a doubled text size, wider than a phone',
+    label: 'the dropdown menu keeps 13.75rem at a doubled text size, wider than a phone',
     file: CLASSES,
-    from: 'min-w-[min(calc(var(--spacing)*48),round(down,var(--available-width),1px))]',
-    to: 'min-w-48',
+    from: 'min-w-[min(calc(var(--spacing)*55),round(down,var(--available-width),1px))]',
+    to: 'min-w-55',
   },
   {
     label: 'a dropdown shortcut is capped at half its row, so a short row cuts a real shortcut',
@@ -228,7 +228,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a dropdown row drops the shared highlight, so the row the keyboard is on has neither fill nor ring',
     file: CLASSES,
-    from: '  ROW,\n  ROW_HIGHLIGHT,\n',
+    from: '  ROW,\n  ROW_FOCUSED,\n',
     to: '  ROW,\n',
   },
   {
@@ -248,5 +248,11 @@ export const MUTATIONS: Mutation[] = [
     file: CLIENT,
     from: 'delay={delay === undefined ? undefined : clamp(delay, delayMin, delayMax)}',
     to: 'delay={delay}',
+  },
+  {
+    label: 'the dropdown playground drops defaultOpen from its stage branch, so the docs stage draws the trigger with no menu under it',
+    file: 'src/components/dropdown/dummy/playground.tsx',
+    from: '<DropdownRoot defaultOpen modal={false}>',
+    to: '<DropdownRoot modal={false}>',
   },
 ]

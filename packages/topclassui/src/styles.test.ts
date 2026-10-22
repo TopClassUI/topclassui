@@ -12,7 +12,7 @@ const CANDIDATES = [
   'border-line', 'border-line-strong', 'bg-overlay', 'outline-ring',
   'bg-primary-solid', 'text-primary-on-solid', 'bg-primary-soft', 'text-primary-on-soft',
   'bg-danger-solid', 'bg-warning-soft', 'text-info-on-soft', 'bg-neutral-solid',
-  'h-control-xs', 'h-control-md', 'h-control-xl', 'size-toggle-md', 'size-icon-lg',
+  'h-control-xs', 'h-control-md', 'h-control-xl', 'size-toggle-md', 'size-knob-md', 'size-icon-lg',
   'px-pad-x-md', 'py-pad-y-xs', 'py-pad-y-sm',
   'rounded-control', 'rounded-box', 'rounded-chip',
   'font-sans', 'font-mono',

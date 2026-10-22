@@ -21,6 +21,20 @@ export const contentSchema = z.strictObject({
   demos: z.array(z.string().min(1)).min(1),
   stageHeight: z.number().positive(),
   stageDemo: z.string().min(1).optional(),
+  /** The frame draws the overlay open in the stage: the playground demo gets `stage` and renders open inside its own root. */
+  stageOpen: z.boolean().optional(),
+  /** The demo THE CODE shows at rest when the frame's code is another sample than the stage it draws. */
+  codeDemo: z.string().min(1).optional(),
+  /** A one-line caption the frame writes over THE CODE in place of its heading (S8). */
+  codeCaption: both.optional(),
+  /** Booleans the schema does not hold that Try it still offers, as the frame draws them: a native `disabled`, or a part the playground adds (Card's footer). */
+  extraSwitches: z.array(z.string().regex(/^[a-z][A-Za-z]*$/)).optional(),
+  /** Props Try it lists first, in the frame's order; the rest follow in the schema's. */
+  /** Where Try it starts a prop the playground sets in its body rather than its signature, so the control shows what the stage draws. */
+  starts: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional(),
+  controlOrder: z.array(z.string().regex(/^[a-z][A-Za-z]*$/)).optional(),
+  /** Props Try it leaves out because the frame draws no control for them. */
+  controlsHidden: z.array(z.string().regex(/^[a-z][A-Za-z]*$/)).optional(),
   note: both,
   notes: bothLists,
   keyboard: z.array(z.strictObject({ keys: z.array(z.string().min(1)).min(1), action: both })),
@@ -53,6 +67,9 @@ export function contentProblems(value: unknown, context: ContentContext): string
   if (new Set(content.demos).size !== content.demos.length) problems.push('a demo is listed twice')
   if (content.stageDemo !== undefined && !context.demos.includes(content.stageDemo)) {
     problems.push(`stageDemo ${content.stageDemo} has no dummy/${content.stageDemo}.tsx`)
+  }
+  if (content.codeDemo !== undefined && !context.demos.includes(content.codeDemo)) {
+    problems.push(`codeDemo ${content.codeDemo} has no dummy/${content.codeDemo}.tsx`)
   }
   if (!context.hasSchema && content.stageDemo === undefined) problems.push('no schema, so the stage needs a stageDemo')
   for (const related of content.related.components) {

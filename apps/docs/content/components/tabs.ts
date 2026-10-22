@@ -6,11 +6,12 @@ export const tabs = {
     ar: 'علامات التبويب',
   },
   description: {
-    en: 'Views of one thing, shown one at a time. Every panel renders on the server and stays in the HTML, so hidden text is still indexed.',
+    en: 'Panels render on the server and stay in the HTML, so inactive text is still indexed.',
     ar: 'عروض متعددة لشيء واحد، يظهر منها واحد في كل مرة. كل لوحة تُعرض على الخادم وتبقى في HTML، فيُفهرَس النص المخفي أيضًا.',
   },
   demos: ['basic', 'enclosed', 'sizes', 'disabled', 'server-content', 'controlled', 'many', 'long-label', 'rtl'],
-  stageHeight: 7,
+  stageHeight: 19.4,
+  stageDemo: 'stage',
   note: {
     en: '`keepMounted` is true here, where Base UI\'s default is false: inactive panels stay in the server HTML, hidden.',
     ar: '`keepMounted` هنا true، وقيمته في Base UI هي false: اللوحات غير النشطة تبقى مخفية في HTML القادم من الخادم.',

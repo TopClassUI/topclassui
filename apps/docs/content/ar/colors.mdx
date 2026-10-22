@@ -9,7 +9,7 @@ description: "للألوان ثلاث طبقات: لوحة ألوان لا تس�
 
 لا يسمّي المكوّن لونًا أبدًا، بل يسمّي دورًا، ويُحَلّ هذا الدور بشكل مختلف في كل وضع.
 
-لوحة الألوان هي تدرّج <span dir="ltr">oklch</span> في <span dir="ltr">Tailwind v4</span>. تربط الطبقة الدلالية كل دور بدرجة لونية، ثم يحوّل <span dir="ltr">`@theme inline`</span> كل دور إلى صنف مساعد.
+لوحة الألوان هي تدرّج <span dir="ltr">oklch</span> في <span dir="ltr">Tailwind v4</span>. تربط الطبقة الدلالية كل دور بدرجة لونية، ثم يحوّل <span dir="ltr">@theme inline</span> كل دور إلى صنف مساعد.
 
 ```css
 /* palette - never referenced by a component */
@@ -28,7 +28,7 @@ description: "للألوان ثلاث طبقات: لوحة ألوان لا تس�
 className="bg-primary-solid text-primary-on-solid"
 ```
 
-لا يستخدم أي مكوّن إلا الطبقة الدلالية، لذا لا يحتاج أي وضع جديد إلى تغيير في المكوّنات.
+<Caption>لا يستخدم أي مكوّن إلا الطبقة الدلالية، لذا لا يحتاج أي وضع جديد إلى تغيير في المكوّنات.</Caption>
 
 ## كل الأصناف
 
@@ -72,7 +72,7 @@ className="bg-primary-solid text-primary-on-solid"
 
 </ToneSwatches>
 
-معروضة في وضع الصفحة. كل صف متغيّر حيّ، لا صورة له.
+<Caption>معروضة في وضع الصفحة. كل صف متغيّر حيّ، لا صورة له.</Caption>
 
 ## أين يُستخدم كل لون
 
@@ -93,11 +93,11 @@ className="bg-primary-solid text-primary-on-solid"
 
 ## الأوضاع الثلاثة
 
-الفاتح والداكن والمحيط ثلاث كتل <span dir="ltr">CSS</span> تضبط أسماء المتغيّرات نفسها. يتبع هذا الموقع وضع نظامك إلى أن تختار وضعًا.
+الفاتح والداكن والمحيط ثلاث كتل <span dir="ltr">CSS</span> تضبط أسماء المتغيّرات نفسها. يتبع هذا الموقع وضع نظامك.
 
 وضع المحيط هو الوضع الفاتح بلون أساسي سماوي وزوايا على شكل كبسولة. لا يحتاج الوضع المخصّص إلى أكثر من كتلة <span dir="ltr">CSS</span> واحدة.
 
-<TokensSample mode="dark" />
+<TokensSample mode="dark" names="--tc-page --tc-surface --tc-surface-raised --tc-line-strong --tc-primary-mix" />
 
 ## ما يفرضه فحص التباين
 
@@ -105,19 +105,20 @@ className="bg-primary-solid text-primary-on-solid"
 
 | ما يُقاس | الحدّ | يُقاس مقابل |
 |---|---|---|
-| النص، بما فيه نص النبرة فوق صبغتها | 4.5:1 | السطح الذي يقع عليه |
-| <span dir="ltr">`line-strong`</span> و<span dir="ltr">`ring`</span> والأيقونات | 3:1 | الأسطح الثلاثة كلها، لا الصفحة وحدها |
+| النص، بما فيه نص النبرة فوق صبغتها | <span dir="ltr">`4.5:1`</span> | السطح الذي يقع عليه |
+| <span dir="ltr">line-strong</span> و<span dir="ltr">ring</span> والأيقونات | <span dir="ltr">`3:1`</span> | الأسطح الثلاثة كلها، لا الصفحة وحدها |
 | الصبغة الخفيفة | خطوة 1.06 | الأسطح الثلاثة كلها |
-| <span dir="ltr">`line`</span> | مُستثنى | خط رفيع للزينة، <span dir="ltr">WCAG 1.4.11</span> |
+| <span dir="ltr">`line`</span> | `مُستثنى` | خط رفيع للزينة، <span dir="ltr">[WCAG 1.4.11](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html)</span> |
 
 ## أضف سمتك الخاصة
 
-أضف كتلة <span dir="ltr">CSS</span> واحدة، وضع <span dir="ltr">`data-theme="brand"`</span> على العنصر الذي تغطيه. يمكن للوضع أن يغيّر مفاتيح الضبط كما يغيّر الألوان.
+أضف كتلة <span dir="ltr">CSS</span> واحدة، وضع <span dir="ltr">data-theme</span> على القسم الذي تغطيه. يمكن للوضع أن يغيّر مفاتيح الضبط كما يغيّر الألوان.
 
-<Callout tone="warning">الوضع الذي يضبط <span dir="ltr">`--tc-primary-solid`</span> يجب أن يضبط <span dir="ltr">`--tc-primary-on-solid`</span> أيضًا، وإلا فقد ينزل تباين تسميته عن 4.5:1 فوق التعبئة الجديدة.</Callout>
+<Callout tone="warning">الوضع الذي يضبط <span dir="ltr">--tc-primary-solid</span> يجب أن يضبط <span dir="ltr">--tc-primary-on-solid</span> أيضًا، وإلا فقد ينزل تباين تسميته عن 4.5:1 فوق التعبئة الجديدة.</Callout>
 
 ```css title="app/globals.css"
 /* after the three imports */
+/* ThemeScript keeps light, dark and ocean: set brand on a section */
 [data-theme="brand"] {
   color-scheme: dark;
 
@@ -137,4 +138,3 @@ className="bg-primary-solid text-primary-on-solid"
 }
 ```
 
-<Callout tone="info">لا يحفظ <span dir="ltr">`ThemeScript`</span> إلا <span dir="ltr">`light`</span> و<span dir="ltr">`dark`</span> و<span dir="ltr">`ocean`</span>، لذا ضع الوضع المخصّص على قسم من الصفحة، أو على <span dir="ltr">`html`</span> في تخطيط لا يعرض <span dir="ltr">`ThemeScript`</span>.</Callout>

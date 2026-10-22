@@ -71,14 +71,14 @@ describe('the box that owns the width', () => {
   it('at each size the control pads by half the knob and its focus ring when that is more than half a target', () => {
     const [fine, coarse] = SLIDER_CONTROL_SIZE.md.split(' ')
     expect(ruleOf(selectorOf(fine ?? ''))).toBe(
-      'padding-inline: max(calc(var(--tc-target-min,24px) / 2), calc(var(--spacing-toggle-md) / 2 + var(--tc-ring-offset) + var(--tc-ring-width)));',
+      'padding-inline: max(calc(var(--tc-target-min,24px) / 2), calc(var(--spacing-knob-md) / 2 + var(--tc-ring-offset) + var(--tc-ring-width)));',
     )
     expect(ruleOf(selectorOf(coarse ?? ''))).toBe(
-      'padding-inline: max(calc(var(--tc-target-coarse,44px) / 2), calc(var(--spacing-toggle-md) / 2 + var(--tc-ring-offset) + var(--tc-ring-width)));',
+      'padding-inline: max(calc(var(--tc-target-coarse,44px) / 2), calc(var(--spacing-knob-md) / 2 + var(--tc-ring-offset) + var(--tc-ring-width)));',
     )
     expect(mediaOf(selectorOf(coarse ?? ''))).toBe('@media (pointer: coarse)')
     for (const size of ['xs', 'sm', 'lg', 'xl'] as const) {
-      expect(SLIDER_CONTROL_SIZE[size].split(' ').map((cls) => ruleOf(selectorOf(cls)).includes(`var(--spacing-toggle-${size}) / 2 + var(--tc-ring-offset)`)), size)
+      expect(SLIDER_CONTROL_SIZE[size].split(' ').map((cls) => ruleOf(selectorOf(cls)).includes(`var(--spacing-knob-${size}) / 2 + var(--tc-ring-offset)`)), size)
         .toEqual([true, true])
     }
     expect(SLIDER_CONTROL_SIZE.custom).toBe('')

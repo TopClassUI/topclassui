@@ -6,11 +6,15 @@ export const combobox = {
     ar: 'قائمة اختيار مع بحث',
   },
   description: {
-    en: 'A text input that filters a list as you type. It is windowed above 200 options and calls loadMore for the next page.',
-    ar: 'حقل نص يصفّي قائمة أثناء الكتابة. يعرض الصفوف الظاهرة فقط بعد 200 خيار، ويستدعي loadMore لجلب الصفحة التالية.',
+    en: 'A text input that filters a listbox; it calls loadMore() for the next page, caches nothing.',
+    ar: 'حقل نص يصفّي قائمة؛ يستدعي loadMore() للصفحة التالية ولا يخزّن شيئًا.',
   },
   demos: ['basic', 'form', 'sizes', 'load-more', 'status', 'ten-thousand', 'long-content', 'rtl'],
-  stageHeight: 7,
+  stageHeight: 21,
+  stageOpen: true,
+  controlOrder: ['size', 'visibleRows', 'disabled', 'invalid', 'fullWidth', 'hasMore'],
+  controlsHidden: ['loadMoreThreshold', 'placement', 'status'],
+  extraSwitches: ['disabled'],
   note: {
     en: 'Filtering runs over the options loaded so far; the next page arrives through `hasMore` and `loadMore`.',
     ar: 'تجري التصفية على الخيارات المحمّلة حتى الآن؛ وتصل الصفحة التالية عبر `hasMore` و`loadMore`.',

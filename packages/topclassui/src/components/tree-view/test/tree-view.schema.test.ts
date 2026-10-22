@@ -44,7 +44,7 @@ describe('the schema and the constants agree', () => {
     })
     expect(TREE_VIEW_STATUSES).toEqual(['idle', 'loading', 'loading-more', 'empty'])
     expect(TYPEAHEAD_MS).toBe(500)
-    expect(TREE_VIEW_ROW_ESTIMATE).toBe(40)
+    expect(TREE_VIEW_ROW_ESTIMATE).toBe(32)
   })
 
   it('takes true and false for virtualize; refuses what is out of bounds and the error status (choice 3)', () => {

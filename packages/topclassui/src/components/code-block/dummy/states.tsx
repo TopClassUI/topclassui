@@ -1,27 +1,20 @@
+import { en } from '#shared/labels/en.js'
 import { CodeBlock } from '../index.js'
 
-const CODE = `export default async function Page() {
-  const invoices = await getInvoices()
-  return <InvoiceTable items={invoices} />
-}`
-
-const LONG = `export const columns = ['number', 'customer', 'issued', 'due', 'amount', 'status', 'actions'] as const`
-
-/** The states a server can render, each with its name under it; the button's hover and "Copied" are live in the browser. */
+/** One small block per state the server renders, named by its aria-label; the button's hover and "Copied" are live in
+ * the browser. The wrapped line is one the block's width breaks; the untitled block's region
+ * takes a name of its own from labels, since a page may hold another untitled block. */
 export default function Demo() {
   return (
-    <div className="grid gap-6 text-sm text-muted">
-      <div className="grid gap-2">
-        <CodeBlock lang="tsx" title="app/page.tsx">{CODE}</CodeBlock>
-        <span>Idle</span>
+    <div className="grid gap-6">
+      <div role="group" aria-label="idle">
+        <CodeBlock lang="tsx" title="idle" className="w-32">{'<Button/>'}</CodeBlock>
       </div>
-      <div className="grid gap-2">
-        <CodeBlock lang="tsx" title="columns.ts" wrap>{LONG}</CodeBlock>
-        <span>Wrapped</span>
+      <div role="group" aria-label="wrapped">
+        <CodeBlock lang="tsx" title="wrap" className="w-32" wrap>{'<Button size="sm"/>'}</CodeBlock>
       </div>
-      <div className="grid gap-2">
-        <CodeBlock lang="tsx" title="app/reports/page.tsx" showCopy={false}>{CODE}</CodeBlock>
-        <span>No copy button</span>
+      <div role="group" aria-label="no header">
+        <CodeBlock lang="tsx" showCopy={false} className="w-32" labels={{ ...en, common: { ...en.common, code: 'Untitled code' } }}>{'<Button/>'}</CodeBlock>
       </div>
     </div>
   )

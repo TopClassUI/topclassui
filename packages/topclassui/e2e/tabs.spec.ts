@@ -21,7 +21,8 @@ const TABS: Record<string, number> = {
   'tabs--rtl': 1,
   'tabs--server-content': 1,
   'tabs--sizes': 12,
-  'tabs--states': 2,
+  'tabs--stage': 2,
+  'tabs--states': 4,
 }
 
 /** The three screens Unit 3 measures at, and a phone on its side. */
@@ -155,7 +156,7 @@ test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) 
 
 test('the table names every tabs demo', () => {
   expect(Object.keys(TABS).sort()).toEqual(DEMOS.filter((demo) => demo.startsWith('tabs--')).sort())
-  expect(Object.keys(TABS)).toHaveLength(11)
+  expect(Object.keys(TABS)).toHaveLength(12)
 })
 
 // PLAN 19, Phase 6: accepted on the HTML the server sends, before any script has run.
@@ -480,7 +481,7 @@ test.describe('eight tabs on a 320 px screen', () => {
       const towardsEnd = direction === 'rtl' ? -4000 : 4000
       await page.mouse.move(frame.left + 80, frame.top + 20)
       await page.mouse.wheel(towardsEnd, 0)
-      await expect.poll(async () => Math.abs((await scrollOf(list)).at)).toBeGreaterThan(600)
+      await expect.poll(async () => Math.abs((await scrollOf(list)).at)).toBeGreaterThan(500)
       await expect(tabsIn(list).last()).toBeInViewport({ ratio: 1 })
       await page.mouse.wheel(towardsEnd, 0)
       expect(await page.evaluate(() => window.scrollX)).toBe(0)
@@ -627,14 +628,17 @@ test.describe('inside a real layout, and with content no demo should show', () =
     })
   }
 
-  test('at 1280 px the enclosed list is as wide as its tabs, and the line list as wide as its root', async ({ page }) => {
+  test('at 1280 px both lists are as wide as their tabs, as Figma 138:809 draws them', async ({ page }) => {
     await openFixture(page)
     const [enclosed, line, root] = [await boxOf(listIn(page, '#grid-enclosed')), await boxOf(listIn(page, '#grid-line')), await boxOf(page.locator('#grid-line'))]
-    expect(line.width).toBe(root.width)
+    expect(line.width).toBeLessThan(root.width - 200)
     expect(enclosed.width).toBeLessThan(root.width - 200)
     const last = await boxOf(tabsIn(listIn(page, '#grid-enclosed')).last())
-    // The box ends its 4 px of padding after its last tab.
-    expect(Math.round(enclosed.right - last.right)).toBe(4)
+    // The box ends its 2 px of padding after its last tab.
+    expect(Math.round(enclosed.right - last.right)).toBe(2)
+    const end = await boxOf(tabsIn(listIn(page, '#grid-line')).last())
+    // The line list ends the pixel it keeps for the scroll after its last tab.
+    expect(Math.round(line.right - end.right)).toBe(1)
   })
 
   for (const look of LOOKS) {
@@ -696,7 +700,7 @@ test.describe('inside a real layout, and with content no demo should show', () =
   test('tabs inside a panel take the look of their own root: xs line tabs inside lg enclosed ones', async ({ page }) => {
     await openFixture(page)
     const [outer, inner] = [tabsIn(listIn(page, '#outer')).first(), tabsIn(listIn(page, '#inner')).first()]
-    expect((await boxOf(outer)).height).toBe(48)
+    expect((await boxOf(outer)).height).toBe(40)
     expect((await boxOf(inner)).height).toBe(28)
     await expect(inner).toHaveCSS('border-bottom-width', '2px')
     await expect(outer).toHaveCSS('border-bottom-width', '0px')
@@ -711,21 +715,21 @@ test.describe('inside a real layout, and with content no demo should show', () =
 
 for (const mode of MODES) {
   test.describe(`what is drawn, ${mode}`, () => {
-    test('line: the bar of the active tab sits on the line of the list and covers it, and the line runs on beside it', async ({ page }) => {
+    test('line: the bar of the active tab sits just above the line of the list, and the line runs on under it and beside it', async ({ page }) => {
       await openLive(page, 'tabs--basic', { mode })
       await atRest(page)
       const list = listIn(page, '#demo')
       const [frame, active, other] = [await boxOf(list), await boxOf(tabsIn(list).nth(0)), await boxOf(tabsIn(list).nth(1))]
-      // No border on the list: a tab is as tall as its list, so its bar reaches the row the line is on.
-      expect(frame.height).toBe(40)
-      expect(active.bottom).toBe(frame.bottom)
+      // No border on the list: it keeps a pixel under its tabs, the row its line is on, so the bar sits on that line.
+      expect(frame.height).toBe(41)
+      expect(active.bottom).toBe(frame.bottom - 1)
 
       const backdrop = (await pixelAt(page, frame.left + 2, frame.bottom + 6)).join(',')
-      const bar = (await pixelAt(page, active.left + active.width / 2, frame.bottom - 1)).join(',')
+      const bar = (await pixelAt(page, active.left + active.width / 2, frame.bottom - 2)).join(',')
       const line = (await pixelAt(page, other.left + other.width / 2, frame.bottom - 1)).join(',')
       expect(new Set([backdrop, bar, line]).size, `page ${backdrop}, bar ${bar}, line ${line}: three colours`).toBe(3)
       // Read downwards through the last four rows of the list and the two under it.
-      expect(await columnAt(page, active.left + active.width / 2, frame.bottom - 4, 6), 'under the active tab').toEqual([backdrop, backdrop, bar, bar, backdrop, backdrop])
+      expect(await columnAt(page, active.left + active.width / 2, frame.bottom - 4, 6), 'under the active tab').toEqual([backdrop, bar, bar, line, backdrop, backdrop])
       expect(await columnAt(page, other.left + other.width / 2, frame.bottom - 4, 6), 'under another tab').toEqual([backdrop, backdrop, backdrop, line, backdrop, backdrop])
       expect(await columnAt(page, frame.right - 20, frame.bottom - 4, 6), 'at the far end of the list').toEqual([backdrop, backdrop, backdrop, line, backdrop, backdrop])
       expect(contrast(rgbOf(`rgb(${bar})`), rgbOf(`rgb(${backdrop})`)), 'the bar against the page').toBeGreaterThanOrEqual(3)
@@ -743,7 +747,7 @@ for (const mode of MODES) {
       expect(painted).toBeLessThanOrEqual(Math.ceil(active.width))
     })
 
-    test('enclosed: the active tab is a raised box with a shadow inside the tinted list, and the others have no fill', async ({ page }) => {
+    test('enclosed: the active tab is a flat raised box inside the tinted list, and the others have no fill', async ({ page }) => {
       await openLive(page, 'tabs--enclosed', { mode })
       await atRest(page)
       const list = listIn(page, '#demo')
@@ -755,27 +759,29 @@ for (const mode of MODES) {
       }
       expect(fills.other).toBe('rgba(0, 0, 0, 0)')
       expect(fills.active).not.toBe(fills.list)
-      await expect(active).not.toHaveCSS('box-shadow', 'none')
+      await expect(active).toHaveCSS('box-shadow', 'none')
       await expect(other).toHaveCSS('box-shadow', 'none')
-      // The list hugs its tabs: 4 px of padding round a 40 px row.
-      expect((await boxOf(list)).height).toBe(48)
+      // The list hugs its tabs: 2 px of padding round a 32 px row, the drawn 36 px.
+      expect((await boxOf(list)).height).toBe(36)
     })
 
-    // WCAG 1.4.11: the raised fill is near the tint of the list, so the state needs an edge of its own.
-    test('enclosed: the active tab has an edge of 3:1 against the list, and its label is heavier than the same label at rest', async ({ page }) => {
+    // Figma 138:809 draws no edge: the raised fill and the heavier body label tell the active tab.
+    test('enclosed: the active tab has no edge, and its label is heavier than the same label at rest', async ({ page }) => {
       await openLive(page, 'tabs--enclosed', { mode })
       await atRest(page)
       const list = listIn(page, '#demo')
       const [frame, active, other] = [await boxOf(list), await boxOf(tabsIn(list).nth(0)), await boxOf(tabsIn(list).nth(1))]
-      const tint = await pixelAt(page, frame.left + 2, frame.top + frame.height / 2)
+      // The list pads its tabs by 2 px: its tint is the pixel after its edge.
+      const tint = await pixelAt(page, frame.left + 1, frame.top + frame.height / 2)
       const edges = {
         top: await pixelAt(page, active.left + active.width / 2, active.top),
         bottom: await pixelAt(page, active.left + active.width / 2, active.bottom - 1),
         start: await pixelAt(page, active.left, active.top + active.height / 2),
         end: await pixelAt(page, active.right - 1, active.top + active.height / 2),
       }
+      const fill = await pixelAt(page, active.left + active.width / 2, active.top + 3)
       for (const [side, pixel] of Object.entries(edges)) {
-        expect(contrast(pixel, tint), `${side} edge ${pixel.join(',')} on the list ${tint.join(',')}`).toBeGreaterThanOrEqual(3)
+        expect(contrast(pixel, tint) <= contrast(fill, tint) + 0.05, `${side} edge ${pixel.join(',')} is no edge on the list ${tint.join(',')}`).toBe(true)
       }
       const rest = await pixelAt(page, other.left + other.width / 2, other.top)
       expect(contrast(rest, tint), `a tab at rest has no edge: ${rest.join(',')}`).toBeLessThan(1.1)
@@ -849,7 +855,7 @@ for (const scheme of ['light', 'dark'] as const) {
       await expect(list).toHaveCSS('box-shadow', 'none')
       await expect(list).toHaveCSS('border-bottom-width', '1px')
       const frame = await boxOf(list)
-      expect(frame.height).toBe(41)
+      expect(frame.height).toBe(42)
       const system = await systemColours(page)
       expect((await pixelAt(page, frame.right - 20, frame.bottom - 1)).join(','), 'the last row of the list, away from any tab').not.toBe(rgbOf(system.canvas).join(','))
     })
@@ -861,8 +867,8 @@ for (const scheme of ['light', 'dark'] as const) {
       const [active, other] = [tabsIn(list).nth(0), tabsIn(list).nth(2)]
       await expect(active).toHaveCSS('background-color', system.highlight)
       await expect(active).toHaveCSS('color', system.highlightText)
-      // shadow-none leaves a list of shadows with no colour and no size: nothing of it is painted.
-      expect((await active.evaluate((element) => getComputedStyle(element).boxShadow)).replaceAll('rgba(0, 0, 0, 0) 0px 0px 0px 0px', '').replace(/[, ]/g, '')).toBe('')
+      // shadow-none leaves a list of shadows with no colour and no size, or none at all (Windows): nothing of it is painted.
+      expect((await active.evaluate((element) => getComputedStyle(element).boxShadow)).replace(/^none$/, '').replaceAll('rgba(0, 0, 0, 0) 0px 0px 0px 0px', '').replace(/[, ]/g, '')).toBe('')
       await expect(other).toHaveCSS('color', system.text)
 
       const [fill, canvas] = [rgbOf(system.highlight).join(','), rgbOf(system.canvas).join(',')]
@@ -947,7 +953,7 @@ test.describe('text that is made larger or spaced out', () => {
         const [box, ink] = [tab.getBoundingClientRect(), range.getBoundingClientRect()]
         return { height: box.height, font: getComputedStyle(tab).fontSize, spill: Math.max(0, box.top - ink.top, ink.bottom - box.bottom) }
       }))
-      expect(new Set(tabs.map((tab) => `${String(tab.height)} ${tab.font}`))).toEqual(new Set(['80 28px']))
+      expect(new Set(tabs.map((tab) => `${String(tab.height)} ${tab.font}`))).toEqual(new Set(['80 28px', '64 28px']))
       expect(tabs.filter((tab) => tab.spill > 0.5)).toEqual([])
     })
 

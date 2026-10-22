@@ -69,9 +69,8 @@ export interface SiteLabels {
     copy: string
     packageManagers: string
     framework: string
-    utilities: { token: string; utilities: string }
+    utilities: { token: string; utilities: string; through: string; scale: string }
     props: { prop: string; type: string; default: string; description: string; required: string }
-    csp: string
     /** Read after a code title the page shows again: ", version 2". */
     repeat: (count: number) => string
   }
@@ -206,8 +205,8 @@ export interface CatalogLabels {
   beforeTitle: string
   beforeOnce: string
   beforeLead: string
-  /** Steps 1 to 3 of Figma's four; step 4, copy the source, waits for the CLI (choice 11). */
-  steps: { install: StepLabels; css: StepLabels; layout: StepLabels }
+  /** Figma's four steps; the comment line is step 1's, between the install and the add command. */
+  steps: { install: StepLabels; css: StepLabels; layout: StepLabels; source: StepLabels; addComment: string }
   legendTitle: string
   legendLead: string
   legend: { title: string; text: string }[]
@@ -228,6 +227,8 @@ export interface SearchLabels {
   placeholder: string
   groups: Record<SearchGroup, string>
   shortcut: { pc: string; mac: string }
+  empty: string
+  loading: string
 }
 
 export interface LlmsLabels { summary: string; docs: string; components: string; keyboard: string; accessibility: string; rtl: string }

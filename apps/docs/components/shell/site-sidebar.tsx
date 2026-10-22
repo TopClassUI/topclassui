@@ -12,10 +12,10 @@ export interface SiteSidebarProps {
   labels: SiteLabels
 }
 
-// The docs frames: the rail on the page colour, its line the full height of the column, rows 26 px tall and 28 apart (the row knob, 24 px floor kept).
+// The docs frames: the rail on the page colour, its line the full height of the column, rows 29 px tall and 31 apart (the row knob, 24 px floor kept).
 const COLUMN = 'hidden border-e-(length:--tc-line-width) border-line lg:block'
-const RAIL = 'h-full border-e-0 bg-page px-2.5 pt-5 pb-6 [--tc-row-height:1.625rem]'
-const TITLE = 'flex shrink-0 items-center gap-2 ps-2 pb-2.5 text-sm font-semibold text-body'
+const RAIL = 'h-full border-e-0 bg-page px-2.5 pt-5 pb-6 [--tc-row-height:1.8125rem]'
+const TITLE = 'flex shrink-0 items-center gap-2 ps-2 pb-1 text-sm font-semibold text-body'
 
 /** Sticky under the navbar, its own scroll container; hidden under 64rem, where the menu's drawer carries the groups. */
 export function SiteSidebar({ locale, current, labels }: SiteSidebarProps) {

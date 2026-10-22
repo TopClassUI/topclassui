@@ -15,7 +15,7 @@ import { FORCED_CANVAS, contrast, inkOn, pixelsOf } from './pixels.js'
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const NAMES = { xs: 'Extra small', sm: 'Small', md: 'Medium', lg: 'Large', xl: 'Extra large' } as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['basic', 'form', 'limits', 'playground', 'row', 'rtl', 'sizes', 'states'].map((demo) => `number-field--${demo}`)
+const DEMOS = ['basic', 'form', 'limits', 'playground', 'row', 'rtl', 'sizes', 'states', 'combined'].map((demo) => `number-field--${demo}`)
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 
 const input = (page: Page, name: string) => page.getByRole('textbox', { name, exact: true })
@@ -36,16 +36,16 @@ const order = (field: Locator) => groupOf(field).evaluate((group) => [...group.q
 
 test.describe('the five sizes, on the static page', () => {
   const FINE = {
-    xs: { field: [165.59, 28], decrease: [28, 28], input: [107.59, 28], increase: [28, 28] },
-    sm: { field: [193.19, 32], decrease: [32, 32], input: [127.19, 32], increase: [32, 32] },
-    md: { field: [193.19, 40], decrease: [40, 40], input: [111.19, 40], increase: [40, 40] },
-    lg: { field: [220.8, 48], decrease: [48, 48], input: [122.8, 48], increase: [48, 48] },
-    xl: { field: [220.8, 56], decrease: [56, 56], input: [106.8, 56], increase: [56, 56] },
+    xs: { field: [165.59, 28], decrease: [24, 28], input: [115.59, 28], increase: [24, 28] },
+    sm: { field: [193.19, 32], decrease: [25.59, 32], input: [140, 32], increase: [25.59, 32] },
+    md: { field: [193.19, 40], decrease: [32, 40], input: [127.19, 40], increase: [32, 40] },
+    lg: { field: [220.8, 48], decrease: [38.39, 48], input: [142.02, 48], increase: [38.39, 48] },
+    xl: { field: [220.8, 56], decrease: [44.8, 56], input: [129.2, 56], increase: [44.8, 56] },
   }
   const shapes = async (page: Page) => Object.fromEntries(await Promise.all(SIZES.map(async (size) => [size, await shape(input(page, NAMES[size]))] as const)))
 
   for (const direction of DIRECTIONS) {
-    test(`fine pointer, ${direction}: the field, its square steppers and the number between them, at each size`, async ({ page }) => {
+    test(`fine pointer, ${direction}: the field, its steppers four fifths as wide as tall and the number between them, at each size`, async ({ page }) => {
       await page.goto(urlFor('number-field--sizes', 'light', direction))
       expect(await shapes(page)).toEqual(FINE)
     })
@@ -64,8 +64,8 @@ test.describe('the five sizes, on the static page', () => {
 
     test('every stepper and the input are 44 px tall at least, and the text typed into is 16 px', async ({ page }) => {
       await page.goto(urlFor('number-field--sizes', 'light', 'ltr'))
-      const at = (side: number, input: number) => ({ field: [220.8, side], decrease: [side, side], input: [input, side], increase: [side, side] })
-      expect(await shapes(page)).toEqual({ xs: at(44, 130.8), sm: at(44, 130.8), md: at(44, 130.8), lg: at(48, 122.8), xl: at(56, 106.8) })
+      const at = (side: number, step: number, input: number) => ({ field: [220.8, side], decrease: [step, side], input: [input, side], increase: [step, side] })
+      expect(await shapes(page)).toEqual({ xs: at(44, 44, 130.8), sm: at(44, 44, 130.8), md: at(44, 44, 130.8), lg: at(48, 44, 130.8), xl: at(56, 44.8, 129.2) })
       expect(await page.locator('#demo input[type="text"]').evaluateAll((all) => all.map((el) => getComputedStyle(el).fontSize))).toEqual(Array(5).fill('16px'))
     })
 
@@ -76,10 +76,10 @@ test.describe('the five sizes, on the static page', () => {
       expect(Object.values(await shapes(page)).map(({ field }) => field[0])).toEqual(Array(5).fill(220.8))
     })
 
-    test('number-field--row at 320 px: the two fields are 124 px each and the page does not scroll sideways', async ({ page }) => {
+    test('number-field--row at 320 px: two fields of three 44 px targets do not fit side by side, so each goes on its own line, an Input wide, and the page does not scroll sideways', async ({ page }) => {
       await page.setViewportSize({ width: 320, height: 480 })
       await page.goto(urlFor('number-field--row', 'light', 'ltr'))
-      expect([(await shape(input(page, 'Adults'))).field[0], (await shape(input(page, 'Children'))).field[0]]).toEqual([124, 124])
+      expect([(await shape(input(page, 'Adults'))).field[0], (await shape(input(page, 'Children'))).field[0]]).toEqual([220.8, 220.8])
       await expectNoSidewaysScroll(page)
       await page.setViewportSize({ width: 390, height: 844 })
       expect((await shape(input(page, 'Adults'))).field[0]).toBe(159)
@@ -99,13 +99,13 @@ test.describe('what the server HTML sends, before any script runs', () => {
 
 test.describe('the look of each state, on the static page', () => {
   test('disabled: the box is at 0.5 and a stepper inside it at 1, so each is painted once at half', async ({ page }) => {
-    await page.goto(urlFor('number-field--states', 'light', 'ltr'))
+    await page.goto(urlFor('number-field--combined', 'light', 'ltr'))
     const group = groupOf(input(page, 'Disabled'))
     expect([await css(group, 'opacity'), ...await group.locator('button').evaluateAll((all) => all.map((el) => getComputedStyle(el).opacity))]).toEqual(['0.5', '1', '1'])
   })
 
   test('in a disabled fieldset, before any script runs, the field dims as one exactly as the disabled prop dims it', async ({ page }) => {
-    await page.goto(urlFor('number-field--states', 'light', 'ltr'))
+    await page.goto(urlFor('number-field--combined', 'light', 'ltr'))
     await groupOf(input(page, 'Empty')).evaluate((group) => {
       const fieldset = document.createElement('fieldset')
       fieldset.disabled = true
@@ -123,11 +123,11 @@ test.describe('the look of each state, on the static page', () => {
     expect([await css(group, 'opacity'), ...await group.locator('button').evaluateAll((all) => all.map((el) => getComputedStyle(el).opacity))]).toEqual(['1', '1', '0.5'])
   })
 
-  test('read-only: both steppers at 0.5, the box tinted, and the pointer paints no hover on a stepper', async ({ page }) => {
-    await page.goto(urlFor('number-field--states', 'light', 'ltr'))
+  test('read-only: both steppers at 0.5, the box untinted as the frame draws it, and the pointer paints no hover on a stepper', async ({ page }) => {
+    await page.goto(urlFor('number-field--combined', 'light', 'ltr'))
     const group = groupOf(input(page, 'Read-only'))
     expect(await group.locator('button').evaluateAll((all) => all.map((el) => getComputedStyle(el).opacity))).toEqual(['0.5', '0.5'])
-    expect(await css(group, 'background-color')).not.toBe(await css(groupOf(input(page, 'Invalid')), 'background-color'))
+    expect(await css(group, 'background-color')).toBe(await css(groupOf(input(page, 'Invalid')), 'background-color'))
     const plus = group.getByRole('button', { name: 'Increase' })
     const before = await css(plus, 'background-color')
     await page.mouse.move(0, 0)
@@ -137,7 +137,7 @@ test.describe('the look of each state, on the static page', () => {
   })
 
   test('invalid: the line of the box turns to danger and is 2 px thick', async ({ page }) => {
-    await page.goto(urlFor('number-field--states', 'light', 'ltr'))
+    await page.goto(urlFor('number-field--combined', 'light', 'ltr'))
     const danger = await page.evaluate(() => {
       const probe = document.createElement('span')
       probe.style.color = 'var(--tc-danger-solid)'
@@ -169,7 +169,7 @@ for (const scheme of ['light', 'dark'] as const) {
       const [minus, plus] = [group.getByRole('button', { name: 'Decrease' }), group.getByRole('button', { name: 'Increase' })]
       expect(await ink(page, minus)).toBeGreaterThan(10)
       expect(await ink(page, plus)).toBeLessThan(await ink(page, minus))
-      await page.goto(urlFor('number-field--states', 'light', 'ltr'))
+      await page.goto(urlFor('number-field--combined', 'light', 'ltr'))
       expect(await css(groupOf(input(page, 'Invalid')), 'border-top-width')).toBe('2px')
       expect(await css(groupOf(input(page, 'Empty')), 'border-top-width')).toBe('1px')
     })
@@ -197,7 +197,7 @@ test.describe('text', () => {
       await page.goto(urlFor('number-field--basic', 'light', 'rtl'))
       await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
       const typed = input(page, 'Guests')
-      expect((await shape(typed)).decrease).toEqual([80, 80])
+      expect((await shape(typed)).decrease).toEqual([64, 80])
       expect(await typed.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true)
       await expectNoSidewaysScroll(page)
     })
@@ -489,9 +489,19 @@ test.describe('live: where a page puts a number field', () => {
       test(`320 px, ${direction}: two side by side are as wide as two Inputs, each case shrinks to its room, and nothing scrolls`, async ({ page }) => {
         await page.setViewportSize({ width: 320, height: 480 })
         await fixture(page, 'number-field-layouts', { direction })
+        // The room beside a text is the page's 288 px less that text, whose width is the platform's font: 192.56, 174.91 and 200.3 on Linux.
+        const room = await page.evaluate(() => {
+          const width = (selector: string) => document.querySelector(selector)?.getBoundingClientRect().width ?? 0
+          const round = (px: number) => Math.round(px * 100) / 100
+          return {
+            cell: round(width('[data-case="cell"] td:last-child') - 17),
+            row: round(288 - width('[data-case="label-row"] label') - 8),
+            beside: round(288 - width('[data-case="beside-label"] label') - 8),
+          }
+        })
         expect(await cases(page)).toEqual([
-          ['grid', 220.8], ['track', 140], ['flex-1', 200], ['w-fit', 220.8], ['cell', 205.59], ['label-row', 195.91],
-          ['pair-grid', 140, 140], ['pair-flex', 140, 140], ['pair-div', 140, 140], ['pair-input', 140, 140], ['beside-label', 183.44], ['wrapping-label', 220.8],
+          ['grid', 220.8], ['track', 140], ['flex-1', 200], ['w-fit', 220.8], ['cell', Math.min(room.cell, 220.8)], ['label-row', Math.min(room.row, 220.8)],
+          ['pair-grid', 140, 140], ['pair-flex', 140, 140], ['pair-div', 140, 140], ['pair-input', 140, 140], ['beside-label', Math.min(room.beside, 220.8)], ['wrapping-label', 220.8],
         ])
         await expectNoSidewaysScroll(page)
       })

@@ -81,10 +81,11 @@ for (const scheme of ['light', 'dark'] as const) {
       const box = await current.boundingBox()
       const other = await page.locator('nav a:not([aria-current])').first().boundingBox()
       if (!box || !other) throw new Error('no cell to measure')
-      expect([box.width, box.height]).toEqual([40, 40])
-      // 1,600 pixels less the rounded corners and the digit. Another page has a stroke and no fill.
+      // The wide md cell Figma 138:1269 draws: 40 wide, 28 tall.
+      expect([box.width, box.height]).toEqual([40, 28])
+      // 1,120 pixels less the rounded corners and the digit. Another page has a stroke and no fill.
       const fill = rgbOf(pair.fill)
-      expect(paintedIn(await pixelsOf(page, box), fill), 'pixels of fill in the current page').toBeGreaterThan(1200)
+      expect(paintedIn(await pixelsOf(page, box), fill), 'pixels of fill in the current page').toBeGreaterThan(900)
       expect(paintedIn(await pixelsOf(page, other), fill), 'pixels of fill in another page').toBe(0)
 
       // The digit's own rectangle: a backplate covers every pixel of fill inside it.

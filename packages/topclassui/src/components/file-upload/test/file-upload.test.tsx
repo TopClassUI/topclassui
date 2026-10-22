@@ -34,7 +34,7 @@ describe('the native input carries the form props', () => {
   })
 
   it('is the last child of the zone, after the icon, the prompt and the hint', () => {
-    expect(html).toMatch(/<div class="group\/zone [^"]*"><span aria-hidden="true"[^>]*>.*<\/span><span class="flex flex-col[^"]*"><span>Drop files here<\/span><span class="[^"]*">Browse<\/span><\/span><span id="[^"]*"[^>]*>PDF only<\/span><input [^>]*><\/div>/)
+    expect(html).toMatch(/<div class="group\/zone [^"]*"><span aria-hidden="true"[^>]*>.*<\/span><span class="flex flex-wrap[^"]*"><span>Drag files here or<\/span><span class="[^"]*">browse<\/span><\/span><span id="[^"]*"[^>]*>PDF only<\/span><input [^>]*><\/div>/)
   })
 })
 
@@ -110,7 +110,7 @@ describe('invalid and disabled', () => {
 describe('the words come from the labels', () => {
   it('in Arabic under the provider', () => {
     const html = markup(<TopClassProvider direction="rtl" locale="ar"><FileUpload aria-label="ملفات" /></TopClassProvider>)
-    expect(html).toContain('<span>أفلت الملفات هنا</span>')
+    expect(html).toContain('<span>اسحب الملفات إلى هنا أو</span>')
     expect(html).toMatch(/<span class="[^"]*">تصفّح<\/span>/)
   })
 })

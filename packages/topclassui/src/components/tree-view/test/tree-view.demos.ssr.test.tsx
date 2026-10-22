@@ -11,21 +11,24 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-5.md, Demos). */
-const EXPECTED = ['basic', 'load-more', 'long-content', 'playground', 'rtl', 'selected', 'states', 'status', 'ten-thousand']
+const EXPECTED = ['basic', 'load-more', 'long-content', 'playground', 'rtl', 'selected', 'stage', 'states', 'status', 'ten-thousand']
 
 /** Each tree of each demo as the server writes it: its name, a tab stop or not, and the first rows it holds. */
 const TREES: Record<string, string[]> = {
   'basic': ['Files 0: src, app, layout.tsx, page.tsx, components, lib, package.json, README.md'],
   'load-more': ['Repository 0: Folder 1, Folder 2, Folder 3, Folder 4, Folder 5, Folder 6, Folder 7, Folder 8'],
   'long-content': ['Every hostile case 0: Supercalifragilistic, تقرير report 2026 ال, Level 1, Level 2, Level 3, Level 4, Level 5, Level 6'],
-  'playground': ['Files 0: src, app, layout.tsx, page.tsx, components, lib, package.json, README.md'],
+  'playground': ['Files 0: components, button, index.tsx, variants.ts, input'],
   'rtl': ['الملفات 0: المستندات, التقرير السنوي.pdf, الميزانية.xlsx, الصور, ملاحظات.txt'],
   'selected': ['Project 0: app, layout.tsx, page.tsx, docs, next.config.ts'],
+  'stage': ['Files 0: components, button, index.tsx, variants.ts, input'],
   'states': [
-    'Project 0: app, layout.tsx, page.tsx, docs, guide.md, faq.md, next.config.ts',
-    'Project, loading more 0: app, docs, next.config.ts',
-    'Project, loading -: ',
-    'Project, empty -: ',
+    'Source, collapsed 0: src',
+    'Source, expanded 0: src, file1, file2',
+    'Source, selected 0: src, file1, file2',
+    'Source, focus-visible 0: src, file1, file2',
+    'Source, loading -: ',
+    'Source, empty -: ',
   ],
   'status': ['Files, loading -: ', 'Files, empty -: '],
   'ten-thousand': ['Ten thousand files 0: Folder 1, File 1.ts, File 2.ts, File 3.ts, File 4.ts, File 5.ts, File 6.ts, File 7.ts'],
@@ -92,6 +95,6 @@ describe('the demos the plan names', () => {
   it('status: the loading tree is busy and says Loading; the empty one says Nothing here yet', async () => {
     const html = await render('status')
     expect([...html.matchAll(/aria-busy="true"/g)]).toHaveLength(1)
-    expect([...html.matchAll(/<div role="status"[^>]*>([^<]*)<\/div>/g)].map(([, text]) => text)).toEqual(['Loading', 'Nothing here yet'])
+    expect([...html.matchAll(/<div role="status"[^>]*>(.*?)<\/div>/g)].map(([, inner]) => inner?.replace(/<[^>]*>/g, ''))).toEqual(['Loading', 'Nothing here yet'])
   })
 })

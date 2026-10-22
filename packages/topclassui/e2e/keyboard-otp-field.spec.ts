@@ -91,7 +91,7 @@ for (const direction of DIRECTIONS) {
     })
 
     test('a read-only field takes the focus and the ring, and no character or Backspace changes it; a disabled one is no stop', async ({ page }) => {
-      await openLive(page, 'otp-field--states', { direction })
+      await openLive(page, 'otp-field--combined', { direction })
       const invalid = `${GROUP}:has(#otp-states-invalid)`
       const disabled = `${GROUP}:has(#otp-states-disabled)`
       const readOnly = `${GROUP}:has(#otp-states-read-only)`

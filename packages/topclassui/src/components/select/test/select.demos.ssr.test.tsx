@@ -12,7 +12,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'four-rows', 'load-more', 'long-content', 'phase-4-form', 'playground', 'rtl', 'sixty-items', 'sizes', 'states']
+const EXPECTED = ['basic', 'form', 'four-rows', 'load-more', 'long-content', 'phase-4-form', 'playground', 'read-only', 'rtl', 'sixty-items', 'sizes', 'states']
 
 /** Each Select of each demo as the server writes it: its name, then what its trigger shows. */
 const SELECTS: Record<string, string[]> = {
@@ -26,7 +26,8 @@ const SELECTS: Record<string, string[]> = {
   'rtl': ['الدولة: الأردن'],
   'sixty-items': ['Sixty options: Option 30'],
   'sizes': ['Extra small: Pro', 'Small: Pro', 'Medium: Pro', 'Large: Pro', 'Extra large: Pro'],
-  'states': ['Nothing chosen: Select', 'Invalid: Free', 'Disabled: Pro', 'Read-only: Team'],
+  'read-only': ['Read-only: Jordan'],
+  'states': ['idle: Country', 'hover: Country', 'focus-visible: Jordan', 'open: Jordan', 'disabled: Country', 'invalid: Jordan'],
 }
 
 const render = async (file: string) => {
@@ -87,10 +88,10 @@ describe('the demos the plan names', () => {
     expect(await render('rtl')).toMatch(/^<div class="isolate"><div dir="rtl" lang="ar" class="[^"]*">/)
   })
 
-  it('states: invalid points at its message, disabled and read-only say so', async () => {
+  it('states: invalid, disabled and read-only say so', async () => {
     const html = await render('states')
-    expect(html).toMatch(/aria-describedby="select-states-error" aria-invalid="true"|aria-invalid="true"[^>]*aria-describedby="select-states-error"/)
-    expect(html).toMatch(/<button [^>]*disabled=""[^>]*aria-label="Disabled"/)
-    expect(html).toMatch(/<button [^>]*aria-readonly="true"[^>]*aria-label="Read-only"/)
+    expect(html).toMatch(/<button [^>]*aria-invalid="true"[^>]*aria-label="invalid"|<button [^>]*aria-label="invalid"[^>]*aria-invalid="true"/)
+    expect(html).toMatch(/<button [^>]*disabled=""[^>]*aria-label="disabled"/)
+    expect(await render('read-only')).toMatch(/<button [^>]*aria-readonly="true"[^>]*aria-label="Read-only"/)
   })
 })

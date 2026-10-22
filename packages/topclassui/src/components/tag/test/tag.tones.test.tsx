@@ -19,7 +19,7 @@ const PAINT: Record<string, string[]> = {
 
 /** Every colour class on the root: the fill, the label and the border, without the size step. */
 const paint = (list: string[]) => list.filter((c) =>
-  /^(bg|text|border)-/.test(c) && !/^(text-(xs|sm|base|lg)$|border-\(length)/.test(c))
+  /^(bg|text|border)-/.test(c) && !/^(text-(xs|sm|base|lg)(\/\d)?$|border-\(length)/.test(c))
 
 describe('every tone paints its soft pair', () => {
   it('names all six tones in the table, so adding one cannot skip coverage', () => {

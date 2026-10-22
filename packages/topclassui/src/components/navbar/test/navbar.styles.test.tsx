@@ -21,9 +21,9 @@ const TARGET = [
 
 /** The bar of either kind, up to the padding of its top edge. */
 const BAR = [
-  'flex', 'min-h-15', 'w-full', 'flex-wrap', 'items-center', 'gap-x-6', 'gap-y-2', 'pb-1.5',
-  'ps-[calc(1.25rem+var(--tc-safe-start))]', 'pe-[calc(1.25rem+var(--tc-safe-end))]',
-  'bg-surface-raised', 'border-b-(length:--tc-line-width)', 'border-line',
+  'flex', 'min-h-13', 'w-full', 'flex-wrap', 'items-center', 'gap-x-4', 'gap-y-2', 'pb-1',
+  'ps-[calc(1rem+var(--tc-safe-start))]', 'pe-[calc(1rem+var(--tc-safe-end))]',
+  'border-b-(length:--tc-line-width)', 'bg-surface-raised', 'border-line', 'data-scrolled:shadow-md',
 ]
 
 describe('every part carries exactly the classes written here', () => {
@@ -35,6 +35,14 @@ describe('every part carries exactly the classes written here', () => {
 
   it('NavbarRoot, not sticky: the same bar with a plain top padding and nothing that sticks', () => {
     expect(classesOf(<NavbarRoot sticky={false} />, 'header')).toEqual([...BAR, 'pt-1.5'])
+  })
+
+  it('NavbarRoot, transparent: no surface and no shadow, its line kept but transparent so the box is the same', () => {
+    expect(classesOf(<NavbarRoot sticky={false} variant="transparent" />, 'header')).toEqual([
+      'flex', 'min-h-13', 'w-full', 'flex-wrap', 'items-center', 'gap-x-4', 'gap-y-2', 'pb-1',
+      'ps-[calc(1rem+var(--tc-safe-start))]', 'pe-[calc(1rem+var(--tc-safe-end))]',
+      'border-b-(length:--tc-line-width)', 'border-transparent', 'pt-1.5',
+    ])
   })
 
   it('NavbarBrand', () => {
@@ -50,7 +58,7 @@ describe('every part carries exactly the classes written here', () => {
 
   it('the list scrolls sideways, snaps but not under the pointer, and keeps the reach of a ring clear on every side', () => {
     expect(classesOf(<NavbarLinks />, 'ul')).toEqual([
-      'flex', 'items-center', 'gap-5', 'snap-x', 'snap-mandatory', 'hover:snap-none',
+      'flex', 'items-center', 'gap-4', 'snap-x', 'snap-mandatory', 'hover:snap-none',
       '-m-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+1px)]', 'p-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+1px)]',
       'overflow-x-auto', 'overscroll-x-contain', '[scrollbar-width:thin]', '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]',
     ])
@@ -86,7 +94,7 @@ describe('a className on a part wins over the part', () => {
     expect(classes).toContain('bg-surface')
     expect(classes).not.toContain('bg-surface-raised')
     expect(classes).toContain('gap-x-2')
-    expect(classes).not.toContain('gap-x-6')
+    expect(classes).not.toContain('gap-x-4')
     expect(classes).toContain('static')
     expect(classes).not.toContain('sticky')
   })

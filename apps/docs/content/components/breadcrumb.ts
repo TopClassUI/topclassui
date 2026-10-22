@@ -6,12 +6,13 @@ export const breadcrumb = {
     ar: 'مسار التنقل',
   },
   description: {
-    en: 'Where a page sits in the site, as real links with no JavaScript. The same trail is written as BreadcrumbList JSON-LD.',
+    en: 'Real links with aria-current on the last crumb, and BreadcrumbList JSON-LD.',
     ar: 'موقع الصفحة في الموقع، بروابط حقيقية ودون JavaScript. والمسار نفسه يُكتب BreadcrumbList بصيغة JSON-LD.',
   },
   demos: ['basic', 'all-links', 'long-trail', 'long-label', 'mixed-label', 'deep-trail', 'rtl'],
-  stageHeight: 3,
+  stageHeight: 15.6,
   stageDemo: 'basic',
+  controlOrder: ['maxItems', 'showHome'],
   note: {
     en: 'Leave href off the last item: it becomes the current page, and the linked items also emit the BreadcrumbList JSON-LD.',
     ar: 'اترك href عن العنصر الأخير ليصبح الصفحة الحالية. العناصر ذات الروابط تُكتب أيضًا في BreadcrumbList بصيغة JSON-LD.',

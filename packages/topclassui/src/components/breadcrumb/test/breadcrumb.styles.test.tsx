@@ -22,9 +22,9 @@ const sorted = (list: readonly string[]) => [...list].sort()
 
 /** The Build this block, written out: a derived expectation would shrink with the source. */
 const LINK = [
-  'inline-flex', 'items-center', 'justify-center', 'rounded-chip', 'text-muted', 'underline-offset-4',
+  'inline-flex', 'items-center', 'justify-center', 'gap-1.5', 'rounded-chip', 'text-muted', 'underline-offset-3',
   'max-w-full',
-  'hover:underline',
+  'hover:underline', 'hover:text-body',
   'outline-none',
   'focus-visible:outline-solid',
   'focus-visible:outline-(length:--tc-ring-width)',
@@ -101,8 +101,8 @@ describe('the link is interactive, so it carries what R-5.6 asks of every contro
     expect(link()).toContain('justify-center')
   })
 
-  it('underlines on hover through the shared link hover, with no hand-written colour change', () => {
-    expect(link().filter((c) => c.startsWith('hover:'))).toEqual(['hover:underline'])
+  it('underlines and lifts to the body colour on hover through the shared muted-link hover (Figma 138:1140)', () => {
+    expect(link().filter((c) => c.startsWith('hover:')).sort()).toEqual(['hover:text-body', 'hover:underline'])
     expect(link().filter((c) => c.startsWith('active:'))).toEqual([])
   })
 })

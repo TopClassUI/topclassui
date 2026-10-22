@@ -1,15 +1,24 @@
 import { Input } from '../index.js'
 
-/** The states a server can render; hover and focus-visible are live in the browser. */
+/** The ring a focused field wears, drawn at rest so the strip can show it; not under forced colours, where a ring at rest would read as focus. */
+const RING = 'w-32 not-forced-colors:outline-solid not-forced-colors:outline-(length:--tc-ring-width) not-forced-colors:outline-offset-(length:--tc-ring-offset) not-forced-colors:outline-ring'
+
+/** The line a hovered field draws, at rest, on the frame's 128 px field. */
+const HOVER = 'w-32 border-body'
+
+/** The field the frame draws in each cell, 128 px. */
+const CELL = 'w-32'
+
+/** The frame's strip, one cell a state named by its aria-label. */
 export default function Demo() {
   return (
-    <div className="grid max-w-sm gap-3">
-      <Input fullWidth placeholder="Enter your email" aria-label="Idle" />
-      <Input fullWidth defaultValue="omar@example.com" aria-label="Filled" />
-      <Input fullWidth disabled defaultValue="omar@example.com" aria-label="Disabled" />
-      <Input fullWidth readOnly defaultValue="omar@example.com" aria-label="Read-only" />
-      <Input fullWidth invalid defaultValue="omar@example" aria-label="Invalid" />
-      <Input fullWidth required placeholder="Required" aria-label="Required" />
+    <div className="flex flex-wrap items-start gap-6">
+      <Input className={CELL} placeholder="Email" aria-label="idle" />
+      <Input className={HOVER} placeholder="Email" aria-label="hover" />
+      <Input className={RING} defaultValue="jo@mail.com" aria-label="focus-visible" />
+      <Input className={CELL} disabled placeholder="Email" aria-label="disabled" />
+      <Input className={CELL} readOnly defaultValue="jo@mail.com" aria-label="read-only" />
+      <Input className={CELL} invalid defaultValue="jo@mail.com" aria-label="invalid" />
     </div>
   )
 }

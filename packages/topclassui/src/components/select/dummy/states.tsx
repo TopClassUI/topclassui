@@ -1,18 +1,27 @@
 import { Select } from '../index.js'
 
-const PLANS = [{ value: 'free', label: 'Free' }, { value: 'pro', label: 'Pro' }, { value: 'team', label: 'Team' }]
+const COUNTRIES = [{ value: 'jo', label: 'Jordan' }, { value: 'eg', label: 'Egypt' }, { value: 'ma', label: 'Morocco' }]
 
-/** The states a server can render. Invalid points at its message; read-only keeps its value and takes the soft fill. */
+/** The ring a focused trigger wears, and an open one keeps, drawn at rest so the strip can show it; not under forced colours, where a ring at rest would read as focus. */
+const RING = 'w-32 justify-self-center not-forced-colors:outline-solid not-forced-colors:outline-(length:--tc-ring-width) not-forced-colors:outline-offset-(length:--tc-ring-offset) not-forced-colors:outline-ring'
+
+/** The trigger the frame draws in each cell, 128 px. */
+const CELL = 'w-32 justify-self-center'
+
+/** The line a hovered trigger draws, at rest, on the frame's 128 px trigger. */
+const HOVER = 'w-32 justify-self-center border-body'
+
+/** The frame's strip, one cell a state named by its aria-label; the open cell is the trigger the frame draws, its list
+ * left shut so it covers no cell. */
 export default function Demo() {
   return (
-    <div className="grid justify-items-start gap-3">
-      <Select aria-label="Nothing chosen" items={PLANS} />
-      <div className="grid justify-items-start gap-1">
-        <Select aria-label="Invalid" invalid aria-describedby="select-states-error" items={PLANS} defaultValue="free" />
-        <span id="select-states-error" className="text-xs text-danger-on-soft">Pick a paid plan.</span>
-      </div>
-      <Select aria-label="Disabled" disabled items={PLANS} defaultValue="pro" />
-      <Select aria-label="Read-only" readOnly items={PLANS} defaultValue="team" />
+    <div className="flex flex-wrap items-start gap-6">
+      <Select className={CELL} aria-label="idle" placeholder="Country" items={COUNTRIES} />
+      <Select className={HOVER} aria-label="hover" placeholder="Country" items={COUNTRIES} />
+      <Select className={RING} aria-label="focus-visible" items={COUNTRIES} defaultValue="jo" />
+      <Select className={RING} aria-label="open" items={COUNTRIES} defaultValue="jo" />
+      <Select className={CELL} aria-label="disabled" disabled placeholder="Country" items={COUNTRIES} />
+      <Select className={CELL} aria-label="invalid" invalid items={COUNTRIES} defaultValue="jo" />
     </div>
   )
 }

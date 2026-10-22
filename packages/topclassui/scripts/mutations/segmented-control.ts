@@ -10,7 +10,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the segmented control selected segment loses its heavier weight, so only a fill tells it from the others',
     file: CLASSES,
-    from: ' data-checked:font-semibold',
+    from: ' data-checked:font-medium',
     to: '',
   },
   {
@@ -136,7 +136,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the segmented control track is no offset parent and keeps no scroll padding, so an arrow in RTL leaves a segment cut',
     file: CLASSES,
-    from: '`relative flex w-fit max-w-full items-stretch gap-0.5 rounded-control bg-surface p-0.75 scroll-px-px ',
+    from: '`relative flex w-fit max-w-full items-stretch gap-0.5 rounded-control bg-surface p-0.75 scroll-px-0.5 ',
     to: '`flex w-fit max-w-full items-stretch gap-0.5 rounded-control bg-surface p-0.75 ',
   },
   {
@@ -228,5 +228,11 @@ export const MUTATIONS: Mutation[] = [
     file: HOOK,
     from: 'useState(() => serveTabStopOn(children, value ?? defaultValue ?? null, disabled))',
     to: 'useState(() => value ?? defaultValue ?? null)',
+  },
+  {
+    label: 'the md track goes back to the 40 px control step instead of the 36 px Figma draws',
+    file: CLASSES,
+    from: "md: 'min-h-(--tc-segmented-height)',",
+    to: "md: 'min-h-control-md',",
   },
 ]

@@ -13,7 +13,7 @@ A knob is one custom property that many classes read. Change it once, every comp
 |---|---|---|
 | `--tc-radius` | `0.5rem` | Every corner radius: control, box and chip |
 | `--tc-density` | `1` | Every control height and its padding |
-| `--tc-motion` | `1` | Every transition, and `0` under `prefers-reduced-motion` |
+| `--tc-motion` | `1` | Every transition, and 0 under prefers-reduced-motion |
 | `--tc-list-rows` | `7` | How many rows a list shows before it scrolls |
 | `--tc-ring-width` | `2px` | The focus ring |
 | `--tc-line-width` | `1px` | Every border |
@@ -22,15 +22,15 @@ A knob is one custom property that many classes read. Change it once, every comp
 
 ## A mode is one block
 
-There is no theme object and no provider prop for color. A mode is a CSS block selected by `data-theme`.
+There is no theme object and no provider prop for color. A mode is a CSS block selected by data-theme.
 
 <TokensSample mode="ocean" />
 
-The ocean mode in full. It changes one tone and one knob.
+<Caption>The ocean mode in full. It changes one tone and one knob.</Caption>
 
 ## Scoping a theme to a section
 
-`data-theme` works on any element, not only the root. Set it on a panel and everything inside recomputes, including the soft tints and the focus ring.
+data-theme works on any element, not only the root. Set it on a panel and everything inside recomputes, including the soft tints and the focus ring.
 
 ```tsx check
 <section data-theme="dark" className="bg-page text-body">

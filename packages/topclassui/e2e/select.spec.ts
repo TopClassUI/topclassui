@@ -16,7 +16,7 @@ import { FORCED_CANVAS, contrast, inkOn, pixelsOf, rgbOf } from './pixels.js'
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const NAMES = { xs: 'Extra small', sm: 'Small', md: 'Medium', lg: 'Large', xl: 'Extra large' } as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['basic', 'form', 'four-rows', 'load-more', 'long-content', 'phase-4-form', 'playground', 'rtl', 'sixty-items', 'sizes', 'states'].map((demo) => `select--${demo}`)
+const DEMOS = ['basic', 'form', 'four-rows', 'load-more', 'long-content', 'phase-4-form', 'playground', 'read-only', 'rtl', 'sixty-items', 'sizes', 'states'].map((demo) => `select--${demo}`)
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 /** The listbox has no data-open of its own: the popup around it carries the placement and the state. */
 const POPUP = '[data-placement]'
@@ -97,15 +97,17 @@ test.describe('the static page: the server HTML, before any script runs', () => 
     })
   }
 
-  test('the states: the placeholder is muted, invalid is red and 2 px, disabled is dimmed, read-only takes the soft fill', async ({ page }) => {
+  test('the states: the placeholder is muted, invalid is red and 2 px, disabled sits on the surface and is dimmed, read-only looks like idle', async ({ page }) => {
     await page.goto(urlFor('select--states', 'light', 'ltr'))
     const danger = await resolve(page, 'var(--tc-danger-solid)')
-    expect(await css(combo(page, 'Nothing chosen').locator('span').first(), 'color')).toBe(await resolve(page, 'var(--tc-muted)'))
-    expect(await css(combo(page, 'Invalid'), 'border-top-color')).toBe(danger)
-    expect(await css(combo(page, 'Invalid'), 'box-shadow')).toContain(`${danger} 0px 0px 0px 1px inset`)
-    expect(await css(combo(page, 'Disabled'), 'opacity')).toBe('0.5')
-    expect(await css(combo(page, 'Read-only'), 'background-color')).toBe(await resolve(page, 'var(--tc-neutral-soft)'))
-    expect(await css(combo(page, 'Nothing chosen'), 'background-color')).toBe(await resolve(page, 'var(--tc-surface-raised)'))
+    expect(await css(combo(page, 'idle').locator('span').first(), 'color')).toBe(await resolve(page, 'var(--tc-muted)'))
+    expect(await css(combo(page, 'invalid'), 'border-top-color')).toBe(danger)
+    expect(await css(combo(page, 'invalid'), 'box-shadow')).toContain(`${danger} 0px 0px 0px 1px inset`)
+    expect(await css(combo(page, 'disabled'), 'opacity')).toBe('0.5')
+    expect(await css(combo(page, 'disabled'), 'background-color')).toBe(await resolve(page, 'var(--tc-surface)'))
+    expect(await css(combo(page, 'idle'), 'background-color')).toBe(await resolve(page, 'var(--tc-surface-raised)'))
+    await page.goto(urlFor('select--read-only', 'light', 'ltr'))
+    expect(await css(combo(page, 'Read-only'), 'background-color')).toBe(await resolve(page, 'var(--tc-surface-raised)'))
   })
 
   for (const scheme of ['light', 'dark'] as const) {
@@ -113,13 +115,13 @@ test.describe('the static page: the server HTML, before any script runs', () => 
       await page.emulateMedia({ forcedColors: 'active', colorScheme: scheme })
       await page.goto(urlFor('select--states', 'light', 'ltr'))
       const canvas = FORCED_CANVAS[scheme]
-      const box = await boxOf(combo(page, 'Nothing chosen'))
+      const box = await boxOf(combo(page, 'idle'))
       const middle = Math.round(box.top + box.height / 2)
       const left = await pixelsOf(page, { x: Math.floor(box.left), y: middle, width: 3, height: 1 })
       expect(inkOn(left, canvas), 'line pixels at 3:1 on the inline-start edge').toBeGreaterThan(0)
-      expect(contrast(rgbOf(await css(combo(page, 'Nothing chosen'), 'border-top-color')), canvas)).toBeGreaterThanOrEqual(3)
-      expect(await css(combo(page, 'Invalid'), 'border-top-width')).toBe('2px')
-      expect(await css(combo(page, 'Nothing chosen'), 'border-top-width')).toBe('1px')
+      expect(contrast(rgbOf(await css(combo(page, 'idle'), 'border-top-color')), canvas)).toBeGreaterThanOrEqual(3)
+      expect(await css(combo(page, 'invalid'), 'border-top-width')).toBe('2px')
+      expect(await css(combo(page, 'idle'), 'border-top-width')).toBe('1px')
     })
   }
 
@@ -132,34 +134,35 @@ test.describe('the static page: the server HTML, before any script runs', () => 
           const style = getComputedStyle(el)
           return [style.borderTopStyle, style.borderInlineStartStyle, style.borderBottomStyle, style.borderInlineEndStyle, style.borderTopWidth].join(' ')
         })
-        expect(await line('Read-only')).toBe('dashed dashed dashed dashed 1px')
-        for (const name of ['Nothing chosen', 'Disabled']) expect(await line(name), name).toBe('solid solid solid solid 1px')
-        expect(await line('Invalid')).toBe('solid solid solid solid 2px')
+        for (const name of ['idle', 'disabled']) expect(await line(name), name).toBe('solid solid solid solid 1px')
+        expect(await line('invalid')).toBe('solid solid solid solid 2px')
         const topEdge = async (name: string) => {
           const box = await boxOf(combo(page, name))
           const row = await pixelsOf(page, { x: Math.round(box.left + 8), y: Math.floor(box.top), width: Math.round(box.width - 16), height: 1 })
           return [inkOn(row, FORCED_CANVAS[scheme]), row.length]
         }
-        const [plain, length] = await topEdge('Nothing chosen')
+        const [plain, length] = await topEdge('idle')
         expect(plain, 'the plain line is whole').toBe(length)
-        const [dashed] = await topEdge('Read-only')
+        await page.goto(urlFor('select--read-only', 'light', direction))
+        expect(await line('Read-only')).toBe('dashed dashed dashed dashed 1px')
+        const [dashed, own] = await topEdge('Read-only')
         expect(dashed, 'the dashes are drawn').toBeGreaterThan(0)
-        expect(dashed, 'the dashes leave gaps').toBeLessThan((length ?? 0) * 0.8)
+        expect(dashed, 'the dashes leave gaps').toBeLessThan((own ?? 0) * 0.8)
       })
     }
   }
 
   test('forced colours, after hydration: the read-only line is still dashed, and the list still opens', async ({ page }) => {
     await page.emulateMedia({ forcedColors: 'active' })
-    await openLive(page, 'select--states')
+    await openLive(page, 'select--read-only')
     expect(await css(combo(page, 'Read-only'), 'border-top-style')).toBe('dashed')
     await openList(page, combo(page, 'Read-only'))
     expect(await css(combo(page, 'Read-only'), 'border-top-style')).toBe('dashed')
     expect(await liveErrors(page)).toEqual([])
   })
 
-  test('outside forced colours the read-only line stays solid: the soft fill tells it there', async ({ page }) => {
-    await page.goto(urlFor('select--states', 'light', 'ltr'))
+  test('outside forced colours the read-only line stays solid, as the frame draws it', async ({ page }) => {
+    await page.goto(urlFor('select--read-only', 'light', 'ltr'))
     expect(await css(combo(page, 'Read-only'), 'border-top-style')).toBe('solid')
   })
 
@@ -212,7 +215,7 @@ test.describe('live: the keyboard, the Authoring Practices select-only combobox'
       const option = (name: string) => popup.getByRole('option', { name, exact: true })
       await expect(option('Option 30')).toBeInViewport()
       expect(await option('Option 30').evaluate((el) => [el.hasAttribute('data-highlighted'), el.getAttribute('aria-selected'), getComputedStyle(el).fontWeight, el.querySelector('svg') !== null]))
-        .toEqual([true, 'true', '500', true])
+        .toEqual([true, 'true', '400', true])
       for (let press = 0; press < 12; press += 1) await page.keyboard.press('ArrowDown')
       await expect.poll(() => focusedText(page)).toBe('Option 42')
       await expect(option('Option 42')).toBeInViewport()
@@ -270,7 +273,7 @@ test.describe('live: the keyboard, the Authoring Practices select-only combobox'
 test.describe('live: where the list opens', () => {
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 
-  test('ltr: 6 px under the trigger, its left edge on the trigger\'s, at least as wide, seven rows of 40 px, scrolling inside itself', async ({ page }) => {
+  test('ltr: 6 px under the trigger, its left edge on the trigger\'s, at least as wide, seven rows of 32 px, scrolling inside itself', async ({ page }) => {
     await openLive(page, 'select--sixty-items')
     const trigger = combo(page)
     const popup = await openList(page, trigger)
@@ -279,8 +282,8 @@ test.describe('live: where the list opens', () => {
     expect(Math.abs(p.left - t.left)).toBeLessThanOrEqual(1)
     expect(p.width).toBeGreaterThanOrEqual(t.width - 1)
     const list = popup.getByRole('listbox')
-    expect(await list.evaluate((el) => [el.clientHeight, el.scrollHeight, getComputedStyle(el).overscrollBehaviorY])).toEqual([280, 2530, 'contain'])
-    expect((await boxOf(popup.getByRole('option').first())).height).toBe(40)
+    expect(await list.evaluate((el) => [el.clientHeight, el.scrollHeight, getComputedStyle(el).overscrollBehaviorY])).toEqual([224, 2050, 'contain'])
+    expect((await boxOf(popup.getByRole('option').first())).height).toBe(32)
   })
 
   test('rtl: the list ends at the right edge of the trigger, and the caret and the tick sit at the left', async ({ page }) => {
@@ -317,10 +320,10 @@ test.describe('live: where the list opens', () => {
     })
   }
 
-  test('visibleRows={4}: the list is 160 px tall', async ({ page }) => {
+  test('visibleRows={4}: the list is 128 px tall', async ({ page }) => {
     await openLive(page, 'select--four-rows')
     const popup = await openList(page, combo(page))
-    expect(await popup.getByRole('listbox').evaluate((el) => el.clientHeight)).toBe(160)
+    expect(await popup.getByRole('listbox').evaluate((el) => el.clientHeight)).toBe(128)
   })
 
   test.describe('under a coarse pointer', () => {
@@ -339,12 +342,12 @@ test.describe('live: where the list opens', () => {
       await openLive(page, 'select--sixty-items')
       await page.evaluate(() => { document.documentElement.style.fontSize = '32px' })
       let popup = await openList(page, combo(page), 'tap')
-      expect((await boxOf(popup.getByRole('option').first())).height).toBe(80)
+      expect((await boxOf(popup.getByRole('option').first())).height).toBe(64)
       await page.keyboard.press('Escape')
       await expect(popup).toBeHidden()
-      await page.evaluate(() => { document.documentElement.style.fontSize = ''; document.documentElement.style.setProperty('--tc-density', '1.25') })
+      await page.evaluate(() => { document.documentElement.style.fontSize = ''; document.documentElement.style.setProperty('--tc-density', '1.5') })
       popup = await openList(page, combo(page), 'tap')
-      expect((await boxOf(popup.getByRole('option').first())).height).toBe(50)
+      expect((await boxOf(popup.getByRole('option').first())).height).toBe(48)
     })
   })
 

@@ -21,8 +21,9 @@ const AFTER: Record<string, string[]> = {
   'playground': ['Calendar'],
   'rtl': ['تقويم'],
   'sizes': ['Off', 'Off', 'Off', 'Off', 'Off'],
-  'states': ['Invalid', 'Disabled, selected', 'Live', 'Read-only, selected'],
-  'with-icons': ['System'],
+  'states': ['B', 'B', 'B', 'B', 'A'],
+  'track-states': ['Invalid', 'Disabled, selected', 'Live', 'Read-only, selected'],
+  'with-icons': ['Ocean'],
 }
 
 const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { default: ComponentType }).default

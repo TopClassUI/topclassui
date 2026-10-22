@@ -1,26 +1,46 @@
 import { Breadcrumb } from '../index.js'
 
-/** The states a server can render: a trail ending on the page being read, one of ancestors only,
- * and a lone current page. Three navs on one page need a name each, so every one passes its own. */
+/** The four states the frame draws, one nav each, named by its aria-label: a trail of ancestors only, a crumb under
+ * the pointer (drawn with the data-hover a pointer would set), a long trail folded by maxItems, and the page being read. */
 export default function Demo() {
   return (
     <div className="grid justify-items-start gap-4">
       <Breadcrumb
-        aria-label="Ending on the current page"
+        className="text-xs *:gap-1.25 *:*:gap-1.25"
+        aria-label="idle"
         items={[
-          { href: '/', label: 'Home' },
           { href: '/docs', label: 'Docs' },
-          { label: 'Breadcrumb' },
+          { href: '/docs/button', label: 'Button' },
         ]}
       />
       <Breadcrumb
-        aria-label="Every crumb a link"
+        className="text-xs *:gap-1.25 *:*:gap-1.25"
+        aria-label="hover"
+        link={<a href="/" data-hover="" />}
         items={[
-          { href: '/', label: 'Home' },
-          { href: '/shop', label: 'Shop' },
+          { href: '/docs', label: 'Docs' },
+          { label: 'Button' },
         ]}
       />
-      <Breadcrumb aria-label="Only the current page" items={[{ label: 'Home' }]} />
+      <Breadcrumb
+        className="text-xs *:gap-1.25 *:*:gap-1.25"
+        aria-label="collapsed"
+        maxItems={2}
+        items={[
+          { href: '/docs', label: 'Docs' },
+          { href: '/docs/components', label: 'Components' },
+          { href: '/docs/components/actions', label: 'Actions' },
+          { label: 'Button' },
+        ]}
+      />
+      <Breadcrumb
+        className="text-xs *:gap-1.25 *:*:gap-1.25"
+        aria-label="current"
+        items={[
+          { href: '/docs', label: 'Docs' },
+          { label: 'Button' },
+        ]}
+      />
     </div>
   )
 }

@@ -43,7 +43,7 @@ import { SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoot } fr
 - **A link.** Pass `href`, or `render={<Link href="/docs" />}` in Next.js. Every other prop
   goes to the link, not to the `<li>` around it.
 - **The current page.** `current` on one link sets `aria-current="page"` and draws the
-  row filled, bold and with a bar at its start.
+  row filled and bold.
 - **Give every link an `icon`** when the rail can collapse. Collapsed, the icon is all that
   is drawn: a link without one is an empty row, still a tab stop and still named.
 - **Collapsed, nothing loses its name.** The title, the label of a group and the label of
@@ -159,6 +159,7 @@ Anything else is passed to the element each part draws, so standard attributes (
 - `dummy/long-list.tsx`
 - `dummy/playground.tsx`
 - `dummy/rtl.tsx`
+- `dummy/stage.tsx`
 - `dummy/states.tsx`
 
 ## Verified against

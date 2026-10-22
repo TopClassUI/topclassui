@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { compileEntry } from '#test/stylesheet.js'
 import {
-  NAVBAR_ACTIONS, NAVBAR_BRAND, NAVBAR_ITEM, NAVBAR_LINK, NAVBAR_LINKS, NAVBAR_LIST, NAVBAR_ROOT, NAVBAR_TOP,
+  NAVBAR_ACTIONS, NAVBAR_BRAND, NAVBAR_ITEM, NAVBAR_LINK, NAVBAR_LINKS, NAVBAR_LIST, NAVBAR_ROOT, NAVBAR_SURFACE, NAVBAR_TOP,
 } from '../classes.js'
 
 const REACH = 'calc(var(--tc-ring-width) + var(--tc-ring-offset) + 1px)'
@@ -11,15 +11,15 @@ const REACH = 'calc(var(--tc-ring-width) + var(--tc-ring-offset) + 1px)'
 const DECLARATION: Record<string, string> = {
   // The bar.
   'flex': 'display: flex;',
-  'min-h-15': 'min-height: calc(var(--spacing) * 15);',
+  'min-h-13': 'min-height: calc(var(--spacing) * 13);',
   'w-full': 'width: 100%;',
   'flex-wrap': 'flex-wrap: wrap;',
   'items-center': 'align-items: center;',
-  'gap-x-6': 'column-gap: calc(var(--spacing) * 6);',
+  'gap-x-4': 'column-gap: calc(var(--spacing) * 4);',
   'gap-y-2': 'row-gap: calc(var(--spacing) * 2);',
-  'pb-1.5': 'padding-bottom: calc(var(--spacing) * 1.5);',
-  'ps-[calc(1.25rem+var(--tc-safe-start))]': 'padding-inline-start: calc(1.25rem + var(--tc-safe-start));',
-  'pe-[calc(1.25rem+var(--tc-safe-end))]': 'padding-inline-end: calc(1.25rem + var(--tc-safe-end));',
+  'pb-1': 'padding-bottom: var(--spacing);',
+  'ps-[calc(1rem+var(--tc-safe-start))]': 'padding-inline-start: calc(1rem + var(--tc-safe-start));',
+  'pe-[calc(1rem+var(--tc-safe-end))]': 'padding-inline-end: calc(1rem + var(--tc-safe-end));',
   'bg-surface-raised': 'background-color: var(--tc-surface-raised);',
   'border-b-(length:--tc-line-width)': 'border-bottom-width: var(--tc-line-width);',
   'border-line': 'border-color: var(--tc-line);',
@@ -63,7 +63,7 @@ const DECLARATION: Record<string, string> = {
   'grow': 'flex-grow: 1;',
   'basis-24': 'flex-basis: calc(var(--spacing) * 24);',
   'grid-cols-1': 'grid-template-columns: repeat(1, minmax(0, 1fr));',
-  'gap-5': 'gap: calc(var(--spacing) * 5);',
+  'gap-4': 'gap: calc(var(--spacing) * 4);',
   'snap-x': 'scroll-snap-type: x var(--tw-scroll-snap-strictness);',
   'snap-mandatory': '--tw-scroll-snap-strictness: mandatory;',
   'hover:snap-none': 'scroll-snap-type: none;',
@@ -74,6 +74,9 @@ const DECLARATION: Record<string, string> = {
   '[scrollbar-width:thin]': 'scrollbar-width: thin;',
   '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]': 'scrollbar-color: var(--tc-scrollbar-thumb) var(--tc-scrollbar-track);',
   'shrink-0': 'flex-shrink: 0;',
+  // The two looks.
+  'border-transparent': 'border-color: transparent;',
+  'data-scrolled:shadow-md': '--tw-shadow: 0 4px 6px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 2px 4px -2px var(--tw-shadow-color, rgb(0 0 0 / 0.1));',
   // The actions.
   'ms-auto': 'margin-inline-start: auto;',
   'justify-end': 'justify-content: flex-end;',
@@ -86,6 +89,7 @@ const SCOPE: Record<string, string> = {
   'forced-colors:aria-[current=page]:underline': '[aria-current="page"] {',
   'aria-[current=page]:[scroll-initial-target:nearest]': '[aria-current="page"] {',
   'data-unstuck:static': '[data-unstuck] {',
+  'data-scrolled:shadow-md': '[data-scrolled] {',
   'focus-visible:snap-center': ':focus-visible {',
   'hover:snap-none': ':hover {',
   'focus-visible:outline-solid': ':focus-visible {',
@@ -119,10 +123,10 @@ describe('every class Navbar writes compiles with the installed Tailwind', () =>
 
   it('the table names exactly the classes of the bar, the brand, the nav, its list, a link and the actions', () => {
     const all = written([
-      NAVBAR_ROOT, ...Object.values(NAVBAR_TOP), NAVBAR_BRAND, NAVBAR_LINKS, NAVBAR_LIST, NAVBAR_ITEM, NAVBAR_LINK, NAVBAR_ACTIONS,
+      NAVBAR_ROOT, ...Object.values(NAVBAR_SURFACE), ...Object.values(NAVBAR_TOP), NAVBAR_BRAND, NAVBAR_LINKS, NAVBAR_LIST, NAVBAR_ITEM, NAVBAR_LINK, NAVBAR_ACTIONS,
     ])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(63)
+    expect(all).toHaveLength(65)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

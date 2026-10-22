@@ -1,16 +1,17 @@
 import { FileUpload } from '../index.js'
 
-/** Invalid draws the zone's line in danger and thicker; disabled dims the zone and takes no file. */
+/** The frame's strip, one zone a cell named by its aria-label: idle, and disabled dimmed. Drag over, uploading, done and
+ * error need a held file or a drag, which a server cannot draw; invalid has a demo of its own. */
 export default function Demo() {
   return (
-    <div className="grid gap-6">
-      <div className="grid gap-1.5">
-        <label htmlFor="file-upload-invalid" className="text-sm font-medium text-body">Invalid</label>
-        <FileUpload id="file-upload-invalid" name="invalid" invalid>A file is required</FileUpload>
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(min(12rem,100%),1fr))] items-start gap-6">
+      <div role="group" aria-label="idle">
+        <label htmlFor="file-upload-idle" className="sr-only">idle</label>
+        <FileUpload id="file-upload-idle" name="idle" />
       </div>
-      <div className="grid gap-1.5">
-        <label htmlFor="file-upload-disabled" className="text-sm font-medium text-body">Disabled</label>
-        <FileUpload id="file-upload-disabled" name="disabled" disabled>Uploads are closed</FileUpload>
+      <div role="group" aria-label="disabled">
+        <label htmlFor="file-upload-disabled" className="sr-only">disabled</label>
+        <FileUpload id="file-upload-disabled" name="disabled" disabled />
       </div>
     </div>
   )

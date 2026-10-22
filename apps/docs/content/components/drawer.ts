@@ -3,8 +3,8 @@ export const drawer = {
   slug: 'drawer',
   title: { en: 'Drawer', ar: 'درج' },
   description: {
-    en: 'A dialog that slides in from a logical edge, so it mirrors in Arabic with no code change. A swipe or the x closes it.',
-    ar: 'مربع حوار ينزلق من حافة منطقية، فينعكس في العربية دون أي تعديل في الشيفرة. يُغلق بالسحب أو بزر الإغلاق.',
+    en: 'Dialog that slides from a logical edge, so it mirrors in RTL without a code change.',
+    ar: 'مربع حوار ينزلق من حافة منطقية، فينعكس في الاتجاه من اليمين إلى اليسار دون تعديل في الشيفرة.',
   },
   demos: [
     'end',
@@ -19,7 +19,8 @@ export const drawer = {
     'trap-focus',
     'rtl',
   ],
-  stageHeight: 12,
+  stageHeight: 20.5,
+  stageOpen: true,
   note: {
     en: '`placement` is logical: `start` opens from the left in English and from the right in Arabic. Never `left` or `right`.',
     ar: '`placement` منطقي: `start` يفتح من اليسار في الإنجليزية ومن اليمين في العربية. لا `left` ولا `right` أبدًا.',

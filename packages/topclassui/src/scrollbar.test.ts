@@ -43,7 +43,7 @@ const declared = (selector: string) => {
 
 describe('the two scrollbar tokens', () => {
   it('light, and ocean through it: a neutral-500 thumb on a transparent track', () => {
-    expect(declared(":root, [data-theme='light']")).toEqual(['var(--color-neutral-500)', 'transparent'])
+    expect(declared(":root, [data-theme='light'], [data-theme='ocean']")).toEqual(['var(--color-neutral-500)', 'transparent'])
   })
 
   it('dark: a neutral-400 thumb on a transparent track', () => {
@@ -52,7 +52,7 @@ describe('the two scrollbar tokens', () => {
 
   it('are declared in those two blocks and nowhere else, so ocean keeps the light bar', () => {
     const where = blocks.filter((b) => b.decls.has('--tc-scrollbar-thumb') || b.decls.has('--tc-scrollbar-track'))
-    expect(where.map((b) => b.selector.replace(/\s+/g, ' ').trim())).toEqual([":root, [data-theme='light']", "[data-theme='dark']"])
+    expect(where.map((b) => b.selector.replace(/\s+/g, ' ').trim())).toEqual([":root, [data-theme='light'], [data-theme='ocean']", "[data-theme='dark']"])
   })
 })
 

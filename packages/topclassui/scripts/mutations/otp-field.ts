@@ -46,8 +46,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the otp field cell takes a basis in place of its max-w, so a table cell counts it as 40 px',
     file: CLASSES,
-    from: "md: 'h-control-md max-w-control-md ",
-    to: "md: 'h-control-md basis-control-md ",
+    from: "md: 'h-control-lg max-w-control-md ",
+    to: "md: 'h-control-lg basis-control-md ",
   },
   {
     label: 'the otp field hands Base UI defaultValue again, so a form reset leaves the code as it was',
@@ -184,8 +184,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the otp field cell loses its 24 px floor, so a narrow parent squeezes it under the target size',
     file: CLASSES,
-    from: '`min-w-[var(--tc-target-min,24px)] shrink',
-    to: '`min-w-0 shrink',
+    from: '`min-w-[var(--tc-target-min,24px)] pointer-coarse:',
+    to: '`min-w-0 pointer-coarse:',
   },
   {
     label: 'the otp field cell loses its height floor, so under a finger it is 40 px tall',

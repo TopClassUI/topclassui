@@ -4,4 +4,4 @@
 import { island } from '../lazy-island'
 
 export const ExampleKnobs = island(() => import('./example-knobs').then((m) => m.ExampleKnobs))
-export const ExampleTabs = island(() => import('./example-tabs').then((m) => m.ExampleTabs))
+export const ExampleStage = island(() => import('./example-stage').then((m) => m.ExampleStage))

@@ -51,7 +51,7 @@ function ShellSettings({ locale, path, labels }: Omit<SiteNavbarProps, 'current'
 export function SiteNavbar({ locale, current, path, labels }: SiteNavbarProps) {
   const library = getLabels(locale)
   return (
-    <NavbarRoot className="bg-surface">
+    <NavbarRoot className="bg-surface min-h-14.5 ps-[calc(1.75rem+var(--tc-safe-start))] pe-[calc(1.75rem+var(--tc-safe-end))]">
       <NavbarBrand render={<Link href={`/${locale}`} />}>
         <BrandTile />
         <span>{labels.meta.siteName}</span>

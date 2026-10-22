@@ -11,8 +11,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the banner loses wrap-anywhere, so a long URL runs out of the row',
     file: 'src/components/banner/variants.ts',
-    from: "text-sm font-medium wrap-anywhere'",
-    to: "text-sm font-medium'",
+    from: "text-sm/tight font-medium wrap-anywhere'",
+    to: "text-sm/tight font-medium'",
   },
   {
     label: 'the banner message loses min-w-0, so it cannot shrink below its longest word beside an action',

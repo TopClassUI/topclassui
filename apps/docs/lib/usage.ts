@@ -11,27 +11,51 @@ export interface Usage {
 }
 
 const SPREAD = /[ \t]*\{\.\.\.props\}/
-const IMPORT = /^import\s+(?!type\b)[^\n]*$/gm
+// A brace list may run over several lines, as a long import of a part family does.
+const IMPORT = /^import\s+(?!type\b)(?:[^\n{]*\{[^}]*\}[^\n]*|[^\n]*)$/gm
 const SIGNATURE = /export default function \w+\(\s*(?:\{([^}]*)\})?[^)]*\)[^{]*\{/
 const passThrough = (name: string) => new RegExp(`\\s+${name}=\\{${name}\\}`, 'g')
+// The docs stage's own branch: a Stage the demo draws open, which the reader's usage never takes.
+const STAGE_BRANCH = /^if \(stage\) return <\w+[^\n]*\/>$/
+/** The names an import line binds, `as` left out: a side-effect import binds none and is always kept. */
+const bindingsOf = (line: string) => [...line.replace(/^import\s+/, '').replace(/\s+from\s+['"][^'"]+['"];?\s*$/, '').matchAll(/\w+/g)].map(([name]) => name).filter((name) => name !== 'as')
+
+/** Where the last `return ` outside a template literal starts, so a code sample passed as a child never reads as the demo's return. */
+function lastReturnOf(source: string): number {
+  let found = -1
+  let literal = false
+  for (let i = 0; i < source.length; i++) {
+    if (source[i] === '\\') i++
+    else if (source[i] === '`') literal = !literal
+    else if (!literal && source.startsWith('return ', i)) found = i
+  }
+  return found
+}
 
 /** Reads a dummy/playground.tsx whose default export only returns one JSX tree that spreads `props` or passes its props on by name. */
 export function usageOf(source: string): Usage | null {
   const signature = SIGNATURE.exec(source)
-  const start = source.lastIndexOf('return ')
+  const start = lastReturnOf(source)
   const end = source.lastIndexOf('}')
   if (signature === null || start === -1 || end < start) return null
   // A hook or a constant before the return is state the snippet would lose, so such a demo shows its whole source.
-  if (source.slice(signature.index + signature[0].length, start).trim() !== '') return null
+  const before = source.slice(signature.index + signature[0].length, start).trim()
+  if (before !== '' && !STAGE_BRANCH.test(before)) return null
   const body = source.slice(start + 'return '.length, end).trim().replace(/^\(\s*\n?/, '').replace(/\n?\s*\)$/, '')
-  const passed = (signature[1] ?? '').split(',').map((name) => name.trim()).filter((name) => /^\w+$/.test(name) && passThrough(name).test(body))
+  // A name with a default (`dismissible = true`) is passed on all the same.
+  const passed = (signature[1] ?? '').split(',').map((name) => name.split('=')[0]?.trim() ?? '').filter((name) => /^\w+$/.test(name) && passThrough(name).test(body))
   if (!SPREAD.test(body) && passed.length === 0) return null
   const lines = body.split('\n')
-  const indents = lines.slice(1).filter((line) => line.trim() !== '').map((line) => /^ */.exec(line)?.[0].length ?? 0)
+  // A line that opens inside a template literal is the sample's own text: its indent is not the tree's.
+  const opensInLiteral = lines.map((_, index) => (lines.slice(0, index).join('\n').match(/`/g) ?? []).length % 2 === 1)
+  const indents = lines.slice(1).filter((line, index) => line.trim() !== '' && !opensInLiteral[index + 1]).map((line) => /^ */.exec(line)?.[0].length ?? 0)
   // A multi-line tree's closing tag sits at the root's own indent, which the first line lost to the trim.
   const cut = indents.length > 0 ? Math.min(...indents) : 0
-  const jsx = lines.map((line, index) => (index === 0 ? line : line.slice(Math.min(cut, line.length - line.trimStart().length)))).join('\n')
-  return { imports: source.match(IMPORT) ?? [], jsx, passed }
+  const jsx = lines.map((line, index) => (index === 0 || opensInLiteral[index] ? line : line.slice(Math.min(cut, line.length - line.trimStart().length)))).join('\n')
+  // A type the demo needs for its own props, or a name only its Stage uses, is not one the reader's usage needs.
+  const imports = (source.match(IMPORT) ?? []).map((line) => line.replace(/,\s*type \w+/g, '').replace(/\{\s*type \w+,\s*/, '{ '))
+    .filter((line) => bindingsOf(line).length === 0 || bindingsOf(line).some((name) => new RegExp(`\\b${name}\\b`).test(jsx)))
+  return { imports, jsx, passed }
 }
 
 /** One JSX attribute as a reader would type it: `size="lg"`, `loading`, `fullWidth={false}`, `max={5}`. */
@@ -47,6 +71,19 @@ export function changedProps(values: Readonly<Record<string, PropValue>>, defaul
 }
 
 const attributeNamed = (name: string) => new RegExp(`(\\s)${name}=(?:\\{[^{}]*\\}|"[^"]*")`, 'g')
+
+/** The tag that holds the spread without its own value of a prop the spread now writes, bare or literal. */
+function withoutSpreadOwn(jsx: string, name: string): string {
+  const at = jsx.search(SPREAD)
+  if (at < 0) return jsx
+  const start = jsx.lastIndexOf('<', at)
+  // Quotes and braces blanked to the same length, so a class word or an expression never matches.
+  const blank = jsx.slice(start, at).replace(/"[^"]*"|\{[^{}]*\}/g, (part) => `${part[0] ?? ''}${' '.repeat(part.length - 2)}${part.at(-1) ?? ''}`)
+  const match = new RegExp(`\\s+${name}(?:=(?:\\{\\s*\\}|"\\s*"))?(?=[\\s/>]|$)`).exec(blank)
+  if (match === null) return jsx
+  const from = start + match.index
+  return `${jsx.slice(0, from)}${jsx.slice(from + match[0].length)}`
+}
 
 /** The root element's opening tag with every brace's contents blanked, so only its own attributes can match. */
 function rootTagOf(jsx: string): string {
@@ -75,7 +112,10 @@ export function snippetOf(usage: Usage, props: readonly [string, PropValue][]): 
     const root = rootTagOf(jsx)
     const literal = [...root.matchAll(attributeNamed(name))][0]
     if (passThrough(name).test(jsx)) jsx = jsx.replace(passThrough(name), attribute)
-    else if (literal === undefined) spread.push(attribute)
+    else if (literal === undefined) {
+      jsx = withoutSpreadOwn(jsx, name)
+      spread.push(attribute)
+    }
     else {
       // The blanked tag keeps every offset, so the match's place in it is its place in the tree.
       const start = literal.index + (literal[1]?.length ?? 0)
@@ -84,6 +124,29 @@ export function snippetOf(usage: Usage, props: readonly [string, PropValue][]): 
     }
   }
   jsx = usage.passed.reduce((tree, name) => tree.replace(passThrough(name), ''), jsx)
-  jsx = jsx.replace(/[ \t]+(\w+)=\{\1\}/g, '').replace(SPREAD, spread.join(''))
+  // A spread on a line of its own goes with its line when nothing takes its place.
+  if (spread.length === 0) jsx = jsx.replace(/\n[ \t]*\{\.\.\.props\}(?=\n)/, '')
+  else jsx = jsx.replace(/^([ \t]*)\{\.\.\.props\}$/m, (_, indent: string) => spread.map((attribute) => `${indent}${attribute.trim()}`).join('\n'))
+  // A pass-through on a line of its own goes with its line.
+  jsx = jsx.replace(/\n[ \t]*(\w+)=\{\1\}(?=\n)/g, '').replace(/[ \t]+(\w+)=\{\1\}/g, '').replace(SPREAD, spread.join(''))
   return usage.imports.length > 0 ? `${usage.imports.join('\n')}\n\n${jsx}` : jsx
+}
+
+const DOC_COMMENT = /^\/\*\*[\s\S]*?\*\/\n(?=export default function)/m
+const TYPE_IMPORT = /^import\s+type\b[^\n]*\n/gm
+
+/** A demo shown whole, as a reader would write it: no type imports, no docs comment, and the props the docs
+ * stage passes in taken out of the signature, the pass-throughs and the `name ?? fallback` reads. */
+export function cleanSourceOf(source: string): string {
+  const signature = SIGNATURE.exec(source)
+  const names = (signature?.[1] ?? '').split(',').map((name) => name.trim()).filter((name) => /^\w+$/.test(name))
+  let code = source.replace(TYPE_IMPORT, '').replace(DOC_COMMENT, '')
+  if (signature !== null && names.length > 0) {
+    code = code.replace(/(export default function \w+\()\s*\{[^}]*\}[^)]*\)/, '$1)')
+    for (const name of names) {
+      code = code.replace(new RegExp(`\\n[ \\t]*${name}=\\{${name}\\}(?=\\n)`, 'g'), '').replace(passThrough(name), '')
+      code = code.replace(new RegExp(`\\b${name} \\?\\? `, 'g'), '')
+    }
+  }
+  return code.replace(/\n{3,}/g, '\n\n')
 }

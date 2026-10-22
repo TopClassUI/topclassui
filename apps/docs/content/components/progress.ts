@@ -3,7 +3,7 @@ export const progress = {
   slug: 'progress',
   title: { en: 'Progress', ar: 'شريط التقدم' },
   description: {
-    en: 'How far along a task is: a neutral track with a bar in the tone, read by a screen reader as a progressbar from 0 to 100.',
+    en: 'A neutral track with a bar in the tone, read as a progressbar from 0 to 100.',
     ar: 'إلى أين وصلت المهمة: مسار محايد عليه شريط بلون النبرة، يقرؤه قارئ الشاشة شريطَ تقدم من 0 إلى 100.',
   },
   note: {
@@ -11,7 +11,9 @@ export const progress = {
     ar: 'لا يعرض أي نص ويحصر القيمة بين 0 و100، فسمِّه بـ aria-label أو aria-labelledby.',
   },
   demos: ['labelled', 'values', 'tones', 'sizes', 'indeterminate', 'file-row', 'custom-size', 'rtl'],
-  stageHeight: 3,
+  stageHeight: 17.875,
+  controlOrder: ['tone', 'size', 'value', 'indeterminate'],
+  starts: { value: 60 },
   notes: {
     en: [
       'For an upload, a quota or a step in a long job. `value` is a percentage, clamped to 0-100 before it reaches ARIA or the bar; for a custom range, use Meter.',

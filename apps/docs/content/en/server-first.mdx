@@ -1,7 +1,7 @@
 ---
 slug: server-first
 title: Server first
-description: A component ships JavaScript only when it has to listen for something. The rest add none.
+description: A component ships JavaScript only when it has to listen for something. Most of them never do.
 ---
 
 ## The three kinds
@@ -24,8 +24,14 @@ Only what React can serialise: strings, numbers, booleans, plain objects, arrays
 
 ```tsx
 // app/page.tsx - a Server Component
-<Command items={commands} getKey={(c) => c.id} getLabel={(c) => c.label} onSelect={run} />
-// getKey, getLabel and onSelect are functions: they cannot cross
+<Command
+  items={commands}
+  getKey={(c) => c.id}
+  getLabel={(c) => c.label}
+  onSelect={run}
+/>
+// getKey, getLabel and onSelect are functions:
+// they cannot cross
 ```
 
 ```tsx check
@@ -33,13 +39,17 @@ Only what React can serialise: strings, numbers, booleans, plain objects, arrays
 // the file that configures a palette is a client file
 import { Command } from 'topclassui/command'
 
-export function Search({ commands }: { commands: { id: string, label: string }[] }) {
+type Item = { id: string, label: string }
+
+export function Search({ commands }: { commands: Item[] }) {
   return (
     <Command
       items={commands}
       getKey={(command) => command.id}
       getLabel={(command) => command.label}
-      onSelect={(command) => { window.location.assign(`/docs/${command.id}`) }}
+      onSelect={(command) => {
+        window.location.assign(`/docs/${command.id}`)
+      }}
     />
   )
 }
@@ -49,7 +59,7 @@ export function Search({ commands }: { commands: { id: string, label: string }[]
 
 ## Why index.tsx has no hooks
 
-Markup lives in `index.tsx`, behaviour in `hook.ts`. `index.tsx` never contains `'use client'` and never imports `hook.ts`. A build check enforces it.
+Markup lives in index.tsx, behaviour in hook.ts. index.tsx never contains use client and never imports hook.ts. A build check enforces it.
 
 ```tsx title="index.tsx"
 // index.tsx - server
@@ -60,7 +70,7 @@ import { use } from 'react'     // allowed
 // useState, useEffect, useRef, useMemo, useCallback
 ```
 
-The two hooks a Server Component is allowed to call.
+<Caption>The two hooks a Server Component is allowed to call.</Caption>
 
 ## How a split component works
 
@@ -78,7 +88,7 @@ export function Tag({ onRemove, children, ...rest }: TagProps) {
 
 ## How sizes are checked
 
-Every client component has a size budget in `size-budget.json`: 6 KB gzipped for a simple control, 14 KB for an overlay, and Command and DatePicker load their heavy part on demand. `pnpm size` bundles each component's client entry with esbuild, minified, and gzips it. React and Base UI are left out of the number, because a page loads them once; the total with Base UI is recorded beside it. `pnpm size --check` runs in `pnpm check` and fails the build when a component goes over its budget.
+Every client component has a size budget: 6 KB gzipped for a simple control, 14 KB for an overlay. `pnpm size --check` fails the build when one is crossed; React and Base UI are left out, because a page loads them once.
 
 <Callout tone="info">The chips print the number `pnpm size` measured, so a chip cannot drift from the build.</Callout>
 
@@ -86,7 +96,7 @@ Every client component has a size budget in `size-budget.json`: 6 KB gzipped for
 
 Server-first comes with constraints. These are the ones you will notice.
 
-<Cards>
+<Cards columns={3}>
   <Card title="No onClick on a server component">A Button rendered on the server submits a form or follows a link. If it must run code in the browser, it lives in a client file.</Card>
   <Card title="A command palette needs a client file">`getKey`, `getLabel` and `onSelect` are functions, so Command must be configured in a file marked `'use client'`. Select and Combobox take plain data and render from a server file.</Card>
   <Card title="Some controls wait for hydration">Checkbox, Switch and Select submit their default value until JavaScript loads. Input and Textarea need no JavaScript at all.</Card>

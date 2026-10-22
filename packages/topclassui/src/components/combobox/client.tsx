@@ -2,15 +2,15 @@
 
 import { Combobox as Base } from '@base-ui/react/combobox'
 
-import { caretDown } from '#icons/data/caret-down.js'
+import { magnifyingGlass } from '#icons/data/magnifying-glass.js'
 import { spinner } from '#icons/data/spinner.js'
 import { FIELD_SIZE, FIELD_TEXT } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
 import { FLOATING, toSideAlign } from '#shared/floating.js'
 import { Svg } from '#components/svg/index.js'
 import {
-  COMBOBOX_ICON, COMBOBOX_INPUT, COMBOBOX_INPUT_END, COMBOBOX_NOTE, COMBOBOX_POPUP, COMBOBOX_POSITIONER, COMBOBOX_ROOT,
-  COMBOBOX_SPIN, COMBOBOX_WIDTH,
+  COMBOBOX_ICON, COMBOBOX_INPUT, COMBOBOX_INPUT_END, COMBOBOX_INPUT_START, COMBOBOX_NOTE, COMBOBOX_POPUP, COMBOBOX_POSITIONER,
+  COMBOBOX_ROOT, COMBOBOX_SEARCH, COMBOBOX_SPIN, COMBOBOX_WIDTH,
 } from './classes.js'
 import { COMBOBOX_DEFAULTS } from './constants.js'
 import { useCombobox } from './hook.js'
@@ -85,13 +85,14 @@ export function Combobox({
           aria-invalid={invalid ? true : ariaInvalid}
           aria-busy={combobox.busy || undefined}
           data-size={size}
-          className={cn(COMBOBOX_INPUT, FIELD_SIZE[size], COMBOBOX_INPUT_END, className)}
+          className={cn(COMBOBOX_INPUT, FIELD_SIZE[size], COMBOBOX_INPUT_START, COMBOBOX_INPUT_END, className)}
         />
-        <span aria-hidden className={COMBOBOX_ICON}>
-          {combobox.spinning
-            ? <span className={COMBOBOX_SPIN}><Svg icon={spinner} size="0.875rem" /></span>
-            : <Svg icon={caretDown} size="0.875rem" />}
-        </span>
+        <span aria-hidden className={COMBOBOX_SEARCH}><Svg icon={magnifyingGlass} size="0.875rem" /></span>
+        {combobox.spinning && (
+          <span aria-hidden className={COMBOBOX_ICON}>
+            <span className={COMBOBOX_SPIN}><Svg icon={spinner} size="0.875rem" /></span>
+          </span>
+        )}
         <Base.Portal container={container} keepMounted={keepMounted}>
           <Base.Positioner
             dir={combobox.dir}

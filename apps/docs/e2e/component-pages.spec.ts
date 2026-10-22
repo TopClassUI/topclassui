@@ -48,23 +48,25 @@ test('every code block shows the rewritten imports, never a path into the librar
   }
 })
 
-test('the Code tab of an example opens its source', async ({ page }) => {
+test('every example shows its stage and its source under it, with a Copy', async ({ page }) => {
   await page.goto('/en/docs/components/button')
-  const example = page.locator('section[aria-labelledby="examples"] [role="tablist"]').first()
-  await example.getByRole('tab', { name: 'Code' }).click()
-  await expect(page.getByRole('tabpanel').filter({ hasText: "from 'topclassui/button'" }).first()).toBeVisible()
+  const example = page.locator('section[aria-labelledby="examples"] article').first()
+  await expect(example.locator('pre')).toContainText("from 'topclassui/button'")
+  await expect(example.getByRole('button', { name: /Copy the .* code for Button/ })).toBeVisible()
 })
 
-test('Button: the playground drives the stage and the code', async ({ page }) => {
+test('Button: the stage draws the five variants, then the playground drives it and the code', async ({ page }) => {
   const errors = collectErrors(page)
   await page.goto('/en/docs/components/button')
   const button = card(page, 'button')
-  const stage = button.locator('button', { hasText: 'Save' })
+  const stageBox = button.locator('[style*="--tc-stage-height"]').first()
+  await expect(stageBox.getByRole('button')).toHaveCount(5)
+  const stage = stageBox.locator('button', { hasText: 'Save' })
   await expect(stage).toHaveAttribute('data-variant', 'solid')
   await button.getByRole('combobox', { name: 'variant' }).click()
   await page.getByRole('option', { name: 'soft', exact: true }).click()
   await expect(stage).toHaveAttribute('data-variant', 'soft')
-  await button.getByRole('switch', { name: 'loading' }).click()
+  await button.getByRole('checkbox', { name: 'loading' }).click()
   await expect(stage).toHaveAttribute('aria-busy', 'true')
   await expect(button.locator('pre').first()).toContainText('<Button variant="soft" loading>Save</Button>')
   expect(errors).toEqual([])
@@ -73,9 +75,15 @@ test('Button: the playground drives the stage and the code', async ({ page }) =>
 test('Tag: the playground drives the tone, in Arabic', async ({ page }) => {
   await page.goto('/ar/docs/components/tag')
   const tag = card(page, 'tag')
+  // At rest the stage is the frame's row of four tones and a removable danger tag, and THE CODE its row of topics; the first change swaps in the playground's tag.
+  const stageBox = tag.locator('[style*="--tc-stage-height"]').first()
+  await expect(stageBox.locator('[data-tone]')).toHaveCount(5)
+  await expect(stageBox.getByRole('button', { name: /danger/ })).toBeVisible()
+  await expect(tag.locator('pre').first()).toContainText('TOPICS.map')
   await tag.getByRole('combobox', { name: 'tone' }).click()
   await page.getByRole('option', { name: 'danger', exact: true }).click()
-  await expect(tag.locator('[data-tone="danger"]').first()).toBeVisible()
+  await expect(stageBox.locator('[data-tone]')).toHaveCount(1)
+  await expect(stageBox.locator('[data-tone]', { hasText: 'Design systems' })).toHaveAttribute('data-tone', 'danger')
   await expect(tag.locator('pre').first()).toContainText('tone="danger"')
 })
 
@@ -83,9 +91,10 @@ test('SegmentedControl: the client stage mounts near the viewport and takes the 
   const errors = collectErrors(page)
   await page.goto('/en/docs/components/segmented-control')
   const segmented = card(page, 'segmented-control')
+  // At rest the stage is the frame's colour mode track; the first Try it change swaps in the playground.
+  await expect(segmented.getByRole('radiogroup', { name: 'Colour mode', exact: true })).toBeVisible()
   const track = segmented.getByRole('radiogroup', { name: 'View' })
-  await expect(track).toBeVisible()
-  await segmented.getByRole('switch', { name: 'invalid' }).click()
+  await segmented.getByRole('checkbox', { name: 'invalid' }).click()
   await expect(track).toHaveAttribute('aria-invalid', 'true')
   await track.getByRole('radio', { name: 'Table' }).click()
   await expect(track.getByRole('radio', { name: 'Table' })).toHaveAttribute('aria-checked', 'true')
@@ -98,6 +107,18 @@ test('a live example hydrates: a segmented control in the examples answers a cli
   const radios = page.locator('section[aria-labelledby="examples"] [role="radiogroup"]').nth(2).getByRole('radio')
   await radios.nth(1).click()
   await expect(radios.nth(1)).toHaveAttribute('aria-checked', 'true')
+})
+
+test('Kbd: Try it presses and disables the three keys of the frame', async ({ page }) => {
+  await page.goto('/en/docs/components/kbd')
+  const kbd = card(page, 'kbd')
+  const stage = kbd.locator('[style*="--tc-stage-height"]').first()
+  await expect(stage.locator('kbd')).toHaveText(['Ctrl', 'Shift', 'K'])
+  await kbd.getByRole('checkbox', { name: 'pressed' }).click()
+  await expect(stage.locator('kbd[data-pressed]')).toHaveCount(3)
+  await kbd.getByRole('checkbox', { name: 'disabled' }).click()
+  await expect(stage.locator('kbd[data-disabled]')).toHaveCount(3)
+  await expect(kbd.locator('pre').first()).toContainText('<Kbd pressed disabled>')
 })
 
 test('Kbd: the keys of an English sentence keep its order on the Arabic page', async ({ page }) => {

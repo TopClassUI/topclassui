@@ -3,11 +3,13 @@ export const avatarGroup = {
   slug: 'avatar-group',
   title: { en: 'Avatar group', ar: 'مجموعة صور رمزية' },
   description: {
-    en: 'Overlapping avatars with a +N counter for the rest. Render every member; max is clamped from 1 to 20.',
-    ar: 'صور رمزية متداخلة مع عدّاد +N للبقية. اعرض كل الأعضاء؛ وتُحصر قيمة max بين 1 و20.',
+    en: 'Overlapping avatars with a +N counter; max is clamped to a safe range.',
+    ar: 'صور رمزية متداخلة مع عدّاد +N؛ وتُحصر max في نطاق آمن.',
   },
   demos: ['max', 'two', 'four', 'overflow', 'counts', 'sizes', 'linked', 'on-card', 'in-table', 'many', 'custom-size', 'rtl'],
-  stageHeight: 8,
+  stageHeight: 17.875,
+  stageDemo: 'overflow',
+  codeDemo: 'max',
   note: {
     en: 'max counts children, so render every member and let the group hide the overflow.',
     ar: 'تعدّ max العناصر الأبناء، فاعرض كل عضو ودع المجموعة تخفي الفائض.',

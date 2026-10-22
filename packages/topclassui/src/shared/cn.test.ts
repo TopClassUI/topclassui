@@ -15,6 +15,7 @@ describe('cn', () => {
 
   it('resolves the other custom spacing scales', () => {
     expect(cn('size-toggle-md', 'size-toggle-lg')).toBe('size-toggle-lg')
+    expect(cn('size-knob-md', 'size-knob-lg')).toBe('size-knob-lg')
     expect(cn('px-pad-x-sm', 'px-pad-x-xl')).toBe('px-pad-x-xl')
   })
 

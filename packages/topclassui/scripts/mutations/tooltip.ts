@@ -170,4 +170,16 @@ export const MUTATIONS: Mutation[] = [
     from: "'aria-describedby': state.open ? popupId : undefined",
     to: "'aria-describedby': popupId",
   },
+  {
+    label: 'the tooltip playground stops holding its stage open, so the docs stage draws the trigger with no tooltip at it',
+    file: 'src/components/tooltip/dummy/playground.tsx',
+    from: '<TooltipRoot open>',
+    to: '<TooltipRoot>',
+  },
+  {
+    label: 'the tooltip popup stops handing its container to the portal, so a tooltip drawn open in a box of its own lands in the body',
+    file: 'src/components/tooltip/client.tsx',
+    from: '<Base.Portal container={container} keepMounted={keepMounted}>',
+    to: '<Base.Portal keepMounted={keepMounted}>',
+  },
 ]

@@ -20,7 +20,9 @@ const AFTER: Record<string, string[]> = {
   row: ['3', '1'],
   rtl: ['‎-4', '١٬٢٣٥٫٥'],
   sizes: ['13', '13', '13', '13', '13'],
-  states: ['0', '13', '12', '12'],
+  combined: ['0', '13', '12', '12', '99'],
+  stage: ['13'],
+  states: ['13', '13', '13', '99', '13', '12'],
 }
 
 const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { default: ComponentType }).default

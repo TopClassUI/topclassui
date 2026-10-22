@@ -1,29 +1,23 @@
-import { Button } from '#components/button/index.js'
+import { checkCircle } from '#icons/data/check-circle.js'
+import { info } from '#icons/data/info.js'
+import { warning } from '#icons/data/warning.js'
+import { warningCircle } from '#icons/data/warning-circle.js'
+import { Svg } from '#components/svg/index.js'
 import { Alert } from '../index.js'
 
-/** Every state Alert draws: the three variants, the six tones, each slot left out, and actions. */
+const CELL = 'grid min-h-14 place-items-center'
+// The frame's small alert: 142 by 31 px, a 14 px icon and a 12 px title.
+const SMALL = 'w-35.5 px-2.25 py-1.75 **:text-xs/tight'
+
+/** The frame's strip, one equal cell a tone, each alert the same width and with its own icon so the message reads
+ * without colour. The variants and the slots left out have demos of their own. */
 export default function Demo() {
   return (
-    <div className="flex flex-col gap-3">
-      <Alert variant="soft" title="Soft">A tint of the tone.</Alert>
-      <Alert variant="solid" title="Solid">The full fill.</Alert>
-      <Alert variant="outline" title="Outline">A line in the tone colour.</Alert>
-      <Alert tone="primary" title="Primary">A new version is ready.</Alert>
-      <Alert tone="neutral" title="Neutral">Nothing has changed since Monday.</Alert>
-      <Alert tone="success" title="Success">The invoice was paid.</Alert>
-      <Alert tone="warning" title="Warning">The trial ends in three days.</Alert>
-      <Alert tone="danger" title="Danger">The last deploy failed.</Alert>
-      <Alert tone="info" title="Info">Maintenance starts at 22:00.</Alert>
-      <Alert title="Title only" />
-      <Alert>Description only, with no title above it.</Alert>
-      <Alert icon={null} title="No icon">The icon is left out.</Alert>
-      <Alert
-        tone="warning"
-        title="With actions"
-        actions={<Button size="sm" variant="outline" tone="warning">Remind me later</Button>}
-      >
-        Actions sit in a row under the description.
-      </Alert>
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] gap-4">
+      <div role="group" aria-label="info" className={CELL}><Alert tone="info" title="Saved" className={SMALL} icon={<Svg icon={info} size="0.875rem" />} /></div>
+      <div role="group" aria-label="success" className={CELL}><Alert tone="success" title="Saved" className={SMALL} icon={<Svg icon={checkCircle} size="0.875rem" />} /></div>
+      <div role="group" aria-label="warning" className={CELL}><Alert tone="warning" title="Saved" className={SMALL} icon={<Svg icon={warning} size="0.875rem" />} /></div>
+      <div role="group" aria-label="danger" className={CELL}><Alert tone="danger" title="Saved" className={SMALL} icon={<Svg icon={warningCircle} size="0.875rem" />} /></div>
     </div>
   )
 }

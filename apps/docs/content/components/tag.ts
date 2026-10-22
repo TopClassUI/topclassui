@@ -7,7 +7,9 @@ export const tag = {
     ar: 'شريحة تسمية لموضوع، تُعرض على الخادم. تمرير onRemove يضيف زر إزالة، وهو الجزء الوحيد الذي يعمل في المتصفح.',
   },
   demos: ['topics', 'tones', 'sizes', 'with-icon', 'removable', 'removable-sizes', 'link', 'long-label', 'element-label', 'custom-size', 'rtl'],
-  stageHeight: 20,
+  stageHeight: 19.4375,
+  stageDemo: 'stage',
+  codeDemo: 'topics',
   note: {
     en: 'A plain Tag stays on the server; `onRemove` is the switch that adds the x, and taking the tag out of the list is yours.',
     ar: 'الوسم العادي يبقى على الخادم، و`onRemove` هو ما يضيف زر الإزالة، وإخراج الوسم من القائمة مسؤوليتك.',

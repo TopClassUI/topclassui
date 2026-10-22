@@ -9,27 +9,39 @@ export type Control =
   | { prop: string; kind: 'slider'; min: number; max: number; step: number | null; default: number | null }
   | { prop: string; kind: 'number'; min: number | null; max: number | null; step: number | null; default: number | null }
 
-/** A segmented control up to this many values; a select above it. */
-export const SEGMENTED_MAX = 3
+/** An integer range up to this many steps is a fixed option set, a select as the Previewer frames draw visibleRows; a wider one is a slider. */
+export const SELECT_SPAN = 100
 /** A wider range is a guard rail (R-5.7-8), such as pageCount up to 2^53, which no slider can step through. */
 export const SLIDER_SPAN = 10_000
 
 const numberOrNull = (value: unknown) => (typeof value === 'number' ? value : null)
 
+/** A prop's schema, with the anyOf a union is written as, such as a number step or the word any. */
+export type PropSchema = JsonSchemaProp & { anyOf?: readonly (JsonSchemaProp & { const?: unknown })[] }
+
 /** One control for a prop, or null when the schema gives nothing a control can offer (a free string, a union). */
-export function controlOf(prop: string, schema: JsonSchemaProp): Control | null {
+export function controlOf(prop: string, schema: PropSchema): Control | null {
+  // A number or a word (step: 1 or 'any') is a select of its default and each word, as frame 135:1594 draws step.
+  const branches = schema.anyOf ?? []
+  const words = branches.flatMap((branch) => (typeof branch.const === 'string' ? [branch.const] : []))
+  if (typeof schema.default === 'number' && words.length > 0 && branches.some((branch) => branch.type === 'number' || branch.type === 'integer')) {
+    return { prop, kind: 'select', options: [schema.default, ...words], default: schema.default }
+  }
   if (schema.enum) {
     // R-5.7-2: `custom` emits no size classes, so the stage would show nothing to compare.
     const options = schema.enum.filter((value) => !(prop === 'size' && value === 'custom'))
     const value = schema.default
     const fallback = typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' ? value : null
-    return { prop, kind: options.length <= SEGMENTED_MAX ? 'segmented' : 'select', options, default: fallback }
+    return { prop, kind: 'select', options, default: fallback }
   }
   if (schema.type === 'boolean') return { prop, kind: 'switch', default: schema.default === true }
   if (schema.type === 'number' || schema.type === 'integer') {
     const step = schema.type === 'integer' ? 1 : null
     const value = numberOrNull(schema.default)
     const { minimum: min, maximum: max } = schema
+    if (schema.type === 'integer' && min !== undefined && max !== undefined && max - min <= SELECT_SPAN) {
+      return { prop, kind: 'select', options: Array.from({ length: max - min + 1 }, (_, index) => min + index), default: value }
+    }
     if (min !== undefined && max !== undefined && max - min <= SLIDER_SPAN) {
       return { prop, kind: 'slider', min, max, step, default: value }
     }
@@ -43,4 +55,26 @@ export function controlsOf(json: JsonSchemaObject): Control[] {
   return Object.entries(json.properties ?? {})
     .map(([prop, schema]) => controlOf(prop, schema))
     .filter((control) => control !== null)
+}
+
+/** The starting values a playground demo gives its own props in its signature, `{ dismissible = true, size = 'lg' }`:
+ * the stage opens as the demo draws it, so Try it starts there too, and the schema default only where the demo sets nothing. */
+export function demoStartsOf(source: string): Record<string, ControlValue> {
+  const params = /export default function \w+\(\s*\{([^}]*)\}/.exec(source)?.[1] ?? ''
+  const starts: Record<string, ControlValue> = {}
+  for (const [, name = '', raw = ''] of params.matchAll(/(\w+)\s*=\s*(true|false|-?\d+(?:\.\d+)?|'[^']*'|"[^"]*")/g)) {
+    starts[name] = raw === 'true' ? true : raw === 'false' ? false : /^-?\d/.test(raw) ? Number(raw) : raw.slice(1, -1)
+  }
+  return starts
+}
+
+/** The controls with each start the demo sets written in as the default. */
+export function withStarts(controls: readonly Control[], starts: Readonly<Record<string, ControlValue>>): Control[] {
+  return controls.map((control) => {
+    const start = starts[control.prop]
+    if (start === undefined) return control
+    if (control.kind === 'switch') return typeof start === 'boolean' ? { ...control, default: start } : control
+    if (control.kind === 'slider' || control.kind === 'number') return typeof start === 'number' ? { ...control, default: start } : control
+    return control.options.includes(start) ? { ...control, default: start } : control
+  })
 }

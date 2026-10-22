@@ -24,7 +24,11 @@ vi.mock('#components/dialog/client.js', () => references([
 vi.mock('#shared/provider/provider.js', () => ({ TopClassProvider: reference('TopClassProvider') }))
 
 const DUMMY = join(import.meta.dirname, '..', 'dummy')
-const names = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
+const every = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
+
+/** A demo that is itself a client file: it holds a ref, so a server page imports it as a reference and never runs it. */
+const isClient = (name: string) => readFileSync(join(DUMMY, `${name}.tsx`), 'utf8').startsWith("'use client'")
+const names = every.filter((name) => !isClient(name))
 
 interface Crossing { part: string, props: Props }
 
@@ -68,13 +72,15 @@ const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { 
 describe('every demo is a Server Component that only hands the parts what can cross (R-5.1-3)', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
     expect(names).toEqual([
-      'basic', 'danger-item', 'data-driven', 'groups', 'in-dialog', 'placements', 'playground', 'rtl', 'sixty-items',
-      'states', 'with-links',
+      'basic', 'danger-item', 'data-driven', 'groups', 'in-dialog', 'placements', 'rtl', 'sixty-items', 'with-links',
     ])
   })
 
-  it('none of them is a client file: a menu needs no state of the page to open', () => {
-    expect(names.filter((name) => readFileSync(join(DUMMY, `${name}.tsx`), 'utf8').startsWith("'use client'"))).toEqual([])
+  it('leaves out the two demos that are client files, which cannot run here: they draw a menu open in a box of their own, held by useRef', async () => {
+    expect(every.filter(isClient)).toEqual(['playground', 'states'])
+    const Demo = (await import('../dummy/playground.js') as { default: (props: Props) => ReactElement<Props> }).default
+    const staged = Demo({ stage: true })
+    expect(() => (staged.type as Part)(staged.props)).toThrow(/useRef/)
   })
 
   for (const name of names) {

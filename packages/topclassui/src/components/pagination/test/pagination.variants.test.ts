@@ -26,8 +26,8 @@ describe('paginationVariants is a cache, so it has to behave like a pure functio
 
   it('is the md cell of a page that is not current when nothing is passed', () => {
     expect(paginationVariants()).toBe(paginationVariants({ size: 'md', current: false }))
-    expect(paginationVariants().split(' ')).toContain('h-control-md')
-    expect(paginationVariants().split(' ')).toContain('border-line-strong')
+    expect(paginationVariants().split(' ')).toContain('h-control-xs')
+    expect(paginationVariants().split(' ')).toContain('border-line')
     expect(paginationVariants().split(' ')).not.toContain('bg-primary-solid')
   })
 

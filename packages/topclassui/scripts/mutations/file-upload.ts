@@ -140,10 +140,16 @@ export const MUTATIONS: Mutation[] = [
     to: '    void files',
   },
   {
-    label: 'the file upload drag look is a fill and a hue only: the line stays dashed',
+    label: 'the file upload drag turns the line solid outside forced colours too, where the frame keeps it dashed',
     file: CLASSES,
-    from: ' data-dragging:border-solid',
-    to: '',
+    from: ' data-dragging:border-primary-solid forced-colors:data-dragging:border-solid',
+    to: ' data-dragging:border-solid data-dragging:border-primary-solid',
+  },
+  {
+    label: 'the file upload prompt stacks browse under the drop words again',
+    file: CLASSES,
+    from: 'export const FILE_UPLOAD_PROMPT = `flex flex-wrap justify-center gap-x-1',
+    to: 'export const FILE_UPLOAD_PROMPT = `flex flex-col items-center gap-0.5',
   },
   {
     label: 'the file upload drag line is not Highlight under forced colours',

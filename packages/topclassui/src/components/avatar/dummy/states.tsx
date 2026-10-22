@@ -2,45 +2,31 @@ import { Svg } from '#components/svg/index.js'
 import { user } from '#icons/data/user.js'
 import { AvatarFallback, AvatarImage, AvatarRoot, AvatarSkeleton } from '../index.js'
 
-/** Inline, so the demo never reaches the network. */
-const PORTRAIT = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23475569'/%3E%3Ccircle cx='20' cy='15' r='7' fill='%23e2e8f0'/%3E%3Cpath d='M6 40a14 14 0 0 1 28 0z' fill='%23e2e8f0'/%3E%3C/svg%3E"
+/** Inline, so the demo never reaches the network: the picture Figma 137:461 draws, a white image glyph on primary blue-600. */
+const PICTURE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23155dfc'/%3E%3Cpath transform='translate%2810 10%29 scale%280.078125%29' d='M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,16V158.75l-26.07-26.06a16,16,0,0,0-22.63,0l-20,20-44-44a16,16,0,0,0-22.62,0L40,149.37V56ZM40,172l52-52,80,80H40Zm176,28H194.63l-36-36,20-20L216,181.38V200ZM144,100a12,12,0,1,1,12,12A12,12,0,0,1,144,100Z' fill='%23fff'/%3E%3C/svg%3E"
 
-/** Not a picture, so it fails the way a 404 does. */
-const FAILED = 'data:image/svg+xml,failed'
-
-/** Each state with its name under it: a picture, initials, an icon, a picture that failed, and loading. */
+/** One cell per state, named by its aria-label: the four Figma 137:461 draws; a picture that failed is the failed demo. */
 export default function Demo() {
   return (
-    <div className="flex flex-wrap items-start gap-6 text-sm text-muted">
-      <div className="grid justify-items-center gap-2">
-        <AvatarRoot size="lg">
-          <AvatarImage src={PORTRAIT} alt="Omar Abed" />
+    <div className="flex flex-wrap items-center gap-6">
+      <div role="group" aria-label="image">
+        <AvatarRoot>
+          <AvatarImage src={PICTURE} alt="Omar Abed" />
           <AvatarFallback>OA</AvatarFallback>
         </AvatarRoot>
-        <span>Image</span>
       </div>
-      <div className="grid justify-items-center gap-2">
-        <AvatarRoot size="lg" aria-label="Lina Haddad">
+      <div role="group" aria-label="initials">
+        <AvatarRoot aria-label="Lina Haddad">
           <AvatarFallback>LH</AvatarFallback>
         </AvatarRoot>
-        <span>Initials</span>
       </div>
-      <div className="grid justify-items-center gap-2">
-        <AvatarRoot size="lg" aria-label="Guest">
-          <AvatarFallback><Svg icon={user} /></AvatarFallback>
+      <div role="group" aria-label="icon">
+        <AvatarRoot aria-label="Guest">
+          <AvatarFallback><Svg icon={user} size="1.35em" /></AvatarFallback>
         </AvatarRoot>
-        <span>Icon</span>
       </div>
-      <div className="grid justify-items-center gap-2">
-        <AvatarRoot size="lg">
-          <AvatarImage src={FAILED} alt="Sara Khalil" />
-          <AvatarFallback>SK</AvatarFallback>
-        </AvatarRoot>
-        <span>Failed</span>
-      </div>
-      <div className="grid justify-items-center gap-2">
-        <AvatarSkeleton size="lg" />
-        <span>Loading</span>
+      <div role="group" aria-label="loading">
+        <AvatarSkeleton />
       </div>
     </div>
   )

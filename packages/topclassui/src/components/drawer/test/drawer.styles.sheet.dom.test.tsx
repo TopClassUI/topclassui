@@ -57,7 +57,7 @@ const SHEET = [
   ...RING_INSET,
   'bg-surface-raised', 'data-swiping:select-none', 'duration-(--tc-duration-slow)', 'ease-out', 'flex', 'flex-col',
   'overflow-y-auto', 'overscroll-contain', 'relative', 'scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))]',
-  'shadow-lg', 'text-body', 'transform-[translate(var(--drawer-swipe-movement-x,0px),var(--drawer-swipe-movement-y,0px))]',
+  'shadow-(--tc-shadow-overlay)', 'text-body', 'transform-[translate(var(--drawer-swipe-movement-x,0px),var(--drawer-swipe-movement-y,0px))]',
   'transition-transform', 'w-full', 'wrap-anywhere', 'border-line', '[scrollbar-color:var(--tc-scrollbar-thumb)_var(--tc-scrollbar-track)]', '[scrollbar-width:thin]',
 ]
 

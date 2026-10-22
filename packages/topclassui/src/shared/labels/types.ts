@@ -93,11 +93,14 @@ export interface Labels {
   }
   readonly toast: {
     readonly region: string
+    readonly stage: string
     readonly close: string
   }
   readonly command: {
     readonly label: string
     readonly placeholder: string
+    readonly escape: string
+    readonly enter: string
   }
   readonly navbar: {
     readonly label: string

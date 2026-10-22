@@ -3,11 +3,14 @@ export const dropdown = {
   slug: 'dropdown',
   title: { en: 'Dropdown menu', ar: 'قائمة منسدلة' },
   description: {
-    en: 'A menu of actions and links behind one button. Link rows are real anchors, so open in a new tab and middle-click work.',
-    ar: 'قائمة إجراءات وروابط خلف زر واحد. صفوف الروابط روابط حقيقية، فيعمل الفتح في علامة تبويب جديدة والنقر بالزر الأوسط.',
+    en: 'Menu whose links render real anchors, so open-in-new-tab and middle-click work.',
+    ar: 'قائمة تُعرض عناصر روابطها روابطَ حقيقية، فيعمل الفتح في علامة تبويب جديدة والنقر بالزر الأوسط.',
   },
   demos: ['basic', 'groups', 'danger-item', 'with-links', 'data-driven', 'placements', 'sixty-items', 'in-dialog', 'rtl'],
-  stageHeight: 12,
+  stageHeight: 19.4375,
+  controlOrder: ['placement'],
+  controlsHidden: ['delay', 'closeDelay', 'tone'],
+  stageOpen: true,
   note: {
     en: '`href` and Server Action items work from a server page; `onSelect` is a plain function and needs a client file.',
     ar: 'عناصر `href` وإجراء الخادم تعمل من صفحة خادم؛ أما `onSelect` فدالة عادية تحتاج ملف عميل.',

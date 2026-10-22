@@ -16,7 +16,7 @@ const examplesOf = (page: Page) => page.locator('section[aria-labelledby="exampl
 async function openCard(page: Page, slug: string) {
   const scope = card(page, slug)
   await scope.scrollIntoViewIfNeeded()
-  await expect(scope.getByRole('switch', { name: 'invalid', exact: true }).or(scope.getByRole('switch', { name: 'readOnly', exact: true }))).toBeVisible()
+  await expect(scope.getByRole('checkbox', { name: 'invalid', exact: true }).or(scope.getByRole('checkbox', { name: 'readOnly', exact: true }))).toBeVisible()
   return scope
 }
 
@@ -65,7 +65,7 @@ test('every live example on a Forms page is hydrated by React', async ({ page })
       const end = section.getBoundingClientRect().bottom + window.scrollY
       for (let y = section.getBoundingClientRect().top + window.scrollY; y < end; y += window.innerHeight) {
         window.scrollTo({ top: y, behavior: 'instant' })
-        await new Promise((resolve) => setTimeout(resolve, 50))
+        await new Promise((resolve) => setTimeout(resolve, 150))
       }
     })
     await page.waitForLoadState('networkidle')
@@ -106,7 +106,7 @@ for (const slug of SLUGS.filter((name) => name !== 'rating')) {
       await expect(stage.locator('[data-size="lg"]').first()).toBeAttached()
     }
     await expect(stage.locator('[aria-invalid="true"]')).toHaveCount(0)
-    await scope.getByRole('switch', { name: 'invalid', exact: true }).click()
+    await scope.getByRole('checkbox', { name: 'invalid', exact: true }).click()
     await expect(stage.locator('[aria-invalid="true"]').first()).toBeAttached()
     await expect(scope.locator('pre').first()).toContainText(sized ? 'size="lg" invalid' : ' invalid')
     expect(errors).toEqual([])
@@ -119,13 +119,13 @@ test('rating: the playground turns the read-only stars into radios and back on t
   const scope = await openCard(page, 'rating')
   const stage = stageOf(scope)
   await expect(stage.getByRole('radio')).toHaveCount(0)
-  await scope.getByRole('switch', { name: 'readOnly', exact: true }).click()
+  await scope.getByRole('checkbox', { name: 'readOnly', exact: true }).click()
   await expect(stage.getByRole('radio')).toHaveCount(5)
   await stage.getByRole('radio').nth(4).check({ force: true })
   await expect(stage.getByRole('radio').nth(4)).toBeChecked()
   await pick(page, scope, 'size', 'xl')
   await expect(stage.locator('[data-size="xl"]').first()).toBeAttached()
-  await scope.getByRole('switch', { name: 'readOnly', exact: true }).click()
+  await scope.getByRole('checkbox', { name: 'readOnly', exact: true }).click()
   await expect(stage.getByRole('radio')).toHaveCount(0)
   expect(errors).toEqual([])
 })
@@ -133,7 +133,8 @@ test('rating: the playground turns the read-only stars into radios and back on t
 test('switch: the stage answers a click on the Arabic page', async ({ page }) => {
   await page.goto('/ar/docs/components/switch')
   const scope = await openCard(page, 'switch')
-  const control = stageOf(scope).getByRole('switch')
+  // The stage draws the frame's pair, off then on; the on one is pressed.
+  const control = stageOf(scope).getByRole('switch', { name: 'On', exact: true })
   await expect(control).toHaveAttribute('aria-checked', 'true')
   await control.click()
   await expect(control).toHaveAttribute('aria-checked', 'false')

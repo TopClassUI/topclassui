@@ -51,7 +51,6 @@ describe('the box', () => {
   it('rings while the input inside it has the focus, and dims as a whole when disabled', () => {
     expect(selectorLine('has-focus-visible:outline-solid')).toBe('.has-focus-visible\\:outline-solid:has(:focus-visible)')
     expect(ruleOf(`${selectorOf('data-disabled:opacity-50')}[data-disabled]`)).toBe('opacity: 50%;')
-    expect(ruleOf(`${selectorOf('data-readonly:bg-neutral-soft')}[data-readonly]`)).toBe('background-color: var(--tc-neutral-soft);')
   })
 
   it('dims as a whole when a disabled fieldset disables its input, and not when only a stepper at its limit is disabled', () => {
@@ -74,8 +73,8 @@ describe('the input and the steppers', () => {
     expect(ruleOf(selectorOf('tabular-nums'))).toContain('--tw-numeric-spacing: tabular-nums;')
   })
 
-  it('a stepper is square but gives way to its floor before it is cut, and keeps full opacity inside a disabled box', () => {
-    expect(ruleOf(selectorOf('aspect-square'))).toBe('aspect-ratio: 1 / 1;')
+  it('a stepper is four fifths as wide as tall but gives way to its floor before it is cut, and keeps full opacity inside a disabled box', () => {
+    expect(ruleOf(selectorOf('aspect-4/5'))).toBe('aspect-ratio: 4/5;')
     expect(ruleOf(selectorOf('shrink'))).toBe('flex-shrink: 1;')
     expect(NUMBER_FIELD_STEP.split(' ')).not.toContain('shrink-0')
     expect(selectorLine('group-data-disabled/number:disabled:opacity-100')).toMatch(/:is\(:where\(\.group\\\/number\)\[data-disabled\] \*\):disabled$/)

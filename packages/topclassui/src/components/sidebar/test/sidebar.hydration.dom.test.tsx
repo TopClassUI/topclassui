@@ -109,12 +109,12 @@ describe('a server-rendered rail hydrates cleanly', () => {
 /** The state of each rail of each demo, in document order, as the server sends it. */
 const RAILS: Record<string, string[]> = {
   'basic': ['open'], 'collapsed': ['closed'], 'controlled': ['open'], 'groups': ['open'], 'in-a-layout': ['open'],
-  'long-list': ['open'], 'playground': ['open'], 'rtl': ['open'], 'states': ['open', 'closed'],
+  'long-list': ['open'], 'playground': ['open'], 'rtl': ['open'], 'stage': ['open'], 'states': ['open', 'closed', 'open', 'open', 'open'],
 }
 
 describe('every demo renders and hydrates', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(DEMOS.map(([name]) => name)).toEqual(['basic', 'collapsed', 'controlled', 'groups', 'in-a-layout', 'long-list', 'playground', 'rtl', 'states'])
+    expect(DEMOS.map(([name]) => name)).toEqual(['basic', 'collapsed', 'controlled', 'groups', 'in-a-layout', 'long-list', 'playground', 'rtl', 'stage', 'states'])
     expect(Object.keys(RAILS)).toEqual(DEMOS.map(([name]) => name))
   })
 

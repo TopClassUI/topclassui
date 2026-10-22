@@ -20,10 +20,7 @@ const BUTTONS: Record<string, string[]> = {
   'playground': ['Show a toast'],
   'promise': ['Upload', 'Upload and fail'],
   'rtl': ['دعوة'],
-  'states': [
-    'Neutral', 'Primary', 'Success', 'Warning', 'Danger', 'Info',
-    'With description', 'With action', 'Sticky', 'High priority', 'Loading',
-  ],
+  'states': [],
   'sticky': ['Go offline'],
   'tall-page': ['Go offline', 'Read about Install', 'Read about Usage', 'Read about Theming', 'Read about Questions'],
   'tones': ['Neutral', 'Primary', 'Success', 'Warning', 'Danger', 'Info'],
@@ -47,4 +44,25 @@ describe('the demos', () => {
       expect(html).not.toContain('role="region"')
     })
   }
+})
+
+describe('the states demo', () => {
+  it('is the frame\'s strip: one captioned cell a state, drawn in place and never as a live region', async () => {
+    const Demo = await load('states')
+    const html = markup(<Demo />)
+    expect([...html.matchAll(/<div role="group" aria-label="([^"]+)"/g)].map((m) => m[1]))
+      .toEqual(['success', 'error', 'loading', 'stacked', 'entering', 'limited'])
+    expect(html).not.toMatch(/role="(region|status|alert|dialog)"/)
+  })
+})
+
+describe('the playground demo', () => {
+  it('is the button alone by default, and with stage the button at the start beside a centred stage, its toast added only once mounted', async () => {
+    const Demo = (await import('../dummy/playground.js')).default as ComponentType<{ stage?: boolean }>
+    expect(markup(<Demo />)).toMatch(/^<button /)
+    const staged = markup(<Demo stage />)
+    expect(staged).toMatch(/^<div class="relative grid min-h-67.75 w-full place-items-center"><div class="absolute top-0 inset-s-0"><button /)
+    expect(staged).toContain('<div class="relative isolate h-25 w-full max-w-88">')
+    expect(staged).not.toContain('Project created')
+  })
 })

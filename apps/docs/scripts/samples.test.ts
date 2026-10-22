@@ -8,6 +8,11 @@ import { checkedSamples, compileSamples, programsOf, samplesOf } from './lib/sam
 const APP = resolve(import.meta.dirname, '..')
 
 describe('checkedSamples', () => {
+  it('compiles only the checklines range of a fence that holds two files', () => {
+    const mdx = '```ts check checklines="3-4"\n// a.ts\nimport x from "missing"\n// b.ts\nconst b = 2\n```\n'
+    expect(checkedSamples('en/x.mdx', mdx)).toEqual([{ file: 'en/x.mdx', index: 0, lang: 'ts', title: null, code: '// b.ts\nconst b = 2\n' }])
+  })
+
   it('takes only the fences marked check', () => {
     const mdx = '```tsx title="a.tsx" check\nconst a = 1\n```\n\n```tsx title="check.tsx"\nconst b = 2\n```\n'
     expect(checkedSamples('en/x.mdx', mdx)).toEqual([{ file: 'en/x.mdx', index: 0, lang: 'tsx', title: 'a.tsx', code: 'const a = 1\n' }])
@@ -17,37 +22,31 @@ describe('checkedSamples', () => {
 describe('the live guide pages', () => {
   const samples = samplesOf(resolve(APP, 'content'), LIVE_GUIDES.map((page) => page.slug), LOCALES)
 
-  it('hold thirty samples marked check: six on the getting-started pages and nine on the foundation pages, in each locale', () => {
+  it('hold twenty-four samples marked check: five on the getting-started pages and seven on the foundation pages, in each locale', () => {
     expect(samples.map((sample) => `${sample.file} ${sample.title ?? ''}`)).toEqual([
-      'en/installation.mdx src/icons.ts',
+      'en/installation.mdx ',
       'en/provider.mdx app/[locale]/layout.tsx',
       'en/first-component.mdx app/subscribe/actions.ts',
       'en/first-component.mdx app/subscribe/page.tsx',
       'en/first-component.mdx app/subscribe/subscribe-form.tsx',
-      'en/first-component.mdx app/subscribe/page.tsx',
       'en/icons.mdx ',
       'en/icons.mdx my-logo.tsx',
       'en/theming.mdx ',
       'en/rtl.mdx app/layout.tsx',
-      'en/rtl.mdx ',
+      'en/rtl.mdx right',
       'en/server-first.mdx ',
-      'en/accessibility.mdx save-button.tsx',
-      'en/accessibility.mdx home-link.tsx',
       'en/accessibility.mdx ',
-      'ar/installation.mdx src/icons.ts',
+      'ar/installation.mdx ',
       'ar/provider.mdx app/[locale]/layout.tsx',
       'ar/first-component.mdx app/subscribe/actions.ts',
       'ar/first-component.mdx app/subscribe/page.tsx',
       'ar/first-component.mdx app/subscribe/subscribe-form.tsx',
-      'ar/first-component.mdx app/subscribe/page.tsx',
       'ar/icons.mdx ',
       'ar/icons.mdx my-logo.tsx',
       'ar/theming.mdx ',
       'ar/rtl.mdx app/layout.tsx',
-      'ar/rtl.mdx ',
+      'ar/rtl.mdx right',
       'ar/server-first.mdx ',
-      'ar/accessibility.mdx save-button.tsx',
-      'ar/accessibility.mdx home-link.tsx',
       'ar/accessibility.mdx ',
     ])
   })
@@ -56,8 +55,8 @@ describe('the live guide pages', () => {
     expect(compileSamples(APP, samples)).toEqual([])
   })
 
-  it('compile the step 2 page.tsx too, which step 4 replaces under the same title', () => {
-    expect(programsOf(APP, samples)).toHaveLength(3)
+  it('compile every sample in one program, since no later sample of the same title hides an earlier one', () => {
+    expect(programsOf(APP, samples)).toHaveLength(1)
   })
 
   it('fail an earlier sample that a later one of the same title would hide', () => {

@@ -35,7 +35,7 @@ is a real link, so it works with no JavaScript and a crawler follows it.
 
 - **Arabic.** `{...getLabels('ar')}` passes `labels` and `locale`; the four carets flip in RTL.
 - **A bad page in the URL.** `value` is clamped for what is shown, so `?page=999` of 12 shows page 12. Query that same page with `clampPage(Number(page), pageCount)`, exported beside `Pagination`.
-- **A narrow screen.** The row wraps instead of scrolling. One row needs up to 480 px by default (11 cells), 392 px with `siblingCount={0}`, and 304 px with `boundaryCount={0}` as well. Cells are 44 px on a touch screen, so 520, 428 and 328 px there. On a phone pass both; a 320 px screen still wraps once.
+- **A narrow screen.** Below 36rem of width, or under a coarse pointer whatever the width, the row turns compact: First, Previous, "3 of 12", Next and Last on one line, each control a 44 px target on a touch screen. The page links stay in the HTML, hidden, so a crawler still follows every one; Next and Previous reach every page. The width is the list's own (a container query), so a pager in a narrow column turns compact on a wide screen too. Placed in a flex row, give the `<nav>` a width (`flex-1` or `w-full`): a container takes none from its content.
 - **Alignment.** `className` lands on the `<nav>`; `className="[&>ul]:justify-end"` moves the row to the end.
 - **Size.** `md` is 40 px, the height of a Button; `size="sm"` is the 32 px cell of the design.
 - **`rel`.** The previous and next links carry `rel="prev"` and `rel="next"`. On the first and on the last page that control is disabled and has no `href`.
@@ -59,6 +59,7 @@ Required: `getHref`, `pageCount`, `value`. Every other prop below is optional.
 | `pageCount` | **yes** | `integer`, min 1, max 9007199254740991 | - | How many pages there are; a fraction is rounded up and anything below 1 is one page. |
 | `value` | **yes** | `integer`, min 1, max 9007199254740991 | - | The current page, counted from 1; anything outside 1 to pageCount is clamped. |
 | `boundaryCount` | no | `integer`, min 0, max 3 | `1` | How many pages always show at each end of the list; clamped to 0-3. |
+| `disabled` | no | `boolean` | `false` | Every cell is dimmed and none is a link, the current page included. |
 | `labels` | no | `Labels` | - | The built-in strings: the name of the nav, of each page and of the four icon links. Defaults to English. |
 | `link` | no | `ReactElement` | - | The element every link is cloned from, such as `link={<Link href="" />}`; its href is replaced. |
 | `locale` | no | `string` | - | The locale the page numbers are formatted in. Defaults to `en`. |

@@ -32,10 +32,14 @@ export interface TimelineProps<T extends TimelineItem = TimelineItem>
   items: readonly T[]
   /** A stable identity for each item, which becomes its React key. */
   getKey: (item: T) => string
-  /** Rendered in place of the list while `items` is empty. Without it, nothing renders. */
+  /** Rendered in place of the list while `items` is empty. Defaults to the tray and `labels.state.empty`, muted; `null` renders nothing. */
   emptyFallback?: ReactNode | undefined
   /** The built-in strings, which name each status. Defaults to English; pass `getLabels(locale).labels` for another. */
   labels?: Labels | undefined
   /** Accepted so `{...getLabels(locale)}` spreads cleanly. Nothing here formats a number, so it is not used and never reaches the element. */
   locale?: string | undefined
 }
+
+/** A skeleton draws three rows of its own, so it takes no children. It is hidden from the accessibility tree. */
+export type TimelineSkeletonProps =
+  Omit<ComponentPropsWithRef<'div'>, 'children' | 'dangerouslySetInnerHTML' | 'aria-hidden'>

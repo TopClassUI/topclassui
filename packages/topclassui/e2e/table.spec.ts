@@ -311,8 +311,8 @@ test('a sort header that wraps is no taller than its lines: the link sits on the
   const wrapped = await measure()
 
   expect(wrapped.link, 'the header did not wrap, so this measured nothing').toBeGreaterThan(oneLine.link + 12)
-  // 20 px of cell padding less the 8 px the link gives back: on the baseline the wrapped row was 16 px more, not 12.
-  expect([oneLine.row - oneLine.link, wrapped.row - wrapped.link]).toEqual([12, 12])
+  // 16 px of cell padding less the 8 px the link gives back: on the baseline the wrapped row was 12 px more, not 8.
+  expect([oneLine.row - oneLine.link, wrapped.row - wrapped.link]).toEqual([8, 8])
 })
 
 type Sides = Record<'top' | 'bottom' | 'left' | 'right', number>

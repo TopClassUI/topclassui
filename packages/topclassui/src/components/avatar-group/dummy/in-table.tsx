@@ -12,10 +12,10 @@ const PROJECTS: Project[] = [
   { id: 'search', name: 'Search migration', members: 20, due: '30 Jun 2026' },
 ]
 
-/** Every member is rendered, and the group shows four and counts the rest. The ring takes
- * the colour of the table, which is a raised surface as a Card is. */
+/** Every member is rendered, and the group shows four and counts the rest. The ring is the
+ * avatar's own fill, so the table needs no class for it. */
 const team = (project: Project, placed: string) => (
-  <AvatarGroup className="*:ring-surface-raised" aria-label={`${project.name}: ${placed}`}>
+  <AvatarGroup aria-label={`${project.name}: ${placed}`}>
     {Array.from({ length: project.members }, (_, index) => (
       <AvatarRoot key={index} aria-label={`Member ${String(index + 1)}`}>
         <AvatarFallback>{INITIALS[index % INITIALS.length] ?? 'OA'}</AvatarFallback>

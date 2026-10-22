@@ -136,12 +136,14 @@ Anything else is passed to the element each part draws, so standard attributes (
 ## Examples
 
 - `dummy/basic.tsx`
+- `dummy/combined.tsx`
 - `dummy/form.tsx`
 - `dummy/horizontal.tsx`
 - `dummy/long-content.tsx`
 - `dummy/playground.tsx`
 - `dummy/rtl.tsx`
 - `dummy/sizes.tsx`
+- `dummy/stage.tsx`
 - `dummy/states.tsx`
 
 ## Verified against

@@ -51,10 +51,12 @@ export function TooltipTrigger<Payload>({
   )
 }
 
-/** The portal, positioner, popup and arrow in one part. Rest props reach the popup;
- * the positioner takes none, so the placement and the collision rule stay ours. */
+/** The portal, positioner, popup and arrow in one part. Rest props reach the popup, container and
+ * keepMounted the portal; the positioner takes none, so the placement and the collision rule stay ours. */
 export function TooltipPopup({
   placement = TOOLTIP_DEFAULTS.placement,
+  container,
+  keepMounted,
   className,
   children,
   ...rest
@@ -62,7 +64,7 @@ export function TooltipPopup({
   const { side, align } = toSideAlign(placement)
   const { dir, lang, id } = useTooltipPopup(rest.id)
   return (
-    <Base.Portal>
+    <Base.Portal container={container} keepMounted={keepMounted}>
       <Base.Positioner
         dir={dir}
         lang={lang}

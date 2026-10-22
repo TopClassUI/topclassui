@@ -7,13 +7,13 @@ export default function Demo() {
   return (
     <div className="flex flex-wrap items-center gap-3">
       <AvatarRoot size="sm" aria-label="Guest">
-        <AvatarFallback><Svg icon={user} /></AvatarFallback>
+        <AvatarFallback><Svg icon={user} size="1.35em" /></AvatarFallback>
       </AvatarRoot>
       <AvatarRoot aria-label="Guest">
-        <AvatarFallback><Svg icon={user} /></AvatarFallback>
+        <AvatarFallback><Svg icon={user} size="1.35em" /></AvatarFallback>
       </AvatarRoot>
       <AvatarRoot size="xl" aria-label="Guest">
-        <AvatarFallback><Svg icon={user} /></AvatarFallback>
+        <AvatarFallback><Svg icon={user} size="1.35em" /></AvatarFallback>
       </AvatarRoot>
     </div>
   )

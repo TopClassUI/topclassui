@@ -65,7 +65,7 @@ describe('DropdownItem', () => {
     await popup(<DropdownItem>Profile</DropdownItem>)
     const list = classes(row('Profile'))
     for (const cls of [
-      'flex', 'min-h-(--tc-row-height)', 'w-full', 'items-center', 'gap-2', 'rounded-control', 'px-3', 'text-sm', 'outline-none',
+      'flex', 'min-h-(--tc-row-height)', 'w-full', 'items-center', 'gap-2', 'rounded-control', 'px-2.5', 'text-sm', 'outline-none',
       'data-highlighted:bg-primary-soft', 'data-highlighted:text-primary-on-soft', 'forced-colors:data-highlighted:bg-[Highlight]',
       'max-w-full', 'group', 'shrink-0', 'cursor-pointer', 'data-disabled:cursor-default', 'select-none', 'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]',
     ]) expect(list, cls).toContain(cls)
@@ -111,7 +111,7 @@ describe('DropdownItem', () => {
     expect(item.getAttribute('data-testid')).toBe('r')
     expect(item.style.getPropertyValue('--tc-radius')).toBe('0px')
     expect(classes(item)).toContain('px-6')
-    expect(classes(item)).not.toContain('px-3')
+    expect(classes(item)).not.toContain('px-2.5')
     expect(classes(item)).not.toContain('text-sm')
   })
 
