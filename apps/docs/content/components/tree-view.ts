@@ -3,11 +3,12 @@ export const treeView = {
   slug: 'tree-view',
   title: { en: 'Tree view', ar: 'عرض شجري' },
   description: {
-    en: 'Nodes in levels that open and close. Open branches flatten into one windowed list, so 10,000 nodes stay fast.',
+    en: 'Nodes that open and close, flattened into one windowed list: 10,000 stay fast.',
     ar: 'عقد في مستويات تُفتح وتُغلق. الفروع المفتوحة تُسطَّح في قائمة واحدة تعرض ما يظهر فقط، فتبقى 10,000 عقدة سريعة.',
   },
   demos: ['basic', 'selected', 'load-more', 'status', 'ten-thousand', 'long-content', 'rtl'],
-  stageHeight: 22,
+  stageHeight: 19.4375,
+  stageDemo: 'stage',
   controlOrder: ['visibleRows'],
   controlsHidden: ['loadMoreThreshold'],
   note: {

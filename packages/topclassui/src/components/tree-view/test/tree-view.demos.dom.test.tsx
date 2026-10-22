@@ -20,6 +20,7 @@ const AFTER: Record<string, (string | null)[]> = {
   'rtl': ['ملاحظات.txt'],
   'selected': ['next.config.ts'],
   // The collapsed tree's src, then file2 in each of the three open trees.
+  'stage': ['input'],
   'states': ['src', 'file2', 'file2', 'file2'],
   'status': [],
   'ten-thousand': ['File 10000.ts'],
