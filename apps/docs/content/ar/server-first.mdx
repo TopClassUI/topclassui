@@ -78,7 +78,7 @@ export function Tag({ onRemove, children, ...rest }: TagProps) {
 
 ## كيف تُفحص الأحجام
 
-لكل مكوّن يعمل في المتصفح ميزانية حجم في <span dir="ltr">`size-budget.json`</span>: <span dir="ltr">6 KB</span> مضغوطة لعنصر التحكم البسيط، و<span dir="ltr">14 KB</span> للطبقة المنبثقة، ويحمّل <span dir="ltr">`Command`</span> و<span dir="ltr">`DatePicker`</span> جزأهما الثقيل عند الطلب. يجمع الأمر <span dir="ltr">`pnpm size`</span> مدخل المتصفح لكل مكوّن بأداة <span dir="ltr">esbuild</span> مصغّرًا ثم يضغطه. لا يدخل <span dir="ltr">React</span> ولا <span dir="ltr">Base UI</span> في الرقم، لأن الصفحة تحمّلهما مرة واحدة؛ ويُسجَّل المجموع مع <span dir="ltr">Base UI</span> بجانبه. يعمل <span dir="ltr">`pnpm size --check`</span> ضمن <span dir="ltr">`pnpm check`</span> ويُفشل البناء حين يتجاوز مكوّن ميزانيته.
+لكل مكوّن يعمل في المتصفح ميزانية حجم: <span dir="ltr">6 KB</span> مضغوطة لعنصر التحكم البسيط، و<span dir="ltr">14 KB</span> للطبقة المنبثقة. يُفشل <span dir="ltr">`pnpm size --check`</span> البناء حين تُتجاوز إحداها؛ ولا يدخل <span dir="ltr">React</span> ولا <span dir="ltr">Base UI</span> في الرقم، لأن الصفحة تحمّلهما مرة واحدة.
 
 <Callout tone="info">تطبع الشارات الرقم الذي قاسه <span dir="ltr">`pnpm size`</span>، فلا تنحرف الشارة عن البناء.</Callout>
 
@@ -86,7 +86,7 @@ export function Tag({ onRemove, children, ...rest }: TagProps) {
 
 يأتي مبدأ الخادم أولًا ببعض القيود، وهذه هي القيود التي ستلاحظها.
 
-<Cards>
+<Cards columns={3}>
   <Card title="لا يوجد onClick في مكوّن الخادم">الزر الذي يُعرض على الخادم يرسل نموذجًا أو يتبع رابطًا. وإن كان لا بد أن ينفّذ شيفرة في المتصفح، فمكانه ملف عميل.</Card>
   <Card title="لوحة الأوامر تحتاج إلى ملف عميل"><span dir="ltr">`getKey`</span> و<span dir="ltr">`getLabel`</span> و<span dir="ltr">`onSelect`</span> دوال، لذا يجب إعداد <span dir="ltr">`Command`</span> في ملف يبدأ بـ <span dir="ltr">`'use client'`</span>. أما <span dir="ltr">`Select`</span> و<span dir="ltr">`Combobox`</span> فيأخذان بيانات بسيطة ويُعرضان من ملف خادم.</Card>
   <Card title="بعض عناصر التحكم تنتظر الترطيب">ترسل <span dir="ltr">`Checkbox`</span> و<span dir="ltr">`Switch`</span> و<span dir="ltr">`Select`</span> قيمتها الافتراضية إلى أن يُحمَّل <span dir="ltr">JavaScript</span>. أما <span dir="ltr">`Input`</span> و<span dir="ltr">`Textarea`</span> فلا يحتاجان إلى <span dir="ltr">JavaScript</span> إطلاقًا.</Card>

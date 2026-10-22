@@ -6,6 +6,10 @@ import { TocList } from './shell-islands'
 export interface TocEntry {
   text: string
   id: string
+  /** The small capitals the entry opens, as the catalog groups START HERE and SECTIONS. */
+  group?: string | undefined
+  /** A number read after the text, at the end of its row: a section's card count. */
+  count?: number | undefined
 }
 
 /** The page's `##` headings, sticky, hidden under 80rem; the list loads its scroll spy once it is in view. TODO(tc): TableOfContents (choice 13). */

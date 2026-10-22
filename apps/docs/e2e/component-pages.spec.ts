@@ -75,9 +75,14 @@ test('Button: the stage draws the five variants, then the playground drives it a
 test('Tag: the playground drives the tone, in Arabic', async ({ page }) => {
   await page.goto('/ar/docs/components/tag')
   const tag = card(page, 'tag')
+  // At rest the stage is the frame's row of tones and THE CODE its row of topics; the first change swaps in the playground's tag.
+  const stageBox = tag.locator('[style*="--tc-stage-height"]').first()
+  await expect(stageBox.locator('[data-tone]')).toHaveCount(6)
+  await expect(tag.locator('pre').first()).toContainText('TOPICS.map')
   await tag.getByRole('combobox', { name: 'tone' }).click()
   await page.getByRole('option', { name: 'danger', exact: true }).click()
-  await expect(tag.locator('[data-tone="danger"]').first()).toBeVisible()
+  await expect(stageBox.locator('[data-tone]')).toHaveCount(1)
+  await expect(stageBox.locator('[data-tone]', { hasText: 'Design systems' })).toHaveAttribute('data-tone', 'danger')
   await expect(tag.locator('pre').first()).toContainText('tone="danger"')
 })
 

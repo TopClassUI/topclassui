@@ -8,6 +8,7 @@ export const codeBlock = {
   },
   demos: ['basic', 'highlighted', 'long-line', 'wrap', 'no-copy', 'no-header', 'rtl'],
   stageHeight: 10,
+  controlOrder: ['wrap', 'showCopy'],
   note: {
     en: 'Pass the code as a template-literal child. No highlighter is built in: pass coloured nodes as highlighted.',
     ar: 'مرّر الشيفرة ابنًا بصيغة template literal. لا يوجد ملوّن مدمج: مرّر العقد الملوّنة عبر highlighted.',

@@ -23,6 +23,8 @@ export const contentSchema = z.strictObject({
   stageDemo: z.string().min(1).optional(),
   /** The frame draws the overlay open in the stage: the playground demo gets `stage` and renders open inside its own root. */
   stageOpen: z.boolean().optional(),
+  /** The demo THE CODE shows at rest when the frame's code is another sample than the stage it draws. */
+  codeDemo: z.string().min(1).optional(),
   /** Boolean props the schema leaves to the element (a native `disabled`) that Try it still offers, as the frame draws them. */
   extraSwitches: z.array(z.string().regex(/^[a-z][A-Za-z]*$/)).optional(),
   /** Props Try it lists first, in the frame's order; the rest follow in the schema's. */
@@ -63,6 +65,9 @@ export function contentProblems(value: unknown, context: ContentContext): string
   if (new Set(content.demos).size !== content.demos.length) problems.push('a demo is listed twice')
   if (content.stageDemo !== undefined && !context.demos.includes(content.stageDemo)) {
     problems.push(`stageDemo ${content.stageDemo} has no dummy/${content.stageDemo}.tsx`)
+  }
+  if (content.codeDemo !== undefined && !context.demos.includes(content.codeDemo)) {
+    problems.push(`codeDemo ${content.codeDemo} has no dummy/${content.codeDemo}.tsx`)
   }
   if (!context.hasSchema && content.stageDemo === undefined) problems.push('no schema, so the stage needs a stageDemo')
   for (const related of content.related.components) {

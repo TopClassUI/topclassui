@@ -86,6 +86,29 @@ describe('usageOf', () => {
     })
   })
 
+  it("reads the demo's own return past a code sample whose template literal holds a return of its own", () => {
+    const source = [
+      "import { CodeBlock } from 'topclassui/code-block'",
+      '',
+      'export default function Demo(props: CodeBlockDesignProps) {',
+      '  return (',
+      '    <CodeBlock lang="tsx" {...props}>',
+      '      {`export default function Page() {',
+      '  return <Table />',
+      '}`}',
+      '    </CodeBlock>',
+      '  )',
+      '}',
+    ].join('\n')
+    expect(usageOf(source)?.jsx).toBe([
+      '<CodeBlock lang="tsx" {...props}>',
+      '  {`export default function Page() {',
+      '  return <Table />',
+      '}`}',
+      '</CodeBlock>',
+    ].join('\n'))
+  })
+
   it('dedents a tree written over several lines to its root', () => {
     expect(usageOf(SEGMENTED)?.jsx).toBe([
       '<SegmentedControlRoot {...props} aria-label="View" defaultValue="board">',
