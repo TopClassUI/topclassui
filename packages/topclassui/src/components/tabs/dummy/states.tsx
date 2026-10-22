@@ -9,28 +9,28 @@ const RING = 'not-forced-colors:outline-solid not-forced-colors:outline-(length:
 export default function Demo() {
   return (
     <div className="grid justify-items-start gap-8">
-      <TabsRoot title="line" size="sm" defaultValue="overview">
+      <TabsRoot title="line" size="sm" className="w-max" defaultValue="overview">
         <TabsList aria-label="Line">
           <TabsTab value="overview">Overview</TabsTab>
           <TabsTab value="props">Props</TabsTab>
           <TabsTab value="a11y">A11y</TabsTab>
         </TabsList>
       </TabsRoot>
-      <TabsRoot title="enclosed" size="sm" variant="enclosed" defaultValue="overview">
+      <TabsRoot title="enclosed" size="sm" className="w-max" variant="enclosed" defaultValue="overview">
         <TabsList aria-label="Enclosed">
           <TabsTab value="overview">Overview</TabsTab>
           <TabsTab value="props">Props</TabsTab>
           <TabsTab value="a11y">A11y</TabsTab>
         </TabsList>
       </TabsRoot>
-      <TabsRoot title="focus-visible" size="sm" defaultValue="overview">
+      <TabsRoot title="focus-visible" size="sm" className="w-max" defaultValue="overview">
         <TabsList aria-label="Focused">
           <TabsTab value="overview" className={RING}>Overview</TabsTab>
           <TabsTab value="props">Props</TabsTab>
           <TabsTab value="a11y">A11y</TabsTab>
         </TabsList>
       </TabsRoot>
-      <TabsRoot title="disabled" size="sm" defaultValue="overview">
+      <TabsRoot title="disabled" size="sm" className="w-max" defaultValue="overview">
         <TabsList aria-label="Every tab disabled">
           <TabsTab value="overview" disabled>Overview</TabsTab>
           <TabsTab value="props" disabled>Props</TabsTab>

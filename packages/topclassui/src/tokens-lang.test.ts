@@ -18,6 +18,10 @@ describe('an Arabic page or island', () => {
     expect(settersOf('font-family')).toEqual(["@layer base [lang|='ar']"])
   })
 
+  it('points --tc-font-sans at the Arabic stack where lang is written, unlayered so it beats :root', () => {
+    expect(settersOf('--tc-font-sans')).toEqual([' :root', " [lang|='ar']"])
+  })
+
   it('resets letter-spacing on every element in Arabic, so a spaced ancestor cannot pull the letters apart (R-5.3-3)', () => {
     expect(settersOf('letter-spacing')).toEqual(['@layer base :lang(ar)'])
   })

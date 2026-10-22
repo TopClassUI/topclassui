@@ -92,6 +92,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/playground.tsx`
 - `dummy/rtl.tsx`
 - `dummy/selected.tsx`
+- `dummy/stage.tsx`
 - `dummy/states.tsx`
 - `dummy/status.tsx`
 - `dummy/ten-thousand.tsx`

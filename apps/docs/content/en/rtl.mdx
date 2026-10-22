@@ -7,7 +7,7 @@ description: Every component mirrors in Arabic without a code change, because no
 
 Direction is set once, on the `html` element. Components read it through logical CSS, never through JavaScript.
 
-```tsx check title="app/layout.tsx"
+```tsx check title="app/layout.tsx" show="5-8"
 import { TopClassProvider } from 'topclassui/provider'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -65,7 +65,7 @@ Every overlay takes a `placement` instead of a `side`. `start` and `end` resolve
 <PopoverPopup side="left" align="start" />
 ```
 
-```tsx check title="right"
+```tsx check title="right" show="3-6"
 import { PopoverPopup } from 'topclassui/popover'
 
 <PopoverPopup placement="start-top" />

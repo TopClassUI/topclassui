@@ -1,12 +1,12 @@
 import { AccordionItem, AccordionRoot } from '../index.js'
 
-/** The ring a focused trigger wears, inset as the live one is, drawn at rest on the one-item box so the strip can show
- * it; not under forced colours, where a ring at rest would read as focus. */
-const RING = 'not-forced-colors:outline-solid not-forced-colors:outline-(length:--tc-ring-width) not-forced-colors:-outline-offset-(length:--tc-ring-width) not-forced-colors:outline-ring'
+/** The ring a focused trigger wears, drawn at rest outside the one-item box, as the frame draws it and the strip does not clip;
+ * not under forced colours, where a ring at rest would read as focus. */
+const RING = 'not-forced-colors:outline-solid not-forced-colors:outline-(length:--tc-ring-width) not-forced-colors:outline-offset-(length:--tc-ring-offset) not-forced-colors:outline-ring'
 
 /** The five states Figma 138:994 draws, one accordion each asking the drawn Question, in a section named by its state.
  * The open one has a title of its own, so its region and the one a reader opens next are not two landmarks of one name.
- * Hover is the neutral tint a pointer lays on the trigger, which fills the one-item box. */
+ * Hover is drawn as the frame draws it, the box on the darker surface. */
 export default function Demo() {
   return (
     <div className="grid justify-items-start gap-6">
@@ -20,12 +20,12 @@ export default function Demo() {
       <section aria-label="open">
         <AccordionRoot defaultValue={['open']}>
           <AccordionItem value="open" title="Open question" headingLevel={2}>
-            <p>Answer.</p>
+            <p className="text-xs">Answer.</p>
           </AccordionItem>
         </AccordionRoot>
       </section>
       <section aria-label="hover">
-        <AccordionRoot className="tone-neutral bg-(--tc-soft)">
+        <AccordionRoot className="bg-surface">
           <AccordionItem value="hover" title="Question" headingLevel={2}>
             <p>A closed panel stays in the HTML, hidden until it is found.</p>
           </AccordionItem>

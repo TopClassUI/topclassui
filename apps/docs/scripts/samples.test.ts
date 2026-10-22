@@ -17,7 +17,7 @@ describe('checkedSamples', () => {
 describe('the live guide pages', () => {
   const samples = samplesOf(resolve(APP, 'content'), LIVE_GUIDES.map((page) => page.slug), LOCALES)
 
-  it('hold thirty samples marked check: six on the getting-started pages and nine on the foundation pages, in each locale', () => {
+  it('hold twenty-six samples marked check: six on the getting-started pages and seven on the foundation pages, in each locale', () => {
     expect(samples.map((sample) => `${sample.file} ${sample.title ?? ''}`)).toEqual([
       'en/installation.mdx src/icons.ts',
       'en/provider.mdx app/[locale]/layout.tsx',
@@ -31,8 +31,6 @@ describe('the live guide pages', () => {
       'en/rtl.mdx app/layout.tsx',
       'en/rtl.mdx right',
       'en/server-first.mdx ',
-      'en/accessibility.mdx save-button.tsx',
-      'en/accessibility.mdx home-link.tsx',
       'en/accessibility.mdx ',
       'ar/installation.mdx src/icons.ts',
       'ar/provider.mdx app/[locale]/layout.tsx',
@@ -46,8 +44,6 @@ describe('the live guide pages', () => {
       'ar/rtl.mdx app/layout.tsx',
       'ar/rtl.mdx right',
       'ar/server-first.mdx ',
-      'ar/accessibility.mdx save-button.tsx',
-      'ar/accessibility.mdx home-link.tsx',
       'ar/accessibility.mdx ',
     ])
   })
