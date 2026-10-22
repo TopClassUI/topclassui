@@ -120,7 +120,7 @@ test('Separator: the playground turns the line vertical and semantic', async ({ 
   await expect(separator.locator('pre').first()).toContainText('orientation="vertical"')
 })
 
-test('Skeleton: the playground drives the variant and the rows', async ({ page }) => {
+test('Skeleton: the playground drives the variant, the rows, the pulse and the corners', async ({ page }) => {
   await page.goto('/en/docs/components/skeleton')
   const skeleton = card(page, 'skeleton')
   // The playground draws an avatar circle beside the text skeleton, so the rows are the text one's.
@@ -133,6 +133,19 @@ test('Skeleton: the playground drives the variant and the rows', async ({ page }
   await skeleton.getByRole('combobox', { name: 'variant' }).click()
   await page.getByRole('option', { name: 'circle', exact: true }).click()
   await expect(stageOf(page, 'skeleton').locator('[data-variant]').first()).toHaveAttribute('data-variant', 'circle')
+  // animate and rounded start on, as the frame draws them; off, the shape holds still with square corners.
+  const shape = stageOf(page, 'skeleton').locator('[data-variant="circle"]')
+  await expect(shape).toHaveClass(/animate-pulse/)
+  await skeleton.getByRole('checkbox', { name: 'animate' }).click()
+  await expect(shape).not.toHaveClass(/animate-pulse/)
+  await expect(skeleton.locator('pre').first()).toContainText('animate={false}')
+  await skeleton.getByRole('combobox', { name: 'variant' }).click()
+  await page.getByRole('option', { name: 'rect', exact: true }).click()
+  const rect = stageOf(page, 'skeleton').locator('[data-variant="rect"]')
+  await expect(rect).toHaveClass(/rounded-control/)
+  await skeleton.getByRole('checkbox', { name: 'rounded' }).click()
+  await expect(rect).not.toHaveClass(/rounded-control/)
+  await expect(skeleton.locator('pre').first()).toContainText('rounded={false}')
 })
 
 test('CodeBlock: the client stage takes showCopy and wrap', async ({ page }) => {
@@ -157,7 +170,7 @@ test('a live CodeBlock example hydrates: its copy button answers a click', async
   await expect(page.locator('section[aria-labelledby="examples"] [role="status"]').first()).not.toBeEmpty()
 })
 
-test('Card: Try it switches the link, the media band and the footer, starting as the frame draws them', async ({ page }) => {
+test('Card: Try it switches the link, the media band and the footer, starting as the frame draws them, and THE CODE follows', async ({ page }) => {
   const errors = collectErrors(page)
   await page.goto('/en/docs/components/card')
   const cardEntry = card(page, 'card')
@@ -167,12 +180,19 @@ test('Card: Try it switches the link, the media band and the footer, starting as
   await expect(cardEntry.getByRole('checkbox', { name: 'footer' })).toBeChecked()
   await expect(cardEntry.locator('pre').first()).toContainText("from 'topclassui/card'")
   await expect(cardEntry.locator('pre').first()).toContainText('Download PDF')
+  // THE CODE follows each switch: the branch it turns on, and none of the parts it turns off.
+  const code = cardEntry.locator('pre').first()
   await cardEntry.getByRole('checkbox', { name: 'media' }).click()
   await expect(stage.locator('.rounded-t-box')).toHaveCount(1)
+  await expect(code).toContainText('<CardMedia>')
+  await expect(code).not.toContainText('Download PDF')
   await cardEntry.getByRole('checkbox', { name: 'interactive' }).click()
   await expect(stage.getByRole('link')).toHaveCount(1)
   await expect(stage.getByRole('button')).toHaveCount(0)
+  await expect(code).toContainText('<CardRoot render={<a href="#card" />}>')
+  await expect(code).not.toContainText('<Button')
   await cardEntry.getByRole('checkbox', { name: 'footer' }).click()
   await expect(stage.getByText('Read more')).toHaveCount(0)
+  await expect(code).not.toContainText('CardFooter')
   expect(errors).toEqual([])
 })
