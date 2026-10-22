@@ -2,6 +2,7 @@
 
 import { useRef } from 'react'
 
+import { cn } from '#shared/cn.js'
 import { Button } from '#components/button/index.js'
 import {
   DrawerBody, DrawerClose, DrawerDescription, DrawerFooter, DrawerHeader, DrawerPopup, DrawerRoot, DrawerTitle,
@@ -9,27 +10,38 @@ import {
 } from '../index.js'
 import type { DrawerDesignProps } from '../types.js'
 
-/** The sheet drawn open inside its own box over a scrim, as the frame draws it: not modal, and it takes no focus. */
+const BAR = 'min-h-2 rounded-chip bg-neutral-soft'
+
+/** The page behind the scrim, as the frame draws it: four bars of text, hidden from a reader. */
+function PageBehind() {
+  return (
+    <div aria-hidden className="absolute inset-0 flex flex-col gap-2 p-3.5">
+      <div className={`${BAR} w-1/2`} />
+      <div className={`${BAR} w-4/5`} />
+      <div className={`${BAR} w-2/3`} />
+      <div className={`${BAR} w-2/5`} />
+    </div>
+  )
+}
+
+/** The frame's filters sheet drawn open in a 420 by 260 px box over the page and a scrim, 220 px wide until Try it sets
+ * a size: not modal, and it takes no focus. */
 function Stage({ placement, size }: DrawerDesignProps) {
   const root = useRef<HTMLDivElement>(null)
   return (
-    <div ref={root} data-stage="" className="relative min-h-87 w-full [contain:paint]">
+    <div ref={root} data-stage="" className="relative h-65 w-105 max-w-full overflow-hidden rounded-box [contain:paint]">
+      <PageBehind />
       <div aria-hidden className="absolute inset-0 bg-overlay" />
       <DrawerRoot placement={placement} size={size} defaultOpen modal={false}>
-        <DrawerPopup container={root} initialFocus={false} className="max-h-full">
+        <DrawerPopup container={root} initialFocus={false} className={cn('max-h-full', size === undefined && 'max-w-55')}>
           <DrawerHeader>
             <DrawerTitle>Filters</DrawerTitle>
-            <DrawerDescription>Narrow the list of projects.</DrawerDescription>
           </DrawerHeader>
           <DrawerBody className="grid content-start gap-2.5">
             <p>Status</p>
             <p>Owner</p>
             <p>Updated</p>
           </DrawerBody>
-          <DrawerFooter>
-            <DrawerClose render={<Button variant="outline">Reset</Button>} />
-            <DrawerClose render={<Button>Apply</Button>} />
-          </DrawerFooter>
         </DrawerPopup>
       </DrawerRoot>
     </div>
