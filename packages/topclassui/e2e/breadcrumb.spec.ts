@@ -216,7 +216,8 @@ for (const scheme of ['light', 'dark'] as const) {
         const fills = await page.locator('nav li > svg path').evaluateAll((paths) => paths.map((path) => getComputedStyle(path).fill))
         const canvas = await page.evaluate(() => getComputedStyle(document.body).backgroundColor)
 
-        expect(fills).toEqual([SYSTEM[scheme].text, SYSTEM[scheme].text, SYSTEM[scheme].text])
+        // Two carets: the house is followed by Docs with no caret between them.
+        expect(fills).toEqual([SYSTEM[scheme].text, SYSTEM[scheme].text])
         expect(canvas).toBe(SYSTEM[scheme].canvas)
       })
     }

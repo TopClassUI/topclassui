@@ -21,10 +21,12 @@ export const ACCORDION_TRIGGER_CORNERS = '[:first-child>*>&]:rounded-t-box [:las
 /** Forced colours keep the 50% of a disabled trigger, which a theme can make unreadable: it takes the system's own grey. */
 export const ACCORDION_TRIGGER_FORCED = 'forced-colors:data-disabled:text-[GrayText] forced-colors:data-disabled:opacity-100'
 
-/** A disabled item dims its trigger, but not inside a disabled root, which has dimmed the whole box already. */
+/** A disabled item dims its trigger, but not inside a disabled root, which has dimmed the whole box already,
+ * and not under forced colours, where the trigger takes GrayText at full strength instead. */
 export const ACCORDION_TRIGGER_DISABLED = [
   'disabled:pointer-events-none data-disabled:pointer-events-none',
-  'not-group-data-disabled/accordion:disabled:opacity-50 not-group-data-disabled/accordion:data-disabled:opacity-50',
+  'not-forced-colors:not-group-data-disabled/accordion:disabled:opacity-50',
+  'not-forced-colors:not-group-data-disabled/accordion:data-disabled:opacity-50',
 ].join(' ')
 
 /** A row as wide as the box. Its ring is drawn inside it, because the box clips. Where six letters
