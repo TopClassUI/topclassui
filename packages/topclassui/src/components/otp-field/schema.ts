@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 import { sizeSchema } from '#shared/contracts/size.schema.js'
 import { OTP_FIELD_BOUNDARIES } from './boundaries.js'
-import { OTP_FIELD_DEFAULTS } from './constants.js'
+import { OTP_FIELD_DEFAULTS, OTP_FIELD_VALIDATION_TYPES } from './constants.js'
 
 const { lengthMin, lengthMax, groupSizeMin } = OTP_FIELD_BOUNDARIES
 
@@ -17,6 +17,8 @@ export const otpFieldSchema = z.object({
     .meta({ description: 'Marks the code as wrong: sets aria-invalid on every cell, whose line turns to danger and thickens.' }),
   groupSize: z.number().int().min(groupSizeMin).max(lengthMax).default(OTP_FIELD_DEFAULTS.groupSize)
     .meta({ description: 'Draws a separator after every this many cells; 0 draws none. Clamped between 0 and length.' }),
+  validationType: z.enum(OTP_FIELD_VALIDATION_TYPES).default(OTP_FIELD_DEFAULTS.validationType)
+    .meta({ description: 'The characters a cell keeps: numeric takes Arabic-Indic and Persian digits too; none keeps any.' }),
 })
 
 export type OtpFieldSchemaInput = z.input<typeof otpFieldSchema>

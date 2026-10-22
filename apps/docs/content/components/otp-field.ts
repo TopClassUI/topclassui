@@ -12,7 +12,7 @@ export const otpField = {
   demos: ['basic', 'grouped', 'form', 'sizes', 'long', 'rtl'],
   stageDemo: 'stage',
   stageHeight: 7.25,
-  controlOrder: ['length', 'size', 'mask', 'autoSubmit', 'disabled', 'invalid'],
+  controlOrder: ['length', 'validationType', 'size', 'mask', 'autoSubmit', 'disabled', 'invalid'],
   controlsHidden: ['groupSize'],
   extraSwitches: ['mask', 'autoSubmit', 'disabled'],
   note: {

@@ -2,17 +2,17 @@ import { z } from 'zod'
 import { describe, expect, it } from 'vitest'
 
 import { OTP_FIELD_BOUNDARIES } from '../boundaries.js'
-import { OTP_FIELD_DEFAULTS, OTP_FIELD_SIZES, OTP_FIELD_WRAP_ABOVE } from '../constants.js'
+import { OTP_FIELD_DEFAULTS, OTP_FIELD_SIZES, OTP_FIELD_VALIDATION_TYPES, OTP_FIELD_WRAP_ABOVE } from '../constants.js'
 import { otpFieldSchema } from '../schema.js'
 
 // R-8.3-3: the props table, the playground and registry.json all read this output.
 const json = z.toJSONSchema(otpFieldSchema, { io: 'input' }) as {
   properties?: Record<string, { description?: string, default?: unknown, enum?: unknown[], minimum?: number, maximum?: number }>
 }
-const KEYS = ['groupSize', 'invalid', 'length', 'size']
+const KEYS = ['groupSize', 'invalid', 'length', 'size', 'validationType']
 
 describe('the schema is the documentation', () => {
-  it('covers the four props OTPField adds and no other: the rest are Base UI\'s', () => {
+  it('covers the five props OTPField adds or narrows and no other: the rest are Base UI\'s', () => {
     expect(Object.keys(otpFieldSchema.shape).sort()).toEqual(KEYS)
     expect(Object.keys(json.properties ?? {}).sort()).toEqual(KEYS)
   })
@@ -23,12 +23,14 @@ describe('the schema is the documentation', () => {
     })
   }
 
-  it('records 6, md, false and 0 as the defaults, and the six sizes', () => {
+  it('records 6, md, false, 0 and numeric as the defaults, the six sizes and the four character types', () => {
     expect(json.properties?.['length']?.default).toBe(6)
     expect(json.properties?.['size']?.default).toBe('md')
     expect(json.properties?.['invalid']?.default).toBe(false)
     expect(json.properties?.['groupSize']?.default).toBe(0)
     expect(json.properties?.['size']?.enum).toEqual(['xs', 'sm', 'md', 'lg', 'xl', 'custom'])
+    expect(json.properties?.['validationType']?.default).toBe('numeric')
+    expect(json.properties?.['validationType']?.enum).toEqual(['numeric', 'alpha', 'alphanumeric', 'none'])
   })
 
   it('records the bounds the component clamps to (R-5.7-7)', () => {
@@ -39,11 +41,12 @@ describe('the schema is the documentation', () => {
 
 describe('the schema and the constants agree', () => {
   it('fills every default from constants.ts', () => {
-    expect(otpFieldSchema.parse({})).toEqual({ length: 6, size: 'md', invalid: false, groupSize: 0 })
+    expect(otpFieldSchema.parse({})).toEqual({ length: 6, size: 'md', invalid: false, groupSize: 0, validationType: 'numeric' })
   })
 
   it('names the values the spec gives, so a changed constant is a failure here', () => {
-    expect(OTP_FIELD_DEFAULTS).toEqual({ length: 6, size: 'md', invalid: false, groupSize: 0, defaultValue: '' })
+    expect(OTP_FIELD_DEFAULTS).toEqual({ length: 6, size: 'md', invalid: false, groupSize: 0, validationType: 'numeric', defaultValue: '' })
+    expect(OTP_FIELD_VALIDATION_TYPES).toEqual(['numeric', 'alpha', 'alphanumeric', 'none'])
     expect(OTP_FIELD_BOUNDARIES).toEqual({ lengthMin: 1, lengthMax: 12, groupSizeMin: 0 })
     expect(OTP_FIELD_WRAP_ABOVE).toBe(8)
     expect(OTP_FIELD_SIZES).toEqual(['xs', 'sm', 'md', 'lg', 'xl', 'custom'])
@@ -54,6 +57,7 @@ describe('the schema and the constants agree', () => {
     expect(otpFieldSchema.safeParse({ size: 'xxl' }).success).toBe(false)
     expect(otpFieldSchema.safeParse({ groupSize: -1 }).success).toBe(false)
     expect(otpFieldSchema.safeParse({ invalid: 'yes' }).success).toBe(false)
+    expect(otpFieldSchema.safeParse({ validationType: 'hex' }).success).toBe(false)
   })
 
   it('keeps what is not built out of the schema: no tone, no variant, no loading', () => {
