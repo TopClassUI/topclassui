@@ -82,6 +82,7 @@ Required: `children`. Every other prop below is optional.
 |---|---|---|---|---|
 | `children` | **yes** | `string` | - | The code, as a template literal: every space and line break is kept, and this is what the button copies. |
 | `highlighted` | no | `ReactNode` | - | The same code as nodes the caller coloured, for example with a highlighter at build time. Rendered in place of children. |
+| `icon` | no | `ReactNode` | - | Before the title, an element such as `<Svg icon={copy} />`. Defaults to the terminal-window icon; `null` draws none. |
 | `labels` | no | `Labels` | - | The built-in strings of the copy button. Defaults to English; pass `getLabels(locale).labels` for another. |
 | `lang` | no | `string` | - | The language, written as data-lang for a stylesheet or a script to read. Nothing here colours it. |
 | `locale` | no | `string` | - | Accepted so `{...getLabels(locale)}` spreads cleanly. Nothing here formats a number, so it is not used and never reaches the element. |

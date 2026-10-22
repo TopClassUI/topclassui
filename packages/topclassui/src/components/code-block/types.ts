@@ -17,6 +17,8 @@ export interface CodeBlockProps
   lang?: string | undefined
   /** The file name in the header. It names the code region and the copy button. */
   title?: ReactNode | undefined
+  /** Before the title, an element such as `<Svg icon={copy} />`. Defaults to the terminal-window icon; `null` draws none. */
+  icon?: ReactNode | undefined
   /** The same code as nodes the caller coloured, for example with a highlighter at build time. Rendered in place of children. */
   highlighted?: ReactNode | undefined
   /** The built-in strings of the copy button. Defaults to English; pass `getLabels(locale).labels` for another. */

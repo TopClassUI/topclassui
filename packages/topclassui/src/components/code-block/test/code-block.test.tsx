@@ -82,6 +82,19 @@ describe('the header', () => {
     expect(out.indexOf('page.tsx</span>')).toBeLessThan(out.indexOf('<button'))
   })
 
+  it('icon={null} draws no icon, and the title still names the block', () => {
+    const out = html({ title: 'page.tsx', icon: null })
+    expect(out).not.toContain('<span aria-hidden="true"')
+    expect(out).toContain('page.tsx</span>')
+  })
+
+  it('draws the icon it is given in place of the terminal, hidden, before the title', () => {
+    const out = html({ title: 'page.tsx', icon: <i data-probe="" /> })
+    expect(out).toMatch(/<span aria-hidden="true" class="[^"]*"><i data-probe=""><\/i><\/span>/)
+    expect(out.match(/<svg/g), 'the copy button\'s icon alone').toHaveLength(1)
+    expect(out.indexOf('data-probe')).toBeLessThan(out.indexOf('page.tsx</span>'))
+  })
+
   it('without a title holds the button alone, and no icon', () => {
     const out = html()
     expect(out).toContain('<button')

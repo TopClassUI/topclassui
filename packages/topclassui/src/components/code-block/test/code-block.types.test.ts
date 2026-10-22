@@ -22,9 +22,10 @@ describe('the own props', () => {
     expectTypeOf<Accepts<CodeBlockProps, { children: ReactNode }>>().toEqualTypeOf<false>()
   })
 
-  it('title and highlighted are nodes; lang is a string, the language and not the HTML lang', () => {
+  it('title, icon and highlighted are nodes; lang is a string, the language and not the HTML lang', () => {
     expectTypeOf<CodeBlockProps['title']>().toEqualTypeOf<ReactNode | undefined>()
     expectTypeOf<CodeBlockProps['highlighted']>().toEqualTypeOf<ReactNode | undefined>()
+    expectTypeOf<CodeBlockProps['icon']>().toEqualTypeOf<ReactNode | undefined>()
     expectTypeOf<CodeBlockProps['lang']>().toEqualTypeOf<string | undefined>()
   })
 

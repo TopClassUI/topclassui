@@ -19,6 +19,7 @@ export function CodeBlock({
   children,
   lang,
   title,
+  icon,
   highlighted,
   showCopy = CODE_BLOCK_DEFAULTS.showCopy,
   wrap = CODE_BLOCK_DEFAULTS.wrap,
@@ -31,13 +32,14 @@ export function CodeBlock({
   const titleId = useId()
   const named = hasContent(title)
   const header = named || showCopy
+  const shownIcon = icon === undefined ? <Svg icon={terminalWindow} size="0.875rem" /> : icon
   return (
     <div data-lang={lang} className={cn(CODE_BLOCK_ROOT, className)} {...rest}>
       {header ? (
         <div className={CODE_BLOCK_HEADER}>
           {named ? (
             <>
-              <span aria-hidden="true" className={CODE_BLOCK_ICON}><Svg icon={terminalWindow} size="0.875rem" /></span>
+              {hasContent(shownIcon) ? <span aria-hidden="true" className={CODE_BLOCK_ICON}>{shownIcon}</span> : null}
               <span dir="auto" id={titleId} className={CODE_BLOCK_TITLE}>{title}</span>
             </>
           ) : null}
