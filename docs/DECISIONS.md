@@ -6,6 +6,33 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-22 - Nothing reads layout in the hydration commit: Home's motion and the Navbar measure where the browser has just laid out
+
+**Decision.** `apps/docs/lib/motion.ts` no longer reads `--tc-motion` or a block's box when it arms. It observes every `[data-motion]` block and decides on the IntersectionObserver's first report, which comes after the browser's own layout. A block inside Home's `content-visibility: auto` sections reports an empty box there, so the outermost box around it that lies wholly off the screen answers, read from the root down; the skipped block itself is never measured. Every box is read before any block is held. The library's `useNavbarOffset` (Navbar) now measures the bar, reads an #anchor target and the scroll padding, sets `data-scrolled` and writes `--tc-sticky-top` at the ResizeObserver's first report instead of in the effect. A browser makes that report for every rendered bar with no resize, before the frame paints.
+
+**Why.** Lighthouse's forced-reflow item. Lighthouse 12.8.2 flags a group of forced style and layout that reaches 30 ms. Traced with source maps on merged main (ad3e1a8c): the Navbar effect wrote `--tc-sticky-top` on `<html>`, which invalidates every element's style. Then MotionWatch, which runs on every page, read `getComputedStyle(html)` (5 to 42 ms of style). On Home it also read each block's `getBoundingClientRect()`, which laid the skipped sections out in several passes (10 to 74 ms more). Flagged groups on main were 24 to 47 ms on `/en`, 28 to 103 ms on `/ar` and 39 to 48 ms on `/en/docs/components/button`. With the motion fixed alone, the same recalc moved to the next reader, Table's `useCollection` layout effect (9 to 44 ms). So the Navbar's write left the commit too. The "top function call" Lighthouse names, React's scheduler `performWorkUntilDeadline`, is only the entry point.
+
+**Measured.** Lighthouse 12.8.2, mobile, `measure.sh`: the median of 3 interleaved runs each, on a local `next start` of main and of this branch. Main first, then this branch; a second run of two pages is in brackets.
+
+| Page | Performance | TBT | CLS |
+| --- | --- | --- | --- |
+| `/en` | 94, 94 | 35, 22 ms | 0, 0 |
+| `/ar` | 83, 82 (83, 83) | 73, 109 ms (69, 53) | 0, 0 |
+| `/en/docs/components` | 81, 76 (81, 84) | 161, 260 ms (152, 140) | 0, 0 |
+| `/en/docs/components/button` | 93, 93 | 97, 65 ms | 0, 0 |
+| `/en/docs/installation` | 95, 95 | 52, 21 ms | 0, 0 |
+
+LCP and FCP are within 10 ms of main on every page but the catalog, which moves with the machine (4.21 against 4.40 s, then 4.21 against 3.76 s). Forced reflow was flagged in 8 of 21 runs on main, `/ar` in all 6, and in 3 of 21 on this branch, none of them on `/en` or `/ar`. One of the three is Table's read (31 ms); two are Lighthouse's own unattributed time (below).
+
+**Left, with reasons.**
+- `useCollection` (Table, on the component pages and in Home's frame) reads its container in its ResizeObserver. In the frame where the Navbar first writes its height, that read pays the frame's one style recalc early: 4 to 21 ms, 31 ms in one run. That is no extra work, and moving it means changing the collection hook every list shares.
+- Base UI 1.8.0: `CompositeList`'s layout effect calls `scrollIntoViewIfNeeded` (`internals/composite/composite.mjs`, reading `scrollLeft`), 0.3 to 2 ms, and its `getAnimations` read takes 0.4 ms. Both are inside the dependency.
+- Lighthouse's own "[unattributed]" time, 19 to 38 ms on the docs pages, on main as well. It is main-thread layout that happens while V8 parses a script on a background thread. Lighthouse 12.8.2's `WarningsHandler` reads every thread as one stack and counts any `v8.*` event as JavaScript, so it reports ordinary layout as forced. Nothing on the page forces it.
+
+**What it affects.** `apps/docs/lib/motion.ts` and its new test. `packages/topclassui/src/components/navbar/hook.ts`, its offset, unstuck and hydration tests (happy-dom's ResizeObserver never reports, so the tests deliver the browser's first report by hand), and two mutation rows that replace one. Checked in Chrome against main: `--tc-sticky-top` (58 px), `data-scrolled`, the #anchor landing on the theming guide in both languages at 1280 and 390 px, Home's held blocks, the count-up, reduced motion and a reload scrolled to the foot all match. The Playwright specs (motion, navbar, overlay-scroll) were not run on this branch.
+
+---
+
 ## 2026-10-22 - Plain code on a dark ground stays neutral-300, softer than the frames' neutral-50
 
 **Decision.** The Shiki pair keeps plain code text at `#d4d4d4` (neutral-300) on the dark ground (`apps/docs/lib/shiki-themes.ts`, from 7fb765f6), where the guide frames draw plain code in base/body (`#fafafa`). The other token colours stay as drawn, and attribute selectors and constants now take the drawn amber and blue.
