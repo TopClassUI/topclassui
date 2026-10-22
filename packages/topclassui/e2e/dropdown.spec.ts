@@ -1301,10 +1301,12 @@ test.describe('the states demo, as the Every state strip draws it', () => {
         const cell = page.locator(`#demo [title="${title}"]`)
         const picture = cell.locator(':scope > [aria-hidden="true"][inert]')
         await expect(picture, title).toBeVisible()
-        expect(await picture.locator(':scope > *').evaluateAll((all) => all.map((row) => `${row.textContent ?? ''}${row.hasAttribute('data-highlighted') ? '*' : ''}${row.hasAttribute('data-disabled') ? '-' : ''}`))).toEqual(rows)
+        expect(await picture.locator(':scope > *').evaluateAll((all) => all.map((row) => `${row.textContent}${row.hasAttribute('data-highlighted') ? '*' : ''}${row.hasAttribute('data-disabled') ? '-' : ''}`))).toEqual(rows)
         await expect(picture.locator('[role], button, a, input, [tabindex]'), title).toHaveCount(0)
         const [inner, outer] = [await boxOf(picture), await boxOf(cell)]
-        expect(inner.left >= outer.left && inner.right <= outer.right && inner.top >= outer.top && inner.bottom <= outer.bottom, `the picture of "${title}" leaves its cell`).toBe(true)
+        expect(inner.left >= outer.left && inner.right <= outer.right, `the picture of "${title}" leaves its cell`).toBe(true)
+        // The frame's 76 px menu on its 58 px row, reaching 9 px past it above and below.
+        expect([Math.round(inner.height), Math.round(inner.top - outer.top), Math.round(outer.bottom - inner.bottom)], title).toEqual([76, -9, -9])
       }
       // Not modal: no scroll lock on the page, and nothing of it hidden or made inert behind a menu.
       const lock = await pageLock(page)

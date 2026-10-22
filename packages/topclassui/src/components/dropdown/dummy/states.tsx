@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react'
 
+import { dotsThree } from '#icons/data/dots-three.js'
 import { gear } from '#icons/data/gear.js'
 import { pencilSimple } from '#icons/data/pencil-simple.js'
 import { trash } from '#icons/data/trash.js'
@@ -12,9 +13,10 @@ import { OVERLAY_SURFACE, ROW } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
 import { DropdownItem, DropdownPopup, DropdownRoot, DropdownTrigger } from '../index.js'
 
-const CELL = 'grid h-21 w-38 place-items-center'
+// A row of the frame's 58 px: the 76 px menu reaches past it above and below, as drawn.
+const CELL = 'flex h-14.5 w-38 items-center justify-center'
 // The menu's look, written out from the shared classes: a demo the site shows imports public paths only.
-const panel = `flex w-34 flex-col gap-0.5 p-1.5 ${OVERLAY_SURFACE}`
+const panel = `flex w-34 flex-col gap-0.5 p-1 ${OVERLAY_SURFACE}`
 const row = `${ROW} cursor-default`
 
 interface Row { icon: ReactNode, label: string, highlighted?: boolean, disabled?: boolean }
@@ -47,7 +49,7 @@ export default function Demo() {
     <div className="grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] gap-4">
       <div title="closed" className={CELL}>
         <DropdownRoot>
-          <DropdownTrigger render={<Button variant="outline" size="sm">Actions</Button>} />
+          <DropdownTrigger render={<Button variant="outline" size="xs" className="border-line bg-surface"><Svg icon={dotsThree} />Actions</Button>} />
           <DropdownPopup>
             <DropdownItem icon={<Svg icon={user} />}>Profile</DropdownItem>
             <DropdownItem icon={<Svg icon={gear} />}>Settings</DropdownItem>

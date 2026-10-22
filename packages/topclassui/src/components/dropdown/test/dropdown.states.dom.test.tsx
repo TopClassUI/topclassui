@@ -12,7 +12,7 @@ describe('the states demo, one cell per state of the Every state strip', () => {
     expect(cellsOf(container.firstElementChild).map((cell) => cell.getAttribute('title'))).toEqual(['closed', 'open', 'hover item', 'disabled item'])
   })
 
-  it('draws the three open ones as pictures, hidden and inert, and only the closed cell holds a real menu', async () => {
+  it('draws the three open ones as pictures, hidden and inert, and only the closed cell holds a real menu', () => {
     const { container } = render(<Demo />)
     const [closed, ...pictures] = cellsOf(container.firstElementChild)
     expect(screen.queryAllByRole('menu')).toHaveLength(0)
