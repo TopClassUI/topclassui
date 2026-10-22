@@ -88,6 +88,16 @@ describe('a press brings the focus and never scrolls the tree; a key or a script
     expect(selected()).toEqual(['Fig'])
   })
 
+  it('a press on a disabled row, which keeps its pointer events for its not-allowed cursor, highlights none', () => {
+    render(<TreeView aria-label="Fruit" {...OPEN} />)
+    fireEvent.pointerDown(screen.getByRole('treeitem', { name: 'Date' }), { pointerType: 'mouse' })
+    act(() => { tree().focus() })
+    fireEvent.pointerUp(screen.getByRole('treeitem', { name: 'Date' }), { pointerType: 'mouse' })
+    fireEvent.click(screen.getByRole('treeitem', { name: 'Date' }))
+    expect(active()).toBe(null)
+    expect(selected()).toEqual(['Fig'])
+  })
+
   it('a press on a row highlights that row and scrolls nothing, even with the selected row elsewhere', () => {
     render(<TreeView aria-label="Fruit" {...OPEN} />)
     const asked = scrolls()

@@ -109,9 +109,10 @@ describe('a row', () => {
     expect(mediaOf(`${selectorOf('forced-colors:aria-selected:bg-[Highlight]')}[aria-selected="true"]`)).toBe('@media (forced-colors: active)')
   })
 
-  it('a disabled row dims to half and takes no pointer', () => {
+  it('a disabled row dims to half and shows not-allowed, keeping the pointer events that cursor needs', () => {
     expect(ruleOf(`${selectorOf('aria-disabled:opacity-50')}[aria-disabled="true"]`)).toBe('opacity: 50%;')
-    expect(ruleOf(`${selectorOf('aria-disabled:pointer-events-none')}[aria-disabled="true"]`)).toBe('pointer-events: none;')
+    expect(ruleOf(`${selectorOf('aria-disabled:cursor-not-allowed')}[aria-disabled="true"]`)).toBe('cursor: not-allowed;')
+    expect(`${TREE_VIEW_ROW} ${TREE_VIEW_ROW_DISABLED}`).not.toContain('pointer-events')
   })
 
   it('the caret slot is 12 px wide on every row, and the label ends in an ellipsis', () => {

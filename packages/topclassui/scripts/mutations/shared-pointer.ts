@@ -8,20 +8,20 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the shared pointer loses the hand, so every button, tab, option and row shows the arrow',
     file: CLASSES,
-    from: "export const POINTER = 'cursor-pointer disabled:cursor-default",
-    to: "export const POINTER = 'disabled:cursor-default",
+    from: 'export const POINTER = `cursor-pointer ${NOT_ALLOWED}',
+    to: 'export const POINTER = `${NOT_ALLOWED}',
   },
   {
     label: 'the shared pointer keeps the hand on a disabled control',
     file: CLASSES,
-    from: " disabled:cursor-default aria-disabled:cursor-default",
-    to: " aria-disabled:cursor-default",
+    from: 'cursor-pointer ${NOT_ALLOWED} data-readonly',
+    to: 'cursor-pointer data-readonly',
   },
   {
     label: 'the shared pointer keeps the hand on a loading control',
     file: CLASSES,
-    from: " data-loading:cursor-default'",
-    to: "'",
+    from: ' data-loading:cursor-default`',
+    to: '`',
   },
   {
     label: 'the shared pointer leaves the row of a menu or a list',
@@ -40,5 +40,41 @@ export const MUTATIONS: Mutation[] = [
     file: CLASSES,
     from: 'w-fit shrink-0 ${POINTER} items-center',
     to: 'w-fit shrink-0 items-center',
+  },
+  {
+    label: 'the shared pointer shows the arrow on a disabled control, not not-allowed',
+    file: CLASSES,
+    from: "export const NOT_ALLOWED = 'disabled:cursor-not-allowed",
+    to: "export const NOT_ALLOWED = 'disabled:cursor-default",
+  },
+  {
+    label: 'the shared pointer misses a control marked by aria-disabled alone',
+    file: CLASSES,
+    from: ' aria-disabled:cursor-not-allowed data-disabled:cursor-not-allowed',
+    to: ' data-disabled:cursor-not-allowed',
+  },
+  {
+    label: 'the shared pointer leaves the dimming, so a disabled field shows its own cursor',
+    file: CLASSES,
+    from: "'data-disabled:opacity-50', NOT_ALLOWED].join",
+    to: "'data-disabled:opacity-50'].join",
+  },
+  {
+    label: 'the shared pointer hover paints on a disabled control again',
+    file: 'src/styles.css',
+    from: '&:hover:not(:where(:disabled, [aria-disabled="true"], [data-disabled]))',
+    to: '&:hover',
+  },
+  {
+    label: 'the shared pointer press paints on a disabled control again',
+    file: 'src/styles.css',
+    from: '&:active:not(:where(:disabled, [aria-disabled="true"], [data-disabled]))',
+    to: '&:active',
+  },
+  {
+    label: 'the shared pointer lets a disabled row of a menu take the highlight',
+    file: 'src/shared/row-highlight.ts',
+    from: '    if (disabled === true) event.preventBaseUIHandler()\n',
+    to: '',
   },
 ]

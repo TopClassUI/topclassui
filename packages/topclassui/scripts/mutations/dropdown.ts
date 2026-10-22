@@ -261,4 +261,10 @@ export const MUTATIONS: Mutation[] = [
     from: "'inline-flex shrink-0 text-muted group-data-highlighted",
     to: "'inline-flex shrink-0 group-data-highlighted",
   },
+  {
+    label: 'the dropdown lets a pointer highlight a disabled row',
+    file: CLIENT,
+    from: 'onMouseMove={skipDisabledHighlight(rest.disabled, onMouseMove)}',
+    to: 'onMouseMove={onMouseMove}',
+  },
 ]

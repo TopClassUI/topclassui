@@ -1,7 +1,7 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ReactNode } from 'react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { Button } from '#components/button/index.js'
 import { DropdownItem, DropdownLinkItem, DropdownPopup, DropdownRoot, DropdownTrigger } from '../index.js'
@@ -67,7 +67,7 @@ describe('DropdownItem', () => {
     for (const cls of [
       'flex', 'min-h-(--tc-row-height)', 'w-full', 'items-center', 'gap-2', 'rounded-control', 'px-2.5', 'text-sm', 'outline-none',
       'data-highlighted:bg-primary-soft', 'data-highlighted:text-primary-on-soft', 'forced-colors:data-highlighted:bg-[Highlight]',
-      'max-w-full', 'group', 'shrink-0', 'cursor-pointer', 'data-disabled:cursor-default', 'select-none', 'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]',
+      'max-w-full', 'group', 'shrink-0', 'cursor-pointer', 'data-disabled:cursor-not-allowed', 'select-none', 'pointer-coarse:min-h-[max(var(--tc-row-height),var(--tc-target-coarse,44px))]',
     ]) expect(list, cls).toContain(cls)
   })
 
@@ -95,9 +95,20 @@ describe('DropdownItem', () => {
     const list = classes(row('Rename'))
     expect(row('Rename').getAttribute('aria-disabled')).toBe('true')
     expect(list).toContain('data-disabled:*:opacity-50')
-    expect(list).toContain('data-disabled:pointer-events-none')
+    expect(list).toContain('data-disabled:cursor-not-allowed')
+    expect(list).not.toContain('data-disabled:pointer-events-none')
     expect(list).not.toContain('data-disabled:opacity-50')
     expect(list).toContain('forced-colors:data-disabled:not-data-highlighted:text-[GrayText]')
+  })
+
+  it('a disabled row keeps its pointer events for its cursor, and a pointer moving over it takes no highlight', async () => {
+    const moved = vi.fn()
+    await popup(<><DropdownItem>Edit</DropdownItem><DropdownItem disabled onMouseMove={moved}>Rename</DropdownItem></>)
+    fireEvent.mouseMove(row('Edit'), { movementX: 1 })
+    expect(row('Edit').hasAttribute('data-highlighted')).toBe(true)
+    fireEvent.mouseMove(row('Rename'), { movementX: 1 })
+    expect(row('Rename').hasAttribute('data-highlighted')).toBe(false)
+    expect(moved).toHaveBeenCalledTimes(1)
   })
 
   it('takes a className last, a style, a ref, an id and a data attribute', async () => {

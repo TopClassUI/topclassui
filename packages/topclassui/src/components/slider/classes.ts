@@ -5,7 +5,10 @@ import {
 
 /** The box that owns the width. No type step here: FIELD_TEXT[size] gives it, so the em of the width is an Input's.
  * has-disabled: a disabled fieldset disables the range input, which Base UI does not know, so the root dims on that. */
-export const SLIDER_ROOT = `group/slider grid ${FIELD_HOLDER} ${DISABLED} has-disabled:pointer-events-none has-disabled:opacity-50`
+export const SLIDER_ROOT = `group/slider grid ${FIELD_HOLDER} ${DISABLED} has-disabled:cursor-not-allowed has-disabled:opacity-50`
+
+/** And the control stops taking presses, which Base UI would act on: the root around it keeps the not-allowed cursor. */
+export const SLIDER_CONTROL_OFF = 'group-has-disabled/slider:pointer-events-none'
 
 /** An Input's type step at each size, which sets the em of --tc-input-width. */
 export const SLIDER_TEXT = FIELD_TEXT
@@ -20,7 +23,7 @@ export const SLIDER_KNOB_SIZE = KNOB_SIZE
 export const SLIDER_ROW = 'flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1'
 
 /** Padded by half a target on each side, so a thumb at 0 or at 100 stays inside the box; custom keeps this. */
-export const SLIDER_CONTROL = `relative flex min-w-2/3 flex-1 touch-none select-none items-center px-[calc(var(--tc-target-min,24px)/2)] pointer-coarse:px-[calc(var(--tc-target-coarse,44px)/2)] ${TARGET_HEIGHT}`
+export const SLIDER_CONTROL = `relative flex min-w-2/3 flex-1 touch-none select-none items-center px-[calc(var(--tc-target-min,24px)/2)] pointer-coarse:px-[calc(var(--tc-target-coarse,44px)/2)] ${TARGET_HEIGHT} ${SLIDER_CONTROL_OFF}`
 
 /** Merged after the control: half the knob plus its focus ring when that is more than half a target, as at xl or a
  * 32 px root, so the ring of a thumb at either end stays inside the box too. custom keeps the control's own. */

@@ -86,9 +86,9 @@ describe('the list and the status lines', () => {
     expect(ruleOf(`${selectorOf('empty:hidden')}:empty`)).toBe('display: none;')
   })
 
-  it('a remove of a disabled upload dims with the zone and takes no pointer', () => {
-    expect(['disabled:opacity-50', 'disabled:pointer-events-none'].filter((cls) => !CLASSES_OF.FILE_UPLOAD_REMOVE.split(' ').includes(cls))).toEqual([])
-    expect([ruleOf(`${selectorOf('disabled:opacity-50')}:disabled`), ruleOf(`${selectorOf('disabled:pointer-events-none')}:disabled`)]).toEqual(['opacity: 50%;', 'pointer-events: none;'])
+  it('a remove of a disabled upload dims with the zone and shows not-allowed', () => {
+    expect(['disabled:opacity-50', 'disabled:cursor-not-allowed'].filter((cls) => !CLASSES_OF.FILE_UPLOAD_REMOVE.split(' ').includes(cls))).toEqual([])
+    expect([ruleOf(`${selectorOf('disabled:opacity-50')}:disabled`), ruleOf(`${selectorOf('disabled:cursor-not-allowed')}:disabled`)]).toEqual(['opacity: 50%;', 'cursor: not-allowed;'])
   })
 
   it('the message line leaves the grid while empty and stays in the accessibility tree: sr-only, never display none', () => {

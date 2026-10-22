@@ -28,8 +28,8 @@ export const DATE_PICKER_POPUP = [
 export const DATE_PICKER_HEADER = 'flex shrink-0 items-center gap-2'
 /** Three 44 px buttons under a finger leave about 92 px at 320 px: the month wraps, never cut. */
 export const DATE_PICKER_TITLE = 'min-w-0 flex-1 text-center text-sm font-semibold text-body wrap-anywhere'
-/** Dimmed and deaf to the pointer, and still focusable: a month button at the range's end keeps the focus it had. */
-const ARIA_DISABLED = 'aria-disabled:pointer-events-none aria-disabled:opacity-50'
+/** Dimmed, and still focusable: a month button at the range's end keeps the focus it had. The hook refuses its press. */
+const ARIA_DISABLED = 'aria-disabled:opacity-50'
 /** Previous, next and close: 24 px, 44 under a finger, where the drawing has bare 14 px carets. */
 export const DATE_PICKER_NAV = `${ICON_BUTTON} text-body ${HOVER.ghost} ${ARIA_DISABLED}`
 /** Under 20rem of screen (320 px) the room beside a trigger leaves the grid a row or less. It stops scrolling and the

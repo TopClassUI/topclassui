@@ -56,9 +56,16 @@ describe('the box that owns the width', () => {
     expect(ruleOf(selectorOf('grid-cols-1'))).toBe('grid-template-columns: repeat(1, minmax(0, 1fr));')
   })
 
-  it('a range input disabled by a fieldset, which Base UI does not know, dims the root and stops a press on its track', () => {
-    expect(ruleOf(`${selectorOf('has-disabled:pointer-events-none')}:has(:disabled)`)).toBe('pointer-events: none;')
+  it('a range input disabled by a fieldset, which Base UI does not know, dims the root and shows not-allowed on it', () => {
+    expect(ruleOf(`${selectorOf('has-disabled:cursor-not-allowed')}:has(:disabled)`)).toBe('cursor: not-allowed;')
     expect(ruleOf(`${selectorOf('has-disabled:opacity-50')}:has(:disabled)`)).toBe('opacity: 50%;')
+    expect(SLIDER_ROOT).not.toContain('pointer-events')
+  })
+
+  it('and stops a press on its track at the control, so the root around it keeps the cursor', () => {
+    expect(SLIDER_CONTROL.split(' ')).toContain('group-has-disabled/slider:pointer-events-none')
+    expect(ruleOf(`${selectorOf('group-has-disabled/slider:pointer-events-none')}:is(:where(.group\\/slider):has(:disabled) *)`))
+      .toBe('pointer-events: none;')
   })
 
   it('the control is padded by half a target, 12 px, and 22 under a finger', () => {

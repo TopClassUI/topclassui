@@ -131,10 +131,11 @@ describe('the shared class constants are used whole, not spot-copied', () => {
     })
   }
 
-  it('dims and stops the pointer when disabled, through the native attribute', () => {
+  it('dims and shows not-allowed when disabled, through the native attribute', () => {
     const list = classes({ disabled: true })
     expect(list).toContain('disabled:opacity-50')
-    expect(list).toContain('disabled:pointer-events-none')
+    expect(list).toContain('disabled:cursor-not-allowed')
+    expect(list).not.toContain('disabled:pointer-events-none')
   })
 
   it('never outgrows its container, even at its own width', () => {

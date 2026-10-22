@@ -140,10 +140,11 @@ describe('a tab of either look', () => {
     it(`${variant}: when disabled, dims what it holds and not itself, so its ring keeps its contrast`, () => {
       render(tabs({ variant }))
       expect(classes('tab')).toEqual(expect.arrayContaining([
-        'data-disabled:pointer-events-none', 'data-disabled:*:opacity-50', 'forced-colors:data-disabled:*:opacity-100',
+        'data-disabled:cursor-not-allowed', 'data-disabled:*:opacity-50', 'forced-colors:data-disabled:*:opacity-100',
         'forced-colors:data-disabled:not-data-active:text-[GrayText]',
       ]))
       expect(classes('tab')).not.toContain('data-disabled:opacity-50')
+      expect(classes('tab')).not.toContain('data-disabled:pointer-events-none')
     })
   }
 })

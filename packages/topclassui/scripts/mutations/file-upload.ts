@@ -172,8 +172,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the file upload input no longer covers the zone, so a click on the prompt opens nothing',
     file: CLASSES,
-    from: "FILE_UPLOAD_INPUT = 'absolute inset-0 size-full",
-    to: "FILE_UPLOAD_INPUT = 'absolute size-full",
+    from: 'FILE_UPLOAD_INPUT = `absolute inset-0 size-full',
+    to: 'FILE_UPLOAD_INPUT = `absolute size-full',
   },
   {
     label: 'the file upload picks the unit before rounding, so 1,048,575 bytes print 1,024 kB',
@@ -258,5 +258,11 @@ export const MUTATIONS: Mutation[] = [
     file: LIB,
     from: 'Math.max(0, padding - gap)',
     to: 'padding',
+  },
+  {
+    label: 'the file upload input loses the shared pointer, so a disabled upload shows the hand',
+    file: CLASSES,
+    from: 'size-full opacity-0 ${POINTER}`',
+    to: 'size-full opacity-0 cursor-pointer`',
   },
 ]

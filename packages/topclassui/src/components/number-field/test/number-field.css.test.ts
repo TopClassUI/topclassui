@@ -91,4 +91,10 @@ describe('the input and the steppers', () => {
     expect(ruleOf(`${selectorOf('data-readonly:opacity-50')}[data-readonly]`)).toBe('opacity: 50%;')
     expect(ruleOf(`${selectorOf('data-readonly:pointer-events-none')}[data-readonly]`)).toBe('pointer-events: none;')
   })
+
+  it('a disabled input shows not-allowed, which the browser would have made the arrow; the box around it does the dimming', () => {
+    expect(NUMBER_FIELD_INPUT.split(' ')).toEqual(expect.arrayContaining(['disabled:cursor-not-allowed', 'aria-disabled:cursor-not-allowed', 'data-disabled:cursor-not-allowed']))
+    expect(ruleOf(`${selectorOf('disabled:cursor-not-allowed')}:disabled`)).toBe('cursor: not-allowed;')
+    expect(NUMBER_FIELD_INPUT).not.toContain('opacity')
+  })
 })

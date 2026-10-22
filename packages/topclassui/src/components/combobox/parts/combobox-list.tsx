@@ -3,6 +3,7 @@
 import { Combobox as Base } from '@base-ui/react/combobox'
 
 import { check } from '#icons/data/check.js'
+import { skipDisabledHighlight } from '#shared/row-highlight.js'
 import { Svg } from '#components/svg/index.js'
 import { COMBOBOX_ITEM, COMBOBOX_ITEM_TEXT, COMBOBOX_ITEM_TICK, COMBOBOX_LIST } from '../classes.js'
 import { useComboboxList } from '../hook.js'
@@ -20,6 +21,7 @@ export function ComboboxList(props: ComboboxListProps) {
           index={row.index}
           value={row.item.value}
           disabled={row.item.disabled}
+          onMouseMove={skipDisabledHighlight(row.item.disabled)}
           data-row={row.index}
           aria-setsize={list.total}
           aria-posinset={row.index + 1}

@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -125,5 +125,17 @@ describe('paging (R-8.5-2): the component asks, and never while closed', () => {
     render(<Combobox aria-label="Framework" items={FRAMEWORKS} loadMore={loadMore} />)
     await userEvent.click(input())
     expect(loadMore).not.toHaveBeenCalled()
+  })
+})
+
+describe('a disabled option', () => {
+  it('keeps its pointer events for its not-allowed cursor, and a pointer moving over it takes no highlight', async () => {
+    render(<Combobox aria-label="Framework" items={[...FRAMEWORKS, { value: 'qwik', label: 'Qwik', disabled: true }]} />)
+    await userEvent.click(input())
+    const [astro, qwik] = [await screen.findByRole('option', { name: 'Astro' }), screen.getByRole('option', { name: 'Qwik' })]
+    fireEvent.mouseMove(astro, { movementX: 1 })
+    expect(astro.hasAttribute('data-highlighted')).toBe(true)
+    fireEvent.mouseMove(qwik, { movementX: 1 })
+    expect(qwik.hasAttribute('data-highlighted')).toBe(false)
   })
 })

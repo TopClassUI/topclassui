@@ -809,7 +809,7 @@ test.describe('a disabled row keeps its focus mark', () => {
       expect(await fillOf(page, disabled)).toEqual(enabled)
       await expect(disabled).toHaveCSS('opacity', '1')
       await expect(disabled.locator('span.min-w-0')).toHaveCSS('opacity', '0.5')
-      await expect(disabled).toHaveCSS('pointer-events', 'none')
+      await expect(disabled).toHaveCSS('cursor', 'not-allowed')
     })
   }
 })

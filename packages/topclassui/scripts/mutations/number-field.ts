@@ -145,4 +145,10 @@ export const MUTATIONS: Mutation[] = [
     from: "    input.addEventListener('keydown', enter)\n",
     to: '',
   },
+  {
+    label: 'the number field input shows the arrow when disabled, not not-allowed',
+    file: CLASSES,
+    from: '${TARGET_HEIGHT} ${NOT_ALLOWED}`',
+    to: '${TARGET_HEIGHT}`',
+  },
 ]

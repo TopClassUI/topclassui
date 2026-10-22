@@ -137,6 +137,18 @@ describe('a choice', () => {
     expect(screen.getByRole('dialog')).toBeTruthy()
   })
 
+  it('a press on a day outside the range moves no focus either: it keeps its pointer events only for its cursor', async () => {
+    const onValueChange = vi.fn()
+    render(<CheckIn defaultValue="2026-10-02" minDate="2026-09-25" maxDate="2027-03-31" onValueChange={onValueChange} />)
+    await open()
+    const previous = screen.getByRole('button', { name: 'Previous month' })
+    await userEvent.click(previous)
+    await userEvent.click(within(screen.getByRole('grid')).getByRole('button', { name: 'Thursday, September 24, 2026' }))
+    expect(document.activeElement).toBe(previous)
+    expect(onValueChange).not.toHaveBeenCalled()
+    expect(screen.getByRole('heading').textContent).toBe('September 2026')
+  })
+
   it('controlled: stays where its owner holds it, and follows the owner', async () => {
     function Owner() {
       const [value, setValue] = useState<string | null>('2026-09-22')
@@ -175,9 +187,12 @@ describe('the month buttons', () => {
     const [previous, next] = [screen.getByRole('button', { name: 'Previous month' }), screen.getByRole('button', { name: 'Next month' })]
     expect([previous.getAttribute('aria-disabled'), previous.hasAttribute('disabled')]).toEqual(['true', false])
     const stop = () => screen.getByRole('grid').querySelector('button[tabindex="0"]')?.getAttribute('aria-label')
+    const before = document.activeElement
+    // Disabled from the start, a press on it does nothing, and so takes no focus either, as Base UI's own disabled buttons.
     await userEvent.click(previous)
     expect([screen.getByRole('heading').textContent, stop()]).toEqual(['September 2026', 'Wednesday, September 30, 2026'])
-    expect(document.activeElement).toBe(previous)
+    expect(document.activeElement).toBe(before)
+    expect(document.activeElement).not.toBe(previous)
     await userEvent.click(next)
     expect(screen.getByRole('heading').textContent).toBe('October 2026')
     expect([next.getAttribute('aria-disabled'), next.hasAttribute('disabled')]).toEqual(['true', false])

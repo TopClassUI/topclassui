@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { FOCUS_RING_WITHIN, TOUCH_TARGET } from '#shared/classes.js'
+import { FOCUS_RING_WITHIN, POINTER, TOUCH_TARGET } from '#shared/classes.js'
 import { compileEntry } from '#test/stylesheet.js'
 import {
   RATING_FILL, RATING_FILL_ICON, RATING_FILL_WIDTH, RATING_RADIO, RATING_ROOT, RATING_STAR, RATING_STEP,
 } from '../classes.js'
 
-// Rating's own classes; the shared ones (TOUCH_TARGET, FOCUS_RING_WITHIN, DISABLED) are pinned in src/shared.
+// Rating's own classes; the shared ones (TOUCH_TARGET, FOCUS_RING_WITHIN, POINTER, DISABLED) are pinned in src/shared.
 const DECLARATION: Record<string, string> = {
   'inline-flex': 'display: inline-flex;',
   'flex-wrap': 'flex-wrap: wrap;',
@@ -25,13 +25,13 @@ const DECLARATION: Record<string, string> = {
   'w-full': 'width: 100%;',
   'w-1/2': 'width: calc(1 / 2 * 100%);',
   'max-w-none': 'max-width: none;',
-  'cursor-pointer': 'cursor: pointer;',
   'justify-center': 'justify-content: center;',
   'rounded-control': 'border-radius: var(--tc-radius);',
   'inset-0': 'inset: 0px;',
   'size-full': 'width: 100%;',
   'appearance-none': 'appearance: none;',
   'opacity-0': 'opacity: 0%;',
+  'pointer-events-none': 'pointer-events: none;',
 }
 
 const escape = (cls: string) => cls.replace(/[^a-zA-Z0-9_-]/g, '\\$&')
@@ -42,8 +42,8 @@ function ruleFor(css: string, cls: string): string {
   return at === -1 ? '' : css.slice(at, css.indexOf('}', at) + 1)
 }
 
-/** Every class of Rating's own tables, without the two shared constants a step is built from. */
-const shared = new Set(`${TOUCH_TARGET} ${FOCUS_RING_WITHIN}`.split(' '))
+/** Every class of Rating's own tables, without the shared constants a step and its radio are built from. */
+const shared = new Set(`${TOUCH_TARGET} ${FOCUS_RING_WITHIN} ${POINTER}`.split(' '))
 const written = [RATING_ROOT, RATING_STAR, RATING_FILL, RATING_FILL_ICON, RATING_RADIO, RATING_STEP, ...Object.values(RATING_FILL_WIDTH)]
   .join(' ').split(' ').filter((cls) => !shared.has(cls))
 
@@ -78,7 +78,15 @@ describe('the guarantees a class carries', () => {
   })
 
   it('the radio covers its whole label and is invisible, never sr-only', () => {
-    expect(RATING_RADIO.split(' ')).toEqual(['absolute', 'inset-0', 'size-full', 'cursor-pointer', 'appearance-none', 'opacity-0'])
+    expect(RATING_RADIO.split(' ')).toEqual([
+      'absolute', 'inset-0', 'size-full', 'appearance-none', 'opacity-0', 'cursor-pointer', 'disabled:cursor-not-allowed',
+      'aria-disabled:cursor-not-allowed', 'data-disabled:cursor-not-allowed', 'data-readonly:cursor-default', 'data-loading:cursor-default',
+    ])
+  })
+
+  it('the star drawn over the radio lets the pointer through, so a disabled step shows the radio\'s not-allowed', () => {
+    expect(RATING_STAR.split(' ')).toContain('pointer-events-none')
+    expect(RATING_STEP).not.toContain('cursor')
   })
 
   it('a step is a target and carries the ring of the radio it holds', () => {

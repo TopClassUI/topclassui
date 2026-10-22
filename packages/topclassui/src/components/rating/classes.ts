@@ -1,15 +1,16 @@
 // R-5.12-4: this component's own class tables, built from the shared constants.
-import { CONTAIN, DISABLED, FOCUS_RING_WITHIN, TOUCH_TARGET } from '#shared/classes.js'
+import { CONTAIN, DISABLED, FOCUS_RING_WITHIN, POINTER, TOUCH_TARGET } from '#shared/classes.js'
 import type { RatingFill } from './types.js'
 
 /** The row, read-only or editing. Ten xl stars are 436 px, so a row that meets a narrow box wraps. */
 export const RATING_ROOT = `inline-flex flex-wrap items-center gap-1 ${CONTAIN}`
 
-/** The radio group adds the disabled look: dimmed, and no pointer reaches a star. */
+/** The radio group adds the disabled look: dimmed, and not-allowed under the pointer. */
 export const RATING_GROUP = `${RATING_ROOT} ${DISABLED}`
 
-/** One star: the outline, in a colour of 3:1, on the span and never on the svg. */
-export const RATING_STAR = 'relative inline-flex shrink-0 text-line-strong'
+/** One star: the outline, in a colour of 3:1, on the span and never on the svg. Drawn over the radio, it lets the pointer
+ * through to it, so the radio's own cursor is the one shown, not-allowed when disabled, and a press still reaches it. */
+export const RATING_STAR = 'pointer-events-none relative inline-flex shrink-0 text-line-strong'
 
 /** The filled star over it, clipped from the inline start, so a half fills the right half in Arabic.
  * warning-on-soft, not warning-solid: amber-500 is 2.13:1 on a white page, and an icon needs 3:1. */
@@ -25,7 +26,7 @@ export const RATING_FILL_WIDTH = {
 export const RATING_FILL_ICON = 'max-w-none'
 
 /** One step: a label as large as a target, ringed when the radio inside it has the keyboard. */
-export const RATING_STEP = `relative inline-flex cursor-pointer items-center justify-center rounded-control ${TOUCH_TARGET} ${FOCUS_RING_WITHIN}`
+export const RATING_STEP = `relative inline-flex items-center justify-center rounded-control ${TOUCH_TARGET} ${FOCUS_RING_WITHIN}`
 
 /** The native radio, over the whole label: not sr-only, or it is a 1 px target. */
-export const RATING_RADIO = 'absolute inset-0 size-full cursor-pointer appearance-none opacity-0'
+export const RATING_RADIO = `absolute inset-0 size-full appearance-none opacity-0 ${POINTER}`

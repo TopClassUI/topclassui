@@ -60,11 +60,15 @@ describe('the line forced colours leave of a shape drawn by its fill alone', () 
 })
 
 describe('disabled and loading each carry both halves', () => {
-  it('dims and blocks a real control and an element with only data-disabled', () => {
+  it('dims a real control and an element with only data-disabled, and shows not-allowed on both', () => {
     for (const cls of [
-      'disabled:pointer-events-none', 'disabled:opacity-50',
-      'data-disabled:pointer-events-none', 'data-disabled:opacity-50',
+      'disabled:opacity-50', 'disabled:cursor-not-allowed',
+      'data-disabled:opacity-50', 'data-disabled:cursor-not-allowed',
     ]) expect(has(DISABLED, cls), cls).toBe(true)
+  })
+
+  it('keeps the pointer events of a disabled control, or its not-allowed cursor could never paint', () => {
+    expect(DISABLED).not.toContain('pointer-events')
   })
 
   it('keeps a loading control at full colour, shows progress and blocks clicks', () => {

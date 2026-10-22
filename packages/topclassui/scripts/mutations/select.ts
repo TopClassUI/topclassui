@@ -163,4 +163,10 @@ export const MUTATIONS: Mutation[] = [
     from: 'items.length > virtualizeAbove',
     to: 'false',
   },
+  {
+    label: 'the select lets a pointer highlight a disabled option',
+    file: CLIENT,
+    from: '                  onMouseMove={skipDisabledHighlight(item.disabled)}\n',
+    to: '',
+  },
 ]

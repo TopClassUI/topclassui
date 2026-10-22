@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
@@ -45,6 +45,16 @@ describe('a choice, with Base UI\'s details', () => {
     await choose('Morocco')
     expect(onValueChange).not.toHaveBeenCalled()
     expect(hidden(container).value).toBe('jo')
+  })
+
+  it('a disabled option keeps its pointer events for its cursor, and a pointer moving over it takes no highlight', async () => {
+    render(<Country defaultValue="jo" />)
+    await userEvent.click(trigger())
+    const [egypt, morocco] = [await screen.findByRole('option', { name: 'Egypt' }), screen.getByRole('option', { name: 'Morocco' })]
+    fireEvent.mouseMove(egypt, { movementX: 1 })
+    expect(egypt.hasAttribute('data-highlighted')).toBe(true)
+    fireEvent.mouseMove(morocco, { movementX: 1 })
+    expect(morocco.hasAttribute('data-highlighted')).toBe(false)
   })
 
   it('a handler that calls details.cancel() leaves the value as it was, on screen and in the input', async () => {
