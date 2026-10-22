@@ -32,7 +32,7 @@ export function TryItControl({ control, value, onChange, description, idBase }: 
     const id = `${labelId}-box`
     return (
       <div className={CHECK_ROW}>
-        <Checkbox id={id} aria-describedby={describedBy} size="sm" checked={value === true} onCheckedChange={(checked) => { onChange(checked) }} />
+        <Checkbox id={id} aria-describedby={describedBy} size="xs" checked={value === true} onCheckedChange={(checked) => { onChange(checked) }} />
         <label htmlFor={id} dir="ltr" className={CHECK_LABEL}>{control.prop}</label>
         <span id={describedBy} className="sr-only">{description}</span>
       </div>

@@ -18,7 +18,7 @@ export function SidebarGroups({ locale, current, labels }: SidebarGroupsProps) {
     const pages = LIVE_PAGES.filter((page) => page.group === group)
     if (pages.length === 0) return null
     return (
-      <SidebarGroup key={group} label={<span className={`uppercase ${TYPE.eyebrow}`}>{labels.shell.groups[group]}</span>} className="pt-2 *:gap-0.5">
+      <SidebarGroup key={group} label={<span className={`-ms-1 uppercase ${TYPE.eyebrow}`}>{labels.shell.groups[group]}</span>} className="pt-2 *:gap-0.5">
         {pages.map((page) => (
           <SidebarLink
             key={page.slug}

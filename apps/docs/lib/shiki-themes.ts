@@ -48,4 +48,4 @@ export const ON_DARK = themeOf('on-dark', DARK_GROUND)
 export const ON_LIGHT = themeOf('on-light', LIGHT_GROUND)
 
 /** The languages the site's fences and demos use; anything else renders as plain text. */
-export const LANGS = ['tsx', 'ts', 'jsx', 'js', 'css', 'bash', 'json', 'html'] as const
+export const LANGS = ['tsx', 'ts', 'jsx', 'js', 'css', 'bash', 'json', 'html', 'text'] as const
