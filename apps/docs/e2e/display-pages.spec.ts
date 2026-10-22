@@ -157,7 +157,7 @@ test('a live CodeBlock example hydrates: its copy button answers a click', async
   await expect(page.locator('section[aria-labelledby="examples"] [role="status"]').first()).not.toBeEmpty()
 })
 
-test('Card: Try it switches the link, the media band and the footer, starting as the frame draws them', async ({ page }) => {
+test('Card: Try it switches the link, the media band and the footer, starting as the frame draws them, and THE CODE follows', async ({ page }) => {
   const errors = collectErrors(page)
   await page.goto('/en/docs/components/card')
   const cardEntry = card(page, 'card')
@@ -167,12 +167,19 @@ test('Card: Try it switches the link, the media band and the footer, starting as
   await expect(cardEntry.getByRole('checkbox', { name: 'footer' })).toBeChecked()
   await expect(cardEntry.locator('pre').first()).toContainText("from 'topclassui/card'")
   await expect(cardEntry.locator('pre').first()).toContainText('Download PDF')
+  // THE CODE follows each switch: the branch it turns on, and none of the parts it turns off.
+  const code = cardEntry.locator('pre').first()
   await cardEntry.getByRole('checkbox', { name: 'media' }).click()
   await expect(stage.locator('.rounded-t-box')).toHaveCount(1)
+  await expect(code).toContainText('<CardMedia>')
+  await expect(code).not.toContainText('Download PDF')
   await cardEntry.getByRole('checkbox', { name: 'interactive' }).click()
   await expect(stage.getByRole('link')).toHaveCount(1)
   await expect(stage.getByRole('button')).toHaveCount(0)
+  await expect(code).toContainText('<CardRoot render={<a href="#card" />}>')
+  await expect(code).not.toContainText('<Button')
   await cardEntry.getByRole('checkbox', { name: 'footer' }).click()
   await expect(stage.getByText('Read more')).toHaveCount(0)
+  await expect(code).not.toContainText('CardFooter')
   expect(errors).toEqual([])
 })
