@@ -61,11 +61,14 @@ test('every live example on a Forms page is hydrated by React', async ({ page })
     const controls = examplesOf(page).locator('input, textarea, button, [role="slider"], [role="combobox"]')
     expect(await controls.count(), slug).toBeGreaterThan(0)
     // An example takes over when it nears the viewport (lazy-island.tsx), so each is brought on screen first.
+    // It watches the viewport only once it has mounted, and sees a place only in a frame: a scroll before either passes it unseen.
+    await expect.poll(() => examplesOf(page).evaluate((section) => [...section.querySelectorAll('[data-island]')]
+      .filter((box) => !section.contains(box.parentElement?.closest('[data-island]') ?? null) && !box.hasAttribute('data-island-mounted')).length), { message: slug }).toBe(0)
     await examplesOf(page).evaluate(async (section) => {
       const end = section.getBoundingClientRect().bottom + window.scrollY
       for (let y = section.getBoundingClientRect().top + window.scrollY; y < end; y += window.innerHeight) {
         window.scrollTo({ top: y, behavior: 'instant' })
-        await new Promise((resolve) => setTimeout(resolve, 150))
+        await new Promise((resolve) => { requestAnimationFrame(() => { setTimeout(resolve, 150) }) })
       }
     })
     await page.waitForLoadState('networkidle')
