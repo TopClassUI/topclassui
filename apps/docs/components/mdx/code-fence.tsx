@@ -44,10 +44,10 @@ export function fenceOf(children: ReactNode): { code: string; lang: string | und
   }
 }
 
-/** A fenced block: CodeBlock with Shiki's colours from build time, named by its file, its language or "code" (docs-site S3). */
+/** A fenced block: CodeBlock with Shiki's colours from build time, named by its file, "terminal" or "code" (docs-site S3). */
 export async function CodeFence({ children, locale, terminal, title, repeat, copy = true, wrap = false, className }: CodeFenceProps) {
   const { code, lang, meta, repeat: count } = fenceOf(children)
-  const named = title ?? parseMeta(meta).title ?? (lang === undefined ? labelsFor(locale).blocks.code : SHELL.has(lang) ? terminal : lang)
+  const named = title ?? parseMeta(meta).title ?? (lang !== undefined && SHELL.has(lang) ? terminal : labelsFor(locale).blocks.code)
   const highlighted = await highlight(code, lang)
   return (
     <CodeFrame

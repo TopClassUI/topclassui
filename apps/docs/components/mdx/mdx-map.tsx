@@ -50,7 +50,7 @@ export function mdxComponents(locale: Locale): MDXComponents {
     InstallLine: () => <code dir="ltr" className={PROSE_CODE}>{INSTALL_LINE}</code>,
     ThemeUtilities: () => <ThemeUtilities locale={locale} labels={labels.blocks.utilities} />,
     PropsTable: ({ of }: { of: 'TopClassProvider' }) => <PropsTable of={of} locale={locale} labels={labels} />,
-    ThemeScriptCsp: () => <ThemeScriptCsp locale={locale} />,
+    ThemeScriptCsp: () => <ThemeScriptCsp locale={locale} title={labels.blocks.code} />,
     ThemeScriptHtml: () => <ThemeScriptHtml locale={locale} />,
   }
 }
