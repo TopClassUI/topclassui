@@ -54,8 +54,8 @@ export function Breadcrumb({
           return (
             // The index is the key: two crumbs may share a label, and the trail is never reordered.
             <li key={index} className={ITEM}>
-              {/* Svg hides an unlabelled icon and flips a directional one under dir="rtl". */}
-              {index === 0 ? null : <Svg icon={caretRight} />}
+              {/* Svg hides an unlabelled icon and flips a directional one under dir="rtl"; the house stands as the root, with no caret after it (Figma 138:1173). */}
+              {index === 0 || (showHome && index === 1) ? null : <Svg icon={caretRight} />}
               {item.href === undefined ? (
                 <span dir={resolveLabelDir(item.label)} aria-current={current ? 'page' : undefined} className={current ? CURRENT : TEXT}>
                   {home ? <><Svg icon={house} />{text}</> : cutLabel(item.label, max)}

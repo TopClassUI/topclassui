@@ -24,6 +24,7 @@ const DECLARATION: Record<string, string> = {
   'wrap-anywhere': 'overflow-wrap: anywhere;',
   'border-(length:--tc-line-width)': 'border-width: var(--tc-line-width);',
   'border-line': 'border-color: var(--tc-line);',
+  'group/accordion': '',
   // The line between two items.
   'border-t-(length:--tc-line-width)': 'border-top-width: var(--tc-line-width);',
   'first:border-t-0': 'border-top-width: 0px;',
@@ -57,8 +58,9 @@ const DECLARATION: Record<string, string> = {
   'duration-(--tc-duration)': 'transition-duration: var(--tc-duration);',
   'ease-out': 'transition-timing-function: var(--ease-out);',
   'disabled:pointer-events-none': 'pointer-events: none;',
-  'disabled:opacity-50': 'opacity: 50%;',
   'data-disabled:pointer-events-none': 'pointer-events: none;',
+  'not-forced-colors:not-group-data-disabled/accordion:disabled:opacity-50': 'opacity: 50%;',
+  'not-forced-colors:not-group-data-disabled/accordion:data-disabled:opacity-50': 'opacity: 50%;',
   'data-disabled:opacity-50': 'opacity: 50%;',
   '[:first-child>*>&]:rounded-t-box': 'border-top-left-radius: min(calc(var(--tc-radius) * 1.5), 1.5rem);',
   '[:last-child>*>&]:not-data-panel-open:rounded-b-box': 'border-bottom-right-radius: min(calc(var(--tc-radius) * 1.5), 1.5rem);',
@@ -111,11 +113,11 @@ describe('every class an Accordion wears compiles with the installed Tailwind', 
       ACCORDION_ROOT, ACCORDION_ITEM, ACCORDION_TRIGGER, ACCORDION_TITLE, ACCORDION_CARET, ACCORDION_PANEL, ACCORDION_CONTENT,
     ])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(70)
+    expect(all).toHaveLength(72)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {
-    // group is a marker with no rule of its own: the caret's variant reads it.
+    // group and group/accordion are markers with no rule of their own: the caret's and the trigger's variants read them.
     if (declaration === '') continue
     it(`${cls} emits ${declaration}`, async () => {
       expect(ruleFor(await css, cls), cls).toContain(declaration)

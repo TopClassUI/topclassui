@@ -128,14 +128,26 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a tabs tab may be wider than its list, so a long label never ends in an ellipsis',
     file: CLASSES,
-    from: '  CONTAIN,\n  FOCUS_RING_INSET,',
-    to: '  FOCUS_RING_INSET,',
+    from: '  CONTAIN,\n  POINTER,',
+    to: '  POINTER,',
   },
   {
     label: 'the ring of a tabs tab is drawn outside it, where the list clips it',
     file: CLASSES,
-    from: '  CONTAIN,\n  FOCUS_RING_INSET,',
-    to: '  CONTAIN,\n  FOCUS_RING,',
+    from: '`${TAB} ${FOCUS_RING_INSET} ${TABS_RAISED}`',
+    to: '`${TAB} ${FOCUS_RING} ${TABS_RAISED}`',
+  },
+  {
+    label: 'the ring of a line tab is inset by its width alone again, so it covers the bar of the focused tab',
+    file: CLASSES,
+    from: 'focus-visible:-outline-offset-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+2px)]',
+    to: 'focus-visible:-outline-offset-(length:--tc-ring-width)',
+  },
+  {
+    label: 'the bar of a disabled active tab stays at full strength, where the frame dims it with its label',
+    file: CLASSES,
+    from: "  'data-disabled:data-active:border-primary-solid/50 ",
+    to: "  '",
   },
   {
     label: 'a tabs tab loses the 24 and 44 px floors, so an xs tab is a 28 px target under a finger',

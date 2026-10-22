@@ -177,8 +177,8 @@ describe('pageCount', () => {
 
 describe('the width the full row claims', () => {
   it('adds four arrows, each page at its floor or by its digits, a gap at the floor, and the room between cells', () => {
-    // 4 x 30 arrows, 3 x 26 pages and 6 x 4 between them at xs.
-    expect(measureRow(['1', '2', '3'], 'xs')).toBe(222)
+    // 4 x 24 arrows, 3 x 24 pages and 6 x 4 between them at xs.
+    expect(measureRow(['1', '2', '3'], 'xs')).toBe(192)
     // The middle row at md: 4 x 40 arrows, 7 x 40 pages and gaps, 10 x 6 between them.
     expect(measureRow(['1', '', '5', '6', '7', '', '12'], 'md')).toBe(500)
     // "12,345" is 6 x 8 + 21 = 69 wide, past the 40 px floor: 160 + 69 + 4 x 6.

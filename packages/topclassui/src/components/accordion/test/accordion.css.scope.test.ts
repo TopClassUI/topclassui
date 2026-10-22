@@ -12,6 +12,9 @@ const SCOPE: Record<string, string> = {
   'focus-visible:outline-solid': ':focus-visible {',
   'focus-visible:-outline-offset-(length:--tc-ring-width)': ':focus-visible {',
   'data-disabled:opacity-50': '[data-disabled] {',
+  // Inside a disabled root the box has dimmed already, so the trigger does not dim a second time.
+  'not-forced-colors:not-group-data-disabled/accordion:data-disabled:opacity-50': ':not(:is(:where(.group/accordion)[data-disabled] *))[data-disabled] {',
+  'not-forced-colors:not-group-data-disabled/accordion:disabled:opacity-50': ':not(:is(:where(.group/accordion)[data-disabled] *)):disabled {',
   'forced-colors:data-disabled:text-[GrayText]': '[data-disabled] {',
   'forced-colors:data-disabled:opacity-100': '[data-disabled] {',
   'forced-colors:group-data-disabled:text-[GrayText]': ':is(:where(.group)[data-disabled] *) {',

@@ -35,7 +35,7 @@ describe('the parts are where the scan expects them', () => {
 
 describe('the rail', () => {
   it('is the group its server parts read, a column as tall as its parent that a flex row cannot squeeze', () => {
-    expect(nav?.slice(0, 10)).toEqual(['group/sidebar', 'relative', 'flex', 'h-full', 'shrink-0', 'flex-col', 'gap-1', 'bg-page', 'p-2', 'text-body'])
+    expect(nav?.slice(0, 10)).toEqual(['group/sidebar', 'relative', 'flex', 'h-full', 'shrink-0', 'flex-col', 'gap-0.5', 'bg-page', 'p-2', 'text-body'])
   })
 
   // A rail with no SidebarBody, inside a box of the page that scrolls: its hidden labels need a box of their own to stay in.
@@ -63,7 +63,7 @@ describe('the rail', () => {
 
 describe('the header', () => {
   it('is a row that never shrinks, and centres the toggle when the title is gone', () => {
-    expect(header).toEqual(['flex', 'shrink-0', 'items-center', 'gap-2', 'pb-1.5', 'group-data-closed/sidebar:justify-center'])
+    expect(header).toEqual(['flex', 'shrink-0', 'items-center', 'gap-2', 'pb-0.5', 'group-data-closed/sidebar:justify-center'])
   })
 
   it('the toggle is the shared icon button with its 24 and 44 px floors, its ring and the ghost hover of the neutral ramp', () => {

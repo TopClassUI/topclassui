@@ -357,8 +357,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the toggle of a collapsed sidebar stays at the start, 7.5 px off the icons under it',
     file: CLASSES,
-    from: " pb-1.5 group-data-closed/sidebar:justify-center'",
-    to: " pb-1.5'",
+    from: " pb-0.5 group-data-closed/sidebar:justify-center'",
+    to: " pb-0.5'",
   },
   {
     label: 'the current sidebar row is medium, which a font with a regular and a bold face draws as regular',

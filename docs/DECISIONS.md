@@ -24,6 +24,28 @@ The format is: date, decision, why, and what it affects.
 **Not built, for Omar** (the frames draw them in Try it with nothing behind them): Input `type` as a select and `variant`; Textarea, Select and Combobox `variant`; SegmentedControl `tone` and `orientation`; Rating `precision`, `showValue` and `allowClear`; DatePicker `mode`, `clearable` and `showWeekNumbers`, and the frame's en-GB date ("22 Sep 2026") where the site's en locale formats month first; FileUpload `accept` and `showList` as controls, `multiple` (owned by `maxFiles`), the maxSize presets as a select, an initial-files API for the stage's file row, and the per-file status (uploading, done); OTPField's ring at rest on the active cell of the idle and partly filled cells, which would make them read as focus-visible.
 
 **Affects.** `combobox/classes.ts` and `client.tsx`; `date-picker/schema.ts` and `dummy/playground.tsx`; `segmented-control/classes.ts`; `otp-field/schema.ts`, `constants.ts`, `types.ts` and `lib.ts`; the READMEs; `apps/docs/content/components/{date-picker,otp-field}.ts`.
+## 2026-10-22 - The navigation family's small library rows of round 11
+
+**Decision.** Job 155 (round 12) closes the small and safe library rows of `cloud-reports/audit-r11/job-145-status.md`. Each one is a class or a line in markup, with no new prop and no new API:
+
+- **A disabled Accordion dims once.** In Base UI 1.8.0 a disabled root sets `data-disabled` on the root, on every item and on every trigger (`AccordionItem.mjs`: an item is disabled when it or its root is). The root now dims as one box, fill and edge included, as Figma 138:1118 draws it. A trigger dims only outside a disabled root (`not-group-data-disabled/accordion:`), so its text never sits at 25 %. A disabled item between live ones still dims its trigger alone. Under forced colours the box stays opaque and the trigger takes GrayText at full strength.
+- **The line tab's ring sits above its bar.** The list scrolls sideways, and `overflow-x: auto` clips the block axis too, so a ring drawn outside a tab would still be cut. The list cannot stop clipping without padding that moves its hairline away from the bar. The ring therefore stays inside the tab, but on a line tab it is now inset past the 2 px bar and the ring offset (`-outline-offset: calc(ring width + ring offset + 2px)`). The bar shows under a focused tab (138:949). The ring stays square, because a radius would round the ends of the bar. An enclosed tab has no bar and keeps `FOCUS_RING_INSET`.
+- **A disabled tab's bar dims with its label** (`border-primary-solid/50`, GrayText under forced colours), as 138:962 draws it. The list's hairline stays at full strength: the list itself is not disabled, only its tabs are, and Tabs `disabled` is one of the Try it props not built (2026-10-19).
+- **No caret after the house.** With `showHome`, the crumb after the house has no caret before it (138:1173), so the house stands as the root of the trail. A folded trail's dots keep their caret. This extends the 2026-10-22 entry "Breadcrumb, Kbd and Card get the Try it".
+- **Pagination's xs cell is 24 px.** It is the floor itself (`px-1`, no width step), as the states strip draws it; an arrow cell was 30 px. `PAGINATION_CELL_PX.xs` follows (24, 24, 7, 10, 4), so a three-page xs row claims 20rem instead of 22.
+- **The sidebar header is 26 px.** It has `pb-0.5` under the 24 px toggle, which R-5.6-2 keeps at 24 px. The rail spaces the header 2 px from the rows (`gap-0.5`), as 138:2539 draws it.
+
+**Kept.** The sidebar's current row stays semibold, where 138:2580 draws Medium. The reason is the one in `sidebar/classes.ts`: a font with only a regular and a bold face paints 500 as regular, and the tint alone would then tell the current row, which WCAG 1.4.1 does not allow. Breadcrumb's current crumb and the active tab are semibold for the same reason.
+
+**Held for Omar, built on `fix/r12-library-navigation`.** Accordion `size`, with its context, `data-size`, schema and types. A crumb's own `link` element, which the states strip's hover cell (138:1231) needs. Until then that cell ends on the current Button.
+
+**Still not built,** as recorded on 2026-10-19:
+
+- Try it props: Pagination `shape`, `showFirstLast` and `showPrevNext`; Tabs `orientation`, `fullWidth` and `disabled`; Accordion `type`, `variant` and `collapsible`; Stepper `orientation`, `activeStep`, `clickable`, `showConnector` and `compact`; Navbar `size`, `bordered` and `collapsible`; Sidebar `variant`, `width`, `collapsible`, `bordered` and `overlayOnMobile`.
+- Navbar's mobile menu and rounded corners, and Sidebar's card border.
+- Pagination's window rule. The row stays one length on every page (`lib.ts`), so page 1 shows 1 2 3 4 5 … 24. Omar decides, or Figma redraws 138:1302.
+
+**Affects.** `src/components/{accordion,tabs,breadcrumb,pagination,sidebar}`: classes, the Breadcrumb caret line, tests, the e2e specs for those components, the mutation rows and the READMEs.
 
 ---
 

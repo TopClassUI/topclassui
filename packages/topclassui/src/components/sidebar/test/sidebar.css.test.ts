@@ -21,7 +21,6 @@ const DECLARATION: Record<string, string> = {
   'self-start': 'align-self: flex-start;',
   'flex-col': 'flex-direction: column;',
   'gap-0.5': 'gap: calc(var(--spacing) * 0.5);',
-  'gap-1': 'gap: var(--spacing);',
   'bg-page': 'background-color: var(--tc-page);',
   'cursor-pointer': 'cursor: pointer;',
   'p-2': 'padding: calc(var(--spacing) * 2);',
@@ -57,7 +56,7 @@ const DECLARATION: Record<string, string> = {
   'active:bg-(--tc-soft-hover)': 'background-color: var(--tc-soft-hover);',
   // The header and its title.
   'gap-2': 'gap: calc(var(--spacing) * 2);',
-  'pb-1.5': 'padding-bottom: calc(var(--spacing) * 1.5);',
+  'pb-0.5': 'padding-bottom: calc(var(--spacing) * 0.5);',
   'group-data-closed/sidebar:justify-center': 'justify-content: center;',
   'truncate': 'text-overflow: ellipsis;',
   'min-w-0': 'min-width: 0px;',
@@ -133,7 +132,7 @@ describe('every class Sidebar writes compiles with the installed Tailwind', () =
 
   it('the table names exactly the classes of classes.ts, and the one that only marks the group', () => {
     expect(written).toEqual([...Object.keys(DECLARATION), 'group/sidebar'].sort())
-    expect(written).toHaveLength(78)
+    expect(written).toHaveLength(77)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

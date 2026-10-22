@@ -124,8 +124,7 @@ describe('a tab of either look', () => {
     it(`${variant}: draws its ring inside its own box, because the list clips`, () => {
       render(tabs({ variant }))
       expect(classes('tab')).toEqual(expect.arrayContaining([
-        'outline-none', 'focus-visible:outline-solid', 'focus-visible:outline-(length:--tc-ring-width)',
-        'focus-visible:-outline-offset-(length:--tc-ring-width)', 'focus-visible:outline-ring',
+        'outline-none', 'focus-visible:outline-solid', 'focus-visible:outline-(length:--tc-ring-width)', 'focus-visible:outline-ring',
       ]))
       expect(classes('tab')).not.toContain('focus-visible:outline-offset-(length:--tc-ring-offset)')
     })
@@ -188,5 +187,19 @@ describe('the panel', () => {
       'mt-4', 'wrap-anywhere', 'outline-none', 'focus-visible:outline-solid', 'focus-visible:outline-(length:--tc-ring-width)',
       'focus-visible:outline-offset-(length:--tc-ring-offset)', 'focus-visible:outline-ring',
     ])
+  })
+})
+
+describe('where the ring sits inside a tab', () => {
+  it('line: inset past the 2 px bar and the ring offset, so the bar shows under a focused tab (Figma 138:949)', () => {
+    render(tabs({ variant: 'line' }))
+    expect(classes('tab')).toContain('focus-visible:-outline-offset-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+2px)]')
+    expect(classes('tab')).not.toContain('focus-visible:-outline-offset-(length:--tc-ring-width)')
+  })
+
+  it('enclosed: inset by its own width, since no bar lies under it', () => {
+    render(tabs({ variant: 'enclosed' }))
+    expect(classes('tab')).toContain('focus-visible:-outline-offset-(length:--tc-ring-width)')
+    expect(classes('tab')).not.toContain('focus-visible:-outline-offset-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+2px)]')
   })
 })

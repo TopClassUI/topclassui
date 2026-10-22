@@ -168,7 +168,7 @@ describe('the compact row on a narrow list or under a finger', () => {
 
   it('lets the list claim its row and turn compact below it, so a cell sized to its content shows the full row', () => {
     const steps = RENDERED.filter((cls) => cls.startsWith('pagination-at-')).sort()
-    expect(steps).toEqual(['pagination-at-22', 'pagination-at-28', 'pagination-at-32', 'pagination-at-36', 'pagination-at-38', 'pagination-at-44'])
+    expect(steps).toEqual(['pagination-at-20', 'pagination-at-28', 'pagination-at-32', 'pagination-at-36', 'pagination-at-38', 'pagination-at-44'])
     expect(flat()).toContain(
       '.pagination-at-28 { contain-intrinsic-inline-size: 28rem; @container pagination (width < 28rem) { '
       + '& .pagination-full { display: none !important; } & .pagination-compact { display: flex; } } }',
