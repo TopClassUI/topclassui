@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { parseMeta, textOf } from './text-of.js'
+import { parseMeta, shownOf, textOf } from './text-of.js'
 
 describe('textOf', () => {
   it('joins the text of nested elements', () => {
@@ -23,5 +23,14 @@ describe('parseMeta', () => {
 
   it('reads an empty info string as no title', () => {
     expect(parseMeta(undefined)).toEqual({ check: false })
+  })
+})
+
+describe('shownOf', () => {
+  it('keeps the lines show names, dedented, and the whole fence without it', () => {
+    const code = 'import { A } from "a"\n\nexport function B() {\n  return (\n    <A>\n      <b />\n    </A>\n  )\n}'
+    expect(shownOf(code, 'check show="5-7"')).toBe('<A>\n  <b />\n</A>')
+    expect(shownOf(code, 'check')).toBe(code)
+    expect(shownOf(code, undefined)).toBe(code)
   })
 })
