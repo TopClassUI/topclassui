@@ -6,6 +6,14 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-22 - Only main creates a Vercel deployment
+
+**Decision.** `apps/docs/vercel.json` sets `git.deploymentEnabled` to `{ "**": false, "main": true }`: a push to any branch but `main` creates no deployment.
+
+**Why.** Vercel Hobby allows 100 deployments a day, and every branch push created one, even with the Ignored Build Step set to production only. On 2026-10-22 the parallel jobs' pushes hit that cap twice and Vercel refused the production deploys of PR #183 and PR #184. A branch matching several rules deploys when one rule is true (Vercel docs, git configuration), so `main` keeps deploying.
+
+**Affects.** Branches get no preview URL; the gates run locally on Windows before a merge, as they already do.
+
 ## 2026-10-22 - The fields follow their Previewer frames: Combobox, DatePicker, SegmentedControl, OTPField
 
 **Decision.** Job 153 (round 12) closes the small library rows of the round-11 audits for the fields.
