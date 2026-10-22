@@ -17,6 +17,8 @@ describe('familyOf', () => {
     expect(familyOf(['--tc-page', '--tc-surface', '--tc-surface-raised'])).toBe('--tc-page, surface, surface-raised')
     expect(familyOf(['--tc-radius', '--radius-box', '--radius-chip'])).toBe('--tc-radius, radius-box, radius-chip')
     expect(familyOf(['--tc-ring'])).toBe('--tc-ring')
+    expect(familyOf(['--tc-primary-solid', '--tc-primary-on-solid', '--tc-primary-soft'])).toBe('--tc-primary-solid, on-solid, soft')
+    expect(familyOf(['--tc-{tone}-solid', '--tc-{tone}-soft'])).toBe('--tc-{tone}-solid, soft')
   })
 })
 

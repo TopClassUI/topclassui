@@ -6,8 +6,8 @@ import { GUIDES } from '../../lib/data'
 import { familyOf, groupedRows, scaleEndsOf, type UtilityRow } from '../../lib/utility-row'
 import { PROSE_COLUMN, PROSE_TABLE } from '../classes'
 
-// The frame sets these values in the cell's muted colour, not the body colour of other table code.
-const VALUE = 'font-mono text-muted'
+// The frame sets the token names as the cell's plain muted text and the utilities as 10.5 px code in the body colour.
+const VALUE = 'font-mono text-[0.6875rem] text-body'
 
 function Code({ children }: { children: string }) {
   return <code dir="ltr" className={VALUE}>{children}</code>
@@ -15,14 +15,10 @@ function Code({ children }: { children: string }) {
 
 function Tokens({ row, through, scale }: { row: UtilityRow; through: string; scale: string }) {
   const ends = scaleEndsOf(row.tokens)
-  if (ends !== null) return <span><Code>{ends[0]}</Code> {through} <Code>{ends[1]}</Code></span>
-  return (
-    <span>
-      <Code>{familyOf(row.tokens)}</Code>
-      {row.tones === null ? null : <> (<span dir="ltr">{row.tones.join(', ')}</span>)</>}
-      {row.scale ? <> ({scale})</> : null}
-    </span>
-  )
+  if (ends !== null) return <span dir="ltr">{ends[0]} {through} {ends[1]}</span>
+  if (row.scale) return <span>{scale}</span>
+  if (row.tones !== null) return <span dir="ltr" className="whitespace-nowrap">{`${row.tokens[0]?.replace(/-[^-]+$/, '-*') ?? ''}: ${row.tones.join(', ')}`}</span>
+  return <span dir="ltr">{familyOf(row.tokens)}</span>
 }
 
 function Utilities({ values, through }: { values: readonly string[]; through: string }) {

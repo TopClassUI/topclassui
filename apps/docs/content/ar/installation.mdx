@@ -24,9 +24,9 @@ description: خطوتان فقط. ثبّت الحزمة، ثم أضف المكو
 
 | الحزمة | النطاق | سبب الحاجة إليها |
 |---|---|---|
-| <span dir="ltr">`react`</span> | <PeerRange name="react" /> | المكوّنات مكتوبة لـ React 19، حيث <span dir="ltr">ref</span> خاصية عادية |
+| <span dir="ltr">react</span> | <PeerRange name="react" /> | المكوّنات مكتوبة لـ React 19، حيث <span dir="ltr">ref</span> خاصية عادية |
 | <span dir="ltr">`react-dom`</span> | <PeerRange name="react-dom" /> | السبب نفسه |
-| <span dir="ltr">`tailwindcss`</span> | <PeerRange name="tailwindcss" /> | الأصناف المساعدة <span dir="ltr">inset-s-*</span> تحتاج إلى Tailwind 4.2 أو أحدث |
+| <span dir="ltr">tailwindcss</span> | <PeerRange name="tailwindcss" /> | الأصناف المساعدة <span dir="ltr">inset-s-*</span> تحتاج إلى Tailwind 4.2 أو أحدث |
 
 </Widths>
 
@@ -49,7 +49,8 @@ description: خطوتان فقط. ثبّت الحزمة، ثم أضف المكو
 
 لا عرض على الخادم، لذلك يُشحن كل مكوّن تستخدمه داخل حزمة تطبيقك. استورد <span dir="ltr">`Icon`</span> من <span dir="ltr">`topclassui/icon-registry`</span> وسجّل الأيقونات التي تستخدمها مرة واحدة. والصق سكربت السمة في <span dir="ltr">`index.html`</span> يدويًا، كما تشرح صفحة [المزوّد](/ar/docs/provider#في-تطبيق-صفحة-واحدة).
 
-```ts title="vite.config.ts"
+```ts check checklines="10-14"
+// vite.config.ts
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -57,10 +58,8 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
 })
-```
 
-```ts title="src/icons.ts" check
-// once per app
+// src/icons.ts - once per app
 import { registerIcons } from 'topclassui/icon-registry'
 import { caretDown } from 'topclassui/icons/caret-down'
 
