@@ -7,8 +7,8 @@
   --tc-font-latin: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   /* Inter after Noto Sans Arabic: a Latin word in Arabic text, a prop or the product name, keeps the site's Latin face. */
   --tc-font-arabic: var(--font-noto-arabic), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  /* Geist Mono first; Arabic in a code comment falls back to Noto Sans Arabic, not a system monospace that spaces its letters apart. */
-  --tc-font-mono: var(--font-geist-mono), ui-monospace, monospace, var(--font-noto-arabic, monospace);
+  /* Geist Mono by name before its Arial fallback face, so Arabic glyphs reach Noto Sans Arabic (unset on /en, hence the var() fallback). */
+  --tc-font-mono: "Geist Mono", var(--font-noto-arabic, "Geist Mono"), var(--font-geist-mono), ui-monospace, monospace;
   --docs-sidebar: 13.75rem;
   --docs-toc: 11.875rem;
   --docs-column: 59rem;

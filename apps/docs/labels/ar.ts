@@ -250,7 +250,7 @@ export const ar: SiteLabels = {
     },
     startHere: 'ابدأ من هنا',
     sectionsHeading: 'الأقسام',
-    installHeading: 'قبل أن تبدأ',
+    installHeading: 'التثبيت: سطر الأوامر أو الحزمة',
   },
   search: {
     button: 'ابحث في التوثيق',
