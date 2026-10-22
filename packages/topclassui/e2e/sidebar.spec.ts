@@ -670,7 +670,7 @@ test.describe('sixty links', () => {
   })
 
   for (const direction of DIRECTIONS) {
-    test(`${direction}: a first link with no label above it is flush under the header, and its ring is whole there too`, async ({ page }) => {
+    test(`${direction}: a first link with no label above it sits 2 px under the header, and its ring is whole there too`, async ({ page }) => {
       await openLive(page, 'sidebar--basic', { direction })
       const rail = railOf(page)
       await triggerOf(rail).focus()
@@ -678,8 +678,8 @@ test.describe('sixty links', () => {
       await expect(linksOf(rail).first()).toBeFocused()
       const room = await roomOf(bodyOf(rail))
       expect([room.top, room.left, room.right], 'px above and beside the first link').toEqual([4, 4, 4])
-      // The body starts where the header ends: the 4 px it keeps for the ring are the gap between the two.
-      expect((await boxOf(bodyOf(rail))).top).toBe((await boxOf(headerOf(rail))).bottom)
+      // The body keeps 4 px for the ring and the rail's gap is 2 px, so the ring's room lies over the header's 2 px of padding.
+      expect((await boxOf(bodyOf(rail))).top).toBe((await boxOf(headerOf(rail))).bottom - 2)
       expect(await ringOf(page)).toEqual(WHOLE)
     })
   }
