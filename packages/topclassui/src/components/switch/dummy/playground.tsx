@@ -5,7 +5,7 @@ import type { SwitchDesignProps } from '../types.js'
 export default function Demo(props: SwitchDesignProps) {
   return (
     <div className="flex items-center gap-2">
-      <Switch id="switch-playground" defaultChecked {...props} />
+      <Switch id="switch-playground" {...props} />
       <label htmlFor="switch-playground" className="text-sm text-body">Weekly digest</label>
     </div>
   )

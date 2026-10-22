@@ -12,7 +12,7 @@ const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
 const EXPECTED = [
-  'custom-size', 'full-width', 'labelled', 'playground', 'row', 'rtl', 'sizes', 'skeleton', 'skeleton-match', 'states',
+  'custom-size', 'full-width', 'labelled', 'playground', 'row', 'rtl', 'sizes', 'skeleton', 'skeleton-match', 'stage', 'states',
   'types',
 ]
 
@@ -88,7 +88,7 @@ describe('the demos cover what PLAN 20 asks for', () => {
     expect(html).toContain('readOnly=""')
     expect(html).toContain('data-invalid=""')
     expect(html).toContain('aria-invalid="true"')
-    expect(html).toContain('value="you@mail.com"')
+    expect(html).toContain('value="jo@mail.com"')
   })
 
   it('shows every text type, a number, a date, a caller cap and no cap', async () => {
@@ -106,13 +106,16 @@ describe('the demos cover what PLAN 20 asks for', () => {
     expect(tags.map((tag) => / w-full[ "]/.test(tag))).toEqual([true, false])
   })
 
-  it('fills the column in the states and types demos, so a date and a text field line up', async () => {
+  it('fills the column in the types demo, so a date and a text field line up', async () => {
     // A grid stretches a date, whose width is auto, but not a text field at its own width.
-    for (const file of ['states', 'types']) {
-      const tags = inputs(await render(file))
-      expect(tags.length, file).toBeGreaterThan(5)
-      expect(tags.filter((tag) => !/ w-full[ "]/.test(tag)).map((tag) => attr(tag, 'aria-label')), file).toEqual([])
-    }
+    const tags = inputs(await render('types'))
+    expect(tags.length).toBeGreaterThan(5)
+    expect(tags.filter((tag) => !/ w-full[ "]/.test(tag)).map((tag) => attr(tag, 'aria-label'))).toEqual([])
+  })
+
+  it('draws every state at the frame\'s 128 px field', async () => {
+    const tags = inputs(await render('states'))
+    expect(tags.filter((tag) => / w-32[ "]/.test(tag)).map((tag) => attr(tag, 'aria-label'))).toEqual(['idle', 'hover', 'focus-visible', 'disabled', 'read-only', 'invalid'])
   })
 
   it('shows the skeleton hidden from assistive technology', async () => {

@@ -10,7 +10,8 @@ export const rating = {
     ar: 'نجوم القراءة فقط هي HTML من الخادم ولا تشحن أي سكربت. وحده التقييم القابل للتعديل يترطّب، كمجموعة أزرار راديو أصلية.',
   },
   demos: ['read-only', 'editable', 'in-form', 'controlled', 'disabled', 'sizes', 'max-ten', 'rtl'],
-  stageHeight: 4,
+  stageHeight: 19.4375,
+  stageDemo: 'stage',
   controlOrder: ['max', 'size', 'readOnly'],
   controlsHidden: ['value', 'defaultValue', 'disabled'],
   note: {

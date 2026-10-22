@@ -15,10 +15,10 @@ test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) 
 
 for (const direction of DIRECTIONS) {
   test.describe(direction, () => {
-    test('Tab reaches each live textarea, a read-only one too, and skips a disabled one; Shift+Tab walks back', async ({ page }) => {
+    test('Tab reaches each live textarea, a full one too, and skips a disabled one; Shift+Tab walks back', async ({ page }) => {
       await openLive(page, 'textarea--states', { direction })
-      expect(await walk(page, 6)).toEqual(['idle', 'hover', 'focus-visible', 'invalid', 'Message at its limit', 'read-only'])
-      expect(await walk(page, 2, 'Shift+Tab')).toEqual(['Message at its limit', 'invalid'])
+      expect(await walk(page, 5)).toEqual(['idle', 'hover', 'focus-visible', 'invalid', 'Message at its limit'])
+      expect(await walk(page, 2, 'Shift+Tab')).toEqual(['invalid', 'focus-visible'])
     })
 
     test('the focused textarea paints the ring', async ({ page }) => {
@@ -62,15 +62,15 @@ for (const direction of DIRECTIONS) {
     })
 
     test('a read-only textarea takes the focus and the ring, and a key types nothing into it', async ({ page }) => {
-      await openLive(page, 'textarea--states', { direction })
-      await walk(page, 6)
-      const area = areaOf(page, 'read-only')
+      await openLive(page, 'textarea--read-only', { direction })
+      await walk(page, 1)
+      const area = areaOf(page, 'Read-only')
       await expect(area).toBeFocused()
       await expectRing(area, 'the read-only textarea')
       await page.keyboard.type('x')
       await page.keyboard.press('Enter')
       await page.keyboard.press('Backspace')
-      await expect(area).toHaveValue('Message')
+      await expect(area).toHaveValue('Kept as it was sent')
     })
   })
 }

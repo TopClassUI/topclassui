@@ -1,24 +1,26 @@
 import { Textarea } from '../index.js'
 
 /** The ring a focused field wears, drawn at rest so the strip can show it; not under forced colours, where a ring at rest would read as focus. */
-const RING = 'not-forced-colors:outline-solid not-forced-colors:outline-(length:--tc-ring-width) not-forced-colors:outline-offset-(length:--tc-ring-offset) not-forced-colors:outline-ring'
+const RING = 'w-32 max-w-full resize-none not-forced-colors:outline-solid not-forced-colors:outline-(length:--tc-ring-width) not-forced-colors:outline-offset-(length:--tc-ring-offset) not-forced-colors:outline-ring'
 
-/** The line a hovered field draws, at rest. */
-const HOVER = 'border-body'
+/** The field the frame draws in each cell: 128 px, with no grip. */
+const CELL = 'w-32 max-w-full resize-none'
 
-/** The frame's strip, one cell a state named by its aria-label (the counted field wears a wrapper, so a group names its cell), each field filling a track so none spills into the next; then read-only, which the frame leaves out. */
+/** The line a hovered field draws, at rest, on the frame's 128 px field. */
+const HOVER = 'w-32 max-w-full resize-none border-body'
+
+/** The frame's strip, one cell a state named by its aria-label; the counted field wears a wrapper, so a group names its cell. */
 export default function Demo() {
   return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(min(8rem,100%),1fr))] items-start gap-6">
-      <Textarea fullWidth rows={2} placeholder="Message" aria-label="idle" />
-      <Textarea fullWidth rows={2} defaultValue="Message" aria-label="hover" className={HOVER} />
-      <Textarea fullWidth rows={2} defaultValue="Message" aria-label="focus-visible" className={RING} />
-      <Textarea fullWidth rows={2} disabled placeholder="Message" aria-label="disabled" />
-      <Textarea fullWidth rows={2} invalid defaultValue="Message" aria-label="invalid" />
-      <div role="group" aria-label="at limit">
-        <Textarea fullWidth rows={2} showCount maxLength={7} defaultValue="Message" aria-label="Message at its limit" />
+    <div className="flex flex-wrap items-start gap-6">
+      <Textarea className={CELL} rows={1} placeholder="Message" aria-label="idle" />
+      <Textarea className={HOVER} rows={1} defaultValue="Message" aria-label="hover" />
+      <Textarea className={RING} rows={1} defaultValue="Message" aria-label="focus-visible" />
+      <Textarea className={CELL} rows={1} disabled defaultValue="Message" aria-label="disabled" />
+      <Textarea className={CELL} rows={1} invalid defaultValue="Message" aria-label="invalid" />
+      <div role="group" aria-label="at limit" className="min-w-0 max-w-full">
+        <Textarea className={CELL} rows={1} showCount maxLength={7} defaultValue="Message" aria-label="Message at its limit" />
       </div>
-      <Textarea fullWidth rows={2} readOnly defaultValue="Message" aria-label="read-only" />
     </div>
   )
 }

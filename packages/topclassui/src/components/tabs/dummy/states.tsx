@@ -4,33 +4,33 @@ import { TabsList, TabsRoot, TabsTab } from '../index.js'
  * colours, where a ring at rest would read as focus. */
 const RING = 'not-forced-colors:outline-solid not-forced-colors:outline-(length:--tc-ring-width) not-forced-colors:-outline-offset-(length:--tc-ring-width) not-forced-colors:outline-ring'
 
-/** The four states the frame draws, a list each at sm with no panel so it fits its cell, captioned by the title: line, enclosed, the
+/** The four states the frame draws, a list each at md with no panel and room around it, captioned by the title: line, enclosed, the
  * focus ring on the active tab, and a list whose every tab is disabled. Each list is named on its own. */
 export default function Demo() {
   return (
     <div className="grid justify-items-start gap-8">
-      <TabsRoot title="line" size="sm" className="w-max" defaultValue="overview">
+      <TabsRoot title="line" className="mx-2 w-max" defaultValue="overview">
         <TabsList aria-label="Line">
           <TabsTab value="overview">Overview</TabsTab>
           <TabsTab value="props">Props</TabsTab>
           <TabsTab value="a11y">A11y</TabsTab>
         </TabsList>
       </TabsRoot>
-      <TabsRoot title="enclosed" size="sm" className="w-max" variant="enclosed" defaultValue="overview">
+      <TabsRoot title="enclosed" className="mx-2 w-max" variant="enclosed" defaultValue="overview">
         <TabsList aria-label="Enclosed">
           <TabsTab value="overview">Overview</TabsTab>
           <TabsTab value="props">Props</TabsTab>
           <TabsTab value="a11y">A11y</TabsTab>
         </TabsList>
       </TabsRoot>
-      <TabsRoot title="focus-visible" size="sm" className="w-max" defaultValue="overview">
+      <TabsRoot title="focus-visible" className="mx-2 w-max" defaultValue="overview">
         <TabsList aria-label="Focused">
           <TabsTab value="overview" className={RING}>Overview</TabsTab>
           <TabsTab value="props">Props</TabsTab>
           <TabsTab value="a11y">A11y</TabsTab>
         </TabsList>
       </TabsRoot>
-      <TabsRoot title="disabled" size="sm" className="w-max" defaultValue="overview">
+      <TabsRoot title="disabled" className="mx-2 w-max" defaultValue="overview">
         <TabsList aria-label="Every tab disabled">
           <TabsTab value="overview" disabled>Overview</TabsTab>
           <TabsTab value="props" disabled>Props</TabsTab>
