@@ -41,6 +41,23 @@ The scan change saves 2,002 bytes of CSS (about 350 bytes gzip) and moves no met
 **Not changed.** Lighthouse lists no preconnect candidate, since every request is same-origin. The network dependency tree flags any chain of two requests, so HTML to CSS always fails it short of inlining; the manifest is in it too. Noto Sans Arabic still waits for the font CSS on `/ar`, because it is not preloaded (PLAN 14 and the Noto Sans Arabic entry of the same day).
 
 **Affects.** `apps/docs/app/globals.css` only. A class used only in a test or an e2e spec no longer reaches the site's CSS.
+## 2026-10-22 - Noto Sans Arabic stays Google's one variable file, and Inter stays preloaded on /ar
+
+**Decision.** `lib/fonts.ts` is unchanged: one Noto Sans Arabic call with three weights, and Inter preloaded on both locales.
+
+**Why.** `/ar` sets all three weights in its first viewport (400, 500 and 600 at 412 and 1350 px wide), so no weight can go. Asked for three weights, Google sends its 100-900 variable file: 166,639 bytes of Arabic and 31,853 of Latin. Three single-weight calls get static files of 48,924, 53,188 and 53,380 bytes plus 3 x 10.7 KB of Latin, about 10 KB less, but the static instances place the dots of the 92 px headline about 1 px lower: 570 pixels differ in `/ar`'s first viewport, against 0 between two runs of the same build. Dropping Inter's preload on `/ar` saves nothing: with its `<link>` and its RSC hint both removed the page still fetches the same 48,917-byte file through the font stack, only later; with the `<link>` alone removed, Lighthouse measured the same 265 KB of fonts and FCP 2.72 s against 2.41 s.
+
+**What it costs.** Lighthouse charges `/ar` about a second of FCP and LCP that `/en` does not pay: the 198 KB of Noto start downloading before the first paint, and its simulated 4G counts them in full. Cutting that needs smaller Arabic files (a font instanced to 400-600, self-hosted), which is Omar's call.
+
+---
+
+## 2026-10-22 - A code token names its colour role by class, and globals.css sets the pair once
+
+**Decision.** `lib/highlight.tsx` gives each Shiki token the class of its role in `lib/shiki-themes.ts` (`tk-text`, `tk-comment`, `tk-keyword`, `tk-string`, `tk-attribute`, `tk-tag`) instead of an inline `style` with both colours, and `app/globals.css` sets each role's `--tc-code-on-dark` and `--tc-code-on-light` once. A pair the themes do not name keeps its inline style. A line that is not blank no longer sends `data-blank` as undefined. The two flat-code selectors that read `[style*='#D4D4D4']` and `[style*='#51A2FF']` read `.tk-text` and `.tk-keyword`.
+
+**Why.** Every token carried `style="--tc-code-on-dark:#D4D4D4;--tc-code-on-light:#262626"` (60 bytes), once in the HTML and again in the RSC payload. The catalog has 2,735 tokens: its HTML drops from 3,639,105 to 3,352,251 bytes raw and from 288,936 to 264,418 gzip; Button's from 850,451 to 760,217 raw (62,070 to 59,946 gzip). Lighthouse mobile, median of 3 interleaved runs against merged main: the catalog's FCP 2.56 to 2.41 s, LCP 4.14 to 4.07 s, score 81 to 82. Other pages: the same FCP and LCP within 40 ms; their score moved only with TBT, which swung by 100 to 300 ms between runs of the same build. Vercel sends brotli, whose window spans the repeated cards, so the transfer saving there is about 2 KB (the catalog from 128,579 to 126,548 bytes at brotli quality 4, from 97,429 to 95,563 at quality 11); the raw bytes the browser parses are what drop.
+
+**What it affects.** Every code block on the site. The colours are unchanged: the computed colour of every token span in light, dark and ocean is identical between the two builds (9,900 on the catalog, 3,126 on Button), and screenshots of Button and Install the package match pixel for pixel. `lib/highlight.test.tsx` pins the markup and holds the six CSS rules to the theme pairs.
 
 ---
 
