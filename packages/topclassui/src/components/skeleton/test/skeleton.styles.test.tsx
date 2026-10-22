@@ -34,6 +34,38 @@ describe('the fill', () => {
   })
 })
 
+describe('animate', () => {
+  for (const variant of ['circle', 'rect', 'card'] as const) {
+    it(`${variant} holds still when animate is off, keeping the fill and its forced-colours line`, () => {
+      expect(classes({ variant, animate: false }).filter((c) => /^(bg-|animate-|motion-reduce:|forced-colors:)/.test(c)))
+        .toEqual(['bg-neutral-soft', 'forced-colors:outline-(length:--tc-line-width)'])
+    })
+  }
+
+  it('stops every row of the text shape, and pulses them by default', () => {
+    for (const row of rowClasses(html({ animate: false }))) expect(row).not.toContain('animate-pulse')
+    for (const row of rowClasses(html({ animate: true }))) expect(row).toContain('animate-pulse')
+  })
+})
+
+describe('rounded', () => {
+  it('takes the corners of the control and the card knobs by default, and none when off', () => {
+    expect(classes({ variant: 'rect' })).toContain('rounded-control')
+    expect(classes({ variant: 'card' })).toContain('rounded-box')
+    expect(classes({ variant: 'rect', rounded: false }).filter((c) => c.startsWith('rounded'))).toEqual([])
+    expect(classes({ variant: 'card', rounded: false }).filter((c) => c.startsWith('rounded'))).toEqual([])
+  })
+
+  it('leaves a circle round, since round is its shape', () => {
+    expect(classes({ variant: 'circle', rounded: false })).toContain('rounded-full')
+  })
+
+  it('squares every row of the text shape when off', () => {
+    expect(rowClasses(html({ rounded: false })).map((row) => row.split(' ').filter((c) => c.startsWith('rounded')))).toEqual([[], [], []])
+    expect(rowClasses(html()).map((row) => row.split(' ').filter((c) => c.startsWith('rounded')))).toEqual([['rounded-chip'], ['rounded-chip'], ['rounded-chip']])
+  })
+})
+
 // e2e/skeleton.spec measures it: with the fill erased, a skeleton painted nothing at all.
 describe('the line that forced colours leave of a fill', () => {
   const edges = (list: readonly string[]) => list.filter((c) => c.includes('outline'))

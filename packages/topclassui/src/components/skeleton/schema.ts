@@ -11,6 +11,10 @@ export const skeletonSchema = z.object({
   rows: z.number().int().min(SKELETON_BOUNDARIES.rowsMin).max(SKELETON_BOUNDARIES.rowsMax)
     .default(SKELETON_DEFAULTS.rows)
     .meta({ description: 'How many lines the text shape holds, clamped to the bounds; the other shapes ignore it.' }),
+  animate: z.boolean().default(SKELETON_DEFAULTS.animate)
+    .meta({ description: 'The fill pulses while it waits; reduced motion holds it still either way.' }),
+  rounded: z.boolean().default(SKELETON_DEFAULTS.rounded)
+    .meta({ description: 'Rows, rect and card take the corners of the chip, control and card knobs; off, they are square. A circle stays round.' }),
 })
 
 export type SkeletonSchemaInput = z.input<typeof skeletonSchema>

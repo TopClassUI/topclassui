@@ -35,8 +35,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a skeleton shape passes className first, so the consumer loses every conflict',
     file: 'src/components/skeleton/index.tsx',
-    from: 'cn(SKELETON_SHAPE[variant], SKELETON_FILL, className)',
-    to: 'cn(className, SKELETON_SHAPE[variant], SKELETON_FILL)',
+    from: 'cn(SKELETON_SHAPE[variant], rounded && SKELETON_RADIUS[variant], fill, className)',
+    to: 'cn(className, SKELETON_SHAPE[variant], rounded && SKELETON_RADIUS[variant], fill)',
   },
   {
     label: 'the text skeleton passes className first, so the consumer cannot set its width',
@@ -91,5 +91,23 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/skeleton/index.tsx',
     from: '            count > 2 && row === count - 2 && SKELETON_NEXT_TO_LAST_ROW,\n',
     to: '',
+  },
+  {
+    label: 'animate={false} keeps the pulse, so a still skeleton still pulses',
+    file: 'src/components/skeleton/index.tsx',
+    from: 'const fill = animate ? SKELETON_FILL : SKELETON_FILL_STILL',
+    to: 'const fill = SKELETON_FILL',
+  },
+  {
+    label: 'rounded={false} keeps the corners of a rect and a card',
+    file: 'src/components/skeleton/index.tsx',
+    from: 'rounded && SKELETON_RADIUS[variant]',
+    to: 'SKELETON_RADIUS[variant]',
+  },
+  {
+    label: 'rounded={false} keeps the corners of every row',
+    file: 'src/components/skeleton/index.tsx',
+    from: 'rounded && SKELETON_ROW_RADIUS,',
+    to: 'SKELETON_ROW_RADIUS,',
   },
 ]

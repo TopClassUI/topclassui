@@ -15,14 +15,14 @@ describe('the schema is the documentation', () => {
 
   it('covers every design prop, and none of the unbuilt ones', () => {
     // Named, or a key dropped from the schema drops from the expectation too.
-    expect(keys.sort()).toEqual(['rows', 'variant'])
+    expect(keys.sort()).toEqual(['animate', 'rounded', 'rows', 'variant'])
   })
 
   it('converts to JSON Schema at all', () => {
-    expect(Object.keys(json.properties ?? {}).sort()).toEqual(['rows', 'variant'])
+    expect(Object.keys(json.properties ?? {}).sort()).toEqual(['animate', 'rounded', 'rows', 'variant'])
   })
 
-  for (const key of ['rows', 'variant']) {
+  for (const key of ['animate', 'rounded', 'rows', 'variant']) {
     it(`${key} carries a description into the JSON Schema output`, () => {
       const description = json.properties?.[key]?.description
       expect(typeof description, key).toBe('string')

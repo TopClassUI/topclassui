@@ -43,6 +43,8 @@ Every prop below is optional and falls back to the default shown.
 
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
+| `animate` | no | `boolean` | `true` | The fill pulses while it waits; reduced motion holds it still either way. |
+| `rounded` | no | `boolean` | `true` | Rows, rect and card take the corners of the chip, control and card knobs; off, they are square. A circle stays round. |
 | `rows` | no | `integer`, min 1, max 50 | `3` | How many lines the text shape holds, clamped to the bounds; the other shapes ignore it. |
 | `variant` | no | `text` \| `circle` \| `rect` \| `card` | `"text"` | The shape it holds the place of: lines of text, a circle, a rectangle or a card. |
 

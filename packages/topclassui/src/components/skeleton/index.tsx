@@ -2,7 +2,9 @@
 import { cn } from '#shared/cn.js'
 import { clamp } from '#shared/clamp.js'
 import { SKELETON_BOUNDARIES } from './boundaries.js'
-import { SKELETON_FILL, SKELETON_LAST_ROW, SKELETON_NEXT_TO_LAST_ROW, SKELETON_ROW, SKELETON_SHAPE } from './classes.js'
+import {
+  SKELETON_FILL, SKELETON_FILL_STILL, SKELETON_LAST_ROW, SKELETON_NEXT_TO_LAST_ROW, SKELETON_RADIUS, SKELETON_ROW, SKELETON_ROW_RADIUS, SKELETON_SHAPE,
+} from './classes.js'
 import { SKELETON_DEFAULTS } from './constants.js'
 import type { SkeletonProps } from './types.js'
 
@@ -11,14 +13,17 @@ import type { SkeletonProps } from './types.js'
 export function Skeleton({
   variant = SKELETON_DEFAULTS.variant,
   rows = SKELETON_DEFAULTS.rows,
+  animate = SKELETON_DEFAULTS.animate,
+  rounded = SKELETON_DEFAULTS.rounded,
   className,
   ...rest
 }: SkeletonProps) {
+  const fill = animate ? SKELETON_FILL : SKELETON_FILL_STILL
   if (variant !== 'text') {
     return (
       <span
         data-variant={variant}
-        className={cn(SKELETON_SHAPE[variant], SKELETON_FILL, className)}
+        className={cn(SKELETON_SHAPE[variant], rounded && SKELETON_RADIUS[variant], fill, className)}
         {...rest}
         aria-hidden
       />
@@ -35,7 +40,8 @@ export function Skeleton({
           key={row}
           className={cn(
             SKELETON_ROW,
-            SKELETON_FILL,
+            rounded && SKELETON_ROW_RADIUS,
+            fill,
             count > 1 && row === count - 1 && SKELETON_LAST_ROW,
             count > 2 && row === count - 2 && SKELETON_NEXT_TO_LAST_ROW,
           )}

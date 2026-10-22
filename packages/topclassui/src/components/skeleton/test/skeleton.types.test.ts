@@ -41,9 +41,12 @@ describe('the props follow the vocabulary', () => {
     expectTypeOf<Accepts<keyof SkeletonProps, 'dangerouslySetInnerHTML'>>().toEqualTypeOf<false>()
   })
 
+  it('takes the two toggles the frame\'s Try it draws, as booleans', () => {
+    expectTypeOf<SkeletonProps['animate']>().toEqualTypeOf<boolean | undefined>()
+    expectTypeOf<SkeletonProps['rounded']>().toEqualTypeOf<boolean | undefined>()
+  })
+
   it('has none of the props the spec leaves unbuilt', () => {
-    expectTypeOf<Accepts<keyof SkeletonProps, 'animate'>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<keyof SkeletonProps, 'rounded'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof SkeletonProps, 'size'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof SkeletonProps, 'tone'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof SkeletonProps, 'lines'>>().toEqualTypeOf<false>()
@@ -67,7 +70,7 @@ describe('the design props and the schema cannot drift', () => {
 
 describe('the schema', () => {
   it('fills every default', () => {
-    expect(skeletonSchema.parse({})).toEqual({ variant: 'text', rows: 3 })
+    expect(skeletonSchema.parse({})).toEqual({ variant: 'text', rows: 3, animate: true, rounded: true })
   })
 
   it('accepts every value the constants list', () => {
@@ -82,7 +85,7 @@ describe('the schema', () => {
   })
 
   it('agrees with the defaults the spec names', () => {
-    expect(SKELETON_DEFAULTS).toEqual({ variant: 'text', rows: 3 })
+    expect(SKELETON_DEFAULTS).toEqual({ variant: 'text', rows: 3, animate: true, rounded: true })
   })
 
   it('lists the four shapes in the order the docs previewer draws them', () => {

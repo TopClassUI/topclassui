@@ -7,4 +7,6 @@ export const SKELETON_VARIANTS = ['text', 'circle', 'rect', 'card'] as const
 export const SKELETON_DEFAULTS = {
   variant: 'text',
   rows: 3,
+  animate: true,
+  rounded: true,
 } as const
