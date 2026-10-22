@@ -135,13 +135,15 @@ test.describe('the separator points along the trail', () => {
   test('left to right, the caret points right, at the crumb it leads to', async ({ page }) => {
     await page.goto(urlFor('breadcrumb--basic', 'light', 'ltr'))
     const expected = { scale: '1', points: 'right', crumbIsOnThe: 'right' }
-    expect(await page.evaluate(carets)).toEqual([expected, expected, expected])
+    // Four crumbs and two carets: the house is followed by Docs with no caret between them (Figma 138:1173).
+    expect(await page.evaluate(carets)).toEqual([expected, expected])
   })
 
   test('right to left, it is mirrored and points left, where the next crumb is', async ({ page }) => {
     await page.goto(urlFor('breadcrumb--basic', 'light', 'rtl'))
     const expected = { scale: '-1 1', points: 'left', crumbIsOnThe: 'left' }
-    expect(await page.evaluate(carets)).toEqual([expected, expected, expected])
+    // Four crumbs and two carets: the house is followed by Docs with no caret between them (Figma 138:1173).
+    expect(await page.evaluate(carets)).toEqual([expected, expected])
   })
 
   test('inside a dir="rtl" block on a left-to-right page, it follows the block', async ({ page }) => {
