@@ -10,13 +10,15 @@ export interface SectionHeadingProps {
   anchorLabel: string
   /** A size class that replaces the h2's own, for a heading set inside a card. */
   className?: string
+  /** The anchor out of flow, before the title, so what follows the heading sits right after its text (frame 140:943). */
+  anchorBefore?: boolean
 }
 
-export function SectionHeading({ id, children, anchorLabel, className }: SectionHeadingProps) {
+export function SectionHeading({ id, children, anchorLabel, className, anchorBefore = false }: SectionHeadingProps) {
   return (
-    <h2 id={id} className={className === undefined ? H2 : `${H2_BASE} ${className}`}>
+    <h2 id={id} className={`${className === undefined ? H2 : `${H2_BASE} ${className}`}${anchorBefore ? ' lg:relative' : ''}`}>
       {children}
-      <a href={`#${id}`} aria-label={anchorLabel} className={ANCHOR}>
+      <a href={`#${id}`} aria-label={anchorLabel} className={anchorBefore ? `${ANCHOR} lg:absolute lg:inset-e-full lg:me-1` : ANCHOR}>
         <Svg icon={linkSimple} size="1rem" aria-hidden="true" />
       </a>
     </h2>
