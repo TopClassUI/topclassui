@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['basic', 'controlled', 'disabled', 'enclosed', 'long-label', 'many', 'playground', 'rtl', 'server-content', 'sizes', 'states']
+const EXPECTED = ['basic', 'controlled', 'disabled', 'enclosed', 'long-label', 'many', 'playground', 'rtl', 'server-content', 'sizes', 'stage', 'states']
 
 /** How many roots each demo holds, and its tabs and panels: every panel is rendered, one per root is shown. */
 const COUNTS: Record<string, { roots: number, tabs: number, panels: number }> = {
@@ -25,7 +25,8 @@ const COUNTS: Record<string, { roots: number, tabs: number, panels: number }> = 
   'rtl': { roots: 1, tabs: 3, panels: 3 },
   'server-content': { roots: 1, tabs: 2, panels: 2 },
   'sizes': { roots: 12, tabs: 24, panels: 24 },
-  // The strip draws lists only, as the frame does: how a tab looks, with no panel under it.
+  // The stage and the strip draw lists only, as the frame does: how a tab looks, with no panel under it.
+  'stage': { roots: 2, tabs: 6, panels: 0 },
   'states': { roots: 4, tabs: 12, panels: 0 },
 }
 
@@ -41,6 +42,7 @@ const HIDDEN_TEXT: Record<string, string | null> = {
   'rtl': 'لا يعيد تسمية المشروع أو يحذفه إلا مالكه.',
   'server-content': '<li>Yousef Nasser</li>',
   'sizes': 'Props of your own size.',
+  'stage': null,
   'states': null,
 }
 
