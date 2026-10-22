@@ -51,8 +51,8 @@ export const PAGES = [
     slug: 'cli', path: '/docs/cli', kind: 'guide', group: 'start', icon: 'terminal-window', status: 'live',
     title: { en: 'Add with the CLI', ar: 'الإضافة عبر الطرفية' },
     description: {
-      en: 'Copy one component into your project with one command. The CLI brings its source, constants, schema, types and variants, and you edit them as your own files.',
-      ar: 'انسخ مكوّنًا واحدًا إلى مشروعك بأمر واحد. تجلب الطرفية مصدره مع ثوابته ومخططه وأنواعه ومتغيراته، ثم تعدّلها كأنها ملفاتك، ويظهر كل تحديث لاحق بأمر diff.',
+      en: 'Copy a component into your project and own the file.',
+      ar: 'انسخ مكوّنًا إلى مشروعك وامتلك ملفه، فهو ملفك تعدّله كما تشاء.',
     },
   },
   {

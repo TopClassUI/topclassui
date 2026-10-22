@@ -11,6 +11,7 @@ import { Callout } from './callout'
 import { FrameworkTabs } from './framework-tabs'
 import { Card, Cards } from './cards'
 import { CodeFence } from './code-fence'
+import { FileTree } from './file-tree'
 import { Heading } from './heading'
 import { MdxTable, Widths, type ColumnWidth } from './mdx-table'
 import { PackageManagers } from './package-managers'
@@ -40,6 +41,7 @@ export function mdxComponents(locale: Locale): MDXComponents {
       href.startsWith('/') ? <Link href={href} className={TEXT_LINK}>{children}</Link> : <a href={href} rel={isExternal(href) ? EXTERNAL_REL : undefined} className={TEXT_LINK}>{children}</a>,
     Callout,
     Cards,
+    FileTree,
     Card,
     WrongRight: ({ children }) => <WrongRight locale={locale} wrong={wrong} right={right} terminal={terminal} repeat={labels.blocks.repeat}>{children}</WrongRight>,
     PackageManagers: () => <PackageManagers locale={locale} label={packageManagers} />,

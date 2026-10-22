@@ -113,7 +113,7 @@ const NEXT = {
 } as const
 
 // Written out: how many `##` sections each page has, so a heading lost from the MDX fails here.
-const SECTIONS = { installation: 5, cli: 9, css: 7, provider: 6, 'first-component': 6 } as const
+const SECTIONS = { installation: 5, cli: 7, css: 7, provider: 6, 'first-component': 6 } as const
 
 for (const slug of GUIDES) {
   for (const locale of ['en', 'ar'] as const) {
