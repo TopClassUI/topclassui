@@ -8,8 +8,10 @@ import type { FileUpload, FileUploadDesignProps, FileUploadName, FileUploadProps
 type Accepts<Union, Candidate> = Candidate extends Union ? true : false
 
 describe('the props FileUpload adds come from the schema', () => {
-  it('are maxFiles, maxSize, invalid and visibleRows, all optional', () => {
-    expectTypeOf<keyof FileUploadDesignProps>().toEqualTypeOf<'maxFiles' | 'maxSize' | 'invalid' | 'visibleRows'>()
+  it('are maxFiles, maxSize, invalid, compact and visibleRows, all optional', () => {
+    expectTypeOf<keyof FileUploadDesignProps>().toEqualTypeOf<'maxFiles' | 'maxSize' | 'invalid' | 'compact' | 'visibleRows'>()
+    expectTypeOf<FileUploadProps['compact']>().toEqualTypeOf<boolean | undefined>()
+    expectTypeOf<FileUploadProps['data-dragging']>().toEqualTypeOf<boolean | undefined>()
     expectTypeOf<FileUploadProps['maxFiles']>().toEqualTypeOf<number | undefined>()
     expectTypeOf<FileUploadProps['maxSize']>().toEqualTypeOf<number | undefined>()
     expectTypeOf<FileUploadProps['invalid']>().toEqualTypeOf<boolean | undefined>()
