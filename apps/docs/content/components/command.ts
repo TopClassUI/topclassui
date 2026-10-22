@@ -20,7 +20,8 @@ export const command = {
     'rtl',
   ],
   stageHeight: 19.4375,
-  controlOrder: ['visibleRows'],
+  controlOrder: ['visibleRows', 'shortcut'],
+  controlOptions: { shortcut: ['k', 'p', '/'] },
   controlsHidden: ['loadMoreThreshold'],
   stageOpen: true,
   codeCaption: {

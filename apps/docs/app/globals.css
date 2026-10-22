@@ -169,10 +169,11 @@
 
   /* Code with no grammar takes the muted grey, as the highlighted code's own text does. */
   .docs-code > pre {
-    padding-block-start: 0.875rem;
+    padding-block: 0.875rem;
+    padding-inline: 0.875rem;
     color: var(--tc-muted);
     font-size: var(--text-xs);
-    line-height: var(--text-sm--line-height);
+    line-height: 1.58;
   }
 
   /* On the page the colours follow the page, not the opposite theme. */
@@ -339,9 +340,9 @@
     --tc-scrollbar-track: transparent;
   }
   .docs-flat-code .shiki span { color: light-dark(var(--tc-code-on-light), var(--tc-code-on-dark)); }
-  /* Plain tokens (lib/shiki-themes.ts, text) as the frames draw them: body in the JSX, muted on a line that opens with a keyword, an import. */
+  /* Plain tokens (lib/shiki-themes.ts, text) as the frames draw them: body in the JSX, muted on every line of an import (lib/highlight.tsx). */
   .docs-flat-code .shiki span[style*='#D4D4D4'] { color: var(--tc-body); }
   /* The frames part the imports from the JSX by a 10 px gap, not a whole blank line. */
   .docs-flat-code .shiki > span[data-blank] { display: block; block-size: 0.625rem; overflow: hidden; }
-  .docs-flat-code .shiki > span:has(> span:first-child[style*='#51A2FF']) > span[style*='#D4D4D4'] { color: var(--tc-muted); }
+  .docs-flat-code .shiki > span[data-import] > span[style*='#D4D4D4'] { color: var(--tc-muted); }
 }

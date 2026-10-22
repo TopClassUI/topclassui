@@ -72,17 +72,28 @@ export function changedProps(values: Readonly<Record<string, PropValue>>, defaul
 
 const attributeNamed = (name: string) => new RegExp(`(\\s)${name}=(?:\\{[^{}]*\\}|"[^"]*")`, 'g')
 
-/** The tag that holds the spread without its own value of a prop the spread now writes, bare or literal. */
+/** Every tag that holds a spread, without its own value of a prop the spread now writes, bare or literal. */
 function withoutSpreadOwn(jsx: string, name: string): string {
-  const at = jsx.search(SPREAD)
-  if (at < 0) return jsx
-  const start = jsx.lastIndexOf('<', at)
-  // Quotes and braces blanked to the same length, so a class word or an expression never matches.
-  const blank = jsx.slice(start, at).replace(/"[^"]*"|\{[^{}]*\}/g, (part) => `${part[0] ?? ''}${' '.repeat(part.length - 2)}${part.at(-1) ?? ''}`)
-  const match = new RegExp(`\\s+${name}(?:=(?:\\{\\s*\\}|"\\s*"))?(?=[\\s/>]|$)`).exec(blank)
-  if (match === null) return jsx
-  const from = start + match.index
-  return `${jsx.slice(0, from)}${jsx.slice(from + match[0].length)}`
+  const spreads = [...jsx.matchAll(new RegExp(SPREAD, 'g'))].map((found) => found.index)
+  // From the last spread back, so a cut never moves the offsets still to come.
+  return spreads.reverse().reduce((tree, at) => {
+    const start = tree.lastIndexOf('<', at)
+    // Quotes and braces blanked to the same length, so a class word or an expression never matches.
+    const blank = tree.slice(start, at).replace(/"[^"]*"|\{[^{}]*\}/g, (part) => `${part[0] ?? ''}${' '.repeat(part.length - 2)}${part.at(-1) ?? ''}`)
+    const match = new RegExp(`\\s+${name}(?:=(?:\\{\\s*\\}|"\\s*"))?(?=[\\s/>]|$)`).exec(blank)
+    if (match === null) return tree
+    const from = start + match.index
+    return `${tree.slice(0, from)}${tree.slice(from + match[0].length)}`
+  }, jsx)
+}
+
+/** A read of a prop with its fallback (`props.orientation ?? 'horizontal'`) as the value it resolves to. */
+function withPropReads(jsx: string, props: readonly [string, PropValue][]): string {
+  const given = new Map(props)
+  return jsx.replace(/props\.(\w+) \?\? ('[^']*'|"[^"]*"|-?\d+(?:\.\d+)?|true|false)/g, (_, name: string, fallback: string) => {
+    const value = given.get(name)
+    return value === undefined ? fallback : typeof value === 'string' ? `'${value}'` : String(value)
+  })
 }
 
 /** The root element's opening tag with every brace's contents blanked, so only its own attributes can match. */
@@ -103,7 +114,7 @@ function rootTagOf(jsx: string): string {
 }
 
 /** The usage with the given props written in: over a pass-through of the same name wherever it is (a part's
- * `current={current}`), over a literal on the root itself (`value={6}`), else where the spread was; unset pass-throughs are dropped. */
+ * `current={current}`), over a literal on the root itself (`value={6}`), else on every part the props are spread on; unset pass-throughs are dropped. */
 export function snippetOf(usage: Usage, props: readonly [string, PropValue][]): string {
   let jsx = usage.jsx
   const spread: string[] = []
@@ -123,12 +134,12 @@ export function snippetOf(usage: Usage, props: readonly [string, PropValue][]): 
       jsx = `${jsx.slice(0, start)}${attributeOf(name, value)}${jsx.slice(start + length)}`
     }
   }
-  jsx = usage.passed.reduce((tree, name) => tree.replace(passThrough(name), ''), jsx)
+  jsx = withPropReads(usage.passed.reduce((tree, name) => tree.replace(passThrough(name), ''), jsx), props)
   // A spread on a line of its own goes with its line when nothing takes its place.
-  if (spread.length === 0) jsx = jsx.replace(/\n[ \t]*\{\.\.\.props\}(?=\n)/, '')
-  else jsx = jsx.replace(/^([ \t]*)\{\.\.\.props\}$/m, (_, indent: string) => spread.map((attribute) => `${indent}${attribute.trim()}`).join('\n'))
+  if (spread.length === 0) jsx = jsx.replace(/\n[ \t]*\{\.\.\.props\}(?=\n)/g, '')
+  else jsx = jsx.replace(/^([ \t]*)\{\.\.\.props\}$/gm, (_, indent: string) => spread.map((attribute) => `${indent}${attribute.trim()}`).join('\n'))
   // A pass-through on a line of its own goes with its line.
-  jsx = jsx.replace(/\n[ \t]*(\w+)=\{\1\}(?=\n)/g, '').replace(/[ \t]+(\w+)=\{\1\}/g, '').replace(SPREAD, spread.join(''))
+  jsx = jsx.replace(/\n[ \t]*(\w+)=\{\1\}(?=\n)/g, '').replace(/[ \t]+(\w+)=\{\1\}/g, '').replace(new RegExp(SPREAD, 'g'), spread.join(''))
   return usage.imports.length > 0 ? `${usage.imports.join('\n')}\n\n${jsx}` : jsx
 }
 

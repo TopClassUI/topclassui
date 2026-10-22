@@ -52,7 +52,8 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
   const title = content.title[locale]
   const order = content.controlOrder ?? []
   const rank = (prop: string) => (order.includes(prop) ? order.indexOf(prop) : order.length)
-  const controls = withStarts([...entry.controls, ...(content.extraSwitches ?? []).map((prop) => ({ prop, kind: 'switch' as const, default: false }))], content.starts ?? {})
+  const offered = Object.entries(content.controlOptions ?? {}).map(([prop, options]) => ({ prop, kind: 'select' as const, options, default: options[0] ?? null }))
+  const controls = withStarts([...entry.controls, ...offered, ...(content.extraSwitches ?? []).map((prop) => ({ prop, kind: 'switch' as const, default: false }))], content.starts ?? {})
     .filter((control) => !(content.controlsHidden ?? []).includes(control.prop))
     .map((control, index) => ({ control, index }))
     .sort((a, b) => rank(a.control.prop) - rank(b.control.prop) || a.index - b.index)

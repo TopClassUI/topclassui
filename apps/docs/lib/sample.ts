@@ -135,10 +135,12 @@ function pruned(source: string): string {
       const start = code.search(new RegExp(`^(?:const|function|interface) ${name}\\b`, 'm'))
       if (start === -1) continue
       const end = statementEnd(code, start)
-      // A word of a class name, such as row in --tc-row-height, is not a use.
-      if (new RegExp(`(?<![\\w-])${name}(?![\\w-])`).test(code.slice(0, start) + code.slice(end))) continue
+      // The declaration's own leading comment goes with it, so a word in it is not a use.
       const comment = /(?:\/\/[^\n]*\n|\/\*\*[\s\S]*?\*\/\n)$/.exec(code.slice(0, start))
-      code = code.slice(0, comment === null ? start : start - comment[0].length) + code.slice(end)
+      const from = comment === null ? start : start - comment[0].length
+      // A word of a class name, such as row in --tc-row-height, is not a use.
+      if (new RegExp(`(?<![\\w-])${name}(?![\\w-])`).test(code.slice(0, from) + code.slice(end))) continue
+      code = code.slice(0, from) + code.slice(end)
       changed = true
     }
   }
