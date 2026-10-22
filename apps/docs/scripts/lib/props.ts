@@ -53,5 +53,7 @@ export function propsOf(program: ts.Program, dir: string, meta: ComponentMeta, j
     return familyOf(program, typeFile, exported, root, fromSchema).parts
       .map((part) => ({ name: part.name, rows: withLimits(part.rows, json) }))
   }
-  return [{ name: meta.name, rows: withLimits(mergeRows(fromSchema, fromTypes), json) }]
+  // A single part is named by its real export, whose casing the folder name cannot carry (OTPField).
+  const name = exported.find((value) => value.toLowerCase() === meta.name.toLowerCase()) ?? meta.name
+  return [{ name, rows: withLimits(mergeRows(fromSchema, fromTypes), json) }]
 }
