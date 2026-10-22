@@ -11,8 +11,8 @@ import {
 
 const LINES = Array.from({ length: 12 }, (_, index) => index + 1)
 
-const CELL = 'relative h-18 w-33 justify-self-center overflow-hidden rounded-box [contain:paint]'
-const BAR = 'min-h-2 rounded-chip bg-surface-raised'
+const CELL = 'relative -my-1.75 h-18 w-33 justify-self-center overflow-hidden rounded-box bg-page [contain:paint]'
+const BAR = 'min-h-2 rounded-chip bg-neutral-soft'
 const LABEL = 'font-mono text-xs/tight font-normal text-muted'
 // The ring the focus draws, as a picture: the focus stays where it was.
 const TRAPPED = 'outline-solid outline-(length:--tc-ring-width) outline-offset-(length:--tc-ring-offset) outline-ring'
@@ -51,9 +51,9 @@ function Open({ title, alert = false, className, children }: { title: string, al
 export default function Demo() {
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] gap-4">
-      <div title="closed" className="grid h-18 place-items-center">
+      <div title="closed" className="grid h-14.5 place-items-center">
         <DialogRoot>
-          <DialogTrigger render={<Button variant="outline" size="sm">Open</Button>} />
+          <DialogTrigger render={<Button variant="outline" size="xs" className="border-line bg-surface">Open</Button>} />
           <DialogPopup>
             <DialogHeader>
               <DialogTitle>Open</DialogTitle>

@@ -1,7 +1,7 @@
 import type { ComponentPropsWithRef, ReactNode, Ref } from 'react'
 import { describe, expectTypeOf, it } from 'vitest'
 
-import type { KbdProps } from '../types.js'
+import type { KbdDesignProps, KbdProps } from '../types.js'
 
 /** Assignability as a value, so a rejected prop is a passing assertion. */
 type Accepts<Union, Candidate> = Candidate extends Union ? true : false
@@ -11,6 +11,13 @@ describe('the props are the native kbd props and nothing else', () => {
     expectTypeOf<Omit<KbdProps, 'pressed' | 'disabled'>>().toEqualTypeOf<Omit<ComponentPropsWithRef<'kbd'>, 'pressed' | 'disabled'>>()
     expectTypeOf<KbdProps['pressed']>().toEqualTypeOf<boolean | undefined>()
     expectTypeOf<KbdProps['disabled']>().toEqualTypeOf<boolean | undefined>()
+  })
+
+  it('derives pressed and disabled from the schema, so Try it reads them', () => {
+    expectTypeOf<keyof KbdDesignProps>().toEqualTypeOf<'pressed' | 'disabled'>()
+    expectTypeOf<KbdDesignProps['pressed']>().toEqualTypeOf<boolean | undefined>()
+    expectTypeOf<KbdDesignProps['disabled']>().toEqualTypeOf<boolean | undefined>()
+    expectTypeOf<Accepts<KbdProps['pressed'], 'true'>>().toEqualTypeOf<false>()
   })
 
   it('accepts children, className, style and ref, and ref is a normal prop', () => {

@@ -47,14 +47,15 @@ function Panel({ query, active = false }: { query: string, active?: boolean }) {
   )
 }
 
-const CELL = 'grid min-h-20 place-items-center'
+// A row of the frame's 58 px: the 68 px panels reach past it above and below, as drawn.
+const CELL = 'flex h-14.5 items-center justify-center'
 
 /** Every state, one equal cell each, captioned by its title. The palette is modal, so one opens at a time: closed is the
  * real one behind its Ctrl K, and the open, typing, empty, loading and selected cells are small pictures of its look. */
 export default function Demo() {
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] gap-4">
-      <div title="closed" className={cn(CELL, 'grid-flow-col justify-center gap-1 font-mono text-xs text-muted')}>
+      <div title="closed" className={cn(CELL, 'gap-1 font-mono text-xs text-muted')}>
         Ctrl K
       </div>
       <div title="open" className={CELL}><Panel query="search" /></div>

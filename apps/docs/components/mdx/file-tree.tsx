@@ -7,7 +7,7 @@ const ROW = 'flex min-w-0 items-center gap-2.5 py-2.75 pe-3.5'
 const DEPTH = ['ps-3.5', 'ps-9', 'ps-14.5', 'ps-20', 'ps-25.5', 'ps-31'] as const
 const KIND = { folder: 'folder', file: 'file-text', code: 'code', settings: 'file' } as const
 const TONE = { folder: 'text-primary-on-soft', file: 'text-muted', code: 'text-muted', settings: 'text-muted' } as const
-const NAME = 'shrink-0 font-mono text-[0.8125rem] text-body'
+const NAME = 'shrink-0 font-mono text-[0.8125rem]/[1.0625rem] text-body'
 const NOTE = 'min-w-0 truncate text-xs text-muted'
 
 export interface FileTreeRow {

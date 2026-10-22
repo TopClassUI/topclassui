@@ -58,7 +58,7 @@ describe('propsOf, through the README generator', () => {
 
 describe('jsonSchemaOf', () => {
   it('returns null for a folder with no schema.ts', async () => {
-    expect(await jsonSchemaOf(join(COMPONENTS, 'kbd'))).toBeNull()
+    expect(await jsonSchemaOf(join(COMPONENTS, 'timeline'))).toBeNull()
   })
 })
 

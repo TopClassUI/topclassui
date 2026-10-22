@@ -12,16 +12,19 @@ describe('the states demo, one cell per state of the Every state strip', () => {
     expect(cellsOf(container.firstElementChild).map((cell) => cell.getAttribute('title'))).toEqual(['closed', 'open', 'hover item', 'disabled item'])
   })
 
-  it('draws the three open menus open inside their own cells, not modal, and the closed one with none', async () => {
+  it('draws the three open ones as pictures, hidden and inert, and only the closed cell holds a real menu', () => {
     const { container } = render(<Demo />)
-    const [closed, open, hover, disabled] = cellsOf(container.firstElementChild)
-    expect(await screen.findAllByRole('menu')).toHaveLength(3)
-    expect(closed?.querySelector('[role="menu"]')).toBeNull()
+    const [closed, ...pictures] = cellsOf(container.firstElementChild)
+    expect(screen.queryAllByRole('menu')).toHaveLength(0)
     expect(closed?.querySelector('button')?.getAttribute('aria-expanded')).toBe('false')
-    const rows = (cell: HTMLElement | undefined) => [...(cell?.querySelectorAll('[role="menu"][data-open] [role="menuitem"]') ?? [])]
-    expect(rows(open).map((row) => row.textContent)).toEqual(['Edit', 'Delete'])
-    expect(rows(hover).map((row) => [row.textContent, row.hasAttribute('data-highlighted')])).toEqual([['Edit', true], ['Delete', false]])
-    expect(rows(disabled).map((row) => [row.textContent, row.getAttribute('aria-disabled')])).toEqual([['Edit', null], ['Delete', 'true']])
-    expect(document.querySelectorAll('[data-base-ui-portal] > [data-base-ui-inert]')).toHaveLength(0)
+    const rowsOf = (cell: HTMLElement | undefined) => {
+      const picture = cell?.firstElementChild
+      return [picture?.getAttribute('aria-hidden'), picture?.hasAttribute('inert'), [...(picture?.children ?? [])].map((row) =>
+        `${row.textContent}${row.hasAttribute('data-highlighted') ? '*' : ''}${row.hasAttribute('data-disabled') ? '-' : ''}`)]
+    }
+    expect(pictures.map(rowsOf)).toEqual([
+      ['true', true, ['Edit', 'Delete']], ['true', true, ['Edit*', 'Delete']], ['true', true, ['Edit', 'Delete-']],
+    ])
+    expect(pictures.flatMap((cell) => [...cell.querySelectorAll('[role], button, a, [tabindex]')])).toHaveLength(0)
   })
 })

@@ -15,10 +15,10 @@ const BAR = 'min-h-2 rounded-chip bg-neutral-soft'
 function PageBehind() {
   return (
     <div aria-hidden className="absolute inset-0 flex flex-col gap-2 p-3.5">
-      <div className={`${BAR} w-1/2`} />
-      <div className={`${BAR} w-4/5`} />
-      <div className={`${BAR} w-2/3`} />
-      <div className={`${BAR} w-2/5`} />
+      <div className={`${BAR} w-67.75 max-w-full`} />
+      <div className={`${BAR} w-104.5 max-w-full`} />
+      <div className={`${BAR} w-86 max-w-full`} />
+      <div className={`${BAR} w-55.25 max-w-full`} />
     </div>
   )
 }
@@ -37,8 +37,8 @@ function Stage({ size, closeButton }: DialogDesignProps) {
           </DialogHeader>
           <DialogBody>This removes the project and every file in it. This cannot be undone.</DialogBody>
           <DialogFooter>
-            <DialogClose render={<Button variant="soft" tone="neutral" size="sm">Cancel</Button>} />
-            <DialogClose render={<Button tone="danger" size="sm">Delete</Button>} />
+            <DialogClose render={<Button variant="soft" tone="neutral" size="xs">Cancel</Button>} />
+            <DialogClose render={<Button tone="danger" size="xs">Delete</Button>} />
           </DialogFooter>
         </DialogPopup>
       </DialogRoot>
@@ -61,8 +61,8 @@ export default function Demo({ size, closeButton, stage = false }: DialogDesignP
         </DialogHeader>
         <DialogBody>11 files changed since the last publish.</DialogBody>
         <DialogFooter>
-          <DialogClose render={<Button variant="soft" tone="neutral" size="sm">Cancel</Button>} />
-          <DialogClose render={<Button size="sm">Publish now</Button>} />
+          <DialogClose render={<Button variant="soft" tone="neutral" size="xs">Cancel</Button>} />
+          <DialogClose render={<Button size="xs">Publish now</Button>} />
         </DialogFooter>
       </DialogPopup>
     </DialogRoot>

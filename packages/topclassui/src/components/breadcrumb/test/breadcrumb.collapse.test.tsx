@@ -53,6 +53,12 @@ describe('maxItems', () => {
     expect(gap).not.toContain('<a ')
   })
 
+  it('starts at the 100 rail: five crumbs stay whole, and a 150-crumb trail folds to the first and the last 99', () => {
+    expect(shown(html())).toEqual(['Home', 'Docs', 'Components', 'Button', 'Props'])
+    const long = Array.from({ length: 150 }, (_, index) => ({ href: `/${String(index)}`, label: `Crumb ${String(index)}` }))
+    expect(shown(markup(<Breadcrumb items={long} />))).toHaveLength(101)
+  })
+
   it('leaves the JSON-LD whole, every crumb in it', () => {
     const json = /<script type="application\/ld\+json">(.*?)<\/script>/.exec(html({ maxItems: 3, siteUrl: 'https://example.com' }))?.[1] ?? ''
     expect((JSON.parse(json) as { itemListElement: unknown[] }).itemListElement).toHaveLength(5)

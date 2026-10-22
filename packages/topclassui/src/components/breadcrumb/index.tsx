@@ -8,6 +8,7 @@ import { renderLink } from '#shared/link.js'
 import { cutLabel, resolveLabelDir, truncateLabel } from '#shared/truncate-label.js'
 import { Svg } from '#components/svg/index.js'
 import { BREADCRUMB_BOUNDARIES } from './boundaries.js'
+import { BREADCRUMB_DEFAULTS } from './constants.js'
 import { CURRENT, GAP, HIDDEN_LABEL, ITEM, LINK, LIST, ROOT, TEXT } from './classes.js'
 import { buildBreadcrumbList, collapseTrail, serializeJsonLd } from './lib.js'
 import type { BreadcrumbProps } from './types.js'
@@ -18,8 +19,8 @@ export function Breadcrumb({
   items,
   link,
   siteUrl,
-  showHome = false,
-  maxItems,
+  showHome = BREADCRUMB_DEFAULTS.showHome,
+  maxItems = BREADCRUMB_DEFAULTS.maxItems,
   labels = en,
   locale: _locale,
   className,
@@ -72,4 +73,4 @@ export function Breadcrumb({
   )
 }
 
-export type { BreadcrumbItem, BreadcrumbProps } from './types.js'
+export type { BreadcrumbDesignProps, BreadcrumbItem, BreadcrumbProps } from './types.js'

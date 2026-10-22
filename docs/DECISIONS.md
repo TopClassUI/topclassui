@@ -16,6 +16,46 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-22 - Breadcrumb, Kbd and Card get the Try it their Previewer frames draw
+
+**Decision.** Job 151 (round 11) gives the three a Try it, reversing docs-site S8's "a component with no schema has no Try it" for them. Breadcrumb's schema takes `showHome` (default false) and `maxItems` (2 to 100, default 100, clamped), and Try it starts at the frame's 4 with the house on. A trail over 100 crumbs now folds at the rail, where before an unset `maxItems` drew it whole. Kbd gets a `schema.ts` and a `constants.ts` holding `pressed` and `disabled`, both default false. Card gets no schema: `interactive`, `media` and `footer` are parts, not props (`render={<a />}`, `CardMedia`, `CardFooter`). They ride the content file's `extraSwitches`, footer starting on. An interactive card's footer is its call in words, because a link holds no button. Each folder has a `dummy/playground.tsx`, so the site has three more demos (489).
+
+**Why.** The frames 138:1140, 135:411 and 137:705 draw a Try it column, and the build drew a bare stage (audit-r11 rows 145/1 and 142/1).
+
+**Affects.** Still not built and left out of Try it, as recorded on 2026-10-19: Breadcrumb `separator`, `collapse` and `truncate`, Kbd `variant`, `size` and `muted`, and Card `variant` and `padding`. Card's THE CODE stays the basic sample while Try it changes, since its playground passes no props through.
+
+---
+
+## 2026-10-22 - A disabled Kbd keeps 4.5:1 text where the frame fades it to 50 %
+
+**Decision.** The Kbd frame (135:411) draws the disabled key at `opacity: 0.5`. The build keeps the text at `text-muted`, the fill at `bg-surface` and the line at `border-line` (`kbd/index.tsx`), and fades nothing. This corrects the 2026-10-19 Kbd bullet, which said the disabled look is as the frame's strip draws it.
+
+**Why.** A key is not a control. It is text the reader has to read to know what to press. R-5.6-4's 4.5:1 applies to it, and WCAG's exemption for disabled controls does not. At half opacity the drawn body text drops under 4.5:1 on the raised surface: #0a0a0a over white blends to about #858585.
+
+**Affects.** `kbd/index.tsx` and its contrast; the parity composite (`docs/figma/parity/site-component-kbd.png`) shows the difference.
+## 2026-10-22 - The site loads Noto Sans Arabic with display optional, not swap, and keeps PLAN 14's single preload
+
+**Decision.** `apps/docs/lib/fonts.ts` keeps Noto Sans Arabic unpreloaded, as PLAN 14 asks (Inter only, plus Geist Mono), and sets it to `display: 'optional'` instead of `'swap'`. The Home frame's search field takes a fixed `w-56` instead of a width sized by its font. A first try preloaded the font on every page (16aafcf4); it is withdrawn, since `/en` then downloaded 166,152 bytes of Arabic font it never uses.
+
+**Why.** Since the library's `[lang|='ar']` rule sets `/ar` text in Noto Sans Arabic, its late swap under `display: 'swap'` moved every Arabic line on the page. The layout-shift sources on `/ar` at 1280 x 720 were: the hero's text lines moving up to 37 px as the face's vertical metrics changed (0.0117, glyphs only, against the spec's 0.0005 for text); then the hero h1 narrowing from 836 to 820 px, the chip caption from 274 to 265 px, the header's language link moving 5 px and the frame's search input from 223 to 218 px (0.0029, boxes). On `/ar/docs/components` the header link row narrowed from 552 to 548 px beside text moving 5 to 16 px (0.0037). A stable box holds a box (the search now has one), but no box holds a glyph whose ascent and descent change with the face, so the text shift of a 92 px headline cannot be fixed that way. With `optional` the browser uses the face only if it is ready within its short block period; otherwise that page view keeps the fallback and never swaps, and the face, already downloading, is cached for the next page.
+
+**What an Arabic first visit shows.** On a fast connection, Noto Sans Arabic, as before. On a slow one, the fallback stack for the whole first page view: next/font's size-adjusted "Noto Sans Arabic Fallback", with the Arabic glyphs from the operating system's Arabic face (Segoe UI on Windows, SF Arabic on macOS and iOS, the system Noto on Android). The next page uses Noto from the cache. `/en` loads no Arabic font at all: Inter (48,432 bytes) and Geist Mono (23,108 bytes) only; `/ar` fetches Noto Sans Arabic (166,152 bytes) when its text needs it.
+
+**Measured.** Lighthouse 12.8.2, mobile, performance only, on a local `next start` of each build (not Vercel, which the cloud container cannot reach), median of 3 runs, measured on the laptop.
+
+| Page | Build | Performance | LCP | CLS | TBT | Bytes | Fonts |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `/en` | swap, the preview (local merge 6963704f) | 93 | 3.12 s | 0.000 | 32 ms | 544 KB | 71 KB |
+| `/en` | optional, this branch | 94 | 3.12 s | 0.000 | - | 543 KB | 71 KB |
+| `/ar` | swap, the preview (local merge 6963704f) | 82 | 4.21 s | 0.038 | 93 ms | 745 KB | 265 KB |
+| `/ar` | optional, this branch | 83 | 4.21 s | 0.000 | 66 ms | 746 KB | 265 KB |
+
+The `/en` branch score is 3 x 94 on an interleaved re-run against 93, 94 and 94 for the preview; a first 88 was machine noise. `/en` is unchanged: it loads no Arabic font bytes either way. `/ar` loses its 0.038 layout shift at the same LCP and bytes. The cost is the first Arabic visit, which may show the fallback face until the font is cached.
+
+**What it affects.** `apps/docs` only: `lib/fonts.ts`, `components/home/product-frame.tsx`. `motion.spec.ts` `/ar` and `/en` pass three times over; `site.spec.ts`'s font checks pass.
+
+---
+
 ## 2026-10-22 - Right to left keeps the full Arabic plural sample, and a checked fence may show only its drawn lines
 
 **Decision.** "Type, plurals and digits" on the Right to left guide keeps the five-branch `Intl.PluralRules` sample (zero, one, two, few, many and the rest) instead of the frame's one-line ternary (183:1245). Elsewhere a guide fence marked `check` may carry `show="a-b"`: the page shows those lines, dedented, and Copy copies them, while the sample check still compiles the whole fence.
@@ -165,7 +205,7 @@ The format is: date, decision, why, and what it affects.
 
 - **Two new values in `tokens.css`.** `--tc-shadow-overlay` is the frames' drop shadow, `0 8px 10px` at 45% black in dark and 15% on a light page (light and ocean), and `OVERLAY_SURFACE` and the Drawer's sheet wear it instead of `shadow-lg`. `--tc-row-height` is now `2rem` times the density, 32 px: every menu and list row in the frames is 31 px (14 px text, 7 px of padding above and below), against 40 before. A coarse pointer still gets 44 px from `ROW_TOUCH` and `COMMAND_UNIT`, and the 24 px floor of R-5.6-2 is untouched. `ROW` pads 10 px a side instead of 12 (the frames draw 9). Every component that wears `ROW` or the knob moves with it: Select, Combobox, Sidebar, TreeView, FileUpload and DatePicker as well as the six here.
 - **The scrim.** `--tc-overlay` is 30% black on a light page and 40% in dark (was 50% and 70%): the frames dim the page behind a dialog or a sheet so that it stays readable.
-- **Dialog.** Header and footer pad 18 by 14 px and the body 18, as drawn; `md` is 380 px wide (`max-w-95`), the drawn panel. The x reaches 5 px into the padding (`-me-1.25`), so its glyph ends on the padding line while its box keeps 24 px. The basic demo's actions are `sm`, as drawn.
+- **Dialog.** Header and footer pad 18 by 14 px and the body 18, as drawn; `md` is 380 px wide (`max-w-95`), the drawn panel. The x reaches 5 px into the padding (`-me-1.25`), so its glyph ends on the padding line while its box keeps 24 px. The basic demo's actions are `sm`; the playground's are `xs`, the frame's 29 px with 12 px text.
 - **Drawer.** The header pads 14 px above and below.
 - **Command.** 400 px wide, the search row pads 14 px at its start, the input is 40 px tall and 48 under a finger, and an Esc keycap (`labels.command.escape`, aria-hidden, gone under a coarse pointer) ends the search row. The group heading sits 2 px over its rows.
 - **Dropdown.** 220 px at least (`calc(var(--spacing)*55)`), and the separator has no margin of its own: the 2 px gap of the popup is all the frame leaves around the line. A row holds the real focus, so it wears job 114's `ROW_FOCUSED` (the same text as on `figma/forms-1`): the frame's hover row is the tint alone, and a key brings the focus ring back. The basic demo's trigger is `sm`.
@@ -173,7 +213,7 @@ The format is: date, decision, why, and what it affects.
 
 **Not followed, and why.** The Command input and its active row keep a keyboard mark in another shape than the ring (the entry above). Dialog's bars draw their line only while the body scrolls, as the frame's scrolled state does. The Dialog demos' Cancel is the neutral soft Button, as drawn. The neutral look of an outline Button (the frames' Cancel and triggers) is Button's own frame, job 116.
 
-- **The stage and the states strip (a lead call for the docs site).** Each of the six `dummy/playground.tsx` takes an optional `stage`: the overlay is drawn open inside the demo's own box (`data-stage`, `contain: paint`, the portal's container), not modal, taking no focus, over a scrim where the frame draws one (Dialog, Drawer). Command is always modal, so its stage is a picture built from its own class constants and hidden from a reader; Tooltip is held `open`, because the provider's delay group keeps one tooltip open at a time. Each `dummy/states.tsx` is one captioned cell per drawn state (the `title` of each direct child), real components drawn open in their cells (Command's as pictures). Left out, because they need a live focus, pointer or gesture, or look the same as another cell: Dialog and Drawer "focus trapped", Drawer "dragging", Popover "focus-visible" and "dismissed", Tooltip "delayed", Dropdown "hover item". Dropdown's "submenu" and "checked" need a submenu and a checkbox item, which Dropdown does not have: new API, for Omar. A Dropdown menu drawn open takes the focus (Base UI 1.8.0's `MenuPopup` hardcodes its initial focus), so the last open menu of the strip shows its focus ring.
+- **The stage and the states strip (a lead call for the docs site).** Each of the six `dummy/playground.tsx` takes an optional `stage`: the overlay is drawn open inside the demo's own box (`data-stage`, `contain: paint`, the portal's container), not modal, taking no focus, over a scrim where the frame draws one (Dialog, Drawer). Command is always modal, so its stage is a picture built from its own class constants and hidden from a reader; Tooltip is held `open`, because the provider's delay group keeps one tooltip open at a time. Each `dummy/states.tsx` is one captioned cell per drawn state (the `title` of each direct child) on the frame's 58 px row. The closed cell holds the one real component; Dialog's open cells are real dialogs drawn open in their cells, and the open cells of Drawer, Popover, Tooltip, Dropdown and Command are pictures built from the shared classes, `aria-hidden` and `inert`, because an anchored popup hides itself while its trigger is off screen and a full-page capture then shows an empty cell. Tooltip's top and bottom cells draw the tip and its arrow alone, as the frame does. Dialog's "scrolled" cell keeps a body that scrolls under its header, where the frame draws it like "open": the cell would otherwise say nothing. Dropdown's "submenu" and "checked" need a submenu and a checkbox item, which Dropdown does not have: new API, for Omar. The stage's open menu takes the focus and wears its ring (Base UI 1.8.0's `MenuPopup` has no `initialFocus` and focuses the popup on open). Kept for a library round, since they change component source: the frame's muted menu icons (`DROPDOWN_ICON` sets no colour) and the Command input's start padding (`COMMAND_INPUT` `px-2`; the stage picture already draws the frame's `pe-2`). The Tooltip stage keeps "Copy link", which the frame's own code and note use, where its picture says "Copy to clipboard".
 - **TooltipPopup takes `container` and `keepMounted`,** the two props of its portal, as PopoverPopup does, so a stage can draw it inside its own box.
 
 **What it affects.** `src/tokens.css`, `src/shared/classes.ts`, the six `classes.ts`, `command/parts/command-panel.tsx`, the labels (`command.escape` in English and Arabic), the Popover basic demo, the tests that pin those class strings, and their mutation rows.

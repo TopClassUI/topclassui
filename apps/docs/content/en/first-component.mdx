@@ -66,7 +66,7 @@ export default function Page() {
 
 ## 4. Show the error without a reload
 
-Move the form into a client file and use `FormAction`. Errors land on the matching field. The page renders `<SubscribeForm action={subscribe} />`.
+Move the form into a client file and use `FormAction`. Errors land on the matching field.
 
 ```tsx title="app/subscribe/subscribe-form.tsx" check
 'use client'
@@ -87,6 +87,8 @@ export function SubscribeForm({ action }: { action: typeof subscribe }) {
   )
 }
 ```
+
+<Caption>The page renders `<SubscribeForm action={subscribe} />`.</Caption>
 
 ## On Vite
 
