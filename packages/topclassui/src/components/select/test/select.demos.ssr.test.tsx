@@ -12,7 +12,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-4.md, Demos). */
-const EXPECTED = ['basic', 'form', 'four-rows', 'load-more', 'long-content', 'phase-4-form', 'playground', 'rtl', 'sixty-items', 'sizes', 'states']
+const EXPECTED = ['basic', 'form', 'four-rows', 'load-more', 'long-content', 'phase-4-form', 'playground', 'read-only', 'rtl', 'sixty-items', 'sizes', 'states']
 
 /** Each Select of each demo as the server writes it: its name, then what its trigger shows. */
 const SELECTS: Record<string, string[]> = {
@@ -26,7 +26,8 @@ const SELECTS: Record<string, string[]> = {
   'rtl': ['الدولة: الأردن'],
   'sixty-items': ['Sixty options: Option 30'],
   'sizes': ['Extra small: Pro', 'Small: Pro', 'Medium: Pro', 'Large: Pro', 'Extra large: Pro'],
-  'states': ['idle: Country', 'hover: Country', 'focus-visible: Jordan', 'open: Jordan', 'disabled: Country', 'invalid: Jordan', 'read-only: Jordan'],
+  'read-only': ['Read-only: Jordan'],
+  'states': ['idle: Country', 'hover: Country', 'focus-visible: Jordan', 'open: Jordan', 'disabled: Country', 'invalid: Jordan'],
 }
 
 const render = async (file: string) => {
@@ -91,6 +92,6 @@ describe('the demos the plan names', () => {
     const html = await render('states')
     expect(html).toMatch(/<button [^>]*aria-invalid="true"[^>]*aria-label="invalid"|<button [^>]*aria-label="invalid"[^>]*aria-invalid="true"/)
     expect(html).toMatch(/<button [^>]*disabled=""[^>]*aria-label="disabled"/)
-    expect(html).toMatch(/<button [^>]*aria-readonly="true"[^>]*aria-label="read-only"/)
+    expect(await render('read-only')).toMatch(/<button [^>]*aria-readonly="true"[^>]*aria-label="Read-only"/)
   })
 })

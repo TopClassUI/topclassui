@@ -6,8 +6,8 @@ export const datePicker = {
     ar: 'منتقي التاريخ',
   },
   description: {
-    en: 'One day picked from a month. The calendar loads on its first open, and every month name and digit comes from Intl.',
-    ar: 'يوم واحد يُختار من شهر. يُحمَّل التقويم عند فتحه أول مرة، وكل اسم شهر وكل رقم يأتي من Intl.',
+    en: 'A lazy-loaded calendar popover that formats dates with the provider\'s locale and digits.',
+    ar: 'تقويم منبثق يُحمَّل عند الحاجة، ويكتب التواريخ بلغة المزوّد وأرقامه.',
   },
   demos: ['basic', 'in-field', 'limits', 'week-start', 'form', 'sizes', 'rtl'],
   stageHeight: 7.5,

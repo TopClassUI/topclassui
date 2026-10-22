@@ -13,7 +13,7 @@ import { urlFor } from './pages.js'
 
 const SIZES = ['Extra small', 'Small', 'Medium', 'Large', 'Extra large'] as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['autosize', 'basic', 'form', 'long-content', 'playground', 'row', 'rtl', 'show-count', 'sizes', 'skeleton', 'states'].map((name) => `textarea--${name}`)
+const DEMOS = ['autosize', 'basic', 'form', 'long-content', 'playground', 'read-only', 'row', 'rtl', 'show-count', 'sizes', 'skeleton', 'stage', 'states'].map((name) => `textarea--${name}`)
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 
 const field = (page: Page, name: string) => page.getByRole('textbox', { name, exact: true })
