@@ -19,10 +19,10 @@ const PAIRS = {
 const CSS = readFileSync(resolve(import.meta.dirname, '..', 'app', 'globals.css'), 'utf8')
 
 describe('highlight', () => {
-  it('names each token by its role and marks a blank line', async () => {
+  it('names each token by its role and marks a blank line and an import line', async () => {
     const markup = renderToStaticMarkup(await highlight("import { x } from 'y'\n\n// z", 'ts'))
     expect(markup).toBe(
-      '<span class="shiki"><span><span class="tk-keyword">import</span><span class="tk-text"> { x } </span><span class="tk-keyword">from</span><span class="tk-text"> </span><span class="tk-string">&#x27;y&#x27;</span>\n</span>'
+      '<span class="shiki"><span data-import=""><span class="tk-keyword">import</span><span class="tk-text"> { x } </span><span class="tk-keyword">from</span><span class="tk-text"> </span><span class="tk-string">&#x27;y&#x27;</span>\n</span>'
       + '<span data-blank="">\n</span><span><span class="tk-comment">// z</span></span></span>',
     )
   })
