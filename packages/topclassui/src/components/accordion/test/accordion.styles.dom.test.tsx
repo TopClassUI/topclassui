@@ -29,9 +29,10 @@ const classes = (element: Element | null | undefined) =>
   (element?.getAttribute('class') ?? '').split(/\s+/).filter(Boolean).sort()
 
 describe('every element carries exactly the classes the spec names', () => {
-  it('the root: the raised box with a line, which clips, breaks a long word, and is one grid column', () => {
+  it('the root: the raised box with a line, which clips, breaks a long word, is one grid column and dims as one when disabled', () => {
     expect(classes(opened().root)).toEqual([
-      'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line', 'grid', 'grid-cols-1', 'overflow-hidden',
+      'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line', 'data-disabled:opacity-50',
+      'forced-colors:data-disabled:opacity-100', 'grid', 'grid-cols-1', 'group/accordion', 'overflow-hidden',
       'rounded-box', 'text-body', 'wrap-anywhere',
     ])
   })
@@ -52,12 +53,10 @@ describe('every element carries exactly the classes the spec names', () => {
       'aria-disabled:cursor-default',
       'cursor-pointer',
       'data-disabled:cursor-default',
-      'data-disabled:opacity-50',
       'data-disabled:pointer-events-none',
       'data-loading:cursor-default',
       'data-readonly:cursor-default',
       'disabled:cursor-default',
-      'disabled:opacity-50',
       'disabled:pointer-events-none',
       'duration-(--tc-duration)',
       'ease-out',
@@ -76,6 +75,8 @@ describe('every element carries exactly the classes the spec names', () => {
       'items-center',
       'min-h-[var(--tc-target-min,24px)]',
       'min-w-[var(--tc-target-min,24px)]',
+      'not-forced-colors:not-group-data-disabled/accordion:data-disabled:opacity-50',
+      'not-forced-colors:not-group-data-disabled/accordion:disabled:opacity-50',
       'outline-none',
       'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]',
       'pointer-coarse:min-w-[var(--tc-target-coarse,44px)]',
@@ -151,6 +152,11 @@ describe('the state attributes are Base UI own', () => {
     expect(opened({}, { disabled: true }).trigger.hasAttribute('data-disabled')).toBe(true)
   })
 
+  it('a disabled root carries data-disabled, which dims the box, and so do its items and their triggers', () => {
+    const { root, item, trigger } = opened({ disabled: true })
+    for (const element of [root, item, trigger]) expect(element?.hasAttribute('data-disabled')).toBe(true)
+  })
+
   it('no part writes a data-state, a data-size or a data-variant: an accordion has no design value', () => {
     const { root, item, trigger, panel } = opened()
     for (const element of [root, item, trigger, panel]) {
@@ -164,7 +170,8 @@ describe('the state attributes are Base UI own', () => {
 describe('className is passed last', () => {
   it('lets a consumer class replace the radius and the fill of the box, and keeps the rest', () => {
     expect(classes(opened({ className: 'rounded-control bg-surface' }).root)).toEqual([
-      'bg-surface', 'border-(length:--tc-line-width)', 'border-line', 'grid', 'grid-cols-1', 'overflow-hidden',
+      'bg-surface', 'border-(length:--tc-line-width)', 'border-line', 'data-disabled:opacity-50',
+      'forced-colors:data-disabled:opacity-100', 'grid', 'grid-cols-1', 'group/accordion', 'overflow-hidden',
       'rounded-control', 'text-body', 'wrap-anywhere',
     ])
   })

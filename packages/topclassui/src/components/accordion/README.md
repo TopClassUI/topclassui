@@ -48,8 +48,8 @@ import { AccordionItem, AccordionRoot } from 'topclassui/accordion'
   starts once the page has hydrated; before that a closed panel is plain `hidden`.
 - **`hiddenUntilFound={false}`** on the root takes closed panels out of the page.
   `keepMounted` then keeps them, hidden from the search as well.
-- **Disabled.** `disabled` on an item, or on the root for all of them. The trigger keeps
-  its place in the tab order and says that it is disabled.
+- **Disabled.** `disabled` on an item dims its trigger; on the root it dims the whole box
+  once. The trigger keeps its place in the tab order and says that it is disabled.
 - **Keyboard.** Tab moves from trigger to trigger. Enter and Space toggle. There are no
   arrow keys: Base UI 1.8.0 dropped them, as the ARIA Authoring Practices did.
 - **A screen reader** hears the trigger as a button in a heading, expanded or collapsed,

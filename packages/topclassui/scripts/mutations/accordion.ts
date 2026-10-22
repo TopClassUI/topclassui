@@ -237,4 +237,16 @@ export const MUTATIONS: Mutation[] = [
     from: '    sizes.disconnect()\n',
     to: '',
   },
+  {
+    label: 'a disabled accordion root no longer dims its box, so only the text tells it is disabled',
+    file: CLASSES,
+    from: "'group/accordion data-disabled:opacity-50 ",
+    to: "'group/accordion ",
+  },
+  {
+    label: 'a trigger inside a disabled accordion root dims a second time, its text at a quarter strength',
+    file: CLASSES,
+    from: 'not-forced-colors:not-group-data-disabled/accordion:data-disabled:opacity-50',
+    to: 'not-forced-colors:data-disabled:opacity-50',
+  },
 ]
