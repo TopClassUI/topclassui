@@ -118,6 +118,8 @@ test('Icons: a tile copies its Icon code and says so', async ({ page, context })
 test('Colors: the radius and density sliders set their knobs on main only', async ({ page }) => {
   await page.goto('/en/docs/colors')
   const radius = page.getByRole('slider', { name: 'Radius (rem)' })
+  // The controls are a lazy island: a key pressed before it takes over the server's HTML moves nothing.
+  await expect(page.locator('[data-island][data-island-live]').filter({ has: radius })).toHaveCount(1)
   await radius.focus()
   await page.keyboard.press('ArrowRight')
   await expect(page.locator('main#main')).toHaveAttribute('style', /--tc-radius: 0\.625rem/)
