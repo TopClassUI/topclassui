@@ -92,6 +92,7 @@ Anything else is passed to the element each part draws, so standard attributes (
 - `dummy/interactive.tsx`
 - `dummy/media.tsx`
 - `dummy/paragraphs.tsx`
+- `dummy/playground.tsx`
 - `dummy/report.tsx`
 - `dummy/rtl.tsx`
 - `dummy/skeleton.tsx`
