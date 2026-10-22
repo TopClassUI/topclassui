@@ -15,4 +15,19 @@ describe('remarkMeta', () => {
       { hProperties: { 'data-meta': 'title="page.tsx" check', 'data-repeat': '2' } },
     ])
   })
+
+  it('numbers untitled fences by the name they show, "code" or "terminal", and leaves a WrongRight pane to its pair', () => {
+    const shell = () => ({ type: 'code', lang: 'bash', meta: null, value: '', data: undefined as unknown })
+    const fences = [fence(null), shell(), fence(null), fence(null), shell()]
+    const [first, terminal, second, pane, again] = fences
+    const tree = { type: 'root', children: [first, terminal, second, { type: 'mdxJsxFlowElement', name: 'WrongRight', children: [pane] }, again] }
+    remarkMeta()(tree)
+    expect(fences.map((node) => node.data)).toEqual([
+      undefined,
+      undefined,
+      { hProperties: { 'data-repeat': '2' } },
+      undefined,
+      { hProperties: { 'data-repeat': '2' } },
+    ])
+  })
 })

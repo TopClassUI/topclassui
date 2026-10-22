@@ -60,7 +60,7 @@ function Screen({ labels }: { labels: ReturnType<typeof guideLabelsFor>['board']
         <div className={`flex w-60 flex-col items-start gap-2 rounded-box bg-surface p-4 ${BORDER}`}>
           <span className="text-sm font-semibold text-body">{labels.title}</span>
           <span className="text-xs text-muted">{labels.lead}</span>
-          <Button type="button" size="xs">{labels.save}</Button>
+          <Button type="button" size="xs" className="px-3 font-semibold">{labels.save}</Button>
         </div>
         <div className={`absolute inset-s-[53.5%] top-24 flex w-44 flex-col gap-0.5 rounded-box bg-surface-raised p-1.5 shadow-lg ${BORDER}`}>
           <span className="rounded-control bg-primary-soft px-2.5 py-1.5 text-xs font-semibold text-primary-on-soft">{selected}</span>
