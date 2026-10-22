@@ -6,15 +6,17 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
-## 2026-10-22 - The site preloads Noto Sans Arabic on every page, against PLAN 14
+## 2026-10-22 - The site loads Noto Sans Arabic with display optional, not swap, and keeps PLAN 14's single preload
 
-**Decision.** `apps/docs/lib/fonts.ts` preloads Noto Sans Arabic (`preload: true`), where PLAN 14 preloaded Inter only. The Home frame's search field takes a fixed `w-56` instead of a width sized by its font.
+**Decision.** `apps/docs/lib/fonts.ts` keeps Noto Sans Arabic unpreloaded, as PLAN 14 asks (Inter only, plus Geist Mono), and sets it to `display: 'optional'` instead of `'swap'`. The Home frame's search field takes a fixed `w-56` instead of a width sized by its font. A first try preloaded the font on every page (16aafcf4); it is withdrawn, since `/en` then downloaded 166,152 bytes of Arabic font it never uses.
 
-**Why.** Since the library's `[lang|='ar']` rule (2026-10-22, `--tc-font-sans: var(--tc-font-arabic)`), every `/ar` page sets its text in Noto Sans Arabic. Unpreloaded, it arrives after the first paint, and the swap grew the Arabic hero h1 from 185 to 257 px: a layout shift of 0.004 to 0.0097 on `/ar`, which `e2e/motion.spec.ts` holds at 0 for boxes. With the preload the font is ready before the first paint. The one box still moving was the search input in Home's product frame, sized by its font's character width (223 to 218 px, 0.0000058); a fixed width ends that. next/font keys its preload list by the module that imports the font, not by the route's params, and `/en` and `/ar` render from the same `app/(site)/[locale]/layout.tsx`, so the preload cannot be scoped to `/ar` without splitting the route tree.
+**Why.** Since the library's `[lang|='ar']` rule sets `/ar` text in Noto Sans Arabic, its late swap under `display: 'swap'` moved every Arabic line on the page. The layout-shift sources on `/ar` at 1280 x 720 were: the hero's text lines moving up to 37 px as the face's vertical metrics changed (0.0117, glyphs only, against the spec's 0.0005 for text); then the hero h1 narrowing from 836 to 820 px, the chip caption from 274 to 265 px, the header's language link moving 5 px and the frame's search input from 223 to 218 px (0.0029, boxes). On `/ar/docs/components` the header link row narrowed from 552 to 548 px beside text moving 5 to 16 px (0.0037). A stable box holds a box (the search now has one), but no box holds a glyph whose ascent and descent change with the face, so the text shift of a 92 px headline cannot be fixed that way. With `optional` the browser uses the face only if it is ready within its short block period; otherwise that page view keeps the fallback and never swaps, and the face, already downloading, is cached for the next page.
 
-**Cost.** One more preloaded file on every page, `/en` included: the Noto Sans Arabic woff2 of 166,152 bytes (162.3 KiB, one variable file for the 400, 500 and 600 weights), beside Inter's 48,432 and Geist Mono's 23,108 bytes, from the build's `next-font-manifest.json`.
+**What an Arabic first visit shows.** On a fast connection, Noto Sans Arabic, as before. On a slow one, the fallback stack for the whole first page view: next/font's size-adjusted "Noto Sans Arabic Fallback", with the Arabic glyphs from the operating system's Arabic face (Segoe UI on Windows, SF Arabic on macOS and iOS, the system Noto on Android). The next page uses Noto from the cache. `/en` loads no Arabic font at all: Inter (48,432 bytes) and Geist Mono (23,108 bytes) only; `/ar` fetches Noto Sans Arabic (166,152 bytes) when its text needs it.
 
-**What it affects.** `apps/docs` only: `lib/fonts.ts`, `components/home/product-frame.tsx`. `motion.spec.ts` `/ar` and `/en` pass three times over.
+**Not measured here.** Mobile Lighthouse on the branch's Vercel preview against production (performance, LCP, CLS, bytes for `/en` and `/ar`): the cloud container's network policy refuses topclassui.com and vercel.com (proxy CONNECT 403), so the laptop measures it before this merges.
+
+**What it affects.** `apps/docs` only: `lib/fonts.ts`, `components/home/product-frame.tsx`. `motion.spec.ts` `/ar` and `/en` pass three times over; `site.spec.ts`'s font checks pass.
 
 ---
 
