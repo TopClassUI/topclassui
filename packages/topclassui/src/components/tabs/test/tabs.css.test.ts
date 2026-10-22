@@ -70,6 +70,10 @@ const DECLARATION: Record<string, string> = {
   'data-active:border-primary-solid': 'border-color: var(--tc-primary-solid);',
   'forced-colors:border-[Canvas]': 'border-color: Canvas;',
   'forced-colors:data-active:border-[Highlight]': 'border-color: Highlight;',
+  'data-disabled:data-active:border-primary-solid/50': 'border-color: color-mix(in oklab, var(--tc-primary-solid) 50%, transparent);',
+  'forced-colors:data-disabled:data-active:border-[GrayText]': 'border-color: GrayText;',
+  'focus-visible:-outline-offset-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+2px)]':
+    'outline-offset: calc(calc(var(--tc-ring-width) + var(--tc-ring-offset) + 2px) * -1);',
   'data-active:bg-surface-raised': 'background-color: var(--tc-surface-raised);',
   'forced-colors:data-active:forced-color-adjust-none': 'forced-color-adjust: none;',
   'forced-colors:data-active:bg-[Highlight]': 'background-color: Highlight;',
@@ -105,6 +109,9 @@ const SCOPE: Record<string, string> = {
   'forced-colors:data-disabled:*:opacity-100': '[data-disabled] > *) {',
   'forced-colors:data-disabled:not-data-active:text-[GrayText]': '[data-disabled]:not([data-active]) {',
   'forced-colors:data-active:border-[Highlight]': '[data-active] {',
+  'data-disabled:data-active:border-primary-solid/50': '[data-disabled][data-active] {',
+  'forced-colors:data-disabled:data-active:border-[GrayText]': '[data-disabled][data-active] {',
+  'focus-visible:-outline-offset-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+2px)]': ':focus-visible {',
   'forced-colors:data-active:forced-color-adjust-none': '[data-active] {',
   'forced-colors:data-active:bg-[Highlight]': '[data-active] {',
   'forced-colors:data-active:text-[HighlightText]': '[data-active] {',
@@ -135,7 +142,7 @@ describe('every class Tabs writes compiles with the installed Tailwind', () => {
   it('the table names exactly the classes of the root, the lists, the tabs, the panel and the size scale', () => {
     const all = written([TABS_ROOT, ...Object.values(TABS_LIST), ...Object.values(TABS_TAB), TABS_PANEL, ...Object.values(TABS_SIZE).flatMap((sizes) => Object.values(sizes))])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(79)
+    expect(all).toHaveLength(82)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {
