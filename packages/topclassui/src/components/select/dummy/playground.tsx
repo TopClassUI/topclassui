@@ -22,7 +22,7 @@ const COUNTRIES = [
  * The picture is hidden from a reader and inert, so the page keeps its focus order and nothing is marked aria-hidden. */
 function Stage(props: SelectDesignProps) {
   return (
-    <div data-stage="" className="grid w-fit gap-1.5">
+    <div data-stage="" className="grid w-56 max-w-full gap-1.5">
       <Select aria-label="Country" items={COUNTRIES.slice(0, 3)} defaultValue="jo" fullWidth {...props} />
       <div aria-hidden inert className={popup}>
         <div className={list}>

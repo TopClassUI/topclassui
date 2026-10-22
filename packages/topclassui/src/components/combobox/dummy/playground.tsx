@@ -30,7 +30,7 @@ const PLACES = [{ value: 'jo', label: 'Jordan' }, { value: 'jv', label: 'Jordan 
  * shared classes. The picture is hidden from a reader and inert, so the page keeps its focus order and nothing is marked aria-hidden. */
 function Stage(props: ComboboxDesignProps) {
   return (
-    <div data-stage="" className="grid w-fit gap-1.5">
+    <div data-stage="" className="grid w-56 max-w-full gap-1.5">
       <Combobox aria-label="Country" items={PLACES} defaultValue="jo" defaultInputValue="jor" fullWidth {...props} />
       <div aria-hidden inert className={popup}>
         <div className={list}>
