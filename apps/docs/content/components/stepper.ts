@@ -3,11 +3,11 @@ export const stepper = {
   slug: 'stepper',
   title: { en: 'Stepper', ar: 'مؤشر الخطوات' },
   description: {
-    en: 'Where a reader is in a task of a few steps. A done step carries a tick, not just a colour, so it survives a greyscale screenshot.',
+    en: 'A done step carries a tick, not just a colour, so it survives a greyscale screenshot.',
     ar: 'أين يقف القارئ في مهمة من بضع خطوات. الخطوة المكتملة تحمل علامة صح لا لونًا فقط، فتبقى واضحة في لقطة شاشة رمادية.',
   },
   demos: ['basic', 'statuses', 'sizes', 'custom-size', 'long-content', 'arabic-digits', 'rtl'],
-  stageHeight: 10,
+  stageHeight: 19.4,
   note: {
     en: 'Stepper renders on the server: pass `value`, the id of the current step. It shows progress; it does not navigate.',
     ar: 'مؤشر الخطوات يُعرض على الخادم: مرّر `value`، أي معرّف الخطوة الحالية. هو يعرض التقدّم ولا ينقل بين الصفحات.',

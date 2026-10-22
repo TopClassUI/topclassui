@@ -326,4 +326,7 @@
     --tc-scrollbar-track: transparent;
   }
   .docs-flat-code .shiki span { color: light-dark(var(--tc-code-on-light), var(--tc-code-on-dark)); }
+  /* Plain tokens (lib/shiki-themes.ts, text) as the frames draw them: body in the JSX, muted on a line that opens with a keyword, an import. */
+  .docs-flat-code .shiki span[style*='#D4D4D4'] { color: var(--tc-body); }
+  .docs-flat-code .shiki > span:has(> span:first-child[style*='#51A2FF']) > span[style*='#D4D4D4'] { color: var(--tc-muted); }
 }

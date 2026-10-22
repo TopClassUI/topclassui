@@ -115,13 +115,13 @@ describe('the parts a demo is built from', () => {
     expect(handed).toEqual({
       'basic': [{}], 'collapsed': [{ defaultOpen: false }], 'groups': [{}], 'in-a-layout': [{}], 'long-list': [{}],
       // The Try it rail hands on what the controls pass, which is nothing until one is set.
-      'playground': [{ defaultOpen: undefined, open: undefined }], 'rtl': [{}],
+      'playground': [{ defaultOpen: undefined, open: undefined, className: 'h-auto rounded-box border-(length:--tc-line-width) data-open:w-47.5' }], 'rtl': [{}],
       'states': [
-        { 'aria-label': 'expanded', 'defaultOpen': true, 'className': 'data-open:w-40' },
-        { 'aria-label': 'collapsed', 'defaultOpen': false, 'className': 'data-open:w-40' },
-        { 'aria-label': 'active item', 'defaultOpen': true, 'className': 'data-open:w-40' },
-        { 'aria-label': 'hover', 'defaultOpen': true, 'className': 'data-open:w-40' },
-        { 'aria-label': 'focus-visible', 'defaultOpen': true, 'className': 'data-open:w-40' },
+        { 'aria-label': 'expanded', 'defaultOpen': true, 'className': 'data-open:w-40 rounded-box border-(length:--tc-line-width)' },
+        { 'aria-label': 'collapsed', 'defaultOpen': false, 'className': 'data-open:w-40 rounded-box border-(length:--tc-line-width)' },
+        { 'aria-label': 'active item', 'defaultOpen': true, 'className': 'data-open:w-40 rounded-box border-(length:--tc-line-width)' },
+        { 'aria-label': 'hover', 'defaultOpen': true, 'className': 'data-open:w-40 rounded-box border-(length:--tc-line-width)' },
+        { 'aria-label': 'focus-visible', 'defaultOpen': true, 'className': 'data-open:w-40 rounded-box border-(length:--tc-line-width)' },
       ],
     })
     const collapsed = crossings((await load('collapsed'))()).find((crossing) => crossing.part === 'SidebarRoot')
