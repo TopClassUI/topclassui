@@ -288,3 +288,18 @@ Statuses: fixed (commit), already fixed (commit), shared (job 150: previewer/*, 
 | command | 7 Try it list | kept: Omar's call |
 | command | 9 closed as text | fixed 8b094e07 |
 | command | 10 small panels | fixed 8b094e07 |
+
+### Job 142 audit 2 status (cloud-reports/audit-r12/job-142-display.md: button, tag, kbd, badge)
+
+| Row | Status |
+|---|---|
+| button 1 head chip | shared with 150 (previewer.tsx:91) |
+| button 2 Try it checkbox column | shared with 150 (classes.ts:192 CHECK_ROW) |
+| button 3 caption and label line heights | shared with 150 (classes.ts H3, CAPTION, CONTROL_LABEL, STATE_CAPTION, INSTALL_NOTE) |
+| button 4 stage and Try it row height | fixed (button.ts stageHeight 19.4375; the rest of the 311 px comes with 150's leading-3, row 3) |
+| button 5 copy icon colour | shared with 150 (copy-button.tsx:60) |
+| tag 1 Try it panel | kept, library need for Omar: Tag has no disabled prop; removable is a different component (TagRemovable, a client part needing onRemove), and Try it's code reads a playground that returns one tree spreading its props (lib/usage.ts usageOf), so the switch needs a Tag prop or a schema change, not a demo; variant and truncate to be added to DECISIONS 'Not built, for Omar' by the lead or Omar |
+| tag 2 removable danger tag gap | kept, library need for Omar: tag/classes.ts REMOVE_SIZE (component source): an inline-start pull on the 24 px x target, or a DECISIONS line recording the 13 px gap as the price of the target |
+| kbd 1 Try it panel and stage centring | job 151 |
+| kbd 2 Every state disabled cell | kept, library need for Omar: kbd/index.tsx:14 opacity-50 as drawn, or the DECISIONS.md:277 Kbd bullet rewritten to record 4.5:1 muted text |
+| badge | matches, no rows |
