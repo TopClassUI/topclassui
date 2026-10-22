@@ -4,7 +4,7 @@ import { resolve } from 'node:path'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 
-import { highlight } from './highlight.js'
+import { highlight, importRowsOf } from './highlight.js'
 import { TOKEN_ROLES } from './shiki-themes.js'
 
 const PAIRS = {
@@ -42,5 +42,11 @@ describe('highlight', () => {
     for (const [role, [dark, light]] of Object.entries(PAIRS)) {
       expect(CSS).toContain(`.tk-${role} { --tc-code-on-dark: ${dark}; --tc-code-on-light: ${light}; }`)
     }
+  })
+})
+
+describe('the import lines of a sample', () => {
+  it('marks every line of an import, from its import line through its from line', () => {
+    expect(importRowsOf(["import {", '  DialogBody,', "} from 'topclassui/dialog'", "import 'x.css'", '', '<DialogRoot />'])).toEqual([true, true, true, true, false, false])
   })
 })
