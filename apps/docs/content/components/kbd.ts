@@ -8,7 +8,8 @@ export const kbd = {
   },
   demos: ['keys', 'combination', 'with-icon', 'nested', 'rtl'],
   stageDemo: 'combination',
-  stageHeight: 8,
+  stageHeight: 15.5,
+  codeDemo: 'with-icon',
   note: {
     en: 'An icon inside a key is an `<Svg>` with no size: at its 1em default it follows the key\'s own text.',
     ar: 'الأيقونة داخل المفتاح `<Svg>` بلا حجم: بقيمتها الافتراضية 1em تتبع نص المفتاح نفسه.',

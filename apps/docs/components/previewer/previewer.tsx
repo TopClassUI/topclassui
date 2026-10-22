@@ -64,7 +64,9 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
   const playgroundSource = demoSourceOf(entry, 'playground') ?? ''
   // An overlay's playground draws the docs stage too: the usage is read from it once the stage is gone.
   const usage = playground ? (usageOf(playgroundSource) ?? usageOf(stagelessOf(playgroundSource))) : null
-  const restSource = usage === null || stageDemo !== 'playground' ? sampleOf(stageSource) : snippetOf(usage, [])
+  // THE CODE at rest is the frame's sample: codeDemo when it differs from the stage, else the stage's own.
+  const codeSource = content.codeDemo === undefined ? null : demoSourceOf(entry, content.codeDemo)
+  const restSource = codeSource !== null ? sampleOf(codeSource) : usage === null || stageDemo !== 'playground' ? sampleOf(stageSource) : snippetOf(usage, [])
   const restCode = <Code locale={locale} title={`${entry.slug}.tsx`} copyLabel={t.copyCode} code={restSource} className={FLAT_CODE} />
   const note = (
     <p className={`flex items-start gap-2 ${NOTE}`}>
@@ -109,6 +111,7 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
               stageHeight={content.stageHeight}
               stageOpen={content.stageOpen === true}
               serverStage={stageDemo !== 'playground' ? <Demo demoKey={`${entry.slug}/${stageDemo}`} /> : entry.rendering === 'client' ? null : <Demo demoKey={`${entry.slug}/playground`} />}
+              stageIsPlayground={stageDemo === 'playground'}
               restCode={restCode}
               restSource={restSource}
               usage={usage}

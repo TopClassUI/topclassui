@@ -7,8 +7,9 @@ export const badge = {
     ar: 'تسمية حالة قصيرة بثلاثة أنماط عبر ست نبرات. تُعرض على الخادم ولا تُرسل أي JavaScript إلى المتصفح.',
   },
   demos: ['with-icon', 'variants', 'tones', 'sizes', 'long-label', 'skeleton', 'custom-size', 'rtl'],
-  stageHeight: 8,
+  stageHeight: 19.5,
   stageDemo: 'tones',
+  codeDemo: 'with-icon',
   note: {
     en: 'Badge has no ARIA role: the text carries the meaning, colour never does alone.',
     ar: 'لا تحمل الشارة أي دور ARIA: النص يحمل المعنى، واللون وحده لا يكفي أبدًا.',
