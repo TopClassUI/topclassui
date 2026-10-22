@@ -6,6 +6,19 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-22 - Badge xs at 19 px and TreeView's loading and empty notes, the small library rows of round 12
+
+**Decision.** Job 152 (round 12) ships the small, safe library rows of the data family; the larger ones (forced row states on Table and TreeView, EmptyState `bordered`, a CodeBlock `icon` prop) are built on `fix/r12-library-data` and held for Omar's call.
+
+- **Badge xs.** `py-[calc(var(--spacing-pad-y-xs)-var(--tc-line-width))]` on a 15 px line: the always-present border sits inside the drawn 2 px padding, so the chip is the frame's 19 px instead of 22 (Table's stage badges). The other steps are within 1 px of the frame and stay.
+- **TreeView's notes.** Loading draws the two bars bare, 5 px apart, as the frame does, with no box; empty keeps its raised box (the entry "TreeView draws its states as the previewer does") at `px-4 py-6`, so "Nothing here yet" stays on one line in the strip's cell. The caret and the item icon stay in the body colour, as that entry says, where the frame's pixels read muted (780588f4).
+
+**Why.** The rows table 8, tree-view 5 and 7 (audit 1) and 5 and 7 (audit 2) were left for a library change in round 11.
+
+**Affects.** Every xs Badge (3 px shorter) and every TreeView while loading or empty.
+
+---
+
 ## 2026-10-22 - Plain code on a dark ground stays neutral-300, softer than the frames' neutral-50
 
 **Decision.** The Shiki pair keeps plain code text at `#d4d4d4` (neutral-300) on the dark ground (`apps/docs/lib/shiki-themes.ts`, from 7fb765f6), where the guide frames draw plain code in base/body (`#fafafa`). The other token colours stay as drawn, and attribute selectors and constants now take the drawn amber and blue.
