@@ -6,6 +6,20 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-22 - The site replaces Next's polyfill module with the one patch its browsers need
+
+**Decision.** `apps/docs/next.config.ts` aliases `../build/polyfills/polyfill-module` (Turbopack `resolveAlias`) to `apps/docs/lib/polyfills.ts`, which keeps only `URL.canParse` (Chrome 120, Safari 17). Next 16.3.8's `client/app-globals.js` imports that file on every page whatever the targets. It patches `trimStart`, `trimEnd`, `Symbol.description`, `flat`, `flatMap`, `Promise.finally`, `Object.fromEntries`, `Array.at`, `Object.hasOwn` and `URL.canParse`; all but the last are in Chrome 111, Safari 16.4 and Firefox 128, the browsers Tailwind v4 already needs. `browserslist` is unchanged: it steers SWC and the CSS, not this file, and Lighthouse flagged no transform.
+
+**Why.** PageSpeed's Legacy JavaScript item ("Est savings of 14 KiB") named only these patches. The 14 KiB is Lighthouse's core-js estimate: the real file is 1,380 bytes, and the React chunk drops from 72,328 to 71,965 bytes sent (229,285 to 227,998 raw). No client code calls `URL.canParse` today; the patch stays so the alias removes nothing a supported browser lacks. If a later Next renames the file, the alias matches nothing and Next's patches come back, with nothing broken; if it adds a patch to the same file, `apps/docs/lib/polyfills.test.ts`, which pins the ten, fails until the new one is checked against the browsers.
+
+**Measured.** Lighthouse 12.8.2, mobile, local `next start`, median of 3 interleaved with merged main (ad3e1a8c): Legacy JavaScript passes on all 12 runs (main: 14 KiB on all 12). Performance 81 to 81 on `/en/docs/components`, 92 to 93 on `/en/docs/components/button`, 83 to 82 on `/ar` (LCP 4.21 to 4.22 s), `/en` 87 to 93 on a noisy baseline; CLS 0 throughout. A second interleaved run in review gave the same medians on both sides (94, 83, 81 and 93), Legacy JavaScript again passing on all 12 runs: the change clears the item and moves no score.
+
+**Affects.** `apps/docs` only. Unused JavaScript (23 KiB) stays: it is React DOM's client build (module of 200,697 bytes raw, 63,185 gzipped, in the same 72 KB chunk), code paths a first load does not reach, and a page cannot hydrate without it.
+
+**The long tasks in that chunk stay too.** A CPU profile at 4x slowdown shows the first is Next's start: compiling and running React DOM and the router, and decoding the page's RSC payload. The second is the commit of the page's hydration under the provider island: React walking every fiber of the page (about a third), and the motion watcher's style and layout reads (more than half on `/en`), which is the Forced reflow item. Making the provider's `Intl.NumberFormat` lazy took 31 ms of ICU start-up out of the provider's idle task (116 to 73 ms at 4x on `/en`), but Lighthouse listed the same long tasks before and after, and `pnpm size` grew every client half by about 40 bytes, so it was not kept.
+
+---
+
 ## 2026-10-22 - Plain code on a dark ground stays neutral-300, softer than the frames' neutral-50
 
 **Decision.** The Shiki pair keeps plain code text at `#d4d4d4` (neutral-300) on the dark ground (`apps/docs/lib/shiki-themes.ts`, from 7fb765f6), where the guide frames draw plain code in base/body (`#fafafa`). The other token colours stay as drawn, and attribute selectors and constants now take the drawn amber and blue.

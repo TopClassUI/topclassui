@@ -21,7 +21,11 @@ const IMMUTABLE = 'public, max-age=31536000, immutable'
 const config: NextConfig = {
   pageExtensions: ['ts', 'tsx', 'mdx'],
   // Relative imports into packages/topclassui/dist resolve from inside apps/docs only with the repo as the root.
-  turbopack: { root: REPO },
+  turbopack: {
+    root: REPO,
+    // Next's client imports this file of feature patches for older browsers whatever the targets (Lighthouse's Legacy JavaScript); lib/polyfills.ts keeps the one patch the site's browsers need.
+    resolveAlias: { '../build/polyfills/polyfill-module': './lib/polyfills.ts' },
+  },
   outputFileTracingRoot: REPO,
   // Still experimental in 16.3.8: without it app/global-not-found.tsx is ignored (docs-site page 20).
   experimental: { globalNotFound: true },
