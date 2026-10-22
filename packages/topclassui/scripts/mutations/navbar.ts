@@ -43,10 +43,16 @@ export const MUTATIONS: Mutation[] = [
     to: '',
   },
   {
-    label: 'the navbar hook waits for a resize before it writes anything, so a bar that never resizes writes nothing',
+    label: 'the navbar hook skips the first report, so a bar that never resizes writes nothing',
     file: HOOK,
-    from: "    view.addEventListener('resize', publish)\n    publish()\n",
-    to: "    view.addEventListener('resize', publish)\n",
+    from: '      if (first) land()\n      else publish()\n',
+    to: '      if (!first) publish()\n',
+  },
+  {
+    label: 'the navbar hook measures in the commit, where every read forces a layout of the page',
+    file: HOOK,
+    from: "    view.addEventListener('resize', publish)\n\n    return () => {",
+    to: "    view.addEventListener('resize', publish)\n    publish()\n\n    return () => {",
   },
   {
     label: 'the navbar hook watches the content box, which a growing safe area does not always change',
@@ -117,7 +123,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the navbar hook leaves a page opened at an #anchor with its heading under the bar',
     file: HOOK,
-    from: '    if (target && landed !== undefined && Math.abs(landed - padding) < 1) target.scrollIntoView()\n',
+    from: '      if (target && landed !== undefined && Math.abs(landed - padding) < 1) target.scrollIntoView()\n',
     to: '',
   },
   {
