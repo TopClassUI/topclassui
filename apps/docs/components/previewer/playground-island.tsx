@@ -28,6 +28,8 @@ export interface PlaygroundIslandProps {
   stageOpen: boolean
   /** The server's render of the stage at the defaults; null for a client component, which mounts near the viewport. */
   serverStage: ReactNode
+  /** False when the stage at rest is another demo (stageDemo): a client one cannot stand in while the playground loads, so the reserve does. */
+  stageIsPlayground: boolean
   /** The highlighted usage at the defaults, rendered on the server. */
   restCode: ReactNode
   /** The same usage as text, for the copy button. */
@@ -46,7 +48,7 @@ const startOf = (controls: Control[]) => Object.fromEntries(controls.flatMap((co
 })) as Record<string, PropValue>
 
 export function PlaygroundIsland(props: PlaygroundIslandProps) {
-  const { slug, locale, controls, descriptions, stageHeight, stageOpen, serverStage, restCode, restSource, usage, note, labels } = props
+  const { slug, locale, controls, descriptions, stageHeight, stageOpen, serverStage, stageIsPlayground, restCode, restSource, usage, note, labels } = props
   const idBase = useId()
   const row = useRef<HTMLDivElement>(null)
   const near = useNearViewport(row)
@@ -65,7 +67,7 @@ export function PlaygroundIsland(props: PlaygroundIslandProps) {
     <>
       <ModeScope className={PLAY_ROW}>
         <div ref={row} style={{ '--tc-stage-height': `${String(stageHeight)}rem` }} className={stageOpen ? `${STAGE} ${STAGE_OPEN} min-h-(--tc-stage-height)` : `${STAGE} min-h-(--tc-stage-height)`}>
-          {live ? <Suspense fallback={serverStage ?? reserve}><Demo key={remountKey} {...(stageOpen ? { stage: true } : {})} {...Object.fromEntries(changed)} /></Suspense> : (serverStage ?? reserve)}
+          {live ? <Suspense fallback={stageIsPlayground ? (serverStage ?? reserve) : reserve}><Demo key={remountKey} {...(stageOpen ? { stage: true } : {})} {...Object.fromEntries(changed)} /></Suspense> : (serverStage ?? reserve)}
         </div>
         <div className={TRY_IT}>
           <h3 className={H3}>{labels.tryIt}</h3>
