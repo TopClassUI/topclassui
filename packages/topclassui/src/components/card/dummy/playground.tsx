@@ -24,8 +24,8 @@ export default function Demo({ interactive = false, media = false, footer = true
           <CardFooter>
             {interactive ? <span className="text-sm font-medium text-body">Read more</span> : (
               <>
-                <Button size="sm">Read more</Button>
-                <Button size="sm" variant="outline" tone="neutral">Later</Button>
+                <Button size="xs">Read more</Button>
+                <Button size="xs" variant="outline" tone="neutral" className="border-line bg-surface">Later</Button>
               </>
             )}
           </CardFooter>
