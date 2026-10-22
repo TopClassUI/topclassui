@@ -48,8 +48,9 @@ export const DROPDOWN_ITEM_TONE = {
   danger: 'text-danger-on-soft data-highlighted:bg-danger-soft data-highlighted:text-danger-on-soft',
 } as const satisfies Record<DropdownItemTone, string>
 
-/** The icon keeps its size while a long label gives way. */
-export const DROPDOWN_ICON = 'inline-flex shrink-0'
+/** The icon keeps its size while a long label gives way. Muted at rest on a neutral row, as Figma 138:1496 draws
+ * it, and the colour of its row once that is highlighted or danger. */
+export const DROPDOWN_ICON = 'inline-flex shrink-0 text-muted group-data-highlighted:text-inherit group-data-[tone=danger]:text-inherit'
 
 /** At the end of the row, never past 10rem or half the room Base UI measured. Where the row is short (a
  * phone, a doubled text size) it gives way first, ten thousand times faster than the label, so the name

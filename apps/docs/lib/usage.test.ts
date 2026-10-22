@@ -246,6 +246,25 @@ describe('snippetOf', () => {
   })
 })
 
+describe('snippetOf, a spread on every part', () => {
+  it('writes the values on the one part that spreads them', () => {
+    const usage = { imports: [], jsx: '<div className="flex">\n  <Select items={COUNTRIES} {...props} />\n</div>', passed: [] }
+    expect(snippetOf(usage, [['size', 'sm']])).toBe('<div className="flex">\n  <Select items={COUNTRIES} size="sm" />\n</div>')
+  })
+
+  it('writes the values on every part that spreads them, and drops every spread at rest', () => {
+    const usage = { imports: [], jsx: '<div>\n  <Kbd {...props}>Ctrl</Kbd>\n  <Kbd {...props}>Shift</Kbd>\n  <Kbd size="md" {...props}>K</Kbd>\n</div>', passed: [] }
+    expect(snippetOf(usage, [['size', 'sm'], ['pressed', true]])).toBe('<div>\n  <Kbd size="sm" pressed>Ctrl</Kbd>\n  <Kbd size="sm" pressed>Shift</Kbd>\n  <Kbd size="sm" pressed>K</Kbd>\n</div>')
+    expect(snippetOf(usage, [])).toBe('<div>\n  <Kbd>Ctrl</Kbd>\n  <Kbd>Shift</Kbd>\n  <Kbd size="md">K</Kbd>\n</div>')
+  })
+
+  it('writes the values on a part nested inside another, and resolves a read of a prop to its value or its fallback', () => {
+    const usage = { imports: [], jsx: "<div className={box[props.orientation ?? 'horizontal']}>\n  <Separator {...props} />\n  {withLabel && <Separator {...props} className=\"x\">or</Separator>}\n</div>", passed: [] }
+    expect(snippetOf(usage, [['orientation', 'vertical']])).toBe("<div className={box['vertical']}>\n  <Separator orientation=\"vertical\" />\n  {withLabel && <Separator orientation=\"vertical\" className=\"x\">or</Separator>}\n</div>")
+    expect(snippetOf(usage, [])).toBe("<div className={box['horizontal']}>\n  <Separator />\n  {withLabel && <Separator className=\"x\">or</Separator>}\n</div>")
+  })
+})
+
 describe('cleanSourceOf', () => {
   it('takes the docs plumbing out of a demo shown whole', () => {
     const source = [
@@ -318,5 +337,87 @@ describe('snippetOf on a multi-line root', () => {
     const usage = usageOf(source)
     expect(usage === null ? null : snippetOf(usage, [])).toBe("import { Table } from 'topclassui/table'\n\n<Table\n  caption=\"Team\"\n/>")
     expect(usage === null ? null : snippetOf(usage, [['striped', true]])).toBe("import { Table } from 'topclassui/table'\n\n<Table\n  striped\n  caption=\"Team\"\n/>")
+  })
+})
+
+const CARD = [
+  "import { Button } from 'topclassui/button'",
+  "import { CardBody, CardFooter, CardMedia, CardRoot } from 'topclassui/card'",
+  '',
+  'export default function Demo({ interactive = false, media = false, footer = true }: PlaygroundProps = {}) {',
+  '  return (',
+  '    <CardRoot render={interactive ? <a href="#card" /> : undefined}>',
+  '      {media ? <CardMedia /> : null}',
+  '      <CardBody>Text</CardBody>',
+  '      {footer ? (',
+  '        <CardFooter>',
+  '          {interactive ? <span>Read more</span> : (',
+  '            <>',
+  '              <Button>Read more</Button>',
+  '              <Button>Later</Button>',
+  '            </>',
+  '          )}',
+  '        </CardFooter>',
+  '      ) : null}',
+  '    </CardRoot>',
+  '  )',
+  '}',
+].join('\n')
+
+const REMOVABLE = [
+  "import { Tag, TagRemovable } from 'topclassui/tag'",
+  '',
+  'export default function Demo({ removable = false, disabled, ...props }: TagDesignProps & { removable?: boolean, disabled?: boolean }) {',
+  '  return removable',
+  '    ? <TagRemovable {...props} disabled={disabled} onRemove={() => undefined}>Design systems</TagRemovable>',
+  '    : <Tag {...props}>Design systems</Tag>',
+  '}',
+].join('\n')
+
+describe('snippetOf on a switch the tree only tests', () => {
+  it('reads each tested prop as a switch with the default its signature gives', () => {
+    expect(usageOf(CARD)?.switches).toEqual({ interactive: false, media: false, footer: true })
+    expect(usageOf(REMOVABLE)?.switches).toEqual({ removable: false })
+    expect(usageOf(REMOVABLE)?.passed).toEqual(['disabled'])
+  })
+
+  it('draws the branches the defaults pick for a change elsewhere, and drops the parts and imports of the rest', () => {
+    const usage = usageOf(REMOVABLE)
+    expect(usage === null ? null : snippetOf(usage, [['tone', 'primary']])).toBe("import { Tag } from 'topclassui/tag'\n\n<Tag tone=\"primary\">Design systems</Tag>")
+  })
+
+  it('draws the branch a switch turns on, with the props its part takes', () => {
+    const usage = usageOf(REMOVABLE)
+    expect(usage === null ? null : snippetOf(usage, [['removable', true], ['disabled', true], ['size', 'lg']]))
+      .toBe("import { TagRemovable } from 'topclassui/tag'\n\n<TagRemovable size=\"lg\" disabled onRemove={() => undefined}>Design systems</TagRemovable>")
+  })
+
+  it('writes no prop whose part sits in a branch left out', () => {
+    const usage = usageOf(REMOVABLE)
+    expect(usage === null ? null : snippetOf(usage, [['disabled', true]])).toBe("import { Tag } from 'topclassui/tag'\n\n<Tag>Design systems</Tag>")
+  })
+
+  it('takes a child, an attribute and a fragment branch, and a child that draws nothing goes with its line', () => {
+    const usage = usageOf(CARD)
+    expect(usage === null ? null : snippetOf(usage, [['media', true]])).toBe([
+      "import { Button } from 'topclassui/button'",
+      "import { CardBody, CardFooter, CardMedia, CardRoot } from 'topclassui/card'",
+      '',
+      '<CardRoot>',
+      '  <CardMedia />',
+      '  <CardBody>Text</CardBody>',
+      '  <CardFooter>',
+      '    <Button>Read more</Button>',
+      '    <Button>Later</Button>',
+      '  </CardFooter>',
+      '</CardRoot>',
+    ].join('\n'))
+    expect(usage === null ? null : snippetOf(usage, [['interactive', true], ['footer', false]])).toBe([
+      "import { CardBody, CardRoot } from 'topclassui/card'",
+      '',
+      '<CardRoot render={<a href="#card" />}>',
+      '  <CardBody>Text</CardBody>',
+      '</CardRoot>',
+    ].join('\n'))
   })
 })

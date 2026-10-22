@@ -10,9 +10,23 @@ import { TOOLTIP_BOUNDARIES } from './boundaries.js'
 import { TOOLTIP_ARROW, TOOLTIP_POPUP, TOOLTIP_POSITIONER } from './classes.js'
 import { TOOLTIP_ARROW_HEIGHT, TOOLTIP_COLLISION_AVOIDANCE, TOOLTIP_DEFAULTS } from './constants.js'
 import { useTooltipPopup, useTooltipRoot, useTooltipTriggerElement } from './hook.js'
-import type { TooltipPopupProps, TooltipRootProps, TooltipTriggerElementProps, TooltipTriggerProps } from './types.js'
+import type {
+  TooltipPopupProps, TooltipProviderProps, TooltipRootProps, TooltipTriggerElementProps, TooltipTriggerProps,
+} from './types.js'
 
 const { delayMin, delayMax } = TOOLTIP_BOUNDARIES
+
+/** A delay group of its own, nested inside TopClassProvider's: a tooltip held open inside it, such as a
+ * docs stage, never closes the one a reader hovers outside it. It renders no element. */
+export function TooltipProvider({ delay: open, closeDelay: close, ...rest }: TooltipProviderProps) {
+  return (
+    <Base.Provider
+      {...rest}
+      delay={open === undefined ? undefined : clamp(open, delayMin, delayMax)}
+      closeDelay={close === undefined ? undefined : clamp(close, delayMin, delayMax)}
+    />
+  )
+}
 
 /** Groups one trigger with its popup. It renders no element, so it takes no className,
  * style or ref, and Base UI holds the open state. */

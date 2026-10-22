@@ -6,7 +6,7 @@ const RING = 'not-forced-colors:outline-solid not-forced-colors:outline-(length:
 
 /** The five states Figma 138:994 draws, one accordion each asking the drawn Question, in a section named by its state.
  * The open one has a title of its own, so its region and the one a reader opens next are not two landmarks of one name.
- * Hover is drawn as the frame draws it, the box on the darker surface. */
+ * Hover is drawn as the frame draws it, the box on the darker surface; disabled dims the whole box once. */
 export default function Demo() {
   return (
     <div className="grid justify-items-start gap-6">

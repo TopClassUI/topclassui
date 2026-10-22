@@ -27,6 +27,24 @@ export const MUTATIONS: Mutation[] = [
     to: 'closeDelay={clamp(closeDelay ?? TOOLTIP_DEFAULTS.closeDelay, delayMin, delayMax)}',
   },
   {
+    label: 'the provider delay loses its clamp, so a group delay of 20000 makes every reader inside it wait 20 seconds',
+    file: 'src/components/tooltip/client.tsx',
+    from: 'delay={open === undefined ? undefined : clamp(open, delayMin, delayMax)}',
+    to: 'delay={open}',
+  },
+  {
+    label: 'the provider closeDelay loses its clamp, so a negative group closeDelay reaches Base UI as given',
+    file: 'src/components/tooltip/client.tsx',
+    from: 'closeDelay={close === undefined ? undefined : clamp(close, delayMin, delayMax)}',
+    to: 'closeDelay={close}',
+  },
+  {
+    label: "a provider with no delay forwards 600, so a trigger's own delay is no longer the only one",
+    file: 'src/components/tooltip/client.tsx',
+    from: 'delay={open === undefined ? undefined : clamp(open, delayMin, delayMax)}',
+    to: 'delay={clamp(open ?? TOOLTIP_DEFAULTS.delay, delayMin, delayMax)}',
+  },
+  {
     label: 'TooltipPopup stops passing its placement on, so every tooltip opens at the shared bottom-start',
     file: 'src/components/tooltip/client.tsx',
     from: 'const { side, align } = toSideAlign(placement)',

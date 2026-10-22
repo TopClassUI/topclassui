@@ -33,9 +33,10 @@ export const ON_OUTLINE = {
 } as const satisfies Record<Tone, string>
 
 /** The drawn inline padding is twice padding-y at every size, so it is not pad-x. The line is
- * tight, as Figma draws the chip (29 px at md): 16 on a 14 px label, not text-sm's 20. */
+ * tight, as Figma draws the chip (29 px at md): 16 on a 14 px label, not text-sm's 20. At xs the
+ * border sits inside the drawn padding, 15 px on a 12 px label: 19 px, as drawn. */
 export const BADGE_SIZE = {
-  xs: 'px-1 py-pad-y-xs gap-1 text-xs',
+  xs: 'px-1 py-[calc(var(--spacing-pad-y-xs)-var(--tc-line-width))] gap-1 text-xs/3.75',
   sm: 'px-2 py-pad-y-sm gap-1.5 text-sm/4',
   md: 'px-3 py-pad-y-md gap-2 text-sm/4',
   lg: 'px-4 py-pad-y-lg gap-2 text-base/5',

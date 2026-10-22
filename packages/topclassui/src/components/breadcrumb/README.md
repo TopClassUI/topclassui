@@ -44,6 +44,7 @@ A `siteUrl` that is not an `http` or `https` URL writes no script either, and ne
 - **No `href` in the middle.** A crumb without an `href` that is not the last one is plain text: no link, and no entry in the JSON-LD.
 - **A long label.** It ends in an ellipsis at the width of its box, and the text is cut at 200 characters. The JSON-LD keeps the whole label.
 - **Its name.** `aria-label` renames the `<nav>`; an empty one falls back to the built-in name.
+- **The house.** `showHome` draws the first crumb as the house icon, with no caret after it: the next crumb follows it directly.
 
 <!-- /hand-written -->
 

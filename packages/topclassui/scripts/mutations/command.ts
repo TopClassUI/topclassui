@@ -181,8 +181,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'command: the input text drops to 14 px, and iOS zooms the page into it',
     file: CLASSES,
-    from: 'bg-transparent px-2 text-base text-body',
-    to: 'bg-transparent px-2 text-sm text-body',
+    from: 'bg-transparent pe-2 text-base text-body',
+    to: 'bg-transparent pe-2 text-sm text-body',
   },
   {
     label: 'command: the empty listbox stays in view when nothing matches',

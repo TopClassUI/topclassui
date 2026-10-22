@@ -35,7 +35,7 @@ export function AvatarGroup({
     >
       {visible}
       {fmt && (
-        <AvatarRoot size={size} role="img" aria-label={labels.avatar.more(hidden, fmt)} className={GROUP_COUNTER[size]}>
+        <AvatarRoot size={size} role="img" data-counter="" aria-label={labels.avatar.more(hidden, fmt)} className={GROUP_COUNTER[size]}>
           {/* dir: an rtl paragraph would move a leading plus to the far side of its digits. */}
           <AvatarFallback dir="ltr">+{fmt.format(hidden)}</AvatarFallback>
         </AvatarRoot>

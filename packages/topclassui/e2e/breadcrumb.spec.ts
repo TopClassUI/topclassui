@@ -135,13 +135,15 @@ test.describe('the separator points along the trail', () => {
   test('left to right, the caret points right, at the crumb it leads to', async ({ page }) => {
     await page.goto(urlFor('breadcrumb--basic', 'light', 'ltr'))
     const expected = { scale: '1', points: 'right', crumbIsOnThe: 'right' }
-    expect(await page.evaluate(carets)).toEqual([expected, expected, expected])
+    // Four crumbs and two carets: the house is followed by Docs with no caret between them (Figma 138:1173).
+    expect(await page.evaluate(carets)).toEqual([expected, expected])
   })
 
   test('right to left, it is mirrored and points left, where the next crumb is', async ({ page }) => {
     await page.goto(urlFor('breadcrumb--basic', 'light', 'rtl'))
     const expected = { scale: '-1 1', points: 'left', crumbIsOnThe: 'left' }
-    expect(await page.evaluate(carets)).toEqual([expected, expected, expected])
+    // Four crumbs and two carets: the house is followed by Docs with no caret between them (Figma 138:1173).
+    expect(await page.evaluate(carets)).toEqual([expected, expected])
   })
 
   test('inside a dir="rtl" block on a left-to-right page, it follows the block', async ({ page }) => {
@@ -214,7 +216,8 @@ for (const scheme of ['light', 'dark'] as const) {
         const fills = await page.locator('nav li > svg path').evaluateAll((paths) => paths.map((path) => getComputedStyle(path).fill))
         const canvas = await page.evaluate(() => getComputedStyle(document.body).backgroundColor)
 
-        expect(fills).toEqual([SYSTEM[scheme].text, SYSTEM[scheme].text, SYSTEM[scheme].text])
+        // Two carets: the house is followed by Docs with no caret between them.
+        expect(fills).toEqual([SYSTEM[scheme].text, SYSTEM[scheme].text])
         expect(canvas).toBe(SYSTEM[scheme].canvas)
       })
     }

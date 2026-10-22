@@ -124,6 +124,7 @@ Required: `aria-labelledby` or `id`. Every other prop below is optional.
 | `length` | no | `integer`, min 1, max 12 | `6` | The number of cells, one character each. Clamped between 1 and 12; past eight items the row wraps. |
 | `ref` | no | `Ref<HTMLDivElement>` | - | The `<div role="group">` around the cells. |
 | `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | The control scale of each square cell and its type step; custom emits no size classes. |
+| `validationType` | no | `numeric` \| `alpha` \| `alphanumeric` \| `none` | `"numeric"` | The characters a cell keeps: numeric takes Arabic-Indic and Persian digits too; none keeps any. |
 
 Anything else on `OTPField` is passed to the element it draws, so standard attributes (`onClick`, `aria-*`, `data-*`, `id`) work. `className` is merged last, so yours wins a conflict, and `ref` is a normal prop.
 

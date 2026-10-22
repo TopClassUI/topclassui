@@ -71,6 +71,12 @@ describe('the holder and the track', () => {
     expect(ruleOf(selectorOf('p-0.75'))).toBe('padding: calc(var(--spacing) * 0.75);')
   })
 
+  it('a disabled track dims once as a whole, as drawn, and its segments do not dim again inside it', () => {
+    expect(ruleOf(`${selectorOf('data-disabled:opacity-50')}[data-disabled]`)).toBe('opacity: 50%;')
+    const guard = `${selectorOf('group-data-disabled/segmented:data-disabled:opacity-100')}:is(:where(.group\\/segmented)[data-disabled] *)[data-disabled]`
+    expect(ruleOf(guard)).toBe('opacity: 100%;')
+  })
+
   it('the height of the track at each size is the control scale, md the drawn 36 px knob, and custom draws none', () => {
     const sizes = Object.fromEntries(Object.entries(SEGMENTED_ROOT_SIZE).filter(([size]) => size !== 'custom')
       .map(([size, cls]) => [size, ruleOf(selectorOf(cls))]))

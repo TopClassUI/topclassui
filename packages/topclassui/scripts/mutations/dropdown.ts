@@ -186,8 +186,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a dropdown shortcut stays muted on a highlighted row, and grey on the system highlight under forced colours',
     file: CLASSES,
-    from: ' group-data-highlighted:text-inherit',
-    to: '',
+    from: 'text-xs text-muted group-data-highlighted:text-inherit',
+    to: 'text-xs text-muted',
   },
   {
     label: 'a disabled dropdown row dims itself, highlight and all, so its focus mark fades',
@@ -254,5 +254,11 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/dropdown/dummy/playground.tsx',
     from: '<DropdownRoot defaultOpen modal={false}>',
     to: '<DropdownRoot modal={false}>',
+  },
+  {
+    label: 'a dropdown menu icon paints in the body colour at rest, where the frame draws it muted',
+    file: CLASSES,
+    from: "'inline-flex shrink-0 text-muted group-data-highlighted",
+    to: "'inline-flex shrink-0 group-data-highlighted",
   },
 ]

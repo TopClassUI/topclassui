@@ -77,10 +77,13 @@ describe('on the server', () => {
     expect(attr(input(html()), 'data-size')).toBe('md')
   })
 
-  it('the end padding of the size is replaced, so the text stays clear of the caret', () => {
-    const classes = attr(input(html({ size: 'lg' })), 'class') ?? ''
-    expect(classes).toContain('px-pad-x-lg')
-    expect(classes.endsWith(' pe-9')).toBe(true)
+  it('the end padding of the size stays at rest, so a placeholder keeps its room; the spinner replaces it while loading', () => {
+    const rest = attr(input(html({ size: 'lg' })), 'class') ?? ''
+    expect(rest).toContain('px-pad-x-lg')
+    expect(rest).toContain(' ps-9.5')
+    expect(rest).not.toContain('pe-9')
+    expect(attr(input(html({ size: 'lg', status: 'loading-more' })), 'class')).not.toContain('pe-9')
+    expect(attr(input(html({ size: 'lg', status: 'loading' })), 'class')?.endsWith(' pe-9')).toBe(true)
   })
 
   it('size custom emits no height and no type step', () => {
@@ -116,7 +119,7 @@ describe('on the server', () => {
   })
 
   it('the magnifying glass is drawn at the inline start, in a wrapper hidden from assistive technology, and no caret', () => {
-    expect(html()).toMatch(/<span aria-hidden="true" class="pointer-events-none absolute inset-y-0 inset-s-3 flex items-center text-muted peer-disabled:opacity-50"><svg/)
+    expect(html()).toMatch(/<span aria-hidden="true" class="pointer-events-none absolute inset-y-0 inset-s-4 flex items-center text-muted peer-disabled:opacity-50"><svg/)
     expect(html()).not.toContain('inset-e-3')
   })
 })

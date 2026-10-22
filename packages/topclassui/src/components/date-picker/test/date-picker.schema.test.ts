@@ -7,7 +7,7 @@ import { datePickerSchema } from '../schema.js'
 
 // R-8.3-3: the props table, the playground and registry.json all read this output.
 const json = z.toJSONSchema(datePickerSchema, { io: 'input' }) as {
-  properties?: Record<string, { description?: string; default?: unknown; enum?: unknown[]; minimum?: number; maximum?: number; pattern?: string }>
+  properties?: Record<string, { description?: string; default?: unknown; enum?: unknown[]; minimum?: number; maximum?: number; pattern?: string; type?: string }>
 }
 const KEYS = ['firstDayOfWeek', 'fullWidth', 'invalid', 'maxDate', 'minDate', 'placement', 'size']
 
@@ -34,6 +34,7 @@ describe('the schema is the documentation', () => {
     expect(json.properties?.['placement']?.enum).toHaveLength(12)
     expect(json.properties?.['minDate']?.pattern).toBe('^(\\d{4})-(\\d{2})-(\\d{2})$')
     expect([json.properties?.['firstDayOfWeek']?.minimum, json.properties?.['firstDayOfWeek']?.maximum]).toEqual([1, 7])
+    expect(json.properties?.['firstDayOfWeek']?.type).toBe('integer')
   })
 })
 
@@ -61,6 +62,7 @@ describe('the schema and the constants agree', () => {
     expect(datePickerSchema.safeParse({ firstDayOfWeek: 0 }).success).toBe(false)
     expect(datePickerSchema.safeParse({ firstDayOfWeek: 8 }).success).toBe(false)
     expect(datePickerSchema.safeParse({ firstDayOfWeek: 6 }).success).toBe(true)
+    expect(datePickerSchema.safeParse({ firstDayOfWeek: 6.5 }).success).toBe(false)
     expect(datePickerSchema.safeParse({ placement: 'left' }).success).toBe(false)
   })
 })

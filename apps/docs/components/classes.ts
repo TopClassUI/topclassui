@@ -101,8 +101,8 @@ export const PROSE_COLUMN = {
   prose: `${PROSE_CELL} ${PROSE_HEAD.prose} whitespace-normal min-w-60`,
 } as const
 
-/** Code an author wrote in a cell arrives at prose size (INLINE_CODE); in a guide table it takes the cell's, never breaks at a hyphen, and reads in the body colour. */
-export const AUTHORED_CELL = '**:text-[length:inherit] **:whitespace-nowrap [&_code]:text-body'
+/** Code an author wrote in a cell arrives at prose size (INLINE_CODE); in a guide table it takes the cell's, never breaks at a hyphen, and reads in the body colour; the getting-started frames draw it in 11 px mono. */
+export const AUTHORED_CELL = '**:text-[length:inherit] **:whitespace-nowrap [&_code]:text-body in-data-[group=start]:[&_code]:font-mono in-data-[group=start]:[&_code]:text-[0.6875rem]'
 
 /** Code a guide table prints itself: mono and body-coloured, at the cell's size. */
 export const TABLE_CODE = 'font-mono text-body'

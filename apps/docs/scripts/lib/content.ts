@@ -35,6 +35,8 @@ export const contentSchema = z.strictObject({
   controlOrder: z.array(z.string().regex(/^[a-z][A-Za-z]*$/)).optional(),
   /** Props Try it leaves out because the frame draws no control for them. */
   controlsHidden: z.array(z.string().regex(/^[a-z][A-Za-z]*$/)).optional(),
+  /** A free-string prop Try it offers as a select of these values, as the frame draws it (Command's shortcut); the first is the start. */
+  controlOptions: z.record(z.string().regex(/^[a-z][A-Za-z]*$/), z.array(z.string().min(1)).min(1)).optional(),
   note: both,
   notes: bothLists,
   keyboard: z.array(z.strictObject({ keys: z.array(z.string().min(1)).min(1), action: both })),

@@ -6,6 +6,82 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-22 - Only main creates a Vercel deployment
+
+**Decision.** `apps/docs/vercel.json` sets `git.deploymentEnabled` to `{ "**": false, "main": true }`: a push to any branch but `main` creates no deployment.
+
+**Why.** Vercel Hobby allows 100 deployments a day, and every branch push created one, even with the Ignored Build Step set to production only. On 2026-10-22 the parallel jobs' pushes hit that cap twice and Vercel refused the production deploys of PR #183 and PR #184. A branch matching several rules deploys when one rule is true (Vercel docs, git configuration), so `main` keeps deploying.
+
+**Affects.** Branches get no preview URL; the gates run locally on Windows before a merge, as they already do.
+
+## 2026-10-22 - The fields follow their Previewer frames: Combobox, DatePicker, SegmentedControl, OTPField
+
+**Decision.** Job 153 (round 12) closes the small library rows of the round-11 audits for the fields.
+
+- **Combobox.** `COMBOBOX_INPUT_END` (`pe-9`) applies only while `status` is `loading`, the one time the spinner sits at the end; at rest the size's own end padding stays, so the placeholder is no longer cut. The glass sits 16 px in (`inset-s-4`) and the text 8 px after it (`ps-9.5`), as frame 135:939 draws them.
+- **DatePicker's stage draws the calendar open as a picture.** The playground's `stage` renders the live trigger, closed, over an inert, aria-hidden picture of the open September 2026 panel (the 22nd chosen, the week from Monday), drawn from `OVERLAY_SURFACE`, `TARGET_HEIGHT` and hand-written strings that follow the calendar's, as the Select and Combobox stages draw their lists (53ccea65); the site sets `stageOpen`. The root keeps `modal="trap-focus"`: a live calendar open on load would trap the page's focus.
+- **DatePicker `firstDayOfWeek`** is `.int()` in the schema, so Try it offers the seven days as a select; the runtime still rounds and clamps a caller's number (R-5.7-7).
+- **DatePicker's strip keeps `fullWidth` cells** (129 and 145 px of content), not the frame's 128 px trigger: at md the en date "Sep 22, 2026" with the icon and the padding does not fit in 128 px and would end in an ellipsis (R-5.2-7), so the strip would cut the very value it shows. The frame's two-line "22 Sep 2026" is the en-GB format, recorded below.
+- **SegmentedControl, disabled.** A disabled track dims once as a whole, line, fill and segments, as 138:787 draws it (`data-disabled:opacity-50` on `SEGMENTED_ROOT`); its segments do not dim again inside it (`group-data-disabled/segmented:data-disabled:opacity-100`, the NumberField guard's pattern), and a single disabled segment in a live track still dims on its own.
+- **SegmentedControl always has a selected segment.** The types require `value` or `defaultValue` (`segmented-control/types.ts`), and the frame's no-selection cell is not drawn. A radio group with nothing checked gives the keyboard no checked segment to land on, and round 10 tried an empty track and reverted it (b380bed). This entry is that reason, which until now was only a code comment.
+- **OTPField `validationType`** joins `schema.ts` and `constants.ts` (`OTP_FIELD_VALIDATION_TYPES`, Base UI's four, `numeric` by default), so Try it offers it after `length`. `numeric` keeps choice 21's mapping to Base UI's `none` with the Arabic-Indic and Persian digit filter.
+- **Select and Combobox** keep the `stage` pictures of 53ccea65: a live open Select marked the rest of the page aria-hidden (reverted 78145911).
+
+**Built on fix/r12-library-fields, held for Omar's call** (each is a new prop): FileUpload `compact`, the frame's mini zone, and `data-dragging`, which draws drag over at rest; with them the strip draws idle, drag over, a refused file and disabled. Until then the FileUpload strip keeps idle and disabled: drag over and a refused row cannot be drawn at rest with the props there are. A DatePicker `modal` pass-through, with a live open stage, was built there too and is replaced here by the picture.
+
+**Not built, for Omar** (the frames draw them in Try it with nothing behind them): Input `type` as a select and `variant`; Textarea, Select and Combobox `variant`; SegmentedControl `tone` and `orientation`; Rating `precision`, `showValue` and `allowClear`; DatePicker `mode`, `clearable` and `showWeekNumbers`, and the frame's en-GB date ("22 Sep 2026") where the site's en locale formats month first; FileUpload `accept` and `showList` as controls, `multiple` (owned by `maxFiles`), the maxSize presets as a select, an initial-files API for the stage's file row, and the per-file status (uploading, done); OTPField's ring at rest on the active cell of the idle and partly filled cells, which would make them read as focus-visible.
+
+**Affects.** `combobox/classes.ts` and `client.tsx`; `date-picker/schema.ts` and `dummy/playground.tsx`; `segmented-control/classes.ts`; `otp-field/schema.ts`, `constants.ts`, `types.ts` and `lib.ts`; the READMEs; `apps/docs/content/components/{date-picker,otp-field}.ts`.
+## 2026-10-22 - The navigation family's small library rows of round 11
+
+**Decision.** Job 155 (round 12) closes the small and safe library rows of `cloud-reports/audit-r11/job-145-status.md`. Each one is a class or a line in markup, with no new prop and no new API:
+
+- **A disabled Accordion dims once.** In Base UI 1.8.0 a disabled root sets `data-disabled` on the root, on every item and on every trigger (`AccordionItem.mjs`: an item is disabled when it or its root is). The root now dims as one box, fill and edge included, as Figma 138:1118 draws it. A trigger dims only outside a disabled root (`not-group-data-disabled/accordion:`), so its text never sits at 25 %. A disabled item between live ones still dims its trigger alone. Under forced colours the box stays opaque and the trigger takes GrayText at full strength.
+- **The line tab's ring sits above its bar.** The list scrolls sideways, and `overflow-x: auto` clips the block axis too, so a ring drawn outside a tab would still be cut. The list cannot stop clipping without padding that moves its hairline away from the bar. The ring therefore stays inside the tab, but on a line tab it is now inset past the 2 px bar and the ring offset (`-outline-offset: calc(ring width + ring offset + 2px)`). The bar shows under a focused tab (138:949). The ring stays square, because a radius would round the ends of the bar. An enclosed tab has no bar and keeps `FOCUS_RING_INSET`.
+- **A disabled tab's bar dims with its label** (`border-primary-solid/50`, GrayText under forced colours), as 138:962 draws it. The list's hairline stays at full strength: the list itself is not disabled, only its tabs are, and Tabs `disabled` is one of the Try it props not built (2026-10-19).
+- **No caret after the house.** With `showHome`, the crumb after the house has no caret before it (138:1173), so the house stands as the root of the trail. A folded trail's dots keep their caret. This extends the 2026-10-22 entry "Breadcrumb, Kbd and Card get the Try it".
+- **Pagination's xs cell is 24 px.** It is the floor itself (`px-1`, no width step), as the states strip draws it; an arrow cell was 30 px. `PAGINATION_CELL_PX.xs` follows (24, 24, 7, 10, 4), so a three-page xs row claims 20rem instead of 22.
+- **The sidebar header is 26 px.** It has `pb-0.5` under the 24 px toggle, which R-5.6-2 keeps at 24 px. The rail spaces the header 2 px from the rows (`gap-0.5`), as 138:2539 draws it.
+
+**Kept.** The sidebar's current row stays semibold, where 138:2580 draws Medium. The reason is the one in `sidebar/classes.ts`: a font with only a regular and a bold face paints 500 as regular, and the tint alone would then tell the current row, which WCAG 1.4.1 does not allow. Breadcrumb's current crumb and the active tab are semibold for the same reason.
+
+**Held for Omar, built on `fix/r12-library-navigation`.** Accordion `size`, with its context, `data-size`, schema and types. A crumb's own `link` element, which the states strip's hover cell (138:1231) needs. Until then that cell ends on the current Button.
+
+**Still not built,** as recorded on 2026-10-19:
+
+- Try it props: Pagination `shape`, `showFirstLast` and `showPrevNext`; Tabs `orientation`, `fullWidth` and `disabled`; Accordion `type`, `variant` and `collapsible`; Stepper `orientation`, `activeStep`, `clickable`, `showConnector` and `compact`; Navbar `size`, `bordered` and `collapsible`; Sidebar `variant`, `width`, `collapsible`, `bordered` and `overlayOnMobile`.
+- Navbar's mobile menu and rounded corners, and Sidebar's card border.
+- Pagination's window rule. The row stays one length on every page (`lib.ts`), so page 1 shows 1 2 3 4 5 … 24. Omar decides, or Figma redraws 138:1302.
+
+**Affects.** `src/components/{accordion,tabs,breadcrumb,pagination,sidebar}`: classes, the Breadcrumb caret line, tests, the e2e specs for those components, the mutation rows and the READMEs.
+## 2026-10-22 - Tag, AvatarGroup, Dropdown and Command follow their frames; THE CODE follows a switch
+
+**Decision.** Job 154 (round 12) closes the small library rows of the display family and three overlays; the new props it built stay on `fix/r12-library-display` for Omar (below).
+
+- **Try it offers `removable` on Tag**: the playground is a client file that draws `TagRemovable` with the switch on, through the props it already has.
+- **Tag's x pulls back over the chip's gap** (`REMOVE_SIZE`: `-ms-1`, `-ms-1.5`, `-ms-2`, `-ms-2`, `-ms-3`, the gaps of `TAG_SIZE`). The 24 px target, 44 under a finger, now starts where the label ends, so the glyph's own inset in it is the gap the eye reads: 5 px at md, where the docs stage 135:327 draws 4 and the component frame 79:199 draws 8. The target never covers the label, and a md tag is 91 px where 99 was (drawn 90).
+- **AvatarGroup's counter keeps its primary ring** through `*:data-counter:ring-primary-soft` on the root and `data-counter` on the counter. A class on the counter lost to the root's child ring, which has the same weight and comes later; `ring-primary-soft!` would have done it too, but a caller's `*:data-counter:ring-*` can still win this one through `cn()`, and a caller's `*:ring-surface-raised` still matches the avatars to a Card.
+- **Dropdown's icons are muted at rest** (`DROPDOWN_ICON`): the frame 138:1496 paints Profile and Duplicate at rgb 161 and 146 where the build painted them white. A highlighted row and a danger row give the icon their own colour, as drawn. The states picture follows.
+- **Command's query starts 10 px after the glass**: `COMMAND_INPUT` pads its end only, so the search row's gap is the whole space, as 79:328 draws it (18 px before).
+- **THE CODE follows a switch** (`apps/docs/lib/usage.ts`). A prop a playground only tests (`{media ? <CardMedia /> : null}`, `render={interactive ? <a /> : undefined}`, a tree that starts `removable ?`) picks its branch in the code, at its value or the default its signature gives, instead of being written as an attribute no part takes; a part left out takes its imports and props with it. Card's code now follows `interactive`, `media` and `footer`, Tag's `removable`, and Separator's `withLabel`, with no change to Card's playground.
+
+**Kept, though the frames differ.** In Ocean the Skeleton rect and card stay on the control and box knobs, a pill and 24 px (job 147's sweep): a skeleton holds the shape of what loads, and an Ocean control is a pill and an Ocean card 24 px round; the frame's skeleton radii are raw and do not move with the mode (`docs/figma/unit-1.md`). For Omar: `rounded-chip` on the rect would give the frame's box in every mode (4 px light, 8 px Ocean). AvatarGroup's stage discs stay 40 px, md, where the frame draws 44, which is off the control scale (R-5.7-2) and which its own Try it calls md. `tag/dummy/link.tsx` keeps its bare chip with no ellipsis, the coverage `e2e/tag.spec` measures (the lead's call (b)); for Omar, option (a) is a fixture page in `e2e/` for the bare case so the demo can wear `LABEL`.
+
+**Built and held for Omar** on `fix/r12-library-display`: `disabled` on `TagRemovable` (the x a disabled button, the chip at half; a plain Tag takes none, as text), and Skeleton `animate` and `rounded`, both on by default as the frame's Try it (137:916) draws them.
+
+**Not built, for Omar.** Tag `disabled`, Skeleton `animate` and `rounded` (held, above), Tag `variant` and `truncate` (a bare label already ends in an ellipsis), with the 2026-10-19 list below. The Try it props the overlay and feedback frames draw beyond their schemas: Dialog `placement`, `dismissible`, `modal`, `scrollBody`; Drawer `dismissible`, `snapPoints`, `swipeToClose`; Dropdown `size`, `sideOffset`, `modal`, `loop`, `closeOnSelect`; Command `placement`, `modal`, `loop`, `filter`; Popover `sideOffset`, `size`, `modal`, `showArrow`, `dismissible`; Tooltip `showArrow`, `disabled`, `instant` and the delays as selects; Alert `size`, `dismissible`, `withIcon`; Banner `variant`, `placement`, `sticky`, `withAction`; Toast `position`, `dismissible`, `pauseOnHover`, `withAction`.
+
+**Affects.** `tag/classes.ts`, `tag/dummy/playground.tsx` (now a client file), `avatar-group/classes.ts` and `index.tsx`, `dropdown/classes.ts` and its states demo, `command/classes.ts`, `apps/docs/lib/usage.ts`, the content of Tag, and the tests and mutation rows that pin them.
+## 2026-10-22 - Badge xs at 19 px and TreeView's loading and empty notes, the small library rows of round 12
+
+**Decision.** Job 152 (round 12) ships the small, safe library rows of the data family; the larger ones (forced row states on Table and TreeView, EmptyState `bordered`, a CodeBlock `icon` prop) are built on `fix/r12-library-data` and held for Omar's call.
+
+- **Badge xs.** `py-[calc(var(--spacing-pad-y-xs)-var(--tc-line-width))]` on a 15 px line: the always-present border sits inside the drawn 2 px padding, so the chip is the frame's 19 px instead of 22 (Table's stage badges). The other steps are within 1 px of the frame and stay.
+- **TreeView's notes.** Loading draws the two bars bare, 5 px apart, as the frame does, with no box; empty keeps its raised box (the entry "TreeView draws its states as the previewer does") at `px-4 py-6`, so "Nothing here yet" stays on one line in the strip's cell. The caret and the item icon stay in the body colour, as that entry says, where the frame's pixels read muted (780588f4).
+
+**Why.** The rows table 8, tree-view 5 and 7 (audit 1) and 5 and 7 (audit 2) were left for a library change in round 11.
+
+**Affects.** Every xs Badge (3 px shorter) and every TreeView while loading or empty.
 ## 2026-10-22 - The site replaces Next's polyfill module with the one patch its browsers need
 
 **Decision.** `apps/docs/next.config.ts` aliases `../build/polyfills/polyfill-module` (Turbopack `resolveAlias`) to `apps/docs/lib/polyfills.ts`, which keeps only `URL.canParse` (Chrome 120, Safari 17). Next 16.3.8's `client/app-globals.js` imports that file on every page whatever the targets. It patches `trimStart`, `trimEnd`, `Symbol.description`, `flat`, `flatMap`, `Promise.finally`, `Object.fromEntries`, `Array.at`, `Object.hasOwn` and `URL.canParse`; all but the last are in Chrome 111, Safari 16.4 and Firefox 128, the browsers Tailwind v4 already needs. `browserslist` is unchanged: it steers SWC and the CSS, not this file, and Lighthouse flagged no transform.
@@ -101,7 +177,7 @@ LCP and FCP are within 10 ms of main on every page but the catalog, which moves 
 
 **Why.** The frames 138:1140, 135:411 and 137:705 draw a Try it column, and the build drew a bare stage (audit-r11 rows 145/1 and 142/1).
 
-**Affects.** Still not built and left out of Try it, as recorded on 2026-10-19: Breadcrumb `separator`, `collapse` and `truncate`, Kbd `variant`, `size` and `muted`, and Card `variant` and `padding`. Card's THE CODE stays the basic sample while Try it changes, since its playground passes no props through.
+**Affects.** Still not built and left out of Try it, as recorded on 2026-10-19: Breadcrumb `separator`, `collapse` and `truncate`, Kbd `variant`, `size` and `muted`, and Card `variant` and `padding`. Card's THE CODE stayed the basic sample while Try it changed, since its playground passes no props through; since job 154 it follows the switches (the entry above).
 
 ---
 
@@ -312,7 +388,7 @@ The `/en` branch score is 3 x 94 on an interleaved re-run against 93, 94 and 94 
 
 **The states demos are the frames' strips.** Each `dummy/states.tsx` holds one direct child a state, captioned by its `aria-label` (a `role="group"` around a component that takes none): Table idle, hover row, sorted, selected, empty, loading; Toast success, error, loading, stacked, entering, limited, drawn in place with the viewport's classes rather than through the live region; Alert info, success, warning, danger; Banner primary, info, warning, dismissed. The states each strip leaves out (variants, slots, the caption, stripes, the stuck column, the x) have demos of their own.
 
-**Not built, and left for Omar.** The frame's Try it also offers Table's `pageSize` (it needs Select), Alert's `size` and `dismissible`, and Banner's `variant`, `placement` and `sticky`; none is built. The toast past the limit stays undrawn (`data-limited:hidden`), not the frame's 40% ghost, which would keep its row in the column. Dark `--tc-info-on-soft` reads a little lighter than the frame's info text: a token for the integrator. The frame's "stacked" toast cell overlaps three toasts by 6 px; the build keeps its column with an 8 px gap, because an overlap would hide the edge of the toast behind and the frame's prototype gives no expand behaviour to follow. The frame's avatar is a neutral circle; the library's Avatar fallback is the primary tint (Avatar is job 116's). The frame draws the toast at rest in the docs stage; on the site it is still a button that adds one (job 127's stage).
+**Not built, and left for Omar.** The frame's Try it also offers Table's `pageSize` (it needs Select), Alert's `size` and `dismissible`, and Banner's `variant`, `placement` and `sticky`; none is built. The toast past the limit stays undrawn (`data-limited:hidden`), not the frame's 40% ghost, which would keep its row in the column. Dark `--tc-info-on-soft` reads a little lighter than the frame's info text: a token for the integrator. The frame's "stacked" toast cell overlaps three toasts by 6 px; the build keeps its column with an 8 px gap, because an overlap would hide the edge of the toast behind and the frame's prototype gives no expand behaviour to follow. The frame's avatar is a neutral circle; the library's Avatar fallback is the primary tint (Avatar is job 116's). The frame draws the toast at rest in the docs stage; the site's stage draws that resting toast and keeps the "Show a toast" button at its top-start corner, because it is the only way a reader sees Try it's duration and priority act on a live toast, and `apps/docs/e2e/feedback-pages.spec.ts` drives Try it through it.
 
 **Affects** `src/tokens.css`, `src/components/toast/{classes.ts,client.tsx,dummy/playground.tsx}`, `src/components/table/*` and its README, both components' tests and mutation rows.
 
@@ -529,6 +605,7 @@ The `/en` branch score is 3 x 94 on an interleaved re-run against 93, 94 and 94 
 **Departures this records**, each the narrowest the test allows:
 
 - `DialogRoot`, `DrawerRoot`, `PopoverRoot`, `TooltipRoot` and `DropdownRoot` are Base UI Roots that render no element, so there is nothing to spread onto (`R-5.7-3`). Base UI says so ("Doesn't render its own HTML element.", dialog/root/DialogRoot.d.ts:8, drawer/root/DrawerRoot.d.ts:9, popover/root/PopoverRoot.d.ts:8, tooltip/root/TooltipRoot.d.ts:8, menu/root/MenuRoot.d.ts:12), and no prop makes one render. The test proves they render no element of their own.
+- `TooltipProvider` is Base UI's `Tooltip.Provider`, a delay group that renders no element (tooltip/provider/TooltipProvider.d.ts: an `FC` of `children`, `delay`, `closeDelay` and `timeout`, with no element and no `render`), so there is nothing to spread onto (`R-5.7-3`). The test proves it renders no element of its own.
 - `DatePicker` is held in a span with its hidden input and its required note; className, style, ref and the rest reach the trigger button, the span's first child (`R-5.7-3`). A box with no width of its own needs a holder to be as wide as an Input in a `w-fit` parent (`src/shared/classes.ts`, `FIELD_HOLDER`), and the holder is a grid track, which sizes the content box: on the button its padding and border would add to that width. `e2e/date-picker.spec.ts` pins the Input's width.
 - `TreeView` is held in a div with its live status note; className, style, ref and the rest reach the `role="tree"` element, the div's first child, which is the scroll container and the tab stop (`R-5.7-3`). The note cannot sit inside the tree, which owns only `group` and `treeitem` (WAI-ARIA 1.2), and as a sibling of the tree in a fragment it would be a second item of the caller's flex or grid.
 
@@ -1730,3 +1807,11 @@ The second audit proposed about ninety more. They were declined and listed at th
 **Why.** topclassui.com computed Inter on the body, h1 and p of every `/ar` page while `<html>` computed Noto Sans Arabic: the body carries `font-sans`, which read the Latin stack and overrode the inherited Arabic one, and Inter has no Arabic letters, so Arabic fell to a system font. The rule must be unlayered: a layered one loses to the unlayered `:root` value (R-4-1 allows unlayered custom properties). There is no cycle, because `--tc-font-arabic` is a literal list, never `var(--tc-font-sans)`.
 
 **Affects.** `src/tokens.css`, `src/tokens-lang.test.ts`, `e2e/shared-arabic-font.spec.ts`, the docs site's `app/globals.css` and `e2e/site.spec.ts`. A consumer who sets `--tc-font-sans` on `:root` keeps it for Latin and gets `--tc-font-arabic` under Arabic.
+
+## 2026-10-22 - A tooltip held open sits in a delay group of its own: TooltipProvider
+
+**Decision.** Tooltip exports `TooltipProvider`, Base UI's `Tooltip.Provider` with the trigger's clamped `delay` and `closeDelay` (`TOOLTIP_BOUNDARIES`, 0 to 10000), and `TooltipProviderProps`. The tooltip held open by `open` in `dummy/playground.tsx` (the docs stage) sits in a `TooltipProvider` of its own, nested inside `TopClassProvider`'s group; `dummy/states.tsx` draws its top and bottom tips as pictures, so it holds none open.
+
+**Why.** In Base UI 1.8.0 a tooltip that opens takes its delay group and closes the tooltip open before it (`useDelayGroup`, floating-ui-react/components/FloatingDelayGroup.mjs, which calls the previous one's `onOpenChange(false)` and does not check `hasProvider`, so the module's default context groups every tooltip that has no provider). `TopClassProvider` renders one `Tooltip.Provider` for the app, so a held-open stage tooltip that mounted while a reader hovered an example closed that example's tooltip. In a group of its own it closes nothing outside it; the reader's tooltip trying to close it is ignored, since `open` holds it. `src/components/tooltip/test/tooltip.provider.dom.test.tsx` proves both halves. This replaces the "no provider" line of `tooltip.exports.test.ts`.
+
+**Affects.** `src/components/tooltip/{types.ts,client.tsx,index.tsx}`, its `README.md`, `test/fixture.ts`, `test/tooltip.exports.test.ts`, `test/tooltip.types.test.ts`, `test/tooltip.provider.dom.test.tsx`, `dummy/playground.tsx`. The delay group of the app stays `TopClassProvider`'s; an app nests a `TooltipProvider` only for a tooltip it holds open.

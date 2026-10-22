@@ -41,7 +41,7 @@ const RING = [
 const TYPE_STEP = { xs: 'text-xs', sm: 'text-sm', md: 'text-sm', lg: 'text-base', xl: 'text-base' } as const
 /** Figma 138:1269: a cell as wide as its control step and a step or two shorter, written out per size. */
 const GEOMETRY = {
-  xs: ['px-pad-x-xs'],
+  xs: ['px-1'],
   sm: ['min-w-control-sm', 'px-pad-x-xs'],
   md: ['h-control-xs', 'min-w-control-md', 'px-pad-x-xs'],
   lg: ['h-control-sm', 'min-w-control-lg', 'px-pad-x-sm'],

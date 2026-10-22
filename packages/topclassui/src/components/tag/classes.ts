@@ -57,12 +57,13 @@ export const REMOVE_FORCED = 'forced-colors:hover:forced-color-adjust-none force
 /** The x: a 24 px target, 44 under a finger, on the tint of its own tag. */
 export const TAG_REMOVE = `${ICON_BUTTON} ${HOVER.soft} ${REMOVE_FORCED}`
 
-/** The button reaches over the block padding and the border, so it sets the height only where it is taller. */
+/** The button reaches over the block padding and the border, so it sets the height only where it is taller,
+ * and back over the chip's gap, so the glyph's own inset in the 24 px target is the gap the eye reads. */
 export const REMOVE_SIZE = {
-  xs: '-my-[calc(var(--spacing-pad-y-xs)+var(--tc-line-width))]',
-  sm: '-my-[calc(var(--spacing-pad-y-sm)+var(--tc-line-width))]',
-  md: '-my-[calc(var(--spacing-pad-y-md)+var(--tc-line-width))]',
-  lg: '-my-[calc(var(--spacing-pad-y-lg)+var(--tc-line-width))]',
-  xl: '-my-[calc(var(--spacing-pad-y-xl)+var(--tc-line-width))]',
+  xs: '-my-[calc(var(--spacing-pad-y-xs)+var(--tc-line-width))] -ms-1',
+  sm: '-my-[calc(var(--spacing-pad-y-sm)+var(--tc-line-width))] -ms-1.5',
+  md: '-my-[calc(var(--spacing-pad-y-md)+var(--tc-line-width))] -ms-2',
+  lg: '-my-[calc(var(--spacing-pad-y-lg)+var(--tc-line-width))] -ms-2',
+  xl: '-my-[calc(var(--spacing-pad-y-xl)+var(--tc-line-width))] -ms-3',
   custom: '',
 } as const satisfies Record<Size, string>

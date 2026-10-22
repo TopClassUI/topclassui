@@ -37,6 +37,17 @@ function langOf(lang: string | undefined): (typeof LANGS)[number] | null {
   return known ?? null
 }
 
+/** Which lines belong to an import statement, from its import line through its from line, so the flat code can mute them as one. */
+export function importRowsOf(lines: readonly string[]): boolean[] {
+  let open = false
+  return lines.map((line) => {
+    if (!open && /^import\b/.test(line)) open = true
+    const inside = open
+    if (open && /(?:\bfrom\s*|^import\s*)['"][^'"]*['"];?\s*$/.test(line)) open = false
+    return inside
+  })
+}
+
 /** The code as coloured spans for CodeBlock's `highlighted`; plain text when the language is not loaded. */
 export async function highlight(code: string, lang?: string): Promise<ReactNode> {
   const known = langOf(lang)
@@ -47,10 +58,11 @@ export async function highlight(code: string, lang?: string): Promise<ReactNode>
     defaultColor: false,
     cssVariablePrefix: '--tc-code-',
   })
+  const imports = importRowsOf(tokens.map((line) => line.map((token) => token.content).join('')))
   return (
     <span className="shiki">
       {tokens.map((line, row) => (
-        <span key={row} {...(line.length === 0 ? { 'data-blank': '' } : {})}>
+        <span key={row} {...(line.length === 0 ? { 'data-blank': '' } : {})} {...(imports[row] === true ? { 'data-import': '' } : {})}>
           {line.map((token, column) => (
             <span key={column} {...tokenProps(token.htmlStyle)}>{token.content}</span>
           ))}

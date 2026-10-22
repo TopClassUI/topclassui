@@ -4,7 +4,7 @@ import { resolve } from 'node:path'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 
-import { highlight } from './highlight.js'
+import { highlight, importRowsOf } from './highlight.js'
 import { TOKEN_ROLES } from './shiki-themes.js'
 
 const PAIRS = {
@@ -19,10 +19,10 @@ const PAIRS = {
 const CSS = readFileSync(resolve(import.meta.dirname, '..', 'app', 'globals.css'), 'utf8')
 
 describe('highlight', () => {
-  it('names each token by its role and marks a blank line', async () => {
+  it('names each token by its role and marks a blank line and an import line', async () => {
     const markup = renderToStaticMarkup(await highlight("import { x } from 'y'\n\n// z", 'ts'))
     expect(markup).toBe(
-      '<span class="shiki"><span><span class="tk-keyword">import</span><span class="tk-text"> { x } </span><span class="tk-keyword">from</span><span class="tk-text"> </span><span class="tk-string">&#x27;y&#x27;</span>\n</span>'
+      '<span class="shiki"><span data-import=""><span class="tk-keyword">import</span><span class="tk-text"> { x } </span><span class="tk-keyword">from</span><span class="tk-text"> </span><span class="tk-string">&#x27;y&#x27;</span>\n</span>'
       + '<span data-blank="">\n</span><span><span class="tk-comment">// z</span></span></span>',
     )
   })
@@ -42,5 +42,11 @@ describe('highlight', () => {
     for (const [role, [dark, light]] of Object.entries(PAIRS)) {
       expect(CSS).toContain(`.tk-${role} { --tc-code-on-dark: ${dark}; --tc-code-on-light: ${light}; }`)
     }
+  })
+})
+
+describe('the import lines of a sample', () => {
+  it('marks every line of an import, from its import line through its from line', () => {
+    expect(importRowsOf(["import {", '  DialogBody,', "} from 'topclassui/dialog'", "import 'x.css'", '', '<DialogRoot />'])).toEqual([true, true, true, true, false, false])
   })
 })

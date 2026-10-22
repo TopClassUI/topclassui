@@ -73,6 +73,19 @@ describe('showHome', () => {
     expect(first).toMatch(/^<a href="\/"/)
   })
 
+  it('draws no caret after the house, as Figma 138:1173 does, and one before every crumb after that', () => {
+    const items = [...html({ showHome: true }).matchAll(/<li[^>]*>(.*?)<\/li>/g)].map((match) => match[1] ?? '')
+    expect(items.map((item) => item.startsWith('<svg'))).toEqual([false, false, true, true, true])
+    const plain = [...html().matchAll(/<li[^>]*>(.*?)<\/li>/g)].map((match) => match[1] ?? '')
+    expect(plain.map((item) => item.startsWith('<svg'))).toEqual([false, true, true, true, true])
+  })
+
+  it('keeps the caret before the folded mark that follows the house', () => {
+    expect(shown(html({ showHome: true, maxItems: 3 }))).toEqual(['Home', 'gap', 'Button', 'Props'])
+    const gap = /<li aria-hidden="true"[^>]*>(.*?)<\/li>/.exec(html({ showHome: true, maxItems: 3 }))?.[1] ?? ''
+    expect(gap).toMatch(/^<svg /)
+  })
+
   it('touches no crumb but the first, and nothing without it', () => {
     expect(html({ showHome: true }).split(house.path)).toHaveLength(2)
     expect(html()).not.toContain(house.path)

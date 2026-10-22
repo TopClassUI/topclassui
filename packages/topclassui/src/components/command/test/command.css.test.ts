@@ -36,7 +36,7 @@ const DECLARATION: Record<string, string> = {
   'min-w-0': 'min-width: 0px;',
   'flex-1': 'flex: 1;',
   'bg-transparent': 'background-color: transparent;',
-  'px-2': 'padding-inline: calc(var(--spacing) * 2);',
+  'pe-2': 'padding-inline-end: calc(var(--spacing) * 2);',
   'text-base': 'font-size: var(--text-base);',
   'placeholder:text-muted': 'color: var(--tc-muted);',
   // The list, and its rows of one unit each.
@@ -173,7 +173,7 @@ describe('the guarantees a class carries', () => {
   })
 
   it('the input is 40 px tall, 48 under a finger, with 16 px text, so a phone neither misses it nor zooms the page', () => {
-    expect(COMMAND_INPUT.split(' ').slice(0, 7)).toEqual(['h-control-md', 'pointer-coarse:h-control-lg', 'min-w-0', 'flex-1', 'bg-transparent', 'px-2', 'text-base'])
+    expect(COMMAND_INPUT.split(' ').slice(0, 7)).toEqual(['h-control-md', 'pointer-coarse:h-control-lg', 'min-w-0', 'flex-1', 'bg-transparent', 'pe-2', 'text-base'])
   })
 
   it('the input draws no box and no ring: its focus is the ring-thick line its row draws while it has the focus', () => {

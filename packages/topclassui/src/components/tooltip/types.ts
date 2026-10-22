@@ -17,6 +17,11 @@ export type TooltipText = string | number
 // R-5.7-5: derived at the seam with Base UI's Payload, so a typed handle still types the payload.
 export type TooltipRootProps<Payload = unknown> = Omit<Base.Root.Props<Payload>, 'className'>
 
+/** A delay group of its own, with the trigger's clamped delays: what opens inside it closes nothing outside it. */
+export type TooltipProviderProps =
+  Omit<Base.Provider.Props, 'className' | 'delay' | 'closeDelay'>
+  & Pick<TooltipDesignProps, 'delay' | 'closeDelay'>
+
 export type TooltipTriggerProps<Payload = unknown> =
   Omit<Base.Trigger.Props<Payload>, 'className' | 'delay' | 'closeDelay'>
   & Pick<TooltipDesignProps, 'delay' | 'closeDelay'>

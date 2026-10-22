@@ -1,8 +1,8 @@
 import { TabsList, TabsRoot, TabsTab } from '../index.js'
 
-/** The ring a focused tab wears, inset as the live one is, drawn at rest so the strip can show it; not under forced
- * colours, where a ring at rest would read as focus. */
-const RING = 'not-forced-colors:outline-solid not-forced-colors:outline-(length:--tc-ring-width) not-forced-colors:-outline-offset-(length:--tc-ring-width) not-forced-colors:outline-ring'
+/** The ring a focused line tab wears, inset past its bar as the live one is, drawn at rest so the strip can show it; not under
+ * forced colours, where a ring at rest would read as focus. */
+const RING = 'not-forced-colors:outline-solid not-forced-colors:outline-(length:--tc-ring-width) not-forced-colors:-outline-offset-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+2px)] not-forced-colors:outline-ring'
 
 /** The four states the frame draws, a list each at md with no panel and room around it, captioned by the title: line, enclosed, the
  * focus ring on the active tab, and a list whose every tab is disabled. Each list is named on its own. */

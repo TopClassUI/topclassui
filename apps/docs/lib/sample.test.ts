@@ -62,3 +62,10 @@ describe('a demo that only returns a tree', () => {
     expect(sampleOf(source)).toContain('export default function Demo() {')
   })
 })
+
+describe('a declaration the sample does not use', () => {
+  it('goes with its leading comment, even when a word of that comment names it', () => {
+    const source = "import { A } from 'topclassui/a'\n\n// The heading the picture draws.\nconst heading = 'x'\n\nexport default function Demo() {\n  return <A />\n}\n"
+    expect(sampleOf(source)).not.toContain('heading')
+  })
+})

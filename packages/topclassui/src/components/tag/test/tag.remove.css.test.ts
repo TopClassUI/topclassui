@@ -55,6 +55,11 @@ const DECLARATION: Record<string, string> = {
   '-my-[calc(var(--spacing-pad-y-md)+var(--tc-line-width))]': 'margin-block: calc(calc(var(--spacing-pad-y-md) + var(--tc-line-width)) * -1);',
   '-my-[calc(var(--spacing-pad-y-lg)+var(--tc-line-width))]': 'margin-block: calc(calc(var(--spacing-pad-y-lg) + var(--tc-line-width)) * -1);',
   '-my-[calc(var(--spacing-pad-y-xl)+var(--tc-line-width))]': 'margin-block: calc(calc(var(--spacing-pad-y-xl) + var(--tc-line-width)) * -1);',
+  // The pull back over the chip's gap, one per gap of TAG_SIZE: 4, 6, 8 and 12 px.
+  '-ms-1': 'margin-inline-start: calc(var(--spacing) * -1);',
+  '-ms-1.5': 'margin-inline-start: calc(var(--spacing) * -1.5);',
+  '-ms-2': 'margin-inline-start: calc(var(--spacing) * -2);',
+  '-ms-3': 'margin-inline-start: calc(var(--spacing) * -3);',
 }
 
 /** The state or the media each variant class must sit under, or it would paint at rest. */
@@ -89,7 +94,7 @@ describe('every class of the removable tag compiles with the installed Tailwind'
   it('the table names exactly the classes of the chip, the label, the x and the two size tables', () => {
     const all = written([REMOVABLE, ...Object.values(REMOVABLE_END), TAG_LABEL, TAG_REMOVE, ...Object.values(REMOVE_SIZE)])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(45)
+    expect(all).toHaveLength(49)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {
