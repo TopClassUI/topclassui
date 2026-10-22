@@ -14,7 +14,11 @@ export function scaleEndsOf(values: readonly string[]): readonly [string, string
 export function familyOf(tokens: readonly string[]): string {
   const [first = '', ...rest] = tokens
   const prefix = /^--(tc-|spacing-)?/.exec(first)?.[0] ?? '--'
-  return [first, ...rest.map((token) => (token.startsWith(prefix) ? token.slice(prefix.length) : token.replace(/^--/, '')))].join(', ')
+  const short = rest.map((token) => (token.startsWith(prefix) ? token.slice(prefix.length) : token.replace(/^--/, '')))
+  // '--tc-primary-solid, primary-soft' reads '--tc-primary-solid, soft': a stem every short name shares is said once.
+  const stem = /^[^-]+-/.exec(first.slice(prefix.length))?.[0] ?? ''
+  const shared = stem !== '' && short.every((name) => name.startsWith(stem))
+  return [first, ...short.map((name) => (shared ? name.slice(stem.length) : name))].join(', ')
 }
 
 const TONE = /^--tc-(neutral|success|warning|danger|info)-/

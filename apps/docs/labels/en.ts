@@ -55,7 +55,7 @@ export const en: SiteLabels = {
     copy: 'Copy',
     packageManagers: 'Package manager',
     framework: 'Framework',
-    utilities: { token: 'Token', utilities: 'Utilities', through: 'to', scale: '* is xs to xl' },
+    utilities: { token: 'Token', utilities: 'Utilities', through: 'to', scale: 'size and padding scales, * is xs to xl' },
     props: { prop: 'Prop', type: 'Type', default: 'Default', description: 'What it does', required: 'required' },
     repeat: (count) => `, version ${String(count)}`,
   },
