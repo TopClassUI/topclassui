@@ -2,16 +2,17 @@ import { Button } from '#components/button/index.js'
 import { OVERLAY_SURFACE } from '#shared/classes.js'
 import { PopoverDescription, PopoverPopup, PopoverRoot, PopoverTitle, PopoverTrigger } from '../index.js'
 
-const CELL = 'grid h-28 w-45 place-items-center'
+// A row of the frame's 58 px: an open group reaches past it above and below, as drawn.
+const CELL = 'flex h-14.5 w-45 items-center justify-center'
 // The popup's look, written out from the shared classes: a demo the site shows imports public paths only.
-const panel = `w-28 p-2 font-mono text-xs/tight text-muted ${OVERLAY_SURFACE}`
+const panel = `w-27.5 p-2 font-mono text-[0.6875rem]/tight text-muted ${OVERLAY_SURFACE}`
 
 /** One cell, captioned by its title: a picture of a small popover at its trigger, below it or flipped above, hidden from
  * a reader and inert, so it draws in every capture, where an open popup hides itself while its trigger is off screen. */
 function Open({ title, flipped = false }: { title: string, flipped?: boolean }) {
   return (
     <div title={title} className={CELL}>
-      <div aria-hidden inert className={flipped ? 'flex flex-col-reverse items-center gap-1.5' : 'flex flex-col items-center gap-1.5'}>
+      <div aria-hidden inert className={flipped ? 'flex flex-col-reverse items-center gap-1' : 'flex flex-col items-center gap-1'}>
         <Button variant="outline" size="xs">Open</Button>
         <div className={panel}>panel</div>
       </div>

@@ -91,7 +91,7 @@ test.describe('the states strip', () => {
   const cellOf = (page: Page, title: string) => page.locator(`#demo [title="${title}"]`)
 
   for (const direction of DIRECTIONS) {
-    test(`${direction}: open draws its panel below its trigger and flipped above it, both pictures a reader never meets, whole inside their cells`, async ({ page }) => {
+    test(`${direction}: open draws its panel below its trigger and flipped above it, both pictures a reader never meets, centred on their row`, async ({ page }) => {
       await openLive(page, 'popover--states', { direction })
       expect(await cellOf(page, 'closed').locator('xpath=..').locator(':scope > *').evaluateAll((cells) => cells.map((cell) => cell.getAttribute('title'))))
         .toEqual(['closed', 'open', 'flipped'])
@@ -104,7 +104,10 @@ test.describe('the states strip', () => {
         const [trigger, panel] = [await boxOf(picture.locator('button')), await boxOf(picture.getByText('panel', { exact: true }))]
         expect(sideOf(panel, trigger)?.where, `${title} lies on the wrong side of its trigger`).toBe(where)
         const [inner, outer] = [await boxOf(picture), await boxOf(cell)]
-        expect(inner.top >= outer.top && inner.bottom <= outer.bottom && inner.left >= outer.left && inner.right <= outer.right, `${title} leaves its cell`).toBe(true)
+        expect(inner.left >= outer.left && inner.right <= outer.right, `${title} leaves its cell`).toBe(true)
+        // The frame's group, centred on its 58 px row and reaching past it above and below, 4 px between trigger and panel.
+        expect(Math.abs((inner.top + inner.bottom) / 2 - (outer.top + outer.bottom) / 2), `${title} is off the middle of its row`).toBeLessThanOrEqual(1)
+        expect(Math.round(sideOf(panel, trigger)?.gap ?? 0), title).toBe(4)
       }
       expect((await axe(page)).violations).toEqual([])
     })
