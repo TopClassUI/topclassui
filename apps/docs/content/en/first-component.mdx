@@ -8,7 +8,7 @@ description: A form that renders on the server and posts to a Server Action. No 
 
 A subscribe form: an `Input` inside a `Field`, and a `Button`.
 
-<Callout tone="info">[Install the package](/en/docs/installation) first.</Callout>
+<Callout tone="info">[Install the package](/en/docs/installation) first: <InstallLine /></Callout>
 
 ## 1. The action
 
@@ -60,9 +60,9 @@ export default function Page() {
 
 ## 3. What you should see
 
-1. **A labelled input and a button, styled in the current mode.** If they are unstyled, the CSS entry is missing a line or the order is wrong.
-2. **Disable JavaScript and submit.** The form still posts, the action runs and the page reloads. That is the Server Action doing its job; the returned errors appear in step 4.
-3. **Open the network panel.** No script for the form. `Input`, `Button` and `Field` all ship 0 KB here.
+1. **A labelled input and a button, styled in the current mode** If they are unstyled, the CSS entry is missing a line or the order is wrong.
+2. **Disable JavaScript and submit** The form still posts, the action runs and the page reloads. That is the Server Action doing its job; the returned errors appear in step 4.
+3. **Open the network panel** No script for the form. `Input`, `Button` and `Field` all ship 0 KB here.
 
 ## 4. Show the error without a reload
 

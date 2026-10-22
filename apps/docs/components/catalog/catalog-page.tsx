@@ -3,7 +3,7 @@ import { labelsFor } from '../../labels/index'
 import { COMPONENT_PAGE_LABELS } from '../../labels/component-page'
 import { type PagedComponent, SECTIONS, pagedComponentOf } from '../../lib/components'
 import type { Locale } from '../../lib/locales'
-import { CHIP, H1, SECTION_H2, SMALL, TYPE } from '../classes'
+import { CHIP, H1, SECTION_H2, SMALL } from '../classes'
 import { Previewer } from '../previewer/previewer'
 import { SectionHeading } from '../section-heading'
 import { BeforeYouStart } from './before-you-start'
@@ -48,7 +48,7 @@ export function CatalogPage({ locale }: { locale: Locale }) {
     <article className="mx-auto grid w-full max-w-(--docs-column) min-w-0 gap-7">
       <header className="grid min-w-0 gap-2.5">
         <h1 className={H1}>{t.title}</h1>
-        <p className={`${TYPE.lead} max-w-185 text-muted`}>{t.lead(sections.reduce((sum, section) => sum + section.cards.length, 0))}</p>
+        <p className="max-w-185 text-base text-muted">{t.lead(sections.reduce((sum, section) => sum + section.cards.length, 0))}</p>
       </header>
       <BeforeYouStart id={BEFORE_ID} locale={locale} />
       <CardLegend id={LEGEND_ID} locale={locale} />
@@ -56,10 +56,10 @@ export function CatalogPage({ locale }: { locale: Locale }) {
         <section key={section.id} aria-labelledby={section.id} data-section={section.id} className="grid min-w-0 gap-7">
           <div className="grid min-w-0 scroll-mt-(--tc-sticky-top,0px) gap-2 pt-6.5">
             <div className="flex min-w-0 flex-wrap items-center gap-2.5">
-              <SectionHeading id={section.id} className={SECTION_H2} anchorLabel={anchor(section.title[locale])}>{section.title[locale]}</SectionHeading>
+              <SectionHeading id={section.id} className={SECTION_H2} anchorBefore anchorLabel={anchor(section.title[locale])}>{section.title[locale]}</SectionHeading>
               <span className={`${CHIP} bg-surface`}>{t.sectionCount(section.cards.length)}</span>
             </div>
-            <p className={SMALL}>{section.lead[locale]}</p>
+            <p className={`${SMALL} max-w-190`}>{section.lead[locale]}</p>
             <hr className="w-25 border-line" />
           </div>
           {section.cards.map((entry) => (
