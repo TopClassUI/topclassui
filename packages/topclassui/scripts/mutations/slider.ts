@@ -31,10 +31,10 @@ export const MUTATIONS: Mutation[] = [
     to: 'export const SLIDER_ROOT = `group/slider grid ${DISABLED}',
   },
   {
-    label: 'the slider root loses has-disabled, so inside a disabled fieldset a press on the track still moves the thumb',
+    label: 'the slider control loses has-disabled, so inside a disabled fieldset a press on the track still moves the thumb',
     file: CLASSES,
-    from: ' has-disabled:pointer-events-none',
-    to: '',
+    from: "SLIDER_CONTROL_OFF = 'group-has-disabled/slider:pointer-events-none'",
+    to: "SLIDER_CONTROL_OFF = ''",
   },
   {
     label: 'the slider root does not dim inside a disabled fieldset, so it looks live while the form sends nothing',
@@ -274,6 +274,12 @@ export const MUTATIONS: Mutation[] = [
     label: 'the slider ring moves off the knob',
     file: CLASSES,
     from: ' group-has-focus-visible/thumb:outline-solid',
+    to: '',
+  },
+  {
+    label: 'the slider root shows no not-allowed inside a disabled fieldset',
+    file: CLASSES,
+    from: ' has-disabled:cursor-not-allowed',
     to: '',
   },
 ]

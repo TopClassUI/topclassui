@@ -47,8 +47,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'disabled styling stops reaching an element with no disabled attribute',
     file: 'src/shared/classes.ts',
-    from: "  'data-disabled:pointer-events-none data-disabled:opacity-50',\n",
-    to: '',
+    from: "'disabled:opacity-50', 'data-disabled:opacity-50', NOT_ALLOWED]",
+    to: "'disabled:opacity-50', NOT_ALLOWED]",
   },
   {
     label: 'a tone class stops being its own tailwind-merge group',

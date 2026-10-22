@@ -32,6 +32,10 @@ export const TONE_TEXT = {
   info: 'text-info-on-soft',
 } as const satisfies Record<Tone, string>
 
+/** A disabled component element, such as next/link, keeps its href and a server component has no handler to cancel
+ * the press, so the pointer is its one stop: it shows its parent's cursor, not not-allowed. */
+export const UNPRESSABLE = 'pointer-events-none'
+
 /** Width only: the height comes from CONTROL_HEIGHT, so the two cannot drift apart. */
 export const SKELETON_WIDTH = {
   xs: 'w-16', sm: 'w-20', md: 'w-24', lg: 'w-28', xl: 'w-32', custom: '',

@@ -8,10 +8,10 @@ import {
 
 // A class list proves nothing about the rule behind it: each class is compiled with the installed Tailwind.
 const DECLARATION: Record<string, string> = {
-  // POINTER: the hand, and the arrow back on a control that cannot be pressed.
-  'disabled:cursor-default': 'cursor: default;',
-  'aria-disabled:cursor-default': 'cursor: default;',
-  'data-disabled:cursor-default': 'cursor: default;',
+  // POINTER: the hand, not-allowed on a disabled control, and the arrow on read-only and loading.
+  'disabled:cursor-not-allowed': 'cursor: not-allowed;',
+  'aria-disabled:cursor-not-allowed': 'cursor: not-allowed;',
+  'data-disabled:cursor-not-allowed': 'cursor: not-allowed;',
   'data-readonly:cursor-default': 'cursor: default;',
   'data-loading:cursor-default': 'cursor: default;',
   // The box.
@@ -57,8 +57,6 @@ const DECLARATION: Record<string, string> = {
     'transition-property: color,background-color,border-color,outline-color,opacity,translate;',
   'duration-(--tc-duration)': 'transition-duration: var(--tc-duration);',
   'ease-out': 'transition-timing-function: var(--ease-out);',
-  'disabled:pointer-events-none': 'pointer-events: none;',
-  'data-disabled:pointer-events-none': 'pointer-events: none;',
   'not-forced-colors:not-group-data-disabled/accordion:disabled:opacity-50': 'opacity: 50%;',
   'not-forced-colors:not-group-data-disabled/accordion:data-disabled:opacity-50': 'opacity: 50%;',
   'data-disabled:opacity-50': 'opacity: 50%;',
@@ -113,7 +111,7 @@ describe('every class an Accordion wears compiles with the installed Tailwind', 
       ACCORDION_ROOT, ACCORDION_ITEM, ACCORDION_TRIGGER, ACCORDION_TITLE, ACCORDION_CARET, ACCORDION_PANEL, ACCORDION_CONTENT,
     ])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(72)
+    expect(all).toHaveLength(70)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

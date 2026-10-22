@@ -13,7 +13,7 @@ import {
 } from './lib.js'
 import type {
   DateParts, DatePickerActions, DatePickerCalendarProps, DatePickerDay, DatePickerFocusEvent, DatePickerKeyEvent,
-  DatePickerChangeDetails, DatePickerStateProps,
+  DatePickerChangeDetails, DatePickerPressEvent, DatePickerStateProps,
 } from './types.js'
 
 /** The trigger's half: the value a form reset brings back, its text in the provider's locale and digits, the ids the
@@ -161,5 +161,7 @@ export function useDatePickerCalendar({ value, range, formats, firstDayOfWeek, c
     gridRef: grid,
     onKeyDown,
     pick: (iso: string) => { if (iso >= range.min && iso <= range.max) choose(iso) },
+    // A disabled day or month button keeps its pointer events for its cursor: a press on it moves no focus, as on Base UI's own.
+    refuse: (event: DatePickerPressEvent) => { event.preventDefault() },
   }
 }

@@ -161,9 +161,11 @@ export function useTreeView(props: TreeViewHookProps): TreeViewHookResult {
     if (event.target === event.currentTarget) setActive(null)
   }
 
+  // A press on a disabled row is a press off a row: it highlights nothing.
   const onPointerDown = (event: TreePointerEvent) => {
     props.onPointerDown?.(event)
-    pressed.current = rowIndexOf(event.target)
+    const index = rowIndexOf(event.target)
+    pressed.current = rows[index]?.node.disabled === true ? -1 : index
   }
 
   // A mouse focuses before it lifts; a finger after, and then clicks. A finger that scrolls is cancelled, and never focuses.
@@ -177,7 +179,7 @@ export function useTreeView(props: TreeViewHookProps): TreeViewHookResult {
     pressed.current = null
   }
 
-  // A press does what Enter does. A disabled row takes no pointer, and is refused here as well.
+  // A press does what Enter does, except on a disabled row, which keeps its pointer events for its cursor.
   const onClick = (event: TreeMouseEvent) => {
     props.onClick?.(event)
     const index = rowIndexOf(event.target)

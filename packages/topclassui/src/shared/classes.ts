@@ -30,8 +30,10 @@ export const OPEN_RING = 'data-popup-open:outline-solid data-popup-open:outline-
 /** Every transition multiplies by --tc-motion, so one knob can stop all of them. */
 export const TRANSITION = 'transition-[color,background-color,border-color,outline-color,opacity,translate] duration-(--tc-duration) ease-out'
 
-/** The hand on whatever a pointer can press. Disabled, read-only and loading go back to the arrow, whichever mark the control carries. */
-export const POINTER = 'cursor-pointer disabled:cursor-default aria-disabled:cursor-default data-disabled:cursor-default data-readonly:cursor-default data-loading:cursor-default'
+/** The cursor of a disabled control, whichever mark it carries: it cannot be pressed. */
+export const NOT_ALLOWED = 'disabled:cursor-not-allowed aria-disabled:cursor-not-allowed data-disabled:cursor-not-allowed'
+/** The hand on whatever a pointer can press. Read-only and loading take the arrow, emitted after NOT_ALLOWED: loading wins over its own disabled. */
+export const POINTER = `cursor-pointer ${NOT_ALLOWED} data-readonly:cursor-default data-loading:cursor-default`
 
 /** R-5.6-2: SC 2.5.8 is written in CSS px, so the floor is a px token, never a rem step. */
 export const TOUCH_TARGET = [
@@ -104,15 +106,11 @@ export const SCROLLBAR = '[scrollbar-width:thin] [scrollbar-color:var(--tc-scrol
  * Tab scrolls into view lands flush with its edge, so the area keeps the reach of the focus ring clear. */
 export const SCROLL_AREA = `overflow-y-auto overscroll-contain scroll-py-[calc(var(--tc-ring-width)+var(--tc-ring-offset))] ${SCROLLBAR}`
 
-/** Disabled is opacity plus no pointer events; loading keeps full colour so it never reads as disabled. */
-// data-disabled carries it for an element with no disabled attribute, such as an anchor.
-export const DISABLED = [
-  'disabled:pointer-events-none disabled:opacity-50',
-  'data-disabled:pointer-events-none data-disabled:opacity-50',
-].join(' ')
+/** Dimmed and not-allowed, also by data-disabled where there is no disabled attribute. It keeps its pointer events, or
+ * that cursor could not paint: the hover and active variants skip it, and the control itself refuses the press. */
+export const DISABLED = ['disabled:opacity-50', 'data-disabled:opacity-50', NOT_ALLOWED].join(' ')
 
-/** Full colour while busy, and no clicks. No cursor: a loading control is always
- * pointer-events: none, so one could never paint. The order is pinned by a test. */
+/** Full colour while busy, and no clicks: pointer-events: none, so no cursor of its own could paint. The order is pinned by a test. */
 export const LOADING = 'aria-busy:opacity-100 data-loading:pointer-events-none'
 
 /** A control never outgrows its box. Measured at 436px inside a 200px box before

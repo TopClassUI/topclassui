@@ -91,7 +91,7 @@ const SCOPE: Record<string, string> = {
   'data-unstuck:static': '[data-unstuck] {',
   'data-scrolled:shadow-md': '[data-scrolled] {',
   'focus-visible:snap-center': ':focus-visible {',
-  'hover:snap-none': ':hover {',
+  'hover:snap-none': ':hover:not(:where(:disabled, [aria-disabled="true"], [data-disabled])) {',
   'focus-visible:outline-solid': ':focus-visible {',
   'focus-visible:outline-(length:--tc-ring-width)': ':focus-visible {',
   'focus-visible:outline-offset-(length:--tc-ring-offset)': ':focus-visible {',

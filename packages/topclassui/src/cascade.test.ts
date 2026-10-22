@@ -6,7 +6,7 @@ import { compileEntry, declarationIndex } from '#test/stylesheet.js'
 
 const CANDIDATES = [
   'disabled:opacity-50', 'data-disabled:opacity-50', 'aria-busy:opacity-100',
-  'hover:bg-(--tc-hover)', 'disabled:pointer-events-none', 'data-loading:pointer-events-none',
+  'hover:bg-(--tc-hover)', 'disabled:cursor-not-allowed', 'data-loading:pointer-events-none',
 ]
 
 let css = ''

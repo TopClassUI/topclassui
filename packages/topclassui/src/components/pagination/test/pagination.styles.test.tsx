@@ -142,21 +142,22 @@ describe('the current page and the others', () => {
   })
 })
 
-describe('an edge span is dimmed and takes no pointer', () => {
+describe('an edge span is dimmed and shows not-allowed', () => {
   it('carries both data-disabled classes, which the attribute beside them switches on', () => {
     const edges = classesOf(html({ value: 1 }), EDGE)
     expect(edges).toHaveLength(2)
     for (const list of edges) {
       expect(list).toContain('data-disabled:opacity-50')
-      expect(list).toContain('data-disabled:pointer-events-none')
+      expect(list).toContain('data-disabled:cursor-not-allowed')
+      expect(list).not.toContain('data-disabled:pointer-events-none')
     }
     expect(html({ value: 1 }).match(/<span [^>]*data-disabled=""/g)).toHaveLength(2)
   })
 
-  it('drops its stroke and the pointer, as the dead edges of Figma 138:1269 do', () => {
+  it('drops its stroke and the hand, as the dead edges of Figma 138:1269 do', () => {
     for (const list of classesOf(html({ value: 1 }), EDGE)) {
       expect(list).toContain('data-disabled:border-transparent')
-      expect(list).toContain('data-disabled:cursor-default')
+      expect(list).toContain('data-disabled:cursor-not-allowed')
     }
   })
 })

@@ -8,10 +8,10 @@ const CLOSED = ':is(:where(.group\\/sidebar)[data-closed] *) {'
 
 /** What each class Sidebar writes must emit, written out: a class Tailwind does not know emits nothing at all. */
 const DECLARATION: Record<string, string> = {
-  // POINTER: the hand, and the arrow back on a control that cannot be pressed.
-  'disabled:cursor-default': 'cursor: default;',
-  'aria-disabled:cursor-default': 'cursor: default;',
-  'data-disabled:cursor-default': 'cursor: default;',
+  // POINTER: the hand, not-allowed on a disabled control, and the arrow on read-only and loading.
+  'disabled:cursor-not-allowed': 'cursor: not-allowed;',
+  'aria-disabled:cursor-not-allowed': 'cursor: not-allowed;',
+  'data-disabled:cursor-not-allowed': 'cursor: not-allowed;',
   'data-readonly:cursor-default': 'cursor: default;',
   'data-loading:cursor-default': 'cursor: default;',
   // The rail.
@@ -108,8 +108,8 @@ const SCOPE: Record<string, string> = {
   'focus-visible:outline-(length:--tc-ring-width)': ':focus-visible {',
   'focus-visible:outline-offset-(length:--tc-ring-offset)': ':focus-visible {',
   'focus-visible:outline-ring': ':focus-visible {',
-  'hover:bg-(--tc-soft)': ':hover {',
-  'active:bg-(--tc-soft-hover)': ':active {',
+  'hover:bg-(--tc-soft)': ':hover:not(:where(:disabled, [aria-disabled="true"], [data-disabled])) {',
+  'active:bg-(--tc-soft-hover)': ':active:not(:where(:disabled, [aria-disabled="true"], [data-disabled])) {',
 }
 
 const escape = (cls: string) => cls.replace(/[^a-zA-Z0-9_-]/g, '\\$&')

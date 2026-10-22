@@ -23,7 +23,6 @@ export const ACCORDION_TRIGGER_FORCED = 'forced-colors:data-disabled:text-[GrayT
 /** A disabled item dims its trigger, but not inside a disabled root, which has dimmed the whole box already,
  * and not under forced colours, where the trigger takes GrayText at full strength instead. */
 export const ACCORDION_TRIGGER_DISABLED = [
-  'disabled:pointer-events-none data-disabled:pointer-events-none',
   'not-forced-colors:not-group-data-disabled/accordion:disabled:opacity-50',
   'not-forced-colors:not-group-data-disabled/accordion:data-disabled:opacity-50',
 ].join(' ')

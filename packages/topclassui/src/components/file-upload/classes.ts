@@ -1,7 +1,7 @@
 // R-5.12-4: the class strings of the file upload, built from the shared constants (unit-5.md, FileUpload).
 import {
-  BORDER, BORDER_STRONG, CONTAIN, DISABLED, FIELD_INVALID_WITHIN, FOCUS_RING_INSET, FOCUS_RING_WITHIN, HOVER, ICON_BUTTON, LABEL, ROW_TOUCH,
-  SCROLL_AREA, TRANSITION,
+  BORDER, BORDER_STRONG, CONTAIN, DISABLED, FIELD_INVALID_WITHIN, FOCUS_RING_INSET, FOCUS_RING_WITHIN, HOVER, ICON_BUTTON, LABEL, POINTER,
+  ROW_TOUCH, SCROLL_AREA, TRANSITION,
 } from '#shared/classes.js'
 
 /** One column, so the list scrolls instead of widening its parent. relative: it holds the hidden status line. */
@@ -12,7 +12,7 @@ export const FILE_UPLOAD_ROOT = 'relative grid min-w-0 grid-cols-1 gap-2.5 text-
 export const FILE_UPLOAD_ZONE = `group/zone relative flex flex-col items-center justify-center gap-2 rounded-box border-dashed bg-surface p-6 text-center ${BORDER_STRONG} ${TRANSITION} ${FOCUS_RING_WITHIN} ${FIELD_INVALID_WITHIN} data-disabled:opacity-50 data-dragging:border-primary-solid forced-colors:data-dragging:border-solid data-dragging:bg-primary-soft data-dragging:text-primary-on-soft forced-colors:data-dragging:border-[Highlight]`
 
 /** The native input over the whole zone, unseen: a click, a key and a drop reach it before any script. */
-export const FILE_UPLOAD_INPUT = 'absolute inset-0 size-full cursor-pointer opacity-0 disabled:cursor-default'
+export const FILE_UPLOAD_INPUT = `absolute inset-0 size-full opacity-0 ${POINTER}`
 
 export const FILE_UPLOAD_ICON = 'flex text-muted group-data-dragging/zone:text-primary-on-soft'
 

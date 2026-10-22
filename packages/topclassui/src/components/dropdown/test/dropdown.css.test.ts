@@ -8,11 +8,11 @@ import {
 
 // The static harness never opens a menu, so none of these classes reaches Tailwind there.
 const DECLARATION: Record<string, string> = {
-  // POINTER: the hand, and the arrow back on a control that cannot be pressed.
+  // POINTER: the hand, not-allowed on a disabled control, and the arrow on read-only and loading.
   'cursor-pointer': 'cursor: pointer;',
-  'disabled:cursor-default': 'cursor: default;',
-  'aria-disabled:cursor-default': 'cursor: default;',
-  'data-disabled:cursor-default': 'cursor: default;',
+  'disabled:cursor-not-allowed': 'cursor: not-allowed;',
+  'aria-disabled:cursor-not-allowed': 'cursor: not-allowed;',
+  'data-disabled:cursor-not-allowed': 'cursor: not-allowed;',
   'data-readonly:cursor-default': 'cursor: default;',
   'data-loading:cursor-default': 'cursor: default;',
   // The positioner: the popup layer, and hidden with its trigger.
@@ -76,7 +76,6 @@ const DECLARATION: Record<string, string> = {
   // The row holds the focus, so its ring is the focus ring, in the system's colour under forced colours.
   'forced-colors:focus-visible:outline-[HighlightText]': 'outline-color: HighlightText;',
   // A disabled row: what it holds is dimmed, and forced colours take the grey of the system.
-  'data-disabled:pointer-events-none': 'pointer-events: none;',
   'data-disabled:*:opacity-50': 'opacity: 50%;',
   'forced-colors:data-disabled:*:opacity-100': 'opacity: 100%;',
   'forced-colors:data-disabled:not-data-highlighted:text-[GrayText]': 'color: GrayText;',
@@ -113,7 +112,7 @@ const SCOPE: Record<string, string> = {
   'group-data-[tone=danger]:text-inherit': ':is(:where(.group)[data-tone="danger"] *) {',
   'data-highlighted:bg-danger-soft': '[data-highlighted] {',
   'data-highlighted:text-danger-on-soft': '[data-highlighted] {',
-  'data-disabled:pointer-events-none': '[data-disabled] {',
+  'data-disabled:cursor-not-allowed': '[data-disabled] {',
   'forced-colors:data-highlighted:bg-[Highlight]': '[data-highlighted] {',
   'forced-colors:focus-visible:outline-[HighlightText]': ':focus-visible {',
   'forced-colors:data-disabled:not-data-highlighted:text-[GrayText]': '[data-disabled]:not([data-highlighted]) {',
@@ -163,7 +162,7 @@ describe('every class an open Dropdown wears compiles with the installed Tailwin
       DROPDOWN_SHORTCUT, DROPDOWN_GROUP, DROPDOWN_GROUP_LABEL, DROPDOWN_SEPARATOR,
     ])
     expect(all).toEqual([...Object.keys(DECLARATION), 'group'].sort())
-    expect(all).toHaveLength(81)
+    expect(all).toHaveLength(80)
   })
 
   it('group emits nothing of its own: it only marks the row for the shortcut inside it', async () => {

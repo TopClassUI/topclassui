@@ -7,6 +7,7 @@ import { truncateLabel } from '#shared/truncate-label.js'
 import { renderElement } from '#shared/render.js'
 import { Svg } from '#components/svg/index.js'
 import { BUTTON_BOUNDARIES } from './boundaries.js'
+import { UNPRESSABLE } from './classes.js'
 import { BUTTON_DEFAULTS } from './constants.js'
 import type { ButtonProps } from './types.js'
 import { buttonVariants } from './variants.js'
@@ -38,9 +39,11 @@ export function Button({
   // Only a real button has a disabled attribute; anything else needs the ARIA pair.
   const nativeButton = render == null || render.type === 'button'
 
-  /** An anchor navigates under pointer-events: none and a server component cannot
-   * cancel it, so the href goes. next/link keeps its own: the prop is required. */
+  /** An anchor navigates on Enter or a press and a server component cannot cancel
+   * it, so the href goes. next/link keeps its own: the prop is required. */
   const deadLink = inactive && render?.type === 'a'
+  // A component element may be a link it cannot strip, so only the pointer is stopped.
+  const deadComponent = inactive && render != null && typeof render.type !== 'string'
   const element = deadLink
     ? cloneElement(render as ReactElement<{ href?: string }>, { href: undefined })
     : (render ?? <button type={type} />)
@@ -61,7 +64,7 @@ export function Button({
     'data-variant': variant,
     'data-tone': tone,
     'data-size': size,
-    className: cn(buttonVariants({ variant, tone, size, fullWidth }), className),
+    className: cn(buttonVariants({ variant, tone, size, fullWidth }), deadComponent && UNPRESSABLE, className),
     children: truncateLabel(children, BUTTON_BOUNDARIES.labelMaxLength),
     ...rest,
   }, loading ? withSpinner : undefined)

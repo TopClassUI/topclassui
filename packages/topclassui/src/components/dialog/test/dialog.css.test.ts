@@ -9,11 +9,11 @@ import {
 
 // The static harness never opens a popup, so none of these classes reaches Tailwind there.
 const DECLARATION: Record<string, string> = {
-  // POINTER: the hand, and the arrow back on a control that cannot be pressed.
+  // POINTER: the hand, not-allowed on a disabled control, and the arrow on read-only and loading.
   'cursor-pointer': 'cursor: pointer;',
-  'disabled:cursor-default': 'cursor: default;',
-  'aria-disabled:cursor-default': 'cursor: default;',
-  'data-disabled:cursor-default': 'cursor: default;',
+  'disabled:cursor-not-allowed': 'cursor: not-allowed;',
+  'aria-disabled:cursor-not-allowed': 'cursor: not-allowed;',
+  'data-disabled:cursor-not-allowed': 'cursor: not-allowed;',
   'data-readonly:cursor-default': 'cursor: default;',
   'data-loading:cursor-default': 'cursor: default;',
   // The scrim and the viewport.
@@ -112,8 +112,8 @@ const SCOPE: Record<string, string> = {
   'focus-visible:outline-solid': ':focus-visible {',
   'focus-visible:outline-(length:--tc-ring-width)': ':focus-visible {',
   'focus-visible:-outline-offset-(length:--tc-ring-width)': ':focus-visible {',
-  'hover:bg-(--tc-soft)': ':hover {',
-  'active:bg-(--tc-soft-hover)': ':active {',
+  'hover:bg-(--tc-soft)': ':hover:not(:where(:disabled, [aria-disabled="true"], [data-disabled])) {',
+  'active:bg-(--tc-soft-hover)': ':active:not(:where(:disabled, [aria-disabled="true"], [data-disabled])) {',
 }
 
 /** The two that Tailwind wraps from outside: the query opens just before the selector. */

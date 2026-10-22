@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { describe, expect, it } from 'vitest'
 
 import { spinner } from '#icons/data/spinner.js'
@@ -62,12 +63,17 @@ describe('disabled', () => {
     expect(html({ disabled: false, loading: true })).toContain('disabled=""')
   })
 
-  it('is actually dimmed and stops taking pointer events, both ways', () => {
+  it('is actually dimmed and shows not-allowed, both ways', () => {
     const list = classes({ disabled: true })
     for (const cls of [
-      'disabled:opacity-50', 'disabled:pointer-events-none',
-      'data-disabled:opacity-50', 'data-disabled:pointer-events-none',
+      'disabled:opacity-50', 'disabled:cursor-not-allowed',
+      'data-disabled:opacity-50', 'data-disabled:cursor-not-allowed',
     ]) expect(list, cls).toContain(cls)
+  })
+
+  it('keeps its pointer events, so the cursor paints: a native disabled button takes no click of its own', () => {
+    // LOADING's data-loading:pointer-events-none stays: a loading button keeps the arrow it always had.
+    expect(classes({ disabled: true }).filter((cls) => cls.includes('pointer-events'))).toEqual(['data-loading:pointer-events-none'])
   })
 })
 
@@ -125,5 +131,26 @@ describe('a disabled anchor cannot still be followed', () => {
     const html_ = markup(<Button render={<a href="/x" id="go" hrefLang="en" />} disabled>Go</Button>)
     expect(attr(html_, 'id')).toBe('go')
     expect(attr(html_, 'hrefLang')).toBe('en')
+  })
+})
+
+describe('a disabled component element, such as next/link, keeps its href', () => {
+  // A component element, as next/link is: the button cannot strip its href, which the type requires.
+  function Link({ href, ...rest }: { href: string, className?: string, children?: ReactNode }) {
+    return <a href={href} {...rest} />
+  }
+  const link = (props: { disabled?: boolean; loading?: boolean } = {}) =>
+    markup(<Button render={<Link href="/x" />} {...props}>Go</Button>)
+
+  it('so the pointer is its one stop: it takes no pointer events, and shows its parent\'s cursor rather than not-allowed', () => {
+    expect(attr(link({ disabled: true }), 'href')).toBe('/x')
+    expect(classList(link({ disabled: true }))).toContain('pointer-events-none')
+    expect(classList(link({ loading: true }))).toContain('pointer-events-none')
+  })
+
+  it('a usable one, a disabled anchor whose href went and a disabled native button keep their pointer events', () => {
+    expect(classList(link())).not.toContain('pointer-events-none')
+    expect(classList(markup(<Button render={<a href="/x" />} disabled>Go</Button>))).not.toContain('pointer-events-none')
+    expect(classes({ disabled: true })).not.toContain('pointer-events-none')
   })
 })

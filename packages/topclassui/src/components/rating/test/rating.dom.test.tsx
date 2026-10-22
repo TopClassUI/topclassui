@@ -175,7 +175,7 @@ describe('the vocabulary', () => {
     expect(ref.current).toBe(screen.getByRole('radiogroup'))
     expect(ref.current?.id).toBe('stars')
     expect(ref.current?.getAttribute('data-testid')).toBe('x')
-    expect(ref.current?.className).toBe('inline-flex flex-wrap items-center max-w-full disabled:pointer-events-none disabled:opacity-50 data-disabled:pointer-events-none data-disabled:opacity-50 gap-3')
+    expect(ref.current?.className).toBe('inline-flex flex-wrap items-center max-w-full disabled:opacity-50 data-disabled:opacity-50 disabled:cursor-not-allowed aria-disabled:cursor-not-allowed data-disabled:cursor-not-allowed gap-3')
   })
 
   it('aria-labelledby names the group as well', () => {

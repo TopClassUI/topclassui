@@ -90,9 +90,10 @@ describe('the floors and the dimming reach the browser', () => {
     expect(css).toContain('min-width: var(--tc-target-coarse,44px);')
   })
 
-  it('dims an edge span by the attribute, since a span has no disabled state', () => {
+  it('dims an edge span by the attribute, since a span has no disabled state, and shows not-allowed', () => {
     expect(css).toContain(`${selectorOf('data-disabled:opacity-50')}[data-disabled]`)
-    expect(css).toContain(`${selectorOf('data-disabled:pointer-events-none')}[data-disabled]`)
+    expect(ruleOf(`${selectorOf('data-disabled:cursor-not-allowed')}[data-disabled]`)).toBe('cursor: not-allowed;')
+    expect(css).not.toContain('pointer-events: none')
   })
 })
 
@@ -138,8 +139,10 @@ describe('the current page under forced colours', () => {
   it('puts the forced fill after the hover and pressed fills, so it is the one painted under a pointer', () => {
     const hover = css.indexOf(`${selectorOf('hover:bg-(--tc-hover)')}:hover`)
     const pressed = css.indexOf(`${selectorOf('active:bg-(--tc-active)')}:active`)
-    const forcedHover = css.indexOf(`${selectorOf('forced-colors:hover:bg-[Highlight]')}:hover {\n        background-color: Highlight;`)
-    const forcedPressed = css.indexOf(`${selectorOf('forced-colors:active:bg-[Highlight]')}:active {\n      background-color: Highlight;`)
+    // A dead edge keeps its pointer events for its not-allowed cursor, so a hover or a press skips a disabled cell.
+    const live = ':not(:where(:disabled, [aria-disabled="true"], [data-disabled]))'
+    const forcedHover = css.indexOf(`${selectorOf('forced-colors:hover:bg-[Highlight]')}:hover${live} {\n        background-color: Highlight;`)
+    const forcedPressed = css.indexOf(`${selectorOf('forced-colors:active:bg-[Highlight]')}:active${live} {\n      background-color: Highlight;`)
     expect(hover, 'the hover fill is not emitted').toBeGreaterThan(-1)
     expect(pressed, 'the pressed fill is not emitted after the hover one').toBeGreaterThan(hover)
     expect(forcedHover, 'the forced hover fill is not emitted after the pressed one').toBeGreaterThan(pressed)

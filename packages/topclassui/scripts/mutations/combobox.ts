@@ -158,4 +158,10 @@ export const MUTATIONS: Mutation[] = [
     from: '    if (node && target?.top === node.scrollTop && target.height !== node.clientHeight) {',
     to: '    if (node && target && target.height !== node.clientHeight) {',
   },
+  {
+    label: 'the combobox lets a pointer highlight a disabled option',
+    file: PART,
+    from: '          onMouseMove={skipDisabledHighlight(row.item.disabled)}\n',
+    to: '',
+  },
 ]

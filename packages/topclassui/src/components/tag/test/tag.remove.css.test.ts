@@ -5,11 +5,11 @@ import { REMOVABLE, REMOVABLE_END, REMOVE_SIZE, TAG_LABEL, TAG_REMOVE } from '..
 
 /** What each class of the removable tag must emit, written out: a class Tailwind does not know emits nothing at all. */
 const DECLARATION: Record<string, string> = {
-  // POINTER: the hand, and the arrow back on a control that cannot be pressed.
+  // POINTER: the hand, not-allowed on a disabled control, and the arrow on read-only and loading.
   'cursor-pointer': 'cursor: pointer;',
-  'disabled:cursor-default': 'cursor: default;',
-  'aria-disabled:cursor-default': 'cursor: default;',
-  'data-disabled:cursor-default': 'cursor: default;',
+  'disabled:cursor-not-allowed': 'cursor: not-allowed;',
+  'aria-disabled:cursor-not-allowed': 'cursor: not-allowed;',
+  'data-disabled:cursor-not-allowed': 'cursor: not-allowed;',
   'data-readonly:cursor-default': 'cursor: default;',
   'data-loading:cursor-default': 'cursor: default;',
   // The chip.

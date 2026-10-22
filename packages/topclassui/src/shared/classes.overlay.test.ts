@@ -67,8 +67,8 @@ describe('a row of a menu and its highlight', () => {
   it('ROW is a full-width flex row as tall as the row token, with no outline of its own', () => {
     expect(list(ROW)).toEqual([
       'flex', 'min-h-(--tc-row-height)', 'w-full', 'items-center', 'gap-2', 'rounded-control', 'px-2.5',
-      'text-start', 'text-sm', 'outline-none', 'cursor-pointer', 'disabled:cursor-default', 'aria-disabled:cursor-default',
-      'data-disabled:cursor-default', 'data-readonly:cursor-default', 'data-loading:cursor-default',
+      'text-start', 'text-sm', 'outline-none', 'cursor-pointer', 'disabled:cursor-not-allowed', 'aria-disabled:cursor-not-allowed',
+      'data-disabled:cursor-not-allowed', 'data-readonly:cursor-default', 'data-loading:cursor-default',
     ])
   })
 
@@ -133,8 +133,8 @@ describe('the icon button and the two other rings', () => {
       'outline-none', 'focus-visible:outline-solid', 'focus-visible:outline-(length:--tc-ring-width)',
       'focus-visible:outline-offset-(length:--tc-ring-offset)', 'focus-visible:outline-ring',
       'transition-[color,background-color,border-color,outline-color,opacity,translate]',
-      'duration-(--tc-duration)', 'ease-out', 'cursor-pointer', 'disabled:cursor-default', 'aria-disabled:cursor-default',
-      'data-disabled:cursor-default', 'data-readonly:cursor-default', 'data-loading:cursor-default',
+      'duration-(--tc-duration)', 'ease-out', 'cursor-pointer', 'disabled:cursor-not-allowed', 'aria-disabled:cursor-not-allowed',
+      'data-disabled:cursor-not-allowed', 'data-readonly:cursor-default', 'data-loading:cursor-default',
     ])
   })
 

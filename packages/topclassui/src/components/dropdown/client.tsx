@@ -9,6 +9,7 @@ import { FLOATING, toSideAlign } from '#shared/floating.js'
 import { toLinkElement } from '#shared/link.js'
 import { guardEscape } from '#shared/overlay.js'
 import { renderPart, renderTrigger } from '#shared/render-trigger.js'
+import { skipDisabledHighlight } from '#shared/row-highlight.js'
 import { DROPDOWN_BOUNDARIES } from './boundaries.js'
 import {
   DROPDOWN_GROUP, DROPDOWN_ITEM, DROPDOWN_ITEM_TONE, DROPDOWN_POPUP, DROPDOWN_POSITIONER, DROPDOWN_SEPARATOR,
@@ -99,10 +100,18 @@ function DropdownSurface({ ref, className, ...rest }: DropdownPopupProps) {
 }
 
 /** One row: the icon, the label in the span that truncates it, then the shortcut. */
-export function DropdownItem({ icon, shortcut, tone = DROPDOWN_DEFAULTS.tone, className, render, children, ...rest }: DropdownItemProps) {
+export function DropdownItem({
+  icon, shortcut, tone = DROPDOWN_DEFAULTS.tone, className, render, children, onMouseMove, ...rest
+}: DropdownItemProps) {
   const part = renderPart(render, cn(DROPDOWN_ITEM, DROPDOWN_ITEM_TONE[tone], className))
   return (
-    <Base.Item {...rest} data-tone={tone} render={part.render} className={part.className}>
+    <Base.Item
+      {...rest}
+      onMouseMove={skipDisabledHighlight(rest.disabled, onMouseMove)}
+      data-tone={tone}
+      render={part.render}
+      className={part.className}
+    >
       <DropdownRow icon={icon} label={children} shortcut={shortcut} />
     </Base.Item>
   )

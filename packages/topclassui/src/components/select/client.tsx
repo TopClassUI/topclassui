@@ -7,6 +7,7 @@ import { check } from '#icons/data/check.js'
 import { FIELD_HOLDER_FULL, FIELD_SIZE, FIELD_TEXT } from '#shared/classes.js'
 import { cn } from '#shared/cn.js'
 import { FLOATING, toSideAlign } from '#shared/floating.js'
+import { skipDisabledHighlight } from '#shared/row-highlight.js'
 import { Svg } from '#components/svg/index.js'
 import {
   SELECT_ICON, SELECT_ITEM, SELECT_ITEM_TEXT, SELECT_ITEM_TICK, SELECT_LIST, SELECT_POPUP, SELECT_POSITIONER, SELECT_ROOT,
@@ -94,7 +95,14 @@ export function Select({
               style={{ '--tc-list-rows': select.rows }}
             >
               {select.options.map(({ item, key }) => (
-                <Base.Item key={key} value={item.value} label={item.label} disabled={item.disabled} className={SELECT_ITEM}>
+                <Base.Item
+                  key={key}
+                  value={item.value}
+                  label={item.label}
+                  disabled={item.disabled}
+                  onMouseMove={skipDisabledHighlight(item.disabled)}
+                  className={SELECT_ITEM}
+                >
                   <Base.ItemText className={SELECT_ITEM_TEXT}>{item.label}</Base.ItemText>
                   <Base.ItemIndicator className={SELECT_ITEM_TICK}><Svg icon={check} size="0.875rem" /></Base.ItemIndicator>
                 </Base.Item>
