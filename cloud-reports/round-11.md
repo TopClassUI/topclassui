@@ -28,6 +28,8 @@ Second Figma audit routed (02:32 UTC, the laptop, Omar's word: every difference 
 
 Merge rule from 02:35 UTC (the laptop, Omar's word: fastest, nothing waits): the lead merges a branch as soon as its own gates are green and pushes; job 149 runs the full docs:check on the tip and routes what breaks; a merge never waits on a 40-minute e2e. 144b is held until the hover retry is replaced by the page fix.
 
+Windows docs:check (02:5x UTC, the laptop, Omar's word) on a local merge of preview/r8-all 99ae7ded + fix/r11-pages-144 3840b111 + getting-started 5d686950 + pages-141 53ccea65 + light-ocean 3bb78559 (the same the lead merged into 87f2863a and df334f0d): unit 298/298, static gates green, e2e 1124 passed / 2 failed, both the /ar motion cases (motion:74 and :94), the Noto Sans Arabic swap after 147's tokens line, which 133's fix/r11-arabic-preload covers; with it, 151 (Try it) and 144b (the tooltip delay group on the page), the next tip should be fully green on Windows. The laptop's audit of feedback, overlays and getting started re-runs after the account's session limit. The account's session limit also stopped every cloud job at about 02:50 UTC (reset 03:00 UTC); the lead woke each at 03:02 UTC to continue from where it stopped.
+
 Job 134's site work: told at 21:55 UTC to push what passes the static gates on preview/r8-all within ten minutes, name the components covered on its round-9 row, and stop; the rest is redistributed to 140-145.
 
 | Job | Branch | Base | Tip | Commits | Gates | Composites and what is left for Omar |
