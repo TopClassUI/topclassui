@@ -27,8 +27,9 @@ export const COMMAND_SEARCH_FOCUS = 'after:absolute after:inset-x-0 after:-botto
 export const COMMAND_SEARCH = `relative flex shrink-0 items-center gap-2.5 border-b-(length:--tc-line-width) border-line ps-3.5 pe-3 text-muted ${COMMAND_SEARCH_FOCUS}`
 
 /** 40 px tall, 48 under a finger, and 16 px text, so a phone neither misses it nor zooms the page into it.
- * Borderless and with no ring: its focus is the line under its row, COMMAND_SEARCH_FOCUS. */
-export const COMMAND_INPUT = 'h-control-md pointer-coarse:h-control-lg min-w-0 flex-1 bg-transparent px-2 text-base text-body outline-none placeholder:text-muted'
+ * Borderless and with no ring: its focus is the line under its row, COMMAND_SEARCH_FOCUS. No start padding:
+ * the query starts the search row's 10 px gap after the glass, as Figma 79:328 draws it. */
+export const COMMAND_INPUT = 'h-control-md pointer-coarse:h-control-lg min-w-0 flex-1 bg-transparent pe-2 text-base text-body outline-none placeholder:text-muted'
 
 /** R-10.5-1: the scroll container, at most --tc-list-rows rows, gone when nothing matches. No gap: the
  * spacers count whole rows, so with one the list grew and slid 2 px for each row the window passed. */
