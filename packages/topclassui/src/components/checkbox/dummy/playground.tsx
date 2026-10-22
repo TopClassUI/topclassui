@@ -5,7 +5,7 @@ import type { CheckboxDesignProps } from '../types.js'
 export default function Demo(props: CheckboxDesignProps) {
   return (
     <div className="flex items-center gap-2">
-      <Checkbox id="checkbox-playground" defaultChecked {...props} />
+      <Checkbox id="checkbox-playground" {...props} />
       <label htmlFor="checkbox-playground" className="text-sm text-body">I accept the terms</label>
     </div>
   )

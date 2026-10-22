@@ -14,7 +14,7 @@ const names = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.
 const AFTER: Record<string, string[]> = {
   'basic': ['false', 'true'],
   'form': ['false'],
-  'playground': ['false'],
+  'playground': ['true'],
   'rtl': ['false', 'true'],
   'sizes': ['false', 'false', 'false', 'false', 'false'],
   'combined': ['true', 'false', 'true', 'false', 'false', 'true', 'true'],

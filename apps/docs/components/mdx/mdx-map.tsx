@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { MDXComponents } from 'mdx/types'
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
 import type { Locale } from '../../content/pages'
 import { EXTERNAL_REL, isExternal } from '../../lib/external'
@@ -11,8 +11,9 @@ import { Callout } from './callout'
 import { FrameworkTabs } from './framework-tabs'
 import { Card, Cards } from './cards'
 import { CodeFence } from './code-fence'
+import { FileTree } from './file-tree'
 import { Heading } from './heading'
-import { MdxTable } from './mdx-table'
+import { MdxTable, Widths, type ColumnWidth } from './mdx-table'
 import { PackageManagers } from './package-managers'
 import { PeerRange } from './peer-range'
 import { PropsTable } from './props-table'
@@ -34,12 +35,14 @@ export function mdxComponents(locale: Locale): MDXComponents {
     ol: ({ children }) => <Steps>{children}</Steps>,
     code: ({ children }) => <code dir="ltr" className={PROSE_CODE}>{children}</code>,
     pre: ({ children }) => <CodeFence locale={locale} terminal={terminal} repeat={labels.blocks.repeat}>{children}</CodeFence>,
-    table: ({ children }) => <MdxTable locale={locale}>{children}</MdxTable>,
+    table: ({ children, widths }: { children?: ReactNode; widths?: readonly ColumnWidth[] | undefined }) => <MdxTable locale={locale} widths={widths}>{children}</MdxTable>,
+    Widths,
     a: ({ href = '', children }: ComponentProps<'a'>) =>
       href.startsWith('/') ? <Link href={href} className={TEXT_LINK}>{children}</Link> : <a href={href} rel={isExternal(href) ? EXTERNAL_REL : undefined} className={TEXT_LINK}>{children}</a>,
     Callout,
     Caption: ({ children }) => <p className={NOTE}>{children}</p>,
     Cards,
+    FileTree,
     Card,
     WrongRight: ({ children }) => <WrongRight locale={locale} wrong={wrong} right={right} terminal={terminal} repeat={labels.blocks.repeat}>{children}</WrongRight>,
     PackageManagers: () => <PackageManagers locale={locale} label={packageManagers} />,
@@ -48,7 +51,7 @@ export function mdxComponents(locale: Locale): MDXComponents {
     InstallLine: () => <code dir="ltr" className={PROSE_CODE}>{INSTALL_LINE}</code>,
     ThemeUtilities: () => <ThemeUtilities locale={locale} labels={labels.blocks.utilities} />,
     PropsTable: ({ of }: { of: 'TopClassProvider' }) => <PropsTable of={of} locale={locale} labels={labels} />,
-    ThemeScriptCsp: () => <ThemeScriptCsp locale={locale} />,
+    ThemeScriptCsp: () => <ThemeScriptCsp locale={locale} title={labels.blocks.code} />,
     ThemeScriptHtml: () => <ThemeScriptHtml locale={locale} />,
   }
 }

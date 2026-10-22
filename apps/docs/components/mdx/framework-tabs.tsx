@@ -23,7 +23,7 @@ export async function FrameworkTabs({ locale, label, terminal, frameworks }: Fra
   const tabs = frameworks.map((name) => ({
     name,
     value: slugify(name),
-    panel: <CodeBlock className={DOCS_CODE} {...getLabels(locale)} lang="bash" title={terminal} highlighted={highlighted ?? undefined}>{code}</CodeBlock>,
+    panel: <CodeBlock className={DOCS_CODE} {...getLabels(locale)} lang="bash" title={terminal} showCopy={false} highlighted={highlighted ?? undefined}>{code}</CodeBlock>,
   }))
   return <CodeTabs label={label} tabs={tabs} />
 }

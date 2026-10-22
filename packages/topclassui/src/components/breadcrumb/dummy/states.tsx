@@ -6,7 +6,7 @@ export default function Demo() {
   return (
     <div className="grid justify-items-start gap-4">
       <Breadcrumb
-        className="text-xs"
+        className="text-xs *:gap-1.25 *:*:gap-1.25"
         aria-label="idle"
         items={[
           { href: '/docs', label: 'Docs' },
@@ -14,7 +14,7 @@ export default function Demo() {
         ]}
       />
       <Breadcrumb
-        className="text-xs"
+        className="text-xs *:gap-1.25 *:*:gap-1.25"
         aria-label="hover"
         link={<a href="/" data-hover="" />}
         items={[
@@ -23,7 +23,7 @@ export default function Demo() {
         ]}
       />
       <Breadcrumb
-        className="text-xs"
+        className="text-xs *:gap-1.25 *:*:gap-1.25"
         aria-label="collapsed"
         maxItems={2}
         items={[
@@ -34,7 +34,7 @@ export default function Demo() {
         ]}
       />
       <Breadcrumb
-        className="text-xs"
+        className="text-xs *:gap-1.25 *:*:gap-1.25"
         aria-label="current"
         items={[
           { href: '/docs', label: 'Docs' },

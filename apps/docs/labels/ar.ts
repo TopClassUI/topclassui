@@ -56,7 +56,7 @@ export const ar: SiteLabels = {
     copy: 'نسخ',
     packageManagers: 'مدير الحزم',
     framework: 'إطار العمل',
-    utilities: { token: 'المتغيّر', utilities: 'الأصناف المساعدة', through: 'إلى' },
+    utilities: { token: 'المتغيّر', utilities: 'الأصناف المساعدة', through: 'إلى', scale: '* من xs إلى xl' },
     props: { prop: 'الخاصية', type: 'النوع', default: 'القيمة الافتراضية', description: 'ما الذي تفعله', required: 'مطلوبة' },
     repeat: (count) => `، النسخة ${String(count)}`,
   },
@@ -250,7 +250,7 @@ export const ar: SiteLabels = {
     },
     startHere: 'ابدأ من هنا',
     sectionsHeading: 'الأقسام',
-    installHeading: 'قبل أن تبدأ',
+    installHeading: 'التثبيت: سطر الأوامر أو الحزمة',
   },
   search: {
     button: 'ابحث في التوثيق',
