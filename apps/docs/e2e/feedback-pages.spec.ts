@@ -123,10 +123,19 @@ test('a live example hydrates: a toast from the examples shows and closes', asyn
   await expect(shown).toHaveCount(0)
 })
 
-test('EmptyState has no Try it controls and still shows its stage and code', async ({ page }) => {
+test('EmptyState: the playground drives bordered and compact, the two switches the frame draws', async ({ page }) => {
+  const errors = collectErrors(page)
   await page.goto('/en/docs/components/empty-state')
   const empty = card(page, 'empty-state')
-  await expect(empty.getByRole('checkbox')).toHaveCount(0)
-  await expect(empty.getByRole('combobox')).toHaveCount(0)
+  const stage = () => empty.locator('p', { hasText: 'No projects yet' }).first().locator('..')
+  await expect(empty.getByRole('checkbox', { name: 'bordered' })).toBeChecked()
+  await expect(empty.getByRole('checkbox', { name: 'compact' })).not.toBeChecked()
+  await expect(stage()).toHaveAttribute('data-bordered', '')
+  await empty.getByRole('checkbox', { name: 'bordered' }).click()
+  await expect(stage()).not.toHaveAttribute('data-bordered')
+  await empty.getByRole('checkbox', { name: 'compact' }).click()
+  await expect(stage()).toHaveAttribute('data-compact', '')
+  await expect(empty.locator('pre').first()).toContainText('bordered={false}')
   await expect(empty.locator('pre').first()).toContainText("from 'topclassui/empty-state'")
+  expect(errors).toEqual([])
 })

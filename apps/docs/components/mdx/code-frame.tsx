@@ -1,7 +1,9 @@
 // A guide page's code block (docs-site S3): CodeBlock names the region from its header, and the frame lays a worded Copy button over that header.
 import type { ReactNode } from 'react'
 import { CodeBlock } from 'topclassui/code-block'
+import { copy as copyGlyph } from 'topclassui/icons/copy'
 import { getLabels } from 'topclassui/labels/get-labels'
+import { Svg } from 'topclassui/svg'
 
 import type { Locale } from '../../content/pages'
 import { labelsFor } from '../../labels/index'
@@ -29,10 +31,12 @@ export interface CodeFrameProps {
 export function CodeFrame({ code, locale, title, repeat, lang, highlighted, copy = code, wrap = false, className }: CodeFrameProps) {
   const library = getLabels(locale)
   const { common } = library.labels
-  const word = labelsFor(locale).blocks.copy
+  const { copy: word, terminal } = labelsFor(locale).blocks
+  // The frames draw icon/copy at 13 px before a code block's name, and CodeBlock's own terminal icon only on a terminal block.
+  const icon = title === terminal ? undefined : <Svg icon={copyGlyph} size="0.8125rem" />
   const shown = repeat === undefined ? title : <>{title}<span className="sr-only">{repeat}</span></>
   const block = (
-    <CodeBlock {...library} lang={lang} title={shown} highlighted={highlighted ?? undefined} showCopy={false} wrap={wrap} className={className === undefined ? DOCS_CODE : `${DOCS_CODE} ${className}`}>
+    <CodeBlock {...library} lang={lang} title={shown} icon={icon} highlighted={highlighted ?? undefined} showCopy={false} wrap={wrap} className={className === undefined ? DOCS_CODE : `${DOCS_CODE} ${className}`}>
       {code}
     </CodeBlock>
   )
