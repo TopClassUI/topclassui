@@ -13,7 +13,7 @@ function Stage({ placement, delay, closeDelay }: TooltipDesignProps) {
   // An element, not a ref: a popup open on the first render resolves its container before a ref is attached.
   const [root, setRoot] = useState<HTMLDivElement | null>(null)
   return (
-    <div ref={setRoot} data-stage="" className="relative min-h-87 w-full [contain:paint]">
+    <div ref={setRoot} data-stage="" className="relative min-h-67.75 w-full [contain:paint]">
       <div className="absolute inset-0 flex items-center justify-center">
         <TooltipRoot open>
           <TooltipTrigger

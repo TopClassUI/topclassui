@@ -32,7 +32,7 @@ export function TryItControl({ control, value, onChange, description, idBase }: 
     const id = `${labelId}-box`
     return (
       <div className={CHECK_ROW}>
-        <Checkbox id={id} aria-describedby={describedBy} size="sm" checked={value === true} onCheckedChange={(checked) => { onChange(checked) }} />
+        <Checkbox id={id} aria-describedby={describedBy} size="xs" checked={value === true} onCheckedChange={(checked) => { onChange(checked) }} />
         <label htmlFor={id} dir="ltr" className={CHECK_LABEL}>{control.prop}</label>
         <span id={describedBy} className="sr-only">{description}</span>
       </div>
@@ -45,7 +45,7 @@ export function TryItControl({ control, value, onChange, description, idBase }: 
       {control.kind === 'segmented' ? (
         <SegmentedControlRoot
           {...named}
-          size="sm"
+          size="xs"
           fullWidth
           value={String(value ?? control.options[0])}
           onValueChange={(next) => {
@@ -61,7 +61,7 @@ export function TryItControl({ control, value, onChange, description, idBase }: 
       {control.kind === 'select' ? (
         <Select
           {...named}
-          size="sm"
+          size="xs"
           fullWidth
           className="font-mono"
           items={control.options.map((option) => ({ value: String(option), label: String(option) }))}
@@ -75,7 +75,7 @@ export function TryItControl({ control, value, onChange, description, idBase }: 
       {control.kind === 'slider' ? (
         <Slider
           {...named}
-          size="sm"
+          size="xs"
           fullWidth
           showValue
           min={control.min}
@@ -88,7 +88,7 @@ export function TryItControl({ control, value, onChange, description, idBase }: 
       {control.kind === 'number' ? (
         <NumberField
           {...named}
-          size="sm"
+          size="xs"
           fullWidth
           min={control.min ?? undefined}
           max={control.max ?? undefined}

@@ -1,15 +1,14 @@
 import type { CodeBlockDesignProps } from '../index.js'
 import { CodeBlock } from '../index.js'
 
-/** The docs stage: the Try it controls hand their values in as props. One line is long, so wrap shows; 420 px
- * wide, as the frame draws it. */
+/** The docs stage as the frame draws it: three short lines in a 420 px block; the Try it controls hand their values in
+ * as props. The long line that wrap breaks is the long-line and wrap demos'. */
 export default function Demo(props: CodeBlockDesignProps) {
   return (
-    <CodeBlock lang="tsx" title="app/invoices/page.tsx" className="w-full max-w-105" {...props}>
-      {`export default async function Page() {
-  const invoices = await getInvoices({ status: 'overdue', sortBy: 'dueDate', order: 'descending' })
-  return <InvoiceTable items={invoices} />
-}`}
+    <CodeBlock lang="tsx" title="download.tsx" className="w-full max-w-105" {...props}>
+      {`<Button variant="solid" size="md">
+  Download
+</Button>`}
     </CodeBlock>
   )
 }

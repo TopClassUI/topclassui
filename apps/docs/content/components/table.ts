@@ -10,7 +10,7 @@ export const table = {
     'basic', 'sorted', 'sticky-first-column', 'row-actions', 'striped', 'caption', 'column-classes', 'empty',
     'skeleton', 'in-a-layout', 'rtl',
   ],
-  stageHeight: 22,
+  stageHeight: 21,
   controlOrder: ['density', 'variant', 'stickyFirstColumn', 'striped'],
   controlsHidden: ['visibleRows', 'loadMoreThreshold'],
   note: {

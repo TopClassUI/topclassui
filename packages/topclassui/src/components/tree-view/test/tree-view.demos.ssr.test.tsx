@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested (unit-5.md, Demos). */
-const EXPECTED = ['basic', 'load-more', 'long-content', 'playground', 'rtl', 'selected', 'states', 'status', 'ten-thousand']
+const EXPECTED = ['basic', 'load-more', 'long-content', 'playground', 'rtl', 'selected', 'stage', 'states', 'status', 'ten-thousand']
 
 /** Each tree of each demo as the server writes it: its name, a tab stop or not, and the first rows it holds. */
 const TREES: Record<string, string[]> = {
@@ -21,6 +21,7 @@ const TREES: Record<string, string[]> = {
   'playground': ['Files 0: src, app, layout.tsx, page.tsx, components, lib, package.json, README.md'],
   'rtl': ['الملفات 0: المستندات, التقرير السنوي.pdf, الميزانية.xlsx, الصور, ملاحظات.txt'],
   'selected': ['Project 0: app, layout.tsx, page.tsx, docs, next.config.ts'],
+  'stage': ['Files 0: components, button, index.tsx, variants.ts, input'],
   'states': [
     'Source, collapsed 0: src',
     'Source, expanded 0: src, file1, file2',

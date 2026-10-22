@@ -15,7 +15,7 @@ import { countStates } from '../../lib/states'
 import { sampleOf, stagelessOf } from '../../lib/sample'
 import { snippetOf, usageOf } from '../../lib/usage'
 import { withStarts } from '../../scripts/lib/controls'
-import { CARD_PART, CARD_TITLE, CODE_PART, FLAT_CODE, H3, LINK, NOTE, PART_ROW, PREVIEWER, PREVIEWER_HEAD, SMALL, STAGE } from '../classes'
+import { CARD_PART, CODE_PART, FLAT_CODE, H3, NOTE, NOTE_CODE, PART_ROW, PREVIEWER, PREVIEWER_DESCRIPTION, PREVIEWER_HEAD, PREVIEWER_TITLE, PREVIEWER_TITLE_LINK, STAGE } from '../classes'
 import { Code } from '../code'
 import { Demo } from '../demo'
 import { InlineText } from '../inline-text'
@@ -71,7 +71,7 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
   const note = (
     <p className={`flex items-start gap-2 ${NOTE}`}>
       <Svg icon={info} size="0.75rem" className="mt-0.5 shrink-0" aria-hidden="true" />
-      <span><InlineText text={content.note[locale]} /></span>
+      <span className={NOTE_CODE}><InlineText text={content.note[locale]} /></span>
     </p>
   )
   const descriptions = Object.fromEntries(entry.props.flatMap((part) => part.rows.map((row) => [row.name, row.description])))
@@ -85,16 +85,16 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
         <header className={PREVIEWER_HEAD}>
           <div className="grid min-w-0 flex-1 basis-80 gap-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 id={headingId} className={CARD_TITLE}>
-                {href === undefined ? title : <a href={href} className={LINK}>{title}</a>}
+              <h2 id={headingId} className={PREVIEWER_TITLE}>
+                {href === undefined ? title : <a href={href} className={PREVIEWER_TITLE_LINK}>{title}</a>}
               </h2>
-              <Badge tone={CHIP_TONE[entry.rendering]} variant="soft" size="sm" className="font-mono"><bdi>{chipOf(entry, t.chip)}</bdi></Badge>
+              <Badge tone={CHIP_TONE[entry.rendering]} variant="soft" size="xs" className="px-1.75 font-mono font-normal"><bdi>{chipOf(entry, t.chip)}</bdi></Badge>
             </div>
-            <p className={SMALL}><InlineText text={content.description[locale]} /></p>
+            <p className={PREVIEWER_DESCRIPTION}><InlineText text={content.description[locale]} /></p>
           </div>
           <div className="flex flex-wrap items-center gap-2.5">
             <CardModeSwitch label={t.cardMode(title)} names={t.modes} />
-            <Button size="sm" render={<a href={`#${installId}`} />}>
+            <Button size="xs" className="gap-1.5 px-3" render={<a href={`#${installId}`} />}>
               <Svg icon={downloadSimple} size="0.875rem" aria-hidden="true" />
               {t.install}
             </Button>
@@ -139,7 +139,7 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
 
         {statesSource === null ? null : (
           <div className={CARD_PART}>
-            <StatesPart demoKey={`${entry.slug}/states`} heading={t.everyState} counts={counts} sourceCount={countStates(statesSource)} />
+            <StatesPart demoKey={`${entry.slug}/states`} heading={t.everyState} counts={counts} sourceCount={countStates(statesSource)} names={t.stateNames} />
           </div>
         )}
 
