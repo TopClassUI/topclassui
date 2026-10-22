@@ -75,3 +75,13 @@ export function defaultLines(text: string): string[] {
   entries.push(inner.slice(start).trim())
   return entries.map((entry, at) => `${at === 0 ? '{ ' : ''}${entry}${at === entries.length - 1 ? ' }' : ','}`)
 }
+
+/** Each column's fit; when the last one is short, the first long one takes the slack, so short values sit at the end as the frames draw them. */
+export function columnsOf(header: readonly ReactNode[], rows: readonly (readonly ReactNode[])[], head: 'auto' | 'code' = 'auto'): { fit: 'fit' | 'wrap' | 'prose'; fill: boolean }[] {
+  const fits = header.map((cell, column) => {
+    const fit = columnFit(cell, rows.map((cells) => cells[column]), column === header.length - 1)
+    return head === 'code' && fit === 'prose' ? 'wrap' : fit
+  })
+  const slack = fits.at(-1) === 'fit' ? fits.findIndex((fit) => fit !== 'fit') : -1
+  return fits.map((fit, column) => ({ fit, fill: column === slack }))
+}

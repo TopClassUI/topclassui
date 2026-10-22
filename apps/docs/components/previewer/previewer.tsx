@@ -15,7 +15,7 @@ import { countStates } from '../../lib/states'
 import { sampleOf, stagelessOf } from '../../lib/sample'
 import { snippetOf, usageOf } from '../../lib/usage'
 import { withStarts } from '../../scripts/lib/controls'
-import { CARD_PART, CODE_PART, FLAT_CODE, H3, NOTE, NOTE_CODE, PART_ROW, PREVIEWER, PREVIEWER_DESCRIPTION, PREVIEWER_HEAD, PREVIEWER_TITLE, PREVIEWER_TITLE_LINK, STAGE } from '../classes'
+import { CARD_PART, CODE_CAPTION, CODE_PART, FLAT_CODE, H3, NOTE, NOTE_CODE, PART_ROW, PREVIEWER, PREVIEWER_DESCRIPTION, PREVIEWER_HEAD, PREVIEWER_TITLE, PREVIEWER_TITLE_LINK, STAGE } from '../classes'
 import { Code } from '../code'
 import { Demo } from '../demo'
 import { InlineText } from '../inline-text'
@@ -88,7 +88,7 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
               <h2 id={headingId} className={PREVIEWER_TITLE}>
                 {href === undefined ? title : <a href={href} className={PREVIEWER_TITLE_LINK}>{title}</a>}
               </h2>
-              <Badge tone={CHIP_TONE[entry.rendering]} variant="soft" size="xs" className="px-1.75 font-mono font-normal"><bdi>{chipOf(entry, t.chip)}</bdi></Badge>
+              <Badge tone={CHIP_TONE[entry.rendering]} variant="soft" size="xs" className="px-1.75 py-px font-mono font-normal text-[0.625rem]/3"><bdi>{chipOf(entry, t.chip)}</bdi></Badge>
             </div>
             <p className={PREVIEWER_DESCRIPTION}><InlineText text={content.description[locale]} /></p>
           </div>
@@ -116,6 +116,7 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
               restSource={restSource}
               usage={usage}
               note={note}
+              codeCaption={content.codeCaption?.[locale]}
               labels={{ tryIt: t.tryIt, theCode: t.theCode, copyCode: t.copyCode, copy: t.copy, copied: t.copied, copyFailed: t.copyFailed }}
             />
           </div>
@@ -128,7 +129,7 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
             </ModeScope>
             <div className={CODE_PART}>
               <div className={PART_ROW}>
-                <h3 className={H3}>{t.theCode}</h3>
+                <h3 className={content.codeCaption === undefined ? H3 : CODE_CAPTION}>{content.codeCaption?.[locale] ?? t.theCode}</h3>
                 <CopyButton text={restSource} label={t.copyCode} word={t.copy} copied={t.copied} failed={t.copyFailed} />
               </div>
               {restCode}

@@ -57,7 +57,7 @@ export function CopyButton({ text, label, word, copied, failed, className }: Cop
         className={`shrink-0 ${word === undefined ? '' : 'gap-1.5 border-line bg-surface px-2.5'} ${className ?? ''}`}
         onClick={() => { void press() }}
       >
-        <Svg icon={result === 'copied' ? check : copy} size="0.875rem" aria-hidden="true" />
+        <Svg icon={result === 'copied' ? check : copy} size="0.875rem" className={result === 'copied' ? undefined : 'text-muted'} aria-hidden="true" />
         {word === undefined ? null : <span aria-hidden="true">{word}</span>}
       </Button>
       <span role="status" className="sr-only">

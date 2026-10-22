@@ -154,6 +154,8 @@ numbers are the reader's.
 | 15 | Arabic sidebar lacks "Your first component" and MORE | The Arabic sidebar is the English one, translated: one list, two languages |
 | 17 | The Components page is spaced differently from the docs pages | One shell spacing for every docs page, the Components page included |
 | 18 | Chip wording differs by page | One chip, generated (S8) |
+| 19 | Every guide frame marks Components as the navbar's current link | The navbar marks the page's own section (Docs on a guide page, Components on the catalog), so the current link tells the reader where they are |
+| 20 | Accessibility's Automatic and manual table draws its first check name, Contrast, in mono | A frame slip from the How cell beside it: the Check column is labels, so Contrast is plain text like the other five |
 
 ## Rules for all pages
 

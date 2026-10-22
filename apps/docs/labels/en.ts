@@ -244,7 +244,7 @@ export const en: SiteLabels = {
     sectionCount: (n) => (n === 1 ? '1 component' : `${String(n)} components`),
     startHere: 'Start here',
     sectionsHeading: 'Sections',
-    installHeading: 'Before you start',
+    installHeading: 'Install: CLI or package',
   },
   search: {
     button: 'Search',

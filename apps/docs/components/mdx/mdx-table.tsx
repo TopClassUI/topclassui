@@ -3,7 +3,7 @@ import { Table } from 'topclassui/table'
 import { getLabels } from 'topclassui/labels/get-labels'
 
 import type { Locale } from '../../content/pages'
-import { TABLE_ROWS_ALL, columnFit } from '../../lib/table-of'
+import { TABLE_ROWS_ALL, columnsOf } from '../../lib/table-of'
 import { textOf } from '../../lib/text-of'
 import { AUTHORED_CELL, PROSE_COLUMN, PROSE_TABLE } from '../classes'
 
@@ -37,6 +37,7 @@ export function MdxTable({ children, locale, widths = [] }: { children?: ReactNo
     if (part.type === 'tbody') body = rowsOf(part.props.children)
   })
   const items: Row[] = body.map((cells, index) => ({ key: String(index), cells }))
+  const layout = columnsOf(header, body)
   const caption = header.map(textOf).join(', ')
   return (
     <Table
@@ -50,7 +51,7 @@ export function MdxTable({ children, locale, widths = [] }: { children?: ReactNo
         key: String(column),
         header: cell,
         rowHeader: column === 0,
-        className: `${PROSE_COLUMN[columnFit(cell, body.map((cells) => cells[column]), column === header.length - 1)]} ${AUTHORED_CELL} ${widthOf(widths[column])}`,
+        className: `${PROSE_COLUMN[layout[column]?.fit ?? 'prose']} ${AUTHORED_CELL} ${widths.length === 0 && layout[column]?.fill === true ? 'w-full' : widthOf(widths[column])}`,
         cell: (item: Row) => item.cells[column],
       }))}
     />
