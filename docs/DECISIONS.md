@@ -6,6 +6,16 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-22 - Plain code on a dark ground stays neutral-300, softer than the frames' neutral-50
+
+**Decision.** The Shiki pair keeps plain code text at `#d4d4d4` (neutral-300) on the dark ground (`apps/docs/lib/shiki-themes.ts`, from 7fb765f6), where the guide frames draw plain code in base/body (`#fafafa`). The other token colours stay as drawn, and attribute selectors and constants now take the drawn amber and blue.
+
+**Why.** It is the colour the landing work chose on purpose (7fb765f6, "soften code text") for every code block on the site, and the guides share that block; neutral-300 still clears 4.5:1 on the dark page (lib/shiki-contrast.test), and the keywords, strings and attributes stay the brightest marks. Changing it is a site-wide call for Omar, not a guide page's.
+
+**Affects.** Every code block on the site in dark mode. The second Figma audit row "Every guide code block, plain code text colour" (cloud-reports/audit-r12/guides.md, Colors 11) is kept on this entry.
+
+---
+
 ## 2026-10-22 - Right to left keeps the full Arabic plural sample, and a checked fence may show only its drawn lines
 
 **Decision.** "Type, plurals and digits" on the Right to left guide keeps the five-branch `Intl.PluralRules` sample (zero, one, two, few, many and the rest) instead of the frame's one-line ternary (183:1245). Elsewhere a guide fence marked `check` may carry `show="a-b"`: the page shows those lines, dedented, and Copy copies them, while the sample check still compiles the whole fence.

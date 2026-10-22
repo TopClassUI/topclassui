@@ -31,13 +31,15 @@ function themeOf(name: string, palette: Palette): ThemeRegistrationRaw {
       { settings: { foreground: palette.text } },
       { scope: ['comment', 'punctuation.definition.comment'], settings: { foreground: palette.comment } },
       {
-        scope: ['keyword.control', 'keyword.other', 'keyword.operator.new', 'keyword.operator.expression', 'storage', 'variable.language', 'constant.language'],
+        scope: ['keyword.control', 'keyword.other', 'keyword.operator.new', 'keyword.operator.expression', 'storage', 'variable.language', 'constant.language', 'variable.other.constant'],
         settings: { foreground: palette.keyword },
       },
       { scope: ['entity.name.tag', 'support.class.component'], settings: { foreground: palette.tag } },
       { scope: ['string', 'punctuation.definition.string', 'string.template'], settings: { foreground: palette.string } },
       { scope: ['entity.other.attribute-name'], settings: { foreground: palette.attribute } },
       { scope: [...PLAIN_IN_CSS, 'string.unquoted.argument'], settings: { foreground: palette.text } },
+      // An attribute selector's name ([data-theme=...]) is drawn in the attribute colour, after the plain-selector rule above.
+      { scope: ['meta.attribute-selector.css entity.other.attribute-name'], settings: { foreground: palette.attribute } },
     ],
   }
 }
