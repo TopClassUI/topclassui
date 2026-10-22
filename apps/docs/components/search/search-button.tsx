@@ -41,8 +41,8 @@ export function SearchButton({ locale, labels: t }: { locale: Locale; labels: Se
 
   return (
     <>
-      <Button variant="outline" tone="neutral" size="sm" className={SEARCH_TRIGGER} aria-keyshortcuts={mac ? 'Meta+K' : 'Control+K'} data-search-button="" onClick={() => { setOpened(true); setOpen(true) }}>
-        <Svg icon={magnifyingGlass} size="1rem" aria-hidden="true" />
+      <Button variant="outline" tone="neutral" size="xs" className={SEARCH_TRIGGER} aria-keyshortcuts={mac ? 'Meta+K' : 'Control+K'} data-search-button="" onClick={() => { setOpened(true); setOpen(true) }}>
+        <Svg icon={magnifyingGlass} size="0.875rem" aria-hidden="true" />
         <span className="max-md:sr-only">{t.button}</span>
         <kbd aria-hidden="true" dir="ltr" className="font-mono text-xs text-muted max-md:hidden">{mac ? t.shortcut.mac : t.shortcut.pc}</kbd>
       </Button>
