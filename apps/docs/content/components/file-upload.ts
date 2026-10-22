@@ -12,7 +12,7 @@ export const fileUpload = {
   demos: ['basic', 'multiple', 'in-field', 'form', 'rtl'],
   stageHeight: 19.4375,
   controlOrder: ['maxFiles', 'disabled'],
-  controlsHidden: ['visibleRows', 'maxSize'],
+  controlsHidden: ['visibleRows', 'maxSize', 'compact'],
   extraSwitches: ['disabled'],
   note: {
     en: '`maxSize` is in bytes and checked in the browser only: check it again in the action.',
