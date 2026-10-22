@@ -6,7 +6,7 @@ description: انسخ مكوّنًا إلى مشروعك وامتلك ملفه،
 
 ## التهيئة مرة واحدة
 
-يتعرّف <span dir="ltr">`init`</span> على إطار العمل ومدير الحزم، وينسخ الشيفرة المشتركة إلى مجلد واحد، ويضيف سطرين إلى ملف CSS.
+يتعرّف <span dir="ltr">`init`</span> على إطار العمل ومدير الحزم، ثم ينسخ الشيفرة المشتركة ويعدّل ملف CSS.
 
 ```text title="الطرفية"
 $ npx topclassui init
@@ -106,7 +106,7 @@ $ bunx topclassui add select
 
 ## عندما تعدّل ملفًا منسوخًا
 
-لا يكتب <span dir="ltr">`add`</span> فوق تعديلاتك أبدًا. يعرض <span dir="ltr">`diff`</span> ما تغيّر ويخرج بالرمز 1 إذا وُجد أي اختلاف؛ والخيار <span dir="ltr">`--overwrite`</span> يستبدل الملف ويطبع الفرق أولًا.
+لا يكتب <span dir="ltr">`add`</span> فوق تعديلاتك أبدًا. يعرض <span dir="ltr">`diff`</span> ما تغيّر؛ و<span dir="ltr">`--overwrite`</span> يستبدل الملف ويطبع الفرق أولًا.
 
 ```text title="الطرفية"
 $ npx topclassui diff select
@@ -117,11 +117,11 @@ select: 1 of 20 files differ
 $ npx topclassui add select --overwrite
 ```
 
-بعد تحديث الحزمة، يكتب <span dir="ltr">`add --update`</span> الإصدار الجديد من كل ملف لم تلمسه.
+يخرج <span dir="ltr">`diff`</span> بالرمز 1 إذا وُجد أي اختلاف. وبعد تحديث الحزمة، يكتب <span dir="ltr">`add --update`</span> الإصدار الجديد من كل ملف لم تلمسه.
 
 ## التشغيل بلا أسئلة
 
-```bash title="الطرفية"
+```bash title="شيفرة"
 npx topclassui init --yes                # يقبل كل القيم الافتراضية
 npx topclassui add button --yes
 npx topclassui add button --dry-run      # يطبع ما سيكتبه ولا يكتب شيئًا
@@ -144,7 +144,7 @@ npx topclassui add button --dry-run      # يطبع ما سيكتبه ولا ي�
 ## ما لا يفعله أبدًا
 
 <Cards columns={3}>
-  <Card title="لا قياس عن بُعد">لا يرسل شيئًا. الملفات تأتي من الحزمة التي ثبّتّها، والتنزيل الوحيد هو التثبيت الذي يشغّله، والخيار <span dir="ltr">`--no-install`</span> يوقفه.</Card>
-  <Card title="لا شيء خارج ملفاته">يكتب المجلد <span dir="ltr">`topclassui/`</span> والملف <span dir="ltr">`topclassui.json`</span>، ويضيف سطرين إلى ملف CSS الذي تسمّيه. أما التخطيط فيبقى لك.</Card>
-  <Card title="لا كتابة فوق ملفاتك بصمت">الملف الذي عدّلته يُترك كما هو ما لم تمرّر <span dir="ltr">`--overwrite`</span>، وحتى عندها يُطبع الفرق أولًا.</Card>
+  <Card title="لا قياس عن بُعد">لا يرسل شيئًا. التنزيل الوحيد هو التثبيت الذي يشغّله.</Card>
+  <Card title="لا شيء خارج ملفاته">يكتب مجلده و<span dir="ltr">topclassui.json</span>، وسطرين في ملف CSS.</Card>
+  <Card title="لا كتابة فوق ملفاتك بصمت">الملف الذي عدّلته يُترك كما هو ما لم تمرّر <span dir="ltr">--overwrite</span>، وعندها يُطبع الفرق أولًا.</Card>
 </Cards>

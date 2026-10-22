@@ -6,7 +6,7 @@ description: Copy a component into your project and own the file.
 
 ## Initialise once
 
-`init` detects your framework and package manager, copies the shared code into one folder and adds two lines to your CSS entry.
+`init` detects your framework and package manager, then copies the shared code and edits your CSS.
 
 ```text title="terminal"
 $ npx topclassui init
@@ -106,7 +106,7 @@ Written by `init` and read by `add` and `diff`. `lock` records each copied file 
 
 ## When you have edited a copied file
 
-`add` never overwrites your edits. `diff` shows what changed and exits with 1 when anything differs; `--overwrite` replaces the file and prints the diff first.
+`add` never overwrites your edits. `diff` shows what changed; `--overwrite` replaces the file and prints the diff first.
 
 ```text title="terminal"
 $ npx topclassui diff select
@@ -117,11 +117,11 @@ select: 1 of 20 files differ
 $ npx topclassui add select --overwrite
 ```
 
-After you update the package, `add --update` writes the new version of every file you have not touched.
+`diff` exits with 1 when anything differs. After you update the package, `add --update` writes the new version of every file you have not touched.
 
 ## Running without prompts
 
-```bash title="terminal"
+```bash title="code"
 npx topclassui init --yes                # accept every default
 npx topclassui add button --yes
 npx topclassui add button --dry-run      # print what would be written, write nothing
@@ -144,7 +144,7 @@ Every command also takes `--cwd <dir>` for a project outside the current folder.
 ## What it never does
 
 <Cards columns={3}>
-  <Card title="No telemetry">It sends nothing. The files come from the package you installed; the only download is the install it runs, and `--no-install` turns that off.</Card>
-  <Card title="Nothing outside its own files">It writes the `topclassui/` folder and `topclassui.json`, and adds two lines to the CSS entry you name. Your layout stays yours.</Card>
-  <Card title="No silent overwrite">A file you have edited is left alone unless you pass `--overwrite`, and even then the diff prints first.</Card>
+  <Card title="No telemetry">It sends nothing. The only download is the install it runs.</Card>
+  <Card title="Nothing outside its own files">It writes its own folder and topclassui.json, and two lines in your CSS entry.</Card>
+  <Card title="No silent overwrite">A file you edited is left alone unless you pass <span dir="ltr">--overwrite</span>, and then the diff prints first.</Card>
 </Cards>
