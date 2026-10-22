@@ -103,3 +103,29 @@ Shared means job 150's (fix/r11-card-shell). Library means a component or prop c
 | empty-state | 5 card chrome | shared |
 
 Refuted rows (the audit's own list) are not acted on.
+
+### Job 142 audit status (cloud-reports/audit-r11/job-142-display.md: button, tag, kbd, badge)
+
+| Row | Status |
+|---|---|
+| button 1 chip beside the name | shared (job 150: previewer.tsx:89) |
+| button 2 Try it select | shared (job 140 94f50361 Try it look; the rest job 150) |
+| button 3 note under the code | shared (job 150: inline-text.tsx, previewer.tsx:72) |
+| button 4 install row copy fields | shared (job 140 Then-import field in 2d778e56; copy-button size job 150) |
+| button 5 card corner and shadow | shared (job 150: classes.ts:129) |
+| button 6 Install button | shared (job 150: previewer.tsx:95) |
+| button 7 description | fixed (1456cb22) |
+| button 8 Try it checkboxes | shared (job 140 94f50361; try-it-control.tsx, job 150) |
+| button 9 code part Copy button | shared (job 150: copy-button.tsx) |
+| button 10 Every state captions | shared (job 150: classes.ts:210) |
+| tag 1 stage at rest | fixed (8cdbafdd: dummy/stage.tsx, stageDemo stage, stageHeight 19.4375) |
+| tag 2 Try it panel | kept, library need for Omar: Tag has no disabled prop, removable needs a client playground, variant and truncate not built |
+| tag 3 Every state hover and active | fixed (8cdbafdd: cn() in states.tsx) |
+| kbd 1 Try it panel | kept, library need for Omar: kbd/schema.ts (pressed, disabled) and a playground |
+| kbd 2 stage at rest | fixed (52897785: dummy/stage.tsx Ctrl Shift K) |
+| kbd 3 stage height | fixed (52897785: stageHeight 15.625) |
+| kbd 4 disabled cell | kept, library need for Omar: index.tsx:14 keeps 4.5:1 text; fade to 50% or correct the DECISIONS Kbd bullet |
+| badge 1 stage rows gaps | fixed (f865c3b3: tones.tsx gap-2.5 and gap-2) |
+| badge 2 stage row height | fixed (f865c3b3: stageHeight 19.4375) |
+| badge 3 description | fixed (f865c3b3) |
+| 148: tag/dummy/link.tsx bare chip cut with no ellipsis | open, question to the lead: the bare chip is deliberate (tag.demos.ssr.test "leaves the other bare, so the e2e page measures both"; e2e/tag.spec expects 'clipped'); fixing the demo means moving that measured case to an e2e fixture |
