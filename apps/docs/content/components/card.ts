@@ -7,8 +7,11 @@ export const card = {
     ar: 'سطح لمحتوى يجمعه موضوع واحد، باستدارة أكبر من استدارة عنصر التحكم كي لا تبدو البطاقة زرًا أبدًا.',
   },
   demos: ['basic', 'with-actions', 'report', 'paragraphs', 'grid', 'skeleton', 'rtl'],
-  stageHeight: 12,
+  stageHeight: 15.625,
   stageDemo: 'basic',
+  controlOrder: ['interactive', 'media', 'footer'],
+  extraSwitches: ['interactive', 'media', 'footer'],
+  starts: { footer: true },
   note: {
     en: 'Card sets the type of its title and leaves the heading level to you: put the h2 or h3 inside CardHeader.',
     ar: 'تحدد البطاقة خط عنوانها وتترك لك مستوى العنوان: ضع h2 أو h3 داخل CardHeader.',

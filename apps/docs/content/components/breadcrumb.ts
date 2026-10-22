@@ -10,8 +10,9 @@ export const breadcrumb = {
     ar: 'موقع الصفحة في الموقع، بروابط حقيقية ودون JavaScript. والمسار نفسه يُكتب BreadcrumbList بصيغة JSON-LD.',
   },
   demos: ['basic', 'all-links', 'long-trail', 'long-label', 'mixed-label', 'deep-trail', 'rtl'],
-  stageHeight: 3,
+  stageHeight: 15.625,
   stageDemo: 'basic',
+  controlOrder: ['maxItems', 'showHome'],
   note: {
     en: 'Leave href off the last item: it becomes the current page, and the linked items also emit the BreadcrumbList JSON-LD.',
     ar: 'اترك href عن العنصر الأخير ليصبح الصفحة الحالية. العناصر ذات الروابط تُكتب أيضًا في BreadcrumbList بصيغة JSON-LD.',

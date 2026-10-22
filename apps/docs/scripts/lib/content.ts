@@ -25,7 +25,7 @@ export const contentSchema = z.strictObject({
   stageOpen: z.boolean().optional(),
   /** The demo THE CODE shows at rest when the frame's code is another sample than the stage it draws. */
   codeDemo: z.string().min(1).optional(),
-  /** Boolean props the schema leaves to the element (a native `disabled`) that Try it still offers, as the frame draws them. */
+  /** Booleans the schema does not hold that Try it still offers, as the frame draws them: a native `disabled`, or a part the playground adds (Card's footer). */
   extraSwitches: z.array(z.string().regex(/^[a-z][A-Za-z]*$/)).optional(),
   /** Props Try it lists first, in the frame's order; the rest follow in the schema's. */
   /** Where Try it starts a prop the playground sets in its body rather than its signature, so the control shows what the stage draws. */

@@ -87,11 +87,23 @@ test('every Navigation code block shows the rewritten imports, never a path into
   }
 })
 
-test('Breadcrumb has no Try it: its stage is the basic demo across the row', async ({ page }) => {
+test('Breadcrumb: Try it folds the trail with maxItems and drops the house with showHome', async ({ page }) => {
+  const errors = collectErrors(page)
   await page.goto('/en/docs/components/breadcrumb')
   const breadcrumb = card(page, 'breadcrumb')
-  await expect(breadcrumb.getByRole('heading', { name: 'Try it' })).toHaveCount(0)
-  await expect(breadcrumb.getByRole('navigation').first()).toBeVisible()
+  const trail = breadcrumb.getByRole('navigation').first()
+  // Try it starts where the frame does: maxItems 4, showHome on, the four crumbs whole.
+  await expect(breadcrumb.getByRole('combobox', { name: 'maxItems' })).toHaveText('4')
+  await expect(breadcrumb.getByRole('checkbox', { name: 'showHome' })).toBeChecked()
+  await expect(trail.locator('li')).toHaveCount(4)
+  await breadcrumb.getByRole('combobox', { name: 'maxItems' }).click()
+  await page.getByRole('option', { name: '2', exact: true }).click()
+  await expect(trail.locator('li')).toHaveCount(3)
+  await expect(trail.locator('li[aria-hidden="true"]')).toHaveCount(1)
+  await expect(breadcrumb.locator('pre').first()).toContainText('maxItems={2}')
+  await breadcrumb.getByRole('checkbox', { name: 'showHome' }).click()
+  await expect(trail.getByRole('link', { name: 'Home' })).toHaveText('Home')
+  expect(errors).toEqual([])
 })
 
 test('Navbar: the playground drives sticky on the bar and current on its link, and the code', async ({ page }) => {
