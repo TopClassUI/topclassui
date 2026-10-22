@@ -25,6 +25,7 @@ const AFTER: Record<string, string[]> = {
   'rtl': ['مدى الحياة'],
   'sizes': ['Off', 'Off', 'Off', 'Off', 'Off'],
   'combined': ['Invalid', 'Disabled, checked', 'Live', 'Read-only, checked'],
+  'stage': ['Lifetime'],
   'states': ['', '', '', '', ''],
 }
 

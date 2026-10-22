@@ -38,7 +38,7 @@ export function CardModeSwitch({ label, names }: CardModeSwitchProps) {
       onValueChange={(value) => { if (isMode(value)) setMode(value) }}
     >
       {MODES.map((item) => (
-        <SegmentedControlItem key={item} value={item} icon={<Svg icon={ICONS[item]} size="1rem" />}>
+        <SegmentedControlItem key={item} value={item} icon={<Svg icon={ICONS[item]} size="0.875rem" />}>
           {names[item]}
         </SegmentedControlItem>
       ))}
