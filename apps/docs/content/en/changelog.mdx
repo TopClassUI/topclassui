@@ -6,33 +6,10 @@ description: Every release of TopClass UI, newest first, with what changed in it
 
 <Releases />
 
-## How an entry is written
-
-Every change comes with a short note. At release time those notes are collected, the version is bumped and this page is written from them.
-
-```md title=".changeset/dialog-body.md"
----
-"topclassui": minor
----
-
-Add `DialogBody` as the scroll container. `DialogTitle` and `DialogFooter`
-now stay fixed while the body scrolls, per the scroll policy.
-```
-
-## Version policy
-
-TopClass UI follows semantic versioning. One package, one version number. A peer dependency range only widens in a minor release, never narrows.
-
 ## Breaking changes
 
 A breaking change means a major version bump, marked in the entry with migration steps. Before 1.0 a minor release may contain one.
 
-An entry with a breaking change looks like this:
+## Version policy
 
-```md title="CHANGELOG.md"
-## 0.4.0
-
-### Breaking
-
-- `Card` is now `CardRoot`. Find and replace; nothing else changed.
-```
+TopClass UI follows semantic versioning. One package, one version number. A peer dependency range only widens in a minor release, never narrows.

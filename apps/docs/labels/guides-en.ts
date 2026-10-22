@@ -4,7 +4,7 @@ export const guidesEn: GuideLabels = {
   tokens: {
     swatch: 'Swatch',
     modes: { light: 'Light', dark: 'Dark', ocean: 'Ocean' },
-    mix: (percent, of) => `${String(percent)}% ${of} into the page`,
+    mix: (percent) => `${String(percent)}% into the page`,
     contrast: (ratio, min) => `${ratio.toFixed(2)}:1, needs ${String(min)}:1`,
     notMeasured: 'Not measured: a surface or a decorative line',
   },
@@ -33,6 +33,7 @@ export const guidesEn: GuideLabels = {
     copy: (name) => `Copy the code for ${name}`,
     copied: (code) => `Copied ${code}`,
     failed: 'The browser did not allow copying. Select the name and copy it instead.',
+    clear: 'Clear the search',
   },
   island: {
     page: 'In the page mode',

@@ -3,7 +3,7 @@ import { isValidElement, type ReactNode } from 'react'
 import type { Locale } from '../../content/pages'
 import { labelsFor } from '../../labels/index'
 import { highlight } from '../../lib/highlight'
-import { parseMeta } from '../../lib/text-of'
+import { parseMeta, shownOf } from '../../lib/text-of'
 import { CodeFrame } from './code-frame'
 
 interface CodeProps {
@@ -46,7 +46,8 @@ export function fenceOf(children: ReactNode): { code: string; lang: string | und
 
 /** A fenced block: CodeBlock with Shiki's colours from build time, named by its file, its language or "code" (docs-site S3). */
 export async function CodeFence({ children, locale, terminal, title, repeat, copy = true, wrap = false, className }: CodeFenceProps) {
-  const { code, lang, meta, repeat: count } = fenceOf(children)
+  const { code: whole, lang, meta, repeat: count } = fenceOf(children)
+  const code = shownOf(whole, meta)
   const named = title ?? parseMeta(meta).title ?? (lang === undefined ? labelsFor(locale).blocks.code : SHELL.has(lang) ? terminal : lang)
   const highlighted = await highlight(code, lang)
   return (
