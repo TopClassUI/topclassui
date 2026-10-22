@@ -16,6 +16,8 @@ The format is: date, decision, why, and what it affects.
 
 **Affects.** `apps/docs` only. Unused JavaScript (23 KiB) stays: it is React DOM's client build (module of 200,697 bytes raw, 63,185 gzipped, in the same 72 KB chunk), code paths a first load does not reach, and a page cannot hydrate without it.
 
+**The long tasks in that chunk stay too.** A CPU profile at 4x slowdown shows the first is Next's start: compiling and running React DOM and the router, and decoding the page's RSC payload. The second is the commit of the page's hydration under the provider island: React walking every fiber of the page (about a third), and the motion watcher's style and layout reads (more than half on `/en`), which is the Forced reflow item. Making the provider's `Intl.NumberFormat` lazy took 31 ms of ICU start-up out of the provider's idle task (116 to 73 ms at 4x on `/en`), but Lighthouse listed the same long tasks before and after, and `pnpm size` grew every client half by about 40 bytes, so it was not kept.
+
 ---
 
 ## 2026-10-22 - Plain code on a dark ground stays neutral-300, softer than the frames' neutral-50
