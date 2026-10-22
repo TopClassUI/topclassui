@@ -137,7 +137,16 @@ for (const slug of SLUGS) {
         }
         // Command's example opens its palette from a plain button, so the palette itself is the proof.
         if (slug === 'command') await expect(page.locator(POPUP.command), name ?? String(index)).toBeVisible()
-        else await expect(trigger, name ?? String(index)).toHaveAttribute('data-popup-open', '')
+        else if (slug === 'tooltip') {
+          // A late island or the stage's held-open tooltip shares the delay group and can close this one, so the hover is given again until it holds.
+          await expect(async () => {
+            if ((await trigger.getAttribute('data-popup-open')) === null) {
+              await page.mouse.move(0, 0)
+              await drive(slug, trigger)
+            }
+            await expect(trigger).toHaveAttribute('data-popup-open', '', { timeout: 2000 })
+          }, name ?? String(index)).toPass({ timeout: 20_000 })
+        } else await expect(trigger, name ?? String(index)).toHaveAttribute('data-popup-open', '')
         await page.keyboard.press('Escape')
         if (slug === 'command') await expect(page.locator(POPUP.command)).toHaveCount(0)
         else await expect(trigger, name ?? String(index)).not.toHaveAttribute('data-popup-open')
