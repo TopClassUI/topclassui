@@ -1583,3 +1583,11 @@ The second audit proposed about ninety more. They were declined and listed at th
 **Why.** The CLI plan (K1) ships the component sources once, as the registry JSON in `dist/registry/`, so `npx topclassui add` reads its own installed version with no network; the registry is 1.48 MB unpacked (one item per component with its demos, one base item for `shared/` and `icons/`). The 1.3 MB budget was written for the components-only tarball of release R5.
 
 **Affects.** `pack-checks.ts`, its test, and every later release: a tarball over 3.05 MB needs a new entry here, not a bigger number.
+
+## 2026-10-22 - Under Arabic, --tc-font-sans is the Arabic stack
+
+**Decision.** `src/tokens.css` adds an unlayered `[lang|='ar'] { --tc-font-sans: var(--tc-font-arabic); }` after the `:root` knobs, so `font-sans` (and so Tailwind's `--font-sans`) names the Arabic stack wherever `lang="ar"` is written, on the page or on an island. The `font-family` rule on `[lang|='ar']` stays as it was. The docs site's `--tc-font-arabic` lists Inter after Noto Sans Arabic, so a Latin word inside Arabic text keeps the Latin face.
+
+**Why.** topclassui.com computed Inter on the body, h1 and p of every `/ar` page while `<html>` computed Noto Sans Arabic: the body carries `font-sans`, which read the Latin stack and overrode the inherited Arabic one, and Inter has no Arabic letters, so Arabic fell to a system font. The rule must be unlayered: a layered one loses to the unlayered `:root` value (R-4-1 allows unlayered custom properties). There is no cycle, because `--tc-font-arabic` is a literal list, never `var(--tc-font-sans)`.
+
+**Affects.** `src/tokens.css`, `src/tokens-lang.test.ts`, `e2e/shared-arabic-font.spec.ts`, the docs site's `app/globals.css` and `e2e/site.spec.ts`. A consumer who sets `--tc-font-sans` on `:root` keeps it for Latin and gets `--tc-font-arabic` under Arabic.
