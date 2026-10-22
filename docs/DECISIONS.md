@@ -6,6 +6,47 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-22 - globals.css leads the head, and /ar preloads its two Noto Sans Arabic faces itself
+
+**Decision.** Two changes to what the first paint waits for, in `apps/docs` only.
+- `app/(site)/[locale]/layout.tsx` imports `globals.css` first, so its `<link>` comes before next/font's on every page, the order the preview layout already had. Both files and their bytes are unchanged.
+- On `/ar` only, the layout adds an inline script after `ThemeScript` (`lib/arabic-preload.ts`). It runs once the stylesheets have loaded and before the first layout, finds the Noto Sans Arabic `@font-face` rules whose `unicode-range` holds an Arabic alef or a Latin a, and adds a `<link rel="preload" as="font">` for each file: the Arabic one (162.7 KB sent) and the Latin one (31.1 KB). `lib/fonts.ts` keeps `preload: false`, since next/font preloads per layout file and one layout serves both locales, so `/en` still never fetches the font. This is the "preloading Noto Sans Arabic on `/ar` only" left for Omar in the 2026-10-18 islands entry. It reads PLAN 14's "primary font instance and subset" per locale: on `/ar` the primary face is Noto Sans Arabic.
+
+**Why.** Lighthouse's simulated load (Lantern) builds FCP from the HTML, every request the browser marked VeryHigh that ended before the observed first paint, and the first parse, layout and paint tasks. A font found through the CSS is requested at VeryHigh; a preloaded one at High.
+- On `/ar` the two Noto files ended before the observed first paint, because `display: optional` holds text up to 100 ms, so Lantern charged all 194 KB to FCP: its render-blocking item put the savings at 1,250 ms, against 300 on `/en`. A real first paint never waited for those bytes past the 100 ms. Preloaded, the same two files are High and leave the FCP estimate. Re-simulating the two traces as HTTP/2 (what Vercel serves) gives FCP 2,104 against 1,203 ms, so this part should reach PageSpeed.
+- Over HTTP/1.1 (`next start`) the first stylesheet requested reuses the connection the HTML warmed, and the second opens a new one. next/font's 3 KB file came first, so the 27 KB `globals.css` paid two extra round trips: 455 ms in the render-blocking item, against 306 ms for each file now. Over HTTP/2 Lantern sends the requests one after another on one connection, and the order makes no difference: re-simulated as h2, the `/en` traces of both builds end the stylesheets 150 ms after the HTML. This part is a gain on the local measure and for HTTP/1.1 clients, and should not move PageSpeed.
+
+**Measured.** `measure.sh` (Lighthouse 12.8.2, mobile, simulated), the median of 5 interleaved runs each against merged main c577d9de. Two pairs of runs: the stylesheet order alone, then both changes.
+
+| Page | Build | Performance | FCP | SI | LCP | CLS |
+| --- | --- | --- | --- | --- | --- | --- |
+| `/en` | main, first pair | 94 | 1.36 s | 1.36 s | 3.12 s | 0 |
+| `/en` | stylesheet order | 94 | 1.21 s | 1.31 s | 3.12 s | 0 |
+| `/en` | main, second pair | 94 | 1.36 s | 1.36 s | 3.12 s | 0 |
+| `/en` | both changes | 93 | 1.21 s | 1.32 s | 3.13 s | 0 |
+| `/ar` | main, first pair | 79 | 2.41 s | 3.02 s | 4.81 s | 0 |
+| `/ar` | stylesheet order | 78 | 2.42 s | 3.07 s | 4.22 s | 0 |
+| `/ar` | main, second pair | 79 | 2.41 s | 2.99 s | 4.81 s | 0 |
+| `/ar` | both changes | 82 | 1.21 s | 2.69 s | 4.21 s | 0 |
+| `/en/docs/components` | main, second pair | 82 | 2.41 s | 2.41 s | 4.06 s | 0 |
+| `/en/docs/components` | both changes | 84 | 2.26 s | 2.26 s | 3.99 s | 0 |
+
+FCP moved the same way in every run: `/en` 1,357 to 1,361 ms on main, 1,207 to 1,213 on the branch; `/ar` 2,409 to 2,416 on main, 1,208 to 1,212 on the branch but for one run at 1,450. On `/ar` the stylesheet order alone does nothing, because the Noto files waited for next/font's stylesheet, which now ends later; with the preload it gains there too. SI and LCP swing with the observed first paint (below).
+
+**What changes on screen.** Nothing once the font is cached: screenshots at 412 and 1280 px of `/en`, `/ar` and `/ar/docs/components/button` match main pixel for pixel, but for a few header pixels (the search button on a phone, the lower edge of the mode switch at 1280 px) that also differ between two loads of main. On a first visit with an empty cache, `/ar` now shows Noto Sans Arabic where main showed the fallback stack: even on localhost, main requested the font only at the first layout and missed `optional`'s block period, so the whole first view stayed in Arial and the system Arabic face. On a slow connection the first view still shows the fallback, as before.
+
+**Not kept.**
+- Geist Mono without its preload: requested from the CSS it is VeryHigh and ends before the first paint, so Lantern charges it to FCP: `/en` 1.52 s against 1.21 s with the preload, `/ar` 1.52 against 1.21, the catalog 2.56 against 2.26 with CLS 0.002. The preload stays (db7313a7, for the header's Ctrl K).
+- Fewer or ranged weights: Google sends the same variable file for `wght@400..600` as for `400;500;600` (Inter 48,256 bytes, Geist Mono 23,128, Noto Sans Arabic 165,960 and 31,416), so no weight change saves a byte.
+- `fetchPriority` on the font preloads: next/font has no option for it, and a font preloaded at High already sits outside Lantern's FCP estimate; a lower priority only lets it land after the first paint.
+- Home's first frame lays out twice as its `content-visibility: auto` sections near the screen unlock (384 then 423 objects, 11 ms of style and 38 ms of layout locally). Without `content-visibility` it is one pass of 1,551 objects, 17 ms and 47 ms, so the skipping already pays; the reveal timeline adds two passes of under 1 ms.
+
+**Measuring on this laptop.** `measure.sh` as given writes Lighthouse's JSON to `/tmp/...` (Git Bash's name for `%TEMP%`), which Node on Windows reads as `C:\tmp`, so every run failed and it printed "no runs"; these numbers come from a copy whose only change is the folder path written as `C:/Users/...`. In many of this afternoon's loads the renderer got about one frame a second for the first two seconds (traced: BeginFrame at 1 Hz, then 240 Hz), so a page whose first frame is not contentful (Arabic text held by `optional`) shows its first paint at about 1.25 s: `/ar` did on both sides in most runs, and `/en` on main in some. That inflates the observed first paint, SI and LCP on both sides alike; FCP is computed from the request graph and stays steady.
+
+**Affects.** `apps/docs/app/(site)/[locale]/layout.tsx`, `apps/docs/lib/arabic-preload.ts` and its test, and the comment in `lib/fonts.ts`. Every `/ar` page's HTML grows by about 2.4 KB raw (the script, once in the head and once in the RSC payload).
+
+---
+
 ## 2026-10-22 - Only main creates a Vercel deployment
 
 **Decision.** `apps/docs/vercel.json` sets `git.deploymentEnabled` to `{ "**": false, "main": true }`: a push to any branch but `main` creates no deployment.
