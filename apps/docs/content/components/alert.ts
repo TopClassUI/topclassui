@@ -3,15 +3,16 @@ export const alert = {
   slug: 'alert',
   title: { en: 'Alert', ar: 'تنبيه' },
   description: {
-    en: 'A message that belongs to the page, in six tones. Info, success, warning and danger each draw their own icon, so it reads without colour.',
-    ar: 'رسالة تنتمي إلى الصفحة، بست نبرات. لكلٍّ من المعلومة والنجاح والتحذير والخطر أيقونتها الخاصة، فتُقرأ الرسالة دون الاعتماد على اللون.',
+    en: 'Four tones, each with its own icon, so the message reads without relying on colour.',
+    ar: 'أربع نبرات، لكلٍّ منها أيقونتها، فتُقرأ الرسالة دون الاعتماد على اللون.',
   },
   note: {
-    en: 'Not a live region: it is page content. Pass role="alert" when it appears after load, or announce the event with Toast.',
-    ar: 'ليس منطقة حية: إنه جزء من محتوى الصفحة. مرّر role="alert" إذا ظهر بعد التحميل، أو أعلن الحدث بإشعار.',
+    en: 'Not a live region: page content. Announce what just happened with Toast instead.',
+    ar: 'ليس منطقة حية: إنه محتوى الصفحة. أعلن ما حدث للتو بإشعار بدلًا منه.',
   },
   demos: ['basic', 'tones', 'variants', 'with-actions', 'minimal', 'rich-content', 'custom-icon', 'live-region', 'long-text', 'rtl'],
-  stageHeight: 8,
+  stageHeight: 17.875,
+  stageDemo: 'stage',
   controlOrder: ['tone', 'variant'],
   notes: {
     en: [
