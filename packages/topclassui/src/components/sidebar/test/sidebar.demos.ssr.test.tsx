@@ -11,7 +11,7 @@ const DUMMY = join(import.meta.dirname, '..', 'dummy')
 const files = readdirSync(DUMMY).filter((f) => f.endsWith('.tsx')).map((f) => f.slice(0, -4)).sort()
 
 /** Named, or readdirSync shrinks the loop with the folder and a deleted demo is untested. */
-const EXPECTED = ['basic', 'collapsed', 'controlled', 'groups', 'in-a-layout', 'long-list', 'playground', 'rtl', 'states']
+const EXPECTED = ['basic', 'collapsed', 'controlled', 'groups', 'in-a-layout', 'long-list', 'playground', 'rtl', 'stage', 'states']
 
 /** What each demo holds: its rails, its links, its lists that have a name, the rows that are the current page, and its title. */
 const SHOWS: Record<string, { rails: number, links: number, named: number, current: string[], title: string }> = {
@@ -24,6 +24,8 @@ const SHOWS: Record<string, { rails: number, links: number, named: number, curre
   // The Try it rail, with nothing passed: Home is current, as the frame's stage draws it, until the reader turns it off.
   'playground': { rails: 1, links: 4, named: 0, current: ['Home'], title: 'Workspace' },
   'rtl': { rails: 1, links: 4, named: 1, current: ['الرئيسية'], title: 'مساحة العمل' },
+  // The frame's stage: a 190 px card rail, Home current.
+  'stage': { rails: 1, links: 4, named: 0, current: ['Home'], title: 'Workspace' },
   'states': { rails: 5, links: 20, named: 0, current: ['Home', 'Home', 'Home', 'Home', 'Home'], title: 'Workspace' },
 }
 
@@ -99,7 +101,7 @@ describe('what the demos show', () => {
     }
     expect(found).toEqual({
       'basic': ['open'], 'collapsed': ['closed'], 'controlled': ['open'], 'groups': ['open'], 'in-a-layout': ['open'],
-      'long-list': ['open'], 'playground': ['open'], 'rtl': ['open'], 'states': ['open', 'closed', 'open', 'open', 'open'],
+      'long-list': ['open'], 'playground': ['open'], 'rtl': ['open'], 'stage': ['open'], 'states': ['open', 'closed', 'open', 'open', 'open'],
     })
   })
 
@@ -111,6 +113,8 @@ describe('what the demos show', () => {
       'in-a-layout': 'flex h-[calc(100dvh-4rem)]', 'long-list': 'h-[calc(100dvh-4rem)]',
       // The Try it rail is as tall as its four links, as the frame's stage draws it: no parent of its own.
       'playground': '', 'rtl': 'h-96',
+      // The frame's stage card is as tall as its links, so it needs no parent height either.
+      'stage': '',
       // The states strip: each rail as tall as its four links, as the frame draws it, so its body has nothing to scroll.
       'states': 'flex flex-wrap items-start gap-6',
     })
