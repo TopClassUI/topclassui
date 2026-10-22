@@ -3,12 +3,12 @@ export const avatar = {
   slug: 'avatar',
   title: { en: 'Avatar', ar: 'صورة رمزية' },
   description: {
-    en: 'A picture, initials or an icon in a circle, on the same five sizes as every control so an avatar and a button line up.',
-    ar: 'صورة أو أحرف أولى أو أيقونة داخل دائرة، بالأحجام الخمسة نفسها لكل عنصر تحكم، فتصطف الصورة الرمزية مع الزر في الصف نفسه.',
+    en: 'Image, initials or an icon, on the same five sizes as every control so rows line up.',
+    ar: 'صورة أو أحرف أولى أو أيقونة، بالأحجام الخمسة نفسها لكل عنصر تحكم فتصطف الصفوف.',
   },
   demos: ['basic', 'with-name', 'sizes', 'icon', 'failed', 'skeleton', 'custom-size', 'rtl'],
-  stageHeight: 15.5,
-  stageDemo: 'basic',
+  stageHeight: 15.625,
+  stageDemo: 'stage',
   note: {
     en: 'The fallback shows while the picture loads and after it fails; initials are its children.',
     ar: 'يظهر البديل أثناء تحميل الصورة وبعد فشلها؛ والأحرف الأولى هي محتواه.',

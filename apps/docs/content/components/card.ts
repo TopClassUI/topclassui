@@ -3,11 +3,11 @@ export const card = {
   slug: 'card',
   title: { en: 'Card', ar: 'بطاقة' },
   description: {
-    en: 'A surface for content that belongs together, with a larger radius than a control so it never reads as a button.',
-    ar: 'سطح لمحتوى يجمعه موضوع واحد، باستدارة أكبر من استدارة عنصر التحكم كي لا تبدو البطاقة زرًا أبدًا.',
+    en: 'A surface with a larger radius than a control, so it never reads as a button.',
+    ar: 'سطح باستدارة أكبر من عنصر التحكم، فلا يبدو زرًا أبدًا.',
   },
   demos: ['basic', 'with-actions', 'report', 'paragraphs', 'grid', 'skeleton', 'rtl'],
-  stageHeight: 15.5,
+  stageHeight: 15.625,
   stageDemo: 'basic',
   codeDemo: 'report',
   note: {

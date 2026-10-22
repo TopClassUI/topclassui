@@ -4,8 +4,8 @@ import { Skeleton } from '../index.js'
 export default function Demo() {
   return (
     <div className="flex flex-wrap items-center gap-6">
-      <div role="group" aria-label="text" className="w-28"><Skeleton variant="text" rows={2} /></div>
-      <div role="group" aria-label="circle"><Skeleton variant="circle" /></div>
+      <div role="group" aria-label="text" className="w-27.5 text-[0.6667rem]/[0.875rem]"><Skeleton variant="text" rows={2} /></div>
+      <div role="group" aria-label="circle"><Skeleton variant="circle" className="size-9" /></div>
       <div role="group" aria-label="rect" className="w-28"><Skeleton variant="rect" /></div>
       <div role="group" aria-label="card" className="w-28"><Skeleton variant="card" /></div>
     </div>
