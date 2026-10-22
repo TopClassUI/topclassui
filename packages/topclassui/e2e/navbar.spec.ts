@@ -2,7 +2,7 @@ import AxeBuilder from '@axe-core/playwright'
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
 import { DIRECTIONS, type Direction, MODES } from '../scripts/lib/harness.js'
-import { type LiveOptions, expectNoSidewaysScroll, liveErrors, liveUrl, openLive } from './live.js'
+import { type LiveOptions, expectNoSidewaysScroll, liveErrors, liveUrl, nextFrame, openLive } from './live.js'
 import { DEMOS, urlFor } from './pages.js'
 import { type Clip, type Rgb, contrast, pixelsOf, rgbOf } from './pixels.js'
 
@@ -233,6 +233,7 @@ test.describe('a page opened at an #anchor, with script', () => {
       await page.setViewportSize(screen)
       await page.goto(`${liveUrl('navbar--tall-page')}#theming`)
       await expect(page.locator('html')).toHaveAttribute('data-harness', 'hydrated')
+      await nextFrame(page)
       expect(await sticky(page)).toEqual({ variable: `${String(screen.bar)}px`, padding: `${String(screen.bar)}px` })
       expect(await below(page.locator('#theming'))).toBe(0)
 
@@ -243,6 +244,7 @@ test.describe('a page opened at an #anchor, with script', () => {
       })
       await page.goto(`${liveUrl('navbar--tall-page')}#questions`)
       await expect(page.locator('html')).toHaveAttribute('data-harness', 'hydrated')
+      await nextFrame(page)
       expect(await below(page.locator('#questions'))).toBe(0)
     })
   }
@@ -254,6 +256,7 @@ test.describe('a page opened at an #anchor, with script', () => {
     })
     await page.goto(`${liveUrl('navbar--tall-page')}#theming`)
     await expect(page.locator('html')).toHaveAttribute('data-harness', 'hydrated')
+    await nextFrame(page)
     expect(await sticky(page)).toEqual({ variable: '52px', padding: '52px' })
   })
 })
