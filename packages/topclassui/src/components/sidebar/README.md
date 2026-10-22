@@ -159,6 +159,7 @@ Anything else is passed to the element each part draws, so standard attributes (
 - `dummy/long-list.tsx`
 - `dummy/playground.tsx`
 - `dummy/rtl.tsx`
+- `dummy/stage.tsx`
 - `dummy/states.tsx`
 
 ## Verified against

@@ -127,7 +127,7 @@ test('Sidebar: the playground closes the rail and takes the mark off Home, in Ar
   await sidebar.getByRole('checkbox', { name: 'current' }).click()
   await expect(home).not.toHaveAttribute('aria-current', 'page')
   const code = sidebar.locator('pre').first()
-  await expect(code).toContainText('<SidebarRoot defaultOpen={false} className=')
+  await expect(code).toContainText('<SidebarRoot defaultOpen={false}>')
   await expect(code).toContainText('current={false}>Home</SidebarLink>')
   expect(errors).toEqual([])
 })
