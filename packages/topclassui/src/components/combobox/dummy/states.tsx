@@ -8,22 +8,25 @@ const COUNTRIES = [
 ]
 
 /** The ring a focused input wears, and an open one keeps, drawn at rest so the strip can show it; not under forced colours, where a ring at rest would read as focus. */
-const RING = 'not-forced-colors:outline-solid not-forced-colors:outline-(length:--tc-ring-width) not-forced-colors:outline-offset-(length:--tc-ring-offset) not-forced-colors:outline-ring'
+const RING = 'w-32 not-forced-colors:outline-solid not-forced-colors:outline-(length:--tc-ring-width) not-forced-colors:outline-offset-(length:--tc-ring-offset) not-forced-colors:outline-ring'
 
-/** The frame's strip, one cell a state named by its aria-label, each input filling a track; the open and empty cells are
- * the inputs the frame draws, their lists left shut so they cover no cell. Then invalid, read-only and one disabled option. */
+/** The input the frame draws in each cell, 128 px. */
+const CELL = 'w-32'
+
+/** The frame's strip, one cell a state named by its aria-label; the open and empty cells are the inputs the frame draws,
+ * their lists left shut so they cover no cell, the empty one with the words its list would say. */
 export default function Demo() {
   return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(min(8rem,100%),1fr))] items-start gap-6">
-      <Combobox fullWidth aria-label="idle" placeholder="Search" items={COUNTRIES} />
-      <Combobox fullWidth aria-label="focus-visible" items={COUNTRIES} defaultValue="jo" className={RING} />
-      <Combobox fullWidth aria-label="open" items={COUNTRIES} defaultInputValue="jor" className={RING} />
-      <Combobox fullWidth aria-label="loading" status="loading" items={[]} defaultInputValue="jor" />
-      <Combobox fullWidth aria-label="empty" items={COUNTRIES} defaultInputValue="zzz" />
-      <Combobox fullWidth aria-label="disabled" disabled placeholder="Search" items={COUNTRIES} />
-      <Combobox fullWidth aria-label="invalid" invalid items={COUNTRIES} defaultValue="jo" />
-      <Combobox fullWidth aria-label="read-only" readOnly items={COUNTRIES} defaultValue="sa" />
-      <Combobox fullWidth aria-label="one option disabled" items={COUNTRIES} />
+    <div className="flex flex-wrap items-start gap-6">
+      <Combobox className={CELL} aria-label="idle" placeholder="Search" items={COUNTRIES} />
+      <Combobox className={RING} aria-label="focus-visible" items={COUNTRIES} defaultValue="jo" />
+      <Combobox className={RING} aria-label="open" items={COUNTRIES} defaultInputValue="jor" />
+      <Combobox className={CELL} aria-label="loading" status="loading" items={[]} defaultInputValue="jor" />
+      <div role="group" aria-label="empty" className="grid justify-items-center gap-1">
+        <Combobox className={CELL} aria-label="Country, nothing matches" items={COUNTRIES} defaultInputValue="zzz" />
+        <span className="text-xs text-muted">no matches</span>
+      </div>
+      <Combobox className={CELL} aria-label="disabled" disabled placeholder="Search" items={COUNTRIES} />
     </div>
   )
 }

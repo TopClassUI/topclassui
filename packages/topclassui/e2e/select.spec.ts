@@ -16,7 +16,7 @@ import { FORCED_CANVAS, contrast, inkOn, pixelsOf, rgbOf } from './pixels.js'
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 const NAMES = { xs: 'Extra small', sm: 'Small', md: 'Medium', lg: 'Large', xl: 'Extra large' } as const
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['basic', 'form', 'four-rows', 'load-more', 'long-content', 'phase-4-form', 'playground', 'rtl', 'sixty-items', 'sizes', 'states'].map((demo) => `select--${demo}`)
+const DEMOS = ['basic', 'form', 'four-rows', 'load-more', 'long-content', 'phase-4-form', 'playground', 'read-only', 'rtl', 'sixty-items', 'sizes', 'states'].map((demo) => `select--${demo}`)
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 /** The listbox has no data-open of its own: the popup around it carries the placement and the state. */
 const POPUP = '[data-placement]'
@@ -105,8 +105,9 @@ test.describe('the static page: the server HTML, before any script runs', () => 
     expect(await css(combo(page, 'invalid'), 'box-shadow')).toContain(`${danger} 0px 0px 0px 1px inset`)
     expect(await css(combo(page, 'disabled'), 'opacity')).toBe('0.5')
     expect(await css(combo(page, 'disabled'), 'background-color')).toBe(await resolve(page, 'var(--tc-surface)'))
-    expect(await css(combo(page, 'read-only'), 'background-color')).toBe(await resolve(page, 'var(--tc-surface-raised)'))
     expect(await css(combo(page, 'idle'), 'background-color')).toBe(await resolve(page, 'var(--tc-surface-raised)'))
+    await page.goto(urlFor('select--read-only', 'light', 'ltr'))
+    expect(await css(combo(page, 'Read-only'), 'background-color')).toBe(await resolve(page, 'var(--tc-surface-raised)'))
   })
 
   for (const scheme of ['light', 'dark'] as const) {
@@ -133,7 +134,6 @@ test.describe('the static page: the server HTML, before any script runs', () => 
           const style = getComputedStyle(el)
           return [style.borderTopStyle, style.borderInlineStartStyle, style.borderBottomStyle, style.borderInlineEndStyle, style.borderTopWidth].join(' ')
         })
-        expect(await line('read-only')).toBe('dashed dashed dashed dashed 1px')
         for (const name of ['idle', 'disabled']) expect(await line(name), name).toBe('solid solid solid solid 1px')
         expect(await line('invalid')).toBe('solid solid solid solid 2px')
         const topEdge = async (name: string) => {
@@ -143,25 +143,27 @@ test.describe('the static page: the server HTML, before any script runs', () => 
         }
         const [plain, length] = await topEdge('idle')
         expect(plain, 'the plain line is whole').toBe(length)
-        const [dashed] = await topEdge('read-only')
+        await page.goto(urlFor('select--read-only', 'light', direction))
+        expect(await line('Read-only')).toBe('dashed dashed dashed dashed 1px')
+        const [dashed, own] = await topEdge('Read-only')
         expect(dashed, 'the dashes are drawn').toBeGreaterThan(0)
-        expect(dashed, 'the dashes leave gaps').toBeLessThan((length ?? 0) * 0.8)
+        expect(dashed, 'the dashes leave gaps').toBeLessThan((own ?? 0) * 0.8)
       })
     }
   }
 
   test('forced colours, after hydration: the read-only line is still dashed, and the list still opens', async ({ page }) => {
     await page.emulateMedia({ forcedColors: 'active' })
-    await openLive(page, 'select--states')
-    expect(await css(combo(page, 'read-only'), 'border-top-style')).toBe('dashed')
-    await openList(page, combo(page, 'read-only'))
-    expect(await css(combo(page, 'read-only'), 'border-top-style')).toBe('dashed')
+    await openLive(page, 'select--read-only')
+    expect(await css(combo(page, 'Read-only'), 'border-top-style')).toBe('dashed')
+    await openList(page, combo(page, 'Read-only'))
+    expect(await css(combo(page, 'Read-only'), 'border-top-style')).toBe('dashed')
     expect(await liveErrors(page)).toEqual([])
   })
 
   test('outside forced colours the read-only line stays solid, as the frame draws it', async ({ page }) => {
-    await page.goto(urlFor('select--states', 'light', 'ltr'))
-    expect(await css(combo(page, 'read-only'), 'border-top-style')).toBe('solid')
+    await page.goto(urlFor('select--read-only', 'light', 'ltr'))
+    expect(await css(combo(page, 'Read-only'), 'border-top-style')).toBe('solid')
   })
 
   for (const direction of DIRECTIONS) {

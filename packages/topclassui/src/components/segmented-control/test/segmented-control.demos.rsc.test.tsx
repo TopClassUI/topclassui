@@ -68,14 +68,11 @@ describe('every demo is a Server Component that only hands the segmented control
     const props = crossings((await load('states'))())
       .map(({ part, props: given }) => `${part}: ${Object.keys(given).filter((key) => !['aria-label', 'children'].includes(key)).join(' ')}`)
     expect(props).toEqual([
-      'SegmentedControlRoot: defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value',
-      'SegmentedControlRoot: defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value',
-      'SegmentedControlRoot: defaultValue', 'SegmentedControlItem: value className', 'SegmentedControlItem: value',
-      'SegmentedControlRoot: defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value',
-      'SegmentedControlRoot: disabled defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value',
-      'SegmentedControlRoot: invalid defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value',
-      'SegmentedControlRoot: defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value disabled', 'SegmentedControlItem: value',
-      'SegmentedControlRoot: readOnly defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value',
+      'SegmentedControlRoot: size defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value',
+      'SegmentedControlRoot: size defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value',
+      'SegmentedControlRoot: size defaultValue', 'SegmentedControlItem: value className', 'SegmentedControlItem: value',
+      'SegmentedControlRoot: size defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value',
+      'SegmentedControlRoot: size disabled defaultValue', 'SegmentedControlItem: value', 'SegmentedControlItem: value',
     ])
   })
 
