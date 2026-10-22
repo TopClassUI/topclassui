@@ -14,8 +14,8 @@ const POPUP = { dialog: '[role="dialog"]', drawer: '[role="dialog"]', popover: '
 /** Each states strip: the cells drawn open, and the trigger of its one closed cell, the first button of that name.
  * Command draws its open cells as pictures hidden from a reader, and its closed one waits behind the site's own Ctrl K. */
 const STATES = {
-  dialog: { open: 3, trigger: 'Open' },
-  drawer: { open: 2, trigger: 'Open' },
+  dialog: { open: 4, trigger: 'Open' },
+  drawer: { open: 4, trigger: 'Open' },
   popover: { open: 2, trigger: 'Share' },
   tooltip: { open: 2, trigger: 'Copy link' },
   dropdown: { open: 2, trigger: 'Actions' },
@@ -104,10 +104,12 @@ for (const slug of SLUGS) {
         await expect(drawn).toBeVisible()
       }
       if (trigger === null) {
-        await expect(states.locator('[aria-hidden="true"]:has(> * > svg)')).toHaveCount(COMMAND_PICTURES)
+        await expect(states.locator('[aria-hidden="true"]:has(svg)')).toHaveCount(COMMAND_PICTURES)
       } else {
         // A modal dialog hides the rest of the page from the accessibility tree once it opens, its own trigger included.
         const closed = states.getByRole('button', { name: trigger, exact: true, includeHidden: true }).first()
+        // The stage loads after the strip, and its tooltip, held open, closes any other open one of the shared delay group.
+        await expect(stagePopup(page, slug)).toHaveCount(1)
         await expect(closed).not.toHaveAttribute('data-popup-open')
         await drive(slug, closed)
         await expect(closed).toHaveAttribute('data-popup-open', '')

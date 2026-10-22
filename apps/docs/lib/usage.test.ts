@@ -86,6 +86,29 @@ describe('usageOf', () => {
     })
   })
 
+  it("reads the demo's own return past a code sample whose template literal holds a return of its own", () => {
+    const source = [
+      "import { CodeBlock } from 'topclassui/code-block'",
+      '',
+      'export default function Demo(props: CodeBlockDesignProps) {',
+      '  return (',
+      '    <CodeBlock lang="tsx" {...props}>',
+      '      {`export default function Page() {',
+      '  return <Table />',
+      '}`}',
+      '    </CodeBlock>',
+      '  )',
+      '}',
+    ].join('\n')
+    expect(usageOf(source)?.jsx).toBe([
+      '<CodeBlock lang="tsx" {...props}>',
+      '  {`export default function Page() {',
+      '  return <Table />',
+      '}`}',
+      '</CodeBlock>',
+    ].join('\n'))
+  })
+
   it('dedents a tree written over several lines to its root', () => {
     expect(usageOf(SEGMENTED)?.jsx).toBe([
       '<SegmentedControlRoot {...props} aria-label="View" defaultValue="board">',
@@ -196,6 +219,19 @@ describe('snippetOf', () => {
   it('writes a part\'s prop on that part, and the root\'s where the spread was', () => {
     expect(snippetOf({ imports: [], jsx: NAVBAR, passed: [] }, [['sticky', false], ['current', true]]))
       .toBe('<NavbarRoot sticky={false}>\n  <NavbarLink href="/docs" current>Docs</NavbarLink>\n</NavbarRoot>')
+  })
+
+  const BANNER = 'export default function Demo({ dismissible = true, ...props }: P = {}) {\n  return (\n    <Banner {...props}\n      dismissible={dismissible}\n      id="x"\n    >\n      Hi.\n    </Banner>\n  )\n}\n'
+
+  it('drops a pass-through with a default and its line at rest, leaving no empty line in the tag', () => {
+    const usage = usageOf(BANNER)
+    expect(usage?.passed).toEqual(['dismissible'])
+    expect(usage === null ? '' : snippetOf(usage, [])).toBe('<Banner\n  id="x"\n>\n  Hi.\n</Banner>')
+  })
+
+  it('writes a changed pass-through with a default on the tag it stood in', () => {
+    const usage = usageOf(BANNER)
+    expect(usage === null ? '' : snippetOf(usage, [['dismissible', false], ['tone', 'info']])).toBe('<Banner tone="info" dismissible={false}\n  id="x"\n>\n  Hi.\n</Banner>')
   })
 
   it('writes a root prop where the spread was, never over a nested part\'s attribute of the same name', () => {

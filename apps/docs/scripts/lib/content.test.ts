@@ -40,12 +40,13 @@ describe('contentProblems', () => {
     expect(contentProblems({ ...valid, stageDemos: 'keys' }, context)).toEqual(['(file): Unrecognized key: "stageDemos"'])
   })
 
-  it('reports a demo or a stageDemo with no file, a demo listed twice and a related slug with no page', () => {
-    const wrong = { ...valid, demos: ['keys', 'keys', 'basic'], stageDemo: 'default', related: { components: ['meter'], pages: [] } }
+  it('reports a demo, a stageDemo or a codeDemo with no file, a demo listed twice and a related slug with no page', () => {
+    const wrong = { ...valid, demos: ['keys', 'keys', 'basic'], stageDemo: 'default', codeDemo: 'sample', related: { components: ['meter'], pages: [] } }
     expect(contentProblems(wrong, context)).toEqual([
       'demo basic has no dummy/basic.tsx',
       'a demo is listed twice',
       'stageDemo default has no dummy/default.tsx',
+      'codeDemo sample has no dummy/sample.tsx',
       'related component meter has no page',
     ])
   })
