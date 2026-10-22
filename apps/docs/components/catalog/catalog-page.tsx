@@ -3,7 +3,7 @@ import { labelsFor } from '../../labels/index'
 import { COMPONENT_PAGE_LABELS } from '../../labels/component-page'
 import { type PagedComponent, SECTIONS, pagedComponentOf } from '../../lib/components'
 import type { Locale } from '../../lib/locales'
-import { CHIP, H1, LEAD, SECTION_H2, SMALL } from '../classes'
+import { CHIP, H1, SECTION_H2, SMALL, TYPE } from '../classes'
 import { Previewer } from '../previewer/previewer'
 import { SectionHeading } from '../section-heading'
 import { BeforeYouStart } from './before-you-start'
@@ -31,8 +31,13 @@ export function catalogToc(locale: Locale) {
   const t = labelsFor(locale).catalog
   return [
     { group: t.startHere, items: [{ id: LEGEND_ID, text: t.legendTitle }, { id: BEFORE_ID, text: t.installHeading }] },
-    { group: t.sectionsHeading, items: catalogSections().map((section) => ({ id: section.id, text: `${section.title[locale]} ${String(section.cards.length)}` })) },
+    { group: t.sectionsHeading, items: catalogSections().map((section) => ({ id: section.id, text: section.title[locale], count: section.cards.length })) },
   ]
+}
+
+/** The groups as one list for On this page: each group's name on its first entry. */
+export function catalogTocEntries(locale: Locale) {
+  return catalogToc(locale).flatMap((group) => group.items.map((item, index) => (index === 0 ? { ...item, group: group.group } : item)))
 }
 
 export function CatalogPage({ locale }: { locale: Locale }) {
@@ -43,7 +48,7 @@ export function CatalogPage({ locale }: { locale: Locale }) {
     <article className="mx-auto grid w-full max-w-(--docs-column) min-w-0 gap-7">
       <header className="grid min-w-0 gap-2.5">
         <h1 className={H1}>{t.title}</h1>
-        <p className={`${LEAD} max-w-185`}>{t.lead(sections.reduce((sum, section) => sum + section.cards.length, 0))}</p>
+        <p className={`${TYPE.lead} max-w-185 text-muted`}>{t.lead(sections.reduce((sum, section) => sum + section.cards.length, 0))}</p>
       </header>
       <BeforeYouStart id={BEFORE_ID} locale={locale} />
       <CardLegend id={LEGEND_ID} locale={locale} />
