@@ -225,7 +225,7 @@ export const ar: SiteLabels = {
       },
       layout: {
         title: '3. التخطيط الجذري',
-        note: 'مرّر direction وlocale إلى TopClassProvider خاصيتين من التخطيط؛ ولا تقرأهما أبدًا من document.dir داخل effect. يأتي ThemeScript أولًا في <head>: يضبط data-theme قبل أول رسم.',
+        note: 'مرّر direction وlocale إلى TopClassProvider خاصيتين من التخطيط؛ ولا تقرأهما أبدًا من document.dir داخل effect. يأتي ThemeScript أولًا في <head>: يضبط data-theme قبل أول رسم، فأضف suppressHydrationWarning إلى <html>.',
       },
       source: {
         title: '4. أو انسخ الشيفرة المصدرية إلى مستودعك',
