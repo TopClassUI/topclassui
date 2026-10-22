@@ -15,10 +15,10 @@ describe('the states demo, one cell per state of the Every state strip', () => {
     ])
   })
 
-  it('draws the closed palette as its Ctrl K hint, a pair of keys', () => {
+  it('draws the closed palette as its Ctrl K hint, in plain mono text as the frame does', () => {
     const { container } = render(<Demo />)
     const [closed] = cellsOf(container.firstElementChild)
-    expect([...(closed?.querySelectorAll('kbd') ?? [])].map((key) => key.textContent)).toEqual(['Ctrl', 'K'])
+    expect([closed?.textContent.trim(), closed?.querySelectorAll('kbd').length]).toEqual(['Ctrl K', 0])
   })
 
   it('draws every other cell as one picture hidden from a reader, with no role and no control in it', () => {

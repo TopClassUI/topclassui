@@ -3,7 +3,6 @@ import { GUIDES } from '../../lib/data'
 import { highlight } from '../../lib/highlight'
 import { CodeFrame } from './code-frame'
 
-// A language name, the same in every locale, as an untitled fence's header is.
 const LANG = 'tsx'
 
 /** The ThemeScript sample with the CSP source that allows it, its SHA-256 computed by docs:data from the installed package. */
@@ -17,8 +16,9 @@ export function themeScriptSample(hash = GUIDES.themeScriptHash): string {
   ].join('\n')
 }
 
-export async function ThemeScriptCsp({ locale }: { locale: Locale }) {
+/** Headed "code", as an untitled fence is. */
+export async function ThemeScriptCsp({ locale, title }: { locale: Locale; title: string }) {
   const code = themeScriptSample()
   const highlighted = await highlight(code, LANG)
-  return <CodeFrame code={code} locale={locale} lang={LANG} title={LANG} highlighted={highlighted} />
+  return <CodeFrame code={code} locale={locale} lang={LANG} title={title} highlighted={highlighted} />
 }
