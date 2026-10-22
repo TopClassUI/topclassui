@@ -5,7 +5,7 @@ import type { ComponentProps } from 'react'
 import type { Locale } from '../../content/pages'
 import { EXTERNAL_REL, isExternal } from '../../lib/external'
 import { labelsFor } from '../../labels/index'
-import { PROSE_CODE, TEXT_LINK } from '../classes'
+import { NOTE, PROSE_CODE, TEXT_LINK } from '../classes'
 import { Callout } from './callout'
 import { FrameworkTabs } from './framework-tabs'
 import { Card, Cards } from './cards'
@@ -37,6 +37,7 @@ export function mdxComponents(locale: Locale): MDXComponents {
     a: ({ href = '', children }: ComponentProps<'a'>) =>
       href.startsWith('/') ? <Link href={href} className={TEXT_LINK}>{children}</Link> : <a href={href} rel={isExternal(href) ? EXTERNAL_REL : undefined} className={TEXT_LINK}>{children}</a>,
     Callout,
+    Caption: ({ children }) => <p className={NOTE}>{children}</p>,
     Cards,
     Card,
     WrongRight: ({ children }) => <WrongRight locale={locale} wrong={wrong} right={right} terminal={terminal} repeat={labels.blocks.repeat}>{children}</WrongRight>,
