@@ -327,7 +327,8 @@
   .docs-flat-code > div:first-child { display: none; }
   /* Ocean's pill radius rounds a box of code into a disc that clips its corner letters: a box takes the box radius at most. */
   .docs-flat-code,
-  .docs-box { border-radius: min(var(--radius-control), var(--radius-box)); }
+  .docs-box,
+  div:has(> code[dir='ltr'][translate='no'] + [data-island]) { border-radius: min(var(--radius-control), var(--radius-box)); }
   /* Flat code has no edge to round, and with no padding the scroller's corner would cut the first letter of the last line. */
   .docs-flat-code pre {
     border-radius: 0;
