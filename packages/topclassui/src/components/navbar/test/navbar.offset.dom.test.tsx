@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react'
 import { act } from 'react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest'
 
 import { NavbarBrand, NavbarRoot } from '../index.js'
 
@@ -23,6 +23,8 @@ let height = 60
 const tops = new Map<string, number>()
 /** The height of the screen with the address bar shown, as the root element reports it. */
 let screenHeight = 768
+/** Every box the hook asked for. */
+let measured: MockInstance<() => DOMRect>
 
 const variable = () => document.documentElement.style.getPropertyValue('--tc-sticky-top')
 function resize(to: number): void {
@@ -31,13 +33,15 @@ function resize(to: number): void {
     for (const observer of Observer.made) if (!observer.disconnected) observer.fire()
   })
 }
+/** The report a browser makes by itself after the layout that follows observe(), with no resize. */
+const laidOut = () => { resize(height) }
 
 beforeEach(() => {
   height = 60
   screenHeight = 768
   Observer.made = []
   vi.stubGlobal('ResizeObserver', Observer)
-  vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function measure(this: HTMLElement) {
+  measured = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function measure(this: HTMLElement) {
     return { x: 0, y: 0, left: 0, top: tops.get(this.id) ?? 0, width: 320, right: 320, height: this.tagName === 'HEADER' ? height : 0, bottom: 0, toJSON: () => ({}) }
   })
   vi.spyOn(document.documentElement, 'clientHeight', 'get').mockImplementation(() => screenHeight)
@@ -61,13 +65,22 @@ const bar = (sticky?: boolean) => (
 describe('a sticky bar publishes its height', () => {
   it('writes the height of the header to --tc-sticky-top on the root element, in px', () => {
     render(bar())
+    laidOut()
     expect(variable()).toBe('60px')
   })
 
-  it('writes it on mount, before any resize is reported', () => {
+  it('writes it at the first report, which the browser makes after its layout with no resize', () => {
     render(bar())
     expect(Observer.made).toHaveLength(1)
+    laidOut()
     expect(variable()).toBe('60px')
+  })
+
+  it('reads and writes nothing in the commit, where a read would force a layout (a forced reflow)', () => {
+    const { container } = render(bar())
+    expect(measured).not.toHaveBeenCalled()
+    expect(variable()).toBe('')
+    expect(container.querySelector('header')?.hasAttribute('data-unstuck')).toBe(false)
   })
 
   it('follows the bar when it grows by a row, and when it shrinks back', () => {
@@ -94,6 +107,7 @@ describe('a sticky bar publishes its height', () => {
 
   it('measures the header, not the hidden span that carries the effect', () => {
     const { container } = render(bar())
+    laidOut()
     const span = container.querySelector('header > span[hidden]')
     expect(span).not.toBeNull()
     expect(span?.parentElement?.tagName).toBe('HEADER')
@@ -104,6 +118,7 @@ describe('a sticky bar publishes its height', () => {
 describe('the variable goes when the bar goes', () => {
   it('is removed when the bar unmounts, as on a client navigation to a page without it', () => {
     const { unmount } = render(bar())
+    laidOut()
     expect(variable()).toBe('60px')
     unmount()
     expect(variable()).toBe('')
@@ -120,6 +135,7 @@ describe('the variable goes when the bar goes', () => {
 
   it('is removed when the bar stops being sticky', () => {
     const { rerender } = render(bar())
+    laidOut()
     expect(variable()).toBe('60px')
     rerender(bar(false))
     expect(variable()).toBe('')
@@ -144,6 +160,7 @@ describe('a bar that is not sticky', () => {
   it('beside a sticky one, leaves that one\'s height in place', () => {
     render(<>{bar()}{bar(false)}</>)
     expect(Observer.made).toHaveLength(1)
+    laidOut()
     expect(variable()).toBe('60px')
   })
 })
@@ -156,6 +173,8 @@ describe('a page opened at an #anchor', () => {
     tops.set(id, top)
     const scrolled = vi.spyOn(HTMLElement.prototype, 'scrollIntoView').mockImplementation(() => undefined)
     const { container } = render(<>{bar()}<h2 id={id}>Theming</h2></>)
+    expect(scrolled).not.toHaveBeenCalled()
+    laidOut()
     return { scrolled, heading: container.querySelector('h2') }
   }
 

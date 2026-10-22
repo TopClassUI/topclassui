@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react'
-import { act } from 'react'
+import { act, type ReactElement } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { NavbarBrand, NavbarRoot } from '../index.js'
@@ -28,6 +28,12 @@ function resize(to: number): void {
     height = to
     for (const observer of Observer.made) if (!observer.disconnected) observer.fire()
   })
+}
+/** Renders the bar, then gives it the report a browser makes by itself after the layout that follows observe(). */
+function mount(element: ReactElement) {
+  const rendered = render(element)
+  resize(height)
+  return rendered
 }
 
 beforeEach(() => {
@@ -58,7 +64,7 @@ describe('a bar too tall for the screen stops sticking', () => {
   it('a bar of 161 px on a 480 px screen is marked unstuck and writes 0px: nothing stays over the page', () => {
     screen(480)
     height = 161
-    const { container } = render(bar())
+    const { container } = mount(bar())
     expect(header(container)?.hasAttribute('data-unstuck')).toBe(true)
     expect(variable()).toBe('0px')
   })
@@ -66,14 +72,14 @@ describe('a bar too tall for the screen stops sticking', () => {
   it('a bar of a third of the screen, 160 px of 480, still sticks and writes its height', () => {
     screen(480)
     height = 160
-    const { container } = render(bar())
+    const { container } = mount(bar())
     expect(header(container)?.hasAttribute('data-unstuck')).toBe(false)
     expect(variable()).toBe('160px')
   })
 
   it('follows the bar as it grows past its share and back', () => {
     screen(480)
-    const { container } = render(bar())
+    const { container } = mount(bar())
     resize(321)
     expect([header(container)?.hasAttribute('data-unstuck'), variable()]).toEqual([true, '0px'])
     resize(85)
@@ -83,7 +89,7 @@ describe('a bar too tall for the screen stops sticking', () => {
   it('follows the screen when it turns, though the bar keeps its height', () => {
     screen(844)
     height = 225
-    const { container } = render(bar())
+    const { container } = mount(bar())
     expect([header(container)?.hasAttribute('data-unstuck'), variable()]).toEqual([false, '225px'])
     turn(390)
     expect([header(container)?.hasAttribute('data-unstuck'), variable()]).toEqual([true, '0px'])
@@ -95,7 +101,7 @@ describe('a bar too tall for the screen stops sticking', () => {
     screen(480)
     height = 170
     const window560 = vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(560)
-    const { container } = render(bar())
+    const { container } = mount(bar())
     expect([header(container)?.hasAttribute('data-unstuck'), variable()]).toEqual([true, '0px'])
     window560.mockReturnValue(480)
     act(() => { window.dispatchEvent(new Event('resize')) })
@@ -105,7 +111,7 @@ describe('a bar too tall for the screen stops sticking', () => {
   it('leaves no mark on a bar that stops being sticky, and no listener once it unmounts', () => {
     screen(480)
     height = 321
-    const { container, rerender, unmount } = render(bar())
+    const { container, rerender, unmount } = mount(bar())
     expect(header(container)?.hasAttribute('data-unstuck')).toBe(true)
     rerender(bar(false))
     expect(header(container)?.hasAttribute('data-unstuck')).toBe(false)

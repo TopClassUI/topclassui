@@ -50,5 +50,10 @@ export const ON_DARK = themeOf('on-dark', DARK_GROUND)
 /** For a light ground: the page in light and ocean, CodeBlock's own block in dark. */
 export const ON_LIGHT = themeOf('on-light', LIGHT_GROUND)
 
+export type TokenRole = keyof Palette
+
+/** Each role's colours, on a dark ground then a light one: a token names its role by class, and globals.css sets the pair once. */
+export const TOKEN_ROLES = Object.fromEntries((Object.keys(DARK_GROUND) as TokenRole[]).map((role) => [role, [DARK_GROUND[role], LIGHT_GROUND[role]]])) as Record<TokenRole, [string, string]>
+
 /** The languages the site's fences and demos use; anything else renders as plain text. */
 export const LANGS = ['tsx', 'ts', 'jsx', 'js', 'css', 'bash', 'json', 'html', 'text'] as const
