@@ -262,12 +262,14 @@ for (const path of ['/en/docs/components', '/en/docs/components/accordion'] as c
 
 test('in ocean the install row\'s copy fields and the icons guide\'s tiles keep a box\'s corners', async ({ page }) => {
   await openIn(page, '/en/docs/components/dialog', 'ocean')
-  const fields = await page.locator('div:has(> code[dir="ltr"][translate="no"] + [data-island])').evaluateAll((all) => all.map((field) => getComputedStyle(field).borderStartStartRadius))
-  expect(fields).toEqual(['24px', '24px'])
+  const fields = page.locator('div:has(> code[dir="ltr"][translate="no"] + [data-island])')
+  await expect(fields).toHaveCount(2)
+  for (const index of [0, 1]) await expect(fields.nth(index)).toHaveCSS('border-start-start-radius', '24px')
   await openIn(page, '/en/docs/icons', 'ocean')
-  const tile = await page.locator('main button:has(svg)').nth(10).evaluate((element) => ({ radius: parseFloat(getComputedStyle(element).borderStartStartRadius), height: element.getBoundingClientRect().height }))
-  expect(tile.radius).toBeLessThanOrEqual(24)
-  expect(tile.height).toBeGreaterThan(48)
+  // The finder island re-renders its tiles after hydration, so read through retrying assertions, never a one-off handle.
+  const tile = page.locator('main button.border-dashed[aria-label]').nth(10)
+  await expect(tile).toHaveCSS('border-start-start-radius', /^(\d|1\d|2[0-4])(\.\d+)?px$/)
+  await expect.poll(() => tile.evaluate((element) => element.getBoundingClientRect().height)).toBeGreaterThan(48)
 })
 
 // The dark frame's stage dims its drawn page and keeps it readable; on white the library's 30 % black read as a solid grey block.
