@@ -15,7 +15,7 @@ const POPUP = { dialog: '[role="dialog"]', drawer: '[role="dialog"]', popover: '
  * Command draws its open cells as pictures hidden from a reader, and its closed one waits behind the site's own Ctrl K. */
 const STATES = {
   dialog: { open: 4, trigger: 'Open' },
-  drawer: { open: 4, trigger: 'Open' },
+  drawer: { open: 0, trigger: 'Open' },
   popover: { open: 0, trigger: 'Share' },
   tooltip: { open: 0, trigger: 'Copy link' },
   dropdown: { open: 0, trigger: 'Actions' },
@@ -23,7 +23,7 @@ const STATES = {
 } as const
 const COMMAND_PICTURES = 5
 /** The open cells the other strips draw as inert pictures, so they show in every capture of the page. */
-const PICTURES = { dialog: 0, drawer: 0, popover: 2, tooltip: 2, dropdown: 3, command: 0 } as const
+const PICTURES = { dialog: 0, drawer: 4, popover: 2, tooltip: 2, dropdown: 3, command: 0 } as const
 
 function collectErrors(page: Page): string[] {
   const errors: string[] = []
@@ -228,13 +228,12 @@ test('Tooltip: placement bottom opens below its trigger', async ({ page }) => {
   expect(under?.y ?? 0).toBeGreaterThanOrEqual((over?.y ?? 0) + (over?.height ?? 0))
 })
 
-test('Dropdown: tone danger colours the last row', async ({ page }) => {
+test('Dropdown: Delete is danger in the stage and in THE CODE, as drawn, and Try it offers no tone', async ({ page }) => {
   await page.goto('/en/docs/components/dropdown')
   await card(page, 'dropdown').scrollIntoViewIfNeeded()
-  await card(page, 'dropdown').getByRole('combobox', { name: 'tone' }).click()
-  await page.getByRole('option', { name: 'danger', exact: true }).click()
-  await expect(card(page, 'dropdown').locator('pre').first()).toContainText('tone="danger"')
+  await expect(card(page, 'dropdown').locator('pre').first()).toContainText('shortcut="Del" tone="danger">Delete')
   await expect(stagePopup(page, 'dropdown').getByRole('menuitem', { name: 'Delete' })).toHaveAttribute('data-tone', 'danger')
+  await expect(card(page, 'dropdown').getByRole('combobox', { name: 'tone' })).toHaveCount(0)
 })
 
 test('Command: defaultOpen from Try it opens the palette with its list', async ({ page }) => {
