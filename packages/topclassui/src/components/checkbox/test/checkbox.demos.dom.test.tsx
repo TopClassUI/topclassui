@@ -17,7 +17,7 @@ const AFTER: Record<string, string[] | 'browser'> = {
   'basic': ['false', 'true'],
   'form': ['false', 'true'],
   'labelled': 'browser',
-  'playground': ['false'],
+  'playground': ['true'],
   'rtl': ['false', 'true'],
   'sizes': ['false', 'false', 'false', 'false', 'false'],
   'combined': ['true', 'false', 'mixed', 'true', 'false', 'mixed', 'false', 'true', 'true'],

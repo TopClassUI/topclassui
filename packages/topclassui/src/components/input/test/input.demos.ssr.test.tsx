@@ -88,7 +88,7 @@ describe('the demos cover what PLAN 20 asks for', () => {
     expect(html).toContain('readOnly=""')
     expect(html).toContain('data-invalid=""')
     expect(html).toContain('aria-invalid="true"')
-    expect(html).toContain('value="you@mail.com"')
+    expect(html).toContain('value="jo@mail.com"')
   })
 
   it('shows every text type, a number, a date, a caller cap and no cap', async () => {

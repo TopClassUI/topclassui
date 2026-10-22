@@ -11,8 +11,8 @@ export default function Demo() {
       <div role="group" aria-label="empty" className="flex"><Rating size="xs" value={0} /></div>
       <div role="group" aria-label="partial" className="flex"><Rating size="xs" value={3} /></div>
       <div role="group" aria-label="full" className="flex"><Rating size="xs" value={5} /></div>
-      <Rating size="xs" readOnly={false} defaultValue={4} aria-label="hover" />
-      <Rating size="xs" readOnly={false} defaultValue={3} aria-label="focus-visible" className={RING} />
+      <div role="group" aria-label="hover" className="flex"><Rating size="xs" value={4} /></div>
+      <div role="group" aria-label="focus-visible" className="flex"><Rating size="xs" value={3} className={RING} /></div>
       <div role="group" aria-label="read-only" className="flex"><Rating size="xs" value={3} /></div>
     </div>
   )

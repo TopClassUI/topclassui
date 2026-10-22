@@ -10,7 +10,7 @@ export const input = {
     ar: 'حقل إدخال أصلي يشحن 0 KB، ولا يُبنى دون id أو aria-label.',
   },
   demos: ['labelled', 'types', 'sizes', 'full-width', 'row', 'custom-size', 'skeleton', 'rtl'],
-  stageHeight: 8.5,
+  stageHeight: 21,
   stageDemo: 'stage',
   controlOrder: ['size', 'disabled', 'invalid', 'required', 'fullWidth'],
   extraSwitches: ['disabled', 'required'],

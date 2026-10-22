@@ -102,7 +102,7 @@ describe('readOnly={false} renders the client half, handed only what can cross (
     expect(await parts('max-ten')).toEqual(['RatingField'])
     expect(await parts('sizes')).toEqual(['RatingField', 'RatingField'])
     expect(await parts('rtl')).toEqual(['TopClassProvider', 'RatingField'])
-    expect(await parts('states')).toEqual(['RatingField', 'RatingField'])
+    expect(await parts('states')).toEqual([])
     expect(await parts('stage')).toEqual([])
     expect(await parts('playground')).toEqual([])
   })

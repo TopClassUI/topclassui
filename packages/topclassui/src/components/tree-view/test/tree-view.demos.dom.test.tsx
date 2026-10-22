@@ -16,7 +16,7 @@ const AFTER: Record<string, (string | null)[]> = {
   'basic': ['README.md'],
   'load-more': ['Folder 20'],
   'long-content': ['Item 60'],
-  'playground': ['README.md'],
+  'playground': ['input'],
   'rtl': ['ملاحظات.txt'],
   'selected': ['next.config.ts'],
   // The collapsed tree's src, then file2 in each of the three open trees.

@@ -15,10 +15,10 @@ export default function Demo() {
     <div className="flex flex-wrap items-start gap-6">
       <Input className={CELL} placeholder="Email" aria-label="idle" />
       <Input className={HOVER} placeholder="Email" aria-label="hover" />
-      <Input className={RING} defaultValue="you@mail.com" aria-label="focus-visible" />
+      <Input className={RING} defaultValue="jo@mail.com" aria-label="focus-visible" />
       <Input className={CELL} disabled placeholder="Email" aria-label="disabled" />
-      <Input className={CELL} readOnly defaultValue="you@mail.com" aria-label="read-only" />
-      <Input className={CELL} invalid defaultValue="you@mail" aria-label="invalid" />
+      <Input className={CELL} readOnly defaultValue="jo@mail.com" aria-label="read-only" />
+      <Input className={CELL} invalid defaultValue="jo@mail.com" aria-label="invalid" />
     </div>
   )
 }

@@ -10,8 +10,17 @@ const rows: Row[] = [
 
 const nothing: Row[] = []
 
+/** The strip's miniature step: 8 px in, 7 px above and below, 12 px text. A column's class lands last on each cell. */
+const CELL = 'px-2 py-1.75 text-xs'
+
 const columns: TableColumn<Row>[] = [
-  { key: 'name', header: 'Name', sortHref: '?sort=name', cell: (row) => row.name },
+  { key: 'name', header: 'Name', className: CELL, sortHref: '?sort=name', cell: (row) => row.name },
+]
+
+const sorted: Row[] = [
+  { id: 'row-1', name: 'A - Z' },
+  { id: 'row-2', name: 'Row 2' },
+  { id: 'row-3', name: 'Row 3' },
 ]
 
 const key = (row: Row) => row.id
@@ -21,8 +30,9 @@ const hovered: TableColumn<Row>[] = [
   {
     key: 'name',
     header: 'Name',
+    className: CELL,
     sortHref: '?sort=name',
-    cell: (row) => (row.id === 'row-2' ? <span className="-mx-3.5 -my-1.5 block bg-surface px-3.5 py-1.5">{row.name}</span> : row.name),
+    cell: (row) => (row.id === 'row-2' ? <span className="-mx-2 -my-1.75 block bg-surface px-2 py-1.75">{row.name}</span> : row.name),
   },
 ]
 
@@ -43,7 +53,7 @@ export default function Demo() {
           className="w-32"
           sort={{ key: 'name', direction: 'ascending' }}
           caption="Rows, A to Z"
-          items={rows}
+          items={sorted}
           getKey={key}
           columns={columns}
         />
