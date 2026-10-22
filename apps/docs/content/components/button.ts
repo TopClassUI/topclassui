@@ -7,7 +7,7 @@ export const button = {
     ar: 'خمسة أنماط عبر ست نبرات، يُعرض على الخادم بلا JavaScript. ومن خلال render يصبح رابطًا حقيقيًا بالشكل نفسه.',
   },
   demos: ['variants', 'tones', 'sizes', 'with-icon', 'as-link', 'full-width', 'long-label', 'custom-size', 'skeleton', 'rtl'],
-  stageHeight: 20,
+  stageHeight: 19.4375,
   stageDemo: 'variants',
   extraSwitches: ['disabled'],
   note: {
