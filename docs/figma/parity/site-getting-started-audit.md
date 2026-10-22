@@ -75,7 +75,7 @@ The transcripts differ from the drawn ones where the shipped CLI does: two CSS l
 
 | # | Row | Status |
 |---|---|---|
-| 1 | table header row, mono 11 px in every column but the last | shared, job 150 (PROSE_HEAD.code in classes.ts, built into PROSE_COLUMN.fit and .wrap) |
+| 1 | table header row, mono 11 px in every column but the last | already fixed, 34981dfc (job 150: 14 px semibold headers on the getting-started pages) |
 | 2 | React without Next.js, one block | fixed, 7fb760a5 (one untitled fence with the two '// file' comment lines as drawn; `checklines="10-14"` compiles the icons half, scripts/lib/samples.ts) |
 | 3 | plain code text at rgb 212 against 250 | shared, job 150 (shiki-themes.ts and globals.css serve every guide fence; rests on the DECISIONS 2026-10-22 plain-code entry) |
 | 4 | table cell fonts | fixed in part, 7fb760a5 (react and tailwindcss plain, react-dom code, as drawn); shared, job 150: code in a guide cell at 11 px body (AUTHORED_CELL, PROSE_CODE, INLINE_CODE in classes.ts) |
@@ -85,7 +85,7 @@ The transcripts differ from the drawn ones where the shipped CLI does: two CSS l
 | 8 | footer Get started and version chip | shared, job 150 (site-footer.tsx) |
 | 9 | code block header icon | shared, job 150 (CodeBlock hard-codes the terminal icon) |
 | 10 | code body line pitch and padding | shared, job 150 (globals.css .docs-code) |
-| 11 | prose inline code | shared, job 150 (PROSE_CODE) |
+| 11 | prose inline code | already fixed, 34981dfc (job 150: PROSE_CODE plain muted text) |
 | 12 | sidebar list position | shared, job 150 (site-sidebar.tsx, sidebar-groups.tsx) |
 | 13 | which section the navbar marks current | shared, job 150: keep the build and record it in DECISIONS.md, then redraw the guide navbars (Omar's call) |
 
@@ -96,7 +96,7 @@ The transcripts differ from the drawn ones where the shipped CLI does: two CSS l
 | 1 | extra blocks | fixed in part, c27a8112 (both leads back to one line). Kept: the Next.js and Vite table, the flags table, the exit codes callout and the short paragraphs carry facts the drawn page lacks; they need a DECISIONS.md entry and a Figma redraw, or a reference page, which is Omar's call (DECISIONS.md is outside this branch) |
 | 2 | tree rows 42.5 px, card fill | fixed, c27a8112 (names on a 17 px line: 40 px rows). Kept: the fill stays bg-page, since the frame binds base/surface but renders 0 |
 | 3 | What it never does, card heights | fixed, c27a8112 (title on a 17 px line; the guides job's cards.tsx already sets the 15 px text line; the three texts shortened to two lines each, plain text as drawn) |
-| 4 | On this page entry that wraps | shared, job 150 (TOC_LINK in classes.ts) |
+| 4 | On this page entry that wraps | already fixed, 34981dfc (job 150: TOC_LINK py-1) |
 | 5 | Running without prompts header | fixed, c27a8112 (title "code"); the icon is row 9 above, shared |
 
 ## /en/docs/css
