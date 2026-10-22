@@ -11,8 +11,9 @@ export const switchControl = {
   },
   demos: ['basic', 'form', 'unchecked-value', 'sizes', 'rtl'],
   stageHeight: 5.25,
-  controlOrder: ['size', 'disabled', 'required', 'invalid'],
-  extraSwitches: ['disabled', 'required'],
+  controlOrder: ['size', 'defaultChecked', 'disabled', 'required', 'invalid'],
+  extraSwitches: ['defaultChecked', 'disabled', 'required'],
+  starts: { defaultChecked: true },
   note: {
     en: 'The `xs` and `sm` switches still grow to a 44px target under a touch pointer, so the thumb stays easy to tap.',
     ar: 'المفتاحان `xs` و`sm` يكبران إلى هدف بمقدار 44px تحت مؤشر لمس، فيبقى المقبض سهل اللمس.',
