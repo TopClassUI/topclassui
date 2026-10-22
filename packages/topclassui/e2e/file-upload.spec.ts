@@ -14,7 +14,7 @@ import { FORCED_CANVAS, contrast, pixelsOf } from './pixels.js'
 
 const MB = 1024 * 1024
 const SCREENS = [{ width: 320, height: 480 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 1280, height: 800 }] as const
-const DEMOS = ['file-upload--basic', 'file-upload--form', 'file-upload--in-field', 'file-upload--multiple', 'file-upload--playground', 'file-upload--rtl', 'file-upload--states'] as const
+const DEMOS = ['file-upload--basic', 'file-upload--form', 'file-upload--in-field', 'file-upload--invalid', 'file-upload--multiple', 'file-upload--playground', 'file-upload--rtl', 'file-upload--states'] as const
 const COARSE = { hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } } as const
 const LONG = `${'quarterly-report-final-'.repeat(13).slice(0, 296)}.pdf`
 
@@ -552,8 +552,9 @@ for (const scheme of ['light', 'dark'] as const) {
       })
       expect([await css(zone, 'border-top-style'), await css(zone, 'border-top-color')]).toEqual(['solid', system])
       await openLive(page, 'file-upload--states')
-      expect(await css(zoneOf(page.locator('#file-upload-invalid')), 'border-top-width')).toBe('2px')
       expect(await css(zoneOf(page.locator('#file-upload-disabled')), 'border-top-width')).toBe('1px')
+      await openLive(page, 'file-upload--invalid')
+      expect(await css(zoneOf(page.locator('#file-upload-invalid')), 'border-top-width')).toBe('2px')
     })
 
     test('a refused row keeps its mark and its words, and the remove x is painted', async ({ page }) => {
