@@ -23,6 +23,10 @@ export const command = {
   controlOrder: ['visibleRows'],
   controlsHidden: ['loadMoreThreshold'],
   stageOpen: true,
+  codeCaption: {
+    en: 'Loaded with React.lazy and mounted on first open, so it is never in the initial bundle.',
+    ar: 'يُحمَّل عبر React.lazy ويُركَّب عند أول فتح، فلا يدخل الحزمة الأولى أبدًا.',
+  },
   note: {
     en: '`getKey`, `getLabel` and `onSelect` are functions, so the palette is configured inside a client file.',
     ar: '`getKey` و`getLabel` و`onSelect` دوال، لذا تُضبط اللوحة داخل ملف عميل.',

@@ -93,6 +93,8 @@ export function TryItControl({ control, value, onChange, description, idBase }: 
           min={control.min ?? undefined}
           max={control.max ?? undefined}
           step={control.step ?? 1}
+          format={{ useGrouping: false }}
+          className="font-mono"
           value={typeof value === 'number' ? value : null}
           onValueChange={(next) => { if (next !== null) onChange(next) }}
         />

@@ -45,7 +45,10 @@ export default async function GuidePage({ params }: { params: Params }) {
     <SitePage locale={locale} current={entry.slug} path={entry.path}>
       <JsonLd data={guideArticleData(entry, locale, pageDate(entry.slug))} />
       <DocsShell locale={locale} entry={entry} labels={labelsFor(locale)}>
-        <Content components={{ ...mdxComponents(locale), ...guideComponents(locale) }} />
+        {/* The page's group, which the guide tables read for the header their frames draw. */}
+        <div data-group={entry.group} className="contents">
+          <Content components={{ ...mdxComponents(locale), ...guideComponents(locale) }} />
+        </div>
       </DocsShell>
     </SitePage>
   )
