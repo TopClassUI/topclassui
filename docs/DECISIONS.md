@@ -6,6 +6,26 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-22 - Breadcrumb, Kbd and Card get the Try it their Previewer frames draw
+
+**Decision.** Job 151 (round 11) gives the three a Try it, reversing docs-site S8's "a component with no schema has no Try it" for them. Breadcrumb's schema takes `showHome` (default false) and `maxItems` (2 to 100, default 100, clamped), and Try it starts at the frame's 4 with the house on. A trail over 100 crumbs now folds at the rail, where before an unset `maxItems` drew it whole. Kbd gets a `schema.ts` and a `constants.ts` holding `pressed` and `disabled`, both default false. Card gets no schema: `interactive`, `media` and `footer` are parts, not props (`render={<a />}`, `CardMedia`, `CardFooter`). They ride the content file's `extraSwitches`, footer starting on. An interactive card's footer is its call in words, because a link holds no button. Each folder has a `dummy/playground.tsx`, so the site has three more demos (489).
+
+**Why.** The frames 138:1140, 135:411 and 137:705 draw a Try it column, and the build drew a bare stage (audit-r11 rows 145/1 and 142/1).
+
+**Affects.** Still not built and left out of Try it, as recorded on 2026-10-19: Breadcrumb `separator`, `collapse` and `truncate`, Kbd `variant`, `size` and `muted`, and Card `variant` and `padding`. Card's THE CODE stays the basic sample while Try it changes, since its playground passes no props through.
+
+---
+
+## 2026-10-22 - A disabled Kbd keeps 4.5:1 text where the frame fades it to 50 %
+
+**Decision.** The Kbd frame (135:411) draws the disabled key at `opacity: 0.5`. The build keeps the text at `text-muted`, the fill at `bg-surface` and the line at `border-line` (`kbd/index.tsx`), and fades nothing. This corrects the 2026-10-19 Kbd bullet, which said the disabled look is as the frame's strip draws it.
+
+**Why.** A key is not a control. It is text the reader has to read to know what to press. R-5.6-4's 4.5:1 applies to it, and WCAG's exemption for disabled controls does not. At half opacity the drawn body text drops under 4.5:1 on the raised surface: #0a0a0a over white blends to about #858585.
+
+**Affects.** `kbd/index.tsx` and its contrast; the parity composite (`docs/figma/parity/site-component-kbd.png`) shows the difference.
+
+---
+
 ## 2026-10-21 - Ocean is a light mode on a section too, and the mono token names each platform's font
 
 **Decision.** `[data-theme='ocean']` joins `:root` and `[data-theme='light']` on the block of light colours in `src/tokens.css`, so an ocean section inside a dark page gets the light neutrals, tints and scrollbar under its own cyan primary and pill radius, as Theming's "Scoping a theme to a section" shows; before, it kept the dark page's neutrals under `color-scheme: light`. The dark block now sets the four primary tokens ocean changes (solid, on-solid, hover, active, to light's values), so a dark section inside an ocean page loses the cyan. `--tc-font-mono` is `ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace`: `ui-monospace` resolves only in Safari, and Chromium on Windows fell back to Courier New.
