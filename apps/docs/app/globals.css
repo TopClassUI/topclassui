@@ -43,6 +43,14 @@
   [data-theme='dark'] .shiki span { color: var(--tc-code-on-light); }
   [data-theme='light'] .shiki span,
   [data-theme='ocean'] .shiki span { color: var(--tc-code-on-dark); }
+
+  /* Each token role's pair from lib/shiki-themes.ts, set once here rather than on every token (lib/highlight.test.tsx holds them in step). */
+  .tk-text { --tc-code-on-dark: #d4d4d4; --tc-code-on-light: #262626; }
+  .tk-comment { --tc-code-on-dark: #a1a1a1; --tc-code-on-light: #525252; }
+  .tk-keyword { --tc-code-on-dark: #51a2ff; --tc-code-on-light: #1447e6; }
+  .tk-string { --tc-code-on-dark: #00d492; --tc-code-on-light: #007a55; }
+  .tk-attribute { --tc-code-on-dark: #ffb900; --tc-code-on-light: #973c00; }
+  .tk-tag { --tc-code-on-dark: #00bcff; --tc-code-on-light: #0069a8; }
 }
 
 @layer components {
@@ -340,8 +348,8 @@
   }
   .docs-flat-code .shiki span { color: light-dark(var(--tc-code-on-light), var(--tc-code-on-dark)); }
   /* Plain tokens (lib/shiki-themes.ts, text) as the frames draw them: body in the JSX, muted on a line that opens with a keyword, an import. */
-  .docs-flat-code .shiki span[style*='#D4D4D4'] { color: var(--tc-body); }
+  .docs-flat-code .shiki span.tk-text { color: var(--tc-body); }
   /* The frames part the imports from the JSX by a 10 px gap, not a whole blank line. */
   .docs-flat-code .shiki > span[data-blank] { display: block; block-size: 0.625rem; overflow: hidden; }
-  .docs-flat-code .shiki > span:has(> span:first-child[style*='#51A2FF']) > span[style*='#D4D4D4'] { color: var(--tc-muted); }
+  .docs-flat-code .shiki > span:has(> span:first-child.tk-keyword) > span.tk-text { color: var(--tc-muted); }
 }
