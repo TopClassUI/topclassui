@@ -6,6 +6,27 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-22 - The fields follow their Previewer frames: Combobox, DatePicker, SegmentedControl, OTPField
+
+**Decision.** Job 153 (round 12) closes the small library rows of the round-11 audits for the fields.
+
+- **Combobox.** `COMBOBOX_INPUT_END` (`pe-9`) applies only while `status` is `loading`, the one time the spinner sits at the end; at rest the size's own end padding stays, so the placeholder is no longer cut. The glass sits 16 px in (`inset-s-4`) and the text 8 px after it (`ps-9.5`), as frame 135:939 draws them.
+- **DatePicker's stage draws the calendar open as a picture.** The playground's `stage` renders the live trigger, closed, over an inert, aria-hidden picture of the open September 2026 panel (the 22nd chosen, the week from Monday), drawn from `OVERLAY_SURFACE`, `TARGET_HEIGHT` and hand-written strings that follow the calendar's, as the Select and Combobox stages draw their lists (53ccea65); the site sets `stageOpen`. The root keeps `modal="trap-focus"`: a live calendar open on load would trap the page's focus.
+- **DatePicker `firstDayOfWeek`** is `.int()` in the schema, so Try it offers the seven days as a select; the runtime still rounds and clamps a caller's number (R-5.7-7).
+- **DatePicker's strip keeps `fullWidth` cells** (129 and 145 px of content), not the frame's 128 px trigger: at md the en date "Sep 22, 2026" with the icon and the padding does not fit in 128 px and would end in an ellipsis (R-5.2-7), so the strip would cut the very value it shows. The frame's two-line "22 Sep 2026" is the en-GB format, recorded below.
+- **SegmentedControl, disabled.** A disabled track dims once as a whole, line, fill and segments, as 138:787 draws it (`data-disabled:opacity-50` on `SEGMENTED_ROOT`); its segments do not dim again inside it (`group-data-disabled/segmented:data-disabled:opacity-100`, the NumberField guard's pattern), and a single disabled segment in a live track still dims on its own.
+- **SegmentedControl always has a selected segment.** The types require `value` or `defaultValue` (`segmented-control/types.ts`), and the frame's no-selection cell is not drawn. A radio group with nothing checked gives the keyboard no checked segment to land on, and round 10 tried an empty track and reverted it (b380bed). This entry is that reason, which until now was only a code comment.
+- **OTPField `validationType`** joins `schema.ts` and `constants.ts` (`OTP_FIELD_VALIDATION_TYPES`, Base UI's four, `numeric` by default), so Try it offers it after `length`. `numeric` keeps choice 21's mapping to Base UI's `none` with the Arabic-Indic and Persian digit filter.
+- **Select and Combobox** keep the `stage` pictures of 53ccea65: a live open Select marked the rest of the page aria-hidden (reverted 78145911).
+
+**Built on fix/r12-library-fields, held for Omar's call** (each is a new prop): FileUpload `compact`, the frame's mini zone, and `data-dragging`, which draws drag over at rest; with them the strip draws idle, drag over, a refused file and disabled. Until then the FileUpload strip keeps idle and disabled: drag over and a refused row cannot be drawn at rest with the props there are. A DatePicker `modal` pass-through, with a live open stage, was built there too and is replaced here by the picture.
+
+**Not built, for Omar** (the frames draw them in Try it with nothing behind them): Input `type` as a select and `variant`; Textarea, Select and Combobox `variant`; SegmentedControl `tone` and `orientation`; Rating `precision`, `showValue` and `allowClear`; DatePicker `mode`, `clearable` and `showWeekNumbers`, and the frame's en-GB date ("22 Sep 2026") where the site's en locale formats month first; FileUpload `accept` and `showList` as controls, `multiple` (owned by `maxFiles`), the maxSize presets as a select, an initial-files API for the stage's file row, and the per-file status (uploading, done); OTPField's ring at rest on the active cell of the idle and partly filled cells, which would make them read as focus-visible.
+
+**Affects.** `combobox/classes.ts` and `client.tsx`; `date-picker/schema.ts` and `dummy/playground.tsx`; `segmented-control/classes.ts`; `otp-field/schema.ts`, `constants.ts`, `types.ts` and `lib.ts`; the READMEs; `apps/docs/content/components/{date-picker,otp-field}.ts`.
+
+---
+
 ## 2026-10-22 - Plain code on a dark ground stays neutral-300, softer than the frames' neutral-50
 
 **Decision.** The Shiki pair keeps plain code text at `#d4d4d4` (neutral-300) on the dark ground (`apps/docs/lib/shiki-themes.ts`, from 7fb765f6), where the guide frames draw plain code in base/body (`#fafafa`). The other token colours stay as drawn, and attribute selectors and constants now take the drawn amber and blue.
