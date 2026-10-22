@@ -42,8 +42,8 @@ export function Button({
   /** An anchor navigates on Enter or a press and a server component cannot cancel
    * it, so the href goes. next/link keeps its own: the prop is required. */
   const deadLink = inactive && render?.type === 'a'
-  // A component element may be a link it cannot strip, so only the pointer is stopped.
-  const deadComponent = inactive && render != null && typeof render.type !== 'string'
+  // No disabled attribute and no handler here: only the pointer can refuse its click and the focus a click gives it.
+  const unpressable = inactive && !nativeButton
   const element = deadLink
     ? cloneElement(render as ReactElement<{ href?: string }>, { href: undefined })
     : (render ?? <button type={type} />)
@@ -64,7 +64,7 @@ export function Button({
     'data-variant': variant,
     'data-tone': tone,
     'data-size': size,
-    className: cn(buttonVariants({ variant, tone, size, fullWidth }), deadComponent && UNPRESSABLE, className),
+    className: cn(buttonVariants({ variant, tone, size, fullWidth }), unpressable && UNPRESSABLE, className),
     children: truncateLabel(children, BUTTON_BOUNDARIES.labelMaxLength),
     ...rest,
   }, loading ? withSpinner : undefined)

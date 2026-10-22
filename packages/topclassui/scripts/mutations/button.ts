@@ -17,8 +17,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the consumer className stops winning the merge',
     file: 'src/components/button/index.tsx',
-    from: '    className: cn(buttonVariants({ variant, tone, size, fullWidth }), deadComponent && UNPRESSABLE, className),',
-    to: '    className: cn(className, buttonVariants({ variant, tone, size, fullWidth }), deadComponent && UNPRESSABLE),',
+    from: '    className: cn(buttonVariants({ variant, tone, size, fullWidth }), unpressable && UNPRESSABLE, className),',
+    to: '    className: cn(className, buttonVariants({ variant, tone, size, fullWidth }), unpressable && UNPRESSABLE),',
   },
   {
     label: 'the button stops being a centred flex row',
@@ -126,7 +126,13 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a disabled next/link button takes the pointer again, so a press follows the href it keeps',
     file: 'src/components/button/index.tsx',
-    from: 'deadComponent && UNPRESSABLE, className',
+    from: 'unpressable && UNPRESSABLE, className',
     to: 'className',
+  },
+  {
+    label: 'a disabled anchor button takes the pointer again, so a click focuses it and runs its onClick',
+    file: 'src/components/button/index.tsx',
+    from: '  const unpressable = inactive && !nativeButton',
+    to: "  const unpressable = inactive && render != null && typeof render.type !== 'string'",
   },
 ]

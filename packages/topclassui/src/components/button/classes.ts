@@ -32,8 +32,9 @@ export const TONE_TEXT = {
   info: 'text-info-on-soft',
 } as const satisfies Record<Tone, string>
 
-/** A disabled component element, such as next/link, keeps its href and a server component has no handler to cancel
- * the press, so the pointer is its one stop: it shows its parent's cursor, not not-allowed. */
+/** A disabled Button that is not a button, an anchor or next/link, has no disabled attribute, and a server component no
+ * handler to refuse a click or the focus its tabindex takes from one: the pointer is its one stop, so it shows its
+ * parent's cursor, not not-allowed. */
 export const UNPRESSABLE = 'pointer-events-none'
 
 /** Width only: the height comes from CONTROL_HEIGHT, so the two cannot drift apart. */

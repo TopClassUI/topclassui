@@ -148,9 +148,20 @@ describe('a disabled component element, such as next/link, keeps its href', () =
     expect(classList(link({ loading: true }))).toContain('pointer-events-none')
   })
 
-  it('a usable one, a disabled anchor whose href went and a disabled native button keep their pointer events', () => {
+  it('a usable one and a disabled native button keep their pointer events', () => {
     expect(classList(link())).not.toContain('pointer-events-none')
-    expect(classList(markup(<Button render={<a href="/x" />} disabled>Go</Button>))).not.toContain('pointer-events-none')
+    expect(classList(markup(<Button render={<a href="/x" />}>Go</Button>))).not.toContain('pointer-events-none')
     expect(classes({ disabled: true })).not.toContain('pointer-events-none')
+    expect(classList(markup(<Button render={<button />} disabled>Go</Button>))).not.toContain('pointer-events-none')
+  })
+})
+
+describe('a disabled anchor or other element has no disabled attribute', () => {
+  // Its tabindex of -1 takes the focus from a click, and a client tree's onClick would still run.
+  it('so it takes no pointer events either, whose href went or not', () => {
+    for (const element of [<a href="/x" />, <div />, <span />]) {
+      expect(classList(markup(<Button render={element} disabled>Go</Button>)), String(element.type)).toContain('pointer-events-none')
+      expect(classList(markup(<Button render={element} loading>Go</Button>)), String(element.type)).toContain('pointer-events-none')
+    }
   })
 })
