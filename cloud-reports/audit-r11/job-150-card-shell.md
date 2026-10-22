@@ -41,7 +41,7 @@ Branch fix/r11-card-shell. The 115 rows of the ten audit files marked (shared) o
 | 35 | job-140-fields-1.md | /en/docs/components/checkbox | 14 [low] install row, copy icon position (shared) | already fixed 8d15e6d2 (job 140: size-6 px-0 copy target, pe-0) |
 | 36 | job-140-fields-1.md | /en/docs/components/checkbox | 15 [low] card frame, corner radius (shared) | fixed (c7c65f16) |
 | 37 | job-140-fields-1.md | /en/docs/components/radio-group | 4 [low] install row, note under 'Then import it' | fixed (c7c65f16) |
-| 38 | job-140-fields-1.md | /en/docs/components/otp-field | 1 [high] install row, 'Then import it' line | fixed (c7c65f16) |
+| 38 | job-140-fields-1.md | /en/docs/components/otp-field | 1 [high] install row, 'Then import it' line | fixed (job 140 d47b95c0, which replaces c7c65f16's props.ts lines: the case-insensitive match also renamed Toast's part to the toast function; 140 requires a capitalised export) |
 | 39 | job-141-fields-2.md | /en/docs/components/input | 4 [medium] Try it, select controls (shared) | fixed (c7c65f16); the select keeps its line-strong edge (kept, R-5.6-4: a control boundary needs 3:1) |
 | 40 | job-141-fields-2.md | /en/docs/components/input | 5 [medium] code part, Copy button (shared) | fixed (c7c65f16) |
 | 41 | job-141-fields-2.md | /en/docs/components/input | 6 [medium] code part, note line (shared) | fixed (c7c65f16) |
@@ -121,3 +121,4 @@ Branch fix/r11-card-shell. The 115 rows of the ten audit files marked (shared) o
 | 115 | job-145-navigation.md | /en/docs/components/sidebar | 6 [low] Try it, checkbox | fixed (c7c65f16) |
 | 116 | catalog-and-search.md | /en/docs/components | 10 [low] navbar, search button size (the TYPE.nav part) | fixed (ae033af1); the xs size and 14 px icon are the catalog job's |
 | 117 | lead, from job 144 | stage tooltip | stageOpen tooltip shares Base UI's delay group | library item: the fix is a TooltipProvider around the docs stage; topclassui exports none and the docs may not import @base-ui/react (no new dependency) |
+| 118 | lead, from job 143 | every card with a dummy/stage.tsx | THE CODE printed the whole stage file | fixed (14f32510): THE CODE is codeDemo when set, else the playground's usage whatever the stage draws |
