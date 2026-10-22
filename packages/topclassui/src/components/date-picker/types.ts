@@ -19,8 +19,8 @@ export type DatePickerName = ControlName
 type TriggerRemoved = 'render' | 'nativeButton' | 'handle' | 'payload' | 'openOnHover' | 'delay' | 'closeDelay' | 'children'
   | 'value' | 'defaultValue' | 'type' | 'className' | 'ref' | 'id' | 'aria-label' | 'aria-labelledby' | 'name' | 'form'
 
-/** The root's open state is the consumer's; its children, handle, actions, modality and trigger ids are ours. */
-type RootRemoved = 'className' | 'children' | 'handle' | 'actionsRef' | 'modal' | 'triggerId' | 'defaultTriggerId'
+/** The root's open state and modality are the consumer's; its children, handle, actions and trigger ids are ours. */
+type RootRemoved = 'className' | 'children' | 'handle' | 'actionsRef' | 'triggerId' | 'defaultTriggerId'
 
 // R-5.7-5: derived at the seam. The root's open state, the trigger's own props, and the form's.
 export type DatePickerProps = Omit<Base.Trigger.Props, TriggerRemoved>
@@ -92,6 +92,8 @@ export interface DatePickerCalendarProps {
   choose: (iso: string) => void
   /** Tells the trigger the part has mounted, so a close from then on animates it out. */
   onMount: () => void
+  /** Open on the first render, as a stage draws it: the grid leaves the page's focus where it is. */
+  quiet: boolean
   placement: DatePickerPlacement
   /** The root's Escape scope, which the popup writes as data-overlay. */
   scope: string

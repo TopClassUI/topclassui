@@ -89,7 +89,9 @@ popup cannot reach 44 px each.
 **On the element.** `className`, `style`, `ref`, `aria-describedby`, `aria-invalid` and the rest go
 to the button. `invalid` sets `aria-invalid`: the line turns red and thickens. `disabled` is the real
 attribute, on the button and the input, so the form sends nothing. `open`, `defaultOpen`,
-`onOpenChange` and `onOpenChangeComplete` are Base UI's, on the root.
+`onOpenChange`, `onOpenChangeComplete` and `modal` are Base UI's, on the root. A calendar open on the
+first render takes no focus, so a page that draws it open with `modal={false}` is not scrolled to
+it; every later open moves the focus to the chosen day.
 
 ### What Base UI gives
 
@@ -97,7 +99,7 @@ attribute, on the button and the input, so the form sends nothing. `open`, `defa
 |---|---|
 | `Popover.Root`, `Trigger`, `Portal`, `Positioner`, `Popup`, `Title`, `Close` | one `DatePicker` |
 | `open`, `defaultOpen`, `onOpenChange`, `onOpenChangeComplete` | passed through; Escape is guarded per root |
-| `modal` | always `'trap-focus'`, with the `Close` part that makes the trap work |
+| `modal` | passed through, `'trap-focus'` by default, with the `Close` part that makes the trap work |
 | `side`, `align`, `sideOffset`, `collisionPadding` | `placement` and the shared offsets |
 | `container` on the Portal | passed through |
 | the trigger's `render`, `nativeButton`, `handle`, `payload`, `openOnHover`, `delay`, `closeDelay` | not props |
@@ -129,7 +131,7 @@ Required: `aria-label` or `aria-labelledby` or `id`. Every other prop below is o
 | `className` | no | `string` | - | On the trigger, merged last, so a consumer class wins a conflict with its own. |
 | `container` | no | `Base.Portal.Props['container']` | - | Where the calendar mounts; `<body>` by default. |
 | `defaultValue` | no | `string \| null` | - | The day of the first render, and the one a form reset brings back. |
-| `firstDayOfWeek` | no | `number`, min 1, max 7 | - | DatePicker: the first column, 1 (Monday) to 7 (Sunday), rounded and clamped; left out, the locale's. |
+| `firstDayOfWeek` | no | `integer`, min 1, max 7 | - | DatePicker: the first column, a whole day 1 (Monday) to 7 (Sunday), rounded and clamped; left out, the locale's. |
 | `form` | no | `string` | - | The id of a form elsewhere on the page that the form input belongs to. |
 | `fullWidth` | no | `boolean` | `false` | DatePicker: the box fills the width of its parent instead of taking the width of an Input. |
 | `invalid` | no | `boolean` | `false` | DatePicker: marks the date as wrong: sets aria-invalid on the trigger, whose line turns to danger and thickens. |

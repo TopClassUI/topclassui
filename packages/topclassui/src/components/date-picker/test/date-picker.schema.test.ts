@@ -7,7 +7,7 @@ import { datePickerSchema } from '../schema.js'
 
 // R-8.3-3: the props table, the playground and registry.json all read this output.
 const json = z.toJSONSchema(datePickerSchema, { io: 'input' }) as {
-  properties?: Record<string, { description?: string; default?: unknown; enum?: unknown[]; minimum?: number; maximum?: number; pattern?: string }>
+  properties?: Record<string, { description?: string; default?: unknown; enum?: unknown[]; minimum?: number; maximum?: number; pattern?: string; type?: string }>
 }
 const KEYS = ['firstDayOfWeek', 'fullWidth', 'invalid', 'maxDate', 'minDate', 'placement', 'size']
 
@@ -34,6 +34,7 @@ describe('the schema is the documentation', () => {
     expect(json.properties?.['placement']?.enum).toHaveLength(12)
     expect(json.properties?.['minDate']?.pattern).toBe('^(\\d{4})-(\\d{2})-(\\d{2})$')
     expect([json.properties?.['firstDayOfWeek']?.minimum, json.properties?.['firstDayOfWeek']?.maximum]).toEqual([1, 7])
+    expect(json.properties?.['firstDayOfWeek']?.type).toBe('integer')
   })
 })
 
@@ -46,7 +47,8 @@ describe('the schema and the constants agree', () => {
 
   it('names the defaults and the bounds the spec gives, so a changed constant is a failure here', () => {
     expect(DATE_PICKER_DEFAULTS).toEqual({
-      size: 'md', placement: 'bottom-start', invalid: false, fullWidth: false, minDate: '0001-01-01', maxDate: '9999-12-31', weekStartFallback: 1,
+      size: 'md', placement: 'bottom-start', invalid: false, fullWidth: false, modal: 'trap-focus', minDate: '0001-01-01', maxDate: '9999-12-31',
+      weekStartFallback: 1,
     })
     expect(DATE_PICKER_BOUNDARIES).toEqual({ minDate: '0001-01-01', maxDate: '9999-12-31', firstDayOfWeekMin: 1, firstDayOfWeekMax: 7 })
     expect(DATE_PICKER_SIZES).toEqual(['xs', 'sm', 'md', 'lg', 'xl', 'custom'])
@@ -61,6 +63,7 @@ describe('the schema and the constants agree', () => {
     expect(datePickerSchema.safeParse({ firstDayOfWeek: 0 }).success).toBe(false)
     expect(datePickerSchema.safeParse({ firstDayOfWeek: 8 }).success).toBe(false)
     expect(datePickerSchema.safeParse({ firstDayOfWeek: 6 }).success).toBe(true)
+    expect(datePickerSchema.safeParse({ firstDayOfWeek: 6.5 }).success).toBe(false)
     expect(datePickerSchema.safeParse({ placement: 'left' }).success).toBe(false)
   })
 })

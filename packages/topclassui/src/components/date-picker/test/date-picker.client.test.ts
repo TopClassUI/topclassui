@@ -87,9 +87,10 @@ describe('client.tsx, the part and hook.ts (R-5.12-1)', () => {
     expect([...client, ...part].filter((m) => m.includes('schema') || m.startsWith('zod'))).toEqual([])
   })
 
-  it('the popup traps the focus with a Close part, opens with no focus of Base UI\'s, and keeps the shared bounds', () => {
+  it('the popup traps the focus with a Close part unless modal says otherwise, opens with no focus of Base UI\'s, and keeps the shared bounds', () => {
     const part = read('parts/date-picker-calendar.tsx')
-    expect(read('client.tsx')).toContain('modal="trap-focus"')
+    expect(read('client.tsx')).toContain('modal = DATE_PICKER_DEFAULTS.modal,')
+    expect(read('client.tsx')).toContain('<Base.Root modal={modal} ')
     expect(part).toContain('initialFocus={false}')
     expect(part).toContain('sideOffset={FLOATING.sideOffset}')
     expect(part).toContain('collisionPadding={FLOATING.collisionPadding}')

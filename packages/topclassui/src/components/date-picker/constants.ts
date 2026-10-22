@@ -17,6 +17,8 @@ export const DATE_PICKER_DEFAULTS = {
   placement: 'bottom-start',
   invalid: false,
   fullWidth: false,
+  // While open, Tab goes round the calendar and stays in it, as the date picker dialog of the Authoring Practices asks.
+  modal: 'trap-focus',
   minDate: DATE_PICKER_BOUNDARIES.minDate,
   maxDate: DATE_PICKER_BOUNDARIES.maxDate,
   weekStartFallback: 1,

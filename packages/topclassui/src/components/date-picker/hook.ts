@@ -28,6 +28,9 @@ export function useDatePicker({
   })
   const [ownOpen, setOwnOpen] = useState(defaultOpen === true)
   const shown = open ?? ownOpen
+  // Open on the first render, the calendar is a picture on the page, not a place the user went: it takes no focus until reopened.
+  const [quiet, setQuiet] = useState(shown)
+  if (quiet && !shown) setQuiet(false)
   // Whether this root's calendar part has mounted: until it has, a close leaves nothing to animate out.
   const ready = useRef(false)
   const opened = useRef(shown)
@@ -85,7 +88,7 @@ export function useDatePicker({
     requiredText: labels.common.required,
     // The value first, so the date is heard after the label; then the required word, which no button can carry.
     describedBy: [valueId, required === true ? requiredId : '', describedBy ?? ''].filter(Boolean).join(' '),
-    calendar: { value: current, range, formats, choose, onMount },
+    calendar: { value: current, range, formats, choose, onMount, quiet },
     // React refuses a value with no handler; the input changes only through the value.
     onInputChange: () => undefined,
     // Once hydrated, the browser's required check lands on the trigger, not on the input nobody sees.
@@ -94,7 +97,7 @@ export function useDatePicker({
 }
 
 /** The calendar's half: the active day and the keys that move it, the month it shows, today, and each cell's name. */
-export function useDatePickerCalendar({ value, range, formats, firstDayOfWeek, choose, placement, onMount }: DatePickerCalendarProps) {
+export function useDatePickerCalendar({ value, range, formats, firstDayOfWeek, choose, placement, onMount, quiet }: DatePickerCalendarProps) {
   const labels = useLabels()
   const locale = useLocale()
   const numbers = useNumberFormat()
@@ -105,7 +108,7 @@ export function useDatePickerCalendar({ value, range, formats, firstDayOfWeek, c
   const [today] = useState(() => toIsoDate(todayParts(new Date())))
   const [active, setActive] = useState(() => value ?? clampIso(today, range.min, range.max))
   const grid = useRef(null as HTMLTableElement | null)
-  const focusing = useRef('mount' as 'mount' | 'key' | null)
+  const focusing = useRef((quiet ? null : 'mount') as 'mount' | 'key' | null)
 
   useEffect(() => { onMount() }, [onMount])
 

@@ -62,8 +62,8 @@ describe('what a demo must not write by hand', () => {
     expect(sources.filter(([, source]) => /tabIndex|render=|on[A-Z]\w*=\{/.test(source)).map(([file]) => file)).toEqual([])
   })
 
-  it('no demo is a client file: a DatePicker takes only data', () => {
-    expect(sources.filter(([, source]) => source.startsWith("'use client'")).map(([file]) => file)).toEqual([])
+  it('no demo is a client file but the playground, whose stage holds the open calendar in a box of its own: a DatePicker takes only data', () => {
+    expect(sources.filter(([, source]) => source.startsWith("'use client'")).map(([file]) => file)).toEqual(['playground'])
   })
 })
 

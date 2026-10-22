@@ -17,7 +17,9 @@ describe('the value is an ISO date string or null', () => {
     expectTypeOf<Parameters<NonNullable<DatePickerProps['onValueChange']>>>().toEqualTypeOf<[value: string]>()
   })
 
-  it('the open state is Base UI\'s root\'s', () => {
+  it('the open state and the modality are Base UI\'s root\'s', () => {
+    expectTypeOf<DatePickerProps['modal']>().toEqualTypeOf<Base.Root.Props['modal']>()
+    expectTypeOf<DatePickerProps['modal']>().toEqualTypeOf<boolean | 'trap-focus' | undefined>()
     expectTypeOf<DatePickerProps['open']>().toEqualTypeOf<Base.Root.Props['open']>()
     expectTypeOf<DatePickerProps['defaultOpen']>().toEqualTypeOf<Base.Root.Props['defaultOpen']>()
     expectTypeOf<DatePickerProps['onOpenChange']>().toEqualTypeOf<Base.Root.Props['onOpenChange']>()

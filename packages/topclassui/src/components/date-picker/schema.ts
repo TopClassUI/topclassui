@@ -26,8 +26,8 @@ export const datePickerSchema = z.object({
     .meta({ description: `DatePicker: the first day that can be chosen, an ISO date clamped to ${minDate} to ${maxDate}.` }),
   maxDate: isoDate.default(DATE_PICKER_DEFAULTS.maxDate)
     .meta({ description: `DatePicker: the last day that can be chosen, clamped like minDate and raised to it when below.` }),
-  firstDayOfWeek: z.number().min(firstDayOfWeekMin).max(firstDayOfWeekMax).optional()
-    .meta({ description: 'DatePicker: the first column, 1 (Monday) to 7 (Sunday), rounded and clamped; left out, the locale\'s.' }),
+  firstDayOfWeek: z.number().int().min(firstDayOfWeekMin).max(firstDayOfWeekMax).optional()
+    .meta({ description: 'DatePicker: the first column, a whole day 1 (Monday) to 7 (Sunday), rounded and clamped; left out, the locale\'s.' }),
 })
 
 export type DatePickerSchemaInput = z.input<typeof datePickerSchema>
