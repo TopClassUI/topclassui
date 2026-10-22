@@ -259,3 +259,12 @@ for (const path of ['/en/docs/components', '/en/docs/components/accordion'] as c
     }
   })
 }
+
+// The dark frame's stage dims its drawn page and keeps it readable; on white the library's 30 % black read as a solid grey block.
+for (const [mode, alpha] of [['light', '0.12'], ['ocean', '0.12'], ['dark', '0.4']] as const) {
+  test(`/en/docs/components/dialog in ${mode}: the stage's scrim is black at ${alpha}`, async ({ page }) => {
+    await openIn(page, '/en/docs/components/dialog', mode)
+    const scrim = page.locator('[data-component="dialog"] .bg-overlay').first()
+    expect(await scrim.evaluate((element) => getComputedStyle(element).backgroundColor)).toMatch(new RegExp(`^(lab|oklch|rgba)\\(0,? 0,? 0 ?[/,] ?${alpha}\\)$`))
+  })
+}
