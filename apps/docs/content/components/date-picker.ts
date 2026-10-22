@@ -10,7 +10,7 @@ export const datePicker = {
     ar: 'يوم واحد يُختار من شهر. يُحمَّل التقويم عند فتحه أول مرة، وكل اسم شهر وكل رقم يأتي من Intl.',
   },
   demos: ['basic', 'in-field', 'limits', 'week-start', 'form', 'sizes', 'rtl'],
-  stageHeight: 7,
+  stageHeight: 7.5,
   controlOrder: ['size', 'placement', 'firstDayOfWeek', 'disabled', 'invalid'],
   controlsHidden: ['fullWidth'],
   extraSwitches: ['disabled'],

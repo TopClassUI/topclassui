@@ -15,11 +15,13 @@ export interface CopyButtonProps {
   word?: string
   copied: string
   failed: string
+  /** Merged after the button's own classes: a copy field sizes the icon button it holds. */
+  className?: string
 }
 
 type Result = 'idle' | 'copied' | 'failed'
 
-export function CopyButton({ text, label, word, copied, failed }: CopyButtonProps) {
+export function CopyButton({ text, label, word, copied, failed, className }: CopyButtonProps) {
   const [result, setResult] = useState<Result>('idle')
   const [presses, setPresses] = useState(0)
   const timer = useRef(0)
@@ -52,7 +54,7 @@ export function CopyButton({ text, label, word, copied, failed }: CopyButtonProp
         size="sm"
         aria-label={label}
         data-copied={result === 'copied' ? '' : undefined}
-        className="shrink-0"
+        className={className === undefined ? 'shrink-0' : `shrink-0 ${className}`}
         onClick={() => { void press() }}
       >
         <Svg icon={result === 'copied' ? check : copy} size="0.875rem" aria-hidden="true" />

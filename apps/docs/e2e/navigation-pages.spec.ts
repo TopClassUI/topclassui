@@ -110,7 +110,7 @@ test('Navbar: the playground drives sticky on the bar and current on its link, a
   expect(errors).toEqual([])
 })
 
-test('Sidebar: the playground closes the rail and marks Home, in Arabic', async ({ page }) => {
+test('Sidebar: the playground closes the rail and takes the mark off Home, in Arabic', async ({ page }) => {
   const errors = collectErrors(page)
   await page.goto('/ar/docs/components/sidebar')
   const sidebar = card(page, 'sidebar')
@@ -118,11 +118,14 @@ test('Sidebar: the playground closes the rail and marks Home, in Arabic', async 
   await expect(rail).toHaveAttribute('data-open', '')
   await sidebar.getByRole('checkbox', { name: 'defaultOpen' }).click()
   await expect(rail).toHaveAttribute('data-closed', '')
+  // Home is the page being read from the start, as the frame's stage draws it; the switch takes the mark off.
+  const home = sidebar.locator('a[href="#home"]').first()
+  await expect(home).toHaveAttribute('aria-current', 'page')
   await sidebar.getByRole('checkbox', { name: 'current' }).click()
-  await expect(sidebar.locator('a[href="#home"]').first()).toHaveAttribute('aria-current', 'page')
+  await expect(home).not.toHaveAttribute('aria-current', 'page')
   const code = sidebar.locator('pre').first()
   await expect(code).toContainText('<SidebarRoot defaultOpen={false}>')
-  await expect(code).toContainText('current>Home</SidebarLink>')
+  await expect(code).toContainText('current={false}>Home</SidebarLink>')
   expect(errors).toEqual([])
 })
 
@@ -164,7 +167,9 @@ test('Pagination: the playground drives the size and the code', async ({ page })
   await page.goto('/en/docs/components/pagination')
   const pagination = card(page, 'pagination')
   const nav = pagination.locator('nav[data-size]').first()
-  await expect(nav).toHaveAttribute('data-size', 'md')
+  // The stage opens at sm, as the frame draws it, and Try it starts there too.
+  await expect(nav).toHaveAttribute('data-size', 'sm')
+  await expect(pagination.getByRole('combobox', { name: 'size' })).toHaveText('sm')
   await pagination.getByRole('combobox', { name: 'size' }).click()
   await page.getByRole('option', { name: 'lg', exact: true }).click()
   await expect(nav).toHaveAttribute('data-size', 'lg')

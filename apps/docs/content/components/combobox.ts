@@ -10,9 +10,9 @@ export const combobox = {
     ar: 'حقل نص يصفّي قائمة أثناء الكتابة. يعرض الصفوف الظاهرة فقط بعد 200 خيار، ويستدعي loadMore لجلب الصفحة التالية.',
   },
   demos: ['basic', 'form', 'sizes', 'load-more', 'status', 'ten-thousand', 'long-content', 'rtl'],
-  stageHeight: 7,
+  stageHeight: 7.5,
   controlOrder: ['size', 'visibleRows', 'disabled', 'invalid', 'fullWidth', 'hasMore'],
-  controlsHidden: ['loadMoreThreshold'],
+  controlsHidden: ['loadMoreThreshold', 'placement', 'status'],
   extraSwitches: ['disabled'],
   note: {
     en: 'Filtering runs over the options loaded so far; the next page arrives through `hasMore` and `loadMore`.',

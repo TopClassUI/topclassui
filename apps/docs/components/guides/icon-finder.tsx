@@ -16,7 +16,7 @@ export interface IconFinderProps {
   locale: Locale
 }
 
-const TILE = `flex w-full min-w-0 flex-col items-center gap-2 rounded-control ${BORDER} bg-page px-2 py-3 text-body ${HOVER.ghost} ${TRANSITION} ${FOCUS_RING} ${TOUCH_TARGET}`
+const TILE = `flex w-full min-w-0 flex-col items-center gap-2 rounded-control px-2 py-3 text-body ${HOVER.ghost} ${TRANSITION} ${FOCUS_RING} ${TOUCH_TARGET}`
 
 /** The client half of the Icons grid: the tiles arrive drawn by the server; this hides them and copies their code. */
 export function IconFinder({ icons, locale }: IconFinderProps) {

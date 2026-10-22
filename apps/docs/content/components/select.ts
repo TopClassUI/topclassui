@@ -10,7 +10,7 @@ export const select = {
     ar: 'اختيار واحد من قائمة بيانات بسيطة. تبقى القائمة المنبثقة داخل الشاشة وتمرّر نفسها، بارتفاع سبعة صفوف افتراضيًا.',
   },
   demos: ['basic', 'form', 'sizes', 'four-rows', 'sixty-items', 'long-content', 'rtl'],
-  stageHeight: 7,
+  stageHeight: 7.5,
   controlOrder: ['size', 'placement', 'disabled', 'invalid', 'required', 'fullWidth'],
   controlsHidden: ['visibleRows', 'loadMoreThreshold'],
   extraSwitches: ['disabled', 'required'],
