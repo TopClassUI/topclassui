@@ -68,3 +68,35 @@ Rows of `cloud-reports/audit-r11/job-145-navigation.md` (origin/cloud/audit-r11 
 | sidebar | 6 checkbox | shared (140) |
 | sidebar | 7 mode switch, Install | shared (job 150) |
 | sidebar | 8 state rails | fixed ff68c1a8 (rounded border, hover bg-surface) |
+
+## Audit 2 (cloud-reports/audit-r12/job-145-navigation.md, 25 rows)
+
+On fix/r11-pages-145 after preview/r8-all 62ce0c67. Library means a component source or schema change, which this round leaves closed; each is listed for Omar.
+
+| Page | Row | Status |
+|---|---|---|
+| pagination | 1 stage row 1 2 3 4 5 … 24 | library: listPages keeps the row one length (lib.ts:23-24, :39); Omar decides the window rule or Figma redraws 138:1302; not in DECISIONS, to record |
+| pagination | 2 stage height | fixed 0eb4dc79 (stageHeight 19.4) |
+| pagination | 3 state cell size | library: CELL_SIZE.xs pads an arrow cell to 30 px (pagination/classes.ts); three pages kept so middle is a middle; the lone centred 4th cell is STATE_CELL, shared with 150 |
+| pagination | 4 current page per cell | kept: Figma 138:1388 and 138:1408 drawn wrong (audit: no code change) |
+| breadcrumb | 1 hover cell | library: a per-item hover needs items to take link attributes; until then the cell ends on the current Button, or Figma redraws 138:1231 |
+| breadcrumb | 2 crumb gaps | fixed bab94a78 (text-xs, 5 px gaps on the list and each item) |
+| breadcrumb | 3 caret after the house | library: index.tsx:57 draws a caret before every crumb but the first; the showHome bullet in DECISIONS to extend, or Figma redraws 138:1173 |
+| breadcrumb | 4 collapsed Docs in 9 px mono | kept: Figma slip in 138:1236 (audit: no code change) |
+| tabs | 1 focus-visible ring over the bar | library: the inset ring (FOCUS_RING_INSET, tabs/classes.ts:45) because the list clips; Figma redraws 138:949 or the library draws it above the bar |
+| tabs | 2 stage height | fixed 3f5ee746 (stageHeight 19.4) |
+| tabs | 3 lists run together | fixed 3f5ee746 (mx-2 w-max; the strip wraps 3 + 1 as the frame's does) |
+| tabs | 4 disabled bar and hairline | library: TABS_BAR and TABS_TAB_DISABLED (tabs/classes.ts:33-34, :54) |
+| tabs | 5 tab size | fixed 3f5ee746 (md, now the strip wraps) |
+| accordion | 1 trigger boxes | library: Accordion has no size prop (R-5.7-2) |
+| accordion | 2 stage height | fixed b1a585ac (stageHeight 15.6); pt-1 kept for the ring room (audit) |
+| accordion | 3 open cell caption | fixed b1a585ac (-my-3 on the open section); title "Open question" kept: two open regions named Question fail axe landmark-unique when the last item opens |
+| accordion | 4 disabled box | library: ACCORDION_ROOT has no disabled look (classes.ts:8); a demo opacity on the root would dim the trigger twice |
+| stepper | 1 digits | kept: one-step lists number from 1 (audit: Figma to redraw) |
+| stepper | 2 mark position | fixed 06cce276 (*:gap-0 on each state stepper) |
+| stepper | 3 connector ends | kept: Figma auto-layout effect (audit: no code change) |
+| navbar | 1 stage height | fixed 9baf7480 (stageHeight 15.6) |
+| navbar | 2 stage tile and actions | fixed 9baf7480 (13 px palette in a p-0.5 tile, 16 px brand gap, xs bell button, xs avatar) |
+| navbar | 3 state bar size | fixed 9baf7480 (132 px bars, px 8, plain tile, 12 px mono name; the frame's 8 px type is under the 12 px floor of the type scale) |
+| navbar | 4 focus-visible ring | kept: the ring is on the brand link, the focusable element (audit: Figma to redraw) |
+| sidebar | 1 header and current link | library: SIDEBAR_HEADER pb-1.5, the rail gap-1 and SIDEBAR_LINK_STATE.current font-semibold (sidebar/classes.ts:28, :82); the 24 px toggle stays (R-5.6-2) |

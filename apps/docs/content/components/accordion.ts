@@ -10,7 +10,7 @@ export const accordion = {
     ar: 'أقسام يفتحها القارئ واحدًا تلو الآخر. اللوحات المغلقة تبقى في HTML، فيقرؤها الزاحف ويفتحها البحث في الصفحة.',
   },
   demos: ['basic', 'first-open', 'multiple', 'disabled', 'long-content', 'many-items', 'rtl'],
-  stageHeight: 14,
+  stageHeight: 15.6,
   controlOrder: ['hiddenUntilFound', 'disabled'],
   controlsHidden: ['headingLevel'],
   extraSwitches: ['disabled'],

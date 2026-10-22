@@ -3,13 +3,13 @@ import { Select } from '../index.js'
 const COUNTRIES = [{ value: 'jo', label: 'Jordan' }, { value: 'eg', label: 'Egypt' }, { value: 'ma', label: 'Morocco' }]
 
 /** The ring a focused trigger wears, and an open one keeps, drawn at rest so the strip can show it; not under forced colours, where a ring at rest would read as focus. */
-const RING = 'w-32 not-forced-colors:outline-solid not-forced-colors:outline-(length:--tc-ring-width) not-forced-colors:outline-offset-(length:--tc-ring-offset) not-forced-colors:outline-ring'
+const RING = 'w-32 justify-self-center not-forced-colors:outline-solid not-forced-colors:outline-(length:--tc-ring-width) not-forced-colors:outline-offset-(length:--tc-ring-offset) not-forced-colors:outline-ring'
 
 /** The trigger the frame draws in each cell, 128 px. */
-const CELL = 'w-32'
+const CELL = 'w-32 justify-self-center'
 
 /** The line a hovered trigger draws, at rest, on the frame's 128 px trigger. */
-const HOVER = 'w-32 border-body'
+const HOVER = 'w-32 justify-self-center border-body'
 
 /** The frame's strip, one cell a state named by its aria-label; the open cell is the trigger the frame draws, its list
  * left shut so it covers no cell. */
