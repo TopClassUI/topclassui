@@ -54,7 +54,7 @@ describe('a server-rendered Switch hydrates cleanly', () => {
 
 describe('every demo renders and hydrates', () => {
   it('found the demo folder, so an empty list cannot pass', () => {
-    expect(names).toEqual(['basic', 'combined', 'form', 'playground', 'rtl', 'sizes', 'states', 'unchecked-value'])
+    expect(names).toEqual(['basic', 'combined', 'form', 'playground', 'rtl', 'sizes', 'stage', 'states', 'unchecked-value'])
   })
 
   for (const [name, Demo] of DEMOS) {

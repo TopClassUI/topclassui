@@ -19,7 +19,7 @@ const WRITES: Record<string, string | null> = {
   'long-line': "const token = 'a1b2c3d4e5",
   'no-copy': null,
   'no-header': null,
-  'playground': 'export default async function Page() {',
+  'playground': '<Button variant="solid" size="md">',
   'rtl': 'export default async function Page() {',
   'states': '<Button/>',
   'wrap': "export const columns = ['number'",
