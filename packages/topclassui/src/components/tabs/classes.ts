@@ -42,7 +42,6 @@ const TAB = [
   'inline-flex shrink-0 items-center justify-center-safe gap-2 overflow-hidden whitespace-nowrap font-normal text-muted',
   'data-active:font-semibold data-active:text-body',
   CONTAIN,
-  FOCUS_RING_INSET,
   POINTER,
   TOUCH_TARGET,
   TRANSITION,
@@ -51,7 +50,18 @@ const TAB = [
 
 /** Forced colours paint every border, a transparent one too: there the bar of a tab that is
  * not active takes the colour of the page, and the active one the system's highlight. */
-export const TABS_BAR = 'border-b-2 border-transparent data-active:border-primary-solid forced-colors:border-[Canvas] forced-colors:data-active:border-[Highlight]'
+export const TABS_BAR = [
+  'border-b-2 border-transparent data-active:border-primary-solid forced-colors:border-[Canvas] forced-colors:data-active:border-[Highlight]',
+  // A disabled tab's bar dims with its label, as Figma 138:962 draws it; forced colours take the system's grey, as the label does.
+  'data-disabled:data-active:border-primary-solid/50 forced-colors:data-disabled:data-active:border-[GrayText]',
+].join(' ')
+
+/** The line tab's ring, still inside its box since the list clips, but inset past the 2 px bar and the ring offset,
+ * so the bar shows under a focused tab (Figma 138:949). */
+export const TABS_RING_ABOVE_BAR = [
+  'outline-none focus-visible:outline-solid focus-visible:outline-(length:--tc-ring-width) focus-visible:outline-ring',
+  'focus-visible:-outline-offset-[calc(var(--tc-ring-width)+var(--tc-ring-offset)+2px)]',
+].join(' ')
 
 /** A flat raised fill, with no edge and no shadow, as Figma 138:809 draws it: the semibold body label tells the
  * active tab too. Forced colours erase a fill: there it takes the system pair, with a ring that shows on it. */
@@ -65,8 +75,8 @@ export const TABS_RAISED = [
 /** R-5.2-3: the active tab is told by a bar or by an edged, raised surface, and by its weight:
  * 400 at rest, since Windows' own font draws 500 and 600 as one face. */
 export const TABS_TAB = {
-  line: `${TAB} ${TABS_BAR}`,
-  enclosed: `${TAB} ${TABS_RAISED}`,
+  line: `${TAB} ${TABS_BAR} ${TABS_RING_ABOVE_BAR}`,
+  enclosed: `${TAB} ${FOCUS_RING_INSET} ${TABS_RAISED}`,
 } as const satisfies Record<TabsVariant, string>
 
 /** The type step, with the inline padding one step under a button's: Figma 138:809 pads a md tab 11 px.

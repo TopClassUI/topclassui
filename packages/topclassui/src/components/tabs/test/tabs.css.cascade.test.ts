@@ -32,7 +32,8 @@ describe('a class that only applies under a query sits inside it', () => {
       'forced-colors:data-active:[--tc-ring:HighlightText]', 'forced-colors:data-active:bg-[Highlight]',
       'forced-colors:data-active:border-[Highlight]', 'forced-colors:data-active:forced-color-adjust-none',
       'forced-colors:data-active:text-[HighlightText]',
-      'forced-colors:data-disabled:*:opacity-100', 'forced-colors:data-disabled:not-data-active:text-[GrayText]',
+      'forced-colors:data-disabled:*:opacity-100', 'forced-colors:data-disabled:data-active:border-[GrayText]',
+      'forced-colors:data-disabled:not-data-active:text-[GrayText]',
       'forced-colors:outline-(length:--tc-line-width)',
     ])
   })
@@ -67,6 +68,12 @@ describe('the order the cascade needs', () => {
   it('under forced colours the active enclosed tab takes the system pair after its raised surface and its body colour', async () => {
     await follows('forced-colors:data-active:bg-[Highlight]', 'data-active:bg-surface-raised')
     await follows('forced-colors:data-active:text-[HighlightText]', 'data-active:text-body')
+  })
+
+  it('the bar of a disabled active tab dims after it took the primary colour, and takes the grey under forced colours after both', async () => {
+    await follows('data-disabled:data-active:border-primary-solid/50', 'data-active:border-primary-solid')
+    await follows('forced-colors:data-disabled:data-active:border-[GrayText]', 'data-disabled:data-active:border-primary-solid/50')
+    await follows('forced-colors:data-disabled:data-active:border-[GrayText]', 'forced-colors:data-active:border-[Highlight]')
   })
 
   it('under forced colours what a disabled tab holds is opaque again, after it was dimmed', async () => {

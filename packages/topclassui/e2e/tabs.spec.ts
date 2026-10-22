@@ -460,7 +460,8 @@ test.describe('eight tabs on a 320 px screen', () => {
         await tabs.first().focus()
         await press(page, 'End', 'Changelog')
         await expect(tabs.last()).toHaveCSS('outline-style', 'solid')
-        await expect(tabs.last()).toHaveCSS('outline-offset', '-2px')
+        // A line tab's ring is inset past its 2 px bar and the ring offset; an enclosed tab's by its own width.
+        await expect(tabs.last()).toHaveCSS('outline-offset', look === 'line' ? '-6px' : '-2px')
         expect((await scrollOf(list)).at, 'the list is scrolled to its end').not.toBe(0)
         const atEnd = await ringOf(page)
         expect([atEnd.left, atEnd.right, atEnd.top, atEnd.bottom].every((side) => side >= 2), `ring px on each side at the end: ${JSON.stringify(atEnd)}`).toBe(true)
