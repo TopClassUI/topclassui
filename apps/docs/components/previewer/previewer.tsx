@@ -139,7 +139,7 @@ export function Previewer({ entry, locale, href, headingId, deferred = false }: 
 
         {statesSource === null ? null : (
           <div className={CARD_PART}>
-            <StatesPart demoKey={`${entry.slug}/states`} heading={t.everyState} counts={counts} sourceCount={countStates(statesSource)} />
+            <StatesPart demoKey={`${entry.slug}/states`} heading={t.everyState} counts={counts} sourceCount={countStates(statesSource)} names={t.stateNames} />
           </div>
         )}
 

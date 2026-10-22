@@ -28,7 +28,7 @@ export const TOC_LINK = {
 export const SHELL_EYEBROW = `${TYPE.eyebrow} font-medium text-muted uppercase`
 
 /** The navbar's search trigger, sunk into the page with a quiet label and the quiet line the frames draw; merged after the Button's own classes. */
-export const SEARCH_TRIGGER = `bg-page border-line font-normal text-muted ${TYPE.nav}`
+export const SEARCH_TRIGGER = 'bg-page border-line font-normal text-muted'
 
 /** A segment of the mode switch, regular and the chosen one medium; merged after the segment's own classes. */
 export const MODE_SEGMENT = `font-normal data-checked:font-medium ${TYPE.nav}`
