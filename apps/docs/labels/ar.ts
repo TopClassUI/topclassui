@@ -56,10 +56,9 @@ export const ar: SiteLabels = {
     copy: 'نسخ',
     packageManagers: 'مدير الحزم',
     framework: 'إطار العمل',
-    utilities: { token: 'المتغيّر', utilities: 'الأصناف المساعدة' },
+    utilities: { token: 'المتغيّر', utilities: 'الأصناف المساعدة', through: 'إلى' },
     props: { prop: 'الخاصية', type: 'النوع', default: 'القيمة الافتراضية', description: 'ما الذي تفعله', required: 'مطلوبة' },
     repeat: (count) => `، النسخة ${String(count)}`,
-    csp: 'سياسة أمان المحتوى',
   },
   providerProps: {
     children: 'تطبيقك.',
@@ -226,7 +225,7 @@ export const ar: SiteLabels = {
       },
       layout: {
         title: '3. التخطيط الجذري',
-        note: 'مرّر direction وlocale إلى TopClassProvider خاصيتين من التخطيط؛ ولا تقرأهما أبدًا من document.dir داخل effect. يأتي ThemeScript أولًا في <head>: يضبط data-theme قبل أول رسم.',
+        note: 'مرّر direction وlocale إلى TopClassProvider خاصيتين من التخطيط؛ ولا تقرأهما أبدًا من document.dir داخل effect. يأتي ThemeScript أولًا في <head>: يضبط data-theme قبل أول رسم، فأضف suppressHydrationWarning إلى <html>.',
       },
       source: {
         title: '4. أو انسخ الشيفرة المصدرية إلى مستودعك',

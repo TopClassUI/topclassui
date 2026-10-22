@@ -67,12 +67,6 @@ useEffect(() => {
 
 A small inline script, first in `head`, reads the stored preference and sets `data-theme` before the first paint. Without it the page renders in the default mode and then switches, which shows a flash of the wrong mode. The script is a constant string, so a strict Content Security Policy can allow it by the hash below.
 
-```tsx
-import { ThemeScript } from 'topclassui/theme'
-
-<head><ThemeScript /></head>
-```
-
 <ThemeScriptCsp />
 
 ## In a single-page app
