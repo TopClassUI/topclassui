@@ -5,7 +5,8 @@ import { tray } from '#icons/data/tray.js'
 import { cn } from '#shared/cn.js'
 import { en } from '#shared/labels/en.js'
 import { Svg } from '#components/svg/index.js'
-import { COMPACT, DESCRIPTION, ICON, ROOT, TITLE } from './classes.js'
+import { BARE, COMPACT, DESCRIPTION, ICON, ROOT, TITLE } from './classes.js'
+import { EMPTY_STATE_DEFAULTS } from './constants.js'
 import type { EmptyStateProps } from './types.js'
 
 // A wrapper around nothing would still open a gap in the column, so it is left out.
@@ -17,7 +18,8 @@ export function EmptyState({
   icon,
   title,
   description,
-  compact = false,
+  compact = EMPTY_STATE_DEFAULTS.compact,
+  bordered = EMPTY_STATE_DEFAULTS.bordered,
   labels = en,
   locale: _locale,
   className,
@@ -32,7 +34,12 @@ export function EmptyState({
     : description
 
   return (
-    <div data-compact={compact ? '' : undefined} className={cn(ROOT, compact && COMPACT.root, className)} {...rest}>
+    <div
+      data-compact={compact ? '' : undefined}
+      data-bordered={bordered ? '' : undefined}
+      className={cn(ROOT, compact && COMPACT.root, !bordered && BARE, className)}
+      {...rest}
+    >
       {shownIcon}
       {isBlank(shownTitle) ? null : <p className={cn(TITLE, compact && COMPACT.title)}>{shownTitle}</p>}
       {isBlank(shownDescription) ? null : <div className={cn(DESCRIPTION, compact && COMPACT.description)}>{shownDescription}</div>}
@@ -41,4 +48,4 @@ export function EmptyState({
   )
 }
 
-export type { EmptyStateProps } from './types.js'
+export type { EmptyStateDesignProps, EmptyStateProps } from './types.js'

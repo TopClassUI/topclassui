@@ -3,5 +3,5 @@ import type * as Index from '../index.js'
 
 // R-5.7-3: the required props of each export, read by src/test/root-props.dom.test.tsx.
 export const fixture: RootPropsFixture<typeof Index> = {
-  EmptyState: { props: {} },
+  EmptyState: [{ props: {} }, { props: { bordered: false } }],
 }

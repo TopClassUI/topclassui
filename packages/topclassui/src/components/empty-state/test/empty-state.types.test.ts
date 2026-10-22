@@ -59,11 +59,14 @@ describe('the props follow the vocabulary', () => {
     expectTypeOf<EmptyStateProps['compact']>().toEqualTypeOf<boolean | undefined>()
   })
 
+  it('takes bordered, the dashed box or the bare form, as an optional boolean from the schema', () => {
+    expectTypeOf<EmptyStateProps['bordered']>().toEqualTypeOf<boolean | undefined>()
+  })
+
   it('has none of the props the spec leaves unbuilt', () => {
     expectTypeOf<Accepts<keyof EmptyStateProps, 'size'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof EmptyStateProps, 'variant'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof EmptyStateProps, 'tone'>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<keyof EmptyStateProps, 'bordered'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof EmptyStateProps, 'withAction'>>().toEqualTypeOf<false>()
   })
 })

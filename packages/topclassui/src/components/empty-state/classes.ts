@@ -1,5 +1,5 @@
-/** R-5.12-4: EmptyState's own classes. It has no design prop, so each part has one fixed
- * string; the previewer's raw 10 and 28 px are the plain steps gap-2.5 and p-7. */
+/** R-5.12-4: EmptyState's own classes. Each part has one fixed string, with compact and bare laid
+ * over it; the previewer's raw 10 and 28 px are the plain steps gap-2.5 and p-7. */
 import { BORDER_STRONG } from '#shared/classes.js'
 
 /** The previewer draws the dash in line-strong, so the frame reads on the page. CSS draws its own dash, not 6 / 4. */
@@ -22,3 +22,6 @@ export const COMPACT = {
   title: 'text-sm leading-tight',
   description: 'text-xs leading-tight',
 } as const
+
+/** bordered false: no dash, no fill and no padding, laid over the root after compact, so it wins both. */
+export const BARE = 'border-0 bg-transparent p-0'

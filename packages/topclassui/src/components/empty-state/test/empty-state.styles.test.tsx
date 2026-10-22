@@ -139,3 +139,25 @@ describe('compact', () => {
     expect(html()).not.toContain('data-compact')
   })
 })
+
+describe('bordered', () => {
+  it('is on by default: the dashed box on the surface, padded, and marked on the root', () => {
+    expect(attr(html(), 'data-bordered')).toBe('')
+    expect(classList(html())).toEqual(expect.arrayContaining(['border-dashed', 'bg-surface', 'p-7']))
+  })
+
+  it('false draws the icon and the words bare: no line, no fill, no padding, and no attribute', () => {
+    const out = html({ bordered: false })
+    expect(attr(out, 'data-bordered')).toBeUndefined()
+    expect(classList(out)).toEqual(expect.arrayContaining(['border-0', 'bg-transparent', 'p-0']))
+    expect(classList(out)).not.toContain('p-7')
+    expect(classList(out)).not.toContain('bg-surface')
+  })
+
+  it('false wins over compact\'s padding too, and keeps compact\'s gap', () => {
+    const out = html({ bordered: false, compact: true })
+    expect(classList(out)).toContain('p-0')
+    expect(classList(out)).not.toContain('p-4')
+    expect(classList(out)).toContain('gap-1.5')
+  })
+})
