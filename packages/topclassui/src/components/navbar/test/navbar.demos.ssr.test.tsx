@@ -43,13 +43,15 @@ const DEMOS: Record<string, Shape> = {
     hrefs: ['#install', '#install', '#usage', '#theming', '#questions', '/handbook/edit', '#usage', '#theming', '#questions', '#install'],
     current: [], navs: ['On this page'], sticky: 1,
   },
-  'states': { hrefs: ['/', '/', '/', '/'], current: [], navs: [], bars: 4, sticky: 1 },
+  // The stage Figma draws: a rounded bar in the flow, Docs current, a bell and the account.
+  'stage': { hrefs: ['/', '/docs', '/components', '/icons'], current: ['/docs'], navs: ['Main'], sticky: 0 },
+  'states': { hrefs: ['/', '/', '/', '/'], current: [], navs: [], bars: 4, sticky: 0 },
   'with-search': { hrefs: ['/', '/docs', '/components', '/icons'], current: ['/docs'], navs: ['Main'], sticky: 1 },
 }
 
 describe('every demo renders on the server', () => {
   it('holds exactly the demos the brief asks for, so none can be deleted silently', () => {
-    expect(files).toEqual(['basic', 'many-links', 'not-sticky', 'playground', 'rtl', 'states', 'tall-page', 'with-search'])
+    expect(files).toEqual(['basic', 'many-links', 'not-sticky', 'playground', 'rtl', 'stage', 'states', 'tall-page', 'with-search'])
     expect(Object.keys(DEMOS).sort()).toEqual(files)
   })
 

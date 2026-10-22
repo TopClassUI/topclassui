@@ -18,7 +18,7 @@ const STATES = {
   drawer: { open: 4, trigger: 'Open' },
   popover: { open: 2, trigger: 'Share' },
   tooltip: { open: 2, trigger: 'Copy link' },
-  dropdown: { open: 2, trigger: 'Actions' },
+  dropdown: { open: 3, trigger: 'Actions' },
   command: { open: 0, trigger: null },
 } as const
 const COMMAND_PICTURES = 5
@@ -180,7 +180,7 @@ test('Dialog: size from Try it reaches the open popup and the code', async ({ pa
   await expect(card(page, 'dialog').locator('pre').first()).toContainText('size="lg"')
   await expect(stagePopup(page, 'dialog')).toHaveAttribute('data-size', 'lg')
   await card(page, 'dialog').getByRole('checkbox', { name: 'closeButton' }).click()
-  await expect(stagePopup(page, 'dialog').getByRole('button')).toHaveText(['Cancel', 'Publish now'])
+  await expect(stagePopup(page, 'dialog').getByRole('button')).toHaveText(['Cancel', 'Delete'])
   expect(errors).toEqual([])
 })
 

@@ -7,7 +7,7 @@ description: كل مكوّن ينعكس في العربية دون أي تغيي
 
 يُضبط الاتجاه مرة واحدة، على العنصر <span dir="ltr">`html`</span>. وتقرؤه المكوّنات عبر <span dir="ltr">CSS</span> المنطقي، لا عبر <span dir="ltr">JavaScript</span> أبدًا.
 
-```tsx check title="app/layout.tsx"
+```tsx check title="app/layout.tsx" show="5-8"
 import { TopClassProvider } from 'topclassui/provider'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -65,7 +65,7 @@ className="object-left rtl:object-right"
 <PopoverPopup side="left" align="start" />
 ```
 
-```tsx check title="right"
+```tsx check title="right" show="3-6"
 import { PopoverPopup } from 'topclassui/popover'
 
 <PopoverPopup placement="start-top" />

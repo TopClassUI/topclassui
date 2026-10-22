@@ -62,6 +62,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/loading.tsx`
 - `dummy/long-text.tsx`
 - `dummy/rtl.tsx`
+- `dummy/stage.tsx`
 - `dummy/states.tsx`
 - `dummy/tones.tsx`
 

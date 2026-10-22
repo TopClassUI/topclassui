@@ -95,8 +95,10 @@ test('Avatar: the playground drives the size, in Arabic', async ({ page }) => {
 test('AvatarGroup: the max select changes how many avatars show', async ({ page }) => {
   await page.goto('/en/docs/components/avatar-group')
   const group = card(page, 'avatar-group')
+  // At rest the stage is the frame's overflow of thirteen and THE CODE its max sample; Try it swaps in the playground's six.
+  await expect(stageOf(page, 'avatar-group').getByRole('group', { name: 'Everyone on the project' }).getByRole('img', { name: '9 more' })).toBeVisible()
+  await expect(group.locator('pre').first()).not.toContainText('props.')
   const stage = stageOf(page, 'avatar-group').getByRole('group', { name: 'Project team' })
-  await expect(stage.getByRole('img', { name: '2 more' })).toBeVisible()
   await group.getByRole('combobox', { name: 'max' }).click()
   await page.getByRole('option', { name: '2', exact: true }).click()
   await expect(stage.getByRole('img', { name: '4 more' })).toBeVisible()
@@ -109,6 +111,7 @@ test('Separator: the playground turns the line vertical and semantic', async ({ 
   // The stage draws the frame's line and its labelled "or" divider, and both take Try it's props.
   const stage = stageOf(page, 'separator').locator('[data-orientation]').first()
   await expect(stage).toHaveAttribute('role', 'none')
+  await expect(separator.locator('pre').first()).toContainText('Personal details')
   await separator.getByRole('combobox', { name: 'orientation' }).click()
   await page.getByRole('option', { name: 'vertical', exact: true }).click()
   await expect(stage).toHaveAttribute('data-orientation', 'vertical')
@@ -123,6 +126,7 @@ test('Skeleton: the playground drives the variant and the rows', async ({ page }
   // The playground draws an avatar circle beside the text skeleton, so the rows are the text one's.
   const stage = stageOf(page, 'skeleton').locator('[data-variant="text"]')
   await expect(stage.locator('> span')).toHaveCount(3)
+  await expect(skeleton.locator('pre').first()).not.toContainText('props.')
   await skeleton.getByRole('combobox', { name: 'rows' }).click()
   await page.getByRole('option', { name: '5', exact: true }).click()
   await expect(stage.locator('> span')).toHaveCount(5)
@@ -162,6 +166,7 @@ test('Card: Try it switches the link, the media band and the footer, starting as
   await expect(cardEntry.getByRole('checkbox', { name: 'media' })).not.toBeChecked()
   await expect(cardEntry.getByRole('checkbox', { name: 'footer' })).toBeChecked()
   await expect(cardEntry.locator('pre').first()).toContainText("from 'topclassui/card'")
+  await expect(cardEntry.locator('pre').first()).toContainText('Download PDF')
   await cardEntry.getByRole('checkbox', { name: 'media' }).click()
   await expect(stage.locator('.rounded-t-box')).toHaveCount(1)
   await cardEntry.getByRole('checkbox', { name: 'interactive' }).click()

@@ -6,7 +6,7 @@ export const accordion = {
     ar: 'الأكورديون',
   },
   description: {
-    en: 'Sections a reader opens one at a time. Closed panels stay in the HTML, so a crawler reads them and find-in-page opens them.',
+    en: 'Closed panels stay in the HTML, so find-in-page and crawlers reach them.',
     ar: 'أقسام يفتحها القارئ واحدًا تلو الآخر. اللوحات المغلقة تبقى في HTML، فيقرؤها الزاحف ويفتحها البحث في الصفحة.',
   },
   demos: ['basic', 'first-open', 'multiple', 'disabled', 'long-content', 'many-items', 'rtl'],

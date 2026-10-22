@@ -24,8 +24,14 @@ Only what React can serialise: strings, numbers, booleans, plain objects, arrays
 
 ```tsx
 // app/page.tsx - a Server Component
-<Command items={commands} getKey={(c) => c.id} getLabel={(c) => c.label} onSelect={run} />
-// getKey, getLabel and onSelect are functions: they cannot cross
+<Command
+  items={commands}
+  getKey={(c) => c.id}
+  getLabel={(c) => c.label}
+  onSelect={run}
+/>
+// getKey, getLabel and onSelect are functions:
+// they cannot cross
 ```
 
 ```tsx check
@@ -60,7 +66,7 @@ import { use } from 'react'     // allowed
 // useState, useEffect, useRef, useMemo, useCallback
 ```
 
-The two hooks a Server Component is allowed to call.
+<Caption>The two hooks a Server Component is allowed to call.</Caption>
 
 ## How a split component works
 

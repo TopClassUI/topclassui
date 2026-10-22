@@ -51,10 +51,10 @@ export function CopyButton({ text, label, word, copied, failed, className }: Cop
       <Button
         variant={word === undefined ? 'ghost' : 'outline'}
         tone="neutral"
-        size="sm"
+        size={word === undefined ? 'sm' : 'xs'}
         aria-label={label}
         data-copied={result === 'copied' ? '' : undefined}
-        className={className === undefined ? 'shrink-0' : `shrink-0 ${className}`}
+        className={`shrink-0 ${word === undefined ? '' : 'gap-1.5 border-line bg-surface px-2.5'} ${className ?? ''}`}
         onClick={() => { void press() }}
       >
         <Svg icon={result === 'copied' ? check : copy} size="0.875rem" aria-hidden="true" />

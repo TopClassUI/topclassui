@@ -23,6 +23,13 @@ The format is: date, decision, why, and what it affects.
 **Why.** A key is not a control. It is text the reader has to read to know what to press. R-5.6-4's 4.5:1 applies to it, and WCAG's exemption for disabled controls does not. At half opacity the drawn body text drops under 4.5:1 on the raised surface: #0a0a0a over white blends to about #858585.
 
 **Affects.** `kbd/index.tsx` and its contrast; the parity composite (`docs/figma/parity/site-component-kbd.png`) shows the difference.
+## 2026-10-22 - Right to left keeps the full Arabic plural sample, and a checked fence may show only its drawn lines
+
+**Decision.** "Type, plurals and digits" on the Right to left guide keeps the five-branch `Intl.PluralRules` sample (zero, one, two, few, many and the rest) instead of the frame's one-line ternary (183:1245). Elsewhere a guide fence marked `check` may carry `show="a-b"`: the page shows those lines, dedented, and Copy copies them, while the sample check still compiles the whole fence.
+
+**Why.** Arabic has six plural forms; the drawn `one ? ... : ...` ternary prints the wrong form for two, three to ten and eleven and up, so copying it would teach a bug. The frames draw excerpts (the html and provider lines, the PopoverPopup and the Field) where the checked sources need their imports and a component around them; `show` gives the frame its lines without losing the compile.
+
+**Affects.** `apps/docs/content/{en,ar}/rtl.mdx` and `accessibility.mdx`, `apps/docs/lib/text-of.ts` (`shownOf`) and `apps/docs/components/mdx/code-fence.tsx`. The audit row "Type, plurals and digits, code sample" (cloud-reports/audit-r11/guides.md) is kept on this entry.
 
 ---
 

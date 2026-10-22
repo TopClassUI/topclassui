@@ -107,13 +107,15 @@ test('TreeView: the keyboard moves through the stage, and in Arabic ArrowLeft op
   await page.goto('/ar/docs/components/tree-view')
   const tree = card(page, 'tree-view').getByRole('tree', { name: 'Files' })
   await tree.focus()
-  const components = tree.getByRole('treeitem', { name: 'components' })
-  await expect(components).toHaveAttribute('aria-expanded', 'false')
-  // The stage selects page.tsx, so the focus starts there, one row above components.
+  const input = tree.getByRole('treeitem', { name: 'input' })
+  await expect(input).toHaveAttribute('aria-expanded', 'false')
+  // The stage hydrates on focus: the keys count once the tree names its active row, index.tsx, two rows above input.
+  await expect(tree).toHaveAttribute('aria-activedescendant', /.+/)
   await page.keyboard.press('ArrowDown')
-  await expect(tree).toHaveAttribute('aria-activedescendant', (await components.getAttribute('id')) ?? '')
+  await page.keyboard.press('ArrowDown')
+  await expect.poll(async () => (await tree.getAttribute('aria-activedescendant')) === (await input.getAttribute('id'))).toBe(true)
   await page.keyboard.press('ArrowLeft')
-  await expect(components).toHaveAttribute('aria-expanded', 'true')
+  await expect(input).toHaveAttribute('aria-expanded', 'true')
 })
 
 test('Stepper: the playground drives the size, in Arabic', async ({ page }) => {
@@ -128,7 +130,7 @@ test('Stepper: the playground drives the size, in Arabic', async ({ page }) => {
   expect(errors).toEqual([])
 })
 
-test('Timeline: no schema, so the card shows its basic demo and no Try it', async ({ page }) => {
+test('Timeline: no schema, so the card shows its drawn stage and no Try it', async ({ page }) => {
   await page.goto('/en/docs/components/timeline')
   const timeline = card(page, 'timeline')
   await expect(timeline.getByRole('heading', { name: 'Try it' })).toHaveCount(0)
