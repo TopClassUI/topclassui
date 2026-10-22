@@ -6,11 +6,12 @@ export const input = {
     ar: 'حقل نص',
   },
   description: {
-    en: 'A native input that renders on the server and ships 0 KB of JavaScript. The types refuse one with no name.',
-    ar: 'حقل إدخال أصلي يُعرض على الخادم ولا يشحن أي JavaScript. الأنواع ترفض حقلًا بلا اسم.',
+    en: 'A native input that ships 0 KB. It will not compile without an id or an aria-label.',
+    ar: 'حقل إدخال أصلي يشحن 0 KB، ولا يُبنى دون id أو aria-label.',
   },
   demos: ['labelled', 'types', 'sizes', 'full-width', 'row', 'custom-size', 'skeleton', 'rtl'],
-  stageHeight: 7.5,
+  stageHeight: 8.5,
+  stageDemo: 'stage',
   controlOrder: ['size', 'disabled', 'invalid', 'required', 'fullWidth'],
   extraSwitches: ['disabled', 'required'],
   note: {

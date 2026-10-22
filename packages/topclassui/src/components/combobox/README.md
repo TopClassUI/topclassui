@@ -168,6 +168,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 ## Examples
 
 - `dummy/basic.tsx`
+- `dummy/combined.tsx`
 - `dummy/form.tsx`
 - `dummy/load-more.tsx`
 - `dummy/long-content.tsx`
