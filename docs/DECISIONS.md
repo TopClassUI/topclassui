@@ -6,6 +6,26 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-22 - Tag, AvatarGroup, Skeleton, Dropdown and Command follow their frames; THE CODE follows a switch
+
+**Decision.** Job 154 (round 12) closes the library rows of the display family and three overlays.
+
+- **Tag's x pulls back over the chip's gap** (`REMOVE_SIZE`: `-ms-1`, `-ms-1.5`, `-ms-2`, `-ms-2`, `-ms-3`, the gaps of `TAG_SIZE`). The 24 px target, 44 under a finger, now starts where the label ends, so the glyph's own inset in it is the gap the eye reads: 5 px at md, where the docs stage 135:327 draws 4 and the component frame 79:199 draws 8. The target never covers the label, and a md tag is 91 px where 99 was (drawn 90).
+- **`disabled` on `TagRemovable`**: the x is a disabled button and the chip carries `data-disabled` and fades to half, as a disabled control does. A plain `Tag` takes no `disabled`: it is text, and keeps 4.5:1 for the reason the Kbd entry below gives. The disabled cell the frame draws is the linked chip, which `tagVariants({ interactive: true })` already dims through `data-disabled`. Try it gets `removable` and `disabled` as switches; `disabled` acts on the x, so with `removable` off it changes nothing.
+- **AvatarGroup's counter keeps its primary ring** through `*:data-counter:ring-primary-soft` on the root and `data-counter` on the counter. A class on the counter lost to the root's child ring, which has the same weight and comes later; `ring-primary-soft!` would have done it too, but a caller's `*:data-counter:ring-*` can still win this one through `cn()`, and a caller's `*:ring-surface-raised` still matches the avatars to a Card.
+- **Skeleton takes `animate` and `rounded`**, both on by default as the frame's Try it (137:916) draws them. `animate={false}` drops the pulse and keeps the fill and its forced-colours line; `rounded={false}` squares the rows, the rect and the card, and a circle stays round. The playground hands `animate` to its circle too, so the stage pulses or holds still as one.
+- **Dropdown's icons are muted at rest** (`DROPDOWN_ICON`): the frame 138:1496 paints Profile and Duplicate at rgb 161 and 146 where the build painted them white. A highlighted row and a danger row give the icon their own colour, as drawn. The states picture follows.
+- **Command's query starts 10 px after the glass**: `COMMAND_INPUT` pads its end only, so the search row's gap is the whole space, as 79:328 draws it (18 px before).
+- **THE CODE follows a switch** (`apps/docs/lib/usage.ts`). A prop a playground only tests (`{media ? <CardMedia /> : null}`, `render={interactive ? <a /> : undefined}`, a tree that starts `removable ?`) picks its branch in the code, at its value or the default its signature gives, instead of being written as an attribute no part takes; a part left out takes its imports and props with it. Card's code now follows `interactive`, `media` and `footer`, Tag's `removable`, and Separator's `withLabel`, with no change to Card's playground.
+
+**Kept, though the frames differ.** In Ocean the Skeleton rect and card stay on the control and box knobs, a pill and 24 px (job 147's sweep): a skeleton holds the shape of what loads, and an Ocean control is a pill and an Ocean card 24 px round; the frame's skeleton radii are raw and do not move with the mode (`docs/figma/unit-1.md`). For Omar: `rounded-chip` on the rect would give the frame's box in every mode (4 px light, 8 px Ocean). AvatarGroup's stage discs stay 40 px, md, where the frame draws 44, which is off the control scale (R-5.7-2) and which its own Try it calls md. `tag/dummy/link.tsx` keeps its bare chip with no ellipsis, the coverage `e2e/tag.spec` measures (the lead's call (b)); for Omar, option (a) is a fixture page in `e2e/` for the bare case so the demo can wear `LABEL`.
+
+**Not built, for Omar.** Tag `variant` and `truncate` (a bare label already ends in an ellipsis), with the 2026-10-19 list below. The Try it props the overlay and feedback frames draw beyond their schemas: Dialog `placement`, `dismissible`, `modal`, `scrollBody`; Drawer `dismissible`, `snapPoints`, `swipeToClose`; Dropdown `size`, `sideOffset`, `modal`, `loop`, `closeOnSelect`; Command `placement`, `modal`, `loop`, `filter`; Popover `sideOffset`, `size`, `modal`, `showArrow`, `dismissible`; Tooltip `showArrow`, `disabled`, `instant` and the delays as selects; Alert `size`, `dismissible`, `withIcon`; Banner `variant`, `placement`, `sticky`, `withAction`; Toast `position`, `dismissible`, `pauseOnHover`, `withAction`.
+
+**Affects.** `tag/classes.ts`, `tag/client.tsx`, `tag/types.ts`, `tag/constants.ts`, `tag/dummy/playground.tsx` (now a client file), `avatar-group/classes.ts` and `index.tsx`, the Skeleton schema, constants, classes, component and playground, `dropdown/classes.ts` and its states demo, `command/classes.ts`, `apps/docs/lib/usage.ts`, the content of Tag, their READMEs and the tests and mutation rows that pin them.
+
+---
+
 ## 2026-10-22 - Plain code on a dark ground stays neutral-300, softer than the frames' neutral-50
 
 **Decision.** The Shiki pair keeps plain code text at `#d4d4d4` (neutral-300) on the dark ground (`apps/docs/lib/shiki-themes.ts`, from 7fb765f6), where the guide frames draw plain code in base/body (`#fafafa`). The other token colours stay as drawn, and attribute selectors and constants now take the drawn amber and blue.
@@ -22,7 +42,7 @@ The format is: date, decision, why, and what it affects.
 
 **Why.** The frames 138:1140, 135:411 and 137:705 draw a Try it column, and the build drew a bare stage (audit-r11 rows 145/1 and 142/1).
 
-**Affects.** Still not built and left out of Try it, as recorded on 2026-10-19: Breadcrumb `separator`, `collapse` and `truncate`, Kbd `variant`, `size` and `muted`, and Card `variant` and `padding`. Card's THE CODE stays the basic sample while Try it changes, since its playground passes no props through.
+**Affects.** Still not built and left out of Try it, as recorded on 2026-10-19: Breadcrumb `separator`, `collapse` and `truncate`, Kbd `variant`, `size` and `muted`, and Card `variant` and `padding`. Card's THE CODE stayed the basic sample while Try it changed, since its playground passes no props through; since job 154 it follows the switches (the entry above).
 
 ---
 
