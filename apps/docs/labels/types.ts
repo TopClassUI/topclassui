@@ -69,7 +69,7 @@ export interface SiteLabels {
     copy: string
     packageManagers: string
     framework: string
-    utilities: { token: string; utilities: string; through: string }
+    utilities: { token: string; utilities: string; through: string; scale: string }
     props: { prop: string; type: string; default: string; description: string; required: string }
     /** Read after a code title the page shows again: ", version 2". */
     repeat: (count: number) => string

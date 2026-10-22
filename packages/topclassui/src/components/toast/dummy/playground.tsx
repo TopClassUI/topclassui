@@ -19,7 +19,7 @@ export default function Demo({ stage = false, ...props }: ToastDesignProps & { s
   return (
     <div className="relative grid min-h-67.75 w-full place-items-center">
       <div className="absolute top-0 inset-s-0">{button}</div>
-      <ToastStage toast={{ tone: 'success', ...props, title: TITLE, description: DESCRIPTION }} className="h-25 w-88 max-w-full" />
+      <ToastStage toast={{ tone: 'success', ...props, title: TITLE, description: DESCRIPTION }} className="h-25 w-full max-w-88" />
     </div>
   )
 }

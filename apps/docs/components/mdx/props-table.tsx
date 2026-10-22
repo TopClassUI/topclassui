@@ -25,9 +25,10 @@ export function PropsTable({ locale, labels }: { of: 'TopClassProvider'; locale:
       visibleRows={GUIDES.provider.length}
       className={PROSE_TABLE}
       columns={[
-        { key: 'prop', header: prop, rowHeader: true, className: PROSE_COLUMN.fit, cell: (row: ProviderPropRow) => code(row.name) },
-        { key: 'type', header: type, className: PROSE_COLUMN.wrap, cell: (row: ProviderPropRow) => code(row.type) },
-        { key: 'default', header: fallback, className: PROSE_COLUMN.fit, cell: (row: ProviderPropRow) => (row.required ? required : lines(row.default)) },
+        // The frame draws the names as plain muted text and the columns at 115 / 322 / 115 of its 944 px.
+        { key: 'prop', header: prop, rowHeader: true, className: `${PROSE_COLUMN.fit} w-[12%]`, cell: (row: ProviderPropRow) => <span dir="ltr">{row.name}</span> },
+        { key: 'type', header: type, className: `${PROSE_COLUMN.wrap} w-[34%]`, cell: (row: ProviderPropRow) => code(row.type) },
+        { key: 'default', header: fallback, className: `${PROSE_COLUMN.fit} w-[12%]`, cell: (row: ProviderPropRow) => (row.required ? required : lines(row.default)) },
         { key: 'description', header: description, className: PROSE_COLUMN.prose, cell: (row: ProviderPropRow) => labels.providerProps[row.name] ?? '' },
       ]}
     />

@@ -174,7 +174,7 @@
   [data-theme='light'] .docs-code .shiki span,
   [data-theme='ocean'] .docs-code .shiki span { color: var(--tc-code-on-light); }
 
-  /* Inside the tab card the tab names the code: the header keeps only its copy button, at the inline end. */
+  /* Inside the tab card the tab names the code: the header stays only as the region's hidden name. */
   .docs-tabbed .docs-code {
     border: 0;
     border-radius: 0;
@@ -197,10 +197,6 @@
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
-  }
-
-  .docs-tabbed .docs-code > pre {
-    padding-inline-end: 3rem;
   }
 
   /* Follow us buttons as drawn: Button's border-transparent is a utility, so this sits in the same layer after it. */
@@ -323,7 +319,12 @@
 @layer utilities {
   /* The Previewer frames draw code flat on the page colour, not in CodeBlock's inverted box: the name stays for the region, the header goes. */
   .docs-flat-code > div:first-child { display: none; }
+  /* Ocean's pill radius rounds a box of code into a disc that clips its corner letters: a box takes the box radius at most. */
+  .docs-flat-code,
+  .docs-box { border-radius: min(var(--radius-control), var(--radius-box)); }
+  /* Flat code has no edge to round, and with no padding the scroller's corner would cut the first letter of the last line. */
   .docs-flat-code pre {
+    border-radius: 0;
     padding: 0;
     font-size: 0.75rem;
     line-height: 1.7;
