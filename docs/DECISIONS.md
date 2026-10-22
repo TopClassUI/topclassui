@@ -6,6 +6,22 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-22 - The data family's library rows: forced row states, a bare EmptyState, a CodeBlock icon and Badge xs at 19 px
+
+**Decision.** Job 152 (round 12) closes the library rows the round-11 audits left on Table, TreeView, CodeBlock, EmptyState and Badge.
+
+- **Forced row states, one mechanism.** The hover and focus-visible variants already read a forced attribute (`&[data-hover]`, `&[data-focus-visible]` in `src/styles.css`, "the forced attribute lets the docs show every state"). Table takes `hoveredKey`, which writes `data-hover` on that row, so `ROW` and `ROW_FILL` paint the hover fill at rest; TreeView takes `focusVisibleId`, which writes `data-focus-visible` on that row, and `TREE_VIEW_ROW_FORCED` draws the same ring as `TREE_VIEW_ROW_ACTIVE` from it. Both are strings, so they cross to the client, and neither moves the focus or the pointer: they are for docs and screenshots. The states strips use them (row 2 hovered, `src` ringed); the live ring stays proved by `e2e/keyboard-tree-view`.
+- **TreeView's notes.** Loading draws the two bars bare, 5 px apart, as the frame does, with no box; empty keeps its raised box (the entry "TreeView draws its states as the previewer does") at `px-4 py-6`, so "Nothing here yet" stays on one line in the strip's cell. The caret and the item icon stay in the body colour, as that entry says, where the frame's pixels read muted.
+- **Badge xs.** `py-[calc(var(--spacing-pad-y-xs)-var(--tc-line-width))]` on a 15 px line: the always-present border sits inside the drawn 2 px padding, so the chip is the frame's 19 px instead of 22. The other steps are within 1 px of the frame and stay.
+- **EmptyState `bordered`.** The frame's Try it draws `compact` and `bordered`, so EmptyState gets a `schema.ts` and a `constants.ts` with both (`bordered` default true, the current dashed box, marked `data-bordered`), and a playground. `bordered={false}` lays `border-0 bg-transparent p-0` over the root after `compact`. The states strip draws its four cells bare, a 24 px icon over the frame's word in mono.
+- **CodeBlock `icon`.** Before the title; left out it is the terminal-window icon, as before, and `null` draws none. It is an element, not an `IconName`: `index.tsx` renders in any React tree (R-5.1-5), and a sync server half cannot turn a name into path data without the async `<Icon>` or the registry, so, like EmptyState, Alert, Timeline and TreeView, it takes `<Svg icon={x} />` and R-7-2 has no name contract to resolve. The strip passes `null`, as the frame draws no icon there. On the site, `CodeFrame` passes icon/copy at 13 px unless the block is titled "terminal", as the guide and getting-started frames draw it.
+
+**Why.** The rows table 1 and 8, tree-view 1, 5 and 7, code-block 1, empty-state 1 (both audits), guides audit 2 (Colors 5, Theming 4, Right to left 4, Server first 6, Accessibility 9) and getting-started row 20 were left for a library change in round 11.
+
+**Affects.** Recorded, not built: no unboxed TreeView option, since the strip's trees already draw bare through `className` (0481c9db) and the raised box stays recorded as above; Table `pageSize` and CodeBlock `theme`, `maxLines` and `lineNumbers` stay under "Not built, for Omar" (2026-10-19).
+
+---
+
 ## 2026-10-22 - Plain code on a dark ground stays neutral-300, softer than the frames' neutral-50
 
 **Decision.** The Shiki pair keeps plain code text at `#d4d4d4` (neutral-300) on the dark ground (`apps/docs/lib/shiki-themes.ts`, from 7fb765f6), where the guide frames draw plain code in base/body (`#fafafa`). The other token colours stay as drawn, and attribute selectors and constants now take the drawn amber and blue.
