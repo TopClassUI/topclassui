@@ -133,7 +133,8 @@ test('rating: the playground turns the read-only stars into radios and back on t
 test('switch: the stage answers a click on the Arabic page', async ({ page }) => {
   await page.goto('/ar/docs/components/switch')
   const scope = await openCard(page, 'switch')
-  const control = stageOf(scope).getByRole('switch')
+  // The stage draws the frame's pair, off then on; the on one is pressed.
+  const control = stageOf(scope).getByRole('switch', { name: 'On', exact: true })
   await expect(control).toHaveAttribute('aria-checked', 'true')
   await control.click()
   await expect(control).toHaveAttribute('aria-checked', 'false')
