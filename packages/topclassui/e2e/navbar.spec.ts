@@ -11,7 +11,7 @@ import { type Clip, type Rgb, contrast, pixelsOf, rgbOf } from './pixels.js'
 
 /** Every demo. Written out, so a renamed demo fails here. */
 const NAVBARS = [
-  'navbar--basic', 'navbar--many-links', 'navbar--not-sticky', 'navbar--playground', 'navbar--rtl', 'navbar--states', 'navbar--tall-page',
+  'navbar--basic', 'navbar--many-links', 'navbar--not-sticky', 'navbar--playground', 'navbar--rtl', 'navbar--stage', 'navbar--states', 'navbar--tall-page',
   'navbar--with-search',
 ]
 
@@ -165,7 +165,7 @@ test.afterEach(async ({ page }) => {
 
 test('the table names every navbar demo', () => {
   expect([...NAVBARS].sort()).toEqual(DEMOS.filter((demo) => demo.startsWith('navbar--')).sort())
-  expect(NAVBARS).toHaveLength(8)
+  expect(NAVBARS).toHaveLength(9)
 })
 
 // PLAN 19: a server-first bar is accepted on the HTML the server sends, before any script has run.

@@ -9,5 +9,5 @@ const STEPS = [
 
 /** The docs card's stage: the Try it controls pass the schema's props, the steps stay as drawn. */
 export default function Demo(props: StepperDesignProps) {
-  return <Stepper {...props} items={STEPS} value="profile" aria-label="Sign-up" />
+  return <Stepper {...props} items={STEPS} value="profile" aria-label="Sign-up" className="justify-center" />
 }
