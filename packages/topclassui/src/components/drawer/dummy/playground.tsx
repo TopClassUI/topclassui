@@ -16,10 +16,10 @@ const BAR = 'min-h-2 rounded-chip bg-neutral-soft'
 function PageBehind() {
   return (
     <div aria-hidden className="absolute inset-0 flex flex-col gap-2 p-3.5">
-      <div className={`${BAR} w-1/2`} />
-      <div className={`${BAR} w-4/5`} />
-      <div className={`${BAR} w-2/3`} />
-      <div className={`${BAR} w-2/5`} />
+      <div className={`${BAR} w-54 max-w-full`} />
+      <div className={`${BAR} w-83.25 max-w-full`} />
+      <div className={`${BAR} w-68.5 max-w-full`} />
+      <div className={`${BAR} w-44 max-w-full`} />
     </div>
   )
 }

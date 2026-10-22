@@ -4,7 +4,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
 import { DIRECTIONS, MODES } from '../scripts/lib/harness.js'
 import { type LiveOptions, expectInsideViewport, expectNoSidewaysScroll, liveErrors, openLive } from './live.js'
 import {
-  type Box, type OpenOptions, OPENED, atRest, boxOf, expectClosed, expectNothingSideways, inkOf, openOverlay,
+  type Box, type OpenOptions, atRest, boxOf, expectClosed, expectNothingSideways, inkOf, openOverlay,
   pageLock, pressInside, scrollPageTo, touchDrag, wheelAt, withScrollbar,
 } from './overlay.js'
 import { DEMOS } from './pages.js'
@@ -164,24 +164,20 @@ test.describe('the states strip', () => {
   const cellOf = (page: Page, title: string) => page.locator(`#demo [title="${title}"]`)
 
   for (const direction of DIRECTIONS) {
-    test(`${direction}: the side and the bottom sheet stand open at their edge of their own cell, whole inside it, and neither holds the focus`, async ({ page }) => {
+    test(`${direction}: the side and the bottom sheet are pictures at their edge of their own cell, whole inside it, and the page holds no open sheet`, async ({ page }) => {
       await openLive(page, 'drawer--states', { direction })
       expect(await cellOf(page, 'closed').locator('xpath=..').locator(':scope > *').evaluateAll((cells) => cells.map((cell) => cell.getAttribute('title'))))
         .toEqual(['closed', 'side sheet', 'bottom sheet', 'dragging', 'focus trapped'])
-      await expect(cellOf(page, 'closed').locator('[role="dialog"]')).toHaveCount(0)
-      for (const [title, name] of [['side sheet', 'sheet'], ['bottom sheet', 'sheet']] as const) {
+      await expect(page.locator('[role="dialog"]')).toHaveCount(0)
+      for (const title of ['side sheet', 'bottom sheet', 'dragging', 'focus trapped']) {
         const cell = cellOf(page, title)
-        const popup = cell.locator(`[role="dialog"]${OPENED}`)
-        await expect(popup).toBeVisible()
-        await atRest(popup)
-        await expect(popup.locator('h2')).toHaveText(name)
-        const [inner, outer] = [await boxOf(popup), await boxOf(cell)]
+        const sheet = cell.locator('[aria-hidden="true"][inert]')
+        await expect(sheet).toHaveText('sheet')
+        const [inner, outer] = [await boxOf(sheet), await boxOf(cell)]
         expect(inner.top >= outer.top && inner.bottom <= outer.bottom && inner.left >= outer.left && inner.right <= outer.right, `${title} leaves its cell`).toBe(true)
         // The edge it stands on: the inline end, which is the left in Arabic, or the bottom.
         const edge = title === 'bottom sheet' ? outer.bottom - inner.bottom : direction === 'rtl' ? inner.left - outer.left : outer.right - inner.right
-        expect(Math.abs(edge - 1), `${title} is off its edge`).toBeLessThanOrEqual(1)
-        await expect(popup.locator(':scope > :last-child')).toHaveAttribute('aria-label', direction === 'rtl' ? CLOSE.ar : CLOSE.en)
-        expect(await popup.evaluate((element) => element.contains(document.activeElement)), `${title} took the focus`).toBe(false)
+        expect(Math.abs(edge), `${title} is off its edge`).toBeLessThanOrEqual(1)
       }
       expect((await axe(page)).violations).toEqual([])
     })

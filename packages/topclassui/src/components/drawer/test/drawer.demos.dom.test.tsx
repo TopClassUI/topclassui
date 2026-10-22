@@ -69,8 +69,7 @@ function nameOf(control: Element): string {
 }
 
 /** Opens each sheet of a demo in turn from its trigger, reads it, and closes it with Escape. A button
- * of the page that opens nothing, as two demos hold beside their trigger, is not one; nor is a sheet
- * the states strip draws open in a cell, which is there before any press. */
+ * of the page that opens nothing, as two demos hold beside their trigger, is not one. */
 async function shown(Demo: ComponentType): Promise<Shown[]> {
   render(<Demo />)
   const out: Shown[] = []
@@ -109,18 +108,18 @@ describe('every demo opens the sheet its trigger names', () => {
 })
 
 describe('the states strip, one cell per state the frame draws', () => {
-  it('captions each cell by its title, and draws the side, bottom, dragging and trapped sheets open inside their own cell', async () => {
+  it('captions each cell by its title, and draws the side, bottom, dragging and trapped sheets as inert pictures inside their own cell', async () => {
     const loaded = await import('../dummy/states.js') as { default: ComponentType }
     const { container } = render(<loaded.default />)
     const cells = [...(container.firstElementChild?.children ?? [])]
     expect(cells.map((cell) => cell.getAttribute('title'))).toEqual(['closed', 'side sheet', 'bottom sheet', 'dragging', 'focus trapped'])
-    const dialogs = await screen.findAllByRole('dialog')
-    expect(dialogs.map((dialog) => [dialog.querySelector('h2')?.textContent, dialog.getAttribute('data-placement')]))
-      .toEqual([['sheet', 'end'], ['sheet', 'bottom'], ['sheet', 'end'], ['sheet', 'end']])
-    expect(dialogs.map((dialog) => cells.findIndex((cell) => cell.contains(dialog)))).toEqual([1, 2, 3, 4])
+    expect(screen.queryAllByRole('dialog')).toHaveLength(0)
+    const sheets = cells.map((cell) => cell.querySelector('[inert]'))
+    expect(sheets.map((sheet) => [sheet?.getAttribute('aria-hidden'), sheet?.textContent])).toEqual([
+      [undefined, undefined], ['true', 'sheet'], ['true', 'sheet'], ['true', 'sheet'], ['true', 'sheet'],
+    ])
     expect(cells.map((cell) => cell.querySelectorAll(':scope > .bg-overlay').length)).toEqual([0, 1, 1, 1, 1])
-    expect(document.querySelectorAll('[data-base-ui-portal] > [data-base-ui-inert]')).toHaveLength(0)
-    expect(dialogs.some((dialog) => dialog.contains(document.activeElement))).toBe(false)
+    expect(cells.slice(1).map((cell) => cell.querySelectorAll('button, a, [tabindex]').length)).toEqual([0, 0, 0, 0])
     expect(within(cells[0] as HTMLElement).getByRole('button', { name: 'Open' }).getAttribute('aria-expanded')).toBe('false')
   })
 })
