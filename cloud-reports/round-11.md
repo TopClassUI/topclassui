@@ -129,7 +129,7 @@ Refuted rows (the audit's own list) are not acted on.
 | badge 1 stage rows gaps | fixed (f865c3b3: tones.tsx gap-2.5 and gap-2) |
 | badge 2 stage row height | fixed (f865c3b3: stageHeight 19.4375) |
 | badge 3 description | fixed (f865c3b3) |
-| 148: tag/dummy/link.tsx bare chip cut with no ellipsis | open, question to the lead: the bare chip is deliberate (tag.demos.ssr.test "leaves the other bare, so the e2e page measures both"; e2e/tag.spec expects 'clipped'); fixing the demo means moving that measured case to an e2e fixture |
+| 148: tag/dummy/link.tsx bare chip cut with no ellipsis | kept (lead call (b)): deliberate coverage of the bare label, measured by e2e/tag.spec tag--link; the content note says to put the label in a span. For Omar: option (a), a fixture page in packages/topclassui/e2e for the bare case, is the clean way if he wants the demo chip wearing LABEL |
 
 ### Job 141, audit-r11 rows closed (cloud-reports/audit-r11/job-141-fields-2.md)
 
