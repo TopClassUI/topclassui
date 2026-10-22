@@ -85,7 +85,7 @@ export function Combobox({
           aria-invalid={invalid ? true : ariaInvalid}
           aria-busy={combobox.busy || undefined}
           data-size={size}
-          className={cn(COMBOBOX_INPUT, FIELD_SIZE[size], COMBOBOX_INPUT_START, COMBOBOX_INPUT_END, className)}
+          className={cn(COMBOBOX_INPUT, FIELD_SIZE[size], COMBOBOX_INPUT_START, combobox.spinning && COMBOBOX_INPUT_END, className)}
         />
         <span aria-hidden className={COMBOBOX_SEARCH}><Svg icon={magnifyingGlass} size="0.875rem" /></span>
         {combobox.spinning && (
