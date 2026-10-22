@@ -6,6 +6,16 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-22 - Noto Sans Arabic stays Google's one variable file, and Inter stays preloaded on /ar
+
+**Decision.** `lib/fonts.ts` is unchanged: one Noto Sans Arabic call with three weights, and Inter preloaded on both locales.
+
+**Why.** `/ar` sets all three weights in its first viewport (400, 500 and 600 at 412 and 1350 px wide), so no weight can go. Asked for three weights, Google sends its 100-900 variable file: 166,639 bytes of Arabic and 31,853 of Latin. Three single-weight calls get static files of 48,924, 53,188 and 53,380 bytes plus 3 x 10.7 KB of Latin, about 10 KB less, but the static instances place the dots of the 92 px headline about 1 px lower: 570 pixels differ in `/ar`'s first viewport, against 0 between two runs of the same build. Dropping Inter's preload on `/ar` saves nothing: with its `<link>` and its RSC hint both removed the page still fetches the same 48,917-byte file through the font stack, only later; with the `<link>` alone removed, Lighthouse measured the same 265 KB of fonts and FCP 2.72 s against 2.41 s.
+
+**What it costs.** Lighthouse charges `/ar` about a second of FCP and LCP that `/en` does not pay: the 198 KB of Noto start downloading before the first paint, and its simulated 4G counts them in full. Cutting that needs smaller Arabic files (a font instanced to 400-600, self-hosted), which is Omar's call.
+
+---
+
 ## 2026-10-22 - A code token names its colour role by class, and globals.css sets the pair once
 
 **Decision.** `lib/highlight.tsx` gives each Shiki token the class of its role in `lib/shiki-themes.ts` (`tk-text`, `tk-comment`, `tk-keyword`, `tk-string`, `tk-attribute`, `tk-tag`) instead of an inline `style` with both colours, and `app/globals.css` sets each role's `--tc-code-on-dark` and `--tc-code-on-light` once. A pair the themes do not name keeps its inline style. A line that is not blank no longer sends `data-blank` as undefined. The two flat-code selectors that read `[style*='#D4D4D4']` and `[style*='#51A2FF']` read `.tk-text` and `.tk-keyword`.
