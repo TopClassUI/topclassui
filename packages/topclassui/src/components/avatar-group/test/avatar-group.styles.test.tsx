@@ -54,9 +54,10 @@ describe('the root', () => {
     expect(attr(group(), 'class')).not.toContain('not-first')
   })
 
-  it('rings every child in the page colour, the counter included', () => {
+  it('rings every child in the avatar fill, and the counter in its own primary fill', () => {
     expect(classList(group())).toContain('*:ring-2')
     expect(classList(group())).toContain('*:ring-neutral-soft')
+    expect(classList(group())).toContain('*:data-counter:ring-primary-soft')
   })
 
   it('makes every child a circle that paints whole, so a link around an avatar is ringed like one', () => {
@@ -79,7 +80,7 @@ describe('the counter is an Avatar of the same size that may widen', () => {
       const classes = classList(counter(group({ size })))
       const [box, floor] = BOX[size]
       const root = classList(markup(<AvatarRoot size={size} />)).filter((c) => c !== 'bg-neutral-soft' && c !== 'text-neutral-on-soft')
-      expect(classes, size).toEqual([...root, 'w-auto', floor, 'px-1', 'bg-primary-soft', 'text-primary-on-soft', 'ring-primary-soft'])
+      expect(classes, size).toEqual([...root, 'w-auto', floor, 'px-1', 'bg-primary-soft', 'text-primary-on-soft'])
       expect(classes, size).toContain(box)
     })
 
