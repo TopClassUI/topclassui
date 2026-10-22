@@ -7,7 +7,8 @@ export const skeleton = {
     ar: 'عنصر نائب يحجز شكل المحتوى أثناء تحميله: أسطر نص، أو دائرة، أو مستطيل، أو بطاقة.',
   },
   demos: ['media-object', 'variants', 'rows', 'beside-text', 'custom-size', 'rtl'],
-  stageHeight: 8,
+  stageHeight: 14,
+  codeDemo: 'media-object',
   note: {
     en: 'Give the skeleton the real dimensions through className; rows is clamped from 1 to 50, and a wrong size is a layout shift.',
     ar: 'أعطِ الهيكل الأبعاد الحقيقية عبر className؛ تُحصر rows بين 1 و50، والحجم الخاطئ يعني إزاحة في التخطيط.',

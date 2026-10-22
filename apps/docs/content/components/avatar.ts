@@ -7,7 +7,8 @@ export const avatar = {
     ar: 'صورة أو أحرف أولى أو أيقونة داخل دائرة، بالأحجام الخمسة نفسها لكل عنصر تحكم، فتصطف الصورة الرمزية مع الزر في الصف نفسه.',
   },
   demos: ['basic', 'with-name', 'sizes', 'icon', 'failed', 'skeleton', 'custom-size', 'rtl'],
-  stageHeight: 8,
+  stageHeight: 15.5,
+  stageDemo: 'basic',
   note: {
     en: 'The fallback shows while the picture loads and after it fails; initials are its children.',
     ar: 'يظهر البديل أثناء تحميل الصورة وبعد فشلها؛ والأحرف الأولى هي محتواه.',

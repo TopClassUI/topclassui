@@ -7,7 +7,9 @@ export const avatarGroup = {
     ar: 'صور رمزية متداخلة مع عدّاد +N للبقية. اعرض كل الأعضاء؛ وتُحصر قيمة max بين 1 و20.',
   },
   demos: ['max', 'two', 'four', 'overflow', 'counts', 'sizes', 'linked', 'on-card', 'in-table', 'many', 'custom-size', 'rtl'],
-  stageHeight: 8,
+  stageHeight: 18,
+  stageDemo: 'overflow',
+  codeDemo: 'max',
   note: {
     en: 'max counts children, so render every member and let the group hide the overflow.',
     ar: 'تعدّ max العناصر الأبناء، فاعرض كل عضو ودع المجموعة تخفي الفائض.',

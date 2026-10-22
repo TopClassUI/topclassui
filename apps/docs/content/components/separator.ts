@@ -7,7 +7,8 @@ export const separator = {
     ar: 'خط رفيع بين مجموعتين، عرضيًا في عمود أو طوليًا في صف. زخرفي افتراضيًا، فلا يُعلَن لقارئ الشاشة.',
   },
   demos: ['horizontal', 'vertical', 'semantic', 'rtl'],
-  stageHeight: 8,
+  stageHeight: 14,
+  codeDemo: 'horizontal',
   note: {
     en: 'A vertical Separator takes its height from a flex or grid row; give the row a height or let it stretch.',
     ar: 'يأخذ الفاصل العمودي ارتفاعه من صف flex أو grid؛ أعطِ الصف ارتفاعًا أو دعه يتمدد.',
