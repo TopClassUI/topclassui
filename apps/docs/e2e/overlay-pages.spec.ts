@@ -108,6 +108,8 @@ for (const slug of SLUGS) {
       } else {
         // A modal dialog hides the rest of the page from the accessibility tree once it opens, its own trigger included.
         const closed = states.getByRole('button', { name: trigger, exact: true, includeHidden: true }).first()
+        // The stage loads after the strip, and its tooltip, held open, closes any other open one of the shared delay group.
+        await expect(stagePopup(page, slug)).toHaveCount(1)
         await expect(closed).not.toHaveAttribute('data-popup-open')
         await drive(slug, closed)
         await expect(closed).toHaveAttribute('data-popup-open', '')

@@ -252,7 +252,6 @@ export const en: SiteLabels = {
     placeholder: 'Search pages and components',
     groups: { pages: 'Pages', components: 'Components', icons: 'Icons' },
     shortcut: { pc: 'Ctrl K', mac: '⌘ K' },
-    enter: 'Enter',
     empty: 'No results',
     loading: 'Loading the index',
   },

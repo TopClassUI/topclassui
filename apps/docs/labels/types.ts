@@ -227,8 +227,6 @@ export interface SearchLabels {
   placeholder: string
   groups: Record<SearchGroup, string>
   shortcut: { pc: string; mac: string }
-  /** The key hint on the active row, as frame 138:1653 draws it. */
-  enter: string
   empty: string
   loading: string
 }

@@ -258,7 +258,6 @@ export const ar: SiteLabels = {
     placeholder: 'ابحث في الصفحات والمكوّنات',
     groups: { pages: 'الصفحات', components: 'المكوّنات', icons: 'الأيقونات' },
     shortcut: { pc: 'Ctrl K', mac: '⌘ K' },
-    enter: 'Enter',
     empty: 'لا نتائج',
     loading: 'جارٍ تحميل الفهرس',
   },

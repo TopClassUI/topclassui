@@ -140,8 +140,10 @@ export const FLAT_CODE = 'docs-flat-code bg-transparent text-body [--tc-ring:var
 /** The same code in a bordered box on the page background, as Before you start draws it. */
 export const BOXED_CODE = `${FLAT_CODE} rounded-control bg-page p-3 ${BORDER}`
 /** A one-line copy field of the install row: the text, then its copy button. */
-export const COPY_FIELD = `flex min-w-0 items-center gap-2 rounded-control bg-page ps-3 pe-1 ${BORDER}`
-export const COPY_FIELD_TEXT = 'min-w-0 flex-1 py-2 font-mono text-xs text-body wrap-anywhere'
+export const COPY_FIELD = `flex min-w-0 items-center gap-0.5 rounded-control bg-page ps-2.5 pe-0 ${BORDER}`
+/** The frames' 11 px mono: a 59-character import line fits a 932 px card's half beside a 24 px copy target. */
+export const COPY_FIELD_TEXT = 'min-w-0 flex-1 py-2 font-mono text-[0.6875rem] leading-4 text-body wrap-anywhere'
+export const COPY_FIELD_BUTTON = 'size-6 px-0'
 /** The two install columns side by side at 40rem and up, stacked below. */
 export const INSTALL_ROW = 'grid min-w-0 border-t-(length:--tc-line-width) border-line sm:grid-cols-2'
 export const INSTALL_COL = 'grid min-w-0 content-start gap-2 p-4.5'
@@ -202,9 +204,9 @@ export const STEP = 'grid min-w-0 content-start gap-2.5 border-t-(length:--tc-li
 export const CHIP = `inline-flex items-center rounded-chip px-2 py-0.5 font-mono text-xs text-muted ${BORDER}`
 /** The legend's step number in its soft round badge. */
 export const LEGEND_NUMBER = 'inline-flex size-4.5 shrink-0 items-center justify-center rounded-full bg-primary-soft text-xs font-semibold text-primary-on-soft'
-/** Every state: equal abutting cells share the row, each at least 144 px (six fit the frames' 906), and wrap below that; a wide state grows. */
+/** Every state: abutting cells of one basis grow equally to share the row, each at least 144 px (six fit the frames' 906), and wrap below that; a wide state grows. */
 export const STATE_GRID = 'flex min-w-0 flex-wrap items-start gap-x-0 gap-y-4'
-export const STATE_CELL = 'grid min-w-[max(9rem,min-content)] max-w-full flex-1 basis-0 content-start justify-items-center gap-2.5'
+export const STATE_CELL = 'grid min-w-[max(9rem,min-content)] max-w-full grow basis-36 content-start justify-items-center gap-2.5'
 /** The frames' 56 px box each state sits centred in. */
 export const STATE_BOX = 'flex min-h-14 max-w-full items-center justify-center'
 export const STATE_CAPTION = 'max-w-full text-center font-mono text-xs text-muted'
