@@ -23,7 +23,7 @@ const INPUTS: Record<string, string[]> = {
   playground: ['Attachment: attachment, multiple, accept .png,.jpg,.jpeg,.pdf'],
   rtl: ['المرفقات: attachments, multiple, accept application/pdf,image/png'],
   invalid: ['Contract: contract, one, invalid'],
-  states: ['idle: idle, one', 'disabled: disabled, one, disabled'],
+  states: ['idle: idle, one', 'drag over: drag, one', 'disabled: disabled, one, disabled'],
   'ten-thousand': ['Ten thousand files: photos, multiple, accept image/*'],
 }
 
@@ -88,6 +88,6 @@ describe('the demos the plan names', () => {
   it('rtl: an island that carries the direction and the language, and the Arabic words', async () => {
     const html = await render('rtl')
     expect(html).toMatch(/^<div class="isolate"><div dir="rtl" lang="ar" class="[^"]*">/)
-    expect(html).toContain('<span>اسحب الملفات إلى هنا أو</span>')
+    expect(html).toMatch(/<span class="[^"]*">اسحب الملفات إلى هنا أو<\/span>/)
   })
 })

@@ -8,8 +8,9 @@ import {
 export const FILE_UPLOAD_ROOT = 'relative grid min-w-0 grid-cols-1 gap-2.5 text-body'
 
 /** The ring shows when the input over the zone has the keyboard; the dashed 3:1 line, danger when invalid. A drag turns
- * the dashed line, the fill and the words primary, as drawn; forced colours erase those, so there the line turns solid. */
-export const FILE_UPLOAD_ZONE = `group/zone relative flex flex-col items-center justify-center gap-2 rounded-box border-dashed bg-surface p-6 text-center ${BORDER_STRONG} ${TRANSITION} ${FOCUS_RING_WITHIN} ${FIELD_INVALID_WITHIN} data-disabled:opacity-50 data-dragging:border-primary-solid forced-colors:data-dragging:border-solid data-dragging:bg-primary-soft data-dragging:text-primary-on-soft forced-colors:data-dragging:border-[Highlight]`
+ * the dashed line, the fill and the words primary, as drawn; forced colours erase those, so there the line turns solid.
+ * Compact is the frame's mini zone: 12 px of padding and 4 between the icon and the word. */
+export const FILE_UPLOAD_ZONE = `group/zone relative flex flex-col items-center justify-center gap-2 rounded-box border-dashed bg-surface p-6 text-center data-compact:gap-1 data-compact:p-3 ${BORDER_STRONG} ${TRANSITION} ${FOCUS_RING_WITHIN} ${FIELD_INVALID_WITHIN} data-disabled:opacity-50 data-dragging:border-primary-solid forced-colors:data-dragging:border-solid data-dragging:bg-primary-soft data-dragging:text-primary-on-soft forced-colors:data-dragging:border-[Highlight]`
 
 /** The native input over the whole zone, unseen: a click, a key and a drop reach it before any script. */
 export const FILE_UPLOAD_INPUT = 'absolute inset-0 size-full cursor-pointer opacity-0 disabled:cursor-default'
@@ -17,7 +18,10 @@ export const FILE_UPLOAD_INPUT = 'absolute inset-0 size-full cursor-pointer opac
 export const FILE_UPLOAD_ICON = 'flex text-muted group-data-dragging/zone:text-primary-on-soft'
 
 /** CONTAIN and wrap-anywhere: a word with no space to break at wraps inside the zone instead of widening the page. */
-export const FILE_UPLOAD_PROMPT = `flex flex-wrap justify-center gap-x-1 text-sm font-medium wrap-anywhere ${CONTAIN}`
+export const FILE_UPLOAD_PROMPT = `flex flex-wrap justify-center gap-x-1 text-sm font-medium wrap-anywhere group-data-compact/zone:text-xs group-data-compact/zone:font-normal ${CONTAIN}`
+
+/** The drop words before browse; a compact zone shows the browse word alone, as the frame's mini zone does. */
+export const FILE_UPLOAD_DROP = 'group-data-compact/zone:hidden'
 
 /** One line with the drop words, as drawn: the whole zone is the control, so the word needs no link styling. */
 export const FILE_UPLOAD_BROWSE = 'text-body group-data-dragging/zone:text-primary-on-soft'

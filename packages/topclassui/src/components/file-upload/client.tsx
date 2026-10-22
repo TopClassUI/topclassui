@@ -7,7 +7,7 @@ import { warningCircle } from '#icons/data/warning-circle.js'
 import { x } from '#icons/data/x.js'
 import { cn } from '#shared/cn.js'
 import {
-  FILE_UPLOAD_ANNOUNCE, FILE_UPLOAD_BROWSE, FILE_UPLOAD_HINT, FILE_UPLOAD_ICON, FILE_UPLOAD_INPUT, FILE_UPLOAD_LIST,
+  FILE_UPLOAD_ANNOUNCE, FILE_UPLOAD_BROWSE, FILE_UPLOAD_DROP, FILE_UPLOAD_HINT, FILE_UPLOAD_ICON, FILE_UPLOAD_INPUT, FILE_UPLOAD_LIST,
   FILE_UPLOAD_MESSAGE, FILE_UPLOAD_NAME, FILE_UPLOAD_PROMPT, FILE_UPLOAD_REASON, FILE_UPLOAD_REJECTED_ICON,
   FILE_UPLOAD_REMOVE, FILE_UPLOAD_ROOT, FILE_UPLOAD_ROW, FILE_UPLOAD_ROW_ICON, FILE_UPLOAD_SIZE, FILE_UPLOAD_SPACER_END,
   FILE_UPLOAD_SPACER_START, FILE_UPLOAD_ZONE,
@@ -24,6 +24,7 @@ export function FileUpload({
   maxSize,
   visibleRows,
   invalid = FILE_UPLOAD_DEFAULTS.invalid,
+  compact = FILE_UPLOAD_DEFAULTS.compact,
   accept,
   disabled,
   onValueChange,
@@ -33,6 +34,7 @@ export function FileUpload({
   children,
   'aria-describedby': describedBy,
   'aria-invalid': ariaInvalid,
+  'data-dragging': held,
   ...rest
 }: FileUploadProps) {
   const upload = useFileUpload({ maxFiles, maxSize, visibleRows, accept, disabled, hint: children, describedBy, onValueChange, ref })
@@ -40,13 +42,14 @@ export function FileUpload({
     <div ref={upload.rootRef} style={style} className={cn(FILE_UPLOAD_ROOT, className)}>
       <div
         {...upload.zone}
-        data-dragging={upload.dragging ? '' : undefined}
+        data-dragging={upload.dragging || held === true ? '' : undefined}
         data-disabled={disabled ? '' : undefined}
+        data-compact={compact ? '' : undefined}
         className={FILE_UPLOAD_ZONE}
       >
-        <span aria-hidden="true" className={FILE_UPLOAD_ICON}><Svg icon={uploadSimple} size="1.625rem" /></span>
+        <span aria-hidden="true" className={FILE_UPLOAD_ICON}><Svg icon={uploadSimple} size={compact ? '1.125rem' : '1.625rem'} /></span>
         <span className={FILE_UPLOAD_PROMPT}>
-          <span>{upload.labels.drop}</span>
+          <span className={FILE_UPLOAD_DROP}>{upload.labels.drop}</span>
           <span className={FILE_UPLOAD_BROWSE}>{upload.labels.browse}</span>
         </span>
         {upload.hintId === undefined ? null : <span id={upload.hintId} className={FILE_UPLOAD_HINT}>{children}</span>}

@@ -9,10 +9,10 @@ import { fileUploadSchema } from '../schema.js'
 const json = z.toJSONSchema(fileUploadSchema, { io: 'input' }) as {
   properties?: Record<string, { description?: string; default?: unknown; minimum?: number; maximum?: number; type?: string }>
 }
-const KEYS = ['invalid', 'maxFiles', 'maxSize', 'visibleRows']
+const KEYS = ['compact', 'invalid', 'maxFiles', 'maxSize', 'visibleRows']
 
 describe('the schema is the documentation', () => {
-  it('covers the four props FileUpload adds and no other: the rest are the input\'s', () => {
+  it('covers the five props FileUpload adds and no other: the rest are the input\'s', () => {
     expect(Object.keys(fileUploadSchema.shape).sort()).toEqual(KEYS)
     expect(Object.keys(json.properties ?? {}).sort()).toEqual(KEYS)
   })
@@ -29,16 +29,17 @@ describe('the schema is the documentation', () => {
     expect(range('maxSize')).toEqual([10_737_418_240, 1, 10_737_418_240])
     expect(range('visibleRows')).toEqual([7, 1, 20])
     expect(json.properties?.['invalid']?.default).toBe(false)
+    expect(json.properties?.['compact']?.default).toBe(false)
   })
 })
 
 describe('the schema, the constants and the bounds agree', () => {
   it('fills every default from constants.ts', () => {
-    expect(fileUploadSchema.parse({})).toEqual({ maxFiles: 1, maxSize: 10_737_418_240, invalid: false, visibleRows: 7 })
+    expect(fileUploadSchema.parse({})).toEqual({ maxFiles: 1, maxSize: 10_737_418_240, invalid: false, compact: false, visibleRows: 7 })
   })
 
   it('names the defaults, the bounds and the lists the spec gives, so a changed constant is a failure here', () => {
-    expect(FILE_UPLOAD_DEFAULTS).toEqual({ maxFiles: 1, maxSize: 10_737_418_240, invalid: false, visibleRows: 7 })
+    expect(FILE_UPLOAD_DEFAULTS).toEqual({ maxFiles: 1, maxSize: 10_737_418_240, invalid: false, compact: false, visibleRows: 7 })
     expect(FILE_UPLOAD_BOUNDARIES).toEqual({ maxFilesMin: 1, maxFilesMax: 100, maxSizeMin: 1, maxSizeMax: 10_737_418_240 })
     expect(FILE_UPLOAD_REASONS).toEqual(['tooLarge', 'wrongType'])
     expect(FILE_UPLOAD_UNITS).toEqual(['kilobyte', 'megabyte', 'gigabyte'])

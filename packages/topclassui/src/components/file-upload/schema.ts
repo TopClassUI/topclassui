@@ -16,6 +16,8 @@ export const fileUploadSchema = z.object({
     .meta({ description: 'The largest file accepted, in bytes, clamped to 1 to 10 GiB; checked in the browser only.' }),
   invalid: z.boolean().default(FILE_UPLOAD_DEFAULTS.invalid)
     .meta({ description: 'Marks the files as wrong: sets aria-invalid on the input, and the line of the zone turns to danger and thickens.' }),
+  compact: z.boolean().default(FILE_UPLOAD_DEFAULTS.compact)
+    .meta({ description: 'A small zone for a tight space: less padding, a smaller icon, and the browse word alone as its prompt.' }),
   visibleRows: z.number().min(visibleRowsMin).max(visibleRowsMax).default(FILE_UPLOAD_DEFAULTS.visibleRows)
     .meta({ description: 'Rows the list shows before it scrolls, clamped; left out, the --tc-list-rows knob applies.' }),
 })

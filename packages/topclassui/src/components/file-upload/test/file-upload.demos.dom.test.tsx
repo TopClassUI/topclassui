@@ -18,7 +18,7 @@ const AFTER: Record<string, number[]> = {
   playground: [2],
   rtl: [2],
   invalid: [1],
-  states: [1, 0],
+  states: [1, 1, 0],
   // Images only: both PDFs are refused, and a refused file is a row too.
   'ten-thousand': [2],
 }

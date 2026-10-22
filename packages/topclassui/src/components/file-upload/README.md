@@ -74,7 +74,11 @@ page, so there is no `value`.
 
 **A drop.** A drag of files marks the zone (`data-dragging`): the line turns solid and primary
 and the zone takes the primary tint; under forced colours the line is Highlight. A drag of text
-is left alone. A disabled upload takes no drop and the browser does not open the file.
+is left alone. A disabled upload takes no drop and the browser does not open the file. The
+`data-dragging` prop draws that look at rest, for a strip of states.
+
+**Compact** is a small zone for a tight space: 12 px of padding, an 18 px icon and the word
+"browse" alone, in the xs type step. The input still covers the whole zone.
 
 **The keyboard.** Tab reaches the input, and the zone draws the ring; Enter or Space opens the
 picker. Each remove button is a tab stop; the list is one only while it scrolls.
@@ -119,6 +123,8 @@ Required: `aria-label` or `aria-labelledby` or `id`. Every other prop below is o
 | `id` | **yes**, or `aria-label` or `aria-labelledby` | `string` | - | The id a `<label htmlFor>` points at. |
 | `children` | no | `ReactNode` | - | The hint inside the zone, such as "PDF or PNG, up to 5 MB": it describes the input; a link in it takes its own click. |
 | `className` | no | `string` | - | On the root, merged last. |
+| `compact` | no | `boolean` | `false` | A small zone for a tight space: less padding, a smaller icon, and the browse word alone as its prompt. |
+| `data-dragging` | no | `boolean` | - | Draws the zone as if files were held over it, at rest, for a strip of states; a real drag sets it on its own. |
 | `invalid` | no | `boolean` | `false` | Marks the files as wrong: sets aria-invalid on the input, and the line of the zone turns to danger and thickens. |
 | `maxFiles` | no | `integer`, min 1, max 100 | `1` | How many files the list keeps, clamped to 1 to 100; above 1 the input takes several at once. |
 | `maxSize` | no | `integer`, min 1, max 10737418240 | `10737418240` | The largest file accepted, in bytes, clamped to 1 to 10 GiB; checked in the browser only. |

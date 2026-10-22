@@ -34,7 +34,7 @@ describe('the native input carries the form props', () => {
   })
 
   it('is the last child of the zone, after the icon, the prompt and the hint', () => {
-    expect(html).toMatch(/<div class="group\/zone [^"]*"><span aria-hidden="true"[^>]*>.*<\/span><span class="flex flex-wrap[^"]*"><span>Drag files here or<\/span><span class="[^"]*">browse<\/span><\/span><span id="[^"]*"[^>]*>PDF only<\/span><input [^>]*><\/div>/)
+    expect(html).toMatch(/<div class="group\/zone [^"]*"><span aria-hidden="true"[^>]*>.*<\/span><span class="flex flex-wrap[^"]*"><span class="[^"]*">Drag files here or<\/span><span class="[^"]*">browse<\/span><\/span><span id="[^"]*"[^>]*>PDF only<\/span><input [^>]*><\/div>/)
   })
 })
 
@@ -110,7 +110,25 @@ describe('invalid and disabled', () => {
 describe('the words come from the labels', () => {
   it('in Arabic under the provider', () => {
     const html = markup(<TopClassProvider direction="rtl" locale="ar"><FileUpload aria-label="ملفات" /></TopClassProvider>)
-    expect(html).toContain('<span>اسحب الملفات إلى هنا أو</span>')
+    expect(html).toMatch(/<span class="[^"]*">اسحب الملفات إلى هنا أو<\/span>/)
     expect(html).toMatch(/<span class="[^"]*">تصفّح<\/span>/)
+  })
+})
+
+describe('the compact zone and a drag drawn at rest', () => {
+  it('compact marks the zone, draws the 18 px icon and hides the drop words, so browse is the prompt alone', () => {
+    const html = markup(<FileUpload aria-label="F" compact />)
+    expect(html).toMatch(/<div data-compact="" class="group\/zone /)
+    expect(html).toContain('width="1.125rem"')
+    expect(html).toMatch(/<span class="group-data-compact\/zone:hidden">Drag files here or<\/span>/)
+    expect(markup(<FileUpload aria-label="F" />)).not.toContain('data-compact=""')
+    expect(markup(<FileUpload aria-label="F" />)).toContain('width="1.625rem"')
+  })
+
+  it('data-dragging draws the zone as a drag over it, on the zone and never on the input', () => {
+    const html = markup(<FileUpload aria-label="F" data-dragging />)
+    expect(html).toMatch(/<div data-dragging="" class="group\/zone /)
+    expect(inputOf(html)).not.toContain('data-dragging=')
+    expect(markup(<FileUpload aria-label="F" data-dragging={false} />)).not.toContain('data-dragging=""')
   })
 })

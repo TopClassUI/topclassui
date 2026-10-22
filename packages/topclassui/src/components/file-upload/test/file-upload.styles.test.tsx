@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { markup } from '#test/markup.js'
 import {
-  FILE_UPLOAD_ANNOUNCE, FILE_UPLOAD_BROWSE, FILE_UPLOAD_HINT, FILE_UPLOAD_ICON, FILE_UPLOAD_INPUT, FILE_UPLOAD_LIST,
+  FILE_UPLOAD_ANNOUNCE, FILE_UPLOAD_BROWSE, FILE_UPLOAD_DROP, FILE_UPLOAD_HINT, FILE_UPLOAD_ICON, FILE_UPLOAD_INPUT, FILE_UPLOAD_LIST,
   FILE_UPLOAD_MESSAGE, FILE_UPLOAD_PROMPT, FILE_UPLOAD_ROOT, FILE_UPLOAD_ZONE,
 } from '../classes.js'
 import { FileUpload } from '../index.js'
@@ -18,6 +18,7 @@ describe('each element wears its own string', () => {
       ['div', FILE_UPLOAD_ZONE],
       ['span', FILE_UPLOAD_ICON],
       ['span', FILE_UPLOAD_PROMPT],
+      ['span', FILE_UPLOAD_DROP],
       ['span', FILE_UPLOAD_BROWSE],
       ['span', FILE_UPLOAD_HINT],
       ['input', FILE_UPLOAD_INPUT],

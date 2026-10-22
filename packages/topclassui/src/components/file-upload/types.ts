@@ -33,6 +33,8 @@ export type FileUploadProps = Omit<ComponentPropsWithoutRef<'input'>, Owned>
     style?: CSSProperties | undefined
     /** The root element, a `<div>`. */
     ref?: Ref<HTMLDivElement> | undefined
+    /** Draws the zone as if files were held over it, at rest, for a strip of states; a real drag sets it on its own. */
+    'data-dragging'?: boolean | undefined
   }
   & FileUploadName
 

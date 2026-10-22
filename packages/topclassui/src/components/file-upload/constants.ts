@@ -12,6 +12,7 @@ export const FILE_UPLOAD_DEFAULTS = {
   maxFiles: 1,
   maxSize: 10_737_418_240,
   invalid: false,
+  compact: false,
   visibleRows: COLLECTION_DEFAULTS.visibleRows,
 } as const
 
