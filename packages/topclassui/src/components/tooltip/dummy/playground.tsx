@@ -5,28 +5,30 @@ import { useState } from 'react'
 import { linkSimple } from '#icons/data/link-simple.js'
 import { Button } from '#components/button/index.js'
 import { Svg } from '#components/svg/index.js'
-import { TooltipPopup, TooltipRoot, TooltipTrigger } from '../index.js'
+import { TooltipPopup, TooltipProvider, TooltipRoot, TooltipTrigger } from '../index.js'
 import type { TooltipDesignProps } from '../types.js'
 
-/** The tooltip held open at its trigger inside its own box, as the frame draws it, whatever tooltip opens beside it. */
+/** The tooltip held open at its trigger inside its own box and its own delay group, as the frame draws it, whatever tooltip opens beside it. */
 function Stage({ placement, delay, closeDelay }: TooltipDesignProps) {
   // An element, not a ref: a popup open on the first render resolves its container before a ref is attached.
   const [root, setRoot] = useState<HTMLDivElement | null>(null)
   return (
     <div ref={setRoot} data-stage="" className="relative min-h-67.75 w-full [contain:paint]">
       <div className="absolute inset-0 flex items-center justify-center">
-        <TooltipRoot open>
-          <TooltipTrigger
-            delay={delay}
-            closeDelay={closeDelay}
-            render={
-              <Button variant="ghost" aria-label="Copy link">
-                <Svg icon={linkSimple} />
-              </Button>
-            }
-          />
-          <TooltipPopup placement={placement} container={root}>Copy link</TooltipPopup>
-        </TooltipRoot>
+        <TooltipProvider>
+          <TooltipRoot open>
+            <TooltipTrigger
+              delay={delay}
+              closeDelay={closeDelay}
+              render={
+                <Button variant="ghost" aria-label="Copy link">
+                  <Svg icon={linkSimple} />
+                </Button>
+              }
+            />
+            <TooltipPopup placement={placement} container={root}>Copy link</TooltipPopup>
+          </TooltipRoot>
+        </TooltipProvider>
       </div>
     </div>
   )
