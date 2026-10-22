@@ -10,6 +10,7 @@ export const switchControl = {
     ar: 'مفتاح تشغيل وإطفاء لإعداد يسري فورًا. يتحرك مقبضه في الاتجاه الصحيح في التخطيطات من اليمين إلى اليسار.',
   },
   demos: ['basic', 'form', 'unchecked-value', 'sizes', 'rtl'],
+  stageDemo: 'stage',
   stageHeight: 5.25,
   controlOrder: ['size', 'defaultChecked', 'disabled', 'required', 'invalid'],
   extraSwitches: ['defaultChecked', 'disabled', 'required'],

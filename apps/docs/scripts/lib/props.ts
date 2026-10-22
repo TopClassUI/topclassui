@@ -53,7 +53,7 @@ export function propsOf(program: ts.Program, dir: string, meta: ComponentMeta, j
     return familyOf(program, typeFile, exported, root, fromSchema).parts
       .map((part) => ({ name: part.name, rows: withLimits(part.rows, json) }))
   }
-  // A single part is named by its real export, whose casing the folder name cannot carry (OTPField).
-  const name = exported.find((value) => value.toLowerCase() === meta.name.toLowerCase()) ?? meta.name
+  // The part is named by its real export (OTPField), which the folder's PascalCase (OtpField) can miss.
+  const name = exported.find((one) => /^[A-Z]/.test(one) && one.toLowerCase() === meta.name.toLowerCase()) ?? meta.name
   return [{ name, rows: withLimits(mergeRows(fromSchema, fromTypes), json) }]
 }
