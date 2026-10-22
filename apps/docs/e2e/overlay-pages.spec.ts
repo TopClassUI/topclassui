@@ -64,7 +64,11 @@ const strip = (page: Page, slug: string, locale: (typeof LOCALES)[number]['local
 
 /** A tooltip opens on hover; every other overlay on a press. The trigger sits mid-screen, so a popup has room on every side. */
 async function drive(slug: (typeof SLUGS)[number], trigger: Locator) {
+  // The pointer rests where the last trigger was centred; parked first, it enters this one only on the hover below.
+  if (slug === 'tooltip') await trigger.page().mouse.move(0, 0)
   await trigger.evaluate((element) => { element.scrollIntoView({ block: 'center', behavior: 'instant' }) })
+  // An example takes over in place of the server's HTML as it nears the viewport (lazy-island.tsx), so a hover before that lands on a node about to go.
+  await expect.poll(() => trigger.evaluate((element) => element.closest('[data-island]:not([data-island-live])') === null && Object.keys(element).some((key) => key.startsWith('__reactFiber')))).toBe(true)
   await (slug === 'tooltip' ? trigger.hover() : trigger.click())
 }
 
@@ -137,16 +141,7 @@ for (const slug of SLUGS) {
         }
         // Command's example opens its palette from a plain button, so the palette itself is the proof.
         if (slug === 'command') await expect(page.locator(POPUP.command), name ?? String(index)).toBeVisible()
-        else if (slug === 'tooltip') {
-          // A late island or the stage's held-open tooltip shares the delay group and can close this one, so the hover is given again until it holds.
-          await expect(async () => {
-            if ((await trigger.getAttribute('data-popup-open')) === null) {
-              await page.mouse.move(0, 0)
-              await drive(slug, trigger)
-            }
-            await expect(trigger).toHaveAttribute('data-popup-open', '', { timeout: 2000 })
-          }, name ?? String(index)).toPass({ timeout: 20_000 })
-        } else await expect(trigger, name ?? String(index)).toHaveAttribute('data-popup-open', '')
+        else await expect(trigger, name ?? String(index)).toHaveAttribute('data-popup-open', '')
         await page.keyboard.press('Escape')
         if (slug === 'command') await expect(page.locator(POPUP.command)).toHaveCount(0)
         else await expect(trigger, name ?? String(index)).not.toHaveAttribute('data-popup-open')
