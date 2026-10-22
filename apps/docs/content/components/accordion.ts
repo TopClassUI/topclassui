@@ -11,7 +11,7 @@ export const accordion = {
   },
   demos: ['basic', 'first-open', 'multiple', 'disabled', 'long-content', 'many-items', 'rtl'],
   stageHeight: 15.6,
-  controlOrder: ['hiddenUntilFound', 'disabled'],
+  controlOrder: ['size', 'hiddenUntilFound', 'disabled'],
   controlsHidden: ['headingLevel'],
   extraSwitches: ['disabled'],
   note: {

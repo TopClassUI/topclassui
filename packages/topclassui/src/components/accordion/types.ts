@@ -22,7 +22,9 @@ interface OwnClassName {
 }
 
 // R-5.7-5: derived at the seam. loopFocus and orientation are deprecated in 1.8.0 and move no focus, so they are left out.
-export type AccordionRootProps = Omit<Base.Root.Props<string>, 'className' | 'loopFocus' | 'orientation'> & OwnClassName
+export type AccordionRootProps = Omit<Base.Root.Props<string>, 'className' | 'loopFocus' | 'orientation'>
+  & Pick<AccordionDesignProps, 'size'>
+  & OwnClassName
 
 /** Base UI's item, with the three things it holds. Rest props reach the item's own element. */
 export type AccordionItemProps = Omit<Base.Item.Props, 'className' | 'value' | 'title' | 'children'>

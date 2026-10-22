@@ -13,9 +13,9 @@ const json = z.toJSONSchema(accordionSchema, { io: 'input' }) as {
 describe('the schema is the documentation', () => {
   const keys = Object.keys(accordionSchema.shape)
 
-  it('covers the two props whose default or bounds are ours, and no other', () => {
-    expect(keys.sort()).toEqual(['headingLevel', 'hiddenUntilFound'])
-    expect(Object.keys(json.properties ?? {}).sort()).toEqual(['headingLevel', 'hiddenUntilFound'])
+  it('covers the three props whose default or bounds are ours, and no other', () => {
+    expect(keys.sort()).toEqual(['headingLevel', 'hiddenUntilFound', 'size'])
+    expect(Object.keys(json.properties ?? {}).sort()).toEqual(['headingLevel', 'hiddenUntilFound', 'size'])
   })
 
   for (const key of keys) {
@@ -26,9 +26,14 @@ describe('the schema is the documentation', () => {
     })
   }
 
-  it('records the defaults: closed panels kept in the HTML, and an h3', () => {
+  it('records the defaults: closed panels kept in the HTML, an h3 and md', () => {
     expect(json.properties?.['hiddenUntilFound']?.default).toBe(true)
     expect(json.properties?.['headingLevel']?.default).toBe(3)
+    expect(json.properties?.['size']?.default).toBe('md')
+  })
+
+  it('lists size as the shared scale, custom included (R-5.7-2)', () => {
+    expect(json.properties?.['size']).toMatchObject({ enum: ['xs', 'sm', 'md', 'lg', 'xl', 'custom'] })
   })
 
   it('lists headingLevel as a whole number from 2 to 6, and hiddenUntilFound as a boolean', () => {
@@ -39,11 +44,11 @@ describe('the schema is the documentation', () => {
 
 describe('the schema, the constants and the bounds agree', () => {
   it('fills every default from constants.ts', () => {
-    expect(accordionSchema.parse({})).toEqual({ hiddenUntilFound: true, headingLevel: 3 })
+    expect(accordionSchema.parse({})).toEqual({ hiddenUntilFound: true, headingLevel: 3, size: 'md' })
   })
 
   it('names the defaults and the bounds the spec gives, so a changed number is a failure here', () => {
-    expect(ACCORDION_DEFAULTS).toEqual({ hiddenUntilFound: true, headingLevel: 3 })
+    expect(ACCORDION_DEFAULTS).toEqual({ hiddenUntilFound: true, headingLevel: 3, size: 'md' })
     expect(ACCORDION_BOUNDARIES).toEqual({ headingLevelMin: 2, headingLevelMax: 6 })
   })
 
@@ -55,6 +60,7 @@ describe('the schema, the constants and the bounds agree', () => {
   it('refuses a level outside the bounds, a level that is no whole number, and a text', () => {
     for (const headingLevel of [1, 7, 9, 2.5, '2']) expect(accordionSchema.safeParse({ headingLevel }).success, String(headingLevel)).toBe(false)
     expect(accordionSchema.safeParse({ hiddenUntilFound: 'false' }).success).toBe(false)
+    expect(accordionSchema.safeParse({ size: 'xxl' }).success).toBe(false)
   })
 
   it('keeps multiple, disabled and keepMounted out of the schema: they are Base UI own, with its defaults', () => {

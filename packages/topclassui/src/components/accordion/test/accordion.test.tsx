@@ -17,7 +17,7 @@ const tag = (source: string, pattern: RegExp) => pattern.exec(source)?.[0] ?? ''
 // The ssr project: what reaches the HTML before any script runs.
 describe('on the server', () => {
   it('AccordionRoot is one div, the box, around its items', () => {
-    expect(html).toMatch(/^<div data-orientation="vertical" class="grid grid-cols-1 overflow-hidden rounded-box /)
+    expect(html).toMatch(/^<div data-orientation="vertical" data-size="md" class="grid grid-cols-1 overflow-hidden rounded-box /)
     expect(html).toMatch(/<\/div><\/div><\/div><\/div>$/)
   })
 

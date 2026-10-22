@@ -48,8 +48,10 @@ import { AccordionItem, AccordionRoot } from 'topclassui/accordion'
   starts once the page has hydrated; before that a closed panel is plain `hidden`.
 - **`hiddenUntilFound={false}`** on the root takes closed panels out of the page.
   `keepMounted` then keeps them, hidden from the search as well.
-- **Disabled.** `disabled` on an item, or on the root for all of them. The trigger keeps
-  its place in the tab order and says that it is disabled.
+- **Size.** `size` on the root, `xs` to `xl`, default `md`: the padding and type step of
+  every trigger and panel in it. `md` is the 41 px row; `custom` emits none, for your own.
+- **Disabled.** `disabled` on an item dims its trigger; on the root it dims the whole box
+  once. The trigger keeps its place in the tab order and says that it is disabled.
 - **Keyboard.** Tab moves from trigger to trigger. Enter and Space toggle. There are no
   arrow keys: Base UI 1.8.0 dropped them, as the ARIA Authoring Practices did.
 - **A screen reader** hears the trigger as a button in a heading, expanded or collapsed,
@@ -97,6 +99,7 @@ Required: `title` on `AccordionItem`, `value` on `AccordionItem`. Every other pr
 | Prop | Required | Type | Default | What it does |
 |---|---|---|---|---|
 | `hiddenUntilFound` | no | `boolean` | `true` | AccordionRoot: closed panels stay in the HTML, where find-in-page and a crawler read them. |
+| `size` | no | `xs` \| `sm` \| `md` \| `lg` \| `xl` \| `custom` | `"md"` | AccordionRoot: the padding and type step of every trigger and panel; custom emits none. |
 
 ### AccordionItem
 

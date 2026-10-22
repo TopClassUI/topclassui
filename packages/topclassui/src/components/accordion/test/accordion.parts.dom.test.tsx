@@ -26,7 +26,8 @@ describe('what each part passes on (R-5.7-3)', () => {
     expect(root.style.maxWidth).toBe('420px')
     // rounded-none replaced the radius of the box: the consumer's class won the conflict.
     expect(root.className.split(' ').sort()).toEqual([
-      'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line', 'grid', 'grid-cols-1', 'overflow-hidden',
+      'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line', 'data-disabled:opacity-50',
+      'forced-colors:data-disabled:opacity-100', 'grid', 'grid-cols-1', 'group/accordion', 'overflow-hidden',
       'p-2', 'rounded-none', 'text-body', 'wrap-anywhere',
     ])
   })

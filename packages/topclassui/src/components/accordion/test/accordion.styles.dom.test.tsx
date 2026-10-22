@@ -29,9 +29,10 @@ const classes = (element: Element | null | undefined) =>
   (element?.getAttribute('class') ?? '').split(/\s+/).filter(Boolean).sort()
 
 describe('every element carries exactly the classes the spec names', () => {
-  it('the root: the raised box with a line, which clips, breaks a long word, and is one grid column', () => {
+  it('the root: the raised box with a line, which clips, breaks a long word, is one grid column and dims as one when disabled', () => {
     expect(classes(opened().root)).toEqual([
-      'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line', 'grid', 'grid-cols-1', 'overflow-hidden',
+      'bg-surface-raised', 'border-(length:--tc-line-width)', 'border-line', 'data-disabled:opacity-50',
+      'forced-colors:data-disabled:opacity-100', 'grid', 'grid-cols-1', 'group/accordion', 'overflow-hidden',
       'rounded-box', 'text-body', 'wrap-anywhere',
     ])
   })
@@ -52,12 +53,10 @@ describe('every element carries exactly the classes the spec names', () => {
       'aria-disabled:cursor-default',
       'cursor-pointer',
       'data-disabled:cursor-default',
-      'data-disabled:opacity-50',
       'data-disabled:pointer-events-none',
       'data-loading:cursor-default',
       'data-readonly:cursor-default',
       'disabled:cursor-default',
-      'disabled:opacity-50',
       'disabled:pointer-events-none',
       'duration-(--tc-duration)',
       'ease-out',
@@ -76,6 +75,8 @@ describe('every element carries exactly the classes the spec names', () => {
       'items-center',
       'min-h-[var(--tc-target-min,24px)]',
       'min-w-[var(--tc-target-min,24px)]',
+      'not-group-data-disabled/accordion:data-disabled:opacity-50',
+      'not-group-data-disabled/accordion:disabled:opacity-50',
       'outline-none',
       'pointer-coarse:min-h-[var(--tc-target-coarse,44px)]',
       'pointer-coarse:min-w-[var(--tc-target-coarse,44px)]',
@@ -151,20 +152,27 @@ describe('the state attributes are Base UI own', () => {
     expect(opened({}, { disabled: true }).trigger.hasAttribute('data-disabled')).toBe(true)
   })
 
-  it('no part writes a data-state, a data-size or a data-variant: an accordion has no design value', () => {
+  it('no part writes a data-state or a data-variant, and only the root writes its data-size', () => {
     const { root, item, trigger, panel } = opened()
+    expect(root?.getAttribute('data-size')).toBe('md')
     for (const element of [root, item, trigger, panel]) {
       expect(element?.hasAttribute('data-state')).toBe(false)
-      expect(element?.hasAttribute('data-size')).toBe(false)
       expect(element?.hasAttribute('data-variant')).toBe(false)
     }
+    for (const element of [item, trigger, panel]) expect(element?.hasAttribute('data-size')).toBe(false)
+  })
+
+  it('a disabled root carries data-disabled, which dims the box, and so do its items and their triggers', () => {
+    const { root, item, trigger } = opened({ disabled: true })
+    for (const element of [root, item, trigger]) expect(element?.hasAttribute('data-disabled')).toBe(true)
   })
 })
 
 describe('className is passed last', () => {
   it('lets a consumer class replace the radius and the fill of the box, and keeps the rest', () => {
     expect(classes(opened({ className: 'rounded-control bg-surface' }).root)).toEqual([
-      'bg-surface', 'border-(length:--tc-line-width)', 'border-line', 'grid', 'grid-cols-1', 'overflow-hidden',
+      'bg-surface', 'border-(length:--tc-line-width)', 'border-line', 'data-disabled:opacity-50',
+      'forced-colors:data-disabled:opacity-100', 'grid', 'grid-cols-1', 'group/accordion', 'overflow-hidden',
       'rounded-control', 'text-body', 'wrap-anywhere',
     ])
   })
@@ -173,5 +181,46 @@ describe('className is passed last', () => {
     expect(classes(opened({}, { className: 'scroll-mt-20' }).item)).toEqual([
       'border-line', 'border-t-(length:--tc-line-width)', 'first:border-t-0', 'scroll-mt-20',
     ])
+  })
+})
+
+describe('size', () => {
+  /** The padding and the type step each element takes at a size, written out per size. */
+  const SCALE = {
+    xs: { trigger: ['px-2.5', 'py-2', 'text-xs'], panel: ['text-xs'], content: ['pb-2.5', 'px-2.5'] },
+    sm: { trigger: ['px-3', 'py-2.5', 'text-sm'], panel: ['text-sm'], content: ['pb-3', 'px-3'] },
+    md: { trigger: ['px-3.5', 'py-3', 'text-sm'], panel: ['text-sm'], content: ['pb-3.5', 'px-3.5'] },
+    lg: { trigger: ['px-4', 'py-3.5', 'text-base'], panel: ['text-base'], content: ['pb-4', 'px-4'] },
+    xl: { trigger: ['px-5', 'py-4', 'text-base'], panel: ['text-base'], content: ['pb-5', 'px-5'] },
+    custom: { trigger: [], panel: [], content: [] },
+  } as const
+  const scaled = (list: string[]) => list.filter((cls) => /^(px-|py-|pb-|text-(xs|sm|base))/.test(cls))
+
+  for (const size of ['xs', 'sm', 'md', 'lg', 'xl', 'custom'] as const) {
+    it(`${size} gives the trigger, the panel and the region their padding and type step, and the root data-size`, () => {
+      const { root, trigger, panel, content } = opened({ size })
+      expect(root?.getAttribute('data-size')).toBe(size)
+      expect(scaled(classes(trigger))).toEqual(SCALE[size].trigger)
+      expect(scaled(classes(panel))).toEqual(SCALE[size].panel)
+      expect(scaled(classes(content))).toEqual(SCALE[size].content)
+    })
+  }
+
+  it('is md when none is passed, the 41 px row the stage draws (R-5.7-2)', () => {
+    const { root, trigger } = opened()
+    expect(root?.getAttribute('data-size')).toBe('md')
+    expect(scaled(classes(trigger))).toEqual(['px-3.5', 'py-3', 'text-sm'])
+  })
+
+  it('reaches the items of its own root only, not those of an accordion nested in a panel', () => {
+    render(
+      <AccordionRoot size="lg" defaultValue={['outer']}>
+        <AccordionItem value="outer" title="Outer">
+          <AccordionRoot size="xs"><AccordionItem value="inner" title="Inner">Text</AccordionItem></AccordionRoot>
+        </AccordionItem>
+      </AccordionRoot>,
+    )
+    expect(scaled(classes(screen.getByRole('button', { name: 'Outer' })))).toEqual(['px-4', 'py-3.5', 'text-base'])
+    expect(scaled(classes(screen.getByRole('button', { name: 'Inner' })))).toEqual(['px-2.5', 'py-2', 'text-xs'])
   })
 })

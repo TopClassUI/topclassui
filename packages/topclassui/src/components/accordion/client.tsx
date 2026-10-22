@@ -7,24 +7,30 @@ import { cn } from '#shared/cn.js'
 import { renderPart } from '#shared/render-trigger.js'
 import { Svg } from '#components/svg/index.js'
 import {
-  ACCORDION_CARET, ACCORDION_CONTENT, ACCORDION_ITEM, ACCORDION_PANEL, ACCORDION_ROOT, ACCORDION_TITLE,
-  ACCORDION_TRIGGER,
+  ACCORDION_CARET, ACCORDION_CONTENT, ACCORDION_CONTENT_SIZE, ACCORDION_ITEM, ACCORDION_PANEL, ACCORDION_PANEL_SIZE,
+  ACCORDION_ROOT, ACCORDION_TITLE, ACCORDION_TRIGGER, ACCORDION_TRIGGER_SIZE,
 } from './classes.js'
 import { ACCORDION_DEFAULTS } from './constants.js'
-import { useAccordionItem } from './hook.js'
+import { useAccordionItem, useAccordionRoot } from './hook.js'
 import { headingFor } from './lib.js'
 import type { AccordionItemProps, AccordionRootProps } from './types.js'
 
 /** Base UI's root, in the box. It holds which items are open; a closed panel stays in the
- * HTML, hidden until the browser finds text in it, unless hiddenUntilFound is false. */
+ * HTML, hidden until the browser finds text in it, unless hiddenUntilFound is false. Its items take its size. */
 export function AccordionRoot({
   hiddenUntilFound = ACCORDION_DEFAULTS.hiddenUntilFound,
+  size = ACCORDION_DEFAULTS.size,
   className,
   render,
   ...rest
 }: AccordionRootProps) {
+  const root = useAccordionRoot()
   const part = renderPart(render, cn(ACCORDION_ROOT, className))
-  return <Base.Root {...rest} hiddenUntilFound={hiddenUntilFound} render={part.render} className={part.className} />
+  return (
+    <root.Context value={size}>
+      <Base.Root data-size={size} {...rest} hiddenUntilFound={hiddenUntilFound} render={part.render} className={part.className} />
+    </root.Context>
+  )
 }
 
 /** One item: a heading that holds the trigger, then the panel. Rest props reach the item's
@@ -43,18 +49,18 @@ export function AccordionItem({
   return (
     <Base.Item {...rest} render={part.render} className={part.className}>
       <Base.Header render={<Heading />}>
-        <Base.Trigger id={item.triggerId} onClick={item.onClick} className={ACCORDION_TRIGGER}>
+        <Base.Trigger id={item.triggerId} onClick={item.onClick} className={cn(ACCORDION_TRIGGER, ACCORDION_TRIGGER_SIZE[item.size])}>
           <span className={ACCORDION_TITLE}>{title}</span>
           <span className={ACCORDION_CARET}><Svg icon={caretDown} flipRtl={false} /></span>
         </Base.Trigger>
       </Base.Header>
-      <Base.Panel role={undefined} aria-labelledby={undefined} className={ACCORDION_PANEL}>
+      <Base.Panel role={undefined} aria-labelledby={undefined} className={cn(ACCORDION_PANEL, ACCORDION_PANEL_SIZE[item.size])}>
         <div
           ref={item.ref}
           role="region"
           aria-labelledby={item.triggerId}
           tabIndex={item.tabIndex}
-          className={ACCORDION_CONTENT}
+          className={cn(ACCORDION_CONTENT, ACCORDION_CONTENT_SIZE[item.size])}
         >
           {children}
         </div>

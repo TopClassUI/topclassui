@@ -45,6 +45,12 @@ describe('the root is Base UI root, derived at the seam (R-5.7-5)', () => {
     expectTypeOf<Accepts<keyof Accordion.Root.Props, 'loopFocus' | 'orientation'>>().toEqualTypeOf<true>()
   })
 
+  it('takes size, the shared scale with custom (R-5.7-2), on the root alone', () => {
+    expectTypeOf<AccordionRootProps['size']>().toEqualTypeOf<'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'custom' | undefined>()
+    expectTypeOf<Accepts<keyof AccordionItemProps, 'size'>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<AccordionRootProps['size'], 'xxl'>>().toEqualTypeOf<false>()
+  })
+
   it('has no type, no collapsible and no variant, which the docs card draws', () => {
     expectTypeOf<Accepts<keyof AccordionRootProps, 'type'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof AccordionRootProps, 'collapsible'>>().toEqualTypeOf<false>()
@@ -93,8 +99,8 @@ describe('the item', () => {
 })
 
 describe('the design props and the heading', () => {
-  it('are the two the schema holds, both optional', () => {
-    expectTypeOf<keyof AccordionDesignProps>().toEqualTypeOf<'hiddenUntilFound' | 'headingLevel'>()
+  it('are the three the schema holds, all optional', () => {
+    expectTypeOf<keyof AccordionDesignProps>().toEqualTypeOf<'hiddenUntilFound' | 'headingLevel' | 'size'>()
     expectTypeOf<AccordionDesignProps['hiddenUntilFound']>().toEqualTypeOf<boolean | undefined>()
   })
 

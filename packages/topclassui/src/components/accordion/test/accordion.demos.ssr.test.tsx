@@ -97,7 +97,7 @@ describe('what each demo shows', () => {
 
   it('rtl: an island that carries its direction and its language, and names neither on the accordion', async () => {
     const html = await render('rtl')
-    expect(html).toContain('<div dir="rtl" lang="ar"><div data-orientation="vertical" class="grid ')
+    expect(html).toContain('<div dir="rtl" lang="ar"><div data-orientation="vertical" data-size="md" class="grid ')
     expect(html.match(/ dir="/g)).toHaveLength(1)
   })
 

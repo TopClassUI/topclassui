@@ -1,10 +1,20 @@
 'use client'
 
-import { type MouseEvent, useId, useRef } from 'react'
+import { createContext, type MouseEvent, useContext, useId, useRef } from 'react'
 
+import type { Size } from '#shared/contracts/size.js'
 import { useProviderPresence } from '#shared/provider/context.js'
 import { useScrollTabStop } from '#shared/use-scroll-tab-stop.js'
-import { ACCORDION_HOLD_MS } from './constants.js'
+import { ACCORDION_DEFAULTS, ACCORDION_HOLD_MS } from './constants.js'
+
+/** The size of the nearest AccordionRoot. Base UI tells its items nothing of ours, and a selector on
+ * an ancestor would also match the items of an accordion nested inside a panel. */
+const AccordionSizeContext = createContext<Size>(ACCORDION_DEFAULTS.size)
+
+/** What AccordionRoot provides its items: the context its size travels in. */
+export function useAccordionRoot() {
+  return { Context: AccordionSizeContext }
+}
 
 /** The box the trigger scrolls in: the nearest ancestor that scrolls up and down, or the page. */
 function scrollerOf(element: Element): Element {
@@ -40,10 +50,10 @@ function holdTrigger(event: MouseEvent) {
   }, ACCORDION_HOLD_MS)
 }
 
-/** What one item needs: an id for its trigger, which names the region inside the panel; the ref and tabIndex
- * of that region, a tab stop only while what it holds scrolls sideways; and the onClick that holds the trigger. */
+/** What one item needs: its root's size; an id for its trigger, which names the region inside the panel; the ref and
+ * tabIndex of that region, a tab stop only while what it holds scrolls sideways; and the onClick that holds the trigger. */
 export function useAccordionItem() {
   useProviderPresence()
   const ref = useRef(null as HTMLDivElement | null)
-  return { triggerId: useId(), ref, tabIndex: useScrollTabStop(ref), onClick: holdTrigger }
+  return { size: useContext(AccordionSizeContext), triggerId: useId(), ref, tabIndex: useScrollTabStop(ref), onClick: holdTrigger }
 }

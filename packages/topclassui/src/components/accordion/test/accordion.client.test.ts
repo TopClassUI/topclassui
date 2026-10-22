@@ -93,12 +93,12 @@ describe('client.tsx is the browser half (R-5.12-1)', () => {
     expect(hooks).toEqual([])
   })
 
-  it('each part calls at most one hook: the root none, the item one for its id and its region', () => {
-    expect(hooksByPart(source)).toEqual({ AccordionRoot: [], AccordionItem: ['useAccordionItem'] })
+  it('each part calls at most one hook: the root one for the context of its size, the item one for its size, its id and its region', () => {
+    expect(hooksByPart(source)).toEqual({ AccordionRoot: ['useAccordionRoot'], AccordionItem: ['useAccordionItem'] })
   })
 
-  it('takes that hook from hook.ts, and its one pure helper from lib.ts', () => {
-    expect(importedNames(source, './hook.js')).toEqual(['useAccordionItem'])
+  it('takes those hooks from hook.ts, and its one pure helper from lib.ts', () => {
+    expect(importedNames(source, './hook.js')).toEqual(['useAccordionItem', 'useAccordionRoot'])
     expect(importedNames(source, './lib.js')).toEqual(['headingFor'])
   })
 
@@ -134,13 +134,18 @@ describe('hook.ts holds what an item needs from React (R-5.12-1)', () => {
     expect(source.startsWith("'use client'\n")).toBe(true)
   })
 
-  it('imports useId, useRef and the type of a click from React, the provider check, the shared tab stop and how long a press is held: no state of its own', () => {
-    expect(importedModules(source)).toEqual(['react', '#shared/provider/context.js', '#shared/use-scroll-tab-stop.js', './constants.js'])
-    expect(importedNames(source, 'react')).toEqual(['MouseEvent', 'useId', 'useRef'])
+  it('imports a context, useId, useRef and the type of a click from React, the size type, the provider check, the shared tab stop, the default size and how long a press is held: no state of its own', () => {
+    expect(importedModules(source)).toEqual([
+      'react', '#shared/contracts/size.js', '#shared/provider/context.js', '#shared/use-scroll-tab-stop.js', './constants.js',
+    ])
+    expect(importedNames(source, 'react')).toEqual(['createContext', 'MouseEvent', 'useContext', 'useId', 'useRef'])
   })
 
-  it('one hook: the id of the trigger, the ref of the region and its tab stop; the hold of a press calls none', () => {
-    expect(hooksByPart(source)).toEqual({ holdTrigger: [], scrollerOf: [], useAccordionItem: ['useProviderPresence', 'useRef', 'useId', 'useScrollTabStop'] })
+  it('two hooks: the root hands out the context of its size; an item reads it, the id of the trigger, the ref of the region and its tab stop; the hold of a press calls none', () => {
+    expect(hooksByPart(source)).toEqual({
+      holdTrigger: [], scrollerOf: [], useAccordionRoot: [],
+      useAccordionItem: ['useProviderPresence', 'useRef', 'useContext', 'useId', 'useScrollTabStop'],
+    })
   })
 })
 
