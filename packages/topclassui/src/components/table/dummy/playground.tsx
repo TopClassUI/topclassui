@@ -10,11 +10,13 @@ const members: Member[] = [
   { id: 'm_3', name: 'Sami Nasser', initials: 'SN', role: 'Viewer', status: 'Invited' },
 ]
 
-/** The docs card's stage, as the frame draws it: sorted by name, every column sortable, the Try it controls pass the schema's props. */
+/** The docs card's stage, as the frame draws it: 460 px, name and role at 200 and 120 px, sorted by name, every column
+ * sortable; the Try it controls pass the schema's props. */
 export default function Demo(props: TableDesignProps) {
   return (
     <Table
       {...props}
+      className="w-full max-w-115"
       caption="Team members, by name"
       items={members}
       getKey={(member) => member.id}
@@ -23,6 +25,7 @@ export default function Demo(props: TableDesignProps) {
         {
           key: 'name',
           header: 'Name',
+          className: 'w-50',
           rowHeader: true,
           sortHref: '?sort=name&dir=desc',
           cell: (member) => (
@@ -34,7 +37,7 @@ export default function Demo(props: TableDesignProps) {
             </span>
           ),
         },
-        { key: 'role', header: 'Role', sortHref: '?sort=role', cell: (member) => member.role },
+        { key: 'role', header: 'Role', className: 'w-30', sortHref: '?sort=role', cell: (member) => member.role },
         {
           key: 'status',
           header: 'Status',

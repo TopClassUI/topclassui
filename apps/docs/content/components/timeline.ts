@@ -7,8 +7,8 @@ export const timeline = {
     ar: 'مسار من الأحداث المؤرّخة، لكل حدث علامة بنبرته. يُعرض على الخادم وينعكس وحده في التخطيطات من اليمين إلى اليسار.',
   },
   demos: ['basic', 'tones', 'icons', 'long-text', 'empty', 'rtl'],
-  stageHeight: 18,
-  stageDemo: 'basic',
+  stageHeight: 19.4375,
+  stageDemo: 'stage',
   note: {
     en: 'An item\'s icon is an element, such as `<Svg icon={check} size="xs" />`, not an icon name: no icon loader ships.',
     ar: 'أيقونة العنصر عنصرٌ، مثل `<Svg icon={check} size="xs" />`، لا اسم أيقونة: لا يُشحن أي محمّل أيقونات.',

@@ -9,12 +9,12 @@ import {
 } from '../index.js'
 import type { DialogDesignProps } from '../types.js'
 
-const BAR = 'min-h-2 rounded-chip bg-surface-raised'
+const BAR = 'min-h-2 rounded-chip bg-neutral-soft'
 
 /** The page behind the scrim, as the frame draws it: four bars of text, hidden from a reader. */
 function PageBehind() {
   return (
-    <div aria-hidden className="absolute inset-0 flex flex-col gap-2 p-6">
+    <div aria-hidden className="absolute inset-0 flex flex-col gap-2 p-3.5">
       <div className={`${BAR} w-1/2`} />
       <div className={`${BAR} w-4/5`} />
       <div className={`${BAR} w-2/3`} />
@@ -23,23 +23,22 @@ function PageBehind() {
   )
 }
 
-/** The dialog drawn open inside its own box over the page and a scrim, as the frame draws it: not modal, and it takes no focus. */
+/** The frame's confirm drawn open in a 520 by 280 px box over the page and a scrim: not modal, and it takes no focus. */
 function Stage({ size, closeButton }: DialogDesignProps) {
   const root = useRef<HTMLDivElement>(null)
   return (
-    <div ref={root} data-stage="" className="relative min-h-87 w-full [contain:paint]">
+    <div ref={root} data-stage="" className="relative h-70 w-130 max-w-full overflow-hidden rounded-box [contain:paint]">
       <PageBehind />
       <div aria-hidden className="absolute inset-0 bg-overlay" />
       <DialogRoot defaultOpen modal={false}>
         <DialogPopup size={size} container={root} initialFocus={false}>
           <DialogHeader closeButton={closeButton}>
-            <DialogTitle>Publish changes</DialogTitle>
-            <DialogDescription>Your changes go live right away.</DialogDescription>
+            <DialogTitle>Delete this project?</DialogTitle>
           </DialogHeader>
-          <DialogBody>11 files changed since the last publish.</DialogBody>
+          <DialogBody>This removes the project and every file in it. This cannot be undone.</DialogBody>
           <DialogFooter>
             <DialogClose render={<Button variant="soft" tone="neutral" size="sm">Cancel</Button>} />
-            <DialogClose render={<Button size="sm">Publish now</Button>} />
+            <DialogClose render={<Button tone="danger" size="sm">Delete</Button>} />
           </DialogFooter>
         </DialogPopup>
       </DialogRoot>

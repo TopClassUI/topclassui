@@ -57,11 +57,12 @@ describe('the states demo', () => {
 })
 
 describe('the playground demo', () => {
-  it('is the button alone by default, and inside a stage with stage, its toast added only once mounted', async () => {
+  it('is the button alone by default, and with stage the button at the start beside a centred stage, its toast added only once mounted', async () => {
     const Demo = (await import('../dummy/playground.js')).default as ComponentType<{ stage?: boolean }>
     expect(markup(<Demo />)).toMatch(/^<button /)
     const staged = markup(<Demo stage />)
-    expect(staged).toMatch(/^<div class="relative isolate min-h-60 w-full"><button /)
+    expect(staged).toMatch(/^<div class="relative grid min-h-67.75 w-full place-items-center"><div class="absolute top-0 inset-s-0"><button /)
+    expect(staged).toContain('<div class="relative isolate h-25 w-88 max-w-full">')
     expect(staged).not.toContain('Project created')
   })
 })

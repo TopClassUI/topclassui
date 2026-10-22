@@ -10,7 +10,7 @@ export const sidebar = {
     ar: 'شريط جانبي روابطه تُعرض على الخادم، وينطوي إلى عمود من الأيقونات. الشريط وزرّه وحدهما يعملان في المتصفح.',
   },
   demos: ['basic', 'groups', 'collapsed', 'controlled', 'in-a-layout', 'long-list', 'rtl'],
-  stageHeight: 14,
+  stageHeight: 19.4,
   controlOrder: ['defaultOpen'],
   controlsHidden: ['open'],
   note: {

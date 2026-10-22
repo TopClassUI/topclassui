@@ -67,12 +67,6 @@ useEffect(() => {
 
 سكربت صغير مضمّن، يأتي أولًا في <span dir="ltr">`head`</span>، يقرأ التفضيل المحفوظ ويضبط <span dir="ltr">`data-theme`</span> قبل أول رسم. من دونه تُعرض الصفحة بالوضع الافتراضي ثم تتبدّل، فيظهر وميض بالوضع الخاطئ. السكربت نص ثابت، لذلك تستطيع سياسة أمان المحتوى (CSP) الصارمة أن تسمح به عبر البصمة أدناه.
 
-```tsx
-import { ThemeScript } from 'topclassui/theme'
-
-<head><ThemeScript /></head>
-```
-
 <ThemeScriptCsp />
 
 ## في تطبيق صفحة واحدة

@@ -10,23 +10,23 @@ export default function Demo() {
   return (
     <div className="flex flex-wrap items-center gap-6">
       <div role="group" aria-label="image">
-        <AvatarRoot size="lg">
+        <AvatarRoot>
           <AvatarImage src={PORTRAIT} alt="Omar Abed" />
           <AvatarFallback>OA</AvatarFallback>
         </AvatarRoot>
       </div>
       <div role="group" aria-label="initials">
-        <AvatarRoot size="lg" aria-label="Lina Haddad">
+        <AvatarRoot aria-label="Lina Haddad">
           <AvatarFallback>LH</AvatarFallback>
         </AvatarRoot>
       </div>
       <div role="group" aria-label="icon">
-        <AvatarRoot size="lg" aria-label="Guest">
+        <AvatarRoot aria-label="Guest">
           <AvatarFallback><Svg icon={user} size="1.35em" /></AvatarFallback>
         </AvatarRoot>
       </div>
       <div role="group" aria-label="loading">
-        <AvatarSkeleton size="lg" />
+        <AvatarSkeleton />
       </div>
     </div>
   )

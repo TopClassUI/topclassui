@@ -3,7 +3,7 @@ export const emptyState = {
   slug: 'empty-state',
   title: { en: 'Empty state', ar: 'الحالة الفارغة' },
   description: {
-    en: 'What a list, a table or a search shows when there is nothing to show: an icon, a line, a sentence and your own action.',
+    en: 'What a collection shows when there is nothing: an icon, a line and an action.',
     ar: 'ما تعرضه القائمة أو الجدول أو البحث حين لا يوجد ما يُعرض: أيقونة وسطر وجملة وإجراء من عندك.',
   },
   note: {
@@ -12,7 +12,7 @@ export const emptyState = {
   },
   demos: ['default', 'with-action', 'filtered', 'failed', 'title-only', 'long-text', 'rtl'],
   stageDemo: 'with-action',
-  stageHeight: 16,
+  stageHeight: 19.4375,
   notes: {
     en: [
       'Pass a `title` and the default description goes too, because it would describe the wrong thing.',

@@ -3,11 +3,15 @@ export const separator = {
   slug: 'separator',
   title: { en: 'Separator', ar: 'فاصل' },
   description: {
-    en: 'A hairline between two groups, across a column or down a row. Decorative by default, so it is not announced.',
-    ar: 'خط رفيع بين مجموعتين، عرضيًا في عمود أو طوليًا في صف. زخرفي افتراضيًا، فلا يُعلَن لقارئ الشاشة.',
+    en: 'A hairline divider. It is decorative, so it is exempt from the 3:1 contrast rule.',
+    ar: 'خط فاصل رفيع. زخرفي، فهو مستثنى من قاعدة تباين 3:1.',
   },
   demos: ['horizontal', 'vertical', 'semantic', 'rtl'],
-  stageHeight: 8,
+  stageHeight: 14.0625,
+  controlOrder: ['orientation', 'withLabel', 'decorative'],
+  extraSwitches: ['withLabel'],
+  starts: { withLabel: true },
+  codeDemo: 'horizontal',
   note: {
     en: 'A vertical Separator takes its height from a flex or grid row; give the row a height or let it stretch.',
     ar: 'يأخذ الفاصل العمودي ارتفاعه من صف flex أو grid؛ أعطِ الصف ارتفاعًا أو دعه يتمدد.',

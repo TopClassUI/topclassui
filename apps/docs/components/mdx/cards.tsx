@@ -15,7 +15,8 @@ export function Card({ title, children }: { title: string; children?: ReactNode 
         <h3 className="text-sm font-semibold text-body">{title}</h3>
       </CardHeader>
       <CardBody>
-        <div className="text-xs text-muted **:text-[length:inherit]">{children}</div>
+        {/* A narrow card would break a flag such as --no-install at its hyphen, worst inside Arabic text. */}
+        <div className="text-xs text-muted **:whitespace-nowrap **:text-[length:inherit]">{children}</div>
       </CardBody>
     </CardRoot>
   )

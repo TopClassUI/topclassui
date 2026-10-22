@@ -6,7 +6,7 @@ export const pagination = {
     ar: 'ترقيم الصفحات',
   },
   description: {
-    en: 'Page numbers that are real links, not click handlers, so they work with no JavaScript and a crawler follows every page.',
+    en: 'Page numbers are real links, not click handlers; siblingCount is clamped.',
     ar: 'أرقام صفحات هي روابط حقيقية لا معالجات نقر، فتعمل دون JavaScript ويتبع الزاحف كل صفحة منها.',
   },
   demos: ['middle', 'first-page', 'last-page', 'sizes', 'many-pages', 'two-navs', 'custom-size', 'wide-numbers', 'rtl'],

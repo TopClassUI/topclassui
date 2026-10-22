@@ -3,7 +3,7 @@ export const button = {
   slug: 'button',
   title: { en: 'Button', ar: 'زر' },
   description: {
-    en: 'Five variants across six tones, rendered on the server with no JavaScript. Through render it becomes a real link that looks the same.',
+    en: 'Five variants across six tones, with no script; render turns it into a real link.',
     ar: 'خمسة أنماط عبر ست نبرات، يُعرض على الخادم بلا JavaScript. ومن خلال render يصبح رابطًا حقيقيًا بالشكل نفسه.',
   },
   demos: ['variants', 'tones', 'sizes', 'with-icon', 'as-link', 'full-width', 'long-label', 'custom-size', 'skeleton', 'rtl'],
