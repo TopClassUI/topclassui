@@ -9,7 +9,7 @@ description: "للألوان ثلاث طبقات: لوحة ألوان لا تس�
 
 لا يسمّي المكوّن لونًا أبدًا، بل يسمّي دورًا، ويُحَلّ هذا الدور بشكل مختلف في كل وضع.
 
-لوحة الألوان هي تدرّج <span dir="ltr">oklch</span> في <span dir="ltr">Tailwind v4</span>. تربط الطبقة الدلالية كل دور بدرجة لونية، ثم يحوّل <span dir="ltr">`@theme inline`</span> كل دور إلى صنف مساعد.
+لوحة الألوان هي تدرّج <span dir="ltr">oklch</span> في <span dir="ltr">Tailwind v4</span>. تربط الطبقة الدلالية كل دور بدرجة لونية، ثم يحوّل <span dir="ltr">@theme inline</span> كل دور إلى صنف مساعد.
 
 ```css
 /* palette - never referenced by a component */
@@ -112,12 +112,13 @@ className="bg-primary-solid text-primary-on-solid"
 
 ## أضف سمتك الخاصة
 
-أضف كتلة <span dir="ltr">CSS</span> واحدة، وضع <span dir="ltr">`data-theme="brand"`</span> على العنصر الذي تغطيه. يمكن للوضع أن يغيّر مفاتيح الضبط كما يغيّر الألوان، ولأن <span dir="ltr">`ThemeScript`</span> لا يحفظ إلا الأوضاع الثلاثة المضمّنة، يوضع الوضع المخصّص على قسم من الصفحة.
+أضف كتلة <span dir="ltr">CSS</span> واحدة، وضع <span dir="ltr">data-theme</span> على القسم الذي تغطيه. يمكن للوضع أن يغيّر مفاتيح الضبط كما يغيّر الألوان.
 
-<Callout tone="warning">الوضع الذي يضبط <span dir="ltr">`--tc-primary-solid`</span> يجب أن يضبط <span dir="ltr">`--tc-primary-on-solid`</span> أيضًا، وإلا فقد ينزل تباين تسميته عن 4.5:1 فوق التعبئة الجديدة.</Callout>
+<Callout tone="warning">الوضع الذي يضبط <span dir="ltr">--tc-primary-solid</span> يجب أن يضبط <span dir="ltr">--tc-primary-on-solid</span> أيضًا، وإلا فقد ينزل تباين تسميته عن 4.5:1 فوق التعبئة الجديدة.</Callout>
 
 ```css title="app/globals.css"
 /* after the three imports */
+/* ThemeScript keeps light, dark and ocean: set brand on a section */
 [data-theme="brand"] {
   color-scheme: dark;
 

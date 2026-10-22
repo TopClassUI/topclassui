@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { columnFit, defaultLines } from './table-of.js'
+import { columnFit, columnsOf, defaultLines } from './table-of.js'
 
 describe('columnFit', () => {
   it('keeps a column of short cells on one line, the framework name included', () => {
@@ -41,5 +41,20 @@ describe('defaultLines', () => {
     expect(defaultLines("{ query: '(width < 48rem)' }")).toEqual(["{ query: '(width < 48rem)' }"])
     expect(defaultLines('-')).toEqual(['-'])
     expect(defaultLines("'latn'")).toEqual(["'latn'"])
+  })
+})
+
+describe('columnsOf', () => {
+  it('gives the slack to the first long column when the last one is short', () => {
+    expect(columnsOf(['What', 'Minimum'], [['A control boundary, on every surface it can sit on', '3:1']])).toEqual([
+      { fit: 'wrap', fill: true },
+      { fit: 'fit', fill: false },
+    ])
+  })
+
+  it('keeps a long last column as prose, or as a mono-headed wrap when the head is code', () => {
+    const rows = [['bg-page', 'The page behind everything, under every card and popup']]
+    expect(columnsOf(['Class', 'What it is for'], rows)).toEqual([{ fit: 'fit', fill: false }, { fit: 'prose', fill: false }])
+    expect(columnsOf(['Class', 'What it is for'], rows, 'code')).toEqual([{ fit: 'fit', fill: false }, { fit: 'wrap', fill: false }])
   })
 })
