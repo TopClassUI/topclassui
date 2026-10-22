@@ -1,8 +1,8 @@
 // The site's own class strings, built from the library's shared constants (docs-site rule 1, choice 20).
 import { BORDER, FOCUS_RING, HOVER, POINTER, SCROLL_X, TOUCH_TARGET, TRANSITION } from 'topclassui/classes'
 
-/** A text link inside prose or a list: the library's ring and target, underlined on hover. */
-export const TEXT_LINK = `inline-flex items-center text-primary-on-soft underline-offset-4 ${HOVER.link} ${FOCUS_RING} ${TOUCH_TARGET} rounded-chip`
+/** A text link inside prose or a list: underlined as the guide frames draw it, with the library's ring and target. */
+export const TEXT_LINK = `inline-flex items-center text-primary-on-soft underline underline-offset-4 ${HOVER.link} ${FOCUS_RING} ${TOUCH_TARGET} rounded-chip`
 
 /** The shell's type steps between the library's 12, 14 and 16 px, as the docs frames draw them: 11, 13, 15 (a lead, or a name on one line) and 32 px. */
 export const TYPE = {
@@ -30,13 +30,13 @@ export const SHELL_EYEBROW = `${TYPE.eyebrow} font-medium text-muted uppercase`
 /** The navbar's search trigger, sunk into the page with a quiet label and the quiet line the frames draw; merged after the Button's own classes. */
 export const SEARCH_TRIGGER = 'bg-page border-line font-normal text-muted'
 
-/** A segment of the mode switch, regular and the chosen one medium; merged after the segment's own classes. */
-export const MODE_SEGMENT = `font-normal data-checked:font-medium ${TYPE.nav}`
+/** A segment of the navbar's mode switch, every label medium as the navbar frame draws it; merged after the segment's own classes. */
+export const MODE_SEGMENT = `font-medium ${TYPE.nav}`
 
-/** A sidebar row merged after the library's, 29 px as drawn: muted until hovered; the page being read keeps its pill and primary text, without the edge bar. */
+/** A sidebar row merged after the library's, 29 px as drawn: the library's body text and hover fill; the page being read keeps its pill and primary text, without the edge bar. */
 export const SIDE_LINK = {
   current: `min-h-[1.8125rem] px-2 font-medium before:hidden ${TYPE.nav}`,
-  rest: `min-h-[1.8125rem] px-2 text-muted hover:text-body ${TYPE.nav}`,
+  rest: `min-h-[1.8125rem] px-2 ${TYPE.nav}`,
 } as const
 
 /** The skip link: hidden until it takes the focus, then drawn above the navbar. */
@@ -101,8 +101,8 @@ export const PROSE_COLUMN = {
   prose: `${PROSE_CELL} ${PROSE_HEAD.prose} whitespace-normal min-w-60`,
 } as const
 
-/** Code an author wrote in a cell arrives at prose size (INLINE_CODE); in a guide table it takes the cell's, and never breaks at a hyphen. */
-export const AUTHORED_CELL = '**:text-[length:inherit] **:whitespace-nowrap'
+/** Code an author wrote in a cell arrives at prose size (INLINE_CODE); in a guide table it takes the cell's, never breaks at a hyphen, and reads in the body colour. */
+export const AUTHORED_CELL = '**:text-[length:inherit] **:whitespace-nowrap [&_code]:text-body'
 
 /** Code a guide table prints itself: mono and body-coloured, at the cell's size. */
 export const TABLE_CODE = 'font-mono text-body'
@@ -145,9 +145,9 @@ export const FLAT_CODE = 'docs-flat-code bg-transparent text-body [--tc-ring:var
 /** The same code in a bordered box on the page background, as Before you start draws it. */
 export const BOXED_CODE = `${FLAT_CODE} rounded-control bg-page p-3 ${BORDER}`
 /** A one-line copy field of the install row: the text, then its copy button. */
-export const COPY_FIELD = `flex min-w-0 items-center gap-0.5 rounded-control bg-page ps-2.5 pe-0 ${BORDER}`
-/** The frames' 11 px mono: a 59-character import line fits a 932 px card's half beside a 24 px copy target. */
-export const COPY_FIELD_TEXT = 'min-w-0 flex-1 py-2 font-mono text-[0.6875rem] leading-4 text-body wrap-anywhere'
+export const COPY_FIELD = `flex min-w-0 items-center gap-0.5 rounded-control bg-page ps-3 pe-0.5 ${BORDER}`
+/** The frames' 10 px mono, a site step under the drawn 10.5: a 61-character import line fits a 932 px card's half beside a 24 px copy target, clear of it. */
+export const COPY_FIELD_TEXT = 'min-w-0 flex-1 py-2 font-mono text-[0.625rem] leading-4 text-body wrap-anywhere'
 export const COPY_FIELD_BUTTON = 'size-6 px-0'
 /** The two install columns side by side at 40rem and up, stacked below. */
 export const INSTALL_ROW = 'grid min-w-0 border-t-(length:--tc-line-width) border-line sm:grid-cols-2'
@@ -167,17 +167,17 @@ export const CARD_TITLE = 'text-lg font-semibold text-body'
 export const PREVIEWER_TITLE = 'text-lg/tight font-semibold text-body'
 export const PREVIEWER_TITLE_LINK = `inline-flex items-center rounded-control text-body underline-offset-4 ${HOVER.link} ${FOCUS_RING} ${TOUCH_TARGET}`
 export const PREVIEWER_DESCRIPTION = 'text-sm/tight text-muted'
-export const H3 = 'text-xs font-medium text-muted uppercase'
+export const H3 = 'text-xs/3 font-medium text-muted uppercase'
 /** A part caption the frames write in sentence case: Every state, Copy the source, Then import it. */
-export const CAPTION = 'text-xs font-medium text-muted'
+export const CAPTION = 'text-xs/3 font-medium text-muted'
 export const PROSE = 'text-base text-body'
 export const SMALL = 'text-sm text-muted'
 /** The frames' 10 px notes under a field or a step, read as the scale's xs. */
 export const NOTE = 'text-xs text-muted'
 /** The install row's notes: the drawn 10 px, one line under each field. */
-export const INSTALL_NOTE = 'text-[0.625rem] leading-3.5 text-muted'
-/** Code in the code part's note keeps the note's size and colour, as the frames draw one plain sentence. */
-export const NOTE_CODE = '**:text-[length:inherit] **:text-muted'
+export const INSTALL_NOTE = 'text-[0.625rem] leading-3 text-muted'
+/** Code in the code part's note keeps the note's size, colour and face, as the frames draw one plain sentence. */
+export const NOTE_CODE = '**:text-[length:inherit] **:text-muted **:font-sans'
 export const LIST = 'grid list-disc gap-1 ps-5 text-base text-body'
 /** The stage holds the component on the page background, and a wide one scrolls inside it. */
 export const STAGE = `grid min-w-0 grid-cols-1 place-items-center bg-page p-5 text-body ${SCROLL_X}`
@@ -187,9 +187,9 @@ export const STAGE_OPEN = 'relative contain-paint'
 export const PLAY_ROW = 'grid min-w-0 md:grid-cols-[minmax(0,1fr)_15.5rem]'
 export const TRY_IT = 'grid content-start gap-3.5 border-t-(length:--tc-line-width) border-line bg-surface p-4.5 text-body md:border-t-0 md:border-s-(length:--tc-line-width)'
 export const CONTROL = 'grid gap-1.5'
-export const CONTROL_LABEL = 'justify-self-start text-xs font-medium text-muted'
-/** A boolean prop: the frames' 16 px box, then its name 8 px beside it; the 6.5 px pulled from each side of its 24 px target gives the frames' 25 px pitch down a list of them. */
-export const CHECK_ROW = 'flex min-w-0 items-center gap-1 -my-[0.40625rem]'
+export const CONTROL_LABEL = 'justify-self-start text-xs/3 font-medium text-muted'
+/** A boolean prop: the frames' 16 px box, then its name 8 px beside it; the 6.5 px pulled from each side of its 24 px target gives the frames' 25 px pitch, and the 4 px at its start puts the box on the selects' edge. */
+export const CHECK_ROW = 'flex min-w-0 items-center gap-1 -my-[0.40625rem] -ms-1'
 export const CHECK_LABEL = 'text-xs text-body'
 /** The box each Try it control is reserved before it mounts, as tall as the xs control it stands for, so the column never shifts. */
 export const CONTROL_RESERVE = {
@@ -218,8 +218,8 @@ export const CHIP = `inline-flex items-center rounded-chip px-2 py-0.5 font-mono
 /** The legend's step number in its soft round badge. */
 export const LEGEND_NUMBER = 'inline-flex size-4.5 shrink-0 items-center justify-center rounded-full bg-primary-soft text-xs font-semibold text-primary-on-soft'
 /** Every state: abutting cells of one basis grow equally to share the row, each at least 144 px (six fit the frames' 906), and wrap below that; a wide state grows. */
-export const STATE_GRID = 'flex min-w-0 flex-wrap items-start gap-x-0 gap-y-4'
-export const STATE_CELL = 'grid min-w-[max(9rem,min-content)] max-w-full grow basis-36 content-start justify-items-center gap-2.5'
+export const STATE_GRID = 'flex min-w-0 flex-wrap items-stretch gap-x-0 gap-y-4'
+export const STATE_CELL = 'grid min-w-[max(9rem,min-content)] max-w-full grow basis-36 grid-rows-[auto_1fr] justify-items-center gap-2.5'
 /** The frames' 56 px box each state sits centred in. */
 export const STATE_BOX = 'flex min-h-14 max-w-full items-center justify-center'
-export const STATE_CAPTION = `max-w-full text-center font-mono ${TYPE.eyebrow} text-muted`
+export const STATE_CAPTION = 'max-w-full self-end text-center font-mono text-[0.6875rem] leading-3 text-muted'
