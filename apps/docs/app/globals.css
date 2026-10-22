@@ -2,6 +2,10 @@
 @import "topclassui/tokens.css";
 @import "topclassui/styles.css";
 
+/* Tests and specs quote banned classes (left-4, space-x-4, bg-red-500) the site never renders; every page paid for them. */
+@source not "../**/*.test.{ts,tsx}";
+@source not "../e2e";
+
 /* After the three imports: tokens.css declares all three on :root, so only order makes these win (docs-site S10). */
 :root {
   --tc-font-latin: var(--font-inter), ui-sans-serif, system-ui, sans-serif;

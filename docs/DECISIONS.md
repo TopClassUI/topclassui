@@ -6,6 +6,33 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-22 - The site's Tailwind scan skips tests and e2e; its CSS stays two linked files, not inlined
+
+**Decision.** `apps/docs/app/globals.css` adds `@source not "../**/*.test.{ts,tsx}"` and `@source not "../e2e"`. Tailwind's automatic scan of `apps/docs` read the tests, which quote banned classes on purpose, so every page shipped 16 rules no page renders: `left-4`, `right-4`, `start-4`, `end-4`, `ml-4`, `mr-4`, `pr-4`, `space-x-4`, `divide-x-2`, `tracking-wide`, `rounded-md`, `rounded-l-md`, `rounded-r-md`, `bg-red-500`, `min-h-6` and `min-w-6`. `experimental.inlineCss` stays off and `experimental.cssChunking` stays at its default.
+
+**Why two CSS files.** One is next/font's (21,494 bytes, 2.6 KB gzip: 51 `@font-face` rules for Inter, Noto Sans Arabic and Geist Mono, and their variable classes). The other is `globals.css`: Tailwind, the tokens and the library's styles. Turbopack keeps the font file apart in every setting tried: the default, `cssChunking: 'graph'`, `{ type: 'graph', requestCost: 1000000 }`, and the preview layout importing the fonts before `globals.css` as the site layout does. Every build wrote the same byte-identical font file.
+
+**Measured.** Lighthouse 12.8.2 mobile, performance only, local `next start`, median of 3 interleaved runs against merged main ad3e1a8c.
+
+| Build | Page | Performance | FCP | LCP | HTML sent | CSS |
+| --- | --- | --- | --- | --- | --- | --- |
+| this branch | `/en` | 93 (main 93) | 1.36 s (1.36) | 3.13 s (3.13) | 63 KB | 161,145 → 159,143 bytes, 30 → 29 KB sent |
+| this branch | `/ar` | 82 (main 83) | 2.41 s (2.41) | 4.21 s (4.21) | 66 KB | the same file |
+| this branch | `/en/docs/components` | 75 (main 73) | 2.56 s (2.56) | 4.21 s (4.32) | 283 KB | the same file |
+| this branch | `/en/docs/components/button` | 93 (main 91) | 1.36 s (1.36) | 3.12 s (3.13) | 61 KB | the same file |
+| `inlineCss: true` | `/en` | 81 (main 86) | 1.62 s (1.36) | 3.46 s (3.18) | 62 → 120 KB | none sent |
+| `inlineCss: true` | `/ar` | 74 (main 81) | 2.56 s (2.41) | 4.81 s (4.21) | 67 → 125 KB | none sent |
+| `inlineCss: true` | `/en/docs/components` | 73 (main 67) | 2.40 s (2.56) | 4.21 s (4.14) | 283 → 341 KB | none sent |
+| `inlineCss: true` | `/en/docs/components/button` | 90 (main 93) | 1.35 s (1.36) | 3.27 s (3.12) | 61 → 121 KB | none sent |
+
+The scan change saves 2,002 bytes of CSS (about 350 bytes gzip) and moves no metric. Inlining passes Lighthouse's render-blocking check, but Next writes the CSS into each page twice, once in the `<style>` tag and once in the RSC payload, as its own docs warn, so every page's HTML grows by about 58 KB sent and LCP comes later on all four pages.
+
+**Not changed.** Lighthouse lists no preconnect candidate, since every request is same-origin. The network dependency tree flags any chain of two requests, so HTML to CSS always fails it short of inlining; the manifest is in it too. Noto Sans Arabic still waits for the font CSS on `/ar`, because it is not preloaded (PLAN 14 and the Noto Sans Arabic entry of the same day).
+
+**Affects.** `apps/docs/app/globals.css` only. A class used only in a test or an e2e spec no longer reaches the site's CSS.
+
+---
+
 ## 2026-10-22 - Plain code on a dark ground stays neutral-300, softer than the frames' neutral-50
 
 **Decision.** The Shiki pair keeps plain code text at `#d4d4d4` (neutral-300) on the dark ground (`apps/docs/lib/shiki-themes.ts`, from 7fb765f6), where the guide frames draw plain code in base/body (`#fafafa`). The other token colours stay as drawn, and attribute selectors and constants now take the drawn amber and blue.
