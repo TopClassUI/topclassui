@@ -16,12 +16,14 @@ const POPUP = { dialog: '[role="dialog"]', drawer: '[role="dialog"]', popover: '
 const STATES = {
   dialog: { open: 4, trigger: 'Open' },
   drawer: { open: 4, trigger: 'Open' },
-  popover: { open: 2, trigger: 'Share' },
-  tooltip: { open: 2, trigger: 'Copy link' },
-  dropdown: { open: 3, trigger: 'Actions' },
+  popover: { open: 0, trigger: 'Share' },
+  tooltip: { open: 0, trigger: 'Copy link' },
+  dropdown: { open: 0, trigger: 'Actions' },
   command: { open: 0, trigger: null },
 } as const
 const COMMAND_PICTURES = 5
+/** The open cells the other strips draw as inert pictures, so they show in every capture of the page. */
+const PICTURES = { dialog: 0, drawer: 0, popover: 2, tooltip: 2, dropdown: 3, command: 0 } as const
 
 function collectErrors(page: Page): string[] {
   const errors: string[] = []
@@ -106,6 +108,7 @@ for (const slug of SLUGS) {
       if (trigger === null) {
         await expect(states.locator('[aria-hidden="true"]:has(svg)')).toHaveCount(COMMAND_PICTURES)
       } else {
+        await expect(states.locator('[aria-hidden="true"][inert]')).toHaveCount(PICTURES[slug])
         // A modal dialog hides the rest of the page from the accessibility tree once it opens, its own trigger included.
         const closed = states.getByRole('button', { name: trigger, exact: true, includeHidden: true }).first()
         // The stage loads after the strip, and its tooltip, held open, closes any other open one of the shared delay group.

@@ -23,7 +23,7 @@ const TRIGGERS: Record<string, number> = {
   'placements': 12,
   'playground': 1,
   'rtl': 2,
-  'states': 3,
+  'states': 1,
   'with-count': 1,
 }
 
@@ -36,7 +36,7 @@ const ICONS: Record<string, string[]> = {
   'placements': [],
   'playground': ['M165.66,90'],
   'rtl': ['M165.66,90', 'M216,48H17'],
-  'states': ['M165.66,90', 'M205.66,11', 'M205.66,14'],
+  'states': ['M165.66,90'],
   'with-count': ['M216,48H17'],
 }
 
@@ -93,7 +93,8 @@ describe('every demo renders on the server', () => {
     it(`${file}.tsx renders no popup on the server, because the portal mounts in the browser`, async () => {
       const html = await render(file)
       expect(html, file).not.toContain('data-placement')
-      expect(html, file).not.toContain('bg-neutral-solid')
+      // The states strip's two pictures draw a tip and its arrow each in the tooltip's fill.
+      expect((html.match(/bg-neutral-solid/g) ?? []).length, file).toBe(file === 'states' ? 4 : 0)
     })
 
     it(`${file}.tsx uses no bare anchor or svg outside Svg`, async () => {

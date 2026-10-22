@@ -1,7 +1,3 @@
-'use client'
-
-import { useState } from 'react'
-
 import { arrowDown } from '#icons/data/arrow-down.js'
 import { arrowUp } from '#icons/data/arrow-up.js'
 import { linkSimple } from '#icons/data/link-simple.js'
@@ -9,18 +5,36 @@ import { Button } from '#components/button/index.js'
 import { Svg } from '#components/svg/index.js'
 import { TooltipPopup, TooltipRoot, TooltipTrigger } from '../index.js'
 
-const CELL = 'relative flex h-28 w-56 items-center justify-center overflow-hidden [contain:paint]'
+const CELL = 'grid h-28 w-56 place-items-center'
+// The tooltip's look, written out: a demo the site shows imports public paths only.
+const tip = 'relative rounded-control bg-neutral-solid px-2 py-1 text-xs text-neutral-on-solid'
+// R-5.3-2: the half-width step multiplies by --tc-dir, so the arrow stays centred under the tip in Arabic.
+const arrow = 'absolute inset-s-1/2 size-2 -translate-x-[calc(50%*var(--tc-dir))] rotate-45 bg-neutral-solid'
 
-/** Every state the frame draws, one equal cell each, captioned by its title: the hidden tooltip of a trigger
- * at rest, then one held open above its trigger and one below, each inside its own cell. Held by open,
- * since the provider's delay group closes an open tooltip as soon as another one opens. */
+/** One cell, captioned by its title: a picture of a tooltip at its trigger, above or below it, its arrow toward it, hidden
+ * from a reader and inert, so it draws in every capture, where an open tooltip hides itself while its trigger is off screen. */
+function Open({ title, label, icon, below = false }: { title: string, label: string, icon: typeof arrowUp, below?: boolean }) {
+  return (
+    <div title={title} className={CELL}>
+      <div aria-hidden inert className={below ? 'flex flex-col-reverse items-center gap-2.75' : 'flex flex-col items-center gap-2.75'}>
+        <span className={tip}>
+          {label}
+          <span className={below ? `${arrow} -top-1` : `${arrow} -bottom-1`} />
+        </span>
+        <span className="grid h-control-md w-12 place-items-center">
+          <Svg icon={icon} />
+        </span>
+      </div>
+    </div>
+  )
+}
+
+/** Every state the frame draws, one equal cell each, captioned by its title: the real tooltip of a trigger at rest, then
+ * pictures of one above its trigger and one below it. */
 export default function Demo() {
-  // Elements, not refs: a popup open on the first render resolves its container before a ref is attached.
-  const [top, setTop] = useState<HTMLDivElement | null>(null)
-  const [bottom, setBottom] = useState<HTMLDivElement | null>(null)
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] gap-4">
-      <div title="hidden" className="flex h-28 w-56 items-center justify-center">
+      <div title="hidden" className={CELL}>
         <TooltipRoot>
           <TooltipTrigger
             render={
@@ -32,30 +46,8 @@ export default function Demo() {
           <TooltipPopup>Copy link</TooltipPopup>
         </TooltipRoot>
       </div>
-      <div ref={setTop} title="top" className={CELL}>
-        <TooltipRoot open>
-          <TooltipTrigger
-            render={
-              <Button variant="ghost" aria-label="Top">
-                <Svg icon={arrowUp} />
-              </Button>
-            }
-          />
-          <TooltipPopup container={top} className="px-2">Top</TooltipPopup>
-        </TooltipRoot>
-      </div>
-      <div ref={setBottom} title="bottom" className={CELL}>
-        <TooltipRoot open>
-          <TooltipTrigger
-            render={
-              <Button variant="ghost" aria-label="Bottom">
-                <Svg icon={arrowDown} />
-              </Button>
-            }
-          />
-          <TooltipPopup placement="bottom" container={bottom} className="px-2">Bottom</TooltipPopup>
-        </TooltipRoot>
-      </div>
+      <Open title="top" label="Top" icon={arrowUp} />
+      <Open title="bottom" label="Bottom" icon={arrowDown} below />
     </div>
   )
 }
