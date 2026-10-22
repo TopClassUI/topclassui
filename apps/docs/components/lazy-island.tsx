@@ -3,7 +3,7 @@
 // A client part that keeps the server's HTML until it comes within one viewport, then loads its own chunk and takes over in place (S8).
 import { Activity, type ComponentType, type ReactNode, lazy, startTransition, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 
-type Load<P> = () => Promise<ComponentType<P>>
+import { type Load, clientPartOf, createServerBoxes } from '../lib/islands'
 
 export type IslandWhen = 'near' | 'idle'
 
@@ -50,11 +50,7 @@ if (typeof document !== 'undefined') {
 }
 
 /** True while the server's HTML for this island is in the page and nothing has taken it over: a client navigation mounts with no HTML to keep, so it loads at once. */
-function hasServerHtml(id: string): boolean {
-  if (typeof document === 'undefined') return false
-  const box = document.querySelector(`[data-island="${id}"]`)
-  return box !== null && !box.hasAttribute('data-island-mounted')
-}
+const hasServerHtml = typeof document === 'undefined' ? () => false : createServerBoxes(document)
 
 /** Where a node sits under the box, as child indexes, so the same place can be found in a fresh render. */
 function pathOf(box: Element, node: Element): number[] | null {
@@ -102,7 +98,7 @@ export function LazyIsland<P extends object>({ load, props, when = 'near', hydra
     const gate = new Promise<void>((resolve) => { open = resolve })
     const waits = hasServerHtml(id)
     const state = { open, gate, waits, live: !waits, onLive: () => undefined as unknown }
-    const Island = lazy(async () => {
+    const Island = !waits && !hydrate ? clientPartOf(load) : lazy(async () => {
       if (waits) await gate
       const Loaded = await load()
       if (!hydrate) return { default: Loaded }
