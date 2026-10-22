@@ -199,4 +199,12 @@ describe('the states demo', () => {
     const captions = [...html.matchAll(/<div (?:role="(?:group|region)" )?(?:data-tone="\w+" )?[^>]*aria-label="([^"]+)"/g)].map((m) => m[1])
     expect(captions).toEqual(STATES)
   })
+
+  it('draws the hover row through the forced data-hover on row 2, and on no other row of the strip', async () => {
+    const { default: Demo } = await import('../dummy/states.js') as { default: ComponentType }
+    const html = markup(<Demo />)
+    const hovered = [...html.matchAll(/<tr [^>]*data-hover=""[^>]*>/g)].map((m) => m[0])
+    expect(hovered).toHaveLength(1)
+    expect(attr(hovered[0] ?? '', 'aria-rowindex')).toBe('3')
+  })
 })

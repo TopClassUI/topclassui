@@ -74,6 +74,8 @@ export type TreeViewProps = Omit<ComponentPropsWithRef<'div'>, DivOwned> & TreeV
   loadingFallback?: ReactNode | undefined
   /** What status empty says, in place of labels.state.empty. */
   emptyFallback?: ReactNode | undefined
+  /** The id of one row drawn with the keyboard ring, through the `data-focus-visible` the focus-visible variant reads: for docs and screenshots. */
+  focusVisibleId?: string | undefined
   /** On the element with role tree, merged last. */
   className?: string | undefined
 } & TreeViewName

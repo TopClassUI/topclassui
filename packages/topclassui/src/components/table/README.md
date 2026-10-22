@@ -92,6 +92,7 @@ Required: `caption`, `columns`, `getKey`, `items`. Every other prop below is opt
 | `density` | no | `comfortable` \| `compact` | `"comfortable"` | How tall a row is: comfortable, or compact for a long list read at a glance. |
 | `emptyFallback` | no | `ReactNode` | - | Shown in one row across every column when there are no items. `null` also gives `labels.state.empty`. |
 | `hasMore` | no | `boolean` | - |  |
+| `hoveredKey` | no | `string` | - | The key of one row drawn as if the pointer rested on it, through the `data-hover` the hover variant reads: for docs and screenshots. |
 | `labels` | no | `Labels` | - | The built-in strings: the empty row and the words of the sort links. Defaults to English. |
 | `link` | no | `ReactElement` | - | The element every sort link is cloned from, such as `link={<Link href="" />}`; its `href` is replaced with the column's `sortHref`. |
 | `loadMore` | no | `(() => void \| Promise<void>)` | - | Client-only, or a Server Action. Called once when the window nears the end. |

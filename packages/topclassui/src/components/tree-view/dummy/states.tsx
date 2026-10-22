@@ -17,7 +17,7 @@ const ITEMS = [
 ]
 
 /** Every state the strip draws, one cell each, captioned by its name: collapsed, expanded, selected, focus-visible
- * (the ring shows once Tab reaches the tree), loading and empty. */
+ * (the ring drawn at rest on src), loading and empty. */
 export default function Demo() {
   return (
     <div className="grid gap-3 sm:grid-cols-2">
@@ -31,7 +31,7 @@ export default function Demo() {
         <TreeView aria-label="Source, selected" className={BARE} items={ITEMS} defaultExpanded={['src']} defaultValue="file1" />
       </div>
       <div role="group" aria-label="focus-visible">
-        <TreeView aria-label="Source, focus-visible" className={BARE} items={ITEMS} defaultExpanded={['src']} />
+        <TreeView aria-label="Source, focus-visible" className={BARE} items={ITEMS} defaultExpanded={['src']} focusVisibleId="src" />
       </div>
       <div role="group" aria-label="loading">
         <TreeView aria-label="Source, loading" status="loading" items={[]} />

@@ -5,12 +5,12 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import { compileEntry } from '#test/stylesheet.js'
 import {
   TREE_VIEW_CARET, TREE_VIEW_ICON, TREE_VIEW_LABEL, TREE_VIEW_NOTE, TREE_VIEW_ROOT, TREE_VIEW_ROW, TREE_VIEW_ROW_ACTIVE,
-  TREE_VIEW_ROW_DISABLED, TREE_VIEW_ROW_SELECTED, TREE_VIEW_TREE,
+  TREE_VIEW_ROW_DISABLED, TREE_VIEW_ROW_FORCED, TREE_VIEW_ROW_SELECTED, TREE_VIEW_TREE,
 } from '../classes.js'
 
 const OWN = [
   TREE_VIEW_CARET, TREE_VIEW_ICON, TREE_VIEW_LABEL, TREE_VIEW_NOTE, TREE_VIEW_ROOT, TREE_VIEW_ROW, TREE_VIEW_ROW_ACTIVE,
-  TREE_VIEW_ROW_DISABLED, TREE_VIEW_ROW_SELECTED, TREE_VIEW_TREE,
+  TREE_VIEW_ROW_DISABLED, TREE_VIEW_ROW_FORCED, TREE_VIEW_ROW_SELECTED, TREE_VIEW_TREE,
 ]
 const CLASSES = [...new Set(OWN.join(' ').split(' ').filter(Boolean))]
 
@@ -96,6 +96,16 @@ describe('a row', () => {
   it('the active row draws the ring inside its edge only while the tree has the keyboard', () => {
     const active = selectorOf('group-focus-visible/tree:data-highlighted:outline-solid')
     expect(ruleOf(`${active}:is(:where(.group\\/tree):focus-visible *)[data-highlighted]`)).toContain('outline-style: solid;')
+  })
+
+  it('a row named by focusVisibleId draws the same ring at rest, from the forced attribute', () => {
+    const at = (cls: string) => ruleOf(`${selectorOf(`focus-visible:${cls}`)}[data-focus-visible]`)
+    expect(at('outline-solid')).toContain('outline-style: solid;')
+    expect(at('outline-(length:--tc-ring-width)')).toContain('outline-width: var(--tc-ring-width);')
+    expect(at('outline-offset-(length:--tc-ring-offset)')).toBe('outline-offset: var(--tc-ring-offset);')
+    expect(at('outline-ring')).toBe('outline-color: var(--tc-ring);')
+    expect(ruleOf(`${selectorOf('forced-colors:aria-selected:focus-visible:outline-[HighlightText]')}[aria-selected="true"][data-focus-visible]`))
+      .toBe('outline-color: HighlightText;')
   })
 
   it('selected: a tint at the regular weight; under forced colours the system pair, the ring and the marks in HighlightText', () => {

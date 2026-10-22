@@ -27,6 +27,7 @@ export function TableRows(props: TableRowsProps) {
             aria-rowindex={index + 2}
             aria-selected={row.selected ? true : undefined}
             data-selected={row.selected ? '' : undefined}
+            data-hover={row.hovered ? '' : undefined}
             className={cn(ROW, tinted && fill)}
           >
             {props.columns.map((column, at) => {

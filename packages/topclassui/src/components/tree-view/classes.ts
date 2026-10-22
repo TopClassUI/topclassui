@@ -34,6 +34,9 @@ export const TREE_VIEW_ROW_SELECTED = 'aria-selected:bg-primary-soft aria-select
  * 8 px padding and its scroll padding. On a selected row under forced colours it is set to HighlightText. */
 export const TREE_VIEW_ROW_ACTIVE = 'group-focus-visible/tree:data-highlighted:outline-solid group-focus-visible/tree:data-highlighted:outline-(length:--tc-ring-width) group-focus-visible/tree:data-highlighted:outline-offset-(length:--tc-ring-offset) group-focus-visible/tree:data-highlighted:outline-ring forced-colors:aria-selected:group-focus-visible/tree:data-highlighted:outline-[HighlightText]'
 
+/** The same ring on a row named by focusVisibleId, through the data-focus-visible the focus-visible variant reads. */
+export const TREE_VIEW_ROW_FORCED = 'focus-visible:outline-solid focus-visible:outline-(length:--tc-ring-width) focus-visible:outline-offset-(length:--tc-ring-offset) focus-visible:outline-ring forced-colors:aria-selected:focus-visible:outline-[HighlightText]'
+
 export const TREE_VIEW_ROW_DISABLED = 'aria-disabled:pointer-events-none aria-disabled:opacity-50'
 
 /** The caret, or an empty slot as wide on a leaf. Colour on the wrapper, never on the svg; on a selected row under
@@ -48,13 +51,13 @@ export const TREE_VIEW_LABEL = LABEL
 /** The loading and the empty text, outside the tree. A live region stays in the page so its first words are read; empty, it takes no room. */
 export const TREE_VIEW_NOTE = 'px-3 py-2 text-sm text-muted empty:p-0'
 
-/** R-5.2-3: the status line's own look per kind. Loading draws bars in the tree's box, empty the tray over its words. */
+/** R-5.2-3: the status line's own look per kind. Loading draws two bare bars, empty the tray over its words in a box. */
 export const TREE_VIEW_NOTE_KIND = {
   idle: '',
   own: '',
-  loading: `flex flex-col gap-3 rounded-box bg-surface-raised p-4 ${BORDER}`,
+  loading: 'flex flex-col gap-1.25',
   'loading-more': 'flex flex-col gap-3',
-  empty: `flex flex-col items-center gap-2 rounded-box bg-surface-raised p-6 text-center ${BORDER}`,
+  empty: `flex flex-col items-center gap-2 rounded-box bg-surface-raised px-4 py-6 text-center ${BORDER}`,
 } as const
 
 /** The words of a loading line, while bars stand for them: still read by the live region, never seen. */

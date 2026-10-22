@@ -53,6 +53,12 @@ describe('on the server', () => {
     ])
   })
 
+  it('focusVisibleId marks exactly that row with the forced attribute, and nothing without it', () => {
+    expect(rows(html({ defaultExpanded: ['app'], focusVisibleId: 'layout' })).map((row) => attr(row, 'data-focus-visible')))
+      .toEqual([undefined, '', undefined, undefined, undefined])
+    expect(html({ defaultExpanded: ['app'] })).not.toContain('data-focus-visible')
+  })
+
   it('value wins over defaultValue, and expanded over defaultExpanded', () => {
     const out = html({ value: 'readme', defaultValue: 'app', expanded: [], defaultExpanded: ['app'] })
     expect(aria(out)).toEqual(['1 1 3 false false -', '1 2 3 false false -', '1 3 3 - true -'])

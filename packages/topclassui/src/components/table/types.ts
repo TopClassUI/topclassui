@@ -72,6 +72,8 @@ export interface TableProps<T, Caption extends TableCaption = TableCaption>
   sort?: TableSort | undefined
   /** The keys of the selected rows, tinted in primary and marked `aria-selected`. Selecting is the caller's: a checkbox in a column, say. */
   selectedKeys?: readonly string[] | undefined
+  /** The key of one row drawn as if the pointer rested on it, through the `data-hover` the hover variant reads: for docs and screenshots. */
+  hoveredKey?: string | undefined
   /** Shown in one row across every column when there are no items. `null` also gives `labels.state.empty`. */
   emptyFallback?: ReactNode | undefined
   /** The element every sort link is cloned from, such as `link={<Link href="" />}`; its `href` is replaced with the column's `sortHref`. */
@@ -87,6 +89,7 @@ export interface TableRow {
   key: string
   cells: readonly ReactNode[]
   selected: boolean
+  hovered: boolean
 }
 
 /** What a body cell is, worked out on the server: a row header or a data cell, its classes, whether it sticks, and the

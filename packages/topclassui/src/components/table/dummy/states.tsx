@@ -25,17 +25,6 @@ const sorted: Row[] = [
 
 const key = (row: Row) => row.id
 
-/** The hover row as drawn: a pointer cannot rest on a picture, so row 2's cell wears the hover fill across its padding. */
-const hovered: TableColumn<Row>[] = [
-  {
-    key: 'name',
-    header: 'Name',
-    className: CELL,
-    sortHref: '?sort=name',
-    cell: (row) => (row.id === 'row-2' ? <span className="-mx-2 -my-1.75 block bg-surface px-2 py-1.75">{row.name}</span> : row.name),
-  },
-]
-
 /** The frame's strip, one small compact table a state: idle, a row under the pointer, sorted, a row selected, empty and
  * loading. The caption, the stripes and the stuck column have demos of their own. */
 export default function Demo() {
@@ -45,7 +34,7 @@ export default function Demo() {
         <Table density="compact" className="w-32" caption="Rows" items={rows} getKey={key} columns={columns} />
       </div>
       <div role="group" aria-label="hover row">
-        <Table density="compact" className="w-32" caption="Rows, point at one" items={rows} getKey={key} columns={hovered} />
+        <Table density="compact" className="w-32" hoveredKey="row-2" caption="Rows, point at one" items={rows} getKey={key} columns={columns} />
       </div>
       <div role="group" aria-label="sorted">
         <Table

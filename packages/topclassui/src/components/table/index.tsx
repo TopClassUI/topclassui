@@ -32,6 +32,7 @@ export function Table<T, Caption extends TableCaption = TableCaption>({
   captionVisible = TABLE_DEFAULTS.captionVisible,
   sort,
   selectedKeys,
+  hoveredKey,
   density = TABLE_DEFAULTS.density,
   variant = TABLE_DEFAULTS.variant,
   striped = TABLE_DEFAULTS.striped,
@@ -137,7 +138,7 @@ export function Table<T, Caption extends TableCaption = TableCaption>({
           <TableRows
             rows={items.map((item) => {
               const key = getKey(item)
-              return { key, cells: shown.map((column) => column.cell(item)), selected: selectedKeys?.includes(key) === true }
+              return { key, cells: shown.map((column) => column.cell(item)), selected: selectedKeys?.includes(key) === true, hovered: key === hoveredKey }
             })}
             columns={cells}
             striped={striped}

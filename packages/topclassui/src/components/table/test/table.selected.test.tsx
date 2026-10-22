@@ -50,3 +50,11 @@ describe('selectedKeys', () => {
     expect(classList(first.slice(first.lastIndexOf('<th')))).toContain('group-data-selected/row:bg-primary-soft')
   })
 })
+
+describe('hoveredKey', () => {
+  it('marks exactly the row whose key it names with the forced data-hover, and nothing without it', () => {
+    expect(rows(html({ hoveredKey: 'b' })).map((tr) => attr(tr, 'data-hover'))).toEqual([undefined, '', undefined])
+    expect(html()).not.toContain('data-hover')
+    expect(html({ hoveredKey: 'zzz' })).not.toContain('data-hover')
+  })
+})

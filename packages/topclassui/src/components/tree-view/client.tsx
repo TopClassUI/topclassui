@@ -7,7 +7,7 @@ import { cn } from '#shared/cn.js'
 import { Svg } from '#components/svg/index.js'
 import {
   TREE_VIEW_CARET, TREE_VIEW_ICON, TREE_VIEW_LABEL, TREE_VIEW_NOTE, TREE_VIEW_NOTE_KIND, TREE_VIEW_NOTE_TEXT, TREE_VIEW_ROOT,
-  TREE_VIEW_ROW, TREE_VIEW_ROW_ACTIVE, TREE_VIEW_ROW_DISABLED, TREE_VIEW_ROW_SELECTED, TREE_VIEW_SKELETON_BAR,
+  TREE_VIEW_ROW, TREE_VIEW_ROW_ACTIVE, TREE_VIEW_ROW_DISABLED, TREE_VIEW_ROW_FORCED, TREE_VIEW_ROW_SELECTED, TREE_VIEW_SKELETON_BAR,
   TREE_VIEW_SKELETON_WIDTHS, TREE_VIEW_TREE,
 } from './classes.js'
 import { useTreeView } from './hook.js'
@@ -17,7 +17,7 @@ import type { TreeViewProps } from './types.js'
  * keys move a highlight that aria-activedescendant names, so windowing can never drop the focus (choice 27). */
 export function TreeView({
   items, value, defaultValue, onValueChange, expanded, defaultExpanded, onExpandedChange, visibleRows, virtualize, hasMore,
-  loadMore, loadMoreThreshold, status, loadingFallback, emptyFallback, className, style, ref, onKeyDown, onFocus, onBlur,
+  loadMore, loadMoreThreshold, status, loadingFallback, emptyFallback, focusVisibleId, className, style, ref, onKeyDown, onFocus, onBlur,
   onPointerDown, onPointerUp, onPointerCancel, onClick, ...rest
 }: TreeViewProps) {
   const tree = useTreeView({
@@ -58,8 +58,9 @@ export function TreeView({
             aria-selected={tree.selected === key}
             aria-disabled={row.node.disabled === true ? true : undefined}
             data-highlighted={tree.active === key ? '' : undefined}
+            data-focus-visible={key === focusVisibleId ? '' : undefined}
             style={{ '--tc-tree-level': row.level - 1 }}
-            className={cn(TREE_VIEW_ROW, TREE_VIEW_ROW_SELECTED, TREE_VIEW_ROW_ACTIVE, TREE_VIEW_ROW_DISABLED)}
+            className={cn(TREE_VIEW_ROW, TREE_VIEW_ROW_SELECTED, TREE_VIEW_ROW_ACTIVE, TREE_VIEW_ROW_FORCED, TREE_VIEW_ROW_DISABLED)}
           >
             <span aria-hidden="true" className={TREE_VIEW_CARET}>
               {row.branch ? <Svg icon={row.open ? caretDown : caretRight} size="0.75rem" /> : null}

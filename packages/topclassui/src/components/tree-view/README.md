@@ -71,6 +71,7 @@ Required: `items`, `aria-label` or `aria-labelledby`. Every other prop below is 
 | `defaultValue` | no | `string \| null` | - | The id selected when the tree mounts. |
 | `emptyFallback` | no | `ReactNode` | - | What status empty says, in place of labels.state.empty. |
 | `expanded` | no | `readonly string[]` | - | The ids of the open branches. Use with onExpandedChange when controlled. |
+| `focusVisibleId` | no | `string` | - | The id of one row drawn with the keyboard ring, through the `data-focus-visible` the focus-visible variant reads: for docs and screenshots. |
 | `hasMore` | no | `boolean` | - | More root nodes exist, so loadMore is called when the tree nears its end. |
 | `loadingFallback` | no | `ReactNode` | - | What status loading says, in place of labels.common.loading. |
 | `loadMore` | no | `(() => void \| Promise<void>)` | - | Called with no argument for the next page of root nodes, once per page; never for a branch. Client-only, or a Server Action. |
