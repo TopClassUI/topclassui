@@ -1,5 +1,5 @@
 // Helpers for a spec on the live harness (`pnpm harness:serve`), where a demo is hydrated and can open.
-// openLive loads a page, waits for hydration and throws on anything it reported; pinTo moves the demo to an edge.
+// openLive loads a page, waits for hydration and the frame after it, and throws on anything it reported; pinTo moves the demo to an edge.
 // viewportBox, expectInsideViewport and expectNoSidewaysScroll measure; liveErrors lists what the page reported since.
 import { realpathSync } from 'node:fs'
 
@@ -49,7 +49,12 @@ export async function liveErrors(page: Page): Promise<string[]> {
   return [...inPage, ...onlyBrowser]
 }
 
-/** Opens a live page and returns once React has hydrated it. A page that reported anything fails here. */
+/** Resolves once the next frame has rendered, so what a ResizeObserver reports in it (the Navbar's height) has landed. */
+export function nextFrame(page: Page): Promise<void> {
+  return page.evaluate(() => new Promise<void>((resolve) => { requestAnimationFrame(() => { setTimeout(resolve) }) }))
+}
+
+/** Opens a live page and returns once React has hydrated it and the next frame has rendered. A page that reported anything fails here. */
 export async function openLive(page: Page, demo: string, options: LiveOptions = {}): Promise<void> {
   watch(page)
   const url = liveUrl(demo, options)
@@ -75,6 +80,7 @@ export async function openLive(page: Page, demo: string, options: LiveOptions = 
   if (flag !== 'hydrated' || errors.length > 0) {
     throw new Error(`live harness: ${demo} is ${flag} at ${url}\n${errors.join('\n') || 'nothing was reported'}`)
   }
+  await nextFrame(page)
 }
 
 /** Moves the demo of an open page flush against an edge, or back into the page with null. No reload. */

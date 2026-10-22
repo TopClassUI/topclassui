@@ -2,9 +2,25 @@
 import type { ReactNode } from 'react'
 import { createHighlighter, type Highlighter } from 'shiki'
 
-import { LANGS, ON_DARK, ON_LIGHT } from './shiki-themes'
+import { LANGS, ON_DARK, ON_LIGHT, TOKEN_ROLES, type TokenRole } from './shiki-themes'
 
 export type CodeLang = (typeof LANGS)[number]
+
+/** The class that sets a role's two colours in globals.css: a short class per token in place of a 60-byte style, in the HTML and the RSC payload. */
+const TOKEN_CLASS: Record<TokenRole, string> = { text: 'tk-text', comment: 'tk-comment', keyword: 'tk-keyword', string: 'tk-string', attribute: 'tk-attribute', tag: 'tk-tag' }
+
+const ROLE_OF = new Map(Object.entries(TOKEN_ROLES).map(([role, [dark, light]]) => [`${dark}|${light}`, role as TokenRole]))
+
+type TokenProps = { className: string } | { style: Record<string, string> } | Record<string, never>
+
+/** A token's role class; a pair the themes do not name keeps its inline style, and a token with no colour gets neither. */
+function tokenProps(style: Record<string, string> | undefined): TokenProps {
+  const dark = style?.['--tc-code-on-dark']
+  const light = style?.['--tc-code-on-light']
+  if (style === undefined || dark === undefined || light === undefined) return {}
+  const role = ROLE_OF.get(`${dark}|${light}`.toLowerCase())
+  return role !== undefined && Object.keys(style).length === 2 ? { className: TOKEN_CLASS[role] } : { style: { '--tc-code-on-dark': dark, '--tc-code-on-light': light } }
+}
 
 let highlighter: Promise<Highlighter> | null = null
 
@@ -46,9 +62,9 @@ export async function highlight(code: string, lang?: string): Promise<ReactNode>
   return (
     <span className="shiki">
       {tokens.map((line, row) => (
-        <span key={row} data-blank={line.length === 0 ? '' : undefined} data-import={imports[row] === true ? '' : undefined}>
+        <span key={row} {...(line.length === 0 ? { 'data-blank': '' } : {})} {...(imports[row] === true ? { 'data-import': '' } : {})}>
           {line.map((token, column) => (
-            <span key={column} style={{ '--tc-code-on-dark': token.htmlStyle?.['--tc-code-on-dark'], '--tc-code-on-light': token.htmlStyle?.['--tc-code-on-light'] }}>{token.content}</span>
+            <span key={column} {...tokenProps(token.htmlStyle)}>{token.content}</span>
           ))}
           {row < tokens.length - 1 ? '\n' : null}
         </span>

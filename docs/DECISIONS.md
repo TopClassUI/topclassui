@@ -74,6 +74,82 @@ The format is: date, decision, why, and what it affects.
 **Why.** The rows table 8, tree-view 5 and 7 (audit 1) and 5 and 7 (audit 2) were left for a library change in round 11.
 
 **Affects.** Every xs Badge (3 px shorter) and every TreeView while loading or empty.
+## 2026-10-22 - The site replaces Next's polyfill module with the one patch its browsers need
+
+**Decision.** `apps/docs/next.config.ts` aliases `../build/polyfills/polyfill-module` (Turbopack `resolveAlias`) to `apps/docs/lib/polyfills.ts`, which keeps only `URL.canParse` (Chrome 120, Safari 17). Next 16.3.8's `client/app-globals.js` imports that file on every page whatever the targets. It patches `trimStart`, `trimEnd`, `Symbol.description`, `flat`, `flatMap`, `Promise.finally`, `Object.fromEntries`, `Array.at`, `Object.hasOwn` and `URL.canParse`; all but the last are in Chrome 111, Safari 16.4 and Firefox 128, the browsers Tailwind v4 already needs. `browserslist` is unchanged: it steers SWC and the CSS, not this file, and Lighthouse flagged no transform.
+
+**Why.** PageSpeed's Legacy JavaScript item ("Est savings of 14 KiB") named only these patches. The 14 KiB is Lighthouse's core-js estimate: the real file is 1,380 bytes, and the React chunk drops from 72,328 to 71,965 bytes sent (229,285 to 227,998 raw). No client code calls `URL.canParse` today; the patch stays so the alias removes nothing a supported browser lacks. If a later Next renames the file, the alias matches nothing and Next's patches come back, with nothing broken; if it adds a patch to the same file, `apps/docs/lib/polyfills.test.ts`, which pins the ten, fails until the new one is checked against the browsers.
+
+**Measured.** Lighthouse 12.8.2, mobile, local `next start`, median of 3 interleaved with merged main (ad3e1a8c): Legacy JavaScript passes on all 12 runs (main: 14 KiB on all 12). Performance 81 to 81 on `/en/docs/components`, 92 to 93 on `/en/docs/components/button`, 83 to 82 on `/ar` (LCP 4.21 to 4.22 s), `/en` 87 to 93 on a noisy baseline; CLS 0 throughout. A second interleaved run in review gave the same medians on both sides (94, 83, 81 and 93), Legacy JavaScript again passing on all 12 runs: the change clears the item and moves no score.
+
+**Affects.** `apps/docs` only. Unused JavaScript (23 KiB) stays: it is React DOM's client build (module of 200,697 bytes raw, 63,185 gzipped, in the same 72 KB chunk), code paths a first load does not reach, and a page cannot hydrate without it.
+
+**The long tasks in that chunk stay too.** A CPU profile at 4x slowdown shows the first is Next's start: compiling and running React DOM and the router, and decoding the page's RSC payload. The second is the commit of the page's hydration under the provider island: React walking every fiber of the page (about a third), and the motion watcher's style and layout reads (more than half on `/en`), which is the Forced reflow item. Making the provider's `Intl.NumberFormat` lazy took 31 ms of ICU start-up out of the provider's idle task (116 to 73 ms at 4x on `/en`), but Lighthouse listed the same long tasks before and after, and `pnpm size` grew every client half by about 40 bytes, so it was not kept.
+## 2026-10-22 - The site's Tailwind scan skips tests and e2e; its CSS stays two linked files, not inlined
+
+**Decision.** `apps/docs/app/globals.css` adds `@source not "../**/*.test.{ts,tsx}"` and `@source not "../e2e"`. Tailwind's automatic scan of `apps/docs` read the tests, which quote banned classes on purpose, so every page shipped 16 rules no page renders: `left-4`, `right-4`, `start-4`, `end-4`, `ml-4`, `mr-4`, `pr-4`, `space-x-4`, `divide-x-2`, `tracking-wide`, `rounded-md`, `rounded-l-md`, `rounded-r-md`, `bg-red-500`, `min-h-6` and `min-w-6`. `experimental.inlineCss` stays off and `experimental.cssChunking` stays at its default.
+
+**Why two CSS files.** One is next/font's (21,494 bytes, 2.6 KB gzip: 51 `@font-face` rules for Inter, Noto Sans Arabic and Geist Mono, and their variable classes). The other is `globals.css`: Tailwind, the tokens and the library's styles. Turbopack keeps the font file apart in every setting tried: the default, `cssChunking: 'graph'`, `{ type: 'graph', requestCost: 1000000 }`, and the preview layout importing the fonts before `globals.css` as the site layout does. Every build wrote the same byte-identical font file.
+
+**Measured.** Lighthouse 12.8.2 mobile, performance only, local `next start`, median of 3 interleaved runs against merged main ad3e1a8c.
+
+| Build | Page | Performance | FCP | LCP | HTML sent | CSS |
+| --- | --- | --- | --- | --- | --- | --- |
+| this branch | `/en` | 93 (main 93) | 1.36 s (1.36) | 3.13 s (3.13) | 63 KB | 161,145 → 159,143 bytes, 30 → 29 KB sent |
+| this branch | `/ar` | 82 (main 83) | 2.41 s (2.41) | 4.21 s (4.21) | 66 KB | the same file |
+| this branch | `/en/docs/components` | 75 (main 73) | 2.56 s (2.56) | 4.21 s (4.32) | 283 KB | the same file |
+| this branch | `/en/docs/components/button` | 93 (main 91) | 1.36 s (1.36) | 3.12 s (3.13) | 61 KB | the same file |
+| `inlineCss: true` | `/en` | 81 (main 86) | 1.62 s (1.36) | 3.46 s (3.18) | 62 → 120 KB | none sent |
+| `inlineCss: true` | `/ar` | 74 (main 81) | 2.56 s (2.41) | 4.81 s (4.21) | 67 → 125 KB | none sent |
+| `inlineCss: true` | `/en/docs/components` | 73 (main 67) | 2.40 s (2.56) | 4.21 s (4.14) | 283 → 341 KB | none sent |
+| `inlineCss: true` | `/en/docs/components/button` | 90 (main 93) | 1.35 s (1.36) | 3.27 s (3.12) | 61 → 121 KB | none sent |
+
+The scan change saves 2,002 bytes of CSS (about 350 bytes gzip) and moves no metric. Inlining passes Lighthouse's render-blocking check, but Next writes the CSS into each page twice, once in the `<style>` tag and once in the RSC payload, as its own docs warn, so every page's HTML grows by about 58 KB sent and LCP comes later on all four pages.
+
+**Not changed.** Lighthouse lists no preconnect candidate, since every request is same-origin. The network dependency tree flags any chain of two requests, so HTML to CSS always fails it short of inlining; the manifest is in it too. Noto Sans Arabic still waits for the font CSS on `/ar`, because it is not preloaded (PLAN 14 and the Noto Sans Arabic entry of the same day).
+
+**Affects.** `apps/docs/app/globals.css` only. A class used only in a test or an e2e spec no longer reaches the site's CSS.
+## 2026-10-22 - Noto Sans Arabic stays Google's one variable file, and Inter stays preloaded on /ar
+
+**Decision.** `lib/fonts.ts` is unchanged: one Noto Sans Arabic call with three weights, and Inter preloaded on both locales.
+
+**Why.** `/ar` sets all three weights in its first viewport (400, 500 and 600 at 412 and 1350 px wide), so no weight can go. Asked for three weights, Google sends its 100-900 variable file: 166,639 bytes of Arabic and 31,853 of Latin. Three single-weight calls get static files of 48,924, 53,188 and 53,380 bytes plus 3 x 10.7 KB of Latin, about 10 KB less, but the static instances place the dots of the 92 px headline about 1 px lower: 570 pixels differ in `/ar`'s first viewport, against 0 between two runs of the same build. Dropping Inter's preload on `/ar` saves nothing: with its `<link>` and its RSC hint both removed the page still fetches the same 48,917-byte file through the font stack, only later; with the `<link>` alone removed, Lighthouse measured the same 265 KB of fonts and FCP 2.72 s against 2.41 s.
+
+**What it costs.** Lighthouse charges `/ar` about a second of FCP and LCP that `/en` does not pay: the 198 KB of Noto start downloading before the first paint, and its simulated 4G counts them in full. Cutting that needs smaller Arabic files (a font instanced to 400-600, self-hosted), which is Omar's call.
+
+---
+
+## 2026-10-22 - A code token names its colour role by class, and globals.css sets the pair once
+
+**Decision.** `lib/highlight.tsx` gives each Shiki token the class of its role in `lib/shiki-themes.ts` (`tk-text`, `tk-comment`, `tk-keyword`, `tk-string`, `tk-attribute`, `tk-tag`) instead of an inline `style` with both colours, and `app/globals.css` sets each role's `--tc-code-on-dark` and `--tc-code-on-light` once. A pair the themes do not name keeps its inline style. A line that is not blank no longer sends `data-blank` as undefined. The two flat-code selectors that read `[style*='#D4D4D4']` and `[style*='#51A2FF']` read `.tk-text` and `.tk-keyword`.
+
+**Why.** Every token carried `style="--tc-code-on-dark:#D4D4D4;--tc-code-on-light:#262626"` (60 bytes), once in the HTML and again in the RSC payload. The catalog has 2,735 tokens: its HTML drops from 3,639,105 to 3,352,251 bytes raw and from 288,936 to 264,418 gzip; Button's from 850,451 to 760,217 raw (62,070 to 59,946 gzip). Lighthouse mobile, median of 3 interleaved runs against merged main: the catalog's FCP 2.56 to 2.41 s, LCP 4.14 to 4.07 s, score 81 to 82. Other pages: the same FCP and LCP within 40 ms; their score moved only with TBT, which swung by 100 to 300 ms between runs of the same build. Vercel sends brotli, whose window spans the repeated cards, so the transfer saving there is about 2 KB (the catalog from 128,579 to 126,548 bytes at brotli quality 4, from 97,429 to 95,563 at quality 11); the raw bytes the browser parses are what drop.
+
+**What it affects.** Every code block on the site. The colours are unchanged: the computed colour of every token span in light, dark and ocean is identical between the two builds (9,900 on the catalog, 3,126 on Button), and screenshots of Button and Install the package match pixel for pixel. `lib/highlight.test.tsx` pins the markup and holds the six CSS rules to the theme pairs.
+## 2026-10-22 - Nothing reads layout in the hydration commit: Home's motion and the Navbar measure where the browser has just laid out
+
+**Decision.** `apps/docs/lib/motion.ts` no longer reads `--tc-motion` or a block's box when it arms. It observes every `[data-motion]` block and decides on the IntersectionObserver's first report, which comes after the browser's own layout. A block inside Home's `content-visibility: auto` sections reports an empty box there, so the outermost box around it that lies wholly off the screen answers, read from the root down; the skipped block itself is never measured. Every box is read before any block is held. The library's `useNavbarOffset` (Navbar) now measures the bar, reads an #anchor target and the scroll padding, sets `data-scrolled` and writes `--tc-sticky-top` at the ResizeObserver's first report instead of in the effect. A browser makes that report for every rendered bar with no resize, before the frame paints.
+
+**Why.** Lighthouse's forced-reflow item. Lighthouse 12.8.2 flags a group of forced style and layout that reaches 30 ms. Traced with source maps on merged main (ad3e1a8c): the Navbar effect wrote `--tc-sticky-top` on `<html>`, which invalidates every element's style. Then MotionWatch, which runs on every page, read `getComputedStyle(html)` (5 to 42 ms of style). On Home it also read each block's `getBoundingClientRect()`, which laid the skipped sections out in several passes (10 to 74 ms more). Flagged groups on main were 24 to 47 ms on `/en`, 28 to 103 ms on `/ar` and 39 to 48 ms on `/en/docs/components/button`. With the motion fixed alone, the same recalc moved to the next reader, Table's `useCollection` layout effect (9 to 44 ms). So the Navbar's write left the commit too. The "top function call" Lighthouse names, React's scheduler `performWorkUntilDeadline`, is only the entry point.
+
+**Measured.** Lighthouse 12.8.2, mobile, `measure.sh`: the median of 3 interleaved runs each, on a local `next start` of main and of this branch. Main first, then this branch; a second run of two pages is in brackets.
+
+| Page | Performance | TBT | CLS |
+| --- | --- | --- | --- |
+| `/en` | 94, 94 | 35, 22 ms | 0, 0 |
+| `/ar` | 83, 82 (83, 83) | 73, 109 ms (69, 53) | 0, 0 |
+| `/en/docs/components` | 81, 76 (81, 84) | 161, 260 ms (152, 140) | 0, 0 |
+| `/en/docs/components/button` | 93, 93 | 97, 65 ms | 0, 0 |
+| `/en/docs/installation` | 95, 95 | 52, 21 ms | 0, 0 |
+
+LCP and FCP are within 10 ms of main on every page but the catalog, which moves with the machine (4.21 against 4.40 s, then 4.21 against 3.76 s). Forced reflow was flagged in 8 of 21 runs on main, `/ar` in all 6, and in 3 of 21 on this branch, none of them on `/en` or `/ar`. One of the three is Table's read (31 ms); two are Lighthouse's own unattributed time (below). A review rebuild measured main against this branch on four pages: performance 94/93, 78/83, 81/84 and 93/94; TBT 38/22, 106/51, 155/134 and 75/22 ms; LCP no later anywhere (catalog 4.21/3.76 s); CLS 0; forced reflow flagged in 2 of 12 runs on main (`/ar`) and in none on the branch.
+
+**Left, with reasons.**
+- `useCollection` (Table, on the component pages and in Home's frame) reads its container in its ResizeObserver. In the frame where the Navbar first writes its height, that read pays the frame's one style recalc early: 4 to 21 ms, 31 ms in one run. That is no extra work, and moving it means changing the collection hook every list shares.
+- Base UI 1.8.0: `CompositeList`'s layout effect calls `scrollIntoViewIfNeeded` (`internals/composite/composite.mjs`, reading `scrollLeft`), 0.3 to 2 ms, and its `getAnimations` read takes 0.4 ms. Both are inside the dependency.
+- Lighthouse's own "[unattributed]" time, 19 to 38 ms on the docs pages, on main as well. It is main-thread layout that happens while V8 parses a script on a background thread. Lighthouse 12.8.2's `WarningsHandler` reads every thread as one stack and counts any `v8.*` event as JavaScript, so it reports ordinary layout as forced. Nothing on the page forces it.
+
+**What it affects.** `apps/docs/lib/motion.ts` and its new test. `packages/topclassui/src/components/navbar/hook.ts`, its offset, unstuck and hydration tests (happy-dom's ResizeObserver never reports, so the tests deliver the browser's first report by hand), and two mutation rows that replace one. The variable now lands one frame after hydration, so the e2e helper `openLive` and the three #anchor tests that wait for hydration themselves let that frame render (`nextFrame` in `e2e/live.ts`) before they read: on a test page, a read right after the hydration flag missed an observer's first write in 3 to 5 of 150 loads, and in 0 of 300 after one frame. Checked in Chrome against main: `--tc-sticky-top` (58 px), `data-scrolled`, the #anchor landing on the theming guide in both languages at 1280 and 390 px, Home's held blocks, the count-up, reduced motion and a reload scrolled to the foot all match. The Playwright specs (motion, navbar, overlay-scroll) were not run on this branch.
 
 ---
 

@@ -25,6 +25,7 @@ afterEach(() => {
     container.remove()
   }
   vi.restoreAllMocks()
+  vi.unstubAllGlobals()
 })
 
 /** Hydrate the server HTML and report anything React considers a mismatch. */
@@ -62,10 +63,18 @@ describe('a server-rendered Navbar hydrates cleanly', () => {
     expect((await hydrate(bar(false))).errors).toEqual([])
   })
 
-  it('the server HTML carries no height: the variable is written by the effect, after hydration', async () => {
+  it('the server HTML carries no height: the variable is written after hydration, at the first size report', async () => {
+    const reports: (() => void)[] = []
+    vi.stubGlobal('ResizeObserver', class {
+      constructor(fire: () => void) { reports.push(fire) }
+      observe() { return undefined }
+      disconnect() { return undefined }
+    })
     expect(renderToString(bar(true))).not.toContain('--tc-sticky-top')
     await hydrate(bar(true))
-    // happy-dom measures every box as 0, so the value says the effect ran, not how tall the bar is.
+    expect(document.documentElement.style.getPropertyValue('--tc-sticky-top')).toBe('')
+    act(() => { for (const fire of reports) fire() })
+    // happy-dom measures every box as 0, so the value says the report was handled, not how tall the bar is.
     expect(document.documentElement.style.getPropertyValue('--tc-sticky-top')).toBe('0px')
   })
 
