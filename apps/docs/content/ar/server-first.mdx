@@ -39,13 +39,17 @@ description: لا يشحن المكوّن شيفرة JavaScript إلا حين ي
 // the file that configures a palette is a client file
 import { Command } from 'topclassui/command'
 
-export function Search({ commands }: { commands: { id: string, label: string }[] }) {
+type Item = { id: string, label: string }
+
+export function Search({ commands }: { commands: Item[] }) {
   return (
     <Command
       items={commands}
       getKey={(command) => command.id}
       getLabel={(command) => command.label}
-      onSelect={(command) => { window.location.assign(`/docs/${command.id}`) }}
+      onSelect={(command) => {
+        window.location.assign(`/docs/${command.id}`)
+      }}
     />
   )
 }
@@ -55,7 +59,7 @@ export function Search({ commands }: { commands: { id: string, label: string }[]
 
 ## لماذا لا يحتوي index.tsx على خطّافات
 
-البنية في <span dir="ltr">`index.tsx`</span>، والسلوك في <span dir="ltr">`hook.ts`</span>. لا يحتوي <span dir="ltr">`index.tsx`</span> أبدًا على <span dir="ltr">`'use client'`</span>، ولا يستورد <span dir="ltr">`hook.ts`</span>. ويفرض ذلك فحصٌ أثناء البناء.
+البنية في <span dir="ltr">index.tsx</span>، والسلوك في <span dir="ltr">hook.ts</span>. لا يحتوي <span dir="ltr">index.tsx</span> أبدًا على <span dir="ltr">use client</span>، ولا يستورد <span dir="ltr">hook.ts</span>. ويفرض ذلك فحصٌ أثناء البناء.
 
 ```tsx title="index.tsx"
 // index.tsx - server

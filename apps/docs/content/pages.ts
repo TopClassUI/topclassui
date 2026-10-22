@@ -27,6 +27,8 @@ export interface PageEntry {
   title: Both
   description: Both
   status: PageStatus
+  /** A phrase of the lead drawn as a link, the same words in both languages. */
+  leadLink?: { text: string; href: string }
 }
 
 /** Sidebar order. "Next" is the following live entry; a `later` entry is not routed, listed or indexed. */
@@ -121,6 +123,7 @@ export const PAGES = [
   },
   {
     slug: 'accessibility', path: '/docs/accessibility', kind: 'guide', group: 'foundations', icon: 'check-circle', status: 'live',
+    leadLink: { text: 'WCAG 2.2 AA', href: 'https://www.w3.org/TR/WCAG22/' },
     title: { en: 'Accessibility', ar: 'إمكانية الوصول' },
     description: {
       en: 'WCAG 2.2 AA is the target. This page lists what a machine checks, what a person checks, and what is not yet covered.',
