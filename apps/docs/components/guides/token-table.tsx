@@ -40,7 +40,7 @@ export function ToneTable({ children, locale }: { children?: ReactNode; locale: 
         return (
           <li key={token} className={`grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1 border-t-(length:--tc-line-width) border-line px-3.5 py-2.5 first:border-t-0 sm:grid-cols-[auto_12rem_11rem_1fr]`}>
             <span aria-hidden="true" style={{ '--tc-swatch': `var(${token})` }} className={`row-span-3 size-7.5 rounded-chip bg-(--tc-swatch) sm:row-span-1 ${BORDER_WIDTH} border-line`} />
-            <code dir="ltr" className="text-start font-mono text-xs text-body">{role}</code>
+            <code dir="ltr" className="text-start font-mono text-xs text-body">{textOf(role)}</code>
             <span dir="ltr" className="text-start font-mono text-xs text-muted">
               {MODES.map((mode) => {
                 const measured = fact.contrast?.[mode]

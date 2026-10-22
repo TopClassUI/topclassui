@@ -10,7 +10,7 @@ import { Button } from '#components/button/index.js'
 import { Svg } from '#components/svg/index.js'
 import { DropdownItem, DropdownPopup, DropdownRoot, DropdownTrigger } from '../index.js'
 
-const cell = 'relative flex h-36 justify-center overflow-hidden pt-2 [contain:paint]'
+const cell = 'relative flex h-36 w-38 justify-center overflow-hidden pt-2 [contain:paint]'
 const trigger = <Button variant="outline" size="sm">Actions</Button>
 
 /** One cell, captioned by its title: the menu under its trigger, drawn open inside the cell, not modal. */
@@ -26,8 +26,8 @@ function Open({ title, children }: { title: string, children: ReactNode }) {
   )
 }
 
-/** Every state, one equal cell each, captioned by its title: closed, the frame's two rows open, and Delete disabled.
- * The hover of a row needs a live pointer, and a submenu and a checked row are not in the API, so none is drawn. */
+/** Every state, one equal cell each, captioned by its title: closed, the frame's two rows open, Edit drawn as the row under
+ * the pointer, and Delete disabled. A submenu and a checked row are not in the API, so neither is drawn. */
 export default function Demo() {
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] gap-4">
@@ -42,6 +42,10 @@ export default function Demo() {
       </div>
       <Open title="open">
         <DropdownItem icon={<Svg icon={pencilSimple} />}>Edit</DropdownItem>
+        <DropdownItem icon={<Svg icon={trash} />}>Delete</DropdownItem>
+      </Open>
+      <Open title="hover item">
+        <DropdownItem icon={<Svg icon={pencilSimple} />} data-highlighted="">Edit</DropdownItem>
         <DropdownItem icon={<Svg icon={trash} />}>Delete</DropdownItem>
       </Open>
       <Open title="disabled item">

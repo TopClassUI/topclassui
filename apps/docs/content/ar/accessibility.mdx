@@ -4,8 +4,6 @@ title: إمكانية الوصول
 description: الهدف هو WCAG 2.2 AA. تعرض هذه الصفحة ما تفحصه الآلة، وما يفحصه الإنسان، وما لم يُغطَّ بعد.
 ---
 
-import { FOCUS_RING, TOUCH_TARGET } from 'topclassui/classes'
-
 ## التباين
 
 يُقاس التباين من القيم الحقيقية لمتغيّرات التصميم في كل وضع، كجزء من البناء. وكل قيمة تقع ضمن <span dir="ltr">0.15</span> من الحد تُعدّ راسبة.
@@ -22,15 +20,9 @@ import { FOCUS_RING, TOUCH_TARGET } from 'topclassui/classes'
 
 لا يقل أي عنصر تفاعلي عن <span dir="ltr">24 × 24</span> بكسل <span dir="ltr">CSS</span>، ويكبر إلى 44 مع مؤشر اللمس وغيره من المؤشرات غير الدقيقة.
 
-```tsx check title="save-button.tsx"
-import { TOUCH_TARGET } from 'topclassui/classes'
+<ClassSample name="TOUCH_TARGET" />
 
-export function SaveButton() {
-  return <button type="button" className={TOUCH_TARGET}>حفظ</button>
-}
-```
-
-الصنف المشترك الذي يحمله كل عنصر تحكم، ويمكن أن تحمله عناصر التحكم الخاصة بك أيضًا. قيمته: <span dir="ltr"><code>{TOUCH_TARGET}</code></span>
+<Caption>الصنف المشترك الذي يحمله كل عنصر تحكم.</Caption>
 
 ## لكل سحب مسار عبر لوحة المفاتيح
 
@@ -40,15 +32,7 @@ export function SaveButton() {
 
 حلقة تركيز واحدة على كل عنصر تحكم: إطار <span dir="ltr">CSS</span> خارجي (<span dir="ltr">outline</span>) مع إزاحة، فتُظهر الفجوة الخلفية الحقيقية على أي سطح. ويبلغ <span dir="ltr">`--tc-ring`</span> تباين <span dir="ltr">3:1</span> على كل سطح.
 
-```tsx check title="home-link.tsx"
-import { FOCUS_RING } from 'topclassui/classes'
-
-export function HomeLink() {
-  return <a href="/ar" className={FOCUS_RING}>الرئيسية</a>
-}
-```
-
-قيمته: <span dir="ltr"><code>{FOCUS_RING}</code></span>
+<ClassSample name="FOCUS_RING" />
 
 ## الأنواع تفرض التسميات
 
@@ -61,7 +45,7 @@ export function HomeLink() {
 // Type error: id, aria-label or aria-labelledby is required
 ```
 
-```tsx check
+```tsx check show="6-8"
 import { Field } from 'topclassui/field'
 import { Input } from 'topclassui/input'
 

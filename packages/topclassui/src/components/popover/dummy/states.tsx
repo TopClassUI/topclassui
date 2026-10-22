@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { Button } from '#components/button/index.js'
 import { PopoverDescription, PopoverPopup, PopoverRoot, PopoverTitle, PopoverTrigger } from '../index.js'
 
-const CELL = 'relative flex h-28 justify-center overflow-hidden [contain:paint]'
+const CELL = 'relative flex h-28 w-45 justify-center overflow-hidden [contain:paint]'
 const PANEL = 'w-28 p-2.5'
 const LABEL = 'font-mono text-xs/tight font-normal text-muted'
 
@@ -17,9 +17,9 @@ export default function Demo() {
   const [flipped, setFlipped] = useState<HTMLDivElement | null>(null)
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] gap-4">
-      <div title="closed" className="flex h-28 items-center justify-center">
+      <div title="closed" className="flex h-28 w-45 items-center justify-center">
         <PopoverRoot>
-          <PopoverTrigger render={<Button variant="outline">Share</Button>} />
+          <PopoverTrigger render={<Button variant="outline" size="xs">Share</Button>} />
           <PopoverPopup>
             <PopoverTitle>Share this page</PopoverTitle>
             <PopoverDescription>Its trigger opened it; Escape or a press outside closes it.</PopoverDescription>
@@ -28,7 +28,7 @@ export default function Demo() {
       </div>
       <div ref={setOpen} title="open" className={`${CELL} items-start pt-2`}>
         <PopoverRoot defaultOpen>
-          <PopoverTrigger render={<Button variant="outline">Details</Button>} />
+          <PopoverTrigger render={<Button variant="outline" size="xs">Details</Button>} />
           <PopoverPopup container={open} initialFocus={false} className={PANEL}>
             <PopoverTitle className={LABEL}>Details</PopoverTitle>
           </PopoverPopup>
@@ -36,7 +36,7 @@ export default function Demo() {
       </div>
       <div ref={setFlipped} title="flipped" className={`${CELL} items-end pb-2`}>
         <PopoverRoot defaultOpen>
-          <PopoverTrigger render={<Button variant="outline">Settings</Button>} />
+          <PopoverTrigger render={<Button variant="outline" size="xs">Settings</Button>} />
           <PopoverPopup container={flipped} initialFocus={false} className={PANEL}>
             <PopoverTitle className={LABEL}>Settings</PopoverTitle>
           </PopoverPopup>

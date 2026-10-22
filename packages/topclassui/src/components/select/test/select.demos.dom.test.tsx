@@ -23,7 +23,8 @@ const AFTER: Record<string, string[]> = {
   'rtl': ['السعودية'],
   'sixty-items': ['Option 60'],
   'sizes': ['Team', 'Team', 'Team', 'Team', 'Team'],
-  'states': ['Morocco', 'Morocco', 'Morocco', 'Morocco', 'Country', 'Morocco', 'Jordan'],
+  'read-only': ['Jordan'],
+  'states': ['Morocco', 'Morocco', 'Morocco', 'Morocco', 'Country', 'Morocco'],
 }
 
 const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { default: ComponentType }).default

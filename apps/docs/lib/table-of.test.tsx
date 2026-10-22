@@ -8,13 +8,18 @@ describe('columnFit', () => {
     expect(columnFit('Package', [<code key="r">react</code>, <code key="t">tailwindcss</code>], false)).toBe('fit')
   })
 
-  it('wraps a column once one cell, or the header, is longer than 32 characters', () => {
+  it('wraps a column once one cell, or the header, is longer than 34 characters', () => {
     expect(columnFit('What', ['Body and muted text', 'A control boundary, on every surface it can sit on'], false)).toBe('wrap')
     expect(columnFit('A header that is longer than thirty-two', ['1'], false)).toBe('wrap')
   })
 
-  it('gives the last column the prose floor, however short its cells', () => {
-    expect(columnFit('Tier', ['1', '2'], true)).toBe('prose')
+  it('keeps a short last column on one line at the end, and gives a long one the prose floor', () => {
+    expect(columnFit('Minimum', ['4.5:1', '3:1'], true)).toBe('fit')
+    expect(columnFit('What it is for', ['The page behind everything', 'A tint, for a chip or a hovered row in a list'], true)).toBe('prose')
+  })
+
+  it('keeps the 33-character split chip on one line', () => {
+    expect(columnFit('Chip', ['split - 0 KB server + n KB client'], false)).toBe('fit')
   })
 })
 
