@@ -37,11 +37,8 @@ const SHOWN: Record<string, Shown[]> = {
     { trigger: 'التفاصيل', title: 'كيف تعمل الفوترة', controls: [] },
     { trigger: 'الإعدادات', title: 'إعدادات الإشعارات', controls: [] },
   ],
-  'states': [
-    { trigger: 'Share', title: 'Share this page', controls: [] },
-    { trigger: 'Details', title: 'Details', controls: [] },
-    { trigger: 'Settings', title: 'Settings', controls: [] },
-  ],
+  // The open and flipped cells are inert pictures: the closed cell's is the one trigger.
+  'states': [{ trigger: 'Share', title: 'Share this page', controls: [] }],
   'with-close': [{ trigger: 'Notifications', title: 'Notifications are paused', controls: ['Close'] }],
   'with-form': [{ trigger: 'Rename', title: 'Rename this project', controls: ['Name', 'Cancel', 'Save'] }],
 }
@@ -174,17 +171,17 @@ describe('what the demos show of the props', () => {
 })
 
 describe('the states strip, one cell per state the frame draws', () => {
-  it('captions each cell by its title, and draws two popovers open at their trigger inside their own cell', async () => {
+  it('captions each cell by its title, and draws open and flipped as inert pictures, the panel below and above its trigger', async () => {
     const loaded = await import('../dummy/states.js') as { default: ComponentType }
     const { container } = render(<loaded.default />)
     const cells = [...(container.firstElementChild?.children ?? [])]
     expect(cells.map((cell) => cell.getAttribute('title'))).toEqual(['closed', 'open', 'flipped'])
-    const dialogs = await screen.findAllByRole('dialog')
-    expect(dialogs.map((dialog) => dialog.querySelector('h2')?.textContent)).toEqual(['Details', 'Settings'])
-    expect(cells[1]?.contains(dialogs[0] ?? null)).toBe(true)
-    expect(cells[2]?.contains(dialogs[1] ?? null)).toBe(true)
-    expect(cells.map((cell) => cell.querySelector('button')?.getAttribute('aria-expanded'))).toEqual(['false', 'true', 'true'])
-    expect(document.querySelectorAll('[data-base-ui-portal] > [data-base-ui-inert]')).toHaveLength(0)
-    expect(dialogs.some((dialog) => dialog.contains(document.activeElement))).toBe(false)
+    expect(screen.queryAllByRole('dialog')).toHaveLength(0)
+    expect(cells[0]?.querySelector('button')?.getAttribute('aria-expanded')).toBe('false')
+    const picture = (cell: Element | undefined) => {
+      const box = cell?.firstElementChild
+      return [box?.getAttribute('aria-hidden'), box?.hasAttribute('inert'), [...(box?.children ?? [])].map((part) => part.textContent), box?.className.includes('flex-col-reverse')]
+    }
+    expect([picture(cells[1]), picture(cells[2])]).toEqual([['true', true, ['Open', 'panel'], false], ['true', true, ['Open', 'panel'], true]])
   })
 })

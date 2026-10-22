@@ -91,23 +91,20 @@ test.describe('the states strip', () => {
   const cellOf = (page: Page, title: string) => page.locator(`#demo [title="${title}"]`)
 
   for (const direction of DIRECTIONS) {
-    test(`${direction}: open sits below its trigger and flipped above it, 6 px off it, whole inside its own cell, and neither holds the focus`, async ({ page }) => {
+    test(`${direction}: open draws its panel below its trigger and flipped above it, both pictures a reader never meets, whole inside their cells`, async ({ page }) => {
       await openLive(page, 'popover--states', { direction })
       expect(await cellOf(page, 'closed').locator('xpath=..').locator(':scope > *').evaluateAll((cells) => cells.map((cell) => cell.getAttribute('title'))))
         .toEqual(['closed', 'open', 'flipped'])
-      await expect(cellOf(page, 'closed').locator('[role="dialog"]')).toHaveCount(0)
-      for (const [title, where, name] of [['open', 'below', 'Details'], ['flipped', 'above', 'Settings']] as const) {
+      // A picture draws in every capture of the page: a real popup hides itself while its trigger is off screen.
+      await expect(page.locator(`[role="dialog"]${OPENED}`)).toHaveCount(0)
+      for (const [title, where] of [['open', 'below'], ['flipped', 'above']] as const) {
         const cell = cellOf(page, title)
-        const popup = cell.locator(`[role="dialog"]${OPENED}`)
-        await expect(popup).toBeVisible()
-        await atRest(popup)
-        await expect(popup.locator('h2')).toHaveText(name)
-        const side = sideOf(await boxOf(popup), await boxOf(triggerOf(page, name)))
-        expect(side?.where, `${title} lies on the wrong side of its trigger`).toBe(where)
-        expect(Math.abs((side?.gap ?? 0) - 6), `${title} is not 6 px from its trigger`).toBeLessThanOrEqual(1)
-        const [inner, outer] = [await boxOf(popup), await boxOf(cell)]
+        const picture = cell.locator(':scope > [aria-hidden="true"][inert]')
+        await expect(picture, title).toBeVisible()
+        const [trigger, panel] = [await boxOf(picture.locator('button')), await boxOf(picture.getByText('panel', { exact: true }))]
+        expect(sideOf(panel, trigger)?.where, `${title} lies on the wrong side of its trigger`).toBe(where)
+        const [inner, outer] = [await boxOf(picture), await boxOf(cell)]
         expect(inner.top >= outer.top && inner.bottom <= outer.bottom && inner.left >= outer.left && inner.right <= outer.right, `${title} leaves its cell`).toBe(true)
-        expect(await popup.evaluate((element) => element.contains(document.activeElement)), `${title} took the focus`).toBe(false)
       }
       expect((await axe(page)).violations).toEqual([])
     })
