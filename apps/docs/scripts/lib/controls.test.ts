@@ -11,6 +11,12 @@ describe('controlOf', () => {
       .toEqual({ prop: 'tone', kind: 'select', options: ['neutral', 'primary', 'success', 'warning'], default: 'neutral' })
   })
 
+  it('makes a number-or-word union a select of its default and each word, as frame 135:1594 draws step', () => {
+    const step = { default: 1, anyOf: [{ type: 'number', minimum: 1e-15, maximum: 1e15 }, { type: 'string', const: 'any' }] }
+    expect(controlOf('step', step)).toEqual({ prop: 'step', kind: 'select', options: [1, 'any'], default: 1 })
+    expect(controlOf('label', { anyOf: [{ type: 'string' }, { type: 'number' }] })).toBeNull()
+  })
+
   it('leaves custom out of the size control only', () => {
     expect(controlOf('size', { type: 'string', enum: ['xs', 'sm', 'md', 'lg', 'xl', 'custom'], default: 'md' }))
       .toEqual({ prop: 'size', kind: 'select', options: ['xs', 'sm', 'md', 'lg', 'xl'], default: 'md' })

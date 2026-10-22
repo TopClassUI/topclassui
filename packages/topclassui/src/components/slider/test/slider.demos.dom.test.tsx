@@ -21,7 +21,8 @@ const AFTER: Record<string, string[]> = {
   'show-value': ['100', '800', '1000'],
   'sizes': ['100', '100', '100', '100', '100'],
   'combined': ['100', '100', '40', '70', '100'],
-  'states': ['100', '100', '100', '100', '60', '100'],
+  'stage': ['100', '100'],
+  'states': ['100', '100', '100', '100', '40', '100'],
 }
 
 const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { default: ComponentType }).default
