@@ -55,9 +55,9 @@ export const LIST_GAP = {
 export const CELL = 'inline-flex items-center justify-center rounded-control font-medium tabular-nums'
 
 /** A cell wider than it is tall, as Figma 138:1269 draws it: the width of the control step, the height a step
- * or two under it and never under the 24 px floor of TOUCH_TARGET. It grows with a long number instead of spilling it. */
+ * or two under it and never under the 24 px floor of TOUCH_TARGET; xs is that 24 px square, as the states strip draws it. */
 export const CELL_SIZE = {
-  xs: 'px-pad-x-xs text-xs',
+  xs: 'px-1 text-xs',
   sm: 'min-w-control-sm px-pad-x-xs text-sm',
   md: 'h-control-xs min-w-control-md px-pad-x-xs text-sm',
   lg: 'h-control-sm min-w-control-lg px-pad-x-sm text-base',
