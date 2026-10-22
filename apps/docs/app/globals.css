@@ -26,6 +26,12 @@
   --docs-bloom-lead: 65%;
 }
 
+/* A card's stage dims its drawn page as the dark frame does; black at 30 % over white read as a solid grey block. */
+[data-component],
+[data-component] [data-theme] {
+  --tc-overlay: light-dark(oklch(0 0 0 / 0.12), oklch(0 0 0 / 0.4));
+}
+
 @layer base {
   @media (prefers-reduced-motion: no-preference) {
     html { scroll-behavior: smooth; }
