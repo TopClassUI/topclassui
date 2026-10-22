@@ -421,7 +421,7 @@ test.describe('live: a long list under a coarse pointer', () => {
 test.describe('live: a disabled upload that already holds files', () => {
   test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) })
 
-  test('its remove buttons dim with the zone and take no pointer', async ({ page }) => {
+  test('its remove buttons dim with the zone, show not-allowed and remove nothing', async ({ page }) => {
     await openLive(page, 'file-upload--states')
     const input = page.locator('#file-upload-disabled')
     // A form disables the upload while it sends: the rows are there first. Lifted in the DOM only, React's prop stays.
@@ -430,7 +430,9 @@ test.describe('live: a disabled upload that already holds files', () => {
     await input.evaluate((el) => { (el as HTMLInputElement).disabled = true })
     const remove = page.getByRole('button', { name: 'Remove report.pdf' })
     await expect(remove).toBeDisabled()
-    expect([await css(remove, 'opacity'), await css(remove, 'pointer-events')]).toEqual(['0.5', 'none'])
+    expect([await css(remove, 'opacity'), await css(remove, 'cursor')]).toEqual(['0.5', 'not-allowed'])
+    await remove.click({ force: true })
+    await expect(page.getByRole('button', { name: 'Remove report.pdf' })).toHaveCount(1)
   })
 })
 

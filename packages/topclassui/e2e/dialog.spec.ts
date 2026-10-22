@@ -806,7 +806,10 @@ test('disabled on a trigger or a close around a server-built Button: it leaves t
   const off = page.locator('#server-built button').filter({ hasText: 'Disabled on the part' })
   await expect(off).toHaveAttribute('disabled', '')
   await expect(off).toHaveAttribute('data-disabled', '')
-  await expect(off).toHaveCSS('pointer-events', 'none')
+  // It keeps its pointer events for its not-allowed cursor, and a real press opens nothing.
+  await expect(off).toHaveCSS('cursor', 'not-allowed')
+  await off.click({ force: true })
+  await expect(page.locator('[role="dialog"]')).toHaveCount(0)
   // What a screen reader is told: a button that is unavailable, by its native state and no ARIA stand-in.
   await expect(page.getByRole('button', { name: 'Disabled on the part', disabled: true })).toHaveCount(1)
   expect(await off.getAttribute('aria-disabled')).toBeNull()
