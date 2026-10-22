@@ -24,8 +24,10 @@ describe('an item is a label and an optional href', () => {
     expectTypeOf<Accepts<BreadcrumbItem, { label: null }>>().toEqualTypeOf<false>()
   })
 
-  it('has only those two keys', () => {
-    expectTypeOf<keyof BreadcrumbItem>().toEqualTypeOf<'href' | 'label'>()
+  it('has only those three keys: the link element is optional, for attributes one crumb alone carries', () => {
+    expectTypeOf<keyof BreadcrumbItem>().toEqualTypeOf<'href' | 'label' | 'link'>()
+    expectTypeOf<BreadcrumbItem['link']>().toEqualTypeOf<ReactElement | undefined>()
+    expectTypeOf<Accepts<BreadcrumbItem['link'], () => ReactElement>>().toEqualTypeOf<false>()
   })
 })
 
@@ -72,10 +74,9 @@ describe('the props', () => {
     expectTypeOf<Accepts<BreadcrumbProps['link'], string>>().toEqualTypeOf<false>()
   })
 
-  it('has no render prop, on the nav or on an item: the root is the nav and a crumb comes from link', () => {
+  it('has no render prop, on the nav or on an item: the root is the nav and a crumb comes from a link element', () => {
     expectTypeOf<Accepts<keyof BreadcrumbProps, 'render'>>().toEqualTypeOf<false>()
     expectTypeOf<Accepts<keyof BreadcrumbItem, 'render'>>().toEqualTypeOf<false>()
-    expectTypeOf<Accepts<keyof BreadcrumbItem, 'link'>>().toEqualTypeOf<false>()
   })
 
   it('takes siteUrl as an optional string, which only the JSON-LD reads', () => {

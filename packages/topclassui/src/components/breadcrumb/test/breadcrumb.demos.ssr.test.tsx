@@ -95,10 +95,10 @@ describe('each demo shows what its name says', () => {
     expect([...out.matchAll(/<nav aria-label="([^"]*)"/g)].map((m) => m[1])).toEqual([
       'idle', 'hover', 'collapsed', 'current',
     ])
-    // 2 ancestors in idle, then Docs in each of the other three.
-    expect(count(out, '<a href=')).toBe(5)
+    // 2 ancestors in idle and in hover, where Button stays a plain link, then Docs in the other two.
+    expect(count(out, '<a href=')).toBe(6)
     expect(count(out, 'data-hover=""')).toBe(1)
-    expect(count(out, 'aria-current="page"')).toBe(3)
+    expect(count(out, 'aria-current="page"')).toBe(2)
   })
 
   it('rtl sets the direction, names the nav in Arabic and keeps the flipping caret', async () => {

@@ -9,6 +9,8 @@ export interface BreadcrumbItem {
   href?: string | undefined
   /** The text of the crumb, and its `name` in the JSON-LD. */
   label: string
+  /** This crumb's own link element, in place of the trail's `link`, for attributes one crumb alone carries. */
+  link?: ReactElement | undefined
 }
 
 // R-8.3-4: derived from the schema, so the props and the validation cannot drift apart.

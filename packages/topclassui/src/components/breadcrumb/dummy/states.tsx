@@ -1,7 +1,7 @@
 import { Breadcrumb } from '../index.js'
 
 /** The four states the frame draws, one nav each, named by its aria-label: a trail of ancestors only, a crumb under
- * the pointer (drawn with the data-hover a pointer would set), a long trail folded by maxItems, and the page being read. */
+ * the pointer (its own link drawn with the data-hover a pointer would set), a long trail folded by maxItems, and the page being read. */
 export default function Demo() {
   return (
     <div className="grid justify-items-start gap-4">
@@ -16,10 +16,9 @@ export default function Demo() {
       <Breadcrumb
         className="text-xs *:gap-1.25 *:*:gap-1.25"
         aria-label="hover"
-        link={<a href="/" data-hover="" />}
         items={[
-          { href: '/docs', label: 'Docs' },
-          { label: 'Button' },
+          { href: '/docs', label: 'Docs', link: <a href="/" data-hover="" /> },
+          { href: '/docs/button', label: 'Button' },
         ]}
       />
       <Breadcrumb

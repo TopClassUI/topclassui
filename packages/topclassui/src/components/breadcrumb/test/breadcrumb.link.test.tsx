@@ -117,6 +117,37 @@ describe('with link={<Link href="" />} (PLAN 5.8)', () => {
   })
 })
 
+describe("an item's own link", () => {
+  const items: BreadcrumbItem[] = [
+    { href: '/', label: 'Home', link: <a href="" data-hover="" /> },
+    { href: '/docs', label: 'Docs' },
+    { label: 'Avatar' },
+  ]
+
+  it('renders that crumb from its own element and leaves the rest on the plain anchor', () => {
+    const tags = anchors(markup(<Breadcrumb items={items} />))
+    expect(tags.map((tag) => attr(tag, 'href'))).toEqual(['/', '/docs'])
+    expect(tags.map((tag) => attr(tag, 'data-hover'))).toEqual(['', undefined])
+  })
+
+  it("takes the item's element over the trail's link, which the other crumbs still use", () => {
+    const tags = anchors(markup(<Breadcrumb items={items} link={<Link href="" />} />))
+    expect(tags.map((tag) => attr(tag, 'data-client-link'))).toEqual([undefined, ''])
+    expect(tags.map((tag) => attr(tag, 'href'))).toEqual(['/', '/docs'])
+  })
+
+  it('keeps the crumb classes on it, so the hover and the ring are the trail\'s own', () => {
+    const [own, plain] = anchors(markup(<Breadcrumb items={items} />))
+    expect(attr(own ?? '', 'class')).toBe(attr(plain ?? '', 'class'))
+  })
+
+  it('is refused by name when it is not an element', () => {
+    const notAnElement = 'a' as unknown as BreadcrumbItem['link']
+    expect(() => markup(<Breadcrumb items={[{ href: '/', label: 'Home', link: notAnElement }, { label: 'Avatar' }]} />))
+      .toThrow('Breadcrumb: link must be an element')
+  })
+})
+
 describe('a link that is not an element', () => {
   it('is refused by the name of the prop and of the component, before React fails on it', () => {
     const notAnElement = 'a' as unknown as BreadcrumbProps['link']
