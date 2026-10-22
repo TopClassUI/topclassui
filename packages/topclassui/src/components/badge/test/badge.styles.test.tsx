@@ -10,7 +10,7 @@ const classes = (props: BadgeProps = {}) => classList(html(props))
 
 /** The Build this table, written out: a derived expectation would shrink with BADGE_SIZE. */
 const SIZE = {
-  xs: ['px-1', 'py-pad-y-xs', 'gap-1', 'text-xs'],
+  xs: ['px-1', 'py-[calc(var(--spacing-pad-y-xs)-var(--tc-line-width))]', 'gap-1', 'text-xs/3.75'],
   sm: ['px-2', 'py-pad-y-sm', 'gap-1.5', 'text-sm/4'],
   md: ['px-3', 'py-pad-y-md', 'gap-2', 'text-sm/4'],
   lg: ['px-4', 'py-pad-y-lg', 'gap-2', 'text-base/5'],
@@ -50,7 +50,7 @@ describe('size', () => {
 
   it('custom opts out of the scale entirely, which is what it is for', () => {
     const list = classes({ size: 'custom' })
-    expect(list.filter((c) => /^(px-|py-|gap-|text-(xs|sm|base|lg)(\/\d)?$)/.test(c))).toEqual([])
+    expect(list.filter((c) => /^(px-|py-|gap-|text-(xs|sm|base|lg)(\/[\d.]+)?$)/.test(c))).toEqual([])
   })
 })
 
