@@ -9,12 +9,12 @@ import { cn } from '#shared/cn.js'
 
 const CELL = 'grid min-h-14 place-items-center'
 // The stack overflows its 56 px row as the frame's does, so every caption sits on one line.
-const STACKED = 'p-2 text-muted'
+const STACKED = 'p-1.75 text-muted'
 
 /** A toast drawn in place, small, with the look the viewport gives one: a picture of a state, not a live region. */
 function Panel({ icon, label, className }: { icon?: ReactNode; label: string; className?: string }) {
   return (
-    <div className={cn('flex w-34 items-center gap-1.75 rounded-box bg-surface-raised px-2.25 py-2.25 font-mono text-xs/tight text-body shadow-(--tc-shadow-toast)', BORDER, className)}>
+    <div className={cn('flex w-34 items-center gap-1.75 rounded-box bg-surface-raised px-2.25 py-2.25 font-mono text-[0.6875rem]/tight text-body shadow-(--tc-shadow-toast)', BORDER, className)}>
       {icon}
       {label}
     </div>
