@@ -21,6 +21,8 @@ const SIDEBARS: Record<string, { open: boolean, links: number, width?: number }>
   'sidebar--long-list': { open: true, links: 60 },
   'sidebar--playground': { open: true, links: 4 },
   'sidebar--rtl': { open: true, links: 4 },
+  // The frame's stage: a 190 px card rail, the caller's className.
+  'sidebar--stage': { open: true, links: 4, width: 190 },
   // Five rails, the expanded one first: what a test reads of the first rail is that one. 160 px open, so five fit the strip.
   'sidebar--states': { open: true, links: 20, width: 160 },
 }
@@ -229,7 +231,7 @@ test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) 
 
 test('the table names every sidebar demo', () => {
   expect(Object.keys(SIDEBARS).sort()).toEqual(DEMOS.filter((demo) => demo.startsWith('sidebar--')).sort())
-  expect(Object.keys(SIDEBARS)).toHaveLength(9)
+  expect(Object.keys(SIDEBARS)).toHaveLength(10)
 })
 
 // PLAN 19, Phase 6: accepted on the HTML the server sends, before any script has run.

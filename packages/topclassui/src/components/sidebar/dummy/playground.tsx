@@ -7,10 +7,10 @@ import type { SidebarDesignProps } from '../types.js'
 import { SidebarBody, SidebarGroup, SidebarHeader, SidebarLink, SidebarRoot } from '../index.js'
 
 /** The rail the docs' Try it drives: defaultOpen and open go to the root, and current marks Home, as the frame's stage
- * draws it until the reader turns it off. The stage draws the rail as a card as tall as its links: the caller's className. */
+ * draws it until the reader turns it off. No parent height: the rail is as tall as its four links. */
 export default function Demo({ current = true, ...props }: SidebarDesignProps = {}) {
   return (
-    <SidebarRoot {...props} className="h-auto rounded-box border-(length:--tc-line-width) data-open:w-47.5">
+    <SidebarRoot {...props}>
       <SidebarHeader>Workspace</SidebarHeader>
       <SidebarBody>
         <SidebarGroup>
