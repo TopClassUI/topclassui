@@ -45,6 +45,7 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/keys.tsx`
 - `dummy/nested.tsx`
 - `dummy/rtl.tsx`
+- `dummy/stage.tsx`
 - `dummy/states.tsx`
 - `dummy/with-icon.tsx`
 

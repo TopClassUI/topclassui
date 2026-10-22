@@ -75,9 +75,10 @@ test('Button: the stage draws the five variants, then the playground drives it a
 test('Tag: the playground drives the tone, in Arabic', async ({ page }) => {
   await page.goto('/ar/docs/components/tag')
   const tag = card(page, 'tag')
-  // At rest the stage is the frame's row of tones and THE CODE its row of topics; the first change swaps in the playground's tag.
+  // At rest the stage is the frame's row of four tones and a removable danger tag, and THE CODE its row of topics; the first change swaps in the playground's tag.
   const stageBox = tag.locator('[style*="--tc-stage-height"]').first()
-  await expect(stageBox.locator('[data-tone]')).toHaveCount(6)
+  await expect(stageBox.locator('[data-tone]')).toHaveCount(5)
+  await expect(stageBox.getByRole('button', { name: /danger/ })).toBeVisible()
   await expect(tag.locator('pre').first()).toContainText('TOPICS.map')
   await tag.getByRole('combobox', { name: 'tone' }).click()
   await page.getByRole('option', { name: 'danger', exact: true }).click()
@@ -90,8 +91,9 @@ test('SegmentedControl: the client stage mounts near the viewport and takes the 
   const errors = collectErrors(page)
   await page.goto('/en/docs/components/segmented-control')
   const segmented = card(page, 'segmented-control')
+  // At rest the stage is the frame's colour mode track; the first Try it change swaps in the playground.
+  await expect(segmented.getByRole('radiogroup', { name: 'Colour mode', exact: true })).toBeVisible()
   const track = segmented.getByRole('radiogroup', { name: 'View' })
-  await expect(track).toBeVisible()
   await segmented.getByRole('checkbox', { name: 'invalid' }).click()
   await expect(track).toHaveAttribute('aria-invalid', 'true')
   await track.getByRole('radio', { name: 'Table' }).click()

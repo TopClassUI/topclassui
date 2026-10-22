@@ -25,8 +25,12 @@ const LISTS: Record<string, string[]> = {
     'line xs', 'line sm', 'line md', 'line lg', 'line xl', 'line custom',
     'enclosed xs', 'enclosed sm', 'enclosed md', 'enclosed lg', 'enclosed xl', 'enclosed custom',
   ],
+  'stage': ['Line', 'Enclosed'],
   'states': ['Line', 'Enclosed', 'Focused', 'Every tab disabled'],
 }
+
+/** The demos that draw lists with no panel, as the frame's stage and strip do. */
+const LISTS_ONLY = ['stage', 'states']
 
 const load = async (name: string) => (await import(`../dummy/${name}.tsx`) as { default: ComponentType }).default
 
@@ -48,8 +52,8 @@ describe('every list of tabs in every demo', () => {
     it(`${name}: every tab that is not disabled opens a panel that is named after it and holds something`, async () => {
       const Demo = await load(name)
       render(<Demo />)
-      // The states strip draws lists only, as the frame does; every other demo proves the panels.
-      if (name === 'states') {
+      // The stage and the states strip draw lists only, as the frame does; every other demo proves the panels.
+      if (LISTS_ONLY.includes(name)) {
         expect(screen.queryAllByRole('tabpanel')).toEqual([])
         return
       }
@@ -72,7 +76,7 @@ describe('every list of tabs in every demo', () => {
       render(<Demo />)
       const lists = screen.getAllByRole('tablist')
       await userEvent.click(within(lists[0] as HTMLElement).getAllByRole('tab').at(-1) as HTMLElement)
-      expect(screen.queryAllByRole('tabpanel')).toHaveLength(name === 'states' ? 0 : lists.length)
+      expect(screen.queryAllByRole('tabpanel')).toHaveLength(LISTS_ONLY.includes(name) ? 0 : lists.length)
     })
   }
 })

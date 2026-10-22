@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 
 import type { Locale } from '../../content/pages'
 import { guideLabelsFor } from '../../labels/guides'
+import { ClassSample } from './class-sample'
 import { DirectionPair } from './direction-pair'
 import { IconGrid } from './icon-grid'
 import { IconGroups } from './icon-groups'
@@ -31,6 +32,7 @@ export function guideComponents(locale: Locale): MDXComponents {
     ModeIsland: ({ mode }: { mode: Mode }) => <ModeIsland mode={mode} locale={locale} />,
     DirectionPair: ({ ltr, rtl }: { ltr: string; rtl: string }) => <DirectionPair ltr={ltr} rtl={rtl} locale={locale} />,
     KindCounts: () => <KindCounts locale={locale} />,
+    ClassSample: ({ name }: { name: 'TOUCH_TARGET' | 'FOCUS_RING' }) => <ClassSample name={name} locale={locale} />,
     Releases: () => <Releases locale={locale} />,
   }
 }

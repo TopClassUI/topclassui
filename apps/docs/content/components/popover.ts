@@ -3,17 +3,17 @@ export const popover = {
   slug: 'popover',
   title: { en: 'Popover', ar: 'نافذة منبثقة' },
   description: {
-    en: 'An anchored panel for a link, a field or an action. It flips and shrinks to the room it has instead of overflowing.',
-    ar: 'لوحة مثبّتة بجانب مشغّلها لرابط أو حقل أو إجراء. تنقلب وتتقلّص إلى المساحة المتاحة بدلًا من أن تفيض.',
+    en: 'Anchored panel for links and controls; it flips and shrinks instead of overflowing.',
+    ar: 'لوحة مثبّتة للروابط وعناصر التحكم؛ تنقلب وتتقلّص بدلًا من أن تفيض.',
   },
   demos: ['basic', 'with-close', 'hover', 'with-form', 'modal', 'placements', 'long-content', 'rtl'],
-  stageHeight: 24.25,
+  stageHeight: 19.4375,
   controlOrder: ['placement'],
   controlsHidden: ['delay', 'closeDelay'],
   stageOpen: true,
   note: {
-    en: 'A tooltip is plain text only: its children are typed as text. Anything with a link or a control is a Popover.',
-    ar: 'التلميح نص فقط: أبناؤه مكتوبون كنص. كل ما فيه رابط أو عنصر تحكم هو نافذة منبثقة.',
+    en: 'A tooltip that needs a link or a control is a Popover; a lint rule enforces it.',
+    ar: 'التلميح الذي يحتاج رابطًا أو عنصر تحكم هو نافذة منبثقة؛ وتفرض ذلك قاعدة فحص.',
   },
   notes: {
     en: [

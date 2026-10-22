@@ -16,8 +16,17 @@ export const SLIDER_SPAN = 10_000
 
 const numberOrNull = (value: unknown) => (typeof value === 'number' ? value : null)
 
+/** A prop's schema, with the anyOf a union is written as, such as a number step or the word any. */
+export type PropSchema = JsonSchemaProp & { anyOf?: readonly (JsonSchemaProp & { const?: unknown })[] }
+
 /** One control for a prop, or null when the schema gives nothing a control can offer (a free string, a union). */
-export function controlOf(prop: string, schema: JsonSchemaProp): Control | null {
+export function controlOf(prop: string, schema: PropSchema): Control | null {
+  // A number or a word (step: 1 or 'any') is a select of its default and each word, as frame 135:1594 draws step.
+  const branches = schema.anyOf ?? []
+  const words = branches.flatMap((branch) => (typeof branch.const === 'string' ? [branch.const] : []))
+  if (typeof schema.default === 'number' && words.length > 0 && branches.some((branch) => branch.type === 'number' || branch.type === 'integer')) {
+    return { prop, kind: 'select', options: [schema.default, ...words], default: schema.default }
+  }
   if (schema.enum) {
     // R-5.7-2: `custom` emits no size classes, so the stage would show nothing to compare.
     const options = schema.enum.filter((value) => !(prop === 'size' && value === 'custom'))

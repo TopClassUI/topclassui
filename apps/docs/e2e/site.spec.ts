@@ -113,7 +113,7 @@ const NEXT = {
 } as const
 
 // Written out: how many `##` sections each page has, so a heading lost from the MDX fails here.
-const SECTIONS = { installation: 5, cli: 8, css: 7, provider: 6, 'first-component': 6 } as const
+const SECTIONS = { installation: 5, cli: 9, css: 7, provider: 6, 'first-component': 6 } as const
 
 for (const slug of GUIDES) {
   for (const locale of ['en', 'ar'] as const) {
@@ -228,4 +228,18 @@ test('the not-found page passes axe', async ({ page }) => {
   await page.goto('/random')
   const { violations } = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze()
   expect(violations.map((v) => v.id)).toEqual([])
+})
+
+// Inter has no Arabic letters: under lang="ar" the body and its text take Noto Sans Arabic, with Inter after it for Latin words.
+for (const path of ['/ar', '/ar/docs/components', '/ar/docs/colors'] as const) {
+  test(`${path}: the body, the h1 and a paragraph compute Noto Sans Arabic first`, async ({ page }) => {
+    await page.goto(path)
+    const families = await page.evaluate(() => [document.body, document.querySelector('h1'), document.querySelector('main p')].map((element) => element === null ? null : getComputedStyle(element).fontFamily))
+    for (const family of families) expect(family).toMatch(/^"Noto Sans Arabic", "Noto Sans Arabic Fallback", Inter, "Inter Fallback", /)
+  })
+}
+
+test('/en/docs/components: the body computes Inter first', async ({ page }) => {
+  await page.goto('/en/docs/components')
+  expect(await page.evaluate(() => getComputedStyle(document.body).fontFamily)).toMatch(/^Inter, "Inter Fallback", /)
 })

@@ -6,10 +6,11 @@ export const checkbox = {
     ar: 'مربع اختيار',
   },
   description: {
-    en: 'Checked, unchecked or mixed. A hidden input sends the default value before the page hydrates, and a form reset brings it back.',
-    ar: 'محدد أو غير محدد أو مختلط. حقل مخفي يرسل القيمة الافتراضية قبل الترطيب، وإعادة ضبط النموذج تعيدها.',
+    en: 'Checked, unchecked or mixed; a hidden input sends the default before hydration.',
+    ar: 'محدد أو غير محدد أو مختلط؛ حقل مخفي يرسل القيمة الافتراضية قبل الترطيب.',
   },
   demos: ['basic', 'labelled', 'form', 'sizes', 'rtl'],
+  stageDemo: 'stage',
   stageHeight: 5.25,
   controlOrder: ['size', 'defaultChecked', 'indeterminate', 'disabled', 'invalid'],
   extraSwitches: ['defaultChecked', 'indeterminate', 'disabled'],

@@ -40,9 +40,11 @@ export interface StateStripProps {
   counts: string[]
   /** The count read from the source, for a demo whose root is not a plain element. */
   sourceCount: number
+  /** The caption in the page's language by state id; an id missing here is printed as it is. */
+  names: Record<string, string>
 }
 
-export function StateStrip({ tree, heading, counts, sourceCount }: StateStripProps) {
+export function StateStrip({ tree, heading, counts, sourceCount, names }: StateStripProps) {
   const root = isValidElement<Props>(tree) && typeof tree.type === 'string' ? tree : null
   const parts = root === null ? [] : Children.toArray(root.props.children)
   const cells = parts.filter((part) => nameOf(part) !== '')
@@ -61,7 +63,7 @@ export function StateStrip({ tree, heading, counts, sourceCount }: StateStripPro
               {cells.map((part, index) => (
                 <li key={index} className={STATE_CELL}>
                   <div className={STATE_BOX}>{part}</div>
-                  {captionOf(part) === '' ? null : <span aria-hidden="true" className={STATE_CAPTION}>{captionOf(part)}</span>}
+                  {captionOf(part) === '' ? null : <span aria-hidden="true" className={STATE_CAPTION}>{names[captionOf(part)] ?? captionOf(part)}</span>}
                 </li>
               ))}
             </ul>

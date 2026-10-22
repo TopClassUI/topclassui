@@ -21,6 +21,7 @@ const AFTER: Record<string, string[] | 'browser'> = {
   'rtl': ['false', 'true'],
   'sizes': ['false', 'false', 'false', 'false', 'false'],
   'combined': ['true', 'false', 'mixed', 'true', 'false', 'mixed', 'false', 'true', 'true'],
+  'stage': ['true', 'false', 'mixed'],
   'states': ['true', 'false', 'mixed', 'true', 'true', 'false'],
 }
 
