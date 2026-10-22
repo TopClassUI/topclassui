@@ -33,6 +33,7 @@ export const guidesEn: GuideLabels = {
     copy: (name) => `Copy the code for ${name}`,
     copied: (code) => `Copied ${code}`,
     failed: 'The browser did not allow copying. Select the name and copy it instead.',
+    clear: 'Clear the search',
   },
   island: {
     page: 'In the page mode',

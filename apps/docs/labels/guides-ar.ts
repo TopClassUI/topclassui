@@ -40,6 +40,7 @@ export const guidesAr: GuideLabels = {
     copy: (name) => `انسخ شيفرة ${name}`,
     copied: (code) => `نُسخ ${code}`,
     failed: 'لم يسمح المتصفح بالنسخ. حدّد الاسم وانسخه يدويًا.',
+    clear: 'امسح البحث',
   },
   island: {
     page: 'في وضع الصفحة',
