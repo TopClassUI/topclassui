@@ -3,7 +3,7 @@ export const segmentedControl = {
   slug: 'segmented-control',
   title: { en: 'Segmented control', ar: 'تحكم مقسّم' },
   description: {
-    en: 'A radio group drawn as one track; arrow keys select as they move, and reverse in RTL.',
+    en: 'A radio group drawn as one track; arrows select as they move, and reverse in RTL.',
     ar: 'مجموعة أزرار راديو مرسومة كمسار واحد؛ الأسهم تختار أثناء التنقل، وتنعكس من اليمين إلى اليسار.',
   },
   demos: ['basic', 'with-icons', 'sizes', 'full-width', 'form', 'many', 'long-content', 'rtl'],
