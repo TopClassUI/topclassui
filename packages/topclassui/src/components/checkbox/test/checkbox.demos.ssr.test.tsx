@@ -18,7 +18,7 @@ const BOXES: Record<string, string[]> = {
   'basic': ['I accept the terms: true', 'Send me product news: false'],
   'form': ['I accept the terms: true', 'Send me product news: false'],
   'labelled': ['Named by a label that points at it: false', 'Named by a label that wraps it: false'],
-  'playground': ['I accept the terms: true'],
+  'playground': ['I accept the terms: false'],
   'rtl': ['أوافق على الشروط: true', 'أرسل لي أخبار المنتج: false'],
   'sizes': ['Extra small: true', 'Small: true', 'Medium: true', 'Large: true', 'Extra large: true'],
   'combined': [
