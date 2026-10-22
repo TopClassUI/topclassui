@@ -88,6 +88,57 @@ A control that keeps its pointer events must still ignore them, so:
 **Why.** Pointer events are what a cursor needs: an element that takes none shows the cursor of whatever is under it, so no class could paint not-allowed on it.
 
 **What it affects.** R-5.2-4 (the cursor and the hover guard come from `shared/classes.ts` and `styles.css`); this replaces the arrow on a disabled control of the 2026-10-19 POINTER entry. A consumer's own `hover:` and `active:`, compiled with `topclassui/styles.css`, skip a disabled element too. A class string no longer stops a press: `buttonVariants()`, `tagVariants({ interactive: true })` or `paginationVariants()` on the caller's own disabled `<a href>` must drop the `href`, as the demos do. Proved by `e2e/cursor.spec.ts` (the hand on every live control and not-allowed on every disabled one, read where the pointer meets it, on every harness page and in the open Select, Combobox, Dropdown, Command and DatePicker; and on the hydrated pages, every disabled control hovered, pressed, clicked, tapped and keyed with nothing changing, no focus landing on it and no click fired by a native one), `src/shared/classes.pointer.css.test.ts`, `src/shared/row-highlight.test.ts`, the Dropdown, Select, Combobox, TreeView and DatePicker DOM tests, `button.states.test.tsx` for the pointer block of a Button that is not a button, and the "shared pointer" and component rows of `pnpm test:mutation`.
+## 2026-10-22 - The catalog froze in a render React retried without end; islands now keep one part per loader and take over one at a time
+
+**Decision.** `apps/docs/components/lazy-island.tsx`, with its bookkeeping in the new `apps/docs/lib/islands.ts`:
+
+- An island that mounts with no server HTML (inside another island's fresh render, or after a client navigation) renders one `lazy()` part per loader, kept for the page's life (`clientPartOf`), instead of a `lazy()` made in its own `useState`.
+- Whether an island has server HTML is read from one index of every `[data-island]` box, built once the page has parsed (`createServerBoxes`), instead of a `document.querySelector` over the whole page per island per render.
+- The near islands share one IntersectionObserver and leave it once they open; before, each kept its own for the page's life.
+- Islands take over one at a time (`createTurns`): the next fresh render starts once the last one has committed and its frame has painted, or after 5 s, React's expiry for a transition. An input on an island, and a part on screen from the start, go first; then the islands that came near last, nearest the screen first.
+
+**What froze.** Not a layout loop: no ResizeObserver or IntersectionObserver callback triggers itself, the Navbar's scroll handler and first report, the TOC spy and the motion watcher each cost under 1% of the main thread while scrolling, and the state strips are ordinary islands. It is a React render loop that starts only when the machine is slow. An island takes over in a transition, and React renders a transition without yielding once it has waited 5 s (`computeExpirationTime`, react-dom 19.3). A render that suspends then is thrown away, and every part in it mounts again. Each nested island made its `lazy()` in a `useState` initializer, so each new attempt met a new lazy that had not loaded, suspended again, and committed nothing. Every attempt rendered again the islands pending in it, and each of them searched the 11,600 elements of the page for its box. On a quiet machine at 4x no transition expires and the loop never starts. On a busy one it does, and keeps going after the reader stops: here in the live run at 1440 and two local runs of main, all taken while other work ran on the laptop, and in every run of main at 8x.
+
+**How it was measured.** Playwright Chromium (1.63, headless), 1440 x 900 and 390 x 844, CDP CPU throttling, the page settled, then wheel steps of 300 px every 80 ms from top to bottom and 5 s still. A longtask observer, a long-animation-frame observer and a CDP CPU profile (250 us, source-mapped). The live site was measured first, then a local `next start` of main (c577d9de) against this branch, interleaved, under the shared measurement lock. TBT is the sum over tasks of their time past 50 ms while scrolling. "Sync" is the time React spent in `renderRootSync`.
+
+| Run | Longest task | TBT while scrolling | Sync render, scrolling / 5 s after | Main thread busy, 5 s after | Islands live of 241 |
+| --- | --- | --- | --- | --- | --- |
+| topclassui.com, 1440, 4x, laptop busy | 299 ms | 3,069 ms | 21.1 s / 3.9 s | 99% | 45 |
+| topclassui.com, 390, 4x | 544 ms | 2,675 ms | 2.5 s / 0 | 18% | 239 |
+| main, 1440, 8x (3 runs) | 373 / 635 / 1,112 ms | 22.1 / 69.2 / 17.3 s | 31.1 / 66.2 / 19.7 s, then 4.2 / 4.6 / 3.1 s | 99-100% | 45 / 1 / 18 |
+| branch, 1440, 8x (3 runs) | 1,678 / 715 / 1,982 ms | 18.0 / 25.5 / 16.8 s | 3.4 / 0.6 / 3.9 s, then 0.3 / 0.1 / 0.3 s | 99% (islands catching up) | 162 / 75 / 215 |
+| main, 1440, 4x (3 runs) | 413 / 312 / 328 ms | 3,210 / 2,562 / 3,570 ms | 2.2 / 2.1 / 1.8 s, then 0 | 20-36% | 241 |
+| branch, 1440, 4x (3 runs) | 301 / 279 / 266 ms | 2,939 / 3,425 / 3,514 ms | 2.2 / 2.3 / 2.4 s, then 0 | 20-37% | 241 |
+| main, 390, 4x (3 runs) | 164 / 333 / 303 ms | 629 / 2,923 / 1,054 ms | 1.7 / 2.2 / 1.9 s, then 0 | 19-33% | 239 |
+| branch, 390, 4x (3 runs) | 294 / 318 / 235 ms | 2,427 / 2,947 / 1,109 ms | 2.3 / 2.1 / 1.6 s, then 0 | 12-29% | 239 |
+
+Run again later that evening, the same script, interleaved, under the lock, while another worktree ran its e2e on the laptop:
+
+| Run | Longest task while scrolling | TBT while scrolling | Tasks over 200 ms | Islands live of 241 | Box lookups |
+| --- | --- | --- | --- | --- | --- |
+| main, 1440, 4x (2 runs) | 265 / 185 ms | 4,740 / 1,278 ms | 3 / 0 | 202 / 241 | 386 (801 ms) / 263 (190 ms) |
+| branch, 1440, 4x (2 runs) | 329 / 247 ms | 3,537 / 1,891 ms | 1 / 1 | 241 / 241 | 3 (11 ms) / 3 (7 ms) |
+| main, 390, 4x (2 runs) | 266 / 167 ms | 1,704 / 597 ms | 1 / 0 | 239 / 239 | 263 / 263 |
+| branch, 390, 4x (2 runs) | 279 / 231 ms | 1,605 / 464 ms | 1 / 1 | 239 / 239 | 3 / 3 |
+| main, 1440, 8x | 327 ms | 12,185 ms | 8 | 45 | 761 (2,486 ms) |
+| branch, 1440, 8x | 1,210 ms | 14,928 ms | 19 | 226 | 3 (20 ms) |
+| topclassui.com, 1440, 4x | 204 ms | 1,445 ms | 2 | 241 | 283 (223 ms) |
+| topclassui.com, 1440, 8x | 376 ms | 30,392 ms | 35 | 38 | 643 (1,983 ms) |
+
+The first main run at 1440 started the loop at 4x (202 islands live at the end, 1 s of TBT in the 5 s after the scroll); no branch run did. The one task over 200 ms in each branch run at 4x is the Drawer card taking over (below: 231-329 ms, 164-264 ms of it forced style and layout); the branch's 1,210 ms task at 8x is the Drawer's layout effects again (419 ms, the popup's and the one that reads the root's `offsetHeight` and font size) with floating-ui's scroll and resize handlers in the same frame.
+
+Watched for 30 s after the scroll at 8x, main stayed 100% busy, 19.2 s of it rendering without yielding, with 67 islands live, and its box lookups ran 2,055 times for 7.8 s; the branch fell to 49% busy (the last islands taking over), 0.1 s of it sync, with all 241 live. At 4x on a machine where the loop does not start, the longest task and TBT stay within run-to-run noise. What changes there is that a commit holds at most 2 islands instead of 4 to 17, and the box lookups drop from about 265 (130-260 ms) to 3 (6-11 ms). At 8x the branch's longest task is the Drawer card taking over, which main, stuck in its loop, never reaches. The 2 s of sync render left at 4x, on both sides, is not the loop: React does not time-slice default-priority updates (an island's own observers and effects, such as Try it's near-viewport switch) or Base UI's `flushSync` calls.
+
+**Left, with reasons.** Every task over 200 ms on the branch, by function:
+
+- The browser's own style, layout and paint as deferred cards come on screen: 150-330 ms tasks at 4x, about half the main thread while scrolling at 1440. That is the catalog's weight (choice 18).
+- Base UI 1.8.0 `DrawerPopup` (`drawer/popup/DrawerPopup.mjs:177`) measures in a layout effect when the Drawer card takes over (`CSS.registerProperty` for its swipe variables, then an `offsetHeight` read): 184-415 ms at 4x, 554-861 ms at 8x, most of it forced style and layout.
+- The library's `useScrollTabStop` (`src/shared/use-scroll-tab-stop.ts`) measures in its effect, which forces the layout of the card just inserted: 15-61 ms at 4x, 107-398 ms at 8x. Moving that read to the ResizeObserver's first report, as the Navbar did, is a library change for its own pull request.
+- floating-ui's scroll listeners for the overlays drawn open in their stages (Popover, Tooltip and the rest) recompute on every scroll of the page: 5-8% of the main thread while scrolling at 1440, up to 221 ms for one scroll event. Base UI's `disableAnchorTracking` on the stage Positioners would stop it; that changes the library's stage demos.
+- Base UI's `CompositeList` (`scrollIntoViewIfNeeded`, 3-4%), and Turbopack's chunk loader, which runs `querySelectorAll` over the page for every chunk it loads (3%), are inside the dependencies.
+- Found on the way, not a long task: a wheel over the TreeView card does not scroll the page. `SCROLL_AREA` gives the tree `overflow-y: auto` and `overscroll-behavior: contain`, and Chrome keeps the wheel in a contained scroller even when it does not overflow (checked on a bare page). That is a library change too.
+
+**Affects.** `apps/docs` only. Every island keeps the same markup, server HTML, held inputs and replay; no page shows or does anything else. An island near the screen takes over a frame or so after the one before it instead of in the same commit, so a section that scrolls in turns live over a few frames. `lib/islands.test.ts` covers the box index, the shared part (one load per loader, a failed chunk loaded again) and the turns (one at a time, after a paint, by rank, past the limit). `e2e/forms-pages.spec.ts` "every live example on a Forms page is hydrated by React" now waits until every example in the section has mounted, and for a frame after each scroll step, before it scrolls past them: an island watches the viewport only from its mount and sees a place only in a frame, so a scroll during a slow first frame (1.6-1.7 s on a cold browser) passed islands unseen. It failed that way on this branch, and on main too when main was the cold run (43 controls left cold).
 
 ## 2026-10-22 - Only main creates a Vercel deployment
 
