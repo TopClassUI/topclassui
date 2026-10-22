@@ -68,11 +68,14 @@ test.describe('live: the file upload by keyboard', () => {
   }
 
   for (const direction of DIRECTIONS) {
-    test(`${direction}: Tab stops on the idle upload and passes over the disabled one`, async ({ page }) => {
+    test(`${direction}: Tab stops on the idle upload and the one drawn with a drag over it, and passes over the disabled one`, async ({ page }) => {
       await page.goto(urlFor('file-upload--states', 'light', direction))
       await page.keyboard.press('Tab')
       await expect(page.locator('#file-upload-idle')).toBeFocused()
       await expectRing(page, 'the idle upload')
+      await page.keyboard.press('Tab')
+      await expect(page.locator('#file-upload-drag')).toBeFocused()
+      await expectRing(page, 'the upload drawn with a drag over it')
       await page.keyboard.press('Tab')
       expect(await page.evaluate(() => document.activeElement?.closest('#demo')?.tagName ?? null)).toBeNull()
     })
