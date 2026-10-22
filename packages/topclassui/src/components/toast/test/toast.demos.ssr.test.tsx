@@ -62,7 +62,7 @@ describe('the playground demo', () => {
     expect(markup(<Demo />)).toMatch(/^<button /)
     const staged = markup(<Demo stage />)
     expect(staged).toMatch(/^<div class="relative grid min-h-67.75 w-full place-items-center"><div class="absolute top-0 inset-s-0"><button /)
-    expect(staged).toContain('<div class="relative isolate h-25 w-88 max-w-full">')
+    expect(staged).toContain('<div class="relative isolate h-25 w-full max-w-88">')
     expect(staged).not.toContain('Project created')
   })
 })
