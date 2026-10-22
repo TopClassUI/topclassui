@@ -12,11 +12,11 @@ import { guideFacts } from './lib/guides.js'
 const CONTENT = resolve(import.meta.dirname, '..', 'content')
 const read = (file: string) => readFileSync(join(CONTENT, file), 'utf8')
 
-/** The code spans of the first column of the first table under a `##` heading. */
+/** The class names in a table's first column, written as code or as plain words with an escaped `*`. */
 function firstColumn(mdx: string, heading: string): string[][] {
   const section = mdx.split(/^## /m).find((part) => part.startsWith(heading)) ?? ''
   return section.split('\n').filter((line) => line.startsWith('| ') && !/^\|\s*-/.test(line)).slice(1)
-    .map((line) => [...(line.split('|')[1] ?? '').matchAll(/`([^`]+)`/g)].map((match) => match[1] ?? ''))
+    .map((line) => (line.split('|')[1] ?? '').replace(/<[^>]+>/g, ' ').replace(/[`\\]/g, '').split(/\s+/).filter((word) => /^[a-z]+(-[a-z*]+)+$/.test(word)))
 }
 
 const eslint = new ESLint({

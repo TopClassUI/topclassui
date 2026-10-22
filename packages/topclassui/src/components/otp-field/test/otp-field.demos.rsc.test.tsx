@@ -66,8 +66,8 @@ describe('every demo is a Server Component that only hands the field what can cr
   it('states: each state is a plain prop of the field, the drawn ring a class', async () => {
     const props = crossings((await load('states'))()).map(({ props: given }) => Object.keys(given).join(' '))
     expect(props).toEqual([
-      'id length size', 'id length size defaultValue className', 'id length size defaultValue',
-      'id length size defaultValue', 'id length size invalid defaultValue', 'id length size disabled defaultValue',
+      'id length size className', 'id length size defaultValue className', 'id length size defaultValue className',
+      'id length size defaultValue className', 'id length size invalid defaultValue className', 'id length size disabled defaultValue className',
     ])
   })
 

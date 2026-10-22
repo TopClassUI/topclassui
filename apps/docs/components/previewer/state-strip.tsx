@@ -54,7 +54,7 @@ export function StateStrip({ tree, heading, counts, sourceCount, names }: StateS
     <>
       <div className={PART_ROW}>
         <h3 className={CAPTION}>{heading}</h3>
-        <span className="font-mono text-xs text-muted">{counts[count] ?? counts.at(-1)}</span>
+        <span className="font-mono text-xs/3 text-muted">{counts[count] ?? counts.at(-1)}</span>
       </div>
       <ModeScope className={STATE_SCOPE}>
         {cells.length === 0 ? tree : (

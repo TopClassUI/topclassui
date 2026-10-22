@@ -39,13 +39,17 @@ Only what React can serialise: strings, numbers, booleans, plain objects, arrays
 // the file that configures a palette is a client file
 import { Command } from 'topclassui/command'
 
-export function Search({ commands }: { commands: { id: string, label: string }[] }) {
+type Item = { id: string, label: string }
+
+export function Search({ commands }: { commands: Item[] }) {
   return (
     <Command
       items={commands}
       getKey={(command) => command.id}
       getLabel={(command) => command.label}
-      onSelect={(command) => { window.location.assign(`/docs/${command.id}`) }}
+      onSelect={(command) => {
+        window.location.assign(`/docs/${command.id}`)
+      }}
     />
   )
 }
@@ -55,7 +59,7 @@ export function Search({ commands }: { commands: { id: string, label: string }[]
 
 ## Why index.tsx has no hooks
 
-Markup lives in `index.tsx`, behaviour in `hook.ts`. `index.tsx` never contains `'use client'` and never imports `hook.ts`. A build check enforces it.
+Markup lives in index.tsx, behaviour in hook.ts. index.tsx never contains use client and never imports hook.ts. A build check enforces it.
 
 ```tsx title="index.tsx"
 // index.tsx - server

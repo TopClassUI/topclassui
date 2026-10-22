@@ -16,10 +16,11 @@ const DARK_GROUND: Palette = { text: '#d4d4d4', comment: '#a1a1a1', keyword: '#5
 /** Tailwind's neutral-800, neutral-600, blue-700, emerald-700, amber-800 and sky-700: text on a light ground. */
 const LIGHT_GROUND: Palette = { text: '#262626', comment: '#525252', keyword: '#1447e6', string: '#007a55', attribute: '#973c00', tag: '#0069a8' }
 
-/** CSS selectors and units, which the grammars scope as attribute names, tags and keywords; they read as plain text, as drawn. */
+/** CSS selectors, units and the @ of an at-rule, which the grammars scope as attribute names, tags and keywords; they read as plain text, as drawn. */
 const PLAIN_IN_CSS = [
   'entity.other.attribute-name.css', 'entity.other.attribute-name.class.css', 'entity.other.attribute-name.id.css',
   'entity.other.attribute-name.pseudo-class.css', 'entity.other.attribute-name.pseudo-element.css', 'entity.name.tag.css', 'keyword.other.unit',
+  'punctuation.definition.keyword.css',
 ]
 
 function themeOf(name: string, palette: Palette): ThemeRegistrationRaw {
@@ -31,13 +32,15 @@ function themeOf(name: string, palette: Palette): ThemeRegistrationRaw {
       { settings: { foreground: palette.text } },
       { scope: ['comment', 'punctuation.definition.comment'], settings: { foreground: palette.comment } },
       {
-        scope: ['keyword.control', 'keyword.other', 'keyword.operator.new', 'keyword.operator.expression', 'storage', 'variable.language', 'constant.language'],
+        scope: ['keyword.control', 'keyword.other', 'keyword.operator.new', 'keyword.operator.expression', 'storage', 'variable.language', 'constant.language', 'variable.other.constant'],
         settings: { foreground: palette.keyword },
       },
       { scope: ['entity.name.tag', 'support.class.component'], settings: { foreground: palette.tag } },
       { scope: ['string', 'punctuation.definition.string', 'string.template'], settings: { foreground: palette.string } },
       { scope: ['entity.other.attribute-name'], settings: { foreground: palette.attribute } },
       { scope: [...PLAIN_IN_CSS, 'string.unquoted.argument'], settings: { foreground: palette.text } },
+      // An attribute selector's name ([data-theme=...]) is drawn in the attribute colour, after the plain-selector rule above.
+      { scope: ['meta.attribute-selector.css entity.other.attribute-name'], settings: { foreground: palette.attribute } },
     ],
   }
 }
