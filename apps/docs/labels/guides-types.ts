@@ -34,6 +34,7 @@ export interface GuideLabels {
     copy: (name: string) => string
     copied: (code: string) => string
     failed: string
+    clear: string
   }
   island: {
     page: string

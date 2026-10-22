@@ -6,7 +6,7 @@ export default function Demo() {
     <div className="flex flex-wrap items-center gap-10">
       <div role="group" aria-label="horizontal" className="w-28"><Separator /></div>
       <div role="group" aria-label="vertical" className="flex h-10"><Separator orientation="vertical" /></div>
-      <div role="group" aria-label="with label" className="w-28"><Separator>or</Separator></div>
+      <div role="group" aria-label="with label" className="w-28"><Separator className="font-mono">or</Separator></div>
     </div>
   )
 }

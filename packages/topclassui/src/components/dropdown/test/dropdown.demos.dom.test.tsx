@@ -42,6 +42,7 @@ const SHOWN: Record<string, Shown[]> = {
     { trigger: 'Actions', rows: ['Profile', 'Settings'] },
     { trigger: 'Actions', rows: ['Edit', 'Delete'] },
     { trigger: 'Actions', rows: ['Edit', 'Delete'] },
+    { trigger: 'Actions', rows: ['Edit', 'Delete'] },
   ],
   'with-links': [{ trigger: 'Help', rows: ['Documentation', 'Changelog', 'Contact support', 'Status page'] }],
 }

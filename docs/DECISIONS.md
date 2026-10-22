@@ -6,6 +6,16 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-22 - Right to left keeps the full Arabic plural sample, and a checked fence may show only its drawn lines
+
+**Decision.** "Type, plurals and digits" on the Right to left guide keeps the five-branch `Intl.PluralRules` sample (zero, one, two, few, many and the rest) instead of the frame's one-line ternary (183:1245). Elsewhere a guide fence marked `check` may carry `show="a-b"`: the page shows those lines, dedented, and Copy copies them, while the sample check still compiles the whole fence.
+
+**Why.** Arabic has six plural forms; the drawn `one ? ... : ...` ternary prints the wrong form for two, three to ten and eleven and up, so copying it would teach a bug. The frames draw excerpts (the html and provider lines, the PopoverPopup and the Field) where the checked sources need their imports and a component around them; `show` gives the frame its lines without losing the compile.
+
+**Affects.** `apps/docs/content/{en,ar}/rtl.mdx` and `accessibility.mdx`, `apps/docs/lib/text-of.ts` (`shownOf`) and `apps/docs/components/mdx/code-fence.tsx`. The audit row "Type, plurals and digits, code sample" (cloud-reports/audit-r11/guides.md) is kept on this entry.
+
+---
+
 ## 2026-10-21 - Ocean is a light mode on a section too, and the mono token names each platform's font
 
 **Decision.** `[data-theme='ocean']` joins `:root` and `[data-theme='light']` on the block of light colours in `src/tokens.css`, so an ocean section inside a dark page gets the light neutrals, tints and scrollbar under its own cyan primary and pill radius, as Theming's "Scoping a theme to a section" shows; before, it kept the dark page's neutrals under `color-scheme: light`. The dark block now sets the four primary tokens ocean changes (solid, on-solid, hover, active, to light's values), so a dark section inside an ocean page loses the cyan. `--tc-font-mono` is `ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace`: `ui-monospace` resolves only in Safari, and Chromium on Windows fell back to Courier New.

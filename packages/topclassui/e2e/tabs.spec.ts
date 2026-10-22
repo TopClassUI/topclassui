@@ -21,6 +21,7 @@ const TABS: Record<string, number> = {
   'tabs--rtl': 1,
   'tabs--server-content': 1,
   'tabs--sizes': 12,
+  'tabs--stage': 2,
   'tabs--states': 4,
 }
 
@@ -155,7 +156,7 @@ test.afterEach(async ({ page }) => { expect(await liveErrors(page)).toEqual([]) 
 
 test('the table names every tabs demo', () => {
   expect(Object.keys(TABS).sort()).toEqual(DEMOS.filter((demo) => demo.startsWith('tabs--')).sort())
-  expect(Object.keys(TABS)).toHaveLength(11)
+  expect(Object.keys(TABS)).toHaveLength(12)
 })
 
 // PLAN 19, Phase 6: accepted on the HTML the server sends, before any script has run.
