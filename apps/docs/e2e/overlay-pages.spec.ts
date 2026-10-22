@@ -64,7 +64,11 @@ const strip = (page: Page, slug: string, locale: (typeof LOCALES)[number]['local
 
 /** A tooltip opens on hover; every other overlay on a press. The trigger sits mid-screen, so a popup has room on every side. */
 async function drive(slug: (typeof SLUGS)[number], trigger: Locator) {
+  // The pointer rests where the last trigger was centred; parked first, it enters this one only on the hover below.
+  if (slug === 'tooltip') await trigger.page().mouse.move(0, 0)
   await trigger.evaluate((element) => { element.scrollIntoView({ block: 'center', behavior: 'instant' }) })
+  // An example takes over in place of the server's HTML as it nears the viewport (lazy-island.tsx), so a hover before that lands on a node about to go.
+  await expect.poll(() => trigger.evaluate((element) => element.closest('[data-island]:not([data-island-live])') === null && Object.keys(element).some((key) => key.startsWith('__reactFiber')))).toBe(true)
   await (slug === 'tooltip' ? trigger.hover() : trigger.click())
 }
 
