@@ -277,4 +277,10 @@ export const MUTATIONS: Mutation[] = [
     from: 'group-focus-visible/tree:data-highlighted:outline-offset-(length:--tc-ring-offset)',
     to: 'group-focus-visible/tree:data-highlighted:-outline-offset-(length:--tc-ring-width)',
   },
+  {
+    label: 'the tree view rings every row when focusVisibleId is left out',
+    file: CLIENT,
+    from: "data-focus-visible={key === focusVisibleId ? '' : undefined}",
+    to: "data-focus-visible={key !== '' ? '' : undefined}",
+  },
 ]

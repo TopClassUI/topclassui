@@ -23,8 +23,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the empty state passes className first, so the consumer loses every conflict',
     file: 'src/components/empty-state/index.tsx',
-    from: 'cn(ROOT, compact && COMPACT.root, className)',
-    to: 'cn(className, ROOT, compact && COMPACT.root)',
+    from: 'cn(ROOT, compact && COMPACT.root, !bordered && BARE, className)',
+    to: 'cn(className, ROOT, compact && COMPACT.root, !bordered && BARE)',
   },
   {
     label: 'the empty state shows its default icon when the caller passes icon={null}',
@@ -47,8 +47,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the empty state becomes a status live region, so a screen reader announces page content',
     file: 'src/components/empty-state/index.tsx',
-    from: "<div data-compact={compact ? '' : undefined} className=",
-    to: "<div role=\"status\" data-compact={compact ? '' : undefined} className=",
+    from: "data-compact={compact ? '' : undefined}",
+    to: "role=\"status\" data-compact={compact ? '' : undefined}",
   },
   {
     label: 'the empty state default icon drops to 1em, so it shrinks to the text size',
@@ -95,8 +95,14 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a compact empty state keeps the full padding and gap, so it is no tighter than the regular one',
     file: 'src/components/empty-state/index.tsx',
-    from: 'cn(ROOT, compact && COMPACT.root, className)',
-    to: 'cn(ROOT, className)',
+    from: 'cn(ROOT, compact && COMPACT.root, !bordered && BARE, className)',
+    to: 'cn(ROOT, !bordered && BARE, className)',
+  },
+  {
+    label: 'bordered={false} keeps the dashed box, so the bare form is still a box',
+    file: 'src/components/empty-state/index.tsx',
+    from: 'cn(ROOT, compact && COMPACT.root, !bordered && BARE, className)',
+    to: 'cn(ROOT, compact && COMPACT.root, className)',
   },
   {
     label: 'a compact empty state keeps the 40 px icon',

@@ -175,4 +175,10 @@ export const MUTATIONS: Mutation[] = [
     from: "export const CODE_BLOCK_STATUS = 'sr-only'",
     to: "export const CODE_BLOCK_STATUS = ''",
   },
+  {
+    label: 'the code block ignores icon={null} and draws the terminal anyway',
+    file: INDEX,
+    from: 'const shownIcon = icon === undefined ?',
+    to: 'const shownIcon = icon == null ?',
+  },
 ]

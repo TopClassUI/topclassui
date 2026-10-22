@@ -206,4 +206,10 @@ export const MUTATIONS: Mutation[] = [
     from: 'selected: selectedKeys?.includes(key) === true',
     to: 'selected: false',
   },
+  {
+    label: 'the table hovers every row when hoveredKey is left out',
+    file: 'src/components/table/index.tsx',
+    from: 'hovered: key === hoveredKey }',
+    to: 'hovered: key !== \'\' }',
+  },
 ]
