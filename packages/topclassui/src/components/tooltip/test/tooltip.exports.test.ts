@@ -23,9 +23,9 @@ function exportedNames(source: string): string[] {
 }
 
 // The root-part lint reads declarations, and index.tsx declares nothing, so this is the guard.
-describe('index.tsx exports flat names, with no bare Tooltip and no provider', () => {
-  it('exports exactly the three parts', () => {
-    expect(Object.keys(tooltip).sort()).toEqual(['TooltipPopup', 'TooltipRoot', 'TooltipTrigger'])
+describe('index.tsx exports flat names, with no bare Tooltip', () => {
+  it('exports exactly the three parts and the delay group', () => {
+    expect(Object.keys(tooltip).sort()).toEqual(['TooltipPopup', 'TooltipProvider', 'TooltipRoot', 'TooltipTrigger'])
   })
 
   it('exports each one as a function component, never an object a server file would dot into', () => {
@@ -33,10 +33,10 @@ describe('index.tsx exports flat names, with no bare Tooltip and no provider', (
   })
 
   // The namespace import above holds values only, so the type exports are read from the source.
-  it('has no Tooltip and no provider in its type surface either', () => {
+  it('has no bare Tooltip in its type surface either', () => {
     const source = readFileSync(join(import.meta.dirname, '..', 'index.tsx'), 'utf8')
     expect(exportedNames(source).sort()).toEqual([
-      'TooltipDesignProps', 'TooltipPlacement', 'TooltipPopup', 'TooltipPopupProps', 'TooltipRoot',
+      'TooltipDesignProps', 'TooltipPlacement', 'TooltipPopup', 'TooltipPopupProps', 'TooltipProvider', 'TooltipProviderProps', 'TooltipRoot',
       'TooltipRootProps', 'TooltipText', 'TooltipTrigger', 'TooltipTriggerProps',
     ])
   })

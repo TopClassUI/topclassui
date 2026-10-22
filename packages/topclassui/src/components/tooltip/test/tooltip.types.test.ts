@@ -4,8 +4,8 @@ import { describe, expectTypeOf, it } from 'vitest'
 
 // From the index, so a type it stops re-exporting fails here.
 import type {
-  TooltipDesignProps, TooltipPlacement, TooltipPopupProps, TooltipRoot, TooltipRootProps, TooltipText,
-  TooltipTrigger, TooltipTriggerProps,
+  TooltipDesignProps, TooltipPlacement, TooltipPopupProps, TooltipProvider, TooltipProviderProps, TooltipRoot,
+  TooltipRootProps, TooltipText, TooltipTrigger, TooltipTriggerProps,
 } from '../index.js'
 
 /** Assignability as a value, so a rejected prop is a passing assertion. */
@@ -176,5 +176,23 @@ describe('a typed handle types the payload, as Base UI does', () => {
   it('both parts are generic, so JSX infers the payload from the handle', () => {
     expectTypeOf<Parameters<typeof TooltipRoot<Label>>[0]>().toEqualTypeOf<TooltipRootProps<Label>>()
     expectTypeOf<Parameters<typeof TooltipTrigger<Label>>[0]>().toEqualTypeOf<TooltipTriggerProps<Label>>()
+  })
+})
+
+describe('the provider is a delay group and renders no element (R-5.7-3)', () => {
+  it('takes children, the two delays as numbers and the group timeout', () => {
+    expectTypeOf<keyof TooltipProviderProps>().toEqualTypeOf<'children' | 'delay' | 'closeDelay' | 'timeout'>()
+    expectTypeOf<TooltipProviderProps['delay']>().toEqualTypeOf<number | undefined>()
+    expectTypeOf<TooltipProviderProps['closeDelay']>().toEqualTypeOf<number | undefined>()
+  })
+
+  it('takes no className, style or ref, since there is no element to put them on', () => {
+    expectTypeOf<Accepts<keyof TooltipProviderProps, 'className'>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<keyof TooltipProviderProps, 'style'>>().toEqualTypeOf<false>()
+    expectTypeOf<Accepts<keyof TooltipProviderProps, 'ref'>>().toEqualTypeOf<false>()
+  })
+
+  it('is called with exactly its props', () => {
+    expectTypeOf<Parameters<typeof TooltipProvider>[0]>().toEqualTypeOf<TooltipProviderProps>()
   })
 })

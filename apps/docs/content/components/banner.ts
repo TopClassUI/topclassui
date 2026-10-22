@@ -7,8 +7,8 @@ export const banner = {
     ar: 'بعرض كامل فوق الترويسة؛ يدفع الصفحة إلى الأسفل بدل أن يغطي شيئًا.',
   },
   note: {
-    en: 'Dismissal is remembered per id in this browser, so change the id when the message changes.',
-    ar: 'الإخفاء يُحفظ حسب المعرّف في هذا المتصفح، فغيّر المعرّف عندما تتغير الرسالة.',
+    en: 'Dismissal is remembered per id, so change the id when the message changes.',
+    ar: 'الإخفاء يُحفظ حسب المعرّف، فغيّر المعرّف عندما تتغير الرسالة.',
   },
   demos: ['basic', 'tones', 'with-action', 'dismissible', 'minimal', 'long-action', 'long-text', 'rtl'],
   stageHeight: 19.4375,
