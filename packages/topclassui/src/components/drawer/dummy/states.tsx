@@ -8,7 +8,7 @@ import {
   DrawerBody, DrawerClose, DrawerFooter, DrawerHeader, DrawerPopup, DrawerRoot, DrawerTitle, DrawerTrigger,
 } from '../index.js'
 
-const CELL = 'relative h-24 w-36 justify-self-center overflow-hidden rounded-box [contain:paint]'
+const CELL = 'relative h-18 w-33 justify-self-center overflow-hidden rounded-box [contain:paint]'
 const BAR = 'min-h-2 rounded-chip bg-surface-raised'
 const HEADER = 'border-b-0 py-3 ps-2.5'
 const LABEL = 'font-mono text-xs/tight font-normal text-muted'
@@ -26,7 +26,7 @@ function PageBehind() {
 }
 
 // R-5.3-2: part-way out toward the inline end, as a finger leaves it mid-swipe; the edge is the ring, as the focus draws it.
-const DRAGGING = 'translate-x-[calc(1.5rem*var(--tc-dir))]'
+const DRAGGING = 'translate-x-[calc(0.5rem*var(--tc-dir))]'
 const TRAPPED = 'border-s-(length:--tc-ring-width) border-s-ring'
 
 /** One cell, captioned by its title: a small side sheet open at the inline end over the page and its scrim, not modal
@@ -38,7 +38,7 @@ function Side({ title, className }: { title: string, className?: string }) {
       <PageBehind />
       <div aria-hidden className="absolute inset-0 bg-overlay" />
       <DrawerRoot defaultOpen modal={false} size="custom">
-        <DrawerPopup container={box} initialFocus={false} className={cn('max-h-full w-24 *:first:not-last:pe-9', className)}>
+        <DrawerPopup container={box} initialFocus={false} className={cn('max-h-full w-16 *:first:not-last:pe-9', className)}>
           <DrawerHeader className={HEADER}>
             <DrawerTitle className={LABEL}>sheet</DrawerTitle>
           </DrawerHeader>
@@ -54,7 +54,7 @@ export default function Demo() {
   const bottom = useRef<HTMLDivElement>(null)
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] gap-4">
-      <div title="closed" className="grid h-24 place-items-center">
+      <div title="closed" className="grid h-18 place-items-center">
         <DrawerRoot>
           <DrawerTrigger render={<Button variant="outline" size="sm">Open</Button>} />
           <DrawerPopup>
