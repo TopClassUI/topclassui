@@ -20,9 +20,9 @@ export function definitionOf(name: string, value: string): string {
   return `export const ${name} =\n${lines.map((line) => `  '${line}'`).join(' +\n')}`
 }
 
-/** A shared class as the package defines it, printed from topclassui/classes, never typed (docs-site page 12). */
+/** A shared class as the package defines it, printed from topclassui/classes, never typed (docs-site page 12); its name, read after the title, tells the page's two blocks apart. */
 export async function ClassSample({ name, locale }: { name: keyof typeof CLASSES; locale: Locale }) {
   const code = definitionOf(name, CLASSES[name])
   const highlighted = await highlight(code, 'ts')
-  return <CodeFrame code={code} locale={locale} lang="ts" title={MODULE} highlighted={highlighted} />
+  return <CodeFrame code={code} locale={locale} lang="ts" title={MODULE} repeat={`, ${name}`} highlighted={highlighted} />
 }
