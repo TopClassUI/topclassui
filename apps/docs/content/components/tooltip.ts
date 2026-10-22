@@ -3,15 +3,15 @@ export const tooltip = {
   slug: 'tooltip',
   title: { en: 'Tooltip', ar: 'تلميح' },
   description: {
-    en: 'One or two lines of plain text on hover or focus: the name of an icon-only control, or a label that truncates.',
-    ar: 'سطر أو سطران من النص عند التمرير أو التركيز: اسم عنصر تحكم بأيقونة فقط، أو تسمية مقطوعة.',
+    en: 'One or two lines of text on hover; a shared delay makes the next tooltip open instantly.',
+    ar: 'سطر أو سطران من النص عند التمرير؛ ومهلة مشتركة تجعل التلميح التالي يفتح فورًا.',
   },
   demos: ['basic', 'delays', 'long-label', 'with-count', 'placements', 'disabled', 'rtl'],
-  stageHeight: 24.25,
+  stageHeight: 19.4375,
   stageOpen: true,
   note: {
-    en: 'Touch never shows a tooltip, so the trigger\'s own name must repeat the text: give an icon-only Button an `aria-label`.',
-    ar: 'شاشات اللمس لا تعرض التلميح أبدًا، فيجب أن يكرّر اسم المشغّل النص نفسه: أعطِ الزر ذا الأيقونة فقط `aria-label`.',
+    en: 'Touch never shows a tooltip, so the trigger\'s own label must repeat the text.',
+    ar: 'شاشات اللمس لا تعرض التلميح أبدًا، فيجب أن تكرّر تسمية المشغّل النص نفسه.',
   },
   notes: {
     en: [

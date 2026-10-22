@@ -55,10 +55,9 @@ export const en: SiteLabels = {
     copy: 'Copy',
     packageManagers: 'Package manager',
     framework: 'Framework',
-    utilities: { token: 'Token', utilities: 'Utilities' },
+    utilities: { token: 'Token', utilities: 'Utilities', through: 'to' },
     props: { prop: 'Prop', type: 'Type', default: 'Default', description: 'What it does', required: 'required' },
     repeat: (count) => `, version ${String(count)}`,
-    csp: 'Content Security Policy',
   },
   providerProps: {
     children: 'Your app.',
@@ -225,7 +224,7 @@ export const en: SiteLabels = {
       },
       layout: {
         title: '3. The root layout',
-        note: 'Pass direction and locale to TopClassProvider as props from your layout; never read them from document.dir in an effect. ThemeScript goes first in <head>: it sets data-theme before the first paint.',
+        note: 'Pass direction and locale to TopClassProvider as props from your layout; never read them from document.dir in an effect. ThemeScript goes first in <head>: it sets data-theme before the first paint, so add suppressHydrationWarning to <html>.',
       },
       source: {
         title: '4. Or copy the source into your repo',
