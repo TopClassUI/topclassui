@@ -13,7 +13,7 @@ const THEMES = ['light', 'dark', 'ocean'] as const
 const DIRS = [{ dir: 'ltr', lang: 'en' }, { dir: 'rtl', lang: 'ar' }] as const
 
 test('the route has every demo of every live component page', () => {
-  expect(DEMOS.length).toBe(482)
+  expect(DEMOS.length).toBe(483)
 })
 
 for (const theme of THEMES) {

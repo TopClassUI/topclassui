@@ -3,8 +3,8 @@ export const skeleton = {
   slug: 'skeleton',
   title: { en: 'Skeleton', ar: 'هيكل التحميل' },
   description: {
-    en: 'The placeholder every component ships with, so a page holds its shape while it loads.',
-    ar: 'العنصر النائب الذي يأتي مع كل مكوّن، فتحتفظ الصفحة بشكلها أثناء التحميل.',
+    en: 'The placeholder every component ships with, so a page keeps its shape.',
+    ar: 'العنصر النائب الذي يأتي مع كل مكوّن، فتحتفظ الصفحة بشكلها.',
   },
   demos: ['media-object', 'variants', 'rows', 'beside-text', 'custom-size', 'rtl'],
   stageHeight: 14.0625,
