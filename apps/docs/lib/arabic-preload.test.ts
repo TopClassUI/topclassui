@@ -1,3 +1,5 @@
+import { runInNewContext } from 'node:vm'
+
 import { describe, expect, it } from 'vitest'
 
 import { ARABIC_PRELOAD_SCRIPT } from './arabic-preload'
@@ -28,7 +30,7 @@ function run(sheets: { href: string | null; cssRules: unknown[] | 'cross-origin'
     createElement: () => ({ rel: '', as: '', type: '', crossOrigin: null, href: '' }),
     head: { appendChild: (link: Link) => { added.push(link) } },
   }
-  new Function('document', ARABIC_PRELOAD_SCRIPT)(document)
+  runInNewContext(ARABIC_PRELOAD_SCRIPT, { document, URL })
   return added
 }
 
