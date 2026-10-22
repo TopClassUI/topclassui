@@ -1,3 +1,6 @@
+// First, so globals.css's <link> leads next/font's: over HTTP/1.1 the first stylesheet reuses the connection the HTML warmed (DECISIONS 2026-10-22).
+import '../../globals.css'
+
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import type { Metadata, Viewport } from 'next'
 import { notFound } from 'next/navigation'
@@ -8,10 +11,10 @@ import { LOCALES, isLocale } from '../../../content/pages'
 import { TopClassProvider } from '../../../components/shell/provider-island'
 import { SkipLink } from '../../../components/shell/skip-link'
 import { DIRECTION, labelsFor } from '../../../labels/index'
+import { ARABIC_PRELOAD_SCRIPT } from '../../../lib/arabic-preload'
 import { FACTS } from '../../../lib/data'
 import { fontClassOf } from '../../../lib/fonts'
 import { SITE_URL } from '../../../lib/site'
-import '../../globals.css'
 
 export const dynamicParams = false
 
@@ -39,6 +42,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
     <html lang={locale} dir={DIRECTION[locale]} data-theme="dark" suppressHydrationWarning className={fontClassOf(locale)}>
       <head>
         <ThemeScript />
+        {locale === 'ar' ? <script suppressHydrationWarning dangerouslySetInnerHTML={{ __html: ARABIC_PRELOAD_SCRIPT }} /> : null}
       </head>
       <body className="min-h-dvh bg-page font-sans text-body antialiased">
         <SkipLink label={labels.shell.skip} />
