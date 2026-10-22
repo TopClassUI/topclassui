@@ -8,10 +8,10 @@ export default function Demo() {
   return (
     <div className="grid gap-6">
       <div role="group" aria-label="idle">
-        <CodeBlock lang="tsx" title="states.tsx" className="w-32">{'<Button/>'}</CodeBlock>
+        <CodeBlock lang="tsx" title="idle" className="w-32">{'<Button/>'}</CodeBlock>
       </div>
       <div role="group" aria-label="wrapped">
-        <CodeBlock lang="tsx" title="wrapped" className="w-32" wrap>{'<Button size="sm"/>'}</CodeBlock>
+        <CodeBlock lang="tsx" title="wrap" className="w-32" wrap>{'<Button size="sm"/>'}</CodeBlock>
       </div>
       <div role="group" aria-label="no header">
         <CodeBlock lang="tsx" showCopy={false} className="w-32" labels={{ ...en, common: { ...en.common, code: 'Untitled code' } }}>{'<Button/>'}</CodeBlock>
