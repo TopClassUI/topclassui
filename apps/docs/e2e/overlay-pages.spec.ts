@@ -18,7 +18,7 @@ const STATES = {
   drawer: { open: 4, trigger: 'Open' },
   popover: { open: 2, trigger: 'Share' },
   tooltip: { open: 2, trigger: 'Copy link' },
-  dropdown: { open: 2, trigger: 'Actions' },
+  dropdown: { open: 3, trigger: 'Actions' },
   command: { open: 0, trigger: null },
 } as const
 const COMMAND_PICTURES = 5
