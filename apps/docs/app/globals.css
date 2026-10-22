@@ -180,7 +180,7 @@
   [data-theme='light'] .docs-code .shiki span,
   [data-theme='ocean'] .docs-code .shiki span { color: var(--tc-code-on-light); }
 
-  /* Inside the tab card the tab names the code: the header keeps only its copy button, at the inline end. */
+  /* Inside the tab card the tab names the code: the header stays only as the region's hidden name. */
   .docs-tabbed .docs-code {
     border: 0;
     border-radius: 0;
@@ -203,10 +203,6 @@
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
-  }
-
-  .docs-tabbed .docs-code > pre {
-    padding-inline-end: 3rem;
   }
 
   /* Follow us buttons as drawn: Button's border-transparent is a utility, so this sits in the same layer after it. */
