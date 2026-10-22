@@ -29,8 +29,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the AvatarGroup ring loses the page colour, so it paints in the text colour of each avatar',
     file: 'src/components/avatar-group/classes.ts',
-    from: "'*:ring-2 *:ring-neutral-soft'",
-    to: "'*:ring-2'",
+    from: "'*:ring-2 *:ring-neutral-soft *:data-counter:ring-primary-soft'",
+    to: "'*:ring-2 *:data-counter:ring-primary-soft'",
   },
   {
     label: 'the AvatarGroup counter is named from the English labels whatever the labels prop says',
@@ -137,7 +137,13 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'the AvatarGroup counter loses its primary tint, so +N reads as one more neutral face',
     file: 'src/components/avatar-group/classes.ts',
-    from: "md: 'w-auto min-w-control-md px-1 bg-primary-soft text-primary-on-soft ring-primary-soft',",
+    from: "md: 'w-auto min-w-control-md px-1 bg-primary-soft text-primary-on-soft',",
     to: "md: 'w-auto min-w-control-md px-1',",
+  },
+  {
+    label: 'the AvatarGroup counter loses its own ring, so the group paints a grey rim round the primary disc',
+    file: 'src/components/avatar-group/classes.ts',
+    from: " *:data-counter:ring-primary-soft'",
+    to: "'",
   },
 ]

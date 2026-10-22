@@ -133,4 +133,10 @@ export const MUTATIONS: Mutation[] = [
     from: '      data-tag-remove=""\n',
     to: '',
   },
+  {
+    label: 'the x of a tag stops pulling over the chip gap, so the glyph sits 13 px from a md label',
+    file: CLASSES,
+    from: "+var(--tc-line-width))] -ms-2',\n  lg",
+    to: "+var(--tc-line-width))]',\n  lg",
+  },
 ]

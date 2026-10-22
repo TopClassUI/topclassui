@@ -72,7 +72,7 @@ test('Button: the stage draws the five variants, then the playground drives it a
   expect(errors).toEqual([])
 })
 
-test('Tag: the playground drives the tone, in Arabic', async ({ page }) => {
+test('Tag: the playground drives the tone and the x, in Arabic', async ({ page }) => {
   await page.goto('/ar/docs/components/tag')
   const tag = card(page, 'tag')
   // At rest the stage is the frame's row of four tones and a removable danger tag, and THE CODE its row of topics; the first change swaps in the playground's tag.
@@ -85,6 +85,10 @@ test('Tag: the playground drives the tone, in Arabic', async ({ page }) => {
   await expect(stageBox.locator('[data-tone]')).toHaveCount(1)
   await expect(stageBox.locator('[data-tone]', { hasText: 'Design systems' })).toHaveAttribute('data-tone', 'danger')
   await expect(tag.locator('pre').first()).toContainText('tone="danger"')
+  // removable brings the x and THE CODE's TagRemovable.
+  await tag.getByRole('checkbox', { name: 'removable' }).click()
+  await expect(stageBox.getByRole('button')).toHaveCount(1)
+  await expect(tag.locator('pre').first()).toContainText('<TagRemovable tone="danger" onRemove=')
 })
 
 test('SegmentedControl: the client stage mounts near the viewport and takes the props', async ({ page }) => {
