@@ -38,7 +38,7 @@ function Side({ title, className }: { title: string, className?: string }) {
       <PageBehind />
       <div aria-hidden className="absolute inset-0 bg-overlay" />
       <DrawerRoot defaultOpen modal={false} size="custom">
-        <DrawerPopup container={box} initialFocus={false} className={cn('max-h-full w-16 *:first:not-last:pe-9', className)}>
+        <DrawerPopup container={box} initialFocus={false} className={cn('max-h-full w-20 *:first:not-last:pe-8', className)}>
           <DrawerHeader className={HEADER}>
             <DrawerTitle className={LABEL}>sheet</DrawerTitle>
           </DrawerHeader>
