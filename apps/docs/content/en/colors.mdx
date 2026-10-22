@@ -9,7 +9,7 @@ description: "Color has three layers: a palette you never use directly, semantic
 
 A component never names a color. It names a role, and the role resolves differently in each mode.
 
-The palette is the Tailwind v4 oklch ramp. The semantic layer maps each role to a shade, and `@theme inline` turns each one into a utility class.
+The palette is the Tailwind v4 oklch ramp. The semantic layer maps each role to a shade, and @theme inline turns each one into a utility class.
 
 ```css
 /* palette - never referenced by a component */
@@ -112,12 +112,13 @@ Contrast is checked on every change to the library, and a failure blocks the cha
 
 ## Add your own theme
 
-Add one CSS block and set `data-theme="brand"` on the element it covers. A mode can change knobs as well as colors, and since `ThemeScript` stores only the three built-in modes, a custom one goes on a section.
+Add one CSS block and set data-theme on the section it covers. A mode can change knobs as well as colors.
 
-<Callout tone="warning">A mode that sets `--tc-primary-solid` must also set `--tc-primary-on-solid`, or its label can fall below 4.5:1 on the new fill.</Callout>
+<Callout tone="warning">A mode that sets --tc-primary-solid must also set --tc-primary-on-solid, or its label can fall below 4.5:1 on the new fill.</Callout>
 
 ```css title="app/globals.css"
 /* after the three imports */
+/* ThemeScript keeps light, dark and ocean: set brand on a section */
 [data-theme="brand"] {
   color-scheme: dark;
 
