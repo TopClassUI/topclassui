@@ -6,11 +6,11 @@ export const datePicker = {
     ar: 'منتقي التاريخ',
   },
   description: {
-    en: 'A lazy-loaded calendar popover that formats dates with the provider\'s locale and digits.',
+    en: 'A lazy calendar popover that formats dates with the provider\'s locale and digits.',
     ar: 'تقويم منبثق يُحمَّل عند الحاجة، ويكتب التواريخ بلغة المزوّد وأرقامه.',
   },
   demos: ['basic', 'in-field', 'limits', 'week-start', 'form', 'sizes', 'rtl'],
-  stageHeight: 7.5,
+  stageHeight: 21,
   controlOrder: ['size', 'placement', 'firstDayOfWeek', 'disabled', 'invalid'],
   controlsHidden: ['fullWidth'],
   extraSwitches: ['disabled'],
