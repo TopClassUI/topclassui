@@ -94,11 +94,13 @@ Anything else is passed to the root element, so standard attributes (`onClick`, 
 - `dummy/form.tsx`
 - `dummy/long-content.tsx`
 - `dummy/playground.tsx`
+- `dummy/read-only.tsx`
 - `dummy/row.tsx`
 - `dummy/rtl.tsx`
 - `dummy/show-count.tsx`
 - `dummy/sizes.tsx`
 - `dummy/skeleton.tsx`
+- `dummy/stage.tsx`
 - `dummy/states.tsx`
 
 ## Verified against
