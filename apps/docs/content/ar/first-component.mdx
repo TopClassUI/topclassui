@@ -66,7 +66,7 @@ export default function Page() {
 
 ## 4. اعرض الخطأ بلا إعادة تحميل
 
-انقل النموذج إلى ملف عميل واستخدم <span dir="ltr">`FormAction`</span>. تصل الأخطاء إلى الحقل المطابق. والصفحة تعرض <span dir="ltr">`<SubscribeForm action={subscribe} />`</span>.
+انقل النموذج إلى ملف عميل واستخدم <span dir="ltr">`FormAction`</span>. تصل الأخطاء إلى الحقل المطابق.
 
 ```tsx title="app/subscribe/subscribe-form.tsx" check
 'use client'
@@ -87,6 +87,8 @@ export function SubscribeForm({ action }: { action: typeof subscribe }) {
   )
 }
 ```
+
+<Caption>والصفحة تعرض <span dir="ltr">`<SubscribeForm action={subscribe} />`</span>.</Caption>
 
 ## مع Vite
 

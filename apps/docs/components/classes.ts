@@ -225,4 +225,4 @@ export const STATE_BOX = 'flex min-h-14 max-w-full items-center justify-center'
 export const STATE_CAPTION = 'max-w-full self-end text-center font-mono text-[0.6875rem] leading-3 text-muted'
 
 // A step's number as the docs frames draw it: a 22 x 12 pill, 10 px semibold, on the primary tint.
-export const STEP_NUMBER = 'inline-flex h-3 w-5.5 shrink-0 items-center justify-center rounded-full bg-primary-soft text-[0.625rem] font-semibold text-primary-on-soft mt-1'
+export const STEP_NUMBER = 'inline-flex h-3 w-5.5 shrink-0 items-center justify-center rounded-full bg-primary-soft text-[0.625rem] font-semibold text-primary-on-soft'
