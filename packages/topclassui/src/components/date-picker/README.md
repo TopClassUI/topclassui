@@ -129,7 +129,7 @@ Required: `aria-label` or `aria-labelledby` or `id`. Every other prop below is o
 | `className` | no | `string` | - | On the trigger, merged last, so a consumer class wins a conflict with its own. |
 | `container` | no | `Base.Portal.Props['container']` | - | Where the calendar mounts; `<body>` by default. |
 | `defaultValue` | no | `string \| null` | - | The day of the first render, and the one a form reset brings back. |
-| `firstDayOfWeek` | no | `number`, min 1, max 7 | - | DatePicker: the first column, 1 (Monday) to 7 (Sunday), rounded and clamped; left out, the locale's. |
+| `firstDayOfWeek` | no | `integer`, min 1, max 7 | - | DatePicker: the first column, a whole day 1 (Monday) to 7 (Sunday), rounded and clamped; left out, the locale's. |
 | `form` | no | `string` | - | The id of a form elsewhere on the page that the form input belongs to. |
 | `fullWidth` | no | `boolean` | `false` | DatePicker: the box fills the width of its parent instead of taking the width of an Input. |
 | `invalid` | no | `boolean` | `false` | DatePicker: marks the date as wrong: sets aria-invalid on the trigger, whose line turns to danger and thickens. |

@@ -23,8 +23,8 @@ describe('the value is a string', () => {
 })
 
 describe('the props OTPField adds come from the schema', () => {
-  it('are length, size, invalid and groupSize, all optional', () => {
-    expectTypeOf<keyof OtpFieldDesignProps>().toEqualTypeOf<'length' | 'size' | 'invalid' | 'groupSize'>()
+  it('are length, size, invalid, groupSize and validationType, all optional', () => {
+    expectTypeOf<keyof OtpFieldDesignProps>().toEqualTypeOf<'length' | 'size' | 'invalid' | 'groupSize' | 'validationType'>()
     expectTypeOf<OtpFieldProps['length']>().toEqualTypeOf<number | undefined>()
     expectTypeOf<OtpFieldProps['groupSize']>().toEqualTypeOf<number | undefined>()
     expectTypeOf<OtpFieldProps['size']>().toEqualTypeOf<Sizes | undefined>()
@@ -68,6 +68,8 @@ describe('what Base UI gives passes through, untouched (R-5.7-5)', () => {
 
   it('the validation types are Base UI\'s four', () => {
     expectTypeOf<OtpFieldValidationType>().toEqualTypeOf<'numeric' | 'alpha' | 'alphanumeric' | 'none'>()
+    expectTypeOf<OtpFieldValidationType>().toEqualTypeOf<Base.Root.ValidationType>()
+    expectTypeOf<OtpFieldProps['validationType']>().toEqualTypeOf<'numeric' | 'alpha' | 'alphanumeric' | 'none' | undefined>()
   })
 })
 

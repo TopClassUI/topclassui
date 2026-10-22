@@ -11,6 +11,7 @@ export const datePicker = {
   },
   demos: ['basic', 'in-field', 'limits', 'week-start', 'form', 'sizes', 'rtl'],
   stageHeight: 21,
+  stageOpen: true,
   controlOrder: ['size', 'placement', 'firstDayOfWeek', 'disabled', 'invalid'],
   controlsHidden: ['fullWidth'],
   extraSwitches: ['disabled'],

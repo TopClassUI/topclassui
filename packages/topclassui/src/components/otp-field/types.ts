@@ -1,6 +1,7 @@
 import type { OTPField as Base } from '@base-ui/react/otp-field'
 import type { Ref, RefObject } from 'react'
 
+import type { OTP_FIELD_VALIDATION_TYPES } from './constants.js'
 import type { OtpFieldSchemaInput } from './schema.js'
 
 // R-8.3-4: derived from the schema, so the props and the validation cannot drift apart.
@@ -25,8 +26,8 @@ export type OtpFieldName =
     'aria-label'?: undefined
   }
 
-/** The name, the hint and the error mark go on the cells, never on the group; `length` is ours, clamped. */
-type Owned = 'className' | 'ref' | 'length' | 'id' | 'aria-label' | 'aria-labelledby' | 'aria-describedby' | 'aria-invalid'
+/** The name, the hint and the error mark go on the cells, never on the group; `length` is ours, clamped; `validationType` is the schema's. */
+type Owned = 'className' | 'ref' | 'length' | 'validationType' | 'id' | 'aria-label' | 'aria-labelledby' | 'aria-describedby' | 'aria-invalid'
 
 // R-5.7-5: derived at the seam, so every other Base UI prop passes through untouched.
 export type OtpFieldProps = Omit<Base.Root.Props, Owned>
@@ -60,7 +61,7 @@ export type OtpFieldChangeDetails = Base.Root.ChangeEventDetails
 export type OtpFieldCompleteDetails = Base.Root.CompleteEventDetails
 
 /** Which characters Base UI keeps; `numeric` is ours, so Arabic-Indic and Persian digits count (choice 21). */
-export type OtpFieldValidationType = Base.Root.ValidationType
+export type OtpFieldValidationType = (typeof OTP_FIELD_VALIDATION_TYPES)[number]
 
 /** One cell as the part draws it: the name of a cell after the first, and whether a separator follows it. */
 export interface OtpFieldCell {

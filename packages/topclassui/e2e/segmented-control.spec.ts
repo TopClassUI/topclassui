@@ -190,9 +190,12 @@ test.describe('the states, on the static page', () => {
     expect(await css(page.getByRole('radiogroup', { name: 'Read-only' }), 'box-shadow')).toBe('none')
   })
 
-  test('disabled: a segment dims to half, every one of a disabled track too, and a live one beside it does not', async ({ page }) => {
+  test('disabled: a disabled track dims to half once, its segments not again; a lone disabled segment dims, a live one beside it does not', async ({ page }) => {
     await page.goto(urlFor('segmented-control--track-states', 'light', 'ltr'))
-    for (const name of ['Disabled', 'Disabled, selected', 'One disabled']) expect(await css(segmentIn(page, name), 'opacity'), name).toBe('0.5')
+    expect(await css(page.getByRole('radiogroup', { name: 'Disabled', exact: true }), 'opacity')).toBe('0.5')
+    for (const name of ['Disabled', 'Disabled, selected']) expect(await css(segmentIn(page, name), 'opacity'), name).toBe('1')
+    expect(await css(segmentIn(page, 'One disabled'), 'opacity')).toBe('0.5')
+    expect(await css(page.getByRole('radiogroup', { name: 'One disabled', exact: true }), 'opacity')).toBe('1')
     expect(await css(segmentIn(page, 'Live'), 'opacity')).toBe('1')
   })
 })
@@ -236,7 +239,8 @@ for (const scheme of ['light', 'dark'] as const) {
       await page.goto(urlFor('segmented-control--track-states', 'light', 'ltr'))
       expect(await css(page.getByRole('radiogroup', { name: 'Invalid' }), 'border-top-width')).toBe('2px')
       expect(await css(page.getByRole('radiogroup', { name: 'Read-only' }), 'border-top-width')).toBe('1px')
-      for (const name of ['Disabled', 'Disabled, selected', 'One disabled']) expect(await css(segmentIn(page, name), 'opacity'), name).toBe('0.5')
+      expect(await css(page.getByRole('radiogroup', { name: 'Disabled', exact: true }), 'opacity')).toBe('0.5')
+      expect(await css(segmentIn(page, 'One disabled'), 'opacity')).toBe('0.5')
       const outlines = await page.locator('#demo [role="radio"]').evaluateAll((all) => all.map((el) => getComputedStyle(el).outlineStyle))
       expect(new Set(outlines)).toEqual(new Set(['none']))
     })
@@ -370,7 +374,7 @@ test.describe('live: the keyboard', () => {
 
   test('a disabled segment is skipped by the arrows, and a disabled track is skipped by Tab', async ({ page }) => {
     await openLive(page, 'segmented-control--track-states')
-    const track = page.getByRole('radiogroup', { name: 'One disabled' })
+    const track = page.getByRole('radiogroup', { name: 'One disabled', exact: true })
     await page.keyboard.press('Tab')
     await page.keyboard.press('Tab')
     expect(await focusedText(page)).toBe('Live, selected')
