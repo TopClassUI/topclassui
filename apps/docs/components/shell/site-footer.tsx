@@ -48,7 +48,8 @@ export function SiteFooter({ locale, labels }: { locale: Locale; labels: SiteLab
     group,
     links: [
       ...(group === 'more' ? [{ key: 'llms', href: '/llms.txt', text: labels.footer.llms }] : []),
-      ...LIVE_PAGES.filter((page) => page.group === group && page.kind !== 'home').map((page) => ({
+      // The frame lists the CLI last in Get started.
+      ...LIVE_PAGES.filter((page) => page.group === group && page.kind !== 'home').sort((a, b) => Number(a.slug === 'cli') - Number(b.slug === 'cli')).map((page) => ({
         key: page.slug,
         href: hrefOf(page, locale),
         text: page.slug === 'components' ? labels.footer.all(CARDS.length) : page.slug === 'cli' ? labels.footer.cli : page.title[locale],
@@ -74,7 +75,7 @@ export function SiteFooter({ locale, labels }: { locale: Locale; labels: SiteLab
           <p className={BLURB}>{labels.footer.blurb(CARDS.length)}</p>
           <ul className="flex flex-wrap gap-1.5">
             <li className={FACT}>{labels.footer.license}</li>
-            <li className={FACT}><bdi>{labels.footer.version(VERSION, PRERELEASE)}</bdi></li>
+            <li className={FACT}><bdi>{labels.footer.version(VERSION.split('-')[0] ?? VERSION, PRERELEASE)}</bdi></li>
             <li className={FACT}>{labels.footer.wcag}</li>
           </ul>
           <div className={INSTALL_ROW}>

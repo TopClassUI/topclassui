@@ -169,10 +169,11 @@
 
   /* Code with no grammar takes the muted grey, as the highlighted code's own text does. */
   .docs-code > pre {
-    padding-block-start: 0.875rem;
+    padding-block: 0.875rem;
+    padding-inline: 0.875rem;
     color: var(--tc-muted);
     font-size: var(--text-xs);
-    line-height: var(--text-sm--line-height);
+    line-height: 1.58;
   }
 
   /* On the page the colours follow the page, not the opposite theme. */
