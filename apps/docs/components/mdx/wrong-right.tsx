@@ -17,8 +17,8 @@ export interface WrongRightProps {
 // The name sits above each box in its tone, and the box takes that tone as its edge (docs frames, CSS entry and Provider).
 const NAME = 'inline-flex items-center gap-1.5 text-xs font-semibold'
 const NAME_TONE = { wrong: 'text-danger-on-soft', right: 'text-success-on-soft' } as const
-// The panes draw their code at 11 px, so an authored line of a half-column pane keeps its break.
-const EDGE = { wrong: 'docs-bare docs-wrong **:text-[0.6875rem]', right: 'docs-bare docs-right **:text-[0.6875rem]' } as const
+// Side by side the panes draw their code at 11 px, so an authored line keeps its break; stacked on a phone they keep the 12 px floor.
+const EDGE = { wrong: 'docs-bare docs-wrong md:**:text-[0.6875rem]', right: 'docs-bare docs-right md:**:text-[0.6875rem]' } as const
 
 /** Two fences side by side, stacked under 48rem: the first titled Wrong, the second Right; a long line wraps, since each pane is half the column. */
 export function WrongRight({ children, locale, wrong, right, terminal, repeat }: WrongRightProps) {
