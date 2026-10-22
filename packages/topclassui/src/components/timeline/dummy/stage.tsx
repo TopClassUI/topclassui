@@ -6,7 +6,7 @@ const EVENTS = [
   { id: 'deploy', title: 'First deploy', time: 'pending', status: 'todo' },
 ] as const
 
-/** The docs card's stage as the frame draws it: one event done, one current, one still to come. */
+/** The docs card's stage as the frame draws it: one event done, one current, one still to come, the last padded as the others. */
 export default function Demo() {
-  return <Timeline items={EVENTS} getKey={(event) => event.id} />
+  return <Timeline className="pb-4" items={EVENTS} getKey={(event) => event.id} />
 }

@@ -2,8 +2,8 @@ import { Timeline, TimelineSkeleton } from '../index.js'
 
 const key = (event: { id: string }) => event.id
 
-/** The strip's word beside each marker: small, regular and muted, as drawn. */
-const WORD = 'font-mono text-xs font-normal text-muted'
+/** The strip's word beside each marker: 8 px from it, small, regular and muted, as drawn. */
+const WORD = '-ms-1 font-mono text-xs font-normal text-muted'
 
 /** Every state the strip draws, one cell each, captioned by its name: a marker and its word for done, current, todo and
  * error, then loading and empty. */
