@@ -6,7 +6,7 @@ export const fileUpload = {
     ar: 'رفع الملفات',
   },
   description: {
-    en: 'A drop zone that always has a browse button, with the file list as a windowed collection.',
+    en: 'A drop zone that always has a browse button; the file list is a windowed collection.',
     ar: 'منطقة إفلات فيها زر تصفّح دائمًا، وقائمة الملفات فيها مجموعة معروضة على دفعات.',
   },
   demos: ['basic', 'multiple', 'in-field', 'form', 'rtl'],

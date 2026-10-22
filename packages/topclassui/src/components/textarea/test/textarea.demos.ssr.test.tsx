@@ -27,7 +27,7 @@ const TEXTAREAS: Record<string, string[]> = {
   'skeleton': ['Message, xs: 3', 'Message, sm: 3', 'Message, md: 3', 'Message, lg: 3', 'Message, xl: 3', 'One row: 1', 'Full width: 5'],
   'read-only': ['Read-only: 3'],
   'stage': ['Feedback: 3'],
-  'states': ['idle: 2', 'hover: 2', 'focus-visible: 2', 'disabled: 2', 'invalid: 2', 'Message at its limit: 2'],
+  'states': ['idle: 1', 'hover: 1', 'focus-visible: 1', 'disabled: 1', 'invalid: 1', 'Message at its limit: 1'],
 }
 
 const render = async (file: string) => {

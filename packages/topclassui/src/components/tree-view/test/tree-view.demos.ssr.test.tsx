@@ -18,7 +18,7 @@ const TREES: Record<string, string[]> = {
   'basic': ['Files 0: src, app, layout.tsx, page.tsx, components, lib, package.json, README.md'],
   'load-more': ['Repository 0: Folder 1, Folder 2, Folder 3, Folder 4, Folder 5, Folder 6, Folder 7, Folder 8'],
   'long-content': ['Every hostile case 0: Supercalifragilistic, تقرير report 2026 ال, Level 1, Level 2, Level 3, Level 4, Level 5, Level 6'],
-  'playground': ['Files 0: src, app, layout.tsx, page.tsx, components, lib, package.json, README.md'],
+  'playground': ['Files 0: components, button, index.tsx, variants.ts, input'],
   'rtl': ['الملفات 0: المستندات, التقرير السنوي.pdf, الميزانية.xlsx, الصور, ملاحظات.txt'],
   'selected': ['Project 0: app, layout.tsx, page.tsx, docs, next.config.ts'],
   'stage': ['Files 0: components, button, index.tsx, variants.ts, input'],

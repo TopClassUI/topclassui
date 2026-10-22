@@ -10,7 +10,7 @@ export const tabs = {
     ar: 'عروض متعددة لشيء واحد، يظهر منها واحد في كل مرة. كل لوحة تُعرض على الخادم وتبقى في HTML، فيُفهرَس النص المخفي أيضًا.',
   },
   demos: ['basic', 'enclosed', 'sizes', 'disabled', 'server-content', 'controlled', 'many', 'long-label', 'rtl'],
-  stageHeight: 7,
+  stageHeight: 19.4,
   stageDemo: 'stage',
   note: {
     en: '`keepMounted` is true here, where Base UI\'s default is false: inactive panels stay in the server HTML, hidden.',

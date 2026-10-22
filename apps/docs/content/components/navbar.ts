@@ -10,7 +10,7 @@ export const navbar = {
     ar: 'ترويسة مثبّتة روابطها HTML من الخادم، ويكتب جزء صغير واحد في المتصفح ارتفاعها في --tc-sticky-top.',
   },
   demos: ['basic', 'with-search', 'many-links', 'not-sticky', 'tall-page', 'rtl'],
-  stageHeight: 6,
+  stageHeight: 15.6,
   stageDemo: 'stage',
   controlOrder: ['variant', 'sticky'],
   note: {
