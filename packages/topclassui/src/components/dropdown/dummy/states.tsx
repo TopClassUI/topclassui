@@ -15,7 +15,7 @@ import { DropdownItem, DropdownPopup, DropdownRoot, DropdownTrigger } from '../i
 
 // A row of the frame's 58 px: the 76 px menu reaches past it above and below, as drawn.
 const CELL = 'flex h-14.5 w-38 items-center justify-center'
-// The menu's look, written out from the shared classes: a demo the site shows imports public paths only.
+// The menu's look, written out from the shared classes: a demo the site shows imports public paths only. An icon is muted until its row is highlighted.
 const panel = `flex w-34 flex-col gap-0.5 p-1 ${OVERLAY_SURFACE}`
 const row = `${ROW} cursor-default`
 
@@ -33,7 +33,7 @@ function Menu({ title, rows }: { title: string, rows: Row[] }) {
         {rows.map(({ icon, label, highlighted = false, disabled = false }) => (
           <div key={label} data-highlighted={highlighted ? '' : undefined} data-disabled={disabled ? '' : undefined}
             className={cn(row, highlighted && 'bg-primary-soft text-primary-on-soft', disabled && '*:opacity-50')}>
-            {icon}
+            <span className={highlighted ? 'inline-flex shrink-0' : 'inline-flex shrink-0 text-muted'}>{icon}</span>
             <span className="min-w-0 truncate">{label}</span>
           </div>
         ))}
