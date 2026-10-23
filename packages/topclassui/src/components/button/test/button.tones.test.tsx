@@ -90,8 +90,9 @@ describe('the tone mechanism', () => {
 })
 
 describe('the pointer', () => {
-  it('is a hand on every variant, and disabled stops pointer events so it never shows', () => {
+  it('is a hand on every variant, and not-allowed when disabled, which keeps its pointer events so it shows', () => {
     for (const variant of BUTTON_VARIANTS) expect(classes({ variant })).toContain('cursor-pointer')
-    expect(classes({ disabled: true })).toContain('disabled:pointer-events-none')
+    expect(classes({ disabled: true })).toContain('disabled:cursor-not-allowed')
+    expect(classes({ disabled: true })).not.toContain('disabled:pointer-events-none')
   })
 })

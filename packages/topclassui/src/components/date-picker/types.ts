@@ -123,3 +123,4 @@ export type DatePickerActions = Base.Root.Actions
 // Named here because hook.ts writes no type argument.
 export type DatePickerKeyEvent = { key: string, shiftKey: boolean, altKey: boolean, ctrlKey: boolean, metaKey: boolean, preventDefault: () => void }
 export type DatePickerFocusEvent = { currentTarget: HTMLInputElement }
+export type DatePickerPressEvent = { preventDefault: () => void }

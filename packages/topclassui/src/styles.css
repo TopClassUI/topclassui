@@ -6,8 +6,9 @@
 @source not "./**/*.d.ts";
 
 /* The forced attribute lets the docs show every state; hover keeps its media guard. */
+/* A disabled control keeps its pointer events for its not-allowed cursor, so a real hover or press skips it; :where adds no specificity. */
 @custom-variant hover {
-  @media (hover: hover) { &:hover { @slot } }
+  @media (hover: hover) { &:hover:not(:where(:disabled, [aria-disabled="true"], [data-disabled])) { @slot } }
   &[data-hover] { @slot }
 }
 @custom-variant focus-visible {
@@ -15,7 +16,7 @@
   &[data-focus-visible] { @slot }
 }
 @custom-variant active {
-  &:active { @slot }
+  &:active:not(:where(:disabled, [aria-disabled="true"], [data-disabled])) { @slot }
   &[data-active] { @slot }
 }
 

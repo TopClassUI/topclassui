@@ -34,7 +34,8 @@ export const TREE_VIEW_ROW_SELECTED = 'aria-selected:bg-primary-soft aria-select
  * 8 px padding and its scroll padding. On a selected row under forced colours it is set to HighlightText. */
 export const TREE_VIEW_ROW_ACTIVE = 'group-focus-visible/tree:data-highlighted:outline-solid group-focus-visible/tree:data-highlighted:outline-(length:--tc-ring-width) group-focus-visible/tree:data-highlighted:outline-offset-(length:--tc-ring-offset) group-focus-visible/tree:data-highlighted:outline-ring forced-colors:aria-selected:group-focus-visible/tree:data-highlighted:outline-[HighlightText]'
 
-export const TREE_VIEW_ROW_DISABLED = 'aria-disabled:pointer-events-none aria-disabled:opacity-50'
+/** Dimmed, and not-allowed from POINTER; the hook refuses its press and its highlight. */
+export const TREE_VIEW_ROW_DISABLED = 'aria-disabled:opacity-50'
 
 /** The caret, or an empty slot as wide on a leaf. Colour on the wrapper, never on the svg; on a selected row under
  * forced colours it inherits the row's adjust-none, so it is set to HighlightText by hand. */

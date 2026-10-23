@@ -31,7 +31,7 @@ export const TABS_LIST = {
  * not the tab: its ring keeps its full contrast (2.5:1 was measured at half opacity). Base UI
  * writes aria-disabled, so no browser greys it: forced colours take the system's grey instead. */
 export const TABS_TAB_DISABLED = [
-  'data-disabled:pointer-events-none data-disabled:*:opacity-50',
+  'data-disabled:*:opacity-50',
   'forced-colors:data-disabled:*:opacity-100 forced-colors:data-disabled:not-data-active:text-[GrayText]',
 ].join(' ')
 

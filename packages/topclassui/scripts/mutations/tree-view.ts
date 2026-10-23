@@ -277,4 +277,10 @@ export const MUTATIONS: Mutation[] = [
     from: 'group-focus-visible/tree:data-highlighted:outline-offset-(length:--tc-ring-offset)',
     to: 'group-focus-visible/tree:data-highlighted:-outline-offset-(length:--tc-ring-width)',
   },
+  {
+    label: 'the tree view highlights a disabled row a press lands on',
+    file: HOOK,
+    from: 'pressed.current = rows[index]?.node.disabled === true ? -1 : index',
+    to: 'pressed.current = index',
+  },
 ]

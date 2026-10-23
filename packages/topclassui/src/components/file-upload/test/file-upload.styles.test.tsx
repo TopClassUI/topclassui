@@ -39,8 +39,8 @@ describe('the strings say what the plan draws', () => {
     }
   })
 
-  it('the input fills the zone and is unseen', () => {
-    expect(FILE_UPLOAD_INPUT).toBe('absolute inset-0 size-full cursor-pointer opacity-0 disabled:cursor-default')
+  it('the input fills the zone and is unseen, with the hand, and not-allowed when disabled', () => {
+    expect(FILE_UPLOAD_INPUT).toBe('absolute inset-0 size-full opacity-0 cursor-pointer disabled:cursor-not-allowed aria-disabled:cursor-not-allowed data-disabled:cursor-not-allowed data-readonly:cursor-default data-loading:cursor-default')
   })
 
   it('the hidden status line is out of the grid, so a refusal adds no gap', () => {

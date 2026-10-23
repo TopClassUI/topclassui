@@ -149,9 +149,10 @@ describe('a day', () => {
     expect(DATE_PICKER_DAY).not.toMatch(/aria-\[current=date\]:bg-/)
   })
 
-  it('a day outside the range dims to half and takes no press', () => {
+  it('a day outside the range dims to half and shows not-allowed, keeping the pointer events that cursor needs', () => {
     expect(ruleOf(`${selectorOf('aria-disabled:opacity-50')}[aria-disabled="true"]`)).toBe('opacity: 50%;')
-    expect(ruleOf(`${selectorOf('aria-disabled:pointer-events-none')}[aria-disabled="true"]`)).toBe('pointer-events: none;')
+    expect(ruleOf(`${selectorOf('aria-disabled:cursor-not-allowed')}[aria-disabled="true"]`)).toBe('cursor: not-allowed;')
+    expect(DATE_PICKER_DAY).not.toContain('pointer-events')
   })
 })
 
@@ -161,7 +162,7 @@ describe('the three buttons of the header', () => {
   })
 
   it('a month button at the range\'s end dims by aria-disabled, never by disabled, which would drop the focus', () => {
-    expect(DATE_PICKER_NAV.split(' ')).toEqual(expect.arrayContaining(['aria-disabled:opacity-50', 'aria-disabled:pointer-events-none']))
-    expect(DATE_PICKER_NAV.split(' ').filter((cls) => /^disabled:(opacity|pointer-events)/.test(cls))).toEqual([])
+    expect(DATE_PICKER_NAV.split(' ')).toEqual(expect.arrayContaining(['aria-disabled:opacity-50', 'aria-disabled:cursor-not-allowed']))
+    expect(DATE_PICKER_NAV.split(' ').filter((cls) => /^disabled:(opacity|pointer-events)|pointer-events/.test(cls))).toEqual([])
   })
 })

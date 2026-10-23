@@ -5,10 +5,10 @@ import { TABS_LIST, TABS_PANEL, TABS_ROOT, TABS_SIZE, TABS_TAB } from '../classe
 
 /** What each class Tabs writes must emit, written out: a class Tailwind does not know emits nothing at all. */
 const DECLARATION: Record<string, string> = {
-  // POINTER: the hand, and the arrow back on a control that cannot be pressed.
-  'disabled:cursor-default': 'cursor: default;',
-  'aria-disabled:cursor-default': 'cursor: default;',
-  'data-disabled:cursor-default': 'cursor: default;',
+  // POINTER: the hand, not-allowed on a disabled control, and the arrow on read-only and loading.
+  'disabled:cursor-not-allowed': 'cursor: not-allowed;',
+  'aria-disabled:cursor-not-allowed': 'cursor: not-allowed;',
+  'data-disabled:cursor-not-allowed': 'cursor: not-allowed;',
   'data-readonly:cursor-default': 'cursor: default;',
   'data-loading:cursor-default': 'cursor: default;',
   // The root, and the two lists.
@@ -60,7 +60,6 @@ const DECLARATION: Record<string, string> = {
     'transition-property: color,background-color,border-color,outline-color,opacity,translate;',
   'duration-(--tc-duration)': 'transition-duration: var(--tc-duration);',
   'ease-out': 'transition-timing-function: var(--ease-out);',
-  'data-disabled:pointer-events-none': 'pointer-events: none;',
   'data-disabled:*:opacity-50': 'opacity: 50%;',
   'forced-colors:data-disabled:*:opacity-100': 'opacity: 100%;',
   'forced-colors:data-disabled:not-data-active:text-[GrayText]': 'color: GrayText;',
@@ -104,7 +103,7 @@ const SCOPE: Record<string, string> = {
   'data-active:text-body': '[data-active] {',
   'data-active:border-primary-solid': '[data-active] {',
   'data-active:bg-surface-raised': '[data-active] {',
-  'data-disabled:pointer-events-none': '[data-disabled] {',
+  'data-disabled:cursor-not-allowed': '[data-disabled] {',
   'data-disabled:*:opacity-50': '[data-disabled] > *) {',
   'forced-colors:data-disabled:*:opacity-100': '[data-disabled] > *) {',
   'forced-colors:data-disabled:not-data-active:text-[GrayText]': '[data-disabled]:not([data-active]) {',
@@ -142,7 +141,7 @@ describe('every class Tabs writes compiles with the installed Tailwind', () => {
   it('the table names exactly the classes of the root, the lists, the tabs, the panel and the size scale', () => {
     const all = written([TABS_ROOT, ...Object.values(TABS_LIST), ...Object.values(TABS_TAB), TABS_PANEL, ...Object.values(TABS_SIZE).flatMap((sizes) => Object.values(sizes))])
     expect(all).toEqual(Object.keys(DECLARATION).sort())
-    expect(all).toHaveLength(82)
+    expect(all).toHaveLength(81)
   })
 
   for (const [cls, declaration] of Object.entries(DECLARATION)) {

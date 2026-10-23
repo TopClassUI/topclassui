@@ -6,7 +6,7 @@ import { Rating } from '../index.js'
 
 /** How much of each star the HTML draws, from the width class of its clip: 1, 0.5 or 0. */
 function fills(html: string): number[] {
-  return [...html.matchAll(/<span class="relative inline-flex shrink-0 text-line-strong">(.*?)<\/svg>(<span aria-hidden="true" class="[^"]*\b(w-full|w-1\/2)\b)?/g)]
+  return [...html.matchAll(/<span class="pointer-events-none relative inline-flex shrink-0 text-line-strong">(.*?)<\/svg>(<span aria-hidden="true" class="[^"]*\b(w-full|w-1\/2)\b)?/g)]
     .map((match) => (match[3] === 'w-full' ? 1 : match[3] === 'w-1/2' ? 0.5 : 0))
 }
 

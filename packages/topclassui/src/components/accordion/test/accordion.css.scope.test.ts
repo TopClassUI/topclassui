@@ -7,8 +7,8 @@ import { compileEntry } from '#test/stylesheet.js'
 /** The selector each variant class must be scoped to, or it would paint at rest. */
 const SCOPE: Record<string, string> = {
   'first:border-t-0': ':first-child {',
-  'hover:bg-(--tc-soft)': ':hover {',
-  'active:bg-(--tc-soft-hover)': ':active {',
+  'hover:bg-(--tc-soft)': ':hover:not(:where(:disabled, [aria-disabled="true"], [data-disabled])) {',
+  'active:bg-(--tc-soft-hover)': ':active:not(:where(:disabled, [aria-disabled="true"], [data-disabled])) {',
   'focus-visible:outline-solid': ':focus-visible {',
   'focus-visible:-outline-offset-(length:--tc-ring-width)': ':focus-visible {',
   'data-disabled:opacity-50': '[data-disabled] {',

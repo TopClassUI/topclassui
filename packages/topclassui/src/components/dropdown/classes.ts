@@ -27,7 +27,7 @@ export const DROPDOWN_POPUP = [
  * the row: its highlight, which is its focus mark, keeps its full strength. Base UI writes
  * aria-disabled, so no browser greys it: forced colours take the system's grey instead. */
 export const DROPDOWN_ITEM_DISABLED = [
-  'data-disabled:pointer-events-none data-disabled:*:opacity-50',
+  'data-disabled:*:opacity-50',
   'forced-colors:data-disabled:*:opacity-100 forced-colors:data-disabled:not-data-highlighted:text-[GrayText]',
 ].join(' ')
 

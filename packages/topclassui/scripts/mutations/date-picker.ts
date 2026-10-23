@@ -260,4 +260,10 @@ export const MUTATIONS: Mutation[] = [
     from: "  DATE_PICKER_SCROLL_SHORT,\n].join(' ')",
     to: "].join(' ')",
   },
+  {
+    label: 'the date picker lets a press on a disabled day or month button take the focus',
+    file: HOOK,
+    from: 'refuse: (event: DatePickerPressEvent) => { event.preventDefault() },',
+    to: 'refuse: (_event: DatePickerPressEvent) => undefined,',
+  },
 ]

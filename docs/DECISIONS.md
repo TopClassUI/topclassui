@@ -6,6 +6,140 @@ The format is: date, decision, why, and what it affects.
 
 ---
 
+## 2026-10-22 - globals.css leads the head, and /ar preloads its two Noto Sans Arabic faces itself
+
+**Decision.** Two changes to what the first paint waits for, in `apps/docs` only.
+- `app/(site)/[locale]/layout.tsx` imports `globals.css` first, so its `<link>` comes before next/font's on every page, the order the preview layout already had. Both files and their bytes are unchanged.
+- On `/ar` only, the layout adds an inline script after `ThemeScript` (`lib/arabic-preload.ts`). It runs once the stylesheets have loaded and before the first layout, finds the Noto Sans Arabic `@font-face` rules whose `unicode-range` holds an Arabic alef or a Latin a, and adds a `<link rel="preload" as="font">` for each file: the Arabic one (162.7 KB sent) and the Latin one (31.1 KB). `lib/fonts.ts` keeps `preload: false`, since next/font preloads per layout file and one layout serves both locales, so `/en` still never fetches the font. This is the "preloading Noto Sans Arabic on `/ar` only" left for Omar in the 2026-10-18 islands entry. It reads PLAN 14's "primary font instance and subset" per locale: on `/ar` the primary face is Noto Sans Arabic. It replaces the "keeps Noto Sans Arabic unpreloaded" half of the display-optional entry below and the Noto line under "Not changed" in the Tailwind-scan entry; Omar confirms the per-locale reading before merge.
+
+**Why.** Lighthouse's simulated load (Lantern) builds FCP from the HTML, every request the browser marked VeryHigh that ended before the observed first paint, and the first parse, layout and paint tasks. A font found through the CSS is requested at VeryHigh; a preloaded one at High.
+- On `/ar` the two Noto files ended before the observed first paint, because `display: optional` holds text up to 100 ms, so Lantern charged all 194 KB to FCP: its render-blocking item put the savings at 1,250 ms, against 300 on `/en`. A real first paint never waited for those bytes past the 100 ms. Preloaded, the same two files are High and leave the FCP estimate. Re-simulating the two traces as HTTP/2 (what Vercel serves) gives FCP 2,104 against 1,203 ms, so this part should reach PageSpeed.
+- Over HTTP/1.1 (`next start`) the first stylesheet requested reuses the connection the HTML warmed, and the second opens a new one. next/font's 3 KB file came first, so the 27 KB `globals.css` paid two extra round trips: 455 ms in the render-blocking item, against 306 ms for each file now. Over HTTP/2 Lantern sends the requests one after another on one connection, and the order makes no difference: re-simulated as h2, the `/en` traces of both builds end the stylesheets 150 ms after the HTML. This part is a gain on the local measure and for HTTP/1.1 clients, and should not move PageSpeed.
+
+**Measured.** `measure.sh` (Lighthouse 12.8.2, mobile, simulated), the median of 5 interleaved runs each against merged main c577d9de. Two pairs of runs: the stylesheet order alone, then both changes.
+
+| Page | Build | Performance | FCP | SI | LCP | CLS |
+| --- | --- | --- | --- | --- | --- | --- |
+| `/en` | main, first pair | 94 | 1.36 s | 1.36 s | 3.12 s | 0 |
+| `/en` | stylesheet order | 94 | 1.21 s | 1.31 s | 3.12 s | 0 |
+| `/en` | main, second pair | 94 | 1.36 s | 1.36 s | 3.12 s | 0 |
+| `/en` | both changes | 93 | 1.21 s | 1.32 s | 3.13 s | 0 |
+| `/ar` | main, first pair | 79 | 2.41 s | 3.02 s | 4.81 s | 0 |
+| `/ar` | stylesheet order | 78 | 2.42 s | 3.07 s | 4.22 s | 0 |
+| `/ar` | main, second pair | 79 | 2.41 s | 2.99 s | 4.81 s | 0 |
+| `/ar` | both changes | 82 | 1.21 s | 2.69 s | 4.21 s | 0 |
+| `/en/docs/components` | main, second pair | 82 | 2.41 s | 2.41 s | 4.06 s | 0 |
+| `/en/docs/components` | both changes | 84 | 2.26 s | 2.26 s | 3.99 s | 0 |
+
+FCP moved the same way in every run: `/en` 1,357 to 1,361 ms on main, 1,207 to 1,213 on the branch; `/ar` 2,409 to 2,416 on main, 1,208 to 1,212 on the branch but for one run at 1,450. On `/ar` the stylesheet order alone does nothing, because the Noto files waited for next/font's stylesheet, which now ends later; with the preload it gains there too. SI and LCP swing with the observed first paint (below).
+
+**What changes on screen.** Nothing once the font is cached: screenshots at 412 and 1280 px of `/en`, `/ar` and `/ar/docs/components/button` match main pixel for pixel, but for a few header pixels (the search button on a phone, the lower edge of the mode switch at 1280 px) that also differ between two loads of main. On a first visit with an empty cache, `/ar` now shows Noto Sans Arabic where main often showed the fallback stack: main requests the font only at the first layout and can miss `optional`'s block period, and then the whole first view stays in Arial and the system Arabic face. In review a cold load of `/ar` drew its h1 in Noto on both builds, but `/ar` reached from `/en`'s language link drew it in Arial on main and in Noto on the branch. On a slow connection the first view still shows the fallback, as before.
+
+**In review.** Two more interleaved pairs of 5 runs each, the second on `/en` and `/ar` only. `/ar`: FCP 2.42 to 1.21 s and 2.41 to 1.21 s, SI 3.13 to 2.78 s and 2.42 to 1.53 s, LCP 4.67 to 4.21 s and 4.22 to 4.21 s, performance 80 to 83 and 82 to 86. The catalog: FCP 2.41 to 2.26 s, LCP 4.06 to 3.99 s, performance 83 to 85. `/en`: FCP 1.40 to 1.39 s while the machine was loaded (TBT 25 to 728 ms between runs of main), then 1.46 to 1.22 s, SI 2.92 to 2.04 s, LCP 3.43 to 3.36 s, performance 81 to 90. CLS 0 throughout. Lantern on two saved traces per side reproduces Lighthouse's FCP to the millisecond; with every response relabelled h2 it gives `/ar` 2,106 and 2,104 ms on main against 1,087 and 1,117 on the branch, and `/en` 1,068 and 1,205 against 1,207 and 1,205: the `/ar` gain carries to HTTP/2, the `/en` one does not. Full-page screenshots of `/en`, `/ar`, the catalog and Button at 1440 px dark and 390 px light, fonts warm, match main pixel for pixel. Ctrl K, the mode switch, the language link and Button's copy button behave as on main, with no console error. The script runs in 2 to 14 ms at 4x CPU.
+
+**Not kept.**
+- Geist Mono without its preload: requested from the CSS it is VeryHigh and ends before the first paint, so Lantern charges it to FCP: `/en` 1.52 s against 1.21 s with the preload, `/ar` 1.52 against 1.21, the catalog 2.56 against 2.26 with CLS 0.002. The preload stays (db7313a7, for the header's Ctrl K).
+- Fewer or ranged weights: Google sends the same variable file for `wght@400..600` as for `400;500;600` (Inter 48,256 bytes, Geist Mono 23,128, Noto Sans Arabic 165,960 and 31,416), so no weight change saves a byte.
+- `fetchPriority` on the font preloads: next/font has no option for it, and a font preloaded at High already sits outside Lantern's FCP estimate; a lower priority only lets it land after the first paint.
+- Home's first frame lays out twice as its `content-visibility: auto` sections near the screen unlock (384 then 423 objects, 11 ms of style and 38 ms of layout locally). Without `content-visibility` it is one pass of 1,551 objects, 17 ms and 47 ms, so the skipping already pays; the reveal timeline adds two passes of under 1 ms.
+
+**Measuring on this laptop.** `measure.sh` as given writes Lighthouse's JSON to `/tmp/...` (Git Bash's name for `%TEMP%`), which Node on Windows reads as `C:\tmp`, so every run failed and it printed "no runs"; these numbers come from a copy whose only change is the folder path written as `C:/Users/...`. In many of this afternoon's loads the renderer got about one frame a second for the first two seconds (traced: BeginFrame at 1 Hz, then 240 Hz), so a page whose first frame is not contentful (Arabic text held by `optional`) shows its first paint at about 1.25 s: `/ar` did on both sides in most runs, and `/en` on main in some. That inflates the observed first paint, SI and LCP on both sides alike; FCP is computed from the request graph and stays steady.
+
+**Affects.** `apps/docs/app/(site)/[locale]/layout.tsx`, `apps/docs/lib/arabic-preload.ts` and its test, and the comment in `lib/fonts.ts`. Every `/ar` page's HTML grows by about 2.4 KB raw (the script, once in the head and once in the RSC payload).
+
+---
+## 2026-10-22 - Home's HTML can lose 156 KB of repeats, but Lantern's first paint does not move, so it stays as it is
+
+**Decision.** Two `apps/docs` changes were built, checked and measured against main (c577d9de) and are not kept, because neither moved FCP or Speed Index on `/en` or `/ar`:
+
+- **The shell once a payload.** Next 16.3.8 writes `[locale]/not-found.tsx` into every page's RSC payload as the root layout's `notFound` boundary (`create-component-tree.js`), so each page sent a second navbar, phone menu and footer (72 KB raw on Home). Making the footer, the brand, the links, the search button, the settings and each phone-menu group with React's `cache()` lets Flight write the second copy as references (`writtenObjects` in `renderModelDestructive`); 17 KB was left. The rail must keep its own groups: `SidebarGroup`'s `useId` label would repeat in the rail and the open drawer.
+- **One class for what Home repeats.** `.docs-chip`, `.docs-kind`, `.docs-quiet-link` and `.docs-icon-link` in `globals.css`, each an `@apply` of the same utilities from `topclassui/classes`, in place of the 670-character list on each of the 46 chips and the 521-character one on each of the 21 footer links, written once in the markup and again in the payload.
+
+**What they cut.** Home `/en`: 680,374 to 524,635 bytes raw, 63,287 to 54,526 gzip; `/ar` 689,352 to 532,940 raw, 67,679 to 57,949 gzip; every page lost 4 to 8 KB gzip from the shell (`/en/docs/css` 39,103 to 34,470). By section on `/en` (markup plus payload, raw): the not-found copy -54.9 KB, the catalog chips -67.0 KB, the footer -25.1 KB, the navbar and phone menu -5.0 KB. The site CSS grows 4.4 KB raw, 531 bytes gzip. The decoded not-found and page trees were identical to main's, the markup identical but for `useId` numbers, and every computed style of the re-classed links identical at rest, hovered, focused and under a coarse pointer.
+
+**Measured.** `measure.sh`, median of 5 interleaved runs, both changes against main:
+
+```
+/en                          base: perf 94 FCP 1.36s LCP 3.12s SI 1.36s TBT 33 CLS 0.000 | JS 295KB CSS 30KB font 71KB doc 62KB
+/en                          cand: perf 93 FCP 1.36s LCP 3.14s SI 1.94s TBT 40 CLS 0.000 | JS 295KB CSS 30KB font 71KB doc 54KB
+/ar                          base: perf 83 FCP 2.41s LCP 4.21s SI 2.41s TBT 56 CLS 0.000 | JS 295KB CSS 30KB font 265KB doc 67KB
+/ar                          cand: perf 83 FCP 2.41s LCP 4.21s SI 2.41s TBT 45 CLS 0.000 | JS 295KB CSS 30KB font 265KB doc 57KB
+```
+
+On every quiet run Speed Index equals FCP in both builds, 1.36 s on `/en` and 2.41 s on `/ar`; the `/en` 1.94 s is three candidate runs slowed by other builds on the laptop (observed Speed Index 0.7 to 2.2 s against 0.25 s). A review rebuilt both changes and measured them twice more, with an A/A run of the unchanged branch for scale. Where the load left a run alone, FCP was the same on both sides: 1.36 s on `/en`, 2.42 to 2.44 s on `/ar`; the second run's `/en` candidate median of 1.63 s is five loaded runs (observed FCP 0.9 to 2.4 s). The Speed Index medians swung both ways with the laptop's load: `/en` 1.75 to 1.66 s, then 2.35 to 4.37 s; `/ar` 3.42 to 3.18 s, then 3.28 to 2.47 s. The A/A run alone gave `/en` 1.56 against 2.84 s.
+
+**Why the paint does not move.** Lantern downloads the document alone, then the CSS, in TCP round trips of 150 ms that carry 14.6 KB, then 29.2 KB, then 30.7 KB at 1.6 Mbps. A document of 43.8 to 74.5 KB takes two round trips after its first byte, whatever its size inside that range, and Speed Index is never below FCP. The saved runs show the step: `/en/docs/installation` (38 KB) paints at 1.21 s, Home and the Button page (58 to 64 KB) at 1.36 s. Home would need about 11 KB gzip more: making every class string over 60 characters short, nearly all of them the library's, reaches 43.4 KB. On Vercel, which sends brotli, Home `/en` is 44.9 KB today and these changes would bring it to about 42.8 KB, just under the line with its headers; that was not measured.
+
+**Not done.** A `<use>` sprite for the repeated icons: the copies after the first of each repeated SVG on Home are 17 KB raw and 0.7 KB gzip, most of them inside library parts, and the 2026-09-21 entry keeps `<Icon>`. An `@apply` on a selector list (`.docs-chip, .docs-quiet-link, …`) is wrong: the minified CSS kept `outline-style: solid` only for `[data-focus-visible]`, so a focused link lost its ring.
+
+**Affects.** Nothing ships. The not-found page still renders through `SitePage` as docs-site page 20 asks; a client `notFound()` hangs the main thread on main as on the branch, a path the site never takes.
+## 2026-10-22 - A disabled control shows the not-allowed cursor, and still does nothing
+
+**Decision.** Omar's review: a disabled control had no cursor that says it cannot be pressed. `DISABLED` loses `pointer-events: none` and gains `NOT_ALLOWED` (`cursor-not-allowed` under `disabled:`, `aria-disabled:` and `data-disabled:`, new in `shared/classes.ts`); `POINTER` is the hand, then `NOT_ALLOWED`, then the arrow on `data-readonly:` and `data-loading:`. Rating's star, drawn over its radio, takes no pointer events, so the radio's own cursor is the one shown and a press still reaches the radio. The `pointer-events-none` of a disabled Accordion trigger, Tabs tab, Dropdown row, TreeView row, DatePicker day and month button are gone; FileUpload's input and Rating's radio wear `POINTER`; NumberField's input takes `NOT_ALLOWED` alone, since its box already dims it.
+
+A control that keeps its pointer events must still ignore them, so:
+
+- **Hover and press.** The `hover` and `active` variants in `styles.css` skip a disabled element: `&:hover:not(:where(:disabled, [aria-disabled="true"], [data-disabled]))`, inside the hover media query, and the same for `:active`. `:where` adds no specificity, and an overridden variant keeps Tailwind's order, so every state class still wins over a hover as before. The forced `[data-hover]` and `[data-active]` the docs draw a state with are left as they were. This is the guard the 2026-10-06 entry said a progress cursor would need, put in the variant once instead of in every component.
+- **Clicks and keys.** A native disabled control fires no click. Base UI 1.8.0's `useButton` (`internals/use-button/useButton.mjs`) refuses a click, a mousedown, a pointerdown (its default prevented, so no focus either), a keydown and a keyup while disabled, which covers every Base UI trigger, tab, row and toggle. Our own code refuses the rest: a press on a disabled TreeView row highlights nothing, as a press off a row (`hook.ts`), and a disabled DatePicker day or month button prevents its pointerdown (`refuse`), so a click moves no focus, as Base UI's own do.
+- **Highlight.** Base UI moves the highlight of a list, and in a menu or a Select the focus, to the row under a moving pointer, a disabled row too. Dropdown, Select and Combobox rows pass `skipDisabledHighlight` (`shared/row-highlight.ts`), which calls Base UI's documented `preventBaseUIHandler` on a disabled row's mouse move. One difference from before: the highlight now stays on the last live row under the pointer, where a disabled row with no pointer events let it clear.
+
+**Kept as it was.** Loading keeps `data-loading:pointer-events-none` and so the arrow of what is under it; no progress cursor ships (2026-10-06). Read-only keeps the arrow, and NumberField's read-only steppers their `data-readonly:pointer-events-none`. Two cases keep a pointer block because nothing else can stop the press: a disabled or loading Button whose `render` is not a `<button>` (an `<a>` whose `href` went, or `next/link`, which keeps its `href`, 2026-10-06): it has no disabled attribute, and a server component has no handler to refuse a click, a caller's `onClick` in a client tree, or the focus its `tabindex="-1"` takes from a click, so it takes `UNPRESSABLE` (`pointer-events-none`) and shows its parent's cursor; and a Slider inside a disabled fieldset, which Base UI does not know of, whose control stops presses (`SLIDER_CONTROL_OFF`) while the root around it shows not-allowed.
+
+**Why.** Pointer events are what a cursor needs: an element that takes none shows the cursor of whatever is under it, so no class could paint not-allowed on it.
+
+**What it affects.** R-5.2-4 (the cursor and the hover guard come from `shared/classes.ts` and `styles.css`); this replaces the arrow on a disabled control of the 2026-10-19 POINTER entry. A consumer's own `hover:` and `active:`, compiled with `topclassui/styles.css`, skip a disabled element too. A class string no longer stops a press: `buttonVariants()`, `tagVariants({ interactive: true })` or `paginationVariants()` on the caller's own disabled `<a href>` must drop the `href`, as the demos do. Proved by `e2e/cursor.spec.ts` (the hand on every live control and not-allowed on every disabled one, read where the pointer meets it, on every harness page and in the open Select, Combobox, Dropdown, Command and DatePicker; and on the hydrated pages, every disabled control hovered, pressed, clicked, tapped and keyed with nothing changing, no focus landing on it and no click fired by a native one), `src/shared/classes.pointer.css.test.ts`, `src/shared/row-highlight.test.ts`, the Dropdown, Select, Combobox, TreeView and DatePicker DOM tests, `button.states.test.tsx` for the pointer block of a Button that is not a button, and the "shared pointer" and component rows of `pnpm test:mutation`.
+## 2026-10-22 - The catalog froze in a render React retried without end; islands now keep one part per loader and take over one at a time
+
+**Decision.** `apps/docs/components/lazy-island.tsx`, with its bookkeeping in the new `apps/docs/lib/islands.ts`:
+
+- An island that mounts with no server HTML (inside another island's fresh render, or after a client navigation) renders one `lazy()` part per loader, kept for the page's life (`clientPartOf`), instead of a `lazy()` made in its own `useState`.
+- Whether an island has server HTML is read from one index of every `[data-island]` box, built once the page has parsed (`createServerBoxes`), instead of a `document.querySelector` over the whole page per island per render.
+- The near islands share one IntersectionObserver and leave it once they open; before, each kept its own for the page's life.
+- Islands take over one at a time (`createTurns`): the next fresh render starts once the last one has committed and its frame has painted, or after 5 s, React's expiry for a transition. An input on an island, and a part on screen from the start, go first; then the islands that came near last, nearest the screen first.
+
+**What froze.** Not a layout loop: no ResizeObserver or IntersectionObserver callback triggers itself, the Navbar's scroll handler and first report, the TOC spy and the motion watcher each cost under 1% of the main thread while scrolling, and the state strips are ordinary islands. It is a React render loop that starts only when the machine is slow. An island takes over in a transition, and React renders a transition without yielding once it has waited 5 s (`computeExpirationTime`, react-dom 19.3). A render that suspends then is thrown away, and every part in it mounts again. Each nested island made its `lazy()` in a `useState` initializer, so each new attempt met a new lazy that had not loaded, suspended again, and committed nothing. Every attempt rendered again the islands pending in it, and each of them searched the 11,600 elements of the page for its box. On a quiet machine at 4x no transition expires and the loop never starts. On a busy one it does, and keeps going after the reader stops: here in the live run at 1440 and two local runs of main, all taken while other work ran on the laptop, and in every run of main at 8x.
+
+**How it was measured.** Playwright Chromium (1.63, headless), 1440 x 900 and 390 x 844, CDP CPU throttling, the page settled, then wheel steps of 300 px every 80 ms from top to bottom and 5 s still. A longtask observer, a long-animation-frame observer and a CDP CPU profile (250 us, source-mapped). The live site was measured first, then a local `next start` of main (c577d9de) against this branch, interleaved, under the shared measurement lock. TBT is the sum over tasks of their time past 50 ms while scrolling. "Sync" is the time React spent in `renderRootSync`.
+
+| Run | Longest task | TBT while scrolling | Sync render, scrolling / 5 s after | Main thread busy, 5 s after | Islands live of 241 |
+| --- | --- | --- | --- | --- | --- |
+| topclassui.com, 1440, 4x, laptop busy | 299 ms | 3,069 ms | 21.1 s / 3.9 s | 99% | 45 |
+| topclassui.com, 390, 4x | 544 ms | 2,675 ms | 2.5 s / 0 | 18% | 239 |
+| main, 1440, 8x (3 runs) | 373 / 635 / 1,112 ms | 22.1 / 69.2 / 17.3 s | 31.1 / 66.2 / 19.7 s, then 4.2 / 4.6 / 3.1 s | 99-100% | 45 / 1 / 18 |
+| branch, 1440, 8x (3 runs) | 1,678 / 715 / 1,982 ms | 18.0 / 25.5 / 16.8 s | 3.4 / 0.6 / 3.9 s, then 0.3 / 0.1 / 0.3 s | 99% (islands catching up) | 162 / 75 / 215 |
+| main, 1440, 4x (3 runs) | 413 / 312 / 328 ms | 3,210 / 2,562 / 3,570 ms | 2.2 / 2.1 / 1.8 s, then 0 | 20-36% | 241 |
+| branch, 1440, 4x (3 runs) | 301 / 279 / 266 ms | 2,939 / 3,425 / 3,514 ms | 2.2 / 2.3 / 2.4 s, then 0 | 20-37% | 241 |
+| main, 390, 4x (3 runs) | 164 / 333 / 303 ms | 629 / 2,923 / 1,054 ms | 1.7 / 2.2 / 1.9 s, then 0 | 19-33% | 239 |
+| branch, 390, 4x (3 runs) | 294 / 318 / 235 ms | 2,427 / 2,947 / 1,109 ms | 2.3 / 2.1 / 1.6 s, then 0 | 12-29% | 239 |
+
+Run again later that evening, the same script, interleaved, under the lock, while another worktree ran its e2e on the laptop:
+
+| Run | Longest task while scrolling | TBT while scrolling | Tasks over 200 ms | Islands live of 241 | Box lookups |
+| --- | --- | --- | --- | --- | --- |
+| main, 1440, 4x (2 runs) | 265 / 185 ms | 4,740 / 1,278 ms | 3 / 0 | 202 / 241 | 386 (801 ms) / 263 (190 ms) |
+| branch, 1440, 4x (2 runs) | 329 / 247 ms | 3,537 / 1,891 ms | 1 / 1 | 241 / 241 | 3 (11 ms) / 3 (7 ms) |
+| main, 390, 4x (2 runs) | 266 / 167 ms | 1,704 / 597 ms | 1 / 0 | 239 / 239 | 263 / 263 |
+| branch, 390, 4x (2 runs) | 279 / 231 ms | 1,605 / 464 ms | 1 / 1 | 239 / 239 | 3 / 3 |
+| main, 1440, 8x | 327 ms | 12,185 ms | 8 | 45 | 761 (2,486 ms) |
+| branch, 1440, 8x | 1,210 ms | 14,928 ms | 19 | 226 | 3 (20 ms) |
+| topclassui.com, 1440, 4x | 204 ms | 1,445 ms | 2 | 241 | 283 (223 ms) |
+| topclassui.com, 1440, 8x | 376 ms | 30,392 ms | 35 | 38 | 643 (1,983 ms) |
+
+The first main run at 1440 started the loop at 4x (202 islands live at the end, 1 s of TBT in the 5 s after the scroll); no branch run did. The one task over 200 ms in each branch run at 4x is the Drawer card taking over (below: 231-329 ms, 164-264 ms of it forced style and layout); the branch's 1,210 ms task at 8x is the Drawer's layout effects again (419 ms, the popup's and the one that reads the root's `offsetHeight` and font size) with floating-ui's scroll and resize handlers in the same frame.
+
+Watched for 30 s after the scroll at 8x, main stayed 100% busy, 19.2 s of it rendering without yielding, with 67 islands live, and its box lookups ran 2,055 times for 7.8 s; the branch fell to 49% busy (the last islands taking over), 0.1 s of it sync, with all 241 live. At 4x on a machine where the loop does not start, the longest task and TBT stay within run-to-run noise. What changes there is that a commit holds at most 2 islands instead of 4 to 17, and the box lookups drop from about 265 (130-260 ms) to 3 (6-11 ms). At 8x the branch's longest task is the Drawer card taking over, which main, stuck in its loop, never reaches. The 2 s of sync render left at 4x, on both sides, is not the loop: React does not time-slice default-priority updates (an island's own observers and effects, such as Try it's near-viewport switch) or Base UI's `flushSync` calls.
+
+**Left, with reasons.** Every task over 200 ms on the branch, by function:
+
+- The browser's own style, layout and paint as deferred cards come on screen: 150-330 ms tasks at 4x, about half the main thread while scrolling at 1440. That is the catalog's weight (choice 18).
+- Base UI 1.8.0 `DrawerPopup` (`drawer/popup/DrawerPopup.mjs:177`) measures in a layout effect when the Drawer card takes over (`CSS.registerProperty` for its swipe variables, then an `offsetHeight` read): 184-415 ms at 4x, 554-861 ms at 8x, most of it forced style and layout.
+- The library's `useScrollTabStop` (`src/shared/use-scroll-tab-stop.ts`) measures in its effect, which forces the layout of the card just inserted: 15-61 ms at 4x, 107-398 ms at 8x. Moving that read to the ResizeObserver's first report, as the Navbar did, is a library change for its own pull request.
+- floating-ui's scroll listeners for the overlays drawn open in their stages (Popover, Tooltip and the rest) recompute on every scroll of the page: 5-8% of the main thread while scrolling at 1440, up to 221 ms for one scroll event. Base UI's `disableAnchorTracking` on the stage Positioners would stop it; that changes the library's stage demos.
+- Base UI's `CompositeList` (`scrollIntoViewIfNeeded`, 3-4%), and Turbopack's chunk loader, which runs `querySelectorAll` over the page for every chunk it loads (3%), are inside the dependencies.
+- Found on the way, not a long task: a wheel over the TreeView card does not scroll the page. `SCROLL_AREA` gives the tree `overflow-y: auto` and `overscroll-behavior: contain`, and Chrome keeps the wheel in a contained scroller even when it does not overflow (checked on a bare page). That is a library change too.
+
+**Affects.** `apps/docs` only. Every island keeps the same markup, server HTML, held inputs and replay; no page shows or does anything else. An island near the screen takes over a frame or so after the one before it instead of in the same commit, so a section that scrolls in turns live over a few frames. `lib/islands.test.ts` covers the box index, the shared part (one load per loader, a failed chunk loaded again) and the turns (one at a time, after a paint, by rank, past the limit). `e2e/forms-pages.spec.ts` "every live example on a Forms page is hydrated by React" now waits until every example in the section has mounted, and for a frame after each scroll step, before it scrolls past them: an island watches the viewport only from its mount and sees a place only in a frame, so a scroll during a slow first frame (1.6-1.7 s on a cold browser) passed islands unseen. It failed that way on this branch, and on main too when main was the cold run (43 controls left cold).
+
 ## 2026-10-22 - Only main creates a Vercel deployment
 
 **Decision.** `apps/docs/vercel.json` sets `git.deploymentEnabled` to `{ "**": false, "main": true }`: a push to any branch but `main` creates no deployment.

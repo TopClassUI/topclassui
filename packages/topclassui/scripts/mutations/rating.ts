@@ -35,7 +35,7 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'rating: the radio is sr-only, a 1 px target',
     file: 'src/components/rating/classes.ts',
-    from: "'absolute inset-0 size-full cursor-pointer appearance-none opacity-0'",
+    from: '`absolute inset-0 size-full appearance-none opacity-0 ${POINTER}`',
     to: "'sr-only'",
   },
   {
@@ -115,5 +115,17 @@ export const MUTATIONS: Mutation[] = [
     file: 'src/components/rating/lib.ts',
     from: 'names: stepsOf(max).map((step) => labels.rating.stars(step, fmt)),',
     to: 'names: stepsOf(rawMax).map((step) => labels.rating.stars(step, fmt)),',
+  },
+  {
+    label: "rating: the star takes the pointer, so a disabled step shows the arrow over it instead of the radio's not-allowed",
+    file: 'src/components/rating/classes.ts',
+    from: "RATING_STAR = 'pointer-events-none relative",
+    to: "RATING_STAR = 'relative",
+  },
+  {
+    label: 'rating: the radio keeps the hand when disabled',
+    file: 'src/components/rating/classes.ts',
+    from: 'opacity-0 ${POINTER}`',
+    to: 'opacity-0 cursor-pointer`',
   },
 ]

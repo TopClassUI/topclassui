@@ -98,8 +98,8 @@ export const MUTATIONS: Mutation[] = [
   {
     label: 'a disabled tabs tab is dimmed whole, so the ring it shows when the arrow keys land on it drops to 2.5:1',
     file: CLASSES,
-    from: "'data-disabled:pointer-events-none data-disabled:*:opacity-50'",
-    to: "'data-disabled:pointer-events-none data-disabled:opacity-50'",
+    from: "'data-disabled:*:opacity-50',",
+    to: "'data-disabled:opacity-50',",
   },
   {
     label: 'a disabled tabs tab is not greyed under forced colours, so it reads as one that can be opened',

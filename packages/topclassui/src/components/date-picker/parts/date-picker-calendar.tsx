@@ -35,6 +35,7 @@ export function DatePickerCalendar(props: DatePickerCalendarProps) {
             aria-label={calendar.labels.previous}
             aria-disabled={calendar.previous.disabled ? true : undefined}
             onClick={calendar.previous.onClick}
+            onPointerDown={calendar.previous.disabled ? calendar.refuse : undefined}
             className={DATE_PICKER_NAV}
           >
             <Svg icon={caretLeft} size="0.875rem" />
@@ -45,6 +46,7 @@ export function DatePickerCalendar(props: DatePickerCalendarProps) {
             aria-label={calendar.labels.next}
             aria-disabled={calendar.next.disabled ? true : undefined}
             onClick={calendar.next.onClick}
+            onPointerDown={calendar.next.disabled ? calendar.refuse : undefined}
             className={DATE_PICKER_NAV}
           >
             <Svg icon={caretRight} size="0.875rem" />
@@ -76,6 +78,7 @@ export function DatePickerCalendar(props: DatePickerCalendarProps) {
                           aria-disabled={day.disabled ? true : undefined}
                           data-selected={day.selected ? '' : undefined}
                           onClick={() => { calendar.pick(day.iso ?? '') }}
+                          onPointerDown={day.disabled ? calendar.refuse : undefined}
                           className={DATE_PICKER_DAY}
                         >
                           {day.text}
