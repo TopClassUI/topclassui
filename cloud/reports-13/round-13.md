@@ -178,3 +178,8 @@ The laptop reruns `pnpm check` and `docs:check`.
 
 - **Form actions**: `form/dummy/basic.tsx` and `rtl.tsx` post to `/subscribe`, `form/dummy/server-errors.tsx` posts to `/contact`, and `navbar/dummy/with-search.tsx` sends its search form to `/search`. These are form actions, not hrefs, so no crawler follows them and the guard does not cover them, but submitting one on the site lands on a 404. I left them as they are because the job is about hrefs. Changing them to `#` is a one-line follow-up if Omar wants it.
 - **Navbar brand on `/ar` pages**: the demos' `NavbarBrand href="/"` resolves through the redirect to `/en`, which is not a 404.
+
+
+## Lead verification (2026-10-26 19:50 UTC)
+
+fix/demo-links fac18652 verified: base main 9b20ab8f is its ancestor; three commits, each authored and committed by OmarAbed16 <OmarFathiAbed@gmail.com>, one line, no body, no trailer, no Claude or AI mention; every file within the job scope (13 component dummy and test folders, five library e2e specs, apps/docs/scripts, .changeset/pre/demo-links.md), no package.json or lockfile change, no new dependency. The report above is the job own account; the laptop reruns pnpm check and docs:check on Windows and opens the PR. Open for Omar: the form demos post to /subscribe, /contact and /search (form actions, not hrefs), a one-line change to "#" if wanted.
