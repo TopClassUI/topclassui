@@ -31,9 +31,8 @@ for (const direction of DIRECTIONS) {
         await page.keyboard.press(key)
         expect(await focused(page), key).toBe('Docs')
       }
-      const request = page.waitForRequest((sent) => new URL(sent.url()).pathname === '/docs')
       await page.keyboard.press('Enter')
-      await request
+      await expect(page).toHaveURL(/#docs$/)
     })
   })
 }

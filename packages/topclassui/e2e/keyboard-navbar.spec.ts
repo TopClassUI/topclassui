@@ -37,9 +37,8 @@ for (const direction of DIRECTIONS) {
       await pressTo(page, 'Tab', 'Docs')
       expect(await page.evaluate(() => document.activeElement?.getAttribute('aria-current'))).toBe('page')
       await pressTo(page, 'Tab', 'Components')
-      const request = page.waitForRequest((sent) => new URL(sent.url()).pathname === '/components')
       await page.keyboard.press('Enter')
-      await request
+      await expect(page).toHaveURL(/#components$/)
     })
 
     test('with a search field: Tab reaches it after the links, and the avatar is no stop', async ({ page }) => {
