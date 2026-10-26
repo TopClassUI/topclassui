@@ -22,7 +22,7 @@ const columns: TableColumn<Order>[] = [
     rowHeader: true,
     sortHref: '?sort=number&dir=asc',
     cell: (order) => (
-      <Button size="sm" variant="link" render={<a href={`/orders/${String(order.number)}`} />}>
+      <Button size="sm" variant="link" render={<a href={`#order-${String(order.number)}`} />}>
         {`#${String(order.number)}`}
       </Button>
     ),

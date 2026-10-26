@@ -7,13 +7,13 @@ export default function Demo() {
       <Breadcrumb
         items={[
           { href: '/', label: 'Home' },
-          { href: '/docs', label: 'Documentation' },
-          { href: '/docs/components', label: 'Components' },
-          { href: '/docs/components/navigation', label: 'Navigation and disclosure' },
-          { href: '/docs/components/navigation/breadcrumb', label: 'Breadcrumb' },
-          { href: '/docs/components/navigation/breadcrumb/examples', label: 'Examples' },
-          { href: '/docs/components/navigation/breadcrumb/examples/server', label: 'Server rendering' },
-          { href: '/docs/components/navigation/breadcrumb/examples/server/json-ld', label: 'Structured data' },
+          { href: '#docs', label: 'Documentation' },
+          { href: '#components', label: 'Components' },
+          { href: '#navigation', label: 'Navigation and disclosure' },
+          { href: '#breadcrumb', label: 'Breadcrumb' },
+          { href: '#examples', label: 'Examples' },
+          { href: '#server', label: 'Server rendering' },
+          { href: '#json-ld', label: 'Structured data' },
           { label: 'Escaping a label' },
         ]}
       />

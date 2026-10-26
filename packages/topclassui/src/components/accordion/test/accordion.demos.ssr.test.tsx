@@ -109,6 +109,6 @@ describe('what each demo shows', () => {
     expect(html.match(/<h3 /g)).toHaveLength(2)
     // The one link of the demo is a Button, as the target-size spec needs.
     expect(html.match(/<a [^>]*>/g)).toHaveLength(1)
-    expect(html).toMatch(/<a [^>]*href="\/orders"[^>]*data-variant="outline"/)
+    expect(html).toMatch(/<a [^>]*href="#"[^>]*data-variant="outline"/)
   })
 })

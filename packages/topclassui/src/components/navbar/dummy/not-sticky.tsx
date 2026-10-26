@@ -7,9 +7,9 @@ export default function Demo() {
     <NavbarRoot sticky={false}>
       <NavbarBrand href="/">TopClass UI</NavbarBrand>
       <NavbarLinks>
-        <NavbarLink href="/docs">Docs</NavbarLink>
-        <NavbarLink href="/blog" current>Blog</NavbarLink>
-        <NavbarLink href="/changelog">Changelog</NavbarLink>
+        <NavbarLink href="#docs">Docs</NavbarLink>
+        <NavbarLink href="#blog" current>Blog</NavbarLink>
+        <NavbarLink href="#changelog">Changelog</NavbarLink>
       </NavbarLinks>
     </NavbarRoot>
   )

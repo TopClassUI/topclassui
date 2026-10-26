@@ -12,7 +12,7 @@ export default function Demo({ dismissible = true, ...props }: Omit<BannerDesign
       className="max-w-115"
       aria-label="Version 0.2 announcement"
       action={
-        <Button size="sm" variant="link" className="-me-1.25 px-0 font-semibold text-current" render={<a href="/changelog" />}>
+        <Button size="sm" variant="link" className="-me-1.25 px-0 font-semibold text-current" render={<a href="#" />}>
           Read more
         </Button>
       }

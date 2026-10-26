@@ -9,7 +9,7 @@ export default function Demo() {
         labels={ar}
         items={[
           { href: '/', label: 'الرئيسية' },
-          { href: '/docs', label: 'التوثيق' },
+          { href: '#docs', label: 'التوثيق' },
           { label: 'مسار التنقل' },
         ]}
       />

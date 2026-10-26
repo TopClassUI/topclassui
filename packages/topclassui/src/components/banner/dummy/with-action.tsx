@@ -11,7 +11,7 @@ export default function Demo() {
         tone="warning"
         aria-label="Trial notice"
         icon={<Svg icon={warning} size="xs" />}
-        action={<Button size="sm" tone="warning" render={<a href="/billing" />}>Add a payment method</Button>}
+        action={<Button size="sm" tone="warning" render={<a href="#" />}>Add a payment method</Button>}
       >
         Your trial ends in three days.
       </Banner>
@@ -24,7 +24,7 @@ export default function Demo() {
       </Banner>
       <Banner
         aria-labelledby="banner-plan-message"
-        action={<Button size="sm" variant="outline" render={<a href="/plans" />}>Compare plans</Button>}
+        action={<Button size="sm" variant="outline" render={<a href="#" />}>Compare plans</Button>}
       >
         <span id="banner-plan-message">A new plan is available.</span>
       </Banner>

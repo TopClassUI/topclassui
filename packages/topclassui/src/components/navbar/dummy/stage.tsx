@@ -15,9 +15,9 @@ export default function Demo() {
         TopClass
       </NavbarBrand>
       <NavbarLinks>
-        <NavbarLink href="/docs" current>Docs</NavbarLink>
-        <NavbarLink href="/components">Components</NavbarLink>
-        <NavbarLink href="/icons">Icons</NavbarLink>
+        <NavbarLink href="#docs" current>Docs</NavbarLink>
+        <NavbarLink href="#components">Components</NavbarLink>
+        <NavbarLink href="#icons">Icons</NavbarLink>
       </NavbarLinks>
       <NavbarActions>
         <Button variant="ghost" size="xs" aria-label="Notifications"><Svg icon={bell} /></Button>

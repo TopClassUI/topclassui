@@ -11,7 +11,7 @@ export default function Demo() {
         title="No projects yet"
         description="Create your first project and it will show up here."
       >
-        <Button size="xs" className="gap-1.5" render={<a href="/projects/new" />}>
+        <Button size="xs" className="gap-1.5" render={<a href="#" />}>
           <Svg icon={plus} />
           New project
         </Button>

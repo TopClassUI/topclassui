@@ -8,8 +8,8 @@ export default function Demo() {
       showHome
       items={[
         { href: '/', label: 'Home' },
-        { href: '/docs', label: 'Docs' },
-        { href: '/docs/components', label: 'Components' },
+        { href: '#docs', label: 'Docs' },
+        { href: '#components', label: 'Components' },
         { label: 'Button' },
       ]}
     />

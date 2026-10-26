@@ -10,13 +10,13 @@ export default function Demo() {
       <NavbarRoot>
         <NavbarBrand href="/">توب كلاس</NavbarBrand>
         <NavbarLinks labels={ar}>
-          <NavbarLink href="/docs" current>المستندات</NavbarLink>
-          <NavbarLink href="/components">المكوّنات</NavbarLink>
-          <NavbarLink href="/icons">الأيقونات</NavbarLink>
-          <NavbarLink href="/theming">السمات</NavbarLink>
+          <NavbarLink href="#docs" current>المستندات</NavbarLink>
+          <NavbarLink href="#components">المكوّنات</NavbarLink>
+          <NavbarLink href="#icons">الأيقونات</NavbarLink>
+          <NavbarLink href="#theming">السمات</NavbarLink>
         </NavbarLinks>
         <NavbarActions>
-          <Button render={<a href="/login" />}>تسجيل الدخول</Button>
+          <Button render={<a href="#" />}>تسجيل الدخول</Button>
         </NavbarActions>
       </NavbarRoot>
     </div>

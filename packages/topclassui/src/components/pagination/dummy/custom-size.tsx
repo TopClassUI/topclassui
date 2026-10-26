@@ -1,6 +1,6 @@
 import { Pagination } from '../index.js'
 
-const blog = (page: number) => `/blog?page=${String(page)}`
+const blog = (page: number) => `#page-${String(page)}`
 
 /** custom emits no size: a cell falls to the 24 px floor and takes the type size of the nav. */
 export default function Demo() {

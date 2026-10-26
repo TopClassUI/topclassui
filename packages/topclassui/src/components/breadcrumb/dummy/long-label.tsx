@@ -10,7 +10,7 @@ export default function Demo() {
       <Breadcrumb
         items={[
           { href: '/', label: 'Home' },
-          { href: '/guides/migrating', label: LONG_LINK },
+          { href: '#migrating', label: LONG_LINK },
           { label: LONG_PAGE },
         ]}
       />

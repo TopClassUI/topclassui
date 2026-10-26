@@ -46,7 +46,7 @@ describe('row-actions holds what e2e/table.spec walks with the Tab key', () => {
 
   it('has a link in every stuck cell, which is what pulled the box back on every row', async () => {
     const html = await render('row-actions')
-    const stuck = [...html.matchAll(/<th scope="row" class="[^"]*sticky[^"]*"><a [^>]*href="\/orders\/(\d+)"/g)].map((m) => m[1])
+    const stuck = [...html.matchAll(/<th scope="row" class="[^"]*sticky[^"]*"><a [^>]*href="#order-(\d+)"/g)].map((m) => m[1])
     expect(stuck).toHaveLength(25)
     expect([stuck[0], stuck[24]]).toEqual(['1042', '1018'])
   })

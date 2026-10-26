@@ -8,13 +8,13 @@ export default function Demo() {
     <NavbarRoot>
       <NavbarBrand href="/">TopClass UI</NavbarBrand>
       <NavbarLinks>
-        <NavbarLink href="/docs" current>Docs</NavbarLink>
-        <NavbarLink href="/components">Components</NavbarLink>
-        <NavbarLink href="/icons">Icons</NavbarLink>
-        <NavbarLink href="/theming">Theming</NavbarLink>
+        <NavbarLink href="#docs" current>Docs</NavbarLink>
+        <NavbarLink href="#components">Components</NavbarLink>
+        <NavbarLink href="#icons">Icons</NavbarLink>
+        <NavbarLink href="#theming">Theming</NavbarLink>
       </NavbarLinks>
       <NavbarActions>
-        <Button render={<a href="/login" />}>Sign in</Button>
+        <Button render={<a href="#" />}>Sign in</Button>
       </NavbarActions>
     </NavbarRoot>
   )

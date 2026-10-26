@@ -21,7 +21,7 @@ export default function Demo() {
   return (
     <Breadcrumb
       items={STEPS.map((label, index) => (
-        index === STEPS.length - 1 ? { label } : { href: `/handbook/step-${String(index + 1)}`, label }
+        index === STEPS.length - 1 ? { label } : { href: `#step-${String(index + 1)}`, label }
       ))}
     />
   )

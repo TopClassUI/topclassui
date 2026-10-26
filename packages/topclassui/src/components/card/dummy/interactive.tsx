@@ -4,7 +4,7 @@ import { CardBody, CardHeader, CardRoot } from '../index.js'
 export default function Demo() {
   return (
     <div className="max-w-xs">
-      <CardRoot render={<a href="/reports/may" />}>
+      <CardRoot render={<a href="#" />}>
         <CardHeader>
           <h2>Monthly report</h2>
         </CardHeader>

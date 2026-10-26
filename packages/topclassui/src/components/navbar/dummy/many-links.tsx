@@ -10,18 +10,18 @@ export default function Demo() {
     <NavbarRoot>
       <NavbarBrand href="/">TopClass UI</NavbarBrand>
       <NavbarLinks>
-        <NavbarLink href="/docs">Docs</NavbarLink>
-        <NavbarLink href="/components" current>Components</NavbarLink>
-        <NavbarLink href="/icons">Icons</NavbarLink>
-        <NavbarLink href="/theming">Theming</NavbarLink>
-        <NavbarLink href="/connectors">Connectors</NavbarLink>
-        <NavbarLink href="/changelog">Changelog</NavbarLink>
+        <NavbarLink href="#docs">Docs</NavbarLink>
+        <NavbarLink href="#components" current>Components</NavbarLink>
+        <NavbarLink href="#icons">Icons</NavbarLink>
+        <NavbarLink href="#theming">Theming</NavbarLink>
+        <NavbarLink href="#connectors">Connectors</NavbarLink>
+        <NavbarLink href="#changelog">Changelog</NavbarLink>
       </NavbarLinks>
       <NavbarActions>
         <Button variant="ghost" aria-label="GitHub" render={<a href="https://github.com/TopClassUI/topclassui" rel="noopener noreferrer" />}>
           <Svg icon={githubLogo} />
         </Button>
-        <Button render={<a href="/login" />}>Sign in</Button>
+        <Button render={<a href="#" />}>Sign in</Button>
       </NavbarActions>
     </NavbarRoot>
   )

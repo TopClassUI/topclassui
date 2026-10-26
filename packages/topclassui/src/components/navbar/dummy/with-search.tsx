@@ -9,9 +9,9 @@ export default function Demo() {
     <NavbarRoot>
       <NavbarBrand href="/">TopClass UI</NavbarBrand>
       <NavbarLinks>
-        <NavbarLink href="/docs" current>Docs</NavbarLink>
-        <NavbarLink href="/components">Components</NavbarLink>
-        <NavbarLink href="/icons">Icons</NavbarLink>
+        <NavbarLink href="#docs" current>Docs</NavbarLink>
+        <NavbarLink href="#components">Components</NavbarLink>
+        <NavbarLink href="#icons">Icons</NavbarLink>
       </NavbarLinks>
       <NavbarActions>
         <form role="search" action="/search" className="min-w-0">

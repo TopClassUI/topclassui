@@ -4,9 +4,9 @@ import { cn } from '#shared/cn.js'
 import { AvatarGroup } from '../index.js'
 
 const TEAM = [
-  ['OA', 'Omar Abed', '/people/omar'], ['LH', 'Lina Haddad', '/people/lina'],
-  ['SK', 'Sara Khalil', '/people/sara'], ['MN', 'Mona Nasser', '/people/mona'],
-  ['RT', 'Rami Tahan', '/people/rami'],
+  ['OA', 'Omar Abed', '#omar'], ['LH', 'Lina Haddad', '#lina'],
+  ['SK', 'Sara Khalil', '#sara'], ['MN', 'Mona Nasser', '#mona'],
+  ['RT', 'Rami Tahan', '#rami'],
 ] as const
 
 /** inline-flex makes the link exactly as big as its avatar, and the focus ring is the

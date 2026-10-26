@@ -1,7 +1,7 @@
 import { ar } from '#shared/labels/ar.js'
 import { Pagination } from '../index.js'
 
-const blog = (page: number) => `/blog?page=${String(page)}`
+const blog = (page: number) => `#page-${String(page)}`
 
 /** The row runs from the right and the four carets flip, with no class of its own for it. */
 export default function Demo() {

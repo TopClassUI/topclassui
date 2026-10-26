@@ -76,7 +76,7 @@ describe('each demo shows what its name says', () => {
     expect(html).toMatch(/<caption [^>]*class="sr-only">Invoices<\/caption>/)
     expect([...html.matchAll(/<th scope="row"[^>]*>(.*?)<\/th>/g)].map((m) => m[1])).toEqual(['INV-1042', 'INV-1043', 'INV-1044', 'INV-1045'])
     expect(html.split('text-end tabular-nums').length - 1).toBe(10)
-    expect([...html.matchAll(/<a [^>]*href="\/invoices\/inv_\d+"/g)]).toHaveLength(4)
+    expect([...html.matchAll(/<a [^>]*href="#inv_\d+"/g)]).toHaveLength(4)
     // The header that used to widen the page: hidden words in the last column.
     expect(html).toContain('<span class="sr-only">Open</span></th>')
   })

@@ -11,7 +11,7 @@ export default function Demo() {
       <PopoverPopup placement="bottom-start">
         <PopoverTitle>How billing works</PopoverTitle>
         <PopoverDescription>Only the seats in use are billed.</PopoverDescription>
-        <Button variant="link" size="sm" className="self-start" render={<a href="/docs/billing" />}>Read the guide</Button>
+        <Button variant="link" size="sm" className="self-start" render={<a href="#" />}>Read the guide</Button>
       </PopoverPopup>
     </PopoverRoot>
   )

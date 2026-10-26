@@ -10,8 +10,8 @@ export default function Demo({ showHome = true, maxItems = 4, ...props }: Breadc
       {...props}
       items={[
         { href: '/', label: 'Home' },
-        { href: '/docs', label: 'Docs' },
-        { href: '/docs/components', label: 'Components' },
+        { href: '#docs', label: 'Docs' },
+        { href: '#components', label: 'Components' },
         { label: 'Button' },
       ]}
     />

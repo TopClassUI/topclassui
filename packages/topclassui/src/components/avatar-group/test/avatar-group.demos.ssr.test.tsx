@@ -113,7 +113,7 @@ describe('the demos cover what a real dashboard does to a group', () => {
 
   it('linked: every face that shows is the one child of a link, and the links are the children of the group', async () => {
     const html = await render('linked')
-    expect(html.match(/<a href="\/people\/[a-z]+" class="[^"]*"><span [^>]*role="img"/g)).toHaveLength(3)
+    expect(html.match(/<a href="#[a-z]+" class="[^"]*"><span [^>]*role="img"/g)).toHaveLength(3)
     expect(html).toMatch(/^<span [^>]*role="group"[^>]*><a /)
     expect(counters(html)).toEqual(['2 more'])
   })

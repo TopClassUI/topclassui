@@ -153,7 +153,7 @@ describe('what the demos show of the props', () => {
   it('hover: its link is a Button rendered as an anchor, with the address it was given', async () => {
     const popup = await openFirst('hover')
     const link = popup.querySelector('a')
-    expect(link?.getAttribute('href')).toBe('/docs/billing')
+    expect(link?.getAttribute('href')).toBe('#')
     expect(link?.getAttribute('data-variant')).toBe('link')
   })
 

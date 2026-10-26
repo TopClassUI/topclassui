@@ -9,8 +9,8 @@ export default function Demo() {
         className="text-xs *:gap-1.25 *:*:gap-1.25"
         aria-label="idle"
         items={[
-          { href: '/docs', label: 'Docs' },
-          { href: '/docs/button', label: 'Button' },
+          { href: '#docs', label: 'Docs' },
+          { href: '#button', label: 'Button' },
         ]}
       />
       <Breadcrumb
@@ -18,7 +18,7 @@ export default function Demo() {
         aria-label="hover"
         link={<a href="/" data-hover="" />}
         items={[
-          { href: '/docs', label: 'Docs' },
+          { href: '#docs', label: 'Docs' },
           { label: 'Button' },
         ]}
       />
@@ -27,9 +27,9 @@ export default function Demo() {
         aria-label="collapsed"
         maxItems={2}
         items={[
-          { href: '/docs', label: 'Docs' },
-          { href: '/docs/components', label: 'Components' },
-          { href: '/docs/components/actions', label: 'Actions' },
+          { href: '#docs', label: 'Docs' },
+          { href: '#components', label: 'Components' },
+          { href: '#actions', label: 'Actions' },
           { label: 'Button' },
         ]}
       />
@@ -37,7 +37,7 @@ export default function Demo() {
         className="text-xs *:gap-1.25 *:*:gap-1.25"
         aria-label="current"
         items={[
-          { href: '/docs', label: 'Docs' },
+          { href: '#docs', label: 'Docs' },
           { label: 'Button' },
         ]}
       />

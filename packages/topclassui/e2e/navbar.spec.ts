@@ -613,7 +613,7 @@ test.describe('the page being read is in view when a phone opens it', () => {
   async function openOnChangelog(page: Page, direction: Direction, style = ''): Promise<{ shown: number, width: number, at: number, room: number }> {
     await page.route(`**/navbar--many-links--light--${direction}.html*`, async (route) => {
       const response = await route.fetch()
-      const body = (await response.text()).replace(' aria-current="page"', '').replace('href="/changelog"', 'href="/changelog" aria-current="page"')
+      const body = (await response.text()).replace(' aria-current="page"', '').replace('href="#changelog"', 'href="#changelog" aria-current="page"')
       await route.fulfill({ response, body: body.replace('</head>', `<style>${style}</style></head>`) })
     })
     await page.goto(liveUrl('navbar--many-links', { direction }))

@@ -49,8 +49,8 @@ describe('each demo shows what its name says', () => {
     expect(count(out, '<a href=')).toBe(3)
     expect(out).toContain('<a href="/" ')
     expect(out).toContain('<span class="sr-only">Home</span>')
-    expect(out).toContain('<a href="/docs" ')
-    expect(out).toContain('<a href="/docs/components" ')
+    expect(out).toContain('<a href="#docs" ')
+    expect(out).toContain('<a href="#components" ')
     expect(out).toMatch(/<span dir="auto" aria-current="page" class="[^"]*">Button<\/span>/)
   })
 
@@ -72,7 +72,7 @@ describe('each demo shows what its name says', () => {
     expect(out).toMatch(/^<nav /)
     expect(count(out, '<li')).toBe(12)
     expect(count(out, '<a href=')).toBe(11)
-    expect(out).toContain('<a href="/handbook/step-11" ')
+    expect(out).toContain('<a href="#step-11" ')
     expect(out).toContain('>Worked examples for a split leave across two tax years</span></li>')
   })
 

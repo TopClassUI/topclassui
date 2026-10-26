@@ -31,7 +31,7 @@ describe('what the demos show of the props', () => {
   it('start: the three links are real anchors with an address, each drawn as a Button', async () => {
     const popup = await openFirst('start')
     const links = [...popup.querySelectorAll('a')]
-    expect(links.map((link) => link.getAttribute('href'))).toEqual(['/docs', '/components', '/changelog'])
+    expect(links.map((link) => link.getAttribute('href'))).toEqual(['#docs', '#components', '#changelog'])
     for (const link of links) expect(link.getAttribute('data-variant'), link.textContent).toBe('ghost')
   })
 

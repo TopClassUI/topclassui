@@ -31,22 +31,22 @@ interface Shape {
 
 /** Written out per demo, so a demo that changes, or a part that stops rendering a link, fails here. */
 const DEMOS: Record<string, Shape> = {
-  'basic': { hrefs: ['/', '/docs', '/components', '/icons', '/theming', '/login'], current: ['/docs'], navs: ['Main'], sticky: 1 },
+  'basic': { hrefs: ['/', '#docs', '#components', '#icons', '#theming', '#'], current: ['#docs'], navs: ['Main'], sticky: 1 },
   'many-links': {
-    hrefs: ['/', '/docs', '/components', '/icons', '/theming', '/connectors', '/changelog', 'https://github.com/TopClassUI/topclassui', '/login'],
-    current: ['/components'], navs: ['Main'], sticky: 1,
+    hrefs: ['/', '#docs', '#components', '#icons', '#theming', '#connectors', '#changelog', 'https://github.com/TopClassUI/topclassui', '#'],
+    current: ['#components'], navs: ['Main'], sticky: 1,
   },
-  'not-sticky': { hrefs: ['/', '/docs', '/blog', '/changelog'], current: ['/blog'], navs: ['Main'], sticky: 0 },
-  'playground': { hrefs: ['/', '/docs', '/components', '/icons', '/login'], current: [], navs: ['Main'], sticky: 1 },
-  'rtl': { hrefs: ['/', '/docs', '/components', '/icons', '/theming', '/login'], current: ['/docs'], navs: ['التنقل الرئيسي'], sticky: 1 },
+  'not-sticky': { hrefs: ['/', '#docs', '#blog', '#changelog'], current: ['#blog'], navs: ['Main'], sticky: 0 },
+  'playground': { hrefs: ['/', '#docs', '#components', '#icons', '#'], current: [], navs: ['Main'], sticky: 1 },
+  'rtl': { hrefs: ['/', '#docs', '#components', '#icons', '#theming', '#'], current: ['#docs'], navs: ['التنقل الرئيسي'], sticky: 1 },
   'tall-page': {
-    hrefs: ['#install', '#install', '#usage', '#theming', '#questions', '/handbook/edit', '#usage', '#theming', '#questions', '#install'],
+    hrefs: ['#install', '#install', '#usage', '#theming', '#questions', '#', '#usage', '#theming', '#questions', '#install'],
     current: [], navs: ['On this page'], sticky: 1,
   },
   // The stage Figma draws: a rounded bar in the flow, Docs current, a bell and the account.
-  'stage': { hrefs: ['/', '/docs', '/components', '/icons'], current: ['/docs'], navs: ['Main'], sticky: 0 },
+  'stage': { hrefs: ['/', '#docs', '#components', '#icons'], current: ['#docs'], navs: ['Main'], sticky: 0 },
   'states': { hrefs: ['/', '/', '/', '/'], current: [], navs: [], bars: 4, sticky: 0 },
-  'with-search': { hrefs: ['/', '/docs', '/components', '/icons'], current: ['/docs'], navs: ['Main'], sticky: 1 },
+  'with-search': { hrefs: ['/', '#docs', '#components', '#icons'], current: ['#docs'], navs: ['Main'], sticky: 1 },
 }
 
 describe('every demo renders on the server', () => {

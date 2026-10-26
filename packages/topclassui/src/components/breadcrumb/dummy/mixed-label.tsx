@@ -10,7 +10,7 @@ export default function Demo() {
       <Breadcrumb
         items={[
           { href: '/', label: 'Home' },
-          { href: '/release-notes', label: NOTES },
+          { href: '#release-notes', label: NOTES },
           { label: PAGE },
         ]}
       />

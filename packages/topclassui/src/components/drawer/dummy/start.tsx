@@ -1,7 +1,7 @@
 import { Button } from '#components/button/index.js'
 import { DrawerBody, DrawerHeader, DrawerPopup, DrawerRoot, DrawerTitle, DrawerTrigger } from '../index.js'
 
-const LINKS = [['Documentation', '/docs'], ['Components', '/components'], ['Changelog', '/changelog']] as const
+const LINKS = [['Documentation', '#docs'], ['Components', '#components'], ['Changelog', '#changelog']] as const
 
 /** placement="start": the navigation of a phone. It opens from the left in LTR and from the
  * right in RTL, and a swipe toward that edge closes it. Each link is a real anchor. */

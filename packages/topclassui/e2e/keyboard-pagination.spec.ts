@@ -39,9 +39,8 @@ for (const direction of DIRECTIONS) {
     test('Enter follows the focused link', async ({ page }) => {
       await openLive(page, 'pagination--middle', { direction })
       for (const name of MIDDLE.slice(0, 8)) await pressTo(page, 'Tab', name)
-      const request = page.waitForRequest((sent) => sent.url().endsWith('/blog?page=7'))
       await page.keyboard.press('Enter')
-      await request
+      await expect(page).toHaveURL(/#page-7$/)
     })
   })
 }

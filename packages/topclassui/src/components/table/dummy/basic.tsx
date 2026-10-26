@@ -31,7 +31,7 @@ export default function Demo() {
               size="sm"
               variant="outline"
               aria-label={`View invoice ${invoice.number}`}
-              render={<a href={`/invoices/${invoice.id}`} />}
+              render={<a href={`#${invoice.id}`} />}
             >
               View
             </Button>

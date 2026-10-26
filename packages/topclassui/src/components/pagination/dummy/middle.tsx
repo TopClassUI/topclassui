@@ -1,6 +1,6 @@
 import { Pagination } from '../index.js'
 
-const blog = (page: number) => `/blog?page=${String(page)}`
+const blog = (page: number) => `#page-${String(page)}`
 
 /** Away from both ends: one sibling each side, one page at each end and a gap between. */
 export default function Demo() {
