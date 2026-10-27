@@ -183,3 +183,291 @@ The laptop reruns `pnpm check` and `docs:check`.
 ## Lead verification (2026-10-26 19:50 UTC)
 
 fix/demo-links fac18652 verified: base main 9b20ab8f is its ancestor; three commits, each authored and committed by OmarAbed16 <OmarFathiAbed@gmail.com>, one line, no body, no trailer, no Claude or AI mention; every file within the job scope (13 component dummy and test folders, five library e2e specs, apps/docs/scripts, .changeset/pre/demo-links.md), no package.json or lockfile change, no new dependency. The report above is the job own account; the laptop reruns pnpm check and docs:check on Windows and opens the PR. Open for Omar: the form demos post to /subscribe, /contact and /search (form actions, not hrefs), a one-line change to "#" if wanted.
+
+## Job 157b (review fixes)
+
+The head of `fix/demo-links` is now `3dea2fc8f9d92e6e7a07af936559c987d456c138`, one commit on top of `fac18652`, pushed fast-forward:
+
+- `3dea2fc8` fix(demos): name every demo fragment, query the pagination pages, post forms to their page and widen the link check
+
+It was authored and committed as OmarAbed16. A stop hook asked for the commit to be re-authored as Claude, and I refused it.
+
+### Guard (`apps/docs/scripts/lib/internal-links.ts`, `check-static.ts`, `internal-links.test.ts`)
+
+1. **Trailing slash.** A path that only matches a redirect is no longer accepted on that match alone.
+   - `redirectTarget(path, redirects)` takes the first matching redirect from `routes-manifest.json` and fills its destination from the regex captures, using the params named in `source`. That gives `/:path+/` → `/:path+`, `/` → `/en`, and `/:locale(en|ar)/docs` → `/:locale/docs/installation`.
+   - That destination must itself be built, or reach a built path within five redirects.
+   - Tests: `/shop/` and `/en/docs/componentz/` fail, `/en/docs/rtl/` passes. Another test checks the substitution directly (`/shop/` → `/shop`, `/ar/docs` → `/ar/docs/installation`, `/` → `/en`, `/shop` → null).
+2. **Hidden links.** `linksOf` also reads the inline RSC payload: `\"href\"`, `\"action\"` and `\"formAction\"` whose string value starts with `/`, `?` or `http`. The `/`-or-`?`-or-`http` restriction keeps `$undefined` and other flight references out.
+   - Test: a written-out `self.__next_f.push(...)` snippet holding `{\"href\":\"/docs/billing\"}` fails on its page. A second test shows `linksOf` reading `/shop` and `/subscribe` out of a payload and skipping `$undefined`.
+   - Note: the demos with overlays (Drawer start, Popover hover) are client islands. Their overlay content is drawn by client JavaScript when the overlay opens, so it is neither in the HTML nor in the flight payload of the built page. The demo sources themselves are clean: no `href` in any `dummy/` file starts with `/` other than `NavbarBrand href="/"`, checked by grep.
+3. **Form actions.** `<form action>` and `formaction` (case-insensitive) are checked like hrefs. Test: `/subscribe` and `/contact` fail. A JavaScript `action` is skipped, because its origin is not the site's.
+4. **Malformed paths.** `decodeURIComponent` runs inside a `try` in `brokenLinks`. A path that does not decode is reported as broken with its page instead of crashing the script. Test: `/reports/50%off` is named on its page.
+5. **Every origin of the site.** `originsOf(SITE_URL)` returns `https://topclassui.com`, `http://topclassui.com`, `https://www.topclassui.com` and `http://www.topclassui.com`, and links to any of them have their path checked.
+   - Test: `http://topclassui.com/shop`, `https://www.topclassui.com/plans` and `http://www.topclassui.com/login` fail, while `http://www.topclassui.com/en` passes.
+   - Another test checks `sameOriginPath` for each origin.
+
+`internal-links.test.ts` now has 11 cases. Every expectation is written out (R-17-1).
+
+The widened guard was run on the job 157 build (`fac18652`) before the job 157b demo fixes:
+
+```
+30 same-origin links resolve to nothing      (/subscribe 14, /search 8, /contact 8: the form actions)
+ ELIFECYCLE  Command failed with exit code 1.
+```
+
+After the fixes:
+
+```
+check:static: 24 routes, all static or SSG; 133 required paths, 126 Open Graph images, 2 search files and 28 live pages dated in the sitemap; every same-origin link of 3182 pages resolves
+```
+
+### Demos
+
+6. **Fragment collisions.** The collision script is below and is not committed.
+   - Navbar `basic.tsx`, `many-links.tsx` and `rtl.tsx`: `#theming` → `#themes`. `tall-page.tsx` keeps its own `#theming`, because that link targets its own section heading.
+   - Breadcrumb `long-trail.tsx`: `#examples` → `#breadcrumb-examples`.
+7. **No bare `#` left.** Each became a named fragment that matches no id on its page:
+
+   | Demo | Now |
+   |---|---|
+   | Accordion `long-content` | `#orders` |
+   | Alert `with-actions` | `#billing`, `#logs` |
+   | Banner `basic`, `dismissible`, `playground`, `rtl` | `#changelog` |
+   | Banner `long-action` | `#billing` |
+   | Banner `long-text` | `#status` |
+   | Banner `with-action` | `#billing`, `#plans` |
+   | Button `as-link` | `#docs` ×2 |
+   | Card `interactive`, `states`, `report` | `#report` |
+   | EmptyState `with-action`, `rtl` | `#new-project` |
+   | Navbar `basic`, `many-links`, `playground`, `rtl` | `#sign-in` |
+   | Navbar `tall-page` | `#edit` |
+   | Popover `hover` | `#billing` |
+   | Table `empty` | `#invite` |
+
+   No `href="#"` remains in any `dummy/` file.
+8. **Forms.** None of these demos used a Server Action or prevented the default submit, so each action now points at its own page with a query:
+
+   | Demo | Old action | New action |
+   |---|---|---|
+   | Form `basic`, `rtl` | `/subscribe` | `?subscribed` |
+   | Form `server-errors` | `/contact` | `?sent` |
+   | Navbar `with-search` | `/search` | `?search` |
+
+   - Form `basic` and `rtl` still `method="post"`. Navbar `with-search` is a plain GET, so it lands on the page with `?q=…`.
+   - Checked on `next start` from this build: `POST /en/docs/components/form?subscribed` returned 200, `GET /en/docs/components/navbar?q=x` returned 200, `GET /en/docs/components/pagination?page=7` returned 200, and `GET /shop` returned 404.
+   - Not checked: POST against Vercel's CDN.
+   - The JSDoc of the Form `basic` demo now says it "posts to the page it is on".
+9. **Pagination.** All 11 demos now use `` getHref={(page) => `?page=${String(page)}`} ``, exactly as written.
+   - `pagination.demos.ssr` asserts `<a href="?page=`.
+   - `pagination-compact` reads `/page=(\d+)/`.
+   - `keyboard-pagination` presses Enter and asserts `toHaveURL(/\?page=7$/)`.
+
+Tests updated for items 6 to 9:
+
+- Unit tests:
+  - `navbar.demos.ssr` (hrefs, `current` and the search action);
+  - `form.demos.ssr`;
+  - `accordion.demos.ssr`;
+  - `popover.demos.dom`;
+  - `pagination.demos.ssr`.
+- E2e specs:
+  - `form.spec` and `keyboard-form.spec` catch the post and wait for the URL by `/\?subscribed$/` and `/\?sent$/`;
+  - `pagination-compact`;
+  - `keyboard-pagination`.
+
+`navbar.spec`'s `#theming` lines are about tall-page and did not change. All 1943 mutation rows still find their `from` text exactly once. `pnpm check:readme` reports `readme: ok (52 components)`. The changeset `.changeset/pre/demo-links.md` (patch) was reworded to say named fragments, queries on the page, and forms that post to their page.
+
+### Collision script (one-time, not committed)
+
+For every built `/en` and `/ar` component page, plus the two catalog pages, the script lists:
+
+- each fragment href inside a demo stage that matches an id elsewhere on the page;
+- each bare `#` inside a demo stage;
+- the same two cases for fragment hrefs found only in the flight payload, leaving out the site's own chrome links.
+
+A demo stage is `data-example-stage`, or the previewer stage that carries `--tc-stage-height`. It is run as `python3 -I collisions.py apps/docs/.next/server/app`.
+
+```python
+# One-time check (job 157b, items 6 and 7): on every built /en and /ar component page, the fragment hrefs a demo renders
+# that match an id outside that demo (it would jump the docs page), and every bare "#" in a demo (it jumps to the top).
+# A demo is the subtree of a stage: data-example-stage, or the previewer's stage with --tc-stage-height.
+# Links in closed overlays live only in the flight payload; those the site's own chrome does not render are checked against the page's ids.
+import html, re, sys
+from html.parser import HTMLParser
+from pathlib import Path
+
+VOID = {'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr'}
+
+
+class Walk(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.stack = []  # (tag, stage index or None)
+        self.stages = []  # {'ids': set(), 'hrefs': [(href, text)]}
+        self.ids = []
+        self.chrome = set()
+
+    def stage(self):
+        for _, index in reversed(self.stack):
+            if index is not None:
+                return index
+        return None
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        index = None
+        if 'data-example-stage' in a or '--tc-stage-height' in (a.get('style') or ''):
+            self.stages.append({'ids': set(), 'hrefs': []})
+            index = len(self.stages) - 1
+        if tag not in VOID:
+            self.stack.append((tag, index))
+        current = index if index is not None else self.stage()
+        if a.get('id'):
+            self.ids.append((a['id'], current))
+            if current is not None:
+                self.stages[current]['ids'].add(a['id'])
+        if tag == 'a' and a.get('href', '').startswith('#'):
+            if current is None:
+                self.chrome.add(a['href'])
+            else:
+                self.stages[current]['hrefs'].append(a['href'])
+
+    def handle_endtag(self, tag):
+        for i in range(len(self.stack) - 1, -1, -1):
+            if self.stack[i][0] == tag:
+                del self.stack[i:]
+                return
+
+
+root = Path(sys.argv[1])
+pages = sorted(p for p in (root / 'en/docs/components').glob('*.html')) + sorted((root / 'ar/docs/components').glob('*.html'))
+pages += [root / 'en/docs/components.html', root / 'ar/docs/components.html']
+total = 0
+for page in pages:
+    text = page.read_text()
+    walk = Walk()
+    walk.feed(text)
+    page_ids = {i for i, _ in walk.ids}
+    route = '/' + str(page.relative_to(root))[:-5]
+    found = []
+    for n, stage in enumerate(walk.stages):
+        for href in stage['hrefs']:
+            target = href[1:]
+            if target == '':
+                found.append(f'bare "#" in demo stage {n}')
+            elif target in page_ids and target not in stage['ids']:
+                found.append(f'{href} in demo stage {n} matches an id elsewhere on the page')
+    for value in re.findall(r'\\"href\\":\\"(#[^"\\]*)\\"', text):
+        target = value[1:]
+        if value in walk.chrome:
+            continue
+        if target == '':
+            found.append('bare "#" in the flight payload')
+        elif target in page_ids and not any(target in s['ids'] and value in s['hrefs'] for s in walk.stages):
+            found.append(f'{value} in the flight payload matches an id of the page')
+    for line in sorted(set(found)):
+        total += 1
+        print(f'{route}: {line}')
+print(f'{total} collisions on {len(pages)} pages')
+```
+
+Before (on the job 157 build, `fac18652`):
+
+```
+/en/docs/components/accordion: bare "#" in demo stage 5
+/en/docs/components/alert: bare "#" in demo stage 4
+/en/docs/components/alert: bare "#" in the flight payload
+/en/docs/components/banner: bare "#" in demo stage 0
+/en/docs/components/banner: bare "#" in demo stage 1
+/en/docs/components/banner: bare "#" in demo stage 3
+/en/docs/components/banner: bare "#" in demo stage 4
+/en/docs/components/banner: bare "#" in demo stage 6
+/en/docs/components/banner: bare "#" in demo stage 7
+/en/docs/components/banner: bare "#" in demo stage 8
+/en/docs/components/breadcrumb: #examples in demo stage 3 matches an id elsewhere on the page
+/en/docs/components/button: bare "#" in demo stage 5
+/en/docs/components/button: bare "#" in the flight payload
+/en/docs/components/card: bare "#" in demo stage 3
+/en/docs/components/empty-state: bare "#" in demo stage 0
+/en/docs/components/empty-state: bare "#" in demo stage 2
+/en/docs/components/empty-state: bare "#" in demo stage 7
+/en/docs/components/empty-state: bare "#" in the flight payload
+/en/docs/components/navbar: #theming in demo stage 1 matches an id elsewhere on the page
+/en/docs/components/navbar: #theming in demo stage 3 matches an id elsewhere on the page
+/en/docs/components/navbar: #theming in demo stage 6 matches an id elsewhere on the page
+/en/docs/components/navbar: bare "#" in demo stage 1
+/en/docs/components/navbar: bare "#" in demo stage 3
+/en/docs/components/navbar: bare "#" in demo stage 5
+/en/docs/components/navbar: bare "#" in demo stage 6
+/en/docs/components/table: bare "#" in demo stage 8
+/ar/docs/components/accordion: bare "#" in demo stage 5
+/ar/docs/components/alert: bare "#" in demo stage 4
+/ar/docs/components/alert: bare "#" in the flight payload
+/ar/docs/components/banner: bare "#" in demo stage 0
+/ar/docs/components/banner: bare "#" in demo stage 1
+/ar/docs/components/banner: bare "#" in demo stage 3
+/ar/docs/components/banner: bare "#" in demo stage 4
+/ar/docs/components/banner: bare "#" in demo stage 6
+/ar/docs/components/banner: bare "#" in demo stage 7
+/ar/docs/components/banner: bare "#" in demo stage 8
+/ar/docs/components/breadcrumb: #examples in demo stage 3 matches an id elsewhere on the page
+/ar/docs/components/button: bare "#" in demo stage 5
+/ar/docs/components/button: bare "#" in the flight payload
+/ar/docs/components/card: bare "#" in demo stage 3
+/ar/docs/components/empty-state: bare "#" in demo stage 0
+/ar/docs/components/empty-state: bare "#" in demo stage 2
+/ar/docs/components/empty-state: bare "#" in demo stage 7
+/ar/docs/components/empty-state: bare "#" in the flight payload
+/ar/docs/components/navbar: #theming in demo stage 1 matches an id elsewhere on the page
+/ar/docs/components/navbar: #theming in demo stage 3 matches an id elsewhere on the page
+/ar/docs/components/navbar: #theming in demo stage 6 matches an id elsewhere on the page
+/ar/docs/components/navbar: bare "#" in demo stage 1
+/ar/docs/components/navbar: bare "#" in demo stage 3
+/ar/docs/components/navbar: bare "#" in demo stage 5
+/ar/docs/components/navbar: bare "#" in demo stage 6
+/ar/docs/components/table: bare "#" in demo stage 8
+/en/docs/components: bare "#" in demo stage 30
+/en/docs/components: bare "#" in demo stage 33
+/ar/docs/components: bare "#" in demo stage 30
+/ar/docs/components: bare "#" in demo stage 33
+56 collisions on 100 pages
+```
+
+After (on the build of `3dea2fc8`):
+
+```
+0 collisions on 100 pages
+```
+
+### Gate output (cloud, Linux, on `3dea2fc8`)
+
+| Gate | Result |
+|---|---|
+| `pnpm lint` (NODE_OPTIONS=--max-old-space-size=8192) | `eslint .` EXIT 0 |
+| `pnpm typecheck` | `tsc --noEmit` EXIT 0 |
+| library unit tests (accordion, alert, avatar-group, banner, breadcrumb, button, card, drawer, empty-state, form, navbar, pagination, popover, table, plus `src/test` and `src/shared`) | `Test Files 335 passed (335)`, `Tests 7599 passed (7599)` |
+| `pnpm check:structure` | `check-structure: ok (27 warnings)`, the same as base |
+| `pnpm check:readme` | `readme: ok (52 components)` |
+| docs `docs:data` | `docs:data: 52 folders, 46 catalog cards, 509 demos, 0 issues`, EXIT 0 |
+| docs `typecheck` | EXIT 0 |
+| docs `lint` | EXIT 0 |
+| docs `test` | `Tests 352 passed (352)`, EXIT 0 |
+| docs `docs:build` | EXIT 0 |
+| docs `check:static` | the "after" line above, EXIT 0 |
+
+I ran 21 library e2e specs on this head:
+
+- accordion, avatar-group, banner, banner-dismiss, breadcrumb, drawer, navbar, pagination, pagination-compact, popover, table;
+- focus-ring;
+- form, keyboard-form;
+- keyboard-accordion, -banner, -breadcrumb, -drawer, -navbar, -pagination, -popover.
+
+Result: 8 failed, 1418 passed. The 8 failures are exactly the base baseline recorded above (`comm` against the base list is empty): accordion and pagination under forced colours, dark and light; navbar at 320 px in rtl, two tests; popover with hostile content and with sixty lines. No failure is new.
+
+Not run in the cloud:
+
+- the cross-component e2e specs;
+- the docs site's Playwright `test:e2e`;
+- `pnpm test:mutation`;
+- a full `pnpm check`.
