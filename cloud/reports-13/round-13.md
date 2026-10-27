@@ -471,3 +471,8 @@ Not run in the cloud:
 - the docs site's Playwright `test:e2e`;
 - `pnpm test:mutation`;
 - a full `pnpm check`.
+
+
+## Lead verification of job 157b (2026-10-27 07:40 UTC)
+
+fix/demo-links 3dea2fc8 verified: fac18652 and main 9b20ab8f are its ancestors; one commit, authored and committed by OmarAbed16 <OmarFathiAbed@gmail.com>, one line, no body, no trailer, no Claude or AI mention; every file within the job scope (12 component dummy and test folders, four library e2e specs, apps/docs/scripts, .changeset/pre/demo-links.md), no package.json or lockfile change, no new dependency. Spot checks on the tip: no bare href="#" left in any dummy file; the pagination demos share one getHref helper on the query form; the form demos post to "?subscribed" and "?sent" and the navbar search gets "?search". The section above is the job own account (56 fragment collisions before, 0 after; the widened guard 30 form-action offenders on fac18652, 0 on 3dea2fc8; gates all exit 0; e2e of 21 specs 1418 / 8, the 8 the recorded base baseline). The laptop reruns pnpm check and docs:check on Windows and opens the PR. Open for Omar: the overlay links of Drawer start and Popover hover are drawn by client JS, so the guard cannot see them (their demo sources were checked by grep); the form actions were tested against next start, not Vercel.
