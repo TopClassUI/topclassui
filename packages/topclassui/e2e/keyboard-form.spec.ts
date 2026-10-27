@@ -12,9 +12,9 @@ const textbox = (page: Page, name: string) => page.locator('#demo').getByRole('t
 const button = (page: Page, name: string) => page.locator('#demo').getByRole('button', { name, exact: true })
 
 /** Answers every post to `path` with a page of its own and keeps each request. */
-async function catchPosts(page: Page, path: string): Promise<Request[]> {
+async function catchPosts(page: Page, url: RegExp): Promise<Request[]> {
   const posts: Request[] = []
-  await page.route(`**${path}`, async (route) => {
+  await page.route(url, async (route) => {
     posts.push(route.request())
     await route.fulfill({ contentType: 'text/html', body: '<!doctype html><title>Sent</title><p>Sent</p>' })
   })
@@ -25,7 +25,7 @@ test.describe('live: a form by keyboard', () => {
   for (const direction of DIRECTIONS) {
     for (const key of ['Enter', 'Space'] as const) {
       test(`${direction}: ${key} on Subscribe with the email empty sends nothing and puts the focus on the email, ring and all`, async ({ page }) => {
-        const posts = await catchPosts(page, '/subscribe')
+        const posts = await catchPosts(page, /\?subscribed$/)
         await openLive(page, 'form--basic', { direction })
         await page.keyboard.press('Tab')
         await expect(textbox(page, 'Email')).toBeFocused()
@@ -39,13 +39,13 @@ test.describe('live: a form by keyboard', () => {
         expect(posts).toHaveLength(0)
         await page.keyboard.type('omar@example.com')
         await page.keyboard.press('Tab')
-        await Promise.all([page.waitForURL('**/subscribe'), page.keyboard.press(key)])
+        await Promise.all([page.waitForURL(/\?subscribed$/), page.keyboard.press(key)])
         expect(posts.map((post) => post.postData())).toEqual(['email=omar%40example.com'])
       })
     }
 
     test(`${direction}: Enter in the message is a new line; Enter in the email sends what both hold`, async ({ page }) => {
-      const posts = await catchPosts(page, '/contact')
+      const posts = await catchPosts(page, /\?sent$/)
       await openLive(page, 'form--server-errors', { direction })
       await textbox(page, 'Message').focus()
       await page.keyboard.press('Control+End')
@@ -55,7 +55,7 @@ test.describe('live: a form by keyboard', () => {
       expect(await liveErrors(page)).toEqual([])
       await page.keyboard.press('Shift+Tab')
       await expect(textbox(page, 'Email')).toBeFocused()
-      await Promise.all([page.waitForURL('**/contact'), page.keyboard.press('Enter')])
+      await Promise.all([page.waitForURL(/\?sent$/), page.keyboard.press('Enter')])
       expect(posts.map((post) => post.postData())).toEqual(['email=taken%40example.com&message=Hi%2C+see+example.com%0D%0AThanks+for+reading+it+all'])
     })
 

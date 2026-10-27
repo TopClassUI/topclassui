@@ -19,7 +19,7 @@ export default function Demo({ current, ...props }: NavbarDesignProps = {}) {
         <NavbarLink href="#icons">Icons</NavbarLink>
       </NavbarLinks>
       <NavbarActions>
-        <Button render={<a href="#" />}>Sign in</Button>
+        <Button render={<a href="#sign-in" />}>Sign in</Button>
       </NavbarActions>
     </NavbarRoot>
   )

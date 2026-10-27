@@ -14,7 +14,7 @@ export default function Demo() {
         <NavbarLink href="#icons">Icons</NavbarLink>
       </NavbarLinks>
       <NavbarActions>
-        <form role="search" action="/search" className="min-w-0">
+        <form role="search" action="?search" className="min-w-0">
           <Input type="search" name="q" size="sm" placeholder="Search" aria-label="Search the docs" />
         </form>
         <AvatarRoot size="sm" aria-label="Omar Abed">

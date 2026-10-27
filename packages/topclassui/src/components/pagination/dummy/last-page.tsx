@@ -1,6 +1,6 @@
 import { Pagination } from '../index.js'
 
-const blog = (page: number) => `#page-${String(page)}`
+const blog = (page: number) => `?page=${String(page)}`
 
 /** On the last page next and last are the spans; the row is still seven pages long. */
 export default function Demo() {

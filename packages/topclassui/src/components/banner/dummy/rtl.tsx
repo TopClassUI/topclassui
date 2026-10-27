@@ -11,7 +11,7 @@ export default function Demo() {
         tone="info"
         aria-label="إعلان الإصدار"
         icon={<Svg icon={bell} size="xs" />}
-        action={<Button size="sm" variant="outline" tone="info" render={<a href="#" />}>اقرأ المزيد</Button>}
+        action={<Button size="sm" variant="outline" tone="info" render={<a href="#changelog" />}>اقرأ المزيد</Button>}
       >
         صدر الإصدار الثاني، مع بناء أسرع ومحرر جديد للسمات.
       </Banner>

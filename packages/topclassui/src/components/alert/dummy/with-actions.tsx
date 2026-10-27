@@ -10,7 +10,7 @@ export default function Demo() {
         title="Your trial ends in three days"
         actions={(
           <>
-            <Button size="sm" tone="warning" render={<a href="#" />}>Add a payment method</Button>
+            <Button size="sm" tone="warning" render={<a href="#billing" />}>Add a payment method</Button>
             <Button size="sm" variant="outline" tone="warning">Remind me later</Button>
           </>
         )}
@@ -23,7 +23,7 @@ export default function Demo() {
         actions={(
           <>
             <Button size="sm" tone="danger">Retry the deploy</Button>
-            <Button size="sm" variant="outline" tone="danger" render={<a href="#" />}>Read the log</Button>
+            <Button size="sm" variant="outline" tone="danger" render={<a href="#logs" />}>Read the log</Button>
           </>
         )}
       >

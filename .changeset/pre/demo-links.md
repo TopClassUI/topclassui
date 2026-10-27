@@ -2,4 +2,4 @@
 "topclassui": patch
 ---
 
-The demos the CLI copies link to `#` or a fragment such as `#docs` instead of example paths like `/shop` or `/blog?page=2`, which led to a 404 on any site that renders them.
+The demos the CLI copies link to a named fragment such as `#billing` or a query on the page such as `?page=2`, and their forms post to the page they are on, instead of example paths like `/shop`, `/blog?page=2` or `/subscribe`, which led to a 404 on any site that renders them.

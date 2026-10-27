@@ -9,7 +9,7 @@ export default function Demo() {
   return (
     <div dir="rtl" lang="ar" className="max-w-85">
       <EmptyState labels={ar}>
-        <Button size="sm" render={<a href="#" />}>
+        <Button size="sm" render={<a href="#new-project" />}>
           <Svg icon={plus} />
           مشروع جديد
         </Button>

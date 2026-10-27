@@ -13,7 +13,7 @@ const ANSWER = {
 /** Server Fields given the errors an action returned: each lands on its own field, and the values come back as defaults. */
 export default function Demo() {
   return (
-    <Form action="/contact" method="post" className="flex max-w-sm flex-col gap-4">
+    <Form action="?sent" method="post" className="flex max-w-sm flex-col gap-4">
       <Field name="email" label="Email" error={ANSWER.errors.email} required>
         {(control) => <Input {...control} type="email" autoComplete="email" defaultValue={ANSWER.values.email} fullWidth />}
       </Field>

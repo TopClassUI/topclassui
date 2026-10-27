@@ -11,10 +11,10 @@ export default function Demo() {
         <NavbarLink href="#docs" current>Docs</NavbarLink>
         <NavbarLink href="#components">Components</NavbarLink>
         <NavbarLink href="#icons">Icons</NavbarLink>
-        <NavbarLink href="#theming">Theming</NavbarLink>
+        <NavbarLink href="#themes">Theming</NavbarLink>
       </NavbarLinks>
       <NavbarActions>
-        <Button render={<a href="#" />}>Sign in</Button>
+        <Button render={<a href="#sign-in" />}>Sign in</Button>
       </NavbarActions>
     </NavbarRoot>
   )

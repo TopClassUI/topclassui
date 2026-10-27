@@ -1,6 +1,6 @@
 import { Pagination } from '../index.js'
 
-const orders = (page: number) => `#page-${String(page)}`
+const orders = (page: number) => `?page=${String(page)}`
 
 /** Above and below one list: two navs on a page need a name each, so each passes aria-label. */
 export default function Demo() {

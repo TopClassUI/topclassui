@@ -8,7 +8,7 @@ const RING = 'not-forced-colors:outline-solid not-forced-colors:outline-(length:
 /** The small panel Figma 137:705 draws per state: a title bar over a line bar; the title bar is the heading, named for a screen reader. */
 function Sample({ className }: { className?: string }) {
   return (
-    <CardRoot render={<a href="#" />} className={cn('w-37.5 gap-1.5 p-3', className)}>
+    <CardRoot render={<a href="#report" />} className={cn('w-37.5 gap-1.5 p-3', className)}>
       <h2>
         <span className="sr-only">Monthly report</span>
         <Skeleton variant="rect" className="h-2 w-20" />

@@ -4,8 +4,8 @@ import { Button } from '../index.js'
 export default function Demo() {
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <Button render={<a href="#" />}>Read the docs</Button>
-      <Button render={<a href="#" />} variant="outline">Outlined link</Button>
+      <Button render={<a href="#docs" />}>Read the docs</Button>
+      <Button render={<a href="#docs" />} variant="outline">Outlined link</Button>
     </div>
   )
 }

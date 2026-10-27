@@ -1,6 +1,6 @@
 import { Pagination } from '../index.js'
 
-const orders = (page: number) => `#page-${String(page)}`
+const orders = (page: number) => `?page=${String(page)}`
 
 /** 500 pages are still eleven cells: two at each end, two each side of 250 and two gaps. */
 export default function Demo() {

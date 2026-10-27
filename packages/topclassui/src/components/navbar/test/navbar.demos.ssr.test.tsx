@@ -31,16 +31,16 @@ interface Shape {
 
 /** Written out per demo, so a demo that changes, or a part that stops rendering a link, fails here. */
 const DEMOS: Record<string, Shape> = {
-  'basic': { hrefs: ['/', '#docs', '#components', '#icons', '#theming', '#'], current: ['#docs'], navs: ['Main'], sticky: 1 },
+  'basic': { hrefs: ['/', '#docs', '#components', '#icons', '#themes', '#sign-in'], current: ['#docs'], navs: ['Main'], sticky: 1 },
   'many-links': {
-    hrefs: ['/', '#docs', '#components', '#icons', '#theming', '#connectors', '#changelog', 'https://github.com/TopClassUI/topclassui', '#'],
+    hrefs: ['/', '#docs', '#components', '#icons', '#themes', '#connectors', '#changelog', 'https://github.com/TopClassUI/topclassui', '#sign-in'],
     current: ['#components'], navs: ['Main'], sticky: 1,
   },
   'not-sticky': { hrefs: ['/', '#docs', '#blog', '#changelog'], current: ['#blog'], navs: ['Main'], sticky: 0 },
-  'playground': { hrefs: ['/', '#docs', '#components', '#icons', '#'], current: [], navs: ['Main'], sticky: 1 },
-  'rtl': { hrefs: ['/', '#docs', '#components', '#icons', '#theming', '#'], current: ['#docs'], navs: ['التنقل الرئيسي'], sticky: 1 },
+  'playground': { hrefs: ['/', '#docs', '#components', '#icons', '#sign-in'], current: [], navs: ['Main'], sticky: 1 },
+  'rtl': { hrefs: ['/', '#docs', '#components', '#icons', '#themes', '#sign-in'], current: ['#docs'], navs: ['التنقل الرئيسي'], sticky: 1 },
   'tall-page': {
-    hrefs: ['#install', '#install', '#usage', '#theming', '#questions', '#', '#usage', '#theming', '#questions', '#install'],
+    hrefs: ['#install', '#install', '#usage', '#theming', '#questions', '#edit', '#usage', '#theming', '#questions', '#install'],
     current: [], navs: ['On this page'], sticky: 1,
   },
   // The stage Figma draws: a rounded bar in the flow, Docs current, a bell and the account.
@@ -94,7 +94,7 @@ describe('what each demo is there to show', () => {
 
   it('with-search: a search form that is a plain GET, a named field and a named avatar', async () => {
     const html = await render('with-search')
-    expect(html).toContain('<form role="search" class="min-w-0" action="/search">')
+    expect(html).toContain('<form role="search" class="min-w-0" action="?search">')
     expect(html).toMatch(/<input [^>]*type="search"/)
     expect(html).toContain('aria-label="Search the docs"')
     expect(html).toContain('role="img"')

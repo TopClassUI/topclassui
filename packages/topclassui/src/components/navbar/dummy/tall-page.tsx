@@ -21,7 +21,7 @@ export default function Demo() {
           ))}
         </NavbarLinks>
         <NavbarActions>
-          <Button variant="outline" render={<a href="#" />}>Edit this page</Button>
+          <Button variant="outline" render={<a href="#edit" />}>Edit this page</Button>
         </NavbarActions>
       </NavbarRoot>
       {SECTIONS.map((section) => (

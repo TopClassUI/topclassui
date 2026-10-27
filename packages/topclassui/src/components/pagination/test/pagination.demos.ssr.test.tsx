@@ -36,7 +36,7 @@ describe('every demo renders on the server', () => {
       if (!Demo) return
       const html = markup(<Demo />)
       expect(html, file).toContain('<nav ')
-      expect(html, file).toContain('<a href="#page-')
+      expect(html, file).toContain('<a href="?page=')
       expect(html, file).toContain('aria-current="page"')
     })
   }

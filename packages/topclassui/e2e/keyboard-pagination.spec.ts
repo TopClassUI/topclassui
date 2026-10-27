@@ -40,7 +40,7 @@ for (const direction of DIRECTIONS) {
       await openLive(page, 'pagination--middle', { direction })
       for (const name of MIDDLE.slice(0, 8)) await pressTo(page, 'Tab', name)
       await page.keyboard.press('Enter')
-      await expect(page).toHaveURL(/#page-7$/)
+      await expect(page).toHaveURL(/\?page=7$/)
     })
   })
 }

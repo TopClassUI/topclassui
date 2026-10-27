@@ -11,7 +11,7 @@ export default function Demo() {
         </CardHeader>
         <CardBody>Revenue rose 12% against April, driven by renewals.</CardBody>
         <CardFooter>
-          <Button render={<a href="#" />} variant="outline" size="sm">
+          <Button render={<a href="#report" />} variant="outline" size="sm">
             Download PDF
           </Button>
         </CardFooter>

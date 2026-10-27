@@ -12,7 +12,7 @@ export default function Demo() {
         aria-label="Build minutes notice"
         icon={<Svg icon={warning} size="xs" />}
         action={(
-          <Button size="sm" variant="outline" tone="warning" render={<a href="#" />}>
+          <Button size="sm" variant="outline" tone="warning" render={<a href="#billing" />}>
             Upgrade the workspace plan and resume deployments now
           </Button>
         )}

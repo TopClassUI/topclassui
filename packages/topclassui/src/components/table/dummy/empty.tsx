@@ -25,7 +25,7 @@ export default function Demo() {
         emptyFallback={(
           <div className="grid justify-items-center gap-3 py-4">
             <p>Nobody has joined this team yet.</p>
-            <Button size="sm" render={<a href="#" />}>Invite a member</Button>
+            <Button size="sm" render={<a href="#invite" />}>Invite a member</Button>
           </div>
         )}
       />

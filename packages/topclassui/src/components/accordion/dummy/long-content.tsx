@@ -16,7 +16,7 @@ export default function Demo() {
   return (
     <AccordionRoot multiple defaultValue={['word', 'element', 'nested']} className="max-w-105">
       <AccordionItem value="word" title={WORD} headingLevel={2}>
-        <Button size="sm" variant="outline" render={<a href="#" />}>See every order</Button>
+        <Button size="sm" variant="outline" render={<a href="#orders" />}>See every order</Button>
         <p className="pt-2">{WORD}</p>
       </AccordionItem>
       <AccordionItem

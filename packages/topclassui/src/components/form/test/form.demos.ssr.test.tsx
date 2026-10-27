@@ -33,22 +33,22 @@ describe('every demo renders on the server', () => {
     expect(files).toEqual(EXPECTED)
   })
 
-  it('basic: a form that posts to /subscribe, with no noValidate and the email required', async () => {
+  it('basic: a form that posts to its own page, with no noValidate and the email required', async () => {
     const html = await render('basic')
-    expect(html).toMatch(/^<form class="[^"]*" action="\/subscribe" method="post">/)
+    expect(html).toMatch(/^<form class="[^"]*" action="\?subscribed" method="post">/)
     expect(html).not.toMatch(/novalidate/i)
     expect(controlsIn(html)).toEqual(['email: Email: required'])
   })
 
-  it('server-errors: an Input and a Textarea, each named, each invalid, posting to /contact', async () => {
+  it('server-errors: an Input and a Textarea, each named, each invalid, posting to its own page', async () => {
     const html = await render('server-errors')
-    expect(html).toMatch(/^<form class="[^"]*" action="\/contact" method="post">/)
+    expect(html).toMatch(/^<form class="[^"]*" action="\?sent" method="post">/)
     expect(controlsIn(html)).toEqual(['email: Email: required: invalid', 'message: Message: invalid'])
   })
 
   it('rtl: the subscribe form in Arabic, inside an island that carries the direction and the language', async () => {
     const html = await render('rtl')
-    expect(html).toMatch(/^<div class="isolate"><div dir="rtl" lang="ar"><form class="[^"]*" action="\/subscribe" method="post">/)
+    expect(html).toMatch(/^<div class="isolate"><div dir="rtl" lang="ar"><form class="[^"]*" action="\?subscribed" method="post">/)
     expect(controlsIn(html)).toEqual(['name: الاسم', 'email: البريد الإلكتروني: required'])
   })
 

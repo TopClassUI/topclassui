@@ -11,7 +11,7 @@ export default function Demo() {
         <Banner
           tone="warning"
           aria-label="Long notice"
-          action={<Button size="sm" variant="outline" tone="warning" render={<a href="#" />}>Status</Button>}
+          action={<Button size="sm" variant="outline" tone="warning" render={<a href="#status" />}>Status</Button>}
         >
           The deploy is taking longer than usual while the static assets upload to the edge network.
         </Banner>

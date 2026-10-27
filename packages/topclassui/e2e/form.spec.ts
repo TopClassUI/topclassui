@@ -21,9 +21,9 @@ const described = (page: Page, name: string) => field(page, name).evaluate((el) 
 const invalid = (page: Page) => page.locator('#demo [aria-invalid="true"]').evaluateAll((all) => all.map((el) => el.getAttribute('name')))
 
 /** Answers every post to `path` with a page of its own, and keeps each request, so a test reads what the browser sent. */
-async function catchPosts(page: Page, path: string): Promise<Request[]> {
+async function catchPosts(page: Page, url: RegExp): Promise<Request[]> {
   const posts: Request[] = []
-  await page.route(`**${path}`, async (route) => {
+  await page.route(url, async (route) => {
     posts.push(route.request())
     await route.fulfill({ contentType: 'text/html', body: '<!doctype html><title>Sent</title><p>Sent</p>' })
   })
@@ -33,22 +33,22 @@ async function catchPosts(page: Page, path: string): Promise<Request[]> {
 test.describe('with no script: the server HTML posts by itself', () => {
   test.use({ javaScriptEnabled: false })
 
-  test('basic: an empty required email sends nothing; a filled one posts email= to /subscribe', async ({ page }) => {
-    const posts = await catchPosts(page, '/subscribe')
+  test('basic: an empty required email sends nothing; a filled one posts email= to ?subscribed on its own page', async ({ page }) => {
+    const posts = await catchPosts(page, /\?subscribed$/)
     await page.goto(liveUrl('form--basic'))
     expect(await serverEntries(page)).toEqual([['email', '']])
     await page.getByRole('button', { name: 'Subscribe' }).click()
     expect(await field(page, 'Email').evaluate((el) => (el as HTMLInputElement).validity.valueMissing)).toBe(true)
     await field(page, 'Email').fill('omar@example.com')
-    await Promise.all([page.waitForURL('**/subscribe'), page.getByRole('button', { name: 'Subscribe' }).click()])
+    await Promise.all([page.waitForURL(/\?subscribed$/), page.getByRole('button', { name: 'Subscribe' }).click()])
     expect(posts.map((post) => [post.method(), post.postData()])).toEqual([['POST', 'email=omar%40example.com']])
   })
 
-  test('server-errors: an Input and a Textarea in server Fields post what is in them to /contact', async ({ page }) => {
-    const posts = await catchPosts(page, '/contact')
+  test('server-errors: an Input and a Textarea in server Fields post what is in them to ?sent on their own page', async ({ page }) => {
+    const posts = await catchPosts(page, /\?sent$/)
     await page.goto(liveUrl('form--server-errors'))
     await field(page, 'Message').fill('A message long enough to pass')
-    await Promise.all([page.waitForURL('**/contact'), page.getByRole('button', { name: 'Send' }).click()])
+    await Promise.all([page.waitForURL(/\?sent$/), page.getByRole('button', { name: 'Send' }).click()])
     expect(posts.map((post) => post.postData())).toEqual(['email=taken%40example.com&message=A+message+long+enough+to+pass'])
   })
 })

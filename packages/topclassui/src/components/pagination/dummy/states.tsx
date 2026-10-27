@@ -1,6 +1,6 @@
 import { Pagination } from '../index.js'
 
-const blog = (page: number) => `#page-${String(page)}`
+const blog = (page: number) => `?page=${String(page)}`
 
 /** The four states the frame draws, at xs over three pages so each full row fits its cell: on the first page and the
  * last, first and previous or next and last are spans, not links; disabled, every cell is. Each nav has its own name. */

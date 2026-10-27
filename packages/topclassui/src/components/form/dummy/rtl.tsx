@@ -9,7 +9,7 @@ export default function Demo() {
   return (
     <TopClassProvider direction="rtl" locale="ar">
       <div dir="rtl" lang="ar">
-        <Form action="/subscribe" method="post" className="flex max-w-sm flex-col gap-4">
+        <Form action="?subscribed" method="post" className="flex max-w-sm flex-col gap-4">
           <Field name="name" label="الاسم">
             {(control) => <Input {...control} autoComplete="name" fullWidth />}
           </Field>

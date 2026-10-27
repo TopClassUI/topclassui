@@ -11,7 +11,7 @@ export default function Demo() {
           { href: '#components', label: 'Components' },
           { href: '#navigation', label: 'Navigation and disclosure' },
           { href: '#breadcrumb', label: 'Breadcrumb' },
-          { href: '#examples', label: 'Examples' },
+          { href: '#breadcrumb-examples', label: 'Examples' },
           { href: '#server', label: 'Server rendering' },
           { href: '#json-ld', label: 'Structured data' },
           { label: 'Escaping a label' },
