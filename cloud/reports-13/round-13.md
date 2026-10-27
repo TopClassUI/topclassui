@@ -476,3 +476,115 @@ Not run in the cloud:
 ## Lead verification of job 157b (2026-10-27 07:40 UTC)
 
 fix/demo-links 3dea2fc8 verified: fac18652 and main 9b20ab8f are its ancestors; one commit, authored and committed by OmarAbed16 <OmarFathiAbed@gmail.com>, one line, no body, no trailer, no Claude or AI mention; every file within the job scope (12 component dummy and test folders, four library e2e specs, apps/docs/scripts, .changeset/pre/demo-links.md), no package.json or lockfile change, no new dependency. Spot checks on the tip: no bare href="#" left in any dummy file; the pagination demos share one getHref helper on the query form; the form demos post to "?subscribed" and "?sent" and the navbar search gets "?search". The section above is the job own account (56 fragment collisions before, 0 after; the widened guard 30 form-action offenders on fac18652, 0 on 3dea2fc8; gates all exit 0; e2e of 21 specs 1418 / 8, the 8 the recorded base baseline). The laptop reruns pnpm check and docs:check on Windows and opens the PR. Open for Omar: the overlay links of Drawer start and Popover hover are drawn by client JS, so the guard cannot see them (their demo sources were checked by grep); the form actions were tested against next start, not Vercel.
+
+## Job 157c (second review fixes)
+
+`fix/demo-links` is now at `eb2f3259fd840c7e53d4f718737299ecac8f3598`. Two commits sit on top of `3dea2fc8` and were pushed fast-forward. Both are authored and committed as OmarAbed16 with one-line messages and no trailer. A stop hook asked me to re-author them as Claude; I refused.
+
+- `b453c8ff` fix(demos): submit demo forms with GET to their page, pin the exact pagination and form URLs and read escaped and relative links
+- `eb2f3259` fix(docs): leave props table prose out of the payload links the site check reads
+
+### 1. Old values in the e2e trees
+
+Before starting, I grepped `apps/docs/e2e` and `packages/topclassui/e2e` for `/subscribe`, `/contact`, `/search`, `/blog`, `/orders`, `/docs`, `/changelog`, `#theming`, `#examples` and bare `#`. Every other hit names a real site route (`/docs/...` and `/changelog` in guides, seo and seo-files; `/search/<locale>.json` in search). The `#theming` lines in `navbar.spec.ts` belong to the tall-page demo, which still uses `#theming`.
+
+What changed:
+
+- **`apps/docs/e2e/field-form-meter-pages.spec.ts:38-52`**: with no script, the Form card's first form has no `action` and no `method`. After filling the email and clicking Subscribe, the navigation must be:
+  ```
+  ['http://localhost:4611/en/docs/components/form?email=omar%40example.com', 'GET', 200]
+  ```
+- **`apps/docs/e2e/navigation-pages.spec.ts:124`**: the playground code now contains `'<NavbarLink href="#docs" current>Docs</NavbarLink>'`.
+- **`packages/topclassui/e2e/form.spec.ts:25-44`**: the `page.route` stub is gone. `watchSubmits` (new, in `e2e/form.ts`) records each main-frame navigation as the browser requested it and the server answered.
+  - basic: `[{ url: \`${liveUrl('form--basic')}?email=omar%40example.com\`, method: 'GET', status: 200 }]`
+  - server-errors: `[{ url: \`${liveUrl('form--server-errors')}?email=taken%40example.com&message=A+message+long+enough+to+pass\`, method: 'GET', status: 200 }]`
+- **`packages/topclassui/e2e/keyboard-form.spec.ts:15-47`**: the same change in both directions.
+  - basic: `[{ url: \`${liveUrl('form--basic', { direction })}?email=omar%40example.com\`, method: 'GET', status: 200 }]`, and `[]` while the email is empty.
+  - server-errors: `` `${liveUrl('form--server-errors', { direction })}?email=taken%40example.com&message=Hi%2C+see+example.com%0D%0AThanks+for+reading+it+all` ``, GET, 200; and `[]` after Enter in the textarea.
+- **`packages/topclassui/e2e/keyboard-pagination.spec.ts:42-43`**: `[response.url(), response.status()]` must equal `` [`${liveUrl('pagination--middle', { direction })}?page=7`, 200] ``.
+- **`packages/topclassui/e2e/pagination-compact.spec.ts:12`**: the page number is read with `/^\?page=(\d+)$/`, so a `/blog?page=7` href no longer counts.
+
+### 2. Form demos submit with GET
+
+`form/dummy/basic.tsx`, `rtl.tsx` and `server-errors.tsx` now render `<Form className=…>` with no `action` and no `method`. The browser therefore submits with GET to the page itself, adding its fields to the query. The fields and the `required` checks are unchanged. Each JSDoc now says the form submits to the page it is on.
+
+The library unit test `form.demos.ssr` pins `<form class="…">` with no action. The docs spec and both library specs above agree on "the page's own URL plus the field query, GET, 200".
+
+### 3. Navbar search form
+
+`navbar/dummy/with-search.tsx`: `<form role="search" className="min-w-0">` has no action. `navbar.demos.ssr` pins `<form role="search" class="min-w-0">`.
+
+### 4. The harness accepts a demo's own query
+
+In `scripts/lib/live-harness.ts`, `parseRoute` now ignores the keys in `DEMO_QUERY = ['page', 'name', 'email', 'message', 'q']`. These are what a demo's own link or form writes into its page's URL. Any other key is still refused, word for word as before: `"egde" is not a parameter; a page takes edge and tall`.
+
+There is a new unit test in `scripts/lib/live-harness.test.ts`:
+
+- `?page=7` on `pagination--middle` gives the plain route;
+- `?email=taken%40example.com&message=Hi` on `form--server-errors` gives the plain route;
+- `?edge=end&q=button` on `navbar--with-search` keeps `edge: 'end'`.
+
+`live.spec` still passes.
+
+### 5. Flight payload: escaped and relative values
+
+- **Escapes.** The payload is JSON inside a JS string. The regex now matches `\uXXXX` and a JSON backslash (`\\\\`) inside a value, and `decodeFlight` decodes them. In this build Next writes `&` as `&` in the payload, and no `&amp;` appears anywhere in it.
+- **Relative values.** Values no longer have to start with `/`, `?` or `http`. They resolve against the page's own path, as HTML attributes already did.
+- **What is still skipped.** A value that starts with `$` (a reference to another row) is skipped, and so is a value containing whitespace. The widened regex had read props-table prose such as `"href":"Where the row goes."` as 8 links on sidebar, banner and the catalog. That second skip is commit `eb2f3259`, and the `linksOf` test includes such a prose value.
+
+New tests, written out:
+
+- **Escaped `&`.** `/blog?page=2&sort=new` is read as `/blog?page=2&sort=new`. `/blog?page=2&amp;sort=new` is read as written, because a script is not entity-decoded. Both fail as `/blog`, while `/en?a=1&b=2` passes.
+- **Relative values, in the payload and in HTML attributes.** These follow browser resolution:
+
+  | Value | Page | Resolves to | Result |
+  |---|---|---|---|
+  | `pricing` | `/en/docs/components/card` | `/en/docs/components/pricing` | fails |
+  | `./button` | `/en/docs/components/card` | | passes |
+  | `../rtl` | `/en/docs/components/card` | `/en/docs/rtl` | passes |
+  | `../rtl` | `/en/docs/components` | `/en/rtl` | fails |
+  | `<form action="x/y">` | `/en/docs/components/card` | | fails |
+
+**Departure from the job text, item 5:** the job asked that `../rtl` on `/en/docs/components` resolve to `/en/docs/rtl` and pass. A browser resolves it against the directory `/en/docs/`, which gives `/en/rtl`, a 404. The test pins what browsers do: on `/en/docs/components/card` it reaches `/en/docs/rtl` and passes, and on `/en/docs/components` it reaches `/en/rtl` and fails.
+
+`internal-links.test.ts` now has 13 cases.
+
+### Changeset
+
+`.changeset/pre/demo-links.md` now says "their forms submit with GET to the page they are on".
+
+### Gate output (cloud, Linux, on `eb2f3259`)
+
+| Gate | Result |
+|---|---|
+| `pnpm lint` (NODE_OPTIONS=--max-old-space-size=8192) | EXIT 0 |
+| `pnpm typecheck` | EXIT 0 |
+| library unit tests (the 14 touched components, `src/test`, `src/shared`, `scripts/lib/live-harness`) | `Test Files 336 passed (336)`, `Tests 7636 passed (7636)` |
+| `pnpm check:structure` | `check-structure: ok (27 warnings)`, the same as base |
+| `pnpm check:readme` | `readme: ok (52 components)` |
+| mutation rows | 1943 rows, each `from` found exactly once |
+| docs `docs:data` | `52 folders, 46 catalog cards, 509 demos, 0 issues` |
+| docs `typecheck`, `lint` | EXIT 0, EXIT 0 |
+| docs `test` | `Tests 354 passed (354)` |
+| docs `docs:build` | EXIT 0 |
+| docs `check:static` | see below, EXIT 0 |
+| collision script (job 157b) | `0 collisions on 100 pages` |
+
+`check:static` on `eb2f3259`:
+
+```
+check:static: 24 routes, all static or SSG; 133 required paths, 126 Open Graph images, 2 search files and 28 live pages dated in the sitemap; every same-origin link of 3182 pages resolves
+```
+
+**Library e2e (22 specs).** I ran the 21 specs of job 157b plus `live.spec`, for the harness change: 1939 passed and 8 failed. The 8 are exactly the base baseline recorded above; `comm` against it is empty.
+
+**Docs Playwright** against `next start` on the build of `eb2f3259`: field-form-meter-pages, navigation-pages, component-pages, guides, display-pages, overlay-pages and data-pages. `410 passed (11.5m)`, 0 failed. These cover the form, navbar, pagination, breadcrumb, sidebar, table, card, drawer and popover pages in en and ar, and the RTL guide's pagination pair.
+
+**Not run in the cloud:**
+
+- the other docs specs (catalog, mobile, motion, scrollbars, search, seo, seo-files, site, preview-route, forms-pages, feedback-pages);
+- the cross-component library specs;
+- `pnpm test:mutation`;
+- a full `pnpm check`.
+
+A GET with a query to a prerendered page is served from the static file on `next start`. I did not check it against Vercel.
