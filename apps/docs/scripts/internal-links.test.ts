@@ -20,11 +20,11 @@ describe('originsOf', () => {
 })
 
 describe('linksOf', () => {
-  it('reads href in both quote styles, a form action, formaction and the links of the RSC payload', () => {
+  it('reads href in both quote styles, a form action, formaction and the links of the RSC payload, never a reference or a props table prose', () => {
     const html = [
       `<a href="/en?a=1&amp;b=2">x</a><link rel="alternate" href='https://topclassui.com/ar'>`,
       '<form role="search" action="?search"><button formAction="/send">s</button></form>',
-      '<script>self.__next_f.push([1,"[\\"$\\",\\"a\\",null,{\\"href\\":\\"/shop\\",\\"children\\":\\"Shop\\"}],{\\"action\\":\\"/subscribe\\",\\"href\\":\\"$undefined\\"}"])</script>',
+      '<script>self.__next_f.push([1,"[\\"$\\",\\"a\\",null,{\\"href\\":\\"/shop\\",\\"children\\":\\"Shop\\"}],{\\"action\\":\\"/subscribe\\",\\"href\\":\\"$undefined\\"},{\\"href\\":\\"Where the row goes.\\"}"])</script>',
     ].join('')
     expect(linksOf(html)).toEqual(['/en?a=1&b=2', 'https://topclassui.com/ar', '?search', '/send', '/shop', '/subscribe'])
   })

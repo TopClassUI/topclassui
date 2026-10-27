@@ -30,7 +30,7 @@ export function linksOf(html: string): string[] {
   // A value inside the payload is JSON inside a JS string: \uXXXX stands for &, < and >, and a JSON backslash is four.
   const flight = [...html.matchAll(/\\"(?:href|action|formAction)\\":\\"((?:[^"\\]|\\u[0-9a-fA-F]{4}|\\\\\\\\)*)\\"/g)]
     .map((match) => decodeFlight(match[1] ?? ''))
-    .filter((value) => !value.startsWith('$'))
+    .filter((value) => !value.startsWith('$') && !/\s/.test(value))
   return [
     ...attribute(/\shref=(?:"([^"]*)"|'([^']*)')/g),
     ...attribute(/<form\b[^>]*?\saction=(?:"([^"]*)"|'([^']*)')/gi),
@@ -39,7 +39,7 @@ export function linksOf(html: string): string[] {
   ]
 }
 
-/** A value of the payload as the page reads it; `$` starts a reference to another row, never a link. */
+/** A value of the payload as the page reads it. Kept out above: `$` starts a reference to another row, and a value with a space is a props table's prose. */
 function decodeFlight(value: string): string {
   return value.replace(/\\\\\\\\/g, '\\').replace(/\\u([0-9a-fA-F]{4})/g, (_, code: string) => String.fromCharCode(Number.parseInt(code, 16)))
 }
