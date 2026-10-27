@@ -588,3 +588,11 @@ check:static: 24 routes, all static or SSG; 133 required paths, 126 Open Graph i
 - a full `pnpm check`.
 
 A GET with a query to a prerendered page is served from the static file on `next start`. I did not check it against Vercel.
+
+## Lead verification of job 157c (2026-10-27 08:35 UTC)
+
+- `fix/demo-links` at `eb2f3259`: `3dea2fc8` is an ancestor; two commits, both OmarAbed16 one-liners, no trailer, no banned word in the messages or the added lines; every file inside the job's scope (form and navbar demos and ssr tests, library e2e and `scripts/lib`, docs e2e and `scripts`, the changeset); `package.json` and the lockfile untouched.
+- The tip holds no stale assertion: no `action="/subscribe"`, `"/contact"` or `"/search"`, no `href="#"`, no `#examples`; the `#theming` reads left are `navbar.spec` against `tall-page`, whose section list still carries `id: 'theming'`, and `e2e/fixtures/navbar.tsx`, a library fixture no site page renders.
+- Rerun here on `eb2f3259`: `live-harness.test`, `form.demos.ssr` and `navbar.demos.ssr` (97 passed), `internal-links.test` (13 passed).
+- For the laptop: the departure in item 5 is right, a browser resolves `../rtl` on `/en/docs/components` to `/en/rtl`, so the test pins that; the GET-with-query answer on Vercel and the full `pnpm check` remain for the Windows gates.
+- The branch is ready for the laptop's gates and its PR.
