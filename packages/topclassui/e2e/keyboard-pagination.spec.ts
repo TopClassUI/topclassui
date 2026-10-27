@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 import { DIRECTIONS } from '../scripts/lib/harness.js'
 import { expectRing, focused, pressTo } from './keyboard.js'
-import { openLive } from './live.js'
+import { liveUrl, openLive } from './live.js'
 
 // R-5.6-1: pagination is a navigation landmark of links. Tab walks them in reading order with a ring on each,
 // the current page says so and stays a stop, a control with nowhere to go is no stop, and Enter follows a link.
@@ -39,8 +39,8 @@ for (const direction of DIRECTIONS) {
     test('Enter follows the focused link', async ({ page }) => {
       await openLive(page, 'pagination--middle', { direction })
       for (const name of MIDDLE.slice(0, 8)) await pressTo(page, 'Tab', name)
-      await page.keyboard.press('Enter')
-      await expect(page).toHaveURL(/\?page=7$/)
+      const [response] = await Promise.all([page.waitForResponse((answer) => answer.request().isNavigationRequest()), page.keyboard.press('Enter')])
+      expect([response.url(), response.status()]).toEqual([`${liveUrl('pagination--middle', { direction })}?page=7`, 200])
     })
   })
 }

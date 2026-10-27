@@ -94,7 +94,7 @@ describe('what each demo is there to show', () => {
 
   it('with-search: a search form that is a plain GET, a named field and a named avatar', async () => {
     const html = await render('with-search')
-    expect(html).toContain('<form role="search" class="min-w-0" action="?search">')
+    expect(html).toContain('<form role="search" class="min-w-0">')
     expect(html).toMatch(/<input [^>]*type="search"/)
     expect(html).toContain('aria-label="Search the docs"')
     expect(html).toContain('role="img"')

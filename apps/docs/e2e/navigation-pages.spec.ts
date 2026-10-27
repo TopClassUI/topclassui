@@ -121,7 +121,7 @@ test('Navbar: the playground drives sticky on the bar and current on its link, a
   await expect(bar.getByRole('link', { name: 'Docs' })).toHaveAttribute('aria-current', 'page')
   const code = navbar.locator('pre').first()
   await expect(code).toContainText('<NavbarRoot sticky={false}>')
-  await expect(code).toContainText('<NavbarLink href="/docs" current>Docs</NavbarLink>')
+  await expect(code).toContainText('<NavbarLink href="#docs" current>Docs</NavbarLink>')
   expect(errors).toEqual([])
 })
 

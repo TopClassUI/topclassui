@@ -9,7 +9,7 @@ const PAGINATION = DEMOS.filter((demo) => demo.startsWith('pagination--'))
 
 /** Each nav as the browser draws it: the boxes on screen, and the pages its links lead to. */
 const readNavs = () => [...document.querySelectorAll('nav')].map((nav) => {
-  const page = (href: string | null) => Number(/page=(\d+)/.exec(href ?? '')?.[1])
+  const page = (href: string | null) => Number(/^\?page=(\d+)$/.exec(href ?? '')?.[1])
   const shown = [...nav.querySelectorAll('li')].filter((item) => item.checkVisibility())
   const links = [...nav.querySelectorAll('a[href]')]
   const visible = links.filter((link) => link.checkVisibility())

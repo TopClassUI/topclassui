@@ -27,13 +27,21 @@ export function originsOf(siteUrl: string): string[] {
 /** Every link of `html` a crawler follows: href, a form's action and formaction, and the same props in the inline RSC payload, where a closed overlay's links live. */
 export function linksOf(html: string): string[] {
   const attribute = (pattern: RegExp) => [...html.matchAll(pattern)].map((match) => decodeEntities(match[1] ?? match[2] ?? ''))
-  const flight = [...html.matchAll(/\\"(?:href|action|formAction)\\":\\"((?:\/|\?|https?:)[^"\\]*)\\"/g)].map((match) => match[1] ?? '')
+  // A value inside the payload is JSON inside a JS string: \uXXXX stands for &, < and >, and a JSON backslash is four.
+  const flight = [...html.matchAll(/\\"(?:href|action|formAction)\\":\\"((?:[^"\\]|\\u[0-9a-fA-F]{4}|\\\\\\\\)*)\\"/g)]
+    .map((match) => decodeFlight(match[1] ?? ''))
+    .filter((value) => !value.startsWith('$'))
   return [
     ...attribute(/\shref=(?:"([^"]*)"|'([^']*)')/g),
     ...attribute(/<form\b[^>]*?\saction=(?:"([^"]*)"|'([^']*)')/gi),
     ...attribute(/\sformaction=(?:"([^"]*)"|'([^']*)')/gi),
     ...flight,
   ]
+}
+
+/** A value of the payload as the page reads it; `$` starts a reference to another row, never a link. */
+function decodeFlight(value: string): string {
+  return value.replace(/\\\\\\\\/g, '\\').replace(/\\u([0-9a-fA-F]{4})/g, (_, code: string) => String.fromCharCode(Number.parseInt(code, 16)))
 }
 
 function decodeEntities(value: string): string {

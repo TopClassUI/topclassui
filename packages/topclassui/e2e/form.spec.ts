@@ -1,14 +1,14 @@
 import AxeBuilder from '@axe-core/playwright'
-import { expect, test, type Page, type Request } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
 import { DIRECTIONS } from '../scripts/lib/harness.js'
 import { CLIENT_ENTRY } from '../scripts/lib/live-harness.js'
-import { serverEntries } from './form.js'
+import { serverEntries, watchSubmits } from './form.js'
 import { expectNoSidewaysScroll, liveErrors, liveUrl, openLive } from './live.js'
 import { boxOf } from './overlay.js'
 import { urlFor } from './pages.js'
 
-// What happy-dom cannot do: post a form with no script and read what the browser sent, React's reset in a real
+// What happy-dom cannot do: submit a form with no script and read what the browser sent, React's reset in a real
 // browser, the focus after an answer, a submit replayed after a late script, and where the fields land on a screen.
 
 const DEMOS = ['basic', 'form-action', 'rtl', 'server-errors'].map((name) => `form--${name}`)
@@ -20,36 +20,28 @@ const described = (page: Page, name: string) => field(page, name).evaluate((el) 
   .split(' ').filter(Boolean).map((id) => document.getElementById(id)?.textContent ?? `(missing ${id})`))
 const invalid = (page: Page) => page.locator('#demo [aria-invalid="true"]').evaluateAll((all) => all.map((el) => el.getAttribute('name')))
 
-/** Answers every post to `path` with a page of its own, and keeps each request, so a test reads what the browser sent. */
-async function catchPosts(page: Page, url: RegExp): Promise<Request[]> {
-  const posts: Request[] = []
-  await page.route(url, async (route) => {
-    posts.push(route.request())
-    await route.fulfill({ contentType: 'text/html', body: '<!doctype html><title>Sent</title><p>Sent</p>' })
-  })
-  return posts
-}
-
-test.describe('with no script: the server HTML posts by itself', () => {
+test.describe('with no script: the server HTML submits by itself, with GET to its own page', () => {
   test.use({ javaScriptEnabled: false })
 
-  test('basic: an empty required email sends nothing; a filled one posts email= to ?subscribed on its own page', async ({ page }) => {
-    const posts = await catchPosts(page, /\?subscribed$/)
+  test('basic: an empty required email sends nothing; a filled one asks for its own page with ?email=', async ({ page }) => {
     await page.goto(liveUrl('form--basic'))
+    const submits = watchSubmits(page)
     expect(await serverEntries(page)).toEqual([['email', '']])
     await page.getByRole('button', { name: 'Subscribe' }).click()
     expect(await field(page, 'Email').evaluate((el) => (el as HTMLInputElement).validity.valueMissing)).toBe(true)
     await field(page, 'Email').fill('omar@example.com')
-    await Promise.all([page.waitForURL(/\?subscribed$/), page.getByRole('button', { name: 'Subscribe' }).click()])
-    expect(posts.map((post) => [post.method(), post.postData()])).toEqual([['POST', 'email=omar%40example.com']])
+    const sent = `${liveUrl('form--basic')}?email=omar%40example.com`
+    await Promise.all([page.waitForURL(sent), page.getByRole('button', { name: 'Subscribe' }).click()])
+    expect(submits).toEqual([{ url: sent, method: 'GET', status: 200 }])
   })
 
-  test('server-errors: an Input and a Textarea in server Fields post what is in them to ?sent on their own page', async ({ page }) => {
-    const posts = await catchPosts(page, /\?sent$/)
+  test('server-errors: an Input and a Textarea in server Fields send what is in them in the query of their own page', async ({ page }) => {
     await page.goto(liveUrl('form--server-errors'))
+    const submits = watchSubmits(page)
     await field(page, 'Message').fill('A message long enough to pass')
-    await Promise.all([page.waitForURL(/\?sent$/), page.getByRole('button', { name: 'Send' }).click()])
-    expect(posts.map((post) => post.postData())).toEqual(['email=taken%40example.com&message=A+message+long+enough+to+pass'])
+    const sent = `${liveUrl('form--server-errors')}?email=taken%40example.com&message=A+message+long+enough+to+pass`
+    await Promise.all([page.waitForURL(sent), page.getByRole('button', { name: 'Send' }).click()])
+    expect(submits).toEqual([{ url: sent, method: 'GET', status: 200 }])
   })
 })
 

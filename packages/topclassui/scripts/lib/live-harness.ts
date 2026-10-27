@@ -41,6 +41,9 @@ export function routeFor(demo: string, mode: Mode, direction: Direction, options
   return `/${pageName(demo, mode, direction)}${query.length > 0 ? `?${query.join('&')}` : ''}`
 }
 
+/** What a demo's own link or form writes into its page's URL (Pagination's ?page=, a GET form's fields): the page is the same, so it is ignored. */
+export const DEMO_QUERY: readonly string[] = ['page', 'name', 'email', 'message', 'q']
+
 const oneOf = <T extends string>(list: readonly T[], value: string | undefined): value is T =>
   (list as readonly string[]).includes(value ?? '')
 
@@ -65,6 +68,7 @@ export function parseRoute(url: string): Route | { error: string } | null {
 
   // toast is taken too, for the toast spec's placements; the message keeps the words e2e/live.spec.ts reads verbatim.
   for (const key of searchParams.keys()) {
+    if (DEMO_QUERY.includes(key)) continue
     if (key !== 'edge' && key !== 'tall' && key !== 'toast') return { error: `"${key}" is not a parameter; a page takes edge and tall` }
   }
   const edge = searchParams.get('edge')

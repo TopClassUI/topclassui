@@ -35,13 +35,19 @@ test('Field, Form and Meter have no Try it: the stage shows the basic demo, and 
   await expect(card(page, 'meter').getByRole('meter', { name: 'Battery' })).toHaveAttribute('aria-valuenow', '60')
 })
 
-test('Form: the subscribe form posts with no script, and the browser asks for the email first', async ({ browser }) => {
+test('Form: the subscribe form submits with no script, with GET to this page, and the browser asks for the email first', async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false })
   const page = await context.newPage()
   await page.goto('/en/docs/components/form')
   const form = card(page, 'form').locator('form').first()
-  await expect(form).toHaveAttribute('action', '/subscribe')
-  await expect(form.getByRole('textbox', { name: 'Email' })).toHaveAttribute('required', '')
+  await expect(form).not.toHaveAttribute('action')
+  await expect(form).not.toHaveAttribute('method')
+  const email = form.getByRole('textbox', { name: 'Email' })
+  await expect(email).toHaveAttribute('required', '')
+  await email.fill('omar@example.com')
+  const [response] = await Promise.all([page.waitForResponse((answer) => answer.request().isNavigationRequest()), form.getByRole('button', { name: 'Subscribe' }).click()])
+  expect([response.url(), response.request().method(), response.status()])
+    .toEqual(['http://localhost:4611/en/docs/components/form?email=omar%40example.com', 'GET', 200])
   await context.close()
 })
 

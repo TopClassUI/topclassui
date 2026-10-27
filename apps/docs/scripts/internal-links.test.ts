@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { brokenLinks, linksOf, originsOf, redirectTarget, sameOriginPath } from './lib/internal-links.js'
 
 const ORIGINS = ['https://topclassui.com', 'http://topclassui.com', 'https://www.topclassui.com', 'http://www.topclassui.com']
-const BUILT = new Set(['/en', '/en/docs/installation', '/en/docs/rtl', '/en/docs/components', '/en/docs/components/button', '/llms.txt'])
+const BUILT = new Set(['/en', '/en/docs/installation', '/en/docs/rtl', '/en/docs/components', '/en/docs/components/button', '/en/docs/components/card', '/llms.txt'])
 const isBuilt = (path: string) => BUILT.has(path)
 // The three redirects of .next/routes-manifest.json, as the 16.3.8 build writes them.
 const REDIRECTS = [
@@ -90,6 +90,27 @@ describe('brokenLinks', () => {
     expect(check('/en', '<form action="/subscribe" method="post"><button formaction="/contact">s</button></form>')).toEqual([
       { href: '/subscribe', page: '/en' },
       { href: '/contact', page: '/en' },
+    ])
+  })
+
+  it('reads a payload value with an escaped & in its query, and the path before it decides', () => {
+    const html = '<script>self.__next_f.push([1,"{\\"href\\":\\"/blog?page=2\\u0026sort=new\\"},{\\"href\\":\\"/blog?page=2&amp;sort=new\\"},{\\"href\\":\\"/en?a=1\\u0026b=2\\"}"])</script>'
+    expect(linksOf(html)).toEqual(['/blog?page=2&sort=new', '/blog?page=2&amp;sort=new', '/en?a=1&b=2'])
+    expect(check('/en', html)).toEqual([
+      { href: '/blog?page=2&sort=new', page: '/en' },
+      { href: '/blog?page=2&amp;sort=new', page: '/en' },
+    ])
+  })
+
+  it('resolves a relative link against the page, as a browser does, in the payload and in the HTML', () => {
+    const payload = (value: string) => `<script>self.__next_f.push([1,"{\\"href\\":\\"${value}\\"}"])</script>`
+    expect(check('/en/docs/components/card', payload('pricing'))).toEqual([{ href: 'pricing', page: '/en/docs/components/card' }])
+    expect(check('/en/docs/components/card', payload('./button'))).toEqual([])
+    expect(check('/en/docs/components/card', payload('../rtl'))).toEqual([])
+    expect(check('/en/docs/components', payload('../rtl'))).toEqual([{ href: '../rtl', page: '/en/docs/components' }])
+    expect(check('/en/docs/components/card', '<a href="pricing">p</a><a href="../rtl">r</a><form action="./button"></form><form action="x/y"></form>')).toEqual([
+      { href: 'pricing', page: '/en/docs/components/card' },
+      { href: 'x/y', page: '/en/docs/components/card' },
     ])
   })
 

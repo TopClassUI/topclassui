@@ -9,3 +9,15 @@ export function serverEntries(page: Page, form = 'form'): Promise<[string, strin
     return [...new FormData(node).entries()].map(([key, value]): [string, string] => [key, typeof value === 'string' ? value : value.name])
   })
 }
+
+export interface Submit { url: string, method: string, status: number }
+
+/** Every page the main frame goes to from now on, as the browser asked for it and the server answered: a native submit is one. */
+export function watchSubmits(page: Page): Submit[] {
+  const submits: Submit[] = []
+  page.on('response', (response) => {
+    const request = response.request()
+    if (request.isNavigationRequest() && request.frame() === page.mainFrame()) submits.push({ url: response.url(), method: request.method(), status: response.status() })
+  })
+  return submits
+}

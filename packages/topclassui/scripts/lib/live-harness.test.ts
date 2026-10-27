@@ -65,6 +65,15 @@ describe('parsing a request', () => {
       .toEqual({ demo: 'tooltip--basic', mode: 'dark', direction: 'rtl', edge: 'top', tall: false })
   })
 
+  it('ignores the query a demo writes with its own link or form, and still reads the parameters beside it', () => {
+    expect(parseRoute('/pagination--middle--light--ltr.html?page=7'))
+      .toEqual({ demo: 'pagination--middle', mode: 'light', direction: 'ltr', edge: null, tall: false })
+    expect(parseRoute('/form--server-errors--light--rtl.html?email=taken%40example.com&message=Hi'))
+      .toEqual({ demo: 'form--server-errors', mode: 'light', direction: 'rtl', edge: null, tall: false })
+    expect(parseRoute('/navbar--with-search--dark--ltr.html?edge=end&q=button'))
+      .toEqual({ demo: 'navbar--with-search', mode: 'dark', direction: 'ltr', edge: 'end', tall: false })
+  })
+
   it('leaves everything that is no page to Vite', () => {
     expect(parseRoute('/')).toBeNull()
     expect(parseRoute('/src/components/tooltip/dummy/basic.tsx')).toBeNull()

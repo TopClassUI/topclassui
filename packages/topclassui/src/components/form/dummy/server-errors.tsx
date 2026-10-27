@@ -10,10 +10,10 @@ const ANSWER = {
   values: { email: 'taken@example.com', message: 'Hi, see example.com' },
 }
 
-/** Server Fields given the errors an action returned: each lands on its own field, and the values come back as defaults. */
+/** Server Fields given the errors an action returned: each lands on its own field, the values come back as defaults, and it submits to the page it is on. */
 export default function Demo() {
   return (
-    <Form action="?sent" method="post" className="flex max-w-sm flex-col gap-4">
+    <Form className="flex max-w-sm flex-col gap-4">
       <Field name="email" label="Email" error={ANSWER.errors.email} required>
         {(control) => <Input {...control} type="email" autoComplete="email" defaultValue={ANSWER.values.email} fullWidth />}
       </Field>
